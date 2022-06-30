@@ -29,6 +29,8 @@ struct WalletApp: SwiftUI.App {
             #if os(macOS)
                 .frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
             #endif
+            Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
+                .padding()
         }
     }
 }
