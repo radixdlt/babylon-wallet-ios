@@ -5,6 +5,10 @@ import PackageDescription
 
 let package = Package(
     name: "babylon-wallet-swift",
+    platforms: [
+        .macOS(.v12), // for development purposes
+        .iOS(.v15) // `task` in SwiftUI
+    ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
