@@ -1,4 +1,4 @@
-# babylon-wallet-swift
+# babylon-wallet-ios
 
 An iOS wallet for interacting with the [Radix DLT ledger][radixdlt].
 
