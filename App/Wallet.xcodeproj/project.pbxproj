@@ -115,6 +115,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Wallet (iOS)" */;
 			buildPhases = (
+				E68FEA33286DD67200992DFA /* SwiftFormat */,
 				E6805BC0286DB3ED00861180 /* Sources */,
 				E6805BC1286DB3ED00861180 /* Frameworks */,
 				E6805BC2286DB3ED00861180 /* Resources */,
@@ -135,6 +136,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Wallet (macOS)" */;
 			buildPhases = (
+				E68FEA34286DD72F00992DFA /* SwiftFormat */,
 				E6805BC6286DB3ED00861180 /* Sources */,
 				E6805BC7286DB3ED00861180 /* Frameworks */,
 				E6805BC8286DB3ED00861180 /* Resources */,
@@ -206,6 +208,45 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E68FEA33286DD67200992DFA /* SwiftFormat */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftFormat;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "swift run -c release --package-path ../Sources/BuildTools swiftformat \"$SRCROOT/../\"\n";
+		};
+		E68FEA34286DD72F00992DFA /* SwiftFormat */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftFormat;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "swift run -c release --package-path ../Sources/BuildTools swiftformat \"$SRCROOT/../\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E6805BC0286DB3ED00861180 /* Sources */ = {

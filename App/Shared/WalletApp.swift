@@ -11,30 +11,31 @@ import SwiftUI
 
 typealias App = AppFeature.App
 
+// MARK: - WalletApp
 @main
 struct WalletApp: SwiftUI.App {
-    let store: Store
+	let store: Store
 
-    init() {
-        self.store = Store(
-            initialState: .init(),
-            reducer: App.reducer,
-            environment: .init()
-        )
-    }
-    
-    var body: some Scene {
-        WindowGroup {
-            App.View(store: store)
-            #if os(macOS)
-                .frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
-            #endif
-            Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
-                .padding()
-        }
-    }
+	init() {
+		store = Store(
+			initialState: .init(),
+			reducer: App.reducer,
+			environment: .init()
+		)
+	}
+
+	var body: some Scene {
+		WindowGroup {
+			App.View(store: store)
+			#if os(macOS)
+				.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
+			#endif
+			Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
+				.padding()
+		}
+	}
 }
 
 extension WalletApp {
-    typealias Store = ComposableArchitecture.Store<App.State, App.Action>
+	typealias Store = ComposableArchitecture.Store<App.State, App.Action>
 }

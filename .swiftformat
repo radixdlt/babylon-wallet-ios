@@ -1,0 +1,12 @@
+--swiftversion 5.6
+
+# format options
+--allman false # Prefer `K&R` https://en.wikipedia.org/wiki/Indentation_style#K&R_style
+--indent tab
+--tabwidth 4
+
+--enable marktypes
+--lineaftermarks false
+
+# file options
+--exclude .build
