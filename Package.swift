@@ -3,30 +3,39 @@
 
 import PackageDescription
 
+let tca: Target.Dependency = .product(
+    name: "ComposableArchitecture",
+    package: "swift-composable-architecture"
+)
+
 let package = Package(
-    name: "babylon-wallet-swift",
+    name: "Babylon",
     platforms: [
         .macOS(.v12), // for development purposes
         .iOS(.v15) // `task` in SwiftUI
     ],
     products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "babylon-wallet-swift",
-            targets: ["babylon-wallet-swift"]),
+            name: "AppFeature",
+            targets: ["AppFeature"]),
     ],
     dependencies: [
-        // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
+        // TCA - ComposableArchitecture used as architecture
+        .package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.38.1")
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages this package depends on.
+        // Targets sorted lexicographically, placing `testTarget` just after `target`.
         .target(
-            name: "babylon-wallet-swift",
-            dependencies: []),
+            name: "AppFeature",
+            dependencies: [
+                // ˅˅˅ Sort lexicographically ˅˅˅
+                tca
+                // ^^^ Sort lexicographically ^^^
+            ]),
         .testTarget(
-            name: "babylon-wallet-swiftTests",
-            dependencies: ["babylon-wallet-swift"]),
+            name: "AppFeatureTests",
+            dependencies: [
+                "AppFeature"
+            ]),
     ]
 )
