@@ -7,6 +7,7 @@ Writtin in Swift using SwiftUI as UI framework and [TCA - The Composable Archite
 # Architecture
 The structure is the same as [PointfreeCo's game Isowords (source)][isowords] (the authors of TCA). 
 
+## SPM + App structure
 A "gotcha" of this structure is that the project root contains the Package.swift and `Source` and `Tests` of the Swift Packages. The actual app is an ultra thin entrypoint, using `AppFeature` package, and is put in `App` folder. This is how the app references the local packages:
 
 1. Select the project in the Navigator
@@ -21,6 +22,56 @@ A "gotcha" of this structure is that the project root contains the Package.swift
 10. Again click "+"button in bottom of "Link Binary With Libraries" section and you should see "AppFeature" (and all other packages) there, add "AppFeature"!
 11. This setup only needs to happen once, for all targets, but any other targets need to perform the last step, of adding the actual package as dependency, e.g. for macOS (for development purpuses).
 
+## Packages
+We use the super modular design that PointFreeCo uses in [Isowords](https://github.com/pointfreeco/isowords/blob/main/Package.swift) - with almost 100 different packages. 
+
+## Encapsulate ALL dependencies
+We encapsulate ALL real world APIs, dependencies and inputs such as UserDefaults, Keychain, NotificationCenter, API Clients etc, we follow the pattern of [PointFreeCo's Isoword here UserDefaults][https://github.com/pointfreeco/isowords/tree/main/Sources/UserDefaultsClient]. 
+
+Define the "interface" using structs! 
+Which does NOT use `protocol`s! We use structs with closures for each function as input, which makes mocking super easy. Here is a code excerpt:
+
+```swift
+public struct UserDefaultsClient {
+  public var boolForKey: (String) -> Bool
+  public var setBool: (Bool, String) -> Effect<Never, Never>
+
+
+  public var hasShownFirstLaunchOnboarding: Bool {
+    self.boolForKey(hasShownFirstLaunchOnboardingKey)
+  }
+
+  public func setHasShownFirstLaunchOnboarding(_ bool: Bool) -> Effect<Never, Never> {
+    self.setBool(bool, hasShownFirstLaunchOnboardingKey)
+  }
+}
+
+let hasShownFirstLaunchOnboardingKey = "hasShownFirstLaunchOnboardingKey"
+let installationTimeKey = "installationTimeKey"
+let multiplayerOpensCount = "multiplayerOpensCount"
+```
+
+[Here is the Live version](https://github.com/pointfreeco/isowords/blob/main/Sources/UserDefaultsClient/Live.swift) (code excerpt):
+
+```swift
+extension UserDefaultsClient {
+  public static func live(
+    userDefaults: UserDefaults = UserDefaults(suiteName: "group.isowords")!
+  ) -> Self {
+    Self(
+      boolForKey: userDefaults.bool(forKey:),
+	...
+      setBool: { value, key in
+        .fireAndForget {
+          userDefaults.set(value, forKey: key)
+        }
+      },
+	...
+    )
+  }
+}
+```
+
 # Development
 To open the project use:
 
@@ -28,7 +79,16 @@ To open the project use:
 open App/Wallet.xcodeproj
 ```
 
+## Preview Packages
+Thanks to TCA we can create Feature Previews, which are super small apps using a specific Feature's package as entry point, this is extremely useful, because suddenly we can start a small Preview App which takes us directly to Settings, or Directly directly to onboarding. See [Isowords Preview apps here](https://github.com/pointfreeco/isowords/tree/main/App/Previews).
+
 instead of opening the root, otherwise you will not get access to the App and the Packages.
+
+# Testing
+1. Unit tests for each package, split into multiple files for each seperate system under test (sut).
+2. UI testing using [PointFreeCo's Snapsshot testing Package][snapshotTesting] (Only when UI becomes stable)
+3. Integration tests can be enabled later on using locally running Gateway service with Docker. Which has been [done before in ancient deprecated Swift SDK](https://github.com/radixdlt/radixdlt-swift-archive/tree/develop/Tests/TestCases/IntegrationTests]
+
 
 # Releasing
 
@@ -53,3 +113,4 @@ and set `CURRENT_PROJECT_VERSION` to `$(BUILD_NUMBER_GLOBAL_UNIQUE)`.
 [radixdlt]: https://radixdlt.com
 [tca]: https://github.com/pointfreeco/swift-composable-architecture
 [isowords]: https://github.com/pointfreeco/isowords
+[snapshotTesting]: https://github.com/pointfreeco/swift-snapshot-testing
