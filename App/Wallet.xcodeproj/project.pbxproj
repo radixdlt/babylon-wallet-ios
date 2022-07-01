@@ -226,7 +226,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "swift run -c release --package-path ../Sources/_BuildTools swiftformat \"$SRCROOT/../\"\n";
+			shellScript = "SDKROOT=macosx swift run -c release --package-path ../Sources/_BuildTools swiftformat \"$SRCROOT/../\"\n";
 		};
 		E68FEA34286DD72F00992DFA /* SwiftFormat */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -244,7 +244,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "swift run -c release --package-path ../Sources/_BuildTools swiftformat \"$SRCROOT/../\"\n";
+			shellScript = "SDKROOT=macosx swift run -c release --package-path ../Sources/_BuildTools swiftformat \"$SRCROOT/../\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
