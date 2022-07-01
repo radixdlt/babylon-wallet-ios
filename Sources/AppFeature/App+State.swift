@@ -13,6 +13,7 @@ public enum App {}
 
 public extension App {
 	// MARK: State
+	// Might change to an enum instead? and use SwitchStore in App.Coordinator body (alert not needed)
 	struct State: Equatable {
 		// Remove alert from App later on, just used in early stage for presenting errors
 		public var alert: AlertState<Action>?
