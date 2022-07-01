@@ -9,8 +9,10 @@ import Common
 import ComposableArchitecture
 import Foundation
 import Profile
+import ProfileLoader
 import SwiftUI
 import Wallet
+import WalletLoader
 
 // MARK: - Splash
 /// Namespace for SplashFeature
@@ -31,10 +33,21 @@ public extension Splash {
 	}
 }
 
+// MARK: - SplashLoadWalletResult
+public enum SplashLoadWalletResult: Equatable {
+	case walletLoaded(Wallet)
+	case noWallet(reason: NoWalletLoaded)
+
+	public enum NoWalletLoaded: Equatable {
+		case noProfileFoundAtPath(String)
+		case failedToLoadProfileFromDocument
+		case secretsNotFoundForProfile(Profile)
+	}
+}
+
 public extension Splash.Action {
 	enum CoordinatingAction: Equatable {
-		case walletLoaded(Wallet)
-		case secretsNotFoundForProfile(Profile)
+		case loadWalletResult(SplashLoadWalletResult)
 	}
 }
 
@@ -43,6 +56,10 @@ public enum PlaceholderError: Swift.Error, Equatable {}
 
 public extension Splash.Action {
 	enum InternalAction: Equatable {
+		/// So we can use a single exit path, and `delay` to display this Splash for at
+		/// least 500 ms or suitable time
+		case coordinate(CoordinatingAction)
+
 		case system(SystemAction)
 	}
 }
@@ -50,15 +67,10 @@ public extension Splash.Action {
 public extension Splash.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case loadProfile
-		case loadProfileResult(Result<Profile, PlaceholderError>)
-		case loadWallet
-		case loadWalletResult(Result<Wallet, PlaceholderError>)
-		case viewLifeCycle(ViewLifeCycleAction)
-	}
-}
+		case loadProfileResult(Result<Profile, ProfileLoader.Error>)
+		case loadWalletWithProfile(Profile)
+		case loadWalletWithProfileResult(Result<Wallet, WalletLoader.Error>, profile: Profile)
 
-public extension Splash.Action.InternalAction.SystemAction {
-	enum ViewLifeCycleAction: Equatable {
 		case viewDidAppear
 	}
 }
@@ -68,12 +80,18 @@ public extension Splash {
 	struct Environment {
 		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
 		public let mainQueue: AnySchedulerOf<DispatchQueue>
+		public let profileLoader: ProfileLoader
+		public let walletLoader: WalletLoader
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
-			mainQueue: AnySchedulerOf<DispatchQueue>
+			mainQueue: AnySchedulerOf<DispatchQueue>,
+			profileLoader: ProfileLoader,
+			walletLoader: WalletLoader
 		) {
 			self.backgroundQueue = backgroundQueue
 			self.mainQueue = mainQueue
+			self.profileLoader = profileLoader
+			self.walletLoader = walletLoader
 		}
 	}
 }
@@ -81,15 +99,44 @@ public extension Splash {
 public extension Splash {
 	// MARK: Reducer
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer { _, action, _ in
+	static let reducer = Reducer { _, action, environment in
 		switch action {
-		case .internal(.system(.viewLifeCycle(.viewDidAppear))):
-			fatalError()
-		case .coordinate: break
-		default:
-			fatalError()
+		case .internal(.system(.viewDidAppear)):
+			return Effect(value: .internal(.system(.loadProfile)))
+		case .internal(.system(.loadProfile)):
+			return environment
+				.profileLoader
+				.loadProfile()
+				.subscribe(on: environment.backgroundQueue)
+				.receive(on: environment.mainQueue)
+				.catchToEffect { Splash.Action.internal(.system(.loadProfileResult($0))) }
+
+		case let .internal(.system(.loadProfileResult(.success(profile)))):
+			return Effect(value: .internal(.system(.loadWalletWithProfile(profile))))
+		case let .internal(.system(.loadProfileResult(.failure(.noProfileDocumentFoundAtPath(path))))):
+			return Effect(value: .internal(.coordinate(.loadWalletResult(.noWallet(reason: .noProfileFoundAtPath(path))))))
+		case .internal(.system(.loadProfileResult(.failure(.failedToLoadProfileFromDocument)))):
+			return Effect(value: .internal(.coordinate(.loadWalletResult(.noWallet(reason: .failedToLoadProfileFromDocument)))))
+
+		case let .internal(.system(.loadWalletWithProfile(profile))):
+			return environment
+				.walletLoader
+				.loadWallet(profile)
+				.subscribe(on: environment.backgroundQueue)
+				.receive(on: environment.mainQueue)
+				.catchToEffect { Splash.Action.internal(.system(.loadWalletWithProfileResult($0, profile: profile))) }
+
+		case let .internal(.system(.loadWalletWithProfileResult(.success(wallet), _))):
+			return Effect(value: .internal(.coordinate(.loadWalletResult(.walletLoaded(wallet)))))
+		case let .internal(.system(.loadWalletWithProfileResult(.failure(.secretsNoFoundForProfile), profile))):
+			return Effect(value: .internal(.coordinate(.loadWalletResult(.noWallet(reason: .secretsNotFoundForProfile(profile))))))
+		case let .internal(.coordinate(actionToCoordinate)):
+			return Effect(value: .coordinate(actionToCoordinate))
+				.delay(for: 0.7, scheduler: environment.mainQueue)
+				.eraseToEffect()
+		case .coordinate:
+			return .none
 		}
-		return .none
 	}
 }
 
@@ -114,17 +161,16 @@ internal extension Splash.Coordinator {
 internal extension Splash.Coordinator {
 	// MARK: ViewAction
 	enum ViewAction {
-		case noop
+		case viewDidAppear
 	}
 }
 
 internal extension Splash.Action {
-	init(action _: Splash.Coordinator.ViewAction) {
-//		switch action {
-//		case .noop:
-//			fat
-//		}
-		fatalError()
+	init(action: Splash.Coordinator.ViewAction) {
+		switch action {
+		case .viewDidAppear:
+			self = .internal(.system(.viewDidAppear))
+		}
 	}
 }
 
@@ -136,11 +182,14 @@ public extension Splash.Coordinator {
 				state: ViewState.init,
 				action: Splash.Action.init
 			)
-		) { _ in
+		) { viewStore in
 			ForceFullScreen {
 				VStack {
 					Text("Splash")
 				}
+			}
+			.onAppear {
+				viewStore.send(.viewDidAppear)
 			}
 		}
 	}
@@ -156,7 +205,9 @@ struct SplashCoordinator_Previews: PreviewProvider {
 				reducer: Splash.reducer,
 				environment: .init(
 					backgroundQueue: .immediate,
-					mainQueue: .immediate
+					mainQueue: .immediate,
+					profileLoader: .noop,
+					walletLoader: .noop
 				)
 			)
 		)

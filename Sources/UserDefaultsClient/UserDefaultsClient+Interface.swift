@@ -21,6 +21,20 @@ public struct UserDefaultsClient {
 	public var setInteger: (Int, String) -> Effect<Never, Never>
 }
 
+private extension UserDefaultsClient {
+	func setString(_ string: String, forKey key: String, encoding: String.Encoding = .utf8) -> Effect<Never, Never> {
+		let data = string.data(using: encoding)!
+		return setData(data, key)
+	}
+
+	func stringForKey(_ key: String, encoding: String.Encoding = .utf8) -> String? {
+		guard let data = dataForKey(key) else {
+			return nil
+		}
+		return String(data: data, encoding: encoding)
+	}
+}
+
 public extension UserDefaultsClient {
 	var hasShownFirstLaunchOnboarding: Bool {
 		boolForKey(hasShownFirstLaunchOnboardingKey)
@@ -29,6 +43,19 @@ public extension UserDefaultsClient {
 	func setHasShownFirstLaunchOnboarding(_ bool: Bool) -> Effect<Never, Never> {
 		setBool(bool, hasShownFirstLaunchOnboardingKey)
 	}
+
+	func setProfileName(_ name: String) -> Effect<Never, Never> {
+		setString(name, forKey: profileNameKey)
+	}
+
+	func removeProfileName() -> Effect<Never, Never> {
+		remove(profileNameKey)
+	}
+
+	var profileName: String? {
+		stringForKey(profileNameKey)
+	}
 }
 
 let hasShownFirstLaunchOnboardingKey = "hasShownFirstLaunchOnboardingKey"
+let profileNameKey = "profileNameKey"

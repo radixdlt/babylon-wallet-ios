@@ -8,7 +8,7 @@
 import Profile
 
 public struct Wallet: Equatable {
-	private let profile: Profile
+	public let profile: Profile
 	public init(
 		profile: Profile
 	) {

@@ -8,14 +8,23 @@
 import AppFeature
 import ComposableArchitecture
 import SwiftUI
+import UserDefaultsClient
 
 typealias App = AppFeature.App
 
 public extension App.Environment {
-	static let live = Self(
-		backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
-		mainQueue: .main
-	)
+	static let live: Self = {
+		let userDefaultsClient: UserDefaultsClient = .live()
+
+		return Self(
+			backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
+			mainQueue: .main,
+			profileLoader: .live(userDefaultsClient: userDefaultsClient),
+			userDefaultsClient: userDefaultsClient,
+			walletLoader: .live
+		)
+
+	}()
 }
 
 // MARK: - WalletApp
@@ -34,6 +43,9 @@ struct WalletApp: SwiftUI.App {
 	var body: some Scene {
 		WindowGroup {
 			App.Coordinator(store: store)
+				.textFieldStyle(.roundedBorder)
+				.buttonStyle(.bordered)
+				.padding()
 			#if os(macOS)
 				.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
 			#endif

@@ -9,6 +9,8 @@ import Common
 import ComposableArchitecture
 import Foundation
 import SwiftUI
+import UserDefaultsClient
+import Wallet
 
 // MARK: - Main
 /// Namespace for MainFeature
@@ -17,7 +19,10 @@ public enum Main {}
 public extension Main {
 	// MARK: State
 	struct State: Equatable {
-		public init() {}
+		public var wallet: Wallet
+		public init(wallet: Wallet) {
+			self.wallet = wallet
+		}
 	}
 }
 
@@ -59,12 +64,15 @@ public extension Main {
 	struct Environment {
 		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
 		public let mainQueue: AnySchedulerOf<DispatchQueue>
+		public let userDefaultsClient: UserDefaultsClient
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
-			mainQueue: AnySchedulerOf<DispatchQueue>
+			mainQueue: AnySchedulerOf<DispatchQueue>,
+			userDefaultsClient: UserDefaultsClient
 		) {
 			self.backgroundQueue = backgroundQueue
 			self.mainQueue = mainQueue
+			self.userDefaultsClient = userDefaultsClient
 		}
 	}
 }
@@ -76,11 +84,18 @@ public extension Main {
 		switch action {
 		case .internal(.user(.removeWallet)):
 			return Effect(value: .internal(.system(.removedWallet)))
-				.delay(for: 1, scheduler: environment.backgroundQueue)
-				.eraseToEffect()
 
 		case .internal(.system(.removedWallet)):
-			return Effect(value: .coordinate(.removedWallet))
+			return .concatenate(
+				environment
+					.userDefaultsClient
+					.removeProfileName()
+					.subscribe(on: environment.backgroundQueue)
+					.receive(on: environment.mainQueue)
+					.fireAndForget(),
+
+				Effect(value: .coordinate(.removedWallet))
+			)
 
 		case .coordinate:
 			return .none
@@ -102,7 +117,10 @@ public extension Main {
 internal extension Main.Coordinator {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: Main.State) {}
+		public var profileName: String
+		init(state: Main.State) {
+			profileName = state.wallet.profile.name
+		}
 	}
 }
 
@@ -133,7 +151,7 @@ public extension Main.Coordinator {
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
-					Text("Main")
+					Text("Welcome: \(viewStore.profileName)")
 					Button("Remove Wallet") {
 						viewStore.send(.removeWalletButtonPressed)
 					}
@@ -149,11 +167,12 @@ struct MainCoordinator_Previews: PreviewProvider {
 	static var previews: some View {
 		Main.Coordinator(
 			store: .init(
-				initialState: .init(),
+				initialState: .init(wallet: .init(profile: .init())),
 				reducer: Main.reducer,
 				environment: .init(
 					backgroundQueue: .immediate,
-					mainQueue: .immediate
+					mainQueue: .immediate,
+					userDefaultsClient: .noop
 				)
 			)
 		)
