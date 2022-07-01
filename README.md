@@ -28,9 +28,6 @@ We use the super modular design that PointFreeCo uses in [Isowords](https://gith
 ## Encapsulate ALL dependencies
 We encapsulate ALL real world APIs, dependencies and inputs such as UserDefaults, Keychain, NotificationCenter, API Clients etc, we follow the pattern of [PointFreeCo's Isoword here UserDefaults][https://github.com/pointfreeco/isowords/tree/main/Sources/UserDefaultsClient]. 
 
-Define the "interface" using structs! 
-Which does NOT use `protocol`s! We use structs with closures for each function as input, which makes mocking super easy. Here is a code excerpt:
-
 ```swift
 public struct UserDefaultsClient {
   public var boolForKey: (String) -> Bool
@@ -51,7 +48,8 @@ let installationTimeKey = "installationTimeKey"
 let multiplayerOpensCount = "multiplayerOpensCount"
 ```
 
-[Here is the Live version](https://github.com/pointfreeco/isowords/blob/main/Sources/UserDefaultsClient/Live.swift) (code excerpt):
+Which does NOT use `protocol`s! We use structs with closures for each function as input, which makes mocking super easy.
+Here is the Live version:
 
 ```swift
 extension UserDefaultsClient {
@@ -60,13 +58,34 @@ extension UserDefaultsClient {
   ) -> Self {
     Self(
       boolForKey: userDefaults.bool(forKey:),
-	...
+      dataForKey: userDefaults.data(forKey:),
+      doubleForKey: userDefaults.double(forKey:),
+      integerForKey: userDefaults.integer(forKey:),
+      remove: { key in
+        .fireAndForget {
+          userDefaults.removeObject(forKey: key)
+        }
+      },
       setBool: { value, key in
         .fireAndForget {
           userDefaults.set(value, forKey: key)
         }
       },
-	...
+      setData: { data, key in
+        .fireAndForget {
+          userDefaults.set(data, forKey: key)
+        }
+      },
+      setDouble: { value, key in
+        .fireAndForget {
+          userDefaults.set(value, forKey: key)
+        }
+      },
+      setInteger: { value, key in
+        .fireAndForget {
+          userDefaults.set(value, forKey: key)
+        }
+      }
     )
   }
 }

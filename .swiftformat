@@ -7,6 +7,7 @@
 
 --enable marktypes
 --lineaftermarks false
+--ifdef no-indent
 
 # file options
 --exclude .build

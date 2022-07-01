@@ -29,6 +29,10 @@ let package = Package(
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
+
+		// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
+		.target(name: "_BuildTools"),
+
 		.target(
 			name: "AppFeature",
 			dependencies: [
@@ -41,10 +45,40 @@ let package = Package(
 			name: "AppFeatureTests",
 			dependencies: [
 				"AppFeature",
+				"TestUtils",
 			]
 		),
-
-		// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
-		.target(name: "BuildTools"),
+		.target(
+			name: "Common",
+			dependencies: [
+			]
+		),
+		.testTarget(
+			name: "CommonTests",
+			dependencies: [
+				"Common",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "UserDefaultsClient",
+			dependencies: [
+				tca,
+			]
+		),
+		.testTarget(
+			name: "UserDefaultsClientTests",
+			dependencies: [
+				"UserDefaultsClient",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "TestUtils",
+			dependencies: [
+				"Common",
+				tca,
+			]
+		),
 	]
 )
