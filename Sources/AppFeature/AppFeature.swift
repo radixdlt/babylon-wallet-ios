@@ -1,4 +1,7 @@
 import ComposableArchitecture
+import MainFeature
+import OnboardingFeature
+import SplashFeature
 import SwiftUI
 
 // MARK: - App
@@ -8,15 +11,18 @@ public enum App {}
 public extension App {
 	// MARK: State
 	struct State: Equatable {
-		public var alert: AlertState<Action>?
-		public var counter: Int
+		public var main: Main.State?
+		public var onboarding: Onboarding.State?
+		public var splash: Splash.State?
 
 		public init(
-			alert: AlertState<Action>? = nil,
-			counter: Int = 3
+			splash: Splash.State? = .init(),
+			main: Main.State? = nil,
+			onboarding: Onboarding.State? = nil
 		) {
-			self.alert = alert
-			self.counter = counter
+			self.splash = splash
+			self.main = main
+			self.onboarding = onboarding
 		}
 	}
 }
@@ -24,9 +30,9 @@ public extension App {
 public extension App {
 	// MARK: Action
 	enum Action: Equatable {
-		case alertDismissed
-		case increaseCounter
-		case decreaseCounter
+		case main(Main.Action)
+		case onboarding(Onboarding.Action)
+		case splash(Splash.Action)
 	}
 }
 
@@ -40,29 +46,54 @@ public extension App {
 public extension App {
 	// MARK: Reducer
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer { state, action, _ in
+
+	static let reducer = Reducer.combine(
+		Main.reducer
+			.optional()
+			.pullback(
+				state: \.main,
+				action: /Action.main,
+				environment: { _ in
+					Main.Environment()
+				}
+			),
+
+		Onboarding.reducer
+			.optional()
+			.pullback(
+				state: \.onboarding,
+				action: /Action.onboarding,
+				environment: { _ in
+					Onboarding.Environment()
+				}
+			),
+
+		Splash.reducer
+			.optional()
+			.pullback(
+				state: \.splash,
+				action: /Action.splash,
+				environment: { _ in
+					Splash.Environment()
+				}
+			),
+
+		appReducer
+	)
+
+	static let appReducer = Reducer { _, action, _ in
 		switch action {
-		case .increaseCounter:
-			state.counter += 1
-			return .none
-		case .decreaseCounter:
-			if state.counter == 0 {
-				state.alert = .init(title: TextState("Counter must not be negative"))
-			} else {
-				state.counter -= 1
-			}
-			return .none
-		case .alertDismissed:
-			state.alert = nil
-			return .none
+		case .main: break
+		case .onboarding: break
+		case .splash: break
 		}
+		return .none
 	}
-	.debug()
 }
 
 public extension App {
-	// MARK: View
-	struct View: SwiftUI.View {
+	// MARK: Coordinator
+	struct Coordinator: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 
 		private let store: Store
@@ -73,65 +104,43 @@ public extension App {
 	}
 }
 
-internal extension App.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		let counter: Int
-		init(state: App.State) {
-			counter = state.counter
-		}
-	}
-}
-
-internal extension App.View {
-	// MARK: ViewAction
-	enum ViewAction {
-		case decreaseCounterButtonTapped
-		case increaseCounterButtonTapped
-	}
-}
-
-internal extension App.Action {
-	init(action: App.View.ViewAction) {
-		switch action {
-		case .increaseCounterButtonTapped:
-			self = .increaseCounter
-		case .decreaseCounterButtonTapped:
-			self = .decreaseCounter
-		}
-	}
-}
-
-public extension App.View {
+public extension App.Coordinator {
 	// MARK: Body
 	var body: some View {
-		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: App.Action.init
+		ZStack {
+			Text("<APP EMPTY STATE>") // Handle better, make App.State an enum?
+				.foregroundColor(Color.red)
+				.background(Color.yellow)
+				.font(.largeTitle)
+				.zIndex(0)
+
+			IfLetStore(
+				store.scope(state: \.main, action: App.Action.main),
+				then: Main.Coordinator.init(store:)
 			)
-		) { viewStore in
-			VStack {
-				Text("Hello world!")
-				Text("Counter: \(viewStore.counter)")
-				Button("Increase counter") {
-					viewStore.send(.increaseCounterButtonTapped)
-				}
-				Button("Decrease counter") {
-					viewStore.send(.decreaseCounterButtonTapped)
-				}
-			}
-			.alert(store.scope(state: \.alert), dismiss: .alertDismissed)
+			.zIndex(1)
+
+			IfLetStore(
+				store.scope(state: \.onboarding, action: App.Action.onboarding),
+				then: Onboarding.Coordinator.init(store:)
+			)
+			.zIndex(2)
+
+			IfLetStore(
+				store.scope(state: \.splash, action: App.Action.splash),
+				then: Splash.Coordinator.init(store:)
+			)
+			.zIndex(3)
 		}
 	}
 }
 
-// MARK: - AppView_Previews
-struct AppView_Previews: PreviewProvider {
+// MARK: - AppCoordinator_Previews
+struct AppCoordinator_Previews: PreviewProvider {
 	static var previews: some View {
-		App.View(
+		App.Coordinator(
 			store: .init(
-				initialState: .init(counter: 7),
+				initialState: .init(),
 				reducer: App.reducer,
 				environment: .init()
 			)

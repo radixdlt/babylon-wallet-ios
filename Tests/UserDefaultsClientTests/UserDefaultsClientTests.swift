@@ -54,7 +54,7 @@ final class UserDefaultsClientLiveTests: TestCase {
 		try await completion(of: sut.setInteger(1022, "key"))
 		XCTAssertEqual(sut.integerForKey("key"), 1022)
 	}
-	
+
 	func testRemove() async throws {
 		let key = "key"
 		try await completion(of: sut.setData("deadbeef".hexData, key))

@@ -38,6 +38,9 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				tca,
+				"MainFeature",
+				"OnboardingFeature",
+				"SplashFeature",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -61,6 +64,61 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "MainFeature",
+			dependencies: [
+				// ˅˅˅ Sort lexicographically ˅˅˅
+				"Common",
+				tca,
+				// ^^^ Sort lexicographically ^^^
+			]
+		),
+		.testTarget(
+			name: "MainFeatureTests",
+			dependencies: [
+				"MainFeature",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "OnboardingFeature",
+			dependencies: [
+				// ˅˅˅ Sort lexicographically ˅˅˅
+				"Common",
+				tca,
+				// ^^^ Sort lexicographically ^^^
+			]
+		),
+		.testTarget(
+			name: "OnboardingFeatureTests",
+			dependencies: [
+				"OnboardingFeature",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "SplashFeature",
+			dependencies: [
+				// ˅˅˅ Sort lexicographically ˅˅˅
+				"Common",
+				tca,
+				// ^^^ Sort lexicographically ^^^
+			]
+		),
+		.testTarget(
+			name: "SplashFeatureTests",
+			dependencies: [
+				"SplashFeature",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "TestUtils",
+			dependencies: [
+				"Common",
+				tca,
+			]
+		),
+		.target(
 			name: "UserDefaultsClient",
 			dependencies: [
 				tca,
@@ -71,13 +129,6 @@ let package = Package(
 			dependencies: [
 				"UserDefaultsClient",
 				"TestUtils",
-			]
-		),
-		.target(
-			name: "TestUtils",
-			dependencies: [
-				"Common",
-				tca,
 			]
 		),
 	]

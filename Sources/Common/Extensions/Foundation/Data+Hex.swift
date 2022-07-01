@@ -22,7 +22,6 @@
 // * Changed `func hexEncodedString` to `func hex`
 // * Added computed property `var hex: String`
 
-
 import Foundation
 
 // MARK: - ByteHexEncodingErrors
