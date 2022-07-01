@@ -30,8 +30,16 @@ public extension Onboarding {
 
 public extension Onboarding {
 	// MARK: Environment
-	struct Environment: Equatable {
-		public init() {}
+	struct Environment {
+		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
+		public let mainQueue: AnySchedulerOf<DispatchQueue>
+		public init(
+			backgroundQueue: AnySchedulerOf<DispatchQueue>,
+			mainQueue: AnySchedulerOf<DispatchQueue>
+		) {
+			self.backgroundQueue = backgroundQueue
+			self.mainQueue = mainQueue
+		}
 	}
 }
 
@@ -99,14 +107,19 @@ public extension Onboarding.Coordinator {
 }
 
 // MARK: - OnboardingCoordinator_Previews
+#if DEBUG
 struct OnboardingCoordinator_Previews: PreviewProvider {
 	static var previews: some View {
 		Onboarding.Coordinator(
 			store: .init(
 				initialState: .init(),
 				reducer: Onboarding.reducer,
-				environment: .init()
+				environment: .init(
+					backgroundQueue: .immediate,
+					mainQueue: .immediate
+				)
 			)
 		)
 	}
 }
+#endif // DEBUG

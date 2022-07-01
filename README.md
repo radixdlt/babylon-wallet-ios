@@ -22,6 +22,19 @@ A "gotcha" of this structure is that the project root contains the Package.swift
 10. Again click "+"button in bottom of "Link Binary With Libraries" section and you should see "AppFeature" (and all other packages) there, add "AppFeature"!
 11. This setup only needs to happen once, for all targets, but any other targets need to perform the last step, of adding the actual package as dependency, e.g. for macOS (for development purpuses).
 
+# Code style
+
+## No `protocol`s
+We do not use Protocols at all (maybe with few rare exceptions), instead we use `struct` with closures. See section "Encapsulate ALL Dependencies" below for more info.
+
+## No `class`es
+We do not use classes at all (maybe with a few ultrarare exceptions), instead we use `struct` with closures. See section "Encapsulate ALL Dependencies" below for more info.
+
+(Except for `final class MyTests: TestCase` (inheriting from `open class TestCase: XCTestCase` with some config) ofc...)
+
+## SwiftFormat
+We use SwiftFormat to format code, rules are defined in `.swiftformat`.
+
 ## Packages
 We use the super modular design that PointFreeCo uses in [Isowords](https://github.com/pointfreeco/isowords/blob/main/Package.swift) - with almost 100 different packages. 
 
@@ -95,7 +108,7 @@ extension UserDefaultsClient {
 To open the project use:
 
 ```sh
-open App/Wallet.xcodeproj
+open App/BabylonWallet.xcodeproj
 ```
 
 ## Preview Packages
@@ -106,7 +119,7 @@ instead of opening the root, otherwise you will not get access to the App and th
 # Testing
 1. Unit tests for each package, split into multiple files for each seperate system under test (sut).
 2. UI testing using [PointFreeCo's Snapsshot testing Package][snapshotTesting] (Only when UI becomes stable)
-3. Integration tests can be enabled later on using locally running Gateway service with Docker. Which has been [done before in ancient deprecated Swift SDK](https://github.com/radixdlt/radixdlt-swift-archive/tree/develop/Tests/TestCases/IntegrationTests]
+3. Integration tests can be enabled later on using locally running Gateway service with Docker. Which has been [done before in ancient deprecated Swift SDK](https://github.com/radixdlt/radixdlt-swift-archive/tree/develop/Tests/TestCases/IntegrationTests)
 
 
 # Releasing

@@ -21,8 +21,8 @@
 		E6781C96286DBFC90032E010 /* Bundle_Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bundle_Extensions.swift; sourceTree = "<group>"; };
 		E6805BBD286DB3EC00861180 /* WalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApp.swift; sourceTree = "<group>"; };
 		E6805BBF286DB3ED00861180 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		E6805BC4286DB3ED00861180 /* Wallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E6805BCA286DB3ED00861180 /* Wallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6805BC4286DB3ED00861180 /* BabylonWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabylonWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6805BCA286DB3ED00861180 /* BabylonWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabylonWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6805BCC286DB3ED00861180 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
 		E6805BDC286DB44400861180 /* Babylon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Babylon; path = ..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -79,8 +79,8 @@
 		E6805BC5286DB3ED00861180 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E6805BC4286DB3ED00861180 /* Wallet.app */,
-				E6805BCA286DB3ED00861180 /* Wallet.app */,
+				E6805BC4286DB3ED00861180 /* BabylonWallet.app */,
+				E6805BCA286DB3ED00861180 /* BabylonWallet.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -111,9 +111,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E6805BC3286DB3ED00861180 /* Wallet (iOS) */ = {
+		E6805BC3286DB3ED00861180 /* BabylonWallet (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Wallet (iOS)" */;
+			buildConfigurationList = E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (iOS)" */;
 			buildPhases = (
 				E68FEA33286DD67200992DFA /* SwiftFormat */,
 				E6805BC0286DB3ED00861180 /* Sources */,
@@ -124,17 +124,17 @@
 			);
 			dependencies = (
 			);
-			name = "Wallet (iOS)";
+			name = "BabylonWallet (iOS)";
 			packageProductDependencies = (
 				E6805BDE286DB74300861180 /* AppFeature */,
 			);
 			productName = "Wallet (iOS)";
-			productReference = E6805BC4286DB3ED00861180 /* Wallet.app */;
+			productReference = E6805BC4286DB3ED00861180 /* BabylonWallet.app */;
 			productType = "com.apple.product-type.application";
 		};
-		E6805BC9286DB3ED00861180 /* Wallet (macOS) */ = {
+		E6805BC9286DB3ED00861180 /* BabylonWallet (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Wallet (macOS)" */;
+			buildConfigurationList = E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (macOS)" */;
 			buildPhases = (
 				E68FEA34286DD72F00992DFA /* SwiftFormat */,
 				E6805BC6286DB3ED00861180 /* Sources */,
@@ -145,12 +145,12 @@
 			);
 			dependencies = (
 			);
-			name = "Wallet (macOS)";
+			name = "BabylonWallet (macOS)";
 			packageProductDependencies = (
 				E6805BE0286DB74900861180 /* AppFeature */,
 			);
 			productName = "Wallet (macOS)";
-			productReference = E6805BCA286DB3ED00861180 /* Wallet.app */;
+			productReference = E6805BCA286DB3ED00861180 /* BabylonWallet.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -171,7 +171,7 @@
 					};
 				};
 			};
-			buildConfigurationList = E6805BBB286DB3EB00861180 /* Build configuration list for PBXProject "Wallet" */;
+			buildConfigurationList = E6805BBB286DB3EB00861180 /* Build configuration list for PBXProject "BabylonWallet" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -184,8 +184,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E6805BC3286DB3ED00861180 /* Wallet (iOS) */,
-				E6805BC9286DB3ED00861180 /* Wallet (macOS) */,
+				E6805BC3286DB3ED00861180 /* BabylonWallet (iOS) */,
+				E6805BC9286DB3ED00861180 /* BabylonWallet (macOS) */,
 			);
 		};
 /* End PBXProject section */
@@ -226,7 +226,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SDKROOT=macosx swift run -c release --package-path ../Sources/_BuildTools swiftformat \"$SRCROOT/../\"\n";
+			shellScript = "echo \"warning: Next warning 'no such SDK: macosx' can be ignored. This manual warning is located in iOS Target -> Build Phases -> SwiftFormat. The 'SDKROOT=macosx ' part of the run SwiftFormat comman below is neccessary. But I have not managed to get `xcrun --show-sdk-path` or similar to work.\"\nSDKROOT=macosx swift run -c release --package-path ../Sources/_BuildTools swiftformat \"$SRCROOT/../\"\n";
 		};
 		E68FEA34286DD72F00992DFA /* SwiftFormat */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -413,7 +413,7 @@
 				);
 				MARKETING_VERSION = "$(BUILD_VERSION_MAJOR).$(BUILD_VERSION_MINOR).$(BUILD_VERSION_PATCH)";
 				PRODUCT_BUNDLE_IDENTIFIER = works.rdx.Wallet;
-				PRODUCT_NAME = Wallet;
+				PRODUCT_NAME = BabylonWallet;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -443,7 +443,7 @@
 				);
 				MARKETING_VERSION = "$(BUILD_VERSION_MAJOR).$(BUILD_VERSION_MINOR).$(BUILD_VERSION_PATCH)";
 				PRODUCT_BUNDLE_IDENTIFIER = works.rdx.Wallet;
-				PRODUCT_NAME = Wallet;
+				PRODUCT_NAME = BabylonWallet;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -473,7 +473,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = "$(BUILD_VERSION_MAJOR).$(BUILD_VERSION_MINOR).$(BUILD_VERSION_PATCH)";
 				PRODUCT_BUNDLE_IDENTIFIER = works.rdx.Wallet;
-				PRODUCT_NAME = Wallet;
+				PRODUCT_NAME = BabylonWallet;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -501,7 +501,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MARKETING_VERSION = "$(BUILD_VERSION_MAJOR).$(BUILD_VERSION_MINOR).$(BUILD_VERSION_PATCH)";
 				PRODUCT_BUNDLE_IDENTIFIER = works.rdx.Wallet;
-				PRODUCT_NAME = Wallet;
+				PRODUCT_NAME = BabylonWallet;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -511,7 +511,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E6805BBB286DB3EB00861180 /* Build configuration list for PBXProject "Wallet" */ = {
+		E6805BBB286DB3EB00861180 /* Build configuration list for PBXProject "BabylonWallet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E6805BD3286DB3ED00861180 /* Debug */,
@@ -520,7 +520,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Wallet (iOS)" */ = {
+		E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E6805BD6286DB3ED00861180 /* Debug */,
@@ -529,7 +529,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Wallet (macOS)" */ = {
+		E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E6805BD9286DB3ED00861180 /* Debug */,

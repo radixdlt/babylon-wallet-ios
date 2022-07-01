@@ -39,9 +39,26 @@ public extension App {
 public extension App {
 	// MARK: Environment
 	struct Environment {
-		public init() {}
+		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
+		public let mainQueue: AnySchedulerOf<DispatchQueue>
+		public init(
+			backgroundQueue: AnySchedulerOf<DispatchQueue>,
+			mainQueue: AnySchedulerOf<DispatchQueue>
+		) {
+			self.backgroundQueue = backgroundQueue
+			self.mainQueue = mainQueue
+		}
 	}
 }
+
+#if DEBUG
+public extension App.Environment {
+	static let noop = Self(
+		backgroundQueue: .immediate,
+		mainQueue: .immediate
+	)
+}
+#endif // DEBUG
 
 public extension App {
 	// MARK: Reducer
@@ -53,8 +70,11 @@ public extension App {
 			.pullback(
 				state: \.main,
 				action: /Action.main,
-				environment: { _ in
-					Main.Environment()
+				environment: {
+					Main.Environment(
+						backgroundQueue: $0.backgroundQueue,
+						mainQueue: $0.mainQueue
+					)
 				}
 			),
 
@@ -63,8 +83,11 @@ public extension App {
 			.pullback(
 				state: \.onboarding,
 				action: /Action.onboarding,
-				environment: { _ in
-					Onboarding.Environment()
+				environment: {
+					Onboarding.Environment(
+						backgroundQueue: $0.backgroundQueue,
+						mainQueue: $0.mainQueue
+					)
 				}
 			),
 
@@ -73,16 +96,22 @@ public extension App {
 			.pullback(
 				state: \.splash,
 				action: /Action.splash,
-				environment: { _ in
-					Splash.Environment()
+				environment: {
+					Splash.Environment(
+						backgroundQueue: $0.backgroundQueue,
+						mainQueue: $0.mainQueue
+					)
 				}
 			),
 
 		appReducer
 	)
 
-	static let appReducer = Reducer { _, action, _ in
+	static let appReducer = Reducer { state, action, _ in
 		switch action {
+		case .main(.coordinate(.removedWallet)):
+			state.main = nil
+			state.onboarding = .init()
 		case .main: break
 		case .onboarding: break
 		case .splash: break
@@ -136,14 +165,17 @@ public extension App.Coordinator {
 }
 
 // MARK: - AppCoordinator_Previews
+#if DEBUG
 struct AppCoordinator_Previews: PreviewProvider {
 	static var previews: some View {
 		App.Coordinator(
 			store: .init(
 				initialState: .init(),
 				reducer: App.reducer,
-				environment: .init()
+				environment: .noop
 			)
 		)
 	}
 }
+
+#endif // DEBUG

@@ -24,23 +24,65 @@ public extension Main {
 public extension Main {
 	// MARK: Action
 	enum Action: Equatable {
-		case noop // removes warning
+		case `internal`(InternalActions)
+		case coordinate(CoordinatingAction)
+	}
+}
+
+public extension Main.Action {
+	enum InternalActions: Equatable {
+		case user(UserAction)
+		case system(SystemAction)
+	}
+}
+
+public extension Main.Action.InternalActions {
+	enum UserAction: Equatable {
+		case removeWallet
+	}
+}
+
+public extension Main.Action.InternalActions {
+	enum SystemAction: Equatable {
+		case removedWallet
+	}
+}
+
+public extension Main.Action {
+	enum CoordinatingAction: Equatable {
+		case removedWallet
 	}
 }
 
 public extension Main {
 	// MARK: Environment
-	struct Environment: Equatable {
-		public init() {}
+	struct Environment {
+		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
+		public let mainQueue: AnySchedulerOf<DispatchQueue>
+		public init(
+			backgroundQueue: AnySchedulerOf<DispatchQueue>,
+			mainQueue: AnySchedulerOf<DispatchQueue>
+		) {
+			self.backgroundQueue = backgroundQueue
+			self.mainQueue = mainQueue
+		}
 	}
 }
 
 public extension Main {
 	// MARK: Reducer
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer { _, action, _ in
+	static let reducer = Reducer { _, action, environment in
 		switch action {
-		case .noop:
+		case .internal(.user(.removeWallet)):
+			return Effect(value: .internal(.system(.removedWallet)))
+				.delay(for: 1, scheduler: environment.backgroundQueue)
+				.eraseToEffect()
+
+		case .internal(.system(.removedWallet)):
+			return Effect(value: .coordinate(.removedWallet))
+
+		case .coordinate:
 			return .none
 		}
 	}
@@ -67,15 +109,15 @@ internal extension Main.Coordinator {
 internal extension Main.Coordinator {
 	// MARK: ViewAction
 	enum ViewAction {
-		case noop
+		case removeWalletButtonPressed
 	}
 }
 
 internal extension Main.Action {
 	init(action: Main.Coordinator.ViewAction) {
 		switch action {
-		case .noop:
-			self = .noop
+		case .removeWalletButtonPressed:
+			self = .internal(.user(.removeWallet))
 		}
 	}
 }
@@ -88,10 +130,13 @@ public extension Main.Coordinator {
 				state: ViewState.init,
 				action: Main.Action.init
 			)
-		) { _ in
+		) { viewStore in
 			ForceFullScreen {
 				VStack {
 					Text("Main")
+					Button("Remove Wallet") {
+						viewStore.send(.removeWalletButtonPressed)
+					}
 				}
 			}
 		}
@@ -99,14 +144,19 @@ public extension Main.Coordinator {
 }
 
 // MARK: - MainCoordinator_Previews
+#if DEBUG
 struct MainCoordinator_Previews: PreviewProvider {
 	static var previews: some View {
 		Main.Coordinator(
 			store: .init(
 				initialState: .init(),
 				reducer: Main.reducer,
-				environment: .init()
+				environment: .init(
+					backgroundQueue: .immediate,
+					mainQueue: .immediate
+				)
 			)
 		)
 	}
 }
+#endif // DEBUG

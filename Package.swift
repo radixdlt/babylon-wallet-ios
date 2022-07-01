@@ -41,6 +41,7 @@ let package = Package(
 				"MainFeature",
 				"OnboardingFeature",
 				"SplashFeature",
+				"Wallet",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -69,6 +70,7 @@ let package = Package(
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
 				tca,
+				"Wallet",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -96,11 +98,25 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "Profile",
+			dependencies: [
+				"Common",
+			]
+		),
+		.testTarget(
+			name: "ProfileTests",
+			dependencies: [
+				"Profile",
+				"TestUtils",
+			]
+		),
+		.target(
 			name: "SplashFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
 				tca,
+				"Wallet",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -128,6 +144,21 @@ let package = Package(
 			name: "UserDefaultsClientTests",
 			dependencies: [
 				"UserDefaultsClient",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "Wallet",
+			dependencies: [
+				"Common",
+				"Profile",
+				tca,
+			]
+		),
+		.testTarget(
+			name: "WalletTests",
+			dependencies: [
+				"Wallet",
 				"TestUtils",
 			]
 		),

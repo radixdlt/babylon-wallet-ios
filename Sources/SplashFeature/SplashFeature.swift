@@ -8,7 +8,9 @@
 import Common
 import ComposableArchitecture
 import Foundation
+import Profile
 import SwiftUI
+import Wallet
 
 // MARK: - Splash
 /// Namespace for SplashFeature
@@ -24,14 +26,55 @@ public extension Splash {
 public extension Splash {
 	// MARK: Action
 	enum Action: Equatable {
-		case noop // removes warning
+		case `internal`(InternalAction)
+		case coordinate(CoordinatingAction)
+	}
+}
+
+public extension Splash.Action {
+	enum CoordinatingAction: Equatable {
+		case walletLoaded(Wallet)
+		case secretsNotFoundForProfile(Profile)
+	}
+}
+
+// MARK: - PlaceholderError
+public enum PlaceholderError: Swift.Error, Equatable {}
+
+public extension Splash.Action {
+	enum InternalAction: Equatable {
+		case system(SystemAction)
+	}
+}
+
+public extension Splash.Action.InternalAction {
+	enum SystemAction: Equatable {
+		case loadProfile
+		case loadProfileResult(Result<Profile, PlaceholderError>)
+		case loadWallet
+		case loadWalletResult(Result<Wallet, PlaceholderError>)
+		case viewLifeCycle(ViewLifeCycleAction)
+	}
+}
+
+public extension Splash.Action.InternalAction.SystemAction {
+	enum ViewLifeCycleAction: Equatable {
+		case viewDidAppear
 	}
 }
 
 public extension Splash {
 	// MARK: Environment
-	struct Environment: Equatable {
-		public init() {}
+	struct Environment {
+		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
+		public let mainQueue: AnySchedulerOf<DispatchQueue>
+		public init(
+			backgroundQueue: AnySchedulerOf<DispatchQueue>,
+			mainQueue: AnySchedulerOf<DispatchQueue>
+		) {
+			self.backgroundQueue = backgroundQueue
+			self.mainQueue = mainQueue
+		}
 	}
 }
 
@@ -40,9 +83,13 @@ public extension Splash {
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = Reducer { _, action, _ in
 		switch action {
-		case .noop:
-			return .none
+		case .internal(.system(.viewLifeCycle(.viewDidAppear))):
+			fatalError()
+		case .coordinate: break
+		default:
+			fatalError()
 		}
+		return .none
 	}
 }
 
@@ -72,11 +119,12 @@ internal extension Splash.Coordinator {
 }
 
 internal extension Splash.Action {
-	init(action: Splash.Coordinator.ViewAction) {
-		switch action {
-		case .noop:
-			self = .noop
-		}
+	init(action _: Splash.Coordinator.ViewAction) {
+//		switch action {
+//		case .noop:
+//			fat
+//		}
+		fatalError()
 	}
 }
 
@@ -99,14 +147,19 @@ public extension Splash.Coordinator {
 }
 
 // MARK: - SplashCoordinator_Previews
+#if DEBUG
 struct SplashCoordinator_Previews: PreviewProvider {
 	static var previews: some View {
 		Splash.Coordinator(
 			store: .init(
 				initialState: .init(),
 				reducer: Splash.reducer,
-				environment: .init()
+				environment: .init(
+					backgroundQueue: .immediate,
+					mainQueue: .immediate
+				)
 			)
 		)
 	}
 }
+#endif // DEBUG

@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E6805BC9286DB3ED00861180"
-               BuildableName = "Wallet.app"
-               BlueprintName = "Wallet (macOS)"
-               ReferencedContainer = "container:Wallet.xcodeproj">
+               BuildableName = "BabylonWallet.app"
+               BlueprintName = "BabylonWallet (macOS)"
+               ReferencedContainer = "container:BabylonWallet.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -75,9 +75,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E6805BC9286DB3ED00861180"
-            BuildableName = "Wallet.app"
-            BlueprintName = "Wallet (macOS)"
-            ReferencedContainer = "container:Wallet.xcodeproj">
+            BuildableName = "BabylonWallet.app"
+            BlueprintName = "BabylonWallet (macOS)"
+            ReferencedContainer = "container:BabylonWallet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -92,9 +92,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E6805BC9286DB3ED00861180"
-            BuildableName = "Wallet.app"
-            BlueprintName = "Wallet (macOS)"
-            ReferencedContainer = "container:Wallet.xcodeproj">
+            BuildableName = "BabylonWallet.app"
+            BlueprintName = "BabylonWallet (macOS)"
+            ReferencedContainer = "container:BabylonWallet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

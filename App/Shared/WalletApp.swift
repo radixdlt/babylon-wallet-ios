@@ -11,6 +11,13 @@ import SwiftUI
 
 typealias App = AppFeature.App
 
+public extension App.Environment {
+	static let live = Self(
+		backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
+		mainQueue: .main
+	)
+}
+
 // MARK: - WalletApp
 @main
 struct WalletApp: SwiftUI.App {
@@ -20,7 +27,7 @@ struct WalletApp: SwiftUI.App {
 		store = Store(
 			initialState: .init(),
 			reducer: App.reducer,
-			environment: .init()
+			environment: .live
 		)
 	}
 
