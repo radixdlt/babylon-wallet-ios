@@ -89,8 +89,10 @@ public extension Main.Coordinator {
 				action: Main.Action.init
 			)
 		) { _ in
-			VStack {
-				Text("Main")
+			ForceFullScreen {
+				VStack {
+					Text("Main")
+				}
 			}
 		}
 	}

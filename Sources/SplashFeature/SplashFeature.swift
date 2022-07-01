@@ -89,8 +89,10 @@ public extension Splash.Coordinator {
 				action: Splash.Action.init
 			)
 		) { _ in
-			VStack {
-				Text("Splash")
+			ForceFullScreen {
+				VStack {
+					Text("Splash")
+				}
 			}
 		}
 	}

@@ -89,8 +89,10 @@ public extension Onboarding.Coordinator {
 				action: Onboarding.Action.init
 			)
 		) { _ in
-			VStack {
-				Text("Onboarding")
+			ForceFullScreen {
+				VStack {
+					Text("Onboarding")
+				}
 			}
 		}
 	}
