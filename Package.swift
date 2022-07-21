@@ -38,6 +38,7 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				tca,
+				"HomeFeature",
 				"MainFeature",
 				"OnboardingFeature",
 				"ProfileLoader",
@@ -64,6 +65,23 @@ let package = Package(
 			name: "CommonTests",
 			dependencies: [
 				"Common",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "HomeFeature",
+			dependencies: [
+				// ˅˅˅ Sort lexicographically ˅˅˅
+				"Common",
+				tca,
+				"Wallet",
+				// ^^^ Sort lexicographically ^^^
+			]
+		),
+		.testTarget(
+			name: "HomeFeatureTests",
+			dependencies: [
+				"HomeFeature",
 				"TestUtils",
 			]
 		),
