@@ -71,7 +71,8 @@ public extension App {
 		case .main(.coordinate(.removedWallet)):
 			state.main = nil
 			return Effect(value: .coordinate(.onboard))
-
+		case .home:
+			return .none
 		case .main:
 			return .none
 		case let .onboarding(.coordinate(.onboardedWithWallet(wallet))):

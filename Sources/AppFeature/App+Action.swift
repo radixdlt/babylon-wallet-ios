@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import HomeFeature
 import MainFeature
 import OnboardingFeature
 import SplashFeature
@@ -14,6 +15,7 @@ import Wallet
 public extension App {
 	// MARK: Action
 	enum Action: Equatable {
+		case home(Home.Action)
 		case main(Main.Action)
 		case onboarding(Onboarding.Action)
 		case splash(Splash.Action)
