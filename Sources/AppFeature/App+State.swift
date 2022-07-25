@@ -19,7 +19,6 @@ public extension App {
 		// Remove alert from App later on, just used in early stage for presenting errors
 		public var alert: AlertState<Action>?
 
-		public var home: Home.State?
 		public var main: Main.State?
 		public var onboarding: Onboarding.State?
 		public var splash: Splash.State?
@@ -27,13 +26,11 @@ public extension App {
 		public init(
 			alert: AlertState<Action>? = nil,
 			splash: Splash.State? = nil,
-			home: Home.State? = .init(),
-			main: Main.State? = nil,
+			main: Main.State? = .init(wallet: .init(profile: .init(name: "A name"))),
 			onboarding: Onboarding.State? = nil
 		) {
 			self.alert = alert
 			self.splash = splash
-			self.home = home
 			self.main = main
 			self.onboarding = onboarding
 		}

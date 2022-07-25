@@ -42,29 +42,22 @@ public extension App.Coordinator {
 			 */
 
 			IfLetStore(
-				store.scope(state: \.home, action: App.Action.home),
-				then: Home.Coordinator.init(store:)
+				store.scope(state: \.main, action: App.Action.main),
+				then: Main.Coordinator.init(store:)
 			)
+			.zIndex(1)
 
-			/*
-			 IfLetStore(
-			 	store.scope(state: \.main, action: App.Action.main),
-			 	then: Main.Coordinator.init(store:)
-			 )
-			 .zIndex(1)
+			IfLetStore(
+				store.scope(state: \.onboarding, action: App.Action.onboarding),
+				then: Onboarding.Coordinator.init(store:)
+			)
+			.zIndex(2)
 
-			 IfLetStore(
-			 	store.scope(state: \.onboarding, action: App.Action.onboarding),
-			 	then: Onboarding.Coordinator.init(store:)
-			 )
-			 .zIndex(2)
-
-			 IfLetStore(
-			 	store.scope(state: \.splash, action: App.Action.splash),
-			 	then: Splash.Coordinator.init(store:)
-			 )
-			 .zIndex(3)
-			 */
+			IfLetStore(
+				store.scope(state: \.splash, action: App.Action.splash),
+				then: Splash.Coordinator.init(store:)
+			)
+			.zIndex(3)
 		}
 //		.alert(store.scope(state: \.alert), dismiss: .internal(.user(.alertDismissed)))
 	}

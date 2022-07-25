@@ -8,6 +8,7 @@
 import Common
 import ComposableArchitecture
 import Foundation
+import HomeFeature
 import SwiftUI
 import UserDefaultsClient
 import Wallet
@@ -57,15 +58,22 @@ public extension Main.Coordinator {
 				state: ViewState.init,
 				action: Main.Action.init
 			)
-		) { viewStore in
-			ForceFullScreen {
-				VStack {
-					Text("Welcome: \(viewStore.profileName)")
-					Button("Remove Wallet") {
-						viewStore.send(.removeWalletButtonPressed)
-					}
-				}
-			}
+		) { _ in
+			IfLetStore(
+				store.scope(state: \.home,
+				            action: Main.Action.home),
+				then: Home.Coordinator.init(store:)
+			)
+			/*
+			 ForceFullScreen {
+			 	VStack {
+			 		Text("Welcome: \(viewStore.profileName)")
+			 		Button("Remove Wallet") {
+			 			viewStore.send(.removeWalletButtonPressed)
+			 		}
+			 	}
+			 }
+			 */
 		}
 	}
 }

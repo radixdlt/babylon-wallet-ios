@@ -15,7 +15,19 @@ public extension Home {
 public extension Home.Coordinator {
 	// MARK: Body
 	var body: some View {
-		Text("Hello, Babylon!")
+		HStack(alignment: .top) {
+			VStack(alignment: .leading, spacing: 10) {
+				Text("Radar Wallet")
+					.font(.title)
+					.bold()
+				Text("Welcome, here are all your\naccounts on the Radar Network")
+
+				Spacer()
+			}
+			.background(Color.red)
+			.padding()
+			Spacer()
+		}
 	}
 }
 
