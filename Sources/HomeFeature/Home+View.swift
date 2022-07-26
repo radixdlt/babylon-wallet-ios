@@ -17,12 +17,12 @@ public extension Home.Coordinator {
 	// MARK: Body
 	var body: some View {
 		HStack(alignment: .top) {
-			VStack(alignment: .leading, spacing: 10) {
-				Text("home_wallet_title")
-					.modifier(PrimaryTitleLabel())
-				Text("home_wallet_subtitle")
-					.modifier(SecondaryLabel())
-				Spacer()
+			GeometryReader { proxy in
+				VStack {
+					titleView
+						.frame(width: proxy.size.width * 0.7)
+					Spacer()
+				}
 			}
 			.padding()
 			Spacer()
