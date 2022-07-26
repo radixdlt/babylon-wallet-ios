@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		93DD2F66288EEE9A0008D376 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 93DD2F69288EEE9A0008D376 /* Localizable.strings */; };
+		93DD2F67288EEE9A0008D376 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 93DD2F69288EEE9A0008D376 /* Localizable.strings */; };
 		E6781C97286DBFC90032E010 /* Bundle_Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6781C96286DBFC90032E010 /* Bundle_Extensions.swift */; };
 		E6781C98286DBFFB0032E010 /* Bundle_Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6781C96286DBFC90032E010 /* Bundle_Extensions.swift */; };
 		E6805BCD286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
@@ -18,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		93DD2F68288EEE9A0008D376 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E6781C96286DBFC90032E010 /* Bundle_Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bundle_Extensions.swift; sourceTree = "<group>"; };
 		E6805BBD286DB3EC00861180 /* WalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApp.swift; sourceTree = "<group>"; };
 		E6805BBF286DB3ED00861180 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -47,6 +50,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		93DD2F6A288EEF200008D376 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				93DD2F69288EEE9A0008D376 /* Localizable.strings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		E6781C95286DBFBA0032E010 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -69,6 +80,7 @@
 		E6805BBC286DB3EC00861180 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				93DD2F6A288EEF200008D376 /* Resources */,
 				E6781C95286DBFBA0032E010 /* Extensions */,
 				E6805BBD286DB3EC00861180 /* WalletApp.swift */,
 				E6805BBF286DB3ED00861180 /* Assets.xcassets */,
@@ -196,6 +208,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E6805BD1286DB3ED00861180 /* Assets.xcassets in Resources */,
+				93DD2F66288EEE9A0008D376 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -204,6 +217,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E6805BD2286DB3ED00861180 /* Assets.xcassets in Resources */,
+				93DD2F67288EEE9A0008D376 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,6 +282,17 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		93DD2F69288EEE9A0008D376 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				93DD2F68288EEE9A0008D376 /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		E6805BD3286DB3ED00861180 /* Debug */ = {

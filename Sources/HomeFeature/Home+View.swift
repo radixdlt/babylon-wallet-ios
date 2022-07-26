@@ -17,14 +17,13 @@ public extension Home.Coordinator {
 	var body: some View {
 		HStack(alignment: .top) {
 			VStack(alignment: .leading, spacing: 10) {
-				Text("Radar Wallet")
+				Text("wallet_title")
 					.font(.title)
 					.bold()
-				Text("Welcome, here are all your\naccounts on the Radar Network")
+				Text("home_wallet_subtitle")
 
 				Spacer()
 			}
-			.background(Color.red)
 			.padding()
 			Spacer()
 		}
