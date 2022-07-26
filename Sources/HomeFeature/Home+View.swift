@@ -30,6 +30,17 @@ public extension Home.Coordinator {
 	}
 }
 
+private extension Home.Coordinator {
+	var titleView: some View {
+		VStack(alignment: .leading, spacing: 10) {
+			Text("home_wallet_title")
+				.modifier(PrimaryTitleLabel())
+			Text("home_wallet_subtitle")
+				.modifier(SecondaryLabel())
+		}
+	}
+}
+
 // MARK: - HomeView_Previews
 #if DEBUG
 struct HomeView_Previews: PreviewProvider {
