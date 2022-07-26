@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import SwiftUI
 
@@ -17,11 +18,10 @@ public extension Home.Coordinator {
 	var body: some View {
 		HStack(alignment: .top) {
 			VStack(alignment: .leading, spacing: 10) {
-				Text("wallet_title")
-					.font(.title)
-					.bold()
+				Text("home_wallet_title")
+					.modifier(PrimaryTitleLabel())
 				Text("home_wallet_subtitle")
-
+					.modifier(SecondaryLabel())
 				Spacer()
 			}
 			.padding()
