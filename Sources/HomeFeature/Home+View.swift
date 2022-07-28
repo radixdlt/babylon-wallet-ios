@@ -34,9 +34,10 @@ private extension Home.Coordinator {
 	var titleView: some View {
 		VStack(alignment: .leading, spacing: 10) {
 			Text(L10n.Home.Wallet.title)
-				.textStyle(.primaryTitle)
+				.font(.app.title)
 			Text(L10n.Home.Wallet.subtitle)
-				.textStyle(.secondary)
+				.font(.app.body)
+				.foregroundColor(.appGrey2)
 		}
 	}
 }
