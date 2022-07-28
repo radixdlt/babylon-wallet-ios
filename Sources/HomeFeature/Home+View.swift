@@ -33,9 +33,9 @@ public extension Home.Coordinator {
 private extension Home.Coordinator {
 	var titleView: some View {
 		VStack(alignment: .leading, spacing: 10) {
-			Text("home_wallet_title")
+			Text(L10n.Home.Wallet.title)
 				.textStyle(.primaryTitle)
-			Text("home_wallet_subtitle")
+			Text(L10n.Home.Wallet.subtitle)
 				.textStyle(.secondary)
 		}
 	}
