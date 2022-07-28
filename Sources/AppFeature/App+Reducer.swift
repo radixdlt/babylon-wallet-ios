@@ -22,7 +22,7 @@ public extension App {
 		Main.reducer
 			.optional()
 			.pullback(
-				state: \.main,
+				state: /App.State.main,
 				action: /Action.main,
 				environment: {
 					Main.Environment(
@@ -36,7 +36,7 @@ public extension App {
 		Onboarding.reducer
 			.optional()
 			.pullback(
-				state: \.onboarding,
+				state: /App.State.onboarding,
 				action: /Action.onboarding,
 				environment: {
 					Onboarding.Environment(
@@ -50,7 +50,7 @@ public extension App {
 		Splash.reducer
 			.optional()
 			.pullback(
-				state: \.splash,
+				state: /App.State.splash,
 				action: /Action.splash,
 				environment: {
 					Splash.Environment(
@@ -69,24 +69,21 @@ public extension App {
 	static let appReducer = Reducer { state, action, _ in
 		switch action {
 		case .main(.coordinate(.removedWallet)):
-			state.main = nil
+			state = .onboarding(.init())
 			return Effect(value: .coordinate(.onboard))
 		case .main:
 			return .none
 		case let .onboarding(.coordinate(.onboardedWithWallet(wallet))):
-			state.onboarding = nil
+			state = .main(.init(wallet: wallet))
 			return Effect(value: .coordinate(.toMain(wallet)))
 		case .onboarding:
 			return .none
-
 		case let .splash(.coordinate(.loadWalletResult(loadWalletResult))):
-
-			state.splash = nil
 			switch loadWalletResult {
 			case let .walletLoaded(wallet):
 				return Effect(value: .coordinate(.toMain(wallet)))
 			case let .noWallet(.noProfileFoundAtPath(path)):
-				state.alert = .init(
+				state = App.State.alert(.init(
 					title: TextState("No profile found at: \(path)"),
 					buttons: [
 						.cancel(
@@ -94,10 +91,10 @@ public extension App {
 							action: .send(.coordinate(.onboard))
 						),
 					]
-				)
+				))
 				return .none
 			case .noWallet(.failedToLoadProfileFromDocument):
-				state.alert = .init(
+				state = App.State.alert(.init(
 					title: TextState("Failed to load profile from document"),
 					buttons: [
 						.cancel(
@@ -105,10 +102,10 @@ public extension App {
 							action: .send(.coordinate(.onboard))
 						),
 					]
-				)
+				))
 				return .none
 			case .noWallet(.secretsNotFoundForProfile):
-				state.alert = .init(
+				state = App.State.alert(.init(
 					title: TextState("Secrets not found for profile"),
 					buttons: [
 						.cancel(
@@ -116,21 +113,19 @@ public extension App {
 							action: .send(.coordinate(.onboard))
 						),
 					]
-				)
+				))
 				return .none
 			}
-
 		case .splash:
 			return .none
-
 		case .coordinate(.onboard):
-			state.onboarding = .init()
+			state = .onboarding(.init())
 			return .none
 		case let .coordinate(.toMain(wallet)):
-			state.main = .init(wallet: wallet)
+			state = .main(.init(wallet: wallet))
 			return .none
 		case .internal(.user(.alertDismissed)):
-			state.alert = nil
+			state = .alert(nil)
 			return .none
 		}
 	}
