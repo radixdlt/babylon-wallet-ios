@@ -37,7 +37,7 @@ private extension Home.Coordinator {
 				.font(.app.title)
 			Text(L10n.Home.Wallet.subtitle)
 				.font(.app.body)
-				.foregroundColor(.appGrey2)
+				.foregroundColor(.app.secondary)
 		}
 	}
 }

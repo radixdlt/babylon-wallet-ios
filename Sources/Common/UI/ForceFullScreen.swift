@@ -33,6 +33,6 @@ public struct ForceFullScreen<Content>: View where Content: View {
 
 private extension ForceFullScreen {
 	var background: some View {
-		colorScheme == .dark ? Color.appBackgroundDark : .appBackgroundLight
+		colorScheme == .dark ? Color.app.backgroundDark : .app.backgroundLight
 	}
 }

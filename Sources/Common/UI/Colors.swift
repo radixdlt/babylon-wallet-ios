@@ -9,9 +9,29 @@ import Foundation
 import SwiftUI
 
 public extension Color {
-	static let appBackgroundDark: Self = .black
-	static let appBackgroundLight: Self = .white
-	static let appGrey2 = Self(hex: .appGrey2)
+	/// Namespace only
+	struct App { fileprivate init() {} }
+	static let app = App()
+}
+
+public extension Color.App {
+	var backgroundDark: Color {
+		.black
+	}
+
+	var backgroundLight: Color {
+		.white
+	}
+
+	var secondary: Color {
+		.init(hex: .appGrey2)
+	}
+}
+
+extension Color {
+	enum Hex: UInt32 {
+		case appGrey2 = 0x8A8FA4
+	}
 }
 
 extension Double {
@@ -19,10 +39,6 @@ extension Double {
 }
 
 extension Color {
-	enum Hex: UInt32 {
-		case appGrey2 = 0x8A8FA4
-	}
-
 	init(hex: Hex, opacity: Double = .defaultOpacity) {
 		self.init(hex: hex.rawValue, opacity: opacity)
 	}
