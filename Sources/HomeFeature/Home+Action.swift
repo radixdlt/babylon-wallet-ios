@@ -19,7 +19,7 @@ public extension Home.Action.InternalActions {
 	enum UserAction: Equatable {
 		case toggleWalletVisibility
 		case walletToggleIsPressed
-		case settingsButtonIsPressed
+		case settingsButtonTapped
 		case createNewAccountButtonIsPressed
 		case visitTheRadixHubIsPressed
 	}

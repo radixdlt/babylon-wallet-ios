@@ -13,31 +13,72 @@ public extension Home {
 	}
 }
 
+internal extension Home.Coordinator {
+	// MARK: ViewState
+	struct ViewState: Equatable {
+		init(state _: Home.State) {}
+	}
+}
+
+internal extension Home.Coordinator {
+	// MARK: ViewAction
+	enum ViewAction: Equatable {
+		case settingsButtonTapped
+	}
+}
+
+internal extension Home.Action {
+	init(action: Home.Coordinator.ViewAction) {
+		switch action {
+		case .settingsButtonTapped:
+			self = .internal(.user(.settingsButtonTapped))
+		}
+	}
+}
+
 public extension Home.Coordinator {
 	// MARK: Body
 	var body: some View {
-		HStack(alignment: .top) {
-			GeometryReader { proxy in
-				VStack {
-					titleView
-						.frame(width: proxy.size.width * 0.7)
-					Spacer()
-				}
+		WithViewStore(
+			store.scope(
+				state: ViewState.init,
+				action: Home.Action.init
+			)
+		) { viewStore in
+			VStack(alignment: .leading, spacing: 10) {
+				TitleView(action: { viewStore.send(.settingsButtonTapped) })
+					.padding(EdgeInsets(top: 57, leading: 31, bottom: 0, trailing: 31))
+				subtitleView
+					.padding(EdgeInsets(top: 0, leading: 29, bottom: 0, trailing: 29))
 			}
-			.padding()
-			Spacer()
 		}
 	}
 }
 
 private extension Home.Coordinator {
-	var titleView: some View {
-		VStack(alignment: .leading, spacing: 10) {
-			Text(L10n.Home.Wallet.title)
-				.font(.app.title)
+	var subtitleView: some View {
+		GeometryReader { proxy in
 			Text(L10n.Home.Wallet.subtitle)
+				.frame(width: proxy.size.width * 0.7)
 				.font(.app.body)
 				.foregroundColor(.app.secondary)
+		}
+	}
+
+	struct TitleView: View {
+		let action: () -> Void
+
+		var body: some View {
+			HStack {
+				Text(L10n.Home.Wallet.title)
+					.font(.app.title)
+				Spacer()
+				Button(action: {
+					action()
+				}, label: {
+					Image("home-settings")
+				})
+			}
 		}
 	}
 }
