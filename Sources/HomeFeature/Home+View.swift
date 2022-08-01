@@ -47,18 +47,20 @@ public extension Home.Coordinator {
 				state: ViewState.init,
 				action: Home.Action.init
 			)
-		) { viewStore in
+		) { _ in
 			VStack(alignment: .leading, spacing: 10) {
-				TitleView(action: { viewStore.send(.settingsButtonTapped) },
-				          shouldShowNotification: viewStore.state.hasNotification)
-					.padding(EdgeInsets(top: 57, leading: 31, bottom: 0, trailing: 31))
-				subtitleView
-					.padding(EdgeInsets(top: 0, leading: 29, bottom: 0, trailing: 29))
+				Text("")
+				//                Home.Header.TitleView(action: { viewStore.send(.settingsButtonTapped) },
+//				          shouldShowNotification: viewStore.state.hasNotification)
+//					.padding(EdgeInsets(top: 57, leading: 31, bottom: 0, trailing: 31))
+				//                Home.Header.subtitleView
+//					.padding(EdgeInsets(top: 0, leading: 29, bottom: 0, trailing: 29))
 			}
 		}
 	}
 }
 
+/*
 private extension Home.Coordinator {
 	var subtitleView: some View {
 		GeometryReader { proxy in
@@ -104,6 +106,7 @@ private extension Home.Coordinator {
 		}
 	}
 }
+*/
 
 // MARK: - HomeView_Previews
 #if DEBUG
