@@ -82,11 +82,17 @@ private extension Home.Coordinator {
 		let action: () -> Void
 
 		var body: some View {
-			Button(action: {
-				action()
-			}, label: {
-				Image("home-settings")
-			})
+			ZStack(alignment: .topTrailing) {
+				Button(action: {
+					action()
+				}, label: {
+					Image("home-settings")
+				})
+
+				Circle()
+					.foregroundColor(.red)
+					.frame(width: 5, height: 5)
+			}
 		}
 	}
 }
