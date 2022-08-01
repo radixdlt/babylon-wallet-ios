@@ -26,6 +26,10 @@ public extension Color.App {
 	var secondary: Color {
 		.init(hex: .appGrey2)
 	}
+
+	var notification: Color {
+		.red
+	}
 }
 
 extension Color {

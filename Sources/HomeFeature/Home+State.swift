@@ -7,6 +7,7 @@ public enum Home {}
 public extension Home {
 	// MARK: State
 	struct State: Equatable {
+		public var hasNotification: Bool
 		public var walletIsVisible: Bool
 		public var walletFiatTotalValue: Float
 		public var walletCurrency: Currency
@@ -14,12 +15,14 @@ public extension Home {
 		public var radixHubUrlString: String
 
 		public init(
+			hasNotification: Bool = false,
 			walletIsVisible: Bool = false,
 			walletFiatTotalValue: Float = 0,
 			walletCurrency: Currency = .usd,
 			accounts: [Account] = [],
 			radixHubUrlString: String = ""
 		) {
+			self.hasNotification = hasNotification
 			self.walletIsVisible = walletIsVisible
 			self.walletFiatTotalValue = walletFiatTotalValue
 			self.walletCurrency = walletCurrency

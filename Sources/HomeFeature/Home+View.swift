@@ -16,7 +16,10 @@ public extension Home {
 internal extension Home.Coordinator {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: Home.State) {}
+		var hasNotification: Bool
+		init(state: Home.State) {
+			hasNotification = state.hasNotification
+		}
 	}
 }
 
@@ -46,7 +49,8 @@ public extension Home.Coordinator {
 			)
 		) { viewStore in
 			VStack(alignment: .leading, spacing: 10) {
-				TitleView(action: { viewStore.send(.settingsButtonTapped) })
+				TitleView(action: { viewStore.send(.settingsButtonTapped) },
+				          shouldShowNotification: viewStore.state.hasNotification)
 					.padding(EdgeInsets(top: 57, leading: 31, bottom: 0, trailing: 31))
 				subtitleView
 					.padding(EdgeInsets(top: 0, leading: 29, bottom: 0, trailing: 29))
@@ -67,19 +71,21 @@ private extension Home.Coordinator {
 
 	struct TitleView: View {
 		let action: () -> Void
+		var shouldShowNotification: Bool
 
 		var body: some View {
 			HStack {
 				Text(L10n.Home.Wallet.title)
 					.font(.app.title)
 				Spacer()
-				SettingsButton(action: action)
+				SettingsButton(action: action, shouldShowNotification: shouldShowNotification)
 			}
 		}
 	}
 
 	struct SettingsButton: View {
 		let action: () -> Void
+		var shouldShowNotification: Bool
 
 		var body: some View {
 			ZStack(alignment: .topTrailing) {
@@ -89,19 +95,13 @@ private extension Home.Coordinator {
 					Image("home-settings")
 				})
 
-				Circle()
-					.foregroundColor(.red)
-					.frame(width: 5, height: 5)
+				if shouldShowNotification {
+					Circle()
+						.foregroundColor(.app.notification)
+						.frame(width: 5, height: 5)
+				}
 			}
 		}
-	}
-}
-
-extension Home.Coordinator.SettingsButton {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		var hasNotification: Bool = false
-		init(state _: Home.State) {}
 	}
 }
 
