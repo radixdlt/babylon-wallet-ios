@@ -73,13 +73,29 @@ private extension Home.Coordinator {
 				Text(L10n.Home.Wallet.title)
 					.font(.app.title)
 				Spacer()
-				Button(action: {
-					action()
-				}, label: {
-					Image("home-settings")
-				})
+				SettingsButton(action: action)
 			}
 		}
+	}
+
+	struct SettingsButton: View {
+		let action: () -> Void
+
+		var body: some View {
+			Button(action: {
+				action()
+			}, label: {
+				Image("home-settings")
+			})
+		}
+	}
+}
+
+extension Home.Coordinator.SettingsButton {
+	// MARK: ViewState
+	struct ViewState: Equatable {
+		var hasNotification: Bool = false
+		init(state _: Home.State) {}
 	}
 }
 
