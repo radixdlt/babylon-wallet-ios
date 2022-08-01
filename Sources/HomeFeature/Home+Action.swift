@@ -17,10 +17,10 @@ public extension Home.Action {
 
 public extension Home.Action.InternalActions {
 	enum UserAction: Equatable {
-		case walletToggleTapped
+		case toggleBalanceVisibilityButtonTapped
 		case settingsButtonTapped
 		case createNewAccountButtonTapped
-		case visitTheRadixHubTapped
+		case visitTheRadixHubButtonTapped
 	}
 }
 
