@@ -7,6 +7,7 @@
 
 import AppFeature
 import ComposableArchitecture
+import HomeFeature
 import SwiftUI
 import UserDefaultsClient
 
@@ -43,14 +44,13 @@ struct WalletApp: SwiftUI.App {
 	var body: some Scene {
 		WindowGroup {
 			App.Coordinator(store: store)
-				.textFieldStyle(.roundedBorder)
-				.buttonStyle(.bordered)
-				.padding()
+
 			#if os(macOS)
 				.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
 			#endif
-			Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
-				.padding()
+
+			// FIXME: Move to Settings
+			// Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
 		}
 	}
 }

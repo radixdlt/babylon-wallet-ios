@@ -8,6 +8,7 @@
 import Common
 import ComposableArchitecture
 import Foundation
+import HomeFeature
 import UserDefaultsClient
 import Wallet
 
@@ -16,6 +17,7 @@ public extension Main {
 	enum Action: Equatable {
 		case `internal`(InternalActions)
 		case coordinate(CoordinatingAction)
+		case home(Home.Action)
 	}
 }
 

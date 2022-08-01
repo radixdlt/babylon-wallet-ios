@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import HomeFeature
 import MainFeature
 import OnboardingFeature
 import ProfileLoader
@@ -31,32 +32,19 @@ public extension App {
 public extension App.Coordinator {
 	// MARK: Body
 	var body: some View {
-		ZStack {
-			Text("<APP EMPTY STATE>") // Handle better, make App.State an enum?
-				.foregroundColor(Color.red)
-				.background(Color.yellow)
-				.font(.largeTitle)
-				.zIndex(0)
+		SwitchStore(store) {
+			CaseLet(state: /App.State.main,
+			        action: App.Action.main,
+			        then: Main.Coordinator.init(store:))
 
-			IfLetStore(
-				store.scope(state: \.main, action: App.Action.main),
-				then: Main.Coordinator.init(store:)
-			)
-			.zIndex(1)
+			CaseLet(state: /App.State.onboarding,
+			        action: App.Action.onboarding,
+			        then: Onboarding.Coordinator.init(store:))
 
-			IfLetStore(
-				store.scope(state: \.onboarding, action: App.Action.onboarding),
-				then: Onboarding.Coordinator.init(store:)
-			)
-			.zIndex(2)
-
-			IfLetStore(
-				store.scope(state: \.splash, action: App.Action.splash),
-				then: Splash.Coordinator.init(store:)
-			)
-			.zIndex(3)
+			CaseLet(state: /App.State.splash,
+			        action: App.Action.splash,
+			        then: Splash.Coordinator.init(store:))
 		}
-		.alert(store.scope(state: \.alert), dismiss: .internal(.user(.alertDismissed)))
 	}
 }
 

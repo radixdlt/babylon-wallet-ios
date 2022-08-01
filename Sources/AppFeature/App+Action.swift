@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import HomeFeature
 import MainFeature
 import OnboardingFeature
 import SplashFeature
