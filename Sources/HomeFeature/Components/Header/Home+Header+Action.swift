@@ -3,18 +3,18 @@ import Foundation
 public extension Home.Header {
 	// MARK: Action
 	enum Action: Equatable {
-		case `internal`(InternalActions)
+		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
 	}
 }
 
 public extension Home.Header.Action {
-	enum InternalActions: Equatable {
+	enum InternalAction: Equatable {
 		case user(UserAction)
 	}
 }
 
-public extension Home.Header.Action.InternalActions {
+public extension Home.Header.Action.InternalAction {
 	enum UserAction: Equatable {
 		case settingsButtonTapped
 	}

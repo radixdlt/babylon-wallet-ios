@@ -4,7 +4,6 @@ public extension Home {
 	// MARK: Action
 	enum Action: Equatable {
 		case header(Home.Header.Action)
-
 		case coordinate(CoordinatingAction)
 	}
 }

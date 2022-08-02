@@ -29,17 +29,15 @@ public extension Home.Coordinator {
 
 // MARK: - HomeView_Previews
 #if DEBUG
-/*
- struct HomeView_Previews: PreviewProvider {
- 	static var previews: some View {
- 		Home.Coordinator(
- 			store: .init(
- 				initialState: .init(),
- 				reducer: Home.reducer,
- 				environment: .init()
- 			)
- 		)
- 	}
- }
- */
+struct HomeView_Previews: PreviewProvider {
+	static var previews: some View {
+		Home.Coordinator(
+			store: .init(
+				initialState: .init(),
+				reducer: Home.reducer,
+				environment: .init()
+			)
+		)
+	}
+}
 #endif // DEBUG
