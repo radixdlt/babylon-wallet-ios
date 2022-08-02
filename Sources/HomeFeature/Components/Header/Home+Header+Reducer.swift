@@ -5,17 +5,9 @@ public extension Home.Header {
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = Reducer { _, action, _ in
 		switch action {
-		case let .internal(actions):
-			switch actions {
-			case let .user(userAction):
-				switch userAction {
-				case .settingsButtonTapped:
-					return Effect(value: .coordinate(.displaySettings))
-				}
-			case let .system(systemAction):
-				return .none
-			}
-		case let .coordinate(coordinatingAction):
+		case .internal(.user(.settingsButtonTapped)):
+			return Effect(value: .coordinate(.displaySettings))
+		case .coordinate:
 			return .none
 		}
 	}

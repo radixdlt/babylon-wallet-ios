@@ -14,10 +14,9 @@ public extension Home {
 
 		Reducer { _, action, _ in
 			switch action {
-			case .component(.header(.coordinate(.displaySettings))):
-				print("BANAN 🔮")
+			case .header(.coordinate(.displaySettings)):
 				return Effect(value: .coordinate(.displaySettings))
-			case .component:
+			case .header(.internal(_)):
 				return .none
 			case .coordinate:
 				return .none

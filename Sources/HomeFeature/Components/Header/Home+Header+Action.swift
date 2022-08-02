@@ -11,7 +11,6 @@ public extension Home.Header {
 public extension Home.Header.Action {
 	enum InternalActions: Equatable {
 		case user(UserAction)
-		case system(SystemAction)
 	}
 }
 
@@ -19,10 +18,6 @@ public extension Home.Header.Action.InternalActions {
 	enum UserAction: Equatable {
 		case settingsButtonTapped
 	}
-}
-
-public extension Home.Header.Action.InternalActions {
-	enum SystemAction: Equatable {}
 }
 
 public extension Home.Header.Action {
