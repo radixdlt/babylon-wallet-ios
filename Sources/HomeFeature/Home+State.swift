@@ -7,31 +7,17 @@ public enum Home {}
 public extension Home {
 	// MARK: State
 	struct State: Equatable {
-		public var hasNotification: Bool
-		public var walletIsVisible: Bool
-		public var walletFiatTotalValue: Float
-		public var walletCurrency: Currency
-		public var accounts: [Account]
-		public var radixHubUrlString: String
+        public var header: Home.Header.State
 
 		public init(
-			hasNotification: Bool = false,
-			walletIsVisible: Bool = false,
-			walletFiatTotalValue: Float = 0,
-			walletCurrency: Currency = .usd,
-			accounts: [Account] = [],
-			radixHubUrlString: String = ""
+            header: Home.Header.State
 		) {
-			self.hasNotification = hasNotification
-			self.walletIsVisible = walletIsVisible
-			self.walletFiatTotalValue = walletFiatTotalValue
-			self.walletCurrency = walletCurrency
-			self.accounts = accounts
-			self.radixHubUrlString = radixHubUrlString
+            self.header = header
 		}
 	}
 }
 
+/*
 public extension Home {
 	struct Account: Equatable {
 		var userGeneratedName: String
@@ -40,7 +26,9 @@ public extension Home {
 		var accountCurrency: Currency
 	}
 }
+*/
 
+/*
 public extension Home {
 	enum Currency: Equatable {
 		case usd
@@ -53,3 +41,4 @@ public extension Home {
 		}
 	}
 }
+*/

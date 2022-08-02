@@ -45,6 +45,8 @@ public extension Main {
 
 			case .coordinate:
 				return .none
+//            case .home(.coordinate(.displaySettings)):
+//                break
 			case .home:
 				return .none
 			}

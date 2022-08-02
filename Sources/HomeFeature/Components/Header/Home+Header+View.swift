@@ -1,22 +1,57 @@
 import Common
+import ComposableArchitecture
 import SwiftUI
 
 public extension Home.Header {
 	struct View: SwiftUI.View {
-		let action: () -> Void
-		let shouldShowNotification: Bool
+		let store: Store<State, Action>
 
 		public var body: some SwiftUI.View {
-			Home.Header.TitleView(action: action,
-			                      shouldShowNotification: shouldShowNotification)
-				.padding(EdgeInsets(top: 57, leading: 31, bottom: 0, trailing: 31))
-				//            Home.Header.subtitle
-				.padding(EdgeInsets(top: 0, leading: 29, bottom: 0, trailing: 29))
+			WithViewStore(
+				store.scope(
+					state: ViewState.init,
+					action: Home.Header.Action.init
+				)
+			) { viewStore in
+				VStack(alignment: .leading, spacing: 10) {
+					TitleView(action: { viewStore.send(.settingsButtonTapped) },
+					          shouldShowNotification: viewStore.state.hasNotification)
+						.padding(EdgeInsets(top: 57, leading: 31, bottom: 0, trailing: 31))
+					subtitleView
+						.padding(EdgeInsets(top: 0, leading: 29, bottom: 0, trailing: 29))
+				}
+			}
 		}
 	}
 }
 
-extension Home.Header {
+internal extension Home.Header.View {
+	// MARK: ViewAction
+	enum ViewAction: Equatable {
+		case settingsButtonTapped
+	}
+}
+
+internal extension Home.Header.Action {
+	init(action: Home.Header.View.ViewAction) {
+		switch action {
+		case .settingsButtonTapped:
+			self = .internal(.user(.settingsButtonTapped))
+		}
+	}
+}
+
+extension Home.Header.View {
+	// MARK: ViewState
+	struct ViewState: Equatable {
+		var hasNotification: Bool
+		init(state: Home.Header.State) {
+			hasNotification = state.hasNotification
+		}
+	}
+}
+
+private extension Home.Header.View {
 	var subtitleView: some SwiftUI.View {
 		GeometryReader { proxy in
 			Text(L10n.Home.Wallet.subtitle)
