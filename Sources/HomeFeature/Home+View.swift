@@ -20,9 +20,7 @@ public extension Home.Coordinator {
 			Home.Header.View(
 				store: store.scope(
 					state: \.header,
-					action: { headerComponentAction in
-						Home.Action.component(.header(headerComponentAction))
-					}
+					action: Home.Action.header
 				)
 			)
 		}

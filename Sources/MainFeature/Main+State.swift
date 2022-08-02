@@ -20,11 +20,11 @@ public extension Main {
 	// MARK: State
 	struct State: Equatable {
 		public var wallet: Wallet
-		public var home: Home.State?
+		public var home: Home.State
 
 		public init(
 			wallet: Wallet,
-			home: Home.State? = .init()
+			home: Home.State = .init()
 		) {
 			self.wallet = wallet
 			self.home = home

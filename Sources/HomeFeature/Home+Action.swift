@@ -19,3 +19,11 @@ public extension Home.Action {
 		case displaySettings
 	}
 }
+
+// MARK: CasePath helpers
+public extension Home.Action {
+	static func header(_ headerComponentAction: Home.Header.Action) -> Self {
+		print("APA✅")
+		return .component(.header(headerComponentAction))
+	}
+}

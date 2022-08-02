@@ -17,7 +17,6 @@ public extension Main {
 	//    typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = ComposableArchitecture.Reducer<State, Action, Environment>.combine(
 		Home.reducer
-			.optional()
 			.pullback(
 				state: \.home,
 				action: /Main.Action.home,

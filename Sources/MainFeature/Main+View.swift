@@ -59,10 +59,10 @@ public extension Main.Coordinator {
 				action: Main.Action.init
 			)
 		) { _ in
-			IfLetStore(
+
+			Home.Coordinator(store:
 				store.scope(state: \.home,
-				            action: Main.Action.home),
-				then: Home.Coordinator.init(store:)
+				            action: Main.Action.home)
 			)
 			/*
 			 ForceFullScreen {
