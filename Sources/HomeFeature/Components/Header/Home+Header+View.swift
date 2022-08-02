@@ -7,20 +7,21 @@ public extension Home.Header {
 		let store: Store<State, Action>
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store.scope(
-					state: ViewState.init,
-					action: Home.Header.Action.init
-				)
-			) { viewStore in
-				VStack(alignment: .leading, spacing: 10) {
-					TitleView(action: { viewStore.send(.settingsButtonTapped) },
-					          shouldShowNotification: viewStore.state.hasNotification)
-						.padding(EdgeInsets(top: 57, leading: 31, bottom: 0, trailing: 31))
-					subtitleView
-						.padding(EdgeInsets(top: 0, leading: 29, bottom: 0, trailing: 29))
-				}
-			}
+//			WithViewStore(
+//				store.scope(
+//					state: ViewState.init,
+//					action: Home.Header.Action.init
+//				)
+//			) { viewStore in
+//				VStack(alignment: .leading, spacing: 10) {
+//					TitleView(action: { viewStore.send(.settingsButtonTapped) },
+//					          shouldShowNotification: viewStore.state.hasNotification)
+//						.padding(EdgeInsets(top: 57, leading: 31, bottom: 0, trailing: 31))
+//					subtitleView
+//						.padding(EdgeInsets(top: 0, leading: 29, bottom: 0, trailing: 29))
+//				}
+//			}
+			Text("NO HEADER")
 		}
 	}
 }
@@ -33,11 +34,12 @@ internal extension Home.Header.View {
 }
 
 internal extension Home.Header.Action {
-	init(action: Home.Header.View.ViewAction) {
-		switch action {
-		case .settingsButtonTapped:
-			self = .internal(.user(.settingsButtonTapped))
-		}
+	init(action _: Home.Header.View.ViewAction) {
+//		switch action {
+//		case .settingsButtonTapped:
+//			self = .internal(.user(.settingsButtonTapped))
+//		}
+		fatalError()
 	}
 }
 

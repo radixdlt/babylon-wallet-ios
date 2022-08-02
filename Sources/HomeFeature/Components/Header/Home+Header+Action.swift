@@ -27,6 +27,6 @@ public extension Home.Header.Action.InternalActions {
 
 public extension Home.Header.Action {
 	enum CoordinatingAction: Equatable {
-        case displaySettings
-    }
+		case displaySettings
+	}
 }

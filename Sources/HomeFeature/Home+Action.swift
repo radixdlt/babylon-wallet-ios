@@ -10,12 +10,12 @@ public extension Home {
 
 public extension Home.Action {
 	enum ComponentAction: Equatable {
-        case header(Home.Header.Action)
+		case header(Home.Header.Action)
 	}
 }
 
 public extension Home.Action {
 	enum CoordinatingAction: Equatable {
-        case displaySettings
-    }
+		case displaySettings
+	}
 }

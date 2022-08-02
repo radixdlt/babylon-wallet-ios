@@ -22,7 +22,7 @@ let package = Package(
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
-		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.38.1"),
+		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.38.2"),
 
 		// Format code
 		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.49.11"),
@@ -90,7 +90,9 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
+				"HomeFeature",
 				tca,
+				"UserDefaultsClient",
 				"Wallet",
 				// ^^^ Sort lexicographically ^^^
 			]
