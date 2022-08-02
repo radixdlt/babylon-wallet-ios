@@ -16,15 +16,16 @@ public extension Home {
 public extension Home.Coordinator {
 	// MARK: Body
 	var body: some View {
-//		VStack {
-//			/*
-//			 Home.Header.View(
-//			     store: store.scope(
-//			         state: \.Home.Header.State.init
-//			         action: \Home.Header.Action))
-//			 */
-//		}
-		Text("NO VIEW")
+		VStack {
+			Home.Header.View(
+				store: store.scope(
+					state: \.header,
+					action: { headerComponentAction in
+						Home.Action.component(.header(headerComponentAction))
+					}
+				)
+			)
+		}
 	}
 }
 
