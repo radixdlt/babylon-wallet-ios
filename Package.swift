@@ -37,13 +37,11 @@ let package = Package(
 			name: "AppFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
-				tca,
-				"HomeFeature",
 				"MainFeature",
 				"OnboardingFeature",
 				"ProfileLoader",
-				"SettingsFeature",
 				"SplashFeature",
+				tca,
 				"UserDefaultsClient",
 				"Wallet",
 				"WalletLoader",
@@ -92,6 +90,7 @@ let package = Package(
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
 				"HomeFeature",
+				"SettingsFeature",
 				tca,
 				"UserDefaultsClient",
 				"Wallet",
@@ -160,14 +159,13 @@ let package = Package(
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
-		// FIXME: Source files for target SettingsFeatureTests should be located under 'Tests/SettingsFeatureTests', or a custom sources path can be set with the 'path' property in Package.swift
-		//        .testTarget(
-		//            name: "SettingsFeatureTests",
-		//            dependencies: [
-		//                "SettingsFeature",
-		//                "TestUtils",
-		//            ]
-		//        ),
+		.testTarget(
+			name: "SettingsFeatureTests",
+			dependencies: [
+				"SettingsFeature",
+				"TestUtils",
+			]
+		),
 		.target(
 			name: "SplashFeature",
 			dependencies: [
