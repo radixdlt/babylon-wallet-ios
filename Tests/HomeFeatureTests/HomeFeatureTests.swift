@@ -1,15 +1,18 @@
-//
-//  File.swift
-//
-//
-//  Created by Nikola Milicevic on 2022-07-21.
-//
-
+import ComposableArchitecture
 @testable import HomeFeature
 import TestUtils
+import XCTest
 
 final class HomeFeatureTests: TestCase {
-	func testTrivial() {
-		XCTAssert(true)
+	func testSettingsButtonTapped() {
+		let store = TestStore(
+			initialState: Home.State(),
+			reducer: Home.reducer,
+			environment: Home.Environment()
+		)
+
+		store.send(.header(.internal(.user(.settingsButtonTapped))))
+		store.receive(.header(.coordinate(.displaySettings)))
+		store.receive(.coordinate(.displaySettings))
 	}
 }
