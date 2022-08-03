@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-public extension Home {
+public extension Settings {
 	struct Coordinator: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -12,17 +12,10 @@ public extension Home {
 	}
 }
 
-public extension Home.Coordinator {
+public extension Settings.Coordinator {
 	// MARK: Body
 	var body: some View {
-		VStack {
-			Home.Header.View(
-				store: store.scope(
-					state: \.header,
-					action: Home.Action.header
-				)
-			)
-		}
+		EmptyView()
 	}
 }
 
@@ -30,10 +23,10 @@ public extension Home.Coordinator {
 #if DEBUG
 struct HomeView_Previews: PreviewProvider {
 	static var previews: some View {
-		Home.Coordinator(
+		Settings.Coordinator(
 			store: .init(
 				initialState: .init(),
-				reducer: Home.reducer,
+				reducer: Settings.reducer,
 				environment: .init()
 			)
 		)
