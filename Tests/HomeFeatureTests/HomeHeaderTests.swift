@@ -3,15 +3,15 @@ import ComposableArchitecture
 import TestUtils
 import XCTest
 
-final class HomeFeatureTests: TestCase {
+final class HomeHeaderTests: TestCase {
 	func testSettingsButtonTapped() {
 		let store = TestStore(
-			initialState: Home.State(),
-			reducer: Home.reducer,
-			environment: Home.Environment()
+			initialState: Home.Header.State(),
+			reducer: Home.Header.reducer,
+			environment: Home.Header.Environment()
 		)
 
-		store.send(.header(.coordinate(.displaySettings)))
+		store.send(.internal(.user(.settingsButtonTapped)))
 		store.receive(.coordinate(.displaySettings))
 	}
 }
