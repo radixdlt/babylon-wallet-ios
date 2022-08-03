@@ -7,7 +7,6 @@
 
 import AppFeature
 import ComposableArchitecture
-import HomeFeature
 import SwiftUI
 import UserDefaultsClient
 
