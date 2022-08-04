@@ -7,7 +7,7 @@ final class MainFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Main.State(wallet: .init(profile: .init())),
 			reducer: Main.reducer,
-			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .default)
+			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop)
 		)
 
 		store.send(.home(.coordinate(.displaySettings))) {
@@ -19,7 +19,7 @@ final class MainFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Main.State(wallet: .init(profile: .init()), settings: .init()),
 			reducer: Main.reducer,
-			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .default)
+			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop)
 		)
 
 		store.send(.settings(.coordinate(.dismissSettings))) {

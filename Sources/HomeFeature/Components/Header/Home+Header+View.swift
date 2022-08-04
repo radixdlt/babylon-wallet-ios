@@ -14,9 +14,10 @@ public extension Home.Header {
 				)
 			) { viewStore in
 				VStack {
-					TitleView(action: { viewStore.send(.settingsButtonTapped) },
-					          shouldShowNotification: viewStore.state.hasNotification)
-					subtitleView
+					TitleView(
+						shouldShowNotification: viewStore.state.hasNotification,
+						settingsButtonTappedAction: { viewStore.send(.settingsButtonTapped) }
+					)
 				}
 			}
 		}
@@ -60,30 +61,26 @@ private extension Home.Header.View {
 	}
 
 	struct TitleView: SwiftUI.View {
-		let action: () -> Void
 		var shouldShowNotification: Bool
+		let settingsButtonTappedAction: () -> Void
 
 		public var body: some SwiftUI.View {
 			HStack {
 				Text(L10n.Home.Wallet.title)
 					.font(.app.title)
 				Spacer()
-				SettingsButton(action: action, shouldShowNotification: shouldShowNotification)
+				SettingsButton(action: settingsButtonTappedAction, shouldShowNotification: shouldShowNotification)
 			}
 		}
 	}
 
 	struct SettingsButton: SwiftUI.View {
 		let action: () -> Void
-		var shouldShowNotification: Bool
+		let shouldShowNotification: Bool
 
 		public var body: some SwiftUI.View {
 			ZStack(alignment: .topTrailing) {
-				Button(action: {
-					action()
-				}, label: {
-					Image("home-settings")
-				})
+				Button(action: action, label: { Image("home-settings") })
 
 				if shouldShowNotification {
 					Circle()
