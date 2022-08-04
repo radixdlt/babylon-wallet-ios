@@ -1,13 +1,5 @@
-//
-//  WalletApp.swift
-//  Shared
-//
-//  Created by Alexander Cyon on 2022-06-30.
-//
-
 import AppFeature
 import ComposableArchitecture
-import HomeFeature
 import SwiftUI
 import UserDefaultsClient
 
@@ -44,6 +36,8 @@ struct WalletApp: SwiftUI.App {
 	var body: some Scene {
 		WindowGroup {
 			App.Coordinator(store: store)
+				.textFieldStyle(.roundedBorder)
+				.buttonStyle(.borderedProminent)
 
 			#if os(macOS)
 				.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)

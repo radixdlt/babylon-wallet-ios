@@ -22,7 +22,7 @@ let package = Package(
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
-		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.38.1"),
+		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.38.2"),
 
 		// Format code
 		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.49.11"),
@@ -37,12 +37,11 @@ let package = Package(
 			name: "AppFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
-				tca,
-				"HomeFeature",
 				"MainFeature",
 				"OnboardingFeature",
 				"ProfileLoader",
 				"SplashFeature",
+				tca,
 				"UserDefaultsClient",
 				"Wallet",
 				"WalletLoader",
@@ -90,7 +89,10 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
+				"HomeFeature",
+				"SettingsFeature",
 				tca,
+				"UserDefaultsClient",
 				"Wallet",
 				// ^^^ Sort lexicographically ^^^
 			]
@@ -146,6 +148,22 @@ let package = Package(
 			name: "ProfileLoaderTests",
 			dependencies: [
 				"ProfileLoader",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "SettingsFeature",
+			dependencies: [
+				// ˅˅˅ Sort lexicographically ˅˅˅
+				"Common",
+				tca,
+				// ^^^ Sort lexicographically ^^^
+			]
+		),
+		.testTarget(
+			name: "SettingsFeatureTests",
+			dependencies: [
+				"SettingsFeature",
 				"TestUtils",
 			]
 		),

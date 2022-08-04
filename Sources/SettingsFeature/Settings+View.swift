@@ -2,7 +2,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
-public extension Home {
+public extension Settings {
 	struct Coordinator: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -13,31 +13,19 @@ public extension Home {
 	}
 }
 
-public extension Home.Coordinator {
+public extension Settings.Coordinator {
 	// MARK: Body
 	var body: some View {
-		HStack(alignment: .top) {
-			GeometryReader { proxy in
+		// NOTE: placeholder implementation
+		WithViewStore(store) { store in
+			ForceFullScreen {
 				VStack {
-					titleView
-						.frame(width: proxy.size.width * 0.7)
-					Spacer()
+					Text("Settings")
+					Button(action: { store.send(.coordinate(.dismissSettings)) }, label: {
+						Text("Dismiss Settings")
+					})
 				}
 			}
-			.padding()
-			Spacer()
-		}
-	}
-}
-
-private extension Home.Coordinator {
-	var titleView: some View {
-		VStack(alignment: .leading, spacing: 10) {
-			Text(L10n.Home.Wallet.title)
-				.font(.app.title)
-			Text(L10n.Home.Wallet.subtitle)
-				.font(.app.body)
-				.foregroundColor(.app.secondary)
 		}
 	}
 }
@@ -46,10 +34,10 @@ private extension Home.Coordinator {
 #if DEBUG
 struct HomeView_Previews: PreviewProvider {
 	static var previews: some View {
-		Home.Coordinator(
+		Settings.Coordinator(
 			store: .init(
 				initialState: .init(),
-				reducer: Home.reducer,
+				reducer: Settings.reducer,
 				environment: .init()
 			)
 		)

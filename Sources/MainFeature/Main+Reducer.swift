@@ -1,23 +1,15 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-07-01.
-//
-
 import Common
 import ComposableArchitecture
 import Foundation
 import HomeFeature
+import SettingsFeature
 import UserDefaultsClient
 import Wallet
 
 public extension Main {
 	// MARK: Reducer
-	//    typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = ComposableArchitecture.Reducer<State, Action, Environment>.combine(
 		Home.reducer
-			.optional()
 			.pullback(
 				state: \.home,
 				action: /Main.Action.home,
@@ -26,7 +18,17 @@ public extension Main {
 				}
 			),
 
-		Reducer { _, action, environment in
+		Settings.reducer
+			.optional()
+			.pullback(
+				state: \.settings,
+				action: /Main.Action.settings,
+				environment: { _ in
+					Settings.Environment()
+				}
+			),
+
+		Reducer { state, action, environment in
 			switch action {
 			case .internal(.user(.removeWallet)):
 				return Effect(value: .internal(.system(.removedWallet)))
@@ -45,7 +47,15 @@ public extension Main {
 
 			case .coordinate:
 				return .none
+			case .home(.coordinate(.displaySettings)):
+				state.settings = .init()
+				return .none
 			case .home:
+				return .none
+			case .settings(.coordinate(.dismissSettings)):
+				state.settings = nil
+				return .none
+			case .settings:
 				return .none
 			}
 		}

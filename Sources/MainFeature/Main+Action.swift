@@ -1,14 +1,8 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-07-01.
-//
-
 import Common
 import ComposableArchitecture
 import Foundation
 import HomeFeature
+import SettingsFeature
 import UserDefaultsClient
 import Wallet
 
@@ -18,6 +12,7 @@ public extension Main {
 		case `internal`(InternalActions)
 		case coordinate(CoordinatingAction)
 		case home(Home.Action)
+		case settings(Settings.Action)
 	}
 }
 

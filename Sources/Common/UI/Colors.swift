@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-07-01.
-//
-
 import Foundation
 import SwiftUI
 
@@ -25,6 +18,10 @@ public extension Color.App {
 
 	var secondary: Color {
 		.init(hex: .appGrey2)
+	}
+
+	var notification: Color {
+		.red
 	}
 }
 
