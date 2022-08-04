@@ -9,6 +9,7 @@ import Common
 import ComposableArchitecture
 import Foundation
 import HomeFeature
+import SettingsFeature
 import SwiftUI
 import UserDefaultsClient
 import Wallet
@@ -53,27 +54,17 @@ internal extension Main.Action {
 public extension Main.Coordinator {
 	// MARK: Body
 	var body: some View {
-		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: Main.Action.init
+		ZStack {
+			Home.Coordinator(
+				store: store.scope(state: \.home, action: Main.Action.home)
 			)
-		) { _ in
+			.zIndex(0)
 
-			Home.Coordinator(store:
-				store.scope(state: \.home,
-				            action: Main.Action.home)
+			IfLetStore(
+				store.scope(state: \.settings, action: Main.Action.settings),
+				then: Settings.Coordinator.init(store:)
 			)
-			/*
-			 ForceFullScreen {
-			 	VStack {
-			 		Text("Welcome: \(viewStore.profileName)")
-			 		Button("Remove Wallet") {
-			 			viewStore.send(.removeWalletButtonPressed)
-			 		}
-			 	}
-			 }
-			 */
+			.zIndex(1)
 		}
 	}
 }
