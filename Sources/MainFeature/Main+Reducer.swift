@@ -24,6 +24,16 @@ public extension Main {
 				}
 			),
 
+		Settings.reducer
+			.optional()
+			.pullback(
+				state: \.settings,
+				action: /Main.Action.settings,
+				environment: { _ in
+					Settings.Environment()
+				}
+			),
+
 		Reducer { state, action, environment in
 			switch action {
 			case .internal(.user(.removeWallet)):

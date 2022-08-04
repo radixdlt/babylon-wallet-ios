@@ -18,7 +18,14 @@ public extension Settings.Coordinator {
 	var body: some View {
 		// NOTE: placeholder implementation
 		ForceFullScreen {
-			Text("Settings")
+			WithViewStore(store) { store in
+				VStack {
+					Text("Settings")
+					Button(action: { store.send(.coordinate(.dismissSettings)) }, label: {
+						Text("Dismiss Settings")
+					})
+				}
+			}
 		}
 	}
 }

@@ -19,6 +19,18 @@ public struct UserDefaultsClient {
 	public var setData: (Data?, String) -> Effect<Never, Never>
 	public var setDouble: (Double, String) -> Effect<Never, Never>
 	public var setInteger: (Int, String) -> Effect<Never, Never>
+
+	public static let `default`: UserDefaultsClient = .init(
+		boolForKey: { _ in true },
+		dataForKey: { _ in nil },
+		doubleForKey: { _ in Double() },
+		integerForKey: { _ in Int() },
+		remove: { _ in .none },
+		setBool: { _, _ in .none },
+		setData: { _, _ in .none },
+		setDouble: { _, _ in .none },
+		setInteger: { _, _ in .none }
+	)
 }
 
 private extension UserDefaultsClient {
