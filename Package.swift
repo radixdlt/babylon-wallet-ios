@@ -155,6 +155,7 @@ let package = Package(
 			name: "SettingsFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
+				"Common",
 				tca,
 				// ^^^ Sort lexicographically ^^^
 			]

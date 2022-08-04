@@ -14,7 +14,6 @@ import Wallet
 
 public extension Main {
 	// MARK: Reducer
-	//    typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = ComposableArchitecture.Reducer<State, Action, Environment>.combine(
 		Home.reducer
 			.pullback(
@@ -25,7 +24,7 @@ public extension Main {
 				}
 			),
 
-		Reducer { _, action, environment in
+		Reducer { state, action, environment in
 			switch action {
 			case .internal(.user(.removeWallet)):
 				return Effect(value: .internal(.system(.removedWallet)))
@@ -44,9 +43,15 @@ public extension Main {
 
 			case .coordinate:
 				return .none
-			//            case .home(.coordinate(.displaySettings)):
-			//                break
+			case .home(.coordinate(.displaySettings)):
+				state.settings = .init()
+				return .none
 			case .home:
+				return .none
+			case .settings(.coordinate(.dismissSettings)):
+				state.settings = nil
+				return .none
+			case .settings:
 				return .none
 			}
 		}

@@ -8,5 +8,7 @@ public extension Settings {
 }
 
 public extension Settings.Action {
-	enum CoordinatingAction: Equatable {}
+	enum CoordinatingAction: Equatable {
+		case dismissSettings
+	}
 }

@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import SwiftUI
 
@@ -15,7 +16,10 @@ public extension Settings {
 public extension Settings.Coordinator {
 	// MARK: Body
 	var body: some View {
-		EmptyView()
+		// NOTE: placeholder implementation
+		ForceFullScreen {
+			Text("Settings")
+		}
 	}
 }
 
