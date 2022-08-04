@@ -13,11 +13,12 @@ public extension Home.Header {
 					action: Home.Header.Action.init
 				)
 			) { viewStore in
-				VStack {
+				VStack(alignment: .leading) {
 					TitleView(
 						shouldShowNotification: viewStore.state.hasNotification,
 						settingsButtonTappedAction: { viewStore.send(.settingsButtonTapped) }
 					)
+					subtitleView
 				}
 			}
 		}
@@ -56,7 +57,6 @@ private extension Home.Header.View {
 			Text(L10n.Home.Wallet.subtitle)
 				.font(.app.body)
 				.foregroundColor(.app.secondary)
-			Spacer(minLength: 88)
 		}
 	}
 
