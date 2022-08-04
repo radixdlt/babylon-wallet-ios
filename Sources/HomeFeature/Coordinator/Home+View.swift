@@ -22,7 +22,9 @@ public extension Home.Coordinator {
 					action: Home.Action.header
 				)
 			)
+			Spacer()
 		}
+		.padding(EdgeInsets(top: 10, leading: 32, bottom: 0, trailing: 32))
 	}
 }
 

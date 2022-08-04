@@ -13,12 +13,10 @@ public extension Home.Header {
 					action: Home.Header.Action.init
 				)
 			) { viewStore in
-				VStack(alignment: .leading, spacing: 10) {
+				VStack {
 					TitleView(action: { viewStore.send(.settingsButtonTapped) },
 					          shouldShowNotification: viewStore.state.hasNotification)
-						.padding(EdgeInsets(top: 57, leading: 31, bottom: 0, trailing: 31))
 					subtitleView
-						.padding(EdgeInsets(top: 0, leading: 29, bottom: 0, trailing: 29))
 				}
 			}
 		}
@@ -53,11 +51,11 @@ extension Home.Header.View {
 
 private extension Home.Header.View {
 	var subtitleView: some SwiftUI.View {
-		GeometryReader { proxy in
+		HStack {
 			Text(L10n.Home.Wallet.subtitle)
-				.frame(width: proxy.size.width * 0.7)
 				.font(.app.body)
 				.foregroundColor(.app.secondary)
+			Spacer(minLength: 88)
 		}
 	}
 
