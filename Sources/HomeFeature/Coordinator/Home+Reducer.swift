@@ -17,6 +17,10 @@ public extension Home {
 				return Effect(value: .coordinate(.displaySettings))
 			case .header(.internal(_)):
 				return .none
+			case .visitHub(.coordinate(.displayHub)):
+				return Effect(value: .coordinate(.displayVisitHub))
+			case .visitHub(.internal(_)):
+				return .none
 			case .coordinate:
 				return .none
 			}
