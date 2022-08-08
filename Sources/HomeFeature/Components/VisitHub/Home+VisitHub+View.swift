@@ -13,18 +13,12 @@ public extension Home.VisitHub {
 					action: Home.VisitHub.Action.init
 				)
 			) { viewStore in
-				VStack(spacing: 20) {
-					Text(L10n.Home.VisitHub.title)
-						.multilineTextAlignment(.center)
-
-					Button(action: { viewStore.send(.visitHubButtonTapped) },
-					       label: {
-					       	Text(L10n.Home.VisitHub.buttonTitle)
-					       		.frame(maxWidth: .infinity)
-					       		.background(Color.red)
-					       })
+				VStack {
+					title
+					visitHubButton { viewStore.send(.visitHubButtonTapped) }
 				}
-				.background(Color.green)
+				.background(Color.app.buttonBackgroundDark)
+				.cornerRadius(6)
 			}
 		}
 	}
@@ -56,5 +50,22 @@ extension Home.VisitHub.View {
 }
 
 private extension Home.VisitHub.View {
-	// TODO: extract subviews
+	var title: some View {
+		Text(L10n.Home.VisitHub.title)
+			.foregroundColor(.app.buttonTextDark)
+			.multilineTextAlignment(.center)
+			.padding()
+	}
+
+	func visitHubButton(_ action: @escaping () -> Void) -> some View {
+		Button(action: action,
+		       label: {
+		       	Text(L10n.Home.VisitHub.buttonTitle)
+		       		.foregroundColor(.app.buttonTextBlack)
+		       		.padding()
+		       		.frame(maxWidth: .infinity)
+		       		.background(Color.app.buttonBackgroundLight)
+		       		.cornerRadius(6)
+		       })
+	}
 }

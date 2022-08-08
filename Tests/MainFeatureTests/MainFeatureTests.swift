@@ -26,4 +26,14 @@ final class MainFeatureTests: TestCase {
 			$0.settings = nil
 		}
 	}
+
+	func testVisitHub() {
+		let store = TestStore(
+			initialState: Main.State(wallet: .init(profile: .init())),
+			reducer: Main.reducer,
+			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop)
+		)
+
+		store.send(.home(.coordinate(.displayVisitHub)))
+	}
 }

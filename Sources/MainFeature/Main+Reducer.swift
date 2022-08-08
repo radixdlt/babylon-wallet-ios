@@ -3,6 +3,7 @@ import ComposableArchitecture
 import Foundation
 import HomeFeature
 import SettingsFeature
+import UIKit
 import UserDefaultsClient
 import Wallet
 
@@ -50,6 +51,8 @@ public extension Main {
 			case .home(.coordinate(.displaySettings)):
 				state.settings = .init()
 				return .none
+			case .home(.coordinate(.displayVisitHub)):
+				return .fireAndForget { UIApplication.shared.open(URL(string: "https://www.apple.com")!) }
 			case .home:
 				return .none
 			case .settings(.coordinate(.dismissSettings)):
