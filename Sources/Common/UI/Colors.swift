@@ -39,6 +39,10 @@ public extension Color.App {
 	var buttonTextBlack: Color {
 		.black
 	}
+
+	var buttonTintDark: Color {
+		.init(hex: .appGrey5)
+	}
 }
 
 extension Color {
@@ -46,6 +50,7 @@ extension Color {
 		case appGrey2 = 0x8A8FA4
 		case appGrey3 = 0xE2E2E2
 		case appGrey4 = 0xBEBDBD
+		case appGrey5 = 0x474747
 		case appCharcoal1 = 0x414141
 	}
 }

@@ -80,7 +80,11 @@ private extension Home.Header.View {
 
 		public var body: some SwiftUI.View {
 			ZStack(alignment: .topTrailing) {
-				Button(action: action, label: { Image("home-settings") })
+				// TODO: use swiftgen for assets
+				Button(action: action) {
+					Image("home-settings")
+						.tint(.app.buttonTintDark)
+				}
 
 				if shouldShowNotification {
 					Circle()
