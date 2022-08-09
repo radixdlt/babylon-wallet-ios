@@ -18,6 +18,7 @@ extension Font {
 
 extension Font {
 	enum Size: CGFloat {
+		case 𝟙𝟙 = 11
 		case 𝟙𝟞 = 16
 		case 𝟚𝟞 = 26
 	}
@@ -30,5 +31,9 @@ public extension Font.App {
 
 	var body: Font {
 		.custom(.𝟙𝟞, .regular)
+	}
+
+	var caption: Font {
+		.custom(.𝟙𝟙, .bold)
 	}
 }

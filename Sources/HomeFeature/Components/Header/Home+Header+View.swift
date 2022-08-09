@@ -45,6 +45,7 @@ extension Home.Header.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		var hasNotification: Bool
+
 		init(state: Home.Header.State) {
 			hasNotification = state.hasNotification
 		}
@@ -82,8 +83,7 @@ private extension Home.Header.View {
 			ZStack(alignment: .topTrailing) {
 				// TODO: use swiftgen for assets
 				Button(action: action) {
-					Image("home-settings")
-						.tint(.app.buttonTintDark)
+					Image("home-header-settings")
 				}
 
 				if shouldShowNotification {
