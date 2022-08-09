@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - Home
-/// Namespace for HomeFeature
+/// Namespace for HeaderFeature
 public extension Home {
 	enum Header {}
 }

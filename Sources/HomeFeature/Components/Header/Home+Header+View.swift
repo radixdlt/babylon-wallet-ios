@@ -70,14 +70,15 @@ private extension Home.Header.View {
 				Text(L10n.Home.Header.title)
 					.font(.app.title)
 				Spacer()
-				SettingsButton(action: settingsButtonTappedAction, shouldShowNotification: shouldShowNotification)
+				SettingsButton(shouldShowNotification: shouldShowNotification,
+				               action: settingsButtonTappedAction)
 			}
 		}
 	}
 
 	struct SettingsButton: SwiftUI.View {
-		let action: () -> Void
 		let shouldShowNotification: Bool
+		let action: () -> Void
 
 		public var body: some SwiftUI.View {
 			ZStack(alignment: .topTrailing) {

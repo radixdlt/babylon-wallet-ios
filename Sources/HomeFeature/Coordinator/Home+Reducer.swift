@@ -11,6 +11,13 @@ public extension Home {
 				environment: { _ in Home.Header.Environment() }
 			),
 
+		Home.Balance.reducer
+			.pullback(
+				state: \.balance,
+				action: /Home.Action.balance,
+				environment: { _ in Home.Balance.Environment() }
+			),
+
 		Home.VisitHub.reducer
 			.pullback(
 				state: \.visitHub,
@@ -23,6 +30,8 @@ public extension Home {
 			case .header(.coordinate(.displaySettings)):
 				return Effect(value: .coordinate(.displaySettings))
 			case .header(.internal(_)):
+				return .none
+			case .balance:
 				return .none
 			case .visitHub(.coordinate(.displayHub)):
 				return Effect(value: .coordinate(.displayVisitHub))
