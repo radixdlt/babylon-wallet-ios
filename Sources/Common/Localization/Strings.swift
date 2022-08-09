@@ -10,11 +10,18 @@ import Foundation
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 public enum L10n {
 	public enum Home {
-		public enum Wallet {
+		public enum Header {
 			/// Welcome, here are all your accounts on the Radar Network
-			public static let subtitle = L10n.tr("Localizable", "home.wallet.subtitle")
+			public static let subtitle = L10n.tr("Localizable", "home.header.subtitle")
 			/// Radar Wallet
-			public static let title = L10n.tr("Localizable", "home.wallet.title")
+			public static let title = L10n.tr("Localizable", "home.header.title")
+		}
+
+		public enum VisitHub {
+			/// Visit the Radar Hub
+			public static let buttonTitle = L10n.tr("Localizable", "home.visitHub.buttonTitle")
+			/// Ready to get started using the Radar Network and your Wallet?
+			public static let title = L10n.tr("Localizable", "home.visitHub.title")
 		}
 	}
 }
@@ -36,7 +43,6 @@ extension L10n {
 private final class BundleToken {
 	static let bundle: Bundle = {
 		#if SWIFT_PACKAGE
-		// FIXME:
 		//    return Bundle.module
 		return Bundle(for: BundleToken.self)
 		#else

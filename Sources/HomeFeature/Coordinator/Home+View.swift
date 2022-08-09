@@ -23,8 +23,13 @@ public extension Home.Coordinator {
 				)
 			)
 			Spacer()
+			Home.VisitHub.View(
+				store: store.scope(
+					state: \.visitHub,
+					action: Home.Action.visitHub
+				))
 		}
-		.padding(EdgeInsets(top: 10, leading: 32, bottom: 0, trailing: 32))
+		.padding(32)
 	}
 }
 

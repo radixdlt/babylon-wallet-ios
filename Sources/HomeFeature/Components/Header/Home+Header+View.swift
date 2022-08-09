@@ -54,7 +54,7 @@ extension Home.Header.View {
 private extension Home.Header.View {
 	var subtitleView: some SwiftUI.View {
 		HStack {
-			Text(L10n.Home.Wallet.subtitle)
+			Text(L10n.Home.Header.subtitle)
 				.font(.app.body)
 				.foregroundColor(.app.secondary)
 		}
@@ -66,7 +66,7 @@ private extension Home.Header.View {
 
 		public var body: some SwiftUI.View {
 			HStack {
-				Text(L10n.Home.Wallet.title)
+				Text(L10n.Home.Header.title)
 					.font(.app.title)
 				Spacer()
 				SettingsButton(action: settingsButtonTappedAction, shouldShowNotification: shouldShowNotification)
@@ -80,7 +80,11 @@ private extension Home.Header.View {
 
 		public var body: some SwiftUI.View {
 			ZStack(alignment: .topTrailing) {
-				Button(action: action, label: { Image("home-settings") })
+				// TODO: use swiftgen for assets
+				Button(action: action) {
+					Image("home-settings")
+						.tint(.app.buttonTintDark)
+				}
 
 				if shouldShowNotification {
 					Circle()

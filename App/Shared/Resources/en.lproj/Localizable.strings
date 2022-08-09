@@ -1,2 +1,5 @@
-"home.wallet.title" = "Radar Wallet";
-"home.wallet.subtitle" = "Welcome, here are all your accounts on the Radar Network";
+"home.header.title" = "Radar Wallet";
+"home.header.subtitle" = "Welcome, here are all your accounts on the Radar Network";
+
+"home.visitHub.title" = "Ready to get started using the Radar Network and your Wallet?";
+"home.visitHub.buttonTitle" = "Visit the Radar Hub";

@@ -4,6 +4,7 @@ public extension Home {
 	// MARK: Action
 	enum Action: Equatable {
 		case header(Home.Header.Action)
+		case visitHub(Home.VisitHub.Action)
 		case coordinate(CoordinatingAction)
 	}
 }
@@ -11,5 +12,6 @@ public extension Home {
 public extension Home.Action {
 	enum CoordinatingAction: Equatable {
 		case displaySettings
+		case displayVisitHub
 	}
 }

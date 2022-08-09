@@ -23,11 +23,35 @@ public extension Color.App {
 	var notification: Color {
 		.red
 	}
+
+	var buttonBackgroundLight: Color {
+		.init(hex: .appGrey3)
+	}
+
+	var buttonBackgroundDark: Color {
+		.init(hex: .appGrey4)
+	}
+
+	var buttonTextDark: Color {
+		.init(hex: .appCharcoal1)
+	}
+
+	var buttonTextBlack: Color {
+		.black
+	}
+
+	var buttonTintDark: Color {
+		.init(hex: .appGrey5)
+	}
 }
 
 extension Color {
 	enum Hex: UInt32 {
 		case appGrey2 = 0x8A8FA4
+		case appGrey3 = 0xE2E2E2
+		case appGrey4 = 0xBEBDBD
+		case appGrey5 = 0x474747
+		case appCharcoal1 = 0x414141
 	}
 }
 

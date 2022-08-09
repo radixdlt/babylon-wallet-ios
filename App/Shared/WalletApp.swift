@@ -36,8 +36,6 @@ struct WalletApp: SwiftUI.App {
 	var body: some Scene {
 		WindowGroup {
 			App.Coordinator(store: store)
-				.textFieldStyle(.roundedBorder)
-				.buttonStyle(.borderedProminent)
 
 			#if os(macOS)
 				.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
