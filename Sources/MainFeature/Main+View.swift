@@ -22,6 +22,7 @@ internal extension Main.Coordinator {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		public var profileName: String
+
 		init(state: Main.State) {
 			profileName = state.wallet.profile.name
 		}
@@ -49,12 +50,18 @@ public extension Main.Coordinator {
 	var body: some View {
 		ZStack {
 			Home.Coordinator(
-				store: store.scope(state: \.home, action: Main.Action.home)
+				store: store.scope(
+					state: \.home,
+					action: Main.Action.home
+				)
 			)
 			.zIndex(0)
 
 			IfLetStore(
-				store.scope(state: \.settings, action: Main.Action.settings),
+				store.scope(
+					state: \.settings,
+					action: Main.Action.settings
+				),
 				then: Settings.Coordinator.init(store:)
 			)
 			.zIndex(1)

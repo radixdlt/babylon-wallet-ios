@@ -29,6 +29,10 @@ public extension Color.App {
 	}
 
 	var buttonBackgroundDark: Color {
+		.init(hex: .appGrey5)
+	}
+
+	var buttonTextLight: Color {
 		.init(hex: .appGrey4)
 	}
 
@@ -39,27 +43,23 @@ public extension Color.App {
 	var buttonTextBlack: Color {
 		.black
 	}
-
-	var buttonTintDark: Color {
-		.init(hex: .appGrey5)
-	}
 }
 
-extension Color {
+private extension Color {
 	enum Hex: UInt32 {
 		case appGrey2 = 0x8A8FA4
 		case appGrey3 = 0xE2E2E2
-		case appGrey4 = 0xBEBDBD
-		case appGrey5 = 0x474747
+		case appGrey4 = 0xE2E5ED
+		case appGrey5 = 0xBEBDBD
 		case appCharcoal1 = 0x414141
 	}
 }
 
-extension Double {
+private extension Double {
 	static let defaultOpacity: Self = 1
 }
 
-extension Color {
+private extension Color {
 	init(hex: Hex, opacity: Double = .defaultOpacity) {
 		self.init(hex: hex.rawValue, opacity: opacity)
 	}

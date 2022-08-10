@@ -6,7 +6,9 @@ public extension Home {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
-		public init(store: Store) {
+		public init(
+			store: Store
+		) {
 			self.store = store
 		}
 	}
@@ -23,11 +25,19 @@ public extension Home.Coordinator {
 				)
 			)
 			Spacer()
+			Home.Balance.View(
+				store: store.scope(
+					state: \.balance,
+					action: Home.Action.balance
+				)
+			)
+			Spacer()
 			Home.VisitHub.View(
 				store: store.scope(
 					state: \.visitHub,
 					action: Home.Action.visitHub
-				))
+				)
+			)
 		}
 		.padding(32)
 	}
