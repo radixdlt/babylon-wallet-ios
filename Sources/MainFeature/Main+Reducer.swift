@@ -52,7 +52,9 @@ public extension Main {
 				state.settings = .init()
 				return .none
 			case .home(.coordinate(.displayVisitHub)):
-				return .fireAndForget { UIApplication.shared.open(URL(string: "https://www.apple.com")!) }
+				return .fireAndForget {
+					UIApplication.shared.open(URL(string: "https://www.apple.com")!)
+				}
 			case .home:
 				return .none
 			case .settings(.coordinate(.dismissSettings)):

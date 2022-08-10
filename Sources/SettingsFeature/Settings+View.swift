@@ -7,7 +7,9 @@ public extension Settings {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
-		public init(store: Store) {
+		public init(
+			store: Store
+		) {
 			self.store = store
 		}
 	}

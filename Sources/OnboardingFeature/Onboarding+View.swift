@@ -22,6 +22,7 @@ internal extension Onboarding.Coordinator {
 	struct ViewState: Equatable {
 		@BindableState var profileName: String
 		var canProceed: Bool
+
 		init(
 			state: Onboarding.State
 		) {

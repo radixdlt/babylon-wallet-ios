@@ -11,6 +11,7 @@ public extension Onboarding {
 		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
 		public let mainQueue: AnySchedulerOf<DispatchQueue>
 		public let userDefaultsClient: UserDefaultsClient // replace with `ProfileCreator`
+
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
 			mainQueue: AnySchedulerOf<DispatchQueue>,

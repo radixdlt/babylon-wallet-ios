@@ -15,7 +15,9 @@ public extension Home.VisitHub {
 			) { viewStore in
 				VStack {
 					title
-					visitHubButton { viewStore.send(.visitHubButtonTapped) }
+					visitHubButton {
+						viewStore.send(.visitHubButtonTapped)
+					}
 				}
 				.background(Color.app.buttonBackgroundDark)
 				.cornerRadius(6)
@@ -43,7 +45,9 @@ internal extension Home.VisitHub.Action {
 extension Home.VisitHub.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: Home.VisitHub.State) {
+		init(
+			state _: Home.VisitHub.State
+		) {
 			// TODO: implement
 		}
 	}
@@ -58,14 +62,16 @@ private extension Home.VisitHub.View {
 	}
 
 	func visitHubButton(_ action: @escaping () -> Void) -> some View {
-		Button(action: action,
-		       label: {
-		       	Text(L10n.Home.VisitHub.buttonTitle)
-		       		.foregroundColor(.app.buttonTextBlack)
-		       		.padding()
-		       		.frame(maxWidth: .infinity)
-		       		.background(Color.app.buttonBackgroundLight)
-		       		.cornerRadius(6)
-		       })
+		Button(
+			action: action,
+			label: {
+				Text(L10n.Home.VisitHub.buttonTitle)
+					.foregroundColor(.app.buttonTextBlack)
+					.padding()
+					.frame(maxWidth: .infinity)
+					.background(Color.app.buttonBackgroundLight)
+					.cornerRadius(6)
+			}
+		)
 	}
 }

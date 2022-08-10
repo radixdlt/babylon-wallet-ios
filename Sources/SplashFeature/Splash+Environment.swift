@@ -13,6 +13,7 @@ public extension Splash {
 		public let mainQueue: AnySchedulerOf<DispatchQueue>
 		public let profileLoader: ProfileLoader
 		public let walletLoader: WalletLoader
+
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
 			mainQueue: AnySchedulerOf<DispatchQueue>,

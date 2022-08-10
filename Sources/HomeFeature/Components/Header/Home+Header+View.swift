@@ -16,7 +16,9 @@ public extension Home.Header {
 				VStack(alignment: .leading) {
 					TitleView(
 						shouldShowNotification: viewStore.state.hasNotification,
-						settingsButtonTappedAction: { viewStore.send(.settingsButtonTapped) }
+						settingsButtonAction: {
+							viewStore.send(.settingsButtonTapped)
+						}
 					)
 					subtitleView
 				}
@@ -46,7 +48,9 @@ extension Home.Header.View {
 	struct ViewState: Equatable {
 		var hasNotification: Bool
 
-		init(state: Home.Header.State) {
+		init(
+			state: Home.Header.State
+		) {
 			hasNotification = state.hasNotification
 		}
 	}
@@ -63,15 +67,17 @@ private extension Home.Header.View {
 
 	struct TitleView: SwiftUI.View {
 		var shouldShowNotification: Bool
-		let settingsButtonTappedAction: () -> Void
+		let settingsButtonAction: () -> Void
 
 		public var body: some SwiftUI.View {
 			HStack {
 				Text(L10n.Home.Header.title)
 					.font(.app.title)
 				Spacer()
-				SettingsButton(shouldShowNotification: shouldShowNotification,
-				               action: settingsButtonTappedAction)
+				SettingsButton(
+					shouldShowNotification: shouldShowNotification,
+					action: settingsButtonAction
+				)
 			}
 		}
 	}

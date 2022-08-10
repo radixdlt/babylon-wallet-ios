@@ -6,7 +6,7 @@ import XCTest
 final class HomeBalanceTests: TestCase {
 	func testVisibilityButtonTapped() {
 		let store = TestStore(
-			initialState: Home.Balance.State(),
+			initialState: Home.Balance.State(isVisible: false),
 			reducer: Home.Balance.reducer,
 			environment: Home.Balance.Environment()
 		)

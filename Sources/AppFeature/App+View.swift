@@ -26,17 +26,23 @@ public extension App.Coordinator {
 	// MARK: Body
 	var body: some View {
 		SwitchStore(store) {
-			CaseLet(state: /App.State.main,
-			        action: App.Action.main,
-			        then: Main.Coordinator.init(store:))
+			CaseLet(
+				state: /App.State.main,
+				action: App.Action.main,
+				then: Main.Coordinator.init(store:)
+			)
 
-			CaseLet(state: /App.State.onboarding,
-			        action: App.Action.onboarding,
-			        then: Onboarding.Coordinator.init(store:))
+			CaseLet(
+				state: /App.State.onboarding,
+				action: App.Action.onboarding,
+				then: Onboarding.Coordinator.init(store:)
+			)
 
-			CaseLet(state: /App.State.splash,
-			        action: App.Action.splash,
-			        then: Splash.Coordinator.init(store:))
+			CaseLet(
+				state: /App.State.splash,
+				action: App.Action.splash,
+				then: Splash.Coordinator.init(store:)
+			)
 		}
 	}
 }

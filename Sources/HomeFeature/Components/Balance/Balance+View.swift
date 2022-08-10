@@ -15,8 +15,12 @@ public extension Home.Balance {
 			) { viewState in
 				VStack {
 					title
-					BalanceView(isBalanceVisible: viewState.isBalanceVisible,
-					            action: { viewState.send(.toggleVisibilityButtonTapped) })
+					BalanceView(
+						isBalanceVisible: viewState.isBalanceVisible,
+						toggleVisibilityAction: {
+							viewState.send(.toggleVisibilityButtonTapped)
+						}
+					)
 				}
 			}
 		}
@@ -44,7 +48,9 @@ extension Home.Balance.View {
 	struct ViewState: Equatable {
 		var isBalanceVisible: Bool
 
-		init(state: Home.Balance.State) {
+		init(
+			state: Home.Balance.State
+		) {
 			isBalanceVisible = state.isVisible
 		}
 	}
@@ -89,15 +95,17 @@ private extension Home.Balance.View {
 
 	struct BalanceView: View {
 		let isBalanceVisible: Bool
-		let action: () -> Void
+		let toggleVisibilityAction: () -> Void
 
 		var body: some View {
 			HStack(spacing: 0) {
 				Spacer()
 				Amount()
 				Spacer(minLength: 44)
-				VisibilityButton(isVisible: isBalanceVisible,
-				                 action: action)
+				VisibilityButton(
+					isVisible: isBalanceVisible,
+					action: toggleVisibilityAction
+				)
 				Spacer()
 			}
 		}

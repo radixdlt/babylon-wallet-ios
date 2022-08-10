@@ -9,7 +9,7 @@ public extension Home {
 public extension Home.Balance {
 	// MARK: State
 	struct State: Equatable {
-		var isVisible: Bool
+		public var isVisible: Bool
 
 		public init(
 			isVisible: Bool = false
