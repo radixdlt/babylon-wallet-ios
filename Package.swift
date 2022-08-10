@@ -85,6 +85,10 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "LocalAuthenticationClient",
+			dependencies: []
+		),
+		.target(
 			name: "MainFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
