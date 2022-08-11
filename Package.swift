@@ -88,6 +88,13 @@ let package = Package(
 			name: "LocalAuthenticationClient",
 			dependencies: []
 		),
+		.testTarget(
+			name: "LocalAuthenticationClientTests",
+			dependencies: [
+				"LocalAuthenticationClient",
+				"TestUtils",
+			]
+		),
 		.target(
 			name: "MainFeature",
 			dependencies: [

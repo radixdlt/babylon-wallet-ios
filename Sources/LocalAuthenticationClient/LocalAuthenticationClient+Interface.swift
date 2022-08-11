@@ -12,7 +12,7 @@ import Foundation
 /// Example usage in SwiftUI:
 ///
 ///     struct LocalAuthView: View {
-///         @State var laConfig: LAContext.LocalAuthenticationConfig?
+///         @State var laConfig: LocalAuthenticationConfig?
 ///         var body: some View {
 ///
 ///             if let laConfig = laConfig {
@@ -31,22 +31,21 @@ import Foundation
 ///
 ///         func queryLAConfig() {
 ///             Task {
-///                 if let laConfig = try await LocalAuthenticationClient.live().queryConfig() {
-///                     self.laConfig = laConfig
-///                 } else {
-///                     print("User cancelled LA config query or failed for unknown reason.")
+///                 do {
+///                     self.laConfig =  try await LocalAuthenticationClient.live().queryConfig() {
+///                 } cath {
+///                     print("User cancelled LA config query or failed: \(error)")
 ///                 }
 ///             }
 ///         }
 ///     }
 public struct LocalAuthenticationClient {
-	
-    /// The return value (`LocalAuthenticationConfig`) might be `nil` if app goes to background or stuff like that.
-	public typealias QueryConfig = @Sendable () async -> LocalAuthenticationConfig?
-	
-    public var queryConfig: QueryConfig
-	
-    public init(queryConfig: @escaping QueryConfig) {
+	/// The return value (`LocalAuthenticationConfig`) might be `nil` if app goes to background or stuff like that.
+	public typealias QueryConfig = @Sendable () async throws -> LocalAuthenticationConfig
+
+	public var queryConfig: QueryConfig
+
+	public init(queryConfig: @escaping QueryConfig) {
 		self.queryConfig = queryConfig
 	}
 }
