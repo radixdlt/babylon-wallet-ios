@@ -1,8 +1,20 @@
 import Foundation
 
 public struct Account: Equatable {
-	var userGeneratedName: String
-	var systemGeneratedName: String
-	var accountFiatTotalValue: Float
-	var accountCurrency: Currency
+	public var userGeneratedName: String
+	public var systemGeneratedName: String
+	public var accountFiatTotalValue: Float
+	public var accountCurrency: Currency
+
+	public init(
+		userGeneratedName: String,
+		systemGeneratedName: String,
+		accountFiatTotalValue: Float,
+		accountCurrency: Currency
+	) {
+		self.userGeneratedName = userGeneratedName
+		self.systemGeneratedName = systemGeneratedName
+		self.accountFiatTotalValue = accountFiatTotalValue
+		self.accountCurrency = accountCurrency
+	}
 }

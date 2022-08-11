@@ -29,7 +29,11 @@ public extension Home.Coordinator {
 				store: store.scope(
 					state: \.balance,
 					action: Home.Action.balance
-				)
+				),
+				account: .init(userGeneratedName: "Temp",
+				               systemGeneratedName: "Temp",
+				               accountFiatTotalValue: 50,
+				               accountCurrency: .usd)
 			)
 			Spacer()
 			Home.VisitHub.View(

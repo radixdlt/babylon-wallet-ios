@@ -1,10 +1,12 @@
 import Common
 import ComposableArchitecture
+import Profile
 import SwiftUI
 
 public extension Home.Balance {
 	struct View: SwiftUI.View {
 		let store: Store<State, Action>
+		let account: Account
 
 		public var body: some SwiftUI.View {
 			WithViewStore(
@@ -15,13 +17,17 @@ public extension Home.Balance {
 			) { viewState in
 				VStack {
 					title
+						.background(Color.cyan)
+
 					BalanceView(
+						account: account,
 						isBalanceVisible: viewState.isBalanceVisible,
 						toggleVisibilityAction: {
 							viewState.send(.toggleVisibilityButtonTapped)
 						}
 					)
 				}
+				.background(Color.green)
 			}
 		}
 	}
@@ -64,17 +70,29 @@ private extension Home.Balance.View {
 			.textCase(.uppercase)
 	}
 
-	struct Amount: View {
+	struct AmountView: View {
+		let isBalanceVisible: Bool
+		let account: Account
+
 		var body: some View {
 			HStack {
 				Text("$")
 					.foregroundColor(.app.buttonTextBlack)
 					.font(.system(size: 26, weight: .bold))
-				Text("••••••")
-					.foregroundColor(.app.buttonTextLight)
-					.font(.system(size: 46, weight: .bold))
-					.offset(y: -3)
+
+				Group {
+					if isBalanceVisible {
+						Text("\(account.accountFiatTotalValue)")
+							.font(.system(size: 26, weight: .bold))
+					} else {
+						Text("••••••")
+							.foregroundColor(.app.buttonTextLight)
+							.font(.system(size: 46, weight: .bold))
+							.offset(y: -3)
+					}
+				}
 			}
+			.background(Color.yellow)
 		}
 	}
 
@@ -94,20 +112,29 @@ private extension Home.Balance.View {
 	}
 
 	struct BalanceView: View {
+		let account: Account
 		let isBalanceVisible: Bool
 		let toggleVisibilityAction: () -> Void
 
 		var body: some View {
-			HStack(spacing: 0) {
+			HStack {
 				Spacer()
-				Amount()
-				Spacer(minLength: 44)
+				AmountView(
+					isBalanceVisible: isBalanceVisible,
+					account: account
+				)
+				Spacer()
+					.frame(width: 44)
+
 				VisibilityButton(
 					isVisible: isBalanceVisible,
 					action: toggleVisibilityAction
 				)
 				Spacer()
+					.frame(width: 44)
 			}
+			.frame(height: 60)
+			.background(Color.red)
 		}
 	}
 }
