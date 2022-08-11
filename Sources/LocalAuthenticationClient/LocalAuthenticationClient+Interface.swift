@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// A client for querying if passcode and biometrics are setup.
+/// A client for querying if passcode and biometrics are set up.
 ///
 /// Example usage in SwiftUI:
 ///
@@ -31,23 +31,22 @@ import Foundation
 ///
 ///         func queryLAConfig() {
 ///             Task {
-///                 do {
-///                     if let laConfig = try await LocalAuthenticationClient.live().queryConfig() {
-///                         self.laConfig = laConfig
-///                     } else {
-///                         print("User cancelled LA config query")
-///                     }
-///                 } catch {
-///                     print("Failed to query LocalAuthentication config, error: \(error)")
+///                 if let laConfig = try await LocalAuthenticationClient.live().queryConfig() {
+///                     self.laConfig = laConfig
+///                 } else {
+///                     print("User cancelled LA config query or failed for unknown reason.")
 ///                 }
 ///             }
 ///         }
 ///     }
 public struct LocalAuthenticationClient {
-	/// Might be nil if app goes to background or stuff like that.
-	public typealias QueryConfig = @Sendable () async throws -> LocalAuthenticationConfig?
-	public var queryConfig: QueryConfig
-	public init(queryConfig: @escaping QueryConfig) {
+	
+    /// The return value (`LocalAuthenticationConfig`) might be `nil` if app goes to background or stuff like that.
+	public typealias QueryConfig = @Sendable () async -> LocalAuthenticationConfig?
+	
+    public var queryConfig: QueryConfig
+	
+    public init(queryConfig: @escaping QueryConfig) {
 		self.queryConfig = queryConfig
 	}
 }
