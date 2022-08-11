@@ -6,6 +6,11 @@ import SettingsFeature
 import UserDefaultsClient
 import Wallet
 
+#if os(iOS)
+// FIXME: move to `UIApplicationClient` package!
+import UIKit
+#endif
+
 public extension Main {
 	// MARK: Reducer
 	static let reducer = ComposableArchitecture.Reducer<State, Action, Environment>.combine(
@@ -52,7 +57,7 @@ public extension Main {
 				return .none
 			case .home(.coordinate(.displayVisitHub)):
 				#if os(iOS)
-                // FIXME: Need to add this as a dependency to Environment, URLOpener or similar, which can be tested!
+				// FIXME: move to `UIApplicationClient` package!
 				return .fireAndForget {
 					UIApplication.shared.open(URL(string: "https://www.apple.com")!)
 				}
