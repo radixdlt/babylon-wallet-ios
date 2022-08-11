@@ -37,6 +37,7 @@ let package = Package(
 			name: "AppFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
+				"LocalAuthenticationClient",
 				"MainFeature",
 				"OnboardingFeature",
 				"ProfileLoader",
