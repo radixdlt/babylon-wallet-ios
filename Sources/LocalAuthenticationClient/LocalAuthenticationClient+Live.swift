@@ -26,6 +26,7 @@ public extension LocalAuthenticationClient {
 		case queryCancelled
 		case evaluationError(LAError)
 		case evaluationFailedWithOtherError(reason: String)
+		case evaluateBioDiscrepancyPasscodeNotSetButExpectedToBe
 	}
 }
 
@@ -46,23 +47,22 @@ private extension LAContext {
 					switch laError.code {
 					case .appCancel, .userCancel:
 						continuation.resume(throwing: Error.queryCancelled)
+						return
 					case .passcodeNotSet:
 						continuation.resume(returning: false)
+						return
 					case .biometryNotEnrolled, .biometryLockout, .biometryNotAvailable:
 						break // irrelevant for passcode
 					default:
-						debugPrint("Unhandled error case: \(laError)")
 						continuation.resume(throwing: Error.evaluationError(laError))
 						return
 					}
 				} else {
 					let reason = String(describing: error)
-					debugPrint("Bad error type, expected `LAError`, error was: \(reason)")
 					continuation.resume(throwing: Error.evaluationFailedWithOtherError(reason: reason))
 					return
 				}
 			}
-			print("canEvaluate: \(canEvaluate)")
 			continuation.resume(returning: canEvaluate)
 		}
 	}
@@ -74,31 +74,29 @@ private extension LAContext {
 				return
 			}
 			var error: NSError?
-			let canEvaluate = self.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
+			let canEvaluate = self.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error)
 
 			if let evaluationError = error {
 				if let laError = evaluationError as? LAError {
 					switch laError.code {
 					case .appCancel, .userCancel:
 						continuation.resume(throwing: Error.queryCancelled)
+						return
 					case .passcodeNotSet:
-						fatalError("BAD STATE")
-					//                        continuation.resume(returning: false)
+						continuation.resume(throwing: Error.evaluateBioDiscrepancyPasscodeNotSetButExpectedToBe)
 					case .biometryNotEnrolled, .biometryLockout, .biometryNotAvailable:
 						continuation.resume(returning: false)
+						return
 					default:
-						debugPrint("Unhandled error case: \(laError)")
 						continuation.resume(throwing: Error.evaluationError(laError))
 						return
 					}
 				} else {
 					let reason = String(describing: error)
-					debugPrint("Bad error type, expected `LAError`, error was: \(reason)")
 					continuation.resume(throwing: Error.evaluationFailedWithOtherError(reason: reason))
 					return
 				}
 			}
-			print("canEvaluate: \(canEvaluate)")
 			continuation.resume(returning: canEvaluate)
 		}
 	}
