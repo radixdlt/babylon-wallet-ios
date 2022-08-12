@@ -30,10 +30,7 @@ public extension Home.Coordinator {
 					state: \.balance,
 					action: Home.Action.balance
 				),
-				account: .init(userGeneratedName: "Temp",
-				               systemGeneratedName: "Temp",
-				               accountFiatTotalValue: 50,
-				               accountCurrency: .usd)
+				account: .default
 			)
 			Spacer()
 			Home.VisitHub.View(

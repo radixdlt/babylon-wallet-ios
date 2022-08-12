@@ -17,8 +17,6 @@ public extension Home.Balance {
 			) { viewState in
 				VStack {
 					title
-						.background(Color.cyan)
-
 					BalanceView(
 						account: account,
 						isBalanceVisible: viewState.isBalanceVisible,
@@ -27,7 +25,6 @@ public extension Home.Balance {
 						}
 					)
 				}
-				.background(Color.green)
 			}
 		}
 	}
@@ -75,24 +72,21 @@ private extension Home.Balance.View {
 		let account: Account
 
 		var body: some View {
-			HStack {
-				Text("$")
-					.foregroundColor(.app.buttonTextBlack)
+			if isBalanceVisible {
+				Text(account.fiatTotalValueString)
 					.font(.system(size: 26, weight: .bold))
+			} else {
+				HStack {
+					Text("\(account.accountCurrency.symbol)")
+						.foregroundColor(.app.buttonTextBlack)
+						.font(.system(size: 26, weight: .bold))
 
-				Group {
-					if isBalanceVisible {
-						Text("\(account.accountFiatTotalValue)")
-							.font(.system(size: 26, weight: .bold))
-					} else {
-						Text("••••••")
-							.foregroundColor(.app.buttonTextLight)
-							.font(.system(size: 46, weight: .bold))
-							.offset(y: -3)
-					}
+					Text("••••••")
+						.foregroundColor(.app.buttonTextLight)
+						.font(.system(size: 46, weight: .bold))
+						.offset(y: -3)
 				}
 			}
-			.background(Color.yellow)
 		}
 	}
 
@@ -125,16 +119,13 @@ private extension Home.Balance.View {
 				)
 				Spacer()
 					.frame(width: 44)
-
 				VisibilityButton(
 					isVisible: isBalanceVisible,
 					action: toggleVisibilityAction
 				)
 				Spacer()
-					.frame(width: 44)
 			}
 			.frame(height: 60)
-			.background(Color.red)
 		}
 	}
 }
