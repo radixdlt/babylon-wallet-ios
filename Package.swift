@@ -37,6 +37,7 @@ let package = Package(
 			name: "AppFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
+				"LocalAuthenticationClient",
 				"MainFeature",
 				"OnboardingFeature",
 				"ProfileLoader",
@@ -81,6 +82,17 @@ let package = Package(
 			name: "HomeFeatureTests",
 			dependencies: [
 				"HomeFeature",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "LocalAuthenticationClient",
+			dependencies: []
+		),
+		.testTarget(
+			name: "LocalAuthenticationClientTests",
+			dependencies: [
+				"LocalAuthenticationClient",
 				"TestUtils",
 			]
 		),

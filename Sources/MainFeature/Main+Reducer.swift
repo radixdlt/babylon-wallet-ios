@@ -3,9 +3,13 @@ import ComposableArchitecture
 import Foundation
 import HomeFeature
 import SettingsFeature
-import UIKit
 import UserDefaultsClient
 import Wallet
+
+#if os(iOS)
+// FIXME: move to `UIApplicationClient` package!
+import UIKit
+#endif
 
 public extension Main {
 	// MARK: Reducer
@@ -52,9 +56,14 @@ public extension Main {
 				state.settings = .init()
 				return .none
 			case .home(.coordinate(.displayVisitHub)):
+				#if os(iOS)
+				// FIXME: move to `UIApplicationClient` package!
 				return .fireAndForget {
 					UIApplication.shared.open(URL(string: "https://www.apple.com")!)
 				}
+				#else
+				return .none
+				#endif // os(iOS)
 			case .home:
 				return .none
 			case .settings(.coordinate(.dismissSettings)):
