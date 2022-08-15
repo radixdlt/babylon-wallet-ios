@@ -5,36 +5,38 @@ import SwiftUI
 public extension Home.Header {
 	struct View: SwiftUI.View {
 		let store: Store<State, Action>
+	}
+}
 
-		public var body: some SwiftUI.View {
-			WithViewStore(
-				store.scope(
-					state: ViewState.init,
-					action: Home.Header.Action.init
+public extension Home.Header.View {
+	var body: some View {
+		WithViewStore(
+			store.scope(
+				state: ViewState.init,
+				action: Home.Header.Action.init
+			)
+		) { viewStore in
+			VStack(alignment: .leading) {
+				TitleView(
+					shouldShowNotification: viewStore.state.hasNotification,
+					settingsButtonAction: {
+						viewStore.send(.settingsButtonTapped)
+					}
 				)
-			) { viewStore in
-				VStack(alignment: .leading) {
-					TitleView(
-						shouldShowNotification: viewStore.state.hasNotification,
-						settingsButtonAction: {
-							viewStore.send(.settingsButtonTapped)
-						}
-					)
-					subtitleView
-				}
+				subtitleView
 			}
 		}
 	}
 }
 
-internal extension Home.Header.View {
+extension Home.Header.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case settingsButtonTapped
 	}
 }
 
-internal extension Home.Header.Action {
+extension Home.Header.Action {
 	init(action: Home.Header.View.ViewAction) {
 		switch action {
 		case .settingsButtonTapped:
@@ -69,7 +71,7 @@ private extension Home.Header.View {
 		var shouldShowNotification: Bool
 		let settingsButtonAction: () -> Void
 
-		public var body: some SwiftUI.View {
+		public var body: some View {
 			HStack {
 				Text(L10n.Home.Header.title)
 					.font(.app.title)
@@ -86,7 +88,7 @@ private extension Home.Header.View {
 		let shouldShowNotification: Bool
 		let action: () -> Void
 
-		public var body: some SwiftUI.View {
+		public var body: some View {
 			ZStack(alignment: .topTrailing) {
 				// TODO: use swiftgen for assets
 				Button(action: action) {

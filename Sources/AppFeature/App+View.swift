@@ -10,10 +10,8 @@ import Wallet
 import WalletLoader
 
 public extension App {
-	// MARK: Coordinator
-	struct Coordinator: SwiftUI.View {
+	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
-
 		private let store: Store
 
 		public init(store: Store) {
@@ -22,36 +20,34 @@ public extension App {
 	}
 }
 
-public extension App.Coordinator {
-	// MARK: Body
+public extension App.View {
 	var body: some View {
 		SwitchStore(store) {
 			CaseLet(
 				state: /App.State.main,
 				action: App.Action.main,
-				then: Main.Coordinator.init(store:)
+				then: Main.View.init(store:)
 			)
 
 			CaseLet(
 				state: /App.State.onboarding,
 				action: App.Action.onboarding,
-				then: Onboarding.Coordinator.init(store:)
+				then: Onboarding.View.init(store:)
 			)
 
 			CaseLet(
 				state: /App.State.splash,
 				action: App.Action.splash,
-				then: Splash.Coordinator.init(store:)
+				then: Splash.View.init(store:)
 			)
 		}
 	}
 }
 
-// MARK: - AppCoordinator_Previews
-#if DEBUG
-struct AppCoordinator_Previews: PreviewProvider {
+// MARK: - AppView_Previews
+struct AppView_Previews: PreviewProvider {
 	static var previews: some View {
-		App.Coordinator(
+		App.View(
 			store: .init(
 				initialState: .init(),
 				reducer: App.reducer,
@@ -60,5 +56,3 @@ struct AppCoordinator_Previews: PreviewProvider {
 		)
 	}
 }
-
-#endif // DEBUG

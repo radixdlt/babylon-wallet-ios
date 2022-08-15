@@ -6,37 +6,39 @@ import SwiftUI
 public extension Home.Balance {
 	struct View: SwiftUI.View {
 		let store: Store<State, Action>
+	}
+}
 
-		public var body: some SwiftUI.View {
-			WithViewStore(
-				store.scope(
-					state: ViewState.init,
-					action: Home.Balance.Action.init
+public extension Home.Balance.View {
+	var body: some View {
+		WithViewStore(
+			store.scope(
+				state: ViewState.init,
+				action: Home.Balance.Action.init
+			)
+		) { viewStore in
+			VStack {
+				title
+				BalanceView(
+					account: viewStore.account,
+					isBalanceVisible: viewStore.isBalanceVisible,
+					toggleVisibilityAction: {
+						viewStore.send(.toggleVisibilityButtonTapped)
+					}
 				)
-			) { viewStore in
-				VStack {
-					title
-					BalanceView(
-						account: viewStore.account,
-						isBalanceVisible: viewStore.isBalanceVisible,
-						toggleVisibilityAction: {
-							viewStore.send(.toggleVisibilityButtonTapped)
-						}
-					)
-				}
 			}
 		}
 	}
 }
 
-internal extension Home.Balance.View {
+extension Home.Balance.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case toggleVisibilityButtonTapped
 	}
 }
 
-internal extension Home.Balance.Action {
+extension Home.Balance.Action {
 	init(action: Home.Balance.View.ViewAction) {
 		switch action {
 		case .toggleVisibilityButtonTapped:
