@@ -4,27 +4,27 @@ import Foundation
 public struct Account: Equatable {
 	public var userGeneratedName: String
 	public var systemGeneratedName: String
-	public var accountFiatTotalValue: Float
-	public var accountCurrency: Currency
+	public var fiatTotalValue: Float
+	public var currency: Currency
 
 	public init(
 		userGeneratedName: String,
 		systemGeneratedName: String,
-		accountFiatTotalValue: Float,
-		accountCurrency: Currency
+		fiatTotalValue: Float,
+		currency: Currency
 	) {
 		self.userGeneratedName = userGeneratedName
 		self.systemGeneratedName = systemGeneratedName
-		self.accountFiatTotalValue = accountFiatTotalValue
-		self.accountCurrency = accountCurrency
+		self.fiatTotalValue = fiatTotalValue
+		self.currency = currency
 	}
 }
 
 public extension Account {
 	var fiatTotalValueString: String {
-		accountFiatTotalValue
+		fiatTotalValue
 			.formatted(
-				.currency(code: accountCurrency.code)
+				.currency(code: currency.code)
 			)
 	}
 }
@@ -33,7 +33,7 @@ public extension Account {
 	static var `default`: Account = .init(
 		userGeneratedName: "Name",
 		systemGeneratedName: "System name",
-		accountFiatTotalValue: 10_000_000_000,
-		accountCurrency: .usd
+		fiatTotalValue: 10_000_000_000,
+		currency: .usd
 	)
 }

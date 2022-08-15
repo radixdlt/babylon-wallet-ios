@@ -29,8 +29,7 @@ public extension Home.Coordinator {
 				store: store.scope(
 					state: \.balance,
 					action: Home.Action.balance
-				),
-				account: .default
+				)
 			)
 			Spacer()
 			Home.VisitHub.View(

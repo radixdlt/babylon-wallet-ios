@@ -6,7 +6,6 @@ import SwiftUI
 public extension Home.Balance {
 	struct View: SwiftUI.View {
 		let store: Store<State, Action>
-		let account: Account
 
 		public var body: some SwiftUI.View {
 			WithViewStore(
@@ -14,14 +13,14 @@ public extension Home.Balance {
 					state: ViewState.init,
 					action: Home.Balance.Action.init
 				)
-			) { viewState in
+			) { viewStore in
 				VStack {
 					title
 					BalanceView(
-						account: account,
-						isBalanceVisible: viewState.isBalanceVisible,
+						account: viewStore.account,
+						isBalanceVisible: viewStore.isBalanceVisible,
 						toggleVisibilityAction: {
-							viewState.send(.toggleVisibilityButtonTapped)
+							viewStore.send(.toggleVisibilityButtonTapped)
 						}
 					)
 				}
@@ -50,11 +49,13 @@ extension Home.Balance.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		var isBalanceVisible: Bool
+		var account: Account
 
 		init(
 			state: Home.Balance.State
 		) {
 			isBalanceVisible = state.isVisible
+			account = state.account
 		}
 	}
 }
@@ -67,17 +68,20 @@ private extension Home.Balance.View {
 			.textCase(.uppercase)
 	}
 
+	// TODO: extract to separate Feature when view complexity increases
 	struct AmountView: View {
 		let isBalanceVisible: Bool
-		let account: Account
+		let amount: Float
+		let formattedAmount: String
+		let currency: Currency
 
 		var body: some View {
 			if isBalanceVisible {
-				Text(account.fiatTotalValueString)
+				Text(formattedAmount)
 					.font(.system(size: 26, weight: .bold))
 			} else {
 				HStack {
-					Text("\(account.accountCurrency.symbol)")
+					Text("\(currency.symbol)")
 						.foregroundColor(.app.buttonTextBlack)
 						.font(.system(size: 26, weight: .bold))
 
@@ -115,7 +119,9 @@ private extension Home.Balance.View {
 				Spacer()
 				AmountView(
 					isBalanceVisible: isBalanceVisible,
-					account: account
+					amount: account.fiatTotalValue,
+					formattedAmount: account.fiatTotalValueString,
+					currency: account.currency
 				)
 				Spacer()
 					.frame(width: 44)
