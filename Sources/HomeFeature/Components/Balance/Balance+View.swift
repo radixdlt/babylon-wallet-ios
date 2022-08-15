@@ -71,7 +71,7 @@ private extension Home.Balance.View {
 	// TODO: extract to separate Feature when view complexity increases
 	struct AmountView: View {
 		let isBalanceVisible: Bool
-		let amount: Float
+		let amount: Float // NOTE: used for copying the actual value
 		let formattedAmount: String
 		let currency: Currency
 
