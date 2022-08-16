@@ -21,6 +21,6 @@ public extension App {
 
 		public init() { self = .onboarding(.init()) }
 		// FIXME: wallet
-//		public init() { self = .main(.init(wallet: .init(profile: .init()))) }
+//		public init() { self = .main(.placeholder) }
 	}
 }

@@ -1,11 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-08-10.
-//
-
-import Foundation
 import LocalAuthentication
 
 public extension LocalAuthenticationClient {

@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-08-11.
-//
-
 import Foundation
 @testable import LocalAuthenticationClient
 import TestUtils

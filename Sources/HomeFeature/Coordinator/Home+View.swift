@@ -49,7 +49,7 @@ struct HomeView_Previews: PreviewProvider {
 			store: .init(
 				initialState: .init(),
 				reducer: Home.reducer,
-				environment: .init()
+				environment: .placeholder
 			)
 		)
 	}

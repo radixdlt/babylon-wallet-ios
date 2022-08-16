@@ -25,9 +25,9 @@ public extension Onboarding {
 				environment
 					.userDefaultsClient
 					.setProfileName(state.profileName)
-					.subscribe(on: environment.backgroundQueue)
-					.receive(on: environment.mainQueue)
-					.fireAndForget(),
+//					.subscribe(on: environment.backgroundQueue)
+//					.receive(on: environment.mainQueue)
+//					.fireAndForget(),
 
 				Effect(value: .internal(.system(.createWalletResult(.success(wallet)))))
 			)

@@ -28,7 +28,7 @@ public extension Main {
 
 #if DEBUG
 public extension Main.State {
-	static let placeholder = Main.State(
+	static let placeholder = Self(
 		home: .init(),
 		settings: nil
 	)

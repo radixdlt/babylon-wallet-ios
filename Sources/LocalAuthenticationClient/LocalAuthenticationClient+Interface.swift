@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-08-10.
-//
-
 import Foundation
 
 /// A client for querying if passcode and biometrics are set up.

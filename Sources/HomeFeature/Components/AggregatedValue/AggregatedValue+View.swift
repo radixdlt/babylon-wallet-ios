@@ -75,7 +75,7 @@ private extension Home.AggregatedValue.View {
 		let isValueVisible: Bool
 		let amount: Float // NOTE: used for copying the actual value
 		let formattedAmount: String
-		let currency: Currency
+		let fiatCurrency: FiatCurrency
 
 		var body: some View {
 			if isValueVisible {
@@ -83,7 +83,7 @@ private extension Home.AggregatedValue.View {
 					.font(.system(size: 26, weight: .bold))
 			} else {
 				HStack {
-					Text("\(currency.symbol)")
+					Text("\(fiatCurrency.symbol)")
 						.foregroundColor(.app.buttonTextBlack)
 						.font(.system(size: 26, weight: .bold))
 
@@ -119,11 +119,12 @@ private extension Home.AggregatedValue.View {
 		var body: some View {
 			HStack {
 				Spacer()
+				// FIXME: currency
 				AmountView(
 					isValueVisible: isValueVisible,
-					amount: account.fiatTotalValue,
-					formattedAmount: account.fiatTotalValueString,
-					currency: account.currency
+					amount: 0,
+					formattedAmount: "0",
+					fiatCurrency: FiatCurrency.usd
 				)
 				Spacer()
 					.frame(width: 44)
