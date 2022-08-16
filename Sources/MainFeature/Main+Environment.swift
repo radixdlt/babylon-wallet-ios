@@ -10,15 +10,18 @@ public extension Main {
 		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
 		public let mainQueue: AnySchedulerOf<DispatchQueue>
 		public let userDefaultsClient: UserDefaultsClient
+		public let wallet: Wallet
 
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
 			mainQueue: AnySchedulerOf<DispatchQueue>,
-			userDefaultsClient: UserDefaultsClient
+			userDefaultsClient: UserDefaultsClient,
+			wallet: Wallet
 		) {
 			self.backgroundQueue = backgroundQueue
 			self.mainQueue = mainQueue
 			self.userDefaultsClient = userDefaultsClient
+			self.wallet = wallet
 		}
 	}
 }

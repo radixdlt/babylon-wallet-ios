@@ -46,8 +46,10 @@ extension Main.View {
 	struct ViewState: Equatable {
 		public var profileName: String
 
-		init(state: Main.State) {
-			profileName = state.wallet.profile.name
+		init(state _: Main.State) {
+//			profileName = state.wallet.profile.name
+			// FIXME: wallet
+			profileName = "placeholder"
 		}
 	}
 }
@@ -73,12 +75,13 @@ struct MainView_Previews: PreviewProvider {
 	static var previews: some View {
 		Main.View(
 			store: .init(
-				initialState: .init(wallet: .init(profile: .init())),
+				initialState: .placeholder,
 				reducer: Main.reducer,
 				environment: .init(
 					backgroundQueue: .immediate,
 					mainQueue: .immediate,
-					userDefaultsClient: .noop
+					userDefaultsClient: .noop,
+					wallet: .placeholder
 				)
 			)
 		)

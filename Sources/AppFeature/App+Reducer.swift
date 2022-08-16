@@ -21,7 +21,10 @@ public extension App {
 					Main.Environment(
 						backgroundQueue: $0.backgroundQueue,
 						mainQueue: $0.mainQueue,
-						userDefaultsClient: $0.userDefaultsClient
+						userDefaultsClient: $0.userDefaultsClient,
+						// FIXME: wallet
+						//                        wallet: $0.walletLoader.loadWallet
+						wallet: .placeholder
 					)
 				}
 			),
@@ -67,7 +70,9 @@ public extension App {
 		case .main:
 			return .none
 		case let .onboarding(.coordinate(.onboardedWithWallet(wallet))):
-			state = .main(.init(wallet: wallet))
+			// FIXME: wallet
+//			state = .main(.init(wallet: wallet))
+			state = .main(.placeholder)
 			return Effect(value: .coordinate(.toMain(wallet)))
 		case .onboarding:
 			return .none
@@ -115,7 +120,9 @@ public extension App {
 			state = .onboarding(.init())
 			return .none
 		case let .coordinate(.toMain(wallet)):
-			state = .main(.init(wallet: wallet))
+			// FIXME: wallet
+//			state = .main(.init(wallet: wallet))
+			state = .main(.placeholder)
 			return .none
 		case .internal(.user(.alertDismissed)):
 			state = .alert(nil)

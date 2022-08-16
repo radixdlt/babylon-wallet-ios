@@ -13,7 +13,7 @@ public extension Home {
 
 		public init(
 			header: Home.Header.State = .init(),
-			aggregatedValue: Home.AggregatedValue.State = .init(),
+			aggregatedValue: Home.AggregatedValue.State = .placeholder,
 			visitHub: Home.VisitHub.State = .init()
 		) {
 			self.header = header

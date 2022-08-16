@@ -15,6 +15,7 @@ public extension App {
 		public let profileLoader: ProfileLoader
 		public let userDefaultsClient: UserDefaultsClient
 		public let walletLoader: WalletLoader
+
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
 			mainQueue: AnySchedulerOf<DispatchQueue>,
@@ -41,4 +42,4 @@ public extension App.Environment {
 		walletLoader: .noop
 	)
 }
-#endif // DEBUG
+#endif

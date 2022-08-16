@@ -10,15 +10,24 @@ public extension Home {
 public extension Home.AggregatedValue {
 	// MARK: State
 	struct State: Equatable {
-		public var isVisible: Bool
 		public var account: Account
+		public var isVisible: Bool
 
 		public init(
-			isVisible: Bool = false,
-			account: Account = .default
+			account: Account,
+			isVisible: Bool = false
 		) {
-			self.isVisible = isVisible
 			self.account = account
+			self.isVisible = isVisible
 		}
 	}
 }
+
+#if DEBUG
+public extension Home.AggregatedValue.State {
+	static let placeholder = Home.AggregatedValue.State(
+		account: .placeholder,
+		isVisible: true
+	)
+}
+#endif

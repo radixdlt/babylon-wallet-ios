@@ -29,11 +29,34 @@ public extension Account {
 	}
 }
 
+#if DEBUG
 public extension Account {
-	static var `default`: Account = .init(
+	static let placeholder: Account = .init(
 		userGeneratedName: "Name",
 		systemGeneratedName: "System name",
 		fiatTotalValue: 10_000_000_000,
 		currency: .usd
 	)
+
+	static let checking: Account = .init(
+		userGeneratedName: "Checking",
+		systemGeneratedName: "checking acount",
+		fiatTotalValue: 10000,
+		currency: .usd
+	)
+
+	static let savings: Account = .init(
+		userGeneratedName: "Savings",
+		systemGeneratedName: "savings acount",
+		fiatTotalValue: 10000,
+		currency: .usd
+	)
+
+	static let deposit: Account = .init(
+		userGeneratedName: "Deposit",
+		systemGeneratedName: "deposit acount",
+		fiatTotalValue: 10000,
+		currency: .usd
+	)
 }
+#endif

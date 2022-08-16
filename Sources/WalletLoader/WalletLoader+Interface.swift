@@ -19,4 +19,4 @@ public extension WalletLoader {
 		loadWallet: { _ in .none }
 	)
 }
-#endif // DEBUG
+#endif

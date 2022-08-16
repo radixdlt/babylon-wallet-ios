@@ -17,7 +17,9 @@ public extension Onboarding {
 		case .internal(.system(.createWallet)):
 			precondition(state.canProceed)
 			let profile = Profile(name: state.profileName)
-			let wallet = Wallet(profile: profile)
+			// FIXME: wallet
+//			let wallet = Wallet(profile: profile)
+			let wallet: Wallet = .placeholder
 
 			return .concatenate(
 				environment
