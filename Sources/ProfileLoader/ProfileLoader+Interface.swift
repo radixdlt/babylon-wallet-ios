@@ -3,7 +3,7 @@ import Profile
 
 // MARK: - ProfileLoader
 public struct ProfileLoader {
-    public var loadProfile: @Sendable () async throws -> Profile
+	public var loadProfile: @Sendable () async throws -> Profile
 }
 
 public extension ProfileLoader {

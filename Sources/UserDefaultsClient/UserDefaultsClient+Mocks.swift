@@ -24,7 +24,7 @@ public extension UserDefaultsClient {
 		dataForKey: XCTUnimplemented("\(Self.self).dataForKey", placeholder: nil),
 		doubleForKey: XCTUnimplemented("\(Self.self).doubleForKey", placeholder: 0),
 		integerForKey: XCTUnimplemented("\(Self.self).integerForKey", placeholder: 0),
-        remove: XCTUnimplemented("\(Self.self).remove"),
+		remove: XCTUnimplemented("\(Self.self).remove"),
 		setBool: XCTUnimplemented("\(Self.self).setBool"),
 		setData: XCTUnimplemented("\(Self.self).setData"),
 		setDouble: XCTUnimplemented("\(Self.self).setDouble"),

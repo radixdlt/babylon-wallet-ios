@@ -33,7 +33,7 @@ final class UserDefaultsClientLiveTests: TestCase {
 	}
 
 	func testSetDataPersistsValue() async throws {
-        await sut.setData("deadbeef".hexData, "key")
+		await sut.setData("deadbeef".hexData, "key")
 		XCTAssertEqual(sut.dataForKey("key"), "deadbeef".hexData)
 	}
 

@@ -4,7 +4,7 @@ import Wallet
 
 // MARK: - WalletLoader
 public struct WalletLoader {
-    public var loadWallet: @Sendable (Profile) async throws -> Wallet
+	public var loadWallet: @Sendable (Profile) async throws -> Wallet
 }
 
 public extension WalletLoader {

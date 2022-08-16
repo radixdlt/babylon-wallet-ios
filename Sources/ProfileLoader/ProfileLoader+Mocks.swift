@@ -3,10 +3,10 @@ import Profile
 
 #if DEBUG
 public extension ProfileLoader {
-    static let noop = Self(
-        loadProfile: {
-            Profile(name: "profileName")
-        }
-    )
+	static let noop = Self(
+		loadProfile: {
+			Profile(name: "profileName")
+		}
+	)
 }
 #endif
