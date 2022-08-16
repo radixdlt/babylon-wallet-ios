@@ -21,18 +21,13 @@ public extension Onboarding {
 //			let wallet = Wallet(profile: profile)
 			let wallet: Wallet = .placeholder
 
-			return .concatenate(
-				environment
-					.userDefaultsClient
-					.setProfileName(state.profileName)
-//					.subscribe(on: environment.backgroundQueue)
-//					.receive(on: environment.mainQueue)
-//					.fireAndForget(),
+			let name = state.profileName
+			return .run { send in
+				await environment.userDefaultsClient.setProfileName(name)
+				await send(.internal(.system(.createdWallet(wallet))))
+			}
 
-				Effect(value: .internal(.system(.createWalletResult(.success(wallet)))))
-			)
-
-		case let .internal(.system(.createWalletResult(.success(wallet)))):
+		case let .internal(.system(.createdWallet(wallet))):
 			return Effect(value: .coordinate(.onboardedWithWallet(wallet)))
 		case .binding:
 			state.canProceed = !state.profileName.isEmpty

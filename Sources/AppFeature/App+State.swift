@@ -20,7 +20,5 @@ public extension App {
 		case splash(Splash.State?)
 
 		public init() { self = .onboarding(.init()) }
-		// FIXME: wallet
-//		public init() { self = .main(.placeholder) }
 	}
 }

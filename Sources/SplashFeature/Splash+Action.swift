@@ -17,13 +17,7 @@ public extension Splash {
 // MARK: - SplashLoadWalletResult
 public enum SplashLoadWalletResult: Equatable {
 	case walletLoaded(Wallet)
-	case noWallet(reason: NoWalletLoaded)
-
-	public enum NoWalletLoaded: Equatable {
-		case noProfileFoundAtPath(String)
-		case failedToLoadProfileFromDocument
-		case secretsNotFoundForProfile(Profile)
-	}
+	case noWallet(reason: String)
 }
 
 public extension Splash.Action {
@@ -45,9 +39,9 @@ public extension Splash.Action {
 public extension Splash.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case loadProfile
-		case loadProfileResult(Result<Profile, ProfileLoader.Error>)
+		case loadProfileResult(TaskResult<Profile>)
 		case loadWalletWithProfile(Profile)
-		case loadWalletWithProfileResult(Result<Wallet, WalletLoader.Error>, profile: Profile)
+		case loadWalletWithProfileResult(TaskResult<Wallet>, profile: Profile)
 
 		case viewDidAppear
 	}

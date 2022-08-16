@@ -80,31 +80,9 @@ public extension App {
 			switch loadWalletResult {
 			case let .walletLoaded(wallet):
 				return Effect(value: .coordinate(.toMain(wallet)))
-			case let .noWallet(.noProfileFoundAtPath(path)):
+			case let .noWallet(reason):
 				state = App.State.alert(.init(
-					title: TextState("No profile found at: \(path)"),
-					buttons: [
-						.cancel(
-							TextState("OK, I'll onboard"),
-							action: .send(.coordinate(.onboard))
-						),
-					]
-				))
-				return .none
-			case .noWallet(.failedToLoadProfileFromDocument):
-				state = App.State.alert(.init(
-					title: TextState("Failed to load profile from document"),
-					buttons: [
-						.cancel(
-							TextState("OK, I'll onboard"),
-							action: .send(.coordinate(.onboard))
-						),
-					]
-				))
-				return .none
-			case .noWallet(.secretsNotFoundForProfile):
-				state = App.State.alert(.init(
-					title: TextState("Secrets not found for profile"),
+					title: TextState(reason),
 					buttons: [
 						.cancel(
 							TextState("OK, I'll onboard"),

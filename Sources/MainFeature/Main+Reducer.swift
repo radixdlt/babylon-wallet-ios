@@ -42,16 +42,10 @@ public extension Main {
 				return Effect(value: .internal(.system(.removedWallet)))
 
 			case .internal(.system(.removedWallet)):
-				return .concatenate(
-					environment
-						.userDefaultsClient
-						.removeProfileName()
-						.subscribe(on: environment.backgroundQueue)
-						.receive(on: environment.mainQueue)
-						.fireAndForget(),
-
-					Effect(value: .coordinate(.removedWallet))
-				)
+				return .run { send in
+					await environment.userDefaultsClient.removeProfileName()
+					await send(.coordinate(.removedWallet))
+				}
 
 			case .coordinate:
 				return .none
