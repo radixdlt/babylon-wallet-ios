@@ -10,9 +10,9 @@ import Foundation
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 public enum L10n {
 	public enum Home {
-		public enum Balance {
+		public enum AggregatedValue {
 			/// Total value
-			public static let title = L10n.tr("Localizable", "home.balance.title", fallback: #"Total value"#)
+			public static let title = L10n.tr("Localizable", "home.aggregatedValue.title", fallback: #"Total value"#)
 		}
 
 		public enum Header {

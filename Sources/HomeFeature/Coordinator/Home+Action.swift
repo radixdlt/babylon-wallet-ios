@@ -4,7 +4,7 @@ public extension Home {
 	// MARK: Action
 	enum Action: Equatable {
 		case header(Home.Header.Action)
-		case balance(Home.Balance.Action)
+		case aggregatedValue(Home.AggregatedValue.Action)
 		case visitHub(Home.VisitHub.Action)
 		case coordinate(CoordinatingAction)
 	}

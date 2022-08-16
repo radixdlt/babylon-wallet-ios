@@ -1,13 +1,13 @@
 import Foundation
 import Profile
 
-// MARK: - Balance
-/// Namespace for BalanceFeature
+// MARK: - AggregatedValue
+/// Namespace for AggregatedValueFeature
 public extension Home {
-	enum Balance {}
+	enum AggregatedValue {}
 }
 
-public extension Home.Balance {
+public extension Home.AggregatedValue {
 	// MARK: State
 	struct State: Equatable {
 		public var isVisible: Bool

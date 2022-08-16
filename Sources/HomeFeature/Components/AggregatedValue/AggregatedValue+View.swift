@@ -3,25 +3,25 @@ import ComposableArchitecture
 import Profile
 import SwiftUI
 
-public extension Home.Balance {
+public extension Home.AggregatedValue {
 	struct View: SwiftUI.View {
 		let store: Store<State, Action>
 	}
 }
 
-public extension Home.Balance.View {
+public extension Home.AggregatedValue.View {
 	var body: some View {
 		WithViewStore(
 			store.scope(
 				state: ViewState.init,
-				action: Home.Balance.Action.init
+				action: Home.AggregatedValue.Action.init
 			)
 		) { viewStore in
 			VStack {
 				title
-				BalanceView(
+				AggregatedValueView(
 					account: viewStore.account,
-					isBalanceVisible: viewStore.isBalanceVisible,
+					isValueVisible: viewStore.isValueVisible,
 					toggleVisibilityAction: {
 						viewStore.send(.toggleVisibilityButtonTapped)
 					}
@@ -31,15 +31,15 @@ public extension Home.Balance.View {
 	}
 }
 
-extension Home.Balance.View {
+extension Home.AggregatedValue.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case toggleVisibilityButtonTapped
 	}
 }
 
-extension Home.Balance.Action {
-	init(action: Home.Balance.View.ViewAction) {
+extension Home.AggregatedValue.Action {
+	init(action: Home.AggregatedValue.View.ViewAction) {
 		switch action {
 		case .toggleVisibilityButtonTapped:
 			self = .internal(.user(.toggleVisibilityButtonTapped))
@@ -47,24 +47,24 @@ extension Home.Balance.Action {
 	}
 }
 
-extension Home.Balance.View {
+extension Home.AggregatedValue.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		var isBalanceVisible: Bool
+		var isValueVisible: Bool
 		var account: Account
 
 		init(
-			state: Home.Balance.State
+			state: Home.AggregatedValue.State
 		) {
-			isBalanceVisible = state.isVisible
+			isValueVisible = state.isVisible
 			account = state.account
 		}
 	}
 }
 
-private extension Home.Balance.View {
+private extension Home.AggregatedValue.View {
 	var title: some View {
-		Text(L10n.Home.Balance.title)
+		Text(L10n.Home.AggregatedValue.title)
 			.foregroundColor(.app.buttonTextBlack)
 			.font(.app.caption)
 			.textCase(.uppercase)
@@ -72,13 +72,13 @@ private extension Home.Balance.View {
 
 	// TODO: extract to separate Feature when view complexity increases
 	struct AmountView: View {
-		let isBalanceVisible: Bool
+		let isValueVisible: Bool
 		let amount: Float // NOTE: used for copying the actual value
 		let formattedAmount: String
 		let currency: Currency
 
 		var body: some View {
-			if isBalanceVisible {
+			if isValueVisible {
 				Text(formattedAmount)
 					.font(.system(size: 26, weight: .bold))
 			} else {
@@ -103,24 +103,24 @@ private extension Home.Balance.View {
 		var body: some View {
 			Button(action: action) {
 				if isVisible {
-					Image("home-balance-shown")
+					Image("home-aggregatedValue-shown")
 				} else {
-					Image("home-balance-hidden")
+					Image("home-aggregatedValue-hidden")
 				}
 			}
 		}
 	}
 
-	struct BalanceView: View {
+	struct AggregatedValueView: View {
 		let account: Account
-		let isBalanceVisible: Bool
+		let isValueVisible: Bool
 		let toggleVisibilityAction: () -> Void
 
 		var body: some View {
 			HStack {
 				Spacer()
 				AmountView(
-					isBalanceVisible: isBalanceVisible,
+					isValueVisible: isValueVisible,
 					amount: account.fiatTotalValue,
 					formattedAmount: account.fiatTotalValueString,
 					currency: account.currency
@@ -128,7 +128,7 @@ private extension Home.Balance.View {
 				Spacer()
 					.frame(width: 44)
 				VisibilityButton(
-					isVisible: isBalanceVisible,
+					isVisible: isValueVisible,
 					action: toggleVisibilityAction
 				)
 				Spacer()
