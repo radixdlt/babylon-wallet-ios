@@ -3,7 +3,7 @@ import ComposableArchitecture
 import SwiftUI
 
 public extension Settings {
-	struct Coordinator: SwiftUI.View {
+	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -15,8 +15,7 @@ public extension Settings {
 	}
 }
 
-public extension Settings.Coordinator {
-	// MARK: Body
+public extension Settings.View {
 	var body: some View {
 		// NOTE: placeholder implementation
 		WithViewStore(store) { store in
@@ -33,10 +32,9 @@ public extension Settings.Coordinator {
 }
 
 // MARK: - HomeView_Previews
-#if DEBUG
 struct HomeView_Previews: PreviewProvider {
 	static var previews: some View {
-		Settings.Coordinator(
+		Settings.View(
 			store: .init(
 				initialState: .init(),
 				reducer: Settings.reducer,
@@ -45,4 +43,3 @@ struct HomeView_Previews: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG

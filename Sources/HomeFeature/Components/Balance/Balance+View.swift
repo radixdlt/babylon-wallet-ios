@@ -1,40 +1,44 @@
 import Common
 import ComposableArchitecture
+import Profile
 import SwiftUI
 
 public extension Home.Balance {
 	struct View: SwiftUI.View {
 		let store: Store<State, Action>
+	}
+}
 
-		public var body: some SwiftUI.View {
-			WithViewStore(
-				store.scope(
-					state: ViewState.init,
-					action: Home.Balance.Action.init
+public extension Home.Balance.View {
+	var body: some View {
+		WithViewStore(
+			store.scope(
+				state: ViewState.init,
+				action: Home.Balance.Action.init
+			)
+		) { viewStore in
+			VStack {
+				title
+				BalanceView(
+					account: viewStore.account,
+					isBalanceVisible: viewStore.isBalanceVisible,
+					toggleVisibilityAction: {
+						viewStore.send(.toggleVisibilityButtonTapped)
+					}
 				)
-			) { viewState in
-				VStack {
-					title
-					BalanceView(
-						isBalanceVisible: viewState.isBalanceVisible,
-						toggleVisibilityAction: {
-							viewState.send(.toggleVisibilityButtonTapped)
-						}
-					)
-				}
 			}
 		}
 	}
 }
 
-internal extension Home.Balance.View {
+extension Home.Balance.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case toggleVisibilityButtonTapped
 	}
 }
 
-internal extension Home.Balance.Action {
+extension Home.Balance.Action {
 	init(action: Home.Balance.View.ViewAction) {
 		switch action {
 		case .toggleVisibilityButtonTapped:
@@ -47,11 +51,13 @@ extension Home.Balance.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		var isBalanceVisible: Bool
+		var account: Account
 
 		init(
 			state: Home.Balance.State
 		) {
 			isBalanceVisible = state.isVisible
+			account = state.account
 		}
 	}
 }
@@ -64,16 +70,28 @@ private extension Home.Balance.View {
 			.textCase(.uppercase)
 	}
 
-	struct Amount: View {
+	// TODO: extract to separate Feature when view complexity increases
+	struct AmountView: View {
+		let isBalanceVisible: Bool
+		let amount: Float // NOTE: used for copying the actual value
+		let formattedAmount: String
+		let currency: Currency
+
 		var body: some View {
-			HStack {
-				Text("$")
-					.foregroundColor(.app.buttonTextBlack)
+			if isBalanceVisible {
+				Text(formattedAmount)
 					.font(.system(size: 26, weight: .bold))
-				Text("••••••")
-					.foregroundColor(.app.buttonTextLight)
-					.font(.system(size: 46, weight: .bold))
-					.offset(y: -3)
+			} else {
+				HStack {
+					Text("\(currency.symbol)")
+						.foregroundColor(.app.buttonTextBlack)
+						.font(.system(size: 26, weight: .bold))
+
+					Text("••••••")
+						.foregroundColor(.app.buttonTextLight)
+						.font(.system(size: 46, weight: .bold))
+						.offset(y: -3)
+				}
 			}
 		}
 	}
@@ -94,20 +112,28 @@ private extension Home.Balance.View {
 	}
 
 	struct BalanceView: View {
+		let account: Account
 		let isBalanceVisible: Bool
 		let toggleVisibilityAction: () -> Void
 
 		var body: some View {
-			HStack(spacing: 0) {
+			HStack {
 				Spacer()
-				Amount()
-				Spacer(minLength: 44)
+				AmountView(
+					isBalanceVisible: isBalanceVisible,
+					amount: account.fiatTotalValue,
+					formattedAmount: account.fiatTotalValueString,
+					currency: account.currency
+				)
+				Spacer()
+					.frame(width: 44)
 				VisibilityButton(
 					isVisible: isBalanceVisible,
 					action: toggleVisibilityAction
 				)
 				Spacer()
 			}
+			.frame(height: 60)
 		}
 	}
 }

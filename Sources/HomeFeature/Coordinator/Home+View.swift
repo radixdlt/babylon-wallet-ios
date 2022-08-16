@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 public extension Home {
-	struct Coordinator: SwiftUI.View {
+	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -14,8 +14,7 @@ public extension Home {
 	}
 }
 
-public extension Home.Coordinator {
-	// MARK: Body
+public extension Home.View {
 	var body: some View {
 		VStack {
 			Home.Header.View(
@@ -44,10 +43,9 @@ public extension Home.Coordinator {
 }
 
 // MARK: - HomeView_Previews
-#if DEBUG
 struct HomeView_Previews: PreviewProvider {
 	static var previews: some View {
-		Home.Coordinator(
+		Home.View(
 			store: .init(
 				initialState: .init(),
 				reducer: Home.reducer,
@@ -56,4 +54,3 @@ struct HomeView_Previews: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG

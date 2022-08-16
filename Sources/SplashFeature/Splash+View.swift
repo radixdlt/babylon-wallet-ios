@@ -8,7 +8,7 @@ import Wallet
 import WalletLoader
 
 public extension Splash {
-	struct Coordinator: SwiftUI.View {
+	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -18,31 +18,7 @@ public extension Splash {
 	}
 }
 
-internal extension Splash.Coordinator {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		init(state _: Splash.State) {}
-	}
-}
-
-internal extension Splash.Coordinator {
-	// MARK: ViewAction
-	enum ViewAction {
-		case viewDidAppear
-	}
-}
-
-internal extension Splash.Action {
-	init(action: Splash.Coordinator.ViewAction) {
-		switch action {
-		case .viewDidAppear:
-			self = .internal(.system(.viewDidAppear))
-		}
-	}
-}
-
-public extension Splash.Coordinator {
-	// MARK: Body
+public extension Splash.View {
 	var body: some View {
 		WithViewStore(
 			store.scope(
@@ -62,11 +38,33 @@ public extension Splash.Coordinator {
 	}
 }
 
-// MARK: - SplashCoordinator_Previews
-#if DEBUG
-struct SplashCoordinator_Previews: PreviewProvider {
+extension Splash.View {
+	// MARK: ViewState
+	struct ViewState: Equatable {
+		init(state _: Splash.State) {}
+	}
+}
+
+extension Splash.View {
+	// MARK: ViewAction
+	enum ViewAction {
+		case viewDidAppear
+	}
+}
+
+extension Splash.Action {
+	init(action: Splash.View.ViewAction) {
+		switch action {
+		case .viewDidAppear:
+			self = .internal(.system(.viewDidAppear))
+		}
+	}
+}
+
+// MARK: - SplashView_Previews
+struct SplashView_Previews: PreviewProvider {
 	static var previews: some View {
-		Splash.Coordinator(
+		Splash.View(
 			store: .init(
 				initialState: .init(),
 				reducer: Splash.reducer,
@@ -80,4 +78,3 @@ struct SplashCoordinator_Previews: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG

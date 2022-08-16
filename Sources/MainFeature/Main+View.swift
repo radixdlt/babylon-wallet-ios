@@ -8,7 +8,7 @@ import UserDefaultsClient
 import Wallet
 
 public extension Main {
-	struct Coordinator: SwiftUI.View {
+	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -18,38 +18,10 @@ public extension Main {
 	}
 }
 
-internal extension Main.Coordinator {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		public var profileName: String
-
-		init(state: Main.State) {
-			profileName = state.wallet.profile.name
-		}
-	}
-}
-
-internal extension Main.Coordinator {
-	// MARK: ViewAction
-	enum ViewAction {
-		case removeWalletButtonPressed
-	}
-}
-
-internal extension Main.Action {
-	init(action: Main.Coordinator.ViewAction) {
-		switch action {
-		case .removeWalletButtonPressed:
-			self = .internal(.user(.removeWallet))
-		}
-	}
-}
-
-public extension Main.Coordinator {
-	// MARK: Body
+public extension Main.View {
 	var body: some View {
 		ZStack {
-			Home.Coordinator(
+			Home.View(
 				store: store.scope(
 					state: \.home,
 					action: Main.Action.home
@@ -62,18 +34,44 @@ public extension Main.Coordinator {
 					state: \.settings,
 					action: Main.Action.settings
 				),
-				then: Settings.Coordinator.init(store:)
+				then: Settings.View.init(store:)
 			)
 			.zIndex(1)
 		}
 	}
 }
 
-// MARK: - MainCoordinator_Previews
-#if DEBUG
-struct MainCoordinator_Previews: PreviewProvider {
+extension Main.View {
+	// MARK: ViewState
+	struct ViewState: Equatable {
+		public var profileName: String
+
+		init(state: Main.State) {
+			profileName = state.wallet.profile.name
+		}
+	}
+}
+
+extension Main.View {
+	// MARK: ViewAction
+	enum ViewAction {
+		case removeWalletButtonPressed
+	}
+}
+
+extension Main.Action {
+	init(action: Main.View.ViewAction) {
+		switch action {
+		case .removeWalletButtonPressed:
+			self = .internal(.user(.removeWallet))
+		}
+	}
+}
+
+// MARK: - MainView_Previews
+struct MainView_Previews: PreviewProvider {
 	static var previews: some View {
-		Main.Coordinator(
+		Main.View(
 			store: .init(
 				initialState: .init(wallet: .init(profile: .init())),
 				reducer: Main.reducer,
@@ -86,4 +84,3 @@ struct MainCoordinator_Previews: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG

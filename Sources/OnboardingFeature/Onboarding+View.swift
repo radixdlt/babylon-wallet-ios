@@ -7,7 +7,7 @@ import UserDefaultsClient
 import Wallet
 
 public extension Onboarding {
-	struct Coordinator: SwiftUI.View {
+	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -17,55 +17,7 @@ public extension Onboarding {
 	}
 }
 
-internal extension Onboarding.Coordinator {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		@BindableState var profileName: String
-		var canProceed: Bool
-
-		init(
-			state: Onboarding.State
-		) {
-			profileName = state.profileName
-			canProceed = state.canProceed
-		}
-	}
-}
-
-internal extension Onboarding.Coordinator {
-	// MARK: ViewAction
-	enum ViewAction: Equatable, BindableAction {
-		case binding(BindingAction<ViewState>)
-		case createWalletButtonPressed
-	}
-}
-
-private extension Onboarding.State {
-	var view: Onboarding.Coordinator.ViewState {
-		get { .init(state: self) }
-		set {
-			// handle bindable actions only:
-			profileName = newValue.profileName
-			canProceed = newValue.canProceed
-		}
-	}
-}
-
-internal extension Onboarding.Action {
-	init(action: Onboarding.Coordinator.ViewAction) {
-		switch action {
-		case let .binding(bindingAction):
-			self = .binding(
-				bindingAction.pullback(\Onboarding.State.view)
-			)
-		case .createWalletButtonPressed:
-			self = .internal(.user(.createWallet))
-		}
-	}
-}
-
-public extension Onboarding.Coordinator {
-	// MARK: Body
+public extension Onboarding.View {
 	var body: some View {
 		WithViewStore(
 			store.scope(
@@ -86,11 +38,57 @@ public extension Onboarding.Coordinator {
 	}
 }
 
-// MARK: - OnboardingCoordinator_Previews
-#if DEBUG
-struct OnboardingCoordinator_Previews: PreviewProvider {
+extension Onboarding.View {
+	// MARK: ViewState
+	struct ViewState: Equatable {
+		@BindableState var profileName: String
+		var canProceed: Bool
+
+		init(
+			state: Onboarding.State
+		) {
+			profileName = state.profileName
+			canProceed = state.canProceed
+		}
+	}
+}
+
+extension Onboarding.View {
+	// MARK: ViewAction
+	enum ViewAction: Equatable, BindableAction {
+		case binding(BindingAction<ViewState>)
+		case createWalletButtonPressed
+	}
+}
+
+extension Onboarding.Action {
+	init(action: Onboarding.View.ViewAction) {
+		switch action {
+		case let .binding(bindingAction):
+			self = .binding(
+				bindingAction.pullback(\Onboarding.State.view)
+			)
+		case .createWalletButtonPressed:
+			self = .internal(.user(.createWallet))
+		}
+	}
+}
+
+private extension Onboarding.State {
+	var view: Onboarding.View.ViewState {
+		get { .init(state: self) }
+		set {
+			// handle bindable actions only:
+			profileName = newValue.profileName
+			canProceed = newValue.canProceed
+		}
+	}
+}
+
+// MARK: - OnboardingView_Previews
+struct OnboardingView_Previews: PreviewProvider {
 	static var previews: some View {
-		Onboarding.Coordinator(
+		Onboarding.View(
 			store: .init(
 				initialState: .init(),
 				reducer: Onboarding.reducer,
@@ -103,4 +101,3 @@ struct OnboardingCoordinator_Previews: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
