@@ -18,11 +18,8 @@ public extension Main {
 			.pullback(
 				state: \.home,
 				action: /Main.Action.home,
-				environment: {
-					.init(
-						backgroundQueue: $0.backgroundQueue,
-						mainQueue: $0.mainQueue
-					)
+				environment: { _ in
+					Home.Environment()
 				}
 			),
 
