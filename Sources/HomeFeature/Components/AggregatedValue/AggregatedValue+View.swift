@@ -80,16 +80,17 @@ private extension Home.AggregatedValue.View {
 		var body: some View {
 			if isValueVisible {
 				Text(formattedAmount)
-					.font(.system(size: 26, weight: .bold))
+					.foregroundColor(.app.buttonTextBlack)
+					.font(.app.titleBold)
 			} else {
 				HStack {
-					Text("\(fiatCurrency.symbol)")
+					Text("\(fiatCurrency.sign)")
 						.foregroundColor(.app.buttonTextBlack)
-						.font(.system(size: 26, weight: .bold))
+						.font(.app.titleBold)
 
 					Text("••••••")
 						.foregroundColor(.app.buttonTextLight)
-						.font(.system(size: 46, weight: .bold))
+						.font(.app.largeTitle)
 						.offset(y: -3)
 				}
 			}
@@ -116,15 +117,21 @@ private extension Home.AggregatedValue.View {
 		let isValueVisible: Bool
 		let toggleVisibilityAction: () -> Void
 
+		// FIXME: propagate correct values
+		let currency = FiatCurrency.usd
+		let amount: Float = 1_000_000
+		var formattedAmount: String {
+			amount.formatted(.currency(code: currency.symbol))
+		}
+
 		var body: some View {
 			HStack {
 				Spacer()
-				// FIXME: currency
 				AmountView(
 					isValueVisible: isValueVisible,
-					amount: 0,
-					formattedAmount: "0",
-					fiatCurrency: FiatCurrency.usd
+					amount: amount,
+					formattedAmount: formattedAmount,
+					fiatCurrency: currency
 				)
 				Spacer()
 					.frame(width: 44)

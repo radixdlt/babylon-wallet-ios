@@ -69,8 +69,8 @@ private extension Home.VisitHub.View {
 			action: action,
 			label: {
 				Text(L10n.Home.VisitHub.buttonTitle)
-					.font(.app.body)
 					.foregroundColor(.app.buttonTextBlack)
+					.font(.app.body)
 					.padding()
 					.frame(maxWidth: .infinity)
 					.background(Color.app.buttonBackgroundLight)

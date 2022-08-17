@@ -22,6 +22,7 @@ extension Font {
 		case 𝟙𝟜 = 14
 		case 𝟙𝟞 = 16
 		case 𝟚𝟞 = 26
+		case 𝟜𝟞 = 46
 	}
 }
 
@@ -40,5 +41,13 @@ public extension Font.App {
 
 	var title: Font {
 		.custom(.𝟚𝟞, .semibold)
+	}
+
+	var titleBold: Font {
+		.custom(.𝟚𝟞, .bold)
+	}
+
+	var largeTitle: Font {
+		.custom(.𝟜𝟞, .bold)
 	}
 }

@@ -27,7 +27,7 @@ public extension Home.AggregatedValue {
 public extension Home.AggregatedValue.State {
 	static let placeholder = Home.AggregatedValue.State(
 		account: .placeholder,
-		isVisible: true
+		isVisible: false
 	)
 }
 #endif
