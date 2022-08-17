@@ -68,6 +68,9 @@ public extension Main {
 				return .none
 			case .settings:
 				return .none
+			case .createAccount(.coordinate(.dismissCreateAccount)):
+				state.createAccount = nil
+				return .none
 			}
 		}
 	)

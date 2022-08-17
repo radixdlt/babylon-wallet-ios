@@ -1,24 +1,32 @@
+import Common
 import ComposableArchitecture
 import SwiftUI
 
 public extension CreateAccount {
 	struct View: SwiftUI.View {
-		let store: Store<State, Action>
+		public typealias Store = ComposableArchitecture.Store<State, Action>
+		private let store: Store
+
+		public init(
+			store: Store
+		) {
+			self.store = store
+		}
 	}
 }
 
 public extension CreateAccount.View {
 	var body: some View {
-		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: CreateAccount.Action.init
-			)
-		) { _ in
-			// TODO: implement
-			Text("Impl: CreateAccount")
-				.background(Color.yellow)
-				.foregroundColor(.red)
+		// NOTE: placeholder implementation
+		WithViewStore(store) { store in
+			ForceFullScreen {
+				VStack {
+					Text("Create Account")
+					Button(action: { store.send(.coordinate(.dismissCreateAccount)) }, label: {
+						Text("Dismiss Create Account")
+					})
+				}
+			}
 		}
 	}
 }
