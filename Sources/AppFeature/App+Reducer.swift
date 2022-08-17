@@ -19,8 +19,6 @@ public extension App {
 				action: /Action.main,
 				environment: {
 					Main.Environment(
-						backgroundQueue: $0.backgroundQueue,
-						mainQueue: $0.mainQueue,
 						userDefaultsClient: $0.userDefaultsClient,
 						// FIXME: wallet
 						//                        wallet: $0.walletLoader.loadWallet

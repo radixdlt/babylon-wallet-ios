@@ -88,8 +88,6 @@ struct MainView_Previews: PreviewProvider {
 				initialState: .placeholder,
 				reducer: Main.reducer,
 				environment: .init(
-					backgroundQueue: .immediate,
-					mainQueue: .immediate,
 					userDefaultsClient: .noop,
 					wallet: .placeholder
 				)
