@@ -19,7 +19,6 @@ public extension App {
 		case onboarding(Onboarding.State?)
 		case splash(Splash.State?)
 
-//		public init() { self = .onboarding(.init()) }
-		public init() { self = .main(.init()) }
+		public init() { self = .onboarding(.init()) }
 	}
 }
