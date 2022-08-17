@@ -18,13 +18,14 @@ public extension CreateAccount {
 public extension CreateAccount.View {
 	var body: some View {
 		// NOTE: placeholder implementation
-		WithViewStore(store) { store in
+		WithViewStore(store) { viewStore in
 			ForceFullScreen {
 				VStack {
 					Text("Create Account")
-					Button(action: { store.send(.coordinate(.dismissCreateAccount)) }, label: {
-						Text("Dismiss Create Account")
-					})
+					Button(
+						action: { viewStore.send(.coordinate(.dismissCreateAccount)) },
+						label: { Text("Dismiss Create Account") }
+					)
 				}
 			}
 		}

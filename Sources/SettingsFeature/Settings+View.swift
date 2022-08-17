@@ -18,13 +18,14 @@ public extension Settings {
 public extension Settings.View {
 	var body: some View {
 		// NOTE: placeholder implementation
-		WithViewStore(store) { store in
+		WithViewStore(store) { viewStore in
 			ForceFullScreen {
 				VStack {
 					Text("Settings")
-					Button(action: { store.send(.coordinate(.dismissSettings)) }, label: {
-						Text("Dismiss Settings")
-					})
+					Button(
+						action: { viewStore.send(.coordinate(.dismissSettings)) },
+						label: { Text("Dismiss Settings") }
+					)
 				}
 			}
 		}

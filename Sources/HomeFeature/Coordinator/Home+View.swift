@@ -17,40 +17,41 @@ public extension Home {
 
 public extension Home.View {
 	var body: some View {
-		VStack {
-			Home.Header.View(
-				store: store.scope(
-					state: \.header,
-					action: Home.Action.header
-				)
+		WithViewStore(
+			store.scope(
+				state: ViewState.init,
+				action: Home.Action.init
 			)
-			Spacer()
-			Home.AggregatedValue.View(
-				store: store.scope(
-					state: \.aggregatedValue,
-					action: Home.Action.aggregatedValue
+		) { viewStore in
+
+			VStack {
+				Home.Header.View(
+					store: store.scope(
+						state: \.header,
+						action: Home.Action.header
+					)
 				)
-			)
-			Spacer()
-			WithViewStore(
-				store.scope(
-					state: ViewState.init,
-					action: Home.Action.init
+				Spacer()
+				Home.AggregatedValue.View(
+					store: store.scope(
+						state: \.aggregatedValue,
+						action: Home.Action.aggregatedValue
+					)
 				)
-			) { viewStore in
+				Spacer()
 				createAccountButton {
 					viewStore.send(.createAccountButtonTapped)
 				}
-			}
-			Spacer()
-			Home.VisitHub.View(
-				store: store.scope(
-					state: \.visitHub,
-					action: Home.Action.visitHub
+				Spacer()
+				Home.VisitHub.View(
+					store: store.scope(
+						state: \.visitHub,
+						action: Home.Action.visitHub
+					)
 				)
-			)
+			}
+			.padding(32)
 		}
-		.padding(32)
 	}
 }
 
@@ -78,6 +79,7 @@ extension Home.View {
 }
 
 private extension Home.View {
+	// TODO: extract button for reuse
 	func createAccountButton(action: @escaping () -> Void) -> some View {
 		Button(action: action) {
 			Text(L10n.Home.createNewAccount)
