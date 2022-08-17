@@ -19,6 +19,10 @@ let package = Package(
 			name: "AppFeature",
 			targets: ["AppFeature"]
 		),
+		.library(
+			name: "HomeFeature",
+			targets: ["HomeFeature"]
+		),
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture

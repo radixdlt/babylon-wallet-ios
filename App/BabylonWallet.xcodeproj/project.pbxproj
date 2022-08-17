@@ -15,7 +15,7 @@
 		E6805BCE286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
 		E6805BD1286DB3ED00861180 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6805BBF286DB3ED00861180 /* Assets.xcassets */; };
 		E6805BD2286DB3ED00861180 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6805BBF286DB3ED00861180 /* Assets.xcassets */; };
-		E6805BDF286DB74300861180 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E6805BDE286DB74300861180 /* AppFeature */; };
+		E6805BDF286DB74300861180 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E6805BDE286DB74300861180 /* AppFeature */; settings = {ATTRIBUTES = (Required, ); }; };
 		E6805BE1286DB74900861180 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E6805BE0286DB74900861180 /* AppFeature */; };
 /* End PBXBuildFile section */
 

@@ -77,3 +77,15 @@ private extension Home.VisitHub.View {
 		)
 	}
 }
+
+struct VisitHub_Preview: PreviewProvider {
+	static var previews: some View {
+		Home.VisitHub.View(
+			store: .init(
+				initialState: .init(),
+				reducer: Home.VisitHub.reducer,
+				environment: .init()
+			)
+		)
+	}
+}
