@@ -6,11 +6,11 @@ public extension UserDefaultsClient {
 		dataForKey: { _ in nil },
 		doubleForKey: { _ in 0 },
 		integerForKey: { _ in 0 },
-		remove: { _ in .none },
-		setBool: { _, _ in .none },
-		setData: { _, _ in .none },
-		setDouble: { _, _ in .none },
-		setInteger: { _, _ in .none }
+		remove: { _ in },
+		setBool: { _, _ in },
+		setData: { _, _ in },
+		setDouble: { _, _ in },
+		setInteger: { _, _ in }
 	)
 }
 
@@ -24,11 +24,11 @@ public extension UserDefaultsClient {
 		dataForKey: XCTUnimplemented("\(Self.self).dataForKey", placeholder: nil),
 		doubleForKey: XCTUnimplemented("\(Self.self).doubleForKey", placeholder: 0),
 		integerForKey: XCTUnimplemented("\(Self.self).integerForKey", placeholder: 0),
-		remove: XCTUnimplemented("\(Self.self).remove", placeholder: .none),
-		setBool: XCTUnimplemented("\(Self.self).setBool", placeholder: .none),
-		setData: XCTUnimplemented("\(Self.self).setData", placeholder: .none),
-		setDouble: XCTUnimplemented("\(Self.self).setDouble", placeholder: .none),
-		setInteger: XCTUnimplemented("\(Self.self).setInteger", placeholder: .none)
+		remove: XCTUnimplemented("\(Self.self).remove"),
+		setBool: XCTUnimplemented("\(Self.self).setBool"),
+		setData: XCTUnimplemented("\(Self.self).setData"),
+		setDouble: XCTUnimplemented("\(Self.self).setDouble"),
+		setInteger: XCTUnimplemented("\(Self.self).setInteger")
 	)
 
 	mutating func override(bool: Bool, forKey key: String) {

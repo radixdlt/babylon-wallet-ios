@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import Foundation
 
 public extension Home {
@@ -6,3 +7,9 @@ public extension Home {
 		public init() {}
 	}
 }
+
+#if DEBUG
+public extension Home.Environment {
+	static let placeholder = Self()
+}
+#endif

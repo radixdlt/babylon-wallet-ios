@@ -24,10 +24,10 @@ public extension Home.View {
 				)
 			)
 			Spacer()
-			Home.Balance.View(
+			Home.AggregatedValue.View(
 				store: store.scope(
-					state: \.balance,
-					action: Home.Action.balance
+					state: \.aggregatedValue,
+					action: Home.Action.aggregatedValue
 				)
 			)
 			Spacer()
@@ -49,7 +49,7 @@ struct HomeView_Previews: PreviewProvider {
 			store: .init(
 				initialState: .init(),
 				reducer: Home.reducer,
-				environment: .init()
+				environment: .placeholder
 			)
 		)
 	}

@@ -3,7 +3,7 @@ import Profile
 
 // MARK: - ProfileLoader
 public struct ProfileLoader {
-	public var loadProfile: () -> Effect<Profile, Error>
+	public var loadProfile: @Sendable () async throws -> Profile
 }
 
 public extension ProfileLoader {
@@ -12,11 +12,3 @@ public extension ProfileLoader {
 		case failedToLoadProfileFromDocument
 	}
 }
-
-#if DEBUG
-public extension ProfileLoader {
-	static let noop = Self(
-		loadProfile: { .none }
-	)
-}
-#endif // DEBUG

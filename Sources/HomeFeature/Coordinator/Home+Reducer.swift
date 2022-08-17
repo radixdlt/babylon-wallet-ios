@@ -11,11 +11,11 @@ public extension Home {
 				environment: { _ in Home.Header.Environment() }
 			),
 
-		Home.Balance.reducer
+		Home.AggregatedValue.reducer
 			.pullback(
-				state: \.balance,
-				action: /Home.Action.balance,
-				environment: { _ in Home.Balance.Environment() }
+				state: \.aggregatedValue,
+				action: /Home.Action.aggregatedValue,
+				environment: { _ in Home.AggregatedValue.Environment() }
 			),
 
 		Home.VisitHub.reducer
@@ -31,7 +31,7 @@ public extension Home {
 				return Effect(value: .coordinate(.displaySettings))
 			case .header(.internal(_)):
 				return .none
-			case .balance:
+			case .aggregatedValue:
 				return .none
 			case .visitHub(.coordinate(.displayHub)):
 				return Effect(value: .coordinate(.displayVisitHub))

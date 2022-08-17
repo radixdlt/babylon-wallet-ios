@@ -1,19 +1,19 @@
 import Foundation
 
-public extension Home.Balance {
+public extension Home.AggregatedValue {
 	// MARK: Action
 	enum Action: Equatable {
 		case `internal`(InternalAction)
 	}
 }
 
-public extension Home.Balance.Action {
+public extension Home.AggregatedValue.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
 	}
 }
 
-public extension Home.Balance.Action.InternalAction {
+public extension Home.AggregatedValue.Action.InternalAction {
 	enum UserAction: Equatable {
 		case toggleVisibilityButtonTapped
 	}

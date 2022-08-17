@@ -1,4 +1,3 @@
-import Combine
 import ComposableArchitecture
 import Profile
 import UserDefaultsClient
@@ -10,16 +9,10 @@ public extension ProfileLoader {
 		Self(
 			loadProfile: {
 				guard let profileName = userDefaultsClient.profileName else {
-					return Fail(
-						outputType: Profile.self,
-						failure: Error.noProfileDocumentFoundAtPath("UserDefaults")
-					)
-					.eraseToEffect()
+					throw Error.noProfileDocumentFoundAtPath("UserDefaults")
 				}
 
-				return Just(Profile(name: profileName))
-					.setFailureType(to: Error.self)
-					.eraseToEffect()
+				return Profile(name: profileName)
 			}
 		)
 	}

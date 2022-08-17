@@ -36,6 +36,6 @@ public extension Onboarding.Action.InternalAction {
 public extension Onboarding.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case createWallet
-		case createWalletResult(Result<Wallet, Never>)
+		case createdWallet(Wallet)
 	}
 }

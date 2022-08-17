@@ -3,12 +3,12 @@ import ComposableArchitecture
 import TestUtils
 import XCTest
 
-final class HomeBalanceTests: TestCase {
+final class HomeAggregatedValueTests: TestCase {
 	func testVisibilityButtonTapped() {
 		let store = TestStore(
-			initialState: Home.Balance.State(isVisible: false),
-			reducer: Home.Balance.reducer,
-			environment: Home.Balance.Environment()
+			initialState: Home.AggregatedValue.State(isVisible: false),
+			reducer: Home.AggregatedValue.reducer,
+			environment: Home.AggregatedValue.Environment()
 		)
 
 		store.send(.internal(.user(.toggleVisibilityButtonTapped))) {

@@ -4,7 +4,7 @@ import Wallet
 
 // MARK: - WalletLoader
 public struct WalletLoader {
-	public var loadWallet: (Profile) -> Effect<Wallet, Error>
+	public var loadWallet: @Sendable (Profile) async throws -> Wallet
 }
 
 public extension WalletLoader {
@@ -16,7 +16,7 @@ public extension WalletLoader {
 #if DEBUG
 public extension WalletLoader {
 	static let noop = Self(
-		loadWallet: { _ in .none }
+		loadWallet: { _ in .noop }
 	)
 }
-#endif // DEBUG
+#endif

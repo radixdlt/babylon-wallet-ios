@@ -1,16 +1,16 @@
 import Foundation
 
-public enum Currency: String, Equatable {
+public enum FiatCurrency: String, Equatable {
 	case usd
 
-	public var symbol: String {
+	public var sign: String {
 		switch self {
 		case .usd:
 			return "$"
 		}
 	}
 
-	public var code: String {
+	public var symbol: String {
 		rawValue.uppercased()
 	}
 }

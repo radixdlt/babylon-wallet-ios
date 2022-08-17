@@ -1,6 +1,6 @@
 import ComposableArchitecture
 
-public extension Home.Balance {
+public extension Home.AggregatedValue {
 	// MARK: Reducer
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = Reducer { state, action, _ in

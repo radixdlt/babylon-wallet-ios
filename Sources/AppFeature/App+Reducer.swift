@@ -21,7 +21,10 @@ public extension App {
 					Main.Environment(
 						backgroundQueue: $0.backgroundQueue,
 						mainQueue: $0.mainQueue,
-						userDefaultsClient: $0.userDefaultsClient
+						userDefaultsClient: $0.userDefaultsClient,
+						// FIXME: wallet
+						//                        wallet: $0.walletLoader.loadWallet
+						wallet: .placeholder
 					)
 				}
 			),
@@ -67,7 +70,9 @@ public extension App {
 		case .main:
 			return .none
 		case let .onboarding(.coordinate(.onboardedWithWallet(wallet))):
-			state = .main(.init(wallet: wallet))
+			// FIXME: wallet
+//			state = .main(.init(wallet: wallet))
+			state = .main(.placeholder)
 			return Effect(value: .coordinate(.toMain(wallet)))
 		case .onboarding:
 			return .none
@@ -75,31 +80,9 @@ public extension App {
 			switch loadWalletResult {
 			case let .walletLoaded(wallet):
 				return Effect(value: .coordinate(.toMain(wallet)))
-			case let .noWallet(.noProfileFoundAtPath(path)):
+			case let .noWallet(reason):
 				state = App.State.alert(.init(
-					title: TextState("No profile found at: \(path)"),
-					buttons: [
-						.cancel(
-							TextState("OK, I'll onboard"),
-							action: .send(.coordinate(.onboard))
-						),
-					]
-				))
-				return .none
-			case .noWallet(.failedToLoadProfileFromDocument):
-				state = App.State.alert(.init(
-					title: TextState("Failed to load profile from document"),
-					buttons: [
-						.cancel(
-							TextState("OK, I'll onboard"),
-							action: .send(.coordinate(.onboard))
-						),
-					]
-				))
-				return .none
-			case .noWallet(.secretsNotFoundForProfile):
-				state = App.State.alert(.init(
-					title: TextState("Secrets not found for profile"),
+					title: TextState(reason),
 					buttons: [
 						.cancel(
 							TextState("OK, I'll onboard"),
@@ -115,7 +98,9 @@ public extension App {
 			state = .onboarding(.init())
 			return .none
 		case let .coordinate(.toMain(wallet)):
-			state = .main(.init(wallet: wallet))
+			// FIXME: wallet
+//			state = .main(.init(wallet: wallet))
+			state = .main(.placeholder)
 			return .none
 		case .internal(.user(.alertDismissed)):
 			state = .alert(nil)
