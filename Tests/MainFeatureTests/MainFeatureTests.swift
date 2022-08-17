@@ -15,14 +15,14 @@ final class MainFeatureTests: TestCase {
 		}
 	}
 
-	func testDismissSettings() async {
+	func testDismissSettings() {
 		let store = TestStore(
 			initialState: Main.State(),
 			reducer: Main.reducer,
 			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop, wallet: .noop)
 		)
 
-		await store.send(.settings(.coordinate(.dismissSettings))) {
+		store.send(.settings(.coordinate(.dismissSettings))) {
 			$0.settings = nil
 		}
 	}
@@ -37,15 +37,27 @@ final class MainFeatureTests: TestCase {
 		store.send(.home(.coordinate(.displayVisitHub)))
 	}
 
-	func testDismissCreateAccount() async {
+	func testDisplayCreateAccount() {
 		let store = TestStore(
 			initialState: Main.State(),
 			reducer: Main.reducer,
 			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop, wallet: .noop)
 		)
 
-		await store.send(.createAccount(.coordinate(.dismissCreateAccount))) {
-			$0.settings = nil
+		store.send(.home(.coordinate(.displayCreateAccount))) {
+			$0.createAccount = .init()
+		}
+	}
+
+	func testDismissCreateAccount() {
+		let store = TestStore(
+			initialState: Main.State(),
+			reducer: Main.reducer,
+			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop, wallet: .noop)
+		)
+
+		store.send(.createAccount(.coordinate(.dismissCreateAccount))) {
+			$0.createAccount = nil
 		}
 	}
 }
