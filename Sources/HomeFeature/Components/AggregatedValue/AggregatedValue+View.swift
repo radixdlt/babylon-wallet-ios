@@ -51,7 +51,7 @@ extension Home.AggregatedValue.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		var isValueVisible: Bool
-		var account: Account
+		var account: Home.AccountList.Account
 
 		init(
 			state: Home.AggregatedValue.State
@@ -112,7 +112,7 @@ private extension Home.AggregatedValue.View {
 	}
 
 	struct AggregatedValueView: View {
-		let account: Account
+		let account: Home.AccountList.Account
 		let isValueVisible: Bool
 		let toggleVisibilityAction: () -> Void
 

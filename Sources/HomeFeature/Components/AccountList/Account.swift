@@ -1,19 +1,25 @@
 import Foundation
 
-// MARK: - Account
-public struct Account: Equatable {
-	public let address: String
-	public let name: String
-	public let tokens: [Token]
+public extension Home {
+	enum AccountList {}
+}
 
-	public init(
-		address: String,
-		name: String,
-		tokens: [Token]
-	) {
-		self.address = address
-		self.name = name
-		self.tokens = tokens
+// MARK: - Account
+public extension Home.AccountList {
+	struct Account: Equatable {
+		public let address: String
+		public let name: String
+		public let tokens: [Token]
+
+		public init(
+			address: String,
+			name: String,
+			tokens: [Token]
+		) {
+			self.address = address
+			self.name = name
+			self.tokens = tokens
+		}
 	}
 }
 
@@ -29,22 +35,22 @@ public struct Account: Equatable {
  */
 
 #if DEBUG
-public extension Account {
-	static let placeholder: Account = .checking
+public extension Home.AccountList.Account {
+	static let placeholder: Self = .checking
 
-	static let checking: Account = .init(
+	static let checking: Self = .init(
 		address: UUID().uuidString,
 		name: "Checking",
 		tokens: []
 	)
 
-	static let savings: Account = .init(
+	static let savings: Self = .init(
 		address: UUID().uuidString,
 		name: "Savings",
 		tokens: []
 	)
 
-	static let shared: Account = .init(
+	static let shared: Self = .init(
 		address: UUID().uuidString,
 		name: "Shared",
 		tokens: []

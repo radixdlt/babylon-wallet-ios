@@ -10,11 +10,11 @@ public extension Home {
 public extension Home.AggregatedValue {
 	// MARK: State
 	struct State: Equatable {
-		public var account: Account
+		public var account: Home.AccountList.Account
 		public var isVisible: Bool
 
 		public init(
-			account: Account,
+			account: Home.AccountList.Account,
 			isVisible: Bool = false
 		) {
 			self.account = account
