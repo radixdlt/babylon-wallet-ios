@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import CreateAccount
 import Foundation
 import HomeFeature
 import SettingsFeature
@@ -12,8 +13,10 @@ import UIKit
 #endif
 
 public extension Main {
+	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
+
 	// MARK: Reducer
-	static let reducer = ComposableArchitecture.Reducer<State, Action, Environment>.combine(
+	static let reducer = Reducer.combine(
 		Home.reducer
 			.pullback(
 				state: \.home,
@@ -33,6 +36,16 @@ public extension Main {
 				}
 			),
 
+		CreateAccount.reducer
+			.optional()
+			.pullback(
+				state: \.createAccount,
+				action: /Main.Action.createAccount,
+				environment: { _ in
+					CreateAccount.Environment()
+				}
+			),
+
 		Reducer { state, action, environment in
 			switch action {
 			case .internal(.user(.removeWallet)):
@@ -44,8 +57,6 @@ public extension Main {
 					await send(.coordinate(.removedWallet))
 				}
 
-			case .coordinate:
-				return .none
 			case .home(.coordinate(.displaySettings)):
 				state.settings = .init()
 				return .none
@@ -58,14 +69,31 @@ public extension Main {
 				#else
 				return .none
 				#endif // os(iOS)
-			case .home:
+			case .home(.coordinate(.displayCreateAccount)):
+				state.createAccount = .init()
 				return .none
+
 			case .settings(.coordinate(.dismissSettings)):
 				state.settings = nil
 				return .none
-			case .settings:
+
+			case .createAccount(.coordinate(.dismissCreateAccount)):
+				state.createAccount = nil
+				return .none
+
+			case .home(.internal(_)):
+				return .none
+			case .settings(.internal(_)):
+				return .none
+			case .home(.header(_)):
+				return .none
+			case .home(.aggregatedValue(_)):
+				return .none
+			case .home(.visitHub(_)):
+				return .none
+			case .coordinate:
 				return .none
 			}
 		}
-	)
+	).debug()
 }

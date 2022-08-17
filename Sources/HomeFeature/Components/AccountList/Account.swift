@@ -23,6 +23,7 @@ public extension Home.AccountList {
 	}
 }
 
+// FIXME: fiatTotalValueString
 /*
  public extension Account {
  	var fiatTotalValueString: String {

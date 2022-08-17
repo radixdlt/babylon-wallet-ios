@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import CreateAccount
 import Foundation
 import HomeFeature
 import SettingsFeature
@@ -15,13 +16,16 @@ public extension Main {
 	struct State: Equatable {
 		public var home: Home.State
 		public var settings: Settings.State?
+		public var createAccount: CreateAccount.State?
 
 		public init(
 			home: Home.State = .init(),
-			settings: Settings.State? = nil
+			settings: Settings.State? = nil,
+			createAccount: CreateAccount.State? = nil
 		) {
 			self.home = home
 			self.settings = settings
+			self.createAccount = createAccount
 		}
 	}
 }

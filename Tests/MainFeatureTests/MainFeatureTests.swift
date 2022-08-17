@@ -5,9 +5,9 @@ import TestUtils
 final class MainFeatureTests: TestCase {
 	func testDisplaySettings() {
 		let store = TestStore(
-			initialState: Main.State(wallet: .init(profile: .init())),
+			initialState: Main.State(),
 			reducer: Main.reducer,
-			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop)
+			environment: .noop
 		)
 
 		store.send(.home(.coordinate(.displaySettings))) {
@@ -17,23 +17,48 @@ final class MainFeatureTests: TestCase {
 
 	func testDismissSettings() {
 		let store = TestStore(
-			initialState: Main.State(wallet: .init(profile: .init()), settings: .init()),
+			initialState: Main.State(settings: .init()),
 			reducer: Main.reducer,
-			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop)
+			environment: .noop
 		)
 
-		store.send(.settings(.coordinate(.dismissSettings))) {
+		store.send(.settings(.internal(.user(.dismissSettings))))
+		store.receive(.settings(.coordinate(.dismissSettings))) {
 			$0.settings = nil
 		}
 	}
 
-	func testVisitHub() {
+	func testDisplayVisitHub() {
 		let store = TestStore(
-			initialState: Main.State(wallet: .init(profile: .init())),
+			initialState: Main.State(),
 			reducer: Main.reducer,
-			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop)
+			environment: .noop
 		)
 
 		store.send(.home(.coordinate(.displayVisitHub)))
+	}
+
+	func testDisplayCreateAccount() {
+		let store = TestStore(
+			initialState: Main.State(),
+			reducer: Main.reducer,
+			environment: .noop
+		)
+
+		store.send(.home(.coordinate(.displayCreateAccount))) {
+			$0.createAccount = .init()
+		}
+	}
+
+	func testDismissCreateAccount() {
+		let store = TestStore(
+			initialState: Main.State(createAccount: .init()),
+			reducer: Main.reducer,
+			environment: .noop
+		)
+
+		store.send(.createAccount(.coordinate(.dismissCreateAccount))) {
+			$0.createAccount = nil
+		}
 	}
 }

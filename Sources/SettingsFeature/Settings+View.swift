@@ -18,15 +18,42 @@ public extension Settings {
 public extension Settings.View {
 	var body: some View {
 		// NOTE: placeholder implementation
-		WithViewStore(store) { store in
+		WithViewStore(
+			store.scope(
+				state: ViewState.init,
+				action: Settings.Action.init
+			)
+		) { viewStore in
 			ForceFullScreen {
 				VStack {
 					Text("Settings")
-					Button(action: { store.send(.coordinate(.dismissSettings)) }, label: {
-						Text("Dismiss Settings")
-					})
+					Button(
+						action: { viewStore.send(.dismissSettingsButtonTapped) },
+						label: { Text("Dismiss Settings") }
+					)
 				}
 			}
+		}
+	}
+}
+
+public extension Settings.View {
+	struct ViewState: Equatable {
+		public init(_: Settings.State) {}
+	}
+}
+
+public extension Settings.View {
+	enum ViewAction: Equatable {
+		case dismissSettingsButtonTapped
+	}
+}
+
+extension Settings.Action {
+	init(action: Settings.View.ViewAction) {
+		switch action {
+		case .dismissSettingsButtonTapped:
+			self = .internal(.user(.dismissSettings))
 		}
 	}
 }

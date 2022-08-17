@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import SwiftUI
 
@@ -16,29 +17,79 @@ public extension Home {
 
 public extension Home.View {
 	var body: some View {
-		VStack {
-			Home.Header.View(
-				store: store.scope(
-					state: \.header,
-					action: Home.Action.header
-				)
+		WithViewStore(
+			store.scope(
+				state: ViewState.init,
+				action: Home.Action.init
 			)
-			Spacer()
-			Home.AggregatedValue.View(
-				store: store.scope(
-					state: \.aggregatedValue,
-					action: Home.Action.aggregatedValue
+		) { viewStore in
+
+			VStack {
+				Home.Header.View(
+					store: store.scope(
+						state: \.header,
+						action: Home.Action.header
+					)
 				)
-			)
-			Spacer()
-			Home.VisitHub.View(
-				store: store.scope(
-					state: \.visitHub,
-					action: Home.Action.visitHub
+				Spacer()
+				Home.AggregatedValue.View(
+					store: store.scope(
+						state: \.aggregatedValue,
+						action: Home.Action.aggregatedValue
+					)
 				)
-			)
+				Spacer()
+				createAccountButton {
+					viewStore.send(.createAccountButtonTapped)
+				}
+				Spacer()
+				Home.VisitHub.View(
+					store: store.scope(
+						state: \.visitHub,
+						action: Home.Action.visitHub
+					)
+				)
+			}
+			.padding(32)
 		}
-		.padding(32)
+	}
+}
+
+extension Home.View {
+	// MARK: ViewAction
+	enum ViewAction: Equatable {
+		case createAccountButtonTapped
+	}
+}
+
+extension Home.Action {
+	init(action: Home.View.ViewAction) {
+		switch action {
+		case .createAccountButtonTapped:
+			self = .internal(.user(.createAccountButtonTapped))
+		}
+	}
+}
+
+extension Home.View {
+	// MARK: ViewState
+	struct ViewState: Equatable {
+		init(state _: Home.State) {}
+	}
+}
+
+private extension Home.View {
+	// TODO: extract button for reuse
+	func createAccountButton(action: @escaping () -> Void) -> some View {
+		Button(action: action) {
+			Text(L10n.Home.createNewAccount)
+				.foregroundColor(.app.buttonTextBlack)
+				.font(.app.subhead)
+				.padding(.horizontal, 40)
+				.frame(height: 50)
+				.background(Color.app.buttonBackgroundLight)
+				.cornerRadius(6)
+		}
 	}
 }
 
