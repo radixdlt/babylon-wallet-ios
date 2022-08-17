@@ -37,6 +37,8 @@ public extension Home {
 				return Effect(value: .coordinate(.displayVisitHub))
 			case .visitHub(.internal(_)):
 				return .none
+			case .internal(.user(.createAccountButtonTapped)):
+				return Effect(value: .coordinate(.displayCreateAccount))
 			case .coordinate:
 				return .none
 			}

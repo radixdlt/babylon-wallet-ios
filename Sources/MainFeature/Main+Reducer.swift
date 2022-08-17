@@ -58,6 +58,9 @@ public extension Main {
 				#else
 				return .none
 				#endif // os(iOS)
+			case .home(.coordinate(.displayCreateAccount)):
+				state.createAccount = .init()
+				return .none
 			case .home:
 				return .none
 			case .settings(.coordinate(.dismissSettings)):
