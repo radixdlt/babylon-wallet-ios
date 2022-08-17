@@ -7,7 +7,7 @@ final class MainFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Main.State(),
 			reducer: Main.reducer,
-			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop, wallet: .noop)
+			environment: .noop
 		)
 
 		store.send(.home(.coordinate(.displaySettings))) {
@@ -17,12 +17,13 @@ final class MainFeatureTests: TestCase {
 
 	func testDismissSettings() {
 		let store = TestStore(
-			initialState: Main.State(),
+			initialState: Main.State(settings: .init()),
 			reducer: Main.reducer,
-			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop, wallet: .noop)
+			environment: .noop
 		)
 
-		store.send(.settings(.coordinate(.dismissSettings))) {
+		store.send(.settings(.internal(.user(.dismissSettings))))
+		store.receive(.settings(.coordinate(.dismissSettings))) {
 			$0.settings = nil
 		}
 	}
@@ -31,7 +32,7 @@ final class MainFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Main.State(),
 			reducer: Main.reducer,
-			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop, wallet: .noop)
+			environment: .noop
 		)
 
 		store.send(.home(.coordinate(.displayVisitHub)))
@@ -41,7 +42,7 @@ final class MainFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Main.State(),
 			reducer: Main.reducer,
-			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop, wallet: .noop)
+			environment: .noop
 		)
 
 		store.send(.home(.coordinate(.displayCreateAccount))) {
@@ -51,9 +52,9 @@ final class MainFeatureTests: TestCase {
 
 	func testDismissCreateAccount() {
 		let store = TestStore(
-			initialState: Main.State(),
+			initialState: Main.State(createAccount: .init()),
 			reducer: Main.reducer,
-			environment: .init(backgroundQueue: .global(qos: .background), mainQueue: .main, userDefaultsClient: .noop, wallet: .noop)
+			environment: .noop
 		)
 
 		store.send(.createAccount(.coordinate(.dismissCreateAccount))) {
