@@ -57,6 +57,19 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "CreateAccount",
+			dependencies: [
+				tca,
+			]
+		),
+		.testTarget(
+			name: "CreateAccountTests",
+			dependencies: [
+				"Common",
+				"TestUtils",
+			]
+		),
+		.target(
 			name: "Common",
 			dependencies: [
 			]
@@ -101,6 +114,7 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
+				"CreateAccount",
 				"HomeFeature",
 				"SettingsFeature",
 				tca,
