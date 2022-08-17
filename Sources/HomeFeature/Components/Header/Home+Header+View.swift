@@ -62,8 +62,8 @@ private extension Home.Header.View {
 	var subtitleView: some SwiftUI.View {
 		HStack {
 			Text(L10n.Home.Header.subtitle)
-				.font(.app.body)
 				.foregroundColor(.app.secondary)
+				.font(.app.body)
 		}
 	}
 
@@ -74,6 +74,7 @@ private extension Home.Header.View {
 		public var body: some View {
 			HStack {
 				Text(L10n.Home.Header.title)
+					.foregroundColor(.app.buttonTextBlack)
 					.font(.app.title)
 				Spacer()
 				SettingsButton(

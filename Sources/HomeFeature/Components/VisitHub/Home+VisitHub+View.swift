@@ -58,8 +58,8 @@ extension Home.VisitHub.View {
 private extension Home.VisitHub.View {
 	var title: some View {
 		Text(L10n.Home.VisitHub.title)
-			.font(.app.body)
 			.foregroundColor(.app.buttonTextDark)
+			.font(.app.body)
 			.multilineTextAlignment(.center)
 			.padding()
 	}
