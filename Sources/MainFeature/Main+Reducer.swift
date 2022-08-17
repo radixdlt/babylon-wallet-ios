@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import CreateAccount
 import Foundation
 import HomeFeature
 import SettingsFeature
@@ -30,6 +31,16 @@ public extension Main {
 				action: /Main.Action.settings,
 				environment: { _ in
 					Settings.Environment()
+				}
+			),
+
+		CreateAccount.reducer
+			.optional()
+			.pullback(
+				state: \.createAccount,
+				action: /Main.Action.createAccount,
+				environment: { _ in
+					CreateAccount.Environment()
 				}
 			),
 

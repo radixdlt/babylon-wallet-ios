@@ -6,7 +6,7 @@ import XCTest
 final class HomeAggregatedValueTests: TestCase {
 	func testVisibilityButtonTapped() {
 		let store = TestStore(
-			initialState: Home.AggregatedValue.State(isVisible: false),
+			initialState: Home.AggregatedValue.State(account: .placeholder, isVisible: false),
 			reducer: Home.AggregatedValue.reducer,
 			environment: Home.AggregatedValue.Environment()
 		)
