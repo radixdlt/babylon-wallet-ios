@@ -10,14 +10,14 @@ public extension Home {
 public extension Home.AggregatedValue {
 	// MARK: State
 	struct State: Equatable {
-		public var account: Home.AccountList.Account
+        public var value: Float?
 		public var isVisible: Bool
 
 		public init(
-			account: Home.AccountList.Account,
+            value: Float? = nil,
 			isVisible: Bool = false
 		) {
-			self.account = account
+			self.value = value
 			self.isVisible = isVisible
 		}
 	}
@@ -26,7 +26,7 @@ public extension Home.AggregatedValue {
 #if DEBUG
 public extension Home.AggregatedValue.State {
 	static let placeholder = Home.AggregatedValue.State(
-		account: .placeholder,
+		value: 1000000,
 		isVisible: false
 	)
 }

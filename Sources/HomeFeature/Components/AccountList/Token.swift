@@ -1,14 +1,14 @@
 import Foundation
 
 // MARK: - Token
-public extension Home.AccountList {
+public extension Home.AccountRow {
 	struct Token: Equatable {
 		let code: Code
 		let value: Float
 	}
 }
 
-public extension Home.AccountList.Token {
+public extension Home.AccountRow.Token {
 	enum Code: String {
 		case xrd
 

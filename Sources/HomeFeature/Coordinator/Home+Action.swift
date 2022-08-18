@@ -3,8 +3,9 @@ import Foundation
 public extension Home {
 	// MARK: Action
 	enum Action: Equatable {
-		case header(Home.Header.Action)
+		case accountList(Home.AccountList.Action)
 		case aggregatedValue(Home.AggregatedValue.Action)
+		case header(Home.Header.Action)
 		case visitHub(Home.VisitHub.Action)
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)

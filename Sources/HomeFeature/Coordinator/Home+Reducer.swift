@@ -41,6 +41,8 @@ public extension Home {
 				return Effect(value: .coordinate(.displayCreateAccount))
 			case .coordinate:
 				return .none
+			case .accountList:
+				return .none
 			}
 		}
 	)

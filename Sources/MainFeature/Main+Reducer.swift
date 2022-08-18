@@ -87,6 +87,8 @@ public extension Main {
 				return .none
 			case .home(.header(_)):
 				return .none
+			case .home(.accountList(_)):
+				return .none
 			case .home(.aggregatedValue(_)):
 				return .none
 			case .home(.visitHub(_)):

@@ -1,8 +1,7 @@
-import ComposableArchitecture
 import Foundation
 import Wallet
 
-public extension Home {
+public extension Home.AccountList {
 	// MARK: Environment
 	struct Environment {
         public var wallet: Wallet
@@ -14,9 +13,3 @@ public extension Home {
         }
 	}
 }
-
-#if DEBUG
-public extension Home.Environment {
-    static let placeholder = Self(wallet: .placeholder)
-}
-#endif
