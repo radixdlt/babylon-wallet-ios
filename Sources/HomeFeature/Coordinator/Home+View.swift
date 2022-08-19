@@ -30,41 +30,36 @@ public extension Home.View {
 						action: Home.Action.header
 					)
 				)
+				.padding([.leading, .trailing, .top], 32)
 
 				ScrollView {
-					GeometryReader { _ in
-						VStack {
-							Home.AggregatedValue.View(
-								store: store.scope(
-									state: \.aggregatedValue,
-									action: Home.Action.aggregatedValue
-								)
+					LazyVStack(spacing: 25) {
+						Home.AggregatedValue.View(
+							store: store.scope(
+								state: \.aggregatedValue,
+								action: Home.Action.aggregatedValue
 							)
-							Home.AccountList.View(
-								store: store.scope(
-									state: \.accountList,
-									action: Home.Action.accountList
-								)
+						)
+						Home.AccountList.View(
+							store: store.scope(
+								state: \.accountList,
+								action: Home.Action.accountList
 							)
-							createAccountButton {
-								viewStore.send(.createAccountButtonTapped)
-							}
-							Spacer()
-							Home.VisitHub.View(
-								store: store.scope(
-									state: \.visitHub,
-									action: Home.Action.visitHub
-								)
-							)
+						)
+						createAccountButton {
+							viewStore.send(.createAccountButtonTapped)
 						}
-						.background(Color.cyan)
-						.frame(maxHeight: .infinity)
+						Spacer()
+						Home.VisitHub.View(
+							store: store.scope(
+								state: \.visitHub,
+								action: Home.Action.visitHub
+							)
+						)
 					}
-					.background(Color.green)
+					.padding(32)
 				}
-				.background(Color.brown)
 			}
-			.padding(32)
 		}
 	}
 }

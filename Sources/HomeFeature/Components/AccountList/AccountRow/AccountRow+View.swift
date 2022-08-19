@@ -22,10 +22,46 @@ public extension Home.AccountRow.View {
 				action: Home.AccountRow.Action.init
 			)
 		) { _ in
-			// TODO: implement
-			Text("Impl: AccountRow")
-				.background(Color.yellow)
-				.foregroundColor(.red)
+			VStack(alignment: .leading) {
+				VStack(alignment: .leading, spacing: 0) {
+					Text("My main account")
+						.foregroundColor(.app.buttonTextBlack)
+						.font(.app.buttonTitle)
+
+					HStack(spacing: 0) {
+						Text("rdr12hj3cqqG89ijHsjA3cq2qgtxg4sahjU78s")
+							.lineLimit(1)
+							.truncationMode(.middle)
+							.foregroundColor(.app.buttonTextBlackTransparent)
+							.font(.app.caption2)
+							.frame(maxWidth: 110)
+
+						Button(
+							action: {
+								// TODO: implement address copy
+							},
+							label: {
+								Text("Copy")
+									.foregroundColor(.app.buttonTextBlack)
+									.font(.app.caption2)
+									.underline()
+									.padding(12)
+							}
+						)
+						Spacer()
+					}
+				}
+
+				HStack(spacing: -10) {
+					ForEach(0 ..< .random(in: 1 ... 10)) { _ in
+						TokenView()
+							.frame(width: 30, height: 30)
+					}
+				}
+			}
+			.padding(25)
+			.background(Color.app.cardBackgroundLight)
+			.cornerRadius(6)
 		}
 	}
 }
@@ -50,6 +86,21 @@ extension Home.AccountRow.View {
 	struct ViewState: Equatable {
 		init(state _: Home.AccountRow.State) {
 			// TODO: implement
+		}
+	}
+}
+
+// MARK: - TokenView
+struct TokenView: View {
+	var body: some View {
+		ZStack {
+			Circle()
+				.strokeBorder(.orange, lineWidth: 1)
+				.background(Circle().foregroundColor(Color.App.random))
+			Text("Rdr")
+				.textCase(.uppercase)
+				.foregroundColor(.app.buttonTextBlack)
+				.font(.app.footnote)
 		}
 	}
 }

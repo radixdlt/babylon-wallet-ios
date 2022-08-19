@@ -28,6 +28,10 @@ public extension Color.App {
 		.init(hex: .appGrey3)
 	}
 
+	var cardBackgroundLight: Color {
+		.init(hex: .appGrey6)
+	}
+
 	var buttonBackgroundDark: Color {
 		.init(hex: .appGrey5)
 	}
@@ -43,6 +47,10 @@ public extension Color.App {
 	var buttonTextBlack: Color {
 		.black
 	}
+
+	var buttonTextBlackTransparent: Color {
+		.black.opacity(0.6)
+	}
 }
 
 private extension Color {
@@ -51,6 +59,7 @@ private extension Color {
 		case appGrey3 = 0xE2E2E2
 		case appGrey4 = 0xE2E5ED
 		case appGrey5 = 0xBEBDBD
+		case appGrey6 = 0xF4F4F4
 		case appCharcoal1 = 0x414141
 	}
 }
@@ -77,3 +86,15 @@ private extension Color {
 		)
 	}
 }
+
+#if DEBUG
+public extension Color.App {
+	static var random: Color {
+		Color(
+			red: .random(in: 0 ... 1),
+			green: .random(in: 0 ... 1),
+			blue: .random(in: 0 ... 1)
+		)
+	}
+}
+#endif

@@ -18,8 +18,10 @@ extension Font {
 
 extension Font {
 	enum Size: CGFloat {
+		case 𝟙𝟘 = 10
 		case 𝟙𝟙 = 11
 		case 𝟙𝟜 = 14
+		case 𝟙𝟠 = 18
 		case 𝟙𝟞 = 16
 		case 𝟚𝟞 = 26
 		case 𝟜𝟞 = 46
@@ -27,8 +29,16 @@ extension Font {
 }
 
 public extension Font.App {
-	var caption: Font {
+	var footnote: Font {
+		.custom(.𝟙𝟘, .semibold)
+	}
+
+	var caption1: Font {
 		.custom(.𝟙𝟙, .bold)
+	}
+
+	var caption2: Font {
+		.custom(.𝟙𝟜, .regular)
 	}
 
 	var subhead: Font {
@@ -37,6 +47,10 @@ public extension Font.App {
 
 	var body: Font {
 		.custom(.𝟙𝟞, .regular)
+	}
+
+	var buttonTitle: Font {
+		.custom(.𝟙𝟠, .semibold)
 	}
 
 	var title: Font {

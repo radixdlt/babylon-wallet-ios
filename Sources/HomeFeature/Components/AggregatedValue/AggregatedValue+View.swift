@@ -66,7 +66,7 @@ private extension Home.AggregatedValue.View {
 	var title: some View {
 		Text(L10n.Home.AggregatedValue.title)
 			.foregroundColor(.app.buttonTextBlack)
-			.font(.app.caption)
+			.font(.app.caption1)
 			.textCase(.uppercase)
 	}
 }

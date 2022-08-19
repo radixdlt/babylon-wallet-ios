@@ -21,8 +21,8 @@ public extension Home.AccountList.View {
 				state: ViewState.init,
 				action: Home.AccountList.Action.init
 			)
-		) { viewStore in
-			LazyVStack {
+		) { _ in
+			LazyVStack(spacing: 25) {
 				ForEachStore(
 					store.scope(
 						state: \.accounts,
@@ -32,11 +32,9 @@ public extension Home.AccountList.View {
 				)
 			}
 			.onAppear {
-				viewStore.send(.viewDidAppear)
+//				viewStore.send(.viewDidAppear)
 			}
 			.alert(store.scope(state: \.alert), dismiss: .internal(.user(.alertDismissed)))
-
-			.background(Color.green)
 		}
 	}
 }
