@@ -24,9 +24,17 @@ public extension Home.AccountRow.View {
 		) { _ in
 			VStack(alignment: .leading) {
 				VStack(alignment: .leading, spacing: 0) {
-					Text("My main account")
-						.foregroundColor(.app.buttonTextBlack)
-						.font(.app.buttonTitle)
+                    HStack {
+                        Text("My main account")
+                            .foregroundColor(.app.buttonTextBlack)
+                            .font(.app.buttonTitle)
+                            .fixedSize()
+                        Spacer()
+                        Text(amount)
+                            .foregroundColor(.app.buttonTextBlack)
+                            .font(.app.buttonTitle)
+                            .fixedSize()
+                    }
 
 					HStack(spacing: 0) {
 						Text("rdr12hj3cqqG89ijHsjA3cq2qgtxg4sahjU78s")
@@ -64,6 +72,10 @@ public extension Home.AccountRow.View {
 			.cornerRadius(6)
 		}
 	}
+    
+    var amount: String {
+        Float(100000).formatted(.currency(code: "USD"))
+    }
 }
 
 extension Home.AccountRow.View {
