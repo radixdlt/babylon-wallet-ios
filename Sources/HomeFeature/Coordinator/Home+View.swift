@@ -32,37 +32,37 @@ public extension Home.View {
 				)
 
 				ScrollView {
-                    GeometryReader { _ in
-                        VStack {
-                            Home.AggregatedValue.View(
-                                store: store.scope(
-                                    state: \.aggregatedValue,
-                                    action: Home.Action.aggregatedValue
-                                )
-                            )
-                            Home.AccountList.View(
-                                store: store.scope(
-                                    state: \.accountList,
-                                    action: Home.Action.accountList
-                                )
-                            )
-                            createAccountButton {
-                                viewStore.send(.createAccountButtonTapped)
-                            }
-                            Spacer()
-                            Home.VisitHub.View(
-                                store: store.scope(
-                                    state: \.visitHub,
-                                    action: Home.Action.visitHub
-                                )
-                            )
-                        }
-                        .background(Color.cyan)
-                        .frame(maxHeight: .infinity)
-                    }
-                    .background(Color.green)
+					GeometryReader { _ in
+						VStack {
+							Home.AggregatedValue.View(
+								store: store.scope(
+									state: \.aggregatedValue,
+									action: Home.Action.aggregatedValue
+								)
+							)
+							Home.AccountList.View(
+								store: store.scope(
+									state: \.accountList,
+									action: Home.Action.accountList
+								)
+							)
+							createAccountButton {
+								viewStore.send(.createAccountButtonTapped)
+							}
+							Spacer()
+							Home.VisitHub.View(
+								store: store.scope(
+									state: \.visitHub,
+									action: Home.Action.visitHub
+								)
+							)
+						}
+						.background(Color.cyan)
+						.frame(maxHeight: .infinity)
+					}
+					.background(Color.green)
 				}
-                .background(Color.brown)
+				.background(Color.brown)
 			}
 			.padding(32)
 		}

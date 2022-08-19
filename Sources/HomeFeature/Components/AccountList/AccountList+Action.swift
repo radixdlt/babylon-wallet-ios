@@ -1,5 +1,5 @@
-import Foundation
 import ComposableArchitecture
+import Foundation
 import Profile
 
 public extension Home.AccountList {
@@ -7,7 +7,7 @@ public extension Home.AccountList {
 	enum Action: Equatable {
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
-		case account(id: UUID, action: Home.AccountRow.Action)
+		case account(id: Home.AccountRow.State.ID, action: Home.AccountRow.Action)
 	}
 }
 
@@ -20,15 +20,15 @@ public extension Home.AccountList.Action {
 
 public extension Home.AccountList.Action.InternalAction {
 	enum UserAction: Equatable {
-        case alertDismissed
-    }
+		case alertDismissed
+	}
 }
 
 public extension Home.AccountList.Action.InternalAction {
 	enum SystemAction: Equatable {
-        case viewDidAppear
-        case loadAccountResult(TaskResult<[Profile.Account]>)
-    }
+		case viewDidAppear
+		case loadAccountResult(TaskResult<[Profile.Account]>)
+	}
 }
 
 public extension Home.AccountList.Action {

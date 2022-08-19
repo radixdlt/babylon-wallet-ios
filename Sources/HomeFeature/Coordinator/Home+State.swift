@@ -13,7 +13,7 @@ public extension Home {
 		public var visitHub: Home.VisitHub.State
 
 		public init(
-            accountList: Home.AccountList.State = .init(),
+			accountList: Home.AccountList.State = .init(),
 			aggregatedValue: Home.AggregatedValue.State = .init(),
 			header: Home.Header.State = .init(),
 			visitHub: Home.VisitHub.State = .init()
@@ -29,8 +29,8 @@ public extension Home {
 #if DEBUG
 public extension Home.State {
 	static let placeholder = Home.State(
-        accountList: .init(accounts: .placeholder),
-        aggregatedValue: .placeholder,
+		accountList: .init(accounts: .placeholder),
+		aggregatedValue: .placeholder,
 		header: .init(hasNotification: false),
 		visitHub: .init()
 	)

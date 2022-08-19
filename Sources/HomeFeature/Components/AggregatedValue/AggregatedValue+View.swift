@@ -20,7 +20,7 @@ public extension Home.AggregatedValue.View {
 			VStack {
 				title
 				AggregatedValueView(
-					account: viewStore.account,
+					value: viewStore.value,
 					isValueVisible: viewStore.isValueVisible,
 					toggleVisibilityAction: {
 						viewStore.send(.toggleVisibilityButtonTapped)
@@ -51,7 +51,7 @@ extension Home.AggregatedValue.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		var isValueVisible: Bool
-        var value: Float?
+		var value: Float?
 
 		init(
 			state: Home.AggregatedValue.State
@@ -73,7 +73,7 @@ private extension Home.AggregatedValue.View {
 
 // MARK: - AggregatedValueView
 private struct AggregatedValueView: View {
-	let account: Home.AccountList.Account
+	let value: Float?
 	let isValueVisible: Bool
 	let toggleVisibilityAction: () -> Void
 

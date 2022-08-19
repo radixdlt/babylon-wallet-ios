@@ -22,7 +22,8 @@ public extension Main {
 				state: \.home,
 				action: /Main.Action.home,
 				environment: { _ in
-					Home.Environment()
+					// dzoni
+					Home.Environment(wallet: .placeholder)
 				}
 			),
 

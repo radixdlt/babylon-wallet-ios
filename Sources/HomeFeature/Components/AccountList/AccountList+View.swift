@@ -15,42 +15,44 @@ public extension Home.AccountList {
 }
 
 public extension Home.AccountList.View {
-    var body: some View {
-        WithViewStore(store.scope(
-            state: ViewState.init,
-            action: Home.AccountList.Action.init)
-        ) { viewStore in
-                LazyVStack {
-                    ForEachStore(
-                        store.scope(
-                            state: \.accounts,
-                            action: Home.AccountList.Action.account(id:action:)
-                        ),
-                        content: Home.AccountRow.View.init(store:)
-                    )
-                }
-                .onAppear {
-                    viewStore.send(.viewDidAppear)
-                }
-                .alert(store.scope(state: \.alert), dismiss: .internal(.user(.alertDismissed)))
+	var body: some View {
+		WithViewStore(
+			store.scope(
+				state: ViewState.init,
+				action: Home.AccountList.Action.init
+			)
+		) { viewStore in
+			LazyVStack {
+				ForEachStore(
+					store.scope(
+						state: \.accounts,
+						action: Home.AccountList.Action.account(id:action:)
+					),
+					content: Home.AccountRow.View.init(store:)
+				)
+			}
+			.onAppear {
+				viewStore.send(.viewDidAppear)
+			}
+			.alert(store.scope(state: \.alert), dismiss: .internal(.user(.alertDismissed)))
 
-                .background(Color.green)
-            }
-    }
+			.background(Color.green)
+		}
+	}
 }
 
 extension Home.AccountList.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
-        case viewDidAppear
-    }
+		case viewDidAppear
+	}
 }
 
 extension Home.AccountList.Action {
 	init(action: Home.AccountList.View.ViewAction) {
 		switch action {
-        case .viewDidAppear:
-            self = .internal(.system(.viewDidAppear))
+		case .viewDidAppear:
+			self = .internal(.system(.viewDidAppear))
 		}
 	}
 }
@@ -66,13 +68,13 @@ extension Home.AccountList.View {
 
 // MARK: - AccountList_Preview
 struct AccountList_Preview: PreviewProvider {
-    static var previews: some View {
-        Home.AccountList.View(
-            store: .init(
-                initialState: .init(accounts: .placeholder, alert: nil),
-                reducer: Home.AccountList.reducer,
-                environment: .init(wallet: .placeholder)
-            )
-        )
-    }
+	static var previews: some View {
+		Home.AccountList.View(
+			store: .init(
+				initialState: .init(accounts: .placeholder, alert: nil),
+				reducer: Home.AccountList.reducer,
+				environment: .init(wallet: .placeholder)
+			)
+		)
+	}
 }
