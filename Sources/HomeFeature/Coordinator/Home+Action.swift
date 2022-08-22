@@ -29,5 +29,7 @@ public extension Home.Action {
 		case displaySettings
 		case displayVisitHub
 		case displayCreateAccount
+		case displayAccountDetails(Home.AccountRow.State)
+		case copyAddress(Home.AccountRow.State)
 	}
 }

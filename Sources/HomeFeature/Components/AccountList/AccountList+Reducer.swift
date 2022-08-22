@@ -33,7 +33,7 @@ public extension Home.AccountList {
 					}
 				case .internal(.user(.didSelect)):
 					return .run { send in
-						await send(.coordinate(.openDetailsFor(account)))
+						await send(.coordinate(.displayAccountDetails(account)))
 					}
 				}
 			case let .internal(.system(.loadAccountResult(.success(accounts)))):

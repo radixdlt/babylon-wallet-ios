@@ -10,7 +10,7 @@ import Wallet
 public extension Main {
 	// MARK: Action
 	enum Action: Equatable {
-		case `internal`(InternalActions)
+		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
 		case home(Home.Action)
 		case settings(Settings.Action)
@@ -19,19 +19,19 @@ public extension Main {
 }
 
 public extension Main.Action {
-	enum InternalActions: Equatable {
+	enum InternalAction: Equatable {
 		case user(UserAction)
 		case system(SystemAction)
 	}
 }
 
-public extension Main.Action.InternalActions {
+public extension Main.Action.InternalAction {
 	enum UserAction: Equatable {
 		case removeWallet
 	}
 }
 
-public extension Main.Action.InternalActions {
+public extension Main.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case removedWallet
 	}

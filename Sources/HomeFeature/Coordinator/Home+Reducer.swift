@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import UIKit
 
 public extension Home {
 	// MARK: Reducer
@@ -46,9 +47,19 @@ public extension Home {
 				return .none
 			case .internal(.user(.createAccountButtonTapped)):
 				return Effect(value: .coordinate(.displayCreateAccount))
-			case .coordinate:
-				print("🔵🔵🔵")
+			case .internal:
 				return .none
+			case .coordinate:
+				return .none
+			case let .accountList(.coordinate(.displayAccountDetails(account))):
+				return .run { send in
+					await send(.coordinate(.displayAccountDetails(account)))
+				}
+			case let .accountList(.coordinate(.copyAddress(account))):
+				return .run { send in
+					await send(.coordinate(.copyAddress(account)))
+				}
+			// TODO: display confirmation popup? discuss with po / designer
 			case .accountList:
 				return .none
 			}

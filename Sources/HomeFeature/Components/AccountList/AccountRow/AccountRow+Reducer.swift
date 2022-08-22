@@ -6,12 +6,8 @@ public extension Home.AccountRow {
 	static let reducer = Reducer { _, action, _ in
 		switch action {
 		case .internal(.user(.copyAddress)):
-			print("🟢🟢🟢")
 			return .none
 		case .internal(.user(.didSelect)):
-			print("🟣🟣🟣")
-			return .none
-		case .coordinate:
 			return .none
 		}
 	}

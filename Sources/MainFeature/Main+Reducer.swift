@@ -82,6 +82,15 @@ public extension Main {
 				state.createAccount = nil
 				return .none
 
+			case let .home(.coordinate(.displayAccountDetails(account))):
+				state.account = account
+				return .none
+
+			case let .home(.coordinate(.copyAddress(account))):
+				let pasteboard = UIPasteboard.general
+				pasteboard.string = account.address
+				return .none
+
 			case .home(.internal(_)):
 				return .none
 			case .settings(.internal(_)):
