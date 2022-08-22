@@ -14,13 +14,13 @@ public enum Main {}
 public extension Main {
 	// MARK: State
 	struct State: Equatable {
-		public var account: Home.AccountRow.State?
+		public var account: AccountDetails.State?
 		public var home: Home.State
 		public var settings: Settings.State?
 		public var createAccount: CreateAccount.State?
 
 		public init(
-			account: Home.AccountRow.State? = nil,
+			account: AccountDetails.State? = nil,
 			home: Home.State = .placeholder, // TODO: remove placeholder
 			settings: Settings.State? = nil,
 			createAccount: CreateAccount.State? = nil

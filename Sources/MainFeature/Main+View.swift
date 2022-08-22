@@ -47,6 +47,15 @@ public extension Main.View {
 				then: CreateAccount.View.init(store:)
 			)
 			.zIndex(2)
+
+			IfLetStore(
+				store.scope(
+					state: \.account,
+					action: Main.Action.accountDetails
+				),
+				then: AccountDetails.View.init(store:)
+			)
+			.zIndex(3)
 		}
 	}
 }

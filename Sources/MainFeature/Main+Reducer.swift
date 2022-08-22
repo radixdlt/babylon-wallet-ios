@@ -47,6 +47,16 @@ public extension Main {
 				}
 			),
 
+		AccountDetails.reducer
+			.optional()
+			.pullback(
+				state: \.account,
+				action: /Main.Action.accountDetails,
+				environment: { _ in
+					AccountDetails.Environment()
+				}
+			),
+
 		Reducer { state, action, environment in
 			switch action {
 			case .internal(.user(.removeWallet)):
@@ -83,7 +93,7 @@ public extension Main {
 				return .none
 
 			case let .home(.coordinate(.displayAccountDetails(account))):
-				state.account = account
+				state.account = .init(state: account)
 				return .none
 
 			case let .home(.coordinate(.copyAddress(account))):
@@ -104,6 +114,11 @@ public extension Main {
 			case .home(.visitHub(_)):
 				return .none
 			case .coordinate:
+				return .none
+			case .accountDetails(.coordinate(.dismissAccountDetails)):
+				state.account = nil
+				return .none
+			case .accountDetails(.internal(_)):
 				return .none
 			}
 		}

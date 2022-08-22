@@ -32,7 +32,7 @@ public extension Home.AccountList.View {
 				)
 			}
 			.onAppear {
-//				viewStore.send(.viewDidAppear)
+//				viewStore.send(.viewDidAppear) // FIXME: uncomment once data flow is working to enable previews
 			}
 			.alert(store.scope(state: \.alert), dismiss: .internal(.user(.alertDismissed)))
 		}

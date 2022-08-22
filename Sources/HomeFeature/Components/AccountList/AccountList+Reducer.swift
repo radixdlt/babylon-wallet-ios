@@ -23,8 +23,7 @@ public extension Home.AccountList {
 				return .none
 			case let .account(id: id, action: action):
 				guard let account = state.accounts.first(where: { $0.id == id }) else {
-					// FIXME: how to handle when there's no account?
-					return .none
+					preconditionFailure("Account value should not be nil.")
 				}
 				switch action {
 				case .internal(.user(.copyAddress)):

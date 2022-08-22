@@ -39,6 +39,7 @@ public extension Home.AccountRow.View {
 					}
 				}
 
+				// FIXME: use real data instead of dummy data
 				HStack(spacing: -10) {
 					ForEach(0 ..< .random(in: 1 ... 10)) { _ in
 						TokenView()
