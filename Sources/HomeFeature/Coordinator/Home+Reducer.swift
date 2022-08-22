@@ -25,6 +25,13 @@ public extension Home {
 				environment: { _ in Home.VisitHub.Environment() }
 			),
 
+		Home.AccountList.reducer
+			.pullback(
+				state: \.accountList,
+				action: /Home.Action.accountList,
+				environment: { _ in Home.AccountList.Environment(wallet: .placeholder) } // FIXME: replace wallet placeholder
+			),
+
 		Reducer { _, action, _ in
 			switch action {
 			case .header(.coordinate(.displaySettings)):
@@ -40,6 +47,7 @@ public extension Home {
 			case .internal(.user(.createAccountButtonTapped)):
 				return Effect(value: .coordinate(.displayCreateAccount))
 			case .coordinate:
+				print("🔵🔵🔵")
 				return .none
 			case .accountList:
 				return .none

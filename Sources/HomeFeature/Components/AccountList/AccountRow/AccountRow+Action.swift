@@ -1,4 +1,5 @@
 import Foundation
+import Profile
 
 public extension Home.AccountRow {
 	// MARK: Action
@@ -16,7 +17,10 @@ public extension Home.AccountRow.Action {
 }
 
 public extension Home.AccountRow.Action.InternalAction {
-	enum UserAction: Equatable {}
+	enum UserAction: Equatable {
+		case copyAddress
+		case didSelect
+	}
 }
 
 public extension Home.AccountRow.Action.InternalAction {

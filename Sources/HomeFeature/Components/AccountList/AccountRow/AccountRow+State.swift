@@ -11,15 +11,21 @@ public extension Home.AccountRow {
 	// MARK: State
 	struct State: Equatable, Identifiable {
 		public let address: String
+		public let aggregatedValue: Float?
+		public let currency: FiatCurrency
 		public let name: String?
 		public let tokens: [Token]
 
 		public init(
 			address: String,
+			aggregatedValue: Float?,
+			currency: FiatCurrency,
 			name: String?,
 			tokens: [Token]
 		) {
 			self.address = address
+			self.aggregatedValue = aggregatedValue
+			self.currency = currency
 			self.name = name
 			self.tokens = tokens
 		}
@@ -38,6 +44,8 @@ public extension Home.AccountRow.State {
 	init(profileAccount: Profile.Account) {
 		self.init(
 			address: profileAccount.address,
+			aggregatedValue: profileAccount.aggregatedValue,
+			currency: .usd, // FIXME: propagate value from profileAccount
 			name: profileAccount.name,
 			tokens: []
 		)
@@ -46,33 +54,16 @@ public extension Home.AccountRow.State {
 
 #if DEBUG
 public extension Home.AccountRow.State {
-	static let placeholder: Self = .init(profileAccount: .init(address: .init()))
+	static let placeholder: Self = .init(
+		profileAccount: .init(address: "rdr12hj3cqqG89ijHsjA3cq2qgtxg4sahjU78s",
+		                      aggregatedValue: 1_000_000,
+		                      currency: FiatCurrency.usd.rawValue, // FIXME: use correct type for fiat currency, not String
+		                      name: "My account")
+	)
 }
 #endif
 
 /*
- import Foundation
- import Profile
-
- // MARK: - Account
- public extension Home.AccountList {
-     struct Account: Equatable {
-         public let address: String
-         public let name: String?
-         public let tokens: [Token]
-
-         public init(
-             address: String,
-             name: String?,
-             tokens: [Token]
-         ) {
-             self.address = address
-             self.name = name
-             self.tokens = tokens
-         }
-     }
- }
-
  // FIXME: fiatTotalValueString
  /*
   public extension Account {
@@ -84,28 +75,4 @@ public extension Home.AccountRow.State {
       }
   }
   */
-
- #if DEBUG
- public extension Home.AccountList.Account {
-     static let placeholder: Self = .checking
-
-     static let checking: Self = .init(
-         address: UUID().uuidString,
-         name: "Checking",
-         tokens: []
-     )
-
-     static let savings: Self = .init(
-         address: UUID().uuidString,
-         name: "Savings",
-         tokens: []
-     )
-
-     static let shared: Self = .init(
-         address: UUID().uuidString,
-         name: "Shared",
-         tokens: []
-     )
- }
- #endif
  */

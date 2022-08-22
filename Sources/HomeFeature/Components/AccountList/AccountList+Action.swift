@@ -32,5 +32,8 @@ public extension Home.AccountList.Action.InternalAction {
 }
 
 public extension Home.AccountList.Action {
-	enum CoordinatingAction: Equatable {}
+	enum CoordinatingAction: Equatable {
+		case openDetailsFor(Home.AccountRow.State)
+		case copyAddress(Home.AccountRow.State)
+	}
 }

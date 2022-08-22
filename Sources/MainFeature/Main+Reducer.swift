@@ -22,7 +22,7 @@ public extension Main {
 				state: \.home,
 				action: /Main.Action.home,
 				environment: { _ in
-					// dzoni
+					// FIXME: remove placeholder with real implementation
 					Home.Environment(wallet: .placeholder)
 				}
 			),

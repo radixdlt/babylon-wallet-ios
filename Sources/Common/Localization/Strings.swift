@@ -12,6 +12,11 @@ public enum L10n {
 	public enum Home {
 		/// Create New Account
 		public static let createNewAccount = L10n.tr("Localizable", "home.createNewAccount", fallback: #"Create New Account"#)
+		public enum AccountRow {
+			/// Copy
+			public static let copyTitle = L10n.tr("Localizable", "home.accountRow.copyTitle", fallback: #"Copy"#)
+		}
+
 		public enum AggregatedValue {
 			/// Total value
 			public static let title = L10n.tr("Localizable", "home.aggregatedValue.title", fallback: #"Total value"#)

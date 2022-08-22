@@ -1,4 +1,6 @@
+import Common
 import ComposableArchitecture
+import Profile
 import SwiftUI
 
 public extension Home.AccountRow {
@@ -21,42 +23,19 @@ public extension Home.AccountRow.View {
 				state: ViewState.init,
 				action: Home.AccountRow.Action.init
 			)
-		) { _ in
+		) { viewStore in
 			VStack(alignment: .leading) {
 				VStack(alignment: .leading, spacing: 0) {
-                    HStack {
-                        Text("My main account")
-                            .foregroundColor(.app.buttonTextBlack)
-                            .font(.app.buttonTitle)
-                            .fixedSize()
-                        Spacer()
-                        Text(amount)
-                            .foregroundColor(.app.buttonTextBlack)
-                            .font(.app.buttonTitle)
-                            .fixedSize()
-                    }
-
-					HStack(spacing: 0) {
-						Text("rdr12hj3cqqG89ijHsjA3cq2qgtxg4sahjU78s")
-							.lineLimit(1)
-							.truncationMode(.middle)
-							.foregroundColor(.app.buttonTextBlackTransparent)
-							.font(.app.caption2)
-							.frame(maxWidth: 110)
-
-						Button(
-							action: {
-								// TODO: implement address copy
-							},
-							label: {
-								Text("Copy")
-									.foregroundColor(.app.buttonTextBlack)
-									.font(.app.caption2)
-									.underline()
-									.padding(12)
-							}
+					HeaderView(
+						name: viewStore.name ?? "",
+						value: formattedAmmount(
+							viewStore.aggregatedValue ?? 0,
+							currency: viewStore.currency
 						)
-						Spacer()
+					)
+
+					AddressView(address: viewStore.address) {
+						viewStore.send(.copyAddress)
 					}
 				}
 
@@ -70,25 +49,32 @@ public extension Home.AccountRow.View {
 			.padding(25)
 			.background(Color.app.cardBackgroundLight)
 			.cornerRadius(6)
+			.onTapGesture {
+				viewStore.send(.didSelect)
+			}
 		}
 	}
-    
-    var amount: String {
-        Float(100000).formatted(.currency(code: "USD"))
-    }
+
+	func formattedAmmount(_ amount: Float, currency: FiatCurrency) -> String {
+		amount.formatted(.currency(code: currency.symbol))
+	}
 }
 
 extension Home.AccountRow.View {
 	// MARK: ViewAction
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case copyAddress
+		case didSelect
+	}
 }
 
 extension Home.AccountRow.Action {
 	init(action: Home.AccountRow.View.ViewAction) {
 		switch action {
-		default:
-			// TODO: implement
-			break
+		case .copyAddress:
+			self = .internal(.user(.copyAddress))
+		case .didSelect:
+			self = .internal(.user(.didSelect))
 		}
 	}
 }
@@ -96,14 +82,73 @@ extension Home.AccountRow.Action {
 extension Home.AccountRow.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: Home.AccountRow.State) {
-			// TODO: implement
+		let address: Profile.Account.Address
+		let aggregatedValue: Float?
+		let currency: FiatCurrency
+		let name: String?
+		let tokens: [Home.AccountRow.Token]
+
+		init(state: Home.AccountRow.State) {
+			address = state.address
+			aggregatedValue = state.aggregatedValue
+			currency = state.currency
+			name = state.name
+			tokens = state.tokens
+		}
+	}
+}
+
+// MARK: - HeaderView
+private struct HeaderView: View {
+	let name: String
+	let value: String
+
+	var body: some View {
+		HStack {
+			Text(name)
+				.foregroundColor(.app.buttonTextBlack)
+				.font(.app.buttonTitle)
+				.fixedSize()
+			Spacer()
+			Text(value)
+				.foregroundColor(.app.buttonTextBlack)
+				.font(.app.buttonTitle)
+				.fixedSize()
+		}
+	}
+}
+
+// MARK: - AddressView
+private struct AddressView: View {
+	let address: String
+	let copyAddressAction: () -> Void
+
+	var body: some View {
+		HStack(spacing: 0) {
+			Text(address)
+				.lineLimit(1)
+				.truncationMode(.middle)
+				.foregroundColor(.app.buttonTextBlackTransparent)
+				.font(.app.caption2)
+				.frame(maxWidth: 110)
+
+			Button(
+				action: copyAddressAction,
+				label: {
+					Text(L10n.Home.AccountRow.copyTitle)
+						.foregroundColor(.app.buttonTextBlack)
+						.font(.app.caption2)
+						.underline()
+						.padding(12)
+				}
+			)
+			Spacer()
 		}
 	}
 }
 
 // MARK: - TokenView
-struct TokenView: View {
+private struct TokenView: View {
 	var body: some View {
 		ZStack {
 			Circle()
