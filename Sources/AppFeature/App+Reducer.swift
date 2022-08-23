@@ -20,6 +20,7 @@ public extension App {
 				environment: {
 					Main.Environment(
 						userDefaultsClient: $0.userDefaultsClient,
+						pasteboardClient: $0.pasteboardClient,
 						// FIXME: wallet
 						//                        wallet: $0.walletLoader.loadWallet
 						wallet: .placeholder

@@ -1,5 +1,4 @@
 import TestUtils
-
 @testable import UserDefaultsClient
 
 // MARK: - UserDefaultsClientLiveTests

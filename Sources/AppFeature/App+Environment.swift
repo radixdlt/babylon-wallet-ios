@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import MainFeature
 import OnboardingFeature
@@ -12,6 +13,7 @@ public extension App {
 	struct Environment {
 		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
 		public let mainQueue: AnySchedulerOf<DispatchQueue>
+		public let pasteboardClient: PasteboardClient
 		public let profileLoader: ProfileLoader
 		public let userDefaultsClient: UserDefaultsClient
 		public let walletLoader: WalletLoader
@@ -19,12 +21,14 @@ public extension App {
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
 			mainQueue: AnySchedulerOf<DispatchQueue>,
+			pasteboardClient: PasteboardClient,
 			profileLoader: ProfileLoader,
 			userDefaultsClient: UserDefaultsClient,
 			walletLoader: WalletLoader
 		) {
 			self.backgroundQueue = backgroundQueue
 			self.mainQueue = mainQueue
+			self.pasteboardClient = pasteboardClient
 			self.profileLoader = profileLoader
 			self.userDefaultsClient = userDefaultsClient
 			self.walletLoader = walletLoader
@@ -37,6 +41,7 @@ public extension App.Environment {
 	static let noop = Self(
 		backgroundQueue: .immediate,
 		mainQueue: .immediate,
+		pasteboardClient: .noop,
 		profileLoader: .noop,
 		userDefaultsClient: .noop,
 		walletLoader: .noop

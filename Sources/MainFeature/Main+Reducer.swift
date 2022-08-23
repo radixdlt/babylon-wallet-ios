@@ -97,9 +97,9 @@ public extension Main {
 				return .none
 
 			case let .home(.coordinate(.copyAddress(account))):
-				let pasteboard = UIPasteboard.general
-				pasteboard.string = account.address
-				return .none
+				return .run { _ in
+					await environment.pasteboardClient.copyString(account.address)
+				}
 
 			case .home(.internal(_)):
 				return .none

@@ -98,6 +98,7 @@ struct MainView_Previews: PreviewProvider {
 				reducer: Main.reducer,
 				environment: .init(
 					userDefaultsClient: .noop,
+					pasteboardClient: .noop,
 					wallet: .placeholder
 				)
 			)

@@ -69,7 +69,6 @@ let package = Package(
 		.testTarget(
 			name: "CreateAccountTests",
 			dependencies: [
-				"Common",
 				"TestUtils",
 			]
 		),
@@ -149,6 +148,12 @@ let package = Package(
 			name: "OnboardingFeatureTests",
 			dependencies: [
 				"OnboardingFeature",
+				"TestUtils",
+			]
+		),
+		.testTarget(
+			name: "PasteboardClientTests",
+			dependencies: [
 				"TestUtils",
 			]
 		),
