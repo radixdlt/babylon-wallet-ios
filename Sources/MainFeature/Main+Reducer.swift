@@ -98,7 +98,7 @@ public extension Main {
 
 			case let .home(.coordinate(.copyAddress(account))):
 				return .run { _ in
-					await environment.pasteboardClient.copyString(account.address)
+					environment.pasteboardClient.copyString(account.address)
 				}
 
 			case .home(.internal(_)):
