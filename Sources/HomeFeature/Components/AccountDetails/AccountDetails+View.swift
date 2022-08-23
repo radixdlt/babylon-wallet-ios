@@ -25,7 +25,7 @@ public extension Home.AccountDetails.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
-					Text("Settings")
+					Text("Account Details")
 					Button(
 						action: { viewStore.send(.dismissAccountDetailsButtonTapped) },
 						label: { Text("Dismiss Account Details") }

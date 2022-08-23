@@ -44,6 +44,7 @@ let package = Package(
 				"LocalAuthenticationClient",
 				"MainFeature",
 				"OnboardingFeature",
+				"PasteboardClient",
 				"ProfileLoader",
 				"SplashFeature",
 				tca,
@@ -119,6 +120,7 @@ let package = Package(
 				"Common",
 				"CreateAccount",
 				"HomeFeature",
+				"PasteboardClient",
 				"SettingsFeature",
 				tca,
 				"UserDefaultsClient",
@@ -149,6 +151,11 @@ let package = Package(
 			dependencies: [
 				"OnboardingFeature",
 				"TestUtils",
+			]
+		),
+		.target(
+			name: "PasteboardClient",
+			dependencies: [
 			]
 		),
 		.testTarget(

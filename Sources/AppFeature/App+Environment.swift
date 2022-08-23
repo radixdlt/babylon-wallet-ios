@@ -2,6 +2,7 @@ import Common
 import ComposableArchitecture
 import MainFeature
 import OnboardingFeature
+import PasteboardClient
 import ProfileLoader
 import SplashFeature
 import UserDefaultsClient

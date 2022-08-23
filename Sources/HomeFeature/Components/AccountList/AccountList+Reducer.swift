@@ -24,6 +24,7 @@ public extension Home.AccountList {
 			case let .account(id: id, action: action):
 				guard let account = state.accounts.first(where: { $0.id == id }) else {
 					preconditionFailure("Account value should not be nil.")
+					return .none
 				}
 				switch action {
 				case .internal(.user(.copyAddress)):

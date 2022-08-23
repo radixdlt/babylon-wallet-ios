@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import UIKit
 
 public extension Home {
 	// MARK: Reducer

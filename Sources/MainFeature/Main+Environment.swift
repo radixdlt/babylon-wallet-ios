@@ -1,6 +1,7 @@
 import Common
 import ComposableArchitecture
 import Foundation
+import PasteboardClient
 import UserDefaultsClient
 import Wallet
 
