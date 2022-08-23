@@ -60,6 +60,14 @@ public extension Home.AccountRow.State {
 		                      currency: FiatCurrency.usd.rawValue, // FIXME: use correct type for fiat currency, not String
 		                      name: "My account")
 	)
+
+	static let radnomTokenPlaceholder: Self = .init(
+		address: "rdr12hj3cqqG89ijHsjA3cq2qgtxg4sahjU78s",
+		aggregatedValue: 1_000_000,
+		currency: FiatCurrency.usd,
+		name: "My account",
+		tokens: TokenRandomizer.generateRandomTokens()
+	)
 }
 #endif
 

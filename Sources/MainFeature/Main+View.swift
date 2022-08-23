@@ -53,7 +53,7 @@ public extension Main.View {
 					state: \.account,
 					action: Main.Action.accountDetails
 				),
-				then: AccountDetails.View.init(store:)
+				then: Home.AccountDetails.View.init(store:)
 			)
 			.zIndex(3)
 		}

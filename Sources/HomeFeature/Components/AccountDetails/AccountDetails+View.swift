@@ -2,7 +2,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
-public extension AccountDetails {
+public extension Home.AccountDetails {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -15,12 +15,12 @@ public extension AccountDetails {
 	}
 }
 
-public extension AccountDetails.View {
+public extension Home.AccountDetails.View {
 	var body: some View {
 		WithViewStore(
 			store.scope(
 				state: ViewState.init,
-				action: AccountDetails.Action.init
+				action: Home.AccountDetails.Action.init
 			)
 		) { viewStore in
 			ForceFullScreen {
@@ -36,15 +36,15 @@ public extension AccountDetails.View {
 	}
 }
 
-extension AccountDetails.View {
+extension Home.AccountDetails.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case dismissAccountDetailsButtonTapped
 	}
 }
 
-extension AccountDetails.Action {
-	init(action: AccountDetails.View.ViewAction) {
+extension Home.AccountDetails.Action {
+	init(action: Home.AccountDetails.View.ViewAction) {
 		switch action {
 		case .dismissAccountDetailsButtonTapped:
 			self = .internal(.user(.dismissAccountDetails))
@@ -52,10 +52,10 @@ extension AccountDetails.Action {
 	}
 }
 
-extension AccountDetails.View {
+extension Home.AccountDetails.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: AccountDetails.State) {
+		init(state _: Home.AccountDetails.State) {
 			// TODO: implement
 		}
 	}
@@ -64,10 +64,10 @@ extension AccountDetails.View {
 // MARK: - AccountDetails_Preview
 struct AccountDetails_Preview: PreviewProvider {
 	static var previews: some View {
-		AccountDetails.View(
+		Home.AccountDetails.View(
 			store: .init(
 				initialState: .init(state: .placeholder),
-				reducer: AccountDetails.reducer,
+				reducer: Home.AccountDetails.reducer,
 				environment: .init()
 			)
 		)

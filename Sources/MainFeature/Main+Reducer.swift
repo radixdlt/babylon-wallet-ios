@@ -47,13 +47,13 @@ public extension Main {
 				}
 			),
 
-		AccountDetails.reducer
+		Home.AccountDetails.reducer
 			.optional()
 			.pullback(
 				state: \.account,
 				action: /Main.Action.accountDetails,
 				environment: { _ in
-					AccountDetails.Environment()
+					Home.AccountDetails.Environment()
 				}
 			),
 

@@ -2,9 +2,11 @@ import Foundation
 
 // MARK: - AccountDetails
 /// Namespace for AccountDetailsFeature
-public enum AccountDetails {}
+public extension Home {
+	enum AccountDetails {}
+}
 
-public extension AccountDetails {
+public extension Home.AccountDetails {
 	// MARK: State
 	struct State: Equatable {
 		public let address: String

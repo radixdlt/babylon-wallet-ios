@@ -39,13 +39,7 @@ public extension Home.AccountRow.View {
 					}
 				}
 
-				// FIXME: use real data instead of dummy data
-				HStack(spacing: -10) {
-					ForEach(0 ..< .random(in: 1 ... 10)) { _ in
-						TokenView()
-							.frame(width: 30, height: 30)
-					}
-				}
+				TokenListView(tokens: viewStore.state.tokens)
 			}
 			.padding(25)
 			.background(Color.app.cardBackgroundLight)
@@ -150,15 +144,41 @@ private struct AddressView: View {
 
 // MARK: - TokenView
 private struct TokenView: View {
+	let code: String
+
 	var body: some View {
 		ZStack {
 			Circle()
 				.strokeBorder(.orange, lineWidth: 1)
 				.background(Circle().foregroundColor(Color.App.random))
-			Text("Rdr")
+			Text(code)
 				.textCase(.uppercase)
 				.foregroundColor(.app.buttonTextBlack)
 				.font(.app.footnote)
+		}
+		.frame(width: 30, height: 30)
+	}
+}
+
+// MARK: - TokenListView
+private struct TokenListView: View {
+	let tokens: [Home.AccountRow.Token]
+	private let limit = 5
+
+	var body: some View {
+		if tokens.count > limit {
+			HStack(spacing: -10) {
+				ForEach(tokens[0 ..< limit]) { token in
+					TokenView(code: token.code.rawValue)
+				}
+				TokenView(code: "+\(tokens.count - limit)")
+			}
+		} else {
+			HStack(spacing: -10) {
+				ForEach(tokens) { token in
+					TokenView(code: token.code.rawValue)
+				}
+			}
 		}
 	}
 }
@@ -168,7 +188,7 @@ struct AccountRow_Preview: PreviewProvider {
 	static var previews: some View {
 		Home.AccountRow.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .radnomTokenPlaceholder,
 				reducer: Home.AccountRow.reducer,
 				environment: .init()
 			)

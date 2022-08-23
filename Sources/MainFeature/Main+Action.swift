@@ -15,7 +15,7 @@ public extension Main {
 		case home(Home.Action)
 		case settings(Settings.Action)
 		case createAccount(CreateAccount.Action)
-		case accountDetails(AccountDetails.Action)
+		case accountDetails(Home.AccountDetails.Action)
 	}
 }
 
