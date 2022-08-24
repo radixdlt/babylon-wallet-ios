@@ -1,16 +1,14 @@
 #if os(iOS)
 import UIKit
-let pasteboard = UIPasteboard.general
+public typealias Pasteboard = UIPasteboard
 #elseif os(macOS)
 import AppKit
-let pasteboard = NSPasteboard.general
+public typealias Pasteboard = NSPasteboard
 #endif
 
 public extension PasteboardClient {
-	static var live: Self {
-		print("tralala")
-
-		return Self(
+	static func live(pasteboard: Pasteboard = .general) -> Self {
+		Self(
 			copyString: { aString in
 				#if os(iOS)
 				pasteboard.string = aString

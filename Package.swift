@@ -161,6 +161,7 @@ let package = Package(
 		.testTarget(
 			name: "PasteboardClientTests",
 			dependencies: [
+				"PasteboardClient",
 				"TestUtils",
 			]
 		),

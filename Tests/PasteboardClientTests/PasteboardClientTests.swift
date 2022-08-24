@@ -1,4 +1,4 @@
-@testable import Common
+@testable import PasteboardClient
 import TestUtils
 
 // MARK: - PasteboardClientTests
@@ -7,7 +7,7 @@ final class PasteboardClientTests: TestCase {
 
 	override func setUp() {
 		super.setUp()
-		sut = PasteboardClient.live
+		sut = PasteboardClient.live()
 	}
 
 	func testCopyStringSetsStringToPasteboard() {
