@@ -66,42 +66,57 @@ private extension Home.Header.View {
 				.font(.app.body)
 		}
 	}
+}
 
-	struct TitleView: SwiftUI.View {
-		var shouldShowNotification: Bool
-		let settingsButtonAction: () -> Void
+// MARK: - TitleView
+private struct TitleView: View {
+	var shouldShowNotification: Bool
+	let settingsButtonAction: () -> Void
 
-		public var body: some View {
-			HStack {
-				Text(L10n.Home.Header.title)
-					.foregroundColor(.app.buttonTextBlack)
-					.font(.app.title)
-				Spacer()
-				SettingsButton(
-					shouldShowNotification: shouldShowNotification,
-					action: settingsButtonAction
-				)
+	public var body: some View {
+		HStack {
+			Text(L10n.Home.Header.title)
+				.foregroundColor(.app.buttonTextBlack)
+				.font(.app.title)
+			Spacer()
+			SettingsButton(
+				shouldShowNotification: shouldShowNotification,
+				action: settingsButtonAction
+			)
+		}
+	}
+}
+
+// MARK: - SettingsButton
+private struct SettingsButton: View {
+	let shouldShowNotification: Bool
+	let action: () -> Void
+
+	public var body: some View {
+		ZStack(alignment: .topTrailing) {
+			// TODO: use swiftgen for assets
+			Button(action: action) {
+				Image("home-header-settings")
+			}
+
+			if shouldShowNotification {
+				Circle()
+					.foregroundColor(.app.notification)
+					.frame(width: 5, height: 5)
 			}
 		}
 	}
+}
 
-	struct SettingsButton: SwiftUI.View {
-		let shouldShowNotification: Bool
-		let action: () -> Void
-
-		public var body: some View {
-			ZStack(alignment: .topTrailing) {
-				// TODO: use swiftgen for assets
-				Button(action: action) {
-					Image("home-header-settings")
-				}
-
-				if shouldShowNotification {
-					Circle()
-						.foregroundColor(.app.notification)
-						.frame(width: 5, height: 5)
-				}
-			}
-		}
+// MARK: - Header_Preview
+struct Header_Preview: PreviewProvider {
+	static var previews: some View {
+		Home.Header.View(
+			store: .init(
+				initialState: .init(),
+				reducer: Home.Header.reducer,
+				environment: .init()
+			)
+		)
 	}
 }

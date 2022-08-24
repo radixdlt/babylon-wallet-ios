@@ -22,7 +22,8 @@ public extension Main {
 				state: \.home,
 				action: /Main.Action.home,
 				environment: { _ in
-					Home.Environment()
+					// FIXME: remove placeholder with real implementation
+					Home.Environment(wallet: .placeholder)
 				}
 			),
 
@@ -43,6 +44,16 @@ public extension Main {
 				action: /Main.Action.createAccount,
 				environment: { _ in
 					CreateAccount.Environment()
+				}
+			),
+
+		Home.AccountDetails.reducer
+			.optional()
+			.pullback(
+				state: \.account,
+				action: /Main.Action.accountDetails,
+				environment: { _ in
+					Home.AccountDetails.Environment()
 				}
 			),
 
@@ -81,17 +92,33 @@ public extension Main {
 				state.createAccount = nil
 				return .none
 
+			case let .home(.coordinate(.displayAccountDetails(account))):
+				state.account = .init(for: account)
+				return .none
+
+			case let .home(.coordinate(.copyAddress(account))):
+				return .run { _ in
+					environment.pasteboardClient.copyString(account.address)
+				}
+
 			case .home(.internal(_)):
 				return .none
 			case .settings(.internal(_)):
 				return .none
 			case .home(.header(_)):
 				return .none
+			case .home(.accountList(_)):
+				return .none
 			case .home(.aggregatedValue(_)):
 				return .none
 			case .home(.visitHub(_)):
 				return .none
 			case .coordinate:
+				return .none
+			case .accountDetails(.coordinate(.dismissAccountDetails)):
+				state.account = nil
+				return .none
+			case .accountDetails(.internal(_)):
 				return .none
 			}
 		}

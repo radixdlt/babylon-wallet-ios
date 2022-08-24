@@ -8,7 +8,7 @@ final class HomeFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Home.State(),
 			reducer: Home.reducer,
-			environment: Home.Environment()
+			environment: Home.Environment(wallet: .placeholder)
 		)
 
 		store.send(.header(.coordinate(.displaySettings)))
@@ -19,7 +19,7 @@ final class HomeFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Home.State(),
 			reducer: Home.reducer,
-			environment: Home.Environment()
+			environment: Home.Environment(wallet: .placeholder)
 		)
 
 		store.send(.visitHub(.coordinate(.displayHub)))

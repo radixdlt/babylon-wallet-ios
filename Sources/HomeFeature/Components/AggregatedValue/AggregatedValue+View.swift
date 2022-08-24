@@ -20,7 +20,7 @@ public extension Home.AggregatedValue.View {
 			VStack {
 				title
 				AggregatedValueView(
-					account: viewStore.account,
+					value: viewStore.value,
 					isValueVisible: viewStore.isValueVisible,
 					toggleVisibilityAction: {
 						viewStore.send(.toggleVisibilityButtonTapped)
@@ -51,13 +51,13 @@ extension Home.AggregatedValue.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		var isValueVisible: Bool
-		var account: Home.AccountList.Account
+		var value: Float?
 
 		init(
 			state: Home.AggregatedValue.State
 		) {
 			isValueVisible = state.isVisible
-			account = state.account
+			value = state.value
 		}
 	}
 }
@@ -66,82 +66,98 @@ private extension Home.AggregatedValue.View {
 	var title: some View {
 		Text(L10n.Home.AggregatedValue.title)
 			.foregroundColor(.app.buttonTextBlack)
-			.font(.app.caption)
+			.font(.app.caption1)
 			.textCase(.uppercase)
 	}
+}
 
-	// TODO: extract to separate Feature when view complexity increases
-	struct AmountView: View {
-		let isValueVisible: Bool
-		let amount: Float // NOTE: used for copying the actual value
-		let formattedAmount: String
-		let fiatCurrency: FiatCurrency
+// MARK: - AggregatedValueView
+private struct AggregatedValueView: View {
+	let value: Float?
+	let isValueVisible: Bool
+	let toggleVisibilityAction: () -> Void
 
-		var body: some View {
-			if isValueVisible {
-				Text(formattedAmount)
+	// FIXME: propagate correct values
+	let currency = FiatCurrency.usd
+	let amount: Float = 1_000_000
+	var formattedAmount: String {
+		amount.formatted(.currency(code: currency.symbol))
+	}
+
+	var body: some View {
+		HStack {
+			Spacer()
+			AmountView(
+				isValueVisible: isValueVisible,
+				amount: amount,
+				formattedAmount: formattedAmount,
+				fiatCurrency: currency
+			)
+			Spacer()
+				.frame(width: 44)
+			VisibilityButton(
+				isVisible: isValueVisible,
+				action: toggleVisibilityAction
+			)
+			Spacer()
+		}
+		.frame(height: 60)
+	}
+}
+
+// MARK: - AmountView
+// TODO: extract to separate Feature when view complexity increases
+private struct AmountView: View {
+	let isValueVisible: Bool
+	let amount: Float // NOTE: used for copying the actual value
+	let formattedAmount: String
+	let fiatCurrency: FiatCurrency
+
+	var body: some View {
+		if isValueVisible {
+			Text(formattedAmount)
+				.foregroundColor(.app.buttonTextBlack)
+				.font(.app.titleBold)
+		} else {
+			HStack {
+				Text("\(fiatCurrency.sign)")
 					.foregroundColor(.app.buttonTextBlack)
 					.font(.app.titleBold)
+
+				Text("••••••")
+					.foregroundColor(.app.buttonTextLight)
+					.font(.app.largeTitle)
+					.offset(y: -3)
+			}
+		}
+	}
+}
+
+// MARK: - VisibilityButton
+private struct VisibilityButton: View {
+	let isVisible: Bool
+	let action: () -> Void
+
+	var body: some View {
+		Button(action: action) {
+			if isVisible {
+				Image("home-aggregatedValue-shown")
 			} else {
-				HStack {
-					Text("\(fiatCurrency.sign)")
-						.foregroundColor(.app.buttonTextBlack)
-						.font(.app.titleBold)
-
-					Text("••••••")
-						.foregroundColor(.app.buttonTextLight)
-						.font(.app.largeTitle)
-						.offset(y: -3)
-				}
+				Image("home-aggregatedValue-hidden")
 			}
 		}
 	}
+}
 
-	struct VisibilityButton: View {
-		let isVisible: Bool
-		let action: () -> Void
-
-		var body: some View {
-			Button(action: action) {
-				if isVisible {
-					Image("home-aggregatedValue-shown")
-				} else {
-					Image("home-aggregatedValue-hidden")
-				}
-			}
-		}
-	}
-
-	struct AggregatedValueView: View {
-		let account: Home.AccountList.Account
-		let isValueVisible: Bool
-		let toggleVisibilityAction: () -> Void
-
-		// FIXME: propagate correct values
-		let currency = FiatCurrency.usd
-		let amount: Float = 1_000_000
-		var formattedAmount: String {
-			amount.formatted(.currency(code: currency.symbol))
-		}
-
-		var body: some View {
-			HStack {
-				Spacer()
-				AmountView(
-					isValueVisible: isValueVisible,
-					amount: amount,
-					formattedAmount: formattedAmount,
-					fiatCurrency: currency
-				)
-				Spacer()
-					.frame(width: 44)
-				VisibilityButton(
-					isVisible: isValueVisible,
-					action: toggleVisibilityAction
-				)
-				Spacer()
-			}
-			.frame(height: 60)
-		}
+// MARK: - AggregatedValue_Preview
+struct AggregatedValue_Preview: PreviewProvider {
+	static var previews: some View {
+		Home.AggregatedValue.View(
+			store: .init(
+				initialState: .placeholder,
+				reducer: Home.AggregatedValue.reducer,
+				environment: .init()
+			)
+		)
 	}
 }

@@ -23,7 +23,6 @@ public extension Home.View {
 				action: Home.Action.init
 			)
 		) { viewStore in
-
 			VStack {
 				Home.Header.View(
 					store: store.scope(
@@ -31,26 +30,36 @@ public extension Home.View {
 						action: Home.Action.header
 					)
 				)
-				Spacer()
-				Home.AggregatedValue.View(
-					store: store.scope(
-						state: \.aggregatedValue,
-						action: Home.Action.aggregatedValue
-					)
-				)
-				Spacer()
-				createAccountButton {
-					viewStore.send(.createAccountButtonTapped)
+				.padding([.leading, .trailing, .top], 32)
+
+				ScrollView {
+					LazyVStack(spacing: 25) {
+						Home.AggregatedValue.View(
+							store: store.scope(
+								state: \.aggregatedValue,
+								action: Home.Action.aggregatedValue
+							)
+						)
+						Home.AccountList.View(
+							store: store.scope(
+								state: \.accountList,
+								action: Home.Action.accountList
+							)
+						)
+						createAccountButton {
+							viewStore.send(.createAccountButtonTapped)
+						}
+						Spacer()
+						Home.VisitHub.View(
+							store: store.scope(
+								state: \.visitHub,
+								action: Home.Action.visitHub
+							)
+						)
+					}
+					.padding(32)
 				}
-				Spacer()
-				Home.VisitHub.View(
-					store: store.scope(
-						state: \.visitHub,
-						action: Home.Action.visitHub
-					)
-				)
 			}
-			.padding(32)
 		}
 	}
 }
@@ -98,7 +107,7 @@ struct HomeView_Previews: PreviewProvider {
 	static var previews: some View {
 		Home.View(
 			store: .init(
-				initialState: .init(),
+				initialState: .placeholder,
 				reducer: Home.reducer,
 				environment: .placeholder
 			)

@@ -47,6 +47,15 @@ public extension Main.View {
 				then: CreateAccount.View.init(store:)
 			)
 			.zIndex(2)
+
+			IfLetStore(
+				store.scope(
+					state: \.account,
+					action: Main.Action.accountDetails
+				),
+				then: Home.AccountDetails.View.init(store:)
+			)
+			.zIndex(3)
 		}
 	}
 }
@@ -89,6 +98,7 @@ struct MainView_Previews: PreviewProvider {
 				reducer: Main.reducer,
 				environment: .init(
 					userDefaultsClient: .noop,
+					pasteboardClient: .noop,
 					wallet: .placeholder
 				)
 			)
