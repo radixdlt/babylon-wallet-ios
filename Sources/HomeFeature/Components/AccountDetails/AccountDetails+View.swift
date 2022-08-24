@@ -66,7 +66,7 @@ struct AccountDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		Home.AccountDetails.View(
 			store: .init(
-				initialState: .init(state: .placeholder),
+				initialState: .init(for: .placeholder),
 				reducer: Home.AccountDetails.reducer,
 				environment: .init()
 			)

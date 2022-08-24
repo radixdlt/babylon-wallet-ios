@@ -93,7 +93,7 @@ public extension Main {
 				return .none
 
 			case let .home(.coordinate(.displayAccountDetails(account))):
-				state.account = .init(state: account)
+				state.account = .init(for: account)
 				return .none
 
 			case let .home(.coordinate(.copyAddress(account))):

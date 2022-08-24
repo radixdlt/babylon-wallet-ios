@@ -15,12 +15,12 @@ public extension Home.AccountDetails {
 		public let name: String?
 		public let tokens: [Home.AccountRow.Token]
 
-		public init(state: Home.AccountRow.State) {
-			address = state.address
-			aggregatedValue = state.aggregatedValue
-			currency = state.currency
-			name = state.name
-			tokens = state.tokens
+		public init(for account: Home.AccountRow.State) {
+			address = account.address
+			aggregatedValue = account.aggregatedValue
+			currency = account.currency
+			name = account.name
+			tokens = account.tokens
 		}
 	}
 }
