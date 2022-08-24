@@ -5,6 +5,7 @@ public extension Home.AccountDetails {
 	enum Action: Equatable {
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
+		case aggregatedValue(Home.AggregatedValue.Action)
 	}
 }
 
@@ -17,11 +18,13 @@ public extension Home.AccountDetails.Action {
 public extension Home.AccountDetails.Action.InternalAction {
 	enum UserAction: Equatable {
 		case dismissAccountDetails
+		case displayAccountPreferences
 	}
 }
 
 public extension Home.AccountDetails.Action {
 	enum CoordinatingAction: Equatable {
 		case dismissAccountDetails
+		case displayAccountPreferences
 	}
 }

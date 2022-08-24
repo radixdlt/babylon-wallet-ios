@@ -34,12 +34,15 @@ public extension Home.View {
 
 				ScrollView {
 					LazyVStack(spacing: 25) {
-						Home.AggregatedValue.View(
-							store: store.scope(
-								state: \.aggregatedValue,
-								action: Home.Action.aggregatedValue
+						VStack {
+							title
+							Home.AggregatedValue.View(
+								store: store.scope(
+									state: \.aggregatedValue,
+									action: Home.Action.aggregatedValue
+								)
 							)
-						)
+						}
 						Home.AccountList.View(
 							store: store.scope(
 								state: \.accountList,
@@ -99,6 +102,15 @@ private extension Home.View {
 				.background(Color.app.buttonBackgroundLight)
 				.cornerRadius(6)
 		}
+	}
+}
+
+private extension Home.View {
+	var title: some View {
+		Text(L10n.Home.AggregatedValue.title)
+			.foregroundColor(.app.buttonTextBlack)
+			.font(.app.caption1)
+			.textCase(.uppercase)
 	}
 }
 

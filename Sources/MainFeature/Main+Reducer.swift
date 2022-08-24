@@ -120,6 +120,10 @@ public extension Main {
 				return .none
 			case .accountDetails(.internal(_)):
 				return .none
+			case .accountDetails(.aggregatedValue(_)):
+				return .none
+			case .accountDetails(.coordinate(.displayAccountPreferences)):
+				return .none
 			}
 		}
 	).debug()

@@ -25,11 +25,28 @@ public extension Home.AccountDetails.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
-					Text("Account Details")
-					Button(
-						action: { viewStore.send(.dismissAccountDetailsButtonTapped) },
-						label: { Text("Dismiss Account Details") }
+					HStack {
+						Button(
+							action: {
+								viewStore.send(.dismissAccountDetailsButtonTapped)
+							}, label: {
+								Text("Go back")
+							}
+						)
+						Spacer()
+						Text("My Account")
+						Spacer()
+						Button(
+							action: {}, label: {}
+						)
+					}
+					Home.AggregatedValue.View(
+						store: store.scope(
+							state: \.aggregatedValue,
+							action: Home.AccountDetails.Action.aggregatedValue
+						)
 					)
+					Spacer()
 				}
 			}
 		}
@@ -40,6 +57,7 @@ extension Home.AccountDetails.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case dismissAccountDetailsButtonTapped
+		case accountPreferencesButtonTapped
 	}
 }
 
@@ -48,6 +66,8 @@ extension Home.AccountDetails.Action {
 		switch action {
 		case .dismissAccountDetailsButtonTapped:
 			self = .internal(.user(.dismissAccountDetails))
+		case .accountPreferencesButtonTapped:
+			self = .internal(.user(.displayAccountPreferences))
 		}
 	}
 }

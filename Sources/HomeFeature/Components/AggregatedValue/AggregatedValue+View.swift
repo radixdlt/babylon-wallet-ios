@@ -17,16 +17,13 @@ public extension Home.AggregatedValue.View {
 				action: Home.AggregatedValue.Action.init
 			)
 		) { viewStore in
-			VStack {
-				title
-				AggregatedValueView(
-					value: viewStore.value,
-					isValueVisible: viewStore.isValueVisible,
-					toggleVisibilityAction: {
-						viewStore.send(.toggleVisibilityButtonTapped)
-					}
-				)
-			}
+			AggregatedValueView(
+				value: viewStore.value,
+				isValueVisible: viewStore.isValueVisible,
+				toggleVisibilityAction: {
+					viewStore.send(.toggleVisibilityButtonTapped)
+				}
+			)
 		}
 	}
 }
@@ -59,15 +56,6 @@ extension Home.AggregatedValue.View {
 			isValueVisible = state.isVisible
 			value = state.value
 		}
-	}
-}
-
-private extension Home.AggregatedValue.View {
-	var title: some View {
-		Text(L10n.Home.AggregatedValue.title)
-			.foregroundColor(.app.buttonTextBlack)
-			.font(.app.caption1)
-			.textCase(.uppercase)
 	}
 }
 
