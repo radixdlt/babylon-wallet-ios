@@ -22,17 +22,17 @@ public extension Home.AccountPreferences.View {
 				state: ViewState.init,
 				action: Home.AccountPreferences.Action.init
 			)
-		) { _ in
+		) { viewStore in
 			// TODO: implement
 			ForceFullScreen {
 				VStack {
 					Text("Impl: AccountPreferences")
 						.background(Color.yellow)
 						.foregroundColor(.red)
-					//                    Button(
-					//                        action: { viewStore.send(.dismissSettingsButtonTapped) },
-					//                        label: { Text("Dismiss Settings") }
-					//                    )
+					Button(
+						action: { viewStore.send(.dismissAccountPreferencesButtonTapped) },
+						label: { Text("Dismiss Settings") }
+					)
 				}
 			}
 		}
@@ -41,15 +41,16 @@ public extension Home.AccountPreferences.View {
 
 extension Home.AccountPreferences.View {
 	// MARK: ViewAction
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case dismissAccountPreferencesButtonTapped
+	}
 }
 
 extension Home.AccountPreferences.Action {
 	init(action: Home.AccountPreferences.View.ViewAction) {
 		switch action {
-		default:
-			// TODO: implement
-			break
+		case .dismissAccountPreferencesButtonTapped:
+			self = .internal(.user(.dismissAccountPreferences))
 		}
 	}
 }

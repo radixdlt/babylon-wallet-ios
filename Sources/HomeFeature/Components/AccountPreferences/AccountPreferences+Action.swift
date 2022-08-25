@@ -16,7 +16,9 @@ public extension Home.AccountPreferences.Action {
 }
 
 public extension Home.AccountPreferences.Action.InternalAction {
-	enum UserAction: Equatable {}
+	enum UserAction: Equatable {
+		case dismissAccountPreferences
+	}
 }
 
 public extension Home.AccountPreferences.Action.InternalAction {
@@ -24,5 +26,7 @@ public extension Home.AccountPreferences.Action.InternalAction {
 }
 
 public extension Home.AccountPreferences.Action {
-	enum CoordinatingAction: Equatable {}
+	enum CoordinatingAction: Equatable {
+		case dismissAccountPreferences
+	}
 }

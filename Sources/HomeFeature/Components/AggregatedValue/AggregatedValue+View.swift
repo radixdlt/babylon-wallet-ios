@@ -19,6 +19,7 @@ public extension Home.AggregatedValue.View {
 		) { viewStore in
 			AggregatedValueView(
 				value: viewStore.value,
+				currency: viewStore.currency,
 				isValueVisible: viewStore.isValueVisible,
 				toggleVisibilityAction: {
 					viewStore.send(.toggleVisibilityButtonTapped)
@@ -49,12 +50,15 @@ extension Home.AggregatedValue.View {
 	struct ViewState: Equatable {
 		var isValueVisible: Bool
 		var value: Float?
+		// FIXME: this should be currency, since it can be any currency
+		var currency: FiatCurrency
 
 		init(
 			state: Home.AggregatedValue.State
 		) {
 			isValueVisible = state.isVisible
 			value = state.value
+			currency = state.currency
 		}
 	}
 }
@@ -62,12 +66,15 @@ extension Home.AggregatedValue.View {
 // MARK: - AggregatedValueView
 private struct AggregatedValueView: View {
 	let value: Float?
+	let currency: FiatCurrency
 	let isValueVisible: Bool
 	let toggleVisibilityAction: () -> Void
 
-	// FIXME: propagate correct values
-	let currency = FiatCurrency.usd
-	let amount: Float = 1_000_000
+	// TODO: is this the right way to handle no value -> 0?
+	var amount: Float {
+		value ?? 0
+	}
+
 	var formattedAmount: String {
 		amount.formatted(.currency(code: currency.symbol))
 	}

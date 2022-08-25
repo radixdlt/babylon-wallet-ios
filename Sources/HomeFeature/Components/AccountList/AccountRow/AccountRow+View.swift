@@ -37,6 +37,7 @@ public extension Home.AccountRow.View {
 					AddressView(address: viewStore.address) {
 						viewStore.send(.copyAddress)
 					}
+					.frame(maxWidth: 160)
 				}
 
 				TokenListView(tokens: viewStore.state.tokens)
@@ -114,7 +115,7 @@ private struct HeaderView: View {
 }
 
 // MARK: - AddressView
-private struct AddressView: View {
+struct AddressView: View {
 	let address: String
 	let copyAddressAction: () -> Void
 
@@ -125,7 +126,6 @@ private struct AddressView: View {
 				.truncationMode(.middle)
 				.foregroundColor(.app.buttonTextBlackTransparent)
 				.font(.app.caption2)
-				.frame(maxWidth: 110)
 
 			Button(
 				action: copyAddressAction,
@@ -135,6 +135,7 @@ private struct AddressView: View {
 						.font(.app.caption2)
 						.underline()
 						.padding(12)
+						.fixedSize()
 				}
 			)
 			Spacer()

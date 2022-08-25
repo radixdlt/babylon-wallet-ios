@@ -17,7 +17,7 @@ public extension Home.AccountDetails {
 
 		public init(for account: Home.AccountRow.State) {
 			address = account.address
-			aggregatedValue = .init(value: account.aggregatedValue, isVisible: true)
+			aggregatedValue = .init(value: account.aggregatedValue, isVisible: false)
 			currency = account.currency
 			name = account.name
 			tokens = account.tokens

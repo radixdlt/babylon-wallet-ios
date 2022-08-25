@@ -30,20 +30,30 @@ public extension Home.AccountDetails.View {
 							action: {
 								viewStore.send(.dismissAccountDetailsButtonTapped)
 							}, label: {
-								Text("Go back")
+								Image("arrow-back")
 							}
 						)
 						Spacer()
-						Text("My Account")
+						Text(viewStore.name ?? "") // TODO: how to handle no name account?
+							.foregroundColor(.app.buttonTextBlack)
+							.font(.app.buttonTitle)
 						Spacer()
 						Button(
 							action: {
 								viewStore.send(.accountPreferencesButtonTapped)
 							}, label: {
-								Text("•••")
+								Image("ellipsis")
 							}
 						)
 					}
+
+					AddressView(
+						address: viewStore.address,
+						copyAddressAction: {
+							// TODO: implement
+						}
+					)
+					.padding([.leading, .trailing], 50)
 
 					Home.AggregatedValue.View(
 						store: store.scope(
@@ -51,6 +61,18 @@ public extension Home.AccountDetails.View {
 							action: Home.AccountDetails.Action.aggregatedValue
 						)
 					)
+
+					Button(action: {
+						// TODO: implement display transfer
+					}, label: {
+						Text("Transfer") // TODO: localize
+							.foregroundColor(.app.buttonTextBlack)
+							.font(.app.body)
+							.padding()
+							.background(Color.app.buttonBackgroundLight)
+							.cornerRadius(6)
+					})
+
 					Spacer()
 				}
 			}
@@ -80,8 +102,16 @@ extension Home.AccountDetails.Action {
 extension Home.AccountDetails.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: Home.AccountDetails.State) {
-			// TODO: implement
+		public let address: String
+		public var aggregatedValue: Home.AggregatedValue.State
+		public let currency: FiatCurrency
+		public let name: String?
+
+		init(state: Home.AccountDetails.State) {
+			address = state.address
+			aggregatedValue = state.aggregatedValue
+			currency = state.currency
+			name = state.name
 		}
 	}
 }

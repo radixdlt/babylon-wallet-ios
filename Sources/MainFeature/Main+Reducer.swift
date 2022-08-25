@@ -135,6 +135,9 @@ public extension Main {
 			case .accountDetails(.coordinate(.displayAccountPreferences)):
 				state.accountPreferences = .init()
 				return .none
+			case .accountPreferences(.coordinate(.dismissAccountPreferences)):
+				state.accountPreferences = nil
+				return .none
 			case .accountPreferences:
 				return .none
 			}
