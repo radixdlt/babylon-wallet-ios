@@ -35,7 +35,6 @@ jobs:
           xcodebuild \
           test \
           -project BabylonWallet.xcodeproj \
-          -scheme BabylonWallet \
           -destination 'platform=iOS Simulator,OS=12.2,name=iPhone X'
 
   snapshot_tests:
