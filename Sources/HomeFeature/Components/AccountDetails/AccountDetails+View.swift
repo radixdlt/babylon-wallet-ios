@@ -37,9 +37,14 @@ public extension Home.AccountDetails.View {
 						Text("My Account")
 						Spacer()
 						Button(
-							action: {}, label: {}
+							action: {
+								viewStore.send(.accountPreferencesButtonTapped)
+							}, label: {
+								Text("•••")
+							}
 						)
 					}
+
 					Home.AggregatedValue.View(
 						store: store.scope(
 							state: \.aggregatedValue,

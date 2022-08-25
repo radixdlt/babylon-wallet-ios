@@ -56,6 +56,15 @@ public extension Main.View {
 				then: Home.AccountDetails.View.init(store:)
 			)
 			.zIndex(3)
+
+			IfLetStore(
+				store.scope(
+					state: \.accountPreferences,
+					action: Main.Action.accountPreferences
+				),
+				then: Home.AccountPreferences.View.init(store:)
+			)
+			.zIndex(4)
 		}
 	}
 }

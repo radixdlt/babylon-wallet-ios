@@ -57,6 +57,16 @@ public extension Main {
 				}
 			),
 
+		Home.AccountPreferences.reducer
+			.optional()
+			.pullback(
+				state: \.accountPreferences,
+				action: /Main.Action.accountPreferences,
+				environment: { _ in
+					Home.AccountPreferences.Environment()
+				}
+			),
+
 		Reducer { state, action, environment in
 			switch action {
 			case .internal(.user(.removeWallet)):
@@ -123,6 +133,9 @@ public extension Main {
 			case .accountDetails(.aggregatedValue(_)):
 				return .none
 			case .accountDetails(.coordinate(.displayAccountPreferences)):
+				state.accountPreferences = .init()
+				return .none
+			case .accountPreferences:
 				return .none
 			}
 		}

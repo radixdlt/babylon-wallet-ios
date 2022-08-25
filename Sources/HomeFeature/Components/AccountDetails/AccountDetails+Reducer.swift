@@ -18,7 +18,9 @@ public extension Home.AccountDetails {
 					await send(.coordinate(.dismissAccountDetails))
 				}
 			case .internal(.user(.displayAccountPreferences)):
-				return .none // dzoni
+				return .run { send in
+					await send(.coordinate(.displayAccountPreferences))
+				}
 			case .coordinate:
 				return .none
 			case .aggregatedValue:
