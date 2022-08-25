@@ -1,0 +1,108 @@
+name: "Test and build"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  lint:
+    name: "Lint"
+    runs-on: macos-12
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Run Lint"
+        run: echo "Hello World" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
+
+  unit_tests:
+    name: "Unit tests"
+    runs-on: macos-12
+
+    needs:
+      - lint
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Run unit tests"
+        run: echo "Hello World" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
+
+  snapshot_tests:
+    name: "Snapshot tests"
+    runs-on: macos-12
+
+    needs:
+      - lint
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Run snapshot tests"
+        run: echo "Hello World" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
+
+  ui_tests:
+    name: "UI tests"
+    runs-on: macos-12
+
+    needs:
+      - lint
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Run UI tests"
+        run: echo "Hello World" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
+
+  static_analysis:
+    name: "Static analysis and SonarCloud"
+    runs-on: macos-12
+
+    continue-on-error: true
+
+    needs:
+      - unit_tests
+      - snapshot_tests
+      - ui_tests
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Run static analysis and Sonarcloud"
+        run: echo "Hello World" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
+
+  build:
+
+    name: "Build"
+    runs-on: macos-12
+
+    needs:
+      - static_analysis
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Dump context
+        uses: crazy-max/ghaction-dump-context@v1.2.1
+
+      - name: "Build"
+        run: echo "Hello World"
+
+      # - name: Upload IPA from PR
+      #   if: ${{ github.event_name == 'pull_request' }}
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ${{ github.event.number }}
+      #     path: app/build/outputs/apk/debug/
+      #     retention-days: 1
+
+      # - name: Upload IPA from main branch
+      #   if: ${{ github.ref == 'refs/heads/main' }}
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: ${{ github.ref_name }}
+      #     path: app/build/outputs/apk/debug/
+      #     retention-days: 1
