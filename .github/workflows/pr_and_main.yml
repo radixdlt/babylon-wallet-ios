@@ -29,7 +29,14 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: "Run unit tests"
-        run: echo "Hello World" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
+        run: |
+          echo "Hello World"
+          cd App
+          xcodebuild \
+          test \
+          -project BabylonWallet.xcodeproj \
+          -scheme BabylonWallet \
+          -destination 'platform=iOS Simulator,OS=12.2,name=iPhone X'
 
   snapshot_tests:
     name: "Snapshot tests"
