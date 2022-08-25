@@ -16,7 +16,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: "Run Lint"
-        run: echo "Hello World" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
+        run: |
+          cd App
+          xcodebuild archive -project BabylonWallet.xcodeproj -scheme "Wallet (iOS)" -sdk iphoneos15.5 -archivePath build.xcarchive CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
 
   unit_tests:
     name: "Unit tests"
