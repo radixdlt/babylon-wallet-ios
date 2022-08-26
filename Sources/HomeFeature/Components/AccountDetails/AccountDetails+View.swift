@@ -64,7 +64,7 @@ public extension Home.AccountDetails.View {
 					)
 
 					Button(action: {
-						// TODO: implement display transfer
+						viewStore.send(.transferButtonTapped)
 					}, label: {
 						Text(L10n.Home.AccountDetails.transferButtonTitle)
 							.foregroundColor(.app.buttonTextBlack)
@@ -87,6 +87,7 @@ extension Home.AccountDetails.View {
 		case dismissAccountDetailsButtonTapped
 		case accountPreferencesButtonTapped
 		case copyAddressButtonTapped
+		case transferButtonTapped
 	}
 }
 
@@ -99,6 +100,8 @@ extension Home.AccountDetails.Action {
 			self = .internal(.user(.displayAccountPreferences))
 		case .copyAddressButtonTapped:
 			self = .internal(.user(.copyAddress))
+		case .transferButtonTapped:
+			self = .internal(.user(.displayTransfer))
 		}
 	}
 }

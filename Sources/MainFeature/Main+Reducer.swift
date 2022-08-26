@@ -67,6 +67,16 @@ public extension Main {
 				}
 			),
 
+		Home.Transfer.reducer
+			.optional()
+			.pullback(
+				state: \.transfer,
+				action: /Main.Action.transfer,
+				environment: { _ in
+					Home.Transfer.Environment()
+				}
+			),
+
 		Reducer { state, action, environment in
 			switch action {
 			case .internal(.user(.removeWallet)):
@@ -144,6 +154,14 @@ public extension Main {
 				state.accountPreferences = nil
 				return .none
 			case .accountPreferences:
+				return .none
+			case .transfer(.coordinate(.dismissTransfer)):
+				state.transfer = nil
+				return .none
+			case .transfer:
+				return .none
+			case .accountDetails(.coordinate(.displayTransfer)):
+				state.transfer = .init()
 				return .none
 			}
 		}

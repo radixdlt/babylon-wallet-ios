@@ -65,6 +65,15 @@ public extension Main.View {
 				then: Home.AccountPreferences.View.init(store:)
 			)
 			.zIndex(4)
+
+			IfLetStore(
+				store.scope(
+					state: \.transfer,
+					action: Main.Action.transfer
+				),
+				then: Home.Transfer.View.init(store:)
+			)
+			.zIndex(4)
 		}
 	}
 }

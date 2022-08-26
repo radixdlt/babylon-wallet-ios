@@ -34,6 +34,10 @@ public extension Home.AccountDetails {
 				return .none
 			case .aggregatedValue:
 				return .none
+			case .internal(.user(.displayTransfer)):
+				return .run { send in
+					await send(.coordinate(.displayTransfer))
+				}
 			}
 		}
 	)

@@ -31,7 +31,7 @@ public extension Home.AccountPreferences.View {
 						.foregroundColor(.red)
 					Button(
 						action: { viewStore.send(.dismissAccountPreferencesButtonTapped) },
-						label: { Text("Dismiss Settings") }
+						label: { Text("Dismiss AccountPreferences") }
 					)
 				}
 			}

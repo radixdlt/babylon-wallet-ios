@@ -18,6 +18,7 @@ public extension Main {
 		public var accountPreferences: Home.AccountPreferences.State?
 		public var home: Home.State
 		public var settings: Settings.State?
+		public var transfer: Home.Transfer.State?
 		public var createAccount: CreateAccount.State?
 
 		public init(
@@ -25,12 +26,14 @@ public extension Main {
 			accountPreferences: Home.AccountPreferences.State? = nil,
 			home: Home.State = .placeholder, // TODO: remove placeholder
 			settings: Settings.State? = nil,
+			transfer: Home.Transfer.State? = nil,
 			createAccount: CreateAccount.State? = nil
 		) {
 			self.account = account
 			self.accountPreferences = accountPreferences
 			self.home = home
 			self.settings = settings
+			self.transfer = transfer
 			self.createAccount = createAccount
 		}
 	}

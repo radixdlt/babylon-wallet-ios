@@ -17,6 +17,7 @@ public extension Main {
 		case createAccount(CreateAccount.Action)
 		case accountDetails(Home.AccountDetails.Action)
 		case accountPreferences(Home.AccountPreferences.Action)
+		case transfer(Home.Transfer.Action)
 	}
 }
 

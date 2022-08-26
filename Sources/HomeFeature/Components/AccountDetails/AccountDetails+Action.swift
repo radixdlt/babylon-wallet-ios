@@ -20,6 +20,7 @@ public extension Home.AccountDetails.Action.InternalAction {
 		case dismissAccountDetails
 		case displayAccountPreferences
 		case copyAddress
+		case displayTransfer
 	}
 }
 
@@ -28,5 +29,6 @@ public extension Home.AccountDetails.Action {
 		case dismissAccountDetails
 		case displayAccountPreferences
 		case copyAddress(String)
+		case displayTransfer
 	}
 }
