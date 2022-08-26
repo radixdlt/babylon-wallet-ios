@@ -24,7 +24,7 @@ public extension Home.AccountDetails.View {
 			)
 		) { viewStore in
 			ForceFullScreen {
-				VStack {
+				VStack(alignment: .center) {
 					HStack {
 						Button(
 							action: {
@@ -49,12 +49,10 @@ public extension Home.AccountDetails.View {
 
 					AddressView(
 						address: viewStore.address,
-						isMultiline: true,
 						copyAddressAction: {
 							viewStore.send(.copyAddressButtonTapped)
 						}
 					)
-					.padding([.leading, .trailing], 50)
 
 					Home.AggregatedValue.View(
 						store: store.scope(

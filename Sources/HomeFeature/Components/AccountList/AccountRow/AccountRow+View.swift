@@ -36,7 +36,6 @@ public extension Home.AccountRow.View {
 
 					AddressView(
 						address: viewStore.address,
-						isMultiline: false,
 						copyAddressAction: {
 							viewStore.send(.copyAddressButtonTapped)
 						}
@@ -121,13 +120,12 @@ private struct HeaderView: View {
 // MARK: - AddressView
 struct AddressView: View {
 	let address: String
-	let isMultiline: Bool
 	let copyAddressAction: () -> Void
 
 	var body: some View {
-		HStack(spacing: 0) {
+		HStack(spacing: 5) {
 			Text(address)
-				.lineLimit(isMultiline ? nil : 1)
+				.lineLimit(1)
 				.truncationMode(.middle)
 				.foregroundColor(.app.buttonTextBlackTransparent)
 				.font(.app.caption2)
@@ -143,7 +141,6 @@ struct AddressView: View {
 						.fixedSize()
 				}
 			)
-			Spacer()
 		}
 	}
 }
