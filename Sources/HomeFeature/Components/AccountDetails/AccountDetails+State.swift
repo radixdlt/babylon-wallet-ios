@@ -12,7 +12,7 @@ public extension Home.AccountDetails {
 		public let address: String
 		public var aggregatedValue: Home.AggregatedValue.State
 		public let currency: FiatCurrency
-		public let name: String?
+		public let name: String
 		public let tokens: [Home.AccountRow.Token]
 
 		public init(for account: Home.AccountRow.State) {

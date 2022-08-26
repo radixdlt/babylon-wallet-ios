@@ -13,14 +13,14 @@ public extension Home.AccountRow {
 		public let address: String
 		public let aggregatedValue: Float?
 		public let currency: FiatCurrency
-		public let name: String?
+		public let name: String
 		public let tokens: [Token]
 
 		public init(
 			address: String,
 			aggregatedValue: Float?,
 			currency: FiatCurrency,
-			name: String?,
+			name: String,
 			tokens: [Token]
 		) {
 			self.address = address

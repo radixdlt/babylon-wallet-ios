@@ -34,7 +34,7 @@ public extension Home.AccountDetails.View {
 							}
 						)
 						Spacer()
-						Text(viewStore.name ?? "") // TODO: how to handle no name account?
+						Text(viewStore.name)
 							.foregroundColor(.app.buttonTextBlack)
 							.font(.app.buttonTitle)
 						Spacer()
@@ -112,7 +112,7 @@ extension Home.AccountDetails.View {
 		public let address: String
 		public var aggregatedValue: Home.AggregatedValue.State
 		public let currency: FiatCurrency
-		public let name: String?
+		public let name: String
 
 		init(state: Home.AccountDetails.State) {
 			address = state.address
