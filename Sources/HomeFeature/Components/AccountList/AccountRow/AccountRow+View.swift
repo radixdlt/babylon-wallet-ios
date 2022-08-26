@@ -27,7 +27,7 @@ public extension Home.AccountRow.View {
 			VStack(alignment: .leading) {
 				VStack(alignment: .leading, spacing: 0) {
 					HeaderView(
-						name: viewStore.name ?? "",
+						name: viewStore.name,
 						value: formattedAmmount(
 							viewStore.aggregatedValue ?? 0,
 							currency: viewStore.currency
@@ -83,13 +83,15 @@ extension Home.AccountRow.View {
 	struct ViewState: Equatable {
 		let address: Profile.Account.Address
 		let aggregatedValue: Float?
+		let isValueVisible: Bool
 		let currency: FiatCurrency
-		let name: String?
+		let name: String
 		let tokens: [Home.AccountRow.Token]
 
 		init(state: Home.AccountRow.State) {
 			address = state.address
 			aggregatedValue = state.aggregatedValue
+			isValueVisible = state.isValueVisible
 			currency = state.currency
 			name = state.name
 			tokens = state.tokens

@@ -36,6 +36,7 @@ public extension Home.AccountRow.State {
 	static let checking: Self = .init(
 		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
+		isValueVisible: false,
 		currency: .usd,
 		name: "Checking",
 		tokens: TokenRandomizer.generateRandomTokens()
@@ -44,6 +45,7 @@ public extension Home.AccountRow.State {
 	static let savings: Self = .init(
 		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
+		isValueVisible: false,
 		currency: .usd,
 		name: "Savings",
 		tokens: TokenRandomizer.generateRandomTokens()
@@ -52,6 +54,7 @@ public extension Home.AccountRow.State {
 	static let shared: Self = .init(
 		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
+		isValueVisible: false,
 		currency: .usd,
 		name: "Shared",
 		tokens: TokenRandomizer.generateRandomTokens()
@@ -60,6 +63,7 @@ public extension Home.AccountRow.State {
 	static let family: Self = .init(
 		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
+		isValueVisible: false,
 		currency: .usd,
 		name: "Family",
 		tokens: TokenRandomizer.generateRandomTokens()
@@ -68,6 +72,7 @@ public extension Home.AccountRow.State {
 	static let dummy1: Self = .init(
 		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
+		isValueVisible: false,
 		currency: .usd,
 		name: "Dummy 1",
 		tokens: TokenRandomizer.generateRandomTokens()
@@ -76,6 +81,7 @@ public extension Home.AccountRow.State {
 	static let dummy2: Self = .init(
 		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
+		isValueVisible: false,
 		currency: .usd,
 		name: "Dummy 2",
 		tokens: TokenRandomizer.generateRandomTokens()
@@ -84,6 +90,7 @@ public extension Home.AccountRow.State {
 	static let dummy3: Self = .init(
 		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
+		isValueVisible: false,
 		currency: .usd,
 		name: "Dummy 3",
 		tokens: TokenRandomizer.generateRandomTokens()

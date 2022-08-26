@@ -12,6 +12,7 @@ public extension Home.AccountRow {
 	struct State: Equatable, Identifiable {
 		public let address: String
 		public let aggregatedValue: Float?
+		public let isValueVisible: Bool
 		public let currency: FiatCurrency
 		public let name: String
 		public let tokens: [Token]
@@ -19,12 +20,14 @@ public extension Home.AccountRow {
 		public init(
 			address: String,
 			aggregatedValue: Float?,
+			isValueVisible: Bool,
 			currency: FiatCurrency,
 			name: String,
 			tokens: [Token]
 		) {
 			self.address = address
 			self.aggregatedValue = aggregatedValue
+			self.isValueVisible = isValueVisible
 			self.currency = currency
 			self.name = name
 			self.tokens = tokens
@@ -45,6 +48,7 @@ public extension Home.AccountRow.State {
 		self.init(
 			address: profileAccount.address,
 			aggregatedValue: profileAccount.aggregatedValue,
+			isValueVisible: profileAccount.isValueVisible,
 			currency: .usd, // FIXME: propagate value from profileAccount
 			name: profileAccount.name,
 			tokens: []
@@ -58,12 +62,14 @@ public extension Home.AccountRow.State {
 		profileAccount: .init(address: .random,
 		                      aggregatedValue: 1_000_000,
 		                      currency: FiatCurrency.usd.rawValue, // FIXME: use correct type for fiat currency, not String
+		                      isValueVisible: false,
 		                      name: "My account")
 	)
 
 	static let radnomTokenPlaceholder: Self = .init(
 		address: .random,
 		aggregatedValue: 1_000_000,
+		isValueVisible: false,
 		currency: FiatCurrency.usd,
 		name: "My account",
 		tokens: TokenRandomizer.generateRandomTokens()

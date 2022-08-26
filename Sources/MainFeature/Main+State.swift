@@ -20,6 +20,7 @@ public extension Main {
 		public var settings: Settings.State?
 		public var transfer: Home.Transfer.State?
 		public var createAccount: CreateAccount.State?
+		public var isCurrencyAmountVisible: Bool
 
 		public init(
 			account: Home.AccountDetails.State? = nil,
@@ -27,7 +28,8 @@ public extension Main {
 			home: Home.State = .placeholder, // TODO: remove placeholder
 			settings: Settings.State? = nil,
 			transfer: Home.Transfer.State? = nil,
-			createAccount: CreateAccount.State? = nil
+			createAccount: CreateAccount.State? = nil,
+			isCurrencyAmountVisible: Bool = false
 		) {
 			self.account = account
 			self.accountPreferences = accountPreferences
@@ -35,6 +37,7 @@ public extension Main {
 			self.settings = settings
 			self.transfer = transfer
 			self.createAccount = createAccount
+			self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
 	}
 }
@@ -43,7 +46,8 @@ public extension Main {
 public extension Main.State {
 	static let placeholder = Self(
 		home: .init(),
-		settings: nil
+		settings: nil,
+		isCurrencyAmountVisible: false
 	)
 }
 #endif
