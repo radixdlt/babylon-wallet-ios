@@ -22,12 +22,7 @@ public extension Home.AccountDetails {
 					await send(.coordinate(.displayAccountPreferences))
 				}
 			case .internal(.user(.copyAddress)):
-				// FIXME: is this the right way to propagate state?
-				// Since we're getting:
-				// Reference to captured parameter 'state' in concurrently-executing code
-				// if using state.address directly
-				let address = state.address
-				return .run { send in
+				return .run { [address = state.address] send in
 					await send(.coordinate(.copyAddress(address)))
 				}
 			case .coordinate:
