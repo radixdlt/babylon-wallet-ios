@@ -21,7 +21,9 @@ public extension CreateAccount.View {
 		WithViewStore(store) { viewStore in
 			ForceFullScreen {
 				VStack {
-					Text("Create Account")
+					Text("Impl: Settings")
+						.background(Color.yellow)
+						.foregroundColor(.red)
 					Button(
 						action: { viewStore.send(.coordinate(.dismissCreateAccount)) },
 						label: { Text("Dismiss Create Account") }

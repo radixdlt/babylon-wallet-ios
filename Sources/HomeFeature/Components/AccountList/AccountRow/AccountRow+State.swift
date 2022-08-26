@@ -55,14 +55,14 @@ public extension Home.AccountRow.State {
 #if DEBUG
 public extension Home.AccountRow.State {
 	static let placeholder: Self = .init(
-		profileAccount: .init(address: "rdr12hj3cqqG89ijHsjA3cq2qgtxg4sahjU78s",
+		profileAccount: .init(address: .random,
 		                      aggregatedValue: 1_000_000,
 		                      currency: FiatCurrency.usd.rawValue, // FIXME: use correct type for fiat currency, not String
 		                      name: "My account")
 	)
 
 	static let radnomTokenPlaceholder: Self = .init(
-		address: "rdr12hj3cqqG89ijHsjA3cq2qgtxg4sahjU78s",
+		address: .random,
 		aggregatedValue: 1_000_000,
 		currency: FiatCurrency.usd,
 		name: "My account",

@@ -34,7 +34,7 @@ public extension IdentifiedArray where Element == Home.AccountRow.State, ID == H
 
 public extension Home.AccountRow.State {
 	static let checking: Self = .init(
-		address: UUID().uuidString,
+		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
 		currency: .usd,
 		name: "Checking",
@@ -42,7 +42,7 @@ public extension Home.AccountRow.State {
 	)
 
 	static let savings: Self = .init(
-		address: UUID().uuidString,
+		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
 		currency: .usd,
 		name: "Savings",
@@ -50,7 +50,7 @@ public extension Home.AccountRow.State {
 	)
 
 	static let shared: Self = .init(
-		address: UUID().uuidString,
+		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
 		currency: .usd,
 		name: "Shared",
@@ -58,7 +58,7 @@ public extension Home.AccountRow.State {
 	)
 
 	static let family: Self = .init(
-		address: UUID().uuidString,
+		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
 		currency: .usd,
 		name: "Family",
@@ -66,7 +66,7 @@ public extension Home.AccountRow.State {
 	)
 
 	static let dummy1: Self = .init(
-		address: UUID().uuidString,
+		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
 		currency: .usd,
 		name: "Dummy 1",
@@ -74,7 +74,7 @@ public extension Home.AccountRow.State {
 	)
 
 	static let dummy2: Self = .init(
-		address: UUID().uuidString,
+		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
 		currency: .usd,
 		name: "Dummy 2",
@@ -82,7 +82,7 @@ public extension Home.AccountRow.State {
 	)
 
 	static let dummy3: Self = .init(
-		address: UUID().uuidString,
+		address: .random,
 		aggregatedValue: Float.random(in: 100 ... 1_000_000),
 		currency: .usd,
 		name: "Dummy 3",

@@ -9,3 +9,5 @@
 "home.aggregatedValue.title" = "Total value";
 
 "home.accountRow.copyTitle" = "Copy";
+
+"home.accountDetails.transferButtonTitle" = "Transfer";

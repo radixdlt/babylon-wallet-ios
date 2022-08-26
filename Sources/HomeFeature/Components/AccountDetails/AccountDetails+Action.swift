@@ -19,6 +19,7 @@ public extension Home.AccountDetails.Action.InternalAction {
 	enum UserAction: Equatable {
 		case dismissAccountDetails
 		case displayAccountPreferences
+		case copyAddress
 	}
 }
 
@@ -26,5 +27,6 @@ public extension Home.AccountDetails.Action {
 	enum CoordinatingAction: Equatable {
 		case dismissAccountDetails
 		case displayAccountPreferences
+		case copyAddress(String)
 	}
 }

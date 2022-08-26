@@ -34,9 +34,13 @@ public extension Home.AccountRow.View {
 						)
 					)
 
-					AddressView(address: viewStore.address) {
-						viewStore.send(.copyAddress)
-					}
+					AddressView(
+						address: viewStore.address,
+						isMultiline: false,
+						copyAddressAction: {
+							viewStore.send(.copyAddressButtonTapped)
+						}
+					)
 					.frame(maxWidth: 160)
 				}
 
@@ -59,7 +63,7 @@ public extension Home.AccountRow.View {
 extension Home.AccountRow.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
-		case copyAddress
+		case copyAddressButtonTapped
 		case didSelect
 	}
 }
@@ -67,7 +71,7 @@ extension Home.AccountRow.View {
 extension Home.AccountRow.Action {
 	init(action: Home.AccountRow.View.ViewAction) {
 		switch action {
-		case .copyAddress:
+		case .copyAddressButtonTapped:
 			self = .internal(.user(.copyAddress))
 		case .didSelect:
 			self = .internal(.user(.didSelect))
@@ -117,12 +121,13 @@ private struct HeaderView: View {
 // MARK: - AddressView
 struct AddressView: View {
 	let address: String
+	let isMultiline: Bool
 	let copyAddressAction: () -> Void
 
 	var body: some View {
 		HStack(spacing: 0) {
 			Text(address)
-				.lineLimit(1)
+				.lineLimit(isMultiline ? nil : 1)
 				.truncationMode(.middle)
 				.foregroundColor(.app.buttonTextBlackTransparent)
 				.font(.app.caption2)

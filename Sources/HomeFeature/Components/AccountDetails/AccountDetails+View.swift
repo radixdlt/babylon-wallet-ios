@@ -49,8 +49,9 @@ public extension Home.AccountDetails.View {
 
 					AddressView(
 						address: viewStore.address,
+						isMultiline: true,
 						copyAddressAction: {
-							// TODO: implement
+							viewStore.send(.copyAddressButtonTapped)
 						}
 					)
 					.padding([.leading, .trailing], 50)
@@ -65,7 +66,7 @@ public extension Home.AccountDetails.View {
 					Button(action: {
 						// TODO: implement display transfer
 					}, label: {
-						Text("Transfer") // TODO: localize
+						Text(L10n.Home.AccountDetails.transferButtonTitle)
 							.foregroundColor(.app.buttonTextBlack)
 							.font(.app.body)
 							.padding()
@@ -85,6 +86,7 @@ extension Home.AccountDetails.View {
 	enum ViewAction: Equatable {
 		case dismissAccountDetailsButtonTapped
 		case accountPreferencesButtonTapped
+		case copyAddressButtonTapped
 	}
 }
 
@@ -95,6 +97,8 @@ extension Home.AccountDetails.Action {
 			self = .internal(.user(.dismissAccountDetails))
 		case .accountPreferencesButtonTapped:
 			self = .internal(.user(.displayAccountPreferences))
+		case .copyAddressButtonTapped:
+			self = .internal(.user(.copyAddress))
 		}
 	}
 }

@@ -135,6 +135,11 @@ public extension Main {
 			case .accountDetails(.coordinate(.displayAccountPreferences)):
 				state.accountPreferences = .init()
 				return .none
+			case let .accountDetails(.coordinate(.copyAddress(address))):
+				// FIXME: use logic from case let .home(.coordinate(.copyAddress(account))):
+				return .run { _ in
+					environment.pasteboardClient.copyString(address)
+				}
 			case .accountPreferences(.coordinate(.dismissAccountPreferences)):
 				state.accountPreferences = nil
 				return .none
