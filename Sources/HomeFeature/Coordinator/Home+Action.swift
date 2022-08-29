@@ -1,4 +1,3 @@
-import CreateAccount
 import Foundation
 
 public extension Home {
@@ -13,7 +12,7 @@ public extension Home {
 		case coordinate(CoordinatingAction)
 		case accountDetails(Home.AccountDetails.Action)
 		case transfer(Home.Transfer.Action)
-		case createAccount(CreateAccount.Action)
+		case createAccount(Home.CreateAccount.Action)
 	}
 }
 

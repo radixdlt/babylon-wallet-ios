@@ -1,6 +1,6 @@
 import Foundation
 
-public extension CreateAccount {
+public extension Home.CreateAccount {
 	// MARK: Environment
 	struct Environment {
 		public init() {}

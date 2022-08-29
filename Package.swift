@@ -62,18 +62,6 @@ let package = Package(
 			]
 		),
 		.target(
-			name: "CreateAccount",
-			dependencies: [
-				tca,
-			]
-		),
-		.testTarget(
-			name: "CreateAccountTests",
-			dependencies: [
-				"TestUtils",
-			]
-		),
-		.target(
 			name: "Common",
 			dependencies: [
 			]
@@ -118,7 +106,6 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
-				"CreateAccount",
 				"HomeFeature",
 				"PasteboardClient",
 				"SettingsFeature",

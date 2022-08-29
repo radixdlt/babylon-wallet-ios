@@ -1,6 +1,6 @@
 import ComposableArchitecture
 
-public extension CreateAccount {
+public extension Home.CreateAccount {
 	// MARK: Reducer
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = Reducer { _, action, _ in

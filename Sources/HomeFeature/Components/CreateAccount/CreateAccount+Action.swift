@@ -1,13 +1,13 @@
 import Foundation
 
-public extension CreateAccount {
+public extension Home.CreateAccount {
 	// MARK: Action
 	enum Action: Equatable {
 		case coordinate(CoordinatingAction)
 	}
 }
 
-public extension CreateAccount.Action {
+public extension Home.CreateAccount.Action {
 	enum CoordinatingAction: Equatable {
 		case dismissCreateAccount
 	}

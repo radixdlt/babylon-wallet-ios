@@ -1,4 +1,3 @@
-import CreateAccount
 import Foundation
 
 // MARK: - Home
@@ -12,7 +11,7 @@ public extension Home {
 		public var accountList: Home.AccountList.State
 		public var accountPreferences: Home.AccountPreferences.State?
 		public var aggregatedValue: Home.AggregatedValue.State
-		public var createAccount: CreateAccount.State?
+		public var createAccount: Home.CreateAccount.State?
 		public var header: Home.Header.State
 		public var visitHub: Home.VisitHub.State
 		public var transfer: Home.Transfer.State?
@@ -22,7 +21,7 @@ public extension Home {
 			accountList: Home.AccountList.State = .init(),
 			accountPreferences: Home.AccountPreferences.State? = nil,
 			aggregatedValue: Home.AggregatedValue.State = .init(),
-			createAccount: CreateAccount.State? = nil,
+			createAccount: Home.CreateAccount.State? = nil,
 			header: Home.Header.State = .init(),
 			visitHub: Home.VisitHub.State = .init(),
 			transfer _: Home.Transfer.State? = nil

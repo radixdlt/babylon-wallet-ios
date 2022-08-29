@@ -1,6 +1,5 @@
 import Common
 import ComposableArchitecture
-import CreateAccount
 import SwiftUI
 
 public extension Home {
@@ -33,7 +32,7 @@ public extension Home.View {
 						state: \.createAccount,
 						action: Home.Action.createAccount
 					),
-					then: CreateAccount.View.init(store:)
+					then: Home.CreateAccount.View.init(store:)
 				)
 				.zIndex(1)
 
