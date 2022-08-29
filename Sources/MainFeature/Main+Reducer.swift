@@ -1,6 +1,5 @@
 import Common
 import ComposableArchitecture
-import CreateAccount
 import Foundation
 import HomeFeature
 import SettingsFeature
@@ -37,46 +36,6 @@ public extension Main {
 				}
 			),
 
-		CreateAccount.reducer
-			.optional()
-			.pullback(
-				state: \.createAccount,
-				action: /Main.Action.createAccount,
-				environment: { _ in
-					CreateAccount.Environment()
-				}
-			),
-
-		Home.AccountDetails.reducer
-			.optional()
-			.pullback(
-				state: \.account,
-				action: /Main.Action.accountDetails,
-				environment: { _ in
-					Home.AccountDetails.Environment()
-				}
-			),
-
-		Home.AccountPreferences.reducer
-			.optional()
-			.pullback(
-				state: \.accountPreferences,
-				action: /Main.Action.accountPreferences,
-				environment: { _ in
-					Home.AccountPreferences.Environment()
-				}
-			),
-
-		Home.Transfer.reducer
-			.optional()
-			.pullback(
-				state: \.transfer,
-				action: /Main.Action.transfer,
-				environment: { _ in
-					Home.Transfer.Environment()
-				}
-			),
-
 		Reducer { state, action, environment in
 			switch action {
 			case .internal(.user(.removeWallet)):
@@ -91,29 +50,11 @@ public extension Main {
 			case .home(.coordinate(.displaySettings)):
 				state.settings = .init()
 				return .none
-			case .home(.coordinate(.displayVisitHub)):
-				#if os(iOS)
-				// FIXME: move to `UIApplicationClient` package!
-				return .fireAndForget {
-					UIApplication.shared.open(URL(string: "https://www.apple.com")!)
-				}
-				#else
-				return .none
-				#endif // os(iOS)
-			case .home(.coordinate(.displayCreateAccount)):
-				state.createAccount = .init()
-				return .none
 
 			case .settings(.coordinate(.dismissSettings)):
 				state.settings = nil
 				return .none
-
-			case .createAccount(.coordinate(.dismissCreateAccount)):
-				state.createAccount = nil
-				return .none
-
-			case let .home(.coordinate(.displayAccountDetails(account))):
-				state.account = .init(for: account)
+			case .settings(.internal(_)):
 				return .none
 
 			case let .home(.coordinate(.copyAddress(account))):
@@ -122,8 +63,6 @@ public extension Main {
 				}
 
 			case .home(.internal(_)):
-				return .none
-			case .settings(.internal(_)):
 				return .none
 			case .home(.header(_)):
 				return .none
@@ -135,33 +74,13 @@ public extension Main {
 				return .none
 			case .coordinate:
 				return .none
-			case .accountDetails(.coordinate(.dismissAccountDetails)):
-				state.account = nil
+			case .home(.accountPreferences(_)):
 				return .none
-			case .accountDetails(.internal(_)):
+			case .home(.accountDetails(_)):
 				return .none
-			case .accountDetails(.aggregatedValue(_)):
+			case .home(.transfer(_)):
 				return .none
-			case .accountDetails(.coordinate(.displayAccountPreferences)):
-				state.accountPreferences = .init()
-				return .none
-			case let .accountDetails(.coordinate(.copyAddress(address))):
-				// FIXME: use logic from case let .home(.coordinate(.copyAddress(account))):
-				return .run { _ in
-					environment.pasteboardClient.copyString(address)
-				}
-			case .accountPreferences(.coordinate(.dismissAccountPreferences)):
-				state.accountPreferences = nil
-				return .none
-			case .accountPreferences:
-				return .none
-			case .transfer(.coordinate(.dismissTransfer)):
-				state.transfer = nil
-				return .none
-			case .transfer:
-				return .none
-			case .accountDetails(.coordinate(.displayTransfer)):
-				state.transfer = .init()
+			case .home(.createAccount(_)):
 				return .none
 			}
 		}

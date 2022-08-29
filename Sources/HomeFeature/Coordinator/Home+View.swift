@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import CreateAccount
 import SwiftUI
 
 public extension Home {
@@ -23,45 +24,45 @@ public extension Home.View {
 				action: Home.Action.init
 			)
 		) { viewStore in
-			VStack {
-				Home.Header.View(
-					store: store.scope(
-						state: \.header,
-						action: Home.Action.header
-					)
-				)
-				.padding([.leading, .trailing, .top], 32)
+			ZStack {
+				homeView(with: viewStore)
+					.zIndex(0)
 
-				ScrollView {
-					LazyVStack(spacing: 25) {
-						VStack {
-							title
-							Home.AggregatedValue.View(
-								store: store.scope(
-									state: \.aggregatedValue,
-									action: Home.Action.aggregatedValue
-								)
-							)
-						}
-						Home.AccountList.View(
-							store: store.scope(
-								state: \.accountList,
-								action: Home.Action.accountList
-							)
-						)
-						createAccountButton {
-							viewStore.send(.createAccountButtonTapped)
-						}
-						Spacer()
-						Home.VisitHub.View(
-							store: store.scope(
-								state: \.visitHub,
-								action: Home.Action.visitHub
-							)
-						)
-					}
-					.padding(32)
-				}
+				IfLetStore(
+					store.scope(
+						state: \.createAccount,
+						action: Home.Action.createAccount
+					),
+					then: CreateAccount.View.init(store:)
+				)
+				.zIndex(1)
+
+				IfLetStore(
+					store.scope(
+						state: \.accountDetails,
+						action: Home.Action.accountDetails
+					),
+					then: Home.AccountDetails.View.init(store:)
+				)
+				.zIndex(2)
+
+				IfLetStore(
+					store.scope(
+						state: \.accountPreferences,
+						action: Home.Action.accountPreferences
+					),
+					then: Home.AccountPreferences.View.init(store:)
+				)
+				.zIndex(3)
+
+				IfLetStore(
+					store.scope(
+						state: \.transfer,
+						action: Home.Action.transfer
+					),
+					then: Home.Transfer.View.init(store:)
+				)
+				.zIndex(5)
 			}
 		}
 	}
@@ -101,6 +102,49 @@ private extension Home.View {
 				.frame(height: 50)
 				.background(Color.app.buttonBackgroundLight)
 				.cornerRadius(6)
+		}
+	}
+
+	func homeView(with viewStore: ViewStore<Home.View.ViewState, Home.View.ViewAction>) -> some View {
+		VStack {
+			Home.Header.View(
+				store: store.scope(
+					state: \.header,
+					action: Home.Action.header
+				)
+			)
+			.padding([.leading, .trailing, .top], 32)
+
+			ScrollView {
+				LazyVStack(spacing: 25) {
+					VStack {
+						title
+						Home.AggregatedValue.View(
+							store: store.scope(
+								state: \.aggregatedValue,
+								action: Home.Action.aggregatedValue
+							)
+						)
+					}
+					Home.AccountList.View(
+						store: store.scope(
+							state: \.accountList,
+							action: Home.Action.accountList
+						)
+					)
+					createAccountButton {
+						viewStore.send(.createAccountButtonTapped)
+					}
+					Spacer()
+					Home.VisitHub.View(
+						store: store.scope(
+							state: \.visitHub,
+							action: Home.Action.visitHub
+						)
+					)
+				}
+				.padding(32)
+			}
 		}
 	}
 }

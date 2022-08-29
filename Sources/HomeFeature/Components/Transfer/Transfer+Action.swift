@@ -11,7 +11,6 @@ public extension Home.Transfer {
 public extension Home.Transfer.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
-		case system(SystemAction)
 	}
 }
 
@@ -19,10 +18,6 @@ public extension Home.Transfer.Action.InternalAction {
 	enum UserAction: Equatable {
 		case dismissTransfer
 	}
-}
-
-public extension Home.Transfer.Action.InternalAction {
-	enum SystemAction: Equatable {}
 }
 
 public extension Home.Transfer.Action {

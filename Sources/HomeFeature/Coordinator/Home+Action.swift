@@ -1,3 +1,4 @@
+import CreateAccount
 import Foundation
 
 public extension Home {
@@ -7,8 +8,12 @@ public extension Home {
 		case aggregatedValue(Home.AggregatedValue.Action)
 		case header(Home.Header.Action)
 		case visitHub(Home.VisitHub.Action)
+		case accountPreferences(Home.AccountPreferences.Action)
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
+		case accountDetails(Home.AccountDetails.Action)
+		case transfer(Home.Transfer.Action)
+		case createAccount(CreateAccount.Action)
 	}
 }
 
@@ -27,9 +32,6 @@ public extension Home.Action.InternalAction {
 public extension Home.Action {
 	enum CoordinatingAction: Equatable {
 		case displaySettings
-		case displayVisitHub
-		case displayCreateAccount
-		case displayAccountDetails(Home.AccountRow.State)
 		case copyAddress(Home.AccountRow.State)
 	}
 }

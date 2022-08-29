@@ -1,6 +1,5 @@
 import Common
 import ComposableArchitecture
-import CreateAccount
 import Foundation
 import HomeFeature
 import SettingsFeature
@@ -38,42 +37,6 @@ public extension Main.View {
 				then: Settings.View.init(store:)
 			)
 			.zIndex(1)
-
-			IfLetStore(
-				store.scope(
-					state: \.createAccount,
-					action: Main.Action.createAccount
-				),
-				then: CreateAccount.View.init(store:)
-			)
-			.zIndex(2)
-
-			IfLetStore(
-				store.scope(
-					state: \.account,
-					action: Main.Action.accountDetails
-				),
-				then: Home.AccountDetails.View.init(store:)
-			)
-			.zIndex(3)
-
-			IfLetStore(
-				store.scope(
-					state: \.accountPreferences,
-					action: Main.Action.accountPreferences
-				),
-				then: Home.AccountPreferences.View.init(store:)
-			)
-			.zIndex(4)
-
-			IfLetStore(
-				store.scope(
-					state: \.transfer,
-					action: Main.Action.transfer
-				),
-				then: Home.Transfer.View.init(store:)
-			)
-			.zIndex(4)
 		}
 	}
 }
