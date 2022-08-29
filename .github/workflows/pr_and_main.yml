@@ -17,7 +17,8 @@ jobs:
 
       - name: "Run Lint"
         run: |
-          brew --info
+          brew install swiftformat
+          swiftformat . --lint
 
   unit_tests:
     name: "Unit tests"
