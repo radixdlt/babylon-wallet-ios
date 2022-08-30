@@ -23,6 +23,9 @@ public extension Profile {
 		.init(address: .random,
 		      aggregatedValue: Float.random(in: 100 ... 1_000_000),
 		      name: "Checking"),
+		.init(address: .random,
+		      aggregatedValue: Float.random(in: 100 ... 1_000_000),
+		      name: "Savings"),
 	], isCurrencyAmountVisible: false)
 }
 #endif

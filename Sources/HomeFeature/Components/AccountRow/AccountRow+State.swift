@@ -44,11 +44,11 @@ public extension Home.AccountRow.State {
 }
 
 public extension Home.AccountRow.State {
-	init(profileAccount: Profile.Account) {
+	init(profileAccount: Profile.Account, isCurrencyAmountVisible: Bool) {
 		self.init(
 			address: profileAccount.address,
 			aggregatedValue: profileAccount.aggregatedValue,
-			isValueVisible: false, // FIXME: propagate right value
+			isValueVisible: isCurrencyAmountVisible,
 			currency: .usd, // FIXME: propagate value from profileAccount
 			name: profileAccount.name,
 			tokens: []
@@ -61,17 +61,20 @@ public extension Home.AccountRow.State {
 	static let placeholder: Self = .init(
 		profileAccount: .init(address: .random,
 		                      aggregatedValue: 1_000_000,
-		                      name: "My account")
+		                      name: "My account"),
+		isCurrencyAmountVisible: false
 	)
 
-	static let radnomTokenPlaceholder: Self = .init(
-		address: .random,
-		aggregatedValue: 1_000_000,
-		isValueVisible: false,
-		currency: FiatCurrency.usd,
-		name: "My account",
-		tokens: TokenRandomizer.generateRandomTokens()
-	)
+	/*
+	 static let radnomTokenPlaceholder: Self = .init(
+	 	address: .random,
+	 	aggregatedValue: 1_000_000,
+	 	isValueVisible: false,
+	 	currency: FiatCurrency.usd,
+	 	name: "My account",
+	 	tokens: TokenRandomizer.generateRandomTokens()
+	 )
+	 */
 }
 #endif
 

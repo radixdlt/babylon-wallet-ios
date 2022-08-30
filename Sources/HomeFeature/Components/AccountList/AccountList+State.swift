@@ -13,27 +13,44 @@ public extension Home.AccountList {
 	struct State: Equatable {
 		public var accounts: IdentifiedArrayOf<Home.AccountRow.State>
 		public var alert: AlertState<Action>?
+		public var isCurrencyAmountVisible: Bool
 
 		public init(
 			accounts: IdentifiedArrayOf<Home.AccountRow.State>,
-			alert: AlertState<Action>? = nil
+			alert: AlertState<Action>? = nil,
+			isCurrencyAmountVisible: Bool
 		) {
 			self.accounts = accounts
 			self.alert = alert
+			self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
 	}
 }
 
 public extension Home.AccountList.State {
-	init(profileAccounts: [Profile.Account], alert: AlertState<Home.AccountList.Action>? = nil) {
-		self.init(accounts: .init(uniqueElements: profileAccounts.map(Home.AccountRow.State.init(profileAccount:))),
-		          alert: alert)
+	init(profileAccounts: [Profile.Account],
+	     alert _: AlertState<Home.AccountList.Action>? = nil,
+	     isCurrencyAmountVisible: Bool)
+	{
+//		self.init(accounts: .init(uniqueElements: profileAccounts.map(Home.AccountRow.State.init(profileAccount:))),
+//		          alert: alert,
+//		          isCurrencyAmountVisible: isCurrencyAmountVisible)
+
+		//        self.init(accounts: .init(uniqueElements: profileAccounts.map(Home.AccountRow.State.init(profileAccount:))),
+		//                  alert: alert,
+		//                  isCurrencyAmountVisible: isCurrencyAmountVisible)
+		let accounts = profileAccounts.map {
+			Home.AccountRow.State(profileAccount: $0, isCurrencyAmountVisible: isCurrencyAmountVisible)
+		}
+		self.init(accounts: .init(uniqueElements: accounts),
+		          isCurrencyAmountVisible: isCurrencyAmountVisible)
 	}
 }
 
 #if DEBUG
 public extension Array where Element == Home.AccountRow.State {
-	static let placeholder: Self = [.checking, .savings, .shared, .family, .dummy1, .dummy2, .dummy3]
+//	static let placeholder: Self = [.checking, .savings, .shared, .family, .dummy1, .dummy2, .dummy3]
+	static let placeholder: Self = []
 }
 
 public extension IdentifiedArray where Element == Home.AccountRow.State, ID == Home.AccountRow.State.ID {
@@ -41,67 +58,69 @@ public extension IdentifiedArray where Element == Home.AccountRow.State, ID == H
 }
 
 public extension Home.AccountRow.State {
-	static let checking: Self = .init(
-		address: .random,
-		aggregatedValue: Float.random(in: 100 ... 1_000_000),
-		isValueVisible: false,
-		currency: .usd,
-		name: "Checking",
-		tokens: TokenRandomizer.generateRandomTokens()
-	)
+	/*
+	 static let checking: Self = .init(
+	 	address: .random,
+	 	aggregatedValue: Float.random(in: 100 ... 1_000_000),
+	 	isValueVisible: false,
+	 	currency: .usd,
+	 	name: "Checking",
+	 	tokens: TokenRandomizer.generateRandomTokens()
+	 )
 
-	static let savings: Self = .init(
-		address: .random,
-		aggregatedValue: Float.random(in: 100 ... 1_000_000),
-		isValueVisible: false,
-		currency: .usd,
-		name: "Savings",
-		tokens: TokenRandomizer.generateRandomTokens()
-	)
+	 static let savings: Self = .init(
+	 	address: .random,
+	 	aggregatedValue: Float.random(in: 100 ... 1_000_000),
+	 	isValueVisible: false,
+	 	currency: .usd,
+	 	name: "Savings",
+	 	tokens: TokenRandomizer.generateRandomTokens()
+	 )
 
-	static let shared: Self = .init(
-		address: .random,
-		aggregatedValue: Float.random(in: 100 ... 1_000_000),
-		isValueVisible: false,
-		currency: .usd,
-		name: "Shared",
-		tokens: TokenRandomizer.generateRandomTokens()
-	)
+	 static let shared: Self = .init(
+	 	address: .random,
+	 	aggregatedValue: Float.random(in: 100 ... 1_000_000),
+	 	isValueVisible: false,
+	 	currency: .usd,
+	 	name: "Shared",
+	 	tokens: TokenRandomizer.generateRandomTokens()
+	 )
 
-	static let family: Self = .init(
-		address: .random,
-		aggregatedValue: Float.random(in: 100 ... 1_000_000),
-		isValueVisible: false,
-		currency: .usd,
-		name: "Family",
-		tokens: TokenRandomizer.generateRandomTokens()
-	)
+	 static let family: Self = .init(
+	 	address: .random,
+	 	aggregatedValue: Float.random(in: 100 ... 1_000_000),
+	 	isValueVisible: false,
+	 	currency: .usd,
+	 	name: "Family",
+	 	tokens: TokenRandomizer.generateRandomTokens()
+	 )
 
-	static let dummy1: Self = .init(
-		address: .random,
-		aggregatedValue: Float.random(in: 100 ... 1_000_000),
-		isValueVisible: false,
-		currency: .usd,
-		name: "Dummy 1",
-		tokens: TokenRandomizer.generateRandomTokens()
-	)
+	 static let dummy1: Self = .init(
+	 	address: .random,
+	 	aggregatedValue: Float.random(in: 100 ... 1_000_000),
+	 	isValueVisible: false,
+	 	currency: .usd,
+	 	name: "Dummy 1",
+	 	tokens: TokenRandomizer.generateRandomTokens()
+	 )
 
-	static let dummy2: Self = .init(
-		address: .random,
-		aggregatedValue: Float.random(in: 100 ... 1_000_000),
-		isValueVisible: false,
-		currency: .usd,
-		name: "Dummy 2",
-		tokens: TokenRandomizer.generateRandomTokens()
-	)
+	 static let dummy2: Self = .init(
+	 	address: .random,
+	 	aggregatedValue: Float.random(in: 100 ... 1_000_000),
+	 	isValueVisible: false,
+	 	currency: .usd,
+	 	name: "Dummy 2",
+	 	tokens: TokenRandomizer.generateRandomTokens()
+	 )
 
-	static let dummy3: Self = .init(
-		address: .random,
-		aggregatedValue: Float.random(in: 100 ... 1_000_000),
-		isValueVisible: false,
-		currency: .usd,
-		name: "Dummy 3",
-		tokens: TokenRandomizer.generateRandomTokens()
-	)
+	 static let dummy3: Self = .init(
+	 	address: .random,
+	 	aggregatedValue: Float.random(in: 100 ... 1_000_000),
+	 	isValueVisible: false,
+	 	currency: .usd,
+	 	name: "Dummy 3",
+	 	tokens: TokenRandomizer.generateRandomTokens()
+	 )
+	 */
 }
 #endif

@@ -84,7 +84,12 @@ public extension Home {
 			case .header(.internal(_)):
 				return .none
 
-			case .aggregatedValue:
+			case .aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible)):
+				state.wallet.profile.isCurrencyAmountVisible.toggle()
+				state.aggregatedValue.isVisible = state.wallet.profile.isCurrencyAmountVisible
+				state.accountList.isCurrencyAmountVisible = state.wallet.profile.isCurrencyAmountVisible
+				return .none
+			case .aggregatedValue(.internal(_)):
 				return .none
 
 			case .visitHub(.coordinate(.displayHub)):

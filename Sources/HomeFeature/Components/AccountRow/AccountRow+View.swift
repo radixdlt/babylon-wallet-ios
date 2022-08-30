@@ -31,7 +31,8 @@ public extension Home.AccountRow.View {
 						value: formattedAmmount(
 							viewStore.aggregatedValue ?? 0,
 							currency: viewStore.currency
-						)
+						),
+						isValueVisible: viewStore.isValueVisible
 					)
 
 					AddressView(
@@ -89,6 +90,7 @@ extension Home.AccountRow.View {
 		let tokens: [Home.AccountRow.Token]
 
 		init(state: Home.AccountRow.State) {
+			print("🟢🟢🟢🟢")
 			address = state.address
 			aggregatedValue = state.aggregatedValue
 			isValueVisible = state.isValueVisible
@@ -103,6 +105,7 @@ extension Home.AccountRow.View {
 private struct HeaderView: View {
 	let name: String
 	let value: String
+	let isValueVisible: Bool
 
 	var body: some View {
 		HStack {
@@ -111,7 +114,7 @@ private struct HeaderView: View {
 				.font(.app.buttonTitle)
 				.fixedSize()
 			Spacer()
-			Text(value)
+			Text(isValueVisible ? value : "•••••")
 				.foregroundColor(.app.buttonTextBlack)
 				.font(.app.buttonTitle)
 				.fixedSize()
@@ -193,7 +196,7 @@ struct AccountRow_Preview: PreviewProvider {
 	static var previews: some View {
 		Home.AccountRow.View(
 			store: .init(
-				initialState: .radnomTokenPlaceholder,
+				initialState: .placeholder,
 				reducer: Home.AccountRow.reducer,
 				environment: .init()
 			)

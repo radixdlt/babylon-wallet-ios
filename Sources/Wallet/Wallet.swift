@@ -4,7 +4,7 @@ public typealias Mnemonic = String
 
 // MARK: - Wallet
 public struct Wallet: Equatable {
-	public let profile: Profile
+	public var profile: Profile
 	public let deviceFactorTypeMnemonic: Mnemonic
 
 	public init(

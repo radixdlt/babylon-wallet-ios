@@ -22,7 +22,7 @@ public extension Home {
 			wallet: Wallet,
 			accountDetails: Home.AccountDetails.State? = nil,
 			accountPreferences: Home.AccountPreferences.State? = nil,
-			aggregatedValue: Home.AggregatedValue.State = .init(),
+			aggregatedValue _: Home.AggregatedValue.State = .init(),
 			createAccount: Home.CreateAccount.State? = nil,
 			header: Home.Header.State = .init(),
 			visitHub: Home.VisitHub.State = .init(),
@@ -30,9 +30,12 @@ public extension Home {
 		) {
 			self.wallet = wallet
 			self.accountDetails = accountDetails
-			accountList = .init(profileAccounts: wallet.profile.accounts)
+			accountList = .init(profileAccounts: wallet.profile.accounts,
+			                    isCurrencyAmountVisible: wallet.profile.isCurrencyAmountVisible)
 			self.accountPreferences = accountPreferences
-			self.aggregatedValue = aggregatedValue
+			aggregatedValue = .init(value: 1234,
+			                        currency: .usd,
+			                        isVisible: wallet.profile.isCurrencyAmountVisible)
 			self.createAccount = createAccount
 			self.header = header
 			self.visitHub = visitHub

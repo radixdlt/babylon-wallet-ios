@@ -50,8 +50,7 @@ extension Home.AggregatedValue.View {
 	struct ViewState: Equatable {
 		var isValueVisible: Bool
 		var value: Float?
-		// FIXME: this should be currency, since it can be any currency
-		var currency: FiatCurrency
+		var currency: FiatCurrency // FIXME: this should be currency, since it can be any currency
 
 		init(
 			state: Home.AggregatedValue.State
@@ -103,7 +102,7 @@ private struct AggregatedValueView: View {
 // MARK: - AmountView
 // TODO: extract to separate Feature when view complexity increases
 private struct AmountView: View {
-	let isValueVisible: Bool
+	var isValueVisible: Bool
 	let amount: Float // NOTE: used for copying the actual value
 	let formattedAmount: String
 	let fiatCurrency: FiatCurrency
