@@ -15,16 +15,13 @@ public extension Main {
 	struct State: Equatable {
 		public var home: Home.State
 		public var settings: Settings.State?
-		public var isCurrencyAmountVisible: Bool
 
 		public init(
 			home: Home.State = .placeholder, // TODO: remove placeholder
-			settings: Settings.State? = nil,
-			isCurrencyAmountVisible: Bool = false
+			settings: Settings.State? = nil
 		) {
 			self.home = home
 			self.settings = settings
-			self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
 	}
 }
@@ -33,8 +30,7 @@ public extension Main {
 public extension Main.State {
 	static let placeholder = Self(
 		home: .init(),
-		settings: nil,
-		isCurrencyAmountVisible: false
+		settings: nil
 	)
 }
 #endif
