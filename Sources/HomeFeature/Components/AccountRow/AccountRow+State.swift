@@ -48,7 +48,7 @@ public extension Home.AccountRow.State {
 		self.init(
 			address: profileAccount.address,
 			aggregatedValue: profileAccount.aggregatedValue,
-			isValueVisible: profileAccount.isValueVisible,
+			isValueVisible: false, // FIXME: propagate right value
 			currency: .usd, // FIXME: propagate value from profileAccount
 			name: profileAccount.name,
 			tokens: []
@@ -61,8 +61,6 @@ public extension Home.AccountRow.State {
 	static let placeholder: Self = .init(
 		profileAccount: .init(address: .random,
 		                      aggregatedValue: 1_000_000,
-		                      currency: FiatCurrency.usd.rawValue, // FIXME: use correct type for fiat currency, not String
-		                      isValueVisible: false,
 		                      name: "My account")
 	)
 

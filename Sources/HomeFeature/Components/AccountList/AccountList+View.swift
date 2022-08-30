@@ -31,9 +31,6 @@ public extension Home.AccountList.View {
 					content: Home.AccountRow.View.init(store:)
 				)
 			}
-			.onAppear {
-//				viewStore.send(.viewDidAppear) // FIXME: uncomment once data flow is working to enable previews
-			}
 			.alert(store.scope(state: \.alert), dismiss: .internal(.user(.alertDismissed)))
 		}
 	}
@@ -41,17 +38,12 @@ public extension Home.AccountList.View {
 
 extension Home.AccountList.View {
 	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case viewDidAppear
-	}
+	enum ViewAction: Equatable {}
 }
 
 extension Home.AccountList.Action {
-	init(action: Home.AccountList.View.ViewAction) {
-		switch action {
-		case .viewDidAppear:
-			self = .internal(.system(.viewDidAppear))
-		}
+	init(action _: Home.AccountList.View.ViewAction) {
+		fatalError()
 	}
 }
 
@@ -71,7 +63,7 @@ struct AccountList_Preview: PreviewProvider {
 			store: .init(
 				initialState: .init(accounts: .placeholder, alert: nil),
 				reducer: Home.AccountList.reducer,
-				environment: .init(wallet: .placeholder)
+				environment: .init()
 			)
 		)
 	}

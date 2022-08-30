@@ -6,9 +6,7 @@ public extension Home.Transfer {
 	static let reducer = Reducer { _, action, _ in
 		switch action {
 		case .internal(.user(.dismissTransfer)):
-			return .run { send in
-				await send(.coordinate(.dismissTransfer))
-			}
+			return Effect(value: .coordinate(.dismissTransfer))
 		case .coordinate:
 			return .none
 		}

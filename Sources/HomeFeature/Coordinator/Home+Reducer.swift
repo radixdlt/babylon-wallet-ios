@@ -34,7 +34,7 @@ public extension Home {
 			.pullback(
 				state: \.accountList,
 				action: /Home.Action.accountList,
-				environment: { _ in Home.AccountList.Environment(wallet: .placeholder) } // FIXME: replace wallet placeholder
+				environment: { _ in Home.AccountList.Environment() }
 			),
 
 		Home.AccountDetails.reducer
@@ -80,9 +80,7 @@ public extension Home {
 		Reducer { state, action, _ in
 			switch action {
 			case .header(.coordinate(.displaySettings)):
-				return .run { send in
-					await send(.coordinate(.displaySettings))
-				}
+				return Effect(value: .coordinate(.displaySettings))
 			case .header(.internal(_)):
 				return .none
 
@@ -110,9 +108,7 @@ public extension Home {
 				state.accountDetails = .init(for: account)
 				return .none
 			case let .accountList(.coordinate(.copyAddress(account))):
-				return .run { send in
-					await send(.coordinate(.copyAddress(account)))
-				}
+				return Effect(value: .coordinate(.copyAddress(account)))
 			// TODO: display confirmation popup? discuss with po / designer
 			case .accountList:
 				return .none

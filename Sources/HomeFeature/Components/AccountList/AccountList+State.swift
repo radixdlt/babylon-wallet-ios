@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import Profile
 
 // MARK: - AccountList
 /// Namespace for AccountListFeature
@@ -14,12 +15,19 @@ public extension Home.AccountList {
 		public var alert: AlertState<Action>?
 
 		public init(
-			accounts: IdentifiedArrayOf<Home.AccountRow.State> = [],
+			accounts: IdentifiedArrayOf<Home.AccountRow.State>,
 			alert: AlertState<Action>? = nil
 		) {
 			self.accounts = accounts
 			self.alert = alert
 		}
+	}
+}
+
+public extension Home.AccountList.State {
+	init(profileAccounts: [Profile.Account], alert: AlertState<Home.AccountList.Action>? = nil) {
+		self.init(accounts: .init(uniqueElements: profileAccounts.map(Home.AccountRow.State.init(profileAccount:))),
+		          alert: alert)
 	}
 }
 

@@ -4,21 +4,15 @@ public extension Profile {
 	struct Account: Equatable {
 		public let address: Address
 		public var aggregatedValue: Float
-		public var isValueVisible: Bool
-		public let currency: String // FIXME: use Currency (NOT FiatCurrency) instead of String
 		public let name: String
 
 		public init(
 			address: Address,
 			aggregatedValue: Float,
-			currency: String,
-			isValueVisible: Bool,
 			name: String
 		) {
 			self.address = address
 			self.aggregatedValue = aggregatedValue
-			self.currency = currency
-			self.isValueVisible = isValueVisible
 			self.name = name
 		}
 	}

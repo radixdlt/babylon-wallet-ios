@@ -14,20 +14,12 @@ public extension Home.AccountList {
 public extension Home.AccountList.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
-		case system(SystemAction)
 	}
 }
 
 public extension Home.AccountList.Action.InternalAction {
 	enum UserAction: Equatable {
 		case alertDismissed
-	}
-}
-
-public extension Home.AccountList.Action.InternalAction {
-	enum SystemAction: Equatable {
-		case viewDidAppear
-		case loadAccountResult(TaskResult<[Profile.Account]>)
 	}
 }
 

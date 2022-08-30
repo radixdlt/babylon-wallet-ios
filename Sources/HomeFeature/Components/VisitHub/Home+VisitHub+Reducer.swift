@@ -6,9 +6,7 @@ public extension Home.VisitHub {
 	static let reducer = Reducer { _, action, _ in
 		switch action {
 		case .internal(.user(.visitHubButtonTapped)):
-			return .run { send in
-				await send(.coordinate(.displayHub))
-			}
+			return Effect(value: .coordinate(.displayHub))
 		case .coordinate:
 			return .none
 		}

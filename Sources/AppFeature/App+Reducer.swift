@@ -20,10 +20,7 @@ public extension App {
 				environment: {
 					Main.Environment(
 						userDefaultsClient: $0.userDefaultsClient,
-						pasteboardClient: $0.pasteboardClient,
-						// FIXME: wallet
-						//                        wallet: $0.walletLoader.loadWallet
-						wallet: .placeholder
+						pasteboardClient: $0.pasteboardClient
 					)
 				}
 			),
@@ -69,9 +66,7 @@ public extension App {
 		case .main:
 			return .none
 		case let .onboarding(.coordinate(.onboardedWithWallet(wallet))):
-			// FIXME: wallet
-//			state = .main(.init(wallet: wallet))
-			state = .main(.placeholder)
+			state = .main(.init(home: .init(wallet: wallet)))
 			return Effect(value: .coordinate(.toMain(wallet)))
 		case .onboarding:
 			return .none

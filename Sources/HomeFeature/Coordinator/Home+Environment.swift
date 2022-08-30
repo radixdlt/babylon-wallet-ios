@@ -5,18 +5,12 @@ import Wallet
 public extension Home {
 	// MARK: Environment
 	struct Environment {
-		public var wallet: Wallet
-
-		public init(
-			wallet: Wallet
-		) {
-			self.wallet = wallet
-		}
+		public init() {}
 	}
 }
 
 #if DEBUG
 public extension Home.Environment {
-	static let placeholder = Self(wallet: .placeholder)
+	static let placeholder: Self = .init()
 }
 #endif

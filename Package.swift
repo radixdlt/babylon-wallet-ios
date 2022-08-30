@@ -239,7 +239,6 @@ let package = Package(
 		.target(
 			name: "Wallet",
 			dependencies: [
-				"Common",
 				"Profile",
 				tca,
 			]

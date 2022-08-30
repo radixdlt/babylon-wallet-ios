@@ -1,4 +1,5 @@
 import Foundation
+import Wallet
 
 // MARK: - Home
 /// Namespace for HomeFeature
@@ -7,6 +8,7 @@ public enum Home {}
 public extension Home {
 	// MARK: State
 	struct State: Equatable {
+		public var wallet: Wallet
 		public var accountDetails: Home.AccountDetails.State?
 		public var accountList: Home.AccountList.State
 		public var accountPreferences: Home.AccountPreferences.State?
@@ -17,22 +19,24 @@ public extension Home {
 		public var transfer: Home.Transfer.State?
 
 		public init(
-			account: Home.AccountDetails.State? = nil,
-			accountList: Home.AccountList.State = .init(),
+			wallet: Wallet,
+			accountDetails: Home.AccountDetails.State? = nil,
 			accountPreferences: Home.AccountPreferences.State? = nil,
 			aggregatedValue: Home.AggregatedValue.State = .init(),
 			createAccount: Home.CreateAccount.State? = nil,
 			header: Home.Header.State = .init(),
 			visitHub: Home.VisitHub.State = .init(),
-			transfer _: Home.Transfer.State? = nil
+			transfer: Home.Transfer.State? = nil
 		) {
-			accountDetails = account
-			self.accountList = accountList
+			self.wallet = wallet
+			self.accountDetails = accountDetails
+			accountList = .init(profileAccounts: wallet.profile.accounts)
 			self.accountPreferences = accountPreferences
 			self.aggregatedValue = aggregatedValue
 			self.createAccount = createAccount
 			self.header = header
 			self.visitHub = visitHub
+			self.transfer = transfer
 		}
 	}
 }
@@ -40,7 +44,7 @@ public extension Home {
 #if DEBUG
 public extension Home.State {
 	static let placeholder = Home.State(
-		accountList: .init(accounts: .placeholder),
+		wallet: .placeholder,
 		aggregatedValue: .placeholder,
 		header: .init(hasNotification: false),
 		visitHub: .init()

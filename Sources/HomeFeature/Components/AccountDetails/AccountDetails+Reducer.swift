@@ -14,13 +14,9 @@ public extension Home.AccountDetails {
 		Reducer { state, action, _ in
 			switch action {
 			case .internal(.user(.dismissAccountDetails)):
-				return .run { send in
-					await send(.coordinate(.dismissAccountDetails))
-				}
+				return Effect(value: .coordinate(.dismissAccountDetails))
 			case .internal(.user(.displayAccountPreferences)):
-				return .run { send in
-					await send(.coordinate(.displayAccountPreferences))
-				}
+				return Effect(value: .coordinate(.displayAccountPreferences))
 			case .internal(.user(.copyAddress)):
 				return .run { [address = state.address] send in
 					await send(.coordinate(.copyAddress(address)))
@@ -30,9 +26,7 @@ public extension Home.AccountDetails {
 			case .aggregatedValue:
 				return .none
 			case .internal(.user(.displayTransfer)):
-				return .run { send in
-					await send(.coordinate(.displayTransfer))
-				}
+				return Effect(value: .coordinate(.displayTransfer))
 			}
 		}
 	)
