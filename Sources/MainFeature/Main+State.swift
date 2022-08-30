@@ -17,7 +17,7 @@ public extension Main {
 		public var settings: Settings.State?
 
 		public init(
-			home: Home.State = .placeholder, // TODO: remove placeholder
+			home: Home.State,
 			settings: Settings.State? = nil
 		) {
 			self.home = home
@@ -29,7 +29,7 @@ public extension Main {
 #if DEBUG
 public extension Main.State {
 	static let placeholder = Self(
-		home: .init(),
+		home: .placeholder,
 		settings: nil
 	)
 }
