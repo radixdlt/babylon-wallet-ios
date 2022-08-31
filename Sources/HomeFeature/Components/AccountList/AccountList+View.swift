@@ -62,8 +62,7 @@ struct AccountList_Preview: PreviewProvider {
 		Home.AccountList.View(
 			store: .init(
 				initialState: .init(accounts: .placeholder,
-				                    alert: nil,
-				                    isCurrencyAmountVisible: false),
+				                    alert: nil),
 				reducer: Home.AccountList.reducer,
 				environment: .init()
 			)

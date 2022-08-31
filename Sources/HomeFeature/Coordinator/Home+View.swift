@@ -120,7 +120,7 @@ private extension Home.View {
 						title
 						Home.AggregatedValue.View(
 							store: store.scope(
-								state: \.aggregatedValue,
+								state: \.aggregatedValueSubState,
 								action: Home.Action.aggregatedValue
 							)
 						)
@@ -157,15 +157,17 @@ private extension Home.View {
 	}
 }
 
-// MARK: - HomeView_Previews
-struct HomeView_Previews: PreviewProvider {
-	static var previews: some View {
-		Home.View(
-			store: .init(
-				initialState: .placeholder,
-				reducer: Home.reducer,
-				environment: .placeholder
-			)
-		)
-	}
-}
+/*
+ // MARK: - HomeView_Previews
+ struct HomeView_Previews: PreviewProvider {
+ 	static var previews: some View {
+ 		Home.View(
+ 			store: .init(
+ 				initialState: .placeholder,
+ 				reducer: Home.reducer,
+ 				environment: .placeholder
+ 			)
+ 		)
+ 	}
+ }
+ */

@@ -5,7 +5,7 @@ import SwiftUI
 
 public extension Home.AggregatedValue {
 	struct View: SwiftUI.View {
-		let store: Store<State, Action>
+		let store: Store<Home.AggregatedValueSubState, Action>
 	}
 }
 
@@ -53,11 +53,11 @@ extension Home.AggregatedValue.View {
 		var currency: FiatCurrency // FIXME: this should be currency, since it can be any currency
 
 		init(
-			state: Home.AggregatedValue.State
+			substate: Home.AggregatedValueSubState
 		) {
-			isValueVisible = state.isVisible
-			value = state.value
-			currency = state.currency
+			isValueVisible = substate.isCurrencyAmountVisible
+			value = substate.aggregatedValue.value
+			currency = substate.aggregatedValue.currency
 		}
 	}
 }
@@ -143,15 +143,17 @@ private struct VisibilityButton: View {
 	}
 }
 
-// MARK: - AggregatedValue_Preview
-struct AggregatedValue_Preview: PreviewProvider {
-	static var previews: some View {
-		Home.AggregatedValue.View(
-			store: .init(
-				initialState: .placeholder,
-				reducer: Home.AggregatedValue.reducer,
-				environment: .init()
-			)
-		)
-	}
-}
+/*
+ // MARK: - AggregatedValue_Preview
+ struct AggregatedValue_Preview: PreviewProvider {
+ 	static var previews: some View {
+ 		Home.AggregatedValue.View(
+ 			store: .init(
+ 				initialState: .placeholder,
+ 				reducer: Home.AggregatedValue.reducer,
+ 				environment: .init()
+ 			)
+ 		)
+ 	}
+ }
+ */

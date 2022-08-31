@@ -9,29 +9,40 @@ public extension Home {
 }
 
 public extension Home.AccountList {
+	//    typealias AccountRowSubState = (isCurrencyAmountVisible: Bool, accountRow: Home.AccountRow.State)
+
 	// MARK: State
 	struct State: Equatable {
 		public var accounts: IdentifiedArrayOf<Home.AccountRow.State>
 		public var alert: AlertState<Action>?
-		public var isCurrencyAmountVisible: Bool
+
+		/*
+		 public var accountRowSubState: IdentifiedArrayOf<AccountRowSubState> {
+		     get {
+		         (wallet.profile.isCurrencyAmountVisible, accountRow)
+		     }
+		     set {
+		         wallet.profile.isCurrencyAmountVisible = newValue.isCurrencyAmountVisible
+		         accountRow = newValue.accountRow
+		     }
+		 }
+		 */
 
 		public init(
 			accounts: IdentifiedArrayOf<Home.AccountRow.State>,
-			alert: AlertState<Action>? = nil,
-			isCurrencyAmountVisible: Bool
+			alert: AlertState<Action>? = nil
 		) {
 			self.accounts = accounts
 			self.alert = alert
-			self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
 	}
 }
 
 public extension Home.AccountList.State {
-	init(profileAccounts: [Profile.Account],
-	     alert _: AlertState<Home.AccountList.Action>? = nil,
-	     isCurrencyAmountVisible: Bool)
-	{
+	init(
+		accounts: [Profile.Account],
+		alert _: AlertState<Home.AccountList.Action>? = nil
+	) {
 //		self.init(accounts: .init(uniqueElements: profileAccounts.map(Home.AccountRow.State.init(profileAccount:))),
 //		          alert: alert,
 //		          isCurrencyAmountVisible: isCurrencyAmountVisible)
@@ -39,11 +50,10 @@ public extension Home.AccountList.State {
 		//        self.init(accounts: .init(uniqueElements: profileAccounts.map(Home.AccountRow.State.init(profileAccount:))),
 		//                  alert: alert,
 		//                  isCurrencyAmountVisible: isCurrencyAmountVisible)
-		let accounts = profileAccounts.map {
-			Home.AccountRow.State(profileAccount: $0, isCurrencyAmountVisible: isCurrencyAmountVisible)
+		let accounts = accounts.map {
+			Home.AccountRow.State(account: $0)
 		}
-		self.init(accounts: .init(uniqueElements: accounts),
-		          isCurrencyAmountVisible: isCurrencyAmountVisible)
+		self.init(accounts: .init(uniqueElements: accounts))
 	}
 }
 

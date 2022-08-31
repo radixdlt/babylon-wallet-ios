@@ -54,12 +54,14 @@ public extension Home.AccountDetails.View {
 						}
 					)
 
-					Home.AggregatedValue.View(
-						store: store.scope(
-							state: \.aggregatedValue,
-							action: Home.AccountDetails.Action.aggregatedValue
-						)
-					)
+					/*
+					 Home.AggregatedValue.View(
+					 	store: store.scope(
+					 		state: \.aggregatedValue,
+					 		action: Home.AccountDetails.Action.aggregatedValue
+					 	)
+					 )
+					 */
 
 					Button(action: {
 						viewStore.send(.transferButtonTapped)

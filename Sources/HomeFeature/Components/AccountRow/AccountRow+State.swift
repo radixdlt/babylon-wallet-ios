@@ -12,7 +12,6 @@ public extension Home.AccountRow {
 	struct State: Equatable, Identifiable {
 		public let address: String
 		public let aggregatedValue: Float?
-		public let isValueVisible: Bool
 		public let currency: FiatCurrency
 		public let name: String
 		public let tokens: [Token]
@@ -20,14 +19,12 @@ public extension Home.AccountRow {
 		public init(
 			address: String,
 			aggregatedValue: Float?,
-			isValueVisible: Bool,
 			currency: FiatCurrency,
 			name: String,
 			tokens: [Token]
 		) {
 			self.address = address
 			self.aggregatedValue = aggregatedValue
-			self.isValueVisible = isValueVisible
 			self.currency = currency
 			self.name = name
 			self.tokens = tokens
@@ -44,13 +41,12 @@ public extension Home.AccountRow.State {
 }
 
 public extension Home.AccountRow.State {
-	init(profileAccount: Profile.Account, isCurrencyAmountVisible: Bool) {
+	init(account: Profile.Account) {
 		self.init(
-			address: profileAccount.address,
-			aggregatedValue: profileAccount.aggregatedValue,
-			isValueVisible: isCurrencyAmountVisible,
+			address: account.address,
+			aggregatedValue: account.aggregatedValue,
 			currency: .usd, // FIXME: propagate value from profileAccount
-			name: profileAccount.name,
+			name: account.name,
 			tokens: []
 		)
 	}
@@ -59,10 +55,9 @@ public extension Home.AccountRow.State {
 #if DEBUG
 public extension Home.AccountRow.State {
 	static let placeholder: Self = .init(
-		profileAccount: .init(address: .random,
-		                      aggregatedValue: 1_000_000,
-		                      name: "My account"),
-		isCurrencyAmountVisible: false
+		account: .init(address: .random,
+		               aggregatedValue: 1_000_000,
+		               name: "My account")
 	)
 
 	/*

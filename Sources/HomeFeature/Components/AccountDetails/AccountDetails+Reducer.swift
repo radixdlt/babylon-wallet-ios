@@ -4,12 +4,14 @@ public extension Home.AccountDetails {
 	// MARK: Reducer
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = Reducer.combine(
-		Home.AggregatedValue.reducer
-			.pullback(
-				state: \.aggregatedValue,
-				action: /Home.AccountDetails.Action.aggregatedValue,
-				environment: { _ in Home.AggregatedValue.Environment() }
-			),
+        /*
+        Home.AggregatedValue.reducer
+            .pullback(
+                state: \Home.State.aggregatedValueSubState,
+                action: /Home.AccountDetails.Action.aggregatedValue,
+                environment: { _ in Home.AggregatedValue.Environment() }
+            ),
+        */
 
 		Reducer { state, action, _ in
 			switch action {
