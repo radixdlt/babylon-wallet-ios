@@ -3,11 +3,17 @@ import Foundation
 // FIXME: replace with Currency, it can be any currency
 public enum FiatCurrency: String, Equatable {
 	case usd
+	case gbp
+	case eur
 
 	public var sign: String {
 		switch self {
 		case .usd:
 			return "$"
+		case .gbp:
+			return "£"
+		case .eur:
+			return "€"
 		}
 	}
 

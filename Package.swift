@@ -62,6 +62,13 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "AppSettings",
+			dependencies: [
+				"Common",
+				"UserDefaultsClient",
+			]
+		),
+		.target(
 			name: "Common",
 			dependencies: [
 			]
@@ -77,6 +84,7 @@ let package = Package(
 			name: "HomeFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
+				"AppSettings",
 				"Common",
 				tca,
 				"Wallet",

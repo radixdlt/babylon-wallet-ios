@@ -25,6 +25,9 @@ public extension Home.View {
 		) { viewStore in
 			ZStack {
 				homeView(with: viewStore)
+					.onAppear {
+						viewStore.send(.didAppear)
+					}
 					.zIndex(0)
 
 				IfLetStore(
@@ -71,12 +74,15 @@ extension Home.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case createAccountButtonTapped
+		case didAppear
 	}
 }
 
 extension Home.Action {
 	init(action: Home.View.ViewAction) {
 		switch action {
+		case .didAppear:
+			self = .internal(.system(.viewDidAppear))
 		case .createAccountButtonTapped:
 			self = .internal(.user(.createAccountButtonTapped))
 		}

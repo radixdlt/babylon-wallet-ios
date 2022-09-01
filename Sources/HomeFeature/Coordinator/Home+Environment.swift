@@ -1,11 +1,17 @@
+import AppSettings
 import ComposableArchitecture
 import Foundation
-import Wallet
 
 public extension Home {
 	// MARK: Environment
 	struct Environment {
-		public init() {}
+		public let appSettingsWorker: AppSettingsWorker
+
+		public init(
+			appSettingsWorker: AppSettingsWorker = .init()
+		) {
+			self.appSettingsWorker = appSettingsWorker
+		}
 	}
 }
 

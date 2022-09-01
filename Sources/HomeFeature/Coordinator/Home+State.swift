@@ -2,12 +2,6 @@ import Foundation
 import Profile
 import Wallet
 
-// MARK: - AccountWorth
-public struct AccountWorth: Equatable {
-	public let address: Profile.Account.Address
-	public let worth: Float
-}
-
 // MARK: - Home
 /// Namespace for HomeFeature
 public enum Home {}

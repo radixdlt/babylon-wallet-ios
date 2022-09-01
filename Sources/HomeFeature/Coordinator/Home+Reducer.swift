@@ -77,8 +77,33 @@ public extension Home {
 				}
 			),
 
-		Reducer { state, action, _ in
+		Reducer { state, action, environment in
 			switch action {
+			case .internal(.user(.createAccountButtonTapped)):
+				state.createAccount = .init()
+				return .none
+
+			case .internal(.system(.viewDidAppear)):
+				return .run { send in
+					let currency = environment.appSettingsWorker.loadCurrency()
+					await send(.internal(.system(.currencyLoaded(currency))))
+					let isVisible = environment.appSettingsWorker.loadIsCurrencyAmountVisible()
+					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
+				}
+
+			case let .internal(.system(.currencyLoaded(currency))):
+				state.aggregatedValue.currency = currency
+				// TODO: update other components
+				return .none
+
+			case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
+				state.aggregatedValue.isCurrencyAmountVisible = isVisible
+				// TODO: update other components
+				return .none
+
+			case .coordinate:
+				return .none
+
 			case .header(.coordinate(.displaySettings)):
 				return Effect(value: .coordinate(.displaySettings))
 			case .header(.internal(_)):
@@ -101,11 +126,6 @@ public extension Home {
 				return .none
 				#endif // os(iOS)
 			case .visitHub(.internal(_)):
-				return .none
-			case .internal(.user(.createAccountButtonTapped)):
-				state.createAccount = .init()
-				return .none
-			case .coordinate:
 				return .none
 
 			case let .accountList(.coordinate(.displayAccountDetails(account))):
