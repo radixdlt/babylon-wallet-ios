@@ -37,7 +37,7 @@ import Foundation
 public struct LocalAuthenticationClient {
 	/// The return value (`LocalAuthenticationConfig`) might be `nil` if app goes to background or stuff like that.
 	public typealias QueryConfig = @Sendable () async throws -> LocalAuthenticationConfig
-	// FIXME:
+
 	public var queryConfig: QueryConfig
 
 	public init(queryConfig: @escaping QueryConfig) {
