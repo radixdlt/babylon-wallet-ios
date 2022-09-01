@@ -73,6 +73,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: "Run static analysis and Sonarcloud"
         run: echo "Hello World" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
