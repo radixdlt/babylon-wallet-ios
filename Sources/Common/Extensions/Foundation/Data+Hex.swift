@@ -83,7 +83,6 @@ public extension Data {
 		return map { String(format: format, $0) }.joined()
 	}
 
-	// FIXME:
 	var hex: String {
 		hex()
 	}
@@ -93,9 +92,5 @@ public extension FixedWidthInteger {
 	var data: Data {
 		let data = withUnsafeBytes(of: bigEndian) { Data($0) }
 		return data
-	}
-
-	var symbol: String {
-		rawValue.uppercased()
 	}
 }
