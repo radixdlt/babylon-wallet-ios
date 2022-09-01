@@ -62,7 +62,7 @@ jobs:
 
   static_analysis:
     name: "SonarCloud"
-    runs-on: macos-12
+    runs-on: ubuntu-latest
 
     continue-on-error: true
 
