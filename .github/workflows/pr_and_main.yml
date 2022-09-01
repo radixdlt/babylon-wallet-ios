@@ -8,8 +8,8 @@ on:
 
 jobs:
 
-  lint:
-    name: "Lint"
+  assertFormated:
+    name: "AssertFormated"
     runs-on: macos-12
 
     steps:
@@ -34,31 +34,31 @@ jobs:
         run: |
           swift test
 
-  snapshot_tests:
-    name: "Snapshot tests"
-    runs-on: macos-12
+  # snapshot_tests:
+  #   name: "Snapshot tests"
+  #   runs-on: macos-12
 
-    needs:
-      - lint
+  #   needs:
+  #     - lint
 
-    steps:
-      - uses: actions/checkout@v2
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: "Run snapshot tests"
-        run: echo "Runing snapshot tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
+  #     - name: "Run snapshot tests"
+  #       run: echo "Runing snapshot tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
 
-  ui_tests:
-    name: "UI tests"
-    runs-on: macos-12
+  # ui_tests:
+  #   name: "UI tests"
+  #   runs-on: macos-12
 
-    needs:
-      - lint
+  #   needs:
+  #     - lint
 
-    steps:
-      - uses: actions/checkout@v2
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: "Run UI tests"
-        run: echo "Runing UI tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
+  #     - name: "Run UI tests"
+  #       run: echo "Runing UI tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
 
   static_analysis:
     name: "Static analysis and SonarCloud"
@@ -76,21 +76,3 @@ jobs:
 
       - name: "Run static analysis and Sonarcloud"
         run: echo "Hello World" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
-
-  build:
-
-    name: "Build"
-    runs-on: macos-12
-
-    needs:
-      - static_analysis
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Dump context
-        uses: crazy-max/ghaction-dump-context@v1.2.1
-
-      - name: "Build"
-        run: |
-          swift build
