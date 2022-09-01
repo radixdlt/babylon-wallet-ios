@@ -92,9 +92,7 @@ public extension App {
 			state = .onboarding(.init())
 			return .none
 		case let .coordinate(.toMain(wallet)):
-			// FIXME: wallet
-//			state = .main(.init(wallet: wallet))
-			state = .main(.placeholder)
+            state = .main(.init(home: .init(justA: wallet)))
 			return .none
 		case .internal(.user(.alertDismissed)):
 			state = .alert(nil)

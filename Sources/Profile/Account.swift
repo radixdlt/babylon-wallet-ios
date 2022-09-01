@@ -3,16 +3,13 @@ import Foundation
 public extension Profile {
 	struct Account: Equatable {
 		public let address: Address
-		public var aggregatedValue: Float
 		public let name: String
 
 		public init(
 			address: Address,
-			aggregatedValue: Float,
 			name: String
 		) {
 			self.address = address
-			self.aggregatedValue = aggregatedValue
 			self.name = name
 		}
 	}
