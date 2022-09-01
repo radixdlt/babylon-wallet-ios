@@ -94,4 +94,8 @@ public extension FixedWidthInteger {
 		let data = withUnsafeBytes(of: bigEndian) { Data($0) }
 		return data
 	}
+
+	var symbol: String {
+		rawValue.uppercased()
+	}
 }
