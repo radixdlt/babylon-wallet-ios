@@ -11,34 +11,34 @@ public extension Home {
 public extension Home.AccountList {
 	// MARK: State
 	struct State: Equatable {
-        public var accounts: IdentifiedArrayOf<Home.AccountRow.State>
-        public var alert: AlertState<Action>?
-        
-        // MARK: - AppSettings properties
-        public var currency: FiatCurrency
-        public var isCurrencyAmountVisible: Bool
-        
-        public init(
-            accounts: IdentifiedArrayOf<Home.AccountRow.State>,
-            alert: AlertState<Action>? = nil,
-            currency: FiatCurrency = .usd,
-            isCurrencyAmountVisible: Bool = false
-        ) {
-            self.accounts = accounts
-            self.alert = alert
-            self.currency = currency
-            self.isCurrencyAmountVisible = isCurrencyAmountVisible
-        }
+		public var accounts: IdentifiedArrayOf<Home.AccountRow.State>
+		public var alert: AlertState<Action>?
+
+		// MARK: - AppSettings properties
+		public var currency: FiatCurrency
+		public var isCurrencyAmountVisible: Bool
+
+		public init(
+			accounts: IdentifiedArrayOf<Home.AccountRow.State>,
+			alert: AlertState<Action>? = nil,
+			currency: FiatCurrency = .usd,
+			isCurrencyAmountVisible: Bool = false
+		) {
+			self.accounts = accounts
+			self.alert = alert
+			self.currency = currency
+			self.isCurrencyAmountVisible = isCurrencyAmountVisible
+		}
 	}
 }
 
 // MARK: - Convenience
 public extension Home.AccountList.State {
-    init(just accounts: [Profile.Account]) {
-        self.init(
-            accounts: .init(uniqueElements: accounts.map(Home.AccountRow.State.init(account:)))
-        )
-    }
+	init(just accounts: [Profile.Account]) {
+		self.init(
+			accounts: .init(uniqueElements: accounts.map(Home.AccountRow.State.init(account:)))
+		)
+	}
 }
 
 #if DEBUG

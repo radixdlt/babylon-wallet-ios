@@ -18,7 +18,7 @@ public extension Home {
 
 		Home.AggregatedValue.reducer
 			.pullback(
-				state: \.aggregatedValueSubState,
+				state: \.aggregatedValue,
 				action: /Home.Action.aggregatedValue,
 				environment: { _ in Home.AggregatedValue.Environment() }
 			),
@@ -85,7 +85,8 @@ public extension Home {
 				return .none
 
 			case .aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible)):
-				state.wallet.profile.isCurrencyAmountVisible.toggle()
+				// TODO: use environment dependency AppSettingsFetcher
+				// fetch value, mutate it, update states in subcomponents
 				return .none
 			case .aggregatedValue(.internal(_)):
 				return .none

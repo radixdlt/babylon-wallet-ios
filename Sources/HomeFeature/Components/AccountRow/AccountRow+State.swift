@@ -10,29 +10,29 @@ public extension Home {
 public extension Home.AccountRow {
 	// MARK: State
 	struct State: Equatable, Identifiable {
-        public let name: String
-        public let address: String
-        public let aggregatedValue: Float?
-        public let tokens: [Token]
-        
-        // MARK: - AppSettings properties
-        public let currency: FiatCurrency
-        public let isCurrencyAmountVisible: Bool
+		public let name: String
+		public let address: String
+		public let aggregatedValue: Float?
+		public let tokens: [Token]
+
+		// MARK: - AppSettings properties
+		public let currency: FiatCurrency
+		public let isCurrencyAmountVisible: Bool
 
 		public init(
-            name: String,
-            address: String,
-            aggregatedValue: Float?,
-            tokens: [Token],
-            currency: FiatCurrency,
-            isCurrencyAmountVisible: Bool
+			name: String,
+			address: String,
+			aggregatedValue: Float?,
+			tokens: [Token],
+			currency: FiatCurrency,
+			isCurrencyAmountVisible: Bool
 		) {
-            self.name = name
-            self.address = address
-            self.aggregatedValue = aggregatedValue
-            self.tokens = tokens
-            self.currency = currency
-            self.isCurrencyAmountVisible = isCurrencyAmountVisible
+			self.name = name
+			self.address = address
+			self.aggregatedValue = aggregatedValue
+			self.tokens = tokens
+			self.currency = currency
+			self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
 	}
 }
@@ -41,22 +41,22 @@ public extension Home.AccountRow {
 public extension Home.AccountRow.State {
 	init(account: Profile.Account) {
 		self.init(
-            name: account.name,
-            address: account.address,
-            aggregatedValue: nil,
-            tokens: [],
-            currency: .usd,
-            isCurrencyAmountVisible: false
+			name: account.name,
+			address: account.address,
+			aggregatedValue: nil,
+			tokens: [],
+			currency: .usd,
+			isCurrencyAmountVisible: false
 		)
 	}
 }
 
 public extension Home.AccountRow.State {
-    typealias ID = Profile.Account.Address
+	typealias ID = Profile.Account.Address
 
-    var id: Profile.Account.Address {
-        address
-    }
+	var id: Profile.Account.Address {
+		address
+	}
 }
 
 #if DEBUG

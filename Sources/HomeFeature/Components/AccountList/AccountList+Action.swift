@@ -20,6 +20,7 @@ public extension Home.AccountList.Action {
 public extension Home.AccountList.Action.InternalAction {
 	enum UserAction: Equatable {
 		case alertDismissed
+		case loadAccounts
 	}
 }
 

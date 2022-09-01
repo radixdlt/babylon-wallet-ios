@@ -1,5 +1,6 @@
 import Foundation
 
+// FIXME: replace with Currency, it can be any currency
 public enum FiatCurrency: String, Equatable {
 	case usd
 

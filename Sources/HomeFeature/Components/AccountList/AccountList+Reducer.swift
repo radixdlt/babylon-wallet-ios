@@ -28,6 +28,9 @@ public extension Home.AccountList {
 			case .internal(.user(.alertDismissed)):
 				state.alert = nil
 				return .none
+			case .internal(.user(.loadAccounts)):
+				// FIXME: initiate load accounts
+				return .none
 			}
 		}
 	)

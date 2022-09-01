@@ -11,14 +11,19 @@ public extension Home.AggregatedValue {
 	// MARK: State
 	struct State: Equatable {
 		public var value: Float?
-		public var currency: FiatCurrency // FIXME: this should be currency, since it can be any currency
+
+		// MARK: - AppSettings properties
+		public var currency: FiatCurrency
+		public var isCurrencyAmountVisible: Bool
 
 		public init(
 			value: Float? = nil,
-			currency: FiatCurrency = .usd // FIXME: do not use default parameter
+			currency: FiatCurrency = .usd,
+			isCurrencyAmountVisible: Bool = false
 		) {
 			self.value = value
 			self.currency = currency
+			self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
 	}
 }

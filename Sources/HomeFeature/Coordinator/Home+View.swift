@@ -120,7 +120,7 @@ private extension Home.View {
 						title
 						Home.AggregatedValue.View(
 							store: store.scope(
-								state: \.aggregatedValueSubState,
+								state: \.aggregatedValue,
 								action: Home.Action.aggregatedValue
 							)
 						)
