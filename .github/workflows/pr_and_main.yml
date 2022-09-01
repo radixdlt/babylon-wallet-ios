@@ -61,18 +61,24 @@ jobs:
   #       run: echo "Runing UI tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
 
   static_analysis:
-    name: "Static analysis and SonarCloud"
+    name: "SonarCloud"
     runs-on: macos-12
 
     continue-on-error: true
 
     needs:
       - unit_tests
-      - snapshot_tests
-      - ui_tests
+      # - snapshot_tests
+      # - ui_tests
 
     steps:
       - uses: actions/checkout@v2
 
       - name: "Run static analysis and Sonarcloud"
         run: echo "Hello World" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
