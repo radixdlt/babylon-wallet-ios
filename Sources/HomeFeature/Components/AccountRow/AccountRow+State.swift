@@ -10,53 +10,59 @@ public extension Home {
 public extension Home.AccountRow {
 	// MARK: State
 	struct State: Equatable, Identifiable {
-		public let address: String
-		public let aggregatedValue: Float?
-		public let currency: FiatCurrency
-		public let name: String
-		public let tokens: [Token]
+        public let name: String
+        public let address: String
+        public let aggregatedValue: Float?
+        public let tokens: [Token]
+        
+        // MARK: - AppSettings properties
+        public let currency: FiatCurrency
+        public let isCurrencyAmountVisible: Bool
 
 		public init(
-			address: String,
-			aggregatedValue: Float?,
-			currency: FiatCurrency,
-			name: String,
-			tokens: [Token]
+            name: String,
+            address: String,
+            aggregatedValue: Float?,
+            tokens: [Token],
+            currency: FiatCurrency,
+            isCurrencyAmountVisible: Bool
 		) {
-			self.address = address
-			self.aggregatedValue = aggregatedValue
-			self.currency = currency
-			self.name = name
-			self.tokens = tokens
+            self.name = name
+            self.address = address
+            self.aggregatedValue = aggregatedValue
+            self.tokens = tokens
+            self.currency = currency
+            self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
 	}
 }
 
+// MARK: - Convenience
 public extension Home.AccountRow.State {
-	typealias ID = Profile.Account.Address
-
-	var id: Profile.Account.Address {
-		address
+	init(account: Profile.Account) {
+		self.init(
+            name: account.name,
+            address: account.address,
+            aggregatedValue: nil,
+            tokens: [],
+            currency: .usd,
+            isCurrencyAmountVisible: false
+		)
 	}
 }
 
 public extension Home.AccountRow.State {
-	init(account: Profile.Account) {
-		self.init(
-			address: account.address,
-			aggregatedValue: account.aggregatedValue,
-			currency: .usd, // FIXME: propagate value from profileAccount
-			name: account.name,
-			tokens: []
-		)
-	}
+    typealias ID = Profile.Account.Address
+
+    var id: Profile.Account.Address {
+        address
+    }
 }
 
 #if DEBUG
 public extension Home.AccountRow.State {
 	static let placeholder: Self = .init(
 		account: .init(address: .random,
-		               aggregatedValue: 1_000_000,
 		               name: "My account")
 	)
 

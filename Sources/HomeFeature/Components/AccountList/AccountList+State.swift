@@ -9,52 +9,36 @@ public extension Home {
 }
 
 public extension Home.AccountList {
-	//    typealias AccountRowSubState = (isCurrencyAmountVisible: Bool, accountRow: Home.AccountRow.State)
-
 	// MARK: State
 	struct State: Equatable {
-		public var accounts: IdentifiedArrayOf<Home.AccountRow.State>
-		public var alert: AlertState<Action>?
-
-		/*
-		 public var accountRowSubState: IdentifiedArrayOf<AccountRowSubState> {
-		     get {
-		         (wallet.profile.isCurrencyAmountVisible, accountRow)
-		     }
-		     set {
-		         wallet.profile.isCurrencyAmountVisible = newValue.isCurrencyAmountVisible
-		         accountRow = newValue.accountRow
-		     }
-		 }
-		 */
-
-		public init(
-			accounts: IdentifiedArrayOf<Home.AccountRow.State>,
-			alert: AlertState<Action>? = nil
-		) {
-			self.accounts = accounts
-			self.alert = alert
-		}
+        public var accounts: IdentifiedArrayOf<Home.AccountRow.State>
+        public var alert: AlertState<Action>?
+        
+        // MARK: - AppSettings properties
+        public var currency: FiatCurrency
+        public var isCurrencyAmountVisible: Bool
+        
+        public init(
+            accounts: IdentifiedArrayOf<Home.AccountRow.State>,
+            alert: AlertState<Action>? = nil,
+            currency: FiatCurrency = .usd,
+            isCurrencyAmountVisible: Bool = false
+        ) {
+            self.accounts = accounts
+            self.alert = alert
+            self.currency = currency
+            self.isCurrencyAmountVisible = isCurrencyAmountVisible
+        }
 	}
 }
 
+// MARK: - Convenience
 public extension Home.AccountList.State {
-	init(
-		accounts: [Profile.Account],
-		alert _: AlertState<Home.AccountList.Action>? = nil
-	) {
-//		self.init(accounts: .init(uniqueElements: profileAccounts.map(Home.AccountRow.State.init(profileAccount:))),
-//		          alert: alert,
-//		          isCurrencyAmountVisible: isCurrencyAmountVisible)
-
-		//        self.init(accounts: .init(uniqueElements: profileAccounts.map(Home.AccountRow.State.init(profileAccount:))),
-		//                  alert: alert,
-		//                  isCurrencyAmountVisible: isCurrencyAmountVisible)
-		let accounts = accounts.map {
-			Home.AccountRow.State(account: $0)
-		}
-		self.init(accounts: .init(uniqueElements: accounts))
-	}
+    init(just accounts: [Profile.Account]) {
+        self.init(
+            accounts: .init(uniqueElements: accounts.map(Home.AccountRow.State.init(account:)))
+        )
+    }
 }
 
 #if DEBUG
