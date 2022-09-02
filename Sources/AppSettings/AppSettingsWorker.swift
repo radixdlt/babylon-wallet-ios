@@ -15,18 +15,38 @@ public struct AppSettingsWorker {
 
 // MARK: - Public Methods
 public extension AppSettingsWorker {
+	func saveCurrency(_ currency: FiatCurrency) async {
+		do {
+			let currencyData = try JSONEncoder().encode(currency)
+			await userDefaultsClient.setData(currencyData, Key.currency.rawValue)
+		} catch {
+			print(error.localizedDescription)
+		}
+	}
+
 	func loadCurrency() -> FiatCurrency {
-		// TODO: implement
-		.gbp
+		guard let data = userDefaultsClient.dataForKey(Key.currency.rawValue),
+		      let currency = try? JSONDecoder().decode(FiatCurrency.self, from: data)
+		else {
+			print("Error loading currency")
+			return .usd
+		}
+		return currency
+	}
+
+	func saveIsCurrencyAmountVisible(_ value: Bool) async {
+		await userDefaultsClient.setBool(value, Key.isCurrencyAmountVisible.rawValue)
 	}
 
 	func loadIsCurrencyAmountVisible() -> Bool {
-		// TODO: implement
-		true
+		userDefaultsClient.boolForKey(Key.isCurrencyAmountVisible.rawValue)
 	}
 }
 
 // MARK: - Private Methods
 private extension AppSettingsWorker {
-	// TODO: add fetching from user defaults
+	enum Key: String {
+		case currency
+		case isCurrencyAmountVisible
+	}
 }

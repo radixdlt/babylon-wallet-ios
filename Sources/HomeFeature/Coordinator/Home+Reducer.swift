@@ -110,9 +110,12 @@ public extension Home {
 				return .none
 
 			case .aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible)):
-				// TODO: use environment dependency AppSettingsFetcher
-				// fetch value, mutate it, update states in subcomponents
-				return .none
+				return .run { send in
+					var isVisible = environment.appSettingsWorker.loadIsCurrencyAmountVisible()
+					isVisible.toggle()
+					await environment.appSettingsWorker.saveIsCurrencyAmountVisible(isVisible)
+					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
+				}
 			case .aggregatedValue(.internal(_)):
 				return .none
 
