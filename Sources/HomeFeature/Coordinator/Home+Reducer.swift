@@ -111,7 +111,7 @@ public extension Home {
 			case .header(.coordinate(.displaySettings)):
 				return Effect(value: .coordinate(.displaySettings))
 
-			case .header(.internal(_)):
+			case .header(.internal):
 				return .none
 
 			case .aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible)):
@@ -122,7 +122,7 @@ public extension Home {
 					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
 				}
 
-			case .aggregatedValue(.internal(_)):
+			case .aggregatedValue(.internal):
 				return .none
 
 			case .visitHub(.coordinate(.displayHub)):
@@ -135,7 +135,18 @@ public extension Home {
 				return .none
 				#endif // os(iOS)
 
-			case .visitHub(.internal(_)):
+			case .visitHub(.internal):
+				return .none
+
+			case .accountList(.coordinate(.loadAccounts)):
+                // TODO: implement real total worth fetcher
+				let totalWorth = environment.aggregatedValueWorker.fetchAggregatedValue(profile: state.wallet.profile)
+				state.accountsWorthDictionary = totalWorth
+				state.aggregatedValue.value = totalWorth.map(\.value.worth).reduce(0, +)
+				state.accountList.accounts.forEach {
+					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalWorth[$0.address]?.worth
+				}
+
 				return .none
 
 			case let .accountList(.coordinate(.displayAccountDetails(account))):
@@ -160,7 +171,7 @@ public extension Home {
 				state.accountDetails = nil
 				return .none
 
-			case .accountDetails(.internal(_)):
+			case .accountDetails(.internal):
 				return .none
 
 			case .accountDetails(.coordinate(.displayAccountPreferences)):
@@ -189,9 +200,38 @@ public extension Home {
 				state.createAccount = nil
 				return .none
 
-			case .transfer(.internal(_)):
+			case .transfer(.internal):
 				return .none
 			}
 		}
 	)
 }
+
+import Profile
+
+// MARK: - AggregatedValueWorker
+public struct AggregatedValueWorker {
+	//    let accountWorthFetcher = AccountWorthFetcher()
+
+	public init() {}
+
+	public func fetchAggregatedValue(profile: Profile) -> [Profile.Account.Address: AccountWorth] {
+		var dict = [Profile.Account.Address: AccountWorth]()
+
+		profile.accounts.forEach {
+			dict[$0.address] = fetchAccountWorth($0.address)
+		}
+
+		return dict
+	}
+
+	private func fetchAccountWorth(_ address: Profile.Account.Address) -> AccountWorth {
+		.init(address: address, worth: Float.random(in: 100 ... 1_000_000))
+	}
+}
+
+/*
+ struct AccountWorthFetcher {
+     func fetchTokenWorth(_ token: Token)
+ }
+ */

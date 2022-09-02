@@ -1,5 +1,6 @@
 import Common
 import Foundation
+import Profile
 
 // MARK: - AccountDetails
 /// Namespace for AccountDetailsFeature
@@ -14,7 +15,7 @@ public extension Home.AccountDetails {
 		public var aggregatedValue: Home.AggregatedValue.State
 		public let currency: FiatCurrency
 		public let name: String
-		public let tokens: [Home.AccountRow.Token]
+		public let tokens: [Token]
 
 		public init(for account: Home.AccountRow.State) {
 			address = account.address

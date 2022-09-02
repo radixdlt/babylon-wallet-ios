@@ -29,8 +29,7 @@ public extension Home.AccountList {
 				state.alert = nil
 				return .none
 			case .internal(.user(.loadAccounts)):
-				// FIXME: initiate load accounts
-				return .none
+				return Effect(value: .coordinate(.loadAccounts))
 			}
 		}
 	)

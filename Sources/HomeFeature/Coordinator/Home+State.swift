@@ -12,12 +12,7 @@ public extension Home {
 	// MARK: State
 	struct State: Equatable {
 		public var wallet: Wallet
-		public var accountsWorthDictionary: [Profile.Account.Address: AccountWorth] {
-			didSet {
-				// TODO: this or update the state of all the subcomponents in reducer
-				aggregatedValue.value = accountsWorthDictionary.map(\.value.worth).reduce(0, +)
-			}
-		}
+		public var accountsWorthDictionary: [Profile.Account.Address: AccountWorth]
 
 		// MARK: - Components
 		public var header: Home.Header.State

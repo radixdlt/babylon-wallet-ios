@@ -6,11 +6,14 @@ public extension Home {
 	// MARK: Environment
 	struct Environment {
 		public let appSettingsWorker: AppSettingsWorker
+		public let aggregatedValueWorker: AggregatedValueWorker
 
 		public init(
-			appSettingsWorker: AppSettingsWorker = .init()
+			appSettingsWorker: AppSettingsWorker = .init(),
+			aggregatedValueWorker: AggregatedValueWorker = .init()
 		) {
 			self.appSettingsWorker = appSettingsWorker
+			self.aggregatedValueWorker = aggregatedValueWorker
 		}
 	}
 }

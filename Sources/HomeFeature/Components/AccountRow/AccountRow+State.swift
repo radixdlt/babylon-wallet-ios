@@ -13,7 +13,7 @@ public extension Home.AccountRow {
 	struct State: Equatable, Identifiable {
 		public let name: String
 		public let address: String
-		public let aggregatedValue: Float?
+		public var aggregatedValue: Float?
 		public let tokens: [Token]
 
 		// MARK: - AppSettings properties

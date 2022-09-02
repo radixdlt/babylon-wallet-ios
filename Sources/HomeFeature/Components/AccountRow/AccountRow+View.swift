@@ -87,7 +87,7 @@ extension Home.AccountRow.View {
 		let aggregatedValue: Float?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
-		let tokens: [Home.AccountRow.Token]
+		let tokens: [Token]
 
 		init(state: Home.AccountRow.State) {
 			name = state.name
@@ -169,7 +169,7 @@ private struct TokenView: View {
 
 // MARK: - TokenListView
 private struct TokenListView: View {
-	let tokens: [Home.AccountRow.Token]
+	let tokens: [Token]
 	private let limit = 5
 
 	var body: some View {
