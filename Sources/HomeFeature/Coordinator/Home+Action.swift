@@ -35,6 +35,7 @@ public extension Home.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
 		case currencyLoaded(FiatCurrency)
+		case toggleIsCurrencyAmountVisible
 		case isCurrencyAmountVisibleLoaded(Bool)
 	}
 }

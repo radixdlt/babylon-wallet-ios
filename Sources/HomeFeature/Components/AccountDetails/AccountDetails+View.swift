@@ -109,13 +109,11 @@ extension Home.AccountDetails.View {
 	struct ViewState: Equatable {
 		public let address: String
 		public var aggregatedValue: Home.AggregatedValue.State
-		public let currency: FiatCurrency
 		public let name: String
 
 		init(state: Home.AccountDetails.State) {
 			address = state.address
 			aggregatedValue = state.aggregatedValue
-			currency = state.currency
 			name = state.name
 		}
 	}

@@ -98,11 +98,20 @@ public extension Home {
 				}
 				return .none
 
+			case .internal(.system(.toggleIsCurrencyAmountVisible)):
+				return .run { send in
+					var isVisible = environment.appSettingsWorker.loadIsCurrencyAmountVisible()
+					isVisible.toggle()
+					await environment.appSettingsWorker.saveIsCurrencyAmountVisible(isVisible)
+					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
+				}
+
 			case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
 				state.aggregatedValue.isCurrencyAmountVisible = isVisible
 				state.accountList.accounts.forEach {
 					state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = isVisible
 				}
+				state.accountDetails?.aggregatedValue.isCurrencyAmountVisible = isVisible
 				return .none
 
 			case .coordinate:
@@ -115,12 +124,7 @@ public extension Home {
 				return .none
 
 			case .aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible)):
-				return .run { send in
-					var isVisible = environment.appSettingsWorker.loadIsCurrencyAmountVisible()
-					isVisible.toggle()
-					await environment.appSettingsWorker.saveIsCurrencyAmountVisible(isVisible)
-					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
-				}
+				return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
 
 			case .aggregatedValue(.internal):
 				return .none
@@ -139,7 +143,7 @@ public extension Home {
 				return .none
 
 			case .accountList(.coordinate(.loadAccounts)):
-                // TODO: implement real total worth fetcher
+				// TODO: implement real total worth fetcher
 				let totalWorth = environment.aggregatedValueWorker.fetchAggregatedValue(profile: state.wallet.profile)
 				state.accountsWorthDictionary = totalWorth
 				state.aggregatedValue.value = totalWorth.map(\.value.worth).reduce(0, +)
@@ -189,8 +193,11 @@ public extension Home {
 				state.transfer = .init()
 				return .none
 
-			case .accountDetails(.aggregatedValue(_)):
+			case .accountDetails(.aggregatedValue(.internal(_))):
 				return .none
+
+			case .accountDetails(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))):
+				return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
 
 			case .transfer(.coordinate(.dismissTransfer)):
 				state.transfer = nil

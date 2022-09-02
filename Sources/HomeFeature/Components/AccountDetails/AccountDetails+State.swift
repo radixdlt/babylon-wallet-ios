@@ -13,14 +13,16 @@ public extension Home.AccountDetails {
 	struct State: Equatable {
 		public let address: String
 		public var aggregatedValue: Home.AggregatedValue.State
-		public let currency: FiatCurrency
 		public let name: String
 		public let tokens: [Token]
 
 		public init(for account: Home.AccountRow.State) {
 			address = account.address
-			aggregatedValue = .init(value: account.aggregatedValue)
-			currency = account.currency
+			aggregatedValue = .init(
+				value: account.aggregatedValue,
+				currency: account.currency,
+				isCurrencyAmountVisible: account.isCurrencyAmountVisible
+			)
 			name = account.name
 			tokens = account.tokens
 		}
