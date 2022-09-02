@@ -15,20 +15,12 @@ public extension Home.AccountList {
 		public var accounts: IdentifiedArrayOf<Home.AccountRow.State>
 		public var alert: AlertState<Action>?
 
-		// MARK: - AppSettings properties
-		public var currency: FiatCurrency
-		public var isCurrencyAmountVisible: Bool
-
 		public init(
 			accounts: IdentifiedArrayOf<Home.AccountRow.State>,
-			alert: AlertState<Action>? = nil,
-			currency: FiatCurrency = .usd,
-			isCurrencyAmountVisible: Bool = false
+			alert: AlertState<Action>? = nil
 		) {
 			self.accounts = accounts
 			self.alert = alert
-			self.currency = currency
-			self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
 	}
 }

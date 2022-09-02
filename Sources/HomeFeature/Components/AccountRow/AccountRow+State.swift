@@ -17,8 +17,8 @@ public extension Home.AccountRow {
 		public let tokens: [Token]
 
 		// MARK: - AppSettings properties
-		public let currency: FiatCurrency
-		public let isCurrencyAmountVisible: Bool
+		public var currency: FiatCurrency
+		public var isCurrencyAmountVisible: Bool
 
 		public init(
 			name: String,

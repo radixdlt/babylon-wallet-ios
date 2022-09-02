@@ -32,7 +32,7 @@ public extension Home.AccountRow.View {
 							viewStore.aggregatedValue ?? 0,
 							currency: viewStore.currency
 						),
-						isValueVisible: false // TODO: propagate right value
+						isValueVisible: viewStore.isCurrencyAmountVisible
 					)
 
 					AddressView(
@@ -82,17 +82,19 @@ extension Home.AccountRow.Action {
 extension Home.AccountRow.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
+		let name: String
 		let address: Profile.Account.Address
 		let aggregatedValue: Float?
 		let currency: FiatCurrency
-		let name: String
+		let isCurrencyAmountVisible: Bool
 		let tokens: [Home.AccountRow.Token]
 
 		init(state: Home.AccountRow.State) {
+			name = state.name
 			address = state.address
 			aggregatedValue = state.aggregatedValue
 			currency = state.currency
-			name = state.name
+			isCurrencyAmountVisible = state.isCurrencyAmountVisible
 			tokens = state.tokens
 		}
 	}
