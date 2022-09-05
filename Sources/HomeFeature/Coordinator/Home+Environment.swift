@@ -5,14 +5,14 @@ import Foundation
 public extension Home {
 	// MARK: Environment
 	struct Environment {
-		public let appSettingsWorker: AppSettingsWorker
+		public let appSettingsClient: AppSettingsClient
 		public let aggregatedValueWorker: AggregatedValueWorker
 
 		public init(
-			appSettingsWorker: AppSettingsWorker = .init(),
+			appSettingsClient: AppSettingsClient = .init(),
 			aggregatedValueWorker: AggregatedValueWorker = .init()
 		) {
-			self.appSettingsWorker = appSettingsWorker
+			self.appSettingsClient = appSettingsClient
 			self.aggregatedValueWorker = aggregatedValueWorker
 		}
 	}

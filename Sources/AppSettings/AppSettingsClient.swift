@@ -2,8 +2,8 @@ import Common
 import Foundation
 import UserDefaultsClient
 
-// MARK: - AppSettingsWorker
-public struct AppSettingsWorker {
+// MARK: - AppSettingsClient
+public struct AppSettingsClient {
 	public let userDefaultsClient: UserDefaultsClient
 
 	public init(
@@ -14,7 +14,7 @@ public struct AppSettingsWorker {
 }
 
 // MARK: - Public Methods
-public extension AppSettingsWorker {
+public extension AppSettingsClient {
 	func saveCurrency(_ currency: FiatCurrency) async {
 		do {
 			let currencyData = try JSONEncoder().encode(currency)
@@ -44,7 +44,7 @@ public extension AppSettingsWorker {
 }
 
 // MARK: - Private Methods
-private extension AppSettingsWorker {
+private extension AppSettingsClient {
 	enum Key: String {
 		case currency
 		case isCurrencyAmountVisible
