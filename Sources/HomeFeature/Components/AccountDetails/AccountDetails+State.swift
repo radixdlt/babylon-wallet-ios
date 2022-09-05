@@ -1,6 +1,6 @@
+import AccountValueFetcher
 import Common
 import Foundation
-import Profile
 
 // MARK: - AccountDetails
 /// Namespace for AccountDetailsFeature

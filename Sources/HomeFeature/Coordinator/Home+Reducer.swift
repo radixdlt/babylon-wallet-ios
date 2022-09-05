@@ -1,3 +1,4 @@
+import AccountValueFetcher
 import ComposableArchitecture
 
 #if os(iOS)
@@ -144,11 +145,14 @@ public extension Home {
 
 			case .accountList(.coordinate(.loadAccounts)):
 				// TODO: implement real total worth fetcher
-				let totalWorth = environment.aggregatedValueWorker.fetchAggregatedValue(profile: state.wallet.profile)
+				let totalWorth = environment.accountValueFetcher.fetchTotalWorth(profile: state.wallet.profile)
 				state.accountsWorthDictionary = totalWorth
-				state.aggregatedValue.value = totalWorth.map(\.value.worth).reduce(0, +)
+				state.aggregatedValue.value = totalWorth.compactMap(\.value.worth).reduce(0, +)
 				state.accountList.accounts.forEach {
 					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalWorth[$0.address]?.worth
+
+					let tokens = totalWorth[$0.address]?.tokenContainers.map(\.token) ?? []
+					state.accountList.accounts[id: $0.address]?.tokens = tokens
 				}
 
 				return .none
@@ -213,32 +217,3 @@ public extension Home {
 		}
 	)
 }
-
-import Profile
-
-// MARK: - AggregatedValueWorker
-public struct AggregatedValueWorker {
-	//    let accountWorthFetcher = AccountWorthFetcher()
-
-	public init() {}
-
-	public func fetchAggregatedValue(profile: Profile) -> [Profile.Account.Address: AccountWorth] {
-		var dict = [Profile.Account.Address: AccountWorth]()
-
-		profile.accounts.forEach {
-			dict[$0.address] = fetchAccountWorth($0.address)
-		}
-
-		return dict
-	}
-
-	private func fetchAccountWorth(_ address: Profile.Account.Address) -> AccountWorth {
-		.init(address: address, worth: Float.random(in: 100 ... 1_000_000))
-	}
-}
-
-/*
- struct AccountWorthFetcher {
-     func fetchTokenWorth(_ token: Token)
- }
- */

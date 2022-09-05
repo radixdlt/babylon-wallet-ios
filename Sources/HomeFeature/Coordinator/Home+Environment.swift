@@ -1,3 +1,4 @@
+import AccountValueFetcher
 import AppSettings
 import ComposableArchitecture
 import Foundation
@@ -6,14 +7,14 @@ public extension Home {
 	// MARK: Environment
 	struct Environment {
 		public let appSettingsClient: AppSettingsClient
-		public let aggregatedValueWorker: AggregatedValueWorker
+		public let accountValueFetcher: AccountValueFetcher
 
 		public init(
 			appSettingsClient: AppSettingsClient = .init(),
-			aggregatedValueWorker: AggregatedValueWorker = .init()
+			accountValueFetcher: AccountValueFetcher = .init()
 		) {
 			self.appSettingsClient = appSettingsClient
-			self.aggregatedValueWorker = aggregatedValueWorker
+			self.accountValueFetcher = accountValueFetcher
 		}
 	}
 }

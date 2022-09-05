@@ -4,7 +4,7 @@ import Foundation
 public struct Token: Equatable, Identifiable {
 	public let id = UUID()
 	public let code: Code
-	public let value: Float
+	public let value: Float?
 }
 
 public extension Token {
@@ -34,7 +34,7 @@ public extension Token {
 }
 
 public enum TokenRandomizer {
-	static func generateRandomTokens(_ limit: Int = 10) -> [Token] {
+	public static func generateRandomTokens(_ limit: Int = 10) -> [Token] {
 		(1 ..< .random(in: 1 ... limit)).map { _ in
 			Token(
 				code: Token.Code.allCases.randomElement() ?? .xrd,

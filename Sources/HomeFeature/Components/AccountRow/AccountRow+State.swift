@@ -1,3 +1,4 @@
+import AccountValueFetcher
 import Common
 import Foundation
 import Profile
@@ -14,7 +15,7 @@ public extension Home.AccountRow {
 		public let name: String
 		public let address: String
 		public var aggregatedValue: Float?
-		public let tokens: [Token]
+		public var tokens: [Token]
 
 		// MARK: - AppSettings properties
 		public var currency: FiatCurrency
