@@ -10,12 +10,27 @@ public extension TokenWorthFetcher {
 
 		return Self(
 			fetchWorth: { tokens, currency in
-				var containers = [TokenWorthContainer]()
-				try await tokens.asyncForEach {
-					let worth = try await fetchSingleTokenWorth($0, currency)
-					containers.append(.init(token: $0, valueInCurrency: worth))
-				}
-				return containers
+				try await withThrowingTaskGroup(
+					of: (token: Token, worth: Float?).self,
+					returning: [TokenWorthContainer].self,
+					body: { taskGroup in
+						var containers = [TokenWorthContainer]()
+
+						for token in tokens {
+							taskGroup.addTask {
+								let worth = try await fetchSingleTokenWorth(token, currency)
+								return (token, worth)
+							}
+						}
+
+						for try await result in taskGroup {
+							containers.append(.init(token: result.token, valueInCurrency: result.worth))
+						}
+
+						return containers
+					}
+				)
+
 			}, fetchSingleTokenWorth: fetchSingleTokenWorth
 		)
 	}()
