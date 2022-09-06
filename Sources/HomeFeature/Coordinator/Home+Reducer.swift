@@ -1,4 +1,4 @@
-import AccountValueFetcher
+import AccountWorthFetcher
 import ComposableArchitecture
 
 #if os(iOS)
@@ -115,6 +115,17 @@ public extension Home {
 				state.accountDetails?.aggregatedValue.isCurrencyAmountVisible = isVisible
 				return .none
 
+			case let .internal(.system(.totalWorthLoaded(totalWorth))):
+				state.accountsWorthDictionary = totalWorth
+				state.aggregatedValue.value = totalWorth.compactMap(\.value.worth).reduce(0, +)
+				state.accountList.accounts.forEach {
+					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalWorth[$0.address]?.worth
+
+					let tokens = totalWorth[$0.address]?.tokenContainers.map(\.token) ?? []
+					state.accountList.accounts[id: $0.address]?.tokens = tokens
+				}
+				return .none
+
 			case .coordinate:
 				return .none
 
@@ -144,18 +155,11 @@ public extension Home {
 				return .none
 
 			case .accountList(.coordinate(.loadAccounts)):
-				let addresses = state.wallet.profile.accounts.map(\.address)
-				let totalWorth = environment.accountValueFetcher.fetchWorth(for: addresses)
-				state.accountsWorthDictionary = totalWorth
-				state.aggregatedValue.value = totalWorth.compactMap(\.value.worth).reduce(0, +)
-				state.accountList.accounts.forEach {
-					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalWorth[$0.address]?.worth
-
-					let tokens = totalWorth[$0.address]?.tokenContainers.map(\.token) ?? []
-					state.accountList.accounts[id: $0.address]?.tokens = tokens
+				return .run { [state = state] send in
+					let addresses = state.wallet.profile.accounts.map(\.address)
+					let totalWorth = try await environment.accountWorthFetcher.fetchWorth(addresses)
+					await send(.internal(.system(.totalWorthLoaded(totalWorth))))
 				}
-
-				return .none
 
 			case let .accountList(.coordinate(.displayAccountDetails(account))):
 				state.accountDetails = .init(for: account)

@@ -37,7 +37,7 @@ let package = Package(
 		// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
 		.target(name: "_BuildTools"),
 		.target(
-			name: "AccountValueFetcher",
+			name: "AccountWorthFetcher",
 			dependencies: [
 				"AppSettings",
 				"Profile",
@@ -90,7 +90,7 @@ let package = Package(
 			name: "HomeFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
-				"AccountValueFetcher",
+				"AccountWorthFetcher",
 				"AppSettings",
 				"Common",
 				tca,

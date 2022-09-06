@@ -1,4 +1,4 @@
-import AccountValueFetcher
+import AccountWorthFetcher
 import Foundation
 import Profile
 import Wallet
@@ -7,13 +7,13 @@ import Wallet
 /// Namespace for HomeFeature
 public enum Home {}
 
-public extension Home {
-	typealias AccountsWorthDictionary = [Profile.Account.Address: AccountPortfolioWorth]
+public typealias AccountsWorthDictionary = [Profile.Account.Address: AccountPortfolioWorth]
 
+public extension Home {
 	// MARK: State
 	struct State: Equatable {
 		public var wallet: Wallet
-		public var accountsWorthDictionary: [Profile.Account.Address: AccountPortfolioWorth]
+		public var accountsWorthDictionary: AccountsWorthDictionary
 
 		// MARK: - Components
 		public var header: Home.Header.State

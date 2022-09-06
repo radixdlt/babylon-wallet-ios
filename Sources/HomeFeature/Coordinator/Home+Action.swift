@@ -1,5 +1,6 @@
 import Common
 import Foundation
+import Profile
 
 public extension Home {
 	// MARK: Action
@@ -37,6 +38,7 @@ public extension Home.Action.InternalAction {
 		case currencyLoaded(FiatCurrency)
 		case toggleIsCurrencyAmountVisible
 		case isCurrencyAmountVisibleLoaded(Bool)
+		case totalWorthLoaded(AccountsWorthDictionary)
 	}
 }
 

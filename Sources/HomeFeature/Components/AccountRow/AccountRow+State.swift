@@ -1,4 +1,4 @@
-import AccountValueFetcher
+import AccountWorthFetcher
 import Common
 import Foundation
 import Profile
