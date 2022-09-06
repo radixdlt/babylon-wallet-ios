@@ -23,8 +23,7 @@ public extension AccountWorthFetcher {
 					let address = $0.key
 					let tokens = $0.value
 					let tokenContainers = try await tokenWorthFetcher.fetchWorth(tokens, currency)
-					let worth = tokenContainers.compactMap(\.valueInCurrency).reduce(0, +)
-					totalWorth[address] = .init(worth: worth, tokenContainers: tokenContainers)
+					totalWorth[address] = .init(tokenContainers: tokenContainers)
 				}
 
 				return totalWorth
