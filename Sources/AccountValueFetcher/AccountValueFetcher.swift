@@ -22,12 +22,12 @@ public struct AccountValueFetcher {
 
 // MARK: - Public Methods
 public extension AccountValueFetcher {
-	func fetchTotalWorth(profile: Profile) -> [Profile.Account.Address: AccountPortfolioWorth] {
+	func fetchWorth(for addresses: [Profile.Account.Address]) -> [Profile.Account.Address: AccountPortfolioWorth] {
 		var totalWorth = [Profile.Account.Address: AccountPortfolioWorth]()
 
 		var portfolioDictionary = [Profile.Account.Address: [Token]]()
-		profile.accounts.forEach {
-			portfolioDictionary[$0.address] = tokenFetcher.fetchTokens(for: $0.address)
+		addresses.forEach {
+			portfolioDictionary[$0] = tokenFetcher.fetchTokens(for: $0)
 		}
 
 		let currency = appSettingsClient.loadCurrency()

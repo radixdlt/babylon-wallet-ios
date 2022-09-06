@@ -144,8 +144,8 @@ public extension Home {
 				return .none
 
 			case .accountList(.coordinate(.loadAccounts)):
-				// TODO: implement real total worth fetcher
-				let totalWorth = environment.accountValueFetcher.fetchTotalWorth(profile: state.wallet.profile)
+				let addresses = state.wallet.profile.accounts.map(\.address)
+				let totalWorth = environment.accountValueFetcher.fetchWorth(for: addresses)
 				state.accountsWorthDictionary = totalWorth
 				state.aggregatedValue.value = totalWorth.compactMap(\.value.worth).reduce(0, +)
 				state.accountList.accounts.forEach {
