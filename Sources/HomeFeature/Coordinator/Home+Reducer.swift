@@ -126,13 +126,13 @@ public extension Home {
 				}
 				return .none
 
-            case let .internal(.system(.copyAddress(address))):
-                // TODO: display confirmation popup? discuss with po / designer
-                return .run { _ in
-                    environment.pasteboardClient.copyString(address)
-                }
-                
-            case .coordinate:
+			case let .internal(.system(.copyAddress(address))):
+				// TODO: display confirmation popup? discuss with po / designer
+				return .run { _ in
+					environment.pasteboardClient.copyString(address)
+				}
+
+			case .coordinate:
 				return .none
 
 			case .header(.coordinate(.displaySettings)):

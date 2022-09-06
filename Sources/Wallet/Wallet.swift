@@ -18,7 +18,6 @@ public struct Wallet: Equatable {
 
 #if DEBUG
 public extension Wallet {
-	static let noop: Wallet = .init(profile: .init(), deviceFactorTypeMnemonic: "")
 	static let placeholder: Wallet = .init(profile: .placeholder, deviceFactorTypeMnemonic: "")
 }
 #endif
