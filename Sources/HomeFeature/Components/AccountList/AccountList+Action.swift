@@ -27,7 +27,7 @@ public extension Home.AccountList.Action.InternalAction {
 public extension Home.AccountList.Action {
 	enum CoordinatingAction: Equatable {
 		case displayAccountDetails(Home.AccountRow.State)
-		case copyAddress(Home.AccountRow.State)
+		case copyAddress(Profile.Account.Address)
 		case loadAccounts
 	}
 }

@@ -20,8 +20,8 @@ public extension Main {
 			.pullback(
 				state: \.home,
 				action: /Main.Action.home,
-				environment: { _ in
-					Home.Environment()
+				environment: {
+					Home.Environment(pasteboardClient: $0.pasteboardClient)
 				}
 			),
 
@@ -53,13 +53,9 @@ public extension Main {
 			case .settings(.coordinate(.dismissSettings)):
 				state.settings = nil
 				return .none
+
 			case .settings(.internal(_)):
 				return .none
-
-			case let .home(.coordinate(.copyAddress(account))):
-				return .run { _ in
-					environment.pasteboardClient.copyString(account.address)
-				}
 
 			case .home(.internal(_)):
 				return .none

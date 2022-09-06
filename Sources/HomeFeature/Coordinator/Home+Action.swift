@@ -39,12 +39,12 @@ public extension Home.Action.InternalAction {
 		case toggleIsCurrencyAmountVisible
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case totalWorthLoaded(AccountsWorthDictionary)
+		case copyAddress(Profile.Account.Address)
 	}
 }
 
 public extension Home.Action {
 	enum CoordinatingAction: Equatable {
 		case displaySettings
-		case copyAddress(Home.AccountRow.State)
 	}
 }

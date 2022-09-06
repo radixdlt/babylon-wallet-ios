@@ -21,7 +21,7 @@ public extension Home.AccountList {
 				}
 				switch action {
 				case .internal(.user(.copyAddress)):
-					return Effect(value: .coordinate(.copyAddress(account)))
+					return Effect(value: .coordinate(.copyAddress(account.address)))
 				case .internal(.user(.didSelect)):
 					return Effect(value: .coordinate(.displayAccountDetails(account)))
 				}

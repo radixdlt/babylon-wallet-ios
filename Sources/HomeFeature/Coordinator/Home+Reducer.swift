@@ -126,7 +126,13 @@ public extension Home {
 				}
 				return .none
 
-			case .coordinate:
+            case let .internal(.system(.copyAddress(address))):
+                // TODO: display confirmation popup? discuss with po / designer
+                return .run { _ in
+                    environment.pasteboardClient.copyString(address)
+                }
+                
+            case .coordinate:
 				return .none
 
 			case .header(.coordinate(.displaySettings)):
@@ -165,9 +171,8 @@ public extension Home {
 				state.accountDetails = .init(for: account)
 				return .none
 
-			case let .accountList(.coordinate(.copyAddress(account))):
-				return Effect(value: .coordinate(.copyAddress(account)))
-			// TODO: display confirmation popup? discuss with po / designer
+			case let .accountList(.coordinate(.copyAddress(address))):
+				return Effect(value: .internal(.system(.copyAddress(address))))
 
 			case .accountList:
 				return .none
@@ -190,13 +195,9 @@ public extension Home {
 				state.accountPreferences = .init()
 				return .none
 
-			case .accountDetails(.coordinate(.copyAddress(_))):
-				// TODO: how to handle this? + remove pasteboardClient from main environment
-				//                return .run { _ in
-				//                    environment.pasteboardClient.copyString(address)
-				//                }
+			case let .accountDetails(.coordinate(.copyAddress(address))):
+				return Effect(value: .internal(.system(.copyAddress(address))))
 
-				return .none
 			case .accountDetails(.coordinate(.displayTransfer)):
 				state.transfer = .init()
 				return .none
