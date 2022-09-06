@@ -12,7 +12,7 @@ public struct AccountValueFetcher {
 	public init(
 		tokenFetcher: TokenFetcher = .init(),
 		tokenWorthFetcher: TokenWorthFetcher = .init(),
-		appSettingsClient: AppSettingsClient = .init()
+		appSettingsClient: AppSettingsClient = .live()
 	) {
 		self.tokenFetcher = tokenFetcher
 		self.tokenWorthFetcher = tokenWorthFetcher
@@ -30,7 +30,8 @@ public extension AccountValueFetcher {
 			portfolioDictionary[$0] = tokenFetcher.fetchTokens(for: $0)
 		}
 
-		let currency = appSettingsClient.loadCurrency()
+//		let currency = appSettingsClient.loadCurrency()
+		let currency = FiatCurrency.usd
 
 		portfolioDictionary.forEach {
 			let address = $0.key

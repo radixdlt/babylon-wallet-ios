@@ -10,7 +10,7 @@ public extension Home {
 		public let accountValueFetcher: AccountValueFetcher
 
 		public init(
-			appSettingsClient: AppSettingsClient = .init(),
+			appSettingsClient: AppSettingsClient = .live(),
 			accountValueFetcher: AccountValueFetcher = .init()
 		) {
 			self.appSettingsClient = appSettingsClient

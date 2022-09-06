@@ -86,9 +86,9 @@ public extension Home {
 
 			case .internal(.system(.viewDidAppear)):
 				return .run { send in
-					let currency = environment.appSettingsClient.loadCurrency()
+					let currency = try await environment.appSettingsClient.loadCurrency()
 					await send(.internal(.system(.currencyLoaded(currency))))
-					let isVisible = environment.appSettingsClient.loadIsCurrencyAmountVisible()
+					let isVisible = try await environment.appSettingsClient.loadIsCurrencyAmountVisible()
 					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
 				}
 
@@ -101,9 +101,9 @@ public extension Home {
 
 			case .internal(.system(.toggleIsCurrencyAmountVisible)):
 				return .run { send in
-					var isVisible = environment.appSettingsClient.loadIsCurrencyAmountVisible()
+					var isVisible = try await environment.appSettingsClient.loadIsCurrencyAmountVisible()
 					isVisible.toggle()
-					await environment.appSettingsClient.saveIsCurrencyAmountVisible(isVisible)
+					try await environment.appSettingsClient.saveIsCurrencyAmountVisible(isVisible)
 					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
 				}
 
