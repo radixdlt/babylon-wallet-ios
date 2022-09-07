@@ -30,7 +30,7 @@ public extension AccountWorthFetcher {
 					}
 				)
 
-				let currency = try await appSettingsClient.loadCurrency()
+				let currency = try await appSettingsClient.loadSettings().currency
 
 				let totalWorth = try await withThrowingTaskGroup(
 					of: (address: Profile.Account.Address, tokenContainers: [TokenWorthContainer]).self,

@@ -86,10 +86,11 @@ public extension Home {
 
 			case .internal(.system(.viewDidAppear)):
 				return .run { send in
-					let currency = try await environment.appSettingsClient.loadCurrency()
-					await send(.internal(.system(.currencyLoaded(currency))))
-					let isVisible = try await environment.appSettingsClient.loadIsCurrencyAmountVisible()
-					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
+					let settings = try await environment.appSettingsClient.loadSettings()
+					await send(.internal(.system(.currencyLoaded(settings.currency))))
+					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(settings.isCurrencyAmountVisible))))
+				} catch: { error, send in
+					await send(.internal(.system(.errorOccured(reason: String(describing: error)))))
 				}
 
 			case let .internal(.system(.currencyLoaded(currency))):
@@ -101,10 +102,12 @@ public extension Home {
 
 			case .internal(.system(.toggleIsCurrencyAmountVisible)):
 				return .run { send in
-					var isVisible = try await environment.appSettingsClient.loadIsCurrencyAmountVisible()
+					var isVisible = try await environment.appSettingsClient.loadSettings().isCurrencyAmountVisible
 					isVisible.toggle()
 					try await environment.appSettingsClient.saveIsCurrencyAmountVisible(isVisible)
 					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
+				} catch: { error, send in
+					await send(.internal(.system(.errorOccured(reason: String(describing: error)))))
 				}
 
 			case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
@@ -131,6 +134,10 @@ public extension Home {
 				return .run { _ in
 					environment.pasteboardClient.copyString(address)
 				}
+
+			case let .internal(.system(.errorOccured(reason: reason))):
+				print(reason)
+				return .none
 
 			case .coordinate:
 				return .none

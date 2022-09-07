@@ -4,8 +4,8 @@ import UserDefaultsClient
 
 // MARK: - AppSettingsClient
 public struct AppSettingsClient {
-	var saveSettings: SaveSettings
-	var loadSettings: LoadSettings
+	public var saveSettings: SaveSettings
+	public var loadSettings: LoadSettings
 
 	public init(
 		saveSettings: @escaping SaveSettings,
@@ -24,20 +24,10 @@ public extension AppSettingsClient {
 
 // MARK: - Public Methods
 public extension AppSettingsClient {
-	func loadCurrency() async throws -> FiatCurrency {
-		let settings = try await loadSettings()
-		return settings.currency
-	}
-
 	func saveCurrency(currency: FiatCurrency) async throws {
 		try await updating {
 			$0.currency = currency
 		}
-	}
-
-	func loadIsCurrencyAmountVisible() async throws -> Bool {
-		let settings = try await loadSettings()
-		return settings.isCurrencyAmountVisible
 	}
 
 	func saveIsCurrencyAmountVisible(_ isCurrencyAmountVisible: Bool) async throws {
@@ -58,7 +48,7 @@ private extension AppSettingsClient {
 
 // MARK: - Public Types
 public extension AppSettingsClient {
-	enum AppSettingsClientError: Error {
+	enum ClientError: Error, LocalizedError {
 		case loadSettingsFailed
 		case saveSettingsFailed
 	}
