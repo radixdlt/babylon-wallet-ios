@@ -120,6 +120,7 @@ let package = Package(
 			name: "MainFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
+				"AccountWorthFetcher",
 				"Common",
 				"HomeFeature",
 				"PasteboardClient",

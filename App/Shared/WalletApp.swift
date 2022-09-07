@@ -12,6 +12,8 @@ public extension App.Environment {
 		return Self(
 			backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
 			mainQueue: .main,
+			appSettingsClient: .live(),
+			accountWorthFetcher: .live(),
 			pasteboardClient: .live(),
 			profileLoader: .live(userDefaultsClient: userDefaultsClient),
 			userDefaultsClient: userDefaultsClient,

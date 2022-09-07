@@ -19,6 +19,8 @@ public extension App {
 				action: /Action.main,
 				environment: {
 					Main.Environment(
+						appSettingsClient: $0.appSettingsClient,
+						accountWorthFetcher: $0.accountWorthFetcher,
 						userDefaultsClient: $0.userDefaultsClient,
 						pasteboardClient: $0.pasteboardClient
 					)

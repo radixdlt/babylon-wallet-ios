@@ -12,8 +12,8 @@ public extension Home {
 		public let pasteboardClient: PasteboardClient
 
 		public init(
-			appSettingsClient: AppSettingsClient = .live(),
-			accountWorthFetcher: AccountWorthFetcher = .live(),
+			appSettingsClient: AppSettingsClient,
+			accountWorthFetcher: AccountWorthFetcher,
 			pasteboardClient: PasteboardClient
 		) {
 			self.appSettingsClient = appSettingsClient
@@ -25,6 +25,10 @@ public extension Home {
 
 #if DEBUG
 public extension Home.Environment {
-	static let placeholder: Self = .init(pasteboardClient: .noop)
+	static let placeholder: Self = .init(
+		appSettingsClient: .mock,
+		accountWorthFetcher: .mock,
+		pasteboardClient: .noop
+	)
 }
 #endif

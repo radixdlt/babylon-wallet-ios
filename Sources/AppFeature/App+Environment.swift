@@ -1,3 +1,5 @@
+import AccountWorthFetcher
+import AppSettings
 import Common
 import ComposableArchitecture
 import MainFeature
@@ -14,6 +16,8 @@ public extension App {
 	struct Environment {
 		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
 		public let mainQueue: AnySchedulerOf<DispatchQueue>
+		public let appSettingsClient: AppSettingsClient
+		public let accountWorthFetcher: AccountWorthFetcher
 		public let pasteboardClient: PasteboardClient
 		public let profileLoader: ProfileLoader
 		public let userDefaultsClient: UserDefaultsClient
@@ -22,6 +26,8 @@ public extension App {
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
 			mainQueue: AnySchedulerOf<DispatchQueue>,
+			appSettingsClient: AppSettingsClient,
+			accountWorthFetcher: AccountWorthFetcher,
 			pasteboardClient: PasteboardClient,
 			profileLoader: ProfileLoader,
 			userDefaultsClient: UserDefaultsClient,
@@ -29,6 +35,8 @@ public extension App {
 		) {
 			self.backgroundQueue = backgroundQueue
 			self.mainQueue = mainQueue
+			self.appSettingsClient = appSettingsClient
+			self.accountWorthFetcher = accountWorthFetcher
 			self.pasteboardClient = pasteboardClient
 			self.profileLoader = profileLoader
 			self.userDefaultsClient = userDefaultsClient
@@ -42,6 +50,8 @@ public extension App.Environment {
 	static let noop = Self(
 		backgroundQueue: .immediate,
 		mainQueue: .immediate,
+		appSettingsClient: .mock,
+		accountWorthFetcher: .mock,
 		pasteboardClient: .noop,
 		profileLoader: .noop,
 		userDefaultsClient: .noop,

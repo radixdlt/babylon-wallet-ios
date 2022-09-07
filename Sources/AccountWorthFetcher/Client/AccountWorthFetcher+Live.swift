@@ -34,7 +34,7 @@ public extension AccountWorthFetcher {
 
 				let totalWorth = try await withThrowingTaskGroup(
 					of: (address: Profile.Account.Address, tokenContainers: [TokenWorthContainer]).self,
-					returning: [Profile.Account.Address: AccountPortfolioWorth].self,
+					returning: AccountsWorth.self,
 					body: { taskGroup in
 						for element in portfolioDictionary {
 							taskGroup.addTask {
@@ -45,7 +45,7 @@ public extension AccountWorthFetcher {
 							}
 						}
 
-						var totalWorth = [Profile.Account.Address: AccountPortfolioWorth]()
+						var totalWorth = AccountsWorth()
 						for try await result in taskGroup {
 							totalWorth[result.address] = .init(tokenContainers: result.tokenContainers)
 						}

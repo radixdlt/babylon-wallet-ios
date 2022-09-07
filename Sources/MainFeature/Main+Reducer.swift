@@ -21,7 +21,11 @@ public extension Main {
 				state: \.home,
 				action: /Main.Action.home,
 				environment: {
-					Home.Environment(pasteboardClient: $0.pasteboardClient)
+					Home.Environment(
+						appSettingsClient: $0.appSettingsClient,
+						accountWorthFetcher: $0.accountWorthFetcher,
+						pasteboardClient: $0.pasteboardClient
+					)
 				}
 			),
 
