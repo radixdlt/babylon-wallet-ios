@@ -4,8 +4,22 @@ import UserDefaultsClient
 
 // MARK: - AppSettingsClient
 public struct AppSettingsClient {
-	var saveSettings: @Sendable (AppSettings) async throws -> Void
-	var loadSettings: @Sendable () async throws -> AppSettings
+	var saveSettings: SaveSettings
+	var loadSettings: LoadSettings
+
+	public init(
+		saveSettings: @escaping SaveSettings,
+		loadSettings: @escaping LoadSettings
+	) {
+		self.saveSettings = saveSettings
+		self.loadSettings = loadSettings
+	}
+}
+
+// MARK: - Typealias
+public extension AppSettingsClient {
+	typealias SaveSettings = @Sendable (AppSettings) async throws -> Void
+	typealias LoadSettings = @Sendable () async throws -> AppSettings
 }
 
 // MARK: - Public Methods
@@ -42,7 +56,15 @@ private extension AppSettingsClient {
 	}
 }
 
-// MARK: - Private Types
+// MARK: - Public Types
+public extension AppSettingsClient {
+	enum AppSettingsClientError: Error {
+		case loadSettingsFailed
+		case saveSettingsFailed
+	}
+}
+
+// MARK: - Internal Types
 extension AppSettingsClient {
 	enum Key: String {
 		case appSettings

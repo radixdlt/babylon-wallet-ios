@@ -3,7 +3,7 @@ import Foundation
 
 public extension TokenWorthFetcher {
 	static let live: Self = {
-		let fetchSingleTokenWorth: @Sendable (Token, FiatCurrency) async throws -> Float? = { _, _ in
+		let fetchSingleTokenWorth: FetchSingleTokenWorth = { _, _ in
 			// TODO: replace with real implementation when API is ready
 			.random(in: 0 ... 10000)
 		}
