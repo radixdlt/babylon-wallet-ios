@@ -40,7 +40,7 @@ public extension Home.Action.InternalAction {
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case totalWorthLoaded(AccountsWorthDictionary)
 		case copyAddress(Profile.Account.Address)
-		case errorOccured(reason: String)
+		case failedToLoadSettings(reason: String)
 	}
 }
 

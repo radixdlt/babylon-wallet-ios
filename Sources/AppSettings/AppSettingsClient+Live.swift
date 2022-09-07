@@ -4,7 +4,7 @@ import UserDefaultsClient
 public extension AppSettingsClient {
 	static func live(
 		userDefaultsClient: UserDefaultsClient = .live(),
-		defaultSettings: AppSettings = .default
+		initialSettingsToPersist: AppSettings? = .default
 	) -> Self {
 		let saveSettings: SaveSettings = { appSettings in
 			let data = try JSONEncoder().encode(appSettings)
@@ -14,8 +14,11 @@ public extension AppSettingsClient {
 		let loadSettings: LoadSettings = {
 			guard let data = userDefaultsClient.dataForKey(Key.appSettings.rawValue)
 			else {
-				try await saveSettings(defaultSettings)
-				return defaultSettings
+				guard let settings = initialSettingsToPersist else {
+					throw AppSettingsClient.Error.loadSettingsFailed
+				}
+				try await saveSettings(settings)
+				return settings
 			}
 			return try JSONDecoder().decode(AppSettings.self, from: data)
 		}

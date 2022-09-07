@@ -48,7 +48,7 @@ private extension AppSettingsClient {
 
 // MARK: - Public Types
 public extension AppSettingsClient {
-	enum ClientError: Error, LocalizedError {
+	enum Error: Swift.Error, LocalizedError {
 		case loadSettingsFailed
 		case saveSettingsFailed
 	}

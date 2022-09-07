@@ -90,7 +90,7 @@ public extension Home {
 					await send(.internal(.system(.currencyLoaded(settings.currency))))
 					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(settings.isCurrencyAmountVisible))))
 				} catch: { error, send in
-					await send(.internal(.system(.errorOccured(reason: String(describing: error)))))
+					await send(.internal(.system(.failedToLoadSettings(reason: String(describing: error)))))
 				}
 
 			case let .internal(.system(.currencyLoaded(currency))):
@@ -107,7 +107,7 @@ public extension Home {
 					try await environment.appSettingsClient.saveIsCurrencyAmountVisible(isVisible)
 					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
 				} catch: { error, send in
-					await send(.internal(.system(.errorOccured(reason: String(describing: error)))))
+					await send(.internal(.system(.failedToLoadSettings(reason: String(describing: error)))))
 				}
 
 			case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
@@ -135,7 +135,7 @@ public extension Home {
 					environment.pasteboardClient.copyString(address)
 				}
 
-			case let .internal(.system(.errorOccured(reason: reason))):
+			case let .internal(.system(.failedToLoadSettings(reason: reason))):
 				print(reason)
 				return .none
 
