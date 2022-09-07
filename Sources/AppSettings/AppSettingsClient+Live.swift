@@ -4,7 +4,7 @@ import UserDefaultsClient
 public extension AppSettingsClient {
 	static func live(
 		userDefaultsClient: UserDefaultsClient = .live(),
-		defaultSettings: AppSettings = .defaults
+		defaultSettings: AppSettings = .default
 	) -> Self {
 		let saveSettings: SaveSettings = { appSettings in
 			let data = try JSONEncoder().encode(appSettings)

@@ -16,7 +16,7 @@ public struct AppSettings: Codable {
 }
 
 public extension AppSettings {
-	static let defaults: Self = .init(
+	static let `default`: Self = .init(
 		currency: .usd,
 		isCurrencyAmountVisible: true
 	)

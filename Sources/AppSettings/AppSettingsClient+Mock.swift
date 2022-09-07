@@ -6,7 +6,7 @@ public extension AppSettingsClient {
 		saveSettings: { _ in
 			/* not implemented */
 		}, loadSettings: {
-			.defaults
+			.default
 		}
 	)
 }
