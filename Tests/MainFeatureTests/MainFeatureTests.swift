@@ -3,31 +3,28 @@ import ComposableArchitecture
 import TestUtils
 
 final class MainFeatureTests: TestCase {
-	/*
-	 func testRemoveWallet(){
-	 	let store = TestStore(
-	 		initialState: Main.State(home: .placeholder),
-	 		reducer: Main.reducer,
-	 		environment: .noop
-	 	)
+	@MainActor func testRemoveWallet() async {
+		let store = TestStore(
+			initialState: Main.State(home: .placeholder),
+			reducer: Main.reducer,
+			environment: .noop
+		)
 
-	 	store.send(.internal(.user(.removeWallet)))
-	 	store.receive(.internal(.system(.removedWallet)))
-	 }
-	 */
+		await store.send(.internal(.user(.removeWallet)))
+		await store.receive(.internal(.system(.removedWallet)))
+		await store.receive((.coordinate(.removedWallet)))
+	}
 
-	/*
-	 func testRemovedWallet() {
-	 	let store = TestStore(
-	 		initialState: Main.State(home: .placeholder),
-	 		reducer: Main.reducer,
-	 		environment: .noop
-	 	)
+	@MainActor func testRemovedWallet() async {
+		let store = TestStore(
+			initialState: Main.State(home: .placeholder),
+			reducer: Main.reducer,
+			environment: .noop
+		)
 
-	 	store.send(.internal(.system(.removedWallet)))
-	 	store.receive(.coordinate(.removedWallet))
-	 }
-	 */
+		await store.send(.internal(.system(.removedWallet)))
+		await store.receive(.coordinate(.removedWallet))
+	}
 
 	func testDisplaySettings() {
 		let store = TestStore(
