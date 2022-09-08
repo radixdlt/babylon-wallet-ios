@@ -11,8 +11,8 @@ final class MainFeatureTests: TestCase {
 	 		environment: .noop
 	 	)
 
-	 	await store.send(.internal(.user(.removeWallet)))
-	 	await store.receive(.internal(.system(.removedWallet)))
+	 	store.send(.internal(.user(.removeWallet)))
+	 	store.receive(.internal(.system(.removedWallet)))
 	 }
 	 */
 
@@ -36,8 +36,7 @@ final class MainFeatureTests: TestCase {
 			environment: .noop
 		)
 
-		store.send(.home(.header(.coordinate(.displaySettings))))
-		store.receive(.home(.coordinate(.displaySettings))) {
+		store.send(.home(.coordinate(.displaySettings))) {
 			$0.settings = .init()
 		}
 	}
@@ -49,43 +48,8 @@ final class MainFeatureTests: TestCase {
 			environment: .noop
 		)
 
-		store.send(.settings(.internal(.user(.dismissSettings))))
-		store.receive(.settings(.coordinate(.dismissSettings))) {
+		store.send(.settings(.coordinate(.dismissSettings))) {
 			$0.settings = nil
 		}
 	}
-//
-	//    func testDisplayVisitHub() {
-	//        let store = TestStore(
-	//            initialState: Main.State(home: .placeholder),
-	//            reducer: Main.reducer,
-	//            environment: .noop
-	//        )
-//
-	//        store.send(.home(.coordinate(.displayVisitHub)))
-	//    }
-//
-	//    func testDisplayCreateAccount() {
-	//        let store = TestStore(
-	//            initialState: Main.State(),
-	//            reducer: Main.reducer,
-	//            environment: .noop
-	//        )
-//
-	//        store.send(.home(.coordinate(.displayCreateAccount))) {
-	//            $0.createAccount = .init()
-	//        }
-	//    }
-//
-	//    func testDismissCreateAccount() {
-	//        let store = TestStore(
-	//            initialState: Main.State(),
-	//            reducer: Main.reducer,
-	//            environment: .noop
-	//        )
-//
-	//        store.send(.createAccount(.coordinate(.dismissCreateAccount))) {
-	//            $0.createAccount = nil
-	//        }
-	//    }
 }
