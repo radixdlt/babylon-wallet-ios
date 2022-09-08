@@ -49,8 +49,8 @@ private extension AppSettingsClient {
 // MARK: - Public Types
 public extension AppSettingsClient {
 	enum Error: Swift.Error, LocalizedError {
-		case loadSettingsFailed
-		case saveSettingsFailed
+		case loadSettingsFailed(reason: String)
+		case saveSettingsFailed(reason: String)
 	}
 }
 
