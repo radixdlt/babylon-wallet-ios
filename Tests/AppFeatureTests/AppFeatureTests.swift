@@ -43,8 +43,7 @@ final class AppFeatureTests: TestCase {
 		store.receive(.coordinate(.toMain(wallet)))
 	}
 
-/*
-	func testLoadWalletResult() {
+	func testLoadWalletResultLoadedWallet() {
 		let store = TestStore(
 			initialState: App.State.splash(.init()),
 			reducer: App.reducer,
@@ -54,10 +53,67 @@ final class AppFeatureTests: TestCase {
 		let wallet = Wallet(profile: .init(), deviceFactorTypeMnemonic: "")
 		let loadWalletResult = SplashLoadWalletResult.walletLoaded(wallet)
 		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
-		//        {
-//			$0 = .main(.init(home: .init(justA: wallet)))
-//		}
-		store.receive(.coordinate(.toMain(wallet)))
+		store.receive(.coordinate(.toMain(wallet))) {
+			$0 = .main(.init(home: .init(justA: wallet)))
+		}
 	}
-*/
+
+	func testLoadWalletResultNoWallet() {
+		let store = TestStore(
+			initialState: App.State.splash(.init()),
+			reducer: App.reducer,
+			environment: environment
+		)
+
+		let reason = "No wallet"
+		let loadWalletResult = SplashLoadWalletResult.noWallet(reason: reason)
+		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult)))) {
+			$0 = .alert(.init(
+				title: TextState(reason),
+				buttons: [
+					.cancel(
+						TextState("OK, I'll onboard"),
+						action: .send(.coordinate(.onboard))
+					),
+				]
+			))
+		}
+	}
+
+	func testCoordinateOnboard() {
+		let store = TestStore(
+			initialState: App.State.splash(.init()),
+			reducer: App.reducer,
+			environment: environment
+		)
+
+		store.send(.coordinate(.onboard)) {
+			$0 = .onboarding(.init())
+		}
+	}
+
+	func testCoordinateToMain() {
+		let store = TestStore(
+			initialState: App.State.onboarding(.init()),
+			reducer: App.reducer,
+			environment: environment
+		)
+
+		let wallet = Wallet(profile: .init(), deviceFactorTypeMnemonic: "")
+		store.send(.coordinate(.toMain(wallet))) {
+			$0 = .main(.init(home: .init(justA: wallet)))
+		}
+	}
+
+	func testDismissAlert() {
+		let store = TestStore(
+			initialState: App.State.alert(.init(title: .init("Alert"))),
+			reducer: App.reducer,
+			environment: environment
+		)
+
+		store.send(.internal(.user(.alertDismissed))) {
+			$0 = .alert(nil)
+		}
+	}
 }
