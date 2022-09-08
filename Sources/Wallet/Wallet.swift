@@ -1,10 +1,23 @@
 import Profile
 
-public struct Wallet: Equatable {
-	public var loadAccounts: @Sendable () async throws -> [Profile.Account]
+public typealias Mnemonic = String
 
-	// FIXME: wallet
-	public static func == (_: Wallet, _: Wallet) -> Bool {
-		true
+// MARK: - Wallet
+public struct Wallet: Equatable {
+	public var profile: Profile
+	public let deviceFactorTypeMnemonic: Mnemonic
+
+	public init(
+		profile: Profile,
+		deviceFactorTypeMnemonic: Mnemonic
+	) {
+		self.profile = profile
+		self.deviceFactorTypeMnemonic = deviceFactorTypeMnemonic
 	}
 }
+
+#if DEBUG
+public extension Wallet {
+	static let placeholder: Wallet = .init(profile: .placeholder, deviceFactorTypeMnemonic: "")
+}
+#endif

@@ -24,12 +24,55 @@ public extension Home.AccountDetails.View {
 			)
 		) { viewStore in
 			ForceFullScreen {
-				VStack {
-					Text("Account Details")
-					Button(
-						action: { viewStore.send(.dismissAccountDetailsButtonTapped) },
-						label: { Text("Dismiss Account Details") }
+				VStack(alignment: .center) {
+					HStack {
+						Button(
+							action: {
+								viewStore.send(.dismissAccountDetailsButtonTapped)
+							}, label: {
+								Image("arrow-back")
+							}
+						)
+						Spacer()
+						Text(viewStore.name)
+							.foregroundColor(.app.buttonTextBlack)
+							.font(.app.buttonTitle)
+						Spacer()
+						Button(
+							action: {
+								viewStore.send(.accountPreferencesButtonTapped)
+							}, label: {
+								Image("ellipsis")
+							}
+						)
+					}
+
+					AddressView(
+						address: viewStore.address,
+						copyAddressAction: {
+							viewStore.send(.copyAddressButtonTapped)
+						}
 					)
+
+					Home.AggregatedValue.View(
+						store: store.scope(
+							state: \.aggregatedValue,
+							action: Home.AccountDetails.Action.aggregatedValue
+						)
+					)
+
+					Button(action: {
+						viewStore.send(.transferButtonTapped)
+					}, label: {
+						Text(L10n.Home.AccountDetails.transferButtonTitle)
+							.foregroundColor(.app.buttonTextBlack)
+							.font(.app.body)
+							.padding()
+							.background(Color.app.buttonBackgroundLight)
+							.cornerRadius(6)
+					})
+
+					Spacer()
 				}
 			}
 		}
@@ -40,6 +83,9 @@ extension Home.AccountDetails.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case dismissAccountDetailsButtonTapped
+		case accountPreferencesButtonTapped
+		case copyAddressButtonTapped
+		case transferButtonTapped
 	}
 }
 
@@ -48,6 +94,12 @@ extension Home.AccountDetails.Action {
 		switch action {
 		case .dismissAccountDetailsButtonTapped:
 			self = .internal(.user(.dismissAccountDetails))
+		case .accountPreferencesButtonTapped:
+			self = .internal(.user(.displayAccountPreferences))
+		case .copyAddressButtonTapped:
+			self = .internal(.user(.copyAddress))
+		case .transferButtonTapped:
+			self = .internal(.user(.displayTransfer))
 		}
 	}
 }
@@ -55,8 +107,14 @@ extension Home.AccountDetails.Action {
 extension Home.AccountDetails.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: Home.AccountDetails.State) {
-			// TODO: implement
+		public let address: String
+		public var aggregatedValue: Home.AggregatedValue.State
+		public let name: String
+
+		init(state: Home.AccountDetails.State) {
+			address = state.address
+			aggregatedValue = state.aggregatedValue
+			name = state.name
 		}
 	}
 }

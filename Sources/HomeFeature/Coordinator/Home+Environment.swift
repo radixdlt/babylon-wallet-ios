@@ -1,22 +1,34 @@
+import AccountWorthFetcher
+import AppSettings
 import ComposableArchitecture
 import Foundation
-import Wallet
+import PasteboardClient
 
 public extension Home {
 	// MARK: Environment
 	struct Environment {
-		public var wallet: Wallet
+		public let appSettingsClient: AppSettingsClient
+		public let accountWorthFetcher: AccountWorthFetcher
+		public let pasteboardClient: PasteboardClient
 
 		public init(
-			wallet: Wallet
+			appSettingsClient: AppSettingsClient,
+			accountWorthFetcher: AccountWorthFetcher,
+			pasteboardClient: PasteboardClient
 		) {
-			self.wallet = wallet
+			self.appSettingsClient = appSettingsClient
+			self.accountWorthFetcher = accountWorthFetcher
+			self.pasteboardClient = pasteboardClient
 		}
 	}
 }
 
 #if DEBUG
 public extension Home.Environment {
-	static let placeholder = Self(wallet: .placeholder)
+	static let placeholder: Self = .init(
+		appSettingsClient: .mock,
+		accountWorthFetcher: .mock,
+		pasteboardClient: .noop
+	)
 }
 #endif

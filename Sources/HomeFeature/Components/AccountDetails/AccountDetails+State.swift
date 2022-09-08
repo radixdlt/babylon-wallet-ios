@@ -1,3 +1,5 @@
+import AccountWorthFetcher
+import Common
 import Foundation
 
 // MARK: - AccountDetails
@@ -10,15 +12,17 @@ public extension Home.AccountDetails {
 	// MARK: State
 	struct State: Equatable {
 		public let address: String
-		public let aggregatedValue: Float?
-		public let currency: FiatCurrency
-		public let name: String?
-		public let tokens: [Home.AccountRow.Token]
+		public var aggregatedValue: Home.AggregatedValue.State
+		public let name: String
+		public let tokens: [Token]
 
 		public init(for account: Home.AccountRow.State) {
 			address = account.address
-			aggregatedValue = account.aggregatedValue
-			currency = account.currency
+			aggregatedValue = .init(
+				value: account.aggregatedValue,
+				currency: account.currency,
+				isCurrencyAmountVisible: account.isCurrencyAmountVisible
+			)
 			name = account.name
 			tokens = account.tokens
 		}

@@ -1,3 +1,4 @@
+import AccountWorthFetcher
 import Common
 import ComposableArchitecture
 import Profile
@@ -27,16 +28,21 @@ public extension Home.AccountRow.View {
 			VStack(alignment: .leading) {
 				VStack(alignment: .leading, spacing: 0) {
 					HeaderView(
-						name: viewStore.name ?? "",
+						name: viewStore.name,
 						value: formattedAmmount(
 							viewStore.aggregatedValue ?? 0,
 							currency: viewStore.currency
-						)
+						),
+						isValueVisible: viewStore.isCurrencyAmountVisible
 					)
 
-					AddressView(address: viewStore.address) {
-						viewStore.send(.copyAddress)
-					}
+					AddressView(
+						address: viewStore.address,
+						copyAddressAction: {
+							viewStore.send(.copyAddressButtonTapped)
+						}
+					)
+					.frame(maxWidth: 160)
 				}
 
 				TokenListView(tokens: viewStore.state.tokens)
@@ -58,7 +64,7 @@ public extension Home.AccountRow.View {
 extension Home.AccountRow.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
-		case copyAddress
+		case copyAddressButtonTapped
 		case didSelect
 	}
 }
@@ -66,7 +72,7 @@ extension Home.AccountRow.View {
 extension Home.AccountRow.Action {
 	init(action: Home.AccountRow.View.ViewAction) {
 		switch action {
-		case .copyAddress:
+		case .copyAddressButtonTapped:
 			self = .internal(.user(.copyAddress))
 		case .didSelect:
 			self = .internal(.user(.didSelect))
@@ -77,17 +83,19 @@ extension Home.AccountRow.Action {
 extension Home.AccountRow.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
+		let name: String
 		let address: Profile.Account.Address
 		let aggregatedValue: Float?
 		let currency: FiatCurrency
-		let name: String?
-		let tokens: [Home.AccountRow.Token]
+		let isCurrencyAmountVisible: Bool
+		let tokens: [Token]
 
 		init(state: Home.AccountRow.State) {
+			name = state.name
 			address = state.address
 			aggregatedValue = state.aggregatedValue
 			currency = state.currency
-			name = state.name
+			isCurrencyAmountVisible = state.isCurrencyAmountVisible
 			tokens = state.tokens
 		}
 	}
@@ -97,6 +105,7 @@ extension Home.AccountRow.View {
 private struct HeaderView: View {
 	let name: String
 	let value: String
+	let isValueVisible: Bool
 
 	var body: some View {
 		HStack {
@@ -105,7 +114,7 @@ private struct HeaderView: View {
 				.font(.app.buttonTitle)
 				.fixedSize()
 			Spacer()
-			Text(value)
+			Text(isValueVisible ? value : "•••••")
 				.foregroundColor(.app.buttonTextBlack)
 				.font(.app.buttonTitle)
 				.fixedSize()
@@ -114,18 +123,17 @@ private struct HeaderView: View {
 }
 
 // MARK: - AddressView
-private struct AddressView: View {
+struct AddressView: View {
 	let address: String
 	let copyAddressAction: () -> Void
 
 	var body: some View {
-		HStack(spacing: 0) {
+		HStack(spacing: 5) {
 			Text(address)
 				.lineLimit(1)
 				.truncationMode(.middle)
 				.foregroundColor(.app.buttonTextBlackTransparent)
 				.font(.app.caption2)
-				.frame(maxWidth: 110)
 
 			Button(
 				action: copyAddressAction,
@@ -135,9 +143,9 @@ private struct AddressView: View {
 						.font(.app.caption2)
 						.underline()
 						.padding(12)
+						.fixedSize()
 				}
 			)
-			Spacer()
 		}
 	}
 }
@@ -162,7 +170,7 @@ private struct TokenView: View {
 
 // MARK: - TokenListView
 private struct TokenListView: View {
-	let tokens: [Home.AccountRow.Token]
+	let tokens: [Token]
 	private let limit = 5
 
 	var body: some View {
@@ -188,7 +196,7 @@ struct AccountRow_Preview: PreviewProvider {
 	static var previews: some View {
 		Home.AccountRow.View(
 			store: .init(
-				initialState: .radnomTokenPlaceholder,
+				initialState: .placeholder,
 				reducer: Home.AccountRow.reducer,
 				environment: .init()
 			)

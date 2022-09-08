@@ -1,6 +1,5 @@
 import Common
 import ComposableArchitecture
-import CreateAccount
 import Foundation
 import HomeFeature
 import SettingsFeature
@@ -38,24 +37,6 @@ public extension Main.View {
 				then: Settings.View.init(store:)
 			)
 			.zIndex(1)
-
-			IfLetStore(
-				store.scope(
-					state: \.createAccount,
-					action: Main.Action.createAccount
-				),
-				then: CreateAccount.View.init(store:)
-			)
-			.zIndex(2)
-
-			IfLetStore(
-				store.scope(
-					state: \.account,
-					action: Main.Action.accountDetails
-				),
-				then: Home.AccountDetails.View.init(store:)
-			)
-			.zIndex(3)
 		}
 	}
 }
@@ -97,9 +78,10 @@ struct MainView_Previews: PreviewProvider {
 				initialState: .placeholder,
 				reducer: Main.reducer,
 				environment: .init(
+					appSettingsClient: .mock,
+					accountWorthFetcher: .mock,
 					userDefaultsClient: .noop,
-					pasteboardClient: .noop,
-					wallet: .placeholder
+					pasteboardClient: .noop
 				)
 			)
 		)

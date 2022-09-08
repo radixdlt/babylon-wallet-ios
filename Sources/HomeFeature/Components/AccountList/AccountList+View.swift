@@ -21,7 +21,7 @@ public extension Home.AccountList.View {
 				state: ViewState.init,
 				action: Home.AccountList.Action.init
 			)
-		) { _ in
+		) { viewStore in
 			LazyVStack(spacing: 25) {
 				ForEachStore(
 					store.scope(
@@ -32,7 +32,7 @@ public extension Home.AccountList.View {
 				)
 			}
 			.onAppear {
-//				viewStore.send(.viewDidAppear) // FIXME: uncomment once data flow is working to enable previews
+				viewStore.send(.didAppear)
 			}
 			.alert(store.scope(state: \.alert), dismiss: .internal(.user(.alertDismissed)))
 		}
@@ -42,15 +42,15 @@ public extension Home.AccountList.View {
 extension Home.AccountList.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
-		case viewDidAppear
+		case didAppear
 	}
 }
 
 extension Home.AccountList.Action {
 	init(action: Home.AccountList.View.ViewAction) {
 		switch action {
-		case .viewDidAppear:
-			self = .internal(.system(.viewDidAppear))
+		case .didAppear:
+			self = .internal(.user(.loadAccounts))
 		}
 	}
 }
@@ -69,9 +69,10 @@ struct AccountList_Preview: PreviewProvider {
 	static var previews: some View {
 		Home.AccountList.View(
 			store: .init(
-				initialState: .init(accounts: .placeholder, alert: nil),
+				initialState: .init(accounts: .placeholder,
+				                    alert: nil),
 				reducer: Home.AccountList.reducer,
-				environment: .init(wallet: .placeholder)
+				environment: .init()
 			)
 		)
 	}

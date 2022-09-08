@@ -1,6 +1,5 @@
 import Common
 import ComposableArchitecture
-import CreateAccount
 import Foundation
 import HomeFeature
 import SettingsFeature
@@ -14,8 +13,6 @@ public extension Main {
 		case coordinate(CoordinatingAction)
 		case home(Home.Action)
 		case settings(Settings.Action)
-		case createAccount(CreateAccount.Action)
-		case accountDetails(Home.AccountDetails.Action)
 	}
 }
 

@@ -16,7 +16,7 @@ public extension WalletLoader {
 #if DEBUG
 public extension WalletLoader {
 	static let noop = Self(
-		loadWallet: { _ in .noop }
+		loadWallet: { _ in .placeholder }
 	)
 }
 #endif

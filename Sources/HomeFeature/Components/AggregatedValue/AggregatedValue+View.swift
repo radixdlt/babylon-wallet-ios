@@ -17,16 +17,14 @@ public extension Home.AggregatedValue.View {
 				action: Home.AggregatedValue.Action.init
 			)
 		) { viewStore in
-			VStack {
-				title
-				AggregatedValueView(
-					value: viewStore.value,
-					isValueVisible: viewStore.isValueVisible,
-					toggleVisibilityAction: {
-						viewStore.send(.toggleVisibilityButtonTapped)
-					}
-				)
-			}
+			AggregatedValueView(
+				value: viewStore.value,
+				currency: viewStore.currency,
+				isValueVisible: viewStore.isValueVisible,
+				toggleVisibilityAction: {
+					viewStore.send(.toggleVisibilityButtonTapped)
+				}
+			)
 		}
 	}
 }
@@ -52,34 +50,30 @@ extension Home.AggregatedValue.View {
 	struct ViewState: Equatable {
 		var isValueVisible: Bool
 		var value: Float?
+		var currency: FiatCurrency // FIXME: this should be currency, since it can be any currency
 
 		init(
 			state: Home.AggregatedValue.State
 		) {
-			isValueVisible = state.isVisible
+			isValueVisible = state.isCurrencyAmountVisible
 			value = state.value
+			currency = state.currency
 		}
-	}
-}
-
-private extension Home.AggregatedValue.View {
-	var title: some View {
-		Text(L10n.Home.AggregatedValue.title)
-			.foregroundColor(.app.buttonTextBlack)
-			.font(.app.caption1)
-			.textCase(.uppercase)
 	}
 }
 
 // MARK: - AggregatedValueView
 private struct AggregatedValueView: View {
 	let value: Float?
+	let currency: FiatCurrency
 	let isValueVisible: Bool
 	let toggleVisibilityAction: () -> Void
 
-	// FIXME: propagate correct values
-	let currency = FiatCurrency.usd
-	let amount: Float = 1_000_000
+	// TODO: is this the right way to handle no value -> 0?
+	var amount: Float {
+		value ?? 0
+	}
+
 	var formattedAmount: String {
 		amount.formatted(.currency(code: currency.symbol))
 	}
@@ -108,7 +102,7 @@ private struct AggregatedValueView: View {
 // MARK: - AmountView
 // TODO: extract to separate Feature when view complexity increases
 private struct AmountView: View {
-	let isValueVisible: Bool
+	var isValueVisible: Bool
 	let amount: Float // NOTE: used for copying the actual value
 	let formattedAmount: String
 	let fiatCurrency: FiatCurrency
@@ -149,15 +143,17 @@ private struct VisibilityButton: View {
 	}
 }
 
-// MARK: - AggregatedValue_Preview
-struct AggregatedValue_Preview: PreviewProvider {
-	static var previews: some View {
-		Home.AggregatedValue.View(
-			store: .init(
-				initialState: .placeholder,
-				reducer: Home.AggregatedValue.reducer,
-				environment: .init()
-			)
-		)
-	}
-}
+/*
+ // MARK: - AggregatedValue_Preview
+ struct AggregatedValue_Preview: PreviewProvider {
+ 	static var previews: some View {
+ 		Home.AggregatedValue.View(
+ 			store: .init(
+ 				initialState: .placeholder,
+ 				reducer: Home.AggregatedValue.reducer,
+ 				environment: .init()
+ 			)
+ 		)
+ 	}
+ }
+ */

@@ -24,9 +24,12 @@ public extension Settings.View {
 				action: Settings.Action.init
 			)
 		) { viewStore in
+			// TODO: implement
 			ForceFullScreen {
 				VStack {
-					Text("Settings")
+					Text("Impl: Settings")
+						.background(Color.yellow)
+						.foregroundColor(.red)
 					Button(
 						action: { viewStore.send(.dismissSettingsButtonTapped) },
 						label: { Text("Dismiss Settings") }

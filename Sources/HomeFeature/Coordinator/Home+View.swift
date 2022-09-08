@@ -23,42 +23,48 @@ public extension Home.View {
 				action: Home.Action.init
 			)
 		) { viewStore in
-			VStack {
-				Home.Header.View(
-					store: store.scope(
-						state: \.header,
-						action: Home.Action.header
-					)
-				)
-				.padding([.leading, .trailing, .top], 32)
-
-				ScrollView {
-					LazyVStack(spacing: 25) {
-						Home.AggregatedValue.View(
-							store: store.scope(
-								state: \.aggregatedValue,
-								action: Home.Action.aggregatedValue
-							)
-						)
-						Home.AccountList.View(
-							store: store.scope(
-								state: \.accountList,
-								action: Home.Action.accountList
-							)
-						)
-						createAccountButton {
-							viewStore.send(.createAccountButtonTapped)
-						}
-						Spacer()
-						Home.VisitHub.View(
-							store: store.scope(
-								state: \.visitHub,
-								action: Home.Action.visitHub
-							)
-						)
+			ZStack {
+				homeView(with: viewStore)
+					.onAppear {
+						viewStore.send(.didAppear)
 					}
-					.padding(32)
-				}
+					.zIndex(0)
+
+				IfLetStore(
+					store.scope(
+						state: \.createAccount,
+						action: Home.Action.createAccount
+					),
+					then: Home.CreateAccount.View.init(store:)
+				)
+				.zIndex(1)
+
+				IfLetStore(
+					store.scope(
+						state: \.accountDetails,
+						action: Home.Action.accountDetails
+					),
+					then: Home.AccountDetails.View.init(store:)
+				)
+				.zIndex(2)
+
+				IfLetStore(
+					store.scope(
+						state: \.accountPreferences,
+						action: Home.Action.accountPreferences
+					),
+					then: Home.AccountPreferences.View.init(store:)
+				)
+				.zIndex(3)
+
+				IfLetStore(
+					store.scope(
+						state: \.transfer,
+						action: Home.Action.transfer
+					),
+					then: Home.Transfer.View.init(store:)
+				)
+				.zIndex(5)
 			}
 		}
 	}
@@ -68,12 +74,15 @@ extension Home.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case createAccountButtonTapped
+		case didAppear
 	}
 }
 
 extension Home.Action {
 	init(action: Home.View.ViewAction) {
 		switch action {
+		case .didAppear:
+			self = .internal(.system(.viewDidAppear))
 		case .createAccountButtonTapped:
 			self = .internal(.user(.createAccountButtonTapped))
 		}
@@ -100,17 +109,71 @@ private extension Home.View {
 				.cornerRadius(6)
 		}
 	}
-}
 
-// MARK: - HomeView_Previews
-struct HomeView_Previews: PreviewProvider {
-	static var previews: some View {
-		Home.View(
-			store: .init(
-				initialState: .placeholder,
-				reducer: Home.reducer,
-				environment: .placeholder
+	func homeView(with viewStore: ViewStore<Home.View.ViewState, Home.View.ViewAction>) -> some View {
+		VStack {
+			Home.Header.View(
+				store: store.scope(
+					state: \.header,
+					action: Home.Action.header
+				)
 			)
-		)
+			.padding([.leading, .trailing, .top], 32)
+
+			ScrollView {
+				LazyVStack(spacing: 25) {
+					VStack {
+						title
+						Home.AggregatedValue.View(
+							store: store.scope(
+								state: \.aggregatedValue,
+								action: Home.Action.aggregatedValue
+							)
+						)
+					}
+					Home.AccountList.View(
+						store: store.scope(
+							state: \.accountList,
+							action: Home.Action.accountList
+						)
+					)
+					createAccountButton {
+						viewStore.send(.createAccountButtonTapped)
+					}
+					Spacer()
+					Home.VisitHub.View(
+						store: store.scope(
+							state: \.visitHub,
+							action: Home.Action.visitHub
+						)
+					)
+				}
+				.padding(32)
+			}
+		}
 	}
 }
+
+private extension Home.View {
+	var title: some View {
+		Text(L10n.Home.AggregatedValue.title)
+			.foregroundColor(.app.buttonTextBlack)
+			.font(.app.caption1)
+			.textCase(.uppercase)
+	}
+}
+
+/*
+ // MARK: - HomeView_Previews
+ struct HomeView_Previews: PreviewProvider {
+ 	static var previews: some View {
+ 		Home.View(
+ 			store: .init(
+ 				initialState: .placeholder,
+ 				reducer: Home.reducer,
+ 				environment: .placeholder
+ 			)
+ 		)
+ 	}
+ }
+ */

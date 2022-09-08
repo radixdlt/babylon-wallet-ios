@@ -1,15 +1,13 @@
 import Foundation
 
 // MARK: - Token
-public extension Home.AccountRow {
-	struct Token: Equatable, Identifiable {
-		public let id = UUID()
-		let code: Code
-		let value: Float
-	}
+public struct Token: Equatable, Identifiable {
+	public let id = UUID()
+	public let code: Code
+	public let value: Float?
 }
 
-public extension Home.AccountRow.Token {
+public extension Token {
 	enum Code: String, CaseIterable {
 		case btc
 		case doge
@@ -28,18 +26,18 @@ public extension Home.AccountRow.Token {
 }
 
 #if DEBUG
-public extension Home.AccountRow.Token {
+public extension Token {
 	static let placeholder: Self = .init(
-		code: Home.AccountRow.Token.Code.allCases.randomElement() ?? .xrd,
+		code: Token.Code.allCases.randomElement() ?? .xrd,
 		value: .random(in: 0 ... 1_000_000)
 	)
 }
 
 public enum TokenRandomizer {
-	static func generateRandomTokens(_ limit: Int = 10) -> [Home.AccountRow.Token] {
+	public static func generateRandomTokens(_ limit: Int = 10) -> [Token] {
 		(1 ..< .random(in: 1 ... limit)).map { _ in
-			Home.AccountRow.Token(
-				code: Home.AccountRow.Token.Code.allCases.randomElement() ?? .xrd,
+			Token(
+				code: Token.Code.allCases.randomElement() ?? .xrd,
 				value: .random(in: 0 ... 1_000_000)
 			)
 		}

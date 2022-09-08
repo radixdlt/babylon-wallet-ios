@@ -17,10 +17,8 @@ public extension Onboarding {
 		case .internal(.system(.createWallet)):
 			precondition(state.canProceed)
 			let profile = Profile(name: state.profileName)
-			// FIXME: wallet
-//			let wallet = Wallet(profile: profile)
-			let wallet: Wallet = .placeholder
-
+			// FIXME: insert right mnemonic
+			let wallet: Wallet = .init(profile: profile, deviceFactorTypeMnemonic: "")
 			let name = state.profileName
 			return .run { send in
 				await environment.userDefaultsClient.setProfileName(name)

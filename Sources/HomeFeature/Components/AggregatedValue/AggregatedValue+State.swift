@@ -1,3 +1,4 @@
+import Common
 import Foundation
 import Profile
 
@@ -11,14 +12,19 @@ public extension Home.AggregatedValue {
 	// MARK: State
 	struct State: Equatable {
 		public var value: Float?
-		public var isVisible: Bool
+
+		// MARK: - AppSettings properties
+		public var currency: FiatCurrency
+		public var isCurrencyAmountVisible: Bool
 
 		public init(
 			value: Float? = nil,
-			isVisible: Bool = false
+			currency: FiatCurrency = .usd,
+			isCurrencyAmountVisible: Bool = false
 		) {
 			self.value = value
-			self.isVisible = isVisible
+			self.currency = currency
+			self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
 	}
 }
@@ -27,7 +33,7 @@ public extension Home.AggregatedValue {
 public extension Home.AggregatedValue.State {
 	static let placeholder = Home.AggregatedValue.State(
 		value: 1_000_000,
-		isVisible: false
+		currency: .usd
 	)
 }
 #endif
