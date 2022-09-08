@@ -1,4 +1,3 @@
-import Common
 import Foundation
 
 public extension TokenWorthFetcher {

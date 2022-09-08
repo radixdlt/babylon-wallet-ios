@@ -1,11 +1,7 @@
-import Common
 import ComposableArchitecture
-import Foundation
 import HomeFeature
 import SettingsFeature
 import SwiftUI
-import UserDefaultsClient
-import Wallet
 
 public extension Main {
 	struct View: SwiftUI.View {
@@ -78,10 +74,10 @@ struct MainView_Previews: PreviewProvider {
 				initialState: .placeholder,
 				reducer: Main.reducer,
 				environment: .init(
-					appSettingsClient: .mock,
 					accountWorthFetcher: .mock,
-					userDefaultsClient: .noop,
-					pasteboardClient: .noop
+					appSettingsClient: .mock,
+					pasteboardClient: .noop,
+					userDefaultsClient: .noop
 				)
 			)
 		)

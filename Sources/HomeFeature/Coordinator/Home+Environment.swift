@@ -1,7 +1,5 @@
 import AccountWorthFetcher
 import AppSettings
-import ComposableArchitecture
-import Foundation
 import PasteboardClient
 
 public extension Home {

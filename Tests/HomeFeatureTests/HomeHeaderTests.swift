@@ -1,7 +1,6 @@
 import ComposableArchitecture
 @testable import HomeFeature
 import TestUtils
-import XCTest
 
 final class HomeHeaderTests: TestCase {
 	func testSettingsButtonTapped() {

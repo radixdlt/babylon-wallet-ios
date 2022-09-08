@@ -1,11 +1,6 @@
 import Common
 import ComposableArchitecture
-import Foundation
-import Profile
-import ProfileLoader
 import SwiftUI
-import Wallet
-import WalletLoader
 
 public extension Splash {
 	struct View: SwiftUI.View {

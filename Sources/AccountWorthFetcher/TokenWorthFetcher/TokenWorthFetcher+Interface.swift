@@ -1,5 +1,4 @@
 import Common
-import Foundation
 
 // MARK: - TokenWorthFetcher
 public struct TokenWorthFetcher {

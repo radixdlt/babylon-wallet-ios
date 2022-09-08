@@ -1,12 +1,7 @@
 import ComposableArchitecture
-import HomeFeature
 import MainFeature
 import OnboardingFeature
-import ProfileLoader
 import SplashFeature
-import UserDefaultsClient
-import Wallet
-import WalletLoader
 
 // MARK: - App
 /// Namespace for AppFeature

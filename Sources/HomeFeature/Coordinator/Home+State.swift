@@ -1,5 +1,4 @@
 import AccountWorthFetcher
-import Foundation
 import Profile
 import Wallet
 

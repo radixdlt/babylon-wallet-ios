@@ -1,6 +1,5 @@
 import Common
 import ComposableArchitecture
-import Profile
 import SwiftUI
 
 public extension Home.AggregatedValue {

@@ -1,5 +1,4 @@
 import AccountWorthFetcher
-import Common
 import Foundation
 
 // MARK: - AccountDetails

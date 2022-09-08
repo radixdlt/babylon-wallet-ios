@@ -1,30 +1,26 @@
 import AccountWorthFetcher
 import AppSettings
-import Common
-import ComposableArchitecture
-import Foundation
 import PasteboardClient
 import UserDefaultsClient
-import Wallet
 
 public extension Main {
 	// MARK: Environment
 	struct Environment {
-		public let appSettingsClient: AppSettingsClient
 		public let accountWorthFetcher: AccountWorthFetcher
-		public let userDefaultsClient: UserDefaultsClient
+		public let appSettingsClient: AppSettingsClient
 		public let pasteboardClient: PasteboardClient
+		public let userDefaultsClient: UserDefaultsClient
 
 		public init(
-			appSettingsClient: AppSettingsClient,
 			accountWorthFetcher: AccountWorthFetcher,
-			userDefaultsClient: UserDefaultsClient,
-			pasteboardClient: PasteboardClient
+			appSettingsClient: AppSettingsClient,
+			pasteboardClient: PasteboardClient,
+			userDefaultsClient: UserDefaultsClient
 		) {
-			self.appSettingsClient = appSettingsClient
 			self.accountWorthFetcher = accountWorthFetcher
-			self.userDefaultsClient = userDefaultsClient
+			self.appSettingsClient = appSettingsClient
 			self.pasteboardClient = pasteboardClient
+			self.userDefaultsClient = userDefaultsClient
 		}
 	}
 }
@@ -32,10 +28,10 @@ public extension Main {
 #if DEBUG
 public extension Main.Environment {
 	static let noop = Self(
-		appSettingsClient: .mock,
 		accountWorthFetcher: .mock,
-		userDefaultsClient: .noop,
-		pasteboardClient: .noop
+		appSettingsClient: .mock,
+		pasteboardClient: .noop,
+		userDefaultsClient: .noop
 	)
 }
 #endif // DEBUG

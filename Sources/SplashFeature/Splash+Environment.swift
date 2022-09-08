@@ -1,9 +1,5 @@
-import Common
 import ComposableArchitecture
-import Foundation
-import Profile
 import ProfileLoader
-import Wallet
 import WalletLoader
 
 public extension Splash {

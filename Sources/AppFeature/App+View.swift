@@ -1,13 +1,8 @@
 import ComposableArchitecture
-import HomeFeature
 import MainFeature
 import OnboardingFeature
-import ProfileLoader
 import SplashFeature
 import SwiftUI
-import UserDefaultsClient
-import Wallet
-import WalletLoader
 
 public extension App {
 	struct View: SwiftUI.View {
