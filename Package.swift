@@ -66,7 +66,9 @@ let package = Package(
 			name: "AppFeatureTests",
 			dependencies: [
 				"AppFeature",
+				"SplashFeature",
 				"TestUtils",
+				"Wallet",
 			]
 		),
 		.target(
