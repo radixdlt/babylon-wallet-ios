@@ -1,4 +1,3 @@
-import AccountWorthFetcher
 import ComposableArchitecture
 
 #if os(iOS)

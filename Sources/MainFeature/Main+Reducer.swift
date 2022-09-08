@@ -1,10 +1,6 @@
-import Common
 import ComposableArchitecture
-import Foundation
 import HomeFeature
 import SettingsFeature
-import UserDefaultsClient
-import Wallet
 
 #if os(iOS)
 // FIXME: move to `UIApplicationClient` package!

@@ -1,8 +1,4 @@
-import Common
 import ComposableArchitecture
-import Foundation
-import Profile
-import UserDefaultsClient
 import Wallet
 
 public extension Onboarding {

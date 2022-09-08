@@ -1,5 +1,4 @@
 import Foundation
-import Profile
 
 public extension Home.AccountRow {
 	// MARK: Action

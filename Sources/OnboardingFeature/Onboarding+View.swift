@@ -1,10 +1,6 @@
 import Common
 import ComposableArchitecture
-import Foundation
-import Profile
 import SwiftUI
-import UserDefaultsClient
-import Wallet
 
 public extension Onboarding {
 	struct View: SwiftUI.View {

@@ -1,10 +1,5 @@
-import Common
-import ComposableArchitecture
-import Foundation
 import HomeFeature
 import SettingsFeature
-import UserDefaultsClient
-import Wallet
 
 // MARK: - Main
 /// Namespace for MainFeature

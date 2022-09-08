@@ -40,6 +40,7 @@ let package = Package(
 			name: "AccountWorthFetcher",
 			dependencies: [
 				"AppSettings",
+				"Common",
 				"Profile",
 			]
 		),
@@ -47,7 +48,8 @@ let package = Package(
 			name: "AppFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
-				"LocalAuthenticationClient",
+				"AccountWorthFetcher",
+				"AppSettings",
 				"MainFeature",
 				"OnboardingFeature",
 				"PasteboardClient",
@@ -93,6 +95,8 @@ let package = Package(
 				"AccountWorthFetcher",
 				"AppSettings",
 				"Common",
+				"Profile",
+				"PasteboardClient",
 				tca,
 				"Wallet",
 				// ^^^ Sort lexicographically ^^^
@@ -121,13 +125,12 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"AccountWorthFetcher",
-				"Common",
+				"AppSettings",
 				"HomeFeature",
 				"PasteboardClient",
 				"SettingsFeature",
 				tca,
 				"UserDefaultsClient",
-				"Wallet",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -143,6 +146,7 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
+				"Profile",
 				tca,
 				"UserDefaultsClient", // replace with `ProfileCreator`
 				"Wallet",
@@ -184,9 +188,7 @@ let package = Package(
 		.target(
 			name: "ProfileLoader",
 			dependencies: [
-				"Common",
 				"Profile",
-				tca,
 				"UserDefaultsClient",
 			]
 		),
@@ -218,6 +220,7 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
+				"Profile",
 				"ProfileLoader",
 				tca,
 				"Wallet",
@@ -256,7 +259,6 @@ let package = Package(
 			name: "Wallet",
 			dependencies: [
 				"Profile",
-				tca,
 			]
 		),
 		.testTarget(
@@ -269,7 +271,6 @@ let package = Package(
 		.target(
 			name: "WalletLoader",
 			dependencies: [
-				"Common",
 				"Profile",
 				"Wallet",
 				tca,

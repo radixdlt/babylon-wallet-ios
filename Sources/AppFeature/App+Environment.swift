@@ -1,14 +1,9 @@
 import AccountWorthFetcher
 import AppSettings
-import Common
 import ComposableArchitecture
-import MainFeature
-import OnboardingFeature
 import PasteboardClient
 import ProfileLoader
-import SplashFeature
 import UserDefaultsClient
-import Wallet
 import WalletLoader
 
 public extension App {
