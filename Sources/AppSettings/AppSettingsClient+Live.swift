@@ -10,7 +10,6 @@ public extension AppSettingsClient {
 			do {
 				let data = try JSONEncoder().encode(appSettings)
 				await userDefaultsClient.setData(data, Key.appSettings.rawValue)
-				print("save settings ✅, \(String(describing: appSettings))")
 			} catch {
 				throw Error.saveSettingsFailed(reason: String(describing: error))
 			}
@@ -27,7 +26,6 @@ public extension AppSettingsClient {
 
 			do {
 				let settings = try JSONDecoder().decode(AppSettings.self, from: data)
-				print("load settings ✅, \(String(describing: settings))")
 				return settings
 			} catch {
 				throw Error.loadSettingsFailed(reason: String(describing: error))
