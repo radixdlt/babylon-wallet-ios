@@ -64,7 +64,6 @@ public extension App {
 		case .main:
 			return .none
 		case let .onboarding(.coordinate(.onboardedWithWallet(wallet))):
-			state = .main(.init(home: .init(wallet: wallet)))
 			return Effect(value: .coordinate(.toMain(wallet)))
 		case .onboarding:
 			return .none
