@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Profile
 import Wallet
+import XCTestDynamicOverlay
 
 // MARK: - WalletLoader
 public struct WalletLoader {
@@ -17,6 +18,10 @@ public extension WalletLoader {
 public extension WalletLoader {
 	static let noop = Self(
 		loadWallet: { _ in .placeholder }
+	)
+
+	static let unimplemented = Self(
+		loadWallet: XCTUnimplemented("\(Self.self).loadWallet")
 	)
 }
 #endif

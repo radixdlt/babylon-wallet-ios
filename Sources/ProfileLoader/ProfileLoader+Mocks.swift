@@ -1,4 +1,5 @@
 import Profile
+import XCTestDynamicOverlay
 
 #if DEBUG
 public extension ProfileLoader {
@@ -6,6 +7,10 @@ public extension ProfileLoader {
 		loadProfile: {
 			Profile(name: "profileName")
 		}
+	)
+
+	static let unimplemented = Self(
+		loadProfile: XCTUnimplemented("\(Self.self).loadProfile")
 	)
 }
 #endif

@@ -1,4 +1,5 @@
 import Foundation
+import XCTestDynamicOverlay
 
 public extension AppSettingsClient {
 	static let mock = Self(
@@ -9,3 +10,12 @@ public extension AppSettingsClient {
 		}
 	)
 }
+
+#if DEBUG
+public extension AppSettingsClient {
+	static let unimplemented = Self(
+		saveSettings: XCTUnimplemented("\(Self.self).saveSettings"),
+		loadSettings: XCTUnimplemented("\(Self.self).loadSettings")
+	)
+}
+#endif

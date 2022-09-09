@@ -8,66 +8,84 @@ final class AppFeatureTests: TestCase {
 	let environment = App.Environment(
 		backgroundQueue: .unimplemented,
 		mainQueue: .unimplemented,
-		appSettingsClient: .mock,
-		accountWorthFetcher: .mock,
-		pasteboardClient: .noop,
-		profileLoader: .noop,
+		appSettingsClient: .unimplemented,
+		accountWorthFetcher: .unimplemented,
+		pasteboardClient: .unimplemented,
+		profileLoader: .unimplemented,
 		userDefaultsClient: .unimplemented,
-		walletLoader: .noop
+		walletLoader: .unimplemented
 	)
 
-	func testRemovedWallet() {
+	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() {
+		// given
+		let initialState = App.State.main(.placeholder)
 		let store = TestStore(
-			initialState: App.State.main(.placeholder),
+			initialState: initialState,
 			reducer: App.reducer,
 			environment: environment
 		)
 
+		// when
 		store.send(.main(.coordinate(.removedWallet))) {
+			// then
 			$0 = .onboarding(.init())
 		}
 		store.receive(.coordinate(.onboard))
 	}
 
-	func testOnboardedWithWallet() {
+	func test_onboardedWithWallet_whenWalletCreatedSuccessfullyInOnbnoarding_thenNavigateToMainScreen() {
+		// given
+		let initialState = App.State.onboarding(.init())
+		let wallet = Wallet.placeholder
 		let store = TestStore(
-			initialState: App.State.onboarding(.init()),
+			initialState: initialState,
 			reducer: App.reducer,
 			environment: environment
 		)
 
-		let wallet = Wallet(profile: .init(), deviceFactorTypeMnemonic: "")
-		store.send(.onboarding(.coordinate(.onboardedWithWallet(wallet)))) {
-			$0 = .main(.init(home: .init(wallet: wallet)))
-		}
-		store.receive(.coordinate(.toMain(wallet)))
-	}
+		// when
+		store.send(.onboarding(.coordinate(.onboardedWithWallet(wallet))))
 
-	func testLoadWalletResultLoadedWallet() {
-		let store = TestStore(
-			initialState: App.State.splash(.init()),
-			reducer: App.reducer,
-			environment: environment
-		)
-
-		let wallet = Wallet(profile: .init(), deviceFactorTypeMnemonic: "")
-		let loadWalletResult = SplashLoadWalletResult.walletLoaded(wallet)
-		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
+		// then
 		store.receive(.coordinate(.toMain(wallet))) {
 			$0 = .main(.init(home: .init(justA: wallet)))
 		}
 	}
 
-	func testLoadWalletResultNoWallet() {
+	func test_loadWalletResult_whenWalletLoadedSuccessfullyInSplash_thenNavigateToMainScreen() {
+		// given
+		let initialState = App.State.splash(.init())
+		let wallet = Wallet.placeholder
+		let loadWalletResult = SplashLoadWalletResult.walletLoaded(wallet)
 		let store = TestStore(
-			initialState: App.State.splash(.init()),
+			initialState: initialState,
 			reducer: App.reducer,
 			environment: environment
 		)
 
+		// when
+		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
+
+		// then
+		store.receive(.coordinate(.toMain(wallet))) {
+			$0 = .main(.init(home: .init(justA: wallet)))
+		}
+	}
+
+	func test_loadWalletResult_whenWalletLoadingFailedInSplash_thenDisplayAlert() {
+		// given
+		let initialState = App.State.splash(.init())
 		let reason = "No wallet"
 		let loadWalletResult = SplashLoadWalletResult.noWallet(reason: reason)
+		let store = TestStore(
+			initialState: initialState,
+			reducer: App.reducer,
+			environment: environment
+		)
+
+		// when
 		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult)))) {
+			// then
 			$0 = .alert(.init(
 				title: TextState(reason),
 				buttons: [
@@ -80,39 +98,34 @@ final class AppFeatureTests: TestCase {
 		}
 	}
 
-	func testCoordinateOnboard() {
+	func test_coordinateOnboard_whenNoWalletLoadedInSplash_thenNavigateToOnboarding() {
+		// given
+		let initialState = App.State.splash(.init())
 		let store = TestStore(
-			initialState: App.State.splash(.init()),
+			initialState: initialState,
 			reducer: App.reducer,
 			environment: environment
 		)
 
+		// when
 		store.send(.coordinate(.onboard)) {
+			// then
 			$0 = .onboarding(.init())
 		}
 	}
 
-	func testCoordinateToMain() {
+	func test_dismissAlert_whenTapOnDismissPresentedAlert_thenHideAlert() {
+		// given
+		let initialState = App.State.alert(.init(title: .init("Alert")))
 		let store = TestStore(
-			initialState: App.State.onboarding(.init()),
+			initialState: initialState,
 			reducer: App.reducer,
 			environment: environment
 		)
 
-		let wallet = Wallet(profile: .init(), deviceFactorTypeMnemonic: "")
-		store.send(.coordinate(.toMain(wallet))) {
-			$0 = .main(.init(home: .init(justA: wallet)))
-		}
-	}
-
-	func testDismissAlert() {
-		let store = TestStore(
-			initialState: App.State.alert(.init(title: .init("Alert"))),
-			reducer: App.reducer,
-			environment: environment
-		)
-
+		// when
 		store.send(.internal(.user(.alertDismissed))) {
+			// then
 			$0 = .alert(nil)
 		}
 	}
