@@ -25,27 +25,7 @@ public extension Home.AccountDetails.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack(alignment: .center) {
-					HStack {
-						Button(
-							action: {
-								viewStore.send(.dismissAccountDetailsButtonTapped)
-							}, label: {
-								Image("arrow-back")
-							}
-						)
-						Spacer()
-						Text(viewStore.name)
-							.foregroundColor(.app.buttonTextBlack)
-							.font(.app.buttonTitle)
-						Spacer()
-						Button(
-							action: {
-								viewStore.send(.accountPreferencesButtonTapped)
-							}, label: {
-								Image("ellipsis")
-							}
-						)
-					}
+					header(with: viewStore)
 
 					AddressView(
 						address: viewStore.address,
@@ -61,21 +41,64 @@ public extension Home.AccountDetails.View {
 						)
 					)
 
-					Button(action: {
-						viewStore.send(.transferButtonTapped)
-					}, label: {
-						Text(L10n.Home.AccountDetails.transferButtonTitle)
-							.foregroundColor(.app.buttonTextBlack)
-							.font(.app.body)
-							.padding()
-							.background(Color.app.buttonBackgroundLight)
-							.cornerRadius(6)
-					})
+					transferButton(with: viewStore)
+
+					Home.AssetList.View(
+						store: store.scope(
+							state: \.assetList,
+							action: Home.AccountDetails.Action.assetList
+						)
+					)
 
 					Spacer()
 				}
 			}
 		}
+	}
+}
+
+// MARK: - Private Typealias
+private extension Home.AccountDetails.View {
+	typealias AccountDetailsViewStore = ViewStore<Home.AccountDetails.View.ViewState, Home.AccountDetails.View.ViewAction>
+}
+
+// MARK: - Private Methods
+private extension Home.AccountDetails.View {
+	func header(with viewStore: AccountDetailsViewStore) -> some View {
+		HStack {
+			Button(
+				action: {
+					viewStore.send(.dismissAccountDetailsButtonTapped)
+				}, label: {
+					Image("arrow-back")
+				}
+			)
+			Spacer()
+			Text(viewStore.name)
+				.foregroundColor(.app.buttonTextBlack)
+				.font(.app.buttonTitle)
+			Spacer()
+			Button(
+				action: {
+					viewStore.send(.accountPreferencesButtonTapped)
+				}, label: {
+					Image("ellipsis")
+				}
+			)
+		}
+	}
+
+	func transferButton(with viewStore: AccountDetailsViewStore) -> some View {
+		Button(action: {
+			viewStore.send(.transferButtonTapped)
+		}, label: {
+			Text(L10n.Home.AccountDetails.transferButtonTitle)
+				.foregroundColor(.app.buttonTextBlack)
+				.font(.app.body)
+				.padding()
+				.background(Color.app.buttonBackgroundLight)
+				.cornerRadius(6)
+		})
 	}
 }
 

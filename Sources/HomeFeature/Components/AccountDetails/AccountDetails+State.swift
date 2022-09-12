@@ -14,6 +14,7 @@ public extension Home.AccountDetails {
 		public var aggregatedValue: Home.AggregatedValue.State
 		public let name: String
 		public let tokens: [Token]
+		public let assetList: Home.AssetList.State
 
 		public init(for account: Home.AccountRow.State) {
 			address = account.address
@@ -24,6 +25,9 @@ public extension Home.AccountDetails {
 			)
 			name = account.name
 			tokens = account.tokens
+
+			// TODO: implement
+			assetList = .init()
 		}
 	}
 }

@@ -214,6 +214,9 @@ public extension Home {
 			case .accountDetails(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))):
 				return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
 
+			case .accountDetails(.assetList(_)):
+				return .none
+
 			case .transfer(.coordinate(.dismissTransfer)):
 				state.transfer = nil
 				return .none

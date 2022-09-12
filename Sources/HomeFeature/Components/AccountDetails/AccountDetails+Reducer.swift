@@ -27,6 +27,8 @@ public extension Home.AccountDetails {
 				return .none
 			case .internal(.user(.displayTransfer)):
 				return Effect(value: .coordinate(.displayTransfer))
+			case .assetList:
+				return .none
 			}
 		}
 	)

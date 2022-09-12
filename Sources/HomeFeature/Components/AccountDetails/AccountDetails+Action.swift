@@ -6,6 +6,7 @@ public extension Home.AccountDetails {
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
 		case aggregatedValue(Home.AggregatedValue.Action)
+		case assetList(Home.AssetList.Action)
 	}
 }
 
