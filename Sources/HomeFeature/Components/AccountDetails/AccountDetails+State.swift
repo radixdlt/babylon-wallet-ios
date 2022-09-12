@@ -1,4 +1,5 @@
 import AccountWorthFetcher
+import ComposableArchitecture
 import Foundation
 
 // MARK: - AccountDetails
@@ -13,7 +14,6 @@ public extension Home.AccountDetails {
 		public let address: String
 		public var aggregatedValue: Home.AggregatedValue.State
 		public let name: String
-		public let tokens: [Token]
 		public let assetList: Home.AssetList.State
 
 		public init(for account: Home.AccountRow.State) {
@@ -24,10 +24,12 @@ public extension Home.AccountDetails {
 				isCurrencyAmountVisible: account.isCurrencyAmountVisible
 			)
 			name = account.name
-			tokens = account.tokens
 
-			// TODO: implement
-			assetList = .init()
+			assetList = .init(
+				assets: .init(uniqueElements: account.tokenContainers.map {
+					Home.AssetRow.State(id: UUID(), tokenContainer: $0, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible)
+				})
+			)
 		}
 	}
 }

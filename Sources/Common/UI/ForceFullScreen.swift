@@ -19,7 +19,7 @@ public struct ForceFullScreen<Content>: View where Content: View {
 	public var body: some View {
 		ZStack {
 			background.edgesIgnoringSafeArea(.all)
-			content.padding()
+			content
 		}
 	}
 }

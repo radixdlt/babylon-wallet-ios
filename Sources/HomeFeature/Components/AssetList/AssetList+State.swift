@@ -1,4 +1,5 @@
-import Foundation
+import Common
+import ComposableArchitecture
 
 // MARK: - AssetList
 /// Namespace for AssetListFeature
@@ -9,6 +10,12 @@ public extension Home {
 public extension Home.AssetList {
 	// MARK: State
 	struct State: Equatable {
-		public init() {}
+		public let assets: IdentifiedArrayOf<Home.AssetRow.State>
+
+		public init(
+			assets: IdentifiedArrayOf<Home.AssetRow.State>
+		) {
+			self.assets = assets
+		}
 	}
 }

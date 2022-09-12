@@ -34,12 +34,10 @@ public extension Token {
 }
 
 public enum TokenRandomizer {
-	public static func generateRandomTokens(_ limit: Int = 10) -> [Token] {
-		(1 ..< .random(in: 1 ... limit)).map { _ in
-			Token(
-				code: Token.Code.allCases.randomElement() ?? .xrd,
-				value: .random(in: 0 ... 1_000_000)
-			)
+	public static func generateRandomTokens() -> [Token] {
+		Token.Code.allCases.map {
+			let randomValue: Float = .random(in: 0 ... 100)
+			return Token(code: $0, value: randomValue)
 		}
 	}
 }

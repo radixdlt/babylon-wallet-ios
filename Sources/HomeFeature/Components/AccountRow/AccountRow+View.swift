@@ -45,7 +45,7 @@ public extension Home.AccountRow.View {
 					.frame(maxWidth: 160)
 				}
 
-				TokenListView(tokens: viewStore.state.tokens)
+				TokenListView(tokens: viewStore.state.tokenContainers.map(\.token))
 			}
 			.padding(25)
 			.background(Color.app.cardBackgroundLight)
@@ -88,7 +88,7 @@ extension Home.AccountRow.View {
 		let aggregatedValue: Float?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
-		let tokens: [Token]
+		let tokenContainers: [TokenWorthContainer]
 
 		init(state: Home.AccountRow.State) {
 			name = state.name
@@ -96,7 +96,7 @@ extension Home.AccountRow.View {
 			aggregatedValue = state.aggregatedValue
 			currency = state.currency
 			isCurrencyAmountVisible = state.isCurrencyAmountVisible
-			tokens = state.tokens
+			tokenContainers = state.tokenContainers
 		}
 	}
 }

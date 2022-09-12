@@ -119,8 +119,8 @@ public extension Home {
 				state.accountList.accounts.forEach {
 					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalWorth[$0.address]?.worth
 
-					let tokens = totalWorth[$0.address]?.tokenContainers.map(\.token) ?? []
-					state.accountList.accounts[id: $0.address]?.tokens = tokens
+					let tokenContainers = totalWorth[$0.address]?.tokenContainers ?? []
+					state.accountList.accounts[id: $0.address]?.tokenContainers = tokenContainers
 				}
 				return .none
 

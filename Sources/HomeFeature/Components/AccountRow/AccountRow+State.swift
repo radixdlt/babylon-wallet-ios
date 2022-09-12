@@ -15,7 +15,7 @@ public extension Home.AccountRow {
 		public let name: String
 		public let address: String
 		public var aggregatedValue: Float?
-		public var tokens: [Token]
+		public var tokenContainers: [TokenWorthContainer]
 
 		// MARK: - AppSettings properties
 		public var currency: FiatCurrency
@@ -25,14 +25,14 @@ public extension Home.AccountRow {
 			name: String,
 			address: String,
 			aggregatedValue: Float?,
-			tokens: [Token],
+			tokenContainers: [TokenWorthContainer],
 			currency: FiatCurrency,
 			isCurrencyAmountVisible: Bool
 		) {
 			self.name = name
 			self.address = address
 			self.aggregatedValue = aggregatedValue
-			self.tokens = tokens
+			self.tokenContainers = tokenContainers
 			self.currency = currency
 			self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
@@ -46,7 +46,7 @@ public extension Home.AccountRow.State {
 			name: account.name,
 			address: account.address,
 			aggregatedValue: nil,
-			tokens: [],
+			tokenContainers: [],
 			currency: .usd,
 			isCurrencyAmountVisible: false
 		)

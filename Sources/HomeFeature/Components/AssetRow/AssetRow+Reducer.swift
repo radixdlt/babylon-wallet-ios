@@ -1,6 +1,6 @@
 import ComposableArchitecture
 
-public extension Home.AssetList {
+public extension Home.AssetRow {
 	// MARK: Reducer
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = Reducer { _, action, _ in
@@ -8,10 +8,6 @@ public extension Home.AssetList {
 		case .internal:
 			return .none
 		case .coordinate:
-			return .none
-		case let .asset(id: id, action: action):
-			// TODO: implement
-			print(id, action)
 			return .none
 		}
 	}

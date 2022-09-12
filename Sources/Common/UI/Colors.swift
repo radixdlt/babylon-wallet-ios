@@ -32,12 +32,24 @@ public extension Color.App {
 		.init(hex: .appGrey6)
 	}
 
+	var backgroundLightGray: Color {
+		.init(hex: .appGrey8)
+	}
+
+	var separatorLightGray: Color {
+		.init(hex: .appGrey9)
+	}
+
 	var buttonBackgroundDark: Color {
 		.init(hex: .appGrey5)
 	}
 
 	var buttonTextLight: Color {
 		.init(hex: .appGrey4)
+	}
+
+	var tokenPlaceholderGray: Color {
+		.init(hex: .appGrey7)
 	}
 
 	var buttonTextDark: Color {
@@ -60,6 +72,9 @@ private extension Color {
 		case appGrey4 = 0xE2E5ED
 		case appGrey5 = 0xBEBDBD
 		case appGrey6 = 0xF4F4F4
+		case appGrey7 = 0xDDDCDC
+		case appGrey8 = 0xAFB1B7
+		case appGrey9 = 0xF4F5F9
 		case appCharcoal1 = 0x414141
 	}
 }
