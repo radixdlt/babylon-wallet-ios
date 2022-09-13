@@ -14,7 +14,7 @@ public extension Home.AccountDetails {
 		public let address: String
 		public var aggregatedValue: Home.AggregatedValue.State
 		public let name: String
-		public let assetList: Home.AssetList.State
+		public var assetList: Home.AssetList.State
 
 		public init(for account: Home.AccountRow.State) {
 			address = account.address
@@ -26,6 +26,9 @@ public extension Home.AccountDetails {
 			name = account.name
 
 			assetList = .init(
+				xrdToken: account.tokenContainers.first.map {
+					Home.AssetRow.State(id: UUID(), tokenContainer: $0, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible)
+				},
 				assets: .init(uniqueElements: account.tokenContainers.map {
 					Home.AssetRow.State(id: UUID(), tokenContainer: $0, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible)
 				})

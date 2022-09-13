@@ -13,6 +13,8 @@ public extension Home.AssetList {
 			// TODO: implement
 			print(id, action)
 			return .none
+		case let .xrdAction(action: action):
+			return .none
 		}
 	}
 }

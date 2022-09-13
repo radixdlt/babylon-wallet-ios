@@ -23,6 +23,36 @@ public extension Home.AssetList.View {
 			)
 		) { _ in
 			LazyVStack(spacing: 25) {
+//				 IfLetStore(
+//				     store.scope(
+//				         state: \.xrdToken,
+//				         action: Home.AssetList.Action.asset(id:action:)
+//				     )) { store in
+//				         //                        Home.AssetRow.View(store: store)
+//				         //                        Text(String(describing: store))
+				//                         Home.AssetRow.View(store: store)
+//				     }
+
+				//                Home.AssetRow.View(store: .init(initialState: Home.AssetRow.State(, reducer: Home.AssetRow.reducer, environment: Home.AssetRow.Environment()))
+
+				/*
+				 IfLetStore(
+				     store.scope(
+				         state: \.xrdToken,
+				         action: Home.AssetList.Action.asset(id:action:)
+				     ),
+				     then: Home.AssetRow.View.init(store:)
+				 )
+				 */
+
+				IfLetStore(
+					store.scope(
+						state: \.xrdToken,
+						action: Home.AssetList.Action.xrdAction(action:)
+					),
+					then: Home.AssetRow.View.init(store:)
+				)
+
 				ForEachStore(
 					store.scope(
 						state: \.assets,
@@ -31,18 +61,23 @@ public extension Home.AssetList.View {
 					content: { store in
 						VStack {
 							Home.AssetRow.View(store: store)
-                            // TODO: exclude if last row
+							// TODO: exclude if last row
 							separator()
 						}
 					}
 				)
 			}
-			.background(Color.white
-//				.shadow(color: .black.opacity(0.5), radius: 5, x: 5, y: 5)
-			)
-			.cornerRadius(6)
 		}
 	}
+
+	/*
+	 .background(
+	     RoundedRectangle(cornerRadius: 6)
+	         .fill(Color.white)
+	         .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 9)
+	 )
+	 .padding([.leading, .trailing], 18)
+	 */
 
 	func separator() -> some View {
 		Rectangle()
@@ -82,6 +117,7 @@ struct AssetList_Preview: PreviewProvider {
 		Home.AssetList.View(
 			store: .init(
 				initialState: .init(
+					xrdToken: nil,
 					assets: []
 				),
 				reducer: Home.AssetList.reducer,

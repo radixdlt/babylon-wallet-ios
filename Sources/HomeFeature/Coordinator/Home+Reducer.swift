@@ -1,3 +1,4 @@
+import AccountWorthFetcher
 import ComposableArchitecture
 
 #if os(iOS)
@@ -106,11 +107,19 @@ public extension Home {
 				}
 
 			case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
+				// aggregated value
 				state.aggregatedValue.isCurrencyAmountVisible = isVisible
+
+				// account list
 				state.accountList.accounts.forEach {
 					state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = isVisible
 				}
+
+				// account details
 				state.accountDetails?.aggregatedValue.isCurrencyAmountVisible = isVisible
+				state.accountDetails?.assetList.assets.forEach {
+					state.accountDetails?.assetList.assets[id: $0.id]?.isCurrencyAmountVisible = isVisible
+				}
 				return .none
 
 			case let .internal(.system(.totalWorthLoaded(totalWorth))):
@@ -174,7 +183,33 @@ public extension Home {
 				}
 
 			case let .accountList(.coordinate(.displayAccountDetails(account))):
-				state.accountDetails = .init(for: account)
+				var xrdContainer: TokenWorthContainer?
+				var noValueTokens = [TokenWorthContainer]()
+				var tokensWithValues = [TokenWorthContainer]()
+
+				account.tokenContainers.forEach {
+					if $0.token.code == .xrd {
+						xrdContainer = $0
+					} else if $0.token.value == nil {
+						noValueTokens.append($0)
+					} else {
+						tokensWithValues.append($0)
+					}
+				}
+
+				tokensWithValues.sort { $0.token.value! > $1.token.value! }
+				noValueTokens.sort { $0.token.code.value < $1.token.code.value }
+
+				var newAccount = account
+				newAccount.tokenContainers = []
+
+				if let xrdContainer = xrdContainer {
+					newAccount.tokenContainers.append(xrdContainer)
+				}
+				newAccount.tokenContainers.append(contentsOf: tokensWithValues)
+				newAccount.tokenContainers.append(contentsOf: noValueTokens)
+
+				state.accountDetails = .init(for: newAccount)
 				return .none
 
 			case let .accountList(.coordinate(.copyAddress(address))):

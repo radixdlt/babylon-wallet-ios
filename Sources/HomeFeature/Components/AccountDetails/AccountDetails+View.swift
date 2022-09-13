@@ -24,35 +24,38 @@ public extension Home.AccountDetails.View {
 			)
 		) { viewStore in
 			ForceFullScreen {
-				VStack(alignment: .center) {
+				VStack {
 					header(with: viewStore)
+						.padding([.leading, .trailing, .top], 24)
 
 					ScrollView {
-						AddressView(
-							address: viewStore.address,
-							copyAddressAction: {
-								viewStore.send(.copyAddressButtonTapped)
-							}
-						)
-
-						Home.AggregatedValue.View(
-							store: store.scope(
-								state: \.aggregatedValue,
-								action: Home.AccountDetails.Action.aggregatedValue
+						VStack(spacing: 16) {
+							AddressView(
+								address: viewStore.address,
+								copyAddressAction: {
+									viewStore.send(.copyAddressButtonTapped)
+								}
 							)
-						)
 
-						transferButton(with: viewStore)
-
-						Home.AssetList.View(
-							store: store.scope(
-								state: \.assetList,
-								action: Home.AccountDetails.Action.assetList
+							Home.AggregatedValue.View(
+								store: store.scope(
+									state: \.aggregatedValue,
+									action: Home.AccountDetails.Action.aggregatedValue
+								)
 							)
-						)
+
+							transferButton(with: viewStore)
+								.padding(.bottom, 44)
+
+							Home.AssetList.View(
+								store: store.scope(
+									state: \.assetList,
+									action: Home.AccountDetails.Action.assetList
+								)
+							)
+						}
 					}
 				}
-				.padding([.leading, .trailing, .top], 16)
 				.background(Color.app.backgroundLightGray.opacity(0.15))
 			}
 		}

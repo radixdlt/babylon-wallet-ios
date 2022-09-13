@@ -24,11 +24,20 @@ public extension Home.AssetRow.View {
 				action: Home.AssetRow.Action.init
 			)
 		) { viewStore in
-			tokenRow(viewStore.tokenContainer)
+			tokenRow(with: viewStore, container: viewStore.tokenContainer)
+				.padding([.leading, .trailing], 24)
 		}
 	}
+}
 
-	func tokenRow(_ container: TokenWorthContainer) -> some View {
+// MARK: - Private Typealias
+private extension Home.AssetRow.View {
+	typealias AssetRowViewStore = ViewStore<Home.AssetRow.View.ViewState, Home.AssetRow.View.ViewAction>
+}
+
+// MARK: - Private Methods
+private extension Home.AssetRow.View {
+	func tokenRow(with viewStore: AssetRowViewStore, container: TokenWorthContainer) -> some View {
 		VStack {
 			HStack {
 				HStack {
@@ -44,23 +53,50 @@ public extension Home.AssetRow.View {
 				Spacer()
 
 				VStack(alignment: .trailing, spacing: 5) {
-					Text("\(container.token.value ?? 0)")
+					Text(tokenAmount(value: container.token.value,
+					                 isVisible: viewStore.isCurrencyAmountVisible))
 						.foregroundColor(.app.buttonTextBlack)
 						.font(.app.buttonTitle)
-					Text("\(container.valueInCurrency ?? 0)")
+					Text(tokenValue(container.valueInCurrency,
+					                isVisible: viewStore.isCurrencyAmountVisible,
+					                currency: viewStore.currency))
 						.foregroundColor(.app.secondary)
 						.font(.app.caption2)
 				}
 			}
 		}
-        // TODO: add shadow
-		//        .background(Color.green)
-		.padding([.leading, .trailing], 18)
+//		.padding([.leading, .trailing], 18)
 		.frame(height: 80)
-		//        .background(Color.orange)
-		//        .background(Color.white
-		//            .shadow(color: .black, radius: 10, x: 10, y: 10)
-		//        )
+		/*
+		 .if(container.token.code == .xrd, transform: { view in
+		 	view
+		 		.background(
+		 			RoundedRectangle(cornerRadius: 6)
+		 				.fill(Color.white)
+		 				.shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 9)
+		 		)
+		 })
+		 */
+	}
+
+	func tokenAmount(value: Float?, isVisible: Bool) -> String {
+		if isVisible {
+			if let value = value {
+				return "\(value)"
+			} else {
+				return "-"
+			}
+		} else {
+			return "••••"
+		}
+	}
+
+	func tokenValue(_ value: Float?, isVisible: Bool, currency: FiatCurrency) -> String {
+		if isVisible {
+			return value?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign)-"
+		} else {
+			return "\(currency.sign) ••••"
+		}
 	}
 }
 
@@ -112,5 +148,20 @@ struct AssetRow_Preview: PreviewProvider {
 				environment: .init()
 			)
 		)
+	}
+}
+
+extension View {
+	/// Applies the given transform if the given condition evaluates to `true`.
+	/// - Parameters:
+	///   - condition: The condition to evaluate.
+	///   - transform: The transform to apply to the source `View`.
+	/// - Returns: Either the original `View` or the modified `View` if the condition is `true`.
+	@ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+		if condition {
+			transform(self)
+		} else {
+			self
+		}
 	}
 }

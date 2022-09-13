@@ -118,10 +118,10 @@ private extension Home.View {
 					action: Home.Action.header
 				)
 			)
-			.padding([.leading, .trailing, .top], 32)
+			.padding([.leading, .trailing, .top], 24)
 
 			ScrollView {
-				LazyVStack(spacing: 25) {
+				LazyVStack(spacing: 24) {
 					VStack {
 						title
 						Home.AggregatedValue.View(
@@ -148,7 +148,7 @@ private extension Home.View {
 						)
 					)
 				}
-				.padding(32)
+				.padding(24)
 			}
 		}
 	}

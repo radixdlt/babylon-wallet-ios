@@ -6,6 +6,7 @@ public extension Home.AssetList {
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
 		case asset(id: UUID, action: Home.AssetRow.Action)
+		case xrdAction(action: Home.AssetRow.Action)
 	}
 }
 
