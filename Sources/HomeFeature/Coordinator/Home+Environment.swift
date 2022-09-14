@@ -8,15 +8,18 @@ public extension Home {
 		public let appSettingsClient: AppSettingsClient
 		public let accountWorthFetcher: AccountWorthFetcher
 		public let pasteboardClient: PasteboardClient
+		public let assetListSorter: AssetListSorter
 
 		public init(
 			appSettingsClient: AppSettingsClient,
 			accountWorthFetcher: AccountWorthFetcher,
-			pasteboardClient: PasteboardClient
+			pasteboardClient: PasteboardClient,
+			assetListSorter: AssetListSorter = .live
 		) {
 			self.appSettingsClient = appSettingsClient
 			self.accountWorthFetcher = accountWorthFetcher
 			self.pasteboardClient = pasteboardClient
+			self.assetListSorter = assetListSorter
 		}
 	}
 }
@@ -26,7 +29,8 @@ public extension Home.Environment {
 	static let placeholder: Self = .init(
 		appSettingsClient: .mock,
 		accountWorthFetcher: .mock,
-		pasteboardClient: .noop
+		pasteboardClient: .noop,
+		assetListSorter: .mock
 	)
 }
 #endif

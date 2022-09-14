@@ -127,14 +127,42 @@ public extension Home {
 
 			case let .internal(.system(.totalWorthLoaded(totalWorth))):
 				state.accountsWorthDictionary = totalWorth
+
+				// aggregated value
 				state.aggregatedValue.value = totalWorth.compactMap(\.value.worth).reduce(0, +)
+
+				// account list
 				state.accountList.accounts.forEach {
 					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalWorth[$0.address]?.worth
-
 					let tokenContainers = totalWorth[$0.address]?.tokenContainers ?? []
 					state.accountList.accounts[id: $0.address]?.tokenContainers = tokenContainers
 				}
+
+				// account details
+				if let details = state.accountDetails {
+					// aggregated value
+					let account = details.account
+					let accountWorth = state.accountsWorthDictionary[details.address]
+					state.accountDetails?.aggregatedValue.value = accountWorth?.worth
+
+					// asset list
+					let containers = totalWorth[account.address]?.tokenContainers ?? []
+					let sortedContainers = environment.assetListSorter.sortTokens(containers)
+
+					state.accountDetails?.assetList = .init(
+						sections: .init(uniqueElements: sortedContainers.map { containers in
+							let rows = containers.map { container in Home.AssetRow.State(tokenContainer: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
+							return Home.AssetSection.State(assets: .init(uniqueElements: rows))
+						})
+					)
+				}
+
 				return .none
+
+			case let .internal(.system(.accountWorthLoaded(accountWorth))):
+				guard let key = accountWorth.first?.key else { return .none }
+				state.accountsWorthDictionary[key] = accountWorth.first?.value
+				return Effect(value: .internal(.system(.totalWorthLoaded(state.accountsWorthDictionary))))
 
 			case let .internal(.system(.copyAddress(address))):
 				// TODO: display confirmation popup? discuss with po / designer
@@ -219,6 +247,12 @@ public extension Home {
 			case .accountDetails(.coordinate(.displayTransfer)):
 				state.transfer = .init()
 				return .none
+
+			case let .accountDetails(.coordinate(.refresh(address))):
+				return .run { send in
+					let accountWorth = try await environment.accountWorthFetcher.fetchWorth([address])
+					await send(.internal(.system(.accountWorthLoaded(accountWorth))))
+				}
 
 			case .accountDetails(.aggregatedValue(.internal(_))):
 				return .none

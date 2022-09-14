@@ -85,7 +85,10 @@ private extension Home.AccountDetails.View {
 			Spacer()
 			Button(
 				action: {
-					viewStore.send(.accountPreferencesButtonTapped)
+					// TODO: uncomment
+//					viewStore.send(.accountPreferencesButtonTapped)
+					// TODO: temp implementation just for testing pull to refresh
+					viewStore.send(.refreshTapped)
 				}, label: {
 					Image("ellipsis")
 				}
@@ -114,6 +117,7 @@ extension Home.AccountDetails.View {
 		case accountPreferencesButtonTapped
 		case copyAddressButtonTapped
 		case transferButtonTapped
+		case refreshTapped
 	}
 }
 
@@ -128,6 +132,8 @@ extension Home.AccountDetails.Action {
 			self = .internal(.user(.copyAddress))
 		case .transferButtonTapped:
 			self = .internal(.user(.displayTransfer))
+		case .refreshTapped:
+			self = .internal(.user(.refresh))
 		}
 	}
 }

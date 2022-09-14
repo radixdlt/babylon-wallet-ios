@@ -1,4 +1,5 @@
 import Foundation
+import Profile
 
 public extension Home.AccountDetails {
 	// MARK: Action
@@ -22,6 +23,7 @@ public extension Home.AccountDetails.Action.InternalAction {
 		case displayAccountPreferences
 		case copyAddress
 		case displayTransfer
+		case refresh
 	}
 }
 
@@ -29,7 +31,8 @@ public extension Home.AccountDetails.Action {
 	enum CoordinatingAction: Equatable {
 		case dismissAccountDetails
 		case displayAccountPreferences
-		case copyAddress(String)
+		case copyAddress(Profile.Account.Address)
 		case displayTransfer
+		case refresh(Profile.Account.Address)
 	}
 }

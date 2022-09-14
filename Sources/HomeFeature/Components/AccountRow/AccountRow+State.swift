@@ -12,8 +12,9 @@ public extension Home {
 public extension Home.AccountRow {
 	// MARK: State
 	struct State: Equatable {
+		public let account: Profile.Account
 		public let name: String
-		public let address: String
+		public let address: Profile.Account.Address
 		public var aggregatedValue: Float?
 		public var tokenContainers: [TokenWorthContainer]
 
@@ -22,6 +23,7 @@ public extension Home.AccountRow {
 		public var isCurrencyAmountVisible: Bool
 
 		public init(
+			account: Profile.Account,
 			name: String,
 			address: String,
 			aggregatedValue: Float?,
@@ -29,6 +31,7 @@ public extension Home.AccountRow {
 			currency: FiatCurrency,
 			isCurrencyAmountVisible: Bool
 		) {
+			self.account = account
 			self.name = name
 			self.address = address
 			self.aggregatedValue = aggregatedValue
@@ -43,6 +46,7 @@ public extension Home.AccountRow {
 public extension Home.AccountRow.State {
 	init(account: Profile.Account) {
 		self.init(
+			account: account,
 			name: account.name,
 			address: account.address,
 			aggregatedValue: nil,
@@ -59,39 +63,6 @@ extension Home.AccountRow.State: Identifiable {
 
 	public var id: Profile.Account.Address {
 		address
-	}
-}
-
-// MARK: - Computed Properties
-public extension Home.AccountRow.State {
-	var sectionedTokenContainers: [[TokenWorthContainer]] {
-		var xrdContainer: TokenWorthContainer?
-		var noValueTokens = [TokenWorthContainer]()
-		var tokensWithValues = [TokenWorthContainer]()
-
-		tokenContainers.forEach {
-			if $0.token.code == .xrd {
-				xrdContainer = $0
-			} else if $0.token.value == nil {
-				noValueTokens.append($0)
-			} else {
-				tokensWithValues.append($0)
-			}
-		}
-
-		tokensWithValues.sort { $0.token.value! > $1.token.value! }
-		noValueTokens.sort { $0.token.code.value < $1.token.code.value }
-
-		var result = [[TokenWorthContainer]]()
-
-		if let xrdContainer = xrdContainer {
-			result.append([xrdContainer])
-		}
-
-		let otherAssets: [TokenWorthContainer] = tokensWithValues + noValueTokens
-		result.append(otherAssets)
-
-		return result
 	}
 }
 

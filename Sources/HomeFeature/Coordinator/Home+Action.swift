@@ -39,6 +39,7 @@ public extension Home.Action.InternalAction {
 		case toggleIsCurrencyAmountVisible
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case totalWorthLoaded(AccountsWorthDictionary)
+		case accountWorthLoaded(AccountsWorthDictionary)
 		case copyAddress(Profile.Account.Address)
 		case viewDidAppearActionFailed(reason: String)
 		case toggleIsCurrencyAmountVisibleFailed(reason: String)

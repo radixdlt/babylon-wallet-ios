@@ -21,6 +21,8 @@ public extension Home.AccountDetails {
 				return .run { [address = state.address] send in
 					await send(.coordinate(.copyAddress(address)))
 				}
+			case .internal(.user(.refresh)):
+				return Effect(value: .coordinate(.refresh(state.address)))
 			case .coordinate:
 				return .none
 			case .aggregatedValue:
