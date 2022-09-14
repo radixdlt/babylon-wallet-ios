@@ -10,15 +10,39 @@ public extension Home {
 public extension Home.AssetList {
 	// MARK: State
 	struct State: Equatable {
-		public var xrdToken: Home.AssetRow.State?
-		public var assets: IdentifiedArrayOf<Home.AssetRow.State>
+		public var type: ListType = .tokens
+		public var sections: IdentifiedArrayOf<Home.AssetSection.State>
 
 		public init(
-			xrdToken: Home.AssetRow.State?,
-			assets: IdentifiedArrayOf<Home.AssetRow.State>
+			sections: IdentifiedArrayOf<Home.AssetSection.State>
 		) {
-			self.xrdToken = xrdToken
-			self.assets = assets
+			self.sections = sections
+		}
+	}
+}
+
+public extension Home.AssetList {
+	enum ListType: String, CaseIterable, Identifiable {
+		case tokens
+		case nfts
+		case poolShare
+		case badges
+
+		var displayText: String {
+			switch self {
+			case .tokens:
+				return L10n.Home.AssetList.tokens
+			case .nfts:
+				return L10n.Home.AssetList.nfts
+			case .poolShare:
+				return L10n.Home.AssetList.poolShare
+			case .badges:
+				return L10n.Home.AssetList.badges
+			}
+		}
+
+		public var id: String {
+			rawValue
 		}
 	}
 }

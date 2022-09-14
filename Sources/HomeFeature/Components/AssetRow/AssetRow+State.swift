@@ -11,7 +11,7 @@ public extension Home {
 public extension Home.AssetRow {
 	// MARK: State
 	struct State: Equatable, Identifiable {
-		public var id: UUID
+		public let id = UUID()
 		public var tokenContainer: TokenWorthContainer
 
 		// MARK: - AppSettings properties
@@ -19,12 +19,10 @@ public extension Home.AssetRow {
 		public var isCurrencyAmountVisible: Bool
 
 		public init(
-			id: UUID,
 			tokenContainer: TokenWorthContainer,
 			currency: FiatCurrency,
 			isCurrencyAmountVisible: Bool
 		) {
-			self.id = id
 			self.tokenContainer = tokenContainer
 			self.currency = currency
 			self.isCurrencyAmountVisible = isCurrencyAmountVisible

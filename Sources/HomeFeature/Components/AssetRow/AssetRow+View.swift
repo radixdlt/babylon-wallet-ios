@@ -38,8 +38,8 @@ private extension Home.AssetRow.View {
 // MARK: - Private Methods
 private extension Home.AssetRow.View {
 	func tokenRow(with viewStore: AssetRowViewStore, container: TokenWorthContainer) -> some View {
-		VStack {
-			HStack {
+		ZStack {
+			HStack(alignment: .center) {
 				HStack {
 					Circle()
 						.frame(width: 40, height: 40)
@@ -64,19 +64,19 @@ private extension Home.AssetRow.View {
 						.font(.app.caption2)
 				}
 			}
+
+			VStack {
+				Spacer()
+				separator()
+			}
 		}
-//		.padding([.leading, .trailing], 18)
 		.frame(height: 80)
-		/*
-		 .if(container.token.code == .xrd, transform: { view in
-		 	view
-		 		.background(
-		 			RoundedRectangle(cornerRadius: 6)
-		 				.fill(Color.white)
-		 				.shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 9)
-		 		)
-		 })
-		 */
+	}
+
+	func separator() -> some View {
+		Rectangle()
+			.foregroundColor(.app.separatorLightGray)
+			.frame(height: 1)
 	}
 
 	func tokenAmount(value: Float?, isVisible: Bool) -> String {
@@ -136,7 +136,6 @@ struct AssetRow_Preview: PreviewProvider {
 		Home.AssetRow.View(
 			store: .init(
 				initialState: .init(
-					id: UUID(),
 					tokenContainer: .init(
 						token: .placeholder,
 						valueInCurrency: 100
@@ -148,20 +147,5 @@ struct AssetRow_Preview: PreviewProvider {
 				environment: .init()
 			)
 		)
-	}
-}
-
-extension View {
-	/// Applies the given transform if the given condition evaluates to `true`.
-	/// - Parameters:
-	///   - condition: The condition to evaluate.
-	///   - transform: The transform to apply to the source `View`.
-	/// - Returns: Either the original `View` or the modified `View` if the condition is `true`.
-	@ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
-		if condition {
-			transform(self)
-		} else {
-			self
-		}
 	}
 }

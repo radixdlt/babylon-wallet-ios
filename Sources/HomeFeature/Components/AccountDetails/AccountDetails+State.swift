@@ -26,11 +26,9 @@ public extension Home.AccountDetails {
 			name = account.name
 
 			assetList = .init(
-				xrdToken: account.tokenContainers.first.map {
-					Home.AssetRow.State(id: UUID(), tokenContainer: $0, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible)
-				},
-				assets: .init(uniqueElements: account.tokenContainers.map {
-					Home.AssetRow.State(id: UUID(), tokenContainer: $0, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible)
+				sections: .init(uniqueElements: account.sectionedTokenContainers.map { containers in
+					let rows = containers.map { container in Home.AssetRow.State(tokenContainer: container, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible) }
+					return Home.AssetSection.State(assets: .init(uniqueElements: rows))
 				})
 			)
 		}

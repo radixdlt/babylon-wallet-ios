@@ -11,7 +11,7 @@ public extension Home {
 
 public extension Home.AccountRow {
 	// MARK: State
-	struct State: Equatable, Identifiable {
+	struct State: Equatable {
 		public let name: String
 		public let address: String
 		public var aggregatedValue: Float?
@@ -53,11 +53,45 @@ public extension Home.AccountRow.State {
 	}
 }
 
-public extension Home.AccountRow.State {
-	typealias ID = Profile.Account.Address
+// MARK: - Home.AccountRow.State + Identifiable
+extension Home.AccountRow.State: Identifiable {
+	public typealias ID = Profile.Account.Address
 
-	var id: Profile.Account.Address {
+	public var id: Profile.Account.Address {
 		address
+	}
+}
+
+// MARK: - Computed Properties
+public extension Home.AccountRow.State {
+	var sectionedTokenContainers: [[TokenWorthContainer]] {
+		var xrdContainer: TokenWorthContainer?
+		var noValueTokens = [TokenWorthContainer]()
+		var tokensWithValues = [TokenWorthContainer]()
+
+		tokenContainers.forEach {
+			if $0.token.code == .xrd {
+				xrdContainer = $0
+			} else if $0.token.value == nil {
+				noValueTokens.append($0)
+			} else {
+				tokensWithValues.append($0)
+			}
+		}
+
+		tokensWithValues.sort { $0.token.value! > $1.token.value! }
+		noValueTokens.sort { $0.token.code.value < $1.token.code.value }
+
+		var result = [[TokenWorthContainer]]()
+
+		if let xrdContainer = xrdContainer {
+			result.append([xrdContainer])
+		}
+
+		let otherAssets: [TokenWorthContainer] = tokensWithValues + noValueTokens
+		result.append(otherAssets)
+
+		return result
 	}
 }
 

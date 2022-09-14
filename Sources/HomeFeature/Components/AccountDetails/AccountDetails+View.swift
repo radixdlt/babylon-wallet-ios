@@ -45,7 +45,7 @@ public extension Home.AccountDetails.View {
 							)
 
 							transferButton(with: viewStore)
-								.padding(.bottom, 44)
+								.padding(.bottom, 20)
 
 							Home.AssetList.View(
 								store: store.scope(

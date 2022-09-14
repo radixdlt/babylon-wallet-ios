@@ -49,6 +49,10 @@ public extension Font.App {
 		.custom(.𝟙𝟞, .regular)
 	}
 
+	var buttonBody: Font {
+		.custom(.𝟙𝟞, .semibold)
+	}
+
 	var buttonTitle: Font {
 		.custom(.𝟙𝟠, .semibold)
 	}

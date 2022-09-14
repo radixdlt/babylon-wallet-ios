@@ -27,6 +27,17 @@ public enum L10n {
 			public static let title = L10n.tr("Localizable", "home.aggregatedValue.title", fallback: #"Total value"#)
 		}
 
+		public enum AssetList {
+			/// Badges
+			public static let badges = L10n.tr("Localizable", "home.assetList.badges", fallback: #"Badges"#)
+			/// NFTs
+			public static let nfts = L10n.tr("Localizable", "home.assetList.nfts", fallback: #"NFTs"#)
+			/// Pool Share
+			public static let poolShare = L10n.tr("Localizable", "home.assetList.poolShare", fallback: #"Pool Share"#)
+			/// Tokens
+			public static let tokens = L10n.tr("Localizable", "home.assetList.tokens", fallback: #"Tokens"#)
+		}
+
 		public enum Header {
 			/// Welcome, here are all your accounts on the Radar Network
 			public static let subtitle = L10n.tr("Localizable", "home.header.subtitle", fallback: #"Welcome, here are all your accounts on the Radar Network"#)

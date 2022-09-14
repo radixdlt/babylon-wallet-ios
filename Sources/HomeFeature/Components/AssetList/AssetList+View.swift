@@ -22,68 +22,43 @@ public extension Home.AssetList.View {
 				action: Home.AssetList.Action.init
 			)
 		) { _ in
-			LazyVStack(spacing: 25) {
-//				 IfLetStore(
-//				     store.scope(
-//				         state: \.xrdToken,
-//				         action: Home.AssetList.Action.asset(id:action:)
-//				     )) { store in
-//				         //                        Home.AssetRow.View(store: store)
-//				         //                        Text(String(describing: store))
-				//                         Home.AssetRow.View(store: store)
-//				     }
+			VStack(spacing: 30) {
+				selectorView()
 
-				//                Home.AssetRow.View(store: .init(initialState: Home.AssetRow.State(, reducer: Home.AssetRow.reducer, environment: Home.AssetRow.Environment()))
-
-				/*
-				 IfLetStore(
-				     store.scope(
-				         state: \.xrdToken,
-				         action: Home.AssetList.Action.asset(id:action:)
-				     ),
-				     then: Home.AssetRow.View.init(store:)
-				 )
-				 */
-
-				IfLetStore(
-					store.scope(
-						state: \.xrdToken,
-						action: Home.AssetList.Action.xrdAction(action:)
-					),
-					then: Home.AssetRow.View.init(store:)
-				)
-
-				ForEachStore(
-					store.scope(
-						state: \.assets,
-						action: Home.AssetList.Action.asset(id:action:)
-					),
-					content: { store in
-						VStack {
-							Home.AssetRow.View(store: store)
-							// TODO: exclude if last row
-							separator()
-						}
-					}
-				)
+				LazyVStack(spacing: 25) {
+					ForEachStore(
+						store.scope(
+							state: \.sections,
+							action: Home.AssetList.Action.assetSection
+						),
+						content: Home.AssetSection.View.init(store:)
+					)
+				}
 			}
 		}
 	}
+}
 
-	/*
-	 .background(
-	     RoundedRectangle(cornerRadius: 6)
-	         .fill(Color.white)
-	         .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 9)
-	 )
-	 .padding([.leading, .trailing], 18)
-	 */
-
-	func separator() -> some View {
-		Rectangle()
-			.padding([.leading, .trailing], 18)
-			.foregroundColor(.app.separatorLightGray)
-			.frame(height: 1)
+// MARK: - Private Methods
+private extension Home.AssetList.View {
+	func selectorView() -> some View {
+		ScrollView(.horizontal, showsIndicators: false) {
+			Button(
+				action: {
+					// TODO: implement
+				}, label: {
+					Text(Home.AssetList.ListType.tokens.displayText)
+						.foregroundColor(.app.buttonTextWhite)
+						.font(.app.buttonBody)
+						.frame(height: 40)
+						.padding([.leading, .trailing], 16)
+						.background(RoundedRectangle(cornerRadius: 21)
+							.fill(Color.app.buttonBackgroundDark2)
+						)
+						.padding([.leading, .trailing], 18)
+				}
+			)
+		}
 	}
 }
 
@@ -117,8 +92,7 @@ struct AssetList_Preview: PreviewProvider {
 		Home.AssetList.View(
 			store: .init(
 				initialState: .init(
-					xrdToken: nil,
-					assets: []
+					sections: []
 				),
 				reducer: Home.AssetList.reducer,
 				environment: .init()

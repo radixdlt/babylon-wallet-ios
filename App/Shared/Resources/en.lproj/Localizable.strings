@@ -11,3 +11,8 @@
 "home.accountRow.copyTitle" = "Copy";
 
 "home.accountDetails.transferButtonTitle" = "Transfer";
+
+"home.assetList.tokens" = "Tokens";
+"home.assetList.nfts" = "NFTs";
+"home.assetList.poolShare" = "Pool Share";
+"home.assetList.badges" = "Badges";
