@@ -54,6 +54,7 @@ public extension Home.AccountDetails.View {
 								)
 							)
 						}
+						.padding(.bottom, 24)
 					}
 				}
 				.background(Color.app.backgroundLightGray.opacity(0.15))
