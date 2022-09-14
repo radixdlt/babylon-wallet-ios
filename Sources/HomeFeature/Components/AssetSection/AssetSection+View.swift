@@ -34,7 +34,7 @@ public extension Home.AssetSection.View {
 			.background(
 				RoundedRectangle(cornerRadius: 6)
 					.fill(Color.white)
-					.shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 9)
+					.shadow(color: .app.shadowBlack, radius: 8, x: 0, y: 9)
 			)
 			.padding([.leading, .trailing], 18)
 		}

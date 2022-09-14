@@ -33,7 +33,8 @@ public extension Home.AccountRow.View {
 							viewStore.aggregatedValue ?? 0,
 							currency: viewStore.currency
 						),
-						isValueVisible: viewStore.isCurrencyAmountVisible
+						isValueVisible: viewStore.isCurrencyAmountVisible,
+						currency: viewStore.currency
 					)
 
 					AddressView(
@@ -106,6 +107,7 @@ private struct HeaderView: View {
 	let name: String
 	let value: String
 	let isValueVisible: Bool
+	let currency: FiatCurrency
 
 	var body: some View {
 		HStack {
@@ -114,7 +116,7 @@ private struct HeaderView: View {
 				.font(.app.buttonTitle)
 				.fixedSize()
 			Spacer()
-			Text(isValueVisible ? value : "•••••")
+			Text(isValueVisible ? value : "\(currency.sign) ••••")
 				.foregroundColor(.app.buttonTextBlack)
 				.font(.app.buttonTitle)
 				.fixedSize()

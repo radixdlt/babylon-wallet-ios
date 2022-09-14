@@ -25,7 +25,7 @@ public extension Home.AssetList.View {
 			VStack(spacing: 30) {
 				selectorView()
 
-				LazyVStack(spacing: 25) {
+				LazyVStack(spacing: 20) {
 					ForEachStore(
 						store.scope(
 							state: \.sections,

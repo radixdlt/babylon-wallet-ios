@@ -71,6 +71,10 @@ public extension Color.App {
 	var buttonTextBlackTransparent: Color {
 		.black.opacity(0.6)
 	}
+
+	var shadowBlack: Color {
+		.black.opacity(0.08)
+	}
 }
 
 private extension Color {
