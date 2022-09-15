@@ -29,7 +29,7 @@ public extension Home {
 		public var accountDetails: AccountDetails.State?
 		public var accountPreferences: AccountPreferences.State?
 		public var createAccount: CreateAccount.State?
-		public var transfer: Home.Transfer.State?
+		public var transfer: AccountDetails.Transfer.State?
 
 		public init(
 			wallet: Wallet,
@@ -41,7 +41,7 @@ public extension Home {
 			accountDetails: AccountDetails.State? = nil,
 			accountPreferences: AccountPreferences.State? = nil,
 			createAccount: CreateAccount.State? = nil,
-			transfer: Home.Transfer.State? = nil
+			transfer: AccountDetails.Transfer.State? = nil
 		) {
 			self.wallet = wallet
 			self.accountsWorthDictionary = accountsWorthDictionary

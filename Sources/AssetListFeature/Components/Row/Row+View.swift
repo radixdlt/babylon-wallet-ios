@@ -3,7 +3,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
-public extension AccountDetails.AssetRow {
+public extension AssetList.Row {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -16,12 +16,12 @@ public extension AccountDetails.AssetRow {
 	}
 }
 
-public extension AccountDetails.AssetRow.View {
+public extension AssetList.Row.View {
 	var body: some View {
 		WithViewStore(
 			store.scope(
 				state: ViewState.init,
-				action: AccountDetails.AssetRow.Action.init
+				action: AssetList.Row.Action.init
 			)
 		) { viewStore in
 			tokenRow(with: viewStore, container: viewStore.tokenContainer)
@@ -31,13 +31,13 @@ public extension AccountDetails.AssetRow.View {
 }
 
 // MARK: - Private Typealias
-private extension AccountDetails.AssetRow.View {
-	typealias AssetRowViewStore = ViewStore<AccountDetails.AssetRow.View.ViewState, AccountDetails.AssetRow.View.ViewAction>
+private extension AssetList.Row.View {
+	typealias RowViewStore = ViewStore<AssetList.Row.View.ViewState, AssetList.Row.View.ViewAction>
 }
 
 // MARK: - Private Methods
-private extension AccountDetails.AssetRow.View {
-	func tokenRow(with viewStore: AssetRowViewStore, container: TokenWorthContainer) -> some View {
+private extension AssetList.Row.View {
+	func tokenRow(with viewStore: RowViewStore, container: TokenWorthContainer) -> some View {
 		ZStack {
 			HStack(alignment: .center) {
 				HStack {
@@ -100,13 +100,13 @@ private extension AccountDetails.AssetRow.View {
 	}
 }
 
-extension AccountDetails.AssetRow.View {
+extension AssetList.Row.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {}
 }
 
-extension AccountDetails.AssetRow.Action {
-	init(action: AccountDetails.AssetRow.View.ViewAction) {
+extension AssetList.Row.Action {
+	init(action: AssetList.Row.View.ViewAction) {
 		switch action {
 		default:
 			// TODO: implement
@@ -115,14 +115,14 @@ extension AccountDetails.AssetRow.Action {
 	}
 }
 
-extension AccountDetails.AssetRow.View {
+extension AssetList.Row.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		let tokenContainer: TokenWorthContainer
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
 
-		init(state: AccountDetails.AssetRow.State) {
+		init(state: AssetList.Row.State) {
 			tokenContainer = state.tokenContainer
 			currency = state.currency
 			isCurrencyAmountVisible = state.isCurrencyAmountVisible
@@ -130,10 +130,10 @@ extension AccountDetails.AssetRow.View {
 	}
 }
 
-// MARK: - AssetRow_Preview
-struct AssetRow_Preview: PreviewProvider {
+// MARK: - Row_Preview
+struct Row_Preview: PreviewProvider {
 	static var previews: some View {
-		AccountDetails.AssetRow.View(
+		AssetList.Row.View(
 			store: .init(
 				initialState: .init(
 					tokenContainer: .init(
@@ -143,7 +143,7 @@ struct AssetRow_Preview: PreviewProvider {
 					currency: .usd,
 					isCurrencyAmountVisible: true
 				),
-				reducer: AccountDetails.AssetRow.reducer,
+				reducer: AssetList.Row.reducer,
 				environment: .init()
 			)
 		)

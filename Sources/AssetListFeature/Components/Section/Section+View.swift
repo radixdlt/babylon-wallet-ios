@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-public extension AccountDetails.AssetSection {
+public extension AssetList.Section {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -14,21 +14,21 @@ public extension AccountDetails.AssetSection {
 	}
 }
 
-public extension AccountDetails.AssetSection.View {
+public extension AssetList.Section.View {
 	var body: some View {
 		WithViewStore(
 			store.scope(
 				state: ViewState.init,
-				action: AccountDetails.AssetSection.Action.init
+				action: AssetList.Section.Action.init
 			)
 		) { _ in
 			LazyVStack(spacing: 0) {
 				ForEachStore(
 					store.scope(
 						state: \.assets,
-						action: AccountDetails.AssetSection.Action.asset(id:action:)
+						action: AssetList.Section.Action.asset(id:action:)
 					),
-					content: AccountDetails.AssetRow.View.init(store:)
+					content: AssetList.Row.View.init(store:)
 				)
 			}
 			.background(
@@ -41,13 +41,13 @@ public extension AccountDetails.AssetSection.View {
 	}
 }
 
-extension AccountDetails.AssetSection.View {
+extension AssetList.Section.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {}
 }
 
-extension AccountDetails.AssetSection.Action {
-	init(action: AccountDetails.AssetSection.View.ViewAction) {
+extension AssetList.Section.Action {
+	init(action: AssetList.Section.View.ViewAction) {
 		switch action {
 		default:
 			// TODO: implement
@@ -56,24 +56,24 @@ extension AccountDetails.AssetSection.Action {
 	}
 }
 
-extension AccountDetails.AssetSection.View {
+extension AssetList.Section.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: AccountDetails.AssetSection.State) {
+		init(state _: AssetList.Section.State) {
 			// TODO: implement
 		}
 	}
 }
 
-// MARK: - AssetSection_Preview
-struct AssetSection_Preview: PreviewProvider {
+// MARK: - Section_Preview
+struct Section_Preview: PreviewProvider {
 	static var previews: some View {
-		AccountDetails.AssetSection.View(
+		AssetList.Section.View(
 			store: .init(
 				initialState: .init(
 					assets: []
 				),
-				reducer: AccountDetails.AssetSection.reducer,
+				reducer: AssetList.Section.reducer,
 				environment: .init()
 			)
 		)

@@ -1,6 +1,6 @@
 import Foundation
 
-public extension AccountDetails.AssetRow {
+public extension AccountDetails.Transfer {
 	// MARK: Environment
 	struct Environment {
 		public init() {}

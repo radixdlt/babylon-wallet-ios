@@ -2,7 +2,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
-public extension Home.Transfer {
+public extension AccountDetails.Transfer {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -15,12 +15,12 @@ public extension Home.Transfer {
 	}
 }
 
-public extension Home.Transfer.View {
+public extension AccountDetails.Transfer.View {
 	var body: some View {
 		WithViewStore(
 			store.scope(
 				state: ViewState.init,
-				action: Home.Transfer.Action.init
+				action: AccountDetails.Transfer.Action.init
 			)
 		) { viewStore in
 			// TODO: implement
@@ -39,15 +39,15 @@ public extension Home.Transfer.View {
 	}
 }
 
-extension Home.Transfer.View {
+extension AccountDetails.Transfer.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case dismissTransferButtonTapped
 	}
 }
 
-extension Home.Transfer.Action {
-	init(action: Home.Transfer.View.ViewAction) {
+extension AccountDetails.Transfer.Action {
+	init(action: AccountDetails.Transfer.View.ViewAction) {
 		switch action {
 		case .dismissTransferButtonTapped:
 			self = .internal(.user(.dismissTransfer))
@@ -55,10 +55,10 @@ extension Home.Transfer.Action {
 	}
 }
 
-extension Home.Transfer.View {
+extension AccountDetails.Transfer.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: Home.Transfer.State) {
+		init(state _: AccountDetails.Transfer.State) {
 			// TODO: implement
 		}
 	}
@@ -67,10 +67,10 @@ extension Home.Transfer.View {
 // MARK: - Transfer_Preview
 struct Transfer_Preview: PreviewProvider {
 	static var previews: some View {
-		Home.Transfer.View(
+		AccountDetails.Transfer.View(
 			store: .init(
 				initialState: .init(),
-				reducer: Home.Transfer.reducer,
+				reducer: AccountDetails.Transfer.reducer,
 				environment: .init()
 			)
 		)

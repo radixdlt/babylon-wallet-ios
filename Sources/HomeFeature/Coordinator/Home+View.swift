@@ -67,7 +67,7 @@ public extension Home.View {
 						state: \.transfer,
 						action: Home.Action.transfer
 					),
-					then: Home.Transfer.View.init(store:)
+					then: AccountDetails.Transfer.View.init(store:)
 				)
 				.zIndex(5)
 			}

@@ -1,6 +1,6 @@
 import Foundation
 
-public extension AccountDetails.AssetList {
+public extension AssetList {
 	// MARK: Environment
 	struct Environment {
 		public init() {}

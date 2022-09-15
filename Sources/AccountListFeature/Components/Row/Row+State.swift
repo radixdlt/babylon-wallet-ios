@@ -3,8 +3,8 @@ import Common
 import Foundation
 import Profile
 
-// MARK: - AccountRow
-/// Namespace for AccountRowFeature
+// MARK: - Row
+/// Namespace for Row
 public extension AccountList {
 	enum Row {}
 }

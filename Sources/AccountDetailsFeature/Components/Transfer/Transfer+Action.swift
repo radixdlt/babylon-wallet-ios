@@ -1,6 +1,6 @@
 import Foundation
 
-public extension Home.Transfer {
+public extension AccountDetails.Transfer {
 	// MARK: Action
 	enum Action: Equatable {
 		case `internal`(InternalAction)
@@ -8,19 +8,19 @@ public extension Home.Transfer {
 	}
 }
 
-public extension Home.Transfer.Action {
+public extension AccountDetails.Transfer.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
 	}
 }
 
-public extension Home.Transfer.Action.InternalAction {
+public extension AccountDetails.Transfer.Action.InternalAction {
 	enum UserAction: Equatable {
 		case dismissTransfer
 	}
 }
 
-public extension Home.Transfer.Action {
+public extension AccountDetails.Transfer.Action {
 	enum CoordinatingAction: Equatable {
 		case dismissTransfer
 	}

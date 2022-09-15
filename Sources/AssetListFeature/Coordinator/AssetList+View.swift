@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-public extension AccountDetails.AssetList {
+public extension AssetList {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -14,12 +14,12 @@ public extension AccountDetails.AssetList {
 	}
 }
 
-public extension AccountDetails.AssetList.View {
+public extension AssetList.View {
 	var body: some View {
 		WithViewStore(
 			store.scope(
 				state: ViewState.init,
-				action: AccountDetails.AssetList.Action.init
+				action: AssetList.Action.init
 			)
 		) { _ in
 			VStack(spacing: 30) {
@@ -29,9 +29,9 @@ public extension AccountDetails.AssetList.View {
 					ForEachStore(
 						store.scope(
 							state: \.sections,
-							action: AccountDetails.AssetList.Action.assetSection
+							action: AssetList.Action.section
 						),
-						content: AccountDetails.AssetSection.View.init(store:)
+						content: AssetList.Section.View.init(store:)
 					)
 				}
 			}
@@ -40,14 +40,14 @@ public extension AccountDetails.AssetList.View {
 }
 
 // MARK: - Private Methods
-private extension AccountDetails.AssetList.View {
+private extension AssetList.View {
 	func selectorView() -> some View {
 		ScrollView(.horizontal, showsIndicators: false) {
 			Button(
 				action: {
 					// TODO: implement
 				}, label: {
-					Text(AccountDetails.AssetList.ListType.tokens.displayText)
+					Text(AssetList.ListType.tokens.displayText)
 						.foregroundColor(.app.buttonTextWhite)
 						.font(.app.buttonBody)
 						.frame(height: 40)
@@ -62,13 +62,13 @@ private extension AccountDetails.AssetList.View {
 	}
 }
 
-extension AccountDetails.AssetList.View {
+extension AssetList.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {}
 }
 
-extension AccountDetails.AssetList.Action {
-	init(action: AccountDetails.AssetList.View.ViewAction) {
+extension AssetList.Action {
+	init(action: AssetList.View.ViewAction) {
 		switch action {
 		default:
 			// TODO: implement
@@ -77,10 +77,10 @@ extension AccountDetails.AssetList.Action {
 	}
 }
 
-extension AccountDetails.AssetList.View {
+extension AssetList.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: AccountDetails.AssetList.State) {
+		init(state _: AssetList.State) {
 			// TODO: implement
 		}
 	}
@@ -89,12 +89,12 @@ extension AccountDetails.AssetList.View {
 // MARK: - AssetList_Preview
 struct AssetList_Preview: PreviewProvider {
 	static var previews: some View {
-		AccountDetails.AssetList.View(
+		AssetList.View(
 			store: .init(
 				initialState: .init(
 					sections: []
 				),
-				reducer: AccountDetails.AssetList.reducer,
+				reducer: AssetList.reducer,
 				environment: .init()
 			)
 		)

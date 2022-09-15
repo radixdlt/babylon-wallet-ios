@@ -3,25 +3,23 @@ import ComposableArchitecture
 
 // MARK: - AssetList
 /// Namespace for AssetListFeature
-public extension AccountDetails {
-	enum AssetList {}
-}
+public enum AssetList {}
 
-public extension AccountDetails.AssetList {
+public extension AssetList {
 	// MARK: State
 	struct State: Equatable {
 		public var type: ListType = .tokens
-		public var sections: IdentifiedArrayOf<AccountDetails.AssetSection.State>
+		public var sections: IdentifiedArrayOf<AssetList.Section.State>
 
 		public init(
-			sections: IdentifiedArrayOf<AccountDetails.AssetSection.State>
+			sections: IdentifiedArrayOf<AssetList.Section.State>
 		) {
 			self.sections = sections
 		}
 	}
 }
 
-public extension AccountDetails.AssetList {
+public extension AssetList {
 	enum ListType: String, CaseIterable, Identifiable {
 		case tokens
 		case nfts

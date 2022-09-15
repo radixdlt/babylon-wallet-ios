@@ -1,6 +1,7 @@
 import AccountDetailsFeature
 import AccountWorthFetcher
 import AppSettings
+import AssetListFeature
 import PasteboardClient
 
 public extension Home {

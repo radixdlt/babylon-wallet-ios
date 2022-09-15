@@ -3,6 +3,7 @@ import AccountListFeature
 import AccountPreferencesFeature
 import AccountWorthFetcher
 import AggregatedValueFeature
+import AssetListFeature
 import ComposableArchitecture
 import CreateAccountFeature
 
@@ -63,13 +64,13 @@ public extension Home {
 				}
 			),
 
-		Home.Transfer.reducer
+		AccountDetails.Transfer.reducer
 			.optional()
 			.pullback(
 				state: \.transfer,
 				action: /Home.Action.transfer,
 				environment: { _ in
-					Home.Transfer.Environment()
+					AccountDetails.Transfer.Environment()
 				}
 			),
 
@@ -156,8 +157,8 @@ public extension Home {
 
 					state.accountDetails?.assetList = .init(
 						sections: .init(uniqueElements: sortedContainers.map { containers in
-							let rows = containers.map { container in AccountDetails.AssetRow.State(tokenContainer: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
-							return AccountDetails.AssetSection.State(assets: .init(uniqueElements: rows))
+							let rows = containers.map { container in AssetList.Row.State(tokenContainer: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
+							return AssetList.Section.State(assets: .init(uniqueElements: rows))
 						})
 					)
 				}

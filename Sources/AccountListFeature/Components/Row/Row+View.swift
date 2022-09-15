@@ -38,15 +38,13 @@ public extension AccountList.Row.View {
 						currency: viewStore.currency
 					)
 
-					/*
-					 AddressView(
-					 	address: viewStore.address,
-					 	copyAddressAction: {
-					 		viewStore.send(.copyAddressButtonTapped)
-					 	}
-					 )
-					 .frame(maxWidth: 160)
-					 */
+					AddressView(
+						address: viewStore.address,
+						copyAddressAction: {
+							viewStore.send(.copyAddressButtonTapped)
+						}
+					)
+					.frame(maxWidth: 160)
 				}
 
 				TokenListView(tokens: viewStore.state.tokenContainers.map(\.token))
@@ -135,36 +133,6 @@ private struct HeaderView: View {
 }
 
 // MARK: - TokenView
-/*
- // MARK: - AddressView
- struct AddressView: View {
- 	let address: String
- 	let copyAddressAction: () -> Void
-
- 	var body: some View {
- 		HStack(spacing: 5) {
- 			Text(address)
- 				.lineLimit(1)
- 				.truncationMode(.middle)
- 				.foregroundColor(.app.buttonTextBlackTransparent)
- 				.font(.app.caption2)
-
- 			Button(
- 				action: copyAddressAction,
- 				label: {
- 					Text(L10n.Home.AccountRow.copyTitle)
- 						.foregroundColor(.app.buttonTextBlack)
- 						.font(.app.caption2)
- 						.underline()
- 						.padding(12)
- 						.fixedSize()
- 				}
- 			)
- 		}
- 	}
- }
- */
-
 private struct TokenView: View {
 	let code: String
 
@@ -205,8 +173,8 @@ private struct TokenListView: View {
 	}
 }
 
-// MARK: - AccountRow_Preview
-struct AccountRow_Preview: PreviewProvider {
+// MARK: - Row_Preview
+struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountList.Row.View(
 			store: .init(

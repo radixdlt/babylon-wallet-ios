@@ -42,6 +42,7 @@ let package = Package(
 				"AccountListFeature",
 				"AccountWorthFetcher",
 				"AggregatedValueFeature",
+				"AssetListFeature",
 				tca,
 			]
 		),
@@ -105,6 +106,13 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "AssetListFeature",
+			dependencies: [
+				"AccountWorthFetcher",
+				tca,
+			]
+		),
+		.target(
 			name: "Common",
 			dependencies: [
 			]
@@ -131,6 +139,7 @@ let package = Package(
 				"AccountPreferencesFeature",
 				"AccountWorthFetcher",
 				"AppSettings",
+				"AssetListFeature",
 				"Common",
 				"CreateAccountFeature",
 				"Profile",

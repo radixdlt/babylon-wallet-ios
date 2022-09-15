@@ -1,4 +1,5 @@
 import AggregatedValueFeature
+import AssetListFeature
 import Foundation
 import Profile
 
@@ -8,7 +9,7 @@ public extension AccountDetails {
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
 		case aggregatedValue(AggregatedValue.Action)
-		case assetList(AccountDetails.AssetList.Action)
+		case assetList(AssetList.Action)
 	}
 }
 

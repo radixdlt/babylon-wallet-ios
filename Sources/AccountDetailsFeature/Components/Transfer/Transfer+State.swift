@@ -2,11 +2,11 @@ import Foundation
 
 // MARK: - Transfer
 /// Namespace for TransferFeature
-public extension Home {
+public extension AccountDetails {
 	enum Transfer {}
 }
 
-public extension Home.Transfer {
+public extension AccountDetails.Transfer {
 	// MARK: State
 	struct State: Equatable {
 		public init() {}

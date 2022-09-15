@@ -1,4 +1,5 @@
 import AggregatedValueFeature
+import AssetListFeature
 import Common
 import ComposableArchitecture
 import SwiftUI
@@ -31,14 +32,12 @@ public extension AccountDetails.View {
 
 					ScrollView {
 						VStack(spacing: 16) {
-							/*
-							 AccountDetails.AddressView(
-							 	address: viewStore.address,
-							 	copyAddressAction: {
-							 		viewStore.send(.copyAddressButtonTapped)
-							 	}
-							 )
-							 */
+							AddressView(
+								address: viewStore.address,
+								copyAddressAction: {
+									viewStore.send(.copyAddressButtonTapped)
+								}
+							)
 
 							AggregatedValue.View(
 								store: store.scope(
@@ -50,7 +49,7 @@ public extension AccountDetails.View {
 							transferButton(with: viewStore)
 								.padding(.bottom, 20)
 
-							AccountDetails.AssetList.View(
+							AssetList.View(
 								store: store.scope(
 									state: \.assetList,
 									action: AccountDetails.Action.assetList
@@ -111,34 +110,6 @@ private extension AccountDetails.View {
 				.background(Color.app.buttonBackgroundLight)
 				.cornerRadius(6)
 		})
-	}
-}
-
-// MARK: - AddressView
-struct AddressView: SwiftUI.View {
-	let address: String
-	let copyAddressAction: () -> Void
-
-	var body: some View {
-		HStack(spacing: 5) {
-			Text(address)
-				.lineLimit(1)
-				.truncationMode(.middle)
-				.foregroundColor(.app.buttonTextBlackTransparent)
-				.font(.app.caption2)
-
-			Button(
-				action: copyAddressAction,
-				label: {
-					Text(L10n.Home.AccountRow.copyTitle)
-						.foregroundColor(.app.buttonTextBlack)
-						.font(.app.caption2)
-						.underline()
-						.padding(12)
-						.fixedSize()
-				}
-			)
-		}
 	}
 }
 

@@ -1,13 +1,13 @@
 import ComposableArchitecture
 
-public extension AccountDetails.AssetList {
+public extension AssetList.Section {
 	// MARK: Reducer
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = Reducer.combine(
-		AccountDetails.AssetSection.reducer.forEach(
-			state: \.sections,
-			action: /AccountDetails.AssetList.Action.assetSection,
-			environment: { _ in AccountDetails.AssetSection.Environment() }
+		AssetList.Row.reducer.forEach(
+			state: \.assets,
+			action: /AssetList.Section.Action.asset(id:action:),
+			environment: { _ in AssetList.Row.Environment() }
 		),
 
 		Reducer { _, action, _ in
@@ -16,7 +16,7 @@ public extension AccountDetails.AssetList {
 				return .none
 			case .coordinate:
 				return .none
-			case .assetSection:
+			case let .asset(id: id, action: action):
 				return .none
 			}
 		}

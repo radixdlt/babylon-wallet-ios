@@ -19,7 +19,7 @@ public extension Home {
 		case visitHub(Home.VisitHub.Action)
 		case accountPreferences(AccountPreferences.Action)
 		case accountDetails(AccountDetails.Action)
-		case transfer(Home.Transfer.Action)
+		case transfer(AccountDetails.Transfer.Action)
 		case createAccount(CreateAccount.Action)
 	}
 }

@@ -2,13 +2,13 @@ import AccountWorthFetcher
 import Common
 import Foundation
 
-// MARK: - AssetRow
-/// Namespace for AssetRowFeature
-public extension AccountDetails {
-	enum AssetRow {}
+// MARK: - Row
+/// Namespace for Row
+public extension AssetList {
+	enum Row {}
 }
 
-public extension AccountDetails.AssetRow {
+public extension AssetList.Row {
 	// MARK: State
 	struct State: Equatable {
 		public var tokenContainer: TokenWorthContainer
@@ -29,8 +29,8 @@ public extension AccountDetails.AssetRow {
 	}
 }
 
-// MARK: - AccountDetails.AssetRow.State + Identifiable
-extension AccountDetails.AssetRow.State: Identifiable {
+// MARK: - AssetList.Row.State + Identifiable
+extension AssetList.Row.State: Identifiable {
 	public typealias ID = Token.Code
 
 	public var id: Token.Code {
