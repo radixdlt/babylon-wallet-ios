@@ -37,11 +37,39 @@ let package = Package(
 		// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
 		.target(name: "_BuildTools"),
 		.target(
+			name: "AccountDetailsFeature",
+			dependencies: [
+				"AccountListFeature",
+				"AccountWorthFetcher",
+				"AggregatedValueFeature",
+				tca,
+			]
+		),
+		.target(
+			name: "AccountListFeature",
+			dependencies: [
+				"AccountWorthFetcher",
+				tca,
+			]
+		),
+		.target(
+			name: "AccountPreferencesFeature",
+			dependencies: [
+				tca,
+			]
+		),
+		.target(
 			name: "AccountWorthFetcher",
 			dependencies: [
 				"AppSettings",
 				"Common",
 				"Profile",
+			]
+		),
+		.target(
+			name: "AggregatedValueFeature",
+			dependencies: [
+				tca,
 			]
 		),
 		.target(
@@ -89,12 +117,22 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "CreateAccountFeature",
+			dependencies: [
+				tca,
+			]
+		),
+		.target(
 			name: "HomeFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
+				"AccountListFeature",
+				"AccountDetailsFeature",
+				"AccountPreferencesFeature",
 				"AccountWorthFetcher",
 				"AppSettings",
 				"Common",
+				"CreateAccountFeature",
 				"Profile",
 				"PasteboardClient",
 				tca,

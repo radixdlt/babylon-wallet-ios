@@ -1,0 +1,151 @@
+import AccountWorthFetcher
+import Common
+import ComposableArchitecture
+import SwiftUI
+
+public extension AccountDetails.AssetRow {
+	struct View: SwiftUI.View {
+		public typealias Store = ComposableArchitecture.Store<State, Action>
+		private let store: Store
+
+		public init(
+			store: Store
+		) {
+			self.store = store
+		}
+	}
+}
+
+public extension AccountDetails.AssetRow.View {
+	var body: some View {
+		WithViewStore(
+			store.scope(
+				state: ViewState.init,
+				action: AccountDetails.AssetRow.Action.init
+			)
+		) { viewStore in
+			tokenRow(with: viewStore, container: viewStore.tokenContainer)
+				.padding([.leading, .trailing], 24)
+		}
+	}
+}
+
+// MARK: - Private Typealias
+private extension AccountDetails.AssetRow.View {
+	typealias AssetRowViewStore = ViewStore<AccountDetails.AssetRow.View.ViewState, AccountDetails.AssetRow.View.ViewAction>
+}
+
+// MARK: - Private Methods
+private extension AccountDetails.AssetRow.View {
+	func tokenRow(with viewStore: AssetRowViewStore, container: TokenWorthContainer) -> some View {
+		ZStack {
+			HStack(alignment: .center) {
+				HStack {
+					Circle()
+						.frame(width: 40, height: 40)
+						.foregroundColor(.app.tokenPlaceholderGray)
+
+					Text(container.token.code.value)
+						.foregroundColor(.app.secondary)
+						.font(.app.subhead)
+				}
+
+				Spacer()
+
+				VStack(alignment: .trailing, spacing: 5) {
+					Text(tokenAmount(value: container.token.value,
+					                 isVisible: viewStore.isCurrencyAmountVisible))
+						.foregroundColor(.app.buttonTextBlack)
+						.font(.app.buttonTitle)
+					Text(tokenValue(container.valueInCurrency,
+					                isVisible: viewStore.isCurrencyAmountVisible,
+					                currency: viewStore.currency))
+						.foregroundColor(.app.secondary)
+						.font(.app.caption2)
+				}
+			}
+
+			VStack {
+				Spacer()
+				separator()
+			}
+		}
+		.frame(height: 80)
+	}
+
+	func separator() -> some View {
+		Rectangle()
+			.foregroundColor(.app.separatorLightGray)
+			.frame(height: 1)
+	}
+
+	func tokenAmount(value: Float?, isVisible: Bool) -> String {
+		if isVisible {
+			if let value = value {
+				return "\(value)"
+			} else {
+				return "-"
+			}
+		} else {
+			return "••••"
+		}
+	}
+
+	func tokenValue(_ value: Float?, isVisible: Bool, currency: FiatCurrency) -> String {
+		if isVisible {
+			return value?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign) -"
+		} else {
+			return "\(currency.sign) ••••"
+		}
+	}
+}
+
+extension AccountDetails.AssetRow.View {
+	// MARK: ViewAction
+	enum ViewAction: Equatable {}
+}
+
+extension AccountDetails.AssetRow.Action {
+	init(action: AccountDetails.AssetRow.View.ViewAction) {
+		switch action {
+		default:
+			// TODO: implement
+			break
+		}
+	}
+}
+
+extension AccountDetails.AssetRow.View {
+	// MARK: ViewState
+	struct ViewState: Equatable {
+		let tokenContainer: TokenWorthContainer
+		let currency: FiatCurrency
+		let isCurrencyAmountVisible: Bool
+
+		init(state: AccountDetails.AssetRow.State) {
+			tokenContainer = state.tokenContainer
+			currency = state.currency
+			isCurrencyAmountVisible = state.isCurrencyAmountVisible
+		}
+	}
+}
+
+// MARK: - AssetRow_Preview
+struct AssetRow_Preview: PreviewProvider {
+	static var previews: some View {
+		AccountDetails.AssetRow.View(
+			store: .init(
+				initialState: .init(
+					tokenContainer: .init(
+						token: .placeholder,
+						valueInCurrency: 100
+					),
+					currency: .usd,
+					isCurrencyAmountVisible: true
+				),
+				reducer: AccountDetails.AssetRow.reducer,
+				environment: .init()
+			)
+		)
+	}
+}

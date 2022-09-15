@@ -1,3 +1,4 @@
+import AccountDetailsFeature
 import AccountWorthFetcher
 import AppSettings
 import PasteboardClient

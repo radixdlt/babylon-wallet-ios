@@ -1,5 +1,10 @@
+import AccountDetailsFeature
+import AccountListFeature
+import AccountPreferencesFeature
+import AggregatedValueFeature
 import Common
 import ComposableArchitecture
+import CreateAccountFeature
 import SwiftUI
 
 public extension Home {
@@ -35,7 +40,7 @@ public extension Home.View {
 						state: \.createAccount,
 						action: Home.Action.createAccount
 					),
-					then: Home.CreateAccount.View.init(store:)
+					then: CreateAccount.View.init(store:)
 				)
 				.zIndex(1)
 
@@ -44,7 +49,7 @@ public extension Home.View {
 						state: \.accountDetails,
 						action: Home.Action.accountDetails
 					),
-					then: Home.AccountDetails.View.init(store:)
+					then: AccountDetails.View.init(store:)
 				)
 				.zIndex(2)
 
@@ -53,7 +58,7 @@ public extension Home.View {
 						state: \.accountPreferences,
 						action: Home.Action.accountPreferences
 					),
-					then: Home.AccountPreferences.View.init(store:)
+					then: AccountPreferences.View.init(store:)
 				)
 				.zIndex(3)
 
@@ -124,14 +129,14 @@ private extension Home.View {
 				LazyVStack(spacing: 24) {
 					VStack {
 						title
-						Home.AggregatedValue.View(
+						AggregatedValue.View(
 							store: store.scope(
 								state: \.aggregatedValue,
 								action: Home.Action.aggregatedValue
 							)
 						)
 					}
-					Home.AccountList.View(
+					AccountList.View(
 						store: store.scope(
 							state: \.accountList,
 							action: Home.Action.accountList

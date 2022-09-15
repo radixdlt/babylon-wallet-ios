@@ -1,5 +1,10 @@
+import AccountDetailsFeature
+import AccountListFeature
+import AccountPreferencesFeature
 import AccountWorthFetcher
+import AggregatedValueFeature
 import ComposableArchitecture
+import CreateAccountFeature
 
 #if os(iOS)
 // FIXME: move to `UIApplicationClient` package!
@@ -17,11 +22,11 @@ public extension Home {
 				environment: { _ in Home.Header.Environment() }
 			),
 
-		Home.AggregatedValue.reducer
+		AggregatedValue.reducer
 			.pullback(
 				state: \.aggregatedValue,
 				action: /Home.Action.aggregatedValue,
-				environment: { _ in Home.AggregatedValue.Environment() }
+				environment: { _ in AggregatedValue.Environment() }
 			),
 
 		Home.VisitHub.reducer
@@ -31,30 +36,30 @@ public extension Home {
 				environment: { _ in Home.VisitHub.Environment() }
 			),
 
-		Home.AccountList.reducer
+		AccountList.reducer
 			.pullback(
 				state: \.accountList,
 				action: /Home.Action.accountList,
-				environment: { _ in Home.AccountList.Environment() }
+				environment: { _ in AccountList.Environment() }
 			),
 
-		Home.AccountDetails.reducer
+		AccountDetails.reducer
 			.optional()
 			.pullback(
 				state: \.accountDetails,
 				action: /Home.Action.accountDetails,
 				environment: { _ in
-					Home.AccountDetails.Environment()
+					AccountDetails.Environment()
 				}
 			),
 
-		Home.AccountPreferences.reducer
+		AccountPreferences.reducer
 			.optional()
 			.pullback(
 				state: \.accountPreferences,
 				action: /Home.Action.accountPreferences,
 				environment: { _ in
-					Home.AccountPreferences.Environment()
+					AccountPreferences.Environment()
 				}
 			),
 
@@ -151,8 +156,8 @@ public extension Home {
 
 					state.accountDetails?.assetList = .init(
 						sections: .init(uniqueElements: sortedContainers.map { containers in
-							let rows = containers.map { container in Home.AssetRow.State(tokenContainer: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
-							return Home.AssetSection.State(assets: .init(uniqueElements: rows))
+							let rows = containers.map { container in AccountDetails.AssetRow.State(tokenContainer: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
+							return AccountDetails.AssetSection.State(assets: .init(uniqueElements: rows))
 						})
 					)
 				}
