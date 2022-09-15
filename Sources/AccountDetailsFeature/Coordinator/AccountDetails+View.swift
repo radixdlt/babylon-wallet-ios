@@ -103,7 +103,7 @@ private extension AccountDetails.View {
 		Button(action: {
 			viewStore.send(.transferButtonTapped)
 		}, label: {
-			Text(L10n.Home.AccountDetails.transferButtonTitle)
+			Text(L10n.AccountDetails.transferButtonTitle)
 				.foregroundColor(.app.buttonTextBlack)
 				.font(.app.body)
 				.padding()

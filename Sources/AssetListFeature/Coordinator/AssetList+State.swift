@@ -29,13 +29,13 @@ public extension AssetList {
 		var displayText: String {
 			switch self {
 			case .tokens:
-				return L10n.Home.AssetList.tokens
+				return L10n.AssetList.tokens
 			case .nfts:
-				return L10n.Home.AssetList.nfts
+				return L10n.AssetList.nfts
 			case .poolShare:
-				return L10n.Home.AssetList.poolShare
+				return L10n.AssetList.poolShare
 			case .badges:
-				return L10n.Home.AssetList.badges
+				return L10n.AssetList.badges
 			}
 		}
 	}

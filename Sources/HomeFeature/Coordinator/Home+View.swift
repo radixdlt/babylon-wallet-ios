@@ -105,7 +105,7 @@ private extension Home.View {
 	// TODO: extract button for reuse
 	func createAccountButton(action: @escaping () -> Void) -> some View {
 		Button(action: action) {
-			Text(L10n.Home.createNewAccount)
+			Text(L10n.CreateAccount.createNewAccount)
 				.foregroundColor(.app.buttonTextBlack)
 				.font(.app.subhead)
 				.padding(.horizontal, 40)
@@ -161,7 +161,7 @@ private extension Home.View {
 
 private extension Home.View {
 	var title: some View {
-		Text(L10n.Home.AggregatedValue.title)
+		Text(L10n.AggregatedValue.title)
 			.foregroundColor(.app.buttonTextBlack)
 			.font(.app.caption1)
 			.textCase(.uppercase)

@@ -26,7 +26,7 @@ public extension AddressView {
 			Button(
 				action: copyAddressAction,
 				label: {
-					Text(L10n.Home.AccountRow.copyTitle)
+					Text(L10n.AccountList.Row.copyTitle)
 						.foregroundColor(.app.buttonTextBlack)
 						.font(.app.caption2)
 						.underline()
