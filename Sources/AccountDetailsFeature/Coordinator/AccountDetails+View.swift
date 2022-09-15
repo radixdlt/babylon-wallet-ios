@@ -67,7 +67,7 @@ public extension AccountDetails.View {
 
 // MARK: - Private Typealias
 private extension AccountDetails.View {
-	typealias AccountDetailsViewStore = ViewStore<AccountDetails.View.ViewState, AccountDetails.View.ViewAction>
+	typealias AccountDetailsViewStore = ComposableArchitecture.ViewStore<AccountDetails.View.ViewState, AccountDetails.View.ViewAction>
 }
 
 // MARK: - Private Methods
