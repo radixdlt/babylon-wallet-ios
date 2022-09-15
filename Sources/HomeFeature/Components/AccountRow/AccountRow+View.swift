@@ -30,7 +30,8 @@ public extension Home.AccountRow.View {
 					HeaderView(
 						name: viewStore.name,
 						value: formattedAmmount(
-							viewStore.aggregatedValue ?? 0,
+							viewStore.aggregatedValue,
+							isVisible: viewStore.isCurrencyAmountVisible,
 							currency: viewStore.currency
 						),
 						isValueVisible: viewStore.isCurrencyAmountVisible,
@@ -56,9 +57,16 @@ public extension Home.AccountRow.View {
 			}
 		}
 	}
+}
 
-	func formattedAmmount(_ amount: Float, currency: FiatCurrency) -> String {
-		amount.formatted(.currency(code: currency.symbol))
+// MARK: - Private Methods
+private extension Home.AccountRow.View {
+	func formattedAmmount(_ value: Float?, isVisible: Bool, currency: FiatCurrency) -> String {
+		if isVisible {
+			return value?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign) -"
+		} else {
+			return "\(currency.sign) ••••"
+		}
 	}
 }
 
@@ -116,7 +124,7 @@ private struct HeaderView: View {
 				.font(.app.buttonTitle)
 				.fixedSize()
 			Spacer()
-			Text(isValueVisible ? value : "\(currency.sign) ••••")
+			Text(value)
 				.foregroundColor(.app.buttonTextBlack)
 				.font(.app.buttonTitle)
 				.fixedSize()

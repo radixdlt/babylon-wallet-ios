@@ -93,7 +93,7 @@ private extension Home.AssetRow.View {
 
 	func tokenValue(_ value: Float?, isVisible: Bool, currency: FiatCurrency) -> String {
 		if isVisible {
-			return value?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign)-"
+			return value?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign) -"
 		} else {
 			return "\(currency.sign) ••••"
 		}

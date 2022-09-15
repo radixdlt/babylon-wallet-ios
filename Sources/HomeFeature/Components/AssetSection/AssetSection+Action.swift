@@ -1,3 +1,4 @@
+import AccountWorthFetcher
 import Foundation
 
 public extension Home.AssetSection {
@@ -5,7 +6,7 @@ public extension Home.AssetSection {
 	enum Action: Equatable {
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
-		case asset(id: UUID, action: Home.AssetRow.Action)
+		case asset(id: Token.Code, action: Home.AssetRow.Action)
 	}
 }
 

@@ -40,9 +40,5 @@ public extension Home.AssetList {
 				return L10n.Home.AssetList.badges
 			}
 		}
-
-		public var id: String {
-			rawValue
-		}
 	}
 }

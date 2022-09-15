@@ -36,7 +36,7 @@ public extension Token {
 public enum TokenRandomizer {
 	public static func generateRandomTokens() -> [Token] {
 		Token.Code.allCases.map {
-			let randomValue: Float = .random(in: 0 ... 100)
+			let randomValue: Float? = Bool.random() ? .random(in: 0 ... 100) : nil
 			return Token(code: $0, value: randomValue)
 		}
 	}

@@ -10,8 +10,7 @@ public extension Home {
 
 public extension Home.AssetRow {
 	// MARK: State
-	struct State: Equatable, Identifiable {
-		public let id = UUID()
+	struct State: Equatable {
 		public var tokenContainer: TokenWorthContainer
 
 		// MARK: - AppSettings properties
@@ -27,5 +26,14 @@ public extension Home.AssetRow {
 			self.currency = currency
 			self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
+	}
+}
+
+// MARK: - Home.AssetRow.State + Identifiable
+extension Home.AssetRow.State: Identifiable {
+	public typealias ID = Token.Code
+
+	public var id: Token.Code {
+		tokenContainer.token.code
 	}
 }
