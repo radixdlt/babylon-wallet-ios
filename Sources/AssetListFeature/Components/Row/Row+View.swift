@@ -80,15 +80,8 @@ private extension AssetList.Row.View {
 	}
 
 	func tokenAmount(value: Float?, isVisible: Bool) -> String {
-		if isVisible {
-			if let value = value {
-				return "\(value)"
-			} else {
-				return "-"
-			}
-		} else {
-			return "••••"
-		}
+		guard isVisible else { return "••••" }
+		return value != nil ? "\(value!)" : "-"
 	}
 
 	func tokenValue(_ value: Float?, isVisible: Bool, currency: FiatCurrency) -> String {

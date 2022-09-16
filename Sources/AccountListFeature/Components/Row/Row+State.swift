@@ -1,4 +1,5 @@
 import AccountWorthFetcher
+import Address
 import Common
 import Foundation
 import Profile
@@ -14,7 +15,7 @@ public extension AccountList.Row {
 	struct State: Equatable {
 		public let account: Profile.Account
 		public let name: String
-		public let address: Profile.Account.Address
+		public let address: Address
 		public var aggregatedValue: Float?
 		public var tokenContainers: [TokenWorthContainer]
 
@@ -59,9 +60,9 @@ public extension AccountList.Row.State {
 
 // MARK: - AccountList.Row.State + Identifiable
 extension AccountList.Row.State: Identifiable {
-	public typealias ID = Profile.Account.Address
+	public typealias ID = Address
 
-	public var id: Profile.Account.Address {
+	public var id: Address {
 		address
 	}
 }

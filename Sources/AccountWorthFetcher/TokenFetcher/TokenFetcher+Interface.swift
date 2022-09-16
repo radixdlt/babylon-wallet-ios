@@ -1,4 +1,4 @@
-import Profile
+import Address
 
 // MARK: - TokenFetcher
 public struct TokenFetcher {
@@ -13,5 +13,5 @@ public struct TokenFetcher {
 
 // MARK: - Typealias
 public extension TokenFetcher {
-	typealias FetchTokens = @Sendable (Profile.Account.Address) async throws -> [Token]
+	typealias FetchTokens = @Sendable (Address) async throws -> [Token]
 }

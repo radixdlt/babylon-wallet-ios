@@ -2,16 +2,16 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPreferencesFeature
 import AccountWorthFetcher
+import Address
 import AggregatedValueFeature
 import CreateAccountFeature
-import Profile
 import Wallet
 
 // MARK: - Home
 /// Namespace for HomeFeature
 public enum Home {}
 
-public typealias AccountsWorthDictionary = [Profile.Account.Address: AccountPortfolioWorth]
+public typealias AccountsWorthDictionary = [Address: AccountPortfolioWorth]
 
 public extension Home {
 	// MARK: State

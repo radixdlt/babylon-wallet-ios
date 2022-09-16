@@ -1,11 +1,11 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPreferencesFeature
+import Address
 import AggregatedValueFeature
 import Common
 import CreateAccountFeature
 import Foundation
-import Profile
 
 public extension Home {
 	// MARK: Action
@@ -45,7 +45,7 @@ public extension Home.Action.InternalAction {
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case totalWorthLoaded(AccountsWorthDictionary)
 		case accountWorthLoaded(AccountsWorthDictionary)
-		case copyAddress(Profile.Account.Address)
+		case copyAddress(Address)
 		case viewDidAppearActionFailed(reason: String)
 		case toggleIsCurrencyAmountVisibleFailed(reason: String)
 	}

@@ -1,8 +1,9 @@
+import Address
 import SwiftUI
 
 // MARK: - AddressView
 public struct AddressView: View {
-	let address: String
+	let address: Address
 	let copyAddressAction: () -> Void
 
 	public init(

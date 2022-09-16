@@ -1,7 +1,7 @@
 import AccountWorthFetcher
+import Address
 import Common
 import ComposableArchitecture
-import Profile
 import SwiftUI
 
 public extension AccountList.Row {
@@ -93,7 +93,7 @@ extension AccountList.Row.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		let name: String
-		let address: Profile.Account.Address
+		let address: Address
 		let aggregatedValue: Float?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool

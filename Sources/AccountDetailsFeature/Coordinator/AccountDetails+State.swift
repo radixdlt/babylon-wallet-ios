@@ -1,5 +1,6 @@
 import AccountListFeature
 import AccountWorthFetcher
+import Address
 import AggregatedValueFeature
 import AssetListFeature
 import ComposableArchitecture
@@ -13,8 +14,9 @@ public enum AccountDetails {}
 public extension AccountDetails {
 	// MARK: State
 	struct State: Equatable {
+		// dzoni
 		public let account: Profile.Account
-		public let address: Profile.Account.Address
+		public let address: Address
 		public var aggregatedValue: AggregatedValue.State
 		public let name: String
 		public var assetList: AssetList.State

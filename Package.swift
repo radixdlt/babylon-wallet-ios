@@ -41,8 +41,10 @@ let package = Package(
 			dependencies: [
 				"AccountListFeature",
 				"AccountWorthFetcher",
+				"Address",
 				"AggregatedValueFeature",
 				"AssetListFeature",
+				"Profile",
 				tca,
 			]
 		),
@@ -50,6 +52,8 @@ let package = Package(
 			name: "AccountListFeature",
 			dependencies: [
 				"AccountWorthFetcher",
+				"Address",
+				"Profile",
 				tca,
 			]
 		),
@@ -64,7 +68,12 @@ let package = Package(
 			dependencies: [
 				"AppSettings",
 				"Common",
-				"Profile",
+				"Address",
+			]
+		),
+		.target(
+			name: "Address",
+			dependencies: [
 			]
 		),
 		.target(
@@ -115,6 +124,7 @@ let package = Package(
 		.target(
 			name: "Common",
 			dependencies: [
+				"Address",
 			]
 		),
 		.testTarget(
@@ -138,11 +148,11 @@ let package = Package(
 				"AccountDetailsFeature",
 				"AccountPreferencesFeature",
 				"AccountWorthFetcher",
+				"Address",
 				"AppSettings",
 				"AssetListFeature",
 				"Common",
 				"CreateAccountFeature",
-				"Profile",
 				"PasteboardClient",
 				tca,
 				"Wallet",
@@ -222,7 +232,7 @@ let package = Package(
 		.target(
 			name: "Profile",
 			dependencies: [
-				"Common",
+				"Address",
 			]
 		),
 		.testTarget(

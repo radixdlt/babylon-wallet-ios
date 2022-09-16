@@ -1,4 +1,4 @@
-import Profile
+import Address
 
 // MARK: - AccountWorthFetcher
 public struct AccountWorthFetcher {
@@ -13,6 +13,6 @@ public struct AccountWorthFetcher {
 
 // MARK: - Typealias
 public extension AccountWorthFetcher {
-	typealias AccountsWorth = [Profile.Account.Address: AccountPortfolioWorth]
-	typealias FetchWorth = @Sendable ([Profile.Account.Address]) async throws -> AccountsWorth
+	typealias AccountsWorth = [Address: AccountPortfolioWorth]
+	typealias FetchWorth = @Sendable ([Address]) async throws -> AccountsWorth
 }
