@@ -25,13 +25,23 @@ public struct NonFungibleTokenContainer: AssetContainer {
 	public let asset: NonFungibleToken
 
 	/// Metadata unique to this asset.
-	public var metadata: [String: String]?
+	public var metadata: [[String: String]]?
 
 	public init(
 		asset: NonFungibleToken,
-		metadata: [String: String]?
+		metadata: [[String: String]]?
 	) {
 		self.asset = asset
 		self.metadata = metadata
 	}
 }
+
+#if DEBUG
+public extension NonFungibleToken {
+	static let mock = Self(
+		address: "mock",
+		supply: .fixed(100),
+		iconURL: nil
+	)
+}
+#endif

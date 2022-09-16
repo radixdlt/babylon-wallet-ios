@@ -157,10 +157,17 @@ public extension Home {
 					let categories = environment.fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
 
 					state.accountDetails?.assets = .init(
-						fungibleTokenList: .init(sections: .init(uniqueElements: categories.map { category in
-							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
-							return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
-						}))
+						fungibleTokenList: .init(
+							sections: .init(uniqueElements: categories.map { category in
+								let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
+								return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
+							})
+						),
+						nonFungibleTokenList: .init(
+							rows: .init(uniqueElements: [accountPortfolio.nonFungibleTokenContainers].map {
+								.init(containers: $0)
+							})
+						)
 					)
 				}
 

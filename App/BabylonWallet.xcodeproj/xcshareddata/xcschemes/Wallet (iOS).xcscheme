@@ -192,6 +192,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "NonFungibleTokenListFeatureTests"
+               BuildableName = "NonFungibleTokenListFeatureTests"
+               BlueprintName = "NonFungibleTokenListFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "OnboardingFeatureTests"
                BuildableName = "OnboardingFeatureTests"
                BlueprintName = "OnboardingFeatureTests"

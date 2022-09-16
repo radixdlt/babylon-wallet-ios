@@ -41,7 +41,7 @@ final class OnboardingFeatureTests: TestCase {
 			let wallet: Wallet = .init(profile: profile, deviceFactorTypeMnemonic: "")
 			await store.receive(.internal(.system(.createdWallet(wallet))))
 			await store.receive(.coordinate(.onboardedWithWallet(wallet)))
-			await isSetDataCalled.withValue { XCTAssertNoDifference($0, true) }
+			await isSetDataCalled.withValue { XCTAssertTrue($0) }
 		} catch {
 			XCTFail("No profile")
 		}

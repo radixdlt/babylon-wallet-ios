@@ -27,7 +27,7 @@ public extension AccountDetails.Transfer.View {
 			// TODO: implement
 			ForceFullScreen {
 				VStack {
-					Text("Impl: Transfer")
+					Text("Implement: Transfer")
 						.background(Color.yellow)
 						.foregroundColor(.red)
 					Button(

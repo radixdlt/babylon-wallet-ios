@@ -1,5 +1,6 @@
 import Asset
 import FungibleTokenListFeature
+import NonFungibleTokenListFeature
 
 // MARK: - AssetsView.Action
 public extension AssetsView {
@@ -8,6 +9,7 @@ public extension AssetsView {
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
 		case fungibleTokenList(FungibleTokenList.Action)
+		case nonFungibleTokenList(NonFungibleTokenList.Action)
 	}
 }
 
@@ -21,7 +23,9 @@ public extension AssetsView.Action {
 
 // MARK: - AssetsView.Action.InternalAction.UserAction
 public extension AssetsView.Action.InternalAction {
-	enum UserAction: Equatable {}
+	enum UserAction: Equatable {
+		case listSelectorTapped(AssetsView.AssetsViewType)
+	}
 }
 
 // MARK: - AssetsView.Action.InternalAction.SystemAction

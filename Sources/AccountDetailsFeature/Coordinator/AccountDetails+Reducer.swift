@@ -1,4 +1,5 @@
 import AggregatedValueFeature
+import AssetsViewFeature
 import ComposableArchitecture
 
 public extension AccountDetails {
@@ -10,6 +11,13 @@ public extension AccountDetails {
 				state: \.aggregatedValue,
 				action: /AccountDetails.Action.aggregatedValue,
 				environment: { _ in AggregatedValue.Environment() }
+			),
+
+		AssetsView.reducer
+			.pullback(
+				state: \.assets,
+				action: /AccountDetails.Action.assets,
+				environment: { _ in AssetsView.Environment() }
 			),
 
 		Reducer { state, action, _ in

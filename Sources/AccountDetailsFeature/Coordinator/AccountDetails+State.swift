@@ -39,6 +39,10 @@ public extension AccountDetails {
 						let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible) }
 						return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
 					})
+				), nonFungibleTokenList: .init(
+					rows: .init(uniqueElements: [account.portfolio.nonFungibleTokenContainers].map {
+						.init(containers: $0)
+					})
 				)
 			)
 		}

@@ -11,7 +11,13 @@
 
 "accountDetails.transferButtonTitle" = "Transfer";
 
-"assetList.tokens" = "Tokens";
-"assetList.nfts" = "NFTs";
-"assetList.poolShare" = "Pool Share";
-"assetList.badges" = "Badges";
+"assetsView.tokens" = "Tokens";
+"assetsView.nfts" = "NFTs";
+"assetsView.poolShare" = "Pool Share";
+"assetsView.badges" = "Badges";
+
+"nftList.header.hide" = "- Hide";
+"nftList.header.show" = "+ Show";
+"nftList.header.supplyUnknown" = "Unknown";
+"nftList.nftPlural" = "%d NFTs";
+"nftList.ownedOfTotal" = "%d of %d";

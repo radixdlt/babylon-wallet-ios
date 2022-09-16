@@ -26,15 +26,15 @@ public enum L10n {
 		public static let title = L10n.tr("Localizable", "aggregatedValue.title", fallback: #"Total value"#)
 	}
 
-	public enum AssetList {
+	public enum AssetsView {
 		/// Badges
-		public static let badges = L10n.tr("Localizable", "assetList.badges", fallback: #"Badges"#)
+		public static let badges = L10n.tr("Localizable", "assetsView.badges", fallback: #"Badges"#)
 		/// NFTs
-		public static let nfts = L10n.tr("Localizable", "assetList.nfts", fallback: #"NFTs"#)
+		public static let nfts = L10n.tr("Localizable", "assetsView.nfts", fallback: #"NFTs"#)
 		/// Pool Share
-		public static let poolShare = L10n.tr("Localizable", "assetList.poolShare", fallback: #"Pool Share"#)
+		public static let poolShare = L10n.tr("Localizable", "assetsView.poolShare", fallback: #"Pool Share"#)
 		/// Tokens
-		public static let tokens = L10n.tr("Localizable", "assetList.tokens", fallback: #"Tokens"#)
+		public static let tokens = L10n.tr("Localizable", "assetsView.tokens", fallback: #"Tokens"#)
 	}
 
 	public enum CreateAccount {
@@ -55,6 +55,27 @@ public enum L10n {
 			public static let buttonTitle = L10n.tr("Localizable", "home.visitHub.buttonTitle", fallback: #"Visit the Radar Hub"#)
 			/// Ready to get started using the Radar Network and your Wallet?
 			public static let title = L10n.tr("Localizable", "home.visitHub.title", fallback: #"Ready to get started using the Radar Network and your Wallet?"#)
+		}
+	}
+
+	public enum NftList {
+		/// %d NFTs
+		public static func nftPlural(_ p1: Int) -> String {
+			L10n.tr("Localizable", "nftList.nftPlural", p1, fallback: #"%d NFTs"#)
+		}
+
+		/// %d of %d
+		public static func ownedOfTotal(_ p1: Int, _ p2: Int) -> String {
+			L10n.tr("Localizable", "nftList.ownedOfTotal", p1, p2, fallback: #"%d of %d"#)
+		}
+
+		public enum Header {
+			/// - Hide
+			public static let hide = L10n.tr("Localizable", "nftList.header.hide", fallback: #"- Hide"#)
+			/// + Show
+			public static let show = L10n.tr("Localizable", "nftList.header.show", fallback: #"+ Show"#)
+			/// Unknown
+			public static let supplyUnknown = L10n.tr("Localizable", "nftList.header.supplyUnknown", fallback: #"Unknown"#)
 		}
 	}
 }

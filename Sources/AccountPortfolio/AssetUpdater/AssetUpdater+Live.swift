@@ -11,7 +11,14 @@ public extension AssetUpdater {
 
 			} else if let asset = asset as? NonFungibleToken {
 				// TODO: fetch real metadata when API is ready
-				return NonFungibleTokenContainer(asset: asset, metadata: nil)
+				let metadata = [
+					["Principle amount": "2,000"],
+					["Principle": "XDR"],
+					["Term (months)": "12"],
+					["Rate (%)": "0.35"],
+				]
+
+				return NonFungibleTokenContainer(asset: asset, metadata: metadata)
 
 			} else if let asset = asset as? PoolShare {
 				// TODO: fetch real metadata when API is ready

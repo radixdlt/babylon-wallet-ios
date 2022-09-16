@@ -15,9 +15,9 @@ public enum AssetGenerator {
 				FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "XRP token", code: "XRP", iconURL: ""),
 			],
 			[
-				NonFungibleToken(address: .random, supply: .fixed(100), iconURL: ""),
-				NonFungibleToken(address: .random, supply: .fixed(100), iconURL: ""),
-				NonFungibleToken(address: .random, supply: .fixed(100), iconURL: ""),
+				NonFungibleToken(address: .random, supply: .fixed(100), iconURL: "nft"),
+				NonFungibleToken(address: .random, supply: .fixed(100), iconURL: "nft"),
+				NonFungibleToken(address: .random, supply: .fixed(100), iconURL: "nft"),
 			],
 		]
 	}
