@@ -173,6 +173,7 @@ let package = Package(
 		.testTarget(
 			name: "AssetListFeatureTests",
 			dependencies: [
+				"AccountWorthFetcher",
 				"AssetListFeature",
 				"TestUtils",
 			]
@@ -225,7 +226,13 @@ let package = Package(
 		.testTarget(
 			name: "HomeFeatureTests",
 			dependencies: [
+				"AccountDetailsFeature",
+				"AccountListFeature",
+				"AccountWorthFetcher",
+				"Address",
+				"AssetListFeature",
 				"HomeFeature",
+				"Profile",
 				"TestUtils",
 			]
 		),

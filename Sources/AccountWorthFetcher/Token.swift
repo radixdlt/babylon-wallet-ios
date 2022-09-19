@@ -5,6 +5,14 @@ public struct Token: Equatable, Identifiable {
 	public let id = UUID()
 	public let code: Code
 	public let value: Float?
+
+	public init(
+		code: Code,
+		value: Float?
+	) {
+		self.code = code
+		self.value = value
+	}
 }
 
 public extension Token {

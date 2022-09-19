@@ -34,5 +34,11 @@ public extension Home.Environment {
 		pasteboardClient: .noop,
 		assetListSorter: .mock
 	)
+
+	static let unimplemented: Self = .init(
+		appSettingsClient: .unimplemented,
+		accountWorthFetcher: .unimplemented,
+		pasteboardClient: .unimplemented
+	)
 }
 #endif

@@ -5,7 +5,7 @@ public extension AssetList {
 	enum Action: Equatable {
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
-		case section(id: UUID, action: AssetList.Section.Action)
+		case section(id: Int, action: AssetList.Section.Action)
 	}
 }
 

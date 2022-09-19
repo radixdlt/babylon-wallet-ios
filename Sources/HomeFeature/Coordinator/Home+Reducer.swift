@@ -156,9 +156,9 @@ public extension Home {
 					let sortedContainers = environment.assetListSorter.sortTokens(containers)
 
 					state.accountDetails?.assetList = .init(
-						sections: .init(uniqueElements: sortedContainers.map { containers in
+						sections: .init(uniqueElements: sortedContainers.enumerated().map { index, containers in
 							let rows = containers.map { container in AssetList.Row.State(tokenContainer: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
-							return AssetList.Section.State(assets: .init(uniqueElements: rows))
+							return AssetList.Section.State(id: index, assets: .init(uniqueElements: rows))
 						})
 					)
 				}

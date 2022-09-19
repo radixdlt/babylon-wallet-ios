@@ -9,12 +9,14 @@ public extension AssetList {
 public extension AssetList.Section {
 	// MARK: State
 	struct State: Equatable, Identifiable {
-		public let id = UUID()
+		public let id: Int
 		public var assets: IdentifiedArrayOf<AssetList.Row.State>
 
 		public init(
+			id: Int,
 			assets: IdentifiedArrayOf<AssetList.Row.State>
 		) {
+			self.id = id
 			self.assets = assets
 		}
 	}

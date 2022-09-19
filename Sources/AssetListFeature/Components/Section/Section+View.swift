@@ -71,7 +71,7 @@ struct Section_Preview: PreviewProvider {
 		AssetList.Section.View(
 			store: .init(
 				initialState: .init(
-					assets: []
+					id: 0, assets: []
 				),
 				reducer: AssetList.Section.reducer,
 				environment: .init()
