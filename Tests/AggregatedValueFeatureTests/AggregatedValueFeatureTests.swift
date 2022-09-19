@@ -1,8 +1,8 @@
+@testable import AggregatedValueFeature
 import ComposableArchitecture
-@testable import HomeFeature
 import TestUtils
 
-final class HomeAggregatedValueTests: TestCase {
+final class AggregatedValueFeatureTests: TestCase {
 	/*
 	 func testVisibilityButtonTapped() {
 	 	let store = TestStore(

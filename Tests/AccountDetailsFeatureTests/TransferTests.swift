@@ -1,8 +1,8 @@
+@testable import AccountDetailsFeature
 import ComposableArchitecture
-@testable import HomeFeature
 import TestUtils
 
-final class AccountListTests: TestCase {
+final class TransferTests: TestCase {
 	func testTrivial() {
 		XCTAssert(true)
 	}

@@ -48,6 +48,13 @@ let package = Package(
 				tca,
 			]
 		),
+		.testTarget(
+			name: "AccountDetailsFeatureTests",
+			dependencies: [
+				"AccountDetailsFeature",
+				"TestUtils",
+			]
+		),
 		.target(
 			name: "AccountListFeature",
 			dependencies: [
@@ -57,10 +64,24 @@ let package = Package(
 				tca,
 			]
 		),
+		.testTarget(
+			name: "AccountListFeatureTests",
+			dependencies: [
+				"AccountListFeature",
+				"TestUtils",
+			]
+		),
 		.target(
 			name: "AccountPreferencesFeature",
 			dependencies: [
 				tca,
+			]
+		),
+		.testTarget(
+			name: "AccountPreferencesFeatureTests",
+			dependencies: [
+				"AccountPreferencesFeature",
+				"TestUtils",
 			]
 		),
 		.target(
@@ -71,15 +92,36 @@ let package = Package(
 				"Address",
 			]
 		),
+		.testTarget(
+			name: "AccountWorthFetcherTests",
+			dependencies: [
+				"AccountWorthFetcher",
+				"TestUtils",
+			]
+		),
 		.target(
 			name: "Address",
 			dependencies: [
+			]
+		),
+		.testTarget(
+			name: "AddressTests",
+			dependencies: [
+				"Address",
+				"TestUtils",
 			]
 		),
 		.target(
 			name: "AggregatedValueFeature",
 			dependencies: [
 				tca,
+			]
+		),
+		.testTarget(
+			name: "AggregatedValueFeatureTests",
+			dependencies: [
+				"AggregatedValueFeature",
+				"TestUtils",
 			]
 		),
 		.target(
@@ -114,11 +156,25 @@ let package = Package(
 				"UserDefaultsClient",
 			]
 		),
+		.testTarget(
+			name: "AppSettingsTests",
+			dependencies: [
+				"AppSettings",
+				"TestUtils",
+			]
+		),
 		.target(
 			name: "AssetListFeature",
 			dependencies: [
 				"AccountWorthFetcher",
 				tca,
+			]
+		),
+		.testTarget(
+			name: "AssetListFeatureTests",
+			dependencies: [
+				"AssetListFeature",
+				"TestUtils",
 			]
 		),
 		.target(
@@ -138,6 +194,13 @@ let package = Package(
 			name: "CreateAccountFeature",
 			dependencies: [
 				tca,
+			]
+		),
+		.testTarget(
+			name: "CreateAccountFeatureTests",
+			dependencies: [
+				"CreateAccountFeature",
+				"TestUtils",
 			]
 		),
 		.target(

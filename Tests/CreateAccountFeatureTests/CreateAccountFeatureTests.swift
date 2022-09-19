@@ -1,9 +1,9 @@
 import ComposableArchitecture
-@testable import HomeFeature
+@testable import CreateAccountFeature
 import TestUtils
 
 final class CreateAccountFeatureTests: TestCase {
 	func testTrivial() throws {
-		XCTAssertEqual(Home.CreateAccount.State(), Home.CreateAccount.State())
+		XCTAssertEqual(CreateAccount.State(), CreateAccount.State())
 	}
 }

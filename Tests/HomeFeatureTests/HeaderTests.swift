@@ -2,7 +2,7 @@ import ComposableArchitecture
 @testable import HomeFeature
 import TestUtils
 
-final class HomeHeaderTests: TestCase {
+final class HeaderTests: TestCase {
 	func testSettingsButtonTapped() {
 		let store = TestStore(
 			initialState: Home.Header.State(),

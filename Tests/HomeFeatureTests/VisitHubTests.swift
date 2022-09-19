@@ -2,7 +2,7 @@ import ComposableArchitecture
 @testable import HomeFeature
 import TestUtils
 
-final class HomeVisitHubTests: TestCase {
+final class VisitHubTests: TestCase {
 	func testVisitHubButtonTapped() {
 		let store = TestStore(
 			initialState: Home.VisitHub.State(),
