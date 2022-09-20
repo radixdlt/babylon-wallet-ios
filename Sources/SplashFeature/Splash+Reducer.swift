@@ -1,4 +1,6 @@
 import ComposableArchitecture
+import ProfileLoader
+import WalletLoader
 
 public extension Splash {
 	// MARK: Reducer
@@ -17,7 +19,16 @@ public extension Splash {
 			return Effect(value: .internal(.system(.loadWalletWithProfile(profile))))
 
 		case let .internal(.system(.loadProfileResult(.failure(error)))):
-			return Effect(value: .internal(.coordinate(.loadWalletResult(.noWallet(reason: "Failed to load profile")))))
+			return .run { send in
+				switch error {
+				case ProfileLoader.Error.noProfileDocumentFoundAtPath:
+					break
+				case ProfileLoader.Error.failedToLoadProfileFromDocument:
+					await send(.internal(.coordinate(.loadWalletResult(.noWallet(reason: "Failed to load profile")))))
+				default:
+					break
+				}
+			}
 
 		case let .internal(.system(.loadWalletWithProfile(profile))):
 			return .run { send in
@@ -28,8 +39,13 @@ public extension Splash {
 		case let .internal(.system(.loadWalletWithProfileResult(.success(wallet), _))):
 			return Effect(value: .internal(.coordinate(.loadWalletResult(.walletLoaded(wallet)))))
 
-		case .internal(.system(.loadWalletWithProfileResult(.failure, _))):
-			return Effect(value: .internal(.coordinate(.loadWalletResult(.noWallet(reason: "Failed to load profile")))))
+		case let .internal(.system(.loadWalletWithProfileResult(.failure(error), _))):
+			switch error {
+			case WalletLoader.Error.secretsNoFoundForProfile:
+				return Effect(value: .internal(.coordinate(.loadWalletResult(.noWallet(reason: "Failed to load profile")))))
+			default:
+				return .none
+			}
 
 		case let .internal(.coordinate(actionToCoordinate)):
 			return Effect(value: .coordinate(actionToCoordinate))
