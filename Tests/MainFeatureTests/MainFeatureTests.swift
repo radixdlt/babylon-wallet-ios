@@ -2,50 +2,50 @@ import ComposableArchitecture
 @testable import MainFeature
 import TestUtils
 
+@MainActor
 final class MainFeatureTests: TestCase {
-	@MainActor func testRemoveWallet() async {
+	func test_removeWallet_whenTappedOnRemoveWallet_thenCoordinateRemovalResult() async {
+		// given
 		let store = TestStore(
 			initialState: Main.State(home: .placeholder),
 			reducer: Main.reducer,
 			environment: .noop
 		)
 
-		await store.send(.internal(.user(.removeWallet)))
+		// when
+		_ = await store.send(.internal(.user(.removeWallet)))
+
+		// then
 		await store.receive(.internal(.system(.removedWallet)))
-		await store.receive((.coordinate(.removedWallet)))
-	}
-
-	@MainActor func testRemovedWallet() async {
-		let store = TestStore(
-			initialState: Main.State(home: .placeholder),
-			reducer: Main.reducer,
-			environment: .noop
-		)
-
-		await store.send(.internal(.system(.removedWallet)))
 		await store.receive(.coordinate(.removedWallet))
 	}
 
-	func testDisplaySettings() {
+	func test_displaySettings_whenCoordinatedToDispaySettings_thenDisplaySettings() async {
+		// given
 		let store = TestStore(
 			initialState: Main.State(home: .placeholder),
 			reducer: Main.reducer,
 			environment: .noop
 		)
 
-		store.send(.home(.coordinate(.displaySettings))) {
+		// when
+		_ = await store.send(.home(.coordinate(.displaySettings))) {
+			// then
 			$0.settings = .init()
 		}
 	}
 
-	func testDismissSettings() {
+	func test_dismissSettings_whenCoordinatedToDismissSettings_thenDismissSettings() async {
+		// given
 		let store = TestStore(
 			initialState: Main.State(home: .placeholder, settings: .init()),
 			reducer: Main.reducer,
 			environment: .noop
 		)
 
-		store.send(.settings(.coordinate(.dismissSettings))) {
+		// when
+		_ = await store.send(.settings(.coordinate(.dismissSettings))) {
+			// then
 			$0.settings = nil
 		}
 	}
