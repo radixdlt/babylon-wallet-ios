@@ -5,24 +5,13 @@ import TestUtils
 import Wallet
 
 final class AppFeatureTests: TestCase {
-	let environment = App.Environment(
-		backgroundQueue: .unimplemented,
-		mainQueue: .unimplemented,
-		appSettingsClient: .unimplemented,
-		accountWorthFetcher: .unimplemented,
-		pasteboardClient: .unimplemented,
-		profileLoader: .unimplemented,
-		userDefaultsClient: .unimplemented,
-		walletLoader: .unimplemented
-	)
-
 	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() {
 		// given
 		let initialState = App.State.main(.placeholder)
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
-			environment: environment
+			environment: .unimplemented
 		)
 
 		// when
@@ -40,7 +29,7 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
-			environment: environment
+			environment: .unimplemented
 		)
 
 		// when
@@ -60,7 +49,7 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
-			environment: environment
+			environment: .unimplemented
 		)
 
 		// when
@@ -80,7 +69,7 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
-			environment: environment
+			environment: .unimplemented
 		)
 
 		// when
@@ -104,7 +93,7 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
-			environment: environment
+			environment: .unimplemented
 		)
 
 		// when
@@ -120,7 +109,7 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
-			environment: environment
+			environment: .unimplemented
 		)
 
 		// when
