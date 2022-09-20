@@ -52,5 +52,16 @@ public extension App.Environment {
 		userDefaultsClient: .noop,
 		walletLoader: .noop
 	)
+
+	static let unimplemented = Self(
+		backgroundQueue: .unimplemented,
+		mainQueue: .unimplemented,
+		appSettingsClient: .unimplemented,
+		accountWorthFetcher: .unimplemented,
+		pasteboardClient: .unimplemented,
+		profileLoader: .unimplemented,
+		userDefaultsClient: .unimplemented,
+		walletLoader: .unimplemented
+	)
 }
 #endif
