@@ -81,9 +81,9 @@ final class AppFeatureTests: TestCase {
 
 		// when
 		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
-        
-        // then
-        // do nothing for now, no state change occured
+
+		// then
+		// do nothing for now, no state change occured
 	}
 
 	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_thenNavigateToOnboarding() async {
