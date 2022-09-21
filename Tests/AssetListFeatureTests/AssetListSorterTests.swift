@@ -35,7 +35,8 @@ final class AssetListSorterTests: TestCase {
 
 		// then
 		let expectedResult = [
-			[xrdContainer], [dotContainer, ltcContainer, ethContainer, btcContainer],
+			AssetCategory(type: .xrd, tokenContainers: [xrdContainer]),
+			AssetCategory(type: .nonXrd, tokenContainers: [dotContainer, ltcContainer, ethContainer, btcContainer]),
 		]
 		XCTAssertEqual(result, expectedResult)
 	}
@@ -59,7 +60,8 @@ final class AssetListSorterTests: TestCase {
 
 		// then
 		let expectedResult = [
-			[xrdContainer], [btcContainer, dotContainer, ethContainer, ltcContainer],
+			AssetCategory(type: .xrd, tokenContainers: [xrdContainer]),
+			AssetCategory(type: .nonXrd, tokenContainers: [btcContainer, dotContainer, ethContainer, ltcContainer]),
 		]
 		XCTAssertEqual(result, expectedResult)
 	}
@@ -83,7 +85,8 @@ final class AssetListSorterTests: TestCase {
 
 		// then
 		let expectedResult = [
-			[xrdContainer], [ltcContainer, ethContainer, btcContainer, dotContainer],
+			AssetCategory(type: .xrd, tokenContainers: [xrdContainer]),
+			AssetCategory(type: .nonXrd, tokenContainers: [ltcContainer, ethContainer, btcContainer, dotContainer]),
 		]
 		XCTAssertEqual(result, expectedResult)
 	}

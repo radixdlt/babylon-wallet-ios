@@ -153,12 +153,12 @@ public extension Home {
 
 					// asset list
 					let containers = totalWorth[account.address]?.tokenContainers ?? []
-					let sortedContainers = environment.assetListSorter.sortTokens(containers)
+					let categories = environment.assetListSorter.sortTokens(containers)
 
 					state.accountDetails?.assetList = .init(
-						sections: .init(uniqueElements: sortedContainers.enumerated().map { index, containers in
-							let rows = containers.map { container in AssetList.Row.State(tokenContainer: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
-							return AssetList.Section.State(id: index, assets: .init(uniqueElements: rows))
+						sections: .init(uniqueElements: categories.map { category in
+							let rows = category.tokenContainers.map { container in AssetList.Row.State(tokenContainer: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
+							return AssetList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
 						})
 					)
 				}

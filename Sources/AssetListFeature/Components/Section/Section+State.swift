@@ -9,11 +9,11 @@ public extension AssetList {
 public extension AssetList.Section {
 	// MARK: State
 	struct State: Equatable, Identifiable {
-		public let id: Int
+		public let id: AssetCategory.CategoryType
 		public var assets: IdentifiedArrayOf<AssetList.Row.State>
 
 		public init(
-			id: Int,
+			id: AssetCategory.CategoryType,
 			assets: IdentifiedArrayOf<AssetList.Row.State>
 		) {
 			self.id = id

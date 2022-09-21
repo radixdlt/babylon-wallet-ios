@@ -32,9 +32,9 @@ public extension AccountDetails {
 			name = account.name
 
 			assetList = .init(
-				sections: .init(uniqueElements: AssetListSorter.live.sortTokens(account.tokenContainers).enumerated().map { index, containers in
-					let rows = containers.map { container in AssetList.Row.State(tokenContainer: container, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible) }
-					return AssetList.Section.State(id: index, assets: .init(uniqueElements: rows))
+				sections: .init(uniqueElements: AssetListSorter.live.sortTokens(account.tokenContainers).map { category in
+					let rows = category.tokenContainers.map { container in AssetList.Row.State(tokenContainer: container, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible) }
+					return AssetList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
 				})
 			)
 		}

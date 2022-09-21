@@ -21,14 +21,14 @@ public extension AssetListSorter {
 			tokensWithValues.sort { $0.token.value! > $1.token.value! }
 			noValueTokens.sort { $0.token.code.value < $1.token.code.value }
 
-			var result = [[TokenWorthContainer]]()
+			var result = [AssetCategory]()
 
 			if let xrdContainer = xrdContainer {
-				result.append([xrdContainer])
+				result.append(AssetCategory(type: .xrd, tokenContainers: [xrdContainer]))
 			}
 
 			let otherAssets: [TokenWorthContainer] = tokensWithValues + noValueTokens
-			result.append(otherAssets)
+			result.append(AssetCategory(type: .nonXrd, tokenContainers: otherAssets))
 
 			return result
 		}

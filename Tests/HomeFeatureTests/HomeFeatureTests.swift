@@ -69,9 +69,9 @@ final class HomeFeatureTests: TestCase {
 				let sortedContainers = environment.assetListSorter.sortTokens(containers)
 
 				let section0 = AssetList.Section.State(
-					id: 0, assets: [
+					id: .xrd, assets: [
 						AssetList.Row.State(
-							tokenContainer: sortedContainers[0][0],
+							tokenContainer: sortedContainers[0].tokenContainers[0],
 							currency: $0.accountDetails!.aggregatedValue.currency,
 							isCurrencyAmountVisible: $0.accountDetails!.aggregatedValue.isCurrencyAmountVisible
 						),
@@ -79,15 +79,15 @@ final class HomeFeatureTests: TestCase {
 				)
 
 				let section1 = AssetList.Section.State(
-					id: 1,
+					id: .nonXrd,
 					assets: [
 						AssetList.Row.State(
-							tokenContainer: sortedContainers[1][0],
+							tokenContainer: sortedContainers[1].tokenContainers[0],
 							currency: $0.accountDetails!.aggregatedValue.currency,
 							isCurrencyAmountVisible: $0.accountDetails!.aggregatedValue.isCurrencyAmountVisible
 						),
 						AssetList.Row.State(
-							tokenContainer: sortedContainers[1][1],
+							tokenContainer: sortedContainers[1].tokenContainers[1],
 							currency: $0.accountDetails!.aggregatedValue.currency,
 							isCurrencyAmountVisible: $0.accountDetails!.aggregatedValue.isCurrencyAmountVisible
 						),
