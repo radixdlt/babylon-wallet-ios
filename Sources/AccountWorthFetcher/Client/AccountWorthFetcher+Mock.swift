@@ -10,6 +10,8 @@ public extension AccountWorthFetcher {
 }
 
 #if DEBUG
+import XCTestDynamicOverlay
+
 public extension AccountWorthFetcher {
 	static let unimplemented = Self(
 		fetchWorth: XCTUnimplemented("\(Self.self).fetchWorth")

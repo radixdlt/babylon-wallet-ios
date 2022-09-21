@@ -5,6 +5,14 @@ public struct Token: Equatable, Identifiable {
 	public let id = UUID()
 	public let code: Code
 	public let value: Float?
+
+	public init(
+		code: Code,
+		value: Float?
+	) {
+		self.code = code
+		self.value = value
+	}
 }
 
 public extension Token {
@@ -34,12 +42,10 @@ public extension Token {
 }
 
 public enum TokenRandomizer {
-	public static func generateRandomTokens(_ limit: Int = 10) -> [Token] {
-		(1 ..< .random(in: 1 ... limit)).map { _ in
-			Token(
-				code: Token.Code.allCases.randomElement() ?? .xrd,
-				value: .random(in: 0 ... 1_000_000)
-			)
+	public static func generateRandomTokens() -> [Token] {
+		Token.Code.allCases.map {
+			let randomValue: Float? = Bool.random() ? .random(in: 0 ... 100) : nil
+			return Token(code: $0, value: randomValue)
 		}
 	}
 }

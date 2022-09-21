@@ -12,6 +12,8 @@ public extension AppSettingsClient {
 }
 
 #if DEBUG
+import XCTestDynamicOverlay
+
 public extension AppSettingsClient {
 	static let unimplemented = Self(
 		saveSettings: XCTUnimplemented("\(Self.self).saveSettings"),

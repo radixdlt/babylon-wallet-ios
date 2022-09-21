@@ -9,24 +9,40 @@ import Foundation
 // swiftlint:disable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:disable nesting type_body_length type_name vertical_whitespace_opening_braces
 public enum L10n {
-	public enum Home {
-		/// Create New Account
-		public static let createNewAccount = L10n.tr("Localizable", "home.createNewAccount", fallback: #"Create New Account"#)
-		public enum AccountDetails {
-			/// Transfer
-			public static let transferButtonTitle = L10n.tr("Localizable", "home.accountDetails.transferButtonTitle", fallback: #"Transfer"#)
-		}
+	public enum AccountDetails {
+		/// Transfer
+		public static let transferButtonTitle = L10n.tr("Localizable", "accountDetails.transferButtonTitle", fallback: #"Transfer"#)
+	}
 
-		public enum AccountRow {
+	public enum AccountList {
+		public enum Row {
 			/// Copy
-			public static let copyTitle = L10n.tr("Localizable", "home.accountRow.copyTitle", fallback: #"Copy"#)
+			public static let copyTitle = L10n.tr("Localizable", "accountList.row.copyTitle", fallback: #"Copy"#)
 		}
+	}
 
-		public enum AggregatedValue {
-			/// Total value
-			public static let title = L10n.tr("Localizable", "home.aggregatedValue.title", fallback: #"Total value"#)
-		}
+	public enum AggregatedValue {
+		/// Total value
+		public static let title = L10n.tr("Localizable", "aggregatedValue.title", fallback: #"Total value"#)
+	}
 
+	public enum AssetList {
+		/// Badges
+		public static let badges = L10n.tr("Localizable", "assetList.badges", fallback: #"Badges"#)
+		/// NFTs
+		public static let nfts = L10n.tr("Localizable", "assetList.nfts", fallback: #"NFTs"#)
+		/// Pool Share
+		public static let poolShare = L10n.tr("Localizable", "assetList.poolShare", fallback: #"Pool Share"#)
+		/// Tokens
+		public static let tokens = L10n.tr("Localizable", "assetList.tokens", fallback: #"Tokens"#)
+	}
+
+	public enum CreateAccount {
+		/// Create New Account
+		public static let createNewAccount = L10n.tr("Localizable", "createAccount.createNewAccount", fallback: #"Create New Account"#)
+	}
+
+	public enum Home {
 		public enum Header {
 			/// Welcome, here are all your accounts on the Radar Network
 			public static let subtitle = L10n.tr("Localizable", "home.header.subtitle", fallback: #"Welcome, here are all your accounts on the Radar Network"#)

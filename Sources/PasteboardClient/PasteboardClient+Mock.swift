@@ -1,7 +1,7 @@
+#if DEBUG
 import Foundation
 import XCTestDynamicOverlay
 
-#if DEBUG
 public extension PasteboardClient {
 	static let noop = Self(
 		copyString: { _ in },

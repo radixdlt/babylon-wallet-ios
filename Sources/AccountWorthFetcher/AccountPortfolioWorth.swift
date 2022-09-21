@@ -3,6 +3,12 @@ import Foundation
 // MARK: - AccountPortfolioWorth
 public struct AccountPortfolioWorth: Equatable {
 	public let tokenContainers: [TokenWorthContainer]
+
+	public init(
+		tokenContainers: [TokenWorthContainer]
+	) {
+		self.tokenContainers = tokenContainers
+	}
 }
 
 // MARK: - Computed Properties

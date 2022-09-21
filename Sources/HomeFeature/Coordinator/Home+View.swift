@@ -1,5 +1,10 @@
+import AccountDetailsFeature
+import AccountListFeature
+import AccountPreferencesFeature
+import AggregatedValueFeature
 import Common
 import ComposableArchitecture
+import CreateAccountFeature
 import SwiftUI
 
 public extension Home {
@@ -35,7 +40,7 @@ public extension Home.View {
 						state: \.createAccount,
 						action: Home.Action.createAccount
 					),
-					then: Home.CreateAccount.View.init(store:)
+					then: CreateAccount.View.init(store:)
 				)
 				.zIndex(1)
 
@@ -44,7 +49,7 @@ public extension Home.View {
 						state: \.accountDetails,
 						action: Home.Action.accountDetails
 					),
-					then: Home.AccountDetails.View.init(store:)
+					then: AccountDetails.View.init(store:)
 				)
 				.zIndex(2)
 
@@ -53,7 +58,7 @@ public extension Home.View {
 						state: \.accountPreferences,
 						action: Home.Action.accountPreferences
 					),
-					then: Home.AccountPreferences.View.init(store:)
+					then: AccountPreferences.View.init(store:)
 				)
 				.zIndex(3)
 
@@ -62,7 +67,7 @@ public extension Home.View {
 						state: \.transfer,
 						action: Home.Action.transfer
 					),
-					then: Home.Transfer.View.init(store:)
+					then: AccountDetails.Transfer.View.init(store:)
 				)
 				.zIndex(5)
 			}
@@ -100,7 +105,7 @@ private extension Home.View {
 	// TODO: extract button for reuse
 	func createAccountButton(action: @escaping () -> Void) -> some View {
 		Button(action: action) {
-			Text(L10n.Home.createNewAccount)
+			Text(L10n.CreateAccount.createNewAccount)
 				.foregroundColor(.app.buttonTextBlack)
 				.font(.app.subhead)
 				.padding(.horizontal, 40)
@@ -118,20 +123,20 @@ private extension Home.View {
 					action: Home.Action.header
 				)
 			)
-			.padding([.leading, .trailing, .top], 32)
+			.padding([.leading, .trailing, .top], 24)
 
 			ScrollView {
-				LazyVStack(spacing: 25) {
+				LazyVStack(spacing: 24) {
 					VStack {
 						title
-						Home.AggregatedValue.View(
+						AggregatedValue.View(
 							store: store.scope(
 								state: \.aggregatedValue,
 								action: Home.Action.aggregatedValue
 							)
 						)
 					}
-					Home.AccountList.View(
+					AccountList.View(
 						store: store.scope(
 							state: \.accountList,
 							action: Home.Action.accountList
@@ -148,7 +153,7 @@ private extension Home.View {
 						)
 					)
 				}
-				.padding(32)
+				.padding(24)
 			}
 		}
 	}
@@ -156,7 +161,7 @@ private extension Home.View {
 
 private extension Home.View {
 	var title: some View {
-		Text(L10n.Home.AggregatedValue.title)
+		Text(L10n.AggregatedValue.title)
 			.foregroundColor(.app.buttonTextBlack)
 			.font(.app.caption1)
 			.textCase(.uppercase)

@@ -8,7 +8,7 @@ public struct Profile: Equatable {
 	public init(
 		name: String = "Unnamed",
 		accounts: [Account] = []
-	) {
+	) throws {
 		self.name = name
 		self.accounts = accounts
 	}
@@ -16,7 +16,7 @@ public struct Profile: Equatable {
 
 #if DEBUG
 public extension Profile {
-	static let placeholder: Profile = .init(
+	static let placeholder = try! Self(
 		name: "Profile Placeholder",
 		accounts: [
 			.init(address: "c10erx8v19sd6gvggh7n6j4vsn", name: "Checking"),

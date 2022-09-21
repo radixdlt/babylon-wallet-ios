@@ -13,7 +13,7 @@ public extension Splash {
 // MARK: - SplashLoadWalletResult
 public enum SplashLoadWalletResult: Equatable {
 	case walletLoaded(Wallet)
-	case noWallet(reason: String)
+	case noWallet(reason: String, failedToDecode: Bool)
 }
 
 public extension Splash.Action {
