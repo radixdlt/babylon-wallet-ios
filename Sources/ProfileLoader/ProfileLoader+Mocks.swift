@@ -5,7 +5,7 @@ import XCTestDynamicOverlay
 public extension ProfileLoader {
 	static let noop = Self(
 		loadProfile: {
-			Profile(name: "profileName")
+			try! Profile(name: "profileName")
 		}
 	)
 

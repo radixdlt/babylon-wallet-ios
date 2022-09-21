@@ -11,7 +11,6 @@ public extension App {
 		case splash(Splash.Action)
 
 		case coordinate(CoordinatingAction)
-		case `internal`(InternalAction)
 	}
 }
 
@@ -19,17 +18,5 @@ public extension App.Action {
 	enum CoordinatingAction: Equatable {
 		case onboard
 		case toMain(Wallet)
-	}
-}
-
-public extension App.Action {
-	enum InternalAction: Equatable {
-		case user(UserAction)
-	}
-}
-
-public extension App.Action.InternalAction {
-	enum UserAction: Equatable {
-		case alertDismissed
 	}
 }

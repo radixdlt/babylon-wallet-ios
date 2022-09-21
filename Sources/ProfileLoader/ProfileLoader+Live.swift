@@ -8,11 +8,21 @@ public extension ProfileLoader {
 		Self(
 			loadProfile: {
 				guard let profileName = userDefaultsClient.profileName else {
-					throw Error.noProfileDocumentFoundAtPath("UserDefaults")
+					struct NoProfileFoundInUserDefaults: Swift.Error {}
+					throw NoProfileFoundInUserDefaults()
 				}
-
-				return Profile(name: profileName)
+				do {
+					return try Profile(name: profileName)
+				} catch {
+					throw Self.Error.failedToDecode
+				}
 			}
 		)
+	}
+}
+
+public extension ProfileLoader {
+	enum Error: String, Swift.Error, Equatable {
+		case failedToDecode
 	}
 }

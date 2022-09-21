@@ -13,7 +13,7 @@ public extension Onboarding {
 			return Effect(value: .internal(.system(.createWallet)))
 		case .internal(.system(.createWallet)):
 			precondition(state.canProceed)
-			let profile = Profile(name: state.profileName)
+			let profile = try! Profile(name: state.profileName)
 			// FIXME: insert right mnemonic
 			let wallet: Wallet = .init(profile: profile, deviceFactorTypeMnemonic: "")
 			let name = state.profileName
