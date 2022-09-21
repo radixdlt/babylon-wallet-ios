@@ -73,7 +73,7 @@ public extension App {
 				return Effect(value: .coordinate(.toMain(wallet)))
 			case let .noWallet(reason, failedToDecode):
 				if failedToDecode {
-					fatalError("Fix this, failed to load wallet: \(reason)")
+					print("Fix this, failed to load wallet: \(reason)")
 					return .none
 				} else {
 					return .run { send in

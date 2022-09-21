@@ -4,7 +4,14 @@ import SplashFeature
 import TestUtils
 import Wallet
 
+@MainActor
 final class AppFeatureTests: TestCase {
+	func test_initialAppState_whenAppLaunches_thenInitialAppStateIsSplash() {
+		let appState = App.State()
+		let expectedInitialAppState: App.State = .splash(.init())
+		XCTAssertEqual(appState, expectedInitialAppState)
+	}
+
 	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() {
 		// given
 		let initialState = App.State.main(.placeholder)
@@ -61,11 +68,11 @@ final class AppFeatureTests: TestCase {
 		}
 	}
 
-	func test_loadWalletResult_whenWalletLoadingFailedInSplash_thenDisplayAlert() {
+	func test_loadWalletResult_whenWalletLoadingFailedBecauseDecodingError_thenDoNothingForNow() {
 		// given
 		let initialState = App.State.splash(.init())
-		let reason = "No wallet"
-		let loadWalletResult = SplashLoadWalletResult.noWallet(reason: reason)
+		let reason = "Failed to decode wallet"
+		let loadWalletResult = SplashLoadWalletResult.noWallet(reason: reason, failedToDecode: true)
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
@@ -73,23 +80,17 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult)))) {
-			// then
-			$0 = .alert(.init(
-				title: TextState(reason),
-				buttons: [
-					.cancel(
-						TextState("OK, I'll onboard"),
-						action: .send(.coordinate(.onboard))
-					),
-				]
-			))
-		}
+		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
+        
+        // then
+        // do nothing for now, no state change occured
 	}
 
-	func test_coordinateOnboard_whenNoWalletLoadedInSplash_thenNavigateToOnboarding() {
+	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_thenNavigateToOnboarding() async {
 		// given
 		let initialState = App.State.splash(.init())
+		let reason = "Failed to load profile"
+		let loadWalletResult = SplashLoadWalletResult.noWallet(reason: reason, failedToDecode: false)
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
@@ -97,25 +98,11 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		store.send(.coordinate(.onboard)) {
-			// then
+		_ = await store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
+
+		// then
+		await store.receive(.coordinate(.onboard)) {
 			$0 = .onboarding(.init())
-		}
-	}
-
-	func test_dismissAlert_whenTapOnDismissPresentedAlert_thenHideAlert() {
-		// given
-		let initialState = App.State.alert(.init(title: .init("Alert")))
-		let store = TestStore(
-			initialState: initialState,
-			reducer: App.reducer,
-			environment: .unimplemented
-		)
-
-		// when
-		store.send(.internal(.user(.alertDismissed))) {
-			// then
-			$0 = .alert(nil)
 		}
 	}
 }
