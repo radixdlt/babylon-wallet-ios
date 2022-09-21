@@ -165,6 +165,7 @@ let package = Package(
 		.target(
 			name: "PasteboardClient",
 			dependencies: [
+				tca,
 			]
 		),
 		.testTarget(
