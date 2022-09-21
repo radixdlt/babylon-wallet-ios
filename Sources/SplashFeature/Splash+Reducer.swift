@@ -1,4 +1,6 @@
 import ComposableArchitecture
+import ProfileLoader
+import WalletLoader
 
 public extension Splash {
 	// MARK: Reducer
@@ -9,32 +11,69 @@ public extension Splash {
 			return Effect(value: .internal(.system(.loadProfile)))
 		case .internal(.system(.loadProfile)):
 			return .run { send in
-				let profile = try await environment.profileLoader.loadProfile()
-				await send(.internal(.system(.loadProfileResult(.success(profile)))))
+				await send(.internal(.system(.loadProfileResult(
+					TaskResult {
+						try await environment.profileLoader.loadProfile()
+					}
+				))))
 			}
 
 		case let .internal(.system(.loadProfileResult(.success(profile)))):
 			return Effect(value: .internal(.system(.loadWalletWithProfile(profile))))
 
 		case let .internal(.system(.loadProfileResult(.failure(error)))):
-			return Effect(value: .internal(.coordinate(.loadWalletResult(.noWallet(reason: "Failed to load profile")))))
+			return .run { send in
+				switch error {
+				case ProfileLoader.Error.failedToDecode:
+					await send(.internal(.coordinate(.loadWalletResult(
+						.noWallet(
+							reason: "Failed to load profile",
+							failedToDecode: true
+						)
+					))))
+				default:
+					await send(.internal(.coordinate(.loadWalletResult(
+						.noWallet(
+							reason: "Failed to load profile",
+							failedToDecode: false
+						)
+					))))
+				}
+			}
 
 		case let .internal(.system(.loadWalletWithProfile(profile))):
 			return .run { send in
-				let wallet = try await environment.walletLoader.loadWallet(profile)
-				await send(.internal(.system(.loadWalletWithProfileResult(.success(wallet), profile: profile))))
+				await send(.internal(.system(.loadWalletWithProfileResult(
+					TaskResult {
+						try await environment.walletLoader.loadWallet(profile)
+					}, profile: profile
+				)
+				)))
 			}
 
 		case let .internal(.system(.loadWalletWithProfileResult(.success(wallet), _))):
 			return Effect(value: .internal(.coordinate(.loadWalletResult(.walletLoaded(wallet)))))
 
-		case .internal(.system(.loadWalletWithProfileResult(.failure, _))):
-			return Effect(value: .internal(.coordinate(.loadWalletResult(.noWallet(reason: "Failed to load profile")))))
+		case let .internal(.system(.loadWalletWithProfileResult(.failure(error), _))):
+			switch error {
+			case WalletLoader.Error.secretsNoFoundForProfile:
+				return Effect(value: .internal(.coordinate(.loadWalletResult(.noWallet(reason: "Failed to load profile", failedToDecode: false)))))
+			default:
+				return Effect(value: .internal(.coordinate(.loadWalletResult(.noWallet(reason: "Failed to decode wallet", failedToDecode: true)))))
+			}
 
 		case let .internal(.coordinate(actionToCoordinate)):
-			return Effect(value: .coordinate(actionToCoordinate))
-				.delay(for: 0.7, scheduler: environment.mainQueue)
-				.eraseToEffect()
+			return .run { send in
+				let duration: TimeInterval
+				#if DEBUG
+				duration = 0.1
+				#else
+				duration = 0.7
+				#endif
+				try await Task.sleep(nanoseconds: UInt64(duration * TimeInterval(NSEC_PER_SEC)))
+				await send(.coordinate(actionToCoordinate))
+			}
+
 		case .coordinate:
 			return .none
 		}

@@ -64,7 +64,6 @@ public extension App {
 		case .main:
 			return .none
 		case let .onboarding(.coordinate(.onboardedWithWallet(wallet))):
-			state = .main(.init(home: .init(wallet: wallet)))
 			return Effect(value: .coordinate(.toMain(wallet)))
 		case .onboarding:
 			return .none
@@ -72,17 +71,15 @@ public extension App {
 			switch loadWalletResult {
 			case let .walletLoaded(wallet):
 				return Effect(value: .coordinate(.toMain(wallet)))
-			case let .noWallet(reason):
-				state = App.State.alert(.init(
-					title: TextState(reason),
-					buttons: [
-						.cancel(
-							TextState("OK, I'll onboard"),
-							action: .send(.coordinate(.onboard))
-						),
-					]
-				))
-				return .none
+			case let .noWallet(reason, failedToDecode):
+				if failedToDecode {
+					print("Fix this, failed to load wallet: \(reason)")
+					return .none
+				} else {
+					return .run { send in
+						await send(.coordinate(.onboard))
+					}
+				}
 			}
 		case .splash:
 			return .none
@@ -91,9 +88,6 @@ public extension App {
 			return .none
 		case let .coordinate(.toMain(wallet)):
 			state = .main(.init(home: .init(justA: wallet)))
-			return .none
-		case .internal(.user(.alertDismissed)):
-			state = .alert(nil)
 			return .none
 		}
 	}

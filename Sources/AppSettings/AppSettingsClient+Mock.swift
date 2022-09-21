@@ -1,4 +1,5 @@
 import Foundation
+import XCTestDynamicOverlay
 
 public extension AppSettingsClient {
 	static let mock = Self(
