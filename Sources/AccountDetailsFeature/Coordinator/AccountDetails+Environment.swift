@@ -6,3 +6,11 @@ public extension AccountDetails {
 		public init() {}
 	}
 }
+
+#if DEBUG
+public extension AccountDetails.Environment {
+	static let placeholder: Self = .init()
+
+	static let unimplemented: Self = .init()
+}
+#endif

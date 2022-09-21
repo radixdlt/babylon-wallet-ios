@@ -6,33 +6,20 @@ import TestUtils
 
 @MainActor
 final class AccountDetailsFeatureTests: TestCase {
-	private var initialState: AccountDetails.State!
-	private var store: TestStore<AccountDetails.State, AccountDetails.State, AccountDetails.Action, AccountDetails.Action, AccountDetails.Environment>!
-
-	override func setUpWithError() throws {
-		try super.setUpWithError()
-
+	func test_dismissAccountDetails_whenTappedOnBackButton_thenCoordinateDismissal() async {
+		// given
 		guard let account = Profile.placeholder.accounts.first else {
 			XCTFail("No account present")
 			return
 		}
 		let accountListRowState = AccountList.Row.State(account: account)
-		initialState = AccountDetails.State(for: accountListRowState)
-		store = TestStore(
+		let initialState = AccountDetails.State(for: accountListRowState)
+		let store = TestStore(
 			initialState: initialState,
 			reducer: AccountDetails.reducer,
-			environment: AccountDetails.Environment()
+			environment: .unimplemented
 		)
-	}
 
-	override func tearDownWithError() throws {
-		initialState = nil
-		store = nil
-		try super.tearDownWithError()
-	}
-
-	func test_dismissAccountDetails_whenTappedOnBackButton_thenCoordinateDismissal() async {
-		// given initial state
 		// when
 		_ = await store.send(.internal(.user(.dismissAccountDetails)))
 
@@ -41,7 +28,19 @@ final class AccountDetailsFeatureTests: TestCase {
 	}
 
 	func test_navigateToAccountPreferences_whenTappedOnPreferencesButton_thenCoordinateNavigationToPreferences() async {
-		// given initial state
+		// given
+		guard let account = Profile.placeholder.accounts.first else {
+			XCTFail("No account present")
+			return
+		}
+		let accountListRowState = AccountList.Row.State(account: account)
+		let initialState = AccountDetails.State(for: accountListRowState)
+		let store = TestStore(
+			initialState: initialState,
+			reducer: AccountDetails.reducer,
+			environment: .unimplemented
+		)
+
 		// when
 		_ = await store.send(.internal(.user(.displayAccountPreferences)))
 
@@ -50,7 +49,19 @@ final class AccountDetailsFeatureTests: TestCase {
 	}
 
 	func test_copyAddress_whenTappedOnCopyAddress_thenCoordiateCopiedAddress() async {
-		// given initial state
+		// given
+		guard let account = Profile.placeholder.accounts.first else {
+			XCTFail("No account present")
+			return
+		}
+		let accountListRowState = AccountList.Row.State(account: account)
+		let initialState = AccountDetails.State(for: accountListRowState)
+		let store = TestStore(
+			initialState: initialState,
+			reducer: AccountDetails.reducer,
+			environment: .unimplemented
+		)
+
 		// when
 		_ = await store.send(.internal(.user(.copyAddress)))
 
@@ -59,7 +70,19 @@ final class AccountDetailsFeatureTests: TestCase {
 	}
 
 	func test_refresh_whenInitiatedRefresh_thenCoordinateRefreshForAddress() async {
-		// given initial state
+		// given
+		guard let account = Profile.placeholder.accounts.first else {
+			XCTFail("No account present")
+			return
+		}
+		let accountListRowState = AccountList.Row.State(account: account)
+		let initialState = AccountDetails.State(for: accountListRowState)
+		let store = TestStore(
+			initialState: initialState,
+			reducer: AccountDetails.reducer,
+			environment: .unimplemented
+		)
+
 		// when
 		_ = await store.send(.internal(.user(.refresh)))
 
@@ -68,7 +91,19 @@ final class AccountDetailsFeatureTests: TestCase {
 	}
 
 	func test_displayTransfer_whenTappedOnDisplayTransfer_thenCoordinateNavigationToTransfer() async {
-		// given initial state
+		// given
+		guard let account = Profile.placeholder.accounts.first else {
+			XCTFail("No account present")
+			return
+		}
+		let accountListRowState = AccountList.Row.State(account: account)
+		let initialState = AccountDetails.State(for: accountListRowState)
+		let store = TestStore(
+			initialState: initialState,
+			reducer: AccountDetails.reducer,
+			environment: .unimplemented
+		)
+
 		// when
 		_ = await store.send(.internal(.user(.displayTransfer)))
 
