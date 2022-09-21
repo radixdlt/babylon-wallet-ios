@@ -1,13 +1,17 @@
-"home.createNewAccount" = "Create New Account";
+"createAccount.createNewAccount" = "Create New Account";
 
 "home.header.title" = "Radar Wallet";
 "home.header.subtitle" = "Welcome, here are all your accounts on the Radar Network";
-
 "home.visitHub.title" = "Ready to get started using the Radar Network and your Wallet?";
 "home.visitHub.buttonTitle" = "Visit the Radar Hub";
 
-"home.aggregatedValue.title" = "Total value";
+"aggregatedValue.title" = "Total value";
 
-"home.accountRow.copyTitle" = "Copy";
+"accountList.row.copyTitle" = "Copy";
 
-"home.accountDetails.transferButtonTitle" = "Transfer";
+"accountDetails.transferButtonTitle" = "Transfer";
+
+"assetList.tokens" = "Tokens";
+"assetList.nfts" = "NFTs";
+"assetList.poolShare" = "Pool Share";
+"assetList.badges" = "Badges";

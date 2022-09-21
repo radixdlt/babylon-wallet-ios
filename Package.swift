@@ -37,11 +37,91 @@ let package = Package(
 		// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
 		.target(name: "_BuildTools"),
 		.target(
+			name: "AccountDetailsFeature",
+			dependencies: [
+				"AccountListFeature",
+				"AccountWorthFetcher",
+				"Address",
+				"AggregatedValueFeature",
+				"AssetListFeature",
+				"Profile",
+				tca,
+			]
+		),
+		.testTarget(
+			name: "AccountDetailsFeatureTests",
+			dependencies: [
+				"AccountDetailsFeature",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "AccountListFeature",
+			dependencies: [
+				"AccountWorthFetcher",
+				"Address",
+				"Profile",
+				tca,
+			]
+		),
+		.testTarget(
+			name: "AccountListFeatureTests",
+			dependencies: [
+				"AccountListFeature",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "AccountPreferencesFeature",
+			dependencies: [
+				tca,
+			]
+		),
+		.testTarget(
+			name: "AccountPreferencesFeatureTests",
+			dependencies: [
+				"AccountPreferencesFeature",
+				"TestUtils",
+			]
+		),
+		.target(
 			name: "AccountWorthFetcher",
 			dependencies: [
 				"AppSettings",
 				"Common",
-				"Profile",
+				"Address",
+			]
+		),
+		.testTarget(
+			name: "AccountWorthFetcherTests",
+			dependencies: [
+				"AccountWorthFetcher",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "Address",
+			dependencies: [
+			]
+		),
+		.testTarget(
+			name: "AddressTests",
+			dependencies: [
+				"Address",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "AggregatedValueFeature",
+			dependencies: [
+				tca,
+			]
+		),
+		.testTarget(
+			name: "AggregatedValueFeatureTests",
+			dependencies: [
+				"AggregatedValueFeature",
+				"TestUtils",
 			]
 		),
 		.target(
@@ -76,9 +156,32 @@ let package = Package(
 				"UserDefaultsClient",
 			]
 		),
+		.testTarget(
+			name: "AppSettingsTests",
+			dependencies: [
+				"AppSettings",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "AssetListFeature",
+			dependencies: [
+				"AccountWorthFetcher",
+				tca,
+			]
+		),
+		.testTarget(
+			name: "AssetListFeatureTests",
+			dependencies: [
+				"AccountWorthFetcher",
+				"AssetListFeature",
+				"TestUtils",
+			]
+		),
 		.target(
 			name: "Common",
 			dependencies: [
+				"Address",
 			]
 		),
 		.testTarget(
@@ -89,13 +192,31 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "CreateAccountFeature",
+			dependencies: [
+				tca,
+			]
+		),
+		.testTarget(
+			name: "CreateAccountFeatureTests",
+			dependencies: [
+				"CreateAccountFeature",
+				"TestUtils",
+			]
+		),
+		.target(
 			name: "HomeFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
+				"AccountListFeature",
+				"AccountDetailsFeature",
+				"AccountPreferencesFeature",
 				"AccountWorthFetcher",
+				"Address",
 				"AppSettings",
+				"AssetListFeature",
 				"Common",
-				"Profile",
+				"CreateAccountFeature",
 				"PasteboardClient",
 				tca,
 				"Wallet",
@@ -105,7 +226,13 @@ let package = Package(
 		.testTarget(
 			name: "HomeFeatureTests",
 			dependencies: [
+				"AccountDetailsFeature",
+				"AccountListFeature",
+				"AccountWorthFetcher",
+				"Address",
+				"AssetListFeature",
 				"HomeFeature",
+				"Profile",
 				"TestUtils",
 			]
 		),
@@ -163,6 +290,7 @@ let package = Package(
 		.target(
 			name: "PasteboardClient",
 			dependencies: [
+				tca,
 			]
 		),
 		.testTarget(
@@ -175,7 +303,7 @@ let package = Package(
 		.target(
 			name: "Profile",
 			dependencies: [
-				"Common",
+				"Address",
 			]
 		),
 		.testTarget(

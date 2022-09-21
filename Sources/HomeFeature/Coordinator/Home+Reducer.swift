@@ -1,4 +1,11 @@
+import AccountDetailsFeature
+import AccountListFeature
+import AccountPreferencesFeature
+import AccountWorthFetcher
+import AggregatedValueFeature
+import AssetListFeature
 import ComposableArchitecture
+import CreateAccountFeature
 
 #if os(iOS)
 // FIXME: move to `UIApplicationClient` package!
@@ -16,11 +23,11 @@ public extension Home {
 				environment: { _ in Home.Header.Environment() }
 			),
 
-		Home.AggregatedValue.reducer
+		AggregatedValue.reducer
 			.pullback(
 				state: \.aggregatedValue,
 				action: /Home.Action.aggregatedValue,
-				environment: { _ in Home.AggregatedValue.Environment() }
+				environment: { _ in AggregatedValue.Environment() }
 			),
 
 		Home.VisitHub.reducer
@@ -30,40 +37,40 @@ public extension Home {
 				environment: { _ in Home.VisitHub.Environment() }
 			),
 
-		Home.AccountList.reducer
+		AccountList.reducer
 			.pullback(
 				state: \.accountList,
 				action: /Home.Action.accountList,
-				environment: { _ in Home.AccountList.Environment() }
+				environment: { _ in AccountList.Environment() }
 			),
 
-		Home.AccountDetails.reducer
+		AccountDetails.reducer
 			.optional()
 			.pullback(
 				state: \.accountDetails,
 				action: /Home.Action.accountDetails,
 				environment: { _ in
-					Home.AccountDetails.Environment()
+					AccountDetails.Environment()
 				}
 			),
 
-		Home.AccountPreferences.reducer
+		AccountPreferences.reducer
 			.optional()
 			.pullback(
 				state: \.accountPreferences,
 				action: /Home.Action.accountPreferences,
 				environment: { _ in
-					Home.AccountPreferences.Environment()
+					AccountPreferences.Environment()
 				}
 			),
 
-		Home.Transfer.reducer
+		AccountDetails.Transfer.reducer
 			.optional()
 			.pullback(
 				state: \.transfer,
 				action: /Home.Action.transfer,
 				environment: { _ in
-					Home.Transfer.Environment()
+					AccountDetails.Transfer.Environment()
 				}
 			),
 
@@ -106,23 +113,62 @@ public extension Home {
 				}
 
 			case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
+				// aggregated value
 				state.aggregatedValue.isCurrencyAmountVisible = isVisible
+
+				// account list
 				state.accountList.accounts.forEach {
 					state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = isVisible
 				}
+
+				// account details
 				state.accountDetails?.aggregatedValue.isCurrencyAmountVisible = isVisible
+				state.accountDetails?.assetList.sections.forEach { section in
+					section.assets.forEach { row in
+						state.accountDetails?.assetList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
+					}
+				}
+
 				return .none
 
 			case let .internal(.system(.totalWorthLoaded(totalWorth))):
 				state.accountsWorthDictionary = totalWorth
+
+				// aggregated value
 				state.aggregatedValue.value = totalWorth.compactMap(\.value.worth).reduce(0, +)
+
+				// account list
 				state.accountList.accounts.forEach {
 					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalWorth[$0.address]?.worth
-
-					let tokens = totalWorth[$0.address]?.tokenContainers.map(\.token) ?? []
-					state.accountList.accounts[id: $0.address]?.tokens = tokens
+					let tokenContainers = totalWorth[$0.address]?.tokenContainers ?? []
+					state.accountList.accounts[id: $0.address]?.tokenContainers = tokenContainers
 				}
+
+				// account details
+				if let details = state.accountDetails {
+					// aggregated value
+					let account = details.account
+					let accountWorth = state.accountsWorthDictionary[details.address]
+					state.accountDetails?.aggregatedValue.value = accountWorth?.worth
+
+					// asset list
+					let containers = totalWorth[account.address]?.tokenContainers ?? []
+					let categories = environment.assetListSorter.sortTokens(containers)
+
+					state.accountDetails?.assetList = .init(
+						sections: .init(uniqueElements: categories.map { category in
+							let rows = category.tokenContainers.map { container in AssetList.Row.State(tokenContainer: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
+							return AssetList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
+						})
+					)
+				}
+
 				return .none
+
+			case let .internal(.system(.accountWorthLoaded(accountWorth))):
+				guard let key = accountWorth.first?.key else { return .none }
+				state.accountsWorthDictionary[key] = accountWorth.first?.value
+				return Effect(value: .internal(.system(.totalWorthLoaded(state.accountsWorthDictionary))))
 
 			case let .internal(.system(.copyAddress(address))):
 				// TODO: display confirmation popup? discuss with po / designer
@@ -208,11 +254,20 @@ public extension Home {
 				state.transfer = .init()
 				return .none
 
+			case let .accountDetails(.coordinate(.refresh(address))):
+				return .run { send in
+					let accountWorth = try await environment.accountWorthFetcher.fetchWorth([address])
+					await send(.internal(.system(.accountWorthLoaded(accountWorth))))
+				}
+
 			case .accountDetails(.aggregatedValue(.internal(_))):
 				return .none
 
 			case .accountDetails(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))):
 				return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
+
+			case .accountDetails(.assetList(_)):
+				return .none
 
 			case .transfer(.coordinate(.dismissTransfer)):
 				state.transfer = nil

@@ -1,5 +1,5 @@
+import Address
 import AppSettings
-import Profile
 
 public extension AccountWorthFetcher {
 	static func live(
@@ -10,8 +10,8 @@ public extension AccountWorthFetcher {
 		Self(
 			fetchWorth: { addresses in
 				let portfolioDictionary = try await withThrowingTaskGroup(
-					of: (address: Profile.Account.Address, tokens: [Token]).self,
-					returning: [Profile.Account.Address: [Token]].self,
+					of: (address: Address, tokens: [Token]).self,
+					returning: [Address: [Token]].self,
 					body: { taskGroup in
 						for address in addresses {
 							taskGroup.addTask {
@@ -20,7 +20,7 @@ public extension AccountWorthFetcher {
 							}
 						}
 
-						var portfolioDictionary = [Profile.Account.Address: [Token]]()
+						var portfolioDictionary = [Address: [Token]]()
 						for try await result in taskGroup {
 							portfolioDictionary[result.address] = result.tokens
 						}
@@ -32,7 +32,7 @@ public extension AccountWorthFetcher {
 				let currency = try await appSettingsClient.loadSettings().currency
 
 				let totalWorth = try await withThrowingTaskGroup(
-					of: (address: Profile.Account.Address, tokenContainers: [TokenWorthContainer]).self,
+					of: (address: Address, tokenContainers: [TokenWorthContainer]).self,
 					returning: AccountsWorth.self,
 					body: { taskGroup in
 						for element in portfolioDictionary {

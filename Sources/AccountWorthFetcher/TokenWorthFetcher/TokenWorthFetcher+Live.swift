@@ -2,9 +2,13 @@ import Foundation
 
 public extension TokenWorthFetcher {
 	static let live: Self = {
-		let fetchSingleTokenWorth: FetchSingleTokenWorth = { _, _ in
+		let fetchSingleTokenWorth: FetchSingleTokenWorth = { token, _ in
 			// TODO: replace with real implementation when API is ready
-			.random(in: 0 ... 10000)
+			if let value = token.value {
+				return .random(in: 0 ... 10000)
+			} else {
+				return nil
+			}
 		}
 
 		return Self(
