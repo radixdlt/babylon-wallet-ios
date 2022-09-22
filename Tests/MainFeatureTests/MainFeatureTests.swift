@@ -30,7 +30,7 @@ final class MainFeatureTests: TestCase {
 		// then
 		await store.receive(.internal(.system(.removedWallet)))
 		await store.receive(.coordinate(.removedWallet))
-		await isRemoveWalletCalled.withValue { XCTAssertNoDifference($0, true) }
+		await isRemoveWalletCalled.withValue { XCTAssertTrue($0) }
 	}
 
 	func test_displaySettings_whenCoordinatedToDispaySettings_thenDisplaySettings() async {

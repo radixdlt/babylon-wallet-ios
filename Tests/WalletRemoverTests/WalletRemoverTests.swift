@@ -18,6 +18,6 @@ final class WalletRemoverTests: TestCase {
 		await sut.removeWallet()
 
 		// then
-		await isRemoveCalled.withValue { XCTAssertNoDifference($0, true) }
+		await isRemoveCalled.withValue { XCTAssertTrue($0) }
 	}
 }
