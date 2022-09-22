@@ -7,10 +7,10 @@ import WalletRemover
 final class MainFeatureTests: TestCase {
 	func test_removeWallet_whenTappedOnRemoveWallet_thenCoordinateRemovalResult() async {
 		// given
-		var isRemoveWalletCalled = false
-		var walletRemover: WalletRemover = .mock
+		let isRemoveWalletCalled = ActorIsolated(false)
+		var walletRemover: WalletRemover = .unimplemented
 		walletRemover.removeWallet = {
-			print("mutate isRemoveWalletCalled here")
+			await isRemoveWalletCalled.setValue(true)
 		}
 		let environment = Main.Environment(
 			accountWorthFetcher: .unimplemented,
@@ -30,6 +30,7 @@ final class MainFeatureTests: TestCase {
 		// then
 		await store.receive(.internal(.system(.removedWallet)))
 		await store.receive(.coordinate(.removedWallet))
+		await isRemoveWalletCalled.withValue { XCTAssertNoDifference($0, true) }
 	}
 
 	func test_displaySettings_whenCoordinatedToDispaySettings_thenDisplaySettings() async {

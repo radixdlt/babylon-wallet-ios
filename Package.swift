@@ -289,6 +289,7 @@ let package = Package(
 			dependencies: [
 				"OnboardingFeature",
 				"TestUtils",
+				"UserDefaultsClient",
 			]
 		),
 		.target(
@@ -425,8 +426,10 @@ let package = Package(
 		.testTarget(
 			name: "WalletRemoverTests",
 			dependencies: [
-				"WalletRemover",
+				"UserDefaultsClient",
 				"TestUtils",
+				"WalletRemover",
+				tca,
 			]
 		),
 	]
