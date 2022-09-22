@@ -19,3 +19,13 @@ public extension Onboarding {
 		}
 	}
 }
+
+#if DEBUG
+public extension Onboarding.Environment {
+	static let unimplemented = Self(
+		backgroundQueue: .unimplemented,
+		mainQueue: .unimplemented,
+		userDefaultsClient: .unimplemented
+	)
+}
+#endif

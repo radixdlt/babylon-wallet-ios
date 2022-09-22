@@ -6,10 +6,16 @@ import TestUtils
 final class MainFeatureTests: TestCase {
 	func test_removeWallet_whenTappedOnRemoveWallet_thenCoordinateRemovalResult() async {
 		// given
+		let environment = Main.Environment(
+			accountWorthFetcher: .unimplemented,
+			appSettingsClient: .unimplemented,
+			pasteboardClient: .unimplemented,
+			userDefaultsClient: .live()
+		)
 		let store = TestStore(
 			initialState: Main.State(home: .placeholder),
 			reducer: Main.reducer,
-			environment: .noop
+			environment: environment
 		)
 
 		// when
@@ -25,7 +31,7 @@ final class MainFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Main.State(home: .placeholder),
 			reducer: Main.reducer,
-			environment: .noop
+			environment: .unimplemented
 		)
 
 		// when
@@ -40,7 +46,7 @@ final class MainFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Main.State(home: .placeholder, settings: .init()),
 			reducer: Main.reducer,
-			environment: .noop
+			environment: .unimplemented
 		)
 
 		// when

@@ -6,25 +6,36 @@ import Wallet
 
 @MainActor
 final class OnboardingFeatureTests: TestCase {
-	private let environment = Onboarding.Environment(
-		backgroundQueue: .unimplemented,
-		mainQueue: .unimplemented,
-		userDefaultsClient: .noop
-	)
-
-	func testCreateWallet() async {
+	func test_createWallet_whenTappedOnCreateWalletButton_thenCreateWallet() async {
+		// given
+		let environment = Onboarding.Environment(
+			backgroundQueue: .unimplemented,
+			mainQueue: .unimplemented,
+			userDefaultsClient: .live()
+		)
 		let profileName = "Profile"
+		let canProceed = true
 		let store = TestStore(
-			initialState: Onboarding.State(profileName: profileName, canProceed: true),
+			initialState: Onboarding.State(
+				profileName: profileName,
+				canProceed: canProceed
+			),
 			reducer: Onboarding.reducer,
 			environment: environment
 		)
 
-		let profile = try! Profile(name: profileName)
-		let wallet: Wallet = .init(profile: profile, deviceFactorTypeMnemonic: "")
+		// when
 		_ = await store.send(.internal(.user(.createWallet)))
+
+		// then
 		await store.receive(.internal(.system(.createWallet)))
-		await store.receive(.internal(.system(.createdWallet(wallet))))
-		await store.receive(.coordinate(.onboardedWithWallet(wallet)))
+		do {
+			let profile = try Profile(name: profileName)
+			let wallet: Wallet = .init(profile: profile, deviceFactorTypeMnemonic: "")
+			await store.receive(.internal(.system(.createdWallet(wallet))))
+			await store.receive(.coordinate(.onboardedWithWallet(wallet)))
+		} catch {
+			XCTFail("No profile")
+		}
 	}
 }

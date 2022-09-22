@@ -33,5 +33,12 @@ public extension Main.Environment {
 		pasteboardClient: .noop,
 		userDefaultsClient: .noop
 	)
+
+	static let unimplemented = Self(
+		accountWorthFetcher: .unimplemented,
+		appSettingsClient: .unimplemented,
+		pasteboardClient: .unimplemented,
+		userDefaultsClient: .unimplemented
+	)
 }
-#endif // DEBUG
+#endif
