@@ -1,5 +1,4 @@
 import Foundation
-import XCTestDynamicOverlay
 
 public extension AccountWorthFetcher {
 	static let mock = Self(

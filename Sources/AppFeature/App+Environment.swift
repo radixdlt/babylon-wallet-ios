@@ -5,6 +5,7 @@ import PasteboardClient
 import ProfileLoader
 import UserDefaultsClient
 import WalletLoader
+import WalletRemover
 
 public extension App {
 	// MARK: Environment
@@ -17,6 +18,7 @@ public extension App {
 		public let profileLoader: ProfileLoader
 		public let userDefaultsClient: UserDefaultsClient
 		public let walletLoader: WalletLoader
+		public let walletRemover: WalletRemover
 
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
@@ -26,7 +28,8 @@ public extension App {
 			pasteboardClient: PasteboardClient,
 			profileLoader: ProfileLoader,
 			userDefaultsClient: UserDefaultsClient,
-			walletLoader: WalletLoader
+			walletLoader: WalletLoader,
+			walletRemover: WalletRemover
 		) {
 			self.backgroundQueue = backgroundQueue
 			self.mainQueue = mainQueue
@@ -36,6 +39,7 @@ public extension App {
 			self.profileLoader = profileLoader
 			self.userDefaultsClient = userDefaultsClient
 			self.walletLoader = walletLoader
+			self.walletRemover = walletRemover
 		}
 	}
 }
@@ -50,7 +54,8 @@ public extension App.Environment {
 		pasteboardClient: .noop,
 		profileLoader: .noop,
 		userDefaultsClient: .noop,
-		walletLoader: .noop
+		walletLoader: .noop,
+		walletRemover: .noop
 	)
 
 	static let unimplemented = Self(
@@ -61,7 +66,8 @@ public extension App.Environment {
 		pasteboardClient: .unimplemented,
 		profileLoader: .unimplemented,
 		userDefaultsClient: .unimplemented,
-		walletLoader: .unimplemented
+		walletLoader: .unimplemented,
+		walletRemover: .unimplemented
 	)
 }
 #endif

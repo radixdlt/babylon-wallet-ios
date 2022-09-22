@@ -77,7 +77,7 @@ struct MainView_Previews: PreviewProvider {
 					accountWorthFetcher: .mock,
 					appSettingsClient: .mock,
 					pasteboardClient: .noop,
-					userDefaultsClient: .noop
+					walletRemover: .mock
 				)
 			)
 		)

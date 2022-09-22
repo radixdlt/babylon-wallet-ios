@@ -139,6 +139,7 @@ let package = Package(
 				"UserDefaultsClient",
 				"Wallet",
 				"WalletLoader",
+				"WalletRemover",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -259,7 +260,7 @@ let package = Package(
 				"PasteboardClient",
 				"SettingsFeature",
 				tca,
-				"UserDefaultsClient",
+				"WalletRemover",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -268,6 +269,7 @@ let package = Package(
 			dependencies: [
 				"MainFeature",
 				"TestUtils",
+				"WalletRemover",
 			]
 		),
 		.target(
@@ -287,6 +289,7 @@ let package = Package(
 			dependencies: [
 				"OnboardingFeature",
 				"TestUtils",
+				"UserDefaultsClient",
 			]
 		),
 		.target(
@@ -411,6 +414,22 @@ let package = Package(
 			dependencies: [
 				"WalletLoader",
 				"TestUtils",
+			]
+		),
+		.target(
+			name: "WalletRemover",
+			dependencies: [
+				"UserDefaultsClient",
+				tca,
+			]
+		),
+		.testTarget(
+			name: "WalletRemoverTests",
+			dependencies: [
+				"UserDefaultsClient",
+				"TestUtils",
+				"WalletRemover",
+				tca,
 			]
 		),
 	]
