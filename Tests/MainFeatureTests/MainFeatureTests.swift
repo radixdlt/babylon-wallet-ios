@@ -10,7 +10,7 @@ final class MainFeatureTests: TestCase {
 			accountWorthFetcher: .unimplemented,
 			appSettingsClient: .unimplemented,
 			pasteboardClient: .unimplemented,
-			userDefaultsClient: .live()
+			walletRemover: .mock
 		)
 		let store = TestStore(
 			initialState: Main.State(home: .placeholder),

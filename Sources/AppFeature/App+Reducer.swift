@@ -18,7 +18,7 @@ public extension App {
 						accountWorthFetcher: $0.accountWorthFetcher,
 						appSettingsClient: $0.appSettingsClient,
 						pasteboardClient: $0.pasteboardClient,
-						userDefaultsClient: $0.userDefaultsClient
+						walletRemover: $0.walletRemover
 					)
 				}
 			),

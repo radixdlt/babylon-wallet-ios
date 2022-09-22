@@ -17,7 +17,8 @@ public extension App.Environment {
 			pasteboardClient: .live(),
 			profileLoader: .live(userDefaultsClient: userDefaultsClient),
 			userDefaultsClient: userDefaultsClient,
-			walletLoader: .live
+			walletLoader: .live,
+			walletRemover: .live()
 		)
 	}()
 }

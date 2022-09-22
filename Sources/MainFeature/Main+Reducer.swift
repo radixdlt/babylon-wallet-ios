@@ -42,7 +42,7 @@ public extension Main {
 
 			case .internal(.system(.removedWallet)):
 				return .run { send in
-					await environment.userDefaultsClient.removeProfileName()
+					await environment.walletRemover.removeWallet()
 					await send(.coordinate(.removedWallet))
 				}
 
