@@ -20,3 +20,12 @@ public extension Onboarding {
 		}
 	}
 }
+
+#if DEBUG
+public extension Onboarding.State {
+	static let placeholder = Self(
+		profileName: "Profile",
+		canProceed: true
+	)
+}
+#endif

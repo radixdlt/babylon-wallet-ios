@@ -38,4 +38,19 @@ final class OnboardingFeatureTests: TestCase {
 			XCTFail("No profile")
 		}
 	}
+
+	func test_binding_whenProfileNameIsNotEmpty_thenCanProceedWithWalletCreation() {
+		// given
+		let store = TestStore(
+			initialState: .placeholder,
+			reducer: Onboarding.reducer,
+			environment: .unimplemented
+		)
+
+		// when
+		let canProceed = !store.state.profileName.isEmpty
+
+		// then
+		XCTAssertEqual(store.state.canProceed, canProceed)
+	}
 }
