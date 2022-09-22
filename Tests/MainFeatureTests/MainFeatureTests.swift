@@ -1,16 +1,22 @@
 import ComposableArchitecture
 @testable import MainFeature
 import TestUtils
+import WalletRemover
 
 @MainActor
 final class MainFeatureTests: TestCase {
 	func test_removeWallet_whenTappedOnRemoveWallet_thenCoordinateRemovalResult() async {
 		// given
+		var isRemoveWalletCalled = false
+		var walletRemover: WalletRemover = .mock
+		walletRemover.removeWallet = {
+			print("mutate isRemoveWalletCalled here")
+		}
 		let environment = Main.Environment(
 			accountWorthFetcher: .unimplemented,
 			appSettingsClient: .unimplemented,
 			pasteboardClient: .unimplemented,
-			walletRemover: .mock
+			walletRemover: walletRemover
 		)
 		let store = TestStore(
 			initialState: Main.State(home: .placeholder),
