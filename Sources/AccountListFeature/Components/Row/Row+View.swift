@@ -1,5 +1,6 @@
-import AccountWorthFetcher
+import AccountPortfolio
 import Address
+import Asset
 import Common
 import ComposableArchitecture
 import SwiftUI
@@ -48,7 +49,7 @@ public extension AccountList.Row.View {
 					.frame(maxWidth: 160)
 				}
 
-				TokenListView(tokens: viewStore.state.tokenContainers.map(\.token))
+				TokenListView(tokens: viewStore.state.portfolio.fungibleTokenContainers.map(\.asset))
 			}
 			.padding(25)
 			.background(Color.app.cardBackgroundLight)
@@ -100,7 +101,7 @@ extension AccountList.Row.View {
 		let aggregatedValue: Float?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
-		let tokenContainers: [TokenWorthContainer]
+		let portfolio: AccountPortfolio
 
 		init(state: AccountList.Row.State) {
 			name = state.name
@@ -108,7 +109,7 @@ extension AccountList.Row.View {
 			aggregatedValue = state.aggregatedValue
 			currency = state.currency
 			isCurrencyAmountVisible = state.isCurrencyAmountVisible
-			tokenContainers = state.tokenContainers
+			portfolio = state.portfolio
 		}
 	}
 }
@@ -155,21 +156,21 @@ private struct TokenView: View {
 
 // MARK: - TokenListView
 private struct TokenListView: View {
-	let tokens: [Token]
+	let tokens: [FungibleToken]
 	private let limit = 5
 
 	var body: some View {
 		if tokens.count > limit {
 			HStack(spacing: -10) {
 				ForEach(tokens[0 ..< limit]) { token in
-					TokenView(code: token.code.rawValue)
+					TokenView(code: token.code ?? "")
 				}
 				TokenView(code: "+\(tokens.count - limit)")
 			}
 		} else {
 			HStack(spacing: -10) {
 				ForEach(tokens) { token in
-					TokenView(code: token.code.rawValue)
+					TokenView(code: token.code ?? "")
 				}
 			}
 		}

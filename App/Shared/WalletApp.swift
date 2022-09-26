@@ -13,7 +13,7 @@ public extension App.Environment {
 			backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
 			mainQueue: .main,
 			appSettingsClient: .live(),
-			accountWorthFetcher: .live(),
+			accountPortfolioFetcher: .live(),
 			pasteboardClient: .live(),
 			profileLoader: .live(userDefaultsClient: userDefaultsClient),
 			userDefaultsClient: userDefaultsClient,

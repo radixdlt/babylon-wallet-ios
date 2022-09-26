@@ -1,11 +1,12 @@
 import AccountDetailsFeature
 import AccountListFeature
+import AccountPortfolio
 import AccountPreferencesFeature
-import AccountWorthFetcher
 import AggregatedValueFeature
-import AssetListFeature
+import Asset
 import ComposableArchitecture
 import CreateAccountFeature
+import FungibleTokenListFeature
 
 #if os(iOS)
 // FIXME: move to `UIApplicationClient` package!
@@ -123,52 +124,52 @@ public extension Home {
 
 				// account details
 				state.accountDetails?.aggregatedValue.isCurrencyAmountVisible = isVisible
-				state.accountDetails?.assetList.sections.forEach { section in
+				state.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
 					section.assets.forEach { row in
-						state.accountDetails?.assetList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
+						state.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
 					}
 				}
 
 				return .none
 
-			case let .internal(.system(.totalWorthLoaded(totalWorth))):
-				state.accountsWorthDictionary = totalWorth
+			case let .internal(.system(.totalPortfolioLoaded(totalPortfolio))):
+				state.accountPortfolioDictionary = totalPortfolio
 
 				// aggregated value
-				state.aggregatedValue.value = totalWorth.compactMap(\.value.worth).reduce(0, +)
+				state.aggregatedValue.value = totalPortfolio.compactMap(\.value.worth).reduce(0, +)
 
 				// account list
 				state.accountList.accounts.forEach {
-					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalWorth[$0.address]?.worth
-					let tokenContainers = totalWorth[$0.address]?.tokenContainers ?? []
-					state.accountList.accounts[id: $0.address]?.tokenContainers = tokenContainers
+					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalPortfolio[$0.address]?.worth
+					let accountPortfolio = totalPortfolio[$0.address] ?? AccountPortfolio.empty
+					state.accountList.accounts[id: $0.address]?.portfolio = accountPortfolio
 				}
 
 				// account details
 				if let details = state.accountDetails {
 					// aggregated value
 					let account = details.account
-					let accountWorth = state.accountsWorthDictionary[details.address]
+					let accountWorth = state.accountPortfolioDictionary[details.address]
 					state.accountDetails?.aggregatedValue.value = accountWorth?.worth
 
 					// asset list
-					let containers = totalWorth[account.address]?.tokenContainers ?? []
-					let categories = environment.assetListSorter.sortTokens(containers)
+					let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
+					let categories = environment.fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
 
-					state.accountDetails?.assetList = .init(
-						sections: .init(uniqueElements: categories.map { category in
-							let rows = category.tokenContainers.map { container in AssetList.Row.State(tokenContainer: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
-							return AssetList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
-						})
+					state.accountDetails?.assets = .init(
+						fungibleTokenList: .init(sections: .init(uniqueElements: categories.map { category in
+							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
+							return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
+						}))
 					)
 				}
 
 				return .none
 
-			case let .internal(.system(.accountWorthLoaded(accountWorth))):
-				guard let key = accountWorth.first?.key else { return .none }
-				state.accountsWorthDictionary[key] = accountWorth.first?.value
-				return Effect(value: .internal(.system(.totalWorthLoaded(state.accountsWorthDictionary))))
+			case let .internal(.system(.accountPortfolioLoaded(accountPortfolio))):
+				guard let key = accountPortfolio.first?.key else { return .none }
+				state.accountPortfolioDictionary[key] = accountPortfolio.first?.value
+				return Effect(value: .internal(.system(.totalPortfolioLoaded(state.accountPortfolioDictionary))))
 
 			case let .internal(.system(.copyAddress(address))):
 				// TODO: display confirmation popup? discuss with po / designer
@@ -215,8 +216,8 @@ public extension Home {
 			case .accountList(.coordinate(.loadAccounts)):
 				return .run { [state = state] send in
 					let addresses = state.wallet.profile.accounts.map(\.address)
-					let totalWorth = try await environment.accountWorthFetcher.fetchWorth(addresses)
-					await send(.internal(.system(.totalWorthLoaded(totalWorth))))
+					let totalPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio(addresses)
+					await send(.internal(.system(.totalPortfolioLoaded(totalPortfolio))))
 				}
 
 			case let .accountList(.coordinate(.displayAccountDetails(account))):
@@ -256,8 +257,8 @@ public extension Home {
 
 			case let .accountDetails(.coordinate(.refresh(address))):
 				return .run { send in
-					let accountWorth = try await environment.accountWorthFetcher.fetchWorth([address])
-					await send(.internal(.system(.accountWorthLoaded(accountWorth))))
+					let accountPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio([address])
+					await send(.internal(.system(.accountPortfolioLoaded(accountPortfolio))))
 				}
 
 			case .accountDetails(.aggregatedValue(.internal(_))):
@@ -266,7 +267,7 @@ public extension Home {
 			case .accountDetails(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))):
 				return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
 
-			case .accountDetails(.assetList(_)):
+			case .accountDetails(.assets):
 				return .none
 
 			case .transfer(.coordinate(.dismissTransfer)):

@@ -1,7 +1,7 @@
 import AccountDetailsFeature
 import AccountListFeature
+import AccountPortfolio
 import AccountPreferencesFeature
-import AccountWorthFetcher
 import Address
 import AggregatedValueFeature
 import CreateAccountFeature
@@ -11,14 +11,12 @@ import Wallet
 /// Namespace for HomeFeature
 public enum Home {}
 
-public typealias AccountsWorthDictionary = [Address: AccountPortfolioWorth]
-
-// MARK: - Home.State
+// MARK: Home.State
 public extension Home {
 	// MARK: State
 	struct State: Equatable {
 		public var wallet: Wallet
-		public var accountsWorthDictionary: AccountsWorthDictionary
+		public var accountPortfolioDictionary: AccountPortfolioDictionary
 
 		// MARK: - Components
 		public var header: Home.Header.State
@@ -34,7 +32,7 @@ public extension Home {
 
 		public init(
 			wallet: Wallet,
-			accountsWorthDictionary: AccountsWorthDictionary = [:],
+			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
 			header: Home.Header.State = .init(),
 			aggregatedValue: AggregatedValue.State = .init(),
 			accountList: AccountList.State = .init(accounts: []),
@@ -45,7 +43,7 @@ public extension Home {
 			transfer: AccountDetails.Transfer.State? = nil
 		) {
 			self.wallet = wallet
-			self.accountsWorthDictionary = accountsWorthDictionary
+			self.accountPortfolioDictionary = accountPortfolioDictionary
 			self.header = header
 			self.aggregatedValue = aggregatedValue
 			self.accountList = accountList

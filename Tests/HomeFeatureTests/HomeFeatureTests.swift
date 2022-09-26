@@ -1,9 +1,10 @@
 import AccountDetailsFeature
 import AccountListFeature
-import AccountWorthFetcher
+import AccountPortfolio
 import Address
-import AssetListFeature
+import Asset
 import ComposableArchitecture
+import FungibleTokenListFeature
 @testable import HomeFeature
 import Profile
 import TestUtils
@@ -12,19 +13,24 @@ import TestUtils
 final class HomeFeatureTests: TestCase {
 	func test_totalWorthLoaded_whenTotalWorthIsLoaded_thenUpdateAllSubStates() async {
 		// given
-		let btc = Token(code: .btc, value: 1.234)
-		let eth = Token(code: .eth, value: 2.345)
-		let xrd = Token(code: .xrd, value: 4.567)
+		let btc = FungibleToken(address: "btcaddress", supply: .fixed(100), tokenDescription: nil, name: "Bitcoin", code: "BTC", iconURL: "")
+		let eth = FungibleToken(address: "ethaddress", supply: .fixed(100), tokenDescription: nil, name: "Ethereum", code: "ETH", iconURL: "")
+		let xrd = FungibleToken.xrd
 
-		let btcContainer = TokenWorthContainer(token: btc, valueInCurrency: 1.987)
-		let ethContainer = TokenWorthContainer(token: eth, valueInCurrency: 2.876)
-		let xrdContainer = TokenWorthContainer(token: xrd, valueInCurrency: 4.654)
+		let btcContainer = FungibleTokenContainer(asset: btc, amount: 1.234, worth: 1.987)
+		let ethContainer = FungibleTokenContainer(asset: eth, amount: 2.345, worth: 2.876)
+		let xrdContainer = FungibleTokenContainer(asset: xrd, amount: 4.567, worth: 4.654)
 		let expectedAggregatedValue: Float = 9.517
 
 		let address: Address = "abcdefgh12345678"
 		let account: Profile.Account = .init(address: address, name: "Test Account")
-		let totalWorth: [Address: AccountPortfolioWorth] = [
-			address: .init(tokenContainers: [btcContainer, ethContainer, xrdContainer]),
+		let totalPortfolio: AccountPortfolioDictionary = [
+			address: .init(
+				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
+				nonFungibleTokenContainers: [],
+				poolShareContainers: [],
+				badgeContainers: []
+			),
 		]
 
 		let accountRowState = AccountList.Row.State(account: account)
@@ -34,9 +40,9 @@ final class HomeFeatureTests: TestCase {
 		initialState.accountList = .init(just: [account])
 		let environment = Home.Environment(
 			appSettingsClient: .unimplemented,
-			accountWorthFetcher: .unimplemented,
+			accountPortfolioFetcher: .unimplemented,
 			pasteboardClient: .unimplemented,
-			assetListSorter: .live
+			fungibleTokenListSorter: .live
 		)
 		let store = TestStore(
 			initialState: initialState,
@@ -45,74 +51,78 @@ final class HomeFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.system(.totalWorthLoaded(totalWorth)))) {
+		_ = await store.send(.internal(.system(.totalPortfolioLoaded(totalPortfolio)))) {
 			// then
 			// local dictionary
-			$0.accountsWorthDictionary = totalWorth
+			$0.accountPortfolioDictionary = totalPortfolio
 
 			// aggregated value
 			$0.aggregatedValue.value = expectedAggregatedValue
 
 			// account list
-			$0.accountList.accounts[id: address]!.aggregatedValue = totalWorth[address]!.worth
-			let tokenContainers = totalWorth[address]!.tokenContainers
-			$0.accountList.accounts[id: address]!.tokenContainers = tokenContainers
+			$0.accountList.accounts[id: address]!.aggregatedValue = totalPortfolio[address]!.worth
+			let accountPortfolio = totalPortfolio[address]!
+			$0.accountList.accounts[id: address]!.portfolio = accountPortfolio
 
 			// account details
 			if let details = $0.accountDetails {
 				// aggregated value
-				let accountWorth = $0.accountsWorthDictionary[details.address]
+				let accountWorth = $0.accountPortfolioDictionary[details.address]
 				$0.accountDetails?.aggregatedValue.value = accountWorth?.worth
 
 				// asset list
-				let containers = totalWorth[address]!.tokenContainers
-				let sortedContainers = environment.assetListSorter.sortTokens(containers)
+				let sortedCategories = environment.fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
 
-				let section0 = AssetList.Section.State(
+				let section0 = FungibleTokenList.Section.State(
 					id: .xrd, assets: [
-						AssetList.Row.State(
-							tokenContainer: sortedContainers[0].tokenContainers[0],
+						FungibleTokenList.Row.State(
+							container: sortedCategories[0].tokenContainers[0],
 							currency: $0.accountDetails!.aggregatedValue.currency,
 							isCurrencyAmountVisible: $0.accountDetails!.aggregatedValue.isCurrencyAmountVisible
 						),
 					]
 				)
 
-				let section1 = AssetList.Section.State(
+				let section1 = FungibleTokenList.Section.State(
 					id: .nonXrd,
 					assets: [
-						AssetList.Row.State(
-							tokenContainer: sortedContainers[1].tokenContainers[0],
+						FungibleTokenList.Row.State(
+							container: sortedCategories[1].tokenContainers[0],
 							currency: $0.accountDetails!.aggregatedValue.currency,
 							isCurrencyAmountVisible: $0.accountDetails!.aggregatedValue.isCurrencyAmountVisible
 						),
-						AssetList.Row.State(
-							tokenContainer: sortedContainers[1].tokenContainers[1],
+						FungibleTokenList.Row.State(
+							container: sortedCategories[1].tokenContainers[1],
 							currency: $0.accountDetails!.aggregatedValue.currency,
 							isCurrencyAmountVisible: $0.accountDetails!.aggregatedValue.isCurrencyAmountVisible
 						),
 					]
 				)
 
-				$0.accountDetails?.assetList = .init(sections: [section0, section1])
+				$0.accountDetails?.assets = .init(fungibleTokenList: .init(sections: [section0, section1]))
 			}
 		}
 	}
 
 	func test_accountWorthLoaded_whenSingleAccountWorthIsLoaded_thenUpdateSingleAccount() async {
 		// given
-		let btc = Token(code: .btc, value: 1.234)
-		let eth = Token(code: .eth, value: 2.345)
-		let xrd = Token(code: .xrd, value: 4.567)
+		let btc = FungibleToken(address: "btcaddress", supply: .fixed(100), tokenDescription: nil, name: "Bitcoin", code: "BTC", iconURL: "")
+		let eth = FungibleToken(address: "ethaddress", supply: .fixed(100), tokenDescription: nil, name: "Ethereum", code: "ETH", iconURL: "")
+		let xrd = FungibleToken.xrd
 
-		let btcContainer = TokenWorthContainer(token: btc, valueInCurrency: 1.987)
-		let ethContainer = TokenWorthContainer(token: eth, valueInCurrency: 2.876)
-		let xrdContainer = TokenWorthContainer(token: xrd, valueInCurrency: 4.654)
+		let btcContainer = FungibleTokenContainer(asset: btc, amount: 1.234, worth: 1.987)
+		let ethContainer = FungibleTokenContainer(asset: eth, amount: 2.345, worth: 2.876)
+		let xrdContainer = FungibleTokenContainer(asset: xrd, amount: 4.567, worth: 4.654)
 		let expectedAggregatedValue: Float = 9.517
 
 		let address: Address = "abcdefgh12345678"
-		let accountWorth: [Address: AccountPortfolioWorth] = [
-			address: .init(tokenContainers: [btcContainer, ethContainer, xrdContainer]),
+		let accountPortfolio: AccountPortfolioDictionary = [
+			address: .init(
+				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
+				nonFungibleTokenContainers: [],
+				poolShareContainers: [],
+				badgeContainers: []
+			),
 		]
 
 		let initialState: Home.State = .placeholder
@@ -122,15 +132,15 @@ final class HomeFeatureTests: TestCase {
 			environment: .unimplemented
 		)
 
-		_ = await store.send(.internal(.system(.accountWorthLoaded(accountWorth)))) {
-			guard let key = accountWorth.first?.key else {
+		_ = await store.send(.internal(.system(.accountPortfolioLoaded(accountPortfolio)))) {
+			guard let key = accountPortfolio.first?.key else {
 				XCTFail("Failed to fetch first account")
 				return
 			}
-			$0.accountsWorthDictionary[key] = accountWorth.first?.value
+			$0.accountPortfolioDictionary[key] = accountPortfolio.first?.value
 		}
 
-		await store.receive(.internal(.system(.totalWorthLoaded(store.state.accountsWorthDictionary)))) {
+		await store.receive(.internal(.system(.totalPortfolioLoaded(store.state.accountPortfolioDictionary)))) {
 			$0.aggregatedValue.value = expectedAggregatedValue
 		}
 	}
@@ -142,7 +152,7 @@ final class HomeFeatureTests: TestCase {
 	 		reducer: Home.reducer,
 	 		environment: Home.Environment(
 	 			appSettingsClient: .mock,
-	 			accountWorthFetcher: .mock,
+	 			accountPortfolioFetcher: .mock,
 	 			pasteboardClient: .noop
 	 		)
 	 	)
@@ -159,13 +169,12 @@ final class HomeFeatureTests: TestCase {
 	 		reducer: Home.reducer,
 	 		environment: Home.Environment(
 	 			appSettingsClient: .mock,
-	 			accountWorthFetcher: .mock,
+	 			accountPortfolioFetcher: .mock,
 	 			pasteboardClient: .noop
 	 		)
 	 	)
 
 	 	store.send(.visitHub(.coordinate(.displayHub)))
-	 	store.receive(.coordinate(.displayVisitHub))
 	 }
 	 */
 }

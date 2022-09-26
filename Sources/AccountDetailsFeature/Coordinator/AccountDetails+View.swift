@@ -1,5 +1,5 @@
 import AggregatedValueFeature
-import AssetListFeature
+import AssetsViewFeature
 import Common
 import ComposableArchitecture
 import SwiftUI
@@ -50,10 +50,10 @@ public extension AccountDetails.View {
 							transferButton(with: viewStore)
 								.padding(.bottom, 20)
 
-							AssetList.View(
+							AssetsView.View(
 								store: store.scope(
-									state: \.assetList,
-									action: AccountDetails.Action.assetList
+									state: \.assets,
+									action: AccountDetails.Action.assets
 								)
 							)
 						}

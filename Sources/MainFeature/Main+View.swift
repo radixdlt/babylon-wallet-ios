@@ -77,7 +77,7 @@ struct MainView_Previews: PreviewProvider {
 				initialState: .placeholder,
 				reducer: Main.reducer,
 				environment: .init(
-					accountWorthFetcher: .mock,
+					accountPortfolioFetcher: .mock,
 					appSettingsClient: .mock,
 					pasteboardClient: .noop,
 					walletRemover: .mock

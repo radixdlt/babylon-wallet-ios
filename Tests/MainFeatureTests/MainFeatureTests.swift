@@ -13,7 +13,7 @@ final class MainFeatureTests: TestCase {
 			await isRemoveWalletCalled.setValue(true)
 		}
 		let environment = Main.Environment(
-			accountWorthFetcher: .unimplemented,
+			accountPortfolioFetcher: .unimplemented,
 			appSettingsClient: .unimplemented,
 			pasteboardClient: .unimplemented,
 			walletRemover: walletRemover

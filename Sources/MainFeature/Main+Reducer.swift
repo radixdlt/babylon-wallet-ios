@@ -19,7 +19,7 @@ public extension Main {
 				environment: {
 					Home.Environment(
 						appSettingsClient: $0.appSettingsClient,
-						accountWorthFetcher: $0.accountWorthFetcher,
+						accountPortfolioFetcher: $0.accountPortfolioFetcher,
 						pasteboardClient: $0.pasteboardClient
 					)
 				}

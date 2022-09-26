@@ -40,10 +40,10 @@ let package = Package(
 			name: "AccountDetailsFeature",
 			dependencies: [
 				"AccountListFeature",
-				"AccountWorthFetcher",
 				"Address",
 				"AggregatedValueFeature",
-				"AssetListFeature",
+				"Asset",
+				"AssetsViewFeature",
 				"Profile",
 				tca,
 			]
@@ -58,8 +58,9 @@ let package = Package(
 		.target(
 			name: "AccountListFeature",
 			dependencies: [
-				"AccountWorthFetcher",
+				"AccountPortfolio",
 				"Address",
+				"Asset",
 				"Profile",
 				tca,
 			]
@@ -68,6 +69,23 @@ let package = Package(
 			name: "AccountListFeatureTests",
 			dependencies: [
 				"AccountListFeature",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "AccountPortfolio",
+			dependencies: [
+				"Address",
+				"AppSettings",
+				"Asset",
+				"Common",
+			]
+		),
+		.testTarget(
+			name: "AccountPortfolioTests",
+			dependencies: [
+				"AccountPortfolio",
+				tca,
 				"TestUtils",
 			]
 		),
@@ -81,21 +99,6 @@ let package = Package(
 			name: "AccountPreferencesFeatureTests",
 			dependencies: [
 				"AccountPreferencesFeature",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "AccountWorthFetcher",
-			dependencies: [
-				"AppSettings",
-				"Common",
-				"Address",
-			]
-		),
-		.testTarget(
-			name: "AccountWorthFetcherTests",
-			dependencies: [
-				"AccountWorthFetcher",
 				"TestUtils",
 			]
 		),
@@ -128,7 +131,7 @@ let package = Package(
 			name: "AppFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
-				"AccountWorthFetcher",
+				"AccountPortfolio",
 				"AppSettings",
 				"MainFeature",
 				"OnboardingFeature",
@@ -167,17 +170,31 @@ let package = Package(
 			]
 		),
 		.target(
-			name: "AssetListFeature",
+			name: "Asset",
 			dependencies: [
-				"AccountWorthFetcher",
+				"Address",
+			]
+		),
+		.testTarget(
+			name: "AssetTests",
+			dependencies: [
+				"Asset",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "AssetsViewFeature",
+			dependencies: [
+				"Asset",
+				"Common",
+				"FungibleTokenListFeature",
 				tca,
 			]
 		),
 		.testTarget(
-			name: "AssetListFeatureTests",
+			name: "AssetsViewFeatureTests",
 			dependencies: [
-				"AccountWorthFetcher",
-				"AssetListFeature",
+				"AssetsViewFeature",
 				"TestUtils",
 			]
 		),
@@ -208,16 +225,32 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "FungibleTokenListFeature",
+			dependencies: [
+				"Asset",
+				"Common",
+				tca,
+			]
+		),
+		.testTarget(
+			name: "FungibleTokenListFeatureTests",
+			dependencies: [
+				"Asset",
+				"FungibleTokenListFeature",
+				tca,
+				"TestUtils",
+			]
+		),
+		.target(
 			name: "HomeFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"AccountListFeature",
 				"AccountDetailsFeature",
+				"AccountPortfolio",
 				"AccountPreferencesFeature",
-				"AccountWorthFetcher",
 				"Address",
 				"AppSettings",
-				"AssetListFeature",
 				"Common",
 				"CreateAccountFeature",
 				"PasteboardClient",
@@ -230,10 +263,11 @@ let package = Package(
 			name: "HomeFeatureTests",
 			dependencies: [
 				"AccountDetailsFeature",
+				"AccountPortfolio",
 				"AccountListFeature",
-				"AccountWorthFetcher",
 				"Address",
-				"AssetListFeature",
+				"Asset",
+				"FungibleTokenListFeature",
 				"HomeFeature",
 				"Profile",
 				"TestUtils",
@@ -254,8 +288,8 @@ let package = Package(
 			name: "MainFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
-				"AccountWorthFetcher",
 				"AppSettings",
+				"AccountPortfolio",
 				"HomeFeature",
 				"PasteboardClient",
 				"SettingsFeature",

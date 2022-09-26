@@ -52,9 +52,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AccountPreferencesFeatureTests"
-               BuildableName = "AccountPreferencesFeatureTests"
-               BlueprintName = "AccountPreferencesFeatureTests"
+               BlueprintIdentifier = "AccountPortfolioTests"
+               BuildableName = "AccountPortfolioTests"
+               BlueprintName = "AccountPortfolioTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -62,9 +62,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AccountWorthFetcherTests"
-               BuildableName = "AccountWorthFetcherTests"
-               BlueprintName = "AccountWorthFetcherTests"
+               BlueprintIdentifier = "AccountPreferencesFeatureTests"
+               BuildableName = "AccountPreferencesFeatureTests"
+               BlueprintName = "AccountPreferencesFeatureTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -112,9 +112,19 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AssetListFeatureTests"
-               BuildableName = "AssetListFeatureTests"
-               BlueprintName = "AssetListFeatureTests"
+               BlueprintIdentifier = "AssetTests"
+               BuildableName = "AssetTests"
+               BlueprintName = "AssetTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AssetsViewFeatureTests"
+               BuildableName = "AssetsViewFeatureTests"
+               BlueprintName = "AssetsViewFeatureTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -135,6 +145,16 @@
                BlueprintIdentifier = "CreateAccountFeatureTests"
                BuildableName = "CreateAccountFeatureTests"
                BlueprintName = "CreateAccountFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FungibleTokenListFeatureTests"
+               BuildableName = "FungibleTokenListFeatureTests"
+               BlueprintName = "FungibleTokenListFeatureTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -252,9 +272,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "WalletTests"
-               BuildableName = "WalletTests"
-               BlueprintName = "WalletTests"
+               BlueprintIdentifier = "WalletRemoverTests"
+               BuildableName = "WalletRemoverTests"
+               BlueprintName = "WalletRemoverTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -262,9 +282,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "WalletRemoverTests"
-               BuildableName = "WalletRemoverTests"
-               BlueprintName = "WalletRemoverTests"
+               BlueprintIdentifier = "WalletTests"
+               BuildableName = "WalletTests"
+               BlueprintName = "WalletTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>

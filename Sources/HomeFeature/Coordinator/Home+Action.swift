@@ -1,5 +1,6 @@
 import AccountDetailsFeature
 import AccountListFeature
+import AccountPortfolio
 import AccountPreferencesFeature
 import Address
 import AggregatedValueFeature
@@ -47,8 +48,8 @@ public extension Home.Action.InternalAction {
 		case currencyLoaded(FiatCurrency)
 		case toggleIsCurrencyAmountVisible
 		case isCurrencyAmountVisibleLoaded(Bool)
-		case totalWorthLoaded(AccountsWorthDictionary)
-		case accountWorthLoaded(AccountsWorthDictionary)
+		case totalPortfolioLoaded(AccountPortfolioDictionary)
+		case accountPortfolioLoaded(AccountPortfolioDictionary)
 		case copyAddress(Address)
 		case viewDidAppearActionFailed(reason: String)
 		case toggleIsCurrencyAmountVisibleFailed(reason: String)
