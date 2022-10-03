@@ -61,6 +61,7 @@ let package = Package(
 				"AccountPortfolio",
 				"Address",
 				"Asset",
+				"FungibleTokenListFeature",
 				"Profile",
 				tca,
 			]
