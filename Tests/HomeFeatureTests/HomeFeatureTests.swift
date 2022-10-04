@@ -13,8 +13,8 @@ import TestUtils
 final class HomeFeatureTests: TestCase {
 	func test_totalWorthLoaded_whenTotalWorthIsLoaded_thenUpdateAllSubStates() async {
 		// given
-		let btc = FungibleToken(address: "btcaddress", supply: .fixed(100), tokenDescription: nil, name: "Bitcoin", code: "BTC", iconURL: "")
-		let eth = FungibleToken(address: "ethaddress", supply: .fixed(100), tokenDescription: nil, name: "Ethereum", code: "ETH", iconURL: "")
+		let btc = FungibleToken(address: "btc-deadbeef", supply: .fixed(100), tokenDescription: nil, name: "Bitcoin", code: "BTC", iconURL: "")
+		let eth = FungibleToken(address: "eth-deadbeef", supply: .fixed(100), tokenDescription: nil, name: "Ethereum", code: "ETH", iconURL: "")
 		let xrd = FungibleToken.xrd
 
 		let btcContainer = FungibleTokenContainer(asset: btc, amount: 1.234, worth: 1.987)

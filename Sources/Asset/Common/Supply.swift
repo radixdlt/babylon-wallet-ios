@@ -10,7 +10,7 @@ public enum Supply: Sendable, Equatable {
 public struct UInt256: Sendable, Equatable, ExpressibleByIntegerLiteral {
 	private let magnitude: UInt64 // TODO: replace me
 
-	init(magnitude: UInt64) {
+	public init(magnitude: UInt64) {
 		self.magnitude = magnitude
 	}
 

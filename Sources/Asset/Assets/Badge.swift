@@ -4,7 +4,7 @@ import Foundation
 public struct Badge: Asset {
 	public let address: ComponentAddress
 
-	init(
+	public init(
 		address: ComponentAddress
 	) {
 		self.address = address
