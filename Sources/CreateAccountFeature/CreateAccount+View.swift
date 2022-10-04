@@ -5,58 +5,117 @@ import SwiftUI
 // MARK: - CreateAccount.View
 public extension CreateAccount {
 	struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+		private let store: StoreOf<CreateAccount>
+		@ObservedObject private var viewStore: ViewStoreOf<CreateAccount>
+		@FocusState private var nameIsFocused: Bool
 
 		public init(
-			store: Store
+			store: StoreOf<CreateAccount>
 		) {
 			self.store = store
+			viewStore = ViewStore(self.store)
 		}
 	}
 }
 
 public extension CreateAccount.View {
 	var body: some View {
-		// NOTE: placeholder implementation
-		WithViewStore(store) { viewStore in
-			ForceFullScreen {
-				VStack {
-					Text("Implement: Settings")
-						.background(Color.yellow)
-						.foregroundColor(.red)
+		ForceFullScreen {
+			VStack {
+				HStack {
 					Button(
-						action: { viewStore.send(.coordinate(.dismissCreateAccount)) },
-						label: { Text("Dismiss Create Account") }
+						action: { viewStore.send(.internal(.user(.closeButtonTapped))) },
+						label: { Image("close") }
 					)
+					Spacer()
 				}
+
+				VStack(spacing: 15) {
+					Image("createAccount-safe")
+
+					Text(titleText)
+						.foregroundColor(.app.buttonTextBlack)
+						.font(.app.title2Bold)
+				}
+
+				Spacer()
+					.frame(minHeight: 10, maxHeight: 40)
+
+				VStack(spacing: 40) {
+					Text(L10n.CreateAccount.subtitle)
+						.fixedSize(horizontal: false, vertical: true)
+						.padding(.horizontal, 40)
+						.multilineTextAlignment(.center)
+						.foregroundColor(.app.subtitleGray)
+						.font(.app.textFieldRegular)
+
+					VStack(alignment: .leading, spacing: 10) {
+						TextField(
+							L10n.CreateAccount.placeholder,
+							text: viewStore.binding(
+								get: \.accountName,
+								send: { .internal(.user(.accountNameChanged($0))) }
+							)
+						)
+						.padding()
+						.frame(height: 50)
+						.background(Color.app.textFieldGray)
+						.foregroundColor(.app.buttonTextBlack)
+						.font(.app.textFieldRegular)
+						.cornerRadius(4)
+						.overlay(
+							RoundedRectangle(cornerRadius: 4)
+								.stroke(Color.app.buttonTextBlack, lineWidth: 1)
+						)
+						.focused($nameIsFocused)
+						.onSubmit {
+							nameIsFocused = false
+						}
+
+						Text(L10n.CreateAccount.explanation)
+							.foregroundColor(.app.secondary)
+							.font(.app.body)
+					}
+				}
+
+				Spacer(minLength: 10)
+
+				Button(
+					action: { /* TODO: implement */ },
+					label: {
+						Text(L10n.CreateAccount.continueButtonTitle)
+							.foregroundColor(.app.buttonTextWhite)
+							.font(.app.buttonBody)
+							.frame(maxWidth: .infinity)
+							.frame(height: 44)
+							.background(viewStore.isValid ? Color.app.buttonBackgroundDark2 : Color.app.buttonDisabledGray)
+							.cornerRadius(4)
+							.shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+					}
+				)
+				.disabled(!viewStore.isValid)
 			}
+			.padding(24)
 		}
 	}
 }
 
-// MARK: - CreateAccount.View.ViewAction
-extension CreateAccount.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {}
-}
-
-extension CreateAccount.Action {
-	init(action: CreateAccount.View.ViewAction) {
-		switch action {
-		default:
-			// TODO: implement
-			break
-		}
+private extension CreateAccount.View {
+	var titleText: String {
+		// TODO: calculate depending on the wallet.profile.accounts.count
+		let bool = false
+		return bool ? L10n.CreateAccount.createNewAccount : L10n.CreateAccount.createFirstAccount
 	}
 }
 
-// MARK: - CreateAccount.View.ViewState
-extension CreateAccount.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		init(state _: CreateAccount.State) {
-			// TODO: implement
-		}
+// MARK: - CreateAccount_Previews
+struct CreateAccount_Previews: PreviewProvider {
+	static var previews: some View {
+		CreateAccount.View(
+			store: .init(
+				initialState: .init(),
+				reducer: CreateAccount()
+			)
+		)
 	}
 }

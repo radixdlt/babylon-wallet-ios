@@ -1,13 +1,17 @@
-import Foundation
-
-// MARK: - CreateAccount
-/// Namespace for CreateAccountFeature
-public enum CreateAccount {}
+import ComposableArchitecture
 
 // MARK: CreateAccount.State
 public extension CreateAccount {
-	// MARK: State
 	struct State: Equatable {
-		public init() {}
+		public var accountName: String
+		public var isValid: Bool
+
+		public init(
+			accountName: String = "",
+			isValid: Bool = false
+		) {
+			self.accountName = accountName
+			self.isValid = isValid
+		}
 	}
 }

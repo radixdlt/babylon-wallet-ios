@@ -24,6 +24,7 @@ extension Font {
 		case 𝟙𝟜 = 14
 		case 𝟙𝟠 = 18
 		case 𝟙𝟞 = 16
+		case 𝟚𝟜 = 24
 		case 𝟚𝟞 = 26
 		case 𝟜𝟞 = 46
 	}
@@ -54,8 +55,16 @@ public extension Font.App {
 		.custom(.𝟙𝟞, .semibold)
 	}
 
+	var textFieldRegular: Font {
+		.custom(.𝟙𝟠, .regular)
+	}
+
 	var buttonTitle: Font {
 		.custom(.𝟙𝟠, .semibold)
+	}
+
+	var title2Bold: Font {
+		.custom(.𝟚𝟜, .bold)
 	}
 
 	var title: Font {

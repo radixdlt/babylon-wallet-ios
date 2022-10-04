@@ -75,15 +75,16 @@ public extension Home {
 				}
 			),
 
-		CreateAccount.reducer
-			.optional()
-			.pullback(
-				state: \.createAccount,
-				action: /Home.Action.createAccount,
-				environment: { _ in
-					CreateAccount.Environment()
-				}
-			),
+		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
+		AnyReducer { _ in
+			CreateAccount()
+		}
+		.optional()
+		.pullback(
+			state: \.createAccount,
+			action: /Home.Action.createAccount,
+			environment: { _ in CreateAccount.Environment() }
+		),
 
 		Reducer { state, action, environment in
 			switch action {
@@ -279,6 +280,9 @@ public extension Home {
 
 			case .transfer(.coordinate(.dismissTransfer)):
 				state.transfer = nil
+				return .none
+
+			case .createAccount(.internal):
 				return .none
 
 			case .createAccount(.coordinate(.dismissCreateAccount)):

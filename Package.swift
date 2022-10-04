@@ -23,6 +23,10 @@ let package = Package(
 			name: "HomeFeature",
 			targets: ["HomeFeature"]
 		),
+		.library(
+			name: "CreateAccountFeature",
+			targets: ["CreateAccountFeature"]
+		),
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
@@ -218,6 +222,7 @@ let package = Package(
 		.target(
 			name: "CreateAccountFeature",
 			dependencies: [
+				"Common",
 				tca,
 			]
 		),
