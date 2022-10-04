@@ -26,7 +26,7 @@ let package = Package(
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
-		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.39.0"),
+		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.40.2"),
 
 		// Format code
 		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.49.11"),

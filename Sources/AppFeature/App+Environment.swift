@@ -1,6 +1,7 @@
 import AccountWorthFetcher
 import AppSettings
 import ComposableArchitecture
+import Foundation
 import PasteboardClient
 import ProfileLoader
 import UserDefaultsClient

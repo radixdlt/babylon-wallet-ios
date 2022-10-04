@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 import ProfileLoader
 import WalletLoader
 
