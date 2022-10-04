@@ -1,6 +1,6 @@
 import Address
 import AggregatedValueFeature
-import AssetListFeature
+import AssetsViewFeature
 
 // MARK: - AccountDetails.Action
 public extension AccountDetails {
@@ -9,7 +9,7 @@ public extension AccountDetails {
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
 		case aggregatedValue(AggregatedValue.Action)
-		case assetList(AssetList.Action)
+		case assets(AssetsView.Action)
 	}
 }
 

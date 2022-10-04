@@ -30,7 +30,7 @@ public extension AccountDetails {
 				return .none
 			case .internal(.user(.displayTransfer)):
 				return Effect(value: .coordinate(.displayTransfer))
-			case .assetList:
+			case .assets:
 				return .none
 			}
 		}

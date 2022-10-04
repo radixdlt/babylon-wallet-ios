@@ -15,7 +15,7 @@ public extension App {
 				action: /Action.main,
 				environment: {
 					Main.Environment(
-						accountWorthFetcher: $0.accountWorthFetcher,
+						accountPortfolioFetcher: $0.accountPortfolioFetcher,
 						appSettingsClient: $0.appSettingsClient,
 						pasteboardClient: $0.pasteboardClient,
 						walletRemover: $0.walletRemover

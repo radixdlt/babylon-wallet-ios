@@ -1,4 +1,4 @@
-import AccountWorthFetcher
+import AccountPortfolio
 import AppSettings
 import ComposableArchitecture
 import Foundation
@@ -15,7 +15,7 @@ public extension App {
 		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
 		public let mainQueue: AnySchedulerOf<DispatchQueue>
 		public let appSettingsClient: AppSettingsClient
-		public let accountWorthFetcher: AccountWorthFetcher
+		public let accountPortfolioFetcher: AccountPortfolioFetcher
 		public let pasteboardClient: PasteboardClient
 		public let profileLoader: ProfileLoader
 		public let userDefaultsClient: UserDefaultsClient
@@ -26,7 +26,7 @@ public extension App {
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
 			mainQueue: AnySchedulerOf<DispatchQueue>,
 			appSettingsClient: AppSettingsClient,
-			accountWorthFetcher: AccountWorthFetcher,
+			accountPortfolioFetcher: AccountPortfolioFetcher,
 			pasteboardClient: PasteboardClient,
 			profileLoader: ProfileLoader,
 			userDefaultsClient: UserDefaultsClient,
@@ -36,7 +36,7 @@ public extension App {
 			self.backgroundQueue = backgroundQueue
 			self.mainQueue = mainQueue
 			self.appSettingsClient = appSettingsClient
-			self.accountWorthFetcher = accountWorthFetcher
+			self.accountPortfolioFetcher = accountPortfolioFetcher
 			self.pasteboardClient = pasteboardClient
 			self.profileLoader = profileLoader
 			self.userDefaultsClient = userDefaultsClient
@@ -52,7 +52,7 @@ public extension App.Environment {
 		backgroundQueue: .immediate,
 		mainQueue: .immediate,
 		appSettingsClient: .mock,
-		accountWorthFetcher: .mock,
+		accountPortfolioFetcher: .mock,
 		pasteboardClient: .noop,
 		profileLoader: .noop,
 		userDefaultsClient: .noop,
@@ -64,7 +64,7 @@ public extension App.Environment {
 		backgroundQueue: .unimplemented,
 		mainQueue: .unimplemented,
 		appSettingsClient: .unimplemented,
-		accountWorthFetcher: .unimplemented,
+		accountPortfolioFetcher: .unimplemented,
 		pasteboardClient: .unimplemented,
 		profileLoader: .unimplemented,
 		userDefaultsClient: .unimplemented,

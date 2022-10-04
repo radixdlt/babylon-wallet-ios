@@ -1,7 +1,7 @@
 import AccountDetailsFeature
-import AccountWorthFetcher
+import AccountPortfolio
 import AppSettings
-import AssetListFeature
+import FungibleTokenListFeature
 import PasteboardClient
 
 // MARK: - Home.Environment
@@ -9,20 +9,20 @@ public extension Home {
 	// MARK: Environment
 	struct Environment {
 		public let appSettingsClient: AppSettingsClient
-		public let accountWorthFetcher: AccountWorthFetcher
+		public let accountPortfolioFetcher: AccountPortfolioFetcher
 		public let pasteboardClient: PasteboardClient
-		public let assetListSorter: AssetListSorter
+		public let fungibleTokenListSorter: FungibleTokenListSorter
 
 		public init(
 			appSettingsClient: AppSettingsClient,
-			accountWorthFetcher: AccountWorthFetcher,
+			accountPortfolioFetcher: AccountPortfolioFetcher,
 			pasteboardClient: PasteboardClient,
-			assetListSorter: AssetListSorter = .live
+			fungibleTokenListSorter: FungibleTokenListSorter = .live
 		) {
 			self.appSettingsClient = appSettingsClient
-			self.accountWorthFetcher = accountWorthFetcher
+			self.accountPortfolioFetcher = accountPortfolioFetcher
 			self.pasteboardClient = pasteboardClient
-			self.assetListSorter = assetListSorter
+			self.fungibleTokenListSorter = fungibleTokenListSorter
 		}
 	}
 }
@@ -31,15 +31,16 @@ public extension Home {
 public extension Home.Environment {
 	static let placeholder: Self = .init(
 		appSettingsClient: .mock,
-		accountWorthFetcher: .mock,
+		accountPortfolioFetcher: .mock,
 		pasteboardClient: .noop,
-		assetListSorter: .mock
+		fungibleTokenListSorter: .mock
 	)
 
 	static let unimplemented: Self = .init(
 		appSettingsClient: .unimplemented,
-		accountWorthFetcher: .unimplemented,
-		pasteboardClient: .unimplemented
+		accountPortfolioFetcher: .unimplemented,
+		pasteboardClient: .unimplemented,
+		fungibleTokenListSorter: .unimplemented
 	)
 }
 #endif

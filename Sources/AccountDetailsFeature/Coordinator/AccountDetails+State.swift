@@ -1,10 +1,11 @@
 import AccountListFeature
-import AccountWorthFetcher
 import Address
 import AggregatedValueFeature
-import AssetListFeature
+import Asset
+import AssetsViewFeature
 import ComposableArchitecture
 import Foundation
+import FungibleTokenListFeature
 import Profile
 
 // MARK: - AccountDetails
@@ -15,12 +16,11 @@ public enum AccountDetails {}
 public extension AccountDetails {
 	// MARK: State
 	struct State: Equatable {
-		// dzoni
 		public let account: Profile.Account
 		public let address: Address
 		public var aggregatedValue: AggregatedValue.State
 		public let name: String
-		public var assetList: AssetList.State
+		public var assets: AssetsView.State
 
 		public init(for account: AccountList.Row.State) {
 			self.account = account.account
@@ -32,11 +32,14 @@ public extension AccountDetails {
 			)
 			name = account.name
 
-			assetList = .init(
-				sections: .init(uniqueElements: AssetListSorter.live.sortTokens(account.tokenContainers).map { category in
-					let rows = category.tokenContainers.map { container in AssetList.Row.State(tokenContainer: container, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible) }
-					return AssetList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
-				})
+			let fungibleTokenCategories = FungibleTokenListSorter.live.sortTokens(account.portfolio.fungibleTokenContainers)
+			assets = .init(
+				fungibleTokenList: .init(
+					sections: .init(uniqueElements: fungibleTokenCategories.map { category in
+						let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible) }
+						return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
+					})
+				)
 			)
 		}
 	}

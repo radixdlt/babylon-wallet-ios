@@ -1,4 +1,4 @@
-import AccountWorthFetcher
+import AccountPortfolio
 import AppSettings
 import PasteboardClient
 import WalletRemover
@@ -7,18 +7,18 @@ import WalletRemover
 public extension Main {
 	// MARK: Environment
 	struct Environment {
-		public let accountWorthFetcher: AccountWorthFetcher
+		public let accountPortfolioFetcher: AccountPortfolioFetcher
 		public let appSettingsClient: AppSettingsClient
 		public let pasteboardClient: PasteboardClient
 		public let walletRemover: WalletRemover
 
 		public init(
-			accountWorthFetcher: AccountWorthFetcher,
+			accountPortfolioFetcher: AccountPortfolioFetcher,
 			appSettingsClient: AppSettingsClient,
 			pasteboardClient: PasteboardClient,
 			walletRemover: WalletRemover
 		) {
-			self.accountWorthFetcher = accountWorthFetcher
+			self.accountPortfolioFetcher = accountPortfolioFetcher
 			self.appSettingsClient = appSettingsClient
 			self.pasteboardClient = pasteboardClient
 			self.walletRemover = walletRemover
@@ -29,14 +29,14 @@ public extension Main {
 #if DEBUG
 public extension Main.Environment {
 	static let noop = Self(
-		accountWorthFetcher: .mock,
+		accountPortfolioFetcher: .mock,
 		appSettingsClient: .mock,
 		pasteboardClient: .noop,
 		walletRemover: .noop
 	)
 
 	static let unimplemented = Self(
-		accountWorthFetcher: .unimplemented,
+		accountPortfolioFetcher: .unimplemented,
 		appSettingsClient: .unimplemented,
 		pasteboardClient: .unimplemented,
 		walletRemover: .unimplemented
