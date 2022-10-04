@@ -3,6 +3,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - AssetList.Row.View
 public extension AssetList.Row {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
@@ -30,7 +31,7 @@ public extension AssetList.Row.View {
 	}
 }
 
-// MARK: - Private Typealias
+// MARK: - AssetList.Row.View.RowViewStore
 private extension AssetList.Row.View {
 	typealias RowViewStore = ViewStore<AssetList.Row.View.ViewState, AssetList.Row.View.ViewAction>
 }
@@ -93,6 +94,7 @@ private extension AssetList.Row.View {
 	}
 }
 
+// MARK: - AssetList.Row.View.ViewAction
 extension AssetList.Row.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {}
@@ -108,6 +110,7 @@ extension AssetList.Row.Action {
 	}
 }
 
+// MARK: - AssetList.Row.View.ViewState
 extension AssetList.Row.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {

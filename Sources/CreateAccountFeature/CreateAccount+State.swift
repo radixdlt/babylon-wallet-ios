@@ -4,6 +4,7 @@ import Foundation
 /// Namespace for CreateAccountFeature
 public enum CreateAccount {}
 
+// MARK: CreateAccount.State
 public extension CreateAccount {
 	// MARK: State
 	struct State: Equatable {

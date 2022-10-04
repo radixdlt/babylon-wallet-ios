@@ -16,6 +16,7 @@ extension Font {
 	}
 }
 
+// MARK: - Font.Size
 extension Font {
 	enum Size: CGFloat {
 		case 𝟙𝟘 = 10

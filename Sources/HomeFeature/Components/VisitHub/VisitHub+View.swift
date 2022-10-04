@@ -2,6 +2,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - Home.VisitHub.View
 public extension Home.VisitHub {
 	struct View: SwiftUI.View {
 		let store: Store<State, Action>
@@ -28,6 +29,7 @@ public extension Home.VisitHub.View {
 	}
 }
 
+// MARK: - Home.VisitHub.View.ViewAction
 extension Home.VisitHub.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
@@ -44,6 +46,7 @@ extension Home.VisitHub.Action {
 	}
 }
 
+// MARK: - Home.VisitHub.View.ViewState
 extension Home.VisitHub.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {

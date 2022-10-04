@@ -12,7 +12,7 @@ public struct AssetListSorter {
 	}
 }
 
-// MARK: - Typealias
+// MARK: AssetListSorter.SortTokens
 public extension AssetListSorter {
 	typealias SortTokens = @Sendable ([TokenWorthContainer]) -> [AssetCategory]
 }

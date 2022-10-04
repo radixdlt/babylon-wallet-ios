@@ -2,12 +2,13 @@ import AccountWorthFetcher
 import Common
 import Foundation
 
-// MARK: - Row
+// MARK: - AssetList.Row
 /// Namespace for Row
 public extension AssetList {
 	enum Row {}
 }
 
+// MARK: - AssetList.Row.State
 public extension AssetList.Row {
 	// MARK: State
 	struct State: Equatable {

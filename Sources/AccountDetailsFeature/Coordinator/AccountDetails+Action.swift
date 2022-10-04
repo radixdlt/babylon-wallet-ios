@@ -2,6 +2,7 @@ import Address
 import AggregatedValueFeature
 import AssetListFeature
 
+// MARK: - AccountDetails.Action
 public extension AccountDetails {
 	// MARK: Action
 	enum Action: Equatable {
@@ -12,12 +13,14 @@ public extension AccountDetails {
 	}
 }
 
+// MARK: - AccountDetails.Action.InternalAction
 public extension AccountDetails.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
 	}
 }
 
+// MARK: - AccountDetails.Action.InternalAction.UserAction
 public extension AccountDetails.Action.InternalAction {
 	enum UserAction: Equatable {
 		case dismissAccountDetails
@@ -28,6 +31,7 @@ public extension AccountDetails.Action.InternalAction {
 	}
 }
 
+// MARK: - AccountDetails.Action.CoordinatingAction
 public extension AccountDetails.Action {
 	enum CoordinatingAction: Equatable {
 		case dismissAccountDetails

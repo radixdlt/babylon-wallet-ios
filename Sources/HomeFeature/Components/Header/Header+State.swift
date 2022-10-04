@@ -1,11 +1,12 @@
 import Foundation
 
-// MARK: - Home
+// MARK: - Home.Header
 /// Namespace for HeaderFeature
 public extension Home {
 	enum Header {}
 }
 
+// MARK: - Home.Header.State
 public extension Home.Header {
 	// MARK: State
 	struct State: Equatable {

@@ -8,6 +8,7 @@ public struct WalletLoader {
 	public var loadWallet: @Sendable (Profile) async throws -> Wallet
 }
 
+// MARK: WalletLoader.Error
 public extension WalletLoader {
 	enum Error: Swift.Error, Equatable {
 		case secretsNoFoundForProfile

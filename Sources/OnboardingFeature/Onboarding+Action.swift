@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Wallet
 
+// MARK: - Onboarding.Action
 public extension Onboarding {
 	// MARK: Action
 	enum Action: Equatable, BindableAction {
@@ -10,12 +11,14 @@ public extension Onboarding {
 	}
 }
 
+// MARK: - Onboarding.Action.CoordinatingAction
 public extension Onboarding.Action {
 	enum CoordinatingAction: Equatable {
 		case onboardedWithWallet(Wallet)
 	}
 }
 
+// MARK: - Onboarding.Action.InternalAction
 public extension Onboarding.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
@@ -23,12 +26,14 @@ public extension Onboarding.Action {
 	}
 }
 
+// MARK: - Onboarding.Action.InternalAction.UserAction
 public extension Onboarding.Action.InternalAction {
 	enum UserAction: Equatable {
 		case createWallet
 	}
 }
 
+// MARK: - Onboarding.Action.InternalAction.SystemAction
 public extension Onboarding.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case createWallet

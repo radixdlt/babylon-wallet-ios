@@ -1,6 +1,7 @@
 import Address
 import Foundation
 
+// MARK: - AccountList.Action
 public extension AccountList {
 	// MARK: Action
 	enum Action: Equatable {
@@ -10,12 +11,14 @@ public extension AccountList {
 	}
 }
 
+// MARK: - AccountList.Action.InternalAction
 public extension AccountList.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
 	}
 }
 
+// MARK: - AccountList.Action.InternalAction.UserAction
 public extension AccountList.Action.InternalAction {
 	enum UserAction: Equatable {
 		case alertDismissed
@@ -23,6 +26,7 @@ public extension AccountList.Action.InternalAction {
 	}
 }
 
+// MARK: - AccountList.Action.CoordinatingAction
 public extension AccountList.Action {
 	enum CoordinatingAction: Equatable {
 		case displayAccountDetails(AccountList.Row.State)

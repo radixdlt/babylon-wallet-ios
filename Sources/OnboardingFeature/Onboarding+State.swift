@@ -4,6 +4,7 @@ import ComposableArchitecture
 /// Namespace for OnboardingFeature
 public enum Onboarding {}
 
+// MARK: Onboarding.State
 public extension Onboarding {
 	// MARK: State
 	struct State: Equatable {

@@ -2,6 +2,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - Onboarding.View
 public extension Onboarding {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
@@ -34,6 +35,7 @@ public extension Onboarding.View {
 	}
 }
 
+// MARK: - Onboarding.View.ViewState
 extension Onboarding.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
@@ -49,6 +51,7 @@ extension Onboarding.View {
 	}
 }
 
+// MARK: - Onboarding.View.ViewAction
 extension Onboarding.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable, BindableAction {

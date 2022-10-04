@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Foundation
 import UserDefaultsClient
 
+// MARK: - Onboarding.Environment
 public extension Onboarding {
 	// MARK: Environment
 	struct Environment {

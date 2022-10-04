@@ -3,6 +3,7 @@ import HomeFeature
 import SettingsFeature
 import SwiftUI
 
+// MARK: - Main.View
 public extension Main {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
@@ -37,6 +38,7 @@ public extension Main.View {
 	}
 }
 
+// MARK: - Main.View.ViewState
 extension Main.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
@@ -50,6 +52,7 @@ extension Main.View {
 	}
 }
 
+// MARK: - Main.View.ViewAction
 extension Main.View {
 	// MARK: ViewAction
 	enum ViewAction {

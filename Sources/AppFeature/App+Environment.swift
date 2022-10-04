@@ -8,6 +8,7 @@ import UserDefaultsClient
 import WalletLoader
 import WalletRemover
 
+// MARK: - App.Environment
 public extension App {
 	// MARK: Environment
 	struct Environment {

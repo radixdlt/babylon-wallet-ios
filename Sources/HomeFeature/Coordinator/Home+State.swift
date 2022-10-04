@@ -13,6 +13,7 @@ public enum Home {}
 
 public typealias AccountsWorthDictionary = [Address: AccountPortfolioWorth]
 
+// MARK: - Home.State
 public extension Home {
 	// MARK: State
 	struct State: Equatable {

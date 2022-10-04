@@ -1,5 +1,6 @@
 import Foundation
 
+// MARK: - Settings.Action
 public extension Settings {
 	// MARK: Action
 	enum Action: Equatable {
@@ -18,6 +19,7 @@ public extension Settings.Action {
 	}
 }
 
+// MARK: - Settings.Action.InternalAction.UserAction
 public extension Settings.Action.InternalAction {
 	enum UserAction: Equatable {
 		case dismissSettings

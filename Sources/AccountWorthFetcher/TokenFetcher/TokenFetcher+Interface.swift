@@ -11,7 +11,7 @@ public struct TokenFetcher {
 	}
 }
 
-// MARK: - Typealias
+// MARK: TokenFetcher.FetchTokens
 public extension TokenFetcher {
 	typealias FetchTokens = @Sendable (Address) async throws -> [Token]
 }

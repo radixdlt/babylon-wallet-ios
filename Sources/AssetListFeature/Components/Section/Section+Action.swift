@@ -1,6 +1,7 @@
 import AccountWorthFetcher
 import Foundation
 
+// MARK: - AssetList.Section.Action
 public extension AssetList.Section {
 	// MARK: Action
 	enum Action: Equatable {
@@ -10,6 +11,7 @@ public extension AssetList.Section {
 	}
 }
 
+// MARK: - AssetList.Section.Action.InternalAction
 public extension AssetList.Section.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
@@ -17,14 +19,17 @@ public extension AssetList.Section.Action {
 	}
 }
 
+// MARK: - AssetList.Section.Action.InternalAction.UserAction
 public extension AssetList.Section.Action.InternalAction {
 	enum UserAction: Equatable {}
 }
 
+// MARK: - AssetList.Section.Action.InternalAction.SystemAction
 public extension AssetList.Section.Action.InternalAction {
 	enum SystemAction: Equatable {}
 }
 
+// MARK: - AssetList.Section.Action.CoordinatingAction
 public extension AssetList.Section.Action {
 	enum CoordinatingAction: Equatable {}
 }

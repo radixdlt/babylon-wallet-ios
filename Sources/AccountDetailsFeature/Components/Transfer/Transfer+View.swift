@@ -2,6 +2,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - AccountDetails.Transfer.View
 public extension AccountDetails.Transfer {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
@@ -39,6 +40,7 @@ public extension AccountDetails.Transfer.View {
 	}
 }
 
+// MARK: - AccountDetails.Transfer.View.ViewAction
 extension AccountDetails.Transfer.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
@@ -55,6 +57,7 @@ extension AccountDetails.Transfer.Action {
 	}
 }
 
+// MARK: - AccountDetails.Transfer.View.ViewState
 extension AccountDetails.Transfer.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {

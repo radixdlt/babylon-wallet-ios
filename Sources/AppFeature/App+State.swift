@@ -7,6 +7,7 @@ import SplashFeature
 /// Namespace for AppFeature
 public enum App {}
 
+// MARK: App.State
 public extension App {
 	enum State: Equatable {
 		case main(Main.State?)
