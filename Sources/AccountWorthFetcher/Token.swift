@@ -15,6 +15,7 @@ public struct Token: Equatable, Identifiable {
 	}
 }
 
+// MARK: Token.Code
 public extension Token {
 	enum Code: String, CaseIterable {
 		case btc

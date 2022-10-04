@@ -11,6 +11,7 @@ import Profile
 /// Namespace for AccountDetailsFeature
 public enum AccountDetails {}
 
+// MARK: AccountDetails.State
 public extension AccountDetails {
 	// MARK: State
 	struct State: Equatable {

@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - AssetList.Section.View
 public extension AssetList.Section {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
@@ -41,6 +42,7 @@ public extension AssetList.Section.View {
 	}
 }
 
+// MARK: - AssetList.Section.View.ViewAction
 extension AssetList.Section.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {}
@@ -56,6 +58,7 @@ extension AssetList.Section.Action {
 	}
 }
 
+// MARK: - AssetList.Section.View.ViewState
 extension AssetList.Section.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {

@@ -4,6 +4,7 @@ import Foundation
 /// Namespace for AccountPreferencesFeature
 public enum AccountPreferences {}
 
+// MARK: AccountPreferences.State
 public extension AccountPreferences {
 	// MARK: State
 	struct State: Equatable {

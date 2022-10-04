@@ -1,5 +1,6 @@
 import Foundation
 
+// MARK: - AccountDetails.Environment
 public extension AccountDetails {
 	// MARK: Environment
 	struct Environment {

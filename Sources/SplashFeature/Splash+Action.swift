@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Profile
 import Wallet
 
+// MARK: - Splash.Action
 public extension Splash {
 	// MARK: Action
 	enum Action: Equatable {
@@ -16,12 +17,14 @@ public enum SplashLoadWalletResult: Equatable {
 	case noWallet(reason: String, failedToDecode: Bool)
 }
 
+// MARK: - Splash.Action.CoordinatingAction
 public extension Splash.Action {
 	enum CoordinatingAction: Equatable {
 		case loadWalletResult(SplashLoadWalletResult)
 	}
 }
 
+// MARK: - Splash.Action.InternalAction
 public extension Splash.Action {
 	enum InternalAction: Equatable {
 		/// So we can use a single exit path, and `delay` to display this Splash for at
@@ -32,6 +35,7 @@ public extension Splash.Action {
 	}
 }
 
+// MARK: - Splash.Action.InternalAction.SystemAction
 public extension Splash.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case loadProfile

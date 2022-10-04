@@ -1,11 +1,12 @@
 import ComposableArchitecture
 
-// MARK: - Section
+// MARK: - AssetList.Section
 /// Namespace for Section
 public extension AssetList {
 	enum Section {}
 }
 
+// MARK: - AssetList.Section.State
 public extension AssetList.Section {
 	// MARK: State
 	struct State: Equatable, Identifiable {

@@ -2,6 +2,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - AccountPreferences.View
 public extension AccountPreferences {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
@@ -39,6 +40,7 @@ public extension AccountPreferences.View {
 	}
 }
 
+// MARK: - AccountPreferences.View.ViewAction
 extension AccountPreferences.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
@@ -55,6 +57,7 @@ extension AccountPreferences.Action {
 	}
 }
 
+// MARK: - AccountPreferences.View.ViewState
 extension AccountPreferences.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {

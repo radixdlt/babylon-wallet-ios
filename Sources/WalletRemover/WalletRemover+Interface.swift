@@ -11,7 +11,7 @@ public struct WalletRemover {
 	}
 }
 
-// MARK: - Typealias
+// MARK: WalletRemover.RemoveWallet
 public extension WalletRemover {
 	typealias RemoveWallet = @Sendable () async -> Void
 }

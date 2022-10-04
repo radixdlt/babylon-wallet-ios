@@ -5,6 +5,7 @@ import ComposableArchitecture
 /// Namespace for AssetListFeature
 public enum AssetList {}
 
+// MARK: AssetList.State
 public extension AssetList {
 	// MARK: State
 	struct State: Equatable {
@@ -19,6 +20,7 @@ public extension AssetList {
 	}
 }
 
+// MARK: AssetList.ListType
 public extension AssetList {
 	enum ListType: String, CaseIterable, Identifiable {
 		case tokens

@@ -21,6 +21,7 @@ public extension ProfileLoader {
 	}
 }
 
+// MARK: - ProfileLoader.Error
 public extension ProfileLoader {
 	enum Error: String, Swift.Error, Equatable {
 		case failedToDecode

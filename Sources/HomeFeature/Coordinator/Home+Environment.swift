@@ -4,6 +4,7 @@ import AppSettings
 import AssetListFeature
 import PasteboardClient
 
+// MARK: - Home.Environment
 public extension Home {
 	// MARK: Environment
 	struct Environment {

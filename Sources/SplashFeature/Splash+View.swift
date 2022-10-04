@@ -2,6 +2,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - Splash.View
 public extension Splash {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
@@ -33,6 +34,7 @@ public extension Splash.View {
 	}
 }
 
+// MARK: - Splash.View.ViewState
 extension Splash.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
@@ -40,6 +42,7 @@ extension Splash.View {
 	}
 }
 
+// MARK: - Splash.View.ViewAction
 extension Splash.View {
 	// MARK: ViewAction
 	enum ViewAction {

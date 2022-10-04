@@ -4,6 +4,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - AccountDetails.View
 public extension AccountDetails {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
@@ -65,7 +66,7 @@ public extension AccountDetails.View {
 	}
 }
 
-// MARK: - Private Typealias
+// MARK: - AccountDetails.View.AccountDetailsViewStore
 private extension AccountDetails.View {
 	typealias AccountDetailsViewStore = ComposableArchitecture.ViewStore<AccountDetails.View.ViewState, AccountDetails.View.ViewAction>
 }
@@ -113,6 +114,7 @@ private extension AccountDetails.View {
 	}
 }
 
+// MARK: - AccountDetails.View.ViewAction
 extension AccountDetails.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
@@ -141,6 +143,7 @@ extension AccountDetails.Action {
 	}
 }
 
+// MARK: - AccountDetails.View.ViewState
 extension AccountDetails.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {

@@ -29,7 +29,7 @@ let package = Package(
 		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.40.2"),
 
 		// Format code
-		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.49.11"),
+		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.0"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.

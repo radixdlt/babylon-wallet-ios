@@ -3,6 +3,7 @@ import AppSettings
 import PasteboardClient
 import WalletRemover
 
+// MARK: - Main.Environment
 public extension Main {
 	// MARK: Environment
 	struct Environment {

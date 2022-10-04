@@ -7,6 +7,7 @@ import Common
 import CreateAccountFeature
 import Foundation
 
+// MARK: - Home.Action
 public extension Home {
 	// MARK: Action
 	enum Action: Equatable {
@@ -24,6 +25,7 @@ public extension Home {
 	}
 }
 
+// MARK: - Home.Action.InternalAction
 public extension Home.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
@@ -31,12 +33,14 @@ public extension Home.Action {
 	}
 }
 
+// MARK: - Home.Action.InternalAction.UserAction
 public extension Home.Action.InternalAction {
 	enum UserAction: Equatable {
 		case createAccountButtonTapped
 	}
 }
 
+// MARK: - Home.Action.InternalAction.SystemAction
 public extension Home.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
@@ -51,6 +55,7 @@ public extension Home.Action.InternalAction {
 	}
 }
 
+// MARK: - Home.Action.CoordinatingAction
 public extension Home.Action {
 	enum CoordinatingAction: Equatable {
 		case displaySettings

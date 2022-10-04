@@ -2,6 +2,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - Home.Header.View
 public extension Home.Header {
 	struct View: SwiftUI.View {
 		let store: Store<State, Action>
@@ -29,6 +30,7 @@ public extension Home.Header.View {
 	}
 }
 
+// MARK: - Home.Header.View.ViewAction
 extension Home.Header.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
@@ -45,6 +47,7 @@ extension Home.Header.Action {
 	}
 }
 
+// MARK: - Home.Header.View.ViewState
 extension Home.Header.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {

@@ -4,6 +4,7 @@ import OnboardingFeature
 import SplashFeature
 import SwiftUI
 
+// MARK: - App.View
 public extension App {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>

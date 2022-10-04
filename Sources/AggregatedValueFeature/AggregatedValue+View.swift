@@ -2,6 +2,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - AggregatedValue.View
 public extension AggregatedValue {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
@@ -35,6 +36,7 @@ public extension AggregatedValue.View {
 	}
 }
 
+// MARK: - AggregatedValue.View.ViewAction
 extension AggregatedValue.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
@@ -51,6 +53,7 @@ extension AggregatedValue.Action {
 	}
 }
 
+// MARK: - AggregatedValue.View.ViewState
 extension AggregatedValue.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {

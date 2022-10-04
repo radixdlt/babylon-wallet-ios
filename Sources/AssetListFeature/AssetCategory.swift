@@ -12,7 +12,7 @@ extension AssetCategory: Identifiable {
 	public var id: ID { type }
 }
 
-// MARK: - Public Types
+// MARK: AssetCategory.CategoryType
 public extension AssetCategory {
 	enum CategoryType {
 		case xrd

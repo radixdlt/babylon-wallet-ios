@@ -50,6 +50,7 @@ struct WalletApp: SwiftUI.App {
 	}
 }
 
+// MARK: WalletApp.Store
 extension WalletApp {
 	typealias Store = ComposableArchitecture.Store<App.State, App.Action>
 }

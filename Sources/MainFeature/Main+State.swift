@@ -5,6 +5,7 @@ import SettingsFeature
 /// Namespace for MainFeature
 public enum Main {}
 
+// MARK: Main.State
 public extension Main {
 	// MARK: State
 	struct State: Equatable {

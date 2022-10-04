@@ -2,6 +2,7 @@ import Common
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - Settings.View
 public extension Settings {
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
@@ -40,12 +41,14 @@ public extension Settings.View {
 	}
 }
 
+// MARK: - Settings.View.ViewState
 public extension Settings.View {
 	struct ViewState: Equatable {
 		public init(_: Settings.State) {}
 	}
 }
 
+// MARK: - Settings.View.ViewAction
 public extension Settings.View {
 	enum ViewAction: Equatable {
 		case dismissSettingsButtonTapped

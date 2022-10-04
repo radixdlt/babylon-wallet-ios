@@ -12,6 +12,7 @@ public extension LocalAuthenticationClient {
 	}
 }
 
+// MARK: - LocalAuthenticationClient.Error
 public extension LocalAuthenticationClient {
 	enum Error: Swift.Error, Equatable {
 		case contextDeinitialized

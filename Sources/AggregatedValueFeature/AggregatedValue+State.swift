@@ -5,6 +5,7 @@ import Foundation
 /// Namespace for AggregatedValueFeature
 public enum AggregatedValue {}
 
+// MARK: AggregatedValue.State
 public extension AggregatedValue {
 	// MARK: State
 	struct State: Equatable {

@@ -5,6 +5,7 @@ import Profile
 /// Namespace for AccountListFeature
 public enum AccountList {}
 
+// MARK: AccountList.State
 public extension AccountList {
 	// MARK: State
 	struct State: Equatable {

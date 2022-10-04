@@ -77,6 +77,7 @@ public extension Color.App {
 	}
 }
 
+// MARK: - Color.Hex
 private extension Color {
 	enum Hex: UInt32 {
 		case appGrey2 = 0x8A8FA4

@@ -3,6 +3,7 @@ import OnboardingFeature
 import SplashFeature
 import Wallet
 
+// MARK: - App.Action
 public extension App {
 	// MARK: Action
 	enum Action: Equatable {
@@ -14,6 +15,7 @@ public extension App {
 	}
 }
 
+// MARK: - App.Action.CoordinatingAction
 public extension App.Action {
 	enum CoordinatingAction: Equatable {
 		case onboard
