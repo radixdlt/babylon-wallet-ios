@@ -3,6 +3,7 @@ import Address
 import Asset
 import Common
 import ComposableArchitecture
+import FungibleTokenListFeature
 import SwiftUI
 
 // MARK: - AccountList.Row.View
@@ -49,7 +50,7 @@ public extension AccountList.Row.View {
 					.frame(maxWidth: 160)
 				}
 
-				TokenListView(tokens: viewStore.state.portfolio.fungibleTokenContainers.map(\.asset))
+				TokenListView(containers: viewStore.state.portfolio.fungibleTokenContainers)
 			}
 			.padding(25)
 			.background(Color.app.cardBackgroundLight)
@@ -156,21 +157,25 @@ private struct TokenView: View {
 
 // MARK: - TokenListView
 private struct TokenListView: View {
-	let tokens: [FungibleToken]
+	private let sortedTokens: [FungibleTokenContainer]
 	private let limit = 5
 
+	init(containers: [FungibleTokenContainer]) {
+		sortedTokens = FungibleTokenListSorter.live.sortTokens(containers).map(\.tokenContainers).flatMap { $0 }
+	}
+
 	var body: some View {
-		if tokens.count > limit {
+		if sortedTokens.count > limit {
 			HStack(spacing: -10) {
-				ForEach(tokens[0 ..< limit]) { token in
-					TokenView(code: token.code ?? "")
+				ForEach(sortedTokens[0 ..< limit]) { token in
+					TokenView(code: token.asset.code ?? "")
 				}
-				TokenView(code: "+\(tokens.count - limit)")
+				TokenView(code: "+\(sortedTokens.count - limit)")
 			}
 		} else {
 			HStack(spacing: -10) {
-				ForEach(tokens) { token in
-					TokenView(code: token.code ?? "")
+				ForEach(sortedTokens) { token in
+					TokenView(code: token.asset.code ?? "")
 				}
 			}
 		}
