@@ -28,7 +28,7 @@ public extension Settings.View {
 			// TODO: implement
 			ForceFullScreen {
 				VStack {
-					Text("Impl: Settings")
+					Text("Implement: Settings")
 						.background(Color.yellow)
 						.foregroundColor(.red)
 					Button(

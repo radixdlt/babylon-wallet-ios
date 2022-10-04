@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import FungibleTokenListFeature
+import NonFungibleTokenListFeature
 import SwiftUI
 
 // MARK: - AssetsView.View
@@ -25,7 +26,7 @@ public extension AssetsView.View {
 			)
 		) { viewStore in
 			VStack(spacing: 30) {
-				selectorView()
+				selectorView(with: viewStore)
 
 				switch viewStore.state.type {
 				case .tokens:
@@ -36,7 +37,12 @@ public extension AssetsView.View {
 						)
 					)
 				case .nfts:
-					Text("NFTs")
+					NonFungibleTokenList.View(
+						store: store.scope(
+							state: \.nonFungibleTokenList,
+							action: AssetsView.Action.nonFungibleTokenList
+						)
+					)
 				case .poolShare:
 					Text("Pool Share")
 				case .badges:
@@ -47,41 +53,68 @@ public extension AssetsView.View {
 	}
 }
 
+// MARK: - AssetsView.View.AssetsViewViewStore
+private extension AssetsView.View {
+	typealias AssetsViewViewStore = ComposableArchitecture.ViewStore<AssetsView.View.ViewState, AssetsView.View.ViewAction>
+}
+
 // MARK: - Private Methods
 private extension AssetsView.View {
-	func selectorView() -> some View {
+	func selectorView(with viewStore: AssetsViewViewStore) -> some View {
 		ScrollView(.horizontal, showsIndicators: false) {
-			Button(
-				action: {
-					// TODO: implement
-				}, label: {
-					Text(AssetsView.AssetsViewType.tokens.displayText)
-						.foregroundColor(.app.buttonTextWhite)
-						.font(.app.buttonBody)
-						.frame(height: 40)
-						.padding([.leading, .trailing], 16)
-						.background(RoundedRectangle(cornerRadius: 21)
-							.fill(Color.app.buttonBackgroundDark2)
-						)
-						.padding([.leading, .trailing], 18)
+			ScrollViewReader { proxy in
+				HStack(spacing: 0) {
+					ForEach(AssetsView.AssetsViewType.allCases) { type in
+						selectorButton(type: type, with: viewStore) {
+							viewStore.send(.listSelectorTapped(type))
+							withAnimation {
+								proxy.scrollTo(type, anchor: .center)
+							}
+						}
+					}
 				}
-			)
+				.padding([.leading, .trailing], 18)
+			}
 		}
+	}
+
+	func selectorButton(
+		type: AssetsView.AssetsViewType,
+		with viewStore: AssetsViewViewStore,
+		action: @escaping () -> Void
+	) -> some View {
+		Button(
+			action: {
+				action()
+			}, label: {
+				Text(type.displayText)
+					.foregroundColor(type == viewStore.type ? .app.buttonTextWhite : .app.buttonTextBlack)
+					.font(.app.buttonBody)
+					.frame(height: 40)
+					.padding([.leading, .trailing], 18)
+					.background(type == viewStore.type ?
+						RoundedRectangle(cornerRadius: 21)
+						.fill(Color.app.buttonBackgroundDark2) : nil
+					)
+			}
+		)
+		.id(type)
 	}
 }
 
 // MARK: - AssetsView.View.ViewAction
 extension AssetsView.View {
 	// MARK: ViewAction
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case listSelectorTapped(AssetsView.AssetsViewType)
+	}
 }
 
 extension AssetsView.Action {
 	init(action: AssetsView.View.ViewAction) {
 		switch action {
-		default:
-			// TODO: implement
-			break
+		case let .listSelectorTapped(type):
+			self = .internal(.user(.listSelectorTapped(type)))
 		}
 	}
 }
@@ -98,13 +131,14 @@ extension AssetsView.View {
 	}
 }
 
-// MARK: - AssetList_Preview
-struct AssetList_Preview: PreviewProvider {
+// MARK: - AssetsView_Preview
+struct AssetsView_Preview: PreviewProvider {
 	static var previews: some View {
 		AssetsView.View(
 			store: .init(
 				initialState: .init(
-					fungibleTokenList: .init(sections: [])
+					fungibleTokenList: .init(sections: []),
+					nonFungibleTokenList: .init(rows: [])
 				),
 				reducer: AssetsView.reducer,
 				environment: .init()

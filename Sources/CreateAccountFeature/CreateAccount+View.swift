@@ -22,7 +22,7 @@ public extension CreateAccount.View {
 		WithViewStore(store) { viewStore in
 			ForceFullScreen {
 				VStack {
-					Text("Impl: Settings")
+					Text("Implement: Settings")
 						.background(Color.yellow)
 						.foregroundColor(.red)
 					Button(

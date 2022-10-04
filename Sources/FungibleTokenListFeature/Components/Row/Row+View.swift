@@ -126,24 +126,19 @@ extension FungibleTokenList.Row.View {
 	}
 }
 
-/*
- // MARK: - Row_Preview
- struct Row_Preview: PreviewProvider {
-     static var previews: some View {
-         AssetList.Row.View(
-             store: .init(
-                 initialState: .init(
-                     asset: .init(
-                         token: .placeholder,
-                         valueInCurrency: 100
-                     ),
-                     currency: .usd,
-                     isCurrencyAmountVisible: true
-                 ),
-                 reducer: AssetList.Row.reducer,
-                 environment: .init()
-             )
-         )
-     }
- }
- */
+// MARK: - Row_Preview
+struct Row_Preview: PreviewProvider {
+	static var previews: some View {
+		FungibleTokenList.Row.View(
+			store: .init(
+				initialState: .init(
+					container: .init(asset: .xrd, amount: 100, worth: 200),
+					currency: .usd,
+					isCurrencyAmountVisible: true
+				),
+				reducer: FungibleTokenList.Row.reducer,
+				environment: .init()
+			)
+		)
+	}
+}

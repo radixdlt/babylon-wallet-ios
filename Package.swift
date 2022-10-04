@@ -188,6 +188,7 @@ let package = Package(
 				"Asset",
 				"Common",
 				"FungibleTokenListFeature",
+				"NonFungibleTokenListFeature",
 				tca,
 			]
 		),
@@ -269,6 +270,7 @@ let package = Package(
 				"Asset",
 				"FungibleTokenListFeature",
 				"HomeFeature",
+				"NonFungibleTokenListFeature",
 				"Profile",
 				"TestUtils",
 			]
@@ -304,6 +306,21 @@ let package = Package(
 				"MainFeature",
 				"TestUtils",
 				"WalletRemover",
+			]
+		),
+		.target(
+			name: "NonFungibleTokenListFeature",
+			dependencies: [
+				"Asset",
+				"Common",
+				tca,
+			]
+		),
+		.testTarget(
+			name: "NonFungibleTokenListFeatureTests",
+			dependencies: [
+				"NonFungibleTokenListFeature",
+				"TestUtils",
 			]
 		),
 		.target(

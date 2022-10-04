@@ -64,8 +64,8 @@ extension FungibleTokenList.View {
 	}
 }
 
-// MARK: - AssetList_Preview
-struct AssetList_Preview: PreviewProvider {
+// MARK: - FungibleTokenList_Preview
+struct FungibleTokenList_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenList.View(
 			store: .init(

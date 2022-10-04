@@ -71,7 +71,7 @@ public extension Splash {
 				#else
 				duration = 0.7
 				#endif
-				try await Task.sleep(nanoseconds: UInt64(duration * TimeInterval(NSEC_PER_SEC)))
+				try await environment.mainQueue.sleep(for: .seconds(duration))
 				await send(.coordinate(actionToCoordinate))
 			}
 

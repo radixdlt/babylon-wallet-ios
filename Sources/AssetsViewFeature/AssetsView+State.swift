@@ -1,6 +1,7 @@
 import Common
 import ComposableArchitecture
 import FungibleTokenListFeature
+import NonFungibleTokenListFeature
 
 // MARK: - AssetsView
 /// Namespace for AssetsViewFeature
@@ -12,11 +13,14 @@ public extension AssetsView {
 	struct State: Equatable {
 		public var type: AssetsViewType = .tokens
 		public var fungibleTokenList: FungibleTokenList.State
+		public var nonFungibleTokenList: NonFungibleTokenList.State
 
 		public init(
-			fungibleTokenList: FungibleTokenList.State
+			fungibleTokenList: FungibleTokenList.State,
+			nonFungibleTokenList: NonFungibleTokenList.State
 		) {
 			self.fungibleTokenList = fungibleTokenList
+			self.nonFungibleTokenList = nonFungibleTokenList
 		}
 	}
 }
@@ -32,13 +36,13 @@ public extension AssetsView {
 		var displayText: String {
 			switch self {
 			case .tokens:
-				return L10n.AssetList.tokens
+				return L10n.AssetsView.tokens
 			case .nfts:
-				return L10n.AssetList.nfts
+				return L10n.AssetsView.nfts
 			case .poolShare:
-				return L10n.AssetList.poolShare
+				return L10n.AssetsView.poolShare
 			case .badges:
-				return L10n.AssetList.badges
+				return L10n.AssetsView.badges
 			}
 		}
 	}

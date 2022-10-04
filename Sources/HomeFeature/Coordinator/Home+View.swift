@@ -171,17 +171,15 @@ private extension Home.View {
 	}
 }
 
-/*
- // MARK: - HomeView_Previews
- struct HomeView_Previews: PreviewProvider {
- 	static var previews: some View {
- 		Home.View(
- 			store: .init(
- 				initialState: .placeholder,
- 				reducer: Home.reducer,
- 				environment: .placeholder
- 			)
- 		)
- 	}
- }
- */
+// MARK: - HomeView_Previews
+struct HomeView_Previews: PreviewProvider {
+	static var previews: some View {
+		Home.View(
+			store: .init(
+				initialState: .placeholder,
+				reducer: Home.reducer,
+				environment: .placeholder
+			)
+		)
+	}
+}

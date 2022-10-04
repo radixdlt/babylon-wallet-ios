@@ -27,7 +27,7 @@ public extension AccountPreferences.View {
 			// TODO: implement
 			ForceFullScreen {
 				VStack {
-					Text("Impl: AccountPreferences")
+					Text("Implement: AccountPreferences")
 						.background(Color.yellow)
 						.foregroundColor(.red)
 					Button(
