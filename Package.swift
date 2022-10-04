@@ -270,6 +270,7 @@ let package = Package(
 				"Asset",
 				"FungibleTokenListFeature",
 				"HomeFeature",
+				"NonFungibleTokenListFeature",
 				"Profile",
 				"TestUtils",
 			]

@@ -6,6 +6,7 @@ import Asset
 import ComposableArchitecture
 import FungibleTokenListFeature
 @testable import HomeFeature
+import NonFungibleTokenListFeature
 import Profile
 import TestUtils
 
@@ -13,21 +14,30 @@ import TestUtils
 final class HomeFeatureTests: TestCase {
 	func test_totalWorthLoaded_whenTotalWorthIsLoaded_thenUpdateAllSubStates() async {
 		// given
+
+		// fungible tokens
 		let btc = FungibleToken(address: "btc-deadbeef", supply: .fixed(100), tokenDescription: nil, name: "Bitcoin", code: "BTC", iconURL: "")
 		let eth = FungibleToken(address: "eth-deadbeef", supply: .fixed(100), tokenDescription: nil, name: "Ethereum", code: "ETH", iconURL: "")
 		let xrd = FungibleToken.xrd
-
 		let btcContainer = FungibleTokenContainer(asset: btc, amount: 1.234, worth: 1.987)
 		let ethContainer = FungibleTokenContainer(asset: eth, amount: 2.345, worth: 2.876)
 		let xrdContainer = FungibleTokenContainer(asset: xrd, amount: 4.567, worth: 4.654)
 		let expectedAggregatedValue: Float = 9.517
+
+		// non fungible tokens
+		let nft1 = NonFungibleToken(address: "nft1-deadbeef", supply: .fixed(100), iconURL: nil)
+		let nft2 = NonFungibleToken(address: "nft2-deadbeef", supply: .fixed(100), iconURL: nil)
+		let nft3 = NonFungibleToken(address: "nft3-deadbeef", supply: .fixed(100), iconURL: nil)
+		let nftContainer1 = NonFungibleTokenContainer(asset: nft1, metadata: nil)
+		let nftContainer2 = NonFungibleTokenContainer(asset: nft2, metadata: nil)
+		let nftContainer3 = NonFungibleTokenContainer(asset: nft3, metadata: nil)
 
 		let address: Address = "abcdefgh12345678"
 		let account: Profile.Account = .init(address: address, name: "Test Account")
 		let totalPortfolio: AccountPortfolioDictionary = [
 			address: .init(
 				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
-				nonFungibleTokenContainers: [],
+				nonFungibleTokenContainers: [nftContainer1, nftContainer2, nftContainer3],
 				poolShareContainers: [],
 				badgeContainers: []
 			),
@@ -99,7 +109,18 @@ final class HomeFeatureTests: TestCase {
 					]
 				)
 
-				$0.accountDetails?.assets = .init(fungibleTokenList: .init(sections: [section0, section1]))
+				let nonFungibleRow = NonFungibleTokenList.Row.RowState(
+					containers: accountPortfolio.nonFungibleTokenContainers
+				)
+
+				$0.accountDetails?.assets = .init(
+					fungibleTokenList: .init(
+						sections: [section0, section1]
+					),
+					nonFungibleTokenList: .init(
+						rows: [nonFungibleRow]
+					)
+				)
 			}
 		}
 	}
