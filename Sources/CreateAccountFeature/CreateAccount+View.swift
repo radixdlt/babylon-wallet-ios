@@ -7,7 +7,7 @@ public extension CreateAccount {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<CreateAccount>
 		@ObservedObject private var viewStore: ViewStoreOf<CreateAccount>
-		@FocusState private var nameIsFocused: Bool
+		@FocusState private var focusedField: CreateAccount.State.Field?
 
 		public init(
 			store: StoreOf<CreateAccount>
@@ -56,6 +56,15 @@ public extension CreateAccount.View {
 								get: \.accountName,
 								send: { .internal(.user(.accountNameChanged($0))) }
 							)
+							.removeDuplicates()
+						)
+						.focused($focusedField, equals: .accountName)
+						.synchronize(
+							viewStore.binding(
+								get: \.focusedField,
+								send: .internal(.user(.textFieldDidFocus))
+							),
+							self.$focusedField
 						)
 						.padding()
 						.frame(height: 50)
@@ -67,10 +76,6 @@ public extension CreateAccount.View {
 							RoundedRectangle(cornerRadius: 4)
 								.stroke(Color.app.buttonTextBlack, lineWidth: 1)
 						)
-						.focused($nameIsFocused)
-						.onSubmit {
-							nameIsFocused = false
-						}
 
 						Text(L10n.CreateAccount.explanation)
 							.foregroundColor(.app.secondary)
@@ -94,6 +99,9 @@ public extension CreateAccount.View {
 					}
 				)
 				.disabled(!viewStore.isValid)
+			}
+			.onAppear {
+				viewStore.send(.internal(.system(.viewDidAppear)))
 			}
 			.padding(24)
 		}

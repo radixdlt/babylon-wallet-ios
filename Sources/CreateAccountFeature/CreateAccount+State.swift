@@ -1,17 +1,27 @@
 import ComposableArchitecture
 
-// MARK: CreateAccount.State
+// MARK: - CreateAccount.State
 public extension CreateAccount {
 	struct State: Equatable {
 		public var accountName: String
 		public var isValid: Bool
+		@BindableState public var focusedField: Field?
 
 		public init(
 			accountName: String = "",
-			isValid: Bool = false
+			isValid: Bool = false,
+			focusedField: Field? = nil
 		) {
 			self.accountName = accountName
 			self.isValid = isValid
+			self.focusedField = focusedField
 		}
+	}
+}
+
+// MARK: - CreateAccount.State.Field
+public extension CreateAccount.State {
+	enum Field: String, Hashable {
+		case accountName
 	}
 }

@@ -1,4 +1,4 @@
-import Foundation
+import ComposableArchitecture
 
 // MARK: - CreateAccount.Action
 public extension CreateAccount {
@@ -13,6 +13,7 @@ public extension CreateAccount {
 public extension CreateAccount.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
+		case system(SystemAction)
 	}
 }
 
@@ -21,6 +22,15 @@ public extension CreateAccount.Action.InternalAction {
 	enum UserAction: Equatable {
 		case closeButtonTapped
 		case accountNameChanged(String)
+		case textFieldDidFocus
+	}
+}
+
+// MARK: - CreateAccount.Action.InternalAction.SystemAction
+public extension CreateAccount.Action.InternalAction {
+	enum SystemAction: Equatable {
+		case viewDidAppear
+		case focusTextField
 	}
 }
 
