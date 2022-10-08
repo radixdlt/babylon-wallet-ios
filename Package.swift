@@ -222,6 +222,7 @@ let package = Package(
 		.target(
 			name: "CreateAccountFeature",
 			dependencies: [
+				"Address",
 				"Common",
 				tca,
 			]
