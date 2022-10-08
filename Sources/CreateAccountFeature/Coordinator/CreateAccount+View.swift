@@ -54,7 +54,7 @@ public extension CreateAccount.View {
 							L10n.CreateAccount.placeholder,
 							text: viewStore.binding(
 								get: \.accountName,
-								send: { .internal(.user(.accountNameChanged($0))) }
+								send: { .internal(.user(.textFieldDidChange($0))) }
 							)
 							.removeDuplicates()
 						)
@@ -108,11 +108,10 @@ public extension CreateAccount.View {
 	}
 }
 
+// MARK: - Private Computer Properties
 private extension CreateAccount.View {
 	var titleText: String {
-		// TODO: calculate depending on the wallet.profile.accounts.count
-		let bool = false
-		return bool ? L10n.CreateAccount.createNewAccount : L10n.CreateAccount.createFirstAccount
+		viewStore.numberOfExistingAccounts == 0 ? L10n.CreateAccount.createFirstAccount : L10n.CreateAccount.createNewAccount
 	}
 }
 

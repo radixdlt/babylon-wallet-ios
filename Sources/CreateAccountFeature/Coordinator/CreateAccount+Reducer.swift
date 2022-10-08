@@ -14,7 +14,7 @@ public struct CreateAccount: ReducerProtocol {
 			}
 		case .coordinate(.dismissCreateAccount):
 			return .none
-		case let .internal(.user(.accountNameChanged(accountName))):
+		case let .internal(.user(.textFieldDidChange(accountName))):
 			let result = accountNameValidator.validate(accountName)
 			if !accountNameValidator.isCharacterCountOverLimit(result.trimmedName) {
 				state.isValid = result.isValid

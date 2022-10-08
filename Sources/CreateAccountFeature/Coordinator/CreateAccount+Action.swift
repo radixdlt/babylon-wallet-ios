@@ -21,7 +21,7 @@ public extension CreateAccount.Action {
 public extension CreateAccount.Action.InternalAction {
 	enum UserAction: Equatable {
 		case closeButtonTapped
-		case accountNameChanged(String)
+		case textFieldDidChange(String)
 		case textFieldDidFocus
 	}
 }

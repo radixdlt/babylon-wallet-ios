@@ -89,7 +89,7 @@ public extension Home {
 		Reducer { state, action, environment in
 			switch action {
 			case .internal(.user(.createAccountButtonTapped)):
-				state.createAccount = .init()
+				state.createAccount = .init(numberOfExistingAccounts: state.wallet.profile.accounts.count)
 				return .none
 
 			case .internal(.system(.viewDidAppear)):
