@@ -66,7 +66,7 @@ private extension Home.Header.View {
 		HStack {
 			Text(L10n.Home.Header.subtitle)
 				.foregroundColor(.app.secondary)
-				.font(.app.body)
+				.font(.app.body1Regular)
 		}
 	}
 }
@@ -80,7 +80,7 @@ private struct TitleView: View {
 		HStack {
 			Text(L10n.Home.Header.title)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.title)
+				.font(.app.sectionHeader)
 			Spacer()
 			SettingsButton(
 				shouldShowNotification: shouldShowNotification,

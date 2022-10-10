@@ -35,7 +35,7 @@ public extension CreateAccount.View {
 
 					Text(titleText)
 						.foregroundColor(.app.buttonTextBlack)
-						.font(.app.title2Bold)
+						.font(.app.sectionHeader)
 				}
 
 				Spacer()
@@ -47,7 +47,7 @@ public extension CreateAccount.View {
 						.padding(.horizontal, 40)
 						.multilineTextAlignment(.center)
 						.foregroundColor(.app.subtitleGray)
-						.font(.app.textFieldRegular)
+						.font(.app.body1Regular)
 
 					VStack(alignment: .leading, spacing: 10) {
 						TextField(
@@ -70,7 +70,7 @@ public extension CreateAccount.View {
 						.frame(height: 50)
 						.background(Color.app.textFieldGray)
 						.foregroundColor(.app.buttonTextBlack)
-						.font(.app.textFieldRegular)
+						.font(.app.body1Regular)
 						.cornerRadius(4)
 						.overlay(
 							RoundedRectangle(cornerRadius: 4)
@@ -79,7 +79,7 @@ public extension CreateAccount.View {
 
 						Text(L10n.CreateAccount.explanation)
 							.foregroundColor(.app.secondary)
-							.font(.app.body)
+							.font(.app.body1Regular)
 					}
 				}
 
@@ -90,7 +90,7 @@ public extension CreateAccount.View {
 					label: {
 						Text(L10n.CreateAccount.continueButtonTitle)
 							.foregroundColor(.app.buttonTextWhite)
-							.font(.app.buttonBody)
+							.font(.app.body1Header)
 							.frame(maxWidth: .infinity)
 							.frame(height: 44)
 							.background(viewStore.isValid ? Color.app.buttonBackgroundDark2 : Color.app.buttonDisabledGray)

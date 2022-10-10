@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		932A61C928F43A3900B6104F /* IBMPlexSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 932A61C528F43A3900B6104F /* IBMPlexSans-Medium.ttf */; };
+		932A61CA28F43A3900B6104F /* IBMPlexSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 932A61C528F43A3900B6104F /* IBMPlexSans-Medium.ttf */; };
+		932A61CB28F43A3900B6104F /* IBMPlexSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 932A61C628F43A3900B6104F /* IBMPlexSans-SemiBold.ttf */; };
+		932A61CC28F43A3900B6104F /* IBMPlexSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 932A61C628F43A3900B6104F /* IBMPlexSans-SemiBold.ttf */; };
+		932A61CD28F43A3900B6104F /* IBMPlexSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 932A61C728F43A3900B6104F /* IBMPlexSans-Regular.ttf */; };
+		932A61CE28F43A3900B6104F /* IBMPlexSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 932A61C728F43A3900B6104F /* IBMPlexSans-Regular.ttf */; };
+		932A61CF28F43A3900B6104F /* IBMPlexSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 932A61C828F43A3900B6104F /* IBMPlexSans-Bold.ttf */; };
+		932A61D028F43A3900B6104F /* IBMPlexSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 932A61C828F43A3900B6104F /* IBMPlexSans-Bold.ttf */; };
+		932A61D228F43B8300B6104F /* BabylonWallet-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 932A61D128F43B8300B6104F /* BabylonWallet-Info.plist */; };
+		932A61D328F43B8300B6104F /* BabylonWallet-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 932A61D128F43B8300B6104F /* BabylonWallet-Info.plist */; };
 		93DD2F66288EEE9A0008D376 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 93DD2F69288EEE9A0008D376 /* Localizable.strings */; };
 		93DD2F67288EEE9A0008D376 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 93DD2F69288EEE9A0008D376 /* Localizable.strings */; };
 		E6781C97286DBFC90032E010 /* Bundle_Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6781C96286DBFC90032E010 /* Bundle_Extensions.swift */; };
@@ -20,6 +30,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		932A61C528F43A3900B6104F /* IBMPlexSans-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Medium.ttf"; sourceTree = "<group>"; };
+		932A61C628F43A3900B6104F /* IBMPlexSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-SemiBold.ttf"; sourceTree = "<group>"; };
+		932A61C728F43A3900B6104F /* IBMPlexSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Regular.ttf"; sourceTree = "<group>"; };
+		932A61C828F43A3900B6104F /* IBMPlexSans-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "IBMPlexSans-Bold.ttf"; sourceTree = "<group>"; };
+		932A61D128F43B8300B6104F /* BabylonWallet-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BabylonWallet-Info.plist"; sourceTree = "<group>"; };
 		93DD2F68288EEE9A0008D376 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E6781C96286DBFC90032E010 /* Bundle_Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bundle_Extensions.swift; sourceTree = "<group>"; };
 		E6805BBD286DB3EC00861180 /* WalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApp.swift; sourceTree = "<group>"; };
@@ -50,10 +65,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		932A61C328F43A3900B6104F /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				932A61C428F43A3900B6104F /* IBMPlexSans */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		932A61C428F43A3900B6104F /* IBMPlexSans */ = {
+			isa = PBXGroup;
+			children = (
+				932A61C728F43A3900B6104F /* IBMPlexSans-Regular.ttf */,
+				932A61C528F43A3900B6104F /* IBMPlexSans-Medium.ttf */,
+				932A61C628F43A3900B6104F /* IBMPlexSans-SemiBold.ttf */,
+				932A61C828F43A3900B6104F /* IBMPlexSans-Bold.ttf */,
+			);
+			path = IBMPlexSans;
+			sourceTree = "<group>";
+		};
 		93DD2F6A288EEF200008D376 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				932A61C328F43A3900B6104F /* Fonts */,
 				93DD2F69288EEE9A0008D376 /* Localizable.strings */,
+				932A61D128F43B8300B6104F /* BabylonWallet-Info.plist */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -208,7 +244,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				932A61C928F43A3900B6104F /* IBMPlexSans-Medium.ttf in Resources */,
 				E6805BD1286DB3ED00861180 /* Assets.xcassets in Resources */,
+				932A61CF28F43A3900B6104F /* IBMPlexSans-Bold.ttf in Resources */,
+				932A61D228F43B8300B6104F /* BabylonWallet-Info.plist in Resources */,
+				932A61CD28F43A3900B6104F /* IBMPlexSans-Regular.ttf in Resources */,
+				932A61CB28F43A3900B6104F /* IBMPlexSans-SemiBold.ttf in Resources */,
 				93DD2F66288EEE9A0008D376 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -217,7 +258,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				932A61CA28F43A3900B6104F /* IBMPlexSans-Medium.ttf in Resources */,
 				E6805BD2286DB3ED00861180 /* Assets.xcassets in Resources */,
+				932A61D028F43A3900B6104F /* IBMPlexSans-Bold.ttf in Resources */,
+				932A61D328F43B8300B6104F /* BabylonWallet-Info.plist in Resources */,
+				932A61CE28F43A3900B6104F /* IBMPlexSans-Regular.ttf in Resources */,
+				932A61CC28F43A3900B6104F /* IBMPlexSans-SemiBold.ttf in Resources */,
 				93DD2F67288EEE9A0008D376 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -350,6 +396,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "Shared/Resources/BabylonWallet-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -408,6 +455,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = "Shared/Resources/BabylonWallet-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;

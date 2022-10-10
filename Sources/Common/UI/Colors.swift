@@ -8,9 +8,9 @@ public extension Color {
 }
 
 public extension Color.App {
-    // Old colors
-    // TODO: refactor
-    
+	// Old colors
+	// TODO: refactor
+
 	var backgroundDark: Color {
 		.black
 	}
@@ -90,15 +90,15 @@ public extension Color.App {
 	var shadowBlack: Color {
 		.black.opacity(0.08)
 	}
-    
-    // New colors
+
+	// New colors
 }
 
 // MARK: - Color.Hex
 private extension Color {
 	enum Hex: UInt32 {
-        // Old colors
-        // TODO: refactor
+		// Old colors
+		// TODO: refactor
 		case appGray3 = 0xE2E2E2
 		case appGray5 = 0xBEBDBD
 		case appGray6 = 0xF4F4F4
@@ -109,27 +109,27 @@ private extension Color {
 		case appGray12 = 0x3D3D3D
 		case appGray13 = 0xDDDDDD
 		case appCharcoal1 = 0x414141
-        
-        // new colors
-        case blue1 = 0x060F8F
-        case blue2 = 0x052CC0
-        case blue3 = 0x20E4FF
-        
-        case green1 = 0x00AB84
-        case green2 = 0x00C389
-        case green3 = 0x21FFBE
-        
-        case pink1 = 0xCE0D98
-        case pink2 = 0xFF43CA
-        
-        case gray1 = 0x003057
-        case gray2 = 0x8A8FA4
-        case gray3 = 0xCED0D6
-        case gray4 = 0xE2E5ED
-        case gray5 = 0xF4F5F9
-        
-        case white = 0xFFFFFF
-    }
+
+		// new colors
+		case blue1 = 0x060F8F
+		case blue2 = 0x052CC0
+		case blue3 = 0x20E4FF
+
+		case green1 = 0x00AB84
+		case green2 = 0x00C389
+		case green3 = 0x21FFBE
+
+		case pink1 = 0xCE0D98
+		case pink2 = 0xFF43CA
+
+		case gray1 = 0x003057
+		case gray2 = 0x8A8FA4
+		case gray3 = 0xCED0D6
+		case gray4 = 0xE2E5ED
+		case gray5 = 0xF4F5F9
+
+		case white = 0xFFFFFF
+	}
 }
 
 private extension Double {

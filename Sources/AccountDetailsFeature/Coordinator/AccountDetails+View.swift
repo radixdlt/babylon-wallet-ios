@@ -85,7 +85,7 @@ private extension AccountDetails.View {
 			Spacer()
 			Text(viewStore.name)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.buttonTitle)
+				.font(.app.secondaryHeader)
 			Spacer()
 			Button(
 				action: {
@@ -106,7 +106,7 @@ private extension AccountDetails.View {
 		}, label: {
 			Text(L10n.AccountDetails.transferButtonTitle)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.body)
+				.font(.app.body1Regular)
 				.padding()
 				.background(Color.app.buttonBackgroundLight)
 				.cornerRadius(6)

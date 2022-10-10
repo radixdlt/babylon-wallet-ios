@@ -33,24 +33,24 @@ public extension AccountCompletion.View {
 
 				Text("Congratulations")
 					.foregroundColor(.app.buttonTextBlack)
-					.font(.app.title2Bold)
+					.font(.app.sectionHeader)
 
 				Text("You’ve created your account.")
 					.foregroundColor(.app.subtitleGray)
-					.font(.app.textFieldRegular)
+					.font(.app.body1Regular)
 
 				Spacer()
 
 				VStack(spacing: 15) {
 					Text(viewStore.accountName)
 						.foregroundColor(.app.buttonTextBlack)
-						.font(.app.buttonTitle)
+						.font(.app.secondaryHeader)
 						.multilineTextAlignment(.center)
 
 					HStack {
 						Text(viewStore.accountAddress)
 							.foregroundColor(.app.buttonTextBlack.opacity(0.6))
-							.font(.app.caption2)
+							.font(.app.body2Regular)
 
 						Image("copy")
 					}
@@ -62,7 +62,7 @@ public extension AccountCompletion.View {
 
 				Text("Your account lives on the Radar Network and you can access it anytime in Radar Wallet.")
 					.foregroundColor(.app.subtitleGray)
-					.font(.app.caption2)
+					.font(.app.body2Regular)
 					.multilineTextAlignment(.center)
 					.padding(.horizontal, 24)
 
@@ -74,7 +74,7 @@ public extension AccountCompletion.View {
 					label: {
 						Text("Go to \(viewStore.origin.displayText)")
 							.foregroundColor(.app.buttonTextWhite)
-							.font(.app.buttonBody)
+							.font(.app.body1Header)
 							.frame(maxWidth: .infinity)
 							.frame(height: 44)
 							.background(Color.app.buttonBackgroundDark2)

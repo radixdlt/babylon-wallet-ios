@@ -48,7 +48,7 @@ private extension FungibleTokenList.Row.View {
 
 					Text(container.asset.code ?? "")
 						.foregroundColor(.app.secondary)
-						.font(.app.subhead)
+						.font(.app.body2HighImportance)
 				}
 
 				Spacer()
@@ -57,12 +57,12 @@ private extension FungibleTokenList.Row.View {
 					Text(tokenAmount(value: container.amount,
 					                 isVisible: viewStore.isCurrencyAmountVisible))
 						.foregroundColor(.app.buttonTextBlack)
-						.font(.app.buttonTitle)
+						.font(.app.secondaryHeader)
 					Text(tokenValue(container.worth,
 					                isVisible: viewStore.isCurrencyAmountVisible,
 					                currency: viewStore.currency))
 						.foregroundColor(.app.secondary)
-						.font(.app.caption2)
+						.font(.app.body2Regular)
 				}
 			}
 
