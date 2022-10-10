@@ -245,6 +245,17 @@ let package = Package(
 				"TestUtils",
 			]
 		),
+        .target(
+            name: "GatewayAPI",
+            dependencies: [
+                "Profile",  // address
+                "XCTestDynamicOverlay"
+            ]
+        ),
+        .testTarget(
+            name: "GatewayAPITests",
+            dependencies: ["GatewayAPI"]
+        ),
 		.target(
 			name: "HomeFeature",
 			dependencies: [
