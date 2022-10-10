@@ -44,10 +44,10 @@ private extension FungibleTokenList.Row.View {
 				HStack {
 					Circle()
 						.frame(width: 40, height: 40)
-						.foregroundColor(.app.tokenPlaceholderGray)
+						.foregroundColor(.app.gray3)
 
 					Text(container.asset.code ?? "")
-						.foregroundColor(.app.secondary)
+						.foregroundColor(.app.gray2)
 						.font(.app.body2HighImportance)
 				}
 
@@ -61,7 +61,7 @@ private extension FungibleTokenList.Row.View {
 					Text(tokenValue(container.worth,
 					                isVisible: viewStore.isCurrencyAmountVisible,
 					                currency: viewStore.currency))
-						.foregroundColor(.app.secondary)
+						.foregroundColor(.app.gray2)
 						.font(.app.body2Regular)
 				}
 			}
@@ -76,7 +76,7 @@ private extension FungibleTokenList.Row.View {
 
 	func separator() -> some View {
 		Rectangle()
-			.foregroundColor(.app.separatorLightGray)
+			.foregroundColor(.app.gray5)
 			.frame(height: 1)
 	}
 

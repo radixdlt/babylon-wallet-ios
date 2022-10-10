@@ -65,7 +65,7 @@ private extension Home.Header.View {
 	var subtitleView: some SwiftUI.View {
 		HStack {
 			Text(L10n.Home.Header.subtitle)
-				.foregroundColor(.app.secondary)
+				.foregroundColor(.app.gray2)
 				.font(.app.body1Regular)
 		}
 	}

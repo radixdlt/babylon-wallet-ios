@@ -94,7 +94,7 @@ private extension AssetsView.View {
 					.padding([.leading, .trailing], 18)
 					.background(type == viewStore.type ?
 						RoundedRectangle(cornerRadius: 21)
-						.fill(Color.app.buttonBackgroundDark2) : nil
+						.fill(Color.app.gray1) : nil
 					)
 			}
 		)

@@ -45,8 +45,8 @@ extension Font {
 extension Font {
 	enum Size: CGFloat {
 		case 𝟙𝟜 = 14
-        case 𝟙𝟞 = 16
-        case 𝟙𝟠 = 18
+		case 𝟙𝟞 = 16
+		case 𝟙𝟠 = 18
 		case 𝟚𝟘 = 20
 		case 𝟛𝟚 = 32
 	}

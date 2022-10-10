@@ -113,7 +113,7 @@ private extension Home.View {
 				.font(.app.body2HighImportance)
 				.padding(.horizontal, 40)
 				.frame(height: 50)
-				.background(Color.app.buttonBackgroundLight)
+				.background(Color.app.gray4)
 				.cornerRadius(6)
 		}
 	}

@@ -8,9 +8,6 @@ public extension Color {
 }
 
 public extension Color.App {
-	// Old colors
-	// TODO: refactor
-
 	var backgroundDark: Color {
 		.black
 	}
@@ -19,60 +16,28 @@ public extension Color.App {
 		.white
 	}
 
-	var secondary: Color {
+	var notification: Color {
+		.init(hex: .red1)
+	}
+
+	var gray1: Color {
+		.init(hex: .gray1)
+	}
+
+	var gray2: Color {
 		.init(hex: .gray2)
 	}
 
-	var notification: Color {
-		.red
+	var gray3: Color {
+		.init(hex: .gray3)
 	}
 
-	var buttonBackgroundLight: Color {
-		.init(hex: .appGray3)
-	}
-
-	var cardBackgroundLight: Color {
-		.init(hex: .appGray6)
-	}
-
-	var backgroundLightGray: Color {
-		.init(hex: .appGray8)
-	}
-
-	var separatorLightGray: Color {
-		.init(hex: .gray5)
-	}
-
-	var buttonBackgroundDark: Color {
-		.init(hex: .appGray5)
-	}
-
-	var buttonBackgroundDark2: Color {
-		.init(hex: .appGray10)
-	}
-
-	var buttonTextLight: Color {
+	var gray4: Color {
 		.init(hex: .gray4)
 	}
 
-	var tokenPlaceholderGray: Color {
-		.init(hex: .appGray7)
-	}
-
-	var buttonTextDark: Color {
-		.init(hex: .appCharcoal1)
-	}
-
-	var textFieldGray: Color {
-		.init(hex: .appGray11)
-	}
-
-	var subtitleGray: Color {
-		.init(hex: .appGray12)
-	}
-
-	var buttonDisabledGray: Color {
-		.init(hex: .appGray13)
+	var gray5: Color {
+		.init(hex: .gray5)
 	}
 
 	var buttonTextWhite: Color {
@@ -90,45 +55,38 @@ public extension Color.App {
 	var shadowBlack: Color {
 		.black.opacity(0.08)
 	}
-
-	// New colors
 }
 
 // MARK: - Color.Hex
 private extension Color {
 	enum Hex: UInt32 {
-		// Old colors
-		// TODO: refactor
-		case appGray3 = 0xE2E2E2
-		case appGray5 = 0xBEBDBD
-		case appGray6 = 0xF4F4F4
-		case appGray7 = 0xDDDCDC
-		case appGray8 = 0xAFB1B7
-		case appGray10 = 0x535353
-		case appGray11 = 0xEFEFEF
-		case appGray12 = 0x3D3D3D
-		case appGray13 = 0xDDDDDD
-		case appCharcoal1 = 0x414141
-
-		// new colors
+		// blue
 		case blue1 = 0x060F8F
 		case blue2 = 0x052CC0
 		case blue3 = 0x20E4FF
 
+		// green
 		case green1 = 0x00AB84
 		case green2 = 0x00C389
 		case green3 = 0x21FFBE
 
+		// pink
 		case pink1 = 0xCE0D98
 		case pink2 = 0xFF43CA
 
+		// gray
 		case gray1 = 0x003057
 		case gray2 = 0x8A8FA4
 		case gray3 = 0xCED0D6
 		case gray4 = 0xE2E5ED
 		case gray5 = 0xF4F5F9
 
+		// white
 		case white = 0xFFFFFF
+
+		// alert
+		case orange1 = 0xF2AD21
+		case red1 = 0xC82020
 	}
 }
 

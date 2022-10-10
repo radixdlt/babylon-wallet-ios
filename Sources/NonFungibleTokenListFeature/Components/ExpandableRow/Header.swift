@@ -18,14 +18,14 @@ struct Header: View {
 					.foregroundColor(.app.buttonTextBlack)
 					.font(.app.body1Header)
 				Text(supply)
-					.foregroundColor(.app.secondary)
+					.foregroundColor(.app.gray2)
 					.font(.app.body2Regular)
 			}
 
 			Spacer()
 
 			Text(toggleDisplayText)
-				.foregroundColor(.app.secondary)
+				.foregroundColor(.app.gray2)
 				.font(.app.body2Regular)
 		}
 		.padding(25)

@@ -29,7 +29,7 @@ extension Component {
 
 			VStack(alignment: .leading, spacing: 8) {
 				Text(container.asset.address)
-					.foregroundColor(.app.secondary)
+					.foregroundColor(.app.gray2)
 					.font(.app.body2Regular)
 
 				ForEach(metadata, id: \.self) { element in

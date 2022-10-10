@@ -128,7 +128,7 @@ private struct AmountView: View {
 					.font(.app.sectionHeader)
 
 				Text("••••••")
-					.foregroundColor(.app.buttonTextLight)
+					.foregroundColor(.app.gray4)
 					.font(.app.sheetTitle)
 					.offset(y: -3)
 			}

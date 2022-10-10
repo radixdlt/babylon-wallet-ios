@@ -53,7 +53,7 @@ public extension AccountList.Row.View {
 				TokenListView(containers: viewStore.state.portfolio.fungibleTokenContainers)
 			}
 			.padding(25)
-			.background(Color.app.cardBackgroundLight)
+			.background(Color.app.gray5)
 			.cornerRadius(6)
 			.onTapGesture {
 				viewStore.send(.didSelect)

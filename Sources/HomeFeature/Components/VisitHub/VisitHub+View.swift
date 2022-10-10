@@ -23,7 +23,7 @@ public extension Home.VisitHub.View {
 					viewStore.send(.visitHubButtonTapped)
 				}
 			}
-			.background(Color.app.buttonBackgroundDark)
+			.background(Color.app.gray3)
 			.cornerRadius(6)
 		}
 	}
@@ -61,7 +61,7 @@ extension Home.VisitHub.View {
 private extension Home.VisitHub.View {
 	var title: some View {
 		Text(L10n.Home.VisitHub.title)
-			.foregroundColor(.app.buttonTextDark)
+			.foregroundColor(.app.gray1)
 			.font(.app.body1Regular)
 			.multilineTextAlignment(.center)
 			.padding()
@@ -76,7 +76,7 @@ private extension Home.VisitHub.View {
 					.font(.app.body1Regular)
 					.padding()
 					.frame(maxWidth: .infinity)
-					.background(Color.app.buttonBackgroundLight)
+					.background(Color.app.gray4)
 					.cornerRadius(6)
 			}
 		)

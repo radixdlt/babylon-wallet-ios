@@ -36,7 +36,7 @@ public extension AccountCompletion.View {
 					.font(.app.sectionHeader)
 
 				Text("You’ve created your account.")
-					.foregroundColor(.app.subtitleGray)
+					.foregroundColor(.app.gray1)
 					.font(.app.body1Regular)
 
 				Spacer()
@@ -57,11 +57,11 @@ public extension AccountCompletion.View {
 				}
 				.frame(maxWidth: .infinity)
 				.padding(30)
-				.background(Color.app.tokenPlaceholderGray)
+				.background(Color.app.gray3)
 				.cornerRadius(8)
 
 				Text("Your account lives on the Radar Network and you can access it anytime in Radar Wallet.")
-					.foregroundColor(.app.subtitleGray)
+					.foregroundColor(.app.gray1)
 					.font(.app.body2Regular)
 					.multilineTextAlignment(.center)
 					.padding(.horizontal, 24)
@@ -77,7 +77,7 @@ public extension AccountCompletion.View {
 							.font(.app.body1Header)
 							.frame(maxWidth: .infinity)
 							.frame(height: 44)
-							.background(Color.app.buttonBackgroundDark2)
+							.background(Color.app.gray1)
 							.cornerRadius(4)
 							.shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
 					}
