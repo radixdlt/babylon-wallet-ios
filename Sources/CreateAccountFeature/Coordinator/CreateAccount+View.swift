@@ -85,18 +85,10 @@ public extension CreateAccount.View {
 
 				Spacer(minLength: 10)
 
-				Button(
-					action: { /* TODO: implement */ },
-					label: {
-						Text(L10n.CreateAccount.continueButtonTitle)
-							.foregroundColor(.app.buttonTextWhite)
-							.font(.app.body1Header)
-							.frame(maxWidth: .infinity)
-							.frame(height: 44)
-							.background(viewStore.isValid ? Color.app.gray1 : Color.app.gray4)
-							.cornerRadius(4)
-							.shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-					}
+				PrimaryButton(
+					title: L10n.CreateAccount.continueButtonTitle,
+					isEnabled: viewStore.isValid,
+					action: { /* TODO: implement */ }
 				)
 				.disabled(!viewStore.isValid)
 			}

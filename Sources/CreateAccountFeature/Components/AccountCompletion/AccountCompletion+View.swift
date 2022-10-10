@@ -73,7 +73,7 @@ public extension AccountCompletion.View {
 					action: { /* TODO: implement */ },
 					label: {
 						Text("Go to \(viewStore.origin.displayText)")
-							.foregroundColor(.app.buttonTextWhite)
+							.foregroundColor(.app.white)
 							.font(.app.body1Header)
 							.frame(maxWidth: .infinity)
 							.frame(height: 44)

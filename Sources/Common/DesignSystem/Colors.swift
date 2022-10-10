@@ -8,16 +8,16 @@ public extension Color {
 }
 
 public extension Color.App {
-	var backgroundDark: Color {
-		.black
+	var blue1: Color {
+		.init(hex: .blue1)
 	}
 
-	var backgroundLight: Color {
-		.white
+	var blue2: Color {
+		.init(hex: .blue2)
 	}
 
-	var notification: Color {
-		.init(hex: .red1)
+	var blue3: Color {
+		.init(hex: .blue3)
 	}
 
 	var gray1: Color {
@@ -40,8 +40,20 @@ public extension Color.App {
 		.init(hex: .gray5)
 	}
 
-	var buttonTextWhite: Color {
+	var white: Color {
+		.init(hex: .white)
+	}
+
+	var backgroundDark: Color {
+		.black
+	}
+
+	var backgroundLight: Color {
 		.white
+	}
+
+	var notification: Color {
+		.init(hex: .red1)
 	}
 
 	var buttonTextBlack: Color {

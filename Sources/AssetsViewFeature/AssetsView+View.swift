@@ -88,7 +88,7 @@ private extension AssetsView.View {
 				action()
 			}, label: {
 				Text(type.displayText)
-					.foregroundColor(type == viewStore.type ? .app.buttonTextWhite : .app.buttonTextBlack)
+					.foregroundColor(type == viewStore.type ? .app.white : .app.buttonTextBlack)
 					.font(.app.body1Header)
 					.frame(height: 40)
 					.padding([.leading, .trailing], 18)
