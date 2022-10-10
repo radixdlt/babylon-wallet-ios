@@ -108,7 +108,7 @@ public extension CreateAccount.View {
 	}
 }
 
-// MARK: - Private Computer Properties
+// MARK: - Private Computed Properties
 private extension CreateAccount.View {
 	var titleText: String {
 		viewStore.numberOfExistingAccounts == 0 ? L10n.CreateAccount.createFirstAccount : L10n.CreateAccount.createNewAccount

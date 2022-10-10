@@ -41,7 +41,7 @@ final class CreateAccountFeatureTests: TestCase {
 		}
 	}
 
-	func test_textFieldDidChange_whenUserEntersInvalidAccountName_thenDoNothing() async {
+	func test_textFieldDidChange_whenUserEntersTooLongAccountName_thenDoNothing() async {
 		// given
 		var accountName = "My account dummy nam" // character count == 20
 		let initialState = CreateAccount.State(
@@ -64,6 +64,7 @@ final class CreateAccountFeatureTests: TestCase {
 
 	func test_viewDidAppear_whenViewAppears_thenFocusOnTextFieldAfterDelay() async {
 		// given
+		let mainQueue = DispatchQueue.test
 		let initialState = CreateAccount.State(
 			accountName: "",
 			isValid: false,
@@ -74,17 +75,15 @@ final class CreateAccountFeatureTests: TestCase {
 			reducer: CreateAccount()
 		)
 
+		store.dependencies.mainQueue = mainQueue.eraseToAnyScheduler()
+
 		// when
 		_ = await store.send(.internal(.system(.viewDidAppear)))
 
 		// then
-		do {
-			try await Task.sleep(nanoseconds: 500_000_000)
-			await store.receive(.internal(.system(.focusTextField))) {
-				$0.focusedField = .accountName
-			}
-		} catch {
-			XCTFail("Failed with reason: \(error.localizedDescription)")
+		await mainQueue.advance(by: .seconds(0.5))
+		await store.receive(.internal(.system(.focusTextField))) {
+			$0.focusedField = .accountName
 		}
 	}
 }

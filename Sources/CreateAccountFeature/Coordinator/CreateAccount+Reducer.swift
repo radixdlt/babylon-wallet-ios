@@ -2,11 +2,14 @@ import ComposableArchitecture
 
 // MARK: - CreateAccount
 public struct CreateAccount: ReducerProtocol {
-	public init() {}
-
 	@Dependency(\.accountNameValidator) var accountNameValidator
+	@Dependency(\.mainQueue) var mainQueue
 
-	public func reduce(into state: inout State, action: Action) -> ComposableArchitecture.Effect<Action, Never> {
+	public init() {}
+}
+
+public extension CreateAccount {
+	func reduce(into state: inout State, action: Action) -> ComposableArchitecture.Effect<Action, Never> {
 		switch action {
 		case .internal(.user(.closeButtonTapped)):
 			return .run { send in
@@ -25,7 +28,7 @@ public struct CreateAccount: ReducerProtocol {
 			return .none
 		case .internal(.system(.viewDidAppear)):
 			return .run { send in
-				try await Task.sleep(nanoseconds: 500_000_000)
+				try await self.mainQueue.sleep(for: .seconds(0.5))
 				await send(.internal(.system(.focusTextField)))
 			}
 		case .internal(.system(.focusTextField)):
