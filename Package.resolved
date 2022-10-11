@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "branch" : "protocol-beta",
-        "revision" : "eef9d67d0275ec2bbcf53d5a3384eb14a5194c82"
+        "revision" : "4228ff40e0df1cb849f6a158e018b1c13d6bd9c9",
+        "version" : "0.41.2"
       }
     },
     {
@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nicklockwood/SwiftFormat",
       "state" : {
-        "revision" : "4347527a2fb8ecec9e2c3eb23bbce7a5d1a5e459",
-        "version" : "0.50.0"
+        "revision" : "2937847c9e2434a9f8d71260b777fb15ddff287c",
+        "version" : "0.50.1"
       }
     },
     {
