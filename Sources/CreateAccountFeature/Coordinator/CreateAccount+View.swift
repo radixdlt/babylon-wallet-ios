@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 
 // MARK: - CreateAccount.View
@@ -35,7 +36,7 @@ public extension CreateAccount.View {
 
 					Text(titleText)
 						.foregroundColor(.app.buttonTextBlack)
-						.font(.app.title2Bold)
+						.textStyle(.sectionHeader)
 				}
 
 				Spacer()
@@ -46,8 +47,8 @@ public extension CreateAccount.View {
 						.fixedSize(horizontal: false, vertical: true)
 						.padding(.horizontal, 40)
 						.multilineTextAlignment(.center)
-						.foregroundColor(.app.subtitleGray)
-						.font(.app.textFieldRegular)
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1Regular)
 
 					VStack(alignment: .leading, spacing: 10) {
 						TextField(
@@ -68,9 +69,9 @@ public extension CreateAccount.View {
 						)
 						.padding()
 						.frame(height: 50)
-						.background(Color.app.textFieldGray)
+						.background(Color.app.gray5)
 						.foregroundColor(.app.buttonTextBlack)
-						.font(.app.textFieldRegular)
+						.textStyle(.body1Regular)
 						.cornerRadius(4)
 						.overlay(
 							RoundedRectangle(cornerRadius: 4)
@@ -78,25 +79,17 @@ public extension CreateAccount.View {
 						)
 
 						Text(L10n.CreateAccount.explanation)
-							.foregroundColor(.app.secondary)
-							.font(.app.body)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1Regular)
 					}
 				}
 
 				Spacer(minLength: 10)
 
-				Button(
-					action: { /* TODO: implement */ },
-					label: {
-						Text(L10n.CreateAccount.continueButtonTitle)
-							.foregroundColor(.app.buttonTextWhite)
-							.font(.app.buttonBody)
-							.frame(maxWidth: .infinity)
-							.frame(height: 44)
-							.background(viewStore.isValid ? Color.app.buttonBackgroundDark2 : Color.app.buttonDisabledGray)
-							.cornerRadius(4)
-							.shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-					}
+				PrimaryButton(
+					title: L10n.CreateAccount.continueButtonTitle,
+					isEnabled: viewStore.isValid,
+					action: { /* TODO: implement */ }
 				)
 				.disabled(!viewStore.isValid)
 			}
@@ -118,7 +111,9 @@ private extension CreateAccount.View {
 // MARK: - CreateAccount_Previews
 struct CreateAccount_Previews: PreviewProvider {
 	static var previews: some View {
-		CreateAccount.View(
+		registerFonts()
+
+		return CreateAccount.View(
 			store: .init(
 				initialState: .init(),
 				reducer: CreateAccount()

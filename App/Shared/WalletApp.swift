@@ -1,5 +1,6 @@
 import AppFeature
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 import UserDefaultsClient
 
@@ -34,6 +35,8 @@ struct WalletApp: SwiftUI.App {
 			reducer: App.reducer,
 			environment: .live
 		)
+
+		DesignSystem.registerFonts()
 	}
 
 	var body: some Scene {

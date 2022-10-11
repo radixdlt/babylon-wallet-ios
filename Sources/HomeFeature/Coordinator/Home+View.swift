@@ -110,10 +110,10 @@ private extension Home.View {
 		Button(action: action) {
 			Text(L10n.CreateAccount.createNewAccount)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.subhead)
+				.textStyle(.body2HighImportance)
 				.padding(.horizontal, 40)
 				.frame(height: 50)
-				.background(Color.app.buttonBackgroundLight)
+				.background(Color.app.gray4)
 				.cornerRadius(6)
 		}
 	}
@@ -166,7 +166,7 @@ private extension Home.View {
 	var title: some View {
 		Text(L10n.AggregatedValue.title)
 			.foregroundColor(.app.buttonTextBlack)
-			.font(.app.caption1)
+			.textStyle(.body2Header)
 			.textCase(.uppercase)
 	}
 }

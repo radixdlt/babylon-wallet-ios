@@ -65,8 +65,8 @@ private extension Home.Header.View {
 	var subtitleView: some SwiftUI.View {
 		HStack {
 			Text(L10n.Home.Header.subtitle)
-				.foregroundColor(.app.secondary)
-				.font(.app.body)
+				.foregroundColor(.app.gray2)
+				.textStyle(.body1Regular)
 		}
 	}
 }
@@ -80,7 +80,7 @@ private struct TitleView: View {
 		HStack {
 			Text(L10n.Home.Header.title)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.title)
+				.textStyle(.sheetTitle)
 			Spacer()
 			SettingsButton(
 				shouldShowNotification: shouldShowNotification,

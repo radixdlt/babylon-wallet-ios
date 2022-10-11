@@ -53,7 +53,7 @@ public extension AccountList.Row.View {
 				TokenListView(containers: viewStore.state.portfolio.fungibleTokenContainers)
 			}
 			.padding(25)
-			.background(Color.app.cardBackgroundLight)
+			.background(Color.app.gray5)
 			.cornerRadius(6)
 			.onTapGesture {
 				viewStore.send(.didSelect)
@@ -126,12 +126,12 @@ private struct HeaderView: View {
 		HStack {
 			Text(name)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.buttonTitle)
+				.textStyle(.secondaryHeader)
 				.fixedSize()
 			Spacer()
 			Text(value)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.buttonTitle)
+				.textStyle(.secondaryHeader)
 				.fixedSize()
 		}
 	}
@@ -149,7 +149,7 @@ private struct TokenView: View {
 			Text(code)
 				.textCase(.uppercase)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.footnote)
+				.textStyle(.body2HighImportance)
 		}
 		.frame(width: 30, height: 30)
 	}

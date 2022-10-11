@@ -1,4 +1,5 @@
 import Address
+import DesignSystem
 import SwiftUI
 
 // MARK: - AddressView
@@ -22,15 +23,15 @@ public extension AddressView {
 				.lineLimit(1)
 				.truncationMode(.middle)
 				.foregroundColor(.app.buttonTextBlackTransparent)
-				.font(.app.caption2)
+				.textStyle(.body2Regular)
 
 			Button(
 				action: copyAddressAction,
 				label: {
 					Text(L10n.AccountList.Row.copyTitle)
 						.foregroundColor(.app.buttonTextBlack)
-						.font(.app.caption2)
 						.underline()
+						.textStyle(.body2Regular)
 						.padding(12)
 						.fixedSize()
 				}

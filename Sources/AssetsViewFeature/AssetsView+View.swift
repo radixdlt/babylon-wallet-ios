@@ -88,13 +88,13 @@ private extension AssetsView.View {
 				action()
 			}, label: {
 				Text(type.displayText)
-					.foregroundColor(type == viewStore.type ? .app.buttonTextWhite : .app.buttonTextBlack)
-					.font(.app.buttonBody)
+					.foregroundColor(type == viewStore.type ? .app.white : .app.buttonTextBlack)
+					.textStyle(.body1Header)
 					.frame(height: 40)
 					.padding([.leading, .trailing], 18)
 					.background(type == viewStore.type ?
 						RoundedRectangle(cornerRadius: 21)
-						.fill(Color.app.buttonBackgroundDark2) : nil
+						.fill(Color.app.gray1) : nil
 					)
 			}
 		)
