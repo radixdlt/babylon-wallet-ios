@@ -211,7 +211,7 @@ let package = Package(
 			dependencies: [
 				"Address",
 				"DesignSystem",
-            ]
+			]
 		),
 		.testTarget(
 			name: "CommonTests",
