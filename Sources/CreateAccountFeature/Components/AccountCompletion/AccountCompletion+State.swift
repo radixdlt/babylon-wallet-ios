@@ -1,5 +1,6 @@
 import Address
 import Foundation
+import Common
 
 // MARK: - AccountCompletion.State
 public extension AccountCompletion {
@@ -28,8 +29,18 @@ public extension AccountCompletion.State {
 		var displayText: String {
 			switch self {
 			case .home:
-				return "Home"
+                return L10n.CreateAccount.Completion.Origin.home
 			}
 		}
 	}
 }
+
+#if DEBUG
+public extension AccountCompletion.State {
+	static let placeholder: Self = .init(
+		accountName: "My main account",
+		accountAddress: .random,
+		origin: .home
+	)
+}
+#endif

@@ -8,7 +8,7 @@ public struct PrimaryButton: View {
 
 	public init(
 		title: String,
-		isEnabled: Bool,
+		isEnabled: Bool = true,
 		action: @escaping () -> Void
 	) {
 		self.title = title

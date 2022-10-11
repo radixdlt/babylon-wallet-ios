@@ -9,6 +9,11 @@
 "assetsView.poolShare" = "Pool Share";
 "assetsView.tokens" = "Tokens";
 
+"createAccount.completion.explanation" = "Your account lives on the Radix Network and you can access it anytime in Radix Wallet.";
+"createAccount.completion.origin.home" = "Home";
+"createAccount.completion.returnToOrigin" = "Go to %@";
+"createAccount.completion.subtitle" = "You’ve created your account.";
+"createAccount.completion.title" = "Congratulations";
 "createAccount.continueButtonTitle" = "Continue";
 "createAccount.createFirstAccount" = "Create First Account";
 "createAccount.createNewAccount" = "Create New Account";
@@ -16,11 +21,11 @@
 "createAccount.placeholder" = "e.g. My First Account";
 "createAccount.subtitle" = "What would you like to call your account?";
 
-"home.header.subtitle" = "Welcome, here are all your accounts on the Radar Network";
-"home.header.title" = "Radar Wallet";
+"home.header.subtitle" = "Welcome, here are all your accounts on the Radix Network";
+"home.header.title" = "Radix Wallet";
 
-"home.visitHub.buttonTitle" = "Visit the Radar Hub";
-"home.visitHub.title" = "Ready to get started using the Radar Network and your Wallet?";
+"home.visitHub.buttonTitle" = "Visit the Radix Hub";
+"home.visitHub.title" = "Ready to get started using the Radix Network and your Wallet?";
 
 "nftList.header.hide" = "- Hide";
 "nftList.header.show" = "+ Show";

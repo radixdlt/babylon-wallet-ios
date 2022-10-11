@@ -31,11 +31,11 @@ public extension AccountCompletion.View {
 
 				Image("createAccount-safe")
 
-				Text("Congratulations")
+				Text(L10n.CreateAccount.Completion.title)
 					.foregroundColor(.app.buttonTextBlack)
 					.font(.app.sectionHeader)
 
-				Text("You’ve created your account.")
+				Text(L10n.CreateAccount.Completion.subtitle)
 					.foregroundColor(.app.gray1)
 					.font(.app.body1Regular)
 
@@ -60,27 +60,17 @@ public extension AccountCompletion.View {
 				.background(Color.app.gray3)
 				.cornerRadius(8)
 
-				Text("Your account lives on the Radar Network and you can access it anytime in Radar Wallet.")
+				Text(L10n.CreateAccount.Completion.explanation)
 					.foregroundColor(.app.gray1)
-					.font(.app.body2Regular)
+					.font(.app.body1Regular)
 					.multilineTextAlignment(.center)
 					.padding(.horizontal, 24)
 
 				Spacer()
 
-				// TODO: make button reusable - Primary button probably
-				Button(
-					action: { /* TODO: implement */ },
-					label: {
-						Text("Go to \(viewStore.origin.displayText)")
-							.foregroundColor(.app.white)
-							.font(.app.body1Header)
-							.frame(maxWidth: .infinity)
-							.frame(height: 44)
-							.background(Color.app.gray1)
-							.cornerRadius(4)
-							.shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-					}
+				PrimaryButton(
+					title: L10n.CreateAccount.Completion.returnToOrigin(viewStore.origin.displayText),
+					action: { /* TODO: implement */ }
 				)
 			}
 			.padding(24)
@@ -119,11 +109,7 @@ struct AccountCompletion_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountCompletion.View(
 			store: .init(
-				initialState: .init(
-					accountName: "My main account",
-					accountAddress: .random,
-					origin: .home
-				),
+				initialState: .placeholder,
 				reducer: AccountCompletion()
 			)
 		)
