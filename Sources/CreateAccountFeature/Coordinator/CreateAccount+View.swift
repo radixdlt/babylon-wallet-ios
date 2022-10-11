@@ -32,7 +32,7 @@ public extension CreateAccount.View {
 				}
 
 				VStack(spacing: 15) {
-					Image("createAccount-safe", bundle: .module)
+                    Image("createAccount-safe", bundle: Bundle.module)
 
 					Text(titleText)
 						.foregroundColor(.app.buttonTextBlack)

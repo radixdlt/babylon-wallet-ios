@@ -30,7 +30,7 @@ public extension AccountCompletion.View {
 			VStack(spacing: 20) {
 				Spacer()
 
-				Image("createAccount-safe", bundle: .module)
+				Image("createAccount-safe", bundle: Bundle.module)
 
 				Text(L10n.CreateAccount.Completion.title)
 					.foregroundColor(.app.buttonTextBlack)

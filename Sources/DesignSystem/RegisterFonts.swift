@@ -3,10 +3,10 @@ import SwiftUI
 @discardableResult
 public func registerFonts() -> Bool {
 	[
-		Font.registerFont(bundle: .module, fontName: Font.IBMPlexSans.regular.rawValue, fontExtension: "ttf"),
-		Font.registerFont(bundle: .module, fontName: Font.IBMPlexSans.medium.rawValue, fontExtension: "ttf"),
-		Font.registerFont(bundle: .module, fontName: Font.IBMPlexSans.semiBold.rawValue, fontExtension: "ttf"),
-		Font.registerFont(bundle: .module, fontName: Font.IBMPlexSans.bold.rawValue, fontExtension: "ttf"),
+		Font.registerFont(bundle: Bundle.module, fontName: Font.IBMPlexSans.regular.rawValue, fontExtension: "ttf"),
+		Font.registerFont(bundle: Bundle.module, fontName: Font.IBMPlexSans.medium.rawValue, fontExtension: "ttf"),
+		Font.registerFont(bundle: Bundle.module, fontName: Font.IBMPlexSans.semiBold.rawValue, fontExtension: "ttf"),
+		Font.registerFont(bundle: Bundle.module, fontName: Font.IBMPlexSans.bold.rawValue, fontExtension: "ttf"),
 	]
 	.allSatisfy { $0 }
 }
