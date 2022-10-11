@@ -1,18 +1,17 @@
 import SwiftUI
-import UIKit
 
 @discardableResult
 public func registerFonts() -> Bool {
 	[
-		UIFont.registerFont(bundle: .module, fontName: Font.IBMPlexSans.regular.rawValue, fontExtension: "ttf"),
-		UIFont.registerFont(bundle: .module, fontName: Font.IBMPlexSans.medium.rawValue, fontExtension: "ttf"),
-		UIFont.registerFont(bundle: .module, fontName: Font.IBMPlexSans.semiBold.rawValue, fontExtension: "ttf"),
-		UIFont.registerFont(bundle: .module, fontName: Font.IBMPlexSans.bold.rawValue, fontExtension: "ttf"),
+		Font.registerFont(bundle: .module, fontName: Font.IBMPlexSans.regular.rawValue, fontExtension: "ttf"),
+		Font.registerFont(bundle: .module, fontName: Font.IBMPlexSans.medium.rawValue, fontExtension: "ttf"),
+		Font.registerFont(bundle: .module, fontName: Font.IBMPlexSans.semiBold.rawValue, fontExtension: "ttf"),
+		Font.registerFont(bundle: .module, fontName: Font.IBMPlexSans.bold.rawValue, fontExtension: "ttf"),
 	]
 	.allSatisfy { $0 }
 }
 
-extension UIFont {
+extension Font {
 	static func registerFont(bundle: Bundle, fontName: String, fontExtension: String) -> Bool {
 		guard let fontURL = bundle.url(forResource: fontName, withExtension: fontExtension) else {
 			print("Couldn't find font \(fontName)")
