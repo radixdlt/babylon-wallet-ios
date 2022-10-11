@@ -114,7 +114,7 @@ public enum L10n {
 
 extension L10n {
 	private static func tr(_ table: String, _ key: String, _ args: CVarArg..., fallback value: String) -> String {
-		let format = BundleToken.bundle.localizedString(forKey: key, value: value, table: table)
+		let format = BundleToken.appBundle.localizedString(forKey: key, value: value, table: table)
 		return String(format: format, locale: Locale.current, arguments: args)
 	}
 }
@@ -122,7 +122,7 @@ extension L10n {
 // MARK: - BundleToken
 // swiftlint:disable convenience_type
 private final class BundleToken {
-	static let bundle: Bundle = {
+	static let appBundle: Bundle = {
 		#if SWIFT_PACKAGE
 		return Bundle(for: BundleToken.self)
 		#else
