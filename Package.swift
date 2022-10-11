@@ -30,12 +30,9 @@ let package = Package(
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
-		.package(
-			url: "https://github.com/pointfreeco/swift-composable-architecture",
-			branch: "protocol-beta"
-		),
+		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.41.2"),
 		// Format code
-		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.0"),
+		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.1"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
