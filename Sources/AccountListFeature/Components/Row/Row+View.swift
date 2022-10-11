@@ -126,12 +126,12 @@ private struct HeaderView: View {
 		HStack {
 			Text(name)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.secondaryHeader)
+				.textStyle(.secondaryHeader)
 				.fixedSize()
 			Spacer()
 			Text(value)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.secondaryHeader)
+				.textStyle(.secondaryHeader)
 				.fixedSize()
 		}
 	}
@@ -149,7 +149,7 @@ private struct TokenView: View {
 			Text(code)
 				.textCase(.uppercase)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.body2HighImportance)
+				.textStyle(.body2HighImportance)
 		}
 		.frame(width: 30, height: 30)
 	}

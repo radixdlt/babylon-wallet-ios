@@ -120,16 +120,16 @@ private struct AmountView: View {
 		if isValueVisible {
 			Text(formattedAmount)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.sectionHeader)
+				.textStyle(.sectionHeader)
 		} else {
 			HStack {
 				Text("\(fiatCurrency.sign)")
 					.foregroundColor(.app.buttonTextBlack)
-					.font(.app.sectionHeader)
+					.textStyle(.sectionHeader)
 
 				Text("••••••")
 					.foregroundColor(.app.gray4)
-					.font(.app.sheetTitle)
+					.textStyle(.sheetTitle)
 					.offset(y: -3)
 			}
 		}

@@ -33,24 +33,24 @@ public extension AccountCompletion.View {
 
 				Text(L10n.CreateAccount.Completion.title)
 					.foregroundColor(.app.buttonTextBlack)
-					.font(.app.sectionHeader)
+					.textStyle(.sectionHeader)
 
 				Text(L10n.CreateAccount.Completion.subtitle)
 					.foregroundColor(.app.gray1)
-					.font(.app.body1Regular)
+					.textStyle(.body1Regular)
 
 				Spacer()
 
 				VStack(spacing: 15) {
 					Text(viewStore.accountName)
 						.foregroundColor(.app.buttonTextBlack)
-						.font(.app.secondaryHeader)
+						.textStyle(.secondaryHeader)
 						.multilineTextAlignment(.center)
 
 					HStack {
 						Text(viewStore.accountAddress)
 							.foregroundColor(.app.buttonTextBlack.opacity(0.6))
-							.font(.app.body2Regular)
+							.textStyle(.body2Regular)
 
 						Image("copy")
 					}
@@ -62,7 +62,12 @@ public extension AccountCompletion.View {
 
 				Text(L10n.CreateAccount.Completion.explanation)
 					.foregroundColor(.app.gray1)
-					.font(.app.body1Regular)
+					.textStyle(.body1Regular)
+					.lineSpacing(23 / 3)
+					.textStyle(.sheetTitle)
+					//                    .textStyle(.primaryTitle)
+					//                    .textStyle(.primaryTitle)
+					//                    .typography(.title)
 					.multilineTextAlignment(.center)
 					.padding(.horizontal, 24)
 

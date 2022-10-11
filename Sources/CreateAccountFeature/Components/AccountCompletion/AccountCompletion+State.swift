@@ -1,6 +1,6 @@
 import Address
-import Foundation
 import Common
+import Foundation
 
 // MARK: - AccountCompletion.State
 public extension AccountCompletion {
@@ -29,7 +29,7 @@ public extension AccountCompletion.State {
 		var displayText: String {
 			switch self {
 			case .home:
-                return L10n.CreateAccount.Completion.Origin.home
+				return L10n.CreateAccount.Completion.Origin.home
 			}
 		}
 	}

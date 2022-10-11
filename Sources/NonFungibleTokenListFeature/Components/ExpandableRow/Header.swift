@@ -16,17 +16,17 @@ struct Header: View {
 			VStack(alignment: .leading) {
 				Text(name)
 					.foregroundColor(.app.buttonTextBlack)
-					.font(.app.body1Header)
+					.textStyle(.body1Header)
 				Text(supply)
 					.foregroundColor(.app.gray2)
-					.font(.app.body2Regular)
+					.textStyle(.body2Regular)
 			}
 
 			Spacer()
 
 			Text(toggleDisplayText)
 				.foregroundColor(.app.gray2)
-				.font(.app.body2Regular)
+				.textStyle(.body2Regular)
 		}
 		.padding(25)
 		.background(

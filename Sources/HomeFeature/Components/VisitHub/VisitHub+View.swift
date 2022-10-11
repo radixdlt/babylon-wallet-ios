@@ -62,7 +62,7 @@ private extension Home.VisitHub.View {
 	var title: some View {
 		Text(L10n.Home.VisitHub.title)
 			.foregroundColor(.app.gray1)
-			.font(.app.body1Regular)
+			.textStyle(.body1Regular)
 			.multilineTextAlignment(.center)
 			.padding()
 	}
@@ -73,7 +73,7 @@ private extension Home.VisitHub.View {
 			label: {
 				Text(L10n.Home.VisitHub.buttonTitle)
 					.foregroundColor(.app.buttonTextBlack)
-					.font(.app.body1Regular)
+					.textStyle(.body1Regular)
 					.padding()
 					.frame(maxWidth: .infinity)
 					.background(Color.app.gray4)

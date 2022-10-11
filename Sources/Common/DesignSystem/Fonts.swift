@@ -1,6 +1,6 @@
 import SwiftUI
 
-public extension Font {
+extension Font {
 	/// Namespace only
 	struct App { fileprivate init() {} }
 	static let app = App()
@@ -52,7 +52,7 @@ extension Font {
 	}
 }
 
-public extension Font.App {
+extension Font.App {
 	var sheetTitle: Font {
 		.custom(.𝟛𝟚, .bold)
 	}
