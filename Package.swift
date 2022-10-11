@@ -210,7 +210,8 @@ let package = Package(
 			name: "Common",
 			dependencies: [
 				"Address",
-			]
+				"DesignSystem",
+            ]
 		),
 		.testTarget(
 			name: "CommonTests",
@@ -223,6 +224,7 @@ let package = Package(
 			name: "CreateAccountFeature",
 			dependencies: [
 				"Address",
+				"DesignSystem",
 				"Common",
 				tca,
 			]
@@ -232,6 +234,14 @@ let package = Package(
 			dependencies: [
 				"CreateAccountFeature",
 				"TestUtils",
+			]
+		),
+		.target(
+			name: "DesignSystem",
+			dependencies: [
+			],
+			resources: [
+				.process("Fonts"),
 			]
 		),
 		.target(

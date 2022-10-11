@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 
 // MARK: - CreateAccount.View
@@ -31,7 +32,7 @@ public extension CreateAccount.View {
 				}
 
 				VStack(spacing: 15) {
-					Image("createAccount-safe")
+                    Image("createAccount-safe", bundle: .module)
 
 					Text(titleText)
 						.foregroundColor(.app.buttonTextBlack)
@@ -110,7 +111,9 @@ private extension CreateAccount.View {
 // MARK: - CreateAccount_Previews
 struct CreateAccount_Previews: PreviewProvider {
 	static var previews: some View {
-		CreateAccount.View(
+		registerFonts()
+
+		return CreateAccount.View(
 			store: .init(
 				initialState: .init(),
 				reducer: CreateAccount()

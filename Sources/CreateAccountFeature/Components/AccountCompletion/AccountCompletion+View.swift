@@ -1,6 +1,7 @@
 import Address
 import Common
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 
 // MARK: - AccountCompletion.View
@@ -29,7 +30,7 @@ public extension AccountCompletion.View {
 			VStack(spacing: 20) {
 				Spacer()
 
-				Image("createAccount-safe")
+                Image("createAccount-safe", bundle: .module)
 
 				Text(L10n.CreateAccount.Completion.title)
 					.foregroundColor(.app.buttonTextBlack)
@@ -52,7 +53,7 @@ public extension AccountCompletion.View {
 							.foregroundColor(.app.buttonTextBlack.opacity(0.6))
 							.textStyle(.body2Regular)
 
-						Image("copy")
+                        Image("copy")
 					}
 				}
 				.frame(maxWidth: .infinity)
@@ -65,9 +66,6 @@ public extension AccountCompletion.View {
 					.textStyle(.body1Regular)
 					.lineSpacing(23 / 3)
 					.textStyle(.sheetTitle)
-					//                    .textStyle(.primaryTitle)
-					//                    .textStyle(.primaryTitle)
-					//                    .typography(.title)
 					.multilineTextAlignment(.center)
 					.padding(.horizontal, 24)
 
@@ -112,7 +110,9 @@ extension AccountCompletion.View {
 // MARK: - AccountCompletion_Preview
 struct AccountCompletion_Preview: PreviewProvider {
 	static var previews: some View {
-		AccountCompletion.View(
+		registerFonts()
+
+		return AccountCompletion.View(
 			store: .init(
 				initialState: .placeholder,
 				reducer: AccountCompletion()
