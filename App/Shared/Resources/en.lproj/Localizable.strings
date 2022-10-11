@@ -1,20 +1,26 @@
-"createAccount.createNewAccount" = "Create New Account";
-
-"home.header.title" = "Radar Wallet";
-"home.header.subtitle" = "Welcome, here are all your accounts on the Radar Network";
-"home.visitHub.title" = "Ready to get started using the Radar Network and your Wallet?";
-"home.visitHub.buttonTitle" = "Visit the Radar Hub";
-
-"aggregatedValue.title" = "Total value";
+"accountDetails.transferButtonTitle" = "Transfer";
 
 "accountList.row.copyTitle" = "Copy";
 
-"accountDetails.transferButtonTitle" = "Transfer";
+"aggregatedValue.title" = "Total value";
 
-"assetsView.tokens" = "Tokens";
+"assetsView.badges" = "Badges";
 "assetsView.nfts" = "NFTs";
 "assetsView.poolShare" = "Pool Share";
-"assetsView.badges" = "Badges";
+"assetsView.tokens" = "Tokens";
+
+"createAccount.continueButtonTitle" = "Continue";
+"createAccount.createFirstAccount" = "Create First Account";
+"createAccount.createNewAccount" = "Create New Account";
+"createAccount.explanation" = "This can be changed any time";
+"createAccount.placeholder" = "e.g. My First Account";
+"createAccount.subtitle" = "What would you like to call your account?";
+
+"home.header.subtitle" = "Welcome, here are all your accounts on the Radar Network";
+"home.header.title" = "Radar Wallet";
+
+"home.visitHub.buttonTitle" = "Visit the Radar Hub";
+"home.visitHub.title" = "Ready to get started using the Radar Network and your Wallet?";
 
 "nftList.header.hide" = "- Hide";
 "nftList.header.show" = "+ Show";

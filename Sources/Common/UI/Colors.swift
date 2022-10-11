@@ -17,7 +17,7 @@ public extension Color.App {
 	}
 
 	var secondary: Color {
-		.init(hex: .appGrey2)
+		.init(hex: .appGray2)
 	}
 
 	var notification: Color {
@@ -25,39 +25,51 @@ public extension Color.App {
 	}
 
 	var buttonBackgroundLight: Color {
-		.init(hex: .appGrey3)
+		.init(hex: .appGray3)
 	}
 
 	var cardBackgroundLight: Color {
-		.init(hex: .appGrey6)
+		.init(hex: .appGray6)
 	}
 
 	var backgroundLightGray: Color {
-		.init(hex: .appGrey8)
+		.init(hex: .appGray8)
 	}
 
 	var separatorLightGray: Color {
-		.init(hex: .appGrey9)
+		.init(hex: .appGray9)
 	}
 
 	var buttonBackgroundDark: Color {
-		.init(hex: .appGrey5)
+		.init(hex: .appGray5)
 	}
 
 	var buttonBackgroundDark2: Color {
-		.init(hex: .appGrey10)
+		.init(hex: .appGray10)
 	}
 
 	var buttonTextLight: Color {
-		.init(hex: .appGrey4)
+		.init(hex: .appGray4)
 	}
 
 	var tokenPlaceholderGray: Color {
-		.init(hex: .appGrey7)
+		.init(hex: .appGray7)
 	}
 
 	var buttonTextDark: Color {
 		.init(hex: .appCharcoal1)
+	}
+
+	var textFieldGray: Color {
+		.init(hex: .appGray11)
+	}
+
+	var subtitleGray: Color {
+		.init(hex: .appGray12)
+	}
+
+	var buttonDisabledGray: Color {
+		.init(hex: .appGray13)
 	}
 
 	var buttonTextWhite: Color {
@@ -80,15 +92,18 @@ public extension Color.App {
 // MARK: - Color.Hex
 private extension Color {
 	enum Hex: UInt32 {
-		case appGrey2 = 0x8A8FA4
-		case appGrey3 = 0xE2E2E2
-		case appGrey4 = 0xE2E5ED
-		case appGrey5 = 0xBEBDBD
-		case appGrey6 = 0xF4F4F4
-		case appGrey7 = 0xDDDCDC
-		case appGrey8 = 0xAFB1B7
-		case appGrey9 = 0xF4F5F9
-		case appGrey10 = 0x535353
+		case appGray2 = 0x8A8FA4
+		case appGray3 = 0xE2E2E2
+		case appGray4 = 0xE2E5ED
+		case appGray5 = 0xBEBDBD
+		case appGray6 = 0xF4F4F4
+		case appGray7 = 0xDDDCDC
+		case appGray8 = 0xAFB1B7
+		case appGray9 = 0xF4F5F9
+		case appGray10 = 0x535353
+		case appGray11 = 0xEFEFEF
+		case appGray12 = 0x3D3D3D
+		case appGray13 = 0xDDDDDD
 		case appCharcoal1 = 0x414141
 	}
 }

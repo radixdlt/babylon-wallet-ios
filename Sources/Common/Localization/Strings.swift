@@ -38,8 +38,18 @@ public enum L10n {
 	}
 
 	public enum CreateAccount {
+		/// Continue
+		public static let continueButtonTitle = L10n.tr("Localizable", "createAccount.continueButtonTitle", fallback: #"Continue"#)
+		/// Create First Account
+		public static let createFirstAccount = L10n.tr("Localizable", "createAccount.createFirstAccount", fallback: #"Create First Account"#)
 		/// Create New Account
 		public static let createNewAccount = L10n.tr("Localizable", "createAccount.createNewAccount", fallback: #"Create New Account"#)
+		/// This can be changed any time
+		public static let explanation = L10n.tr("Localizable", "createAccount.explanation", fallback: #"This can be changed any time"#)
+		/// e.g. My First Account
+		public static let placeholder = L10n.tr("Localizable", "createAccount.placeholder", fallback: #"e.g. My First Account"#)
+		/// What would you like to call your account?
+		public static let subtitle = L10n.tr("Localizable", "createAccount.subtitle", fallback: #"What would you like to call your account?"#)
 	}
 
 	public enum Home {
