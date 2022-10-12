@@ -10,9 +10,10 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionLookupOrigin
 public enum TransactionLookupOrigin: String, Sendable, Codable, CaseIterable {
-    case intent = "intent"
-    case signedIntent = "signed_intent"
-    case notarized = "notarized"
-    case payload = "payload"
+	case intent
+	case signedIntent = "signed_intent"
+	case notarized
+	case payload
 }

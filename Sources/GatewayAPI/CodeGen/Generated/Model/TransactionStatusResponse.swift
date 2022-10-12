@@ -10,27 +10,26 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionStatusResponse
 public struct TransactionStatusResponse: Sendable, Codable, Hashable {
+	public let ledgerState: LedgerState
+	public let transaction: TransactionInfo
 
-    public let ledgerState: LedgerState
-    public let transaction: TransactionInfo
+	public init(ledgerState: LedgerState, transaction: TransactionInfo) {
+		self.ledgerState = ledgerState
+		self.transaction = transaction
+	}
 
-    public init(ledgerState: LedgerState, transaction: TransactionInfo) {
-        self.ledgerState = ledgerState
-        self.transaction = transaction
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case ledgerState = "ledger_state"
+		case transaction
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case ledgerState = "ledger_state"
-        case transaction
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(ledgerState, forKey: .ledgerState)
-        try container.encode(transaction, forKey: .transaction)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(ledgerState, forKey: .ledgerState)
+		try container.encode(transaction, forKey: .transaction)
+	}
 }
-

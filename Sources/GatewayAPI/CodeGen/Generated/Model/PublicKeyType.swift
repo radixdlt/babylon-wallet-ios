@@ -10,7 +10,8 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - PublicKeyType
 public enum PublicKeyType: String, Sendable, Codable, CaseIterable {
-    case ecdsaSecp256k1 = "EcdsaSecp256k1"
-    case eddsaEd25519 = "EddsaEd25519"
+	case ecdsaSecp256k1 = "EcdsaSecp256k1"
+	case eddsaEd25519 = "EddsaEd25519"
 }

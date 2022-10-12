@@ -10,29 +10,28 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - GatewayApiVersions
 public struct GatewayApiVersions: Sendable, Codable, Hashable {
+	/** The release that is currently deployed to the Gateway API. */
+	public let version: String
+	/** The open api schema version that was used to generate the API models. */
+	public let openApiSchemaVersion: String
 
-    /** The release that is currently deployed to the Gateway API. */
-    public let version: String
-    /** The open api schema version that was used to generate the API models. */
-    public let openApiSchemaVersion: String
+	public init(version: String, openApiSchemaVersion: String) {
+		self.version = version
+		self.openApiSchemaVersion = openApiSchemaVersion
+	}
 
-    public init(version: String, openApiSchemaVersion: String) {
-        self.version = version
-        self.openApiSchemaVersion = openApiSchemaVersion
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case version
+		case openApiSchemaVersion = "open_api_schema_version"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case version
-        case openApiSchemaVersion = "open_api_schema_version"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(version, forKey: .version)
-        try container.encode(openApiSchemaVersion, forKey: .openApiSchemaVersion)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(version, forKey: .version)
+		try container.encode(openApiSchemaVersion, forKey: .openApiSchemaVersion)
+	}
 }
-

@@ -10,39 +10,38 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionInfo
 public struct TransactionInfo: Sendable, Codable, Hashable {
+	public let transactionStatus: TransactionStatus
+	public let payloadHashHex: String
+	public let intentHashHex: String
+	public let transactionAccumulatorHex: String
+	public let feePaid: TokenAmount
 
-    public let transactionStatus: TransactionStatus
-    public let payloadHashHex: String
-    public let intentHashHex: String
-    public let transactionAccumulatorHex: String
-    public let feePaid: TokenAmount
+	public init(transactionStatus: TransactionStatus, payloadHashHex: String, intentHashHex: String, transactionAccumulatorHex: String, feePaid: TokenAmount) {
+		self.transactionStatus = transactionStatus
+		self.payloadHashHex = payloadHashHex
+		self.intentHashHex = intentHashHex
+		self.transactionAccumulatorHex = transactionAccumulatorHex
+		self.feePaid = feePaid
+	}
 
-    public init(transactionStatus: TransactionStatus, payloadHashHex: String, intentHashHex: String, transactionAccumulatorHex: String, feePaid: TokenAmount) {
-        self.transactionStatus = transactionStatus
-        self.payloadHashHex = payloadHashHex
-        self.intentHashHex = intentHashHex
-        self.transactionAccumulatorHex = transactionAccumulatorHex
-        self.feePaid = feePaid
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case transactionStatus = "transaction_status"
+		case payloadHashHex = "payload_hash_hex"
+		case intentHashHex = "intent_hash_hex"
+		case transactionAccumulatorHex = "transaction_accumulator_hex"
+		case feePaid = "fee_paid"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case transactionStatus = "transaction_status"
-        case payloadHashHex = "payload_hash_hex"
-        case intentHashHex = "intent_hash_hex"
-        case transactionAccumulatorHex = "transaction_accumulator_hex"
-        case feePaid = "fee_paid"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(transactionStatus, forKey: .transactionStatus)
-        try container.encode(payloadHashHex, forKey: .payloadHashHex)
-        try container.encode(intentHashHex, forKey: .intentHashHex)
-        try container.encode(transactionAccumulatorHex, forKey: .transactionAccumulatorHex)
-        try container.encode(feePaid, forKey: .feePaid)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(transactionStatus, forKey: .transactionStatus)
+		try container.encode(payloadHashHex, forKey: .payloadHashHex)
+		try container.encode(intentHashHex, forKey: .intentHashHex)
+		try container.encode(transactionAccumulatorHex, forKey: .transactionAccumulatorHex)
+		try container.encode(feePaid, forKey: .feePaid)
+	}
 }
-

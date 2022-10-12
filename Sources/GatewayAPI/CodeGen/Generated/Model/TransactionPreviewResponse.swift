@@ -5,12 +5,12 @@
 //// https://openapi-generator.tech
 ////
 //
-//import Foundation
-//#if canImport(AnyCodable)
-//import AnyCodable
-//#endif
+// import Foundation
+// #if canImport(AnyCodable)
+// import AnyCodable
+// #endif
 //
-//public struct TransactionPreviewResponse: Sendable, Codable, Hashable {
+// public struct TransactionPreviewResponse: Sendable, Codable, Hashable {
 //
 //    public let coreApiResponse: AnyCodable
 //
@@ -28,5 +28,5 @@
 //        var container = encoder.container(keyedBy: CodingKeys.self)
 //        try container.encode(coreApiResponse, forKey: .coreApiResponse)
 //    }
-//}
+// }
 //

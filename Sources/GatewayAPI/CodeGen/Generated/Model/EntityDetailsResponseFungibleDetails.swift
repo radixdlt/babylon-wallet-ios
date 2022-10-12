@@ -10,39 +10,38 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - EntityDetailsResponseFungibleDetails
 public struct EntityDetailsResponseFungibleDetails: Sendable, Codable, Hashable {
+	public let resourceType: String
+	public let isFungible: Bool
+	public let totalSupplyAttos: String
+	public let totalMintedAttos: String
+	public let totalBurntAttos: String
 
-    public let resourceType: String
-    public let isFungible: Bool
-    public let totalSupplyAttos: String
-    public let totalMintedAttos: String
-    public let totalBurntAttos: String
+	public init(resourceType: String, isFungible: Bool, totalSupplyAttos: String, totalMintedAttos: String, totalBurntAttos: String) {
+		self.resourceType = resourceType
+		self.isFungible = isFungible
+		self.totalSupplyAttos = totalSupplyAttos
+		self.totalMintedAttos = totalMintedAttos
+		self.totalBurntAttos = totalBurntAttos
+	}
 
-    public init(resourceType: String, isFungible: Bool, totalSupplyAttos: String, totalMintedAttos: String, totalBurntAttos: String) {
-        self.resourceType = resourceType
-        self.isFungible = isFungible
-        self.totalSupplyAttos = totalSupplyAttos
-        self.totalMintedAttos = totalMintedAttos
-        self.totalBurntAttos = totalBurntAttos
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case resourceType = "resource_type"
+		case isFungible = "is_fungible"
+		case totalSupplyAttos = "total_supply_attos"
+		case totalMintedAttos = "total_minted_attos"
+		case totalBurntAttos = "total_burnt_attos"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case resourceType = "resource_type"
-        case isFungible = "is_fungible"
-        case totalSupplyAttos = "total_supply_attos"
-        case totalMintedAttos = "total_minted_attos"
-        case totalBurntAttos = "total_burnt_attos"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(resourceType, forKey: .resourceType)
-        try container.encode(isFungible, forKey: .isFungible)
-        try container.encode(totalSupplyAttos, forKey: .totalSupplyAttos)
-        try container.encode(totalMintedAttos, forKey: .totalMintedAttos)
-        try container.encode(totalBurntAttos, forKey: .totalBurntAttos)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(resourceType, forKey: .resourceType)
+		try container.encode(isFungible, forKey: .isFungible)
+		try container.encode(totalSupplyAttos, forKey: .totalSupplyAttos)
+		try container.encode(totalMintedAttos, forKey: .totalMintedAttos)
+		try container.encode(totalBurntAttos, forKey: .totalBurntAttos)
+	}
 }
-

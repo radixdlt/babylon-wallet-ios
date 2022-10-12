@@ -10,45 +10,44 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - LedgerState
 /** The ledger state against which the response was generated. Can be used to detect if the Network Gateway is returning up-to-date information.  */
 public struct LedgerState: Sendable, Codable, Hashable {
+	/** The name of the network against which the request is made. */
+	public let network: String
+	/** The state version of the ledger. Each transaction increments the state version by 1. */
+	public let version: Int64
+	/** The round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.  */
+	public let timestamp: String
+	/** The epoch number of the ledger at this state version. */
+	public let epoch: Int64
+	/** The consensus round in the epoch that this state version was committed in. */
+	public let round: Int64
 
-    /** The name of the network against which the request is made. */
-    public let network: String
-    /** The state version of the ledger. Each transaction increments the state version by 1. */
-    public let version: Int64
-    /** The round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.  */
-    public let timestamp: String
-    /** The epoch number of the ledger at this state version. */
-    public let epoch: Int64
-    /** The consensus round in the epoch that this state version was committed in. */
-    public let round: Int64
+	public init(network: String, version: Int64, timestamp: String, epoch: Int64, round: Int64) {
+		self.network = network
+		self.version = version
+		self.timestamp = timestamp
+		self.epoch = epoch
+		self.round = round
+	}
 
-    public init(network: String, version: Int64, timestamp: String, epoch: Int64, round: Int64) {
-        self.network = network
-        self.version = version
-        self.timestamp = timestamp
-        self.epoch = epoch
-        self.round = round
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case network
+		case version
+		case timestamp
+		case epoch
+		case round
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case network
-        case version
-        case timestamp
-        case epoch
-        case round
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(network, forKey: .network)
-        try container.encode(version, forKey: .version)
-        try container.encode(timestamp, forKey: .timestamp)
-        try container.encode(epoch, forKey: .epoch)
-        try container.encode(round, forKey: .round)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(network, forKey: .network)
+		try container.encode(version, forKey: .version)
+		try container.encode(timestamp, forKey: .timestamp)
+		try container.encode(epoch, forKey: .epoch)
+		try container.encode(round, forKey: .round)
+	}
 }
-

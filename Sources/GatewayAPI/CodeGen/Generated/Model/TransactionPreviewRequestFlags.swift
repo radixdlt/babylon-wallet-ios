@@ -10,23 +10,22 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionPreviewRequestFlags
 public struct TransactionPreviewRequestFlags: Sendable, Codable, Hashable {
+	public let unlimitedLoan: Bool
 
-    public let unlimitedLoan: Bool
+	public init(unlimitedLoan: Bool) {
+		self.unlimitedLoan = unlimitedLoan
+	}
 
-    public init(unlimitedLoan: Bool) {
-        self.unlimitedLoan = unlimitedLoan
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case unlimitedLoan = "unlimited_loan"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case unlimitedLoan = "unlimited_loan"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(unlimitedLoan, forKey: .unlimitedLoan)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(unlimitedLoan, forKey: .unlimitedLoan)
+	}
 }
-

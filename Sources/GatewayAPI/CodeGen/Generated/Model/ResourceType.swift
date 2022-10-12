@@ -10,7 +10,8 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - ResourceType
 public enum ResourceType: String, Sendable, Codable, CaseIterable {
-    case fungible = "fungible"
-    case nonFungible = "non_fungible"
+	case fungible
+	case nonFungible = "non_fungible"
 }

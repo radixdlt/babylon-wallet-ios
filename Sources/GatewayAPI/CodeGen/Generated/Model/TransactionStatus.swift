@@ -10,37 +10,37 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionStatus
 public struct TransactionStatus: Sendable, Codable, Hashable {
+	public enum Status: String, Sendable, Codable, CaseIterable {
+		case succeeded
+		case failed
+		case rejected
+		case pending
+	}
 
-    public enum Status: String, Sendable, Codable, CaseIterable {
-        case succeeded = "succeeded"
-        case failed = "failed"
-        case rejected = "rejected"
-        case pending = "pending"
-    }
-    public let stateVersion: Int64?
-    public let status: Status
-    public let confirmedTime: Date?
+	public let stateVersion: Int64?
+	public let status: Status
+	public let confirmedTime: Date?
 
-    public init(stateVersion: Int64? = nil, status: Status, confirmedTime: Date? = nil) {
-        self.stateVersion = stateVersion
-        self.status = status
-        self.confirmedTime = confirmedTime
-    }
+	public init(stateVersion: Int64? = nil, status: Status, confirmedTime: Date? = nil) {
+		self.stateVersion = stateVersion
+		self.status = status
+		self.confirmedTime = confirmedTime
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case stateVersion = "state_version"
-        case status
-        case confirmedTime = "confirmed_time"
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case stateVersion = "state_version"
+		case status
+		case confirmedTime = "confirmed_time"
+	}
 
-    // Encodable protocol methods
+	// Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(stateVersion, forKey: .stateVersion)
-        try container.encode(status, forKey: .status)
-        try container.encodeIfPresent(confirmedTime, forKey: .confirmedTime)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encodeIfPresent(stateVersion, forKey: .stateVersion)
+		try container.encode(status, forKey: .status)
+		try container.encodeIfPresent(confirmedTime, forKey: .confirmedTime)
+	}
 }
-

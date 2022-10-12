@@ -10,31 +10,30 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - EntityDetailsResponseNonFungibleDetails
 public struct EntityDetailsResponseNonFungibleDetails: Sendable, Codable, Hashable {
+	public let resourceType: String
+	public let isFungible: Bool
+	public let tbd: String
 
-    public let resourceType: String
-    public let isFungible: Bool
-    public let tbd: String
+	public init(resourceType: String, isFungible: Bool, tbd: String) {
+		self.resourceType = resourceType
+		self.isFungible = isFungible
+		self.tbd = tbd
+	}
 
-    public init(resourceType: String, isFungible: Bool, tbd: String) {
-        self.resourceType = resourceType
-        self.isFungible = isFungible
-        self.tbd = tbd
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case resourceType = "resource_type"
+		case isFungible = "is_fungible"
+		case tbd
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case resourceType = "resource_type"
-        case isFungible = "is_fungible"
-        case tbd
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(resourceType, forKey: .resourceType)
-        try container.encode(isFungible, forKey: .isFungible)
-        try container.encode(tbd, forKey: .tbd)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(resourceType, forKey: .resourceType)
+		try container.encode(isFungible, forKey: .isFungible)
+		try container.encode(tbd, forKey: .tbd)
+	}
 }
-

@@ -10,23 +10,22 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - EntityResourcesResponseNonFungibleResourcesAllOf
 public struct EntityResourcesResponseNonFungibleResourcesAllOf: Sendable, Codable, Hashable {
+	public let results: [EntityStateResponseNonFungibleResource]
 
-    public let results: [EntityStateResponseNonFungibleResource]
+	public init(results: [EntityStateResponseNonFungibleResource]) {
+		self.results = results
+	}
 
-    public init(results: [EntityStateResponseNonFungibleResource]) {
-        self.results = results
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case results
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case results
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(results, forKey: .results)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(results, forKey: .results)
+	}
 }
-

@@ -10,53 +10,52 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionPreviewRequest
 public struct TransactionPreviewRequest: Sendable, Codable, Hashable {
+	/** A transaction manifest. sbor encoded, and then hex encoded. */
+	public let manifest: String
+	/** An array of hex-encoded blob data (optional) */
+	public let blobsHex: [String]?
+	/** An integer between 0 and 2^32 - 1, giving the maximum number of cost units available for transaction execution */
+	public let costUnitLimit: Int64
+	/** An integer between 0 and 2^32 - 1, specifying the validator tip as a percentage amount. A value of \"1\" corresponds to 1% of the fee. */
+	public let tipPercentage: Int64
+	/** A decimal-string-encoded integer between 0 and 2^64-1, used to ensure the transaction intent is unique. */
+	public let nonce: String
+	/** A list of public keys to be used as transaction signers */
+	public let signerPublicKeys: [PublicKey]
+	public let flags: TransactionPreviewRequestFlags
 
-    /** A transaction manifest. sbor encoded, and then hex encoded. */
-    public let manifest: String
-    /** An array of hex-encoded blob data (optional) */
-    public let blobsHex: [String]?
-    /** An integer between 0 and 2^32 - 1, giving the maximum number of cost units available for transaction execution */
-    public let costUnitLimit: Int64
-    /** An integer between 0 and 2^32 - 1, specifying the validator tip as a percentage amount. A value of \"1\" corresponds to 1% of the fee. */
-    public let tipPercentage: Int64
-    /** A decimal-string-encoded integer between 0 and 2^64-1, used to ensure the transaction intent is unique. */
-    public let nonce: String
-    /** A list of public keys to be used as transaction signers */
-    public let signerPublicKeys: [PublicKey]
-    public let flags: TransactionPreviewRequestFlags
+	public init(manifest: String, blobsHex: [String]? = nil, costUnitLimit: Int64, tipPercentage: Int64, nonce: String, signerPublicKeys: [PublicKey], flags: TransactionPreviewRequestFlags) {
+		self.manifest = manifest
+		self.blobsHex = blobsHex
+		self.costUnitLimit = costUnitLimit
+		self.tipPercentage = tipPercentage
+		self.nonce = nonce
+		self.signerPublicKeys = signerPublicKeys
+		self.flags = flags
+	}
 
-    public init(manifest: String, blobsHex: [String]? = nil, costUnitLimit: Int64, tipPercentage: Int64, nonce: String, signerPublicKeys: [PublicKey], flags: TransactionPreviewRequestFlags) {
-        self.manifest = manifest
-        self.blobsHex = blobsHex
-        self.costUnitLimit = costUnitLimit
-        self.tipPercentage = tipPercentage
-        self.nonce = nonce
-        self.signerPublicKeys = signerPublicKeys
-        self.flags = flags
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case manifest
+		case blobsHex = "blobs_hex"
+		case costUnitLimit = "cost_unit_limit"
+		case tipPercentage = "tip_percentage"
+		case nonce
+		case signerPublicKeys = "signer_public_keys"
+		case flags
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case manifest
-        case blobsHex = "blobs_hex"
-        case costUnitLimit = "cost_unit_limit"
-        case tipPercentage = "tip_percentage"
-        case nonce
-        case signerPublicKeys = "signer_public_keys"
-        case flags
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(manifest, forKey: .manifest)
-        try container.encodeIfPresent(blobsHex, forKey: .blobsHex)
-        try container.encode(costUnitLimit, forKey: .costUnitLimit)
-        try container.encode(tipPercentage, forKey: .tipPercentage)
-        try container.encode(nonce, forKey: .nonce)
-        try container.encode(signerPublicKeys, forKey: .signerPublicKeys)
-        try container.encode(flags, forKey: .flags)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(manifest, forKey: .manifest)
+		try container.encodeIfPresent(blobsHex, forKey: .blobsHex)
+		try container.encode(costUnitLimit, forKey: .costUnitLimit)
+		try container.encode(tipPercentage, forKey: .tipPercentage)
+		try container.encode(nonce, forKey: .nonce)
+		try container.encode(signerPublicKeys, forKey: .signerPublicKeys)
+		try container.encode(flags, forKey: .flags)
+	}
 }
-

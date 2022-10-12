@@ -10,31 +10,30 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionDetailsResponse
 public struct TransactionDetailsResponse: Sendable, Codable, Hashable {
+	public let ledgerState: LedgerState
+	public let transaction: TransactionInfo
+	public let details: TransactionDetails
 
-    public let ledgerState: LedgerState
-    public let transaction: TransactionInfo
-    public let details: TransactionDetails
+	public init(ledgerState: LedgerState, transaction: TransactionInfo, details: TransactionDetails) {
+		self.ledgerState = ledgerState
+		self.transaction = transaction
+		self.details = details
+	}
 
-    public init(ledgerState: LedgerState, transaction: TransactionInfo, details: TransactionDetails) {
-        self.ledgerState = ledgerState
-        self.transaction = transaction
-        self.details = details
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case ledgerState = "ledger_state"
+		case transaction
+		case details
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case ledgerState = "ledger_state"
-        case transaction
-        case details
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(ledgerState, forKey: .ledgerState)
-        try container.encode(transaction, forKey: .transaction)
-        try container.encode(details, forKey: .details)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(ledgerState, forKey: .ledgerState)
+		try container.encode(transaction, forKey: .transaction)
+		try container.encode(details, forKey: .details)
+	}
 }
-

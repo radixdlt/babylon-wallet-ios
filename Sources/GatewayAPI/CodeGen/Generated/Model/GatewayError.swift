@@ -10,24 +10,23 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - GatewayError
 public struct GatewayError: Sendable, Codable, Hashable {
+	/** The type of error. Each subtype may have its own additional structured fields. */
+	public let type: String
 
-    /** The type of error. Each subtype may have its own additional structured fields. */
-    public let type: String
+	public init(type: String) {
+		self.type = type
+	}
 
-    public init(type: String) {
-        self.type = type
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case type
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case type
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(type, forKey: .type)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(type, forKey: .type)
+	}
 }
-

@@ -10,27 +10,26 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TokenAmount
 public struct TokenAmount: Sendable, Codable, Hashable {
+	public let value: String
+	public let tokenIdentifier: TokenIdentifier
 
-    public let value: String
-    public let tokenIdentifier: TokenIdentifier
+	public init(value: String, tokenIdentifier: TokenIdentifier) {
+		self.value = value
+		self.tokenIdentifier = tokenIdentifier
+	}
 
-    public init(value: String, tokenIdentifier: TokenIdentifier) {
-        self.value = value
-        self.tokenIdentifier = tokenIdentifier
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case value
+		case tokenIdentifier = "token_identifier"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case value
-        case tokenIdentifier = "token_identifier"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(value, forKey: .value)
-        try container.encode(tokenIdentifier, forKey: .tokenIdentifier)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(value, forKey: .value)
+		try container.encode(tokenIdentifier, forKey: .tokenIdentifier)
+	}
 }
-

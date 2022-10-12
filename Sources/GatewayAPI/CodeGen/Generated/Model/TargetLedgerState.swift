@@ -10,24 +10,23 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TargetLedgerState
 public struct TargetLedgerState: Sendable, Codable, Hashable {
+	/** The latest-seen state version of the tip of the network's ledger. If this is singificantly ahead of the current LedgerState version, the Network Gateway is possibly behind and may be reporting outdated information.  */
+	public let version: Int64
 
-    /** The latest-seen state version of the tip of the network's ledger. If this is singificantly ahead of the current LedgerState version, the Network Gateway is possibly behind and may be reporting outdated information.  */
-    public let version: Int64
+	public init(version: Int64) {
+		self.version = version
+	}
 
-    public init(version: Int64) {
-        self.version = version
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case version
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case version
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(version, forKey: .version)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(version, forKey: .version)
+	}
 }
-

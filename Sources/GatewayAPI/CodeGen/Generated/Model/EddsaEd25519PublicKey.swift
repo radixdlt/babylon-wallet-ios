@@ -10,28 +10,27 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - EddsaEd25519PublicKey
 public struct EddsaEd25519PublicKey: Sendable, Codable, Hashable {
+	public let keyType: String
+	/** The hex-encoded compressed EdDSA Ed25519 public key (32 bytes) */
+	public let keyHex: String
 
-    public let keyType: String
-    /** The hex-encoded compressed EdDSA Ed25519 public key (32 bytes) */
-    public let keyHex: String
+	public init(keyType: String, keyHex: String) {
+		self.keyType = keyType
+		self.keyHex = keyHex
+	}
 
-    public init(keyType: String, keyHex: String) {
-        self.keyType = keyType
-        self.keyHex = keyHex
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case keyType = "key_type"
+		case keyHex = "key_hex"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case keyType = "key_type"
-        case keyHex = "key_hex"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(keyType, forKey: .keyType)
-        try container.encode(keyHex, forKey: .keyHex)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(keyType, forKey: .keyType)
+		try container.encode(keyHex, forKey: .keyHex)
+	}
 }
-

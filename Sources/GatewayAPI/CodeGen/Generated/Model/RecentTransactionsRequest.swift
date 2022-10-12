@@ -10,37 +10,36 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - RecentTransactionsRequest
 public struct RecentTransactionsRequest: Sendable, Codable, Hashable {
+	public let atStateIdentifier: PartialLedgerStateIdentifier?
+	public let fromStateIdentifier: PartialLedgerStateIdentifier?
+	/** This cursor allows forward pagination, by providing the cursor from the previous request. */
+	public let cursor: String?
+	/** The page size requested. The maximum value is 30 at present. */
+	public let limit: Int?
 
-    public let atStateIdentifier: PartialLedgerStateIdentifier?
-    public let fromStateIdentifier: PartialLedgerStateIdentifier?
-    /** This cursor allows forward pagination, by providing the cursor from the previous request. */
-    public let cursor: String?
-    /** The page size requested. The maximum value is 30 at present. */
-    public let limit: Int?
+	public init(atStateIdentifier: PartialLedgerStateIdentifier? = nil, fromStateIdentifier: PartialLedgerStateIdentifier? = nil, cursor: String? = nil, limit: Int? = nil) {
+		self.atStateIdentifier = atStateIdentifier
+		self.fromStateIdentifier = fromStateIdentifier
+		self.cursor = cursor
+		self.limit = limit
+	}
 
-    public init(atStateIdentifier: PartialLedgerStateIdentifier? = nil, fromStateIdentifier: PartialLedgerStateIdentifier? = nil, cursor: String? = nil, limit: Int? = nil) {
-        self.atStateIdentifier = atStateIdentifier
-        self.fromStateIdentifier = fromStateIdentifier
-        self.cursor = cursor
-        self.limit = limit
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case atStateIdentifier = "at_state_identifier"
+		case fromStateIdentifier = "from_state_identifier"
+		case cursor
+		case limit
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case atStateIdentifier = "at_state_identifier"
-        case fromStateIdentifier = "from_state_identifier"
-        case cursor
-        case limit
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(atStateIdentifier, forKey: .atStateIdentifier)
-        try container.encodeIfPresent(fromStateIdentifier, forKey: .fromStateIdentifier)
-        try container.encodeIfPresent(cursor, forKey: .cursor)
-        try container.encodeIfPresent(limit, forKey: .limit)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encodeIfPresent(atStateIdentifier, forKey: .atStateIdentifier)
+		try container.encodeIfPresent(fromStateIdentifier, forKey: .fromStateIdentifier)
+		try container.encodeIfPresent(cursor, forKey: .cursor)
+		try container.encodeIfPresent(limit, forKey: .limit)
+	}
 }
-

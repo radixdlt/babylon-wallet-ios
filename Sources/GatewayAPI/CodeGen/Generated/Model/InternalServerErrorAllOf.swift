@@ -10,29 +10,28 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - InternalServerErrorAllOf
 public struct InternalServerErrorAllOf: Sendable, Codable, Hashable {
+	/** Gives an error type which occurred within the Gateway API when serving the request. */
+	public let exception: String
+	/** Gives a human readable message - likely just a trace ID for reporting the error. */
+	public let cause: String
 
-    /** Gives an error type which occurred within the Gateway API when serving the request. */
-    public let exception: String
-    /** Gives a human readable message - likely just a trace ID for reporting the error. */
-    public let cause: String
+	public init(exception: String, cause: String) {
+		self.exception = exception
+		self.cause = cause
+	}
 
-    public init(exception: String, cause: String) {
-        self.exception = exception
-        self.cause = cause
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case exception
+		case cause
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case exception
-        case cause
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(exception, forKey: .exception)
-        try container.encode(cause, forKey: .cause)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(exception, forKey: .exception)
+		try container.encode(cause, forKey: .cause)
+	}
 }
-

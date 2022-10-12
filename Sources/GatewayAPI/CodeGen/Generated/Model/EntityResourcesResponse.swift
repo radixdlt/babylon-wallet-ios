@@ -10,32 +10,31 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - EntityResourcesResponse
 public struct EntityResourcesResponse: Sendable, Codable, Hashable {
+	/** The Bech32m-encoded human readable version of the entity's global address */
+	public let address: String
+	public let fungibleResources: EntityResourcesResponseFungibleResources
+	public let nonFungibleResources: EntityResourcesResponseNonFungibleResources
 
-    /** The Bech32m-encoded human readable version of the entity's global address */
-    public let address: String
-    public let fungibleResources: EntityResourcesResponseFungibleResources
-    public let nonFungibleResources: EntityResourcesResponseNonFungibleResources
+	public init(address: String, fungibleResources: EntityResourcesResponseFungibleResources, nonFungibleResources: EntityResourcesResponseNonFungibleResources) {
+		self.address = address
+		self.fungibleResources = fungibleResources
+		self.nonFungibleResources = nonFungibleResources
+	}
 
-    public init(address: String, fungibleResources: EntityResourcesResponseFungibleResources, nonFungibleResources: EntityResourcesResponseNonFungibleResources) {
-        self.address = address
-        self.fungibleResources = fungibleResources
-        self.nonFungibleResources = nonFungibleResources
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case address
+		case fungibleResources = "fungible_resources"
+		case nonFungibleResources = "non_fungible_resources"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case address
-        case fungibleResources = "fungible_resources"
-        case nonFungibleResources = "non_fungible_resources"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(address, forKey: .address)
-        try container.encode(fungibleResources, forKey: .fungibleResources)
-        try container.encode(nonFungibleResources, forKey: .nonFungibleResources)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(address, forKey: .address)
+		try container.encode(fungibleResources, forKey: .fungibleResources)
+		try container.encode(nonFungibleResources, forKey: .nonFungibleResources)
+	}
 }
-
