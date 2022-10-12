@@ -14,15 +14,15 @@ import AnyCodable
 public struct LedgerState: Sendable, Codable, Hashable {
 
     /** The name of the network against which the request is made. */
-    public var network: String
+    public let network: String
     /** The state version of the ledger. Each transaction increments the state version by 1. */
-    public var version: Int64
+    public let version: Int64
     /** The round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.  */
-    public var timestamp: String
+    public let timestamp: String
     /** The epoch number of the ledger at this state version. */
-    public var epoch: Int64
+    public let epoch: Int64
     /** The consensus round in the epoch that this state version was committed in. */
-    public var round: Int64
+    public let round: Int64
 
     public init(network: String, version: Int64, timestamp: String, epoch: Int64, round: Int64) {
         self.network = network

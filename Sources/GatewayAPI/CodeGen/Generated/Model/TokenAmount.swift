@@ -12,8 +12,8 @@ import AnyCodable
 
 public struct TokenAmount: Sendable, Codable, Hashable {
 
-    public var value: String
-    public var tokenIdentifier: TokenIdentifier
+    public let value: String
+    public let tokenIdentifier: TokenIdentifier
 
     public init(value: String, tokenIdentifier: TokenIdentifier) {
         self.value = value

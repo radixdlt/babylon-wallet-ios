@@ -13,9 +13,9 @@ import AnyCodable
 public struct EntityResourcesResponse: Sendable, Codable, Hashable {
 
     /** The Bech32m-encoded human readable version of the entity's global address */
-    public var address: String
-    public var fungibleResources: EntityResourcesResponseFungibleResources
-    public var nonFungibleResources: EntityResourcesResponseNonFungibleResources
+    public let address: String
+    public let fungibleResources: EntityResourcesResponseFungibleResources
+    public let nonFungibleResources: EntityResourcesResponseNonFungibleResources
 
     public init(address: String, fungibleResources: EntityResourcesResponseFungibleResources, nonFungibleResources: EntityResourcesResponseNonFungibleResources) {
         self.address = address

@@ -12,9 +12,9 @@ import AnyCodable
 
 public struct EntityDetailsResponseNonFungibleDetails: Sendable, Codable, Hashable {
 
-    public var resourceType: String
-    public var isFungible: Bool
-    public var tbd: String
+    public let resourceType: String
+    public let isFungible: Bool
+    public let tbd: String
 
     public init(resourceType: String, isFungible: Bool, tbd: String) {
         self.resourceType = resourceType

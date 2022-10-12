@@ -13,10 +13,10 @@ import AnyCodable
 public struct EntityDetailsResponse: Sendable, Codable, Hashable {
 
     /** The Bech32m-encoded human readable version of the resource's global address */
-    public var address: String
+    public let address: String
     /** TBD */
-    public var metadata: [String: String]
-    public var details: EntityDetailsResponseDetails
+    public let metadata: [String: String]
+    public let details: EntityDetailsResponseDetails
 
     public init(address: String, metadata: [String: String], details: EntityDetailsResponseDetails) {
         self.address = address

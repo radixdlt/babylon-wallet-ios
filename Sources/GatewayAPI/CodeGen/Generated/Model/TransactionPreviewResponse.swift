@@ -12,7 +12,7 @@
 //
 //public struct TransactionPreviewResponse: Sendable, Codable, Hashable {
 //
-//    public var coreApiResponse: AnyCodable
+//    public let coreApiResponse: AnyCodable
 //
 //    public init(coreApiResponse: AnyCodable) {
 //        self.coreApiResponse = coreApiResponse

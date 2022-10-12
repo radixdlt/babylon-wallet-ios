@@ -13,7 +13,7 @@ import AnyCodable
 public struct AccountIdentifier: Sendable, Codable, Hashable {
 
     /** The radix address of the account. */
-    public var address: String
+    public let address: String
 
     public init(address: String) {
         self.address = address

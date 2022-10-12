@@ -12,9 +12,9 @@ import AnyCodable
 
 public struct TransactionDetailsResponse: Sendable, Codable, Hashable {
 
-    public var ledgerState: LedgerState
-    public var transaction: TransactionInfo
-    public var details: TransactionDetails
+    public let ledgerState: LedgerState
+    public let transaction: TransactionInfo
+    public let details: TransactionDetails
 
     public init(ledgerState: LedgerState, transaction: TransactionInfo, details: TransactionDetails) {
         self.ledgerState = ledgerState

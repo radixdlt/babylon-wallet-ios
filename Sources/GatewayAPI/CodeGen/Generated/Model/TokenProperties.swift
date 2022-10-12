@@ -12,15 +12,15 @@ import AnyCodable
 
 public struct TokenProperties: Sendable, Codable, Hashable {
 
-    public var name: String
-    public var description: String
-    public var iconUrl: String
-    public var url: String
-    public var symbol: String
+    public let name: String
+    public let description: String
+    public let iconUrl: String
+    public let url: String
+    public let symbol: String
     /** If true, the token is allowed to be minted/burned by the owner. */
-    public var isSupplyMutable: Bool
-    public var granularity: String
-    public var owner: AccountIdentifier?
+    public let isSupplyMutable: Bool
+    public let granularity: String
+    public let owner: AccountIdentifier?
 
     public init(name: String, description: String, iconUrl: String, url: String, symbol: String, isSupplyMutable: Bool, granularity: String, owner: AccountIdentifier? = nil) {
         self.name = name

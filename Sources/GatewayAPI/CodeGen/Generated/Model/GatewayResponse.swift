@@ -12,9 +12,9 @@ import AnyCodable
 
 public struct GatewayResponse: Sendable, Codable, Hashable {
 
-    public var gatewayApi: GatewayApiVersions
-    public var ledgerState: LedgerState
-    public var targetLedgerState: TargetLedgerState?
+    public let gatewayApi: GatewayApiVersions
+    public let ledgerState: LedgerState
+    public let targetLedgerState: TargetLedgerState?
 
     public init(gatewayApi: GatewayApiVersions, ledgerState: LedgerState, targetLedgerState: TargetLedgerState? = nil) {
         self.gatewayApi = gatewayApi

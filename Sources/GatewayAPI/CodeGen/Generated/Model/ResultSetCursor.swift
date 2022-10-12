@@ -13,12 +13,12 @@ import AnyCodable
 public struct ResultSetCursor<Content: Sendable & Codable & Hashable>: Sendable, Codable, Hashable {
 
     /** TBD (make it nullable when we're dealing with unknown result set sizes?) */
-    public var totalCount: Int
+    public let totalCount: Int
     /** TBD (maybe we should use HATEOAS-like permalinks?) */
-    public var previousCursor: String?
+    public let previousCursor: String?
     /** TBD (maybe we should use HATEOAS-like permalinks?) */
-    public var nextCursor: String?
-    public var results: [Content]
+    public let nextCursor: String?
+    public let results: [Content]
 
     public init(totalCount: Int, previousCursor: String? = nil, nextCursor: String? = nil, results: [Content]) {
         self.totalCount = totalCount

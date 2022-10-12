@@ -13,11 +13,11 @@ import AnyCodable
 public struct NotSyncedUpErrorAllOf: Sendable, Codable, Hashable {
 
     /** The request type that triggered this exception. */
-    public var requestType: String
+    public let requestType: String
     /** The current delay between the Gateway DB and the network ledger round timestamp. */
-    public var currentSyncDelaySeconds: Int64
+    public let currentSyncDelaySeconds: Int64
     /** The maximum allowed delay between the Gateway DB and the network ledger round timestamp for this `request_type`. */
-    public var maxAllowedSyncDelaySeconds: Int64
+    public let maxAllowedSyncDelaySeconds: Int64
 
     public init(requestType: String, currentSyncDelaySeconds: Int64, maxAllowedSyncDelaySeconds: Int64) {
         self.requestType = requestType

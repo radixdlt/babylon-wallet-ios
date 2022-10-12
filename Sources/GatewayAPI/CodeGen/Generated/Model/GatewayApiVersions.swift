@@ -13,9 +13,9 @@ import AnyCodable
 public struct GatewayApiVersions: Sendable, Codable, Hashable {
 
     /** The release that is currently deployed to the Gateway API. */
-    public var version: String
+    public let version: String
     /** The open api schema version that was used to generate the API models. */
-    public var openApiSchemaVersion: String
+    public let openApiSchemaVersion: String
 
     public init(version: String, openApiSchemaVersion: String) {
         self.version = version

@@ -13,7 +13,7 @@ import AnyCodable
 public struct InvalidRequestErrorAllOf: Sendable, Codable, Hashable {
 
     /** One or more validation errors which occurred when validating the request. */
-    public var validationErrors: [ValidationErrorsAtPath]
+    public let validationErrors: [ValidationErrorsAtPath]
 
     public init(validationErrors: [ValidationErrorsAtPath]) {
         self.validationErrors = validationErrors

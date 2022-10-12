@@ -13,8 +13,8 @@ import AnyCodable
 public struct TransactionNotFoundError: Sendable, Codable, Hashable {
 
     /** The type of error. Each subtype may have its own additional structured fields. */
-    public var type: String
-    public var transactionNotFound: TransactionLookupIdentifier
+    public let type: String
+    public let transactionNotFound: TransactionLookupIdentifier
 
     public init(type: String, transactionNotFound: TransactionLookupIdentifier) {
         self.type = type

@@ -13,7 +13,7 @@ import AnyCodable
 public struct TransactionSubmitRequest: Sendable, Codable, Hashable {
 
     /** The notarized transaction payload which can be submitted, hex encoded. */
-    public var notarizedTransaction: String
+    public let notarizedTransaction: String
 
     public init(notarizedTransaction: String) {
         self.notarizedTransaction = notarizedTransaction

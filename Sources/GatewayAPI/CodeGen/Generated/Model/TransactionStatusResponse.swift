@@ -12,8 +12,8 @@ import AnyCodable
 
 public struct TransactionStatusResponse: Sendable, Codable, Hashable {
 
-    public var ledgerState: LedgerState
-    public var transaction: TransactionInfo
+    public let ledgerState: LedgerState
+    public let transaction: TransactionInfo
 
     public init(ledgerState: LedgerState, transaction: TransactionInfo) {
         self.ledgerState = ledgerState

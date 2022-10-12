@@ -12,11 +12,11 @@ import AnyCodable
 
 public struct RecentTransactionsResponse: Sendable, Codable, Hashable {
 
-    public var ledgerState: LedgerState
+    public let ledgerState: LedgerState
     /** The cursor to be provided for the next page of results. If missing, this is the last page of results. */
-    public var nextCursor: String?
+    public let nextCursor: String?
     /** The page of user transactions. */
-    public var transactions: [TransactionInfo]
+    public let transactions: [TransactionInfo]
 
     public init(ledgerState: LedgerState, nextCursor: String? = nil, transactions: [TransactionInfo]) {
         self.ledgerState = ledgerState

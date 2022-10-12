@@ -12,9 +12,9 @@ import AnyCodable
 
 public struct EddsaEd25519PublicKey: Sendable, Codable, Hashable {
 
-    public var keyType: String
+    public let keyType: String
     /** The hex-encoded compressed EdDSA Ed25519 public key (32 bytes) */
-    public var keyHex: String
+    public let keyHex: String
 
     public init(keyType: String, keyHex: String) {
         self.keyType = keyType

@@ -14,12 +14,12 @@ import AnyCodable
 public struct PartialLedgerStateIdentifier: Sendable, Codable, Hashable {
 
     /** If the version is provided, the latest ledger state <= the given version is returned. */
-    public var stateVersion: Int64?
+    public let stateVersion: Int64?
     /** If a timestamp is provided, the latest ledger state <= the given timestamp is returned. */
-    public var timestamp: Date?
+    public let timestamp: Date?
     /** If an epoch is provided, the ledger state at the given epoch <= the given round (else round 0) is returned. */
-    public var epoch: Int64?
-    public var round: Int64?
+    public let epoch: Int64?
+    public let round: Int64?
 
     public init(stateVersion: Int64? = nil, timestamp: Date? = nil, epoch: Int64? = nil, round: Int64? = nil) {
         self.stateVersion = stateVersion

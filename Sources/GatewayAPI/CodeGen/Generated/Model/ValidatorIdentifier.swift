@@ -13,7 +13,7 @@ import AnyCodable
 public struct ValidatorIdentifier: Sendable, Codable, Hashable {
 
     /** The radix address of the validator. */
-    public var address: String
+    public let address: String
 
     public init(address: String) {
         self.address = address

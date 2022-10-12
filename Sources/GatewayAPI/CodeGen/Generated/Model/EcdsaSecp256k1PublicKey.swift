@@ -12,9 +12,9 @@ import AnyCodable
 
 public struct EcdsaSecp256k1PublicKey: Sendable, Codable, Hashable {
 
-    public var keyType: String
+    public let keyType: String
     /** The hex-encoded compressed ECDSA Secp256k1 public key (33 bytes) */
-    public var keyHex: String
+    public let keyHex: String
 
     public init(keyType: String, keyHex: String) {
         self.keyType = keyType

@@ -12,7 +12,7 @@ import AnyCodable
 
 public struct EntityResourcesResponseNonFungibleResourcesAllOf: Sendable, Codable, Hashable {
 
-    public var results: [EntityStateResponseNonFungibleResource]
+    public let results: [EntityStateResponseNonFungibleResource]
 
     public init(results: [EntityStateResponseNonFungibleResource]) {
         self.results = results

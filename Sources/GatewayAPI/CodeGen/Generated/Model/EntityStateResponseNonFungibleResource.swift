@@ -13,8 +13,8 @@ import AnyCodable
 public struct EntityStateResponseNonFungibleResource: Sendable, Codable, Hashable {
 
     /** The Bech32m-encoded human readable version of the resource's global address */
-    public var address: String
-    public var amount: Double
+    public let address: String
+    public let amount: Double
 
     public init(address: String, amount: Double) {
         self.address = address

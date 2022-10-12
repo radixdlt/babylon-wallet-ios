@@ -13,9 +13,9 @@ import AnyCodable
 public struct InvalidRequestError: Sendable, Codable, Hashable {
 
     /** The type of error. Each subtype may have its own additional structured fields. */
-    public var type: String
+    public let type: String
     /** One or more validation errors which occurred when validating the request. */
-    public var validationErrors: [ValidationErrorsAtPath]
+    public let validationErrors: [ValidationErrorsAtPath]
 
     public init(type: String, validationErrors: [ValidationErrorsAtPath]) {
         self.type = type

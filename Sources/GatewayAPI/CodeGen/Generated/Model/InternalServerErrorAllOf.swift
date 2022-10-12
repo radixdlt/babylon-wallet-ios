@@ -13,9 +13,9 @@ import AnyCodable
 public struct InternalServerErrorAllOf: Sendable, Codable, Hashable {
 
     /** Gives an error type which occurred within the Gateway API when serving the request. */
-    public var exception: String
+    public let exception: String
     /** Gives a human readable message - likely just a trace ID for reporting the error. */
-    public var cause: String
+    public let cause: String
 
     public init(exception: String, cause: String) {
         self.exception = exception

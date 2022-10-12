@@ -13,7 +13,7 @@ import AnyCodable
 public struct GatewayError: Sendable, Codable, Hashable {
 
     /** The type of error. Each subtype may have its own additional structured fields. */
-    public var type: String
+    public let type: String
 
     public init(type: String) {
         self.type = type

@@ -12,8 +12,8 @@ import AnyCodable
 
 public struct TransactionStatusRequest: Sendable, Codable, Hashable {
 
-    public var transactionIdentifier: TransactionLookupIdentifier
-    public var atStateIdentifier: PartialLedgerStateIdentifier?
+    public let transactionIdentifier: TransactionLookupIdentifier
+    public let atStateIdentifier: PartialLedgerStateIdentifier?
 
     public init(transactionIdentifier: TransactionLookupIdentifier, atStateIdentifier: PartialLedgerStateIdentifier? = nil) {
         self.transactionIdentifier = transactionIdentifier

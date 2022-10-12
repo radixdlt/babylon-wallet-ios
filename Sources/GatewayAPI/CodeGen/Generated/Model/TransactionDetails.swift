@@ -13,10 +13,10 @@ import AnyCodable
 public struct TransactionDetails: Sendable, Codable, Hashable {
 
     /** The raw transaction payload, hex encoded. */
-    public var rawHex: String
-    public var referencedGlobalEntities: [String]
+    public let rawHex: String
+    public let referencedGlobalEntities: [String]
     /** The message bytes, hex encoded. */
-    public var messageHex: String?
+    public let messageHex: String?
 
     public init(rawHex: String, referencedGlobalEntities: [String], messageHex: String? = nil) {
         self.rawHex = rawHex

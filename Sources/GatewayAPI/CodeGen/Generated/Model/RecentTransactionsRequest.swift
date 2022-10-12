@@ -12,12 +12,12 @@ import AnyCodable
 
 public struct RecentTransactionsRequest: Sendable, Codable, Hashable {
 
-    public var atStateIdentifier: PartialLedgerStateIdentifier?
-    public var fromStateIdentifier: PartialLedgerStateIdentifier?
+    public let atStateIdentifier: PartialLedgerStateIdentifier?
+    public let fromStateIdentifier: PartialLedgerStateIdentifier?
     /** This cursor allows forward pagination, by providing the cursor from the previous request. */
-    public var cursor: String?
+    public let cursor: String?
     /** The page size requested. The maximum value is 30 at present. */
-    public var limit: Int?
+    public let limit: Int?
 
     public init(atStateIdentifier: PartialLedgerStateIdentifier? = nil, fromStateIdentifier: PartialLedgerStateIdentifier? = nil, cursor: String? = nil, limit: Int? = nil) {
         self.atStateIdentifier = atStateIdentifier

@@ -18,4 +18,5 @@ echo "🎯 Destination for generated files: '$DESTINATION'"
 
 $GEN_TOOL generate -i $SWAGGER_TEMPLATE \
 -g swift5 \
--o $OUTPUTDIR
+-o $OUTPUTDIR \
+--additional-properties=useJsonEncodable=false,readonlyProperties=true

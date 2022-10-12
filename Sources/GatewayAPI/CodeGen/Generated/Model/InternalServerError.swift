@@ -13,11 +13,11 @@ import AnyCodable
 public struct InternalServerError: Sendable, Codable, Hashable {
 
     /** The type of error. Each subtype may have its own additional structured fields. */
-    public var type: String
+    public let type: String
     /** Gives an error type which occurred within the Gateway API when serving the request. */
-    public var exception: String
+    public let exception: String
     /** Gives a human readable message - likely just a trace ID for reporting the error. */
-    public var cause: String
+    public let cause: String
 
     public init(type: String, exception: String, cause: String) {
         self.type = type

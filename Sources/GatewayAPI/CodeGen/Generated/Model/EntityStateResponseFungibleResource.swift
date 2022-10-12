@@ -13,9 +13,9 @@ import AnyCodable
 public struct EntityStateResponseFungibleResource: Sendable, Codable, Hashable {
 
     /** The Bech32m-encoded human readable version of the resource's global address */
-    public var address: String
+    public let address: String
     /** A decimal-string-encoded integer between 0 and 2^255-1, which represents the total number of 10^(-18) subunits in the total supply of this resource.  */
-    public var amountAttos: String
+    public let amountAttos: String
 
     public init(address: String, amountAttos: String) {
         self.address = address

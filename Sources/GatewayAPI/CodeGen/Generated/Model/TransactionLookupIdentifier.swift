@@ -12,8 +12,8 @@ import AnyCodable
 
 public struct TransactionLookupIdentifier: Sendable, Codable, Hashable {
 
-    public var origin: TransactionLookupOrigin
-    public var valueHex: String
+    public let origin: TransactionLookupOrigin
+    public let valueHex: String
 
     public init(origin: TransactionLookupOrigin, valueHex: String) {
         self.origin = origin

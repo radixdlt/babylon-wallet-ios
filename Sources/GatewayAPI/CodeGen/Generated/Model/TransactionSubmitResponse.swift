@@ -13,7 +13,7 @@ import AnyCodable
 public struct TransactionSubmitResponse: Sendable, Codable, Hashable {
 
     /** Is true if the transaction is a duplicate of an existing transaction in the mempool. */
-    public var duplicate: Bool
+    public let duplicate: Bool
 
     public init(duplicate: Bool) {
         self.duplicate = duplicate

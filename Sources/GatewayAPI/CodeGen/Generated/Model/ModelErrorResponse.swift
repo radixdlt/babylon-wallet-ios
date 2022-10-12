@@ -13,12 +13,12 @@ import AnyCodable
 public struct ModelErrorResponse: Sendable, Codable, Hashable {
 
     /** A numeric code corresponding to the given error type, roughly aligned with HTTP Status Code semantics (eg 400/404/500). */
-    public var code: Int
+    public let code: Int
     /** A human-readable error message. */
-    public var message: String
-    public var details: GatewayError?
+    public let message: String
+    public let details: GatewayError?
     /** A GUID to be used when reporting errors, to allow correlation with the Gateway API's error logs. */
-    public var traceId: String?
+    public let traceId: String?
 
     public init(code: Int, message: String, details: GatewayError? = nil, traceId: String? = nil) {
         self.code = code

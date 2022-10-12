@@ -12,11 +12,11 @@ import AnyCodable
 
 public struct TransactionInfo: Sendable, Codable, Hashable {
 
-    public var transactionStatus: TransactionStatus
-    public var payloadHashHex: String
-    public var intentHashHex: String
-    public var transactionAccumulatorHex: String
-    public var feePaid: TokenAmount
+    public let transactionStatus: TransactionStatus
+    public let payloadHashHex: String
+    public let intentHashHex: String
+    public let transactionAccumulatorHex: String
+    public let feePaid: TokenAmount
 
     public init(transactionStatus: TransactionStatus, payloadHashHex: String, intentHashHex: String, transactionAccumulatorHex: String, feePaid: TokenAmount) {
         self.transactionStatus = transactionStatus

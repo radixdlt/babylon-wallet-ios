@@ -12,8 +12,8 @@ import AnyCodable
 
 public struct ValidationErrorsAtPath: Sendable, Codable, Hashable {
 
-    public var path: String
-    public var errors: [String]
+    public let path: String
+    public let errors: [String]
 
     public init(path: String, errors: [String]) {
         self.path = path

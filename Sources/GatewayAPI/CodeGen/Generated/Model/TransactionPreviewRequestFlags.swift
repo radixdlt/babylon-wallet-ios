@@ -12,7 +12,7 @@ import AnyCodable
 
 public struct TransactionPreviewRequestFlags: Sendable, Codable, Hashable {
 
-    public var unlimitedLoan: Bool
+    public let unlimitedLoan: Bool
 
     public init(unlimitedLoan: Bool) {
         self.unlimitedLoan = unlimitedLoan

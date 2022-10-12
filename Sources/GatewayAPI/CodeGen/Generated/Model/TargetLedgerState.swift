@@ -13,7 +13,7 @@ import AnyCodable
 public struct TargetLedgerState: Sendable, Codable, Hashable {
 
     /** The latest-seen state version of the tip of the network's ledger. If this is singificantly ahead of the current LedgerState version, the Network Gateway is possibly behind and may be reporting outdated information.  */
-    public var version: Int64
+    public let version: Int64
 
     public init(version: Int64) {
         self.version = version

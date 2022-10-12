@@ -13,8 +13,8 @@ import AnyCodable
 public struct EntityResourcesRequest: Sendable, Codable, Hashable {
 
     /** The Bech32m-encoded human readable version of the entity's global address */
-    public var address: String
-    public var atStateIdentifier: PartialLedgerStateIdentifier?
+    public let address: String
+    public let atStateIdentifier: PartialLedgerStateIdentifier?
 
     public init(address: String, atStateIdentifier: PartialLedgerStateIdentifier? = nil) {
         self.address = address

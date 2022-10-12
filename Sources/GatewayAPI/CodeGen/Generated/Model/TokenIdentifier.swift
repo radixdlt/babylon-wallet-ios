@@ -13,7 +13,7 @@ import AnyCodable
 public struct TokenIdentifier: Sendable, Codable, Hashable {
 
     /** The radix resource identifier of the token. */
-    public var rri: String
+    public let rri: String
 
     public init(rri: String) {
         self.rri = rri

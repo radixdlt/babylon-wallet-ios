@@ -18,9 +18,9 @@ public struct TransactionStatus: Sendable, Codable, Hashable {
         case rejected = "rejected"
         case pending = "pending"
     }
-    public var stateVersion: Int64?
-    public var status: Status
-    public var confirmedTime: Date?
+    public let stateVersion: Int64?
+    public let status: Status
+    public let confirmedTime: Date?
 
     public init(stateVersion: Int64? = nil, status: Status, confirmedTime: Date? = nil) {
         self.stateVersion = stateVersion

@@ -12,7 +12,7 @@ import AnyCodable
 
 public struct TransactionNotFoundErrorAllOf: Sendable, Codable, Hashable {
 
-    public var transactionNotFound: TransactionLookupIdentifier
+    public let transactionNotFound: TransactionLookupIdentifier
 
     public init(transactionNotFound: TransactionLookupIdentifier) {
         self.transactionNotFound = transactionNotFound

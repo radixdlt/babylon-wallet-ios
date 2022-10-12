@@ -13,18 +13,18 @@ import AnyCodable
 public struct TransactionPreviewRequest: Sendable, Codable, Hashable {
 
     /** A transaction manifest. sbor encoded, and then hex encoded. */
-    public var manifest: String
+    public let manifest: String
     /** An array of hex-encoded blob data (optional) */
-    public var blobsHex: [String]?
+    public let blobsHex: [String]?
     /** An integer between 0 and 2^32 - 1, giving the maximum number of cost units available for transaction execution */
-    public var costUnitLimit: Int64
+    public let costUnitLimit: Int64
     /** An integer between 0 and 2^32 - 1, specifying the validator tip as a percentage amount. A value of \"1\" corresponds to 1% of the fee. */
-    public var tipPercentage: Int64
+    public let tipPercentage: Int64
     /** A decimal-string-encoded integer between 0 and 2^64-1, used to ensure the transaction intent is unique. */
-    public var nonce: String
+    public let nonce: String
     /** A list of public keys to be used as transaction signers */
-    public var signerPublicKeys: [PublicKey]
-    public var flags: TransactionPreviewRequestFlags
+    public let signerPublicKeys: [PublicKey]
+    public let flags: TransactionPreviewRequestFlags
 
     public init(manifest: String, blobsHex: [String]? = nil, costUnitLimit: Int64, tipPercentage: Int64, nonce: String, signerPublicKeys: [PublicKey], flags: TransactionPreviewRequestFlags) {
         self.manifest = manifest
