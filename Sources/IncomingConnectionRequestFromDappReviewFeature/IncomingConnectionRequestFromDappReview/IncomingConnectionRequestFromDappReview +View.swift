@@ -27,7 +27,7 @@ public extension IncomingConnectionRequestFromDappReview.View {
 						.textStyle(.sectionHeader)
 						.multilineTextAlignment(.center)
 
-					Image("dapp-placeholder", bundle: .module)
+					Image("dapp-placeholder")
 				}
 
 				Spacer(minLength: 40)
