@@ -27,6 +27,10 @@ let package = Package(
 			name: "CreateAccountFeature",
 			targets: ["CreateAccountFeature"]
 		),
+		.library(
+			name: "IncomingConnectionRequestFromDappReviewFeature",
+			targets: ["IncomingConnectionRequestFromDappReviewFeature"]
+		),
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
@@ -369,6 +373,21 @@ let package = Package(
 			name: "PasteboardClientTests",
 			dependencies: [
 				"PasteboardClient",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "IncomingConnectionRequestFromDappReviewFeature",
+			dependencies: [
+				"Common",
+				"DesignSystem",
+				tca,
+			]
+		),
+		.testTarget(
+			name: "IncomingConnectionRequestFromDappReviewFeatureTests",
+			dependencies: [
+				"IncomingConnectionRequestFromDappReviewFeature",
 				"TestUtils",
 			]
 		),

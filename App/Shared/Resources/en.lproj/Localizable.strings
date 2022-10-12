@@ -27,6 +27,11 @@
 "home.visitHub.buttonTitle" = "Visit the Radix Hub";
 "home.visitHub.title" = "Ready to get started using the Radix Network and your Wallet?";
 
+"persona.connectionRequest.continueButtonTitle" = "Continue";
+"persona.connectionRequest.subtitle" = "For this dApp to function, it needs the following:";
+"persona.connectionRequest.title" = "dApp Connection Request";
+"persona.connectionRequest.wantsToConnect" = "%@ wants to connect to your wallet";
+
 "nftList.header.hide" = "- Hide";
 "nftList.header.show" = "+ Show";
 "nftList.header.supplyUnknown" = "Unknown";
