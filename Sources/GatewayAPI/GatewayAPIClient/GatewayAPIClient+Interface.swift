@@ -20,7 +20,7 @@ public struct GatewayAPIClient {
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
 
-	init(
+	public init(
 		accountResourcesByAddress: @escaping GetAccountResourcesByAddress,
 		resourceDetailsByResourceIdentifier: @escaping GetResourceDetailsByResourceIdentifier,
 		submitTransaction: @escaping SubmitTransaction,
