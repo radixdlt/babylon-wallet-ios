@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PersonaConnectionFeature"
-               BuildableName = "PersonaConnectionFeature"
-               BlueprintName = "PersonaConnectionFeature"
+               BlueprintIdentifier = "IncomingConnectionRequestFromDappReviewFeature"
+               BuildableName = "IncomingConnectionRequestFromDappReviewFeature"
+               BlueprintName = "IncomingConnectionRequestFromDappReviewFeature"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -50,9 +50,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "PersonaConnectionFeature"
-            BuildableName = "PersonaConnectionFeature"
-            BlueprintName = "PersonaConnectionFeature"
+            BlueprintIdentifier = "IncomingConnectionRequestFromDappReviewFeature"
+            BuildableName = "IncomingConnectionRequestFromDappReviewFeature"
+            BlueprintName = "IncomingConnectionRequestFromDappReviewFeature"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>

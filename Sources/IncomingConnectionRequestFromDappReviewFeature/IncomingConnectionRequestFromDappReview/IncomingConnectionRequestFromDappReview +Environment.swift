@@ -1,6 +1,6 @@
 import Foundation
 
-public extension PersonaConnectionRequest {
+public extension IncomingConnectionRequestFromDappReview {
 	struct Environment {
 		public init() {}
 	}

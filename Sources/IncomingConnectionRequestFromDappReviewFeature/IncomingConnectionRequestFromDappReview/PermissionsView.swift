@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - PermissionsView
 struct PermissionsView: View {
-	let permissions: [Permission]
+	let permissions: [IncomingConnectionRequestFromDapp.Permission]
 
 	var body: some View {
 		VStack(alignment: .leading) {
@@ -58,7 +58,11 @@ struct PermissionDetails: View {
 struct PermissionsView_Previews: PreviewProvider {
 	static var previews: some View {
 		PermissionsView(
-			permissions: [.placeholder1, .placeholder2, .placeholder3]
+			permissions: [
+				IncomingConnectionRequestFromDapp.Permission.placeholder1,
+				IncomingConnectionRequestFromDapp.Permission.placeholder2,
+				IncomingConnectionRequestFromDapp.Permission.placeholder3,
+			]
 		)
 	}
 }

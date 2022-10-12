@@ -28,8 +28,8 @@ let package = Package(
 			targets: ["CreateAccountFeature"]
 		),
 		.library(
-			name: "PersonaConnectionFeature",
-			targets: ["PersonaConnectionFeature"]
+			name: "IncomingConnectionRequestFromDappReviewFeature",
+			targets: ["IncomingConnectionRequestFromDappReviewFeature"]
 		),
 	],
 	dependencies: [
@@ -377,7 +377,7 @@ let package = Package(
 			]
 		),
 		.target(
-			name: "PersonaConnectionFeature",
+			name: "IncomingConnectionRequestFromDappReviewFeature",
 			dependencies: [
 				"Common",
 				"DesignSystem",
@@ -385,9 +385,9 @@ let package = Package(
 			]
 		),
 		.testTarget(
-			name: "PersonaConnectionFeatureTests",
+			name: "IncomingConnectionRequestFromDappReviewFeatureTests",
 			dependencies: [
-				"PersonaConnectionFeature",
+				"IncomingConnectionRequestFromDappReviewFeature",
 				"TestUtils",
 			]
 		),

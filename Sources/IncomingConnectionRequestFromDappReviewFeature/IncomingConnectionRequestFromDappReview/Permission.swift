@@ -1,18 +1,20 @@
 import Foundation
 
-// MARK: - Permission
-public struct Permission: Equatable {
-	let description: String
-	let details: [String]?
+// MARK: - IncomingConnectionRequestFromDapp.Permission
+public extension IncomingConnectionRequestFromDapp {
+	struct Permission: Equatable, Decodable {
+		let description: String
+		let details: [String]?
+	}
 }
 
-// MARK: Identifiable
-extension Permission: Identifiable {
+// MARK: - IncomingConnectionRequestFromDapp.Permission + Identifiable
+extension IncomingConnectionRequestFromDapp.Permission: Identifiable {
 	public var id: String { description }
 }
 
 #if DEBUG
-public extension Permission {
+public extension IncomingConnectionRequestFromDapp.Permission {
 	static let placeholder1: Self = .init(
 		description: "A dApp Login, including the following information:",
 		details: [
