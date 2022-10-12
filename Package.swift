@@ -27,6 +27,10 @@ let package = Package(
 			name: "CreateAccountFeature",
 			targets: ["CreateAccountFeature"]
 		),
+		.library(
+			name: "PersonaConnectionFeature",
+			targets: ["PersonaConnectionFeature"]
+		),
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
@@ -369,6 +373,21 @@ let package = Package(
 			name: "PasteboardClientTests",
 			dependencies: [
 				"PasteboardClient",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "PersonaConnectionFeature",
+			dependencies: [
+				"Common",
+				"DesignSystem",
+				tca,
+			]
+		),
+		.testTarget(
+			name: "PersonaConnectionFeatureTests",
+			dependencies: [
+				"PersonaConnectionFeature",
 				"TestUtils",
 			]
 		),

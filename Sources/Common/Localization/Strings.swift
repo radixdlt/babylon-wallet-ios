@@ -105,6 +105,21 @@ public enum L10n {
 			public static let supplyUnknown = L10n.tr("Localizable", "nftList.header.supplyUnknown", fallback: #"Unknown"#)
 		}
 	}
+
+	public enum Persona {
+		public enum ConnectionRequest {
+			/// Continue
+			public static let continueButtonTitle = L10n.tr("Localizable", "persona.connectionRequest.continueButtonTitle", fallback: #"Continue"#)
+			/// For this dApp to function, it needs the following:
+			public static let subtitle = L10n.tr("Localizable", "persona.connectionRequest.subtitle", fallback: #"For this dApp to function, it needs the following:"#)
+			/// dApp Connection Request
+			public static let title = L10n.tr("Localizable", "persona.connectionRequest.title", fallback: #"dApp Connection Request"#)
+			/// %@ wants to connect to your wallet
+			public static func wantsToConnect(_ p1: Any) -> String {
+				L10n.tr("Localizable", "persona.connectionRequest.wantsToConnect", String(describing: p1), fallback: #"%@ wants to connect to your wallet"#)
+			}
+		}
+	}
 }
 
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length
