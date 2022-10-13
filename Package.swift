@@ -7,7 +7,6 @@ let tca: Target.Dependency = .product(
 	name: "ComposableArchitecture",
 	package: "swift-composable-architecture"
 )
-let xctestDynamicOverlay: Target.Dependency = .product(name: "XCTestDynamicOverlay", package: "xctest-dynamic-overlay")
 
 let package = Package(
 	name: "Babylon",
@@ -30,8 +29,6 @@ let package = Package(
 		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.41.2"),
 		// Format code
 		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.1"),
-		// XCTUnimplemented
-		.package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "0.4.0"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
@@ -250,7 +247,7 @@ let package = Package(
 			dependencies: [
 				"Common",
 				"Profile", // address
-				xctestDynamicOverlay,
+				tca, // XCTestDynamicOverlay + DependencyKey
 			],
 			exclude: [
 				"CodeGen/Input/",
