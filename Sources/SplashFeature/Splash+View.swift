@@ -17,10 +17,9 @@ public extension Splash {
 public extension Splash.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: Splash.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: Splash.Action.init
 		) { viewStore in
 			ForceFullScreen {
 				VStack {

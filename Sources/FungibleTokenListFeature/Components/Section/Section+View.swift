@@ -18,10 +18,9 @@ public extension FungibleTokenList.Section {
 public extension FungibleTokenList.Section.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: FungibleTokenList.Section.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: FungibleTokenList.Section.Action.init
 		) { _ in
 			LazyVStack(spacing: 0) {
 				ForEachStore(
@@ -62,9 +61,7 @@ extension FungibleTokenList.Section.Action {
 extension FungibleTokenList.Section.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: FungibleTokenList.Section.State) {
-			// TODO: implement
-		}
+		init(state _: FungibleTokenList.Section.State) {}
 	}
 }
 

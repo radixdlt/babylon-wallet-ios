@@ -24,10 +24,9 @@ public extension Home {
 public extension Home.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: Home.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: Home.Action.init
 		) { viewStore in
 			ZStack {
 				homeView(with: viewStore)

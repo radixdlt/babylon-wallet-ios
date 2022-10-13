@@ -18,12 +18,10 @@ public extension Settings {
 
 public extension Settings.View {
 	var body: some View {
-		// NOTE: placeholder implementation
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: Settings.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: Settings.Action.init
 		) { viewStore in
 			// TODO: implement
 			ForceFullScreen {
@@ -44,7 +42,7 @@ public extension Settings.View {
 // MARK: - Settings.View.ViewState
 public extension Settings.View {
 	struct ViewState: Equatable {
-		public init(_: Settings.State) {}
+		public init(state _: Settings.State) {}
 	}
 }
 

@@ -8,13 +8,9 @@ import SwiftUI
 public extension AccountCompletion {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<AccountCompletion>
-		@ObservedObject private var viewStore: ViewStoreOf<AccountCompletion>
 
-		public init(
-			store: StoreOf<AccountCompletion>
-		) {
+		public init(store: StoreOf<AccountCompletion>) {
 			self.store = store
-			viewStore = ViewStore(self.store)
 		}
 	}
 }
@@ -22,11 +18,10 @@ public extension AccountCompletion {
 public extension AccountCompletion.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: AccountCompletion.Action.init
-			)
-		) { _ in
+			store,
+			observe: ViewState.init(state:),
+			send: AccountCompletion.Action.init
+		) { viewStore in
 			VStack(spacing: 20) {
 				Spacer()
 
@@ -101,8 +96,14 @@ extension AccountCompletion.Action {
 extension AccountCompletion.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: AccountCompletion.State) {
-			// TODO: implement
+		let accountName: String
+		let accountAddress: Address
+		let origin: AccountCompletion.State.Origin
+
+		init(state: AccountCompletion.State) {
+			accountName = state.accountName
+			accountAddress = state.accountAddress
+			origin = state.origin
 		}
 	}
 }

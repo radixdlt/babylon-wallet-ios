@@ -21,10 +21,9 @@ public extension AccountDetails {
 public extension AccountDetails.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: AccountDetails.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: AccountDetails.Action.init
 		) { viewStore in
 			ForceFullScreen {
 				VStack {

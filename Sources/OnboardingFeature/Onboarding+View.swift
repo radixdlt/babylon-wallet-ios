@@ -17,10 +17,9 @@ public extension Onboarding {
 public extension Onboarding.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: Onboarding.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: Onboarding.Action.init
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
@@ -42,9 +41,7 @@ extension Onboarding.View {
 		@BindableState var profileName: String
 		var canProceed: Bool
 
-		init(
-			state: Onboarding.State
-		) {
+		init(state: Onboarding.State) {
 			profileName = state.profileName
 			canProceed = state.canProceed
 		}

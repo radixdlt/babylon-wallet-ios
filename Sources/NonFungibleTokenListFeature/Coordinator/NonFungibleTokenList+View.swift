@@ -18,10 +18,9 @@ public extension NonFungibleTokenList {
 public extension NonFungibleTokenList.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: NonFungibleTokenList.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: NonFungibleTokenList.Action.init
 		) { _ in
 			VStack(spacing: 25) {
 				ForEachStore(
@@ -56,9 +55,7 @@ extension NonFungibleTokenList.Action {
 extension NonFungibleTokenList.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: NonFungibleTokenList.State) {
-			// TODO: implement
-		}
+		init(state _: NonFungibleTokenList.State) {}
 	}
 }
 

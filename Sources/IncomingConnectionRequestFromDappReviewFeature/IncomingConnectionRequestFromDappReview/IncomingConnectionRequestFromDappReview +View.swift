@@ -19,7 +19,7 @@ public extension IncomingConnectionRequestFromDappReview {
 public extension IncomingConnectionRequestFromDappReview.View {
 	var body: some View {
 		WithViewStore(
-			self.store,
+			store,
 			observe: ViewState.init(state:),
 			send: IncomingConnectionRequestFromDappReview.Action.init(action:)
 		) { viewStore in

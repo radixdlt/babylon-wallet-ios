@@ -12,10 +12,9 @@ public extension Home.Header {
 public extension Home.Header.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: Home.Header.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: Home.Header.Action.init
 		) { viewStore in
 			VStack(alignment: .leading) {
 				TitleView(
@@ -53,9 +52,7 @@ extension Home.Header.View {
 	struct ViewState: Equatable {
 		var hasNotification: Bool
 
-		init(
-			state: Home.Header.State
-		) {
+		init(state: Home.Header.State) {
 			hasNotification = state.hasNotification
 		}
 	}
