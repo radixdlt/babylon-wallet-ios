@@ -7,54 +7,58 @@ import SwiftUI
 public extension IncomingConnectionRequestFromDappReview {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<IncomingConnectionRequestFromDappReview>
-		@ObservedObject private var viewStore: ViewStoreOf<IncomingConnectionRequestFromDappReview>
 
 		public init(
 			store: StoreOf<IncomingConnectionRequestFromDappReview>
 		) {
 			self.store = store
-			viewStore = ViewStore(self.store)
 		}
 	}
 }
 
 public extension IncomingConnectionRequestFromDappReview.View {
 	var body: some View {
-		ScrollView {
-			VStack {
-				VStack(spacing: 40) {
-					Text(L10n.Persona.ConnectionRequest.title)
-						.textStyle(.sectionHeader)
-						.multilineTextAlignment(.center)
+		WithViewStore(
+			self.store,
+			observe: ViewState.init(state:),
+			send: IncomingConnectionRequestFromDappReview.Action.init(action:)
+		) { viewStore in
+			ScrollView {
+				VStack {
+					VStack(spacing: 40) {
+						Text(L10n.Persona.ConnectionRequest.title)
+							.textStyle(.sectionHeader)
+							.multilineTextAlignment(.center)
 
-					Image("dapp-placeholder")
+						Image("dapp-placeholder")
+					}
+
+					Spacer(minLength: 40)
+
+					VStack(spacing: 20) {
+						Text(L10n.Persona.ConnectionRequest.wantsToConnect(viewStore.incomingConnectionRequestFromDapp.name))
+							.textStyle(.secondaryHeader)
+
+						Text(L10n.Persona.ConnectionRequest.subtitle)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1Regular)
+					}
+					.multilineTextAlignment(.center)
+
+					Spacer(minLength: 60)
+
+					PermissionsView(permissions: viewStore.incomingConnectionRequestFromDapp.permissions)
+						.padding(.horizontal, 24)
+
+					Spacer()
+
+					PrimaryButton(
+						title: L10n.Persona.ConnectionRequest.continueButtonTitle,
+						action: { /* TODO: implement */ }
+					)
 				}
-
-				Spacer(minLength: 40)
-
-				VStack(spacing: 20) {
-					Text(L10n.Persona.ConnectionRequest.wantsToConnect(viewStore.incomingConnectionRequestFromDapp.name))
-						.textStyle(.secondaryHeader)
-
-					Text(L10n.Persona.ConnectionRequest.subtitle)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body1Regular)
-				}
-				.multilineTextAlignment(.center)
-
-				Spacer(minLength: 60)
-
-				PermissionsView(permissions: viewStore.incomingConnectionRequestFromDapp.permissions)
-					.padding(.horizontal, 24)
-
-				Spacer()
-
-				PrimaryButton(
-					title: L10n.Persona.ConnectionRequest.continueButtonTitle,
-					action: { /* TODO: implement */ }
-				)
+				.padding(.horizontal, 24)
 			}
-			.padding(.horizontal, 24)
 		}
 	}
 }
@@ -77,8 +81,10 @@ extension IncomingConnectionRequestFromDappReview.Action {
 // MARK: - IncomingConnectionRequestFromDappReview.View.ViewState
 extension IncomingConnectionRequestFromDappReview.View {
 	struct ViewState: Equatable {
-		init(state _: IncomingConnectionRequestFromDappReview.State) {
-			// TODO: implement
+		let incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp
+
+		init(state: IncomingConnectionRequestFromDappReview.State) {
+			incomingConnectionRequestFromDapp = state.incomingConnectionRequestFromDapp
 		}
 	}
 }
