@@ -79,5 +79,6 @@ public extension Main {
 				return .none
 			}
 		}
-	).debug()
+	)
+	// .debug()
 }
