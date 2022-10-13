@@ -54,7 +54,7 @@ public extension App {
 
 		appReducer
 	)
-	.debug()
+	// .debug()
 
 	static let appReducer = Reducer { state, action, _ in
 		switch action {

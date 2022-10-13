@@ -1,6 +1,6 @@
 import Foundation
 
-public extension CreateAccount {
+public extension AccountCompletion {
 	// MARK: Environment
 	struct Environment {
 		public init() {}

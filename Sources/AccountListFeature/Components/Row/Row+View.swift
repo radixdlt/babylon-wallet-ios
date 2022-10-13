@@ -23,10 +23,9 @@ public extension AccountList.Row {
 public extension AccountList.Row.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: AccountList.Row.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: AccountList.Row.Action.init
 		) { viewStore in
 			VStack(alignment: .leading) {
 				VStack(alignment: .leading, spacing: 0) {
@@ -53,7 +52,7 @@ public extension AccountList.Row.View {
 				TokenListView(containers: viewStore.state.portfolio.fungibleTokenContainers)
 			}
 			.padding(25)
-			.background(Color.app.cardBackgroundLight)
+			.background(Color.app.gray5)
 			.cornerRadius(6)
 			.onTapGesture {
 				viewStore.send(.didSelect)
@@ -126,12 +125,12 @@ private struct HeaderView: View {
 		HStack {
 			Text(name)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.buttonTitle)
+				.textStyle(.secondaryHeader)
 				.fixedSize()
 			Spacer()
 			Text(value)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.buttonTitle)
+				.textStyle(.secondaryHeader)
 				.fixedSize()
 		}
 	}
@@ -149,7 +148,7 @@ private struct TokenView: View {
 			Text(code)
 				.textCase(.uppercase)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.footnote)
+				.textStyle(.body2HighImportance)
 		}
 		.frame(width: 30, height: 30)
 	}

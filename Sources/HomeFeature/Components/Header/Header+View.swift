@@ -12,10 +12,9 @@ public extension Home.Header {
 public extension Home.Header.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: Home.Header.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: Home.Header.Action.init
 		) { viewStore in
 			VStack(alignment: .leading) {
 				TitleView(
@@ -53,9 +52,7 @@ extension Home.Header.View {
 	struct ViewState: Equatable {
 		var hasNotification: Bool
 
-		init(
-			state: Home.Header.State
-		) {
+		init(state: Home.Header.State) {
 			hasNotification = state.hasNotification
 		}
 	}
@@ -65,8 +62,8 @@ private extension Home.Header.View {
 	var subtitleView: some SwiftUI.View {
 		HStack {
 			Text(L10n.Home.Header.subtitle)
-				.foregroundColor(.app.secondary)
-				.font(.app.body)
+				.foregroundColor(.app.gray2)
+				.textStyle(.body1Regular)
 		}
 	}
 }
@@ -80,7 +77,7 @@ private struct TitleView: View {
 		HStack {
 			Text(L10n.Home.Header.title)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.title)
+				.textStyle(.sheetTitle)
 			Spacer()
 			SettingsButton(
 				shouldShowNotification: shouldShowNotification,

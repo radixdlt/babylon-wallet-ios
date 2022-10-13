@@ -9,9 +9,7 @@ public extension AssetsView {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
-		public init(
-			store: Store
-		) {
+		public init(store: Store) {
 			self.store = store
 		}
 	}
@@ -20,10 +18,9 @@ public extension AssetsView {
 public extension AssetsView.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: AssetsView.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: AssetsView.Action.init
 		) { viewStore in
 			VStack(spacing: 30) {
 				selectorView(with: viewStore)
@@ -88,13 +85,13 @@ private extension AssetsView.View {
 				action()
 			}, label: {
 				Text(type.displayText)
-					.foregroundColor(type == viewStore.type ? .app.buttonTextWhite : .app.buttonTextBlack)
-					.font(.app.buttonBody)
+					.foregroundColor(type == viewStore.type ? .app.white : .app.buttonTextBlack)
+					.textStyle(.body1Header)
 					.frame(height: 40)
 					.padding([.leading, .trailing], 18)
 					.background(type == viewStore.type ?
 						RoundedRectangle(cornerRadius: 21)
-						.fill(Color.app.buttonBackgroundDark2) : nil
+						.fill(Color.app.gray1) : nil
 					)
 			}
 		)

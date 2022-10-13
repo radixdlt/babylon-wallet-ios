@@ -38,23 +38,50 @@ public enum L10n {
 	}
 
 	public enum CreateAccount {
+		/// Continue
+		public static let continueButtonTitle = L10n.tr("Localizable", "createAccount.continueButtonTitle", fallback: #"Continue"#)
+		/// Create First Account
+		public static let createFirstAccount = L10n.tr("Localizable", "createAccount.createFirstAccount", fallback: #"Create First Account"#)
 		/// Create New Account
 		public static let createNewAccount = L10n.tr("Localizable", "createAccount.createNewAccount", fallback: #"Create New Account"#)
+		/// This can be changed any time
+		public static let explanation = L10n.tr("Localizable", "createAccount.explanation", fallback: #"This can be changed any time"#)
+		/// e.g. My First Account
+		public static let placeholder = L10n.tr("Localizable", "createAccount.placeholder", fallback: #"e.g. My First Account"#)
+		/// What would you like to call your account?
+		public static let subtitle = L10n.tr("Localizable", "createAccount.subtitle", fallback: #"What would you like to call your account?"#)
+		public enum Completion {
+			/// Your account lives on the Radix Network and you can access it anytime in Radix Wallet.
+			public static let explanation = L10n.tr("Localizable", "createAccount.completion.explanation", fallback: #"Your account lives on the Radix Network and you can access it anytime in Radix Wallet."#)
+			/// Go to %@
+			public static func returnToOrigin(_ p1: Any) -> String {
+				L10n.tr("Localizable", "createAccount.completion.returnToOrigin", String(describing: p1), fallback: #"Go to %@"#)
+			}
+
+			/// You’ve created your account.
+			public static let subtitle = L10n.tr("Localizable", "createAccount.completion.subtitle", fallback: #"You’ve created your account."#)
+			/// Congratulations
+			public static let title = L10n.tr("Localizable", "createAccount.completion.title", fallback: #"Congratulations"#)
+			public enum Origin {
+				/// Home
+				public static let home = L10n.tr("Localizable", "createAccount.completion.origin.home", fallback: #"Home"#)
+			}
+		}
 	}
 
 	public enum Home {
 		public enum Header {
-			/// Welcome, here are all your accounts on the Radar Network
-			public static let subtitle = L10n.tr("Localizable", "home.header.subtitle", fallback: #"Welcome, here are all your accounts on the Radar Network"#)
-			/// Radar Wallet
-			public static let title = L10n.tr("Localizable", "home.header.title", fallback: #"Radar Wallet"#)
+			/// Welcome, here are all your accounts on the Radix Network
+			public static let subtitle = L10n.tr("Localizable", "home.header.subtitle", fallback: #"Welcome, here are all your accounts on the Radix Network"#)
+			/// Radix Wallet
+			public static let title = L10n.tr("Localizable", "home.header.title", fallback: #"Radix Wallet"#)
 		}
 
 		public enum VisitHub {
-			/// Visit the Radar Hub
-			public static let buttonTitle = L10n.tr("Localizable", "home.visitHub.buttonTitle", fallback: #"Visit the Radar Hub"#)
-			/// Ready to get started using the Radar Network and your Wallet?
-			public static let title = L10n.tr("Localizable", "home.visitHub.title", fallback: #"Ready to get started using the Radar Network and your Wallet?"#)
+			/// Visit the Radix Hub
+			public static let buttonTitle = L10n.tr("Localizable", "home.visitHub.buttonTitle", fallback: #"Visit the Radix Hub"#)
+			/// Ready to get started using the Radix Network and your Wallet?
+			public static let title = L10n.tr("Localizable", "home.visitHub.title", fallback: #"Ready to get started using the Radix Network and your Wallet?"#)
 		}
 	}
 
@@ -76,6 +103,21 @@ public enum L10n {
 			public static let show = L10n.tr("Localizable", "nftList.header.show", fallback: #"+ Show"#)
 			/// Unknown
 			public static let supplyUnknown = L10n.tr("Localizable", "nftList.header.supplyUnknown", fallback: #"Unknown"#)
+		}
+	}
+
+	public enum Persona {
+		public enum ConnectionRequest {
+			/// Continue
+			public static let continueButtonTitle = L10n.tr("Localizable", "persona.connectionRequest.continueButtonTitle", fallback: #"Continue"#)
+			/// For this dApp to function, it needs the following:
+			public static let subtitle = L10n.tr("Localizable", "persona.connectionRequest.subtitle", fallback: #"For this dApp to function, it needs the following:"#)
+			/// dApp Connection Request
+			public static let title = L10n.tr("Localizable", "persona.connectionRequest.title", fallback: #"dApp Connection Request"#)
+			/// %@ wants to connect to your wallet
+			public static func wantsToConnect(_ p1: Any) -> String {
+				L10n.tr("Localizable", "persona.connectionRequest.wantsToConnect", String(describing: p1), fallback: #"%@ wants to connect to your wallet"#)
+			}
 		}
 	}
 }

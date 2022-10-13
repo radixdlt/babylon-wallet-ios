@@ -21,10 +21,9 @@ public extension AccountDetails {
 public extension AccountDetails.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: AccountDetails.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: AccountDetails.Action.init
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
@@ -60,7 +59,7 @@ public extension AccountDetails.View {
 						.padding(.bottom, 24)
 					}
 				}
-				.background(Color.app.backgroundLightGray.opacity(0.15))
+				.background(Color.app.gray2.opacity(0.15))
 			}
 		}
 	}
@@ -85,7 +84,7 @@ private extension AccountDetails.View {
 			Spacer()
 			Text(viewStore.name)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.buttonTitle)
+				.textStyle(.secondaryHeader)
 			Spacer()
 			Button(
 				action: {
@@ -106,9 +105,9 @@ private extension AccountDetails.View {
 		}, label: {
 			Text(L10n.AccountDetails.transferButtonTitle)
 				.foregroundColor(.app.buttonTextBlack)
-				.font(.app.body)
+				.textStyle(.body1Regular)
 				.padding()
-				.background(Color.app.buttonBackgroundLight)
+				.background(Color.app.gray4)
 				.cornerRadius(6)
 		})
 	}

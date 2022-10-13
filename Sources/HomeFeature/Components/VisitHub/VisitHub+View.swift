@@ -12,10 +12,9 @@ public extension Home.VisitHub {
 public extension Home.VisitHub.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: Home.VisitHub.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: Home.VisitHub.Action.init
 		) { viewStore in
 			VStack {
 				title
@@ -23,7 +22,7 @@ public extension Home.VisitHub.View {
 					viewStore.send(.visitHubButtonTapped)
 				}
 			}
-			.background(Color.app.buttonBackgroundDark)
+			.background(Color.app.gray3)
 			.cornerRadius(6)
 		}
 	}
@@ -50,19 +49,15 @@ extension Home.VisitHub.Action {
 extension Home.VisitHub.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(
-			state _: Home.VisitHub.State
-		) {
-			// TODO: implement
-		}
+		init(state _: Home.VisitHub.State) {}
 	}
 }
 
 private extension Home.VisitHub.View {
 	var title: some View {
 		Text(L10n.Home.VisitHub.title)
-			.foregroundColor(.app.buttonTextDark)
-			.font(.app.body)
+			.foregroundColor(.app.gray1)
+			.textStyle(.body1Regular)
 			.multilineTextAlignment(.center)
 			.padding()
 	}
@@ -73,10 +68,10 @@ private extension Home.VisitHub.View {
 			label: {
 				Text(L10n.Home.VisitHub.buttonTitle)
 					.foregroundColor(.app.buttonTextBlack)
-					.font(.app.body)
+					.textStyle(.body1Regular)
 					.padding()
 					.frame(maxWidth: .infinity)
-					.background(Color.app.buttonBackgroundLight)
+					.background(Color.app.gray4)
 					.cornerRadius(6)
 			}
 		)

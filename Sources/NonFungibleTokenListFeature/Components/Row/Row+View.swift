@@ -27,10 +27,9 @@ public extension NonFungibleTokenList.Row {
 public extension NonFungibleTokenList.Row.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: NonFungibleTokenList.Row.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: NonFungibleTokenList.Row.Action.init
 		) { viewStore in
 			VStack(spacing: 1) {
 				ForEach(-1 ..< viewStore.containers.count) { index in
@@ -99,9 +98,7 @@ extension NonFungibleTokenList.Row.View {
 		let containers: [NonFungibleTokenContainer]
 		var isExpanded: Bool
 
-		init(
-			state: NonFungibleTokenList.Row.RowState
-		) {
+		init(state: NonFungibleTokenList.Row.RowState) {
 			containers = state.containers
 			isExpanded = state.isExpanded
 		}

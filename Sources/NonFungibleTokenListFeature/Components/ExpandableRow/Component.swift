@@ -29,20 +29,20 @@ extension Component {
 
 			VStack(alignment: .leading, spacing: 8) {
 				Text(container.asset.address)
-					.foregroundColor(.app.secondary)
-					.font(.app.caption2)
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2Regular)
 
 				ForEach(metadata, id: \.self) { element in
 					HStack(alignment: .top) {
 						Text(element.keys.first ?? "")
 							.foregroundColor(.app.buttonTextBlack)
-							.font(.app.body)
+							.textStyle(.body1Regular)
 
 						Spacer()
 
 						Text(element.values.first ?? "")
 							.foregroundColor(.app.buttonTextBlack)
-							.font(.app.buttonBody)
+							.textStyle(.body1Header)
 					}
 				}
 

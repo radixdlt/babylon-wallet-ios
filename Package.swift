@@ -23,6 +23,14 @@ let package = Package(
 			name: "HomeFeature",
 			targets: ["HomeFeature"]
 		),
+		.library(
+			name: "CreateAccountFeature",
+			targets: ["CreateAccountFeature"]
+		),
+		.library(
+			name: "IncomingConnectionRequestFromDappReviewFeature",
+			targets: ["IncomingConnectionRequestFromDappReviewFeature"]
+		),
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
@@ -203,6 +211,7 @@ let package = Package(
 			name: "Common",
 			dependencies: [
 				"Address",
+				"DesignSystem",
 			]
 		),
 		.testTarget(
@@ -215,6 +224,9 @@ let package = Package(
 		.target(
 			name: "CreateAccountFeature",
 			dependencies: [
+				"Address",
+				"DesignSystem",
+				"Common",
 				tca,
 			]
 		),
@@ -223,6 +235,14 @@ let package = Package(
 			dependencies: [
 				"CreateAccountFeature",
 				"TestUtils",
+			]
+		),
+		.target(
+			name: "DesignSystem",
+			dependencies: [
+			],
+			resources: [
+				.process("Fonts"),
 			]
 		),
 		.target(
@@ -371,6 +391,21 @@ let package = Package(
 			name: "PasteboardClientTests",
 			dependencies: [
 				"PasteboardClient",
+				"TestUtils",
+			]
+		),
+		.target(
+			name: "IncomingConnectionRequestFromDappReviewFeature",
+			dependencies: [
+				"Common",
+				"DesignSystem",
+				tca,
+			]
+		),
+		.testTarget(
+			name: "IncomingConnectionRequestFromDappReviewFeatureTests",
+			dependencies: [
+				"IncomingConnectionRequestFromDappReviewFeature",
 				"TestUtils",
 			]
 		),

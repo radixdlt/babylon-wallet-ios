@@ -19,10 +19,9 @@ public extension AccountDetails.Transfer {
 public extension AccountDetails.Transfer.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: AccountDetails.Transfer.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: AccountDetails.Transfer.Action.init
 		) { viewStore in
 			// TODO: implement
 			ForceFullScreen {
@@ -61,9 +60,7 @@ extension AccountDetails.Transfer.Action {
 extension AccountDetails.Transfer.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: AccountDetails.Transfer.State) {
-			// TODO: implement
-		}
+		init(state _: AccountDetails.Transfer.State) {}
 	}
 }
 
