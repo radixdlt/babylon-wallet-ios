@@ -19,10 +19,9 @@ public extension AggregatedValue {
 public extension AggregatedValue.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: AggregatedValue.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: AggregatedValue.Action.init
 		) { viewStore in
 			AggregatedValueView(
 				value: viewStore.value,
@@ -61,9 +60,7 @@ extension AggregatedValue.View {
 		var value: Float?
 		var currency: FiatCurrency // FIXME: this should be currency, since it can be any currency
 
-		init(
-			state: AggregatedValue.State
-		) {
+		init(state: AggregatedValue.State) {
 			isValueVisible = state.isCurrencyAmountVisible
 			value = state.value
 			currency = state.currency

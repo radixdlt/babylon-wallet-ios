@@ -19,10 +19,9 @@ public extension AccountPreferences {
 public extension AccountPreferences.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: AccountPreferences.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: AccountPreferences.Action.init
 		) { viewStore in
 			// TODO: implement
 			ForceFullScreen {
@@ -61,9 +60,7 @@ extension AccountPreferences.Action {
 extension AccountPreferences.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: AccountPreferences.State) {
-			// TODO: implement
-		}
+		init(state _: AccountPreferences.State) {}
 	}
 }
 

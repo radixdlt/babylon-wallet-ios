@@ -9,9 +9,7 @@ public extension AssetsView {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
-		public init(
-			store: Store
-		) {
+		public init(store: Store) {
 			self.store = store
 		}
 	}
@@ -20,10 +18,9 @@ public extension AssetsView {
 public extension AssetsView.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: AssetsView.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: AssetsView.Action.init
 		) { viewStore in
 			VStack(spacing: 30) {
 				selectorView(with: viewStore)

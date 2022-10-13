@@ -20,10 +20,9 @@ public extension FungibleTokenList.Row {
 public extension FungibleTokenList.Row.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: FungibleTokenList.Row.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: FungibleTokenList.Row.Action.init
 		) { viewStore in
 			tokenRow(with: viewStore, container: viewStore.container)
 				.padding([.leading, .trailing], 24)

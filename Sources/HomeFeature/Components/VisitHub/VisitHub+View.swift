@@ -12,10 +12,9 @@ public extension Home.VisitHub {
 public extension Home.VisitHub.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: Home.VisitHub.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: Home.VisitHub.Action.init
 		) { viewStore in
 			VStack {
 				title
@@ -50,11 +49,7 @@ extension Home.VisitHub.Action {
 extension Home.VisitHub.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(
-			state _: Home.VisitHub.State
-		) {
-			// TODO: implement
-		}
+		init(state _: Home.VisitHub.State) {}
 	}
 }
 

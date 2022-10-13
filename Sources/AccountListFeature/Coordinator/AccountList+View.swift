@@ -18,10 +18,9 @@ public extension AccountList {
 public extension AccountList.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: AccountList.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: AccountList.Action.init
 		) { viewStore in
 			LazyVStack(spacing: 25) {
 				ForEachStore(
@@ -33,7 +32,7 @@ public extension AccountList.View {
 				)
 			}
 			.onAppear {
-				viewStore.send(.didAppear)
+				viewStore.send(.viewDidAppear)
 			}
 			.alert(store.scope(state: \.alert), dismiss: .internal(.user(.alertDismissed)))
 		}
@@ -44,14 +43,14 @@ public extension AccountList.View {
 extension AccountList.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
-		case didAppear
+		case viewDidAppear
 	}
 }
 
 extension AccountList.Action {
 	init(action: AccountList.View.ViewAction) {
 		switch action {
-		case .didAppear:
+		case .viewDidAppear:
 			self = .internal(.user(.loadAccounts))
 		}
 	}
@@ -61,9 +60,7 @@ extension AccountList.Action {
 extension AccountList.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: AccountList.State) {
-			// TODO: implement
-		}
+		init(state _: AccountList.State) {}
 	}
 }
 

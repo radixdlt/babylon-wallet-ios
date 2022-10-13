@@ -23,10 +23,9 @@ public extension AccountList.Row {
 public extension AccountList.Row.View {
 	var body: some View {
 		WithViewStore(
-			store.scope(
-				state: ViewState.init,
-				action: AccountList.Row.Action.init
-			)
+			store,
+			observe: ViewState.init(state:),
+			send: AccountList.Row.Action.init
 		) { viewStore in
 			VStack(alignment: .leading) {
 				VStack(alignment: .leading, spacing: 0) {
