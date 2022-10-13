@@ -86,6 +86,7 @@ let package = Package(
 				"Address",
 				"AppSettings",
 				"Asset",
+				"GatewayAPI",
 				"Common",
 			]
 		),
