@@ -263,6 +263,24 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "GatewayAPI",
+			dependencies: [
+				"Common",
+				"Profile", // address
+				tca, // XCTestDynamicOverlay + DependencyKey
+			],
+			exclude: [
+				"CodeGen/Input/",
+			]
+		),
+		.testTarget(
+			name: "GatewayAPITests",
+			dependencies: [
+				"TestUtils",
+				"GatewayAPI",
+			]
+		),
+		.target(
 			name: "HomeFeature",
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
