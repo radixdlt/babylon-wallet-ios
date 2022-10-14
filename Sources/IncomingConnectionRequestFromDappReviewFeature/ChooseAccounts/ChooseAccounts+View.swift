@@ -1,0 +1,128 @@
+import Common
+import ComposableArchitecture
+import DesignSystem
+import SwiftUI
+
+// MARK: - ChooseAccounts.View
+public extension ChooseAccounts {
+	struct View: SwiftUI.View {
+		private let store: StoreOf<ChooseAccounts>
+
+		public init(store: StoreOf<ChooseAccounts>) {
+			self.store = store
+		}
+	}
+}
+
+public extension ChooseAccounts.View {
+	var body: some View {
+		WithViewStore(
+			store,
+			observe: ViewState.init(state:),
+			send: ChooseAccounts.Action.init
+		) { viewStore in
+			VStack {
+				header(with: viewStore)
+					.padding(.horizontal, 24)
+
+				ScrollView {
+					VStack {
+						Image("dapp-placeholder", bundle: .module)
+
+						Spacer(minLength: 40)
+
+						VStack(spacing: 20) {
+							Text(L10n.DApp.ChooseAccounts.title)
+								.textStyle(.secondaryHeader)
+
+							Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.incomingConnectionRequestFromDapp.displayName))
+								.foregroundColor(.app.gray2)
+								.textStyle(.body1Regular)
+								.padding(24)
+						}
+						.multilineTextAlignment(.center)
+
+						Spacer(minLength: 60)
+
+						Button(
+							action: {},
+							label: {
+								Text(L10n.DApp.ChooseAccounts.createNewAccount)
+									.foregroundColor(.app.gray1)
+									.textStyle(.body1Regular)
+							}
+						)
+
+						Spacer(minLength: 60)
+
+						PrimaryButton(
+							title: L10n.DApp.ConnectionRequest.continueButtonTitle,
+							isEnabled: viewStore.isValid,
+							action: { /* TODO: implement */ }
+						)
+						.disabled(!viewStore.isValid)
+					}
+					.padding(.horizontal, 24)
+				}
+			}
+		}
+	}
+}
+
+// MARK: - ChooseAccounts.View.ChooseAccountsViewStore
+private extension ChooseAccounts.View {
+	typealias ChooseAccountsViewStore = ComposableArchitecture.ViewStore<ChooseAccounts.View.ViewState, ChooseAccounts.View.ViewAction>
+}
+
+private extension ChooseAccounts.View {
+	func header(with _: ChooseAccountsViewStore) -> some View {
+		HStack {
+			BackButton {
+				// TODO: implement
+			}
+			Spacer()
+		}
+	}
+}
+
+// MARK: - ChooseAccounts.View.ViewAction
+extension ChooseAccounts.View {
+	enum ViewAction: Equatable {}
+}
+
+extension ChooseAccounts.Action {
+	init(action: ChooseAccounts.View.ViewAction) {
+		switch action {
+		default:
+			// TODO: implement
+			break
+		}
+	}
+}
+
+// MARK: - ChooseAccounts.View.ViewState
+extension ChooseAccounts.View {
+	struct ViewState: Equatable {
+		var isValid: Bool
+		let incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp
+
+		init(state: ChooseAccounts.State) {
+			isValid = state.isValid
+			incomingConnectionRequestFromDapp = state.incomingConnectionRequestFromDapp
+		}
+	}
+}
+
+// MARK: - ChooseAccounts_Preview
+struct ChooseAccounts_Preview: PreviewProvider {
+	static var previews: some View {
+		registerFonts()
+
+		return ChooseAccounts.View(
+			store: .init(
+				initialState: .placeholder,
+				reducer: ChooseAccounts()
+			)
+		)
+	}
+}

@@ -25,10 +25,9 @@ public extension CreateAccount.View {
 			ForceFullScreen {
 				VStack {
 					HStack {
-						Button(
-							action: { viewStore.send(.closeButtonTapped) },
-							label: { Image("close") }
-						)
+						CloseButton {
+							viewStore.send(.closeButtonTapped)
+						}
 						Spacer()
 					}
 

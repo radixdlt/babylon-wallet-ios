@@ -36,16 +36,20 @@ let package = Package(
 	],
 	products: [
 		.library(
+			name: "AccountListFeature",
+			targets: ["AccountListFeature"]
+		),
+		.library(
 			name: "AppFeature",
 			targets: ["AppFeature"]
 		),
 		.library(
-			name: "HomeFeature",
-			targets: ["HomeFeature"]
-		),
-		.library(
 			name: "CreateAccountFeature",
 			targets: ["CreateAccountFeature"]
+		),
+		.library(
+			name: "HomeFeature",
+			targets: ["HomeFeature"]
 		),
 		.library(
 			name: "IncomingConnectionRequestFromDappReviewFeature",
@@ -84,6 +88,7 @@ let package = Package(
 				"AggregatedValueFeature",
 				"Asset",
 				"AssetsViewFeature",
+				"DesignSystem",
 				engineToolkit,
 				profile,
 				tca,

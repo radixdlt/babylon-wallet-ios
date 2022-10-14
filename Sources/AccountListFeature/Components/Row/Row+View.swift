@@ -2,6 +2,7 @@ import AccountPortfolio
 import Asset
 import Common
 import ComposableArchitecture
+import DesignSystem
 import FungibleTokenListFeature
 import Profile
 import SwiftUI
@@ -138,55 +139,12 @@ private struct HeaderView: View {
 	}
 }
 
-// MARK: - TokenView
-private struct TokenView: View {
-	let code: String
-
-	var body: some View {
-		ZStack {
-			Circle()
-				.strokeBorder(.orange, lineWidth: 1)
-				.background(Circle().foregroundColor(Color.App.random))
-			Text(code)
-				.textCase(.uppercase)
-				.foregroundColor(.app.buttonTextBlack)
-				.textStyle(.body2HighImportance)
-		}
-		.frame(width: 30, height: 30)
-	}
-}
-
-// MARK: - TokenListView
-private struct TokenListView: View {
-	private let sortedTokens: [FungibleTokenContainer]
-	private let limit = 5
-
-	init(containers: [FungibleTokenContainer]) {
-		sortedTokens = FungibleTokenListSorter.live.sortTokens(containers).map(\.tokenContainers).flatMap { $0 }
-	}
-
-	var body: some View {
-		if sortedTokens.count > limit {
-			HStack(spacing: -10) {
-				ForEach(sortedTokens[0 ..< limit]) { token in
-					TokenView(code: token.asset.symbol ?? "")
-				}
-				TokenView(code: "+\(sortedTokens.count - limit)")
-			}
-		} else {
-			HStack(spacing: -10) {
-				ForEach(sortedTokens) { token in
-					TokenView(code: token.asset.symbol ?? "")
-				}
-			}
-		}
-	}
-}
-
 // MARK: - Row_Preview
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
-		AccountList.Row.View(
+		registerFonts()
+
+		return AccountList.Row.View(
 			store: .init(
 				initialState: .placeholder,
 				reducer: AccountList.Row.reducer,
