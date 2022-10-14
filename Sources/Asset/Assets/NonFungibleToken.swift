@@ -1,21 +1,34 @@
 import Foundation
+import GatewayAPI
 
 // MARK: - NonFungibleToken
 public struct NonFungibleToken: Asset, Token {
 	public let address: ComponentAddress
-	public let supply: Supply
+	// TODO: add supply when API is ready
 
 	/// Token icon URL.
 	public var iconURL: String?
 
 	public init(
 		address: ComponentAddress,
-		supply: Supply,
 		iconURL: String?
 	) {
 		self.address = address
-		self.supply = supply
 		self.iconURL = iconURL
+	}
+}
+
+// MARK: - Convenience
+public extension NonFungibleToken {
+	init(
+		address: ComponentAddress,
+		details _: EntityDetailsResponseNonFungibleDetails
+	) {
+		self.init(
+			address: address,
+			// TODO: update when API is ready
+			iconURL: nil
+		)
 	}
 }
 
@@ -40,7 +53,6 @@ public struct NonFungibleTokenContainer: AssetContainer {
 public extension NonFungibleToken {
 	static let mock = Self(
 		address: "mock",
-		supply: .fixed(100),
 		iconURL: nil
 	)
 }

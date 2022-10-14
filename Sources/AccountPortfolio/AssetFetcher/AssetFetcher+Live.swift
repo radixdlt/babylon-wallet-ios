@@ -9,39 +9,57 @@ public extension AssetFetcher {
 
 		return Self(
 			fetchAssets: { address in
-
 				let resources = try await apiClient.accountResourcesByAddress(address)
 
-				let entityDetails = try await withThrowingTaskGroup(
-					of: EntityDetailsResponseDetails.self,
-					returning: [EntityDetailsResponseDetails].self,
+				let resourceDetails = try await withThrowingTaskGroup(
+					of: ResourceDetails.self,
+					returning: [ResourceDetails].self,
 					body: { taskGroup in
-						for result in resources.fungibleResources.results {
+						for resource in resources.fungibleResources.results {
 							taskGroup.addTask {
-								let details = try await apiClient.resourceDetailsByResourceIdentifier(result.address)
-								return details
+								let details = try await apiClient.resourceDetailsByResourceIdentifier(resource.address)
+								return .init(address: resource.address, details: details)
 							}
 						}
 
-						for result in resources.nonFungibleResources.results {
+						for resource in resources.nonFungibleResources.results {
 							taskGroup.addTask {
-								let details = try await apiClient.resourceDetailsByResourceIdentifier(result.address)
-								return details
+								let details = try await apiClient.resourceDetailsByResourceIdentifier(resource.address)
+								return .init(address: resource.address, details: details)
 							}
 						}
 
-						var entityDetails = [EntityDetailsResponseDetails]()
+						var resourceDetails = [ResourceDetails]()
 						for try await result in taskGroup {
-							entityDetails.append(result)
+							resourceDetails.append(result)
 						}
 
-						return entityDetails
+						return resourceDetails
 					}
 				)
 
-				// TODO: replace with real implementation when API is ready
-				return AssetGenerator.mockAssets
+				var fungibleTokens = [any Asset]()
+				var nonFungibleTokens = [any Asset]()
+
+				resourceDetails.forEach {
+					switch $0.details {
+					case let .typeEntityDetailsResponseFungibleDetails(details):
+						fungibleTokens.append(FungibleToken(address: $0.address, details: details))
+					case let .typeEntityDetailsResponseNonFungibleDetails(details):
+						nonFungibleTokens.append(NonFungibleToken(address: $0.address, details: details))
+					}
+				}
+
+				return [fungibleTokens, nonFungibleTokens]
 			}
 		)
 	}()
+}
+
+// MARK: - AssetFetcher.ResourceDetails
+private extension AssetFetcher {
+	struct ResourceDetails {
+		let address: String
+		let details: EntityDetailsResponseDetails
+	}
 }

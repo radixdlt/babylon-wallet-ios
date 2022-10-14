@@ -1,9 +1,13 @@
+import BigInt
 import Foundation
+import GatewayAPI
 
 // MARK: - FungibleToken
 public struct FungibleToken: Asset, Token {
 	public let address: ComponentAddress
-	public let supply: Supply
+	public let totalSupplyAttos: BigUInt
+	public let totalMintedAttos: BigUInt
+	public let totalBurntAttos: BigUInt
 
 	/// An optional desciption of this token.
 	public let tokenDescription: String?
@@ -19,18 +23,42 @@ public struct FungibleToken: Asset, Token {
 
 	public init(
 		address: ComponentAddress,
-		supply: Supply,
+		totalSupplyAttos: BigUInt,
+		totalMintedAttos: BigUInt,
+		totalBurntAttos: BigUInt,
 		tokenDescription: String?,
 		name: String?,
 		code: String?,
 		iconURL: String?
 	) {
 		self.address = address
-		self.supply = supply
+		self.totalSupplyAttos = totalSupplyAttos
+		self.totalMintedAttos = totalMintedAttos
+		self.totalBurntAttos = totalBurntAttos
 		self.tokenDescription = tokenDescription
 		self.name = name
 		self.code = code
 		self.iconURL = iconURL
+	}
+}
+
+// MARK: - Convenience
+public extension FungibleToken {
+	init(
+		address: ComponentAddress,
+		details: EntityDetailsResponseFungibleDetails
+	) {
+		self.init(
+			address: address,
+			totalSupplyAttos: .init(stringLiteral: details.totalSupplyAttos),
+			totalMintedAttos: .init(stringLiteral: details.totalMintedAttos),
+			totalBurntAttos: .init(stringLiteral: details.totalBurntAttos),
+			// TODO: update when API is ready
+			tokenDescription: nil,
+			name: nil,
+			code: nil,
+			iconURL: nil
+		)
 	}
 }
 
@@ -59,7 +87,9 @@ public extension FungibleToken {
 	/// The native token of the Radix Ledger
 	static let xrd = Self(
 		address: "unknown at this point",
-		supply: .fixed(24_000_000_000),
+        totalSupplyAttos: .init(stringLiteral: "24000000000"),
+		totalMintedAttos: .init(stringLiteral: "0"),
+		totalBurntAttos: .init(stringLiteral: "0"),
 		tokenDescription: "The native token of the Radix Ledger",
 		name: "RAD",
 		code: "XRD",
