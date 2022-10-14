@@ -16,18 +16,19 @@ final class HomeFeatureTests: TestCase {
 		// given
 
 		// fungible tokens
-		let btc = FungibleToken(address: "btc-deadbeef", supply: .fixed(100), tokenDescription: nil, name: "Bitcoin", code: "BTC", iconURL: "")
-		let eth = FungibleToken(address: "eth-deadbeef", supply: .fixed(100), tokenDescription: nil, name: "Ethereum", code: "ETH", iconURL: "")
+		let btc = FungibleToken.btc
+		let eth = FungibleToken.eth
 		let xrd = FungibleToken.xrd
+
 		let btcContainer = FungibleTokenContainer(asset: btc, amount: 1.234, worth: 1.987)
 		let ethContainer = FungibleTokenContainer(asset: eth, amount: 2.345, worth: 2.876)
 		let xrdContainer = FungibleTokenContainer(asset: xrd, amount: 4.567, worth: 4.654)
 		let expectedAggregatedValue: Float = 9.517
 
 		// non fungible tokens
-		let nft1 = NonFungibleToken(address: "nft1-deadbeef", supply: .fixed(100), iconURL: nil)
-		let nft2 = NonFungibleToken(address: "nft2-deadbeef", supply: .fixed(100), iconURL: nil)
-		let nft3 = NonFungibleToken(address: "nft3-deadbeef", supply: .fixed(100), iconURL: nil)
+		let nft1 = NonFungibleToken.mock1
+		let nft2 = NonFungibleToken.mock2
+		let nft3 = NonFungibleToken.mock3
 		let nftContainer1 = NonFungibleTokenContainer(asset: nft1, metadata: nil)
 		let nftContainer2 = NonFungibleTokenContainer(asset: nft2, metadata: nil)
 		let nftContainer3 = NonFungibleTokenContainer(asset: nft3, metadata: nil)
@@ -127,8 +128,8 @@ final class HomeFeatureTests: TestCase {
 
 	func test_accountWorthLoaded_whenSingleAccountWorthIsLoaded_thenUpdateSingleAccount() async {
 		// given
-		let btc = FungibleToken(address: "btcaddress", supply: .fixed(100), tokenDescription: nil, name: "Bitcoin", code: "BTC", iconURL: "")
-		let eth = FungibleToken(address: "ethaddress", supply: .fixed(100), tokenDescription: nil, name: "Ethereum", code: "ETH", iconURL: "")
+		let btc = FungibleToken.btc
+		let eth = FungibleToken.eth
 		let xrd = FungibleToken.xrd
 
 		let btcContainer = FungibleTokenContainer(asset: btc, amount: 1.234, worth: 1.987)

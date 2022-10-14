@@ -51,8 +51,18 @@ public struct NonFungibleTokenContainer: AssetContainer {
 
 #if DEBUG
 public extension NonFungibleToken {
-	static let mock = Self(
-		address: "mock",
+	static let mock1 = Self(
+		address: "nft1-deadbeef",
+		iconURL: nil
+	)
+
+	static let mock2 = Self(
+		address: "nft2-deadbeef",
+		iconURL: nil
+	)
+
+	static let mock3 = Self(
+		address: "nft3-deadbeef",
 		iconURL: nil
 	)
 }

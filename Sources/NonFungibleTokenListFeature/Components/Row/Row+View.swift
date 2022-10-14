@@ -187,7 +187,9 @@ struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleTokenList.Row.View(
 			store: .init(
-				initialState: .init(containers: [.init(asset: .mock, metadata: nil)]),
+				initialState: .init(
+					containers: [.init(asset: .mock1, metadata: nil)]
+				),
 				reducer: NonFungibleTokenList.Row.reducer,
 				environment: .init()
 			)
