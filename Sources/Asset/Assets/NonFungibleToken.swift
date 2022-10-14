@@ -1,5 +1,4 @@
 import Foundation
-import GatewayAPI
 
 // MARK: - NonFungibleToken
 public struct NonFungibleToken: Asset, Token {
@@ -15,20 +14,6 @@ public struct NonFungibleToken: Asset, Token {
 	) {
 		self.address = address
 		self.iconURL = iconURL
-	}
-}
-
-// MARK: - Convenience
-public extension NonFungibleToken {
-	init(
-		address: ComponentAddress,
-		details _: EntityDetailsResponseNonFungibleDetails
-	) {
-		self.init(
-			address: address,
-			// TODO: update when API is ready
-			iconURL: nil
-		)
 	}
 }
 

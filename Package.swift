@@ -189,8 +189,8 @@ let package = Package(
 			name: "Asset",
 			dependencies: [
 				"Address",
+				"Common",
 				bigInt,
-				"GatewayAPI",
 			]
 		),
 		.testTarget(
@@ -221,6 +221,7 @@ let package = Package(
 			name: "Common",
 			dependencies: [
 				"Address",
+				bigInt,
 				"DesignSystem",
 			]
 		),
@@ -275,6 +276,7 @@ let package = Package(
 		.target(
 			name: "GatewayAPI",
 			dependencies: [
+				"Asset",
 				"Common",
 				"Profile", // address
 				tca, // XCTestDynamicOverlay + DependencyKey

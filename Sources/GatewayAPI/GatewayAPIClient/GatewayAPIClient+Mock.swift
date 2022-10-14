@@ -40,13 +40,13 @@ extension FixedWidthInteger {
 }
 
 extension Data {
-	var asInt: Int {
-		withUnsafeBytes { $0.load(as: Int.self) }
+	var asUInt: UInt {
+		withUnsafeBytes { $0.load(as: UInt.self) }
 	}
 }
 
-func amount(at index: Int) -> Int {
-	Data(SHA256.hash(data: index.data)).asInt
+func amount(at index: Int) -> UInt {
+	Data(SHA256.hash(data: index.data)).asUInt
 }
 
 func amountAttos(at index: Int) -> String {

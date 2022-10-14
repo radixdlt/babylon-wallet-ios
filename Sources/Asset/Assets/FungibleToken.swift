@@ -1,6 +1,6 @@
 import BigInt
+import Common
 import Foundation
-import GatewayAPI
 
 // MARK: - FungibleToken
 public struct FungibleToken: Asset, Token {
@@ -39,26 +39,6 @@ public struct FungibleToken: Asset, Token {
 		self.name = name
 		self.code = code
 		self.iconURL = iconURL
-	}
-}
-
-// MARK: - Convenience
-public extension FungibleToken {
-	init(
-		address: ComponentAddress,
-		details: EntityDetailsResponseFungibleDetails
-	) {
-		self.init(
-			address: address,
-			totalSupplyAttos: .init(stringLiteral: details.totalSupplyAttos),
-			totalMintedAttos: .init(stringLiteral: details.totalMintedAttos),
-			totalBurntAttos: .init(stringLiteral: details.totalBurntAttos),
-			// TODO: update when API is ready
-			tokenDescription: nil,
-			name: nil,
-			code: nil,
-			iconURL: nil
-		)
 	}
 }
 

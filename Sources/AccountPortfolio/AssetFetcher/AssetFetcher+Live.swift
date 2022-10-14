@@ -41,10 +41,10 @@ public extension AssetFetcher {
 				var fungibleTokens = [any Asset]()
 				var nonFungibleTokens = [any Asset]()
 
-				resourceDetails.forEach {
+				try resourceDetails.forEach {
 					switch $0.details {
 					case let .typeEntityDetailsResponseFungibleDetails(details):
-						fungibleTokens.append(FungibleToken(address: $0.address, details: details))
+						try fungibleTokens.append(FungibleToken(address: $0.address, details: details))
 					case let .typeEntityDetailsResponseNonFungibleDetails(details):
 						nonFungibleTokens.append(NonFungibleToken(address: $0.address, details: details))
 					}

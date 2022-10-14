@@ -223,9 +223,13 @@ public extension Home {
 
 			case .accountList(.coordinate(.loadAccounts)):
 				return .run { [state = state] send in
-					let addresses = state.wallet.profile.accounts.map(\.address)
-					let totalPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio(addresses)
-					await send(.internal(.system(.totalPortfolioLoaded(totalPortfolio))))
+					do {
+						let addresses = state.wallet.profile.accounts.map(\.address)
+						let totalPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio(addresses)
+						await send(.internal(.system(.totalPortfolioLoaded(totalPortfolio))))
+					} catch {
+						print(error.localizedDescription)
+					}
 				}
 
 			case let .accountList(.coordinate(.displayAccountDetails(account))):
