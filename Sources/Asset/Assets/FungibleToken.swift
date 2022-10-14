@@ -2,9 +2,6 @@ import BigInt
 import Foundation
 import GatewayAPI
 
-// MARK: - BigUInt + Sendable
-extension BigUInt: @unchecked Sendable {}
-
 // MARK: - FungibleToken
 public struct FungibleToken: Asset, Token {
 	public let address: ComponentAddress
@@ -90,9 +87,9 @@ public extension FungibleToken {
 	/// The native token of the Radix Ledger
 	static let xrd = Self(
 		address: "unknown at this point",
-		totalSupplyAttos: .init(stringLiteral: "24000000000"),
-		totalMintedAttos: .init(stringLiteral: "0"),
-		totalBurntAttos: .init(stringLiteral: "0"),
+		totalSupplyAttos: .init(integerLiteral: 24_000_000_000).inAttos,
+		totalMintedAttos: .init(integerLiteral: 0).inAttos,
+		totalBurntAttos: .init(integerLiteral: 0).inAttos,
 		tokenDescription: "The native token of the Radix Ledger",
 		name: "RAD",
 		code: "XRD",
@@ -104,9 +101,9 @@ public extension FungibleToken {
 public extension FungibleToken {
 	static let btc = Self(
 		address: "btc-deadbeef",
-		totalSupplyAttos: .init(stringLiteral: "0"),
-		totalMintedAttos: .init(stringLiteral: "0"),
-		totalBurntAttos: .init(stringLiteral: "0"),
+		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
+		totalMintedAttos: .init(integerLiteral: 0).inAttos,
+		totalBurntAttos: .init(integerLiteral: 0).inAttos,
 		tokenDescription: nil,
 		name: "Bitcoin",
 		code: "BTC",
@@ -115,9 +112,9 @@ public extension FungibleToken {
 
 	static let dot = Self(
 		address: "dot-deadbeef",
-		totalSupplyAttos: .init(stringLiteral: "0"),
-		totalMintedAttos: .init(stringLiteral: "0"),
-		totalBurntAttos: .init(stringLiteral: "0"),
+		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
+		totalMintedAttos: .init(integerLiteral: 0).inAttos,
+		totalBurntAttos: .init(integerLiteral: 0).inAttos,
 		tokenDescription: nil,
 		name: "Polkadot",
 		code: "DOT",
@@ -126,9 +123,9 @@ public extension FungibleToken {
 
 	static let eth = Self(
 		address: "eth-deadbeef",
-		totalSupplyAttos: .init(stringLiteral: "0"),
-		totalMintedAttos: .init(stringLiteral: "0"),
-		totalBurntAttos: .init(stringLiteral: "0"),
+		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
+		totalMintedAttos: .init(integerLiteral: 0).inAttos,
+		totalBurntAttos: .init(integerLiteral: 0).inAttos,
 		tokenDescription: nil,
 		name: "Ethereum",
 		code: "ETH",
@@ -137,9 +134,9 @@ public extension FungibleToken {
 
 	static let ltc = Self(
 		address: "ltc-deadbeef",
-		totalSupplyAttos: .init(stringLiteral: "0"),
-		totalMintedAttos: .init(stringLiteral: "0"),
-		totalBurntAttos: .init(stringLiteral: "0"),
+		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
+		totalMintedAttos: .init(integerLiteral: 0).inAttos,
+		totalBurntAttos: .init(integerLiteral: 0).inAttos,
 		tokenDescription: nil,
 		name: "Litecoin",
 		code: "LTC",
@@ -148,9 +145,9 @@ public extension FungibleToken {
 
 	static let sol = Self(
 		address: "sol-deadbeef",
-		totalSupplyAttos: .init(stringLiteral: "0"),
-		totalMintedAttos: .init(stringLiteral: "0"),
-		totalBurntAttos: .init(stringLiteral: "0"),
+		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
+		totalMintedAttos: .init(integerLiteral: 0).inAttos,
+		totalBurntAttos: .init(integerLiteral: 0).inAttos,
 		tokenDescription: nil,
 		name: "Solana",
 		code: "SOL",
@@ -159,9 +156,9 @@ public extension FungibleToken {
 
 	static let usdt = Self(
 		address: "usdt-deadbeef",
-		totalSupplyAttos: .init(stringLiteral: "0"),
-		totalMintedAttos: .init(stringLiteral: "0"),
-		totalBurntAttos: .init(stringLiteral: "0"),
+		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
+		totalMintedAttos: .init(integerLiteral: 0).inAttos,
+		totalBurntAttos: .init(integerLiteral: 0).inAttos,
 		tokenDescription: nil,
 		name: "Tether",
 		code: "USDT",
@@ -170,9 +167,9 @@ public extension FungibleToken {
 
 	static let xrp = Self(
 		address: "xrp-deadbeef",
-		totalSupplyAttos: .init(stringLiteral: "0"),
-		totalMintedAttos: .init(stringLiteral: "0"),
-		totalBurntAttos: .init(stringLiteral: "0"),
+		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
+		totalMintedAttos: .init(integerLiteral: 0).inAttos,
+		totalBurntAttos: .init(integerLiteral: 0).inAttos,
 		tokenDescription: nil,
 		name: "XRP token",
 		code: "XRP",
