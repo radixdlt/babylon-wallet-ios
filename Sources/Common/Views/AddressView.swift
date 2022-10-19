@@ -1,4 +1,4 @@
-import Address
+import Profile
 import DesignSystem
 import SwiftUI
 
@@ -8,7 +8,7 @@ public struct AddressView: View {
 	let copyAddressAction: () -> Void
 
 	public init(
-		address: String,
+		address: Address,
 		copyAddressAction: @escaping () -> Void
 	) {
 		self.address = address
@@ -19,7 +19,7 @@ public struct AddressView: View {
 public extension AddressView {
 	var body: some View {
 		HStack(spacing: 5) {
-			Text(address)
+            Text(address.address)
 				.lineLimit(1)
 				.truncationMode(.middle)
 				.foregroundColor(.app.buttonTextBlackTransparent)

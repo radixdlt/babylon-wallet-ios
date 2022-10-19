@@ -48,7 +48,7 @@ let package = Package(
 		// Format code
 		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.1"),
         
-        .package(url: "https://github.com/radixdlt/swift-profile", from: "0.0.5"),
+        .package(url: "https://github.com/radixdlt/swift-profile", from: "0.0.6"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
@@ -110,6 +110,7 @@ let package = Package(
 		.target(
 			name: "AccountPreferencesFeature",
 			dependencies: [
+                "Common",
 				tca,
 			]
 		),
@@ -123,6 +124,7 @@ let package = Package(
 		.target(
 			name: "AggregatedValueFeature",
 			dependencies: [
+                "Common",
 				tca,
 			]
 		),
