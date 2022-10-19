@@ -48,7 +48,7 @@ let package = Package(
 		// Format code
 		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.1"),
         
-        .package(url: "https://github.com/radixdlt/swift-profile", from: "0.0.2"),
+        .package(url: "https://github.com/radixdlt/swift-profile", from: "0.0.5"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
@@ -146,7 +146,7 @@ let package = Package(
 				"SplashFeature",
 				tca,
 				"UserDefaultsClient",
-				"Wallet",
+				"WalletClient",
 				"WalletLoader",
 				"WalletRemover",
 				// ^^^ Sort lexicographically ^^^
@@ -158,7 +158,7 @@ let package = Package(
 				"AppFeature",
 				"SplashFeature",
 				"TestUtils",
-				"Wallet",
+				"WalletClient",
 			]
 		),
 		.target(
@@ -292,7 +292,7 @@ let package = Package(
 				"CreateAccountFeature",
 				"PasteboardClient",
 				tca,
-				"Wallet",
+				"WalletClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -362,7 +362,7 @@ let package = Package(
                 profile,
 				tca,
 				"UserDefaultsClient", // replace with `ProfileCreator`
-				"Wallet",
+				"WalletClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -440,7 +440,7 @@ let package = Package(
                 profile,
 				"ProfileLoader",
 				tca,
-				"Wallet",
+				"WalletClient",
 				"WalletLoader",
 				// ^^^ Sort lexicographically ^^^
 			]
@@ -473,15 +473,16 @@ let package = Package(
 			]
 		),
 		.target(
-			name: "Wallet",
+			name: "WalletClient",
 			dependencies: [
                 profile,
+                tca, // XCTestDynamicOverlay + DependencyKey
 			]
 		),
 		.testTarget(
-			name: "WalletTests",
+			name: "WalletClientTests",
 			dependencies: [
-				"Wallet",
+				"WalletClient",
 				"TestUtils",
 			]
 		),
@@ -490,7 +491,7 @@ let package = Package(
 			dependencies: [
                 profile,
                 keychainClient,
-				"Wallet",
+				"WalletClient",
 				tca,
 			]
 		),
@@ -505,7 +506,7 @@ let package = Package(
 			name: "WalletRemover",
 			dependencies: [
                 keychainClient,
-                "Wallet",
+                "WalletClient",
 				tca,
 			]
 		),
