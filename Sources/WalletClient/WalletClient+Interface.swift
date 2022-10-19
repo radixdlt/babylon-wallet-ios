@@ -16,49 +16,73 @@ public struct WalletClient {
     public var injectProfileSnapshot: InjectProfileSnapshot
     public var extractProfileSnapshot: ExtractProfileSnapshot
     public var getAccounts: GetAccounts
+    public var getAppPreferences: GetAppPreferences
+    public var setAppPreferences: SetAppPreferences
+    
     
 }
 
 public extension WalletClient {
     // ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
-    typealias InjectProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
-    typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
-    typealias GetAccounts = @Sendable (NetworkID) async throws -> [OnNetwork.Account]
+    typealias InjectProfileSnapshot = @Sendable (ProfileSnapshot) throws -> Void
+    typealias ExtractProfileSnapshot = @Sendable () throws -> ProfileSnapshot
+    typealias GetAccounts = @Sendable () throws -> [OnNetwork.Account]
+    typealias GetAppPreferences = @Sendable () throws -> AppPreferences
+    typealias SetAppPreferences = @Sendable (AppPreferences) throws -> Void
     // ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 }
 
 
-
 public extension WalletClient {
     static let live: Self = {
-        let actor = WalletClientActor()
-        return Self.init(
+        let profileHolder = ProfileHolder()
+        return Self(
             injectProfileSnapshot: {
-                try await actor.injectProfileSnapshot($0)
+                try profileHolder.injectProfileSnapshot($0)
             },
             extractProfileSnapshot: {
-                try await actor.takeProfileSnapshot()
+                try profileHolder.takeProfileSnapshot()
             },
-            getAccounts: { networkID in
-                try await actor.withProfile { profile in
-                    try profile.perNetwork.onNetwork(id: networkID).accounts.rawValue.elements
+            getAccounts: {
+                try profileHolder.get { profile in
+                    profile.primaryNet.accounts.rawValue.elements
                 }
-            })
+            },
+            getAppPreferences: {
+                try profileHolder.get { profile in
+                    profile.appPreferences
+                }
+            },
+            setAppPreferences: { appPreferences in
+                try profileHolder.setting { profile in
+                    profile.appPreferences = appPreferences
+                }
+            }
+        )
     }()
 }
 
-final actor WalletClientActor {
+private final class ProfileHolder {
     private var profile: Profile?
     
     struct NoProfile: Swift.Error {}
     
     
     @discardableResult
-    func withProfile<T>(_ withProfile: (Profile) throws -> T) throws -> T {
+    func get<T>(_ withProfile: (Profile) throws -> T) throws -> T {
         guard let profile else {
             throw NoProfile()
         }
         return try withProfile(profile)
+    }
+    
+    func setting(_ setProfile: (inout Profile) throws -> Void) throws -> Void {
+        guard var profile else {
+            throw NoProfile()
+        }
+        try setProfile(&profile)
+        self.profile = profile
+        return
     }
     
     func injectProfileSnapshot(_ profileSnapshot: ProfileSnapshot) throws {
@@ -66,7 +90,7 @@ final actor WalletClientActor {
     }
     
     func takeProfileSnapshot() throws -> ProfileSnapshot {
-        try withProfile { profile in
+        try get { profile in
             profile.snaphot()
         }
     }
@@ -77,7 +101,7 @@ public extension WalletClient {
         Self(
             injectProfileSnapshot: { _ in /* No op */ },
             extractProfileSnapshot: { fatalError("Impl me") },
-            getAccounts: { _ in
+            getAccounts: {
                 [
                     try! OnNetwork.Account(
                         address: OnNetwork.Account.EntityAddress(

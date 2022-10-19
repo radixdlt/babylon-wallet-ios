@@ -17,8 +17,8 @@ public extension ProfileLoader {
         jsonDecoder: JSONDecoder = .iso8601
 	) -> Self {
 		Self(
-			loadProfile: {
-                try keychainClient.loadProfile(jsonDecoder: jsonDecoder)
+            loadProfileSnapshot: {
+                try keychainClient.loadProfileSnapshot(jsonDecoder: jsonDecoder)
 			}
 		)
 	}
