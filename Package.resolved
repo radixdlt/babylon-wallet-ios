@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "bigint",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/attaswift/BigInt.git",
+      "state" : {
+        "revision" : "0ed110f7555c34ff468e72e1686e59721f2b0da6",
+        "version" : "5.3.0"
+      }
+    },
+    {
       "identity" : "combine-schedulers",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/combine-schedulers",
@@ -32,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "4228ff40e0df1cb849f6a158e018b1c13d6bd9c9",
-        "version" : "0.41.2"
+        "revision" : "5c476994eaa79af8e466041f6de1ab116f37c528",
+        "version" : "0.42.0"
       }
     },
     {
@@ -59,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nicklockwood/SwiftFormat",
       "state" : {
-        "revision" : "2937847c9e2434a9f8d71260b777fb15ddff287c",
-        "version" : "0.50.1"
+        "revision" : "de82a49c5db5b679e06fa031f89552353926317b",
+        "version" : "0.50.2"
       }
     },
     {

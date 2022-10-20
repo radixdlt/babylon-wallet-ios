@@ -142,17 +142,23 @@ private extension NonFungibleTokenList.Row.View {
 		"Some NFT"
 	}
 
-	func headerSupplyText(with viewStore: ViewStore) -> String {
-		guard let supply = viewStore.containers.first?.asset.supply else {
-			return L10n.NftList.Header.supplyUnknown
-		}
+	func headerSupplyText(with _: ViewStore) -> String {
+		// TODO: remove when API is ready
+		L10n.NftList.Header.supplyUnknown
 
-		switch supply {
-		case let .fixed(value):
-			return NSLocalizedString(L10n.NftList.ownedOfTotal(viewStore.containers.count, Int(value.magnitude)), comment: "Number of NFTs owned of total number")
-		case .mutable:
-			return NSLocalizedString(L10n.NftList.nftPlural(viewStore.containers.count), comment: "Number of NFTs owned")
-		}
+		// TODO: update when API is ready
+		/*
+		 guard let supply = viewStore.containers.first?.asset.supply else {
+		 	return L10n.NftList.Header.supplyUnknown
+		 }
+
+		 switch supply {
+		 case let .fixed(value):
+		 	return NSLocalizedString(L10n.NftList.ownedOfTotal(viewStore.containers.count, Int(value.magnitude)), comment: "Number of NFTs owned of total number")
+		 case .mutable:
+		 	return NSLocalizedString(L10n.NftList.nftPlural(viewStore.containers.count), comment: "Number of NFTs owned")
+		 }
+		 */
 	}
 
 	var headerIconURL: String? {
@@ -181,7 +187,9 @@ struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleTokenList.Row.View(
 			store: .init(
-				initialState: .init(containers: [.init(asset: .mock, metadata: nil)]),
+				initialState: .init(
+					containers: [.init(asset: .mock1, metadata: nil)]
+				),
 				reducer: NonFungibleTokenList.Row.reducer,
 				environment: .init()
 			)

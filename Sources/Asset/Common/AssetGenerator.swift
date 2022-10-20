@@ -5,19 +5,19 @@ public enum AssetGenerator {
 	public static var mockAssets: [[any Asset]] {
 		[
 			[
-				FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Bitcoin", code: "BTC", iconURL: ""),
-				FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Polkadot", code: "DOT", iconURL: ""),
-				FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Ethereum", code: "ETH", iconURL: ""),
-				FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Litecoin", code: "LTC", iconURL: ""),
-				FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Solana", code: "SOL", iconURL: ""),
-				FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Tether", code: "USDT", iconURL: ""),
+				FungibleToken.btc,
+				FungibleToken.dot,
+				FungibleToken.eth,
+				FungibleToken.ltc,
+				FungibleToken.sol,
+				FungibleToken.usdt,
 				FungibleToken.xrd,
-				FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "XRP token", code: "XRP", iconURL: ""),
+				FungibleToken.xrp,
 			],
 			[
-				NonFungibleToken(address: .random, supply: .fixed(100), iconURL: "nft"),
-				NonFungibleToken(address: .random, supply: .fixed(100), iconURL: "nft"),
-				NonFungibleToken(address: .random, supply: .fixed(100), iconURL: "nft"),
+				NonFungibleToken.mock1,
+				NonFungibleToken.mock2,
+				NonFungibleToken.mock3,
 			],
 		]
 	}

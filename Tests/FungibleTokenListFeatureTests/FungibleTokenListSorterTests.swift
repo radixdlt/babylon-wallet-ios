@@ -18,11 +18,11 @@ final class FungibleTokenListSorterTests: TestCase {
 
 	func test_sortTokensWithValues() {
 		// given
-		let btc = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Bitcoin", code: "BTC", iconURL: "")
-		let eth = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Ethereum", code: "ETH", iconURL: "")
-		let ltc = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Litecoin", code: "LTC", iconURL: "")
+		let btc = FungibleToken.btc
+		let eth = FungibleToken.eth
+		let ltc = FungibleToken.ltc
 		let xrd = FungibleToken.xrd
-		let dot = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Polkadot", code: "DOT", iconURL: "")
+		let dot = FungibleToken.dot
 
 		let btcContainer = FungibleTokenContainer(asset: btc, amount: nil, worth: 1.987)
 		let ethContainer = FungibleTokenContainer(asset: eth, amount: nil, worth: 2.876)
@@ -43,11 +43,11 @@ final class FungibleTokenListSorterTests: TestCase {
 
 	func test_sortTokensWithNoValues() {
 		// given
-		let btc = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Bitcoin", code: "BTC", iconURL: "")
-		let eth = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Ethereum", code: "ETH", iconURL: "")
-		let ltc = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Litecoin", code: "LTC", iconURL: "")
+		let btc = FungibleToken.btc
+		let eth = FungibleToken.eth
+		let ltc = FungibleToken.ltc
 		let xrd = FungibleToken.xrd
-		let dot = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Polkadot", code: "DOT", iconURL: "")
+		let dot = FungibleToken.dot
 
 		let btcContainer = FungibleTokenContainer(asset: btc, amount: nil, worth: nil)
 		let ethContainer = FungibleTokenContainer(asset: eth, amount: nil, worth: nil)
@@ -68,11 +68,11 @@ final class FungibleTokenListSorterTests: TestCase {
 
 	func test_sortTokensWithAndWithNoValues() {
 		// given
-		let btc = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Bitcoin", code: "BTC", iconURL: "")
-		let eth = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Ethereum", code: "ETH", iconURL: "")
-		let ltc = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Litecoin", code: "LTC", iconURL: "")
+		let btc = FungibleToken.btc
+		let eth = FungibleToken.eth
+		let ltc = FungibleToken.ltc
 		let xrd = FungibleToken.xrd
-		let dot = FungibleToken(address: .random, supply: .fixed(100), tokenDescription: nil, name: "Polkadot", code: "DOT", iconURL: "")
+		let dot = FungibleToken.dot
 
 		let btcContainer = FungibleTokenContainer(asset: btc, amount: nil, worth: nil)
 		let ethContainer = FungibleTokenContainer(asset: eth, amount: nil, worth: 2.345)

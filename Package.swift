@@ -8,6 +8,11 @@ let tca: Target.Dependency = .product(
 	package: "swift-composable-architecture"
 )
 
+let bigInt: Target.Dependency = .product(
+	name: "BigInt",
+	package: "BigInt"
+)
+
 let package = Package(
 	name: "Babylon",
 	platforms: [
@@ -34,9 +39,11 @@ let package = Package(
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
-		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.41.2"),
+		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
 		// Format code
-		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.1"),
+		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
+		// BigInt
+		.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
@@ -86,6 +93,7 @@ let package = Package(
 				"Address",
 				"AppSettings",
 				"Asset",
+				"GatewayAPI",
 				"Common",
 			]
 		),
@@ -181,6 +189,8 @@ let package = Package(
 			name: "Asset",
 			dependencies: [
 				"Address",
+				"Common",
+				bigInt,
 			]
 		),
 		.testTarget(
@@ -211,6 +221,7 @@ let package = Package(
 			name: "Common",
 			dependencies: [
 				"Address",
+				bigInt,
 				"DesignSystem",
 			]
 		),
@@ -265,6 +276,7 @@ let package = Package(
 		.target(
 			name: "GatewayAPI",
 			dependencies: [
+				"Asset",
 				"Common",
 				"Profile", // address
 				tca, // XCTestDynamicOverlay + DependencyKey
