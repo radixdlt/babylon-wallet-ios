@@ -8,7 +8,6 @@ import Profile
 
 public extension KeychainClient {
 	static let live = Self.live(
-		service: "rdx.works.babylon",
 		accessibility: .whenPasscodeSetThisDeviceOnly
 	)
 }
@@ -42,9 +41,9 @@ public struct WalletClient {
 
 public extension WalletClient {
 	typealias InjectProfile = @Sendable (Profile) -> Void
+	typealias DeleteProfileSnapshot = @Sendable () throws -> Void
 
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
-	typealias DeleteProfileSnapshot = @Sendable () throws -> Void
 	typealias ExtractProfileSnapshot = @Sendable () throws -> ProfileSnapshot
 	typealias GetAccounts = @Sendable () throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
 	typealias GetAppPreferences = @Sendable () throws -> AppPreferences

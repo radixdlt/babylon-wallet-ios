@@ -32,26 +32,26 @@ public extension Main {
 			.pullback(
 				state: \.settings,
 				action: /Main.Action.settings,
-				environment: { _ in
-					Settings.Environment()
+				environment: {
+					Settings.Environment(
+						keychainClient: $0.keychainClient,
+						walletClient: $0.walletClient
+					)
 				}
 			),
 
 		Reducer { state, action, environment in
 			switch action {
-			case .internal(.user(.removeWallet)):
-				return Effect(value: .internal(.system(.removedWallet)))
+			case .home(.coordinate(.displaySettings)):
+				state.settings = .init()
+				return .none
 
-			case .internal(.system(.removedWallet)):
+			case .settings(.coordinate(.deleteProfileAndFactorSources)):
 				return .run { send in
 					try environment.keychainClient.removeAllFactorSourcesAndProfileSnapshot()
 					try environment.walletClient.deleteProfileSnapshot()
 					await send(.coordinate(.removedWallet))
 				}
-
-			case .home(.coordinate(.displaySettings)):
-				state.settings = .init()
-				return .none
 
 			case .settings(.coordinate(.dismissSettings)):
 				state.settings = nil

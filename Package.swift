@@ -48,7 +48,7 @@ let package = Package(
 		// Format code
 		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.1"),
 
-		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.12"),
+		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.16"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
@@ -423,6 +423,10 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
+				profile,
+				.product(name: "ProfileView", package: "swift-profile"),
+				keychainClient,
+				"WalletClient",
 				tca,
 				// ^^^ Sort lexicographically ^^^
 			]

@@ -29,13 +29,25 @@ public extension AccountDetails {
 			)
 
 			let fungibleTokenCategories = FungibleTokenListSorter.live.sortTokens(account.portfolio.fungibleTokenContainers)
+
 			assets = .init(
 				fungibleTokenList: .init(
 					sections: .init(uniqueElements: fungibleTokenCategories.map { category in
-						let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible) }
-						return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
+						let rows = category.tokenContainers.map { container in
+							FungibleTokenList.Row.State(
+								container: container,
+								currency: account.currency,
+								isCurrencyAmountVisible: account.isCurrencyAmountVisible
+							)
+						}
+						return FungibleTokenList.Section.State(
+							id: category.type,
+							assets: .init(uniqueElements: rows)
+						)
 					})
-				), nonFungibleTokenList: .init(
+				),
+
+				nonFungibleTokenList: .init(
 					rows: .init(uniqueElements: [account.portfolio.nonFungibleTokenContainers].map {
 						.init(containers: $0)
 					})

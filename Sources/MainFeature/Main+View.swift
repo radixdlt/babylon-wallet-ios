@@ -38,31 +38,6 @@ public extension Main.View {
 	}
 }
 
-// MARK: - Main.View.ViewState
-extension Main.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		init(state _: Main.State) {}
-	}
-}
-
-// MARK: - Main.View.ViewAction
-extension Main.View {
-	// MARK: ViewAction
-	enum ViewAction {
-		case removeWalletButtonPressed
-	}
-}
-
-extension Main.Action {
-	init(action: Main.View.ViewAction) {
-		switch action {
-		case .removeWalletButtonPressed:
-			self = .internal(.user(.removeWallet))
-		}
-	}
-}
-
 // MARK: - MainView_Previews
 struct MainView_Previews: PreviewProvider {
 	static var previews: some View {

@@ -44,13 +44,9 @@ struct WalletApp: SwiftUI.App {
 	var body: some Scene {
 		WindowGroup {
 			App.View(store: store)
-
 			#if os(macOS)
 				.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
 			#endif
-
-			// FIXME: Move to Settings
-			// Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
 		}
 	}
 }
