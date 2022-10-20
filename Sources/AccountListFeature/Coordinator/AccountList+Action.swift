@@ -15,6 +15,7 @@ public extension AccountList {
 public extension AccountList.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
+		case system(SystemAction)
 	}
 }
 
@@ -22,7 +23,13 @@ public extension AccountList.Action {
 public extension AccountList.Action.InternalAction {
 	enum UserAction: Equatable {
 		case alertDismissed
-		case loadAccounts
+	}
+}
+
+// MARK: - AccountList.Action.InternalAction.SystemAction
+public extension AccountList.Action.InternalAction {
+	enum SystemAction: Equatable {
+		case fetchPortfolioForAccounts
 	}
 }
 
@@ -31,6 +38,6 @@ public extension AccountList.Action {
 	enum CoordinatingAction: Equatable {
 		case displayAccountDetails(AccountList.Row.State)
 		case copyAddress(AccountAddress)
-		case loadAccounts
+		case fetchPortfolioForAccounts
 	}
 }

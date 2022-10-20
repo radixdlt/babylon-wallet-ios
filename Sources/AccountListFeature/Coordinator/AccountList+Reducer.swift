@@ -21,15 +21,21 @@ public extension AccountList {
 				}
 				switch action {
 				case .internal(.user(.copyAddress)):
-					return Effect(value: .coordinate(.copyAddress(account.address)))
+					return .run { send in
+						await send(.coordinate(.copyAddress(account.address)))
+					}
 				case .internal(.user(.didSelect)):
-					return Effect(value: .coordinate(.displayAccountDetails(account)))
+					return .run { send in
+						await send(.coordinate(.displayAccountDetails(account)))
+					}
 				}
 			case .internal(.user(.alertDismissed)):
 				state.alert = nil
 				return .none
-			case .internal(.user(.loadAccounts)):
-				return Effect(value: .coordinate(.loadAccounts))
+			case .internal(.system(.fetchPortfolioForAccounts)):
+				return .run { send in
+					await send(.coordinate(.fetchPortfolioForAccounts))
+				}
 			}
 		}
 	)

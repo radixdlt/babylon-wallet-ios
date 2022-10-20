@@ -1,7 +1,9 @@
+import Collections
 import ComposableArchitecture
 import Foundation
 import KeychainClient
 import Mnemonic
+import NonEmpty
 import Profile
 
 public extension KeychainClient {
@@ -44,7 +46,7 @@ public extension WalletClient {
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 	typealias DeleteProfileSnapshot = @Sendable () throws -> Void
 	typealias ExtractProfileSnapshot = @Sendable () throws -> ProfileSnapshot
-	typealias GetAccounts = @Sendable () throws -> [OnNetwork.Account]
+	typealias GetAccounts = @Sendable () throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
 	typealias GetAppPreferences = @Sendable () throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) throws -> Void
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
@@ -65,7 +67,7 @@ public extension WalletClient {
 			},
 			getAccounts: {
 				try profileHolder.get { profile in
-					profile.primaryNet.accounts.rawValue.elements
+					profile.primaryNet.accounts
 				}
 			},
 			getAppPreferences: {

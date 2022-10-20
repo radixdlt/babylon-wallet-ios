@@ -99,10 +99,16 @@ public extension Home {
 
 			case .internal(.system(.viewDidAppear)):
 				return .run { send in
+					let accounts = try environment.walletClient.getAccounts()
+					await send(.internal(.system(.accountsLoaded(accounts))))
 					let settings = try await environment.appSettingsClient.loadSettings()
 					await send(.internal(.system(.currencyLoaded(settings.currency))))
 					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(settings.isCurrencyAmountVisible))))
 				}
+
+			case let .internal(.system(.accountsLoaded(accounts))):
+				state.accountList = .init(nonEmptyOrderedSetOfAccounts: accounts)
+				return .none
 
 			case let .internal(.system(.currencyLoaded(currency))):
 				state.aggregatedValue.currency = currency
@@ -226,9 +232,9 @@ public extension Home {
 			case .visitHub(.internal):
 				return .none
 
-			case .accountList(.coordinate(.loadAccounts)):
+			case .accountList(.coordinate(.fetchPortfolioForAccounts)):
 				return .run { send in
-					let accounts = try environment.walletClient.getAccounts()
+					let accounts = try environment.walletClient.getAccounts().rawValue.elements
 					let addresses = accounts.map(\.address)
 					let totalPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio(addresses)
 					await send(.internal(.system(.totalPortfolioLoaded(totalPortfolio))))

@@ -1,4 +1,6 @@
+import Collections
 import ComposableArchitecture
+import NonEmpty
 import Profile
 
 // MARK: - AccountList
@@ -24,9 +26,9 @@ public extension AccountList {
 
 // MARK: - Convenience
 public extension AccountList.State {
-	init(just accounts: [OnNetwork.Account]) {
+	init(nonEmptyOrderedSetOfAccounts accounts: NonEmpty<OrderedSet<OnNetwork.Account>>) {
 		self.init(
-			accounts: .init(uniqueElements: accounts.map(AccountList.Row.State.init(account:)))
+			accounts: .init(uniqueElements: accounts.rawValue.elements.map(AccountList.Row.State.init(account:)))
 		)
 	}
 }

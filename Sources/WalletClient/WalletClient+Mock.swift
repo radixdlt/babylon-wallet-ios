@@ -5,7 +5,9 @@
 //  Created by Alexander Cyon on 2022-10-20.
 //
 
+import Collections
 import Foundation
+import NonEmpty
 import Profile
 
 public extension WalletClient {
@@ -15,7 +17,7 @@ public extension WalletClient {
 			extractProfileSnapshot: { fatalError("Impl me") },
 			deleteProfileSnapshot: { /* Noop */ },
 			getAccounts: {
-				[
+				let accounts: [OnNetwork.Account] = [
 					try! OnNetwork.Account(
 						address: OnNetwork.Account.EntityAddress(
 							address: "account_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
@@ -61,6 +63,8 @@ public extension WalletClient {
 						displayName: "Secondary"
 					),
 				]
+
+				return NonEmpty(rawValue: OrderedSet(accounts))!
 			},
 			getAppPreferences: {
 				fatalError()

@@ -3,9 +3,11 @@ import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
 import AggregatedValueFeature
+import Collections
 import Common
 import CreateAccountFeature
 import Foundation
+import NonEmpty
 import Profile
 
 // MARK: - Home.Action
@@ -46,6 +48,7 @@ public extension Home.Action.InternalAction {
 public extension Home.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
+		case accountsLoaded(NonEmpty<OrderedSet<OnNetwork.Account>>)
 		case currencyLoaded(FiatCurrency)
 		case toggleIsCurrencyAmountVisible
 		case isCurrencyAmountVisibleLoaded(Bool)
