@@ -90,6 +90,7 @@ struct OnboardingView_Previews: PreviewProvider {
 				reducer: Onboarding.reducer,
 				environment: .init(
 					backgroundQueue: .immediate,
+					keychainClient: .unimplemented,
 					mainQueue: .immediate,
 					userDefaultsClient: .noop
 				)

@@ -37,18 +37,17 @@ public extension Main {
 				}
 			),
 
-		Reducer { state, action, _ in
+		Reducer { state, action, environment in
 			switch action {
 			case .internal(.user(.removeWallet)):
 				return Effect(value: .internal(.system(.removedWallet)))
 
 			case .internal(.system(.removedWallet)):
-//				return .run { send in
-				//                    try environment.keychainClient.removeAllFactorSourcesAndProfileSnapshot()
-				//                    try environment.walletClient.deleteProfileSnapshot()
-//					await send(.coordinate(.removedWallet))
-//				}
-				fatalError() // FIXME:
+				return .run { send in
+					try environment.keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+					try environment.walletClient.deleteProfileSnapshot()
+					await send(.coordinate(.removedWallet))
+				}
 
 			case .home(.coordinate(.displaySettings)):
 				state.settings = .init()

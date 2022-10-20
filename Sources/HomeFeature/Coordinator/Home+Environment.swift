@@ -9,11 +9,11 @@ import WalletClient
 public extension Home {
 	// MARK: Environment
 	struct Environment {
-		public let walletClient: WalletClient
 		public let appSettingsClient: AppSettingsClient
 		public let accountPortfolioFetcher: AccountPortfolioFetcher
 		public let pasteboardClient: PasteboardClient
 		public let fungibleTokenListSorter: FungibleTokenListSorter
+		public let walletClient: WalletClient
 
 		public init(
 			walletClient: WalletClient,

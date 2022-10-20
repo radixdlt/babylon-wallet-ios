@@ -28,11 +28,14 @@ public extension Splash {
 			}
 
 		case .internal(.system(.loadProfileResult(.success(.none)))):
-			fatalError()
+			return .run { send in
+				await send(.internal(.coordinate(.loadProfileResult(SplashLoadProfileResult.noProfile(reason: "No profile saved yet", failedToDecode: false)))))
+			}
 
-		case .internal(.system(.loadProfileResult(.failure(_)))):
-			fatalError()
-
+		case let .internal(.system(.loadProfileResult(.failure(error)))):
+			return .run { send in
+				await send(.internal(.coordinate(.loadProfileResult(SplashLoadProfileResult.noProfile(reason: String(describing: error), failedToDecode: error is Swift.DecodingError)))))
+			}
 		case let .internal(.coordinate(actionToCoordinate)):
 			return .run { send in
 				let duration: TimeInterval

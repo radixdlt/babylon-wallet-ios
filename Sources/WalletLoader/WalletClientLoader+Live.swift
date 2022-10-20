@@ -6,7 +6,7 @@ import WalletClient
 
 public extension WalletClientLoader {
 	static func live(
-		keychainClient: KeychainClient = .live(),
+		keychainClient: KeychainClient,
 		jsonDecoder: JSONDecoder = .iso8601
 	) -> Self {
 		Self.live(profileLoader: .live(keychainClient: keychainClient, jsonDecoder: jsonDecoder))

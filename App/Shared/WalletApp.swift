@@ -10,7 +10,7 @@ typealias App = AppFeature.App
 
 public extension App.Environment {
 	static let live: Self = {
-		let keychainClient: KeychainClient = .live()
+		let keychainClient = KeychainClient.live
 
 		return Self(
 			backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),

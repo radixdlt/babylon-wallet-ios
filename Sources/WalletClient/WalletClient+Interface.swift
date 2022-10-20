@@ -1,6 +1,29 @@
+import ComposableArchitecture
 import Foundation
+import KeychainClient
 import Mnemonic
 import Profile
+
+public extension KeychainClient {
+	static let live = Self.live(
+		service: "rdx.works.babylon",
+		accessibility: .whenPasscodeSetThisDeviceOnly
+	)
+}
+
+// MARK: - KeychainClientKey
+private enum KeychainClientKey: DependencyKey {
+	typealias Value = KeychainClient
+	static let liveValue = KeychainClient.live
+	static let testValue = KeychainClient.unimplemented
+}
+
+public extension DependencyValues {
+	var keychainClient: KeychainClient {
+		get { self[KeychainClientKey.self] }
+		set { self[KeychainClientKey.self] = newValue }
+	}
+}
 
 // MARK: - WalletClient
 public struct WalletClient {

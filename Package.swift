@@ -48,7 +48,7 @@ let package = Package(
 		// Format code
 		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.1"),
 
-		.package(url: "https://github.com/radixdlt/swift-profile", from: "0.0.9"),
+		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.12"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.

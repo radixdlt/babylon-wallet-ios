@@ -4,7 +4,7 @@ import Profile
 
 public extension ProfileLoader {
 	static func live(
-		keychainClient: KeychainClient = .live(),
+		keychainClient: KeychainClient,
 		jsonDecoder: JSONDecoder = .iso8601
 	) -> Self {
 		Self(
