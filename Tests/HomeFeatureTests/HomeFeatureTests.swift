@@ -1,7 +1,6 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
-import Address
 import Asset
 import ComposableArchitecture
 import FungibleTokenListFeature
@@ -12,6 +11,30 @@ import TestUtils
 
 @MainActor
 final class HomeFeatureTests: TestCase {
+	let account = try! OnNetwork.Account(
+		address: OnNetwork.Account.EntityAddress(
+			address: "account_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
+		),
+		securityState: .unsecured(.init(
+			genesisFactorInstance: .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(.init(
+				factorSourceReference: .init(
+					factorSourceKind: .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind,
+					factorSourceID: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"
+				),
+				publicKey: .curve25519(.init(
+					compressedRepresentation: Data(
+						hexString: "7bf9f97c0cac8c6c112d716069ccc169283b9838fa2f951c625b3d4ca0a8f05b")
+				)),
+				derivationPath: .accountPath(.init(derivationPath: "m/44H/1022H/10H/525H/0H/1238H"))
+			)
+			)
+		)),
+		index: 0,
+		derivationPath: .init(derivationPath: "m/44H/1022H/10H/525H/0H/1238H"),
+		displayName: "Main"
+	)
+	var address: AccountAddress { account.address }
+
 	func test_totalWorthLoaded_whenTotalWorthIsLoaded_thenUpdateAllSubStates() async {
 		// given
 
@@ -33,10 +56,8 @@ final class HomeFeatureTests: TestCase {
 		let nftContainer2 = NonFungibleTokenContainer(asset: nft2, metadata: nil)
 		let nftContainer3 = NonFungibleTokenContainer(asset: nft3, metadata: nil)
 
-		let address: Address = "abcdefgh12345678"
-		let account: Profile.Account = .init(address: address, name: "Test Account")
 		let totalPortfolio: AccountPortfolioDictionary = [
-			address: .init(
+			account.address: .init(
 				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
 				nonFungibleTokenContainers: [nftContainer1, nftContainer2, nftContainer3],
 				poolShareContainers: [],
@@ -48,8 +69,10 @@ final class HomeFeatureTests: TestCase {
 		let accountDetailsState = AccountDetails.State(for: accountRowState)
 		var initialState: Home.State = .placeholder
 		initialState.accountDetails = accountDetailsState
-		initialState.accountList = .init(just: [account])
+		initialState.accountList = .init(nonEmptyOrderedSetOfAccounts: .init(rawValue: .init([account]))!)
+
 		let environment = Home.Environment(
+			walletClient: .unimplemented,
 			appSettingsClient: .unimplemented,
 			accountPortfolioFetcher: .unimplemented,
 			pasteboardClient: .unimplemented,
@@ -62,7 +85,7 @@ final class HomeFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.system(.totalPortfolioLoaded(totalPortfolio)))) {
+		_ = await store.send(.internal(.system(.totalPortfolioLoaded(totalPortfolio)))) { [address] in
 			// then
 			// local dictionary
 			$0.accountPortfolioDictionary = totalPortfolio
@@ -137,7 +160,6 @@ final class HomeFeatureTests: TestCase {
 		let xrdContainer = FungibleTokenContainer(asset: xrd, amount: 4.567, worth: 4.654)
 		let expectedAggregatedValue: Float = 9.517
 
-		let address: Address = "abcdefgh12345678"
 		let accountPortfolio: AccountPortfolioDictionary = [
 			address: .init(
 				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],

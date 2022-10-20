@@ -1,8 +1,8 @@
 @testable import AppFeature
 import ComposableArchitecture
+import Profile
 import SplashFeature
 import TestUtils
-import Wallet
 
 @MainActor
 final class AppFeatureTests: TestCase {
@@ -29,80 +29,84 @@ final class AppFeatureTests: TestCase {
 		store.receive(.coordinate(.onboard))
 	}
 
-	func test_onboardedWithWallet_whenWalletCreatedSuccessfullyInOnbnoarding_thenNavigateToMainScreen() {
-		// given
+	func test__GIVEN__onboarding__WHEN__profile_loaded__THEN__navigate_to_main() async throws {
+		// GIVEN obnarding
 		let initialState = App.State.onboarding(.init())
-		let wallet = Wallet.placeholder
+		var environment: App.Environment = .unimplemented
+		let newProfile = try await Profile.new(mnemonic: .generate())
+		environment.walletClient.injectProfile = {
+			XCTAssertEqual($0, newProfile)
+		}
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
-			environment: .unimplemented
+            environment: environment
 		)
 
-		// when
-		store.send(.onboarding(.coordinate(.onboardedWithWallet(wallet))))
+		// WHEN profile loaded
+		_ = await store.send(.onboarding(.coordinate(.onboardedWithProfile(newProfile))))
 
 		// then
-		store.receive(.coordinate(.toMain(wallet))) {
-			$0 = .main(.init(home: .init(justA: wallet)))
+		await store.receive(.coordinate(.toMain)) {
+			$0 = .main(.init())
 		}
 	}
 
-	func test_loadWalletResult_whenWalletLoadedSuccessfullyInSplash_thenNavigateToMainScreen() {
-		// given
-		let initialState = App.State.splash(.init())
-		let wallet = Wallet.placeholder
-		let loadWalletResult = SplashLoadWalletResult.walletLoaded(wallet)
-		let store = TestStore(
-			initialState: initialState,
-			reducer: App.reducer,
-			environment: .unimplemented
-		)
-
-		// when
-		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
-
-		// then
-		store.receive(.coordinate(.toMain(wallet))) {
-			$0 = .main(.init(home: .init(justA: wallet)))
-		}
-	}
-
-	func test_loadWalletResult_whenWalletLoadingFailedBecauseDecodingError_thenDoNothingForNow() {
-		// given
-		let initialState = App.State.splash(.init())
-		let reason = "Failed to decode wallet"
-		let loadWalletResult = SplashLoadWalletResult.noWallet(reason: reason, failedToDecode: true)
-		let store = TestStore(
-			initialState: initialState,
-			reducer: App.reducer,
-			environment: .unimplemented
-		)
-
-		// when
-		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
-
-		// then
-		// do nothing for now, no state change occured
-	}
-
-	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_thenNavigateToOnboarding() async {
-		// given
-		let initialState = App.State.splash(.init())
-		let reason = "Failed to load profile"
-		let loadWalletResult = SplashLoadWalletResult.noWallet(reason: reason, failedToDecode: false)
-		let store = TestStore(
-			initialState: initialState,
-			reducer: App.reducer,
-			environment: .unimplemented
-		)
-
-		// when
-		_ = await store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
-
-		// then
-		await store.receive(.coordinate(.onboard)) {
-			$0 = .onboarding(.init())
-		}
-	}
+//	func test_loadWalletResult_whenWalletLoadedSuccessfullyInSplash_thenNavigateToMainScreen() {
+//		// given
+//		let initialState = App.State.splash(.init())
+//		let wallet = Wallet.placeholder
+//		let loadWalletResult = SplashLoadWalletResult.walletLoaded(wallet)
+//		let store = TestStore(
+//			initialState: initialState,
+//			reducer: App.reducer,
+//			environment: .unimplemented
+//		)
+//
+//		// when
+//		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
+//
+//		// then
+//		store.receive(.coordinate(.toMain(wallet))) {
+//			$0 = .main(.init(home: .init(justA: wallet)))
+//		}
+//	}
+//
+//	func test_loadWalletResult_whenWalletLoadingFailedBecauseDecodingError_thenDoNothingForNow() {
+//		// given
+//		let initialState = App.State.splash(.init())
+//		let reason = "Failed to decode wallet"
+//		let loadWalletResult = SplashLoadWalletResult.noWallet(reason: reason, failedToDecode: true)
+//		let store = TestStore(
+//			initialState: initialState,
+//			reducer: App.reducer,
+//			environment: .unimplemented
+//		)
+//
+//		// when
+//		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
+//
+//		// then
+//		// do nothing for now, no state change occured
+//	}
+//
+//	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_thenNavigateToOnboarding() async {
+//		// given
+//		let initialState = App.State.splash(.init())
+//		let reason = "Failed to load profile"
+//		let loadWalletResult = SplashLoadWalletResult.noWallet(reason: reason, failedToDecode: false)
+//		let store = TestStore(
+//			initialState: initialState,
+//			reducer: App.reducer,
+//			environment: .unimplemented
+//		)
+//
+//		// when
+//		_ = await store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
+//
+//		// then
+//		await store.receive(.coordinate(.onboard)) {
+//			$0 = .onboarding(.init())
+//		}
+//	}
 }

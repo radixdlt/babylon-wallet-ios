@@ -4,6 +4,6 @@ import Mnemonic
 
 public extension String {
 	var hexData: Data {
-		try! Data(hex: self)
+		try! Data(hexString: self)
 	}
 }

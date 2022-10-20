@@ -20,7 +20,7 @@ public extension App {
 		public let pasteboardClient: PasteboardClient
 		public let profileLoader: ProfileLoader
 		public let userDefaultsClient: UserDefaultsClient
-		public let walletClient: WalletClient
+		public var walletClient: WalletClient
 
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,

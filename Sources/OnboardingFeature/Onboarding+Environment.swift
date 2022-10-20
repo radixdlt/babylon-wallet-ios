@@ -11,14 +11,12 @@ public extension Onboarding {
 		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
 		public let keychainClient: KeychainClient
 		public let mainQueue: AnySchedulerOf<DispatchQueue>
-		public let userDefaultsClient: UserDefaultsClient // replace with `ProfileCreator`
 		public let mnemonicGenerator: @Sendable (BIP39.WordCount, BIP39.Language) throws -> Mnemonic
 
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
 			keychainClient: KeychainClient,
 			mainQueue: AnySchedulerOf<DispatchQueue>,
-			userDefaultsClient: UserDefaultsClient,
 			mnemonicGenerator: @escaping @Sendable (BIP39.WordCount, BIP39.Language) throws -> Mnemonic = { wordCount, language in
 				try Mnemonic.generate(wordCount: wordCount, language: language)
 			}
@@ -26,7 +24,6 @@ public extension Onboarding {
 			self.backgroundQueue = backgroundQueue
 			self.keychainClient = keychainClient
 			self.mainQueue = mainQueue
-			self.userDefaultsClient = userDefaultsClient
 			self.mnemonicGenerator = mnemonicGenerator
 		}
 	}
@@ -37,8 +34,7 @@ public extension Onboarding.Environment {
 	static let unimplemented = Self(
 		backgroundQueue: .unimplemented,
 		keychainClient: .unimplemented,
-		mainQueue: .unimplemented,
-		userDefaultsClient: .unimplemented
+		mainQueue: .unimplemented
 	)
 }
 #endif

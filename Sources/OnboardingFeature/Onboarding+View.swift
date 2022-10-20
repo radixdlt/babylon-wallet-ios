@@ -94,8 +94,7 @@ struct OnboardingView_Previews: PreviewProvider {
 				environment: .init(
 					backgroundQueue: .immediate,
 					keychainClient: .unimplemented,
-					mainQueue: .immediate,
-					userDefaultsClient: .noop
+					mainQueue: .immediate
 				)
 			)
 		)

@@ -33,8 +33,7 @@ public extension App {
 					Onboarding.Environment(
 						backgroundQueue: $0.backgroundQueue,
 						keychainClient: $0.keychainClient,
-						mainQueue: $0.mainQueue,
-						userDefaultsClient: $0.userDefaultsClient
+						mainQueue: $0.mainQueue
 					)
 				}
 			),
