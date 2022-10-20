@@ -13,7 +13,7 @@ public extension App {
 	// MARK: Environment
 	struct Environment {
 		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
-		public let mainQueue: AnySchedulerOf<DispatchQueue>
+		public var mainQueue: AnySchedulerOf<DispatchQueue>
 		public let appSettingsClient: AppSettingsClient
 		public let accountPortfolioFetcher: AccountPortfolioFetcher
 		public let keychainClient: KeychainClient

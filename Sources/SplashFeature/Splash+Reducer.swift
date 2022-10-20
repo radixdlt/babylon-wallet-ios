@@ -38,13 +38,13 @@ public extension Splash {
 			}
 		case let .internal(.coordinate(actionToCoordinate)):
 			return .run { send in
-				let duration: TimeInterval
+				let durationInMS: Int
 				#if DEBUG
-				duration = 0.1
+				durationInMS = 100
 				#else
-				duration = 0.7
+				durationInMS = 700
 				#endif
-				try await environment.mainQueue.sleep(for: .seconds(duration))
+				try await environment.mainQueue.sleep(for: .milliseconds(durationInMS))
 				await send(.coordinate(actionToCoordinate))
 			}
 
