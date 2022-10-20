@@ -29,6 +29,9 @@ public extension Onboarding.View {
 					}
 					.disabled(!viewStore.canProceed)
 				}
+				.padding()
+				.buttonStyle(.borderedProminent)
+				.textFieldStyle(.roundedBorder)
 			}
 		}
 	}
