@@ -157,8 +157,6 @@ let package = Package(
 				tca,
 				"UserDefaultsClient",
 				"WalletClient",
-				"WalletLoader",
-				"WalletRemover",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -341,7 +339,6 @@ let package = Package(
 				"PasteboardClient",
 				"SettingsFeature",
 				tca,
-				"WalletRemover",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -350,7 +347,6 @@ let package = Package(
 			dependencies: [
 				"MainFeature",
 				"TestUtils",
-				"WalletRemover",
 			]
 		),
 		.target(
@@ -459,7 +455,6 @@ let package = Package(
 				"ProfileLoader",
 				tca,
 				"WalletClient",
-				"WalletLoader",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -504,38 +499,6 @@ let package = Package(
 			dependencies: [
 				"WalletClient",
 				"TestUtils",
-			]
-		),
-		.target(
-			name: "WalletLoader",
-			dependencies: [
-				profile,
-				keychainClient,
-				"WalletClient",
-				tca,
-			]
-		),
-		.testTarget(
-			name: "WalletLoaderTests",
-			dependencies: [
-				"WalletLoader",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "WalletRemover",
-			dependencies: [
-				keychainClient,
-				"WalletClient",
-				tca,
-			]
-		),
-		.testTarget(
-			name: "WalletRemoverTests",
-			dependencies: [
-				"TestUtils",
-				"WalletRemover",
-				tca,
 			]
 		),
 	]

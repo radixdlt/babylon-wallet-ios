@@ -18,9 +18,4 @@ final class HexStringToDataTests: TestCase {
 		let data = try Data(hexString: "deadbeef")
 		XCTAssertEqual(data, Data([0xDE, 0xAD, 0xBE, 0xEF]))
 	}
-
-	func testAssertThatHexStringCanBePrefixWithBaseIdentifier() throws {
-		let data = try Data(hexString: "0xdeadbeef")
-		XCTAssertEqual(data, Data([0xDE, 0xAD, 0xBE, 0xEF]))
-	}
 }

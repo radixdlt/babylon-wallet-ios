@@ -11,10 +11,19 @@ final class OnboardingFeatureTests: TestCase {
 	func test_createWallet_whenTappedOnCreateWalletButton_thenCreateWallet() async throws {
 		// given
 		var keychainClient: KeychainClient = .unimplemented
-		let expectSetDataForProfile = expectation(description: "SetDataForKey on keychainClient should be called for profile snapshot")
-		keychainClient.setDataDataForKey = { _, key in
+
+		let expectActorIsolated = expectation(description: "ActorIsolated<Profile?> to have set value")
+		let profileSavedToKeychain = ActorIsolated<Profile?>(nil)
+
+		keychainClient.setDataDataForKey = { data, key in
 			if key == "profileSnapshotKeychainKey" {
-				expectSetDataForProfile.fulfill()
+				if let snapshot = try? JSONDecoder.iso8601.decode(ProfileSnapshot.self, from: data) {
+					let profile = try? Profile(snapshot: snapshot)
+					Task {
+						await profileSavedToKeychain.setValue(profile)
+						expectActorIsolated.fulfill()
+					}
+				}
 			}
 		}
 		let environment = Onboarding.Environment(
@@ -39,9 +48,13 @@ final class OnboardingFeatureTests: TestCase {
 
 		// then
 		await store.receive(.internal(.system(.createProfile)))
-		let profile = try await Profile.new(mnemonic: Mnemonic.generate())
-		await store.receive(.internal(.system(.createdProfile(profile))))
-		await store.receive(.coordinate(.onboardedWithProfile(profile)))
-		waitForExpectations(timeout: 0.1)
+
+		waitForExpectations(timeout: 1)
+		await profileSavedToKeychain.withValue {
+			if let profile = $0 {
+				await store.receive(.internal(.system(.createdProfile(profile))))
+				await store.receive(.coordinate(.onboardedWithProfile(profile)))
+			}
+		}
 	}
 }

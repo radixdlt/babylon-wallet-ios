@@ -1,7 +1,6 @@
 import ComposableArchitecture
 import Foundation
 import ProfileLoader
-import WalletLoader
 
 public extension Splash {
 	// MARK: Reducer
@@ -24,17 +23,47 @@ public extension Splash {
 
 		case let .internal(.system(.loadProfileResult(.success(.some(profile))))):
 			return .run { send in
-				await send(.internal(.coordinate(.loadProfileResult(SplashLoadProfileResult.profileLoaded(profile)))))
+				await send(
+					.internal(
+						.coordinate(
+							.loadProfileResult(
+								.profileLoaded(profile)
+							)
+						)
+					)
+				)
 			}
 
 		case .internal(.system(.loadProfileResult(.success(.none)))):
 			return .run { send in
-				await send(.internal(.coordinate(.loadProfileResult(SplashLoadProfileResult.noProfile(reason: "No profile saved yet", failedToDecode: false)))))
+				await send(
+					.internal(
+						.coordinate(
+							.loadProfileResult(
+								.noProfile(
+									reason: "No profile saved yet",
+									failedToDecode: false
+								)
+							)
+						)
+					)
+				)
 			}
 
 		case let .internal(.system(.loadProfileResult(.failure(error)))):
 			return .run { send in
-				await send(.internal(.coordinate(.loadProfileResult(SplashLoadProfileResult.noProfile(reason: String(describing: error), failedToDecode: error is Swift.DecodingError)))))
+				await send(
+					.internal(
+						.coordinate(
+							.loadProfileResult(
+								.noProfile(
+									reason: String(describing: error),
+									failedToDecode: error is Swift.DecodingError
+								)
+							)
+						)
+					)
+				)
 			}
 		case let .internal(.coordinate(actionToCoordinate)):
 			return .run { send in
