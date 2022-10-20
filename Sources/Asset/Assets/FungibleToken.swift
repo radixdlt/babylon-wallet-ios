@@ -67,9 +67,9 @@ public extension FungibleToken {
 	/// The native token of the Radix Ledger
 	static let xrd = Self(
 		address: "unknown at this point",
-		totalSupplyAttos: .init(integerLiteral: 24_000_000_000).inAttos,
-		totalMintedAttos: .init(integerLiteral: 0).inAttos,
-		totalBurntAttos: .init(integerLiteral: 0).inAttos,
+		totalSupplyAttos: 24_000_000_000.inAttos,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
 		tokenDescription: "The native token of the Radix Ledger",
 		name: "RAD",
 		code: "XRD",
@@ -81,9 +81,9 @@ public extension FungibleToken {
 public extension FungibleToken {
 	static let btc = Self(
 		address: "btc-deadbeef",
-		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
-		totalMintedAttos: .init(integerLiteral: 0).inAttos,
-		totalBurntAttos: .init(integerLiteral: 0).inAttos,
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
 		tokenDescription: nil,
 		name: "Bitcoin",
 		code: "BTC",
@@ -92,9 +92,9 @@ public extension FungibleToken {
 
 	static let dot = Self(
 		address: "dot-deadbeef",
-		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
-		totalMintedAttos: .init(integerLiteral: 0).inAttos,
-		totalBurntAttos: .init(integerLiteral: 0).inAttos,
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
 		tokenDescription: nil,
 		name: "Polkadot",
 		code: "DOT",
@@ -103,9 +103,9 @@ public extension FungibleToken {
 
 	static let eth = Self(
 		address: "eth-deadbeef",
-		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
-		totalMintedAttos: .init(integerLiteral: 0).inAttos,
-		totalBurntAttos: .init(integerLiteral: 0).inAttos,
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
 		tokenDescription: nil,
 		name: "Ethereum",
 		code: "ETH",
@@ -114,9 +114,9 @@ public extension FungibleToken {
 
 	static let ltc = Self(
 		address: "ltc-deadbeef",
-		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
-		totalMintedAttos: .init(integerLiteral: 0).inAttos,
-		totalBurntAttos: .init(integerLiteral: 0).inAttos,
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
 		tokenDescription: nil,
 		name: "Litecoin",
 		code: "LTC",
@@ -125,9 +125,9 @@ public extension FungibleToken {
 
 	static let sol = Self(
 		address: "sol-deadbeef",
-		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
-		totalMintedAttos: .init(integerLiteral: 0).inAttos,
-		totalBurntAttos: .init(integerLiteral: 0).inAttos,
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
 		tokenDescription: nil,
 		name: "Solana",
 		code: "SOL",
@@ -136,9 +136,9 @@ public extension FungibleToken {
 
 	static let usdt = Self(
 		address: "usdt-deadbeef",
-		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
-		totalMintedAttos: .init(integerLiteral: 0).inAttos,
-		totalBurntAttos: .init(integerLiteral: 0).inAttos,
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
 		tokenDescription: nil,
 		name: "Tether",
 		code: "USDT",
@@ -147,9 +147,9 @@ public extension FungibleToken {
 
 	static let xrp = Self(
 		address: "xrp-deadbeef",
-		totalSupplyAttos: .init(integerLiteral: 0).inAttos,
-		totalMintedAttos: .init(integerLiteral: 0).inAttos,
-		totalBurntAttos: .init(integerLiteral: 0).inAttos,
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
 		tokenDescription: nil,
 		name: "XRP token",
 		code: "XRP",

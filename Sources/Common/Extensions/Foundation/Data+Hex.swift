@@ -22,6 +22,7 @@
 // * Changed `func hexEncodedString` to `func hex`
 // * Added computed property `var hex: String`
 
+import BigInt
 import Foundation
 
 // MARK: - ByteHexEncodingErrors
@@ -92,5 +93,9 @@ public extension FixedWidthInteger {
 	var data: Data {
 		let data = withUnsafeBytes(of: bigEndian) { Data($0) }
 		return data
+	}
+
+	var inAttos: BigUInt {
+		BigUInt(self).inAttos
 	}
 }
