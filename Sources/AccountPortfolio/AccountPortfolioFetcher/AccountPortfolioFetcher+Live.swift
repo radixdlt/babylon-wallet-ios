@@ -1,6 +1,6 @@
-import Profile
 import AppSettings
 import Asset
+import Profile
 
 public extension AccountPortfolioFetcher {
 	private typealias AssetsDictionaryPerAccountAddress = [AccountAddress: [[any Asset]]]

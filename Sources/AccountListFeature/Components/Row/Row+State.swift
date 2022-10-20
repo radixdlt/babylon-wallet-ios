@@ -54,16 +54,16 @@ public extension AccountList.Row.State {
 // MARK: - AccountList.Row.State + Identifiable
 extension AccountList.Row.State: Identifiable {
 	public typealias ID = AccountAddress
-    public var id: ID { address }
-    public var address: AccountAddress {
-        account.address
-    }
+	public var id: ID { address }
+	public var address: AccountAddress {
+		account.address
+	}
 }
 
 #if DEBUG
 public extension AccountList.Row.State {
-    static let placeholder: Self = {
-        fatalError()
-    }()
+	static let placeholder: Self = {
+		fatalError()
+	}()
 }
 #endif

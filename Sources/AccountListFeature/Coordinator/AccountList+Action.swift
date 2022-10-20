@@ -1,5 +1,5 @@
-import Profile
 import Foundation
+import Profile
 
 // MARK: - AccountList.Action
 public extension AccountList {

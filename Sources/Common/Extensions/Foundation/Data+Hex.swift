@@ -1,5 +1,5 @@
-import Mnemonic
 import Foundation
+import Mnemonic
 
 public extension FixedWidthInteger {
 	var data: Data {

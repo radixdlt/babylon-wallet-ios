@@ -1,5 +1,5 @@
-import Profile
 import DesignSystem
+import Profile
 import SwiftUI
 
 // MARK: - AddressView
@@ -19,7 +19,7 @@ public struct AddressView: View {
 public extension AddressView {
 	var body: some View {
 		HStack(spacing: 5) {
-            Text(address.address)
+			Text(address.address)
 				.lineLimit(1)
 				.truncationMode(.middle)
 				.foregroundColor(.app.buttonTextBlackTransparent)

@@ -27,8 +27,8 @@ public extension AccountDetails {
 			case .internal(.user(.displayAccountPreferences)):
 				return Effect(value: .coordinate(.displayAccountPreferences))
 			case .internal(.user(.copyAddress)):
-                return .run { [address = state.address] send in
-                    await send(.coordinate(.copyAddress(address)))
+				return .run { [address = state.address] send in
+					await send(.coordinate(.copyAddress(address)))
 				}
 			case .internal(.user(.refresh)):
 				return Effect(value: .coordinate(.refresh(state.address)))

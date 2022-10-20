@@ -1,5 +1,5 @@
-import Profile
 import Asset
+import Profile
 
 // MARK: - AssetFetcher
 public struct AssetFetcher {

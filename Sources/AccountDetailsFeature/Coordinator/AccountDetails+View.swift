@@ -2,8 +2,8 @@ import AggregatedValueFeature
 import AssetsViewFeature
 import Common
 import ComposableArchitecture
-import SwiftUI
 import Profile
+import SwiftUI
 
 // MARK: - AccountDetails.View
 public extension AccountDetails {
@@ -34,7 +34,7 @@ public extension AccountDetails.View {
 					ScrollView {
 						VStack(spacing: 16) {
 							AddressView(
-                                address: viewStore.address.wrapAsAddress(),
+								address: viewStore.address.wrapAsAddress(),
 								copyAddressAction: {
 									viewStore.send(.copyAddressButtonTapped)
 								}
@@ -82,12 +82,12 @@ private extension AccountDetails.View {
 					Image("arrow-back")
 				}
 			)
-            Spacer()
-            if let displayName = viewStore.displayName {
-                Text(displayName)
-                    .foregroundColor(.app.buttonTextBlack)
-                    .textStyle(.secondaryHeader)
-            }
+			Spacer()
+			if let displayName = viewStore.displayName {
+				Text(displayName)
+					.foregroundColor(.app.buttonTextBlack)
+					.textStyle(.secondaryHeader)
+			}
 			Spacer()
 			Button(
 				action: {
@@ -154,9 +154,9 @@ extension AccountDetails.View {
 		public let displayName: String?
 
 		init(state: AccountDetails.State) {
-            self.address = state.address
-            self.aggregatedValue = state.aggregatedValue
-            self.displayName = state.displayName
+			address = state.address
+			aggregatedValue = state.aggregatedValue
+			displayName = state.displayName
 		}
 	}
 }

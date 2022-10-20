@@ -42,13 +42,7 @@ public extension Main.View {
 extension Main.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		public var profileName: String
-
-		init(state _: Main.State) {
-//			profileName = state.wallet.profile.name
-			// FIXME: wallet
-			profileName = "placeholder"
-		}
+		init(state _: Main.State) {}
 	}
 }
 
@@ -79,8 +73,9 @@ struct MainView_Previews: PreviewProvider {
 				environment: .init(
 					accountPortfolioFetcher: .mock,
 					appSettingsClient: .mock,
+					keychainClient: .unimplemented,
 					pasteboardClient: .noop,
-					walletRemover: .mock
+					walletClient: .unimplemented
 				)
 			)
 		)

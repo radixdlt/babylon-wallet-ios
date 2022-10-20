@@ -1,9 +1,9 @@
 import AccountPortfolio
-import Profile
 import Asset
 import Common
 import ComposableArchitecture
 import FungibleTokenListFeature
+import Profile
 import SwiftUI
 
 // MARK: - AccountList.Row.View
@@ -41,7 +41,7 @@ public extension AccountList.Row.View {
 					)
 
 					AddressView(
-                        address: viewStore.address.wrapAsAddress(),
+						address: viewStore.address.wrapAsAddress(),
 						copyAddressAction: {
 							viewStore.send(.copyAddressButtonTapped)
 						}
@@ -104,8 +104,8 @@ extension AccountList.Row.View {
 		let portfolio: AccountPortfolio
 
 		init(state: AccountList.Row.State) {
-            name = state.account.displayName
-            address = state.account.address
+			name = state.account.displayName
+			address = state.account.address
 			aggregatedValue = state.aggregatedValue
 			currency = state.currency
 			isCurrencyAmountVisible = state.isCurrencyAmountVisible
@@ -123,12 +123,12 @@ private struct HeaderView: View {
 
 	var body: some View {
 		HStack {
-            if let name {
-                Text(name)
-                    .foregroundColor(.app.buttonTextBlack)
-                    .textStyle(.secondaryHeader)
-                    .fixedSize()
-            }
+			if let name {
+				Text(name)
+					.foregroundColor(.app.buttonTextBlack)
+					.textStyle(.secondaryHeader)
+					.fixedSize()
+			}
 			Spacer()
 			Text(value)
 				.foregroundColor(.app.buttonTextBlack)

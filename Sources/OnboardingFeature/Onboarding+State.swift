@@ -8,12 +8,11 @@ public enum Onboarding {}
 public extension Onboarding {
 	// MARK: State
 	struct State: Equatable {
-        
 		@BindableState public var nameOfFirstAccount: String
 		public var canProceed: Bool
 
 		public init(
-            nameOfFirstAccount: String = "",
+			nameOfFirstAccount: String = "",
 			canProceed: Bool = false
 		) {
 			self.nameOfFirstAccount = nameOfFirstAccount
@@ -25,7 +24,7 @@ public extension Onboarding {
 #if DEBUG
 public extension Onboarding.State {
 	static let placeholder = Self(
-        nameOfFirstAccount: "Main",
+		nameOfFirstAccount: "Main",
 		canProceed: true
 	)
 }

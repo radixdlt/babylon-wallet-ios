@@ -31,6 +31,7 @@ public extension Home.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
 		case system(SystemAction)
+		case coordinate(InternalCoordinateAction)
 	}
 }
 
@@ -53,6 +54,10 @@ public extension Home.Action.InternalAction {
 		case copyAddress(Address)
 		case viewDidAppearActionFailed(reason: String)
 		case toggleIsCurrencyAmountVisibleFailed(reason: String)
+	}
+
+	enum InternalCoordinateAction: Equatable {
+		case createAccount(numberOfExistingAccounts: Int)
 	}
 }
 

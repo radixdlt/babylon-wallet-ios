@@ -1,6 +1,6 @@
-import Profile
 import AggregatedValueFeature
 import AssetsViewFeature
+import Profile
 
 // MARK: - AccountDetails.Action
 public extension AccountDetails {

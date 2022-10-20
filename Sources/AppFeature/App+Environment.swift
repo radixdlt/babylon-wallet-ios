@@ -2,11 +2,11 @@ import AccountPortfolio
 import AppSettings
 import ComposableArchitecture
 import Foundation
+import KeychainClient
 import PasteboardClient
 import ProfileLoader
 import UserDefaultsClient
-import WalletLoader
-import WalletRemover
+import WalletClient
 
 // MARK: - App.Environment
 public extension App {
@@ -16,32 +16,32 @@ public extension App {
 		public let mainQueue: AnySchedulerOf<DispatchQueue>
 		public let appSettingsClient: AppSettingsClient
 		public let accountPortfolioFetcher: AccountPortfolioFetcher
+		public let keychainClient: KeychainClient
 		public let pasteboardClient: PasteboardClient
 		public let profileLoader: ProfileLoader
 		public let userDefaultsClient: UserDefaultsClient
-		public let walletLoader: WalletLoader
-		public let walletRemover: WalletRemover
+		public let walletClient: WalletClient
 
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
 			mainQueue: AnySchedulerOf<DispatchQueue>,
 			appSettingsClient: AppSettingsClient,
 			accountPortfolioFetcher: AccountPortfolioFetcher,
+			keychainClient: KeychainClient,
 			pasteboardClient: PasteboardClient,
 			profileLoader: ProfileLoader,
 			userDefaultsClient: UserDefaultsClient,
-			walletLoader: WalletLoader,
-			walletRemover: WalletRemover
+			walletClient: WalletClient
 		) {
 			self.backgroundQueue = backgroundQueue
 			self.mainQueue = mainQueue
 			self.appSettingsClient = appSettingsClient
 			self.accountPortfolioFetcher = accountPortfolioFetcher
+			self.keychainClient = keychainClient
 			self.pasteboardClient = pasteboardClient
 			self.profileLoader = profileLoader
 			self.userDefaultsClient = userDefaultsClient
-			self.walletLoader = walletLoader
-			self.walletRemover = walletRemover
+			self.walletClient = walletClient
 		}
 	}
 }
@@ -53,11 +53,11 @@ public extension App.Environment {
 		mainQueue: .immediate,
 		appSettingsClient: .mock,
 		accountPortfolioFetcher: .mock,
+		keychainClient: .unimplemented,
 		pasteboardClient: .noop,
-		profileLoader: .noop,
+		profileLoader: .unimplemented,
 		userDefaultsClient: .noop,
-		walletLoader: .noop,
-		walletRemover: .noop
+		walletClient: .unimplemented
 	)
 
 	static let unimplemented = Self(
@@ -65,11 +65,11 @@ public extension App.Environment {
 		mainQueue: .unimplemented,
 		appSettingsClient: .unimplemented,
 		accountPortfolioFetcher: .unimplemented,
+		keychainClient: .unimplemented,
 		pasteboardClient: .unimplemented,
 		profileLoader: .unimplemented,
 		userDefaultsClient: .unimplemented,
-		walletLoader: .unimplemented,
-		walletRemover: .unimplemented
+		walletClient: .unimplemented
 	)
 }
 #endif

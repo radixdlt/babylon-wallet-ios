@@ -8,33 +8,30 @@ public extension Splash {
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = Reducer { _, action, environment in
 		switch action {
-		
-        case .internal(.system(.viewDidAppear)):
-            return .run { send in
-                await send(.internal(.system(.loadProfile)))
-            }
-		
-        case .internal(.system(.loadProfile)):
+		case .internal(.system(.viewDidAppear)):
+			return .run { send in
+				await send(.internal(.system(.loadProfile)))
+			}
+
+		case .internal(.system(.loadProfile)):
 			return .run { send in
 				await send(.internal(.system(.loadProfileResult(
 					TaskResult {
-                        try await environment.profileLoader.loadProfile()
+						try await environment.profileLoader.loadProfile()
 					}
 				))))
 			}
 
-            
-            
-            
-            
-        case let .internal(.system(.loadProfileResult(.success(.some(profile))))):
-            return .run { send in
-                await send(.internal(.coordinate(.loadProfileResult(SplashLoadProfileResult.profileLoaded(profile)))))
-            }
-            
-        case .internal(.system(.loadProfileResult(.success(.none)))):
-            fatalError()
-    
+		case let .internal(.system(.loadProfileResult(.success(.some(profile))))):
+			return .run { send in
+				await send(.internal(.coordinate(.loadProfileResult(SplashLoadProfileResult.profileLoaded(profile)))))
+			}
+
+		case .internal(.system(.loadProfileResult(.success(.none)))):
+			fatalError()
+
+		case .internal(.system(.loadProfileResult(.failure(_)))):
+			fatalError()
 
 		case let .internal(.coordinate(actionToCoordinate)):
 			return .run { send in

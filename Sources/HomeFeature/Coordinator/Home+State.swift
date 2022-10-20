@@ -2,9 +2,9 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import Profile
 import AggregatedValueFeature
 import CreateAccountFeature
+import Profile
 import WalletClient
 
 // MARK: - Home
@@ -15,7 +15,6 @@ public enum Home {}
 public extension Home {
 	// MARK: State
 	struct State: Equatable {
-        public var profileSnapshot: ProfileSnapshot
 		public var accountPortfolioDictionary: AccountPortfolioDictionary
 
 		// MARK: - Components
@@ -31,7 +30,6 @@ public extension Home {
 		public var transfer: AccountDetails.Transfer.State?
 
 		public init(
-            profileSnapshot: ProfileSnapshot,
 			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
 			header: Home.Header.State = .init(),
 			aggregatedValue: AggregatedValue.State = .init(),
@@ -42,7 +40,6 @@ public extension Home {
 			createAccount: CreateAccount.State? = nil,
 			transfer: AccountDetails.Transfer.State? = nil
 		) {
-            self.profileSnapshot = profileSnapshot
 			self.accountPortfolioDictionary = accountPortfolioDictionary
 			self.header = header
 			self.aggregatedValue = aggregatedValue
@@ -57,15 +54,9 @@ public extension Home {
 }
 
 #if DEBUG
-public extension ProfileSnapshot {
-    static let placeholder: Self = {
-        fatalError()
-    }()
-}
 
 public extension Home.State {
 	static let placeholder = Home.State(
-        profileSnapshot: .placeholder,
 		header: .init(hasNotification: false),
 		aggregatedValue: .placeholder,
 		visitHub: .init()

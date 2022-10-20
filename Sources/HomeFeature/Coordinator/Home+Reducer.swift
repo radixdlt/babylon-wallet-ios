@@ -86,213 +86,219 @@ public extension Home {
 			environment: { _ in CreateAccount.Environment() }
 		),
 
-		Reducer { state, action, environment in
-			switch action {
-			case .internal(.user(.createAccountButtonTapped)):
-				state.createAccount = .init(numberOfExistingAccounts: state.wallet.profile.accounts.count)
-				return .none
-
-			case .internal(.system(.viewDidAppear)):
-                return .run { [profileSnapshot = state.profileSnapshot] send in
-                    try environment.walletClient.injectProfileSnapshot()
-					let settings = try await environment.appSettingsClient.loadSettings()
-					await send(.internal(.system(.currencyLoaded(settings.currency))))
-					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(settings.isCurrencyAmountVisible))))
-				}
-
-			case let .internal(.system(.currencyLoaded(currency))):
-				state.aggregatedValue.currency = currency
-				state.accountList.accounts.forEach {
-					state.accountList.accounts[id: $0.address]?.currency = currency
-				}
-				return .none
-
-			case .internal(.system(.toggleIsCurrencyAmountVisible)):
-				return .run { send in
-					var isVisible = try await environment.appSettingsClient.loadSettings().isCurrencyAmountVisible
-					isVisible.toggle()
-					try await environment.appSettingsClient.saveIsCurrencyAmountVisible(isVisible)
-					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
-				}
-
-			case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
-				// aggregated value
-				state.aggregatedValue.isCurrencyAmountVisible = isVisible
-
-				// account list
-				state.accountList.accounts.forEach {
-					state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = isVisible
-				}
-
-				// account details
-				state.accountDetails?.aggregatedValue.isCurrencyAmountVisible = isVisible
-				state.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
-					section.assets.forEach { row in
-						state.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
-					}
-				}
-
-				return .none
-
-			case let .internal(.system(.totalPortfolioLoaded(totalPortfolio))):
-				state.accountPortfolioDictionary = totalPortfolio
-
-				// aggregated value
-				state.aggregatedValue.value = totalPortfolio.compactMap(\.value.worth).reduce(0, +)
-
-				// account list
-				state.accountList.accounts.forEach {
-					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalPortfolio[$0.address]?.worth
-					let accountPortfolio = totalPortfolio[$0.address] ?? AccountPortfolio.empty
-					state.accountList.accounts[id: $0.address]?.portfolio = accountPortfolio
-				}
-
-				// account details
-				if let details = state.accountDetails {
-					// aggregated value
-					let account = details.account
-					let accountWorth = state.accountPortfolioDictionary[details.address]
-					state.accountDetails?.aggregatedValue.value = accountWorth?.worth
-
-					// asset list
-					let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
-					let categories = environment.fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
-
-					state.accountDetails?.assets = .init(
-						fungibleTokenList: .init(
-							sections: .init(uniqueElements: categories.map { category in
-								let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
-								return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
-							})
-						),
-						nonFungibleTokenList: .init(
-							rows: .init(uniqueElements: [accountPortfolio.nonFungibleTokenContainers].map {
-								.init(containers: $0)
-							})
-						)
-					)
-				}
-
-				return .none
-
-			case let .internal(.system(.accountPortfolioLoaded(accountPortfolio))):
-				guard let key = accountPortfolio.first?.key else { return .none }
-				state.accountPortfolioDictionary[key] = accountPortfolio.first?.value
-				return Effect(value: .internal(.system(.totalPortfolioLoaded(state.accountPortfolioDictionary))))
-
-			case let .internal(.system(.copyAddress(address))):
-				// TODO: display confirmation popup? discuss with po / designer
-				return .run { _ in
-					environment.pasteboardClient.copyString(address)
-				}
-
-			case let .internal(.system(.viewDidAppearActionFailed(reason: reason))):
-				print(reason)
-				return .none
-
-			case let .internal(.system(.toggleIsCurrencyAmountVisibleFailed(reason: reason))):
-				print(reason)
-				return .none
-
-			case .coordinate:
-				return .none
-
-			case .header(.coordinate(.displaySettings)):
-				return Effect(value: .coordinate(.displaySettings))
-
-			case .header(.internal):
-				return .none
-
-			case .aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible)):
-				return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
-
-			case .aggregatedValue(.internal):
-				return .none
-
-			case .visitHub(.coordinate(.displayHub)):
-				#if os(iOS)
-				// FIXME: move to `UIApplicationClient` package!
-				return .fireAndForget {
-					UIApplication.shared.open(URL(string: "https://www.apple.com")!)
-				}
-				#else
-				return .none
-				#endif // os(iOS)
-
-			case .visitHub(.internal):
-				return .none
-
-			case .accountList(.coordinate(.loadAccounts)):
-				return .run { [state = state] send in
-					let addresses = state.wallet.profile.accounts.map(\.address)
-					let totalPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio(addresses)
-					await send(.internal(.system(.totalPortfolioLoaded(totalPortfolio))))
-				}
-
-			case let .accountList(.coordinate(.displayAccountDetails(account))):
-				state.accountDetails = .init(for: account)
-				return .none
-
-			case let .accountList(.coordinate(.copyAddress(address))):
-				return Effect(value: .internal(.system(.copyAddress(address))))
-
-			case .accountList:
-				return .none
-
-			case .accountPreferences(.coordinate(.dismissAccountPreferences)):
-				state.accountPreferences = nil
-				return .none
-
-			case .accountPreferences(.internal):
-				return .none
-
-			case .accountDetails(.coordinate(.dismissAccountDetails)):
-				state.accountDetails = nil
-				return .none
-
-			case .accountDetails(.internal):
-				return .none
-
-			case .accountDetails(.coordinate(.displayAccountPreferences)):
-				state.accountPreferences = .init()
-				return .none
-
-			case let .accountDetails(.coordinate(.copyAddress(address))):
-				return Effect(value: .internal(.system(.copyAddress(address))))
-
-			case .accountDetails(.coordinate(.displayTransfer)):
-				state.transfer = .init()
-				return .none
-
-			case let .accountDetails(.coordinate(.refresh(address))):
-				return .run { send in
-					let accountPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio([address])
-					await send(.internal(.system(.accountPortfolioLoaded(accountPortfolio))))
-				}
-
-			case .accountDetails(.aggregatedValue(.internal(_))):
-				return .none
-
-			case .accountDetails(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))):
-				return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
-
-			case .accountDetails(.assets):
-				return .none
-
-			case .transfer(.coordinate(.dismissTransfer)):
-				state.transfer = nil
-				return .none
-
-			case .createAccount(.internal):
-				return .none
-
-			case .createAccount(.coordinate(.dismissCreateAccount)):
-				state.createAccount = nil
-				return .none
-
-			case .transfer(.internal):
-				return .none
-			}
+		Reducer { _, _, _ in
+//			switch action {
+//			case .internal(.user(.createAccountButtonTapped)):
+			//                return .run { send in
+			//                    let accounts = try environment.walletClient.getAccounts()
+			//                    await send(.internal(.coordinate(.createAccount(numberOfExistingAccounts: accounts.count))))
+			//                }
+			//            case let .internal(.coordinate(createAccount(numberOfExistingAccounts))):
+			//                state.createAccount = .init(numberOfExistingAccounts: numberOfExistingAccounts)
+			//                return .none
+//
+//			case .internal(.system(.viewDidAppear)):
+			//                return .run { [profileSnapshot = state.profileSnapshot] send in
+			//                    try environment.walletClient.injectProfileSnapshot()
+//					let settings = try await environment.appSettingsClient.loadSettings()
+//					await send(.internal(.system(.currencyLoaded(settings.currency))))
+//					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(settings.isCurrencyAmountVisible))))
+//				}
+//
+//			case let .internal(.system(.currencyLoaded(currency))):
+//				state.aggregatedValue.currency = currency
+//				state.accountList.accounts.forEach {
+//					state.accountList.accounts[id: $0.address]?.currency = currency
+//				}
+//				return .none
+//
+//			case .internal(.system(.toggleIsCurrencyAmountVisible)):
+//				return .run { send in
+//					var isVisible = try await environment.appSettingsClient.loadSettings().isCurrencyAmountVisible
+//					isVisible.toggle()
+//					try await environment.appSettingsClient.saveIsCurrencyAmountVisible(isVisible)
+//					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
+//				}
+//
+//			case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
+//				// aggregated value
+//				state.aggregatedValue.isCurrencyAmountVisible = isVisible
+//
+//				// account list
+//				state.accountList.accounts.forEach {
+//					state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = isVisible
+//				}
+//
+//				// account details
+//				state.accountDetails?.aggregatedValue.isCurrencyAmountVisible = isVisible
+//				state.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
+//					section.assets.forEach { row in
+//						state.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
+//					}
+//				}
+//
+//				return .none
+//
+//			case let .internal(.system(.totalPortfolioLoaded(totalPortfolio))):
+//				state.accountPortfolioDictionary = totalPortfolio
+//
+//				// aggregated value
+//				state.aggregatedValue.value = totalPortfolio.compactMap(\.value.worth).reduce(0, +)
+//
+//				// account list
+//				state.accountList.accounts.forEach {
+//					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalPortfolio[$0.address]?.worth
+//					let accountPortfolio = totalPortfolio[$0.address] ?? AccountPortfolio.empty
+//					state.accountList.accounts[id: $0.address]?.portfolio = accountPortfolio
+//				}
+//
+//				// account details
+//				if let details = state.accountDetails {
+//					// aggregated value
+//					let account = details.account
+//					let accountWorth = state.accountPortfolioDictionary[details.address]
+//					state.accountDetails?.aggregatedValue.value = accountWorth?.worth
+//
+//					// asset list
+//					let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
+//					let categories = environment.fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
+//
+//					state.accountDetails?.assets = .init(
+//						fungibleTokenList: .init(
+//							sections: .init(uniqueElements: categories.map { category in
+//								let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
+//								return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
+//							})
+//						),
+//						nonFungibleTokenList: .init(
+//							rows: .init(uniqueElements: [accountPortfolio.nonFungibleTokenContainers].map {
+//								.init(containers: $0)
+//							})
+//						)
+//					)
+//				}
+//
+//				return .none
+//
+//			case let .internal(.system(.accountPortfolioLoaded(accountPortfolio))):
+//				guard let key = accountPortfolio.first?.key else { return .none }
+//				state.accountPortfolioDictionary[key] = accountPortfolio.first?.value
+//				return Effect(value: .internal(.system(.totalPortfolioLoaded(state.accountPortfolioDictionary))))
+//
+//			case let .internal(.system(.copyAddress(address))):
+//				// TODO: display confirmation popup? discuss with po / designer
+//				return .run { _ in
+//					environment.pasteboardClient.copyString(address)
+//				}
+//
+//			case let .internal(.system(.viewDidAppearActionFailed(reason: reason))):
+//				print(reason)
+//				return .none
+//
+//			case let .internal(.system(.toggleIsCurrencyAmountVisibleFailed(reason: reason))):
+//				print(reason)
+//				return .none
+//
+//			case .coordinate:
+//				return .none
+//
+//			case .header(.coordinate(.displaySettings)):
+//				return Effect(value: .coordinate(.displaySettings))
+//
+//			case .header(.internal):
+//				return .none
+//
+//			case .aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible)):
+//				return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
+//
+//			case .aggregatedValue(.internal):
+//				return .none
+//
+//			case .visitHub(.coordinate(.displayHub)):
+//				#if os(iOS)
+//				// FIXME: move to `UIApplicationClient` package!
+//				return .fireAndForget {
+//					UIApplication.shared.open(URL(string: "https://www.apple.com")!)
+//				}
+//				#else
+//				return .none
+//				#endif // os(iOS)
+//
+//			case .visitHub(.internal):
+//				return .none
+//
+//			case .accountList(.coordinate(.loadAccounts)):
+//				return .run { [state = state] send in
+//					let addresses = state.wallet.profile.accounts.map(\.address)
+//					let totalPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio(addresses)
+//					await send(.internal(.system(.totalPortfolioLoaded(totalPortfolio))))
+//				}
+//
+//			case let .accountList(.coordinate(.displayAccountDetails(account))):
+//				state.accountDetails = .init(for: account)
+//				return .none
+//
+//			case let .accountList(.coordinate(.copyAddress(address))):
+//				return Effect(value: .internal(.system(.copyAddress(address))))
+//
+//			case .accountList:
+//				return .none
+//
+//			case .accountPreferences(.coordinate(.dismissAccountPreferences)):
+//				state.accountPreferences = nil
+//				return .none
+//
+//			case .accountPreferences(.internal):
+//				return .none
+//
+//			case .accountDetails(.coordinate(.dismissAccountDetails)):
+//				state.accountDetails = nil
+//				return .none
+//
+//			case .accountDetails(.internal):
+//				return .none
+//
+//			case .accountDetails(.coordinate(.displayAccountPreferences)):
+//				state.accountPreferences = .init()
+//				return .none
+//
+//			case let .accountDetails(.coordinate(.copyAddress(address))):
+//				return Effect(value: .internal(.system(.copyAddress(address))))
+//
+//			case .accountDetails(.coordinate(.displayTransfer)):
+//				state.transfer = .init()
+//				return .none
+//
+//			case let .accountDetails(.coordinate(.refresh(address))):
+//				return .run { send in
+//					let accountPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio([address])
+//					await send(.internal(.system(.accountPortfolioLoaded(accountPortfolio))))
+//				}
+//
+//			case .accountDetails(.aggregatedValue(.internal(_))):
+//				return .none
+//
+//			case .accountDetails(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))):
+//				return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
+//
+//			case .accountDetails(.assets):
+//				return .none
+//
+//			case .transfer(.coordinate(.dismissTransfer)):
+//				state.transfer = nil
+//				return .none
+//
+//			case .createAccount(.internal):
+//				return .none
+//
+//			case .createAccount(.coordinate(.dismissCreateAccount)):
+//				state.createAccount = nil
+//				return .none
+//
+//			case .transfer(.internal):
+//				return .none
+//			}
+			.none
 		}
 	)
 }

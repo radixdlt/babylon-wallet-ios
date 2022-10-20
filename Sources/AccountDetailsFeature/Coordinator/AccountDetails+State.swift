@@ -22,7 +22,7 @@ public extension AccountDetails {
 		public init(for account: AccountList.Row.State) {
 			self.account = account.account
 
-            self.aggregatedValue = .init(
+			aggregatedValue = .init(
 				value: account.aggregatedValue,
 				currency: account.currency,
 				isCurrencyAmountVisible: account.isCurrencyAmountVisible
@@ -46,10 +46,11 @@ public extension AccountDetails {
 }
 
 public extension AccountDetails.State {
-    var address: AccountAddress {
-        account.address
-    }
-    var displayName: String? {
-        account.displayName
-    }
+	var address: AccountAddress {
+		account.address
+	}
+
+	var displayName: String? {
+		account.displayName
+	}
 }

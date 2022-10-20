@@ -42,8 +42,8 @@ extension Onboarding.View {
 		var canProceed: Bool
 
 		init(state: Onboarding.State) {
-            self.nameOfFirstAccount = state.nameOfFirstAccount
-            self.canProceed = state.canProceed
+			nameOfFirstAccount = state.nameOfFirstAccount
+			canProceed = state.canProceed
 		}
 	}
 }
@@ -75,7 +75,7 @@ private extension Onboarding.State {
 		get { .init(state: self) }
 		set {
 			// handle bindable actions only:
-            nameOfFirstAccount = newValue.nameOfFirstAccount
+			nameOfFirstAccount = newValue.nameOfFirstAccount
 			canProceed = newValue.canProceed
 		}
 	}

@@ -1,7 +1,8 @@
 import AccountPortfolio
 import AppSettings
+import KeychainClient
 import PasteboardClient
-import WalletRemover
+import WalletClient
 
 // MARK: - Main.Environment
 public extension Main {
@@ -9,19 +10,22 @@ public extension Main {
 	struct Environment {
 		public let accountPortfolioFetcher: AccountPortfolioFetcher
 		public let appSettingsClient: AppSettingsClient
+		public let keychainClient: KeychainClient
 		public let pasteboardClient: PasteboardClient
-		public let walletRemover: WalletRemover
+		public let walletClient: WalletClient
 
 		public init(
 			accountPortfolioFetcher: AccountPortfolioFetcher,
 			appSettingsClient: AppSettingsClient,
+			keychainClient: KeychainClient,
 			pasteboardClient: PasteboardClient,
-			walletRemover: WalletRemover
+			walletClient: WalletClient
 		) {
 			self.accountPortfolioFetcher = accountPortfolioFetcher
 			self.appSettingsClient = appSettingsClient
+			self.keychainClient = keychainClient
 			self.pasteboardClient = pasteboardClient
-			self.walletRemover = walletRemover
+			self.walletClient = walletClient
 		}
 	}
 }
@@ -31,15 +35,17 @@ public extension Main.Environment {
 	static let noop = Self(
 		accountPortfolioFetcher: .mock,
 		appSettingsClient: .mock,
+		keychainClient: .unimplemented,
 		pasteboardClient: .noop,
-		walletRemover: .noop
+		walletClient: .unimplemented
 	)
 
 	static let unimplemented = Self(
 		accountPortfolioFetcher: .unimplemented,
 		appSettingsClient: .unimplemented,
+		keychainClient: .unimplemented,
 		pasteboardClient: .unimplemented,
-		walletRemover: .unimplemented
+		walletClient: .unimplemented
 	)
 }
 #endif

@@ -1,25 +1,27 @@
 import AppFeature
 import ComposableArchitecture
 import DesignSystem
+import KeychainClient
 import SwiftUI
 import UserDefaultsClient
+import WalletClient
 
 typealias App = AppFeature.App
 
 public extension App.Environment {
 	static let live: Self = {
-		let userDefaultsClient: UserDefaultsClient = .live()
+		let keychainClient: KeychainClient = .live()
 
 		return Self(
 			backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
 			mainQueue: .main,
 			appSettingsClient: .live(),
 			accountPortfolioFetcher: .live(),
+			keychainClient: keychainClient,
 			pasteboardClient: .live(),
-			profileLoader: .live(userDefaultsClient: userDefaultsClient),
-			userDefaultsClient: userDefaultsClient,
-			walletLoader: .live,
-			walletRemover: .live()
+			profileLoader: .live(keychainClient: keychainClient),
+			userDefaultsClient: .live(),
+			walletClient: .live
 		)
 	}()
 }

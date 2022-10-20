@@ -5,7 +5,7 @@ import WalletClient
 public extension Onboarding {
 	// MARK: Reducer
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer { state, action, environment in
+	static let reducer = Reducer { state, action, _ in
 		switch action {
 		case .coordinate:
 			return .none
@@ -13,10 +13,10 @@ public extension Onboarding {
 			return Effect(value: .internal(.system(.createProfile)))
 		case .internal(.system(.createProfile)):
 			precondition(state.canProceed)
-            
-            // FIXME Wallet Client
-            return .none
- 
+
+			// FIXME: Wallet Client
+			return .none
+
 //
 //            return .run { send in
 //				await send(.internal(.system(.createdWallet(wallet))))

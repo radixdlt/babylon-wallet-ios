@@ -1,6 +1,6 @@
 import ComposableArchitecture
-import ProfileLoader
 import Profile
+import ProfileLoader
 import WalletClient
 import XCTestDynamicOverlay
 
@@ -12,7 +12,7 @@ public struct WalletClientLoader {
 #if DEBUG
 public extension WalletClientLoader {
 	static let unimplemented = Self(
-        loadWalletClient: XCTUnimplemented("\(Self.self).loadWalletClient")
+		loadWalletClient: XCTUnimplemented("\(Self.self).loadWalletClient")
 	)
 }
 #endif

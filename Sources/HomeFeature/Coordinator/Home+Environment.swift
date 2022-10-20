@@ -9,20 +9,20 @@ import WalletClient
 public extension Home {
 	// MARK: Environment
 	struct Environment {
-        public let walletClient: WalletClient
+		public let walletClient: WalletClient
 		public let appSettingsClient: AppSettingsClient
 		public let accountPortfolioFetcher: AccountPortfolioFetcher
 		public let pasteboardClient: PasteboardClient
 		public let fungibleTokenListSorter: FungibleTokenListSorter
 
 		public init(
-            walletClient: WalletClient,
+			walletClient: WalletClient,
 			appSettingsClient: AppSettingsClient,
 			accountPortfolioFetcher: AccountPortfolioFetcher,
 			pasteboardClient: PasteboardClient,
 			fungibleTokenListSorter: FungibleTokenListSorter = .live
 		) {
-            self.walletClient = walletClient
+			self.walletClient = walletClient
 			self.appSettingsClient = appSettingsClient
 			self.accountPortfolioFetcher = accountPortfolioFetcher
 			self.pasteboardClient = pasteboardClient
@@ -34,7 +34,7 @@ public extension Home {
 #if DEBUG
 public extension Home.Environment {
 	static let placeholder: Self = .init(
-        walletClient: .mock(),
+		walletClient: .mock(),
 		appSettingsClient: .mock,
 		accountPortfolioFetcher: .mock,
 		pasteboardClient: .noop,
@@ -42,7 +42,7 @@ public extension Home.Environment {
 	)
 
 	static let unimplemented: Self = .init(
-        walletClient: .unimplemented,
+		walletClient: .unimplemented,
 		appSettingsClient: .unimplemented,
 		accountPortfolioFetcher: .unimplemented,
 		pasteboardClient: .unimplemented,
