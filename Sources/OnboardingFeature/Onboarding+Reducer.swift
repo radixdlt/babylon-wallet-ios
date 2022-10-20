@@ -11,7 +11,9 @@ public extension Onboarding {
 		case .coordinate:
 			return .none
 		case .internal(.user(.createProfile)):
-			return Effect(value: .internal(.system(.createProfile)))
+			return .run { send in
+				await send(.internal(.system(.createProfile)))
+			}
 		case .internal(.system(.createProfile)):
 			precondition(state.canProceed)
 			return .run { [nameOfFirstAccount = state.nameOfFirstAccount] send in
@@ -29,10 +31,14 @@ public extension Onboarding {
 					reference: curve25519FactorSourceReference
 				)
 
+				try environment.keychainClient.saveProfile(profile: newProfile)
+
 				await send(.internal(.system(.createdProfile(newProfile))))
 			}
 		case let .internal(.system(.createdProfile(profile))):
-			return Effect(value: .coordinate(.onboardedWithProfile(profile)))
+			return .run { send in
+				await send(.coordinate(.onboardedWithProfile(profile)))
+			}
 		case .binding:
 			state.canProceed = !state.nameOfFirstAccount.isEmpty
 			return .none
