@@ -18,6 +18,11 @@ let keychainClient: Target.Dependency = .product(
 	package: "swift-profile"
 )
 
+let bigInt: Target.Dependency = .product(
+	name: "BigInt",
+	package: "BigInt"
+)
+
 let package = Package(
 	name: "Babylon",
 	platforms: [
@@ -44,9 +49,11 @@ let package = Package(
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
-		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.41.2"),
+		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
 		// Format code
-		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.1"),
+		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
+		// BigInt
+		.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
 
 		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.16"),
 	],
@@ -96,6 +103,7 @@ let package = Package(
 				profile,
 				"AppSettings",
 				"Asset",
+				"GatewayAPI",
 				"Common",
 			]
 		),
@@ -180,7 +188,9 @@ let package = Package(
 		.target(
 			name: "Asset",
 			dependencies: [
+				"Common",
 				profile, // Address
+				bigInt,
 			]
 		),
 		.testTarget(
@@ -211,6 +221,7 @@ let package = Package(
 			name: "Common",
 			dependencies: [
 				profile, // Address
+				bigInt,
 				"DesignSystem",
 			]
 		),
@@ -265,6 +276,7 @@ let package = Package(
 		.target(
 			name: "GatewayAPI",
 			dependencies: [
+				"Asset",
 				"Common",
 				profile, // address
 				tca, // XCTestDynamicOverlay + DependencyKey

@@ -1,9 +1,13 @@
+import BigInt
+import Common
 import Foundation
 
 // MARK: - FungibleToken
 public struct FungibleToken: Asset, Token {
 	public let address: ComponentAddress
-	public let supply: Supply
+	public let totalSupplyAttos: BigUInt
+	public let totalMintedAttos: BigUInt
+	public let totalBurntAttos: BigUInt
 
 	/// An optional desciption of this token.
 	public let tokenDescription: String?
@@ -19,14 +23,18 @@ public struct FungibleToken: Asset, Token {
 
 	public init(
 		address: ComponentAddress,
-		supply: Supply,
+		totalSupplyAttos: BigUInt,
+		totalMintedAttos: BigUInt,
+		totalBurntAttos: BigUInt,
 		tokenDescription: String?,
 		name: String?,
 		code: String?,
 		iconURL: String?
 	) {
 		self.address = address
-		self.supply = supply
+		self.totalSupplyAttos = totalSupplyAttos
+		self.totalMintedAttos = totalMintedAttos
+		self.totalBurntAttos = totalBurntAttos
 		self.tokenDescription = tokenDescription
 		self.name = name
 		self.code = code
@@ -59,10 +67,93 @@ public extension FungibleToken {
 	/// The native token of the Radix Ledger
 	static let xrd = Self(
 		address: "unknown at this point",
-		supply: .fixed(24_000_000_000),
+		totalSupplyAttos: 24_000_000_000.inAttos,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
 		tokenDescription: "The native token of the Radix Ledger",
 		name: "RAD",
 		code: "XRD",
 		iconURL: nil
 	)
 }
+
+#if DEBUG
+public extension FungibleToken {
+	static let btc = Self(
+		address: "btc-deadbeef",
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
+		tokenDescription: nil,
+		name: "Bitcoin",
+		code: "BTC",
+		iconURL: nil
+	)
+
+	static let dot = Self(
+		address: "dot-deadbeef",
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
+		tokenDescription: nil,
+		name: "Polkadot",
+		code: "DOT",
+		iconURL: nil
+	)
+
+	static let eth = Self(
+		address: "eth-deadbeef",
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
+		tokenDescription: nil,
+		name: "Ethereum",
+		code: "ETH",
+		iconURL: nil
+	)
+
+	static let ltc = Self(
+		address: "ltc-deadbeef",
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
+		tokenDescription: nil,
+		name: "Litecoin",
+		code: "LTC",
+		iconURL: nil
+	)
+
+	static let sol = Self(
+		address: "sol-deadbeef",
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
+		tokenDescription: nil,
+		name: "Solana",
+		code: "SOL",
+		iconURL: nil
+	)
+
+	static let usdt = Self(
+		address: "usdt-deadbeef",
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
+		tokenDescription: nil,
+		name: "Tether",
+		code: "USDT",
+		iconURL: nil
+	)
+
+	static let xrp = Self(
+		address: "xrp-deadbeef",
+		totalSupplyAttos: 0,
+		totalMintedAttos: 0,
+		totalBurntAttos: 0,
+		tokenDescription: nil,
+		name: "XRP token",
+		code: "XRP",
+		iconURL: nil
+	)
+}
+#endif

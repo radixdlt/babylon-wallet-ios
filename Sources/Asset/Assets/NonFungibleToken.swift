@@ -3,18 +3,16 @@ import Foundation
 // MARK: - NonFungibleToken
 public struct NonFungibleToken: Asset, Token {
 	public let address: ComponentAddress
-	public let supply: Supply
+	// TODO: add supply when API is ready
 
 	/// Token icon URL.
 	public var iconURL: String?
 
 	public init(
 		address: ComponentAddress,
-		supply: Supply,
 		iconURL: String?
 	) {
 		self.address = address
-		self.supply = supply
 		self.iconURL = iconURL
 	}
 }
@@ -38,9 +36,18 @@ public struct NonFungibleTokenContainer: AssetContainer {
 
 #if DEBUG
 public extension NonFungibleToken {
-	static let mock = Self(
-		address: "mock",
-		supply: .fixed(100),
+	static let mock1 = Self(
+		address: "nft1-deadbeef",
+		iconURL: nil
+	)
+
+	static let mock2 = Self(
+		address: "nft2-deadbeef",
+		iconURL: nil
+	)
+
+	static let mock3 = Self(
+		address: "nft3-deadbeef",
 		iconURL: nil
 	)
 }

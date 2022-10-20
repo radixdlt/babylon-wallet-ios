@@ -39,7 +39,7 @@
     {
       "identity" : "mnemonic",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/Mnemonic",
+      "location" : "git@github.com:radixdlt/Mnemonic.git",
       "state" : {
         "revision" : "c8f9f61c158aa983ff080089603ac599cf6e37b0",
         "version" : "0.0.2"
@@ -48,7 +48,7 @@
     {
       "identity" : "slip10",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/SLIP10",
+      "location" : "git@github.com:radixdlt/SLIP10.git",
       "state" : {
         "revision" : "954fb5bda0565aa261eaee47f4bddb9e10cc0f39",
         "version" : "0.0.8"
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "revision" : "b4a872984463070c71e2e97e5c02c73a07d0fe36",
-        "version" : "0.9.0"
+        "revision" : "15bba50ebf3a2065388c8d12210debe4f6ada202",
+        "version" : "0.10.0"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-identified-collections",
       "state" : {
-        "revision" : "2d6b7ffcc67afd9077fac5e5a29bcd6d39b71076",
-        "version" : "0.4.0"
+        "revision" : "bfb0d43e75a15b6dfac770bf33479e8393884a36",
+        "version" : "0.4.1"
       }
     },
     {
@@ -129,7 +129,7 @@
     {
       "identity" : "swift-profile",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/swift-profile",
+      "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
         "revision" : "521628ce39295704267796af6bedf0eaa7007357",
         "version" : "0.0.16"
@@ -149,8 +149,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nicklockwood/SwiftFormat",
       "state" : {
-        "revision" : "2937847c9e2434a9f8d71260b777fb15ddff287c",
-        "version" : "0.50.1"
+        "revision" : "3a5a4b9baa2ad2f6bb528351807eefbf3b9c0786",
+        "version" : "0.50.3"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "38bc9242e4388b80bd23ddfdf3071428859e3260",
-        "version" : "0.4.0"
+        "revision" : "16e6409ee82e1b81390bdffbf217b9c08ab32784",
+        "version" : "0.5.0"
       }
     }
   ],

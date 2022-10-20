@@ -8,6 +8,7 @@
 #if DEBUG
 import CryptoKit
 import Foundation
+import Mnemonic
 import XCTestDynamicOverlay
 
 private let fungibleResourceAddresses = [
@@ -40,13 +41,13 @@ extension FixedWidthInteger {
 }
 
 extension Data {
-	var asInt: Int {
-		withUnsafeBytes { $0.load(as: Int.self) }
+	var asUInt: UInt {
+		withUnsafeBytes { $0.load(as: UInt.self) }
 	}
 }
 
-func amount(at index: Int) -> Int {
-	Data(SHA256.hash(data: index.data)).asInt
+func amount(at index: Int) -> UInt {
+	Data(SHA256.hash(data: index.data)).asUInt
 }
 
 func amountAttos(at index: Int) -> String {
@@ -70,7 +71,7 @@ public extension GatewayAPIClient {
 		.init(
 			accountResourcesByAddress: { accountAddress in
 				.init(
-					address: accountAddress,
+					address: accountAddress.address,
 					fungibleResources: .init(
 						totalCount: fungibleResourceCount,
 						results: (0 ..< fungibleResourceCount).map { index in
@@ -139,9 +140,13 @@ public extension GatewayAPIClient {
 						transactionStatus: .init(
 							status: txStatus ?? TransactionStatus.Status(seed: request.transactionIdentifier.hashValue)
 						),
-						payloadHashHex: Data(SHA256.hash(data: "payloadHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex,
-						intentHashHex: Data(SHA256.hash(data: "intentHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex,
-						transactionAccumulatorHex: Data(SHA256.hash(data: "transactionAccumulatorHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex,
+
+						payloadHashHex: Data(SHA256.hash(data: "payloadHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hexEncodedString(),
+
+						intentHashHex: Data(SHA256.hash(data: "intentHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hexEncodedString(),
+
+						transactionAccumulatorHex: Data(SHA256.hash(data: "transactionAccumulatorHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hexEncodedString(),
+
 						feePaid: TokenAmount(value: "\(request.transactionIdentifier.hashValue)", tokenIdentifier: .init(rri: "resource_rdx1xrd"))
 					)
 				)

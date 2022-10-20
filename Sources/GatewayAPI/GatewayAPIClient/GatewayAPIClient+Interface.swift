@@ -10,7 +10,6 @@ import CryptoKit
 import Foundation
 import Profile
 
-public typealias AccountAddress = Profile.Account.Address
 public typealias ResourceIdentifier = String
 
 // MARK: - GatewayAPIClient
