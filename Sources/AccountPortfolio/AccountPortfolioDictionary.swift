@@ -1,3 +1,3 @@
-import Address
+import Profile
 
-public typealias AccountPortfolioDictionary = [Address: AccountPortfolio]
+public typealias AccountPortfolioDictionary = [AccountAddress: AccountPortfolio]

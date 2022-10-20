@@ -2,9 +2,9 @@ import Foundation
 import Profile
 import ProfileLoader
 import WalletClient
+import KeychainClient
 
-public extension WalletLoader {
-    //        public var loadWallet: @Sendable () async throws -> WalletClient
+public extension WalletClientLoader {
     
     static func live(
         keychainClient: KeychainClient = .live(),
@@ -12,13 +12,17 @@ public extension WalletLoader {
     ) -> Self {
         Self.live(profileLoader: .live(keychainClient: keychainClient, jsonDecoder: jsonDecoder))
     }
+    
     static func live(
         profileLoader: ProfileLoader
     ) -> Self {
         Self.init(
-            loadWallet: {
-                let profile = try await profileLoader.loadProfile()
-                let wallet = WalletClient.
+            loadWalletClient: {
+                var wallet = WalletClient.live
+                if let profileSnapshot = try await profileLoader.loadProfileSnapshot() {
+                    try wallet.injectProfileSnapshot(profileSnapshot)
+                }
+                return wallet
             }
         )
     }

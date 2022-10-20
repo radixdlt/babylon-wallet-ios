@@ -2,6 +2,7 @@ import Asset
 import Common
 import ComposableArchitecture
 import SwiftUI
+import Profile
 
 // MARK: - FungibleTokenList.Row.View
 public extension FungibleTokenList.Row {

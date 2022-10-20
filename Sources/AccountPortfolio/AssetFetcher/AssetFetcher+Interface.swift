@@ -1,4 +1,4 @@
-import Address
+import Profile
 import Asset
 
 // MARK: - AssetFetcher
@@ -14,5 +14,5 @@ public struct AssetFetcher {
 
 // MARK: AssetFetcher.FetchAssets
 public extension AssetFetcher {
-	typealias FetchAssets = @Sendable (Address) async throws -> [[any Asset]]
+	typealias FetchAssets = @Sendable (AccountAddress) async throws -> [[any Asset]]
 }

@@ -4,15 +4,15 @@ import Profile
 import WalletClient
 import XCTestDynamicOverlay
 
-// MARK: - WalletLoader
+// MARK: - WalletClientLoader
 public struct WalletClientLoader {
-	public var loadWallet: @Sendable () async throws -> WalletClient
+	public var loadWalletClient: @Sendable () async throws -> WalletClient
 }
 
 #if DEBUG
 public extension WalletClientLoader {
 	static let unimplemented = Self(
-		loadWallet: XCTUnimplemented("\(Self.self).loadWallet")
+        loadWalletClient: XCTUnimplemented("\(Self.self).loadWalletClient")
 	)
 }
 #endif

@@ -1,4 +1,4 @@
-import Address
+import Profile
 import Foundation
 
 // MARK: - AccountList.Action
@@ -30,7 +30,7 @@ public extension AccountList.Action.InternalAction {
 public extension AccountList.Action {
 	enum CoordinatingAction: Equatable {
 		case displayAccountDetails(AccountList.Row.State)
-		case copyAddress(Address)
+		case copyAddress(AccountAddress)
 		case loadAccounts
 	}
 }

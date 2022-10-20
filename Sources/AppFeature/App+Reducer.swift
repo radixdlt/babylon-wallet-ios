@@ -63,15 +63,15 @@ public extension App {
 			return Effect(value: .coordinate(.onboard))
 		case .main:
 			return .none
-		case let .onboarding(.coordinate(.onboardedWithWallet(wallet))):
-			return Effect(value: .coordinate(.toMain(wallet)))
+		case let .onboarding(.coordinate(.onboardedWithProfile(profile))):
+			return Effect(value: .coordinate(.toMain(profile)))
 		case .onboarding:
 			return .none
-		case let .splash(.coordinate(.loadWalletResult(loadWalletResult))):
-			switch loadWalletResult {
-			case let .walletLoaded(wallet):
-				return Effect(value: .coordinate(.toMain(wallet)))
-			case let .noWallet(reason, failedToDecode):
+		case let .splash(.coordinate(.loadProfileResult(loadProfileResult))):
+			switch loadProfileResult {
+            case let .profileLoaded(profile)
+				return Effect(value: .coordinate(.toMain(profile)))
+			case let .noProfile(reason, failedToDecode):
 				if failedToDecode {
 					print("Fix this, failed to load wallet: \(reason)")
 					return .none

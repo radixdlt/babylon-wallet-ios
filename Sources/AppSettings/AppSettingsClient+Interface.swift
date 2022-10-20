@@ -1,6 +1,7 @@
 import Common
 import Foundation
 import UserDefaultsClient
+import Profile
 
 // MARK: - AppSettingsClient
 public struct AppSettingsClient {

@@ -1,5 +1,6 @@
 import Common
 import Foundation
+import Profile
 
 // MARK: - AppSettings
 public struct AppSettings: Codable {

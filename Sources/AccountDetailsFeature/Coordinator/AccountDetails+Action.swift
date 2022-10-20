@@ -1,4 +1,4 @@
-import Address
+import Profile
 import AggregatedValueFeature
 import AssetsViewFeature
 
@@ -36,8 +36,8 @@ public extension AccountDetails.Action {
 	enum CoordinatingAction: Equatable {
 		case dismissAccountDetails
 		case displayAccountPreferences
-		case copyAddress(Address)
+		case copyAddress(AccountAddress)
 		case displayTransfer
-		case refresh(Address)
+		case refresh(AccountAddress)
 	}
 }

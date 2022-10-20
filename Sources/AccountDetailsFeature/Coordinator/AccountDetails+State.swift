@@ -1,5 +1,4 @@
 import AccountListFeature
-import Address
 import AggregatedValueFeature
 import Asset
 import AssetsViewFeature
@@ -16,21 +15,18 @@ public enum AccountDetails {}
 public extension AccountDetails {
 	// MARK: State
 	struct State: Equatable {
-		public let account: Profile.Account
-		public let address: Address
+		public let account: OnNetwork.Account
 		public var aggregatedValue: AggregatedValue.State
-		public let name: String
 		public var assets: AssetsView.State
 
 		public init(for account: AccountList.Row.State) {
 			self.account = account.account
-			address = account.address
-			aggregatedValue = .init(
+
+            self.aggregatedValue = .init(
 				value: account.aggregatedValue,
 				currency: account.currency,
 				isCurrencyAmountVisible: account.isCurrencyAmountVisible
 			)
-			name = account.name
 
 			let fungibleTokenCategories = FungibleTokenListSorter.live.sortTokens(account.portfolio.fungibleTokenContainers)
 			assets = .init(
@@ -47,4 +43,13 @@ public extension AccountDetails {
 			)
 		}
 	}
+}
+
+public extension AccountDetails.State {
+    var address: AccountAddress {
+        account.address
+    }
+    var displayName: String? {
+        account.displayName
+    }
 }

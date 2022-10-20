@@ -1,5 +1,5 @@
 import AccountPortfolio
-import Address
+import Profile
 import Asset
 import Common
 import ComposableArchitecture
@@ -41,7 +41,7 @@ public extension AccountList.Row.View {
 					)
 
 					AddressView(
-						address: viewStore.address,
+                        address: viewStore.address.wrapAsAddress(),
 						copyAddressAction: {
 							viewStore.send(.copyAddressButtonTapped)
 						}
@@ -96,16 +96,16 @@ extension AccountList.Row.Action {
 extension AccountList.Row.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		let name: String
-		let address: Address
+		let name: String?
+		let address: AccountAddress
 		let aggregatedValue: Float?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
 		let portfolio: AccountPortfolio
 
 		init(state: AccountList.Row.State) {
-			name = state.name
-			address = state.address
+            name = state.account.displayName
+            address = state.account.address
 			aggregatedValue = state.aggregatedValue
 			currency = state.currency
 			isCurrencyAmountVisible = state.isCurrencyAmountVisible
@@ -116,17 +116,19 @@ extension AccountList.Row.View {
 
 // MARK: - HeaderView
 private struct HeaderView: View {
-	let name: String
+	let name: String?
 	let value: String
 	let isValueVisible: Bool
 	let currency: FiatCurrency
 
 	var body: some View {
 		HStack {
-			Text(name)
-				.foregroundColor(.app.buttonTextBlack)
-				.textStyle(.secondaryHeader)
-				.fixedSize()
+            if let name {
+                Text(name)
+                    .foregroundColor(.app.buttonTextBlack)
+                    .textStyle(.secondaryHeader)
+                    .fixedSize()
+            }
 			Spacer()
 			Text(value)
 				.foregroundColor(.app.buttonTextBlack)

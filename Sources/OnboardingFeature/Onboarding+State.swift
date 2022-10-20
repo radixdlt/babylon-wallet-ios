@@ -8,15 +8,15 @@ public enum Onboarding {}
 public extension Onboarding {
 	// MARK: State
 	struct State: Equatable {
-		// Just for initial testing
-		@BindableState public var profileName: String
+        
+		@BindableState public var nameOfFirstAccount: String
 		public var canProceed: Bool
 
 		public init(
-			profileName: String = "",
+            nameOfFirstAccount: String = "",
 			canProceed: Bool = false
 		) {
-			self.profileName = profileName
+			self.nameOfFirstAccount = nameOfFirstAccount
 			self.canProceed = canProceed
 		}
 	}
@@ -25,7 +25,7 @@ public extension Onboarding {
 #if DEBUG
 public extension Onboarding.State {
 	static let placeholder = Self(
-		profileName: "Profile",
+        nameOfFirstAccount: "Main",
 		canProceed: true
 	)
 }

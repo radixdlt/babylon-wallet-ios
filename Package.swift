@@ -48,7 +48,7 @@ let package = Package(
 		// Format code
 		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.1"),
         
-        .package(url: "https://github.com/radixdlt/swift-profile", from: "0.0.6"),
+        .package(url: "https://github.com/radixdlt/swift-profile", from: "0.0.8"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
@@ -478,6 +478,7 @@ let package = Package(
 			name: "WalletClient",
 			dependencies: [
                 profile,
+                "ProfileLoader",
                 tca, // XCTestDynamicOverlay + DependencyKey
 			]
 		),

@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import Profile
-import Wallet
 
 // MARK: - Splash.Action
 public extension Splash {
@@ -11,16 +10,16 @@ public extension Splash {
 	}
 }
 
-// MARK: - SplashLoadWalletResult
-public enum SplashLoadWalletResult: Equatable {
-	case walletLoaded(Wallet)
-	case noWallet(reason: String, failedToDecode: Bool)
+// MARK: - SplashLoadProfileResult
+public enum SplashLoadProfileResult: Equatable {
+	case profileLoaded(Profile)
+	case noProfile(reason: String, failedToDecode: Bool)
 }
 
 // MARK: - Splash.Action.CoordinatingAction
 public extension Splash.Action {
 	enum CoordinatingAction: Equatable {
-		case loadWalletResult(SplashLoadWalletResult)
+		case loadProfileResult(SplashLoadProfileResult)
 	}
 }
 
@@ -39,9 +38,7 @@ public extension Splash.Action {
 public extension Splash.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case loadProfile
-		case loadProfileResult(TaskResult<Profile>)
-		case loadWalletWithProfile(Profile)
-		case loadWalletWithProfileResult(TaskResult<Wallet>, profile: Profile)
+		case loadProfileResult(TaskResult<Profile?>)
 
 		case viewDidAppear
 	}

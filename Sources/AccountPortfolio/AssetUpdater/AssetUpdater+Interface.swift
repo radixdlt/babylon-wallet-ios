@@ -1,5 +1,6 @@
 import Asset
 import Common
+import Profile
 
 // MARK: - AssetUpdater
 public struct AssetUpdater {

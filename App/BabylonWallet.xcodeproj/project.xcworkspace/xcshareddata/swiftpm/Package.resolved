@@ -131,8 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/swift-profile",
       "state" : {
-        "revision" : "3e9cb1f8cb46208169aac430d4ca82a9fb0e1c46",
-        "version" : "0.0.6"
+        "revision" : "31b97ab6601e3e50f565202ef5aeabc685db8c76",
+        "version" : "0.0.8"
       }
     },
     {

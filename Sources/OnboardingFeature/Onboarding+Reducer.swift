@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import Profile
-import Wallet
+import WalletClient
 
 public extension Onboarding {
 	// MARK: Reducer
@@ -9,23 +9,23 @@ public extension Onboarding {
 		switch action {
 		case .coordinate:
 			return .none
-		case .internal(.user(.createWallet)):
-			return Effect(value: .internal(.system(.createWallet)))
-		case .internal(.system(.createWallet)):
+		case .internal(.user(.createProfile)):
+			return Effect(value: .internal(.system(.createProfile)))
+		case .internal(.system(.createProfile)):
 			precondition(state.canProceed)
-			let profile = try! Profile(name: state.profileName)
-			// FIXME: insert right mnemonic
-			let wallet: Wallet = .init(profile: profile, deviceFactorTypeMnemonic: "")
-			let name = state.profileName
-			return .run { send in
-				await environment.userDefaultsClient.setProfileName(name)
-				await send(.internal(.system(.createdWallet(wallet))))
-			}
+            
+            // FIXME Wallet Client
+            return .none
+ 
+//
+//            return .run { send in
+//				await send(.internal(.system(.createdWallet(wallet))))
+//			}
 
-		case let .internal(.system(.createdWallet(wallet))):
-			return Effect(value: .coordinate(.onboardedWithWallet(wallet)))
+		case let .internal(.system(.createdProfile(profile))):
+			return Effect(value: .coordinate(.onboardedWithProfile(profile)))
 		case .binding:
-			state.canProceed = !state.profileName.isEmpty
+			state.canProceed = !state.nameOfFirstAccount.isEmpty
 			return .none
 		}
 	}

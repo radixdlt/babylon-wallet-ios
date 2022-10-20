@@ -1,5 +1,6 @@
 import Common
 import Foundation
+import Profile
 
 // MARK: - AggregatedValue
 /// Namespace for AggregatedValueFeature

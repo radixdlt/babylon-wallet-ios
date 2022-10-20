@@ -1,9 +1,9 @@
-import Address
+import Profile
 import AppSettings
 import Asset
 
 public extension AccountPortfolioFetcher {
-	private typealias AssetsDictionaryPerAccountAddress = [Address: [[any Asset]]]
+	private typealias AssetsDictionaryPerAccountAddress = [AccountAddress: [[any Asset]]]
 
 	static func live(
 		assetFetcher: AssetFetcher = .live,
@@ -13,7 +13,7 @@ public extension AccountPortfolioFetcher {
 		Self(
 			fetchPortfolio: { addresses in
 				let portfolioDictionary = try await withThrowingTaskGroup(
-					of: (address: Address, assets: [[any Asset]]).self,
+					of: (address: AccountAddress, assets: [[any Asset]]).self,
 					returning: AssetsDictionaryPerAccountAddress.self,
 					body: { taskGroup in
 						for address in addresses {
@@ -35,7 +35,7 @@ public extension AccountPortfolioFetcher {
 				let currency = try await appSettingsClient.loadSettings().currency
 
 				let accountsPortfolio = try await withThrowingTaskGroup(
-					of: (address: Address, portfolio: AccountPortfolio).self,
+					of: (address: AccountAddress, portfolio: AccountPortfolio).self,
 					returning: AccountPortfolioDictionary.self,
 					body: { taskGroup in
 						for element in portfolioDictionary {

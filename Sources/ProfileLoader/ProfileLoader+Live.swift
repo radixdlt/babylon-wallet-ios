@@ -19,7 +19,10 @@ public extension ProfileLoader {
 		Self(
             loadProfileSnapshot: {
                 try keychainClient.loadProfileSnapshot(jsonDecoder: jsonDecoder)
-			}
+            },
+            loadProfile: {
+                try keychainClient.loadProfile(jsonDecoder: jsonDecoder)
+            }
 		)
 	}
 }

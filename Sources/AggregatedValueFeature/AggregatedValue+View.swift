@@ -1,6 +1,7 @@
 import Common
 import ComposableArchitecture
 import SwiftUI
+import Profile
 
 // MARK: - AggregatedValue.View
 public extension AggregatedValue {

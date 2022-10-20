@@ -23,9 +23,9 @@ public extension Onboarding.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
-					TextField("Profile Name", text: viewStore.binding(\.$profileName))
-					Button("Create wallet") {
-						viewStore.send(.createWalletButtonPressed)
+					TextField("Name of first account", text: viewStore.binding(\.$nameOfFirstAccount))
+					Button("Create Profle") {
+						viewStore.send(.createProfileButtonPressed)
 					}
 					.disabled(!viewStore.canProceed)
 				}
@@ -38,12 +38,12 @@ public extension Onboarding.View {
 extension Onboarding.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		@BindableState var profileName: String
+		@BindableState var nameOfFirstAccount: String
 		var canProceed: Bool
 
 		init(state: Onboarding.State) {
-			profileName = state.profileName
-			canProceed = state.canProceed
+            self.nameOfFirstAccount = state.nameOfFirstAccount
+            self.canProceed = state.canProceed
 		}
 	}
 }
@@ -53,7 +53,7 @@ extension Onboarding.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable, BindableAction {
 		case binding(BindingAction<ViewState>)
-		case createWalletButtonPressed
+		case createProfileButtonPressed
 	}
 }
 
@@ -64,8 +64,8 @@ extension Onboarding.Action {
 			self = .binding(
 				bindingAction.pullback(\Onboarding.State.view)
 			)
-		case .createWalletButtonPressed:
-			self = .internal(.user(.createWallet))
+		case .createProfileButtonPressed:
+			self = .internal(.user(.createProfile))
 		}
 	}
 }
@@ -75,7 +75,7 @@ private extension Onboarding.State {
 		get { .init(state: self) }
 		set {
 			// handle bindable actions only:
-			profileName = newValue.profileName
+            nameOfFirstAccount = newValue.nameOfFirstAccount
 			canProceed = newValue.canProceed
 		}
 	}

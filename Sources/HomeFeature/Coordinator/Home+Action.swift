@@ -2,11 +2,11 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import Address
 import AggregatedValueFeature
 import Common
 import CreateAccountFeature
 import Foundation
+import Profile
 
 // MARK: - Home.Action
 public extension Home {

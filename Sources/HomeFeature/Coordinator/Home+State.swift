@@ -2,10 +2,10 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import Address
+import Profile
 import AggregatedValueFeature
 import CreateAccountFeature
-import Wallet
+import WalletClient
 
 // MARK: - Home
 /// Namespace for HomeFeature
@@ -15,7 +15,7 @@ public enum Home {}
 public extension Home {
 	// MARK: State
 	struct State: Equatable {
-		public var wallet: Wallet
+        public var profileSnapshot: ProfileSnapshot
 		public var accountPortfolioDictionary: AccountPortfolioDictionary
 
 		// MARK: - Components
@@ -31,7 +31,7 @@ public extension Home {
 		public var transfer: AccountDetails.Transfer.State?
 
 		public init(
-			wallet: Wallet,
+            profileSnapshot: ProfileSnapshot,
 			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
 			header: Home.Header.State = .init(),
 			aggregatedValue: AggregatedValue.State = .init(),
@@ -42,7 +42,7 @@ public extension Home {
 			createAccount: CreateAccount.State? = nil,
 			transfer: AccountDetails.Transfer.State? = nil
 		) {
-			self.wallet = wallet
+            self.profileSnapshot = profileSnapshot
 			self.accountPortfolioDictionary = accountPortfolioDictionary
 			self.header = header
 			self.aggregatedValue = aggregatedValue
@@ -56,20 +56,16 @@ public extension Home {
 	}
 }
 
-// MARK: - Convenience
-public extension Home.State {
-	init(justA wallet: Wallet) {
-		self.init(
-			wallet: wallet,
-			accountList: .init(just: wallet.profile.accounts)
-		)
-	}
+#if DEBUG
+public extension ProfileSnapshot {
+    static let placeholder: Self = {
+        fatalError()
+    }()
 }
 
-#if DEBUG
 public extension Home.State {
 	static let placeholder = Home.State(
-		wallet: .placeholder,
+        profileSnapshot: .placeholder,
 		header: .init(hasNotification: false),
 		aggregatedValue: .placeholder,
 		visitHub: .init()

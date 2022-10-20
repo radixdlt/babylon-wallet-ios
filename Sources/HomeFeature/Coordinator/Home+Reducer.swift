@@ -93,7 +93,8 @@ public extension Home {
 				return .none
 
 			case .internal(.system(.viewDidAppear)):
-				return .run { send in
+                return .run { [profileSnapshot = state.profileSnapshot] send in
+                    try environment.walletClient.injectProfileSnapshot()
 					let settings = try await environment.appSettingsClient.loadSettings()
 					await send(.internal(.system(.currencyLoaded(settings.currency))))
 					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(settings.isCurrencyAmountVisible))))
