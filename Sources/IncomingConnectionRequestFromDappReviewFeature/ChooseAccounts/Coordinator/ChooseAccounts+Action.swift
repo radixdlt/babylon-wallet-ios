@@ -5,6 +5,7 @@ public extension ChooseAccounts {
 	enum Action: Equatable {
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
+        case account(id: ChooseAccounts.Row.State.ID, action: ChooseAccounts.Row.Action)
 	}
 }
 

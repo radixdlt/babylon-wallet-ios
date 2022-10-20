@@ -19,6 +19,18 @@ public extension Color.App {
 	var blue3: Color {
 		.init(hex: .blue3)
 	}
+    
+    var green1: Color {
+        .init(hex: .green1)
+    }
+    
+    var green2: Color {
+        .init(hex: .green2)
+    }
+
+    var green3: Color {
+        .init(hex: .green3)
+    }
 
 	var gray1: Color {
 		.init(hex: .gray1)
