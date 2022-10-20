@@ -41,14 +41,14 @@ public extension ChooseAccounts.View {
 								.padding(24)
 						}
 						.multilineTextAlignment(.center)
-                        
-                        ForEachStore(
-                            store.scope(
-                                state: \.accounts,
-                                action: ChooseAccounts.Action.account(id:action:)
-                            ),
-                            content: ChooseAccounts.Row.View.init(store:)
-                        )
+
+						ForEachStore(
+							store.scope(
+								state: \.accounts,
+								action: ChooseAccounts.Action.account(id:action:)
+							),
+							content: ChooseAccounts.Row.View.init(store:)
+						)
 
 						Spacer(minLength: 60)
 
@@ -76,33 +76,6 @@ public extension ChooseAccounts.View {
 		}
 	}
 }
-
-/*
-private extension ChooseAccounts.View {
-    struct AccountView: View {
-        @State private var isSelected = false
-        
-        var body: some View {
-            HStack {
-                VStack(alignment: .leading, spacing: 14) {
-                    Text("My main account")
-                    Text("acct...q2qgtxg")
-                }
-                
-                Spacer()
-                
-                CheckmarkView(isChecked: $isSelected)
-            }
-            .padding(24)
-            .background(Color.red)
-            .cornerRadius(12)
-            .onTapGesture {
-                isSelected.toggle()
-            }
-        }
-    }
-}
-*/
 
 // MARK: - ChooseAccounts.View.ChooseAccountsViewStore
 private extension ChooseAccounts.View {

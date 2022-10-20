@@ -6,27 +6,30 @@ public struct ChooseAccounts: ReducerProtocol {
 }
 
 public extension ChooseAccounts {
-    /*
-	func reduce(into _: inout State, action _: Action) -> ComposableArchitecture.Effect<Action, Never> {
-		.none
+	var body: some ReducerProtocol<State, Action> {
+		Reduce { state, action in
+			switch action {
+			case .internal:
+				return .none
+
+			case let .account(id: id, action: action):
+				guard let account = state.accounts[id: id] else { return .none }
+				switch action {
+				case .internal(.user(.didSelect)):
+					if account.isSelected {
+						state.selectedAccounts.removeAll(where: { $0.id == id })
+						state.accounts[id: id]?.isSelected = false
+					} else {
+						guard state.selectedAccounts.count < state.accountLimit else { return .none }
+						state.selectedAccounts.append(account)
+						state.accounts[id: id]?.isSelected = true
+					}
+					return .none
+				}
+			}
+		}
+		.forEach(\.accounts, action: /Action.account(id:action:)) {
+			ChooseAccounts.Row()
+		}
 	}
-    */
-    
-    var body: some ReducerProtocol<State, Action> {
-      Reduce { state, action in
-          return .none
-      }
-      .forEach(\.accounts, action: /Action.account(id:action:)) {
-          ChooseAccounts.Row()
-      }
-    }
-
 }
-
-/*
-AccountList.Row.reducer.forEach(
-    state: \.accounts,
-    action: /AccountList.Action.account(id:action:),
-    environment: { _ in AccountList.Row.Environment() }
-),
-*/

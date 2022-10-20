@@ -47,10 +47,10 @@ let package = Package(
 			name: "CreateAccountFeature",
 			targets: ["CreateAccountFeature"]
 		),
-        .library(
-            name: "DesignSystem",
-            targets: ["DesignSystem"]
-        ),
+		.library(
+			name: "DesignSystem",
+			targets: ["DesignSystem"]
+		),
 		.library(
 			name: "HomeFeature",
 			targets: ["HomeFeature"]
@@ -457,10 +457,10 @@ let package = Package(
 		.target(
 			name: "IncomingConnectionRequestFromDappReviewFeature",
 			dependencies: [
-                "Address",
+				"Address",
 				"Common",
 				"DesignSystem",
-                "Profile",
+				"Profile",
 				tca,
 			],
 			resources: [
