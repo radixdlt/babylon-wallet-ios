@@ -56,7 +56,11 @@ public extension Settings.View {
 								viewStore.send(.setDebugProfileSheet(isPresented: false))
 							}
 							if let profile = viewStore.profileToInspect {
-								ProfileView(profile: profile)
+								ProfileView(
+									profile: profile,
+									// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
+									keychainClient: KeychainClient.live
+								)
 							} else {
 								Text("No profile, strange")
 							}
