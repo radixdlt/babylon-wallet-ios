@@ -13,7 +13,7 @@ jobs:
     runs-on: macos-12
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
 
       - name: "Run Lint"
         run: |
@@ -28,7 +28,7 @@ jobs:
       - assertFormated
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
 
       - uses: webfactory/ssh-agent@v0.6.0
         with:
@@ -53,7 +53,7 @@ jobs:
   #     - assertFormated
 
   #   steps:
-  #     - uses: actions/checkout@v2
+  #     - uses: actions/checkout@v3.1.0
 
   #     - name: "Run snapshot tests"
   #       run: echo "Runing snapshot tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
@@ -66,7 +66,7 @@ jobs:
   #     - assertFormated
 
   #   steps:
-  #     - uses: actions/checkout@v2
+  #     - uses: actions/checkout@v3.1.0
 
   #     - name: "Run UI tests"
   #       run: echo "Runing UI tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
@@ -83,7 +83,7 @@ jobs:
       # - ui_tests
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 0
 
