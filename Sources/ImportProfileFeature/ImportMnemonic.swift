@@ -78,12 +78,12 @@ public extension ImportMnemonic {
 	enum InternalAction: Equatable {
 		case goBack
 		case phraseOfMnemonicToImportChanged(String)
-		case importMnemonicButtonPressed
+		case importMnemonic
 		case importMnemonicResult(TaskResult<Mnemonic>)
-		case saveImportedMnemonicButtonPressed
+		case saveImportedMnemonic
 		case saveImportedMnemonicResult(TaskResult<Mnemonic>)
 
-		case importProfileFromSnapshotButtonPressed
+		case importProfileFromSnapshot
 		case profileFromSnapshotResult(TaskResult<Profile>)
 	}
 }
@@ -100,7 +100,7 @@ public extension ImportMnemonic {
 			state.phraseOfMnemonicToImport = phraseOfMnemonicToImport
 			return .none
 
-		case .internal(.importMnemonicButtonPressed):
+		case .internal(.importMnemonic):
 			return .run { [mnemonicImporter, phrase = state.phraseOfMnemonicToImport] send in
 				await send(.internal(.importMnemonicResult(TaskResult { try mnemonicImporter(phrase) })))
 			}
@@ -114,7 +114,7 @@ public extension ImportMnemonic {
 				await send(.coordinate(.failedToImportMnemonicOrProfile(reason: "Failed to import mnemonic, error: \(String(describing: error))")))
 			}
 
-		case .internal(.saveImportedMnemonicButtonPressed):
+		case .internal(.saveImportedMnemonic):
 			guard let mnemonic = state.importedMnemonic else {
 				return .none
 			}
@@ -145,7 +145,7 @@ public extension ImportMnemonic {
 			state.savedMnemonic = mnemonic
 			return .none
 
-		case .internal(.importProfileFromSnapshotButtonPressed):
+		case .internal(.importProfileFromSnapshot):
 			return .run { [profileFromSnapshotImporter, snapshot = state.importedProfileSnapshot] send in
 				await send(.internal(.profileFromSnapshotResult(TaskResult {
 					try profileFromSnapshotImporter(snapshot)
@@ -185,12 +185,16 @@ public extension ImportMnemonic {
 
 public extension ImportMnemonic.View {
 	var body: some View {
-		WithViewStore(store, observe: { $0 }) { viewStore in
+		WithViewStore(
+			store,
+			observe: ViewState.init(state:),
+			send: ImportMnemonic.Action.init
+		) { viewStore in
 			VStack {
 				HStack {
 					Button(
 						action: {
-							viewStore.send(.internal(.goBack))
+							viewStore.send(.goBackButtonTapped)
 						}, label: {
 							Image("arrow-back")
 						}
@@ -206,24 +210,68 @@ public extension ImportMnemonic.View {
 					"Mnemonic phrasec",
 					text: viewStore.binding(
 						get: \.phraseOfMnemonicToImport,
-						send: { ImportMnemonic.Action.internal(.phraseOfMnemonicToImportChanged($0)) }
+						send: { ViewAction.phraseOfMnemonicToImportChanged($0) }
 					)
 				)
 				Button("Import mnemonic") {
-					viewStore.send(.internal(.importMnemonicButtonPressed))
+					viewStore.send(.importMnemonicButtonTapped)
 				}
-				.disabled(viewStore.phraseOfMnemonicToImport.isEmpty)
+				.disabled(!viewStore.canImportMnemonic)
 
 				Button("Save imported mnemonic") {
-					viewStore.send(.internal(.saveImportedMnemonicButtonPressed))
+					viewStore.send(.saveImportedMnemonicButtonTapped)
 				}
-				.disabled(viewStore.importedMnemonic == nil)
+				.disabled(!viewStore.canSaveImportedMnemonic)
 
 				Button("Profile from snapshot") {
-					viewStore.send(.internal(.importProfileFromSnapshotButtonPressed))
+					viewStore.send(.importProfileFromSnapshotButtonTapped)
 				}
-				.disabled(viewStore.savedMnemonic == nil)
+				.disabled(!viewStore.canImportProfileFromSnapshot)
 			}
+		}
+	}
+}
+
+// MARK: - ImportMnemonic.View.ViewState
+public extension ImportMnemonic.View {
+	struct ViewState: Equatable {
+		public let phraseOfMnemonicToImport: String
+		public let canImportMnemonic: Bool
+		public let canSaveImportedMnemonic: Bool
+		public let canImportProfileFromSnapshot: Bool
+		public init(state: ImportMnemonic.State) {
+			phraseOfMnemonicToImport = state.phraseOfMnemonicToImport
+			canImportMnemonic = !state.phraseOfMnemonicToImport.isEmpty
+			canSaveImportedMnemonic = state.importedMnemonic != nil
+			canImportProfileFromSnapshot = state.savedMnemonic != nil
+		}
+	}
+}
+
+// MARK: - ImportMnemonic.View.ViewAction
+public extension ImportMnemonic.View {
+	enum ViewAction: Equatable {
+		case goBackButtonTapped
+		case importMnemonicButtonTapped
+		case importProfileFromSnapshotButtonTapped
+		case saveImportedMnemonicButtonTapped
+		case phraseOfMnemonicToImportChanged(String)
+	}
+}
+
+extension ImportMnemonic.Action {
+	init(action: ImportMnemonic.View.ViewAction) {
+		switch action {
+		case .goBackButtonTapped:
+			self = .internal(.goBack)
+		case .importMnemonicButtonTapped:
+			self = .internal(.importMnemonic)
+		case .importProfileFromSnapshotButtonTapped:
+			self = .internal(.importProfileFromSnapshot)
+		case .saveImportedMnemonicButtonTapped:
+			self = .internal(.saveImportedMnemonic)
+		case let .phraseOfMnemonicToImportChanged(phrase):
+			self = .internal(.phraseOfMnemonicToImportChanged(phrase))
 		}
 	}
 }

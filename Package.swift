@@ -54,7 +54,7 @@ let package = Package(
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
-		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.42.0"),
+		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
 		// Format code
 		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
 		// BigInt
