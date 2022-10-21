@@ -9,6 +9,8 @@ fi
 
 cd $(dirname $0)
 INPUTDIR=$PWD
+# using https://github.com/radixdlt/babylon-gateway/blob/93a023bffc8516ba92338f17725edb2a131c5ed5/src/RadixDlt.NetworkGateway.GatewayApi/gateway-api-spec.yaml
+# commit 93a023b from 2022-10-20
 SWAGGER_TEMPLATE="$INPUTDIR/gateway-api-spec.yml"
 OUTPUTDIR="$INPUTDIR/.."
 DESTINATION="$OUTPUTDIR/Generated"

@@ -7,7 +7,6 @@ info:
     url: https://www.radixfoundation.org/licenses/LICENSE-v1
   description: |
     See https://docs.radixdlt.com/main/apis/introduction.html
-
 servers:
   - url: http://localhost:5208
   - url: https://stokenet.radixdlt.com
@@ -19,13 +18,13 @@ tags:
   - name: Transaction
     x-displayName: Transaction Endpoints
     description: To build, finalize and submit transactions, and to query transaction status and contents.
-  - name: State
-    x-displayName: TBD State Endpoints
+  - name: Entity
+    x-displayName: Entity State Endpoints
     description: TBD
 paths:
   "/gateway":
     post:
-      operationId: getGatewayInfo
+      operationId: GatewayInfo
       summary: Get Gateway Info
       description: Returns the Gateway API version, network and current ledger state.
       tags:
@@ -35,14 +34,14 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/GatewayRequest"
+              "$ref": "#/components/schemas/GatewayInfoRequest"
       responses:
         '200':
           description: The Network
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/GatewayResponse"
+                "$ref": "#/components/schemas/GatewayInfoResponse"
         '500':
           description: Gateway Error
           content:
@@ -51,7 +50,7 @@ paths:
                 "$ref": "#/components/schemas/ErrorResponse"
   "/transaction/recent":
     post:
-      operationId: getRecentTransactions
+      operationId: RecentTransactions
       summary: Get Recent Transactions
       description: |
         Returns user-initiated transactions which have been succesfully committed to the ledger.
@@ -79,7 +78,7 @@ paths:
                 "$ref": "#/components/schemas/ErrorResponse"
   "/transaction/preview":
     post:
-      operationId: previewTransaction
+      operationId: PreviewTransaction
       summary: Preview Transaction
       description: |
         Previews transaction against the network.
@@ -106,7 +105,7 @@ paths:
                 "$ref": "#/components/schemas/ErrorResponse"
   "/transaction/submit":
     post:
-      operationId: submitTransaction
+      operationId: SubmitTransaction
       summary: Submit Transaction
       description: |
         Submits a signed transaction payload to the network.
@@ -134,7 +133,7 @@ paths:
                 "$ref": "#/components/schemas/ErrorResponse"
   "/transaction/status":
     post:
-      operationId: getTransactionStatus
+      operationId: TransactionStatus
       summary: Transaction Status
       description: |
         Returns the status and contents of the transaction with the given transaction identifier. Transaction identifiers which aren't recognised as either belonging to a committed transaction or a transaction submitted through this Network Gateway may return a `TransactionNotFoundError`. Transaction identifiers relating to failed transactions will, after a delay, also be reported as a `TransactionNotFoundError`.
@@ -161,7 +160,7 @@ paths:
                 "$ref": "#/components/schemas/ErrorResponse"
   "/transaction/details":
     post:
-      operationId: getTransactionDetails
+      operationId: TransactionDetails
       summary: Transaction Details
       description: |
         Returns the status and contents of the transaction with the given transaction identifier. Transaction identifiers which aren't recognised as either belonging to a committed transaction or a transaction submitted through this Network Gateway may return a `TransactionNotFoundError`. Transaction identifiers relating to failed transactions will, after a delay, also be reported as a `TransactionNotFoundError`.
@@ -188,12 +187,12 @@ paths:
                 "$ref": "#/components/schemas/ErrorResponse"
   /entity/resources:
     post:
-      operationId: getEntityResources
+      operationId: EntityResources
       summary: Entity Resources
       description: |
         TBD
       tags:
-        - State
+        - Entity
       requestBody:
         required: true
         content:
@@ -215,12 +214,12 @@ paths:
                 "$ref": "#/components/schemas/ErrorResponse"
   /entity/details:
     post:
-      operationId: getEntityDetails
+      operationId: EntityDetails
       summary: Entity Details
       description: |
         TBD
       tags:
-        - State
+        - Entity
       requestBody:
         required: true
         content:
@@ -240,9 +239,113 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/ErrorResponse"
+  /entity/overview:
+    post:
+      operationId: EntityOverview
+      summary: Entity Overview
+      description: |
+        TBD
+      tags:
+        - Entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/EntityOverviewRequest"
+      responses:
+        '200':
+          description: Entity Details
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/EntityOverviewResponse"
+        '500':
+          description: Gateway Error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ErrorResponse"
 components:
   schemas:
-    ResultSetCursor:
+
+    #
+    # Mapping Enums
+    #
+
+    ResourceTypeMapping:
+      type: string
+      enum:
+        - fungible
+        - non_fungible
+
+    #
+    # Generic Types
+    #
+
+    LedgerState:
+      description: |
+        The ledger state against which the response was generated. Can be used to detect if the Network Gateway is returning up-to-date information.
+      type: object
+      required:
+        - network
+        - version
+        - timestamp
+        - epoch
+        - round
+      properties:
+        network:
+          description: The name of the network against which the request is made.
+          type: string
+        version:
+          description: The state version of the ledger. Each transaction increments the state version by 1.
+          type: integer
+          format: int64
+        timestamp:
+          description: |
+            The round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.
+          type: string
+        epoch:
+          description: The epoch number of the ledger at this state version.
+          type: integer
+          format: int64
+        round:
+          description: The consensus round in the epoch that this state version was committed in.
+          type: integer
+          format: int64
+    PartialLedgerStateIdentifier:
+      description: Allows a client to request a response referencing an earlier (`at_*` properties) or later (`from_*` properties) ledger state.
+      type: object
+      nullable: true
+      properties:
+        state_version:
+          description: If the version is provided, the latest ledger state <= the given version is returned.
+          nullable: true
+          type: integer
+          format: int64
+        timestamp:
+          description: If a timestamp is provided, the latest ledger state <= the given timestamp is returned.
+          nullable: true
+          type: string
+          format: date-time
+        epoch:
+          description: If an epoch is provided, the ledger state at the given epoch <= the given round (else round 0) is returned.
+          nullable: true
+          type: integer
+          format: int64
+        round:
+          nullable: true
+          type: integer
+          format: int64
+
+    LedgerStateMixin:
+      type: object
+      required:
+        - ledger_state
+      properties:
+        ledger_state:
+          $ref: "#/components/schemas/LedgerState"
+    ResultSetCursorMixin:
       type: object
       required:
         - total_count
@@ -259,151 +362,56 @@ components:
           description: TBD (maybe we should use HATEOAS-like permalinks?)
           type: string
           nullable: true
-        results:
-          type: array
-          items: { } # any type of items
-    EntityResourcesRequest:
+
+    #
+    # "Status" Request & Response Types
+    #
+
+    GatewayInfoRequest:
+      type: object
+      example: {}
+    GatewayInfoResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - gateway_api
+            - ledger_state
+            - target_ledger_state
+          properties:
+            gateway_api:
+              $ref: "#/components/schemas/GatewayInfoResponseGatewayApiVersions"
+            target_ledger_state:
+              $ref: "#/components/schemas/GatewayInfoResponseTargetLedgerState"
+    GatewayInfoResponseGatewayApiVersions:
       type: object
       required:
-        - address
+        - version
+        - open_api_schema_version
       properties:
-        address:
-          description: The Bech32m-encoded human readable version of the entity's global address
+        version:
+          description: The release that is currently deployed to the Gateway API.
           type: string
-        at_state_identifier:
-          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
-    EntityResourcesResponse:
+        open_api_schema_version:
+          description: The open api schema version that was used to generate the API models.
+          type: string
+    GatewayInfoResponseTargetLedgerState:
       type: object
       required:
-        - address
-        - fungible_resources
-        - non_fungible_resources
+        - version
       properties:
-        address:
-          description: The Bech32m-encoded human readable version of the entity's global address
-          type: string
-        fungible_resources:
-          allOf:
-            - $ref: "#/components/schemas/ResultSetCursor"
-            - type: object
-              required:
-                - results
-              properties:
-                results:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/EntityStateResponseFungibleResource"
-        non_fungible_resources:
-          allOf:
-            - $ref: "#/components/schemas/ResultSetCursor"
-            - type: object
-              required:
-                - results
-              properties:
-                results:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/EntityStateResponseNonFungibleResource"
-    EntityStateResponseFungibleResource:
-      type: object
-      required:
-        - address
-        - amount_attos
-      properties:
-        address:
-          description: The Bech32m-encoded human readable version of the resource's global address
-          type: string
-        amount_attos:
-          type: string
+        version:
           description: |
-            A decimal-string-encoded integer between 0 and 2^255-1, which represents the total number of 10^(-18) subunits in
-            the total supply of this resource.
-    EntityStateResponseNonFungibleResource:
-      type: object
-      required:
-        - address
-        - amount
-      properties:
-        address:
-          description: The Bech32m-encoded human readable version of the resource's global address
-          type: string
-        amount:
-          type: number
-    EntityDetailsRequest:
-      type: object
-      required:
-        - address
-      properties:
-        address:
-          description: The Bech32m-encoded human readable version of the entity's global address
-          type: string
-        at_state_identifier:
-          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
-    EntityDetailsResponse:
-      type: object
-      required:
-        - address
-        - metadata
-        - details
-      properties:
-        address:
-          description: The Bech32m-encoded human readable version of the resource's global address
-          type: string
-        metadata:
-          description: TBD
-          type: object
-          additionalProperties:
-            type: string
-        details:
-          oneOf:
-            - "$ref": "#/components/schemas/EntityDetailsResponseFungibleDetails"
-            - "$ref": "#/components/schemas/EntityDetailsResponseNonFungibleDetails"
-          discriminator:
-            propertyName: resource_type
-            mapping:
-              fungible: "#/components/schemas/EntityDetailsResponseFungibleDetails"
-              non_fungible: "#/components/schemas/EntityDetailsResponseNonFungibleDetails"
-    ResourceType:
-      type: string
-      enum:
-        - fungible
-        - non_fungible
-    EntityDetailsResponseFungibleDetails:
-      type: object
-      required:
-        - resource_type
-        - is_fungible
-        - total_supply_attos
-        - total_minted_attos
-        - total_burnt_attos
-      properties:
-        resource_type:
-          type: string
-        is_fungible:
-          type: boolean
-        total_supply_attos:
-          type: string
-        total_minted_attos:
-          type: string
-        total_burnt_attos:
-          type: string
-    EntityDetailsResponseNonFungibleDetails:
-      type: object
-      required:
-        - resource_type
-        - is_fungible
-        - tbd
-      properties:
-        resource_type:
-          type: string
-        is_fungible:
-          type: boolean
-        tbd:
-          type: string
+            The latest-seen state version of the tip of the network's ledger. If this is significantly ahead of the current LedgerState version, the Network Gateway is possibly behind and may be reporting outdated information.
+          type: integer
+          format: int64
+
+    #
+    # "Transaction" Request & Response Types
+    #
+
     RecentTransactionsRequest:
       type: object
-      required:
-        - account_identifier
       properties:
         at_state_identifier:
           $ref: "#/components/schemas/PartialLedgerStateIdentifier"
@@ -417,24 +425,204 @@ components:
           description: The page size requested. The maximum value is 30 at present.
           type: integer
           nullable: true
-      example:
-        limit: 10
     RecentTransactionsResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - allOf:
+            - $ref: "#/components/schemas/ResultSetCursorMixin"
+            - type: object
+              required:
+                - items
+              properties:
+                items:
+                  description: The page of user transactions.
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/TransactionInfo"
+    #
+    # "Entity" Request & Response Types
+    #
+
+    EntityResourcesRequest:
       type: object
       required:
-        - ledger_state
-        - transactions
+        - address
       properties:
-        ledger_state:
-          $ref: "#/components/schemas/LedgerState"
-        next_cursor:
-          description: The cursor to be provided for the next page of results. If missing, this is the last page of results.
+        address:
+          description: The Bech32m-encoded human readable version of the entity's global address
           type: string
-        transactions:
-          description: The page of user transactions.
+        at_state_identifier:
+          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+    EntityResourcesResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - address
+            - fungible_resources
+            - non_fungible_resources
+          properties:
+            address:
+              description: The Bech32m-encoded human readable version of the entity's global address
+              type: string
+            fungible_resources:
+              $ref: "#/components/schemas/EntityResourcesResponseFungibleResources"
+            non_fungible_resources:
+              $ref: "#/components/schemas/EntityResourcesResponseNonFungibleResources"
+    EntityResourcesResponseFungibleResources:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - results
+          properties:
+            results:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityResourcesResponseFungibleResourcesItem"
+    EntityResourcesResponseFungibleResourcesItem:
+      type: object
+      required:
+        - address
+        - amount_attos
+      properties:
+        address:
+          description: The Bech32m-encoded human readable version of the resource's global address
+          type: string
+        amount_attos:
+          type: string
+          description: |
+            A decimal-string-encoded integer between 0 and 2^255-1, which represents the total number of 10^(-18) subunits in
+            the total supply of this resource.
+    EntityResourcesResponseNonFungibleResources:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - results
+          properties:
+            results:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityResourcesResponseNonFungibleResourcesItem"
+    EntityResourcesResponseNonFungibleResourcesItem:
+      type: object
+      required:
+        - address
+        - amount
+      properties:
+        address:
+          description: The Bech32m-encoded human readable version of the resource's global address
+          type: string
+        amount:
+          type: number
+
+    EntityDetailsRequest:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          description: The Bech32m-encoded human readable version of the entity's global address
+          type: string
+        at_state_identifier:
+          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+    EntityDetailsResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - address
+            - metadata
+            - details
+          properties:
+            address:
+              description: The Bech32m-encoded human readable version of the resource's global address
+              type: string
+            metadata:
+              description: TBD
+              type: object
+              additionalProperties:
+                type: string
+            details:
+              $ref: "#/components/schemas/EntityDetailsResponseDetails"
+    EntityDetailsResponseDetails:
+      oneOf:
+        - $ref: "#/components/schemas/EntityDetailsResponseFungibleDetails"
+        - $ref: "#/components/schemas/EntityDetailsResponseNonFungibleDetails"
+      discriminator:
+        propertyName: resource_type
+        mapping:
+          fungible: "#/components/schemas/EntityDetailsResponseFungibleDetails"
+          non_fungible: "#/components/schemas/EntityDetailsResponseNonFungibleDetails"
+    EntityDetailsResponseFungibleDetails:
+      type: object
+      required:
+        - resource_type
+        - total_supply_attos
+        - total_minted_attos
+        - total_burnt_attos
+      properties:
+        resource_type:
+          $ref: "#/components/schemas/ResourceTypeMapping"
+        total_supply_attos:
+          type: string
+        total_minted_attos:
+          type: string
+        total_burnt_attos:
+          type: string
+    EntityDetailsResponseNonFungibleDetails:
+      type: object
+      required:
+        - resource_type
+        - tbd
+      properties:
+        resource_type:
+          $ref: "#/components/schemas/ResourceTypeMapping"
+        tbd:
+          type: string
+
+    EntityOverviewRequest:
+      type: object
+      required:
+        - addresses
+      properties:
+        addresses:
           type: array
           items:
-            $ref: "#/components/schemas/TransactionInfo"
+            type: string
+        at_state_identifier:
+          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+    EntityOverviewResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - entities
+          properties:
+            entities:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityOverviewResponseEntityItem"
+    EntityOverviewResponseEntityItem:
+       type: object
+       required:
+         - address
+         - metadata
+       properties:
+         address:
+           description: The Bech32m-encoded human readable version of the resource's global address
+           type: string
+         metadata:
+           description: TBD
+           type: object
+           additionalProperties:
+             type: string
+
+    #
+    # TODO Not categorized yet
+    #
+
     TransactionPreviewRequest:
       type: object
       required:
@@ -504,89 +692,8 @@ components:
       properties:
         duplicate:
           type: boolean
-          description: Is true if the transaction is a duplicate of an existing transaction in the mempool.
-    GatewayRequest:
-      type: object
-      example: {}
-    GatewayResponse:
-      type: object
-      required:
-        - gateway_api
-        - ledger_state
-      properties:
-        gateway_api:
-          $ref: "#/components/schemas/GatewayApiVersions"
-        ledger_state:
-          $ref: "#/components/schemas/LedgerState"
-        target_ledger_state:
-          $ref: "#/components/schemas/TargetLedgerState"
-      example:
-        ledger_state:
-        target_ledger_state:
-    LedgerState:
-      description: |
-        The ledger state against which the response was generated. Can be used to detect if the Network Gateway is returning up-to-date information.
-      type: object
-      required:
-        - network
-        - version
-        - timestamp
-        - epoch
-        - round
-      properties:
-        network:
-          description: The name of the network against which the request is made.
-          type: string
-        version:
-          description: The state version of the ledger. Each transaction increments the state version by 1.
-          type: integer
-          format: int64
-        timestamp:
-          description: |
-            The round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.
-          type: string
-        epoch:
-          description: The epoch number of the ledger at this state version.
-          type: integer
-          format: int64
-        round:
-          description: The consensus round in the epoch that this state version was committed in.
-          type: integer
-          format: int64
-    TargetLedgerState:
-      type: object
-      required:
-        - version
-      properties:
-        version:
-          description: |
-            The latest-seen state version of the tip of the network's ledger. If this is singificantly ahead of the current LedgerState version, the Network Gateway is possibly behind and may be reporting outdated information.
-          type: integer
-          format: int64
-    PartialLedgerStateIdentifier:
-      description: Optional. Allows a client to request a response referencing an earlier (`at_*` properties) or later (`from_*` properties) ledger state.
-      type: object
-      nullable: true
-      properties:
-        state_version:
-          description: If the version is provided, the latest ledger state <= the given version is returned.
-          nullable: true
-          type: integer
-          format: int64
-        timestamp:
-          description: If a timestamp is provided, the latest ledger state <= the given timestamp is returned.
-          nullable: true
-          type: string
-          format: date-time
-        epoch:
-          description: If an epoch is provided, the ledger state at the given epoch <= the given round (else round 0) is returned.
-          nullable: true
-          type: integer
-          format: int64
-        round:
-          nullable: true
-          type: integer
-          format: int64
+          description: Is true if the transaction is a duplicate of an existing pending transaction.
+
     TransactionStatusRequest:
       type: object
       required:
@@ -601,15 +708,14 @@ components:
           origin: intent
           value_hex: ef71a9d6c63444fce6abd2df8fab2755cfb51f6794e578f60d99337193811842
     TransactionStatusResponse:
-      type: object
-      required:
-        - ledger_state
-        - transaction
-      properties:
-        ledger_state:
-          $ref: "#/components/schemas/LedgerState"
-        transaction:
-          $ref: "#/components/schemas/TransactionInfo"
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - transaction
+          properties:
+            transaction:
+              $ref: "#/components/schemas/TransactionInfo"
     TransactionDetailsRequest:
       type: object
       required:
@@ -624,18 +730,17 @@ components:
           origin: intent
           value_hex: ef71a9d6c63444fce6abd2df8fab2755cfb51f6794e578f60d99337193811842
     TransactionDetailsResponse:
-      type: object
-      required:
-        - ledger_state
-        - transaction
-        - details
-      properties:
-        ledger_state:
-          $ref: "#/components/schemas/LedgerState"
-        transaction:
-          $ref: "#/components/schemas/TransactionInfo"
-        details:
-          "$ref": "#/components/schemas/TransactionDetails"
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - transaction
+            - details
+          properties:
+            transaction:
+              $ref: "#/components/schemas/TransactionInfo"
+            details:
+              "$ref": "#/components/schemas/TransactionDetails"
     TokenProperties:
       type: object
       required:
@@ -731,18 +836,6 @@ components:
     BigInteger:
       type: string
       pattern: "^-?[0-9]+$"
-    GatewayApiVersions:
-      type: object
-      required:
-        - version
-        - open_api_schema_version
-      properties:
-        version:
-          description: The release that is currently deployed to the Gateway API.
-          type: string
-        open_api_schema_version:
-          description: The open api schema version that was used to generate the API models.
-          type: string
     AccountIdentifier:
       type: object
       required:
@@ -814,6 +907,7 @@ components:
         mapping:
           NotSyncedUpError: "#/components/schemas/NotSyncedUpError"
           InvalidRequestError: "#/components/schemas/InvalidRequestError"
+          InvalidTransactionError: "#/components/schemas/InvalidTransactionError"
           TransactionNotFoundError: "#/components/schemas/TransactionNotFoundError"
           InternalServerError: "#/components/schemas/InternalServerError"
     NotSyncedUpError:
@@ -874,6 +968,9 @@ components:
             cause:
               description: Gives a human readable message - likely just a trace ID for reporting the error.
               type: string
+    InvalidTransactionError:
+      allOf:
+        - $ref: "#/components/schemas/GatewayError"
     TransactionNotFoundError:
       allOf:
         - $ref: "#/components/schemas/GatewayError"
