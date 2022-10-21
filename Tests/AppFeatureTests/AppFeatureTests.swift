@@ -38,14 +38,14 @@ final class AppFeatureTests: TestCase {
 		}
 		let store = TestStore(
 			// GIVEN: No profile (Onboarding)
-			initialState: .onboarding(.init()),
+			initialState: .onboarding(.init(newProfile: .init())),
 			reducer: App.reducer,
 			environment: environment
 		)
 
 		// WHEN: a new profile is created
-		_ = await store.send(.onboarding(.internal(.system(.createdProfile(newProfile)))))
-		_ = await store.receive(.onboarding(.coordinate(.onboardedWithProfile(newProfile))))
+		_ = await store.send(.onboarding(.newProfile(.coordinate(.finishedCreatingNewProfile(newProfile)))))
+		_ = await store.receive(.onboarding(.coordinate(.onboardedWithProfile(newProfile, isNew: true))))
 
 		// THEN: it is injected into ProfileClient...
 		_ = await store.receive(.internal(.injectProfileIntoWalletClient(newProfile)))
@@ -91,7 +91,7 @@ final class AppFeatureTests: TestCase {
 	func test_loadWalletResult_whenWalletLoadingFailedBecauseDecodingError_thenDoNothingForNow() async throws {
 		// given
 		let initialState = App.State.splash(.init())
-		let reason = "Failed to decode wallet"
+		let reason = "FAIL_FROM_TEST"
 		let loadProfileResult = SplashLoadProfileResult.noProfile(reason: reason, failedToDecode: true)
 		let store = TestStore(
 			initialState: initialState,
@@ -103,7 +103,7 @@ final class AppFeatureTests: TestCase {
 		_ = await store.send(.splash(.coordinate(.loadProfileResult(loadProfileResult))))
 
 		// then
-		// do nothing for now, no state change occured
+		_ = await store.receive(.coordinate(.failedToCreateOrImportProfile(reason: "Failed to decode profile: FAIL_FROM_TEST")))
 	}
 
 	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_thenNavigateToOnboarding() async {
