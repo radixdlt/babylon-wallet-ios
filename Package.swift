@@ -87,6 +87,7 @@ let package = Package(
 				"Asset",
 				"FungibleTokenListFeature",
 				profile,
+				"ProfileClient",
 				tca,
 			]
 		),
