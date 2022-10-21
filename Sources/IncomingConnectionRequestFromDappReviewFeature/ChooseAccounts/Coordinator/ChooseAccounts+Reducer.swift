@@ -23,9 +23,9 @@ public extension ChooseAccounts {
 						guard state.selectedAccounts.count < state.accountLimit else { return .none }
 						state.selectedAccounts.append(account)
 						state.accounts[id: id]?.isSelected = true
-                    }
-                    
-                    state.isValid = state.selectedAccounts.count == state.accountLimit
+					}
+
+					state.isValid = state.selectedAccounts.count == state.accountLimit
 					return .none
 				}
 			}

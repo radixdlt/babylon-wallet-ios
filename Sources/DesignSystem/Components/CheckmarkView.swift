@@ -13,7 +13,7 @@ public struct CheckmarkView: View {
 
 public extension CheckmarkView {
 	var body: some View {
-        // TODO: replace with checkmark images when given export permission from Figma
+		// TODO: replace with checkmark images when given export permission from Figma
 		RoundedRectangle(cornerRadius: 2)
 			.fill(isChecked ? Color.green : Color.gray)
 			.frame(width: 20, height: 20)
