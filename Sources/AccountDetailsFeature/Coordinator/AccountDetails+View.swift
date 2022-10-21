@@ -83,11 +83,11 @@ private extension AccountDetails.View {
 				}
 			)
 			Spacer()
-			if let displayName = viewStore.displayName {
-				Text(displayName)
-					.foregroundColor(.app.buttonTextBlack)
-					.textStyle(.secondaryHeader)
-			}
+
+			Text(viewStore.displayName)
+				.foregroundColor(.app.buttonTextBlack)
+				.textStyle(.secondaryHeader)
+
 			Spacer()
 			Button(
 				action: {
@@ -151,7 +151,7 @@ extension AccountDetails.View {
 	struct ViewState: Equatable {
 		public let address: AccountAddress
 		public var aggregatedValue: AggregatedValue.State
-		public let displayName: String?
+		public let displayName: String
 
 		init(state: AccountDetails.State) {
 			address = state.address
