@@ -9,6 +9,14 @@ public extension Onboarding {
 		public var newProfile: NewProfile.State?
 		public var importProfile: ImportProfile.State?
 		public var importMnemonic: ImportMnemonic.State?
-		public init() {}
+		public init(
+			newProfile: NewProfile.State? = nil,
+			importProfile: ImportProfile.State? = nil,
+			importMnemonic: ImportMnemonic.State? = nil
+		) {
+			self.newProfile = newProfile
+			self.importProfile = importProfile
+			self.importMnemonic = importMnemonic
+		}
 	}
 }
