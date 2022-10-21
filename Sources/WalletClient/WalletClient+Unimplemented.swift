@@ -9,6 +9,7 @@
 import Foundation
 import Profile
 import XCTestDynamicOverlay
+
 public extension WalletClient {
 	static let unimplemented: Self = .init(
 		injectProfile: XCTUnimplemented("\(Self.self).injectProfile is unimplemented"),
