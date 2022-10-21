@@ -34,9 +34,13 @@ public extension Onboarding {
 				}
 
 			case let .importProfile(.coordinate(.importedProfile(profile))):
-				return .run { send in
-					await send(.coordinate(.onboardedWithProfile(profile, isNew: false)))
-				}
+                return .run { send in
+//                    await send(.coordinate(.onboardedWithProfile(profile, isNew: false)))
+                    await send(.internal(.coordinate(.importMnemonicForProfile(profile))))
+                }
+                
+            case let .internal(.coordinate(.importMnemonicForProfile(profile))):
+                state.importMnemonic = 
 
 			case .newProfile(.coordinate(.goBack)):
 				state.newProfile = nil
