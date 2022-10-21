@@ -15,7 +15,7 @@ final class CreateAccountFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.closeButtonTapped)))
+		_ = await store.send(.internal(.user(.dismiss)))
 
 		// then
 		await store.receive(.coordinate(.dismissCreateAccount))
