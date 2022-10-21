@@ -33,7 +33,8 @@ jobs:
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |
-              ${{ secrets.SWIFT_PROFILE_SSH_KEY }}
+            ${{ secrets.SWIFT_PROFILE_SSH_KEY }}
+            ${{ secrets.SLIP_10_SSH_KEY }}
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
