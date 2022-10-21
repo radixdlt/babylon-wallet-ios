@@ -33,14 +33,16 @@ public extension Onboarding {
 					await send(.coordinate(.failedToCreateOrImportProfile(reason: "Import failed: \(importFailureReason)")))
 				}
 
-			case let .importProfile(.coordinate(.importedProfile(profile))):
-                return .run { send in
-//                    await send(.coordinate(.onboardedWithProfile(profile, isNew: false)))
-                    await send(.internal(.coordinate(.importMnemonicForProfile(profile))))
-                }
-                
-            case let .internal(.coordinate(.importMnemonicForProfile(profile))):
-                state.importMnemonic = 
+//			case let .importProfile(.coordinate(.importedProfile(profile))):
+			case let .importProfile(.coordinate(.importedProfileSnapshot(profileSnapshot))):
+				return .run { send in
+					//                    await send(.coordinate(.onboardedWithProfile(profile, isNew: false)))
+					await send(.internal(.coordinate(.importMnemonicForProfileSnapshot(profileSnapshot))))
+				}
+
+			case let .internal(.coordinate(.importMnemonicForProfileSnapshot(profileSnapshot))):
+				state.importMnemonic = .init(importedProfileSnapshot: profileSnapshot)
+				return .none
 
 			case .newProfile(.coordinate(.goBack)):
 				state.newProfile = nil
@@ -51,7 +53,23 @@ public extension Onboarding {
 					await send(.coordinate(.onboardedWithProfile(newProfile, isNew: true)))
 				}
 
+			case .importMnemonic(.coordinate(.goBack)):
+				state.importMnemonic = nil
+				return .none
+
+			case let .importMnemonic(.coordinate(.failedToImportMnemonicOrProfile(importFailureReason))):
+				return .run { send in
+					await send(.coordinate(.failedToCreateOrImportProfile(reason: "Import mnemonic failed: \(importFailureReason)")))
+				}
+			case let .importMnemonic(.coordinate(.finishedImporting(_, profile))):
+				return .run { send in
+					await send(.coordinate(.onboardedWithProfile(profile, isNew: false)))
+				}
+
 			case .importProfile(.internal):
+				return .none
+
+			case .importMnemonic(.internal):
 				return .none
 
 			case .newProfile(.internal):
@@ -66,6 +84,9 @@ public extension Onboarding {
 		}
 		.ifLet(\.importProfile, action: /Action.importProfile) {
 			ImportProfile()
+		}
+		.ifLet(\.importMnemonic, action: /Action.importMnemonic) {
+			ImportMnemonic()
 		}
 	}
 }

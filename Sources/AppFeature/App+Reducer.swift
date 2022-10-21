@@ -23,7 +23,7 @@ public extension App {
 					)
 				}
 			),
-        // TODO: remove AnyReducer when migration to ReducerProtocol is complete
+		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
 		AnyReducer { _ in
 			Scope(state: /App.State.onboarding, action: /Action.onboarding) {
 				Onboarding()

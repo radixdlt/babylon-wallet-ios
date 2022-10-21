@@ -50,7 +50,7 @@ public extension ImportMnemonic {
 		public var importedMnemonic: Mnemonic?
 		public var savedMnemonic: Mnemonic?
 
-		init(
+		public init(
 			importedProfileSnapshot: ProfileSnapshot,
 			phraseOfMnemonicToImport: String = "bright club bacon dinner achieve pull grid save ramp cereal blush woman humble limb repeat video sudden possible story mask neutral prize goose mandate"
 		) {
@@ -70,11 +70,13 @@ public extension ImportMnemonic {
 
 public extension ImportMnemonic {
 	enum CoordinateAction: Equatable {
+		case goBack
 		case finishedImporting(mnemonic: Mnemonic, andProfile: Profile)
 		case failedToImportMnemonicOrProfile(reason: String)
 	}
 
 	enum InternalAction: Equatable {
+		case goBack
 		case phraseOfMnemonicToImportChanged(String)
 		case importMnemonicButtonPressed
 		case importMnemonicResult(TaskResult<Mnemonic>)
@@ -89,18 +91,24 @@ public extension ImportMnemonic {
 public extension ImportMnemonic {
 	func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
 		switch action {
-		case .coordinate:
-			return .none
+		case .internal(.goBack):
+			return .run { send in
+				await send(.coordinate(.goBack))
+			}
+
 		case let .internal(.phraseOfMnemonicToImportChanged(phraseOfMnemonicToImport)):
 			state.phraseOfMnemonicToImport = phraseOfMnemonicToImport
 			return .none
+
 		case .internal(.importMnemonicButtonPressed):
 			return .run { [mnemonicImporter, phrase = state.phraseOfMnemonicToImport] send in
 				await send(.internal(.importMnemonicResult(TaskResult { try mnemonicImporter(phrase) })))
 			}
+
 		case let .internal(.importMnemonicResult(.success(mnemonicToSave))):
 			state.importedMnemonic = mnemonicToSave
 			return .none
+
 		case let .internal(.importMnemonicResult(.failure(error))):
 			return .run { send in
 				await send(.coordinate(.failedToImportMnemonicOrProfile(reason: "Failed to import mnemonic, error: \(String(describing: error))")))
@@ -127,10 +135,12 @@ public extension ImportMnemonic {
 					)
 				)
 			}
+
 		case let .internal(.saveImportedMnemonicResult(.failure(error))):
 			return .run { send in
 				await send(.coordinate(.failedToImportMnemonicOrProfile(reason: "Failed to save mnemonic to keychain, error: \(String(describing: error))")))
 			}
+
 		case let .internal(.saveImportedMnemonicResult(.success(mnemonic))):
 			state.savedMnemonic = mnemonic
 			return .none
@@ -141,10 +151,12 @@ public extension ImportMnemonic {
 					try profileFromSnapshotImporter(snapshot)
 				})))
 			}
+
 		case let .internal(.profileFromSnapshotResult(.failure(error))):
 			return .run { send in
 				await send(.coordinate(.failedToImportMnemonicOrProfile(reason: "Failed to import profile from snapshot, error: \(String(describing: error))")))
 			}
+
 		case let .internal(.profileFromSnapshotResult(.success(profile))):
 			guard let mnemonic = state.savedMnemonic else {
 				return .run { send in
@@ -154,6 +166,9 @@ public extension ImportMnemonic {
 			return .run { send in
 				await send(.coordinate(.finishedImporting(mnemonic: mnemonic, andProfile: profile)))
 			}
+
+		case .coordinate:
+			return .none
 		}
 	}
 }
@@ -172,6 +187,21 @@ public extension ImportMnemonic.View {
 	var body: some View {
 		WithViewStore(store, observe: { $0 }) { viewStore in
 			VStack {
+				HStack {
+					Button(
+						action: {
+							viewStore.send(.internal(.goBack))
+						}, label: {
+							Image("arrow-back")
+						}
+					)
+					Spacer()
+					Text("Import Mnemonic")
+					Spacer()
+					EmptyView()
+				}
+				Spacer()
+
 				TextField(
 					"Mnemonic phrasec",
 					text: viewStore.binding(
