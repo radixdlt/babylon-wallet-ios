@@ -34,3 +34,20 @@ public extension GatewayAPIClient {
 
 // MARK: - Date + Sendable
 extension Date: @unchecked Sendable {}
+
+public extension GatewayAPIClient {
+	static let live: Self = .init(
+		accountResourcesByAddress: { accountAddress in
+			try await Self.mock().accountResourcesByAddress(accountAddress)
+		},
+		resourceDetailsByResourceIdentifier: { resourceAddress in
+			try await Self.mock().resourceDetailsByResourceIdentifier(resourceAddress)
+		},
+		submitTransaction: { transactionSubmitRequest in
+			try await Self.mock().submitTransaction(transactionSubmitRequest)
+		},
+		transactionStatus: { transactionStatusRequest in
+			try await Self.mock().transactionStatus(transactionStatusRequest)
+		}
+	)
+}

@@ -250,7 +250,9 @@ public extension Home {
 				return .none
 
 			case let .accountList(.coordinate(.copyAddress(address))):
-				return Effect(value: .internal(.system(.copyAddress(address.wrapAsAddress()))))
+				return .run { send in
+					await send(.internal(.system(.copyAddress(address.wrapAsAddress()))))
+				}
 
 			case .accountList:
 				return .none
@@ -274,7 +276,9 @@ public extension Home {
 				return .none
 
 			case let .accountDetails(.coordinate(.copyAddress(address))):
-				return Effect(value: .internal(.system(.copyAddress(address.wrapAsAddress()))))
+				return .run { send in
+					await send(.internal(.system(.copyAddress(address.wrapAsAddress()))))
+				}
 
 			case .accountDetails(.coordinate(.displayTransfer)):
 				state.transfer = .init()
