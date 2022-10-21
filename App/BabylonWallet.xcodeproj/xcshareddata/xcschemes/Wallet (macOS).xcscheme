@@ -92,16 +92,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProfileTests"
-               BuildableName = "ProfileTests"
-               BlueprintName = "ProfileTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "SplashFeatureTests"
                BuildableName = "SplashFeatureTests"
                BlueprintName = "SplashFeatureTests"
@@ -115,26 +105,6 @@
                BlueprintIdentifier = "UserDefaultsClientTests"
                BuildableName = "UserDefaultsClientTests"
                BlueprintName = "UserDefaultsClientTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "WalletLoaderTests"
-               BuildableName = "WalletLoaderTests"
-               BlueprintName = "WalletLoaderTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "WalletTests"
-               BuildableName = "WalletTests"
-               BlueprintName = "WalletTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -302,9 +272,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "WalletClientTests"
-               BuildableName = "WalletClientTests"
-               BlueprintName = "WalletClientTests"
+               BlueprintIdentifier = "ProfileClientTests"
+               BuildableName = "ProfileClientTests"
+               BlueprintName = "ProfileClientTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
