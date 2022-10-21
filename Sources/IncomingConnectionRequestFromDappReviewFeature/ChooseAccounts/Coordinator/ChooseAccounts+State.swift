@@ -30,13 +30,13 @@ public extension ChooseAccounts {
 public extension ChooseAccounts.State {
 	static let placeholder: Self = .init(
 		incomingConnectionRequestFromDapp: .placeholder,
-		isValid: true,
+		isValid: false,
 		accounts: .init(
 			uniqueElements: [
 				.placeholder,
 			]
 		),
-		accountLimit: 2
+		accountLimit: 1
 	)
 }
 #endif

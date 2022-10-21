@@ -27,7 +27,7 @@ public extension ChooseAccounts.View {
 
 				ScrollView {
 					VStack {
-						Image("dapp-placeholder", bundle: .module)
+						Image("dapp-placeholder")
 
 						Spacer(minLength: 40)
 
