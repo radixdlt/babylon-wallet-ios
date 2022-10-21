@@ -321,6 +321,25 @@ let package = Package(
 				"TestUtils",
 			]
 		),
+        
+        
+        .target(
+            name: "ImportProfileFeature",
+            dependencies: [
+                "Common",
+                profile,
+                tca,
+            ]
+        ),
+        .testTarget(
+            name: "ImportProfileFeatureTests",
+            dependencies: [
+                "ImportProfileFeature",
+                "TestUtils"
+            ]
+        ),
+        
+        
 		.target(
 			name: "LocalAuthenticationClient",
 			dependencies: []
