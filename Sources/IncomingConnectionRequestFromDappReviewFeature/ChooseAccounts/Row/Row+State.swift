@@ -1,15 +1,14 @@
-import Address
 import Foundation
 import Profile
 
 // MARK: - ChooseAccounts.Row.State
 public extension ChooseAccounts.Row {
 	struct State: Equatable {
-		public let account: Profile.Account
+		public let account: OnNetwork.Account
 		public var isSelected: Bool
 
 		public init(
-			account: Profile.Account,
+			account: OnNetwork.Account,
 			isSelected: Bool = false
 		) {
 			self.account = account
@@ -20,18 +19,14 @@ public extension ChooseAccounts.Row {
 
 // MARK: - ChooseAccounts.Row.State + Identifiable
 extension ChooseAccounts.Row.State: Identifiable {
-	public typealias ID = Address
-	public var id: Address { account.address }
+	public typealias ID = AccountAddress
+	public var address: AccountAddress { account.address }
+	public var id: ID { address }
 }
 
 #if DEBUG
+import ProfileClient
 public extension ChooseAccounts.Row.State {
-	static let placeholder: Self = .init(
-		account: .init(
-			address: .random,
-			name: "My account"
-		),
-		isSelected: false
-	)
+	static let placeholder: Self = try! Self(account: ProfileClient.mock().getAccounts().first)
 }
 #endif

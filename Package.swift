@@ -353,6 +353,26 @@ let package = Package(
 				"TestUtils",
 			]
 		),
+		.target(
+			name: "IncomingConnectionRequestFromDappReviewFeature",
+			dependencies: [
+				"Address",
+				"Common",
+				"DesignSystem",
+				"Profile",
+				tca,
+			],
+			resources: [
+				.process("Resources"),
+			]
+		),
+		.testTarget(
+			name: "IncomingConnectionRequestFromDappReviewFeatureTests",
+			dependencies: [
+				"IncomingConnectionRequestFromDappReviewFeature",
+				"TestUtils",
+			]
+		),
 
 		.target(
 			name: "ImportProfileFeature",
@@ -451,26 +471,6 @@ let package = Package(
 			name: "PasteboardClientTests",
 			dependencies: [
 				"PasteboardClient",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "IncomingConnectionRequestFromDappReviewFeature",
-			dependencies: [
-				"Address",
-				"Common",
-				"DesignSystem",
-				"Profile",
-				tca,
-			],
-			resources: [
-				.process("Resources"),
-			]
-		),
-		.testTarget(
-			name: "IncomingConnectionRequestFromDappReviewFeatureTests",
-			dependencies: [
-				"IncomingConnectionRequestFromDappReviewFeature",
 				"TestUtils",
 			]
 		),

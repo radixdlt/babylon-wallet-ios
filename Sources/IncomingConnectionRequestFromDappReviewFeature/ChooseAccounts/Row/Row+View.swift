@@ -73,8 +73,8 @@ extension ChooseAccounts.Row.View {
 
 		init(state: ChooseAccounts.Row.State) {
 			isSelected = state.isSelected
-			accountName = state.account.name
-			accountAddress = state.account.address
+			accountName = state.account.displayName ?? "Unnamed account"
+			accountAddress = state.account.address.address
 		}
 	}
 }

@@ -33,11 +33,7 @@ public extension ChooseAccounts.State {
 		isValid: true,
 		accounts: .init(
 			uniqueElements: [
-				.init(account: .init(address: "account1address-deadbeef", name: "My account 1")),
-				.init(account: .init(address: "account2address-deadbeef", name: "My account 2")),
-//				.init(account: .init(address: "account3address-deadbeef", name: "My account 3")),
-//				.init(account: .init(address: "account4address-deadbeef", name: "My account 4")),
-//				.init(account: .init(address: "account5address-deadbeef", name: "My account 5")),
+				.placeholder,
 			]
 		),
 		accountLimit: 2
