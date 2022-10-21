@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-10-12.
-//
-
 #if DEBUG
 import CryptoKit
 import Foundation
