@@ -1,48 +1,67 @@
 import ComposableArchitecture
+import ImportProfileFeature
 import Mnemonic
 import Profile
 import ProfileClient
 
+// MARK: - Onboarding
+public struct Onboarding: ReducerProtocol {
+	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.mainQueue) var mainQueue
+	public init() {}
+}
+
 public extension Onboarding {
-	// MARK: Reducer
-	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer { state, action, environment in
-		switch action {
-		case .coordinate:
-			return .none
-		case .internal(.user(.createProfile)):
-			return .run { send in
-				await send(.internal(.system(.createProfile)))
+	var body: some ReducerProtocol<State, Action> {
+		Reduce { state, action in
+			switch action {
+			case .internal(.user(.newProfile)):
+				state.newProfile = .init()
+				return .none
+
+			case .internal(.user(.importProfile)):
+				state.importProfile = .init()
+				return .none
+
+			case .importProfile(.coordinate(.goBack)):
+				state.importProfile = nil
+				return .none
+
+			case let .importProfile(.coordinate(.failedToImportProfileSnapshot(importFailureReason))):
+				return .run { send in
+					await send(.coordinate(.failedToCreateOrImportProfile(reason: "Import failed: \(importFailureReason)")))
+				}
+
+			case let .importProfile(.coordinate(.importedProfile(profile))):
+				return .run { send in
+					await send(.coordinate(.onboardedWithProfile(profile, isNew: false)))
+				}
+
+			case .newProfile(.coordinate(.goBack)):
+				state.newProfile = nil
+				return .none
+
+			case let .newProfile(.coordinate(.finishedCreatingNewProfile(newProfile))):
+				return .run { send in
+					await send(.coordinate(.onboardedWithProfile(newProfile, isNew: true)))
+				}
+
+			case .importProfile(.internal):
+				return .none
+
+			case .newProfile(.internal):
+				return .none
+
+			case .coordinate:
+				return .none
 			}
-		case .internal(.system(.createProfile)):
-			precondition(state.canProceed)
-			return .run { [nameOfFirstAccount = state.nameOfFirstAccount] send in
-				let curve25519FactorSourceMnemonic = try environment.mnemonicGenerator(BIP39.WordCount.twentyFour, BIP39.Language.english)
-
-				let newProfile = try await Profile.new(
-					mnemonic: curve25519FactorSourceMnemonic,
-					firstAccountDisplayName: nameOfFirstAccount
-				)
-
-				let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
-
-				try environment.keychainClient.saveFactorSource(
-					mnemonic: curve25519FactorSourceMnemonic,
-					reference: curve25519FactorSourceReference
-				)
-
-				try environment.keychainClient.saveProfile(profile: newProfile)
-
-				await send(.internal(.system(.createdProfile(newProfile))))
-			}
-		case let .internal(.system(.createdProfile(profile))):
-			return .run { send in
-				await send(.coordinate(.onboardedWithProfile(profile)))
-			}
-		case .binding:
-			state.canProceed = !state.nameOfFirstAccount.isEmpty
-			return .none
+		}
+		.ifLet(\.newProfile, action: /Action.newProfile) {
+			NewProfile()
+		}
+		.ifLet(\.importProfile, action: /Action.importProfile) {
+			ImportProfile()
 		}
 	}
-	.binding()
 }

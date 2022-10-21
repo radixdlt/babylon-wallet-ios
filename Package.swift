@@ -46,6 +46,11 @@ let package = Package(
 			name: "IncomingConnectionRequestFromDappReviewFeature",
 			targets: ["IncomingConnectionRequestFromDappReviewFeature"]
 		),
+		.library(
+			name: "ImportProfileFeature",
+			targets: ["ImportProfileFeature"]
+		),
+
 	],
 	dependencies: [
 		// TCA - ComposableArchitecture used as architecture
@@ -321,25 +326,24 @@ let package = Package(
 				"TestUtils",
 			]
 		),
-        
-        
-        .target(
-            name: "ImportProfileFeature",
-            dependencies: [
-                "Common",
-                profile,
-                tca,
-            ]
-        ),
-        .testTarget(
-            name: "ImportProfileFeatureTests",
-            dependencies: [
-                "ImportProfileFeature",
-                "TestUtils"
-            ]
-        ),
-        
-        
+
+		.target(
+			name: "ImportProfileFeature",
+			dependencies: [
+				"Common",
+				profile,
+				"ProfileClient",
+				tca,
+			]
+		),
+		.testTarget(
+			name: "ImportProfileFeatureTests",
+			dependencies: [
+				"ImportProfileFeature",
+				"TestUtils",
+			]
+		),
+
 		.target(
 			name: "LocalAuthenticationClient",
 			dependencies: []
@@ -391,6 +395,7 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
+				"ImportProfileFeature",
 				profile,
 				tca,
 				"UserDefaultsClient", // replace with `ProfileCreator`
