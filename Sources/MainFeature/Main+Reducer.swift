@@ -19,7 +19,7 @@ public extension Main {
 				action: /Main.Action.home,
 				environment: {
 					Home.Environment(
-						walletClient: $0.walletClient,
+						profileClient: $0.profileClient,
 						appSettingsClient: $0.appSettingsClient,
 						accountPortfolioFetcher: $0.accountPortfolioFetcher,
 						pasteboardClient: $0.pasteboardClient
@@ -35,7 +35,7 @@ public extension Main {
 				environment: {
 					Settings.Environment(
 						keychainClient: $0.keychainClient,
-						walletClient: $0.walletClient
+						profileClient: $0.profileClient
 					)
 				}
 			),
@@ -49,7 +49,7 @@ public extension Main {
 			case .settings(.coordinate(.deleteProfileAndFactorSources)):
 				return .run { send in
 					try environment.keychainClient.removeAllFactorSourcesAndProfileSnapshot()
-					try environment.walletClient.deleteProfileSnapshot()
+					try environment.profileClient.deleteProfileSnapshot()
 					await send(.coordinate(.removedWallet))
 				}
 

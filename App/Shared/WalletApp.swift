@@ -2,9 +2,9 @@ import AppFeature
 import ComposableArchitecture
 import DesignSystem
 import KeychainClient
+import ProfileClient
 import SwiftUI
 import UserDefaultsClient
-import WalletClient
 
 typealias App = AppFeature.App
 
@@ -21,7 +21,7 @@ public extension App.Environment {
 			pasteboardClient: .live(),
 			profileLoader: .live(keychainClient: keychainClient),
 			userDefaultsClient: .live(),
-			walletClient: .live
+			profileClient: .live
 		)
 	}()
 }

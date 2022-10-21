@@ -72,7 +72,7 @@ final class HomeFeatureTests: TestCase {
 		initialState.accountList = .init(nonEmptyOrderedSetOfAccounts: .init(rawValue: .init([account]))!)
 
 		let environment = Home.Environment(
-			walletClient: .unimplemented,
+			profileClient: .unimplemented,
 			appSettingsClient: .unimplemented,
 			accountPortfolioFetcher: .unimplemented,
 			pasteboardClient: .unimplemented,

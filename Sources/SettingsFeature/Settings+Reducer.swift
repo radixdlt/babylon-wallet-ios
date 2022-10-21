@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import Profile
-import WalletClient
+import ProfileClient
 
 public extension Settings {
 	// MARK: Reducer
@@ -21,7 +21,7 @@ public extension Settings {
 
 			return .run { send in
 				guard
-					let snapshot = try? environment.walletClient.extractProfileSnapshot(),
+					let snapshot = try? environment.profileClient.extractProfileSnapshot(),
 					let profile = try? Profile(snapshot: snapshot)
 				else {
 					return

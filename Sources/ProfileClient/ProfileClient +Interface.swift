@@ -26,8 +26,8 @@ public extension DependencyValues {
 	}
 }
 
-// MARK: - WalletClient
-public struct WalletClient {
+// MARK: - ProfileClient
+public struct ProfileClient {
 	public var injectProfile: InjectProfile
 	public var extractProfileSnapshot: ExtractProfileSnapshot
 
@@ -40,7 +40,7 @@ public struct WalletClient {
 	public var createAccountWithKeychainClient: CreateAccountWithKeychainClient
 }
 
-public extension WalletClient {
+public extension ProfileClient {
 	typealias InjectProfile = @Sendable (Profile) -> Void
 	typealias DeleteProfileSnapshot = @Sendable () throws -> Void
 
@@ -53,7 +53,7 @@ public extension WalletClient {
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 }
 
-public extension WalletClient {
+public extension ProfileClient {
 	static let live: Self = {
 		let profileHolder = ProfileHolder.shared
 		return Self(

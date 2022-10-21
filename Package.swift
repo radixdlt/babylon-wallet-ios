@@ -156,7 +156,7 @@ let package = Package(
 				"SplashFeature",
 				tca,
 				"UserDefaultsClient",
-				"WalletClient",
+				"ProfileClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -166,7 +166,7 @@ let package = Package(
 				"AppFeature",
 				"SplashFeature",
 				"TestUtils",
-				"WalletClient",
+				"ProfileClient",
 			]
 		),
 		.target(
@@ -238,7 +238,7 @@ let package = Package(
 				keychainClient,
 				profile,
 				tca,
-				"WalletClient",
+				"ProfileClient",
 			]
 		),
 		.testTarget(
@@ -306,7 +306,7 @@ let package = Package(
 				"CreateAccountFeature",
 				"PasteboardClient",
 				tca,
-				"WalletClient",
+				"ProfileClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -374,7 +374,7 @@ let package = Package(
 				profile,
 				tca,
 				"UserDefaultsClient", // replace with `ProfileCreator`
-				"WalletClient",
+				"ProfileClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -436,7 +436,7 @@ let package = Package(
 				profile,
 				.product(name: "ProfileView", package: "swift-profile"),
 				keychainClient,
-				"WalletClient",
+				"ProfileClient",
 				tca,
 				// ^^^ Sort lexicographically ^^^
 			]
@@ -456,7 +456,7 @@ let package = Package(
 				profile,
 				"ProfileLoader",
 				tca,
-				"WalletClient",
+				"ProfileClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -489,7 +489,7 @@ let package = Package(
 			]
 		),
 		.target(
-			name: "WalletClient",
+			name: "ProfileClient",
 			dependencies: [
 				profile,
 				"ProfileLoader",
@@ -497,9 +497,9 @@ let package = Package(
 			]
 		),
 		.testTarget(
-			name: "WalletClientTests",
+			name: "ProfileClientTests",
 			dependencies: [
-				"WalletClient",
+				"ProfileClient",
 				"TestUtils",
 			]
 		),

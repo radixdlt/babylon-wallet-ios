@@ -19,7 +19,7 @@ public extension App {
 						appSettingsClient: $0.appSettingsClient,
 						keychainClient: $0.keychainClient,
 						pasteboardClient: $0.pasteboardClient,
-						walletClient: $0.walletClient
+						profileClient: $0.profileClient
 					)
 				}
 			),
@@ -83,7 +83,7 @@ public extension App {
 
 		case let .internal(.injectProfileIntoWalletClient(profile)):
 			return .run { send in
-				environment.walletClient.injectProfile(profile)
+				environment.profileClient.injectProfile(profile)
 				await send(.coordinate(.toMain))
 			}
 

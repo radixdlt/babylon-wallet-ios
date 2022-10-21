@@ -5,7 +5,7 @@ import AccountPreferencesFeature
 import AggregatedValueFeature
 import CreateAccountFeature
 import Profile
-import WalletClient
+import ProfileClient
 
 // MARK: - Home
 /// Namespace for HomeFeature

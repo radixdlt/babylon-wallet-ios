@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import Mnemonic
 import Profile
-import WalletClient
+import ProfileClient
 
 public extension Onboarding {
 	// MARK: Reducer

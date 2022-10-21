@@ -33,7 +33,7 @@ final class AppFeatureTests: TestCase {
 	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_walletClient_and_we_navigate_to_main() async throws {
 		var environment: App.Environment = .unimplemented
 		let newProfile = try await Profile.new(mnemonic: .generate())
-		environment.walletClient.injectProfile = {
+		environment.profileClient.injectProfile = {
 			XCTAssertEqual($0, newProfile) // assert correct profile is injected
 		}
 		let store = TestStore(
@@ -47,7 +47,7 @@ final class AppFeatureTests: TestCase {
 		_ = await store.send(.onboarding(.internal(.system(.createdProfile(newProfile)))))
 		_ = await store.receive(.onboarding(.coordinate(.onboardedWithProfile(newProfile))))
 
-		// THEN: it is injected into WalletClient...
+		// THEN: it is injected into ProfileClient...
 		_ = await store.receive(.internal(.injectProfileIntoWalletClient(newProfile)))
 
 		// THEN: ... and we navigate to main
@@ -63,7 +63,7 @@ final class AppFeatureTests: TestCase {
 		let testScheduler = DispatchQueue.test
 		var environment: App.Environment = .unimplemented
 		environment.mainQueue = testScheduler.eraseToAnyScheduler()
-		environment.walletClient.injectProfile = {
+		environment.profileClient.injectProfile = {
 			XCTAssertEqual($0, existingProfile) // assert correct profile is injected
 		}
 		let store = TestStore(
@@ -80,7 +80,7 @@ final class AppFeatureTests: TestCase {
 		await testScheduler.advance(by: .milliseconds(110))
 		_ = await store.receive(.splash(.coordinate(.loadProfileResult(.profileLoaded(existingProfile)))))
 
-		// THEN: it is injected into WalletClient...
+		// THEN: it is injected into ProfileClient...
 		_ = await store.receive(.internal(.injectProfileIntoWalletClient(existingProfile)))
 		// THEN: ... and we navigate to main
 		await store.receive(.coordinate(.toMain)) {

@@ -3,7 +3,7 @@ import AccountPortfolio
 import AppSettings
 import FungibleTokenListFeature
 import PasteboardClient
-import WalletClient
+import ProfileClient
 
 // MARK: - Home.Environment
 public extension Home {
@@ -13,16 +13,16 @@ public extension Home {
 		public let accountPortfolioFetcher: AccountPortfolioFetcher
 		public let pasteboardClient: PasteboardClient
 		public let fungibleTokenListSorter: FungibleTokenListSorter
-		public let walletClient: WalletClient
+		public let profileClient: ProfileClient
 
 		public init(
-			walletClient: WalletClient,
+			profileClient: ProfileClient,
 			appSettingsClient: AppSettingsClient,
 			accountPortfolioFetcher: AccountPortfolioFetcher,
 			pasteboardClient: PasteboardClient,
 			fungibleTokenListSorter: FungibleTokenListSorter = .live
 		) {
-			self.walletClient = walletClient
+			self.profileClient = profileClient
 			self.appSettingsClient = appSettingsClient
 			self.accountPortfolioFetcher = accountPortfolioFetcher
 			self.pasteboardClient = pasteboardClient
@@ -34,7 +34,7 @@ public extension Home {
 #if DEBUG
 public extension Home.Environment {
 	static let placeholder: Self = .init(
-		walletClient: .mock(),
+		profileClient: .mock(),
 		appSettingsClient: .mock,
 		accountPortfolioFetcher: .mock,
 		pasteboardClient: .noop,
@@ -42,7 +42,7 @@ public extension Home.Environment {
 	)
 
 	static let unimplemented: Self = .init(
-		walletClient: .unimplemented,
+		profileClient: .unimplemented,
 		appSettingsClient: .unimplemented,
 		accountPortfolioFetcher: .unimplemented,
 		pasteboardClient: .unimplemented,

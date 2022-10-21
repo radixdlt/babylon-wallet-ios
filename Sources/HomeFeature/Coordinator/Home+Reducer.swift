@@ -90,7 +90,7 @@ public extension Home {
 			switch action {
 			case .internal(.user(.createAccountButtonTapped)):
 				return .run { send in
-					let accounts = try environment.walletClient.getAccounts()
+					let accounts = try environment.profileClient.getAccounts()
 					await send(.internal(.coordinate(.createAccount(numberOfExistingAccounts: accounts.count))))
 				}
 			case let .internal(.coordinate(.createAccount(numberOfExistingAccounts))):
@@ -104,7 +104,7 @@ public extension Home {
 
 			case .internal(.system(.loadAccountsAndSettings)):
 				return .run { send in
-					let accounts = try environment.walletClient.getAccounts()
+					let accounts = try environment.profileClient.getAccounts()
 					await send(.internal(.system(.accountsLoaded(accounts))))
 					let settings = try await environment.appSettingsClient.loadSettings()
 					await send(.internal(.system(.currencyLoaded(settings.currency))))
@@ -239,7 +239,7 @@ public extension Home {
 
 			case .accountList(.coordinate(.fetchPortfolioForAccounts)):
 				return .run { send in
-					let accounts = try environment.walletClient.getAccounts().rawValue.elements
+					let accounts = try environment.profileClient.getAccounts().rawValue.elements
 					let addresses = accounts.map(\.address)
 					let totalPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio(addresses)
 					await send(.internal(.system(.totalPortfolioLoaded(totalPortfolio))))

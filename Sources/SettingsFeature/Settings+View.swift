@@ -2,8 +2,8 @@ import Common
 import ComposableArchitecture
 import KeychainClient
 import Profile
+import ProfileClient
 import SwiftUI
-import WalletClient
 #if DEBUG
 import ProfileView
 #endif // DEBUG
@@ -123,7 +123,7 @@ struct HomeView_Previews: PreviewProvider {
 				reducer: Settings.reducer,
 				environment: .init(
 					keychainClient: .unimplemented,
-					walletClient: .unimplemented
+					profileClient: .unimplemented
 				)
 			)
 		)

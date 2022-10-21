@@ -50,7 +50,7 @@ struct MainView_Previews: PreviewProvider {
 					appSettingsClient: .mock,
 					keychainClient: .unimplemented,
 					pasteboardClient: .noop,
-					walletClient: .unimplemented
+					profileClient: .unimplemented
 				)
 			)
 		)

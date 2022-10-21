@@ -4,9 +4,9 @@ import ComposableArchitecture
 import Foundation
 import KeychainClient
 import PasteboardClient
+import ProfileClient
 import ProfileLoader
 import UserDefaultsClient
-import WalletClient
 
 // MARK: - App.Environment
 public extension App {
@@ -20,7 +20,7 @@ public extension App {
 		public let pasteboardClient: PasteboardClient
 		public let profileLoader: ProfileLoader
 		public let userDefaultsClient: UserDefaultsClient
-		public var walletClient: WalletClient
+		public var profileClient: ProfileClient
 
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
@@ -31,7 +31,7 @@ public extension App {
 			pasteboardClient: PasteboardClient,
 			profileLoader: ProfileLoader,
 			userDefaultsClient: UserDefaultsClient,
-			walletClient: WalletClient
+			profileClient: ProfileClient
 		) {
 			self.backgroundQueue = backgroundQueue
 			self.mainQueue = mainQueue
@@ -41,7 +41,7 @@ public extension App {
 			self.pasteboardClient = pasteboardClient
 			self.profileLoader = profileLoader
 			self.userDefaultsClient = userDefaultsClient
-			self.walletClient = walletClient
+			self.profileClient = profileClient
 		}
 	}
 }
@@ -57,7 +57,7 @@ public extension App.Environment {
 		pasteboardClient: .noop,
 		profileLoader: .unimplemented,
 		userDefaultsClient: .noop,
-		walletClient: .unimplemented
+		profileClient: .unimplemented
 	)
 
 	static let unimplemented = Self(
@@ -69,7 +69,7 @@ public extension App.Environment {
 		pasteboardClient: .unimplemented,
 		profileLoader: .unimplemented,
 		userDefaultsClient: .unimplemented,
-		walletClient: .unimplemented
+		profileClient: .unimplemented
 	)
 }
 #endif

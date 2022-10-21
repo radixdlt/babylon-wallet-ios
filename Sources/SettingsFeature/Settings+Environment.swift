@@ -1,20 +1,20 @@
 import Foundation
 import KeychainClient
 import Profile
-import WalletClient
+import ProfileClient
 
 public extension Settings {
 	// MARK: Environment
 	struct Environment {
 		public let keychainClient: KeychainClient
-		public let walletClient: WalletClient
+		public let profileClient: ProfileClient
 
 		public init(
 			keychainClient: KeychainClient,
-			walletClient: WalletClient
+			profileClient: ProfileClient
 		) {
 			self.keychainClient = keychainClient
-			self.walletClient = walletClient
+			self.profileClient = profileClient
 		}
 	}
 }

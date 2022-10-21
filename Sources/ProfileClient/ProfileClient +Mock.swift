@@ -3,7 +3,7 @@ import Foundation
 import NonEmpty
 import Profile
 
-public extension WalletClient {
+public extension ProfileClient {
 	static func mock() -> Self {
 		Self(
 			injectProfile: { _ in /* Noop */ },

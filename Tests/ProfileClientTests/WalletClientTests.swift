@@ -1,5 +1,5 @@
+@testable import ProfileClient
 import TestUtils
-@testable import WalletClient
 
 final class WalletClientTests: TestCase {
 	func testTrivial() {

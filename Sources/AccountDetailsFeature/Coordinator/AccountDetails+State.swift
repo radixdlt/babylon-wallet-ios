@@ -63,6 +63,6 @@ public extension AccountDetails.State {
 	}
 
 	var displayName: String {
-		account.displayName ?? "Unnamned account"
+		account.displayName ?? "Unnamed account"
 	}
 }
