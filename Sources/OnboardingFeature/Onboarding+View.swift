@@ -73,6 +73,19 @@ public extension Onboarding.View {
 					}
 				)
 				.zIndex(2)
+
+				IfLetStore(
+					store.scope(
+						state: \.importMnemonic,
+						action: Onboarding.Action.importMnemonic
+					),
+					then: { importMnemonicStore in
+						ForceFullScreen {
+							ImportMnemonic.View(store: importMnemonicStore)
+						}
+					}
+				)
+				.zIndex(3)
 			}
 		}
 	}
