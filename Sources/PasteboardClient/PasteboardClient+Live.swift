@@ -8,7 +8,11 @@ public typealias Pasteboard = NSPasteboard
 
 public extension PasteboardClient {
 	static func live(pasteboard: Pasteboard = .general) -> Self {
-		Self(
+		#if os(macOS)
+		// https://stackoverflow.com/a/71927867
+		pasteboard.declareTypes([.string], owner: nil)
+		#endif
+		return Self(
 			copyString: { aString in
 				#if os(iOS)
 				pasteboard.string = aString
