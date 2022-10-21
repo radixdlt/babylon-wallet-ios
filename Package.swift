@@ -55,7 +55,7 @@ let package = Package(
 		// BigInt
 		.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
 
-		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.17"),
+		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.18"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
@@ -233,10 +233,12 @@ let package = Package(
 		.target(
 			name: "CreateAccountFeature",
 			dependencies: [
-				profile,
-				"DesignSystem",
 				"Common",
+				"DesignSystem",
+				keychainClient,
+				profile,
 				tca,
+				"WalletClient",
 			]
 		),
 		.testTarget(

@@ -90,7 +90,9 @@ public extension CreateAccount.View {
 					PrimaryButton(
 						title: L10n.CreateAccount.continueButtonTitle,
 						isEnabled: viewStore.isValid,
-						action: { /* TODO: implement */ }
+						action: {
+							viewStore.send(.createButtonTapped)
+						}
 					)
 					.disabled(!viewStore.isValid)
 				}
@@ -108,6 +110,7 @@ extension CreateAccount.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case viewDidAppear
+		case createButtonTapped
 		case closeButtonTapped
 		case textFieldDidFocus
 		case textFieldDidChange(String)
@@ -117,12 +120,18 @@ extension CreateAccount.View {
 extension CreateAccount.Action {
 	init(action: CreateAccount.View.ViewAction) {
 		switch action {
+		case .createButtonTapped:
+			self = .internal(.user(.createAccount))
+
 		case .viewDidAppear:
 			self = .internal(.system(.viewDidAppear))
+
 		case .closeButtonTapped:
-			self = .internal(.user(.closeButtonTapped))
+			self = .internal(.user(.dismiss))
+
 		case .textFieldDidFocus:
 			self = .internal(.user(.textFieldDidFocus))
+
 		case let .textFieldDidChange(value):
 			self = .internal(.user(.textFieldDidChange(value)))
 		}

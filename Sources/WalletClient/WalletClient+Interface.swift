@@ -37,6 +37,7 @@ public struct WalletClient {
 	public var getAccounts: GetAccounts
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
+	public var createAccountWithKeychainClient: CreateAccountWithKeychainClient
 }
 
 public extension WalletClient {
@@ -48,6 +49,7 @@ public extension WalletClient {
 	typealias GetAccounts = @Sendable () throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
 	typealias GetAppPreferences = @Sendable () throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) throws -> Void
+	typealias CreateAccountWithKeychainClient = @Sendable (_ accountName: String?, KeychainClient) async throws -> OnNetwork.Account
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 }
 
@@ -77,6 +79,14 @@ public extension WalletClient {
 			setDisplayAppPreferences: { _ in
 				try profileHolder.setting { _ in
 				}
+			},
+			createAccountWithKeychainClient: { accountName, keychainClient in
+				try await profileHolder.asyncSetting { profile in
+					try await profile.addAccount(
+						displayName: accountName,
+						fromKeychainLoadOnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource: keychainClient
+					)
+				}
 			}
 		)
 	}()
@@ -102,12 +112,29 @@ private final class ProfileHolder {
 		return try withProfile(profile)
 	}
 
+	@discardableResult
+	func getAsync<T>(_ withProfile: (Profile) async throws -> T) async throws -> T {
+		guard let profile else {
+			throw NoProfile()
+		}
+		return try await withProfile(profile)
+	}
+
 	func setting(_ setProfile: (inout Profile) throws -> Void) throws {
 		guard var profile else {
 			throw NoProfile()
 		}
 		try setProfile(&profile)
 		self.profile = profile
+	}
+
+	func asyncSetting<T>(_ setProfile: (inout Profile) async throws -> T) async throws -> T {
+		guard var profile else {
+			throw NoProfile()
+		}
+		let result = try await setProfile(&profile)
+		self.profile = profile
+		return result
 	}
 
 	func injectProfile(_ profile: Profile) {

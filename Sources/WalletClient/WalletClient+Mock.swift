@@ -71,6 +71,9 @@ public extension WalletClient {
 			},
 			setDisplayAppPreferences: { _ in
 				fatalError()
+			},
+			createAccountWithKeychainClient: { _, _ in
+				fatalError()
 			}
 		)
 	}

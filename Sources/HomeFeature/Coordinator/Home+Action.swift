@@ -48,6 +48,7 @@ public extension Home.Action.InternalAction {
 public extension Home.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
+		case loadAccountsAndSettings
 		case accountsLoaded(NonEmpty<OrderedSet<OnNetwork.Account>>)
 		case currencyLoaded(FiatCurrency)
 		case toggleIsCurrencyAmountVisible

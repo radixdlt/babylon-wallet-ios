@@ -99,6 +99,11 @@ public extension Home {
 
 			case .internal(.system(.viewDidAppear)):
 				return .run { send in
+					await send(.internal(.system(.loadAccountsAndSettings)))
+				}
+
+			case .internal(.system(.loadAccountsAndSettings)):
+				return .run { send in
 					let accounts = try environment.walletClient.getAccounts()
 					await send(.internal(.system(.accountsLoaded(accounts))))
 					let settings = try await environment.appSettingsClient.loadSettings()
@@ -300,6 +305,12 @@ public extension Home {
 			case .createAccount(.coordinate(.dismissCreateAccount)):
 				state.createAccount = nil
 				return .none
+
+			case .createAccount(.coordinate(.createdNewAccount(_))):
+				state.createAccount = nil
+				return .run { send in
+					await send(.internal(.system(.loadAccountsAndSettings)))
+				}
 
 			case .transfer(.internal):
 				return .none

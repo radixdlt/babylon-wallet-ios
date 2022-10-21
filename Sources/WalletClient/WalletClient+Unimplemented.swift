@@ -16,7 +16,8 @@ public extension WalletClient {
 		deleteProfileSnapshot: XCTUnimplemented("\(Self.self).deleteProfileSnapshot is unimplemented"),
 		getAccounts: XCTUnimplemented("\(Self.self).getAccounts is unimplemented"),
 		getAppPreferences: XCTUnimplemented("\(Self.self).getAppPreferences is unimplemented"),
-		setDisplayAppPreferences: XCTUnimplemented("\(Self.self).setDisplayAppPreferences is unimplemented")
+		setDisplayAppPreferences: XCTUnimplemented("\(Self.self).setDisplayAppPreferences is unimplemented"),
+		createAccountWithKeychainClient: XCTUnimplemented("\(Self.self).createAccountWithKeychainClient is unimplemented")
 	)
 }
 #endif

@@ -12,7 +12,7 @@ import Foundation
 public enum WalletClientKey: DependencyKey {}
 public extension WalletClientKey {
 	typealias Value = WalletClient
-	static let liveValue = WalletClient.mock()
+	static let liveValue = WalletClient.live
 	static let testValue = WalletClient.mock()
 }
 
