@@ -1,6 +1,6 @@
-import Address
 import Common
 import Foundation
+import Profile
 
 // MARK: - AccountCompletion.State
 public extension AccountCompletion {
@@ -39,7 +39,7 @@ public extension AccountCompletion.State {
 public extension AccountCompletion.State {
 	static let placeholder: Self = .init(
 		accountName: "My main account",
-		accountAddress: .random,
+		accountAddress: .account(.init(address: "some_account_address")),
 		origin: .home
 	)
 }

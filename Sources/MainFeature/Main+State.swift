@@ -13,7 +13,7 @@ public extension Main {
 		public var settings: Settings.State?
 
 		public init(
-			home: Home.State,
+			home: Home.State = .init(),
 			settings: Settings.State? = nil
 		) {
 			self.home = home

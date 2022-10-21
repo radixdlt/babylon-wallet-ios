@@ -1,5 +1,4 @@
 import AccountListFeature
-import Address
 import AggregatedValueFeature
 import Asset
 import AssetsViewFeature
@@ -16,35 +15,54 @@ public enum AccountDetails {}
 public extension AccountDetails {
 	// MARK: State
 	struct State: Equatable {
-		public let account: Profile.Account
-		public let address: Address
+		public let account: OnNetwork.Account
 		public var aggregatedValue: AggregatedValue.State
-		public let name: String
 		public var assets: AssetsView.State
 
 		public init(for account: AccountList.Row.State) {
 			self.account = account.account
-			address = account.address
+
 			aggregatedValue = .init(
 				value: account.aggregatedValue,
 				currency: account.currency,
 				isCurrencyAmountVisible: account.isCurrencyAmountVisible
 			)
-			name = account.name
 
 			let fungibleTokenCategories = FungibleTokenListSorter.live.sortTokens(account.portfolio.fungibleTokenContainers)
+
 			assets = .init(
 				fungibleTokenList: .init(
 					sections: .init(uniqueElements: fungibleTokenCategories.map { category in
-						let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: account.currency, isCurrencyAmountVisible: account.isCurrencyAmountVisible) }
-						return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
+						let rows = category.tokenContainers.map { container in
+							FungibleTokenList.Row.State(
+								container: container,
+								currency: account.currency,
+								isCurrencyAmountVisible: account.isCurrencyAmountVisible
+							)
+						}
+						return FungibleTokenList.Section.State(
+							id: category.type,
+							assets: .init(uniqueElements: rows)
+						)
 					})
-				), nonFungibleTokenList: .init(
+				),
+
+				nonFungibleTokenList: .init(
 					rows: .init(uniqueElements: [account.portfolio.nonFungibleTokenContainers].map {
 						.init(containers: $0)
 					})
 				)
 			)
 		}
+	}
+}
+
+public extension AccountDetails.State {
+	var address: AccountAddress {
+		account.address
+	}
+
+	var displayName: String {
+		account.displayName ?? "Unnamed account"
 	}
 }

@@ -1,6 +1,7 @@
 import Asset
 import Common
 import Foundation
+import Profile
 
 // MARK: - FungibleTokenList.Row
 /// Namespace for Row

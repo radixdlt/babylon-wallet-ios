@@ -38,37 +38,6 @@ public extension Main.View {
 	}
 }
 
-// MARK: - Main.View.ViewState
-extension Main.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		public var profileName: String
-
-		init(state _: Main.State) {
-//			profileName = state.wallet.profile.name
-			// FIXME: wallet
-			profileName = "placeholder"
-		}
-	}
-}
-
-// MARK: - Main.View.ViewAction
-extension Main.View {
-	// MARK: ViewAction
-	enum ViewAction {
-		case removeWalletButtonPressed
-	}
-}
-
-extension Main.Action {
-	init(action: Main.View.ViewAction) {
-		switch action {
-		case .removeWalletButtonPressed:
-			self = .internal(.user(.removeWallet))
-		}
-	}
-}
-
 // MARK: - MainView_Previews
 struct MainView_Previews: PreviewProvider {
 	static var previews: some View {
@@ -79,8 +48,9 @@ struct MainView_Previews: PreviewProvider {
 				environment: .init(
 					accountPortfolioFetcher: .mock,
 					appSettingsClient: .mock,
+					keychainClient: .unimplemented,
 					pasteboardClient: .noop,
-					walletRemover: .mock
+					profileClient: .unimplemented
 				)
 			)
 		)

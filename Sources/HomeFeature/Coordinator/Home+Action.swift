@@ -2,11 +2,13 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import Address
 import AggregatedValueFeature
+import Collections
 import Common
 import CreateAccountFeature
 import Foundation
+import NonEmpty
+import Profile
 
 // MARK: - Home.Action
 public extension Home {
@@ -31,6 +33,7 @@ public extension Home.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
 		case system(SystemAction)
+		case coordinate(InternalCoordinateAction)
 	}
 }
 
@@ -45,6 +48,8 @@ public extension Home.Action.InternalAction {
 public extension Home.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
+		case loadAccountsAndSettings
+		case accountsLoaded(NonEmpty<OrderedSet<OnNetwork.Account>>)
 		case currencyLoaded(FiatCurrency)
 		case toggleIsCurrencyAmountVisible
 		case isCurrencyAmountVisibleLoaded(Bool)
@@ -53,6 +58,10 @@ public extension Home.Action.InternalAction {
 		case copyAddress(Address)
 		case viewDidAppearActionFailed(reason: String)
 		case toggleIsCurrencyAmountVisibleFailed(reason: String)
+	}
+
+	enum InternalCoordinateAction: Equatable {
+		case createAccount(numberOfExistingAccounts: Int)
 	}
 }
 

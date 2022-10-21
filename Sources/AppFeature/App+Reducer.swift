@@ -17,8 +17,9 @@ public extension App {
 					Main.Environment(
 						accountPortfolioFetcher: $0.accountPortfolioFetcher,
 						appSettingsClient: $0.appSettingsClient,
+						keychainClient: $0.keychainClient,
 						pasteboardClient: $0.pasteboardClient,
-						walletRemover: $0.walletRemover
+						profileClient: $0.profileClient
 					)
 				}
 			),
@@ -31,8 +32,8 @@ public extension App {
 				environment: {
 					Onboarding.Environment(
 						backgroundQueue: $0.backgroundQueue,
-						mainQueue: $0.mainQueue,
-						userDefaultsClient: $0.userDefaultsClient
+						keychainClient: $0.keychainClient,
+						mainQueue: $0.mainQueue
 					)
 				}
 			),
@@ -46,8 +47,7 @@ public extension App {
 					Splash.Environment(
 						backgroundQueue: $0.backgroundQueue,
 						mainQueue: $0.mainQueue,
-						profileLoader: $0.profileLoader,
-						walletLoader: $0.walletLoader
+						profileLoader: $0.profileLoader
 					)
 				}
 			),
@@ -56,38 +56,52 @@ public extension App {
 	)
 	// .debug()
 
-	static let appReducer = Reducer { state, action, _ in
+	static let appReducer = Reducer { state, action, environment in
 		switch action {
 		case .main(.coordinate(.removedWallet)):
 			state = .onboarding(.init())
 			return Effect(value: .coordinate(.onboard))
-		case .main:
-			return .none
-		case let .onboarding(.coordinate(.onboardedWithWallet(wallet))):
-			return Effect(value: .coordinate(.toMain(wallet)))
-		case .onboarding:
-			return .none
-		case let .splash(.coordinate(.loadWalletResult(loadWalletResult))):
-			switch loadWalletResult {
-			case let .walletLoaded(wallet):
-				return Effect(value: .coordinate(.toMain(wallet)))
-			case let .noWallet(reason, failedToDecode):
-				if failedToDecode {
-					print("Fix this, failed to load wallet: \(reason)")
-					return .none
-				} else {
-					return .run { send in
-						await send(.coordinate(.onboard))
-					}
+
+		case let .onboarding(.coordinate(.onboardedWithProfile(profile))):
+			return .run { send in
+				await send(.internal(.injectProfileIntoWalletClient(profile)))
+			}
+
+		case let .splash(.coordinate(.loadProfileResult(.profileLoaded(profile)))):
+			return .run { send in
+				await send(.internal(.injectProfileIntoWalletClient(profile)))
+			}
+		case let .splash(.coordinate(.loadProfileResult(.noProfile(reason, failedToDecode)))):
+			if failedToDecode {
+				print("Fix this, failed to load wallet: \(reason)")
+				return .none
+			} else {
+				return .run { send in
+					await send(.coordinate(.onboard))
 				}
 			}
-		case .splash:
-			return .none
+
+		case let .internal(.injectProfileIntoWalletClient(profile)):
+			return .run { send in
+				environment.profileClient.injectProfile(profile)
+				await send(.coordinate(.toMain))
+			}
+
 		case .coordinate(.onboard):
 			state = .onboarding(.init())
 			return .none
-		case let .coordinate(.toMain(wallet)):
-			state = .main(.init(home: .init(justA: wallet)))
+
+		case .coordinate(.toMain):
+			state = .main(.init())
+			return .none
+
+		case .main:
+			return .none
+
+		case .onboarding:
+			return .none
+
+		case .splash:
 			return .none
 		}
 	}

@@ -1,5 +1,4 @@
 import AccountPortfolio
-import Address
 import Asset
 import Common
 import Foundation
@@ -15,9 +14,7 @@ public extension AccountList {
 public extension AccountList.Row {
 	// MARK: State
 	struct State: Equatable {
-		public let account: Profile.Account
-		public let name: String
-		public let address: Address
+		public let account: OnNetwork.Account
 		public var aggregatedValue: Float?
 		public var portfolio: AccountPortfolio
 
@@ -26,17 +23,13 @@ public extension AccountList.Row {
 		public var isCurrencyAmountVisible: Bool
 
 		public init(
-			account: Profile.Account,
-			name: String,
-			address: String,
+			account: OnNetwork.Account,
 			aggregatedValue: Float?,
 			portfolio: AccountPortfolio,
 			currency: FiatCurrency,
 			isCurrencyAmountVisible: Bool
 		) {
 			self.account = account
-			self.name = name
-			self.address = address
 			self.aggregatedValue = aggregatedValue
 			self.portfolio = portfolio
 			self.currency = currency
@@ -47,11 +40,9 @@ public extension AccountList.Row {
 
 // MARK: - Convenience
 public extension AccountList.Row.State {
-	init(account: Profile.Account) {
+	init(account: OnNetwork.Account) {
 		self.init(
 			account: account,
-			name: account.name,
-			address: account.address,
 			aggregatedValue: nil,
 			portfolio: .empty,
 			currency: .usd,
@@ -62,15 +53,16 @@ public extension AccountList.Row.State {
 
 // MARK: - AccountList.Row.State + Identifiable
 extension AccountList.Row.State: Identifiable {
-	public typealias ID = Address
-	public var id: Address { address }
+	public typealias ID = AccountAddress
+	public var id: ID { address }
+	public var address: AccountAddress {
+		account.address
+	}
 }
 
 #if DEBUG
+import ProfileClient
 public extension AccountList.Row.State {
-	static let placeholder: Self = .init(
-		account: .init(address: Address(),
-		               name: "My account")
-	)
+	static let placeholder: Self = try! Self(account: ProfileClient.mock().getAccounts().first)
 }
 #endif

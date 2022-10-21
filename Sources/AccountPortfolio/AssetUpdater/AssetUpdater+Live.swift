@@ -1,5 +1,6 @@
 import AppSettings
 import Asset
+import Profile
 
 public extension AssetUpdater {
 	static let live: Self = {

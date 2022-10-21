@@ -1,4 +1,4 @@
-import Address
+import Profile
 
 // MARK: - AccountPortfolioFetcher
 public struct AccountPortfolioFetcher {
@@ -13,5 +13,5 @@ public struct AccountPortfolioFetcher {
 
 // MARK: AccountPortfolioFetcher.FetchPortfolio
 public extension AccountPortfolioFetcher {
-	typealias FetchPortfolio = @Sendable ([Address]) async throws -> AccountPortfolioDictionary
+	typealias FetchPortfolio = @Sendable ([AccountAddress]) async throws -> AccountPortfolioDictionary
 }

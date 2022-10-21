@@ -1,6 +1,7 @@
 import ComposableArchitecture
+import Mnemonic
 import Profile
-import Wallet
+import ProfileClient
 
 public extension Onboarding {
 	// MARK: Reducer
@@ -9,23 +10,37 @@ public extension Onboarding {
 		switch action {
 		case .coordinate:
 			return .none
-		case .internal(.user(.createWallet)):
-			return Effect(value: .internal(.system(.createWallet)))
-		case .internal(.system(.createWallet)):
-			precondition(state.canProceed)
-			let profile = try! Profile(name: state.profileName)
-			// FIXME: insert right mnemonic
-			let wallet: Wallet = .init(profile: profile, deviceFactorTypeMnemonic: "")
-			let name = state.profileName
+		case .internal(.user(.createProfile)):
 			return .run { send in
-				await environment.userDefaultsClient.setProfileName(name)
-				await send(.internal(.system(.createdWallet(wallet))))
+				await send(.internal(.system(.createProfile)))
 			}
+		case .internal(.system(.createProfile)):
+			precondition(state.canProceed)
+			return .run { [nameOfFirstAccount = state.nameOfFirstAccount] send in
+				let curve25519FactorSourceMnemonic = try environment.mnemonicGenerator(BIP39.WordCount.twentyFour, BIP39.Language.english)
 
-		case let .internal(.system(.createdWallet(wallet))):
-			return Effect(value: .coordinate(.onboardedWithWallet(wallet)))
+				let newProfile = try await Profile.new(
+					mnemonic: curve25519FactorSourceMnemonic,
+					firstAccountDisplayName: nameOfFirstAccount
+				)
+
+				let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
+
+				try environment.keychainClient.saveFactorSource(
+					mnemonic: curve25519FactorSourceMnemonic,
+					reference: curve25519FactorSourceReference
+				)
+
+				try environment.keychainClient.saveProfile(profile: newProfile)
+
+				await send(.internal(.system(.createdProfile(newProfile))))
+			}
+		case let .internal(.system(.createdProfile(profile))):
+			return .run { send in
+				await send(.coordinate(.onboardedWithProfile(profile)))
+			}
 		case .binding:
-			state.canProceed = !state.profileName.isEmpty
+			state.canProceed = !state.nameOfFirstAccount.isEmpty
 			return .none
 		}
 	}

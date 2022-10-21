@@ -1,5 +1,6 @@
 import Common
 import Foundation
+import Profile
 import UserDefaultsClient
 
 // MARK: - AppSettingsClient

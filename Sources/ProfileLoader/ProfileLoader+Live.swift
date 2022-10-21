@@ -1,21 +1,15 @@
+import Foundation
+import KeychainClient
 import Profile
-import UserDefaultsClient
 
 public extension ProfileLoader {
 	static func live(
-		userDefaultsClient: UserDefaultsClient
+		keychainClient: KeychainClient,
+		jsonDecoder: JSONDecoder = .iso8601
 	) -> Self {
 		Self(
 			loadProfile: {
-				guard let profileName = userDefaultsClient.profileName else {
-					struct NoProfileFoundInUserDefaults: Swift.Error {}
-					throw NoProfileFoundInUserDefaults()
-				}
-				do {
-					return try Profile(name: profileName)
-				} catch {
-					throw Self.Error.failedToDecode
-				}
+				try keychainClient.loadProfile(jsonDecoder: jsonDecoder)
 			}
 		)
 	}

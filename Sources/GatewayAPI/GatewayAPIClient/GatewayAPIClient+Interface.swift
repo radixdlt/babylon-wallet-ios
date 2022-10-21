@@ -1,16 +1,8 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-10-11.
-//
-
 import Common
 import CryptoKit
 import Foundation
 import Profile
 
-public typealias AccountAddress = Profile.Account.Address
 public typealias ResourceIdentifier = String
 
 // MARK: - GatewayAPIClient

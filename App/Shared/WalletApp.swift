@@ -1,6 +1,8 @@
 import AppFeature
 import ComposableArchitecture
 import DesignSystem
+import KeychainClient
+import ProfileClient
 import SwiftUI
 import UserDefaultsClient
 
@@ -8,18 +10,18 @@ typealias App = AppFeature.App
 
 public extension App.Environment {
 	static let live: Self = {
-		let userDefaultsClient: UserDefaultsClient = .live()
+		let keychainClient = KeychainClient.live
 
 		return Self(
 			backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
 			mainQueue: .main,
 			appSettingsClient: .live(),
 			accountPortfolioFetcher: .live(),
+			keychainClient: keychainClient,
 			pasteboardClient: .live(),
-			profileLoader: .live(userDefaultsClient: userDefaultsClient),
-			userDefaultsClient: userDefaultsClient,
-			walletLoader: .live,
-			walletRemover: .live()
+			profileLoader: .live(keychainClient: keychainClient),
+			userDefaultsClient: .live(),
+			profileClient: .live
 		)
 	}()
 }
@@ -42,13 +44,9 @@ struct WalletApp: SwiftUI.App {
 	var body: some Scene {
 		WindowGroup {
 			App.View(store: store)
-
 			#if os(macOS)
 				.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
 			#endif
-
-			// FIXME: Move to Settings
-			// Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
 		}
 	}
 }

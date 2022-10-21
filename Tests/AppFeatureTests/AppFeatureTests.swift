@@ -1,8 +1,9 @@
 @testable import AppFeature
 import ComposableArchitecture
+import OnboardingFeature
+import Profile
 import SplashFeature
 import TestUtils
-import Wallet
 
 @MainActor
 final class AppFeatureTests: TestCase {
@@ -29,50 +30,69 @@ final class AppFeatureTests: TestCase {
 		store.receive(.coordinate(.onboard))
 	}
 
-	func test_onboardedWithWallet_whenWalletCreatedSuccessfullyInOnbnoarding_thenNavigateToMainScreen() {
-		// given
-		let initialState = App.State.onboarding(.init())
-		let wallet = Wallet.placeholder
+	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_walletClient_and_we_navigate_to_main() async throws {
+		var environment: App.Environment = .unimplemented
+		let newProfile = try await Profile.new(mnemonic: .generate())
+		environment.profileClient.injectProfile = {
+			XCTAssertEqual($0, newProfile) // assert correct profile is injected
+		}
 		let store = TestStore(
-			initialState: initialState,
+			// GIVEN: No profile (Onboarding)
+			initialState: .onboarding(.init()),
 			reducer: App.reducer,
-			environment: .unimplemented
+			environment: environment
 		)
 
-		// when
-		store.send(.onboarding(.coordinate(.onboardedWithWallet(wallet))))
+		// WHEN: a new profile is created
+		_ = await store.send(.onboarding(.internal(.system(.createdProfile(newProfile)))))
+		_ = await store.receive(.onboarding(.coordinate(.onboardedWithProfile(newProfile))))
 
-		// then
-		store.receive(.coordinate(.toMain(wallet))) {
-			$0 = .main(.init(home: .init(justA: wallet)))
+		// THEN: it is injected into ProfileClient...
+		_ = await store.receive(.internal(.injectProfileIntoWalletClient(newProfile)))
+
+		// THEN: ... and we navigate to main
+		await store.receive(.coordinate(.toMain)) {
+			$0 = .main(.init())
 		}
 	}
 
-	func test_loadWalletResult_whenWalletLoadedSuccessfullyInSplash_thenNavigateToMainScreen() {
-		// given
-		let initialState = App.State.splash(.init())
-		let wallet = Wallet.placeholder
-		let loadWalletResult = SplashLoadWalletResult.walletLoaded(wallet)
+	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__it_is_injected_into_walletClient_and_we_navigate_to_main() async throws {
+		// GIVEN: an existing profile
+		let existingProfile = try await Profile.new(mnemonic: .generate())
+
+		let testScheduler = DispatchQueue.test
+		var environment: App.Environment = .unimplemented
+		environment.mainQueue = testScheduler.eraseToAnyScheduler()
+		environment.profileClient.injectProfile = {
+			XCTAssertEqual($0, existingProfile) // assert correct profile is injected
+		}
 		let store = TestStore(
-			initialState: initialState,
+			initialState: .splash(.init()),
 			reducer: App.reducer,
-			environment: .unimplemented
+			environment: environment
 		)
 
-		// when
-		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
+		// WHEN: existing profile is loaded
+		_ = await store.send(.splash(.internal(.system(.loadProfileResult(.success(existingProfile))))))
 
-		// then
-		store.receive(.coordinate(.toMain(wallet))) {
-			$0 = .main(.init(home: .init(justA: wallet)))
+		_ = await store.receive(.splash(.internal(.coordinate(.loadProfileResult(.profileLoaded(existingProfile))))))
+
+		await testScheduler.advance(by: .milliseconds(110))
+		_ = await store.receive(.splash(.coordinate(.loadProfileResult(.profileLoaded(existingProfile)))))
+
+		// THEN: it is injected into ProfileClient...
+		_ = await store.receive(.internal(.injectProfileIntoWalletClient(existingProfile)))
+		// THEN: ... and we navigate to main
+		await store.receive(.coordinate(.toMain)) {
+			$0 = .main(.init())
 		}
 	}
 
-	func test_loadWalletResult_whenWalletLoadingFailedBecauseDecodingError_thenDoNothingForNow() {
+	func test_loadWalletResult_whenWalletLoadingFailedBecauseDecodingError_thenDoNothingForNow() async throws {
 		// given
 		let initialState = App.State.splash(.init())
 		let reason = "Failed to decode wallet"
-		let loadWalletResult = SplashLoadWalletResult.noWallet(reason: reason, failedToDecode: true)
+		let loadProfileResult = SplashLoadProfileResult.noProfile(reason: reason, failedToDecode: true)
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
@@ -80,7 +100,7 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
+		_ = await store.send(.splash(.coordinate(.loadProfileResult(loadProfileResult))))
 
 		// then
 		// do nothing for now, no state change occured
@@ -90,7 +110,7 @@ final class AppFeatureTests: TestCase {
 		// given
 		let initialState = App.State.splash(.init())
 		let reason = "Failed to load profile"
-		let loadWalletResult = SplashLoadWalletResult.noWallet(reason: reason, failedToDecode: false)
+		let loadProfileResult = SplashLoadProfileResult.noProfile(reason: reason, failedToDecode: false)
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
@@ -98,7 +118,7 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.splash(.coordinate(.loadWalletResult(loadWalletResult))))
+		_ = await store.send(.splash(.coordinate(.loadProfileResult(loadProfileResult))))
 
 		// then
 		await store.receive(.coordinate(.onboard)) {

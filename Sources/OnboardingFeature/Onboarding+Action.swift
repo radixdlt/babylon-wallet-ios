@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import Wallet
+import Profile
 
 // MARK: - Onboarding.Action
 public extension Onboarding {
@@ -14,7 +14,7 @@ public extension Onboarding {
 // MARK: - Onboarding.Action.CoordinatingAction
 public extension Onboarding.Action {
 	enum CoordinatingAction: Equatable {
-		case onboardedWithWallet(Wallet)
+		case onboardedWithProfile(Profile)
 	}
 }
 
@@ -29,14 +29,14 @@ public extension Onboarding.Action {
 // MARK: - Onboarding.Action.InternalAction.UserAction
 public extension Onboarding.Action.InternalAction {
 	enum UserAction: Equatable {
-		case createWallet
+		case createProfile
 	}
 }
 
 // MARK: - Onboarding.Action.InternalAction.SystemAction
 public extension Onboarding.Action.InternalAction {
 	enum SystemAction: Equatable {
-		case createWallet
-		case createdWallet(Wallet)
+		case createProfile
+		case createdProfile(Profile)
 	}
 }

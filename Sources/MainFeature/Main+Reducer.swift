@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import HomeFeature
+import Profile
 import SettingsFeature
 
 #if os(iOS)
@@ -18,6 +19,7 @@ public extension Main {
 				action: /Main.Action.home,
 				environment: {
 					Home.Environment(
+						profileClient: $0.profileClient,
 						appSettingsClient: $0.appSettingsClient,
 						accountPortfolioFetcher: $0.accountPortfolioFetcher,
 						pasteboardClient: $0.pasteboardClient
@@ -30,25 +32,26 @@ public extension Main {
 			.pullback(
 				state: \.settings,
 				action: /Main.Action.settings,
-				environment: { _ in
-					Settings.Environment()
+				environment: {
+					Settings.Environment(
+						keychainClient: $0.keychainClient,
+						profileClient: $0.profileClient
+					)
 				}
 			),
 
 		Reducer { state, action, environment in
 			switch action {
-			case .internal(.user(.removeWallet)):
-				return Effect(value: .internal(.system(.removedWallet)))
-
-			case .internal(.system(.removedWallet)):
-				return .run { send in
-					await environment.walletRemover.removeWallet()
-					await send(.coordinate(.removedWallet))
-				}
-
 			case .home(.coordinate(.displaySettings)):
 				state.settings = .init()
 				return .none
+
+			case .settings(.coordinate(.deleteProfileAndFactorSources)):
+				return .run { send in
+					try environment.keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+					try environment.profileClient.deleteProfileSnapshot()
+					await send(.coordinate(.removedWallet))
+				}
 
 			case .settings(.coordinate(.dismissSettings)):
 				state.settings = nil

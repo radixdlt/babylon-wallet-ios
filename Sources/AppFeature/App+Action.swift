@@ -1,7 +1,7 @@
 import MainFeature
 import OnboardingFeature
+import Profile
 import SplashFeature
-import Wallet
 
 // MARK: - App.Action
 public extension App {
@@ -11,6 +11,7 @@ public extension App {
 		case onboarding(Onboarding.Action)
 		case splash(Splash.Action)
 
+		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
 	}
 }
@@ -19,6 +20,10 @@ public extension App {
 public extension App.Action {
 	enum CoordinatingAction: Equatable {
 		case onboard
-		case toMain(Wallet)
+		case toMain
+	}
+
+	enum InternalAction: Equatable {
+		case injectProfileIntoWalletClient(Profile)
 	}
 }

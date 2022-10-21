@@ -51,7 +51,7 @@ extension AccountList.Action {
 	init(action: AccountList.View.ViewAction) {
 		switch action {
 		case .viewDidAppear:
-			self = .internal(.user(.loadAccounts))
+			self = .internal(.system(.fetchPortfolioForAccounts))
 		}
 	}
 }

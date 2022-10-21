@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Profile
 
 // MARK: - CreateAccount.Action
 public extension CreateAccount {
@@ -20,7 +21,8 @@ public extension CreateAccount.Action {
 // MARK: - CreateAccount.Action.InternalAction.UserAction
 public extension CreateAccount.Action.InternalAction {
 	enum UserAction: Equatable {
-		case closeButtonTapped
+		case dismiss
+		case createAccount
 		case textFieldDidChange(String)
 		case textFieldDidFocus
 	}
@@ -31,6 +33,7 @@ public extension CreateAccount.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
 		case focusTextField
+		case createdNewAccount(OnNetwork.Account)
 	}
 }
 
@@ -38,5 +41,6 @@ public extension CreateAccount.Action.InternalAction {
 public extension CreateAccount.Action {
 	enum CoordinatingAction: Equatable {
 		case dismissCreateAccount
+		case createdNewAccount(OnNetwork.Account)
 	}
 }

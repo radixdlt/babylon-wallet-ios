@@ -2,46 +2,46 @@ import AccountPortfolio
 import AppSettings
 import ComposableArchitecture
 import Foundation
+import KeychainClient
 import PasteboardClient
+import ProfileClient
 import ProfileLoader
 import UserDefaultsClient
-import WalletLoader
-import WalletRemover
 
 // MARK: - App.Environment
 public extension App {
 	// MARK: Environment
 	struct Environment {
 		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
-		public let mainQueue: AnySchedulerOf<DispatchQueue>
+		public var mainQueue: AnySchedulerOf<DispatchQueue>
 		public let appSettingsClient: AppSettingsClient
 		public let accountPortfolioFetcher: AccountPortfolioFetcher
+		public let keychainClient: KeychainClient
 		public let pasteboardClient: PasteboardClient
 		public let profileLoader: ProfileLoader
 		public let userDefaultsClient: UserDefaultsClient
-		public let walletLoader: WalletLoader
-		public let walletRemover: WalletRemover
+		public var profileClient: ProfileClient
 
 		public init(
 			backgroundQueue: AnySchedulerOf<DispatchQueue>,
 			mainQueue: AnySchedulerOf<DispatchQueue>,
 			appSettingsClient: AppSettingsClient,
 			accountPortfolioFetcher: AccountPortfolioFetcher,
+			keychainClient: KeychainClient,
 			pasteboardClient: PasteboardClient,
 			profileLoader: ProfileLoader,
 			userDefaultsClient: UserDefaultsClient,
-			walletLoader: WalletLoader,
-			walletRemover: WalletRemover
+			profileClient: ProfileClient
 		) {
 			self.backgroundQueue = backgroundQueue
 			self.mainQueue = mainQueue
 			self.appSettingsClient = appSettingsClient
 			self.accountPortfolioFetcher = accountPortfolioFetcher
+			self.keychainClient = keychainClient
 			self.pasteboardClient = pasteboardClient
 			self.profileLoader = profileLoader
 			self.userDefaultsClient = userDefaultsClient
-			self.walletLoader = walletLoader
-			self.walletRemover = walletRemover
+			self.profileClient = profileClient
 		}
 	}
 }
@@ -53,11 +53,11 @@ public extension App.Environment {
 		mainQueue: .immediate,
 		appSettingsClient: .mock,
 		accountPortfolioFetcher: .mock,
+		keychainClient: .unimplemented,
 		pasteboardClient: .noop,
-		profileLoader: .noop,
+		profileLoader: .unimplemented,
 		userDefaultsClient: .noop,
-		walletLoader: .noop,
-		walletRemover: .noop
+		profileClient: .unimplemented
 	)
 
 	static let unimplemented = Self(
@@ -65,11 +65,11 @@ public extension App.Environment {
 		mainQueue: .unimplemented,
 		appSettingsClient: .unimplemented,
 		accountPortfolioFetcher: .unimplemented,
+		keychainClient: .unimplemented,
 		pasteboardClient: .unimplemented,
 		profileLoader: .unimplemented,
 		userDefaultsClient: .unimplemented,
-		walletLoader: .unimplemented,
-		walletRemover: .unimplemented
+		profileClient: .unimplemented
 	)
 }
 #endif

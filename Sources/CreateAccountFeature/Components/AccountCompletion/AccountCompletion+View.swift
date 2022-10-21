@@ -1,7 +1,7 @@
-import Address
 import Common
 import ComposableArchitecture
 import DesignSystem
+import Profile
 import SwiftUI
 
 // MARK: - AccountCompletion.View
@@ -44,7 +44,7 @@ public extension AccountCompletion.View {
 						.multilineTextAlignment(.center)
 
 					HStack {
-						Text(viewStore.accountAddress)
+						Text(viewStore.accountAddress.address)
 							.foregroundColor(.app.buttonTextBlack.opacity(0.6))
 							.textStyle(.body2Regular)
 

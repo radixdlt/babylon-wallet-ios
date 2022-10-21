@@ -4,6 +4,8 @@ import TestUtils
 
 @MainActor
 final class CreateAccountFeatureTests: TestCase {
+	let testScheduler = DispatchQueue.test
+
 	func test_closeButtonTapped_whenTappedOnCloseButton_thenCoordinateDismissal() async {
 		// given
 		let initialState = CreateAccount.State()
@@ -64,7 +66,6 @@ final class CreateAccountFeatureTests: TestCase {
 
 	func test_viewDidAppear_whenViewAppears_thenFocusOnTextFieldAfterDelay() async {
 		// given
-		let mainQueue = DispatchQueue.test
 		let initialState = CreateAccount.State(
 			accountName: "",
 			isValid: false,
@@ -75,13 +76,13 @@ final class CreateAccountFeatureTests: TestCase {
 			reducer: CreateAccount()
 		)
 
-		store.dependencies.mainQueue = mainQueue.eraseToAnyScheduler()
+		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 
 		// when
 		_ = await store.send(.internal(.system(.viewDidAppear)))
 
 		// then
-		await mainQueue.advance(by: .seconds(0.5))
+		await testScheduler.advance(by: .seconds(0.5))
 		await store.receive(.internal(.system(.focusTextField))) {
 			$0.focusedField = .accountName
 		}

@@ -8,6 +8,16 @@ let tca: Target.Dependency = .product(
 	package: "swift-composable-architecture"
 )
 
+let profile: Target.Dependency = .product(
+	name: "Profile",
+	package: "swift-profile"
+)
+
+let keychainClient: Target.Dependency = .product(
+	name: "KeychainClient",
+	package: "swift-profile"
+)
+
 let bigInt: Target.Dependency = .product(
 	name: "BigInt",
 	package: "BigInt"
@@ -44,6 +54,8 @@ let package = Package(
 		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
 		// BigInt
 		.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
+
+		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.18"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
@@ -54,11 +66,10 @@ let package = Package(
 			name: "AccountDetailsFeature",
 			dependencies: [
 				"AccountListFeature",
-				"Address",
 				"AggregatedValueFeature",
 				"Asset",
 				"AssetsViewFeature",
-				"Profile",
+				profile,
 				tca,
 			]
 		),
@@ -73,10 +84,9 @@ let package = Package(
 			name: "AccountListFeature",
 			dependencies: [
 				"AccountPortfolio",
-				"Address",
 				"Asset",
 				"FungibleTokenListFeature",
-				"Profile",
+				profile,
 				tca,
 			]
 		),
@@ -90,7 +100,7 @@ let package = Package(
 		.target(
 			name: "AccountPortfolio",
 			dependencies: [
-				"Address",
+				profile,
 				"AppSettings",
 				"Asset",
 				"GatewayAPI",
@@ -108,6 +118,7 @@ let package = Package(
 		.target(
 			name: "AccountPreferencesFeature",
 			dependencies: [
+				"Common",
 				tca,
 			]
 		),
@@ -119,20 +130,9 @@ let package = Package(
 			]
 		),
 		.target(
-			name: "Address",
-			dependencies: [
-			]
-		),
-		.testTarget(
-			name: "AddressTests",
-			dependencies: [
-				"Address",
-				"TestUtils",
-			]
-		),
-		.target(
 			name: "AggregatedValueFeature",
 			dependencies: [
+				"Common",
 				tca,
 			]
 		),
@@ -156,9 +156,7 @@ let package = Package(
 				"SplashFeature",
 				tca,
 				"UserDefaultsClient",
-				"Wallet",
-				"WalletLoader",
-				"WalletRemover",
+				"ProfileClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -168,7 +166,7 @@ let package = Package(
 				"AppFeature",
 				"SplashFeature",
 				"TestUtils",
-				"Wallet",
+				"ProfileClient",
 			]
 		),
 		.target(
@@ -188,8 +186,8 @@ let package = Package(
 		.target(
 			name: "Asset",
 			dependencies: [
-				"Address",
 				"Common",
+				profile, // Address
 				bigInt,
 			]
 		),
@@ -220,7 +218,7 @@ let package = Package(
 		.target(
 			name: "Common",
 			dependencies: [
-				"Address",
+				profile, // Address
 				bigInt,
 				"DesignSystem",
 			]
@@ -235,10 +233,12 @@ let package = Package(
 		.target(
 			name: "CreateAccountFeature",
 			dependencies: [
-				"Address",
-				"DesignSystem",
 				"Common",
+				"DesignSystem",
+				keychainClient,
+				profile,
 				tca,
+				"ProfileClient",
 			]
 		),
 		.testTarget(
@@ -278,7 +278,7 @@ let package = Package(
 			dependencies: [
 				"Asset",
 				"Common",
-				"Profile", // address
+				profile, // address
 				tca, // XCTestDynamicOverlay + DependencyKey
 			],
 			exclude: [
@@ -300,28 +300,23 @@ let package = Package(
 				"AccountDetailsFeature",
 				"AccountPortfolio",
 				"AccountPreferencesFeature",
-				"Address",
+				profile,
 				"AppSettings",
 				"Common",
 				"CreateAccountFeature",
 				"PasteboardClient",
 				tca,
-				"Wallet",
+				"ProfileClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
 		.testTarget(
 			name: "HomeFeatureTests",
 			dependencies: [
-				"AccountDetailsFeature",
-				"AccountPortfolio",
-				"AccountListFeature",
-				"Address",
 				"Asset",
 				"FungibleTokenListFeature",
 				"HomeFeature",
 				"NonFungibleTokenListFeature",
-				"Profile",
 				"TestUtils",
 			]
 		),
@@ -346,7 +341,6 @@ let package = Package(
 				"PasteboardClient",
 				"SettingsFeature",
 				tca,
-				"WalletRemover",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -355,7 +349,6 @@ let package = Package(
 			dependencies: [
 				"MainFeature",
 				"TestUtils",
-				"WalletRemover",
 			]
 		),
 		.target(
@@ -378,10 +371,10 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
-				"Profile",
+				profile,
 				tca,
 				"UserDefaultsClient", // replace with `ProfileCreator`
-				"Wallet",
+				"ProfileClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -422,23 +415,10 @@ let package = Package(
 			]
 		),
 		.target(
-			name: "Profile",
-			dependencies: [
-				"Address",
-			]
-		),
-		.testTarget(
-			name: "ProfileTests",
-			dependencies: [
-				"Profile",
-				"TestUtils",
-			]
-		),
-		.target(
 			name: "ProfileLoader",
 			dependencies: [
-				"Profile",
-				"UserDefaultsClient",
+				profile,
+				keychainClient,
 			]
 		),
 		.testTarget(
@@ -453,6 +433,10 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
+				profile,
+				.product(name: "ProfileView", package: "swift-profile"),
+				keychainClient,
+				"ProfileClient",
 				tca,
 				// ^^^ Sort lexicographically ^^^
 			]
@@ -469,11 +453,10 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
-				"Profile",
+				profile,
 				"ProfileLoader",
 				tca,
-				"Wallet",
-				"WalletLoader",
+				"ProfileClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -488,6 +471,7 @@ let package = Package(
 			name: "TestUtils",
 			dependencies: [
 				"Common",
+				profile, // Actually `Mnemonic`, Contains Data+Hex extension. FIXME: Extract Data+Hex functions to seperate repo, which Mnemonic and thus this TestUtils package can depend on.
 				tca,
 			]
 		),
@@ -505,47 +489,18 @@ let package = Package(
 			]
 		),
 		.target(
-			name: "Wallet",
+			name: "ProfileClient",
 			dependencies: [
-				"Profile",
+				profile,
+				"ProfileLoader",
+				tca, // XCTestDynamicOverlay + DependencyKey
 			]
 		),
 		.testTarget(
-			name: "WalletTests",
+			name: "ProfileClientTests",
 			dependencies: [
-				"Wallet",
+				"ProfileClient",
 				"TestUtils",
-			]
-		),
-		.target(
-			name: "WalletLoader",
-			dependencies: [
-				"Profile",
-				"Wallet",
-				tca,
-			]
-		),
-		.testTarget(
-			name: "WalletLoaderTests",
-			dependencies: [
-				"WalletLoader",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "WalletRemover",
-			dependencies: [
-				"UserDefaultsClient",
-				tca,
-			]
-		),
-		.testTarget(
-			name: "WalletRemoverTests",
-			dependencies: [
-				"UserDefaultsClient",
-				"TestUtils",
-				"WalletRemover",
-				tca,
 			]
 		),
 	]

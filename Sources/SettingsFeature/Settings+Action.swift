@@ -1,4 +1,5 @@
 import Foundation
+import Profile
 
 // MARK: - Settings.Action
 public extension Settings {
@@ -12,16 +13,29 @@ public extension Settings {
 public extension Settings.Action {
 	enum CoordinatingAction: Equatable {
 		case dismissSettings
+		case deleteProfileAndFactorSources
 	}
 
 	enum InternalAction: Equatable {
 		case user(UserAction)
+		case system(SystemAction)
 	}
 }
 
 // MARK: - Settings.Action.InternalAction.UserAction
 public extension Settings.Action.InternalAction {
+	enum SystemAction: Equatable {
+		#if DEBUG
+		case profileToDebugLoaded(Profile)
+		#endif // DEBUG
+	}
+
 	enum UserAction: Equatable {
 		case dismissSettings
+		case deleteProfileAndFactorSources
+		#if DEBUG
+		case debugInspectProfile
+		case setDebugProfileSheet(isPresented: Bool)
+		#endif // DEBUG
 	}
 }

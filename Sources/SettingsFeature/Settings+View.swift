@@ -1,6 +1,12 @@
 import Common
 import ComposableArchitecture
+import KeychainClient
+import Profile
+import ProfileClient
 import SwiftUI
+#if DEBUG
+import ProfileView
+#endif // DEBUG
 
 // MARK: - Settings.View
 public extension Settings {
@@ -23,17 +29,41 @@ public extension Settings.View {
 			observe: ViewState.init(state:),
 			send: Settings.Action.init
 		) { viewStore in
-			// TODO: implement
 			ForceFullScreen {
 				VStack {
-					Text("Implement: Settings")
-						.background(Color.yellow)
-						.foregroundColor(.red)
 					Button(
 						action: { viewStore.send(.dismissSettingsButtonTapped) },
 						label: { Text("Dismiss Settings") }
 					)
+
+					#if DEBUG
+					Button("Debug Inspect Profile") {
+						viewStore.send(.debugInspectProfileButtonTapped)
+					}
+					#endif // DEBUG
+
+					Spacer()
+					Button("Delete Profile & Factor Sources", role: .destructive) {
+						viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
+					}
+
+					Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
 				}
+				#if DEBUG
+					.sheet(isPresented: viewStore.binding(get: \.isDebugProfileViewSheetPresented, send: ViewAction.setDebugProfileSheet(isPresented:))) {
+						VStack {
+							Button("Close") {
+								viewStore.send(.setDebugProfileSheet(isPresented: false))
+							}
+							if let profile = viewStore.profileToInspect {
+								ProfileView(profile: profile)
+							} else {
+								Text("No profile, strange")
+							}
+						}
+					}
+				#endif // DEBUG
+					.buttonStyle(.borderedProminent)
 			}
 		}
 	}
@@ -42,7 +72,16 @@ public extension Settings.View {
 // MARK: - Settings.View.ViewState
 public extension Settings.View {
 	struct ViewState: Equatable {
-		public init(state _: Settings.State) {}
+		#if DEBUG
+		public let isDebugProfileViewSheetPresented: Bool
+		public let profileToInspect: Profile?
+		#endif // DEBUG
+		public init(state: Settings.State) {
+			#if DEBUG
+			isDebugProfileViewSheetPresented = state.profileToInspect != nil
+			profileToInspect = state.profileToInspect
+			#endif // DEBUG
+		}
 	}
 }
 
@@ -50,6 +89,11 @@ public extension Settings.View {
 public extension Settings.View {
 	enum ViewAction: Equatable {
 		case dismissSettingsButtonTapped
+		case deleteProfileAndFactorSourcesButtonTapped
+		#if DEBUG
+		case debugInspectProfileButtonTapped
+		case setDebugProfileSheet(isPresented: Bool)
+		#endif // DEBUG
 	}
 }
 
@@ -58,6 +102,14 @@ extension Settings.Action {
 		switch action {
 		case .dismissSettingsButtonTapped:
 			self = .internal(.user(.dismissSettings))
+		case .deleteProfileAndFactorSourcesButtonTapped:
+			self = .internal(.user(.deleteProfileAndFactorSources))
+		#if DEBUG
+		case .debugInspectProfileButtonTapped:
+			self = .internal(.user(.debugInspectProfile))
+		case let .setDebugProfileSheet(isPresented):
+			self = .internal(.user(.setDebugProfileSheet(isPresented: isPresented)))
+		#endif // DEBUG
 		}
 	}
 }
@@ -69,8 +121,24 @@ struct HomeView_Previews: PreviewProvider {
 			store: .init(
 				initialState: .init(),
 				reducer: Settings.reducer,
-				environment: .init()
+				environment: .init(
+					keychainClient: .unimplemented,
+					profileClient: .unimplemented
+				)
 			)
 		)
 	}
+}
+
+public extension Bundle {
+	var appName: String { getInfo("CFBundleName") }
+	var displayName: String { getInfo("CFBundleDisplayName") }
+	var language: String { getInfo("CFBundleDevelopmentRegion") }
+	var identifier: String { getInfo("CFBundleIdentifier") }
+	var copyright: String { getInfo("NSHumanReadableCopyright").replacingOccurrences(of: "\\\\n", with: "\n") }
+
+	var appBuild: String { getInfo("CFBundleVersion") }
+	var appVersionLong: String { getInfo("CFBundleShortVersionString") }
+
+	private func getInfo(_ str: String) -> String { infoDictionary?[str] as? String ?? "⚠️" }
 }

@@ -89,15 +89,31 @@ public extension Home {
 		Reducer { state, action, environment in
 			switch action {
 			case .internal(.user(.createAccountButtonTapped)):
-				state.createAccount = .init(numberOfExistingAccounts: state.wallet.profile.accounts.count)
+				return .run { send in
+					let accounts = try environment.profileClient.getAccounts()
+					await send(.internal(.coordinate(.createAccount(numberOfExistingAccounts: accounts.count))))
+				}
+			case let .internal(.coordinate(.createAccount(numberOfExistingAccounts))):
+				state.createAccount = .init(numberOfExistingAccounts: numberOfExistingAccounts)
 				return .none
 
 			case .internal(.system(.viewDidAppear)):
 				return .run { send in
+					await send(.internal(.system(.loadAccountsAndSettings)))
+				}
+
+			case .internal(.system(.loadAccountsAndSettings)):
+				return .run { send in
+					let accounts = try environment.profileClient.getAccounts()
+					await send(.internal(.system(.accountsLoaded(accounts))))
 					let settings = try await environment.appSettingsClient.loadSettings()
 					await send(.internal(.system(.currencyLoaded(settings.currency))))
 					await send(.internal(.system(.isCurrencyAmountVisibleLoaded(settings.isCurrencyAmountVisible))))
 				}
+
+			case let .internal(.system(.accountsLoaded(accounts))):
+				state.accountList = .init(nonEmptyOrderedSetOfAccounts: accounts)
+				return .none
 
 			case let .internal(.system(.currencyLoaded(currency))):
 				state.aggregatedValue.currency = currency
@@ -182,7 +198,7 @@ public extension Home {
 			case let .internal(.system(.copyAddress(address))):
 				// TODO: display confirmation popup? discuss with po / designer
 				return .run { _ in
-					environment.pasteboardClient.copyString(address)
+					environment.pasteboardClient.copyString(address.address)
 				}
 
 			case let .internal(.system(.viewDidAppearActionFailed(reason: reason))):
@@ -221,15 +237,12 @@ public extension Home {
 			case .visitHub(.internal):
 				return .none
 
-			case .accountList(.coordinate(.loadAccounts)):
-				return .run { [state = state] send in
-					do {
-						let addresses = state.wallet.profile.accounts.map(\.address)
-						let totalPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio(addresses)
-						await send(.internal(.system(.totalPortfolioLoaded(totalPortfolio))))
-					} catch {
-						print(error.localizedDescription)
-					}
+			case .accountList(.coordinate(.fetchPortfolioForAccounts)):
+				return .run { send in
+					let accounts = try environment.profileClient.getAccounts().rawValue.elements
+					let addresses = accounts.map(\.address)
+					let totalPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio(addresses)
+					await send(.internal(.system(.totalPortfolioLoaded(totalPortfolio))))
 				}
 
 			case let .accountList(.coordinate(.displayAccountDetails(account))):
@@ -237,7 +250,7 @@ public extension Home {
 				return .none
 
 			case let .accountList(.coordinate(.copyAddress(address))):
-				return Effect(value: .internal(.system(.copyAddress(address))))
+				return Effect(value: .internal(.system(.copyAddress(address.wrapAsAddress()))))
 
 			case .accountList:
 				return .none
@@ -261,7 +274,7 @@ public extension Home {
 				return .none
 
 			case let .accountDetails(.coordinate(.copyAddress(address))):
-				return Effect(value: .internal(.system(.copyAddress(address))))
+				return Effect(value: .internal(.system(.copyAddress(address.wrapAsAddress()))))
 
 			case .accountDetails(.coordinate(.displayTransfer)):
 				state.transfer = .init()
@@ -292,6 +305,12 @@ public extension Home {
 			case .createAccount(.coordinate(.dismissCreateAccount)):
 				state.createAccount = nil
 				return .none
+
+			case .createAccount(.coordinate(.createdNewAccount(_))):
+				state.createAccount = nil
+				return .run { send in
+					await send(.internal(.system(.loadAccountsAndSettings)))
+				}
 
 			case .transfer(.internal):
 				return .none

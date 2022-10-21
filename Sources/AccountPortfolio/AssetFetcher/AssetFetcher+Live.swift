@@ -1,7 +1,7 @@
-import Address
 import Asset
 import ComposableArchitecture
 import GatewayAPI
+import Profile
 
 public extension AssetFetcher {
 	static let live: Self = {
