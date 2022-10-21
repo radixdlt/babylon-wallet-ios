@@ -2,7 +2,7 @@
 
 GEN_TOOL=openapi-generator
 if ! [ -x "$(command -v $GEN_TOOL)" ]; then
-  echo "Error: '$GEN_TOOL' is not installed." >&2
+  echo "Error: '$GEN_TOOL' is not installed. Install it with `brew install openapi-generator`" >&2
   exit 1
 fi
 
@@ -22,3 +22,6 @@ $GEN_TOOL generate -i $SWAGGER_TEMPLATE \
 -g swift5 \
 -o $OUTPUTDIR \
 --additional-properties=useJsonEncodable=false,readonlyProperties=true
+
+echo "✨ Generation of models done, unfortunately you now how to manually perform these changes: "
+echo "✍🏽 Change 1: "
