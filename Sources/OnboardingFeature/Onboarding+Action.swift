@@ -1,20 +1,24 @@
 import ComposableArchitecture
+import ImportProfileFeature
 import Profile
 
 // MARK: - Onboarding.Action
 public extension Onboarding {
 	// MARK: Action
-	enum Action: Equatable, BindableAction {
-		case binding(BindingAction<State>)
-		case coordinate(CoordinatingAction)
+	enum Action: Equatable {
 		case `internal`(InternalAction)
+		case coordinate(CoordinatingAction)
+
+		case newProfile(NewProfile.Action)
+		case importProfile(ImportProfile.Action)
 	}
 }
 
 // MARK: - Onboarding.Action.CoordinatingAction
 public extension Onboarding.Action {
 	enum CoordinatingAction: Equatable {
-		case onboardedWithProfile(Profile)
+		case onboardedWithProfile(Profile, isNew: Bool)
+		case failedToCreateOrImportProfile(reason: String)
 	}
 }
 
@@ -22,21 +26,13 @@ public extension Onboarding.Action {
 public extension Onboarding.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
-		case system(SystemAction)
 	}
 }
 
 // MARK: - Onboarding.Action.InternalAction.UserAction
 public extension Onboarding.Action.InternalAction {
 	enum UserAction: Equatable {
-		case createProfile
-	}
-}
-
-// MARK: - Onboarding.Action.InternalAction.SystemAction
-public extension Onboarding.Action.InternalAction {
-	enum SystemAction: Equatable {
-		case createProfile
-		case createdProfile(Profile)
+		case newProfile
+		case importProfile
 	}
 }
