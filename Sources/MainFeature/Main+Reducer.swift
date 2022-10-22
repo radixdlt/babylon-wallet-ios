@@ -27,27 +27,16 @@ public extension Main {
 				}
 			),
 
-//		Settings.reducer
-//			.optional()
-//			.pullback(
-//				state: \.settings,
-//				action: /Main.Action.settings,
-//				environment: {
-//					Settings.Environment(
-//						keychainClient: $0.keychainClient,
-//						profileClient: $0.profileClient
-//					)
-//				}
-//			),
 		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
 		AnyReducer { _ in
-			Scope(
-				state: \Main.State.settings,
-				action: /Action.settings
-			) {
-				Settings()
-			}
-		},
+			Settings()
+		}
+		.optional()
+		.pullback(
+			state: \.settings,
+			action: /Main.Action.settings,
+			environment: { $0 }
+		),
 
 		Reducer { state, action, environment in
 			switch action {
