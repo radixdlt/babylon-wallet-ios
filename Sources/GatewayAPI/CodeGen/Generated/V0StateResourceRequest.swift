@@ -10,24 +10,23 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - V0StateResourceRequest
 public struct V0StateResourceRequest: Codable, Hashable {
+	/** The Bech32m-encoded human readable version of the resource's global address */
+	public private(set) var resourceAddress: String
 
-    /** The Bech32m-encoded human readable version of the resource's global address */
-    public private(set) var resourceAddress: String
+	public init(resourceAddress: String) {
+		self.resourceAddress = resourceAddress
+	}
 
-    public init(resourceAddress: String) {
-        self.resourceAddress = resourceAddress
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case resourceAddress = "resource_address"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case resourceAddress = "resource_address"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(resourceAddress, forKey: .resourceAddress)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(resourceAddress, forKey: .resourceAddress)
+	}
 }
-

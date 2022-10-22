@@ -10,24 +10,23 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - V0StatePackageRequest
 public struct V0StatePackageRequest: Codable, Hashable {
+	/** The Bech32m-encoded human readable version of the package's global address */
+	public private(set) var packageAddress: String
 
-    /** The Bech32m-encoded human readable version of the package's global address */
-    public private(set) var packageAddress: String
+	public init(packageAddress: String) {
+		self.packageAddress = packageAddress
+	}
 
-    public init(packageAddress: String) {
-        self.packageAddress = packageAddress
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case packageAddress = "package_address"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case packageAddress = "package_address"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(packageAddress, forKey: .packageAddress)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(packageAddress, forKey: .packageAddress)
+	}
 }
-

@@ -10,23 +10,22 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionParseResponse
 public struct TransactionParseResponse: Codable, Hashable {
+	public private(set) var parsed: ParsedTransaction
 
-    public private(set) var parsed: ParsedTransaction
+	public init(parsed: ParsedTransaction) {
+		self.parsed = parsed
+	}
 
-    public init(parsed: ParsedTransaction) {
-        self.parsed = parsed
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case parsed
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case parsed
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(parsed, forKey: .parsed)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(parsed, forKey: .parsed)
+	}
 }
-

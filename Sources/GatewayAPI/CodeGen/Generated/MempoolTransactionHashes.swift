@@ -10,29 +10,28 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - MempoolTransactionHashes
 public struct MempoolTransactionHashes: Codable, Hashable {
+	/** The hex-encoded transaction intent hash. This is also known as the Transaction Identifier hash for user transactions. This hash is SHA256(SHA256(compiled_intent)) */
+	public private(set) var intentHash: String
+	/** The hex-encoded notarized transaction hash. This is also known as the payload hash. This hash is SHA256(SHA256(compiled_notarized_transaction)) */
+	public private(set) var payloadHash: String
 
-    /** The hex-encoded transaction intent hash. This is also known as the Transaction Identifier hash for user transactions. This hash is SHA256(SHA256(compiled_intent)) */
-    public private(set) var intentHash: String
-    /** The hex-encoded notarized transaction hash. This is also known as the payload hash. This hash is SHA256(SHA256(compiled_notarized_transaction)) */
-    public private(set) var payloadHash: String
+	public init(intentHash: String, payloadHash: String) {
+		self.intentHash = intentHash
+		self.payloadHash = payloadHash
+	}
 
-    public init(intentHash: String, payloadHash: String) {
-        self.intentHash = intentHash
-        self.payloadHash = payloadHash
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case intentHash = "intent_hash"
+		case payloadHash = "payload_hash"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case intentHash = "intent_hash"
-        case payloadHash = "payload_hash"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(intentHash, forKey: .intentHash)
-        try container.encode(payloadHash, forKey: .payloadHash)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(intentHash, forKey: .intentHash)
+		try container.encode(payloadHash, forKey: .payloadHash)
+	}
 }
-

@@ -10,24 +10,23 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - V0TransactionSubmitRequest
 public struct V0TransactionSubmitRequest: Codable, Hashable {
+	/** A hex-encoded, compiled notarized transaction. */
+	public private(set) var notarizedTransactionHex: String
 
-    /** A hex-encoded, compiled notarized transaction. */
-    public private(set) var notarizedTransactionHex: String
+	public init(notarizedTransactionHex: String) {
+		self.notarizedTransactionHex = notarizedTransactionHex
+	}
 
-    public init(notarizedTransactionHex: String) {
-        self.notarizedTransactionHex = notarizedTransactionHex
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case notarizedTransactionHex = "notarized_transaction_hex"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case notarizedTransactionHex = "notarized_transaction_hex"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(notarizedTransactionHex, forKey: .notarizedTransactionHex)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(notarizedTransactionHex, forKey: .notarizedTransactionHex)
+	}
 }
-

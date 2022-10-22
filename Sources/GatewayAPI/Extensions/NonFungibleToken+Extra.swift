@@ -4,7 +4,7 @@ import Asset
 public extension NonFungibleToken {
 	init(
 		address: ComponentAddress,
-		details _: EntityDetailsResponseNonFungibleDetails
+		stateComponentResponse _: V0StateComponentResponse
 	) {
 		self.init(
 			address: address,

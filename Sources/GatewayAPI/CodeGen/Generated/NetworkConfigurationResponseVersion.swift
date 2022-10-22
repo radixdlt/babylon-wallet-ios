@@ -10,28 +10,27 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - NetworkConfigurationResponseVersion
 /** Different versions regarding the node, network and api. */
 public struct NetworkConfigurationResponseVersion: Codable, Hashable {
+	public private(set) var coreVersion: String
+	public private(set) var apiVersion: String
 
-    public private(set) var coreVersion: String
-    public private(set) var apiVersion: String
+	public init(coreVersion: String, apiVersion: String) {
+		self.coreVersion = coreVersion
+		self.apiVersion = apiVersion
+	}
 
-    public init(coreVersion: String, apiVersion: String) {
-        self.coreVersion = coreVersion
-        self.apiVersion = apiVersion
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case coreVersion = "core_version"
+		case apiVersion = "api_version"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case coreVersion = "core_version"
-        case apiVersion = "api_version"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(coreVersion, forKey: .coreVersion)
-        try container.encode(apiVersion, forKey: .apiVersion)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(coreVersion, forKey: .coreVersion)
+		try container.encode(apiVersion, forKey: .apiVersion)
+	}
 }
-

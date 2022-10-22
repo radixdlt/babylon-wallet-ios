@@ -29,7 +29,7 @@ public extension Settings {
 			}
 
 		case let .internal(.system(.fetchEpochResult(.success(epoch)))):
-			state.currentEpoch = epoch
+			state.currentEpoch = Int(epoch.epoch)
 			return .none
 
 		case let .internal(.system(.fetchEpochResult(.failure(error)))):

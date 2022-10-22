@@ -10,32 +10,31 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - KeyValueStoreEntrySubstateAllOf
 public struct KeyValueStoreEntrySubstateAllOf: Codable, Hashable {
+	/** The hex-encoded bytes of its key */
+	public private(set) var keyHex: String
+	public private(set) var isDeleted: Bool
+	public private(set) var dataStruct: DataStruct?
 
-    /** The hex-encoded bytes of its key */
-    public private(set) var keyHex: String
-    public private(set) var isDeleted: Bool
-    public private(set) var dataStruct: DataStruct?
+	public init(keyHex: String, isDeleted: Bool, dataStruct: DataStruct? = nil) {
+		self.keyHex = keyHex
+		self.isDeleted = isDeleted
+		self.dataStruct = dataStruct
+	}
 
-    public init(keyHex: String, isDeleted: Bool, dataStruct: DataStruct? = nil) {
-        self.keyHex = keyHex
-        self.isDeleted = isDeleted
-        self.dataStruct = dataStruct
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case keyHex = "key_hex"
+		case isDeleted = "is_deleted"
+		case dataStruct = "data_struct"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case keyHex = "key_hex"
-        case isDeleted = "is_deleted"
-        case dataStruct = "data_struct"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(keyHex, forKey: .keyHex)
-        try container.encode(isDeleted, forKey: .isDeleted)
-        try container.encodeIfPresent(dataStruct, forKey: .dataStruct)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(keyHex, forKey: .keyHex)
+		try container.encode(isDeleted, forKey: .isDeleted)
+		try container.encodeIfPresent(dataStruct, forKey: .dataStruct)
+	}
 }
-

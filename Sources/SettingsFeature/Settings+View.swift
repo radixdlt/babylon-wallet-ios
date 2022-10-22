@@ -39,7 +39,7 @@ public extension Settings.View {
 
 					if let currentEpoch = viewStore.currentEpoch {
 						Text("RDX Ledger Epoch (fetched from Gateway API)")
-						Text("#\(String(describing: currentEpoch.epoch))")
+						Text("#\(String(describing: currentEpoch))")
 					}
 
 					#if DEBUG
@@ -89,7 +89,7 @@ public extension Settings.View {
 		public let isDebugProfileViewSheetPresented: Bool
 		public let profileToInspect: Profile?
 		#endif // DEBUG
-		public var currentEpoch: EpochResponse?
+		public var currentEpoch: Int?
 		public init(state: Settings.State) {
 			#if DEBUG
 			isDebugProfileViewSheetPresented = state.profileToInspect != nil

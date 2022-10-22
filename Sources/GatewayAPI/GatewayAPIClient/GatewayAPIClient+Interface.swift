@@ -4,14 +4,15 @@ import Foundation
 import Profile
 
 public typealias ResourceIdentifier = String
-//public struct EntityResourcesResponse: Sendable, Equatable, Decodable {}
-//public struct TransactionSubmitRequest: Sendable, Equatable, Encodable {}
-//public struct TransactionStatusResponse: Sendable, Equatable, Decodable {}
-//public struct EntityDetailsResponseDetails: Sendable, Equatable, Decodable {}
-//public struct TransactionStatusRequest: Sendable, Equatable, Encodable {}
-//public struct TransactionSubmitResponse: Sendable, Equatable, Decodable {}
 
 // MARK: - GatewayAPIClient
+// public struct EntityResourcesResponse: Sendable, Equatable, Decodable {}
+// public struct TransactionSubmitRequest: Sendable, Equatable, Encodable {}
+// public struct TransactionStatusResponse: Sendable, Equatable, Decodable {}
+// public struct EntityDetailsResponseDetails: Sendable, Equatable, Decodable {}
+// public struct TransactionStatusRequest: Sendable, Equatable, Encodable {}
+// public struct TransactionSubmitResponse: Sendable, Equatable, Decodable {}
+
 public struct GatewayAPIClient {
 	public var getEpoch: GetEpoch
 	public var accountResourcesByAddress: GetAccountResourcesByAddress
@@ -35,9 +36,9 @@ public struct GatewayAPIClient {
 }
 
 public extension GatewayAPIClient {
-	typealias GetEpoch = @Sendable () async throws -> EpochResponse
-	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> EntityResourcesResponse
-	typealias GetResourceDetailsByResourceIdentifier = @Sendable (GetTokenDetailsRequest) async throws -> EntityDetailsResponseDetails
+	typealias GetEpoch = @Sendable () async throws -> V0StateEpochResponse
+	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> V0StateComponentResponse
+	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> V0StateResourceResponse
 //	typealias SubmitTransaction = @Sendable (TransactionSubmitRequest) async throws -> TransactionSubmitResponse
 //	typealias GetTransactionStatus = @Sendable (TransactionStatusRequest) async throws -> TransactionStatusResponse
 }
@@ -112,15 +113,15 @@ public extension GatewayAPIClient {
 
 		@Sendable
 		func post<Response>(
-            urlFromBase: @escaping (URL) -> URL
-        ) async throws -> Response where Response: Decodable {
+			urlFromBase: @escaping (URL) -> URL
+		) async throws -> Response where Response: Decodable {
 			try await makeRequest(httpBodyData: nil, responseType: Response.self, urlFromBase: urlFromBase)
 		}
 
 		@Sendable
 		func post<Request, Response>(
 			request: Request,
-            urlFromBase: @escaping (URL) -> URL
+			urlFromBase: @escaping (URL) -> URL
 		) async throws -> Response
 			where
 			Request: Encodable, Response: Decodable
@@ -141,31 +142,23 @@ public extension GatewayAPIClient {
 		return Self(
 			getEpoch: getEpoch,
 			accountResourcesByAddress: { accountAddress in
-				let epoch = try await getEpoch()
-				let request = EntityResourcesRequest(
-					address: accountAddress.address,
-					atStateIdentifier: PartialLedgerStateIdentifier(
-						stateVersion: 0,
-						timestamp: Date(),
-						epoch: epoch.epoch,
-						round: 0
-					)
-				)
-				return try await post(request: request) { baseURL in
-                    baseURL
-                        .appendingPathComponent("state")
-                        .appendingPathComponent("resources")
-                }
+				try await post(
+					request: V0StateComponentRequest(componentAddress: accountAddress.address)
+				) { baseURL in
+					baseURL
+						.appendingPathComponent("state")
+						.appendingPathComponent("component")
+				}
 
 			},
 			resourceDetailsByResourceIdentifier: { resourceAddress in
-                let epoch = try await getEpoch()
-                let request = ResourceIdentifier.init
-                return try await post(request: request) { baseURL in
-                    baseURL
-                        .appendingPathComponent("state")
-                        .appendingPathComponent("resources")
-                }
+				try await post(
+					request: V0StateResourceRequest(resourceAddress: resourceAddress)
+				) { baseURL in
+					baseURL
+						.appendingPathComponent("state")
+						.appendingPathComponent("resources")
+				}
 			}
 //			submitTransaction: { transactionSubmitRequest in
 //				try await Self.mock().submitTransaction(transactionSubmitRequest)

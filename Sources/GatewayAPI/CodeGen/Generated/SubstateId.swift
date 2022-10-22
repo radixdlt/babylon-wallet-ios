@@ -10,37 +10,36 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - SubstateId
 public struct SubstateId: Codable, Hashable {
+	public private(set) var entityType: EntityType
+	/** The hex-encoded bytes of the entity address */
+	public private(set) var entityAddressHex: String
+	public private(set) var substateType: SubstateType
+	/** The hex-encoded bytes of the substate key, under the entity */
+	public private(set) var substateKeyHex: String
 
-    public private(set) var entityType: EntityType
-    /** The hex-encoded bytes of the entity address */
-    public private(set) var entityAddressHex: String
-    public private(set) var substateType: SubstateType
-    /** The hex-encoded bytes of the substate key, under the entity */
-    public private(set) var substateKeyHex: String
+	public init(entityType: EntityType, entityAddressHex: String, substateType: SubstateType, substateKeyHex: String) {
+		self.entityType = entityType
+		self.entityAddressHex = entityAddressHex
+		self.substateType = substateType
+		self.substateKeyHex = substateKeyHex
+	}
 
-    public init(entityType: EntityType, entityAddressHex: String, substateType: SubstateType, substateKeyHex: String) {
-        self.entityType = entityType
-        self.entityAddressHex = entityAddressHex
-        self.substateType = substateType
-        self.substateKeyHex = substateKeyHex
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case entityType = "entity_type"
+		case entityAddressHex = "entity_address_hex"
+		case substateType = "substate_type"
+		case substateKeyHex = "substate_key_hex"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case entityType = "entity_type"
-        case entityAddressHex = "entity_address_hex"
-        case substateType = "substate_type"
-        case substateKeyHex = "substate_key_hex"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(entityType, forKey: .entityType)
-        try container.encode(entityAddressHex, forKey: .entityAddressHex)
-        try container.encode(substateType, forKey: .substateType)
-        try container.encode(substateKeyHex, forKey: .substateKeyHex)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(entityType, forKey: .entityType)
+		try container.encode(entityAddressHex, forKey: .entityAddressHex)
+		try container.encode(substateType, forKey: .substateType)
+		try container.encode(substateKeyHex, forKey: .substateKeyHex)
+	}
 }
-

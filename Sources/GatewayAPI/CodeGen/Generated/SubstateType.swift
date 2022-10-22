@@ -10,13 +10,14 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - SubstateType
 public enum SubstateType: String, Codable, CaseIterable {
-    case system = "System"
-    case resourceManager = "ResourceManager"
-    case componentInfo = "ComponentInfo"
-    case componentState = "ComponentState"
-    case package = "Package"
-    case vault = "Vault"
-    case nonFungible = "NonFungible"
-    case keyValueStoreEntry = "KeyValueStoreEntry"
+	case system = "System"
+	case resourceManager = "ResourceManager"
+	case componentInfo = "ComponentInfo"
+	case componentState = "ComponentState"
+	case package = "Package"
+	case vault = "Vault"
+	case nonFungible = "NonFungible"
+	case keyValueStoreEntry = "KeyValueStoreEntry"
 }

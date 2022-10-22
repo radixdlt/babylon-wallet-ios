@@ -10,36 +10,35 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - StateUpdates
 /** Transaction state updates (only present if status is Succeeded or Failed) */
 public struct StateUpdates: Codable, Hashable {
+	public private(set) var downVirtualSubstates: [SubstateId]
+	public private(set) var upSubstates: [UpSubstate]
+	public private(set) var downSubstates: [DownSubstate]
+	public private(set) var newGlobalEntities: [GlobalEntityId]
 
-    public private(set) var downVirtualSubstates: [SubstateId]
-    public private(set) var upSubstates: [UpSubstate]
-    public private(set) var downSubstates: [DownSubstate]
-    public private(set) var newGlobalEntities: [GlobalEntityId]
+	public init(downVirtualSubstates: [SubstateId], upSubstates: [UpSubstate], downSubstates: [DownSubstate], newGlobalEntities: [GlobalEntityId]) {
+		self.downVirtualSubstates = downVirtualSubstates
+		self.upSubstates = upSubstates
+		self.downSubstates = downSubstates
+		self.newGlobalEntities = newGlobalEntities
+	}
 
-    public init(downVirtualSubstates: [SubstateId], upSubstates: [UpSubstate], downSubstates: [DownSubstate], newGlobalEntities: [GlobalEntityId]) {
-        self.downVirtualSubstates = downVirtualSubstates
-        self.upSubstates = upSubstates
-        self.downSubstates = downSubstates
-        self.newGlobalEntities = newGlobalEntities
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case downVirtualSubstates = "down_virtual_substates"
+		case upSubstates = "up_substates"
+		case downSubstates = "down_substates"
+		case newGlobalEntities = "new_global_entities"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case downVirtualSubstates = "down_virtual_substates"
-        case upSubstates = "up_substates"
-        case downSubstates = "down_substates"
-        case newGlobalEntities = "new_global_entities"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(downVirtualSubstates, forKey: .downVirtualSubstates)
-        try container.encode(upSubstates, forKey: .upSubstates)
-        try container.encode(downSubstates, forKey: .downSubstates)
-        try container.encode(newGlobalEntities, forKey: .newGlobalEntities)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(downVirtualSubstates, forKey: .downVirtualSubstates)
+		try container.encode(upSubstates, forKey: .upSubstates)
+		try container.encode(downSubstates, forKey: .downSubstates)
+		try container.encode(newGlobalEntities, forKey: .newGlobalEntities)
+	}
 }
-

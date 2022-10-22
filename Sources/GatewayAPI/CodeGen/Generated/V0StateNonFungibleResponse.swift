@@ -10,23 +10,22 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - V0StateNonFungibleResponse
 public struct V0StateNonFungibleResponse: Codable, Hashable {
+	public private(set) var nonFungible: Substate
 
-    public private(set) var nonFungible: Substate
+	public init(nonFungible: Substate) {
+		self.nonFungible = nonFungible
+	}
 
-    public init(nonFungible: Substate) {
-        self.nonFungible = nonFungible
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case nonFungible = "non_fungible"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case nonFungible = "non_fungible"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(nonFungible, forKey: .nonFungible)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(nonFungible, forKey: .nonFungible)
+	}
 }
-

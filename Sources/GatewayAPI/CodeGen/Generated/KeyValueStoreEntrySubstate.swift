@@ -10,40 +10,39 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - KeyValueStoreEntrySubstate
 public struct KeyValueStoreEntrySubstate: Codable, Hashable {
+	public private(set) var entityType: EntityType
+	public private(set) var substateType: SubstateType
+	/** The hex-encoded bytes of its key */
+	public private(set) var keyHex: String
+	public private(set) var isDeleted: Bool
+	public private(set) var dataStruct: DataStruct?
 
-    public private(set) var entityType: EntityType
-    public private(set) var substateType: SubstateType
-    /** The hex-encoded bytes of its key */
-    public private(set) var keyHex: String
-    public private(set) var isDeleted: Bool
-    public private(set) var dataStruct: DataStruct?
+	public init(entityType: EntityType, substateType: SubstateType, keyHex: String, isDeleted: Bool, dataStruct: DataStruct? = nil) {
+		self.entityType = entityType
+		self.substateType = substateType
+		self.keyHex = keyHex
+		self.isDeleted = isDeleted
+		self.dataStruct = dataStruct
+	}
 
-    public init(entityType: EntityType, substateType: SubstateType, keyHex: String, isDeleted: Bool, dataStruct: DataStruct? = nil) {
-        self.entityType = entityType
-        self.substateType = substateType
-        self.keyHex = keyHex
-        self.isDeleted = isDeleted
-        self.dataStruct = dataStruct
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case entityType = "entity_type"
+		case substateType = "substate_type"
+		case keyHex = "key_hex"
+		case isDeleted = "is_deleted"
+		case dataStruct = "data_struct"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case entityType = "entity_type"
-        case substateType = "substate_type"
-        case keyHex = "key_hex"
-        case isDeleted = "is_deleted"
-        case dataStruct = "data_struct"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(entityType, forKey: .entityType)
-        try container.encode(substateType, forKey: .substateType)
-        try container.encode(keyHex, forKey: .keyHex)
-        try container.encode(isDeleted, forKey: .isDeleted)
-        try container.encodeIfPresent(dataStruct, forKey: .dataStruct)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(entityType, forKey: .entityType)
+		try container.encode(substateType, forKey: .substateType)
+		try container.encode(keyHex, forKey: .keyHex)
+		try container.encode(isDeleted, forKey: .isDeleted)
+		try container.encodeIfPresent(dataStruct, forKey: .dataStruct)
+	}
 }
-

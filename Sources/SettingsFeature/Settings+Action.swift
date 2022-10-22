@@ -32,7 +32,7 @@ public extension Settings.Action.InternalAction {
 		#endif // DEBUG
 		case viewDidAppear
 		case loadRDXLedgerEpoch
-		case fetchEpochResult(TaskResult<EpochResponse>)
+		case fetchEpochResult(TaskResult<V0StateEpochResponse>)
 	}
 
 	enum UserAction: Equatable {

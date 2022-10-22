@@ -10,24 +10,23 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - V0StateComponentRequest
 public struct V0StateComponentRequest: Codable, Hashable {
+	/** The Bech32m-encoded human readable version of the component's global address */
+	public private(set) var componentAddress: String
 
-    /** The Bech32m-encoded human readable version of the component's global address */
-    public private(set) var componentAddress: String
+	public init(componentAddress: String) {
+		self.componentAddress = componentAddress
+	}
 
-    public init(componentAddress: String) {
-        self.componentAddress = componentAddress
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case componentAddress = "component_address"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case componentAddress = "component_address"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(componentAddress, forKey: .componentAddress)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(componentAddress, forKey: .componentAddress)
+	}
 }
-

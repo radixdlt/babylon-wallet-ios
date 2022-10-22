@@ -10,23 +10,22 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - V0CommittedTransactionResponse
 public struct V0CommittedTransactionResponse: Codable, Hashable {
+	public private(set) var committed: CommittedTransaction
 
-    public private(set) var committed: CommittedTransaction
+	public init(committed: CommittedTransaction) {
+		self.committed = committed
+	}
 
-    public init(committed: CommittedTransaction) {
-        self.committed = committed
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case committed
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case committed
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(committed, forKey: .committed)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(committed, forKey: .committed)
+	}
 }
-

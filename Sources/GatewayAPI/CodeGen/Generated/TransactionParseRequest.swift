@@ -10,29 +10,28 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionParseRequest
 public struct TransactionParseRequest: Codable, Hashable {
+	/** The logical name of the network */
+	public private(set) var network: String
+	/** A hex-encoded payload of a full transaction or a partial transaction - either a notarized transaction, a signed transaction intent an unsigned transaction intent, or a transaction manifest.  */
+	public private(set) var payloadHex: String
 
-    /** The logical name of the network */
-    public private(set) var network: String
-    /** A hex-encoded payload of a full transaction or a partial transaction - either a notarized transaction, a signed transaction intent an unsigned transaction intent, or a transaction manifest.  */
-    public private(set) var payloadHex: String
+	public init(network: String, payloadHex: String) {
+		self.network = network
+		self.payloadHex = payloadHex
+	}
 
-    public init(network: String, payloadHex: String) {
-        self.network = network
-        self.payloadHex = payloadHex
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case network
+		case payloadHex = "payload_hex"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case network
-        case payloadHex = "payload_hex"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(network, forKey: .network)
-        try container.encode(payloadHex, forKey: .payloadHex)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(network, forKey: .network)
+		try container.encode(payloadHex, forKey: .payloadHex)
+	}
 }
-

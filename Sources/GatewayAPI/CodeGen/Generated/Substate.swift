@@ -10,59 +10,59 @@ import Foundation
 import AnyCodable
 #endif
 
-public enum Substate: Codable, Hashable {
-    case typeComponentInfoSubstate(ComponentInfoSubstate)
-    case typeComponentStateSubstate(ComponentStateSubstate)
-    case typeKeyValueStoreEntrySubstate(KeyValueStoreEntrySubstate)
-    case typeNonFungibleSubstate(NonFungibleSubstate)
-    case typePackageSubstate(PackageSubstate)
-    case typeResourceManagerSubstate(ResourceManagerSubstate)
-    case typeSystemSubstate(SystemSubstate)
-    case typeVaultSubstate(VaultSubstate)
+// MARK: - Substate
+public enum Substate: Codable, JSONEncodable, Hashable {
+	case typeComponentInfoSubstate(ComponentInfoSubstate)
+	case typeComponentStateSubstate(ComponentStateSubstate)
+	case typeKeyValueStoreEntrySubstate(KeyValueStoreEntrySubstate)
+	case typeNonFungibleSubstate(NonFungibleSubstate)
+	case typePackageSubstate(PackageSubstate)
+	case typeResourceManagerSubstate(ResourceManagerSubstate)
+	case typeSystemSubstate(SystemSubstate)
+	case typeVaultSubstate(VaultSubstate)
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        switch self {
-        case .typeComponentInfoSubstate(let value):
-            try container.encode(value)
-        case .typeComponentStateSubstate(let value):
-            try container.encode(value)
-        case .typeKeyValueStoreEntrySubstate(let value):
-            try container.encode(value)
-        case .typeNonFungibleSubstate(let value):
-            try container.encode(value)
-        case .typePackageSubstate(let value):
-            try container.encode(value)
-        case .typeResourceManagerSubstate(let value):
-            try container.encode(value)
-        case .typeSystemSubstate(let value):
-            try container.encode(value)
-        case .typeVaultSubstate(let value):
-            try container.encode(value)
-        }
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		switch self {
+		case let .typeComponentInfoSubstate(value):
+			try container.encode(value)
+		case let .typeComponentStateSubstate(value):
+			try container.encode(value)
+		case let .typeKeyValueStoreEntrySubstate(value):
+			try container.encode(value)
+		case let .typeNonFungibleSubstate(value):
+			try container.encode(value)
+		case let .typePackageSubstate(value):
+			try container.encode(value)
+		case let .typeResourceManagerSubstate(value):
+			try container.encode(value)
+		case let .typeSystemSubstate(value):
+			try container.encode(value)
+		case let .typeVaultSubstate(value):
+			try container.encode(value)
+		}
+	}
 
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        if let value = try? container.decode(ComponentInfoSubstate.self) {
-            self = .typeComponentInfoSubstate(value)
-        } else if let value = try? container.decode(ComponentStateSubstate.self) {
-            self = .typeComponentStateSubstate(value)
-        } else if let value = try? container.decode(KeyValueStoreEntrySubstate.self) {
-            self = .typeKeyValueStoreEntrySubstate(value)
-        } else if let value = try? container.decode(NonFungibleSubstate.self) {
-            self = .typeNonFungibleSubstate(value)
-        } else if let value = try? container.decode(PackageSubstate.self) {
-            self = .typePackageSubstate(value)
-        } else if let value = try? container.decode(ResourceManagerSubstate.self) {
-            self = .typeResourceManagerSubstate(value)
-        } else if let value = try? container.decode(SystemSubstate.self) {
-            self = .typeSystemSubstate(value)
-        } else if let value = try? container.decode(VaultSubstate.self) {
-            self = .typeVaultSubstate(value)
-        } else {
-            throw DecodingError.typeMismatch(Self.Type.self, .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode instance of Substate"))
-        }
-    }
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		if let value = try? container.decode(ComponentInfoSubstate.self) {
+			self = .typeComponentInfoSubstate(value)
+		} else if let value = try? container.decode(ComponentStateSubstate.self) {
+			self = .typeComponentStateSubstate(value)
+		} else if let value = try? container.decode(KeyValueStoreEntrySubstate.self) {
+			self = .typeKeyValueStoreEntrySubstate(value)
+		} else if let value = try? container.decode(NonFungibleSubstate.self) {
+			self = .typeNonFungibleSubstate(value)
+		} else if let value = try? container.decode(PackageSubstate.self) {
+			self = .typePackageSubstate(value)
+		} else if let value = try? container.decode(ResourceManagerSubstate.self) {
+			self = .typeResourceManagerSubstate(value)
+		} else if let value = try? container.decode(SystemSubstate.self) {
+			self = .typeSystemSubstate(value)
+		} else if let value = try? container.decode(VaultSubstate.self) {
+			self = .typeVaultSubstate(value)
+		} else {
+			throw DecodingError.typeMismatch(Self.Type.self, .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode instance of Substate"))
+		}
+	}
 }
-

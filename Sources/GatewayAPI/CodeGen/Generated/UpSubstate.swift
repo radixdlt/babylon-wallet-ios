@@ -10,42 +10,41 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - UpSubstate
 public struct UpSubstate: Codable, Hashable {
+	public private(set) var substateId: SubstateId
+	/** An integer between 0 and 10^13, counting the number of times the substate was updated */
+	public private(set) var version: Int64
+	/** The hex-encoded, SBOR-encoded substate data bytes */
+	public private(set) var substateHex: String
+	/** The hex-encoded single-SHA256 hash of the substate data bytes */
+	public private(set) var substateDataHash: String
+	public private(set) var substateData: Substate
 
-    public private(set) var substateId: SubstateId
-    /** An integer between 0 and 10^13, counting the number of times the substate was updated */
-    public private(set) var version: Int64
-    /** The hex-encoded, SBOR-encoded substate data bytes */
-    public private(set) var substateHex: String
-    /** The hex-encoded single-SHA256 hash of the substate data bytes */
-    public private(set) var substateDataHash: String
-    public private(set) var substateData: Substate
+	public init(substateId: SubstateId, version: Int64, substateHex: String, substateDataHash: String, substateData: Substate) {
+		self.substateId = substateId
+		self.version = version
+		self.substateHex = substateHex
+		self.substateDataHash = substateDataHash
+		self.substateData = substateData
+	}
 
-    public init(substateId: SubstateId, version: Int64, substateHex: String, substateDataHash: String, substateData: Substate) {
-        self.substateId = substateId
-        self.version = version
-        self.substateHex = substateHex
-        self.substateDataHash = substateDataHash
-        self.substateData = substateData
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case substateId = "substate_id"
+		case version
+		case substateHex = "substate_hex"
+		case substateDataHash = "substate_data_hash"
+		case substateData = "substate_data"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case substateId = "substate_id"
-        case version
-        case substateHex = "substate_hex"
-        case substateDataHash = "substate_data_hash"
-        case substateData = "substate_data"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(substateId, forKey: .substateId)
-        try container.encode(version, forKey: .version)
-        try container.encode(substateHex, forKey: .substateHex)
-        try container.encode(substateDataHash, forKey: .substateDataHash)
-        try container.encode(substateData, forKey: .substateData)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(substateId, forKey: .substateId)
+		try container.encode(version, forKey: .version)
+		try container.encode(substateHex, forKey: .substateHex)
+		try container.encode(substateDataHash, forKey: .substateDataHash)
+		try container.encode(substateData, forKey: .substateData)
+	}
 }
-

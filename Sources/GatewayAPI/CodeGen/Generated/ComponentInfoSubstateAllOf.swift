@@ -10,28 +10,27 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - ComponentInfoSubstateAllOf
 public struct ComponentInfoSubstateAllOf: Codable, Hashable {
+	/** The Bech32m-encoded human readable version of the package address */
+	public private(set) var packageAddress: String
+	public private(set) var blueprintName: String
 
-    /** The Bech32m-encoded human readable version of the package address */
-    public private(set) var packageAddress: String
-    public private(set) var blueprintName: String
+	public init(packageAddress: String, blueprintName: String) {
+		self.packageAddress = packageAddress
+		self.blueprintName = blueprintName
+	}
 
-    public init(packageAddress: String, blueprintName: String) {
-        self.packageAddress = packageAddress
-        self.blueprintName = blueprintName
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case packageAddress = "package_address"
+		case blueprintName = "blueprint_name"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case packageAddress = "package_address"
-        case blueprintName = "blueprint_name"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(packageAddress, forKey: .packageAddress)
-        try container.encode(blueprintName, forKey: .blueprintName)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(packageAddress, forKey: .packageAddress)
+		try container.encode(blueprintName, forKey: .blueprintName)
+	}
 }
-

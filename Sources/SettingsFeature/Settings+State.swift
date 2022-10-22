@@ -11,7 +11,7 @@ public extension Settings {
 		#endif // DEBUG
 
 		/// Fetched from the RDX Ledger
-		public var currentEpoch: EpochResponse?
+		public var currentEpoch: Int?
 
 		public init() {}
 	}

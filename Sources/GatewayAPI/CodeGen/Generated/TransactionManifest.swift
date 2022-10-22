@@ -10,29 +10,28 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionManifest
 public struct TransactionManifest: Codable, Hashable {
+	/** The decompiled transaction manifest instructions */
+	public private(set) var instructions: String
+	/** A map of the hex-encoded blob hash, to hex-encoded blob content */
+	public private(set) var blobsHex: [String: String]
 
-    /** The decompiled transaction manifest instructions */
-    public private(set) var instructions: String
-    /** A map of the hex-encoded blob hash, to hex-encoded blob content */
-    public private(set) var blobsHex: [String: String]
+	public init(instructions: String, blobsHex: [String: String]) {
+		self.instructions = instructions
+		self.blobsHex = blobsHex
+	}
 
-    public init(instructions: String, blobsHex: [String: String]) {
-        self.instructions = instructions
-        self.blobsHex = blobsHex
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case instructions
+		case blobsHex = "blobs_hex"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case instructions
-        case blobsHex = "blobs_hex"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(instructions, forKey: .instructions)
-        try container.encode(blobsHex, forKey: .blobsHex)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(instructions, forKey: .instructions)
+		try container.encode(blobsHex, forKey: .blobsHex)
+	}
 }
-

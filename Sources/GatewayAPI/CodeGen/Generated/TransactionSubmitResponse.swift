@@ -10,24 +10,23 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionSubmitResponse
 public struct TransactionSubmitResponse: Codable, Hashable {
+	/** Is true if the transaction is a duplicate of an existing transaction in the mempool. */
+	public private(set) var duplicate: Bool
 
-    /** Is true if the transaction is a duplicate of an existing transaction in the mempool. */
-    public private(set) var duplicate: Bool
+	public init(duplicate: Bool) {
+		self.duplicate = duplicate
+	}
 
-    public init(duplicate: Bool) {
-        self.duplicate = duplicate
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case duplicate
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case duplicate
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(duplicate, forKey: .duplicate)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(duplicate, forKey: .duplicate)
+	}
 }
-

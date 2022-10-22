@@ -10,35 +10,35 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - V0TransactionStatusResponse
 public struct V0TransactionStatusResponse: Codable, Hashable {
+	public enum IntentStatus: String, Codable, CaseIterable {
+		case committedSuccess = "CommittedSuccess"
+		case committedFailure = "CommittedFailure"
+		case inMempool = "InMempool"
+		case rejected = "Rejected"
+		case unknown = "Unknown"
+	}
 
-    public enum IntentStatus: String, Codable, CaseIterable {
-        case committedSuccess = "CommittedSuccess"
-        case committedFailure = "CommittedFailure"
-        case inMempool = "InMempool"
-        case rejected = "Rejected"
-        case unknown = "Unknown"
-    }
-    /** The status of the transaction intent */
-    public private(set) var intentStatus: IntentStatus
-    public private(set) var knownPayloads: [V0TransactionPayloadStatus]
+	/** The status of the transaction intent */
+	public private(set) var intentStatus: IntentStatus
+	public private(set) var knownPayloads: [V0TransactionPayloadStatus]
 
-    public init(intentStatus: IntentStatus, knownPayloads: [V0TransactionPayloadStatus]) {
-        self.intentStatus = intentStatus
-        self.knownPayloads = knownPayloads
-    }
+	public init(intentStatus: IntentStatus, knownPayloads: [V0TransactionPayloadStatus]) {
+		self.intentStatus = intentStatus
+		self.knownPayloads = knownPayloads
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case intentStatus = "intent_status"
-        case knownPayloads = "known_payloads"
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case intentStatus = "intent_status"
+		case knownPayloads = "known_payloads"
+	}
 
-    // Encodable protocol methods
+	// Encodable protocol methods
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(intentStatus, forKey: .intentStatus)
-        try container.encode(knownPayloads, forKey: .knownPayloads)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(intentStatus, forKey: .intentStatus)
+		try container.encode(knownPayloads, forKey: .knownPayloads)
+	}
 }
-

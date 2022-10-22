@@ -10,9 +10,10 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionStatus
 /** The status of the transaction */
 public enum TransactionStatus: String, Codable, CaseIterable {
-    case succeeded = "Succeeded"
-    case failed = "Failed"
-    case rejected = "Rejected"
+	case succeeded = "Succeeded"
+	case failed = "Failed"
+	case rejected = "Rejected"
 }

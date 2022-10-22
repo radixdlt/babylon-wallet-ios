@@ -10,11 +10,12 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - EntityType
 public enum EntityType: String, Codable, CaseIterable {
-    case system = "System"
-    case resourceManager = "ResourceManager"
-    case component = "Component"
-    case package = "Package"
-    case vault = "Vault"
-    case keyValueStore = "KeyValueStore"
+	case system = "System"
+	case resourceManager = "ResourceManager"
+	case component = "Component"
+	case package = "Package"
+	case vault = "Vault"
+	case keyValueStore = "KeyValueStore"
 }

@@ -10,23 +10,22 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - ParsedTransactionManifest
 public struct ParsedTransactionManifest: Codable, Hashable {
+	public private(set) var manifest: TransactionManifest
 
-    public private(set) var manifest: TransactionManifest
+	public init(manifest: TransactionManifest) {
+		self.manifest = manifest
+	}
 
-    public init(manifest: TransactionManifest) {
-        self.manifest = manifest
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case manifest
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case manifest
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(manifest, forKey: .manifest)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(manifest, forKey: .manifest)
+	}
 }
-

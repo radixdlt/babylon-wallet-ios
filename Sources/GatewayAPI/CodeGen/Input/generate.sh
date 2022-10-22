@@ -28,5 +28,11 @@ cd $INPUTDIR
 cd ..
 rm -rf Generated
 mv OpenAPIClient/Classes/OpenAPIs/Models Generated
+cd Generated
+mkdir AUXILARY
+mv ../OpenAPIClient/Classes/OpenAPIs/Models.swift ../Generated/AUXILARY
+mv ../OpenAPIClient/Classes/OpenAPIs/Extensions.swift ../Generated/AUXILARY
+mv ../OpenAPIClient/Classes/OpenAPIs/CodableHelper.swift ../Generated/AUXILARY
+mv ../OpenAPIClient/Classes/OpenAPIs/OpenISO8601DateFormatter.swift ../Generated/AUXILARY
 cd $OUTPUTDIR
 rm -r docs OpenAPIClient Cartfile git_push.sh OpenAPIClient.podspec Package.swift project.yml README.md .gitignore .openapi-generator-ignore .swiftformat .openapi-generator/FILES  .openapi-generator/VERSION

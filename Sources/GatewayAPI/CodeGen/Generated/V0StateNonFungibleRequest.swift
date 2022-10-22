@@ -10,29 +10,28 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - V0StateNonFungibleRequest
 public struct V0StateNonFungibleRequest: Codable, Hashable {
+	/** The Bech32m-encoded human readable version of the resource's global address */
+	public private(set) var resourceAddress: String
+	/** The hex-encoded non-fungible id */
+	public private(set) var nonFungibleIdHex: String
 
-    /** The Bech32m-encoded human readable version of the resource's global address */
-    public private(set) var resourceAddress: String
-    /** The hex-encoded non-fungible id */
-    public private(set) var nonFungibleIdHex: String
+	public init(resourceAddress: String, nonFungibleIdHex: String) {
+		self.resourceAddress = resourceAddress
+		self.nonFungibleIdHex = nonFungibleIdHex
+	}
 
-    public init(resourceAddress: String, nonFungibleIdHex: String) {
-        self.resourceAddress = resourceAddress
-        self.nonFungibleIdHex = nonFungibleIdHex
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case resourceAddress = "resource_address"
+		case nonFungibleIdHex = "non_fungible_id_hex"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case resourceAddress = "resource_address"
-        case nonFungibleIdHex = "non_fungible_id_hex"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(resourceAddress, forKey: .resourceAddress)
-        try container.encode(nonFungibleIdHex, forKey: .nonFungibleIdHex)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(resourceAddress, forKey: .resourceAddress)
+		try container.encode(nonFungibleIdHex, forKey: .nonFungibleIdHex)
+	}
 }
-

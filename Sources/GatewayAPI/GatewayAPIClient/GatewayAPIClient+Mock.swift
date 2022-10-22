@@ -57,14 +57,14 @@ public extension GatewayAPIClient {
 	)
 
 	static func mock(
-		fungibleResourceCount: Int = 2,
-		nonFungibleResourceCount: Int = 2,
-		submittedTXIsDoubleSpend: Bool = false
+		fungibleResourceCount _: Int = 2,
+		nonFungibleResourceCount _: Int = 2,
+		submittedTXIsDoubleSpend _: Bool = false
 //		, txStatus: TransactionStatus.Status? = nil
 	) -> Self {
 		.init(
 			getEpoch: { .init(epoch: 1337) },
-			accountResourcesByAddress: { accountAddress in
+			accountResourcesByAddress: { _ in
 //				.init(
 //					address: accountAddress.address,
 //					fungibleResources: .init(
@@ -86,9 +86,9 @@ public extension GatewayAPIClient {
 //						}
 //					)
 //				)
-                fatalError()
+				fatalError()
 			},
-			resourceDetailsByResourceIdentifier: { resourceAddress in
+			resourceDetailsByResourceIdentifier: { _ in
 //				let seed = resourceAddress.hashValue
 //				let seed1 = resourceAddress.count.hashValue
 //				let seed2 = resourceAddress.count.bitWidth.hashValue
@@ -119,9 +119,9 @@ public extension GatewayAPIClient {
 //				} else {
 //					return fun
 //				}
-                fatalError()
+				fatalError()
 			}
-//            ,
+			//            ,
 //			submitTransaction: { _ in
 //				.init(duplicate: submittedTXIsDoubleSpend)
 //			},
@@ -153,7 +153,7 @@ public extension GatewayAPIClient {
 	}
 }
 
-//private extension TransactionStatus.Status {
+// private extension TransactionStatus.Status {
 //	init(seed: Int) {
 //		switch seed % 4 {
 //		case 0: self = .succeeded
@@ -163,5 +163,5 @@ public extension GatewayAPIClient {
 //		default: self = .succeeded
 //		}
 //	}
-//}
+// }
 #endif

@@ -10,10 +10,11 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - ParsedTransactionType
 /** The type of the parsed (partial) transaction payload */
 public enum ParsedTransactionType: String, Codable, CaseIterable {
-    case notarizedTransaction = "NotarizedTransaction"
-    case signedTransactionIntent = "SignedTransactionIntent"
-    case transactionIntent = "TransactionIntent"
-    case transactionManifest = "TransactionManifest"
+	case notarizedTransaction = "NotarizedTransaction"
+	case signedTransactionIntent = "SignedTransactionIntent"
+	case transactionIntent = "TransactionIntent"
+	case transactionManifest = "TransactionManifest"
 }

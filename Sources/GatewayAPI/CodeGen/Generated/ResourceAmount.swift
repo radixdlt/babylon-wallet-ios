@@ -10,29 +10,29 @@ import Foundation
 import AnyCodable
 #endif
 
-public enum ResourceAmount: Codable, Hashable {
-    case typeFungibleResourceAmount(FungibleResourceAmount)
-    case typeNonFungibleResourceAmount(NonFungibleResourceAmount)
+// MARK: - ResourceAmount
+public enum ResourceAmount: Codable, JSONEncodable, Hashable {
+	case typeFungibleResourceAmount(FungibleResourceAmount)
+	case typeNonFungibleResourceAmount(NonFungibleResourceAmount)
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        switch self {
-        case .typeFungibleResourceAmount(let value):
-            try container.encode(value)
-        case .typeNonFungibleResourceAmount(let value):
-            try container.encode(value)
-        }
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		switch self {
+		case let .typeFungibleResourceAmount(value):
+			try container.encode(value)
+		case let .typeNonFungibleResourceAmount(value):
+			try container.encode(value)
+		}
+	}
 
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        if let value = try? container.decode(FungibleResourceAmount.self) {
-            self = .typeFungibleResourceAmount(value)
-        } else if let value = try? container.decode(NonFungibleResourceAmount.self) {
-            self = .typeNonFungibleResourceAmount(value)
-        } else {
-            throw DecodingError.typeMismatch(Self.Type.self, .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode instance of ResourceAmount"))
-        }
-    }
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		if let value = try? container.decode(FungibleResourceAmount.self) {
+			self = .typeFungibleResourceAmount(value)
+		} else if let value = try? container.decode(NonFungibleResourceAmount.self) {
+			self = .typeNonFungibleResourceAmount(value)
+		} else {
+			throw DecodingError.typeMismatch(Self.Type.self, .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode instance of ResourceAmount"))
+		}
+	}
 }
-

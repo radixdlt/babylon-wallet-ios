@@ -10,34 +10,33 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - ModelErrorResponse
 public struct ModelErrorResponse: Codable, Hashable {
+	/** A numeric code corresponding to the given HTTP error code. */
+	public private(set) var code: Int
+	/** A human-readable error message. */
+	public private(set) var message: String
+	/** A GUID to be used when reporting errors, to allow correlation with the Core API's error logs, in the case where the Core API details are hidden. */
+	public private(set) var traceId: String?
 
-    /** A numeric code corresponding to the given HTTP error code. */
-    public private(set) var code: Int
-    /** A human-readable error message. */
-    public private(set) var message: String
-    /** A GUID to be used when reporting errors, to allow correlation with the Core API's error logs, in the case where the Core API details are hidden. */
-    public private(set) var traceId: String?
+	public init(code: Int, message: String, traceId: String? = nil) {
+		self.code = code
+		self.message = message
+		self.traceId = traceId
+	}
 
-    public init(code: Int, message: String, traceId: String? = nil) {
-        self.code = code
-        self.message = message
-        self.traceId = traceId
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case code
+		case message
+		case traceId = "trace_id"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case code
-        case message
-        case traceId = "trace_id"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(code, forKey: .code)
-        try container.encode(message, forKey: .message)
-        try container.encodeIfPresent(traceId, forKey: .traceId)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(code, forKey: .code)
+		try container.encode(message, forKey: .message)
+		try container.encodeIfPresent(traceId, forKey: .traceId)
+	}
 }
-

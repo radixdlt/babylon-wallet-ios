@@ -10,23 +10,22 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - ParsedTransactionIntent
 public struct ParsedTransactionIntent: Codable, Hashable {
+	public private(set) var intent: TransactionIntent
 
-    public private(set) var intent: TransactionIntent
+	public init(intent: TransactionIntent) {
+		self.intent = intent
+	}
 
-    public init(intent: TransactionIntent) {
-        self.intent = intent
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case intent
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case intent
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(intent, forKey: .intent)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(intent, forKey: .intent)
+	}
 }
-

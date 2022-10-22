@@ -10,35 +10,34 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - CommittedTransactionsRequest
 /** A request to retrieve a sublist of committed transactions from the ledger.  */
 public struct CommittedTransactionsRequest: Codable, Hashable {
+	/** The logical name of the network */
+	public private(set) var network: String
+	/** An integer between 1 and 10^13, giving the first (resultant) state version to be returned */
+	public private(set) var fromStateVersion: Int64
+	/** The maximum number of transactions that will be returned. */
+	public private(set) var limit: Int
 
-    /** The logical name of the network */
-    public private(set) var network: String
-    /** An integer between 1 and 10^13, giving the first (resultant) state version to be returned */
-    public private(set) var fromStateVersion: Int64
-    /** The maximum number of transactions that will be returned. */
-    public private(set) var limit: Int
+	public init(network: String, fromStateVersion: Int64, limit: Int) {
+		self.network = network
+		self.fromStateVersion = fromStateVersion
+		self.limit = limit
+	}
 
-    public init(network: String, fromStateVersion: Int64, limit: Int) {
-        self.network = network
-        self.fromStateVersion = fromStateVersion
-        self.limit = limit
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case network
+		case fromStateVersion = "from_state_version"
+		case limit
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case network
-        case fromStateVersion = "from_state_version"
-        case limit
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(network, forKey: .network)
-        try container.encode(fromStateVersion, forKey: .fromStateVersion)
-        try container.encode(limit, forKey: .limit)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(network, forKey: .network)
+		try container.encode(fromStateVersion, forKey: .fromStateVersion)
+		try container.encode(limit, forKey: .limit)
+	}
 }
-

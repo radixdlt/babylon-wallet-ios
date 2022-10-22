@@ -10,31 +10,30 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - TransactionPreviewResponse
 public struct TransactionPreviewResponse: Codable, Hashable {
+	public private(set) var receipt: TransactionReceipt
+	public private(set) var resourceChanges: [ResourceChange]
+	public private(set) var logs: [TransactionPreviewResponseLogsInner]
 
-    public private(set) var receipt: TransactionReceipt
-    public private(set) var resourceChanges: [ResourceChange]
-    public private(set) var logs: [TransactionPreviewResponseLogsInner]
+	public init(receipt: TransactionReceipt, resourceChanges: [ResourceChange], logs: [TransactionPreviewResponseLogsInner]) {
+		self.receipt = receipt
+		self.resourceChanges = resourceChanges
+		self.logs = logs
+	}
 
-    public init(receipt: TransactionReceipt, resourceChanges: [ResourceChange], logs: [TransactionPreviewResponseLogsInner]) {
-        self.receipt = receipt
-        self.resourceChanges = resourceChanges
-        self.logs = logs
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case receipt
+		case resourceChanges = "resource_changes"
+		case logs
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case receipt
-        case resourceChanges = "resource_changes"
-        case logs
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(receipt, forKey: .receipt)
-        try container.encode(resourceChanges, forKey: .resourceChanges)
-        try container.encode(logs, forKey: .logs)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(receipt, forKey: .receipt)
+		try container.encode(resourceChanges, forKey: .resourceChanges)
+		try container.encode(logs, forKey: .logs)
+	}
 }
-

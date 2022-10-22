@@ -10,24 +10,23 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - CommittedStateIdentifier
 public struct CommittedStateIdentifier: Codable, Hashable {
+	/** An integer between 0 and 10^13, representing the state version. The state version increments with each transaction, starting at 0 pre-genesis. */
+	public private(set) var stateVersion: Int64
 
-    /** An integer between 0 and 10^13, representing the state version. The state version increments with each transaction, starting at 0 pre-genesis. */
-    public private(set) var stateVersion: Int64
+	public init(stateVersion: Int64) {
+		self.stateVersion = stateVersion
+	}
 
-    public init(stateVersion: Int64) {
-        self.stateVersion = stateVersion
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case stateVersion = "state_version"
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case stateVersion = "state_version"
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(stateVersion, forKey: .stateVersion)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(stateVersion, forKey: .stateVersion)
+	}
 }
-

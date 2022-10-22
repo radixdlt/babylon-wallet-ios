@@ -10,29 +10,29 @@ import Foundation
 import AnyCodable
 #endif
 
-public enum Signature: Codable, Hashable {
-    case typeEcdsaSecp256k1Signature(EcdsaSecp256k1Signature)
-    case typeEddsaEd25519Signature(EddsaEd25519Signature)
+// MARK: - Signature
+public enum Signature: Codable, JSONEncodable, Hashable {
+	case typeEcdsaSecp256k1Signature(EcdsaSecp256k1Signature)
+	case typeEddsaEd25519Signature(EddsaEd25519Signature)
 
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        switch self {
-        case .typeEcdsaSecp256k1Signature(let value):
-            try container.encode(value)
-        case .typeEddsaEd25519Signature(let value):
-            try container.encode(value)
-        }
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		switch self {
+		case let .typeEcdsaSecp256k1Signature(value):
+			try container.encode(value)
+		case let .typeEddsaEd25519Signature(value):
+			try container.encode(value)
+		}
+	}
 
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        if let value = try? container.decode(EcdsaSecp256k1Signature.self) {
-            self = .typeEcdsaSecp256k1Signature(value)
-        } else if let value = try? container.decode(EddsaEd25519Signature.self) {
-            self = .typeEddsaEd25519Signature(value)
-        } else {
-            throw DecodingError.typeMismatch(Self.Type.self, .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode instance of Signature"))
-        }
-    }
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		if let value = try? container.decode(EcdsaSecp256k1Signature.self) {
+			self = .typeEcdsaSecp256k1Signature(value)
+		} else if let value = try? container.decode(EddsaEd25519Signature.self) {
+			self = .typeEddsaEd25519Signature(value)
+		} else {
+			throw DecodingError.typeMismatch(Self.Type.self, .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode instance of Signature"))
+		}
+	}
 }
-

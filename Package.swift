@@ -68,6 +68,9 @@ let package = Package(
 		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.19"),
 
 		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.1"),
+
+		// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
+		.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
@@ -290,6 +293,7 @@ let package = Package(
 		.target(
 			name: "GatewayAPI",
 			dependencies: [
+				"AnyCodable",
 				"Asset",
 				bigInt,
 				"Common",

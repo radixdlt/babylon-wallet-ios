@@ -10,24 +10,23 @@ import Foundation
 import AnyCodable
 #endif
 
+// MARK: - NetworkStatusRequest
 public struct NetworkStatusRequest: Codable, Hashable {
+	/** The logical name of the network */
+	public private(set) var network: String
 
-    /** The logical name of the network */
-    public private(set) var network: String
+	public init(network: String) {
+		self.network = network
+	}
 
-    public init(network: String) {
-        self.network = network
-    }
+	public enum CodingKeys: String, CodingKey, CaseIterable {
+		case network
+	}
 
-    public enum CodingKeys: String, CodingKey, CaseIterable {
-        case network
-    }
+	// Encodable protocol methods
 
-    // Encodable protocol methods
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(network, forKey: .network)
-    }
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(network, forKey: .network)
+	}
 }
-
