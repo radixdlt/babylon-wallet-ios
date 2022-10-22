@@ -5,6 +5,7 @@ import AccountPreferencesFeature
 import AggregatedValueFeature
 import Collections
 import Common
+import ComposableArchitecture
 import CreateAccountFeature
 import Foundation
 import NonEmpty
@@ -53,8 +54,8 @@ public extension Home.Action.InternalAction {
 		case currencyLoaded(FiatCurrency)
 		case toggleIsCurrencyAmountVisible
 		case isCurrencyAmountVisibleLoaded(Bool)
-		case totalPortfolioLoaded(AccountPortfolioDictionary)
-		case accountPortfolioLoaded(AccountPortfolioDictionary)
+		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)
+		case accountPortfolioResult(TaskResult<AccountPortfolioDictionary>)
 		case copyAddress(Address)
 		case viewDidAppearActionFailed(reason: String)
 		case toggleIsCurrencyAmountVisibleFailed(reason: String)

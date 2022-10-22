@@ -74,6 +74,9 @@ public extension Settings.View {
 					}
 				#endif // DEBUG
 					.buttonStyle(.borderedProminent)
+					.onAppear {
+						viewStore.send(.viewDidAppear)
+					}
 			}
 		}
 	}
@@ -102,6 +105,7 @@ public extension Settings.View {
 	enum ViewAction: Equatable {
 		case dismissSettingsButtonTapped
 		case deleteProfileAndFactorSourcesButtonTapped
+		case viewDidAppear
 		#if DEBUG
 		case debugInspectProfileButtonTapped
 		case setDebugProfileSheet(isPresented: Bool)
@@ -116,6 +120,8 @@ extension Settings.Action {
 			self = .internal(.user(.dismissSettings))
 		case .deleteProfileAndFactorSourcesButtonTapped:
 			self = .internal(.user(.deleteProfileAndFactorSources))
+		case .viewDidAppear:
+			self = .internal(.system(.viewDidAppear))
 		#if DEBUG
 		case .debugInspectProfileButtonTapped:
 			self = .internal(.user(.debugInspectProfile))

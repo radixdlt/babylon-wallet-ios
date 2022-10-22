@@ -4,36 +4,42 @@ import Foundation
 import Profile
 
 public typealias ResourceIdentifier = String
+//public struct EntityResourcesResponse: Sendable, Equatable, Decodable {}
+//public struct TransactionSubmitRequest: Sendable, Equatable, Encodable {}
+//public struct TransactionStatusResponse: Sendable, Equatable, Decodable {}
+//public struct EntityDetailsResponseDetails: Sendable, Equatable, Decodable {}
+//public struct TransactionStatusRequest: Sendable, Equatable, Encodable {}
+//public struct TransactionSubmitResponse: Sendable, Equatable, Decodable {}
 
 // MARK: - GatewayAPIClient
 public struct GatewayAPIClient {
 	public var getEpoch: GetEpoch
 	public var accountResourcesByAddress: GetAccountResourcesByAddress
 	public var resourceDetailsByResourceIdentifier: GetResourceDetailsByResourceIdentifier
-	public var submitTransaction: SubmitTransaction
-	public var transactionStatus: GetTransactionStatus
+//	public var submitTransaction: SubmitTransaction
+//	public var transactionStatus: GetTransactionStatus
 
 	public init(
 		getEpoch: @escaping GetEpoch,
 		accountResourcesByAddress: @escaping GetAccountResourcesByAddress,
-		resourceDetailsByResourceIdentifier: @escaping GetResourceDetailsByResourceIdentifier,
-		submitTransaction: @escaping SubmitTransaction,
-		transactionStatus: @escaping GetTransactionStatus
+		resourceDetailsByResourceIdentifier: @escaping GetResourceDetailsByResourceIdentifier
+//		submitTransaction: @escaping SubmitTransaction,
+//		transactionStatus: @escaping GetTransactionStatus
 	) {
 		self.getEpoch = getEpoch
 		self.accountResourcesByAddress = accountResourcesByAddress
 		self.resourceDetailsByResourceIdentifier = resourceDetailsByResourceIdentifier
-		self.submitTransaction = submitTransaction
-		self.transactionStatus = transactionStatus
+//		self.submitTransaction = submitTransaction
+//		self.transactionStatus = transactionStatus
 	}
 }
 
 public extension GatewayAPIClient {
 	typealias GetEpoch = @Sendable () async throws -> EpochResponse
 	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> EntityResourcesResponse
-	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> EntityDetailsResponseDetails
-	typealias SubmitTransaction = @Sendable (TransactionSubmitRequest) async throws -> TransactionSubmitResponse
-	typealias GetTransactionStatus = @Sendable (TransactionStatusRequest) async throws -> TransactionStatusResponse
+	typealias GetResourceDetailsByResourceIdentifier = @Sendable (GetTokenDetailsRequest) async throws -> EntityDetailsResponseDetails
+//	typealias SubmitTransaction = @Sendable (TransactionSubmitRequest) async throws -> TransactionSubmitResponse
+//	typealias GetTransactionStatus = @Sendable (TransactionStatusRequest) async throws -> TransactionStatusResponse
 }
 
 // MARK: - Date + Sendable
@@ -64,12 +70,16 @@ public extension GatewayAPIClient {
 			urlFromBase: (URL) -> URL
 		) async throws -> Response where Response: Decodable {
 			let url = urlFromBase(baseURL)
-
+			print("📡 🛰 Network request: \(url.absoluteString)")
 			var urlRequest = URLRequest(url: url)
 			urlRequest.httpMethod = method
 			if let httpBody {
 				urlRequest.httpBody = httpBody
 			}
+
+			urlRequest.allHTTPHeaderFields = [
+				"Content-Type": "application/json",
+			]
 
 			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
 
@@ -101,64 +111,68 @@ public extension GatewayAPIClient {
 		}
 
 		@Sendable
-		func post<Response>(urlFromBase: @escaping (URL) -> URL) async throws -> Response where Response: Decodable {
+		func post<Response>(
+            urlFromBase: @escaping (URL) -> URL
+        ) async throws -> Response where Response: Decodable {
 			try await makeRequest(httpBodyData: nil, responseType: Response.self, urlFromBase: urlFromBase)
 		}
 
 		@Sendable
-		func post<Request, Response>(request: Request) async throws -> Response where Request: Encodable, Response: Decodable {
-//			let url = baseURL
-//				.appendingPathComponent("entity")
-//				.appendingPathComponent("resources")
-//
-//			var urlRequest = URLRequest(url: url)
-//			urlRequest.httpMethod = "POST"
+		func post<Request, Response>(
+			request: Request,
+            urlFromBase: @escaping (URL) -> URL
+		) async throws -> Response
+			where
+			Request: Encodable, Response: Decodable
+		{
 			let httpBody = try jsonEncoder.encode(request)
-//
-//			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
-//
-//			guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
-//				throw ExpectedHTTPURLResponse()
-//			}
-//
-//			guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
-//				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
-//			}
-//
-//			let response = try jsonDecoder.decode(EntityResourcesResponse.self, from: data)
-//
-//			return response
-			return try await makeRequest(httpBodyData: httpBody) { baseURL in
-				baseURL
-					.appendingPathComponent("entity")
-					.appendingPathComponent("resources")
+
+			return try await makeRequest(httpBodyData: httpBody, urlFromBase: urlFromBase)
+		}
+
+		let getEpoch: GetEpoch = {
+			try await post {
+				$0
+					.appendingPathComponent("state")
+					.appendingPathComponent("epoch")
 			}
 		}
 
 		return Self(
-			getEpoch: {
-				try await post {
-					$0
-						.appendingPathComponent("state")
-						.appendingPathComponent("epoch")
-				}
-			},
+			getEpoch: getEpoch,
 			accountResourcesByAddress: { accountAddress in
+				let epoch = try await getEpoch()
 				let request = EntityResourcesRequest(
 					address: accountAddress.address,
-					atStateIdentifier: PartialLedgerStateIdentifier(stateVersion: 7588, timestamp: Date(), epoch: 0, round: 0)
+					atStateIdentifier: PartialLedgerStateIdentifier(
+						stateVersion: 0,
+						timestamp: Date(),
+						epoch: epoch.epoch,
+						round: 0
+					)
 				)
-				return try await post(request: request)
+				return try await post(request: request) { baseURL in
+                    baseURL
+                        .appendingPathComponent("state")
+                        .appendingPathComponent("resources")
+                }
+
 			},
 			resourceDetailsByResourceIdentifier: { resourceAddress in
-				try await Self.mock().resourceDetailsByResourceIdentifier(resourceAddress)
-			},
-			submitTransaction: { transactionSubmitRequest in
-				try await Self.mock().submitTransaction(transactionSubmitRequest)
-			},
-			transactionStatus: { transactionStatusRequest in
-				try await Self.mock().transactionStatus(transactionStatusRequest)
+                let epoch = try await getEpoch()
+                let request = ResourceIdentifier.init
+                return try await post(request: request) { baseURL in
+                    baseURL
+                        .appendingPathComponent("state")
+                        .appendingPathComponent("resources")
+                }
 			}
+//			submitTransaction: { transactionSubmitRequest in
+//				try await Self.mock().submitTransaction(transactionSubmitRequest)
+//			},
+//			transactionStatus: { transactionStatusRequest in
+//				try await Self.mock().transactionStatus(transactionStatusRequest)
+//			}
 		)
 	}
 }

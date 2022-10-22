@@ -24,5 +24,9 @@ $GEN_TOOL generate -i $SWAGGER_TEMPLATE \
 --additional-properties=useJsonEncodable=false,readonlyProperties=true
 
 echo "✨ Generation of models done, Removing some files we dont need."
+cd $INPUTDIR
+cd ..
+rm -rf Generated
+mv OpenAPIClient/Classes/OpenAPIs/Models Generated
 cd $OUTPUTDIR
 rm -r docs OpenAPIClient Cartfile git_push.sh OpenAPIClient.podspec Package.swift project.yml README.md .gitignore .openapi-generator-ignore .swiftformat .openapi-generator/FILES  .openapi-generator/VERSION
