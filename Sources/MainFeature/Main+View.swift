@@ -38,21 +38,21 @@ public extension Main.View {
 	}
 }
 
-// MARK: - MainView_Previews
-struct MainView_Previews: PreviewProvider {
-	static var previews: some View {
-		Main.View(
-			store: .init(
-				initialState: .placeholder,
-				reducer: Main.reducer,
-				environment: .init(
-					accountPortfolioFetcher: .mock,
-					appSettingsClient: .mock,
-					keychainClient: .unimplemented,
-					pasteboardClient: .noop,
-					profileClient: .unimplemented
-				)
-			)
-		)
-	}
-}
+//// MARK: - MainView_Previews
+// struct MainView_Previews: PreviewProvider {
+//	static var previews: some View {
+//		Main.View(
+//			store: .init(
+//				initialState: .placeholder,
+//				reducer: Main.reducer,
+//				environment: .init(
+//					accountPortfolioFetcher: .mock,
+//					appSettingsClient: .mock,
+//					keychainClient: .unimplemented,
+//					pasteboardClient: .noop,
+//					profileClient: .unimplemented
+//				)
+//			)
+//		)
+//	}
+// }

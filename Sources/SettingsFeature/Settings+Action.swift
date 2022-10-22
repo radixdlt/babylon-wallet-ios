@@ -1,4 +1,6 @@
+import ComposableArchitecture
 import Foundation
+import GatewayAPI
 import Profile
 
 // MARK: - Settings.Action
@@ -28,6 +30,9 @@ public extension Settings.Action.InternalAction {
 		#if DEBUG
 		case profileToDebugLoaded(Profile)
 		#endif // DEBUG
+		case viewDidAppear
+		case loadRDXLedgerEpoch
+		case fetchEpochResult(TaskResult<EpochResponse>)
 	}
 
 	enum UserAction: Equatable {

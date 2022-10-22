@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import GatewayAPI
 import KeychainClient
 import Profile
 import ProfileClient
@@ -11,7 +12,7 @@ import ProfileView
 // MARK: - Settings.View
 public extension Settings {
 	struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
+		public typealias Store = ComposableArchitecture.StoreOf<Settings>
 		private let store: Store
 
 		public init(
@@ -35,6 +36,11 @@ public extension Settings.View {
 						action: { viewStore.send(.dismissSettingsButtonTapped) },
 						label: { Text("Dismiss Settings") }
 					)
+
+					if let currentEpoch = viewStore.currentEpoch {
+						Text("RDX Ledger Epoch (fetched from Gateway API)")
+						Text("#\(String(describing: currentEpoch.epoch))")
+					}
 
 					#if DEBUG
 					Button("Debug Inspect Profile") {
@@ -80,11 +86,13 @@ public extension Settings.View {
 		public let isDebugProfileViewSheetPresented: Bool
 		public let profileToInspect: Profile?
 		#endif // DEBUG
+		public var currentEpoch: EpochResponse?
 		public init(state: Settings.State) {
 			#if DEBUG
 			isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			profileToInspect = state.profileToInspect
 			#endif // DEBUG
+			currentEpoch = state.currentEpoch
 		}
 	}
 }
@@ -124,11 +132,7 @@ struct HomeView_Previews: PreviewProvider {
 		Settings.View(
 			store: .init(
 				initialState: .init(),
-				reducer: Settings.reducer,
-				environment: .init(
-					keychainClient: .unimplemented,
-					profileClient: .unimplemented
-				)
+				reducer: Settings()
 			)
 		)
 	}

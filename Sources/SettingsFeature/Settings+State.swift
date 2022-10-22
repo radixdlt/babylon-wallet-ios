@@ -1,9 +1,6 @@
 import Foundation
+import GatewayAPI
 import Profile
-
-// MARK: - Settings
-/// Namespace for SettingsFeature
-public enum Settings {}
 
 // MARK: Settings.State
 public extension Settings {
@@ -12,6 +9,9 @@ public extension Settings {
 		#if DEBUG
 		public var profileToInspect: Profile?
 		#endif // DEBUG
+
+		/// Fetched from the RDX Ledger
+		public var currentEpoch: EpochResponse?
 
 		public init() {}
 	}

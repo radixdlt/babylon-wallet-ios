@@ -23,6 +23,11 @@ let bigInt: Target.Dependency = .product(
 	package: "BigInt"
 )
 
+let engineToolkit: Target.Dependency = .product(
+	name: "EngineToolkit",
+	package: "swift-engine-toolkit"
+)
+
 let package = Package(
 	name: "Babylon",
 	platforms: [
@@ -61,6 +66,8 @@ let package = Package(
 		.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
 
 		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.19"),
+
+		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.1"),
 	],
 	targets: [
 		// Targets sorted lexicographically, placing `testTarget` just after `target`.
@@ -74,6 +81,7 @@ let package = Package(
 				"AggregatedValueFeature",
 				"Asset",
 				"AssetsViewFeature",
+				engineToolkit,
 				profile,
 				tca,
 			]
@@ -283,7 +291,9 @@ let package = Package(
 			name: "GatewayAPI",
 			dependencies: [
 				"Asset",
+				bigInt,
 				"Common",
+				engineToolkit,
 				profile, // address
 				tca, // XCTestDynamicOverlay + DependencyKey
 			],
@@ -459,9 +469,10 @@ let package = Package(
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
 				profile,
-				.product(name: "ProfileView", package: "swift-profile"),
+				"GatewayAPI",
 				keychainClient,
 				"ProfileClient",
+				.product(name: "ProfileView", package: "swift-profile"),
 				tca,
 				// ^^^ Sort lexicographically ^^^
 			]

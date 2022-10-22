@@ -49,6 +49,7 @@ func amountAttos(at index: Int) -> String {
 
 public extension GatewayAPIClient {
 	static let unimplemented = Self(
+		getEpoch: XCTUnimplemented("\(Self.self).getEpoch is unimplemented"),
 		accountResourcesByAddress: XCTUnimplemented("\(Self.self).accountResourcesByAddress is unimplemented"),
 		resourceDetailsByResourceIdentifier: XCTUnimplemented("\(Self.self).resourceDetailsByResourceIdentifier is unimplemented"),
 		submitTransaction: XCTUnimplemented("\(Self.self).submitTransaction is unimplemented"),
@@ -62,6 +63,7 @@ public extension GatewayAPIClient {
 		txStatus: TransactionStatus.Status? = nil
 	) -> Self {
 		.init(
+			getEpoch: { .init(epoch: 1337) },
 			accountResourcesByAddress: { accountAddress in
 				.init(
 					address: accountAddress.address,
