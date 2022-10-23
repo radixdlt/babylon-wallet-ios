@@ -46,7 +46,7 @@ private extension FungibleTokenList.Row.View {
 						.frame(width: 40, height: 40)
 						.foregroundColor(.app.gray3)
 
-					Text(container.asset.code ?? "")
+					Text(container.asset.symbol ?? "")
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2HighImportance)
 				}

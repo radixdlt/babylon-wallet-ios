@@ -1,9 +1,12 @@
 import AppSettings
 import Asset
+import GatewayAPI
 import Profile
 
 public extension AssetUpdater {
-	static let live: Self = {
+	static func live(
+		gatewayAPIClient _: GatewayAPIClient = .live()
+	) -> Self {
 		let updateSingleAsset: UpdateSingleAsset = { asset, _ in
 			if let asset = asset as? FungibleToken {
 				// TODO: fetch real amount and worth when API is ready
@@ -88,5 +91,5 @@ public extension AssetUpdater {
 
 			}, updateSingleAsset: updateSingleAsset
 		)
-	}()
+	}
 }

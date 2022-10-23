@@ -4,27 +4,28 @@ import GatewayAPI
 import Profile
 
 public extension AssetFetcher {
-    static func live(apiClient: GatewayAPIClient) -> AssetFetcher {
-
-        AssetFetcher(
-			fetchAssets: { address async throws -> [[any Asset]] in
-				let resources = try await apiClient.accountResourcesByAddress(address)
+	static func live(
+		gatewayAPIClient: GatewayAPIClient = .live()
+	) -> Self {
+		Self(
+			fetchAssets: { (address: AccountAddress) async throws -> [[any Asset]] in
+				let resources = try await gatewayAPIClient.accountResourcesByAddress(address)
 
 				let resourceDetails = try await withThrowingTaskGroup(
 					of: ResourceDetails.self,
 					returning: [ResourceDetails].self,
 					body: { taskGroup in
-                        for resource in resources.ownedVaults.compactMap({ $0.fungibleResourceAmount }) {
+						for resource in resources.ownedVaults.compactMap(\.fungibleResourceAmount) {
 							taskGroup.addTask {
-                                let details = try await apiClient.resourceDetailsByResourceIdentifier(resource.resourceAddress)
+								let details = try await gatewayAPIClient.resourceDetailsByResourceIdentifier(resource.resourceAddress)
 								return .init(address: resource.resourceAddress, details: details)
 							}
 						}
 
-                        for resource in resources.ownedVaults.compactMap({ $0.vault?.resourceAmount.nonFungibleResourceAmount }) {
+						for resource in resources.ownedVaults.compactMap({ $0.vault?.resourceAmount.nonFungibleResourceAmount }) {
 							taskGroup.addTask {
-                                let details = try await apiClient.resourceDetailsByResourceIdentifier(resource.resourceAddress)
-                                return .init(address: resource.resourceAddress, details: details)
+								let details = try await gatewayAPIClient.resourceDetailsByResourceIdentifier(resource.resourceAddress)
+								return .init(address: resource.resourceAddress, details: details)
 							}
 						}
 
@@ -40,12 +41,23 @@ public extension AssetFetcher {
 				var fungibleTokens = [any Asset]()
 				var nonFungibleTokens = [any Asset]()
 
-				try resourceDetails.forEach {
-					switch $0.details {
-					case let .typeEntityDetailsResponseFungibleDetails(details):
-						try fungibleTokens.append(FungibleToken(address: $0.address, details: details))
-					case let .typeEntityDetailsResponseNonFungibleDetails(details):
-						nonFungibleTokens.append(NonFungibleToken(address: $0.address, details: details))
+				for detailedResource in resourceDetails {
+					switch detailedResource.details.manager {
+					case let .typeResourceManagerSubstate(fungible):
+						try fungibleTokens.append(
+							FungibleToken(
+								address: detailedResource.address,
+								resourceManagerSubstate: fungible
+							)
+						)
+					case let .typeNonFungibleSubstate(nonFungible):
+						nonFungibleTokens.append(
+							NonFungibleToken(
+								address: detailedResource.address,
+								nonFungibleSubstate: nonFungible
+							)
+						)
+					default: continue
 					}
 				}
 

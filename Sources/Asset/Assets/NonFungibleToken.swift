@@ -3,21 +3,32 @@ import Foundation
 // MARK: - NonFungibleToken
 public struct NonFungibleToken: Asset, Token {
 	public let address: ComponentAddress
-	// TODO: add supply when API is ready
 
-	/// Token icon URL.
+	public let nonFungibleID: String
+
+	public let isDeleted: Bool
+
+	// FIXME: this needs to be translated into something well structured.
+	public let nonFungibleDataAsString: String
 	public var iconURL: String?
 
 	public init(
 		address: ComponentAddress,
-		iconURL: String?
+		nonFungibleID: String,
+		isDeleted: Bool,
+		nonFungibleDataAsString: String,
+		iconURL: String? = nil
 	) {
 		self.address = address
+		self.nonFungibleID = nonFungibleID
+		self.isDeleted = isDeleted
+		self.nonFungibleDataAsString = nonFungibleDataAsString
 		self.iconURL = iconURL
 	}
 }
 
 // MARK: - NonFungibleTokenContainer
+// FIXME: Cyon: What is the purpose of this???
 public struct NonFungibleTokenContainer: AssetContainer {
 	public typealias T = NonFungibleToken
 	public let asset: NonFungibleToken
@@ -38,17 +49,23 @@ public struct NonFungibleTokenContainer: AssetContainer {
 public extension NonFungibleToken {
 	static let mock1 = Self(
 		address: "nft1-deadbeef",
-		iconURL: nil
+		nonFungibleID: "nft1-deadbeef-nft1-deadbeef",
+		isDeleted: false,
+		nonFungibleDataAsString: "<metadata goes here>"
 	)
 
 	static let mock2 = Self(
 		address: "nft2-deadbeef",
-		iconURL: nil
+		nonFungibleID: "nft2-deadbeef-nft2-deadbeef",
+		isDeleted: false,
+		nonFungibleDataAsString: "<metadata goes here>"
 	)
 
 	static let mock3 = Self(
-		address: "nft3-deadbeef",
-		iconURL: nil
+		address: "nft1-deadbeef",
+		nonFungibleID: "nft1-deadbeef-nft1-deadbeef",
+		isDeleted: true,
+		nonFungibleDataAsString: "<metadata goes here>"
 	)
 }
 #endif

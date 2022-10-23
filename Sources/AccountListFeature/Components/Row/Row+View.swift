@@ -169,14 +169,14 @@ private struct TokenListView: View {
 		if sortedTokens.count > limit {
 			HStack(spacing: -10) {
 				ForEach(sortedTokens[0 ..< limit]) { token in
-					TokenView(code: token.asset.code ?? "")
+					TokenView(code: token.asset.symbol ?? "")
 				}
 				TokenView(code: "+\(sortedTokens.count - limit)")
 			}
 		} else {
 			HStack(spacing: -10) {
 				ForEach(sortedTokens) { token in
-					TokenView(code: token.asset.code ?? "")
+					TokenView(code: token.asset.symbol ?? "")
 				}
 			}
 		}

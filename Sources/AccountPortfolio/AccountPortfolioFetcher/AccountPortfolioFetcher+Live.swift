@@ -1,13 +1,25 @@
 import AppSettings
 import Asset
+import GatewayAPI
 import Profile
 
 public extension AccountPortfolioFetcher {
 	private typealias AssetsDictionaryPerAccountAddress = [AccountAddress: [[any Asset]]]
 
 	static func live(
-		assetFetcher: AssetFetcher = .live,
-		assetUpdater: AssetUpdater = .live,
+		gatewayAPIClient: GatewayAPIClient,
+		appSettingsClient: AppSettingsClient = .live()
+	) -> Self {
+		Self.live(
+			assetFetcher: .live(gatewayAPIClient: gatewayAPIClient),
+			assetUpdater: .live(gatewayAPIClient: gatewayAPIClient),
+			appSettingsClient: appSettingsClient
+		)
+	}
+
+	static func live(
+		assetFetcher: AssetFetcher = .live(),
+		assetUpdater: AssetUpdater = .live(),
 		appSettingsClient: AppSettingsClient = .live()
 	) -> Self {
 		Self(

@@ -6,13 +6,6 @@ import Profile
 public typealias ResourceIdentifier = String
 
 // MARK: - GatewayAPIClient
-// public struct EntityResourcesResponse: Sendable, Equatable, Decodable {}
-// public struct TransactionSubmitRequest: Sendable, Equatable, Encodable {}
-// public struct TransactionStatusResponse: Sendable, Equatable, Decodable {}
-// public struct EntityDetailsResponseDetails: Sendable, Equatable, Decodable {}
-// public struct TransactionStatusRequest: Sendable, Equatable, Encodable {}
-// public struct TransactionSubmitResponse: Sendable, Equatable, Decodable {}
-
 public struct GatewayAPIClient {
 	public var getEpoch: GetEpoch
 	public var accountResourcesByAddress: GetAccountResourcesByAddress
@@ -79,6 +72,7 @@ public extension GatewayAPIClient {
 			}
 
 			urlRequest.allHTTPHeaderFields = [
+				"accept": "application/json",
 				"Content-Type": "application/json",
 			]
 
@@ -126,6 +120,7 @@ public extension GatewayAPIClient {
 			where
 			Request: Encodable, Response: Decodable
 		{
+			jsonEncoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
 			let httpBody = try jsonEncoder.encode(request)
 
 			return try await makeRequest(httpBodyData: httpBody, urlFromBase: urlFromBase)
@@ -149,7 +144,6 @@ public extension GatewayAPIClient {
 						.appendingPathComponent("state")
 						.appendingPathComponent("component")
 				}
-
 			},
 			resourceDetailsByResourceIdentifier: { resourceAddress in
 				try await post(
@@ -157,7 +151,7 @@ public extension GatewayAPIClient {
 				) { baseURL in
 					baseURL
 						.appendingPathComponent("state")
-						.appendingPathComponent("resources")
+						.appendingPathComponent("resource")
 				}
 			}
 //			submitTransaction: { transactionSubmitRequest in
