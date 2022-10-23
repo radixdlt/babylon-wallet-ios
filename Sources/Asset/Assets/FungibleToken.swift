@@ -6,8 +6,8 @@ import Foundation
 public struct FungibleToken: Asset, Token {
 	public let address: ComponentAddress
 	public let totalSupplyAttos: BigUInt
-	public let totalMintedAttos: BigUInt
-	public let totalBurntAttos: BigUInt
+	public let totalMintedAttos: BigUInt?
+	public let totalBurntAttos: BigUInt?
 
 	/// An optional desciption of this token.
 	public let tokenDescription: String?
@@ -24,8 +24,8 @@ public struct FungibleToken: Asset, Token {
 	public init(
 		address: ComponentAddress,
 		totalSupplyAttos: BigUInt,
-		totalMintedAttos: BigUInt,
-		totalBurntAttos: BigUInt,
+		totalMintedAttos: BigUInt?,
+		totalBurntAttos: BigUInt?,
 		tokenDescription: String?,
 		name: String?,
 		code: String?,
