@@ -4,7 +4,7 @@ import GatewayAPI
 import Profile
 
 public extension AccountPortfolioFetcher {
-	private typealias AssetsDictionaryPerAccountAddress = [AccountAddress: [[any Asset]]]
+	private typealias AssetsDictionaryPerAccountAddress = [AccountAddress: OwnedAssets]
 
 	static func live(
 		gatewayAPIClient: GatewayAPIClient,
@@ -12,20 +12,18 @@ public extension AccountPortfolioFetcher {
 	) -> Self {
 		Self.live(
 			assetFetcher: .live(gatewayAPIClient: gatewayAPIClient),
-			assetUpdater: .live(gatewayAPIClient: gatewayAPIClient),
 			appSettingsClient: appSettingsClient
 		)
 	}
 
 	static func live(
 		assetFetcher: AssetFetcher = .live(),
-		assetUpdater: AssetUpdater = .live(),
-		appSettingsClient: AppSettingsClient = .live()
+		appSettingsClient _: AppSettingsClient = .live()
 	) -> Self {
 		Self(
 			fetchPortfolio: { addresses in
 				let portfolioDictionary = try await withThrowingTaskGroup(
-					of: (address: AccountAddress, assets: [[any Asset]]).self,
+					of: (address: AccountAddress, assets: OwnedAssets).self,
 					returning: AssetsDictionaryPerAccountAddress.self,
 					body: { taskGroup in
 						for address in addresses {
@@ -44,36 +42,33 @@ public extension AccountPortfolioFetcher {
 					}
 				)
 
-				let currency = try await appSettingsClient.loadSettings().currency
-
-				let accountsPortfolio = try await withThrowingTaskGroup(
-					of: (address: AccountAddress, portfolio: AccountPortfolio).self,
-					returning: AccountPortfolioDictionary.self,
-					body: { taskGroup in
-						for element in portfolioDictionary {
-							taskGroup.addTask {
-								let address = element.key
-								let assets = element.value
-								let assetContainers = try await assetUpdater.updateAssets(assets, currency)
-								return (address, assetContainers)
-							}
-						}
-
-						var portfolio = AccountPortfolioDictionary()
-						for try await result in taskGroup {
-							portfolio[result.address] = AccountPortfolio(
-								fungibleTokenContainers: result.portfolio.fungibleTokenContainers,
-								nonFungibleTokenContainers: result.portfolio.nonFungibleTokenContainers,
-								poolShareContainers: result.portfolio.poolShareContainers,
-								badgeContainers: result.portfolio.badgeContainers
-							)
-						}
-						return portfolio
-					}
-				)
-
-				return accountsPortfolio
+				return portfolioDictionary
 			}
 		)
 	}
 }
+
+// extension AccountPortfolio {
+//	init(assetMatrix: [[any Asset]]) {
+//        var fungibleTokenContainers: [FungibleTokenContainer] = []
+//        var nonFungibleTokenContainers: [NonFungibleTokenContainer] = []
+//       var poolShareContainers: [PoolShareContainer] = []
+//       var badgeContainers: [BadgeContainer] = []
+//
+//        for list in assetMatrix {
+//            if let fungibleTokens = list as? [FungibleToken] {
+//                fungibleTokenContainers = fungibleTokens.map { (fungibleToken: FungibleToken) in
+//                    FungibleTokenContainer.init(asset: fungibleToken, amount: <#T##Float?#>, worth: <#T##Float?#>)
+//                }
+//            } else if let nonFungibleTokens = list as? [NonFungibleToken] {
+//
+//            } else if let nonFungibleTokens = list as? [NonFungibleToken] {
+//
+//            } else if let nonFungibleTokens = list as? [NonFungibleToken] {
+//
+//            } else {
+//                fatalError("Did you mix assets together? Not supported...")
+//            }
+//        }
+//	}
+// }

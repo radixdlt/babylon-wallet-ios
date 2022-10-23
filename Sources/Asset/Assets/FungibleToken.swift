@@ -40,7 +40,7 @@ import Foundation
 ///			],
 ///			"total_supply_attos": "1000000000000000000000000000000"
 ///		}
-public struct FungibleToken: Asset, Token {
+public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public let address: ComponentAddress
 	public let totalSupplyAttos: BigUInt
 	public let totalMintedAttos: BigUInt?
@@ -99,14 +99,14 @@ public struct FungibleTokenContainer: AssetContainer, Equatable {
 	public let asset: FungibleToken
 
 	/// Token amount held in one account.
-	public var amount: Float?
+	public var amount: BigUInt?
 	/// Token worth in currently selected currency.
-	public var worth: Float?
+	public var worth: BigUInt?
 
 	public init(
 		asset: FungibleToken,
-		amount: Float?,
-		worth: Float?
+		amount: BigUInt?,
+		worth: BigUInt?
 	) {
 		self.asset = asset
 		self.amount = amount

@@ -117,11 +117,12 @@ let package = Package(
 		.target(
 			name: "AccountPortfolio",
 			dependencies: [
-				profile,
 				"AppSettings",
 				"Asset",
-				"GatewayAPI",
+				bigInt,
 				"Common",
+				profile,
+				"GatewayAPI",
 			]
 		),
 		.testTarget(

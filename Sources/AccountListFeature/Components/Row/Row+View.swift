@@ -101,7 +101,7 @@ extension AccountList.Row.View {
 		let aggregatedValue: Float?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
-		let portfolio: AccountPortfolio
+		let portfolio: OwnedAssets
 
 		init(state: AccountList.Row.State) {
 			name = state.account.displayName

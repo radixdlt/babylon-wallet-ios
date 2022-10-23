@@ -1,4 +1,5 @@
 import Asset
+import BigInt
 import Common
 import ComposableArchitecture
 import Profile
@@ -80,12 +81,12 @@ private extension FungibleTokenList.Row.View {
 			.frame(height: 1)
 	}
 
-	func tokenAmount(value: Float?, isVisible: Bool) -> String {
+	func tokenAmount(value: BigUInt?, isVisible: Bool) -> String {
 		guard isVisible else { return "••••" }
 		return value != nil ? "\(value!)" : "-"
 	}
 
-	func tokenValue(_ value: Float?, isVisible: Bool, currency: FiatCurrency) -> String {
+	func tokenValue(_ value: BigUInt?, isVisible: Bool, currency: FiatCurrency) -> String {
 		if isVisible {
 			return value?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign) -"
 		} else {

@@ -1,3 +1,3 @@
 import Profile
 
-public typealias AccountPortfolioDictionary = [AccountAddress: AccountPortfolio]
+public typealias AccountPortfolioDictionary = [AccountAddress: OwnedAssets]

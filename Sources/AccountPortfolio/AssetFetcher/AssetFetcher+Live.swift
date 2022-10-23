@@ -1,31 +1,68 @@
 import Asset
+import BigInt
+import Common
 import ComposableArchitecture
 import GatewayAPI
 import Profile
+
+public extension V0StateComponentResponse {
+	func asSimpleOwnedAssets(owner: AccountAddress) throws -> SimpleOwnedAssets {
+		let simpleOwnedFungibleTokens = try ownedVaults.compactMap(\.fungibleResourceAmount)
+			.map {
+				SimpleOwnedFungibleToken(
+					owner: owner,
+					amount: try BigUInt(decimalString: $0.amountAttos),
+					tokenResourceAddress: $0.resourceAddress
+				)
+			}
+
+		let simpleOwnedNonFungibleTokens = ownedVaults.compactMap { $0.vault?.resourceAmount.nonFungibleResourceAmount }
+			.map {
+				SimpleOwnedNonFungibleToken(
+					owner: owner,
+					nonFungibleIDS: $0.nfIdsHex,
+					tokenResourceAddress: $0.resourceAddress
+				)
+			}
+
+		return SimpleOwnedAssets(
+			simpleOwnedFungibleTokens: simpleOwnedFungibleTokens,
+			simpleOwnedNonFungibleTokens: simpleOwnedNonFungibleTokens
+		)
+	}
+}
 
 public extension AssetFetcher {
 	static func live(
 		gatewayAPIClient: GatewayAPIClient = .live()
 	) -> Self {
 		Self(
-			fetchAssets: { (address: AccountAddress) async throws -> [[any Asset]] in
-				let resources = try await gatewayAPIClient.accountResourcesByAddress(address)
+			fetchAssets: { (accountAddress: AccountAddress) async throws -> OwnedAssets in
+				let resourcesRaw = try await gatewayAPIClient.accountResourcesByAddress(accountAddress)
 
-				let resourceDetails = try await withThrowingTaskGroup(
+				let simpleOwnedAssets: SimpleOwnedAssets = try resourcesRaw.asSimpleOwnedAssets(owner: accountAddress)
+
+				let detailsOfResources: [ResourceDetails] = try await withThrowingTaskGroup(
 					of: ResourceDetails.self,
 					returning: [ResourceDetails].self,
 					body: { taskGroup in
-						for resource in resources.ownedVaults.compactMap(\.fungibleResourceAmount) {
+						for simpleOwnedFungibleToken in simpleOwnedAssets.simpleOwnedFungibleTokens {
 							taskGroup.addTask {
-								let details = try await gatewayAPIClient.resourceDetailsByResourceIdentifier(resource.resourceAddress)
-								return .init(address: resource.resourceAddress, details: details)
+								let details = try await gatewayAPIClient.resourceDetailsByResourceIdentifier(simpleOwnedFungibleToken.tokenResourceAddress)
+								return .init(
+									simpleOwnedAsset: .simpleOwnedFungibleToken(simpleOwnedFungibleToken),
+									details: details
+								)
 							}
 						}
 
-						for resource in resources.ownedVaults.compactMap({ $0.vault?.resourceAmount.nonFungibleResourceAmount }) {
+						for simpleOwnedNonFungibleToken in simpleOwnedAssets.simpleOwnedNonFungibleTokens {
 							taskGroup.addTask {
-								let details = try await gatewayAPIClient.resourceDetailsByResourceIdentifier(resource.resourceAddress)
-								return .init(address: resource.resourceAddress, details: details)
+								let details = try await gatewayAPIClient.resourceDetailsByResourceIdentifier(simpleOwnedNonFungibleToken.tokenResourceAddress)
+								return .init(
+									simpleOwnedAsset: .simpleOwnedNonFungibleToken(simpleOwnedNonFungibleToken),
+									details: details
+								)
 							}
 						}
 
@@ -38,30 +75,47 @@ public extension AssetFetcher {
 					}
 				)
 
-				var fungibleTokens = [any Asset]()
-				var nonFungibleTokens = [any Asset]()
-
-				for detailedResource in resourceDetails {
-					switch detailedResource.details.manager {
-					case let .typeResourceManagerSubstate(fungible):
-						try fungibleTokens.append(
-							FungibleToken(
-								address: detailedResource.address,
-								resourceManagerSubstate: fungible
-							)
-						)
-					case let .typeNonFungibleSubstate(nonFungible):
-						nonFungibleTokens.append(
-							NonFungibleToken(
-								address: detailedResource.address,
-								nonFungibleSubstate: nonFungible
-							)
-						)
-					default: continue
+				let ownedFungibleTokens: [OwnedFungibleToken] = try detailsOfResources.filter { $0.simpleOwnedAsset.simpleOwnedFungibleToken != nil }.map {
+					guard let simpleOwnedFungibleToken = $0.simpleOwnedAsset.simpleOwnedFungibleToken else {
+						fatalError("bad logic")
 					}
+					guard let resourceManagerSubstate = $0.details.manager.resourceManagerSubstate else {
+						fatalError("bad logic 2")
+					}
+					let fungibleToken = try FungibleToken(
+						address: simpleOwnedFungibleToken.tokenResourceAddress,
+						resourceManagerSubstate: resourceManagerSubstate
+					)
+					return OwnedFungibleToken(
+						owner: simpleOwnedFungibleToken.owner,
+						amount: simpleOwnedFungibleToken.amount,
+						token: fungibleToken
+					)
 				}
 
-				return [fungibleTokens, nonFungibleTokens]
+				let ownedNonFungibleTokens: [OwnedNonFungibleToken] = detailsOfResources.filter { $0.simpleOwnedAsset.simpleOwnedNonFungibleToken != nil }.map {
+					guard let simpleOwnedNonFungibleToken = $0.simpleOwnedAsset.simpleOwnedNonFungibleToken else {
+						fatalError("bad logic")
+					}
+					guard let nonFungibleSubstate = $0.details.manager.nonFungibleSubstate else {
+						fatalError("bad logic 2")
+					}
+					let nonFungibleToken = NonFungibleToken(
+						address: simpleOwnedNonFungibleToken.tokenResourceAddress,
+						nonFungibleSubstate: nonFungibleSubstate
+					)
+
+					return OwnedNonFungibleToken(
+						owner: simpleOwnedNonFungibleToken.owner,
+						nonFungibleIDS: simpleOwnedNonFungibleToken.nonFungibleIDS,
+						token: nonFungibleToken
+					)
+				}
+
+				return OwnedAssets(
+					ownedFungibleTokens: ownedFungibleTokens,
+					ownedNonFungibleTokens: ownedNonFungibleTokens
+				)
 			}
 		)
 	}
@@ -70,7 +124,7 @@ public extension AssetFetcher {
 // MARK: - AssetFetcher.ResourceDetails
 private extension AssetFetcher {
 	struct ResourceDetails {
-		let address: String
+		let simpleOwnedAsset: SimpleOwnedAsset
 		let details: V0StateResourceResponse
 	}
 }

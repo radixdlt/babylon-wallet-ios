@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - NonFungibleToken
-public struct NonFungibleToken: Asset, Token {
+public struct NonFungibleToken: Sendable, Asset, Token, Hashable {
 	public let address: ComponentAddress
 
 	public let nonFungibleID: String

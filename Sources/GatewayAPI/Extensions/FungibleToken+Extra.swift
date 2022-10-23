@@ -41,6 +41,20 @@ public extension Substate {
 		vault?.resourceAmount.fungibleResourceAmount
 	}
 
+	var resourceManagerSubstate: ResourceManagerSubstate? {
+		guard case let .typeResourceManagerSubstate(typeResourceManagerSubstate) = self else {
+			return nil
+		}
+		return typeResourceManagerSubstate
+	}
+
+	var nonFungibleSubstate: NonFungibleSubstate? {
+		guard case let .typeNonFungibleSubstate(nonFungibleSubstate) = self else {
+			return nil
+		}
+		return nonFungibleSubstate
+	}
+
 	var nonFungibleResourceAmount: NonFungibleResourceAmount? {
 		vault?.resourceAmount.nonFungibleResourceAmount
 	}

@@ -154,12 +154,12 @@ public extension Home {
 				state.accountPortfolioDictionary = totalPortfolio
 
 				// aggregated value
-				state.aggregatedValue.value = totalPortfolio.compactMap(\.value.worth).reduce(0, +)
+//				state.aggregatedValue.value = totalPortfolio.compactMap(\.value.worth).reduce(0, +)
 
 				// account list
 				state.accountList.accounts.forEach {
-					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalPortfolio[$0.address]?.worth
-					let accountPortfolio = totalPortfolio[$0.address] ?? AccountPortfolio.empty
+//					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalPortfolio[$0.address]?.worth
+					let accountPortfolio = totalPortfolio[$0.address] ?? OwnedAssets.empty
 					state.accountList.accounts[id: $0.address]?.portfolio = accountPortfolio
 				}
 
@@ -168,10 +168,10 @@ public extension Home {
 					// aggregated value
 					let account = details.account
 					let accountWorth = state.accountPortfolioDictionary[details.address]
-					state.accountDetails?.aggregatedValue.value = accountWorth?.worth
+//					state.accountDetails?.aggregatedValue.value = accountWorth?.worth
 
 					// asset list
-					let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
+					let accountPortfolio = totalPortfolio[account.address] ?? OwnedAssets.empty
 					let categories = environment.fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
 
 					state.accountDetails?.assets = .init(
