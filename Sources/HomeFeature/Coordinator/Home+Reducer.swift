@@ -195,7 +195,7 @@ public extension Home {
 				guard let key = accountPortfolio.first?.key else { return .none }
 				state.accountPortfolioDictionary[key] = accountPortfolio.first?.value
 				return .run { [portfolio = state.accountPortfolioDictionary] send in
-					await send(.internal(.system(.accountPortfolioResult(.success(portfolio)))))
+					await send(.internal(.system(.fetchPortfolioResult(.success(portfolio)))))
 				}
 
 			case let .internal(.system(.accountPortfolioResult(.failure(error)))):
