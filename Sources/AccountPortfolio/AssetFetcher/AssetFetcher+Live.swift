@@ -95,10 +95,10 @@ public extension AssetFetcher {
 
 				let ownedNonFungibleTokens: [OwnedNonFungibleToken] = detailsOfResources.filter { $0.simpleOwnedAsset.simpleOwnedNonFungibleToken != nil }.map {
 					guard let simpleOwnedNonFungibleToken = $0.simpleOwnedAsset.simpleOwnedNonFungibleToken else {
-                        fatalError("We just filtered on `simpleOwnedNonFungibleToken`, so this should not happend")
+						fatalError("We just filtered on `simpleOwnedNonFungibleToken`, so this should not happend")
 					}
 					guard let nonFungibleSubstate = $0.details.manager.nonFungibleSubstate else {
-                        fatalError("Expected fungible token to always have a `nonFungibleSubstate`")
+						fatalError("Expected fungible token to always have a `nonFungibleSubstate`")
 					}
 					let nonFungibleToken = NonFungibleToken(
 						address: simpleOwnedNonFungibleToken.tokenResourceAddress,

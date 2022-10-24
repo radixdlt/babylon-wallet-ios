@@ -4,7 +4,6 @@ import GatewayAPI
 import Profile
 
 public extension AccountPortfolioFetcher {
-
 	static func live(
 		assetFetcher: AssetFetcher = .live(),
 		appSettingsClient _: AppSettingsClient = .live()
