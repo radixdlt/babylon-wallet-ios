@@ -23,20 +23,12 @@ public extension App {
 					)
 				}
 			),
-
-		Onboarding.reducer
-			.optional()
-			.pullback(
-				state: /App.State.onboarding,
-				action: /Action.onboarding,
-				environment: {
-					Onboarding.Environment(
-						backgroundQueue: $0.backgroundQueue,
-						keychainClient: $0.keychainClient,
-						mainQueue: $0.mainQueue
-					)
-				}
-			),
+		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
+		AnyReducer { _ in
+			Scope(state: /App.State.onboarding, action: /Action.onboarding) {
+				Onboarding()
+			}
+		},
 
 		Splash.reducer
 			.optional()
@@ -54,7 +46,7 @@ public extension App {
 
 		appReducer
 	)
-	// .debug()
+//	.debug()
 
 	static let appReducer = Reducer { state, action, environment in
 		switch action {
@@ -62,9 +54,13 @@ public extension App {
 			state = .onboarding(.init())
 			return Effect(value: .coordinate(.onboard))
 
-		case let .onboarding(.coordinate(.onboardedWithProfile(profile))):
+		case let .onboarding(.coordinate(.onboardedWithProfile(profile, isNew))):
 			return .run { send in
 				await send(.internal(.injectProfileIntoWalletClient(profile)))
+			}
+		case let .onboarding(.coordinate(.failedToCreateOrImportProfile(failureReason))):
+			return .run { send in
+				await send(.coordinate(.failedToCreateOrImportProfile(reason: failureReason)))
 			}
 
 		case let .splash(.coordinate(.loadProfileResult(.profileLoaded(profile)))):
@@ -73,8 +69,9 @@ public extension App {
 			}
 		case let .splash(.coordinate(.loadProfileResult(.noProfile(reason, failedToDecode)))):
 			if failedToDecode {
-				print("Fix this, failed to load wallet: \(reason)")
-				return .none
+				return .run { send in
+					await send(.coordinate(.failedToCreateOrImportProfile(reason: "Failed to decode profile: \(reason)")))
+				}
 			} else {
 				return .run { send in
 					await send(.coordinate(.onboard))
@@ -93,6 +90,11 @@ public extension App {
 
 		case .coordinate(.toMain):
 			state = .main(.init())
+			return .none
+
+		case let .coordinate(.failedToCreateOrImportProfile(reason)):
+			// FIXME: display error to user...
+			print("ERROR: \(reason)")
 			return .none
 
 		case .main:

@@ -21,6 +21,8 @@ public extension App.Action {
 	enum CoordinatingAction: Equatable {
 		case onboard
 		case toMain
+
+		case failedToCreateOrImportProfile(reason: String)
 	}
 
 	enum InternalAction: Equatable {

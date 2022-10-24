@@ -1,31 +1,22 @@
 import ComposableArchitecture
-
-// MARK: - Onboarding
-/// Namespace for OnboardingFeature
-public enum Onboarding {}
+import ImportProfileFeature
+import Mnemonic
 
 // MARK: Onboarding.State
 public extension Onboarding {
 	// MARK: State
 	struct State: Equatable {
-		@BindableState public var nameOfFirstAccount: String
-		public var canProceed: Bool
-
+		public var newProfile: NewProfile.State?
+		public var importProfile: ImportProfile.State?
+		public var importMnemonic: ImportMnemonic.State?
 		public init(
-			nameOfFirstAccount: String = "",
-			canProceed: Bool = false
+			newProfile: NewProfile.State? = nil,
+			importProfile: ImportProfile.State? = nil,
+			importMnemonic: ImportMnemonic.State? = nil
 		) {
-			self.nameOfFirstAccount = nameOfFirstAccount
-			self.canProceed = canProceed
+			self.newProfile = newProfile
+			self.importProfile = importProfile
+			self.importMnemonic = importMnemonic
 		}
 	}
 }
-
-#if DEBUG
-public extension Onboarding.State {
-	static let placeholder = Self(
-		nameOfFirstAccount: "Main",
-		canProceed: true
-	)
-}
-#endif

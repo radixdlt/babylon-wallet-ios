@@ -1,14 +1,14 @@
 import Common
 import ComposableArchitecture
+import ImportProfileFeature
 import SwiftUI
 
 // MARK: - Onboarding.View
 public extension Onboarding {
 	struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+		private let store: StoreOf<Onboarding>
 
-		public init(store: Store) {
+		public init(store: StoreOf<Onboarding>) {
 			self.store = store
 		}
 	}
@@ -21,32 +21,72 @@ public extension Onboarding.View {
 			observe: ViewState.init(state:),
 			send: Onboarding.Action.init
 		) { viewStore in
-			ForceFullScreen {
-				VStack {
-					TextField("Name of first account", text: viewStore.binding(\.$nameOfFirstAccount))
-					Button("Create Profle") {
-						viewStore.send(.createProfileButtonPressed)
+			ZStack {
+				ForceFullScreen {
+					VStack {
+						Button {
+							viewStore.send(.newProfileButtonTapped)
+						} label: {
+							Text("New Profile")
+								.foregroundColor(.white)
+								.frame(maxWidth: .infinity)
+						}
+
+						LabelledDivider(label: "or")
+
+						Button {
+							viewStore.send(.importProfileButtonTapped)
+						} label: {
+							Text("Import Profile")
+								.foregroundColor(.white)
+								.frame(maxWidth: .infinity)
+						}
 					}
-					.disabled(!viewStore.canProceed)
+					.padding()
+					.buttonStyle(.borderedProminent)
+					.textFieldStyle(.roundedBorder)
 				}
-				.padding()
-				.buttonStyle(.borderedProminent)
-				.textFieldStyle(.roundedBorder)
+				.zIndex(0)
+
+				IfLetStore(
+					store.scope(
+						state: \.newProfile,
+						action: Onboarding.Action.newProfile
+					),
+					then: { newProfileStore in
+						ForceFullScreen {
+							NewProfile.View(store: newProfileStore)
+						}
+					}
+				)
+				.zIndex(1)
+
+				IfLetStore(
+					store.scope(
+						state: \.importProfile,
+						action: Onboarding.Action.importProfile
+					),
+					then: { importProfileStore in
+						ForceFullScreen {
+							ImportProfile.View(store: importProfileStore)
+						}
+					}
+				)
+				.zIndex(2)
+
+				IfLetStore(
+					store.scope(
+						state: \.importMnemonic,
+						action: Onboarding.Action.importMnemonic
+					),
+					then: { importMnemonicStore in
+						ForceFullScreen {
+							ImportMnemonic.View(store: importMnemonicStore)
+						}
+					}
+				)
+				.zIndex(3)
 			}
-		}
-	}
-}
-
-// MARK: - Onboarding.View.ViewState
-extension Onboarding.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		@BindableState var nameOfFirstAccount: String
-		var canProceed: Bool
-
-		init(state: Onboarding.State) {
-			nameOfFirstAccount = state.nameOfFirstAccount
-			canProceed = state.canProceed
 		}
 	}
 }
@@ -54,49 +94,58 @@ extension Onboarding.View {
 // MARK: - Onboarding.View.ViewAction
 extension Onboarding.View {
 	// MARK: ViewAction
-	enum ViewAction: Equatable, BindableAction {
-		case binding(BindingAction<ViewState>)
-		case createProfileButtonPressed
+	enum ViewAction: Equatable {
+		case newProfileButtonTapped
+		case importProfileButtonTapped
+	}
+}
+
+// MARK: - Onboarding.View.ViewState
+extension Onboarding.View {
+	struct ViewState: Equatable {
+		public var newProfile: NewProfile.State?
+		public var importProfile: ImportProfile.State?
+		public var importMnemonic: ImportMnemonic.State?
+		public init(state: Onboarding.State) {
+			newProfile = state.newProfile
+			importProfile = state.importProfile
+			importMnemonic = state.importMnemonic
+		}
 	}
 }
 
 extension Onboarding.Action {
 	init(action: Onboarding.View.ViewAction) {
 		switch action {
-		case let .binding(bindingAction):
-			self = .binding(
-				bindingAction.pullback(\Onboarding.State.view)
-			)
-		case .createProfileButtonPressed:
-			self = .internal(.user(.createProfile))
+		case .importProfileButtonTapped:
+			self = .internal(.user(.importProfile))
+		case .newProfileButtonTapped:
+			self = .internal(.user(.newProfile))
 		}
 	}
 }
 
-private extension Onboarding.State {
-	var view: Onboarding.View.ViewState {
-		get { .init(state: self) }
-		set {
-			// handle bindable actions only:
-			nameOfFirstAccount = newValue.nameOfFirstAccount
-			canProceed = newValue.canProceed
+// MARK: - LabelledDivider
+struct LabelledDivider: View {
+	let label: String
+	let horizontalPadding: CGFloat
+	let color: Color
+
+	init(label: String, horizontalPadding: CGFloat = 20, color: Color = .gray) {
+		self.label = label
+		self.horizontalPadding = horizontalPadding
+		self.color = color
+	}
+
+	var body: some View {
+		HStack {
+			line
+			Text(label).foregroundColor(color)
+			line
 		}
 	}
-}
 
-// MARK: - OnboardingView_Previews
-struct OnboardingView_Previews: PreviewProvider {
-	static var previews: some View {
-		Onboarding.View(
-			store: .init(
-				initialState: .init(),
-				reducer: Onboarding.reducer,
-				environment: .init(
-					backgroundQueue: .immediate,
-					keychainClient: .unimplemented,
-					mainQueue: .immediate
-				)
-			)
-		)
+	var line: some View {
+		VStack { Divider().background(color) }.padding(horizontalPadding)
 	}
 }
