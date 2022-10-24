@@ -33,10 +33,8 @@ public extension Onboarding {
 					await send(.coordinate(.failedToCreateOrImportProfile(reason: "Import failed: \(importFailureReason)")))
 				}
 
-//			case let .importProfile(.coordinate(.importedProfile(profile))):
 			case let .importProfile(.coordinate(.importedProfileSnapshot(profileSnapshot))):
 				return .run { send in
-					//                    await send(.coordinate(.onboardedWithProfile(profile, isNew: false)))
 					await send(.internal(.coordinate(.importMnemonicForProfileSnapshot(profileSnapshot))))
 				}
 
