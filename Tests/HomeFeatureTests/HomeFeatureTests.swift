@@ -35,34 +35,21 @@ final class HomeFeatureTests: TestCase {
 	)
 	var address: AccountAddress { account.address }
 
-	func test_totalWorthLoaded_whenTotalWorthIsLoaded_thenUpdateAllSubStates() async {
+	func test_fetchPortfolio() async {
 		// given
 
 		// fungible tokens
-		let btc = FungibleToken.btc
-		let eth = FungibleToken.eth
-		let xrd = FungibleToken.xrd
-
-		let btcContainer = FungibleTokenContainer(asset: btc, amount: 1.234, worth: 1.987)
-		let ethContainer = FungibleTokenContainer(asset: eth, amount: 2.345, worth: 2.876)
-		let xrdContainer = FungibleTokenContainer(asset: xrd, amount: 4.567, worth: 4.654)
-		let expectedAggregatedValue: Float = 9.517
+		let ownedBTC = OwnedFungibleToken(owner: account.address, amountInAttos: 14.inAttos, token: .btc)
+		let ownedETH = OwnedFungibleToken(owner: account.address, amountInAttos: 2, token: .eth)
+		let ownedXRD = OwnedFungibleToken(owner: account.address, amountInAttos: 4, token: .xrd)
 
 		// non fungible tokens
-		let nft1 = NonFungibleToken.mock1
-		let nft2 = NonFungibleToken.mock2
-		let nft3 = NonFungibleToken.mock3
-		let nftContainer1 = NonFungibleTokenContainer(asset: nft1, metadata: nil)
-		let nftContainer2 = NonFungibleTokenContainer(asset: nft2, metadata: nil)
-		let nftContainer3 = NonFungibleTokenContainer(asset: nft3, metadata: nil)
+		let ownedNFT1 = OwnedNonFungibleToken(owner: account.address, nonFungibleIDS: ["1"], token: .mock1)
+		let ownedNFT2 = OwnedNonFungibleToken(owner: account.address, nonFungibleIDS: ["3", "7"], token: .mock2)
+		let ownedNFT3 = OwnedNonFungibleToken(owner: account.address, nonFungibleIDS: ["1337"], token: .mock3)
 
 		let totalPortfolio: AccountPortfolioDictionary = [
-			account.address: .init(
-				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
-				nonFungibleTokenContainers: [nftContainer1, nftContainer2, nftContainer3],
-				poolShareContainers: [],
-				badgeContainers: []
-			),
+			account.address: .init(ownedFungibleTokens: [ownedBTC, ownedETH, ownedXRD], ownedNonFungibleTokens: [ownedNFT1, ownedNFT2, ownedNFT3]),
 		]
 
 		let accountRowState = AccountList.Row.State(account: account)
@@ -85,25 +72,17 @@ final class HomeFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.system(.totalPortfolioLoaded(totalPortfolio)))) { [address] in
+		_ = await store.send(.internal(.system(.fetchPortfolioResult(.success(totalPortfolio))))) { [address] in
 			// then
 			// local dictionary
 			$0.accountPortfolioDictionary = totalPortfolio
 
-			// aggregated value
-			$0.aggregatedValue.value = expectedAggregatedValue
-
 			// account list
-			$0.accountList.accounts[id: address]!.aggregatedValue = totalPortfolio[address]!.worth
 			let accountPortfolio = totalPortfolio[address]!
 			$0.accountList.accounts[id: address]!.portfolio = accountPortfolio
 
 			// account details
 			if let details = $0.accountDetails {
-				// aggregated value
-				let accountWorth = $0.accountPortfolioDictionary[details.address]
-				$0.accountDetails?.aggregatedValue.value = accountWorth?.worth
-
 				// asset list
 				let sortedCategories = environment.fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
 
@@ -151,22 +130,13 @@ final class HomeFeatureTests: TestCase {
 
 	func test_accountWorthLoaded_whenSingleAccountWorthIsLoaded_thenUpdateSingleAccount() async {
 		// given
-		let btc = FungibleToken.btc
-		let eth = FungibleToken.eth
-		let xrd = FungibleToken.xrd
-
-		let btcContainer = FungibleTokenContainer(asset: btc, amount: 1.234, worth: 1.987)
-		let ethContainer = FungibleTokenContainer(asset: eth, amount: 2.345, worth: 2.876)
-		let xrdContainer = FungibleTokenContainer(asset: xrd, amount: 4.567, worth: 4.654)
-		let expectedAggregatedValue: Float = 9.517
+		// fungible tokens
+		let ownedBTC = OwnedFungibleToken(owner: account.address, amountInAttos: 14.inAttos, token: .btc)
+		let ownedETH = OwnedFungibleToken(owner: account.address, amountInAttos: 2, token: .eth)
+		let ownedXRD = OwnedFungibleToken(owner: account.address, amountInAttos: 4, token: .xrd)
 
 		let accountPortfolio: AccountPortfolioDictionary = [
-			address: .init(
-				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
-				nonFungibleTokenContainers: [],
-				poolShareContainers: [],
-				badgeContainers: []
-			),
+			account.address: .init(ownedFungibleTokens: [ownedBTC, ownedETH, ownedXRD], ownedNonFungibleTokens: []),
 		]
 
 		let initialState: Home.State = .placeholder
@@ -176,16 +146,12 @@ final class HomeFeatureTests: TestCase {
 			environment: .unimplemented
 		)
 
-		_ = await store.send(.internal(.system(.accountPortfolioLoaded(accountPortfolio)))) {
+		_ = await store.send(.internal(.system(.fetchPortfolioResult(.success(accountPortfolio))))) {
 			guard let key = accountPortfolio.first?.key else {
 				XCTFail("Failed to fetch first account")
 				return
 			}
 			$0.accountPortfolioDictionary[key] = accountPortfolio.first?.value
-		}
-
-		await store.receive(.internal(.system(.totalPortfolioLoaded(store.state.accountPortfolioDictionary)))) {
-			$0.aggregatedValue.value = expectedAggregatedValue
 		}
 	}
 
