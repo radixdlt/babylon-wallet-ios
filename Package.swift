@@ -359,6 +359,9 @@ let package = Package(
 			dependencies: [
 				"ImportProfileFeature",
 				"TestUtils",
+			],
+			resources: [
+				.process("profile_snapshot.json"),
 			]
 		),
 
