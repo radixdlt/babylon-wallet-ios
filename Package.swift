@@ -257,6 +257,9 @@ let package = Package(
 				profile,
 				tca,
 				"ProfileClient",
+			],
+			resources: [
+				.process("Resources"),
 			]
 		),
 		.testTarget(
@@ -445,6 +448,9 @@ let package = Package(
 				"Common",
 				"DesignSystem",
 				tca,
+			],
+			resources: [
+				.process("Resources"),
 			]
 		),
 		.testTarget(
