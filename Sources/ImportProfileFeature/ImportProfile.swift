@@ -4,7 +4,6 @@ import KeychainClient
 import Profile
 import ProfileClient // FIXME: only need `KeychainClientKey`, which lives here... how to handle this best since KeychainClient is defined in Profile repo but we want to create our live value in any of our Packages (here ProfileClient..)?
 import SwiftUI
-import UniformTypeIdentifiers
 
 // MARK: - JSONDecoderKey
 private enum JSONDecoderKey: DependencyKey {
@@ -15,6 +14,9 @@ private enum JSONDecoderKey: DependencyKey {
 		return decoder
 	}()
 }
+
+// MARK: - JSONDecoder + Sendable
+@available(iOS 15, macOS 12, *) extension JSONDecoder: @unchecked Sendable {}
 
 public extension DependencyValues {
 	var jsonDecoder: JSONDecoder {
@@ -199,8 +201,4 @@ public extension ImportProfile.View {
 			)
 		}
 	}
-}
-
-extension UTType {
-	static let profile: Self = .json
 }
