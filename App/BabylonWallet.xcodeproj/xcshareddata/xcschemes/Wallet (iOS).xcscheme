@@ -72,16 +72,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AddressTests"
-               BuildableName = "AddressTests"
-               BlueprintName = "AddressTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "AggregatedValueFeatureTests"
                BuildableName = "AggregatedValueFeatureTests"
                BlueprintName = "AggregatedValueFeatureTests"
@@ -232,16 +222,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProfileTests"
-               BuildableName = "ProfileTests"
-               BlueprintName = "ProfileTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "SettingsFeatureTests"
                BuildableName = "SettingsFeatureTests"
                BlueprintName = "SettingsFeatureTests"
@@ -272,9 +252,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "WalletLoaderTests"
-               BuildableName = "WalletLoaderTests"
-               BlueprintName = "WalletLoaderTests"
+               BlueprintIdentifier = "GatewayAPITests"
+               BuildableName = "GatewayAPITests"
+               BlueprintName = "GatewayAPITests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -282,9 +262,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "WalletRemoverTests"
-               BuildableName = "WalletRemoverTests"
-               BlueprintName = "WalletRemoverTests"
+               BlueprintIdentifier = "ImportProfileFeatureTests"
+               BuildableName = "ImportProfileFeatureTests"
+               BlueprintName = "ImportProfileFeatureTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -292,9 +272,19 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "WalletTests"
-               BuildableName = "WalletTests"
-               BlueprintName = "WalletTests"
+               BlueprintIdentifier = "IncomingConnectionRequestFromDappReviewFeatureTests"
+               BuildableName = "IncomingConnectionRequestFromDappReviewFeatureTests"
+               BlueprintName = "IncomingConnectionRequestFromDappReviewFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ProfileClientTests"
+               BuildableName = "ProfileClientTests"
+               BlueprintName = "ProfileClientTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>

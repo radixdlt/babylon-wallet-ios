@@ -77,10 +77,10 @@ public extension AssetFetcher {
 
 				let ownedFungibleTokens: [OwnedFungibleToken] = try detailsOfResources.filter { $0.simpleOwnedAsset.simpleOwnedFungibleToken != nil }.map {
 					guard let simpleOwnedFungibleToken = $0.simpleOwnedAsset.simpleOwnedFungibleToken else {
-						fatalError("bad logic")
+						fatalError("We just filtered on `simpleOwnedFungibleToken`, so this should not happend")
 					}
 					guard let resourceManagerSubstate = $0.details.manager.resourceManagerSubstate else {
-						fatalError("bad logic 2")
+						fatalError("Expected fungible token to always have a `resourceManagerSubstate`")
 					}
 					let fungibleToken = try FungibleToken(
 						address: simpleOwnedFungibleToken.tokenResourceAddress,
@@ -95,10 +95,10 @@ public extension AssetFetcher {
 
 				let ownedNonFungibleTokens: [OwnedNonFungibleToken] = detailsOfResources.filter { $0.simpleOwnedAsset.simpleOwnedNonFungibleToken != nil }.map {
 					guard let simpleOwnedNonFungibleToken = $0.simpleOwnedAsset.simpleOwnedNonFungibleToken else {
-						fatalError("bad logic")
+                        fatalError("We just filtered on `simpleOwnedNonFungibleToken`, so this should not happend")
 					}
 					guard let nonFungibleSubstate = $0.details.manager.nonFungibleSubstate else {
-						fatalError("bad logic 2")
+                        fatalError("Expected fungible token to always have a `nonFungibleSubstate`")
 					}
 					let nonFungibleToken = NonFungibleToken(
 						address: simpleOwnedNonFungibleToken.tokenResourceAddress,

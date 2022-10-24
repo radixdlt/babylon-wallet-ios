@@ -3,25 +3,6 @@ import Foundation
 import KeychainClient
 import Profile
 import ProfileClient // FIXME: only need `KeychainClientKey`, which lives here... how to handle this best since KeychainClient is defined in Profile repo but we want to create our live value in any of our Packages (here ProfileClient..)?
-import SwiftUI
-import UniformTypeIdentifiers
-
-// MARK: - JSONDecoderKey
-private enum JSONDecoderKey: DependencyKey {
-	typealias Value = JSONDecoder
-	static let liveValue = {
-		let decoder = JSONDecoder()
-		decoder.dateDecodingStrategy = .iso8601
-		return decoder
-	}()
-}
-
-public extension DependencyValues {
-	var jsonDecoder: JSONDecoder {
-		get { self[JSONDecoderKey.self] }
-		set { self[JSONDecoderKey.self] = newValue }
-	}
-}
 
 // MARK: - ImportProfile
 public struct ImportProfile: ReducerProtocol {
@@ -30,47 +11,7 @@ public struct ImportProfile: ReducerProtocol {
 	public init() {}
 }
 
-// MARK: ImportProfile.State
-public extension ImportProfile {
-	struct State: Equatable {
-		public var isDisplayingFileImporter = false
-
-		public init(
-			isDisplayingFileImporter: Bool = false
-		) {
-			self.isDisplayingFileImporter = isDisplayingFileImporter
-		}
-	}
-}
-
-// MARK: ImportProfile.Action
-public extension ImportProfile {
-	enum Action: Equatable {
-		case coordinate(Coordinate)
-		case `internal`(Internal)
-	}
-}
-
-public extension ImportProfile {
-	enum Internal: Equatable {
-		case goBack
-		case importProfileFile
-		case dismissFileimporter
-		case importProfileFileResult(TaskResult<URL>)
-		case importProfileDataFromFileAt(URL)
-		case importProfileDataResult(TaskResult<Data>)
-		case importProfileSnapshotFromDataResult(TaskResult<ProfileSnapshot>)
-		case saveProfileSnapshot(ProfileSnapshot)
-		case saveProfileSnapshotResult(TaskResult<ProfileSnapshot>)
-	}
-
-	enum Coordinate: Equatable {
-		case goBack
-		case importedProfileSnapshot(ProfileSnapshot)
-		case failedToImportProfileSnapshot(reason: String)
-	}
-}
-
+// MARK: ReducerProtocol Conformance
 public extension ImportProfile {
 	func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
 		switch action {
@@ -146,61 +87,4 @@ public extension ImportProfile {
 		case .coordinate: return .none
 		}
 	}
-}
-
-// MARK: ImportProfile.View
-public extension ImportProfile {
-	struct View: SwiftUI.View {
-		let store: StoreOf<ImportProfile>
-		public init(store: StoreOf<ImportProfile>) {
-			self.store = store
-		}
-	}
-}
-
-public extension ImportProfile.View {
-	var body: some View {
-		WithViewStore(
-			store,
-			observe: { $0 }
-		) { viewStore in
-			VStack {
-				HStack {
-					Button(
-						action: {
-							viewStore.send(.internal(.goBack))
-						}, label: {
-							Image("arrow-back")
-						}
-					)
-					Spacer()
-					Text("Import profile")
-					Spacer()
-					EmptyView()
-				}
-				Spacer()
-
-				Button("Import Profile") {
-					viewStore.send(.internal(.importProfileFile))
-				}
-				.buttonStyle(.borderedProminent)
-				Spacer()
-			}
-			.fileImporter(
-				isPresented: viewStore.binding(
-					get: \.isDisplayingFileImporter,
-					send: ImportProfile.Action.internal(.dismissFileimporter)
-				),
-				allowedContentTypes: [.profile],
-				onCompletion: {
-					let taskResult: TaskResult<URL> = TaskResult($0)
-					viewStore.send(.internal(.importProfileFileResult(taskResult)))
-				}
-			)
-		}
-	}
-}
-
-extension UTType {
-	static let profile: Self = .json
 }
