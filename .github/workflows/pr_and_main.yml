@@ -38,6 +38,7 @@ jobs:
             ${{ secrets.MNEMONIC_SSH_KEY }}
             ${{ secrets.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
             ${{ secrets.CONVERSE_SSH_KEY }}
+            ${{ secrets.BITE_SSH_KEY }}
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
