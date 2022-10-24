@@ -62,12 +62,10 @@ public extension ImportProfile {
 		case importProfileSnapshotFromDataResult(TaskResult<ProfileSnapshot>)
 		case saveProfileSnapshot(ProfileSnapshot)
 		case saveProfileSnapshotResult(TaskResult<ProfileSnapshot>)
-//		case restoreProfileFromSnapshotResult(TaskResult<Profile>)
 	}
 
 	enum Coordinate: Equatable {
 		case goBack
-//		case importedProfile(Profile)
 		case importedProfileSnapshot(ProfileSnapshot)
 		case failedToImportProfileSnapshot(reason: String)
 	}
@@ -84,9 +82,11 @@ public extension ImportProfile {
 		case .internal(.dismissFileimporter):
 			state.isDisplayingFileImporter = false
 			return .none
+
 		case .internal(.importProfileFile):
 			state.isDisplayingFileImporter = true
 			return .none
+
 		case let .internal(.importProfileFileResult(.failure(error))):
 			return .run { send in
 				await send(.coordinate(.failedToImportProfileSnapshot(reason: "Failed to import file, error: \(String(describing: error))")))
@@ -96,10 +96,12 @@ public extension ImportProfile {
 			return .run { send in
 				await send(.internal(.importProfileDataFromFileAt(profileURL)))
 			}
+
 		case let .internal(.importProfileDataFromFileAt(profileFileURL)):
 			return .run { send in
 				await send(.internal(.importProfileDataResult(TaskResult { try Data(contentsOf: profileFileURL, options: .uncached) })))
 			}
+
 		case let .internal(.importProfileDataResult(.success(profileData))):
 			return .run { [jsonDecoder] send in
 				await send(.internal(.importProfileSnapshotFromDataResult(TaskResult {
@@ -116,6 +118,7 @@ public extension ImportProfile {
 			return .run { send in
 				await send(.internal(.saveProfileSnapshot(profileSnapshot)))
 			}
+
 		case let .internal(.importProfileSnapshotFromDataResult(.failure(error))):
 			return .run { send in
 				await send(.coordinate(.failedToImportProfileSnapshot(reason: "Failed to import ProfileSnapshot from data, error: \(String(describing: error))")))
@@ -132,9 +135,6 @@ public extension ImportProfile {
 
 		case let .internal(.saveProfileSnapshotResult(.success(savedProfileSnapshot))):
 			return .run { send in
-//				await send(.internal(.restoreProfileFromSnapshotResult(TaskResult {
-//					try Profile(snapshot: savedProfileSnapshot)
-//				})))
 				await send(.coordinate(.importedProfileSnapshot(savedProfileSnapshot)))
 			}
 
@@ -142,15 +142,6 @@ public extension ImportProfile {
 			return .run { send in
 				await send(.coordinate(.failedToImportProfileSnapshot(reason: "Failed to save ProfileSnapshot, error: \(String(describing: error))")))
 			}
-
-//		case let .internal(.restoreProfileFromSnapshotResult(.success(profile))):
-//			return .run { send in
-//				await send(.coordinate(.importedProfile(profile)))
-//			}
-//		case let .internal(.restoreProfileFromSnapshotResult(.failure(error))):
-//			return .run { send in
-//				await send(.coordinate(.failedToImportProfileSnapshot(reason: "Failed to restore Profile from Snapshot, error: \(String(describing: error))")))
-//			}
 
 		case .coordinate: return .none
 		}

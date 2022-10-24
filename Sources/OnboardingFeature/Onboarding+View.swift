@@ -18,7 +18,7 @@ public extension Onboarding.View {
 	var body: some View {
 		WithViewStore(
 			store,
-			observe: { $0 },
+			observe: ViewState.init(state:),
 			send: Onboarding.Action.init
 		) { viewStore in
 			ZStack {
@@ -97,6 +97,20 @@ extension Onboarding.View {
 	enum ViewAction: Equatable {
 		case newProfileButtonTapped
 		case importProfileButtonTapped
+	}
+}
+
+// MARK: - Onboarding.View.ViewState
+extension Onboarding.View {
+	struct ViewState: Equatable {
+		public var newProfile: NewProfile.State?
+		public var importProfile: ImportProfile.State?
+		public var importMnemonic: ImportMnemonic.State?
+		public init(state: Onboarding.State) {
+			newProfile = state.newProfile
+			importProfile = state.importProfile
+			importMnemonic = state.importMnemonic
+		}
 	}
 }
 
