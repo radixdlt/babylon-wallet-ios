@@ -1,3 +1,4 @@
+import Asset
 import Foundation
 
 public extension AccountPortfolioFetcher {
@@ -13,7 +14,7 @@ import XCTestDynamicOverlay
 
 public extension AccountPortfolioFetcher {
 	static let unimplemented = Self(
-		fetchPortfolio: XCTUnimplemented("\(Self.self).fetchWorth")
+		fetchPortfolio: XCTUnimplemented("\(Self.self).fetchPortfolio")
 	)
 }
 #endif

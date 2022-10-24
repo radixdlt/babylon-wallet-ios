@@ -11,7 +11,7 @@ public extension V0StateComponentResponse {
 			.map {
 				SimpleOwnedFungibleToken(
 					owner: owner,
-					amount: try BigUInt(decimalString: $0.amountAttos),
+					amountInAttos: try BigUInt(decimalString: $0.amountAttos),
 					tokenResourceAddress: $0.resourceAddress
 				)
 			}
@@ -88,7 +88,7 @@ public extension AssetFetcher {
 					)
 					return OwnedFungibleToken(
 						owner: simpleOwnedFungibleToken.owner,
-						amount: simpleOwnedFungibleToken.amount,
+						amountInAttos: simpleOwnedFungibleToken.amountInAttos,
 						token: fungibleToken
 					)
 				}

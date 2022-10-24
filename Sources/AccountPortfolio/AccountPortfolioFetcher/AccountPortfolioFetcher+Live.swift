@@ -47,28 +47,3 @@ public extension AccountPortfolioFetcher {
 		)
 	}
 }
-
-// extension AccountPortfolio {
-//	init(assetMatrix: [[any Asset]]) {
-//        var fungibleTokenContainers: [FungibleTokenContainer] = []
-//        var nonFungibleTokenContainers: [NonFungibleTokenContainer] = []
-//       var poolShareContainers: [PoolShareContainer] = []
-//       var badgeContainers: [BadgeContainer] = []
-//
-//        for list in assetMatrix {
-//            if let fungibleTokens = list as? [FungibleToken] {
-//                fungibleTokenContainers = fungibleTokens.map { (fungibleToken: FungibleToken) in
-//                    FungibleTokenContainer.init(asset: fungibleToken, amount: <#T##Float?#>, worth: <#T##Float?#>)
-//                }
-//            } else if let nonFungibleTokens = list as? [NonFungibleToken] {
-//
-//            } else if let nonFungibleTokens = list as? [NonFungibleToken] {
-//
-//            } else if let nonFungibleTokens = list as? [NonFungibleToken] {
-//
-//            } else {
-//                fatalError("Did you mix assets together? Not supported...")
-//            }
-//        }
-//	}
-// }

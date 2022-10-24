@@ -1,3 +1,4 @@
+import Asset
 import Foundation
 
 public extension AssetFetcher {
