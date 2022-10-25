@@ -359,6 +359,7 @@ let package = Package(
 				"Common",
 				"DesignSystem",
 				profile,
+				"ProfileClient",
 				tca,
 			],
 			resources: [
