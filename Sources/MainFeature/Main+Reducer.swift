@@ -78,6 +78,11 @@ public extension Main {
 				return .none
 			case .home(.createAccount(_)):
 				return .none
+
+			#if DEBUG
+			case .home(.connectionRequest(_)):
+				return .none
+			#endif
 			}
 		}
 	)

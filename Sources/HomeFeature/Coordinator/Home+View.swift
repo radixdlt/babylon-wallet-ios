@@ -5,6 +5,7 @@ import AggregatedValueFeature
 import Common
 import ComposableArchitecture
 import CreateAccountFeature
+import IncomingConnectionRequestFromDappReviewFeature
 import SwiftUI
 
 // MARK: - Home.View
@@ -70,6 +71,17 @@ public extension Home.View {
 					then: AccountDetails.Transfer.View.init(store:)
 				)
 				.zIndex(5)
+
+				#if DEBUG
+				IfLetStore(
+					store.scope(
+						state: \.connectionRequest,
+						action: Home.Action.connectionRequest
+					),
+					then: IncomingConnectionRequestFromDappReview.View.init(store:)
+				)
+				.zIndex(6)
+				#endif
 			}
 		}
 	}
@@ -81,6 +93,10 @@ extension Home.View {
 	enum ViewAction: Equatable {
 		case createAccountButtonTapped
 		case didAppear
+
+		#if DEBUG
+		case showDAppConnectionRequest
+		#endif
 	}
 }
 
@@ -91,6 +107,11 @@ extension Home.Action {
 			self = .internal(.system(.viewDidAppear))
 		case .createAccountButtonTapped:
 			self = .internal(.user(.createAccountButtonTapped))
+
+		#if DEBUG
+		case .showDAppConnectionRequest:
+			self = .internal(.user(.showDAppConnectionRequest))
+		#endif
 		}
 	}
 }
@@ -148,6 +169,22 @@ private extension Home.View {
 						viewStore.send(.createAccountButtonTapped)
 					}
 					Spacer()
+
+					#if DEBUG
+					Button(
+						action: { viewStore.send(.showDAppConnectionRequest) },
+						label: {
+							Text("dApp Connection Request")
+								.padding()
+								.background(Color.red)
+								.cornerRadius(8)
+								.foregroundColor(.yellow)
+						}
+					)
+
+					Spacer()
+					#endif
+
 					Home.VisitHub.View(
 						store: store.scope(
 							state: \.visitHub,

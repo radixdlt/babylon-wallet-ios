@@ -8,6 +8,7 @@ import Common
 import ComposableArchitecture
 import CreateAccountFeature
 import Foundation
+import IncomingConnectionRequestFromDappReviewFeature
 import NonEmpty
 import Profile
 
@@ -26,6 +27,10 @@ public extension Home {
 		case accountDetails(AccountDetails.Action)
 		case transfer(AccountDetails.Transfer.Action)
 		case createAccount(CreateAccount.Action)
+
+		#if DEBUG
+		case connectionRequest(IncomingConnectionRequestFromDappReview.Action)
+		#endif
 	}
 }
 
@@ -42,6 +47,10 @@ public extension Home.Action {
 public extension Home.Action.InternalAction {
 	enum UserAction: Equatable {
 		case createAccountButtonTapped
+
+		#if DEBUG
+		case showDAppConnectionRequest
+		#endif
 	}
 }
 

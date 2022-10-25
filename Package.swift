@@ -333,13 +333,14 @@ let package = Package(
 				"AccountDetailsFeature",
 				"AccountPortfolio",
 				"AccountPreferencesFeature",
-				profile,
 				"AppSettings",
 				"Common",
 				"CreateAccountFeature",
+				"IncomingConnectionRequestFromDappReviewFeature",
 				"PasteboardClient",
-				tca,
+				profile,
 				"ProfileClient",
+				tca,
 				// ^^^ Sort lexicographically ^^^
 			]
 		),

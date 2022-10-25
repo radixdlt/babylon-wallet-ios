@@ -7,6 +7,7 @@ import Asset
 import ComposableArchitecture
 import CreateAccountFeature
 import FungibleTokenListFeature
+import IncomingConnectionRequestFromDappReviewFeature
 
 #if os(iOS)
 // FIXME: move to `UIApplicationClient` package!
@@ -94,6 +95,14 @@ public extension Home {
 					let accounts = try environment.profileClient.getAccounts()
 					await send(.internal(.coordinate(.createAccount(numberOfExistingAccounts: accounts.count))))
 				}
+
+			// commented out DEBUG because swift format replaces state with _
+//			#if DEBUG
+			case .internal(.user(.showDAppConnectionRequest)):
+				state.connectionRequest = .init(incomingConnectionRequestFromDapp: .placeholder)
+				return .none
+//			#endif
+
 			case let .internal(.coordinate(.createAccount(numberOfExistingAccounts))):
 				state.createAccount = .init(numberOfExistingAccounts: numberOfExistingAccounts)
 				return .none
@@ -335,6 +344,11 @@ public extension Home {
 
 			case .transfer(.internal):
 				return .none
+
+			#if DEBUG
+			case .connectionRequest:
+				return .none
+			#endif
 			}
 		}
 	)
