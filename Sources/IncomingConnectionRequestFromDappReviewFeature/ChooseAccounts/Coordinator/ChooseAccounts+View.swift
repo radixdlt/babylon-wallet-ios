@@ -65,10 +65,10 @@ public extension ChooseAccounts.View {
 
 						PrimaryButton(
 							title: L10n.DApp.ConnectionRequest.continueButtonTitle,
-							isEnabled: viewStore.isValid,
+							isEnabled: viewStore.canProceed,
 							action: { viewStore.send(.continueButtonTapped) }
 						)
-						.disabled(!viewStore.isValid)
+						.disabled(!viewStore.canProceed)
 					}
 					.padding(.horizontal, 24)
 				}
@@ -115,11 +115,11 @@ extension ChooseAccounts.Action {
 // MARK: - ChooseAccounts.View.ViewState
 extension ChooseAccounts.View {
 	struct ViewState: Equatable {
-		var isValid: Bool
+		var canProceed: Bool
 		let incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp
 
 		init(state: ChooseAccounts.State) {
-			isValid = state.isValid
+			canProceed = state.canProceed
 			incomingConnectionRequestFromDapp = state.incomingConnectionRequestFromDapp
 		}
 	}

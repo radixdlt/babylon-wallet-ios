@@ -5,18 +5,18 @@ import Foundation
 public extension ChooseAccounts {
 	struct State: Equatable {
 		public let incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp
-		public var isValid: Bool
+		public var canProceed: Bool
 		public var accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
 		public let accountLimit: Int
 
 		public init(
 			incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp,
-			isValid: Bool = false,
+			canProceed: Bool = false,
 			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>,
 			accountLimit: Int
 		) {
 			self.incomingConnectionRequestFromDapp = incomingConnectionRequestFromDapp
-			self.isValid = isValid
+			self.canProceed = canProceed
 			self.accounts = accounts
 			self.accountLimit = accountLimit
 		}
@@ -34,7 +34,7 @@ extension ChooseAccounts.State {
 public extension ChooseAccounts.State {
 	static let placeholder: Self = .init(
 		incomingConnectionRequestFromDapp: .placeholder,
-		isValid: false,
+		canProceed: false,
 		accounts: .init(
 			uniqueElements: [
 				.placeholder,

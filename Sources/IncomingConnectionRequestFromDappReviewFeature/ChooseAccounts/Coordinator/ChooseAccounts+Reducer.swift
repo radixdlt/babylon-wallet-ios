@@ -36,7 +36,7 @@ public extension ChooseAccounts {
 						state.accounts[id: id]?.isSelected = true
 					}
 
-					state.isValid = state.selectedAccounts.count == state.accountLimit
+					state.canProceed = state.selectedAccounts.count == state.accountLimit
 					return .none
 				}
 			}

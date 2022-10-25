@@ -39,7 +39,7 @@ final class ChooseAccountsTests: TestCase {
 
 		let initialState: ChooseAccounts.State = .init(
 			incomingConnectionRequestFromDapp: .placeholder,
-			isValid: false,
+			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
 					accountRow,
@@ -57,7 +57,7 @@ final class ChooseAccountsTests: TestCase {
 		_ = await store.send(.account(id: accountRow.id, action: .internal(.user(.didSelect)))) {
 			// then
 			$0.accounts[id: accountRow.id]?.isSelected = false
-			$0.isValid = false
+			$0.canProceed = false
 		}
 	}
 
@@ -68,7 +68,7 @@ final class ChooseAccountsTests: TestCase {
 
 		let initialState: ChooseAccounts.State = .init(
 			incomingConnectionRequestFromDapp: .placeholder,
-			isValid: false,
+			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
 					accountRow,
@@ -86,7 +86,7 @@ final class ChooseAccountsTests: TestCase {
 		_ = await store.send(.account(id: accountRow.id, action: .internal(.user(.didSelect)))) {
 			// then
 			$0.accounts[id: accountRow.id]?.isSelected = true
-			$0.isValid = true
+			$0.canProceed = true
 		}
 	}
 
@@ -97,7 +97,7 @@ final class ChooseAccountsTests: TestCase {
 
 		let initialState: ChooseAccounts.State = .init(
 			incomingConnectionRequestFromDapp: .placeholder,
-			isValid: false,
+			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
 					accountRow,
