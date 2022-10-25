@@ -69,6 +69,35 @@ public enum L10n {
 		}
 	}
 
+	public enum DApp {
+		/// Unknown dApp
+		public static let unknownName = L10n.tr("Localizable", "dApp.unknownName", fallback: #"Unknown dApp"#)
+		public enum ChooseAccounts {
+			/// + Create a new Account
+			public static let createNewAccount = L10n.tr("Localizable", "dApp.chooseAccounts.createNewAccount", fallback: #"+ Create a new Account"#)
+			/// Choose the account(s) you wish %@ to know about
+			public static func subtitle(_ p1: Any) -> String {
+				L10n.tr("Localizable", "dApp.chooseAccounts.subtitle", String(describing: p1), fallback: #"Choose the account(s) you wish %@ to know about"#)
+			}
+
+			/// Choose Accounts
+			public static let title = L10n.tr("Localizable", "dApp.chooseAccounts.title", fallback: #"Choose Accounts"#)
+		}
+
+		public enum ConnectionRequest {
+			/// Continue
+			public static let continueButtonTitle = L10n.tr("Localizable", "dApp.connectionRequest.continueButtonTitle", fallback: #"Continue"#)
+			/// For this dApp to function, it needs the following:
+			public static let subtitle = L10n.tr("Localizable", "dApp.connectionRequest.subtitle", fallback: #"For this dApp to function, it needs the following:"#)
+			/// dApp Connection Request
+			public static let title = L10n.tr("Localizable", "dApp.connectionRequest.title", fallback: #"dApp Connection Request"#)
+			/// %@ wants to connect to your wallet
+			public static func wantsToConnect(_ p1: Any) -> String {
+				L10n.tr("Localizable", "dApp.connectionRequest.wantsToConnect", String(describing: p1), fallback: #"%@ wants to connect to your wallet"#)
+			}
+		}
+	}
+
 	public enum Home {
 		public enum Header {
 			/// Welcome, here are all your accounts on the Radix Network
@@ -103,21 +132,6 @@ public enum L10n {
 			public static let show = L10n.tr("Localizable", "nftList.header.show", fallback: #"+ Show"#)
 			/// Unknown
 			public static let supplyUnknown = L10n.tr("Localizable", "nftList.header.supplyUnknown", fallback: #"Unknown"#)
-		}
-	}
-
-	public enum Persona {
-		public enum ConnectionRequest {
-			/// Continue
-			public static let continueButtonTitle = L10n.tr("Localizable", "persona.connectionRequest.continueButtonTitle", fallback: #"Continue"#)
-			/// For this dApp to function, it needs the following:
-			public static let subtitle = L10n.tr("Localizable", "persona.connectionRequest.subtitle", fallback: #"For this dApp to function, it needs the following:"#)
-			/// dApp Connection Request
-			public static let title = L10n.tr("Localizable", "persona.connectionRequest.title", fallback: #"dApp Connection Request"#)
-			/// %@ wants to connect to your wallet
-			public static func wantsToConnect(_ p1: Any) -> String {
-				L10n.tr("Localizable", "persona.connectionRequest.wantsToConnect", String(describing: p1), fallback: #"%@ wants to connect to your wallet"#)
-			}
 		}
 	}
 }

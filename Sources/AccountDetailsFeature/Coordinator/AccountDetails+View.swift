@@ -2,6 +2,7 @@ import AggregatedValueFeature
 import AssetsViewFeature
 import Common
 import ComposableArchitecture
+import DesignSystem
 import Profile
 import SwiftUI
 
@@ -75,13 +76,10 @@ private extension AccountDetails.View {
 private extension AccountDetails.View {
 	func header(with viewStore: AccountDetailsViewStore) -> some View {
 		HStack {
-			Button(
-				action: {
-					viewStore.send(.dismissAccountDetailsButtonTapped)
-				}, label: {
-					Image("arrow-back")
-				}
-			)
+			BackButton {
+				viewStore.send(.dismissAccountDetailsButtonTapped)
+			}
+
 			Spacer()
 
 			Text(viewStore.displayName)

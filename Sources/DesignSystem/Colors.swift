@@ -8,6 +8,7 @@ public extension Color {
 }
 
 public extension Color.App {
+	// blue
 	var blue1: Color {
 		.init(hex: .blue1)
 	}
@@ -20,6 +21,20 @@ public extension Color.App {
 		.init(hex: .blue3)
 	}
 
+	// green
+	var green1: Color {
+		.init(hex: .green1)
+	}
+
+	var green2: Color {
+		.init(hex: .green2)
+	}
+
+	var green3: Color {
+		.init(hex: .green3)
+	}
+
+	// gray
 	var gray1: Color {
 		.init(hex: .gray1)
 	}
@@ -40,6 +55,7 @@ public extension Color.App {
 		.init(hex: .gray5)
 	}
 
+	// white
 	var white: Color {
 		.init(hex: .white)
 	}
@@ -66,6 +82,11 @@ public extension Color.App {
 
 	var shadowBlack: Color {
 		.black.opacity(0.08)
+	}
+
+	// gradient
+	var account1green: Color {
+		.init(hex: .account1green)
 	}
 }
 
@@ -99,6 +120,9 @@ private extension Color {
 		// alert
 		case orange1 = 0xF2AD21
 		case red1 = 0xC82020
+
+		// gradient
+		case account1green = 0x01E2A0
 	}
 }
 

@@ -36,16 +36,24 @@ let package = Package(
 	],
 	products: [
 		.library(
+			name: "AccountListFeature",
+			targets: ["AccountListFeature"]
+		),
+		.library(
 			name: "AppFeature",
 			targets: ["AppFeature"]
 		),
 		.library(
-			name: "HomeFeature",
-			targets: ["HomeFeature"]
-		),
-		.library(
 			name: "CreateAccountFeature",
 			targets: ["CreateAccountFeature"]
+		),
+		.library(
+			name: "DesignSystem",
+			targets: ["DesignSystem"]
+		),
+		.library(
+			name: "HomeFeature",
+			targets: ["HomeFeature"]
 		),
 		.library(
 			name: "IncomingConnectionRequestFromDappReviewFeature",
@@ -84,6 +92,7 @@ let package = Package(
 				"AggregatedValueFeature",
 				"Asset",
 				"AssetsViewFeature",
+				"DesignSystem",
 				engineToolkit,
 				profile,
 				tca,
@@ -344,6 +353,27 @@ let package = Package(
 				"TestUtils",
 			]
 		),
+		.target(
+			name: "IncomingConnectionRequestFromDappReviewFeature",
+			dependencies: [
+				"Common",
+				"DesignSystem",
+				profile,
+				"ProfileClient",
+				tca,
+			],
+			resources: [
+				.process("Resources"),
+			]
+		),
+		.testTarget(
+			name: "IncomingConnectionRequestFromDappReviewFeatureTests",
+			dependencies: [
+				"IncomingConnectionRequestFromDappReviewFeature",
+				tca,
+				"TestUtils",
+			]
+		),
 
 		.target(
 			name: "ImportProfileFeature",
@@ -442,24 +472,6 @@ let package = Package(
 			name: "PasteboardClientTests",
 			dependencies: [
 				"PasteboardClient",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "IncomingConnectionRequestFromDappReviewFeature",
-			dependencies: [
-				"Common",
-				"DesignSystem",
-				tca,
-			],
-			resources: [
-				.process("Resources"),
-			]
-		),
-		.testTarget(
-			name: "IncomingConnectionRequestFromDappReviewFeatureTests",
-			dependencies: [
-				"IncomingConnectionRequestFromDappReviewFeature",
 				"TestUtils",
 			]
 		),

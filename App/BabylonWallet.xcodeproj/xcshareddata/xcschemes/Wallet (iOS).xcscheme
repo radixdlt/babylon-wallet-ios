@@ -152,9 +152,29 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "GatewayAPITests"
+               BuildableName = "GatewayAPITests"
+               BlueprintName = "GatewayAPITests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "HomeFeatureTests"
                BuildableName = "HomeFeatureTests"
                BlueprintName = "HomeFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "IncomingConnectionRequestFromDappReviewFeatureTests"
+               BuildableName = "IncomingConnectionRequestFromDappReviewFeatureTests"
+               BlueprintName = "IncomingConnectionRequestFromDappReviewFeatureTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -212,9 +232,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProfileLoaderTests"
-               BuildableName = "ProfileLoaderTests"
-               BlueprintName = "ProfileLoaderTests"
+               BlueprintIdentifier = "ProfileClientTests"
+               BuildableName = "ProfileClientTests"
+               BlueprintName = "ProfileClientTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>

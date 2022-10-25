@@ -27,10 +27,14 @@
 "home.visitHub.buttonTitle" = "Visit the Radix Hub";
 "home.visitHub.title" = "Ready to get started using the Radix Network and your Wallet?";
 
-"persona.connectionRequest.continueButtonTitle" = "Continue";
-"persona.connectionRequest.subtitle" = "For this dApp to function, it needs the following:";
-"persona.connectionRequest.title" = "dApp Connection Request";
-"persona.connectionRequest.wantsToConnect" = "%@ wants to connect to your wallet";
+"dApp.chooseAccounts.createNewAccount" = "+ Create a new Account";
+"dApp.chooseAccounts.subtitle" = "Choose the account(s) you wish %@ to know about";
+"dApp.chooseAccounts.title" = "Choose Accounts";
+"dApp.connectionRequest.continueButtonTitle" = "Continue";
+"dApp.connectionRequest.subtitle" = "For this dApp to function, it needs the following:";
+"dApp.connectionRequest.title" = "dApp Connection Request";
+"dApp.connectionRequest.wantsToConnect" = "%@ wants to connect to your wallet";
+"dApp.unknownName" = "Unknown dApp";
 
 "nftList.header.hide" = "- Hide";
 "nftList.header.show" = "+ Show";
