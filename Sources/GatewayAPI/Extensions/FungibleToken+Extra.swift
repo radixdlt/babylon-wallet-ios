@@ -4,18 +4,74 @@ import Asset
 public extension FungibleToken {
 	init(
 		address: ComponentAddress,
-		details: EntityDetailsResponseFungibleDetails
+		resourceManagerSubstate substate: ResourceManagerSubstate
 	) throws {
+		guard substate.resourceType == .fungible else {
+			fatalError("bad logic")
+		}
+		func metadataValueFor(key: String) -> String? {
+			substate.metadata.first(where: { $0.key == key })?.value
+		}
+
 		self.init(
 			address: address,
-			totalSupplyAttos: try .init(decimalString: details.totalSupplyAttos).inAttos,
-			totalMintedAttos: try .init(decimalString: details.totalMintedAttos).inAttos,
-			totalBurntAttos: try .init(decimalString: details.totalBurntAttos).inAttos,
+			divisibility: substate.fungibleDivisibility,
+			totalSupplyAttos: try .init(decimalString: substate.totalSupplyAttos).inAttos,
+			totalMintedAttos: nil,
+			totalBurntAttos: nil,
 			// TODO: update when API is ready
-			tokenDescription: nil,
-			name: nil,
-			code: nil,
+			tokenDescription: metadataValueFor(key: "description"),
+			name: metadataValueFor(key: "name"),
+			symbol: metadataValueFor(key: "symbol"),
+			tokenInfoURL: metadataValueFor(key: "url"),
 			iconURL: nil
 		)
+	}
+}
+
+public extension Substate {
+	var vault: VaultSubstate? {
+		guard case let .typeVaultSubstate(vault) = self else {
+			return nil
+		}
+		return vault
+	}
+
+	var fungibleResourceAmount: FungibleResourceAmount? {
+		vault?.resourceAmount.fungibleResourceAmount
+	}
+
+	var resourceManagerSubstate: ResourceManagerSubstate? {
+		guard case let .typeResourceManagerSubstate(typeResourceManagerSubstate) = self else {
+			return nil
+		}
+		return typeResourceManagerSubstate
+	}
+
+	var nonFungibleSubstate: NonFungibleSubstate? {
+		guard case let .typeNonFungibleSubstate(nonFungibleSubstate) = self else {
+			return nil
+		}
+		return nonFungibleSubstate
+	}
+
+	var nonFungibleResourceAmount: NonFungibleResourceAmount? {
+		vault?.resourceAmount.nonFungibleResourceAmount
+	}
+}
+
+public extension ResourceAmount {
+	var fungibleResourceAmount: FungibleResourceAmount? {
+		guard case let .typeFungibleResourceAmount(typeFungibleResourceAmount) = self else {
+			return nil
+		}
+		return typeFungibleResourceAmount
+	}
+
+	var nonFungibleResourceAmount: NonFungibleResourceAmount? {
+		guard case let .typeNonFungibleResourceAmount(typeNonFungibleResourceAmount) = self else {
+			return nil
+		}
+		return typeNonFungibleResourceAmount
 	}
 }

@@ -1,4 +1,5 @@
 import Asset
+import BigInt
 
 // MARK: - AccountPortfolio
 public struct AccountPortfolio: Equatable {
@@ -22,7 +23,7 @@ public struct AccountPortfolio: Equatable {
 
 // MARK: - Computed Properties
 public extension AccountPortfolio {
-	var worth: Float? {
+	var worth: BigUInt? {
 		fungibleTokenContainers.compactMap(\.worth).reduce(0, +)
 	}
 }

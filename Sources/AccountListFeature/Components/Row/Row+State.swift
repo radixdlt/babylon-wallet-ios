@@ -16,7 +16,7 @@ public extension AccountList.Row {
 	struct State: Equatable {
 		public let account: OnNetwork.Account
 		public var aggregatedValue: Float?
-		public var portfolio: AccountPortfolio
+		public var portfolio: OwnedAssets
 
 		// MARK: - AppSettings properties
 		public var currency: FiatCurrency
@@ -25,7 +25,7 @@ public extension AccountList.Row {
 		public init(
 			account: OnNetwork.Account,
 			aggregatedValue: Float?,
-			portfolio: AccountPortfolio,
+			portfolio: OwnedAssets,
 			currency: FiatCurrency,
 			isCurrencyAmountVisible: Bool
 		) {

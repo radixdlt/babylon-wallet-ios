@@ -101,7 +101,7 @@ extension AccountList.Row.View {
 		let aggregatedValue: Float?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
-		let portfolio: AccountPortfolio
+		let portfolio: OwnedAssets
 
 		init(state: AccountList.Row.State) {
 			name = state.account.displayName
@@ -169,14 +169,14 @@ private struct TokenListView: View {
 		if sortedTokens.count > limit {
 			HStack(spacing: -10) {
 				ForEach(sortedTokens[0 ..< limit]) { token in
-					TokenView(code: token.asset.code ?? "")
+					TokenView(code: token.asset.symbol ?? "")
 				}
 				TokenView(code: "+\(sortedTokens.count - limit)")
 			}
 		} else {
 			HStack(spacing: -10) {
 				ForEach(sortedTokens) { token in
-					TokenView(code: token.asset.code ?? "")
+					TokenView(code: token.asset.symbol ?? "")
 				}
 			}
 		}

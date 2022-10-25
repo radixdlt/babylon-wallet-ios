@@ -87,6 +87,7 @@ public extension Home {
 		),
 
 		Reducer { state, action, environment in
+
 			switch action {
 			case .internal(.user(.createAccountButtonTapped)):
 				return .run { send in
@@ -149,16 +150,16 @@ public extension Home {
 
 				return .none
 
-			case let .internal(.system(.totalPortfolioLoaded(totalPortfolio))):
+			case let .internal(.system(.fetchPortfolioResult(.success(totalPortfolio)))):
 				state.accountPortfolioDictionary = totalPortfolio
 
 				// aggregated value
-				state.aggregatedValue.value = totalPortfolio.compactMap(\.value.worth).reduce(0, +)
+//				state.aggregatedValue.value = totalPortfolio.compactMap(\.value.worth).reduce(0, +)
 
 				// account list
 				state.accountList.accounts.forEach {
-					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalPortfolio[$0.address]?.worth
-					let accountPortfolio = totalPortfolio[$0.address] ?? AccountPortfolio.empty
+//					state.accountList.accounts[id: $0.address]?.aggregatedValue = totalPortfolio[$0.address]?.worth
+					let accountPortfolio = totalPortfolio[$0.address] ?? OwnedAssets.empty
 					state.accountList.accounts[id: $0.address]?.portfolio = accountPortfolio
 				}
 
@@ -167,10 +168,10 @@ public extension Home {
 					// aggregated value
 					let account = details.account
 					let accountWorth = state.accountPortfolioDictionary[details.address]
-					state.accountDetails?.aggregatedValue.value = accountWorth?.worth
+//					state.accountDetails?.aggregatedValue.value = accountWorth?.worth
 
 					// asset list
-					let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
+					let accountPortfolio = totalPortfolio[account.address] ?? OwnedAssets.empty
 					let categories = environment.fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
 
 					state.accountDetails?.assets = .init(
@@ -190,10 +191,16 @@ public extension Home {
 
 				return .none
 
-			case let .internal(.system(.accountPortfolioLoaded(accountPortfolio))):
+			case let .internal(.system(.accountPortfolioResult(.success(accountPortfolio)))):
 				guard let key = accountPortfolio.first?.key else { return .none }
 				state.accountPortfolioDictionary[key] = accountPortfolio.first?.value
-				return Effect(value: .internal(.system(.totalPortfolioLoaded(state.accountPortfolioDictionary))))
+				return .run { [portfolio = state.accountPortfolioDictionary] send in
+					await send(.internal(.system(.fetchPortfolioResult(.success(portfolio)))))
+				}
+
+			case let .internal(.system(.accountPortfolioResult(.failure(error)))):
+				print("⚠️ failed to fetch accout portfolio, error: \(String(describing: error))")
+				return .none
 
 			case let .internal(.system(.copyAddress(address))):
 				// TODO: display confirmation popup? discuss with po / designer
@@ -241,16 +248,27 @@ public extension Home {
 				return .run { send in
 					let accounts = try environment.profileClient.getAccounts().rawValue.elements
 					let addresses = accounts.map(\.address)
-					let totalPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio(addresses)
-					await send(.internal(.system(.totalPortfolioLoaded(totalPortfolio))))
+					await send(.internal(.system(.fetchPortfolioResult(TaskResult {
+						try await environment.accountPortfolioFetcher.fetchPortfolio(addresses)
+					}))))
 				}
+
+//			case let .internal(.system(.fetchPortfolioResult(.success(totalPortfolio)))):
+//				return .run { send in
+//					await send(.internal(.system(.accountPortfolioResult(.success(totalPortfolio)))))
+//				}
+			case let .internal(.system(.fetchPortfolioResult(.failure(error)))):
+				print("⚠️ failed to fetch portfolio, error: \(String(describing: error))")
+				return .none
 
 			case let .accountList(.coordinate(.displayAccountDetails(account))):
 				state.accountDetails = .init(for: account)
 				return .none
 
 			case let .accountList(.coordinate(.copyAddress(address))):
-				return Effect(value: .internal(.system(.copyAddress(address.wrapAsAddress()))))
+				return .run { send in
+					await send(.internal(.system(.copyAddress(address.wrapAsAddress()))))
+				}
 
 			case .accountList:
 				return .none
@@ -274,7 +292,9 @@ public extension Home {
 				return .none
 
 			case let .accountDetails(.coordinate(.copyAddress(address))):
-				return Effect(value: .internal(.system(.copyAddress(address.wrapAsAddress()))))
+				return .run { send in
+					await send(.internal(.system(.copyAddress(address.wrapAsAddress()))))
+				}
 
 			case .accountDetails(.coordinate(.displayTransfer)):
 				state.transfer = .init()
@@ -282,8 +302,9 @@ public extension Home {
 
 			case let .accountDetails(.coordinate(.refresh(address))):
 				return .run { send in
-					let accountPortfolio = try await environment.accountPortfolioFetcher.fetchPortfolio([address])
-					await send(.internal(.system(.accountPortfolioLoaded(accountPortfolio))))
+					await send(.internal(.system(.accountPortfolioResult(TaskResult {
+						try await environment.accountPortfolioFetcher.fetchPortfolio([address])
+					}))))
 				}
 
 			case .accountDetails(.aggregatedValue(.internal(_))):

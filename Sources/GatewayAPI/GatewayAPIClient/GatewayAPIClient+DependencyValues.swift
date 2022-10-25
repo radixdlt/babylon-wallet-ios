@@ -5,7 +5,7 @@ import Foundation
 public enum GatewayAPIClientKey: DependencyKey {}
 public extension GatewayAPIClientKey {
 	typealias Value = GatewayAPIClient
-	static let liveValue = GatewayAPIClient.mock()
+	static let liveValue = GatewayAPIClient.live()
 	static let testValue = GatewayAPIClient.mock()
 }
 

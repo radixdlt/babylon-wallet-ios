@@ -24,11 +24,11 @@ final class FungibleTokenListSorterTests: TestCase {
 		let xrd = FungibleToken.xrd
 		let dot = FungibleToken.dot
 
-		let btcContainer = FungibleTokenContainer(asset: btc, amount: nil, worth: 1.987)
-		let ethContainer = FungibleTokenContainer(asset: eth, amount: nil, worth: 2.876)
-		let ltcContainer = FungibleTokenContainer(asset: ltc, amount: nil, worth: 3.765)
-		let xrdContainer = FungibleTokenContainer(asset: xrd, amount: nil, worth: 4.654)
-		let dotContainer = FungibleTokenContainer(asset: dot, amount: nil, worth: 5.543)
+		let btcContainer = FungibleTokenContainer(asset: btc, amountInAttos: nil, worth: 1)
+		let ethContainer = FungibleTokenContainer(asset: eth, amountInAttos: nil, worth: 2)
+		let ltcContainer = FungibleTokenContainer(asset: ltc, amountInAttos: nil, worth: 3)
+		let xrdContainer = FungibleTokenContainer(asset: xrd, amountInAttos: nil, worth: 4)
+		let dotContainer = FungibleTokenContainer(asset: dot, amountInAttos: nil, worth: 5)
 
 		// when
 		let result = sut.sortTokens([btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer])
@@ -49,11 +49,11 @@ final class FungibleTokenListSorterTests: TestCase {
 		let xrd = FungibleToken.xrd
 		let dot = FungibleToken.dot
 
-		let btcContainer = FungibleTokenContainer(asset: btc, amount: nil, worth: nil)
-		let ethContainer = FungibleTokenContainer(asset: eth, amount: nil, worth: nil)
-		let ltcContainer = FungibleTokenContainer(asset: ltc, amount: nil, worth: nil)
-		let xrdContainer = FungibleTokenContainer(asset: xrd, amount: nil, worth: nil)
-		let dotContainer = FungibleTokenContainer(asset: dot, amount: nil, worth: nil)
+		let btcContainer = FungibleTokenContainer(asset: btc, amountInAttos: nil, worth: nil)
+		let ethContainer = FungibleTokenContainer(asset: eth, amountInAttos: nil, worth: nil)
+		let ltcContainer = FungibleTokenContainer(asset: ltc, amountInAttos: nil, worth: nil)
+		let xrdContainer = FungibleTokenContainer(asset: xrd, amountInAttos: nil, worth: nil)
+		let dotContainer = FungibleTokenContainer(asset: dot, amountInAttos: nil, worth: nil)
 
 		// when
 		let result = sut.sortTokens([btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer])
@@ -74,11 +74,11 @@ final class FungibleTokenListSorterTests: TestCase {
 		let xrd = FungibleToken.xrd
 		let dot = FungibleToken.dot
 
-		let btcContainer = FungibleTokenContainer(asset: btc, amount: nil, worth: nil)
-		let ethContainer = FungibleTokenContainer(asset: eth, amount: nil, worth: 2.345)
-		let ltcContainer = FungibleTokenContainer(asset: ltc, amount: nil, worth: 3.456)
-		let xrdContainer = FungibleTokenContainer(asset: xrd, amount: nil, worth: nil)
-		let dotContainer = FungibleTokenContainer(asset: dot, amount: nil, worth: nil)
+		let btcContainer = FungibleTokenContainer(asset: btc, amountInAttos: nil, worth: nil)
+		let ethContainer = FungibleTokenContainer(asset: eth, amountInAttos: nil, worth: 2)
+		let ltcContainer = FungibleTokenContainer(asset: ltc, amountInAttos: nil, worth: 3)
+		let xrdContainer = FungibleTokenContainer(asset: xrd, amountInAttos: nil, worth: nil)
+		let dotContainer = FungibleTokenContainer(asset: dot, amountInAttos: nil, worth: nil)
 
 		// when
 		let result = sut.sortTokens([btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer])

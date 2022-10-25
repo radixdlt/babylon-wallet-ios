@@ -4,12 +4,13 @@ import Asset
 public extension NonFungibleToken {
 	init(
 		address: ComponentAddress,
-		details _: EntityDetailsResponseNonFungibleDetails
+		nonFungibleSubstate: NonFungibleSubstate
 	) {
 		self.init(
 			address: address,
-			// TODO: update when API is ready
-			iconURL: nil
+			nonFungibleID: nonFungibleSubstate.nfIdHex,
+			isDeleted: nonFungibleSubstate.isDeleted,
+			nonFungibleDataAsString: nonFungibleSubstate.nonFungibleData.map { String(describing: $0) } ?? ""
 		)
 	}
 }

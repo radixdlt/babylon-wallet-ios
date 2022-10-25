@@ -18,7 +18,7 @@ public extension FungibleTokenListSorter {
 			}
 
 			tokensWithValues.sort { $0.worth! > $1.worth! }
-			noValueTokens.sort { $0.asset.code ?? "" < $1.asset.code ?? "" }
+			noValueTokens.sort { $0.asset.symbol ?? "" < $1.asset.symbol ?? "" }
 
 			var result = [FungibleTokenCategory]()
 
