@@ -26,7 +26,7 @@ public extension IncomingConnectionRequestFromDapp {
 			.placeholder2,
 //			.placeholder3,
 		],
-		accountLimit: 2
+		accountLimit: 1
 	)
 }
 #endif

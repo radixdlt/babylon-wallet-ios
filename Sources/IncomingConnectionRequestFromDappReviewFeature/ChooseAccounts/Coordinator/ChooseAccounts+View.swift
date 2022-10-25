@@ -24,7 +24,7 @@ public extension ChooseAccounts.View {
 			ForceFullScreen {
 				VStack {
 					header(with: viewStore)
-						.padding(.horizontal, 24)
+						.padding(24)
 
 					ScrollView {
 						VStack {
