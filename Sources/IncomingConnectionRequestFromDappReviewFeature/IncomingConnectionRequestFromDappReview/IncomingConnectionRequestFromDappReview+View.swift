@@ -74,10 +74,10 @@ private extension IncomingConnectionRequestFromDappReview.View {
 }
 
 private extension IncomingConnectionRequestFromDappReview.View {
-	func header(with _: IncomingConnectionViewStore) -> some View {
+	func header(with viewStore: IncomingConnectionViewStore) -> some View {
 		HStack {
 			CloseButton {
-				// TODO: implement
+				viewStore.send(.dismissButtonTapped)
 			}
 			Spacer()
 		}
@@ -86,15 +86,16 @@ private extension IncomingConnectionRequestFromDappReview.View {
 
 // MARK: - IncomingConnectionRequestFromDappReview.View.ViewAction
 extension IncomingConnectionRequestFromDappReview.View {
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case dismissButtonTapped
+	}
 }
 
 extension IncomingConnectionRequestFromDappReview.Action {
 	init(action: IncomingConnectionRequestFromDappReview.View.ViewAction) {
 		switch action {
-		default:
-			// TODO: implement
-			break
+		case .dismissButtonTapped:
+			self = .internal(.user(.dismissIncomingConnectionRequest))
 		}
 	}
 }

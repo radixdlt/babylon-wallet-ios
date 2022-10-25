@@ -6,7 +6,14 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 }
 
 public extension IncomingConnectionRequestFromDappReview {
-	func reduce(into _: inout State, action _: Action) -> ComposableArchitecture.Effect<Action, Never> {
-		.none
+	func reduce(into _: inout State, action: Action) -> ComposableArchitecture.Effect<Action, Never> {
+		switch action {
+		case .internal(.user(.dismissIncomingConnectionRequest)):
+			return .run { send in
+				await send(.coordinate(.dismissIncomingConnectionRequest))
+			}
+		case .coordinate:
+			return .none
+		}
 	}
 }

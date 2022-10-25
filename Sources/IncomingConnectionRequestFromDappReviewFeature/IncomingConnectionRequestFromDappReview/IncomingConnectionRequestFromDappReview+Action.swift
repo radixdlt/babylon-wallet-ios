@@ -18,7 +18,9 @@ public extension IncomingConnectionRequestFromDappReview.Action {
 
 // MARK: - IncomingConnectionRequestFromDappReview.Action.InternalAction.UserAction
 public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
-	enum UserAction: Equatable {}
+	enum UserAction: Equatable {
+		case dismissIncomingConnectionRequest
+	}
 }
 
 // MARK: - IncomingConnectionRequestFromDappReview.Action.InternalAction.SystemAction
@@ -28,5 +30,7 @@ public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
 
 // MARK: - IncomingConnectionRequestFromDappReview.Action.CoordinatingAction
 public extension IncomingConnectionRequestFromDappReview.Action {
-	enum CoordinatingAction: Equatable {}
+	enum CoordinatingAction: Equatable {
+		case dismissIncomingConnectionRequest
+	}
 }

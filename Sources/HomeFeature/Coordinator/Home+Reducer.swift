@@ -84,7 +84,18 @@ public extension Home {
 		.pullback(
 			state: \.createAccount,
 			action: /Home.Action.createAccount,
-			environment: { _ in CreateAccount.Environment() }
+			environment: { $0 }
+		),
+
+		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
+		AnyReducer { _ in
+			IncomingConnectionRequestFromDappReview()
+		}
+		.optional()
+		.pullback(
+			state: \.connectionRequest,
+			action: /Home.Action.connectionRequest,
+			environment: { $0 }
 		),
 
 		Reducer { state, action, environment in
@@ -345,10 +356,14 @@ public extension Home {
 			case .transfer(.internal):
 				return .none
 
-			#if DEBUG
-			case .connectionRequest:
+			// commented out DEBUG because swift format replaces state with _
+//			#if DEBUG
+			case .connectionRequest(.coordinate(.dismissIncomingConnectionRequest)):
+				state.connectionRequest = nil
 				return .none
-			#endif
+			case .connectionRequest(.internal(_)):
+				return .none
+				//            #endif
 			}
 		}
 	)
