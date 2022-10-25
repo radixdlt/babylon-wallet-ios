@@ -122,64 +122,62 @@ public extension EngineToolkitClient {
 	static let live: Self = .init(buildTransactionForCreateOnLedgerAccount: { request in
 		let privateKey = request.privateKey
 
-		        // Deriving the `NonFungibleAddress` based on the public key of the account.
-		        func deriveNonFungibleAddress(publicKey: SLIP10.PublicKey) throws -> NonFungibleAddress {
-		            let data = try Data(hex: "000000000000000000000000000000000000000000000000000002300721000000") + publicKey.compressedRepresentation
-		            return NonFungibleAddress(bytes: [UInt8](data))
-		        }
-		        let nonFungibleAddress = try deriveNonFungibleAddress(publicKey: privateKey.publicKey())
+		// Deriving the `NonFungibleAddress` based on the public key of the account.
+		func deriveNonFungibleAddress(publicKey: SLIP10.PublicKey) throws -> NonFungibleAddress {
+			let data = try Data(hex: "000000000000000000000000000000000000000000000000000002300721000000") + publicKey.compressedRepresentation
+			return NonFungibleAddress(bytes: [UInt8](data))
+		}
+		let nonFungibleAddress = try deriveNonFungibleAddress(publicKey: privateKey.publicKey())
 
-		        let transactionManifest = TransactionManifest {
-		            CallMethod(
-		                componentAddress: AlphanetAddresses.faucet,
-		                methodName: "lock_fee"
-		        ) {
-		                Decimal_(10.0)
-		            }
+		let transactionManifest = TransactionManifest {
+			CallMethod(
+				componentAddress: AlphanetAddresses.faucet,
+				methodName: "lock_fee"
+			) {
+				Decimal_(10.0)
+			}
 
-		            CallMethod(
-		                componentAddress: AlphanetAddresses.faucet,
-		                methodName: "free_xrd"
-		            )
+			CallMethod(
+				componentAddress: AlphanetAddresses.faucet,
+				methodName: "free_xrd"
+			)
 
-		            let xrdBucket: Bucket = "xrd"
+			let xrdBucket: Bucket = "xrd"
 
-		            TakeFromWorktop(resourceAddress: AlphanetAddresses.xrd, bucket: xrdBucket)
+			TakeFromWorktop(resourceAddress: AlphanetAddresses.xrd, bucket: xrdBucket)
 
-		            CallFunction(
-		                packageAddress: AlphanetAddresses.createAccountComponent,
-		                blueprintName: "Account",
-		                functionName: "new_with_resource"
-		            ) {
-		                Enum("Protected") {
-		                    Enum("ProofRule") {
-		                        Enum("Require") {
-		                            Enum("StaticNonFungible") {
-		                                nonFungibleAddress
-		                            }
-		                        }
-		                    }
-		                }
-		                xrdBucket
-		            }
-		        }
+			CallFunction(
+				packageAddress: AlphanetAddresses.createAccountComponent,
+				blueprintName: "Account",
+				functionName: "new_with_resource"
+			) {
+				Enum("Protected") {
+					Enum("ProofRule") {
+						Enum("Require") {
+							Enum("StaticNonFungible") {
+								nonFungibleAddress
+							}
+						}
+					}
+				}
+				xrdBucket
+			}
+		}
 
+		let header = try request.transactionHeaderInput.header()
+		let notarized = try transactionManifest
+			.header(header)
+			.sign(with: privateKey)
+			.notarize(privateKey)
 
+		let signedTransactionIntent = SignedTransactionIntent(
+			intent: notarized.signedIntent.intent,
+			intentSignatures: notarized.signedIntent.intentSignatures
+		)
 
-        let header = try request.transactionHeaderInput.header()
-        let notarized = try transactionManifest
-            .header(header)
-            .sign(with: privateKey)
-            .notarize(privateKey)
-        
-        let signedTransactionIntent = SignedTransactionIntent(
-            intent: notarized.signedIntent.intent,
-            intentSignatures: notarized.signedIntent.intentSignatures
-        )
+		let engineToolkit = EngineToolkit()
+		let compiledSignedTransactionIntent = try engineToolkit.compileSignedTransactionIntentRequest(request: signedTransactionIntent).get()
 
-        let engineToolkit = EngineToolkit()
-        let compiledSignedTransactionIntent = try engineToolkit.compileSignedTransactionIntentRequest(request: signedTransactionIntent).get()
-        
-        return compiledSignedTransactionIntent
+		return compiledSignedTransactionIntent
 	})
 }

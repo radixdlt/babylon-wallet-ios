@@ -6,8 +6,21 @@ import Mnemonic
 import NonEmpty
 import Profile
 
+// MARK: - CreateNewProfileRequest
+public struct CreateNewProfileRequest {
+	public let curve25519FactorSourceMnemonic: Mnemonic
+	public let createFirstAccountRequest: CreateAccountRequest
+	public init(curve25519FactorSourceMnemonic: Mnemonic, createFirstAccountRequest: CreateAccountRequest) {
+		self.curve25519FactorSourceMnemonic = curve25519FactorSourceMnemonic
+		self.createFirstAccountRequest = createFirstAccountRequest
+	}
+}
+
 // MARK: - ProfileClient
 public struct ProfileClient {
+	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
+	public var createNewProfile: CreateNewProfile
+
 	public var injectProfile: InjectProfile
 	public var extractProfileSnapshot: ExtractProfileSnapshot
 
@@ -21,6 +34,8 @@ public struct ProfileClient {
 }
 
 public extension ProfileClient {
+	/// For when profile already exists
+	typealias CreateNewProfile = @Sendable (CreateNewProfileRequest) async throws -> Profile
 	typealias InjectProfile = @Sendable (Profile) -> Void
 	typealias DeleteProfileSnapshot = @Sendable () throws -> Void
 

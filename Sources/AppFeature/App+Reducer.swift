@@ -51,7 +51,6 @@ public extension App {
 	static let appReducer = Reducer { state, action, environment in
 		switch action {
 		case .main(.coordinate(.removedWallet)):
-			state = .onboarding(.init())
 			return .run { send in
 				await send(.coordinate(.onboard))
 			}
@@ -89,7 +88,8 @@ public extension App {
 			}
 
 		case .coordinate(.onboard):
-			state = .onboarding(.init())
+			// FIXME: Handle NetworkID, where? AppSettings? Profile?
+			state = .onboarding(.init(networkID: .primary))
 			return .none
 
 		case .coordinate(.toMain):

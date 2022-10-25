@@ -6,6 +6,7 @@ import Profile
 public extension ProfileClient {
 	static func mock() -> Self {
 		Self(
+			createNewProfile: { _ in fatalError("imple me") },
 			injectProfile: { _ in /* Noop */ },
 			extractProfileSnapshot: { fatalError("Impl me") },
 			deleteProfileSnapshot: { /* Noop */ },

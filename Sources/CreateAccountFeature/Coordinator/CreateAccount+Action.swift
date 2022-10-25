@@ -33,7 +33,7 @@ public extension CreateAccount.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
 		case focusTextField
-		case createdNewAccount(OnNetwork.Account)
+		case createdNewAccountResult(TaskResult<OnNetwork.Account>)
 	}
 }
 
@@ -42,5 +42,6 @@ public extension CreateAccount.Action {
 	enum CoordinatingAction: Equatable {
 		case dismissCreateAccount
 		case createdNewAccount(OnNetwork.Account)
+		case failedToCreateNewAccount(reason: String)
 	}
 }

@@ -61,7 +61,7 @@ let package = Package(
 		// RDX Works packages
 		// We use SSH because repos are private...
 		.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-		.package(url: "git@github.com:radixdlt/swift-profile.git", revision: "c3becaf6ef3864ad68ff3da82590e40e3c85c0a4"),
+		.package(url: "git@github.com:radixdlt/swift-profile.git", revision: "24215f30746aa1346037b793e20409dbcdcf618f"),
 		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", revision: "efebdfbb2e178e0117121028fa328c078a549358"),
 
 		// BigInt
@@ -442,11 +442,11 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
+				engineToolkit,
 				"ImportProfileFeature",
 				profile,
-				tca,
-				"UserDefaultsClient", // replace with `ProfileCreator`
 				"ProfileClient",
+				tca,
 				// ^^^ Sort lexicographically ^^^
 			]
 		),

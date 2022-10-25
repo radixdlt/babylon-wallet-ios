@@ -336,6 +336,11 @@ public extension Home {
 					await send(.internal(.system(.loadAccountsAndSettings)))
 				}
 
+			case let .createAccount(.coordinate(.failedToCreateNewAccount(reason))):
+				state.createAccount = nil
+				print("Failed to create account: \(reason)")
+				return .none
+
 			case .transfer(.internal):
 				return .none
 			}
