@@ -12,8 +12,10 @@ public extension App.Environment {
 	static let live: Self = {
 		let keychainClient = KeychainClient.live
 
+		let backgroundQueue = DispatchQueue(label: "background-queue").eraseToAnyScheduler()
+
 		return Self(
-			backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
+			backgroundQueue: backgroundQueue,
 			mainQueue: .main,
 			appSettingsClient: .live(),
 			accountPortfolioFetcher: .live(),
@@ -21,7 +23,7 @@ public extension App.Environment {
 			pasteboardClient: .live(),
 			profileLoader: .live(keychainClient: keychainClient),
 			userDefaultsClient: .live(),
-			profileClient: .live
+			profileClient: .live(backgroundQueue: backgroundQueue)
 		)
 	}()
 }

@@ -6,10 +6,6 @@ final class HexStringToDataTests: TestCase {
 		XCTAssertThrowsError(try Data(hex: "deadbee"))
 	}
 
-	func testAssertDataFromEmptyHexStringThrows() throws {
-		XCTAssertThrowsError(try Data(hex: ""))
-	}
-
 	func testAssertDataFromHexStringOfEvenLengthWithNonHexCharsThrows() throws {
 		XCTAssertThrowsError(try Data(hex: "nonhex"))
 	}

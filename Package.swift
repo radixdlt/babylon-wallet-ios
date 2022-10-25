@@ -269,6 +269,22 @@ let package = Package(
 				"TestUtils",
 			]
 		),
+
+		.target(
+			name: "EngineToolkitClient",
+			dependencies: [
+				.product(name: "EngineToolkit", package: "swift-engine-toolkit"),
+				tca,
+			]
+		),
+		.testTarget(
+			name: "EngineToolkitClientTests",
+			dependencies: [
+				"EngineToolkitClient",
+				"TestUtils",
+			]
+		),
+
 		.target(
 			name: "DesignSystem",
 			dependencies: [
@@ -541,6 +557,8 @@ let package = Package(
 		.target(
 			name: "ProfileClient",
 			dependencies: [
+				"EngineToolkitClient", // Create TX
+				"GatewayAPI", // Create Account On Ledger => Submit TX
 				profile,
 				"ProfileLoader",
 				tca, // XCTestDynamicOverlay + DependencyKey
