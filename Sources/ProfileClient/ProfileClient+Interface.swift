@@ -17,7 +17,7 @@ public struct ProfileClient {
 	public var getAccounts: GetAccounts
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
-	public var createAccountWithKeychainClient: CreateAccountWithKeychainClient
+	public var createAccount: CreateAccount
 }
 
 public extension ProfileClient {
@@ -29,6 +29,24 @@ public extension ProfileClient {
 	typealias GetAccounts = @Sendable () throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
 	typealias GetAppPreferences = @Sendable () throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) throws -> Void
-	typealias CreateAccountWithKeychainClient = @Sendable (_ accountName: String?, KeychainClient) async throws -> OnNetwork.Account
+	typealias CreateAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
+}
+
+// MARK: - CreateAccountRequest
+public struct CreateAccountRequest {
+	public let accountName: String?
+	public let networkID: NetworkID
+	/// Used to read out secrets
+	public let keychainClient: KeychainClient
+
+	public init(
+		accountName: String?,
+		keychainClient: KeychainClient,
+		networkID: NetworkID
+	) {
+		self.accountName = accountName
+		self.keychainClient = keychainClient
+		self.networkID = networkID
+	}
 }

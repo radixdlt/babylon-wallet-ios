@@ -52,12 +52,15 @@ public extension App {
 		switch action {
 		case .main(.coordinate(.removedWallet)):
 			state = .onboarding(.init())
-			return Effect(value: .coordinate(.onboard))
+			return .run { send in
+				await send(.coordinate(.onboard))
+			}
 
 		case let .onboarding(.coordinate(.onboardedWithProfile(profile, isNew))):
 			return .run { send in
 				await send(.internal(.injectProfileIntoWalletClient(profile)))
 			}
+
 		case let .onboarding(.coordinate(.failedToCreateOrImportProfile(failureReason))):
 			return .run { send in
 				await send(.coordinate(.failedToCreateOrImportProfile(reason: failureReason)))
@@ -67,6 +70,7 @@ public extension App {
 			return .run { send in
 				await send(.internal(.injectProfileIntoWalletClient(profile)))
 			}
+
 		case let .splash(.coordinate(.loadProfileResult(.noProfile(reason, failedToDecode)))):
 			if failedToDecode {
 				return .run { send in
@@ -89,7 +93,8 @@ public extension App {
 			return .none
 
 		case .coordinate(.toMain):
-			state = .main(.init())
+			// FIXME: Handle NetworkID, where? AppSettings? Profile?
+			state = .main(.init(networkID: .primary))
 			return .none
 
 		case let .coordinate(.failedToCreateOrImportProfile(reason)):

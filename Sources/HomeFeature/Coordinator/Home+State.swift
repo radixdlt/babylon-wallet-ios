@@ -4,6 +4,7 @@ import AccountPortfolio
 import AccountPreferencesFeature
 import AggregatedValueFeature
 import CreateAccountFeature
+import EngineToolkit
 import Profile
 import ProfileClient
 
@@ -15,6 +16,8 @@ public enum Home {}
 public extension Home {
 	// MARK: State
 	struct State: Equatable {
+		public var networkID: NetworkID
+
 		public var accountPortfolioDictionary: AccountPortfolioDictionary
 
 		// MARK: - Components
@@ -30,6 +33,7 @@ public extension Home {
 		public var transfer: AccountDetails.Transfer.State?
 
 		public init(
+			networkID: NetworkID,
 			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
 			header: Home.Header.State = .init(),
 			aggregatedValue: AggregatedValue.State = .init(),
@@ -40,6 +44,7 @@ public extension Home {
 			createAccount: CreateAccount.State? = nil,
 			transfer: AccountDetails.Transfer.State? = nil
 		) {
+			self.networkID = networkID
 			self.accountPortfolioDictionary = accountPortfolioDictionary
 			self.header = header
 			self.aggregatedValue = aggregatedValue
@@ -57,6 +62,7 @@ public extension Home {
 
 public extension Home.State {
 	static let placeholder = Home.State(
+		networkID: .primary,
 		header: .init(hasNotification: false),
 		aggregatedValue: .placeholder,
 		visitHub: .init()

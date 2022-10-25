@@ -65,7 +65,7 @@ public extension ProfileClient {
 			setDisplayAppPreferences: { _ in
 				fatalError()
 			},
-			createAccountWithKeychainClient: { _, _ in
+			createAccount: { _ in
 				fatalError()
 			}
 		)

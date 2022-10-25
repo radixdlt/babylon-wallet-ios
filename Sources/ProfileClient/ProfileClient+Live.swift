@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import EngineToolkit
 import EngineToolkitClient
 import Foundation
 import GatewayAPI
@@ -45,12 +46,23 @@ public extension ProfileClient {
 				try profileHolder.setting { _ in
 				}
 			},
-			createAccountWithKeychainClient: { accountName, keychainClient in
+			createAccount: { createAccountRequest in
+
 				try await profileHolder.asyncSetting { profile in
+
 					try await profile.createNewOnLedgerAccount(
-						displayName: accountName,
+						displayName: createAccountRequest.accountName,
 						makeEntityNonVirtualBySubmittingItToLedger: { privateKey in
-							let signedTransaction = try engineToolkitClient.buildTransactionForCreateOnLedgerAccount(privateKey)
+
+							let epochResponse = try await gatewayAPIClient.getEpoch()
+							let epoch = Epoch(rawValue: .init(epochResponse.epoch))
+
+							let buildTransactionRequest = BuildTransactionForCreateOnLedgerAccountRequest(
+								privateKey: privateKey,
+								epoch: epoch,
+								networkID: createAccountRequest.networkID
+							)
+							let signedTransaction = try engineToolkitClient.buildTransactionForCreateOnLedgerAccount(buildTransactionRequest)
 
 							/** A hex-encoded, compiled notarized transaction. */
 							let notarizedTransactionHex: String = ""
@@ -97,7 +109,7 @@ public extension ProfileClient {
 
 						},
 						mnemonicForFactorSourceByReference: { reference in
-							try keychainClient.loadFactorSourceMnemonic(reference: reference)
+							try createAccountRequest.keychainClient.loadFactorSourceMnemonic(reference: reference)
 						}
 					)
 				}

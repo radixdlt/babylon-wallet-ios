@@ -8,7 +8,7 @@ final class CreateAccountFeatureTests: TestCase {
 
 	func test_closeButtonTapped_whenTappedOnCloseButton_thenCoordinateDismissal() async {
 		// given
-		let initialState = CreateAccount.State()
+		let initialState = CreateAccount.State(networkID: .primary)
 		let store = TestStore(
 			initialState: initialState,
 			reducer: CreateAccount()
@@ -24,6 +24,7 @@ final class CreateAccountFeatureTests: TestCase {
 	func test_textFieldDidChange_whenUserEntersValidAccountName_thenUpdateState() async {
 		// given
 		let initialState = CreateAccount.State(
+			networkID: .primary,
 			accountName: "",
 			isValid: false,
 			focusedField: nil
@@ -47,6 +48,7 @@ final class CreateAccountFeatureTests: TestCase {
 		// given
 		var accountName = "My account dummy nam" // character count == 20
 		let initialState = CreateAccount.State(
+			networkID: .primary,
 			accountName: accountName,
 			isValid: true,
 			focusedField: .accountName
@@ -67,6 +69,7 @@ final class CreateAccountFeatureTests: TestCase {
 	func test_viewDidAppear_whenViewAppears_thenFocusOnTextFieldAfterDelay() async {
 		// given
 		let initialState = CreateAccount.State(
+			networkID: .primary,
 			accountName: "",
 			isValid: false,
 			focusedField: nil

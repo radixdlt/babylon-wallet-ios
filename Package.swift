@@ -58,16 +58,20 @@ let package = Package(
 
 	],
 	dependencies: [
-		// TCA - ComposableArchitecture used as architecture
-		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
-		// Format code
-		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
+		// RDX Works packages
+		// We use SSH because repos are private...
+		.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
+		.package(url: "git@github.com:radixdlt/swift-profile.git", revision: "c3becaf6ef3864ad68ff3da82590e40e3c85c0a4"),
+		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", revision: "efebdfbb2e178e0117121028fa328c078a549358"),
+
 		// BigInt
 		.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
 
-		.package(url: "git@github.com:radixdlt/swift-profile.git", revision: "af75310a61703e91d6178b92fe357e53fdd1b582"),
+		// TCA - ComposableArchitecture used as architecture
+		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
 
-		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", revision: "f7866aa0e26cdf8ba82210cee4ea1a045fad3b06"),
+		// Format code
+		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
 
 		// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 		.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
@@ -167,14 +171,15 @@ let package = Package(
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"AccountPortfolio",
 				"AppSettings",
+				engineToolkit,
 				"MainFeature",
 				"OnboardingFeature",
 				"PasteboardClient",
 				"ProfileLoader",
+				"ProfileClient",
 				"SplashFeature",
 				tca,
 				"UserDefaultsClient",
-				"ProfileClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -273,7 +278,10 @@ let package = Package(
 		.target(
 			name: "EngineToolkitClient",
 			dependencies: [
-				.product(name: "EngineToolkit", package: "swift-engine-toolkit"),
+				bigInt,
+				"Bite",
+				"Common",
+				engineToolkit,
 				tca,
 			]
 		),
@@ -340,13 +348,14 @@ let package = Package(
 				"AccountDetailsFeature",
 				"AccountPortfolio",
 				"AccountPreferencesFeature",
-				profile,
 				"AppSettings",
 				"Common",
 				"CreateAccountFeature",
+				engineToolkit,
 				"PasteboardClient",
-				tca,
+				profile,
 				"ProfileClient",
+				tca,
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -398,6 +407,7 @@ let package = Package(
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"AppSettings",
 				"AccountPortfolio",
+				engineToolkit,
 				"HomeFeature",
 				"PasteboardClient",
 				"SettingsFeature",

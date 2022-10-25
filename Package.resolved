@@ -131,7 +131,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-engine-toolkit.git",
       "state" : {
-        "revision" : "f7866aa0e26cdf8ba82210cee4ea1a045fad3b06"
+        "revision" : "efebdfbb2e178e0117121028fa328c078a549358"
       }
     },
     {
@@ -157,7 +157,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "af75310a61703e91d6178b92fe357e53fdd1b582"
+        "revision" : "c3becaf6ef3864ad68ff3da82590e40e3c85c0a4"
       }
     },
     {

@@ -95,7 +95,10 @@ public extension Home {
 					await send(.internal(.coordinate(.createAccount(numberOfExistingAccounts: accounts.count))))
 				}
 			case let .internal(.coordinate(.createAccount(numberOfExistingAccounts))):
-				state.createAccount = .init(numberOfExistingAccounts: numberOfExistingAccounts)
+				state.createAccount = .init(
+					networkID: state.networkID,
+					numberOfExistingAccounts: numberOfExistingAccounts
+				)
 				return .none
 
 			case .internal(.system(.viewDidAppear)):
