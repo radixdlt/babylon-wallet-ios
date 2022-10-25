@@ -67,7 +67,7 @@ let package = Package(
 
 		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.19"),
 
-		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.1"),
+		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", branch: "keys"),
 
 		// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 		.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
