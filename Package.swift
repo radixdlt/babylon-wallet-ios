@@ -370,6 +370,7 @@ let package = Package(
 			name: "IncomingConnectionRequestFromDappReviewFeatureTests",
 			dependencies: [
 				"IncomingConnectionRequestFromDappReviewFeature",
+				tca,
 				"TestUtils",
 			]
 		),

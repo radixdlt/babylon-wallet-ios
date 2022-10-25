@@ -11,7 +11,7 @@ public extension ChooseAccounts {
 			switch action {
 			case .internal(.user(.continueFromChooseAccounts)):
 				return .run { send in
-					await send(.coordinate(.dismissChooseAccounts))
+					await send(.coordinate(.continueFromChooseAccounts))
 				}
 
 			case .internal(.user(.dismissChooseAccounts)):
