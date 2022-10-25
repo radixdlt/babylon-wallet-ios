@@ -66,7 +66,7 @@ public extension ChooseAccounts.View {
 						PrimaryButton(
 							title: L10n.DApp.ConnectionRequest.continueButtonTitle,
 							isEnabled: viewStore.isValid,
-							action: { /* TODO: implement */ }
+							action: { viewStore.send(.continueButtonTapped) }
 						)
 						.disabled(!viewStore.isValid)
 					}
@@ -83,10 +83,10 @@ private extension ChooseAccounts.View {
 }
 
 private extension ChooseAccounts.View {
-	func header(with _: ChooseAccountsViewStore) -> some View {
+	func header(with viewStore: ChooseAccountsViewStore) -> some View {
 		HStack {
 			BackButton {
-				// TODO: implement
+				viewStore.send(.backButtonTapped)
 			}
 			Spacer()
 		}
@@ -95,15 +95,19 @@ private extension ChooseAccounts.View {
 
 // MARK: - ChooseAccounts.View.ViewAction
 extension ChooseAccounts.View {
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case continueButtonTapped
+		case backButtonTapped
+	}
 }
 
 extension ChooseAccounts.Action {
 	init(action: ChooseAccounts.View.ViewAction) {
 		switch action {
-		default:
-			// TODO: implement
-			break
+		case .continueButtonTapped:
+			self = .internal(.user(.continueFromChooseAccounts))
+		case .backButtonTapped:
+			self = .internal(.user(.dismissChooseAccounts))
 		}
 	}
 }

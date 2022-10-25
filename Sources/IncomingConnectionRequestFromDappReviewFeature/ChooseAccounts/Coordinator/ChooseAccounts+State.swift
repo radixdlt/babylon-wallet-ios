@@ -8,21 +8,25 @@ public extension ChooseAccounts {
 		public var isValid: Bool
 		public var accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
 		public let accountLimit: Int
-		public var selectedAccounts: [ChooseAccounts.Row.State]
 
 		public init(
 			incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp,
 			isValid: Bool = false,
 			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>,
-			accountLimit: Int,
-			selectedAccounts: [ChooseAccounts.Row.State] = []
+			accountLimit: Int
 		) {
 			self.incomingConnectionRequestFromDapp = incomingConnectionRequestFromDapp
 			self.isValid = isValid
 			self.accounts = accounts
 			self.accountLimit = accountLimit
-			self.selectedAccounts = selectedAccounts
 		}
+	}
+}
+
+// MARK: - Computed Properties
+extension ChooseAccounts.State {
+	var selectedAccounts: [ChooseAccounts.Row.State] {
+		accounts.filter(\.isSelected)
 	}
 }
 

@@ -9,7 +9,20 @@ public extension ChooseAccounts {
 	var body: some ReducerProtocol<State, Action> {
 		Reduce { state, action in
 			switch action {
-			case .internal:
+			case .internal(.user(.continueFromChooseAccounts)):
+				return .run { send in
+					await send(.coordinate(.dismissChooseAccounts))
+				}
+
+			case .internal(.user(.dismissChooseAccounts)):
+				return .run { send in
+					await send(.coordinate(.dismissChooseAccounts))
+				}
+
+			case .coordinate(.continueFromChooseAccounts):
+				return .none
+
+			case .coordinate(.dismissChooseAccounts):
 				return .none
 
 			case let .account(id: id, action: action):
@@ -17,11 +30,9 @@ public extension ChooseAccounts {
 				switch action {
 				case .internal(.user(.didSelect)):
 					if account.isSelected {
-						state.selectedAccounts.removeAll(where: { $0.id == id })
 						state.accounts[id: id]?.isSelected = false
 					} else {
 						guard state.selectedAccounts.count < state.accountLimit else { return .none }
-						state.selectedAccounts.append(account)
 						state.accounts[id: id]?.isSelected = true
 					}
 
