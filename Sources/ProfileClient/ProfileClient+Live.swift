@@ -12,6 +12,7 @@ import Foundation
 import GatewayAPI
 import KeychainClient
 import Profile
+import CryptoKit
 
 public extension ProfileClient {
 	static func live(
@@ -62,10 +63,11 @@ public extension ProfileClient {
 								epoch: epoch,
 								networkID: createAccountRequest.networkID
 							)
-							let signedTransaction = try engineToolkitClient.buildTransactionForCreateOnLedgerAccount(buildTransactionRequest)
+                            let compileSignedTransactionIntentResponse: CompileSignedTransactionIntentResponse = try engineToolkitClient.buildTransactionForCreateOnLedgerAccount(buildTransactionRequest)
+                            let compiledSignedIntentBytes = compileSignedTransactionIntentResponse.compiledSignedIntent
 
 							/** A hex-encoded, compiled notarized transaction. */
-							let notarizedTransactionHex: String = ""
+                            let notarizedTransactionHex: String = compiledSignedIntentBytes.hex
 
 							let submitTransactionRequest = V0TransactionSubmitRequest(notarizedTransactionHex: notarizedTransactionHex)
 							let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
@@ -86,8 +88,8 @@ public extension ProfileClient {
 									throw FailedToGetTransactionStatus()
 								}
 							}
-							let intentHash = "SHA256(SHA256(compiledTransactionIntent))"
-							let getCommittedTXRequest = V0CommittedTransactionRequest(intentHash: intentHash)
+                            let intentHash = SHA256.hashTwice(data: Data(compiledSignedIntentBytes))
+                            let getCommittedTXRequest = V0CommittedTransactionRequest(intentHash: intentHash.hex)
 							let committedResponse = try await gatewayAPIClient.getCommittedTransaction(getCommittedTXRequest)
 							let committed = committedResponse.committed
 
