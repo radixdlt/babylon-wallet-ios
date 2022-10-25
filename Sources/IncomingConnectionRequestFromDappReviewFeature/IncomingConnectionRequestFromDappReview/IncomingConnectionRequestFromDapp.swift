@@ -6,6 +6,7 @@ public struct IncomingConnectionRequestFromDapp: Equatable, Decodable {
 	let componentAddress: ComponentAddress
 	let name: String?
 	let permissions: [IncomingConnectionRequestFromDapp.Permission]
+	let accountLimit: Int
 }
 
 // MARK: - Computed Propertie
@@ -24,7 +25,8 @@ public extension IncomingConnectionRequestFromDapp {
 			.placeholder1,
 			.placeholder2,
 //			.placeholder3,
-		]
+		],
+		accountLimit: 2
 	)
 }
 #endif

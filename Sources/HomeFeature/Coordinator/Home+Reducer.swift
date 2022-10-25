@@ -87,6 +87,9 @@ public extension Home {
 			environment: { $0 }
 		),
 
+		// commented out DEBUG because swift format replaces state with _
+		// #if DEBUG
+
 		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
 		AnyReducer { _ in
 			IncomingConnectionRequestFromDappReview()
@@ -97,6 +100,7 @@ public extension Home {
 			action: /Home.Action.connectionRequest,
 			environment: { $0 }
 		),
+		// #endif
 
 		Reducer { state, action, environment in
 
@@ -108,11 +112,11 @@ public extension Home {
 				}
 
 			// commented out DEBUG because swift format replaces state with _
-//			#if DEBUG
+			// #if DEBUG
 			case .internal(.user(.showDAppConnectionRequest)):
 				state.connectionRequest = .init(incomingConnectionRequestFromDapp: .placeholder)
 				return .none
-//			#endif
+			// #endif
 
 			case let .internal(.coordinate(.createAccount(numberOfExistingAccounts))):
 				state.createAccount = .init(numberOfExistingAccounts: numberOfExistingAccounts)
@@ -357,13 +361,17 @@ public extension Home {
 				return .none
 
 			// commented out DEBUG because swift format replaces state with _
-//			#if DEBUG
+			// #if DEBUG
+			case .connectionRequest(.internal(_)):
+				return .none
 			case .connectionRequest(.coordinate(.dismissIncomingConnectionRequest)):
 				state.connectionRequest = nil
 				return .none
-			case .connectionRequest(.internal(_)):
+			case .connectionRequest(.coordinate(_)):
 				return .none
-				//            #endif
+			case .connectionRequest(.chooseAccounts(_)):
+				return .none
+				// #endif
 			}
 		}
 	)

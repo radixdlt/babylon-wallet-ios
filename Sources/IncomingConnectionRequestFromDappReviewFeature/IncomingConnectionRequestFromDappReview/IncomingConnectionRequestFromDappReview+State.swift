@@ -4,11 +4,14 @@ import Foundation
 public extension IncomingConnectionRequestFromDappReview {
 	struct State: Equatable {
 		public let incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp
+		public var chooseAccounts: ChooseAccounts.State?
 
 		public init(
-			incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp
+			incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp,
+			chooseAccounts: ChooseAccounts.State? = nil
 		) {
 			self.incomingConnectionRequestFromDapp = incomingConnectionRequestFromDapp
+			self.chooseAccounts = chooseAccounts
 		}
 	}
 }

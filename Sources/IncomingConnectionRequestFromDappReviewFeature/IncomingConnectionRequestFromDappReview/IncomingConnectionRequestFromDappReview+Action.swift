@@ -5,6 +5,7 @@ public extension IncomingConnectionRequestFromDappReview {
 	enum Action: Equatable {
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
+		case chooseAccounts(ChooseAccounts.Action)
 	}
 }
 
@@ -20,6 +21,7 @@ public extension IncomingConnectionRequestFromDappReview.Action {
 public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
 	enum UserAction: Equatable {
 		case dismissIncomingConnectionRequest
+		case proceedWithConnectionRequest
 	}
 }
 
@@ -32,5 +34,6 @@ public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
 public extension IncomingConnectionRequestFromDappReview.Action {
 	enum CoordinatingAction: Equatable {
 		case dismissIncomingConnectionRequest
+		case proceedWithConnectionRequest
 	}
 }

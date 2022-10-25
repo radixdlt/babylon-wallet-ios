@@ -52,7 +52,7 @@ public extension Home.View {
 					),
 					then: AccountDetails.View.init(store:)
 				)
-				.zIndex(2)
+				.zIndex(1)
 
 				IfLetStore(
 					store.scope(
@@ -61,7 +61,7 @@ public extension Home.View {
 					),
 					then: AccountPreferences.View.init(store:)
 				)
-				.zIndex(3)
+				.zIndex(2)
 
 				IfLetStore(
 					store.scope(
@@ -70,7 +70,7 @@ public extension Home.View {
 					),
 					then: AccountDetails.Transfer.View.init(store:)
 				)
-				.zIndex(5)
+				.zIndex(2)
 
 				#if DEBUG
 				IfLetStore(
@@ -80,7 +80,7 @@ public extension Home.View {
 					),
 					then: IncomingConnectionRequestFromDappReview.View.init(store:)
 				)
-				.zIndex(6)
+				.zIndex(1)
 				#endif
 			}
 		}
