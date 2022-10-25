@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import DesignSystem
+import Profile
 import SwiftUI
 
 // MARK: - ChooseAccounts.Row.View
@@ -26,7 +27,7 @@ public extension ChooseAccounts.Row.View {
 						.foregroundColor(.app.white)
 						.textStyle(.body1Header)
 
-					Text(viewStore.accountAddress)
+					Text(viewStore.accountAddress.address)
 						.foregroundColor(.app.white.opacity(0.8))
 						.textStyle(.body2HighImportance)
 				}
@@ -69,12 +70,12 @@ extension ChooseAccounts.Row.View {
 	struct ViewState: Equatable {
 		let isSelected: Bool
 		let accountName: String
-		let accountAddress: String
+		let accountAddress: AccountAddress
 
 		init(state: ChooseAccounts.Row.State) {
 			isSelected = state.isSelected
 			accountName = state.account.displayName ?? "Unnamed account"
-			accountAddress = state.account.address.address
+			accountAddress = state.account.address
 		}
 	}
 }
