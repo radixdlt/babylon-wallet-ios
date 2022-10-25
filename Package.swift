@@ -356,10 +356,9 @@ let package = Package(
 		.target(
 			name: "IncomingConnectionRequestFromDappReviewFeature",
 			dependencies: [
-				"Address",
 				"Common",
 				"DesignSystem",
-				"Profile",
+				profile,
 				tca,
 			],
 			resources: [

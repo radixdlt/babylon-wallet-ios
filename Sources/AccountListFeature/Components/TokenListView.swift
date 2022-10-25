@@ -17,12 +17,12 @@ public extension TokenListView {
 		HStack(spacing: -10) {
 			if sortedTokens.count > limit {
 				ForEach(sortedTokens[0 ..< limit]) { token in
-					TokenView(code: token.asset.code ?? "")
+					TokenView(code: token.asset.symbol ?? "")
 				}
 				TokenView(code: "+\(sortedTokens.count - limit)")
 			} else {
 				ForEach(sortedTokens) { token in
-					TokenView(code: token.asset.code ?? "")
+					TokenView(code: token.asset.symbol ?? "")
 				}
 			}
 		}
