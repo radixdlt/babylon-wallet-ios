@@ -15,6 +15,7 @@ public extension NewProfile.Action {
 	enum CoordinatingAction: Equatable {
 		case goBack
 		case finishedCreatingNewProfile(Profile)
+		case failedToCreateNewProfile(reason: String)
 	}
 }
 
@@ -39,6 +40,6 @@ public extension NewProfile.Action.InternalAction {
 public extension NewProfile.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case createProfile
-		case createdProfile(Profile)
+		case createdProfileResult(TaskResult<Profile>)
 	}
 }

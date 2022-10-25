@@ -51,6 +51,11 @@ public extension Onboarding {
 					await send(.coordinate(.onboardedWithProfile(newProfile, isNew: true)))
 				}
 
+			case let .newProfile(.coordinate(.failedToCreateNewProfile(reason))):
+				return .run { send in
+					await send(.coordinate(.failedToCreateOrImportProfile(reason: "Failed to create profile: \(reason)")))
+				}
+
 			case .importMnemonic(.coordinate(.goBack)):
 				state.importMnemonic = nil
 				return .none
