@@ -19,6 +19,15 @@
       }
     },
     {
+      "identity" : "bite",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:radixdlt/Bite.git",
+      "state" : {
+        "revision" : "b6801c0d4e269063ebc7b4930269d9d728b64e47",
+        "version" : "0.0.1"
+      }
+    },
+    {
       "identity" : "combine-schedulers",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/combine-schedulers",
@@ -32,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Sajjon/K1.git",
       "state" : {
-        "revision" : "9990be04f6c2f7d15cc9d4e136a54e59b4699ad2",
-        "version" : "0.0.1"
+        "revision" : "c327b56ba11df06a73a6761ecd14c6b21653f4a2",
+        "version" : "0.0.2"
       }
     },
     {
@@ -50,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Mnemonic.git",
       "state" : {
-        "revision" : "c8f9f61c158aa983ff080089603ac599cf6e37b0",
-        "version" : "0.0.2"
+        "revision" : "2e85c6fedafbbf266185b9e32ac82159bd7d07b2",
+        "version" : "0.0.3"
       }
     },
     {
@@ -59,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/SLIP10.git",
       "state" : {
-        "revision" : "954fb5bda0565aa261eaee47f4bddb9e10cc0f39",
-        "version" : "0.0.8"
+        "revision" : "d93af9e9bf9106e2330b3f00af7683937d6f1c0e",
+        "version" : "0.0.9"
       }
     },
     {
@@ -122,8 +131,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-engine-toolkit.git",
       "state" : {
-        "revision" : "6cedd3250237fe68a90a97a7eec87826463809b9",
-        "version" : "0.0.1"
+        "revision" : "f7866aa0e26cdf8ba82210cee4ea1a045fad3b06"
       }
     },
     {
@@ -149,8 +157,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "affec1aaf5d242c97795497cd4a6f0ff1c8c327a",
-        "version" : "0.0.19"
+        "revision" : "af75310a61703e91d6178b92fe357e53fdd1b582"
       }
     },
     {

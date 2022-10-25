@@ -65,9 +65,9 @@ let package = Package(
 		// BigInt
 		.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
 
-		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.19"),
+		.package(url: "git@github.com:radixdlt/swift-profile.git", revision: "af75310a61703e91d6178b92fe357e53fdd1b582"),
 
-		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", branch: "keys"),
+		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", revision: "f7866aa0e26cdf8ba82210cee4ea1a045fad3b06"),
 
 		// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 		.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),

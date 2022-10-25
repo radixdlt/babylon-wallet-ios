@@ -3,19 +3,19 @@ import TestUtils
 
 final class HexStringToDataTests: TestCase {
 	func testAssertDataFromHexStringWithOddLengthThrows() throws {
-		XCTAssertThrowsError(try Data(hexString: "deadbee"))
+		XCTAssertThrowsError(try Data(hex: "deadbee"))
 	}
 
 	func testAssertDataFromEmptyHexStringThrows() throws {
-		XCTAssertThrowsError(try Data(hexString: ""))
+		XCTAssertThrowsError(try Data(hex: ""))
 	}
 
 	func testAssertDataFromHexStringOfEvenLengthWithNonHexCharsThrows() throws {
-		XCTAssertThrowsError(try Data(hexString: "nonhex"))
+		XCTAssertThrowsError(try Data(hex: "nonhex"))
 	}
 
 	func testAssertDataFromValidHexStringHasCorrectValue() throws {
-		let data = try Data(hexString: "deadbeef")
+		let data = try Data(hex: "deadbeef")
 		XCTAssertEqual(data, Data([0xDE, 0xAD, 0xBE, 0xEF]))
 	}
 }

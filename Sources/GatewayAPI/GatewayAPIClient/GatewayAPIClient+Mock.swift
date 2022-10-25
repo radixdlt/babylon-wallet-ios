@@ -139,11 +139,11 @@ public extension GatewayAPIClient {
 //							status: txStatus ?? TransactionStatus.Status(seed: request.transactionIdentifier.hashValue)
 //						),
 //
-//						payloadHashHex: Data(SHA256.hash(data: "payloadHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hexEncodedString(),
+//						payloadHashHex: Data(SHA256.hash(data: "payloadHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex(),
 //
-//						intentHashHex: Data(SHA256.hash(data: "intentHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hexEncodedString(),
+//						intentHashHex: Data(SHA256.hash(data: "intentHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex(),
 //
-//						transactionAccumulatorHex: Data(SHA256.hash(data: "transactionAccumulatorHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hexEncodedString(),
+//						transactionAccumulatorHex: Data(SHA256.hash(data: "transactionAccumulatorHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex(),
 //
 //						feePaid: TokenAmount(value: "\(request.transactionIdentifier.hashValue)", tokenIdentifier: .init(rri: "resource_rdx1xrd"))
 //					)
