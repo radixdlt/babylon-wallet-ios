@@ -1,14 +1,15 @@
 import AppSettings
 import Asset
+import ComposableArchitecture
 import GatewayAPI
 import Profile
 
-public extension AccountPortfolioFetcher {
-	static func live(
-		assetFetcher: AssetFetcher = .live(),
-		appSettingsClient _: AppSettingsClient = .live()
-	) -> Self {
-		Self(
+extension AccountPortfolioFetcher: DependencyKey {
+	public static var liveValue: AccountPortfolioFetcher {
+		@Dependency(\.appSettingsClient) var appSettingsClient
+		@Dependency(\.assetFetcher) var assetFetcher
+
+		return Self(
 			fetchPortfolio: { addresses in
 				let portfolioDictionary = try await withThrowingTaskGroup(
 					of: (address: AccountAddress, assets: OwnedAssets).self,

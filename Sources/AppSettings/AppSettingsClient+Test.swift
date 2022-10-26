@@ -1,20 +1,6 @@
-/*
- import Foundation
- import XCTestDynamicOverlay
-
- public extension AppSettingsClient {
- 	static let mock = Self(
- 		saveSettings: { _ in
- 			/* not implemented */
- 		}, loadSettings: {
- 			.default
- 		}
- 	)
- }
- */
-
 #if DEBUG
 import ComposableArchitecture
+import Foundation
 import XCTestDynamicOverlay
 
 extension AppSettingsClient: TestDependencyKey {

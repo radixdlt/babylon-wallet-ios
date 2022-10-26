@@ -15,12 +15,12 @@ public extension App.Environment {
 		return Self(
 			backgroundQueue: DispatchQueue(label: "background-queue").eraseToAnyScheduler(),
 			mainQueue: .main,
-			appSettingsClient: .live(),
-			accountPortfolioFetcher: .live(),
+			appSettingsClient: .liveValue,
+			accountPortfolioFetcher: .liveValue,
 			keychainClient: keychainClient,
 			pasteboardClient: .live(),
 			profileLoader: .live(keychainClient: keychainClient),
-			userDefaultsClient: .live(),
+			userDefaultsClient: .liveValue,
 			profileClient: .live
 		)
 	}()

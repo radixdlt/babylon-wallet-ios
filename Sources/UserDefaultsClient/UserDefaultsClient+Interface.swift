@@ -50,5 +50,12 @@ public extension UserDefaultsClient {
 	}
 }
 
+public extension DependencyValues {
+	var userDefaultsClient: UserDefaultsClient {
+		get { self[UserDefaultsClient.self] }
+		set { self[UserDefaultsClient.self] = newValue }
+	}
+}
+
 let hasShownFirstLaunchOnboardingKey = "hasShownFirstLaunchOnboardingKey"
 let profileNameKey = "profileNameKey"

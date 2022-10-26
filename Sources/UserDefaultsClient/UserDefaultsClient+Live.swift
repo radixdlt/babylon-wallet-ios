@@ -1,12 +1,10 @@
+import ComposableArchitecture
 import Foundation
 
-public extension UserDefaultsClient {
-	static func live(
-		userDefaults: @autoclosure @escaping () -> UserDefaults = UserDefaults(
-			suiteName: "group.works.rdx.babylon"
-		)!
-	) -> Self {
-		Self(
+extension UserDefaultsClient: DependencyKey {
+	public static var liveValue: UserDefaultsClient {
+		let userDefaults = { UserDefaults(suiteName: "group.works.rdx.babylon")! }
+		return Self(
 			boolForKey: { userDefaults().bool(forKey: $0) },
 			dataForKey: { userDefaults().data(forKey: $0) },
 			doubleForKey: { userDefaults().double(forKey: $0) },

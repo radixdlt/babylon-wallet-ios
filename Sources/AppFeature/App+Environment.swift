@@ -68,7 +68,7 @@ public extension App.Environment {
 		keychainClient: .unimplemented,
 		pasteboardClient: .testValue,
 		profileLoader: .unimplemented,
-		userDefaultsClient: .unimplemented,
+		userDefaultsClient: .noop,
 		profileClient: .unimplemented
 	)
 }

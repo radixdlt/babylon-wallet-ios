@@ -1,9 +1,11 @@
+import ComposableArchitecture
 import Foundation
 import UserDefaultsClient
 
-public extension AppSettingsClient {
+// MARK: - AppSettingsClient + DependencyKey
+extension AppSettingsClient: DependencyKey {
 	static func live(
-		userDefaultsClient: UserDefaultsClient = .live(),
+		userDefaultsClient: UserDefaultsClient = .liveValue,
 		initialSettingsToPersist: AppSettings? = .default
 	) -> Self {
 		let saveSettings: SaveSettings = { appSettings in
@@ -37,4 +39,9 @@ public extension AppSettingsClient {
 			loadSettings: loadSettings
 		)
 	}
+}
+
+public extension AppSettingsClient {
+	typealias Value = AppSettingsClient
+	static let liveValue = AppSettingsClient.live()
 }

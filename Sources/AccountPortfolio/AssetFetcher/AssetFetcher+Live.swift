@@ -32,11 +32,12 @@ public extension V0StateComponentResponse {
 	}
 }
 
-public extension AssetFetcher {
-	static func live(
-		gatewayAPIClient: GatewayAPIClient = .live()
-	) -> Self {
-		Self(
+// MARK: - AssetFetcher + DependencyKey
+extension AssetFetcher: DependencyKey {
+	public static var liveValue: AssetFetcher {
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+
+		return Self(
 			fetchAssets: { (accountAddress: AccountAddress) async throws -> OwnedAssets in
 				let resourcesRaw = try await gatewayAPIClient.accountResourcesByAddress(accountAddress)
 

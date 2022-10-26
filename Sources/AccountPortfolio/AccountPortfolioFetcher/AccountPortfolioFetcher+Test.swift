@@ -1,16 +1,3 @@
-/*
- import Asset
- import Foundation
-
- public extension AccountPortfolioFetcher {
-     static let mock = Self(
-         fetchPortfolio: { _ in
-             [:]
-         }
-     )
- }
- */
-
 #if DEBUG
 import ComposableArchitecture
 import XCTestDynamicOverlay
