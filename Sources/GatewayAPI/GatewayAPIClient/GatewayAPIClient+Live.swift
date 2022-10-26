@@ -5,6 +5,8 @@
 //  Created by Alexander Cyon on 2022-10-25.
 //
 
+import ComposableArchitecture
+import EngineToolkit
 import Foundation
 
 // MARK: - Date + Sendable
@@ -133,6 +135,108 @@ public extension GatewayAPIClient {
 				) { $0.appendingPathComponent("transaction/receipt") }
 			}
 		)
+	}
+}
+
+// MARK: - FailedToSubmitTransactionWasDuplicate
+struct FailedToSubmitTransactionWasDuplicate: Swift.Error {}
+
+// MARK: - FailedToSubmitTransactionWasRejected
+struct FailedToSubmitTransactionWasRejected: Swift.Error {}
+
+// MARK: - FailedToGetTransactionStatus
+struct FailedToGetTransactionStatus: Swift.Error {}
+
+// MARK: - TXWasSubmittedButNotSuccessfully
+struct TXWasSubmittedButNotSuccessfully: Swift.Error {}
+
+// MARK: - PollStrategy
+public struct PollStrategy {
+	public let maxPollTries: Int
+	public let sleepDuration: TimeInterval
+	public init(maxPollTries: Int, sleepDuration: TimeInterval) {
+		self.maxPollTries = maxPollTries
+		self.sleepDuration = sleepDuration
+	}
+
+	public static let `default` = Self(maxPollTries: 20, sleepDuration: 2)
+}
+
+public extension GatewayAPIClient {
+	func submit(
+		pollStrategy: PollStrategy = .default,
+		backgroundQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue(label: "GatewayUsage").eraseToAnyScheduler(),
+		notarizedSignedTranscationGivenEpoch: (Epoch) async throws -> NotarizedSignedTransctionContext
+	) async throws -> CommittedTransaction {
+		print("🎭 🛰 🕣 Getting Epoch from GatewayAPI...")
+		let epochResponse = try await getEpoch()
+		let epoch = Epoch(rawValue: .init(epochResponse.epoch))
+		print("🎭 🛰 🕣 Got Epoch: \(epoch) ✅")
+
+		print("🎭 🧰 🛠 Building TX with EngineToolkit...")
+		let notarizedSignedTranscation = try await notarizedSignedTranscationGivenEpoch(epoch)
+		print("🎭 🧰 🛠 Built TX with EngineToolkit ✅")
+
+		let submitTransactionRequest = V0TransactionSubmitRequest(
+			notarizedTransactionHex: notarizedSignedTranscation.compileSignedTransactionIntentResponse.compiledSignedIntent.hex
+		)
+
+		print("🎭 🛰 💷 Submitting TX to GatewayAPI...")
+		let response = try await submitTransaction(submitTransactionRequest)
+		print("🎭 🛰 💷 Submitted TX to GatewayAPI ☑️")
+		guard !response.duplicate else {
+			throw FailedToSubmitTransactionWasDuplicate()
+		}
+		print("🎭 🛰 💷 Submitted TX to GatewayAPI (non duplicate) ✅")
+
+		var txStatus: V0TransactionStatusResponse.IntentStatus = .unknown
+		@Sendable func pollTransactionStatus() async throws -> V0TransactionStatusResponse.IntentStatus {
+			let txStatusRequest = V0TransactionStatusRequest(
+				intentHash: notarizedSignedTranscation.transactionIntentHash.hex
+			)
+			let txStatusResponse = try await transactionStatus(txStatusRequest)
+			return txStatusResponse.intentStatus
+		}
+		var pollCount = 0
+		while !txStatus.isComplete {
+			defer { pollCount += 1 }
+			try await backgroundQueue.sleep(for: .seconds(pollStrategy.sleepDuration))
+			print("🎭 🛰 🔮 Polling TX status from GatewayAPI...")
+			txStatus = try await pollTransactionStatus()
+			print("🎭 🛰 🔮 Polled TX status=`\(txStatus.rawValue)` from GatewayAPI ☑️ ")
+			if pollCount >= pollStrategy.maxPollTries {
+				print("🎭 🛰 Failed to get successful TX status after \(pollCount) attempts.")
+				throw FailedToGetTransactionStatus()
+			}
+		}
+		print("🎭 🛰 🔮 Polled TX status from GatewayAPI ☑️")
+		guard txStatus == .committedSuccess else {
+			throw TXWasSubmittedButNotSuccessfully()
+		}
+		print("🎭 🔮 TX was committed successfully ✅")
+
+		print("🎭 🛰 🔮 Getting commited TX from GatewayAPI...")
+		let getCommittedTXRequest = V0CommittedTransactionRequest(
+			intentHash: notarizedSignedTranscation.notarizedTransactionHash.hex
+		)
+		let committedResponse = try await getCommittedTransaction(getCommittedTXRequest)
+		print("🎭 🛰 🔮 Got commited TX from GatewayAPI ☑️")
+		let committed = committedResponse.committed
+
+		guard committed.receipt.status == .succeeded else {
+			throw FailedToSubmitTransactionWasRejected()
+		}
+		print("🎭 🛰 🔮 Commited TX from GatewayAPI was succeeded ✅")
+		return committed
+	}
+}
+
+public extension V0TransactionStatusResponse.IntentStatus {
+	var isComplete: Bool {
+		switch self {
+		case .committedSuccess, .committedFailure, .rejected: return true
+		case .unknown, .inMempool: return false
+		}
 	}
 }
 
