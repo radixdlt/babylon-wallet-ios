@@ -1,52 +1,54 @@
-import AccountDetailsFeature
-import AccountPortfolio
-import AppSettings
-import FungibleTokenListFeature
-import PasteboardClient
-import ProfileClient
+/*
+ import AccountDetailsFeature
+ import AccountPortfolio
+ import AppSettings
+ import FungibleTokenListFeature
+ import PasteboardClient
+ import ProfileClient
 
-// MARK: - Home.Environment
-public extension Home {
-	// MARK: Environment
-	struct Environment {
-		public let appSettingsClient: AppSettingsClient
-		public let accountPortfolioFetcher: AccountPortfolioFetcher
-		public let pasteboardClient: PasteboardClient
-		public let fungibleTokenListSorter: FungibleTokenListSorter
-		public let profileClient: ProfileClient
+ // MARK: - Home.Environment
+ public extension Home {
+ 	// MARK: Environment
+ 	struct Environment {
+ 		public let appSettingsClient: AppSettingsClient
+ 		public let accountPortfolioFetcher: AccountPortfolioFetcher
+ 		public let pasteboardClient: PasteboardClient
+ 		public let fungibleTokenListSorter: FungibleTokenListSorter
+ 		public let profileClient: ProfileClient
 
-		public init(
-			profileClient: ProfileClient,
-			appSettingsClient: AppSettingsClient,
-			accountPortfolioFetcher: AccountPortfolioFetcher,
-			pasteboardClient: PasteboardClient,
-			fungibleTokenListSorter: FungibleTokenListSorter = .live
-		) {
-			self.profileClient = profileClient
-			self.appSettingsClient = appSettingsClient
-			self.accountPortfolioFetcher = accountPortfolioFetcher
-			self.pasteboardClient = pasteboardClient
-			self.fungibleTokenListSorter = fungibleTokenListSorter
-		}
-	}
-}
+ 		public init(
+ 			profileClient: ProfileClient,
+ 			appSettingsClient: AppSettingsClient,
+ 			accountPortfolioFetcher: AccountPortfolioFetcher,
+ 			pasteboardClient: PasteboardClient,
+ 			fungibleTokenListSorter: FungibleTokenListSorter = .live
+ 		) {
+ 			self.profileClient = profileClient
+ 			self.appSettingsClient = appSettingsClient
+ 			self.accountPortfolioFetcher = accountPortfolioFetcher
+ 			self.pasteboardClient = pasteboardClient
+ 			self.fungibleTokenListSorter = fungibleTokenListSorter
+ 		}
+ 	}
+ }
 
-#if DEBUG
-public extension Home.Environment {
-	static let placeholder: Self = .init(
-		profileClient: .mock(),
-		appSettingsClient: .mock,
-		accountPortfolioFetcher: .mock,
-		pasteboardClient: .noop,
-		fungibleTokenListSorter: .mock
-	)
+ #if DEBUG
+ public extension Home.Environment {
+ 	static let placeholder: Self = .init(
+ 		profileClient: .mock(),
+ 		appSettingsClient: .mock,
+ 		accountPortfolioFetcher: .mock,
+ 		pasteboardClient: .noop,
+ 		fungibleTokenListSorter: .mock
+ 	)
 
-	static let unimplemented: Self = .init(
-		profileClient: .unimplemented,
-		appSettingsClient: .unimplemented,
-		accountPortfolioFetcher: .unimplemented,
-		pasteboardClient: .unimplemented,
-		fungibleTokenListSorter: .unimplemented
-	)
-}
-#endif
+ 	static let unimplemented: Self = .init(
+ 		profileClient: .unimplemented,
+ 		appSettingsClient: .unimplemented,
+ 		accountPortfolioFetcher: .unimplemented,
+ 		pasteboardClient: .unimplemented,
+ 		fungibleTokenListSorter: .unimplemented
+ 	)
+ }
+ #endif
+ */

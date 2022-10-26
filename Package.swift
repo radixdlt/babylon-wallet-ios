@@ -130,8 +130,9 @@ let package = Package(
 				"Asset",
 				bigInt,
 				"Common",
-				profile,
 				"GatewayAPI",
+				profile,
+				tca,
 			]
 		),
 		.testTarget(
@@ -200,6 +201,7 @@ let package = Package(
 			name: "AppSettings",
 			dependencies: [
 				"Common",
+				tca,
 				"UserDefaultsClient",
 			]
 		),

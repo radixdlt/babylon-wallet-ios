@@ -8,11 +8,7 @@ import IncomingConnectionRequestFromDappReviewFeature
 import Profile
 import ProfileClient
 
-// MARK: - Home
-/// Namespace for HomeFeature
-public enum Home {}
-
-// MARK: Home.State
+// MARK: - Home.State
 public extension Home {
 	// MARK: State
 	struct State: Equatable {
@@ -31,7 +27,7 @@ public extension Home {
 		public var transfer: AccountDetails.Transfer.State?
 
 		#if DEBUG
-		public var connectionRequest: IncomingConnectionRequestFromDappReview.State?
+		public var debugInitiatedConnectionRequest: IncomingConnectionRequestFromDappReview.State?
 		#endif
 
 		public init(

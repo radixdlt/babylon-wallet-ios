@@ -33,18 +33,18 @@ public extension Main {
 #if DEBUG
 public extension Main.Environment {
 	static let noop = Self(
-		accountPortfolioFetcher: .mock,
-		appSettingsClient: .mock,
+		accountPortfolioFetcher: .noop,
+		appSettingsClient: .noop,
 		keychainClient: .unimplemented,
 		pasteboardClient: .noop,
 		profileClient: .unimplemented
 	)
 
 	static let unimplemented = Self(
-		accountPortfolioFetcher: .unimplemented,
-		appSettingsClient: .unimplemented,
+		accountPortfolioFetcher: .testValue,
+		appSettingsClient: .testValue,
 		keychainClient: .unimplemented,
-		pasteboardClient: .unimplemented,
+		pasteboardClient: .testValue,
 		profileClient: .unimplemented
 	)
 }
