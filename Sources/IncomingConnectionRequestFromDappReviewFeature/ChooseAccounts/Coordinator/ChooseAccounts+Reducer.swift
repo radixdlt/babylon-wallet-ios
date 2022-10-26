@@ -32,11 +32,11 @@ public extension ChooseAccounts {
 					if account.isSelected {
 						state.accounts[id: id]?.isSelected = false
 					} else {
-						guard state.selectedAccounts.count < state.accountLimit else { return .none }
+						guard state.selectedAccounts.count < state.incomingConnectionRequestFromDapp.accountLimit else { return .none }
 						state.accounts[id: id]?.isSelected = true
 					}
 
-					state.canProceed = state.selectedAccounts.count == state.accountLimit
+					state.canProceed = state.selectedAccounts.count == state.incomingConnectionRequestFromDapp.accountLimit
 					return .none
 				}
 			}

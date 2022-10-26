@@ -333,13 +333,14 @@ let package = Package(
 				"AccountDetailsFeature",
 				"AccountPortfolio",
 				"AccountPreferencesFeature",
-				profile,
 				"AppSettings",
 				"Common",
 				"CreateAccountFeature",
+				"IncomingConnectionRequestFromDappReviewFeature",
 				"PasteboardClient",
-				tca,
+				profile,
 				"ProfileClient",
+				tca,
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -370,6 +371,7 @@ let package = Package(
 			name: "IncomingConnectionRequestFromDappReviewFeatureTests",
 			dependencies: [
 				"IncomingConnectionRequestFromDappReviewFeature",
+				"ProfileClient",
 				tca,
 				"TestUtils",
 			]

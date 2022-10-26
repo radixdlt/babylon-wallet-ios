@@ -37,15 +37,21 @@ final class ChooseAccountsTests: TestCase {
 		var accountRow = ChooseAccounts.Row.State.placeholder
 		accountRow.isSelected = true
 
+		let connectionRequest: IncomingConnectionRequestFromDapp = .init(
+			componentAddress: "deadbeef",
+			name: "Radaswap",
+			permissions: [],
+			accountLimit: 1
+		)
+
 		let initialState: ChooseAccounts.State = .init(
-			incomingConnectionRequestFromDapp: .placeholder,
+			incomingConnectionRequestFromDapp: connectionRequest,
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
 					accountRow,
 				]
-			),
-			accountLimit: 1
+			)
 		)
 
 		let store = TestStore(
@@ -66,15 +72,21 @@ final class ChooseAccountsTests: TestCase {
 		var accountRow = ChooseAccounts.Row.State.placeholder
 		accountRow.isSelected = false
 
+		let connectionRequest: IncomingConnectionRequestFromDapp = .init(
+			componentAddress: "deadbeef",
+			name: "Radaswap",
+			permissions: [],
+			accountLimit: 1
+		)
+
 		let initialState: ChooseAccounts.State = .init(
-			incomingConnectionRequestFromDapp: .placeholder,
+			incomingConnectionRequestFromDapp: connectionRequest,
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
 					accountRow,
 				]
-			),
-			accountLimit: 1
+			)
 		)
 
 		let store = TestStore(
@@ -95,15 +107,21 @@ final class ChooseAccountsTests: TestCase {
 		var accountRow = ChooseAccounts.Row.State.placeholder
 		accountRow.isSelected = false
 
+		let connectionRequest: IncomingConnectionRequestFromDapp = .init(
+			componentAddress: "deadbeef",
+			name: "Radaswap",
+			permissions: [],
+			accountLimit: 0
+		)
+
 		let initialState: ChooseAccounts.State = .init(
-			incomingConnectionRequestFromDapp: .placeholder,
+			incomingConnectionRequestFromDapp: connectionRequest,
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
 					accountRow,
 				]
-			),
-			accountLimit: 0
+			)
 		)
 
 		let store = TestStore(

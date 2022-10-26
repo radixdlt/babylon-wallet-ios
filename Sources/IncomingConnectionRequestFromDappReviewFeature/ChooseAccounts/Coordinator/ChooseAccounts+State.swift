@@ -7,18 +7,15 @@ public extension ChooseAccounts {
 		public let incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp
 		public var canProceed: Bool
 		public var accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
-		public let accountLimit: Int
 
 		public init(
 			incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp,
 			canProceed: Bool = false,
-			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>,
-			accountLimit: Int
+			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
 		) {
 			self.incomingConnectionRequestFromDapp = incomingConnectionRequestFromDapp
 			self.canProceed = canProceed
 			self.accounts = accounts
-			self.accountLimit = accountLimit
 		}
 	}
 }
@@ -39,8 +36,7 @@ public extension ChooseAccounts.State {
 			uniqueElements: [
 				.placeholder,
 			]
-		),
-		accountLimit: 1
+		)
 	)
 }
 #endif

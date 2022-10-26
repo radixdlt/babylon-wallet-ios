@@ -5,7 +5,7 @@ import Profile
 public extension ChooseAccounts.Row {
 	struct State: Equatable {
 		public let account: OnNetwork.Account
-		public var isSelected: Bool
+		public var isSelected: Bool = false
 
 		public init(
 			account: OnNetwork.Account,

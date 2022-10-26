@@ -21,56 +21,58 @@ public extension ChooseAccounts.View {
 			observe: ViewState.init(state:),
 			send: ChooseAccounts.Action.init
 		) { viewStore in
-			VStack {
-				header(with: viewStore)
-					.padding(.horizontal, 24)
+			ForceFullScreen {
+				VStack {
+					header(with: viewStore)
+						.padding(24)
 
-				ScrollView {
-					VStack {
-						Image("dapp-placeholder")
+					ScrollView {
+						VStack {
+							Image("dapp-placeholder")
 
-						Spacer(minLength: 40)
+							Spacer(minLength: 40)
 
-						VStack(spacing: 20) {
-							Text(L10n.DApp.ChooseAccounts.title)
-								.textStyle(.secondaryHeader)
+							VStack(spacing: 20) {
+								Text(L10n.DApp.ChooseAccounts.title)
+									.textStyle(.secondaryHeader)
 
-							Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.incomingConnectionRequestFromDapp.displayName))
-								.foregroundColor(.app.gray2)
-								.textStyle(.body1Regular)
-								.padding(24)
-						}
-						.multilineTextAlignment(.center)
-
-						ForEachStore(
-							store.scope(
-								state: \.accounts,
-								action: ChooseAccounts.Action.account(id:action:)
-							),
-							content: ChooseAccounts.Row.View.init(store:)
-						)
-
-						Spacer(minLength: 60)
-
-						Button(
-							action: {},
-							label: {
-								Text(L10n.DApp.ChooseAccounts.createNewAccount)
-									.foregroundColor(.app.gray1)
+								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.incomingConnectionRequestFromDapp.displayName))
+									.foregroundColor(.app.gray2)
 									.textStyle(.body1Regular)
+									.padding(24)
 							}
-						)
+							.multilineTextAlignment(.center)
 
-						Spacer(minLength: 60)
+							ForEachStore(
+								store.scope(
+									state: \.accounts,
+									action: ChooseAccounts.Action.account(id:action:)
+								),
+								content: ChooseAccounts.Row.View.init(store:)
+							)
 
-						PrimaryButton(
-							title: L10n.DApp.ConnectionRequest.continueButtonTitle,
-							isEnabled: viewStore.canProceed,
-							action: { viewStore.send(.continueButtonTapped) }
-						)
-						.disabled(!viewStore.canProceed)
+							Spacer(minLength: 60)
+
+							Button(
+								action: {},
+								label: {
+									Text(L10n.DApp.ChooseAccounts.createNewAccount)
+										.foregroundColor(.app.gray1)
+										.textStyle(.body1Regular)
+								}
+							)
+
+							Spacer(minLength: 60)
+
+							PrimaryButton(
+								title: L10n.DApp.ConnectionRequest.continueButtonTitle,
+								isEnabled: viewStore.canProceed,
+								action: { viewStore.send(.continueButtonTapped) }
+							)
+							.disabled(!viewStore.canProceed)
+						}
+						.padding(.horizontal, 24)
 					}
-					.padding(.horizontal, 24)
 				}
 			}
 		}
