@@ -26,17 +26,6 @@ public extension Nonce {
 	}
 }
 
-public extension SLIP10.PublicKey {
-	var compressedRepresentation: Data {
-		switch self {
-		case let .eddsaEd25519(publicKey):
-			return publicKey.compressedRepresentation
-		case let .ecdsaSecp256k1(publicKey):
-			return publicKey.compressedRepresentation
-		}
-	}
-}
-
 // MARK: - AlphanetAddresses
 public enum AlphanetAddresses {}
 public extension AlphanetAddresses {
@@ -53,7 +42,7 @@ public struct EngineToolkitClient {
 // MARK: EngineToolkitClient.BuildTransactionForCreateOnLedgerAccount
 public extension EngineToolkitClient {
 	// FIXME: what is the signature?
-	typealias BuildTransactionForCreateOnLedgerAccount = @Sendable (BuildTransactionForCreateOnLedgerAccountRequest) throws -> CompileSignedTransactionIntentResponse
+	typealias BuildTransactionForCreateOnLedgerAccount = @Sendable (BuildTransactionForCreateOnLedgerAccountRequest) throws -> NotarizedSignedTransctionContext
 }
 
 // MARK: - BuildTransactionForCreateOnLedgerAccountRequest
@@ -122,12 +111,12 @@ public extension EngineToolkitClient {
 	static let live: Self = .init(buildTransactionForCreateOnLedgerAccount: { request in
 		let privateKey = request.privateKey
 
-		// Deriving the `NonFungibleAddress` based on the public key of the account.
-		func deriveNonFungibleAddress(publicKey: SLIP10.PublicKey) throws -> NonFungibleAddress {
-			let data = try Data(hex: "000000000000000000000000000000000000000000000000000002300721000000") + publicKey.compressedRepresentation
-			return NonFungibleAddress(bytes: [UInt8](data))
-		}
-		let nonFungibleAddress = try deriveNonFungibleAddress(publicKey: privateKey.publicKey())
+		let engineToolkit = EngineToolkit()
+		let nonFungibleAddress = try engineToolkit.deriveNonFungibleAddressFromPublicKeyRequest(
+			request: privateKey.publicKey().intoEngine()
+		)
+		.get()
+		.nonFungibleAddress
 
 		let transactionManifest = TransactionManifest {
 			CallMethod(
@@ -165,19 +154,20 @@ public extension EngineToolkitClient {
 		}
 
 		let header = try request.transactionHeaderInput.header()
-		let notarized = try transactionManifest
+
+		let notarizedTXContext = try transactionManifest
 			.header(header)
-			.sign(with: privateKey)
 			.notarize(privateKey)
 
-		let signedTransactionIntent = SignedTransactionIntent(
-			intent: notarized.signedIntent.intent,
-			intentSignatures: notarized.signedIntent.intentSignatures
-		)
+//		let signedTransactionIntent = SignedTransactionIntent(
+//			intent: notarized.signedIntent.intent,
+//			intentSignatures: notarized.signedIntent.intentSignatures
+//		)
+//
+//
+//		let compiledSignedTransactionIntent = try engineToolkit.compileSignedTransactionIntentRequest(request: signedTransactionIntent).get()
 
-		let engineToolkit = EngineToolkit()
-		let compiledSignedTransactionIntent = try engineToolkit.compileSignedTransactionIntentRequest(request: signedTransactionIntent).get()
-
-		return compiledSignedTransactionIntent
+//		return compiledSignedTransactionIntent
+		return notarizedTXContext
 	})
 }

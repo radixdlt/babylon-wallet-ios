@@ -13,6 +13,7 @@ import Foundation
 import GatewayAPI
 import KeychainClient
 import Profile
+import SLIP10
 
 public extension ProfileClient {
 	static func live(
@@ -20,54 +21,81 @@ public extension ProfileClient {
 		gatewayAPIClient: GatewayAPIClient = .live(),
 		engineToolkitClient: EngineToolkitClient = .live,
 		maxPollTries: Int = 20,
-		pollSleepDuration: TimeInterval = 2
+		pollSleepDuration: TimeInterval = 3
 	) -> Self {
 		let profileHolder = ProfileHolder.shared
 
 		let makeEntityNonVirtualBySubmittingItToLedgerFromCreateAccountRequest: (CreateAccountRequest) async throws -> MakeEntityNonVirtualBySubmittingItToLedger = { (createAccountRequest: CreateAccountRequest) async throws -> MakeEntityNonVirtualBySubmittingItToLedger in
 
 			let makeEntityNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger = { privateKey in
+
+				print("🎭 Create On-Ledger-Account ✨")
+				print("🎭 🛰 🕣 Getting Epoch from GatewayAPI...")
 				let epochResponse = try await gatewayAPIClient.getEpoch()
 				let epoch = Epoch(rawValue: .init(epochResponse.epoch))
+				print("🎭 🛰 🕣 Got Epoch: \(epoch) ✅")
 
 				let buildTransactionRequest = BuildTransactionForCreateOnLedgerAccountRequest(
 					privateKey: privateKey,
 					epoch: epoch,
 					networkID: createAccountRequest.networkID
 				)
-				let compileSignedTransactionIntentResponse: CompileSignedTransactionIntentResponse = try engineToolkitClient.buildTransactionForCreateOnLedgerAccount(buildTransactionRequest)
+
+				print("🎭 🧰 🛠 Building TX with EngineToolkit...")
+				let signTXCtx = try engineToolkitClient.buildTransactionForCreateOnLedgerAccount(buildTransactionRequest)
+				print("🎭 🧰 🛠 Built TX with EngineToolkit ✅")
+
+				let compileSignedTransactionIntentResponse: CompileSignedTransactionIntentResponse = signTXCtx.compileSignedTransactionIntentResponse
 				let compiledSignedIntentBytes = compileSignedTransactionIntentResponse.compiledSignedIntent
 
 				/** A hex-encoded, compiled notarized transaction. */
 				let notarizedTransactionHex: String = compiledSignedIntentBytes.hex
 
 				let submitTransactionRequest = V0TransactionSubmitRequest(notarizedTransactionHex: notarizedTransactionHex)
+				print("🎭 🛰 💷 Submitting TX to GatewayAPI...")
 				let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
-				guard response.duplicate else {
+				print("🎭 🛰 💷 Submitted TX to GatewayAPI ☑️")
+				guard !response.duplicate else {
 					throw FailedToSubmitTransactionWasDuplicate()
 				}
+				print("🎭 🛰 💷 Submitted TX to GatewayAPI (non duplicate) ✅")
 
 				var txStatus: V0TransactionStatusResponse.IntentStatus = .unknown
 				@Sendable func pollTransactionStatus() async throws -> V0TransactionStatusResponse.IntentStatus {
-					.committedFailure
+					let txStatusRequest = V0TransactionStatusRequest(intentHash: signTXCtx.transactionIntentHash.hex)
+					let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
+					return txStatusResponse.intentStatus
 				}
 				var pollCount = 0
-				while txStatus != .committedSuccess || txStatus != .committedFailure || txStatus != .rejected {
+				while !txStatus.isComplete {
 					defer { pollCount += 1 }
 					try await backgroundQueue.sleep(for: .seconds(pollSleepDuration))
+					print("🎭 🛰 🔮 Polling TX status from GatewayAPI...")
 					txStatus = try await pollTransactionStatus()
+					print("🎭 🛰 🔮 Polled TX status=`\(txStatus.rawValue)` from GatewayAPI ☑️ ")
 					if pollCount >= maxPollTries {
+						print("🎭 🛰 Failed to get successful TX status after \(pollCount) attempts.")
 						throw FailedToGetTransactionStatus()
 					}
 				}
-				let intentHash = SHA256.hashTwice(data: Data(compiledSignedIntentBytes))
-				let getCommittedTXRequest = V0CommittedTransactionRequest(intentHash: intentHash.hex)
+				print("🎭 🛰 🔮 Polled TX status from GatewayAPI ☑️")
+				guard txStatus == .committedSuccess else {
+					throw TXWasSubmittedButNotSuccessfully()
+				}
+				print("🎭 🔮 TX was committed successfully ✅")
+
+//				let intentHash = SHA256.twice(data: Data(compiledSignedIntentBytes))
+				let getCommittedTXRequest = V0CommittedTransactionRequest(intentHash: signTXCtx.notarizedTransactionHash.hex)
+
+				print("🎭 🛰 🔮 Getting commited TX from GatewayAPI...")
 				let committedResponse = try await gatewayAPIClient.getCommittedTransaction(getCommittedTXRequest)
+				print("🎭 🛰 🔮 Got commited TX from GatewayAPI ☑️")
 				let committed = committedResponse.committed
 
 				guard committed.receipt.status == .succeeded else {
 					throw FailedToSubmitTransactionWasRejected()
 				}
+				print("🎭 🛰 🔮 Commited TX from GatewayAPI was succeeded ✅")
 
 				guard let accountAddressBech32 = committed
 					.receipt
@@ -78,6 +106,8 @@ public extension ProfileClient {
 				else {
 					throw CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities()
 				}
+
+				print("🎭 SUCCESSFULLY CREATED ACCOUNT On-Ledger with address: \(accountAddressBech32) ✅")
 
 				return try AccountAddress(address: accountAddressBech32)
 			}
@@ -145,6 +175,9 @@ struct CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities: Swif
 // MARK: - FailedToGetTransactionStatus
 struct FailedToGetTransactionStatus: Swift.Error {}
 
+// MARK: - TXWasSubmittedButNotSuccessfully
+struct TXWasSubmittedButNotSuccessfully: Swift.Error {}
+
 // MARK: - ProfileHolder
 private final class ProfileHolder {
 	private var profile: Profile?
@@ -197,6 +230,15 @@ private final class ProfileHolder {
 	func takeProfileSnapshot() throws -> ProfileSnapshot {
 		try get { profile in
 			profile.snaphot()
+		}
+	}
+}
+
+public extension V0TransactionStatusResponse.IntentStatus {
+	var isComplete: Bool {
+		switch self {
+		case .committedSuccess, .committedFailure, .rejected: return true
+		case .unknown, .inMempool: return false
 		}
 	}
 }

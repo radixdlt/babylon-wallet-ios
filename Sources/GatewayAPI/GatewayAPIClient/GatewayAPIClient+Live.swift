@@ -57,6 +57,10 @@ public extension GatewayAPIClient {
 				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
 			}
 
+			#if DEBUG
+			print("🐛 got HTTP response data:\n\n\(data.prettyPrintedJSONString)\n\n")
+			#endif
+
 			let response = try jsonDecoder.decode(Response.self, from: data)
 
 			return response
@@ -98,11 +102,7 @@ public extension GatewayAPIClient {
 		}
 
 		let getEpoch: GetEpoch = {
-			try await post {
-				$0
-					.appendingPathComponent("state")
-					.appendingPathComponent("epoch")
-			}
+			try await post { $0.appendingPathComponent("state/epoch") }
 		}
 
 		return Self(
@@ -110,30 +110,44 @@ public extension GatewayAPIClient {
 			accountResourcesByAddress: { accountAddress in
 				try await post(
 					request: V0StateComponentRequest(componentAddress: accountAddress.address)
-				) { baseURL in
-					baseURL
-						.appendingPathComponent("state")
-						.appendingPathComponent("component")
-				}
+				) { $0.appendingPathComponent("state/component") }
 			},
 			resourceDetailsByResourceIdentifier: { resourceAddress in
 				try await post(
 					request: V0StateResourceRequest(resourceAddress: resourceAddress)
-				) { baseURL in
-					baseURL
-						.appendingPathComponent("state")
-						.appendingPathComponent("resource")
-				}
+				) { $0.appendingPathComponent("state/resource") }
 			},
 			submitTransaction: { transactionSubmitRequest in
-				try await Self.mock().submitTransaction(transactionSubmitRequest)
+				try await post(
+					request: transactionSubmitRequest
+				) { $0.appendingPathComponent("transaction/submit") }
 			},
 			transactionStatus: { transactionStatusRequest in
-				try await Self.mock().transactionStatus(transactionStatusRequest)
+				try await post(
+					request: transactionStatusRequest
+				) { $0.appendingPathComponent("transaction/status") }
 			},
 			getCommittedTransaction: { request in
-				try await Self.mock().getCommittedTransaction(request)
+				try await post(
+					request: request
+				) { $0.appendingPathComponent("transaction/receipt") }
 			}
 		)
 	}
 }
+
+#if DEBUG
+// https://gist.github.com/cprovatas/5c9f51813bc784ef1d7fcbfb89de74fe
+extension Data {
+	/// NSString gives us a nice sanitized debugDescription
+	var prettyPrintedJSONString: NSString? {
+		guard
+			let object = try? JSONSerialization.jsonObject(with: self, options: []),
+			let data = try? JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted]),
+			let prettyPrintedString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)
+		else { return nil }
+
+		return prettyPrintedString
+	}
+}
+#endif

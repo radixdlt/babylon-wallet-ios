@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Sajjon/K1.git",
       "state" : {
-        "revision" : "c327b56ba11df06a73a6761ecd14c6b21653f4a2",
-        "version" : "0.0.2"
+        "revision" : "29eaa6aeef23caf79fbfa161f5e9e7755b50bdbb",
+        "version" : "0.0.3"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/SLIP10.git",
       "state" : {
-        "revision" : "d93af9e9bf9106e2330b3f00af7683937d6f1c0e",
-        "version" : "0.0.9"
+        "branch" : "0.0.12",
+        "revision" : "a61be0bec3b2f2fd9f92e3effc26a13736b5cc08"
       }
     },
     {
@@ -131,7 +131,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-engine-toolkit.git",
       "state" : {
-        "revision" : "efebdfbb2e178e0117121028fa328c078a549358"
+        "revision" : "d9492c25ec2dfd2bd94938537f70e3ebde003c1b"
       }
     },
     {
@@ -157,7 +157,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "3d16186698396e1d5a360aa10745e5fd0987cf02"
+        "revision" : "6d04c32bc85712d32d10b3ef2ba2e1d77500b9ad"
       }
     },
     {
