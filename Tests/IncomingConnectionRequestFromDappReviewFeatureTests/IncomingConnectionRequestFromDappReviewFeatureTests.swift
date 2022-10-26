@@ -38,7 +38,8 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		_ = await store.send(.internal(.user(.proceedWithConnectionRequest)))
 
 		// then
-		_ = await store.receive(.coordinate(.proceedWithConnectionRequest)) {
+		_ = await store.receive(.coordinate(.proceedWithConnectionRequest))
+		_ = await store.receive(.internal(.system(.accountsLoaded(accounts.rawValue.elements)))) {
 			$0.chooseAccounts = .init(
 				incomingConnectionRequestFromDapp: request,
 				accounts: .init(uniqueElements: accounts.rawValue.elements.map {

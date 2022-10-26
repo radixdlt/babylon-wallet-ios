@@ -1,4 +1,5 @@
 import Foundation
+import Profile
 
 // MARK: - IncomingConnectionRequestFromDappReview.Action
 public extension IncomingConnectionRequestFromDappReview {
@@ -27,7 +28,9 @@ public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
 
 // MARK: - IncomingConnectionRequestFromDappReview.Action.InternalAction.SystemAction
 public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
-	enum SystemAction: Equatable {}
+	enum SystemAction: Equatable {
+		case accountsLoaded([OnNetwork.Account])
+	}
 }
 
 // MARK: - IncomingConnectionRequestFromDappReview.Action.CoordinatingAction
