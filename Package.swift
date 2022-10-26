@@ -371,6 +371,7 @@ let package = Package(
 			name: "IncomingConnectionRequestFromDappReviewFeatureTests",
 			dependencies: [
 				"IncomingConnectionRequestFromDappReviewFeature",
+				"ProfileClient",
 				tca,
 				"TestUtils",
 			]
