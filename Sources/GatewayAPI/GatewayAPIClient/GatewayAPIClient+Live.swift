@@ -55,13 +55,13 @@ public extension GatewayAPIClient {
 				throw ExpectedHTTPURLResponse()
 			}
 
-			guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
-				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
-			}
-
 			#if DEBUG
 			print("🐛 got HTTP response data:\n\n\(data.prettyPrintedJSONString)\n\n")
 			#endif
+
+			guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
+				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
+			}
 
 			let response = try jsonDecoder.decode(Response.self, from: data)
 
