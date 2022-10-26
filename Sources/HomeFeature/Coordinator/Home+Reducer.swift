@@ -97,7 +97,7 @@ public extension Home {
 		.optional()
 		.pullback(
 			state: \.connectionRequest,
-			action: /Home.Action.connectionRequest,
+			action: /Home.Action.debugInitiatedConnectionRequest,
 			environment: { $0 }
 		),
 		// #endif
@@ -362,14 +362,14 @@ public extension Home {
 
 			// commented out DEBUG because swift format replaces state with _
 			// #if DEBUG
-			case .connectionRequest(.internal(_)):
+			case .debugInitiatedConnectionRequest(.internal(_)):
 				return .none
-			case .connectionRequest(.coordinate(.dismissIncomingConnectionRequest)):
+			case .debugInitiatedConnectionRequest(.coordinate(.dismissIncomingConnectionRequest)):
 				state.connectionRequest = nil
 				return .none
-			case .connectionRequest(.coordinate(_)):
+			case .debugInitiatedConnectionRequest(.coordinate(_)):
 				return .none
-			case .connectionRequest(.chooseAccounts(_)):
+			case .debugInitiatedConnectionRequest(.chooseAccounts(_)):
 				return .none
 				// #endif
 			}

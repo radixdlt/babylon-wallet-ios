@@ -21,7 +21,7 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 					await send(.coordinate(.proceedWithConnectionRequest))
 				}
 
-			case let .internal(.system(.accountsLoaded(accounts))):
+			case let .internal(.system(.loadAccountsResult(.success(accounts)))):
 				state.chooseAccounts = .init(
 					incomingConnectionRequestFromDapp: state.incomingConnectionRequestFromDapp,
 					accounts: .init(uniqueElements: accounts.map {
@@ -30,10 +30,15 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 				)
 				return .none
 
+			case let .internal(.system(.loadAccountsResult(.failure(error)))):
+				print("⚠️ failed to load accounts, error: \(String(describing: error))")
+				return .none
+
 			case .coordinate(.proceedWithConnectionRequest):
 				return .run { send in
-					let accounts = try profileClient.getAccounts()
-					await send(.internal(.system(.accountsLoaded(accounts.rawValue.elements))))
+					await send(.internal(.system(.loadAccountsResult(TaskResult {
+						try profileClient.getAccounts()
+					}))))
 				}
 
 			case .coordinate(.dismissIncomingConnectionRequest):

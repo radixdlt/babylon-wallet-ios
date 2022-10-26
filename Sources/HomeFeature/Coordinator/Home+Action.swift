@@ -29,7 +29,7 @@ public extension Home {
 		case createAccount(CreateAccount.Action)
 
 		#if DEBUG
-		case connectionRequest(IncomingConnectionRequestFromDappReview.Action)
+		case debugInitiatedConnectionRequest(IncomingConnectionRequestFromDappReview.Action)
 		#endif
 	}
 }

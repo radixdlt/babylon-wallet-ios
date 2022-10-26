@@ -13,10 +13,8 @@ public struct CheckmarkView: View {
 
 public extension CheckmarkView {
 	var body: some View {
-		Group {
-			isChecked ? Image("checkmark-selected") : Image("checkmark-unselected")
-		}
-		.padding(.leading, 12)
+		Image(isChecked ? "checkmark-selected" : "checkmark-unselected")
+			.padding(.leading, 12)
 	}
 }
 

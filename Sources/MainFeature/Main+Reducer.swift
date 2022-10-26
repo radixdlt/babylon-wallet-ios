@@ -80,7 +80,7 @@ public extension Main {
 				return .none
 
 			#if DEBUG
-			case .home(.connectionRequest(_)):
+			case .home(.debugInitiatedConnectionRequest(_)):
 				return .none
 			#endif
 			}

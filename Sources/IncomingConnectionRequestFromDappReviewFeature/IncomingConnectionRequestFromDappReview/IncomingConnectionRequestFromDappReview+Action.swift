@@ -1,4 +1,7 @@
+import Collections
+import ComposableArchitecture
 import Foundation
+import NonEmpty
 import Profile
 
 // MARK: - IncomingConnectionRequestFromDappReview.Action
@@ -29,7 +32,7 @@ public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
 // MARK: - IncomingConnectionRequestFromDappReview.Action.InternalAction.SystemAction
 public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
 	enum SystemAction: Equatable {
-		case accountsLoaded([OnNetwork.Account])
+		case loadAccountsResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
 	}
 }
 

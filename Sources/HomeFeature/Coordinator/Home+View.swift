@@ -76,7 +76,7 @@ public extension Home.View {
 				IfLetStore(
 					store.scope(
 						state: \.connectionRequest,
-						action: Home.Action.connectionRequest
+						action: Home.Action.debugInitiatedConnectionRequest
 					),
 					then: IncomingConnectionRequestFromDappReview.View.init(store:)
 				)
