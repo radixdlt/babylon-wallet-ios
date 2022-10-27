@@ -26,6 +26,16 @@ public struct SignTransactionIntentRequest: Sendable {
 }
 
 public extension SignTransactionIntentRequest {
+	var version: Version {
+		transactionIntent.header.version
+	}
+
+	var networkID: NetworkID {
+		transactionIntent.header.networkId
+	}
+}
+
+public extension SignTransactionIntentRequest {
 	init(
 		manifest: TransactionManifest,
 		header: TransactionHeader,

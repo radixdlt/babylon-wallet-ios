@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/SLIP10.git",
       "state" : {
-        "branch" : "0.0.12",
-        "revision" : "a61be0bec3b2f2fd9f92e3effc26a13736b5cc08"
+        "revision" : "a61be0bec3b2f2fd9f92e3effc26a13736b5cc08",
+        "version" : "0.0.12"
       }
     },
     {
@@ -131,7 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-engine-toolkit.git",
       "state" : {
-        "revision" : "d9492c25ec2dfd2bd94938537f70e3ebde003c1b"
+        "revision" : "2e675f5bc5b454d0253ff91d39f33cba94f60a9f",
+        "version" : "0.0.3"
       }
     },
     {
@@ -157,7 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "6d04c32bc85712d32d10b3ef2ba2e1d77500b9ad"
+        "revision" : "a18328b890e12bfa5f54226693af634c0d8fa932",
+        "version" : "0.0.22"
       }
     },
     {

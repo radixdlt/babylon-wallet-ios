@@ -52,7 +52,7 @@ public extension GatewayAPIClient {
 			}
 
 			#if DEBUG
-			print("🐛 got HTTP response data:\n\n\(data.prettyPrintedJSONString)\n\n")
+			print("🐛 got HTTP response, status=\(httpURLResponse.statusCode), data:\n\n\(String(describing: data.prettyPrintedJSONString))\n\n")
 			#endif
 
 			guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
@@ -159,20 +159,26 @@ public struct PollStrategy {
 }
 
 public extension GatewayAPIClient {
+	// MARK: -
+
+	// MARK: Submit TX Flow
 	func submit(
 		pollStrategy: PollStrategy = .default,
 		backgroundQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue(label: "GatewayUsage").eraseToAnyScheduler(),
 		signedCompiledNotarizedTXGivenEpoch: (Epoch) async throws -> SignedCompiledNotarizedTX
 	) async throws -> CommittedTransaction {
+		// MARK: Get Epoch
 		print("🎭 🛰 🕣 Getting Epoch from GatewayAPI...")
 		let epochResponse = try await getEpoch()
 		let epoch = Epoch(rawValue: .init(epochResponse.epoch))
 		print("🎭 🛰 🕣 Got Epoch: \(epoch) ✅")
 
+		// MARK: Build & Sign TX
 		print("🎭 🧰 🛠 Building TX with EngineToolkit...")
 		let signedCompiledNotarizedTX = try await signedCompiledNotarizedTXGivenEpoch(epoch)
 		print("🎭 🧰 🛠 Built TX with EngineToolkit ✅")
 
+		// MARK: Submit TX
 		let submitTransactionRequest = V0TransactionSubmitRequest(
 			notarizedTransactionHex: signedCompiledNotarizedTX.compileNotarizedTransactionIntentResponse.compiledNotarizedIntent.hex
 		)
@@ -185,8 +191,10 @@ public extension GatewayAPIClient {
 		}
 		print("🎭 🛰 💷 Submitted TX to GatewayAPI (non duplicate) ✅")
 
+		// MARK: Poll Status
 		var txStatus: V0TransactionStatusResponse.IntentStatus = .unknown
 		let intentHash = signedCompiledNotarizedTX.intentHash.hex
+		print("🎭 🛰 🔮 Polling TX status from GatewayAPI using intentHash: \(intentHash)")
 		@Sendable func pollTransactionStatus() async throws -> V0TransactionStatusResponse.IntentStatus {
 			let txStatusRequest = V0TransactionStatusRequest(
 				intentHash: intentHash
@@ -194,11 +202,11 @@ public extension GatewayAPIClient {
 			let txStatusResponse = try await transactionStatus(txStatusRequest)
 			return txStatusResponse.intentStatus
 		}
+
 		var pollCount = 0
 		while !txStatus.isComplete {
 			defer { pollCount += 1 }
 			try await backgroundQueue.sleep(for: .seconds(pollStrategy.sleepDuration))
-			print("🎭 🛰 🔮 Polling TX status from GatewayAPI...")
 			txStatus = try await pollTransactionStatus()
 			print("🎭 🛰 🔮 Polled TX status=`\(txStatus.rawValue)` from GatewayAPI ☑️ ")
 			if pollCount >= pollStrategy.maxPollTries {
@@ -212,7 +220,8 @@ public extension GatewayAPIClient {
 		}
 		print("🎭 🔮 TX was committed successfully ✅")
 
-		print("🎭 🛰 🔮 Getting commited TX from GatewayAPI...")
+		// MARK: Get Commited TX
+		print("🎭 🛰 🔮 Getting commited TX from GatewayAPI using intentHash: \(intentHash)")
 		let getCommittedTXRequest = V0CommittedTransactionRequest(
 			intentHash: intentHash
 		)

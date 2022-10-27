@@ -7,16 +7,19 @@ import Foundation
 import enum SLIP10.PrivateKey
 import enum SLIP10.PublicKey
 
-public extension Nonce {
-	static func secureRandom() -> Self {
-		let byteCount = RawValue.bitWidth / 8
-		var data = Data(repeating: 0, count: byteCount)
-		data.withUnsafeMutableBytes {
-			assert($0.count == byteCount)
-			$0.initializeWithRandomBytes(count: byteCount)
+// FIXME: please move to EngineToolkit repo!
+public extension Engine.Signature {
+	var bytes: [UInt8] {
+		switch self {
+		case let .eddsaEd25519(signature):
+			return signature.bytes
+		case let .ecdsaSecp256k1(signature):
+			return signature.bytes
 		}
-		let rawValue = data.withUnsafeBytes { $0.load(as: RawValue.self) }
-		return Self(rawValue: rawValue)
+	}
+
+	var hex: String {
+		bytes.hex
 	}
 }
 
@@ -30,35 +33,49 @@ public extension EngineToolkitClient {
 				let privateKey = request.privateKey
 				let transactionIntent = request.transactionIntent
 
+				print("\n🔮⚙️🧰 Manifest:", transactionIntent.manifest)
+
 				let compiledTransactionIntent = try engineToolkit.compileTransactionIntentRequest(
 					request: transactionIntent
 				).get()
+
+				print("🔮⚙️🧰 Compiled Transaction Intent:\n\(compiledTransactionIntent.compiledIntent.hex)\n\n")
 
 				let transactionIntentWithSignatures = SignedTransactionIntent(
 					intent: transactionIntent,
 					intentSignatures: []
 				)
 
-				let forNotarySignerToSign = try engineToolkit
+				let compiledSignedIntentResponse = try engineToolkit
 					.compileSignedTransactionIntentRequest(request: transactionIntentWithSignatures)
 					.get()
 
-				let (signedCompiledSignedTXIntent, _) = try privateKey.signReturningHashOfMessage(
-					data: forNotarySignerToSign.compiledSignedIntent
+				print("🔮⚙️🧰 Compiled Signed Intent:\n\(compiledSignedIntentResponse.compiledSignedIntent.hex)\n\n")
+
+				let (signedCompiledSignedTXIntent, hashOfSignedIntent) = try privateKey.signReturningHashOfMessage(
+					data: compiledSignedIntentResponse.compiledSignedIntent
 				)
 
-				let notarizedTX = try NotarizedTransaction(
+				let notarySignature = try signedCompiledSignedTXIntent.intoEngine().signature
+				print("🔮⚙️🧰 Compiled signed intent signature:\n\(notarySignature.hex)\n\n")
+				print("🔮⚙️🧰 Compiled signed intent hash:\n\(hashOfSignedIntent.hex)\n\n")
+
+				let notarizedTX = NotarizedTransaction(
 					signedIntent: transactionIntentWithSignatures,
-					notarySignature: signedCompiledSignedTXIntent.intoEngine().signature
+					notarySignature: notarySignature
 				)
 
 				let notarizedTransactionIntent = try engineToolkit
 					.compileNotarizedTransactionIntentRequest(request: notarizedTX)
 					.get()
 
+				print("🔮⚙️🧰 Compiled notarized transaction intent:\n\(notarizedTransactionIntent.compiledNotarizedIntent.hex)\n\n")
+
 				let intentHash = Data(
 					SHA256.twice(data: Data(compiledTransactionIntent.compiledIntent))
 				)
+
+				print("🔮⚙️🧰 Compiled Intent hash:\n\(intentHash.hex)\n\n")
 
 				return .init(
 					compileTransactionIntentResponse: compiledTransactionIntent,
