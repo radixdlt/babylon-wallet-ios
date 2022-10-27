@@ -20,7 +20,7 @@ public extension App.Environment {
 			appSettingsClient: .liveValue,
 			accountPortfolioFetcher: .liveValue,
 			keychainClient: keychainClient,
-			pasteboardClient: .live(),
+			pasteboardClient: .live,
 			profileLoader: .live(keychainClient: keychainClient),
 			userDefaultsClient: .liveValue,
 			profileClient: .live(backgroundQueue: backgroundQueue)
