@@ -326,6 +326,7 @@ let package = Package(
 				bigInt,
 				"Common",
 				engineToolkit,
+				"EngineToolkitClient",
 				profile, // address
 				tca, // XCTestDynamicOverlay + DependencyKey
 			],

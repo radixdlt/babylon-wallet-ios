@@ -12,6 +12,7 @@ import EngineToolkit
 import Foundation
 import enum SLIP10.PrivateKey
 import enum SLIP10.PublicKey
+import CryptoKit
 
 public extension Nonce {
 	static func secureRandom() -> Self {
@@ -36,31 +37,83 @@ public extension AlphanetAddresses {
 
 // MARK: - EngineToolkitClient
 public struct EngineToolkitClient {
-	public var buildTransactionForCreateOnLedgerAccount: BuildTransactionForCreateOnLedgerAccount
+	public var signTransactionIntent: SignTransactionIntent
+	public init(signTransactionIntent: @escaping SignTransactionIntent) {
+		self.signTransactionIntent = signTransactionIntent
+	}
+}
+
+public struct SignedCompiledNotarizedTX: Sendable, Hashable {
+	public let compileTransactionIntentResponse: CompileTransactionIntentResponse
+	public let intentHash: Data
+	public let compileNotarizedTransactionIntentResponse: CompileNotarizedTransactionIntentResponse
 }
 
 // MARK: EngineToolkitClient.BuildTransactionForCreateOnLedgerAccount
 public extension EngineToolkitClient {
-	// FIXME: what is the signature?
-	typealias BuildTransactionForCreateOnLedgerAccount = @Sendable (BuildTransactionForCreateOnLedgerAccountRequest) throws -> (CompileNotarizedTransactionIntentResponse, CompileTransactionIntentResponse)
+	typealias SignTransactionIntent = @Sendable (SignTransactionIntentRequest) throws -> SignedCompiledNotarizedTX
 }
 
-// MARK: - BuildTransactionForCreateOnLedgerAccountRequest
-public struct BuildTransactionForCreateOnLedgerAccountRequest: Sendable {
+struct NonMatchingPrivateAnPublicKeys: Swift.Error {}
+
+// MARK: - SignTransactionIntentRequest
+public struct SignTransactionIntentRequest: Sendable {
+	public let transactionIntent: TransactionIntent
 	public let privateKey: PrivateKey
-	public let transactionHeaderInput: TransactionHeaderInput
-	public init(
+	
+	public init(transactionIntent: TransactionIntent, privateKey: PrivateKey) throws {
+		guard try transactionIntent.header.publicKey == privateKey.publicKey().intoEngine() else {
+			throw NonMatchingPrivateAnPublicKeys()
+		}
+		self.transactionIntent = transactionIntent
+		self.privateKey = privateKey
+	}
+}
+public extension SignTransactionIntentRequest {
+	init(
+		manifest: TransactionManifest,
+		header: TransactionHeader,
+		privateKey: PrivateKey
+	) throws {
+		try self.init(
+			transactionIntent: .init(
+				header: header,
+				manifest: manifest
+			),
+			privateKey: privateKey
+		)
+	}
+	
+	init(
+		manifest: TransactionManifest,
+		headerInput: TransactionHeaderInput,
+		privateKey: PrivateKey
+	) throws {
+		try self.init(
+			transactionIntent: .init(
+				header: headerInput.header(),
+				manifest: manifest
+			),
+			privateKey: privateKey
+		)
+	}
+	
+	init(
+		manifest: TransactionManifest,
 		privateKey: PrivateKey,
 		epoch: Epoch,
 		networkID: NetworkID,
 		costUnitLimit: UInt32 = TransactionHeaderInput.defaultCostUnitLimit
-	) {
-		self.privateKey = privateKey
-		self.transactionHeaderInput = .init(
+	) throws {
+		let headerInput = TransactionHeaderInput(
 			publicKey: privateKey.publicKey(),
 			startEpoch: epoch,
-			networkID: networkID,
-			costUnitLimit: costUnitLimit
+			networkID: networkID
+		)
+		try self.init(
+			manifest: manifest,
+			headerInput: headerInput,
+			privateKey: privateKey
 		)
 	}
 }
@@ -108,9 +161,37 @@ public struct TransactionHeaderInput: Sendable {
 }
 
 public extension EngineToolkitClient {
-	static let live: Self = .init(buildTransactionForCreateOnLedgerAccount: { request in
-		let privateKey = request.privateKey
+	static let live: Self = .init(signTransactionIntent: { request in
+		let engineToolkit = EngineToolkit()
 
+		let privateKey = request.privateKey
+		let transactionIntent = request.transactionIntent
+
+		let compiledTransactionIntent = try engineToolkit.compileTransactionIntentRequest(request: transactionIntent).get()
+		let transactionIntentWithSignatures = SignedTransactionIntent(intent: transactionIntent, intentSignatures: [])
+		let forNotarySignerToSign = try engineToolkit.compileSignedTransactionIntentRequest(request: transactionIntentWithSignatures).get()
+		let (signedCompiledSignedTXIntent, forNotarySignerToSignHash) = try privateKey.signReturningHashOfMessage(data: forNotarySignerToSign.compiledSignedIntent)
+		let notarizedTX = try NotarizedTransaction(
+			signedIntent: transactionIntentWithSignatures,
+			notarySignature: signedCompiledSignedTXIntent.intoEngine().signature
+		)
+		let notarizedTransactionIntent = try engineToolkit.compileNotarizedTransactionIntentRequest(request: notarizedTX).get()
+
+		let intentHash = Data(SHA256.twice(data: Data(compiledTransactionIntent.compiledIntent)))
+		
+		return .init(
+			compileTransactionIntentResponse: compiledTransactionIntent,
+			intentHash: intentHash,
+			compileNotarizedTransactionIntentResponse: notarizedTransactionIntent)
+
+	})
+}
+
+public extension EngineToolkitClient {
+	func createAccount(request: BuildAndSignTransactionRequest) throws -> SignedCompiledNotarizedTX {
+		let privateKey = request.privateKey
+		let headerInput = request.transactionHeaderInput
+		
 		let engineToolkit = EngineToolkit()
 		let nonFungibleAddress = try engineToolkit.deriveNonFungibleAddressFromPublicKeyRequest(
 			request: privateKey.publicKey().intoEngine()
@@ -118,7 +199,7 @@ public extension EngineToolkitClient {
 		.get()
 		.nonFungibleAddress
 
-		let transactionManifest = TransactionManifest {
+		let manifest = TransactionManifest {
 			CallMethod(
 				componentAddress: AlphanetAddresses.faucet,
 				methodName: "lock_fee"
@@ -152,25 +233,34 @@ public extension EngineToolkitClient {
 				xrdBucket
 			}
 		}
-
-		let header = try request.transactionHeaderInput.header()
-
-		let transactionIntent = TransactionIntent(
-			header: header,
-			manifest: transactionManifest
+		
+		let signTXRequest = try SignTransactionIntentRequest(
+			manifest: manifest,
+			headerInput: headerInput,
+			privateKey: privateKey
 		)
 
-		let compiledTransactionIntent = try engineToolkit.compileTransactionIntentRequest(request: transactionIntent).get()
-		let transactionIntentWithSignatures = SignedTransactionIntent(intent: transactionIntent, intentSignatures: [])
-		let forNotarySignerToSign = try engineToolkit.compileSignedTransactionIntentRequest(request: transactionIntentWithSignatures).get()
-		let (signedCompiledSignedTXIntent, forNotarySignerToSignHash) = try privateKey.signReturningHashOfMessage(data: forNotarySignerToSign.compiledSignedIntent)
-		let notarizedTX = try NotarizedTransaction(
-			signedIntent: transactionIntentWithSignatures,
-			notarySignature: signedCompiledSignedTXIntent.intoEngine().signature
+		return try signTransactionIntent(signTXRequest)
+		
+	}
+}
+
+// MARK: - BuildAndSignTransactionRequest
+public struct BuildAndSignTransactionRequest: Sendable {
+	public let privateKey: PrivateKey
+	public let transactionHeaderInput: TransactionHeaderInput
+	public init(
+		privateKey: PrivateKey,
+		epoch: Epoch,
+		networkID: NetworkID,
+		costUnitLimit: UInt32 = TransactionHeaderInput.defaultCostUnitLimit
+	) {
+		self.privateKey = privateKey
+		self.transactionHeaderInput = .init(
+			publicKey: privateKey.publicKey(),
+			startEpoch: epoch,
+			networkID: networkID,
+			costUnitLimit: costUnitLimit
 		)
-		let notarizedTransactionIntent = try engineToolkit.compileNotarizedTransactionIntentRequest(request: notarizedTX).get()
-
-		return (notarizedTransactionIntent, compiledTransactionIntent)
-
-	})
+	}
 }

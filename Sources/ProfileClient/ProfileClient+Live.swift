@@ -35,13 +35,13 @@ public extension ProfileClient {
 					backgroundQueue: backgroundQueue
 				) { epoch in
 
-					let buildTransactionRequest = BuildTransactionForCreateOnLedgerAccountRequest(
+					let buildAndSignTXRequest = BuildAndSignTransactionRequest(
 						privateKey: privateKey,
 						epoch: epoch,
 						networkID: createAccountRequest.networkID
 					)
 
-					return try engineToolkitClient.buildTransactionForCreateOnLedgerAccount(buildTransactionRequest)
+					return try engineToolkitClient.createAccount(request: buildAndSignTXRequest)
 				}
 
 				guard let accountAddressBech32 = committed

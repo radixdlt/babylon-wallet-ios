@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import CryptoKit
 import EngineToolkit
+import EngineToolkitClient
 import Foundation
 import SLIP10
 
@@ -168,7 +169,7 @@ public extension GatewayAPIClient {
 	func submit(
 		pollStrategy: PollStrategy = .default,
 		backgroundQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue(label: "GatewayUsage").eraseToAnyScheduler(),
-		notarizedSignedTXGivenEpoch: (Epoch) async throws -> (CompileNotarizedTransactionIntentResponse, CompileTransactionIntentResponse)
+		signedCompiledNotarizedTXGivenEpoch: (Epoch) async throws -> SignedCompiledNotarizedTX
 	) async throws -> CommittedTransaction {
 		print("🎭 🛰 🕣 Getting Epoch from GatewayAPI...")
 		let epochResponse = try await getEpoch()
@@ -176,11 +177,11 @@ public extension GatewayAPIClient {
 		print("🎭 🛰 🕣 Got Epoch: \(epoch) ✅")
 
 		print("🎭 🧰 🛠 Building TX with EngineToolkit...")
-		let (notarizedTransactionIntent, compiledTransactionIntent) = try await notarizedSignedTXGivenEpoch(epoch)
+		let signedCompiledNotarizedTX = try await signedCompiledNotarizedTXGivenEpoch(epoch)
 		print("🎭 🧰 🛠 Built TX with EngineToolkit ✅")
 
 		let submitTransactionRequest = V0TransactionSubmitRequest(
-			notarizedTransactionHex: notarizedTransactionIntent.compiledNotarizedIntent.hex
+			notarizedTransactionHex: signedCompiledNotarizedTX.compileNotarizedTransactionIntentResponse.compiledNotarizedIntent.hex
 		)
 
 		print("🎭 🛰 💷 Submitting TX to GatewayAPI...")
@@ -192,7 +193,7 @@ public extension GatewayAPIClient {
 		print("🎭 🛰 💷 Submitted TX to GatewayAPI (non duplicate) ✅")
 
 		var txStatus: V0TransactionStatusResponse.IntentStatus = .unknown
-		let intentHash = Data(SHA256.twice(data: Data(compiledTransactionIntent.compiledIntent))).hex
+		let intentHash = signedCompiledNotarizedTX.intentHash.hex
 		@Sendable func pollTransactionStatus() async throws -> V0TransactionStatusResponse.IntentStatus {
 			let txStatusRequest = V0TransactionStatusRequest(
 				intentHash: intentHash
