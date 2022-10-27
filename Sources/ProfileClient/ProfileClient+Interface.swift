@@ -1,5 +1,5 @@
 import Collections
-import ComposableArchitecture
+import Dependencies
 import Foundation
 import KeychainClient
 import Mnemonic

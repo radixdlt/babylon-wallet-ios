@@ -1,14 +1,15 @@
-import ComposableArchitecture
+import Dependencies
 import Foundation
 import UserDefaultsClient
 
 // MARK: - AppSettingsClient + DependencyKey
 extension AppSettingsClient: DependencyKey {
 	static func live(
-		userDefaultsClient: UserDefaultsClient = .liveValue,
 		initialSettingsToPersist: AppSettings? = .default
 	) -> Self {
 		let saveSettings: SaveSettings = { appSettings in
+			@Dependency(\.userDefaultsClient) var userDefaultsClient
+
 			do {
 				let data = try JSONEncoder().encode(appSettings)
 				await userDefaultsClient.setData(data, Key.appSettings.rawValue)
@@ -18,6 +19,8 @@ extension AppSettingsClient: DependencyKey {
 		}
 
 		let loadSettings: LoadSettings = {
+			@Dependency(\.userDefaultsClient) var userDefaultsClient
+
 			guard let data = userDefaultsClient.dataForKey(Key.appSettings.rawValue) else {
 				guard let settings = initialSettingsToPersist else {
 					throw Error.loadSettingsFailed(reason: "Initial settings missing")

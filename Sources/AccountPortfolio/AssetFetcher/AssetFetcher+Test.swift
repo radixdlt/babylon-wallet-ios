@@ -1,6 +1,6 @@
 #if DEBUG
 import Asset
-import ComposableArchitecture
+import Dependencies
 import XCTestDynamicOverlay
 
 extension AssetFetcher: TestDependencyKey {

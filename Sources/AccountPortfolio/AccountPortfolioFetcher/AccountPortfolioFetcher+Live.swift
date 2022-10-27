@@ -1,6 +1,6 @@
 import AppSettings
 import Asset
-import ComposableArchitecture
+import Dependencies
 import GatewayAPI
 import Profile
 

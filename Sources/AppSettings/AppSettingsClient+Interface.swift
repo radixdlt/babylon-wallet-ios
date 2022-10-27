@@ -1,5 +1,5 @@
 import Common
-import ComposableArchitecture
+import Dependencies
 import Foundation
 import Profile
 import UserDefaultsClient

@@ -1,6 +1,6 @@
 import Asset
 import BigInt
-import ComposableArchitecture
+import Dependencies
 import Profile
 
 // MARK: - AssetFetcher

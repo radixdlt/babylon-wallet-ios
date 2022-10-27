@@ -1,5 +1,5 @@
 #if DEBUG
-import ComposableArchitecture
+import Dependencies
 import XCTestDynamicOverlay
 
 extension PasteboardClient: TestDependencyKey {

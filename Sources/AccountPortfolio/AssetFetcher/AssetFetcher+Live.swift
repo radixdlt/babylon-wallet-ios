@@ -1,7 +1,7 @@
 import Asset
 import BigInt
 import Common
-import ComposableArchitecture
+import Dependencies
 import GatewayAPI
 import Profile
 

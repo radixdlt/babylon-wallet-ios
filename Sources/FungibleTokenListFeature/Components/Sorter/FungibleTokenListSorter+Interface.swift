@@ -1,5 +1,5 @@
 import Asset
-import ComposableArchitecture
+import Dependencies
 
 // MARK: - FungibleTokenListSorter
 public struct FungibleTokenListSorter {
