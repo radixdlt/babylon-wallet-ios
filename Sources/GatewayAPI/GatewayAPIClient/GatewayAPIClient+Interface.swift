@@ -1,5 +1,6 @@
 import Common
 import CryptoKit
+import Dependencies
 import Foundation
 import Profile
 
