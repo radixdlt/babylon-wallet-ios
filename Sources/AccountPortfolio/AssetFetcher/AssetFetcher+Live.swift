@@ -34,7 +34,7 @@ public extension V0StateComponentResponse {
 
 // MARK: - AssetFetcher + DependencyKey
 extension AssetFetcher: DependencyKey {
-	public static var liveValue: AssetFetcher {
+	public static let liveValue: Self = {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 		return Self(
@@ -119,7 +119,7 @@ extension AssetFetcher: DependencyKey {
 				)
 			}
 		)
-	}
+	}()
 }
 
 // MARK: - AssetFetcher.ResourceDetails

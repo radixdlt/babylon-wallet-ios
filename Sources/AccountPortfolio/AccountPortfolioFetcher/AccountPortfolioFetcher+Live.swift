@@ -5,7 +5,7 @@ import GatewayAPI
 import Profile
 
 extension AccountPortfolioFetcher: DependencyKey {
-	public static var liveValue: AccountPortfolioFetcher {
+	public static let liveValue: Self = {
 		@Dependency(\.appSettingsClient) var appSettingsClient
 		@Dependency(\.assetFetcher) var assetFetcher
 
@@ -34,5 +34,5 @@ extension AccountPortfolioFetcher: DependencyKey {
 				return portfolioDictionary
 			}
 		)
-	}
+	}()
 }

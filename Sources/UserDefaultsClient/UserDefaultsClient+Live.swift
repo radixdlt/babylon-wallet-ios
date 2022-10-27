@@ -1,8 +1,9 @@
 import ComposableArchitecture
 import Foundation
 
+// MARK: - UserDefaultsClient + DependencyKey
 extension UserDefaultsClient: DependencyKey {
-	public static var liveValue: UserDefaultsClient {
+	public static let liveValue: Self = {
 		let userDefaults = { UserDefaults(suiteName: "group.works.rdx.babylon")! }
 		return Self(
 			boolForKey: { userDefaults().bool(forKey: $0) },
@@ -15,5 +16,5 @@ extension UserDefaultsClient: DependencyKey {
 			setDouble: { userDefaults().set($0, forKey: $1) },
 			setInteger: { userDefaults().set($0, forKey: $1) }
 		)
-	}
+	}()
 }
