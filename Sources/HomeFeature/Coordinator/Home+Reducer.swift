@@ -7,6 +7,7 @@ import Asset
 import ComposableArchitecture
 import CreateAccountFeature
 import FungibleTokenListFeature
+import IncomingConnectionRequestFromDappReviewFeature
 
 #if os(iOS)
 // FIXME: move to `UIApplicationClient` package!
@@ -83,8 +84,23 @@ public extension Home {
 		.pullback(
 			state: \.createAccount,
 			action: /Home.Action.createAccount,
-			environment: { _ in CreateAccount.Environment() }
+			environment: { $0 }
 		),
+
+		// commented out DEBUG because swift format replaces state with _
+		// #if DEBUG
+
+		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
+		AnyReducer { _ in
+			IncomingConnectionRequestFromDappReview()
+		}
+		.optional()
+		.pullback(
+			state: \.connectionRequest,
+			action: /Home.Action.debugInitiatedConnectionRequest,
+			environment: { $0 }
+		),
+		// #endif
 
 		Reducer { state, action, environment in
 
@@ -94,6 +110,14 @@ public extension Home {
 					let accounts = try environment.profileClient.getAccounts()
 					await send(.internal(.coordinate(.createAccount(numberOfExistingAccounts: accounts.count))))
 				}
+
+			// commented out DEBUG because swift format replaces state with _
+			// #if DEBUG
+			case .internal(.user(.showDAppConnectionRequest)):
+				state.connectionRequest = .init(incomingConnectionRequestFromDapp: .placeholder)
+				return .none
+			// #endif
+
 			case let .internal(.coordinate(.createAccount(numberOfExistingAccounts))):
 				state.createAccount = .init(
 					networkID: state.networkID,
@@ -343,6 +367,19 @@ public extension Home {
 
 			case .transfer(.internal):
 				return .none
+
+			// commented out DEBUG because swift format replaces state with _
+			// #if DEBUG
+			case .debugInitiatedConnectionRequest(.internal(_)):
+				return .none
+			case .debugInitiatedConnectionRequest(.coordinate(.dismissIncomingConnectionRequest)):
+				state.connectionRequest = nil
+				return .none
+			case .debugInitiatedConnectionRequest(.coordinate(_)):
+				return .none
+			case .debugInitiatedConnectionRequest(.chooseAccounts(_)):
+				return .none
+				// #endif
 			}
 		}
 	)

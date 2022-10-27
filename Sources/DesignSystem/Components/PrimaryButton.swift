@@ -33,3 +33,13 @@ public extension PrimaryButton {
 		)
 	}
 }
+
+// MARK: - PrimaryButton_Previews
+struct PrimaryButton_Previews: PreviewProvider {
+	static var previews: some View {
+		PrimaryButton(
+			title: "A title",
+			action: {}
+		)
+	}
+}

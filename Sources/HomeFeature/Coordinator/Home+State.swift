@@ -5,6 +5,7 @@ import AccountPreferencesFeature
 import AggregatedValueFeature
 import CreateAccountFeature
 import EngineToolkit
+import IncomingConnectionRequestFromDappReviewFeature
 import Profile
 import ProfileClient
 
@@ -31,6 +32,10 @@ public extension Home {
 		public var accountPreferences: AccountPreferences.State?
 		public var createAccount: CreateAccount.State?
 		public var transfer: AccountDetails.Transfer.State?
+
+		#if DEBUG
+		public var connectionRequest: IncomingConnectionRequestFromDappReview.State?
+		#endif
 
 		public init(
 			networkID: NetworkID,

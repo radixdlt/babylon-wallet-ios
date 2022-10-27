@@ -8,9 +8,7 @@ public extension IncomingConnectionRequestFromDappReview {
 	struct View: SwiftUI.View {
 		private let store: StoreOf<IncomingConnectionRequestFromDappReview>
 
-		public init(
-			store: StoreOf<IncomingConnectionRequestFromDappReview>
-		) {
+		public init(store: StoreOf<IncomingConnectionRequestFromDappReview>) {
 			self.store = store
 		}
 	}
@@ -23,10 +21,35 @@ public extension IncomingConnectionRequestFromDappReview.View {
 			observe: ViewState.init(state:),
 			send: IncomingConnectionRequestFromDappReview.Action.init(action:)
 		) { viewStore in
+			ForceFullScreen {
+				ZStack {
+					mainView(with: viewStore)
+						.zIndex(0)
+				}
+
+				IfLetStore(
+					store.scope(
+						state: \.chooseAccounts,
+						action: IncomingConnectionRequestFromDappReview.Action.chooseAccounts
+					),
+					then: ChooseAccounts.View.init(store:)
+				)
+				.zIndex(1)
+			}
+		}
+	}
+}
+
+private extension IncomingConnectionRequestFromDappReview.View {
+	func mainView(with viewStore: IncomingConnectionViewStore) -> some View {
+		VStack {
+			header(with: viewStore)
+				.padding(24)
+
 			ScrollView {
 				VStack {
 					VStack(spacing: 40) {
-						Text(L10n.Persona.ConnectionRequest.title)
+						Text(L10n.DApp.ConnectionRequest.title)
 							.textStyle(.sectionHeader)
 							.multilineTextAlignment(.center)
 
@@ -36,10 +59,10 @@ public extension IncomingConnectionRequestFromDappReview.View {
 					Spacer(minLength: 40)
 
 					VStack(spacing: 20) {
-						Text(L10n.Persona.ConnectionRequest.wantsToConnect(viewStore.incomingConnectionRequestFromDapp.name))
+						Text(L10n.DApp.ConnectionRequest.wantsToConnect(viewStore.incomingConnectionRequestFromDapp.displayName))
 							.textStyle(.secondaryHeader)
 
-						Text(L10n.Persona.ConnectionRequest.subtitle)
+						Text(L10n.DApp.ConnectionRequest.subtitle)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body1Regular)
 					}
@@ -53,8 +76,8 @@ public extension IncomingConnectionRequestFromDappReview.View {
 					Spacer()
 
 					PrimaryButton(
-						title: L10n.Persona.ConnectionRequest.continueButtonTitle,
-						action: { /* TODO: implement */ }
+						title: L10n.DApp.ConnectionRequest.continueButtonTitle,
+						action: { viewStore.send(.continueButtonTapped) }
 					)
 				}
 				.padding(.horizontal, 24)
@@ -63,17 +86,37 @@ public extension IncomingConnectionRequestFromDappReview.View {
 	}
 }
 
+// MARK: - IncomingConnectionRequestFromDappReview.View.IncomingConnectionViewStore
+private extension IncomingConnectionRequestFromDappReview.View {
+	typealias IncomingConnectionViewStore = ComposableArchitecture.ViewStore<IncomingConnectionRequestFromDappReview.View.ViewState, IncomingConnectionRequestFromDappReview.View.ViewAction>
+}
+
+private extension IncomingConnectionRequestFromDappReview.View {
+	func header(with viewStore: IncomingConnectionViewStore) -> some View {
+		HStack {
+			CloseButton {
+				viewStore.send(.dismissButtonTapped)
+			}
+			Spacer()
+		}
+	}
+}
+
 // MARK: - IncomingConnectionRequestFromDappReview.View.ViewAction
 extension IncomingConnectionRequestFromDappReview.View {
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case dismissButtonTapped
+		case continueButtonTapped
+	}
 }
 
 extension IncomingConnectionRequestFromDappReview.Action {
 	init(action: IncomingConnectionRequestFromDappReview.View.ViewAction) {
 		switch action {
-		default:
-			// TODO: implement
-			break
+		case .dismissButtonTapped:
+			self = .internal(.user(.dismissIncomingConnectionRequest))
+		case .continueButtonTapped:
+			self = .internal(.user(.proceedWithConnectionRequest))
 		}
 	}
 }
