@@ -6,8 +6,10 @@
 //
 
 import ComposableArchitecture
+import CryptoKit
 import EngineToolkit
 import Foundation
+import SLIP10
 
 // MARK: - Date + Sendable
 extension Date: @unchecked Sendable {}
@@ -166,7 +168,7 @@ public extension GatewayAPIClient {
 	func submit(
 		pollStrategy: PollStrategy = .default,
 		backgroundQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue(label: "GatewayUsage").eraseToAnyScheduler(),
-		notarizedSignedTranscationGivenEpoch: (Epoch) async throws -> NotarizedSignedTransctionContext
+		notarizedSignedTXGivenEpoch: (Epoch) async throws -> (CompileNotarizedTransactionIntentResponse, CompileTransactionIntentResponse)
 	) async throws -> CommittedTransaction {
 		print("🎭 🛰 🕣 Getting Epoch from GatewayAPI...")
 		let epochResponse = try await getEpoch()
@@ -174,11 +176,11 @@ public extension GatewayAPIClient {
 		print("🎭 🛰 🕣 Got Epoch: \(epoch) ✅")
 
 		print("🎭 🧰 🛠 Building TX with EngineToolkit...")
-		let notarizedSignedTranscation = try await notarizedSignedTranscationGivenEpoch(epoch)
+		let (notarizedTransactionIntent, compiledTransactionIntent) = try await notarizedSignedTXGivenEpoch(epoch)
 		print("🎭 🧰 🛠 Built TX with EngineToolkit ✅")
 
 		let submitTransactionRequest = V0TransactionSubmitRequest(
-			notarizedTransactionHex: notarizedSignedTranscation.compileSignedTransactionIntentResponse.compiledSignedIntent.hex
+			notarizedTransactionHex: notarizedTransactionIntent.compiledNotarizedIntent.hex
 		)
 
 		print("🎭 🛰 💷 Submitting TX to GatewayAPI...")
@@ -190,9 +192,10 @@ public extension GatewayAPIClient {
 		print("🎭 🛰 💷 Submitted TX to GatewayAPI (non duplicate) ✅")
 
 		var txStatus: V0TransactionStatusResponse.IntentStatus = .unknown
+		let intentHash = Data(SHA256.twice(data: Data(compiledTransactionIntent.compiledIntent))).hex
 		@Sendable func pollTransactionStatus() async throws -> V0TransactionStatusResponse.IntentStatus {
 			let txStatusRequest = V0TransactionStatusRequest(
-				intentHash: notarizedSignedTranscation.transactionIntentHash.hex
+				intentHash: intentHash
 			)
 			let txStatusResponse = try await transactionStatus(txStatusRequest)
 			return txStatusResponse.intentStatus
@@ -217,7 +220,7 @@ public extension GatewayAPIClient {
 
 		print("🎭 🛰 🔮 Getting commited TX from GatewayAPI...")
 		let getCommittedTXRequest = V0CommittedTransactionRequest(
-			intentHash: notarizedSignedTranscation.notarizedTransactionHash.hex
+			intentHash: intentHash
 		)
 		let committedResponse = try await getCommittedTransaction(getCommittedTXRequest)
 		print("🎭 🛰 🔮 Got commited TX from GatewayAPI ☑️")

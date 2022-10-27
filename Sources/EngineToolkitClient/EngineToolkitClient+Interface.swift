@@ -42,7 +42,7 @@ public struct EngineToolkitClient {
 // MARK: EngineToolkitClient.BuildTransactionForCreateOnLedgerAccount
 public extension EngineToolkitClient {
 	// FIXME: what is the signature?
-	typealias BuildTransactionForCreateOnLedgerAccount = @Sendable (BuildTransactionForCreateOnLedgerAccountRequest) throws -> NotarizedSignedTransctionContext
+	typealias BuildTransactionForCreateOnLedgerAccount = @Sendable (BuildTransactionForCreateOnLedgerAccountRequest) throws -> (CompileNotarizedTransactionIntentResponse, CompileTransactionIntentResponse)
 }
 
 // MARK: - BuildTransactionForCreateOnLedgerAccountRequest
@@ -155,19 +155,22 @@ public extension EngineToolkitClient {
 
 		let header = try request.transactionHeaderInput.header()
 
-		let notarizedTXContext = try transactionManifest
-			.header(header)
-			.notarize(privateKey)
+		let transactionIntent = TransactionIntent(
+			header: header,
+			manifest: transactionManifest
+		)
 
-//		let signedTransactionIntent = SignedTransactionIntent(
-//			intent: notarized.signedIntent.intent,
-//			intentSignatures: notarized.signedIntent.intentSignatures
-//		)
-//
-//
-//		let compiledSignedTransactionIntent = try engineToolkit.compileSignedTransactionIntentRequest(request: signedTransactionIntent).get()
+		let compiledTransactionIntent = try engineToolkit.compileTransactionIntentRequest(request: transactionIntent).get()
+		let transactionIntentWithSignatures = SignedTransactionIntent(intent: transactionIntent, intentSignatures: [])
+		let forNotarySignerToSign = try engineToolkit.compileSignedTransactionIntentRequest(request: transactionIntentWithSignatures).get()
+		let (signedCompiledSignedTXIntent, forNotarySignerToSignHash) = try privateKey.signReturningHashOfMessage(data: forNotarySignerToSign.compiledSignedIntent)
+		let notarizedTX = try NotarizedTransaction(
+			signedIntent: transactionIntentWithSignatures,
+			notarySignature: signedCompiledSignedTXIntent.intoEngine().signature
+		)
+		let notarizedTransactionIntent = try engineToolkit.compileNotarizedTransactionIntentRequest(request: notarizedTX).get()
 
-//		return compiledSignedTransactionIntent
-		return notarizedTXContext
+		return (notarizedTransactionIntent, compiledTransactionIntent)
+
 	})
 }
