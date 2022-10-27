@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-10-25.
-//
-
 import ComposableArchitecture
 import CryptoKit
 import EngineToolkit
@@ -19,7 +12,7 @@ public extension ProfileClient {
 	static func live(
 		backgroundQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue(label: "GatewayUsage").eraseToAnyScheduler(),
 		gatewayAPIClient: GatewayAPIClient = .live(),
-		engineToolkitClient: EngineToolkitClient = .live,
+		engineToolkitClient: EngineToolkitClient = .live(),
 		pollStrategy: PollStrategy = .default
 	) -> Self {
 		let profileHolder = ProfileHolder.shared
