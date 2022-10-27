@@ -7,13 +7,29 @@ import Foundation
 import enum SLIP10.PrivateKey
 import enum SLIP10.PublicKey
 
-// FIXME: please move to EngineToolkit repo!
+// FIXME: move to SLIP10
+public extension PrivateKey {
+	var rawRepresentation: Data {
+		switch self {
+		case let .secp256k1(privateKey):
+			return privateKey.rawRepresentation
+		case let .curve25519(privateKey):
+			return privateKey.rawRepresentation
+		}
+	}
+
+	var hex: String {
+		rawRepresentation.hex
+	}
+}
+
+// FIXME: move to EngineToolkit
 public extension Engine.Signature {
 	var bytes: [UInt8] {
 		switch self {
-		case let .eddsaEd25519(signature):
-			return signature.bytes
 		case let .ecdsaSecp256k1(signature):
+			return signature.bytes
+		case let .eddsaEd25519(signature):
 			return signature.bytes
 		}
 	}
@@ -31,9 +47,16 @@ public extension EngineToolkitClient {
 			signTransactionIntent: { request in
 
 				let privateKey = request.privateKey
+				#if DEBUG
+				print(String(repeating: "☣️", count: 50))
+				print("CRITICAL WARNING! PRINTING PRIVATE KEYS IN DEBUG MODE")
+				print("private key:")
+				print(privateKey.hex)
+				print(String(repeating: "☣️", count: 50))
+				#endif
 				let transactionIntent = request.transactionIntent
 
-				print("\n🔮⚙️🧰 Manifest:", transactionIntent.manifest)
+                print("\n🔮⚙️🧰 Manifest:", transactionIntent.manifest)
 
 				let compiledTransactionIntent = try engineToolkit.compileTransactionIntentRequest(
 					request: transactionIntent
