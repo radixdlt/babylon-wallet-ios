@@ -6,14 +6,10 @@ import AggregatedValueFeature
 import Asset
 import ComposableArchitecture
 import CreateAccountFeature
+import Foundation
 import FungibleTokenListFeature
 import IncomingConnectionRequestFromDappReviewFeature
 import PasteboardClient
-
-#if os(iOS)
-// FIXME: move to `UIApplicationClient` package!
-import UIKit
-#endif
 
 // MARK: - Home
 public struct Home: ReducerProtocol {
@@ -22,6 +18,7 @@ public struct Home: ReducerProtocol {
 	@Dependency(\.fungibleTokenListSorter) var fungibleTokenListSorter
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.openURL) var openURL
 
 	public init() {}
 
@@ -240,15 +237,9 @@ public struct Home: ReducerProtocol {
 			return .none
 
 		case .visitHub(.coordinate(.displayHub)):
-			#if os(iOS)
-			// FIXME: move to `UIApplicationClient` package!
 			return .fireAndForget {
-				UIApplication.shared.open(URL(string: "https://www.apple.com")!)
+				await openURL(URL(string: "https://www.apple.com")!)
 			}
-			#else
-			return .none
-			#endif // os(iOS)
-
 		case .visitHub(.internal):
 			return .none
 

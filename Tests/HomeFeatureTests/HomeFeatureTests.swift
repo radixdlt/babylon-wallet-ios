@@ -166,19 +166,22 @@ final class HomeFeatureTests: TestCase {
 	 }
 	 */
 
-	/*
-	 func testVisitHubButtonTapped() {
-	 	let store = TestStore(
-	 		initialState: Home.State(justA: .placeholder),
-	 		reducer: Home.reducer,
-	 		environment: Home.Environment(
-	 			appSettingsClient: .mock,
-	 			accountPortfolioFetcher: .mock,
-	 			pasteboardClient: .noop
-	 		)
-	 	)
+	func testVisitHubButtonTapped() async {
+		let initialState: Home.State = .placeholder
+		let store = TestStore(
+			initialState: initialState,
+			reducer: Home()
+		)
+		let openedURL = ActorIsolated<URL?>(nil)
+		store.dependencies.openURL = .init { url in
+			await openedURL.setValue(url)
+			return true
+		}
 
-	 	store.send(.visitHub(.coordinate(.displayHub)))
-	 }
-	 */
+		_ = await store.send(.visitHub(.coordinate(.displayHub)))
+
+		await openedURL.withValue { openedURL in
+			XCTAssertEqual(openedURL, URL(string: "https://www.apple.com")!)
+		}
+	}
 }
