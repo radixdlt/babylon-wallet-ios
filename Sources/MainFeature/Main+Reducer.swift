@@ -13,19 +13,15 @@ public extension Main {
 
 	// MARK: Reducer
 	static let reducer = Reducer.combine(
-		Home.reducer
-			.pullback(
-				state: \.home,
-				action: /Main.Action.home,
-				environment: {
-					Home.Environment(
-						profileClient: $0.profileClient,
-						appSettingsClient: $0.appSettingsClient,
-						accountPortfolioFetcher: $0.accountPortfolioFetcher,
-						pasteboardClient: $0.pasteboardClient
-					)
-				}
-			),
+		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
+		AnyReducer { _ in
+			Home()
+		}
+		.pullback(
+			state: \.home,
+			action: /Main.Action.home,
+			environment: { $0 }
+		),
 
 		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
 		AnyReducer { _ in

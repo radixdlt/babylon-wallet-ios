@@ -1,9 +1,9 @@
-import ComposableArchitecture
+import Dependencies
 import Foundation
 
-// MARK: - WalletClientKey
-public enum WalletClientKey: DependencyKey {}
-public extension WalletClientKey {
+// MARK: - ProfileClientKey
+public enum ProfileClientKey: DependencyKey {}
+public extension ProfileClientKey {
 	typealias Value = ProfileClient
 	static let liveValue = ProfileClient.live
 	static let testValue = ProfileClient.mock()
@@ -11,7 +11,7 @@ public extension WalletClientKey {
 
 public extension DependencyValues {
 	var profileClient: ProfileClient {
-		get { self[WalletClientKey.self] }
-		set { self[WalletClientKey.self] = newValue }
+		get { self[ProfileClientKey.self] }
+		set { self[ProfileClientKey.self] = newValue }
 	}
 }

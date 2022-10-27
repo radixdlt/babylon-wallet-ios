@@ -1,4 +1,5 @@
 import Common
+import Dependencies
 import Foundation
 import Profile
 import UserDefaultsClient
@@ -59,5 +60,12 @@ public extension AppSettingsClient {
 extension AppSettingsClient {
 	enum Key: String {
 		case appSettings
+	}
+}
+
+public extension DependencyValues {
+	var appSettingsClient: AppSettingsClient {
+		get { self[AppSettingsClient.self] }
+		set { self[AppSettingsClient.self] = newValue }
 	}
 }

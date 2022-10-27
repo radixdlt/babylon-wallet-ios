@@ -1,5 +1,6 @@
 import Asset
 import BigInt
+import Dependencies
 import Profile
 
 // MARK: - AssetFetcher
@@ -16,4 +17,11 @@ public struct AssetFetcher {
 // MARK: AssetFetcher.FetchAssets
 public extension AssetFetcher {
 	typealias FetchAssets = @Sendable (AccountAddress) async throws -> OwnedAssets
+}
+
+public extension DependencyValues {
+	var assetFetcher: AssetFetcher {
+		get { self[AssetFetcher.self] }
+		set { self[AssetFetcher.self] = newValue }
+	}
 }

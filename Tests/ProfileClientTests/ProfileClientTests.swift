@@ -1,7 +1,7 @@
 @testable import ProfileClient
 import TestUtils
 
-final class WalletClientTests: TestCase {
+final class ProfileClientTests: TestCase {
 	func testTrivial() {
 		XCTAssert(true)
 	}

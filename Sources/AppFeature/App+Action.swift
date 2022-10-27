@@ -26,6 +26,6 @@ public extension App.Action {
 	}
 
 	enum InternalAction: Equatable {
-		case injectProfileIntoWalletClient(Profile)
+		case injectProfileIntoProfileClient(Profile)
 	}
 }

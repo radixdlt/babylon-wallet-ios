@@ -1,3 +1,4 @@
+import Dependencies
 import Profile
 
 // MARK: - AccountPortfolioFetcher
@@ -14,4 +15,11 @@ public struct AccountPortfolioFetcher {
 // MARK: AccountPortfolioFetcher.FetchPortfolio
 public extension AccountPortfolioFetcher {
 	typealias FetchPortfolio = @Sendable ([AccountAddress]) async throws -> AccountPortfolioDictionary
+}
+
+public extension DependencyValues {
+	var accountPortfolioFetcher: AccountPortfolioFetcher {
+		get { self[AccountPortfolioFetcher.self] }
+		set { self[AccountPortfolioFetcher.self] = newValue }
+	}
 }

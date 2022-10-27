@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import Dependencies
 import Foundation
 
 // MARK: - UserDefaultsClient
@@ -47,6 +47,13 @@ public extension UserDefaultsClient {
 
 	var profileName: String? {
 		stringForKey(profileNameKey)
+	}
+}
+
+public extension DependencyValues {
+	var userDefaultsClient: UserDefaultsClient {
+		get { self[UserDefaultsClient.self] }
+		set { self[UserDefaultsClient.self] = newValue }
 	}
 }
 

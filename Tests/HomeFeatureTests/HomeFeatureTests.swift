@@ -58,18 +58,11 @@ final class HomeFeatureTests: TestCase {
 		initialState.accountDetails = accountDetailsState
 		initialState.accountList = .init(nonEmptyOrderedSetOfAccounts: .init(rawValue: .init([account]))!)
 
-		let environment = Home.Environment(
-			profileClient: .unimplemented,
-			appSettingsClient: .unimplemented,
-			accountPortfolioFetcher: .unimplemented,
-			pasteboardClient: .unimplemented,
-			fungibleTokenListSorter: .live
-		)
 		let store = TestStore(
 			initialState: initialState,
-			reducer: Home.reducer,
-			environment: environment
+			reducer: Home()
 		)
+		store.dependencies.fungibleTokenListSorter = .live
 
 		// when
 		_ = await store.send(.internal(.system(.fetchPortfolioResult(.success(totalPortfolio))))) { [address] in
@@ -84,7 +77,7 @@ final class HomeFeatureTests: TestCase {
 			// account details
 			if let details = $0.accountDetails {
 				// asset list
-				let sortedCategories = environment.fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
+				let sortedCategories = store.dependencies.fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
 
 				let section0 = FungibleTokenList.Section.State(
 					id: .xrd, assets: [
@@ -142,11 +135,12 @@ final class HomeFeatureTests: TestCase {
 		let initialState: Home.State = .placeholder
 		let store = TestStore(
 			initialState: initialState,
-			reducer: Home.reducer,
-			environment: .unimplemented
+			reducer: Home()
 		)
 
+		// when
 		_ = await store.send(.internal(.system(.fetchPortfolioResult(.success(accountPortfolio))))) {
+			// then
 			guard let key = accountPortfolio.first?.key else {
 				XCTFail("Failed to fetch first account")
 				return
