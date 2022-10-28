@@ -74,8 +74,8 @@ let package = Package(
 		// RDX Works packages
 		// We use SSH because repos are private...
 		.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-		.package(url: "git@github.com:radixdlt/swift-profile.git", revision: "ea00864e02b872068389571acc20e2233b2a99bb"),
-		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", revision: "ebb72b83a1c94ce0a254c9861c477cf4a68cb90f"),
+		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.23"),
+		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.4"),
 
 		// BigInt
 		.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),

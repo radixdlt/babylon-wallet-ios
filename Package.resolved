@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Mnemonic.git",
       "state" : {
-        "revision" : "2e85c6fedafbbf266185b9e32ac82159bd7d07b2",
-        "version" : "0.0.3"
+        "revision" : "6df4401b181d4d10f2acd1e0d95aa82c7f73d9b1",
+        "version" : "0.0.4"
       }
     },
     {
@@ -68,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/SLIP10.git",
       "state" : {
-        "revision" : "a61be0bec3b2f2fd9f92e3effc26a13736b5cc08",
-        "version" : "0.0.12"
+        "revision" : "8ae35c9d8c1920dfe8197eebe1b5d1a10efb5e28",
+        "version" : "0.0.15"
       }
     },
     {
@@ -131,7 +131,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-engine-toolkit.git",
       "state" : {
-        "revision" : "ebb72b83a1c94ce0a254c9861c477cf4a68cb90f"
+        "revision" : "594a0b2114794ce2a78c464251b5ba9164f37bd3",
+        "version" : "0.0.4"
       }
     },
     {
@@ -157,7 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "ea00864e02b872068389571acc20e2233b2a99bb"
+        "revision" : "f0319b24665fa0d1d0626deca41ff8cc8a976e1f",
+        "version" : "0.0.23"
       }
     },
     {
