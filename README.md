@@ -25,7 +25,7 @@ A "gotcha" of this structure is that the project root contains the Package.swift
 # Package Graph
 The internal package graph for Babylon looks as follows:
 
-```swift
+```
 Babylon
    |
    Profile
