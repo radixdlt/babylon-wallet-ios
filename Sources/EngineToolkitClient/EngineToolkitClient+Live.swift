@@ -1,49 +1,17 @@
 import Bite
 import Common
-import ComposableArchitecture
 import CryptoKit
+import Dependencies
 import EngineToolkit
 import Foundation
 import enum SLIP10.PrivateKey
 import enum SLIP10.PublicKey
 
-// FIXME: move to SLIP10
-public extension PrivateKey {
-	var rawRepresentation: Data {
-		switch self {
-		case let .secp256k1(privateKey):
-			return privateKey.rawRepresentation
-		case let .curve25519(privateKey):
-			return privateKey.rawRepresentation
-		}
-	}
-
-	var hex: String {
-		rawRepresentation.hex
-	}
-}
-
-// FIXME: move to EngineToolkit
-public extension Engine.Signature {
-	var bytes: [UInt8] {
-		switch self {
-		case let .ecdsaSecp256k1(signature):
-			return signature.bytes
-		case let .eddsaEd25519(signature):
-			return signature.bytes
-		}
-	}
-
-	var hex: String {
-		bytes.hex
-	}
-}
-
 public extension EngineToolkitClient {
-	static func live(
-		engineToolkit: EngineToolkit = .init()
-	) -> Self {
-		Self(
+	static let liveValue: Self = {
+		let engineToolkit = EngineToolkit()
+
+		return Self(
 			signTransactionIntent: { request in
 
 				let privateKey = request.privateKey
@@ -89,5 +57,5 @@ public extension EngineToolkitClient {
 				)
 			}
 		)
-	}
+	}()
 }

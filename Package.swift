@@ -297,8 +297,8 @@ let package = Package(
 				bigInt,
 				"Bite",
 				"Common",
+				dependencies,
 				engineToolkit,
-				tca,
 			]
 		),
 		.testTarget(

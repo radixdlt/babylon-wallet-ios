@@ -12,7 +12,7 @@ public extension ProfileClient {
 	static func live(
 		backgroundQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue(label: "GatewayUsage").eraseToAnyScheduler(),
 		gatewayAPIClient: GatewayAPIClient = .live(),
-		engineToolkitClient: EngineToolkitClient = .live(),
+		engineToolkitClient: EngineToolkitClient = .liveValue,
 		pollStrategy: PollStrategy = .default
 	) -> Self {
 		let profileHolder = ProfileHolder.shared
