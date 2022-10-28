@@ -63,7 +63,7 @@ public extension EngineToolkitClient {
 					.compileSignedTransactionIntentRequest(request: transactionIntentWithSignatures)
 					.get()
 
-				let (signedCompiledSignedTXIntent, hashOfSignedIntent) = try privateKey.signReturningHashOfMessage(
+				let (signedCompiledSignedTXIntent, _) = try privateKey.signReturningHashOfMessage(
 					data: compiledSignedIntentResponse.compiledSignedIntent
 				)
 
