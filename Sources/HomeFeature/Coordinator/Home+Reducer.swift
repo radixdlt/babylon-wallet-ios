@@ -94,7 +94,10 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.coordinate(.createAccount(numberOfExistingAccounts))):
-			state.createAccount = .init(numberOfExistingAccounts: numberOfExistingAccounts)
+			state.createAccount = .init(
+				networkID: state.networkID,
+				numberOfExistingAccounts: numberOfExistingAccounts
+			)
 			return .none
 
 		#if DEBUG
@@ -331,6 +334,11 @@ public struct Home: ReducerProtocol {
 			return .run { send in
 				await send(.internal(.system(.loadAccountsAndSettings)))
 			}
+
+		case let .createAccount(.coordinate(.failedToCreateNewAccount(reason: reason))):
+			state.createAccount = nil
+			print("Failed to create account: \(reason)")
+			return .none
 
 		case .transfer(.internal):
 			return .none
