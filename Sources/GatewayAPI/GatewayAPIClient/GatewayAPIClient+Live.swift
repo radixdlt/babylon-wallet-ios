@@ -163,33 +163,25 @@ public extension GatewayAPIClient {
 		signedCompiledNotarizedTXGivenEpoch: (Epoch) async throws -> SignedCompiledNotarizedTX
 	) async throws -> CommittedTransaction {
 		// MARK: Get Epoch
-		print("🎭 🛰 🕣 Getting Epoch from GatewayAPI...")
 		let epochResponse = try await getEpoch()
 		let epoch = Epoch(rawValue: .init(epochResponse.epoch))
-		print("🎭 🛰 🕣 Got Epoch: \(epoch) ✅")
 
 		// MARK: Build & Sign TX
-		print("🎭 🧰 🛠 Building TX with EngineToolkit...")
 		let signedCompiledNotarizedTX = try await signedCompiledNotarizedTXGivenEpoch(epoch)
-		print("🎭 🧰 🛠 Built TX with EngineToolkit ✅")
 
 		// MARK: Submit TX
 		let submitTransactionRequest = V0TransactionSubmitRequest(
 			notarizedTransactionHex: signedCompiledNotarizedTX.compileNotarizedTransactionIntentResponse.compiledNotarizedIntent.hex
 		)
 
-		print("🎭 🛰 💷 Submitting TX to GatewayAPI...")
 		let response = try await submitTransaction(submitTransactionRequest)
-		print("🎭 🛰 💷 Submitted TX to GatewayAPI ☑️")
 		guard !response.duplicate else {
 			throw FailedToSubmitTransactionWasDuplicate()
 		}
-		print("🎭 🛰 💷 Submitted TX to GatewayAPI (non duplicate) ✅")
 
 		// MARK: Poll Status
 		var txStatus: V0TransactionStatusResponse.IntentStatus = .unknown
 		let intentHash = signedCompiledNotarizedTX.intentHash.hex
-		print("🎭 🛰 🔮 Polling TX status from GatewayAPI using intentHash: \(intentHash)")
 		@Sendable func pollTransactionStatus() async throws -> V0TransactionStatusResponse.IntentStatus {
 			let txStatusRequest = V0TransactionStatusRequest(
 				intentHash: intentHash
@@ -203,31 +195,25 @@ public extension GatewayAPIClient {
 			defer { pollCount += 1 }
 			try await backgroundQueue.sleep(for: .seconds(pollStrategy.sleepDuration))
 			txStatus = try await pollTransactionStatus()
-			print("🎭 🛰 🔮 Polled TX status=`\(txStatus.rawValue)` from GatewayAPI ☑️ ")
 			if pollCount >= pollStrategy.maxPollTries {
-				print("🎭 🛰 Failed to get successful TX status after \(pollCount) attempts.")
 				throw FailedToGetTransactionStatus()
 			}
 		}
-		print("🎭 🛰 🔮 Polled TX status from GatewayAPI ☑️")
 		guard txStatus == .committedSuccess else {
 			throw TXWasSubmittedButNotSuccessfully()
 		}
-		print("🎭 🔮 TX was committed successfully ✅")
 
 		// MARK: Get Commited TX
-		print("🎭 🛰 🔮 Getting commited TX from GatewayAPI using intentHash: \(intentHash)")
+
 		let getCommittedTXRequest = V0CommittedTransactionRequest(
 			intentHash: intentHash
 		)
 		let committedResponse = try await getCommittedTransaction(getCommittedTXRequest)
-		print("🎭 🛰 🔮 Got commited TX from GatewayAPI ☑️")
 		let committed = committedResponse.committed
 
 		guard committed.receipt.status == .succeeded else {
 			throw FailedToSubmitTransactionWasRejected()
 		}
-		print("🎭 🛰 🔮 Commited TX from GatewayAPI was succeeded ✅")
 		return committed
 	}
 }
