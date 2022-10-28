@@ -1,10 +1,12 @@
 import ComposableArchitecture
 import Foundation
+import KeychainAccess
 import KeychainClient
 
 public extension KeychainClient {
 	static let live = Self.live(
-		accessibility: .whenPasscodeSetThisDeviceOnly
+		accessibility: .whenPasscodeSetThisDeviceOnly,
+		authenticationPolicy: .biometryCurrentSet
 	)
 }
 
