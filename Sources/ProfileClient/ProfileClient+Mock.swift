@@ -1,12 +1,13 @@
 import Collections
 import Foundation
+import Mnemonic
 import NonEmpty
 import Profile
 
 public extension ProfileClient {
 	static func mock() -> Self {
 		Self(
-			createNewProfile: { _ in fatalError("imple me") },
+			createNewProfile: { req in try! await Profile.new(mnemonic: req.curve25519FactorSourceMnemonic) },
 			injectProfile: { _ in /* Noop */ },
 			extractProfileSnapshot: { fatalError("Impl me") },
 			deleteProfileSnapshot: { /* Noop */ },
