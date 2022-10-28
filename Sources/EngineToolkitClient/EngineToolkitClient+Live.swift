@@ -56,7 +56,7 @@ public extension EngineToolkitClient {
 				#endif
 				let transactionIntent = request.transactionIntent
 
-                print("\n🔮⚙️🧰 Manifest:", transactionIntent.manifest)
+				print("\n🔮⚙️🧰 Manifest:", transactionIntent.manifest)
 
 				let compiledTransactionIntent = try engineToolkit.compileTransactionIntentRequest(
 					request: transactionIntent

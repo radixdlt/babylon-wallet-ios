@@ -15,11 +15,12 @@ public extension EngineToolkitClient {
 		let headerInput = request.transactionHeaderInput
 
 		let engineToolkit = EngineToolkit()
-		let nonFungibleAddress = try engineToolkit.deriveNonFungibleAddressFromPublicKeyRequest(
+		let nonFungibleAddressString = try engineToolkit.deriveNonFungibleAddressFromPublicKeyRequest(
 			request: privateKey.publicKey().intoEngine()
 		)
 		.get()
 		.nonFungibleAddress
+		let nonFungibleAddress = try NonFungibleAddress(hex: nonFungibleAddressString)
 
 		let manifest = TransactionManifest {
 			CallMethod(

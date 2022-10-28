@@ -15,12 +15,12 @@ public struct TransactionIntent: Codable, Hashable {
 	/** The hex-encoded double-SHA256 hash of the transaction intent. Also known as the Transaction ID, Transaction Hash, or Intent Hash.  */
 	public private(set) var hash: String
 	public private(set) var header: TransactionHeader
-	public private(set) var manifest: TransactionManifest
+	public private(set) var manifestString: String
 
-	public init(hash: String, header: TransactionHeader, manifest: TransactionManifest) {
+	public init(hash: String, header: TransactionHeader, manifest: String) {
 		self.hash = hash
 		self.header = header
-		self.manifest = manifest
+		manifestString = manifest
 	}
 
 	public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -30,11 +30,17 @@ public struct TransactionIntent: Codable, Hashable {
 	}
 
 	// Encodable protocol methods
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		hash = try container.decode(String.self, forKey: .hash)
+		header = try container.decode(TransactionHeader.self, forKey: .header)
+		manifestString = try container.decode(String.self, forKey: .manifest)
+	}
 
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(hash, forKey: .hash)
 		try container.encode(header, forKey: .header)
-		try container.encode(manifest, forKey: .manifest)
+		try container.encode(manifestString, forKey: .manifest)
 	}
 }
