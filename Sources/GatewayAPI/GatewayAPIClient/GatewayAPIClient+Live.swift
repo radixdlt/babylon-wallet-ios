@@ -33,7 +33,6 @@ public extension GatewayAPIClient {
 			urlFromBase: (URL) -> URL
 		) async throws -> Response where Response: Decodable {
 			let url = urlFromBase(baseURL)
-			print("📡 🛰 Network request: \(url.absoluteString)")
 			var urlRequest = URLRequest(url: url)
 			urlRequest.httpMethod = method
 			if let httpBody {
@@ -50,12 +49,6 @@ public extension GatewayAPIClient {
 			guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
 				throw ExpectedHTTPURLResponse()
 			}
-
-			#if DEBUG
-			var printBody = url.pathComponents.contains("submit")
-			let bodyOrEmpty = printBody ? ", data:\n\n\(String(describing: data.prettyPrintedJSONString))\n" : ""
-			print("🐛 got HTTP response, status=\(httpURLResponse.statusCode)\(bodyOrEmpty)\n")
-			#endif
 
 			guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
 				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)

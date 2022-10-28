@@ -28,7 +28,7 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 		}
 
 		let store = TestStore(
-			initialState: NewProfile.State(canProceed: true),
+			initialState: NewProfile.State(networkID: .primary, canProceed: true),
 			reducer: NewProfile()
 		)
 		store.dependencies.keychainClient = keychainClient
@@ -53,7 +53,7 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 		waitForExpectations(timeout: 1)
 		await profileSavedToKeychain.withValue {
 			if let profile = $0 {
-				await store.receive(.internal(.system(.createdProfile(profile))))
+				await store.receive(.internal(.system(.createdProfileResult(.success(profile)))))
 				await store.receive(.coordinate(.finishedCreatingNewProfile(profile)))
 			}
 		}
