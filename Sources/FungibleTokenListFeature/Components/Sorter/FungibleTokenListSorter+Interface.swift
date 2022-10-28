@@ -1,4 +1,5 @@
 import Asset
+import Dependencies
 
 // MARK: - FungibleTokenListSorter
 public struct FungibleTokenListSorter {
@@ -14,4 +15,11 @@ public struct FungibleTokenListSorter {
 // MARK: FungibleTokenListSorter.SortTokens
 public extension FungibleTokenListSorter {
 	typealias SortTokens = @Sendable ([FungibleTokenContainer]) -> [FungibleTokenCategory]
+}
+
+public extension DependencyValues {
+	var fungibleTokenListSorter: FungibleTokenListSorter {
+		get { self[FungibleTokenListSorter.self] }
+		set { self[FungibleTokenListSorter.self] = newValue }
+	}
 }

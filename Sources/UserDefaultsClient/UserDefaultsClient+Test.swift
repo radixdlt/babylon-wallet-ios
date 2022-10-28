@@ -1,4 +1,23 @@
+#if DEBUG
+import Dependencies
 import Foundation
+import XCTestDynamicOverlay
+
+extension UserDefaultsClient: TestDependencyKey {
+	public static let previewValue = Self.noop
+
+	public static let testValue = Self(
+		boolForKey: XCTUnimplemented("\(Self.self).boolForKey", placeholder: false),
+		dataForKey: XCTUnimplemented("\(Self.self).dataForKey", placeholder: nil),
+		doubleForKey: XCTUnimplemented("\(Self.self).doubleForKey", placeholder: 0),
+		integerForKey: XCTUnimplemented("\(Self.self).integerForKey", placeholder: 0),
+		remove: XCTUnimplemented("\(Self.self).remove"),
+		setBool: XCTUnimplemented("\(Self.self).setBool"),
+		setData: XCTUnimplemented("\(Self.self).setData"),
+		setDouble: XCTUnimplemented("\(Self.self).setDouble"),
+		setInteger: XCTUnimplemented("\(Self.self).setInteger")
+	)
+}
 
 public extension UserDefaultsClient {
 	static let noop = Self(
@@ -11,24 +30,6 @@ public extension UserDefaultsClient {
 		setData: { _, _ in },
 		setDouble: { _, _ in },
 		setInteger: { _, _ in }
-	)
-}
-
-#if DEBUG
-import Foundation
-import XCTestDynamicOverlay
-
-public extension UserDefaultsClient {
-	static let unimplemented = Self(
-		boolForKey: XCTUnimplemented("\(Self.self).boolForKey", placeholder: false),
-		dataForKey: XCTUnimplemented("\(Self.self).dataForKey", placeholder: nil),
-		doubleForKey: XCTUnimplemented("\(Self.self).doubleForKey", placeholder: 0),
-		integerForKey: XCTUnimplemented("\(Self.self).integerForKey", placeholder: 0),
-		remove: XCTUnimplemented("\(Self.self).remove"),
-		setBool: XCTUnimplemented("\(Self.self).setBool"),
-		setData: XCTUnimplemented("\(Self.self).setData"),
-		setDouble: XCTUnimplemented("\(Self.self).setDouble"),
-		setInteger: XCTUnimplemented("\(Self.self).setInteger")
 	)
 
 	mutating func override(bool: Bool, forKey key: String) {
@@ -47,4 +48,5 @@ public extension UserDefaultsClient {
 		integerForKey = { [self] in $0 == key ? integer : self.integerForKey(key) }
 	}
 }
+
 #endif

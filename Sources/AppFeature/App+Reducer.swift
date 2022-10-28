@@ -57,7 +57,7 @@ public extension App {
 
 		case let .onboarding(.coordinate(.onboardedWithProfile(profile, isNew))):
 			return .run { send in
-				await send(.internal(.injectProfileIntoWalletClient(profile)))
+				await send(.internal(.injectProfileIntoProfileClient(profile)))
 			}
 
 		case let .onboarding(.coordinate(.failedToCreateOrImportProfile(failureReason))):
@@ -67,7 +67,7 @@ public extension App {
 
 		case let .splash(.coordinate(.loadProfileResult(.profileLoaded(profile)))):
 			return .run { send in
-				await send(.internal(.injectProfileIntoWalletClient(profile)))
+				await send(.internal(.injectProfileIntoProfileClient(profile)))
 			}
 
 		case let .splash(.coordinate(.loadProfileResult(.noProfile(reason, failedToDecode)))):
@@ -81,7 +81,7 @@ public extension App {
 				}
 			}
 
-		case let .internal(.injectProfileIntoWalletClient(profile)):
+		case let .internal(.injectProfileIntoProfileClient(profile)):
 			return .run { send in
 				environment.profileClient.injectProfile(profile)
 				await send(.coordinate(.toMain))

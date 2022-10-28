@@ -30,7 +30,7 @@ final class AppFeatureTests: TestCase {
 		_ = await store.receive(.coordinate(.onboard))
 	}
 
-	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_walletClient_and_we_navigate_to_main() async throws {
+	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		var environment: App.Environment = .unimplemented
 		let newProfile = try await Profile.new(mnemonic: .generate())
 		environment.profileClient.injectProfile = {
@@ -48,7 +48,7 @@ final class AppFeatureTests: TestCase {
 		_ = await store.receive(.onboarding(.coordinate(.onboardedWithProfile(newProfile, isNew: true))))
 
 		// THEN: it is injected into ProfileClient...
-		_ = await store.receive(.internal(.injectProfileIntoWalletClient(newProfile)))
+		_ = await store.receive(.internal(.injectProfileIntoProfileClient(newProfile)))
 
 		// THEN: ... and we navigate to main
 		await store.receive(.coordinate(.toMain)) {
@@ -56,7 +56,7 @@ final class AppFeatureTests: TestCase {
 		}
 	}
 
-	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__it_is_injected_into_walletClient_and_we_navigate_to_main() async throws {
+	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		// GIVEN: an existing profile
 		let existingProfile = try await Profile.new(mnemonic: .generate())
 
@@ -81,7 +81,7 @@ final class AppFeatureTests: TestCase {
 		_ = await store.receive(.splash(.coordinate(.loadProfileResult(.profileLoaded(existingProfile)))))
 
 		// THEN: it is injected into ProfileClient...
-		_ = await store.receive(.internal(.injectProfileIntoWalletClient(existingProfile)))
+		_ = await store.receive(.internal(.injectProfileIntoProfileClient(existingProfile)))
 		// THEN: ... and we navigate to main
 		await store.receive(.coordinate(.toMain)) {
 			$0 = .main(.init(networkID: .primary))

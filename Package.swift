@@ -8,6 +8,11 @@ let tca: Target.Dependency = .product(
 	package: "swift-composable-architecture"
 )
 
+let dependencies: Target.Dependency = .product(
+	name: "Dependencies",
+	package: "swift-composable-architecture"
+)
+
 let profile: Target.Dependency = .product(
 	name: "Profile",
 	package: "swift-profile"
@@ -134,15 +139,16 @@ let package = Package(
 				"Asset",
 				bigInt,
 				"Common",
-				profile,
 				"GatewayAPI",
+				profile,
+				dependencies,
 			]
 		),
 		.testTarget(
 			name: "AccountPortfolioTests",
 			dependencies: [
 				"AccountPortfolio",
-				tca,
+				dependencies,
 				"TestUtils",
 			]
 		),
@@ -205,6 +211,7 @@ let package = Package(
 			name: "AppSettings",
 			dependencies: [
 				"Common",
+				dependencies,
 				"UserDefaultsClient",
 			]
 		),
@@ -337,7 +344,7 @@ let package = Package(
 				engineToolkit,
 				"EngineToolkitClient",
 				profile, // address
-				tca, // XCTestDynamicOverlay + DependencyKey
+				dependencies, // XCTestDynamicOverlay + DependencyKey
 			],
 			exclude: [
 				"CodeGen/Input/",
@@ -494,7 +501,7 @@ let package = Package(
 		.target(
 			name: "PasteboardClient",
 			dependencies: [
-				tca,
+				dependencies,
 			]
 		),
 		.testTarget(
@@ -569,7 +576,7 @@ let package = Package(
 		.target(
 			name: "UserDefaultsClient",
 			dependencies: [
-				tca,
+				dependencies,
 			]
 		),
 		.testTarget(
@@ -586,7 +593,7 @@ let package = Package(
 				"GatewayAPI", // Create Account On Ledger => Submit TX
 				profile,
 				"ProfileLoader",
-				tca, // XCTestDynamicOverlay + DependencyKey
+				dependencies, // XCTestDynamicOverlay + DependencyKey
 			]
 		),
 		.testTarget(

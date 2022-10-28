@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import Dependencies
 
 // MARK: - AccountNameValidator + DependencyKey
 extension AccountNameValidator: DependencyKey {

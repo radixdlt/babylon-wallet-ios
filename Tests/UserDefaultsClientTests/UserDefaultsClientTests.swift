@@ -7,7 +7,12 @@ final class UserDefaultsClientLiveTests: TestCase {
 
 	override func setUp() {
 		super.setUp()
-		sut = UserDefaultsClient.live(userDefaults: .init())
+		sut = UserDefaultsClient.liveValue
+	}
+
+	override func tearDown() {
+		sut = nil
+		super.tearDown()
 	}
 
 	func testBoolForKeyReturnsFalseForUnknownKey() {

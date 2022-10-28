@@ -75,7 +75,7 @@ public extension Home.View {
 				#if DEBUG
 				IfLetStore(
 					store.scope(
-						state: \.connectionRequest,
+						state: \.debugInitiatedConnectionRequest,
 						action: Home.Action.debugInitiatedConnectionRequest
 					),
 					then: IncomingConnectionRequestFromDappReview.View.init(store:)
@@ -213,8 +213,7 @@ struct HomeView_Previews: PreviewProvider {
 		Home.View(
 			store: .init(
 				initialState: .placeholder,
-				reducer: Home.reducer,
-				environment: .placeholder
+				reducer: Home()
 			)
 		)
 	}

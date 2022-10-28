@@ -39,12 +39,15 @@ final class ImportProfileFeatureTests: TestCase {
 	}
 
 	func test__GIVEN__valid_profileSnapshot_json_data__WHEN__data_imported__THEN__data_gets_decoded() async throws {
+		sut.dependencies.keychainClient = .mocked
 		sut.dependencies.jsonDecoder = .iso8601
 		_ = await sut.send(.internal(.importProfileDataResult(.success(profileSnapshotData))))
 		_ = await sut.receive(.internal(.importProfileSnapshotFromDataResult(.success(profileSnapshot))))
 	}
 
 	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__it_gets_saved() async throws {
+		sut.dependencies.keychainClient = .mocked
+		sut.dependencies.jsonDecoder = .iso8601
 		_ = await sut.send(.internal(.importProfileSnapshotFromDataResult(.success(profileSnapshot))))
 		_ = await sut.receive(.internal(.saveProfileSnapshot(profileSnapshot)))
 	}

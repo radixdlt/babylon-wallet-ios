@@ -51,8 +51,8 @@ public extension App.Environment {
 	static let noop = Self(
 		backgroundQueue: .immediate,
 		mainQueue: .immediate,
-		appSettingsClient: .mock,
-		accountPortfolioFetcher: .mock,
+		appSettingsClient: .noop,
+		accountPortfolioFetcher: .noop,
 		keychainClient: .unimplemented,
 		pasteboardClient: .noop,
 		profileLoader: .unimplemented,
@@ -63,12 +63,12 @@ public extension App.Environment {
 	static let unimplemented = Self(
 		backgroundQueue: .unimplemented,
 		mainQueue: .unimplemented,
-		appSettingsClient: .unimplemented,
-		accountPortfolioFetcher: .unimplemented,
+		appSettingsClient: .testValue,
+		accountPortfolioFetcher: .testValue,
 		keychainClient: .unimplemented,
-		pasteboardClient: .unimplemented,
+		pasteboardClient: .testValue,
 		profileLoader: .unimplemented,
-		userDefaultsClient: .unimplemented,
+		userDefaultsClient: .noop,
 		profileClient: .unimplemented
 	)
 }
