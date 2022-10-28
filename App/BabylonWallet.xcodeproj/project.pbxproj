@@ -28,6 +28,8 @@
 		E6805BC4286DB3ED00861180 /* BabylonWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabylonWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6805BCA286DB3ED00861180 /* BabylonWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabylonWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6805BCC286DB3ED00861180 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
+		E6FD0073290C598700B9A340 /* BabylonWallet--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "BabylonWallet--iOS--Info.plist"; sourceTree = "<group>"; };
+		E6FD0074290C599300B9A340 /* BabylonWallet--macOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "BabylonWallet--macOS--Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +71,8 @@
 		E6805BB7286DB3EB00861180 = {
 			isa = PBXGroup;
 			children = (
+				E6FD0074290C599300B9A340 /* BabylonWallet--macOS--Info.plist */,
+				E6FD0073290C598700B9A340 /* BabylonWallet--iOS--Info.plist */,
 				E6805BDB286DB44400861180 /* Packages */,
 				E6805BBC286DB3EC00861180 /* Shared */,
 				E6805BCB286DB3ED00861180 /* macOS */,
@@ -365,11 +369,19 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Babylon E2E";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR Code to connect to browser extension";
+				INFOPLIST_KEY_NSDesktopFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
+				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
+				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Access Babylon Wallet Secrets";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRIVACY_ACCESS_BABYLON_PROFILE = "Import Babylon Profile file";
 				PRODUCT_BUNDLE_IDENTIFIER = works.rdx.e2e.babylon;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -426,10 +438,18 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Babylon E2E";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR Code to connect to browser extension";
+				INFOPLIST_KEY_NSDesktopFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
+				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
+				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Access Babylon Wallet Secrets";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				PRIVACY_ACCESS_BABYLON_PROFILE = "Import Babylon Profile file";
 				PRODUCT_BUNDLE_IDENTIFIER = works.rdx.e2e.babylon;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -448,7 +468,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7SPGKHD4HZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = "BabylonWallet--iOS--Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -481,7 +501,7 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7SPGKHD4HZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = "BabylonWallet--iOS--Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -517,7 +537,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = "BabylonWallet--macOS--Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -546,7 +566,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = "BabylonWallet--macOS--Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
