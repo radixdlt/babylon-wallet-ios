@@ -22,6 +22,23 @@ A "gotcha" of this structure is that the project root contains the Package.swift
 10. Again click "+"button in bottom of "Link Binary With Libraries" section and you should see "AppFeature" (and all other packages) there, add "AppFeature"!
 11. This setup only needs to happen once, for all targets, but any other targets need to perform the last step, of adding the actual package as dependency, e.g. for macOS (for development purpuses).
 
+# Package Graph
+The internal package graph for Babylon looks as follows:
+
+```swift
+Babylon
+   |
+   Profile
+      |
+      Engine
+         |
+         SLIP10
+            |
+            Bite
+            Mnemonic
+
+```
+
 # Navigation
 We are not doing navigation, for now. We defer choice of Navigation solution to "as late as possible". What this means is that we do not use any navigation stack, maybe no NavigationView, at all, for now. So we will have zero transition animation, and no automatic means of "go back" (which means that *for now* we will not try to impl any "go back" logic at all).
 
