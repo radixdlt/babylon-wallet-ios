@@ -113,23 +113,44 @@ public struct Home: ReducerProtocol {
 
 		case .internal(.system(.loadAccountsAndSettings)):
 			return .run { send in
-				let accounts = try profileClient.getAccounts()
-				await send(.internal(.system(.accountsLoaded(accounts))))
-				let settings = try await appSettingsClient.loadSettings()
-				await send(.internal(.system(.currencyLoaded(settings.currency))))
-				await send(.internal(.system(.isCurrencyAmountVisibleLoaded(settings.isCurrencyAmountVisible))))
+				await send(.internal(.system(.accountsLoadedResult(
+					TaskResult {
+						try profileClient.getAccounts()
+					}
+				))))
+				await send(.internal(.system(.appSettingsLoadedResult(
+					TaskResult {
+						try await appSettingsClient.loadSettings()
+					}
+				))))
 			}
 
-		case let .internal(.system(.accountsLoaded(accounts))):
-			state.accountList = .init(nonEmptyOrderedSetOfAccounts: accounts)
+		case let .internal(.system(.accountsLoadedResult(.failure(error)))):
+			print("Failed to load accounts, error: \(String(describing: error))")
 			return .none
 
-		case let .internal(.system(.currencyLoaded(currency))):
+		case let .internal(.system(.accountsLoadedResult(.success(accounts)))):
+			state.accountList = .init(nonEmptyOrderedSetOfAccounts: accounts)
+			return .run { send in
+				await send(.internal(.system(.fetchPortfolioResult(TaskResult {
+					try await accountPortfolioFetcher.fetchPortfolio(accounts.map(\.address))
+				}))))
+			}
+
+		case let .internal(.system(.appSettingsLoadedResult(.failure(error)))):
+			print("Failed to load appSettings, error: \(String(describing: error))")
+			return .none
+
+		case let .internal(.system(.appSettingsLoadedResult(.success(appSettings)))):
+			// FIXME: Replace currency with value from Profile!
+			let currency = appSettings.currency
 			state.aggregatedValue.currency = currency
 			state.accountList.accounts.forEach {
 				state.accountList.accounts[id: $0.address]?.currency = currency
 			}
-			return .none
+			return .run { send in
+				await send(.internal(.system(.isCurrencyAmountVisibleLoaded(appSettings.isCurrencyAmountVisible))))
+			}
 
 		case .internal(.system(.toggleIsCurrencyAmountVisible)):
 			return .run { send in
@@ -175,7 +196,7 @@ public struct Home: ReducerProtocol {
 			if let details = state.accountDetails {
 				// aggregated value
 				let account = details.account
-				let accountWorth = state.accountPortfolioDictionary[details.address]
+				// let accountWorth = state.accountPortfolioDictionary[details.address]
 				//                state.accountDetails?.aggregatedValue.value = accountWorth?.worth
 
 				// asset list
@@ -248,17 +269,9 @@ public struct Home: ReducerProtocol {
 
 		case .accountList(.coordinate(.fetchPortfolioForAccounts)):
 			return .run { send in
-				let accounts = try profileClient.getAccounts().rawValue.elements
-				let addresses = accounts.map(\.address)
-				await send(.internal(.system(.fetchPortfolioResult(TaskResult {
-					try await accountPortfolioFetcher.fetchPortfolio(addresses)
-				}))))
+				await send(.internal(.system(.loadAccountsAndSettings)))
 			}
 
-		//        case let .internal(.system(.fetchPortfolioResult(.success(totalPortfolio)))):
-		//            return .run { send in
-		//                await send(.internal(.system(.accountPortfolioResult(.success(totalPortfolio)))))
-		//            }
 		case let .internal(.system(.fetchPortfolioResult(.failure(error)))):
 			print("⚠️ failed to fetch portfolio, error: \(String(describing: error))")
 			return .none

@@ -52,7 +52,9 @@ public extension GatewayAPIClient {
 			}
 
 			#if DEBUG
-			print("🐛 got HTTP response, status=\(httpURLResponse.statusCode), data:\n\n\(String(describing: data.prettyPrintedJSONString))\n\n")
+			var printBody = url.pathComponents.contains("submit")
+			let bodyOrEmpty = printBody ? ", data:\n\n\(String(describing: data.prettyPrintedJSONString))\n" : ""
+			print("🐛 got HTTP response, status=\(httpURLResponse.statusCode)\(bodyOrEmpty)\n")
 			#endif
 
 			guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {

@@ -3,6 +3,7 @@ import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
 import AggregatedValueFeature
+import AppSettings
 import Collections
 import Common
 import ComposableArchitecture
@@ -59,8 +60,8 @@ public extension Home.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
 		case loadAccountsAndSettings
-		case accountsLoaded(NonEmpty<OrderedSet<OnNetwork.Account>>)
-		case currencyLoaded(FiatCurrency)
+		case accountsLoadedResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
+		case appSettingsLoadedResult(TaskResult<AppSettings>)
 		case toggleIsCurrencyAmountVisible
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)
