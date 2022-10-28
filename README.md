@@ -23,19 +23,20 @@ A "gotcha" of this structure is that the project root contains the Package.swift
 11. This setup only needs to happen once, for all targets, but any other targets need to perform the last step, of adding the actual package as dependency, e.g. for macOS (for development purpuses).
 
 # Package Graph
-The internal package graph for Babylon looks as follows:
+The proprietary package dependency graph for Babylon looks as follows:
 
 ```
 Babylon
-   |
-   Profile
-      |
-      Engine
-         |
-         SLIP10
-            |
-            Bite
-            Mnemonic
+  │
+  ╰─ Profile
+  │    │
+  ╰────╰─ EngineToolkit
+       │    │
+       ╰────╰─ SLIP10
+       │         │
+       ╰─────────╰─ Bite
+       │         │
+       ╰─────────╰─ Mnemonic
 ```
 
 # Navigation
