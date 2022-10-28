@@ -36,7 +36,6 @@ Babylon
             |
             Bite
             Mnemonic
-
 ```
 
 # Navigation
