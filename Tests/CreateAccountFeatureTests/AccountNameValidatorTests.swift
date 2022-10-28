@@ -1,5 +1,5 @@
-import ComposableArchitecture
 @testable import CreateAccountFeature
+import Dependencies
 import TestUtils
 
 final class AccountNameValidatorTests: TestCase {

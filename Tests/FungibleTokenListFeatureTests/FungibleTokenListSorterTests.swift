@@ -1,5 +1,4 @@
 import Asset
-import ComposableArchitecture
 @testable import FungibleTokenListFeature
 import TestUtils
 

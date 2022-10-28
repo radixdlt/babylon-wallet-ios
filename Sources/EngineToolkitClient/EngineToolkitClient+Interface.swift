@@ -1,6 +1,6 @@
 import Common
-import ComposableArchitecture
 import CryptoKit
+import Dependencies
 import EngineToolkit
 import Foundation
 import enum SLIP10.PrivateKey
