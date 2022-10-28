@@ -62,7 +62,7 @@ final class HomeFeatureTests: TestCase {
 			initialState: initialState,
 			reducer: Home()
 		)
-		store.dependencies.fungibleTokenListSorter = .live
+		store.dependencies.fungibleTokenListSorter = .liveValue
 
 		// when
 		_ = await store.send(.internal(.system(.fetchPortfolioResult(.success(totalPortfolio))))) { [address] in
