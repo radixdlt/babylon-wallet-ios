@@ -47,22 +47,12 @@ public extension EngineToolkitClient {
 			signTransactionIntent: { request in
 
 				let privateKey = request.privateKey
-				#if DEBUG
-				print(String(repeating: "☣️", count: 50))
-				print("CRITICAL WARNING! PRINTING PRIVATE KEYS IN DEBUG MODE")
-				print("private key:")
-				print(privateKey.hex)
-				print(String(repeating: "☣️", count: 50))
-				#endif
-				let transactionIntent = request.transactionIntent
 
-				print("\n🔮⚙️🧰 Manifest:", transactionIntent.manifest)
+				let transactionIntent = request.transactionIntent
 
 				let compiledTransactionIntent = try engineToolkit.compileTransactionIntentRequest(
 					request: transactionIntent
 				).get()
-
-				print("🔮⚙️🧰 Compiled Transaction Intent:\n\(compiledTransactionIntent.compiledIntent.hex)\n\n")
 
 				let transactionIntentWithSignatures = SignedTransactionIntent(
 					intent: transactionIntent,
@@ -73,15 +63,11 @@ public extension EngineToolkitClient {
 					.compileSignedTransactionIntentRequest(request: transactionIntentWithSignatures)
 					.get()
 
-				print("🔮⚙️🧰 Compiled Signed Intent:\n\(compiledSignedIntentResponse.compiledSignedIntent.hex)\n\n")
-
 				let (signedCompiledSignedTXIntent, hashOfSignedIntent) = try privateKey.signReturningHashOfMessage(
 					data: compiledSignedIntentResponse.compiledSignedIntent
 				)
 
 				let notarySignature = try signedCompiledSignedTXIntent.intoEngine().signature
-				print("🔮⚙️🧰 Compiled signed intent signature:\n\(notarySignature.hex)\n\n")
-				print("🔮⚙️🧰 Compiled signed intent hash:\n\(hashOfSignedIntent.hex)\n\n")
 
 				let notarizedTX = NotarizedTransaction(
 					signedIntent: transactionIntentWithSignatures,
@@ -92,13 +78,9 @@ public extension EngineToolkitClient {
 					.compileNotarizedTransactionIntentRequest(request: notarizedTX)
 					.get()
 
-				print("🔮⚙️🧰 Compiled notarized transaction intent:\n\(notarizedTransactionIntent.compiledNotarizedIntent.hex)\n\n")
-
 				let intentHash = Data(
 					SHA256.twice(data: Data(compiledTransactionIntent.compiledIntent))
 				)
-
-				print("🔮⚙️🧰 Compiled Intent hash:\n\(intentHash.hex)\n\n")
 
 				return .init(
 					compileTransactionIntentResponse: compiledTransactionIntent,
