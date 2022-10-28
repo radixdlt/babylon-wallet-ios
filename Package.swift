@@ -623,7 +623,6 @@ let package = Package(
 			dependencies: [
 				"Common",
 				profile, // Actually `Mnemonic`, Contains Data+Hex extension. FIXME: Extract Data+Hex functions to seperate repo, which Mnemonic and thus this TestUtils package can depend on.
-				tca,
 			]
 		),
 		.target(
