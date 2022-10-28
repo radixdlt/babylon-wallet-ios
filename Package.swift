@@ -71,16 +71,20 @@ let package = Package(
 
 	],
 	dependencies: [
-		// TCA - ComposableArchitecture used as architecture
-		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
-		// Format code
-		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
+		// RDX Works packages
+		// We use SSH because repos are private...
+		.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
+		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.23"),
+		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.4"),
+
 		// BigInt
 		.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
 
-		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.19"),
+		// TCA - ComposableArchitecture used as architecture
+		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
 
-		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.1"),
+		// Format code
+		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
 
 		// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 		.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
@@ -182,14 +186,15 @@ let package = Package(
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"AccountPortfolio",
 				"AppSettings",
+				engineToolkit,
 				"MainFeature",
 				"OnboardingFeature",
 				"PasteboardClient",
 				"ProfileLoader",
+				"ProfileClient",
 				"SplashFeature",
 				tca,
 				"UserDefaultsClient",
-				"ProfileClient",
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -285,6 +290,25 @@ let package = Package(
 				"TestUtils",
 			]
 		),
+
+		.target(
+			name: "EngineToolkitClient",
+			dependencies: [
+				bigInt,
+				"Bite",
+				"Common",
+				dependencies,
+				engineToolkit,
+			]
+		),
+		.testTarget(
+			name: "EngineToolkitClientTests",
+			dependencies: [
+				"EngineToolkitClient",
+				"TestUtils",
+			]
+		),
+
 		.target(
 			name: "DesignSystem",
 			dependencies: [
@@ -318,6 +342,7 @@ let package = Package(
 				bigInt,
 				"Common",
 				engineToolkit,
+				"EngineToolkitClient",
 				profile, // address
 				dependencies, // XCTestDynamicOverlay + DependencyKey
 			],
@@ -343,6 +368,7 @@ let package = Package(
 				"AppSettings",
 				"Common",
 				"CreateAccountFeature",
+				engineToolkit,
 				"IncomingConnectionRequestFromDappReviewFeature",
 				"PasteboardClient",
 				profile,
@@ -421,6 +447,7 @@ let package = Package(
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"AppSettings",
 				"AccountPortfolio",
+				engineToolkit,
 				"HomeFeature",
 				"PasteboardClient",
 				"SettingsFeature",
@@ -455,11 +482,11 @@ let package = Package(
 			dependencies: [
 				// ˅˅˅ Sort lexicographically ˅˅˅
 				"Common",
+				engineToolkit,
 				"ImportProfileFeature",
 				profile,
-				tca,
-				"UserDefaultsClient", // replace with `ProfileCreator`
 				"ProfileClient",
+				tca,
 				// ^^^ Sort lexicographically ^^^
 			]
 		),
@@ -562,6 +589,8 @@ let package = Package(
 		.target(
 			name: "ProfileClient",
 			dependencies: [
+				"EngineToolkitClient", // Create TX
+				"GatewayAPI", // Create Account On Ledger => Submit TX
 				profile,
 				"ProfileLoader",
 				dependencies, // XCTestDynamicOverlay + DependencyKey

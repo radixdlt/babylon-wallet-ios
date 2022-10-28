@@ -18,20 +18,33 @@ public extension CreateAccount {
 		switch action {
 		case .internal(.user(.createAccount)):
 			precondition(state.isValid)
-			return .run { [profileClient, keychainClient, accountName = state.accountName] send in
-				// FIXME: Think our best approach to generalize this. Maybe we actually SHOULD
-				// add the KeychainClient as a "stored propery" of the ProfileClient?
-				// Now it is only passed in so that we can use `Profile` Packages convenience
-				// method to try to load the correct mnemonic from keychain.
-				let newAccount = try await profileClient.createAccountWithKeychainClient(accountName, keychainClient)
-				let profileSnapshot = try profileClient.extractProfileSnapshot()
-				try keychainClient.saveProfileSnapshot(profileSnapshot: profileSnapshot)
-				await send(.internal(.system(.createdNewAccount(newAccount))))
+			return .run { [profileClient, keychainClient, accountName = state.accountName, networkID = state.networkID] send in
+				await send(.internal(.system(.createdNewAccountResult(
+					TaskResult {
+						// FIXME: Think our best approach to generalize this. Maybe we actually SHOULD
+						// add the KeychainClient as a "stored propery" of the ProfileClient?
+						// Now it is only passed in so that we can use `Profile` Packages convenience
+						// method to try to load the correct mnemonic from keychain.
+						let createAccountRequest = CreateAccountRequest(
+							accountName: accountName,
+							keychainClient: keychainClient,
+							networkID: networkID
+						)
+						let newAccount = try await profileClient.createAccount(createAccountRequest)
+						let profileSnapshot = try profileClient.extractProfileSnapshot()
+						try keychainClient.saveProfileSnapshot(profileSnapshot: profileSnapshot)
+						return newAccount
+					}
+				))))
 			}
 
-		case let .internal(.system(.createdNewAccount(account))):
+		case let .internal(.system(.createdNewAccountResult(.success(account)))):
 			return .run { send in
 				await send(.coordinate(.createdNewAccount(account)))
+			}
+		case let .internal(.system(.createdNewAccountResult(.failure(error)))):
+			return .run { send in
+				await send(.coordinate(.failedToCreateNewAccount(reason: String(describing: error))))
 			}
 
 		case .internal(.user(.dismiss)):

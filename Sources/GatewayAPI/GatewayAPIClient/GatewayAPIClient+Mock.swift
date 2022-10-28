@@ -51,16 +51,17 @@ public extension GatewayAPIClient {
 	static let unimplemented = Self(
 		getEpoch: XCTUnimplemented("\(Self.self).getEpoch is unimplemented"),
 		accountResourcesByAddress: XCTUnimplemented("\(Self.self).accountResourcesByAddress is unimplemented"),
-		resourceDetailsByResourceIdentifier: XCTUnimplemented("\(Self.self).resourceDetailsByResourceIdentifier is unimplemented")
-//		,submitTransaction: XCTUnimplemented("\(Self.self).submitTransaction is unimplemented"),
-//		transactionStatus: XCTUnimplemented("\(Self.self).transactionStatus is unimplemented")
+		resourceDetailsByResourceIdentifier: XCTUnimplemented("\(Self.self).resourceDetailsByResourceIdentifier is unimplemented"),
+		submitTransaction: XCTUnimplemented("\(Self.self).submitTransaction is unimplemented"),
+		transactionStatus: XCTUnimplemented("\(Self.self).transactionStatus is unimplemented"),
+		getCommittedTransaction: XCTUnimplemented("\(Self.self).getCommittedTransaction is unimplemented")
 	)
 
 	static func mock(
 		fungibleResourceCount _: Int = 2,
 		nonFungibleResourceCount _: Int = 2,
-		submittedTXIsDoubleSpend _: Bool = false
-//		, txStatus: TransactionStatus.Status? = nil
+		submittedTXIsDoubleSpend: Bool = false,
+		txStatus: V0TransactionStatusResponse.IntentStatus? = nil
 	) -> Self {
 		.init(
 			getEpoch: { .init(epoch: 1337) },
@@ -120,12 +121,11 @@ public extension GatewayAPIClient {
 //					return fun
 //				}
 				fatalError()
-			}
-			//            ,
-//			submitTransaction: { _ in
-//				.init(duplicate: submittedTXIsDoubleSpend)
-//			},
-//			transactionStatus: { request in
+			},
+			submitTransaction: { _ in
+				.init(duplicate: submittedTXIsDoubleSpend)
+			},
+			transactionStatus: { request in
 //				.init(
 //					ledgerState: .init(
 //						network: "mockNET",
@@ -139,16 +139,22 @@ public extension GatewayAPIClient {
 //							status: txStatus ?? TransactionStatus.Status(seed: request.transactionIdentifier.hashValue)
 //						),
 //
-//						payloadHashHex: Data(SHA256.hash(data: "payloadHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hexEncodedString(),
+//						payloadHashHex: Data(SHA256.hash(data: "payloadHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex(),
 //
-//						intentHashHex: Data(SHA256.hash(data: "intentHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hexEncodedString(),
+//						intentHashHex: Data(SHA256.hash(data: "intentHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex(),
 //
-//						transactionAccumulatorHex: Data(SHA256.hash(data: "transactionAccumulatorHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hexEncodedString(),
+//						transactionAccumulatorHex: Data(SHA256.hash(data: "transactionAccumulatorHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex(),
 //
 //						feePaid: TokenAmount(value: "\(request.transactionIdentifier.hashValue)", tokenIdentifier: .init(rri: "resource_rdx1xrd"))
 //					)
 //				)
-//			}
+				.init(intentStatus: txStatus ?? .committedSuccess, knownPayloads: [
+					.init(payloadHash: Data(SHA256.hash(data: "payloadHashHex\(request.intentHash)".data(using: .utf8)!)).hex(), status: .committedSuccess),
+				])
+			},
+			getCommittedTransaction: { _ in
+				fatalError()
+			}
 		)
 	}
 }

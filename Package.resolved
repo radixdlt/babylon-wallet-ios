@@ -19,6 +19,15 @@
       }
     },
     {
+      "identity" : "bite",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:radixdlt/Bite.git",
+      "state" : {
+        "revision" : "b6801c0d4e269063ebc7b4930269d9d728b64e47",
+        "version" : "0.0.1"
+      }
+    },
+    {
       "identity" : "combine-schedulers",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/combine-schedulers",
@@ -32,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Sajjon/K1.git",
       "state" : {
-        "revision" : "9990be04f6c2f7d15cc9d4e136a54e59b4699ad2",
-        "version" : "0.0.1"
+        "revision" : "29eaa6aeef23caf79fbfa161f5e9e7755b50bdbb",
+        "version" : "0.0.3"
       }
     },
     {
@@ -50,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Mnemonic.git",
       "state" : {
-        "revision" : "c8f9f61c158aa983ff080089603ac599cf6e37b0",
-        "version" : "0.0.2"
+        "revision" : "6df4401b181d4d10f2acd1e0d95aa82c7f73d9b1",
+        "version" : "0.0.4"
       }
     },
     {
@@ -59,8 +68,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/SLIP10.git",
       "state" : {
-        "revision" : "954fb5bda0565aa261eaee47f4bddb9e10cc0f39",
-        "version" : "0.0.8"
+        "revision" : "8ae35c9d8c1920dfe8197eebe1b5d1a10efb5e28",
+        "version" : "0.0.15"
       }
     },
     {
@@ -131,8 +140,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-engine-toolkit.git",
       "state" : {
-        "revision" : "6cedd3250237fe68a90a97a7eec87826463809b9",
-        "version" : "0.0.1"
+        "revision" : "594a0b2114794ce2a78c464251b5ba9164f37bd3",
+        "version" : "0.0.4"
       }
     },
     {
@@ -158,8 +167,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "affec1aaf5d242c97795497cd4a6f0ff1c8c327a",
-        "version" : "0.0.19"
+        "revision" : "f0319b24665fa0d1d0626deca41ff8cc8a976e1f",
+        "version" : "0.0.23"
       }
     },
     {

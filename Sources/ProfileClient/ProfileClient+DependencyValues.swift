@@ -5,7 +5,7 @@ import Foundation
 public enum ProfileClientKey: DependencyKey {}
 public extension ProfileClientKey {
 	typealias Value = ProfileClient
-	static let liveValue = ProfileClient.live
+	static let liveValue = ProfileClient.live()
 	static let testValue = ProfileClient.mock()
 }
 

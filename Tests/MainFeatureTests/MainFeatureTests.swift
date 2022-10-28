@@ -7,7 +7,7 @@ final class MainFeatureTests: TestCase {
 	func test_displaySettings_whenCoordinatedToDispaySettings_thenDisplaySettings() async {
 		// given
 		let store = TestStore(
-			initialState: Main.State(home: .placeholder),
+			initialState: Main.State(networkID: .primary, home: .placeholder),
 			reducer: Main.reducer,
 			environment: .unimplemented
 		)
@@ -22,7 +22,7 @@ final class MainFeatureTests: TestCase {
 	func test_dismissSettings_whenCoordinatedToDismissSettings_thenDismissSettings() async {
 		// given
 		let store = TestStore(
-			initialState: Main.State(home: .placeholder, settings: .init()),
+			initialState: Main.State(networkID: .primary, home: .placeholder, settings: .init()),
 			reducer: Main.reducer,
 			environment: .unimplemented
 		)

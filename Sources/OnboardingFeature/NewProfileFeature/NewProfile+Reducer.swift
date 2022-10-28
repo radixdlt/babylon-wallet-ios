@@ -24,6 +24,7 @@ public extension DependencyValues {
 public struct NewProfile: ReducerProtocol {
 	@Dependency(\.mnemonicGenerator) var mnemonicGenerator
 	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.profileClient) var profileClient
 }
 
 public extension NewProfile {
@@ -41,30 +42,44 @@ public extension NewProfile {
 
 		case .internal(.system(.createProfile)):
 			precondition(state.canProceed)
-			return .run { [mnemonicGenerator, keychainClient, nameOfFirstAccount = state.nameOfFirstAccount] send in
+			return .run { [mnemonicGenerator, keychainClient, nameOfFirstAccount = state.nameOfFirstAccount, networkID = state.networkID] send in
 
-				let curve25519FactorSourceMnemonic = try mnemonicGenerator(BIP39.WordCount.twentyFour, BIP39.Language.english)
+				await send(.internal(.system(.createdProfileResult(
+					TaskResult {
+						let curve25519FactorSourceMnemonic = try mnemonicGenerator(BIP39.WordCount.twentyFour, BIP39.Language.english)
 
-				let newProfile = try await Profile.new(
-					mnemonic: curve25519FactorSourceMnemonic,
-					firstAccountDisplayName: nameOfFirstAccount
-				)
+						let newProfileRequest = CreateNewProfileRequest(
+							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
+							createFirstAccountRequest: .init(
+								accountName: nameOfFirstAccount,
+								keychainClient: keychainClient,
+								networkID: networkID
+							)
+						)
+						let newProfile = try await profileClient.createNewProfile(newProfileRequest)
 
-				let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
+						let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
 
-				try keychainClient.saveFactorSource(
-					mnemonic: curve25519FactorSourceMnemonic,
-					reference: curve25519FactorSourceReference
-				)
+						try keychainClient.saveFactorSource(
+							mnemonic: curve25519FactorSourceMnemonic,
+							reference: curve25519FactorSourceReference
+						)
 
-				try keychainClient.saveProfile(profile: newProfile)
+						try keychainClient.saveProfile(profile: newProfile)
 
-				await send(.internal(.system(.createdProfile(newProfile))))
+						return newProfile
+					}
+				))))
 			}
 
-		case let .internal(.system(.createdProfile(profile))):
+		case let .internal(.system(.createdProfileResult(.success(profile)))):
 			return .run { send in
 				await send(.coordinate(.finishedCreatingNewProfile(profile)))
+			}
+
+		case let .internal(.system(.createdProfileResult(.failure(error)))):
+			return .run { send in
+				await send(.coordinate(.failedToCreateNewProfile(reason: String(describing: error))))
 			}
 
 		case let .internal(.user(.accountNameChanged(accountName))):

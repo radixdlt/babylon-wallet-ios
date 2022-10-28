@@ -17,7 +17,7 @@ public extension Onboarding {
 		Reduce { state, action in
 			switch action {
 			case .internal(.user(.newProfile)):
-				state.newProfile = .init()
+				state.newProfile = .init(networkID: state.networkID)
 				return .none
 
 			case .internal(.user(.importProfile)):
@@ -49,6 +49,11 @@ public extension Onboarding {
 			case let .newProfile(.coordinate(.finishedCreatingNewProfile(newProfile))):
 				return .run { send in
 					await send(.coordinate(.onboardedWithProfile(newProfile, isNew: true)))
+				}
+
+			case let .newProfile(.coordinate(.failedToCreateNewProfile(reason))):
+				return .run { send in
+					await send(.coordinate(.failedToCreateOrImportProfile(reason: "Failed to create profile: \(reason)")))
 				}
 
 			case .importMnemonic(.coordinate(.goBack)):

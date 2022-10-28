@@ -7,13 +7,15 @@ import TestUtils
 
 @MainActor
 final class AppFeatureTests: TestCase {
+	let networkID = NetworkID.primary
+
 	func test_initialAppState_whenAppLaunches_thenInitialAppStateIsSplash() {
 		let appState = App.State()
 		let expectedInitialAppState: App.State = .splash(.init())
 		XCTAssertEqual(appState, expectedInitialAppState)
 	}
 
-	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() {
+	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() async throws {
 		// given
 		let initialState = App.State.main(.placeholder)
 		let store = TestStore(
@@ -23,11 +25,11 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		store.send(.main(.coordinate(.removedWallet))) {
+		_ = await store.send(.main(.coordinate(.removedWallet)))
+		_ = await store.receive(.coordinate(.onboard)) {
 			// then
-			$0 = .onboarding(.init())
+			$0 = .onboarding(.init(networkID: .primary))
 		}
-		store.receive(.coordinate(.onboard))
 	}
 
 	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
@@ -36,9 +38,10 @@ final class AppFeatureTests: TestCase {
 		environment.profileClient.injectProfile = {
 			XCTAssertEqual($0, newProfile) // assert correct profile is injected
 		}
+
 		let store = TestStore(
 			// GIVEN: No profile (Onboarding)
-			initialState: .onboarding(.init(newProfile: .init())),
+			initialState: .onboarding(Onboarding.State(networkID: networkID, newProfile: .init(networkID: networkID))),
 			reducer: App.reducer,
 			environment: environment
 		)
@@ -52,7 +55,7 @@ final class AppFeatureTests: TestCase {
 
 		// THEN: ... and we navigate to main
 		await store.receive(.coordinate(.toMain)) {
-			$0 = .main(.init())
+			$0 = .main(.init(networkID: .primary))
 		}
 	}
 
@@ -84,7 +87,7 @@ final class AppFeatureTests: TestCase {
 		_ = await store.receive(.internal(.injectProfileIntoProfileClient(existingProfile)))
 		// THEN: ... and we navigate to main
 		await store.receive(.coordinate(.toMain)) {
-			$0 = .main(.init())
+			$0 = .main(.init(networkID: .primary))
 		}
 	}
 
@@ -121,8 +124,8 @@ final class AppFeatureTests: TestCase {
 		_ = await store.send(.splash(.coordinate(.loadProfileResult(loadProfileResult))))
 
 		// then
-		await store.receive(.coordinate(.onboard)) {
-			$0 = .onboarding(.init())
+		await store.receive(.coordinate(.onboard)) { [networkID] in
+			$0 = .onboarding(.init(networkID: networkID))
 		}
 	}
 }

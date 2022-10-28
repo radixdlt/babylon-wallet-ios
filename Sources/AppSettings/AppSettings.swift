@@ -3,7 +3,7 @@ import Foundation
 import Profile
 
 // MARK: - AppSettings
-public struct AppSettings: Codable {
+public struct AppSettings: Codable, Hashable {
 	public var currency: FiatCurrency
 	public var isCurrencyAmountVisible: Bool
 
