@@ -17,7 +17,7 @@ public struct CreateNewProfileRequest {
 }
 
 // MARK: - ProfileClient
-public struct ProfileClient {
+public struct ProfileClient: DependencyKey {
 	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
 	public var createNewProfile: CreateNewProfile
 

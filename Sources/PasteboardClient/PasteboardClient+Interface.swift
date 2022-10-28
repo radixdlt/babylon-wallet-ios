@@ -2,7 +2,7 @@ import Dependencies
 import Foundation
 
 // MARK: - PasteboardClient
-public struct PasteboardClient {
+public struct PasteboardClient: DependencyKey {
 	public var copyString: @Sendable (String) -> Void
 	public var getString: @Sendable () -> String?
 }

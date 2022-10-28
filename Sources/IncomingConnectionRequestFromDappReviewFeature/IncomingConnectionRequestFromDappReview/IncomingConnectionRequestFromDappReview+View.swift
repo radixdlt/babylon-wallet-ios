@@ -132,6 +132,8 @@ extension IncomingConnectionRequestFromDappReview.View {
 	}
 }
 
+#if DEBUG
+
 // MARK: - IncomingConnectionRequestFromDappReview_Preview
 struct IncomingConnectionRequestFromDappReview_Preview: PreviewProvider {
 	static var previews: some View {
@@ -145,3 +147,4 @@ struct IncomingConnectionRequestFromDappReview_Preview: PreviewProvider {
 		)
 	}
 }
+#endif // DEBUG

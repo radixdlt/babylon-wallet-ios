@@ -182,13 +182,15 @@ private extension NonFungibleTokenList.Row.View {
 	}
 }
 
+#if DEBUG
+
 // MARK: - Row_Preview
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleTokenList.Row.View(
 			store: .init(
 				initialState: .init(
-					containers: [.init(asset: .mock1, metadata: nil)]
+					containers: [.init(asset: NonFungibleToken.mock1, metadata: nil)]
 				),
 				reducer: NonFungibleTokenList.Row.reducer,
 				environment: .init()
@@ -196,3 +198,4 @@ struct Row_Preview: PreviewProvider {
 		)
 	}
 }
+#endif

@@ -8,7 +8,7 @@ import enum SLIP10.PrivateKey
 import enum SLIP10.PublicKey
 
 // MARK: - EngineToolkitClient
-public struct EngineToolkitClient {
+public struct EngineToolkitClient: DependencyKey {
 	public var signTransactionIntent: SignTransactionIntent
 	public init(signTransactionIntent: @escaping SignTransactionIntent) {
 		self.signTransactionIntent = signTransactionIntent

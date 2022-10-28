@@ -7,8 +7,10 @@ public struct TokenListView: View {
 	private let sortedTokens: [FungibleTokenContainer]
 	private let limit = 5
 
+	// FIXME: Should not use Dependency `FungibleTokenListSorter` directly, convert
+	// to TCA Feature?
 	init(containers: [FungibleTokenContainer]) {
-		sortedTokens = FungibleTokenListSorter.live.sortTokens(containers).map(\.tokenContainers).flatMap { $0 }
+		sortedTokens = FungibleTokenListSorter.liveValue.sortTokens(containers).map(\.tokenContainers).flatMap { $0 }
 	}
 }
 

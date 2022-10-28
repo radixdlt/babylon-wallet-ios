@@ -14,7 +14,9 @@ public extension KeychainClient {
 private enum KeychainClientKey: DependencyKey {
 	typealias Value = KeychainClient
 	static let liveValue = KeychainClient.live
+	#if DEBUG
 	static let testValue = KeychainClient.unimplemented
+	#endif // DEBUG
 }
 
 public extension DependencyValues {

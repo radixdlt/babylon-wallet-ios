@@ -64,6 +64,8 @@ extension AccountList.View {
 	}
 }
 
+#if DEBUG
+
 // MARK: - AccountList_Preview
 struct AccountList_Preview: PreviewProvider {
 	static var previews: some View {
@@ -79,3 +81,4 @@ struct AccountList_Preview: PreviewProvider {
 		)
 	}
 }
+#endif // DEBUG

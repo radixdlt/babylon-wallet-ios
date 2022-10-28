@@ -2,7 +2,7 @@ import Asset
 import Dependencies
 
 // MARK: - FungibleTokenListSorter
-public struct FungibleTokenListSorter {
+public struct FungibleTokenListSorter: DependencyKey {
 	public var sortTokens: SortTokens
 
 	public init(
