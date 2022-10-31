@@ -88,13 +88,11 @@ public extension App {
 			}
 
 		case .coordinate(.onboard):
-			// FIXME: Handle NetworkID, where? AppSettings? Profile?
-			state = .onboarding(.init(networkID: .primary))
+			state = .onboarding(.init())
 			return .none
 
 		case .coordinate(.toMain):
-			// FIXME: Handle NetworkID, where? AppSettings? Profile?
-			state = .main(.init(networkID: .primary))
+			state = .main(.init())
 			return .none
 
 		case let .coordinate(.failedToCreateOrImportProfile(reason)):

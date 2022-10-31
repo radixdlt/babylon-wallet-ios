@@ -174,7 +174,7 @@ struct CreateAccount_Previews: PreviewProvider {
 
 		return CreateAccount.View(
 			store: .init(
-				initialState: .init(networkID: .primary),
+				initialState: .init(),
 				reducer: CreateAccount()
 			)
 		)

@@ -36,18 +36,6 @@ public extension UserDefaultsClient {
 	func setHasShownFirstLaunchOnboarding(_ bool: Bool) async {
 		await setBool(bool, hasShownFirstLaunchOnboardingKey)
 	}
-
-	func setProfileName(_ name: String) async {
-		await setString(name, forKey: profileNameKey)
-	}
-
-	func removeProfileName() async {
-		await remove(profileNameKey)
-	}
-
-	var profileName: String? {
-		stringForKey(profileNameKey)
-	}
 }
 
 public extension DependencyValues {
@@ -58,4 +46,3 @@ public extension DependencyValues {
 }
 
 let hasShownFirstLaunchOnboardingKey = "hasShownFirstLaunchOnboardingKey"
-let profileNameKey = "profileNameKey"

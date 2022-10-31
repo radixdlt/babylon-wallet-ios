@@ -16,7 +16,7 @@ let biteDep: PackageDescription.Package.Dependency = .package(
 
 let profileDep: PackageDescription.Package.Dependency = .package(
 	url: "git@github.com:radixdlt/swift-profile.git",
-	from: "0.0.27"
+	from: "0.0.28"
 )
 
 let engineToolkitDep: PackageDescription.Package.Dependency = .package(
@@ -564,6 +564,24 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "ProfileClient",
+			dependencies: [
+				"EngineToolkitClient", // Create TX
+				dependencies, // XCTestDynamicOverlay + DependencyKey
+				"GatewayAPI", // Create Account On Ledger => Submit TX
+				profile,
+				"ProfileLoader",
+				"UserDefaultsClient", // Used to save `NetworkID`, save in Profile instead?
+			]
+		),
+		.testTarget(
+			name: "ProfileClientTests",
+			dependencies: [
+				"ProfileClient",
+				"TestUtils",
+			]
+		),
+		.target(
 			name: "ProfileLoader",
 			dependencies: [
 				profile,
@@ -636,23 +654,6 @@ let package = Package(
 			name: "UserDefaultsClientTests",
 			dependencies: [
 				"UserDefaultsClient",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "ProfileClient",
-			dependencies: [
-				"EngineToolkitClient", // Create TX
-				"GatewayAPI", // Create Account On Ledger => Submit TX
-				profile,
-				"ProfileLoader",
-				dependencies, // XCTestDynamicOverlay + DependencyKey
-			]
-		),
-		.testTarget(
-			name: "ProfileClientTests",
-			dependencies: [
-				"ProfileClient",
 				"TestUtils",
 			]
 		),

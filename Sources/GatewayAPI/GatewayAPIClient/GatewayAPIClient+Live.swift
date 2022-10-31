@@ -159,9 +159,10 @@ public extension GatewayAPIClient {
 	// MARK: Submit TX Flow
 	func submit(
 		pollStrategy: PollStrategy = .default,
-		backgroundQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue(label: "GatewayUsage").eraseToAnyScheduler(),
 		signedCompiledNotarizedTXGivenEpoch: (Epoch) async throws -> SignedCompiledNotarizedTX
 	) async throws -> CommittedTransaction {
+		@Dependency(\.mainQueue) var mainQueue
+
 		// MARK: Get Epoch
 		let epochResponse = try await getEpoch()
 		let epoch = Epoch(rawValue: .init(epochResponse.epoch))
@@ -193,7 +194,7 @@ public extension GatewayAPIClient {
 		var pollCount = 0
 		while !txStatus.isComplete {
 			defer { pollCount += 1 }
-			try await backgroundQueue.sleep(for: .seconds(pollStrategy.sleepDuration))
+			try await mainQueue.sleep(for: .seconds(pollStrategy.sleepDuration))
 			txStatus = try await pollTransactionStatus()
 			if pollCount >= pollStrategy.maxPollTries {
 				throw FailedToGetTransactionStatus()

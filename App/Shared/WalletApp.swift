@@ -23,7 +23,7 @@ public extension App.Environment {
 			pasteboardClient: .live(),
 			profileLoader: .live(keychainClient: keychainClient),
 			userDefaultsClient: .liveValue,
-			profileClient: .live(backgroundQueue: backgroundQueue)
+			profileClient: .liveValue
 		)
 	}()
 }

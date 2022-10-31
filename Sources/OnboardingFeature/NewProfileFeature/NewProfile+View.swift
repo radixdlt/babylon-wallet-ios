@@ -103,7 +103,7 @@ struct NewProfileView_Previews: PreviewProvider {
 	static var previews: some View {
 		NewProfile.View(
 			store: .init(
-				initialState: .init(networkID: .primary),
+				initialState: .init(),
 				reducer: NewProfile()
 			)
 		)

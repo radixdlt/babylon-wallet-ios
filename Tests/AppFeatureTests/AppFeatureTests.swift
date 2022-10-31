@@ -41,7 +41,7 @@ final class AppFeatureTests: TestCase {
 
 		let store = TestStore(
 			// GIVEN: No profile (Onboarding)
-			initialState: .onboarding(Onboarding.State(networkID: networkID, newProfile: .init(networkID: networkID))),
+			initialState: .onboarding(Onboarding.State(newProfile: .init())),
 			reducer: App.reducer,
 			environment: environment
 		)
@@ -125,7 +125,7 @@ final class AppFeatureTests: TestCase {
 
 		// then
 		await store.receive(.coordinate(.onboard)) { [networkID] in
-			$0 = .onboarding(.init(networkID: networkID))
+			$0 = .onboarding(.init())
 		}
 	}
 }

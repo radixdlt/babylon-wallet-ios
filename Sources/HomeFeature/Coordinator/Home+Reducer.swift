@@ -95,7 +95,6 @@ public struct Home: ReducerProtocol {
 
 		case let .internal(.coordinate(.createAccount(numberOfExistingAccounts))):
 			state.createAccount = .init(
-				networkID: state.networkID,
 				numberOfExistingAccounts: numberOfExistingAccounts
 			)
 			return .none

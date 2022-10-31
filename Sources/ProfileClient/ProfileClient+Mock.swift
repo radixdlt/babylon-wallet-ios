@@ -8,7 +8,14 @@ import Profile
 public extension ProfileClient {
 	static func mock() -> Self {
 		Self(
-			createNewProfile: { req in try! await Profile.new(mnemonic: req.curve25519FactorSourceMnemonic) },
+			getCurrentNetworkID: { NetworkID.primary },
+			setCurrentNetworkID: { _ in },
+			createNewProfile: { req in
+				try! await Profile.new(
+					networkID: .primary,
+					mnemonic: req.curve25519FactorSourceMnemonic
+				)
+			},
 			injectProfile: { _ in /* Noop */ },
 			extractProfileSnapshot: { fatalError("Impl me") },
 			deleteProfileSnapshot: { /* Noop */ },

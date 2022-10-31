@@ -17,7 +17,7 @@ public extension Onboarding {
 		Reduce { state, action in
 			switch action {
 			case .internal(.user(.newProfile)):
-				state.newProfile = .init(networkID: state.networkID)
+				state.newProfile = .init()
 				return .none
 
 			case .internal(.user(.importProfile)):
