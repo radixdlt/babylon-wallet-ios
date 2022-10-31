@@ -70,6 +70,9 @@ public extension ProfileClient {
 			},
 			createAccount: { _ in
 				fatalError()
+			},
+			signTransaction: { _, _ in
+				fatalError()
 			}
 		)
 	}

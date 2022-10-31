@@ -98,6 +98,10 @@ public extension ProfileClient {
 						}
 					)
 				}
+			},
+			signTransaction: { accountID, transactionManifest in
+				// TODO: implement
+				return "TXID"
 			}
 		)
 	}

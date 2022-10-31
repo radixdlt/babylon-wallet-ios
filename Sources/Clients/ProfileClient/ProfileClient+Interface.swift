@@ -3,6 +3,7 @@ import Dependencies
 import Foundation
 import KeychainClient
 import Mnemonic
+import EngineToolkit
 import NonEmpty
 import Profile
 
@@ -31,6 +32,7 @@ public struct ProfileClient: DependencyKey {
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
 	public var createAccount: CreateAccount
+	public var signTransaction: SignTransaction
 }
 
 public extension ProfileClient {
@@ -45,8 +47,10 @@ public extension ProfileClient {
 	typealias GetAppPreferences = @Sendable () throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) throws -> Void
 	typealias CreateAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
+	typealias SignTransaction = @Sendable (OnNetwork.Account.ID, TransactionManifest) async throws -> TXID
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 }
+public typealias TXID = String // TODO: replace with real Transaction.ID
 
 // MARK: - CreateAccountRequest
 public struct CreateAccountRequest {
