@@ -161,20 +161,83 @@ package.addModules([
 			dependencies: ["TestUtils"]
 		)
 	),
-	
+	.feature(
+		name: "AccountPreferencesFeature",
+		dependencies: [
+			"Common",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "AggregatedValueFeature",
+		dependencies: [
+			"Common",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "AppFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"AccountPortfolio",
+			"AppSettings",
+			engineToolkit,
+			"MainFeature",
+			"OnboardingFeature",
+			"PasteboardClient",
+			"ProfileLoader",
+			"ProfileClient",
+			"SplashFeature",
+			tca,
+			"UserDefaultsClient",
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: [
+				"SplashFeature",
+				"TestUtils",
+				"ProfileClient",
+			]
+		)
+	),
+	.feature(
+		name: "AssetsViewFeature",
+		dependencies: [
+			"Asset",
+			"Common",
+			"FungibleTokenListFeature",
+			"NonFungibleTokenListFeature",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "CreateAccountFeature",
+		dependencies: [
+			"Common",
+			"DesignSystem",
+			keychainClient,
+			profile,
+			tca,
+			"ProfileClient",
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
 ])
 
 // MARK: - Clients
 
 package.products += [
-	.library(
-		name: "AppFeature",
-		targets: ["AppFeature"]
-	),
-	.library(
-		name: "CreateAccountFeature",
-		targets: ["CreateAccountFeature"]
-	),
 	.library(
 		name: "DesignSystem",
 		targets: ["DesignSystem"]
@@ -200,6 +263,15 @@ package.targets += [
 
 	// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
 	.target(name: "_BuildTools"),
+
+	.testTarget(
+		name: "AccountPortfolioTests",
+		dependencies: [
+			"AccountPortfolio",
+			dependencies,
+			"TestUtils",
+		]
+	),
 	.target(
 		name: "AccountPortfolio",
 		dependencies: [
@@ -210,69 +282,6 @@ package.targets += [
 			"GatewayAPI",
 			profile,
 			dependencies,
-		]
-	),
-	.testTarget(
-		name: "AccountPortfolioTests",
-		dependencies: [
-			"AccountPortfolio",
-			dependencies,
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "AccountPreferencesFeature",
-		dependencies: [
-			"Common",
-			tca,
-		]
-	),
-	.testTarget(
-		name: "AccountPreferencesFeatureTests",
-		dependencies: [
-			"AccountPreferencesFeature",
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "AggregatedValueFeature",
-		dependencies: [
-			"Common",
-			tca,
-		]
-	),
-	.testTarget(
-		name: "AggregatedValueFeatureTests",
-		dependencies: [
-			"AggregatedValueFeature",
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "AppFeature",
-		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"AccountPortfolio",
-			"AppSettings",
-			engineToolkit,
-			"MainFeature",
-			"OnboardingFeature",
-			"PasteboardClient",
-			"ProfileLoader",
-			"ProfileClient",
-			"SplashFeature",
-			tca,
-			"UserDefaultsClient",
-			// ^^^ Sort lexicographically ^^^
-		]
-	),
-	.testTarget(
-		name: "AppFeatureTests",
-		dependencies: [
-			"AppFeature",
-			"SplashFeature",
-			"TestUtils",
-			"ProfileClient",
 		]
 	),
 	.target(
@@ -305,23 +314,7 @@ package.targets += [
 			"TestUtils",
 		]
 	),
-	.target(
-		name: "AssetsViewFeature",
-		dependencies: [
-			"Asset",
-			"Common",
-			"FungibleTokenListFeature",
-			"NonFungibleTokenListFeature",
-			tca,
-		]
-	),
-	.testTarget(
-		name: "AssetsViewFeatureTests",
-		dependencies: [
-			"AssetsViewFeature",
-			"TestUtils",
-		]
-	),
+
 	.target(
 		name: "Common",
 		dependencies: [
@@ -337,38 +330,17 @@ package.targets += [
 			"TestUtils",
 		]
 	),
-	.target(
-		name: "CreateAccountFeature",
-		dependencies: [
-			"Common",
-			"DesignSystem",
-			keychainClient,
-			profile,
-			tca,
-			"ProfileClient",
-		],
-		resources: [
-			.process("Resources"),
-		]
-	),
-	.testTarget(
-		name: "CreateAccountFeatureTests",
-		dependencies: [
-			"CreateAccountFeature",
-			"TestUtils",
-		]
-	),
 
-		.target(
-			name: "EngineToolkitClient",
-			dependencies: [
-				bigInt,
-				bite,
-				"Common",
-				dependencies,
-				engineToolkit,
-			]
-		),
+	.target(
+		name: "EngineToolkitClient",
+		dependencies: [
+			bigInt,
+			bite,
+			"Common",
+			dependencies,
+			engineToolkit,
+		]
+	),
 	.testTarget(
 		name: "EngineToolkitClientTests",
 		dependencies: [
