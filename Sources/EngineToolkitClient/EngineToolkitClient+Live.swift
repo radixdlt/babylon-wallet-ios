@@ -1,4 +1,3 @@
-import Bite
 import Common
 import CryptoKit
 import Dependencies

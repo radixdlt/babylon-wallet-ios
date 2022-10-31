@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Foundation
 import GatewayAPI
+import ManageBrowserExtensionConnectionsFeature
 import Profile
 
 // MARK: - Settings.Action
@@ -9,6 +10,7 @@ public extension Settings {
 	enum Action: Equatable {
 		case coordinate(CoordinatingAction)
 		case `internal`(InternalAction)
+		case manageBrowserExtensionConnections(ManageBrowserExtensionConnections.Action)
 	}
 }
 
@@ -31,13 +33,12 @@ public extension Settings.Action.InternalAction {
 		case profileToDebugLoaded(Profile)
 		#endif // DEBUG
 		case viewDidAppear
-		case loadRDXLedgerEpoch
-		case fetchEpochResult(TaskResult<V0StateEpochResponse>)
 	}
 
 	enum UserAction: Equatable {
 		case dismissSettings
 		case deleteProfileAndFactorSources
+		case goToBrowserExtensionConnections
 		#if DEBUG
 		case debugInspectProfile
 		case setDebugProfileSheet(isPresented: Bool)

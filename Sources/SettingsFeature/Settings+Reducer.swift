@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import GatewayAPI
 import KeychainClient
+import ManageBrowserExtensionConnectionsFeature
 import Profile
 import ProfileClient
 
@@ -8,32 +9,30 @@ import ProfileClient
 public struct Settings: ReducerProtocol {
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
-	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 	public init() {}
 }
 
+// public extension Settings.Action {
+//	static func manageBrowserExtensionConnections(_ action: ManageBrowserExtensionConnections.Action) -> Self {
+//		.internal(.manageBrowserExtensionConnections(action))
+//	}
+// }
+
 public extension Settings {
-	func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
+	var body: some ReducerProtocol<State, Action> {
+		Reduce(self.core)
+			.ifLet(\
+				.manageBrowserExtensionConnections,
+				action: /Settings.Action.manageBrowserExtensionConnections) {
+					ManageBrowserExtensionConnections()
+			}
+			._printChanges()
+	}
+
+	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.system(.viewDidAppear)):
-			return .run { send in
-				await send(.internal(.system(.loadRDXLedgerEpoch)))
-			}
-
-		case .internal(.system(.loadRDXLedgerEpoch)):
-			return .run { [gatewayAPIClient] send in
-				await send(.internal(.system(.fetchEpochResult(TaskResult {
-					try await gatewayAPIClient.getEpoch()
-				}))))
-			}
-
-		case let .internal(.system(.fetchEpochResult(.success(epoch)))):
-			state.currentEpoch = Int(epoch.epoch)
-			return .none
-
-		case let .internal(.system(.fetchEpochResult(.failure(error)))):
-			print("Failed to fetch epoch: \(String(describing: error))")
 			return .none
 
 		case .internal(.user(.dismissSettings)):
@@ -45,6 +44,10 @@ public extension Settings {
 			return .run { send in
 				await send(.coordinate(.deleteProfileAndFactorSources))
 			}
+
+		case .internal(.user(.goToBrowserExtensionConnections)):
+			state.manageBrowserExtensionConnections = .init()
+			return .none
 
 		#if DEBUG
 		case .internal(.user(.debugInspectProfile)):
@@ -69,6 +72,11 @@ public extension Settings {
 		#endif // DEBUG
 
 		case .coordinate:
+			return .none
+		case .manageBrowserExtensionConnections(.coordinate(.dismiss)):
+			state.manageBrowserExtensionConnections = nil
+			return .none
+		case .manageBrowserExtensionConnections(.internal(_)):
 			return .none
 		}
 	}

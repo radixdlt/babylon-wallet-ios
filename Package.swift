@@ -3,6 +3,28 @@
 
 import PackageDescription
 
+// MARK: RDX Package Dependencies
+let converseDep: PackageDescription.Package.Dependency = .package(
+	url: "git@github.com:radixdlt/Converse.git",
+	from: "0.1.13"
+)
+
+let biteDep: PackageDescription.Package.Dependency = .package(
+	url: "git@github.com:radixdlt/Bite.git",
+	from: "0.0.1"
+)
+
+let profileDep: PackageDescription.Package.Dependency = .package(
+	url: "git@github.com:radixdlt/swift-profile.git",
+	from: "0.0.27"
+)
+
+let engineToolkitDep: PackageDescription.Package.Dependency = .package(
+	url: "git@github.com:radixdlt/swift-engine-toolkit.git",
+	from: "0.0.9"
+)
+
+// MARK: Target Dependencies
 let tca: Target.Dependency = .product(
 	name: "ComposableArchitecture",
 	package: "swift-composable-architecture"
@@ -18,6 +40,11 @@ let profile: Target.Dependency = .product(
 	package: "swift-profile"
 )
 
+let converse: Target.Dependency = .product(
+	name: "Converse",
+	package: "Converse"
+)
+
 let keychainClient: Target.Dependency = .product(
 	name: "KeychainClient",
 	package: "swift-profile"
@@ -31,6 +58,11 @@ let bigInt: Target.Dependency = .product(
 let engineToolkit: Target.Dependency = .product(
 	name: "EngineToolkit",
 	package: "swift-engine-toolkit"
+)
+
+let bite: Target.Dependency = .product(
+	name: "Bite",
+	package: "Bite"
 )
 
 let package = Package(
@@ -71,11 +103,11 @@ let package = Package(
 
 	],
 	dependencies: [
-		// RDX Works packages
-		// We use SSH because repos are private...
-		.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-		.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.24"),
-		.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.4"),
+		// RDX Works Package depedencies
+		biteDep,
+		converseDep,
+		engineToolkitDep,
+		profileDep,
 
 		// BigInt
 		.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
@@ -254,6 +286,7 @@ let package = Package(
 				"TestUtils",
 			]
 		),
+
 		.target(
 			name: "Common",
 			dependencies: [
@@ -295,7 +328,7 @@ let package = Package(
 			name: "EngineToolkitClient",
 			dependencies: [
 				bigInt,
-				"Bite",
+				bite,
 				"Common",
 				dependencies,
 				engineToolkit,
@@ -337,7 +370,7 @@ let package = Package(
 		.target(
 			name: "GatewayAPI",
 			dependencies: [
-				"AnyCodable",
+				.product(name: "AnyCodable", package: "AnyCodable"),
 				"Asset",
 				bigInt,
 				"Common",
@@ -387,6 +420,25 @@ let package = Package(
 				"TestUtils",
 			]
 		),
+
+		.target(
+			name: "ManageBrowserExtensionConnectionsFeature",
+			dependencies: [
+				"Common",
+				converse,
+				"DesignSystem",
+				profile,
+				tca,
+			]
+		),
+		.testTarget(
+			name: "ManageBrowserExtensionConnectionsFeatureTests",
+			dependencies: [
+				"ManageBrowserExtensionConnectionsFeature",
+				"TestUtils",
+			]
+		),
+
 		.target(
 			name: "IncomingConnectionRequestFromDappReviewFeature",
 			dependencies: [
@@ -533,6 +585,7 @@ let package = Package(
 				profile,
 				"GatewayAPI",
 				keychainClient,
+				"ManageBrowserExtensionConnectionsFeature",
 				"ProfileClient",
 				.product(name: "ProfileView", package: "swift-profile"),
 				tca,
