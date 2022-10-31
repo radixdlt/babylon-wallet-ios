@@ -11,7 +11,7 @@ let package = Package(
 	]
 )
 
-// MARK - Dependencies
+// MARK: - Dependencies
 
 package.dependencies += [
 	// RDX Works Package depedencies
@@ -107,24 +107,24 @@ extension Package {
 	private func addModule(_ module: Module) {
 		let targetName = module.name
 		package.targets += [
-			.target(name: targetName, dependencies: module.dependencies, resources: module.resources)
+			.target(name: targetName, dependencies: module.dependencies, resources: module.resources),
 		]
 		switch module.tests {
 		case .no:
 			break
-		case .yes(let nameSuffix, let testDependencies, let resources):
+		case let .yes(nameSuffix, testDependencies, resources):
 			let testTargetName = targetName + nameSuffix
 			package.targets += [
 				.testTarget(
 					name: testTargetName,
 					dependencies: [.target(name: targetName)] + testDependencies,
 					resources: resources
-				)
+				),
 			]
 		}
 		if module.isProduct {
 			package.products += [
-				.library(name: targetName, targets: [targetName])
+				.library(name: targetName, targets: [targetName]),
 			]
 		}
 	}
