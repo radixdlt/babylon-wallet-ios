@@ -585,7 +585,7 @@ package.addModules([
 		name: "_BuildTools",
 		dependencies: [],
 		tests: .no
-	)
+	),
 	.core(
 		name: "Common",
 		dependencies: [
