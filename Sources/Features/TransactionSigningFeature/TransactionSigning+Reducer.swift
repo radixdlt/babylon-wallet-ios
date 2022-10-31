@@ -1,22 +1,10 @@
 import ComposableArchitecture
 import EngineToolkitClient
-import GatewayAPI
 import ProfileClient
 
 // MARK: - TransactionSigning
 public struct TransactionSigning: ReducerProtocol {
-	public var account: OnNetwork.Account
-	public var transactionManifest: TransactionManifest
-
 	@Dependency(\.profileClient) var profile
-
-	public init(
-		account: OnNetwork.Account,
-		transactionManifest: TransactionManifest
-	) {
-		self.account = account
-		self.transactionManifest = transactionManifest
-	}
 }
 
 public extension TransactionSigning {
@@ -25,10 +13,14 @@ public extension TransactionSigning {
 		case .signTransaction:
 			return .run { send in
 				let result = TaskResult {
-					try await profile.signTransaction(state.account.id, transactionManifest)
+					try await profile.signTransaction(state.account.id, state.transactionManifest)
 				}
 				await send(.internal(.user(.signTransactionResult(result))))
 			}
+		case .internal:
+			return .none
+		case .coordinate:
+			return .none
 		}
 	}
 }
