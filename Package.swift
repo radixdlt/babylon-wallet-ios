@@ -156,6 +156,7 @@ extension Package {
 
 	private func addModule(_ module: Module) {
 		let targetName = module.name
+
 		package.targets += [
 			.target(name: targetName, dependencies: module.dependencies, exclude: module.exclude, resources: module.resources),
 		]
@@ -173,6 +174,7 @@ extension Package {
 				),
 			]
 		}
+
 		if module.isProduct {
 			package.products += [
 				.library(name: targetName, targets: [targetName]),
@@ -415,8 +417,8 @@ package.addModules([
 		],
 		tests: .yes(
 			dependencies: [
-				"OnboardingFeature",
 				"UserDefaultsClient",
+				"TestUtils",
 			]
 		)
 	),
