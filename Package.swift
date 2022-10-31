@@ -79,7 +79,7 @@ extension Package {
 	struct Module {
 		enum Tests {
 			case no
-			case yes(nameSuffix: String = "Tests", dependencies: [Target.Dependency])
+			case yes(nameSuffix: String = "Tests", dependencies: [Target.Dependency], resources: [Resource]? = nil)
 		}
 
 		let name: String
@@ -112,12 +112,13 @@ extension Package {
 		switch module.tests {
 		case .no:
 			break
-		case .yes(let nameSuffix, let testDependencies):
+		case .yes(let nameSuffix, let testDependencies, let resources):
 			let testTargetName = targetName + nameSuffix
 			package.targets += [
 				.testTarget(
 					name: testTargetName,
-					dependencies: [.target(name: targetName)] + testDependencies
+					dependencies: [.target(name: targetName)] + testDependencies,
+					resources: resources
 				)
 			]
 		}
@@ -278,6 +279,19 @@ package.addModules([
 		)
 	),
 	.feature(
+		name: "ImportProfileFeature",
+		dependencies: [
+			"Common",
+			profile,
+			"ProfileClient",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"],
+			resources: [.process("profile_snapshot.json")]
+		)
+	),
+	.feature(
 		name: "IncomingConnectionRequestFromDappReviewFeature",
 		dependencies: [
 			"Common",
@@ -303,18 +317,6 @@ package.products += [
 	.library(
 		name: "DesignSystem",
 		targets: ["DesignSystem"]
-	),
-	.library(
-		name: "HomeFeature",
-		targets: ["HomeFeature"]
-	),
-	.library(
-		name: "IncomingConnectionRequestFromDappReviewFeature",
-		targets: ["IncomingConnectionRequestFromDappReviewFeature"]
-	),
-	.library(
-		name: "ImportProfileFeature",
-		targets: ["ImportProfileFeature"]
 	),
 ]
 
@@ -436,25 +438,6 @@ package.targets += [
 		dependencies: [
 			"TestUtils",
 			"GatewayAPI",
-		]
-	),
-	.target(
-		name: "ImportProfileFeature",
-		dependencies: [
-			"Common",
-			profile,
-			"ProfileClient",
-			tca,
-		]
-	),
-	.testTarget(
-		name: "ImportProfileFeatureTests",
-		dependencies: [
-			"ImportProfileFeature",
-			"TestUtils",
-		],
-		resources: [
-			.process("profile_snapshot.json"),
 		]
 	),
 	.target(
