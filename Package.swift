@@ -96,6 +96,10 @@ extension Package {
 		static func client(name: String, dependencies: [Target.Dependency], resources: [Resource]? = nil, tests: Tests, isProduct: Bool = false) -> Self {
 			.init(name: name, category: "Clients", dependencies: dependencies, resources: resources, tests: tests, isProduct: isProduct)
 		}
+
+		static func core(name: String, dependencies: [Target.Dependency], resources: [Resource]? = nil, tests: Tests, isProduct: Bool = false) -> Self {
+			.init(name: name, category: "Core", dependencies: dependencies, resources: resources, tests: tests, isProduct: isProduct)
+		}
 	}
 
 	func addModules(_ modules: [Module]) {
@@ -309,18 +313,80 @@ package.addModules([
 			]
 		)
 	),
+	.feature(
+		name: "MainFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"AppSettings",
+			"AccountPortfolio",
+			engineToolkit,
+			"HomeFeature",
+			"PasteboardClient",
+			"SettingsFeature",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "ManageBrowserExtensionConnectionsFeature",
+		dependencies: [
+			"Common",
+			converse,
+			"DesignSystem",
+			profile,
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "NonFungibleTokenListFeature",
+		dependencies: [
+			"Asset",
+			"Common",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "OnboardingFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
+			engineToolkit,
+			"ImportProfileFeature",
+			profile,
+			"ProfileClient",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: [
+				"OnboardingFeature",
+				"UserDefaultsClient",
+			]
+		)
+	),
 ])
 
 // MARK: - Clients
 
-package.products += [
-	.library(
-		name: "DesignSystem",
-		targets: ["DesignSystem"]
-	),
-]
+// MARK: - Core
 
-// MARK: - Misc
+package.addModules([
+	.core(
+		name: "DesignSystem",
+		dependencies: [],
+		resources: [.process("Fonts")],
+		tests: .no
+	)
+])
 
 package.targets += [
 	// Targets sorted lexicographically, placing `testTarget` just after `target`.
@@ -410,14 +476,6 @@ package.targets += [
 		]
 	),
 	.target(
-		name: "DesignSystem",
-		dependencies: [
-		],
-		resources: [
-			.process("Fonts"),
-		]
-	),
-	.target(
 		name: "GatewayAPI",
 		dependencies: [
 			.product(name: "AnyCodable", package: "AnyCodable"),
@@ -449,80 +507,6 @@ package.targets += [
 		dependencies: [
 			"LocalAuthenticationClient",
 			"TestUtils",
-		]
-	),
-	.target(
-		name: "MainFeature",
-		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"AppSettings",
-			"AccountPortfolio",
-			engineToolkit,
-			"HomeFeature",
-			"PasteboardClient",
-			"SettingsFeature",
-			tca,
-			// ^^^ Sort lexicographically ^^^
-		]
-	),
-	.testTarget(
-		name: "MainFeatureTests",
-		dependencies: [
-			"MainFeature",
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "ManageBrowserExtensionConnectionsFeature",
-		dependencies: [
-			"Common",
-			converse,
-			"DesignSystem",
-			profile,
-			tca,
-		]
-	),
-	.testTarget(
-		name: "ManageBrowserExtensionConnectionsFeatureTests",
-		dependencies: [
-			"ManageBrowserExtensionConnectionsFeature",
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "NonFungibleTokenListFeature",
-		dependencies: [
-			"Asset",
-			"Common",
-			tca,
-		]
-	),
-	.testTarget(
-		name: "NonFungibleTokenListFeatureTests",
-		dependencies: [
-			"NonFungibleTokenListFeature",
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "OnboardingFeature",
-		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"Common",
-			engineToolkit,
-			"ImportProfileFeature",
-			profile,
-			"ProfileClient",
-			tca,
-			// ^^^ Sort lexicographically ^^^
-		]
-	),
-	.testTarget(
-		name: "OnboardingFeatureTests",
-		dependencies: [
-			"OnboardingFeature",
-			"TestUtils",
-			"UserDefaultsClient",
 		]
 	),
 	.target(
