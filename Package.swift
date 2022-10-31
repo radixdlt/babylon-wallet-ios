@@ -418,7 +418,7 @@ package.addModules([
 		dependencies: [],
 		resources: [.process("Fonts")],
 		tests: .no
-	)
+	),
 ])
 
 package.targets += [
