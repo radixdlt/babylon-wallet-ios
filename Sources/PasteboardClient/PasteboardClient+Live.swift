@@ -5,10 +5,8 @@ public typealias Pasteboard = UIPasteboard
 import AppKit
 public typealias Pasteboard = NSPasteboard
 #endif
-import Dependencies
 
-// MARK: - PasteboardClient + DependencyKey
-extension PasteboardClient: DependencyKey {
+extension PasteboardClient {
 	public static let liveValue: Self = {
 		let pasteboard = Pasteboard.general
 		#if os(macOS)

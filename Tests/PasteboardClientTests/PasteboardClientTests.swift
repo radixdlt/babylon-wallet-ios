@@ -13,7 +13,7 @@ final class PasteboardClientTests: TestCase {
 
 	 override func setUp() {
 	 	super.setUp()
-	 	sut = PasteboardClient.live
+	 	sut = PasteboardClient.liveValue
 	 }
 
 	 func testCopyStringSetsStringToPasteboard() {
