@@ -85,15 +85,16 @@ extension Package {
 		let name: String
 		let category: String
 		let dependencies: [Target.Dependency]
+		let resources: [Resource]?
 		let tests: Tests
 		let isProduct: Bool
 
-		static func feature(name: String, dependencies: [Target.Dependency], tests: Tests, isProduct: Bool = true) -> Self {
-			.init(name: name, category: "Features", dependencies: dependencies, tests: tests, isProduct: isProduct)
+		static func feature(name: String, dependencies: [Target.Dependency], resources: [Resource]? = nil, tests: Tests, isProduct: Bool = true) -> Self {
+			.init(name: name, category: "Features", dependencies: dependencies, resources: resources, tests: tests, isProduct: isProduct)
 		}
 
-		static func client(name: String, dependencies: [Target.Dependency], tests: Tests, isProduct: Bool = false) -> Self {
-			.init(name: name, category: "Clients", dependencies: dependencies, tests: tests, isProduct: isProduct)
+		static func client(name: String, dependencies: [Target.Dependency], resources: [Resource]? = nil, tests: Tests, isProduct: Bool = false) -> Self {
+			.init(name: name, category: "Clients", dependencies: dependencies, resources: resources, tests: tests, isProduct: isProduct)
 		}
 	}
 
@@ -106,7 +107,7 @@ extension Package {
 	private func addModule(_ module: Module) {
 		let targetName = module.name
 		package.targets += [
-			.target(name: targetName, dependencies: module.dependencies)
+			.target(name: targetName, dependencies: module.dependencies, resources: module.resources)
 		]
 		switch module.tests {
 		case .no:
@@ -233,6 +234,67 @@ package.addModules([
 			dependencies: ["TestUtils"]
 		)
 	),
+	.feature(
+		name: "FungibleTokenListFeature",
+		dependencies: [
+			"Asset",
+			"Common",
+			tca,
+		],
+		tests: .yes(
+			dependencies: [
+				"Asset",
+				tca,
+				"TestUtils",
+			]
+		)
+	),
+	.feature(
+		name: "HomeFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"AccountListFeature",
+			"AccountDetailsFeature",
+			"AccountPortfolio",
+			"AccountPreferencesFeature",
+			"AppSettings",
+			"Common",
+			"CreateAccountFeature",
+			engineToolkit,
+			"IncomingConnectionRequestFromDappReviewFeature",
+			"PasteboardClient",
+			profile,
+			"ProfileClient",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: [
+				"Asset",
+				"FungibleTokenListFeature",
+				"NonFungibleTokenListFeature",
+				"TestUtils",
+			]
+		)
+	),
+	.feature(
+		name: "IncomingConnectionRequestFromDappReviewFeature",
+		dependencies: [
+			"Common",
+			"DesignSystem",
+			profile,
+			"ProfileClient",
+			tca,
+		],
+		resources: [.process("Resources")],
+		tests: .yes(
+			dependencies: [
+				"ProfileClient",
+				tca,
+				"TestUtils",
+			]
+		)
+	),
 ])
 
 // MARK: - Clients
@@ -354,23 +416,6 @@ package.targets += [
 		]
 	),
 	.target(
-		name: "FungibleTokenListFeature",
-		dependencies: [
-			"Asset",
-			"Common",
-			tca,
-		]
-	),
-	.testTarget(
-		name: "FungibleTokenListFeatureTests",
-		dependencies: [
-			"Asset",
-			"FungibleTokenListFeature",
-			tca,
-			"TestUtils",
-		]
-	),
-	.target(
 		name: "GatewayAPI",
 		dependencies: [
 			.product(name: "AnyCodable", package: "AnyCodable"),
@@ -391,75 +436,6 @@ package.targets += [
 		dependencies: [
 			"TestUtils",
 			"GatewayAPI",
-		]
-	),
-	.target(
-		name: "HomeFeature",
-		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"AccountListFeature",
-			"AccountDetailsFeature",
-			"AccountPortfolio",
-			"AccountPreferencesFeature",
-			"AppSettings",
-			"Common",
-			"CreateAccountFeature",
-			engineToolkit,
-			"IncomingConnectionRequestFromDappReviewFeature",
-			"PasteboardClient",
-			profile,
-			"ProfileClient",
-			tca,
-			// ^^^ Sort lexicographically ^^^
-		]
-	),
-	.testTarget(
-		name: "HomeFeatureTests",
-		dependencies: [
-			"Asset",
-			"FungibleTokenListFeature",
-			"HomeFeature",
-			"NonFungibleTokenListFeature",
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "ManageBrowserExtensionConnectionsFeature",
-		dependencies: [
-			"Common",
-			converse,
-			"DesignSystem",
-			profile,
-			tca,
-		]
-	),
-	.testTarget(
-		name: "ManageBrowserExtensionConnectionsFeatureTests",
-		dependencies: [
-			"ManageBrowserExtensionConnectionsFeature",
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "IncomingConnectionRequestFromDappReviewFeature",
-		dependencies: [
-			"Common",
-			"DesignSystem",
-			profile,
-			"ProfileClient",
-			tca,
-		],
-		resources: [
-			.process("Resources"),
-		]
-	),
-	.testTarget(
-		name: "IncomingConnectionRequestFromDappReviewFeatureTests",
-		dependencies: [
-			"IncomingConnectionRequestFromDappReviewFeature",
-			"ProfileClient",
-			tca,
-			"TestUtils",
 		]
 	),
 	.target(
@@ -510,6 +486,23 @@ package.targets += [
 		name: "MainFeatureTests",
 		dependencies: [
 			"MainFeature",
+			"TestUtils",
+		]
+	),
+	.target(
+		name: "ManageBrowserExtensionConnectionsFeature",
+		dependencies: [
+			"Common",
+			converse,
+			"DesignSystem",
+			profile,
+			tca,
+		]
+	),
+	.testTarget(
+		name: "ManageBrowserExtensionConnectionsFeatureTests",
+		dependencies: [
+			"ManageBrowserExtensionConnectionsFeature",
 			"TestUtils",
 		]
 	),
