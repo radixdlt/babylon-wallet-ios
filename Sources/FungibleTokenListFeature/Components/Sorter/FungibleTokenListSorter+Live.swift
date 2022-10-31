@@ -1,7 +1,7 @@
 import Asset
 
 public extension FungibleTokenListSorter {
-	static let live = Self(
+	static let liveValue = Self(
 		sortTokens: { tokenContainers in
 			var xrdContainer: FungibleTokenContainer?
 			var noValueTokens = [FungibleTokenContainer]()

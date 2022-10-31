@@ -149,7 +149,6 @@ private extension Color {
 	}
 }
 
-#if DEBUG
 public extension Color.App {
 	static var random: Color {
 		Color(
@@ -159,4 +158,3 @@ public extension Color.App {
 		)
 	}
 }
-#endif

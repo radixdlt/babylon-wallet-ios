@@ -207,6 +207,8 @@ private extension Home.View {
 	}
 }
 
+#if DEBUG
+
 // MARK: - HomeView_Previews
 struct HomeView_Previews: PreviewProvider {
 	static var previews: some View {
@@ -218,3 +220,4 @@ struct HomeView_Previews: PreviewProvider {
 		)
 	}
 }
+#endif // DEBUG

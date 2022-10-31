@@ -6,7 +6,9 @@ public enum GatewayAPIClientKey: DependencyKey {}
 public extension GatewayAPIClientKey {
 	typealias Value = GatewayAPIClient
 	static let liveValue = GatewayAPIClient.live()
+	#if DEBUG
 	static let testValue = GatewayAPIClient.mock()
+	#endif // DEBUG
 }
 
 public extension DependencyValues {

@@ -127,6 +127,8 @@ extension ChooseAccounts.View {
 	}
 }
 
+#if DEBUG
+
 // MARK: - ChooseAccounts_Preview
 struct ChooseAccounts_Preview: PreviewProvider {
 	static var previews: some View {
@@ -140,3 +142,4 @@ struct ChooseAccounts_Preview: PreviewProvider {
 		)
 	}
 }
+#endif // DEBUG

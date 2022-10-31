@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import ProfileClient
 
 // MARK: - IncomingConnectionRequestFromDappReview
 public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {

@@ -108,6 +108,8 @@ extension AccountCompletion.View {
 	}
 }
 
+#if DEBUG
+
 // MARK: - AccountCompletion_Preview
 struct AccountCompletion_Preview: PreviewProvider {
 	static var previews: some View {
@@ -121,3 +123,5 @@ struct AccountCompletion_Preview: PreviewProvider {
 		)
 	}
 }
+
+#endif // DEBUG

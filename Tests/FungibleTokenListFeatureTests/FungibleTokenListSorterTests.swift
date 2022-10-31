@@ -8,7 +8,7 @@ final class FungibleTokenListSorterTests: TestCase {
 
 	override func setUpWithError() throws {
 		try super.setUpWithError()
-		sut = FungibleTokenListSorter.live
+		sut = FungibleTokenListSorter.liveValue
 	}
 
 	override func tearDownWithError() throws {

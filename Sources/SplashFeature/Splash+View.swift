@@ -58,6 +58,8 @@ extension Splash.Action {
 	}
 }
 
+#if DEBUG
+
 // MARK: - SplashView_Previews
 struct SplashView_Previews: PreviewProvider {
 	static var previews: some View {
@@ -74,3 +76,4 @@ struct SplashView_Previews: PreviewProvider {
 		)
 	}
 }
+#endif // DEBUG

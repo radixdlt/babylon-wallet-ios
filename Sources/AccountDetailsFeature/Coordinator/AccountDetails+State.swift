@@ -28,7 +28,9 @@ public extension AccountDetails {
 				isCurrencyAmountVisible: account.isCurrencyAmountVisible
 			)
 
-			let fungibleTokenCategories = FungibleTokenListSorter.live.sortTokens(account.portfolio.fungibleTokenContainers)
+			// FIXME: Should not access Dependency `FungibleTokenListSorter` directly
+			// move this into Reducer!
+			let fungibleTokenCategories = FungibleTokenListSorter.liveValue.sortTokens(account.portfolio.fungibleTokenContainers)
 
 			assets = .init(
 				fungibleTokenList: .init(

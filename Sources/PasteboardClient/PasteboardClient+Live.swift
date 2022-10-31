@@ -7,6 +7,7 @@ public typealias Pasteboard = NSPasteboard
 #endif
 
 public extension PasteboardClient {
+	static var liveValue: Self = .live()
 	static func live(pasteboard: Pasteboard = .general) -> Self {
 		#if os(macOS)
 		// https://stackoverflow.com/a/71927867

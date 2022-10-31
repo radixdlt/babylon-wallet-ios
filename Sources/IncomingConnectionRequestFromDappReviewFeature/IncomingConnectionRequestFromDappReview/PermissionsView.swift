@@ -54,6 +54,8 @@ struct PermissionDetails: View {
 	}
 }
 
+#if DEBUG
+
 // MARK: - PermissionsView_Previews
 struct PermissionsView_Previews: PreviewProvider {
 	static var previews: some View {
@@ -66,3 +68,4 @@ struct PermissionsView_Previews: PreviewProvider {
 		)
 	}
 }
+#endif // DEBUG

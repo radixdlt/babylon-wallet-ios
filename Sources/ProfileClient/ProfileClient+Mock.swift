@@ -4,6 +4,7 @@ import Mnemonic
 import NonEmpty
 import Profile
 
+#if DEBUG
 public extension ProfileClient {
 	static func mock() -> Self {
 		Self(
@@ -73,3 +74,5 @@ public extension ProfileClient {
 		)
 	}
 }
+
+#endif // DEBUG
