@@ -85,20 +85,66 @@ extension Package {
 		let name: String
 		let category: String
 		let dependencies: [Target.Dependency]
+		let exclude: [String]
 		let resources: [Resource]?
 		let tests: Tests
 		let isProduct: Bool
 
-		static func feature(name: String, dependencies: [Target.Dependency], resources: [Resource]? = nil, tests: Tests, isProduct: Bool = true) -> Self {
-			.init(name: name, category: "Features", dependencies: dependencies, resources: resources, tests: tests, isProduct: isProduct)
+		static func feature(
+			name: String,
+			dependencies: [Target.Dependency],
+			exclude: [String] = [],
+			resources: [Resource]? = nil,
+			tests: Tests,
+			isProduct: Bool = true
+		) -> Self {
+			.init(
+				name: name,
+				category: "Features",
+				dependencies: dependencies,
+				exclude: exclude,
+				resources: resources,
+				tests: tests,
+				isProduct: isProduct
+			)
 		}
 
-		static func client(name: String, dependencies: [Target.Dependency], resources: [Resource]? = nil, tests: Tests, isProduct: Bool = false) -> Self {
-			.init(name: name, category: "Clients", dependencies: dependencies, resources: resources, tests: tests, isProduct: isProduct)
+		static func client(
+			name: String,
+			dependencies: [Target.Dependency],
+			exclude: [String] = [],
+			resources: [Resource]? = nil,
+			tests: Tests,
+			isProduct: Bool = false
+		) -> Self {
+			.init(
+				name: name,
+				category: "Clients",
+				dependencies: dependencies,
+				exclude: exclude,
+				resources: resources,
+				tests: tests,
+				isProduct: isProduct
+			)
 		}
 
-		static func core(name: String, dependencies: [Target.Dependency], resources: [Resource]? = nil, tests: Tests, isProduct: Bool = false) -> Self {
-			.init(name: name, category: "Core", dependencies: dependencies, resources: resources, tests: tests, isProduct: isProduct)
+		static func core(
+			name: String,
+			dependencies: [Target.Dependency],
+			exclude: [String] = [],
+			resources: [Resource]? = nil,
+			tests: Tests,
+			isProduct: Bool = false
+		) -> Self {
+			.init(
+				name: name,
+				category: "Core",
+				dependencies: dependencies,
+				exclude: exclude,
+				resources: resources,
+				tests: tests,
+				isProduct: isProduct
+			)
 		}
 	}
 
@@ -111,8 +157,9 @@ extension Package {
 	private func addModule(_ module: Module) {
 		let targetName = module.name
 		package.targets += [
-			.target(name: targetName, dependencies: module.dependencies, resources: module.resources),
+			.target(name: targetName, dependencies: module.dependencies, exclude: module.exclude, resources: module.resources),
 		]
+
 		switch module.tests {
 		case .no:
 			break
@@ -410,31 +457,8 @@ package.addModules([
 
 // MARK: - Clients
 
-// MARK: - Core
-
 package.addModules([
-	.core(
-		name: "DesignSystem",
-		dependencies: [],
-		resources: [.process("Fonts")],
-		tests: .no
-	),
-])
-
-package.targets += [
-	// Targets sorted lexicographically, placing `testTarget` just after `target`.
-
-	// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
-	.target(name: "_BuildTools"),
-	.testTarget(
-		name: "AccountPortfolioTests",
-		dependencies: [
-			"AccountPortfolio",
-			dependencies,
-			"TestUtils",
-		]
-	),
-	.target(
+	.client(
 		name: "AccountPortfolio",
 		dependencies: [
 			"AppSettings",
@@ -444,54 +468,37 @@ package.targets += [
 			"GatewayAPI",
 			profile,
 			dependencies,
-		]
+		],
+		tests: .yes(
+			dependencies: [
+				dependencies,
+				"TestUtils",
+			]
+		)
 	),
-	.target(
+	.client(
 		name: "AppSettings",
 		dependencies: [
 			"Common",
 			dependencies,
 			"UserDefaultsClient",
-		]
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
-	.testTarget(
-		name: "AppSettingsTests",
-		dependencies: [
-			"AppSettings",
-			"TestUtils",
-		]
-	),
-	.target(
+	.client(
 		name: "Asset",
 		dependencies: [
 			"Common",
 			profile, // Address
 			bigInt,
-		]
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
-	.testTarget(
-		name: "AssetTests",
-		dependencies: [
-			"Asset",
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "Common",
-		dependencies: [
-			profile, // Address
-			bigInt,
-			"DesignSystem",
-		]
-	),
-	.testTarget(
-		name: "CommonTests",
-		dependencies: [
-			"Common",
-			"TestUtils",
-		]
-	),
-	.target(
+	.client(
 		name: "EngineToolkitClient",
 		dependencies: [
 			bigInt,
@@ -499,16 +506,12 @@ package.targets += [
 			"Common",
 			dependencies,
 			engineToolkit,
-		]
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
-	.testTarget(
-		name: "EngineToolkitClientTests",
-		dependencies: [
-			"EngineToolkitClient",
-			"TestUtils",
-		]
-	),
-	.target(
+	.client(
 		name: "GatewayAPI",
 		dependencies: [
 			.product(name: "AnyCodable", package: "AnyCodable"),
@@ -522,75 +525,43 @@ package.targets += [
 		],
 		exclude: [
 			"CodeGen/Input/",
-		]
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
-	.testTarget(
-		name: "GatewayAPITests",
-		dependencies: [
-			"TestUtils",
-			"GatewayAPI",
-		]
-	),
-	.target(
+	.client(
 		name: "LocalAuthenticationClient",
-		dependencies: []
+		dependencies: [],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
-	.testTarget(
-		name: "LocalAuthenticationClientTests",
-		dependencies: [
-			"LocalAuthenticationClient",
-			"TestUtils",
-		]
-	),
-	.target(
+	.client(
 		name: "PasteboardClient",
-		dependencies: [
-			dependencies,
-		]
+		dependencies: [dependencies],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
-	.testTarget(
-		name: "PasteboardClientTests",
-		dependencies: [
-			"PasteboardClient",
-			"TestUtils",
-		]
-	),
-	.target(
+	.client(
 		name: "ProfileLoader",
 		dependencies: [
 			profile,
 			keychainClient,
-		]
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
-	.testTarget(
-		name: "ProfileLoaderTests",
-		dependencies: [
-			"ProfileLoader",
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "TestUtils",
-		dependencies: [
-			"Common",
-			profile, // Actually `Mnemonic`, Contains Data+Hex extension. FIXME: Extract Data+Hex functions to seperate repo, which Mnemonic and thus this TestUtils package can depend on.
-			tca,
-		]
-	),
-	.target(
+	.client(
 		name: "UserDefaultsClient",
-		dependencies: [
-			dependencies,
-		]
+		dependencies: [dependencies],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
-	.testTarget(
-		name: "UserDefaultsClientTests",
-		dependencies: [
-			"UserDefaultsClient",
-			"TestUtils",
-		]
-	),
-	.target(
+	.client(
 		name: "ProfileClient",
 		dependencies: [
 			"EngineToolkitClient", // Create TX
@@ -598,13 +569,47 @@ package.targets += [
 			profile,
 			"ProfileLoader",
 			dependencies, // XCTestDynamicOverlay + DependencyKey
-		]
-	),
-	.testTarget(
-		name: "ProfileClientTests",
-		dependencies: [
-			"ProfileClient",
-			"TestUtils",
-		]
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
 ]
+
+
+// MARK: - Core
+
+package.addModules([
+	// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
+	.core(
+		name: "_BuildTools",
+		dependencies: [],
+		tests: .no
+	)
+	.core(
+		name: "Common",
+		dependencies: [
+			profile, // Address
+			bigInt,
+			"DesignSystem",
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.core(
+		name: "DesignSystem",
+		dependencies: [],
+		resources: [.process("Fonts")],
+		tests: .no
+	),
+	.core(
+		name: "TestUtils",
+		dependencies: [
+			"Common",
+			profile, // Actually `Mnemonic`, Contains Data+Hex extension. FIXME: Extract Data+Hex functions to seperate repo, which Mnemonic and thus this TestUtils package can depend on.
+			tca,
+		],
+		tests: .no
+	),
+])
