@@ -263,7 +263,6 @@ package.targets += [
 
 	// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
 	.target(name: "_BuildTools"),
-
 	.testTarget(
 		name: "AccountPortfolioTests",
 		dependencies: [
@@ -314,7 +313,6 @@ package.targets += [
 			"TestUtils",
 		]
 	),
-
 	.target(
 		name: "Common",
 		dependencies: [
@@ -330,7 +328,6 @@ package.targets += [
 			"TestUtils",
 		]
 	),
-
 	.target(
 		name: "EngineToolkitClient",
 		dependencies: [
@@ -348,15 +345,14 @@ package.targets += [
 			"TestUtils",
 		]
 	),
-
-		.target(
-			name: "DesignSystem",
-			dependencies: [
-			],
-			resources: [
-				.process("Fonts"),
-			]
-		),
+	.target(
+		name: "DesignSystem",
+		dependencies: [
+		],
+		resources: [
+			.process("Fonts"),
+		]
+	),
 	.target(
 		name: "FungibleTokenListFeature",
 		dependencies: [
@@ -427,17 +423,16 @@ package.targets += [
 			"TestUtils",
 		]
 	),
-
-		.target(
-			name: "ManageBrowserExtensionConnectionsFeature",
-			dependencies: [
-				"Common",
-				converse,
-				"DesignSystem",
-				profile,
-				tca,
-			]
-		),
+	.target(
+		name: "ManageBrowserExtensionConnectionsFeature",
+		dependencies: [
+			"Common",
+			converse,
+			"DesignSystem",
+			profile,
+			tca,
+		]
+	),
 	.testTarget(
 		name: "ManageBrowserExtensionConnectionsFeatureTests",
 		dependencies: [
@@ -445,20 +440,19 @@ package.targets += [
 			"TestUtils",
 		]
 	),
-
-		.target(
-			name: "IncomingConnectionRequestFromDappReviewFeature",
-			dependencies: [
-				"Common",
-				"DesignSystem",
-				profile,
-				"ProfileClient",
-				tca,
-			],
-			resources: [
-				.process("Resources"),
-			]
-		),
+	.target(
+		name: "IncomingConnectionRequestFromDappReviewFeature",
+		dependencies: [
+			"Common",
+			"DesignSystem",
+			profile,
+			"ProfileClient",
+			tca,
+		],
+		resources: [
+			.process("Resources"),
+		]
+	),
 	.testTarget(
 		name: "IncomingConnectionRequestFromDappReviewFeatureTests",
 		dependencies: [
@@ -468,16 +462,15 @@ package.targets += [
 			"TestUtils",
 		]
 	),
-
-		.target(
-			name: "ImportProfileFeature",
-			dependencies: [
-				"Common",
-				profile,
-				"ProfileClient",
-				tca,
-			]
-		),
+	.target(
+		name: "ImportProfileFeature",
+		dependencies: [
+			"Common",
+			profile,
+			"ProfileClient",
+			tca,
+		]
+	),
 	.testTarget(
 		name: "ImportProfileFeatureTests",
 		dependencies: [
@@ -488,11 +481,10 @@ package.targets += [
 			.process("profile_snapshot.json"),
 		]
 	),
-
-		.target(
-			name: "LocalAuthenticationClient",
-			dependencies: []
-		),
+	.target(
+		name: "LocalAuthenticationClient",
+		dependencies: []
+	),
 	.testTarget(
 		name: "LocalAuthenticationClientTests",
 		dependencies: [
