@@ -76,25 +76,34 @@ let bite: Target.Dependency = .product(
 // MARK: - Abstract TCA Modules
 
 extension Package {
-	struct TCAModule {
-		enum Category: String {
-			case features = "Features"
-			case clients = "Clients"
-		}
-
+	struct Module {
 		enum Tests {
 			case no
-			case yes(dependencies: [Target.Dependency])
+			case yes(nameSuffix: String = "Tests", dependencies: [Target.Dependency])
 		}
 
 		let name: String
-		let category: Category
+		let category: String
 		let dependencies: [Target.Dependency]
 		let tests: Tests
 		let isProduct: Bool
+
+		static func feature(name: String, dependencies: [Target.Dependency], tests: Tests, isProduct: Bool = true) -> Self {
+			.init(name: name, category: "Features", dependencies: dependencies, tests: tests, isProduct: isProduct)
+		}
+
+		static func client(name: String, dependencies: [Target.Dependency], tests: Tests, isProduct: Bool = false) -> Self {
+			.init(name: name, category: "Clients", dependencies: dependencies, tests: tests, isProduct: isProduct)
+		}
 	}
 
-	private func addTCAModule(_ module: TCAModule) {
+	func addModules(_ modules: [Module]) {
+		for module in modules {
+			addModule(module)
+		}
+	}
+
+	private func addModule(_ module: Module) {
 		let targetName = module.name
 		package.targets += [
 			.target(name: targetName, dependencies: module.dependencies)
@@ -102,8 +111,8 @@ extension Package {
 		switch module.tests {
 		case .no:
 			break
-		case .yes(let testDependencies):
-			let testTargetName = targetName + "Tests"
+		case .yes(let nameSuffix, let testDependencies):
+			let testTargetName = targetName + nameSuffix
 			package.targets += [
 				.testTarget(
 					name: testTargetName,
@@ -121,34 +130,40 @@ extension Package {
 
 // MARK: - Features
 
-extension Package {
-	func addFeature(name: String, dependencies: [Target.Dependency], tests: TCAModule.Tests, isProduct: Bool = true) {
-		addTCAModule(.init(name: name, category: .features, dependencies: dependencies, tests: tests, isProduct: isProduct))
-	}
-}
-
-package.addFeature(
-	name: "AccountListFeature",
-	dependencies: [
-		"AccountPortfolio",
-		"Asset",
-		"FungibleTokenListFeature",
-		profile,
-		"ProfileClient",
-		tca,
-	],
-	tests: .yes(dependencies: [
-		"TestUtils",
-	])
-)
+package.addModules([
+	.feature(
+		name: "AccountListFeature",
+		dependencies: [
+			"AccountPortfolio",
+			"Asset",
+			"FungibleTokenListFeature",
+			profile,
+			"ProfileClient",
+			tca,
+		],
+		tests: .yes(dependencies: [
+			"TestUtils",
+		])
+	),
+	.feature(
+		name: "AccountDetailsFeature",
+		dependencies: [
+			"AccountListFeature",
+			"AggregatedValueFeature",
+			"Asset",
+			"AssetsViewFeature",
+			"DesignSystem",
+			engineToolkit,
+			profile,
+			tca,
+		],
+		tests: .yes(dependencies: [
+			"TestUtils",
+		])
+	),
+])
 
 // MARK: - Clients
-
-extension Package {
-	func addClient(name: String, dependencies: [Target.Dependency], tests: TCAModule.Tests, isProduct: Bool = false) {
-		addTCAModule(.init(name: name, category: .clients, dependencies: dependencies, tests: tests, isProduct: isProduct))
-	}
-}
 
 package.products += [
 	.library(
@@ -184,26 +199,7 @@ package.targets += [
 
 	// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
 	.target(name: "_BuildTools"),
-	.target(
-		name: "AccountDetailsFeature",
-		dependencies: [
-			"AccountListFeature",
-			"AggregatedValueFeature",
-			"Asset",
-			"AssetsViewFeature",
-			"DesignSystem",
-			engineToolkit,
-			profile,
-			tca,
-		]
-	),
-	.testTarget(
-		name: "AccountDetailsFeatureTests",
-		dependencies: [
-			"AccountDetailsFeature",
-			"TestUtils",
-		]
-	),
+
 	.target(
 		name: "AccountPortfolio",
 		dependencies: [
