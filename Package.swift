@@ -574,7 +574,7 @@ package.addModules([
 			dependencies: ["TestUtils"]
 		)
 	),
-]
+])
 
 
 // MARK: - Core
