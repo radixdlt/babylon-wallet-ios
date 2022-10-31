@@ -73,7 +73,7 @@ let bite: Target.Dependency = .product(
 	package: "Bite"
 )
 
-// MARK: - Abstract TCA Modules
+// MARK: - Defining TCA Modules
 
 extension Package {
 	struct Module {
@@ -132,20 +132,6 @@ extension Package {
 
 package.addModules([
 	.feature(
-		name: "AccountListFeature",
-		dependencies: [
-			"AccountPortfolio",
-			"Asset",
-			"FungibleTokenListFeature",
-			profile,
-			"ProfileClient",
-			tca,
-		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
-	),
-	.feature(
 		name: "AccountDetailsFeature",
 		dependencies: [
 			"AccountListFeature",
@@ -157,10 +143,25 @@ package.addModules([
 			profile,
 			tca,
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
+	.feature(
+		name: "AccountListFeature",
+		dependencies: [
+			"AccountPortfolio",
+			"Asset",
+			"FungibleTokenListFeature",
+			profile,
+			"ProfileClient",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	
 ])
 
 // MARK: - Clients
@@ -199,7 +200,6 @@ package.targets += [
 
 	// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
 	.target(name: "_BuildTools"),
-
 	.target(
 		name: "AccountPortfolio",
 		dependencies: [
@@ -322,15 +322,14 @@ package.targets += [
 			"TestUtils",
 		]
 	),
-
-		.target(
-			name: "Common",
-			dependencies: [
-				profile, // Address
-				bigInt,
-				"DesignSystem",
-			]
-		),
+	.target(
+		name: "Common",
+		dependencies: [
+			profile, // Address
+			bigInt,
+			"DesignSystem",
+		]
+	),
 	.testTarget(
 		name: "CommonTests",
 		dependencies: [
