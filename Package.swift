@@ -451,6 +451,19 @@ package.addModules([
 			dependencies: ["TestUtils"]
 		)
 	),
+	.feature(
+		name: "TransactionSigningFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
+			"EngineToolkitClient",
+			"GatewayAPI",
+			"ProfileClient",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .no
+	),
 ])
 
 // MARK: - Clients
