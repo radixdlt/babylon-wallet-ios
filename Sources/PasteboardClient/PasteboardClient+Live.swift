@@ -6,8 +6,8 @@ import AppKit
 public typealias Pasteboard = NSPasteboard
 #endif
 
-extension PasteboardClient {
-	public static let liveValue: Self = {
+public extension PasteboardClient {
+	static let liveValue: Self = {
 		let pasteboard = Pasteboard.general
 		#if os(macOS)
 		// https://stackoverflow.com/a/71927867
