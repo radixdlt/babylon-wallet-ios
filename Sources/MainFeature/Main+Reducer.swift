@@ -54,6 +54,9 @@ public extension Main {
 			case .settings(.internal(_)):
 				return .none
 
+			case .settings(.manageBrowserExtensionConnections(_)):
+				return .none
+
 			case .home(.internal(_)):
 				return .none
 			case .home(.header(_)):
