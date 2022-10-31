@@ -211,7 +211,6 @@ package.addModules([
 			"AccountPortfolio",
 			"Asset",
 			"FungibleTokenListFeature",
-			profile,
 			"ProfileClient",
 			tca,
 		],
@@ -283,9 +282,8 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			keychainClient,
-			profile,
-			tca,
 			"ProfileClient",
+			tca,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -320,7 +318,6 @@ package.addModules([
 			engineToolkit,
 			"IncomingConnectionRequestFromDappReviewFeature",
 			"PasteboardClient",
-			profile,
 			"ProfileClient",
 			tca,
 			// ^^^ Sort lexicographically ^^^
@@ -338,7 +335,6 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Common",
-			profile,
 			"ProfileClient",
 			tca,
 		],
@@ -352,7 +348,6 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"DesignSystem",
-			profile,
 			"ProfileClient",
 			tca,
 		],
@@ -413,7 +408,6 @@ package.addModules([
 			"Common",
 			engineToolkit,
 			"ImportProfileFeature",
-			profile,
 			"ProfileClient",
 			tca,
 			// ^^^ Sort lexicographically ^^^
@@ -448,10 +442,9 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-			profile,
+			"ProfileClient",
 			"ProfileLoader",
 			tca,
-			"ProfileClient",
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
