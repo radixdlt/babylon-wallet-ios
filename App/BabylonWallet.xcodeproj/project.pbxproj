@@ -247,7 +247,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo \"warning: Next warning 'no such SDK: macosx' can be ignored. This manual warning is located in iOS Target -> Build Phases -> SwiftFormat. The 'SDKROOT=macosx ' part of the run SwiftFormat comman below is neccessary. But I have not managed to get `xcrun --show-sdk-path` or similar to work.\"\nSDKROOT=macosx swift run -c release --package-path ../Sources/_BuildTools swiftformat \"$SRCROOT/../\"\n";
+			shellScript = "echo \"warning: Next warning 'no such SDK: macosx' can be ignored. This manual warning is located in iOS Target -> Build Phases -> SwiftFormat. The 'SDKROOT=macosx ' part of the run SwiftFormat comman below is neccessary. But I have not managed to get `xcrun --show-sdk-path` or similar to work.\"\nSDKROOT=macosx swift run -c release --package-path ../Sources/Core/_BuildTools swiftformat \"$SRCROOT/../\"\n";
 		};
 		E68FEA34286DD72F00992DFA /* SwiftFormat */ = {
 			isa = PBXShellScriptBuildPhase;
