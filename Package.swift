@@ -373,6 +373,39 @@ package.addModules([
 			]
 		)
 	),
+	.feature(
+		name: "SettingsFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
+			profile,
+			"GatewayAPI",
+			keychainClient,
+			"ManageBrowserExtensionConnectionsFeature",
+			"ProfileClient",
+			.product(name: "ProfileView", package: "swift-profile"),
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "SplashFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
+			profile,
+			"ProfileLoader",
+			tca,
+			"ProfileClient",
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
 ])
 
 // MARK: - Clients
@@ -533,47 +566,6 @@ package.targets += [
 		name: "ProfileLoaderTests",
 		dependencies: [
 			"ProfileLoader",
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "SettingsFeature",
-		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"Common",
-			profile,
-			"GatewayAPI",
-			keychainClient,
-			"ManageBrowserExtensionConnectionsFeature",
-			"ProfileClient",
-			.product(name: "ProfileView", package: "swift-profile"),
-			tca,
-			// ^^^ Sort lexicographically ^^^
-		]
-	),
-	.testTarget(
-		name: "SettingsFeatureTests",
-		dependencies: [
-			"SettingsFeature",
-			"TestUtils",
-		]
-	),
-	.target(
-		name: "SplashFeature",
-		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"Common",
-			profile,
-			"ProfileLoader",
-			tca,
-			"ProfileClient",
-			// ^^^ Sort lexicographically ^^^
-		]
-	),
-	.testTarget(
-		name: "SplashFeatureTests",
-		dependencies: [
-			"SplashFeature",
 			"TestUtils",
 		]
 	),
