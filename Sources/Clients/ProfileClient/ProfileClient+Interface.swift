@@ -72,11 +72,6 @@ public extension ProfileClient {
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 }
 
-// MARK: - TransactionIntent.TXID
-public extension TransactionIntent {
-	typealias TXID = Tagged<Self, String>
-}
-
 // MARK: - InjectProfileMode
 public enum InjectProfileMode {
 	case onlyInject
@@ -92,4 +87,9 @@ public struct CreateAccountRequest {
 	) {
 		self.accountName = accountName
 	}
+}
+
+// MARK: - TransactionIntent.TXID
+public extension TransactionIntent {
+	typealias TXID = Tagged<Self, String>
 }
