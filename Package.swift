@@ -3,28 +3,36 @@
 
 import PackageDescription
 
-// MARK: RDX Package Dependencies
-let converseDep: PackageDescription.Package.Dependency = .package(
-	url: "git@github.com:radixdlt/Converse.git",
-	from: "0.1.13"
+let package = Package(
+	name: "Babylon",
+	platforms: [
+		.macOS(.v12), // for development purposes
+		.iOS(.v15), // `task` in SwiftUI
+	]
 )
 
-let biteDep: PackageDescription.Package.Dependency = .package(
-	url: "git@github.com:radixdlt/Bite.git",
-	from: "0.0.1"
-)
+// MARK: - Dependencies
 
-let profileDep: PackageDescription.Package.Dependency = .package(
-	url: "git@github.com:radixdlt/swift-profile.git",
-	from: "0.0.27"
-)
+package.dependencies += [
+	// RDX Works Package depedencies
+	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.13"),
+	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.27"),
 
-let engineToolkitDep: PackageDescription.Package.Dependency = .package(
-	url: "git@github.com:radixdlt/swift-engine-toolkit.git",
-	from: "0.0.9"
-)
+	// BigInt
+	.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
 
-// MARK: Target Dependencies
+	// TCA - ComposableArchitecture used as architecture
+	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
+
+	// Format code
+	.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
+
+	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
+	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
+]
+
 let tca: Target.Dependency = .product(
 	name: "ComposableArchitecture",
 	package: "swift-composable-architecture"
@@ -65,595 +73,547 @@ let bite: Target.Dependency = .product(
 	package: "Bite"
 )
 
-let package = Package(
-	name: "Babylon",
-	platforms: [
-		.macOS(.v12), // for development purposes
-		.iOS(.v15), // `task` in SwiftUI
-	],
-	products: [
-		.library(
-			name: "AccountListFeature",
-			targets: ["AccountListFeature"]
-		),
-		.library(
-			name: "AppFeature",
-			targets: ["AppFeature"]
-		),
-		.library(
-			name: "CreateAccountFeature",
-			targets: ["CreateAccountFeature"]
-		),
-		.library(
-			name: "DesignSystem",
-			targets: ["DesignSystem"]
-		),
-		.library(
-			name: "HomeFeature",
-			targets: ["HomeFeature"]
-		),
-		.library(
-			name: "IncomingConnectionRequestFromDappReviewFeature",
-			targets: ["IncomingConnectionRequestFromDappReviewFeature"]
-		),
-		.library(
-			name: "ImportProfileFeature",
-			targets: ["ImportProfileFeature"]
-		),
+// MARK: - Defining TCA Modules
 
-	],
-	dependencies: [
-		// RDX Works Package depedencies
-		biteDep,
-		converseDep,
-		engineToolkitDep,
-		profileDep,
+extension Package {
+	struct Module {
+		enum Tests {
+			case no
+			case yes(nameSuffix: String = "Tests", dependencies: [Target.Dependency], resources: [Resource]? = nil)
+		}
 
-		// BigInt
-		.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
+		let name: String
+		let category: String
+		let dependencies: [Target.Dependency]
+		let exclude: [String]
+		let resources: [Resource]?
+		let tests: Tests
+		let isProduct: Bool
 
-		// TCA - ComposableArchitecture used as architecture
-		.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
+		static func feature(
+			name: String,
+			dependencies: [Target.Dependency],
+			exclude: [String] = [],
+			resources: [Resource]? = nil,
+			tests: Tests,
+			isProduct: Bool = true
+		) -> Self {
+			.init(
+				name: name,
+				category: "Features",
+				dependencies: dependencies,
+				exclude: exclude,
+				resources: resources,
+				tests: tests,
+				isProduct: isProduct
+			)
+		}
 
-		// Format code
-		.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
+		static func client(
+			name: String,
+			dependencies: [Target.Dependency],
+			exclude: [String] = [],
+			resources: [Resource]? = nil,
+			tests: Tests,
+			isProduct: Bool = false
+		) -> Self {
+			.init(
+				name: name,
+				category: "Clients",
+				dependencies: dependencies,
+				exclude: exclude,
+				resources: resources,
+				tests: tests,
+				isProduct: isProduct
+			)
+		}
 
-		// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
-		.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
-	],
-	targets: [
-		// Targets sorted lexicographically, placing `testTarget` just after `target`.
+		static func core(
+			name: String,
+			dependencies: [Target.Dependency],
+			exclude: [String] = [],
+			resources: [Resource]? = nil,
+			tests: Tests,
+			isProduct: Bool = false
+		) -> Self {
+			.init(
+				name: name,
+				category: "Core",
+				dependencies: dependencies,
+				exclude: exclude,
+				resources: resources,
+				tests: tests,
+				isProduct: isProduct
+			)
+		}
+	}
 
-		// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
-		.target(name: "_BuildTools"),
-		.target(
-			name: "AccountDetailsFeature",
-			dependencies: [
-				"AccountListFeature",
-				"AggregatedValueFeature",
-				"Asset",
-				"AssetsViewFeature",
-				"DesignSystem",
-				engineToolkit,
-				profile,
-				tca,
-			]
-		),
-		.testTarget(
-			name: "AccountDetailsFeatureTests",
-			dependencies: [
-				"AccountDetailsFeature",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "AccountListFeature",
-			dependencies: [
-				"AccountPortfolio",
-				"Asset",
-				"FungibleTokenListFeature",
-				profile,
-				"ProfileClient",
-				tca,
-			]
-		),
-		.testTarget(
-			name: "AccountListFeatureTests",
-			dependencies: [
-				"AccountListFeature",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "AccountPortfolio",
-			dependencies: [
-				"AppSettings",
-				"Asset",
-				bigInt,
-				"Common",
-				"GatewayAPI",
-				profile,
-				dependencies,
-			]
-		),
-		.testTarget(
-			name: "AccountPortfolioTests",
-			dependencies: [
-				"AccountPortfolio",
-				dependencies,
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "AccountPreferencesFeature",
-			dependencies: [
-				"Common",
-				tca,
-			]
-		),
-		.testTarget(
-			name: "AccountPreferencesFeatureTests",
-			dependencies: [
-				"AccountPreferencesFeature",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "AggregatedValueFeature",
-			dependencies: [
-				"Common",
-				tca,
-			]
-		),
-		.testTarget(
-			name: "AggregatedValueFeatureTests",
-			dependencies: [
-				"AggregatedValueFeature",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "AppFeature",
-			dependencies: [
-				// ˅˅˅ Sort lexicographically ˅˅˅
-				"AccountPortfolio",
-				"AppSettings",
-				engineToolkit,
-				"MainFeature",
-				"OnboardingFeature",
-				"PasteboardClient",
-				"ProfileLoader",
-				"ProfileClient",
-				"SplashFeature",
-				tca,
-				"UserDefaultsClient",
-				// ^^^ Sort lexicographically ^^^
-			]
-		),
-		.testTarget(
-			name: "AppFeatureTests",
-			dependencies: [
-				"AppFeature",
-				"SplashFeature",
-				"TestUtils",
-				"ProfileClient",
-			]
-		),
-		.target(
-			name: "AppSettings",
-			dependencies: [
-				"Common",
-				dependencies,
-				"UserDefaultsClient",
-			]
-		),
-		.testTarget(
-			name: "AppSettingsTests",
-			dependencies: [
-				"AppSettings",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "Asset",
-			dependencies: [
-				"Common",
-				profile, // Address
-				bigInt,
-			]
-		),
-		.testTarget(
-			name: "AssetTests",
-			dependencies: [
-				"Asset",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "AssetsViewFeature",
-			dependencies: [
-				"Asset",
-				"Common",
-				"FungibleTokenListFeature",
-				"NonFungibleTokenListFeature",
-				tca,
-			]
-		),
-		.testTarget(
-			name: "AssetsViewFeatureTests",
-			dependencies: [
-				"AssetsViewFeature",
-				"TestUtils",
-			]
-		),
+	func addModules(_ modules: [Module]) {
+		for module in modules {
+			addModule(module)
+		}
+	}
 
-		.target(
-			name: "Common",
-			dependencies: [
-				profile, // Address
-				bigInt,
-				"DesignSystem",
-			]
-		),
-		.testTarget(
-			name: "CommonTests",
-			dependencies: [
-				"Common",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "CreateAccountFeature",
-			dependencies: [
-				"Common",
-				"DesignSystem",
-				keychainClient,
-				profile,
-				tca,
-				"ProfileClient",
-			],
-			resources: [
-				.process("Resources"),
-			]
-		),
-		.testTarget(
-			name: "CreateAccountFeatureTests",
-			dependencies: [
-				"CreateAccountFeature",
-				"TestUtils",
-			]
-		),
+	private func addModule(_ module: Module) {
+		let targetName = module.name
+		let targetPath = "Sources/\(module.category)/\(targetName)"
 
-		.target(
-			name: "EngineToolkitClient",
-			dependencies: [
-				bigInt,
-				bite,
-				"Common",
-				dependencies,
-				engineToolkit,
-			]
-		),
-		.testTarget(
-			name: "EngineToolkitClientTests",
-			dependencies: [
-				"EngineToolkitClient",
-				"TestUtils",
-			]
-		),
+		package.targets += [
+			.target(name: targetName, dependencies: module.dependencies, path: targetPath, exclude: module.exclude, resources: module.resources),
+		]
 
-		.target(
-			name: "DesignSystem",
-			dependencies: [
-			],
-			resources: [
-				.process("Fonts"),
+		switch module.tests {
+		case .no:
+			break
+		case let .yes(nameSuffix, testDependencies, resources):
+			let testTargetName = targetName + nameSuffix
+			let testTargetPath = "Tests/\(module.category)/\(testTargetName)"
+			package.targets += [
+				.testTarget(
+					name: testTargetName,
+					dependencies: [.target(name: targetName)] + testDependencies,
+					path: testTargetPath,
+					resources: resources
+				),
 			]
-		),
-		.target(
-			name: "FungibleTokenListFeature",
-			dependencies: [
-				"Asset",
-				"Common",
-				tca,
-			]
-		),
-		.testTarget(
-			name: "FungibleTokenListFeatureTests",
-			dependencies: [
-				"Asset",
-				"FungibleTokenListFeature",
-				tca,
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "GatewayAPI",
-			dependencies: [
-				.product(name: "AnyCodable", package: "AnyCodable"),
-				"Asset",
-				bigInt,
-				"Common",
-				engineToolkit,
-				"EngineToolkitClient",
-				profile, // address
-				dependencies, // XCTestDynamicOverlay + DependencyKey
-			],
-			exclude: [
-				"CodeGen/Input/",
-			]
-		),
-		.testTarget(
-			name: "GatewayAPITests",
-			dependencies: [
-				"TestUtils",
-				"GatewayAPI",
-			]
-		),
-		.target(
-			name: "HomeFeature",
-			dependencies: [
-				// ˅˅˅ Sort lexicographically ˅˅˅
-				"AccountListFeature",
-				"AccountDetailsFeature",
-				"AccountPortfolio",
-				"AccountPreferencesFeature",
-				"AppSettings",
-				"Common",
-				"CreateAccountFeature",
-				engineToolkit,
-				"IncomingConnectionRequestFromDappReviewFeature",
-				"PasteboardClient",
-				profile,
-				"ProfileClient",
-				tca,
-				// ^^^ Sort lexicographically ^^^
-			]
-		),
-		.testTarget(
-			name: "HomeFeatureTests",
-			dependencies: [
-				"Asset",
-				"FungibleTokenListFeature",
-				"HomeFeature",
-				"NonFungibleTokenListFeature",
-				"TestUtils",
-			]
-		),
+		}
 
-		.target(
-			name: "ManageBrowserExtensionConnectionsFeature",
-			dependencies: [
-				"Common",
-				converse,
-				"DesignSystem",
-				profile,
-				tca,
+		if module.isProduct {
+			package.products += [
+				.library(name: targetName, targets: [targetName]),
 			]
-		),
-		.testTarget(
-			name: "ManageBrowserExtensionConnectionsFeatureTests",
-			dependencies: [
-				"ManageBrowserExtensionConnectionsFeature",
-				"TestUtils",
-			]
-		),
+		}
+	}
+}
 
-		.target(
-			name: "IncomingConnectionRequestFromDappReviewFeature",
-			dependencies: [
-				"Common",
-				"DesignSystem",
-				profile,
-				"ProfileClient",
-				tca,
-			],
-			resources: [
-				.process("Resources"),
-			]
-		),
-		.testTarget(
-			name: "IncomingConnectionRequestFromDappReviewFeatureTests",
-			dependencies: [
-				"IncomingConnectionRequestFromDappReviewFeature",
-				"ProfileClient",
-				tca,
-				"TestUtils",
-			]
-		),
+// MARK: - Features
 
-		.target(
-			name: "ImportProfileFeature",
-			dependencies: [
-				"Common",
-				profile,
-				"ProfileClient",
-				tca,
-			]
-		),
-		.testTarget(
-			name: "ImportProfileFeatureTests",
-			dependencies: [
-				"ImportProfileFeature",
-				"TestUtils",
-			],
-			resources: [
-				.process("profile_snapshot.json"),
-			]
-		),
-
-		.target(
-			name: "LocalAuthenticationClient",
-			dependencies: []
-		),
-		.testTarget(
-			name: "LocalAuthenticationClientTests",
-			dependencies: [
-				"LocalAuthenticationClient",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "MainFeature",
-			dependencies: [
-				// ˅˅˅ Sort lexicographically ˅˅˅
-				"AppSettings",
-				"AccountPortfolio",
-				engineToolkit,
-				"HomeFeature",
-				"PasteboardClient",
-				"SettingsFeature",
-				tca,
-				// ^^^ Sort lexicographically ^^^
-			]
-		),
-		.testTarget(
-			name: "MainFeatureTests",
-			dependencies: [
-				"MainFeature",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "NonFungibleTokenListFeature",
-			dependencies: [
-				"Asset",
-				"Common",
-				tca,
-			]
-		),
-		.testTarget(
-			name: "NonFungibleTokenListFeatureTests",
-			dependencies: [
-				"NonFungibleTokenListFeature",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "OnboardingFeature",
-			dependencies: [
-				// ˅˅˅ Sort lexicographically ˅˅˅
-				"Common",
-				engineToolkit,
-				"ImportProfileFeature",
-				profile,
-				"ProfileClient",
-				tca,
-				// ^^^ Sort lexicographically ^^^
-			]
-		),
-		.testTarget(
-			name: "OnboardingFeatureTests",
-			dependencies: [
-				"OnboardingFeature",
-				"TestUtils",
-				"UserDefaultsClient",
-			]
-		),
-		.target(
-			name: "PasteboardClient",
-			dependencies: [
-				dependencies,
-			]
-		),
-		.testTarget(
-			name: "PasteboardClientTests",
-			dependencies: [
-				"PasteboardClient",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "ProfileLoader",
-			dependencies: [
-				profile,
-				keychainClient,
-			]
-		),
-		.testTarget(
-			name: "ProfileLoaderTests",
-			dependencies: [
-				"ProfileLoader",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "SettingsFeature",
-			dependencies: [
-				// ˅˅˅ Sort lexicographically ˅˅˅
-				"Common",
-				profile,
-				"GatewayAPI",
-				keychainClient,
-				"ManageBrowserExtensionConnectionsFeature",
-				"ProfileClient",
-				.product(name: "ProfileView", package: "swift-profile"),
-				tca,
-				// ^^^ Sort lexicographically ^^^
-			]
-		),
-		.testTarget(
-			name: "SettingsFeatureTests",
-			dependencies: [
-				"SettingsFeature",
-				"TestUtils",
-			]
-		),
-		.target(
-			name: "SplashFeature",
-			dependencies: [
-				// ˅˅˅ Sort lexicographically ˅˅˅
-				"Common",
-				profile,
-				"ProfileLoader",
-				tca,
-				"ProfileClient",
-				// ^^^ Sort lexicographically ^^^
-			]
-		),
-		.testTarget(
-			name: "SplashFeatureTests",
+package.addModules([
+	.feature(
+		name: "AccountDetailsFeature",
+		dependencies: [
+			"AccountListFeature",
+			"AggregatedValueFeature",
+			"Asset",
+			"AssetsViewFeature",
+			"DesignSystem",
+			engineToolkit,
+			profile,
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "AccountListFeature",
+		dependencies: [
+			"AccountPortfolio",
+			"Asset",
+			"FungibleTokenListFeature",
+			profile,
+			"ProfileClient",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "AccountPreferencesFeature",
+		dependencies: [
+			"Common",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "AggregatedValueFeature",
+		dependencies: [
+			"Common",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "AppFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"AccountPortfolio",
+			"AppSettings",
+			engineToolkit,
+			"MainFeature",
+			"OnboardingFeature",
+			"PasteboardClient",
+			"ProfileLoader",
+			"ProfileClient",
+			"SplashFeature",
+			tca,
+			"UserDefaultsClient",
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
 			dependencies: [
 				"SplashFeature",
 				"TestUtils",
+				"ProfileClient",
 			]
-		),
-		.target(
-			name: "TestUtils",
+		)
+	),
+	.feature(
+		name: "AssetsViewFeature",
+		dependencies: [
+			"Asset",
+			"Common",
+			"FungibleTokenListFeature",
+			"NonFungibleTokenListFeature",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "CreateAccountFeature",
+		dependencies: [
+			"Common",
+			"DesignSystem",
+			keychainClient,
+			profile,
+			tca,
+			"ProfileClient",
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "FungibleTokenListFeature",
+		dependencies: [
+			"Asset",
+			"Common",
+			tca,
+		],
+		tests: .yes(
 			dependencies: [
-				"Common",
-				profile, // Actually `Mnemonic`, Contains Data+Hex extension. FIXME: Extract Data+Hex functions to seperate repo, which Mnemonic and thus this TestUtils package can depend on.
+				"Asset",
+				tca,
+				"TestUtils",
 			]
-		),
-		.target(
-			name: "UserDefaultsClient",
+		)
+	),
+	.feature(
+		name: "HomeFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"AccountListFeature",
+			"AccountDetailsFeature",
+			"AccountPortfolio",
+			"AccountPreferencesFeature",
+			"AppSettings",
+			"Common",
+			"CreateAccountFeature",
+			engineToolkit,
+			"IncomingConnectionRequestFromDappReviewFeature",
+			"PasteboardClient",
+			profile,
+			"ProfileClient",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
 			dependencies: [
-				dependencies,
+				"Asset",
+				"FungibleTokenListFeature",
+				"NonFungibleTokenListFeature",
+				"TestUtils",
 			]
-		),
-		.testTarget(
-			name: "UserDefaultsClientTests",
+		)
+	),
+	.feature(
+		name: "ImportProfileFeature",
+		dependencies: [
+			"Common",
+			profile,
+			"ProfileClient",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"],
+			resources: [.process("profile_snapshot.json")]
+		)
+	),
+	.feature(
+		name: "IncomingConnectionRequestFromDappReviewFeature",
+		dependencies: [
+			"Common",
+			"DesignSystem",
+			profile,
+			"ProfileClient",
+			tca,
+		],
+		resources: [.process("Resources")],
+		tests: .yes(
+			dependencies: [
+				"ProfileClient",
+				tca,
+				"TestUtils",
+			]
+		)
+	),
+	.feature(
+		name: "MainFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"AppSettings",
+			"AccountPortfolio",
+			engineToolkit,
+			"HomeFeature",
+			"PasteboardClient",
+			"SettingsFeature",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "ManageBrowserExtensionConnectionsFeature",
+		dependencies: [
+			"Common",
+			converse,
+			"DesignSystem",
+			profile,
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "NonFungibleTokenListFeature",
+		dependencies: [
+			"Asset",
+			"Common",
+			tca,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "OnboardingFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
+			engineToolkit,
+			"ImportProfileFeature",
+			profile,
+			"ProfileClient",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
 			dependencies: [
 				"UserDefaultsClient",
 				"TestUtils",
 			]
-		),
-		.target(
-			name: "ProfileClient",
+		)
+	),
+	.feature(
+		name: "SettingsFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
+			profile,
+			"GatewayAPI",
+			keychainClient,
+			"ManageBrowserExtensionConnectionsFeature",
+			"ProfileClient",
+			.product(name: "ProfileView", package: "swift-profile"),
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "SplashFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
+			profile,
+			"ProfileLoader",
+			tca,
+			"ProfileClient",
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+])
+
+// MARK: - Clients
+
+package.addModules([
+	.client(
+		name: "AccountPortfolio",
+		dependencies: [
+			"AppSettings",
+			"Asset",
+			bigInt,
+			"Common",
+			"GatewayAPI",
+			profile,
+			dependencies,
+		],
+		tests: .yes(
 			dependencies: [
-				"EngineToolkitClient", // Create TX
-				"GatewayAPI", // Create Account On Ledger => Submit TX
-				profile,
-				"ProfileLoader",
-				dependencies, // XCTestDynamicOverlay + DependencyKey
-			]
-		),
-		.testTarget(
-			name: "ProfileClientTests",
-			dependencies: [
-				"ProfileClient",
+				dependencies,
 				"TestUtils",
 			]
-		),
-	]
-)
+		)
+	),
+	.client(
+		name: "AppSettings",
+		dependencies: [
+			"Common",
+			dependencies,
+			"UserDefaultsClient",
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
+		name: "Asset",
+		dependencies: [
+			"Common",
+			profile, // Address
+			bigInt,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
+		name: "EngineToolkitClient",
+		dependencies: [
+			bigInt,
+			bite,
+			"Common",
+			dependencies,
+			engineToolkit,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
+		name: "GatewayAPI",
+		dependencies: [
+			.product(name: "AnyCodable", package: "AnyCodable"),
+			"Asset",
+			bigInt,
+			"Common",
+			engineToolkit,
+			"EngineToolkitClient",
+			profile, // address
+			dependencies, // XCTestDynamicOverlay + DependencyKey
+		],
+		exclude: [
+			"CodeGen/Input/",
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
+		name: "LocalAuthenticationClient",
+		dependencies: [],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
+		name: "PasteboardClient",
+		dependencies: [dependencies],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
+		name: "ProfileLoader",
+		dependencies: [
+			profile,
+			keychainClient,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
+		name: "UserDefaultsClient",
+		dependencies: [dependencies],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
+		name: "ProfileClient",
+		dependencies: [
+			"EngineToolkitClient", // Create TX
+			"GatewayAPI", // Create Account On Ledger => Submit TX
+			profile,
+			"ProfileLoader",
+			dependencies, // XCTestDynamicOverlay + DependencyKey
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+])
+
+// MARK: - Core
+
+package.addModules([
+	// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
+	.core(
+		name: "_BuildTools",
+		dependencies: [],
+		tests: .no
+	),
+	.core(
+		name: "Common",
+		dependencies: [
+			profile, // Address
+			bigInt,
+			"DesignSystem",
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.core(
+		name: "DesignSystem",
+		dependencies: [],
+		resources: [.process("Fonts")],
+		tests: .no
+	),
+	.core(
+		name: "TestUtils",
+		dependencies: [
+			"Common",
+			profile, // Actually `Mnemonic`, Contains Data+Hex extension. FIXME: Extract Data+Hex functions to seperate repo, which Mnemonic and thus this TestUtils package can depend on.
+			tca,
+		],
+		tests: .no
+	),
+])
