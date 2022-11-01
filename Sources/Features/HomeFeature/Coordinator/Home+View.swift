@@ -29,59 +29,61 @@ public extension Home.View {
 			observe: ViewState.init(state:),
 			send: Home.Action.init
 		) { viewStore in
-			ZStack {
-				homeView(with: viewStore)
-					.onAppear {
-						viewStore.send(.didAppear)
-					}
-					.zIndex(0)
+			ForceFullScreen {
+				ZStack {
+					homeView(with: viewStore)
+						.onAppear {
+							viewStore.send(.didAppear)
+						}
+						.zIndex(0)
 
-				IfLetStore(
-					store.scope(
-						state: \.createAccount,
-						action: Home.Action.createAccount
-					),
-					then: CreateAccount.View.init(store:)
-				)
-				.zIndex(1)
+					IfLetStore(
+						store.scope(
+							state: \.createAccount,
+							action: Home.Action.createAccount
+						),
+						then: CreateAccount.View.init(store:)
+					)
+					.zIndex(1)
 
-				IfLetStore(
-					store.scope(
-						state: \.accountDetails,
-						action: Home.Action.accountDetails
-					),
-					then: AccountDetails.View.init(store:)
-				)
-				.zIndex(1)
+					IfLetStore(
+						store.scope(
+							state: \.accountDetails,
+							action: Home.Action.accountDetails
+						),
+						then: AccountDetails.View.init(store:)
+					)
+					.zIndex(1)
 
-				IfLetStore(
-					store.scope(
-						state: \.accountPreferences,
-						action: Home.Action.accountPreferences
-					),
-					then: AccountPreferences.View.init(store:)
-				)
-				.zIndex(2)
+					IfLetStore(
+						store.scope(
+							state: \.accountPreferences,
+							action: Home.Action.accountPreferences
+						),
+						then: AccountPreferences.View.init(store:)
+					)
+					.zIndex(2)
 
-				IfLetStore(
-					store.scope(
-						state: \.transfer,
-						action: Home.Action.transfer
-					),
-					then: AccountDetails.Transfer.View.init(store:)
-				)
-				.zIndex(2)
+					IfLetStore(
+						store.scope(
+							state: \.transfer,
+							action: Home.Action.transfer
+						),
+						then: AccountDetails.Transfer.View.init(store:)
+					)
+					.zIndex(2)
 
-				#if DEBUG
-				IfLetStore(
-					store.scope(
-						state: \.debugInitiatedConnectionRequest,
-						action: Home.Action.debugInitiatedConnectionRequest
-					),
-					then: IncomingConnectionRequestFromDappReview.View.init(store:)
-				)
-				.zIndex(1)
-				#endif
+					#if DEBUG
+					IfLetStore(
+						store.scope(
+							state: \.debugInitiatedConnectionRequest,
+							action: Home.Action.debugInitiatedConnectionRequest
+						),
+						then: IncomingConnectionRequestFromDappReview.View.init(store:)
+					)
+					.zIndex(1)
+					#endif
+				}
 			}
 		}
 	}
