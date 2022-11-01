@@ -40,8 +40,8 @@ extension TransactionSigning.View {
 		let transactionManifestDescription: String
 
 		init(state: TransactionSigning.State) {
-			self.transactionManifest = state.transactionManifest
-			self.transactionManifestDescription = state.transactionManifest.description
+			transactionManifest = state.transactionManifest
+			transactionManifestDescription = state.transactionManifest.description
 		}
 	}
 }
