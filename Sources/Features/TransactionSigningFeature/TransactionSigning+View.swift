@@ -36,11 +36,9 @@ public extension TransactionSigning.View {
 // MARK: - TransactionSigning.View.ViewState
 extension TransactionSigning.View {
 	struct ViewState: Equatable {
-		let transactionManifest: TransactionManifest
 		let transactionManifestDescription: String
 
 		init(state: TransactionSigning.State) {
-			transactionManifest = state.transactionManifest
 			transactionManifestDescription = state.transactionManifest.description
 		}
 	}
