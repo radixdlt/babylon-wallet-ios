@@ -390,10 +390,12 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
+			.product(name: "ConnectUsingPasswordFeature", package: "Converse"),
 			converse,
 			"DesignSystem",
 			.product(name: "InputPasswordFeature", package: "Converse"),
 			profile,
+			"ProfileClient",
 			tca,
 			// ^^^ Sort lexicographically ^^^
 		],

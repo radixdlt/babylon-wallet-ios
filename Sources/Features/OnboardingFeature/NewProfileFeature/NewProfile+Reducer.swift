@@ -44,7 +44,7 @@ public extension NewProfile {
 			precondition(state.canProceed)
 			precondition(!state.isCreatingProfile)
 			state.isCreatingProfile = true
-			return .run { [mnemonicGenerator, keychainClient, nameOfFirstAccount = state.nameOfFirstAccount] send in
+			return .run { [mnemonicGenerator, nameOfFirstAccount = state.nameOfFirstAccount] send in
 
 				await send(.internal(.system(.createdProfileResult(
 					TaskResult {
@@ -53,8 +53,7 @@ public extension NewProfile {
 						let newProfileRequest = CreateNewProfileRequest(
 							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
 							createFirstAccountRequest: .init(
-								accountName: nameOfFirstAccount,
-								keychainClient: keychainClient
+								accountName: nameOfFirstAccount
 							)
 						)
 						let newProfile = try await profileClient.createNewProfile(newProfileRequest)

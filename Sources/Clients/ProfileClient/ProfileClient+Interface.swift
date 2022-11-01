@@ -37,6 +37,8 @@ public struct ProfileClient: DependencyKey {
 	public var deleteProfileSnapshot: DeleteProfileSnapshot
 
 	public var getAccounts: GetAccounts
+	public var getBrowserExtensionConnections: GetBrowserExtensionConnections
+	public var addBrowserExtensionConnection: AddBrowserExtensionConnection
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
 	public var createAccount: CreateAccount
@@ -46,17 +48,22 @@ public struct ProfileClient: DependencyKey {
 
 public extension ProfileClient {
 	typealias GetCurrentNetworkID = @Sendable () -> NetworkID
-	typealias SetCurrentNetworkID = @Sendable (NetworkID) async -> Void
+	typealias SetCurrentNetworkID = @Sendable (NetworkID) async throws -> Void
 
 	typealias CreateNewProfile = @Sendable (CreateNewProfileRequest) async throws -> Profile
-	typealias InjectProfile = @Sendable (Profile) -> Void
-	typealias DeleteProfileSnapshot = @Sendable () throws -> Void
+
+	// Async throwing because this also
+	typealias InjectProfile = @Sendable (Profile, InjectProfileMode) async throws -> Void
+
+	typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 	typealias ExtractProfileSnapshot = @Sendable () throws -> ProfileSnapshot
 	typealias GetAccounts = @Sendable () throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
+	typealias GetBrowserExtensionConnections = @Sendable () throws -> BrowserExtensionConnections
+	typealias AddBrowserExtensionConnection = @Sendable (BrowserExtensionConnection) async throws -> Void
 	typealias GetAppPreferences = @Sendable () throws -> AppPreferences
-	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) throws -> Void
+	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
 	typealias CreateAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
 	// FIXME: Cyon will hook this up when PR https://github.com/radixdlt/babylon-wallet-ios/pull/67 is merged
 	// Since it contains changes regarding NetworkID, which is now a getter and setter in ProfileClient
@@ -70,17 +77,19 @@ public extension TransactionIntent {
 	typealias TXID = Tagged<Self, String>
 }
 
+// MARK: - InjectProfileMode
+public enum InjectProfileMode {
+	case onlyInject
+	case injectAndPersistInKeychain
+}
+
 // MARK: - CreateAccountRequest
 public struct CreateAccountRequest {
 	public let accountName: String?
-	/// Used to read out secrets
-	public let keychainClient: KeychainClient
 
 	public init(
-		accountName: String?,
-		keychainClient: KeychainClient
+		accountName: String?
 	) {
 		self.accountName = accountName
-		self.keychainClient = keychainClient
 	}
 }

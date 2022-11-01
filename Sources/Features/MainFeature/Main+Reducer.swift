@@ -43,7 +43,7 @@ public extension Main {
 			case .settings(.coordinate(.deleteProfileAndFactorSources)):
 				return .run { send in
 					try environment.keychainClient.removeAllFactorSourcesAndProfileSnapshot()
-					try environment.profileClient.deleteProfileSnapshot()
+					try await environment.profileClient.deleteProfileSnapshot()
 					await send(.coordinate(.removedWallet))
 				}
 

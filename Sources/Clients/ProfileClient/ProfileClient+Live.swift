@@ -28,6 +28,8 @@ public extension ProfileClient {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		@Dependency(\.keychainClient) var keychainClient
+
 		let pollStrategy: PollStrategy = .default
 
 		let profileHolder = ProfileHolder.shared
@@ -94,8 +96,8 @@ public extension ProfileClient {
 
 				return newProfile
 			},
-			injectProfile: {
-				profileHolder.injectProfile($0)
+			injectProfile: { profile, mode in
+				try await profileHolder.injectProfile(profile, mode: mode)
 			},
 			extractProfileSnapshot: {
 				try profileHolder.takeProfileSnapshot()
@@ -108,25 +110,34 @@ public extension ProfileClient {
 					profile.primaryNet.accounts
 				}
 			},
+			getBrowserExtensionConnections: {
+				try profileHolder.get { profile in
+					profile.appPreferences.browserExtensionConnections
+				}
+			},
+			addBrowserExtensionConnection: { newConnection in
+				try await profileHolder.asyncMutating { profile in
+					_ = profile.appPreferences.browserExtensionConnections.connections.append(newConnection)
+				}
+			},
 			getAppPreferences: {
 				try profileHolder.get { profile in
 					profile.appPreferences
 				}
 			},
 			setDisplayAppPreferences: { newDisplayPreferences in
-				try profileHolder.mutating { profile in
+				try await profileHolder.asyncMutating { profile in
 					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
 			createAccount: { createAccountRequest in
-
 				try await profileHolder.asyncMutating { profile in
 
 					try await profile.createNewOnLedgerAccount(
 						displayName: createAccountRequest.accountName,
 						makeEntityNonVirtualBySubmittingItToLedger: makeEntityNonVirtualBySubmittingItToLedgerFromCreateAccountRequest(createAccountRequest),
-						mnemonicForFactorSourceByReference: { reference in
-							try createAccountRequest.keychainClient.loadFactorSourceMnemonic(reference: reference)
+						mnemonicForFactorSourceByReference: { [keychainClient] reference in
+							try keychainClient.loadFactorSourceMnemonic(reference: reference)
 						}
 					)
 				}
@@ -148,6 +159,7 @@ struct CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities: Swif
 
 // MARK: - ProfileHolder
 private final class ProfileHolder {
+	@Dependency(\.keychainClient) var keychainClient
 	private var profile: Profile?
 	private init() {}
 	fileprivate static let shared = ProfileHolder()
@@ -174,12 +186,10 @@ private final class ProfileHolder {
 		return try await withProfile(profile)
 	}
 
-	func mutating(_ mutateProfile: (inout Profile) throws -> Void) throws {
-		guard var profile else {
-			throw NoProfile()
-		}
-		try mutateProfile(&profile)
-		self.profile = profile
+	// Async because we might wanna add iCloud sync here in future.
+	private func persistProfile() async throws {
+		let profileSnapshot = try takeProfileSnapshot()
+		try keychainClient.saveProfileSnapshot(profileSnapshot: profileSnapshot)
 	}
 
 	func asyncMutating<T>(_ mutateProfile: (inout Profile) async throws -> T) async throws -> T {
@@ -188,11 +198,17 @@ private final class ProfileHolder {
 		}
 		let result = try await mutateProfile(&profile)
 		self.profile = profile
+		try await persistProfile()
 		return result
 	}
 
-	func injectProfile(_ profile: Profile) {
+	func injectProfile(_ profile: Profile, mode: InjectProfileMode) async throws {
 		self.profile = profile
+		switch mode {
+		case .injectAndPersistInKeychain:
+			try await persistProfile()
+		case .onlyInject: break
+		}
 	}
 
 	func takeProfileSnapshot() throws -> ProfileSnapshot {
