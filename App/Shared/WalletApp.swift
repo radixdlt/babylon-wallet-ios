@@ -49,6 +49,7 @@ struct WalletApp: SwiftUI.App {
 			#if os(macOS)
 				.frame(minWidth: 1020, maxWidth: .infinity, minHeight: 512, maxHeight: .infinity)
 			#endif
+				.environment(\.colorScheme, .light) // TODO: implement dark mode and remove this
 		}
 	}
 }
