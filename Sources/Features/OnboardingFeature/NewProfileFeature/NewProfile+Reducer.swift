@@ -42,6 +42,8 @@ public extension NewProfile {
 
 		case .internal(.system(.createProfile)):
 			precondition(state.canProceed)
+			precondition(!state.isCreatingProfile)
+			state.isCreatingProfile = true
 			return .run { [mnemonicGenerator, keychainClient, nameOfFirstAccount = state.nameOfFirstAccount] send in
 
 				await send(.internal(.system(.createdProfileResult(
@@ -72,11 +74,13 @@ public extension NewProfile {
 			}
 
 		case let .internal(.system(.createdProfileResult(.success(profile)))):
+			state.isCreatingProfile = false
 			return .run { send in
 				await send(.coordinate(.finishedCreatingNewProfile(profile)))
 			}
 
 		case let .internal(.system(.createdProfileResult(.failure(error)))):
+			state.isCreatingProfile = false
 			return .run { send in
 				await send(.coordinate(.failedToCreateNewProfile(reason: String(describing: error))))
 			}

@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 
 // MARK: - NewProfile.View
@@ -46,11 +47,15 @@ public extension NewProfile.View {
 						)
 					)
 
+					if viewStore.isLoaderVisible {
+						LoadingView()
+					}
+
 					Button("Create Profle") {
 						viewStore.send(.createProfileButtonPressed)
 					}
 					.buttonStyle(.borderedProminent)
-					.disabled(!viewStore.canProceed)
+					.disabled(!viewStore.isCreateProfileButtonEnabled)
 
 					Spacer()
 				}
@@ -66,11 +71,13 @@ extension NewProfile.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		var nameOfFirstAccount: String
-		var canProceed: Bool
+		var isLoaderVisible: Bool
+		var isCreateProfileButtonEnabled: Bool
 
 		init(state: NewProfile.State) {
 			nameOfFirstAccount = state.nameOfFirstAccount
-			canProceed = state.canProceed
+			isLoaderVisible = state.isCreatingProfile
+			isCreateProfileButtonEnabled = state.canProceed && !state.isCreatingProfile
 		}
 	}
 }

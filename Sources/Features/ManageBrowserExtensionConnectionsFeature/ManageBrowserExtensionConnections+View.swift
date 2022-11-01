@@ -34,21 +34,15 @@ public extension ManageBrowserExtensionConnections.View {
 							action: ManageBrowserExtensionConnections.Action.inputBrowserExtensionConnectionPassword
 						),
 						then: { inputPasswordStore in
-							ForceFullScreen {
+							Screen(
+								title: "New Connection",
+								navBarActionStyle: .close,
+								action: { viewStore.send(.dismissNewConnectionFlowButtonTapped) }
+							) {
 								VStack {
-									HStack {
-										CloseButton {
-											viewStore.send(.dismissNewConnectionFlowButtonTapped)
-										}
-										Spacer()
-										Text("Browser Connections")
-										Spacer()
-										EmptyView()
-									}
-									ForceFullScreen {
-										InputPassword.View(store: inputPasswordStore)
-									}
+									InputPassword.View(store: inputPasswordStore)
 								}
+								.padding()
 							}
 						}
 					)
@@ -63,18 +57,12 @@ private extension ManageBrowserExtensionConnections.View {
 	func manageBrowserExtensionConnectionsView(
 		viewStore: ViewStore<ViewState, ViewAction>
 	) -> some View {
-		ForceFullScreen {
+		Screen(
+			title: "Browser Connections",
+			navBarActionStyle: .back,
+			action: { viewStore.send(.dismissButtonTapped) }
+		) {
 			VStack {
-				HStack {
-					BackButton {
-						viewStore.send(.dismissButtonTapped)
-					}
-					Spacer()
-					Text("Browser Connections")
-					Spacer()
-					EmptyView()
-				}
-				Text("ManageBrowserExtensionConnections")
 				Spacer()
 				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped) }
 				Spacer()

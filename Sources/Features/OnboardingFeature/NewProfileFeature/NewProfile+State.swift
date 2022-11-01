@@ -8,13 +8,16 @@ public extension NewProfile {
 	struct State: Equatable {
 		@BindableState public var nameOfFirstAccount: String
 		public var canProceed: Bool
+		public var isCreatingProfile: Bool
 
 		public init(
 			nameOfFirstAccount: String = "",
-			canProceed: Bool = false
+			canProceed: Bool = false,
+			isCreatingProfile: Bool = false
 		) {
 			self.nameOfFirstAccount = nameOfFirstAccount
 			self.canProceed = canProceed
+			self.isCreatingProfile = isCreatingProfile
 		}
 	}
 }

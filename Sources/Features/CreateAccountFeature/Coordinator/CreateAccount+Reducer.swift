@@ -18,6 +18,8 @@ public extension CreateAccount {
 		switch action {
 		case .internal(.user(.createAccount)):
 			precondition(state.isValid)
+			precondition(!state.isCreatingAccount)
+			state.isCreatingAccount = true
 			return .run { [profileClient, keychainClient, accountName = state.accountName] send in
 				await send(.internal(.system(.createdNewAccountResult(
 					TaskResult {
@@ -38,10 +40,12 @@ public extension CreateAccount {
 			}
 
 		case let .internal(.system(.createdNewAccountResult(.success(account)))):
+			state.isCreatingAccount = false
 			return .run { send in
 				await send(.coordinate(.createdNewAccount(account)))
 			}
 		case let .internal(.system(.createdNewAccountResult(.failure(error)))):
+			state.isCreatingAccount = false
 			return .run { send in
 				await send(.coordinate(.failedToCreateNewAccount(reason: String(describing: error))))
 			}

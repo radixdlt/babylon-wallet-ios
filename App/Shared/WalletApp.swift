@@ -43,7 +43,7 @@ struct WalletApp: SwiftUI.App {
 		DesignSystem.registerFonts()
 	}
 
-	var body: some Scene {
+	var body: some SwiftUI.Scene {
 		WindowGroup {
 			App.View(store: store)
 			#if os(macOS)

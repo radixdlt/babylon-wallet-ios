@@ -416,6 +416,7 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
+			"DesignSystem",
 			engineToolkit,
 			"ImportProfileFeature",
 			profile,
@@ -602,6 +603,7 @@ package.addModules([
 			bigInt,
 			"DesignSystem",
 		],
+		resources: [.process("Localization/Strings")],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
@@ -615,8 +617,8 @@ package.addModules([
 	.core(
 		name: "TestUtils",
 		dependencies: [
+			bite,
 			"Common",
-			profile, // Actually `Mnemonic`, Contains Data+Hex extension. FIXME: Extract Data+Hex functions to seperate repo, which Mnemonic and thus this TestUtils package can depend on.
 			tca,
 		],
 		tests: .no
