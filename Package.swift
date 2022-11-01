@@ -25,6 +25,7 @@ package.dependencies += [
 
 	// TCA - ComposableArchitecture used as architecture
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
+	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 
 	// Format code
 	.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
@@ -41,6 +42,11 @@ let tca: Target.Dependency = .product(
 let dependencies: Target.Dependency = .product(
 	name: "Dependencies",
 	package: "swift-composable-architecture"
+)
+
+let tagged: Target.Dependency = .product(
+	name: "Tagged",
+	package: "swift-tagged"
 )
 
 let profile: Target.Dependency = .product(
@@ -556,6 +562,20 @@ package.addModules([
 		)
 	),
 	.client(
+		name: "ProfileClient",
+		dependencies: [
+			dependencies, // XCTestDynamicOverlay + DependencyKey
+			"EngineToolkitClient", // Create TX
+			"GatewayAPI", // Create Account On Ledger => Submit TX
+			profile,
+			"ProfileLoader",
+			tagged,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
 		name: "ProfileLoader",
 		dependencies: [
 			profile,
@@ -568,19 +588,6 @@ package.addModules([
 	.client(
 		name: "UserDefaultsClient",
 		dependencies: [dependencies],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
-	),
-	.client(
-		name: "ProfileClient",
-		dependencies: [
-			"EngineToolkitClient", // Create TX
-			"GatewayAPI", // Create Account On Ledger => Submit TX
-			profile,
-			"ProfileLoader",
-			dependencies, // XCTestDynamicOverlay + DependencyKey
-		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
