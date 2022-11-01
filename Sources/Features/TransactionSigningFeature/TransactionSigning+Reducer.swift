@@ -1,6 +1,6 @@
 import ComposableArchitecture
-import Foundation
 import EngineToolkitClient
+import Foundation
 import ProfileClient
 
 // MARK: - TransactionSigning
@@ -17,9 +17,9 @@ public extension TransactionSigning {
 					try profileClient.lookupAccountByAddress(address)
 				}
 				switch addressLookupResult {
-				case .failure(let error as NSError):
+				case let .failure(error as NSError):
 					await send(.internal(.system(.addressLookupFailed(error))))
-				case .success(let account):
+				case let .success(account):
 					let result = await TaskResult {
 						try await profileClient.signTransaction(account.id, transactionManifest)
 					}
