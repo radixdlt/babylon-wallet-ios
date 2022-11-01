@@ -34,7 +34,7 @@ public extension ChooseAccounts.State {
 		canProceed: false,
 		accounts: .init(
 			uniqueElements: [
-				.placeholder,
+				.placeholderOne,
 			]
 		)
 	)
