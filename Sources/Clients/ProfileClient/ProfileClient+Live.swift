@@ -113,9 +113,9 @@ public extension ProfileClient {
 					profile.appPreferences
 				}
 			},
-			setDisplayAppPreferences: { _ in
-				try profileHolder.mutating { _ in
-					//                    profile.appPreferences
+			setDisplayAppPreferences: { newDisplayPreferences in
+				try profileHolder.mutating { profile in
+					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
 			createAccount: { createAccountRequest in

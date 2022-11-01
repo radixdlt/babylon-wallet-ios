@@ -48,12 +48,16 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 		_ = await store.send(.internal(.user(.createProfile)))
 
 		// then
-		_ = await store.receive(.internal(.system(.createProfile)))
+		_ = await store.receive(.internal(.system(.createProfile))) {
+			$0.isCreatingProfile = true
+		}
 
 		waitForExpectations(timeout: 1)
 		await profileSavedToKeychain.withValue {
 			if let profile = $0 {
-				await store.receive(.internal(.system(.createdProfileResult(.success(profile)))))
+				await store.receive(.internal(.system(.createdProfileResult(.success(profile))))) {
+					$0.isCreatingProfile = false
+				}
 				await store.receive(.coordinate(.finishedCreatingNewProfile(profile)))
 			}
 		}
