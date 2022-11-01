@@ -8,7 +8,7 @@ public struct TransactionSigning: ReducerProtocol {
 }
 
 public extension TransactionSigning {
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .signTransaction:
 			return .run { send in

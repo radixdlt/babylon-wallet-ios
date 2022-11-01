@@ -1,9 +1,9 @@
 import Collections
 import Dependencies
+import EngineToolkit
 import Foundation
 import KeychainClient
 import Mnemonic
-import EngineToolkit
 import NonEmpty
 import Profile
 
@@ -50,6 +50,7 @@ public extension ProfileClient {
 	typealias SignTransaction = @Sendable (OnNetwork.Account.ID, TransactionManifest) async throws -> TXID
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 }
+
 public typealias TXID = String // TODO: replace with real Transaction.ID
 
 // MARK: - CreateAccountRequest

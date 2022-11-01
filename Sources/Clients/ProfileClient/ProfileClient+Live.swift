@@ -99,9 +99,9 @@ public extension ProfileClient {
 					)
 				}
 			},
-			signTransaction: { accountID, transactionManifest in
+			signTransaction: { _, _ in
 				// TODO: implement
-				return "TXID"
+				"TXID"
 			}
 		)
 	}
