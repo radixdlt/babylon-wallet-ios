@@ -576,6 +576,7 @@ package.addModules([
 			profile,
 			"ProfileLoader",
 			tagged,
+			"UserDefaultsClient",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]

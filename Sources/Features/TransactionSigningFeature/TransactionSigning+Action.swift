@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import EngineToolkit
 import Foundation
 import ProfileClient
 
@@ -22,7 +23,7 @@ public extension TransactionSigning.Action {
 // MARK: - TransactionSigning.Action.InternalAction.UserAction
 public extension TransactionSigning.Action.InternalAction {
 	enum UserAction: Equatable {
-		case signTransactionResult(TaskResult<TXID>)
+		case signTransactionResult(TaskResult<TransactionIntent.TXID>)
 	}
 }
 

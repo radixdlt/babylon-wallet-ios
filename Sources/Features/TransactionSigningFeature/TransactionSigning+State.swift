@@ -20,6 +20,9 @@ public extension TransactionSigning {
 
 #if DEBUG
 public extension TransactionSigning.State {
-//	static let placeholder: Self = .init()
+	static let placeholder = Self(
+		address: "123",
+		transactionManifest: .init(instructions: ManifestInstructions.json([]))
+	)
 }
 #endif
