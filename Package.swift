@@ -156,9 +156,10 @@ extension Package {
 
 	private func addModule(_ module: Module) {
 		let targetName = module.name
+		let targetPath = "Sources/\(module.category)/\(targetName)"
 
 		package.targets += [
-			.target(name: targetName, dependencies: module.dependencies, exclude: module.exclude, resources: module.resources),
+			.target(name: targetName, dependencies: module.dependencies, path: targetPath, exclude: module.exclude, resources: module.resources),
 		]
 
 		switch module.tests {
@@ -166,10 +167,12 @@ extension Package {
 			break
 		case let .yes(nameSuffix, testDependencies, resources):
 			let testTargetName = targetName + nameSuffix
+			let testTargetPath = "Tests/\(module.category)/\(testTargetName)"
 			package.targets += [
 				.testTarget(
 					name: testTargetName,
 					dependencies: [.target(name: targetName)] + testDependencies,
+					path: testTargetPath,
 					resources: resources
 				),
 			]
