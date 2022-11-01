@@ -18,7 +18,7 @@ package.dependencies += [
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.15"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.27"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.29"),
 
 	// BigInt
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
