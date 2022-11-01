@@ -26,5 +26,6 @@ public extension ManageBrowserExtensionConnections.Action {
 	enum UserAction: Equatable {
 		case dismiss
 		case addNewConnection
+		case dismissNewConnectionFlow
 	}
 }

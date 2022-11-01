@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import DesignSystem
 import Foundation
 import InputPasswordFeature
 import SwiftUI
@@ -32,7 +33,24 @@ public extension ManageBrowserExtensionConnections.View {
 							state: \.inputBrowserExtensionConnectionPassword,
 							action: ManageBrowserExtensionConnections.Action.inputBrowserExtensionConnectionPassword
 						),
-						then: InputPassword.View.init(store:)
+						then: { inputPasswordStore in
+							ForceFullScreen {
+								VStack {
+									HStack {
+										CloseButton {
+											viewStore.send(.dismissNewConnectionFlowButtonTapped)
+										}
+										Spacer()
+										Text("Browser Connections")
+										Spacer()
+										EmptyView()
+									}
+									ForceFullScreen {
+										InputPassword.View(store: inputPasswordStore)
+									}
+								}
+							}
+						}
 					)
 					.zIndex(1)
 				}
@@ -42,23 +60,25 @@ public extension ManageBrowserExtensionConnections.View {
 }
 
 private extension ManageBrowserExtensionConnections.View {
-	func manageBrowserExtensionConnectionsView(viewStore: ViewStore<ManageBrowserExtensionConnections.View.ViewState, ManageBrowserExtensionConnections.View.ViewAction>) -> some View {
-		VStack {
-			HStack {
-				Button(
-					action: {
+	func manageBrowserExtensionConnectionsView(
+		viewStore: ViewStore<ViewState, ViewAction>
+	) -> some View {
+		ForceFullScreen {
+			VStack {
+				HStack {
+					BackButton {
 						viewStore.send(.dismissButtonTapped)
-					}, label: {
-						Image("arrow-back")
 					}
-				)
+					Spacer()
+					Text("Browser Connections")
+					Spacer()
+					EmptyView()
+				}
+				Text("ManageBrowserExtensionConnections")
 				Spacer()
 				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped) }
 				Spacer()
-				EmptyView()
 			}
-			Spacer()
-			Text("ManageBrowserExtensionConnections")
 		}
 	}
 }
@@ -68,6 +88,7 @@ public extension ManageBrowserExtensionConnections.View {
 	enum ViewAction: Equatable {
 		case dismissButtonTapped
 		case addNewConnectionButtonTapped
+		case dismissNewConnectionFlowButtonTapped
 	}
 }
 
@@ -85,6 +106,8 @@ extension ManageBrowserExtensionConnections.Action {
 			self = .internal(.user(.dismiss))
 		case .addNewConnectionButtonTapped:
 			self = .internal(.user(.addNewConnection))
+		case .dismissNewConnectionFlowButtonTapped:
+			self = .internal(.user(.dismissNewConnectionFlow))
 		}
 	}
 }

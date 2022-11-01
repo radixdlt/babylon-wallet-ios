@@ -54,7 +54,7 @@ public extension Settings.View {
 }
 
 private extension Settings.View {
-	func settingsView(viewStore: ViewStore<Settings.View.ViewState, Settings.View.ViewAction>) -> some View {
+	func settingsView(viewStore: ViewStore<ViewState, ViewAction>) -> some View {
 		ForceFullScreen {
 			VStack {
 				Button(

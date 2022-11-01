@@ -30,6 +30,9 @@ public extension ManageBrowserExtensionConnections {
 		case .internal(.user(.addNewConnection)):
 			state.inputBrowserExtensionConnectionPassword = .init()
 			return .none
+		case .internal(.user(.dismissNewConnectionFlow)):
+			state.inputBrowserExtensionConnectionPassword = nil
+			return .none
 		case let .inputBrowserExtensionConnectionPassword(.connect(password)):
 			fatalError("password: \(password)")
 		case .inputBrowserExtensionConnectionPassword:
