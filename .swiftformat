@@ -5,6 +5,7 @@
 --indent tab
 --tabwidth 4
 
+--stripunusedargs closure-only
 --enable marktypes
 --lineaftermarks false
 --ifdef no-indent
