@@ -1,6 +1,7 @@
 import Common
 import ComposableArchitecture
 import Foundation
+import InputPasswordFeature
 import SwiftUI
 
 // MARK: - ManageBrowserExtensionConnections.View
@@ -22,24 +23,42 @@ public extension ManageBrowserExtensionConnections.View {
 			send: ManageBrowserExtensionConnections.Action.init
 		) { viewStore in
 			ForceFullScreen {
-				VStack {
-					HStack {
-						Button(
-							action: {
-								viewStore.send(.dismissButtonTapped)
-							}, label: {
-								Image("arrow-back")
-							}
-						)
-						Spacer()
-						Text("Manage Browser Connections")
-						Spacer()
-						EmptyView()
-					}
-					Spacer()
-					Text("ManageBrowserExtensionConnections")
+				ZStack {
+					manageBrowserExtensionConnectionsView(viewStore: viewStore)
+						.zIndex(0)
+
+					IfLetStore(
+						store.scope(
+							state: \.inputBrowserExtensionConnectionPassword,
+							action: ManageBrowserExtensionConnections.Action.inputBrowserExtensionConnectionPassword
+						),
+						then: InputPassword.View.init(store:)
+					)
+					.zIndex(1)
 				}
 			}
+		}
+	}
+}
+
+private extension ManageBrowserExtensionConnections.View {
+	func manageBrowserExtensionConnectionsView(viewStore: ViewStore<ManageBrowserExtensionConnections.View.ViewState, ManageBrowserExtensionConnections.View.ViewAction>) -> some View {
+		VStack {
+			HStack {
+				Button(
+					action: {
+						viewStore.send(.dismissButtonTapped)
+					}, label: {
+						Image("arrow-back")
+					}
+				)
+				Spacer()
+				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped) }
+				Spacer()
+				EmptyView()
+			}
+			Spacer()
+			Text("ManageBrowserExtensionConnections")
 		}
 	}
 }
@@ -48,6 +67,7 @@ public extension ManageBrowserExtensionConnections.View {
 public extension ManageBrowserExtensionConnections.View {
 	enum ViewAction: Equatable {
 		case dismissButtonTapped
+		case addNewConnectionButtonTapped
 	}
 }
 
@@ -63,6 +83,8 @@ extension ManageBrowserExtensionConnections.Action {
 		switch action {
 		case .dismissButtonTapped:
 			self = .internal(.user(.dismiss))
+		case .addNewConnectionButtonTapped:
+			self = .internal(.user(.addNewConnection))
 		}
 	}
 }

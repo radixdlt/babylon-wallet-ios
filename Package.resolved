@@ -37,6 +37,15 @@
       }
     },
     {
+      "identity" : "codescanner",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Sajjon/CodeScanner",
+      "state" : {
+        "revision" : "e99827ca985d9e1ed35daf38be1b5f774269aeb1",
+        "version" : "2.1.2"
+      }
+    },
+    {
       "identity" : "combine-schedulers",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/combine-schedulers",
@@ -50,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Converse.git",
       "state" : {
-        "revision" : "877c9f2c55cf785000eda77f5b3539cfaa68a131",
-        "version" : "0.1.13"
+        "revision" : "68056632cac7fb1138ca4969d492a13745b331e4",
+        "version" : "0.1.15"
       }
     },
     {

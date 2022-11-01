@@ -16,10 +16,10 @@ let package = Package(
 package.dependencies += [
 	// RDX Works Package depedencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.14"),
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.15"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
-    .package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.27"),
-    
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.27"),
+
 	// BigInt
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
 
@@ -284,8 +284,8 @@ package.addModules([
 			"DesignSystem",
 			keychainClient,
 			profile,
-            "ProfileClient",
-            tca,
+			"ProfileClient",
+			tca,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -350,13 +350,13 @@ package.addModules([
 	.feature(
 		name: "IncomingConnectionRequestFromDappReviewFeature",
 		dependencies: [
-            // ˅˅˅ Sort lexicographically ˅˅˅
+			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"DesignSystem",
 			profile,
 			"ProfileClient",
 			tca,
-            // ^^^ Sort lexicographically ^^^
+			// ^^^ Sort lexicographically ^^^
 		],
 		resources: [.process("Resources")],
 		tests: .yes(
@@ -387,14 +387,14 @@ package.addModules([
 	.feature(
 		name: "ManageBrowserExtensionConnectionsFeature",
 		dependencies: [
-            // ˅˅˅ Sort lexicographically ˅˅˅
-            "Common",
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
 			converse,
 			"DesignSystem",
-            .product(name: "InputPasswordFeature", package: "ConverseUI"),
-            profile,
+			.product(name: "InputPasswordFeature", package: "Converse"),
+			profile,
 			tca,
-            // ^^^ Sort lexicographically ^^^
+			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]

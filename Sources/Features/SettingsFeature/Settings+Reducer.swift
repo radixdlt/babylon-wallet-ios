@@ -13,12 +13,6 @@ public struct Settings: ReducerProtocol {
 	public init() {}
 }
 
-// public extension Settings.Action {
-//	static func manageBrowserExtensionConnections(_ action: ManageBrowserExtensionConnections.Action) -> Self {
-//		.internal(.manageBrowserExtensionConnections(action))
-//	}
-// }
-
 public extension Settings {
 	var body: some ReducerProtocol<State, Action> {
 		Reduce(self.core)
@@ -77,6 +71,8 @@ public extension Settings {
 			state.manageBrowserExtensionConnections = nil
 			return .none
 		case .manageBrowserExtensionConnections(.internal(_)):
+			return .none
+		case .manageBrowserExtensionConnections(.inputBrowserExtensionConnectionPassword(_)):
 			return .none
 		}
 	}
