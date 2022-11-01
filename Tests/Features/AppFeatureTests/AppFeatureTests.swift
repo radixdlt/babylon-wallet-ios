@@ -28,13 +28,13 @@ final class AppFeatureTests: TestCase {
 		_ = await store.send(.main(.coordinate(.removedWallet)))
 		_ = await store.receive(.coordinate(.onboard)) {
 			// then
-			$0 = .onboarding(.init(networkID: .primary))
+			$0 = .onboarding(.init())
 		}
 	}
 
 	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		var environment: App.Environment = .unimplemented
-		let newProfile = try await Profile.new(mnemonic: .generate())
+		let newProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
 		environment.profileClient.injectProfile = {
 			XCTAssertEqual($0, newProfile) // assert correct profile is injected
 		}
@@ -55,13 +55,13 @@ final class AppFeatureTests: TestCase {
 
 		// THEN: ... and we navigate to main
 		await store.receive(.coordinate(.toMain)) {
-			$0 = .main(.init(networkID: .primary))
+			$0 = .main(.init())
 		}
 	}
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		// GIVEN: an existing profile
-		let existingProfile = try await Profile.new(mnemonic: .generate())
+		let existingProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
 
 		let testScheduler = DispatchQueue.test
 		var environment: App.Environment = .unimplemented
@@ -87,7 +87,7 @@ final class AppFeatureTests: TestCase {
 		_ = await store.receive(.internal(.injectProfileIntoProfileClient(existingProfile)))
 		// THEN: ... and we navigate to main
 		await store.receive(.coordinate(.toMain)) {
-			$0 = .main(.init(networkID: .primary))
+			$0 = .main(.init())
 		}
 	}
 
@@ -124,7 +124,7 @@ final class AppFeatureTests: TestCase {
 		_ = await store.send(.splash(.coordinate(.loadProfileResult(loadProfileResult))))
 
 		// then
-		await store.receive(.coordinate(.onboard)) { [networkID] in
+		await store.receive(.coordinate(.onboard)) {
 			$0 = .onboarding(.init())
 		}
 	}

@@ -4,7 +4,7 @@ import InputPasswordFeature
 
 // MARK: - ManageBrowserExtensionConnections
 public struct ManageBrowserExtensionConnections: ReducerProtocol {
-	public init() {	}
+	public init() {}
 }
 
 public extension ManageBrowserExtensionConnections {
