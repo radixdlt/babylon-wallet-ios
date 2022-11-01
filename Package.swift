@@ -16,12 +16,12 @@ let package = Package(
 package.dependencies += [
 	// RDX Works Package depedencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.13"),
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.14"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.27"),
-
+    .package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.27"),
+    
 	// BigInt
-	.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
+	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
 
 	// TCA - ComposableArchitecture used as architecture
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
@@ -284,8 +284,8 @@ package.addModules([
 			"DesignSystem",
 			keychainClient,
 			profile,
-			tca,
-			"ProfileClient",
+            "ProfileClient",
+            tca,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -350,11 +350,13 @@ package.addModules([
 	.feature(
 		name: "IncomingConnectionRequestFromDappReviewFeature",
 		dependencies: [
+            // ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"DesignSystem",
 			profile,
 			"ProfileClient",
 			tca,
+            // ^^^ Sort lexicographically ^^^
 		],
 		resources: [.process("Resources")],
 		tests: .yes(
@@ -385,11 +387,14 @@ package.addModules([
 	.feature(
 		name: "ManageBrowserExtensionConnectionsFeature",
 		dependencies: [
-			"Common",
+            // ˅˅˅ Sort lexicographically ˅˅˅
+            "Common",
 			converse,
 			"DesignSystem",
-			profile,
+            .product(name: "InputPasswordFeature", package: "ConverseUI"),
+            profile,
 			tca,
+            // ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
