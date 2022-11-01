@@ -1,6 +1,6 @@
+import Bite
 import Common
 import Foundation
-import Mnemonic
 
 public extension String {
 	var hexData: Data {

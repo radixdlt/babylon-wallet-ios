@@ -18,7 +18,9 @@ public extension CreateAccount {
 		switch action {
 		case .internal(.user(.createAccount)):
 			precondition(state.isValid)
-			return .run { [profileClient, keychainClient, accountName = state.accountName, networkID = state.networkID] send in
+			precondition(!state.isCreatingAccount)
+			state.isCreatingAccount = true
+			return .run { [profileClient, keychainClient, accountName = state.accountName] send in
 				await send(.internal(.system(.createdNewAccountResult(
 					TaskResult {
 						// FIXME: Think our best approach to generalize this. Maybe we actually SHOULD
@@ -27,8 +29,7 @@ public extension CreateAccount {
 						// method to try to load the correct mnemonic from keychain.
 						let createAccountRequest = CreateAccountRequest(
 							accountName: accountName,
-							keychainClient: keychainClient,
-							networkID: networkID
+							keychainClient: keychainClient
 						)
 						let newAccount = try await profileClient.createAccount(createAccountRequest)
 						let profileSnapshot = try profileClient.extractProfileSnapshot()
@@ -39,10 +40,12 @@ public extension CreateAccount {
 			}
 
 		case let .internal(.system(.createdNewAccountResult(.success(account)))):
+			state.isCreatingAccount = false
 			return .run { send in
 				await send(.coordinate(.createdNewAccount(account)))
 			}
 		case let .internal(.system(.createdNewAccountResult(.failure(error)))):
+			state.isCreatingAccount = false
 			return .run { send in
 				await send(.coordinate(.failedToCreateNewAccount(reason: String(describing: error))))
 			}

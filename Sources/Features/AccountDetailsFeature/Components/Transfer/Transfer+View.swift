@@ -1,5 +1,5 @@
-import Common
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 
 // MARK: - AccountDetails.Transfer.View

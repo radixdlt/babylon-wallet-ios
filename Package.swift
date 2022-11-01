@@ -16,12 +16,12 @@ let package = Package(
 package.dependencies += [
 	// RDX Works Package depedencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.13"),
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.15"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.27"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.29"),
 
 	// BigInt
-	.package(url: "https://github.com/attaswift/BigInt.git", from: "5.3.0"),
+	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
 
 	// TCA - ComposableArchitecture used as architecture
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
@@ -284,8 +284,8 @@ package.addModules([
 			"DesignSystem",
 			keychainClient,
 			profile,
-			tca,
 			"ProfileClient",
+			tca,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -350,11 +350,13 @@ package.addModules([
 	.feature(
 		name: "IncomingConnectionRequestFromDappReviewFeature",
 		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"DesignSystem",
 			profile,
 			"ProfileClient",
 			tca,
+			// ^^^ Sort lexicographically ^^^
 		],
 		resources: [.process("Resources")],
 		tests: .yes(
@@ -385,11 +387,14 @@ package.addModules([
 	.feature(
 		name: "ManageBrowserExtensionConnectionsFeature",
 		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			converse,
 			"DesignSystem",
+			.product(name: "InputPasswordFeature", package: "Converse"),
 			profile,
 			tca,
+			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -411,6 +416,7 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
+			"DesignSystem",
 			engineToolkit,
 			"ImportProfileFeature",
 			profile,
@@ -574,6 +580,7 @@ package.addModules([
 			profile,
 			"ProfileLoader",
 			dependencies, // XCTestDynamicOverlay + DependencyKey
+			"UserDefaultsClient", // storing of NetworkID, remove in future in favour of storing this inside Profile?
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -597,6 +604,7 @@ package.addModules([
 			bigInt,
 			"DesignSystem",
 		],
+		resources: [.process("Localization/Strings")],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
@@ -610,8 +618,8 @@ package.addModules([
 	.core(
 		name: "TestUtils",
 		dependencies: [
+			bite,
 			"Common",
-			profile, // Actually `Mnemonic`, Contains Data+Hex extension. FIXME: Extract Data+Hex functions to seperate repo, which Mnemonic and thus this TestUtils package can depend on.
 			tca,
 		],
 		tests: .no
