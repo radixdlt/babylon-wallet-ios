@@ -35,8 +35,8 @@ final class AppFeatureTests: TestCase {
 	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		var environment: App.Environment = .unimplemented
 		let newProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
-		environment.profileClient.injectProfile = {
-			XCTAssertEqual($0, newProfile) // assert correct profile is injected
+		environment.profileClient.injectProfile = { injected, _ in
+			XCTAssertEqual(injected, newProfile) // assert correct profile is injected
 		}
 
 		let store = TestStore(
@@ -51,9 +51,10 @@ final class AppFeatureTests: TestCase {
 		_ = await store.receive(.onboarding(.coordinate(.onboardedWithProfile(newProfile, isNew: true))))
 
 		// THEN: it is injected into ProfileClient...
-		_ = await store.receive(.internal(.injectProfileIntoProfileClient(newProfile)))
+		_ = await store.receive(.internal(.injectProfileIntoProfileClient(newProfile, persistIntoKeychain: true)))
 
 		// THEN: ... and we navigate to main
+		await store.receive(.internal(.injectProfileIntoProfileClientResult(.success(newProfile))))
 		await store.receive(.coordinate(.toMain)) {
 			$0 = .main(.init())
 		}
@@ -66,8 +67,8 @@ final class AppFeatureTests: TestCase {
 		let testScheduler = DispatchQueue.test
 		var environment: App.Environment = .unimplemented
 		environment.mainQueue = testScheduler.eraseToAnyScheduler()
-		environment.profileClient.injectProfile = {
-			XCTAssertEqual($0, existingProfile) // assert correct profile is injected
+		environment.profileClient.injectProfile = { injected, _ in
+			XCTAssertEqual(injected, existingProfile) // assert correct profile is injected
 		}
 		let store = TestStore(
 			initialState: .splash(.init()),
@@ -84,8 +85,9 @@ final class AppFeatureTests: TestCase {
 		_ = await store.receive(.splash(.coordinate(.loadProfileResult(.profileLoaded(existingProfile)))))
 
 		// THEN: it is injected into ProfileClient...
-		_ = await store.receive(.internal(.injectProfileIntoProfileClient(existingProfile)))
+		_ = await store.receive(.internal(.injectProfileIntoProfileClient(existingProfile, persistIntoKeychain: false)))
 		// THEN: ... and we navigate to main
+		await store.receive(.internal(.injectProfileIntoProfileClientResult(.success(existingProfile))))
 		await store.receive(.coordinate(.toMain)) {
 			$0 = .main(.init())
 		}

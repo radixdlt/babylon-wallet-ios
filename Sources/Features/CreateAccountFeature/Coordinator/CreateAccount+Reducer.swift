@@ -20,21 +20,13 @@ public extension CreateAccount {
 			precondition(state.isValid)
 			precondition(!state.isCreatingAccount)
 			state.isCreatingAccount = true
-			return .run { [profileClient, keychainClient, accountName = state.accountName] send in
+			return .run { [profileClient, accountName = state.accountName] send in
 				await send(.internal(.system(.createdNewAccountResult(
 					TaskResult {
-						// FIXME: Think our best approach to generalize this. Maybe we actually SHOULD
-						// add the KeychainClient as a "stored propery" of the ProfileClient?
-						// Now it is only passed in so that we can use `Profile` Packages convenience
-						// method to try to load the correct mnemonic from keychain.
 						let createAccountRequest = CreateAccountRequest(
-							accountName: accountName,
-							keychainClient: keychainClient
+							accountName: accountName
 						)
-						let newAccount = try await profileClient.createAccount(createAccountRequest)
-						let profileSnapshot = try profileClient.extractProfileSnapshot()
-						try keychainClient.saveProfileSnapshot(profileSnapshot: profileSnapshot)
-						return newAccount
+						return try await profileClient.createAccount(createAccountRequest)
 					}
 				))))
 			}
