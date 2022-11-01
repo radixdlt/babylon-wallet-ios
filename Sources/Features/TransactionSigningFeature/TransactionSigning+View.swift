@@ -1,4 +1,6 @@
 import ComposableArchitecture
+import DesignSystem
+import EngineToolkit
 import SwiftUI
 
 // MARK: - TransactionSigning.View
@@ -16,28 +18,15 @@ public extension TransactionSigning.View {
 	var body: some View {
 		WithViewStore(
 			store,
-			observe: ViewState.init(state:),
-			send: TransactionSigning.Action.init
-		) { _ in
-			// TODO: implement
-			Text("Implement: TransactionSigning")
-				.background(Color.yellow)
-				.foregroundColor(.red)
-		}
-	}
-}
-
-// MARK: - TransactionSigning.View.ViewAction
-extension TransactionSigning.View {
-	enum ViewAction: Equatable {}
-}
-
-extension TransactionSigning.Action {
-	init(action: TransactionSigning.View.ViewAction) {
-		switch action {
-		default:
-			// TODO: implement
-			break
+			observe: ViewState.init
+		) { viewStore in
+			VStack {
+				Text(viewStore.state.transactionManifestDescription)
+					.background(Color.gray)
+				PrimaryButton(title: "Sign Transaction") {
+					viewStore.send(.signTransaction)
+				}
+			}
 		}
 	}
 }
@@ -45,8 +34,12 @@ extension TransactionSigning.Action {
 // MARK: - TransactionSigning.View.ViewState
 extension TransactionSigning.View {
 	struct ViewState: Equatable {
-		init(state _: TransactionSigning.State) {
-			// TODO: implement
+		let transactionManifest: TransactionManifest
+		let transactionManifestDescription: String
+
+		init(state: TransactionSigning.State) {
+			self.transactionManifest = state.transactionManifest
+			self.transactionManifestDescription = state.transactionManifest.description
 		}
 	}
 }
