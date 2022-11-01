@@ -42,7 +42,9 @@ public extension NewProfile {
 
 		case .internal(.system(.createProfile)):
 			precondition(state.canProceed)
-			return .run { [mnemonicGenerator, keychainClient, nameOfFirstAccount = state.nameOfFirstAccount, networkID = state.networkID] send in
+			precondition(!state.isCreatingProfile)
+			state.isCreatingProfile = true
+			return .run { [mnemonicGenerator, keychainClient, nameOfFirstAccount = state.nameOfFirstAccount] send in
 
 				await send(.internal(.system(.createdProfileResult(
 					TaskResult {
@@ -52,8 +54,7 @@ public extension NewProfile {
 							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
 							createFirstAccountRequest: .init(
 								accountName: nameOfFirstAccount,
-								keychainClient: keychainClient,
-								networkID: networkID
+								keychainClient: keychainClient
 							)
 						)
 						let newProfile = try await profileClient.createNewProfile(newProfileRequest)
@@ -73,11 +74,13 @@ public extension NewProfile {
 			}
 
 		case let .internal(.system(.createdProfileResult(.success(profile)))):
+			state.isCreatingProfile = false
 			return .run { send in
 				await send(.coordinate(.finishedCreatingNewProfile(profile)))
 			}
 
 		case let .internal(.system(.createdProfileResult(.failure(error)))):
+			state.isCreatingProfile = false
 			return .run { send in
 				await send(.coordinate(.failedToCreateNewProfile(reason: String(describing: error))))
 			}

@@ -5,6 +5,8 @@ import XCTestDynamicOverlay
 
 public extension ProfileClient {
 	static let unimplemented: Self = .init(
+		getCurrentNetworkID: XCTUnimplemented("\(Self.self).getCurrentNetworkID is unimplemented"),
+		setCurrentNetworkID: XCTUnimplemented("\(Self.self).setCurrentNetworkID is unimplemented"),
 		createNewProfile: XCTUnimplemented("\(Self.self).createNewProfile is unimplemented"),
 		injectProfile: XCTUnimplemented("\(Self.self).injectProfile is unimplemented"),
 		extractProfileSnapshot: XCTUnimplemented("\(Self.self).extractProfileSnapshot is unimplemented"),

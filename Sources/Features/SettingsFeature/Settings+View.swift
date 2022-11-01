@@ -1,5 +1,5 @@
-import Common
 import ComposableArchitecture
+import DesignSystem
 import GatewayAPI
 import KeychainClient
 import ManageBrowserExtensionConnectionsFeature
@@ -54,14 +54,13 @@ public extension Settings.View {
 }
 
 private extension Settings.View {
-	func settingsView(viewStore: ViewStore<Settings.View.ViewState, Settings.View.ViewAction>) -> some View {
-		ForceFullScreen {
+	func settingsView(viewStore: ViewStore<ViewState, ViewAction>) -> some View {
+		Screen(
+			title: "Settings",
+			navBarActionStyle: .close,
+			action: { viewStore.send(.dismissSettingsButtonTapped) }
+		) {
 			VStack {
-				Button(
-					action: { viewStore.send(.dismissSettingsButtonTapped) },
-					label: { Text("Dismiss Settings") }
-				)
-
 				#if DEBUG
 				Button("Debug Inspect Profile") {
 					viewStore.send(.debugInspectProfileButtonTapped)

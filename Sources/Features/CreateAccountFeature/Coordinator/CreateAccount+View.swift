@@ -86,14 +86,17 @@ public extension CreateAccount.View {
 
 					Spacer(minLength: 10)
 
+					if viewStore.isLoaderVisible {
+						LoadingView()
+					}
+
 					PrimaryButton(
-						title: L10n.CreateAccount.continueButtonTitle,
-						isEnabled: viewStore.isValid,
+						title: L10n.CreateAccount.createAccountButtonTitle,
+						isEnabled: viewStore.isCreateAccountButtonEnabled,
 						action: {
 							viewStore.send(.createButtonTapped)
 						}
 					)
-					.disabled(!viewStore.isValid)
 				}
 				.onAppear {
 					viewStore.send(.viewDidAppear)
@@ -143,13 +146,15 @@ extension CreateAccount.View {
 	struct ViewState: Equatable {
 		public var numberOfExistingAccounts: Int
 		public var accountName: String
-		public var isValid: Bool
+		public var isLoaderVisible: Bool
+		public var isCreateAccountButtonEnabled: Bool
 		@BindableState public var focusedField: CreateAccount.State.Field?
 
 		init(state: CreateAccount.State) {
 			numberOfExistingAccounts = state.numberOfExistingAccounts
 			accountName = state.accountName
-			isValid = state.isValid
+			isLoaderVisible = state.isCreatingAccount
+			isCreateAccountButtonEnabled = state.isValid && !state.isCreatingAccount
 			focusedField = state.focusedField
 		}
 	}
@@ -174,7 +179,7 @@ struct CreateAccount_Previews: PreviewProvider {
 
 		return CreateAccount.View(
 			store: .init(
-				initialState: .init(networkID: .primary),
+				initialState: .init(),
 				reducer: CreateAccount()
 			)
 		)

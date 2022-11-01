@@ -265,7 +265,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SDKROOT=macosx swift run -c release --package-path ../Sources/_BuildTools swiftformat \"$SRCROOT/../\"\n";
+			shellScript = "SDKROOT=macosx swift run -c release --package-path ../Sources/Core/_BuildTools swiftformat \"$SRCROOT/../\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

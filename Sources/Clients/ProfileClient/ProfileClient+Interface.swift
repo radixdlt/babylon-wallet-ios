@@ -12,7 +12,11 @@ import Tagged
 public struct CreateNewProfileRequest {
 	public let curve25519FactorSourceMnemonic: Mnemonic
 	public let createFirstAccountRequest: CreateAccountRequest
-	public init(curve25519FactorSourceMnemonic: Mnemonic, createFirstAccountRequest: CreateAccountRequest) {
+
+	public init(
+		curve25519FactorSourceMnemonic: Mnemonic,
+		createFirstAccountRequest: CreateAccountRequest
+	) {
 		self.curve25519FactorSourceMnemonic = curve25519FactorSourceMnemonic
 		self.createFirstAccountRequest = createFirstAccountRequest
 	}
@@ -20,6 +24,9 @@ public struct CreateNewProfileRequest {
 
 // MARK: - ProfileClient
 public struct ProfileClient: DependencyKey {
+	public var getCurrentNetworkID: GetCurrentNetworkID
+	public var setCurrentNetworkID: SetCurrentNetworkID
+
 	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
 	public var createNewProfile: CreateNewProfile
 
@@ -38,7 +45,9 @@ public struct ProfileClient: DependencyKey {
 }
 
 public extension ProfileClient {
-	/// For when profile already exists
+	typealias GetCurrentNetworkID = @Sendable () -> NetworkID
+	typealias SetCurrentNetworkID = @Sendable (NetworkID) async -> Void
+
 	typealias CreateNewProfile = @Sendable (CreateNewProfileRequest) async throws -> Profile
 	typealias InjectProfile = @Sendable (Profile) -> Void
 	typealias DeleteProfileSnapshot = @Sendable () throws -> Void
@@ -64,17 +73,14 @@ public extension TransactionIntent {
 // MARK: - CreateAccountRequest
 public struct CreateAccountRequest {
 	public let accountName: String?
-	public let networkID: NetworkID
 	/// Used to read out secrets
 	public let keychainClient: KeychainClient
 
 	public init(
 		accountName: String?,
-		keychainClient: KeychainClient,
-		networkID: NetworkID
+		keychainClient: KeychainClient
 	) {
 		self.accountName = accountName
 		self.keychainClient = keychainClient
-		self.networkID = networkID
 	}
 }

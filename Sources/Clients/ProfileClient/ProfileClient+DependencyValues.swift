@@ -3,8 +3,6 @@ import Foundation
 
 // MARK: - ProfileClientKey
 public extension ProfileClient {
-	static let liveValue = Self.live()
-
 	#if DEBUG
 	static let testValue = Self.mock()
 	#endif // DEBUG

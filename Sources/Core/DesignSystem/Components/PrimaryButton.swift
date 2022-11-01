@@ -31,6 +31,7 @@ public extension PrimaryButton {
 					.cornerRadius(8)
 			}
 		)
+		.disabled(!isEnabled)
 	}
 }
 

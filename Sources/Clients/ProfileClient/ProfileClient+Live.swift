@@ -7,31 +7,49 @@ import GatewayAPI
 import KeychainClient
 import Profile
 import SLIP10
+import UserDefaultsClient
+
+private let currentNetworkIDKey = "currentNetworkIDKey"
+public extension UserDefaultsClient {
+	func setNetworkID(_ networkID: NetworkID) async {
+		await setInteger(Int(networkID.id), currentNetworkIDKey)
+	}
+
+	var networkID: NetworkID {
+		guard case let int = integerForKey(currentNetworkIDKey), int > 0 else {
+			return .primary
+		}
+		return NetworkID(.init(int))
+	}
+}
 
 public extension ProfileClient {
-	static func live(
-		backgroundQueue: AnySchedulerOf<DispatchQueue> = DispatchQueue(label: "GatewayUsage").eraseToAnyScheduler(),
-		gatewayAPIClient: GatewayAPIClient = .live(),
-		engineToolkitClient: EngineToolkitClient = .liveValue,
-		pollStrategy: PollStrategy = .default
-	) -> Self {
+	static let liveValue: Self = {
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.engineToolkitClient) var engineToolkitClient
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		let pollStrategy: PollStrategy = .default
+
 		let profileHolder = ProfileHolder.shared
 
-		let makeEntityNonVirtualBySubmittingItToLedgerFromCreateAccountRequest: (CreateAccountRequest) async throws -> MakeEntityNonVirtualBySubmittingItToLedger = { (createAccountRequest: CreateAccountRequest) async throws -> MakeEntityNonVirtualBySubmittingItToLedger in
+		let getCurrentNetworkID: GetCurrentNetworkID = {
+			userDefaultsClient.networkID
+		}
+
+		let makeEntityNonVirtualBySubmittingItToLedgerFromCreateAccountRequest: (CreateAccountRequest) async throws -> MakeEntityNonVirtualBySubmittingItToLedger = { (_: CreateAccountRequest) async throws -> MakeEntityNonVirtualBySubmittingItToLedger in
 
 			let makeEntityNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger = { privateKey in
 
 				print("🎭 Create On-Ledger-Account ✨")
 
 				let committed = try await gatewayAPIClient.submit(
-					pollStrategy: pollStrategy,
-					backgroundQueue: backgroundQueue
+					pollStrategy: pollStrategy
 				) { epoch in
 
 					let buildAndSignTXRequest = BuildAndSignTransactionRequest(
 						privateKey: privateKey,
 						epoch: epoch,
-						networkID: createAccountRequest.networkID
+						networkID: getCurrentNetworkID()
 					)
 
 					return try engineToolkitClient.createAccount(request: buildAndSignTXRequest)
@@ -56,12 +74,25 @@ public extension ProfileClient {
 		}
 
 		return Self(
+			getCurrentNetworkID: getCurrentNetworkID,
+			setCurrentNetworkID: { newNetworkID in
+				await userDefaultsClient.setNetworkID(newNetworkID)
+			},
 			createNewProfile: { request in
-				try await Profile.new(
+
+				// Get default NetworkID
+				let networkID = getCurrentNetworkID()
+				// Save NetworkID if needed (needed first time wallet launches)
+				await userDefaultsClient.setNetworkID(networkID)
+
+				let newProfile = try await Profile.new(
+					networkID: networkID,
 					mnemonic: request.curve25519FactorSourceMnemonic,
 					firstAccountDisplayName: request.createFirstAccountRequest.accountName,
 					makeFirstAccountNonVirtualBySubmittingItToLedger: makeEntityNonVirtualBySubmittingItToLedgerFromCreateAccountRequest(request.createFirstAccountRequest)
 				)
+
+				return newProfile
 			},
 			injectProfile: {
 				profileHolder.injectProfile($0)
@@ -82,13 +113,14 @@ public extension ProfileClient {
 					profile.appPreferences
 				}
 			},
-			setDisplayAppPreferences: { _ in
-				try profileHolder.setting { _ in
+			setDisplayAppPreferences: { newDisplayPreferences in
+				try profileHolder.mutating { profile in
+					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
 			createAccount: { createAccountRequest in
 
-				try await profileHolder.asyncSetting { profile in
+				try await profileHolder.asyncMutating { profile in
 
 					try await profile.createNewOnLedgerAccount(
 						displayName: createAccountRequest.accountName,
@@ -108,7 +140,7 @@ public extension ProfileClient {
 				"TXID"
 			}
 		)
-	}
+	}()
 }
 
 // MARK: - CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities
@@ -142,19 +174,19 @@ private final class ProfileHolder {
 		return try await withProfile(profile)
 	}
 
-	func setting(_ setProfile: (inout Profile) throws -> Void) throws {
+	func mutating(_ mutateProfile: (inout Profile) throws -> Void) throws {
 		guard var profile else {
 			throw NoProfile()
 		}
-		try setProfile(&profile)
+		try mutateProfile(&profile)
 		self.profile = profile
 	}
 
-	func asyncSetting<T>(_ setProfile: (inout Profile) async throws -> T) async throws -> T {
+	func asyncMutating<T>(_ mutateProfile: (inout Profile) async throws -> T) async throws -> T {
 		guard var profile else {
 			throw NoProfile()
 		}
-		let result = try await setProfile(&profile)
+		let result = try await mutateProfile(&profile)
 		self.profile = profile
 		return result
 	}

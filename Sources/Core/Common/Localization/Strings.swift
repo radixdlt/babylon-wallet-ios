@@ -38,8 +38,8 @@ public enum L10n {
 	}
 
 	public enum CreateAccount {
-		/// Continue
-		public static let continueButtonTitle = L10n.tr("Localizable", "createAccount.continueButtonTitle", fallback: #"Continue"#)
+		/// Create Account
+		public static let createAccountButtonTitle = L10n.tr("Localizable", "createAccount.createAccountButtonTitle", fallback: #"Create Account"#)
 		/// Create First Account
 		public static let createFirstAccount = L10n.tr("Localizable", "createAccount.createFirstAccount", fallback: #"Create First Account"#)
 		/// Create New Account
@@ -102,8 +102,8 @@ public enum L10n {
 		public enum Header {
 			/// Welcome, here are all your accounts on the Radix Network
 			public static let subtitle = L10n.tr("Localizable", "home.header.subtitle", fallback: #"Welcome, here are all your accounts on the Radix Network"#)
-			/// Radix Wallet
-			public static let title = L10n.tr("Localizable", "home.header.title", fallback: #"Radix Wallet"#)
+			/// Babylon E2E
+			public static let title = L10n.tr("Localizable", "home.header.title", fallback: #"Babylon E2E"#)
 		}
 
 		public enum VisitHub {
@@ -151,13 +151,7 @@ extension L10n {
 // MARK: - BundleToken
 // swiftlint:disable convenience_type
 private final class BundleToken {
-	static let bundle: Bundle = {
-		#if SWIFT_PACKAGE
-		return Bundle(for: BundleToken.self)
-		#else
-		return Bundle(for: BundleToken.self)
-		#endif
-	}()
+	static let bundle: Bundle = .init(for: BundleToken.self)
 }
 
 // swiftlint:enable convenience_type

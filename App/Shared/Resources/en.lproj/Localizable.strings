@@ -14,7 +14,7 @@
 "createAccount.completion.returnToOrigin" = "Go to %@";
 "createAccount.completion.subtitle" = "You’ve created your account.";
 "createAccount.completion.title" = "Congratulations";
-"createAccount.continueButtonTitle" = "Continue";
+"createAccount.createAccountButtonTitle" = "Create Account";
 "createAccount.createFirstAccount" = "Create First Account";
 "createAccount.createNewAccount" = "Create New Account";
 "createAccount.explanation" = "This can be changed any time";
