@@ -6,7 +6,15 @@ public struct IncomingConnectionRequestFromDapp: Equatable, Decodable {
 	let componentAddress: ComponentAddress
 	let name: String?
 	let permissions: [IncomingConnectionRequestFromDapp.Permission]
-	let accountLimit: Int
+	let numberOfNeededAccounts: NumberOfNeededAccounts
+}
+
+// MARK: IncomingConnectionRequestFromDapp.NumberOfNeededAccounts
+extension IncomingConnectionRequestFromDapp {
+	enum NumberOfNeededAccounts: Decodable, Equatable {
+		case atLeastOne
+		case exactly(Int)
+	}
 }
 
 // MARK: - Computed Propertie
@@ -26,7 +34,7 @@ public extension IncomingConnectionRequestFromDapp {
 			.placeholder2,
 //			.placeholder3,
 		],
-		accountLimit: 1
+		numberOfNeededAccounts: .exactly(1)
 	)
 }
 #endif
