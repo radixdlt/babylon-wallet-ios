@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import MainFeature
 import OnboardingFeature
 import Profile
@@ -26,6 +27,7 @@ public extension App.Action {
 	}
 
 	enum InternalAction: Equatable {
-		case injectProfileIntoProfileClient(Profile)
+		case injectProfileIntoProfileClient(Profile, persistIntoKeychain: Bool)
+		case injectProfileIntoProfileClientResult(TaskResult<Profile>)
 	}
 }

@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import MainFeature
 import OnboardingFeature
+import ProfileClient
 import SplashFeature
 
 public extension App {
@@ -57,7 +58,7 @@ public extension App {
 
 		case let .onboarding(.coordinate(.onboardedWithProfile(profile, isNew))):
 			return .run { send in
-				await send(.internal(.injectProfileIntoProfileClient(profile)))
+				await send(.internal(.injectProfileIntoProfileClient(profile, persistIntoKeychain: true)))
 			}
 
 		case let .onboarding(.coordinate(.failedToCreateOrImportProfile(failureReason))):
@@ -67,7 +68,7 @@ public extension App {
 
 		case let .splash(.coordinate(.loadProfileResult(.profileLoaded(profile)))):
 			return .run { send in
-				await send(.internal(.injectProfileIntoProfileClient(profile)))
+				await send(.internal(.injectProfileIntoProfileClient(profile, persistIntoKeychain: false)))
 			}
 
 		case let .splash(.coordinate(.loadProfileResult(.noProfile(reason, failedToDecode)))):
@@ -81,11 +82,21 @@ public extension App {
 				}
 			}
 
-		case let .internal(.injectProfileIntoProfileClient(profile)):
+		case let .internal(.injectProfileIntoProfileClient(profile, persistIntoKeychain)):
 			return .run { send in
-				environment.profileClient.injectProfile(profile)
+				await send(.internal(.injectProfileIntoProfileClientResult(
+					TaskResult {
+						try await environment.profileClient.injectProfile(profile, persistIntoKeychain ? InjectProfileMode.injectAndPersistInKeychain : InjectProfileMode.onlyInject)
+						return profile
+					}
+				)))
+			}
+		case let .internal(.injectProfileIntoProfileClientResult(.success(profile))):
+			return .run { send in
 				await send(.coordinate(.toMain))
 			}
+		case let .internal(.injectProfileIntoProfileClientResult(.failure(error))):
+			fatalError(String(describing: error))
 
 		case .coordinate(.onboard):
 			state = .onboarding(.init())

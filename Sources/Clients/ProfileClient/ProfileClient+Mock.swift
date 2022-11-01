@@ -16,7 +16,7 @@ public extension ProfileClient {
 					mnemonic: req.curve25519FactorSourceMnemonic
 				)
 			},
-			injectProfile: { _ in /* Noop */ },
+			injectProfile: { _, _ in /* Noop */ },
 			extractProfileSnapshot: { fatalError("Impl me") },
 			deleteProfileSnapshot: { /* Noop */ },
 			getAccounts: {
@@ -69,6 +69,8 @@ public extension ProfileClient {
 
 				return NonEmpty(rawValue: OrderedSet(accounts))!
 			},
+			getBrowserExtensionConnections: { fatalError() },
+			addBrowserExtensionConnection: { _ in fatalError() },
 			getAppPreferences: {
 				fatalError()
 			},
