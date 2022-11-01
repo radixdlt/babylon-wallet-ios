@@ -4,10 +4,7 @@ import InputPasswordFeature
 
 // MARK: - ManageBrowserExtensionConnections
 public struct ManageBrowserExtensionConnections: ReducerProtocol {
-	public init() {
-		// Tmp proof that we have solved SPM issue 5630 (failed to add Converse as a dependency.)
-		_ = try! Connection.live(connectionSecrets: .random())
-	}
+	public init() {	}
 }
 
 public extension ManageBrowserExtensionConnections {

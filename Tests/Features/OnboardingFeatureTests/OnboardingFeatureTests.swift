@@ -28,7 +28,7 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 		}
 
 		let store = TestStore(
-			initialState: NewProfile.State(networkID: .primary, canProceed: true),
+			initialState: NewProfile.State(canProceed: true),
 			reducer: NewProfile()
 		)
 		store.dependencies.keychainClient = keychainClient

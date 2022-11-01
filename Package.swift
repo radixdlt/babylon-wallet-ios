@@ -579,7 +579,8 @@ package.addModules([
 			"GatewayAPI", // Create Account On Ledger => Submit TX
 			profile,
 			"ProfileLoader",
-			dependencies, // XCTestDynamicOverlay + DependencyKey
+            dependencies, // XCTestDynamicOverlay + DependencyKey
+            "UserDefaultsClient", // storing of NetworkID, remove in future in favour of storing this inside Profile?
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
