@@ -64,4 +64,4 @@ strings:
         publicAccess: true
     templateName: structured-swift5
     #output: App/Shared/Resources/Strings.swift
-    output: Sources/Common/Localization/Strings.swift
+    output: Sources/Core/Common/Localization/Strings.swift
