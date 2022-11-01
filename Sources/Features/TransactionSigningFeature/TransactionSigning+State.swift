@@ -1,18 +1,18 @@
 import Foundation
-import GatewayAPI
+import EngineToolkit
 import Profile
 
 // MARK: - TransactionSigning.State
 public extension TransactionSigning {
 	struct State: Equatable {
-		public var account: OnNetwork.Account
+		public var address: String
 		public var transactionManifest: TransactionManifest
 
 		public init(
-			account: OnNetwork.Account,
+			address: String,
 			transactionManifest: TransactionManifest
 		) {
-			self.account = account
+			self.address = address
 			self.transactionManifest = transactionManifest
 		}
 	}

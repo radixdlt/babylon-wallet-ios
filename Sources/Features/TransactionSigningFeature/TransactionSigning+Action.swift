@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 import ProfileClient
 
 // MARK: - TransactionSigning.Action
@@ -27,7 +28,9 @@ public extension TransactionSigning.Action.InternalAction {
 
 // MARK: - TransactionSigning.Action.InternalAction.SystemAction
 public extension TransactionSigning.Action.InternalAction {
-	enum SystemAction: Equatable {}
+	enum SystemAction: Equatable {
+		case addressLookupFailed(NSError)
+	}
 }
 
 // MARK: - TransactionSigning.Action.CoordinatingAction

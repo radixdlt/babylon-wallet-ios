@@ -1,21 +1,30 @@
 import ComposableArchitecture
+import Foundation
 import EngineToolkitClient
 import ProfileClient
 
 // MARK: - TransactionSigning
 public struct TransactionSigning: ReducerProtocol {
-	@Dependency(\.profileClient) var profile
+	@Dependency(\.profileClient) var profileClient
 }
 
 public extension TransactionSigning {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .signTransaction:
-			return .run { send in
-				let result = TaskResult {
-					try await profile.signTransaction(state.account.id, state.transactionManifest)
+			return .run { [address = state.address, transactionManifest = state.transactionManifest] send in
+				let addressLookupResult = Result {
+					try profileClient.lookupAccountByAddress(address)
 				}
-				await send(.internal(.user(.signTransactionResult(result))))
+				switch addressLookupResult {
+				case .failure(let error as NSError):
+					await send(.internal(.system(.addressLookupFailed(error))))
+				case .success(let account):
+					let result = await TaskResult {
+						try await profileClient.signTransaction(account.id, transactionManifest)
+					}
+					await send(.internal(.user(.signTransactionResult(result))))
+				}
 			}
 		case .internal:
 			return .none
