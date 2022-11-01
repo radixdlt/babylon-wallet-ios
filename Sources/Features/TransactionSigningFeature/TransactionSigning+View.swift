@@ -20,16 +20,15 @@ public extension TransactionSigning.View {
 			store,
 			observe: ViewState.init
 		) { viewStore in
-			VStack {
+			VStack(spacing: 20) {
 				Text(viewStore.state.transactionManifestDescription)
 					.frame(maxWidth: .infinity, maxHeight: .infinity)
 					.background(Color.gray)
-					.padding()
 				PrimaryButton(title: "Sign Transaction") {
 					viewStore.send(.signTransaction)
 				}
-				.padding(.horizontal)
 			}
+			.padding()
 		}
 	}
 }
