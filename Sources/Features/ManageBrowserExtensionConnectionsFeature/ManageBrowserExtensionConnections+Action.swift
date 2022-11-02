@@ -46,6 +46,7 @@ public extension ManageBrowserExtensionConnections.Action.InternalAction {
 		case saveNewConnectionResult(TaskResult<BrowserExtensionConnectionWithState>)
 
 		case deleteConnectionResult(TaskResult<BrowserExtensionConnection.ID>)
+		case sendTestMessageResult(TaskResult<String>)
 	}
 }
 

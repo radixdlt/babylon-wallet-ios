@@ -114,7 +114,7 @@ public extension ManageBrowserExtensionConnections.View {
 	struct ViewState: Equatable {
 		public var connections: IdentifiedArrayOf<BrowserExtensionConnectionWithState>
 		init(state: ManageBrowserExtensionConnections.State) {
-            self.connections = state.connections
+			connections = state.connections
 		}
 	}
 }

@@ -130,7 +130,15 @@ public extension ManageBrowserExtensionConnections {
 			}
 
 		case let .connection(id, .delegate(.sendTestMessage)):
-			fatalError("Send test!")
+			return .run { send in
+				await send(.internal(.coordinate(.sendTestMessageResult(
+					TaskResult {
+						let msg = "Test"
+						try await self.browserExtensionsConnectivityClient.sendMessage(id, msg)
+						return msg
+					}
+				))))
+			}
 
 		case let .connection(id, .delegate(.deleteConnection)):
 			return .run { send in
@@ -149,9 +157,6 @@ public extension ManageBrowserExtensionConnections {
 			print("Failed to delete connection from profile, error: \(String(describing: error))")
 			return .none
 
-		case let .connection(id, .internal(_)):
-			return .none
-
 		case .inputBrowserExtensionConnectionPassword:
 			return .none
 
@@ -159,6 +164,17 @@ public extension ManageBrowserExtensionConnections {
 			return .none
 
 		case .coordinate:
+			return .none
+
+		case let .internal(.coordinate(.sendTestMessageResult(.success(msgSent)))):
+			print("Successfully sent message: '\(msgSent)'")
+			return .none
+
+		case let .internal(.coordinate(.sendTestMessageResult(.failure(error)))):
+			print("Failed to send message, error: \(String(describing: error))")
+			return .none
+
+		case .connection(_, .internal(_)):
 			return .none
 		}
 	}

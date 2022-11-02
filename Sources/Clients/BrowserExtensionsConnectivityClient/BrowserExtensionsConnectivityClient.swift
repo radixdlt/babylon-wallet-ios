@@ -1,3 +1,4 @@
+import AsyncExtensions
 import ComposableArchitecture
 import Converse
 import ConverseCommon
@@ -34,7 +35,9 @@ public extension BrowserExtensionsConnectivityClient {
 		Self(
 			getBrowserExtensionConnections: { [] },
 			addBrowserExtensionConnection: { _ in },
-			deleteBrowserExtensionConnection: { _ in }
+			deleteBrowserExtensionConnection: { _ in },
+			getConnectionStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+			sendMessage: { _, _ in }
 		)
 	}
 	#endif // DEBUG
@@ -55,8 +58,8 @@ public struct BrowserExtensionsConnectivityClient: DependencyKey {
 	public var addBrowserExtensionConnection: AddBrowserExtensionConnection
 	public var deleteBrowserExtensionConnection: DeleteBrowserExtensionConnection
 
-	//    public var addBrowserConnectionUpdateListener: AddBrowserConnectionUpdateListener
-	//    public var addIncomingMessageFromBrowserListener: AddIncomingMessageFromBrowserListener
+	public var getConnectionStatusAsyncSequence: GetConnectionStatusAsyncSequence
+	public var sendMessage: SendMessage
 }
 
 public extension BrowserExtensionsConnectivityClient {
@@ -64,29 +67,47 @@ public extension BrowserExtensionsConnectivityClient {
 	typealias AddBrowserExtensionConnection = @Sendable (BrowserExtensionConnection) async throws -> Void
 	typealias DeleteBrowserExtensionConnection = @Sendable (BrowserExtensionConnection.ID) async throws -> Void
 
-	//    typealias BrowserConnectionUpdateListener = @Sendable (BrowserConnectionUpdate) -> Void
-	//    typealias AddBrowserConnectionUpdateListener = @Sendable (BrowserExtensionConnection.ID, BrowserConnectionUpdateListener) -> Void
-//
-	//    typealias IncomingMessageFromBrowserListener = @Sendable (IncomingMessageFromBrowser) -> Void
-	//    typealias AddIncomingMessageFromBrowserListener = @Sendable (BrowserExtensionConnection.ID, IncomingMessageFromBrowserListener) -> Void
+	typealias GetConnectionStatusAsyncSequence = @Sendable (BrowserExtensionConnection.ID) throws -> AnyAsyncSequence<BrowserConnectionUpdate>
+	typealias SendMessage = @Sendable (BrowserExtensionConnection.ID, String) async throws -> Void
 }
 
+// MARK: - StatefulBrowserConnection
+private struct StatefulBrowserConnection {
+	public let browserExtensionConnection: BrowserExtensionConnection
+	public var connection: Connection
+}
+
+// MARK: - NoConnectionMatchingIDFound
+struct NoConnectionMatchingIDFound: Swift.Error {}
 public extension BrowserExtensionsConnectivityClient {
 	static let liveValue: Self = {
 		@Dependency(\.profileClient) var profileClient
 
 		final class ConnectionsHolder {
-			private var connections: [ConnectionID: Connection] = [:]
+			private var connections: [ConnectionID: StatefulBrowserConnection] = [:]
 			static let shared = ConnectionsHolder()
-			func addConnection(_ connection: Connection) {
-				let key = connection.getConnectionID()
+			func mapID(_ passwordID: BrowserExtensionConnection.ID) throws -> ConnectionID {
+				let connectionPassword = try ConnectionPassword(data: Data(hexString: passwordID))
+				return try ConnectionID(password: connectionPassword)
+			}
+
+			func addConnection(_ connection: StatefulBrowserConnection) {
+				let key = connection.connection.getConnectionID()
 				guard connections[key] == nil else {
 					return
 				}
 				self.connections[key] = connection
 				Task.detached {
-					try await connection.establish()
+					try await connection.connection.establish()
 				}
+			}
+
+			func getConnection(id: BrowserExtensionConnection.ID) throws -> StatefulBrowserConnection {
+				let key = try mapID(id)
+				guard let connection = connections[key] else {
+					throw NoConnectionMatchingIDFound()
+				}
+				return connection
 			}
 		}
 
@@ -100,7 +121,13 @@ public extension BrowserExtensionsConnectivityClient {
 					let password = try ConnectionPassword(data: browserConnection.connectionPassword.data)
 					let secrets = try ConnectionSecrets.from(connectionPassword: password)
 					let connection = Connection.live(connectionSecrets: secrets)
-					connectionsHolder.addConnection(connection)
+
+					let statefulConnection = StatefulBrowserConnection(
+						browserExtensionConnection: browserConnection,
+						connection: connection
+					)
+
+					connectionsHolder.addConnection(statefulConnection)
 
 					return BrowserExtensionConnectionWithState(
 						browserExtensionConnection: browserConnection
@@ -113,6 +140,21 @@ public extension BrowserExtensionsConnectivityClient {
 			},
 			deleteBrowserExtensionConnection: { id in
 				try await profileClient.deleteBrowserExtensionConnection(id)
+			},
+			getConnectionStatusAsyncSequence: { id in
+				let connection = try connectionsHolder.getConnection(id: id)
+				return connection.connection.connectionStatus().map { newStatus in
+					BrowserConnectionUpdate(connectionStatus: newStatus, browserExtensionConnection: connection.browserExtensionConnection)
+				}.eraseToAnyAsyncSequence()
+			},
+			sendMessage: { id, message in
+				let connection = try connectionsHolder.getConnection(id: id)
+				let outgoingMessage = Connection.OutgoingMessage(
+					data: message.data(using: .utf8)!,
+					id: UUID().uuidString
+				)
+
+				try await connection.connection.send(outgoingMessage)
 			}
 		)
 	}()

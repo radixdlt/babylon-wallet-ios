@@ -31,6 +31,8 @@ package.dependencies += [
 
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
+
+	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 ]
 
 let tca: Target.Dependency = .product(
@@ -277,22 +279,6 @@ package.addModules([
 			dependencies: ["TestUtils"]
 		)
 	),
-//	.feature(
-//		name: "BrowerExtensionsConnectivityFeature",
-//		dependencies: [
-//			// ˅˅˅ Sort lexicographically ˅˅˅
-//			"Common",
-//			converse,
-//			"IncomingConnectionRequestFromDappReviewFeature",
-//			profile,
-//			"ProfileClient",
-//			tca,
-//			// ^^^ Sort lexicographically ^^^
-//		],
-//		tests: .yes(
-//			dependencies: ["TestUtils"]
-//		)
-//	),
 	.feature(
 		name: "CreateAccountFeature",
 		dependencies: [
@@ -533,6 +519,7 @@ package.addModules([
 	.client(
 		name: "BrowserExtensionsConnectivityClient",
 		dependencies: [
+			.product(name: "AsyncExtensions", package: "AsyncExtensions"),
 			converse,
 			dependencies,
 			profile,

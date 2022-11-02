@@ -15,12 +15,28 @@ import SwiftUI
 
 // MARK: - ManageBrowserExtensionConnection
 public struct ManageBrowserExtensionConnection: ReducerProtocol {
+	@Dependency(\.browserExtensionsConnectivityClient) var browserExtensionsConnectivityClient
 	public init() {}
 }
 
 public extension ManageBrowserExtensionConnection {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
+		case .internal(.system(.viewDidAppear)):
+			return .run { send in
+				await send(.internal(.system(.subscribeToConnectionUpdates)))
+			}
+		case .internal(.system(.subscribeToConnectionUpdates)):
+			return .run { [id = state.id] send in
+				for try await status in try browserExtensionsConnectivityClient.getConnectionStatusAsyncSequence(id) {
+					guard !Task.isCancelled else { continue }
+					assert(status.browserExtensionConnection.id == id)
+					await send(.internal(.system(.browserConnectionStatusChanged(status.connectionStatus))))
+				}
+			}
+		case let .internal(.system(.browserConnectionStatusChanged(newStatus))):
+			state.connectionStatus = newStatus
+			return .none
 		case .internal(.user(.deleteConnection)):
 			return .run { send in
 				await send(.delegate(.deleteConnection))
@@ -37,17 +53,6 @@ public extension ManageBrowserExtensionConnection {
 
 // MARK: ManageBrowserExtensionConnection.State
 public extension ManageBrowserExtensionConnection {
-	//    struct State: Equatable, Identifiable {
-	//        public typealias ID = BrowserExtensionConnectionWithState.ID
-	//        public var id: ID { connectionWithState.id }
-	//        public var connectionWithState: BrowserExtensionConnectionWithState
-//
-	//        public init(
-	//            connectionWithState: BrowserExtensionConnectionWithState
-	//        ) {
-	//            self.connectionWithState = connectionWithState
-	//        }
-	//    }
 	typealias State = BrowserExtensionConnectionWithState
 }
 
@@ -62,6 +67,7 @@ public extension ManageBrowserExtensionConnection {
 public extension ManageBrowserExtensionConnection.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
+		case system(SystemAction)
 	}
 
 	enum DelegateAction: Equatable {
@@ -75,6 +81,15 @@ public extension ManageBrowserExtensionConnection.Action.InternalAction {
 	enum UserAction: Equatable {
 		case deleteConnection
 		case sendTestMessage
+	}
+}
+
+// MARK: - ManageBrowserExtensionConnection.Action.InternalAction.SystemAction
+public extension ManageBrowserExtensionConnection.Action.InternalAction {
+	enum SystemAction: Equatable {
+		case viewDidAppear
+		case browserConnectionStatusChanged(Connection.State)
+		case subscribeToConnectionUpdates
 	}
 }
 
@@ -122,6 +137,9 @@ public extension ManageBrowserExtensionConnection.View {
 					}
 				}
 			}
+			.onAppear {
+				viewStore.send(.viewDidAppear)
+			}
 		}
 	}
 }
@@ -131,6 +149,7 @@ public extension ManageBrowserExtensionConnection.View {
 	enum ViewAction: Equatable {
 		case deleteConnectionButtonTapped
 		case sendTestMessageButtonTapped
+		case viewDidAppear
 	}
 }
 
@@ -157,6 +176,8 @@ public extension ManageBrowserExtensionConnection.Action {
 			self = .internal(.user(.deleteConnection))
 		case .sendTestMessageButtonTapped:
 			self = .internal(.user(.sendTestMessage))
+		case .viewDidAppear:
+			self = .internal(.system(.viewDidAppear))
 		}
 	}
 }
