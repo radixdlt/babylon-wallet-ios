@@ -36,5 +36,7 @@ public extension TransactionSigning.Action.InternalAction {
 
 // MARK: - TransactionSigning.Action.CoordinatingAction
 public extension TransactionSigning.Action {
-	enum CoordinatingAction: Equatable {}
+	enum CoordinatingAction: Equatable {
+		case dismissView
+	}
 }

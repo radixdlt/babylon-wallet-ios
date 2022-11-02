@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import DesignSystem
 import EngineToolkit
@@ -22,7 +23,7 @@ public extension TransactionSigning.View {
 		) { viewStore in
 			VStack(spacing: 20) {
 				NavigationBar("Confirm transaction", style: .back) {
-					viewStore.send(.signTransaction)
+					viewStore.send(.coordinate(.dismissView))
 				}
 				ScrollView([.horizontal, .vertical], showsIndicators: false) {
 					Text(viewStore.state.manifest)
