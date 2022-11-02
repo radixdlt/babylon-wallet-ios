@@ -374,6 +374,12 @@ public struct Home: ReducerProtocol {
 			return .none
 		case .debugInitiatedConnectionRequest(.chooseAccounts(_)):
 			return .none
+		case .debugTransactionSigning(.signTransaction):
+			return .none
+		case .debugTransactionSigning(.internal):
+			return .none
+		case .debugTransactionSigning(.coordinate):
+			return .none
 		#endif
 		}
 	}
