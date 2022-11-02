@@ -156,7 +156,7 @@ public extension BrowserExtensionsConnectivityClient {
 			sendMessage: { id, message in
 				let connection = try connectionsHolder.getConnection(id: id)
 				let outgoingMessage = Connection.OutgoingMessage(
-					data: message.data(using: .utf8)!,
+					data: Data(message.utf8),
 					id: UUID().uuidString
 				)
 
