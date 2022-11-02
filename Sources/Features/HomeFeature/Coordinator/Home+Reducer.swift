@@ -45,6 +45,12 @@ public struct Home: ReducerProtocol {
 			)
 		}
 
+		accountListReducer()
+
+		Reduce(self.core)
+	}
+
+	func accountListReducer() -> some ReducerProtocol<State, Action> {
 		Scope(state: \.accountList, action: /Action.accountList) {
 			Reduce(
 				AccountList.reducer,
@@ -80,8 +86,6 @@ public struct Home: ReducerProtocol {
 				TransactionSigning()
 			}
 		#endif
-
-		Reduce(self.core)
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
