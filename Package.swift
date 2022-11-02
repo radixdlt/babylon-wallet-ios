@@ -277,22 +277,22 @@ package.addModules([
 			dependencies: ["TestUtils"]
 		)
 	),
-	.feature(
-		name: "BrowerExtensionsConnectivityFeature",
-		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"Common",
-			converse,
-			"IncomingConnectionRequestFromDappReviewFeature",
-			profile,
-			"ProfileClient",
-			tca,
-			// ^^^ Sort lexicographically ^^^
-		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
-	),
+//	.feature(
+//		name: "BrowerExtensionsConnectivityFeature",
+//		dependencies: [
+//			// ˅˅˅ Sort lexicographically ˅˅˅
+//			"Common",
+//			converse,
+//			"IncomingConnectionRequestFromDappReviewFeature",
+//			profile,
+//			"ProfileClient",
+//			tca,
+//			// ^^^ Sort lexicographically ^^^
+//		],
+//		tests: .yes(
+//			dependencies: ["TestUtils"]
+//		)
+//	),
 	.feature(
 		name: "CreateAccountFeature",
 		dependencies: [
@@ -331,6 +331,7 @@ package.addModules([
 			"AccountPortfolio",
 			"AccountPreferencesFeature",
 			"AppSettings",
+			"BrowserExtensionsConnectivityClient",
 			"Common",
 			"CreateAccountFeature",
 			engineToolkit,
@@ -367,6 +368,7 @@ package.addModules([
 		name: "IncomingConnectionRequestFromDappReviewFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
+			"BrowserExtensionsConnectivityClient",
 			"Common",
 			"DesignSystem",
 			profile,
@@ -389,7 +391,6 @@ package.addModules([
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AppSettings",
 			"AccountPortfolio",
-			"BrowerExtensionsConnectivityFeature",
 			engineToolkit,
 			"HomeFeature",
 			"PasteboardClient",
@@ -405,6 +406,7 @@ package.addModules([
 		name: "ManageBrowserExtensionConnectionsFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
+			"BrowserExtensionsConnectivityClient",
 			"Common",
 			.product(name: "ConnectUsingPasswordFeature", package: "Converse"),
 			converse,
@@ -527,6 +529,18 @@ package.addModules([
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.client(
+		name: "BrowserExtensionsConnectivityClient",
+		dependencies: [
+			converse,
+			dependencies,
+			profile,
+			"ProfileClient",
+		],
+		tests: .yes(dependencies: [
+			"TestUtils",
+		])
 	),
 	.client(
 		name: "EngineToolkitClient",

@@ -30,14 +30,21 @@ public extension RequestMethodWalletRequest {
 // MARK: RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest
 public extension RequestMethodWalletRequest {
 	struct AccountAddressesRequestMethodWalletRequest: Sendable, Equatable, Decodable {
-		let requestType: RequestType
-		let numberOfAddresses: Int?
+		public let requestType: RequestType
+		public let numberOfAddresses: Int?
+		public init(requestType: RequestType, numberOfAddresses: Int?) {
+			self.requestType = requestType
+			self.numberOfAddresses = numberOfAddresses
+		}
 	}
 }
 
 // MARK: RequestMethodWalletRequest.Metadata
 public extension RequestMethodWalletRequest {
 	struct Metadata: Sendable, Equatable, Decodable {
-		let networkId: Int
+		public let networkId: Int
+		public init(networkId: Int) {
+			self.networkId = networkId
+		}
 	}
 }

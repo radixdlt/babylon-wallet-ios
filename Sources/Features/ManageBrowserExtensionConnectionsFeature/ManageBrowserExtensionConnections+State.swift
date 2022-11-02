@@ -1,3 +1,4 @@
+import BrowserExtensionsConnectivityClient
 import ComposableArchitecture
 import ConnectUsingPasswordFeature
 import Converse
@@ -5,25 +6,6 @@ import ConverseCommon
 import Foundation
 import InputPasswordFeature
 import Profile
-
-// MARK: - BrowserExtensionConnectionWithState
-public struct BrowserExtensionConnectionWithState: Identifiable, Equatable {
-	public typealias ID = BrowserExtensionConnection.ID
-	public var id: ID { browserExtensionConnection.id }
-	public let browserExtensionConnection: BrowserExtensionConnection
-	public let statefulConnection: Connection
-	public var connectionStatus: Connection.State
-	public init(
-		browserExtensionConnection: BrowserExtensionConnection,
-		statefulConnection: Connection,
-		connectionStatus: Connection.State = .disconnected
-	) {
-		precondition(browserExtensionConnection.connectionPassword.data.data == statefulConnection.getConnectionPassword().data.data)
-		self.browserExtensionConnection = browserExtensionConnection
-		self.statefulConnection = statefulConnection
-		self.connectionStatus = connectionStatus
-	}
-}
 
 // MARK: - ManageBrowserExtensionConnections.State
 public extension ManageBrowserExtensionConnections {

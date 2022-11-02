@@ -5,6 +5,7 @@
 //  Created by Alexander Cyon on 2022-11-02.
 //
 
+import BrowserExtensionsConnectivityClient
 import ComposableArchitecture
 import Converse
 import ConverseCommon

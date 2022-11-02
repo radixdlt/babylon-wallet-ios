@@ -1,3 +1,4 @@
+import BrowserExtensionsConnectivityClient
 import Common
 import ComposableArchitecture
 import ConnectUsingPasswordFeature
@@ -113,7 +114,7 @@ public extension ManageBrowserExtensionConnections.View {
 	struct ViewState: Equatable {
 		public var connections: IdentifiedArrayOf<BrowserExtensionConnectionWithState>
 		init(state: ManageBrowserExtensionConnections.State) {
-			connections = state.connections
+            self.connections = state.connections
 		}
 	}
 }

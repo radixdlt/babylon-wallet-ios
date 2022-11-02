@@ -1,4 +1,3 @@
-import BrowerExtensionsConnectivityFeature
 import ComposableArchitecture
 import HomeFeature
 import Profile
@@ -35,21 +34,8 @@ public extension Main {
 			environment: { $0 }
 		),
 
-		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
-		AnyReducer { _ in
-			BrowerExtensionsConnectivity()
-		}
-		.pullback(
-			state: \.browerExtensionsConnectivity,
-			action: /Main.Action.browerExtensionsConnectivity,
-			environment: { $0 }
-		),
-
 		Reducer { state, action, environment in
 			switch action {
-			case .browerExtensionsConnectivity:
-				fatalError()
-
 			case .home(.coordinate(.displaySettings)):
 				state.settings = .init()
 				return .none

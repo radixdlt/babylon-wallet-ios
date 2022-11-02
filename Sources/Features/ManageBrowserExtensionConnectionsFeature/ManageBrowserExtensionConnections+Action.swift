@@ -1,3 +1,4 @@
+import BrowserExtensionsConnectivityClient
 import ComposableArchitecture
 import ConnectUsingPasswordFeature
 import Converse
@@ -38,13 +39,13 @@ public extension ManageBrowserExtensionConnections.Action {
 public extension ManageBrowserExtensionConnections.Action.InternalAction {
 	enum CoordinateAction: Equatable {
 		case initConnectionSecretsResult(TaskResult<ConnectionSecrets>)
-		case loadConnectionsFromProfile
-		case loadConnectionsFromProfileResult(TaskResult<[BrowserExtensionConnectionWithState]>)
+		case loadConnections
+		case loadConnectionsResult(TaskResult<[BrowserExtensionConnectionWithState]>)
 
-		case saveNewConnectionInProfile(BrowserExtensionConnectionWithState)
-		case saveNewConnectionInProfileResult(TaskResult<BrowserExtensionConnectionWithState>)
+		case saveNewConnection(BrowserExtensionConnectionWithState)
+		case saveNewConnectionResult(TaskResult<BrowserExtensionConnectionWithState>)
 
-		case deleteConnectionFromProfileResult(TaskResult<BrowserExtensionConnection.ID>)
+		case deleteConnectionResult(TaskResult<BrowserExtensionConnection.ID>)
 	}
 }
 

@@ -6,6 +6,6 @@ public enum RequestMethod: String, Sendable, Equatable, Codable {
 }
 
 // MARK: - RequestType
-enum RequestType: String, Sendable, Equatable, Codable {
+public enum RequestType: String, Sendable, Equatable, Codable {
 	case accountAddresses
 }

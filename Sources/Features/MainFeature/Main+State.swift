@@ -1,4 +1,3 @@
-import BrowerExtensionsConnectivityFeature
 import EngineToolkit
 import HomeFeature
 import SettingsFeature
@@ -11,16 +10,13 @@ public enum Main {}
 public extension Main {
 	// MARK: State
 	struct State: Equatable {
-		public var browerExtensionsConnectivity: BrowerExtensionsConnectivity.State
 		public var home: Home.State
 		public var settings: Settings.State?
 
 		public init(
-			browerExtensionsConnectivity: BrowerExtensionsConnectivity.State = .init(),
 			home: Home.State = .init(),
 			settings: Settings.State? = nil
 		) {
-			self.browerExtensionsConnectivity = browerExtensionsConnectivity
 			self.home = home
 			self.settings = settings
 		}

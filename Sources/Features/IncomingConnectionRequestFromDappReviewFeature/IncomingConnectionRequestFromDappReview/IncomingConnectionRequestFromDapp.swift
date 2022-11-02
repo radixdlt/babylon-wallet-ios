@@ -1,3 +1,4 @@
+import BrowserExtensionsConnectivityClient
 import Common
 import Foundation
 
