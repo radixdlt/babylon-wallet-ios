@@ -89,7 +89,7 @@ struct Row_Preview: PreviewProvider {
 
 		return ChooseAccounts.Row.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .placeholderOne,
 				reducer: ChooseAccounts.Row()
 			)
 		)

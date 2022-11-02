@@ -34,14 +34,14 @@ final class ChooseAccountsTests: TestCase {
 
 	func test_didSelectAccount_whenTappedOnSelectedAccount_thenDeselectThatAccount() async {
 		// given
-		var accountRow = ChooseAccounts.Row.State.placeholder
+		var accountRow = ChooseAccounts.Row.State.placeholderOne
 		accountRow.isSelected = true
 
 		let connectionRequest: IncomingConnectionRequestFromDapp = .init(
 			componentAddress: "deadbeef",
 			name: "Radaswap",
 			permissions: [],
-			accountLimit: 1
+			numberOfNeededAccounts: .exactly(1)
 		)
 
 		let initialState: ChooseAccounts.State = .init(
@@ -67,16 +67,61 @@ final class ChooseAccountsTests: TestCase {
 		}
 	}
 
+	func test_didSelectAccount_whenTappedOnDeselectedAccount_thenSelectThatAccount_ifMustSelectAtLeastOneAccount() async {
+		// given
+		var accountRowOne = ChooseAccounts.Row.State.placeholderOne
+		accountRowOne.isSelected = false
+
+		var accountRowTwo = ChooseAccounts.Row.State.placeholderTwo
+		accountRowTwo.isSelected = false
+
+		let connectionRequest: IncomingConnectionRequestFromDapp = .init(
+			componentAddress: "deadbeef",
+			name: "Radaswap",
+			permissions: [],
+			numberOfNeededAccounts: .atLeastOne
+		)
+
+		let initialState: ChooseAccounts.State = .init(
+			incomingConnectionRequestFromDapp: connectionRequest,
+			canProceed: false,
+			accounts: .init(
+				uniqueElements: [
+					accountRowOne,
+					accountRowTwo,
+				]
+			)
+		)
+
+		let store = TestStore(
+			initialState: initialState,
+			reducer: ChooseAccounts()
+		)
+
+		// when
+		_ = await store.send(.account(id: accountRowOne.id, action: .internal(.user(.didSelect)))) {
+			// then
+			$0.accounts[id: accountRowOne.id]?.isSelected = true
+			$0.canProceed = true
+		}
+
+		// when
+		_ = await store.send(.account(id: accountRowTwo.id, action: .internal(.user(.didSelect)))) {
+			// then
+			$0.accounts[id: accountRowTwo.id]?.isSelected = true
+		}
+	}
+
 	func test_didSelectAccount_whenTappedOnDeselectedAccount_thenSelectThatAccount_ifNotOverSelectedAccountLimit() async {
 		// given
-		var accountRow = ChooseAccounts.Row.State.placeholder
+		var accountRow = ChooseAccounts.Row.State.placeholderOne
 		accountRow.isSelected = false
 
 		let connectionRequest: IncomingConnectionRequestFromDapp = .init(
 			componentAddress: "deadbeef",
 			name: "Radaswap",
 			permissions: [],
-			accountLimit: 1
+			numberOfNeededAccounts: .exactly(1)
 		)
 
 		let initialState: ChooseAccounts.State = .init(
@@ -104,22 +149,26 @@ final class ChooseAccountsTests: TestCase {
 
 	func test_didSelectAccount_whenTappedOnDeselectedAccount_thenDontSelectThatAccount_ifOverSelectedAccountLimit() async {
 		// given
-		var accountRow = ChooseAccounts.Row.State.placeholder
-		accountRow.isSelected = false
+		var accountRowOne = ChooseAccounts.Row.State.placeholderOne
+		accountRowOne.isSelected = true
+
+		var accountRowTwo = ChooseAccounts.Row.State.placeholderTwo
+		accountRowTwo.isSelected = false
 
 		let connectionRequest: IncomingConnectionRequestFromDapp = .init(
 			componentAddress: "deadbeef",
 			name: "Radaswap",
 			permissions: [],
-			accountLimit: 0
+			numberOfNeededAccounts: .exactly(1)
 		)
 
 		let initialState: ChooseAccounts.State = .init(
 			incomingConnectionRequestFromDapp: connectionRequest,
-			canProceed: false,
+			canProceed: true,
 			accounts: .init(
 				uniqueElements: [
-					accountRow,
+					accountRowOne,
+					accountRowTwo,
 				]
 			)
 		)
@@ -130,7 +179,7 @@ final class ChooseAccountsTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.account(id: accountRow.id, action: .internal(.user(.didSelect))))
+		_ = await store.send(.account(id: accountRowTwo.id, action: .internal(.user(.didSelect))))
 
 		// then
 		// no state change should occur

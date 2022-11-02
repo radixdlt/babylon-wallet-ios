@@ -6,7 +6,49 @@ public struct IncomingConnectionRequestFromDapp: Equatable, Decodable {
 	let componentAddress: ComponentAddress
 	let name: String?
 	let permissions: [IncomingConnectionRequestFromDapp.Permission]
-	let accountLimit: Int
+	let numberOfNeededAccounts: NumberOfNeededAccounts
+
+	public init(
+		componentAddress: ComponentAddress,
+		name: String?,
+		permissions: [IncomingConnectionRequestFromDapp.Permission],
+		numberOfNeededAccounts: NumberOfNeededAccounts
+	) {
+		self.componentAddress = componentAddress
+		self.name = name
+		self.permissions = permissions
+		self.numberOfNeededAccounts = numberOfNeededAccounts
+	}
+}
+
+// MARK: - Convenience
+public extension IncomingConnectionRequestFromDapp {
+	init(
+		request: RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest
+	) {
+		let numberOfNeededAccounts: NumberOfNeededAccounts
+		if let numberOfAddresses = request.numberOfAddresses {
+			numberOfNeededAccounts = .exactly(numberOfAddresses)
+		} else {
+			numberOfNeededAccounts = .atLeastOne
+		}
+
+		// TODO: replace hardcoded values with real values
+		self.init(
+			componentAddress: "deadbeef",
+			name: "dApp name",
+			permissions: [],
+			numberOfNeededAccounts: numberOfNeededAccounts
+		)
+	}
+}
+
+// MARK: IncomingConnectionRequestFromDapp.NumberOfNeededAccounts
+public extension IncomingConnectionRequestFromDapp {
+	enum NumberOfNeededAccounts: Decodable, Equatable {
+		case atLeastOne
+		case exactly(Int)
+	}
 }
 
 // MARK: - Computed Propertie
@@ -26,7 +68,7 @@ public extension IncomingConnectionRequestFromDapp {
 			.placeholder2,
 //			.placeholder3,
 		],
-		accountLimit: 1
+		numberOfNeededAccounts: .exactly(1)
 	)
 }
 #endif
