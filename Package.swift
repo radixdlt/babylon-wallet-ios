@@ -629,7 +629,8 @@ package.addModules([
 		name: "DesignSystem",
 		dependencies: [],
 		resources: [.process("Fonts")],
-		tests: .no
+		tests: .no,
+		isProduct: true
 	),
 	.core(
 		name: "TestUtils",
