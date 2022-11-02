@@ -51,39 +51,31 @@ public struct Home: ReducerProtocol {
 				environment: AccountList.Environment()
 			)
 		}
-
 		.ifLet(\.accountDetails, action: /Action.accountDetails) {
 			Reduce(
 				AccountDetails.reducer,
 				environment: AccountDetails.Environment()
 			)
 		}
-
 		.ifLet(\.accountPreferences, action: /Action.accountPreferences) {
 			Reduce(
 				AccountPreferences.reducer,
 				environment: AccountPreferences.Environment()
 			)
 		}
-
 		.ifLet(\.transfer, action: /Action.transfer) {
 			Reduce(
 				AccountDetails.Transfer.reducer,
 				environment: AccountDetails.Transfer.Environment()
 			)
 		}
-
 		.ifLet(\.createAccount, action: /Action.createAccount) {
 			CreateAccount()
 		}
-
 		#if DEBUG
 			.ifLet(\.debugInitiatedConnectionRequest, action: /Action.debugInitiatedConnectionRequest) {
 				IncomingConnectionRequestFromDappReview()
 			}
-		#endif
-
-		#if DEBUG
 			.ifLet(\.debugTransactionSigning, action: /Action.debugTransactionSigning) {
 				TransactionSigning()
 			}
@@ -376,11 +368,12 @@ public struct Home: ReducerProtocol {
 			return .none
 		case .debugInitiatedConnectionRequest(.chooseAccounts(_)):
 			return .none
-		case .debugTransactionSigning(.signTransaction):
-			return .none
 		case .debugTransactionSigning(.internal):
 			return .none
-		case .debugTransactionSigning(.coordinate):
+		case .debugTransactionSigning(.coordinate(.dismissView)):
+			state.debugTransactionSigning = nil
+			return .none
+		case .debugTransactionSigning(.signTransaction):
 			return .none
 		#endif
 		}
