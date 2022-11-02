@@ -21,9 +21,14 @@ public extension TransactionSigning.View {
 			observe: ViewState.init
 		) { viewStore in
 			VStack(spacing: 20) {
-				ScrollView {
-					Text(viewStore.state.transactionManifestDescription)
+				NavigationBar("Confirm transaction", style: .back) {
+					viewStore.send(.signTransaction)
+				}
+				ScrollView([.horizontal, .vertical], showsIndicators: false) {
+					Text(viewStore.state.manifest)
 						.padding()
+						.font(.system(size: 13, design: .monospaced))
+						.lineLimit(viewStore.state.numberOfLines)
 						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 						.multilineTextAlignment(.leading)
 				}
@@ -32,7 +37,7 @@ public extension TransactionSigning.View {
 					viewStore.send(.signTransaction)
 				}
 			}
-			.padding()
+			.padding([.horizontal, .bottom])
 		}
 	}
 }
@@ -40,10 +45,13 @@ public extension TransactionSigning.View {
 // MARK: - TransactionSigning.View.ViewState
 extension TransactionSigning.View {
 	struct ViewState: Equatable {
-		let transactionManifestDescription: String
+		let manifest: String
+		let numberOfLines: Int
 
 		init(state: TransactionSigning.State) {
-			transactionManifestDescription = state.transactionManifest.description
+			let manifest = state.transactionManifest.description
+			self.manifest = manifest
+			numberOfLines = manifest.lines()
 		}
 	}
 }
