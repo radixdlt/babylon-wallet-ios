@@ -12,10 +12,16 @@ public struct BrowserExtensionConnectionWithState: Identifiable, Equatable {
 	public var id: ID { browserExtensionConnection.id }
 	public let browserExtensionConnection: BrowserExtensionConnection
 	public let statefulConnection: Connection
-	public init(browserExtensionConnection: BrowserExtensionConnection, statefulConnection: Connection) {
+	public var connectionStatus: Connection.State
+	public init(
+		browserExtensionConnection: BrowserExtensionConnection,
+		statefulConnection: Connection,
+		connectionStatus: Connection.State = .disconnected
+	) {
 		precondition(browserExtensionConnection.connectionPassword.data.data == statefulConnection.getConnectionPassword().data.data)
 		self.browserExtensionConnection = browserExtensionConnection
 		self.statefulConnection = statefulConnection
+		self.connectionStatus = connectionStatus
 	}
 }
 

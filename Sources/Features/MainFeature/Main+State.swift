@@ -11,7 +11,6 @@ public enum Main {}
 public extension Main {
 	// MARK: State
 	struct State: Equatable {
-		
 		public var browerExtensionsConnectivity: BrowerExtensionsConnectivity.State
 		public var home: Home.State
 		public var settings: Settings.State?

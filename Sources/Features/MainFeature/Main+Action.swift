@@ -1,3 +1,4 @@
+import BrowerExtensionsConnectivityFeature
 import HomeFeature
 import SettingsFeature
 
@@ -9,6 +10,7 @@ public extension Main {
 
 		case home(Home.Action)
 		case settings(Settings.Action)
+		case browerExtensionsConnectivity(BrowerExtensionsConnectivity.Action)
 	}
 }
 

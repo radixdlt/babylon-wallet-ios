@@ -14,6 +14,11 @@ public extension ManageBrowserExtensionConnections {
 
 		case inputBrowserExtensionConnectionPassword(InputPassword.Action)
 		case connectUsingPassword(ConnectUsingPassword.Action)
+
+		case connection(
+			id: ManageBrowserExtensionConnection.State.ID,
+			action: ManageBrowserExtensionConnection.Action
+		)
 	}
 }
 
@@ -38,6 +43,8 @@ public extension ManageBrowserExtensionConnections.Action.InternalAction {
 
 		case saveNewConnectionInProfile(BrowserExtensionConnectionWithState)
 		case saveNewConnectionInProfileResult(TaskResult<BrowserExtensionConnectionWithState>)
+
+		case deleteConnectionFromProfileResult(TaskResult<BrowserExtensionConnection.ID>)
 	}
 }
 

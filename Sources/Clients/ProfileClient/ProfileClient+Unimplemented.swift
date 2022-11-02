@@ -14,6 +14,7 @@ public extension ProfileClient {
 		getAccounts: XCTUnimplemented("\(Self.self).getAccounts is unimplemented"),
 		getBrowserExtensionConnections: XCTUnimplemented("\(Self.self).getBrowserExtensionConnections is unimplemented"),
 		addBrowserExtensionConnection: XCTUnimplemented("\(Self.self).addBrowserExtensionConnection is unimplemented"),
+		deleteBrowserExtensionConnection: XCTUnimplemented("\(Self.self).deleteBrowserExtensionConnection is unimplemented"),
 		getAppPreferences: XCTUnimplemented("\(Self.self).getAppPreferences is unimplemented"),
 		setDisplayAppPreferences: XCTUnimplemented("\(Self.self).setDisplayAppPreferences is unimplemented"),
 		createAccount: XCTUnimplemented("\(Self.self).createAccount is unimplemented")

@@ -71,6 +71,7 @@ public extension ProfileClient {
 			},
 			getBrowserExtensionConnections: { fatalError() },
 			addBrowserExtensionConnection: { _ in fatalError() },
+			deleteBrowserExtensionConnection: { _ in fatalError() },
 			getAppPreferences: {
 				fatalError()
 			},

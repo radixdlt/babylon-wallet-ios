@@ -37,6 +37,7 @@ public struct ProfileClient: DependencyKey {
 	public var getAccounts: GetAccounts
 	public var getBrowserExtensionConnections: GetBrowserExtensionConnections
 	public var addBrowserExtensionConnection: AddBrowserExtensionConnection
+	public var deleteBrowserExtensionConnection: DeleteBrowserExtensionConnection
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
 	public var createAccount: CreateAccount
@@ -58,6 +59,7 @@ public extension ProfileClient {
 	typealias GetAccounts = @Sendable () throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
 	typealias GetBrowserExtensionConnections = @Sendable () throws -> BrowserExtensionConnections
 	typealias AddBrowserExtensionConnection = @Sendable (BrowserExtensionConnection) async throws -> Void
+	typealias DeleteBrowserExtensionConnection = @Sendable (BrowserExtensionConnection.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
 	typealias CreateAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account

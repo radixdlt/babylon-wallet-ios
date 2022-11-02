@@ -76,6 +76,8 @@ public extension Settings {
 			return .none
 		case .manageBrowserExtensionConnections(.connectUsingPassword(_)):
 			return .none
+		case .manageBrowserExtensionConnections(.connection(_, _)):
+			return .none
 		}
 	}
 }

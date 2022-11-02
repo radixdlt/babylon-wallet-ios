@@ -120,6 +120,11 @@ public extension ProfileClient {
 					_ = profile.appPreferences.browserExtensionConnections.connections.append(newConnection)
 				}
 			},
+			deleteBrowserExtensionConnection: { idOfConnectionToDelete in
+				try await profileHolder.asyncMutating { profile in
+					profile.appPreferences.browserExtensionConnections.connections.removeAll(where: { $0.id == idOfConnectionToDelete })
+				}
+			},
 			getAppPreferences: {
 				try profileHolder.get { profile in
 					profile.appPreferences
