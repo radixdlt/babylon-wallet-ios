@@ -12,6 +12,7 @@ public extension TransactionSigning {
 	}
 }
 
+// MARK: - TransactionSigning.Action.ViewAction
 public extension TransactionSigning.Action {
 	enum ViewAction: Equatable {
 		case signTransaction
@@ -26,7 +27,7 @@ public extension TransactionSigning.Action {
 	}
 }
 
-// MARK: - TransactionSigning.Action.CoordinatingAction
+// MARK: - TransactionSigning.Action.DelegateAction
 public extension TransactionSigning.Action {
 	enum DelegateAction: Equatable {
 		case dismissView
