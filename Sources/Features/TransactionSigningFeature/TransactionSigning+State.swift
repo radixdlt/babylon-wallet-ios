@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import EngineToolkit
 import Foundation
 import Profile
@@ -7,6 +8,7 @@ public extension TransactionSigning {
 	struct State: Equatable {
 		public var address: String
 		public var transactionManifest: TransactionManifest
+		public var errorAlert: AlertState<Action>? = nil
 
 		public init(
 			address: String,

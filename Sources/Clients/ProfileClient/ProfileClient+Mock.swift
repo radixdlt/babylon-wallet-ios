@@ -81,10 +81,16 @@ public extension ProfileClient {
 				fatalError()
 			},
 			lookupAccountByAddress: { _ in
-				fatalError()
+				struct MockError: LocalizedError {
+					let errorDescription: String? = "Account lookup failed!"
+				}
+				throw MockError()
 			},
 			signTransaction: { _, _ in
-				fatalError()
+				struct MockError: LocalizedError {
+					let errorDescription: String? = "Transaction signing failed!"
+				}
+				throw MockError()
 			}
 		)
 	}

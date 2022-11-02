@@ -41,6 +41,10 @@ public extension TransactionSigning.View {
 				}
 				.padding([.horizontal, .bottom])
 			}
+			.alert(
+				store.scope(state: \.errorAlert),
+				dismiss: .view(.dismissErrorAlert)
+			)
 		}
 	}
 }

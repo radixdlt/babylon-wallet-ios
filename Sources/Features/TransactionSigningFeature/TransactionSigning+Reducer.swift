@@ -27,7 +27,19 @@ public extension TransactionSigning {
 					})))
 				}
 			}
-		case .internal:
+		case let .internal(.addressLookupFailed(error)):
+			state.errorAlert = .init(title: .init("An error ocurred"), message: .init(error.localizedDescription))
+			return .none
+		case let .internal(.signTransactionResult(result)):
+			switch result {
+			case let .success(txid):
+				break // TODO: do something with txid
+			case let .failure(error):
+				state.errorAlert = .init(title: .init("An error ocurred"), message: .init(error.localizedDescription))
+			}
+			return .none
+		case .view(.dismissErrorAlert):
+			state.errorAlert = nil
 			return .none
 		case .delegate:
 			return .none
