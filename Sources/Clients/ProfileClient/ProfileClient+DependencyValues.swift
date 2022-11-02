@@ -1,10 +1,11 @@
 import Dependencies
 import Foundation
 
-// MARK: - ProfileClientKey
-public extension ProfileClient {
+// MARK: - ProfileClient + TestDependencyKey
+extension ProfileClient: TestDependencyKey {
 	#if DEBUG
-	static let testValue = Self.mock()
+	public static let previewValue = Self.mock()
+	public static let testValue = Self.unimplemented
 	#endif // DEBUG
 }
 
