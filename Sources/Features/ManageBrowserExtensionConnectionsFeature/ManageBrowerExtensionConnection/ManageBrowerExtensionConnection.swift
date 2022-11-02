@@ -21,10 +21,13 @@ public extension ManageBrowserExtensionConnection {
 			}
 		case .internal(.system(.subscribeToConnectionUpdates)):
 			return .run { [id = state.id] send in
-				for try await status in try browserExtensionsConnectivityClient.getConnectionStatusAsyncSequence(id) {
-					guard !Task.isCancelled else { continue }
-					assert(status.browserExtensionConnection.id == id)
-					await send(.internal(.system(.browserConnectionStatusChanged(status.connectionStatus))))
+				await withThrowingTaskGroup(of: Void.self) { taskGroup in
+					taskGroup.addTask {
+						for try await status in try browserExtensionsConnectivityClient.getConnectionStatusAsyncSequence(id) {
+							assert(status.browserExtensionConnection.id == id)
+							await send(.internal(.system(.browserConnectionStatusChanged(status.connectionStatus))))
+						}
+					}
 				}
 			}
 		case let .internal(.system(.browserConnectionStatusChanged(newStatus))):
@@ -106,18 +109,9 @@ public extension ManageBrowserExtensionConnection.View {
 		) { viewStore in
 			VStack {
 				Text("Connection ID: \(viewStore.connectionID)")
-
-				switch viewStore.connectionStatus {
-				case .disconnected:
-					HStack {
-						Text("Disconnected")
-						Circle().fill(Color.red).frame(width: 10)
-					}
-				case .connected:
-					HStack {
-						Text("Connected")
-						Circle().fill(Color.green).frame(width: 10)
-					}
+				HStack {
+					Text(viewStore.connectionStatusDescription)
+					Circle().fill(viewStore.connectionStatusColor).frame(width: 10)
 				}
 
 				HStack {
@@ -153,11 +147,28 @@ public extension ManageBrowserExtensionConnection.View {
 		public var connectionStatus: Connection.State
 		init(state: ManageBrowserExtensionConnection.State) {
 			connectionID = [
-				state.browserExtensionConnection.id.suffix(4),
+				state.browserExtensionConnection.id.prefix(4),
 				"...",
 				state.browserExtensionConnection.id.suffix(8),
 			].joined()
 			connectionStatus = state.connectionStatus
+		}
+	}
+}
+
+public extension ManageBrowserExtensionConnection.View.ViewState {
+	var connectionStatusDescription: String {
+		connectionStatus.rawValue.capitalized
+	}
+
+	var connectionStatusColor: Color {
+		switch connectionStatus {
+		case .disconnected:
+			return .red
+		case .connecting:
+			return .yellow
+		case .connected:
+			return .green
 		}
 	}
 }

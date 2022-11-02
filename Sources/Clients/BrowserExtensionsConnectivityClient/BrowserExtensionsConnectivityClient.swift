@@ -65,7 +65,7 @@ public struct BrowserExtensionsConnectivityClient: DependencyKey {
 
 public extension BrowserExtensionsConnectivityClient {
 	typealias GetBrowserExtensionConnections = @Sendable () throws -> [BrowserExtensionWithConnectionStatus]
-	typealias AddBrowserExtensionConnection = @Sendable (BrowserExtensionConnection) async throws -> Void
+	typealias AddBrowserExtensionConnection = @Sendable (StatefulBrowserConnection) async throws -> Void
 	typealias DeleteBrowserExtensionConnection = @Sendable (BrowserExtensionConnection.ID) async throws -> Void
 
 	typealias GetConnectionStatusAsyncSequence = @Sendable (BrowserExtensionConnection.ID) throws -> AnyAsyncSequence<BrowserConnectionUpdate>
@@ -74,9 +74,16 @@ public extension BrowserExtensionsConnectivityClient {
 }
 
 // MARK: - StatefulBrowserConnection
-private struct StatefulBrowserConnection {
+public struct StatefulBrowserConnection: Equatable, Sendable {
 	public let browserExtensionConnection: BrowserExtensionConnection
-	public var connection: Connection
+	public private(set) var connection: Connection
+	public init(
+		browserExtensionConnection: BrowserExtensionConnection,
+		connection: Connection
+	) {
+		self.browserExtensionConnection = browserExtensionConnection
+		self.connection = connection
+	}
 }
 
 // MARK: - NoConnectionMatchingIDFound
@@ -93,15 +100,29 @@ public extension BrowserExtensionsConnectivityClient {
 				return try ConnectionID(password: connectionPassword)
 			}
 
-			func addConnection(_ connection: StatefulBrowserConnection) {
+			func addConnection(_ connection: StatefulBrowserConnection, connect: Bool) {
 				let key = connection.connection.getConnectionID()
 				guard connections[key] == nil else {
 					return
 				}
 				self.connections[key] = connection
+
+				guard connect else { return }
+
 				Task.detached {
 					try await connection.connection.establish()
 				}
+			}
+
+			func disconnectedAndRemove(_ id: BrowserExtensionConnection.ID) {
+				guard
+					let key = try? mapID(id),
+					let _ = connections[key]
+				else {
+					return
+				}
+				// connection.connection.close() // when impl in Converse
+				connections.removeValue(forKey: key)
 			}
 
 			func getConnection(id: BrowserExtensionConnection.ID) throws -> StatefulBrowserConnection {
@@ -114,6 +135,7 @@ public extension BrowserExtensionsConnectivityClient {
 		}
 
 		let connectionsHolder = ConnectionsHolder.shared
+		converseSetLogLevelOfGlobalLogger(.info)
 
 		return Self(
 			getBrowserExtensionConnections: {
@@ -129,7 +151,7 @@ public extension BrowserExtensionsConnectivityClient {
 						connection: connection
 					)
 
-					connectionsHolder.addConnection(statefulConnection)
+					connectionsHolder.addConnection(statefulConnection, connect: true)
 
 					return BrowserExtensionWithConnectionStatus(
 						browserExtensionConnection: browserConnection
@@ -137,16 +159,22 @@ public extension BrowserExtensionsConnectivityClient {
 				}
 
 			},
-			addBrowserExtensionConnection: { browserConnection in
-				try await profileClient.addBrowserExtensionConnection(browserConnection)
+			addBrowserExtensionConnection: { statefulBrowserConnection in
+				connectionsHolder.addConnection(statefulBrowserConnection, connect: false) // should already be connected
+				try await profileClient.addBrowserExtensionConnection(statefulBrowserConnection.browserExtensionConnection)
 			},
 			deleteBrowserExtensionConnection: { id in
+				connectionsHolder.disconnectedAndRemove(id)
 				try await profileClient.deleteBrowserExtensionConnection(id)
 			},
 			getConnectionStatusAsyncSequence: { id in
 				let connection = try connectionsHolder.getConnection(id: id)
 				return connection.connection.connectionStatus().map { newStatus in
-					BrowserConnectionUpdate(connectionStatus: newStatus, browserExtensionConnection: connection.browserExtensionConnection)
+					print("🔮 CYON: BrowserExtensionsConnectivityClient new status: \(newStatus.rawValue)")
+					return BrowserConnectionUpdate(
+						connectionStatus: newStatus,
+						browserExtensionConnection: connection.browserExtensionConnection
+					)
 				}.eraseToAnyAsyncSequence()
 			},
 			getIncomingMessageAsyncSequence: { id in
@@ -177,7 +205,3 @@ public struct BrowserConnectionUpdate: Sendable, Equatable {
 	public let connectionStatus: Connection.State
 	public let browserExtensionConnection: BrowserExtensionConnection
 }
-
-// MARK: - Connection.State + Sendable
-// FIXME: Make `Connection.State` sendable in `Converse`
-extension Connection.State: @unchecked Sendable {}
