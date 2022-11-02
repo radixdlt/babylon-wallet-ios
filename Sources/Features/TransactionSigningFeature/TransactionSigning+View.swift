@@ -21,11 +21,13 @@ public extension TransactionSigning.View {
 			observe: ViewState.init
 		) { viewStore in
 			VStack(spacing: 20) {
-				Text(viewStore.state.transactionManifestDescription)
-					.padding()
-					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-					.multilineTextAlignment(.leading)
-					.background(Color(white: 0.9))
+				ScrollView {
+					Text(viewStore.state.transactionManifestDescription)
+						.padding()
+						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+						.multilineTextAlignment(.leading)
+				}
+				.background(Color(white: 0.9))
 				PrimaryButton(title: "Sign Transaction") {
 					viewStore.send(.signTransaction)
 				}
