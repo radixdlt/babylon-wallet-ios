@@ -6,8 +6,14 @@ import ProfileClient
 // MARK: - TransactionSigning.Action
 public extension TransactionSigning {
 	enum Action: Equatable {
+		case view(ViewAction)
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
+		case delegate(DelegateAction)
+	}
+}
+
+public extension TransactionSigning.Action {
+	enum ViewAction: Equatable {
 		case signTransaction
 	}
 }
@@ -15,28 +21,14 @@ public extension TransactionSigning {
 // MARK: - TransactionSigning.Action.InternalAction
 public extension TransactionSigning.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
-		case system(SystemAction)
-	}
-}
-
-// MARK: - TransactionSigning.Action.InternalAction.UserAction
-public extension TransactionSigning.Action.InternalAction {
-	enum UserAction: Equatable {
 		case signTransactionResult(TaskResult<TransactionIntent.TXID>)
-	}
-}
-
-// MARK: - TransactionSigning.Action.InternalAction.SystemAction
-public extension TransactionSigning.Action.InternalAction {
-	enum SystemAction: Equatable {
 		case addressLookupFailed(NSError)
 	}
 }
 
 // MARK: - TransactionSigning.Action.CoordinatingAction
 public extension TransactionSigning.Action {
-	enum CoordinatingAction: Equatable {
+	enum DelegateAction: Equatable {
 		case dismissView
 	}
 }

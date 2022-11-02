@@ -374,10 +374,10 @@ public struct Home: ReducerProtocol {
 			return .none
 		case .debugTransactionSigning(.internal):
 			return .none
-		case .debugTransactionSigning(.coordinate(.dismissView)):
+		case .debugTransactionSigning(.delegate(.dismissView)):
 			state.debugTransactionSigning = nil
 			return .none
-		case .debugTransactionSigning(.signTransaction):
+		case .debugTransactionSigning(.view):
 			return .none
 		#endif
 		}

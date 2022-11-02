@@ -23,7 +23,7 @@ public extension TransactionSigning.View {
 		) { viewStore in
 			VStack(spacing: 20) {
 				NavigationBar("Confirm transaction", style: .back) {
-					viewStore.send(.coordinate(.dismissView))
+					viewStore.send(.delegate(.dismissView))
 				}
 				ScrollView([.horizontal, .vertical], showsIndicators: false) {
 					Text(viewStore.state.manifest)
@@ -35,7 +35,7 @@ public extension TransactionSigning.View {
 				}
 				.background(Color(white: 0.9))
 				PrimaryButton(title: "Sign Transaction") {
-					viewStore.send(.signTransaction)
+					viewStore.send(.view(.signTransaction))
 				}
 			}
 			.padding([.horizontal, .bottom])

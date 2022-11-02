@@ -13,23 +13,23 @@ public struct TransactionSigning: ReducerProtocol {
 public extension TransactionSigning {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .signTransaction:
+		case .view(.signTransaction):
 			return .run { [address = state.address, transactionManifest = state.transactionManifest] send in
 				let addressLookupResult = Result {
 					try profileClient.lookupAccountByAddress(address)
 				}
 				switch addressLookupResult {
 				case let .failure(error as NSError):
-					await send(.internal(.system(.addressLookupFailed(error))))
+					await send(.internal(.addressLookupFailed(error)))
 				case let .success(account):
-					await send(.internal(.user(.signTransactionResult(TaskResult {
+					await send(.internal(.signTransactionResult(TaskResult {
 						try await profileClient.signTransaction(account.id, transactionManifest)
-					}))))
+					})))
 				}
 			}
 		case .internal:
 			return .none
-		case .coordinate:
+		case .delegate:
 			return .none
 		}
 	}
