@@ -81,7 +81,9 @@ public struct Home: ReducerProtocol {
 			.ifLet(\.debugInitiatedConnectionRequest, action: /Action.debugInitiatedConnectionRequest) {
 				IncomingConnectionRequestFromDappReview()
 			}
+		#endif
 
+		#if DEBUG
 			.ifLet(\.debugTransactionSigning, action: /Action.debugTransactionSigning) {
 				TransactionSigning()
 			}
