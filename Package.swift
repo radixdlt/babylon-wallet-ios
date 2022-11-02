@@ -278,6 +278,22 @@ package.addModules([
 		)
 	),
 	.feature(
+		name: "BrowerExtensionsConnectivityFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
+			converse,
+			"IncomingConnectionRequestFromDappReviewFeature",
+			profile,
+			"ProfileClient",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
 		name: "CreateAccountFeature",
 		dependencies: [
 			"Common",
@@ -373,6 +389,7 @@ package.addModules([
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AppSettings",
 			"AccountPortfolio",
+			"BrowerExtensionsConnectivityFeature",
 			engineToolkit,
 			"HomeFeature",
 			"PasteboardClient",

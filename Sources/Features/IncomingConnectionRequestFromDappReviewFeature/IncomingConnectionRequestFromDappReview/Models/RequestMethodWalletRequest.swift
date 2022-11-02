@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - RequestMethodWalletRequest
-public struct RequestMethodWalletRequest: Decodable {
+public struct RequestMethodWalletRequest: Sendable, Equatable, Decodable {
 	public let method: RequestMethod
 	public let requestId: String
 	public let payload: [Payload]
@@ -22,14 +22,14 @@ public struct RequestMethodWalletRequest: Decodable {
 
 // MARK: RequestMethodWalletRequest.Payload
 public extension RequestMethodWalletRequest {
-	enum Payload: Decodable {
+	enum Payload: Sendable, Equatable, Decodable {
 		case accountAddresses(AccountAddressesRequestMethodWalletRequest)
 	}
 }
 
 // MARK: RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest
 public extension RequestMethodWalletRequest {
-	struct AccountAddressesRequestMethodWalletRequest: Decodable {
+	struct AccountAddressesRequestMethodWalletRequest: Sendable, Equatable, Decodable {
 		let requestType: RequestType
 		let numberOfAddresses: Int?
 	}
@@ -37,7 +37,7 @@ public extension RequestMethodWalletRequest {
 
 // MARK: RequestMethodWalletRequest.Metadata
 public extension RequestMethodWalletRequest {
-	struct Metadata: Decodable {
+	struct Metadata: Sendable, Equatable, Decodable {
 		let networkId: Int
 	}
 }
