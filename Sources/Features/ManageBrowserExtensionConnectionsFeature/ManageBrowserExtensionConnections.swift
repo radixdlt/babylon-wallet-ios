@@ -1,3 +1,4 @@
+import BrowserExtensionsConnectivityClient
 import ComposableArchitecture
 import ConnectUsingPasswordFeature
 import Converse
@@ -8,13 +9,16 @@ import ProfileClient
 
 // MARK: - ManageBrowserExtensionConnections
 public struct ManageBrowserExtensionConnections: ReducerProtocol {
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.browserExtensionsConnectivityClient) var browserExtensionsConnectivityClient
 	public init() {}
 }
 
 public extension ManageBrowserExtensionConnections {
 	var body: some ReducerProtocol<State, Action> {
 		Reduce(self.core)
+			.forEach(\.connections, action: /Action.connection(id:action:)) {
+				ManageBrowserExtensionConnection()
+			}
 			.ifLet(
 				\.inputBrowserExtensionConnectionPassword,
 				action: /ManageBrowserExtensionConnections.Action.inputBrowserExtensionConnectionPassword
@@ -31,62 +35,57 @@ public extension ManageBrowserExtensionConnections {
 		switch action {
 		case .internal(.system(.viewDidAppear)):
 			return .run { send in
-				await send(.internal(.coordinate(.loadConnectionsFromProfile)))
+				await send(.internal(.coordinate(.loadConnections)))
 			}
-		case .internal(.coordinate(.loadConnectionsFromProfile)):
+
+		case .internal(.coordinate(.loadConnections)):
 			return .run { send in
-				await send(.internal(.coordinate(.loadConnectionsFromProfileResult(
+				await send(.internal(.coordinate(.loadConnectionsResult(
 					TaskResult {
-						let connections = try profileClient.getBrowserExtensionConnections()
-						return try connections.connections.map { (conn: BrowserExtensionConnection) in
-							let password = try ConnectionPassword(data: conn.connectionPassword.data)
-							let secrets = try ConnectionSecrets.from(connectionPassword: password)
-							return BrowserExtensionConnectionWithState(
-								browserExtensionConnection: conn,
-								statefulConnection: Connection.live(connectionSecrets: secrets)
-							)
-						}
+						try browserExtensionsConnectivityClient.getBrowserExtensionConnections()
 					}
 				))))
 			}
 
-		case let .internal(.coordinate(.loadConnectionsFromProfileResult(.success(browserConnectionsFromProfile)))):
+		case let .internal(.coordinate(.loadConnectionsResult(.success(browserConnectionsFromProfile)))):
 			state.connections.append(contentsOf: browserConnectionsFromProfile)
 			return .none
 
-		case let .internal(.coordinate(.loadConnectionsFromProfileResult(.failure(error)))):
+		case let .internal(.coordinate(.loadConnectionsResult(.failure(error)))):
 			fatalError(String(describing: error))
 
 		case let .internal(.system(.successfullyOpenedConnectionToBrowser(connection))):
 			state.connectUsingPassword = nil
 			state.inputBrowserExtensionConnectionPassword = nil
 
-			let newConnection = BrowserExtensionConnectionWithState(
+			let newConnection = BrowserExtensionWithConnectionStatus(
 				browserExtensionConnection: .init(
 					computerName: "Unknown",
 					browserName: "Unknown",
 					connectionPassword: connection.getConnectionPassword().data.data
 				),
-				statefulConnection: connection
+				connectionStatus: .connected
 			)
 
 			return .run { send in
-				await send(.internal(.coordinate(.saveNewConnectionInProfile(newConnection))))
+				await send(.internal(.coordinate(.saveNewConnection(newConnection))))
 			}
 
-		case let .internal(.coordinate(.saveNewConnectionInProfile(newConnection))):
+		case let .internal(.coordinate(.saveNewConnection(newConnection))):
 			return .run { send in
-				await send(.internal(.coordinate(.saveNewConnectionInProfileResult(
+				await send(.internal(.coordinate(.saveNewConnectionResult(
 					TaskResult {
-						try await profileClient.addBrowserExtensionConnection(newConnection.browserExtensionConnection)
+						try await browserExtensionsConnectivityClient.addBrowserExtensionConnection(
+							newConnection.browserExtensionConnection
+						)
 					}.map { newConnection }
 				))))
 			}
 
-		case let .internal(.coordinate(.saveNewConnectionInProfileResult(.failure(error)))):
+		case let .internal(.coordinate(.saveNewConnectionResult(.failure(error)))):
 			fatalError(String(describing: error))
 
-		case let .internal(.coordinate(.saveNewConnectionInProfileResult(.success(newConnection)))):
+		case let .internal(.coordinate(.saveNewConnectionResult(.success(newConnection)))):
 			state.connections.append(newConnection)
 			return .none
 
@@ -94,13 +93,16 @@ public extension ManageBrowserExtensionConnections {
 			return .run { send in
 				await send(.coordinate(.dismiss))
 			}
+
 		case .internal(.user(.addNewConnection)):
 			state.inputBrowserExtensionConnectionPassword = .init()
 			return .none
+
 		case .internal(.user(.dismissNewConnectionFlow)):
 			state.inputBrowserExtensionConnectionPassword = nil
 			return .none
-		case let .inputBrowserExtensionConnectionPassword(.connect(password)):
+
+		case let .inputBrowserExtensionConnectionPassword(.delegate(.connect(password))):
 			return .run { send in
 				await send(
 					.internal(.coordinate(.initConnectionSecretsResult(
@@ -110,23 +112,69 @@ public extension ManageBrowserExtensionConnections {
 					)))
 				)
 			}
+
 		case let .internal(.coordinate(.initConnectionSecretsResult(.success(connectionSecrets)))):
 			let connection = Connection.live(connectionSecrets: connectionSecrets)
 			state.connectUsingPassword = ConnectUsingPassword.State(connection: connection)
 			return .none
+
 		case let .internal(.coordinate(.initConnectionSecretsResult(.failure(error)))):
 			fatalError(String(describing: error))
-		case let .connectUsingPassword(.establishConnectionResult(failure: .some(error))):
+
+		case let .connectUsingPassword(.delegate(.establishConnectionResult(.failure(error)))):
 			fatalError(String(describing: error))
-		case let .connectUsingPassword(.connectionOpen(openConnection)):
+
+		case let .connectUsingPassword(.delegate(.establishConnectionResult(.success(openConnection)))):
 			return .run { send in
 				await send(.internal(.system(.successfullyOpenedConnectionToBrowser(openConnection))))
 			}
+
+		case let .connection(id, .delegate(.sendTestMessage)):
+			return .run { send in
+				await send(.internal(.coordinate(.sendTestMessageResult(
+					TaskResult {
+						let msg = "Test"
+						try await self.browserExtensionsConnectivityClient.sendMessage(id, msg)
+						return msg
+					}
+				))))
+			}
+
+		case let .connection(id, .delegate(.deleteConnection)):
+			return .run { send in
+				await send(.internal(.coordinate(.deleteConnectionResult(
+					TaskResult {
+						try await browserExtensionsConnectivityClient.deleteBrowserExtensionConnection(id)
+						return id
+					}
+				))))
+			}
+		case let .internal(.coordinate(.deleteConnectionResult(.success(deletedID)))):
+			state.connections.remove(id: deletedID)
+			return .none
+
+		case let .internal(.coordinate(.deleteConnectionResult(.failure(error)))):
+			print("Failed to delete connection from profile, error: \(String(describing: error))")
+			return .none
+
 		case .inputBrowserExtensionConnectionPassword:
 			return .none
+
 		case .connectUsingPassword:
 			return .none
+
 		case .coordinate:
+			return .none
+
+		case let .internal(.coordinate(.sendTestMessageResult(.success(msgSent)))):
+			print("Successfully sent message: '\(msgSent)'")
+			return .none
+
+		case let .internal(.coordinate(.sendTestMessageResult(.failure(error)))):
+			print("Failed to send message, error: \(String(describing: error))")
+			return .none
+
+		case .connection(_, .internal(_)):
 			return .none
 		}
 	}

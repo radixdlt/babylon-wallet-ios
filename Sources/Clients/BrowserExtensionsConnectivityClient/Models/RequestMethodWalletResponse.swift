@@ -27,15 +27,23 @@ public extension RequestMethodWalletResponse {
 // MARK: RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse
 public extension RequestMethodWalletResponse {
 	struct AccountAddressesRequestMethodWalletResponse: Encodable {
-		let requestType: RequestType
-		let accountAddresses: [AccountAddress]
+		public let requestType: RequestType
+		public let accountAddresses: [AccountAddress]
+		public init(requestType: RequestType, accountAddresses: [AccountAddress]) {
+			self.requestType = requestType
+			self.accountAddresses = accountAddresses
+		}
 	}
 }
 
 // MARK: - RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse.AccountAddress
-extension RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse {
+public extension RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse {
 	struct AccountAddress: Encodable {
-		let address: String
-		let label: String
+		public let address: String
+		public let label: String
+		public init(address: String, label: String) {
+			self.address = address
+			self.label = label
+		}
 	}
 }

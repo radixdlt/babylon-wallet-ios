@@ -16,7 +16,7 @@ let package = Package(
 package.dependencies += [
 	// RDX Works Package depedencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.15"),
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.16"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
 	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.29"),
 
@@ -31,6 +31,8 @@ package.dependencies += [
 
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
+
+	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 ]
 
 let tca: Target.Dependency = .product(
@@ -315,6 +317,7 @@ package.addModules([
 			"AccountPortfolio",
 			"AccountPreferencesFeature",
 			"AppSettings",
+			"BrowserExtensionsConnectivityClient",
 			"Common",
 			"CreateAccountFeature",
 			engineToolkit,
@@ -351,6 +354,7 @@ package.addModules([
 		name: "IncomingConnectionRequestFromDappReviewFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
+			"BrowserExtensionsConnectivityClient",
 			"Common",
 			"DesignSystem",
 			profile,
@@ -388,6 +392,7 @@ package.addModules([
 		name: "ManageBrowserExtensionConnectionsFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
+			"BrowserExtensionsConnectivityClient",
 			"Common",
 			.product(name: "ConnectUsingPasswordFeature", package: "Converse"),
 			converse,
@@ -510,6 +515,19 @@ package.addModules([
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.client(
+		name: "BrowserExtensionsConnectivityClient",
+		dependencies: [
+			.product(name: "AsyncExtensions", package: "AsyncExtensions"),
+			converse,
+			dependencies,
+			profile,
+			"ProfileClient",
+		],
+		tests: .yes(dependencies: [
+			"TestUtils",
+		])
 	),
 	.client(
 		name: "EngineToolkitClient",

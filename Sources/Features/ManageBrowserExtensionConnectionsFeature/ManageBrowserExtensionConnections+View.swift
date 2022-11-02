@@ -1,3 +1,4 @@
+import BrowserExtensionsConnectivityClient
 import Common
 import ComposableArchitecture
 import ConnectUsingPasswordFeature
@@ -79,14 +80,16 @@ private extension ManageBrowserExtensionConnections.View {
 		) {
 			VStack {
 				ScrollView {
-					LazyVStack {
-						// FIXME: Post E2E change to a ForEachStore
-						if let connection = viewStore.connections.first {
-							ConnectionRowView(connectionWithState: connection)
-						}
+					VStack {
+						ForEachStore(
+							store.scope(
+								state: \.connections,
+								action: ManageBrowserExtensionConnections.Action.connection(id:action:)
+							),
+							content: ManageBrowserExtensionConnection.View.init(store:)
+						)
 					}
 				}
-				Spacer()
 				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped) }
 				Spacer()
 			}
@@ -105,25 +108,10 @@ public extension ManageBrowserExtensionConnections.View {
 	}
 }
 
-// MARK: - ConnectionRowView
-public struct ConnectionRowView: View {
-	public let connectionWithState: BrowserExtensionConnectionWithState
-	public init(connectionWithState: BrowserExtensionConnectionWithState) {
-		self.connectionWithState = connectionWithState
-	}
-
-	public var body: some View {
-		VStack {
-			Text("ConnectionRowView")
-			Text("connection id: \(connectionWithState.browserExtensionConnection.id)")
-		}
-	}
-}
-
 // MARK: - ManageBrowserExtensionConnections.View.ViewState
 public extension ManageBrowserExtensionConnections.View {
 	struct ViewState: Equatable {
-		public var connections: IdentifiedArrayOf<BrowserExtensionConnectionWithState>
+		public var connections: IdentifiedArrayOf<BrowserExtensionWithConnectionStatus>
 		init(state: ManageBrowserExtensionConnections.State) {
 			connections = state.connections
 		}
