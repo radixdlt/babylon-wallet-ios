@@ -1,4 +1,5 @@
 import AsyncExtensions
+import ChunkingTransport
 import ComposableArchitecture
 import Converse
 import ConverseCommon
@@ -37,6 +38,7 @@ public extension BrowserExtensionsConnectivityClient {
 			addBrowserExtensionConnection: { _ in },
 			deleteBrowserExtensionConnection: { _ in },
 			getConnectionStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+			getIncomingMessageAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 			sendMessage: { _, _ in }
 		)
 	}
@@ -59,6 +61,7 @@ public struct BrowserExtensionsConnectivityClient: DependencyKey {
 	public var deleteBrowserExtensionConnection: DeleteBrowserExtensionConnection
 
 	public var getConnectionStatusAsyncSequence: GetConnectionStatusAsyncSequence
+	public var getIncomingMessageAsyncSequence: GetIncomingMessageAsyncSequence
 	public var sendMessage: SendMessage
 }
 
@@ -68,6 +71,7 @@ public extension BrowserExtensionsConnectivityClient {
 	typealias DeleteBrowserExtensionConnection = @Sendable (BrowserExtensionConnection.ID) async throws -> Void
 
 	typealias GetConnectionStatusAsyncSequence = @Sendable (BrowserExtensionConnection.ID) throws -> AnyAsyncSequence<BrowserConnectionUpdate>
+	typealias GetIncomingMessageAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<ChunkingTransport.IncomingMessage> // FIXME: change to `IncomingMessageFromBrowser`
 	typealias SendMessage = @Sendable (BrowserExtensionConnection.ID, String) async throws -> Void
 }
 
@@ -146,6 +150,10 @@ public extension BrowserExtensionsConnectivityClient {
 				return connection.connection.connectionStatus().map { newStatus in
 					BrowserConnectionUpdate(connectionStatus: newStatus, browserExtensionConnection: connection.browserExtensionConnection)
 				}.eraseToAnyAsyncSequence()
+			},
+			getIncomingMessageAsyncSequence: { id in
+				let connection = try connectionsHolder.getConnection(id: id)
+				return await connection.connection.receive()
 			},
 			sendMessage: { id, message in
 				let connection = try connectionsHolder.getConnection(id: id)
