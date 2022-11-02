@@ -22,8 +22,10 @@ public extension TransactionSigning.View {
 		) { viewStore in
 			VStack(spacing: 20) {
 				Text(viewStore.state.transactionManifestDescription)
-					.frame(maxWidth: .infinity, maxHeight: .infinity)
-					.background(Color.gray)
+					.padding()
+					.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+					.multilineTextAlignment(.leading)
+					.background(Color(white: 0.9))
 				PrimaryButton(title: "Sign Transaction") {
 					viewStore.send(.signTransaction)
 				}
