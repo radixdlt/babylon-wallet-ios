@@ -20,10 +20,9 @@ public extension TransactionSigning {
 				case let .failure(error as NSError):
 					await send(.internal(.system(.addressLookupFailed(error))))
 				case let .success(account):
-					let result = await TaskResult {
+					await send(.internal(.user(.signTransactionResult(TaskResult {
 						try await profileClient.signTransaction(account.id, transactionManifest)
-					}
-					await send(.internal(.user(.signTransactionResult(result))))
+					}))))
 				}
 			}
 		case .internal:
