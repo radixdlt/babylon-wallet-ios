@@ -10,6 +10,7 @@ import Foundation
 import FungibleTokenListFeature
 import IncomingConnectionRequestFromDappReviewFeature
 import PasteboardClient
+import TransactionSigningFeature
 
 // MARK: - Home
 public struct Home: ReducerProtocol {
@@ -80,6 +81,10 @@ public struct Home: ReducerProtocol {
 			.ifLet(\.debugInitiatedConnectionRequest, action: /Action.debugInitiatedConnectionRequest) {
 				IncomingConnectionRequestFromDappReview()
 			}
+
+			.ifLet(\.debugTransactionSigning, action: /Action.debugTransactionSigning) {
+				TransactionSigning()
+			}
 		#endif
 
 		Reduce(self.core)
@@ -102,6 +107,10 @@ public struct Home: ReducerProtocol {
 		#if DEBUG
 		case .internal(.user(.showDAppConnectionRequest)):
 			state.debugInitiatedConnectionRequest = .init(incomingConnectionRequestFromDapp: .placeholder)
+			return .none
+
+		case .internal(.user(.showTransactionSigning)):
+			state.debugTransactionSigning = .init(address: "123", transactionManifest: .mock)
 			return .none
 		#endif
 

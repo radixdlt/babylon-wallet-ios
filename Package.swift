@@ -326,6 +326,7 @@ package.addModules([
 			"PasteboardClient",
 			"ProfileClient",
 			tca,
+			"TransactionSigningFeature",
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
