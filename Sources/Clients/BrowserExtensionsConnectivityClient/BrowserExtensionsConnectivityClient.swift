@@ -7,23 +7,21 @@ import Foundation
 import Profile
 import ProfileClient
 
-// MARK: - BrowserExtensionConnectionWithState
-public struct BrowserExtensionConnectionWithState: Identifiable, Equatable {
+// MARK: - BrowserExtensionWithConnectionStatus
+public struct BrowserExtensionWithConnectionStatus: Identifiable, Equatable {
 	public let browserExtensionConnection: BrowserExtensionConnection
 	public var connectionStatus: Connection.State
 
 	public init(
 		browserExtensionConnection: BrowserExtensionConnection,
-		//        statefulConnection: Connection,
 		connectionStatus: Connection.State = .disconnected
 	) {
 		self.browserExtensionConnection = browserExtensionConnection
-		//        self.statefulConnection = statefulConnection
 		self.connectionStatus = connectionStatus
 	}
 }
 
-public extension BrowserExtensionConnectionWithState {
+public extension BrowserExtensionWithConnectionStatus {
 	typealias ID = BrowserExtensionConnection.ID
 	var id: ID { browserExtensionConnection.id }
 }
@@ -66,7 +64,7 @@ public struct BrowserExtensionsConnectivityClient: DependencyKey {
 }
 
 public extension BrowserExtensionsConnectivityClient {
-	typealias GetBrowserExtensionConnections = @Sendable () throws -> [BrowserExtensionConnectionWithState]
+	typealias GetBrowserExtensionConnections = @Sendable () throws -> [BrowserExtensionWithConnectionStatus]
 	typealias AddBrowserExtensionConnection = @Sendable (BrowserExtensionConnection) async throws -> Void
 	typealias DeleteBrowserExtensionConnection = @Sendable (BrowserExtensionConnection.ID) async throws -> Void
 
@@ -133,7 +131,7 @@ public extension BrowserExtensionsConnectivityClient {
 
 					connectionsHolder.addConnection(statefulConnection)
 
-					return BrowserExtensionConnectionWithState(
+					return BrowserExtensionWithConnectionStatus(
 						browserExtensionConnection: browserConnection
 					)
 				}

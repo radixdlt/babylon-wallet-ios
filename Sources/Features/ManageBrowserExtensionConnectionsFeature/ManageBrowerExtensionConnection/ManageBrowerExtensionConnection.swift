@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-11-02.
-//
-
 import BrowserExtensionsConnectivityClient
 import ComposableArchitecture
 import Converse
@@ -53,7 +46,7 @@ public extension ManageBrowserExtensionConnection {
 
 // MARK: ManageBrowserExtensionConnection.State
 public extension ManageBrowserExtensionConnection {
-	typealias State = BrowserExtensionConnectionWithState
+	typealias State = BrowserExtensionWithConnectionStatus
 }
 
 // MARK: ManageBrowserExtensionConnection.Action

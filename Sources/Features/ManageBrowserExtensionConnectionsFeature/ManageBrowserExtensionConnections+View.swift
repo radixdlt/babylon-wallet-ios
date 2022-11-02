@@ -90,7 +90,6 @@ private extension ManageBrowserExtensionConnections.View {
 						)
 					}
 				}
-				Spacer()
 				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped) }
 				Spacer()
 			}
@@ -112,7 +111,7 @@ public extension ManageBrowserExtensionConnections.View {
 // MARK: - ManageBrowserExtensionConnections.View.ViewState
 public extension ManageBrowserExtensionConnections.View {
 	struct ViewState: Equatable {
-		public var connections: IdentifiedArrayOf<BrowserExtensionConnectionWithState>
+		public var connections: IdentifiedArrayOf<BrowserExtensionWithConnectionStatus>
 		init(state: ManageBrowserExtensionConnections.State) {
 			connections = state.connections
 		}

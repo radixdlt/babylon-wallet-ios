@@ -40,10 +40,10 @@ public extension ManageBrowserExtensionConnections.Action.InternalAction {
 	enum CoordinateAction: Equatable {
 		case initConnectionSecretsResult(TaskResult<ConnectionSecrets>)
 		case loadConnections
-		case loadConnectionsResult(TaskResult<[BrowserExtensionConnectionWithState]>)
+		case loadConnectionsResult(TaskResult<[BrowserExtensionWithConnectionStatus]>)
 
-		case saveNewConnection(BrowserExtensionConnectionWithState)
-		case saveNewConnectionResult(TaskResult<BrowserExtensionConnectionWithState>)
+		case saveNewConnection(BrowserExtensionWithConnectionStatus)
+		case saveNewConnectionResult(TaskResult<BrowserExtensionWithConnectionStatus>)
 
 		case deleteConnectionResult(TaskResult<BrowserExtensionConnection.ID>)
 		case sendTestMessageResult(TaskResult<String>)

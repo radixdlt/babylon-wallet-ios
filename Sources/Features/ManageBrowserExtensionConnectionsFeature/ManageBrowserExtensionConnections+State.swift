@@ -10,13 +10,13 @@ import Profile
 // MARK: - ManageBrowserExtensionConnections.State
 public extension ManageBrowserExtensionConnections {
 	struct State: Equatable {
-		public var connections: IdentifiedArrayOf<BrowserExtensionConnectionWithState>
+		public var connections: IdentifiedArrayOf<BrowserExtensionWithConnectionStatus>
 
 		public var inputBrowserExtensionConnectionPassword: InputPassword.State?
 		public var connectUsingPassword: ConnectUsingPassword.State?
 
 		public init(
-			connections: IdentifiedArrayOf<BrowserExtensionConnectionWithState> = .init(),
+			connections: IdentifiedArrayOf<BrowserExtensionWithConnectionStatus> = .init(),
 			inputBrowserExtensionConnectionPassword: InputPassword.State? = nil,
 			connectUsingPassword: ConnectUsingPassword.State? = nil
 		) {

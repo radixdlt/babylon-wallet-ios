@@ -58,7 +58,7 @@ public extension ManageBrowserExtensionConnections {
 			state.connectUsingPassword = nil
 			state.inputBrowserExtensionConnectionPassword = nil
 
-			let newConnection = BrowserExtensionConnectionWithState(
+			let newConnection = BrowserExtensionWithConnectionStatus(
 				browserExtensionConnection: .init(
 					computerName: "Unknown",
 					browserName: "Unknown",
