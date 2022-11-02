@@ -6,6 +6,8 @@ import ProfileClient
 // MARK: - TransactionSigning
 public struct TransactionSigning: ReducerProtocol {
 	@Dependency(\.profileClient) var profileClient
+
+	public init() {}
 }
 
 public extension TransactionSigning {
