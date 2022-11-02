@@ -21,24 +21,26 @@ public extension TransactionSigning.View {
 			store,
 			observe: ViewState.init
 		) { viewStore in
-			VStack(spacing: 20) {
-				NavigationBar("Confirm transaction", style: .back) {
-					viewStore.send(.delegate(.dismissView))
+			ForceFullScreen {
+				VStack(spacing: 20) {
+					NavigationBar("Confirm transaction", style: .back) {
+						viewStore.send(.delegate(.dismissView))
+					}
+					ScrollView([.horizontal, .vertical], showsIndicators: false) {
+						Text(viewStore.state.manifest)
+							.padding()
+							.font(.system(size: 13, design: .monospaced))
+							.lineLimit(viewStore.state.numberOfLines)
+							.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+							.multilineTextAlignment(.leading)
+					}
+					.background(Color(white: 0.9))
+					PrimaryButton(title: "Sign Transaction") {
+						viewStore.send(.view(.signTransaction))
+					}
 				}
-				ScrollView([.horizontal, .vertical], showsIndicators: false) {
-					Text(viewStore.state.manifest)
-						.padding()
-						.font(.system(size: 13, design: .monospaced))
-						.lineLimit(viewStore.state.numberOfLines)
-						.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-						.multilineTextAlignment(.leading)
-				}
-				.background(Color(white: 0.9))
-				PrimaryButton(title: "Sign Transaction") {
-					viewStore.send(.view(.signTransaction))
-				}
+				.padding([.horizontal, .bottom])
 			}
-			.padding([.horizontal, .bottom])
 		}
 	}
 }
