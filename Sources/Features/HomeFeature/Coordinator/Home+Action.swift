@@ -4,6 +4,7 @@ import AccountPortfolio
 import AccountPreferencesFeature
 import AggregatedValueFeature
 import AppSettings
+import BrowserExtensionsConnectivityClient
 import Collections
 import Common
 import ComposableArchitecture
@@ -30,10 +31,8 @@ public extension Home {
 		case transfer(AccountDetails.Transfer.Action)
 		case createAccount(CreateAccount.Action)
 
-		#if DEBUG
-		case debugInitiatedConnectionRequest(IncomingConnectionRequestFromDappReview.Action)
-		case debugTransactionSigning(TransactionSigning.Action)
-		#endif
+		case chooseAccountRequestFromDapp(IncomingConnectionRequestFromDappReview.Action)
+		case transactionSigning(TransactionSigning.Action)
 	}
 }
 
@@ -50,11 +49,6 @@ public extension Home.Action {
 public extension Home.Action.InternalAction {
 	enum UserAction: Equatable {
 		case createAccountButtonTapped
-
-		#if DEBUG
-		case showDAppConnectionRequest
-		case showTransactionSigning
-		#endif
 	}
 }
 
@@ -62,9 +56,16 @@ public extension Home.Action.InternalAction {
 public extension Home.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
-		case loadAccountsAndSettings
+		case subscribeToIncomingMessagesFromDappsByBrowserConnectionIDs(OrderedSet<BrowserExtensionConnection.ID>)
+
+		case receiveRequestMessageFromDappResult(TaskResult<IncomingMessageFromBrowser>)
+		case presentViewForRequestFromBrowser(IncomingMessageFromBrowser)
+		case presentViewForNextBufferedRequestFromBrowserIfNeeded
+
+		case loadAccountsConnectionsAndSettings
 		case accountsLoadedResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
 		case appSettingsLoadedResult(TaskResult<AppSettings>)
+		case connectionsLoadedResult(TaskResult<[BrowserExtensionWithConnectionStatus]>)
 		case toggleIsCurrencyAmountVisible
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)

@@ -1,21 +1,27 @@
+import Collections
 import ComposableArchitecture
 @testable import IncomingConnectionRequestFromDappReviewFeature
+import NonEmpty
+import Profile
 import TestUtils
 
 @MainActor
 final class ChooseAccountsTests: TestCase {
 	func test_continueFromChooseAccounts_whenTappedOnContinue_thenCoordinateToNextScreen() async {
 		// given
+		var singleAccount = ChooseAccounts.Row.State.placeholderOne
+		singleAccount.isSelected = true
 		let store = TestStore(
-			initialState: ChooseAccounts.State.placeholder,
+			initialState: ChooseAccounts.State(incomingConnectionRequestFromDapp: .placeholder, accounts: [singleAccount]),
 			reducer: ChooseAccounts()
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.continueFromChooseAccounts)))
+		_ = await store.send(.internal(.user(.finishedChoosingAccounts)))
 
 		// then
-		_ = await store.receive(.coordinate(.continueFromChooseAccounts))
+		let expectedAccounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: [singleAccount.account]))!
+		_ = await store.receive(.coordinate(.finishedChoosingAccounts(expectedAccounts)))
 	}
 
 	func test_dismissChooseAccounts_whenTappedOnDismiss_thenCoordinateDismissal() async {

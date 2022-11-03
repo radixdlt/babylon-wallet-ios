@@ -10,6 +10,7 @@ import ProfileClient
 // MARK: - ManageBrowserExtensionConnections
 public struct ManageBrowserExtensionConnections: ReducerProtocol {
 	@Dependency(\.browserExtensionsConnectivityClient) var browserExtensionsConnectivityClient
+	@Dependency(\.mainQueue) var mainQueue
 	public init() {}
 }
 
@@ -42,7 +43,7 @@ public extension ManageBrowserExtensionConnections {
 			return .run { send in
 				await send(.internal(.coordinate(.loadConnectionsResult(
 					TaskResult {
-						try browserExtensionsConnectivityClient.getBrowserExtensionConnections()
+						try await browserExtensionsConnectivityClient.getBrowserExtensionConnections()
 					}
 				))))
 			}
@@ -58,27 +59,27 @@ public extension ManageBrowserExtensionConnections {
 			state.connectUsingPassword = nil
 			state.inputBrowserExtensionConnectionPassword = nil
 
-			let newConnection = BrowserExtensionWithConnectionStatus(
+			let statefulBrowserConnection = StatefulBrowserConnection(
 				browserExtensionConnection: .init(
 					computerName: "Unknown",
 					browserName: "Unknown",
 					connectionPassword: connection.getConnectionPassword().data.data
 				),
-				connectionStatus: .connected
+				connection: connection
 			)
 
 			return .run { send in
-				await send(.internal(.coordinate(.saveNewConnection(newConnection))))
+				await send(.internal(.coordinate(.saveNewConnection(statefulBrowserConnection))))
 			}
 
-		case let .internal(.coordinate(.saveNewConnection(newConnection))):
+		case let .internal(.coordinate(.saveNewConnection(statefulBrowserConnection))):
 			return .run { send in
 				await send(.internal(.coordinate(.saveNewConnectionResult(
 					TaskResult {
 						try await browserExtensionsConnectivityClient.addBrowserExtensionConnection(
-							newConnection.browserExtensionConnection
+							statefulBrowserConnection
 						)
-					}.map { newConnection }
+					}.map { statefulBrowserConnection }
 				))))
 			}
 
@@ -86,7 +87,12 @@ public extension ManageBrowserExtensionConnections {
 			fatalError(String(describing: error))
 
 		case let .internal(.coordinate(.saveNewConnectionResult(.success(newConnection)))):
-			state.connections.append(newConnection)
+			state.connections.append(
+				BrowserExtensionWithConnectionStatus(
+					browserExtensionConnection: newConnection.browserExtensionConnection,
+					connectionStatus: .connected
+				)
+			)
 			return .none
 
 		case .internal(.user(.dismiss)):
@@ -149,6 +155,7 @@ public extension ManageBrowserExtensionConnections {
 					}
 				))))
 			}
+
 		case let .internal(.coordinate(.deleteConnectionResult(.success(deletedID)))):
 			state.connections.remove(id: deletedID)
 			return .none

@@ -78,12 +78,10 @@ public extension Main {
 			case .home(.createAccount(_)):
 				return .none
 
-			#if DEBUG
-			case .home(.debugInitiatedConnectionRequest(_)):
+			case .home(.chooseAccountRequestFromDapp(_)):
 				return .none
-			case .home(.debugTransactionSigning(_)):
+			case .home(.transactionSigning(_)):
 				return .none
-			#endif
 			}
 		}
 	)

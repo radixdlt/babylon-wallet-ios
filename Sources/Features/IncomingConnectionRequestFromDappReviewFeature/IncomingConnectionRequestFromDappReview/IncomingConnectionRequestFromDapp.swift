@@ -25,26 +25,28 @@ public struct IncomingConnectionRequestFromDapp: Equatable, Decodable {
 // MARK: - Convenience
 public extension IncomingConnectionRequestFromDapp {
 	init(
-		request: RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest
+		addressRequest: RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest,
+		from fullRequest: RequestMethodWalletRequest
 	) {
-		let numberOfNeededAccounts: NumberOfNeededAccounts
-		if let numberOfAddresses = request.numberOfAddresses {
-			numberOfNeededAccounts = .exactly(numberOfAddresses)
-		} else {
-			numberOfNeededAccounts = .atLeastOne
-		}
-
 		// TODO: replace hardcoded values with real values
 		self.init(
-			componentAddress: "deadbeef",
-			name: "dApp name",
-			permissions: [],
-			numberOfNeededAccounts: numberOfNeededAccounts
+			componentAddress: "unknown for E2E", // FIXME: read out from `metadata` once it contains it
+			name: fullRequest.metadata.dAppId.map { "'\($0)'" } ?? "<Unknown>",
+			permissions: [], // FIXME: update for personas info, post E2E, this init cannot be used then, will need to pass `payloads` array in full...
+			numberOfNeededAccounts: .init(int: addressRequest.numberOfAddresses)
 		)
 	}
 }
 
-// MARK: IncomingConnectionRequestFromDapp.NumberOfNeededAccounts
+public extension IncomingConnectionRequestFromDapp.NumberOfNeededAccounts {
+	init(int: Int?) {
+		self = int.map {
+			$0 == 0 ? .atLeastOne : .exactly($0)
+		} ?? .atLeastOne
+	}
+}
+
+// MARK: - IncomingConnectionRequestFromDapp.NumberOfNeededAccounts
 public extension IncomingConnectionRequestFromDapp {
 	enum NumberOfNeededAccounts: Decodable, Equatable {
 		case atLeastOne

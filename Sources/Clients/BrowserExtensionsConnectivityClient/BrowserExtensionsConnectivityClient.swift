@@ -1,5 +1,6 @@
 import AsyncExtensions
-import ChunkingTransport
+import Collections
+import Common
 import ComposableArchitecture
 import Converse
 import ConverseCommon
@@ -64,19 +65,26 @@ public struct BrowserExtensionsConnectivityClient: DependencyKey {
 }
 
 public extension BrowserExtensionsConnectivityClient {
-	typealias GetBrowserExtensionConnections = @Sendable () throws -> [BrowserExtensionWithConnectionStatus]
-	typealias AddBrowserExtensionConnection = @Sendable (BrowserExtensionConnection) async throws -> Void
+	typealias GetBrowserExtensionConnections = @Sendable () async throws -> [BrowserExtensionWithConnectionStatus]
+	typealias AddBrowserExtensionConnection = @Sendable (StatefulBrowserConnection) async throws -> Void
 	typealias DeleteBrowserExtensionConnection = @Sendable (BrowserExtensionConnection.ID) async throws -> Void
 
-	typealias GetConnectionStatusAsyncSequence = @Sendable (BrowserExtensionConnection.ID) throws -> AnyAsyncSequence<BrowserConnectionUpdate>
-	typealias GetIncomingMessageAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<ChunkingTransport.IncomingMessage> // FIXME: change to `IncomingMessageFromBrowser`
+	typealias GetConnectionStatusAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<BrowserConnectionUpdate>
+	typealias GetIncomingMessageAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<IncomingMessageFromBrowser>
 	typealias SendMessage = @Sendable (BrowserExtensionConnection.ID, String) async throws -> Void
 }
 
 // MARK: - StatefulBrowserConnection
-private struct StatefulBrowserConnection {
+public struct StatefulBrowserConnection: Equatable, Sendable {
 	public let browserExtensionConnection: BrowserExtensionConnection
-	public var connection: Connection
+	public private(set) var connection: Connection
+	public init(
+		browserExtensionConnection: BrowserExtensionConnection,
+		connection: Connection
+	) {
+		self.browserExtensionConnection = browserExtensionConnection
+		self.connection = connection
+	}
 }
 
 // MARK: - NoConnectionMatchingIDFound
@@ -85,7 +93,7 @@ public extension BrowserExtensionsConnectivityClient {
 	static let liveValue: Self = {
 		@Dependency(\.profileClient) var profileClient
 
-		final class ConnectionsHolder {
+		final actor ConnectionsHolder: GlobalActor {
 			private var connections: [ConnectionID: StatefulBrowserConnection] = [:]
 			static let shared = ConnectionsHolder()
 			func mapID(_ passwordID: BrowserExtensionConnection.ID) throws -> ConnectionID {
@@ -93,15 +101,29 @@ public extension BrowserExtensionsConnectivityClient {
 				return try ConnectionID(password: connectionPassword)
 			}
 
-			func addConnection(_ connection: StatefulBrowserConnection) {
+			func addConnection(_ connection: StatefulBrowserConnection, connect: Bool) {
 				let key = connection.connection.getConnectionID()
 				guard connections[key] == nil else {
 					return
 				}
 				self.connections[key] = connection
+
+				guard connect else { return }
+
 				Task.detached {
 					try await connection.connection.establish()
 				}
+			}
+
+			func disconnectedAndRemove(_ id: BrowserExtensionConnection.ID) {
+				guard
+					let key = try? mapID(id),
+					let _ = connections[key]
+				else {
+					return
+				}
+				// connection.connection.close() // when impl in Converse
+				connections.removeValue(forKey: key)
 			}
 
 			func getConnection(id: BrowserExtensionConnection.ID) throws -> StatefulBrowserConnection {
@@ -118,7 +140,7 @@ public extension BrowserExtensionsConnectivityClient {
 		return Self(
 			getBrowserExtensionConnections: {
 				let connections = try profileClient.getBrowserExtensionConnections()
-				return try connections.connections.map { browserConnection in
+				return try await connections.connections.asyncMap { browserConnection in
 
 					let password = try ConnectionPassword(data: browserConnection.connectionPassword.data)
 					let secrets = try ConnectionSecrets.from(connectionPassword: password)
@@ -129,7 +151,7 @@ public extension BrowserExtensionsConnectivityClient {
 						connection: connection
 					)
 
-					connectionsHolder.addConnection(statefulConnection)
+					await connectionsHolder.addConnection(statefulConnection, connect: true)
 
 					return BrowserExtensionWithConnectionStatus(
 						browserExtensionConnection: browserConnection
@@ -137,24 +159,44 @@ public extension BrowserExtensionsConnectivityClient {
 				}
 
 			},
-			addBrowserExtensionConnection: { browserConnection in
-				try await profileClient.addBrowserExtensionConnection(browserConnection)
+			addBrowserExtensionConnection: { statefulBrowserConnection in
+				await connectionsHolder.addConnection(statefulBrowserConnection, connect: false) // should already be connected
+				try await profileClient.addBrowserExtensionConnection(statefulBrowserConnection.browserExtensionConnection)
 			},
 			deleteBrowserExtensionConnection: { id in
+				await connectionsHolder.disconnectedAndRemove(id)
 				try await profileClient.deleteBrowserExtensionConnection(id)
 			},
 			getConnectionStatusAsyncSequence: { id in
-				let connection = try connectionsHolder.getConnection(id: id)
+				let connection = try await connectionsHolder.getConnection(id: id)
 				return connection.connection.connectionStatus().map { newStatus in
-					BrowserConnectionUpdate(connectionStatus: newStatus, browserExtensionConnection: connection.browserExtensionConnection)
+					BrowserConnectionUpdate(
+						connectionStatus: newStatus,
+						browserExtensionConnection: connection.browserExtensionConnection
+					)
 				}.eraseToAnyAsyncSequence()
 			},
 			getIncomingMessageAsyncSequence: { id in
-				let connection = try connectionsHolder.getConnection(id: id)
-				return await connection.connection.receive()
+				let connection = try await connectionsHolder.getConnection(id: id)
+				return await connection.connection.receive().compactMap { msg in
+					let jsonData = msg.messagePayload
+					print(jsonData.prettyPrintedJSONString ?? "got json data")
+					do {
+						let requestMethodWalletRequest = try JSONDecoder().decode(RequestMethodWalletRequest.self, from: jsonData)
+
+						return try IncomingMessageFromBrowser(
+							requestMethodWalletRequest: requestMethodWalletRequest,
+							browserExtensionConnection: connection.browserExtensionConnection
+						)
+					} catch {
+						print("⛔️ failed to JSON decode data, error: \(String(describing: error))")
+						return nil
+					}
+
+				}.eraseToAnyAsyncSequence()
 			},
 			sendMessage: { id, message in
-				let connection = try connectionsHolder.getConnection(id: id)
+				let connection = try await connectionsHolder.getConnection(id: id)
 				let outgoingMessage = Connection.OutgoingMessage(
 					data: Data(message.utf8),
 					id: UUID().uuidString
@@ -167,17 +209,50 @@ public extension BrowserExtensionsConnectivityClient {
 }
 
 // MARK: - IncomingMessageFromBrowser
-public struct IncomingMessageFromBrowser: Sendable, Equatable {
+public struct IncomingMessageFromBrowser: Sendable, Equatable, Identifiable {
+	public struct InvalidRequestFromDapp: Swift.Error, Equatable, CustomStringConvertible {
+		public let description: String
+	}
+
 	public let requestMethodWalletRequest: RequestMethodWalletRequest
+
+	// FIXME: Post E2E remove this property
+	public let payload: RequestMethodWalletRequest.Payload
+
 	public let browserExtensionConnection: BrowserExtensionConnection
+	public init(
+		requestMethodWalletRequest: RequestMethodWalletRequest,
+		browserExtensionConnection: BrowserExtensionConnection
+	) throws {
+		// FIXME: Post E2E remove this `guard`
+		guard
+			let payload = requestMethodWalletRequest.payloads.first,
+			requestMethodWalletRequest.payloads.count == 1
+		else {
+			throw InvalidRequestFromDapp(description: "For E2E test we can only handle one single `payload` inside a request from dApp. But got: \(requestMethodWalletRequest.payloads.count)")
+		}
+		self.payload = payload
+		self.requestMethodWalletRequest = requestMethodWalletRequest
+		self.browserExtensionConnection = browserExtensionConnection
+	}
+}
+
+public extension IncomingMessageFromBrowser {
+	typealias ID = RequestMethodWalletRequest.RequestID
+	var id: ID {
+		requestMethodWalletRequest.requestId
+	}
 }
 
 // MARK: - BrowserConnectionUpdate
-public struct BrowserConnectionUpdate: Sendable, Equatable {
+public struct BrowserConnectionUpdate: Sendable, Equatable, Identifiable {
 	public let connectionStatus: Connection.State
 	public let browserExtensionConnection: BrowserExtensionConnection
 }
 
-// MARK: - Connection.State + Sendable
-// FIXME: Make `Connection.State` sendable in `Converse`
-extension Connection.State: @unchecked Sendable {}
+public extension BrowserConnectionUpdate {
+	typealias ID = BrowserExtensionConnection.ID
+	var id: ID {
+		browserExtensionConnection.id
+	}
+}
