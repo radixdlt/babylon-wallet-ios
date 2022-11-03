@@ -37,22 +37,6 @@ public extension ManageBrowserExtensionConnection {
 							))))
 						}
 					}
-
-					taskGroup.addTask {
-						do {
-							let incomingMsgs = try await browserExtensionsConnectivityClient.getIncomingMessageAsyncSequence(id)
-							for try await incomingMsg in incomingMsgs {
-//								assert(status.browserExtensionConnection.id == id)
-								await send(.internal(.system(.receiveMsgResult(
-									TaskResult.success(incomingMsg)
-								))))
-							}
-						} catch {
-							await send(.internal(.system(.receiveMsgResult(
-								TaskResult.failure(error)
-							))))
-						}
-					}
 				}
 			}
 
@@ -62,15 +46,6 @@ public extension ManageBrowserExtensionConnection {
 
 		case let .internal(.system(.connectionStatusResult(.failure(error)))):
 			print("Failed to get browser connection status update, error \(String(describing: error))")
-			return .none
-
-		case let .internal(.system(.receiveMsgResult(.success(newIncomingMessage)))):
-			return .run { send in
-				await send(.delegate(.receivedMsg(newIncomingMessage)))
-			}
-
-		case let .internal(.system(.receiveMsgResult(.failure(error)))):
-			print("Failed to incoming message from browser connection, error \(String(describing: error))")
 			return .none
 
 		case .internal(.user(.deleteConnection)):
@@ -109,7 +84,6 @@ public extension ManageBrowserExtensionConnection.Action {
 	enum DelegateAction: Equatable {
 		case deleteConnection
 		case sendTestMessage
-		case receivedMsg(IncomingMessageFromBrowser)
 	}
 }
 
@@ -126,7 +100,6 @@ public extension ManageBrowserExtensionConnection.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
 		case connectionStatusResult(TaskResult<Connection.State>)
-		case receiveMsgResult(TaskResult<IncomingMessageFromBrowser>)
 		case subscribeToConnectionUpdates
 	}
 }

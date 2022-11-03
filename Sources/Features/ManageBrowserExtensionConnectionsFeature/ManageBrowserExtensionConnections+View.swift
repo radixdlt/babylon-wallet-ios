@@ -94,53 +94,8 @@ private extension ManageBrowserExtensionConnections.View {
 				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped) }
 				Spacer()
 			}
-			.sheet(
-				item: viewStore.binding(
-					get: \.inMsgToPresent,
-					send: ViewAction.dismissPresentedReceivedMsg
-				)
-			) { receivedMessageFromBrowser in
-				// FIXME: Move this to Home!
-				Screen(
-					title: "Request from Dapp",
-					navBarActionStyle: .close,
-					action: { viewStore.send(.dismissPresentedReceivedMsg) }
-				) {
-					switch receivedMessageFromBrowser.requestMethodWalletRequest.payload.first! {
-					case let .accountAddresses(accountAddressRequest):
-						ChooseAccounts.View(
-							store: .init(
-								initialState: .init(
-									incomingConnectionRequestFromDapp: accountAddressRequest.incomingConnectionRequestFromDapp,
-									accounts: .init()
-								),
-								reducer: ChooseAccounts()
-							)
-						)
-					}
-				}
-			}
 			.onAppear { viewStore.send(.viewDidAppear) }
 		}
-	}
-}
-
-public extension RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest {
-	var incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp {
-		.init(
-			componentAddress: "Unknown",
-			name: "Unknown",
-			permissions: [],
-			numberOfNeededAccounts: numberOfAddresses.map {
-				IncomingConnectionRequestFromDapp.NumberOfNeededAccounts(int: $0)
-			} ?? .atLeastOne
-		)
-	}
-}
-
-public extension IncomingConnectionRequestFromDapp.NumberOfNeededAccounts {
-	init(int: Int) {
-		self = int == 0 ? .atLeastOne : .exactly(int)
 	}
 }
 
@@ -151,7 +106,6 @@ public extension ManageBrowserExtensionConnections.View {
 		case dismissButtonTapped
 		case addNewConnectionButtonTapped
 		case dismissNewConnectionFlowButtonTapped
-		case dismissPresentedReceivedMsg
 	}
 }
 
@@ -159,11 +113,9 @@ public extension ManageBrowserExtensionConnections.View {
 public extension ManageBrowserExtensionConnections.View {
 	struct ViewState: Equatable {
 		public var connections: IdentifiedArrayOf<BrowserExtensionWithConnectionStatus>
-		public var inMsgToPresent: IncomingMessageFromBrowser?
 
 		init(state: ManageBrowserExtensionConnections.State) {
 			connections = state.connections
-			inMsgToPresent = state.presentedReceivedMessage
 		}
 	}
 }
@@ -173,8 +125,6 @@ extension ManageBrowserExtensionConnections.Action {
 		switch action {
 		case .viewDidAppear:
 			self = .internal(.system(.viewDidAppear))
-		case .dismissPresentedReceivedMsg:
-			self = .internal(.system(.dismissPresentedReceivedMsg))
 		case .dismissButtonTapped:
 			self = .internal(.user(.dismiss))
 		case .addNewConnectionButtonTapped:

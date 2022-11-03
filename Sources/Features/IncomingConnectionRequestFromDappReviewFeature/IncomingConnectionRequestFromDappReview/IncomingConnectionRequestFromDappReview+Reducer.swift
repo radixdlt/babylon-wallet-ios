@@ -14,12 +14,12 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 			switch action {
 			case .internal(.user(.dismissIncomingConnectionRequest)):
 				return .run { send in
-					await send(.coordinate(.dismissIncomingConnectionRequest))
+					await send(.delegate(.dismiss))
 				}
 
 			case .internal(.user(.proceedWithConnectionRequest)):
 				return .run { send in
-					await send(.coordinate(.proceedWithConnectionRequest))
+					await send(.internal(.coordinate(.proceedWithConnectionRequest)))
 				}
 
 			case let .internal(.system(.loadAccountsResult(.success(accounts)))):
@@ -35,21 +35,29 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 				print("⚠️ failed to load accounts, error: \(String(describing: error))")
 				return .none
 
-			case .coordinate(.proceedWithConnectionRequest):
+			case .internal(.coordinate(.proceedWithConnectionRequest)):
 				return .run { send in
 					await send(.internal(.system(.loadAccountsResult(TaskResult {
 						try profileClient.getAccounts()
 					}))))
 				}
 
-			case .coordinate(.dismissIncomingConnectionRequest):
+			case .internal(.coordinate(.dismissIncomingConnectionRequest)):
 				return .none
 
 			case .chooseAccounts(.coordinate(.dismissChooseAccounts)):
 				state.chooseAccounts = nil
 				return .none
 
+			case let .chooseAccounts(.coordinate(.finishedChoosingAccounts(chosenAccounts))):
+				state.chooseAccounts = nil
+				return .run { send in
+					await send(.delegate(.finishedChoosingAccounts(chosenAccounts)))
+				}
+
 			case .chooseAccounts:
+				return .none
+			case .delegate:
 				return .none
 			}
 		}

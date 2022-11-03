@@ -124,7 +124,7 @@ extension ChooseAccounts.Action {
 	init(action: ChooseAccounts.View.ViewAction) {
 		switch action {
 		case .continueButtonTapped:
-			self = .internal(.user(.continueFromChooseAccounts))
+			self = .internal(.user(.finishedChoosingAccounts))
 		case .backButtonTapped:
 			self = .internal(.user(.dismissChooseAccounts))
 		}

@@ -4,22 +4,27 @@ import AccountPortfolio
 import AccountPreferencesFeature
 import AggregatedValueFeature
 import Asset
+import BrowserExtensionsConnectivityClient
+import Collections
 import ComposableArchitecture
 import CreateAccountFeature
 import Foundation
 import FungibleTokenListFeature
 import IncomingConnectionRequestFromDappReviewFeature
 import PasteboardClient
+import Profile
 import TransactionSigningFeature
 
 // MARK: - Home
 public struct Home: ReducerProtocol {
 	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 	@Dependency(\.appSettingsClient) var appSettingsClient
+	@Dependency(\.browserExtensionsConnectivityClient) var browserExtensionsConnectivityClient
 	@Dependency(\.fungibleTokenListSorter) var fungibleTokenListSorter
+	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.profileClient) var profileClient
-	@Dependency(\.openURL) var openURL
 
 	public init() {}
 
@@ -78,14 +83,12 @@ public struct Home: ReducerProtocol {
 		.ifLet(\.createAccount, action: /Action.createAccount) {
 			CreateAccount()
 		}
-		#if DEBUG
-			.ifLet(\.debugInitiatedConnectionRequest, action: /Action.debugInitiatedConnectionRequest) {
-				IncomingConnectionRequestFromDappReview()
-			}
-			.ifLet(\.debugTransactionSigning, action: /Action.debugTransactionSigning) {
-				TransactionSigning()
-			}
-		#endif
+		.ifLet(\.choseAccountRequestFromDapp, action: /Action.choseAccountRequestFromDapp) {
+			IncomingConnectionRequestFromDappReview()
+		}
+		.ifLet(\.transactionSigning, action: /Action.transactionSigning) {
+			TransactionSigning()
+		}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -102,22 +105,38 @@ public struct Home: ReducerProtocol {
 			)
 			return .none
 
-		#if DEBUG
-		case .internal(.user(.showDAppConnectionRequest)):
-			state.debugInitiatedConnectionRequest = .init(incomingConnectionRequestFromDapp: .placeholder)
-			return .none
-
-		case .internal(.user(.showTransactionSigning)):
-			state.debugTransactionSigning = .init(address: "123", transactionManifest: .mock)
-			return .none
-		#endif
-
 		case .internal(.system(.viewDidAppear)):
 			return .run { send in
-				await send(.internal(.system(.loadAccountsAndSettings)))
+				await send(.internal(.system(.loadAccountsConnectionsAndSettings)))
 			}
 
-		case .internal(.system(.loadAccountsAndSettings)):
+		case let .internal(.system(.subscribeToIncomingMessagesFromDappsByBrowserConnectionIDs(ids))):
+			return .run { send in
+				await withThrowingTaskGroup(of: Void.self) { taskGroup in
+					for id in ids {
+						taskGroup.addTask {
+							do {
+								let incomingMsgs = try await browserExtensionsConnectivityClient.getIncomingMessageAsyncSequence(id)
+								for try await incomingMsg in incomingMsgs {
+									await send(.internal(.system(.receiveRequestMessageFromDappResult(
+										TaskResult.success(incomingMsg)
+									))))
+								}
+							} catch {
+								await send(.internal(.system(.receiveRequestMessageFromDappResult(
+									TaskResult.failure(error)
+								))))
+							}
+						}
+					}
+				}
+			}
+
+		case let .internal(.system(.receiveRequestMessageFromDappResult(.failure(error)))):
+			print("Failed to receive message from dApp, error: \(String(describing: error))")
+			return .none
+
+		case .internal(.system(.loadAccountsConnectionsAndSettings)):
 			return .run { send in
 				await send(.internal(.system(.accountsLoadedResult(
 					TaskResult {
@@ -129,6 +148,21 @@ public struct Home: ReducerProtocol {
 						try await appSettingsClient.loadSettings()
 					}
 				))))
+				await send(.internal(.system(.connectionsLoadedResult(
+					TaskResult {
+						try browserExtensionsConnectivityClient.getBrowserExtensionConnections()
+					}
+				))))
+			}
+
+		case let .internal(.system(.connectionsLoadedResult(.failure(error)))):
+			print("Failed to load connections, error: \(String(describing: error))")
+			return .none
+
+		case let .internal(.system(.connectionsLoadedResult(.success(connections)))):
+			let ids = OrderedSet(connections.map(\.id))
+			return .run { send in
+				await send(.internal(.system(.subscribeToIncomingMessagesFromDappsByBrowserConnectionIDs(ids))))
 			}
 
 		case let .internal(.system(.accountsLoadedResult(.failure(error)))):
@@ -275,7 +309,7 @@ public struct Home: ReducerProtocol {
 
 		case .accountList(.coordinate(.fetchPortfolioForAccounts)):
 			return .run { send in
-				await send(.internal(.system(.loadAccountsAndSettings)))
+				await send(.internal(.system(.loadAccountsConnectionsAndSettings)))
 			}
 
 		case let .internal(.system(.fetchPortfolioResult(.failure(error)))):
@@ -351,7 +385,7 @@ public struct Home: ReducerProtocol {
 		case .createAccount(.coordinate(.createdNewAccount(_))):
 			state.createAccount = nil
 			return .run { send in
-				await send(.internal(.system(.loadAccountsAndSettings)))
+				await send(.internal(.system(.loadAccountsConnectionsAndSettings)))
 			}
 
 		case let .createAccount(.coordinate(.failedToCreateNewAccount(reason: reason))):
@@ -362,24 +396,82 @@ public struct Home: ReducerProtocol {
 		case .transfer(.internal):
 			return .none
 
-		#if DEBUG
-		case .debugInitiatedConnectionRequest(.internal(_)):
+		case .internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)):
+
+			guard let next = state.unhandledReceivedMessages.first else {
+				return .none
+			}
+			state.unhandledReceivedMessages.removeFirst()
+
+			return .run { send in
+				try await mainQueue.sleep(for: .seconds(1))
+				await send(.internal(.system(.presentViewForRequestFromBrowser(next))))
+			}
+
+		case let .internal(.system(.receiveRequestMessageFromDappResult(.success(incomingMessageFromBrowser)))):
+			return .run { send in
+				await send(.internal(.system(.presentViewForRequestFromBrowser(incomingMessageFromBrowser))))
+			}
+
+		case let .internal(.system(.presentViewForRequestFromBrowser(msgToPresent))):
+
+			switch msgToPresent.payload {
+			case let .accountAddresses(accountAddressRequest):
+				if state.choseAccountRequestFromDapp == nil {
+					state.choseAccountRequestFromDapp = IncomingConnectionRequestFromDappReview.State(
+						incomingConnectionRequestFromDapp: accountAddressRequest.incomingConnectionRequestFromDapp
+//						accounts: state.accountList.accounts.map(\.account)
+					)
+				} else {
+					// Buffer
+					state.unhandledReceivedMessages.append(msgToPresent)
+				}
+			}
 			return .none
-		case .debugInitiatedConnectionRequest(.coordinate(.dismissIncomingConnectionRequest)):
-			state.debugInitiatedConnectionRequest = nil
+
+		case .choseAccountRequestFromDapp(.delegate(.dismiss)):
+			state.choseAccountRequestFromDapp = nil
+			return .run { send in
+				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
+			}
+
+		case let .choseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts))):
+			fatalError("send back message with addresses for accounts: \(selectedAccounts) and then dismiss")
+			state.choseAccountRequestFromDapp = nil
+			return .run { send in
+				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
+			}
+
+		case .choseAccountRequestFromDapp:
 			return .none
-		case .debugInitiatedConnectionRequest(.coordinate(_)):
+
+		case .transactionSigning(.delegate(.dismissView)):
+			state.choseAccountRequestFromDapp = nil
+			return .run { send in
+				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
+			}
+
+		case .transactionSigning:
 			return .none
-		case .debugInitiatedConnectionRequest(.chooseAccounts(_)):
-			return .none
-		case .debugTransactionSigning(.internal):
-			return .none
-		case .debugTransactionSigning(.delegate(.dismissView)):
-			state.debugTransactionSigning = nil
-			return .none
-		case .debugTransactionSigning(.view):
-			return .none
-		#endif
 		}
+	}
+}
+
+public extension RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest {
+	var incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp {
+		.init(
+			componentAddress: "Unknown",
+			name: "Unknown",
+			permissions: [],
+			numberOfNeededAccounts: numberOfAddresses.map {
+				IncomingConnectionRequestFromDapp.NumberOfNeededAccounts(int: $0)
+			} ?? .atLeastOne
+		)
+	}
+}
+
+public extension IncomingConnectionRequestFromDapp.NumberOfNeededAccounts {
+	init(int: Int) {
+		self = int == 0 ? .atLeastOne : .exactly(int)
 	}
 }

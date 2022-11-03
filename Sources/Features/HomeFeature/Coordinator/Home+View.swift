@@ -55,7 +55,7 @@ public extension Home.View {
 						),
 						then: AccountDetails.View.init(store:)
 					)
-					.zIndex(1)
+					.zIndex(2)
 
 					IfLetStore(
 						store.scope(
@@ -64,7 +64,7 @@ public extension Home.View {
 						),
 						then: AccountPreferences.View.init(store:)
 					)
-					.zIndex(2)
+					.zIndex(3)
 
 					IfLetStore(
 						store.scope(
@@ -73,29 +73,25 @@ public extension Home.View {
 						),
 						then: AccountDetails.Transfer.View.init(store:)
 					)
-					.zIndex(2)
+					.zIndex(4)
 
-					#if DEBUG
 					IfLetStore(
 						store.scope(
-							state: \.debugInitiatedConnectionRequest,
-							action: Home.Action.debugInitiatedConnectionRequest
+							state: \.choseAccountRequestFromDapp,
+							action: Home.Action.choseAccountRequestFromDapp
 						),
 						then: IncomingConnectionRequestFromDappReview.View.init(store:)
 					)
-					.zIndex(1)
-					#endif
+					.zIndex(5)
 
-					#if DEBUG
 					IfLetStore(
 						store.scope(
-							state: \.debugTransactionSigning,
-							action: Home.Action.debugTransactionSigning
+							state: \.transactionSigning,
+							action: Home.Action.transactionSigning
 						),
 						then: TransactionSigning.View.init(store:)
 					)
-					.zIndex(1)
-					#endif
+					.zIndex(6)
 				}
 			}
 		}
@@ -108,11 +104,6 @@ extension Home.View {
 	enum ViewAction: Equatable {
 		case createAccountButtonTapped
 		case didAppear
-
-		#if DEBUG
-		case showDAppConnectionRequest
-		case showTransactionSigning
-		#endif
 	}
 }
 
@@ -123,13 +114,6 @@ extension Home.Action {
 			self = .internal(.system(.viewDidAppear))
 		case .createAccountButtonTapped:
 			self = .internal(.user(.createAccountButtonTapped))
-
-		#if DEBUG
-		case .showDAppConnectionRequest:
-			self = .internal(.user(.showDAppConnectionRequest))
-		case .showTransactionSigning:
-			self = .internal(.user(.showTransactionSigning))
-		#endif
 		}
 	}
 }
@@ -187,34 +171,6 @@ private extension Home.View {
 						viewStore.send(.createAccountButtonTapped)
 					}
 					Spacer()
-
-					#if DEBUG
-					Button(
-						action: { viewStore.send(.showDAppConnectionRequest) },
-						label: {
-							Text("dApp Connection Request")
-								.padding()
-								.background(Color.red)
-								.cornerRadius(8)
-								.foregroundColor(.yellow)
-						}
-					)
-					#endif
-
-					#if DEBUG
-					Button(
-						action: { viewStore.send(.showTransactionSigning) },
-						label: {
-							Text("Sign TX")
-								.padding()
-								.background(Color.red)
-								.cornerRadius(8)
-								.foregroundColor(.yellow)
-						}
-					)
-
-					Spacer()
-					#endif
 
 					Home.VisitHub.View(
 						store: store.scope(

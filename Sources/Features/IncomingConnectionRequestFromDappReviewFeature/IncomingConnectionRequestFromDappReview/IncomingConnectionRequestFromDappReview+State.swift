@@ -1,4 +1,5 @@
 import Foundation
+import Profile
 
 // MARK: - IncomingConnectionRequestFromDappReview.State
 public extension IncomingConnectionRequestFromDappReview {
@@ -13,6 +14,21 @@ public extension IncomingConnectionRequestFromDappReview {
 			self.incomingConnectionRequestFromDapp = incomingConnectionRequestFromDapp
 			self.chooseAccounts = chooseAccounts
 		}
+	}
+}
+
+public extension IncomingConnectionRequestFromDappReview.State {
+	init(
+		incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp,
+		accounts: [OnNetwork.Account]
+	) {
+		self.init(
+			incomingConnectionRequestFromDapp: incomingConnectionRequestFromDapp,
+			chooseAccounts: .init(
+				incomingConnectionRequestFromDapp: incomingConnectionRequestFromDapp,
+				accounts: .init(uniqueElements: accounts.map { .init(account: $0) })
+			)
+		)
 	}
 }
 

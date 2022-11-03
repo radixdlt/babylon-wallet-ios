@@ -54,8 +54,6 @@ public extension ManageBrowserExtensionConnections.Action.InternalAction {
 public extension ManageBrowserExtensionConnections.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
-		case dismissPresentedReceivedMsg
-		case presentIncomingMsg(IncomingMessageFromBrowser)
 		case successfullyOpenedConnectionToBrowser(Connection)
 	}
 }

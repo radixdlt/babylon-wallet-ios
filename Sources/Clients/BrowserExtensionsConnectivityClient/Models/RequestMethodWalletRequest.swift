@@ -5,18 +5,23 @@ public struct RequestMethodWalletRequest: Sendable, Equatable, Decodable {
 	public typealias RequestID = String
 	public let method: RequestMethod
 	public let requestId: RequestID
-	public let payload: [Payload]
+	public let payloads: [Payload]
 	public let metadata: Metadata
+
+	enum CodingKeys: String, CodingKey {
+		case method, requestId, metadata
+		case payloads = "payload"
+	}
 
 	public init(
 		method: RequestMethod,
 		requestId: RequestID,
-		payload: [Payload],
+		payloads: [Payload],
 		metadata: Metadata
 	) {
 		self.method = method
 		self.requestId = requestId
-		self.payload = payload
+		self.payloads = payloads
 		self.metadata = metadata
 	}
 }

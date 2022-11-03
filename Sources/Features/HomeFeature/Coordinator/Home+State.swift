@@ -3,8 +3,10 @@ import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
 import AggregatedValueFeature
+import BrowserExtensionsConnectivityClient
 import CreateAccountFeature
 import EngineToolkit
+import IdentifiedCollections
 import IncomingConnectionRequestFromDappReviewFeature
 import Profile
 import ProfileClient
@@ -28,10 +30,9 @@ public extension Home {
 		public var createAccount: CreateAccount.State?
 		public var transfer: AccountDetails.Transfer.State?
 
-		#if DEBUG
-		public var debugInitiatedConnectionRequest: IncomingConnectionRequestFromDappReview.State?
-		public var debugTransactionSigning: TransactionSigning.State?
-		#endif
+		public var unhandledReceivedMessages: IdentifiedArrayOf<IncomingMessageFromBrowser>
+		public var choseAccountRequestFromDapp: IncomingConnectionRequestFromDappReview.State?
+		public var transactionSigning: TransactionSigning.State?
 
 		public init(
 			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
@@ -42,6 +43,9 @@ public extension Home {
 			accountDetails: AccountDetails.State? = nil,
 			accountPreferences: AccountPreferences.State? = nil,
 			createAccount: CreateAccount.State? = nil,
+			unhandledReceivedMessages: IdentifiedArrayOf<IncomingMessageFromBrowser> = .init(),
+			choseAccountRequestFromDapp: IncomingConnectionRequestFromDappReview.State? = nil,
+			transactionSigning: TransactionSigning.State? = nil,
 			transfer: AccountDetails.Transfer.State? = nil
 		) {
 			self.accountPortfolioDictionary = accountPortfolioDictionary
@@ -52,6 +56,9 @@ public extension Home {
 			self.accountDetails = accountDetails
 			self.accountPreferences = accountPreferences
 			self.createAccount = createAccount
+			self.unhandledReceivedMessages = unhandledReceivedMessages
+			self.choseAccountRequestFromDapp = choseAccountRequestFromDapp
+			self.transactionSigning = transactionSigning
 			self.transfer = transfer
 		}
 	}

@@ -184,7 +184,7 @@ public extension BrowserExtensionsConnectivityClient {
 					do {
 						let requestMethodWalletRequest = try JSONDecoder().decode(RequestMethodWalletRequest.self, from: jsonData)
 
-						return IncomingMessageFromBrowser(
+						return try IncomingMessageFromBrowser(
 							requestMethodWalletRequest: requestMethodWalletRequest,
 							browserExtensionConnection: connection.browserExtensionConnection
 						)
@@ -210,8 +210,31 @@ public extension BrowserExtensionsConnectivityClient {
 
 // MARK: - IncomingMessageFromBrowser
 public struct IncomingMessageFromBrowser: Sendable, Equatable, Identifiable {
+	public struct InvalidRequestFromDapp: Swift.Error, Equatable, CustomStringConvertible {
+		public let description: String
+	}
+
 	public let requestMethodWalletRequest: RequestMethodWalletRequest
+
+	// FIXME: Post E2E remove this property
+	public let payload: RequestMethodWalletRequest.Payload
+
 	public let browserExtensionConnection: BrowserExtensionConnection
+	public init(
+		requestMethodWalletRequest: RequestMethodWalletRequest,
+		browserExtensionConnection: BrowserExtensionConnection
+	) throws {
+		// FIXME: Post E2E remove this `guard`
+		guard
+			let payload = requestMethodWalletRequest.payloads.first,
+			requestMethodWalletRequest.payloads.count == 1
+		else {
+			throw InvalidRequestFromDapp(description: "For E2E test we can only handle one single `payload` inside a request from dApp. But got: \(requestMethodWalletRequest.payloads.count)")
+		}
+		self.payload = payload
+		self.requestMethodWalletRequest = requestMethodWalletRequest
+		self.browserExtensionConnection = browserExtensionConnection
+	}
 }
 
 public extension IncomingMessageFromBrowser {

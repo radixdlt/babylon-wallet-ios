@@ -39,23 +39,6 @@ public extension ManageBrowserExtensionConnections {
 				await send(.internal(.coordinate(.loadConnections)))
 			}
 
-		case .internal(.system(.dismissPresentedReceivedMsg)):
-
-			state.presentedReceivedMessage = nil
-			guard let next = state.unhandledReceivedMessages.first else {
-				return .none
-			}
-			state.unhandledReceivedMessages.removeFirst()
-
-			return .run { send in
-				try await mainQueue.sleep(for: .seconds(1))
-				await send(.internal(.system(.presentIncomingMsg(next))))
-			}
-
-		case let .internal(.system(.presentIncomingMsg(msgToPresent))):
-			state.presentedReceivedMessage = msgToPresent
-			return .none
-
 		case .internal(.coordinate(.loadConnections)):
 			return .run { send in
 				await send(.internal(.coordinate(.loadConnectionsResult(
@@ -172,14 +155,6 @@ public extension ManageBrowserExtensionConnections {
 					}
 				))))
 			}
-
-		case let .connection(_, .delegate(.receivedMsg(newIncomingMessage))):
-			if state.presentedReceivedMessage == nil {
-				state.presentedReceivedMessage = newIncomingMessage
-			} else {
-				state.unhandledReceivedMessages.append(newIncomingMessage)
-			}
-			return .none
 
 		case let .internal(.coordinate(.deleteConnectionResult(.success(deletedID)))):
 			state.connections.remove(id: deletedID)

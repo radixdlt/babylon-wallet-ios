@@ -8,8 +8,17 @@ import Profile
 public extension IncomingConnectionRequestFromDappReview {
 	enum Action: Equatable {
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
 		case chooseAccounts(ChooseAccounts.Action)
+
+		case delegate(DelegateAction)
+	}
+}
+
+// MARK: - IncomingConnectionRequestFromDappReview.Action.DelegateAction
+public extension IncomingConnectionRequestFromDappReview.Action {
+	enum DelegateAction: Equatable {
+		case finishedChoosingAccounts(NonEmpty<OrderedSet<OnNetwork.Account>>)
+		case dismiss
 	}
 }
 
@@ -17,6 +26,7 @@ public extension IncomingConnectionRequestFromDappReview {
 public extension IncomingConnectionRequestFromDappReview.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
+		case coordinate(InternalCoordinateAction)
 		case system(SystemAction)
 	}
 }
@@ -36,9 +46,9 @@ public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
 	}
 }
 
-// MARK: - IncomingConnectionRequestFromDappReview.Action.CoordinatingAction
+// MARK: - IncomingConnectionRequestFromDappReview.Action.InternalCoordinateAction
 public extension IncomingConnectionRequestFromDappReview.Action {
-	enum CoordinatingAction: Equatable {
+	enum InternalCoordinateAction: Equatable {
 		case dismissIncomingConnectionRequest
 		case proceedWithConnectionRequest
 	}
