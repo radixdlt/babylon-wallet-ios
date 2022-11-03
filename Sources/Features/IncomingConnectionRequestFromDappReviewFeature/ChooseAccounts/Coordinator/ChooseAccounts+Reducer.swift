@@ -1,4 +1,7 @@
+import Collections
 import ComposableArchitecture
+import NonEmpty
+import Profile
 
 // MARK: - ChooseAccounts
 public struct ChooseAccounts: ReducerProtocol {
@@ -9,21 +12,16 @@ public extension ChooseAccounts {
 	var body: some ReducerProtocol<State, Action> {
 		Reduce { state, action in
 			switch action {
-			case .internal(.user(.continueFromChooseAccounts)):
+			case .internal(.user(.finishedChoosingAccounts)):
+				let nonEmptySelectedAccounts = NonEmpty(rawValue: OrderedSet(state.accounts.filter(\.isSelected).map(\.account)))!
 				return .run { send in
-					await send(.coordinate(.continueFromChooseAccounts))
+					await send(.coordinate(.finishedChoosingAccounts(nonEmptySelectedAccounts)))
 				}
 
 			case .internal(.user(.dismissChooseAccounts)):
 				return .run { send in
 					await send(.coordinate(.dismissChooseAccounts))
 				}
-
-			case .coordinate(.continueFromChooseAccounts):
-				return .none
-
-			case .coordinate(.dismissChooseAccounts):
-				return .none
 
 			case let .account(id: id, action: action):
 				guard let account = state.accounts[id: id] else { return .none }
@@ -50,6 +48,8 @@ public extension ChooseAccounts {
 
 					return .none
 				}
+			case .coordinate:
+				return .none
 			}
 		}
 		.forEach(\.accounts, action: /Action.account(id:action:)) {

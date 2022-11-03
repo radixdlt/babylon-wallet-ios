@@ -1,9 +1,9 @@
 import BrowserExtensionsConnectivityClient
-import ComposableArchitecture
 import ConnectUsingPasswordFeature
 import Converse
 import ConverseCommon
 import Foundation
+import IdentifiedCollections
 import InputPasswordFeature
 import Profile
 
@@ -21,6 +21,7 @@ public extension ManageBrowserExtensionConnections {
 			connectUsingPassword: ConnectUsingPassword.State? = nil
 		) {
 			self.connections = connections
+
 			self.inputBrowserExtensionConnectionPassword = inputBrowserExtensionConnectionPassword
 			self.connectUsingPassword = connectUsingPassword
 		}

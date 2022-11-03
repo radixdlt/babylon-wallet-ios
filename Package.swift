@@ -16,7 +16,7 @@ let package = Package(
 package.dependencies += [
 	// RDX Works Package depedencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.16"),
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.18"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
 	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.29"),
 
@@ -400,6 +400,7 @@ package.addModules([
 			converse,
 			"DesignSystem",
 			.product(name: "InputPasswordFeature", package: "Converse"),
+			"IncomingConnectionRequestFromDappReviewFeature", // FIXME: extract to Home! just here for test..
 			profile,
 			"ProfileClient",
 			tca,
@@ -475,6 +476,7 @@ package.addModules([
 		name: "TransactionSigningFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
+			"BrowserExtensionsConnectivityClient", // Actually only models needed...
 			"Common",
 			"EngineToolkitClient",
 			"GatewayAPI",
@@ -533,9 +535,11 @@ package.addModules([
 		name: "BrowserExtensionsConnectivityClient",
 		dependencies: [
 			.product(name: "AsyncExtensions", package: "AsyncExtensions"),
+			"Common",
 			converse,
 			dependencies,
-			profile,
+			engineToolkit, // Model: SignTX contains Manifest
+			profile, // Account
 			"ProfileClient",
 		],
 		tests: .yes(dependencies: [
@@ -634,9 +638,10 @@ package.addModules([
 	.core(
 		name: "Common",
 		dependencies: [
-			profile, // Address
+			bite,
 			bigInt,
 			"DesignSystem",
+			profile, // Address
 		],
 		resources: [.process("Localization/Strings")],
 		tests: .yes(

@@ -1,4 +1,7 @@
+import Collections
 import Foundation
+import NonEmpty
+import Profile
 
 // MARK: - ChooseAccounts.Action
 public extension ChooseAccounts {
@@ -20,7 +23,7 @@ public extension ChooseAccounts.Action {
 // MARK: - ChooseAccounts.Action.InternalAction.UserAction
 public extension ChooseAccounts.Action.InternalAction {
 	enum UserAction: Equatable {
-		case continueFromChooseAccounts
+		case finishedChoosingAccounts
 		case dismissChooseAccounts
 	}
 }
@@ -33,7 +36,7 @@ public extension ChooseAccounts.Action.InternalAction {
 // MARK: - ChooseAccounts.Action.CoordinatingAction
 public extension ChooseAccounts.Action {
 	enum CoordinatingAction: Equatable {
-		case continueFromChooseAccounts
+		case finishedChoosingAccounts(NonEmpty<OrderedSet<OnNetwork.Account>>)
 		case dismissChooseAccounts
 	}
 }

@@ -1,3 +1,4 @@
+import BrowserExtensionsConnectivityClient // RequestMethodWalletRequest, FIXME: extract models into seperate package
 import ComposableArchitecture
 import EngineToolkit
 import Foundation
@@ -6,15 +7,20 @@ import Profile
 // MARK: - TransactionSigning.State
 public extension TransactionSigning {
 	struct State: Equatable {
-		public var address: String
+		/// Need whole original request from dApp to be able to response back to dApp properly, I think.
+		public var requestFromDapp: RequestMethodWalletRequest
+
+		public var addressOfSigner: AccountAddress
 		public var transactionManifest: TransactionManifest
 		public var errorAlert: AlertState<Action>? = nil
 
 		public init(
-			address: String,
+			requestFromDapp: RequestMethodWalletRequest,
+			addressOfSigner: AccountAddress,
 			transactionManifest: TransactionManifest
 		) {
-			self.address = address
+			self.requestFromDapp = requestFromDapp
+			self.addressOfSigner = addressOfSigner
 			self.transactionManifest = transactionManifest
 		}
 	}
@@ -66,7 +72,32 @@ public extension TransactionManifest {
 	}
 }
 
+public extension RequestMethodWalletRequest {
+	static let placeholderSignTXRequets = Self(
+		method: .sendTransaction,
+		requestId: "deadbeef",
+		payloads: [
+			.signTXRequest(
+				.init(
+					accountAddress: try! AccountAddress(address: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
+					version: 1,
+					transactionManifest: "",
+					requestType: .sendTransaction
+				)
+			),
+		],
+		metadata: .init(
+			networkId: 1,
+			dAppId: "RadarSwap"
+		)
+	)
+}
+
 public extension TransactionSigning.State {
-	static let placeholder = Self(address: "123", transactionManifest: .mock)
+	static let placeholder = Self(
+		requestFromDapp: .placeholderSignTXRequets,
+		addressOfSigner: try! AccountAddress(address: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
+		transactionManifest: .mock
+	)
 }
 #endif

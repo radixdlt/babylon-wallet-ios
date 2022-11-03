@@ -33,7 +33,7 @@ public extension ChooseAccounts.View {
 							Spacer(minLength: 40)
 
 							VStack(spacing: 20) {
-								Text(L10n.DApp.ChooseAccounts.title)
+								Text("Choose \(String(describing: viewStore.incomingConnectionRequestFromDapp.numberOfNeededAccounts))")
 									.textStyle(.secondaryHeader)
 
 								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.incomingConnectionRequestFromDapp.displayName))
@@ -50,31 +50,47 @@ public extension ChooseAccounts.View {
 								),
 								content: ChooseAccounts.Row.View.init(store:)
 							)
-
-							Spacer(minLength: 60)
-
-							Button(
-								action: {},
-								label: {
-									Text(L10n.DApp.ChooseAccounts.createNewAccount)
-										.foregroundColor(.app.gray1)
-										.textStyle(.body1Regular)
-								}
-							)
-
-							Spacer(minLength: 60)
-
-							PrimaryButton(
-								title: L10n.DApp.ConnectionRequest.continueButtonTitle,
-								isEnabled: viewStore.canProceed,
-								action: { viewStore.send(.continueButtonTapped) }
-							)
-							.disabled(!viewStore.canProceed)
 						}
-						.padding(.horizontal, 24)
 					}
+					Spacer(minLength: 16)
+					VStack {
+						Button(
+							action: {},
+							label: {
+								Text(L10n.DApp.ChooseAccounts.createNewAccount)
+									.foregroundColor(.app.gray1)
+									.textStyle(.body1Regular)
+							}
+						)
+						PrimaryButton(
+							title: L10n.DApp.ConnectionRequest.continueButtonTitle,
+							isEnabled: viewStore.canProceed,
+							action: { viewStore.send(.continueButtonTapped) }
+						)
+						.disabled(!viewStore.canProceed)
+					}
+
+					Spacer(minLength: 16)
 				}
+				.padding(.horizontal, 24)
 			}
+		}
+	}
+}
+
+// MARK: - IncomingConnectionRequestFromDapp.NumberOfNeededAccounts + CustomStringConvertible
+extension IncomingConnectionRequestFromDapp.NumberOfNeededAccounts: CustomStringConvertible {
+	public var description: String {
+		switch self {
+		case let .exactly(numberOfAccounts):
+			if numberOfAccounts == 1 {
+				return "exactly one account."
+
+			} else {
+				return "exactly #\(numberOfAccounts) accounts."
+			}
+		case .atLeastOne:
+			return "at least one account"
 		}
 	}
 }
@@ -107,7 +123,7 @@ extension ChooseAccounts.Action {
 	init(action: ChooseAccounts.View.ViewAction) {
 		switch action {
 		case .continueButtonTapped:
-			self = .internal(.user(.continueFromChooseAccounts))
+			self = .internal(.user(.finishedChoosingAccounts))
 		case .backButtonTapped:
 			self = .internal(.user(.dismissChooseAccounts))
 		}

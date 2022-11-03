@@ -14,9 +14,9 @@ public extension TransactionSigning {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .view(.signTransaction):
-			return .run { [address = state.address, transactionManifest = state.transactionManifest] send in
+			return .run { [addressOfSigner = state.addressOfSigner, transactionManifest = state.transactionManifest] send in
 				let addressLookupResult = Result {
-					try profileClient.lookupAccountByAddress(address)
+					try profileClient.lookupAccountByAddress(addressOfSigner)
 				}
 				switch addressLookupResult {
 				case let .failure(error as NSError):
@@ -33,7 +33,14 @@ public extension TransactionSigning {
 		case let .internal(.signTransactionResult(result)):
 			switch result {
 			case let .success(txid):
-				break // TODO: do something with txid
+				return .run { [originalDappRequest = state.requestFromDapp] send in
+					await send(.delegate(
+						.signedTXAndSubmittedToGateway(
+							txid,
+							originalDappRequest: originalDappRequest
+						)
+					))
+				}
 			case let .failure(error):
 				state.errorAlert = .init(title: .init("An error ocurred"), message: .init(error.localizedDescription))
 			}

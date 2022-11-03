@@ -4,6 +4,7 @@ import ComposableArchitecture
 import ConnectUsingPasswordFeature
 import DesignSystem
 import Foundation
+import IncomingConnectionRequestFromDappReviewFeature
 import InputPasswordFeature
 import SwiftUI
 
@@ -112,6 +113,7 @@ public extension ManageBrowserExtensionConnections.View {
 public extension ManageBrowserExtensionConnections.View {
 	struct ViewState: Equatable {
 		public var connections: IdentifiedArrayOf<BrowserExtensionWithConnectionStatus>
+
 		init(state: ManageBrowserExtensionConnections.State) {
 			connections = state.connections
 		}

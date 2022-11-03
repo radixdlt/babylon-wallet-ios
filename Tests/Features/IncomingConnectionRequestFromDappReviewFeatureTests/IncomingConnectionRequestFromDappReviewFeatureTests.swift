@@ -8,6 +8,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 	func test_dismissIncomingConnectionRequest_whenTappedOnCloseButton_thenCoortinateDismissal() async {
 		// given
 		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
+			requestFromDapp: .placeholderGetAccountAddressRequest,
 			incomingConnectionRequestFromDapp: .placeholder
 		)
 		let store = TestStore(
@@ -19,13 +20,14 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		_ = await store.send(.internal(.user(.dismissIncomingConnectionRequest)))
 
 		// then
-		_ = await store.receive(.coordinate(.dismissIncomingConnectionRequest))
+		_ = await store.receive(.delegate(.dismiss))
 	}
 
 	func test_proceedWithConnectionRequest_whenTappedOnContinueButton_thenDisplayChooseAccounts() async {
 		// given
 		let request: IncomingConnectionRequestFromDapp = .placeholder
 		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
+			requestFromDapp: .placeholderGetAccountAddressRequest,
 			incomingConnectionRequestFromDapp: request
 		)
 		let store = TestStore(
@@ -39,7 +41,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		_ = await store.send(.internal(.user(.proceedWithConnectionRequest)))
 
 		// then
-		_ = await store.receive(.coordinate(.proceedWithConnectionRequest))
+		_ = await store.receive(.internal(.coordinate(.proceedWithConnectionRequest)))
 		_ = await store.receive(.internal(.system(.loadAccountsResult(.success(accounts))))) {
 			$0.chooseAccounts = .init(
 				incomingConnectionRequestFromDapp: request,
@@ -54,6 +56,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		// given
 		let request: IncomingConnectionRequestFromDapp = .placeholder
 		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
+			requestFromDapp: .placeholderGetAccountAddressRequest,
 			incomingConnectionRequestFromDapp: request,
 			chooseAccounts: .placeholder
 		)
