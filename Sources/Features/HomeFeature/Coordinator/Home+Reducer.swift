@@ -425,6 +425,15 @@ public struct Home: ReducerProtocol {
 					// Buffer
 					state.unhandledReceivedMessages.append(msgToPresent)
 				}
+			case let .signTXRequest(signTXRequest):
+				if state.transactionSigning == nil {
+					// if `state.chooseAccountRequestFromDapp` is non nil, this will present SignTX view
+					// on top of chooseAccountsView...
+					state.transactionSigning = .init(addressOfSigner: signTXRequest.accountAddress, transactionManifest: signTXRequest.transactionManifest)
+				} else {
+					// Buffer
+					state.unhandledReceivedMessages.append(msgToPresent)
+				}
 			}
 			return .none
 

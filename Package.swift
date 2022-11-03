@@ -537,7 +537,8 @@ package.addModules([
 			"Common",
 			converse,
 			dependencies,
-			profile,
+			engineToolkit, // Model: SignTX contains Manifest
+			profile, // Account
 			"ProfileClient",
 		],
 		tests: .yes(dependencies: [

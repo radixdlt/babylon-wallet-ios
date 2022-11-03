@@ -14,9 +14,9 @@ public extension TransactionSigning {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .view(.signTransaction):
-			return .run { [address = state.address, transactionManifest = state.transactionManifest] send in
+			return .run { [addressOfSigner = state.addressOfSigner, transactionManifest = state.transactionManifest] send in
 				let addressLookupResult = Result {
-					try profileClient.lookupAccountByAddress(address)
+					try profileClient.lookupAccountByAddress(addressOfSigner)
 				}
 				switch addressLookupResult {
 				case let .failure(error as NSError):

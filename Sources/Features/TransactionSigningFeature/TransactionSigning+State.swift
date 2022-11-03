@@ -6,15 +6,15 @@ import Profile
 // MARK: - TransactionSigning.State
 public extension TransactionSigning {
 	struct State: Equatable {
-		public var address: String
+		public var addressOfSigner: AccountAddress
 		public var transactionManifest: TransactionManifest
 		public var errorAlert: AlertState<Action>? = nil
 
 		public init(
-			address: String,
+			addressOfSigner: AccountAddress,
 			transactionManifest: TransactionManifest
 		) {
-			self.address = address
+			self.addressOfSigner = addressOfSigner
 			self.transactionManifest = transactionManifest
 		}
 	}
@@ -67,6 +67,9 @@ public extension TransactionManifest {
 }
 
 public extension TransactionSigning.State {
-	static let placeholder = Self(address: "123", transactionManifest: .mock)
+	static let placeholder = Self(
+		addressOfSigner: try! AccountAddress(address: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
+		transactionManifest: .mock
+	)
 }
 #endif

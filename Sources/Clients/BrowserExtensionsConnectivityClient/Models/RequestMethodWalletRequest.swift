@@ -1,7 +1,9 @@
+import EngineToolkit
 import Foundation
+import Profile
 
 // MARK: - RequestMethodWalletRequest
-public struct RequestMethodWalletRequest: Sendable, Equatable, Decodable {
+public struct RequestMethodWalletRequest: Sendable, Hashable, Decodable {
 	public typealias RequestID = String
 	public let method: RequestMethod
 	public let requestId: RequestID
@@ -28,39 +30,92 @@ public struct RequestMethodWalletRequest: Sendable, Equatable, Decodable {
 
 // MARK: RequestMethodWalletRequest.Payload
 public extension RequestMethodWalletRequest {
-	enum Payload: Sendable, Equatable, Decodable {
+	enum Payload: Sendable, Hashable, Decodable {
 		case accountAddresses(AccountAddressesRequestMethodWalletRequest)
+		case signTXRequest(SignTXRequestFromDapp)
+	}
+}
 
-		enum CodingKeys: String, CodingKey {
-			case requestType
-		}
+// MARK: Payload+Decodable
+public extension RequestMethodWalletRequest.Payload {
+	enum CodingKeys: String, CodingKey {
+		case requestType
+	}
 
-		public init(from decoder: Decoder) throws {
-			let container = try decoder.container(keyedBy: CodingKeys.self)
-			let discriminator = try container.decode(RequestType.self, forKey: .requestType)
-			switch discriminator {
-			case .accountAddresses:
-				self = try .accountAddresses(.init(from: decoder))
-			}
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let discriminator = try container.decode(RequestType.self, forKey: .requestType)
+		switch discriminator {
+		case .accountAddresses:
+			self = try .accountAddresses(.init(from: decoder))
+		case .sendTransaction:
+			self = try .signTXRequest(.init(from: decoder))
 		}
 	}
 }
 
-// MARK: RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest
+public extension RequestMethodWalletRequest.Payload {
+	var requestType: RequestType {
+		switch self {
+		case let .signTXRequest(request): return request.requestType
+		case let .accountAddresses(request): return request.requestType
+		}
+	}
+}
+
+// MARK: - RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest
 public extension RequestMethodWalletRequest {
-	struct AccountAddressesRequestMethodWalletRequest: Sendable, Equatable, Decodable {
+	struct AccountAddressesRequestMethodWalletRequest: Sendable, Hashable, Decodable {
 		public let requestType: RequestType
 		public let numberOfAddresses: Int?
 		public init(requestType: RequestType, numberOfAddresses: Int?) {
+			precondition(requestType == .accountAddresses)
 			self.requestType = requestType
 			self.numberOfAddresses = numberOfAddresses
 		}
 	}
 }
 
-// MARK: RequestMethodWalletRequest.Metadata
+// MARK: - RequestMethodWalletRequest.SignTXRequestFromDapp
 public extension RequestMethodWalletRequest {
-	struct Metadata: Sendable, Equatable, Decodable {
+	struct SignTXRequestFromDapp: Sendable, Hashable, Decodable {
+		public var accountAddress: AccountAddress {
+			try! .init(address: __accountAddress)
+		}
+
+		public let __accountAddress: String
+		public let version: Version
+		public let __transactionManifest: String
+		public var transactionManifest: TransactionManifest {
+			TransactionManifest(instructions: .string(__transactionManifest))
+		}
+
+		public let requestType: RequestType
+
+		enum CodingKeys: String, CodingKey {
+			case __accountAddress = "accountAddress"
+			case __transactionManifest = "transactionManifest"
+			case version, requestType
+		}
+
+		public init(
+			accountAddress: AccountAddress,
+			version: Version,
+			transactionManifest: String,
+			requestType: RequestType
+		) {
+			precondition(requestType == .sendTransaction)
+			__accountAddress = accountAddress.address
+			self.version = version
+			__transactionManifest = transactionManifest
+			self.requestType = requestType
+		}
+	}
+}
+
+// MARK: - RequestMethodWalletRequest.Metadata
+public extension RequestMethodWalletRequest {
+	struct Metadata: Sendable, Hashable, Decodable {
 		public let networkId: Int
 		public let dAppId: String?
 		public init(networkId: Int, dAppId: String?) {
