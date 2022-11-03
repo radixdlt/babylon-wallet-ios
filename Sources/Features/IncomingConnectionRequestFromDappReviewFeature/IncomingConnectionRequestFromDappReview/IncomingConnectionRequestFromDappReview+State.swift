@@ -41,23 +41,27 @@ public extension IncomingConnectionRequestFromDappReview.State {
 }
 
 #if DEBUG
+public extension RequestMethodWalletRequest {
+	static let placeholderGetAccountAddressRequest = Self(
+		method: .request,
+		requestId: "deadbeef",
+		payloads: [
+			.accountAddresses(.init(
+				requestType: .accountAddresses,
+				numberOfAddresses: 1
+			)
+			),
+		],
+		metadata: .init(
+			networkId: 1,
+			dAppId: "RadarSwap"
+		)
+	)
+}
+
 public extension IncomingConnectionRequestFromDappReview.State {
 	static let placeholder: Self = .init(
-		requestFromDapp: .init(
-			method: .request,
-			requestId: "deadbeef",
-			payloads: [
-				.accountAddresses(.init(
-					requestType: .accountAddresses,
-					numberOfAddresses: 1
-				)
-				),
-			],
-			metadata: .init(
-				networkId: 1,
-				dAppId: "RadarSwap"
-			)
-		),
+		requestFromDapp: .placeholderGetAccountAddressRequest,
 		incomingConnectionRequestFromDapp: .placeholder
 	)
 }

@@ -8,6 +8,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 	func test_dismissIncomingConnectionRequest_whenTappedOnCloseButton_thenCoortinateDismissal() async {
 		// given
 		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
+			requestFromDapp: .placeholderGetAccountAddressRequest,
 			incomingConnectionRequestFromDapp: .placeholder
 		)
 		let store = TestStore(
@@ -26,6 +27,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		// given
 		let request: IncomingConnectionRequestFromDapp = .placeholder
 		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
+			requestFromDapp: .placeholderGetAccountAddressRequest,
 			incomingConnectionRequestFromDapp: request
 		)
 		let store = TestStore(
@@ -54,6 +56,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		// given
 		let request: IncomingConnectionRequestFromDapp = .placeholder
 		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
+			requestFromDapp: .placeholderGetAccountAddressRequest,
 			incomingConnectionRequestFromDapp: request,
 			chooseAccounts: .placeholder
 		)

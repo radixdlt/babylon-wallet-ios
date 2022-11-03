@@ -72,26 +72,30 @@ public extension TransactionManifest {
 	}
 }
 
+public extension RequestMethodWalletRequest {
+	static let placeholderSignTXRequets = Self(
+		method: .sendTransaction,
+		requestId: "deadbeef",
+		payloads: [
+			.signTXRequest(
+				.init(
+					accountAddress: try! AccountAddress(address: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
+					version: 1,
+					transactionManifest: "",
+					requestType: .sendTransaction
+				)
+			),
+		],
+		metadata: .init(
+			networkId: 1,
+			dAppId: "RadarSwap"
+		)
+	)
+}
+
 public extension TransactionSigning.State {
 	static let placeholder = Self(
-		requestFromDapp: .init(
-			method: .sendTransaction,
-			requestId: "deadbeef",
-			payloads: [
-				.signTXRequest(
-					.init(
-						accountAddress: try! AccountAddress(address: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
-						version: 1,
-						transactionManifest: "",
-						requestType: .sendTransaction
-					)
-				),
-			],
-			metadata: .init(
-				networkId: 1,
-				dAppId: "RadarSwap"
-			)
-		),
+		requestFromDapp: .placeholderSignTXRequets,
 		addressOfSigner: try! AccountAddress(address: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
 		transactionManifest: .mock
 	)
