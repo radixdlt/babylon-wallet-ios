@@ -7,19 +7,19 @@ import Profile
 // MARK: - TransactionSigning.State
 public extension TransactionSigning {
 	struct State: Equatable {
-		/// Need whole original request from dApp to be able to response back to dApp properly, I think.
-		public var requestFromDapp: RequestMethodWalletRequest
+		/// needed for sending response back
+		public let incomingMessageFromBrowser: IncomingMessageFromBrowser
 
 		public var addressOfSigner: AccountAddress
 		public var transactionManifest: TransactionManifest
 		public var errorAlert: AlertState<Action>? = nil
 
 		public init(
-			requestFromDapp: RequestMethodWalletRequest,
+			incomingMessageFromBrowser: IncomingMessageFromBrowser,
 			addressOfSigner: AccountAddress,
 			transactionManifest: TransactionManifest
 		) {
-			self.requestFromDapp = requestFromDapp
+			self.incomingMessageFromBrowser = incomingMessageFromBrowser
 			self.addressOfSigner = addressOfSigner
 			self.transactionManifest = transactionManifest
 		}
@@ -95,7 +95,7 @@ public extension RequestMethodWalletRequest {
 
 public extension TransactionSigning.State {
 	static let placeholder = Self(
-		requestFromDapp: .placeholderSignTXRequets,
+		incomingMessageFromBrowser: try! .init(requestMethodWalletRequest: .placeholderSignTXRequets, browserExtensionConnection: .placeholder),
 		addressOfSigner: try! AccountAddress(address: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
 		transactionManifest: .mock
 	)

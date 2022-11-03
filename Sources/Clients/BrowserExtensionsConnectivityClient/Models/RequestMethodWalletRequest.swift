@@ -87,6 +87,14 @@ public extension RequestMethodWalletRequest {
 		public let __accountAddress: String
 		public let version: Version
 		public let __transactionManifest: String
+		public let __blobsHex: [String]?
+		public var blobs: [[UInt8]] {
+			guard let blobsHex = __blobsHex else { return [] }
+			return blobsHex.map {
+				try! [UInt8](Data(hexString: $0))
+			}
+		}
+
 		public var transactionManifest: TransactionManifest {
 			TransactionManifest(instructions: .string(__transactionManifest))
 		}
@@ -97,6 +105,7 @@ public extension RequestMethodWalletRequest {
 			// FIXME: Clean up JSON decoding post E2E
 			case __accountAddress = "accountAddress"
 			case __transactionManifest = "transactionManifest"
+			case __blobsHex = "blobs"
 			case version, requestType
 		}
 
@@ -104,6 +113,7 @@ public extension RequestMethodWalletRequest {
 			accountAddress: AccountAddress,
 			version: Version,
 			transactionManifest: String,
+			blobsHex: [String] = [],
 			requestType: RequestType
 		) {
 			precondition(requestType == .sendTransaction)
@@ -111,6 +121,7 @@ public extension RequestMethodWalletRequest {
 			__accountAddress = accountAddress.address
 			self.version = version
 			__transactionManifest = transactionManifest
+			__blobsHex = blobsHex
 			self.requestType = requestType
 		}
 	}

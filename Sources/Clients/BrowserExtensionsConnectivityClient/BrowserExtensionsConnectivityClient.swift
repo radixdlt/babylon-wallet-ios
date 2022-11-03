@@ -71,7 +71,12 @@ public extension BrowserExtensionsConnectivityClient {
 
 	typealias GetConnectionStatusAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<BrowserConnectionUpdate>
 	typealias GetIncomingMessageAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<IncomingMessageFromBrowser>
-	typealias SendMessage = @Sendable (BrowserExtensionConnection.ID, String) async throws -> Void
+	typealias SendMessage = @Sendable (BrowserExtensionConnection.ID, MessageToDapp) async throws -> Void
+
+	enum MessageToDapp: Sendable, Hashable {
+		case custom(String)
+		case response(RequestMethodWalletResponse)
+	}
 }
 
 // MARK: - StatefulBrowserConnection
@@ -197,8 +202,22 @@ public extension BrowserExtensionsConnectivityClient {
 			},
 			sendMessage: { id, message in
 				let connection = try await connectionsHolder.getConnection(id: id)
+				let msgDataToSend: Data
+				switch message {
+				case let .custom(customMsg):
+					msgDataToSend = Data(customMsg.utf8)
+				case let .response(response):
+					let jsonEncoder = JSONEncoder()
+					do {
+						msgDataToSend = try jsonEncoder.encode(response)
+					} catch {
+						print("⛔️ failed to JSON encode data, error: \(String(describing: error))")
+						msgDataToSend = Data("Failed to encode response".utf8)
+					}
+				}
+
 				let outgoingMessage = Connection.OutgoingMessage(
-					data: Data(message.utf8),
+					data: msgDataToSend,
 					id: UUID().uuidString
 				)
 
@@ -256,3 +275,13 @@ public extension BrowserConnectionUpdate {
 		browserExtensionConnection.id
 	}
 }
+
+#if DEBUG
+public extension BrowserExtensionConnection {
+	static let placeholder = try! Self(
+		computerName: "Placeholder",
+		browserName: "Placeholder",
+		connectionPassword: Data(hexString: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
+	)
+}
+#endif // DEBUG

@@ -419,7 +419,7 @@ public struct Home: ReducerProtocol {
 			case let .accountAddresses(accountAddressRequest):
 				if state.chooseAccountRequestFromDapp == nil {
 					state.chooseAccountRequestFromDapp = IncomingConnectionRequestFromDappReview.State(
-						requestFromDapp: incomingRequestFromBrowser.requestMethodWalletRequest,
+						incomingMessageFromBrowser: incomingRequestFromBrowser,
 						incomingConnectionRequestFromDapp: .init(addressRequest: accountAddressRequest, from: incomingRequestFromBrowser.requestMethodWalletRequest)
 					)
 				} else {
@@ -431,7 +431,7 @@ public struct Home: ReducerProtocol {
 					// if `state.chooseAccountRequestFromDapp` is non nil, this will present SignTX view
 					// on top of chooseAccountsView...
 					state.transactionSigning = .init(
-						requestFromDapp: incomingRequestFromBrowser.requestMethodWalletRequest,
+						incomingMessageFromBrowser: incomingRequestFromBrowser,
 						addressOfSigner: signTXRequest.accountAddress,
 						transactionManifest: signTXRequest.transactionManifest
 					)
@@ -448,19 +448,51 @@ public struct Home: ReducerProtocol {
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
 
-		case let .chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, originalDappRequest))):
+		case let .chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, incomingMessageFromBrowser))):
 			state.chooseAccountRequestFromDapp = nil
-			// FIXME: SEND RESPONSE!
-			print("🚀 Send response back to dapp! selectedAccounts: \(selectedAccounts), originalRequestFromDapp: \(originalDappRequest)")
+			let accountAddresses: [RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse.AccountAddress] = selectedAccounts.map {
+				.init(address: $0.address.address, label: "NoLabel")
+			}
+			let response = RequestMethodWalletResponse(
+				method: .request,
+				requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
+				payload: [
+					.accountAddresses(.init(requestType: .accountAddresses, accountAddresses: accountAddresses)),
+				]
+			)
+			return .run { send in
+				await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
+			}
+
+		case let .internal(.system(.sendResponseBackToDapp(browserConnectionID, response))):
+			return .run { send in
+				await send(.internal(.system(.sendResponseBackToDappResult(
+					TaskResult {
+						let id: BrowserExtensionConnection.ID = browserConnectionID
+						let messageToDapp: BrowserExtensionsConnectivityClient.MessageToDapp = .response(response)
+
+						try await self.browserExtensionsConnectivityClient.sendMessage(id, messageToDapp)
+						return response.requestId
+					}
+				))))
+			}
+
+		case let .internal(.system(.sendResponseBackToDappResult(.success(idOfSuccessfullyDispatchedMsgOverWebRTCToDapp)))):
+			print("🤷‍♂️ Successfully sent response back to dApp over webRTC?")
 			return .run { send in
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
+
+		case let .internal(.system(.sendResponseBackToDappResult(.failure(error)))):
+			print("Failed to send response back over webRTC, error: \(String(describing: error))")
+			return .none
 
 		case .chooseAccountRequestFromDapp:
 			return .none
 
 		case let .transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, originalDappRequest))):
 			state.transactionSigning = nil
+			// FIXME! Change to use ` await send(.internal(.system(.sendResponseBackToDapp(`
 			print("🚀 Send response back to dapp! TXID: \(txID), originalRequestFromDapp: \(originalDappRequest)")
 			return .run { send in
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))

@@ -73,6 +73,8 @@ public extension Home.Action.InternalAction {
 		case copyAddress(Address)
 		case viewDidAppearActionFailed(reason: String)
 		case toggleIsCurrencyAmountVisibleFailed(reason: String)
+		case sendResponseBackToDapp(BrowserExtensionConnection.ID, RequestMethodWalletResponse)
+		case sendResponseBackToDappResult(TaskResult<RequestMethodWalletResponse.RequestID>)
 	}
 
 	enum InternalCoordinateAction: Equatable {

@@ -33,11 +33,11 @@ public extension TransactionSigning {
 		case let .internal(.signTransactionResult(result)):
 			switch result {
 			case let .success(txid):
-				return .run { [originalDappRequest = state.requestFromDapp] send in
+				return .run { [incomingMessageFromBrowser = state.incomingMessageFromBrowser] send in
 					await send(.delegate(
 						.signedTXAndSubmittedToGateway(
 							txid,
-							originalDappRequest: originalDappRequest
+							incomingMessageFromBrowser: incomingMessageFromBrowser
 						)
 					))
 				}
