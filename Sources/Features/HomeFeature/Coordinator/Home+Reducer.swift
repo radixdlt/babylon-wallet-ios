@@ -413,26 +413,31 @@ public struct Home: ReducerProtocol {
 				await send(.internal(.system(.presentViewForRequestFromBrowser(incomingMessageFromBrowser))))
 			}
 
-		case let .internal(.system(.presentViewForRequestFromBrowser(msgToPresent))):
+		case let .internal(.system(.presentViewForRequestFromBrowser(incomingRequestFromBrowser))):
 
-			switch msgToPresent.payload {
+			switch incomingRequestFromBrowser.payload {
 			case let .accountAddresses(accountAddressRequest):
 				if state.chooseAccountRequestFromDapp == nil {
 					state.chooseAccountRequestFromDapp = IncomingConnectionRequestFromDappReview.State(
-						incomingConnectionRequestFromDapp: .init(addressRequest: accountAddressRequest, from: msgToPresent.requestMethodWalletRequest)
+						requestFromDapp: incomingRequestFromBrowser.requestMethodWalletRequest,
+						incomingConnectionRequestFromDapp: .init(addressRequest: accountAddressRequest, from: incomingRequestFromBrowser.requestMethodWalletRequest)
 					)
 				} else {
 					// Buffer
-					state.unhandledReceivedMessages.append(msgToPresent)
+					state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
 				}
 			case let .signTXRequest(signTXRequest):
 				if state.transactionSigning == nil {
 					// if `state.chooseAccountRequestFromDapp` is non nil, this will present SignTX view
 					// on top of chooseAccountsView...
-					state.transactionSigning = .init(addressOfSigner: signTXRequest.accountAddress, transactionManifest: signTXRequest.transactionManifest)
+					state.transactionSigning = .init(
+						requestFromDapp: incomingRequestFromBrowser.requestMethodWalletRequest,
+						addressOfSigner: signTXRequest.accountAddress,
+						transactionManifest: signTXRequest.transactionManifest
+					)
 				} else {
 					// Buffer
-					state.unhandledReceivedMessages.append(msgToPresent)
+					state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
 				}
 			}
 			return .none
@@ -443,9 +448,10 @@ public struct Home: ReducerProtocol {
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
 
-		case let .chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts))):
+		case let .chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, originalDappRequest))):
 			state.chooseAccountRequestFromDapp = nil
-			fatalError("send back message with addresses for accounts: \(selectedAccounts) and then dismiss")
+			// FIXME: SEND RESPONSE!
+			print("🚀 Send response back to dapp! selectedAccounts: \(selectedAccounts), originalRequestFromDapp: \(originalDappRequest)")
 			return .run { send in
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
@@ -453,8 +459,15 @@ public struct Home: ReducerProtocol {
 		case .chooseAccountRequestFromDapp:
 			return .none
 
+		case let .transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, originalDappRequest))):
+			state.transactionSigning = nil
+			print("🚀 Send response back to dapp! TXID: \(txID), originalRequestFromDapp: \(originalDappRequest)")
+			return .run { send in
+				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
+			}
+
 		case .transactionSigning(.delegate(.dismissView)):
-			state.chooseAccountRequestFromDapp = nil
+			state.transactionSigning = nil
 			return .run { send in
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}

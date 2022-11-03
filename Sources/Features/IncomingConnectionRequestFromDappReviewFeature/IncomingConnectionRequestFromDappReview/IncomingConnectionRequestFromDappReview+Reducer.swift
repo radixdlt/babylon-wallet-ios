@@ -51,8 +51,10 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 
 			case let .chooseAccounts(.coordinate(.finishedChoosingAccounts(chosenAccounts))):
 				state.chooseAccounts = nil
-				return .run { send in
-					await send(.delegate(.finishedChoosingAccounts(chosenAccounts)))
+				return .run { [originalDappRequest = state.requestFromDapp] send in
+					await send(.delegate(
+						.finishedChoosingAccounts(chosenAccounts, originalDappRequest: originalDappRequest)
+					))
 				}
 
 			case .chooseAccounts:

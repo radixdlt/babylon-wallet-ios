@@ -1,3 +1,4 @@
+import BrowserExtensionsConnectivityClient
 import ComposableArchitecture
 import EngineToolkit
 import Foundation
@@ -32,5 +33,10 @@ public extension TransactionSigning.Action {
 public extension TransactionSigning.Action {
 	enum DelegateAction: Equatable {
 		case dismissView
+
+		case signedTXAndSubmittedToGateway(
+			TransactionIntent.TXID,
+			originalDappRequest: RequestMethodWalletRequest
+		)
 	}
 }

@@ -476,6 +476,7 @@ package.addModules([
 		name: "TransactionSigningFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
+			"BrowserExtensionsConnectivityClient", // Actually only models needed...
 			"Common",
 			"EngineToolkitClient",
 			"GatewayAPI",

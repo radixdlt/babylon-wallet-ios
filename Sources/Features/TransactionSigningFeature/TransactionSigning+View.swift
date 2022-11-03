@@ -21,11 +21,8 @@ public extension TransactionSigning.View {
 			store,
 			observe: ViewState.init
 		) { viewStore in
-			ForceFullScreen {
+			Screen(title: "Sign TX", navBarActionStyle: .close, action: { viewStore.send(.delegate(.dismissView)) }) {
 				VStack(spacing: 20) {
-					NavigationBar("Confirm transaction", style: .back) {
-						viewStore.send(.delegate(.dismissView))
-					}
 					ScrollView([.horizontal, .vertical], showsIndicators: false) {
 						Text(viewStore.state.manifest)
 							.padding()
@@ -35,16 +32,17 @@ public extension TransactionSigning.View {
 							.multilineTextAlignment(.leading)
 					}
 					.background(Color(white: 0.9))
+
 					PrimaryButton(title: "Sign Transaction") {
 						viewStore.send(.view(.signTransaction))
 					}
 				}
 				.padding([.horizontal, .bottom])
+				.alert(
+					store.scope(state: \.errorAlert),
+					dismiss: .view(.dismissErrorAlert)
+				)
 			}
-			.alert(
-				store.scope(state: \.errorAlert),
-				dismiss: .view(.dismissErrorAlert)
-			)
 		}
 	}
 }

@@ -1,3 +1,4 @@
+import BrowserExtensionsConnectivityClient
 import Collections
 import ComposableArchitecture
 import Foundation
@@ -17,7 +18,11 @@ public extension IncomingConnectionRequestFromDappReview {
 // MARK: - IncomingConnectionRequestFromDappReview.Action.DelegateAction
 public extension IncomingConnectionRequestFromDappReview.Action {
 	enum DelegateAction: Equatable {
-		case finishedChoosingAccounts(NonEmpty<OrderedSet<OnNetwork.Account>>)
+		case finishedChoosingAccounts(
+			NonEmpty<OrderedSet<OnNetwork.Account>>,
+			originalDappRequest: RequestMethodWalletRequest
+		)
+
 		case dismiss
 	}
 }

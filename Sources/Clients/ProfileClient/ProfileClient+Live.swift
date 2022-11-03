@@ -147,9 +147,15 @@ public extension ProfileClient {
 					)
 				}
 			},
-			lookupAccountByAddress: { _ in
-				// TODO: implement
-				fatalError()
+			lookupAccountByAddress: { accountAddress in
+				// Get default NetworkID
+				let networkID = getCurrentNetworkID()
+				return try profileHolder.get { profile in
+					guard let account = try profile.entity(networkID: networkID, address: accountAddress) as? OnNetwork.Account else {
+						throw ExpectedEntityToBeAccount()
+					}
+					return account
+				}
 			},
 			signTransaction: { _, _ in
 				// TODO: implement
@@ -158,6 +164,9 @@ public extension ProfileClient {
 		)
 	}()
 }
+
+// MARK: - ExpectedEntityToBeAccount
+struct ExpectedEntityToBeAccount: Swift.Error {}
 
 // MARK: - CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities
 struct CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities: Swift.Error {}
