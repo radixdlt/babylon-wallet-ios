@@ -33,7 +33,7 @@ public extension ChooseAccounts.View {
 							Spacer(minLength: 40)
 
 							VStack(spacing: 20) {
-								Text(L10n.DApp.ChooseAccounts.title)
+								Text("Chose \(String(describing: viewStore.incomingConnectionRequestFromDapp.numberOfNeededAccounts))")
 									.textStyle(.secondaryHeader)
 
 								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.incomingConnectionRequestFromDapp.displayName))
@@ -75,6 +75,23 @@ public extension ChooseAccounts.View {
 					}
 				}
 			}
+		}
+	}
+}
+
+// MARK: - IncomingConnectionRequestFromDapp.NumberOfNeededAccounts + CustomStringConvertible
+extension IncomingConnectionRequestFromDapp.NumberOfNeededAccounts: CustomStringConvertible {
+	public var description: String {
+		switch self {
+		case let .exactly(numberOfAccounts):
+			if numberOfAccounts == 1 {
+				return "exactly one account."
+
+			} else {
+				return "exactly #\(numberOfAccounts) accounts."
+			}
+		case .atLeastOne:
+			return "at least one account"
 		}
 	}
 }
