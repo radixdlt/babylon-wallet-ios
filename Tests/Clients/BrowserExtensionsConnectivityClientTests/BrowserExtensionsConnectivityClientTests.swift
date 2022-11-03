@@ -4,7 +4,7 @@ import TestUtils
 
 final class BrowerExtensionsConnectivityClientTests: TestCase {
 	func test_decode_request_from_dApp() throws {
-		let jsonOLD = """
+		let json = """
 		{
 		  "metadata" : {
 		    "networkId" : 1,
@@ -21,25 +21,8 @@ final class BrowerExtensionsConnectivityClientTests: TestCase {
 		}
 		""".data(using: .utf8)!
 
-		"""
-		{
-		  "metadata" : {
-		    "networkId" : 1,
-		    "dAppId" : "radixDashboard"
-		  },
-		  "payload" : [
-		    {
-		      "requestType" : "accountAddresses",
-		      "numberOfAddresses" : 1
-		    }
-		  ],
-		  "method" : "request",
-		  "requestId" : "70bd4ad5-66aa-47cb-9698-afcdafbe3964"
-		}
-		"""
-
 		let decoder = JSONDecoder()
 		let request = try decoder.decode(RequestMethodWalletRequest.self, from: json)
-		XCTAssertEqual(request.payload, [RequestMethodWalletRequest.Payload.accountAddresses(.init(requestType: .accountAddresses, numberOfAddresses: 1))])
+		XCTAssertEqual(request.payloads, [RequestMethodWalletRequest.Payload.accountAddresses(.init(requestType: .accountAddresses, numberOfAddresses: 1))])
 	}
 }

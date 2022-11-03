@@ -19,7 +19,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		_ = await store.send(.internal(.user(.dismissIncomingConnectionRequest)))
 
 		// then
-		_ = await store.receive(.coordinate(.dismissIncomingConnectionRequest))
+		_ = await store.receive(.delegate(.dismiss))
 	}
 
 	func test_proceedWithConnectionRequest_whenTappedOnContinueButton_thenDisplayChooseAccounts() async {
@@ -39,7 +39,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		_ = await store.send(.internal(.user(.proceedWithConnectionRequest)))
 
 		// then
-		_ = await store.receive(.coordinate(.proceedWithConnectionRequest))
+		_ = await store.receive(.internal(.coordinate(.proceedWithConnectionRequest)))
 		_ = await store.receive(.internal(.system(.loadAccountsResult(.success(accounts))))) {
 			$0.chooseAccounts = .init(
 				incomingConnectionRequestFromDapp: request,
