@@ -308,6 +308,46 @@
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BrowserExtensionsConnectivityClientTests"
+               BuildableName = "BrowserExtensionsConnectivityClientTests"
+               BlueprintName = "BrowserExtensionsConnectivityClientTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "EngineToolkitClientTests"
+               BuildableName = "EngineToolkitClientTests"
+               BlueprintName = "EngineToolkitClientTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ManageBrowserExtensionConnectionsFeatureTests"
+               BuildableName = "ManageBrowserExtensionConnectionsFeatureTests"
+               BlueprintName = "ManageBrowserExtensionConnectionsFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ProfileLoaderTests"
+               BuildableName = "ProfileLoaderTests"
+               BlueprintName = "ProfileLoaderTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

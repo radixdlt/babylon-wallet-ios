@@ -25,6 +25,19 @@ public struct RequestMethodWalletRequest: Sendable, Equatable, Decodable {
 public extension RequestMethodWalletRequest {
 	enum Payload: Sendable, Equatable, Decodable {
 		case accountAddresses(AccountAddressesRequestMethodWalletRequest)
+
+		enum CodingKeys: String, CodingKey {
+			case requestType
+		}
+
+		public init(from decoder: Decoder) throws {
+			let container = try decoder.container(keyedBy: CodingKeys.self)
+			let discriminator = try container.decode(RequestType.self, forKey: .requestType)
+			switch discriminator {
+			case .accountAddresses:
+				self = try .accountAddresses(.init(from: decoder))
+			}
+		}
 	}
 }
 
