@@ -136,7 +136,6 @@ public extension BrowserExtensionsConnectivityClient {
 		}
 
 		let connectionsHolder = ConnectionsHolder.shared
-		converseSetLogLevelOfGlobalLogger(.info)
 
 		return Self(
 			getBrowserExtensionConnections: {
