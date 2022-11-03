@@ -482,7 +482,9 @@ package.addModules([
 			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
-		tests: .no
+		tests: .yes(dependencies: [
+			"TestUtils",
+		])
 	),
 ])
 
