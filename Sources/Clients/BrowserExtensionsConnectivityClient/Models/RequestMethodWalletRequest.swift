@@ -83,31 +83,31 @@ public extension RequestMethodWalletRequest {
 			try! .init(address: __accountAddress)
 		}
 
-        // FIXME: Clean up JSON decoding post E2E
-        public let __accountAddress: String
-        public let version: Version
-        public let __transactionManifest: String
-        public var transactionManifest: TransactionManifest {
-            TransactionManifest(instructions: .string(__transactionManifest))
-        }
+		// FIXME: Clean up JSON decoding post E2E
+		public let __accountAddress: String
+		public let version: Version
+		public let __transactionManifest: String
+		public var transactionManifest: TransactionManifest {
+			TransactionManifest(instructions: .string(__transactionManifest))
+		}
 
-        public let requestType: RequestType
+		public let requestType: RequestType
 
-        enum CodingKeys: String, CodingKey {
-            // FIXME: Clean up JSON decoding post E2E
-            case __accountAddress = "accountAddress"
-            case __transactionManifest = "transactionManifest"
-            case version, requestType
-        }
+		enum CodingKeys: String, CodingKey {
+			// FIXME: Clean up JSON decoding post E2E
+			case __accountAddress = "accountAddress"
+			case __transactionManifest = "transactionManifest"
+			case version, requestType
+		}
 
-        public init(
-            accountAddress: AccountAddress,
-            version: Version,
-            transactionManifest: String,
-            requestType: RequestType
-        ) {
-            precondition(requestType == .sendTransaction)
-            // FIXME: Clean up JSON decoding post E2E
+		public init(
+			accountAddress: AccountAddress,
+			version: Version,
+			transactionManifest: String,
+			requestType: RequestType
+		) {
+			precondition(requestType == .sendTransaction)
+			// FIXME: Clean up JSON decoding post E2E
 			__accountAddress = accountAddress.address
 			self.version = version
 			__transactionManifest = transactionManifest

@@ -22,7 +22,6 @@ public struct IncomingConnectionRequestFromDapp: Equatable, Decodable {
 	}
 }
 
-
 // MARK: - Convenience
 public extension IncomingConnectionRequestFromDapp {
 	init(
