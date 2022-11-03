@@ -6,14 +6,15 @@ import TransactionSigningFeature
 final class TransactionSigningFeatureTests: TestCase {
 	let store = TestStore(
 		initialState: TransactionSigning.State(
-			address: "123",
+			requestFromDapp: .placeholderSignTXRequets,
+			addressOfSigner: try! .init(address: "123"),
 			transactionManifest: .mock
 		),
 		reducer: TransactionSigning()
 	)
 
 	func testInitialState() {
-		XCTAssertEqual(store.state.address, "123")
+		XCTAssertEqual(store.state.addressOfSigner, try! .init(address: "123"))
 		XCTAssertEqual(store.state.transactionManifest, .mock)
 		XCTAssertNil(store.state.errorAlert)
 	}
