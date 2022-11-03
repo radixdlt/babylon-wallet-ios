@@ -22,18 +22,6 @@ public struct IncomingConnectionRequestFromDapp: Equatable, Decodable {
 	}
 }
 
-// public extension RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest {
-//    var incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp {
-//        .init(
-//            componentAddress: "Unknown",
-//            name: "Unknown",
-//            permissions: [],
-//            numberOfNeededAccounts: numberOfAddresses.map {
-//                IncomingConnectionRequestFromDapp.NumberOfNeededAccounts(int: $0)
-//            } ?? .atLeastOne
-//        )
-//    }
-// }
 
 // MARK: - Convenience
 public extension IncomingConnectionRequestFromDapp {
