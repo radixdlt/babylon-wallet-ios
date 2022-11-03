@@ -77,8 +77,8 @@ public extension Home.View {
 
 					IfLetStore(
 						store.scope(
-							state: \.choseAccountRequestFromDapp,
-							action: Home.Action.choseAccountRequestFromDapp
+							state: \.chooseAccountRequestFromDapp,
+							action: Home.Action.chooseAccountRequestFromDapp
 						),
 						then: IncomingConnectionRequestFromDappReview.View.init(store:)
 					)

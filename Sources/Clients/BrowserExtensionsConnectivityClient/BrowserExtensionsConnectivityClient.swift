@@ -65,11 +65,11 @@ public struct BrowserExtensionsConnectivityClient: DependencyKey {
 }
 
 public extension BrowserExtensionsConnectivityClient {
-	typealias GetBrowserExtensionConnections = @Sendable () throws -> [BrowserExtensionWithConnectionStatus]
+	typealias GetBrowserExtensionConnections = @Sendable () async throws -> [BrowserExtensionWithConnectionStatus]
 	typealias AddBrowserExtensionConnection = @Sendable (StatefulBrowserConnection) async throws -> Void
 	typealias DeleteBrowserExtensionConnection = @Sendable (BrowserExtensionConnection.ID) async throws -> Void
 
-	typealias GetConnectionStatusAsyncSequence = @Sendable (BrowserExtensionConnection.ID) throws -> AnyAsyncSequence<BrowserConnectionUpdate>
+	typealias GetConnectionStatusAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<BrowserConnectionUpdate>
 	typealias GetIncomingMessageAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<IncomingMessageFromBrowser>
 	typealias SendMessage = @Sendable (BrowserExtensionConnection.ID, String) async throws -> Void
 }
@@ -93,7 +93,7 @@ public extension BrowserExtensionsConnectivityClient {
 	static let liveValue: Self = {
 		@Dependency(\.profileClient) var profileClient
 
-		final class ConnectionsHolder {
+		final actor ConnectionsHolder: GlobalActor {
 			private var connections: [ConnectionID: StatefulBrowserConnection] = [:]
 			static let shared = ConnectionsHolder()
 			func mapID(_ passwordID: BrowserExtensionConnection.ID) throws -> ConnectionID {
@@ -140,7 +140,7 @@ public extension BrowserExtensionsConnectivityClient {
 		return Self(
 			getBrowserExtensionConnections: {
 				let connections = try profileClient.getBrowserExtensionConnections()
-				return try connections.connections.map { browserConnection in
+				return try await connections.connections.asyncMap { browserConnection in
 
 					let password = try ConnectionPassword(data: browserConnection.connectionPassword.data)
 					let secrets = try ConnectionSecrets.from(connectionPassword: password)
@@ -151,7 +151,7 @@ public extension BrowserExtensionsConnectivityClient {
 						connection: connection
 					)
 
-					connectionsHolder.addConnection(statefulConnection, connect: true)
+					await connectionsHolder.addConnection(statefulConnection, connect: true)
 
 					return BrowserExtensionWithConnectionStatus(
 						browserExtensionConnection: browserConnection
@@ -160,15 +160,15 @@ public extension BrowserExtensionsConnectivityClient {
 
 			},
 			addBrowserExtensionConnection: { statefulBrowserConnection in
-				connectionsHolder.addConnection(statefulBrowserConnection, connect: false) // should already be connected
+				await connectionsHolder.addConnection(statefulBrowserConnection, connect: false) // should already be connected
 				try await profileClient.addBrowserExtensionConnection(statefulBrowserConnection.browserExtensionConnection)
 			},
 			deleteBrowserExtensionConnection: { id in
-				connectionsHolder.disconnectedAndRemove(id)
+				await connectionsHolder.disconnectedAndRemove(id)
 				try await profileClient.deleteBrowserExtensionConnection(id)
 			},
 			getConnectionStatusAsyncSequence: { id in
-				let connection = try connectionsHolder.getConnection(id: id)
+				let connection = try await connectionsHolder.getConnection(id: id)
 				return connection.connection.connectionStatus().map { newStatus in
 					BrowserConnectionUpdate(
 						connectionStatus: newStatus,
@@ -177,7 +177,7 @@ public extension BrowserExtensionsConnectivityClient {
 				}.eraseToAnyAsyncSequence()
 			},
 			getIncomingMessageAsyncSequence: { id in
-				let connection = try connectionsHolder.getConnection(id: id)
+				let connection = try await connectionsHolder.getConnection(id: id)
 				return await connection.connection.receive().compactMap { msg in
 					let jsonData = msg.messagePayload
 					print(jsonData.prettyPrintedJSONString ?? "got json data")
@@ -196,7 +196,7 @@ public extension BrowserExtensionsConnectivityClient {
 				}.eraseToAnyAsyncSequence()
 			},
 			sendMessage: { id, message in
-				let connection = try connectionsHolder.getConnection(id: id)
+				let connection = try await connectionsHolder.getConnection(id: id)
 				let outgoingMessage = Connection.OutgoingMessage(
 					data: Data(message.utf8),
 					id: UUID().uuidString

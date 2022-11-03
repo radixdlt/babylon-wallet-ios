@@ -83,7 +83,7 @@ public struct Home: ReducerProtocol {
 		.ifLet(\.createAccount, action: /Action.createAccount) {
 			CreateAccount()
 		}
-		.ifLet(\.choseAccountRequestFromDapp, action: /Action.choseAccountRequestFromDapp) {
+		.ifLet(\.chooseAccountRequestFromDapp, action: /Action.chooseAccountRequestFromDapp) {
 			IncomingConnectionRequestFromDappReview()
 		}
 		.ifLet(\.transactionSigning, action: /Action.transactionSigning) {
@@ -150,7 +150,7 @@ public struct Home: ReducerProtocol {
 				))))
 				await send(.internal(.system(.connectionsLoadedResult(
 					TaskResult {
-						try browserExtensionsConnectivityClient.getBrowserExtensionConnections()
+						try await browserExtensionsConnectivityClient.getBrowserExtensionConnections()
 					}
 				))))
 			}
@@ -417,10 +417,9 @@ public struct Home: ReducerProtocol {
 
 			switch msgToPresent.payload {
 			case let .accountAddresses(accountAddressRequest):
-				if state.choseAccountRequestFromDapp == nil {
-					state.choseAccountRequestFromDapp = IncomingConnectionRequestFromDappReview.State(
-						incomingConnectionRequestFromDapp: accountAddressRequest.incomingConnectionRequestFromDapp
-//						accounts: state.accountList.accounts.map(\.account)
+				if state.chooseAccountRequestFromDapp == nil {
+					state.chooseAccountRequestFromDapp = IncomingConnectionRequestFromDappReview.State(
+						incomingConnectionRequestFromDapp: .init(addressRequest: accountAddressRequest, from: msgToPresent.requestMethodWalletRequest)
 					)
 				} else {
 					// Buffer
@@ -429,24 +428,24 @@ public struct Home: ReducerProtocol {
 			}
 			return .none
 
-		case .choseAccountRequestFromDapp(.delegate(.dismiss)):
-			state.choseAccountRequestFromDapp = nil
+		case .chooseAccountRequestFromDapp(.delegate(.dismiss)):
+			state.chooseAccountRequestFromDapp = nil
 			return .run { send in
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
 
-		case let .choseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts))):
+		case let .chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts))):
+			state.chooseAccountRequestFromDapp = nil
 			fatalError("send back message with addresses for accounts: \(selectedAccounts) and then dismiss")
-			state.choseAccountRequestFromDapp = nil
 			return .run { send in
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
 
-		case .choseAccountRequestFromDapp:
+		case .chooseAccountRequestFromDapp:
 			return .none
 
 		case .transactionSigning(.delegate(.dismissView)):
-			state.choseAccountRequestFromDapp = nil
+			state.chooseAccountRequestFromDapp = nil
 			return .run { send in
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
@@ -454,24 +453,5 @@ public struct Home: ReducerProtocol {
 		case .transactionSigning:
 			return .none
 		}
-	}
-}
-
-public extension RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest {
-	var incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp {
-		.init(
-			componentAddress: "Unknown",
-			name: "Unknown",
-			permissions: [],
-			numberOfNeededAccounts: numberOfAddresses.map {
-				IncomingConnectionRequestFromDapp.NumberOfNeededAccounts(int: $0)
-			} ?? .atLeastOne
-		)
-	}
-}
-
-public extension IncomingConnectionRequestFromDapp.NumberOfNeededAccounts {
-	init(int: Int) {
-		self = int == 0 ? .atLeastOne : .exactly(int)
 	}
 }

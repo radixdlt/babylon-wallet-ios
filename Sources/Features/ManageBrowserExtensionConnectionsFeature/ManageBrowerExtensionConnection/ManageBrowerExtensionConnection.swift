@@ -24,7 +24,7 @@ public extension ManageBrowserExtensionConnection {
 				await withThrowingTaskGroup(of: Void.self) { taskGroup in
 					taskGroup.addTask {
 						do {
-							let statusUpdates = try browserExtensionsConnectivityClient.getConnectionStatusAsyncSequence(id)
+							let statusUpdates = try await browserExtensionsConnectivityClient.getConnectionStatusAsyncSequence(id)
 							for try await status in statusUpdates {
 								assert(status.browserExtensionConnection.id == id)
 								await send(.internal(.system(.connectionStatusResult(

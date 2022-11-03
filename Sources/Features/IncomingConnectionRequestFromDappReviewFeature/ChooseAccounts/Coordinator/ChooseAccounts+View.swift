@@ -33,7 +33,7 @@ public extension ChooseAccounts.View {
 							Spacer(minLength: 40)
 
 							VStack(spacing: 20) {
-								Text("Chose \(String(describing: viewStore.incomingConnectionRequestFromDapp.numberOfNeededAccounts))")
+								Text("Choose \(String(describing: viewStore.incomingConnectionRequestFromDapp.numberOfNeededAccounts))")
 									.textStyle(.secondaryHeader)
 
 								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.incomingConnectionRequestFromDapp.displayName))
@@ -50,30 +50,29 @@ public extension ChooseAccounts.View {
 								),
 								content: ChooseAccounts.Row.View.init(store:)
 							)
-
-							Spacer(minLength: 60)
-
-							Button(
-								action: {},
-								label: {
-									Text(L10n.DApp.ChooseAccounts.createNewAccount)
-										.foregroundColor(.app.gray1)
-										.textStyle(.body1Regular)
-								}
-							)
-
-							Spacer(minLength: 60)
-
-							PrimaryButton(
-								title: L10n.DApp.ConnectionRequest.continueButtonTitle,
-								isEnabled: viewStore.canProceed,
-								action: { viewStore.send(.continueButtonTapped) }
-							)
-							.disabled(!viewStore.canProceed)
 						}
-						.padding(.horizontal, 24)
 					}
+					Spacer(minLength: 16)
+					VStack {
+						Button(
+							action: {},
+							label: {
+								Text(L10n.DApp.ChooseAccounts.createNewAccount)
+									.foregroundColor(.app.gray1)
+									.textStyle(.body1Regular)
+							}
+						)
+						PrimaryButton(
+							title: L10n.DApp.ConnectionRequest.continueButtonTitle,
+							isEnabled: viewStore.canProceed,
+							action: { viewStore.send(.continueButtonTapped) }
+						)
+						.disabled(!viewStore.canProceed)
+					}
+
+					Spacer(minLength: 16)
 				}
+				.padding(.horizontal, 24)
 			}
 		}
 	}

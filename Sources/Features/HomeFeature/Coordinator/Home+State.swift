@@ -31,7 +31,7 @@ public extension Home {
 		public var transfer: AccountDetails.Transfer.State?
 
 		public var unhandledReceivedMessages: IdentifiedArrayOf<IncomingMessageFromBrowser>
-		public var choseAccountRequestFromDapp: IncomingConnectionRequestFromDappReview.State?
+		public var chooseAccountRequestFromDapp: IncomingConnectionRequestFromDappReview.State?
 		public var transactionSigning: TransactionSigning.State?
 
 		public init(
@@ -44,7 +44,7 @@ public extension Home {
 			accountPreferences: AccountPreferences.State? = nil,
 			createAccount: CreateAccount.State? = nil,
 			unhandledReceivedMessages: IdentifiedArrayOf<IncomingMessageFromBrowser> = .init(),
-			choseAccountRequestFromDapp: IncomingConnectionRequestFromDappReview.State? = nil,
+			chooseAccountRequestFromDapp: IncomingConnectionRequestFromDappReview.State? = nil,
 			transactionSigning: TransactionSigning.State? = nil,
 			transfer: AccountDetails.Transfer.State? = nil
 		) {
@@ -57,7 +57,7 @@ public extension Home {
 			self.accountPreferences = accountPreferences
 			self.createAccount = createAccount
 			self.unhandledReceivedMessages = unhandledReceivedMessages
-			self.choseAccountRequestFromDapp = choseAccountRequestFromDapp
+			self.chooseAccountRequestFromDapp = chooseAccountRequestFromDapp
 			self.transactionSigning = transactionSigning
 			self.transfer = transfer
 		}

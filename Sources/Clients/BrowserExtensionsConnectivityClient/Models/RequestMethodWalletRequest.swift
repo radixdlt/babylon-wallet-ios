@@ -62,8 +62,10 @@ public extension RequestMethodWalletRequest {
 public extension RequestMethodWalletRequest {
 	struct Metadata: Sendable, Equatable, Decodable {
 		public let networkId: Int
-		public init(networkId: Int) {
+		public let dAppId: String?
+		public init(networkId: Int, dAppId: String?) {
 			self.networkId = networkId
+			self.dAppId = dAppId
 		}
 	}
 }

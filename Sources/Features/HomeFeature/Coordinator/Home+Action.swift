@@ -31,7 +31,7 @@ public extension Home {
 		case transfer(AccountDetails.Transfer.Action)
 		case createAccount(CreateAccount.Action)
 
-		case choseAccountRequestFromDapp(IncomingConnectionRequestFromDappReview.Action)
+		case chooseAccountRequestFromDapp(IncomingConnectionRequestFromDappReview.Action)
 		case transactionSigning(TransactionSigning.Action)
 	}
 }

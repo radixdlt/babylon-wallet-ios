@@ -43,7 +43,7 @@ public extension ManageBrowserExtensionConnections {
 			return .run { send in
 				await send(.internal(.coordinate(.loadConnectionsResult(
 					TaskResult {
-						try browserExtensionsConnectivityClient.getBrowserExtensionConnections()
+						try await browserExtensionsConnectivityClient.getBrowserExtensionConnections()
 					}
 				))))
 			}
