@@ -12,6 +12,7 @@ import Foundation
 import IncomingConnectionRequestFromDappReviewFeature
 import NonEmpty
 import Profile
+import TransactionSigningFeature
 
 // MARK: - Home.Action
 public extension Home {
@@ -31,6 +32,7 @@ public extension Home {
 
 		#if DEBUG
 		case debugInitiatedConnectionRequest(IncomingConnectionRequestFromDappReview.Action)
+		case debugTransactionSigning(TransactionSigning.Action)
 		#endif
 	}
 }
@@ -51,6 +53,7 @@ public extension Home.Action.InternalAction {
 
 		#if DEBUG
 		case showDAppConnectionRequest
+		case showTransactionSigning
 		#endif
 	}
 }

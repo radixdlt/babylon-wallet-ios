@@ -8,6 +8,7 @@ import EngineToolkit
 import IncomingConnectionRequestFromDappReviewFeature
 import Profile
 import ProfileClient
+import TransactionSigningFeature
 
 // MARK: - Home.State
 public extension Home {
@@ -29,6 +30,7 @@ public extension Home {
 
 		#if DEBUG
 		public var debugInitiatedConnectionRequest: IncomingConnectionRequestFromDappReview.State?
+		public var debugTransactionSigning: TransactionSigning.State?
 		#endif
 
 		public init(

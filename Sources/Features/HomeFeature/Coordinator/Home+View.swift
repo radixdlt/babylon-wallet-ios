@@ -8,6 +8,7 @@ import CreateAccountFeature
 import DesignSystem
 import IncomingConnectionRequestFromDappReviewFeature
 import SwiftUI
+import TransactionSigningFeature
 
 // MARK: - Home.View
 public extension Home {
@@ -84,6 +85,17 @@ public extension Home.View {
 					)
 					.zIndex(1)
 					#endif
+
+					#if DEBUG
+					IfLetStore(
+						store.scope(
+							state: \.debugTransactionSigning,
+							action: Home.Action.debugTransactionSigning
+						),
+						then: TransactionSigning.View.init(store:)
+					)
+					.zIndex(1)
+					#endif
 				}
 			}
 		}
@@ -99,6 +111,7 @@ extension Home.View {
 
 		#if DEBUG
 		case showDAppConnectionRequest
+		case showTransactionSigning
 		#endif
 	}
 }
@@ -114,6 +127,8 @@ extension Home.Action {
 		#if DEBUG
 		case .showDAppConnectionRequest:
 			self = .internal(.user(.showDAppConnectionRequest))
+		case .showTransactionSigning:
+			self = .internal(.user(.showTransactionSigning))
 		#endif
 		}
 	}
@@ -178,6 +193,19 @@ private extension Home.View {
 						action: { viewStore.send(.showDAppConnectionRequest) },
 						label: {
 							Text("dApp Connection Request")
+								.padding()
+								.background(Color.red)
+								.cornerRadius(8)
+								.foregroundColor(.yellow)
+						}
+					)
+					#endif
+
+					#if DEBUG
+					Button(
+						action: { viewStore.send(.showTransactionSigning) },
+						label: {
+							Text("Sign TX")
 								.padding()
 								.background(Color.red)
 								.cornerRadius(8)

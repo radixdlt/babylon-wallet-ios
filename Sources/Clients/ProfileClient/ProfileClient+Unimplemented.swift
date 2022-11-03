@@ -4,7 +4,7 @@ import Profile
 import XCTestDynamicOverlay
 
 public extension ProfileClient {
-	static let unimplemented: Self = .init(
+	static let unimplemented = Self(
 		getCurrentNetworkID: XCTUnimplemented("\(Self.self).getCurrentNetworkID is unimplemented"),
 		setCurrentNetworkID: XCTUnimplemented("\(Self.self).setCurrentNetworkID is unimplemented"),
 		createNewProfile: XCTUnimplemented("\(Self.self).createNewProfile is unimplemented"),
@@ -17,7 +17,9 @@ public extension ProfileClient {
 		deleteBrowserExtensionConnection: XCTUnimplemented("\(Self.self).deleteBrowserExtensionConnection is unimplemented"),
 		getAppPreferences: XCTUnimplemented("\(Self.self).getAppPreferences is unimplemented"),
 		setDisplayAppPreferences: XCTUnimplemented("\(Self.self).setDisplayAppPreferences is unimplemented"),
-		createAccount: XCTUnimplemented("\(Self.self).createAccount is unimplemented")
+		createAccount: XCTUnimplemented("\(Self.self).createAccount is unimplemented"),
+		lookupAccountByAddress: XCTUnimplemented("\(Self.self).lookupAccountByAddress is unimplemented"),
+		signTransaction: XCTUnimplemented("\(Self.self).lookupAccountByAddress is unimplemented")
 	)
 }
 #endif

@@ -146,6 +146,14 @@ public extension ProfileClient {
 						}
 					)
 				}
+			},
+			lookupAccountByAddress: { _ in
+				// TODO: implement
+				fatalError()
+			},
+			signTransaction: { _, _ in
+				// TODO: implement
+				"TXID"
 			}
 		)
 	}()

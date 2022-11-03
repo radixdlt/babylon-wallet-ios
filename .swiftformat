@@ -7,6 +7,7 @@
 
 --stripunusedargs closure-only
 --enable marktypes
+--disable redundantNilInit
 --lineaftermarks false
 --ifdef no-indent
 

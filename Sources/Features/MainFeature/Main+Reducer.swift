@@ -81,6 +81,8 @@ public extension Main {
 			#if DEBUG
 			case .home(.debugInitiatedConnectionRequest(_)):
 				return .none
+			case .home(.debugTransactionSigning(_)):
+				return .none
 			#endif
 			}
 		}
