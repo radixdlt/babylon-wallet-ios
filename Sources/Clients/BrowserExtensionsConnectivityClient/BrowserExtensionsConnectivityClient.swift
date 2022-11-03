@@ -1,5 +1,6 @@
 import AsyncExtensions
 import ChunkingTransport
+import Collections
 import ComposableArchitecture
 import Converse
 import ConverseCommon

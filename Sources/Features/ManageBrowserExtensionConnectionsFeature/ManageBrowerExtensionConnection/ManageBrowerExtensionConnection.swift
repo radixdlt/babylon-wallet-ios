@@ -1,4 +1,5 @@
 import BrowserExtensionsConnectivityClient
+import ChunkingTransport
 import ComposableArchitecture
 import Converse
 import ConverseCommon
@@ -23,16 +24,56 @@ public extension ManageBrowserExtensionConnection {
 			return .run { [id = state.id] send in
 				await withThrowingTaskGroup(of: Void.self) { taskGroup in
 					taskGroup.addTask {
-						for try await status in try browserExtensionsConnectivityClient.getConnectionStatusAsyncSequence(id) {
-							assert(status.browserExtensionConnection.id == id)
-							await send(.internal(.system(.browserConnectionStatusChanged(status.connectionStatus))))
+						do {
+							let statusUpdates = try browserExtensionsConnectivityClient.getConnectionStatusAsyncSequence(id)
+							for try await status in statusUpdates {
+								assert(status.browserExtensionConnection.id == id)
+								await send(.internal(.system(.connectionStatusResult(
+									TaskResult.success(status.connectionStatus)
+								))))
+							}
+						} catch {
+							await send(.internal(.system(.connectionStatusResult(
+								TaskResult.failure(error)
+							))))
+						}
+					}
+
+					taskGroup.addTask {
+						do {
+							let incomingMsgs = try await browserExtensionsConnectivityClient.getIncomingMessageAsyncSequence(id)
+							for try await incomingMsg in incomingMsgs {
+//								assert(status.browserExtensionConnection.id == id)
+								await send(.internal(.system(.receiveMsgResult(
+									TaskResult.success(incomingMsg)
+								))))
+							}
+						} catch {
+							await send(.internal(.system(.receiveMsgResult(
+								TaskResult.failure(error)
+							))))
 						}
 					}
 				}
 			}
-		case let .internal(.system(.browserConnectionStatusChanged(newStatus))):
+
+		case let .internal(.system(.connectionStatusResult(.success(newStatus)))):
 			state.connectionStatus = newStatus
 			return .none
+
+		case let .internal(.system(.connectionStatusResult(.failure(error)))):
+			print("Failed to get browser connection status update, error \(String(describing: error))")
+			return .none
+
+		case let .internal(.system(.receiveMsgResult(.success(newIncomingMessage)))):
+			return .run { send in
+				await send(.delegate(.receivedMsg(newIncomingMessage)))
+			}
+
+		case let .internal(.system(.receiveMsgResult(.failure(error)))):
+			print("Failed to incoming message from browser connection, error \(String(describing: error))")
+			return .none
+
 		case .internal(.user(.deleteConnection)):
 			return .run { send in
 				await send(.delegate(.deleteConnection))
@@ -69,6 +110,7 @@ public extension ManageBrowserExtensionConnection.Action {
 	enum DelegateAction: Equatable {
 		case deleteConnection
 		case sendTestMessage
+		case receivedMsg(ChunkingTransport.IncomingMessage)
 	}
 }
 
@@ -84,7 +126,8 @@ public extension ManageBrowserExtensionConnection.Action.InternalAction {
 public extension ManageBrowserExtensionConnection.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
-		case browserConnectionStatusChanged(Connection.State)
+		case connectionStatusResult(TaskResult<Connection.State>)
+		case receiveMsgResult(TaskResult<ChunkingTransport.IncomingMessage>)
 		case subscribeToConnectionUpdates
 	}
 }

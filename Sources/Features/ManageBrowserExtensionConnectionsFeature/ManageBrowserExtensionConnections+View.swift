@@ -1,4 +1,5 @@
 import BrowserExtensionsConnectivityClient
+import ChunkingTransport
 import Common
 import ComposableArchitecture
 import ConnectUsingPasswordFeature
@@ -93,6 +94,23 @@ private extension ManageBrowserExtensionConnections.View {
 				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped) }
 				Spacer()
 			}
+			.sheet(
+				//				isPresented: viewStore.binding(
+//					get: \.isSheetPresented,
+//					send: ViewAction.setSheet(isPresented:)
+//				)
+				item: viewStore.binding(get: \.inMsgToPresent, send: ViewAction.dismissPresentedReceivedMsg)
+			) { receivedMessageFromBrowser in
+				Screen(
+					title: "Request from Dapp",
+					navBarActionStyle: .close,
+					action: { viewStore.send(.dismissPresentedReceivedMsg) }
+				) {
+					VStack {
+						Text("\(String(data: receivedMessageFromBrowser.messagePayload, encoding: .utf8) ?? "#\(receivedMessageFromBrowser.messagePayload.count) bytes")")
+					}
+				}
+			}
 			.onAppear { viewStore.send(.viewDidAppear) }
 		}
 	}
@@ -105,6 +123,7 @@ public extension ManageBrowserExtensionConnections.View {
 		case dismissButtonTapped
 		case addNewConnectionButtonTapped
 		case dismissNewConnectionFlowButtonTapped
+		case dismissPresentedReceivedMsg
 	}
 }
 
@@ -112,8 +131,11 @@ public extension ManageBrowserExtensionConnections.View {
 public extension ManageBrowserExtensionConnections.View {
 	struct ViewState: Equatable {
 		public var connections: IdentifiedArrayOf<BrowserExtensionWithConnectionStatus>
+		public var inMsgToPresent: ChunkingTransport.IncomingMessage?
+
 		init(state: ManageBrowserExtensionConnections.State) {
 			connections = state.connections
+			inMsgToPresent = state.presentedReceivedMessage
 		}
 	}
 }
@@ -123,6 +145,8 @@ extension ManageBrowserExtensionConnections.Action {
 		switch action {
 		case .viewDidAppear:
 			self = .internal(.system(.viewDidAppear))
+		case .dismissPresentedReceivedMsg:
+			self = .internal(.system(.dismissPresentedReceivedMsg))
 		case .dismissButtonTapped:
 			self = .internal(.user(.dismiss))
 		case .addNewConnectionButtonTapped:
