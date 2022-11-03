@@ -1,5 +1,4 @@
 import BrowserExtensionsConnectivityClient
-import ChunkingTransport
 import ComposableArchitecture
 import ConnectUsingPasswordFeature
 import Converse
@@ -56,7 +55,7 @@ public extension ManageBrowserExtensionConnections.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
 		case dismissPresentedReceivedMsg
-		case presentIncomingMsg(ChunkingTransport.IncomingMessage)
+		case presentIncomingMsg(IncomingMessageFromBrowser)
 		case successfullyOpenedConnectionToBrowser(Connection)
 	}
 }

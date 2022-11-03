@@ -398,6 +398,7 @@ package.addModules([
 			converse,
 			"DesignSystem",
 			.product(name: "InputPasswordFeature", package: "Converse"),
+			"IncomingConnectionRequestFromDappReviewFeature", // FIXME: extract to Home! just here for test..
 			profile,
 			"ProfileClient",
 			tca,
@@ -520,6 +521,7 @@ package.addModules([
 		name: "BrowserExtensionsConnectivityClient",
 		dependencies: [
 			.product(name: "AsyncExtensions", package: "AsyncExtensions"),
+			"Common",
 			converse,
 			dependencies,
 			profile,
@@ -620,9 +622,10 @@ package.addModules([
 	.core(
 		name: "Common",
 		dependencies: [
-			profile, // Address
+			bite,
 			bigInt,
 			"DesignSystem",
+			profile, // Address
 		],
 		resources: [.process("Localization/Strings")],
 		tests: .yes(

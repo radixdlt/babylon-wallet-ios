@@ -2,14 +2,15 @@ import Foundation
 
 // MARK: - RequestMethodWalletRequest
 public struct RequestMethodWalletRequest: Sendable, Equatable, Decodable {
+	public typealias RequestID = String
 	public let method: RequestMethod
-	public let requestId: String
+	public let requestId: RequestID
 	public let payload: [Payload]
 	public let metadata: Metadata
 
 	public init(
 		method: RequestMethod,
-		requestId: String,
+		requestId: RequestID,
 		payload: [Payload],
 		metadata: Metadata
 	) {

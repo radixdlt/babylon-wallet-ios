@@ -1,6 +1,6 @@
 import AsyncExtensions
-import ChunkingTransport
 import Collections
+import Common
 import ComposableArchitecture
 import Converse
 import ConverseCommon
@@ -70,7 +70,7 @@ public extension BrowserExtensionsConnectivityClient {
 	typealias DeleteBrowserExtensionConnection = @Sendable (BrowserExtensionConnection.ID) async throws -> Void
 
 	typealias GetConnectionStatusAsyncSequence = @Sendable (BrowserExtensionConnection.ID) throws -> AnyAsyncSequence<BrowserConnectionUpdate>
-	typealias GetIncomingMessageAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<ChunkingTransport.IncomingMessage> // FIXME: change to `IncomingMessageFromBrowser`
+	typealias GetIncomingMessageAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<IncomingMessageFromBrowser>
 	typealias SendMessage = @Sendable (BrowserExtensionConnection.ID, String) async throws -> Void
 }
 
@@ -171,8 +171,7 @@ public extension BrowserExtensionsConnectivityClient {
 			getConnectionStatusAsyncSequence: { id in
 				let connection = try connectionsHolder.getConnection(id: id)
 				return connection.connection.connectionStatus().map { newStatus in
-					print("🔮 CYON: BrowserExtensionsConnectivityClient new status: \(newStatus.rawValue)")
-					return BrowserConnectionUpdate(
+					BrowserConnectionUpdate(
 						connectionStatus: newStatus,
 						browserExtensionConnection: connection.browserExtensionConnection
 					)
@@ -180,7 +179,22 @@ public extension BrowserExtensionsConnectivityClient {
 			},
 			getIncomingMessageAsyncSequence: { id in
 				let connection = try connectionsHolder.getConnection(id: id)
-				return await connection.connection.receive()
+				return await connection.connection.receive().compactMap { msg in
+					let jsonData = msg.messagePayload
+					print(jsonData.prettyPrintedJSONString ?? "got json data")
+					do {
+						let requestMethodWalletRequest = try JSONDecoder().decode(RequestMethodWalletRequest.self, from: jsonData)
+
+						return IncomingMessageFromBrowser(
+							requestMethodWalletRequest: requestMethodWalletRequest,
+							browserExtensionConnection: connection.browserExtensionConnection
+						)
+					} catch {
+						print("⛔️ failed to JSON decode data, error: \(String(describing: error))")
+						return nil
+					}
+
+				}.eraseToAnyAsyncSequence()
 			},
 			sendMessage: { id, message in
 				let connection = try connectionsHolder.getConnection(id: id)
@@ -196,13 +210,27 @@ public extension BrowserExtensionsConnectivityClient {
 }
 
 // MARK: - IncomingMessageFromBrowser
-public struct IncomingMessageFromBrowser: Sendable, Equatable {
+public struct IncomingMessageFromBrowser: Sendable, Equatable, Identifiable {
 	public let requestMethodWalletRequest: RequestMethodWalletRequest
 	public let browserExtensionConnection: BrowserExtensionConnection
 }
 
+public extension IncomingMessageFromBrowser {
+	typealias ID = RequestMethodWalletRequest.RequestID
+	var id: ID {
+		requestMethodWalletRequest.requestId
+	}
+}
+
 // MARK: - BrowserConnectionUpdate
-public struct BrowserConnectionUpdate: Sendable, Equatable {
+public struct BrowserConnectionUpdate: Sendable, Equatable, Identifiable {
 	public let connectionStatus: Connection.State
 	public let browserExtensionConnection: BrowserExtensionConnection
+}
+
+public extension BrowserConnectionUpdate {
+	typealias ID = BrowserExtensionConnection.ID
+	var id: ID {
+		browserExtensionConnection.id
+	}
 }

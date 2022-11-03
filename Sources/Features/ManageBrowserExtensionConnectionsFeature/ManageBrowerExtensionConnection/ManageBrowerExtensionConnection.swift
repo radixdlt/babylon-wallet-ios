@@ -1,5 +1,4 @@
 import BrowserExtensionsConnectivityClient
-import ChunkingTransport
 import ComposableArchitecture
 import Converse
 import ConverseCommon
@@ -110,7 +109,7 @@ public extension ManageBrowserExtensionConnection.Action {
 	enum DelegateAction: Equatable {
 		case deleteConnection
 		case sendTestMessage
-		case receivedMsg(ChunkingTransport.IncomingMessage)
+		case receivedMsg(IncomingMessageFromBrowser)
 	}
 }
 
@@ -127,7 +126,7 @@ public extension ManageBrowserExtensionConnection.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case viewDidAppear
 		case connectionStatusResult(TaskResult<Connection.State>)
-		case receiveMsgResult(TaskResult<ChunkingTransport.IncomingMessage>)
+		case receiveMsgResult(TaskResult<IncomingMessageFromBrowser>)
 		case subscribeToConnectionUpdates
 	}
 }

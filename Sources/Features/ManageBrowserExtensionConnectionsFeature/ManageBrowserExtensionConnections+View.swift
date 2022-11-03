@@ -1,10 +1,10 @@
 import BrowserExtensionsConnectivityClient
-import ChunkingTransport
 import Common
 import ComposableArchitecture
 import ConnectUsingPasswordFeature
 import DesignSystem
 import Foundation
+import IncomingConnectionRequestFromDappReviewFeature
 import InputPasswordFeature
 import SwiftUI
 
@@ -95,24 +95,52 @@ private extension ManageBrowserExtensionConnections.View {
 				Spacer()
 			}
 			.sheet(
-				//				isPresented: viewStore.binding(
-//					get: \.isSheetPresented,
-//					send: ViewAction.setSheet(isPresented:)
-//				)
-				item: viewStore.binding(get: \.inMsgToPresent, send: ViewAction.dismissPresentedReceivedMsg)
+				item: viewStore.binding(
+					get: \.inMsgToPresent,
+					send: ViewAction.dismissPresentedReceivedMsg
+				)
 			) { receivedMessageFromBrowser in
+				// FIXME: Move this to Home!
 				Screen(
 					title: "Request from Dapp",
 					navBarActionStyle: .close,
 					action: { viewStore.send(.dismissPresentedReceivedMsg) }
 				) {
-					VStack {
-						Text("\(String(data: receivedMessageFromBrowser.messagePayload, encoding: .utf8) ?? "#\(receivedMessageFromBrowser.messagePayload.count) bytes")")
+					switch receivedMessageFromBrowser.requestMethodWalletRequest.payload.first! {
+					case let .accountAddresses(accountAddressRequest):
+						ChooseAccounts.View(
+							store: .init(
+								initialState: .init(
+									incomingConnectionRequestFromDapp: accountAddressRequest.incomingConnectionRequestFromDapp,
+									accounts: .init()
+								),
+								reducer: ChooseAccounts()
+							)
+						)
 					}
 				}
 			}
 			.onAppear { viewStore.send(.viewDidAppear) }
 		}
+	}
+}
+
+public extension RequestMethodWalletRequest.AccountAddressesRequestMethodWalletRequest {
+	var incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp {
+		.init(
+			componentAddress: "Unknown",
+			name: "Unknown",
+			permissions: [],
+			numberOfNeededAccounts: numberOfAddresses.map {
+				IncomingConnectionRequestFromDapp.NumberOfNeededAccounts(int: $0)
+			} ?? .atLeastOne
+		)
+	}
+}
+
+public extension IncomingConnectionRequestFromDapp.NumberOfNeededAccounts {
+	init(int: Int) {
+		self = int == 0 ? .atLeastOne : .exactly(int)
 	}
 }
 
@@ -131,7 +159,7 @@ public extension ManageBrowserExtensionConnections.View {
 public extension ManageBrowserExtensionConnections.View {
 	struct ViewState: Equatable {
 		public var connections: IdentifiedArrayOf<BrowserExtensionWithConnectionStatus>
-		public var inMsgToPresent: ChunkingTransport.IncomingMessage?
+		public var inMsgToPresent: IncomingMessageFromBrowser?
 
 		init(state: ManageBrowserExtensionConnections.State) {
 			connections = state.connections
