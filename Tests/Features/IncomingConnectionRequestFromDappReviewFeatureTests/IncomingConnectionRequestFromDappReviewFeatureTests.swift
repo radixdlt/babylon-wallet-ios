@@ -32,6 +32,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 			initialState: initialState,
 			reducer: IncomingConnectionRequestFromDappReview()
 		)
+		store.dependencies.profileClient = .mock()
 		let accounts = try! store.dependencies.profileClient.getAccounts()
 
 		// when

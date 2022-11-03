@@ -1,10 +1,12 @@
 import Collections
 import Dependencies
+import EngineToolkit
 import Foundation
 import KeychainClient
 import Mnemonic
 import NonEmpty
 import Profile
+import Tagged
 
 // MARK: - CreateNewProfileRequest
 public struct CreateNewProfileRequest {
@@ -41,6 +43,8 @@ public struct ProfileClient: DependencyKey {
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
 	public var createAccount: CreateAccount
+	public var lookupAccountByAddress: LookupAccountByAddress
+	public var signTransaction: SignTransaction
 }
 
 public extension ProfileClient {
@@ -63,6 +67,10 @@ public extension ProfileClient {
 	typealias GetAppPreferences = @Sendable () throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
 	typealias CreateAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
+	// FIXME: Cyon will hook this up when PR https://github.com/radixdlt/babylon-wallet-ios/pull/67 is merged
+	// Since it contains changes regarding NetworkID, which is now a getter and setter in ProfileClient
+	typealias LookupAccountByAddress = @Sendable (String) throws -> OnNetwork.Account
+	typealias SignTransaction = @Sendable (OnNetwork.Account.ID, TransactionManifest) async throws -> TransactionIntent.TXID
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 }
 
@@ -81,4 +89,9 @@ public struct CreateAccountRequest {
 	) {
 		self.accountName = accountName
 	}
+}
+
+// MARK: - TransactionIntent.TXID
+public extension TransactionIntent {
+	typealias TXID = Tagged<Self, String>
 }

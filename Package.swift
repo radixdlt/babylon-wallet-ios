@@ -25,6 +25,7 @@ package.dependencies += [
 
 	// TCA - ComposableArchitecture used as architecture
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
+	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 
 	// Format code
 	.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
@@ -43,6 +44,11 @@ let tca: Target.Dependency = .product(
 let dependencies: Target.Dependency = .product(
 	name: "Dependencies",
 	package: "swift-composable-architecture"
+)
+
+let tagged: Target.Dependency = .product(
+	name: "Tagged",
+	package: "swift-tagged"
 )
 
 let profile: Target.Dependency = .product(
@@ -213,7 +219,6 @@ package.addModules([
 			"AccountPortfolio",
 			"Asset",
 			"FungibleTokenListFeature",
-			profile,
 			"ProfileClient",
 			tca,
 		],
@@ -285,7 +290,6 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			keychainClient,
-			profile,
 			"ProfileClient",
 			tca,
 		],
@@ -323,9 +327,9 @@ package.addModules([
 			engineToolkit,
 			"IncomingConnectionRequestFromDappReviewFeature",
 			"PasteboardClient",
-			profile,
 			"ProfileClient",
 			tca,
+			"TransactionSigningFeature",
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -341,7 +345,6 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Common",
-			profile,
 			"ProfileClient",
 			tca,
 		],
@@ -357,7 +360,6 @@ package.addModules([
 			"BrowserExtensionsConnectivityClient",
 			"Common",
 			"DesignSystem",
-			profile,
 			"ProfileClient",
 			tca,
 			// ^^^ Sort lexicographically ^^^
@@ -427,7 +429,6 @@ package.addModules([
 			"DesignSystem",
 			engineToolkit,
 			"ImportProfileFeature",
-			profile,
 			"ProfileClient",
 			tca,
 			// ^^^ Sort lexicographically ^^^
@@ -462,15 +463,27 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-			profile,
+			"ProfileClient",
 			"ProfileLoader",
 			tca,
-			"ProfileClient",
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.feature(
+		name: "TransactionSigningFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
+			"EngineToolkitClient",
+			"GatewayAPI",
+			"ProfileClient",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .no
 	),
 ])
 
@@ -578,6 +591,21 @@ package.addModules([
 		)
 	),
 	.client(
+		name: "ProfileClient",
+		dependencies: [
+			dependencies, // XCTestDynamicOverlay + DependencyKey
+			"EngineToolkitClient", // Create TX
+			"GatewayAPI", // Create Account On Ledger => Submit TX
+			profile,
+			"ProfileLoader",
+			tagged,
+			"UserDefaultsClient",
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
 		name: "ProfileLoader",
 		dependencies: [
 			profile,
@@ -590,20 +618,6 @@ package.addModules([
 	.client(
 		name: "UserDefaultsClient",
 		dependencies: [dependencies],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
-	),
-	.client(
-		name: "ProfileClient",
-		dependencies: [
-			"EngineToolkitClient", // Create TX
-			"GatewayAPI", // Create Account On Ledger => Submit TX
-			profile,
-			"ProfileLoader",
-			dependencies, // XCTestDynamicOverlay + DependencyKey
-			"UserDefaultsClient", // storing of NetworkID, remove in future in favour of storing this inside Profile?
-		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
@@ -636,7 +650,8 @@ package.addModules([
 		name: "DesignSystem",
 		dependencies: [],
 		resources: [.process("Fonts")],
-		tests: .no
+		tests: .no,
+		isProduct: true
 	),
 	.core(
 		name: "TestUtils",

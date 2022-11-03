@@ -10,6 +10,7 @@ import Foundation
 import FungibleTokenListFeature
 import IncomingConnectionRequestFromDappReviewFeature
 import PasteboardClient
+import TransactionSigningFeature
 
 // MARK: - Home
 public struct Home: ReducerProtocol {
@@ -44,45 +45,47 @@ public struct Home: ReducerProtocol {
 			)
 		}
 
+		accountListReducer()
+
+		Reduce(self.core)
+	}
+
+	func accountListReducer() -> some ReducerProtocol<State, Action> {
 		Scope(state: \.accountList, action: /Action.accountList) {
 			Reduce(
 				AccountList.reducer,
 				environment: AccountList.Environment()
 			)
 		}
-
 		.ifLet(\.accountDetails, action: /Action.accountDetails) {
 			Reduce(
 				AccountDetails.reducer,
 				environment: AccountDetails.Environment()
 			)
 		}
-
 		.ifLet(\.accountPreferences, action: /Action.accountPreferences) {
 			Reduce(
 				AccountPreferences.reducer,
 				environment: AccountPreferences.Environment()
 			)
 		}
-
 		.ifLet(\.transfer, action: /Action.transfer) {
 			Reduce(
 				AccountDetails.Transfer.reducer,
 				environment: AccountDetails.Transfer.Environment()
 			)
 		}
-
 		.ifLet(\.createAccount, action: /Action.createAccount) {
 			CreateAccount()
 		}
-
 		#if DEBUG
 			.ifLet(\.debugInitiatedConnectionRequest, action: /Action.debugInitiatedConnectionRequest) {
 				IncomingConnectionRequestFromDappReview()
 			}
+			.ifLet(\.debugTransactionSigning, action: /Action.debugTransactionSigning) {
+				TransactionSigning()
+			}
 		#endif
-
-		Reduce(self.core)
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -102,6 +105,10 @@ public struct Home: ReducerProtocol {
 		#if DEBUG
 		case .internal(.user(.showDAppConnectionRequest)):
 			state.debugInitiatedConnectionRequest = .init(incomingConnectionRequestFromDapp: .placeholder)
+			return .none
+
+		case .internal(.user(.showTransactionSigning)):
+			state.debugTransactionSigning = .init(address: "123", transactionManifest: .mock)
 			return .none
 		#endif
 
@@ -364,6 +371,13 @@ public struct Home: ReducerProtocol {
 		case .debugInitiatedConnectionRequest(.coordinate(_)):
 			return .none
 		case .debugInitiatedConnectionRequest(.chooseAccounts(_)):
+			return .none
+		case .debugTransactionSigning(.internal):
+			return .none
+		case .debugTransactionSigning(.delegate(.dismissView)):
+			state.debugTransactionSigning = nil
+			return .none
+		case .debugTransactionSigning(.view):
 			return .none
 		#endif
 		}
