@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import CryptoKit
 import EngineToolkit
@@ -160,7 +161,7 @@ public extension GatewayAPIClient {
 	func submit(
 		pollStrategy: PollStrategy = .default,
 		signedCompiledNotarizedTXGivenEpoch: (Epoch) async throws -> SignedCompiledNotarizedTX
-	) async throws -> CommittedTransaction {
+	) async throws -> (committedTransaction: CommittedTransaction, txID: TXID) {
 		@Dependency(\.mainQueue) var mainQueue
 
 		// MARK: Get Epoch
@@ -215,7 +216,8 @@ public extension GatewayAPIClient {
 		guard committed.receipt.status == .succeeded else {
 			throw FailedToSubmitTransactionWasRejected()
 		}
-		return committed
+		let txID = TXID(rawValue: intentHash)
+		return (committed, txID)
 	}
 }
 

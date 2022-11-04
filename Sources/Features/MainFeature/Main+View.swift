@@ -50,7 +50,7 @@ public extension Main.View {
 //					appSettingsClient: .mock,
 //					keychainClient: .unimplemented,
 //					pasteboardClient: .noop,
-//					profileClient: .unimplemented
+//					profileClient: .testValue
 //				)
 //			)
 //		)

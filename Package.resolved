@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Converse.git",
       "state" : {
-        "revision" : "9a937b85dcae166a0992ea9cd687a89ad6c73e0a",
-        "version" : "0.1.18"
+        "revision" : "aea21e46fe1523ddeb9a7c455be76806369a1723",
+        "version" : "0.1.19"
       }
     },
     {
@@ -230,8 +230,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "596fd4ba5fd4d84bbf174cbe6f42ac5b585f0a25",
-        "version" : "0.0.29"
+        "revision" : "2f5d0d511548b5fa83b8984d54831d596d422ef0",
+        "version" : "0.0.30"
       }
     },
     {

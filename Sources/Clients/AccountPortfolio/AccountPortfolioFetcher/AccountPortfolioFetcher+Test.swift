@@ -6,7 +6,7 @@ extension AccountPortfolioFetcher: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
-		fetchPortfolio: XCTUnimplemented("\(Self.self).fetchPortfolio")
+		fetchPortfolio: unimplemented("\(Self.self).fetchPortfolio")
 	)
 }
 

@@ -6,8 +6,8 @@ extension PasteboardClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
-		copyString: XCTUnimplemented("\(Self.self).copyString"),
-		getString: XCTUnimplemented("\(Self.self).getString")
+		copyString: unimplemented("\(Self.self).copyString"),
+		getString: unimplemented("\(Self.self).getString")
 	)
 }
 

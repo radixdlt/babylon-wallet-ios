@@ -14,30 +14,29 @@ public extension TransactionSigning {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .view(.signTransaction):
+			state.isSigningTX = true
 			return .run { [addressOfSigner = state.addressOfSigner, transactionManifest = state.transactionManifest] send in
-				let addressLookupResult = Result {
-					try profileClient.lookupAccountByAddress(addressOfSigner)
-				}
-				switch addressLookupResult {
-				case let .failure(error as NSError):
-					await send(.internal(.addressLookupFailed(error)))
-				case let .success(account):
-					await send(.internal(.signTransactionResult(TaskResult {
-						try await profileClient.signTransaction(account.id, transactionManifest)
-					})))
-				}
+				await send(.internal(.signTransactionResult(TaskResult {
+					try await profileClient.signTransaction(
+						manifest: transactionManifest,
+						addressOfSigner: addressOfSigner
+					)
+				})))
 			}
+
 		case let .internal(.addressLookupFailed(error)):
 			state.errorAlert = .init(title: .init("An error ocurred"), message: .init(error.localizedDescription))
 			return .none
+
 		case let .internal(.signTransactionResult(result)):
+			state.isSigningTX = false
 			switch result {
 			case let .success(txid):
-				return .run { [originalDappRequest = state.requestFromDapp] send in
+				return .run { [incomingMessageFromBrowser = state.incomingMessageFromBrowser] send in
 					await send(.delegate(
 						.signedTXAndSubmittedToGateway(
 							txid,
-							originalDappRequest: originalDappRequest
+							incomingMessageFromBrowser: incomingMessageFromBrowser
 						)
 					))
 				}

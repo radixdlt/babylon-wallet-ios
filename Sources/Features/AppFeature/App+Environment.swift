@@ -55,21 +55,21 @@ public extension App.Environment {
 		accountPortfolioFetcher: .noop,
 		keychainClient: .unimplemented,
 		pasteboardClient: .noop,
-		profileLoader: .unimplemented,
+		profileLoader: .testValue,
 		userDefaultsClient: .noop,
-		profileClient: .unimplemented
+		profileClient: .testValue
 	)
 
-	static let unimplemented = Self(
-		backgroundQueue: .unimplemented,
-		mainQueue: .unimplemented,
+	static let testValue = Self(
+		backgroundQueue: .immediate,
+		mainQueue: .immediate,
 		appSettingsClient: .testValue,
 		accountPortfolioFetcher: .testValue,
 		keychainClient: .unimplemented,
 		pasteboardClient: .testValue,
-		profileLoader: .unimplemented,
+		profileLoader: .testValue,
 		userDefaultsClient: .noop,
-		profileClient: .unimplemented
+		profileClient: .testValue
 	)
 }
 #endif

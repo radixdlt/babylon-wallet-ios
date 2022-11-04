@@ -7,7 +7,7 @@ extension AssetFetcher: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
-		fetchAssets: XCTUnimplemented("\(Self.self).fetchAssets")
+		fetchAssets: unimplemented("\(Self.self).fetchAssets")
 	)
 }
 

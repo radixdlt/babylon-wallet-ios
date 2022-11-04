@@ -5,18 +5,18 @@ import Profile
 // MARK: - IncomingConnectionRequestFromDappReview.State
 public extension IncomingConnectionRequestFromDappReview {
 	struct State: Equatable {
-		/// Need whole original request from dApp to be able to response back to dApp properly, I think.
-		public let requestFromDapp: RequestMethodWalletRequest
+		/// needed for sending response back
+		public let incomingMessageFromBrowser: IncomingMessageFromBrowser
 
 		public let incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp
 		public var chooseAccounts: ChooseAccounts.State?
 
 		public init(
-			requestFromDapp: RequestMethodWalletRequest,
+			incomingMessageFromBrowser: IncomingMessageFromBrowser,
 			incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp,
 			chooseAccounts: ChooseAccounts.State? = nil
 		) {
-			self.requestFromDapp = requestFromDapp
+			self.incomingMessageFromBrowser = incomingMessageFromBrowser
 			self.incomingConnectionRequestFromDapp = incomingConnectionRequestFromDapp
 			self.chooseAccounts = chooseAccounts
 		}
@@ -25,12 +25,12 @@ public extension IncomingConnectionRequestFromDappReview {
 
 public extension IncomingConnectionRequestFromDappReview.State {
 	init(
-		requestFromDapp: RequestMethodWalletRequest,
+		incomingMessageFromBrowser: IncomingMessageFromBrowser,
 		incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp,
 		accounts: [OnNetwork.Account]
 	) {
 		self.init(
-			requestFromDapp: requestFromDapp,
+			incomingMessageFromBrowser: incomingMessageFromBrowser,
 			incomingConnectionRequestFromDapp: incomingConnectionRequestFromDapp,
 			chooseAccounts: .init(
 				incomingConnectionRequestFromDapp: incomingConnectionRequestFromDapp,
@@ -61,7 +61,7 @@ public extension RequestMethodWalletRequest {
 
 public extension IncomingConnectionRequestFromDappReview.State {
 	static let placeholder: Self = .init(
-		requestFromDapp: .placeholderGetAccountAddressRequest,
+		incomingMessageFromBrowser: try! .init(requestMethodWalletRequest: .placeholderGetAccountAddressRequest, browserExtensionConnection: .placeholder),
 		incomingConnectionRequestFromDapp: .placeholder
 	)
 }
