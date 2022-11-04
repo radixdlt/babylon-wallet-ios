@@ -468,17 +468,18 @@ public struct Home: ReducerProtocol {
 			return .run { send in
 				await send(.internal(.system(.sendResponseBackToDappResult(
 					TaskResult {
-						let id: BrowserExtensionConnection.ID = browserConnectionID
-						let messageToDapp: BrowserExtensionsConnectivityClient.MessageToDapp = .response(response)
+						let outgoingMessage = MessageToDappRequest(
+							browserExtensionConnectionID: browserConnectionID,
+							requestMethodWalletResponse: response
+						)
 
-						try await self.browserExtensionsConnectivityClient.sendMessage(id, messageToDapp)
-						return response.requestId
+						return try await browserExtensionsConnectivityClient
+							.sendMessage(outgoingMessage)
 					}
 				))))
 			}
 
-		case let .internal(.system(.sendResponseBackToDappResult(.success(idOfSuccessfullyDispatchedMsgOverWebRTCToDapp)))):
-			print("🤷‍♂️ Successfully sent response back to dApp over webRTC?")
+		case .internal(.system(.sendResponseBackToDappResult(.success(_)))):
 			return .run { send in
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}

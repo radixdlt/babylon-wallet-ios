@@ -38,7 +38,8 @@ public extension BrowserExtensionsConnectivityClient {
 			deleteBrowserExtensionConnection: { _ in },
 			getConnectionStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 			getIncomingMessageAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-			sendMessage: { _, _ in }
+			sendMessage: { _ in fatalError() },
+			_sendTestMessage: { _, _ in fatalError() }
 		)
 	}
 	#endif // DEBUG
@@ -62,6 +63,7 @@ public struct BrowserExtensionsConnectivityClient: DependencyKey {
 	public var getConnectionStatusAsyncSequence: GetConnectionStatusAsyncSequence
 	public var getIncomingMessageAsyncSequence: GetIncomingMessageAsyncSequence
 	public var sendMessage: SendMessage
+	public var _sendTestMessage: _SendTestMessage
 }
 
 public extension BrowserExtensionsConnectivityClient {
@@ -71,12 +73,8 @@ public extension BrowserExtensionsConnectivityClient {
 
 	typealias GetConnectionStatusAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<BrowserConnectionUpdate>
 	typealias GetIncomingMessageAsyncSequence = @Sendable (BrowserExtensionConnection.ID) async throws -> AnyAsyncSequence<IncomingMessageFromBrowser>
-	typealias SendMessage = @Sendable (BrowserExtensionConnection.ID, MessageToDapp) async throws -> Void
-
-	enum MessageToDapp: Sendable, Hashable {
-		case custom(String)
-		case response(RequestMethodWalletResponse)
-	}
+	typealias SendMessage = @Sendable (MessageToDappRequest) async throws -> SentMessageToBrowser
+	typealias _SendTestMessage = @Sendable (BrowserExtensionConnection.ID, String) async throws -> Void
 }
 
 // MARK: - StatefulBrowserConnection
@@ -200,24 +198,32 @@ public extension BrowserExtensionsConnectivityClient {
 
 				}.eraseToAnyAsyncSequence()
 			},
-			sendMessage: { id, message in
-				let connection = try await connectionsHolder.getConnection(id: id)
-				let msgDataToSend: Data
-				switch message {
-				case let .custom(customMsg):
-					msgDataToSend = Data(customMsg.utf8)
-				case let .response(response):
-					let jsonEncoder = JSONEncoder()
-					do {
-						msgDataToSend = try jsonEncoder.encode(response)
-					} catch {
-						print("⛔️ failed to JSON encode data, error: \(String(describing: error))")
-						msgDataToSend = Data("Failed to encode response".utf8)
-					}
-				}
+			sendMessage: { outgoingMsg in
+				let connection = try await connectionsHolder.getConnection(id: outgoingMsg.browserExtensionConnectionID)
+				let data = try outgoingMsg.data()
+				let requestID = outgoingMsg.requestID
 
+				try await connection.connection.send(
+					Connection.OutgoingMessage(
+						data: data,
+						id: requestID
+					)
+				)
+
+				for try await receipt in connection.connection.sentReceipts() {
+					guard receipt.messageID == requestID else { continue }
+					return SentMessageToBrowser(
+						sentReceipt: receipt,
+						requestMethodWalletResponse: outgoingMsg.requestMethodWalletResponse,
+						browserExtensionConnection: connection.browserExtensionConnection
+					)
+				}
+				throw FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp()
+			},
+			_sendTestMessage: { id, message in
+				let connection = try await connectionsHolder.getConnection(id: id)
 				let outgoingMessage = Connection.OutgoingMessage(
-					data: msgDataToSend,
+					data: Data(message.utf8),
 					id: UUID().uuidString
 				)
 
@@ -225,6 +231,58 @@ public extension BrowserExtensionsConnectivityClient {
 			}
 		)
 	}()
+}
+
+// MARK: - FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp
+struct FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp: Swift.Error {}
+
+// MARK: - MessageToDappRequest
+public struct MessageToDappRequest: Sendable, Equatable, Identifiable {
+	public let browserExtensionConnectionID: BrowserExtensionConnection.ID
+	public let requestMethodWalletResponse: RequestMethodWalletResponse
+	public init(
+		browserExtensionConnectionID: BrowserExtensionConnection.ID,
+		requestMethodWalletResponse: RequestMethodWalletResponse
+	) {
+		self.browserExtensionConnectionID = browserExtensionConnectionID
+		self.requestMethodWalletResponse = requestMethodWalletResponse
+	}
+}
+
+public extension MessageToDappRequest {
+	func data(jsonEncoder: JSONEncoder = .init()) throws -> Data {
+		try jsonEncoder.encode(requestMethodWalletResponse)
+	}
+
+	var requestID: RequestMethodWalletResponse.RequestID {
+		requestMethodWalletResponse.requestId
+	}
+
+	typealias ID = RequestMethodWalletResponse.RequestID
+	var id: ID { requestID }
+}
+
+// MARK: - SentMessageToBrowser
+public struct SentMessageToBrowser: Sendable, Equatable, Identifiable {
+	public let sentReceipt: SentReceipt
+	public let requestMethodWalletResponse: RequestMethodWalletResponse
+	public let browserExtensionConnection: BrowserExtensionConnection
+	public init(
+		sentReceipt: SentReceipt,
+		requestMethodWalletResponse: RequestMethodWalletResponse,
+		browserExtensionConnection: BrowserExtensionConnection
+	) {
+		precondition(sentReceipt.messageID == requestMethodWalletResponse.requestId)
+		self.sentReceipt = sentReceipt
+		self.requestMethodWalletResponse = requestMethodWalletResponse
+		self.browserExtensionConnection = browserExtensionConnection
+	}
+}
+
+public extension SentMessageToBrowser {
+	typealias SentReceipt = Connection.ConfirmedSentMessage
+	typealias ID = RequestMethodWalletResponse.RequestID
+	var id: ID { requestMethodWalletResponse.requestId }
 }
 
 // MARK: - IncomingMessageFromBrowser

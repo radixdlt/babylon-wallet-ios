@@ -140,7 +140,7 @@ public extension ManageBrowserExtensionConnections {
 				await send(.internal(.coordinate(.sendTestMessageResult(
 					TaskResult {
 						let msg = "Test"
-						try await self.browserExtensionsConnectivityClient.sendMessage(id, .custom(msg))
+						try await self.browserExtensionsConnectivityClient._sendTestMessage(id, msg)
 						return msg
 					}
 				))))
