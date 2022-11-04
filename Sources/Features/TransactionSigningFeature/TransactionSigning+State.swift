@@ -9,6 +9,7 @@ public extension TransactionSigning {
 	struct State: Equatable {
 		/// needed for sending response back
 		public let incomingMessageFromBrowser: IncomingMessageFromBrowser
+		public var isSigningTX: Bool
 
 		public var addressOfSigner: AccountAddress
 		public var transactionManifest: TransactionManifest
@@ -17,11 +18,13 @@ public extension TransactionSigning {
 		public init(
 			incomingMessageFromBrowser: IncomingMessageFromBrowser,
 			addressOfSigner: AccountAddress,
-			transactionManifest: TransactionManifest
+			transactionManifest: TransactionManifest,
+			isSigningTX: Bool = false
 		) {
 			self.incomingMessageFromBrowser = incomingMessageFromBrowser
 			self.addressOfSigner = addressOfSigner
 			self.transactionManifest = transactionManifest
+			self.isSigningTX = isSigningTX
 		}
 	}
 }

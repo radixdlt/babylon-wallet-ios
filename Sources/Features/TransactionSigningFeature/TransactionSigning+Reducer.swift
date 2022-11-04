@@ -14,6 +14,7 @@ public extension TransactionSigning {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .view(.signTransaction):
+			state.isSigningTX = true
 			return .run { [addressOfSigner = state.addressOfSigner, transactionManifest = state.transactionManifest] send in
 				await send(.internal(.signTransactionResult(TaskResult {
 					try await profileClient.signTransaction(
@@ -22,10 +23,13 @@ public extension TransactionSigning {
 					)
 				})))
 			}
+
 		case let .internal(.addressLookupFailed(error)):
 			state.errorAlert = .init(title: .init("An error ocurred"), message: .init(error.localizedDescription))
 			return .none
+
 		case let .internal(.signTransactionResult(result)):
+			state.isSigningTX = false
 			switch result {
 			case let .success(txid):
 				return .run { [incomingMessageFromBrowser = state.incomingMessageFromBrowser] send in
