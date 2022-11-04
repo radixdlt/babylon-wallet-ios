@@ -13,6 +13,7 @@ public struct BuildAndSignTransactionWithManifestRequest: Sendable {
 		privateKey: PrivateKey,
 		transactionHeaderInput: TransactionHeaderInput
 	) {
+		assert(!manifest.blobs.isEmpty) // FIXME: Remove post E2E
 		self.privateKey = privateKey
 		self.transactionHeaderInput = transactionHeaderInput
 		self.manifest = manifest

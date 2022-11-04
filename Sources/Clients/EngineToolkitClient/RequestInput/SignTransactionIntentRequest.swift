@@ -14,6 +14,7 @@ public struct SignTransactionIntentRequest: Sendable {
 		transactionIntent: TransactionIntent,
 		privateKey: PrivateKey
 	) throws {
+		assert(!transactionIntent.manifest.blobs.isEmpty) // FIXME: Remove post E2E
 		let expectedPublicKey = try privateKey.publicKey().intoEngine()
 		guard
 			transactionIntent.header.publicKey == expectedPublicKey

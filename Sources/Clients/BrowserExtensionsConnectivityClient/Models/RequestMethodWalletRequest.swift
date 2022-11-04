@@ -96,7 +96,7 @@ public extension RequestMethodWalletRequest {
 		}
 
 		public var transactionManifest: TransactionManifest {
-			TransactionManifest(instructions: .string(__transactionManifest))
+			TransactionManifest(instructions: .string(__transactionManifest), blobs: blobs)
 		}
 
 		public let requestType: RequestType

@@ -198,6 +198,7 @@ public extension ProfileClient {
 		addressOfSigner: AccountAddress
 	) async throws -> TransactionIntent.TXID {
 		let account = try lookupAccountByAddress(addressOfSigner)
+		assert(!manifest.blobs.isEmpty) // FIXME: Remove post E2E
 		return try await signTransaction(account, manifest)
 	}
 }

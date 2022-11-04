@@ -24,12 +24,28 @@ public extension TransactionSigning.View {
 			Screen(title: "Sign TX", navBarActionStyle: .close, action: { viewStore.send(.delegate(.dismissView)) }) {
 				VStack(spacing: 20) {
 					ScrollView([.horizontal, .vertical], showsIndicators: false) {
+						Text("MANIFEST")
+						Divider()
 						Text(viewStore.state.manifest)
 							.padding()
 							.font(.system(size: 13, design: .monospaced))
 							.lineLimit(viewStore.state.numberOfLines)
 							.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 							.multilineTextAlignment(.leading)
+						Divider()
+						Text("BLOBS")
+						if viewStore.state.blobs.isEmpty {
+							Text("<NO BLOBS>")
+						} else {
+							VStack {
+								ForEach(viewStore.state.blobs, id: \.self) { blob in
+									VStack {
+										Text("BLOB:")
+										Text(blob)
+									}
+								}
+							}
+						}
 					}
 					.background(Color(white: 0.9))
 
@@ -52,10 +68,12 @@ extension TransactionSigning.View {
 	struct ViewState: Equatable {
 		let manifest: String
 		let numberOfLines: Int
+		let blobs: [String]
 
 		init(state: TransactionSigning.State) {
 			let manifest = state.transactionManifest.description
 			self.manifest = manifest
+			blobs = state.transactionManifest.blobs.map(\.hex)
 			numberOfLines = manifest.lines()
 		}
 	}
