@@ -5,7 +5,6 @@ import Foundation
 extension ProfileClient: TestDependencyKey {
 	#if DEBUG
 	public static let previewValue = Self.mock()
-	public static let testValue = Self.unimplemented
 	#endif // DEBUG
 }
 

@@ -15,17 +15,23 @@ public extension TransactionSigning {
 		switch action {
 		case .view(.signTransaction):
 			return .run { [addressOfSigner = state.addressOfSigner, transactionManifest = state.transactionManifest] send in
-				let addressLookupResult = Result {
-					try profileClient.lookupAccountByAddress(addressOfSigner)
-				}
-				switch addressLookupResult {
-				case let .failure(error as NSError):
-					await send(.internal(.addressLookupFailed(error)))
-				case let .success(account):
-					await send(.internal(.signTransactionResult(TaskResult {
-						try await profileClient.signTransaction(account.id, transactionManifest)
-					})))
-				}
+//				let addressLookupResult = Result {
+//					try profileClient.lookupAccountByAddress(addressOfSigner)
+//				}
+//				switch addressLookupResult {
+//				case let .failure(error as NSError):
+//					await send(.internal(.addressLookupFailed(error)))
+//				case let .success(account):
+//					await send(.internal(.signTransactionResult(TaskResult {
+//						try await profileClient.signTransaction(account, transactionManifest)
+//					})))
+//				}
+				await send(.internal(.signTransactionResult(TaskResult {
+					try await profileClient.signTransaction(
+						manifest: transactionManifest,
+						addressOfSigner: addressOfSigner
+					)
+				})))
 			}
 		case let .internal(.addressLookupFailed(error)):
 			state.errorAlert = .init(title: .init("An error ocurred"), message: .init(error.localizedDescription))

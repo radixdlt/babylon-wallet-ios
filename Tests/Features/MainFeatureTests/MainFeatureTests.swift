@@ -9,7 +9,7 @@ final class MainFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Main.State(home: .placeholder),
 			reducer: Main.reducer,
-			environment: .unimplemented
+			environment: .testValue
 		)
 
 		// when
@@ -24,7 +24,7 @@ final class MainFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Main.State(home: .placeholder, settings: .init()),
 			reducer: Main.reducer,
-			environment: .unimplemented
+			environment: .testValue
 		)
 
 		// when

@@ -7,7 +7,7 @@ extension FungibleTokenListSorter: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
-		sortTokens: XCTUnimplemented("\(Self.self).sortTokens")
+		sortTokens: unimplemented("\(Self.self).sortTokens")
 	)
 }
 

@@ -70,7 +70,7 @@ public extension ProfileClient {
 	// FIXME: Cyon will hook this up when PR https://github.com/radixdlt/babylon-wallet-ios/pull/67 is merged
 	// Since it contains changes regarding NetworkID, which is now a getter and setter in ProfileClient
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) throws -> OnNetwork.Account
-	typealias SignTransaction = @Sendable (OnNetwork.Account.ID, TransactionManifest) async throws -> TransactionIntent.TXID
+	typealias SignTransaction = @Sendable (OnNetwork.Account, TransactionManifest) async throws -> TransactionIntent.TXID
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 }
 
@@ -89,9 +89,4 @@ public struct CreateAccountRequest {
 	) {
 		self.accountName = accountName
 	}
-}
-
-// MARK: - TransactionIntent.TXID
-public extension TransactionIntent {
-	typealias TXID = Tagged<Self, String>
 }

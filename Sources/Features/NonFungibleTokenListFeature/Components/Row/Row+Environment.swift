@@ -10,6 +10,6 @@ public extension NonFungibleTokenList.Row {
 
 #if DEBUG
 public extension NonFungibleTokenList.Row.Environment {
-	static let unimplemented = Self()
+	static let testValue = Self()
 }
 #endif

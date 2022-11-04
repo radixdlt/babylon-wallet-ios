@@ -451,7 +451,7 @@ public struct Home: ReducerProtocol {
 		case let .chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, incomingMessageFromBrowser))):
 			state.chooseAccountRequestFromDapp = nil
 			let accountAddresses: [RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse.AccountAddress] = selectedAccounts.map {
-				.init(address: $0.address.address, label: "NoLabel")
+				.init(address: $0.address.address, label: $0.displayName ?? "AccountIndex: \($0.index)")
 			}
 			let response = RequestMethodWalletResponse(
 				method: .request,
@@ -459,7 +459,6 @@ public struct Home: ReducerProtocol {
 				payload: [
 					.accountAddresses(
 						.init(
-							requestType: .accountAddresses,
 							addresses: accountAddresses
 						)
 					),
@@ -496,12 +495,17 @@ public struct Home: ReducerProtocol {
 		case .chooseAccountRequestFromDapp:
 			return .none
 
-		case let .transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, originalDappRequest))):
+		case let .transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, incomingMessageFromBrowser))):
 			state.transactionSigning = nil
-			// FIXME! Change to use ` await send(.internal(.system(.sendResponseBackToDapp(`
-			print("🚀 Send response back to dapp! TXID: \(txID), originalRequestFromDapp: \(originalDappRequest)")
+			let response = RequestMethodWalletResponse(
+				method: .request,
+				requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
+				payload: [
+					.signTXRequest(.init(transactionIntentHash: txID)),
+				]
+			)
 			return .run { send in
-				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
+				await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
 			}
 
 		case .transactionSigning(.delegate(.dismissView)):

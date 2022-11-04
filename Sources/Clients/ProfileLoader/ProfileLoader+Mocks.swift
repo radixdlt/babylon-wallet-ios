@@ -3,8 +3,8 @@ import XCTestDynamicOverlay
 
 #if DEBUG
 public extension ProfileLoader {
-	static let unimplemented = Self(
-		loadProfile: XCTUnimplemented("\(Self.self).loadProfile is unimplemented")
+	static let testValue = Self(
+		loadProfile: unimplemented("\(Self.self).loadProfile")
 	)
 }
 #endif

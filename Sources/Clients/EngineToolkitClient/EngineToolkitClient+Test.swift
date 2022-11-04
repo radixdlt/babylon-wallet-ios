@@ -16,7 +16,7 @@ public extension EngineToolkitClient {
 	})
 	static let previewValue = Self.noop
 	static let testValue = Self(
-		signTransactionIntent: unimplemented("\(Self.self).signTransactionIntent is unimplemented")
+		signTransactionIntent: unimplemented("\(Self.self).signTransactionIntent")
 	)
 }
 

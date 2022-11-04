@@ -1,4 +1,6 @@
+import EngineToolkit
 import Foundation
+import Profile
 
 // MARK: - RequestMethodWalletResponse
 public struct RequestMethodWalletResponse: Sendable, Hashable, Encodable {
@@ -22,6 +24,7 @@ public struct RequestMethodWalletResponse: Sendable, Hashable, Encodable {
 public extension RequestMethodWalletResponse {
 	enum Payload: Sendable, Hashable, Encodable {
 		case accountAddresses(AccountAddressesRequestMethodWalletResponse)
+		case signTXRequest(SignTXResponseToDapp)
 	}
 }
 
@@ -30,6 +33,8 @@ public extension RequestMethodWalletResponse.Payload {
 		var container = encoder.singleValueContainer()
 		switch self {
 		case let .accountAddresses(payload):
+			try container.encode(payload)
+		case let .signTXRequest(payload):
 			try container.encode(payload)
 		}
 	}
@@ -40,8 +45,11 @@ public extension RequestMethodWalletResponse {
 	struct AccountAddressesRequestMethodWalletResponse: Sendable, Hashable, Encodable {
 		public let requestType: RequestType
 		public let addresses: [AccountAddress]
-		public init(requestType: RequestType, addresses: [AccountAddress]) {
-			self.requestType = requestType
+
+		public init(
+			addresses: [AccountAddress]
+		) {
+			requestType = .accountAddresses
 			self.addresses = addresses
 		}
 	}
@@ -52,9 +60,27 @@ public extension RequestMethodWalletResponse.AccountAddressesRequestMethodWallet
 	struct AccountAddress: Sendable, Hashable, Encodable {
 		public let address: String
 		public let label: String
+
 		public init(address: String, label: String) {
 			self.address = address
 			self.label = label
+		}
+	}
+}
+
+// MARK: - RequestMethodWalletResponse.SignTXResponseToDapp
+public extension RequestMethodWalletResponse {
+	struct SignTXResponseToDapp: Sendable, Hashable, Encodable {
+		public let requestType: RequestType
+
+		/// TransactionIntent hex string
+		public let transactionIntentHash: TransactionIntent.TXID
+
+		public init(
+			transactionIntentHash: TransactionIntent.TXID
+		) {
+			requestType = .sendTransaction
+			self.transactionIntentHash = transactionIntentHash
 		}
 	}
 }

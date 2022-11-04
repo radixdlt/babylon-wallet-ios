@@ -12,6 +12,6 @@ public extension AccountDetails {
 public extension AccountDetails.Environment {
 	static let placeholder: Self = .init()
 
-	static let unimplemented: Self = .init()
+	static let testValue: Self = .init()
 }
 #endif
