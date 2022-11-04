@@ -39,10 +39,10 @@ public extension RequestMethodWalletResponse.Payload {
 public extension RequestMethodWalletResponse {
 	struct AccountAddressesRequestMethodWalletResponse: Sendable, Hashable, Encodable {
 		public let requestType: RequestType
-		public let accountAddresses: [AccountAddress]
-		public init(requestType: RequestType, accountAddresses: [AccountAddress]) {
+		public let addresses: [AccountAddress]
+		public init(requestType: RequestType, addresses: [AccountAddress]) {
 			self.requestType = requestType
-			self.accountAddresses = accountAddresses
+			self.addresses = addresses
 		}
 	}
 }

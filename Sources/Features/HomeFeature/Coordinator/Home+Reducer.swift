@@ -457,7 +457,12 @@ public struct Home: ReducerProtocol {
 				method: .request,
 				requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
 				payload: [
-					.accountAddresses(.init(requestType: .accountAddresses, accountAddresses: accountAddresses)),
+					.accountAddresses(
+						.init(
+							requestType: .accountAddresses,
+							addresses: accountAddresses
+						)
+					),
 				]
 			)
 			return .run { send in
