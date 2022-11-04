@@ -11,7 +11,7 @@ extension AppSettingsClient: DependencyKey {
 			@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 			do {
-				let data = try JSONEncoder().encode(appSettings)
+				let data = try JSONEncoder.iso8601.encode(appSettings)
 				await userDefaultsClient.setData(data, Key.appSettings.rawValue)
 			} catch {
 				throw Error.saveSettingsFailed(reason: String(describing: error))

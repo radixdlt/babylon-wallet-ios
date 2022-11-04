@@ -195,17 +195,17 @@ public extension BrowserExtensionsConnectivityClient {
 			sendMessage: { outgoingMsg in
 				let connection = try await connectionsHolder.getConnection(id: outgoingMsg.browserExtensionConnectionID)
 				let data = try outgoingMsg.data()
-				let requestID = outgoingMsg.requestID
+				let p2pChannelRequestID = UUID().uuidString
 
 				try await connection.connection.send(
 					Connection.OutgoingMessage(
 						data: data,
-						id: requestID
+						id: p2pChannelRequestID
 					)
 				)
 
 				for try await receipt in connection.connection.sentReceipts() {
-					guard receipt.messageID == requestID else { continue }
+					guard receipt.messageID == p2pChannelRequestID else { continue }
 					return SentMessageToBrowser(
 						sentReceipt: receipt,
 						requestMethodWalletResponse: outgoingMsg.requestMethodWalletResponse,
@@ -222,6 +222,8 @@ public extension BrowserExtensionsConnectivityClient {
 				)
 
 				try await connection.connection.send(outgoingMessage)
+
+				// does not care about sent message receipts
 			}
 		)
 	}()
@@ -244,7 +246,8 @@ public struct MessageToDappRequest: Sendable, Equatable, Identifiable {
 }
 
 public extension MessageToDappRequest {
-	func data(jsonEncoder: JSONEncoder = .init()) throws -> Data {
+	// FIXME: move this out and use Dependency
+	func data(jsonEncoder: JSONEncoder = .iso8601) throws -> Data {
 		try jsonEncoder.encode(requestMethodWalletResponse)
 	}
 
@@ -266,7 +269,6 @@ public struct SentMessageToBrowser: Sendable, Equatable, Identifiable {
 		requestMethodWalletResponse: RequestMethodWalletResponse,
 		browserExtensionConnection: BrowserExtensionConnection
 	) {
-		precondition(sentReceipt.messageID == requestMethodWalletResponse.requestId)
 		self.sentReceipt = sentReceipt
 		self.requestMethodWalletResponse = requestMethodWalletResponse
 		self.browserExtensionConnection = browserExtensionConnection
