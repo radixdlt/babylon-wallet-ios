@@ -16,9 +16,8 @@ public extension TransactionSigning {
 // MARK: - TransactionSigning.Action.ViewAction
 public extension TransactionSigning.Action {
 	enum ViewAction: Equatable {
-		case signTransactionButtonTapped
-		case errorAlertDismissButtonTapped
-		case closeButtonTapped
+		case signTransaction
+		case dismissErrorAlert
 	}
 }
 

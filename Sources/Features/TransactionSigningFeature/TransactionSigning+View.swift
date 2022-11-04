@@ -19,14 +19,10 @@ public extension TransactionSigning.View {
 	var body: some View {
 		WithViewStore(
 			store,
-			observe: ViewState.init,
-			send: TransactionSigning.Action.view
+			observe: ViewState.init
 		) { viewStore in
-			Screen(title: "Sign TX", navBarActionStyle: .close, action: { viewStore.send(.closeButtonTapped) }) {
+			Screen(title: "Sign TX", navBarActionStyle: .close, action: { viewStore.send(.delegate(.dismissView)) }) {
 				VStack(spacing: 20) {
-					NavigationBar("Confirm transaction", style: .close) {
-						viewStore.send(.closeButtonTapped)
-					}
 					ScrollView([.horizontal, .vertical], showsIndicators: false) {
 						Text(viewStore.state.manifest)
 							.padding()
@@ -38,15 +34,15 @@ public extension TransactionSigning.View {
 					.background(Color(white: 0.9))
 
 					PrimaryButton(title: "Sign Transaction") {
-						viewStore.send(.signTransactionButtonTapped)
+						viewStore.send(.view(.signTransaction))
 					}
 				}
 				.padding([.horizontal, .bottom])
+				.alert(
+					store.scope(state: \.errorAlert),
+					dismiss: .view(.dismissErrorAlert)
+				)
 			}
-			.alert(
-				store.scope(state: \.errorAlert),
-				dismiss: .view(.errorAlertDismissButtonTapped)
-			)
 		}
 	}
 }
