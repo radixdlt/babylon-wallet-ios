@@ -181,20 +181,14 @@ public extension BrowserExtensionsConnectivityClient {
 			},
 			getIncomingMessageAsyncSequence: { id in
 				let connection = try await connectionsHolder.getConnection(id: id)
-				return await connection.connection.receive().compactMap { msg in
+				return await connection.connection.receive().map { msg in
 					let jsonData = msg.messagePayload
-					print(jsonData.prettyPrintedJSONString ?? "got json data")
-					do {
-						let requestMethodWalletRequest = try JSONDecoder().decode(RequestMethodWalletRequest.self, from: jsonData)
+					let requestMethodWalletRequest = try JSONDecoder().decode(RequestMethodWalletRequest.self, from: jsonData)
 
-						return try IncomingMessageFromBrowser(
-							requestMethodWalletRequest: requestMethodWalletRequest,
-							browserExtensionConnection: connection.browserExtensionConnection
-						)
-					} catch {
-						print("⛔️ failed to JSON decode data, error: \(String(describing: error))")
-						return nil
-					}
+					return try IncomingMessageFromBrowser(
+						requestMethodWalletRequest: requestMethodWalletRequest,
+						browserExtensionConnection: connection.browserExtensionConnection
+					)
 
 				}.eraseToAnyAsyncSequence()
 			},

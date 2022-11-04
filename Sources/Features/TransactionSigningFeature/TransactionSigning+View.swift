@@ -72,6 +72,8 @@ extension TransactionSigning.View {
 	}
 }
 
+#if DEBUG
+
 // MARK: - TransactionSigning_Preview
 struct TransactionSigning_Preview: PreviewProvider {
 	static var previews: some View {
@@ -83,3 +85,4 @@ struct TransactionSigning_Preview: PreviewProvider {
 		)
 	}
 }
+#endif // DEBUG
