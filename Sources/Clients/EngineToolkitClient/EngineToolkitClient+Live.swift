@@ -16,7 +16,7 @@ public extension EngineToolkitClient {
 				let privateKey = request.privateKey
 
 				let transactionIntent = request.transactionIntent
-		
+
 				do {
 					let compiledTransactionIntent = try engineToolkit.compileTransactionIntentRequest(
 						request: transactionIntent
