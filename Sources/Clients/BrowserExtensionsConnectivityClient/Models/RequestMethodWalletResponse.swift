@@ -25,7 +25,17 @@ public extension RequestMethodWalletResponse {
 	}
 }
 
-// MARK: RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse
+public extension RequestMethodWalletResponse.Payload {
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		switch self {
+		case let .accountAddresses(payload):
+			try container.encode(payload)
+		}
+	}
+}
+
+// MARK: - RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse
 public extension RequestMethodWalletResponse {
 	struct AccountAddressesRequestMethodWalletResponse: Sendable, Hashable, Encodable {
 		public let requestType: RequestType
