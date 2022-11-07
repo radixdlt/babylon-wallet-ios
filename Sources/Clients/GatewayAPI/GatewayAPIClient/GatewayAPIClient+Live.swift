@@ -19,8 +19,12 @@ struct BadHTTPResponseCode: Swift.Error {
 	static let expected = 200
 }
 
-public extension GatewayAPIClient {
-	static func live(
+// MARK: - GatewayAPIClient + DependencyKey
+extension GatewayAPIClient: DependencyKey {
+	public typealias Value = GatewayAPIClient
+	public static let liveValue = GatewayAPIClient.live()
+
+	public static func live(
 		baseURL: URL = .init(string: "https://alphanet.radixdlt.com/v0")!,
 		urlSession: URLSession = .shared,
 		jsonEncoder: JSONEncoder = .init(),

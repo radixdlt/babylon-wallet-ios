@@ -5,7 +5,7 @@ import EngineToolkitClient
 import Foundation
 import struct GatewayAPI.GatewayAPIClient
 import struct GatewayAPI.PollStrategy
-import KeychainClient
+import KeychainClientDependency
 import Profile
 import SLIP10
 import UserDefaultsClient

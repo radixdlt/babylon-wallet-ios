@@ -1,7 +1,7 @@
 import AppFeature
 import ComposableArchitecture
 import DesignSystem
-import KeychainClient
+import KeychainClientDependency
 import ProfileClient
 import SwiftUI
 import UserDefaultsClient
@@ -9,20 +9,16 @@ import UserDefaultsClient
 typealias App = AppFeature.App
 
 public extension App.Environment {
-	static let live: Self = {
-		let keychainClient = KeychainClient.live
-
-		return Self(
-			mainQueue: .main,
-			appSettingsClient: .liveValue,
-			accountPortfolioFetcher: .liveValue,
-			keychainClient: keychainClient,
-			pasteboardClient: .live(),
-			profileLoader: .live(keychainClient: keychainClient),
-			userDefaultsClient: .liveValue,
-			profileClient: .liveValue
-		)
-	}()
+	static let live: Self = .init(
+		mainQueue: .main,
+		appSettingsClient: .liveValue,
+		accountPortfolioFetcher: .liveValue,
+		keychainClient: .liveValue,
+		pasteboardClient: .live(),
+		profileLoader: .live(),
+		userDefaultsClient: .liveValue,
+		profileClient: .liveValue
+	)
 }
 
 // MARK: - WalletApp

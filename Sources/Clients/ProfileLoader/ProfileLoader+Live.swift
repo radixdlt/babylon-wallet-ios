@@ -1,15 +1,15 @@
+import Dependencies
 import Foundation
-import KeychainClient
-import Profile
+import KeychainClientDependency
 
 public extension ProfileLoader {
 	static func live(
-		keychainClient: KeychainClient,
 		jsonDecoder: JSONDecoder = .iso8601
 	) -> Self {
 		Self(
 			loadProfile: {
-				try keychainClient.loadProfile(jsonDecoder: jsonDecoder)
+				@Dependency(\.keychainClient) var keychainClient
+				return try keychainClient.loadProfile(jsonDecoder: jsonDecoder)
 			}
 		)
 	}

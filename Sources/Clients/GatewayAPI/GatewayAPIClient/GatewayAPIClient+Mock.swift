@@ -1,5 +1,6 @@
 #if DEBUG
 import CryptoKit
+import Dependencies
 import Foundation
 import Mnemonic
 import XCTestDynamicOverlay
@@ -47,8 +48,8 @@ func amountAttos(at index: Int) -> String {
 	String(amount(at: index))
 }
 
-public extension GatewayAPIClient {
-	static let testValue = Self(
+extension GatewayAPIClient: TestDependencyKey {
+	public static let testValue = Self(
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
 		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
@@ -170,4 +171,11 @@ public extension GatewayAPIClient {
 //		}
 //	}
 // }
+
+public extension DependencyValues {
+	var gatewayAPIClient: GatewayAPIClient {
+		get { self[GatewayAPIClient.self] }
+		set { self[GatewayAPIClient.self] = newValue }
+	}
+}
 #endif

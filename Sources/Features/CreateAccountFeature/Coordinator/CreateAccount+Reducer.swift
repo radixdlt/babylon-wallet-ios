@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import KeychainClient
+import KeychainClientDependency
 import Profile
 import ProfileClient
 
