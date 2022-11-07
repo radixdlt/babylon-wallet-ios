@@ -49,6 +49,7 @@ func amountAttos(at index: Int) -> String {
 }
 
 extension GatewayAPIClient: TestDependencyKey {
+	public static let previewValue = Self.mock()
 	public static let testValue = Self(
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
@@ -58,7 +59,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		getCommittedTransaction: unimplemented("\(Self.self).getCommittedTransaction")
 	)
 
-	static func mock(
+	private static func mock(
 		fungibleResourceCount _: Int = 2,
 		nonFungibleResourceCount _: Int = 2,
 		submittedTXIsDoubleSpend: Bool = false,
