@@ -20,7 +20,6 @@ public struct Home: ReducerProtocol {
 	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 	@Dependency(\.appSettingsClient) var appSettingsClient
 	@Dependency(\.browserExtensionsConnectivityClient) var browserExtensionsConnectivityClient
-	@Dependency(\.fungibleTokenListSorter) var fungibleTokenListSorter
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
@@ -241,7 +240,7 @@ public struct Home: ReducerProtocol {
 
 				// asset list
 				let accountPortfolio = totalPortfolio[account.address] ?? OwnedAssets.empty
-				let categories = fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
+				let categories = accountPortfolio.fungibleTokenContainers.sortedIntoCategories()
 
 				state.accountDetails?.assets = .init(
 					fungibleTokenList: .init(

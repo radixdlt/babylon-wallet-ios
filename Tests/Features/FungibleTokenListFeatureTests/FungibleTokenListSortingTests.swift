@@ -1,21 +1,8 @@
 import Asset
-import ComposableArchitecture
-@testable import FungibleTokenListFeature
+import FungibleTokenListFeature
 import TestUtils
 
-final class FungibleTokenListSorterTests: TestCase {
-	private var sut: FungibleTokenListSorter!
-
-	override func setUpWithError() throws {
-		try super.setUpWithError()
-		sut = FungibleTokenListSorter.liveValue
-	}
-
-	override func tearDownWithError() throws {
-		sut = nil
-		try super.tearDownWithError()
-	}
-
+final class FungibleTokenListSortingTests: TestCase {
 	func test_sortTokensWithValues() {
 		// given
 		let btc = FungibleToken.btc
@@ -31,7 +18,7 @@ final class FungibleTokenListSorterTests: TestCase {
 		let dotContainer = FungibleTokenContainer(asset: dot, amountInAttos: nil, worth: 5)
 
 		// when
-		let result = sut.sortTokens([btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer])
+		let result = [btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer].sortedIntoCategories()
 
 		// then
 		let expectedResult = [
@@ -56,7 +43,7 @@ final class FungibleTokenListSorterTests: TestCase {
 		let dotContainer = FungibleTokenContainer(asset: dot, amountInAttos: nil, worth: nil)
 
 		// when
-		let result = sut.sortTokens([btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer])
+		let result = [btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer].sortedIntoCategories()
 
 		// then
 		let expectedResult = [
@@ -81,7 +68,7 @@ final class FungibleTokenListSorterTests: TestCase {
 		let dotContainer = FungibleTokenContainer(asset: dot, amountInAttos: nil, worth: nil)
 
 		// when
-		let result = sut.sortTokens([btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer])
+		let result = [btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer].sortedIntoCategories()
 
 		// then
 		let expectedResult = [
