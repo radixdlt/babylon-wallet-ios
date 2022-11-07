@@ -7,6 +7,7 @@ import ConverseCommon
 import Foundation
 import Profile
 import ProfileClient
+import XCTestDynamicOverlay
 
 // MARK: - BrowserExtensionWithConnectionStatus
 public struct BrowserExtensionWithConnectionStatus: Identifiable, Equatable {
@@ -27,22 +28,17 @@ public extension BrowserExtensionWithConnectionStatus {
 	var id: ID { browserExtensionConnection.id }
 }
 
-// MARK: - BrowserExtensionsConnectivityClient+TestValue
-public extension BrowserExtensionsConnectivityClient {
-	static let testValue = Self.mock()
-	#if DEBUG
-	static func mock() -> Self {
-		Self(
-			getBrowserExtensionConnections: { [] },
-			addBrowserExtensionConnection: { _ in },
-			deleteBrowserExtensionConnection: { _ in },
-			getConnectionStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-			getIncomingMessageAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-			sendMessage: { _ in fatalError() },
-			_sendTestMessage: { _, _ in fatalError() }
-		)
-	}
-	#endif // DEBUG
+// MARK: - BrowserExtensionsConnectivityClient + TestDependencyKey
+extension BrowserExtensionsConnectivityClient: TestDependencyKey {
+	public static let testValue = Self(
+		getBrowserExtensionConnections: unimplemented("\(Self.self).getBrowserExtensionConnections"),
+		addBrowserExtensionConnection: unimplemented("\(Self.self).addBrowserExtensionConnection"),
+		deleteBrowserExtensionConnection: unimplemented("\(Self.self).deleteBrowserExtensionConnection"),
+		getConnectionStatusAsyncSequence: unimplemented("\(Self.self).getConnectionStatusAsyncSequence"),
+		getIncomingMessageAsyncSequence: unimplemented("\(Self.self).getIncomingMessageAsyncSequence"),
+		sendMessage: unimplemented("\(Self.self).sendMessage"),
+		_sendTestMessage: unimplemented("\(Self.self)._sendTestMessage")
+	)
 }
 
 public extension DependencyValues {
