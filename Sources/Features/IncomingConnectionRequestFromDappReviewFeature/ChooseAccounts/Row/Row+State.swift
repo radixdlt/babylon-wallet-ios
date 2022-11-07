@@ -27,7 +27,7 @@ extension ChooseAccounts.Row.State: Identifiable {
 #if DEBUG
 import ProfileClient
 public extension ChooseAccounts.Row.State {
-	static let placeholderOne: Self = try! Self(account: ProfileClient.mock().getAccounts()[0])
-	static let placeholderTwo: Self = try! Self(account: ProfileClient.mock().getAccounts()[1])
+	static let placeholderOne = Self(account: .mocked0)
+	static let placeholderTwo = Self(account: .mocked1)
 }
 #endif

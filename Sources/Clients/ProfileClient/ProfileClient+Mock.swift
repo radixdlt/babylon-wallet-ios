@@ -1,50 +1,56 @@
 import Collections
+import Dependencies
 import Foundation
 import Mnemonic
 import NonEmpty
 import Profile
 
-#if DEBUG
-public extension ProfileClient {
-	static func mock() -> Self {
-		Self(
-			getCurrentNetworkID: { NetworkID.primary },
-			setCurrentNetworkID: { _ in },
-			createNewProfile: { req in
-				try! await Profile.new(
-					networkID: .primary,
-					mnemonic: req.curve25519FactorSourceMnemonic
-				)
-			},
-			injectProfile: { _, _ in /* Noop */ },
-			extractProfileSnapshot: { fatalError("Impl me") },
-			deleteProfileSnapshot: { /* Noop */ },
-			getAccounts: {
-				let accounts: [OnNetwork.Account] = [.mocked0, .mocked1]
-				return NonEmpty(rawValue: OrderedSet(accounts))!
-			},
-			getBrowserExtensionConnections: { fatalError() },
-			addBrowserExtensionConnection: { _ in fatalError() },
-			deleteBrowserExtensionConnection: { _ in fatalError() },
-			getAppPreferences: {
-				fatalError()
-			},
-			setDisplayAppPreferences: { _ in
-				fatalError()
-			},
-			createAccount: { _ in
-				fatalError()
-			},
-			lookupAccountByAddress: { _ in
-				.mocked0
-			},
-			signTransaction: { _, _ in
-				struct MockError: LocalizedError {
-					let errorDescription: String? = "Transaction signing failed!"
-				}
-				throw MockError()
+// MARK: - ProfileClient + TestDependencyKey
+extension ProfileClient: TestDependencyKey {
+	public static let previewValue = Self(
+		getCurrentNetworkID: { NetworkID.primary },
+		setCurrentNetworkID: { _ in },
+		createNewProfile: { req in
+			try! await Profile.new(
+				networkID: .primary,
+				mnemonic: req.curve25519FactorSourceMnemonic
+			)
+		},
+		injectProfile: { _, _ in /* Noop */ },
+		extractProfileSnapshot: { fatalError("Impl me") },
+		deleteProfileSnapshot: { /* Noop */ },
+		getAccounts: {
+			let accounts: [OnNetwork.Account] = [.mocked0, .mocked1]
+			return NonEmpty(rawValue: OrderedSet(accounts))!
+		},
+		getBrowserExtensionConnections: { fatalError() },
+		addBrowserExtensionConnection: { _ in fatalError() },
+		deleteBrowserExtensionConnection: { _ in fatalError() },
+		getAppPreferences: {
+			fatalError()
+		},
+		setDisplayAppPreferences: { _ in
+			fatalError()
+		},
+		createAccount: { _ in
+			fatalError()
+		},
+		lookupAccountByAddress: { _ in
+			.mocked0
+		},
+		signTransaction: { _, _ in
+			struct MockError: LocalizedError {
+				let errorDescription: String? = "Transaction signing failed!"
 			}
-		)
+			throw MockError()
+		}
+	)
+}
+
+public extension DependencyValues {
+	var profileClient: ProfileClient {
+		get { self[ProfileClient.self] }
+		set { self[ProfileClient.self] = newValue }
 	}
 }
 
@@ -99,5 +105,3 @@ public extension OnNetwork.Account {
 		)
 	}
 }
-
-#endif // DEBUG
