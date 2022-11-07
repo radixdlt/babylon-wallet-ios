@@ -10,14 +10,14 @@ final class TransactionSigningFeatureTests: TestCase {
 				requestMethodWalletRequest: .placeholderSignTXRequets,
 				browserExtensionConnection: .placeholder
 			),
-			addressOfSigner: try! .init(address: "123"),
+			addressOfSigner: try! .init(address: "deadbeef"),
 			transactionManifest: .mock
 		),
 		reducer: TransactionSigning()
 	)
 
 	func testInitialState() {
-		XCTAssertEqual(store.state.addressOfSigner, try! .init(address: "123"))
+		XCTAssertEqual(store.state.addressOfSigner, try! .init(address: "deadbeef"))
 		XCTAssertEqual(store.state.transactionManifest, .mock)
 		XCTAssertNil(store.state.errorAlert)
 	}
