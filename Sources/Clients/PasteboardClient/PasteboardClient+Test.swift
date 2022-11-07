@@ -1,6 +1,7 @@
 import Dependencies
 import XCTestDynamicOverlay
 
+// MARK: - PasteboardClient + TestDependencyKey
 extension PasteboardClient: TestDependencyKey {
 	public static let previewValue = Self(
 		copyString: { _ in },
@@ -11,4 +12,11 @@ extension PasteboardClient: TestDependencyKey {
 		copyString: unimplemented("\(Self.self).copyString"),
 		getString: unimplemented("\(Self.self).getString")
 	)
+}
+
+public extension DependencyValues {
+	var pasteboardClient: PasteboardClient {
+		get { self[PasteboardClient.self] }
+		set { self[PasteboardClient.self] = newValue }
+	}
 }
