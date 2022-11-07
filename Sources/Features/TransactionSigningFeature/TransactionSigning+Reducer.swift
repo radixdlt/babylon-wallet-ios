@@ -15,8 +15,7 @@ public extension TransactionSigning {
 		switch action {
 		case .view(.signTransactionButtonTapped):
 			state.isSigningTX = true
-
-			return .run { [addressOfSigner = state.addressOfSigner, transactionManifest = state.transactionManifest] send in
+			return .run { [transactionManifest = state.transactionManifest, addressOfSigner = state.addressOfSigner] send in
 				await send(.internal(.signTransactionResult(TaskResult {
 					try await profileClient.signTransaction(
 						manifest: transactionManifest,
@@ -24,10 +23,6 @@ public extension TransactionSigning {
 					)
 				})))
 			}
-
-		case let .internal(.addressLookupFailed(error)):
-			state.errorAlert = .init(title: .init("An error ocurred"), message: .init(error.localizedDescription))
-			return .none
 
 		case let .internal(.signTransactionResult(result)):
 			state.isSigningTX = false
@@ -45,11 +40,14 @@ public extension TransactionSigning {
 				state.errorAlert = .init(title: .init("An error ocurred"), message: .init(error.localizedDescription))
 			}
 			return .none
+
 		case .view(.errorAlertDismissButtonTapped):
 			state.errorAlert = nil
 			return .none
+
 		case .view(.closeButtonTapped):
 			return .run { send in await send(.delegate(.dismissView)) }
+
 		case .delegate:
 			return .none
 		}

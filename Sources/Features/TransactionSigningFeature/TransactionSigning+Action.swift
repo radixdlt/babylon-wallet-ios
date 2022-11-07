@@ -26,7 +26,6 @@ public extension TransactionSigning.Action {
 public extension TransactionSigning.Action {
 	enum InternalAction: Equatable {
 		case signTransactionResult(TaskResult<TransactionIntent.TXID>)
-		case addressLookupFailed(NSError)
 	}
 }
 

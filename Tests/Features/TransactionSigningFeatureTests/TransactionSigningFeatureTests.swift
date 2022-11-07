@@ -6,7 +6,10 @@ import TransactionSigningFeature
 final class TransactionSigningFeatureTests: TestCase {
 	let store = TestStore(
 		initialState: TransactionSigning.State(
-			requestFromDapp: .placeholderSignTXRequets,
+			incomingMessageFromBrowser: try! .init(
+				requestMethodWalletRequest: .placeholderSignTXRequets,
+				browserExtensionConnection: .placeholder
+			),
 			addressOfSigner: try! .init(address: "123"),
 			transactionManifest: .mock
 		),
@@ -25,8 +28,11 @@ final class TransactionSigningFeatureTests: TestCase {
 		store.dependencies.profileClient.lookupAccountByAddress = { _ in
 			throw LookupAccountByAddressError()
 		}
-		_ = await store.send(.view(.signTransactionButtonTapped))
-		await store.receive(.internal(.addressLookupFailed(LookupAccountByAddressError() as NSError))) {
+		_ = await store.send(.view(.signTransactionButtonTapped)) {
+			$0.isSigningTX = true
+		}
+		await store.receive(.internal(.signTransactionResult(.failure(LookupAccountByAddressError())))) {
+			$0.isSigningTX = false
 			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("LookupAccountByAddressError"))
 		}
 		_ = await store.send(.view(.errorAlertDismissButtonTapped)) {
@@ -41,8 +47,11 @@ final class TransactionSigningFeatureTests: TestCase {
 		store.dependencies.profileClient.signTransaction = { _, _ in
 			throw SignTransactionError()
 		}
-		_ = await store.send(.view(.signTransactionButtonTapped))
+		_ = await store.send(.view(.signTransactionButtonTapped)) {
+			$0.isSigningTX = true
+		}
 		await store.receive(.internal(.signTransactionResult(.failure(SignTransactionError())))) {
+			$0.isSigningTX = false
 			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("SignTransactionError"))
 		}
 		_ = await store.send(.view(.errorAlertDismissButtonTapped)) {
@@ -53,8 +62,12 @@ final class TransactionSigningFeatureTests: TestCase {
 		store.dependencies.profileClient.signTransaction = { _, _ in
 			"TXID"
 		}
-		_ = await store.send(.view(.signTransactionButtonTapped))
-		await store.receive(.internal(.signTransactionResult(.success("TXID"))))
+		_ = await store.send(.view(.signTransactionButtonTapped)) {
+			$0.isSigningTX = true
+		}
+		await store.receive(.internal(.signTransactionResult(.success("TXID")))) {
+			$0.isSigningTX = false
+		}
 	}
 
 	func testDismissView() async {
