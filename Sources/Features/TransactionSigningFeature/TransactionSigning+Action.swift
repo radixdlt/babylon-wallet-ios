@@ -16,8 +16,9 @@ public extension TransactionSigning {
 // MARK: - TransactionSigning.Action.ViewAction
 public extension TransactionSigning.Action {
 	enum ViewAction: Equatable {
-		case signTransaction
-		case dismissErrorAlert
+		case signTransactionButtonTapped
+		case errorAlertDismissButtonTapped
+		case closeButtonTapped
 	}
 }
 
@@ -25,7 +26,6 @@ public extension TransactionSigning.Action {
 public extension TransactionSigning.Action {
 	enum InternalAction: Equatable {
 		case signTransactionResult(TaskResult<TransactionIntent.TXID>)
-		case addressLookupFailed(NSError)
 	}
 }
 
