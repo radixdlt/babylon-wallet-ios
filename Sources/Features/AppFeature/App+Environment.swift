@@ -54,7 +54,7 @@ public extension App.Environment {
 		appSettingsClient: .noop,
 		accountPortfolioFetcher: .noop,
 		keychainClient: .unimplemented,
-		pasteboardClient: .noop,
+		pasteboardClient: .previewValue,
 		profileLoader: .testValue,
 		userDefaultsClient: .noop,
 		profileClient: .testValue

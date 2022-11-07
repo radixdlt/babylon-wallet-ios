@@ -1,7 +1,7 @@
-#if DEBUG
 import Dependencies
 import XCTestDynamicOverlay
 
+// MARK: - AccountPortfolioFetcher + TestDependencyKey
 extension AccountPortfolioFetcher: TestDependencyKey {
 	public static let previewValue = Self.noop
 
@@ -15,4 +15,3 @@ public extension AccountPortfolioFetcher {
 		fetchPortfolio: { _ in [:] }
 	)
 }
-#endif

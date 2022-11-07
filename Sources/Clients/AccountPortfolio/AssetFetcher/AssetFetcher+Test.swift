@@ -1,8 +1,8 @@
-#if DEBUG
 import Asset
 import Dependencies
 import XCTestDynamicOverlay
 
+// MARK: - AssetFetcher + TestDependencyKey
 extension AssetFetcher: TestDependencyKey {
 	public static let previewValue = Self.noop
 
@@ -18,4 +18,3 @@ public extension AssetFetcher {
 		}
 	)
 }
-#endif

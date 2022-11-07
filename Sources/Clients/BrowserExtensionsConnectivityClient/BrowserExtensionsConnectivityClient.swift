@@ -29,8 +29,8 @@ public extension BrowserExtensionWithConnectionStatus {
 
 // MARK: - BrowserExtensionsConnectivityClient+TestValue
 public extension BrowserExtensionsConnectivityClient {
-	#if DEBUG
 	static let testValue = Self.mock()
+	#if DEBUG
 	static func mock() -> Self {
 		Self(
 			getBrowserExtensionConnections: { [] },

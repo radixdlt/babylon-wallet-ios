@@ -36,7 +36,7 @@ public extension Main.Environment {
 		accountPortfolioFetcher: .noop,
 		appSettingsClient: .noop,
 		keychainClient: .unimplemented,
-		pasteboardClient: .noop,
+		pasteboardClient: .previewValue,
 		profileClient: .testValue
 	)
 

@@ -1,4 +1,3 @@
-#if DEBUG
 import Common
 import CryptoKit
 import Dependencies
@@ -8,16 +7,14 @@ import enum SLIP10.PrivateKey
 import enum SLIP10.PublicKey
 import XCTestDynamicOverlay
 
-struct MockedAlwaysFailingTX: Swift.Error {}
-extension EngineToolkitClient: TestDependencyKey {}
-public extension EngineToolkitClient {
-	static let noop = Self(signTransactionIntent: { _ in
-		throw MockedAlwaysFailingTX()
-	})
-	static let previewValue = Self.noop
-	static let testValue = Self(
+extension EngineToolkitClient: TestDependencyKey {
+	public static let previewValue = Self(
+		signTransactionIntent: { _ in
+			struct MockedAlwaysFailingTX: Swift.Error {}
+			throw MockedAlwaysFailingTX()
+		}
+	)
+	public static let testValue = Self(
 		signTransactionIntent: unimplemented("\(Self.self).signTransactionIntent")
 	)
 }
-
-#endif
