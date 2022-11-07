@@ -394,12 +394,11 @@ package.addModules([
 			"Common",
 			.product(name: "ConnectUsingPasswordFeature", package: "Converse"),
 			converse,
+			dependencies,
 			"DesignSystem",
 			.product(name: "InputPasswordFeature", package: "Converse"),
 			"IncomingConnectionRequestFromDappReviewFeature", // FIXME: extract to Home! just here for test..
-			profile,
 			"ProfileClient",
-			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
