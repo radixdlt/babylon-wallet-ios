@@ -24,8 +24,9 @@ public extension UserDefaultsClient {
 	}
 }
 
-public extension ProfileClient {
-	static let liveValue: Self = {
+// MARK: - ProfileClient + DependencyKey
+extension ProfileClient: DependencyKey {
+	public static let liveValue: Self = {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
