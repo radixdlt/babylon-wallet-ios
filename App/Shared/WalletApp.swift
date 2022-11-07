@@ -12,10 +12,7 @@ public extension App.Environment {
 	static let live: Self = {
 		let keychainClient = KeychainClient.live
 
-		let backgroundQueue = DispatchQueue(label: "background-queue").eraseToAnyScheduler()
-
 		return Self(
-			backgroundQueue: backgroundQueue,
 			mainQueue: .main,
 			appSettingsClient: .liveValue,
 			accountPortfolioFetcher: .liveValue,

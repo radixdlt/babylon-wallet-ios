@@ -12,7 +12,6 @@ import UserDefaultsClient
 public extension App {
 	// MARK: Environment
 	struct Environment {
-		public let backgroundQueue: AnySchedulerOf<DispatchQueue>
 		public var mainQueue: AnySchedulerOf<DispatchQueue>
 		public let appSettingsClient: AppSettingsClient
 		public let accountPortfolioFetcher: AccountPortfolioFetcher
@@ -23,7 +22,6 @@ public extension App {
 		public var profileClient: ProfileClient
 
 		public init(
-			backgroundQueue: AnySchedulerOf<DispatchQueue>,
 			mainQueue: AnySchedulerOf<DispatchQueue>,
 			appSettingsClient: AppSettingsClient,
 			accountPortfolioFetcher: AccountPortfolioFetcher,
@@ -33,7 +31,6 @@ public extension App {
 			userDefaultsClient: UserDefaultsClient,
 			profileClient: ProfileClient
 		) {
-			self.backgroundQueue = backgroundQueue
 			self.mainQueue = mainQueue
 			self.appSettingsClient = appSettingsClient
 			self.accountPortfolioFetcher = accountPortfolioFetcher
@@ -49,7 +46,6 @@ public extension App {
 #if DEBUG
 public extension App.Environment {
 	static let noop = Self(
-		backgroundQueue: .immediate,
 		mainQueue: .immediate,
 		appSettingsClient: .previewValue,
 		accountPortfolioFetcher: .noop,
@@ -61,7 +57,6 @@ public extension App.Environment {
 	)
 
 	static let testValue = Self(
-		backgroundQueue: .immediate,
 		mainQueue: .immediate,
 		appSettingsClient: .testValue,
 		accountPortfolioFetcher: .testValue,

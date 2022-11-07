@@ -68,7 +68,6 @@ struct SplashView_Previews: PreviewProvider {
 				initialState: .init(),
 				reducer: Splash.reducer,
 				environment: .init(
-					backgroundQueue: .immediate,
 					mainQueue: .immediate,
 					profileLoader: .testValue
 				)
