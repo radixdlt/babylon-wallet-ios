@@ -51,7 +51,7 @@ public extension App.Environment {
 	static let noop = Self(
 		backgroundQueue: .immediate,
 		mainQueue: .immediate,
-		appSettingsClient: .noop,
+		appSettingsClient: .previewValue,
 		accountPortfolioFetcher: .noop,
 		keychainClient: .unimplemented,
 		pasteboardClient: .previewValue,

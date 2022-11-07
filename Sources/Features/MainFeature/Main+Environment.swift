@@ -34,7 +34,7 @@ public extension Main {
 public extension Main.Environment {
 	static let noop = Self(
 		accountPortfolioFetcher: .noop,
-		appSettingsClient: .noop,
+		appSettingsClient: .previewValue,
 		keychainClient: .unimplemented,
 		pasteboardClient: .previewValue,
 		profileClient: .testValue
