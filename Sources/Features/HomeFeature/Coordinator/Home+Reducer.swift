@@ -419,7 +419,7 @@ public struct Home: ReducerProtocol {
 			case let .accountAddresses(accountAddressRequest):
 				if state.chooseAccountRequestFromDapp == nil {
 					state.chooseAccountRequestFromDapp = IncomingConnectionRequestFromDappReview.State(
-						requestFromDapp: incomingRequestFromBrowser.requestMethodWalletRequest,
+						incomingMessageFromBrowser: incomingRequestFromBrowser,
 						incomingConnectionRequestFromDapp: .init(addressRequest: accountAddressRequest, from: incomingRequestFromBrowser.requestMethodWalletRequest)
 					)
 				} else {
@@ -431,7 +431,7 @@ public struct Home: ReducerProtocol {
 					// if `state.chooseAccountRequestFromDapp` is non nil, this will present SignTX view
 					// on top of chooseAccountsView...
 					state.transactionSigning = .init(
-						requestFromDapp: incomingRequestFromBrowser.requestMethodWalletRequest,
+						incomingMessageFromBrowser: incomingRequestFromBrowser,
 						addressOfSigner: signTXRequest.accountAddress,
 						transactionManifest: signTXRequest.transactionManifest
 					)
@@ -448,22 +448,64 @@ public struct Home: ReducerProtocol {
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
 
-		case let .chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, originalDappRequest))):
+		case let .chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, incomingMessageFromBrowser))):
 			state.chooseAccountRequestFromDapp = nil
-			// FIXME: SEND RESPONSE!
-			print("🚀 Send response back to dapp! selectedAccounts: \(selectedAccounts), originalRequestFromDapp: \(originalDappRequest)")
+			let accountAddresses: [RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse.AccountAddress] = selectedAccounts.map {
+				.init(address: $0.address.address, label: $0.displayName ?? "AccountIndex: \($0.index)")
+			}
+			let response = RequestMethodWalletResponse(
+				method: .request,
+				requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
+				payload: [
+					.accountAddresses(
+						.init(
+							addresses: accountAddresses
+						)
+					),
+				]
+			)
+			return .run { send in
+				await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
+			}
+
+		case let .internal(.system(.sendResponseBackToDapp(browserConnectionID, response))):
+			return .run { send in
+				await send(.internal(.system(.sendResponseBackToDappResult(
+					TaskResult {
+						let outgoingMessage = MessageToDappRequest(
+							browserExtensionConnectionID: browserConnectionID,
+							requestMethodWalletResponse: response
+						)
+
+						return try await browserExtensionsConnectivityClient
+							.sendMessage(outgoingMessage)
+					}
+				))))
+			}
+
+		case .internal(.system(.sendResponseBackToDappResult(.success(_)))):
 			return .run { send in
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
 
+		case let .internal(.system(.sendResponseBackToDappResult(.failure(error)))):
+			print("Failed to send response back over webRTC, error: \(String(describing: error))")
+			return .none
+
 		case .chooseAccountRequestFromDapp:
 			return .none
 
-		case let .transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, originalDappRequest))):
+		case let .transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, incomingMessageFromBrowser))):
 			state.transactionSigning = nil
-			print("🚀 Send response back to dapp! TXID: \(txID), originalRequestFromDapp: \(originalDappRequest)")
+			let response = RequestMethodWalletResponse(
+				method: .request,
+				requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
+				payload: [
+					.signTXRequest(.init(transactionIntentHash: txID)),
+				]
+			)
 			return .run { send in
-				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
+				await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
 			}
 
 		case .transactionSigning(.delegate(.dismissView)):

@@ -13,7 +13,7 @@ final class NonFungibleTokenListFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: initialState,
 			reducer: NonFungibleTokenList.Row.reducer,
-			environment: .unimplemented
+			environment: .testValue
 		)
 
 		// when

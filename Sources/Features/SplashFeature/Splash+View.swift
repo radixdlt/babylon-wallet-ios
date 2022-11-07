@@ -70,7 +70,7 @@ struct SplashView_Previews: PreviewProvider {
 				environment: .init(
 					backgroundQueue: .immediate,
 					mainQueue: .immediate,
-					profileLoader: .unimplemented
+					profileLoader: .testValue
 				)
 			)
 		)

@@ -48,13 +48,13 @@ func amountAttos(at index: Int) -> String {
 }
 
 public extension GatewayAPIClient {
-	static let unimplemented = Self(
-		getEpoch: XCTUnimplemented("\(Self.self).getEpoch is unimplemented"),
-		accountResourcesByAddress: XCTUnimplemented("\(Self.self).accountResourcesByAddress is unimplemented"),
-		resourceDetailsByResourceIdentifier: XCTUnimplemented("\(Self.self).resourceDetailsByResourceIdentifier is unimplemented"),
-		submitTransaction: XCTUnimplemented("\(Self.self).submitTransaction is unimplemented"),
-		transactionStatus: XCTUnimplemented("\(Self.self).transactionStatus is unimplemented"),
-		getCommittedTransaction: XCTUnimplemented("\(Self.self).getCommittedTransaction is unimplemented")
+	static let testValue = Self(
+		getEpoch: unimplemented("\(Self.self).getEpoch"),
+		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
+		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
+		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
+		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
+		getCommittedTransaction: unimplemented("\(Self.self).getCommittedTransaction")
 	)
 
 	static func mock(

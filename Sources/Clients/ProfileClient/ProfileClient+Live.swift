@@ -3,7 +3,8 @@ import CryptoKit
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
-import GatewayAPI
+import struct GatewayAPI.GatewayAPIClient
+import struct GatewayAPI.PollStrategy
 import KeychainClient
 import Profile
 import SLIP10
@@ -44,11 +45,11 @@ public extension ProfileClient {
 
 				print("🎭 Create On-Ledger-Account ✨")
 
-				let committed = try await gatewayAPIClient.submit(
+				let (committed, txID) = try await gatewayAPIClient.submit(
 					pollStrategy: pollStrategy
 				) { epoch in
 
-					let buildAndSignTXRequest = BuildAndSignTransactionRequest(
+					let buildAndSignTXRequest = BuildAndSignTransactionWithoutManifestRequest(
 						privateKey: privateKey,
 						epoch: epoch,
 						networkID: getCurrentNetworkID()
@@ -67,7 +68,7 @@ public extension ProfileClient {
 					throw CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities()
 				}
 
-				print("🎭 SUCCESSFULLY CREATED ACCOUNT On-Ledger with address: \(accountAddressBech32) ✅")
+				print("🎭 SUCCESSFULLY CREATED ACCOUNT On-Ledger with address: \(accountAddressBech32) ✅ \n txID: \(txID)")
 
 				return try AccountAddress(address: accountAddressBech32)
 			}
@@ -157,12 +158,48 @@ public extension ProfileClient {
 					return account
 				}
 			},
-			signTransaction: { _, _ in
-				// TODO: implement
-				"TXID"
+			signTransaction: { account, manifest in
+				try await profileHolder.getAsync { profile in
+					try await profile.withPrivateKeys(
+						of: account,
+						mnemonicForFactorSourceByReference: { [keychainClient] reference in
+							try keychainClient.loadFactorSourceMnemonic(reference: reference)
+						}
+					) { privateKeys in
+						let privateKey = privateKeys.first
+						print("🔏 Signing transaction and submitting to Ledger ✨")
+
+						let (_, txID) = try await gatewayAPIClient.submit(
+							pollStrategy: pollStrategy
+						) { epoch in
+
+							let signReq = BuildAndSignTransactionWithManifestRequest(
+								manifest: manifest,
+								privateKey: privateKey,
+								epoch: epoch,
+								networkID: getCurrentNetworkID()
+							)
+
+							return try engineToolkitClient.sign(request: signReq)
+						}
+
+						print("🔏 SUCCESSFULLY Signing transaction and submitting to Ledger ✅")
+						return txID
+					}
+				}
 			}
 		)
 	}()
+}
+
+public extension ProfileClient {
+	func signTransaction(
+		manifest: TransactionManifest,
+		addressOfSigner: AccountAddress
+	) async throws -> TransactionIntent.TXID {
+		let account = try lookupAccountByAddress(addressOfSigner)
+		return try await signTransaction(account, manifest)
+	}
 }
 
 // MARK: - ExpectedEntityToBeAccount

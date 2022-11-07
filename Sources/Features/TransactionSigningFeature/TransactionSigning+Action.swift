@@ -37,7 +37,7 @@ public extension TransactionSigning.Action {
 
 		case signedTXAndSubmittedToGateway(
 			TransactionIntent.TXID,
-			originalDappRequest: RequestMethodWalletRequest
+			incomingMessageFromBrowser: IncomingMessageFromBrowser
 		)
 	}
 }

@@ -16,9 +16,9 @@ let package = Package(
 package.dependencies += [
 	// RDX Works Package depedencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.18"),
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.19"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.29"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.30"),
 
 	// BigInt
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
@@ -602,7 +602,6 @@ package.addModules([
 			"GatewayAPI", // Create Account On Ledger => Submit TX
 			profile,
 			"ProfileLoader",
-			tagged,
 			"UserDefaultsClient",
 		],
 		tests: .yes(
@@ -643,7 +642,9 @@ package.addModules([
 			bite,
 			bigInt,
 			"DesignSystem",
+			engineToolkit,
 			profile, // Address
+			tagged,
 		],
 		resources: [.process("Localization/Strings")],
 		tests: .yes(

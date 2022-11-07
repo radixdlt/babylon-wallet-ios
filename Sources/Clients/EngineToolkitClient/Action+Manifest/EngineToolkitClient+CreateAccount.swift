@@ -10,13 +10,12 @@ public extension AlphanetAddresses {
 }
 
 public extension EngineToolkitClient {
-	func createAccount(request: BuildAndSignTransactionRequest) throws -> SignedCompiledNotarizedTX {
-		let privateKey = request.privateKey
-		let headerInput = request.transactionHeaderInput
-
+	func createAccount(
+		request withoutManifestRequest: BuildAndSignTransactionWithoutManifestRequest
+	) throws -> SignedCompiledNotarizedTX {
 		let engineToolkit = EngineToolkit()
 		let nonFungibleAddressString = try engineToolkit.deriveNonFungibleAddressFromPublicKeyRequest(
-			request: privateKey.publicKey().intoEngine()
+			request: withoutManifestRequest.privateKey.publicKey().intoEngine()
 		)
 		.get()
 		.nonFungibleAddress
@@ -57,8 +56,21 @@ public extension EngineToolkitClient {
 			}
 		}
 
+		return try sign(
+			request: .init(manifest: manifest, withoutManifestRequest: withoutManifestRequest),
+			engineToolkit: engineToolkit
+		)
+	}
+
+	func sign(
+		request: BuildAndSignTransactionWithManifestRequest,
+		engineToolkit: EngineToolkit = .init()
+	) throws -> SignedCompiledNotarizedTX {
+		let privateKey = request.privateKey
+		let headerInput = request.transactionHeaderInput
+
 		let signTXRequest = try SignTransactionIntentRequest(
-			manifest: manifest,
+			manifest: request.manifest,
 			headerInput: headerInput,
 			privateKey: privateKey
 		)

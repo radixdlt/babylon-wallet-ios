@@ -3,12 +3,24 @@ import ComposableArchitecture
 import ProfileClient
 import TestUtils
 
+import BrowserExtensionsConnectivityClient
+
+extension IncomingMessageFromBrowser {
+	static var placeholderAccountReq: Self {
+		try! .init(
+			requestMethodWalletRequest: .placeholderGetAccountAddressRequest,
+			browserExtensionConnection: .placeholder
+		)
+	}
+}
+
+// MARK: - IncomingConnectionRequestFromDappReviewFeatureTests
 @MainActor
 final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 	func test_dismissIncomingConnectionRequest_whenTappedOnCloseButton_thenCoortinateDismissal() async {
 		// given
 		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
-			requestFromDapp: .placeholderGetAccountAddressRequest,
+			incomingMessageFromBrowser: .placeholderAccountReq,
 			incomingConnectionRequestFromDapp: .placeholder
 		)
 		let store = TestStore(
@@ -27,7 +39,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		// given
 		let request: IncomingConnectionRequestFromDapp = .placeholder
 		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
-			requestFromDapp: .placeholderGetAccountAddressRequest,
+			incomingMessageFromBrowser: .placeholderAccountReq,
 			incomingConnectionRequestFromDapp: request
 		)
 		let store = TestStore(
@@ -56,7 +68,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		// given
 		let request: IncomingConnectionRequestFromDapp = .placeholder
 		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
-			requestFromDapp: .placeholderGetAccountAddressRequest,
+			incomingMessageFromBrowser: .placeholderAccountReq,
 			incomingConnectionRequestFromDapp: request,
 			chooseAccounts: .placeholder
 		)

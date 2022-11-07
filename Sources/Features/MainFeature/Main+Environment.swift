@@ -37,15 +37,15 @@ public extension Main.Environment {
 		appSettingsClient: .noop,
 		keychainClient: .unimplemented,
 		pasteboardClient: .noop,
-		profileClient: .unimplemented
+		profileClient: .testValue
 	)
 
-	static let unimplemented = Self(
+	static let testValue = Self(
 		accountPortfolioFetcher: .testValue,
 		appSettingsClient: .testValue,
 		keychainClient: .unimplemented,
 		pasteboardClient: .testValue,
-		profileClient: .unimplemented
+		profileClient: .testValue
 	)
 }
 #endif

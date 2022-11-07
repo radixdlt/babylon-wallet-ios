@@ -21,7 +21,7 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
-			environment: .unimplemented
+			environment: .testValue
 		)
 
 		// when
@@ -33,7 +33,7 @@ final class AppFeatureTests: TestCase {
 	}
 
 	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
-		var environment: App.Environment = .unimplemented
+		var environment: App.Environment = .testValue
 		let newProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
 		environment.profileClient.injectProfile = { injected, _ in
 			XCTAssertEqual(injected, newProfile) // assert correct profile is injected
@@ -65,7 +65,7 @@ final class AppFeatureTests: TestCase {
 		let existingProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
 
 		let testScheduler = DispatchQueue.test
-		var environment: App.Environment = .unimplemented
+		var environment: App.Environment = .testValue
 		environment.mainQueue = testScheduler.eraseToAnyScheduler()
 		environment.profileClient.injectProfile = { injected, _ in
 			XCTAssertEqual(injected, existingProfile) // assert correct profile is injected
@@ -101,7 +101,7 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
-			environment: .unimplemented
+			environment: .testValue
 		)
 
 		// when
@@ -119,7 +119,7 @@ final class AppFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: initialState,
 			reducer: App.reducer,
-			environment: .unimplemented
+			environment: .testValue
 		)
 
 		// when

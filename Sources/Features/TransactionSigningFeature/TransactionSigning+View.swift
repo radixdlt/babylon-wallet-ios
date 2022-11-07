@@ -23,30 +23,34 @@ public extension TransactionSigning.View {
 			send: TransactionSigning.Action.view
 		) { viewStore in
 			Screen(title: "Sign TX", navBarActionStyle: .close, action: { viewStore.send(.closeButtonTapped) }) {
-				VStack(spacing: 20) {
-					NavigationBar("Confirm transaction", style: .close) {
-						viewStore.send(.closeButtonTapped)
-					}
-					ScrollView([.horizontal, .vertical], showsIndicators: false) {
-						Text(viewStore.state.manifest)
-							.padding()
-							.font(.system(size: 13, design: .monospaced))
-							.lineLimit(viewStore.state.numberOfLines)
-							.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-							.multilineTextAlignment(.leading)
-					}
-					.background(Color(white: 0.9))
+				ZStack {
+					VStack(spacing: 20) {
+						ScrollView([.vertical], showsIndicators: false) {
+							Text(viewStore.state.manifest)
+								.padding()
+								.font(.system(size: 13, design: .monospaced))
+								.frame(maxHeight: .infinity, alignment: .topLeading)
+						}
+						.background(Color(white: 0.9))
 
-					PrimaryButton(title: "Sign Transaction") {
-						viewStore.send(.signTransactionButtonTapped)
+						PrimaryButton(
+							title: "Sign Transaction",
+							isEnabled: viewStore.isSignButtonEnabled
+						) {
+							viewStore.send(.signTransactionButtonTapped)
+						}
+					}
+					.padding([.horizontal, .bottom])
+
+					if viewStore.isShowingLoader {
+						LoadingView()
 					}
 				}
-				.padding([.horizontal, .bottom])
+				.alert(
+					store.scope(state: \.errorAlert),
+					dismiss: .view(.errorAlertDismissButtonTapped)
+				)
 			}
-			.alert(
-				store.scope(state: \.errorAlert),
-				dismiss: .view(.errorAlertDismissButtonTapped)
-			)
 		}
 	}
 }
@@ -56,14 +60,20 @@ extension TransactionSigning.View {
 	struct ViewState: Equatable {
 		let manifest: String
 		let numberOfLines: Int
+		let isShowingLoader: Bool
+		let isSignButtonEnabled: Bool
 
 		init(state: TransactionSigning.State) {
-			let manifest = state.transactionManifest.description
+			let manifest = state.transactionManifest.toString(preamble: "", blobOutputFormat: .includeBlobsByByteCountOnly, blobPreamble: "\n\nBLOBS:\n", networkID: .primary)
 			self.manifest = manifest
 			numberOfLines = manifest.lines()
+			isShowingLoader = state.isSigningTX
+			isSignButtonEnabled = !state.isSigningTX
 		}
 	}
 }
+
+#if DEBUG
 
 // MARK: - TransactionSigning_Preview
 struct TransactionSigning_Preview: PreviewProvider {
@@ -76,3 +86,4 @@ struct TransactionSigning_Preview: PreviewProvider {
 		)
 	}
 }
+#endif // DEBUG

@@ -20,7 +20,7 @@ public extension IncomingConnectionRequestFromDappReview.Action {
 	enum DelegateAction: Equatable {
 		case finishedChoosingAccounts(
 			NonEmpty<OrderedSet<OnNetwork.Account>>,
-			originalDappRequest: RequestMethodWalletRequest
+			incomingMessageFromBrowser: IncomingMessageFromBrowser
 		)
 
 		case dismiss

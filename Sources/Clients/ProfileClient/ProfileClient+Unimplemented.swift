@@ -4,22 +4,22 @@ import Profile
 import XCTestDynamicOverlay
 
 public extension ProfileClient {
-	static let unimplemented = Self(
-		getCurrentNetworkID: XCTUnimplemented("\(Self.self).getCurrentNetworkID is unimplemented"),
-		setCurrentNetworkID: XCTUnimplemented("\(Self.self).setCurrentNetworkID is unimplemented"),
-		createNewProfile: XCTUnimplemented("\(Self.self).createNewProfile is unimplemented"),
-		injectProfile: XCTUnimplemented("\(Self.self).injectProfile is unimplemented"),
-		extractProfileSnapshot: XCTUnimplemented("\(Self.self).extractProfileSnapshot is unimplemented"),
-		deleteProfileSnapshot: XCTUnimplemented("\(Self.self).deleteProfileSnapshot is unimplemented"),
-		getAccounts: XCTUnimplemented("\(Self.self).getAccounts is unimplemented"),
-		getBrowserExtensionConnections: XCTUnimplemented("\(Self.self).getBrowserExtensionConnections is unimplemented"),
-		addBrowserExtensionConnection: XCTUnimplemented("\(Self.self).addBrowserExtensionConnection is unimplemented"),
-		deleteBrowserExtensionConnection: XCTUnimplemented("\(Self.self).deleteBrowserExtensionConnection is unimplemented"),
-		getAppPreferences: XCTUnimplemented("\(Self.self).getAppPreferences is unimplemented"),
-		setDisplayAppPreferences: XCTUnimplemented("\(Self.self).setDisplayAppPreferences is unimplemented"),
-		createAccount: XCTUnimplemented("\(Self.self).createAccount is unimplemented"),
-		lookupAccountByAddress: XCTUnimplemented("\(Self.self).lookupAccountByAddress is unimplemented"),
-		signTransaction: XCTUnimplemented("\(Self.self).lookupAccountByAddress is unimplemented")
+	static let testValue = Self(
+		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
+		setCurrentNetworkID: unimplemented("\(Self.self).setCurrentNetworkID"),
+		createNewProfile: unimplemented("\(Self.self).createNewProfile"),
+		injectProfile: unimplemented("\(Self.self).injectProfile"),
+		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
+		deleteProfileSnapshot: unimplemented("\(Self.self).deleteProfileSnapshot"),
+		getAccounts: unimplemented("\(Self.self).getAccounts"),
+		getBrowserExtensionConnections: unimplemented("\(Self.self).getBrowserExtensionConnections"),
+		addBrowserExtensionConnection: unimplemented("\(Self.self).addBrowserExtensionConnection"),
+		deleteBrowserExtensionConnection: unimplemented("\(Self.self).deleteBrowserExtensionConnection"),
+		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
+		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
+		createAccount: unimplemented("\(Self.self).createAccount"),
+		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
+		signTransaction: unimplemented("\(Self.self).signTransaction")
 	)
 }
 #endif
