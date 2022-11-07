@@ -28,30 +28,10 @@ public extension BrowserExtensionWithConnectionStatus {
 	var id: ID { browserExtensionConnection.id }
 }
 
-// MARK: - BrowserExtensionsConnectivityClient + TestDependencyKey
-extension BrowserExtensionsConnectivityClient: TestDependencyKey {
-	public static let testValue = Self(
-		getBrowserExtensionConnections: unimplemented("\(Self.self).getBrowserExtensionConnections"),
-		addBrowserExtensionConnection: unimplemented("\(Self.self).addBrowserExtensionConnection"),
-		deleteBrowserExtensionConnection: unimplemented("\(Self.self).deleteBrowserExtensionConnection"),
-		getConnectionStatusAsyncSequence: unimplemented("\(Self.self).getConnectionStatusAsyncSequence"),
-		getIncomingMessageAsyncSequence: unimplemented("\(Self.self).getIncomingMessageAsyncSequence"),
-		sendMessage: unimplemented("\(Self.self).sendMessage"),
-		_sendTestMessage: unimplemented("\(Self.self)._sendTestMessage")
-	)
-}
-
-public extension DependencyValues {
-	var browserExtensionsConnectivityClient: BrowserExtensionsConnectivityClient {
-		get { self[BrowserExtensionsConnectivityClient.self] }
-		set { self[BrowserExtensionsConnectivityClient.self] = newValue }
-	}
-}
-
 // MARK: - BrowserExtensionsConnectivityClient
 
 //  MARK: - BrowerExtensionsConnectivity
-public struct BrowserExtensionsConnectivityClient: DependencyKey {
+public struct BrowserExtensionsConnectivityClient {
 	public var getBrowserExtensionConnections: GetBrowserExtensionConnections
 	public var addBrowserExtensionConnection: AddBrowserExtensionConnection
 	public var deleteBrowserExtensionConnection: DeleteBrowserExtensionConnection
@@ -86,10 +66,9 @@ public struct StatefulBrowserConnection: Equatable, Sendable {
 	}
 }
 
-// MARK: - NoConnectionMatchingIDFound
-struct NoConnectionMatchingIDFound: Swift.Error {}
-public extension BrowserExtensionsConnectivityClient {
-	static let liveValue: Self = {
+// MARK: - BrowserExtensionsConnectivityClient + DependencyKey
+extension BrowserExtensionsConnectivityClient: DependencyKey {
+	public static let liveValue: Self = {
 		@Dependency(\.profileClient) var profileClient
 
 		final actor ConnectionsHolder: GlobalActor {
@@ -128,6 +107,7 @@ public extension BrowserExtensionsConnectivityClient {
 			func getConnection(id: BrowserExtensionConnection.ID) throws -> StatefulBrowserConnection {
 				let key = try mapID(id)
 				guard let connection = connections[key] else {
+					struct NoConnectionMatchingIDFound: Swift.Error {}
 					throw NoConnectionMatchingIDFound()
 				}
 				return connection
@@ -223,6 +203,26 @@ public extension BrowserExtensionsConnectivityClient {
 			}
 		)
 	}()
+}
+
+// MARK: - BrowserExtensionsConnectivityClient + TestDependencyKey
+extension BrowserExtensionsConnectivityClient: TestDependencyKey {
+	public static let testValue = Self(
+		getBrowserExtensionConnections: unimplemented("\(Self.self).getBrowserExtensionConnections"),
+		addBrowserExtensionConnection: unimplemented("\(Self.self).addBrowserExtensionConnection"),
+		deleteBrowserExtensionConnection: unimplemented("\(Self.self).deleteBrowserExtensionConnection"),
+		getConnectionStatusAsyncSequence: unimplemented("\(Self.self).getConnectionStatusAsyncSequence"),
+		getIncomingMessageAsyncSequence: unimplemented("\(Self.self).getIncomingMessageAsyncSequence"),
+		sendMessage: unimplemented("\(Self.self).sendMessage"),
+		_sendTestMessage: unimplemented("\(Self.self)._sendTestMessage")
+	)
+}
+
+public extension DependencyValues {
+	var browserExtensionsConnectivityClient: BrowserExtensionsConnectivityClient {
+		get { self[BrowserExtensionsConnectivityClient.self] }
+		set { self[BrowserExtensionsConnectivityClient.self] = newValue }
+	}
 }
 
 // MARK: - FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp
