@@ -1,8 +1,15 @@
-#if DEBUG
 import Dependencies
 import Foundation
 import XCTestDynamicOverlay
 
+public extension DependencyValues {
+	var userDefaultsClient: UserDefaultsClient {
+		get { self[UserDefaultsClient.self] }
+		set { self[UserDefaultsClient.self] = newValue }
+	}
+}
+
+// MARK: - UserDefaultsClient + TestDependencyKey
 extension UserDefaultsClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
@@ -48,5 +55,3 @@ public extension UserDefaultsClient {
 		integerForKey = { [self] in $0 == key ? integer : self.integerForKey(key) }
 	}
 }
-
-#endif

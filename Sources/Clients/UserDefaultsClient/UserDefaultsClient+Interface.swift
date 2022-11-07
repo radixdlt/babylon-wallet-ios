@@ -1,4 +1,3 @@
-import Dependencies
 import Foundation
 
 // MARK: - UserDefaultsClient
@@ -35,13 +34,6 @@ public extension UserDefaultsClient {
 
 	func setHasShownFirstLaunchOnboarding(_ bool: Bool) async {
 		await setBool(bool, hasShownFirstLaunchOnboardingKey)
-	}
-}
-
-public extension DependencyValues {
-	var userDefaultsClient: UserDefaultsClient {
-		get { self[UserDefaultsClient.self] }
-		set { self[UserDefaultsClient.self] = newValue }
 	}
 }
 
