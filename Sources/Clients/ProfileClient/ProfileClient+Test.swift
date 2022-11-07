@@ -8,6 +8,7 @@ import XCTestDynamicOverlay
 
 // MARK: - ProfileClient + TestDependencyKey
 extension ProfileClient: TestDependencyKey {
+	// TODO: make every endpoint no-op
 	public static let previewValue = Self(
 		getCurrentNetworkID: { NetworkID.primary },
 		setCurrentNetworkID: { _ in },

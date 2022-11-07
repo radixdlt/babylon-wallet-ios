@@ -1,5 +1,7 @@
+import Collections
 import ComposableArchitecture
 @testable import IncomingConnectionRequestFromDappReviewFeature
+import NonEmpty
 import ProfileClient
 import TestUtils
 
@@ -46,8 +48,8 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 			initialState: initialState,
 			reducer: IncomingConnectionRequestFromDappReview()
 		)
-		store.dependencies.profileClient = .mock()
-		let accounts = try! store.dependencies.profileClient.getAccounts()
+		let accounts: NonEmpty<OrderedSet<OnNetwork.Account>> = .init(rawValue: .init([.mocked0, .mocked1]))!
+		store.dependencies.profileClient.getAccounts = { @Sendable in accounts }
 
 		// when
 		_ = await store.send(.internal(.user(.proceedWithConnectionRequest)))

@@ -31,7 +31,12 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 			initialState: NewProfile.State(canProceed: true),
 			reducer: NewProfile()
 		)
-		store.dependencies.profileClient = .mock()
+		store.dependencies.profileClient.createNewProfile = { req in
+			try! await Profile.new(
+				networkID: .primary,
+				mnemonic: req.curve25519FactorSourceMnemonic
+			)
+		}
 		store.dependencies.keychainClient = keychainClient
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 		let generateMnemonicCalled = ActorIsolated<Bool>(false)
