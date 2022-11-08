@@ -10,6 +10,7 @@ public extension Main {
 	}
 }
 
+// MARK: - Main.Action.ChildAction
 public extension Main.Action {
 	enum ChildAction: Equatable {
 		case home(Home.Action)

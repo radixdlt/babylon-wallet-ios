@@ -19,7 +19,7 @@ public extension Main {
 		}
 		.pullback(
 			state: \.home,
-			action: /Main.Action.child..Main.Action.ChildAction.home,
+			action: /Main.Action.child .. Main.Action.ChildAction.home,
 			environment: { $0 }
 		),
 
@@ -30,7 +30,7 @@ public extension Main {
 		.optional()
 		.pullback(
 			state: \.settings,
-			action: /Main.Action.child..Main.Action.ChildAction.settings,
+			action: /Main.Action.child .. Main.Action.ChildAction.settings,
 			environment: { $0 }
 		),
 
