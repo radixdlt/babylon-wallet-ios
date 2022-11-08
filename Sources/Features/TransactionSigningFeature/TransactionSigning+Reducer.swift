@@ -13,7 +13,7 @@ public struct TransactionSigning: ReducerProtocol {
 public extension TransactionSigning {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .view(.signTransactionButtonTapped):
+		case .internal(.view(.signTransactionButtonTapped)):
 			state.isSigningTX = true
 			return .run { [transactionManifest = state.transactionManifest, addressOfSigner = state.addressOfSigner] send in
 				await send(.internal(.signTransactionResult(TaskResult {
@@ -41,11 +41,11 @@ public extension TransactionSigning {
 			}
 			return .none
 
-		case .view(.errorAlertDismissButtonTapped):
+		case .internal(.view(.errorAlertDismissButtonTapped)):
 			state.errorAlert = nil
 			return .none
 
-		case .view(.closeButtonTapped):
+		case .internal(.view(.closeButtonTapped)):
 			return .run { send in await send(.delegate(.dismissView)) }
 
 		case .delegate:

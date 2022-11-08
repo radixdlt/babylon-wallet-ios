@@ -513,7 +513,7 @@ public struct Home: ReducerProtocol {
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
 
-		case .transactionSigning:
+		case .transactionSigning(.internal):
 			return .none
 		}
 	}
