@@ -1,8 +1,8 @@
-#if DEBUG
 import Dependencies
 import Foundation
 import XCTestDynamicOverlay
 
+// MARK: - AppSettingsClient + TestDependencyKey
 extension AppSettingsClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
@@ -12,10 +12,9 @@ extension AppSettingsClient: TestDependencyKey {
 	)
 }
 
-public extension AppSettingsClient {
+extension AppSettingsClient {
 	static let noop = Self(
 		saveSettings: { _ in },
 		loadSettings: { .default }
 	)
 }
-#endif

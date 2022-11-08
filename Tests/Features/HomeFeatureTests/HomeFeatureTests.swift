@@ -62,7 +62,6 @@ final class HomeFeatureTests: TestCase {
 			initialState: initialState,
 			reducer: Home()
 		)
-		store.dependencies.fungibleTokenListSorter = .liveValue
 
 		// when
 		_ = await store.send(.internal(.system(.fetchPortfolioResult(.success(totalPortfolio))))) { [address] in
@@ -77,7 +76,7 @@ final class HomeFeatureTests: TestCase {
 			// account details
 			if let details = $0.accountDetails {
 				// asset list
-				let sortedCategories = store.dependencies.fungibleTokenListSorter.sortTokens(accountPortfolio.fungibleTokenContainers)
+				let sortedCategories = accountPortfolio.fungibleTokenContainers.sortedIntoCategories()
 
 				let section0 = FungibleTokenList.Section.State(
 					id: .xrd, assets: [

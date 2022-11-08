@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import DesignSystem
 import GatewayAPI
-import KeychainClient
+import KeychainClientDependency
 import ManageBrowserExtensionConnectionsFeature
 import Profile
 import ProfileClient
@@ -89,7 +89,7 @@ private extension Settings.View {
 							ProfileView(
 								profile: profile,
 								// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-								keychainClient: KeychainClient.live
+								keychainClient: KeychainClient.liveValue
 							)
 						} else {
 							Text("No profile, strange")

@@ -1,8 +1,7 @@
 import ComposableArchitecture
 import Foundation
-import KeychainClient
+import KeychainClientDependency
 import Profile
-import ProfileClient // FIXME: only need `KeychainClientKey`, which lives here... how to handle this best since KeychainClient is defined in Profile repo but we want to create our live value in any of our Packages (here ProfileClient..)?
 
 // MARK: - ImportProfile
 public struct ImportProfile: ReducerProtocol {

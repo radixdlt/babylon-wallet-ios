@@ -1,12 +1,10 @@
 import Collections
-import Dependencies
 import EngineToolkit
 import Foundation
 import KeychainClient
 import Mnemonic
 import NonEmpty
 import Profile
-import Tagged
 
 // MARK: - CreateNewProfileRequest
 public struct CreateNewProfileRequest {
@@ -23,7 +21,7 @@ public struct CreateNewProfileRequest {
 }
 
 // MARK: - ProfileClient
-public struct ProfileClient: DependencyKey {
+public struct ProfileClient {
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var setCurrentNetworkID: SetCurrentNetworkID
 

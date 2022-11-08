@@ -61,11 +61,6 @@ let converse: Target.Dependency = .product(
 	package: "Converse"
 )
 
-let keychainClient: Target.Dependency = .product(
-	name: "KeychainClient",
-	package: "swift-profile"
-)
-
 let bigInt: Target.Dependency = .product(
 	name: "BigInt",
 	package: "BigInt"
@@ -289,7 +284,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"DesignSystem",
-			keychainClient,
+			"KeychainClientDependency",
 			"ProfileClient",
 			tca,
 		],
@@ -345,6 +340,7 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Common",
+			"KeychainClientDependency",
 			"ProfileClient",
 			tca,
 		],
@@ -398,12 +394,11 @@ package.addModules([
 			"Common",
 			.product(name: "ConnectUsingPasswordFeature", package: "Converse"),
 			converse,
+			dependencies,
 			"DesignSystem",
 			.product(name: "InputPasswordFeature", package: "Converse"),
 			"IncomingConnectionRequestFromDappReviewFeature", // FIXME: extract to Home! just here for test..
-			profile,
 			"ProfileClient",
-			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -447,7 +442,7 @@ package.addModules([
 			"Common",
 			profile,
 			"GatewayAPI",
-			keychainClient,
+			"KeychainClientDependency",
 			"ManageBrowserExtensionConnectionsFeature",
 			"ProfileClient",
 			.product(name: "ProfileView", package: "swift-profile"),
@@ -581,6 +576,14 @@ package.addModules([
 		)
 	),
 	.client(
+		name: "KeychainClientDependency",
+		dependencies: [
+			dependencies,
+			.product(name: "KeychainClient", package: "swift-profile"),
+		],
+		tests: .no
+	),
+	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],
 		tests: .yes(
@@ -611,8 +614,8 @@ package.addModules([
 	.client(
 		name: "ProfileLoader",
 		dependencies: [
+			"KeychainClientDependency",
 			profile,
-			keychainClient,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]

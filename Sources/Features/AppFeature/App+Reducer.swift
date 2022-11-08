@@ -38,7 +38,6 @@ public extension App {
 				action: /Action.splash,
 				environment: {
 					Splash.Environment(
-						backgroundQueue: $0.backgroundQueue,
 						mainQueue: $0.mainQueue,
 						profileLoader: $0.profileLoader
 					)

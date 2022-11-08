@@ -5,9 +5,13 @@ public typealias Pasteboard = UIPasteboard
 import AppKit
 public typealias Pasteboard = NSPasteboard
 #endif
+import Dependencies
 
-public extension PasteboardClient {
-	static var liveValue: Self = .live()
+// MARK: - PasteboardClient + DependencyKey
+extension PasteboardClient: DependencyKey {
+	public typealias Value = PasteboardClient
+	public static let liveValue = Self.live()
+
 	static func live(pasteboard: Pasteboard = .general) -> Self {
 		#if os(macOS)
 		// https://stackoverflow.com/a/71927867

@@ -5,7 +5,7 @@ import EngineToolkitClient
 import Foundation
 import struct GatewayAPI.GatewayAPIClient
 import struct GatewayAPI.PollStrategy
-import KeychainClient
+import KeychainClientDependency
 import Profile
 import SLIP10
 import UserDefaultsClient
@@ -24,8 +24,9 @@ public extension UserDefaultsClient {
 	}
 }
 
-public extension ProfileClient {
-	static let liveValue: Self = {
+// MARK: - ProfileClient + DependencyKey
+extension ProfileClient: DependencyKey {
+	public static let liveValue: Self = {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient

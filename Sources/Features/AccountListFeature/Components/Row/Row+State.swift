@@ -63,6 +63,6 @@ extension AccountList.Row.State: Identifiable {
 #if DEBUG
 import ProfileClient
 public extension AccountList.Row.State {
-	static let placeholder: Self = try! Self(account: ProfileClient.mock().getAccounts().first)
+	static let placeholder = Self(account: .mocked0)
 }
 #endif
