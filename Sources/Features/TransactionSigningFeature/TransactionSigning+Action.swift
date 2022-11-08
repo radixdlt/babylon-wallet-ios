@@ -7,7 +7,7 @@ import ProfileClient
 // MARK: - TransactionSigning.Action
 public extension TransactionSigning {
 	enum Action: Equatable {
-		case view(ViewAction)
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
@@ -25,6 +25,7 @@ public extension TransactionSigning.Action {
 // MARK: - TransactionSigning.Action.InternalAction
 public extension TransactionSigning.Action {
 	enum InternalAction: Equatable {
+		case view(ViewAction)
 		case signTransactionResult(TaskResult<TransactionIntent.TXID>)
 	}
 }
