@@ -2,6 +2,13 @@ import AsyncExtensions
 import Dependencies
 import XCTestDynamicOverlay
 
+public extension DependencyValues {
+	var browserExtensionsConnectivityClient: BrowserExtensionsConnectivityClient {
+		get { self[BrowserExtensionsConnectivityClient.self] }
+		set { self[BrowserExtensionsConnectivityClient.self] = newValue }
+	}
+}
+
 // MARK: - BrowserExtensionsConnectivityClient + TestDependencyKey
 extension BrowserExtensionsConnectivityClient: TestDependencyKey {
 	public static let previewValue = Self.noop
@@ -26,11 +33,4 @@ extension BrowserExtensionsConnectivityClient {
 		sendMessage: { _ in fatalError() },
 		_sendTestMessage: { _, _ in fatalError() }
 	)
-}
-
-public extension DependencyValues {
-	var browserExtensionsConnectivityClient: BrowserExtensionsConnectivityClient {
-		get { self[BrowserExtensionsConnectivityClient.self] }
-		set { self[BrowserExtensionsConnectivityClient.self] = newValue }
-	}
 }

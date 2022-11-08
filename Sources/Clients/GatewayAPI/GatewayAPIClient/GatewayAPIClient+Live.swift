@@ -24,7 +24,7 @@ extension GatewayAPIClient: DependencyKey {
 	public typealias Value = GatewayAPIClient
 	public static let liveValue = GatewayAPIClient.live()
 
-	public static func live(
+	static func live(
 		baseURL: URL = .init(string: "https://alphanet.radixdlt.com/v0")!,
 		urlSession: URLSession = .shared,
 		jsonEncoder: JSONEncoder = .init(),
