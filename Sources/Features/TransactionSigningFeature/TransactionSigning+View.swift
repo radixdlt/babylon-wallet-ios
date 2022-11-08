@@ -20,7 +20,7 @@ public extension TransactionSigning.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init,
-			send: TransactionSigning.Action.view
+			send: { .view($0) }
 		) { viewStore in
 			Screen(title: "Sign TX", navBarActionStyle: .close, action: { viewStore.send(.closeButtonTapped) }) {
 				ZStack {
@@ -47,8 +47,8 @@ public extension TransactionSigning.View {
 					}
 				}
 				.alert(
-					store.scope(state: \.errorAlert),
-					dismiss: .view(.errorAlertDismissButtonTapped)
+					store.scope(state: \.errorAlert, action: { .view($0) }),
+					dismiss: .errorAlertDismissButtonTapped
 				)
 			}
 		}
