@@ -28,21 +28,21 @@ public struct Home: ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocol<State, Action> {
-		Scope(state: \.header, action: /Action.header) {
+		Scope(state: \.header, action: /Action.child..Action.ChildAction.header) {
 			Reduce(
 				Home.Header.reducer,
 				environment: Home.Header.Environment()
 			)
 		}
 
-		Scope(state: \.aggregatedValue, action: /Action.aggregatedValue) {
+		Scope(state: \.aggregatedValue, action: /Action.child..Action.ChildAction.aggregatedValue) {
 			Reduce(
 				AggregatedValue.reducer,
 				environment: AggregatedValue.Environment()
 			)
 		}
 
-		Scope(state: \.visitHub, action: /Action.visitHub) {
+		Scope(state: \.visitHub, action: /Action.child..Action.ChildAction.visitHub) {
 			Reduce(
 				Home.VisitHub.reducer,
 				environment: Home.VisitHub.Environment()
@@ -55,59 +55,57 @@ public struct Home: ReducerProtocol {
 	}
 
 	func accountListReducer() -> some ReducerProtocol<State, Action> {
-		Scope(state: \.accountList, action: /Action.accountList) {
+		Scope(state: \.accountList, action: /Action.child..Action.ChildAction.accountList) {
 			Reduce(
 				AccountList.reducer,
 				environment: AccountList.Environment()
 			)
 		}
-		.ifLet(\.accountDetails, action: /Action.accountDetails) {
+		.ifLet(\.accountDetails, action: /Action.child..Action.ChildAction.accountDetails) {
 			Reduce(
 				AccountDetails.reducer,
 				environment: AccountDetails.Environment()
 			)
 		}
-		.ifLet(\.accountPreferences, action: /Action.accountPreferences) {
+		.ifLet(\.accountPreferences, action: /Action.child..Action.ChildAction.accountPreferences) {
 			Reduce(
 				AccountPreferences.reducer,
 				environment: AccountPreferences.Environment()
 			)
 		}
-		.ifLet(\.transfer, action: /Action.transfer) {
+		.ifLet(\.transfer, action: /Action.child..Action.ChildAction.transfer) {
 			Reduce(
 				AccountDetails.Transfer.reducer,
 				environment: AccountDetails.Transfer.Environment()
 			)
 		}
-		.ifLet(\.createAccount, action: /Action.createAccount) {
+		.ifLet(\.createAccount, action: /Action.child..Action.ChildAction.createAccount) {
 			CreateAccount()
 		}
-		.ifLet(\.chooseAccountRequestFromDapp, action: /Action.chooseAccountRequestFromDapp) {
+		.ifLet(\.chooseAccountRequestFromDapp, action: /Action.child..Action.ChildAction.chooseAccountRequestFromDapp) {
 			IncomingConnectionRequestFromDappReview()
 		}
-		.ifLet(\.transactionSigning, action: /Action.transactionSigning) {
+		.ifLet(\.transactionSigning, action: /Action.child..Action.ChildAction.transactionSigning) {
 			TransactionSigning()
 		}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.user(.createAccountButtonTapped)):
+		case .internal(.view(.createAccountButtonTapped)):
 			return .run { send in
 				let accounts = try profileClient.getAccounts()
-				await send(.internal(.coordinate(.createAccount(numberOfExistingAccounts: accounts.count))))
+				await send(.internal(.system(.createAccount(numberOfExistingAccounts: accounts.count))))
 			}
 
-		case let .internal(.coordinate(.createAccount(numberOfExistingAccounts))):
+		case let .internal(.system(.createAccount(numberOfExistingAccounts))):
 			state.createAccount = .init(
 				numberOfExistingAccounts: numberOfExistingAccounts
 			)
 			return .none
 
-		case .internal(.system(.viewDidAppear)):
-			return .run { send in
-				await send(.internal(.system(.loadAccountsConnectionsAndSettings)))
-			}
+		case .internal(.view(.didAppear)):
+			return loadAccountsConnectionsAndSettings()
 
 		case let .internal(.system(.subscribeToIncomingMessagesFromDappsByBrowserConnectionIDs(ids))):
 			return .run { send in
@@ -134,25 +132,6 @@ public struct Home: ReducerProtocol {
 		case let .internal(.system(.receiveRequestMessageFromDappResult(.failure(error)))):
 			print("Failed to receive message from dApp, error: \(String(describing: error))")
 			return .none
-
-		case .internal(.system(.loadAccountsConnectionsAndSettings)):
-			return .run { send in
-				await send(.internal(.system(.accountsLoadedResult(
-					TaskResult {
-						try profileClient.getAccounts()
-					}
-				))))
-				await send(.internal(.system(.appSettingsLoadedResult(
-					TaskResult {
-						try await appSettingsClient.loadSettings()
-					}
-				))))
-				await send(.internal(.system(.connectionsLoadedResult(
-					TaskResult {
-						try await browserExtensionsConnectivityClient.getBrowserExtensionConnections()
-					}
-				))))
-			}
 
 		case let .internal(.system(.connectionsLoadedResult(.failure(error)))):
 			print("Failed to load connections, error: \(String(describing: error))")
@@ -270,12 +249,6 @@ public struct Home: ReducerProtocol {
 			print("⚠️ failed to fetch accout portfolio, error: \(String(describing: error))")
 			return .none
 
-		case let .internal(.system(.copyAddress(address))):
-			// TODO: display confirmation popup? discuss with po / designer
-			return .run { _ in
-				pasteboardClient.copyString(address.address)
-			}
-
 		case let .internal(.system(.viewDidAppearActionFailed(reason: reason))):
 			print(reason)
 			return .none
@@ -284,115 +257,87 @@ public struct Home: ReducerProtocol {
 			print(reason)
 			return .none
 
-		case .coordinate:
+		case .delegate:
 			return .none
 
-		case .header(.coordinate(.displaySettings)):
-			return Effect(value: .coordinate(.displaySettings))
+		case .child(.header(.coordinate(.displaySettings))):
+			return .run { send in await send(.delegate(.displaySettings)) }
 
-		case .header(.internal):
+		case .child(.header(.internal)):
 			return .none
 
-		case .aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible)):
-			return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
+		case .child(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))):
+			return .run { send in await send(.internal(.system(.toggleIsCurrencyAmountVisible))) }
 
-		case .aggregatedValue(.internal):
+		case .child(.aggregatedValue(.internal)):
 			return .none
 
-		case .visitHub(.coordinate(.displayHub)):
+		case .child(.visitHub(.coordinate(.displayHub))):
 			return .fireAndForget {
 				await openURL(URL(string: "https://www.apple.com")!)
 			}
-		case .visitHub(.internal):
+
+		case .child(.visitHub(.internal)):
 			return .none
 
-		case .accountList(.coordinate(.fetchPortfolioForAccounts)):
-			return .run { send in
-				await send(.internal(.system(.loadAccountsConnectionsAndSettings)))
-			}
+		case .child(.accountList(.coordinate(.fetchPortfolioForAccounts))):
+			return loadAccountsConnectionsAndSettings()
 
 		case let .internal(.system(.fetchPortfolioResult(.failure(error)))):
 			print("⚠️ failed to fetch portfolio, error: \(String(describing: error))")
 			return .none
 
-		case let .accountList(.coordinate(.displayAccountDetails(account))):
+		case let .child(.accountList(.coordinate(.displayAccountDetails(account)))):
 			state.accountDetails = .init(for: account)
 			return .none
 
-		case let .accountList(.coordinate(.copyAddress(address))):
-			return .run { send in
-				await send(.internal(.system(.copyAddress(address.wrapAsAddress()))))
-			}
+		case let .child(.accountList(.coordinate(.copyAddress(address)))):
+			return copyAddress(address)
 
-		case .accountList:
-			return .none
-
-		case .accountPreferences(.coordinate(.dismissAccountPreferences)):
+		case .child(.accountPreferences(.coordinate(.dismissAccountPreferences))):
 			state.accountPreferences = nil
 			return .none
 
-		case .accountPreferences(.internal):
-			return .none
-
-		case .accountDetails(.coordinate(.dismissAccountDetails)):
+		case .child(.accountDetails(.coordinate(.dismissAccountDetails))):
 			state.accountDetails = nil
 			return .none
 
-		case .accountDetails(.internal):
-			return .none
-
-		case .accountDetails(.coordinate(.displayAccountPreferences)):
+		case .child(.accountDetails(.coordinate(.displayAccountPreferences))):
 			state.accountPreferences = .init()
 			return .none
 
-		case let .accountDetails(.coordinate(.copyAddress(address))):
-			return .run { send in
-				await send(.internal(.system(.copyAddress(address.wrapAsAddress()))))
-			}
+		case let .child(.accountDetails(.coordinate(.copyAddress(address)))):
+			return copyAddress(address)
 
-		case .accountDetails(.coordinate(.displayTransfer)):
+		case .child(.accountDetails(.coordinate(.displayTransfer))):
 			state.transfer = .init()
 			return .none
 
-		case let .accountDetails(.coordinate(.refresh(address))):
+		case let .child(.accountDetails(.coordinate(.refresh(address)))):
 			return .run { send in
 				await send(.internal(.system(.accountPortfolioResult(TaskResult {
 					try await accountPortfolioFetcher.fetchPortfolio([address])
 				}))))
 			}
 
-		case .accountDetails(.aggregatedValue(.internal(_))):
-			return .none
-
-		case .accountDetails(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))):
+		case .child(.accountDetails(.child(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))))):
 			return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
 
-		case .accountDetails(.assets):
-			return .none
-
-		case .transfer(.coordinate(.dismissTransfer)):
+		case .child(.transfer(.coordinate(.dismissTransfer))):
 			state.transfer = nil
 			return .none
 
-		case .createAccount(.internal):
-			return .none
-
-		case .createAccount(.coordinate(.dismissCreateAccount)):
+		case .child(.createAccount(.coordinate(.dismissCreateAccount))):
 			state.createAccount = nil
 			return .none
 
-		case .createAccount(.coordinate(.createdNewAccount(_))):
+		case .child(.createAccount(.coordinate(.createdNewAccount))):
 			state.createAccount = nil
-			return .run { send in
-				await send(.internal(.system(.loadAccountsConnectionsAndSettings)))
-			}
+			return loadAccountsConnectionsAndSettings()
 
-		case let .createAccount(.coordinate(.failedToCreateNewAccount(reason: reason))):
+		case let .child(.createAccount(.coordinate(.failedToCreateNewAccount(reason: reason)))):
 			state.createAccount = nil
 			print("Failed to create account: \(reason)")
-			return .none
-
-		case .transfer(.internal):
 			return .none
 
 		case .internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)):
@@ -441,13 +386,13 @@ public struct Home: ReducerProtocol {
 			}
 			return .none
 
-		case .chooseAccountRequestFromDapp(.delegate(.dismiss)):
+		case .child(.chooseAccountRequestFromDapp(.delegate(.dismiss))):
 			state.chooseAccountRequestFromDapp = nil
 			return .run { send in
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
 
-		case let .chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, incomingMessageFromBrowser))):
+		case let .child(.chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, incomingMessageFromBrowser)))):
 			state.chooseAccountRequestFromDapp = nil
 			let accountAddresses: [RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse.AccountAddress] = selectedAccounts.map {
 				.init(address: $0.address.address, label: $0.displayName ?? "AccountIndex: \($0.index)")
@@ -491,10 +436,7 @@ public struct Home: ReducerProtocol {
 			print("Failed to send response back over webRTC, error: \(String(describing: error))")
 			return .none
 
-		case .chooseAccountRequestFromDapp:
-			return .none
-
-		case let .transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, incomingMessageFromBrowser))):
+		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, incomingMessageFromBrowser)))):
 			state.transactionSigning = nil
 			let response = RequestMethodWalletResponse(
 				method: .request,
@@ -507,14 +449,41 @@ public struct Home: ReducerProtocol {
 				await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
 			}
 
-		case .transactionSigning(.delegate(.dismissView)):
+		case .child(.transactionSigning(.delegate(.dismissView))):
 			state.transactionSigning = nil
 			return .run { send in
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
 
-		case .transactionSigning:
+		case .child:
 			return .none
+		}
+	}
+
+	func loadAccountsConnectionsAndSettings() -> EffectTask<Action> {
+		return .run { send in
+			await send(.internal(.system(.accountsLoadedResult(
+				TaskResult {
+					try profileClient.getAccounts()
+				}
+			))))
+			await send(.internal(.system(.appSettingsLoadedResult(
+				TaskResult {
+					try await appSettingsClient.loadSettings()
+				}
+			))))
+			await send(.internal(.system(.connectionsLoadedResult(
+				TaskResult {
+					try await browserExtensionsConnectivityClient.getBrowserExtensionConnections()
+				}
+			))))
+		}
+	}
+
+	func copyAddress(_ address: AccountAddress) -> EffectTask<Action> {
+		// TODO: display confirmation popup? discuss with po / designer
+		return .run { _ in
+			pasteboardClient.copyString(address.wrapAsAddress().address)
 		}
 	}
 }
