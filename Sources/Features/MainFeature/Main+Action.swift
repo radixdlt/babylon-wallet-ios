@@ -5,8 +5,13 @@ import SettingsFeature
 public extension Main {
 	// MARK: Action
 	enum Action: Equatable {
+		case child(ChildAction)
 		case coordinate(CoordinateAction)
+	}
+}
 
+public extension Main.Action {
+	enum ChildAction: Equatable {
 		case home(Home.Action)
 		case settings(Settings.Action)
 	}

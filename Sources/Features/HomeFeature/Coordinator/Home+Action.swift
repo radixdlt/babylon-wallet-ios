@@ -26,6 +26,7 @@ public extension Home {
 	}
 }
 
+// MARK: - Home.Action.ChildAction
 public extension Home.Action {
 	enum ChildAction: Equatable {
 		case accountList(AccountList.Action)
@@ -41,6 +42,7 @@ public extension Home.Action {
 	}
 }
 
+// MARK: - Home.Action.ViewAction
 public extension Home.Action {
 	enum ViewAction: Equatable {
 		case didAppear
@@ -56,6 +58,7 @@ public extension Home.Action {
 	}
 }
 
+// MARK: - Home.Action.SystemAction
 public extension Home.Action {
 	enum SystemAction: Equatable {
 		case createAccount(numberOfExistingAccounts: Int)
@@ -80,6 +83,7 @@ public extension Home.Action {
 	}
 }
 
+// MARK: - Home.Action.DelegateAction
 public extension Home.Action {
 	enum DelegateAction: Equatable {
 		case displaySettings

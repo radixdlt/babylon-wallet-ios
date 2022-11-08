@@ -12,6 +12,7 @@ public extension AccountDetails {
 	}
 }
 
+// MARK: - AccountDetails.Action.ChildAction
 public extension AccountDetails.Action {
 	enum ChildAction: Equatable {
 		case aggregatedValue(AggregatedValue.Action)

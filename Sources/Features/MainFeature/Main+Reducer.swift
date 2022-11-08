@@ -19,7 +19,7 @@ public extension Main {
 		}
 		.pullback(
 			state: \.home,
-			action: /Main.Action.home,
+			action: /Main.Action.child..Main.Action.ChildAction.home,
 			environment: { $0 }
 		),
 
@@ -30,41 +30,29 @@ public extension Main {
 		.optional()
 		.pullback(
 			state: \.settings,
-			action: /Main.Action.settings,
+			action: /Main.Action.child..Main.Action.ChildAction.settings,
 			environment: { $0 }
 		),
 
 		Reducer { state, action, environment in
 			switch action {
-			case .home(.delegate(.displaySettings)):
+			case .child(.home(.delegate(.displaySettings))):
 				state.settings = .init()
 				return .none
 
-			case .settings(.coordinate(.deleteProfileAndFactorSources)):
+			case .child(.settings(.coordinate(.deleteProfileAndFactorSources))):
 				return .run { send in
 					try environment.keychainClient.removeAllFactorSourcesAndProfileSnapshot()
 					try await environment.profileClient.deleteProfileSnapshot()
 					await send(.coordinate(.removedWallet))
 				}
 
-			case .settings(.coordinate(.dismissSettings)):
+			case .child(.settings(.coordinate(.dismissSettings))):
 				state.settings = nil
 				return .none
 
-			case .settings(.internal(_)):
+			case .child, .coordinate:
 				return .none
-
-			case .settings(.manageBrowserExtensionConnections(_)):
-				return .none
-
-			case .coordinate:
-				return .none
-
-			case .home(.child(.chooseAccountRequestFromDapp(_))):
-				return .none
-
-			case .home(.child), .home(.internal):
-				 return .none
 			}
 		}
 	)

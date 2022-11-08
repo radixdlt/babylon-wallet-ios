@@ -28,21 +28,21 @@ public struct Home: ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocol<State, Action> {
-		Scope(state: \.header, action: /Action.child..Action.ChildAction.header) {
+		Scope(state: \.header, action: /Action.child .. Action.ChildAction.header) {
 			Reduce(
 				Home.Header.reducer,
 				environment: Home.Header.Environment()
 			)
 		}
 
-		Scope(state: \.aggregatedValue, action: /Action.child..Action.ChildAction.aggregatedValue) {
+		Scope(state: \.aggregatedValue, action: /Action.child .. Action.ChildAction.aggregatedValue) {
 			Reduce(
 				AggregatedValue.reducer,
 				environment: AggregatedValue.Environment()
 			)
 		}
 
-		Scope(state: \.visitHub, action: /Action.child..Action.ChildAction.visitHub) {
+		Scope(state: \.visitHub, action: /Action.child .. Action.ChildAction.visitHub) {
 			Reduce(
 				Home.VisitHub.reducer,
 				environment: Home.VisitHub.Environment()
@@ -55,37 +55,37 @@ public struct Home: ReducerProtocol {
 	}
 
 	func accountListReducer() -> some ReducerProtocol<State, Action> {
-		Scope(state: \.accountList, action: /Action.child..Action.ChildAction.accountList) {
+		Scope(state: \.accountList, action: /Action.child .. Action.ChildAction.accountList) {
 			Reduce(
 				AccountList.reducer,
 				environment: AccountList.Environment()
 			)
 		}
-		.ifLet(\.accountDetails, action: /Action.child..Action.ChildAction.accountDetails) {
+		.ifLet(\.accountDetails, action: /Action.child .. Action.ChildAction.accountDetails) {
 			Reduce(
 				AccountDetails.reducer,
 				environment: AccountDetails.Environment()
 			)
 		}
-		.ifLet(\.accountPreferences, action: /Action.child..Action.ChildAction.accountPreferences) {
+		.ifLet(\.accountPreferences, action: /Action.child .. Action.ChildAction.accountPreferences) {
 			Reduce(
 				AccountPreferences.reducer,
 				environment: AccountPreferences.Environment()
 			)
 		}
-		.ifLet(\.transfer, action: /Action.child..Action.ChildAction.transfer) {
+		.ifLet(\.transfer, action: /Action.child .. Action.ChildAction.transfer) {
 			Reduce(
 				AccountDetails.Transfer.reducer,
 				environment: AccountDetails.Transfer.Environment()
 			)
 		}
-		.ifLet(\.createAccount, action: /Action.child..Action.ChildAction.createAccount) {
+		.ifLet(\.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
 			CreateAccount()
 		}
-		.ifLet(\.chooseAccountRequestFromDapp, action: /Action.child..Action.ChildAction.chooseAccountRequestFromDapp) {
+		.ifLet(\.chooseAccountRequestFromDapp, action: /Action.child .. Action.ChildAction.chooseAccountRequestFromDapp) {
 			IncomingConnectionRequestFromDappReview()
 		}
-		.ifLet(\.transactionSigning, action: /Action.child..Action.ChildAction.transactionSigning) {
+		.ifLet(\.transactionSigning, action: /Action.child .. Action.ChildAction.transactionSigning) {
 			TransactionSigning()
 		}
 	}
@@ -263,22 +263,13 @@ public struct Home: ReducerProtocol {
 		case .child(.header(.coordinate(.displaySettings))):
 			return .run { send in await send(.delegate(.displaySettings)) }
 
-		case .child(.header(.internal)):
-			return .none
-
 		case .child(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))):
 			return .run { send in await send(.internal(.system(.toggleIsCurrencyAmountVisible))) }
-
-		case .child(.aggregatedValue(.internal)):
-			return .none
 
 		case .child(.visitHub(.coordinate(.displayHub))):
 			return .fireAndForget {
 				await openURL(URL(string: "https://www.apple.com")!)
 			}
-
-		case .child(.visitHub(.internal)):
-			return .none
 
 		case .child(.accountList(.coordinate(.fetchPortfolioForAccounts))):
 			return loadAccountsConnectionsAndSettings()
@@ -461,7 +452,7 @@ public struct Home: ReducerProtocol {
 	}
 
 	func loadAccountsConnectionsAndSettings() -> EffectTask<Action> {
-		return .run { send in
+		.run { send in
 			await send(.internal(.system(.accountsLoadedResult(
 				TaskResult {
 					try profileClient.getAccounts()
@@ -482,7 +473,7 @@ public struct Home: ReducerProtocol {
 
 	func copyAddress(_ address: AccountAddress) -> EffectTask<Action> {
 		// TODO: display confirmation popup? discuss with po / designer
-		return .run { _ in
+		.run { _ in
 			pasteboardClient.copyString(address.wrapAsAddress().address)
 		}
 	}
