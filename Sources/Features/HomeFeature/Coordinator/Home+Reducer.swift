@@ -257,9 +257,6 @@ public struct Home: ReducerProtocol {
 			print(reason)
 			return .none
 
-		case .delegate:
-			return .none
-
 		case .child(.header(.coordinate(.displaySettings))):
 			return .run { send in await send(.delegate(.displaySettings)) }
 
@@ -446,7 +443,7 @@ public struct Home: ReducerProtocol {
 				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
 			}
 
-		case .child:
+		case .child, .delegate:
 			return .none
 		}
 	}
