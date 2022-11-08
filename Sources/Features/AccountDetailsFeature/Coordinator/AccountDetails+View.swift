@@ -44,7 +44,7 @@ public extension AccountDetails.View {
 							AggregatedValue.View(
 								store: store.scope(
 									state: \.aggregatedValue,
-									action: AccountDetails.Action.aggregatedValue
+									action: { .child(.aggregatedValue($0)) }
 								)
 							)
 
@@ -54,7 +54,7 @@ public extension AccountDetails.View {
 							AssetsView.View(
 								store: store.scope(
 									state: \.assets,
-									action: AccountDetails.Action.assets
+									action: { .child(.assets($0)) }
 								)
 							)
 						}
