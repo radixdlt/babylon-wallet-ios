@@ -6,6 +6,15 @@ import NonEmpty
 import Profile
 import XCTestDynamicOverlay
 
+public extension DependencyValues {
+	var profileClient: ProfileClient {
+		get { self[ProfileClient.self] }
+		set { self[ProfileClient.self] = newValue }
+	}
+}
+
+#if DEBUG
+
 // MARK: - ProfileClient + TestDependencyKey
 extension ProfileClient: TestDependencyKey {
 	// TODO: make every endpoint no-op
@@ -67,13 +76,6 @@ extension ProfileClient: TestDependencyKey {
 	)
 }
 
-public extension DependencyValues {
-	var profileClient: ProfileClient {
-		get { self[ProfileClient.self] }
-		set { self[ProfileClient.self] = newValue }
-	}
-}
-
 public extension OnNetwork.Account {
 	static var mocked0: Self {
 		try! OnNetwork.Account(
@@ -125,3 +127,4 @@ public extension OnNetwork.Account {
 		)
 	}
 }
+#endif
