@@ -36,7 +36,7 @@ public extension Main {
 
 		Reducer { state, action, environment in
 			switch action {
-			case .home(.coordinate(.displaySettings)):
+			case .home(.delegate(.displaySettings)):
 				state.settings = .init()
 				return .none
 
@@ -57,31 +57,14 @@ public extension Main {
 			case .settings(.manageBrowserExtensionConnections(_)):
 				return .none
 
-			case .home(.internal(_)):
-				return .none
-			case .home(.header(_)):
-				return .none
-			case .home(.accountList(_)):
-				return .none
-			case .home(.aggregatedValue(_)):
-				return .none
-			case .home(.visitHub(_)):
-				return .none
 			case .coordinate:
 				return .none
-			case .home(.accountPreferences(_)):
-				return .none
-			case .home(.accountDetails(_)):
-				return .none
-			case .home(.transfer(_)):
-				return .none
-			case .home(.createAccount(_)):
+
+			case .home(.child(.chooseAccountRequestFromDapp(_))):
 				return .none
 
-			case .home(.chooseAccountRequestFromDapp(_)):
-				return .none
-			case .home(.transactionSigning(_)):
-				return .none
+			case .home(.child), .home(.internal):
+				 return .none
 			}
 		}
 	)
