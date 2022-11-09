@@ -17,16 +17,16 @@ public struct ManageBrowserExtensionConnections: ReducerProtocol {
 public extension ManageBrowserExtensionConnections {
 	var body: some ReducerProtocol<State, Action> {
 		Reduce(self.core)
-			.forEach(\.connections, action: /Action.connection(id:action:)) {
+			.forEach(\.connections, action: /Action.child .. Action.ChildAction.connection) {
 				ManageBrowserExtensionConnection()
 			}
 			.ifLet(
 				\.inputBrowserExtensionConnectionPassword,
-				action: /ManageBrowserExtensionConnections.Action.inputBrowserExtensionConnectionPassword
+				action: /Action.child .. Action.ChildAction.inputBrowserExtensionConnectionPassword
 			) {
 				InputPassword()
 			}
-			.ifLet(\.connectUsingPassword, action: /ManageBrowserExtensionConnections.Action.connectUsingPassword) {
+			.ifLet(\.connectUsingPassword, action: /Action.child .. Action.ChildAction.connectUsingPassword) {
 				ConnectUsingPassword()
 			}
 			._printChanges()
@@ -34,59 +34,29 @@ public extension ManageBrowserExtensionConnections {
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.system(.viewDidAppear)):
+		case .internal(.view(.viewAppeared)):
 			return .run { send in
-				await send(.internal(.coordinate(.loadConnections)))
-			}
-
-		case .internal(.coordinate(.loadConnections)):
-			return .run { send in
-				await send(.internal(.coordinate(.loadConnectionsResult(
+				await send(.internal(.system(.loadConnectionsResult(
 					TaskResult {
 						try await browserExtensionsConnectivityClient.getBrowserExtensionConnections()
 					}
 				))))
 			}
 
-		case let .internal(.coordinate(.loadConnectionsResult(.success(browserConnectionsFromProfile)))):
+		case let .internal(.system(.loadConnectionsResult(.success(browserConnectionsFromProfile)))):
 			state.connections.append(contentsOf: browserConnectionsFromProfile)
 			return .none
 
-		case let .internal(.coordinate(.loadConnectionsResult(.failure(error)))):
+		case let .internal(.system(.loadConnectionsResult(.failure(error)))):
 			fatalError(String(describing: error))
 
 		case let .internal(.system(.successfullyOpenedConnectionToBrowser(connection))):
-			state.connectUsingPassword = nil
-			state.inputBrowserExtensionConnectionPassword = nil
+			return saveNewConnection(state: &state, action: action, connection: connection)
 
-			let statefulBrowserConnection = StatefulBrowserConnection(
-				browserExtensionConnection: .init(
-					computerName: "Unknown",
-					browserName: "Unknown",
-					connectionPassword: connection.getConnectionPassword().data.data
-				),
-				connection: connection
-			)
-
-			return .run { send in
-				await send(.internal(.coordinate(.saveNewConnection(statefulBrowserConnection))))
-			}
-
-		case let .internal(.coordinate(.saveNewConnection(statefulBrowserConnection))):
-			return .run { send in
-				await send(.internal(.coordinate(.saveNewConnectionResult(
-					TaskResult {
-						try await browserExtensionsConnectivityClient.addBrowserExtensionConnection(
-							statefulBrowserConnection
-						)
-					}.map { statefulBrowserConnection }
-				))))
-			}
-
-		case let .internal(.coordinate(.saveNewConnectionResult(.failure(error)))):
+		case let .internal(.system(.saveNewConnectionResult(.failure(error)))):
 			fatalError(String(describing: error))
 
-		case let .internal(.coordinate(.saveNewConnectionResult(.success(newConnection)))):
+		case let .internal(.system(.saveNewConnectionResult(.success(newConnection)))):
 			state.connections.append(
 				BrowserExtensionWithConnectionStatus(
 					browserExtensionConnection: newConnection.browserExtensionConnection,
@@ -95,23 +65,23 @@ public extension ManageBrowserExtensionConnections {
 			)
 			return .none
 
-		case .internal(.user(.dismiss)):
+		case .internal(.view(.dismissButtonTapped)):
 			return .run { send in
-				await send(.coordinate(.dismiss))
+				await send(.delegate(.dismiss))
 			}
 
-		case .internal(.user(.addNewConnection)):
+		case .internal(.view(.addNewConnectionButtonTapped)):
 			state.inputBrowserExtensionConnectionPassword = .init()
 			return .none
 
-		case .internal(.user(.dismissNewConnectionFlow)):
+		case .internal(.view(.dismissNewConnectionFlowButtonTapped)):
 			state.inputBrowserExtensionConnectionPassword = nil
 			return .none
 
-		case let .inputBrowserExtensionConnectionPassword(.delegate(.connect(password))):
+		case let .child(.inputBrowserExtensionConnectionPassword(.delegate(.connect(password)))):
 			return .run { send in
 				await send(
-					.internal(.coordinate(.initConnectionSecretsResult(
+					.internal(.system(.initConnectionSecretsResult(
 						TaskResult<ConnectionSecrets> {
 							try ConnectionSecrets.from(connectionPassword: password)
 						}
@@ -119,25 +89,23 @@ public extension ManageBrowserExtensionConnections {
 				)
 			}
 
-		case let .internal(.coordinate(.initConnectionSecretsResult(.success(connectionSecrets)))):
+		case let .internal(.system(.initConnectionSecretsResult(.success(connectionSecrets)))):
 			let connection = Connection.live(connectionSecrets: connectionSecrets)
 			state.connectUsingPassword = ConnectUsingPassword.State(connection: connection)
 			return .none
 
-		case let .internal(.coordinate(.initConnectionSecretsResult(.failure(error)))):
+		case let .internal(.system(.initConnectionSecretsResult(.failure(error)))):
 			fatalError(String(describing: error))
 
-		case let .connectUsingPassword(.delegate(.establishConnectionResult(.failure(error)))):
+		case let .child(.connectUsingPassword(.delegate(.establishConnectionResult(.failure(error))))):
 			fatalError(String(describing: error))
 
-		case let .connectUsingPassword(.delegate(.establishConnectionResult(.success(openConnection)))):
-			return .run { send in
-				await send(.internal(.system(.successfullyOpenedConnectionToBrowser(openConnection))))
-			}
+		case let .child(.connectUsingPassword(.delegate(.establishConnectionResult(.success(openConnection))))):
+			return saveNewConnection(state: &state, action: action, connection: openConnection)
 
-		case let .connection(id, .delegate(.sendTestMessage)):
+		case let .child(.connection(id, .delegate(.sendTestMessage))):
 			return .run { send in
-				await send(.internal(.coordinate(.sendTestMessageResult(
+				await send(.internal(.system(.sendTestMessageResult(
 					TaskResult {
 						let msg = "Test"
 						try await self.browserExtensionsConnectivityClient._sendTestMessage(id, msg)
@@ -146,9 +114,9 @@ public extension ManageBrowserExtensionConnections {
 				))))
 			}
 
-		case let .connection(id, .delegate(.deleteConnection)):
+		case let .child(.connection(id, .delegate(.deleteConnection))):
 			return .run { send in
-				await send(.internal(.coordinate(.deleteConnectionResult(
+				await send(.internal(.system(.deleteConnectionResult(
 					TaskResult {
 						try await browserExtensionsConnectivityClient.deleteBrowserExtensionConnection(id)
 						return id
@@ -156,33 +124,48 @@ public extension ManageBrowserExtensionConnections {
 				))))
 			}
 
-		case let .internal(.coordinate(.deleteConnectionResult(.success(deletedID)))):
+		case let .internal(.system(.deleteConnectionResult(.success(deletedID)))):
 			state.connections.remove(id: deletedID)
 			return .none
 
-		case let .internal(.coordinate(.deleteConnectionResult(.failure(error)))):
+		case let .internal(.system(.deleteConnectionResult(.failure(error)))):
 			print("Failed to delete connection from profile, error: \(String(describing: error))")
 			return .none
 
-		case .inputBrowserExtensionConnectionPassword:
-			return .none
-
-		case .connectUsingPassword:
-			return .none
-
-		case .coordinate:
-			return .none
-
-		case let .internal(.coordinate(.sendTestMessageResult(.success(msgSent)))):
+		case let .internal(.system(.sendTestMessageResult(.success(msgSent)))):
 			print("Successfully sent message: '\(msgSent)'")
 			return .none
 
-		case let .internal(.coordinate(.sendTestMessageResult(.failure(error)))):
+		case let .internal(.system(.sendTestMessageResult(.failure(error)))):
 			print("Failed to send message, error: \(String(describing: error))")
 			return .none
 
-		case .connection(_, .internal(_)):
+		case .child, .delegate:
 			return .none
+		}
+	}
+
+	func saveNewConnection(state: inout State, action: Action, connection: Connection) -> EffectTask<Action> {
+		state.connectUsingPassword = nil
+		state.inputBrowserExtensionConnectionPassword = nil
+
+		let statefulBrowserConnection = StatefulBrowserConnection(
+			browserExtensionConnection: .init(
+				computerName: "Unknown",
+				browserName: "Unknown",
+				connectionPassword: connection.getConnectionPassword().data.data
+			),
+			connection: connection
+		)
+
+		return .run { send in
+			await send(.internal(.system(.saveNewConnectionResult(
+				TaskResult {
+					try await browserExtensionsConnectivityClient.addBrowserExtensionConnection(
+						statefulBrowserConnection
+					)
+				}.map { statefulBrowserConnection }
+			))))
 		}
 	}
 }

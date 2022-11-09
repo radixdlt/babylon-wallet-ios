@@ -5,31 +5,39 @@ import Foundation
 public extension NonFungibleTokenList {
 	// MARK: Action
 	enum Action: Equatable {
+		case child(ChildAction)
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
+		case delegate(DelegateAction)
+	}
+}
+
+// MARK: - NonFungibleTokenList.Action.ChildAction
+public extension NonFungibleTokenList.Action {
+	enum ChildAction: Equatable {
 		case asset(id: NonFungibleTokenContainer.ID, action: NonFungibleTokenList.Row.Action)
 	}
+}
+
+// MARK: - NonFungibleTokenList.Action.ViewAction
+public extension NonFungibleTokenList.Action {
+	enum ViewAction: Equatable {}
 }
 
 // MARK: - NonFungibleTokenList.Action.InternalAction
 public extension NonFungibleTokenList.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
+		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
-// MARK: - NonFungibleTokenList.Action.InternalAction.UserAction
-public extension NonFungibleTokenList.Action.InternalAction {
-	enum UserAction: Equatable {}
-}
-
-// MARK: - NonFungibleTokenList.Action.InternalAction.SystemAction
-public extension NonFungibleTokenList.Action.InternalAction {
+// MARK: - NonFungibleTokenList.Action.SystemAction
+public extension NonFungibleTokenList.Action {
 	enum SystemAction: Equatable {}
 }
 
-// MARK: - NonFungibleTokenList.Action.CoordinatingAction
+// MARK: - NonFungibleTokenList.Action.DelegateAction
 public extension NonFungibleTokenList.Action {
-	enum CoordinatingAction: Equatable {}
+	enum DelegateAction: Equatable {}
 }

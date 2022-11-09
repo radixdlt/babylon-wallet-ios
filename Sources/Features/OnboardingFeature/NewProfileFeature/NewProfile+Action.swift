@@ -5,41 +5,42 @@ import Profile
 public extension NewProfile {
 	// MARK: Action
 	enum Action: Equatable {
-		case coordinate(CoordinatingAction)
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
+		case delegate(DelegateAction)
 	}
 }
 
-// MARK: - NewProfile.Action.CoordinatingAction
+// MARK: - NewProfile.Action.ViewAction
 public extension NewProfile.Action {
-	enum CoordinatingAction: Equatable {
-		case goBack
-		case finishedCreatingNewProfile(Profile)
-		case failedToCreateNewProfile(reason: String)
+	enum ViewAction: Equatable {
+		case backButtonPressed
+		case accountNameTextFieldChanged(String)
+		case createProfileButtonPressed
 	}
 }
 
 // MARK: - NewProfile.Action.InternalAction
 public extension NewProfile.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
+		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
-// MARK: - NewProfile.Action.InternalAction.UserAction
-public extension NewProfile.Action.InternalAction {
-	enum UserAction: Equatable {
-		case goBack
-		case accountNameChanged(String)
-		case createProfile
-	}
-}
-
-// MARK: - NewProfile.Action.InternalAction.SystemAction
-public extension NewProfile.Action.InternalAction {
+// MARK: - NewProfile.Action.SystemAction
+public extension NewProfile.Action {
 	enum SystemAction: Equatable {
 		case createProfile
 		case createdProfileResult(TaskResult<Profile>)
+	}
+}
+
+// MARK: - NewProfile.Action.DelegateAction
+public extension NewProfile.Action {
+	enum DelegateAction: Equatable {
+		case goBack
+		case finishedCreatingNewProfile(Profile)
+		case failedToCreateNewProfile(reason: String)
 	}
 }

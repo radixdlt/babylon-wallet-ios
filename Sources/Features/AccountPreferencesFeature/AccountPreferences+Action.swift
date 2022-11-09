@@ -4,28 +4,29 @@ import Foundation
 public extension AccountPreferences {
 	// MARK: Action
 	enum Action: Equatable {
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
+		case delegate(DelegateAction)
+	}
+}
+
+// MARK: - AccountPreferences.Action.ViewAction
+public extension AccountPreferences.Action {
+	enum ViewAction: Equatable {
+		case dismissButtonTapped
 	}
 }
 
 // MARK: - AccountPreferences.Action.InternalAction
 public extension AccountPreferences.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
+		case view(ViewAction)
 	}
 }
 
-// MARK: - AccountPreferences.Action.InternalAction.UserAction
-public extension AccountPreferences.Action.InternalAction {
-	enum UserAction: Equatable {
-		case dismissAccountPreferences
-	}
-}
-
-// MARK: - AccountPreferences.Action.CoordinatingAction
+// MARK: - AccountPreferences.Action.DelegateAction
 public extension AccountPreferences.Action {
-	enum CoordinatingAction: Equatable {
+	enum DelegateAction: Equatable {
 		case dismissAccountPreferences
 	}
 }

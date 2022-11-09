@@ -8,10 +8,25 @@ import Profile
 // MARK: - IncomingConnectionRequestFromDappReview.Action
 public extension IncomingConnectionRequestFromDappReview {
 	enum Action: Equatable {
+		case child(ChildAction)
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
-		case chooseAccounts(ChooseAccounts.Action)
-
 		case delegate(DelegateAction)
+	}
+}
+
+// MARK: - IncomingConnectionRequestFromDappReview.Action.ChildAction
+public extension IncomingConnectionRequestFromDappReview.Action {
+	enum ChildAction: Equatable {
+		case chooseAccounts(ChooseAccounts.Action)
+	}
+}
+
+// MARK: - IncomingConnectionRequestFromDappReview.Action.ViewAction
+public extension IncomingConnectionRequestFromDappReview.Action {
+	enum ViewAction: Equatable {
+		case dismissButtonTapped
+		case continueButtonTapped
 	}
 }
 
@@ -30,17 +45,8 @@ public extension IncomingConnectionRequestFromDappReview.Action {
 // MARK: - IncomingConnectionRequestFromDappReview.Action.InternalAction
 public extension IncomingConnectionRequestFromDappReview.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
-		case coordinate(InternalCoordinateAction)
+		case view(ViewAction)
 		case system(SystemAction)
-	}
-}
-
-// MARK: - IncomingConnectionRequestFromDappReview.Action.InternalAction.UserAction
-public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
-	enum UserAction: Equatable {
-		case dismissIncomingConnectionRequest
-		case proceedWithConnectionRequest
 	}
 }
 
@@ -48,13 +54,5 @@ public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
 public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case loadAccountsResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
-	}
-}
-
-// MARK: - IncomingConnectionRequestFromDappReview.Action.InternalCoordinateAction
-public extension IncomingConnectionRequestFromDappReview.Action {
-	enum InternalCoordinateAction: Equatable {
-		case dismissIncomingConnectionRequest
-		case proceedWithConnectionRequest
 	}
 }

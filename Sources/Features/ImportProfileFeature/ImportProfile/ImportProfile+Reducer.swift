@@ -1,12 +1,14 @@
 import ComposableArchitecture
+import Data
 import Foundation
 import KeychainClientDependency
 import Profile
 
 // MARK: - ImportProfile
 public struct ImportProfile: ReducerProtocol {
-	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.data) var data
 	@Dependency(\.jsonDecoder) var jsonDecoder
+	@Dependency(\.keychainClient) var keychainClient
 	public init() {}
 }
 
@@ -14,76 +16,36 @@ public struct ImportProfile: ReducerProtocol {
 public extension ImportProfile {
 	func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
 		switch action {
-		case .internal(.goBack):
+		case .internal(.view(.goBack)):
 			return .run { send in
-				await send(.coordinate(.goBack))
+				await send(.delegate(.goBack))
 			}
 
-		case .internal(.dismissFileimporter):
+		case .internal(.view(.dismissFileImporter)):
 			state.isDisplayingFileImporter = false
 			return .none
 
-		case .internal(.importProfileFile):
+		case .internal(.view(.importProfileFileButtonTapped)):
 			state.isDisplayingFileImporter = true
 			return .none
 
-		case let .internal(.importProfileFileResult(.failure(error))):
+		case let .internal(.view(.profileImported(.failure(error)))):
 			return .run { send in
-				await send(.coordinate(.failedToImportProfileSnapshot(reason: "Failed to import file, error: \(String(describing: error))")))
+				await send(.delegate(.failedToImportProfileSnapshot(reason: "Failed to import file, error: \(String(describing: error))")))
 			}
 
-		case let .internal(.importProfileFileResult(.success(profileURL))):
-			return .run { send in
-				await send(.internal(.importProfileDataFromFileAt(profileURL)))
+		case let .internal(.view(.profileImported(.success(profileURL)))):
+			return .run { [data, jsonDecoder, keychainClient] send in
+				let data = try data(contentsOf: profileURL, options: .uncached)
+				let snapshot = try jsonDecoder.decode(ProfileSnapshot.self, from: data)
+				try keychainClient.saveProfileSnapshot(profileSnapshot: snapshot)
+				await send(.delegate(.importedProfileSnapshot(snapshot)))
+			} catch: { error, send in
+				await send(.delegate(.failedToImportProfileSnapshot(reason: "Failed to import ProfileSnapshot data, error: \(String(describing: error))")))
 			}
 
-		case let .internal(.importProfileDataFromFileAt(profileFileURL)):
-			return .run { send in
-				await send(.internal(.importProfileDataResult(TaskResult { try Data(contentsOf: profileFileURL, options: .uncached) })))
-			}
-
-		case let .internal(.importProfileDataResult(.success(profileData))):
-			return .run { [jsonDecoder] send in
-				await send(.internal(.importProfileSnapshotFromDataResult(TaskResult {
-					try jsonDecoder.decode(ProfileSnapshot.self, from: profileData)
-				})))
-			}
-
-		case let .internal(.importProfileDataResult(.failure(error))):
-			return .run { send in
-				await send(.coordinate(.failedToImportProfileSnapshot(reason: "Failed to import ProfileSnapshot data, error: \(String(describing: error))")))
-			}
-
-		case let .internal(.importProfileSnapshotFromDataResult(.success(profileSnapshot))):
-			return .run { send in
-				await send(.internal(.saveProfileSnapshot(profileSnapshot)))
-			}
-
-		case let .internal(.importProfileSnapshotFromDataResult(.failure(error))):
-			return .run { send in
-				await send(.coordinate(.failedToImportProfileSnapshot(reason: "Failed to import ProfileSnapshot from data, error: \(String(describing: error))")))
-			}
-
-		case let .internal(.saveProfileSnapshot(profileSnapshotToSave)):
-			return .run { [keychainClient] send in
-				await send(.internal(.saveProfileSnapshotResult(
-					TaskResult {
-						try keychainClient.saveProfileSnapshot(profileSnapshot: profileSnapshotToSave)
-					}.map { profileSnapshotToSave }
-				)))
-			}
-
-		case let .internal(.saveProfileSnapshotResult(.success(savedProfileSnapshot))):
-			return .run { send in
-				await send(.coordinate(.importedProfileSnapshot(savedProfileSnapshot)))
-			}
-
-		case let .internal(.saveProfileSnapshotResult(.failure(error))):
-			return .run { send in
-				await send(.coordinate(.failedToImportProfileSnapshot(reason: "Failed to save ProfileSnapshot, error: \(String(describing: error))")))
-			}
-
-		case .coordinate: return .none
+		case .delegate:
+			return .none
 		}
 	}
 }

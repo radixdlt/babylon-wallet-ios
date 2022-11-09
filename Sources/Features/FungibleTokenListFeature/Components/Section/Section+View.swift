@@ -26,7 +26,7 @@ public extension FungibleTokenList.Section.View {
 				ForEachStore(
 					store.scope(
 						state: \.assets,
-						action: FungibleTokenList.Section.Action.asset(id:action:)
+						action: { .child(.asset(id: $0, action: $1)) }
 					),
 					content: FungibleTokenList.Row.View.init(store:)
 				)

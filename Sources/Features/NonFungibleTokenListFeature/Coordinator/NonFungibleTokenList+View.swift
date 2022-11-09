@@ -26,7 +26,7 @@ public extension NonFungibleTokenList.View {
 				ForEachStore(
 					store.scope(
 						state: \.rows,
-						action: NonFungibleTokenList.Action.asset(id:action:)
+						action: { .child(.asset(id: $0, action: $1)) }
 					),
 					content: NonFungibleTokenList.Row.View.init(store:)
 				)

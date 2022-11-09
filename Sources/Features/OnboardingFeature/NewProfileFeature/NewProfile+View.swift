@@ -20,14 +20,14 @@ public extension NewProfile.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: NewProfile.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
 					HStack {
 						Button(
 							action: {
-								viewStore.send(.goBackButtonPressed)
+								viewStore.send(.backButtonPressed)
 							}, label: {
 								Image("arrow-back")
 							}
@@ -43,7 +43,7 @@ public extension NewProfile.View {
 						"Name of first acocunt",
 						text: viewStore.binding(
 							get: \.nameOfFirstAccount,
-							send: ViewAction.accountNameChanged
+							send: { .accountNameTextFieldChanged($0) }
 						)
 					)
 
@@ -78,29 +78,6 @@ extension NewProfile.View {
 			nameOfFirstAccount = state.nameOfFirstAccount
 			isLoaderVisible = state.isCreatingProfile
 			isCreateProfileButtonEnabled = state.canProceed && !state.isCreatingProfile
-		}
-	}
-}
-
-// MARK: - NewProfile.View.ViewAction
-extension NewProfile.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case accountNameChanged(String)
-		case createProfileButtonPressed
-		case goBackButtonPressed
-	}
-}
-
-extension NewProfile.Action {
-	init(action: NewProfile.View.ViewAction) {
-		switch action {
-		case let .accountNameChanged(accountName):
-			self = .internal(.user(.accountNameChanged(accountName)))
-		case .createProfileButtonPressed:
-			self = .internal(.user(.createProfile))
-		case .goBackButtonPressed:
-			self = .internal(.user(.goBack))
 		}
 	}
 }

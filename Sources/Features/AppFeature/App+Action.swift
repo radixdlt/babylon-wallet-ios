@@ -8,26 +8,35 @@ import SplashFeature
 public extension App {
 	// MARK: Action
 	enum Action: Equatable {
-		case main(Main.Action)
-		case onboarding(Onboarding.Action)
-		case splash(Splash.Action)
-
+		case child(ChildAction)
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
 	}
 }
 
-// MARK: - App.Action.CoordinatingAction
+// MARK: - App.Action.ChildAction
 public extension App.Action {
-	enum CoordinatingAction: Equatable {
-		case onboard
-		case toMain
-
-		case failedToCreateOrImportProfile(reason: String)
+	enum ChildAction: Equatable {
+		case main(Main.Action)
+		case onboarding(Onboarding.Action)
+		case splash(Splash.Action)
 	}
+}
 
+// MARK: - App.Action.InternalAction
+public extension App.Action {
 	enum InternalAction: Equatable {
+		case system(SystemAction)
+	}
+}
+
+// MARK: - App.Action.SystemAction
+public extension App.Action {
+	enum SystemAction: Equatable {
 		case injectProfileIntoProfileClient(Profile, persistIntoKeychain: Bool)
 		case injectProfileIntoProfileClientResult(TaskResult<Profile>)
+		case failedToCreateOrImportProfile(reason: String)
+
+		case goToOnboarding
+		case goToMain
 	}
 }

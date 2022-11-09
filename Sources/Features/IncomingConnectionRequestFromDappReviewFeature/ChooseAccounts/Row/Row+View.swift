@@ -19,7 +19,7 @@ public extension ChooseAccounts.Row.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: ChooseAccounts.Row.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			HStack {
 				VStack(alignment: .leading, spacing: 14) {
@@ -45,22 +45,6 @@ public extension ChooseAccounts.Row.View {
 			.onTapGesture {
 				viewStore.send(.didSelect)
 			}
-		}
-	}
-}
-
-// MARK: - ChooseAccounts.Row.View.ViewAction
-extension ChooseAccounts.Row.View {
-	enum ViewAction: Equatable {
-		case didSelect
-	}
-}
-
-extension ChooseAccounts.Row.Action {
-	init(action: ChooseAccounts.Row.View.ViewAction) {
-		switch action {
-		case .didSelect:
-			self = .internal(.user(.didSelect))
 		}
 	}
 }

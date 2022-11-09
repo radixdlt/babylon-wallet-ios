@@ -24,7 +24,7 @@ public extension ManageBrowserExtensionConnections.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: ManageBrowserExtensionConnections.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
 				ZStack {
@@ -34,7 +34,7 @@ public extension ManageBrowserExtensionConnections.View {
 					IfLetStore(
 						store.scope(
 							state: \.inputBrowserExtensionConnectionPassword,
-							action: ManageBrowserExtensionConnections.Action.inputBrowserExtensionConnectionPassword
+							action: { .child(.inputBrowserExtensionConnectionPassword($0)) }
 						),
 						then: { inputPasswordStore in
 							Screen(
@@ -54,7 +54,7 @@ public extension ManageBrowserExtensionConnections.View {
 					IfLetStore(
 						store.scope(
 							state: \.connectUsingPassword,
-							action: ManageBrowserExtensionConnections.Action.connectUsingPassword
+							action: { .child(.connectUsingPassword($0)) }
 						),
 						then: { connectUsingPasswordStore in
 							ForceFullScreen {
@@ -72,7 +72,7 @@ public extension ManageBrowserExtensionConnections.View {
 
 private extension ManageBrowserExtensionConnections.View {
 	func manageBrowserExtensionConnectionsView(
-		viewStore: ViewStore<ViewState, ViewAction>
+		viewStore: ViewStore<ViewState, ManageBrowserExtensionConnections.Action.ViewAction>
 	) -> some View {
 		Screen(
 			title: "Browser Connections",
@@ -85,7 +85,7 @@ private extension ManageBrowserExtensionConnections.View {
 						ForEachStore(
 							store.scope(
 								state: \.connections,
-								action: ManageBrowserExtensionConnections.Action.connection(id:action:)
+								action: { .child(.connection(id: $0, action: $1)) }
 							),
 							content: ManageBrowserExtensionConnection.View.init(store:)
 						)
@@ -94,18 +94,8 @@ private extension ManageBrowserExtensionConnections.View {
 				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped) }
 				Spacer()
 			}
-			.onAppear { viewStore.send(.viewDidAppear) }
+			.onAppear { viewStore.send(.viewAppeared) }
 		}
-	}
-}
-
-// MARK: - ManageBrowserExtensionConnections.View.ViewAction
-public extension ManageBrowserExtensionConnections.View {
-	enum ViewAction: Equatable {
-		case viewDidAppear
-		case dismissButtonTapped
-		case addNewConnectionButtonTapped
-		case dismissNewConnectionFlowButtonTapped
 	}
 }
 
@@ -116,21 +106,6 @@ public extension ManageBrowserExtensionConnections.View {
 
 		init(state: ManageBrowserExtensionConnections.State) {
 			connections = state.connections
-		}
-	}
-}
-
-extension ManageBrowserExtensionConnections.Action {
-	init(action: ManageBrowserExtensionConnections.View.ViewAction) {
-		switch action {
-		case .viewDidAppear:
-			self = .internal(.system(.viewDidAppear))
-		case .dismissButtonTapped:
-			self = .internal(.user(.dismiss))
-		case .addNewConnectionButtonTapped:
-			self = .internal(.user(.addNewConnection))
-		case .dismissNewConnectionFlowButtonTapped:
-			self = .internal(.user(.dismissNewConnectionFlow))
 		}
 	}
 }

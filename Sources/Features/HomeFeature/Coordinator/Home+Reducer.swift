@@ -257,73 +257,73 @@ public struct Home: ReducerProtocol {
 			print(reason)
 			return .none
 
-		case .child(.header(.coordinate(.displaySettings))):
+		case .child(.header(.delegate(.displaySettings))):
 			return .run { send in await send(.delegate(.displaySettings)) }
 
-		case .child(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))):
+		case .child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))):
 			return .run { send in await send(.internal(.system(.toggleIsCurrencyAmountVisible))) }
 
-		case .child(.visitHub(.coordinate(.displayHub))):
+		case .child(.visitHub(.delegate(.displayHub))):
 			return .fireAndForget {
 				await openURL(URL(string: "https://www.apple.com")!)
 			}
 
-		case .child(.accountList(.coordinate(.fetchPortfolioForAccounts))):
+		case .child(.accountList(.delegate(.fetchPortfolioForAccounts))):
 			return loadAccountsConnectionsAndSettings()
 
 		case let .internal(.system(.fetchPortfolioResult(.failure(error)))):
 			print("⚠️ failed to fetch portfolio, error: \(String(describing: error))")
 			return .none
 
-		case let .child(.accountList(.coordinate(.displayAccountDetails(account)))):
+		case let .child(.accountList(.delegate(.displayAccountDetails(account)))):
 			state.accountDetails = .init(for: account)
 			return .none
 
-		case let .child(.accountList(.coordinate(.copyAddress(address)))):
+		case let .child(.accountList(.delegate(.copyAddress(address)))):
 			return copyAddress(address)
 
-		case .child(.accountPreferences(.coordinate(.dismissAccountPreferences))):
+		case .child(.accountPreferences(.delegate(.dismissAccountPreferences))):
 			state.accountPreferences = nil
 			return .none
 
-		case .child(.accountDetails(.coordinate(.dismissAccountDetails))):
+		case .child(.accountDetails(.delegate(.dismissAccountDetails))):
 			state.accountDetails = nil
 			return .none
 
-		case .child(.accountDetails(.coordinate(.displayAccountPreferences))):
+		case .child(.accountDetails(.delegate(.displayAccountPreferences))):
 			state.accountPreferences = .init()
 			return .none
 
-		case let .child(.accountDetails(.coordinate(.copyAddress(address)))):
+		case let .child(.accountDetails(.delegate(.copyAddress(address)))):
 			return copyAddress(address)
 
-		case .child(.accountDetails(.coordinate(.displayTransfer))):
+		case .child(.accountDetails(.delegate(.displayTransfer))):
 			state.transfer = .init()
 			return .none
 
-		case let .child(.accountDetails(.coordinate(.refresh(address)))):
+		case let .child(.accountDetails(.delegate(.refresh(address)))):
 			return .run { send in
 				await send(.internal(.system(.accountPortfolioResult(TaskResult {
 					try await accountPortfolioFetcher.fetchPortfolio([address])
 				}))))
 			}
 
-		case .child(.accountDetails(.child(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))))):
+		case .child(.accountDetails(.child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))))):
 			return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
 
-		case .child(.transfer(.coordinate(.dismissTransfer))):
+		case .child(.transfer(.delegate(.dismissTransfer))):
 			state.transfer = nil
 			return .none
 
-		case .child(.createAccount(.coordinate(.dismissCreateAccount))):
+		case .child(.createAccount(.delegate(.dismissCreateAccount))):
 			state.createAccount = nil
 			return .none
 
-		case .child(.createAccount(.coordinate(.createdNewAccount))):
+		case .child(.createAccount(.delegate(.createdNewAccount))):
 			state.createAccount = nil
 			return loadAccountsConnectionsAndSettings()
 
-		case let .child(.createAccount(.coordinate(.failedToCreateNewAccount(reason: reason)))):
+		case let .child(.createAccount(.delegate(.failedToCreateNewAccount(reason: reason)))):
 			state.createAccount = nil
 			print("Failed to create account: \(reason)")
 			return .none

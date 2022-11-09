@@ -74,10 +74,10 @@ public extension Splash {
 				durationInMS = 700
 				#endif
 				try await environment.mainQueue.sleep(for: .milliseconds(durationInMS))
-				await send(.coordinate(actionToCoordinate))
+				await send(.delegate(actionToCoordinate))
 			}
 
-		case .coordinate:
+		case .delegate:
 			return .none
 		}
 	}

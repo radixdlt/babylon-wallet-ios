@@ -10,7 +10,7 @@ final class VisitHubTests: TestCase {
 			environment: Home.VisitHub.Environment()
 		)
 
-		store.send(.internal(.user(.visitHubButtonTapped)))
-		store.receive(.coordinate(.displayHub))
+		store.send(.internal(.view(.visitHubButtonTapped)))
+		store.receive(.delegate(.displayHub))
 	}
 }

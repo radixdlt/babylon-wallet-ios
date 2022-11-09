@@ -22,7 +22,7 @@ public extension AggregatedValue.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: AggregatedValue.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			AggregatedValueView(
 				value: viewStore.value,
@@ -41,15 +41,6 @@ extension AggregatedValue.View {
 	// MARK: ViewAction
 	enum ViewAction: Equatable {
 		case toggleVisibilityButtonTapped
-	}
-}
-
-extension AggregatedValue.Action {
-	init(action: AggregatedValue.View.ViewAction) {
-		switch action {
-		case .toggleVisibilityButtonTapped:
-			self = .internal(.user(.toggleVisibilityButtonTapped))
-		}
 	}
 }
 

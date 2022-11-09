@@ -5,9 +5,9 @@ public extension AccountDetails.Transfer {
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = Reducer { _, action, _ in
 		switch action {
-		case .internal(.user(.dismissTransfer)):
-			return Effect(value: .coordinate(.dismissTransfer))
-		case .coordinate:
+		case .internal(.view(.dismissTransferButtonTapped)):
+			return Effect(value: .delegate(.dismissTransfer))
+		case .delegate:
 			return .none
 		}
 	}

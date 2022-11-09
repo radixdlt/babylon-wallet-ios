@@ -25,7 +25,7 @@ public extension AccountDetails.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: AccountDetails.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
@@ -69,7 +69,7 @@ public extension AccountDetails.View {
 
 // MARK: - AccountDetails.View.AccountDetailsViewStore
 private extension AccountDetails.View {
-	typealias AccountDetailsViewStore = ComposableArchitecture.ViewStore<AccountDetails.View.ViewState, AccountDetails.View.ViewAction>
+	typealias AccountDetailsViewStore = ViewStore<AccountDetails.View.ViewState, AccountDetails.Action.ViewAction>
 }
 
 // MARK: - Private Methods
@@ -92,7 +92,7 @@ private extension AccountDetails.View {
 					// TODO: uncomment
 //					viewStore.send(.accountPreferencesButtonTapped)
 					// TODO: temp implementation just for testing pull to refresh
-					viewStore.send(.refreshTapped)
+					viewStore.send(.refreshButtonTapped)
 				}, label: {
 					Image("ellipsis")
 				}
@@ -111,35 +111,6 @@ private extension AccountDetails.View {
 				.background(Color.app.gray4)
 				.cornerRadius(6)
 		})
-	}
-}
-
-// MARK: - AccountDetails.View.ViewAction
-extension AccountDetails.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case dismissAccountDetailsButtonTapped
-		case accountPreferencesButtonTapped
-		case copyAddressButtonTapped
-		case transferButtonTapped
-		case refreshTapped
-	}
-}
-
-extension AccountDetails.Action {
-	init(action: AccountDetails.View.ViewAction) {
-		switch action {
-		case .dismissAccountDetailsButtonTapped:
-			self = .internal(.user(.dismissAccountDetails))
-		case .accountPreferencesButtonTapped:
-			self = .internal(.user(.displayAccountPreferences))
-		case .copyAddressButtonTapped:
-			self = .internal(.user(.copyAddress))
-		case .transferButtonTapped:
-			self = .internal(.user(.displayTransfer))
-		case .refreshTapped:
-			self = .internal(.user(.refresh))
-		}
 	}
 }
 

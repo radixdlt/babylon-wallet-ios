@@ -4,32 +4,33 @@ import Foundation
 public extension NonFungibleTokenList.Row {
 	// MARK: Action
 	enum Action: Equatable {
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
+		case delegate(DelegateAction)
+	}
+}
+
+// MARK: - NonFungibleTokenList.Row.Action.ViewAction
+public extension NonFungibleTokenList.Row.Action {
+	enum ViewAction: Equatable {
+		case isExpandedToggled
 	}
 }
 
 // MARK: - NonFungibleTokenList.Row.Action.InternalAction
 public extension NonFungibleTokenList.Row.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
+		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
-// MARK: - NonFungibleTokenList.Row.Action.InternalAction.UserAction
-public extension NonFungibleTokenList.Row.Action.InternalAction {
-	enum UserAction: Equatable {
-		case toggleIsExpanded
-	}
-}
-
-// MARK: - NonFungibleTokenList.Row.Action.InternalAction.SystemAction
-public extension NonFungibleTokenList.Row.Action.InternalAction {
+// MARK: - NonFungibleTokenList.Row.Action.SystemAction
+public extension NonFungibleTokenList.Row.Action {
 	enum SystemAction: Equatable {}
 }
 
-// MARK: - NonFungibleTokenList.Row.Action.CoordinatingAction
+// MARK: - NonFungibleTokenList.Row.Action.DelegateAction
 public extension NonFungibleTokenList.Row.Action {
-	enum CoordinatingAction: Equatable {}
+	enum DelegateAction: Equatable {}
 }

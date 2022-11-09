@@ -4,28 +4,29 @@ import Foundation
 public extension AccountDetails.Transfer {
 	// MARK: Action
 	enum Action: Equatable {
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
+		case delegate(DelegateAction)
+	}
+}
+
+// MARK: - AccountDetails.Transfer.Action.ViewAction
+public extension AccountDetails.Transfer.Action {
+	enum ViewAction: Equatable {
+		case dismissTransferButtonTapped
 	}
 }
 
 // MARK: - AccountDetails.Transfer.Action.InternalAction
 public extension AccountDetails.Transfer.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
+		case view(ViewAction)
 	}
 }
 
-// MARK: - AccountDetails.Transfer.Action.InternalAction.UserAction
-public extension AccountDetails.Transfer.Action.InternalAction {
-	enum UserAction: Equatable {
-		case dismissTransfer
-	}
-}
-
-// MARK: - AccountDetails.Transfer.Action.CoordinatingAction
+// MARK: - AccountDetails.Transfer.Action.DelegateAction
 public extension AccountDetails.Transfer.Action {
-	enum CoordinatingAction: Equatable {
+	enum DelegateAction: Equatable {
 		case dismissTransfer
 	}
 }

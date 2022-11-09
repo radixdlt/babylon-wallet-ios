@@ -6,25 +6,33 @@ import NonFungibleTokenListFeature
 public extension AssetsView {
 	// MARK: Action
 	enum Action: Equatable {
+		case child(ChildAction)
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
+		case delegate(DelegateAction)
+	}
+}
+
+// MARK: - AssetsView.Action.ChildAction
+public extension AssetsView.Action {
+	enum ChildAction: Equatable {
 		case fungibleTokenList(FungibleTokenList.Action)
 		case nonFungibleTokenList(NonFungibleTokenList.Action)
+	}
+}
+
+// MARK: - AssetsView.Action.ViewAction
+public extension AssetsView.Action {
+	enum ViewAction: Equatable {
+		case listSelectorTapped(AssetsView.AssetsViewType)
 	}
 }
 
 // MARK: - AssetsView.Action.InternalAction
 public extension AssetsView.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
+		case view(ViewAction)
 		case system(SystemAction)
-	}
-}
-
-// MARK: - AssetsView.Action.InternalAction.UserAction
-public extension AssetsView.Action.InternalAction {
-	enum UserAction: Equatable {
-		case listSelectorTapped(AssetsView.AssetsViewType)
 	}
 }
 
@@ -33,7 +41,7 @@ public extension AssetsView.Action.InternalAction {
 	enum SystemAction: Equatable {}
 }
 
-// MARK: - AssetsView.Action.CoordinatingAction
+// MARK: - AssetsView.Action.DelegateAction
 public extension AssetsView.Action {
-	enum CoordinatingAction: Equatable {}
+	enum DelegateAction: Equatable {}
 }

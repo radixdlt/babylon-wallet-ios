@@ -6,7 +6,7 @@ public extension FungibleTokenList {
 	static let reducer = Reducer.combine(
 		FungibleTokenList.Section.reducer.forEach(
 			state: \.sections,
-			action: /FungibleTokenList.Action.section,
+			action: /Action.child .. Action.ChildAction.section,
 			environment: { _ in FungibleTokenList.Section.Environment() }
 		),
 
@@ -14,9 +14,7 @@ public extension FungibleTokenList {
 			switch action {
 			case .internal:
 				return .none
-			case .coordinate:
-				return .none
-			case .section:
+			case .child, .delegate:
 				return .none
 			}
 		}

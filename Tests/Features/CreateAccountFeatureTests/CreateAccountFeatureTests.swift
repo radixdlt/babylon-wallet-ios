@@ -15,10 +15,10 @@ final class CreateAccountFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.dismiss)))
+		_ = await store.send(.internal(.view(.closeButtonTapped)))
 
 		// then
-		await store.receive(.coordinate(.dismissCreateAccount))
+		await store.receive(.delegate(.dismissCreateAccount))
 	}
 
 	func test_textFieldDidChange_whenUserEntersValidAccountName_thenUpdateState() async {
@@ -36,7 +36,7 @@ final class CreateAccountFeatureTests: TestCase {
 		let accountName = "My account"
 
 		// when
-		_ = await store.send(.internal(.user(.textFieldDidChange(accountName)))) {
+		_ = await store.send(.internal(.view(.textFieldChanged(accountName)))) {
 			// then
 			$0.isValid = true
 			$0.accountName = accountName
@@ -59,7 +59,7 @@ final class CreateAccountFeatureTests: TestCase {
 		accountName = "My account dummy name" // character count == 21, over the limit
 
 		// when
-		_ = await store.send(.internal(.user(.textFieldDidChange(accountName))))
+		_ = await store.send(.internal(.view(.textFieldChanged(accountName))))
 		// then
 		// no state change occured
 	}
@@ -79,11 +79,11 @@ final class CreateAccountFeatureTests: TestCase {
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 
 		// when
-		_ = await store.send(.internal(.system(.viewDidAppear)))
+		_ = await store.send(.internal(.view(.viewAppeared)))
 
 		// then
 		await testScheduler.advance(by: .seconds(0.5))
-		await store.receive(.internal(.system(.focusTextField))) {
+		await store.receive(.internal(.system(.focusTextField(.accountName)))) {
 			$0.focusedField = .accountName
 		}
 	}

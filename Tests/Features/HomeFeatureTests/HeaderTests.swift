@@ -10,7 +10,7 @@ final class HeaderTests: TestCase {
 			environment: Home.Header.Environment()
 		)
 
-		store.send(.internal(.user(.settingsButtonTapped)))
-		store.receive(.coordinate(.displaySettings))
+		store.send(.internal(.view(.settingsButtonTapped)))
+		store.receive(.delegate(.displaySettings))
 	}
 }

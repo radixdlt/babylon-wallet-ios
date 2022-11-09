@@ -18,7 +18,7 @@ public extension ImportMnemonic {
 		switch action {
 		case .internal(.goBack):
 			return .run { send in
-				await send(.coordinate(.goBack))
+				await send(.delegate(.goBack))
 			}
 
 		case let .internal(.phraseOfMnemonicToImportChanged(phraseOfMnemonicToImport)):
@@ -36,7 +36,7 @@ public extension ImportMnemonic {
 
 		case let .internal(.importMnemonicResult(.failure(error))):
 			return .run { send in
-				await send(.coordinate(.failedToImportMnemonicOrProfile(reason: "Failed to import mnemonic, error: \(String(describing: error))")))
+				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to import mnemonic, error: \(String(describing: error))")))
 			}
 
 		case .internal(.saveImportedMnemonic):
@@ -63,7 +63,7 @@ public extension ImportMnemonic {
 
 		case let .internal(.saveImportedMnemonicResult(.failure(error))):
 			return .run { send in
-				await send(.coordinate(.failedToImportMnemonicOrProfile(reason: "Failed to save mnemonic to keychain, error: \(String(describing: error))")))
+				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to save mnemonic to keychain, error: \(String(describing: error))")))
 			}
 
 		case let .internal(.saveImportedMnemonicResult(.success(mnemonic))):
@@ -79,20 +79,20 @@ public extension ImportMnemonic {
 
 		case let .internal(.profileFromSnapshotResult(.failure(error))):
 			return .run { send in
-				await send(.coordinate(.failedToImportMnemonicOrProfile(reason: "Failed to import profile from snapshot, error: \(String(describing: error))")))
+				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to import profile from snapshot, error: \(String(describing: error))")))
 			}
 
 		case let .internal(.profileFromSnapshotResult(.success(profile))):
 			guard let mnemonic = state.savedMnemonic else {
 				return .run { send in
-					await send(.coordinate(.failedToImportMnemonicOrProfile(reason: "Expected to have saved mnemonic.")))
+					await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Expected to have saved mnemonic.")))
 				}
 			}
 			return .run { send in
-				await send(.coordinate(.finishedImporting(mnemonic: mnemonic, andProfile: profile)))
+				await send(.delegate(.finishedImporting(mnemonic: mnemonic, andProfile: profile)))
 			}
 
-		case .coordinate:
+		case .delegate:
 			return .none
 		}
 	}

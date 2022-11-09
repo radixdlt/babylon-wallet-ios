@@ -7,7 +7,7 @@ public extension FungibleTokenList.Row {
 		switch action {
 		case .internal:
 			return .none
-		case .coordinate:
+		case .delegate:
 			return .none
 		}
 	}

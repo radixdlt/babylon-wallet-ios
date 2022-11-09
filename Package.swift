@@ -340,6 +340,7 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Common",
+			"Data",
 			"KeychainClientDependency",
 			"ProfileClient",
 			tca,
@@ -542,6 +543,13 @@ package.addModules([
 		tests: .yes(dependencies: [
 			"TestUtils",
 		])
+	),
+	.client(
+		name: "Data",
+		dependencies: [
+			dependencies,
+		],
+		tests: .no
 	),
 	.client(
 		name: "EngineToolkitClient",

@@ -19,7 +19,7 @@ public extension Onboarding.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: Onboarding.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			ZStack {
 				ForceFullScreen {
@@ -51,7 +51,7 @@ public extension Onboarding.View {
 				IfLetStore(
 					store.scope(
 						state: \.newProfile,
-						action: Onboarding.Action.newProfile
+						action: { .child(.newProfile($0)) }
 					),
 					then: { newProfileStore in
 						ForceFullScreen {
@@ -64,7 +64,7 @@ public extension Onboarding.View {
 				IfLetStore(
 					store.scope(
 						state: \.importProfile,
-						action: Onboarding.Action.importProfile
+						action: { .child(.importProfile($0)) }
 					),
 					then: { importProfileStore in
 						ForceFullScreen {
@@ -77,7 +77,7 @@ public extension Onboarding.View {
 				IfLetStore(
 					store.scope(
 						state: \.importMnemonic,
-						action: Onboarding.Action.importMnemonic
+						action: { .child(.importMnemonic($0)) }
 					),
 					then: { importMnemonicStore in
 						ForceFullScreen {
@@ -91,15 +91,6 @@ public extension Onboarding.View {
 	}
 }
 
-// MARK: - Onboarding.View.ViewAction
-extension Onboarding.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case newProfileButtonTapped
-		case importProfileButtonTapped
-	}
-}
-
 // MARK: - Onboarding.View.ViewState
 extension Onboarding.View {
 	struct ViewState: Equatable {
@@ -110,17 +101,6 @@ extension Onboarding.View {
 			newProfile = state.newProfile
 			importProfile = state.importProfile
 			importMnemonic = state.importMnemonic
-		}
-	}
-}
-
-extension Onboarding.Action {
-	init(action: Onboarding.View.ViewAction) {
-		switch action {
-		case .importProfileButtonTapped:
-			self = .internal(.user(.importProfile))
-		case .newProfileButtonTapped:
-			self = .internal(.user(.newProfile))
 		}
 	}
 }

@@ -10,12 +10,18 @@ import Profile
 // MARK: - ManageBrowserExtensionConnections.Action
 public extension ManageBrowserExtensionConnections {
 	enum Action: Equatable {
-		case coordinate(CoordinateAction)
+		case child(ChildAction)
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
+		case delegate(DelegateAction)
+	}
+}
 
+// MARK: - ManageBrowserExtensionConnections.Action.ChildAction
+public extension ManageBrowserExtensionConnections.Action {
+	enum ChildAction: Equatable {
 		case inputBrowserExtensionConnectionPassword(InputPassword.Action)
 		case connectUsingPassword(ConnectUsingPassword.Action)
-
 		case connection(
 			id: ManageBrowserExtensionConnection.State.ID,
 			action: ManageBrowserExtensionConnection.Action
@@ -23,26 +29,32 @@ public extension ManageBrowserExtensionConnections {
 	}
 }
 
+// MARK: - ManageBrowserExtensionConnections.Action.ViewAction
 public extension ManageBrowserExtensionConnections.Action {
-	enum CoordinateAction: Equatable {
-		case dismiss
+	enum ViewAction: Equatable {
+		case viewAppeared
+		case dismissButtonTapped
+		case addNewConnectionButtonTapped
+		case dismissNewConnectionFlowButtonTapped
 	}
+}
 
+// MARK: - ManageBrowserExtensionConnections.Action.InternalAction
+public extension ManageBrowserExtensionConnections.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
-		case coordinate(CoordinateAction)
+		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
-// MARK: - ManageBrowserExtensionConnections.Action.InternalAction.CoordinateAction
+// MARK: - ManageBrowserExtensionConnections.Action.InternalAction.SystemAction
 public extension ManageBrowserExtensionConnections.Action.InternalAction {
-	enum CoordinateAction: Equatable {
+	enum SystemAction: Equatable {
+		case successfullyOpenedConnectionToBrowser(Connection)
+
 		case initConnectionSecretsResult(TaskResult<ConnectionSecrets>)
-		case loadConnections
 		case loadConnectionsResult(TaskResult<[BrowserExtensionWithConnectionStatus]>)
 
-		case saveNewConnection(StatefulBrowserConnection)
 		case saveNewConnectionResult(TaskResult<StatefulBrowserConnection>)
 
 		case deleteConnectionResult(TaskResult<BrowserExtensionConnection.ID>)
@@ -50,19 +62,9 @@ public extension ManageBrowserExtensionConnections.Action.InternalAction {
 	}
 }
 
-// MARK: - ManageBrowserExtensionConnections.Action.InternalAction.SystemAction
-public extension ManageBrowserExtensionConnections.Action.InternalAction {
-	enum SystemAction: Equatable {
-		case viewDidAppear
-		case successfullyOpenedConnectionToBrowser(Connection)
-	}
-}
-
-// MARK: - ManageBrowserExtensionConnections.Action.UserAction
+// MARK: - ManageBrowserExtensionConnections.Action.DelegateAction
 public extension ManageBrowserExtensionConnections.Action {
-	enum UserAction: Equatable {
+	enum DelegateAction: Equatable {
 		case dismiss
-		case addNewConnection
-		case dismissNewConnectionFlow
 	}
 }

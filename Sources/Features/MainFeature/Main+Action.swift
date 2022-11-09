@@ -6,7 +6,7 @@ public extension Main {
 	// MARK: Action
 	enum Action: Equatable {
 		case child(ChildAction)
-		case coordinate(CoordinateAction)
+		case delegate(Delegate)
 	}
 }
 
@@ -18,9 +18,9 @@ public extension Main.Action {
 	}
 }
 
-// MARK: - Main.Action.CoordinateAction
+// MARK: - Main.Action.Delegate
 public extension Main.Action {
-	enum CoordinateAction: Equatable {
+	enum Delegate: Equatable {
 		case removedWallet
 	}
 }

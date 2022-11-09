@@ -40,10 +40,10 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.dismissAccountDetails)))
+		_ = await store.send(.internal(.view(.dismissAccountDetailsButtonTapped)))
 
 		// then
-		await store.receive(.coordinate(.dismissAccountDetails))
+		await store.receive(.delegate(.dismissAccountDetails))
 	}
 
 	func test_navigateToAccountPreferences_whenTappedOnPreferencesButton_thenCoordinateNavigationToPreferences() async {
@@ -58,10 +58,10 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.displayAccountPreferences)))
+		_ = await store.send(.internal(.view(.displayAccountPreferencesButtonTapped)))
 
 		// then
-		await store.receive(.coordinate(.displayAccountPreferences))
+		await store.receive(.delegate(.displayAccountPreferences))
 	}
 
 	func test_copyAddress_whenTappedOnCopyAddress_thenCoordiateCopiedAddress() async {
@@ -76,10 +76,10 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.copyAddress)))
+		_ = await store.send(.internal(.view(.copyAddressButtonTapped)))
 
 		// then
-		await store.receive(.coordinate(.copyAddress(store.state.address)))
+		await store.receive(.delegate(.copyAddress(store.state.address)))
 	}
 
 	func test_refresh_whenInitiatedRefresh_thenCoordinateRefreshForAddress() async {
@@ -94,10 +94,10 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.refresh)))
+		_ = await store.send(.internal(.view(.refreshButtonTapped)))
 
 		// then
-		await store.receive(.coordinate(.refresh(store.state.address)))
+		await store.receive(.delegate(.refresh(store.state.address)))
 	}
 
 	func test_displayTransfer_whenTappedOnDisplayTransfer_thenCoordinateNavigationToTransfer() async {
@@ -112,8 +112,8 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.displayTransfer)))
+		_ = await store.send(.internal(.view(.transferButtonTapped)))
 
-		await store.receive(.coordinate(.displayTransfer))
+		await store.receive(.delegate(.displayTransfer))
 	}
 }

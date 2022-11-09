@@ -21,7 +21,7 @@ public extension AccountPreferences.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: AccountPreferences.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			// TODO: implement
 			ForceFullScreen {
@@ -30,28 +30,11 @@ public extension AccountPreferences.View {
 						.background(Color.yellow)
 						.foregroundColor(.red)
 					Button(
-						action: { viewStore.send(.dismissAccountPreferencesButtonTapped) },
+						action: { viewStore.send(.dismissButtonTapped) },
 						label: { Text("Dismiss AccountPreferences") }
 					)
 				}
 			}
-		}
-	}
-}
-
-// MARK: - AccountPreferences.View.ViewAction
-extension AccountPreferences.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case dismissAccountPreferencesButtonTapped
-	}
-}
-
-extension AccountPreferences.Action {
-	init(action: AccountPreferences.View.ViewAction) {
-		switch action {
-		case .dismissAccountPreferencesButtonTapped:
-			self = .internal(.user(.dismissAccountPreferences))
 		}
 	}
 }

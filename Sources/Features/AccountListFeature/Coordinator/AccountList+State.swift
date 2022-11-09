@@ -12,11 +12,11 @@ public extension AccountList {
 	// MARK: State
 	struct State: Equatable {
 		public var accounts: IdentifiedArrayOf<AccountList.Row.State>
-		public var alert: AlertState<Action>?
+		public var alert: AlertState<Action.ViewAction>?
 
 		public init(
 			accounts: IdentifiedArrayOf<AccountList.Row.State>,
-			alert: AlertState<Action>? = nil
+			alert: AlertState<Action.ViewAction>? = nil
 		) {
 			self.accounts = accounts
 			self.alert = alert

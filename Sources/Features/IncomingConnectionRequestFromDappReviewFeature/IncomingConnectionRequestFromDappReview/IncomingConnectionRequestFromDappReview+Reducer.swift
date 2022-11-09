@@ -7,19 +7,21 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocol<State, Action> {
-		Scope(state: \State.chooseAccounts!, action: /Action.chooseAccounts) {
+		Scope(state: \State.chooseAccounts!, action: /Action.child .. Action.ChildAction.chooseAccounts) {
 			ChooseAccounts()
 		}
 		Reduce { state, action in
 			switch action {
-			case .internal(.user(.dismissIncomingConnectionRequest)):
+			case .internal(.view(.dismissButtonTapped)):
 				return .run { send in
 					await send(.delegate(.dismiss))
 				}
 
-			case .internal(.user(.proceedWithConnectionRequest)):
+			case .internal(.view(.continueButtonTapped)):
 				return .run { send in
-					await send(.internal(.coordinate(.proceedWithConnectionRequest)))
+					await send(.internal(.system(.loadAccountsResult(TaskResult {
+						try profileClient.getAccounts()
+					}))))
 				}
 
 			case let .internal(.system(.loadAccountsResult(.success(accounts)))):
@@ -35,21 +37,11 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 				print("⚠️ failed to load accounts, error: \(String(describing: error))")
 				return .none
 
-			case .internal(.coordinate(.proceedWithConnectionRequest)):
-				return .run { send in
-					await send(.internal(.system(.loadAccountsResult(TaskResult {
-						try profileClient.getAccounts()
-					}))))
-				}
-
-			case .internal(.coordinate(.dismissIncomingConnectionRequest)):
-				return .none
-
-			case .chooseAccounts(.coordinate(.dismissChooseAccounts)):
+			case .child(.chooseAccounts(.delegate(.dismissChooseAccounts))):
 				state.chooseAccounts = nil
 				return .none
 
-			case let .chooseAccounts(.coordinate(.finishedChoosingAccounts(chosenAccounts))):
+			case let .child(.chooseAccounts(.delegate(.finishedChoosingAccounts(chosenAccounts)))):
 				state.chooseAccounts = nil
 				return .run { [incomingMessageFromBrowser = state.incomingMessageFromBrowser] send in
 					await send(.delegate(
@@ -57,9 +49,7 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 					))
 				}
 
-			case .chooseAccounts:
-				return .none
-			case .delegate:
+			case .child, .delegate:
 				return .none
 			}
 		}

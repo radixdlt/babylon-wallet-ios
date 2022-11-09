@@ -6,18 +6,13 @@ import Profile
 // MARK: - ImportMnemonic.Action
 public extension ImportMnemonic {
 	enum Action: Equatable {
-		case coordinate(CoordinateAction)
 		case `internal`(InternalAction)
+		case delegate(DelegateAction)
 	}
 }
 
+// MARK: - ImportMnemonic.InternalAction
 public extension ImportMnemonic {
-	enum CoordinateAction: Equatable {
-		case goBack
-		case finishedImporting(mnemonic: Mnemonic, andProfile: Profile)
-		case failedToImportMnemonicOrProfile(reason: String)
-	}
-
 	enum InternalAction: Equatable {
 		case goBack
 		case phraseOfMnemonicToImportChanged(String)
@@ -28,5 +23,14 @@ public extension ImportMnemonic {
 
 		case importProfileFromSnapshot
 		case profileFromSnapshotResult(TaskResult<Profile>)
+	}
+}
+
+// MARK: - ImportMnemonic.DelegateAction
+public extension ImportMnemonic {
+	enum DelegateAction: Equatable {
+		case goBack
+		case finishedImporting(mnemonic: Mnemonic, andProfile: Profile)
+		case failedToImportMnemonicOrProfile(reason: String)
 	}
 }

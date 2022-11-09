@@ -40,18 +40,18 @@ public extension Main {
 				state.settings = .init()
 				return .none
 
-			case .child(.settings(.coordinate(.deleteProfileAndFactorSources))):
+			case .child(.settings(.delegate(.deleteProfileAndFactorSources))):
 				return .run { send in
 					try environment.keychainClient.removeAllFactorSourcesAndProfileSnapshot()
 					try await environment.profileClient.deleteProfileSnapshot()
-					await send(.coordinate(.removedWallet))
+					await send(.delegate(.removedWallet))
 				}
 
-			case .child(.settings(.coordinate(.dismissSettings))):
+			case .child(.settings(.delegate(.dismissSettings))):
 				state.settings = nil
 				return .none
 
-			case .child, .coordinate:
+			case .child, .delegate:
 				return .none
 			}
 		}

@@ -17,13 +17,14 @@ public extension ImportProfile.View {
 	var body: some View {
 		WithViewStore(
 			store,
-			observe: { $0 }
+			observe: { $0 },
+			send: { .view($0) }
 		) { viewStore in
 			VStack {
 				HStack {
 					Button(
 						action: {
-							viewStore.send(.internal(.goBack))
+							viewStore.send(.goBack)
 						}, label: {
 							Image("arrow-back")
 						}
@@ -36,7 +37,7 @@ public extension ImportProfile.View {
 				Spacer()
 
 				Button("Import Profile") {
-					viewStore.send(.internal(.importProfileFile))
+					viewStore.send(.importProfileFileButtonTapped)
 				}
 				.buttonStyle(.borderedProminent)
 				Spacer()
@@ -44,13 +45,10 @@ public extension ImportProfile.View {
 			.fileImporter(
 				isPresented: viewStore.binding(
 					get: \.isDisplayingFileImporter,
-					send: ImportProfile.Action.internal(.dismissFileimporter)
+					send: .dismissFileImporter
 				),
 				allowedContentTypes: [.profile],
-				onCompletion: {
-					let taskResult: TaskResult<URL> = TaskResult($0)
-					viewStore.send(.internal(.importProfileFileResult(taskResult)))
-				}
+				onCompletion: { viewStore.send(.profileImported($0.mapError { $0 as NSError })) }
 			)
 		}
 	}

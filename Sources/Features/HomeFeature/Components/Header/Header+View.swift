@@ -14,7 +14,7 @@ public extension Home.Header.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: Home.Header.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			VStack(alignment: .leading) {
 				TitleView(
@@ -25,23 +25,6 @@ public extension Home.Header.View {
 				)
 				subtitleView
 			}
-		}
-	}
-}
-
-// MARK: - Home.Header.View.ViewAction
-extension Home.Header.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case settingsButtonTapped
-	}
-}
-
-extension Home.Header.Action {
-	init(action: Home.Header.View.ViewAction) {
-		switch action {
-		case .settingsButtonTapped:
-			self = .internal(.user(.settingsButtonTapped))
 		}
 	}
 }
