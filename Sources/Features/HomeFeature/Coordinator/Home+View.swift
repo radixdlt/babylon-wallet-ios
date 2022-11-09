@@ -29,7 +29,7 @@ public extension Home.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: Home.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
 				ZStack {
@@ -42,7 +42,7 @@ public extension Home.View {
 					IfLetStore(
 						store.scope(
 							state: \.createAccount,
-							action: Home.Action.createAccount
+							action: { .child(.createAccount($0)) }
 						),
 						then: CreateAccount.View.init(store:)
 					)
@@ -51,7 +51,7 @@ public extension Home.View {
 					IfLetStore(
 						store.scope(
 							state: \.accountDetails,
-							action: Home.Action.accountDetails
+							action: { .child(.accountDetails($0)) }
 						),
 						then: AccountDetails.View.init(store:)
 					)
@@ -60,7 +60,7 @@ public extension Home.View {
 					IfLetStore(
 						store.scope(
 							state: \.accountPreferences,
-							action: Home.Action.accountPreferences
+							action: { .child(.accountPreferences($0)) }
 						),
 						then: AccountPreferences.View.init(store:)
 					)
@@ -69,7 +69,7 @@ public extension Home.View {
 					IfLetStore(
 						store.scope(
 							state: \.transfer,
-							action: Home.Action.transfer
+							action: { .child(.transfer($0)) }
 						),
 						then: AccountDetails.Transfer.View.init(store:)
 					)
@@ -78,7 +78,7 @@ public extension Home.View {
 					IfLetStore(
 						store.scope(
 							state: \.chooseAccountRequestFromDapp,
-							action: Home.Action.chooseAccountRequestFromDapp
+							action: { .child(.chooseAccountRequestFromDapp($0)) }
 						),
 						then: IncomingConnectionRequestFromDappReview.View.init(store:)
 					)
@@ -87,33 +87,13 @@ public extension Home.View {
 					IfLetStore(
 						store.scope(
 							state: \.transactionSigning,
-							action: Home.Action.transactionSigning
+							action: { .child(.transactionSigning($0)) }
 						),
 						then: TransactionSigning.View.init(store:)
 					)
 					.zIndex(6)
 				}
 			}
-		}
-	}
-}
-
-// MARK: - Home.View.ViewAction
-extension Home.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case createAccountButtonTapped
-		case didAppear
-	}
-}
-
-extension Home.Action {
-	init(action: Home.View.ViewAction) {
-		switch action {
-		case .didAppear:
-			self = .internal(.system(.viewDidAppear))
-		case .createAccountButtonTapped:
-			self = .internal(.user(.createAccountButtonTapped))
 		}
 	}
 }
@@ -140,12 +120,12 @@ private extension Home.View {
 		}
 	}
 
-	func homeView(with viewStore: ViewStore<Home.View.ViewState, Home.View.ViewAction>) -> some View {
+	func homeView(with viewStore: ViewStore<Home.View.ViewState, Home.Action.ViewAction>) -> some View {
 		VStack {
 			Home.Header.View(
 				store: store.scope(
 					state: \.header,
-					action: Home.Action.header
+					action: { .child(.header($0)) }
 				)
 			)
 			.padding([.leading, .trailing, .top], 24)
@@ -157,14 +137,14 @@ private extension Home.View {
 						AggregatedValue.View(
 							store: store.scope(
 								state: \.aggregatedValue,
-								action: Home.Action.aggregatedValue
+								action: { .child(.aggregatedValue($0)) }
 							)
 						)
 					}
 					AccountList.View(
 						store: store.scope(
 							state: \.accountList,
-							action: Home.Action.accountList
+							action: { .child(.accountList($0)) }
 						)
 					)
 					createAccountButton {
@@ -175,7 +155,7 @@ private extension Home.View {
 					Home.VisitHub.View(
 						store: store.scope(
 							state: \.visitHub,
-							action: Home.Action.visitHub
+							action: { .child(.visitHub($0)) }
 						)
 					)
 				}

@@ -21,7 +21,7 @@ public extension Main.View {
 			Home.View(
 				store: store.scope(
 					state: \.home,
-					action: Main.Action.home
+					action: { .child(.home($0)) }
 				)
 			)
 			.zIndex(0)
@@ -29,7 +29,7 @@ public extension Main.View {
 			IfLetStore(
 				store.scope(
 					state: \.settings,
-					action: Main.Action.settings
+					action: { .child(.settings($0)) }
 				),
 				then: Settings.View.init(store:)
 			)

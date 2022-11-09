@@ -6,8 +6,15 @@ import Profile
 public extension AccountDetails {
 	// MARK: Action
 	enum Action: Equatable {
+		case child(ChildAction)
 		case `internal`(InternalAction)
 		case coordinate(CoordinatingAction)
+	}
+}
+
+// MARK: - AccountDetails.Action.ChildAction
+public extension AccountDetails.Action {
+	enum ChildAction: Equatable {
 		case aggregatedValue(AggregatedValue.Action)
 		case assets(AssetsView.Action)
 	}

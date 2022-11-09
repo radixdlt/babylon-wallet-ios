@@ -9,14 +9,14 @@ public extension AccountDetails {
 		AggregatedValue.reducer
 			.pullback(
 				state: \.aggregatedValue,
-				action: /AccountDetails.Action.aggregatedValue,
+				action: /AccountDetails.Action.child .. AccountDetails.Action.ChildAction.aggregatedValue,
 				environment: { _ in AggregatedValue.Environment() }
 			),
 
 		AssetsView.reducer
 			.pullback(
 				state: \.assets,
-				action: /AccountDetails.Action.assets,
+				action: /AccountDetails.Action.child .. AccountDetails.Action.ChildAction.assets,
 				environment: { _ in AssetsView.Environment() }
 			),
 
@@ -32,13 +32,9 @@ public extension AccountDetails {
 				}
 			case .internal(.user(.refresh)):
 				return Effect(value: .coordinate(.refresh(state.address)))
-			case .coordinate:
-				return .none
-			case .aggregatedValue:
-				return .none
 			case .internal(.user(.displayTransfer)):
 				return Effect(value: .coordinate(.displayTransfer))
-			case .assets:
+			case .child, .coordinate:
 				return .none
 			}
 		}

@@ -177,7 +177,7 @@ final class HomeFeatureTests: TestCase {
 			return true
 		}
 
-		_ = await store.send(.visitHub(.coordinate(.displayHub)))
+		_ = await store.send(.child(.visitHub(.coordinate(.displayHub))))
 
 		await openedURL.withValue { openedURL in
 			XCTAssertEqual(openedURL, URL(string: "https://www.apple.com")!)
