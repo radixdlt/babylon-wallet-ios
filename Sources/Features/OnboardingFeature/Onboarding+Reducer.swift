@@ -24,16 +24,16 @@ public extension Onboarding {
 				state.importProfile = .init()
 				return .none
 
-			case .child(.importProfile(.coordinate(.goBack))):
+			case .child(.importProfile(.delegate(.goBack))):
 				state.importProfile = nil
 				return .none
 
-			case let .child(.importProfile(.coordinate(.failedToImportProfileSnapshot(importFailureReason)))):
+			case let .child(.importProfile(.delegate(.failedToImportProfileSnapshot(importFailureReason)))):
 				return .run { send in
 					await send(.delegate(.failedToCreateOrImportProfile(reason: "Import failed: \(importFailureReason)")))
 				}
 
-			case let .child(.importProfile(.coordinate(.importedProfileSnapshot(profileSnapshot)))):
+			case let .child(.importProfile(.delegate(.importedProfileSnapshot(profileSnapshot)))):
 				state.importMnemonic = .init(importedProfileSnapshot: profileSnapshot)
 				return .none
 

@@ -12,8 +12,8 @@ final class ImportProfileFeatureTests: TestCase {
 	)
 
 	func test__GIVEN__action_goBack__WHEN__reducer_is_run__THEN__it_coordinates_to_goBack() async throws {
-		_ = await sut.send(ImportProfile.Action.internal(.goBack))
-		_ = await sut.receive(.coordinate(.goBack))
+		_ = await sut.send(.internal(.view(.goBack)))
+		_ = await sut.receive(.delegate(.goBack))
 	}
 
 	func test__GIVEN_fileImport_not_displayed__WHEN__user_wants_to_import_a_profile__THEN__fileImported_displayed() async throws {
@@ -22,7 +22,7 @@ final class ImportProfileFeatureTests: TestCase {
 			reducer: ImportProfile()
 		)
 
-		_ = await sut.send(.internal(.importProfileFile)) {
+		_ = await sut.send(.internal(.view(.importProfileFileButtonTapped))) {
 			$0.isDisplayingFileImporter = true
 		}
 	}
@@ -33,26 +33,28 @@ final class ImportProfileFeatureTests: TestCase {
 			reducer: ImportProfile()
 		)
 
-		_ = await sut.send(.internal(.dismissFileimporter)) {
+		_ = await sut.send(.internal(.view(.dismissFileImporter))) {
 			$0.isDisplayingFileImporter = false
 		}
 	}
 
-	func test__GIVEN__valid_profileSnapshot_json_data__WHEN__data_imported__THEN__data_gets_decoded() async throws {
-		sut.dependencies.keychainClient = .mocked
+	func test__GIVEN__a_corrupted_profileSnapshot__WHEN__it_is_decoded__THEN__reducer_delegates_error() async throws {
+		sut.dependencies.data = .init(dataFromURL: { _, _ in
+			Data("deadbeef".utf8) // invalid data
+		})
 		sut.dependencies.jsonDecoder = .iso8601
-		_ = await sut.send(.internal(.importProfileDataResult(.success(profileSnapshotData))))
-		_ = await sut.receive(.internal(.importProfileSnapshotFromDataResult(.success(profileSnapshot))))
+
+		_ = await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
+		_ = await sut.receive(.delegate(.failedToImportProfileSnapshot(reason: "Failed to import ProfileSnapshot data, error: dataCorrupted(Swift.DecodingError.Context(codingPath: [], debugDescription: \"The given data was not valid JSON.\", underlyingError: Optional(Error Domain=NSCocoaErrorDomain Code=3840 \"Invalid value around line 1, column 0.\" UserInfo={NSDebugDescription=Invalid value around line 1, column 0., NSJSONSerializationErrorIndex=0})))")))
 	}
 
-	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__it_gets_saved() async throws {
-		sut.dependencies.keychainClient = .mocked
+	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__reducer_calls_save_on_keychainClient_and_delegates_snapshot() async throws {
+		sut.dependencies.data = .init(dataFromURL: { url, options in
+			XCTAssertEqual(url, URL(string: "file://profiledataurl")!)
+			XCTAssertEqual(options, .uncached)
+			return self.profileSnapshotData
+		})
 		sut.dependencies.jsonDecoder = .iso8601
-		_ = await sut.send(.internal(.importProfileSnapshotFromDataResult(.success(profileSnapshot))))
-		_ = await sut.receive(.internal(.saveProfileSnapshot(profileSnapshot)))
-	}
-
-	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_saved__THEN__reducer_calls_save_on_keychainClient() async throws {
 		let keychainDataGotCalled = ActorIsolated<Data?>(nil)
 		let keychainSetDataExpectation = expectation(description: "setDataForKey should be called on Keychain client")
 		sut.dependencies.keychainClient.setDataDataForKey = { data, key in
@@ -63,8 +65,8 @@ final class ImportProfileFeatureTests: TestCase {
 				}
 			}
 		}
-		_ = await sut.send(.internal(.saveProfileSnapshot(profileSnapshot)))
-		_ = await sut.receive(.internal(.saveProfileSnapshotResult(.success(profileSnapshot))))
+		_ = await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
+		_ = await sut.receive(.delegate(.importedProfileSnapshot(profileSnapshot)))
 
 		waitForExpectations(timeout: 1)
 		try await keychainDataGotCalled.withValue {
@@ -75,11 +77,6 @@ final class ImportProfileFeatureTests: TestCase {
 			let decoded = try JSONDecoder.iso8601.decode(ProfileSnapshot.self, from: jsonData)
 			XCTAssertEqual(decoded, profileSnapshot)
 		}
-	}
-
-	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_has_been_saved__THEN__reducer_coordinates_to_parent_reducer() async throws {
-		_ = await sut.send(.internal(.saveProfileSnapshotResult(.success(profileSnapshot))))
-		_ = await sut.receive(.coordinate(.importedProfileSnapshot(profileSnapshot)))
 	}
 }
 
