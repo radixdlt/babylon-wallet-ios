@@ -10,7 +10,7 @@ extension ProfileLoader: DependencyKey {
 		loadProfile: {
 			@Dependency(\.keychainClient) var keychainClient
 			@Dependency(\.jsonDecoder) var jsonDecoder
-			return try keychainClient.loadProfile(jsonDecoder: jsonDecoder)
+			return try keychainClient.loadProfile(jsonDecoder: jsonDecoder())
 		}
 	)
 }
