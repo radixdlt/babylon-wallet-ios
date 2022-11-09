@@ -86,7 +86,7 @@ extension NonFungibleTokenList.Row.Action {
 	init(action: NonFungibleTokenList.Row.View.ViewAction) {
 		switch action {
 		case .toggleIsExpanded:
-			self = .internal(.user(.toggleIsExpanded))
+			self = .internal(.view(.isExpandedToggled))
 		}
 	}
 }
