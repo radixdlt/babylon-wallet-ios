@@ -6,7 +6,7 @@ public extension NonFungibleTokenList {
 	static let reducer = Reducer.combine(
 		NonFungibleTokenList.Row.reducer.forEach(
 			state: \.rows,
-			action: /NonFungibleTokenList.Action.asset(id:action:),
+			action: /Action.child .. Action.ChildAction.asset,
 			environment: { _ in NonFungibleTokenList.Row.Environment() }
 		),
 
@@ -14,9 +14,7 @@ public extension NonFungibleTokenList {
 			switch action {
 			case .internal:
 				return .none
-			case .coordinate:
-				return .none
-			case let .asset(id: id, action: action):
+			case .child, .delegate:
 				return .none
 			}
 		}
