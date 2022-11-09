@@ -6,7 +6,7 @@ public struct DataEffect {
 	private let contentsOfURL: ContentsOfURL
 
 	public init(contentsOfURL: @escaping ContentsOfURL) {
-	  self.contentsOfURL = contentsOfURL
+		self.contentsOfURL = contentsOfURL
 	}
 
 	public func callAsFunction(contentsOf url: URL, options: Data.ReadingOptions) throws -> Data {

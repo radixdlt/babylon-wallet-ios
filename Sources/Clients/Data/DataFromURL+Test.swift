@@ -9,6 +9,7 @@ public extension DependencyValues {
 	}
 }
 
+// MARK: - DataEffect + TestDependencyKey
 extension DataEffect: TestDependencyKey {
 	public static let previewValue = Self(
 		contentsOfURL: { _, _ in Data() }
