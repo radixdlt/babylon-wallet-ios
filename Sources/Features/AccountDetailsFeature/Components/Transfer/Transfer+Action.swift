@@ -24,7 +24,7 @@ public extension AccountDetails.Transfer.Action {
 	}
 }
 
-// MARK: - AccountDetails.Transfer.Action.CoordinatingAction
+// MARK: - AccountDetails.Transfer.Action.DelegateAction
 public extension AccountDetails.Transfer.Action {
 	enum DelegateAction: Equatable {
 		case dismissTransfer
