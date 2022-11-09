@@ -268,18 +268,18 @@ public struct Home: ReducerProtocol {
 				await openURL(URL(string: "https://www.apple.com")!)
 			}
 
-		case .child(.accountList(.coordinate(.fetchPortfolioForAccounts))):
+		case .child(.accountList(.delegate(.fetchPortfolioForAccounts))):
 			return loadAccountsConnectionsAndSettings()
 
 		case let .internal(.system(.fetchPortfolioResult(.failure(error)))):
 			print("⚠️ failed to fetch portfolio, error: \(String(describing: error))")
 			return .none
 
-		case let .child(.accountList(.coordinate(.displayAccountDetails(account)))):
+		case let .child(.accountList(.delegate(.displayAccountDetails(account)))):
 			state.accountDetails = .init(for: account)
 			return .none
 
-		case let .child(.accountList(.coordinate(.copyAddress(address)))):
+		case let .child(.accountList(.delegate(.copyAddress(address)))):
 			return copyAddress(address)
 
 		case .child(.accountPreferences(.coordinate(.dismissAccountPreferences))):

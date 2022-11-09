@@ -8,7 +8,7 @@ public extension AccountList {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
+		case delegate(DelegateAction)
 	}
 }
 
@@ -40,9 +40,9 @@ public extension AccountList.Action.InternalAction {
 	enum SystemAction: Equatable {}
 }
 
-// MARK: - AccountList.Action.CoordinatingAction
+// MARK: - AccountList.Action.DelegateAction
 public extension AccountList.Action {
-	enum CoordinatingAction: Equatable {
+	enum DelegateAction: Equatable {
 		case displayAccountDetails(AccountList.Row.State)
 		case copyAddress(AccountAddress)
 		case fetchPortfolioForAccounts

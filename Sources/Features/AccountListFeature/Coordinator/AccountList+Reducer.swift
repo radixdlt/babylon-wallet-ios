@@ -12,7 +12,7 @@ public extension AccountList {
 
 		Reducer { state, action, _ in
 			switch action {
-			case .coordinate:
+			case .delegate:
 				return .none
 
 			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child
@@ -25,11 +25,11 @@ public extension AccountList {
 				switch action {
 				case .internal(.user(.copyAddress)):
 					return .run { send in
-						await send(.coordinate(.copyAddress(account.address)))
+						await send(.delegate(.copyAddress(account.address)))
 					}
 				case .internal(.user(.didSelect)):
 					return .run { send in
-						await send(.coordinate(.displayAccountDetails(account)))
+						await send(.delegate(.displayAccountDetails(account)))
 					}
 				}
 
@@ -39,7 +39,7 @@ public extension AccountList {
 
 			case .internal(.view(.viewAppeared)):
 				return .run { send in
-					await send(.coordinate(.fetchPortfolioForAccounts))
+					await send(.delegate(.fetchPortfolioForAccounts))
 				}
 			}
 		}
