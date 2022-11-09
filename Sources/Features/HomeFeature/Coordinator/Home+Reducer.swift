@@ -257,7 +257,7 @@ public struct Home: ReducerProtocol {
 			print(reason)
 			return .none
 
-		case .child(.header(.coordinate(.displaySettings))):
+		case .child(.header(.delegate(.displaySettings))):
 			return .run { send in await send(.delegate(.displaySettings)) }
 
 		case .child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))):

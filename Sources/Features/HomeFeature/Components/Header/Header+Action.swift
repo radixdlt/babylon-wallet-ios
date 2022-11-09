@@ -4,28 +4,29 @@ import Foundation
 public extension Home.Header {
 	// MARK: Action
 	enum Action: Equatable {
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
+		case delegate(DelegateAction)
+	}
+}
+
+// MARK: - Home.Header.Action.ViewAction
+public extension Home.Header.Action {
+	enum ViewAction: Equatable {
+		case settingsButtonTapped
 	}
 }
 
 // MARK: - Home.Header.Action.InternalAction
 public extension Home.Header.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
+		case view(ViewAction)
 	}
 }
 
-// MARK: - Home.Header.Action.InternalAction.UserAction
-public extension Home.Header.Action.InternalAction {
-	enum UserAction: Equatable {
-		case settingsButtonTapped
-	}
-}
-
-// MARK: - Home.Header.Action.CoordinatingAction
+// MARK: - Home.Header.Action.DelegateAction
 public extension Home.Header.Action {
-	enum CoordinatingAction: Equatable {
+	enum DelegateAction: Equatable {
 		case displaySettings
 	}
 }
