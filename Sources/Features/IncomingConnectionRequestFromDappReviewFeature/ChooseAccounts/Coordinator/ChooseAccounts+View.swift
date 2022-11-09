@@ -104,7 +104,7 @@ private extension ChooseAccounts.View {
 	func header(with viewStore: ChooseAccountsViewStore) -> some View {
 		HStack {
 			BackButton {
-				viewStore.send(.dismissButtonTapped)
+				viewStore.send(.backButtonTapped)
 			}
 			Spacer()
 		}

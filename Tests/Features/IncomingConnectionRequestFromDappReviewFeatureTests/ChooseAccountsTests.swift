@@ -32,7 +32,7 @@ final class ChooseAccountsTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.view(.dismissButtonTapped))
+		_ = await store.send(.view(.backButtonTapped))
 
 		// then
 		_ = await store.receive(.delegate(.dismissChooseAccounts))

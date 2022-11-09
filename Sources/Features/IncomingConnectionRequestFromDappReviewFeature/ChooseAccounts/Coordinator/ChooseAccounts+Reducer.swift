@@ -18,7 +18,7 @@ public extension ChooseAccounts {
 					await send(.delegate(.finishedChoosingAccounts(nonEmptySelectedAccounts)))
 				}
 
-			case .internal(.view(.dismissButtonTapped)):
+			case .internal(.view(.backButtonTapped)):
 				return .run { send in
 					await send(.delegate(.dismissChooseAccounts))
 				}
