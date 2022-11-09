@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import DataFromURLClient
+import Data
 import Foundation
 import KeychainClientDependency
 import Profile

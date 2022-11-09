@@ -340,7 +340,7 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Common",
-			"DataFromURLClient",
+			"Data",
 			"KeychainClientDependency",
 			"ProfileClient",
 			tca,
@@ -545,7 +545,7 @@ package.addModules([
 		])
 	),
 	.client(
-		name: "DataFromURLClient",
+		name: "Data",
 		dependencies: [
 			dependencies,
 		],

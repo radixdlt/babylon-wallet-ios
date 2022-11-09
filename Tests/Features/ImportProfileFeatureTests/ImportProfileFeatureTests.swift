@@ -39,7 +39,7 @@ final class ImportProfileFeatureTests: TestCase {
 	}
 
 	func test__GIVEN__a_corrupted_profileSnapshot__WHEN__it_is_decoded__THEN__reducer_delegates_error() async throws {
-		sut.dependencies.data = .init(dataFromURL: { _, _ in
+		sut.dependencies.data = .init(contentsOfURL: { _, _ in
 			Data("deadbeef".utf8) // invalid data
 		})
 		sut.dependencies.jsonDecoder = .iso8601
@@ -49,7 +49,7 @@ final class ImportProfileFeatureTests: TestCase {
 	}
 
 	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__reducer_calls_save_on_keychainClient_and_delegates_snapshot() async throws {
-		sut.dependencies.data = .init(dataFromURL: { url, options in
+		sut.dependencies.data = .init(contentsOfURL: { url, options in
 			XCTAssertEqual(url, URL(string: "file://profiledataurl")!)
 			XCTAssertEqual(options, .uncached)
 			return self.profileSnapshotData
