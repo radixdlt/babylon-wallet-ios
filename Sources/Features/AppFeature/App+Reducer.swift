@@ -65,12 +65,12 @@ public extension App {
 				await send(.internal(.system(.failedToCreateOrImportProfile(reason: failureReason))))
 			}
 
-		case let .child(.splash(.coordinate(.loadProfileResult(.profileLoaded(profile))))):
+		case let .child(.splash(.delegate(.loadProfileResult(.profileLoaded(profile))))):
 			return .run { send in
 				await send(.internal(.system(.injectProfileIntoProfileClient(profile, persistIntoKeychain: false))))
 			}
 
-		case let .child(.splash(.coordinate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
+		case let .child(.splash(.delegate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
 			if failedToDecode {
 				return .run { send in
 					await send(.internal(.system(.failedToCreateOrImportProfile(reason: "Failed to decode profile: \(reason)"))))

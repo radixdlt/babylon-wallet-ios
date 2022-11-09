@@ -9,20 +9,17 @@ public extension AssetsView {
 		NonFungibleTokenList.reducer
 			.pullback(
 				state: \.nonFungibleTokenList,
-				action: /AssetsView.Action.nonFungibleTokenList,
+				action: /Action.child .. Action.ChildAction.nonFungibleTokenList,
 				environment: { _ in NonFungibleTokenList.Environment() }
 			),
 
 		Reducer { state, action, _ in
 			switch action {
-			case let .internal(.user(.listSelectorTapped(type))):
+			case let .internal(.view(.listSelectorTapped(type))):
 				state.type = type
 				return .none
-			case .coordinate:
-				return .none
-			case .fungibleTokenList:
-				return .none
-			case .nonFungibleTokenList:
+
+			case .child, .delegate:
 				return .none
 			}
 		}

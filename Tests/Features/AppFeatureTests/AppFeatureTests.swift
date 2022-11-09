@@ -82,7 +82,7 @@ final class AppFeatureTests: TestCase {
 		_ = await store.receive(.child(.splash(.internal(.coordinate(.loadProfileResult(.profileLoaded(existingProfile)))))))
 
 		await testScheduler.advance(by: .milliseconds(110))
-		_ = await store.receive(.child(.splash(.coordinate(.loadProfileResult(.profileLoaded(existingProfile))))))
+		_ = await store.receive(.child(.splash(.delegate(.loadProfileResult(.profileLoaded(existingProfile))))))
 
 		// THEN: it is injected into ProfileClient...
 		_ = await store.receive(.internal(.system(.injectProfileIntoProfileClient(existingProfile, persistIntoKeychain: false))))
@@ -105,7 +105,7 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.child(.splash(.coordinate(.loadProfileResult(loadProfileResult)))))
+		_ = await store.send(.child(.splash(.delegate(.loadProfileResult(loadProfileResult)))))
 
 		// then
 		_ = await store.receive(.internal(.system(.failedToCreateOrImportProfile(reason: "Failed to decode profile: FAIL_FROM_TEST"))))
@@ -123,7 +123,7 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.child(.splash(.coordinate(.loadProfileResult(loadProfileResult)))))
+		_ = await store.send(.child(.splash(.delegate(.loadProfileResult(loadProfileResult)))))
 
 		// then
 		await store.receive(.internal(.system(.goToOnboarding))) {

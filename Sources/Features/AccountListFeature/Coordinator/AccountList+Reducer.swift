@@ -16,7 +16,7 @@ public extension AccountList {
 				return .none
 
 			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child
-			// and every other action should fall-through
+			// and every other action should fall-through - @davdroman-rdx
 			case let .child(.account(id: id, action: action)):
 				guard let account = state.accounts[id: id] else {
 					assertionFailure("Account value should not be nil.")

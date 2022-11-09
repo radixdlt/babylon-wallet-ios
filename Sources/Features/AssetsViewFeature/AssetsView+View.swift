@@ -20,7 +20,7 @@ public extension AssetsView.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: AssetsView.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			VStack(spacing: 30) {
 				selectorView(with: viewStore)
@@ -30,14 +30,14 @@ public extension AssetsView.View {
 					FungibleTokenList.View(
 						store: store.scope(
 							state: \.fungibleTokenList,
-							action: AssetsView.Action.fungibleTokenList
+							action: { .child(.fungibleTokenList($0)) }
 						)
 					)
 				case .nfts:
 					NonFungibleTokenList.View(
 						store: store.scope(
 							state: \.nonFungibleTokenList,
-							action: AssetsView.Action.nonFungibleTokenList
+							action: { .child(.nonFungibleTokenList($0)) }
 						)
 					)
 				case .poolShare:
@@ -52,7 +52,7 @@ public extension AssetsView.View {
 
 // MARK: - AssetsView.View.AssetsViewViewStore
 private extension AssetsView.View {
-	typealias AssetsViewViewStore = ComposableArchitecture.ViewStore<AssetsView.View.ViewState, AssetsView.View.ViewAction>
+	typealias AssetsViewViewStore = ComposableArchitecture.ViewStore<AssetsView.View.ViewState, AssetsView.Action.ViewAction>
 }
 
 // MARK: - Private Methods
@@ -96,23 +96,6 @@ private extension AssetsView.View {
 			}
 		)
 		.id(type)
-	}
-}
-
-// MARK: - AssetsView.View.ViewAction
-extension AssetsView.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case listSelectorTapped(AssetsView.AssetsViewType)
-	}
-}
-
-extension AssetsView.Action {
-	init(action: AssetsView.View.ViewAction) {
-		switch action {
-		case let .listSelectorTapped(type):
-			self = .internal(.user(.listSelectorTapped(type)))
-		}
 	}
 }
 
