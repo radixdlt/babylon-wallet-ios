@@ -81,10 +81,6 @@ public struct MessageToDappRequest: Sendable, Equatable, Identifiable {
 }
 
 public extension MessageToDappRequest {
-	func data(jsonEncoder: JSONEncoder = .iso8601) throws -> Data {
-		try jsonEncoder.encode(requestMethodWalletResponse)
-	}
-
 	var requestID: RequestMethodWalletResponse.RequestID {
 		requestMethodWalletResponse.requestId
 	}

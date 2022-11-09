@@ -110,8 +110,10 @@ extension BrowserExtensionsConnectivityClient: DependencyKey {
 				}.eraseToAnyAsyncSequence()
 			},
 			sendMessage: { outgoingMsg in
+				@Dependency(\.jsonEncoder) var jsonEncoder
+
 				let connection = try await connectionsHolder.getConnection(id: outgoingMsg.browserExtensionConnectionID)
-				let data = try outgoingMsg.data()
+				let data = try jsonEncoder().encode(outgoingMsg.requestMethodWalletResponse)
 				let p2pChannelRequestID = UUID().uuidString
 
 				try await connection.connection.send(
