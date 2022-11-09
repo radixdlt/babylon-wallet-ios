@@ -55,12 +55,12 @@ public extension App {
 				await send(.coordinate(.onboard))
 			}
 
-		case let .onboarding(.coordinate(.onboardedWithProfile(profile, isNew))):
+		case let .onboarding(.delegate(.onboardedWithProfile(profile, isNew))):
 			return .run { send in
 				await send(.internal(.injectProfileIntoProfileClient(profile, persistIntoKeychain: true)))
 			}
 
-		case let .onboarding(.coordinate(.failedToCreateOrImportProfile(failureReason))):
+		case let .onboarding(.delegate(.failedToCreateOrImportProfile(failureReason))):
 			return .run { send in
 				await send(.coordinate(.failedToCreateOrImportProfile(reason: failureReason)))
 			}

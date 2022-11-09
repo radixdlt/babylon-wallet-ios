@@ -16,79 +16,66 @@ public extension Onboarding {
 	var body: some ReducerProtocol<State, Action> {
 		Reduce { state, action in
 			switch action {
-			case .internal(.user(.newProfile)):
+			case .internal(.view(.newProfileButtonTapped)):
 				state.newProfile = .init()
 				return .none
 
-			case .internal(.user(.importProfile)):
+			case .internal(.view(.importProfileButtonTapped)):
 				state.importProfile = .init()
 				return .none
 
-			case .importProfile(.coordinate(.goBack)):
+			case .child(.importProfile(.coordinate(.goBack))):
 				state.importProfile = nil
 				return .none
 
-			case let .importProfile(.coordinate(.failedToImportProfileSnapshot(importFailureReason))):
+			case let .child(.importProfile(.coordinate(.failedToImportProfileSnapshot(importFailureReason)))):
 				return .run { send in
-					await send(.coordinate(.failedToCreateOrImportProfile(reason: "Import failed: \(importFailureReason)")))
+					await send(.delegate(.failedToCreateOrImportProfile(reason: "Import failed: \(importFailureReason)")))
 				}
 
-			case let .importProfile(.coordinate(.importedProfileSnapshot(profileSnapshot))):
-				return .run { send in
-					await send(.internal(.coordinate(.importMnemonicForProfileSnapshot(profileSnapshot))))
-				}
-
-			case let .internal(.coordinate(.importMnemonicForProfileSnapshot(profileSnapshot))):
+			case let .child(.importProfile(.coordinate(.importedProfileSnapshot(profileSnapshot)))):
 				state.importMnemonic = .init(importedProfileSnapshot: profileSnapshot)
 				return .none
 
-			case .newProfile(.coordinate(.goBack)):
+			case .child(.newProfile(.coordinate(.goBack))):
 				state.newProfile = nil
 				return .none
 
-			case let .newProfile(.coordinate(.finishedCreatingNewProfile(newProfile))):
+			case let .child(.newProfile(.coordinate(.finishedCreatingNewProfile(newProfile)))):
 				return .run { send in
-					await send(.coordinate(.onboardedWithProfile(newProfile, isNew: true)))
+					await send(.delegate(.onboardedWithProfile(newProfile, isNew: true)))
 				}
 
-			case let .newProfile(.coordinate(.failedToCreateNewProfile(reason))):
+			case let .child(.newProfile(.coordinate(.failedToCreateNewProfile(reason)))):
 				return .run { send in
-					await send(.coordinate(.failedToCreateOrImportProfile(reason: "Failed to create profile: \(reason)")))
+					await send(.delegate(.failedToCreateOrImportProfile(reason: "Failed to create profile: \(reason)")))
 				}
 
-			case .importMnemonic(.delegate(.goBack)):
+			case .child(.importMnemonic(.delegate(.goBack))):
 				state.importMnemonic = nil
 				return .none
 
-			case let .importMnemonic(.delegate(.failedToImportMnemonicOrProfile(importFailureReason))):
+			case let .child(.importMnemonic(.delegate(.failedToImportMnemonicOrProfile(importFailureReason)))):
 				return .run { send in
-					await send(.coordinate(.failedToCreateOrImportProfile(reason: "Import mnemonic failed: \(importFailureReason)")))
-				}
-			case let .importMnemonic(.delegate(.finishedImporting(_, profile))):
-				return .run { send in
-					await send(.coordinate(.onboardedWithProfile(profile, isNew: false)))
+					await send(.delegate(.failedToCreateOrImportProfile(reason: "Import mnemonic failed: \(importFailureReason)")))
 				}
 
-			case .importProfile(.internal):
-				return .none
+			case let .child(.importMnemonic(.delegate(.finishedImporting(_, profile)))):
+				return .run { send in
+					await send(.delegate(.onboardedWithProfile(profile, isNew: false)))
+				}
 
-			case .importMnemonic(.internal):
-				return .none
-
-			case .newProfile(.internal):
-				return .none
-
-			case .coordinate:
+			case .child, .delegate:
 				return .none
 			}
 		}
-		.ifLet(\.newProfile, action: /Action.newProfile) {
+		.ifLet(\.newProfile, action: /Action.child .. Action.ChildAction.newProfile) {
 			NewProfile()
 		}
-		.ifLet(\.importProfile, action: /Action.importProfile) {
+		.ifLet(\.importProfile, action: /Action.child .. Action.ChildAction.importProfile) {
 			ImportProfile()
 		}
-		.ifLet(\.importMnemonic, action: /Action.importMnemonic) {
+		.ifLet(\.importMnemonic, action: /Action.child .. Action.ChildAction.importMnemonic) {
 			ImportMnemonic()
 		}
 	}
