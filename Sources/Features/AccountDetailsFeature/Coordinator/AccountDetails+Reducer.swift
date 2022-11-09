@@ -22,19 +22,19 @@ public extension AccountDetails {
 
 		Reducer { state, action, _ in
 			switch action {
-			case .internal(.user(.dismissAccountDetails)):
-				return Effect(value: .coordinate(.dismissAccountDetails))
-			case .internal(.user(.displayAccountPreferences)):
-				return Effect(value: .coordinate(.displayAccountPreferences))
-			case .internal(.user(.copyAddress)):
+			case .internal(.view(.dismissAccountDetailsButtonTapped)):
+				return Effect(value: .delegate(.dismissAccountDetails))
+			case .internal(.view(.displayAccountPreferencesButtonTapped)):
+				return Effect(value: .delegate(.displayAccountPreferences))
+			case .internal(.view(.copyAddressButtonTapped)):
 				return .run { [address = state.address] send in
-					await send(.coordinate(.copyAddress(address)))
+					await send(.delegate(.copyAddress(address)))
 				}
-			case .internal(.user(.refresh)):
-				return Effect(value: .coordinate(.refresh(state.address)))
-			case .internal(.user(.displayTransfer)):
-				return Effect(value: .coordinate(.displayTransfer))
-			case .child, .coordinate:
+			case .internal(.view(.refreshButtonTapped)):
+				return Effect(value: .delegate(.refresh(state.address)))
+			case .internal(.view(.transferButtonTapped)):
+				return Effect(value: .delegate(.displayTransfer))
+			case .child, .delegate:
 				return .none
 			}
 		}

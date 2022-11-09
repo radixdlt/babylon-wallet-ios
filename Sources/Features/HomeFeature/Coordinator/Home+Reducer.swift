@@ -286,22 +286,22 @@ public struct Home: ReducerProtocol {
 			state.accountPreferences = nil
 			return .none
 
-		case .child(.accountDetails(.coordinate(.dismissAccountDetails))):
+		case .child(.accountDetails(.delegate(.dismissAccountDetails))):
 			state.accountDetails = nil
 			return .none
 
-		case .child(.accountDetails(.coordinate(.displayAccountPreferences))):
+		case .child(.accountDetails(.delegate(.displayAccountPreferences))):
 			state.accountPreferences = .init()
 			return .none
 
-		case let .child(.accountDetails(.coordinate(.copyAddress(address)))):
+		case let .child(.accountDetails(.delegate(.copyAddress(address)))):
 			return copyAddress(address)
 
-		case .child(.accountDetails(.coordinate(.displayTransfer))):
+		case .child(.accountDetails(.delegate(.displayTransfer))):
 			state.transfer = .init()
 			return .none
 
-		case let .child(.accountDetails(.coordinate(.refresh(address)))):
+		case let .child(.accountDetails(.delegate(.refresh(address)))):
 			return .run { send in
 				await send(.internal(.system(.accountPortfolioResult(TaskResult {
 					try await accountPortfolioFetcher.fetchPortfolio([address])

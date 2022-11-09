@@ -7,8 +7,9 @@ public extension AccountDetails {
 	// MARK: Action
 	enum Action: Equatable {
 		case child(ChildAction)
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
+		case delegate(DelegateAction)
 	}
 }
 
@@ -20,27 +21,27 @@ public extension AccountDetails.Action {
 	}
 }
 
+// MARK: - AccountDetails.Action.ViewAction
+public extension AccountDetails.Action {
+	enum ViewAction: Equatable {
+		case dismissAccountDetailsButtonTapped
+		case displayAccountPreferencesButtonTapped
+		case copyAddressButtonTapped
+		case transferButtonTapped
+		case refreshButtonTapped
+	}
+}
+
 // MARK: - AccountDetails.Action.InternalAction
 public extension AccountDetails.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
+		case view(ViewAction)
 	}
 }
 
-// MARK: - AccountDetails.Action.InternalAction.UserAction
-public extension AccountDetails.Action.InternalAction {
-	enum UserAction: Equatable {
-		case dismissAccountDetails
-		case displayAccountPreferences
-		case copyAddress
-		case displayTransfer
-		case refresh
-	}
-}
-
-// MARK: - AccountDetails.Action.CoordinatingAction
+// MARK: - AccountDetails.Action.DelegateAction
 public extension AccountDetails.Action {
-	enum CoordinatingAction: Equatable {
+	enum DelegateAction: Equatable {
 		case dismissAccountDetails
 		case displayAccountPreferences
 		case copyAddress(AccountAddress)
