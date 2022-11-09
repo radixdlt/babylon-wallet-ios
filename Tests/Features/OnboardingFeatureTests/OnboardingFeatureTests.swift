@@ -51,7 +51,7 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 		}
 
 		// when
-		_ = await store.send(.internal(.user(.createProfile)))
+		_ = await store.send(.internal(.view(.createProfileButtonPressed)))
 
 		// then
 		_ = await store.receive(.internal(.system(.createProfile))) {
@@ -64,7 +64,7 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 				await store.receive(.internal(.system(.createdProfileResult(.success(profile))))) {
 					$0.isCreatingProfile = false
 				}
-				await store.receive(.coordinate(.finishedCreatingNewProfile(profile)))
+				await store.receive(.delegate(.finishedCreatingNewProfile(profile)))
 			}
 		}
 		await generateMnemonicCalled.withValue {

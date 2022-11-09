@@ -30,12 +30,12 @@ public struct NewProfile: ReducerProtocol {
 public extension NewProfile {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.user(.goBack)):
+		case .internal(.view(.backButtonPressed)):
 			return .run { send in
-				await send(.coordinate(.goBack))
+				await send(.delegate(.goBack))
 			}
 
-		case .internal(.user(.createProfile)):
+		case .internal(.view(.createProfileButtonPressed)):
 			return .run { send in
 				await send(.internal(.system(.createProfile)))
 			}
@@ -75,21 +75,21 @@ public extension NewProfile {
 		case let .internal(.system(.createdProfileResult(.success(profile)))):
 			state.isCreatingProfile = false
 			return .run { send in
-				await send(.coordinate(.finishedCreatingNewProfile(profile)))
+				await send(.delegate(.finishedCreatingNewProfile(profile)))
 			}
 
 		case let .internal(.system(.createdProfileResult(.failure(error)))):
 			state.isCreatingProfile = false
 			return .run { send in
-				await send(.coordinate(.failedToCreateNewProfile(reason: String(describing: error))))
+				await send(.delegate(.failedToCreateNewProfile(reason: String(describing: error))))
 			}
 
-		case let .internal(.user(.accountNameChanged(accountName))):
+		case let .internal(.view(.accountNameTextFieldChanged(accountName))):
 			state.nameOfFirstAccount = accountName
 			state.canProceed = !state.nameOfFirstAccount.isEmpty
 			return .none
 
-		case .coordinate:
+		case .delegate:
 			return .none
 		}
 	}

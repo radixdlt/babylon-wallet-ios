@@ -47,7 +47,7 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// WHEN: a new profile is created
-		_ = await store.send(.child(.onboarding(.child(.newProfile(.coordinate(.finishedCreatingNewProfile(newProfile)))))))
+		_ = await store.send(.child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))))
 		_ = await store.receive(.child(.onboarding(.delegate(.onboardedWithProfile(newProfile, isNew: true)))))
 
 		// THEN: it is injected into ProfileClient...
