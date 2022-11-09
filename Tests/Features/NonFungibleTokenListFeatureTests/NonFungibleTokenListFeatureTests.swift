@@ -17,13 +17,13 @@ final class NonFungibleTokenListFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.toggleIsExpanded))) {
+		_ = await store.send(.internal(.view(.isExpandedToggled))) {
 			// then
 			$0.isExpanded = true
 		}
 
 		// when
-		_ = await store.send(.internal(.user(.toggleIsExpanded))) {
+		_ = await store.send(.internal(.view(.isExpandedToggled))) {
 			// then
 			$0.isExpanded = false
 		}
