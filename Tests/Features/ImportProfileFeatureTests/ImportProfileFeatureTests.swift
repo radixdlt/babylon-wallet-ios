@@ -55,21 +55,18 @@ final class ImportProfileFeatureTests: TestCase {
 			return self.profileSnapshotData
 		})
 		sut.dependencies.jsonDecoder = .iso8601
-		let keychainDataGotCalled = ActorIsolated<Data?>(nil)
-		let keychainSetDataExpectation = expectation(description: "setDataForKey should be called on Keychain client")
+		let profileSnapshotDataInKeychain = ActorIsolated<Data?>(nil)
 		sut.dependencies.keychainClient.setDataDataForKey = { data, key in
 			if key == "profileSnapshotKeychainKey" {
 				Task {
-					await keychainDataGotCalled.setValue(data)
-					keychainSetDataExpectation.fulfill()
+					await profileSnapshotDataInKeychain.setValue(data)
 				}
 			}
 		}
 		_ = await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
 		_ = await sut.receive(.delegate(.importedProfileSnapshot(profileSnapshot)))
 
-		waitForExpectations(timeout: 1)
-		try await keychainDataGotCalled.withValue {
+		try await profileSnapshotDataInKeychain.withValue {
 			guard let jsonData = $0 else {
 				XCTFail("Expected keychain to have set data for profile")
 				return
