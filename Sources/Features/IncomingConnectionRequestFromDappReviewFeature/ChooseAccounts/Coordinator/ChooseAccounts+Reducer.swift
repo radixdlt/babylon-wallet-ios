@@ -12,21 +12,23 @@ public extension ChooseAccounts {
 	var body: some ReducerProtocol<State, Action> {
 		Reduce { state, action in
 			switch action {
-			case .internal(.user(.finishedChoosingAccounts)):
+			case .internal(.view(.continueButtonTapped)):
 				let nonEmptySelectedAccounts = NonEmpty(rawValue: OrderedSet(state.accounts.filter(\.isSelected).map(\.account)))!
 				return .run { send in
-					await send(.coordinate(.finishedChoosingAccounts(nonEmptySelectedAccounts)))
+					await send(.delegate(.finishedChoosingAccounts(nonEmptySelectedAccounts)))
 				}
 
-			case .internal(.user(.dismissChooseAccounts)):
+			case .internal(.view(.dismissButtonTapped)):
 				return .run { send in
-					await send(.coordinate(.dismissChooseAccounts))
+					await send(.delegate(.dismissChooseAccounts))
 				}
 
-			case let .account(id: id, action: action):
+			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child
+			// and every other action should fall-through
+			case let .child(.account(id: id, action: action)):
 				guard let account = state.accounts[id: id] else { return .none }
 				switch action {
-				case .internal(.user(.didSelect)):
+				case .internal(.view(.didSelect)):
 					if account.isSelected {
 						state.accounts[id: id]?.isSelected = false
 					} else {
@@ -48,11 +50,12 @@ public extension ChooseAccounts {
 
 					return .none
 				}
-			case .coordinate:
+
+			case .delegate:
 				return .none
 			}
 		}
-		.forEach(\.accounts, action: /Action.account(id:action:)) {
+		.forEach(\.accounts, action: /Action.child .. Action.ChildAction.account) {
 			ChooseAccounts.Row()
 		}
 	}

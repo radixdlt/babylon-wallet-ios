@@ -17,11 +17,11 @@ final class ChooseAccountsTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.finishedChoosingAccounts)))
+		_ = await store.send(.view(.continueButtonTapped))
 
 		// then
 		let expectedAccounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: [singleAccount.account]))!
-		_ = await store.receive(.coordinate(.finishedChoosingAccounts(expectedAccounts)))
+		_ = await store.receive(.delegate(.finishedChoosingAccounts(expectedAccounts)))
 	}
 
 	func test_dismissChooseAccounts_whenTappedOnDismiss_thenCoordinateDismissal() async {
@@ -32,10 +32,10 @@ final class ChooseAccountsTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.dismissChooseAccounts)))
+		_ = await store.send(.view(.dismissButtonTapped))
 
 		// then
-		_ = await store.receive(.coordinate(.dismissChooseAccounts))
+		_ = await store.receive(.delegate(.dismissChooseAccounts))
 	}
 
 	func test_didSelectAccount_whenTappedOnSelectedAccount_thenDeselectThatAccount() async {
@@ -66,7 +66,7 @@ final class ChooseAccountsTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.account(id: accountRow.id, action: .internal(.user(.didSelect)))) {
+		_ = await store.send(.child(.account(id: accountRow.id, action: .view(.didSelect)))) {
 			// then
 			$0.accounts[id: accountRow.id]?.isSelected = false
 			$0.canProceed = false
@@ -105,14 +105,14 @@ final class ChooseAccountsTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.account(id: accountRowOne.id, action: .internal(.user(.didSelect)))) {
+		_ = await store.send(.child(.account(id: accountRowOne.id, action: .view(.didSelect)))) {
 			// then
 			$0.accounts[id: accountRowOne.id]?.isSelected = true
 			$0.canProceed = true
 		}
 
 		// when
-		_ = await store.send(.account(id: accountRowTwo.id, action: .internal(.user(.didSelect)))) {
+		_ = await store.send(.child(.account(id: accountRowTwo.id, action: .view(.didSelect)))) {
 			// then
 			$0.accounts[id: accountRowTwo.id]?.isSelected = true
 		}
@@ -146,7 +146,7 @@ final class ChooseAccountsTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.account(id: accountRow.id, action: .internal(.user(.didSelect)))) {
+		_ = await store.send(.child(.account(id: accountRow.id, action: .view(.didSelect)))) {
 			// then
 			$0.accounts[id: accountRow.id]?.isSelected = true
 			$0.canProceed = true
@@ -185,7 +185,7 @@ final class ChooseAccountsTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.account(id: accountRowTwo.id, action: .internal(.user(.didSelect))))
+		_ = await store.send(.child(.account(id: accountRowTwo.id, action: .view(.didSelect))))
 
 		// then
 		// no state change should occur

@@ -19,7 +19,7 @@ public extension ChooseAccounts.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: ChooseAccounts.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
@@ -46,7 +46,7 @@ public extension ChooseAccounts.View {
 							ForEachStore(
 								store.scope(
 									state: \.accounts,
-									action: ChooseAccounts.Action.account(id:action:)
+									action: { .child(.account(id: $0, action: $1)) }
 								),
 								content: ChooseAccounts.Row.View.init(store:)
 							)
@@ -97,35 +97,16 @@ extension IncomingConnectionRequestFromDapp.NumberOfNeededAccounts: CustomString
 
 // MARK: - ChooseAccounts.View.ChooseAccountsViewStore
 private extension ChooseAccounts.View {
-	typealias ChooseAccountsViewStore = ComposableArchitecture.ViewStore<ChooseAccounts.View.ViewState, ChooseAccounts.View.ViewAction>
+	typealias ChooseAccountsViewStore = ComposableArchitecture.ViewStore<ChooseAccounts.View.ViewState, ChooseAccounts.Action.ViewAction>
 }
 
 private extension ChooseAccounts.View {
 	func header(with viewStore: ChooseAccountsViewStore) -> some View {
 		HStack {
 			BackButton {
-				viewStore.send(.backButtonTapped)
+				viewStore.send(.dismissButtonTapped)
 			}
 			Spacer()
-		}
-	}
-}
-
-// MARK: - ChooseAccounts.View.ViewAction
-extension ChooseAccounts.View {
-	enum ViewAction: Equatable {
-		case continueButtonTapped
-		case backButtonTapped
-	}
-}
-
-extension ChooseAccounts.Action {
-	init(action: ChooseAccounts.View.ViewAction) {
-		switch action {
-		case .continueButtonTapped:
-			self = .internal(.user(.finishedChoosingAccounts))
-		case .backButtonTapped:
-			self = .internal(.user(.dismissChooseAccounts))
 		}
 	}
 }

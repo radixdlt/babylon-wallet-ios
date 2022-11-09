@@ -19,7 +19,7 @@ public extension IncomingConnectionRequestFromDappReview.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: IncomingConnectionRequestFromDappReview.Action.init(action:)
+			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
 				ZStack {
@@ -30,7 +30,7 @@ public extension IncomingConnectionRequestFromDappReview.View {
 				IfLetStore(
 					store.scope(
 						state: \.chooseAccounts,
-						action: IncomingConnectionRequestFromDappReview.Action.chooseAccounts
+						action: { .child(.chooseAccounts($0)) }
 					),
 					then: ChooseAccounts.View.init(store:)
 				)
@@ -88,7 +88,7 @@ private extension IncomingConnectionRequestFromDappReview.View {
 
 // MARK: - IncomingConnectionRequestFromDappReview.View.IncomingConnectionViewStore
 private extension IncomingConnectionRequestFromDappReview.View {
-	typealias IncomingConnectionViewStore = ComposableArchitecture.ViewStore<IncomingConnectionRequestFromDappReview.View.ViewState, IncomingConnectionRequestFromDappReview.View.ViewAction>
+	typealias IncomingConnectionViewStore = ViewStore<IncomingConnectionRequestFromDappReview.View.ViewState, IncomingConnectionRequestFromDappReview.Action.ViewAction>
 }
 
 private extension IncomingConnectionRequestFromDappReview.View {
@@ -98,25 +98,6 @@ private extension IncomingConnectionRequestFromDappReview.View {
 				viewStore.send(.dismissButtonTapped)
 			}
 			Spacer()
-		}
-	}
-}
-
-// MARK: - IncomingConnectionRequestFromDappReview.View.ViewAction
-extension IncomingConnectionRequestFromDappReview.View {
-	enum ViewAction: Equatable {
-		case dismissButtonTapped
-		case continueButtonTapped
-	}
-}
-
-extension IncomingConnectionRequestFromDappReview.Action {
-	init(action: IncomingConnectionRequestFromDappReview.View.ViewAction) {
-		switch action {
-		case .dismissButtonTapped:
-			self = .internal(.user(.dismissIncomingConnectionRequest))
-		case .continueButtonTapped:
-			self = .internal(.user(.proceedWithConnectionRequest))
 		}
 	}
 }

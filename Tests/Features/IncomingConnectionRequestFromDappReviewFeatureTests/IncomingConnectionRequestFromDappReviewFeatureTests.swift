@@ -31,7 +31,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.dismissIncomingConnectionRequest)))
+		_ = await store.send(.view(.dismissButtonTapped))
 
 		// then
 		_ = await store.receive(.delegate(.dismiss))
@@ -52,10 +52,10 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		store.dependencies.profileClient.getAccounts = { @Sendable in accounts }
 
 		// when
-		_ = await store.send(.internal(.user(.proceedWithConnectionRequest)))
+		_ = await store.send(.view(.continueButtonTapped))
 
 		// then
-		_ = await store.receive(.internal(.coordinate(.proceedWithConnectionRequest)))
+
 		_ = await store.receive(.internal(.system(.loadAccountsResult(.success(accounts))))) {
 			$0.chooseAccounts = .init(
 				incomingConnectionRequestFromDapp: request,
@@ -80,7 +80,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.chooseAccounts(.coordinate(.dismissChooseAccounts))) {
+		_ = await store.send(.child(.chooseAccounts(.delegate(.dismissChooseAccounts)))) {
 			// then
 			$0.chooseAccounts = nil
 		}
