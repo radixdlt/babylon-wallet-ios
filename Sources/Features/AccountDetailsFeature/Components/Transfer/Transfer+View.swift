@@ -21,7 +21,7 @@ public extension AccountDetails.Transfer.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: AccountDetails.Transfer.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			// TODO: implement
 			ForceFullScreen {
@@ -35,23 +35,6 @@ public extension AccountDetails.Transfer.View {
 					)
 				}
 			}
-		}
-	}
-}
-
-// MARK: - AccountDetails.Transfer.View.ViewAction
-extension AccountDetails.Transfer.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case dismissTransferButtonTapped
-	}
-}
-
-extension AccountDetails.Transfer.Action {
-	init(action: AccountDetails.Transfer.View.ViewAction) {
-		switch action {
-		case .dismissTransferButtonTapped:
-			self = .internal(.user(.dismissTransfer))
 		}
 	}
 }

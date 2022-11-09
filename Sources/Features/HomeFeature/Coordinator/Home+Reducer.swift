@@ -311,7 +311,7 @@ public struct Home: ReducerProtocol {
 		case .child(.accountDetails(.child(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))))):
 			return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
 
-		case .child(.transfer(.coordinate(.dismissTransfer))):
+		case .child(.transfer(.delegate(.dismissTransfer))):
 			state.transfer = nil
 			return .none
 
