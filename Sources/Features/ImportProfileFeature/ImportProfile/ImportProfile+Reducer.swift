@@ -38,7 +38,7 @@ public extension ImportProfile {
 		case let .internal(.view(.profileImported(.success(profileURL)))):
 			return .run { [data, jsonDecoder, keychainClient] send in
 				let data = try data(contentsOf: profileURL, options: .uncached)
-				let snapshot = try jsonDecoder.decode(ProfileSnapshot.self, from: data)
+				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
 				try keychainClient.saveProfileSnapshot(profileSnapshot: snapshot)
 				await send(.delegate(.importedProfileSnapshot(snapshot)))
 			} catch: { error, send in
