@@ -16,7 +16,7 @@ public struct CreateAccount: ReducerProtocol {
 public extension CreateAccount {
 	func reduce(into state: inout State, action: Action) -> ComposableArchitecture.Effect<Action, Never> {
 		switch action {
-		case .internal(.user(.createAccount)):
+		case .internal(.view(.createAccountButtonTapped)):
 			precondition(state.isValid)
 			precondition(!state.isCreatingAccount)
 			state.isCreatingAccount = true
@@ -34,20 +34,20 @@ public extension CreateAccount {
 		case let .internal(.system(.createdNewAccountResult(.success(account)))):
 			state.isCreatingAccount = false
 			return .run { send in
-				await send(.coordinate(.createdNewAccount(account)))
+				await send(.delegate(.createdNewAccount(account)))
 			}
 		case let .internal(.system(.createdNewAccountResult(.failure(error)))):
 			state.isCreatingAccount = false
 			return .run { send in
-				await send(.coordinate(.failedToCreateNewAccount(reason: String(describing: error))))
+				await send(.delegate(.failedToCreateNewAccount(reason: String(describing: error))))
 			}
 
-		case .internal(.user(.dismiss)):
+		case .internal(.view(.dismissButtonTapped)):
 			return .run { send in
-				await send(.coordinate(.dismissCreateAccount))
+				await send(.delegate(.dismissCreateAccount))
 			}
 
-		case let .internal(.user(.textFieldDidChange(accountName))):
+		case let .internal(.view(.textFieldChanged(accountName))):
 			let result = accountNameValidator.validate(accountName)
 			if !accountNameValidator.isCharacterCountOverLimit(result.trimmedName) {
 				state.isValid = result.isValid
@@ -55,20 +55,24 @@ public extension CreateAccount {
 			}
 			return .none
 
-		case .internal(.user(.textFieldDidFocus)):
-			return .none
-
-		case .internal(.system(.viewDidAppear)):
+		case .internal(.view(.textFieldFocused)):
 			return .run { send in
 				try await self.mainQueue.sleep(for: .seconds(0.5))
 				await send(.internal(.system(.focusTextField)))
 			}
 
+		case .internal(.view(.viewAppeared)):
+			return .run { send in
+				try await self.mainQueue.sleep(for: .seconds(0.5))
+				await send(.internal(.system(.focusTextField)))
+			}
+
+		/// FIXME: use reducer func instead - @davdroman-rdx
 		case .internal(.system(.focusTextField)):
 			state.focusedField = .accountName
 			return .none
 
-		case .coordinate:
+		case .delegate:
 			return .none
 		}
 	}

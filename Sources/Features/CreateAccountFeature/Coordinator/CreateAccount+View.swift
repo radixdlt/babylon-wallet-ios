@@ -20,7 +20,7 @@ public extension CreateAccount.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: CreateAccount.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
@@ -55,7 +55,7 @@ public extension CreateAccount.View {
 								L10n.CreateAccount.placeholder,
 								text: viewStore.binding(
 									get: \.accountName,
-									send: { ViewAction.textFieldDidChange($0) }
+									send: { .textFieldChanged($0) }
 								)
 								.removeDuplicates()
 							)
@@ -63,7 +63,7 @@ public extension CreateAccount.View {
 							.synchronize(
 								viewStore.binding(
 									get: \.focusedField,
-									send: ViewAction.textFieldDidFocus
+									send: { .textFieldFocused() }
 								),
 								self.$focusedField
 							)
@@ -94,48 +94,15 @@ public extension CreateAccount.View {
 						title: L10n.CreateAccount.createAccountButtonTitle,
 						isEnabled: viewStore.isCreateAccountButtonEnabled,
 						action: {
-							viewStore.send(.createButtonTapped)
+							viewStore.send(.createAccountButtonTapped)
 						}
 					)
 				}
 				.onAppear {
-					viewStore.send(.viewDidAppear)
+					viewStore.send(.viewAppeared)
 				}
 				.padding(24)
 			}
-		}
-	}
-}
-
-// MARK: - CreateAccount.View.ViewAction
-extension CreateAccount.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case viewDidAppear
-		case createButtonTapped
-		case closeButtonTapped
-		case textFieldDidFocus
-		case textFieldDidChange(String)
-	}
-}
-
-extension CreateAccount.Action {
-	init(action: CreateAccount.View.ViewAction) {
-		switch action {
-		case .createButtonTapped:
-			self = .internal(.user(.createAccount))
-
-		case .viewDidAppear:
-			self = .internal(.system(.viewDidAppear))
-
-		case .closeButtonTapped:
-			self = .internal(.user(.dismiss))
-
-		case .textFieldDidFocus:
-			self = .internal(.user(.textFieldDidFocus))
-
-		case let .textFieldDidChange(value):
-			self = .internal(.user(.textFieldDidChange(value)))
 		}
 	}
 }
@@ -162,7 +129,7 @@ extension CreateAccount.View {
 
 // MARK: - CreateAccount.View.ViewStore
 private extension CreateAccount.View {
-	typealias ViewStore = ComposableArchitecture.ViewStore<CreateAccount.View.ViewState, CreateAccount.View.ViewAction>
+	typealias ViewStore = ComposableArchitecture.ViewStore<CreateAccount.View.ViewState, CreateAccount.Action.ViewAction>
 }
 
 // MARK: - Private Computed Properties

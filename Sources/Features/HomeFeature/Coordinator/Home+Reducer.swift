@@ -315,15 +315,15 @@ public struct Home: ReducerProtocol {
 			state.transfer = nil
 			return .none
 
-		case .child(.createAccount(.coordinate(.dismissCreateAccount))):
+		case .child(.createAccount(.delegate(.dismissCreateAccount))):
 			state.createAccount = nil
 			return .none
 
-		case .child(.createAccount(.coordinate(.createdNewAccount))):
+		case .child(.createAccount(.delegate(.createdNewAccount))):
 			state.createAccount = nil
 			return loadAccountsConnectionsAndSettings()
 
-		case let .child(.createAccount(.coordinate(.failedToCreateNewAccount(reason: reason)))):
+		case let .child(.createAccount(.delegate(.failedToCreateNewAccount(reason: reason)))):
 			state.createAccount = nil
 			print("Failed to create account: \(reason)")
 			return .none

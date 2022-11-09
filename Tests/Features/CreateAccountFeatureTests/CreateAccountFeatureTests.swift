@@ -15,10 +15,10 @@ final class CreateAccountFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.user(.dismiss)))
+		_ = await store.send(.internal(.user(.dismissButtonTapped)))
 
 		// then
-		await store.receive(.coordinate(.dismissCreateAccount))
+		await store.receive(.delegate(.dismissCreateAccount))
 	}
 
 	func test_textFieldDidChange_whenUserEntersValidAccountName_thenUpdateState() async {
@@ -36,7 +36,7 @@ final class CreateAccountFeatureTests: TestCase {
 		let accountName = "My account"
 
 		// when
-		_ = await store.send(.internal(.user(.textFieldDidChange(accountName)))) {
+		_ = await store.send(.internal(.user(.textFieldChanged(accountName)))) {
 			// then
 			$0.isValid = true
 			$0.accountName = accountName
@@ -59,7 +59,7 @@ final class CreateAccountFeatureTests: TestCase {
 		accountName = "My account dummy name" // character count == 21, over the limit
 
 		// when
-		_ = await store.send(.internal(.user(.textFieldDidChange(accountName))))
+		_ = await store.send(.internal(.user(.textFieldChanged(accountName))))
 		// then
 		// no state change occured
 	}
