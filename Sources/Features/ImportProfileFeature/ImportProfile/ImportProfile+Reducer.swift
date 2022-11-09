@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DataFromURLClient
 import Foundation
 import KeychainClientDependency
 import Profile
@@ -46,44 +47,5 @@ public extension ImportProfile {
 		case .delegate:
 			return .none
 		}
-	}
-}
-
-public struct ReadDataEffect {
-	public typealias DataFromURL = @Sendable (URL, Data.ReadingOptions) throws -> Data
-
-	private let dataFromURL: DataFromURL
-
-	public init(dataFromURL: @escaping DataFromURL) {
-	  self.dataFromURL = dataFromURL
-	}
-
-	func callAsFunction(contentsOf url: URL, options: Data.ReadingOptions) throws -> Data {
-		try dataFromURL(url, options)
-	}
-}
-
-extension ReadDataEffect: DependencyKey {
-	public static let liveValue = Self(
-		dataFromURL: { url, options in try Data(contentsOf: url, options: options) }
-	)
-}
-
-import XCTestDynamicOverlay
-
-extension ReadDataEffect: TestDependencyKey {
-	public static let previewValue = Self(
-		dataFromURL: { _, _ in Data() }
-	)
-
-	public static let testValue = Self(
-		dataFromURL: unimplemented("\(Self.self).dataFromURL")
-	)
-}
-
-extension DependencyValues {
-	var data: ReadDataEffect {
-		get { self[ReadDataEffect.self] }
-		set { self[ReadDataEffect.self] = newValue }
 	}
 }
