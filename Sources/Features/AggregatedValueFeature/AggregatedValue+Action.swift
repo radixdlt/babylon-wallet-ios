@@ -4,28 +4,29 @@ import Foundation
 public extension AggregatedValue {
 	// MARK: Action
 	enum Action: Equatable {
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
+		case delegate(DelegateAction)
+	}
+}
+
+// MARK: - AggregatedValue.Action.ViewAction
+public extension AggregatedValue.Action {
+	enum ViewAction: Equatable {
+		case toggleVisibilityButtonTapped
 	}
 }
 
 // MARK: - AggregatedValue.Action.InternalAction
 public extension AggregatedValue.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
+		case view(ViewAction)
 	}
 }
 
-// MARK: - AggregatedValue.Action.InternalAction.UserAction
-public extension AggregatedValue.Action.InternalAction {
-	enum UserAction: Equatable {
-		case toggleVisibilityButtonTapped
-	}
-}
-
-// MARK: - AggregatedValue.Action.CoordinatingAction
+// MARK: - AggregatedValue.Action.DelegateAction
 public extension AggregatedValue.Action {
-	enum CoordinatingAction: Equatable {
+	enum DelegateAction: Equatable {
 		case toggleIsCurrencyAmountVisible
 	}
 }

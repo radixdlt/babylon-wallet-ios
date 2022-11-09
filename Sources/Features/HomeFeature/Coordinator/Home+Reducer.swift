@@ -260,7 +260,7 @@ public struct Home: ReducerProtocol {
 		case .child(.header(.coordinate(.displaySettings))):
 			return .run { send in await send(.delegate(.displaySettings)) }
 
-		case .child(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))):
+		case .child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))):
 			return .run { send in await send(.internal(.system(.toggleIsCurrencyAmountVisible))) }
 
 		case .child(.visitHub(.coordinate(.displayHub))):
@@ -282,7 +282,7 @@ public struct Home: ReducerProtocol {
 		case let .child(.accountList(.delegate(.copyAddress(address)))):
 			return copyAddress(address)
 
-		case .child(.accountPreferences(.coordinate(.dismissAccountPreferences))):
+		case .child(.accountPreferences(.delegate(.dismissAccountPreferences))):
 			state.accountPreferences = nil
 			return .none
 
@@ -308,7 +308,7 @@ public struct Home: ReducerProtocol {
 				}))))
 			}
 
-		case .child(.accountDetails(.child(.aggregatedValue(.coordinate(.toggleIsCurrencyAmountVisible))))):
+		case .child(.accountDetails(.child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))))):
 			return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
 
 		case .child(.transfer(.delegate(.dismissTransfer))):

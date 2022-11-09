@@ -5,9 +5,9 @@ public extension AccountPreferences {
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = Reducer { _, action, _ in
 		switch action {
-		case .internal(.user(.dismissAccountPreferences)):
-			return Effect(value: .coordinate(.dismissAccountPreferences))
-		case .coordinate:
+		case .internal(.view(.dismissButtonTapped)):
+			return Effect(value: .delegate(.dismissAccountPreferences))
+		case .delegate:
 			return .none
 		}
 	}
