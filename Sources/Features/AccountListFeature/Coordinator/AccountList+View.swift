@@ -20,38 +20,21 @@ public extension AccountList.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: AccountList.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			LazyVStack(spacing: 25) {
 				ForEachStore(
 					store.scope(
 						state: \.accounts,
-						action: AccountList.Action.account(id:action:)
+						action: { .child(.account(id: $0, action: $1)) }
 					),
 					content: AccountList.Row.View.init(store:)
 				)
 			}
 			.onAppear {
-				viewStore.send(.viewDidAppear)
+				viewStore.send(.viewAppeared)
 			}
-			.alert(store.scope(state: \.alert), dismiss: .internal(.user(.alertDismissed)))
-		}
-	}
-}
-
-// MARK: - AccountList.View.ViewAction
-extension AccountList.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case viewDidAppear
-	}
-}
-
-extension AccountList.Action {
-	init(action: AccountList.View.ViewAction) {
-		switch action {
-		case .viewDidAppear:
-			self = .internal(.system(.fetchPortfolioForAccounts))
+			.alert(store.scope(state: \.alert, action: { .view($0) }), dismiss: .alertDismissButtonTapped)
 		}
 	}
 }

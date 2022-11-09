@@ -6,7 +6,7 @@ public extension AccountList {
 	static let reducer = Reducer.combine(
 		AccountList.Row.reducer.forEach(
 			state: \.accounts,
-			action: /AccountList.Action.account(id:action:),
+			action: /Action.child .. Action.ChildAction.account,
 			environment: { _ in AccountList.Row.Environment() }
 		),
 
@@ -14,9 +14,12 @@ public extension AccountList {
 			switch action {
 			case .coordinate:
 				return .none
-			case let .account(id: id, action: action):
-				guard let account = state.accounts.first(where: { $0.id == id }) else {
-					preconditionFailure("Account value should not be nil.")
+
+			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child
+			// and every other action should fall-through
+			case let .child(.account(id: id, action: action)):
+				guard let account = state.accounts[id: id] else {
+					assertionFailure("Account value should not be nil.")
 					return .none
 				}
 				switch action {
@@ -29,10 +32,12 @@ public extension AccountList {
 						await send(.coordinate(.displayAccountDetails(account)))
 					}
 				}
-			case .internal(.user(.alertDismissed)):
+
+			case .internal(.view(.alertDismissButtonTapped)):
 				state.alert = nil
 				return .none
-			case .internal(.system(.fetchPortfolioForAccounts)):
+
+			case .internal(.view(.viewAppeared)):
 				return .run { send in
 					await send(.coordinate(.fetchPortfolioForAccounts))
 				}
