@@ -28,11 +28,7 @@ final class MainFeatureTests: TestCase {
 		)
 
 		// when
-<<<<<<< HEAD
-		_ = await store.send(.settings(.delegate(.dismissSettings))) {
-=======
-		_ = await store.send(.child(.settings(.coordinate(.dismissSettings)))) {
->>>>>>> child-actions
+		_ = await store.send(.child(.settings(.delegate(.dismissSettings)))) {
 			// then
 			$0.settings = nil
 		}
