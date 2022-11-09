@@ -341,7 +341,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"Data",
-			"JSONDecoder",
+			"JSON",
 			"KeychainClientDependency",
 			"ProfileClient",
 			tca,
@@ -513,6 +513,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			dependencies,
+			"JSON",
 			"UserDefaultsClient",
 		],
 		tests: .yes(
@@ -538,6 +539,7 @@ package.addModules([
 			converse,
 			dependencies,
 			engineToolkit, // Model: SignTX contains Manifest
+			"JSON",
 			profile, // Account
 			"ProfileClient",
 		],
@@ -574,6 +576,7 @@ package.addModules([
 			"Common",
 			engineToolkit,
 			"EngineToolkitClient",
+			"JSON",
 			profile, // address
 			dependencies, // XCTestDynamicOverlay + DependencyKey
 		],
@@ -585,7 +588,7 @@ package.addModules([
 		)
 	),
 	.client(
-		name: "JSONDecoder",
+		name: "JSON", // TODO: extract into external CoreDependencies package, or just as part of Common
 		dependencies: [
 			dependencies,
 		],
@@ -630,6 +633,7 @@ package.addModules([
 	.client(
 		name: "ProfileLoader",
 		dependencies: [
+			"JSON",
 			"KeychainClientDependency",
 			profile,
 		],

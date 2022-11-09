@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import Data
 import Foundation
-import JSONDecoder
+import JSON
 import KeychainClientDependency
 import Profile
 

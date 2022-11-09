@@ -69,7 +69,7 @@ final class ImportProfileFeatureTests: TestCase {
 				XCTFail("Expected keychain to have set data for profile")
 				return
 			}
-			let decoded = try JSONDecoder.iso8601.decode(ProfileSnapshot.self, from: jsonData)
+			let decoded = try JSONDecoder.liveValue().decode(ProfileSnapshot.self, from: jsonData)
 			XCTAssertEqual(decoded, profileSnapshot)
 		}
 	}

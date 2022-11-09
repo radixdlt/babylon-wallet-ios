@@ -81,7 +81,6 @@ public struct MessageToDappRequest: Sendable, Equatable, Identifiable {
 }
 
 public extension MessageToDappRequest {
-	// FIXME: move this out and use Dependency
 	func data(jsonEncoder: JSONEncoder = .iso8601) throws -> Data {
 		try jsonEncoder.encode(requestMethodWalletResponse)
 	}
