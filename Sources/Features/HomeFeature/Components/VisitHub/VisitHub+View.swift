@@ -40,7 +40,7 @@ extension Home.VisitHub.Action {
 	init(action: Home.VisitHub.View.ViewAction) {
 		switch action {
 		case .visitHubButtonTapped:
-			self = .internal(.user(.visitHubButtonTapped))
+			self = .internal(.view(.visitHubButtonTapped))
 		}
 	}
 }

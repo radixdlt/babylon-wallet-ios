@@ -11,6 +11,6 @@ final class VisitHubTests: TestCase {
 		)
 
 		store.send(.internal(.user(.visitHubButtonTapped)))
-		store.receive(.coordinate(.displayHub))
+		store.receive(.delegate(.displayHub))
 	}
 }

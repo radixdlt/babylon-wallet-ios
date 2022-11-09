@@ -263,7 +263,7 @@ public struct Home: ReducerProtocol {
 		case .child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))):
 			return .run { send in await send(.internal(.system(.toggleIsCurrencyAmountVisible))) }
 
-		case .child(.visitHub(.coordinate(.displayHub))):
+		case .child(.visitHub(.delegate(.displayHub))):
 			return .fireAndForget {
 				await openURL(URL(string: "https://www.apple.com")!)
 			}

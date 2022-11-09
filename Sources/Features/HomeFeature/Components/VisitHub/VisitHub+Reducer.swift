@@ -5,9 +5,9 @@ public extension Home.VisitHub {
 	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
 	static let reducer = Reducer { _, action, _ in
 		switch action {
-		case .internal(.user(.visitHubButtonTapped)):
-			return Effect(value: .coordinate(.displayHub))
-		case .coordinate:
+		case .internal(.view(.visitHubButtonTapped)):
+			return Effect(value: .delegate(.displayHub))
+		case .delegate:
 			return .none
 		}
 	}
