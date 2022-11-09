@@ -13,7 +13,7 @@ public extension App {
 			.optional()
 			.pullback(
 				state: /App.State.main,
-				action: /Action.main,
+				action: /Action.child .. Action.ChildAction.main,
 				environment: {
 					Main.Environment(
 						accountPortfolioFetcher: $0.accountPortfolioFetcher,
@@ -26,7 +26,7 @@ public extension App {
 			),
 		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
 		AnyReducer { _ in
-			Scope(state: /App.State.onboarding, action: /Action.onboarding) {
+			Scope(state: /App.State.onboarding, action: /Action.child .. Action.ChildAction.onboarding) {
 				Onboarding()
 			}
 		},
@@ -35,7 +35,7 @@ public extension App {
 			.optional()
 			.pullback(
 				state: /App.State.splash,
-				action: /Action.splash,
+				action: /Action.child .. Action.ChildAction.splash,
 				environment: {
 					Splash.Environment(
 						mainQueue: $0.mainQueue,
@@ -50,73 +50,70 @@ public extension App {
 
 	static let appReducer = Reducer { state, action, environment in
 		switch action {
-		case .main(.delegate(.removedWallet)):
+		case .child(.main(.delegate(.removedWallet))):
 			return .run { send in
-				await send(.coordinate(.onboard))
+				await send(.internal(.system(.goToOnboarding)))
 			}
 
-		case let .onboarding(.delegate(.onboardedWithProfile(profile, isNew))):
+		case let .child(.onboarding(.delegate(.onboardedWithProfile(profile, isNew)))):
 			return .run { send in
-				await send(.internal(.injectProfileIntoProfileClient(profile, persistIntoKeychain: true)))
+				await send(.internal(.system(.injectProfileIntoProfileClient(profile, persistIntoKeychain: true))))
 			}
 
-		case let .onboarding(.delegate(.failedToCreateOrImportProfile(failureReason))):
+		case let .child(.onboarding(.delegate(.failedToCreateOrImportProfile(failureReason)))):
 			return .run { send in
-				await send(.coordinate(.failedToCreateOrImportProfile(reason: failureReason)))
+				await send(.internal(.system(.failedToCreateOrImportProfile(reason: failureReason))))
 			}
 
-		case let .splash(.coordinate(.loadProfileResult(.profileLoaded(profile)))):
+		case let .child(.splash(.coordinate(.loadProfileResult(.profileLoaded(profile))))):
 			return .run { send in
-				await send(.internal(.injectProfileIntoProfileClient(profile, persistIntoKeychain: false)))
+				await send(.internal(.system(.injectProfileIntoProfileClient(profile, persistIntoKeychain: false))))
 			}
 
-		case let .splash(.coordinate(.loadProfileResult(.noProfile(reason, failedToDecode)))):
+		case let .child(.splash(.coordinate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
 			if failedToDecode {
 				return .run { send in
-					await send(.coordinate(.failedToCreateOrImportProfile(reason: "Failed to decode profile: \(reason)")))
+					await send(.internal(.system(.failedToCreateOrImportProfile(reason: "Failed to decode profile: \(reason)"))))
 				}
 			} else {
 				return .run { send in
-					await send(.coordinate(.onboard))
+					await send(.internal(.system(.goToOnboarding)))
 				}
 			}
 
-		case let .internal(.injectProfileIntoProfileClient(profile, persistIntoKeychain)):
+		// TODO: refactor into func after converting to reducer protocol
+		case let .internal(.system(.injectProfileIntoProfileClient(profile, persistIntoKeychain))):
 			return .run { send in
-				await send(.internal(.injectProfileIntoProfileClientResult(
+				await send(.internal(.system(.injectProfileIntoProfileClientResult(
 					TaskResult {
 						try await environment.profileClient.injectProfile(profile, persistIntoKeychain ? InjectProfileMode.injectAndPersistInKeychain : InjectProfileMode.onlyInject)
 						return profile
 					}
-				)))
+				))))
 			}
-		case let .internal(.injectProfileIntoProfileClientResult(.success(profile))):
+
+		case let .internal(.system(.injectProfileIntoProfileClientResult(.success(profile)))):
 			return .run { send in
-				await send(.coordinate(.toMain))
+				await send(.internal(.system(.goToMain)))
 			}
-		case let .internal(.injectProfileIntoProfileClientResult(.failure(error))):
+
+		case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))):
 			fatalError(String(describing: error))
 
-		case .coordinate(.onboard):
+		case .internal(.system(.goToOnboarding)):
 			state = .onboarding(.init())
 			return .none
 
-		case .coordinate(.toMain):
+		case .internal(.system(.goToMain)):
 			state = .main(.init())
 			return .none
 
-		case let .coordinate(.failedToCreateOrImportProfile(reason)):
+		case let .internal(.system(.failedToCreateOrImportProfile(reason))):
 			// FIXME: display error to user...
 			print("ERROR: \(reason)")
 			return .none
 
-		case .main:
-			return .none
-
-		case .onboarding:
-			return .none
-
-		case .splash:
+		case .child:
 			return .none
 		}
 	}

@@ -25,8 +25,8 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.main(.delegate(.removedWallet)))
-		_ = await store.receive(.coordinate(.onboard)) {
+		_ = await store.send(.child(.main(.delegate(.removedWallet))))
+		_ = await store.receive(.internal(.system(.goToOnboarding))) {
 			// then
 			$0 = .onboarding(.init())
 		}
@@ -47,15 +47,15 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// WHEN: a new profile is created
-		_ = await store.send(.onboarding(.child(.newProfile(.coordinate(.finishedCreatingNewProfile(newProfile))))))
-		_ = await store.receive(.onboarding(.delegate(.onboardedWithProfile(newProfile, isNew: true))))
+		_ = await store.send(.child(.onboarding(.child(.newProfile(.coordinate(.finishedCreatingNewProfile(newProfile)))))))
+		_ = await store.receive(.child(.onboarding(.delegate(.onboardedWithProfile(newProfile, isNew: true)))))
 
 		// THEN: it is injected into ProfileClient...
-		_ = await store.receive(.internal(.injectProfileIntoProfileClient(newProfile, persistIntoKeychain: true)))
+		_ = await store.receive(.internal(.system(.injectProfileIntoProfileClient(newProfile, persistIntoKeychain: true))))
 
 		// THEN: ... and we navigate to main
-		await store.receive(.internal(.injectProfileIntoProfileClientResult(.success(newProfile))))
-		await store.receive(.coordinate(.toMain)) {
+		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile)))))
+		await store.receive(.internal(.system(.goToMain))) {
 			$0 = .main(.init())
 		}
 	}
@@ -77,18 +77,18 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// WHEN: existing profile is loaded
-		_ = await store.send(.splash(.internal(.system(.loadProfileResult(.success(existingProfile))))))
+		_ = await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(existingProfile)))))))
 
-		_ = await store.receive(.splash(.internal(.coordinate(.loadProfileResult(.profileLoaded(existingProfile))))))
+		_ = await store.receive(.child(.splash(.internal(.coordinate(.loadProfileResult(.profileLoaded(existingProfile)))))))
 
 		await testScheduler.advance(by: .milliseconds(110))
-		_ = await store.receive(.splash(.coordinate(.loadProfileResult(.profileLoaded(existingProfile)))))
+		_ = await store.receive(.child(.splash(.coordinate(.loadProfileResult(.profileLoaded(existingProfile))))))
 
 		// THEN: it is injected into ProfileClient...
-		_ = await store.receive(.internal(.injectProfileIntoProfileClient(existingProfile, persistIntoKeychain: false)))
+		_ = await store.receive(.internal(.system(.injectProfileIntoProfileClient(existingProfile, persistIntoKeychain: false))))
 		// THEN: ... and we navigate to main
-		await store.receive(.internal(.injectProfileIntoProfileClientResult(.success(existingProfile))))
-		await store.receive(.coordinate(.toMain)) {
+		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(existingProfile)))))
+		await store.receive(.internal(.system(.goToMain))) {
 			$0 = .main(.init())
 		}
 	}
@@ -105,10 +105,10 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.splash(.coordinate(.loadProfileResult(loadProfileResult))))
+		_ = await store.send(.child(.splash(.coordinate(.loadProfileResult(loadProfileResult)))))
 
 		// then
-		_ = await store.receive(.coordinate(.failedToCreateOrImportProfile(reason: "Failed to decode profile: FAIL_FROM_TEST")))
+		_ = await store.receive(.internal(.system(.failedToCreateOrImportProfile(reason: "Failed to decode profile: FAIL_FROM_TEST"))))
 	}
 
 	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_thenNavigateToOnboarding() async {
@@ -123,10 +123,10 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.splash(.coordinate(.loadProfileResult(loadProfileResult))))
+		_ = await store.send(.child(.splash(.coordinate(.loadProfileResult(loadProfileResult)))))
 
 		// then
-		await store.receive(.coordinate(.onboard)) {
+		await store.receive(.internal(.system(.goToOnboarding))) {
 			$0 = .onboarding(.init())
 		}
 	}

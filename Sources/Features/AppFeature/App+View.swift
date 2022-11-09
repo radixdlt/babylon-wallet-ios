@@ -21,19 +21,19 @@ public extension App.View {
 		SwitchStore(store) {
 			CaseLet(
 				state: /App.State.main,
-				action: App.Action.main,
+				action: { App.Action.child(.main($0)) },
 				then: Main.View.init(store:)
 			)
 
 			CaseLet(
 				state: /App.State.onboarding,
-				action: App.Action.onboarding,
+				action: { App.Action.child(.onboarding($0)) },
 				then: Onboarding.View.init(store:)
 			)
 
 			CaseLet(
 				state: /App.State.splash,
-				action: App.Action.splash,
+				action: { App.Action.child(.splash($0)) },
 				then: Splash.View.init(store:)
 			)
 		}
