@@ -44,14 +44,14 @@ public extension Main {
 				return .run { send in
 					try environment.keychainClient.removeAllFactorSourcesAndProfileSnapshot()
 					try await environment.profileClient.deleteProfileSnapshot()
-					await send(.coordinate(.removedWallet))
+					await send(.delegate(.removedWallet))
 				}
 
 			case .child(.settings(.delegate(.dismissSettings))):
 				state.settings = nil
 				return .none
 
-			case .child, .coordinate:
+			case .child, .delegate:
 				return .none
 			}
 		}

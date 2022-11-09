@@ -50,7 +50,7 @@ public extension App {
 
 	static let appReducer = Reducer { state, action, environment in
 		switch action {
-		case .main(.coordinate(.removedWallet)):
+		case .main(.delegate(.removedWallet)):
 			return .run { send in
 				await send(.coordinate(.onboard))
 			}
