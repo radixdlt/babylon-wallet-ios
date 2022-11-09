@@ -1,5 +1,6 @@
 import Dependencies
 import Foundation
+import JSON
 import UserDefaultsClient
 
 // MARK: - AppSettingsClient + DependencyKey
@@ -9,9 +10,10 @@ extension AppSettingsClient: DependencyKey {
 	) -> Self {
 		let saveSettings: SaveSettings = { appSettings in
 			@Dependency(\.userDefaultsClient) var userDefaultsClient
+			@Dependency(\.jsonEncoder) var jsonEncoder
 
 			do {
-				let data = try JSONEncoder.iso8601.encode(appSettings)
+				let data = try jsonEncoder().encode(appSettings)
 				await userDefaultsClient.setData(data, Key.appSettings.rawValue)
 			} catch {
 				throw Error.saveSettingsFailed(reason: String(describing: error))
@@ -30,7 +32,8 @@ extension AppSettingsClient: DependencyKey {
 			}
 
 			do {
-				let settings = try JSONDecoder().decode(AppSettings.self, from: data)
+				@Dependency(\.jsonDecoder) var jsonDecoder
+				let settings = try jsonDecoder().decode(AppSettings.self, from: data)
 				return settings
 			} catch {
 				throw Error.loadSettingsFailed(reason: String(describing: error))

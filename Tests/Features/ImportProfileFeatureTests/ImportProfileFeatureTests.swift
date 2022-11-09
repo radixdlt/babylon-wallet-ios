@@ -42,7 +42,6 @@ final class ImportProfileFeatureTests: TestCase {
 		sut.dependencies.data = .init(contentsOfURL: { _, _ in
 			Data("deadbeef".utf8) // invalid data
 		})
-		sut.dependencies.jsonDecoder = .iso8601
 
 		_ = await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
 		_ = await sut.receive(.delegate(.failedToImportProfileSnapshot(reason: "Failed to import ProfileSnapshot data, error: dataCorrupted(Swift.DecodingError.Context(codingPath: [], debugDescription: \"The given data was not valid JSON.\", underlyingError: Optional(Error Domain=NSCocoaErrorDomain Code=3840 \"Invalid value around line 1, column 0.\" UserInfo={NSDebugDescription=Invalid value around line 1, column 0., NSJSONSerializationErrorIndex=0})))")))
@@ -54,7 +53,6 @@ final class ImportProfileFeatureTests: TestCase {
 			XCTAssertEqual(options, .uncached)
 			return self.profileSnapshotData
 		})
-		sut.dependencies.jsonDecoder = .iso8601
 		let profileSnapshotDataInKeychain = ActorIsolated<Data?>(nil)
 		sut.dependencies.keychainClient.setDataDataForKey = { data, key in
 			if key == "profileSnapshotKeychainKey" {
@@ -71,7 +69,7 @@ final class ImportProfileFeatureTests: TestCase {
 				XCTFail("Expected keychain to have set data for profile")
 				return
 			}
-			let decoded = try JSONDecoder.iso8601.decode(ProfileSnapshot.self, from: jsonData)
+			let decoded = try JSONDecoder.liveValue().decode(ProfileSnapshot.self, from: jsonData)
 			XCTAssertEqual(decoded, profileSnapshot)
 		}
 	}

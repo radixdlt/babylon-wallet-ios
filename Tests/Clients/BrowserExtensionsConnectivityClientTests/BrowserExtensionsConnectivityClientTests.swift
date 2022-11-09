@@ -21,7 +21,7 @@ final class BrowerExtensionsConnectivityClientTests: TestCase {
 		}
 		""".data(using: .utf8)!
 
-		let decoder = JSONDecoder()
+		let decoder = JSONDecoder.liveValue()
 		let request = try decoder.decode(RequestMethodWalletRequest.self, from: json)
 		XCTAssertEqual(request.payloads, [RequestMethodWalletRequest.Payload.accountAddresses(.init(requestType: .accountAddresses, numberOfAddresses: 1))])
 	}
@@ -45,7 +45,7 @@ final class BrowerExtensionsConnectivityClientTests: TestCase {
 		  "requestId" : "ed987de8-fc30-40d0-81ea-e3eef117a2cc"
 		}
 		""".data(using: .utf8)!
-		let decoder = JSONDecoder()
+		let decoder = JSONDecoder.liveValue()
 		let request = try decoder.decode(RequestMethodWalletRequest.self, from: json)
 		XCTAssertEqual(request.method, .sendTransaction)
 		XCTAssertEqual(request.payloads[0].requestType, .sendTransaction)

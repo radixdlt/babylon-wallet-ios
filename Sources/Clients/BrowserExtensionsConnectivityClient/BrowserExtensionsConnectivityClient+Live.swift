@@ -2,6 +2,7 @@ import Converse
 import ConverseCommon
 import Dependencies
 import Foundation
+import JSON
 import ProfileClient
 
 // MARK: - BrowserExtensionsConnectivityClient + DependencyKey
@@ -96,8 +97,10 @@ extension BrowserExtensionsConnectivityClient: DependencyKey {
 			getIncomingMessageAsyncSequence: { id in
 				let connection = try await connectionsHolder.getConnection(id: id)
 				return await connection.connection.receive().map { msg in
+					@Dependency(\.jsonDecoder) var jsonDecoder
+
 					let jsonData = msg.messagePayload
-					let requestMethodWalletRequest = try JSONDecoder().decode(RequestMethodWalletRequest.self, from: jsonData)
+					let requestMethodWalletRequest = try jsonDecoder().decode(RequestMethodWalletRequest.self, from: jsonData)
 
 					return try IncomingMessageFromBrowser(
 						requestMethodWalletRequest: requestMethodWalletRequest,
@@ -107,8 +110,10 @@ extension BrowserExtensionsConnectivityClient: DependencyKey {
 				}.eraseToAnyAsyncSequence()
 			},
 			sendMessage: { outgoingMsg in
+				@Dependency(\.jsonEncoder) var jsonEncoder
+
 				let connection = try await connectionsHolder.getConnection(id: outgoingMsg.browserExtensionConnectionID)
-				let data = try outgoingMsg.data()
+				let data = try jsonEncoder().encode(outgoingMsg.requestMethodWalletResponse)
 				let p2pChannelRequestID = UUID().uuidString
 
 				try await connection.connection.send(

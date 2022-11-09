@@ -17,7 +17,7 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 
 		keychainClient.setDataDataForKey = { data, key in
 			if key == "profileSnapshotKeychainKey" {
-				if let snapshot = try? JSONDecoder.iso8601.decode(ProfileSnapshot.self, from: data) {
+				if let snapshot = try? JSONDecoder.liveValue().decode(ProfileSnapshot.self, from: data) {
 					let profile = try? Profile(snapshot: snapshot)
 					Task {
 						await profileSavedToKeychain.setValue(profile)
