@@ -8,21 +8,29 @@ import Profile
 public extension Settings {
 	// MARK: Action
 	enum Action: Equatable {
-		case coordinate(CoordinatingAction)
+		case child(ChildAction)
 		case `internal`(InternalAction)
+		case delegate(DelegateAction)
+	}
+}
+
+public extension Settings.Action {
+	enum ChildAction: Equatable {
 		case manageBrowserExtensionConnections(ManageBrowserExtensionConnections.Action)
 	}
 }
 
 public extension Settings.Action {
-	enum CoordinatingAction: Equatable {
-		case dismissSettings
-		case deleteProfileAndFactorSources
-	}
-
 	enum InternalAction: Equatable {
 		case user(UserAction)
 		case system(SystemAction)
+	}
+}
+
+public extension Settings.Action {
+	enum DelegateAction: Equatable {
+		case dismissSettings
+		case deleteProfileAndFactorSources
 	}
 }
 

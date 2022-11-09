@@ -18,7 +18,7 @@ public extension Settings {
 		Reduce(self.core)
 			.ifLet(\
 				.manageBrowserExtensionConnections,
-				action: /Settings.Action.manageBrowserExtensionConnections) {
+				action: /Action.child..Action.ChildAction.manageBrowserExtensionConnections) {
 					ManageBrowserExtensionConnections()
 			}
 			._printChanges()
@@ -31,12 +31,12 @@ public extension Settings {
 
 		case .internal(.user(.dismissSettings)):
 			return .run { send in
-				await send(.coordinate(.dismissSettings))
+				await send(.delegate(.dismissSettings))
 			}
 
 		case .internal(.user(.deleteProfileAndFactorSources)):
 			return .run { send in
-				await send(.coordinate(.deleteProfileAndFactorSources))
+				await send(.delegate(.deleteProfileAndFactorSources))
 			}
 
 		case .internal(.user(.goToBrowserExtensionConnections)):
@@ -65,18 +65,11 @@ public extension Settings {
 			return .none
 		#endif // DEBUG
 
-		case .coordinate:
-			return .none
-		case .manageBrowserExtensionConnections(.coordinate(.dismiss)):
+		case .child(.manageBrowserExtensionConnections(.delegate(.dismiss))):
 			state.manageBrowserExtensionConnections = nil
 			return .none
-		case .manageBrowserExtensionConnections(.internal(_)):
-			return .none
-		case .manageBrowserExtensionConnections(.inputBrowserExtensionConnectionPassword(_)):
-			return .none
-		case .manageBrowserExtensionConnections(.connectUsingPassword(_)):
-			return .none
-		case .manageBrowserExtensionConnections(.connection(_, _)):
+
+		case .child, .delegate:
 			return .none
 		}
 	}

@@ -38,7 +38,7 @@ public extension Settings.View {
 					IfLetStore(
 						store.scope(
 							state: \.manageBrowserExtensionConnections,
-							action: Settings.Action.manageBrowserExtensionConnections
+							action: { .child(.manageBrowserExtensionConnections($0)) }
 						),
 						then: ManageBrowserExtensionConnections.View.init(store:)
 					)
