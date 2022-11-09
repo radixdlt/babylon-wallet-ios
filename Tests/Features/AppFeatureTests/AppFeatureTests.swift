@@ -25,7 +25,7 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.main(.coordinate(.removedWallet)))
+		_ = await store.send(.main(.delegate(.removedWallet)))
 		_ = await store.receive(.coordinate(.onboard)) {
 			// then
 			$0 = .onboarding(.init())
@@ -47,8 +47,8 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// WHEN: a new profile is created
-		_ = await store.send(.onboarding(.newProfile(.coordinate(.finishedCreatingNewProfile(newProfile)))))
-		_ = await store.receive(.onboarding(.coordinate(.onboardedWithProfile(newProfile, isNew: true))))
+		_ = await store.send(.onboarding(.child(.newProfile(.coordinate(.finishedCreatingNewProfile(newProfile))))))
+		_ = await store.receive(.onboarding(.delegate(.onboardedWithProfile(newProfile, isNew: true))))
 
 		// THEN: it is injected into ProfileClient...
 		_ = await store.receive(.internal(.injectProfileIntoProfileClient(newProfile, persistIntoKeychain: true)))
