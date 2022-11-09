@@ -4,8 +4,15 @@ import Asset
 public extension FungibleTokenList {
 	// MARK: Action
 	enum Action: Equatable {
+		case child(ChildAction)
 		case `internal`(InternalAction)
-		case coordinate(CoordinatingAction)
+		case delegate(DelegateAction)
+	}
+}
+
+// MARK: - FungibleTokenList.Action.ChildAction
+public extension FungibleTokenList.Action {
+	enum ChildAction: Equatable {
 		case section(id: FungibleTokenCategory.CategoryType, action: FungibleTokenList.Section.Action)
 	}
 }
@@ -13,22 +20,22 @@ public extension FungibleTokenList {
 // MARK: - FungibleTokenList.Action.InternalAction
 public extension FungibleTokenList.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
+		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
-// MARK: - FungibleTokenList.Action.InternalAction.UserAction
-public extension FungibleTokenList.Action.InternalAction {
-	enum UserAction: Equatable {}
+// MARK: - FungibleTokenList.Action.ViewAction
+public extension FungibleTokenList.Action {
+	enum ViewAction: Equatable {}
 }
 
-// MARK: - FungibleTokenList.Action.InternalAction.SystemAction
-public extension FungibleTokenList.Action.InternalAction {
+// MARK: - FungibleTokenList.Action.SystemAction
+public extension FungibleTokenList.Action {
 	enum SystemAction: Equatable {}
 }
 
-// MARK: - FungibleTokenList.Action.CoordinatingAction
+// MARK: - FungibleTokenList.Action.DelegateAction
 public extension FungibleTokenList.Action {
-	enum CoordinatingAction: Equatable {}
+	enum DelegateAction: Equatable {}
 }
