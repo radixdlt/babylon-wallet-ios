@@ -17,6 +17,7 @@ public extension ManageBrowserExtensionConnections {
 	}
 }
 
+// MARK: - ManageBrowserExtensionConnections.Action.ChildAction
 public extension ManageBrowserExtensionConnections.Action {
 	enum ChildAction: Equatable {
 		case inputBrowserExtensionConnectionPassword(InputPassword.Action)
@@ -28,7 +29,7 @@ public extension ManageBrowserExtensionConnections.Action {
 	}
 }
 
-// MARK: - ManageBrowserExtensionConnections.Action.UserAction
+// MARK: - ManageBrowserExtensionConnections.Action.ViewAction
 public extension ManageBrowserExtensionConnections.Action {
 	enum ViewAction: Equatable {
 		case viewAppeared
@@ -38,6 +39,7 @@ public extension ManageBrowserExtensionConnections.Action {
 	}
 }
 
+// MARK: - ManageBrowserExtensionConnections.Action.InternalAction
 public extension ManageBrowserExtensionConnections.Action {
 	enum InternalAction: Equatable {
 		case view(ViewAction)
@@ -60,6 +62,7 @@ public extension ManageBrowserExtensionConnections.Action.InternalAction {
 	}
 }
 
+// MARK: - ManageBrowserExtensionConnections.Action.DelegateAction
 public extension ManageBrowserExtensionConnections.Action {
 	enum DelegateAction: Equatable {
 		case dismiss

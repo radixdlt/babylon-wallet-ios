@@ -14,12 +14,14 @@ public extension Settings {
 	}
 }
 
+// MARK: - Settings.Action.ChildAction
 public extension Settings.Action {
 	enum ChildAction: Equatable {
 		case manageBrowserExtensionConnections(ManageBrowserExtensionConnections.Action)
 	}
 }
 
+// MARK: - Settings.Action.InternalAction
 public extension Settings.Action {
 	enum InternalAction: Equatable {
 		case user(UserAction)
@@ -27,6 +29,7 @@ public extension Settings.Action {
 	}
 }
 
+// MARK: - Settings.Action.DelegateAction
 public extension Settings.Action {
 	enum DelegateAction: Equatable {
 		case dismissSettings

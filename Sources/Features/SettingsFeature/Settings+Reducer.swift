@@ -18,7 +18,7 @@ public extension Settings {
 		Reduce(self.core)
 			.ifLet(\
 				.manageBrowserExtensionConnections,
-				action: /Action.child..Action.ChildAction.manageBrowserExtensionConnections) {
+				action: /Action.child .. Action.ChildAction.manageBrowserExtensionConnections) {
 					ManageBrowserExtensionConnections()
 			}
 			._printChanges()

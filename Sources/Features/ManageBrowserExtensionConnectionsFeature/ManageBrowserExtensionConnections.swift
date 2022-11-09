@@ -17,16 +17,16 @@ public struct ManageBrowserExtensionConnections: ReducerProtocol {
 public extension ManageBrowserExtensionConnections {
 	var body: some ReducerProtocol<State, Action> {
 		Reduce(self.core)
-			.forEach(\.connections, action: /Action.child..Action.ChildAction.connection) {
+			.forEach(\.connections, action: /Action.child .. Action.ChildAction.connection) {
 				ManageBrowserExtensionConnection()
 			}
 			.ifLet(
 				\.inputBrowserExtensionConnectionPassword,
-				action: /Action.child..Action.ChildAction.inputBrowserExtensionConnectionPassword
+				action: /Action.child .. Action.ChildAction.inputBrowserExtensionConnectionPassword
 			) {
 				InputPassword()
 			}
-			.ifLet(\.connectUsingPassword, action: /Action.child..Action.ChildAction.connectUsingPassword) {
+			.ifLet(\.connectUsingPassword, action: /Action.child .. Action.ChildAction.connectUsingPassword) {
 				ConnectUsingPassword()
 			}
 			._printChanges()
