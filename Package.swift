@@ -341,6 +341,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"Data",
+			"JSONDecoder",
 			"KeychainClientDependency",
 			"ProfileClient",
 			tca,
@@ -582,6 +583,13 @@ package.addModules([
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.client(
+		name: "JSONDecoder",
+		dependencies: [
+			dependencies,
+		],
+		tests: .no
 	),
 	.client(
 		name: "KeychainClientDependency",
