@@ -42,7 +42,7 @@ public extension CreateAccount {
 				await send(.delegate(.failedToCreateNewAccount(reason: String(describing: error))))
 			}
 
-		case .internal(.view(.dismissButtonTapped)):
+		case .internal(.view(.closeButtonTapped)):
 			return .run { send in
 				await send(.delegate(.dismissCreateAccount))
 			}
@@ -55,21 +55,21 @@ public extension CreateAccount {
 			}
 			return .none
 
-		case .internal(.view(.textFieldFocused)):
+		case let .internal(.view(.textFieldFocused(focus))):
 			return .run { send in
 				try await self.mainQueue.sleep(for: .seconds(0.5))
-				await send(.internal(.system(.focusTextField)))
+				await send(.internal(.system(.focusTextField(focus))))
 			}
 
 		case .internal(.view(.viewAppeared)):
 			return .run { send in
 				try await self.mainQueue.sleep(for: .seconds(0.5))
-				await send(.internal(.system(.focusTextField)))
+				await send(.internal(.system(.focusTextField(.accountName))))
 			}
 
-		/// FIXME: use reducer func instead - @davdroman-rdx
-		case .internal(.system(.focusTextField)):
-			state.focusedField = .accountName
+		// FIXME: use reducer func instead - @davdroman-rdx
+		case let .internal(.system(.focusTextField(focus))):
+			state.focusedField = focus
 			return .none
 
 		case .delegate:

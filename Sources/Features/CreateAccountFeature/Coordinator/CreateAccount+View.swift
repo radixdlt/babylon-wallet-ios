@@ -63,7 +63,7 @@ public extension CreateAccount.View {
 							.synchronize(
 								viewStore.binding(
 									get: \.focusedField,
-									send: { .textFieldFocused() }
+									send: { .textFieldFocused($0) }
 								),
 								self.$focusedField
 							)

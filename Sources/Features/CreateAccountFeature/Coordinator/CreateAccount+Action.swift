@@ -11,14 +11,14 @@ public extension CreateAccount {
 	}
 }
 
-// MARK: - CreateAccount.Action.InternalAction.UserAction
+// MARK: - CreateAccount.Action.ViewAction
 public extension CreateAccount.Action {
 	enum ViewAction: Equatable {
 		case viewAppeared
-		case dismissButtonTapped
+		case closeButtonTapped
 		case createAccountButtonTapped
 		case textFieldChanged(String)
-		case textFieldFocused
+		case textFieldFocused(CreateAccount.State.Field?)
 	}
 }
 
@@ -33,12 +33,12 @@ public extension CreateAccount.Action {
 // MARK: - CreateAccount.Action.InternalAction.SystemAction
 public extension CreateAccount.Action.InternalAction {
 	enum SystemAction: Equatable {
-		case focusTextField
+		case focusTextField(CreateAccount.State.Field?)
 		case createdNewAccountResult(TaskResult<OnNetwork.Account>)
 	}
 }
 
-// MARK: - CreateAccount.Action.CoordinatingAction
+// MARK: - CreateAccount.Action.DelegateAction
 public extension CreateAccount.Action {
 	enum DelegateAction: Equatable {
 		case dismissCreateAccount
