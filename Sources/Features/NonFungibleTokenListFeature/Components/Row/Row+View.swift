@@ -44,7 +44,7 @@ public extension NonFungibleTokenList.Row.View {
 							)
 							.zIndex(reversedZIndex(count: viewStore.containers.count, index: index))
 							.onTapGesture {
-								viewStore.send(.toggleIsExpanded, animation: Animation.easeInOut)
+								viewStore.send(.isExpandedToggled, animation: Animation.easeInOut)
 							}
 						default:
 							Component(
