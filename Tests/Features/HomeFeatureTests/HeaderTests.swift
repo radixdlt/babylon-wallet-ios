@@ -6,8 +6,7 @@ final class HeaderTests: TestCase {
 	func testSettingsButtonTapped() {
 		let store = TestStore(
 			initialState: Home.Header.State(),
-			reducer: Home.Header.reducer,
-			environment: Home.Header.Environment()
+			reducer: Home.Header()
 		)
 
 		store.send(.internal(.view(.settingsButtonTapped)))

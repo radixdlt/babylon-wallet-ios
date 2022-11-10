@@ -97,8 +97,7 @@ struct Header_Preview: PreviewProvider {
 		Home.Header.View(
 			store: .init(
 				initialState: .init(),
-				reducer: Home.Header.reducer,
-				environment: .init()
+				reducer: Home.Header()
 			)
 		)
 	}

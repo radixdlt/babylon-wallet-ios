@@ -29,10 +29,7 @@ public struct Home: ReducerProtocol {
 
 	public var body: some ReducerProtocol<State, Action> {
 		Scope(state: \.header, action: /Action.child .. Action.ChildAction.header) {
-			Reduce(
-				Home.Header.reducer,
-				environment: Home.Header.Environment()
-			)
+			Home.Header()
 		}
 
 		Scope(state: \.aggregatedValue, action: /Action.child .. Action.ChildAction.aggregatedValue) {
