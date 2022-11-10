@@ -28,7 +28,7 @@ public struct App: ReducerProtocol {
 				return .none
 
 			case let .child(.onboarding(.delegate(.onboardedWithProfile(profile, isNew)))):
-				return injectProfileIntoProfileClient(profile, persistIntoKeychain: true)
+				return injectProfileIntoProfileClient(profile, persistIntoKeychain: isNew)
 
 			case let .child(.onboarding(.delegate(.failedToCreateOrImportProfile(failureReason)))):
 				displayError(state: &state, reason: failureReason)

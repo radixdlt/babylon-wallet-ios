@@ -37,8 +37,9 @@ final class AppFeatureTests: TestCase {
 		)
 		let newProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
 		let expectation = expectation(description: "Profile injected")
-		store.dependencies.profileClient.injectProfile = { injected, _ in
+		store.dependencies.profileClient.injectProfile = { injected, mode in
 			XCTAssertEqual(injected, newProfile)
+			XCTAssert(mode == .injectAndPersistInKeychain)
 			expectation.fulfill()
 		}
 
@@ -46,7 +47,8 @@ final class AppFeatureTests: TestCase {
 		_ = await store.send(.child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))))
 
 		// then
-		_ = await store.receive(.child(.onboarding(.delegate(.onboardedWithProfile(newProfile, isNew: true))))) {
+		_ = await store.receive(.child(.onboarding(.delegate(.onboardedWithProfile(newProfile, isNew: true)))))
+		_ = await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile))))) {
 			$0 = .main(.init())
 		}
 
@@ -63,8 +65,11 @@ final class AppFeatureTests: TestCase {
 			reducer: App()
 		)
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-		store.dependencies.profileClient.injectProfile = { injected, _ in
-			XCTAssertEqual(injected, existingProfile) // assert correct profile is injected
+		let expectation = expectation(description: "Profile injected")
+		store.dependencies.profileClient.injectProfile = { injected, mode in
+			XCTAssertEqual(injected, existingProfile)
+			XCTAssert(mode == .onlyInject)
+			expectation.fulfill()
 		}
 
 		// WHEN: existing profile is loaded
@@ -73,10 +78,14 @@ final class AppFeatureTests: TestCase {
 		// then
 		_ = await store.receive(.child(.splash(.internal(.coordinate(.loadProfileResult(.profileLoaded(existingProfile)))))))
 
-		await testScheduler.advance(by: .milliseconds(110))
-		_ = await store.receive(.child(.splash(.delegate(.loadProfileResult(.profileLoaded(existingProfile)))))) {
+		await testScheduler.advance(by: .milliseconds(100))
+		_ = await store.receive(.child(.splash(.delegate(.loadProfileResult(.profileLoaded(existingProfile))))))
+
+		_ = await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(existingProfile))))) {
 			$0 = .main(.init())
 		}
+
+		wait(for: [expectation], timeout: 0)
 	}
 
 	func test_loadWalletResult_whenWalletLoadingFailedBecauseDecodingError_thenDoNothingForNow() async throws {
