@@ -2,6 +2,8 @@ import ComposableArchitecture
 
 // MARK: - AccountList
 public struct AccountList: ReducerProtocol {
+	public init() {}
+
 	public var body: some ReducerProtocol<State, Action> {
 		Reduce { state, action in
 			switch action {

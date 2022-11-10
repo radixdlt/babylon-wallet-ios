@@ -3,7 +3,7 @@ import ComposableArchitecture
 import NonEmpty
 import Profile
 
-// MARK: AccountList.State
+// MARK: - AccountList.State
 public extension AccountList {
 	// MARK: State
 	struct State: Equatable {
