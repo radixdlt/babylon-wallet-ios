@@ -53,8 +53,7 @@ struct Transfer_Preview: PreviewProvider {
 		AccountDetails.Transfer.View(
 			store: .init(
 				initialState: .init(),
-				reducer: AccountDetails.Transfer.reducer,
-				environment: .init()
+				reducer: AccountDetails.Transfer()
 			)
 		)
 	}
