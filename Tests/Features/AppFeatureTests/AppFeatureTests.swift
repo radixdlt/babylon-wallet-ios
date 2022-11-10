@@ -85,6 +85,8 @@ final class AppFeatureTests: TestCase {
 			$0 = .main(.init())
 		}
 
+		await testScheduler.run() // fast-forward scheduler to the end of time
+
 		wait(for: [expectation], timeout: 0)
 	}
 
