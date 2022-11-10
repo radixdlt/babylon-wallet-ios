@@ -42,7 +42,6 @@ public extension Settings {
 
 		#if DEBUG
 		case .internal(.view(.debugInspectProfileButtonTapped)):
-
 			return .run { [profileClient] send in
 				guard
 					let snapshot = try? profileClient.extractProfileSnapshot(),
@@ -52,6 +51,7 @@ public extension Settings {
 				}
 				await send(.internal(.system(.profileToDebugLoaded(profile))))
 			}
+
 		case let .internal(.system(.profileToDebugLoaded(profile))):
 			state.profileToInspect = profile
 			return .none
