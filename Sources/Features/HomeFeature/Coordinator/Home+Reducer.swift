@@ -68,10 +68,7 @@ public struct Home: ReducerProtocol {
 			)
 		}
 		.ifLet(\.transfer, action: /Action.child .. Action.ChildAction.transfer) {
-			Reduce(
-				AccountDetails.Transfer.reducer,
-				environment: AccountDetails.Transfer.Environment()
-			)
+			AccountDetails.Transfer()
 		}
 		.ifLet(\.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
 			CreateAccount()
