@@ -2,11 +2,7 @@ import EngineToolkit
 import HomeFeature
 import SettingsFeature
 
-// MARK: - Main
-/// Namespace for MainFeature
-public enum Main {}
-
-// MARK: Main.State
+// MARK: - Main.State
 public extension Main {
 	// MARK: State
 	struct State: Equatable {

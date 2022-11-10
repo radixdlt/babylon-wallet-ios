@@ -48,8 +48,7 @@ struct AppView_Previews: PreviewProvider {
 		App.View(
 			store: .init(
 				initialState: .init(),
-				reducer: App.reducer,
-				environment: .noop
+				reducer: App()
 			)
 		)
 	}

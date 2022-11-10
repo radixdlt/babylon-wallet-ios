@@ -2,10 +2,13 @@ import ComposableArchitecture
 import Foundation
 import ProfileLoader
 
-public extension Splash {
-	// MARK: Reducer
-	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer { _, action, environment in
+public struct Splash: ReducerProtocol {
+	public init() {}
+
+	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.profileLoader) var profileLoader
+
+	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.system(.viewDidAppear)):
 			return .run { send in
@@ -13,10 +16,10 @@ public extension Splash {
 			}
 
 		case .internal(.system(.loadProfile)):
-			return .run { send in
+			return .run { [profileLoader] send in
 				await send(.internal(.system(.loadProfileResult(
 					TaskResult {
-						try await environment.profileLoader.loadProfile()
+						try await profileLoader.loadProfile()
 					}
 				))))
 			}
@@ -66,14 +69,14 @@ public extension Splash {
 				)
 			}
 		case let .internal(.coordinate(actionToCoordinate)):
-			return .run { send in
+			return .run { [mainQueue] send in
 				let durationInMS: Int
 				#if DEBUG
 				durationInMS = 100
 				#else
 				durationInMS = 700
 				#endif
-				try await environment.mainQueue.sleep(for: .milliseconds(durationInMS))
+				try await mainQueue.sleep(for: .milliseconds(durationInMS))
 				await send(.delegate(actionToCoordinate))
 			}
 

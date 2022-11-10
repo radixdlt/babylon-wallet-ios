@@ -4,6 +4,10 @@ import XCTestDynamicOverlay
 
 // MARK: - ProfileLoader + TestDependencyKey
 extension ProfileLoader: TestDependencyKey {
+	public static let previewValue = Self(
+		loadProfile: { nil }
+	)
+
 	public static let testValue = Self(
 		loadProfile: unimplemented("\(Self.self).loadProfile")
 	)
