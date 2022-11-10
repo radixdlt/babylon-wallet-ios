@@ -3,10 +3,6 @@ import ComposableArchitecture
 import NonEmpty
 import Profile
 
-// MARK: - AccountList
-/// Namespace for AccountListFeature
-public enum AccountList {}
-
 // MARK: AccountList.State
 public extension AccountList {
 	// MARK: State

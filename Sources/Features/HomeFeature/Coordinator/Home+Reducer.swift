@@ -53,10 +53,7 @@ public struct Home: ReducerProtocol {
 
 	func accountListReducer() -> some ReducerProtocol<State, Action> {
 		Scope(state: \.accountList, action: /Action.child .. Action.ChildAction.accountList) {
-			Reduce(
-				AccountList.reducer,
-				environment: AccountList.Environment()
-			)
+			AccountList()
 		}
 		.ifLet(\.accountDetails, action: /Action.child .. Action.ChildAction.accountDetails) {
 			Reduce(

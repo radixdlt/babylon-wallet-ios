@@ -58,8 +58,7 @@ struct AccountList_Preview: PreviewProvider {
 					accounts: .placeholder,
 					alert: nil
 				),
-				reducer: AccountList.reducer,
-				environment: .init()
+				reducer: AccountList()
 			)
 		)
 	}
