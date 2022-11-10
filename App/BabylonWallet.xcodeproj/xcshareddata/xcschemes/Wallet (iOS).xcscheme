@@ -7,7 +7,7 @@
       buildImplicitDependencies = "YES">
       <BuildActionEntries>
          <BuildActionEntry
-            buildForTesting = "YES"
+            buildForTesting = "NO"
             buildForRunning = "YES"
             buildForProfiling = "YES"
             buildForArchiving = "YES"
@@ -122,6 +122,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BrowserExtensionsConnectivityClientTests"
+               BuildableName = "BrowserExtensionsConnectivityClientTests"
+               BlueprintName = "BrowserExtensionsConnectivityClientTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "CommonTests"
                BuildableName = "CommonTests"
                BlueprintName = "CommonTests"
@@ -135,6 +145,16 @@
                BlueprintIdentifier = "CreateAccountFeatureTests"
                BuildableName = "CreateAccountFeatureTests"
                BlueprintName = "CreateAccountFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "EngineToolkitClientTests"
+               BuildableName = "EngineToolkitClientTests"
+               BlueprintName = "EngineToolkitClientTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -172,6 +192,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ImportProfileFeatureTests"
+               BuildableName = "ImportProfileFeatureTests"
+               BlueprintName = "ImportProfileFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "IncomingConnectionRequestFromDappReviewFeatureTests"
                BuildableName = "IncomingConnectionRequestFromDappReviewFeatureTests"
                BlueprintName = "IncomingConnectionRequestFromDappReviewFeatureTests"
@@ -195,6 +225,16 @@
                BlueprintIdentifier = "MainFeatureTests"
                BuildableName = "MainFeatureTests"
                BlueprintName = "MainFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ManageBrowserExtensionConnectionsFeatureTests"
+               BuildableName = "ManageBrowserExtensionConnectionsFeatureTests"
+               BlueprintName = "ManageBrowserExtensionConnectionsFeatureTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -242,6 +282,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ProfileLoaderTests"
+               BuildableName = "ProfileLoaderTests"
+               BlueprintName = "ProfileLoaderTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "SettingsFeatureTests"
                BuildableName = "SettingsFeatureTests"
                BlueprintName = "SettingsFeatureTests"
@@ -262,99 +312,19 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "UserDefaultsClientTests"
-               BuildableName = "UserDefaultsClientTests"
-               BlueprintName = "UserDefaultsClientTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "GatewayAPITests"
-               BuildableName = "GatewayAPITests"
-               BlueprintName = "GatewayAPITests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ImportProfileFeatureTests"
-               BuildableName = "ImportProfileFeatureTests"
-               BlueprintName = "ImportProfileFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "IncomingConnectionRequestFromDappReviewFeatureTests"
-               BuildableName = "IncomingConnectionRequestFromDappReviewFeatureTests"
-               BlueprintName = "IncomingConnectionRequestFromDappReviewFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProfileClientTests"
-               BuildableName = "ProfileClientTests"
-               BlueprintName = "ProfileClientTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BrowserExtensionsConnectivityClientTests"
-               BuildableName = "BrowserExtensionsConnectivityClientTests"
-               BlueprintName = "BrowserExtensionsConnectivityClientTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "EngineToolkitClientTests"
-               BuildableName = "EngineToolkitClientTests"
-               BlueprintName = "EngineToolkitClientTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ManageBrowserExtensionConnectionsFeatureTests"
-               BuildableName = "ManageBrowserExtensionConnectionsFeatureTests"
-               BlueprintName = "ManageBrowserExtensionConnectionsFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProfileLoaderTests"
-               BuildableName = "ProfileLoaderTests"
-               BlueprintName = "ProfileLoaderTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "TransactionSigningFeatureTests"
                BuildableName = "TransactionSigningFeatureTests"
                BlueprintName = "TransactionSigningFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "UserDefaultsClientTests"
+               BuildableName = "UserDefaultsClientTests"
+               BlueprintName = "UserDefaultsClientTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
