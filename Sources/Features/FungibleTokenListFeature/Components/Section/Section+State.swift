@@ -1,12 +1,6 @@
 import Asset
 import ComposableArchitecture
 
-// MARK: - FungibleTokenList.Section
-/// Namespace for Section
-public extension FungibleTokenList {
-	enum Section {}
-}
-
 // MARK: - FungibleTokenList.Section.State
 public extension FungibleTokenList.Section {
 	// MARK: State

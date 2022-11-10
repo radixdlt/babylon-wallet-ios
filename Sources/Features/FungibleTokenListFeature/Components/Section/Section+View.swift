@@ -73,8 +73,7 @@ struct Section_Preview: PreviewProvider {
 				initialState: .init(
 					id: .nonXrd, assets: []
 				),
-				reducer: FungibleTokenList.Section.reducer,
-				environment: .init()
+				reducer: FungibleTokenList.Section()
 			)
 		)
 	}

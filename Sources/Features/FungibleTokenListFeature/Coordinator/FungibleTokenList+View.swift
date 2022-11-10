@@ -69,8 +69,7 @@ struct FungibleTokenList_Preview: PreviewProvider {
 				initialState: .init(
 					sections: []
 				),
-				reducer: FungibleTokenList.reducer,
-				environment: .init()
+				reducer: FungibleTokenList()
 			)
 		)
 	}

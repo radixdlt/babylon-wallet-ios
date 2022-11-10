@@ -1,10 +1,6 @@
 import Common
 import ComposableArchitecture
 
-// MARK: - FungibleTokenList
-/// Namespace for FungibleTokenListFeature
-public enum FungibleTokenList {}
-
 // MARK: FungibleTokenList.State
 public extension FungibleTokenList {
 	// MARK: State

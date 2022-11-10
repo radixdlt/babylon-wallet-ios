@@ -147,8 +147,7 @@ struct Row_Preview: PreviewProvider {
 					currency: .usd,
 					isCurrencyAmountVisible: true
 				),
-				reducer: FungibleTokenList.Row.reducer,
-				environment: .init()
+				reducer: FungibleTokenList.Row()
 			)
 		)
 	}

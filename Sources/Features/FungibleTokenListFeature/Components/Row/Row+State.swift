@@ -3,12 +3,6 @@ import Common
 import Foundation
 import Profile
 
-// MARK: - FungibleTokenList.Row
-/// Namespace for Row
-public extension FungibleTokenList {
-	enum Row {}
-}
-
 // MARK: - FungibleTokenList.Row.State
 public extension FungibleTokenList.Row {
 	// MARK: State

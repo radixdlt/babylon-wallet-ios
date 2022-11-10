@@ -1,22 +1,12 @@
 import ComposableArchitecture
 
-public extension FungibleTokenList {
-	// MARK: Reducer
-	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer.combine(
-		FungibleTokenList.Section.reducer.forEach(
-			state: \.sections,
-			action: /Action.child .. Action.ChildAction.section,
-			environment: { _ in FungibleTokenList.Section.Environment() }
-		),
+public struct FungibleTokenList: ReducerProtocol {
+	public init() {}
 
-		Reducer { _, action, _ in
-			switch action {
-			case .internal:
-				return .none
-			case .child, .delegate:
-				return .none
+	public var body: some ReducerProtocol<State, Action> {
+		EmptyReducer()
+			.forEach(\.sections, action: /Action.child .. Action.ChildAction.section) {
+				FungibleTokenList.Section()
 			}
-		}
-	)
+	}
 }
