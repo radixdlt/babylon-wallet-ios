@@ -24,71 +24,63 @@ public struct App: ReducerProtocol {
 		Reduce { state, action in
 			switch action {
 			case .child(.main(.delegate(.removedWallet))):
-				return .run { send in
-					await send(.internal(.system(.goToOnboarding)))
-				}
+				goToOnboarding(state: &state)
+				return .none
 
 			case let .child(.onboarding(.delegate(.onboardedWithProfile(profile, isNew)))):
-				return .run { send in
-					await send(.internal(.system(.injectProfileIntoProfileClient(profile, persistIntoKeychain: true))))
-				}
+				return injectProfileIntoProfileClient(profile, persistIntoKeychain: true)
 
 			case let .child(.onboarding(.delegate(.failedToCreateOrImportProfile(failureReason)))):
-				return .run { send in
-					await send(.internal(.system(.failedToCreateOrImportProfile(reason: failureReason))))
-				}
+				displayError(state: &state, reason: failureReason)
+				return .none
 
 			case let .child(.splash(.delegate(.loadProfileResult(.profileLoaded(profile))))):
-				return .run { send in
-					await send(.internal(.system(.injectProfileIntoProfileClient(profile, persistIntoKeychain: false))))
-				}
+				return injectProfileIntoProfileClient(profile, persistIntoKeychain: false)
 
 			case let .child(.splash(.delegate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
 				if failedToDecode {
-					return .run { send in
-						await send(.internal(.system(.failedToCreateOrImportProfile(reason: "Failed to decode profile: \(reason)"))))
-					}
+					displayError(state: &state, reason: "Failed to decode profile: \(reason)")
+					return .none
 				} else {
-					return .run { send in
-						await send(.internal(.system(.goToOnboarding)))
-					}
-				}
-
-			// TODO: refactor into func after converting to reducer protocol
-			case let .internal(.system(.injectProfileIntoProfileClient(profile, persistIntoKeychain))):
-				return .run { [profileClient] send in
-					await send(.internal(.system(.injectProfileIntoProfileClientResult(
-						TaskResult {
-							try await profileClient.injectProfile(profile, persistIntoKeychain ? InjectProfileMode.injectAndPersistInKeychain : InjectProfileMode.onlyInject)
-							return profile
-						}
-					))))
+					goToOnboarding(state: &state)
+					return .none
 				}
 
 			case let .internal(.system(.injectProfileIntoProfileClientResult(.success(profile)))):
-				return .run { send in
-					await send(.internal(.system(.goToMain)))
-				}
+				goToMain(state: &state)
+				return .none
 
 			case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))):
 				fatalError(String(describing: error))
-
-			case .internal(.system(.goToOnboarding)):
-				state = .onboarding(.init())
-				return .none
-
-			case .internal(.system(.goToMain)):
-				state = .main(.init())
-				return .none
-
-			case let .internal(.system(.failedToCreateOrImportProfile(reason))):
-				// FIXME: display error to user...
-				print("ERROR: \(reason)")
-				return .none
 
 			case .child:
 				return .none
 			}
 		}
+	}
+
+	func displayError(state: inout State, reason: String) {
+		// FIXME: display error to user...
+		print("ERROR: \(reason)")
+	}
+
+	func injectProfileIntoProfileClient(_ profile: Profile, persistIntoKeychain: Bool) -> EffectTask<Action> {
+		.run { send in
+			await send(.internal(.system(.injectProfileIntoProfileClientResult(
+				TaskResult {
+					let mode = persistIntoKeychain ? InjectProfileMode.injectAndPersistInKeychain : InjectProfileMode.onlyInject
+					try await profileClient.injectProfile(profile, mode)
+					return profile
+				}
+			))))
+		}
+	}
+
+	func goToMain(state: inout State) {
+		state = .main(.init())
+	}
+
+	func goToOnboarding(state: inout State) {
+		state = .onboarding(.init())
 	}
 }
