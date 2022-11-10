@@ -19,7 +19,7 @@ public extension Splash.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: Splash.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
@@ -27,7 +27,7 @@ public extension Splash.View {
 				}
 			}
 			.onAppear {
-				viewStore.send(.viewDidAppear)
+				viewStore.send(.viewAppeared)
 			}
 		}
 	}
@@ -38,23 +38,6 @@ extension Splash.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		init(state _: Splash.State) {}
-	}
-}
-
-// MARK: - Splash.View.ViewAction
-extension Splash.View {
-	// MARK: ViewAction
-	enum ViewAction {
-		case viewDidAppear
-	}
-}
-
-extension Splash.Action {
-	init(action: Splash.View.ViewAction) {
-		switch action {
-		case .viewDidAppear:
-			self = .internal(.system(.viewDidAppear))
-		}
 	}
 }
 

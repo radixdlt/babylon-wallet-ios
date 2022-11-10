@@ -10,7 +10,7 @@ public struct Splash: ReducerProtocol {
 
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.system(.viewDidAppear)):
+		case .internal(.view(.viewAppeared)):
 			return .run { send in
 				await send(.internal(.system(.loadProfile)))
 			}
