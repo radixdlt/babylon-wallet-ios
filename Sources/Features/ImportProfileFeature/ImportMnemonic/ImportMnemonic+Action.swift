@@ -12,6 +12,7 @@ public extension ImportMnemonic {
 	}
 }
 
+// MARK: - ImportMnemonic.Action.ViewAction
 public extension ImportMnemonic.Action {
 	enum ViewAction: Equatable {
 		case goBackButtonTapped
@@ -22,7 +23,7 @@ public extension ImportMnemonic.Action {
 	}
 }
 
-// MARK: - ImportMnemonic.InternalAction
+// MARK: - ImportMnemonic.Action.InternalAction
 public extension ImportMnemonic.Action {
 	enum InternalAction: Equatable {
 		case view(ViewAction)
@@ -30,6 +31,7 @@ public extension ImportMnemonic.Action {
 	}
 }
 
+// MARK: - ImportMnemonic.Action.SystemAction
 public extension ImportMnemonic.Action {
 	enum SystemAction: Equatable {
 		case importMnemonicResult(TaskResult<Mnemonic>)
@@ -38,7 +40,7 @@ public extension ImportMnemonic.Action {
 	}
 }
 
-// MARK: - ImportMnemonic.DelegateAction
+// MARK: - ImportMnemonic.Action.DelegateAction
 public extension ImportMnemonic.Action {
 	enum DelegateAction: Equatable {
 		case goBack

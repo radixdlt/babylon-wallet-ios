@@ -22,6 +22,7 @@ public extension Settings.Action {
 	}
 }
 
+// MARK: - Settings.Action.ViewAction
 public extension Settings.Action {
 	enum ViewAction: Equatable {
 		case dismissSettingsButtonTapped
@@ -42,7 +43,7 @@ public extension Settings.Action {
 	}
 }
 
-// MARK: - Settings.Action.InternalAction.UserAction
+// MARK: - Settings.Action.InternalAction.SystemAction
 public extension Settings.Action.InternalAction {
 	enum SystemAction: Equatable {
 		#if DEBUG

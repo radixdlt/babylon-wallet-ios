@@ -28,11 +28,11 @@ public struct Splash: ReducerProtocol {
 			return .run { send in
 				let result: SplashLoadProfileResult = {
 					switch loadResult {
-					case .success(let profile?):
+					case let .success(profile?):
 						return .profileLoaded(profile)
 					case .success(.none):
 						return .noProfile(reason: "No profile saved yet", failedToDecode: false)
-					case .failure(let error):
+					case let .failure(error):
 						return .noProfile(reason: String(describing: error), failedToDecode: error is Swift.DecodingError)
 					}
 				}()

@@ -17,6 +17,7 @@ public enum SplashLoadProfileResult: Equatable {
 	case noProfile(reason: String, failedToDecode: Bool)
 }
 
+// MARK: - Splash.Action.ViewAction
 public extension Splash.Action {
 	enum ViewAction: Equatable {
 		case viewAppeared
@@ -31,7 +32,7 @@ public extension Splash.Action {
 	}
 }
 
-// MARK: - Splash.Action.InternalAction.SystemAction
+// MARK: - Splash.Action.SystemAction
 public extension Splash.Action {
 	enum SystemAction: Equatable {
 		case loadProfile

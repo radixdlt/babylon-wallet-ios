@@ -9,7 +9,7 @@ public extension AccountList.Row {
 	}
 }
 
-// MARK: - AccountList.Row.Action.InternalAction.UserAction
+// MARK: - AccountList.Row.Action.ViewAction
 public extension AccountList.Row.Action {
 	enum ViewAction: Equatable {
 		case copyAddressButtonTapped

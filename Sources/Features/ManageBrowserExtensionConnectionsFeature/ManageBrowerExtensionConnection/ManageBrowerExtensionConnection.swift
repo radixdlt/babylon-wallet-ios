@@ -76,7 +76,7 @@ public extension ManageBrowserExtensionConnection {
 	}
 }
 
-// MARK: - ManageBrowserExtensionConnection.View.ViewAction
+// MARK: - ManageBrowserExtensionConnection.Action.ViewAction
 public extension ManageBrowserExtensionConnection.Action {
 	enum ViewAction: Equatable {
 		case deleteConnectionButtonTapped
