@@ -20,8 +20,7 @@ final class AppFeatureTests: TestCase {
 		let initialState = App.State.main(.placeholder)
 		let store = TestStore(
 			initialState: initialState,
-			reducer: App.reducer,
-			environment: .testValue
+			reducer: App()
 		)
 
 		// when
@@ -33,18 +32,15 @@ final class AppFeatureTests: TestCase {
 	}
 
 	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
-		var environment: App.Environment = .testValue
-		let newProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
-		environment.profileClient.injectProfile = { injected, _ in
-			XCTAssertEqual(injected, newProfile) // assert correct profile is injected
-		}
-
 		let store = TestStore(
 			// GIVEN: No profile (Onboarding)
 			initialState: .onboarding(Onboarding.State(newProfile: .init())),
-			reducer: App.reducer,
-			environment: environment
+			reducer: App()
 		)
+		let newProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
+		store.dependencies.profileClient.injectProfile = { injected, _ in
+			XCTAssertEqual(injected, newProfile) // assert correct profile is injected
+		}
 
 		// WHEN: a new profile is created
 		_ = await store.send(.child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))))
@@ -65,16 +61,14 @@ final class AppFeatureTests: TestCase {
 		let existingProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
 
 		let testScheduler = DispatchQueue.test
-		var environment: App.Environment = .testValue
-		environment.mainQueue = testScheduler.eraseToAnyScheduler()
-		environment.profileClient.injectProfile = { injected, _ in
-			XCTAssertEqual(injected, existingProfile) // assert correct profile is injected
-		}
 		let store = TestStore(
 			initialState: .splash(.init()),
-			reducer: App.reducer,
-			environment: environment
+			reducer: App()
 		)
+		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
+		store.dependencies.profileClient.injectProfile = { injected, _ in
+			XCTAssertEqual(injected, existingProfile) // assert correct profile is injected
+		}
 
 		// WHEN: existing profile is loaded
 		_ = await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(existingProfile)))))))
@@ -100,8 +94,7 @@ final class AppFeatureTests: TestCase {
 		let loadProfileResult = SplashLoadProfileResult.noProfile(reason: reason, failedToDecode: true)
 		let store = TestStore(
 			initialState: initialState,
-			reducer: App.reducer,
-			environment: .testValue
+			reducer: App()
 		)
 
 		// when
@@ -118,8 +111,7 @@ final class AppFeatureTests: TestCase {
 		let loadProfileResult = SplashLoadProfileResult.noProfile(reason: reason, failedToDecode: false)
 		let store = TestStore(
 			initialState: initialState,
-			reducer: App.reducer,
-			environment: .testValue
+			reducer: App()
 		)
 
 		// when
