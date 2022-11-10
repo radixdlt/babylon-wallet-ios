@@ -10,6 +10,17 @@ public struct App: ReducerProtocol {
 	@Dependency(\.profileClient) var profileClient
 
 	public var body: some ReducerProtocol<State, Action> {
+		EmptyReducer()
+			.ifCaseLet(/App.State.main, action: /Action.child .. Action.ChildAction.main) {
+				Main()
+			}
+			.ifCaseLet(/App.State.onboarding, action: /Action.child .. Action.ChildAction.onboarding) {
+				Onboarding()
+			}
+			.ifCaseLet(/App.State.splash, action: /Action.child .. Action.ChildAction.splash) {
+				Splash()
+			}
+
 		Reduce { state, action in
 			switch action {
 			case .child(.main(.delegate(.removedWallet))):
@@ -78,15 +89,6 @@ public struct App: ReducerProtocol {
 			case .child:
 				return .none
 			}
-		}
-		.ifCaseLet(/App.State.main, action: /Action.child .. Action.ChildAction.main) {
-			Main()
-		}
-		.ifCaseLet(/App.State.onboarding, action: /Action.child .. Action.ChildAction.onboarding) {
-			Onboarding()
-		}
-		.ifCaseLet(/App.State.splash, action: /Action.child .. Action.ChildAction.splash) {
-			Splash()
 		}
 	}
 }
