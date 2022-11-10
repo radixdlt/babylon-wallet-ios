@@ -46,7 +46,8 @@ jobs:
 
       - name: "Run unit tests"
         run: |
-          xcodebuild clean test -project App/BabylonWallet.xcodeproj -scheme "Wallet (iOS)" -destination "name=iPhone 14,OS=16.0"
+          set -o pipefail && \
+          xcodebuild clean test -project App/BabylonWallet.xcodeproj -scheme "Wallet (iOS)" -destination "name=iPhone 14,OS=16.0" | xcpretty
 
   # snapshot_tests:
   #   name: "Snapshot tests"
