@@ -5,9 +5,9 @@ import ProfileClient
 import SplashFeature
 
 public struct App: ReducerProtocol {
-	public init() {}
-
 	@Dependency(\.profileClient) var profileClient
+
+	public init() {}
 
 	public var body: some ReducerProtocol<State, Action> {
 		EmptyReducer()

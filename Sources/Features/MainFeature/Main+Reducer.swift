@@ -11,10 +11,10 @@ import SettingsFeature
 // #endif
 
 public struct Main: ReducerProtocol {
-	public init() {}
-
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
+
+	public init() {}
 
 	public var body: some ReducerProtocol<State, Action> {
 		Scope(state: \.home, action: /Action.child .. Action.ChildAction.home) {
