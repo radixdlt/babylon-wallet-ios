@@ -18,11 +18,11 @@ public struct AccountList: ReducerProtocol {
 					return .none
 				}
 				switch action {
-				case .internal(.user(.copyAddress)):
+				case .internal(.view(.copyAddressButtonTapped)):
 					return .run { send in
 						await send(.delegate(.copyAddress(account.address)))
 					}
-				case .internal(.user(.didSelect)):
+				case .internal(.view(.selected)):
 					return .run { send in
 						await send(.delegate(.displayAccountDetails(account)))
 					}

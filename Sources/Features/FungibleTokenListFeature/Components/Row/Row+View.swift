@@ -33,7 +33,7 @@ public extension FungibleTokenList.Row.View {
 
 // MARK: - FungibleTokenList.Row.View.RowViewStore
 private extension FungibleTokenList.Row.View {
-	typealias RowViewStore = ViewStore<FungibleTokenList.Row.View.ViewState, FungibleTokenList.Row.View.ViewAction>
+	typealias RowViewStore = ViewStore<FungibleTokenList.Row.View.ViewState, Never>
 }
 
 // MARK: - Private Methods

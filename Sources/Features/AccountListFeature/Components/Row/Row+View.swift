@@ -26,7 +26,7 @@ public extension AccountList.Row.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: AccountList.Row.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			VStack(alignment: .leading) {
 				VStack(alignment: .leading, spacing: 0) {
@@ -56,7 +56,7 @@ public extension AccountList.Row.View {
 			.background(Color.app.gray5)
 			.cornerRadius(6)
 			.onTapGesture {
-				viewStore.send(.didSelect)
+				viewStore.send(.selected)
 			}
 		}
 	}
@@ -69,26 +69,6 @@ private extension AccountList.Row.View {
 			return value?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign) -"
 		} else {
 			return "\(currency.sign) ••••"
-		}
-	}
-}
-
-// MARK: - AccountList.Row.View.ViewAction
-extension AccountList.Row.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case copyAddressButtonTapped
-		case didSelect
-	}
-}
-
-extension AccountList.Row.Action {
-	init(action: AccountList.Row.View.ViewAction) {
-		switch action {
-		case .copyAddressButtonTapped:
-			self = .internal(.user(.copyAddress))
-		case .didSelect:
-			self = .internal(.user(.didSelect))
 		}
 	}
 }
