@@ -43,10 +43,7 @@ public struct Home: ReducerProtocol {
 		}
 
 		Scope(state: \.visitHub, action: /Action.child .. Action.ChildAction.visitHub) {
-			Reduce(
-				Home.VisitHub.reducer,
-				environment: Home.VisitHub.Environment()
-			)
+			Home.VisitHub()
 		}
 
 		accountListReducer()

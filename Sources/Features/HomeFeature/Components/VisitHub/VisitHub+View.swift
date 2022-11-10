@@ -84,8 +84,7 @@ struct VisitHub_Preview: PreviewProvider {
 		Home.VisitHub.View(
 			store: .init(
 				initialState: .init(),
-				reducer: Home.VisitHub.reducer,
-				environment: .init()
+				reducer: Home.VisitHub()
 			)
 		)
 	}
