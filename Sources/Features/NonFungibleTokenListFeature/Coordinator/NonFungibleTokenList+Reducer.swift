@@ -1,22 +1,12 @@
 import ComposableArchitecture
 
-public extension NonFungibleTokenList {
-	// MARK: Reducer
-	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer.combine(
-		NonFungibleTokenList.Row.reducer.forEach(
-			state: \.rows,
-			action: /Action.child .. Action.ChildAction.asset,
-			environment: { _ in NonFungibleTokenList.Row.Environment() }
-		),
+public struct NonFungibleTokenList: ReducerProtocol {
+	public init() {}
 
-		Reducer { _, action, _ in
-			switch action {
-			case .internal:
-				return .none
-			case .child, .delegate:
-				return .none
+	public var body: some ReducerProtocol<State, Action> {
+		EmptyReducer()
+			.forEach(\.rows, action: /Action.child .. Action.ChildAction.asset) {
+				NonFungibleTokenList.Row()
 			}
-		}
-	)
+	}
 }

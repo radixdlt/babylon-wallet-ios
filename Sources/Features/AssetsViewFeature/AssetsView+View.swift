@@ -120,8 +120,7 @@ struct AssetsView_Preview: PreviewProvider {
 					fungibleTokenList: .init(sections: []),
 					nonFungibleTokenList: .init(rows: [])
 				),
-				reducer: AssetsView.reducer,
-				environment: .init()
+				reducer: AssetsView()
 			)
 		)
 	}

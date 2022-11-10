@@ -53,8 +53,7 @@ struct AccountPreferences_Preview: PreviewProvider {
 		AccountPreferences.View(
 			store: .init(
 				initialState: .init(),
-				reducer: AccountPreferences.reducer,
-				environment: .init()
+				reducer: AccountPreferences()
 			)
 		)
 	}

@@ -2,18 +2,15 @@ import ComposableArchitecture
 import FungibleTokenListFeature
 import NonFungibleTokenListFeature
 
-public extension AssetsView {
-	// MARK: Reducer
-	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer.combine(
-		NonFungibleTokenList.reducer
-			.pullback(
-				state: \.nonFungibleTokenList,
-				action: /Action.child .. Action.ChildAction.nonFungibleTokenList,
-				environment: { _ in NonFungibleTokenList.Environment() }
-			),
+public struct AssetsView: ReducerProtocol {
+	public init() {}
 
-		Reducer { state, action, _ in
+	public var body: some ReducerProtocol<State, Action> {
+		Scope(state: \.nonFungibleTokenList, action: /Action.child .. Action.ChildAction.nonFungibleTokenList) {
+			NonFungibleTokenList()
+		}
+
+		Reduce { state, action in
 			switch action {
 			case let .internal(.view(.listSelectorTapped(type))):
 				state.type = type
@@ -23,5 +20,5 @@ public extension AssetsView {
 				return .none
 			}
 		}
-	)
+	}
 }

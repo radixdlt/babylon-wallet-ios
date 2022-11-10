@@ -7,11 +7,7 @@ import Foundation
 import FungibleTokenListFeature
 import Profile
 
-// MARK: - AccountDetails
-/// Namespace for AccountDetailsFeature
-public enum AccountDetails {}
-
-// MARK: AccountDetails.State
+// MARK: - AccountDetails.State
 public extension AccountDetails {
 	// MARK: State
 	struct State: Equatable {

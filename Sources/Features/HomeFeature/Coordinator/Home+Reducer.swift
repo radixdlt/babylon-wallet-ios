@@ -36,10 +36,7 @@ public struct Home: ReducerProtocol {
 		}
 
 		Scope(state: \.aggregatedValue, action: /Action.child .. Action.ChildAction.aggregatedValue) {
-			Reduce(
-				AggregatedValue.reducer,
-				environment: AggregatedValue.Environment()
-			)
+			AggregatedValue()
 		}
 
 		Scope(state: \.visitHub, action: /Action.child .. Action.ChildAction.visitHub) {
@@ -56,16 +53,10 @@ public struct Home: ReducerProtocol {
 			AccountList()
 		}
 		.ifLet(\.accountDetails, action: /Action.child .. Action.ChildAction.accountDetails) {
-			Reduce(
-				AccountDetails.reducer,
-				environment: AccountDetails.Environment()
-			)
+			AccountDetails()
 		}
 		.ifLet(\.accountPreferences, action: /Action.child .. Action.ChildAction.accountPreferences) {
-			Reduce(
-				AccountPreferences.reducer,
-				environment: AccountPreferences.Environment()
-			)
+			AccountPreferences()
 		}
 		.ifLet(\.transfer, action: /Action.child .. Action.ChildAction.transfer) {
 			AccountDetails.Transfer()

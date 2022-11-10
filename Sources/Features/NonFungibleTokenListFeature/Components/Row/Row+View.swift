@@ -6,11 +6,11 @@ import SwiftUI
 // MARK: - NonFungibleTokenList.Row.View
 public extension NonFungibleTokenList.Row {
 	struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<RowState, Action>
+		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
-		@State private var expandedHeight: CGFloat = .zero
-		@State private var rowHeights: [Int: CGFloat] = [:] {
+		@SwiftUI.State private var expandedHeight: CGFloat = .zero
+		@SwiftUI.State private var rowHeights: [Int: CGFloat] = [:] {
 			didSet {
 				expandedHeight = rowHeights.map(\.value).reduce(0, +)
 			}
@@ -98,7 +98,7 @@ extension NonFungibleTokenList.Row.View {
 		let containers: [NonFungibleTokenContainer]
 		var isExpanded: Bool
 
-		init(state: NonFungibleTokenList.Row.RowState) {
+		init(state: NonFungibleTokenList.Row.State) {
 			containers = state.containers
 			isExpanded = state.isExpanded
 		}
@@ -192,8 +192,7 @@ struct Row_Preview: PreviewProvider {
 				initialState: .init(
 					containers: [.init(asset: NonFungibleToken.mock1, metadata: nil)]
 				),
-				reducer: NonFungibleTokenList.Row.reducer,
-				environment: .init()
+				reducer: NonFungibleTokenList.Row()
 			)
 		)
 	}
