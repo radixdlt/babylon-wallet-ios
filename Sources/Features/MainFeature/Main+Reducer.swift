@@ -5,11 +5,6 @@ import Profile
 import ProfileClient
 import SettingsFeature
 
-// #if os(iOS)
-//// FIXME: move to `UIApplicationClient` package!
-// import UIKit
-// #endif
-
 public struct Main: ReducerProtocol {
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
