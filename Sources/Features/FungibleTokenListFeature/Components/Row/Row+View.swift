@@ -22,9 +22,8 @@ public extension FungibleTokenList.Row {
 public extension FungibleTokenList.Row.View {
 	var body: some View {
 		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: FungibleTokenList.Row.Action.init
+			store.actionless,
+			observe: ViewState.init(state:)
 		) { viewStore in
 			tokenRow(with: viewStore, container: viewStore.container)
 				.padding([.leading, .trailing], 24)
@@ -101,22 +100,6 @@ private extension FungibleTokenList.Row.View {
 			return value?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign) -"
 		} else {
 			return "\(currency.sign) ••••"
-		}
-	}
-}
-
-// MARK: - FungibleTokenList.Row.View.ViewAction
-extension FungibleTokenList.Row.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {}
-}
-
-extension FungibleTokenList.Row.Action {
-	init(action: FungibleTokenList.Row.View.ViewAction) {
-		switch action {
-		default:
-			// TODO: implement
-			break
 		}
 	}
 }

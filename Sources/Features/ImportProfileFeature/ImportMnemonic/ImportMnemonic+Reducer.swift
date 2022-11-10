@@ -16,30 +16,30 @@ public struct ImportMnemonic: ReducerProtocol {
 public extension ImportMnemonic {
 	func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
 		switch action {
-		case .internal(.goBack):
+		case .internal(.view(.goBackButtonTapped)):
 			return .run { send in
 				await send(.delegate(.goBack))
 			}
 
-		case let .internal(.phraseOfMnemonicToImportChanged(phraseOfMnemonicToImport)):
+		case let .internal(.view(.phraseOfMnemonicToImportChanged(phraseOfMnemonicToImport))):
 			state.phraseOfMnemonicToImport = phraseOfMnemonicToImport
 			return .none
 
-		case .internal(.importMnemonic):
+		case .internal(.view(.importMnemonicButtonTapped)):
 			return .run { [mnemonicImporter, phrase = state.phraseOfMnemonicToImport] send in
-				await send(.internal(.importMnemonicResult(TaskResult { try mnemonicImporter(phrase) })))
+				await send(.internal(.system(.importMnemonicResult(TaskResult { try mnemonicImporter(phrase) }))))
 			}
 
-		case let .internal(.importMnemonicResult(.success(mnemonicToSave))):
+		case let .internal(.system(.importMnemonicResult(.success(mnemonicToSave)))):
 			state.importedMnemonic = mnemonicToSave
 			return .none
 
-		case let .internal(.importMnemonicResult(.failure(error))):
+		case let .internal(.system(.importMnemonicResult(.failure(error)))):
 			return .run { send in
 				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to import mnemonic, error: \(String(describing: error))")))
 			}
 
-		case .internal(.saveImportedMnemonic):
+		case .internal(.view(.saveImportedMnemonicButtonTapped)):
 			guard let mnemonic = state.importedMnemonic else {
 				return .none
 			}
@@ -49,40 +49,42 @@ public extension ImportMnemonic {
 			] send in
 				await send(
 					.internal(
-						.saveImportedMnemonicResult(
-							TaskResult(catching: {
-								try keychainClient.saveFactorSource(
-									mnemonic: mnemonic,
-									reference: factorSourceReference
-								)
-							}).map { mnemonic }
+						.system(
+							.saveImportedMnemonicResult(
+								TaskResult(catching: {
+									try keychainClient.saveFactorSource(
+										mnemonic: mnemonic,
+										reference: factorSourceReference
+									)
+								}).map { mnemonic }
+							)
 						)
 					)
 				)
 			}
 
-		case let .internal(.saveImportedMnemonicResult(.failure(error))):
+		case let .internal(.system(.saveImportedMnemonicResult(.failure(error)))):
 			return .run { send in
 				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to save mnemonic to keychain, error: \(String(describing: error))")))
 			}
 
-		case let .internal(.saveImportedMnemonicResult(.success(mnemonic))):
+		case let .internal(.system(.saveImportedMnemonicResult(.success(mnemonic)))):
 			state.savedMnemonic = mnemonic
 			return .none
 
-		case .internal(.importProfileFromSnapshot):
+		case .internal(.view(.importProfileFromSnapshotButtonTapped)):
 			return .run { [profileFromSnapshotImporter, snapshot = state.importedProfileSnapshot] send in
-				await send(.internal(.profileFromSnapshotResult(TaskResult {
+				await send(.internal(.system(.profileFromSnapshotResult(TaskResult {
 					try profileFromSnapshotImporter(snapshot)
-				})))
+				}))))
 			}
 
-		case let .internal(.profileFromSnapshotResult(.failure(error))):
+		case let .internal(.system(.profileFromSnapshotResult(.failure(error)))):
 			return .run { send in
 				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to import profile from snapshot, error: \(String(describing: error))")))
 			}
 
-		case let .internal(.profileFromSnapshotResult(.success(profile))):
+		case let .internal(.system(.profileFromSnapshotResult(.success(profile)))):
 			guard let mnemonic = state.savedMnemonic else {
 				return .run { send in
 					await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Expected to have saved mnemonic.")))

@@ -18,9 +18,8 @@ public extension FungibleTokenList.Section {
 public extension FungibleTokenList.Section.View {
 	var body: some View {
 		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: FungibleTokenList.Section.Action.init
+			store.actionless,
+			observe: ViewState.init(state:)
 		) { _ in
 			LazyVStack(spacing: 0) {
 				ForEachStore(
@@ -37,22 +36,6 @@ public extension FungibleTokenList.Section.View {
 					.shadow(color: .app.shadowBlack, radius: 8, x: 0, y: 9)
 			)
 			.padding([.leading, .trailing], 18)
-		}
-	}
-}
-
-// MARK: - FungibleTokenList.Section.View.ViewAction
-extension FungibleTokenList.Section.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {}
-}
-
-extension FungibleTokenList.Section.Action {
-	init(action: FungibleTokenList.Section.View.ViewAction) {
-		switch action {
-		default:
-			// TODO: implement
-			break
 		}
 	}
 }
