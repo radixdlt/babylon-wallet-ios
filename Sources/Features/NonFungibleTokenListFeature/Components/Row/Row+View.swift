@@ -29,7 +29,7 @@ public extension NonFungibleTokenList.Row.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: NonFungibleTokenList.Row.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			VStack(spacing: 1) {
 				ForEach(-1 ..< viewStore.containers.count) { index in
@@ -71,24 +71,7 @@ public extension NonFungibleTokenList.Row.View {
 
 // MARK: - NonFungibleTokenList.Row.View.ViewStore
 private extension NonFungibleTokenList.Row.View {
-	typealias ViewStore = ComposableArchitecture.ViewStore<NonFungibleTokenList.Row.View.ViewState, NonFungibleTokenList.Row.View.ViewAction>
-}
-
-// MARK: - NonFungibleTokenList.Row.View.ViewAction
-extension NonFungibleTokenList.Row.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case toggleIsExpanded
-	}
-}
-
-extension NonFungibleTokenList.Row.Action {
-	init(action: NonFungibleTokenList.Row.View.ViewAction) {
-		switch action {
-		case .toggleIsExpanded:
-			self = .internal(.view(.isExpandedToggled))
-		}
-	}
+	typealias ViewStore = ComposableArchitecture.ViewStore<NonFungibleTokenList.Row.View.ViewState, NonFungibleTokenList.Row.Action.ViewAction>
 }
 
 // MARK: - NonFungibleTokenList.Row.View.ViewState

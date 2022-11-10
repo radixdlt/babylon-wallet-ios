@@ -14,7 +14,7 @@ public extension Home.VisitHub.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: Home.VisitHub.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			VStack {
 				title
@@ -24,23 +24,6 @@ public extension Home.VisitHub.View {
 			}
 			.background(Color.app.gray3)
 			.cornerRadius(6)
-		}
-	}
-}
-
-// MARK: - Home.VisitHub.View.ViewAction
-extension Home.VisitHub.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case visitHubButtonTapped
-	}
-}
-
-extension Home.VisitHub.Action {
-	init(action: Home.VisitHub.View.ViewAction) {
-		switch action {
-		case .visitHubButtonTapped:
-			self = .internal(.view(.visitHubButtonTapped))
 		}
 	}
 }
