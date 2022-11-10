@@ -26,25 +26,22 @@ public extension Settings {
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.system(.viewDidAppear)):
-			return .none
-
-		case .internal(.user(.dismissSettings)):
+		case .internal(.view(.dismissSettingsButtonTapped)):
 			return .run { send in
 				await send(.delegate(.dismissSettings))
 			}
 
-		case .internal(.user(.deleteProfileAndFactorSources)):
+		case .internal(.view(.deleteProfileAndFactorSourcesButtonTapped)):
 			return .run { send in
 				await send(.delegate(.deleteProfileAndFactorSources))
 			}
 
-		case .internal(.user(.goToBrowserExtensionConnections)):
+		case .internal(.view(.browserExtensionConnectionsButtonTapped)):
 			state.manageBrowserExtensionConnections = .init()
 			return .none
 
 		#if DEBUG
-		case .internal(.user(.debugInspectProfile)):
+		case .internal(.view(.debugInspectProfileButtonTapped)):
 
 			return .run { [profileClient] send in
 				guard
@@ -59,7 +56,7 @@ public extension Settings {
 			state.profileToInspect = profile
 			return .none
 
-		case let .internal(.user(.setDebugProfileSheet(isPresented))):
+		case let .internal(.view(.setDebugProfileSheet(isPresented))):
 			precondition(!isPresented)
 			state.profileToInspect = nil
 			return .none

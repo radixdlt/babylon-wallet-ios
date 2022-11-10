@@ -9,6 +9,7 @@ public extension Settings {
 	// MARK: Action
 	enum Action: Equatable {
 		case child(ChildAction)
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
@@ -21,19 +22,23 @@ public extension Settings.Action {
 	}
 }
 
-// MARK: - Settings.Action.InternalAction
 public extension Settings.Action {
-	enum InternalAction: Equatable {
-		case user(UserAction)
-		case system(SystemAction)
+	enum ViewAction: Equatable {
+		case dismissSettingsButtonTapped
+		case deleteProfileAndFactorSourcesButtonTapped
+		case browserExtensionConnectionsButtonTapped
+		#if DEBUG
+		case debugInspectProfileButtonTapped
+		case setDebugProfileSheet(isPresented: Bool)
+		#endif // DEBUG
 	}
 }
 
-// MARK: - Settings.Action.DelegateAction
+// MARK: - Settings.Action.InternalAction
 public extension Settings.Action {
-	enum DelegateAction: Equatable {
-		case dismissSettings
-		case deleteProfileAndFactorSources
+	enum InternalAction: Equatable {
+		case view(ViewAction)
+		case system(SystemAction)
 	}
 }
 
@@ -43,16 +48,13 @@ public extension Settings.Action.InternalAction {
 		#if DEBUG
 		case profileToDebugLoaded(Profile)
 		#endif // DEBUG
-		case viewDidAppear
 	}
+}
 
-	enum UserAction: Equatable {
+// MARK: - Settings.Action.DelegateAction
+public extension Settings.Action {
+	enum DelegateAction: Equatable {
 		case dismissSettings
 		case deleteProfileAndFactorSources
-		case goToBrowserExtensionConnections
-		#if DEBUG
-		case debugInspectProfile
-		case setDebugProfileSheet(isPresented: Bool)
-		#endif // DEBUG
 	}
 }
