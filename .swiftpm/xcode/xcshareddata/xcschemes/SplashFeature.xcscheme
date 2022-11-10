@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CreateAccountFeature"
-               BuildableName = "CreateAccountFeature"
-               BlueprintName = "CreateAccountFeature"
+               BlueprintIdentifier = "SplashFeature"
+               BuildableName = "SplashFeature"
+               BlueprintName = "SplashFeature"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CreateAccountFeatureTests"
-               BuildableName = "CreateAccountFeatureTests"
-               BlueprintName = "CreateAccountFeatureTests"
+               BlueprintIdentifier = "SplashFeatureTests"
+               BuildableName = "SplashFeatureTests"
+               BlueprintName = "SplashFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -60,9 +60,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "CreateAccountFeature"
-            BuildableName = "CreateAccountFeature"
-            BlueprintName = "CreateAccountFeature"
+            BlueprintIdentifier = "SplashFeature"
+            BuildableName = "SplashFeature"
+            BlueprintName = "SplashFeature"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>

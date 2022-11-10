@@ -19,11 +19,6 @@ public enum SplashLoadProfileResult: Equatable {
 // MARK: - Splash.Action.InternalAction
 public extension Splash.Action {
 	enum InternalAction: Equatable {
-		/// So we can use a single exit path, and `delay` to display this Splash for at
-		/// least 500 ms or suitable time
-		/// FIXME: use reducer func instead - @davdroman-rdx
-		case coordinate(DelegateAction)
-
 		case system(SystemAction)
 	}
 }

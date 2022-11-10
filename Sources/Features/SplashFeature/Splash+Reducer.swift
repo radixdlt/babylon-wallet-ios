@@ -24,64 +24,35 @@ public struct Splash: ReducerProtocol {
 				))))
 			}
 
-		case let .internal(.system(.loadProfileResult(.success(.some(profile))))):
+		case let .internal(.system(.loadProfileResult(loadResult))):
 			return .run { send in
-				await send(
-					.internal(
-						.coordinate(
-							.loadProfileResult(
-								.profileLoaded(profile)
-							)
-						)
-					)
-				)
-			}
+				let result: SplashLoadProfileResult = {
+					switch loadResult {
+					case .success(let profile?):
+						return .profileLoaded(profile)
+					case .success(.none):
+						return .noProfile(reason: "No profile saved yet", failedToDecode: false)
+					case .failure(let error):
+						return .noProfile(reason: String(describing: error), failedToDecode: error is Swift.DecodingError)
+					}
+				}()
 
-		case .internal(.system(.loadProfileResult(.success(.none)))):
-			return .run { send in
-				await send(
-					.internal(
-						.coordinate(
-							.loadProfileResult(
-								.noProfile(
-									reason: "No profile saved yet",
-									failedToDecode: false
-								)
-							)
-						)
-					)
-				)
-			}
-
-		case let .internal(.system(.loadProfileResult(.failure(error)))):
-			return .run { send in
-				await send(
-					.internal(
-						.coordinate(
-							.loadProfileResult(
-								.noProfile(
-									reason: String(describing: error),
-									failedToDecode: error is Swift.DecodingError
-								)
-							)
-						)
-					)
-				)
-			}
-		case let .internal(.coordinate(actionToCoordinate)):
-			return .run { [mainQueue] send in
-				let durationInMS: Int
-				#if DEBUG
-				durationInMS = 100
-				#else
-				durationInMS = 700
-				#endif
-				try await mainQueue.sleep(for: .milliseconds(durationInMS))
-				await send(.delegate(actionToCoordinate))
+				try await delay()
+				await send(.delegate(.loadProfileResult(result)))
 			}
 
 		case .delegate:
 			return .none
 		}
+	}
+
+	func delay() async throws {
+		let durationInMS: Int
+		#if DEBUG
+		durationInMS = 100
+		#else
+		durationInMS = 700
+		#endif
+		try await mainQueue.sleep(for: .milliseconds(durationInMS))
 	}
 }
