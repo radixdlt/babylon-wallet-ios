@@ -75,10 +75,9 @@ final class AppFeatureTests: TestCase {
 		// WHEN: existing profile is loaded
 		_ = await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(existingProfile)))))))
 
-		// then
-		_ = await store.receive(.child(.splash(.internal(.coordinate(.loadProfileResult(.profileLoaded(existingProfile)))))))
-
 		await testScheduler.advance(by: .milliseconds(100))
+
+		// then
 		_ = await store.receive(.child(.splash(.delegate(.loadProfileResult(.profileLoaded(existingProfile))))))
 
 		_ = await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(existingProfile))))) {
