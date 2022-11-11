@@ -5,9 +5,9 @@
 	<key>Kind</key>
 	<string>Xcode.IDEFoundation.TextSubstitutionFileTemplateKind</string>
 	<key>Description</key>
-	<string>TCA module</string>
+	<string>TCA Feature</string>
 	<key>Summary</key>
-	<string>TCA module</string>
+	<string>A TCA Feature split into different files</string>
 	<key>SortOrder</key>
 	<string>30</string>
 	<key>AllowedTypes</key>
@@ -15,7 +15,7 @@
 		<string>public.swift-source</string>
 	</array>
 	<key>DefaultCompletionName</key>
-	<string>Scene</string>
+	<string>New File</string>
 	<key>MainTemplateFile</key>
 	<string>___FILEBASENAME___.swift</string>
 	<key>Options</key>
