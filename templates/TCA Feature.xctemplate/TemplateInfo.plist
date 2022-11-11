@@ -24,7 +24,7 @@
 			<key>Description</key>
 			<string>The name of the feature to create (without &quot;Feature&quot; suffix)</string>
 			<key>Identifier</key>
-			<string>moduleName</string>
+			<string>featureName</string>
 			<key>Name</key>
 			<string>Feature:</string>
 			<key>NotPersisted</key>
@@ -33,6 +33,62 @@
 			<true/>
 			<key>Type</key>
 			<string>text</string>
+		</dict>
+		<dict>
+			<key>Default</key>
+			<string>___VARIABLE_featureName___+Action.swift</string>
+			<key>Identifier</key>
+			<string>actionName</string>
+			<key>Name</key>
+			<string>Action:</string>
+			<key>NotPersisted</key>
+			<true/>
+			<key>Required</key>
+			<true/>
+			<key>Type</key>
+			<string>static</string>
+		</dict>
+		<dict>
+			<key>Default</key>
+			<string>___VARIABLE_featureName___+Reducer.swift</string>
+			<key>Identifier</key>
+			<string>reducerName</string>
+			<key>Name</key>
+			<string>Reducer:</string>
+			<key>NotPersisted</key>
+			<true/>
+			<key>Required</key>
+			<true/>
+			<key>Type</key>
+			<string>static</string>
+		</dict>
+		<dict>
+			<key>Default</key>
+			<string>___VARIABLE_featureName___+State.swift</string>
+			<key>Identifier</key>
+			<string>stateName</string>
+			<key>Name</key>
+			<string>State:</string>
+			<key>NotPersisted</key>
+			<true/>
+			<key>Required</key>
+			<true/>
+			<key>Type</key>
+			<string>static</string>
+		</dict>
+		<dict>
+			<key>Default</key>
+			<string>___VARIABLE_featureName___+View.swift</string>
+			<key>Identifier</key>
+			<string>viewName</string>
+			<key>Name</key>
+			<string>View:</string>
+			<key>NotPersisted</key>
+			<true/>
+			<key>Required</key>
+			<true/>
+			<key>Type</key>
+			<string>static</string>
 		</dict>
 	</array>
 </dict>
