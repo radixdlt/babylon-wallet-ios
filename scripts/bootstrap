@@ -1,5 +1,10 @@
 #!/bin/bash
 
+echo "Installing CLI tools (if missing)"
+if ! command -v swiftformat &> /dev/null; then
+    brew install swiftformat
+fi
+
 DIR=$(cd "$(dirname "$BASH_SOURCE")" && pwd)
 
 pushd "$DIR/.." > /dev/null
