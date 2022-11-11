@@ -10,15 +10,17 @@ public struct AssetsView: ReducerProtocol {
 			NonFungibleTokenList()
 		}
 
-		Reduce { state, action in
-			switch action {
-			case let .internal(.view(.listSelectorTapped(type))):
-				state.type = type
-				return .none
+		Reduce(self.core)
+	}
 
-			case .child, .delegate:
-				return .none
-			}
+	func core(state: inout State, action: Action) -> EffectTask<Action> {
+		switch action {
+		case let .internal(.view(.listSelectorTapped(type))):
+			state.type = type
+			return .none
+
+		case .child, .delegate:
+			return .none
 		}
 	}
 }
