@@ -4,6 +4,9 @@ echo "Installing CLI tools (if missing)"
 if ! command -v swiftformat &> /dev/null; then
     brew install swiftformat
 fi
+if ! command -v realpath &> /dev/null; then
+    brew install coreutils
+fi
 
 DIR=$(cd "$(dirname "$BASH_SOURCE")" && pwd)
 
@@ -11,7 +14,12 @@ pushd "$DIR/.." > /dev/null
 
 echo "Symlinking Git hooks"
 mkdir -p .git/hooks
-ln -sf ../../scripts/pre-commit .git/hooks
+ln -sf "$(realpath --relative-to=.git/hooks scripts)/pre-commit" .git/hooks/
+
+echo "Importing custom Xcode templates"
+XCODE_TEMPLATES_DIR="$HOME/Library/Developer/Xcode/Templates/FileTemplates/Custom/"
+mkdir -p $XCODE_TEMPLATES_DIR
+ln -sf "$(realpath --relative-to=$XCODE_TEMPLATES_DIR templates)/TCA.xctemplate" "$XCODE_TEMPLATES_DIR"
 
 echo "Done ✅"
 
