@@ -39,12 +39,6 @@ public struct AccountDetails: ReducerProtocol {
 			case .child, .delegate:
 				return .none
 			}
-		case .internal(.view(.refreshButtonTapped)):
-			return Effect(value: .delegate(.refresh(state.address)))
-		case .internal(.view(.transferButtonTapped)):
-			return Effect(value: .delegate(.displayTransfer))
-		case .child, .delegate:
-			return .none
 		}
 	}
 }

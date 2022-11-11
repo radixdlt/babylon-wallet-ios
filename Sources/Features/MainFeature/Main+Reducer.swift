@@ -16,26 +16,7 @@ public struct Main: ReducerProtocol {
 			Home()
 		}
 
-		Reduce { state, action in
-			switch action {
-			case .child(.home(.delegate(.displaySettings))):
-				state.settings = .init()
-				return .none
-
-			case .child(.settings(.delegate(.deleteProfileAndFactorSources))):
-				return .run { send in
-					try keychainClient.removeAllFactorSourcesAndProfileSnapshot()
-					try await profileClient.deleteProfileSnapshot()
-					await send(.delegate(.removedWallet))
-				}
-
-			case .child(.settings(.delegate(.dismissSettings))):
-				state.settings = nil
-				return .none
-
-			case .child, .delegate:
-				return .none
-			}
+		Reduce(self.core)
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -45,7 +26,7 @@ public struct Main: ReducerProtocol {
 			return .none
 
 		case .child(.settings(.delegate(.deleteProfileAndFactorSources))):
-			return .run { [keychainClient, profileClient] send in
+			return .run { send in
 				try keychainClient.removeAllFactorSourcesAndProfileSnapshot()
 				try await profileClient.deleteProfileSnapshot()
 				await send(.delegate(.removedWallet))
