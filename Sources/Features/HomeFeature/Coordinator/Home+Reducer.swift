@@ -149,14 +149,6 @@ public struct Home: ReducerProtocol {
 				await send(.internal(.system(.isCurrencyAmountVisibleLoaded(appSettings.isCurrencyAmountVisible))))
 			}
 
-		case .internal(.system(.toggleIsCurrencyAmountVisible)):
-			return .run { send in
-				var isVisible = try await appSettingsClient.loadSettings().isCurrencyAmountVisible
-				isVisible.toggle()
-				try await appSettingsClient.saveIsCurrencyAmountVisible(isVisible)
-				await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
-			}
-
 		case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
 			// aggregated value
 			state.aggregatedValue.isCurrencyAmountVisible = isVisible
@@ -240,10 +232,10 @@ public struct Home: ReducerProtocol {
 			return .run { send in await send(.delegate(.displaySettings)) }
 
 		case .child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))):
-			return .run { send in await send(.internal(.system(.toggleIsCurrencyAmountVisible))) }
+			return toggleCurrencyAmountVisible()
 
 		case .child(.visitHub(.delegate(.displayHub))):
-			return .fireAndForget {
+			return .run { _ in
 				await openURL(URL(string: "https://www.apple.com")!)
 			}
 
@@ -288,7 +280,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case .child(.accountDetails(.child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))))):
-			return Effect(value: .internal(.system(.toggleIsCurrencyAmountVisible)))
+			return toggleCurrencyAmountVisible()
 
 		case .child(.transfer(.delegate(.dismissTransfer))):
 			state.transfer = nil
@@ -424,6 +416,15 @@ public struct Home: ReducerProtocol {
 
 		case .child, .delegate:
 			return .none
+		}
+	}
+
+	func toggleCurrencyAmountVisible() -> EffectTask<Action> {
+		.run { send in
+			var isVisible = try await appSettingsClient.loadSettings().isCurrencyAmountVisible
+			isVisible.toggle()
+			try await appSettingsClient.saveIsCurrencyAmountVisible(isVisible)
+			await send(.internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))))
 		}
 	}
 

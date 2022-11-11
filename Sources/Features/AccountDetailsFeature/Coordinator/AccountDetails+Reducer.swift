@@ -17,17 +17,25 @@ public struct AccountDetails: ReducerProtocol {
 		Reduce { state, action in
 			switch action {
 			case .internal(.view(.dismissAccountDetailsButtonTapped)):
-				return Effect(value: .delegate(.dismissAccountDetails))
+				return .run { send in
+					await send(.delegate(.dismissAccountDetails))
+				}
 			case .internal(.view(.displayAccountPreferencesButtonTapped)):
-				return Effect(value: .delegate(.displayAccountPreferences))
+				return .run { send in
+					await send(.delegate(.displayAccountPreferences))
+				}
 			case .internal(.view(.copyAddressButtonTapped)):
 				return .run { [address = state.address] send in
 					await send(.delegate(.copyAddress(address)))
 				}
 			case .internal(.view(.refreshButtonTapped)):
-				return Effect(value: .delegate(.refresh(state.address)))
+				return .run { [address = state.address] send in
+					await send(.delegate(.refresh(address)))
+				}
 			case .internal(.view(.transferButtonTapped)):
-				return Effect(value: .delegate(.displayTransfer))
+				return .run { send in
+					await send(.delegate(.displayTransfer))
+				}
 			case .child, .delegate:
 				return .none
 			}
