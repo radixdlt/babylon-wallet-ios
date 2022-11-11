@@ -75,6 +75,8 @@ public struct Home: ReducerProtocol {
 			return .run { send in
 				let accounts = try profileClient.getAccounts()
 				await send(.internal(.system(.createAccount(numberOfExistingAccounts: accounts.count))))
+			} catch: { error, _ in
+				print(error) // handle error
 			}
 
 		case let .internal(.system(.createAccount(numberOfExistingAccounts))):
@@ -94,14 +96,10 @@ public struct Home: ReducerProtocol {
 							do {
 								let incomingMsgs = try await browserExtensionsConnectivityClient.getIncomingMessageAsyncSequence(id)
 								for try await incomingMsg in incomingMsgs {
-									await send(.internal(.system(.receiveRequestMessageFromDappResult(
-										TaskResult.success(incomingMsg)
-									))))
+									await send(.internal(.system(.receiveRequestMessageFromDappResult(.success(incomingMsg)))))
 								}
 							} catch {
-								await send(.internal(.system(.receiveRequestMessageFromDappResult(
-									TaskResult.failure(error)
-								))))
+								await send(.internal(.system(.receiveRequestMessageFromDappResult(.failure(error)))))
 							}
 						}
 					}
@@ -110,6 +108,10 @@ public struct Home: ReducerProtocol {
 
 		case let .internal(.system(.receiveRequestMessageFromDappResult(.failure(error)))):
 			print("Failed to receive message from dApp, error: \(String(describing: error))")
+			return .none
+
+		case let .internal(.system(.receiveRequestMessageFromDappResult(.success(incomingMessageFromBrowser)))):
+			presentViewForRequestFromBrowser(state: &state, incomingRequestFromBrowser: incomingMessageFromBrowser)
 			return .none
 
 		case let .internal(.system(.connectionsLoadedResult(.failure(error)))):
@@ -229,7 +231,9 @@ public struct Home: ReducerProtocol {
 			return .none
 
 		case .child(.header(.delegate(.displaySettings))):
-			return .run { send in await send(.delegate(.displaySettings)) }
+			return .run { send in
+				await send(.delegate(.displaySettings))
+			}
 
 		case .child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))):
 			return toggleCurrencyAmountVisible()
@@ -311,38 +315,8 @@ public struct Home: ReducerProtocol {
 				await send(.internal(.system(.presentViewForRequestFromBrowser(next))))
 			}
 
-		case let .internal(.system(.receiveRequestMessageFromDappResult(.success(incomingMessageFromBrowser)))):
-			return .run { send in
-				await send(.internal(.system(.presentViewForRequestFromBrowser(incomingMessageFromBrowser))))
-			}
-
 		case let .internal(.system(.presentViewForRequestFromBrowser(incomingRequestFromBrowser))):
-
-			switch incomingRequestFromBrowser.payload {
-			case let .accountAddresses(accountAddressRequest):
-				if state.chooseAccountRequestFromDapp == nil {
-					state.chooseAccountRequestFromDapp = IncomingConnectionRequestFromDappReview.State(
-						incomingMessageFromBrowser: incomingRequestFromBrowser,
-						incomingConnectionRequestFromDapp: .init(addressRequest: accountAddressRequest, from: incomingRequestFromBrowser.requestMethodWalletRequest)
-					)
-				} else {
-					// Buffer
-					state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
-				}
-			case let .signTXRequest(signTXRequest):
-				if state.transactionSigning == nil {
-					// if `state.chooseAccountRequestFromDapp` is non nil, this will present SignTX view
-					// on top of chooseAccountsView...
-					state.transactionSigning = .init(
-						incomingMessageFromBrowser: incomingRequestFromBrowser,
-						addressOfSigner: signTXRequest.accountAddress,
-						transactionManifest: signTXRequest.transactionManifest
-					)
-				} else {
-					// Buffer
-					state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
-				}
-			}
+			presentViewForRequestFromBrowser(state: &state, incomingRequestFromBrowser: incomingRequestFromBrowser)
 			return .none
 
 		case .child(.chooseAccountRequestFromDapp(.delegate(.dismiss))):
@@ -452,6 +426,34 @@ public struct Home: ReducerProtocol {
 		// TODO: display confirmation popup? discuss with po / designer
 		.run { _ in
 			pasteboardClient.copyString(address.wrapAsAddress().address)
+		}
+	}
+
+	func presentViewForRequestFromBrowser(state: inout State, incomingRequestFromBrowser: IncomingMessageFromBrowser) {
+		switch incomingRequestFromBrowser.payload {
+		case let .accountAddresses(accountAddressRequest):
+			if state.chooseAccountRequestFromDapp == nil {
+				state.chooseAccountRequestFromDapp = IncomingConnectionRequestFromDappReview.State(
+					incomingMessageFromBrowser: incomingRequestFromBrowser,
+					incomingConnectionRequestFromDapp: .init(addressRequest: accountAddressRequest, from: incomingRequestFromBrowser.requestMethodWalletRequest)
+				)
+			} else {
+				// Buffer
+				state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
+			}
+		case let .signTXRequest(signTXRequest):
+			if state.transactionSigning == nil {
+				// if `state.chooseAccountRequestFromDapp` is non nil, this will present SignTX view
+				// on top of chooseAccountsView...
+				state.transactionSigning = .init(
+					incomingMessageFromBrowser: incomingRequestFromBrowser,
+					addressOfSigner: signTXRequest.accountAddress,
+					transactionManifest: signTXRequest.transactionManifest
+				)
+			} else {
+				// Buffer
+				state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
+			}
 		}
 	}
 }
