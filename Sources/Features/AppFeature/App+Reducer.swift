@@ -21,41 +21,43 @@ public struct App: ReducerProtocol {
 				Splash()
 			}
 
-		Reduce { state, action in
-			switch action {
-			case .child(.main(.delegate(.removedWallet))):
+		Reduce(self.core)
+	}
+
+	func core(state: inout State, action: Action) -> EffectTask<Action> {
+		switch action {
+		case .child(.main(.delegate(.removedWallet))):
+			goToOnboarding(state: &state)
+			return .none
+
+		case let .child(.onboarding(.delegate(.onboardedWithProfile(profile, isNew)))):
+			return injectProfileIntoProfileClient(profile, persistIntoKeychain: isNew)
+
+		case let .child(.onboarding(.delegate(.failedToCreateOrImportProfile(failureReason)))):
+			displayError(state: &state, reason: failureReason)
+			return .none
+
+		case let .child(.splash(.delegate(.loadProfileResult(.profileLoaded(profile))))):
+			return injectProfileIntoProfileClient(profile, persistIntoKeychain: false)
+
+		case let .child(.splash(.delegate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
+			if failedToDecode {
+				displayError(state: &state, reason: "Failed to decode profile: \(reason)")
+				return .none
+			} else {
 				goToOnboarding(state: &state)
 				return .none
-
-			case let .child(.onboarding(.delegate(.onboardedWithProfile(profile, isNew)))):
-				return injectProfileIntoProfileClient(profile, persistIntoKeychain: isNew)
-
-			case let .child(.onboarding(.delegate(.failedToCreateOrImportProfile(failureReason)))):
-				displayError(state: &state, reason: failureReason)
-				return .none
-
-			case let .child(.splash(.delegate(.loadProfileResult(.profileLoaded(profile))))):
-				return injectProfileIntoProfileClient(profile, persistIntoKeychain: false)
-
-			case let .child(.splash(.delegate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
-				if failedToDecode {
-					displayError(state: &state, reason: "Failed to decode profile: \(reason)")
-					return .none
-				} else {
-					goToOnboarding(state: &state)
-					return .none
-				}
-
-			case let .internal(.system(.injectProfileIntoProfileClientResult(.success(profile)))):
-				goToMain(state: &state)
-				return .none
-
-			case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))):
-				fatalError(String(describing: error))
-
-			case .child:
-				return .none
 			}
+
+		case let .internal(.system(.injectProfileIntoProfileClientResult(.success(profile)))):
+			goToMain(state: &state)
+			return .none
+
+		case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))):
+			fatalError(String(describing: error))
+
+		case .child:
+			return .none
 		}
 	}
 
