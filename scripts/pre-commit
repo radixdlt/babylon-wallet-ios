@@ -1,0 +1,5 @@
+#!/bin/bash
+
+DIR=$(cd "$(dirname "$BASH_SOURCE")" && pwd)
+
+"$DIR/git-format-staged" --formatter "swiftformat stdin --stdinpath '{}'" "*.swift"
