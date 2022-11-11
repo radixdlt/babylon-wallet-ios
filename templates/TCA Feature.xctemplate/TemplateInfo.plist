@@ -22,81 +22,17 @@
 	<array>
 		<dict>
 			<key>Description</key>
-			<string>The name of the module to create</string>
+			<string>The name of the feature to create (without &quot;Feature&quot; suffix)</string>
 			<key>Identifier</key>
 			<string>moduleName</string>
 			<key>Name</key>
-			<string>New Module Name:</string>
+			<string>Feature:</string>
 			<key>NotPersisted</key>
 			<true/>
 			<key>Required</key>
 			<true/>
 			<key>Type</key>
 			<string>text</string>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>___VARIABLE_moduleName___</string>
-			<key>Identifier</key>
-			<string>productName</string>
-			<key>Type</key>
-			<string>static</string>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>___VARIABLE_moduleName___+Action</string>
-			<key>Description</key>
-			<string>Action name</string>
-			<key>Identifier</key>
-			<string>actionName</string>
-			<key>Name</key>
-			<string>Action name:</string>
-			<key>Required</key>
-			<true/>
-			<key>Type</key>
-			<string>static</string>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>___VARIABLE_moduleName___+Reducer</string>
-			<key>Description</key>
-			<string>Reducer name</string>
-			<key>Identifier</key>
-			<string>reducerName</string>
-			<key>Name</key>
-			<string>Reducer name:</string>
-			<key>Required</key>
-			<true/>
-			<key>Type</key>
-			<string>static</string>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>___VARIABLE_moduleName___+State</string>
-			<key>Description</key>
-			<string>State name</string>
-			<key>Identifier</key>
-			<string>stateName</string>
-			<key>Name</key>
-			<string>State name:</string>
-			<key>Required</key>
-			<true/>
-			<key>Type</key>
-			<string>static</string>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>___VARIABLE_moduleName___+View</string>
-			<key>Description</key>
-			<string>View name</string>
-			<key>Identifier</key>
-			<string>viewName</string>
-			<key>Name</key>
-			<string>View name:</string>
-			<key>Required</key>
-			<true/>
-			<key>Type</key>
-			<string>static</string>
 		</dict>
 	</array>
 </dict>

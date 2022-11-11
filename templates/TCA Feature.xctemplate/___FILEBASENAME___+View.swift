@@ -17,7 +17,7 @@ public extension ___VARIABLE_moduleName___.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: (/___VARIABLE_moduleName___.Action.view).embed
+			send: { .view($0) }
 		) { _ in
 			// TODO: implement
 			Text("Implement: ___VARIABLE_moduleName___")

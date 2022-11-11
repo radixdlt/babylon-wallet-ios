@@ -3,7 +3,7 @@ import Foundation
 // MARK: - ___VARIABLE_moduleName___.Action
 public extension ___VARIABLE_moduleName___ {
 	enum Action: Equatable {
-		case view(ViewAction)
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
@@ -16,7 +16,15 @@ public extension ___VARIABLE_moduleName___.Action {
 
 // MARK: - ___VARIABLE_moduleName___.Action.InternalAction
 public extension ___VARIABLE_moduleName___.Action {
-	enum InternalAction: Equatable {}
+	enum InternalAction: Equatable {
+		case view(ViewAction)
+		case system(SystemAction)
+	}
+}
+
+// MARK: - ___VARIABLE_moduleName___.Action.SystemAction
+public extension ___VARIABLE_moduleName___.Action {
+	enum SystemAction: Equatable {}
 }
 
 // MARK: - ___VARIABLE_moduleName___.Action.DelegateAction

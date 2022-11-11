@@ -6,7 +6,7 @@ public struct ___VARIABLE_moduleName___: ReducerProtocol {
 }
 
 public extension ___VARIABLE_moduleName___ {
-	func reduce(into _: inout State, action _: Action) -> ComposableArchitecture.Effect<Action, Never> {
+	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		.none
 	}
 }
