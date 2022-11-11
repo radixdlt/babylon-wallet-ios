@@ -23,7 +23,7 @@ public struct Main: ReducerProtocol {
 				return .none
 
 			case .child(.settings(.delegate(.deleteProfileAndFactorSources))):
-				return .run { [keychainClient, profileClient] send in
+				return .run { send in
 					try keychainClient.removeAllFactorSourcesAndProfileSnapshot()
 					try await profileClient.deleteProfileSnapshot()
 					await send(.delegate(.removedWallet))
