@@ -46,7 +46,9 @@ public extension TransactionSigning {
 			return .none
 
 		case .internal(.view(.closeButtonTapped)):
-			return .run { send in await send(.delegate(.dismissView)) }
+			return .run { send in
+				await send(.delegate(.dismissView))
+			}
 
 		case .delegate:
 			return .none

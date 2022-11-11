@@ -44,7 +44,6 @@ public extension ImportMnemonic {
 				return .none
 			}
 			return .run { [
-				keychainClient,
 				factorSourceReference = state.importedProfileSnapshot.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
 			] send in
 				await send(
@@ -73,7 +72,7 @@ public extension ImportMnemonic {
 			return .none
 
 		case .internal(.view(.importProfileFromSnapshotButtonTapped)):
-			return .run { [profileFromSnapshotImporter, snapshot = state.importedProfileSnapshot] send in
+			return .run { [snapshot = state.importedProfileSnapshot] send in
 				await send(.internal(.system(.profileFromSnapshotResult(TaskResult {
 					try profileFromSnapshotImporter(snapshot)
 				}))))

@@ -20,7 +20,7 @@ public extension CreateAccount {
 			precondition(state.isValid)
 			precondition(!state.isCreatingAccount)
 			state.isCreatingAccount = true
-			return .run { [profileClient, accountName = state.accountName] send in
+			return .run { [accountName = state.accountName] send in
 				await send(.internal(.system(.createdNewAccountResult(
 					TaskResult {
 						let createAccountRequest = CreateAccountRequest(

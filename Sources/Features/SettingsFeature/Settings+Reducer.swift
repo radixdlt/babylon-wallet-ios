@@ -40,7 +40,7 @@ public extension Settings {
 
 		#if DEBUG
 		case .internal(.view(.debugInspectProfileButtonTapped)):
-			return .run { [profileClient] send in
+			return .run { send in
 				guard
 					let snapshot = try? profileClient.extractProfileSnapshot(),
 					let profile = try? Profile(snapshot: snapshot)

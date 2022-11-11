@@ -2,14 +2,15 @@ import ComposableArchitecture
 @testable import HomeFeature
 import TestUtils
 
+@MainActor
 final class VisitHubTests: TestCase {
-	func testVisitHubButtonTapped() {
+	func testVisitHubButtonTapped() async {
 		let store = TestStore(
 			initialState: Home.VisitHub.State(),
 			reducer: Home.VisitHub()
 		)
 
-		store.send(.internal(.view(.visitHubButtonTapped)))
-		store.receive(.delegate(.displayHub))
+		_ = await store.send(.internal(.view(.visitHubButtonTapped)))
+		await store.receive(.delegate(.displayHub))
 	}
 }

@@ -16,10 +16,6 @@ public extension ManageBrowserExtensionConnection {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.viewAppeared)):
-			return .run { send in
-				await send(.internal(.system(.subscribeToConnectionUpdates)))
-			}
-		case .internal(.system(.subscribeToConnectionUpdates)):
 			return .run { [id = state.id] send in
 				await withThrowingTaskGroup(of: Void.self) { taskGroup in
 					taskGroup.addTask {
@@ -101,7 +97,6 @@ public extension ManageBrowserExtensionConnection.Action {
 public extension ManageBrowserExtensionConnection.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case connectionStatusResult(TaskResult<Connection.State>)
-		case subscribeToConnectionUpdates
 	}
 }
 

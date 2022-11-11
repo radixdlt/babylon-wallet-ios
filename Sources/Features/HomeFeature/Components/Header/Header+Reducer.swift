@@ -7,7 +7,9 @@ public extension Home {
 		public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 			switch action {
 			case .internal(.view(.settingsButtonTapped)):
-				return Effect(value: .delegate(.displaySettings))
+				return .run { send in
+					await send(.delegate(.displaySettings))
+				}
 			case .delegate:
 				return .none
 			}

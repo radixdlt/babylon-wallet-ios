@@ -7,7 +7,9 @@ public struct AccountPreferences: ReducerProtocol {
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.dismissButtonTapped)):
-			return Effect(value: .delegate(.dismissAccountPreferences))
+			return .run { send in
+				await send(.delegate(.dismissAccountPreferences))
+			}
 		case .delegate:
 			return .none
 		}

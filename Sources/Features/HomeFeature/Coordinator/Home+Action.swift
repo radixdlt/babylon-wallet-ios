@@ -67,12 +67,10 @@ public extension Home.Action {
 
 		case receiveRequestMessageFromDappResult(TaskResult<IncomingMessageFromBrowser>)
 		case presentViewForRequestFromBrowser(IncomingMessageFromBrowser)
-		case presentViewForNextBufferedRequestFromBrowserIfNeeded
 
 		case accountsLoadedResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
 		case appSettingsLoadedResult(TaskResult<AppSettings>)
 		case connectionsLoadedResult(TaskResult<[BrowserExtensionWithConnectionStatus]>)
-		case toggleIsCurrencyAmountVisible
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)
 		case accountPortfolioResult(TaskResult<AccountPortfolioDictionary>)
