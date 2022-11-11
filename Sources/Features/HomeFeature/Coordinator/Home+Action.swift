@@ -67,7 +67,6 @@ public extension Home.Action {
 
 		case receiveRequestMessageFromDappResult(TaskResult<IncomingMessageFromBrowser>)
 		case presentViewForRequestFromBrowser(IncomingMessageFromBrowser)
-		case presentViewForNextBufferedRequestFromBrowserIfNeeded
 
 		case accountsLoadedResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
 		case appSettingsLoadedResult(TaskResult<AppSettings>)

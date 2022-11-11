@@ -303,27 +303,13 @@ public struct Home: ReducerProtocol {
 			print("Failed to create account: \(reason)")
 			return .none
 
-		case .internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)):
-
-			guard let next = state.unhandledReceivedMessages.first else {
-				return .none
-			}
-			state.unhandledReceivedMessages.removeFirst()
-
-			return .run { send in
-				try await mainQueue.sleep(for: .seconds(1))
-				await send(.internal(.system(.presentViewForRequestFromBrowser(next))))
-			}
-
 		case let .internal(.system(.presentViewForRequestFromBrowser(incomingRequestFromBrowser))):
 			presentViewForRequestFromBrowser(state: &state, incomingRequestFromBrowser: incomingRequestFromBrowser)
 			return .none
 
 		case .child(.chooseAccountRequestFromDapp(.delegate(.dismiss))):
 			state.chooseAccountRequestFromDapp = nil
-			return .run { send in
-				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
-			}
+			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
 
 		case let .child(.chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, incomingMessageFromBrowser)))):
 			state.chooseAccountRequestFromDapp = nil
@@ -361,9 +347,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case .internal(.system(.sendResponseBackToDappResult(.success(_)))):
-			return .run { send in
-				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
-			}
+			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
 
 		case let .internal(.system(.sendResponseBackToDappResult(.failure(error)))):
 			print("Failed to send response back over webRTC, error: \(String(describing: error))")
@@ -384,9 +368,7 @@ public struct Home: ReducerProtocol {
 
 		case .child(.transactionSigning(.delegate(.dismissView))):
 			state.transactionSigning = nil
-			return .run { send in
-				await send(.internal(.system(.presentViewForNextBufferedRequestFromBrowserIfNeeded)))
-			}
+			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
 
 		case .child, .delegate:
 			return .none
@@ -426,6 +408,18 @@ public struct Home: ReducerProtocol {
 		// TODO: display confirmation popup? discuss with po / designer
 		.run { _ in
 			pasteboardClient.copyString(address.wrapAsAddress().address)
+		}
+	}
+
+	func presentViewForNextBufferedRequestFromBrowserIfNeeded(state: inout State) -> EffectTask<Action> {
+		guard let next = state.unhandledReceivedMessages.first else {
+			return .none
+		}
+		state.unhandledReceivedMessages.removeFirst()
+
+		return .run { send in
+			try await mainQueue.sleep(for: .seconds(1))
+			await send(.internal(.system(.presentViewForRequestFromBrowser(next))))
 		}
 	}
 
