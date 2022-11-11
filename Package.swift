@@ -27,9 +27,6 @@ package.dependencies += [
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
 	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 
-	// Format code
-	.package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.50.2"),
-
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
 
@@ -653,12 +650,6 @@ package.addModules([
 // MARK: - Core
 
 package.addModules([
-	// For `swiftformat`: https://github.com/nicklockwood/SwiftFormat#1-create-a-buildtools-folder--packageswift
-	.core(
-		name: "_BuildTools",
-		dependencies: [],
-		tests: .no
-	),
 	.core(
 		name: "Common",
 		dependencies: [
