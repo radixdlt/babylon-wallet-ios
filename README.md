@@ -131,6 +131,11 @@ extension UserDefaultsClient {
 ```
 
 # Development
+Clone the repo and run bootstrap script:
+```sh
+./scripts/bootstrap
+```
+
 To open the project use:
 
 ```sh
