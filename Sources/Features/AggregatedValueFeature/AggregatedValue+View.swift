@@ -36,14 +36,6 @@ public extension AggregatedValue.View {
 	}
 }
 
-// MARK: - AggregatedValue.View.ViewAction
-extension AggregatedValue.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case toggleVisibilityButtonTapped
-	}
-}
-
 // MARK: - AggregatedValue.View.ViewState
 extension AggregatedValue.View {
 	// MARK: ViewState

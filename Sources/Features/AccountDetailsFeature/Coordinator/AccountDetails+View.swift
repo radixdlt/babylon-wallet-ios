@@ -138,8 +138,7 @@ struct AccountDetails_Preview: PreviewProvider {
 		AccountDetails.View(
 			store: .init(
 				initialState: .init(for: .placeholder),
-				reducer: AccountDetails.reducer,
-				environment: .init()
+				reducer: AccountDetails()
 			)
 		)
 	}

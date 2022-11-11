@@ -15,7 +15,7 @@ public struct ManageBrowserExtensionConnection: ReducerProtocol {
 public extension ManageBrowserExtensionConnection {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.system(.viewDidAppear)):
+		case .internal(.view(.viewAppeared)):
 			return .run { send in
 				await send(.internal(.system(.subscribeToConnectionUpdates)))
 			}
@@ -48,11 +48,11 @@ public extension ManageBrowserExtensionConnection {
 			print("Failed to get browser connection status update, error \(String(describing: error))")
 			return .none
 
-		case .internal(.user(.deleteConnection)):
+		case .internal(.view(.deleteConnectionButtonTapped)):
 			return .run { send in
 				await send(.delegate(.deleteConnection))
 			}
-		case .internal(.user(.sendTestMessage)):
+		case .internal(.view(.sendTestMessageButtonTapped)):
 			return .run { send in
 				await send(.delegate(.sendTestMessage))
 			}
@@ -70,14 +70,24 @@ public extension ManageBrowserExtensionConnection {
 // MARK: ManageBrowserExtensionConnection.Action
 public extension ManageBrowserExtensionConnection {
 	enum Action: Equatable {
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case delegate(DelegateAction)
 		case `internal`(InternalAction)
 	}
 }
 
+// MARK: - ManageBrowserExtensionConnection.Action.ViewAction
+public extension ManageBrowserExtensionConnection.Action {
+	enum ViewAction: Equatable {
+		case deleteConnectionButtonTapped
+		case sendTestMessageButtonTapped
+		case viewAppeared
+	}
+}
+
 public extension ManageBrowserExtensionConnection.Action {
 	enum InternalAction: Equatable {
-		case user(UserAction)
+		case view(ViewAction)
 		case system(SystemAction)
 	}
 
@@ -87,18 +97,9 @@ public extension ManageBrowserExtensionConnection.Action {
 	}
 }
 
-// MARK: - ManageBrowserExtensionConnection.Action.InternalAction.UserAction
-public extension ManageBrowserExtensionConnection.Action.InternalAction {
-	enum UserAction: Equatable {
-		case deleteConnection
-		case sendTestMessage
-	}
-}
-
 // MARK: - ManageBrowserExtensionConnection.Action.InternalAction.SystemAction
 public extension ManageBrowserExtensionConnection.Action.InternalAction {
 	enum SystemAction: Equatable {
-		case viewDidAppear
 		case connectionStatusResult(TaskResult<Connection.State>)
 		case subscribeToConnectionUpdates
 	}
@@ -120,7 +121,7 @@ public extension ManageBrowserExtensionConnection.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: ManageBrowserExtensionConnection.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			VStack {
 				Text("Connection ID: \(viewStore.connectionID)")
@@ -140,18 +141,9 @@ public extension ManageBrowserExtensionConnection.View {
 				}
 			}
 			.onAppear {
-				viewStore.send(.viewDidAppear)
+				viewStore.send(.viewAppeared)
 			}
 		}
-	}
-}
-
-// MARK: - ManageBrowserExtensionConnection.View.ViewAction
-public extension ManageBrowserExtensionConnection.View {
-	enum ViewAction: Equatable {
-		case deleteConnectionButtonTapped
-		case sendTestMessageButtonTapped
-		case viewDidAppear
 	}
 }
 
@@ -184,19 +176,6 @@ public extension ManageBrowserExtensionConnection.View.ViewState {
 			return .yellow
 		case .connected:
 			return .green
-		}
-	}
-}
-
-public extension ManageBrowserExtensionConnection.Action {
-	init(action: ManageBrowserExtensionConnection.View.ViewAction) {
-		switch action {
-		case .deleteConnectionButtonTapped:
-			self = .internal(.user(.deleteConnection))
-		case .sendTestMessageButtonTapped:
-			self = .internal(.user(.sendTestMessage))
-		case .viewDidAppear:
-			self = .internal(.system(.viewDidAppear))
 		}
 	}
 }

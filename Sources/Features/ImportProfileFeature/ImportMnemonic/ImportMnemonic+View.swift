@@ -17,7 +17,7 @@ public extension ImportMnemonic.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: ImportMnemonic.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			VStack {
 				HStack {
@@ -39,7 +39,7 @@ public extension ImportMnemonic.View {
 					"Mnemonic phrasec",
 					text: viewStore.binding(
 						get: \.phraseOfMnemonicToImport,
-						send: { ViewAction.phraseOfMnemonicToImportChanged($0) }
+						send: { .phraseOfMnemonicToImportChanged($0) }
 					)
 				)
 				Button("Import mnemonic") {
@@ -73,34 +73,6 @@ public extension ImportMnemonic.View {
 			canImportMnemonic = !state.phraseOfMnemonicToImport.isEmpty
 			canSaveImportedMnemonic = state.importedMnemonic != nil
 			canImportProfileFromSnapshot = state.savedMnemonic != nil
-		}
-	}
-}
-
-// MARK: - ImportMnemonic.View.ViewAction
-public extension ImportMnemonic.View {
-	enum ViewAction: Equatable {
-		case goBackButtonTapped
-		case importMnemonicButtonTapped
-		case importProfileFromSnapshotButtonTapped
-		case saveImportedMnemonicButtonTapped
-		case phraseOfMnemonicToImportChanged(String)
-	}
-}
-
-extension ImportMnemonic.Action {
-	init(action: ImportMnemonic.View.ViewAction) {
-		switch action {
-		case .goBackButtonTapped:
-			self = .internal(.goBack)
-		case .importMnemonicButtonTapped:
-			self = .internal(.importMnemonic)
-		case .importProfileFromSnapshotButtonTapped:
-			self = .internal(.importProfileFromSnapshot)
-		case .saveImportedMnemonicButtonTapped:
-			self = .internal(.saveImportedMnemonic)
-		case let .phraseOfMnemonicToImportChanged(phrase):
-			self = .internal(.phraseOfMnemonicToImportChanged(phrase))
 		}
 	}
 }

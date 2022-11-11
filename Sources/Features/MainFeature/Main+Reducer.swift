@@ -1,49 +1,31 @@
 import ComposableArchitecture
 import HomeFeature
+import KeychainClient
 import Profile
+import ProfileClient
 import SettingsFeature
 
-#if os(iOS)
-// FIXME: move to `UIApplicationClient` package!
-import UIKit
-#endif
+public struct Main: ReducerProtocol {
+	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.profileClient) var profileClient
 
-public extension Main {
-	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
+	public init() {}
 
-	// MARK: Reducer
-	static let reducer = Reducer.combine(
-		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
-		AnyReducer { _ in
+	public var body: some ReducerProtocol<State, Action> {
+		Scope(state: \.home, action: /Action.child .. Action.ChildAction.home) {
 			Home()
 		}
-		.pullback(
-			state: \.home,
-			action: /Main.Action.child .. Main.Action.ChildAction.home,
-			environment: { $0 }
-		),
 
-		// TODO: remove AnyReducer when migration to ReducerProtocol is complete
-		AnyReducer { _ in
-			Settings()
-		}
-		.optional()
-		.pullback(
-			state: \.settings,
-			action: /Main.Action.child .. Main.Action.ChildAction.settings,
-			environment: { $0 }
-		),
-
-		Reducer { state, action, environment in
+		Reduce { state, action in
 			switch action {
 			case .child(.home(.delegate(.displaySettings))):
 				state.settings = .init()
 				return .none
 
 			case .child(.settings(.delegate(.deleteProfileAndFactorSources))):
-				return .run { send in
-					try environment.keychainClient.removeAllFactorSourcesAndProfileSnapshot()
-					try await environment.profileClient.deleteProfileSnapshot()
+				return .run { [keychainClient, profileClient] send in
+					try keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+					try await profileClient.deleteProfileSnapshot()
 					await send(.delegate(.removedWallet))
 				}
 
@@ -55,6 +37,8 @@ public extension Main {
 				return .none
 			}
 		}
-	)
-	// .debug()
+		.ifLet(\.settings, action: /Action.child .. Action.ChildAction.settings) {
+			Settings()
+		}
+	}
 }

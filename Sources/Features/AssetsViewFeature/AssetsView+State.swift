@@ -3,11 +3,7 @@ import ComposableArchitecture
 import FungibleTokenListFeature
 import NonFungibleTokenListFeature
 
-// MARK: - AssetsView
-/// Namespace for AssetsViewFeature
-public enum AssetsView {}
-
-// MARK: AssetsView.State
+// MARK: - AssetsView.State
 public extension AssetsView {
 	// MARK: State
 	struct State: Equatable {
@@ -25,7 +21,7 @@ public extension AssetsView {
 	}
 }
 
-// MARK: AssetsView.AssetsViewType
+// MARK: - AssetsView.AssetsViewType
 public extension AssetsView {
 	enum AssetsViewType: String, CaseIterable, Identifiable {
 		case tokens

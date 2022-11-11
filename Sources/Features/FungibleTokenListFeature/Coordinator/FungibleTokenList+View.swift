@@ -18,9 +18,8 @@ public extension FungibleTokenList {
 public extension FungibleTokenList.View {
 	var body: some View {
 		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: FungibleTokenList.Action.init
+			store.actionless,
+			observe: ViewState.init(state:)
 		) { _ in
 			VStack(spacing: 30) {
 				LazyVStack(spacing: 20) {
@@ -33,22 +32,6 @@ public extension FungibleTokenList.View {
 					)
 				}
 			}
-		}
-	}
-}
-
-// MARK: - FungibleTokenList.View.ViewAction
-extension FungibleTokenList.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {}
-}
-
-extension FungibleTokenList.Action {
-	init(action: FungibleTokenList.View.ViewAction) {
-		switch action {
-		default:
-			// TODO: implement
-			break
 		}
 	}
 }
@@ -69,8 +52,7 @@ struct FungibleTokenList_Preview: PreviewProvider {
 				initialState: .init(
 					sections: []
 				),
-				reducer: FungibleTokenList.reducer,
-				environment: .init()
+				reducer: FungibleTokenList()
 			)
 		)
 	}

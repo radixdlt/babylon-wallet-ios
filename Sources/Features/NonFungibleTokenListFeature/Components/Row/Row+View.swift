@@ -6,11 +6,11 @@ import SwiftUI
 // MARK: - NonFungibleTokenList.Row.View
 public extension NonFungibleTokenList.Row {
 	struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<RowState, Action>
+		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
-		@State private var expandedHeight: CGFloat = .zero
-		@State private var rowHeights: [Int: CGFloat] = [:] {
+		@SwiftUI.State private var expandedHeight: CGFloat = .zero
+		@SwiftUI.State private var rowHeights: [Int: CGFloat] = [:] {
 			didSet {
 				expandedHeight = rowHeights.map(\.value).reduce(0, +)
 			}
@@ -29,7 +29,7 @@ public extension NonFungibleTokenList.Row.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: NonFungibleTokenList.Row.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			VStack(spacing: 1) {
 				ForEach(-1 ..< viewStore.containers.count) { index in
@@ -44,7 +44,7 @@ public extension NonFungibleTokenList.Row.View {
 							)
 							.zIndex(reversedZIndex(count: viewStore.containers.count, index: index))
 							.onTapGesture {
-								viewStore.send(.toggleIsExpanded, animation: Animation.easeInOut)
+								viewStore.send(.isExpandedToggled, animation: Animation.easeInOut)
 							}
 						default:
 							Component(
@@ -71,24 +71,7 @@ public extension NonFungibleTokenList.Row.View {
 
 // MARK: - NonFungibleTokenList.Row.View.ViewStore
 private extension NonFungibleTokenList.Row.View {
-	typealias ViewStore = ComposableArchitecture.ViewStore<NonFungibleTokenList.Row.View.ViewState, NonFungibleTokenList.Row.View.ViewAction>
-}
-
-// MARK: - NonFungibleTokenList.Row.View.ViewAction
-extension NonFungibleTokenList.Row.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {
-		case toggleIsExpanded
-	}
-}
-
-extension NonFungibleTokenList.Row.Action {
-	init(action: NonFungibleTokenList.Row.View.ViewAction) {
-		switch action {
-		case .toggleIsExpanded:
-			self = .internal(.view(.isExpandedToggled))
-		}
-	}
+	typealias ViewStore = ComposableArchitecture.ViewStore<NonFungibleTokenList.Row.View.ViewState, NonFungibleTokenList.Row.Action.ViewAction>
 }
 
 // MARK: - NonFungibleTokenList.Row.View.ViewState
@@ -98,7 +81,7 @@ extension NonFungibleTokenList.Row.View {
 		let containers: [NonFungibleTokenContainer]
 		var isExpanded: Bool
 
-		init(state: NonFungibleTokenList.Row.RowState) {
+		init(state: NonFungibleTokenList.Row.State) {
 			containers = state.containers
 			isExpanded = state.isExpanded
 		}
@@ -192,8 +175,7 @@ struct Row_Preview: PreviewProvider {
 				initialState: .init(
 					containers: [.init(asset: NonFungibleToken.mock1, metadata: nil)]
 				),
-				reducer: NonFungibleTokenList.Row.reducer,
-				environment: .init()
+				reducer: NonFungibleTokenList.Row()
 			)
 		)
 	}

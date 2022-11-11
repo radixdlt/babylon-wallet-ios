@@ -6,8 +6,7 @@ final class VisitHubTests: TestCase {
 	func testVisitHubButtonTapped() {
 		let store = TestStore(
 			initialState: Home.VisitHub.State(),
-			reducer: Home.VisitHub.reducer,
-			environment: Home.VisitHub.Environment()
+			reducer: Home.VisitHub()
 		)
 
 		store.send(.internal(.view(.visitHubButtonTapped)))

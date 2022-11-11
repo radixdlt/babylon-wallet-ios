@@ -3,10 +3,6 @@ import MainFeature
 import OnboardingFeature
 import SplashFeature
 
-// MARK: - App
-/// Namespace for AppFeature
-public enum App {}
-
 // MARK: App.State
 public extension App {
 	enum State: Equatable {

@@ -29,24 +29,15 @@ public struct Home: ReducerProtocol {
 
 	public var body: some ReducerProtocol<State, Action> {
 		Scope(state: \.header, action: /Action.child .. Action.ChildAction.header) {
-			Reduce(
-				Home.Header.reducer,
-				environment: Home.Header.Environment()
-			)
+			Home.Header()
 		}
 
 		Scope(state: \.aggregatedValue, action: /Action.child .. Action.ChildAction.aggregatedValue) {
-			Reduce(
-				AggregatedValue.reducer,
-				environment: AggregatedValue.Environment()
-			)
+			AggregatedValue()
 		}
 
 		Scope(state: \.visitHub, action: /Action.child .. Action.ChildAction.visitHub) {
-			Reduce(
-				Home.VisitHub.reducer,
-				environment: Home.VisitHub.Environment()
-			)
+			Home.VisitHub()
 		}
 
 		accountListReducer()
@@ -56,28 +47,16 @@ public struct Home: ReducerProtocol {
 
 	func accountListReducer() -> some ReducerProtocol<State, Action> {
 		Scope(state: \.accountList, action: /Action.child .. Action.ChildAction.accountList) {
-			Reduce(
-				AccountList.reducer,
-				environment: AccountList.Environment()
-			)
+			AccountList()
 		}
 		.ifLet(\.accountDetails, action: /Action.child .. Action.ChildAction.accountDetails) {
-			Reduce(
-				AccountDetails.reducer,
-				environment: AccountDetails.Environment()
-			)
+			AccountDetails()
 		}
 		.ifLet(\.accountPreferences, action: /Action.child .. Action.ChildAction.accountPreferences) {
-			Reduce(
-				AccountPreferences.reducer,
-				environment: AccountPreferences.Environment()
-			)
+			AccountPreferences()
 		}
 		.ifLet(\.transfer, action: /Action.child .. Action.ChildAction.transfer) {
-			Reduce(
-				AccountDetails.Transfer.reducer,
-				environment: AccountDetails.Transfer.Environment()
-			)
+			AccountDetails.Transfer()
 		}
 		.ifLet(\.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
 			CreateAccount()

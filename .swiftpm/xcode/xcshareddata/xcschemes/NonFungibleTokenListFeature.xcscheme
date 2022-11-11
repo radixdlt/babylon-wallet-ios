@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1340"
+   LastUpgradeVersion = "1400"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AppFeature"
-               BuildableName = "AppFeature"
-               BlueprintName = "AppFeature"
+               BlueprintIdentifier = "NonFungibleTokenListFeature"
+               BuildableName = "NonFungibleTokenListFeature"
+               BlueprintName = "NonFungibleTokenListFeature"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AppFeatureTests"
-               BuildableName = "AppFeatureTests"
-               BlueprintName = "AppFeatureTests"
+               BlueprintIdentifier = "NonFungibleTokenListFeatureTests"
+               BuildableName = "NonFungibleTokenListFeatureTests"
+               BlueprintName = "NonFungibleTokenListFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -60,9 +60,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "AppFeature"
-            BuildableName = "AppFeature"
-            BlueprintName = "AppFeature"
+            BlueprintIdentifier = "NonFungibleTokenListFeature"
+            BuildableName = "NonFungibleTokenListFeature"
+            BlueprintName = "NonFungibleTokenListFeature"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>

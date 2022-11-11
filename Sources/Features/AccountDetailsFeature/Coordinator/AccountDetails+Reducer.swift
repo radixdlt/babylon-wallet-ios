@@ -2,25 +2,19 @@ import AggregatedValueFeature
 import AssetsViewFeature
 import ComposableArchitecture
 
-public extension AccountDetails {
-	// MARK: Reducer
-	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer.combine(
-		AggregatedValue.reducer
-			.pullback(
-				state: \.aggregatedValue,
-				action: /AccountDetails.Action.child .. AccountDetails.Action.ChildAction.aggregatedValue,
-				environment: { _ in AggregatedValue.Environment() }
-			),
+public struct AccountDetails: ReducerProtocol {
+	public init() {}
 
-		AssetsView.reducer
-			.pullback(
-				state: \.assets,
-				action: /AccountDetails.Action.child .. AccountDetails.Action.ChildAction.assets,
-				environment: { _ in AssetsView.Environment() }
-			),
+	public var body: some ReducerProtocol<State, Action> {
+		Scope(state: \.aggregatedValue, action: /Action.child .. Action.ChildAction.aggregatedValue) {
+			AggregatedValue()
+		}
 
-		Reducer { state, action, _ in
+		Scope(state: \.assets, action: /Action.child .. Action.ChildAction.assets) {
+			AssetsView()
+		}
+
+		Reduce { state, action in
 			switch action {
 			case .internal(.view(.dismissAccountDetailsButtonTapped)):
 				return Effect(value: .delegate(.dismissAccountDetails))
@@ -38,5 +32,5 @@ public extension AccountDetails {
 				return .none
 			}
 		}
-	)
+	}
 }

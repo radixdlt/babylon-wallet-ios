@@ -29,7 +29,7 @@ public extension Settings.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: Settings.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
 				ZStack {
@@ -46,15 +46,12 @@ public extension Settings.View {
 				}
 			}
 			.buttonStyle(.borderedProminent)
-			.onAppear {
-				viewStore.send(.viewDidAppear)
-			}
 		}
 	}
 }
 
 private extension Settings.View {
-	func settingsView(viewStore: ViewStore<ViewState, ViewAction>) -> some View {
+	func settingsView(viewStore: ViewStore<ViewState, Settings.Action.ViewAction>) -> some View {
 		Screen(
 			title: "Settings",
 			navBarActionStyle: .close,
@@ -80,7 +77,12 @@ private extension Settings.View {
 				Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
 			}
 			#if DEBUG
-				.sheet(isPresented: viewStore.binding(get: \.isDebugProfileViewSheetPresented, send: ViewAction.setDebugProfileSheet(isPresented:))) {
+				.sheet(
+					isPresented: viewStore.binding(
+						get: \.isDebugProfileViewSheetPresented,
+						send: { .setDebugProfileSheet(isPresented: $0) }
+					)
+				) {
 					VStack {
 						Button("Close") {
 							viewStore.send(.setDebugProfileSheet(isPresented: false))
@@ -113,41 +115,6 @@ public extension Settings.View {
 			isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			profileToInspect = state.profileToInspect
 			#endif // DEBUG
-		}
-	}
-}
-
-// MARK: - Settings.View.ViewAction
-public extension Settings.View {
-	enum ViewAction: Equatable {
-		case dismissSettingsButtonTapped
-		case deleteProfileAndFactorSourcesButtonTapped
-		case viewDidAppear
-		case browserExtensionConnectionsButtonTapped
-		#if DEBUG
-		case debugInspectProfileButtonTapped
-		case setDebugProfileSheet(isPresented: Bool)
-		#endif // DEBUG
-	}
-}
-
-extension Settings.Action {
-	init(action: Settings.View.ViewAction) {
-		switch action {
-		case .dismissSettingsButtonTapped:
-			self = .internal(.user(.dismissSettings))
-		case .deleteProfileAndFactorSourcesButtonTapped:
-			self = .internal(.user(.deleteProfileAndFactorSources))
-		case .viewDidAppear:
-			self = .internal(.system(.viewDidAppear))
-		case .browserExtensionConnectionsButtonTapped:
-			self = .internal(.user(.goToBrowserExtensionConnections))
-		#if DEBUG
-		case .debugInspectProfileButtonTapped:
-			self = .internal(.user(.debugInspectProfile))
-		case let .setDebugProfileSheet(isPresented):
-			self = .internal(.user(.setDebugProfileSheet(isPresented: isPresented)))
-		#endif // DEBUG
 		}
 	}
 }

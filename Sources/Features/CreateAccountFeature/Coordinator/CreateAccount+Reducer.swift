@@ -67,7 +67,6 @@ public extension CreateAccount {
 				await send(.internal(.system(.focusTextField(.accountName))))
 			}
 
-		// FIXME: use reducer func instead - @davdroman-rdx
 		case let .internal(.system(.focusTextField(focus))):
 			state.focusedField = focus
 			return .none

@@ -1,18 +1,14 @@
 import ComposableArchitecture
 import Foundation
 
-// MARK: - NonFungibleTokenList
-/// Namespace for NonFungibleTokenListFeature
-public enum NonFungibleTokenList {}
-
 // MARK: NonFungibleTokenList.State
 public extension NonFungibleTokenList {
 	// MARK: State
 	struct State: Equatable {
-		public var rows: IdentifiedArrayOf<NonFungibleTokenList.Row.RowState>
+		public var rows: IdentifiedArrayOf<NonFungibleTokenList.Row.State>
 
 		public init(
-			rows: IdentifiedArrayOf<NonFungibleTokenList.Row.RowState>
+			rows: IdentifiedArrayOf<NonFungibleTokenList.Row.State>
 		) {
 			self.rows = rows
 		}

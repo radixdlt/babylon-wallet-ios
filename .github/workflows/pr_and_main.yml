@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
 
   assertFormated:
@@ -46,7 +50,9 @@ jobs:
 
       - name: "Run unit tests"
         run: |
-          xcodebuild clean test -project App/BabylonWallet.xcodeproj -scheme "Wallet (iOS)" -destination "name=iPhone 14,OS=16.0"
+          brew install xcbeautify
+          set -o pipefail && \
+          xcodebuild clean test -project App/BabylonWallet.xcodeproj -scheme "Wallet (iOS)" -destination "name=iPhone 14,OS=16.0" | xcbeautify
 
   # snapshot_tests:
   #   name: "Snapshot tests"

@@ -86,5 +86,6 @@ final class CreateAccountFeatureTests: TestCase {
 		await store.receive(.internal(.system(.focusTextField(.accountName)))) {
 			$0.focusedField = .accountName
 		}
+		await testScheduler.run() // fast-forward scheduler to the end of time
 	}
 }

@@ -6,10 +6,8 @@ import Profile
 // MARK: - ChooseAccounts
 public struct ChooseAccounts: ReducerProtocol {
 	public init() {}
-}
 
-public extension ChooseAccounts {
-	var body: some ReducerProtocol<State, Action> {
+	public var body: some ReducerProtocol<State, Action> {
 		Reduce { state, action in
 			switch action {
 			case .internal(.view(.continueButtonTapped)):

@@ -22,9 +22,8 @@ public extension FungibleTokenList.Row {
 public extension FungibleTokenList.Row.View {
 	var body: some View {
 		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: FungibleTokenList.Row.Action.init
+			store.actionless,
+			observe: ViewState.init(state:)
 		) { viewStore in
 			tokenRow(with: viewStore, container: viewStore.container)
 				.padding([.leading, .trailing], 24)
@@ -34,7 +33,7 @@ public extension FungibleTokenList.Row.View {
 
 // MARK: - FungibleTokenList.Row.View.RowViewStore
 private extension FungibleTokenList.Row.View {
-	typealias RowViewStore = ViewStore<FungibleTokenList.Row.View.ViewState, FungibleTokenList.Row.View.ViewAction>
+	typealias RowViewStore = ViewStore<FungibleTokenList.Row.View.ViewState, Never>
 }
 
 // MARK: - Private Methods
@@ -105,22 +104,6 @@ private extension FungibleTokenList.Row.View {
 	}
 }
 
-// MARK: - FungibleTokenList.Row.View.ViewAction
-extension FungibleTokenList.Row.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {}
-}
-
-extension FungibleTokenList.Row.Action {
-	init(action: FungibleTokenList.Row.View.ViewAction) {
-		switch action {
-		default:
-			// TODO: implement
-			break
-		}
-	}
-}
-
 // MARK: - FungibleTokenList.Row.View.ViewState
 extension FungibleTokenList.Row.View {
 	// MARK: ViewState
@@ -147,8 +130,7 @@ struct Row_Preview: PreviewProvider {
 					currency: .usd,
 					isCurrencyAmountVisible: true
 				),
-				reducer: FungibleTokenList.Row.reducer,
-				environment: .init()
+				reducer: FungibleTokenList.Row()
 			)
 		)
 	}

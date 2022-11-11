@@ -4,12 +4,6 @@ import Common
 import Foundation
 import Profile
 
-// MARK: - AccountList.Row
-/// Namespace for Row
-public extension AccountList {
-	enum Row {}
-}
-
 // MARK: - AccountList.Row.State
 public extension AccountList.Row {
 	// MARK: State

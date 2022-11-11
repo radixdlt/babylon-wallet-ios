@@ -32,11 +32,6 @@ public extension App.Action {
 // MARK: - App.Action.SystemAction
 public extension App.Action {
 	enum SystemAction: Equatable {
-		case injectProfileIntoProfileClient(Profile, persistIntoKeychain: Bool)
 		case injectProfileIntoProfileClientResult(TaskResult<Profile>)
-		case failedToCreateOrImportProfile(reason: String)
-
-		case goToOnboarding
-		case goToMain
 	}
 }

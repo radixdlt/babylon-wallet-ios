@@ -18,9 +18,8 @@ public extension NonFungibleTokenList {
 public extension NonFungibleTokenList.View {
 	var body: some View {
 		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: NonFungibleTokenList.Action.init
+			store.actionless,
+			observe: ViewState.init(state:)
 		) { _ in
 			VStack(spacing: 25) {
 				ForEachStore(
@@ -31,22 +30,6 @@ public extension NonFungibleTokenList.View {
 					content: NonFungibleTokenList.Row.View.init(store:)
 				)
 			}
-		}
-	}
-}
-
-// MARK: - NonFungibleTokenList.View.ViewAction
-extension NonFungibleTokenList.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {}
-}
-
-extension NonFungibleTokenList.Action {
-	init(action: NonFungibleTokenList.View.ViewAction) {
-		switch action {
-		default:
-			// TODO: implement
-			break
 		}
 	}
 }
@@ -65,8 +48,7 @@ struct NonFungibleTokenList_Preview: PreviewProvider {
 		NonFungibleTokenList.View(
 			store: .init(
 				initialState: .init(rows: []),
-				reducer: NonFungibleTokenList.reducer,
-				environment: .init()
+				reducer: NonFungibleTokenList()
 			)
 		)
 	}

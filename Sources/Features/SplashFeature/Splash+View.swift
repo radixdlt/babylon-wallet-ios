@@ -19,7 +19,7 @@ public extension Splash.View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
-			send: Splash.Action.init
+			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
@@ -27,7 +27,7 @@ public extension Splash.View {
 				}
 			}
 			.onAppear {
-				viewStore.send(.viewDidAppear)
+				viewStore.send(.viewAppeared)
 			}
 		}
 	}
@@ -41,23 +41,6 @@ extension Splash.View {
 	}
 }
 
-// MARK: - Splash.View.ViewAction
-extension Splash.View {
-	// MARK: ViewAction
-	enum ViewAction {
-		case viewDidAppear
-	}
-}
-
-extension Splash.Action {
-	init(action: Splash.View.ViewAction) {
-		switch action {
-		case .viewDidAppear:
-			self = .internal(.system(.viewDidAppear))
-		}
-	}
-}
-
 #if DEBUG
 
 // MARK: - SplashView_Previews
@@ -66,11 +49,8 @@ struct SplashView_Previews: PreviewProvider {
 		Splash.View(
 			store: .init(
 				initialState: .init(),
-				reducer: Splash.reducer,
-				environment: .init(
-					mainQueue: .immediate,
-					profileLoader: .testValue
-				)
+				reducer: Splash()
+					.dependency(\.mainQueue, .immediate)
 			)
 		)
 	}

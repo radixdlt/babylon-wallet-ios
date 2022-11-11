@@ -1,9 +1,10 @@
 import ComposableArchitecture
 
-public extension AccountPreferences {
-	// MARK: Reducer
-	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer { _, action, _ in
+// MARK: - AccountPreferences
+public struct AccountPreferences: ReducerProtocol {
+	public init() {}
+
+	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.dismissButtonTapped)):
 			return Effect(value: .delegate(.dismissAccountPreferences))

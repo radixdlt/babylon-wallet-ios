@@ -1,16 +1,11 @@
 import ComposableArchitecture
 
-public extension AccountList {
-	// MARK: Reducer
-	typealias Reducer = ComposableArchitecture.Reducer<State, Action, Environment>
-	static let reducer = Reducer.combine(
-		AccountList.Row.reducer.forEach(
-			state: \.accounts,
-			action: /Action.child .. Action.ChildAction.account,
-			environment: { _ in AccountList.Row.Environment() }
-		),
+// MARK: - AccountList
+public struct AccountList: ReducerProtocol {
+	public init() {}
 
-		Reducer { state, action, _ in
+	public var body: some ReducerProtocol<State, Action> {
+		Reduce { state, action in
 			switch action {
 			case .delegate:
 				return .none
@@ -23,11 +18,11 @@ public extension AccountList {
 					return .none
 				}
 				switch action {
-				case .internal(.user(.copyAddress)):
+				case .internal(.view(.copyAddressButtonTapped)):
 					return .run { send in
 						await send(.delegate(.copyAddress(account.address)))
 					}
-				case .internal(.user(.didSelect)):
+				case .internal(.view(.selected)):
 					return .run { send in
 						await send(.delegate(.displayAccountDetails(account)))
 					}
@@ -43,5 +38,8 @@ public extension AccountList {
 				}
 			}
 		}
-	)
+		.forEach(\.accounts, action: /Action.child .. Action.ChildAction.account) {
+			AccountList.Row()
+		}
+	}
 }

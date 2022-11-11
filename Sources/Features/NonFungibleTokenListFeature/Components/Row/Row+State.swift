@@ -1,16 +1,10 @@
 import Asset
 import Foundation
 
-// MARK: - NonFungibleTokenList.Row
-/// Namespace for Row
-public extension NonFungibleTokenList {
-	enum Row {}
-}
-
-// MARK: - NonFungibleTokenList.Row.RowState
+// MARK: - NonFungibleTokenList.Row.State
 public extension NonFungibleTokenList.Row {
 	// MARK: State
-	struct RowState: Equatable {
+	struct State: Equatable {
 		public var containers: [NonFungibleTokenContainer]
 		public var isExpanded = false
 
@@ -22,7 +16,7 @@ public extension NonFungibleTokenList.Row {
 	}
 }
 
-// MARK: - NonFungibleTokenList.Row.RowState + Identifiable
-extension NonFungibleTokenList.Row.RowState: Identifiable {
+// MARK: - NonFungibleTokenList.Row.State + Identifiable
+extension NonFungibleTokenList.Row.State: Identifiable {
 	public var id: NonFungibleTokenContainer.ID { containers.first?.id ?? "" }
 }

@@ -1,16 +1,18 @@
 import ComposableArchitecture
 
-public extension NonFungibleTokenList.Row {
-	// MARK: Reducer
-	typealias Reducer = ComposableArchitecture.Reducer<RowState, Action, Environment>
-	static let reducer = Reducer { state, action, _ in
-		switch action {
-		case .internal(.view(.isExpandedToggled)):
-			state.isExpanded.toggle()
-			return .none
+public extension NonFungibleTokenList {
+	struct Row: ReducerProtocol {
+		public init() {}
 
-		case .delegate:
-			return .none
+		public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+			switch action {
+			case .internal(.view(.isExpandedToggled)):
+				state.isExpanded.toggle()
+				return .none
+
+			case .delegate:
+				return .none
+			}
 		}
 	}
 }

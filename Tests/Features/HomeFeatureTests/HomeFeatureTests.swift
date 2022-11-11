@@ -104,7 +104,7 @@ final class HomeFeatureTests: TestCase {
 					]
 				)
 
-				let nonFungibleRow = NonFungibleTokenList.Row.RowState(
+				let nonFungibleRow = NonFungibleTokenList.Row.State(
 					containers: accountPortfolio.nonFungibleTokenContainers
 				)
 

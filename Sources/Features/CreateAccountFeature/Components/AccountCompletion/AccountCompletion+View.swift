@@ -18,9 +18,8 @@ public extension AccountCompletion {
 public extension AccountCompletion.View {
 	var body: some View {
 		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: AccountCompletion.Action.init
+			store.actionless,
+			observe: ViewState.init(state:)
 		) { viewStore in
 			VStack(spacing: 20) {
 				Spacer()
@@ -72,22 +71,6 @@ public extension AccountCompletion.View {
 				)
 			}
 			.padding(24)
-		}
-	}
-}
-
-// MARK: - AccountCompletion.View.ViewAction
-extension AccountCompletion.View {
-	// MARK: ViewAction
-	enum ViewAction: Equatable {}
-}
-
-extension AccountCompletion.Action {
-	init(action: AccountCompletion.View.ViewAction) {
-		switch action {
-		default:
-			// TODO: implement
-			break
 		}
 	}
 }
