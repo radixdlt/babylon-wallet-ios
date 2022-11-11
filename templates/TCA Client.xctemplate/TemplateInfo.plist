@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Kind</key>
+	<string>Xcode.IDEFoundation.TextSubstitutionFileTemplateKind</string>
+	<key>Description</key>
+	<string>TCA Client</string>
+	<key>Summary</key>
+	<string>A TCA Client split into different files</string>
+	<key>SortOrder</key>
+	<string>30</string>
+	<key>AllowedTypes</key>
+	<array>
+		<string>public.swift-source</string>
+	</array>
+	<key>DefaultCompletionName</key>
+	<string>New File</string>
+	<key>MainTemplateFile</key>
+	<string>___FILEBASENAME___.swift</string>
+	<key>Options</key>
+	<array>
+		<dict>
+			<key>Description</key>
+			<string>The name of the client to create</string>
+			<key>Identifier</key>
+			<string>clientName</string>
+			<key>Name</key>
+			<string>Client:</string>
+			<key>NotPersisted</key>
+			<true/>
+			<key>Required</key>
+			<true/>
+			<key>Type</key>
+			<string>text</string>
+		</dict>
+		<dict>
+			<key>Description</key>
+			<string>The name of the key for @Dependency</string>
+			<key>Identifier</key>
+			<string>dependencyKey</string>
+			<key>Name</key>
+			<string>Dependency Key:</string>
+			<key>NotPersisted</key>
+			<true/>
+			<key>Required</key>
+			<true/>
+			<key>Type</key>
+			<string>text</string>
+		</dict>
+		<dict>
+			<key>Default</key>
+			<string>___VARIABLE_clientName___+Interface.swift</string>
+			<key>Identifier</key>
+			<string>interfaceFile</string>
+			<key>Name</key>
+			<string>Interface:</string>
+			<key>NotPersisted</key>
+			<true/>
+			<key>Required</key>
+			<true/>
+			<key>Type</key>
+			<string>static</string>
+		</dict>
+		<dict>
+			<key>Default</key>
+			<string>___VARIABLE_clientName___+Live.swift</string>
+			<key>Identifier</key>
+			<string>liveFile</string>
+			<key>Name</key>
+			<string>Live:</string>
+			<key>NotPersisted</key>
+			<true/>
+			<key>Required</key>
+			<true/>
+			<key>Type</key>
+			<string>static</string>
+		</dict>
+		<dict>
+			<key>Default</key>
+			<string>___VARIABLE_clientName___+Test.swift</string>
+			<key>Identifier</key>
+			<string>testFile</string>
+			<key>Name</key>
+			<string>Test:</string>
+			<key>NotPersisted</key>
+			<true/>
+			<key>Required</key>
+			<true/>
+			<key>Type</key>
+			<string>static</string>
+		</dict>
+	</array>
+</dict>
+</plist>

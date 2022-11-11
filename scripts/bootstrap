@@ -21,6 +21,8 @@ echo "Importing custom Xcode templates"
 XCODE_TEMPLATES_DIR="$HOME/Library/Developer/Xcode/Templates/File Templates/RDX/"
 mkdir -p "$XCODE_TEMPLATES_DIR"
 ln -sf "$(realpath --relative-to="$XCODE_TEMPLATES_DIR" templates)/TCA Feature.xctemplate" "$XCODE_TEMPLATES_DIR"
+ln -sf "$(realpath --relative-to="$XCODE_TEMPLATES_DIR" templates)/TCA Client.xctemplate" "$XCODE_TEMPLATES_DIR"
+
 
 echo "Done ✅"
 
