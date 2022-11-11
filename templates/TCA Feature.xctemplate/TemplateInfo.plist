@@ -38,7 +38,7 @@
 			<key>Default</key>
 			<string>___VARIABLE_featureName___+Action.swift</string>
 			<key>Identifier</key>
-			<string>actionName</string>
+			<string>actionFile</string>
 			<key>Name</key>
 			<string>Action:</string>
 			<key>NotPersisted</key>
@@ -52,7 +52,7 @@
 			<key>Default</key>
 			<string>___VARIABLE_featureName___+Reducer.swift</string>
 			<key>Identifier</key>
-			<string>reducerName</string>
+			<string>reducerFile</string>
 			<key>Name</key>
 			<string>Reducer:</string>
 			<key>NotPersisted</key>
@@ -66,7 +66,7 @@
 			<key>Default</key>
 			<string>___VARIABLE_featureName___+State.swift</string>
 			<key>Identifier</key>
-			<string>stateName</string>
+			<string>stateFile</string>
 			<key>Name</key>
 			<string>State:</string>
 			<key>NotPersisted</key>
@@ -80,7 +80,7 @@
 			<key>Default</key>
 			<string>___VARIABLE_featureName___+View.swift</string>
 			<key>Identifier</key>
-			<string>viewName</string>
+			<string>viewFile</string>
 			<key>Name</key>
 			<string>View:</string>
 			<key>NotPersisted</key>
