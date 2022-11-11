@@ -1,5 +1,5 @@
 #!/bin/bash
 
-DIR=$(cd "$(dirname "$BASH_SOURCE")" && pwd)
+DIR="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 "$DIR/git-format-staged" --formatter "swiftformat stdin --stdinpath '{}'" "*.swift"

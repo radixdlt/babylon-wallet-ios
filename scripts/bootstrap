@@ -9,10 +9,9 @@ DIR=$(cd "$(dirname "$BASH_SOURCE")" && pwd)
 
 pushd "$DIR/.." > /dev/null
 
-echo "Importing Git hooks"
+echo "Symlinking Git hooks"
 mkdir -p .git/hooks
-cp -f scripts/pre-commit .git/hooks/
-cp -f scripts/git-format-staged .git/hooks/
+ln -sf ../../scripts/pre-commit .git/hooks
 
 echo "Done ✅"
 
