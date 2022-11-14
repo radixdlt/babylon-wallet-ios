@@ -91,9 +91,13 @@ private extension ManageBrowserExtensionConnections.View {
 						)
 					}
 				}
-				PrimaryButton(title: "Add new connection", isEnabled: viewStore.canAddMoreBrowserExtensionConnections) { viewStore.send(.addNewConnectionButtonTapped) }
+				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped)
+				}
+				.enabled(viewStore.canAddMoreBrowserExtensionConnections)
+
 				Spacer()
 			}
+			.buttonStyle(.primary)
 			.onAppear { viewStore.send(.viewAppeared) }
 		}
 	}
