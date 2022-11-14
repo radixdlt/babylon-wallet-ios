@@ -52,6 +52,9 @@ public extension Settings {
 			// FIXME: Error propagation
 			return .none
 
+		case .child(.manageGatewayAPIEndpoints):
+			fatalError("IMPLE ME")
+
 		#if DEBUG
 		case .internal(.view(.debugInspectProfileButtonTapped)):
 			return .run { send in
@@ -82,6 +85,9 @@ public extension Settings {
 			return .none
 		case .internal(.view(.addBrowserExtensionConnectionButtonTapped)):
 			state.manageBrowserExtensionConnections = .init(inputBrowserExtensionConnectionPassword: .init())
+			return .none
+		case .internal(.view(.editGatewayAPIEndpointButtonTapped)):
+			state.manageGatewayAPIEndpoints = .init()
 			return .none
 		}
 	}

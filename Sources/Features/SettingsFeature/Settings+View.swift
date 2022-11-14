@@ -78,6 +78,12 @@ private extension Settings.View {
 				}
 
 				Section {
+					Button("Edit Gateway API Endpoint") {
+						viewStore.send(.editGatewayAPIEndpointButtonTapped)
+					}
+				}
+
+				Section {
 					Button("Delete all  & Factor Sources", role: .destructive) {
 						viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
 					}

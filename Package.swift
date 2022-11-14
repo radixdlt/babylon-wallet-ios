@@ -405,6 +405,19 @@ package.addModules([
 		)
 	),
 	.feature(
+		name: "ManageGatewayAPIEndpointsFeature",
+		dependencies: [
+			"Common",
+			dependencies,
+			"DesignSystem",
+			tca,
+			"UserDefaultsClient",
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
 		name: "NonFungibleTokenListFeature",
 		dependencies: [
 			"Asset",
@@ -443,6 +456,7 @@ package.addModules([
 			"GatewayAPI",
 			"KeychainClientDependency",
 			"ManageBrowserExtensionConnectionsFeature",
+			"ManageGatewayAPIEndpointsFeature",
 			"ProfileClient",
 			.product(name: "ProfileView", package: "swift-profile"),
 			tca,

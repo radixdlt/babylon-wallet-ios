@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Foundation
 import GatewayAPI
 import ManageBrowserExtensionConnectionsFeature
+import ManageGatewayAPIEndpointsFeature
 import Profile
 
 // MARK: - Settings.Action
@@ -19,6 +20,7 @@ public extension Settings {
 public extension Settings.Action {
 	enum ChildAction: Equatable {
 		case manageBrowserExtensionConnections(ManageBrowserExtensionConnections.Action)
+		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
 	}
 }
 
@@ -31,6 +33,9 @@ public extension Settings.Action {
 
 		case manageBrowserExtensionConnectionsButtonTapped
 		case addBrowserExtensionConnectionButtonTapped
+
+		case editGatewayAPIEndpointButtonTapped
+
 		#if DEBUG
 		case debugInspectProfileButtonTapped
 		case setDebugProfileSheet(isPresented: Bool)

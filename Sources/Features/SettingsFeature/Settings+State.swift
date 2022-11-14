@@ -1,6 +1,7 @@
 import Foundation
 import GatewayAPI
 import ManageBrowserExtensionConnectionsFeature
+import ManageGatewayAPIEndpointsFeature
 import Profile
 
 // MARK: Settings.State
@@ -8,6 +9,7 @@ public extension Settings {
 	// MARK: State
 	struct State: Equatable {
 		public var manageBrowserExtensionConnections: ManageBrowserExtensionConnections.State?
+		public var manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State?
 		public var canAddBrowserExtensionConnection: Bool
 		#if DEBUG
 		public var profileToInspect: Profile?
@@ -15,9 +17,11 @@ public extension Settings {
 
 		public init(
 			manageBrowserExtensionConnections: ManageBrowserExtensionConnections.State? = nil,
+			manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State? = nil,
 			canAddBrowserExtensionConnection: Bool = false
 		) {
 			self.manageBrowserExtensionConnections = manageBrowserExtensionConnections
+			self.manageGatewayAPIEndpoints = manageGatewayAPIEndpoints
 			self.canAddBrowserExtensionConnection = canAddBrowserExtensionConnection
 		}
 	}
