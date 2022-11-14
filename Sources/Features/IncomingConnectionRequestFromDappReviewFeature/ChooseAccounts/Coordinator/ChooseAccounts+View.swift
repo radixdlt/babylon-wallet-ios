@@ -67,7 +67,6 @@ public extension ChooseAccounts.View {
 							isEnabled: viewStore.canProceed,
 							action: { viewStore.send(.continueButtonTapped) }
 						)
-						.disabled(!viewStore.canProceed)
 					}
 
 					Spacer(minLength: 16)

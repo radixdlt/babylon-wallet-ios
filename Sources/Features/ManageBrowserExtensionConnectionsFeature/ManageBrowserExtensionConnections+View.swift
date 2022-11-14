@@ -91,9 +91,13 @@ private extension ManageBrowserExtensionConnections.View {
 						)
 					}
 				}
-				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped) }
+				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped)
+				}
+				.enabled(viewStore.canAddMoreBrowserExtensionConnections)
+
 				Spacer()
 			}
+			.buttonStyle(.primary)
 			.onAppear { viewStore.send(.viewAppeared) }
 		}
 	}
@@ -103,6 +107,10 @@ private extension ManageBrowserExtensionConnections.View {
 public extension ManageBrowserExtensionConnections.View {
 	struct ViewState: Equatable {
 		public var connections: IdentifiedArrayOf<BrowserExtensionWithConnectionStatus>
+		public var canAddMoreBrowserExtensionConnections: Bool {
+			// FIXME: Post betanet we should allow multiple connections...
+			connections.isEmpty
+		}
 
 		init(state: ManageBrowserExtensionConnections.State) {
 			connections = state.connections
