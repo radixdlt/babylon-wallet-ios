@@ -1,10 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-11-14.
-//
-
 import SwiftUI
 
 // MARK: - PrimaryButtonStyle
