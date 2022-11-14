@@ -15,11 +15,8 @@ public struct PrimaryButtonStyle: ButtonStyle {
 			.font(.app.body1Header)
 			.frame(maxWidth: .infinity)
 			.frame(height: 50)
-			.if(configuration.role == nil) { label in
-				label
-					.foregroundColor(.app.white)
-					.background(isEnabled ? Color.app.blue2 : Color.app.gray4)
-			}
+			.foregroundColor(.app.white)
+			.background(isEnabled ? Color.app.blue2 : Color.app.gray4)
 			.cornerRadius(8)
 	}
 }

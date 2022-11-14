@@ -46,11 +46,8 @@ public extension PrimaryButton {
 					.font(.app.body1Header)
 					.frame(maxWidth: .infinity)
 					.frame(height: 50)
-					.if(role == nil) { label in
-						label
-							.foregroundColor(.app.white)
-							.background(isEnabled ? Color.app.blue2 : Color.app.gray4)
-					}
+					.foregroundColor(.app.white)
+					.background(isEnabled ? Color.app.blue2 : Color.app.gray4)
 					.cornerRadius(8)
 			}
 		)

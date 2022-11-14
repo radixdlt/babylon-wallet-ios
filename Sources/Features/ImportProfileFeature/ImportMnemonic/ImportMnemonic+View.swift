@@ -43,28 +43,29 @@ public extension ImportMnemonic.View {
 						send: { .phraseOfMnemonicToImportChanged($0) }
 					)
 				)
-				PrimaryButton(
-					"Import mnemonic",
-					isEnabled: viewStore.canImportMnemonic
+				Button(
+					"Import mnemonic"
 				) {
 					viewStore.send(.importMnemonicButtonTapped)
 				}
+				.enabled(viewStore.canImportMnemonic)
 
-				PrimaryButton(
-					"Save imported mnemonic",
-					isEnabled: viewStore.canSaveImportedMnemonic
+				Button(
+					"Save imported mnemonic"
 				) {
 					viewStore.send(.saveImportedMnemonicButtonTapped)
 				}
+				.enabled(viewStore.canSaveImportedMnemonic)
 
-				PrimaryButton(
-					"Profile from snapshot",
-					isEnabled: viewStore.canImportProfileFromSnapshot
+				Button(
+					"Profile from snapshot"
 				) {
 					viewStore.send(.importProfileFromSnapshotButtonTapped)
 				}
+				.enabled(viewStore.canImportProfileFromSnapshot)
 			}
 		}
+		.buttonStyle(.primary)
 	}
 }
 
