@@ -10,6 +10,7 @@
 --disable redundantNilInit
 --lineaftermarks false
 --ifdef no-indent
+--header strip
 
 # file options
 --exclude .build
