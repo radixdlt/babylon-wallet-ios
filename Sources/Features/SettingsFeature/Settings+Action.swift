@@ -25,9 +25,12 @@ public extension Settings.Action {
 // MARK: - Settings.Action.ViewAction
 public extension Settings.Action {
 	enum ViewAction: Equatable {
+		case didAppear
 		case dismissSettingsButtonTapped
 		case deleteProfileAndFactorSourcesButtonTapped
-		case browserExtensionConnectionsButtonTapped
+
+		case manageBrowserExtensionConnectionsButtonTapped
+		case addBrowserExtensionConnectionButtonTapped
 		#if DEBUG
 		case debugInspectProfileButtonTapped
 		case setDebugProfileSheet(isPresented: Bool)
@@ -46,6 +49,7 @@ public extension Settings.Action {
 // MARK: - Settings.Action.InternalAction.SystemAction
 public extension Settings.Action.InternalAction {
 	enum SystemAction: Equatable {
+		case loadBrowserExtensionConnectionResult(TaskResult<BrowserExtensionConnections>)
 		#if DEBUG
 		case profileToDebugLoaded(Profile)
 		#endif // DEBUG

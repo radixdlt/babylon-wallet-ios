@@ -57,24 +57,36 @@ private extension Settings.View {
 			navBarActionStyle: .close,
 			action: { viewStore.send(.dismissSettingsButtonTapped) }
 		) {
-			VStack {
+			Form {
 				#if DEBUG
-				Button("Debug Inspect Profile") {
-					viewStore.send(.debugInspectProfileButtonTapped)
+				Section(header: Text("Debug")) {
+					Button("Inspect Profile") {
+						viewStore.send(.debugInspectProfileButtonTapped)
+					}
 				}
 				#endif // DEBUG
+				Section(header: Text("Browser Connections")) {
+					Button("Manage Connections") {
+						viewStore.send(.manageBrowserExtensionConnectionsButtonTapped)
+					}
 
-				Button(
-					action: { viewStore.send(.browserExtensionConnectionsButtonTapped) },
-					label: { Text("Browser Extension Connections") }
-				)
-
-				Spacer()
-				Button("Delete Profile & Factor Sources", role: .destructive) {
-					viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
+					if viewStore.canAddBrowserExtensionConnection {
+						Button("Add Connection") {
+							viewStore.send(.addBrowserExtensionConnectionButtonTapped)
+						}
+					}
 				}
 
-				Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
+				Section {
+					Button("Delete all  & Factor Sources", role: .destructive) {
+						viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
+					}
+
+					Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
+				}
+			}
+			.onAppear {
+				viewStore.send(.didAppear)
 			}
 			#if DEBUG
 				.sheet(
@@ -100,6 +112,7 @@ private extension Settings.View {
 				}
 			#endif // DEBUG
 		}
+		.buttonStyle(.borderless)
 	}
 }
 
@@ -110,11 +123,13 @@ public extension Settings.View {
 		public let isDebugProfileViewSheetPresented: Bool
 		public let profileToInspect: Profile?
 		#endif // DEBUG
+		public let canAddBrowserExtensionConnection: Bool
 		public init(state: Settings.State) {
 			#if DEBUG
 			isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			profileToInspect = state.profileToInspect
 			#endif // DEBUG
+			canAddBrowserExtensionConnection = state.canAddBrowserExtensionConnection
 		}
 	}
 }

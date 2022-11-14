@@ -17,6 +17,9 @@ public struct Main: ReducerProtocol {
 		}
 
 		Reduce(self.core)
+			.ifLet(\.settings, action: /Action.child .. Action.ChildAction.settings) {
+				Settings()
+			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {

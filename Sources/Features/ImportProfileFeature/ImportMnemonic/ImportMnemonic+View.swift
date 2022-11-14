@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DesignSystem
 import Foundation
 import SwiftUI
 
@@ -42,20 +43,26 @@ public extension ImportMnemonic.View {
 						send: { .phraseOfMnemonicToImportChanged($0) }
 					)
 				)
-				Button("Import mnemonic") {
+				PrimaryButton(
+					"Import mnemonic",
+					isEnabled: viewStore.canImportMnemonic
+				) {
 					viewStore.send(.importMnemonicButtonTapped)
 				}
-				.disabled(!viewStore.canImportMnemonic)
 
-				Button("Save imported mnemonic") {
+				PrimaryButton(
+					"Save imported mnemonic",
+					isEnabled: viewStore.canSaveImportedMnemonic
+				) {
 					viewStore.send(.saveImportedMnemonicButtonTapped)
 				}
-				.disabled(!viewStore.canSaveImportedMnemonic)
 
-				Button("Profile from snapshot") {
+				PrimaryButton(
+					"Profile from snapshot",
+					isEnabled: viewStore.canImportProfileFromSnapshot
+				) {
 					viewStore.send(.importProfileFromSnapshotButtonTapped)
 				}
-				.disabled(!viewStore.canImportProfileFromSnapshot)
 			}
 		}
 	}
