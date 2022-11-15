@@ -23,7 +23,7 @@ public extension Home.VisitHub.View {
 				}
 			}
 			.background(Color.app.gray3)
-			.cornerRadius(6)
+			.cornerRadius(.small2)
 		}
 	}
 }
@@ -55,7 +55,7 @@ private extension Home.VisitHub.View {
 					.padding()
 					.frame(maxWidth: .infinity)
 					.background(Color.app.gray4)
-					.cornerRadius(6)
+					.cornerRadius(.small2)
 			}
 		)
 	}
