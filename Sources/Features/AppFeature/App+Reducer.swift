@@ -59,17 +59,9 @@ public struct App: ReducerProtocol {
 		case let .child(.onboarding(.child(.importMnemonic(.delegate(.finishedImporting(_, profile)))))):
 			return injectProfileIntoProfileClient(profile, persistIntoKeychain: false)
 
-		case let .child(.splash(.delegate(.loadProfileResult(.profileLoaded(profile))))):
-			return injectProfileIntoProfileClient(profile, persistIntoKeychain: false)
-
-		case let .child(.splash(.delegate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
-			if failedToDecode {
-				struct FailedToDecodeProfileError: LocalizedError {
-					let reason: String
-					var errorDescription: String? { "Failed to decode profile: \(reason)" }
-				}
-				errorQueue.schedule(FailedToDecodeProfileError(reason: reason))
-				return .none
+		case let .child(.splash(.delegate(.profileLoaded(profile)))):
+			if let profile {
+				return injectProfileIntoProfileClient(profile, persistIntoKeychain: false)
 			} else {
 				goToOnboarding(state: &state)
 				return .none

@@ -465,6 +465,7 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
+			"ErrorQueue",
 			"ProfileClient",
 			"ProfileLoader",
 			tca,

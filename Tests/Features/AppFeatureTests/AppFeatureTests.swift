@@ -2,7 +2,7 @@
 import ComposableArchitecture
 import OnboardingFeature
 import Profile
-import SplashFeature
+@testable import SplashFeature
 import TestUtils
 
 @MainActor
@@ -11,28 +11,27 @@ final class AppFeatureTests: TestCase {
 
 	func test_initialAppState_whenAppLaunches_thenInitialAppStateIsSplash() {
 		let appState = App.State()
-		let expectedInitialAppState: App.State = .splash(.init())
-		XCTAssertEqual(appState, expectedInitialAppState)
+		XCTAssertEqual(appState.root, .splash(.init()))
+		XCTAssertNil(appState.errorAlert)
 	}
 
-	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() async throws {
+	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() async {
 		// given
-		let initialState = App.State.main(.placeholder)
 		let store = TestStore(
-			initialState: initialState,
+			initialState: App.State(root: .main(.placeholder)),
 			reducer: App()
 		)
 
 		// when
 		_ = await store.send(.child(.main(.delegate(.removedWallet)))) {
 			// then
-			$0 = .onboarding(.init())
+			$0.root = .onboarding(.init())
 		}
 	}
 
 	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		let store = TestStore(
-			initialState: .onboarding(Onboarding.State(newProfile: .init())),
+			initialState: App.State(root: .onboarding(.init(newProfile: .init()))),
 			reducer: App()
 		)
 		let newProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
@@ -47,9 +46,8 @@ final class AppFeatureTests: TestCase {
 		_ = await store.send(.child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))))
 
 		// then
-		_ = await store.receive(.child(.onboarding(.delegate(.onboardedWithProfile(newProfile, isNew: true)))))
 		_ = await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile))))) {
-			$0 = .main(.init())
+			$0.root = .main(.init())
 		}
 
 		wait(for: [expectation], timeout: 0)
@@ -61,7 +59,7 @@ final class AppFeatureTests: TestCase {
 
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(
-			initialState: .splash(.init()),
+			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		)
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
@@ -78,10 +76,10 @@ final class AppFeatureTests: TestCase {
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		_ = await store.receive(.child(.splash(.delegate(.loadProfileResult(.profileLoaded(existingProfile))))))
+		_ = await store.receive(.child(.splash(.delegate(.profileLoaded(existingProfile)))))
 
 		_ = await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(existingProfile))))) {
-			$0 = .main(.init())
+			$0.root = .main(.init())
 		}
 
 		await testScheduler.run() // fast-forward scheduler to the end of time
@@ -89,37 +87,72 @@ final class AppFeatureTests: TestCase {
 		wait(for: [expectation], timeout: 0)
 	}
 
-	func test_loadWalletResult_whenWalletLoadingFailedBecauseDecodingError_thenDoNothingForNow() async throws {
+	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_thenShowErrorAndNavigateToOnboarding() async {
 		// given
-		let initialState = App.State.splash(.init())
-		let reason = "FAIL_FROM_TEST"
-		let loadProfileResult = SplashLoadProfileResult.noProfile(reason: reason, failedToDecode: true)
 		let store = TestStore(
-			initialState: initialState,
+			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		)
 
+		let testScheduler = DispatchQueue.test
+
+		store.dependencies.errorQueue = .liveValue
+		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
+
+		let viewTask = await store.send(.view(.task))
+
 		// when
-		_ = await store.send(.child(.splash(.delegate(.loadProfileResult(loadProfileResult)))))
+		_ = await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(nil)))))))
+
+		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		// TODO: does nothing for now (prints error)
+		_ = await store.receive(.internal(.system(.displayErrorAlert(Splash.NoProfileError() as NSError)))) {
+			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("No profile saved yet"))
+		}
+
+		// when
+		_ = await store.send(.view(.errorAlertDismissButtonTapped)) {
+			// then
+			$0.errorAlert = nil
+		}
+
+		await testScheduler.run() // fast-forward scheduler to the end of time
+		await viewTask.cancel()
 	}
 
-	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_thenNavigateToOnboarding() async {
+	func test_loadWalletResult_whenWalletLoadingFailed_thenShowError() async throws {
 		// given
-		let initialState = App.State.splash(.init())
-		let reason = "Failed to load profile"
-		let loadProfileResult = SplashLoadProfileResult.noProfile(reason: reason, failedToDecode: false)
 		let store = TestStore(
-			initialState: initialState,
+			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		)
 
+		let testScheduler = DispatchQueue.test
+
+		store.dependencies.errorQueue = .liveValue
+		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
+
+		let viewTask = await store.send(.view(.task))
+
 		// when
-		_ = await store.send(.child(.splash(.delegate(.loadProfileResult(loadProfileResult))))) {
-			// then
-			$0 = .onboarding(.init())
+		let decodingError = DecodingError.valueNotFound(Profile.self, .init(codingPath: [], debugDescription: "Something went wrong"))
+		_ = await store.send(.child(.splash(.internal(.system(.loadProfileResult(.failure(decodingError)))))))
+
+		await testScheduler.advance(by: .milliseconds(100))
+
+		// then
+		_ = await store.receive(.internal(.system(.displayErrorAlert(Splash.NoProfileError() as NSError)))) {
+			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("No profile saved yet"))
 		}
+
+		// when
+		_ = await store.send(.view(.errorAlertDismissButtonTapped)) {
+			// then
+			$0.errorAlert = nil
+		}
+
+		await testScheduler.run() // fast-forward scheduler to the end of time
+		await viewTask.cancel()
 	}
 }
