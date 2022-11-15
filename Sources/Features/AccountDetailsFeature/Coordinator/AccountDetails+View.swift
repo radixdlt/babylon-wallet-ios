@@ -29,7 +29,7 @@ public extension AccountDetails.View {
 			ForceFullScreen {
 				VStack {
 					header(with: viewStore)
-						.padding([.leading, .trailing, .top], 24)
+						.padding([.horizontal, .top], 24)
 
 					ScrollView {
 						VStack(spacing: 16) {
@@ -39,9 +39,7 @@ public extension AccountDetails.View {
 									viewStore.send(.copyAddressButtonTapped)
 								}
 							)
-
-							transferButton(with: viewStore)
-								.padding(.bottom, 20)
+							.padding(.horizontal, 24)
 
 							AssetsView.View(
 								store: store.scope(

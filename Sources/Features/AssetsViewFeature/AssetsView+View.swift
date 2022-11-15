@@ -40,10 +40,14 @@ public extension AssetsView.View {
 							action: { .child(.nonFungibleTokenList($0)) }
 						)
 					)
-				case .poolShare:
-					Text("Pool Share")
-				case .badges:
-					Text("Badges")
+
+					// TODO: uncomment when ready for implementation
+					/*
+					 case .poolShare:
+					 	Text("Pool Share")
+					 case .badges:
+					 	Text("Badges")
+					 */
 				}
 			}
 		}
