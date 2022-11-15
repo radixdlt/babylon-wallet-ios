@@ -11,10 +11,10 @@ public extension DependencyValues {
 
 // MARK: - ErrorQueue + TestDependencyKey
 extension ErrorQueue: TestDependencyKey {
-	public static let previewValue = Self(
-		schedule: { _ in }
-	)
+	public static let previewValue = liveValue
+
 	public static let testValue = Self(
+		errors: unimplemented("\(Self.self).errors"),
 		schedule: unimplemented("\(Self.self).schedule")
 	)
 }
