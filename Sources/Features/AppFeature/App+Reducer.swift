@@ -38,15 +38,15 @@ public struct App: ReducerProtocol {
 				}
 			}
 
-		case .internal(.view(.errorAlertDismissed)):
-			state.errorAlert = nil
-			return .none
-
 		case let .internal(.system(.displayErrorAlert(error))):
 			state.errorAlert = .init(
 				title: .init("An error ocurred"),
 				message: .init(error.localizedDescription)
 			)
+			return .none
+
+		case .internal(.view(.errorAlertDismissed)):
+			state.errorAlert = nil
 			return .none
 
 		case .child(.main(.delegate(.removedWallet))):
