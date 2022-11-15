@@ -107,6 +107,9 @@ final class AppFeatureTests: TestCase {
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
+		_ = await store.receive(.child(.splash(.delegate(.profileLoaded(nil))))) {
+			$0.root = .onboarding(.init())
+		}
 		_ = await store.receive(.internal(.system(.displayErrorAlert(Splash.NoProfileError() as NSError)))) {
 			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("No profile saved yet"))
 		}
@@ -142,8 +145,8 @@ final class AppFeatureTests: TestCase {
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		_ = await store.receive(.internal(.system(.displayErrorAlert(Splash.NoProfileError() as NSError)))) {
-			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("No profile saved yet"))
+		_ = await store.receive(.internal(.system(.displayErrorAlert(Splash.FailedToDecodeProfileError(error: decodingError) as NSError)))) {
+			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("Failed to decode profile: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))"))
 		}
 
 		// when
