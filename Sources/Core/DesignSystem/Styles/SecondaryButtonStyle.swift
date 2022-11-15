@@ -8,8 +8,8 @@ public struct SecondaryButtonStyle: ButtonStyle {
 		configuration.label
 			.foregroundColor(isEnabled ? Color.app.gray1 : Color.app.gray3)
 			.font(.app.body1Header)
-			.frame(maxWidth: .infinity)
 			.frame(height: 50)
+			.padding(.horizontal, 24)
 			.background(Color.app.gray4)
 			.cornerRadius(8)
 	}

@@ -137,9 +137,12 @@ private extension Home.View {
 							action: { .child(.accountList($0)) }
 						)
 					)
-					createAccountButton {
+
+					Button(L10n.CreateAccount.createNewAccount) {
 						viewStore.send(.createAccountButtonTapped)
 					}
+					.buttonStyle(.secondary)
+
 					Spacer()
 				}
 				.padding(24)
