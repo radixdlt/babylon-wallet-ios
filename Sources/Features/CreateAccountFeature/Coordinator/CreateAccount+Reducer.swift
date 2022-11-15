@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import ErrorQueue
 import KeychainClientDependency
 import Profile
 import ProfileClient
@@ -7,6 +8,7 @@ import ProfileClient
 public struct CreateAccount: ReducerProtocol {
 	@Dependency(\.accountNameValidator) var accountNameValidator
 	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.keychainClient) var keychainClient
 
@@ -36,10 +38,12 @@ public extension CreateAccount {
 			return .run { send in
 				await send(.delegate(.createdNewAccount(account)))
 			}
+
 		case let .internal(.system(.createdNewAccountResult(.failure(error)))):
 			state.isCreatingAccount = false
+			errorQueue.schedule(error)
 			return .run { send in
-				await send(.delegate(.failedToCreateNewAccount(reason: String(describing: error))))
+				await send(.delegate(.failedToCreateNewAccount))
 			}
 
 		case .internal(.view(.closeButtonTapped)):

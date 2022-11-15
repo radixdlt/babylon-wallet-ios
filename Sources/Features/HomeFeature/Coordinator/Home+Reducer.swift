@@ -298,9 +298,8 @@ public struct Home: ReducerProtocol {
 			state.createAccount = nil
 			return loadAccountsConnectionsAndSettings()
 
-		case let .child(.createAccount(.delegate(.failedToCreateNewAccount(reason: reason)))):
+		case .child(.createAccount(.delegate(.failedToCreateNewAccount))):
 			state.createAccount = nil
-			print("Failed to create account: \(reason)")
 			return .none
 
 		case let .internal(.system(.presentViewForRequestFromBrowser(incomingRequestFromBrowser))):

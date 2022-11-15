@@ -44,6 +44,9 @@ public extension App.View {
 			),
 			dismiss: .errorAlertDismissed
 		)
+		.task {
+			await ViewStore(store.stateless).send(.view(.task)).finish()
+		}
 	}
 }
 

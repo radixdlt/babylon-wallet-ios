@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Foundation
 import MainFeature
 import OnboardingFeature
 import Profile
@@ -26,6 +27,7 @@ public extension App.Action {
 // MARK: - App.Action.ViewAction
 public extension App.Action {
 	enum ViewAction: Equatable {
+		case task
 		case errorAlertDismissed
 	}
 }
@@ -41,6 +43,7 @@ public extension App.Action {
 // MARK: - App.Action.SystemAction
 public extension App.Action {
 	enum SystemAction: Equatable {
+		case displayErrorAlert(NSError)
 		case injectProfileIntoProfileClientResult(TaskResult<Profile>)
 	}
 }

@@ -287,6 +287,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"DesignSystem",
+			"ErrorQueue",
 			"KeychainClientDependency",
 			"ProfileClient",
 			tca,

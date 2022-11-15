@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import ErrorQueue
+import Foundation
 import MainFeature
 import OnboardingFeature
 import ProfileClient
@@ -30,9 +31,22 @@ public struct App: ReducerProtocol {
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
+		case .internal(.view(.task)):
+			return .run { send in
+				for await error in errorQueue.errors() {
+					await send(.internal(.system(.displayErrorAlert(error as NSError))))
+				}
+			}
+
 		case .internal(.view(.errorAlertDismissed)):
-			print("Error dismissed")
 			state.errorAlert = nil
+			return .none
+
+		case let .internal(.system(.displayErrorAlert(error))):
+			state.errorAlert = .init(
+				title: .init("An error ocurred"),
+				message: .init(error.localizedDescription)
+			)
 			return .none
 
 		case .child(.main(.delegate(.removedWallet))):
