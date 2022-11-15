@@ -55,7 +55,7 @@ public extension Onboarding {
 
 		case let .child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))):
 			return .run { send in
-				await send(.delegate(.onboardedWithProfile(newProfile, isNew: true)))
+				await send(.delegate(.onboardedWithProfile(newProfile)))
 			}
 
 		case let .child(.newProfile(.delegate(.failedToCreateNewProfile(reason)))):
@@ -74,7 +74,7 @@ public extension Onboarding {
 
 		case let .child(.importMnemonic(.delegate(.finishedImporting(_, profile)))):
 			return .run { send in
-				await send(.delegate(.onboardedWithProfile(profile, isNew: false)))
+				await send(.delegate(.onboardedWithProfile(profile)))
 			}
 
 		case .child, .delegate:

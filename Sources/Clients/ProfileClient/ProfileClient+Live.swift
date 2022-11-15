@@ -98,13 +98,14 @@ extension ProfileClient: DependencyKey {
 
 				return newProfile
 			},
-			injectProfile: { profile, mode in
-				try await profileHolder.injectProfile(profile, mode: mode)
+			injectProfile: { profile in
+				try await profileHolder.injectProfile(profile)
 			},
 			extractProfileSnapshot: {
 				try profileHolder.takeProfileSnapshot()
 			},
-			deleteProfileSnapshot: {
+			deleteProfileAndFactorSources: {
+				try await keychainClient.removeAllFactorSourcesAndProfileSnapshot()
 				profileHolder.removeProfile()
 			},
 			getAccounts: {
@@ -254,13 +255,8 @@ private final class ProfileHolder {
 		return result
 	}
 
-	func injectProfile(_ profile: Profile, mode: InjectProfileMode) async throws {
+	func injectProfile(_ profile: Profile) async throws {
 		self.profile = profile
-		switch mode {
-		case .injectAndPersistInKeychain:
-			try await persistProfile()
-		case .onlyInject: break
-		}
 	}
 
 	func takeProfileSnapshot() throws -> ProfileSnapshot {

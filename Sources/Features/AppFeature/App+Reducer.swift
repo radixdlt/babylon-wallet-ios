@@ -30,15 +30,15 @@ public struct App: ReducerProtocol {
 			goToOnboarding(state: &state)
 			return .none
 
-		case let .child(.onboarding(.delegate(.onboardedWithProfile(profile, isNew)))):
-			return injectProfileIntoProfileClient(profile, persistIntoKeychain: isNew)
+		case let .child(.onboarding(.delegate(.onboardedWithProfile(profile)))):
+			return injectProfileIntoProfileClient(profile)
 
 		case let .child(.onboarding(.delegate(.failedToCreateOrImportProfile(failureReason)))):
 			displayError(state: &state, reason: failureReason)
 			return .none
 
 		case let .child(.splash(.delegate(.loadProfileResult(.profileLoaded(profile))))):
-			return injectProfileIntoProfileClient(profile, persistIntoKeychain: false)
+			return injectProfileIntoProfileClient(profile)
 
 		case let .child(.splash(.delegate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
 			if failedToDecode {
@@ -49,7 +49,7 @@ public struct App: ReducerProtocol {
 				return .none
 			}
 
-		case let .internal(.system(.injectProfileIntoProfileClientResult(.success(profile)))):
+		case .internal(.system(.injectProfileIntoProfileClientResult(.success(_)))):
 			goToMain(state: &state)
 			return .none
 
@@ -66,12 +66,11 @@ public struct App: ReducerProtocol {
 		print("ERROR: \(reason)")
 	}
 
-	func injectProfileIntoProfileClient(_ profile: Profile, persistIntoKeychain: Bool) -> EffectTask<Action> {
+	func injectProfileIntoProfileClient(_ profile: Profile) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.system(.injectProfileIntoProfileClientResult(
 				TaskResult {
-					let mode = persistIntoKeychain ? InjectProfileMode.injectAndPersistInKeychain : InjectProfileMode.onlyInject
-					try await profileClient.injectProfile(profile, mode)
+					try await profileClient.injectProfile(profile)
 					return profile
 				}
 			))))

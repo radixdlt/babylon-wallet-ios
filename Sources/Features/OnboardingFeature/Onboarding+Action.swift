@@ -46,7 +46,7 @@ public extension Onboarding.Action {
 // MARK: - Onboarding.Action.DelegateAction
 public extension Onboarding.Action {
 	enum DelegateAction: Equatable {
-		case onboardedWithProfile(Profile, isNew: Bool)
+		case onboardedWithProfile(Profile)
 		case failedToCreateOrImportProfile(reason: String)
 	}
 }

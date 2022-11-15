@@ -27,9 +27,9 @@ extension ProfileClient: TestDependencyKey {
 				mnemonic: req.curve25519FactorSourceMnemonic
 			)
 		},
-		injectProfile: { _, _ in /* Noop */ },
+		injectProfile: { _ in /* Noop */ },
 		extractProfileSnapshot: { fatalError("Impl me") },
-		deleteProfileSnapshot: { /* Noop */ },
+		deleteProfileAndFactorSources: { /* Noop */ },
 		getAccounts: {
 			let accounts: [OnNetwork.Account] = [.mocked0, .mocked1]
 			return NonEmpty(rawValue: OrderedSet(accounts))!
@@ -63,7 +63,7 @@ extension ProfileClient: TestDependencyKey {
 		createNewProfile: unimplemented("\(Self.self).createNewProfile"),
 		injectProfile: unimplemented("\(Self.self).injectProfile"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
-		deleteProfileSnapshot: unimplemented("\(Self.self).deleteProfileSnapshot"),
+		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
 		getAccounts: unimplemented("\(Self.self).getAccounts"),
 		getBrowserExtensionConnections: unimplemented("\(Self.self).getBrowserExtensionConnections"),
 		addBrowserExtensionConnection: unimplemented("\(Self.self).addBrowserExtensionConnection"),

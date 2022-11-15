@@ -31,8 +31,8 @@ public struct ProfileClient {
 	public var injectProfile: InjectProfile
 	public var extractProfileSnapshot: ExtractProfileSnapshot
 
-	/// Does NOT delete the ProfileSnapshot from keychain, you have to do that elsewhere.
-	public var deleteProfileSnapshot: DeleteProfileSnapshot
+	/// Also deletes profile and factor sources from keychain
+	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
 	public var getAccounts: GetAccounts
 	public var getBrowserExtensionConnections: GetBrowserExtensionConnections
@@ -52,7 +52,7 @@ public extension ProfileClient {
 	typealias CreateNewProfile = @Sendable (CreateNewProfileRequest) async throws -> Profile
 
 	// Async throwing because this also
-	typealias InjectProfile = @Sendable (Profile, InjectProfileMode) async throws -> Void
+	typealias InjectProfile = @Sendable (Profile) async throws -> Void
 
 	typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 
@@ -70,12 +70,6 @@ public extension ProfileClient {
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) throws -> OnNetwork.Account
 	typealias SignTransaction = @Sendable (OnNetwork.Account, TransactionManifest) async throws -> TransactionIntent.TXID
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
-}
-
-// MARK: - InjectProfileMode
-public enum InjectProfileMode {
-	case onlyInject
-	case injectAndPersistInKeychain
 }
 
 // MARK: - CreateAccountRequest
