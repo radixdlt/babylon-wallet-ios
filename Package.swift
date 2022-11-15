@@ -23,6 +23,7 @@ package.dependencies += [
 	// Third party dependencies
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
+	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
 	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
 	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 
@@ -51,6 +52,11 @@ let dependencies: Target.Dependency = .product(
 let tagged: Target.Dependency = .product(
 	name: "Tagged",
 	package: "swift-tagged"
+)
+
+let legibleError: Target.Dependency = .product(
+	name: "LegibleError",
+	package: "LegibleError"
 )
 
 let profile: Target.Dependency = .product(
@@ -674,6 +680,7 @@ package.addModules([
 			bigInt,
 			"DesignSystem",
 			engineToolkit,
+			legibleError,
 			profile, // Address
 			tagged,
 		],
