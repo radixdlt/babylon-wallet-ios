@@ -27,7 +27,7 @@ public struct Home: ReducerProtocol {
 
 	public init() {}
 
-	public var body: some ReducerProtocol<State, Action> {
+	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.header, action: /Action.child .. Action.ChildAction.header) {
 			Home.Header()
 		}
@@ -45,7 +45,7 @@ public struct Home: ReducerProtocol {
 		Reduce(self.core)
 	}
 
-	func accountListReducer() -> some ReducerProtocol<State, Action> {
+	func accountListReducer() -> some ReducerProtocolOf<Self> {
 		Scope(state: \.accountList, action: /Action.child .. Action.ChildAction.accountList) {
 			AccountList()
 		}

@@ -11,7 +11,7 @@ public struct Main: ReducerProtocol {
 
 	public init() {}
 
-	public var body: some ReducerProtocol<State, Action> {
+	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.home, action: /Action.child .. Action.ChildAction.home) {
 			Home()
 		}

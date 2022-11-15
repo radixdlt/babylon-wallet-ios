@@ -15,7 +15,7 @@ public struct ManageBrowserExtensionConnections: ReducerProtocol {
 }
 
 public extension ManageBrowserExtensionConnections {
-	var body: some ReducerProtocol<State, Action> {
+	var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
 			.forEach(\.connections, action: /Action.child .. Action.ChildAction.connection) {
 				ManageBrowserExtensionConnection()

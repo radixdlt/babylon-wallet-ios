@@ -12,7 +12,7 @@ public struct App: ReducerProtocol {
 
 	public init() {}
 
-	public var body: some ReducerProtocol<State, Action> {
+	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.root, action: /Action.self) {
 			EmptyReducer()
 				.ifCaseLet(/App.State.Root.main, action: /Action.child .. Action.ChildAction.main) {

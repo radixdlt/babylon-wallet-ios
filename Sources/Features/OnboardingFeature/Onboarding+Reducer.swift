@@ -13,7 +13,7 @@ public struct Onboarding: ReducerProtocol {
 }
 
 public extension Onboarding {
-	var body: some ReducerProtocol<State, Action> {
+	var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
 			.ifLet(\.newProfile, action: /Action.child .. Action.ChildAction.newProfile) {
 				NewProfile()
