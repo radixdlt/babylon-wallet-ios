@@ -64,7 +64,11 @@ public struct App: ReducerProtocol {
 
 		case let .child(.splash(.delegate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
 			if failedToDecode {
-				displayError(state: &state, reason: "Failed to decode profile: \(reason)")
+				struct FailedToDecodeError: LocalizedError {
+					let reason: String
+					var errorDescription: String? { "Failed to decode profile: \(reason)" }
+				}
+				errorQueue.schedule(FailedToDecodeError(reason: reason))
 				return .none
 			} else {
 				goToOnboarding(state: &state)
@@ -81,11 +85,6 @@ public struct App: ReducerProtocol {
 		case .child:
 			return .none
 		}
-	}
-
-	func displayError(state: inout State, reason: String) {
-		// FIXME: display error to user...
-		print("ERROR: \(reason)")
 	}
 
 	func injectProfileIntoProfileClient(_ profile: Profile, persistIntoKeychain: Bool) -> EffectTask<Action> {
