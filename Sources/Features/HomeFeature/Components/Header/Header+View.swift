@@ -81,6 +81,7 @@ private struct SettingsButton: View {
 			Button(action: action) {
 				Image("home-header-settings")
 			}
+			.frame(width: 44, height: 44)
 
 			if shouldShowNotification {
 				Circle()

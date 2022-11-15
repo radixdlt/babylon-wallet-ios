@@ -47,12 +47,17 @@ public extension AccountList.Row.View {
 							viewStore.send(.copyAddressButtonTapped)
 						}
 					)
+					.foregroundColor(.app.whiteTransparent)
 					.frame(maxWidth: 160)
+
+					// TODO: replace spacer with token list when API is available
+					Spacer()
+						.frame(height: 64)
 				}
 			}
-			.padding(25)
-			.background(Color.app.gray5)
-			.cornerRadius(6)
+			.padding(EdgeInsets(top: 18, leading: 24, bottom: 18, trailing: 24))
+			.background(Color.app.blue2)
+			.cornerRadius(12)
 			.onTapGesture {
 				viewStore.send(.selected)
 			}
@@ -104,8 +109,8 @@ private struct HeaderView: View {
 		HStack {
 			if let name {
 				Text(name)
-					.foregroundColor(.app.buttonTextBlack)
-					.textStyle(.secondaryHeader)
+					.foregroundColor(.app.white)
+					.textStyle(.body1Header)
 					.fixedSize()
 			}
 			Spacer()

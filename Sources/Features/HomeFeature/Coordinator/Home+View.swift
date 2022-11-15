@@ -127,7 +127,7 @@ private extension Home.View {
 					action: { .child(.header($0)) }
 				)
 			)
-			.padding([.leading, .trailing, .top], 24)
+			.padding(EdgeInsets(top: 32, leading: 32, bottom: 0, trailing: 22))
 
 			ScrollView {
 				LazyVStack(spacing: 24) {
