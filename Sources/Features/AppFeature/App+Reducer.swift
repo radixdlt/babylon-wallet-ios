@@ -72,7 +72,8 @@ public struct App: ReducerProtocol {
 			return .none
 
 		case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case .child:
 			return .none
