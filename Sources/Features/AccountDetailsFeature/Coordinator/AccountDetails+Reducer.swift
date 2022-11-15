@@ -1,4 +1,3 @@
-import AggregatedValueFeature
 import AssetsViewFeature
 import ComposableArchitecture
 
@@ -6,10 +5,6 @@ public struct AccountDetails: ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocol<State, Action> {
-		Scope(state: \.aggregatedValue, action: /Action.child .. Action.ChildAction.aggregatedValue) {
-			AggregatedValue()
-		}
-
 		Scope(state: \.assets, action: /Action.child .. Action.ChildAction.assets) {
 			AssetsView()
 		}

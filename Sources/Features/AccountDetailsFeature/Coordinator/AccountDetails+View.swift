@@ -1,4 +1,3 @@
-import AggregatedValueFeature
 import AssetsViewFeature
 import Common
 import ComposableArchitecture
@@ -39,13 +38,6 @@ public extension AccountDetails.View {
 								copyAddressAction: {
 									viewStore.send(.copyAddressButtonTapped)
 								}
-							)
-
-							AggregatedValue.View(
-								store: store.scope(
-									state: \.aggregatedValue,
-									action: { .child(.aggregatedValue($0)) }
-								)
 							)
 
 							transferButton(with: viewStore)
@@ -119,12 +111,10 @@ extension AccountDetails.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		public let address: AccountAddress
-		public var aggregatedValue: AggregatedValue.State
 		public let displayName: String
 
 		init(state: AccountDetails.State) {
 			address = state.address
-			aggregatedValue = state.aggregatedValue
 			displayName = state.displayName
 		}
 	}

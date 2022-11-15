@@ -183,7 +183,7 @@ public struct Home: ReducerProtocol {
 				state.accountDetails?.assets = .init(
 					fungibleTokenList: .init(
 						sections: .init(uniqueElements: categories.map { category in
-							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
+							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
 							return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
 						})
 					),
@@ -260,9 +260,6 @@ public struct Home: ReducerProtocol {
 					try await accountPortfolioFetcher.fetchPortfolio([address])
 				}))))
 			}
-
-		case .child(.accountDetails(.child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))))):
-			return toggleCurrencyAmountVisible()
 
 		case .child(.transfer(.delegate(.dismissTransfer))):
 			state.transfer = nil

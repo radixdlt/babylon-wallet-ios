@@ -1,7 +1,6 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPreferencesFeature
-import AggregatedValueFeature
 import Common
 import ComposableArchitecture
 import CreateAccountFeature
