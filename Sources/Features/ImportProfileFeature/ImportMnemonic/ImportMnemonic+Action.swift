@@ -45,6 +45,5 @@ public extension ImportMnemonic.Action {
 	enum DelegateAction: Equatable {
 		case goBack
 		case finishedImporting(mnemonic: Mnemonic, andProfile: Profile)
-		case failedToImportMnemonicOrProfile(reason: String)
 	}
 }

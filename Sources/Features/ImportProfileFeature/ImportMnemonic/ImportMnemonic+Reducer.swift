@@ -37,9 +37,8 @@ public extension ImportMnemonic {
 			return .none
 
 		case let .internal(.system(.importMnemonicResult(.failure(error)))):
-			return .run { send in
-				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to import mnemonic, error: \(String(describing: error))")))
-			}
+			errorQueue.schedule(error)
+			return .none
 
 		case .internal(.view(.saveImportedMnemonicButtonTapped)):
 			guard let mnemonic = state.importedMnemonic else {
@@ -67,9 +66,6 @@ public extension ImportMnemonic {
 		case let .internal(.system(.saveImportedMnemonicResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
-			return .run { send in
-				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to save mnemonic to keychain, error: \(String(describing: error))")))
-			}
 
 		case let .internal(.system(.saveImportedMnemonicResult(.success(mnemonic)))):
 			state.savedMnemonic = mnemonic
@@ -85,15 +81,14 @@ public extension ImportMnemonic {
 		case let .internal(.system(.profileFromSnapshotResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
-			return .run { send in
-				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to import profile from snapshot, error: \(String(describing: error))")))
-			}
 
 		case let .internal(.system(.profileFromSnapshotResult(.success(profile)))):
 			guard let mnemonic = state.savedMnemonic else {
-				return .run { send in
-					await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Expected to have saved mnemonic.")))
+				struct ExpectedMnemonicError: LocalizedError {
+					let errorDescription: String? = "Expected to have saved mnemonic."
 				}
+				errorQueue.schedule(ExpectedMnemonicError())
+				return .none
 			}
 			return .run { send in
 				await send(.delegate(.finishedImporting(mnemonic: mnemonic, andProfile: profile)))

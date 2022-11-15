@@ -67,11 +67,6 @@ public extension Onboarding {
 			state.importMnemonic = nil
 			return .none
 
-		case let .child(.importMnemonic(.delegate(.failedToImportMnemonicOrProfile(importFailureReason)))):
-			return .run { send in
-				await send(.delegate(.failedToCreateOrImportProfile(reason: "Import mnemonic failed: \(importFailureReason)")))
-			}
-
 		case let .child(.importMnemonic(.delegate(.finishedImporting(_, profile)))):
 			return .run { send in
 				await send(.delegate(.onboardedWithProfile(profile, isNew: false)))
