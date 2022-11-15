@@ -64,11 +64,11 @@ public struct App: ReducerProtocol {
 
 		case let .child(.splash(.delegate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
 			if failedToDecode {
-				struct FailedToDecodeError: LocalizedError {
+				struct FailedToDecodeProfileError: LocalizedError {
 					let reason: String
 					var errorDescription: String? { "Failed to decode profile: \(reason)" }
 				}
-				errorQueue.schedule(FailedToDecodeError(reason: reason))
+				errorQueue.schedule(FailedToDecodeProfileError(reason: reason))
 				return .none
 			} else {
 				goToOnboarding(state: &state)
