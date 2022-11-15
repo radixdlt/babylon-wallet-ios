@@ -14,24 +14,29 @@ let package = Package(
 // MARK: - Dependencies
 
 package.dependencies += [
-	// RDX Works Package depedencies
+	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.19"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
 	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.30"),
 
-	// BigInt
+	// Third party dependencies
+	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
+	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
+	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
 
 	// TCA - ComposableArchitecture used as architecture
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
-	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
-
-	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 ]
+
+let asyncAlgorithms: Target.Dependency = .product(
+	name: "AsyncAlgorithms",
+	package: "swift-async-algorithms"
+)
 
 let tca: Target.Dependency = .product(
 	name: "ComposableArchitecture",
@@ -245,6 +250,7 @@ package.addModules([
 			"AccountPortfolio",
 			"AppSettings",
 			engineToolkit,
+			"ErrorQueue",
 			"MainFeature",
 			"OnboardingFeature",
 			"PasteboardClient",
@@ -338,6 +344,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"Data",
+			"ErrorQueue",
 			"JSON",
 			"KeychainClientDependency",
 			"ProfileClient",
@@ -563,6 +570,14 @@ package.addModules([
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.client(
+		name: "ErrorQueue",
+		dependencies: [
+			asyncAlgorithms,
+			dependencies,
+		],
+		tests: .no
 	),
 	.client(
 		name: "GatewayAPI",
