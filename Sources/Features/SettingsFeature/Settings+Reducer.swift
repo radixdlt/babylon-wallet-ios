@@ -2,6 +2,7 @@ import ComposableArchitecture
 import GatewayAPI
 import KeychainClient
 import ManageBrowserExtensionConnectionsFeature
+import ManageGatewayAPIEndpointsFeature
 import Profile
 import ProfileClient
 
@@ -19,7 +20,9 @@ public extension Settings {
 			.ifLet(\.manageBrowserExtensionConnections, action: /Action.child .. Action.ChildAction.manageBrowserExtensionConnections) {
 				ManageBrowserExtensionConnections()
 			}
-			._printChanges()
+			.ifLet(\.manageGatewayAPIEndpoints, action: /Action.child .. Action.ChildAction.manageGatewayAPIEndpoints) {
+				ManageGatewayAPIEndpoints()
+			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -52,8 +55,12 @@ public extension Settings {
 			// FIXME: Error propagation
 			return .none
 
-		case .child(.manageGatewayAPIEndpoints):
-			fatalError("IMPLE ME")
+		case .child(.manageGatewayAPIEndpoints(.delegate(.dismiss))):
+			state.manageGatewayAPIEndpoints = nil
+			return .none
+
+		case .child(.manageGatewayAPIEndpoints(.internal)):
+			return .none
 
 		#if DEBUG
 		case .internal(.view(.debugInspectProfileButtonTapped)):

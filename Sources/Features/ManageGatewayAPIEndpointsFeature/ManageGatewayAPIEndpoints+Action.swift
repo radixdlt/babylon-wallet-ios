@@ -11,7 +11,10 @@ public extension ManageGatewayAPIEndpoints {
 
 // MARK: - ManageGatewayAPIEndpoints.Action.ViewAction
 public extension ManageGatewayAPIEndpoints.Action {
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case dismissButtonTapped
+		case gatewayAPIURLChanged(String)
+	}
 }
 
 // MARK: - ManageGatewayAPIEndpoints.Action.InternalAction
@@ -29,5 +32,7 @@ public extension ManageGatewayAPIEndpoints.Action {
 
 // MARK: - ManageGatewayAPIEndpoints.Action.DelegateAction
 public extension ManageGatewayAPIEndpoints.Action {
-	enum DelegateAction: Equatable {}
+	enum DelegateAction: Equatable {
+		case dismiss
+	}
 }

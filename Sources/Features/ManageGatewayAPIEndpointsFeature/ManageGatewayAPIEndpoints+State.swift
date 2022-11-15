@@ -3,6 +3,7 @@ import Foundation
 // MARK: - ManageGatewayAPIEndpoints.State
 public extension ManageGatewayAPIEndpoints {
 	struct State: Equatable {
+		public var gatewayAPIURLString: String = ""
 		public init() {}
 	}
 }

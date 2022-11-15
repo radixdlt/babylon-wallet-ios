@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 
 // MARK: - ManageGatewayAPIEndpoints.View
@@ -18,11 +19,22 @@ public extension ManageGatewayAPIEndpoints.View {
 			store,
 			observe: ViewState.init(state:),
 			send: { .view($0) }
-		) { _ in
-			// TODO: implement
-			Text("Implement: ManageGatewayAPIEndpoints")
-				.background(Color.yellow)
-				.foregroundColor(.red)
+		) { viewStore in
+			Screen(
+				title: "Edit Gateway API URL",
+				navBarActionStyle: .close,
+				action: { viewStore.send(.dismissButtonTapped) }
+			) {
+				VStack {
+					TextField(
+						"Gateway API url",
+						text: viewStore.binding(
+							get: \.gatewayAPIURLString,
+							send: { .gatewayAPIURLChanged($0) }
+						)
+					)
+				}
+			}
 		}
 	}
 }
@@ -30,8 +42,9 @@ public extension ManageGatewayAPIEndpoints.View {
 // MARK: - ManageGatewayAPIEndpoints.View.ViewState
 extension ManageGatewayAPIEndpoints.View {
 	struct ViewState: Equatable {
+		public var gatewayAPIURLString: String
 		init(state: ManageGatewayAPIEndpoints.State) {
-			// TODO: implement
+			gatewayAPIURLString = state.gatewayAPIURLString
 		}
 	}
 }

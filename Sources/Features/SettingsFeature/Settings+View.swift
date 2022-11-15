@@ -3,6 +3,7 @@ import DesignSystem
 import GatewayAPI
 import KeychainClientDependency
 import ManageBrowserExtensionConnectionsFeature
+import ManageGatewayAPIEndpointsFeature
 import Profile
 import ProfileClient
 import SwiftUI
@@ -35,6 +36,7 @@ public extension Settings.View {
 				ZStack {
 					settingsView(viewStore: viewStore)
 						.zIndex(0)
+
 					IfLetStore(
 						store.scope(
 							state: \.manageBrowserExtensionConnections,
@@ -43,6 +45,15 @@ public extension Settings.View {
 						then: ManageBrowserExtensionConnections.View.init(store:)
 					)
 					.zIndex(1)
+
+					IfLetStore(
+						store.scope(
+							state: \.manageGatewayAPIEndpoints,
+							action: { .child(.manageGatewayAPIEndpoints($0)) }
+						),
+						then: ManageGatewayAPIEndpoints.View.init(store:)
+					)
+					.zIndex(2)
 				}
 			}
 			.buttonStyle(.borderedProminent)
