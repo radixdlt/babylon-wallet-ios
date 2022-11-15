@@ -49,8 +49,6 @@ public extension AccountList.Row.View {
 					)
 					.frame(maxWidth: 160)
 				}
-
-				TokenListView(containers: viewStore.state.portfolio.fungibleTokenContainers)
 			}
 			.padding(25)
 			.background(Color.app.gray5)
@@ -111,10 +109,6 @@ private struct HeaderView: View {
 					.fixedSize()
 			}
 			Spacer()
-			Text(value)
-				.foregroundColor(.app.buttonTextBlack)
-				.textStyle(.secondaryHeader)
-				.fixedSize()
 		}
 	}
 }
