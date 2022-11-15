@@ -2,7 +2,6 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import AggregatedValueFeature
 import Asset
 import BrowserExtensionsConnectivityClient
 import Collections
@@ -30,10 +29,6 @@ public struct Home: ReducerProtocol {
 	public var body: some ReducerProtocol<State, Action> {
 		Scope(state: \.header, action: /Action.child .. Action.ChildAction.header) {
 			Home.Header()
-		}
-
-		Scope(state: \.aggregatedValue, action: /Action.child .. Action.ChildAction.aggregatedValue) {
-			AggregatedValue()
 		}
 
 		accountListReducer()
@@ -139,7 +134,6 @@ public struct Home: ReducerProtocol {
 		case let .internal(.system(.appSettingsLoadedResult(.success(appSettings)))):
 			// FIXME: Replace currency with value from Profile!
 			let currency = appSettings.currency
-			state.aggregatedValue.currency = currency
 			state.accountList.accounts.forEach {
 				state.accountList.accounts[id: $0.address]?.currency = currency
 			}
@@ -148,16 +142,12 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
-			// aggregated value
-			state.aggregatedValue.isCurrencyAmountVisible = isVisible
-
 			// account list
 			state.accountList.accounts.forEach {
 				state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = isVisible
 			}
 
 			// account details
-			state.accountDetails?.aggregatedValue.isCurrencyAmountVisible = isVisible
 			state.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
 				section.assets.forEach { row in
 					state.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
@@ -230,9 +220,6 @@ public struct Home: ReducerProtocol {
 			return .run { send in
 				await send(.delegate(.displaySettings))
 			}
-
-		case .child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))):
-			return toggleCurrencyAmountVisible()
 
 		case .child(.accountList(.delegate(.fetchPortfolioForAccounts))):
 			return loadAccountsConnectionsAndSettings()

@@ -132,15 +132,6 @@ private extension Home.View {
 
 			ScrollView {
 				LazyVStack(spacing: 24) {
-					VStack {
-						title
-						AggregatedValue.View(
-							store: store.scope(
-								state: \.aggregatedValue,
-								action: { .child(.aggregatedValue($0)) }
-							)
-						)
-					}
 					AccountList.View(
 						store: store.scope(
 							state: \.accountList,

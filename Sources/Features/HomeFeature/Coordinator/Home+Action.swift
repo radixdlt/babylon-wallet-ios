@@ -2,7 +2,6 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import AggregatedValueFeature
 import AppSettings
 import BrowserExtensionsConnectivityClient
 import Collections
@@ -30,7 +29,6 @@ public extension Home {
 public extension Home.Action {
 	enum ChildAction: Equatable {
 		case accountList(AccountList.Action)
-		case aggregatedValue(AggregatedValue.Action)
 		case header(Home.Header.Action)
 		case accountPreferences(AccountPreferences.Action)
 		case accountDetails(AccountDetails.Action)
