@@ -165,22 +165,24 @@ final class HomeFeatureTests: TestCase {
 	 }
 	 */
 
-	func testVisitHubButtonTapped() async {
-		let initialState: Home.State = .placeholder
-		let store = TestStore(
-			initialState: initialState,
-			reducer: Home()
-		)
-		let openedURL = ActorIsolated<URL?>(nil)
-		store.dependencies.openURL = .init { url in
-			await openedURL.setValue(url)
-			return true
-		}
+	/*
+	 func testVisitHubButtonTapped() async {
+	 	let initialState: Home.State = .placeholder
+	 	let store = TestStore(
+	 		initialState: initialState,
+	 		reducer: Home()
+	 	)
+	 	let openedURL = ActorIsolated<URL?>(nil)
+	 	store.dependencies.openURL = .init { url in
+	 		await openedURL.setValue(url)
+	 		return true
+	 	}
 
-		_ = await store.send(.child(.visitHub(.delegate(.displayHub))))
+	 	_ = await store.send(.child(.visitHub(.delegate(.displayHub))))
 
-		await openedURL.withValue { openedURL in
-			XCTAssertEqual(openedURL, URL(string: "https://www.apple.com")!)
-		}
-	}
+	 	await openedURL.withValue { openedURL in
+	 		XCTAssertEqual(openedURL, URL(string: "https://www.apple.com")!)
+	 	}
+	 }
+	 */
 }

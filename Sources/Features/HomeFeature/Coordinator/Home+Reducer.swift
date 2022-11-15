@@ -36,10 +36,6 @@ public struct Home: ReducerProtocol {
 			AggregatedValue()
 		}
 
-		Scope(state: \.visitHub, action: /Action.child .. Action.ChildAction.visitHub) {
-			Home.VisitHub()
-		}
-
 		accountListReducer()
 
 		Reduce(self.core)
@@ -237,11 +233,6 @@ public struct Home: ReducerProtocol {
 
 		case .child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))):
 			return toggleCurrencyAmountVisible()
-
-		case .child(.visitHub(.delegate(.displayHub))):
-			return .run { _ in
-				await openURL(URL(string: "https://www.apple.com")!)
-			}
 
 		case .child(.accountList(.delegate(.fetchPortfolioForAccounts))):
 			return loadAccountsConnectionsAndSettings()

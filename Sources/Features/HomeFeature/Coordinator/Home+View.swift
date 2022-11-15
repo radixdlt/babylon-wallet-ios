@@ -151,13 +151,6 @@ private extension Home.View {
 						viewStore.send(.createAccountButtonTapped)
 					}
 					Spacer()
-
-					Home.VisitHub.View(
-						store: store.scope(
-							state: \.visitHub,
-							action: { .child(.visitHub($0)) }
-						)
-					)
 				}
 				.padding(24)
 			}

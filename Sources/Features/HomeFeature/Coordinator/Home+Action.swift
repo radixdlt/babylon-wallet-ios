@@ -32,7 +32,6 @@ public extension Home.Action {
 		case accountList(AccountList.Action)
 		case aggregatedValue(AggregatedValue.Action)
 		case header(Home.Header.Action)
-		case visitHub(Home.VisitHub.Action)
 		case accountPreferences(AccountPreferences.Action)
 		case accountDetails(AccountDetails.Action)
 		case transfer(AccountDetails.Transfer.Action)
