@@ -1,31 +1,40 @@
 import ComposableArchitecture
+import ErrorQueue
 import MainFeature
 import OnboardingFeature
 import ProfileClient
 import SplashFeature
 
 public struct App: ReducerProtocol {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
 
 	public var body: some ReducerProtocol<State, Action> {
-		EmptyReducer()
-			.ifCaseLet(/App.State.main, action: /Action.child .. Action.ChildAction.main) {
-				Main()
-			}
-			.ifCaseLet(/App.State.onboarding, action: /Action.child .. Action.ChildAction.onboarding) {
-				Onboarding()
-			}
-			.ifCaseLet(/App.State.splash, action: /Action.child .. Action.ChildAction.splash) {
-				Splash()
-			}
+		Scope(state: \.root, action: /Action.self) {
+			EmptyReducer()
+				.ifCaseLet(/App.State.Root.main, action: /Action.child .. Action.ChildAction.main) {
+					Main()
+				}
+				.ifCaseLet(/App.State.Root.onboarding, action: /Action.child .. Action.ChildAction.onboarding) {
+					Onboarding()
+				}
+				.ifCaseLet(/App.State.Root.splash, action: /Action.child .. Action.ChildAction.splash) {
+					Splash()
+				}
+		}
 
 		Reduce(self.core)
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
+		case .internal(.view(.errorAlertDismissed)):
+			print("Error dismissed")
+			state.errorAlert = nil
+			return .none
+
 		case .child(.main(.delegate(.removedWallet))):
 			goToOnboarding(state: &state)
 			return .none
@@ -79,10 +88,10 @@ public struct App: ReducerProtocol {
 	}
 
 	func goToMain(state: inout State) {
-		state = .main(.init())
+		state.root = .main(.init())
 	}
 
 	func goToOnboarding(state: inout State) {
-		state = .onboarding(.init())
+		state.root = .onboarding(.init())
 	}
 }

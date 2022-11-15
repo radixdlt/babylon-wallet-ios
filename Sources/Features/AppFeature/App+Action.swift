@@ -9,6 +9,7 @@ public extension App {
 	// MARK: Action
 	enum Action: Equatable {
 		case child(ChildAction)
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 	}
 }
@@ -22,9 +23,17 @@ public extension App.Action {
 	}
 }
 
+// MARK: - App.Action.ViewAction
+public extension App.Action {
+	enum ViewAction: Equatable {
+		case errorAlertDismissed
+	}
+}
+
 // MARK: - App.Action.InternalAction
 public extension App.Action {
 	enum InternalAction: Equatable {
+		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
