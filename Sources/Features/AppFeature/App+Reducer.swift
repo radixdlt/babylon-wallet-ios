@@ -45,7 +45,7 @@ public struct App: ReducerProtocol {
 			)
 			return .none
 
-		case .internal(.view(.errorAlertDismissed)):
+		case .internal(.view(.errorAlertDismissButtonTapped)):
 			state.errorAlert = nil
 			return .none
 

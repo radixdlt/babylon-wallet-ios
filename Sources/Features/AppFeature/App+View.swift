@@ -42,7 +42,7 @@ public extension App.View {
 				state: \.errorAlert,
 				action: { .view($0) }
 			),
-			dismiss: .errorAlertDismissed
+			dismiss: .errorAlertDismissButtonTapped
 		)
 		.task { @MainActor in
 			await ViewStore(store.stateless).send(.view(.task)).finish()

@@ -28,7 +28,7 @@ public extension App.Action {
 public extension App.Action {
 	enum ViewAction: Equatable {
 		case task
-		case errorAlertDismissed
+		case errorAlertDismissButtonTapped
 	}
 }
 
