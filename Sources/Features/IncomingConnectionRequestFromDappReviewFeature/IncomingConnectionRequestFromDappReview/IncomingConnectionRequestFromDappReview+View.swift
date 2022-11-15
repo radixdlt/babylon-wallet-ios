@@ -75,10 +75,10 @@ private extension IncomingConnectionRequestFromDappReview.View {
 
 					Spacer()
 
-					PrimaryButton(
-						title: L10n.DApp.ConnectionRequest.continueButtonTitle,
-						action: { viewStore.send(.continueButtonTapped) }
-					)
+					Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
+						viewStore.send(.continueButtonTapped)
+					}
+					.buttonStyle(.primary)
 				}
 				.padding(.horizontal, 24)
 			}

@@ -62,11 +62,12 @@ public extension ChooseAccounts.View {
 									.textStyle(.body1Regular)
 							}
 						)
-						PrimaryButton(
-							title: L10n.DApp.ConnectionRequest.continueButtonTitle,
-							isEnabled: viewStore.canProceed,
-							action: { viewStore.send(.continueButtonTapped) }
-						)
+
+						Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
+							viewStore.send(.continueButtonTapped)
+						}
+						.buttonStyle(.primary)
+						.disabled(!viewStore.canProceed)
 					}
 
 					Spacer(minLength: 16)

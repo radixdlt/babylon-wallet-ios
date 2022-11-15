@@ -65,10 +65,10 @@ public extension AccountCompletion.View {
 
 				Spacer()
 
-				PrimaryButton(
-					title: L10n.CreateAccount.Completion.returnToOrigin(viewStore.origin.displayText),
-					action: { /* TODO: implement */ }
-				)
+				Button(L10n.CreateAccount.Completion.returnToOrigin(viewStore.origin.displayText)) {
+					/* TODO: implement */
+				}
+				.buttonStyle(.primary)
 			}
 			.padding(24)
 		}

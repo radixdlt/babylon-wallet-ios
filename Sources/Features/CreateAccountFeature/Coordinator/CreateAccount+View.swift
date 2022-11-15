@@ -90,13 +90,11 @@ public extension CreateAccount.View {
 						LoadingView()
 					}
 
-					PrimaryButton(
-						title: L10n.CreateAccount.createAccountButtonTitle,
-						isEnabled: viewStore.isCreateAccountButtonEnabled,
-						action: {
-							viewStore.send(.createAccountButtonTapped)
-						}
-					)
+					Button(L10n.CreateAccount.createAccountButtonTitle) {
+						viewStore.send(.createAccountButtonTapped)
+					}
+					.buttonStyle(.primary)
+					.disabled(!viewStore.isCreateAccountButtonEnabled)
 				}
 				.onAppear {
 					viewStore.send(.viewAppeared)

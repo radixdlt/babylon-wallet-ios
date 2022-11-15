@@ -33,12 +33,11 @@ public extension TransactionSigning.View {
 						}
 						.background(Color(white: 0.9))
 
-						PrimaryButton(
-							title: "Sign Transaction",
-							isEnabled: viewStore.isSignButtonEnabled
-						) {
+						Button("Sign Transaction") {
 							viewStore.send(.signTransactionButtonTapped)
 						}
+						.buttonStyle(.primary)
+						.disabled(!viewStore.isSignButtonEnabled)
 					}
 					.padding([.horizontal, .bottom])
 
