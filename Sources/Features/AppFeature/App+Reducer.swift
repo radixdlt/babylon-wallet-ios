@@ -53,12 +53,11 @@ public struct App: ReducerProtocol {
 			goToOnboarding(state: &state)
 			return .none
 
-		case let .child(.onboarding(.delegate(.onboardedWithProfile(profile, isNew)))):
-			return injectProfileIntoProfileClient(profile, persistIntoKeychain: isNew)
+		case let .child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))):
+			return injectProfileIntoProfileClient(newProfile, persistIntoKeychain: true)
 
-		case let .child(.onboarding(.delegate(.failedToCreateOrImportProfile(failureReason)))):
-			displayError(state: &state, reason: failureReason)
-			return .none
+		case let .child(.onboarding(.child(.importMnemonic(.delegate(.finishedImporting(_, profile)))))):
+			return injectProfileIntoProfileClient(profile, persistIntoKeychain: false)
 
 		case let .child(.splash(.delegate(.loadProfileResult(.profileLoaded(profile))))):
 			return injectProfileIntoProfileClient(profile, persistIntoKeychain: false)

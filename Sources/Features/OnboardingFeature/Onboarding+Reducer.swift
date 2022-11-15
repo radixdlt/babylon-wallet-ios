@@ -40,11 +40,6 @@ public extension Onboarding {
 			state.importProfile = nil
 			return .none
 
-		case let .child(.importProfile(.delegate(.failedToImportProfileSnapshot(importFailureReason)))):
-			return .run { send in
-				await send(.delegate(.failedToCreateOrImportProfile(reason: "Import failed: \(importFailureReason)")))
-			}
-
 		case let .child(.importProfile(.delegate(.importedProfileSnapshot(profileSnapshot)))):
 			state.importMnemonic = .init(importedProfileSnapshot: profileSnapshot)
 			return .none
@@ -53,24 +48,9 @@ public extension Onboarding {
 			state.newProfile = nil
 			return .none
 
-		case let .child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))):
-			return .run { send in
-				await send(.delegate(.onboardedWithProfile(newProfile, isNew: true)))
-			}
-
-		case let .child(.newProfile(.delegate(.failedToCreateNewProfile(reason)))):
-			return .run { send in
-				await send(.delegate(.failedToCreateOrImportProfile(reason: "Failed to create profile: \(reason)")))
-			}
-
 		case .child(.importMnemonic(.delegate(.goBack))):
 			state.importMnemonic = nil
 			return .none
-
-		case let .child(.importMnemonic(.delegate(.finishedImporting(_, profile)))):
-			return .run { send in
-				await send(.delegate(.onboardedWithProfile(profile, isNew: false)))
-			}
 
 		case .child, .delegate:
 			return .none
