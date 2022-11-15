@@ -43,10 +43,10 @@ public extension PrimaryButton {
 			action: action,
 			label: {
 				Text(title)
+					.foregroundColor(isEnabled ? .app.white : Color.app.gray3)
 					.font(.app.body1Header)
 					.frame(maxWidth: .infinity)
 					.frame(height: 50)
-					.foregroundColor(.app.white)
 					.background(isEnabled ? Color.app.blue2 : Color.app.gray4)
 					.cornerRadius(8)
 			}
@@ -58,8 +58,11 @@ public extension PrimaryButton {
 // MARK: - PrimaryButton_Previews
 struct PrimaryButton_Previews: PreviewProvider {
 	static var previews: some View {
-		PrimaryButton(
-			title: "A title",
+		registerFonts()
+
+		return PrimaryButton(
+			title: "Primary button",
+			isEnabled: true,
 			action: {}
 		)
 	}
