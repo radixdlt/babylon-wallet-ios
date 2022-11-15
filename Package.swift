@@ -23,8 +23,8 @@ package.dependencies += [
 	// Third party dependencies
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
-	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
+	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 
 	// TCA - ComposableArchitecture used as architecture
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
