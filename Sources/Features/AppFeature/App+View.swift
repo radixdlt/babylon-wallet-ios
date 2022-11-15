@@ -37,6 +37,13 @@ public extension App.View {
 				then: Splash.View.init(store:)
 			)
 		}
+		.alert(
+			store.scope(
+				state: \.errorAlert,
+				action: { .view($0) }
+			),
+			dismiss: .errorAlertDismissed
+		)
 	}
 }
 
