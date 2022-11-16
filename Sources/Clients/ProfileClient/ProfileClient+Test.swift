@@ -20,10 +20,10 @@ extension ProfileClient: TestDependencyKey {
 	// TODO: make every endpoint no-op
 	public static let previewValue = Self(
 		getCurrentNetworkID: { NetworkID.primary },
-		setCurrentNetworkID: { _ in },
-		createNewProfile: { req in
+		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
+		createNewProfileWithOnLedgerAccount: { req, _ in
 			try! await Profile.new(
-				networkID: .primary,
+				networkAndGateway: .primary,
 				mnemonic: req.curve25519FactorSourceMnemonic
 			)
 		},
@@ -43,7 +43,7 @@ extension ProfileClient: TestDependencyKey {
 		setDisplayAppPreferences: { _ in
 			fatalError()
 		},
-		createAccount: { _ in
+		createOnLedgerAccount: { _, _ in
 			fatalError()
 		},
 		lookupAccountByAddress: { _ in
@@ -59,8 +59,8 @@ extension ProfileClient: TestDependencyKey {
 
 	public static let testValue = Self(
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
-		setCurrentNetworkID: unimplemented("\(Self.self).setCurrentNetworkID"),
-		createNewProfile: unimplemented("\(Self.self).createNewProfile"),
+		getGatewayAPIEndpointBaseURL: unimplemented("\(Self.self).getGatewayAPIEndpointBaseURL"),
+		createNewProfileWithOnLedgerAccount: { _, _ in throw UnimplementedError(description: "\(Self.self).createNewProfileWithOnLedgerAccount is unimplemented") },
 		injectProfile: unimplemented("\(Self.self).injectProfile"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
@@ -70,10 +70,14 @@ extension ProfileClient: TestDependencyKey {
 		deleteBrowserExtensionConnection: unimplemented("\(Self.self).deleteBrowserExtensionConnection"),
 		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
 		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
-		createAccount: unimplemented("\(Self.self).createAccount"),
+		createOnLedgerAccount: { _, _ in throw UnimplementedError(description: "\(Self.self).createOnLedgerAccount is unimplemented") },
 		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
 		signTransaction: unimplemented("\(Self.self).signTransaction")
 	)
+}
+
+public struct UnimplementedError: Swift.Error {
+	public let description: String
 }
 
 public extension OnNetwork.Account {

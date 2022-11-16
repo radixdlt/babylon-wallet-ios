@@ -33,7 +33,13 @@ public extension ManageGatewayAPIEndpoints.View {
 							send: { .gatewayAPIURLChanged($0) }
 						)
 					)
+
+					Button("Switch To") {
+						viewStore.send(.switchToButtonTapped)
+					}
+					.enabled(viewStore.isSwitchToButtonEnabled)
 				}
+				.buttonStyle(.primary)
 			}
 		}
 	}
@@ -43,8 +49,10 @@ public extension ManageGatewayAPIEndpoints.View {
 extension ManageGatewayAPIEndpoints.View {
 	struct ViewState: Equatable {
 		public var gatewayAPIURLString: String
+		public var isSwitchToButtonEnabled: Bool
 		init(state: ManageGatewayAPIEndpoints.State) {
 			gatewayAPIURLString = state.gatewayAPIURLString
+			isSwitchToButtonEnabled = state.isSwitchToButtonEnabled
 		}
 	}
 }

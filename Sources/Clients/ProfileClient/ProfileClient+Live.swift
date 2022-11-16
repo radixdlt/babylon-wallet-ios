@@ -3,97 +3,106 @@ import CryptoKit
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
-import struct GatewayAPI.GatewayAPIClient
-import struct GatewayAPI.PollStrategy
 import KeychainClientDependency
 import Profile
 import SLIP10
+import URLBuilderClient
 import UserDefaultsClient
 
-private let currentNetworkIDKey = "currentNetworkIDKey"
-public extension UserDefaultsClient {
-	func setNetworkID(_ networkID: NetworkID) async {
-		await setInteger(Int(networkID.id), currentNetworkIDKey)
-	}
-
-	var networkID: NetworkID {
-		guard case let int = integerForKey(currentNetworkIDKey), int > 0 else {
-			return .primary
-		}
-		return NetworkID(.init(int))
-	}
-}
+private let gatewayAPIEndpointURLStringKey = "gatewayAPIEndpointURLStringKey"
 
 // MARK: - ProfileClient + DependencyKey
 extension ProfileClient: DependencyKey {
 	public static let liveValue: Self = {
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.keychainClient) var keychainClient
-
-		let pollStrategy: PollStrategy = .default
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.urlBuilder) var urlBuilder
 
 		let profileHolder = ProfileHolder.shared
 
-		let getCurrentNetworkID: GetCurrentNetworkID = {
-			userDefaultsClient.networkID
+		let getAppPreferences: GetAppPreferences = {
+			try profileHolder.get { profile in
+				profile.appPreferences
+			}
 		}
 
-		let makeEntityNonVirtualBySubmittingItToLedgerFromCreateAccountRequest: (CreateAccountRequest) async throws -> MakeEntityNonVirtualBySubmittingItToLedger = { (_: CreateAccountRequest) async throws -> MakeEntityNonVirtualBySubmittingItToLedger in
+		let getNetworkAndGateway: () -> AppPreferences.NetworkAndGateway = {
+			do {
+				return try getAppPreferences().networkAndGateway
+			} catch {
+				return AppPreferences.NetworkAndGateway.primary
+			}
+		}
 
-			let makeEntityNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger = { privateKey in
+		let getCurrentNetworkID: GetCurrentNetworkID = {
+			getNetworkAndGateway().network.id
+		}
 
-				print("🎭 Create On-Ledger-Account ✨")
+		let getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL = {
+			getNetworkAndGateway().gatewayAPIEndpointURL
+		}
 
-				let (committed, txID) = try await gatewayAPIClient.submit(
-					pollStrategy: pollStrategy
-				) { epoch in
+		let setGatewayAPIEndpointURLByString: (String) async throws -> URL = { (newBaseURLString: String) async throws -> URL in
+			// Flow is this:
+			// 1. Try to build new URL from string
+			// 2. Read currentURL
+			// 3. Abort if newURL == currentURL
+			// 4. Try to get network name (in future also ID?) from Gateway
+			// 5. Lookup network ID by name (hardcoded lookup table)
+			// 6. Abort if network ID is unknown
+			// 7. Persist newURL in userDefaults
 
-					let buildAndSignTXRequest = BuildAndSignTransactionWithoutManifestRequest(
-						privateKey: privateKey,
-						epoch: epoch,
-						networkID: getCurrentNetworkID()
-					)
-
-					return try engineToolkitClient.createAccount(request: buildAndSignTXRequest)
-				}
-
-				guard let accountAddressBech32 = committed
-					.receipt
-					.stateUpdates
-					.newGlobalEntities
-					.first?
-					.globalAddress
-				else {
-					throw CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities()
-				}
-
-				print("🎭 SUCCESSFULLY CREATED ACCOUNT On-Ledger with address: \(accountAddressBech32) ✅ \n txID: \(txID)")
-
-				return try AccountAddress(address: accountAddressBech32)
+			// 1. Try to build new URL from string
+			let newURL = try urlBuilder.urlFromString(newBaseURLString)
+			// 2. Read currentURL
+			let currentURL = getGatewayAPIEndpointBaseURL()
+			// 3. Abort if newURL == currentURL
+			guard newURL != currentURL else {
+				return currentURL
 			}
 
-			return makeEntityNonVirtualBySubmittingItToLedger
+			/*
+			 do {
+
+			     let current = try await gatewayAPIClient.getCurrentBaseURL()
+			     guard new != current else {
+			         // Nothing to do!
+			         return
+			     }
+
+			     try await gatewayAPIClient.setCurrentBaseURL()
+			     // FIXME replace with getting network name once we have migrated to Enkinet/Hamunet
+			     let hardCodedNetworkName = "Adapanet"
+			     let networkNameGivenNewURL = hardCodedNetworkName
+
+			     // 4. Lookup network ID based on network name
+			     let networkID = try profileClient.lookupNetworkIDByNetworkName(hardCodedNetworkName)
+
+			     // 5. Check if we need to create a new key value in Profile
+			     if profileClient.getCurrentNetworkID() != networkID {
+			         // 6. need to create new account on this new network and need to notify rest of app, and switch Gateway
+			         try profileClient.setCurrentNetworkID(networkID)
+			     } else {
+			         // 6. No network switch needed, only need to switch Gateway
+			     }
+			 } catch {
+
+			 }
+			 */
+			fatalError()
 		}
 
 		return Self(
 			getCurrentNetworkID: getCurrentNetworkID,
-			setCurrentNetworkID: { newNetworkID in
-				await userDefaultsClient.setNetworkID(newNetworkID)
-			},
-			createNewProfile: { request in
-
-				// Get default NetworkID
-				let networkID = getCurrentNetworkID()
-				// Save NetworkID if needed (needed first time wallet launches)
-				await userDefaultsClient.setNetworkID(networkID)
+			getGatewayAPIEndpointBaseURL: getGatewayAPIEndpointBaseURL,
+			createNewProfileWithOnLedgerAccount: { request, makeAccountNonVirtual in
 
 				let newProfile = try await Profile.new(
-					networkID: networkID,
+					networkAndGateway: .primary,
 					mnemonic: request.curve25519FactorSourceMnemonic,
 					firstAccountDisplayName: request.createFirstAccountRequest.accountName,
-					makeFirstAccountNonVirtualBySubmittingItToLedger: makeEntityNonVirtualBySubmittingItToLedgerFromCreateAccountRequest(request.createFirstAccountRequest)
+					makeFirstAccountNonVirtualBySubmittingItToLedger: makeAccountNonVirtual(request.createFirstAccountRequest)
 				)
 
 				return newProfile
@@ -105,7 +114,11 @@ extension ProfileClient: DependencyKey {
 				try profileHolder.takeProfileSnapshot()
 			},
 			deleteProfileAndFactorSources: {
-				try await keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+				do {
+					try keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+				} catch {
+					try keychainClient.removeProfileSnapshot()
+				}
 				profileHolder.removeProfile()
 			},
 			getAccounts: {
@@ -128,22 +141,19 @@ extension ProfileClient: DependencyKey {
 					profile.appPreferences.browserExtensionConnections.connections.removeAll(where: { $0.id == idOfConnectionToDelete })
 				}
 			},
-			getAppPreferences: {
-				try profileHolder.get { profile in
-					profile.appPreferences
-				}
-			},
+			getAppPreferences: getAppPreferences,
 			setDisplayAppPreferences: { newDisplayPreferences in
 				try await profileHolder.asyncMutating { profile in
 					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
-			createAccount: { createAccountRequest in
+			createOnLedgerAccount: { createAccountRequest, makeAccountNonVirtual in
 				try await profileHolder.asyncMutating { profile in
 
 					try await profile.createNewOnLedgerAccount(
+						networkID: getCurrentNetworkID(),
 						displayName: createAccountRequest.accountName,
-						makeEntityNonVirtualBySubmittingItToLedger: makeEntityNonVirtualBySubmittingItToLedgerFromCreateAccountRequest(createAccountRequest),
+						makeEntityNonVirtualBySubmittingItToLedger: makeAccountNonVirtual(createAccountRequest),
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
 							try keychainClient.loadFactorSourceMnemonic(reference: reference)
 						}
@@ -160,7 +170,7 @@ extension ProfileClient: DependencyKey {
 					return account
 				}
 			},
-			signTransaction: { account, manifest in
+			signTransaction: { account, _ in
 				try await profileHolder.getAsync { profile in
 					try await profile.withPrivateKeys(
 						of: account,
@@ -169,24 +179,25 @@ extension ProfileClient: DependencyKey {
 						}
 					) { privateKeys in
 						let privateKey = privateKeys.first
-						print("🔏 Signing transaction and submitting to Ledger ✨")
+						fatalError()
+//						print("🔏 Signing transaction and submitting to Ledger ✨")
 
-						let (_, txID) = try await gatewayAPIClient.submit(
-							pollStrategy: pollStrategy
-						) { epoch in
+//						let (_, txID) = try await gatewayAPIClient.submit(
+//							pollStrategy: pollStrategy
+//						) { epoch in
+//
+//							let signReq = BuildAndSignTransactionWithManifestRequest(
+//								manifest: manifest,
+//								privateKey: privateKey,
+//								epoch: epoch,
+//								networkID: getCurrentNetworkID()
+//							)
+//
+//							return try engineToolkitClient.sign(request: signReq)
+//						}
 
-							let signReq = BuildAndSignTransactionWithManifestRequest(
-								manifest: manifest,
-								privateKey: privateKey,
-								epoch: epoch,
-								networkID: getCurrentNetworkID()
-							)
-
-							return try engineToolkitClient.sign(request: signReq)
-						}
-
-						print("🔏 SUCCESSFULLY Signing transaction and submitting to Ledger ✅")
-						return txID
+//						print("🔏 SUCCESSFULLY Signing transaction and submitting to Ledger ✅")
+//						return txID
 					}
 				}
 			}
@@ -207,8 +218,9 @@ public extension ProfileClient {
 // MARK: - ExpectedEntityToBeAccount
 struct ExpectedEntityToBeAccount: Swift.Error {}
 
-// MARK: - CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities
-struct CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities: Swift.Error {}
+// MARK: - NoProfile
+/// Used in GatewayClient as well
+public struct NoProfile: Swift.Error {}
 
 // MARK: - ProfileHolder
 private final class ProfileHolder {
@@ -216,8 +228,6 @@ private final class ProfileHolder {
 	private var profile: Profile?
 	private init() {}
 	fileprivate static let shared = ProfileHolder()
-
-	struct NoProfile: Swift.Error {}
 
 	func removeProfile() {
 		profile = nil

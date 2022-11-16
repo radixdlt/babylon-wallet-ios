@@ -6,6 +6,8 @@ import Mnemonic
 import NonEmpty
 import Profile
 
+public typealias MakeAccountNonVirtual = @Sendable (CreateAccountRequest) -> MakeEntityNonVirtualBySubmittingItToLedger
+
 // MARK: - CreateNewProfileRequest
 public struct CreateNewProfileRequest {
 	public let curve25519FactorSourceMnemonic: Mnemonic
@@ -23,10 +25,10 @@ public struct CreateNewProfileRequest {
 // MARK: - ProfileClient
 public struct ProfileClient {
 	public var getCurrentNetworkID: GetCurrentNetworkID
-	public var setCurrentNetworkID: SetCurrentNetworkID
+	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
 
 	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
-	public var createNewProfile: CreateNewProfile
+	public var createNewProfileWithOnLedgerAccount: CreateNewProfileWithOnLedgerAccount
 
 	public var injectProfile: InjectProfile
 	public var extractProfileSnapshot: ExtractProfileSnapshot
@@ -40,16 +42,16 @@ public struct ProfileClient {
 	public var deleteBrowserExtensionConnection: DeleteBrowserExtensionConnection
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
-	public var createAccount: CreateAccount
+	public var createOnLedgerAccount: CreateOnLedgerAccount
 	public var lookupAccountByAddress: LookupAccountByAddress
 	public var signTransaction: SignTransaction
 }
 
 public extension ProfileClient {
+	typealias GetGatewayAPIEndpointBaseURL = @Sendable () -> URL
 	typealias GetCurrentNetworkID = @Sendable () -> NetworkID
-	typealias SetCurrentNetworkID = @Sendable (NetworkID) async throws -> Void
 
-	typealias CreateNewProfile = @Sendable (CreateNewProfileRequest) async throws -> Profile
+	typealias CreateNewProfileWithOnLedgerAccount = @Sendable (CreateNewProfileRequest, MakeAccountNonVirtual) async throws -> Profile
 
 	// Async throwing because this also
 	typealias InjectProfile = @Sendable (Profile) async throws -> Void
@@ -64,7 +66,7 @@ public extension ProfileClient {
 	typealias DeleteBrowserExtensionConnection = @Sendable (BrowserExtensionConnection.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
-	typealias CreateAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
+	typealias CreateOnLedgerAccount = @Sendable (CreateAccountRequest, MakeAccountNonVirtual) async throws -> OnNetwork.Account
 	// FIXME: Cyon will hook this up when PR https://github.com/radixdlt/babylon-wallet-ios/pull/67 is merged
 	// Since it contains changes regarding NetworkID, which is now a getter and setter in ProfileClient
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) throws -> OnNetwork.Account

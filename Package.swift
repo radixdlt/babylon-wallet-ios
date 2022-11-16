@@ -18,7 +18,7 @@ package.dependencies += [
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.19"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.30"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.31"),
 
 	// BigInt
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
@@ -284,6 +284,7 @@ package.addModules([
 			"KeychainClientDependency",
 			"ProfileClient",
 			tca,
+			"TransactionClient", // FIXME: remove once we have virtual accounts
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -410,8 +411,11 @@ package.addModules([
 			"Common",
 			dependencies,
 			"DesignSystem",
+			"GatewayAPI",
+			"ProfileClient",
 			tca,
 			"UserDefaultsClient",
+			"URLBuilderClient",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -435,9 +439,11 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			engineToolkit,
+			"GatewayAPI",
 			"ImportProfileFeature",
 			"ProfileClient",
 			tca,
+			"TransactionClient", // FIXME: remove once we have virtual accounts
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -490,6 +496,7 @@ package.addModules([
 			"GatewayAPI",
 			"ProfileClient",
 			tca,
+			"TransactionClient",
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(dependencies: [
@@ -585,11 +592,13 @@ package.addModules([
 			"Asset",
 			bigInt,
 			"Common",
+			dependencies, // XCTestDynamicOverlay + DependencyKey
 			engineToolkit,
 			"EngineToolkitClient",
 			"JSON",
 			profile, // address
-			dependencies, // XCTestDynamicOverlay + DependencyKey
+			"ProfileClient",
+			"URLBuilderClient",
 		],
 		exclude: [
 			"CodeGen/Input/",
@@ -632,10 +641,10 @@ package.addModules([
 		dependencies: [
 			dependencies, // XCTestDynamicOverlay + DependencyKey
 			"EngineToolkitClient", // Create TX
-			"GatewayAPI", // Create Account On Ledger => Submit TX
 			profile,
 			"ProfileLoader",
 			"UserDefaultsClient",
+			"URLBuilderClient",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -648,6 +657,24 @@ package.addModules([
 			"KeychainClientDependency",
 			profile,
 		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
+		name: "TransactionClient",
+		dependencies: [
+			"GatewayAPI",
+			dependencies,
+			"ProfileClient",
+		],
+		tests: .yes(dependencies: [
+			"TestUtils",
+		])
+	),
+	.client(
+		name: "URLBuilderClient",
+		dependencies: [dependencies],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)

@@ -1,8 +1,10 @@
 import ComposableArchitecture
+import GatewayAPI
 import KeychainClient
 import Mnemonic
 import Profile
 import ProfileClient
+import TransactionClient
 
 // MARK: - MnemonicGenerator
 public typealias MnemonicGenerator = (BIP39.WordCount, BIP39.Language) throws -> Mnemonic
@@ -25,6 +27,7 @@ public struct NewProfile: ReducerProtocol {
 	@Dependency(\.mnemonicGenerator) var mnemonicGenerator
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.transactionClient) var transactionClient
 }
 
 public extension NewProfile {
@@ -56,7 +59,8 @@ public extension NewProfile {
 								accountName: nameOfFirstAccount
 							)
 						)
-						let newProfile = try await profileClient.createNewProfile(newProfileRequest)
+						let makeOnLedger: MakeAccountNonVirtual = transactionClient.makeAccountNonVirtual
+						let newProfile = try await profileClient.createNewProfileWithOnLedgerAccount(newProfileRequest, makeOnLedger)
 
 						let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
 

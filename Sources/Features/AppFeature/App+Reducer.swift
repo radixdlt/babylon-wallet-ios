@@ -42,8 +42,15 @@ public struct App: ReducerProtocol {
 
 		case let .child(.splash(.delegate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
 			if failedToDecode {
+				#if DEBUG
+				return .run { send in
+					try! await profileClient.deleteProfileAndFactorSources()
+					await send(.child(.splash(.delegate(.loadProfileResult(.noProfile(reason: "Deleted Since incompatible JSON", failedToDecode: false))))))
+				}
+				#else
 				displayError(state: &state, reason: "Failed to decode profile: \(reason)")
 				return .none
+				#endif // DEBUG
 			} else {
 				goToOnboarding(state: &state)
 				return .none

@@ -4,7 +4,10 @@ import CryptoKit
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
+import Profile
+import ProfileClient
 import SLIP10
+import URLBuilderClient
 
 // MARK: - Date + Sendable
 extension Date: @unchecked Sendable {}
@@ -19,22 +22,28 @@ struct BadHTTPResponseCode: Swift.Error {
 	static let expected = 200
 }
 
-// MARK: - GatewayAPIClient + DependencyKey
-extension GatewayAPIClient: DependencyKey {
-	public typealias Value = GatewayAPIClient
-	public static let liveValue = GatewayAPIClient.live()
+public extension GatewayAPIClient {
+	typealias Value = GatewayAPIClient
+	static let liveValue = GatewayAPIClient.live()
 
 	static func live(
-		baseURL: URL = .init(string: "https://alphanet.radixdlt.com/v0")!,
 		urlSession: URLSession = .shared,
 		jsonEncoder: JSONEncoder = .init(),
 		jsonDecoder: JSONDecoder = .init()
 	) -> Self {
+		@Dependency(\.profileClient) var profileClient
+		@Dependency(\.urlBuilder) var urlBuilder
+
+		let getCurrentBaseURL: () -> URL = {
+			profileClient.getGatewayAPIEndpointBaseURL()
+		}
+
 		@Sendable
 		func makeRequest<Response>(
-			httpBodyData httpBody: Data?,
+			httpBodyData httpBody: Data? = nil,
 			method: String = "POST",
 			responseType _: Response.Type,
+			baseURL: URL,
 			urlFromBase: (URL) -> URL
 		) async throws -> Response where Response: Decodable {
 			let url = urlFromBase(baseURL)
@@ -62,6 +71,35 @@ extension GatewayAPIClient: DependencyKey {
 			let response = try jsonDecoder.decode(Response.self, from: data)
 
 			return response
+		}
+
+		// FIXME: Change to GetNetworkInformation once we have that!
+		func getNetworkInformation(baseURL: URL) async throws -> V0StateEpochResponse {
+			//            try await makeRequest(
+			//                responseType: GetEpoch.self,
+			//                baseURL: baseURL
+			//            ) { $0.appendingPathComponent("state/epoch") }
+			fatalError()
+		}
+
+		let setCurrentBaseURL: SetCurrentBaseURL = { _ in
+			fatalError()
+		}
+
+		@Sendable
+		func makeRequest<Response>(
+			httpBodyData httpBody: Data?,
+			method: String = "POST",
+			responseType: Response.Type,
+			urlFromBase: @escaping (URL) -> URL
+		) async throws -> Response where Response: Decodable {
+			try await makeRequest(
+				httpBodyData: httpBody,
+				method: method,
+				responseType: responseType,
+				baseURL: getCurrentBaseURL(),
+				urlFromBase: urlFromBase
+			)
 		}
 
 		@Sendable
@@ -104,6 +142,7 @@ extension GatewayAPIClient: DependencyKey {
 		}
 
 		return Self(
+			setCurrentBaseURL: setCurrentBaseURL,
 			getEpoch: getEpoch,
 			accountResourcesByAddress: { accountAddress in
 				try await post(

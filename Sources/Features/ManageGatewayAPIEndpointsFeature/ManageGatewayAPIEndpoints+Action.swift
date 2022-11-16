@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import Foundation
 
 // MARK: - ManageGatewayAPIEndpoints.Action
@@ -14,6 +15,7 @@ public extension ManageGatewayAPIEndpoints.Action {
 	enum ViewAction: Equatable {
 		case dismissButtonTapped
 		case gatewayAPIURLChanged(String)
+		case switchToButtonTapped
 	}
 }
 
@@ -27,12 +29,15 @@ public extension ManageGatewayAPIEndpoints.Action {
 
 // MARK: - ManageGatewayAPIEndpoints.Action.SystemAction
 public extension ManageGatewayAPIEndpoints.Action {
-	enum SystemAction: Equatable {}
+	enum SystemAction: Equatable {
+		case setGatewayAPIEndpointResult(TaskResult<URL>)
+	}
 }
 
 // MARK: - ManageGatewayAPIEndpoints.Action.DelegateAction
 public extension ManageGatewayAPIEndpoints.Action {
 	enum DelegateAction: Equatable {
 		case dismiss
+		case successfullyUpdatedGatewayAPIEndpoint
 	}
 }

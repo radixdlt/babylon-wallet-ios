@@ -1,30 +1,21 @@
 import Foundation
 
 // MARK: - UserDefaultsClient
+public typealias Key = String
+
+// MARK: - UserDefaultsClient
 public struct UserDefaultsClient {
-	public var boolForKey: @Sendable (String) -> Bool
-	public var dataForKey: @Sendable (String) -> Data?
-	public var doubleForKey: @Sendable (String) -> Double
-	public var integerForKey: @Sendable (String) -> Int
-	public var remove: @Sendable (String) async -> Void
-	public var setBool: @Sendable (Bool, String) async -> Void
-	public var setData: @Sendable (Data?, String) async -> Void
-	public var setDouble: @Sendable (Double, String) async -> Void
-	public var setInteger: @Sendable (Int, String) async -> Void
-}
-
-private extension UserDefaultsClient {
-	func setString(_ string: String, forKey key: String, encoding: String.Encoding = .utf8) async {
-		let data = string.data(using: encoding)!
-		await setData(data, key)
-	}
-
-	func stringForKey(_ key: String, encoding: String.Encoding = .utf8) -> String? {
-		guard let data = dataForKey(key) else {
-			return nil
-		}
-		return String(data: data, encoding: encoding)
-	}
+	public var stringForKey: @Sendable (Key) -> String?
+	public var boolForKey: @Sendable (Key) -> Bool
+	public var dataForKey: @Sendable (Key) -> Data?
+	public var doubleForKey: @Sendable (Key) -> Double
+	public var integerForKey: @Sendable (Key) -> Int
+	public var remove: @Sendable (Key) async -> Void
+	public var setString: @Sendable (String, Key) async -> Void
+	public var setBool: @Sendable (Bool, Key) async -> Void
+	public var setData: @Sendable (Data?, Key) async -> Void
+	public var setDouble: @Sendable (Double, Key) async -> Void
+	public var setInteger: @Sendable (Int, Key) async -> Void
 }
 
 public extension UserDefaultsClient {
