@@ -56,7 +56,7 @@ jobs:
 
       - name: "Run unit tests"
         working-directory: App
-        run:|
+        run: |
           brew install xcbeautify
           bundle exec fastlane tests
 
