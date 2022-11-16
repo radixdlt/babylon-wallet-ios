@@ -415,6 +415,7 @@ package.addModules([
 			converse,
 			dependencies,
 			"DesignSystem",
+			"ErrorQueue",
 			.product(name: "InputPasswordFeature", package: "Converse"),
 			"IncomingConnectionRequestFromDappReviewFeature", // FIXME: extract to Home! just here for test..
 			"ProfileClient",
@@ -460,6 +461,7 @@ package.addModules([
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			profile,
+			"ErrorQueue",
 			"GatewayAPI",
 			"KeychainClientDependency",
 			"ManageBrowserExtensionConnectionsFeature",

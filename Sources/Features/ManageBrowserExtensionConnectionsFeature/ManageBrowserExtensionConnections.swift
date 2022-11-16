@@ -3,6 +3,7 @@ import ComposableArchitecture
 import ConnectUsingPasswordFeature
 import Converse
 import ConverseCommon
+import ErrorQueue
 import InputPasswordFeature
 import Profile
 import ProfileClient
@@ -11,6 +12,7 @@ import ProfileClient
 public struct ManageBrowserExtensionConnections: ReducerProtocol {
 	@Dependency(\.browserExtensionsConnectivityClient) var browserExtensionsConnectivityClient
 	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 }
 
@@ -129,7 +131,7 @@ public extension ManageBrowserExtensionConnections {
 			return .none
 
 		case let .internal(.system(.deleteConnectionResult(.failure(error)))):
-			print("Failed to delete connection from profile, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.sendTestMessageResult(.success(msgSent)))):
@@ -137,7 +139,7 @@ public extension ManageBrowserExtensionConnections {
 			return .none
 
 		case let .internal(.system(.sendTestMessageResult(.failure(error)))):
-			print("Failed to send message, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case .child, .delegate:

@@ -3,11 +3,13 @@ import ComposableArchitecture
 import Converse
 import ConverseCommon
 import DesignSystem
+import ErrorQueue
 import Foundation
 import SwiftUI
 
 // MARK: - ManageBrowserExtensionConnection
 public struct ManageBrowserExtensionConnection: ReducerProtocol {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.browserExtensionsConnectivityClient) var browserExtensionsConnectivityClient
 	public init() {}
 }
@@ -41,7 +43,7 @@ public extension ManageBrowserExtensionConnection {
 			return .none
 
 		case let .internal(.system(.connectionStatusResult(.failure(error)))):
-			print("Failed to get browser connection status update, error \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case .internal(.view(.deleteConnectionButtonTapped)):
