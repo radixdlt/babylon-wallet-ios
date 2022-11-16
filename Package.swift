@@ -39,6 +39,11 @@ let asyncAlgorithms: Target.Dependency = .product(
 	package: "swift-async-algorithms"
 )
 
+let asyncExtensions: Target.Dependency = .product(
+	name: "AsyncExtensions",
+	package: "AsyncExtensions"
+)
+
 let tca: Target.Dependency = .product(
 	name: "ComposableArchitecture",
 	package: "swift-composable-architecture"
@@ -546,7 +551,7 @@ package.addModules([
 	.client(
 		name: "BrowserExtensionsConnectivityClient",
 		dependencies: [
-			.product(name: "AsyncExtensions", package: "AsyncExtensions"),
+			asyncExtensions,
 			"Common",
 			converse,
 			dependencies,
@@ -583,6 +588,7 @@ package.addModules([
 		name: "ErrorQueue",
 		dependencies: [
 			asyncAlgorithms,
+			asyncExtensions,
 			dependencies,
 		],
 		tests: .no

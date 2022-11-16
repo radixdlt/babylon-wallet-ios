@@ -1,4 +1,5 @@
 import AsyncAlgorithms
+import AsyncExtensions
 import Dependencies
 import Foundation
 
@@ -6,12 +7,12 @@ extension ErrorQueue: DependencyKey {
 	public typealias Value = ErrorQueue
 
 	public static var liveValue: Self {
-		let errors = AsyncChannel<Error>()
+		let errorChannel = AsyncChannel<Error>()
 		return Self(
-			errors: { errors },
+			errors: { errorChannel.eraseToAnyAsyncSequence() },
 			schedule: { error in
 				Task {
-					await errors.send(error)
+					await errorChannel.send(error)
 				}
 			}
 		)
