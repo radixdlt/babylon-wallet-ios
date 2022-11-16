@@ -4,6 +4,18 @@ An iOS wallet for interacting with the [Radix DLT ledger][radixdlt].
 
 Writtin in Swift using SwiftUI as UI framework and [TCA - The Composable Architecture][tca] as architecture.
 
+# Development
+Clone the repo and run bootstrap script:
+```sh
+./scripts/bootstrap
+```
+
+To open the project use:
+
+```sh
+open App/BabylonWallet.xcodeproj
+```
+
 # Architecture
 The structure is the same as [PointfreeCo's game Isowords (source)][isowords] (the authors of TCA). 
 
@@ -128,18 +140,6 @@ extension UserDefaultsClient {
     )
   }
 }
-```
-
-# Development
-Clone the repo and run bootstrap script:
-```sh
-./scripts/bootstrap
-```
-
-To open the project use:
-
-```sh
-open App/BabylonWallet.xcodeproj
 ```
 
 ## Preview Packages
