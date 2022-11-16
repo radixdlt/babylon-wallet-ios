@@ -33,7 +33,7 @@ public struct App: ReducerProtocol {
 		switch action {
 		case .internal(.view(.task)):
 			return .run { send in
-				for await error in errorQueue.errors() {
+				for try await error in errorQueue.errors() {
 					await send(.internal(.system(.displayErrorAlert(error as NSError))))
 				}
 			}
