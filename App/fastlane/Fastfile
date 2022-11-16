@@ -8,6 +8,7 @@ platform :ios do
     desc "Runs tests"
     lane :tests do
         run_tests(scheme: "Wallet (iOS)",
+                  xcodebuild_formatter: "xcbeautify",
                   destination: "platform=iOS Simulator,name=iPhone 14,OS=16.1")
     end
 end
