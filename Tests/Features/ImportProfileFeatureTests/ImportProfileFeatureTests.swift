@@ -48,7 +48,15 @@ final class ImportProfileFeatureTests: TestCase {
 			Data("deadbeef".utf8) // invalid data
 		})
 
+		let expectation = expectation(description: "Error")
+		sut.dependencies.errorQueue.schedule = { error in
+			XCTAssertEqual(String(describing: error), "dataCorrupted(Swift.DecodingError.Context(codingPath: [], debugDescription: \"The given data was not valid JSON.\", underlyingError: Optional(Error Domain=NSCocoaErrorDomain Code=3840 \"Invalid value around line 1, column 0.\" UserInfo={NSDebugDescription=Invalid value around line 1, column 0., NSJSONSerializationErrorIndex=0})))")
+			expectation.fulfill()
+		}
+
 		_ = await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
+
+		wait(for: [expectation], timeout: 0)
 	}
 
 	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__reducer_calls_save_on_keychainClient_and_delegates_snapshot() async throws {
