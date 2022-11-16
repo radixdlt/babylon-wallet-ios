@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import ErrorQueue
 import Foundation
 import Mnemonic
 import Profile
@@ -6,6 +7,7 @@ import SwiftUI
 
 // MARK: - ImportMnemonic
 public struct ImportMnemonic: ReducerProtocol {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.mnemonicImporter) var mnemonicImporter
 	@Dependency(\.profileFromSnapshotImporter) var profileFromSnapshotImporter
@@ -14,7 +16,7 @@ public struct ImportMnemonic: ReducerProtocol {
 
 // MARK: ReducerProtocol Conformance
 public extension ImportMnemonic {
-	func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
+	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.goBackButtonTapped)):
 			return .run { send in
@@ -35,9 +37,8 @@ public extension ImportMnemonic {
 			return .none
 
 		case let .internal(.system(.importMnemonicResult(.failure(error)))):
-			return .run { send in
-				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to import mnemonic, error: \(String(describing: error))")))
-			}
+			errorQueue.schedule(error)
+			return .none
 
 		case .internal(.view(.saveImportedMnemonicButtonTapped)):
 			guard let mnemonic = state.importedMnemonic else {
@@ -63,9 +64,8 @@ public extension ImportMnemonic {
 			}
 
 		case let .internal(.system(.saveImportedMnemonicResult(.failure(error)))):
-			return .run { send in
-				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to save mnemonic to keychain, error: \(String(describing: error))")))
-			}
+			errorQueue.schedule(error)
+			return .none
 
 		case let .internal(.system(.saveImportedMnemonicResult(.success(mnemonic)))):
 			state.savedMnemonic = mnemonic
@@ -79,15 +79,16 @@ public extension ImportMnemonic {
 			}
 
 		case let .internal(.system(.profileFromSnapshotResult(.failure(error)))):
-			return .run { send in
-				await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Failed to import profile from snapshot, error: \(String(describing: error))")))
-			}
+			errorQueue.schedule(error)
+			return .none
 
 		case let .internal(.system(.profileFromSnapshotResult(.success(profile)))):
 			guard let mnemonic = state.savedMnemonic else {
-				return .run { send in
-					await send(.delegate(.failedToImportMnemonicOrProfile(reason: "Expected to have saved mnemonic.")))
+				struct ExpectedMnemonicError: LocalizedError {
+					let errorDescription: String? = "Expected to have saved mnemonic."
 				}
+				errorQueue.schedule(ExpectedMnemonicError())
+				return .none
 			}
 			return .run { send in
 				await send(.delegate(.finishedImporting(mnemonic: mnemonic, andProfile: profile)))

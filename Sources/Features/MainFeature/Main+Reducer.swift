@@ -11,12 +11,15 @@ public struct Main: ReducerProtocol {
 
 	public init() {}
 
-	public var body: some ReducerProtocol<State, Action> {
+	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.home, action: /Action.child .. Action.ChildAction.home) {
 			Home()
 		}
 
 		Reduce(self.core)
+			.ifLet(\.settings, action: /Action.child .. Action.ChildAction.settings) {
+				Settings()
+			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {

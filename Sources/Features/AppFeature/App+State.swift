@@ -5,11 +5,22 @@ import SplashFeature
 
 // MARK: App.State
 public extension App {
-	enum State: Equatable {
-		case main(Main.State?)
-		case onboarding(Onboarding.State?)
-		case splash(Splash.State?)
+	struct State: Equatable {
+		public enum Root: Equatable {
+			case main(Main.State)
+			case onboarding(Onboarding.State)
+			case splash(Splash.State)
+		}
 
-		public init() { self = .splash(.init()) }
+		public var root: Root
+		public var errorAlert: AlertState<Action.ViewAction>?
+
+		public init(
+			root: Root = .splash(.init()),
+			errorAlert: AlertState<Action.ViewAction>? = nil
+		) {
+			self.root = root
+			self.errorAlert = errorAlert
+		}
 	}
 }

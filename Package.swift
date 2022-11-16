@@ -14,24 +14,35 @@ let package = Package(
 // MARK: - Dependencies
 
 package.dependencies += [
-	// RDX Works Package depedencies
+	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.19"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
 	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.30"),
 
-	// BigInt
+	// Third party dependencies
+	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
+	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
+	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
+	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 
 	// TCA - ComposableArchitecture used as architecture
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
-	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
-
-	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 ]
+
+let asyncAlgorithms: Target.Dependency = .product(
+	name: "AsyncAlgorithms",
+	package: "swift-async-algorithms"
+)
+
+let asyncExtensions: Target.Dependency = .product(
+	name: "AsyncExtensions",
+	package: "AsyncExtensions"
+)
 
 let tca: Target.Dependency = .product(
 	name: "ComposableArchitecture",
@@ -46,6 +57,11 @@ let dependencies: Target.Dependency = .product(
 let tagged: Target.Dependency = .product(
 	name: "Tagged",
 	package: "swift-tagged"
+)
+
+let legibleError: Target.Dependency = .product(
+	name: "LegibleError",
+	package: "LegibleError"
 )
 
 let profile: Target.Dependency = .product(
@@ -245,6 +261,7 @@ package.addModules([
 			"AccountPortfolio",
 			"AppSettings",
 			engineToolkit,
+			"ErrorQueue",
 			"MainFeature",
 			"OnboardingFeature",
 			"PasteboardClient",
@@ -281,6 +298,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"DesignSystem",
+			"ErrorQueue",
 			"KeychainClientDependency",
 			"ProfileClient",
 			tca,
@@ -338,6 +356,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"Data",
+			"ErrorQueue",
 			"JSON",
 			"KeychainClientDependency",
 			"ProfileClient",
@@ -457,6 +476,7 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
+			"ErrorQueue",
 			"ProfileClient",
 			"ProfileLoader",
 			tca,
@@ -531,7 +551,7 @@ package.addModules([
 	.client(
 		name: "BrowserExtensionsConnectivityClient",
 		dependencies: [
-			.product(name: "AsyncExtensions", package: "AsyncExtensions"),
+			asyncExtensions,
 			"Common",
 			converse,
 			dependencies,
@@ -563,6 +583,15 @@ package.addModules([
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.client(
+		name: "ErrorQueue",
+		dependencies: [
+			asyncAlgorithms,
+			asyncExtensions,
+			dependencies,
+		],
+		tests: .no
 	),
 	.client(
 		name: "GatewayAPI",
@@ -657,6 +686,7 @@ package.addModules([
 			bigInt,
 			"DesignSystem",
 			engineToolkit,
+			legibleError,
 			profile, // Address
 			tagged,
 		],

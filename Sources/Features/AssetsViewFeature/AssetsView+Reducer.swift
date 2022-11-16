@@ -5,7 +5,7 @@ import NonFungibleTokenListFeature
 public struct AssetsView: ReducerProtocol {
 	public init() {}
 
-	public var body: some ReducerProtocol<State, Action> {
+	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.nonFungibleTokenList, action: /Action.child .. Action.ChildAction.nonFungibleTokenList) {
 			NonFungibleTokenList()
 		}

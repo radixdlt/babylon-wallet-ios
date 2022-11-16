@@ -11,6 +11,7 @@ import CreateAccountFeature
 import Foundation
 import FungibleTokenListFeature
 import IncomingConnectionRequestFromDappReviewFeature
+import LegibleError
 import PasteboardClient
 import Profile
 import TransactionSigningFeature
@@ -21,13 +22,14 @@ public struct Home: ReducerProtocol {
 	@Dependency(\.appSettingsClient) var appSettingsClient
 	@Dependency(\.browserExtensionsConnectivityClient) var browserExtensionsConnectivityClient
 	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
 
-	public var body: some ReducerProtocol<State, Action> {
+	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.header, action: /Action.child .. Action.ChildAction.header) {
 			Home.Header()
 		}
@@ -45,7 +47,7 @@ public struct Home: ReducerProtocol {
 		Reduce(self.core)
 	}
 
-	func accountListReducer() -> some ReducerProtocol<State, Action> {
+	func accountListReducer() -> some ReducerProtocolOf<Self> {
 		Scope(state: \.accountList, action: /Action.child .. Action.ChildAction.accountList) {
 			AccountList()
 		}
@@ -76,7 +78,7 @@ public struct Home: ReducerProtocol {
 				let accounts = try profileClient.getAccounts()
 				await send(.internal(.system(.createAccount(numberOfExistingAccounts: accounts.count))))
 			} catch: { error, _ in
-				print(error) // handle error
+				errorQueue.schedule(error)
 			}
 
 		case let .internal(.system(.createAccount(numberOfExistingAccounts))):
@@ -219,15 +221,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.accountPortfolioResult(.failure(error)))):
-			print("⚠️ failed to fetch accout portfolio, error: \(String(describing: error))")
-			return .none
-
-		case let .internal(.system(.viewDidAppearActionFailed(reason: reason))):
-			print(reason)
-			return .none
-
-		case let .internal(.system(.toggleIsCurrencyAmountVisibleFailed(reason: reason))):
-			print(reason)
+			errorQueue.schedule(FailedToFetchAccountPortfolioError(error: error))
 			return .none
 
 		case .child(.header(.delegate(.displaySettings))):
@@ -298,9 +292,8 @@ public struct Home: ReducerProtocol {
 			state.createAccount = nil
 			return loadAccountsConnectionsAndSettings()
 
-		case let .child(.createAccount(.delegate(.failedToCreateNewAccount(reason: reason)))):
+		case .child(.createAccount(.delegate(.failedToCreateNewAccount))):
 			state.createAccount = nil
-			print("Failed to create account: \(reason)")
 			return .none
 
 		case let .internal(.system(.presentViewForRequestFromBrowser(incomingRequestFromBrowser))):
@@ -449,5 +442,13 @@ public struct Home: ReducerProtocol {
 				state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
 			}
 		}
+	}
+}
+
+// MARK: Home.FailedToFetchAccountPortfolioError
+public extension Home {
+	struct FailedToFetchAccountPortfolioError: LocalizedError {
+		let error: Error
+		public var errorDescription: String? { "Failed to fetch account portfolio, error: \(error.legibleLocalizedDescription)" }
 	}
 }

@@ -14,7 +14,7 @@ public struct Settings: ReducerProtocol {
 }
 
 public extension Settings {
-	var body: some ReducerProtocol<State, Action> {
+	var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
 			.ifLet(\.manageBrowserExtensionConnections, action: /Action.child .. Action.ChildAction.manageBrowserExtensionConnections) {
 				ManageBrowserExtensionConnections()
@@ -34,8 +34,22 @@ public extension Settings {
 				await send(.delegate(.deleteProfileAndFactorSources))
 			}
 
-		case .internal(.view(.browserExtensionConnectionsButtonTapped)):
+		case .internal(.view(.manageBrowserExtensionConnectionsButtonTapped)):
 			state.manageBrowserExtensionConnections = .init()
+			return .none
+
+		case .internal(.view(.didAppear)):
+			return .run { send in
+				await send(.internal(.system(.loadBrowserExtensionConnectionResult(
+					TaskResult { try profileClient.getBrowserExtensionConnections() }
+				))))
+			}
+		case let .internal(.system(.loadBrowserExtensionConnectionResult(.success(connections)))):
+			state.canAddBrowserExtensionConnection = connections.connections.isEmpty
+			return .none
+		case let .internal(.system(.loadBrowserExtensionConnectionResult(.failure(error)))):
+			print("Failed to load browser extensions: \(String(describing: error))")
+			// FIXME: Error propagation
 			return .none
 
 		#if DEBUG
@@ -65,6 +79,9 @@ public extension Settings {
 			return .none
 
 		case .child, .delegate:
+			return .none
+		case .internal(.view(.addBrowserExtensionConnectionButtonTapped)):
+			state.manageBrowserExtensionConnections = .init(inputBrowserExtensionConnectionPassword: .init())
 			return .none
 		}
 	}
