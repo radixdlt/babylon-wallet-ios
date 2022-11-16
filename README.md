@@ -147,6 +147,24 @@ Thanks to TCA we can create Feature Previews, which are super small apps using a
 
 instead of opening the root, otherwise you will not get access to the App and the Packages.
 
+## Fastlane
+
+We use [Bundler](https://bundler.io/) to install and update Fastlane. Follow below steps to have Bundler installed and execute fastlane lanes:
+
+- Install ruby v3.1.2; it is strongly recommend to use a tool like [rbenv](https://github.com/rbenv/rbenv) to manage the rubby version.
+- Install bundler:
+```
+  gem install bundler -v 2.3.25
+```
+- Install this project gems:
+```
+  bundle install
+```
+- Execute a fastlane lane from [App](App) directory:
+```
+  bundle exec fastlane <lane>
+```
+
 # Testing
 1. Unit tests for each package, split into multiple files for each seperate system under test (sut).
 2. UI testing using [PointFreeCo's Snapsshot testing Package][snapshotTesting] (Only when UI becomes stable)

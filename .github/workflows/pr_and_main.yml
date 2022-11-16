@@ -48,11 +48,17 @@ jobs:
         with:
           xcode-version: "14.1"
 
+      - name: "Set up ruby"
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.2
+          bundler-cache: true
+
       - name: "Run unit tests"
+        working-directory: App
         run: |
           brew install xcbeautify
-          set -o pipefail && \
-          xcodebuild clean test -project App/BabylonWallet.xcodeproj -scheme "Wallet (iOS)" -destination "name=iPhone 14,OS=16.1" | xcbeautify
+          bundle exec fastlane tests
 
   # snapshot_tests:
   #   name: "Snapshot tests"
@@ -79,28 +85,3 @@ jobs:
 
   #     - name: "Run UI tests"
   #       run: echo "Runing UI tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
-
-  static_analysis:
-    name: "SonarCloud"
-    runs-on: ubuntu-latest
-
-    continue-on-error: true
-
-    needs:
-      - unit_tests
-      # - snapshot_tests
-      # - ui_tests
-
-    steps:
-      - uses: actions/checkout@v3.1.0
-        with:
-          fetch-depth: 0
-
-      - name: "Run static analysis and Sonarcloud"
-        run: echo "Hello World" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
-
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
