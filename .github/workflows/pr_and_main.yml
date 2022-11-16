@@ -49,7 +49,6 @@ jobs:
 
       - name: "Set up ruby"
         uses: ruby/setup-ruby@v1
-        working-directory: App
         with:
           ruby-version: 3.1.2
           bundler-cache: true
