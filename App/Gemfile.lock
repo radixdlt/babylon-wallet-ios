@@ -212,7 +212,7 @@ PLATFORMS
   arm64-darwin-22
 
 DEPENDENCIES
-  fastlane
+  fastlane (~> 2.211.0)
 
 BUNDLED WITH
    2.3.25
