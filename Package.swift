@@ -374,6 +374,7 @@ package.addModules([
 			"BrowserExtensionsConnectivityClient",
 			"Common",
 			"DesignSystem",
+			"ErrorQueue",
 			"ProfileClient",
 			tca,
 			// ^^^ Sort lexicographically ^^^
