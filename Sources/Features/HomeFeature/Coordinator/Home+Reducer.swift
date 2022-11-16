@@ -109,7 +109,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.receiveRequestMessageFromDappResult(.failure(error)))):
-			print("Failed to receive message from dApp, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.receiveRequestMessageFromDappResult(.success(incomingMessageFromBrowser)))):
@@ -117,7 +117,7 @@ public struct Home: ReducerProtocol {
 			return .none
 
 		case let .internal(.system(.connectionsLoadedResult(.failure(error)))):
-			print("Failed to load connections, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.connectionsLoadedResult(.success(connections)))):
@@ -127,7 +127,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.accountsLoadedResult(.failure(error)))):
-			print("Failed to load accounts, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.accountsLoadedResult(.success(accounts)))):
@@ -139,7 +139,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.appSettingsLoadedResult(.failure(error)))):
-			print("Failed to load appSettings, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.appSettingsLoadedResult(.success(appSettings)))):
@@ -221,7 +221,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.accountPortfolioResult(.failure(error)))):
-			errorQueue.schedule(FailedToFetchAccountPortfolioError(error: error))
+			errorQueue.schedule(error)
 			return .none
 
 		case .child(.header(.delegate(.displaySettings))):
@@ -241,7 +241,7 @@ public struct Home: ReducerProtocol {
 			return loadAccountsConnectionsAndSettings()
 
 		case let .internal(.system(.fetchPortfolioResult(.failure(error)))):
-			print("⚠️ failed to fetch portfolio, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .child(.accountList(.delegate(.displayAccountDetails(account)))):
@@ -343,7 +343,7 @@ public struct Home: ReducerProtocol {
 			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
 
 		case let .internal(.system(.sendResponseBackToDappResult(.failure(error)))):
-			print("Failed to send response back over webRTC, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, incomingMessageFromBrowser)))):
@@ -442,13 +442,5 @@ public struct Home: ReducerProtocol {
 				state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
 			}
 		}
-	}
-}
-
-// MARK: Home.FailedToFetchAccountPortfolioError
-public extension Home {
-	struct FailedToFetchAccountPortfolioError: LocalizedError {
-		let error: Error
-		public var errorDescription: String? { "Failed to fetch account portfolio, error: \(error.legibleLocalizedDescription)" }
 	}
 }
