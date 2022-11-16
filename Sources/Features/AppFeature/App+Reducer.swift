@@ -6,6 +6,7 @@ import OnboardingFeature
 import ProfileClient
 import SplashFeature
 
+// MARK: - App
 public struct App: ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
@@ -34,7 +35,7 @@ public struct App: ReducerProtocol {
 		case .internal(.view(.task)):
 			return .run { send in
 				for try await error in errorQueue.errors() {
-					await send(.internal(.system(.displayErrorAlert(error as NSError))))
+					await send(.internal(.system(.displayErrorAlert(UserFacingError(error)))))
 				}
 			}
 
@@ -98,5 +99,25 @@ public struct App: ReducerProtocol {
 
 	func goToOnboarding(state: inout State) {
 		state.root = .onboarding(.init())
+	}
+}
+
+// MARK: App.UserFacingError
+public extension App {
+	/// A purely user-facing error. Not made for developer logging or analytics collection.
+	struct UserFacingError: Equatable, LocalizedError {
+		let underlyingError: Error
+
+		init(_ underlyingError: Error) {
+			self.underlyingError = underlyingError
+		}
+
+		public var errorDescription: String? {
+			underlyingError.localizedDescription
+		}
+
+		public static func == (lhs: Self, rhs: Self) -> Bool {
+			lhs.underlyingError.localizedDescription == rhs.underlyingError.localizedDescription
+		}
 	}
 }

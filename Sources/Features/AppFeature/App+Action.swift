@@ -43,7 +43,7 @@ public extension App.Action {
 // MARK: - App.Action.SystemAction
 public extension App.Action {
 	enum SystemAction: Equatable {
-		case displayErrorAlert(NSError)
+		case displayErrorAlert(App.UserFacingError)
 		case injectProfileIntoProfileClientResult(TaskResult<Profile>)
 	}
 }
