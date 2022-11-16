@@ -34,7 +34,7 @@ public extension GatewayAPIClient {
 		@Dependency(\.profileClient) var profileClient
 		@Dependency(\.urlBuilder) var urlBuilder
 
-		let getCurrentBaseURL: () -> URL = {
+		let getCurrentBaseURL: GetCurrentBaseURL = {
 			profileClient.getGatewayAPIEndpointBaseURL()
 		}
 
@@ -73,17 +73,33 @@ public extension GatewayAPIClient {
 			return response
 		}
 
-		// FIXME: Change to GetNetworkInformation once we have that!
-		func getNetworkInformation(baseURL: URL) async throws -> V0StateEpochResponse {
-			//            try await makeRequest(
-			//                responseType: GetEpoch.self,
-			//                baseURL: baseURL
-			//            ) { $0.appendingPathComponent("state/epoch") }
-			fatalError()
+		// FIXME: Change returned type to `Network.Name` once Gateway API migration to Enkinet/Hamunet is done!
+		@Sendable func getNetworkName(baseURL: URL) async throws -> Network.Name {
+			// FIXME: Replace with real `getNetworkInformation` request once we have that!
+			_ = try await makeRequest(responseType: V0StateEpochResponse.self, baseURL: baseURL) {
+				$0.appendingPathComponent("state/epoch")
+			}
+			return Network.primary.name
 		}
 
-		let setCurrentBaseURL: SetCurrentBaseURL = { _ in
-			fatalError()
+		let setCurrentBaseURL: SetCurrentBaseURL = { newURL in
+			let currentURL = getCurrentBaseURL()
+			guard newURL != currentURL else {
+				return nil
+			}
+			let name = try await getNetworkName(baseURL: newURL)
+			// FIXME: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
+			// once it returns networkID!
+			let network = try Network.lookupBy(name: name)
+
+			let networkAndGateway = AppPreferences.NetworkAndGateway(
+				network: network,
+				gatewayAPIEndpointURL: newURL
+			)
+
+			try await profileClient.setNetworkAndGateway(networkAndGateway)
+
+			return networkAndGateway
 		}
 
 		@Sendable
@@ -142,6 +158,7 @@ public extension GatewayAPIClient {
 		}
 
 		return Self(
+			getCurrentBaseURL: getCurrentBaseURL,
 			setCurrentBaseURL: setCurrentBaseURL,
 			getEpoch: getEpoch,
 			accountResourcesByAddress: { accountAddress in

@@ -48,7 +48,7 @@ public extension TransactionClient {
 					let buildAndSignTXRequest = BuildAndSignTransactionWithoutManifestRequest(
 						privateKey: privateKey,
 						epoch: epoch,
-						networkID: try profileClient.getCurrentNetworkID()
+						networkID: profileClient.getCurrentNetworkID()
 					)
 
 					return try engineToolkitClient.createAccount(request: buildAndSignTXRequest)

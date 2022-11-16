@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import Foundation
+import Profile
 
 // MARK: - ManageGatewayAPIEndpoints.Action
 public extension ManageGatewayAPIEndpoints {
@@ -13,6 +14,7 @@ public extension ManageGatewayAPIEndpoints {
 // MARK: - ManageGatewayAPIEndpoints.Action.ViewAction
 public extension ManageGatewayAPIEndpoints.Action {
 	enum ViewAction: Equatable {
+		case didAppear
 		case dismissButtonTapped
 		case gatewayAPIURLChanged(String)
 		case switchToButtonTapped
@@ -30,7 +32,8 @@ public extension ManageGatewayAPIEndpoints.Action {
 // MARK: - ManageGatewayAPIEndpoints.Action.SystemAction
 public extension ManageGatewayAPIEndpoints.Action {
 	enum SystemAction: Equatable {
-		case setGatewayAPIEndpointResult(TaskResult<URL>)
+		/// Nil if no change was needed
+		case setGatewayAPIEndpointResult(TaskResult<AppPreferences.NetworkAndGateway?>)
 	}
 }
 
@@ -38,6 +41,5 @@ public extension ManageGatewayAPIEndpoints.Action {
 public extension ManageGatewayAPIEndpoints.Action {
 	enum DelegateAction: Equatable {
 		case dismiss
-		case successfullyUpdatedGatewayAPIEndpoint
 	}
 }

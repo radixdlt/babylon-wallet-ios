@@ -26,6 +26,8 @@ public struct CreateNewProfileRequest {
 public struct ProfileClient {
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
+	public var getNetworkAndGateway: GetNetworkAndGateway
+	public var setNetworkAndGateway: SetNetworkAndGateway
 
 	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
 	public var createNewProfileWithOnLedgerAccount: CreateNewProfileWithOnLedgerAccount
@@ -50,6 +52,8 @@ public struct ProfileClient {
 public extension ProfileClient {
 	typealias GetGatewayAPIEndpointBaseURL = @Sendable () -> URL
 	typealias GetCurrentNetworkID = @Sendable () -> NetworkID
+	typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Void
+	typealias GetNetworkAndGateway = @Sendable () -> AppPreferences.NetworkAndGateway
 
 	typealias CreateNewProfileWithOnLedgerAccount = @Sendable (CreateNewProfileRequest, MakeAccountNonVirtual) async throws -> Profile
 

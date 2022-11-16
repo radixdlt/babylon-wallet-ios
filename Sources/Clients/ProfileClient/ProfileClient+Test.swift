@@ -21,6 +21,8 @@ extension ProfileClient: TestDependencyKey {
 	public static let previewValue = Self(
 		getCurrentNetworkID: { NetworkID.primary },
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
+		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.primary },
+		setNetworkAndGateway: { _ in },
 		createNewProfileWithOnLedgerAccount: { req, _ in
 			try! await Profile.new(
 				networkAndGateway: .primary,
@@ -60,6 +62,8 @@ extension ProfileClient: TestDependencyKey {
 	public static let testValue = Self(
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
 		getGatewayAPIEndpointBaseURL: unimplemented("\(Self.self).getGatewayAPIEndpointBaseURL"),
+		getNetworkAndGateway: unimplemented("\(Self.self).getNetworkAndGateway"),
+		setNetworkAndGateway: unimplemented("\(Self.self).setNetworkAndGateway"),
 		createNewProfileWithOnLedgerAccount: { _, _ in throw UnimplementedError(description: "\(Self.self).createNewProfileWithOnLedgerAccount is unimplemented") },
 		injectProfile: unimplemented("\(Self.self).injectProfile"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),

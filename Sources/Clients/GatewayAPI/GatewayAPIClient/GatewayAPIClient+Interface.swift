@@ -9,6 +9,7 @@ public typealias ResourceIdentifier = String
 // MARK: - GatewayAPIClient
 public struct GatewayAPIClient: DependencyKey {
 	// MARK: BaseURL management
+	public var getCurrentBaseURL: GetCurrentBaseURL
 	public var setCurrentBaseURL: SetCurrentBaseURL
 
 	// MARK: Request
@@ -20,6 +21,7 @@ public struct GatewayAPIClient: DependencyKey {
 	public var getCommittedTransaction: GetCommittedTransaction
 
 	public init(
+		getCurrentBaseURL: @escaping GetCurrentBaseURL,
 		setCurrentBaseURL: @escaping SetCurrentBaseURL,
 		getEpoch: @escaping GetEpoch,
 		accountResourcesByAddress: @escaping GetAccountResourcesByAddress,
@@ -28,6 +30,7 @@ public struct GatewayAPIClient: DependencyKey {
 		transactionStatus: @escaping GetTransactionStatus,
 		getCommittedTransaction: @escaping GetCommittedTransaction
 	) {
+		self.getCurrentBaseURL = getCurrentBaseURL
 		self.setCurrentBaseURL = setCurrentBaseURL
 		self.getEpoch = getEpoch
 		self.accountResourcesByAddress = accountResourcesByAddress
@@ -39,7 +42,8 @@ public struct GatewayAPIClient: DependencyKey {
 }
 
 public extension GatewayAPIClient {
-	typealias SetCurrentBaseURL = @Sendable (URL) async throws -> URL
+	typealias GetCurrentBaseURL = @Sendable () -> URL
+	typealias SetCurrentBaseURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway?
 
 	typealias GetEpoch = @Sendable () async throws -> V0StateEpochResponse
 	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> V0StateComponentResponse

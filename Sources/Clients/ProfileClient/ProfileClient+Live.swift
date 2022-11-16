@@ -27,7 +27,7 @@ extension ProfileClient: DependencyKey {
 			}
 		}
 
-		let getNetworkAndGateway: () -> AppPreferences.NetworkAndGateway = {
+		let getNetworkAndGateway: GetNetworkAndGateway = {
 			do {
 				return try getAppPreferences().networkAndGateway
 			} catch {
@@ -43,59 +43,15 @@ extension ProfileClient: DependencyKey {
 			getNetworkAndGateway().gatewayAPIEndpointURL
 		}
 
-		let setGatewayAPIEndpointURLByString: (String) async throws -> URL = { (newBaseURLString: String) async throws -> URL in
-			// Flow is this:
-			// 1. Try to build new URL from string
-			// 2. Read currentURL
-			// 3. Abort if newURL == currentURL
-			// 4. Try to get network name (in future also ID?) from Gateway
-			// 5. Lookup network ID by name (hardcoded lookup table)
-			// 6. Abort if network ID is unknown
-			// 7. Persist newURL in userDefaults
-
-			// 1. Try to build new URL from string
-			let newURL = try urlBuilder.urlFromString(newBaseURLString)
-			// 2. Read currentURL
-			let currentURL = getGatewayAPIEndpointBaseURL()
-			// 3. Abort if newURL == currentURL
-			guard newURL != currentURL else {
-				return currentURL
-			}
-
-			/*
-			 do {
-
-			     let current = try await gatewayAPIClient.getCurrentBaseURL()
-			     guard new != current else {
-			         // Nothing to do!
-			         return
-			     }
-
-			     try await gatewayAPIClient.setCurrentBaseURL()
-			     // FIXME replace with getting network name once we have migrated to Enkinet/Hamunet
-			     let hardCodedNetworkName = "Adapanet"
-			     let networkNameGivenNewURL = hardCodedNetworkName
-
-			     // 4. Lookup network ID based on network name
-			     let networkID = try profileClient.lookupNetworkIDByNetworkName(hardCodedNetworkName)
-
-			     // 5. Check if we need to create a new key value in Profile
-			     if profileClient.getCurrentNetworkID() != networkID {
-			         // 6. need to create new account on this new network and need to notify rest of app, and switch Gateway
-			         try profileClient.setCurrentNetworkID(networkID)
-			     } else {
-			         // 6. No network switch needed, only need to switch Gateway
-			     }
-			 } catch {
-
-			 }
-			 */
-			fatalError()
-		}
-
 		return Self(
 			getCurrentNetworkID: getCurrentNetworkID,
 			getGatewayAPIEndpointBaseURL: getGatewayAPIEndpointBaseURL,
+			getNetworkAndGateway: getNetworkAndGateway,
+			setNetworkAndGateway: { networkAndGateway in
+				try await profileHolder.asyncMutating { profile in
+					profile.appPreferences.networkAndGateway = networkAndGateway
+				}
+			},
 			createNewProfileWithOnLedgerAccount: { request, makeAccountNonVirtual in
 
 				let newProfile = try await Profile.new(

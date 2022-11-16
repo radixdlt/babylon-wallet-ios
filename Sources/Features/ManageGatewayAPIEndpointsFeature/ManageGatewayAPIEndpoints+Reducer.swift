@@ -8,7 +8,6 @@ import UserDefaultsClient
 public struct ManageGatewayAPIEndpoints: ReducerProtocol {
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.profileClient) var profileClient
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
 	@Dependency(\.urlBuilder) var urlBuilder
 
 	public init() {}
@@ -17,13 +16,26 @@ public struct ManageGatewayAPIEndpoints: ReducerProtocol {
 public extension ManageGatewayAPIEndpoints {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
+		case .internal(.view(.didAppear)):
+			let currentNetworkAndGateway = profileClient.getNetworkAndGateway()
+			state.networkAndGateway = currentNetworkAndGateway
+			state.gatewayAPIURLString = urlBuilder.formatURL(currentNetworkAndGateway.gatewayAPIEndpointURL)
+			return .none
+
 		case .internal(.view(.dismissButtonTapped)):
 			return .run { send in
 				await send(.delegate(.dismiss))
 			}
+
 		case let .internal(.view(.gatewayAPIURLChanged(urlString))):
 			state.gatewayAPIURLString = urlString
-			state.isSwitchToButtonEnabled = (try? urlBuilder.urlFromString(urlString)) != nil
+			do {
+				let newURL = try urlBuilder.urlFromString(urlString)
+				let currentURL = gatewayAPIClient.getCurrentBaseURL()
+				state.isSwitchToButtonEnabled = newURL != currentURL
+			} catch {
+				state.isSwitchToButtonEnabled = false
+			}
 			return .none
 
 		case .internal(.view(.switchToButtonTapped)):
@@ -37,10 +49,11 @@ public extension ManageGatewayAPIEndpoints {
 				))))
 			}
 
-		case .internal(.system(.setGatewayAPIEndpointResult(.success(_)))):
-			return .run { send in
-				await send(.delegate(.successfullyUpdatedGatewayAPIEndpoint))
+		case let .internal(.system(.setGatewayAPIEndpointResult(.success(maybeNew)))):
+			if let new = maybeNew {
+				state.networkAndGateway = new
 			}
+			return .none
 
 		case let .internal(.system(.setGatewayAPIEndpointResult(.failure(error)))):
 			// FIXME: Error propagation

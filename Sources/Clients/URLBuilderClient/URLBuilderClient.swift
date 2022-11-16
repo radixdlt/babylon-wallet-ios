@@ -4,14 +4,21 @@ import Foundation
 // MARK: - URLBuilderClient
 public struct URLBuilderClient: DependencyKey {
 	public var urlFromString: URLFromString
-	public init(urlFromString: @escaping URLFromString) {
+	public var formatURL: FormatURL
+
+	public init(
+		urlFromString: @escaping URLFromString,
+		formatURL: @escaping FormatURL
+	) {
 		self.urlFromString = urlFromString
+		self.formatURL = formatURL
 	}
 }
 
 // MARK: URLBuilderClient.URLFromString
 public extension URLBuilderClient {
 	typealias URLFromString = @Sendable (String) throws -> URL
+	typealias FormatURL = @Sendable (URL) -> String
 }
 
 public extension URLBuilderClient {
@@ -25,7 +32,8 @@ public extension URLBuilderClient {
 				throw InvalidURL(description: "Invalid url string: \(urlString)")
 			}
 			return url
-		}
+		},
+		formatURL: { $0.absoluteString }
 	)
 }
 

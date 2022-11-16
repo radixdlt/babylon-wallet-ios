@@ -59,10 +59,6 @@ public extension Settings {
 			state.manageGatewayAPIEndpoints = nil
 			return .none
 
-		case .child(.manageGatewayAPIEndpoints(.delegate(.successfullyUpdatedGatewayAPIEndpoint))):
-			state.manageGatewayAPIEndpoints = nil
-			return .none
-
 		case .child(.manageGatewayAPIEndpoints(.internal)):
 			return .none
 

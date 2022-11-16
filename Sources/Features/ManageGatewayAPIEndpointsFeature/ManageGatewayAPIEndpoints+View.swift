@@ -1,6 +1,8 @@
 import ComposableArchitecture
 import DesignSystem
+import Profile
 import SwiftUI
+import URLBuilderClient
 
 // MARK: - ManageGatewayAPIEndpoints.View
 public extension ManageGatewayAPIEndpoints {
@@ -25,22 +27,72 @@ public extension ManageGatewayAPIEndpoints.View {
 				navBarActionStyle: .close,
 				action: { viewStore.send(.dismissButtonTapped) }
 			) {
-				VStack {
-					TextField(
-						"Gateway API url",
-						text: viewStore.binding(
-							get: \.gatewayAPIURLString,
-							send: { .gatewayAPIURLChanged($0) }
+				VStack(alignment: .leading) {
+					if let networkAndGateway = viewStore.networkAndGateway {
+						networkAndGatewayView(networkAndGateway)
+					}
+
+					Spacer()
+
+					Group {
+						let prompt = "Gateway API URL"
+						Text(prompt)
+							.font(.callout)
+						TextField(
+							prompt,
+							text: viewStore.binding(
+								get: \.gatewayAPIURLString,
+								send: { .gatewayAPIURLChanged($0) }
+							)
 						)
-					)
+						.textFieldStyle(.roundedBorder)
+					}
+
+					Spacer()
 
 					Button("Switch To") {
 						viewStore.send(.switchToButtonTapped)
 					}
 					.enabled(viewStore.isSwitchToButtonEnabled)
 				}
+				.padding()
 				.buttonStyle(.primary)
 			}
+			.onAppear {
+				viewStore.send(.didAppear)
+			}
+		}
+	}
+}
+
+private extension ManageGatewayAPIEndpoints.View {
+	@ViewBuilder
+	func label(
+		_ label: String,
+		value: CustomStringConvertible,
+		valueColor: Color = Color.app.gray2
+	) -> some View {
+		Group {
+			Text(label)
+				.font(.headline)
+				.foregroundColor(Color.app.gray1)
+			Text(String(describing: value))
+				.textSelection(.enabled)
+				.font(.title3)
+				.foregroundColor(valueColor)
+		}
+	}
+
+	func networkAndGatewayView(
+		_ networkAndGateway: AppPreferences.NetworkAndGateway
+	) -> some View {
+		Group {
+			Text("Current")
+				.font(.title2)
+
+			label("Network name", value: networkAndGateway.network.name)
+			label("Network ID", value: networkAndGateway.network.id)
+			label("Gateway API Endpoint", value: URLBuilderClient.liveValue.formatURL(networkAndGateway.gatewayAPIEndpointURL), valueColor: Color.app.blue2)
 		}
 	}
 }
@@ -49,10 +101,13 @@ public extension ManageGatewayAPIEndpoints.View {
 extension ManageGatewayAPIEndpoints.View {
 	struct ViewState: Equatable {
 		public var gatewayAPIURLString: String
+		public var networkAndGateway: AppPreferences.NetworkAndGateway?
 		public var isSwitchToButtonEnabled: Bool
+
 		init(state: ManageGatewayAPIEndpoints.State) {
 			gatewayAPIURLString = state.gatewayAPIURLString
 			isSwitchToButtonEnabled = state.isSwitchToButtonEnabled
+			networkAndGateway = state.networkAndGateway
 		}
 	}
 }

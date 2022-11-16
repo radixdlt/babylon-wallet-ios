@@ -9,6 +9,7 @@ import XCTestDynamicOverlay
 extension GatewayAPIClient: TestDependencyKey {
 	public static let previewValue = Self.mock()
 	public static let testValue = Self(
+		getCurrentBaseURL: unimplemented("\(Self.self).getCurrentBaseURL"),
 		setCurrentBaseURL: unimplemented("\(Self.self).setCurrentBaseURL"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
@@ -25,7 +26,8 @@ extension GatewayAPIClient: TestDependencyKey {
 		txStatus: V0TransactionStatusResponse.IntentStatus? = nil
 	) -> Self {
 		.init(
-			setCurrentBaseURL: { $0 },
+			getCurrentBaseURL: { URL(string: "example.com")! },
+			setCurrentBaseURL: { _ in AppPreferences.NetworkAndGateway.primary },
 			getEpoch: { .init(epoch: 1337) },
 			accountResourcesByAddress: { _ in
 				fatalError()
