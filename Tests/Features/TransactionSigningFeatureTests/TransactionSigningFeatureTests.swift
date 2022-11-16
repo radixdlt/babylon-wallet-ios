@@ -19,7 +19,6 @@ final class TransactionSigningFeatureTests: TestCase {
 	func testInitialState() {
 		XCTAssertEqual(store.state.addressOfSigner, try! .init(address: "deadbeef"))
 		XCTAssertEqual(store.state.transactionManifest, .mock)
-		XCTAssertNil(store.state.errorAlert)
 	}
 
 	func testSignTransaction() async {
@@ -28,15 +27,16 @@ final class TransactionSigningFeatureTests: TestCase {
 		store.dependencies.profileClient.lookupAccountByAddress = { _ in
 			throw LookupAccountByAddressError()
 		}
+		let errorExpectation1 = expectation(description: "Error")
+		store.dependencies.errorQueue.schedule = { error in
+			XCTAssertEqual(error.localizedDescription, "LookupAccountByAddressError")
+			errorExpectation1.fulfill()
+		}
 		_ = await store.send(.view(.signTransactionButtonTapped)) {
 			$0.isSigningTX = true
 		}
 		await store.receive(.internal(.signTransactionResult(.failure(LookupAccountByAddressError())))) {
 			$0.isSigningTX = false
-			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("LookupAccountByAddressError"))
-		}
-		_ = await store.send(.view(.errorAlertDismissButtonTapped)) {
-			$0.errorAlert = nil
 		}
 
 		// Unhappy path - sign TX error
@@ -47,15 +47,16 @@ final class TransactionSigningFeatureTests: TestCase {
 		store.dependencies.profileClient.signTransaction = { @Sendable _, _ in
 			throw SignTransactionError()
 		}
+		let errorExpectation2 = expectation(description: "Error")
+		store.dependencies.errorQueue.schedule = { error in
+			XCTAssertEqual(error.localizedDescription, "SignTransactionError")
+			errorExpectation2.fulfill()
+		}
 		_ = await store.send(.view(.signTransactionButtonTapped)) {
 			$0.isSigningTX = true
 		}
 		await store.receive(.internal(.signTransactionResult(.failure(SignTransactionError())))) {
 			$0.isSigningTX = false
-			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("SignTransactionError"))
-		}
-		_ = await store.send(.view(.errorAlertDismissButtonTapped)) {
-			$0.errorAlert = nil
 		}
 
 		// Happy path
@@ -68,6 +69,8 @@ final class TransactionSigningFeatureTests: TestCase {
 		await store.receive(.internal(.signTransactionResult(.success("TXID")))) {
 			$0.isSigningTX = false
 		}
+
+		wait(for: [errorExpectation1, errorExpectation2], timeout: 0)
 	}
 
 	func testDismissView() async {

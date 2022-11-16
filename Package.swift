@@ -443,6 +443,7 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			engineToolkit,
+			"ErrorQueue",
 			"ImportProfileFeature",
 			"ProfileClient",
 			tca,
@@ -496,6 +497,7 @@ package.addModules([
 			"BrowserExtensionsConnectivityClient", // Actually only models needed...
 			"Common",
 			"EngineToolkitClient",
+			"ErrorQueue",
 			"GatewayAPI",
 			"ProfileClient",
 			tca,
