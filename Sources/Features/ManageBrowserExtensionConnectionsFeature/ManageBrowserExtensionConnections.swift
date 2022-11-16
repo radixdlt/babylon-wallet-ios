@@ -50,13 +50,15 @@ public extension ManageBrowserExtensionConnections {
 			return .none
 
 		case let .internal(.system(.loadConnectionsResult(.failure(error)))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .internal(.system(.successfullyOpenedConnectionToBrowser(connection))):
 			return saveNewConnection(state: &state, action: action, connection: connection)
 
 		case let .internal(.system(.saveNewConnectionResult(.failure(error)))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .internal(.system(.saveNewConnectionResult(.success(newConnection)))):
 			state.connections.append(
@@ -97,10 +99,12 @@ public extension ManageBrowserExtensionConnections {
 			return .none
 
 		case let .internal(.system(.initConnectionSecretsResult(.failure(error)))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .child(.connectUsingPassword(.delegate(.establishConnectionResult(.failure(error))))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .child(.connectUsingPassword(.delegate(.establishConnectionResult(.success(openConnection))))):
 			return saveNewConnection(state: &state, action: action, connection: openConnection)
