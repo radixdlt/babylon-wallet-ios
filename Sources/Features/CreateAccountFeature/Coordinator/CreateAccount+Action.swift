@@ -43,6 +43,6 @@ public extension CreateAccount.Action {
 	enum DelegateAction: Equatable {
 		case dismissCreateAccount
 		case createdNewAccount(OnNetwork.Account)
-		case failedToCreateNewAccount(reason: String)
+		case failedToCreateNewAccount
 	}
 }

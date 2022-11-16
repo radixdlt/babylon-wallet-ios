@@ -46,13 +46,13 @@ jobs:
 
       - uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: "14.0.1"
+          xcode-version: "14.1"
 
       - name: "Run unit tests"
         run: |
           brew install xcbeautify
           set -o pipefail && \
-          xcodebuild clean test -project App/BabylonWallet.xcodeproj -scheme "Wallet (iOS)" -destination "name=iPhone 14,OS=16.0" | xcbeautify
+          xcodebuild clean test -project App/BabylonWallet.xcodeproj -scheme "Wallet (iOS)" -destination "name=iPhone 14,OS=16.1" | xcbeautify
 
   # snapshot_tests:
   #   name: "Snapshot tests"

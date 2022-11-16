@@ -74,8 +74,6 @@ public extension Home.Action {
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)
 		case accountPortfolioResult(TaskResult<AccountPortfolioDictionary>)
-		case viewDidAppearActionFailed(reason: String)
-		case toggleIsCurrencyAmountVisibleFailed(reason: String)
 		case sendResponseBackToDapp(BrowserExtensionConnection.ID, RequestMethodWalletResponse)
 		case sendResponseBackToDappResult(TaskResult<SentMessageToBrowser>)
 	}

@@ -14,7 +14,7 @@ public struct Settings: ReducerProtocol {
 }
 
 public extension Settings {
-	var body: some ReducerProtocol<State, Action> {
+	var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
 			.ifLet(\.manageBrowserExtensionConnections, action: /Action.child .. Action.ChildAction.manageBrowserExtensionConnections) {
 				ManageBrowserExtensionConnections()

@@ -6,7 +6,7 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 	@Dependency(\.profileClient) var profileClient
 	public init() {}
 
-	public var body: some ReducerProtocol<State, Action> {
+	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \State.chooseAccounts!, action: /Action.child .. Action.ChildAction.chooseAccounts) {
 			ChooseAccounts()
 		}

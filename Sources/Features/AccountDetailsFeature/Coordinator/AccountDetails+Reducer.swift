@@ -5,7 +5,7 @@ import ComposableArchitecture
 public struct AccountDetails: ReducerProtocol {
 	public init() {}
 
-	public var body: some ReducerProtocol<State, Action> {
+	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.aggregatedValue, action: /Action.child .. Action.ChildAction.aggregatedValue) {
 			AggregatedValue()
 		}
