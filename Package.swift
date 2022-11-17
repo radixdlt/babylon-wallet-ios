@@ -381,7 +381,6 @@ package.addModules([
 			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
-		resources: [.process("Resources")],
 		tests: .yes(
 			dependencies: [
 				"ProfileClient",
@@ -697,7 +696,9 @@ package.addModules([
 			profile, // Address
 			tagged,
 		],
-		resources: [.process("Resources/Localization/Strings.swift")],
+		resources: [
+			.process("Resources/"),
+		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
