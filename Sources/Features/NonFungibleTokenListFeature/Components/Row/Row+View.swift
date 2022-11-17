@@ -62,7 +62,7 @@ public extension NonFungibleTokenList.Row.View {
 						rowHeights[index] = size.height
 					}
 				}
-				.padding([.leading, .trailing], 24)
+				.padding(.horizontal, .medium3)
 			}
 			.frame(height: viewStore.isExpanded ? expandedHeight : collapsedHeight(with: viewStore), alignment: .top)
 		}

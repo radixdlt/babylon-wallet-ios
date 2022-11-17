@@ -16,6 +16,7 @@ public extension BackButton {
 			action: action,
 			label: { Image(asset: Asset.arrowBack) }
 		)
+		.frame(.small)
 	}
 }
 

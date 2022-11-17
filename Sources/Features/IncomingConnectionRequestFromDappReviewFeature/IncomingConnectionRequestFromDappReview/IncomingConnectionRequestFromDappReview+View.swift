@@ -44,11 +44,11 @@ private extension IncomingConnectionRequestFromDappReview.View {
 	func mainView(with viewStore: IncomingConnectionViewStore) -> some View {
 		VStack {
 			header(with: viewStore)
-				.padding(24)
+				.padding(.medium1)
 
 			ScrollView {
 				VStack {
-					VStack(spacing: 40) {
+					VStack(spacing: .large1) {
 						Text(L10n.DApp.ConnectionRequest.title)
 							.textStyle(.sectionHeader)
 							.multilineTextAlignment(.center)
@@ -56,9 +56,9 @@ private extension IncomingConnectionRequestFromDappReview.View {
 						Image(asset: Asset.dappPlaceholder)
 					}
 
-					Spacer(minLength: 40)
+					Spacer(minLength: .large1)
 
-					VStack(spacing: 20) {
+					VStack(spacing: .medium2) {
 						Text(L10n.DApp.ConnectionRequest.wantsToConnect(viewStore.incomingConnectionRequestFromDapp.displayName))
 							.textStyle(.secondaryHeader)
 
@@ -68,19 +68,19 @@ private extension IncomingConnectionRequestFromDappReview.View {
 					}
 					.multilineTextAlignment(.center)
 
-					Spacer(minLength: 60)
+					Spacer(minLength: .large1 * 1.5)
 
 					PermissionsView(permissions: viewStore.incomingConnectionRequestFromDapp.permissions)
-						.padding(.horizontal, 24)
+						.padding(.horizontal, .medium1)
 
 					Spacer()
 
-					PrimaryButton(
-						title: L10n.DApp.ConnectionRequest.continueButtonTitle,
-						action: { viewStore.send(.continueButtonTapped) }
-					)
+					Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
+						viewStore.send(.continueButtonTapped)
+					}
+					.buttonStyle(.primary)
 				}
-				.padding(.horizontal, 24)
+				.padding(.horizontal, .medium1)
 			}
 		}
 	}

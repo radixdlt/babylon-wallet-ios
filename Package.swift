@@ -225,7 +225,6 @@ package.addModules([
 		name: "AccountDetailsFeature",
 		dependencies: [
 			"AccountListFeature",
-			"AggregatedValueFeature",
 			"Asset",
 			"AssetsViewFeature",
 			"DesignSystem",

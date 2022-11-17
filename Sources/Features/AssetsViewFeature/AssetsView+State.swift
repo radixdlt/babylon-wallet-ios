@@ -26,8 +26,12 @@ public extension AssetsView {
 	enum AssetsViewType: String, CaseIterable, Identifiable {
 		case tokens
 		case nfts
-		case poolShare
-		case badges
+
+		// TODO: uncomment when ready for implementation
+		/*
+		 case poolShare
+		 case badges
+		 */
 
 		var displayText: String {
 			switch self {
@@ -35,10 +39,14 @@ public extension AssetsView {
 				return L10n.AssetsView.tokens
 			case .nfts:
 				return L10n.AssetsView.nfts
-			case .poolShare:
-				return L10n.AssetsView.poolShare
-			case .badges:
-				return L10n.AssetsView.badges
+
+				// TODO: uncomment when ready for implementation
+				/*
+				 case .poolShare:
+				 	return L10n.AssetsView.poolShare
+				 case .badges:
+				 	return L10n.AssetsView.badges
+				 */
 			}
 		}
 	}

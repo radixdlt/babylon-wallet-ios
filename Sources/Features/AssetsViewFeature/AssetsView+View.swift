@@ -22,8 +22,9 @@ public extension AssetsView.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			VStack(spacing: 30) {
+			VStack(spacing: .large3) {
 				selectorView(with: viewStore)
+					.padding([.top, .horizontal], .medium1)
 
 				switch viewStore.state.type {
 				case .tokens:
@@ -40,10 +41,14 @@ public extension AssetsView.View {
 							action: { .child(.nonFungibleTokenList($0)) }
 						)
 					)
-				case .poolShare:
-					Text("Pool Share")
-				case .badges:
-					Text("Badges")
+
+					// TODO: uncomment when ready for implementation
+					/*
+					 case .poolShare:
+					 	Text("Pool Share")
+					 case .badges:
+					 	Text("Badges")
+					 */
 				}
 			}
 		}
@@ -60,7 +65,7 @@ private extension AssetsView.View {
 	func selectorView(with viewStore: AssetsViewViewStore) -> some View {
 		ScrollView(.horizontal, showsIndicators: false) {
 			ScrollViewReader { proxy in
-				HStack(spacing: 0) {
+				HStack(spacing: .zero) {
 					ForEach(AssetsView.AssetsViewType.allCases) { type in
 						selectorButton(type: type, with: viewStore) {
 							viewStore.send(.listSelectorTapped(type))
@@ -70,7 +75,6 @@ private extension AssetsView.View {
 						}
 					}
 				}
-				.padding([.leading, .trailing], 18)
 			}
 		}
 	}
@@ -80,22 +84,19 @@ private extension AssetsView.View {
 		with viewStore: AssetsViewViewStore,
 		action: @escaping () -> Void
 	) -> some View {
-		Button(
-			action: {
+		Text(type.displayText)
+			.foregroundColor(type == viewStore.type ? .app.white : .app.gray1)
+			.textStyle(.body1HighImportance)
+			.frame(height: .large1)
+			.padding(.horizontal, .medium2)
+			.background(type == viewStore.type ?
+				RoundedRectangle(cornerRadius: .medium2)
+				.fill(Color.app.gray1) : nil
+			)
+			.id(type)
+			.onTapGesture {
 				action()
-			}, label: {
-				Text(type.displayText)
-					.foregroundColor(type == viewStore.type ? .app.white : .app.buttonTextBlack)
-					.textStyle(.body1Header)
-					.frame(height: 40)
-					.padding([.leading, .trailing], 18)
-					.background(type == viewStore.type ?
-						RoundedRectangle(cornerRadius: 21)
-						.fill(Color.app.gray1) : nil
-					)
 			}
-		)
-		.id(type)
 	}
 }
 

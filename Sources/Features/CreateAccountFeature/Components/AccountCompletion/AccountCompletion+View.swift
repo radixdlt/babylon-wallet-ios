@@ -21,7 +21,7 @@ public extension AccountCompletion.View {
 			store.actionless,
 			observe: ViewState.init(state:)
 		) { viewStore in
-			VStack(spacing: 20) {
+			VStack(spacing: .medium2) {
 				Spacer()
 
 				Image(asset: Asset.createAccountSafe)
@@ -36,7 +36,7 @@ public extension AccountCompletion.View {
 
 				Spacer()
 
-				VStack(spacing: 15) {
+				VStack(spacing: .medium3) {
 					Text(viewStore.accountName)
 						.foregroundColor(.app.buttonTextBlack)
 						.textStyle(.secondaryHeader)
@@ -44,33 +44,32 @@ public extension AccountCompletion.View {
 
 					HStack {
 						Text(viewStore.accountAddress.address)
-							.foregroundColor(.app.buttonTextBlack.opacity(0.6))
+							.foregroundColor(.app.buttonTextBlackTransparent)
 							.textStyle(.body2Regular)
 
 						Image(asset: Asset.copy)
 					}
 				}
 				.frame(maxWidth: .infinity)
-				.padding(30)
+				.padding(.large2)
 				.background(Color.app.gray3)
-				.cornerRadius(8)
+				.cornerRadius(.small2)
 
 				Text(L10n.CreateAccount.Completion.explanation)
 					.foregroundColor(.app.gray1)
 					.textStyle(.body1Regular)
-					.lineSpacing(23 / 3)
 					.textStyle(.sheetTitle)
 					.multilineTextAlignment(.center)
-					.padding(.horizontal, 24)
+					.padding(.horizontal, .medium1)
 
 				Spacer()
 
-				PrimaryButton(
-					title: L10n.CreateAccount.Completion.returnToOrigin(viewStore.origin.displayText),
-					action: { /* TODO: implement */ }
-				)
+				Button(L10n.CreateAccount.Completion.returnToOrigin(viewStore.origin.displayText)) {
+					/* TODO: implement */
+				}
+				.buttonStyle(.primary)
 			}
-			.padding(24)
+			.padding(.medium1)
 		}
 	}
 }

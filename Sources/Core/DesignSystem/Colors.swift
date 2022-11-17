@@ -60,6 +60,10 @@ public extension Color.App {
 		.init(hex: .white)
 	}
 
+	var whiteTransparent: Color {
+		.white.opacity(0.8)
+	}
+
 	var backgroundDark: Color {
 		.black
 	}
