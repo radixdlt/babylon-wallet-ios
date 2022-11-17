@@ -94,8 +94,8 @@ public enum L10n {
     public enum Header {
       /// Welcome, here are all your accounts on the Radix Network
       public static let subtitle = L10n.tr("Localizable", "home.header.subtitle", fallback: "Welcome, here are all your accounts on the Radix Network")
-      /// Babylon E2E
-      public static let title = L10n.tr("Localizable", "home.header.title", fallback: "Babylon E2E")
+      /// Radix Wallet
+      public static let title = L10n.tr("Localizable", "home.header.title", fallback: "Radix Wallet")
     }
     public enum VisitHub {
       /// Visit the Radix Hub
@@ -114,10 +114,6 @@ public enum L10n {
       return L10n.tr("Localizable", "nftList.ownedOfTotal", p1, p2, fallback: "%d of %d")
     }
     public enum Header {
-      /// - Hide
-      public static let hide = L10n.tr("Localizable", "nftList.header.hide", fallback: "- Hide")
-      /// + Show
-      public static let show = L10n.tr("Localizable", "nftList.header.show", fallback: "+ Show")
       /// Unknown
       public static let supplyUnknown = L10n.tr("Localizable", "nftList.header.supplyUnknown", fallback: "Unknown")
     }
