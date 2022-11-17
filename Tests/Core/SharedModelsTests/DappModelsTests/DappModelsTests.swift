@@ -32,7 +32,63 @@ final class ToDappResponseTests: TestCase {
 		XCTAssertTrue(jsonString.contains(P2P.FromDapp.Discriminator.ongoingAccountAddresses.rawValue))
 	}
 
-	func test_bas64() throws {
-		let string = "eyJwYXlsb2FkIjpbeyJyZXF1ZXN0VHlwZSI6Im9uZ29pbmdBY2NvdW50QWRkcmVzc2VzIiwiYWNjb3VudEFkZHJlc3NlcyI6W3siYWRkcmVzcyI6ImFjY291bnRfdGR4X2FfMXF3dThxZGgwNGpzbHA5YWp0bmxuNng5dHNmM252eGQyaGc1ZXNrdjBlaDJzZXA4Z2ZjIiwibGFiZWwiOiJDeW9uIiwiYXBwZWFyYW5jZUlEIjowfV19XSwicmVxdWVzdElkIjoiMDRhOTcyNjEtNTQxMS00ZDI2LTg0MTAtY2FhZTA1NzU2Mjk2In0=".data(using: .utf8)!
+	func test_decode_request_from_dApp() throws {
+		let json = """
+		{
+		    "payload":
+		    [
+		        {
+		            "requestType": "ongoingAccountAddresses",
+		            "proofOfOwnership": false
+		        }
+		    ],
+		    "requestId": "791638de-cefa-43a8-9319-aa31c582fc7d",
+		    "metadata":
+		    {
+		        "networkId": 34,
+		        "dAppId": "radixdlt.dashboard.com",
+		        "origin": "https://dashboard-pr-126.rdx-works-main.extratools.works"
+		    }
+		}
+		""".data(using: .utf8)!
+
+		let decoder = JSONDecoder()
+		let request = try decoder.decode(P2P.FromDapp.Request.self, from: json)
+		let expectedItem = P2P.FromDapp.OneTimeAccountAddressesRequest(isRequiringOwnershipProof: false, numberOfAddresses: .oneOrMore)
+		XCTAssertEqual(request.items, [.oneTimeAccountAddresses(expectedItem)])
+		XCTAssertEqual(
+			request.metadata,
+			.init(
+				networkId: .init(34),
+				origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
+				dAppId: "radixdlt.dashboard.com"
+			)
+		)
+		XCTAssertEqual(request.id, "791638de-cefa-43a8-9319-aa31c582fc7d")
+	}
+
+	func test_decode_sign_tx_request() throws {
+		let json = """
+		{
+		    "metadata":
+		    {
+		        "networkId": 34,
+		        "dAppId": "radixdlt.dashboard.com",
+		        "origin": "https://dashboard-pr-126.rdx-works-main.extratools.works"
+		    },
+		  "payload" : [
+		    {
+		      "version" : 1,
+		      "transactionManifest" : "",
+		      "requestType" : "sendTransaction"
+		    }
+		  ],
+		  "requestId" : "ed987de8-fc30-40d0-81ea-e3eef117a2cc"
+		}
+		""".data(using: .utf8)!
+		let decoder = JSONDecoder()
+		let request = try decoder.decode(P2P.FromDapp.Request.self, from: json)
+		XCTAssertEqual(request.items.first?.signTransaction?.version, 1)
+		XCTAssertEqual(request.id, "ed987de8-fc30-40d0-81ea-e3eef117a2cc")
 	}
 }

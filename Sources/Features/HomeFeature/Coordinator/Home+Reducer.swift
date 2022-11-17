@@ -329,7 +329,7 @@ public struct Home: ReducerProtocol {
 			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
 
 		case let .child(.chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
-			//            state.chooseAccountRequestFromDapp = nil
+			state.handleRequest = nil
 			let accountAddresses: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
 				.init(account: $0)
 			}

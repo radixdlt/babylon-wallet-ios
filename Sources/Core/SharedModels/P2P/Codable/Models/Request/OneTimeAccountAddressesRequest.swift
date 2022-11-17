@@ -17,6 +17,10 @@ public extension P2P.FromDapp {
 	{
 		public let isRequiringOwnershipProof: Bool
 		public let numberOfAddresses: Mode
+		internal init(isRequiringOwnershipProof: Bool, numberOfAddresses: Mode) {
+			self.isRequiringOwnershipProof = isRequiringOwnershipProof
+			self.numberOfAddresses = numberOfAddresses
+		}
 	}
 }
 
