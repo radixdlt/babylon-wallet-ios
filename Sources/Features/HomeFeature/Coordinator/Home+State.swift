@@ -67,6 +67,21 @@ public extension Home.State {
 	enum HandleRequest: Equatable {
 		case transactionSigning(TransactionSigning.State)
 		case chooseAccountRequestFromDapp(IncomingConnectionRequestFromDappReview.State)
+		public init(requestItemToHandle: P2P.RequestItemToHandle) {
+			switch requestItemToHandle.requestItem {
+			case let .oneTimeAccountAddresses(item):
+				self = .chooseAccountRequestFromDapp(
+					.init(request: .init(
+						requestItem: item,
+						parentRequest: requestItemToHandle.parentRequest
+					)
+					)
+				)
+			case let .signTransaction(item):
+				//                self = .transactionSigning(.init(requestFromClient: <#T##P2P.RequestFromClient#>, addressOfSigner: <#T##AccountAddress#>, transactionManifest: <#T##TransactionManifest#>))
+				fatalError()
+			}
+		}
 	}
 }
 

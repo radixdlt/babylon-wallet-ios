@@ -38,6 +38,14 @@ public extension Home.Action {
 		case accountDetails(AccountDetails.Action)
 		case transfer(AccountDetails.Transfer.Action)
 		case createAccount(CreateAccount.Action)
+
+		case handleRequest(HandleRequestAction)
+	}
+}
+
+// MARK: - Home.Action.ChildAction.HandleRequestAction
+public extension Home.Action.ChildAction {
+	enum HandleRequestAction: Equatable {
 		case chooseAccountRequestFromDapp(IncomingConnectionRequestFromDappReview.Action)
 		case transactionSigning(TransactionSigning.Action)
 	}
@@ -67,7 +75,10 @@ public extension Home.Action {
 		case subscribeToRequestsFromP2PClientByID(OrderedSet<P2PClient.ID>)
 
 		case receiveRequestFromP2PClientResult(TaskResult<P2P.RequestFromClient>)
-		case presentViewForP2PRequest(P2P.RequestFromClient)
+
+		case dismissed(P2P.RequestFromClient)
+		case handleNextRequestItemIfNeeded
+		case presentViewForP2PRequest(P2P.RequestItemToHandle)
 
 		case accountsLoadedResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
 		case appSettingsLoadedResult(TaskResult<AppSettings>)
@@ -77,7 +88,6 @@ public extension Home.Action {
 		case accountPortfolioResult(TaskResult<AccountPortfolioDictionary>)
 		case viewDidAppearActionFailed(reason: String)
 		case toggleIsCurrencyAmountVisibleFailed(reason: String)
-		case sendResponseBackToDapp(P2PClient.ID, P2P.ToDapp.Response)
 		case sendResponseBackToDappResult(TaskResult<P2P.SentResponseToClient>)
 	}
 }

@@ -77,20 +77,20 @@ public extension Home.View {
 
 					IfLetStore(
 						store.scope(
-							state: \.handleRequest
-							//                            action: { Home.Action.child(.chooseAccountRequestFromDapp($0)) })
+							state: \.handleRequest,
+							action: { .child(.handleRequest($0)) }
 						)
 					) {
 						SwitchStore($0) {
 							CaseLet(
 								state: /Home.State.HandleRequest.chooseAccountRequestFromDapp,
-								action: { Home.Action.child(.chooseAccountRequestFromDapp($0)) },
+								action: { Home.Action.ChildAction.HandleRequestAction.chooseAccountRequestFromDapp($0) },
 								then: IncomingConnectionRequestFromDappReview.View.init(store:)
 							)
 
 							CaseLet(
 								state: /Home.State.HandleRequest.transactionSigning,
-								action: { Home.Action.child(.transactionSigning($0)) },
+								action: { Home.Action.ChildAction.HandleRequestAction.transactionSigning($0) },
 								then: TransactionSigning.View.init(store:)
 							)
 						}

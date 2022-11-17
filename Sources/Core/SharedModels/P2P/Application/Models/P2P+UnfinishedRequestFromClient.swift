@@ -75,24 +75,32 @@ public extension P2P.UnfinishedRequestsFromClient {
 		queued.append(.init(requestFromClient: requestFromClient))
 	}
 
+	mutating func dismiss(request: P2P.RequestFromClient) {
+		if current?.requestFromClient == request {
+			current = nil
+		}
+		queued.removeAll(where: { $0.requestFromClient == request })
+	}
+
 	mutating func finish(
 		_ newlyFinished: P2P.FromDapp.WalletRequestItem,
 		with responseItem: P2P.ToDapp.WalletResponseItem
-	) throws -> P2P.ToDapp.Response? {
-		guard current != nil else { throw NoCurrentUnfinishedRequest() }
-		guard let finished = try current?.finish(newlyFinished, with: responseItem) else {
+	) -> P2P.ToDapp.Response? {
+		if current == nil { preconditionFailure("Expected current") }
+		guard let finished = current?.finish(newlyFinished, with: responseItem) else {
 			return nil
 		}
 		current = nil
 		return finished
 	}
 
-	mutating func next() throws -> P2P.RequestItemToHandle? {
+	mutating func next() -> P2P.RequestItemToHandle? {
 		guard let nextUnfinished = queued.first else {
 			return nil
 		}
 		guard let requestItem = nextUnfinished.unfinishedRequestItems.first else {
-			throw RequestContainsNoRequestItems()
+			assertionFailure("What? Do we need to handle requests with no request items? Or bad logic inside `UnfinishedRequestFromClient` type!")
+			return nil
 		}
 		queued.removeAll(where: { $0.id == nextUnfinished.id })
 
@@ -137,12 +145,14 @@ internal extension P2P.UnfinishedRequestFromClient {
 	mutating func finish(
 		_ newlyFinished: P2P.FromDapp.WalletRequestItem,
 		with responseItem: P2P.ToDapp.WalletResponseItem
-	) throws -> P2P.ToDapp.Response? {
-		guard unfinishedRequestItems.contains(where: { $0 == newlyFinished }) else {
-			throw UnknownRequestItem()
+	) -> P2P.ToDapp.Response? {
+		if !unfinishedRequestItems.contains(where: { $0 == newlyFinished }) {
+//			throw UnknownRequestItem()
+			preconditionFailure("Unknown request item")
 		}
-		guard !finishedResponseItems.contains(where: { $0 == responseItem }) else {
-			throw AlreadyFinishItem()
+		if finishedResponseItems.contains(where: { $0 == responseItem }) {
+//			throw AlreadyFinishItem()
+			preconditionFailure("Finished already finished item")
 		}
 		unfinishedRequestItems.removeAll(where: { $0 == newlyFinished })
 		finishedResponseItems.append(responseItem)
@@ -151,6 +161,11 @@ internal extension P2P.UnfinishedRequestFromClient {
 			return nil
 		}
 
-		return try P2P.ToDapp.Response.to(request: requestFromDapp, items: finishedResponseItems)
+		do {
+			return try P2P.ToDapp.Response.to(request: requestFromDapp, items: finishedResponseItems)
+		} catch {
+			assertionFailure("Failed to create response: \(error), discrepancy somewhere in implementation, please fix!")
+			return nil
+		}
 	}
 }

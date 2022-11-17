@@ -17,5 +17,8 @@ public extension P2P.ToDapp {
 	///
 	struct OngoingAccountAddressesResponse: Sendable, Hashable, Encodable {
 		public let accountAddresses: NonEmpty<[WalletAccount]>
+		public init(accountAddresses: NonEmpty<[WalletAccount]>) {
+			self.accountAddresses = accountAddresses
+		}
 	}
 }

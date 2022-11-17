@@ -17,8 +17,8 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismiss))
+			return .run { [dismissedRequest = state.request] send in
+				await send(.delegate(.dismiss(dismissedRequest)))
 			}
 
 		case .internal(.view(.continueButtonTapped)):

@@ -38,7 +38,7 @@ public extension IncomingConnectionRequestFromDappReview.Action {
 			request: P2P.OneTimeAccountAddressesRequestToHandle
 		)
 
-		case dismiss
+		case dismiss(P2P.OneTimeAccountAddressesRequestToHandle)
 	}
 }
 
