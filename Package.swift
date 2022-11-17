@@ -105,6 +105,7 @@ extension Package {
 		let dependencies: [Target.Dependency]
 		let exclude: [String]
 		let resources: [Resource]?
+		let plugins: [Target.PluginUsage]?
 		let tests: Tests
 		let isProduct: Bool
 
@@ -113,6 +114,7 @@ extension Package {
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
+			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
 			isProduct: Bool = true
 		) -> Self {
@@ -122,6 +124,7 @@ extension Package {
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
+				plugins: plugins,
 				tests: tests,
 				isProduct: isProduct
 			)
@@ -132,6 +135,7 @@ extension Package {
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
+			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
 			isProduct: Bool = false
 		) -> Self {
@@ -141,6 +145,7 @@ extension Package {
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
+				plugins: plugins,
 				tests: tests,
 				isProduct: isProduct
 			)
@@ -151,6 +156,7 @@ extension Package {
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
+			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
 			isProduct: Bool = false
 		) -> Self {
@@ -160,6 +166,7 @@ extension Package {
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
+				plugins: plugins,
 				tests: tests,
 				isProduct: isProduct
 			)
@@ -177,7 +184,14 @@ extension Package {
 		let targetPath = "Sources/\(module.category)/\(targetName)"
 
 		package.targets += [
-			.target(name: targetName, dependencies: module.dependencies, path: targetPath, exclude: module.exclude, resources: module.resources),
+			.target(
+				name: targetName,
+				dependencies: module.dependencies,
+				path: targetPath,
+				exclude: module.exclude,
+				resources: module.resources,
+				plugins: module.plugins
+			),
 		]
 
 		switch module.tests {
@@ -715,6 +729,9 @@ package.addModules([
 		dependencies: [],
 		resources: [
 			.process("Resources/"),
+		],
+		plugins: [
+			.plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin"),
 		],
 		tests: .no
 	),
