@@ -11,7 +11,7 @@
     {%- endif -%}
   {%- endfor -%}
 {% endmacro %}
-{% set enumName %}{{param.enumName|default:"Asset"}}{% endset %}
+{% set enumName %}{{param.enumName|default:"AssetResource"}}{% endset %}
 {% set arResourceGroupType %}{{param.arResourceGroupTypeName|default:"ARResourceGroupAsset"}}{% endset %}
 {% set colorType %}{{param.colorTypeName|default:"ColorAsset"}}{% endset %}
 {% set dataType %}{{param.dataTypeName|default:"DataAsset"}}{% endset %}

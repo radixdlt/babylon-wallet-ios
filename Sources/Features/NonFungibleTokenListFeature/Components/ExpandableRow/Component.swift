@@ -18,7 +18,7 @@ struct Component: View {
 extension Component {
 	var body: some View {
 		VStack(spacing: .medium2) {
-			Image(container.asset.iconURL ?? "")
+			Image(asset: container.asset.iconAsset)
 				.frame(height: isExpanded ? imageHeight : collapsedImageHeight)
 				.cornerRadius(.small3)
 				.onSizeChanged(ReferenceView.self) { size in
