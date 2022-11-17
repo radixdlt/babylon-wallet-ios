@@ -696,19 +696,26 @@ package.addModules([
 			profile, // Address
 			tagged,
 		],
-		resources: [
-			.process("Resources/"),
-		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
 	),
 	.core(
 		name: "DesignSystem",
-		dependencies: [],
+		dependencies: [
+			"Resources",
+		],
 		resources: [.process("Fonts")],
 		tests: .no,
 		isProduct: true
+	),
+	.core(
+		name: "Resources",
+		dependencies: [],
+		resources: [
+			.process("Resources/"),
+		],
+		tests: .no
 	),
 	.core(
 		name: "TestUtils",

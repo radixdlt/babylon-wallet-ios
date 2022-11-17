@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import DesignSystem
 import Foundation
@@ -26,7 +27,7 @@ public extension ImportMnemonic.View {
 						action: {
 							viewStore.send(.goBackButtonTapped)
 						}, label: {
-							Image("arrow-back")
+							Image(asset: Asset.arrowBack)
 						}
 					)
 					Spacer()

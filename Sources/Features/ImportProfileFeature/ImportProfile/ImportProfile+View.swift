@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import Foundation
 import ProfileClient
@@ -26,7 +27,7 @@ public extension ImportProfile.View {
 						action: {
 							viewStore.send(.goBack)
 						}, label: {
-							Image("arrow-back")
+							Image(asset: Asset.arrowBack)
 						}
 					)
 					Spacer()

@@ -94,7 +94,7 @@ private extension AccountDetails.View {
 					// TODO: temp implementation just for testing pull to refresh
 					viewStore.send(.refreshButtonTapped)
 				}, label: {
-					Image("ellipsis")
+					Image(asset: Asset.ellipsis)
 				}
 			)
 		}
