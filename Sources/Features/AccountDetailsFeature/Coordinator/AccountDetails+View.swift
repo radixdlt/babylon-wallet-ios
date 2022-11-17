@@ -113,7 +113,7 @@ private extension AccountDetails.View {
 			action: {
 				viewStore.send(.displayAccountPreferencesButtonTapped)
 			}, label: {
-				Image("ellipsis")
+				Image(asset: AssetResource.ellipsis)
 			}
 		)
 		.frame(.small)

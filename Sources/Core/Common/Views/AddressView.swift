@@ -1,5 +1,6 @@
 import DesignSystem
 import Profile
+import Resources
 import SwiftUI
 
 // MARK: - AddressView
@@ -27,7 +28,7 @@ public extension AddressView {
 			Button(
 				action: copyAddressAction,
 				label: {
-					Image("copy")
+					Image(asset: AssetResource.copy)
 						.frame(width: 28, height: 28)
 				}
 			)

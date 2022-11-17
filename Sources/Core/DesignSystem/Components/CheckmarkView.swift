@@ -1,5 +1,4 @@
-import SwiftUI
-
+import Resources
 import SwiftUI
 
 // MARK: - CheckmarkView
@@ -13,7 +12,7 @@ public struct CheckmarkView: View {
 
 public extension CheckmarkView {
 	var body: some View {
-		Image(isChecked ? "checkmark-selected" : "checkmark-unselected")
+		Image(asset: isChecked ? AssetResource.checkmarkSelected : AssetResource.checkmarkUnselected)
 			.padding(.leading, .small1)
 	}
 }

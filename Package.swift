@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
 	name: "Babylon",
+	defaultLocalization: "en",
 	platforms: [
 		.macOS(.v12), // for development purposes
 		.iOS(.v15), // `task` in SwiftUI
@@ -24,6 +25,7 @@ package.dependencies += [
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
 	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
+	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
 	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
 	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 
@@ -103,6 +105,7 @@ extension Package {
 		let dependencies: [Target.Dependency]
 		let exclude: [String]
 		let resources: [Resource]?
+		let plugins: [Target.PluginUsage]?
 		let tests: Tests
 		let isProduct: Bool
 
@@ -111,6 +114,7 @@ extension Package {
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
+			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
 			isProduct: Bool = true
 		) -> Self {
@@ -120,6 +124,7 @@ extension Package {
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
+				plugins: plugins,
 				tests: tests,
 				isProduct: isProduct
 			)
@@ -130,6 +135,7 @@ extension Package {
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
+			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
 			isProduct: Bool = false
 		) -> Self {
@@ -139,6 +145,7 @@ extension Package {
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
+				plugins: plugins,
 				tests: tests,
 				isProduct: isProduct
 			)
@@ -149,6 +156,7 @@ extension Package {
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
+			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
 			isProduct: Bool = false
 		) -> Self {
@@ -158,6 +166,7 @@ extension Package {
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
+				plugins: plugins,
 				tests: tests,
 				isProduct: isProduct
 			)
@@ -175,7 +184,14 @@ extension Package {
 		let targetPath = "Sources/\(module.category)/\(targetName)"
 
 		package.targets += [
-			.target(name: targetName, dependencies: module.dependencies, path: targetPath, exclude: module.exclude, resources: module.resources),
+			.target(
+				name: targetName,
+				dependencies: module.dependencies,
+				path: targetPath,
+				exclude: module.exclude,
+				resources: module.resources,
+				plugins: module.plugins
+			),
 		]
 
 		switch module.tests {
@@ -378,7 +394,6 @@ package.addModules([
 			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
-		resources: [.process("Resources")],
 		tests: .yes(
 			dependencies: [
 				"ProfileClient",
@@ -692,19 +707,32 @@ package.addModules([
 			engineToolkit,
 			legibleError,
 			profile, // Address
+			"Resources",
 			tagged,
 		],
-		resources: [.process("Localization/Strings")],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
 	),
 	.core(
 		name: "DesignSystem",
-		dependencies: [],
+		dependencies: [
+			"Resources",
+		],
 		resources: [.process("Fonts")],
 		tests: .no,
 		isProduct: true
+	),
+	.core(
+		name: "Resources",
+		dependencies: [],
+		resources: [
+			.process("Resources/"),
+		],
+		plugins: [
+			.plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin"),
+		],
+		tests: .no
 	),
 	.core(
 		name: "TestUtils",

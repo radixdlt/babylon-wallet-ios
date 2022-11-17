@@ -53,7 +53,7 @@ private extension IncomingConnectionRequestFromDappReview.View {
 							.textStyle(.sectionHeader)
 							.multilineTextAlignment(.center)
 
-						Image("dapp-placeholder")
+						Image(asset: AssetResource.dappPlaceholder)
 					}
 
 					Spacer(minLength: .large1)

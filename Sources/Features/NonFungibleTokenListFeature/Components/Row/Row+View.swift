@@ -39,7 +39,7 @@ public extension NonFungibleTokenList.Row.View {
 							Header(
 								name: headerNameText,
 								supply: headerSupplyText(with: viewStore),
-								imageURL: headerIconURL,
+								iconAsset: headerIconAsset,
 								isExpanded: viewStore.isExpanded
 							)
 							.zIndex(reversedZIndex(count: viewStore.containers.count, index: index))
@@ -144,9 +144,9 @@ private extension NonFungibleTokenList.Row.View {
 		 */
 	}
 
-	var headerIconURL: String? {
+	var headerIconAsset: ImageAsset {
 		// TODO: implement depending on the API design
-		"nft-logo"
+		AssetResource.nftLogo
 	}
 }
 
