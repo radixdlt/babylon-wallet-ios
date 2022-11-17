@@ -27,7 +27,7 @@ public extension ImportMnemonic.View {
 						action: {
 							viewStore.send(.goBackButtonTapped)
 						}, label: {
-							Image(asset: Asset.arrowBack)
+							Image(asset: AssetResource.arrowBack)
 						}
 					)
 					Spacer()

@@ -14,7 +14,7 @@ public extension CloseButton {
 	var body: some View {
 		Button(
 			action: action,
-			label: { Image(asset: Asset.close) }
+			label: { Image(asset: AssetResource.close) }
 		)
 	}
 }

@@ -1,3 +1,4 @@
+import Common
 import Foundation
 
 // MARK: - NonFungibleToken
@@ -10,14 +11,14 @@ public struct NonFungibleToken: Sendable, Asset, Token, Hashable {
 
 	// FIXME: this needs to be translated into something well structured.
 	public let nonFungibleDataAsString: String
-	public var iconAsset: Resources.Asset
+	public var iconAsset: ImageAsset?
 
 	public init(
 		address: ComponentAddress,
 		nonFungibleID: String,
 		isDeleted: Bool,
 		nonFungibleDataAsString: String,
-		iconAsset: Resources.Asset
+		iconAsset: ImageAsset? = nil
 	) {
 		self.address = address
 		self.nonFungibleID = nonFungibleID

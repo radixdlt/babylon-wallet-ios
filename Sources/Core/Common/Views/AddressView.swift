@@ -28,7 +28,7 @@ public extension AddressView {
 			Button(
 				action: copyAddressAction,
 				label: {
-					Image(asset: Asset.copy)
+					Image(asset: AssetResource.copy)
 						.frame(width: 28, height: 28)
 				}
 			)

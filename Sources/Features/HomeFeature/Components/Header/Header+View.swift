@@ -79,7 +79,7 @@ private struct SettingsButton: View {
 		ZStack(alignment: .topTrailing) {
 			// TODO: use swiftgen for assets
 			Button(action: action) {
-				Image(asset: Asset.homeHeaderSettings)
+				Image(asset: AssetResource.homeHeaderSettings)
 			}
 			.frame(.small)
 

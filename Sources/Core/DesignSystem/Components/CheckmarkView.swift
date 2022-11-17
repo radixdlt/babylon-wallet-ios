@@ -12,7 +12,7 @@ public struct CheckmarkView: View {
 
 public extension CheckmarkView {
 	var body: some View {
-		Image(asset: isChecked ? Asset.checkmarkSelected : Asset.checkmarkUnselected)
+		Image(asset: isChecked ? AssetResource.checkmarkSelected : AssetResource.checkmarkUnselected)
 			.padding(.leading, .small1)
 	}
 }

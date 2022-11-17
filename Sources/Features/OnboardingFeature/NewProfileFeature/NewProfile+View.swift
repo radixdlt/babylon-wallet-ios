@@ -29,7 +29,7 @@ public extension NewProfile.View {
 							action: {
 								viewStore.send(.backButtonPressed)
 							}, label: {
-								Image(asset: Asset.arrowBack)
+								Image(asset: AssetResource.arrowBack)
 							}
 						)
 						Spacer()

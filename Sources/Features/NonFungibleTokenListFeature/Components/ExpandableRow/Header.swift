@@ -5,7 +5,7 @@ import SwiftUI
 struct Header: View {
 	let name: String
 	let supply: String
-	let imageAsset: Asset
+	let imageAsset: ImageAsset
 	let isExpanded: Bool
 
 	var body: some View {

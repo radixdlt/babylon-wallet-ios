@@ -39,7 +39,7 @@ public enum AssetResource {
 // MARK: - ImageAsset
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 
-public struct ImageAsset {
+public struct ImageAsset: Hashable, Sendable {
 	public fileprivate(set) var name: String
 
 	#if os(macOS)

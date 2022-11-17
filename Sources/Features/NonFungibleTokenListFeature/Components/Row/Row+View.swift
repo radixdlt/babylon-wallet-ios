@@ -144,9 +144,9 @@ private extension NonFungibleTokenList.Row.View {
 		 */
 	}
 
-	var headerIconAsset: Resources.Asset {
+	var headerIconAsset: ImageAsset {
 		// TODO: implement depending on the API design
-		Resources.Asset.nftLogo
+		AssetResource.nftLogo
 	}
 }
 

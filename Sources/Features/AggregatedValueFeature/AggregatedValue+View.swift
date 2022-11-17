@@ -125,9 +125,9 @@ private struct VisibilityButton: View {
 	var body: some View {
 		Button(action: action) {
 			if isVisible {
-				Image(asset: Asset.homeAggregatedValueShown)
+				Image(asset: AssetResource.homeAggregatedValueShown)
 			} else {
-				Image(asset: Asset.homeAggregatedValueHidden)
+				Image(asset: AssetResource.homeAggregatedValueHidden)
 			}
 		}
 	}

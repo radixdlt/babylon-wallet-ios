@@ -14,7 +14,7 @@ public extension BackButton {
 	var body: some View {
 		Button(
 			action: action,
-			label: { Image(asset: Asset.arrowBack) }
+			label: { Image(asset: AssetResource.arrowBack) }
 		)
 		.frame(.small)
 	}

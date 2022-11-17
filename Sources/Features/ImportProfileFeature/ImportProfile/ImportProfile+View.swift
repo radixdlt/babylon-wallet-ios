@@ -27,7 +27,7 @@ public extension ImportProfile.View {
 						action: {
 							viewStore.send(.goBack)
 						}, label: {
-							Image(asset: Asset.arrowBack)
+							Image(asset: AssetResource.arrowBack)
 						}
 					)
 					Spacer()

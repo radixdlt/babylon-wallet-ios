@@ -275,7 +275,7 @@
 {% endif %}
 {% if hasImage %}
 
-{{accessModifier}} struct {{imageType}} {
+{{accessModifier}} struct {{imageType}}: Hashable, Sendable {
   {{accessModifier}} fileprivate(set) var name: String
 
   #if os(macOS)
