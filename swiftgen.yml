@@ -1,15 +1,18 @@
+input_dir: Sources/Core/Resources/Resources
+output_dir: Sources/Core/Resources/Generated
+
 strings:
-  inputs: Sources/Core/Resources/Resources/en.lproj
+  inputs: en.lproj
   outputs:
     params:
       publicAccess: true
     templateName: structured-swift5
-    output: Sources/Core/Resources/Generated/L10n.swift
+    output: L10n.generated.swift
 
 xcassets:
-  inputs: Sources/Core/Resources/Resources/Assets.xcassets
+  inputs: Assets.xcassets
   outputs:
     params:
       publicAccess: true
     templateName: swift5
-    output: Sources/Core/Resources/Generated/Assets.swift
+    output: Assets.generated.swift
