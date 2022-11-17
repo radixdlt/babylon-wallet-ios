@@ -7,18 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D519E04C292661C60015F7AA /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D519E04B292661C60015F7AA /* AppIcon.xcassets */; };
+		D519E04D292661C60015F7AA /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D519E04B292661C60015F7AA /* AppIcon.xcassets */; };
 		E667FFD328F6F7ED0015544F /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E667FFD228F6F7ED0015544F /* AppFeature */; };
 		E6805BCD286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
 		E6805BCE286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
-		E6805BD1286DB3ED00861180 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6805BBF286DB3ED00861180 /* Assets.xcassets */; };
-		E6805BD2286DB3ED00861180 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E6805BBF286DB3ED00861180 /* Assets.xcassets */; };
 		E6805BDF286DB74300861180 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E6805BDE286DB74300861180 /* AppFeature */; settings = {ATTRIBUTES = (Required, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D519E04B292661C60015F7AA /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E667FFD128F6F7E50015544F /* Babylon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Babylon; path = ..; sourceTree = "<group>"; };
 		E6805BBD286DB3EC00861180 /* WalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApp.swift; sourceTree = "<group>"; };
-		E6805BBF286DB3ED00861180 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E6805BC4286DB3ED00861180 /* BabylonWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabylonWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6805BCA286DB3ED00861180 /* BabylonWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabylonWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6805BCC286DB3ED00861180 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
@@ -64,7 +64,7 @@
 			isa = PBXGroup;
 			children = (
 				E6805BBD286DB3EC00861180 /* WalletApp.swift */,
-				E6805BBF286DB3ED00861180 /* Assets.xcassets */,
+				D519E04B292661C60015F7AA /* AppIcon.xcassets */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -188,7 +188,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E6805BD1286DB3ED00861180 /* Assets.xcassets in Resources */,
+				D519E04C292661C60015F7AA /* AppIcon.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,7 +196,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E6805BD2286DB3ED00861180 /* Assets.xcassets in Resources */,
+				D519E04D292661C60015F7AA /* AppIcon.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
