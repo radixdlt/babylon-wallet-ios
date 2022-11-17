@@ -18,16 +18,14 @@ struct Component: View {
 extension Component {
 	var body: some View {
 		VStack(spacing: .medium2) {
-			if let iconAsset = container.asset.iconAsset {
-				Image(asset: iconAsset)
-					.frame(height: isExpanded ? imageHeight : collapsedImageHeight)
-					.cornerRadius(.small3)
-					.onSizeChanged(ReferenceView.self) { size in
-						if imageHeight == nil, size.height != collapsedImageHeight {
-							imageHeight = size.height
-						}
+			AsyncImage(url: container.asset.iconURL)
+				.frame(height: isExpanded ? imageHeight : collapsedImageHeight)
+				.cornerRadius(.small3)
+				.onSizeChanged(ReferenceView.self) { size in
+					if imageHeight == nil, size.height != collapsedImageHeight {
+						imageHeight = size.height
 					}
-			}
+				}
 
 			VStack(alignment: .leading, spacing: .small2) {
 				Text(container.asset.address)
