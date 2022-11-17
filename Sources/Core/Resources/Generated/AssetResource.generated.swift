@@ -2,22 +2,23 @@
 // Generated using SwiftGen — https://github.com/SwiftGen/SwiftGen
 
 #if os(macOS)
-import AppKit
+	import AppKit
 #elseif os(iOS)
-import UIKit
+	import UIKit
 #elseif os(tvOS) || os(watchOS)
-import UIKit
+	import UIKit
 #endif
 #if canImport(SwiftUI)
-import SwiftUI
+	import SwiftUI
 #endif
 
 // Deprecated typealiases
 @available(*, deprecated, renamed: "ImageAsset.Image", message: "This typealias will be removed in SwiftGen 7.0")
 public typealias AssetImageTypeAlias = ImageAsset.Image
 
-// MARK: - AssetResource
 // swiftlint:disable superfluous_disable_command file_length implicit_return
+
+// MARK: - Asset Catalogs
 
 // swiftlint:disable identifier_name line_length nesting type_body_length type_name
 public enum AssetResource {
@@ -35,9 +36,9 @@ public enum AssetResource {
 	public static let nftLogo = ImageAsset(name: "nft-logo")
 	public static let nft = ImageAsset(name: "nft")
 }
-
-// MARK: - ImageAsset
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
+
+// MARK: - Implementation Details
 
 public struct ImageAsset: Hashable, Sendable {
 	public fileprivate(set) var name: String
@@ -54,7 +55,7 @@ public struct ImageAsset: Hashable, Sendable {
 		#if os(iOS) || os(tvOS)
 		let image = Image(named: name, in: bundle, compatibleWith: nil)
 		#elseif os(macOS)
-		let name = NSImage.Name(name)
+		let name = NSImage.Name(self.name)
 		let image = (bundle == .main) ? NSImage(named: name) : bundle.image(forResource: name)
 		#elseif os(watchOS)
 		let image = Image(named: name)
@@ -87,7 +88,7 @@ public struct ImageAsset: Hashable, Sendable {
 public extension ImageAsset.Image {
 	@available(iOS 8.0, tvOS 9.0, watchOS 2.0, *)
 	@available(macOS, deprecated,
-	           message: "This initializer is unsafe on macOS, please use the ImageAsset.image property")
+		message: "This initializer is unsafe on macOS, please use the ImageAsset.image property")
 	convenience init?(asset: ImageAsset) {
 		#if os(iOS) || os(tvOS)
 		let bundle = BundleToken.bundle
@@ -120,7 +121,6 @@ public extension SwiftUI.Image {
 }
 #endif
 
-// MARK: - BundleToken
 // swiftlint:disable convenience_type
 private final class BundleToken {
 	static let bundle: Bundle = {
@@ -131,5 +131,4 @@ private final class BundleToken {
 		#endif
 	}()
 }
-
 // swiftlint:enable convenience_type
