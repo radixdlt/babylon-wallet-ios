@@ -77,21 +77,42 @@ public extension Home.View {
 
 					IfLetStore(
 						store.scope(
-							state: \.chooseAccountRequestFromDapp,
-							action: { .child(.chooseAccountRequestFromDapp($0)) }
-						),
-						then: IncomingConnectionRequestFromDappReview.View.init(store:)
-					)
-					.zIndex(5)
+							state: \.handleRequest
+							//                            action: { Home.Action.child(.chooseAccountRequestFromDapp($0)) })
+						)
+					) {
+						SwitchStore($0) {
+							CaseLet(
+								state: /Home.State.HandleRequest.chooseAccountRequestFromDapp,
+								action: { Home.Action.child(.chooseAccountRequestFromDapp($0)) },
+								then: IncomingConnectionRequestFromDappReview.View.init(store:)
+							)
 
-					IfLetStore(
-						store.scope(
-							state: \.transactionSigning,
-							action: { .child(.transactionSigning($0)) }
-						),
-						then: TransactionSigning.View.init(store:)
-					)
-					.zIndex(6)
+							CaseLet(
+								state: /Home.State.HandleRequest.transactionSigning,
+								action: { Home.Action.child(.transactionSigning($0)) },
+								then: TransactionSigning.View.init(store:)
+							)
+						}
+					}
+
+//					IfLetStore(
+//						store.scope(
+//							state: \.chooseAccountRequestFromDapp,
+//							action: { .child(.chooseAccountRequestFromDapp($0)) }
+//						),
+//						then: IncomingConnectionRequestFromDappReview.View.init(store:)
+//					)
+//					.zIndex(5)
+//
+//					IfLetStore(
+//						store.scope(
+//							state: \.transactionSigning,
+//							action: { .child(.transactionSigning($0)) }
+//						),
+//						then: TransactionSigning.View.init(store:)
+//					)
+//					.zIndex(6)
 				}
 			}
 		}

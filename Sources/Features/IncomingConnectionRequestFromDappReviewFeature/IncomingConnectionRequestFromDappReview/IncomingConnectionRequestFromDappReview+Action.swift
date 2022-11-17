@@ -1,9 +1,9 @@
-import BrowserExtensionsConnectivityClient
 import Collections
 import ComposableArchitecture
 import Foundation
 import NonEmpty
 import Profile
+import SharedModels
 
 // MARK: - IncomingConnectionRequestFromDappReview.Action
 public extension IncomingConnectionRequestFromDappReview {
@@ -35,7 +35,7 @@ public extension IncomingConnectionRequestFromDappReview.Action {
 	enum DelegateAction: Equatable {
 		case finishedChoosingAccounts(
 			NonEmpty<OrderedSet<OnNetwork.Account>>,
-			incomingMessageFromBrowser: IncomingMessageFromBrowser
+			request: P2P.OneTimeAccountAddressesRequestToHandle
 		)
 
 		case dismiss

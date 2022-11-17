@@ -4,7 +4,6 @@ import AccountPortfolio
 import AccountPreferencesFeature
 import AggregatedValueFeature
 import AppSettings
-import BrowserExtensionsConnectivityClient
 import Collections
 import Common
 import ComposableArchitecture
@@ -12,7 +11,9 @@ import CreateAccountFeature
 import Foundation
 import IncomingConnectionRequestFromDappReviewFeature
 import NonEmpty
+import P2PConnectivityClient
 import Profile
+import SharedModels
 import TransactionSigningFeature
 
 // MARK: - Home.Action
@@ -63,21 +64,21 @@ public extension Home.Action {
 	enum SystemAction: Equatable {
 		case createAccount(numberOfExistingAccounts: Int)
 
-		case subscribeToIncomingMessagesFromDappsByBrowserConnectionIDs(OrderedSet<BrowserExtensionConnection.ID>)
+		case subscribeToRequestsFromP2PClientByID(OrderedSet<P2PClient.ID>)
 
-		case receiveRequestMessageFromDappResult(TaskResult<IncomingMessageFromBrowser>)
-		case presentViewForRequestFromBrowser(IncomingMessageFromBrowser)
+		case receiveRequestFromP2PClientResult(TaskResult<P2P.RequestFromClient>)
+		case presentViewForP2PRequest(P2P.RequestFromClient)
 
 		case accountsLoadedResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
 		case appSettingsLoadedResult(TaskResult<AppSettings>)
-		case connectionsLoadedResult(TaskResult<[BrowserExtensionWithConnectionStatus]>)
+		case connectionsLoadedResult(TaskResult<[P2P.ClientWithConnectionStatus]>)
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)
 		case accountPortfolioResult(TaskResult<AccountPortfolioDictionary>)
 		case viewDidAppearActionFailed(reason: String)
 		case toggleIsCurrencyAmountVisibleFailed(reason: String)
-		case sendResponseBackToDapp(BrowserExtensionConnection.ID, RequestMethodWalletResponse)
-		case sendResponseBackToDappResult(TaskResult<SentMessageToBrowser>)
+		case sendResponseBackToDapp(P2PClient.ID, P2P.ToDapp.Response)
+		case sendResponseBackToDappResult(TaskResult<P2P.SentResponseToClient>)
 	}
 }
 

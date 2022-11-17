@@ -28,11 +28,11 @@ public extension TransactionSigning {
 			state.isSigningTX = false
 			switch result {
 			case let .success(txid):
-				return .run { [incomingMessageFromBrowser = state.incomingMessageFromBrowser] send in
+				return .run { [requestFromClient = state.requestFromClient] send in
 					await send(.delegate(
 						.signedTXAndSubmittedToGateway(
 							txid,
-							incomingMessageFromBrowser: incomingMessageFromBrowser
+							requestFromClient: requestFromClient
 						)
 					))
 				}

@@ -4,22 +4,23 @@ import AccountPortfolio
 import AccountPreferencesFeature
 import AggregatedValueFeature
 import Asset
-import BrowserExtensionsConnectivityClient
 import Collections
 import ComposableArchitecture
 import CreateAccountFeature
 import Foundation
 import FungibleTokenListFeature
 import IncomingConnectionRequestFromDappReviewFeature
+import P2PConnectivityClient
 import PasteboardClient
 import Profile
+import SharedModels
 import TransactionSigningFeature
 
 // MARK: - Home
 public struct Home: ReducerProtocol {
 	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 	@Dependency(\.appSettingsClient) var appSettingsClient
-	@Dependency(\.browserExtensionsConnectivityClient) var browserExtensionsConnectivityClient
+	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
@@ -61,12 +62,12 @@ public struct Home: ReducerProtocol {
 		.ifLet(\.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
 			CreateAccount()
 		}
-		.ifLet(\.chooseAccountRequestFromDapp, action: /Action.child .. Action.ChildAction.chooseAccountRequestFromDapp) {
-			IncomingConnectionRequestFromDappReview()
-		}
-		.ifLet(\.transactionSigning, action: /Action.child .. Action.ChildAction.transactionSigning) {
-			TransactionSigning()
-		}
+		//        .ifLet(\.chooseAccountRequestFromDapp, action: /Action.child .. Action.ChildAction.chooseAccountRequestFromDapp) {
+		//            IncomingConnectionRequestFromDappReview()
+		//        }
+		//        .ifLet(\.transactionSigning, action: /Action.child .. Action.ChildAction.transactionSigning) {
+		//            TransactionSigning()
+		//        }
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -88,31 +89,32 @@ public struct Home: ReducerProtocol {
 		case .internal(.view(.didAppear)):
 			return loadAccountsConnectionsAndSettings()
 
-		case let .internal(.system(.subscribeToIncomingMessagesFromDappsByBrowserConnectionIDs(ids))):
+		case let .internal(.system(.subscribeToRequestsFromP2PClientByID(ids))):
 			return .run { send in
 				await withThrowingTaskGroup(of: Void.self) { taskGroup in
 					for id in ids {
 						taskGroup.addTask {
 							do {
-								let incomingMsgs = try await browserExtensionsConnectivityClient.getIncomingMessageAsyncSequence(id)
-								for try await incomingMsg in incomingMsgs {
-									await send(.internal(.system(.receiveRequestMessageFromDappResult(.success(incomingMsg)))))
+								let requests = try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(id)
+								for try await request in requests {
+									await send(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
 								}
 							} catch {
-								await send(.internal(.system(.receiveRequestMessageFromDappResult(.failure(error)))))
+								await send(.internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))))
 							}
 						}
 					}
 				}
 			}
 
-		case let .internal(.system(.receiveRequestMessageFromDappResult(.failure(error)))):
+		case let .internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))):
 			print("Failed to receive message from dApp, error: \(String(describing: error))")
 			return .none
 
-		case let .internal(.system(.receiveRequestMessageFromDappResult(.success(incomingMessageFromBrowser)))):
-			presentViewForRequestFromBrowser(state: &state, incomingRequestFromBrowser: incomingMessageFromBrowser)
-			return .none
+		case let .internal(.system(.receiveRequestFromP2PClientResult(.success(requestFromP2P)))):
+			//            presentViewForP2PRequest(state: &state, incomingRequestFromBrowser: requestFromP2P)
+			//            return .none
+			fatalError()
 
 		case let .internal(.system(.connectionsLoadedResult(.failure(error)))):
 			print("Failed to load connections, error: \(String(describing: error))")
@@ -121,7 +123,7 @@ public struct Home: ReducerProtocol {
 		case let .internal(.system(.connectionsLoadedResult(.success(connections)))):
 			let ids = OrderedSet(connections.map(\.id))
 			return .run { send in
-				await send(.internal(.system(.subscribeToIncomingMessagesFromDappsByBrowserConnectionIDs(ids))))
+				await send(.internal(.system(.subscribeToRequestsFromP2PClientByID(ids))))
 			}
 
 		case let .internal(.system(.accountsLoadedResult(.failure(error)))):
@@ -303,48 +305,52 @@ public struct Home: ReducerProtocol {
 			print("Failed to create account: \(reason)")
 			return .none
 
-		case let .internal(.system(.presentViewForRequestFromBrowser(incomingRequestFromBrowser))):
-			presentViewForRequestFromBrowser(state: &state, incomingRequestFromBrowser: incomingRequestFromBrowser)
-			return .none
+		case let .internal(.system(.presentViewForP2PRequest(incomingRequestFromBrowser))):
+			//            presentViewForP2PRequest(state: &state, incomingRequestFromBrowser: incomingRequestFromBrowser)
+			//            return .none
+			fatalError()
 
 		case .child(.chooseAccountRequestFromDapp(.delegate(.dismiss))):
-			state.chooseAccountRequestFromDapp = nil
-			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
+			//            state.chooseAccountRequestFromDapp = nil
+			//            return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
+			fatalError()
 
 		case let .child(.chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, incomingMessageFromBrowser)))):
-			state.chooseAccountRequestFromDapp = nil
-			let accountAddresses: [RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse.AccountAddress] = selectedAccounts.map {
-				.init(address: $0.address.address, label: $0.displayName ?? "AccountIndex: \($0.index)")
-			}
-			let response = RequestMethodWalletResponse(
-				method: .request,
-				requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
-				payload: [
-					.accountAddresses(
-						.init(
-							addresses: accountAddresses
-						)
-					),
-				]
-			)
-			return .run { send in
-				await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
-			}
+			//            state.chooseAccountRequestFromDapp = nil
+			//            let accountAddresses: [RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse.AccountAddress] = selectedAccounts.map {
+			//                .init(address: $0.address.address, label: $0.displayName ?? "AccountIndex: \($0.index)")
+			//            }
+			//            let response = RequestMethodWalletResponse(
+			//                method: .request,
+			//                requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
+			//                payload: [
+			//                    .accountAddresses(
+			//                        .init(
+			//                            addresses: accountAddresses
+			//                        )
+			//                    ),
+			//                ]
+			//            )
+			//            return .run { send in
+			//                await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
+			//            }
+			fatalError()
 
 		case let .internal(.system(.sendResponseBackToDapp(browserConnectionID, response))):
-			return .run { send in
-				await send(.internal(.system(.sendResponseBackToDappResult(
-					TaskResult {
-						let outgoingMessage = MessageToDappRequest(
-							browserExtensionConnectionID: browserConnectionID,
-							requestMethodWalletResponse: response
-						)
-
-						return try await browserExtensionsConnectivityClient
-							.sendMessage(outgoingMessage)
-					}
-				))))
-			}
+			//            return .run { send in
+			//                await send(.internal(.system(.sendResponseBackToDappResult(
+			//                    TaskResult {
+			//                        let outgoingMessage = MessageToDappRequest(
+			//                            browserExtensionConnectionID: browserConnectionID,
+			//                            requestMethodWalletResponse: response
+			//                        )
+//
+			//                        return try await p2pConnectivityClient
+			//                            .sendMessage(outgoingMessage)
+			//                    }
+			//                ))))
+			//            }
+			fatalError()
 
 		case .internal(.system(.sendResponseBackToDappResult(.success(_)))):
 			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
@@ -354,21 +360,23 @@ public struct Home: ReducerProtocol {
 			return .none
 
 		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, incomingMessageFromBrowser)))):
-			state.transactionSigning = nil
-			let response = RequestMethodWalletResponse(
-				method: .request,
-				requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
-				payload: [
-					.signTXRequest(.init(transactionIntentHash: txID)),
-				]
-			)
-			return .run { send in
-				await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
-			}
+			//            state.transactionSigning = nil
+			//            let response = RequestMethodWalletResponse(
+			//                method: .request,
+			//                requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
+			//                payload: [
+			//                    .signTXRequest(.init(transactionIntentHash: txID)),
+			//                ]
+			//            )
+			//            return .run { send in
+			//                await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
+			//            }
+			fatalError()
 
 		case .child(.transactionSigning(.delegate(.dismissView))):
-			state.transactionSigning = nil
-			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
+			//            state.transactionSigning = nil
+			//            return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
+			fatalError()
 
 		case .child, .delegate:
 			return .none
@@ -398,7 +406,7 @@ public struct Home: ReducerProtocol {
 			))))
 			await send(.internal(.system(.connectionsLoadedResult(
 				TaskResult {
-					try await browserExtensionsConnectivityClient.getBrowserExtensionConnections()
+					try await p2pConnectivityClient.getP2PClients()
 				}
 			))))
 		}
@@ -412,42 +420,56 @@ public struct Home: ReducerProtocol {
 	}
 
 	func presentViewForNextBufferedRequestFromBrowserIfNeeded(state: inout State) -> EffectTask<Action> {
-		guard let next = state.unhandledReceivedMessages.first else {
-			return .none
-		}
-		state.unhandledReceivedMessages.removeFirst()
-
-		return .run { send in
-			try await mainQueue.sleep(for: .seconds(1))
-			await send(.internal(.system(.presentViewForRequestFromBrowser(next))))
-		}
+		//        guard let next = state.unfinishedRequestFromClient. else {
+		//            return .none
+		//        }
+		//        state.unhandledRequestsFromP2PClients.removeFirst()
+//
+		//        return .run { send in
+		//            try await mainQueue.sleep(for: .seconds(1))
+		//            await send(.internal(.system(.presentViewForP2PRequest(next))))
+		//        }
+		fatalError()
 	}
 
-	func presentViewForRequestFromBrowser(state: inout State, incomingRequestFromBrowser: IncomingMessageFromBrowser) {
-		switch incomingRequestFromBrowser.payload {
-		case let .accountAddresses(accountAddressRequest):
-			if state.chooseAccountRequestFromDapp == nil {
-				state.chooseAccountRequestFromDapp = IncomingConnectionRequestFromDappReview.State(
-					incomingMessageFromBrowser: incomingRequestFromBrowser,
-					incomingConnectionRequestFromDapp: .init(addressRequest: accountAddressRequest, from: incomingRequestFromBrowser.requestMethodWalletRequest)
-				)
-			} else {
-				// Buffer
-				state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
-			}
-		case let .signTXRequest(signTXRequest):
-			if state.transactionSigning == nil {
-				// if `state.chooseAccountRequestFromDapp` is non nil, this will present SignTX view
-				// on top of chooseAccountsView...
-				state.transactionSigning = .init(
-					incomingMessageFromBrowser: incomingRequestFromBrowser,
-					addressOfSigner: signTXRequest.accountAddress,
-					transactionManifest: signTXRequest.transactionManifest
-				)
-			} else {
-				// Buffer
-				state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
-			}
-		}
+	func presentViewForP2PRequest(state: inout State, requestFromP2P: P2P.RequestFromClient) {
+		//        for item in requestFromP2P.requestFromDapp.items {
+		//            switch item {
+		//            case let .oneTimeAccountAddresses(oneTimeAccountAddressesRequest):
+		//                if state.chooseAccountRequestFromDapp == nil {
+		//                    state.chooseAccountRequestFromDapp = .init(
+		//                        requestFromDapp: requestFromP2P.requestFromDapp,
+		//                        oneTimeAccountAddressesRequest: oneTimeAccountAddressesRequest
+		//                    )
+		//                } else {
+		//                    // Queue
+		//                    state.unfinishedRequestsFromClient.queue(requestFromClient: requestFromP2P)
+		//                }
+		//            case let .signTransaction(signTXRequest):
+		//                if state.transactionSigning == nil {
+		//                    // if `state.chooseAccountRequestFromDapp` is non nil, this will present SignTX view
+		//                    // on top of chooseAccountsView...
+		//                    state.transactionSigning = .init(
+		//                        requestFromClient: requestFromP2P,
+		//                        addressOfSigner: signTXRequest.accountAddress,
+		//                        transactionManifest: signTXRequest.transactionManifest
+		//                    )
+		//                } else {
+		//                    // Buffer
+		//                    state.unhandledRequestsFromP2PClients.append(requestFromP2P)
+		//                }
+		//            }
+		//        }
+
+		//        // Queue this new request...
+		//        state.unfinishedRequestsFromClient.queue(requestFromClient: requestFromP2P)
+//
+		//        guard state.handleRequest == nil else {
+		//            // We are currently already handling a request, so do nothing.
+		//            return
+		//        }
+		//        // ... handle first requestItem of request since we
+		//        state.unfinishedRequestsFromClient.
+		fatalError()
 	}
 }

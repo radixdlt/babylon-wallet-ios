@@ -1,19 +1,22 @@
 import ComposableArchitecture
 import Foundation
+import SharedModels
 
 // MARK: - ChooseAccounts.State
 public extension ChooseAccounts {
 	struct State: Equatable {
-		public let incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp
+		public let request: P2P.OneTimeAccountAddressesRequestToHandle
+
 		public var canProceed: Bool
 		public var accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
 
 		public init(
-			incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp,
+			request: P2P.OneTimeAccountAddressesRequestToHandle,
 			canProceed: Bool = false,
 			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
 		) {
-			self.incomingConnectionRequestFromDapp = incomingConnectionRequestFromDapp
+			self.request = request
+
 			self.canProceed = canProceed
 			self.accounts = accounts
 		}
@@ -30,7 +33,7 @@ extension ChooseAccounts.State {
 #if DEBUG
 public extension ChooseAccounts.State {
 	static let placeholder: Self = .init(
-		incomingConnectionRequestFromDapp: .placeholder,
+		request: .init(requestItem: .placeholder, parentRequest: .placeholder),
 		canProceed: false,
 		accounts: .init(
 			uniqueElements: [

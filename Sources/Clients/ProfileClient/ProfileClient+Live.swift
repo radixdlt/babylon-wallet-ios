@@ -82,19 +82,19 @@ extension ProfileClient: DependencyKey {
 					profile.primaryNet.accounts
 				}
 			},
-			getBrowserExtensionConnections: {
+			getP2PClients: {
 				try profileHolder.get { profile in
-					profile.appPreferences.browserExtensionConnections
+					profile.appPreferences.p2pClients
 				}
 			},
-			addBrowserExtensionConnection: { newConnection in
+			addP2PClient: { newConnection in
 				try await profileHolder.asyncMutating { profile in
-					_ = profile.appPreferences.browserExtensionConnections.connections.append(newConnection)
+					_ = profile.appPreferences.p2pClients.connections.append(newConnection)
 				}
 			},
-			deleteBrowserExtensionConnection: { idOfConnectionToDelete in
+			deleteP2PClientByID: { id in
 				try await profileHolder.asyncMutating { profile in
-					profile.appPreferences.browserExtensionConnections.connections.removeAll(where: { $0.id == idOfConnectionToDelete })
+					profile.appPreferences.p2pClients.connections.removeAll(where: { $0.id == id })
 				}
 			},
 			getAppPreferences: getAppPreferences,

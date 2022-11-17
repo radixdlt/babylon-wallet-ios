@@ -1,6 +1,7 @@
 import Common
 import ComposableArchitecture
 import DesignSystem
+import SharedModels
 import SwiftUI
 
 // MARK: - ChooseAccounts.View
@@ -33,10 +34,10 @@ public extension ChooseAccounts.View {
 							Spacer(minLength: 40)
 
 							VStack(spacing: 20) {
-								Text("Choose \(String(describing: viewStore.incomingConnectionRequestFromDapp.numberOfNeededAccounts))")
+								Text("Choose \(String(describing: viewStore.oneTimeAccountAddressesRequest.numberOfAddresses))")
 									.textStyle(.secondaryHeader)
 
-								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.incomingConnectionRequestFromDapp.displayName))
+								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.requestFromDapp.metadata.origin))
 									.foregroundColor(.app.gray2)
 									.textStyle(.body1Regular)
 									.padding(24)
@@ -77,18 +78,19 @@ public extension ChooseAccounts.View {
 	}
 }
 
-// MARK: - IncomingConnectionRequestFromDapp.NumberOfNeededAccounts + CustomStringConvertible
-extension IncomingConnectionRequestFromDapp.NumberOfNeededAccounts: CustomStringConvertible {
+// MARK: - P2P.FromDapp.OneTimeAccountAddressesRequest.Mode + CustomStringConvertible
+extension P2P.FromDapp.OneTimeAccountAddressesRequest.Mode: CustomStringConvertible {
 	public var description: String {
 		switch self {
-		case let .exactly(numberOfAccounts):
+		case let .exactly(exactly):
+			let numberOfAccounts = exactly.oneOrMore
 			if numberOfAccounts == 1 {
 				return "exactly one account."
 
 			} else {
 				return "exactly #\(numberOfAccounts) accounts."
 			}
-		case .atLeastOne:
+		case .oneOrMore:
 			return "at least one account"
 		}
 	}
@@ -114,11 +116,14 @@ private extension ChooseAccounts.View {
 extension ChooseAccounts.View {
 	struct ViewState: Equatable {
 		var canProceed: Bool
-		let incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp
+		let oneTimeAccountAddressesRequest: P2P.FromDapp.OneTimeAccountAddressesRequest
+		let requestFromDapp: P2P.FromDapp.Request
 
 		init(state: ChooseAccounts.State) {
 			canProceed = state.canProceed
-			incomingConnectionRequestFromDapp = state.incomingConnectionRequestFromDapp
+			// FIXME: remove Force Unwrap
+			oneTimeAccountAddressesRequest = state.request.requestItem
+			requestFromDapp = state.request.parentRequest.requestFromDapp
 		}
 	}
 }

@@ -1,8 +1,8 @@
-import BrowserExtensionsConnectivityClient
 import ComposableArchitecture
 import EngineToolkit
 import Foundation
 import ProfileClient
+import SharedModels
 
 // MARK: - TransactionSigning.Action
 public extension TransactionSigning {
@@ -37,7 +37,7 @@ public extension TransactionSigning.Action {
 
 		case signedTXAndSubmittedToGateway(
 			TransactionIntent.TXID,
-			incomingMessageFromBrowser: IncomingMessageFromBrowser
+			requestFromClient: P2P.RequestFromClient
 		)
 	}
 }

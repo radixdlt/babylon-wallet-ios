@@ -5,7 +5,7 @@ import NonEmpty
 import ProfileClient
 import TestUtils
 
-import BrowserExtensionsConnectivityClient
+import P2PConnectivityClient
 
 extension IncomingMessageFromBrowser {
 	static var placeholderAccountReq: Self {

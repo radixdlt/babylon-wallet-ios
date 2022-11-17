@@ -3,13 +3,14 @@ import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
 import AggregatedValueFeature
-import BrowserExtensionsConnectivityClient
 import CreateAccountFeature
 import EngineToolkit
 import IdentifiedCollections
 import IncomingConnectionRequestFromDappReviewFeature
+import P2PConnectivityClient
 import Profile
 import ProfileClient
+import SharedModels
 import TransactionSigningFeature
 
 // MARK: - Home.State
@@ -30,9 +31,8 @@ public extension Home {
 		public var createAccount: CreateAccount.State?
 		public var transfer: AccountDetails.Transfer.State?
 
-		public var unhandledReceivedMessages: IdentifiedArrayOf<IncomingMessageFromBrowser>
-		public var chooseAccountRequestFromDapp: IncomingConnectionRequestFromDappReview.State?
-		public var transactionSigning: TransactionSigning.State?
+		public var unfinishedRequestsFromClient: P2P.UnfinishedRequestsFromClient
+		public var handleRequest: HandleRequest?
 
 		public init(
 			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
@@ -43,9 +43,8 @@ public extension Home {
 			accountDetails: AccountDetails.State? = nil,
 			accountPreferences: AccountPreferences.State? = nil,
 			createAccount: CreateAccount.State? = nil,
-			unhandledReceivedMessages: IdentifiedArrayOf<IncomingMessageFromBrowser> = .init(),
-			chooseAccountRequestFromDapp: IncomingConnectionRequestFromDappReview.State? = nil,
-			transactionSigning: TransactionSigning.State? = nil,
+			unfinishedRequestsFromClient: P2P.UnfinishedRequestsFromClient = .init(),
+			handleRequest: HandleRequest? = nil,
 			transfer: AccountDetails.Transfer.State? = nil
 		) {
 			self.accountPortfolioDictionary = accountPortfolioDictionary
@@ -56,11 +55,18 @@ public extension Home {
 			self.accountDetails = accountDetails
 			self.accountPreferences = accountPreferences
 			self.createAccount = createAccount
-			self.unhandledReceivedMessages = unhandledReceivedMessages
-			self.chooseAccountRequestFromDapp = chooseAccountRequestFromDapp
-			self.transactionSigning = transactionSigning
+			self.unfinishedRequestsFromClient = unfinishedRequestsFromClient
+			self.handleRequest = handleRequest
 			self.transfer = transfer
 		}
+	}
+}
+
+// MARK: - Home.State.HandleRequest
+public extension Home.State {
+	enum HandleRequest: Equatable {
+		case transactionSigning(TransactionSigning.State)
+		case chooseAccountRequestFromDapp(IncomingConnectionRequestFromDappReview.State)
 	}
 }
 

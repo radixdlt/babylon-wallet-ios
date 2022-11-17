@@ -39,9 +39,9 @@ public struct ProfileClient {
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
 	public var getAccounts: GetAccounts
-	public var getBrowserExtensionConnections: GetBrowserExtensionConnections
-	public var addBrowserExtensionConnection: AddBrowserExtensionConnection
-	public var deleteBrowserExtensionConnection: DeleteBrowserExtensionConnection
+	public var getP2PClients: GetP2PClients
+	public var addP2PClient: AddP2PClient
+	public var deleteP2PClientByID: DeleteP2PClientByID
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
 	public var createOnLedgerAccount: CreateOnLedgerAccount
@@ -65,9 +65,9 @@ public extension ProfileClient {
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 	typealias ExtractProfileSnapshot = @Sendable () throws -> ProfileSnapshot
 	typealias GetAccounts = @Sendable () throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
-	typealias GetBrowserExtensionConnections = @Sendable () throws -> BrowserExtensionConnections
-	typealias AddBrowserExtensionConnection = @Sendable (BrowserExtensionConnection) async throws -> Void
-	typealias DeleteBrowserExtensionConnection = @Sendable (BrowserExtensionConnection.ID) async throws -> Void
+	typealias GetP2PClients = @Sendable () throws -> P2PClients
+	typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
+	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
 	typealias CreateOnLedgerAccount = @Sendable (CreateAccountRequest, MakeAccountNonVirtual) async throws -> OnNetwork.Account

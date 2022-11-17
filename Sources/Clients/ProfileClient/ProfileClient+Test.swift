@@ -36,9 +36,9 @@ extension ProfileClient: TestDependencyKey {
 			let accounts: [OnNetwork.Account] = [.mocked0, .mocked1]
 			return NonEmpty(rawValue: OrderedSet(accounts))!
 		},
-		getBrowserExtensionConnections: { fatalError() },
-		addBrowserExtensionConnection: { _ in fatalError() },
-		deleteBrowserExtensionConnection: { _ in fatalError() },
+		getP2PClients: { fatalError() },
+		addP2PClient: { _ in fatalError() },
+		deleteP2PClientByID: { _ in fatalError() },
 		getAppPreferences: {
 			fatalError()
 		},
@@ -69,9 +69,9 @@ extension ProfileClient: TestDependencyKey {
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
 		getAccounts: unimplemented("\(Self.self).getAccounts"),
-		getBrowserExtensionConnections: unimplemented("\(Self.self).getBrowserExtensionConnections"),
-		addBrowserExtensionConnection: unimplemented("\(Self.self).addBrowserExtensionConnection"),
-		deleteBrowserExtensionConnection: unimplemented("\(Self.self).deleteBrowserExtensionConnection"),
+		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
+		addP2PClient: unimplemented("\(Self.self).addP2PClient"),
+		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
 		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
 		createOnLedgerAccount: { _, _ in throw UnimplementedError(description: "\(Self.self).createOnLedgerAccount is unimplemented") },

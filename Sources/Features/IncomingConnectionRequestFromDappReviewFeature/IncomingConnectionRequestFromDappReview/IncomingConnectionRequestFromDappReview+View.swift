@@ -1,6 +1,7 @@
 import Common
 import ComposableArchitecture
 import DesignSystem
+import SharedModels
 import SwiftUI
 
 // MARK: - IncomingConnectionRequestFromDappReview.View
@@ -59,7 +60,7 @@ private extension IncomingConnectionRequestFromDappReview.View {
 					Spacer(minLength: 40)
 
 					VStack(spacing: 20) {
-						Text(L10n.DApp.ConnectionRequest.wantsToConnect(viewStore.incomingConnectionRequestFromDapp.displayName))
+						Text(L10n.DApp.ConnectionRequest.wantsToConnect(viewStore.requestFromDapp.metadata.origin))
 							.textStyle(.secondaryHeader)
 
 						Text(L10n.DApp.ConnectionRequest.subtitle)
@@ -69,9 +70,6 @@ private extension IncomingConnectionRequestFromDappReview.View {
 					.multilineTextAlignment(.center)
 
 					Spacer(minLength: 60)
-
-					PermissionsView(permissions: viewStore.incomingConnectionRequestFromDapp.permissions)
-						.padding(.horizontal, 24)
 
 					Spacer()
 
@@ -105,27 +103,26 @@ private extension IncomingConnectionRequestFromDappReview.View {
 // MARK: - IncomingConnectionRequestFromDappReview.View.ViewState
 extension IncomingConnectionRequestFromDappReview.View {
 	struct ViewState: Equatable {
-		let incomingConnectionRequestFromDapp: IncomingConnectionRequestFromDapp
-
+		var requestFromDapp: P2P.FromDapp.Request
 		init(state: IncomingConnectionRequestFromDappReview.State) {
-			incomingConnectionRequestFromDapp = state.incomingConnectionRequestFromDapp
+			requestFromDapp = state.request.parentRequest.requestFromDapp
 		}
 	}
 }
 
-#if DEBUG
-
-// MARK: - IncomingConnectionRequestFromDappReview_Preview
-struct IncomingConnectionRequestFromDappReview_Preview: PreviewProvider {
-	static var previews: some View {
-		registerFonts()
-
-		return IncomingConnectionRequestFromDappReview.View(
-			store: .init(
-				initialState: .placeholder,
-				reducer: IncomingConnectionRequestFromDappReview()
-			)
-		)
-	}
-}
-#endif // DEBUG
+// #if DEBUG
+//
+//// MARK: - IncomingConnectionRequestFromDappReview_Preview
+// struct IncomingConnectionRequestFromDappReview_Preview: PreviewProvider {
+//	static var previews: some View {
+//		registerFonts()
+//
+//		return IncomingConnectionRequestFromDappReview.View(
+//			store: .init(
+//				initialState: .placeholder,
+//				reducer: IncomingConnectionRequestFromDappReview()
+//			)
+//		)
+//	}
+// }
+// #endif // DEBUG

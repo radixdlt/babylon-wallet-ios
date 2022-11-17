@@ -18,7 +18,9 @@ package.dependencies += [
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.19"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.31"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.32"),
+
+	.package(url: "https://github.com/apple/swift-collections", from: "1.0.3"),
 
 	// BigInt
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
@@ -26,12 +28,23 @@ package.dependencies += [
 	// TCA - ComposableArchitecture used as architecture
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
 	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
+	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
 
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
 
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 ]
+
+let collections: Target.Dependency = .product(
+	name: "Collections",
+	package: "swift-collections"
+)
+
+let nonEmpty: Target.Dependency = .product(
+	name: "NonEmpty",
+	package: "swift-nonempty"
+)
 
 let tca: Target.Dependency = .product(
 	name: "ComposableArchitecture",
@@ -314,13 +327,14 @@ package.addModules([
 			"AccountPortfolio",
 			"AccountPreferencesFeature",
 			"AppSettings",
-			"BrowserExtensionsConnectivityClient",
+			"P2PConnectivityClient",
 			"Common",
 			"CreateAccountFeature",
 			engineToolkit,
 			"IncomingConnectionRequestFromDappReviewFeature",
 			"PasteboardClient",
 			"ProfileClient",
+			"SharedModels",
 			tca,
 			"TransactionSigningFeature",
 			// ^^^ Sort lexicographically ^^^
@@ -353,10 +367,11 @@ package.addModules([
 		name: "IncomingConnectionRequestFromDappReviewFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
-			"BrowserExtensionsConnectivityClient",
+			"P2PConnectivityClient",
 			"Common",
 			"DesignSystem",
 			"ProfileClient",
+			"SharedModels",
 			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
@@ -387,18 +402,18 @@ package.addModules([
 		)
 	),
 	.feature(
-		name: "ManageBrowserExtensionConnectionsFeature",
+		name: "ManageP2PClientsFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
-			"BrowserExtensionsConnectivityClient",
 			"Common",
 			.product(name: "ConnectUsingPasswordFeature", package: "Converse"),
 			converse,
 			dependencies,
 			"DesignSystem",
 			.product(name: "InputPasswordFeature", package: "Converse"),
-			"IncomingConnectionRequestFromDappReviewFeature", // FIXME: extract to Home! just here for test..
+			"P2PConnectivityClient",
 			"ProfileClient",
+			"SharedModels",
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -461,7 +476,7 @@ package.addModules([
 			profile,
 			"GatewayAPI",
 			"KeychainClientDependency",
-			"ManageBrowserExtensionConnectionsFeature",
+			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"ProfileClient",
 			.product(name: "ProfileView", package: "swift-profile"),
@@ -490,11 +505,11 @@ package.addModules([
 		name: "TransactionSigningFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
-			"BrowserExtensionsConnectivityClient", // Actually only models needed...
 			"Common",
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"ProfileClient",
+			"SharedModels",
 			tca,
 			"TransactionClient",
 			// ^^^ Sort lexicographically ^^^
@@ -550,7 +565,7 @@ package.addModules([
 		)
 	),
 	.client(
-		name: "BrowserExtensionsConnectivityClient",
+		name: "P2PConnectivityClient",
 		dependencies: [
 			.product(name: "AsyncExtensions", package: "AsyncExtensions"),
 			"Common",
@@ -560,6 +575,7 @@ package.addModules([
 			"JSON",
 			profile, // Account
 			"ProfileClient",
+			"SharedModels",
 		],
 		tests: .yes(dependencies: [
 			"TestUtils",
@@ -702,6 +718,19 @@ package.addModules([
 			tagged,
 		],
 		resources: [.process("Localization/Strings")],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.core(
+		name: "SharedModels",
+		dependencies: [
+			engineToolkit,
+			profile,
+			collections,
+			converse, // FIXME: In `Converse` split out Models package
+			nonEmpty,
+		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
