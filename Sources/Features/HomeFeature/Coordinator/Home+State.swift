@@ -64,6 +64,42 @@ public extension Home {
 
 // MARK: - Home.State.HandleRequest
 public extension Home.State {
+	var chooseAccountRequestFromDapp: IncomingConnectionRequestFromDappReview.State? {
+		get {
+			guard let handleRequest else { return nil }
+			switch handleRequest {
+			case let .chooseAccountRequestFromDapp(state):
+				return state
+			default: return nil
+			}
+		}
+		set {
+			if let newValue {
+				handleRequest = .chooseAccountRequestFromDapp(newValue)
+			} else {
+				handleRequest = nil
+			}
+		}
+	}
+
+	var transactionSigning: TransactionSigning.State? {
+		get {
+			guard let handleRequest else { return nil }
+			switch handleRequest {
+			case let .transactionSigning(state):
+				return state
+			default: return nil
+			}
+		}
+		set {
+			if let newValue {
+				handleRequest = .transactionSigning(newValue)
+			} else {
+				handleRequest = nil
+			}
+		}
+	}
+
 	enum HandleRequest: Equatable {
 		case transactionSigning(TransactionSigning.State)
 		case chooseAccountRequestFromDapp(IncomingConnectionRequestFromDappReview.State)

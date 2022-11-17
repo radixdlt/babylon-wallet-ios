@@ -16,9 +16,9 @@ public extension P2P.ToDapp {
 	/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
 	///
 	struct OngoingAccountAddressesResponse: Sendable, Hashable, Encodable {
-		public let accountAddresses: NonEmpty<[WalletAccount]>
+		public let accountAddresses: [WalletAccount]
 		public init(accountAddresses: NonEmpty<[WalletAccount]>) {
-			self.accountAddresses = accountAddresses
+			self.accountAddresses = accountAddresses.rawValue
 		}
 	}
 }

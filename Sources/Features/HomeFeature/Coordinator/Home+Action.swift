@@ -39,13 +39,6 @@ public extension Home.Action {
 		case transfer(AccountDetails.Transfer.Action)
 		case createAccount(CreateAccount.Action)
 
-		case handleRequest(HandleRequestAction)
-	}
-}
-
-// MARK: - Home.Action.ChildAction.HandleRequestAction
-public extension Home.Action.ChildAction {
-	enum HandleRequestAction: Equatable {
 		case chooseAccountRequestFromDapp(IncomingConnectionRequestFromDappReview.Action)
 		case transactionSigning(TransactionSigning.Action)
 	}

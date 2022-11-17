@@ -69,7 +69,7 @@ public extension P2P.FromDapp.Request {
 	}
 
 	init(from decoder: Decoder) throws {
-		var container = try decoder.container(keyedBy: CodingKeys.self)
+		let container = try decoder.container(keyedBy: CodingKeys.self)
 		try self.init(
 			id: container.decode(ID.self, forKey: .id),
 			metadata: container.decode(Metadata.self, forKey: .metadata),
@@ -81,7 +81,7 @@ public extension P2P.FromDapp.Request {
 #if DEBUG
 public extension P2P.FromDapp.OneTimeAccountAddressesRequest {
 	static let placeholder: Self = .init(
-		proofOfOwnership: false,
+		isRequiringOwnershipProof: false,
 		numberOfAddresses: .oneOrMore
 	)
 }

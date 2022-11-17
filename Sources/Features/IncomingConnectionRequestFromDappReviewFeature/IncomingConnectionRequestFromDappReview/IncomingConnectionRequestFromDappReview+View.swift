@@ -60,7 +60,7 @@ private extension IncomingConnectionRequestFromDappReview.View {
 					Spacer(minLength: 40)
 
 					VStack(spacing: 20) {
-						Text(L10n.DApp.ConnectionRequest.wantsToConnect(viewStore.requestFromDapp.metadata.origin))
+						Text(L10n.DApp.ConnectionRequest.wantsToConnect(viewStore.requestFromDapp.metadata.dAppId))
 							.textStyle(.secondaryHeader)
 
 						Text(L10n.DApp.ConnectionRequest.subtitle)

@@ -98,12 +98,12 @@ public extension P2P.UnfinishedRequestsFromClient {
 		guard let nextUnfinished = queued.first else {
 			return nil
 		}
+		current = nextUnfinished
 		guard let requestItem = nextUnfinished.unfinishedRequestItems.first else {
 			assertionFailure("What? Do we need to handle requests with no request items? Or bad logic inside `UnfinishedRequestFromClient` type!")
 			return nil
 		}
 		queued.removeAll(where: { $0.id == nextUnfinished.id })
-
 		return .init(
 			requestItem: requestItem,
 			parentRequest: nextUnfinished.requestFromClient

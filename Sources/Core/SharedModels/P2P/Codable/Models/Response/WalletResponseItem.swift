@@ -58,12 +58,11 @@ public extension P2P.ToDapp.WalletResponseItem {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(discriminator, forKey: .disciminator)
-		var singleValueContainer = encoder.singleValueContainer()
 		switch self {
 		case let .ongoingAccountAddresses(response):
-			try singleValueContainer.encode(response)
+			try response.encode(to: encoder)
 		case let .signTransaction(response):
-			try singleValueContainer.encode(response)
+			try response.encode(to: encoder)
 		}
 	}
 }

@@ -35,11 +35,10 @@ final class AppFeatureTests: TestCase {
 			initialState: .onboarding(Onboarding.State(newProfile: .init())),
 			reducer: App()
 		)
-		let newProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
+		let newProfile = try await Profile.new(networkAndGateway: .primary, mnemonic: .generate())
 		let expectation = expectation(description: "Profile injected")
-		store.dependencies.profileClient.injectProfile = { injected, mode in
+		store.dependencies.profileClient.injectProfile = { injected in
 			XCTAssertEqual(injected, newProfile)
-			XCTAssert(mode == .injectAndPersistInKeychain)
 			expectation.fulfill()
 		}
 
@@ -47,7 +46,7 @@ final class AppFeatureTests: TestCase {
 		_ = await store.send(.child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))))
 
 		// then
-		_ = await store.receive(.child(.onboarding(.delegate(.onboardedWithProfile(newProfile, isNew: true)))))
+		_ = await store.receive(.child(.onboarding(.delegate(.onboardedWithProfile(newProfile)))))
 		_ = await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile))))) {
 			$0 = .main(.init())
 		}
@@ -57,7 +56,7 @@ final class AppFeatureTests: TestCase {
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		// GIVEN: an existing profile
-		let existingProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
+		let existingProfile = try await Profile.new(networkAndGateway: .primary, mnemonic: .generate())
 
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(
@@ -66,9 +65,8 @@ final class AppFeatureTests: TestCase {
 		)
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 		let expectation = expectation(description: "Profile injected")
-		store.dependencies.profileClient.injectProfile = { injected, mode in
+		store.dependencies.profileClient.injectProfile = { injected in
 			XCTAssertEqual(injected, existingProfile)
-			XCTAssert(mode == .onlyInject)
 			expectation.fulfill()
 		}
 

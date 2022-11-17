@@ -37,7 +37,7 @@ public extension ChooseAccounts.View {
 								Text("Choose \(String(describing: viewStore.oneTimeAccountAddressesRequest.numberOfAddresses))")
 									.textStyle(.secondaryHeader)
 
-								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.requestFromDapp.metadata.origin))
+								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.requestFromDapp.metadata.dAppId))
 									.foregroundColor(.app.gray2)
 									.textStyle(.body1Regular)
 									.padding(24)

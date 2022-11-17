@@ -19,7 +19,7 @@ public extension P2P.ToDapp {
 
 		public let items: [WalletResponseItem]
 
-		private init(
+		internal init(
 			id: P2P.FromDapp.Request.ID,
 			items: [WalletResponseItem]
 		) {
@@ -52,5 +52,6 @@ public extension P2P.ToDapp.Response {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(items, forKey: .items)
+		try container.encode(id, forKey: .id)
 	}
 }

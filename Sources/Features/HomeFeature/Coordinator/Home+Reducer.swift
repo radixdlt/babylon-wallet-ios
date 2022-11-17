@@ -62,28 +62,12 @@ public struct Home: ReducerProtocol {
 		.ifLet(\.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
 			CreateAccount()
 		}
-		//        .ifLet(\.handleRequest, action: /Action.child .. Action.ChildAction.handleRequest) {
-		//            EmptyReducer()
-		//                .ifCaseLet(
-		//                    /Home.State.HandleRequest.chooseAccountRequestFromDapp,
-		//                     action: /Action.child .. Action.ChildAction.HandleRequest.chooseAccountRequestFromDapp
-		//                ) {
-		//                    IncomingConnectionRequestFromDappReview()
-		//                }
-		////                .ifCaseLet(
-		////                    /Home.State.HandleRequest.transactionSigning,
-		////                     action: /Action.child .. Action.ChildAction.handleRequest .. Action.ChildAction.HandleRequest.transactionSigning
-		////                ) {
-		////                    TransactionSigning()
-		////                }
-		//        }
-
-		//        .ifLet(\.chooseAccountRequestFromDapp, action: /Action.child .. Action.ChildAction.chooseAccountRequestFromDapp) {
-		//            IncomingConnectionRequestFromDappReview()
-		//        }
-		//        .ifLet(\.transactionSigning, action: /Action.child .. Action.ChildAction.transactionSigning) {
-		//            TransactionSigning()
-		//        }
+		.ifLet(\.chooseAccountRequestFromDapp, action: /Action.child .. Action.ChildAction.chooseAccountRequestFromDapp) {
+			IncomingConnectionRequestFromDappReview()
+		}
+		.ifLet(\.transactionSigning, action: /Action.child .. Action.ChildAction.transactionSigning) {
+			TransactionSigning()
+		}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -334,7 +318,7 @@ public struct Home: ReducerProtocol {
 			state.handleRequest = .init(requestItemToHandle: requestItemToHandle)
 			return .none
 
-		case let .child(.handleRequest(.chooseAccountRequestFromDapp(.delegate(.dismiss(dismissedRequestItem))))):
+		case let .child(.chooseAccountRequestFromDapp(.delegate(.dismiss(dismissedRequestItem)))):
 			return .run { send in
 				await send(.internal(.system(.dismissed(dismissedRequestItem.parentRequest))))
 			}
@@ -344,7 +328,7 @@ public struct Home: ReducerProtocol {
 			state.unfinishedRequestsFromClient.dismiss(request: dismissedRequest)
 			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
 
-		case let .child(.handleRequest(.chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, request))))):
+		case let .child(.chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
 			//            state.chooseAccountRequestFromDapp = nil
 			let accountAddresses: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
 				.init(account: $0)
@@ -382,7 +366,7 @@ public struct Home: ReducerProtocol {
 			print("Failed to send response back over webRTC, error: \(String(describing: error))")
 			return .none
 
-		case let .child(.handleRequest(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, incomingMessageFromBrowser))))):
+		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, incomingMessageFromBrowser)))):
 			//            state.transactionSigning = nil
 			//            let response = RequestMethodWalletResponse(
 			//                method: .request,
@@ -396,7 +380,7 @@ public struct Home: ReducerProtocol {
 			//            }
 			fatalError()
 
-		case .child(.handleRequest(.transactionSigning(.delegate(.dismissView)))):
+		case .child(.transactionSigning(.delegate(.dismissView))):
 			//            return .run { send in
 			//                await send(.internal(.system(.dismissed(dismissedRequestItem.parentRequest))))
 			//            }
