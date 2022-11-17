@@ -39,7 +39,7 @@ public extension NonFungibleTokenList.Row.View {
 							Header(
 								name: headerNameText,
 								supply: headerSupplyText(with: viewStore),
-								imageURL: headerIconAsset,
+								iconAsset: headerIconAsset,
 								isExpanded: viewStore.isExpanded
 							)
 							.zIndex(reversedZIndex(count: viewStore.containers.count, index: index))

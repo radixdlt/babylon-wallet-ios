@@ -5,12 +5,12 @@ import SwiftUI
 struct Header: View {
 	let name: String
 	let supply: String
-	let imageURL: URL?
+	let iconAsset: ImageAsset
 	let isExpanded: Bool
 
 	var body: some View {
 		HStack(spacing: 18) {
-			AsyncImage(url: imageURL)
+			Image(asset: iconAsset)
 				.cornerRadius(.small3)
 
 			VStack(alignment: .leading, spacing: 6) {
