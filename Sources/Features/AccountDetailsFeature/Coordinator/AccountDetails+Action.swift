@@ -1,4 +1,3 @@
-import AggregatedValueFeature
 import AssetsViewFeature
 import Profile
 
@@ -16,7 +15,6 @@ public extension AccountDetails {
 // MARK: - AccountDetails.Action.ChildAction
 public extension AccountDetails.Action {
 	enum ChildAction: Equatable {
-		case aggregatedValue(AggregatedValue.Action)
 		case assets(AssetsView.Action)
 	}
 }

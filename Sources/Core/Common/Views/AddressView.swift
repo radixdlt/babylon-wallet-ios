@@ -18,22 +18,17 @@ public struct AddressView: View {
 
 public extension AddressView {
 	var body: some View {
-		HStack(spacing: 5) {
+		HStack(spacing: .zero) {
 			Text(address.address)
 				.lineLimit(1)
 				.truncationMode(.middle)
-				.foregroundColor(.app.buttonTextBlackTransparent)
-				.textStyle(.body2Regular)
+				.textStyle(.body2HighImportance)
 
 			Button(
 				action: copyAddressAction,
 				label: {
-					Text(L10n.AccountList.Row.copyTitle)
-						.foregroundColor(.app.buttonTextBlack)
-						.underline()
-						.textStyle(.body2Regular)
-						.padding(12)
-						.fixedSize()
+					Image("copy")
+						.frame(width: 28, height: 28)
 				}
 			)
 		}

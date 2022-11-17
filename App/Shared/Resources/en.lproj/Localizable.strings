@@ -22,7 +22,7 @@
 "createAccount.subtitle" = "What would you like to call your account?";
 
 "home.header.subtitle" = "Welcome, here are all your accounts on the Radix Network";
-"home.header.title" = "Babylon E2E";
+"home.header.title" = "Radix Wallet";
 
 "home.visitHub.buttonTitle" = "Visit the Radix Hub";
 "home.visitHub.title" = "Ready to get started using the Radix Network and your Wallet?";
@@ -36,8 +36,6 @@
 "dApp.connectionRequest.wantsToConnect" = "%@ wants to connect to your wallet";
 "dApp.unknownName" = "Unknown dApp";
 
-"nftList.header.hide" = "- Hide";
-"nftList.header.show" = "+ Show";
 "nftList.header.supplyUnknown" = "Unknown";
 "nftList.nftPlural" = "%d NFTs";
 "nftList.ownedOfTotal" = "%d of %d";

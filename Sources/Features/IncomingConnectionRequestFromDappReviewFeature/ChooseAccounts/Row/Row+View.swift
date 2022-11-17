@@ -22,7 +22,7 @@ public extension ChooseAccounts.Row.View {
 			send: { .view($0) }
 		) { viewStore in
 			HStack {
-				VStack(alignment: .leading, spacing: 14) {
+				VStack(alignment: .leading, spacing: .medium3) {
 					Text(viewStore.accountName)
 						.foregroundColor(.app.white)
 						.textStyle(.body1Header)
@@ -36,12 +36,12 @@ public extension ChooseAccounts.Row.View {
 
 				CheckmarkView(isChecked: viewStore.isSelected)
 			}
-			.padding(24)
+			.padding(.medium1)
 			.background(
 				LinearGradient.app.account1
 					.brightness(viewStore.isSelected ? -0.1 : 0)
 			)
-			.cornerRadius(12)
+			.cornerRadius(.small1)
 			.onTapGesture {
 				viewStore.send(.didSelect)
 			}

@@ -29,7 +29,7 @@ public extension AccountList.Row.View {
 			send: { .view($0) }
 		) { viewStore in
 			VStack(alignment: .leading) {
-				VStack(alignment: .leading, spacing: 0) {
+				VStack(alignment: .leading, spacing: .zero) {
 					HeaderView(
 						name: viewStore.name,
 						value: formattedAmmount(
@@ -47,14 +47,18 @@ public extension AccountList.Row.View {
 							viewStore.send(.copyAddressButtonTapped)
 						}
 					)
+					.foregroundColor(.app.whiteTransparent)
 					.frame(maxWidth: 160)
-				}
 
-				TokenListView(containers: viewStore.state.portfolio.fungibleTokenContainers)
+					// TODO: replace spacer with token list when API is available
+					Spacer()
+						.frame(height: 64)
+				}
 			}
-			.padding(25)
-			.background(Color.app.gray5)
-			.cornerRadius(6)
+			.padding(.horizontal, .medium1)
+			.padding(.vertical, .medium2)
+			.background(Color.app.blue2)
+			.cornerRadius(.small1)
 			.onTapGesture {
 				viewStore.send(.selected)
 			}
@@ -106,15 +110,11 @@ private struct HeaderView: View {
 		HStack {
 			if let name {
 				Text(name)
-					.foregroundColor(.app.buttonTextBlack)
-					.textStyle(.secondaryHeader)
+					.foregroundColor(.app.white)
+					.textStyle(.body1Header)
 					.fixedSize()
 			}
 			Spacer()
-			Text(value)
-				.foregroundColor(.app.buttonTextBlack)
-				.textStyle(.secondaryHeader)
-				.fixedSize()
 		}
 	}
 }

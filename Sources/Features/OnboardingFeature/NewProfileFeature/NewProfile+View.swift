@@ -55,7 +55,7 @@ public extension NewProfile.View {
 						viewStore.send(.createProfileButtonPressed)
 					}
 					.buttonStyle(.borderedProminent)
-					.disabled(!viewStore.isCreateProfileButtonEnabled)
+					.enabled(viewStore.isCreateProfileButtonEnabled)
 
 					Spacer()
 				}

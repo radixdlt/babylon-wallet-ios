@@ -26,7 +26,7 @@ public extension FungibleTokenList.Row.View {
 			observe: ViewState.init(state:)
 		) { viewStore in
 			tokenRow(with: viewStore, container: viewStore.container)
-				.padding([.leading, .trailing], 24)
+				.padding(.horizontal, .medium1)
 		}
 	}
 }
@@ -41,32 +41,40 @@ private extension FungibleTokenList.Row.View {
 	func tokenRow(with viewStore: RowViewStore, container: FungibleTokenContainer) -> some View {
 		ZStack {
 			HStack(alignment: .center) {
-				HStack {
+				HStack(spacing: .small1) {
 					Circle()
-						.frame(width: 40, height: 40)
+						.frame(.small)
 						.foregroundColor(.app.gray3)
 
 					Text(container.asset.symbol ?? "")
-						.foregroundColor(.app.gray2)
+						.foregroundColor(.app.gray1)
 						.textStyle(.body2HighImportance)
 				}
 
 				Spacer()
 
-				VStack(alignment: .trailing, spacing: 5) {
+				VStack(alignment: .trailing, spacing: .small3) {
 					Text(
 						tokenAmount(
 							amountInWhole: container.amountInWhole,
 							isVisible: viewStore.isCurrencyAmountVisible
 						)
 					)
-					.foregroundColor(.app.buttonTextBlack)
+					.foregroundColor(.app.gray1)
 					.textStyle(.secondaryHeader)
-					Text(tokenValue(container.worth,
-					                isVisible: viewStore.isCurrencyAmountVisible,
-					                currency: viewStore.currency))
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
+
+					// TODO: uncomment when fiat value ready for implementation
+					/*
+					 Text(
+					     tokenValue(
+					         container.worth,
+					         isVisible: viewStore.isCurrencyAmountVisible,
+					         currency: viewStore.currency
+					     )
+					 )
+					 .foregroundColor(.app.gray2)
+					 .textStyle(.body2Regular)
+					 */
 				}
 			}
 
@@ -75,7 +83,7 @@ private extension FungibleTokenList.Row.View {
 				separator()
 			}
 		}
-		.frame(height: 80)
+		.frame(height: .large1 * 2)
 	}
 
 	func separator() -> some View {

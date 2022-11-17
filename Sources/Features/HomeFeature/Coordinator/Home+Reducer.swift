@@ -2,7 +2,6 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import AggregatedValueFeature
 import Asset
 import BrowserExtensionsConnectivityClient
 import Collections
@@ -32,14 +31,6 @@ public struct Home: ReducerProtocol {
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.header, action: /Action.child .. Action.ChildAction.header) {
 			Home.Header()
-		}
-
-		Scope(state: \.aggregatedValue, action: /Action.child .. Action.ChildAction.aggregatedValue) {
-			AggregatedValue()
-		}
-
-		Scope(state: \.visitHub, action: /Action.child .. Action.ChildAction.visitHub) {
-			Home.VisitHub()
 		}
 
 		accountListReducer()
@@ -145,7 +136,6 @@ public struct Home: ReducerProtocol {
 		case let .internal(.system(.appSettingsLoadedResult(.success(appSettings)))):
 			// FIXME: Replace currency with value from Profile!
 			let currency = appSettings.currency
-			state.aggregatedValue.currency = currency
 			state.accountList.accounts.forEach {
 				state.accountList.accounts[id: $0.address]?.currency = currency
 			}
@@ -154,16 +144,13 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
-			// aggregated value
-			state.aggregatedValue.isCurrencyAmountVisible = isVisible
-
 			// account list
 			state.accountList.accounts.forEach {
-				state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = isVisible
+				// TODO: replace hardcoded true value with isVisible value
+				state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = true
 			}
 
 			// account details
-			state.accountDetails?.aggregatedValue.isCurrencyAmountVisible = isVisible
 			state.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
 				section.assets.forEach { row in
 					state.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
@@ -199,7 +186,7 @@ public struct Home: ReducerProtocol {
 				state.accountDetails?.assets = .init(
 					fungibleTokenList: .init(
 						sections: .init(uniqueElements: categories.map { category in
-							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
+							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
 							return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
 						})
 					),
@@ -227,14 +214,6 @@ public struct Home: ReducerProtocol {
 		case .child(.header(.delegate(.displaySettings))):
 			return .run { send in
 				await send(.delegate(.displaySettings))
-			}
-
-		case .child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))):
-			return toggleCurrencyAmountVisible()
-
-		case .child(.visitHub(.delegate(.displayHub))):
-			return .run { _ in
-				await openURL(URL(string: "https://www.apple.com")!)
 			}
 
 		case .child(.accountList(.delegate(.fetchPortfolioForAccounts))):
@@ -276,9 +255,6 @@ public struct Home: ReducerProtocol {
 					try await accountPortfolioFetcher.fetchPortfolio([address])
 				}))))
 			}
-
-		case .child(.accountDetails(.child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))))):
-			return toggleCurrencyAmountVisible()
 
 		case .child(.transfer(.delegate(.dismissTransfer))):
 			state.transfer = nil

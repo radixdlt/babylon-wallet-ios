@@ -17,17 +17,17 @@ struct Component: View {
 
 extension Component {
 	var body: some View {
-		VStack(spacing: 20) {
+		VStack(spacing: .medium2) {
 			Image(container.asset.iconURL ?? "")
 				.frame(height: isExpanded ? imageHeight : collapsedImageHeight)
-				.cornerRadius(4)
+				.cornerRadius(.small3)
 				.onSizeChanged(ReferenceView.self) { size in
 					if imageHeight == nil, size.height != collapsedImageHeight {
 						imageHeight = size.height
 					}
 				}
 
-			VStack(alignment: .leading, spacing: 8) {
+			VStack(alignment: .leading, spacing: .small2) {
 				Text(container.asset.address)
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
@@ -67,7 +67,7 @@ extension Component {
 				paddingValue: value,
 				cornerRadius: opositeValue
 			)
-			.shadow(color: isExpanded && !isLast ? .clear : .app.shadowBlack, radius: 8, x: 0, y: 9)
+			.tokenRowShadow(condition: isExpanded && !isLast)
 		)
 	}
 }
@@ -101,6 +101,6 @@ extension Component: ExpandableRow {
 // MARK: Component.Constants
 private extension Component {
 	enum Constants {
-		static let radius: CGFloat = 6
+		static let radius: CGFloat = .small1
 	}
 }

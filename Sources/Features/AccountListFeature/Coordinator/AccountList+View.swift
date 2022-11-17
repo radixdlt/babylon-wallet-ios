@@ -22,7 +22,7 @@ public extension AccountList.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			LazyVStack(spacing: 25) {
+			LazyVStack(spacing: .medium1) {
 				ForEachStore(
 					store.scope(
 						state: \.accounts,

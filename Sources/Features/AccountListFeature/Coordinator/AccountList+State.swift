@@ -31,7 +31,6 @@ public extension AccountList.State {
 
 #if DEBUG
 public extension Array where Element == AccountList.Row.State {
-//	static let placeholder: Self = [.checking, .savings, .shared, .family, .dummy1, .dummy2, .dummy3]
 	static let placeholder: Self = []
 }
 

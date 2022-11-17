@@ -1,4 +1,3 @@
-import AggregatedValueFeature
 import AssetsViewFeature
 import Common
 import ComposableArchitecture
@@ -28,29 +27,22 @@ public extension AccountDetails.View {
 			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
-				VStack {
+				VStack(spacing: .zero) {
 					header(with: viewStore)
-						.padding([.leading, .trailing, .top], 24)
+						.padding([.horizontal, .top], .medium3)
+
+					AddressView(
+						address: viewStore.address.wrapAsAddress(),
+						copyAddressAction: {
+							viewStore.send(.copyAddressButtonTapped)
+						}
+					)
+					.frame(maxWidth: 140)
+					.foregroundColor(.app.whiteTransparent)
+					.padding(.bottom, .medium1)
 
 					ScrollView {
-						VStack(spacing: 16) {
-							AddressView(
-								address: viewStore.address.wrapAsAddress(),
-								copyAddressAction: {
-									viewStore.send(.copyAddressButtonTapped)
-								}
-							)
-
-							AggregatedValue.View(
-								store: store.scope(
-									state: \.aggregatedValue,
-									action: { .child(.aggregatedValue($0)) }
-								)
-							)
-
-							transferButton(with: viewStore)
-								.padding(.bottom, 20)
-
+						VStack(spacing: .medium3) {
 							AssetsView.View(
 								store: store.scope(
 									state: \.assets,
@@ -58,10 +50,14 @@ public extension AccountDetails.View {
 								)
 							)
 						}
-						.padding(.bottom, 24)
+						.padding(.bottom, .medium1)
 					}
+					.background(Color.app.gray5)
+					.padding(.bottom, .medium2)
+					.cornerRadius(.medium2)
+					.padding(.bottom, .medium2 * -2)
 				}
-				.background(Color.app.gray2.opacity(0.15))
+				.background(Color.app.blue2)
 			}
 		}
 	}
@@ -83,21 +79,20 @@ private extension AccountDetails.View {
 			Spacer()
 
 			Text(viewStore.displayName)
-				.foregroundColor(.app.buttonTextBlack)
 				.textStyle(.secondaryHeader)
 
 			Spacer()
-			Button(
-				action: {
-					// TODO: uncomment
-//					viewStore.send(.accountPreferencesButtonTapped)
-					// TODO: temp implementation just for testing pull to refresh
-					viewStore.send(.refreshButtonTapped)
-				}, label: {
-					Image("ellipsis")
-				}
-			)
+
+			// TODO: remove when account preferences screen is implemented
+			Spacer()
+				.frame(.small)
+
+			// TODO: uncomment when account preferences screen is implemented
+			/*
+			 accountPreferencesButton(with: viewStore)
+			 */
 		}
+		.foregroundColor(.app.white)
 	}
 
 	func transferButton(with viewStore: AccountDetailsViewStore) -> some View {
@@ -109,8 +104,19 @@ private extension AccountDetails.View {
 				.textStyle(.body1Regular)
 				.padding()
 				.background(Color.app.gray4)
-				.cornerRadius(6)
+				.cornerRadius(.small2)
 		})
+	}
+
+	func accountPreferencesButton(with viewStore: AccountDetailsViewStore) -> some View {
+		Button(
+			action: {
+				viewStore.send(.displayAccountPreferencesButtonTapped)
+			}, label: {
+				Image("ellipsis")
+			}
+		)
+		.frame(.small)
 	}
 }
 
@@ -119,12 +125,10 @@ extension AccountDetails.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		public let address: AccountAddress
-		public var aggregatedValue: AggregatedValue.State
 		public let displayName: String
 
 		init(state: AccountDetails.State) {
 			address = state.address
-			aggregatedValue = state.aggregatedValue
 			displayName = state.displayName
 		}
 	}

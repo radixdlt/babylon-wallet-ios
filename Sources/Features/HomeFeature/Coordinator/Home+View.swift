@@ -1,7 +1,6 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPreferencesFeature
-import AggregatedValueFeature
 import Common
 import ComposableArchitecture
 import CreateAccountFeature
@@ -107,19 +106,6 @@ extension Home.View {
 }
 
 private extension Home.View {
-	// TODO: extract button for reuse
-	func createAccountButton(action: @escaping () -> Void) -> some View {
-		Button(action: action) {
-			Text(L10n.CreateAccount.createNewAccount)
-				.foregroundColor(.app.buttonTextBlack)
-				.textStyle(.body2HighImportance)
-				.padding(.horizontal, 40)
-				.frame(height: 50)
-				.background(Color.app.gray4)
-				.cornerRadius(6)
-		}
-	}
-
 	func homeView(with viewStore: ViewStore<Home.View.ViewState, Home.Action.ViewAction>) -> some View {
 		VStack {
 			Home.Header.View(
@@ -128,38 +114,25 @@ private extension Home.View {
 					action: { .child(.header($0)) }
 				)
 			)
-			.padding([.leading, .trailing, .top], 24)
+			.padding(EdgeInsets(top: .medium1, leading: .large2, bottom: .zero, trailing: .medium1))
 
 			ScrollView {
-				LazyVStack(spacing: 24) {
-					VStack {
-						title
-						AggregatedValue.View(
-							store: store.scope(
-								state: \.aggregatedValue,
-								action: { .child(.aggregatedValue($0)) }
-							)
-						)
-					}
+				LazyVStack(spacing: .medium1) {
 					AccountList.View(
 						store: store.scope(
 							state: \.accountList,
 							action: { .child(.accountList($0)) }
 						)
 					)
-					createAccountButton {
+
+					Button(L10n.CreateAccount.createNewAccount) {
 						viewStore.send(.createAccountButtonTapped)
 					}
-					Spacer()
+					.buttonStyle(.secondary)
 
-					Home.VisitHub.View(
-						store: store.scope(
-							state: \.visitHub,
-							action: { .child(.visitHub($0)) }
-						)
-					)
+					Spacer()
 				}
-				.padding(24)
+				.padding(.medium1)
 			}
 		}
 	}
