@@ -694,6 +694,7 @@ package.addModules([
 			engineToolkit,
 			legibleError,
 			profile, // Address
+			"Resources",
 			tagged,
 		],
 		tests: .yes(

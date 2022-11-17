@@ -1,5 +1,6 @@
 import DesignSystem
 import Profile
+import Resources
 import SwiftUI
 
 // MARK: - AddressView

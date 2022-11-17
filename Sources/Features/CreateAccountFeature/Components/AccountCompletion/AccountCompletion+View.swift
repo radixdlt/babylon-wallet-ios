@@ -24,7 +24,7 @@ public extension AccountCompletion.View {
 			VStack(spacing: 20) {
 				Spacer()
 
-				Image("createAccount-safe")
+				Image(asset: Asset.createAccountSafe)
 
 				Text(L10n.CreateAccount.Completion.title)
 					.foregroundColor(.app.buttonTextBlack)
@@ -47,7 +47,7 @@ public extension AccountCompletion.View {
 							.foregroundColor(.app.buttonTextBlack.opacity(0.6))
 							.textStyle(.body2Regular)
 
-						Image("copy")
+						Image(asset: Asset.copy)
 					}
 				}
 				.frame(maxWidth: .infinity)
