@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import ErrorQueue
 import GatewayAPI
 import KeychainClient
 import ManageBrowserExtensionConnectionsFeature
@@ -7,6 +8,7 @@ import ProfileClient
 
 // MARK: - Settings
 public struct Settings: ReducerProtocol {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
 
@@ -47,9 +49,9 @@ public extension Settings {
 		case let .internal(.system(.loadBrowserExtensionConnectionResult(.success(connections)))):
 			state.canAddBrowserExtensionConnection = connections.connections.isEmpty
 			return .none
+
 		case let .internal(.system(.loadBrowserExtensionConnectionResult(.failure(error)))):
-			print("Failed to load browser extensions: \(String(describing: error))")
-			// FIXME: Error propagation
+			errorQueue.schedule(error)
 			return .none
 
 		#if DEBUG

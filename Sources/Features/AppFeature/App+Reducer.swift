@@ -42,7 +42,7 @@ public struct App: ReducerProtocol {
 		case let .internal(.system(.displayErrorAlert(error))):
 			state.errorAlert = .init(
 				title: .init("An error ocurred"),
-				message: .init(error.localizedDescription)
+				message: .init(error.legibleLocalizedDescription)
 			)
 			return .none
 

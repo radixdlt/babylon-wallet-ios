@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import ErrorQueue
 import KeychainClient
 import Mnemonic
 import Profile
@@ -22,6 +23,7 @@ public extension DependencyValues {
 
 // MARK: - NewProfile
 public struct NewProfile: ReducerProtocol {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mnemonicGenerator) var mnemonicGenerator
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
@@ -80,9 +82,8 @@ public extension NewProfile {
 
 		case let .internal(.system(.createdProfileResult(.failure(error)))):
 			state.isCreatingProfile = false
-			return .run { send in
-				await send(.delegate(.failedToCreateNewProfile(reason: String(describing: error))))
-			}
+			errorQueue.schedule(error)
+			return .none
 
 		case let .internal(.view(.accountNameTextFieldChanged(accountName))):
 			state.nameOfFirstAccount = accountName

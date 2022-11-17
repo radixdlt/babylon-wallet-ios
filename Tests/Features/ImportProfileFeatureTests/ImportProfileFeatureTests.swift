@@ -6,12 +6,12 @@ import TestUtils
 // MARK: - ImportProfileFeatureTests
 @MainActor
 final class ImportProfileFeatureTests: TestCase {
-	let sut = TestStore(
-		initialState: ImportProfile.State(),
-		reducer: ImportProfile()
-	)
-
 	func test__GIVEN__action_goBack__WHEN__reducer_is_run__THEN__it_coordinates_to_goBack() async throws {
+		let sut = TestStore(
+			initialState: ImportProfile.State(),
+			reducer: ImportProfile()
+		)
+
 		_ = await sut.send(.internal(.view(.goBack)))
 		_ = await sut.receive(.delegate(.goBack))
 	}
@@ -39,15 +39,32 @@ final class ImportProfileFeatureTests: TestCase {
 	}
 
 	func test__GIVEN__a_corrupted_profileSnapshot__WHEN__it_is_decoded__THEN__reducer_delegates_error() async throws {
+		let sut = TestStore(
+			initialState: ImportProfile.State(),
+			reducer: ImportProfile()
+		)
+
 		sut.dependencies.data = .init(contentsOfURL: { _, _ in
 			Data("deadbeef".utf8) // invalid data
 		})
 
+		let expectation = expectation(description: "Error")
+		sut.dependencies.errorQueue.schedule = { error in
+			XCTAssertEqual(String(describing: error), "dataCorrupted(Swift.DecodingError.Context(codingPath: [], debugDescription: \"The given data was not valid JSON.\", underlyingError: Optional(Error Domain=NSCocoaErrorDomain Code=3840 \"Invalid value around line 1, column 0.\" UserInfo={NSDebugDescription=Invalid value around line 1, column 0., NSJSONSerializationErrorIndex=0})))")
+			expectation.fulfill()
+		}
+
 		_ = await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
-		_ = await sut.receive(.delegate(.failedToImportProfileSnapshot(reason: "Failed to import ProfileSnapshot data, error: dataCorrupted(Swift.DecodingError.Context(codingPath: [], debugDescription: \"The given data was not valid JSON.\", underlyingError: Optional(Error Domain=NSCocoaErrorDomain Code=3840 \"Invalid value around line 1, column 0.\" UserInfo={NSDebugDescription=Invalid value around line 1, column 0., NSJSONSerializationErrorIndex=0})))")))
+
+		wait(for: [expectation], timeout: 0)
 	}
 
 	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__reducer_calls_save_on_keychainClient_and_delegates_snapshot() async throws {
+		let sut = TestStore(
+			initialState: ImportProfile.State(),
+			reducer: ImportProfile()
+		)
+
 		sut.dependencies.data = .init(contentsOfURL: { url, options in
 			XCTAssertEqual(url, URL(string: "file://profiledataurl")!)
 			XCTAssertEqual(options, .uncached)

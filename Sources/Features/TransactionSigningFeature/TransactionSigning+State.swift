@@ -13,7 +13,6 @@ public extension TransactionSigning {
 
 		public var addressOfSigner: AccountAddress
 		public var transactionManifest: TransactionManifest
-		public var errorAlert: AlertState<Action.ViewAction>? = nil
 
 		public init(
 			incomingMessageFromBrowser: IncomingMessageFromBrowser,

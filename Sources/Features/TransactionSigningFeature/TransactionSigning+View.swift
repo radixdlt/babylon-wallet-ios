@@ -46,10 +46,6 @@ public extension TransactionSigning.View {
 						LoadingView()
 					}
 				}
-				.alert(
-					store.scope(state: \.errorAlert, action: { .view($0) }),
-					dismiss: .errorAlertDismissButtonTapped
-				)
 			}
 		}
 	}

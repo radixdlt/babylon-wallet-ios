@@ -374,6 +374,7 @@ package.addModules([
 			"BrowserExtensionsConnectivityClient",
 			"Common",
 			"DesignSystem",
+			"ErrorQueue",
 			"ProfileClient",
 			tca,
 			// ^^^ Sort lexicographically ^^^
@@ -414,6 +415,7 @@ package.addModules([
 			converse,
 			dependencies,
 			"DesignSystem",
+			"ErrorQueue",
 			.product(name: "InputPasswordFeature", package: "Converse"),
 			"IncomingConnectionRequestFromDappReviewFeature", // FIXME: extract to Home! just here for test..
 			"ProfileClient",
@@ -441,6 +443,7 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			engineToolkit,
+			"ErrorQueue",
 			"ImportProfileFeature",
 			"ProfileClient",
 			tca,
@@ -459,6 +462,7 @@ package.addModules([
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			profile,
+			"ErrorQueue",
 			"GatewayAPI",
 			"KeychainClientDependency",
 			"ManageBrowserExtensionConnectionsFeature",
@@ -493,6 +497,7 @@ package.addModules([
 			"BrowserExtensionsConnectivityClient", // Actually only models needed...
 			"Common",
 			"EngineToolkitClient",
+			"ErrorQueue",
 			"GatewayAPI",
 			"ProfileClient",
 			tca,

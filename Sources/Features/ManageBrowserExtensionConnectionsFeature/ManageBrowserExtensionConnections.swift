@@ -3,6 +3,7 @@ import ComposableArchitecture
 import ConnectUsingPasswordFeature
 import Converse
 import ConverseCommon
+import ErrorQueue
 import InputPasswordFeature
 import Profile
 import ProfileClient
@@ -11,6 +12,7 @@ import ProfileClient
 public struct ManageBrowserExtensionConnections: ReducerProtocol {
 	@Dependency(\.browserExtensionsConnectivityClient) var browserExtensionsConnectivityClient
 	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 }
 
@@ -48,13 +50,15 @@ public extension ManageBrowserExtensionConnections {
 			return .none
 
 		case let .internal(.system(.loadConnectionsResult(.failure(error)))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .internal(.system(.successfullyOpenedConnectionToBrowser(connection))):
 			return saveNewConnection(state: &state, action: action, connection: connection)
 
 		case let .internal(.system(.saveNewConnectionResult(.failure(error)))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .internal(.system(.saveNewConnectionResult(.success(newConnection)))):
 			state.connections.append(
@@ -95,10 +99,12 @@ public extension ManageBrowserExtensionConnections {
 			return .none
 
 		case let .internal(.system(.initConnectionSecretsResult(.failure(error)))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .child(.connectUsingPassword(.delegate(.establishConnectionResult(.failure(error))))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .child(.connectUsingPassword(.delegate(.establishConnectionResult(.success(openConnection))))):
 			return saveNewConnection(state: &state, action: action, connection: openConnection)
@@ -129,7 +135,7 @@ public extension ManageBrowserExtensionConnections {
 			return .none
 
 		case let .internal(.system(.deleteConnectionResult(.failure(error)))):
-			print("Failed to delete connection from profile, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.sendTestMessageResult(.success(msgSent)))):
@@ -137,7 +143,7 @@ public extension ManageBrowserExtensionConnections {
 			return .none
 
 		case let .internal(.system(.sendTestMessageResult(.failure(error)))):
-			print("Failed to send message, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case .child, .delegate:
