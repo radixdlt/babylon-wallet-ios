@@ -10,7 +10,7 @@ public extension NonFungibleToken {
 			address: address,
 			nonFungibleID: nonFungibleSubstate.nfIdHex,
 			isDeleted: nonFungibleSubstate.isDeleted,
-			nonFungibleDataAsString: nonFungibleSubstate.nonFungibleData.map { String(describing: $0) } ?? "",
+			nonFungibleDataAsString: nonFungibleSubstate.nonFungibleData.map { String(describing: $0) } ?? ""
 		)
 	}
 }
