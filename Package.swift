@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
 	name: "Babylon",
+	defaultLocalization: "en",
 	platforms: [
 		.macOS(.v12), // for development purposes
 		.iOS(.v15), // `task` in SwiftUI
@@ -24,6 +25,7 @@ package.dependencies += [
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
 	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
+	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
 	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
 	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 
@@ -695,7 +697,7 @@ package.addModules([
 			profile, // Address
 			tagged,
 		],
-		resources: [.process("Localization/Strings")],
+		resources: [.process("Resources/Localization/Strings.swift")],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)

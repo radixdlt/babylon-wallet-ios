@@ -58,10 +58,9 @@
 ## https://github.com/SwiftGen/SwiftGen/tree/6.5.1/Documentation/
 
 strings:
-  inputs: App/Shared/Resources/en.lproj
+  inputs: Sources/Core/Common/Resources/Localization/en.lproj
   outputs:
     params:
         publicAccess: true
     templateName: structured-swift5
-    #output: App/Shared/Resources/Strings.swift
-    output: Sources/Core/Common/Localization/Strings.swift
+    output: Sources/Core/Common/Resources/Localization/Strings.swift
