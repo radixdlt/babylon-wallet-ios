@@ -2,12 +2,14 @@ strings:
   inputs: Sources/Core/Common/Resources/en.lproj
   outputs:
     params:
-        publicAccess: true
+      publicAccess: true
     templateName: structured-swift5
     output: Sources/Core/Common/Generated/L10n.swift
 
 xcassets:
   inputs: Sources/Core/Common/Resources/Assets.xcassets
   outputs:
+    params:
+      publicAccess: true
     templateName: swift5
     output: Sources/Core/Common/Generated/Assets.swift

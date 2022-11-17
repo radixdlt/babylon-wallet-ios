@@ -14,42 +14,42 @@ import SwiftUI
 
 // Deprecated typealiases
 @available(*, deprecated, renamed: "ImageAsset.Image", message: "This typealias will be removed in SwiftGen 7.0")
-internal typealias AssetImageTypeAlias = ImageAsset.Image
+public typealias AssetImageTypeAlias = ImageAsset.Image
 
 // MARK: - Asset
 // swiftlint:disable superfluous_disable_command file_length implicit_return
 
 // swiftlint:disable identifier_name line_length nesting type_body_length type_name
-internal enum Asset {
-	internal static let arrowBack = ImageAsset(name: "arrow-back")
-	internal static let checkmarkSelected = ImageAsset(name: "checkmark-selected")
-	internal static let checkmarkUnselected = ImageAsset(name: "checkmark-unselected")
-	internal static let close = ImageAsset(name: "close")
-	internal static let copy = ImageAsset(name: "copy")
-	internal static let ellipsis = ImageAsset(name: "ellipsis")
-	internal static let createAccountSafe = ImageAsset(name: "createAccount-safe")
-	internal static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
-	internal static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
-	internal static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
-	internal static let dappPlaceholder = ImageAsset(name: "dapp-placeholder")
-	internal static let nftLogo = ImageAsset(name: "nft-logo")
-	internal static let nft = ImageAsset(name: "nft")
+public enum Asset {
+	public static let arrowBack = ImageAsset(name: "arrow-back")
+	public static let checkmarkSelected = ImageAsset(name: "checkmark-selected")
+	public static let checkmarkUnselected = ImageAsset(name: "checkmark-unselected")
+	public static let close = ImageAsset(name: "close")
+	public static let copy = ImageAsset(name: "copy")
+	public static let ellipsis = ImageAsset(name: "ellipsis")
+	public static let createAccountSafe = ImageAsset(name: "createAccount-safe")
+	public static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
+	public static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
+	public static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
+	public static let dappPlaceholder = ImageAsset(name: "dapp-placeholder")
+	public static let nftLogo = ImageAsset(name: "nft-logo")
+	public static let nft = ImageAsset(name: "nft")
 }
 
 // MARK: - ImageAsset
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 
-internal struct ImageAsset {
-	internal fileprivate(set) var name: String
+public struct ImageAsset {
+	public fileprivate(set) var name: String
 
 	#if os(macOS)
-	internal typealias Image = NSImage
+	public typealias Image = NSImage
 	#elseif os(iOS) || os(tvOS) || os(watchOS)
-	internal typealias Image = UIImage
+	public typealias Image = UIImage
 	#endif
 
 	@available(iOS 8.0, tvOS 9.0, watchOS 2.0, macOS 10.7, *)
-	internal var image: Image {
+	public var image: Image {
 		let bundle = BundleToken.bundle
 		#if os(iOS) || os(tvOS)
 		let image = Image(named: name, in: bundle, compatibleWith: nil)
@@ -67,7 +67,7 @@ internal struct ImageAsset {
 
 	#if os(iOS) || os(tvOS)
 	@available(iOS 8.0, tvOS 9.0, *)
-	internal func image(compatibleWith traitCollection: UITraitCollection) -> Image {
+	public func image(compatibleWith traitCollection: UITraitCollection) -> Image {
 		let bundle = BundleToken.bundle
 		guard let result = Image(named: name, in: bundle, compatibleWith: traitCollection) else {
 			fatalError("Unable to load image asset named \(name).")
@@ -78,13 +78,13 @@ internal struct ImageAsset {
 
 	#if canImport(SwiftUI)
 	@available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
-	internal var swiftUIImage: SwiftUI.Image {
+	public var swiftUIImage: SwiftUI.Image {
 		SwiftUI.Image(asset: self)
 	}
 	#endif
 }
 
-internal extension ImageAsset.Image {
+public extension ImageAsset.Image {
 	@available(iOS 8.0, tvOS 9.0, watchOS 2.0, *)
 	@available(macOS, deprecated,
 	           message: "This initializer is unsafe on macOS, please use the ImageAsset.image property")
@@ -102,7 +102,7 @@ internal extension ImageAsset.Image {
 
 #if canImport(SwiftUI)
 @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
-internal extension SwiftUI.Image {
+public extension SwiftUI.Image {
 	init(asset: ImageAsset) {
 		let bundle = BundleToken.bundle
 		self.init(asset.name, bundle: bundle)
