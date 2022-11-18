@@ -85,7 +85,7 @@ final class AppFeatureTests: TestCase {
 		wait(for: [expectation], timeout: 0)
 	}
 
-	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_thenShowErrorAndNavigateToOnboarding() async {
+	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_navigateToOnboarding() async {
 		// given
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
@@ -107,15 +107,6 @@ final class AppFeatureTests: TestCase {
 		// then
 		_ = await store.receive(.child(.splash(.delegate(.profileLoaded(nil))))) {
 			$0.root = .onboarding(.init())
-		}
-		_ = await store.receive(.internal(.system(.displayErrorAlert(App.UserFacingError(Splash.NoProfileError()))))) {
-			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("No profile saved yet"))
-		}
-
-		// when
-		_ = await store.send(.view(.errorAlertDismissButtonTapped)) {
-			// then
-			$0.errorAlert = nil
 		}
 
 		await testScheduler.run() // fast-forward scheduler to the end of time

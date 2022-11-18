@@ -129,36 +129,35 @@ extension ProfileClient: DependencyKey {
 			signTransaction: { _ in
 
 				//                engineToolkitClient.accountAddressesOfSigners()
-//
-//				try await profileHolder.getAsync { profile in
-//					try await profile.withPrivateKeys(
-//						of: account,
-//						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-//							try keychainClient.loadFactorSourceMnemonic(reference: reference)
-//						}
-//					) { privateKeys in
-//						let privateKey = privateKeys.first
-//						fatalError()
-				////						print("🔏 Signing transaction and submitting to Ledger ✨")
-//
-				////						let (_, txID) = try await gatewayAPIClient.submit(
-				////							pollStrategy: pollStrategy
-				////						) { epoch in
-				////
-				////							let signReq = BuildAndSignTransactionWithManifestRequest(
-				////								manifest: manifest,
-				////								privateKey: privateKey,
-				////								epoch: epoch,
-				////								networkID: getCurrentNetworkID()
-				////							)
-				////
-				////							return try engineToolkitClient.sign(request: signReq)
-				////						}
-//
-				////						print("🔏 SUCCESSFULLY Signing transaction and submitting to Ledger ✅")
-				////						return txID
-//					}
-				fatalError()
+				//
+				//				try await profileHolder.getAsync { profile in
+				//					try await profile.withPrivateKeys(
+				//						of: account,
+				//						mnemonicForFactorSourceByReference: { [keychainClient] reference in
+				//							try keychainClient.loadFactorSourceMnemonic(reference: reference)
+				//						}
+				//					) { privateKeys in
+				//						let privateKey = privateKeys.first
+				//						fatalError()
+				//						print("🔏 Signing transaction and submitting to Ledger ✨")
+				//						let (_, txID) = try await gatewayAPIClient.submit(
+				//							pollStrategy: pollStrategy
+				//						) { epoch in
+				//
+				//							let signReq = BuildAndSignTransactionWithManifestRequest(
+				//								manifest: manifest,
+				//								privateKey: privateKey,
+				//								epoch: epoch,
+				//								networkID: getCurrentNetworkID()
+				//							)
+				//
+				//							return try engineToolkitClient.sign(request: signReq)
+				//						}
+				//						print("🔏 SUCCESSFULLY Signing transaction and submitting to Ledger ✅")
+				//						return txID
+				//					}
+
+				throw NSError(domain: "Transaction signing disabled until app is Hammunet compatible, once we have it we will use EngineToolkit to get required list of signers and sign.", code: 1337)
 			}
 		)
 	}()

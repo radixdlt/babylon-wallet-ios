@@ -2,12 +2,12 @@ import ComposableArchitecture
 import EngineToolkitClient
 import ErrorQueue
 import Foundation
-import ProfileClient
+import TransactionClient
 
 // MARK: - TransactionSigning
 public struct TransactionSigning: ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.transactionClient) var transactionClient
 	public init() {}
 }
 
@@ -18,7 +18,7 @@ public extension TransactionSigning {
 			state.isSigningTX = true
 			return .run { [transactionManifest = state.transactionManifest] send in
 				await send(.internal(.signTransactionResult(TaskResult {
-					try await profileClient.signTransaction(transactionManifest)
+					try await transactionClient.signTransaction(transactionManifest)
 				})))
 			}
 

@@ -172,23 +172,14 @@ public struct Home: ReducerProtocol {
 
 		case let .internal(.system(.fetchPortfolioResult(.success(totalPortfolio)))):
 			state.accountPortfolioDictionary = totalPortfolio
-
-			// aggregated value
-			//            state.aggregatedValue.value = totalPortfolio.compactMap(\.value.worth).reduce(0, +)
-
-			// account list
 			state.accountList.accounts.forEach {
-				//                state.accountList.accounts[id: $0.address]?.aggregatedValue = totalPortfolio[$0.address]?.worth
 				let accountPortfolio = totalPortfolio[$0.address] ?? OwnedAssets.empty
 				state.accountList.accounts[id: $0.address]?.portfolio = accountPortfolio
 			}
 
 			// account details
 			if let details = state.accountDetails {
-				// aggregated value
 				let account = details.account
-				// let accountWorth = state.accountPortfolioDictionary[details.address]
-				//                state.accountDetails?.aggregatedValue.value = accountWorth?.worth
 
 				// asset list
 				let accountPortfolio = totalPortfolio[account.address] ?? OwnedAssets.empty
@@ -337,18 +328,12 @@ public struct Home: ReducerProtocol {
 
 		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(request)))):
 			state.handleRequest = nil
-			//            state.transactionSigning = nil
-			//            let response = RequestMethodWalletResponse(
-			//                method: .request,
-			//                requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
-			//                payload: [
-			//                    .signTXRequest(.init(transactionIntentHash: txID)),
-			//                ]
-			//            )
-			//            return .run { send in
-			//                await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
-			//            }
-			fatalError()
+
+			// FIXME: Betanet: once we have migrated to Hammunet we can use the EngineToolkit to read out required signeres to sign tx.
+			errorQueue.schedule(
+				NSError(domain: "Transaction signing disabled until app is Hammunet compatible. Once we have it in place we should respond back with TXID to dApp here.", code: 1337)
+			)
+			return .none
 
 		case let .child(.transactionSigning(.delegate(.dismissed(dismissedRequestItem)))):
 			return .run { send in

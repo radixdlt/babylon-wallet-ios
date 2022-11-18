@@ -1,23 +1,28 @@
-//
-//  File.swift
-//
-//
-//  Created by Alexander Cyon on 2022-11-15.
-//
-
 import Dependencies
+import EngineToolkit
 import EngineToolkitClient
 import Foundation
-import GatewayAPI
+import struct GatewayAPI.GatewayAPIClient
+import struct GatewayAPI.PollStrategy
 import Profile
 import ProfileClient
 
 // MARK: - TransactionClient
 public struct TransactionClient: DependencyKey {
 	public var makeAccountNonVirtual: MakeAccountNonVirtual
-	public init(makeAccountNonVirtual: @escaping MakeAccountNonVirtual) {
+	public var signTransaction: SignTransaction
+	public init(
+		makeAccountNonVirtual: @escaping MakeAccountNonVirtual,
+		signTransaction: @escaping SignTransaction
+	) {
 		self.makeAccountNonVirtual = makeAccountNonVirtual
+		self.signTransaction = signTransaction
 	}
+}
+
+// MARK: TransactionClient.SignTransaction
+public extension TransactionClient {
+	typealias SignTransaction = @Sendable (TransactionManifest) async throws -> TransactionIntent.TXID
 }
 
 public extension DependencyValues {
@@ -35,53 +40,51 @@ public extension TransactionClient {
 
 		let pollStrategy: PollStrategy = .default
 
-		return Self(makeAccountNonVirtual: { (_: CreateAccountRequest) -> MakeEntityNonVirtualBySubmittingItToLedger in
-
-			let makeEntityNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger = { privateKey in
-
-				print("🎭 Create On-Ledger-Account ✨")
-
-				let (committed, txID) = try await gatewayAPIClient.submit(
-					pollStrategy: pollStrategy
-				) { epoch in
-
-					let buildAndSignTXRequest = BuildAndSignTransactionWithoutManifestRequest(
-						privateKey: privateKey,
-						epoch: epoch,
-						networkID: profileClient.getCurrentNetworkID()
-					)
-
-					return try engineToolkitClient.createAccount(request: buildAndSignTXRequest)
+		return Self(
+			makeAccountNonVirtual: { (_: CreateAccountRequest) -> MakeEntityNonVirtualBySubmittingItToLedger in
+				{ privateKey in
+					print("🎭 Create On-Ledger-Account ✨")
+					let (committed, txID) = try await gatewayAPIClient.submit(
+						pollStrategy: pollStrategy
+					) { epoch in
+						let buildAndSignTXRequest = BuildAndSignTransactionWithoutManifestRequest(
+							privateKey: privateKey,
+							epoch: epoch,
+							networkID: profileClient.getCurrentNetworkID()
+						)
+						return try engineToolkitClient.createAccount(request: buildAndSignTXRequest)
+					}
+					guard let accountAddressBech32 = committed
+						.receipt
+						.stateUpdates
+						.newGlobalEntities
+						.first?
+						.globalAddress
+					else {
+						throw CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities()
+					}
+					print("🎭 SUCCESSFULLY CREATED ACCOUNT On-Ledger with address: \(accountAddressBech32) ✅ \n txID: \(txID)")
+					return try AccountAddress(address: accountAddressBech32)
 				}
+			},
 
-				guard let accountAddressBech32 = committed
-					.receipt
-					.stateUpdates
-					.newGlobalEntities
-					.first?
-					.globalAddress
-				else {
-					throw CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities()
-				}
-
-				print("🎭 SUCCESSFULLY CREATED ACCOUNT On-Ledger with address: \(accountAddressBech32) ✅ \n txID: \(txID)")
-
-				return try AccountAddress(address: accountAddressBech32)
+			signTransaction: { _ in
+				throw NSError(domain: "Transaction signing disabled until app is Hammunet compatible, once we have it we will use EngineToolkit to get required list of signers and sign.", code: 1337)
 			}
-
-			return makeEntityNonVirtualBySubmittingItToLedger
-		}
 		)
 	}
 }
 
 #if DEBUG
 extension TransactionClient: TestDependencyKey {
-	public static let testValue: TransactionClient = .init(makeAccountNonVirtual: { _ in
-		{ _ in
-			try AccountAddress(address: "mock")
-		}
-	})
+	public static let testValue: TransactionClient = .init(
+		makeAccountNonVirtual: { _ in
+			{ _ in
+				try AccountAddress(address: "mock")
+			}
+		},
+		signTransaction: { _ in "mock TXID" }
+	)
 }
 #endif // DEBUG
 

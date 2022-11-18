@@ -27,11 +27,8 @@ final class TransactionSigningFeatureTests: TestCase {
 
 	func testSignTransaction() async {
 		// Unhappy path - sign TX error
-		store.dependencies.profileClient.lookupAccountByAddress = { _ in
-			.mocked0
-		}
 		struct SignTransactionError: LocalizedError, Equatable { let errorDescription: String? = "SignTransactionError" }
-		store.dependencies.profileClient.signTransaction = { @Sendable _ in
+		store.dependencies.transactionClient.signTransaction = { @Sendable _ in
 			throw SignTransactionError()
 		}
 		let errorExpectation2 = expectation(description: "Error")
@@ -47,7 +44,7 @@ final class TransactionSigningFeatureTests: TestCase {
 		}
 
 		// Happy path
-		store.dependencies.profileClient.signTransaction = { @Sendable _ in
+		store.dependencies.transactionClient.signTransaction = { @Sendable _ in
 			"TXID"
 		}
 		_ = await store.send(.view(.signTransactionButtonTapped)) {
