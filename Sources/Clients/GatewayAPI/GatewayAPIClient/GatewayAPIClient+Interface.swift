@@ -13,31 +13,34 @@ public struct GatewayAPIClient: DependencyKey {
 	public var setCurrentBaseURL: SetCurrentBaseURL
 
 	// MARK: Request
-	public var getEpoch: GetEpoch
+	public var getGateway: GetGateway
 	public var accountResourcesByAddress: GetAccountResourcesByAddress
 	public var resourceDetailsByResourceIdentifier: GetResourceDetailsByResourceIdentifier
+	public var recentTransactions: GetRecentTransactions
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
-	public var getCommittedTransaction: GetCommittedTransaction
+	public var transactionDetails: GetTransactionDetails
 
 	public init(
 		getCurrentBaseURL: @escaping GetCurrentBaseURL,
 		setCurrentBaseURL: @escaping SetCurrentBaseURL,
-		getEpoch: @escaping GetEpoch,
+		getGateway: @escaping GetGateway,
 		accountResourcesByAddress: @escaping GetAccountResourcesByAddress,
 		resourceDetailsByResourceIdentifier: @escaping GetResourceDetailsByResourceIdentifier,
+		recentTransactions: @escaping GetRecentTransactions,
 		submitTransaction: @escaping SubmitTransaction,
 		transactionStatus: @escaping GetTransactionStatus,
-		getCommittedTransaction: @escaping GetCommittedTransaction
+		transactionDetails: @escaping GetTransactionDetails
 	) {
 		self.getCurrentBaseURL = getCurrentBaseURL
 		self.setCurrentBaseURL = setCurrentBaseURL
-		self.getEpoch = getEpoch
+		self.getGateway = getGateway
 		self.accountResourcesByAddress = accountResourcesByAddress
 		self.resourceDetailsByResourceIdentifier = resourceDetailsByResourceIdentifier
+		self.recentTransactions = recentTransactions
 		self.submitTransaction = submitTransaction
 		self.transactionStatus = transactionStatus
-		self.getCommittedTransaction = getCommittedTransaction
+		self.transactionDetails = transactionDetails
 	}
 }
 
@@ -45,10 +48,13 @@ public extension GatewayAPIClient {
 	typealias GetCurrentBaseURL = @Sendable () -> URL
 	typealias SetCurrentBaseURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway?
 
-	typealias GetEpoch = @Sendable () async throws -> V0StateEpochResponse
-	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> V0StateComponentResponse
-	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> V0StateResourceResponse
-	typealias SubmitTransaction = @Sendable (V0TransactionSubmitRequest) async throws -> V0TransactionSubmitResponse
-	typealias GetTransactionStatus = @Sendable (V0TransactionStatusRequest) async throws -> V0TransactionStatusResponse
-	typealias GetCommittedTransaction = @Sendable (V0CommittedTransactionRequest) async throws -> V0CommittedTransactionResponse
+	typealias GetGateway = @Sendable () async throws -> GatewayInfoResponse
+
+	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> EntityResourcesResponse
+	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> EntityDetailsResponse
+
+	typealias GetRecentTransactions = @Sendable (RecentTransactionsRequest) async throws -> RecentTransactionsResponse
+	typealias SubmitTransaction = @Sendable (TransactionSubmitRequest) async throws -> TransactionSubmitResponse
+	typealias GetTransactionStatus = @Sendable (TransactionStatusRequest) async throws -> TransactionStatusResponse
+	typealias GetTransactionDetails = @Sendable (TransactionDetailsRequest) async throws -> TransactionDetailsResponse
 }

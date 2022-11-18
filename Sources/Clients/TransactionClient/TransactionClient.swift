@@ -55,11 +55,9 @@ public extension TransactionClient {
 						return try engineToolkitClient.createAccount(request: buildAndSignTXRequest)
 					}
 					guard let accountAddressBech32 = committed
-						.receipt
-						.stateUpdates
-						.newGlobalEntities
-						.first?
-						.globalAddress
+						.details
+						.referencedGlobalEntities
+						.first
 					else {
 						throw CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities()
 					}

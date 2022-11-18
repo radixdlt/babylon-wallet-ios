@@ -1,3 +1,4 @@
+/*
 import Asset
 
 // MARK: - Convenience
@@ -75,3 +76,4 @@ public extension ResourceAmount {
 		return typeNonFungibleResourceAmount
 	}
 }
+*/

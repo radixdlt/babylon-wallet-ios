@@ -77,17 +77,15 @@ public extension GatewayAPIClient {
 			return response
 		}
 
-		// FIXME: Change returned type to `Network.Name` once Gateway API migration to Enkinet/Hamunet is done!
 		@Sendable func getNetworkName(baseURL: URL) async throws -> Network.Name {
-			// FIXME: Replace with real `getNetworkInformation` request once we have that!
-			_ = try await makeRequest(
-				responseType: V0StateEpochResponse.self,
+			let response = try await makeRequest(
+				responseType: GatewayInfoResponse.self,
 				baseURL: baseURL,
 				timeoutInterval: 2
 			) {
-				$0.appendingPathComponent("state/epoch")
+				$0.appendingPathComponent("gateway")
 			}
-			return Network.primary.name
+			return Network.Name(rawValue: response.ledgerState.network)
 		}
 
 		let setCurrentBaseURL: SetCurrentBaseURL = { newURL in
@@ -163,23 +161,28 @@ public extension GatewayAPIClient {
 			return try await makeRequest(httpBodyData: httpBody, urlFromBase: urlFromBase)
 		}
 
-		let getEpoch: GetEpoch = {
-			try await post { $0.appendingPathComponent("state/epoch") }
+		let getGateway: GetGateway = {
+			try await post { $0.appendingPathComponent("gateway") }
 		}
 
 		return Self(
 			getCurrentBaseURL: getCurrentBaseURL,
 			setCurrentBaseURL: setCurrentBaseURL,
-			getEpoch: getEpoch,
+			getGateway: getGateway,
 			accountResourcesByAddress: { accountAddress in
 				try await post(
-					request: V0StateComponentRequest(componentAddress: accountAddress.address)
-				) { $0.appendingPathComponent("state/component") }
+					request: EntityResourcesRequest(address: accountAddress.address)
+				) { $0.appendingPathComponent("entity/resources") }
 			},
 			resourceDetailsByResourceIdentifier: { resourceAddress in
 				try await post(
-					request: V0StateResourceRequest(resourceAddress: resourceAddress)
-				) { $0.appendingPathComponent("state/resource") }
+					request: EntityDetailsRequest(address: resourceAddress)
+				) { $0.appendingPathComponent("entity/details") }
+			},
+			recentTransactions: { recentTransactionsRequest in
+				try await post(
+					request: recentTransactionsRequest
+				) { $0.appendingPathComponent("transaction/recent") }
 			},
 			submitTransaction: { transactionSubmitRequest in
 				try await post(
@@ -191,11 +194,16 @@ public extension GatewayAPIClient {
 					request: transactionStatusRequest
 				) { $0.appendingPathComponent("transaction/status") }
 			},
-			getCommittedTransaction: { request in
+			transactionDetails: { transactionDetailsRequest in
 				try await post(
-					request: request
-				) { $0.appendingPathComponent("transaction/receipt") }
+					request: transactionDetailsRequest
+				) { $0.appendingPathComponent("transaction/details") }
 			}
+//			getCommittedTransaction: { request in
+//				try await post(
+//					request: request
+//				) { $0.appendingPathComponent("transaction/receipt") }
+//			}
 		)
 	}
 }
@@ -231,19 +239,19 @@ public extension GatewayAPIClient {
 	func submit(
 		pollStrategy: PollStrategy = .default,
 		signedCompiledNotarizedTXGivenEpoch: (Epoch) async throws -> SignedCompiledNotarizedTX
-	) async throws -> (committedTransaction: CommittedTransaction, txID: TXID) {
+	) async throws -> (committedTransaction: TransactionDetailsResponse, txID: TXID) {
 		@Dependency(\.mainQueue) var mainQueue
 
 		// MARK: Get Epoch
-		let epochResponse = try await getEpoch()
-		let epoch = Epoch(rawValue: .init(epochResponse.epoch))
+		let gatewayResponse = try await getGateway()
+		let epoch = Epoch(rawValue: .init(gatewayResponse.ledgerState.epoch))
 
 		// MARK: Build & Sign TX
 		let signedCompiledNotarizedTX = try await signedCompiledNotarizedTXGivenEpoch(epoch)
 
 		// MARK: Submit TX
-		let submitTransactionRequest = V0TransactionSubmitRequest(
-			notarizedTransactionHex: signedCompiledNotarizedTX.compileNotarizedTransactionIntentResponse.compiledNotarizedIntent.hex
+		let submitTransactionRequest = TransactionSubmitRequest(
+			notarizedTransaction: signedCompiledNotarizedTX.compileNotarizedTransactionIntentResponse.compiledNotarizedIntent.hex
 		)
 
 		let response = try await submitTransaction(submitTransactionRequest)
@@ -252,14 +260,17 @@ public extension GatewayAPIClient {
 		}
 
 		// MARK: Poll Status
-		var txStatus: V0TransactionStatusResponse.IntentStatus = .unknown
+		var txStatus: TransactionStatus = .init(status: .pending)
 		let intentHash = signedCompiledNotarizedTX.intentHash.hex
-		@Sendable func pollTransactionStatus() async throws -> V0TransactionStatusResponse.IntentStatus {
-			let txStatusRequest = V0TransactionStatusRequest(
-				intentHash: intentHash
+		@Sendable func pollTransactionStatus() async throws -> TransactionStatus {
+			let txStatusRequest = TransactionStatusRequest(
+				transactionIdentifier: .init(
+					origin: .intent,
+					valueHex: intentHash
+				)
 			)
 			let txStatusResponse = try await transactionStatus(txStatusRequest)
-			return txStatusResponse.intentStatus
+			return txStatusResponse.transaction.transactionStatus
 		}
 
 		var pollCount = 0
@@ -271,31 +282,40 @@ public extension GatewayAPIClient {
 				throw FailedToGetTransactionStatus()
 			}
 		}
-		guard txStatus == .committedSuccess else {
+		guard txStatus.status == .succeeded else {
 			throw TXWasSubmittedButNotSuccessfully()
 		}
 
 		// MARK: Get Commited TX
 
-		let getCommittedTXRequest = V0CommittedTransactionRequest(
-			intentHash: intentHash
-		)
-		let committedResponse = try await getCommittedTransaction(getCommittedTXRequest)
-		let committed = committedResponse.committed
+		let transactionDetailsRequest = TransactionDetailsRequest(transactionIdentifier: .init(origin: .intent, valueHex: intentHash))
+		let transactionDetailsResponse = try await transactionDetails(transactionDetailsRequest)
 
-		guard committed.receipt.status == .succeeded else {
+		switch transactionDetailsResponse.transaction.transactionStatus.status {
+		case .succeeded:
+			break
+		case .failed:
+			// FIXME: what to do here
+			break
+		case .rejected:
 			throw FailedToSubmitTransactionWasRejected()
+		case .pending:
+			// FIXME: what to do here
+			break
 		}
+
 		let txID = TXID(rawValue: intentHash)
-		return (committed, txID)
+		return (transactionDetailsResponse, txID)
 	}
 }
 
-public extension V0TransactionStatusResponse.IntentStatus {
+public extension TransactionStatus {
 	var isComplete: Bool {
-		switch self {
-		case .committedSuccess, .committedFailure, .rejected: return true
-		case .unknown, .inMempool: return false
+		switch status {
+		case .succeeded, .failed, .rejected:
+			return true
+		case .pending:
+			return false
 		}
 	}
 }

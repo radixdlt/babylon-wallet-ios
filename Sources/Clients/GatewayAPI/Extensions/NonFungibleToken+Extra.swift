@@ -1,3 +1,4 @@
+/*
 import Asset
 
 // MARK: - Convenience
@@ -14,3 +15,4 @@ public extension NonFungibleToken {
 		)
 	}
 }
+*/
