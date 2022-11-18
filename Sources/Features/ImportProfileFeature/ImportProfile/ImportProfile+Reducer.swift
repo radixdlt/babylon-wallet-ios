@@ -39,7 +39,18 @@ public extension ImportProfile {
 		case let .internal(.view(.profileImported(.success(profileURL)))):
 			return .run { send in
 				let data = try data(contentsOf: profileURL, options: .uncached)
-				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
+				let snapshot: ProfileSnapshot
+				do {
+					snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
+				} catch {
+					#if DEBUG
+					try? keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+					try? keychainClient.removeProfileSnapshot()
+					#else
+					// TODO: Handle conflicting JSON formats of Profile somehow..?
+					#endif // DEBUG
+					throw error
+				}
 				try keychainClient.saveProfileSnapshot(profileSnapshot: snapshot)
 				await send(.delegate(.importedProfileSnapshot(snapshot)))
 			} catch: { error, _ in

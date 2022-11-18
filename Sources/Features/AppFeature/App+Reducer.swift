@@ -54,29 +54,15 @@ public struct App: ReducerProtocol {
 			goToOnboarding(state: &state)
 			return .none
 
-		case let .child(.onboarding(.delegate(.onboardedWithProfile(profile)))):
+		case let .child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))):
+			return injectProfileIntoProfileClient(newProfile)
+
+		case let .child(.onboarding(.child(.importMnemonic(.delegate(.finishedImporting(_, profile)))))):
 			return injectProfileIntoProfileClient(profile)
 
-		case let .child(.onboarding(.delegate(.failedToCreateOrImportProfile(failureReason)))):
-			displayError(state: &state, reason: failureReason)
-			return .none
-
-		case let .child(.splash(.delegate(.loadProfileResult(.profileLoaded(profile))))):
-			return injectProfileIntoProfileClient(profile)
-
-		case let .child(.splash(.delegate(.loadProfileResult(.noProfile(reason, failedToDecode))))):
-			if failedToDecode {
-				#if DEBUG
-				return .run { send in
-					Task {
-						try? await profileClient.deleteProfileAndFactorSources()
-					}
-					await send(.child(.splash(.delegate(.loadProfileResult(.noProfile(reason: "Deleted Since incompatible JSON", failedToDecode: false))))))
-				}
-				#else
-				displayError(state: &state, reason: "Failed to decode profile: \(reason)")
-				return .none
-				#endif // DEBUG
+		case let .child(.splash(.delegate(.profileLoaded(profile)))):
+			if let profile {
+				return injectProfileIntoProfileClient(profile)
 			} else {
 				goToOnboarding(state: &state)
 				return .none

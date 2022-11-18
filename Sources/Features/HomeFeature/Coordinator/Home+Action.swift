@@ -76,7 +76,6 @@ public extension Home.Action {
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)
 		case accountPortfolioResult(TaskResult<AccountPortfolioDictionary>)
-		case toggleIsCurrencyAmountVisibleFailed(reason: String)
 		case sendResponseBackToDappResult(TaskResult<P2P.SentResponseToClient>)
 	}
 }
