@@ -12,7 +12,7 @@ import AnyCodable
 
 // MARK: - TransactionSubmitResponse
 public struct TransactionSubmitResponse: Codable, Hashable {
-	/** Is true if the transaction is a duplicate of an existing transaction in the mempool. */
+	/** Is true if the transaction is a duplicate of an existing pending transaction. */
 	public private(set) var duplicate: Bool
 
 	public init(duplicate: Bool) {
