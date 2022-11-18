@@ -34,19 +34,40 @@ public extension ManageGatewayAPIEndpoints.View {
 
 					Spacer()
 
-					Group {
-						let prompt = "Gateway API URL"
-						Text(prompt)
-							.font(.callout)
+					VStack {
 						TextField(
-							prompt,
+							"Scheme",
 							text: viewStore.binding(
-								get: \.gatewayAPIURLString,
-								send: { .gatewayAPIURLChanged($0) }
+								get: \.scheme,
+								send: { .schemeChanged($0) }
 							)
 						)
-						.textFieldStyle(.roundedBorder)
+
+						TextField(
+							"Host",
+							text: viewStore.binding(
+								get: \.host,
+								send: { .hostChanged($0) }
+							)
+						)
+
+						TextField(
+							"Path",
+							text: viewStore.binding(
+								get: \.path,
+								send: { .pathChanged($0) }
+							)
+						)
+
+						TextField(
+							"Port",
+							text: viewStore.binding(
+								get: \.port,
+								send: { .portChanged($0) }
+							)
+						)
 					}
+					.textFieldStyle(.roundedBorder)
 
 					Spacer()
 
@@ -100,13 +121,21 @@ private extension ManageGatewayAPIEndpoints.View {
 // MARK: - ManageGatewayAPIEndpoints.View.ViewState
 extension ManageGatewayAPIEndpoints.View {
 	struct ViewState: Equatable {
-		public var gatewayAPIURLString: String
+		public var host: String
+		public var path: String
+		public var scheme: String
+		public var port: String
+
 		public var networkAndGateway: AppPreferences.NetworkAndGateway?
 		public var isSwitchToButtonEnabled: Bool
 
 		init(state: ManageGatewayAPIEndpoints.State) {
-			gatewayAPIURLString = state.gatewayAPIURLString
-			isSwitchToButtonEnabled = state.isSwitchToButtonEnabled
+			host = state.host ?? ""
+			scheme = state.scheme
+			path = state.path
+			port = state.port?.description ?? ""
+
+			isSwitchToButtonEnabled = state.url != nil
 			networkAndGateway = state.networkAndGateway
 		}
 	}

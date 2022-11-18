@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Foundation
 import GatewayAPI
 import ProfileClient
+import URLBuilderClient
 import UserDefaultsClient
 
 // MARK: - ManageGatewayAPIEndpoints
@@ -19,7 +20,14 @@ public extension ManageGatewayAPIEndpoints {
 		case .internal(.view(.didAppear)):
 			let currentNetworkAndGateway = profileClient.getNetworkAndGateway()
 			state.networkAndGateway = currentNetworkAndGateway
-			state.gatewayAPIURLString = urlBuilder.formatURL(currentNetworkAndGateway.gatewayAPIEndpointURL)
+			let url = currentNetworkAndGateway.gatewayAPIEndpointURL
+			state.url = url
+			if let components = try? urlBuilder.componentsFromURL(url) {
+				state.scheme = components.scheme
+				state.port = components.port
+				state.host = components.host
+				state.path = components.path
+			}
 			return .none
 
 		case .internal(.view(.dismissButtonTapped)):
@@ -27,24 +35,33 @@ public extension ManageGatewayAPIEndpoints {
 				await send(.delegate(.dismiss))
 			}
 
-		case let .internal(.view(.gatewayAPIURLChanged(urlString))):
-			state.gatewayAPIURLString = urlString
-			do {
-				let newURL = try urlBuilder.urlFromString(urlString)
-				let currentURL = gatewayAPIClient.getCurrentBaseURL()
-				state.isSwitchToButtonEnabled = newURL != currentURL
-			} catch {
-				state.isSwitchToButtonEnabled = false
-			}
+		case let .internal(.view(.hostChanged(host))):
+			state.host = URLInput.Host(host)
+			updateURL(into: &state)
+			return .none
+
+		case let .internal(.view(.schemeChanged(scheme))):
+			state.scheme = URLInput.Scheme(scheme)
+			updateURL(into: &state)
+			return .none
+
+		case let .internal(.view(.pathChanged(scheme))):
+			state.path = URLInput.Path(scheme)
+			updateURL(into: &state)
+			return .none
+
+		case let .internal(.view(.portChanged(port))):
+			state.port = URLInput.Port(port)
+			updateURL(into: &state)
 			return .none
 
 		case .internal(.view(.switchToButtonTapped)):
-			precondition(state.isSwitchToButtonEnabled)
+			guard let url = state.url else { return .none }
 
-			return .run { [urlString = state.gatewayAPIURLString] send in
+			return .run { send in
 				await send(.internal(.system(.setGatewayAPIEndpointResult(
 					TaskResult {
-						try await gatewayAPIClient.setCurrentBaseURL(urlBuilder.urlFromString(urlString))
+						try await gatewayAPIClient.setCurrentBaseURL(url)
 					}
 				))))
 			}
@@ -63,5 +80,25 @@ public extension ManageGatewayAPIEndpoints {
 		case .delegate:
 			return .none
 		}
+	}
+}
+
+private extension ManageGatewayAPIEndpoints {
+	func updateURL(into state: inout State) {
+		guard let host = state.host else {
+			state.url = nil
+			return
+		}
+		guard let newURL = try? urlBuilder.urlFromInput(
+			.init(host: host, scheme: state.scheme, path: state.path, port: state.port)
+		) else {
+			state.url = nil
+			state.isSwitchToButtonEnabled = false
+			return
+		}
+
+		state.url = newURL
+		let currentURL = gatewayAPIClient.getCurrentBaseURL()
+		state.isSwitchToButtonEnabled = newURL != currentURL
 	}
 }

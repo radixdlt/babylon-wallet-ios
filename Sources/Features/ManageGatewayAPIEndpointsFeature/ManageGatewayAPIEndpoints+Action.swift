@@ -16,7 +16,12 @@ public extension ManageGatewayAPIEndpoints.Action {
 	enum ViewAction: Equatable {
 		case didAppear
 		case dismissButtonTapped
-		case gatewayAPIURLChanged(String)
+
+		case hostChanged(String)
+		case portChanged(String)
+		case pathChanged(String)
+		case schemeChanged(String)
+
 		case switchToButtonTapped
 	}
 }
