@@ -1,3 +1,4 @@
+import Resources
 import SwiftUI
 
 // MARK: - BackButton
@@ -13,8 +14,9 @@ public extension BackButton {
 	var body: some View {
 		Button(
 			action: action,
-			label: { Image("arrow-back") }
+			label: { Image(asset: AssetResource.arrowBack) }
 		)
+		.frame(.small)
 	}
 }
 

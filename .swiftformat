@@ -10,6 +10,7 @@
 --disable redundantNilInit
 --lineaftermarks false
 --ifdef no-indent
+--header strip
 
 # file options
---exclude .build
+--exclude .build,Sources/Core/Resources/Generated/AssetResource.generated.swift,Sources/Core/Resources/Generated/L10n.generated.swift

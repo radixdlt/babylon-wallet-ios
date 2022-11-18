@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import ErrorQueue
 import GatewayAPI
 import KeychainClient
 import ManageGatewayAPIEndpointsFeature
@@ -8,6 +9,7 @@ import ProfileClient
 
 // MARK: - Settings
 public struct Settings: ReducerProtocol {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
 
@@ -15,7 +17,7 @@ public struct Settings: ReducerProtocol {
 }
 
 public extension Settings {
-	var body: some ReducerProtocol<State, Action> {
+	var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
 			.ifLet(\.manageP2PClients, action: /Action.child .. Action.ChildAction.manageP2PClients) {
 				ManageP2PClients()
@@ -51,8 +53,7 @@ public extension Settings {
 			state.canAddP2PClient = connections.connections.isEmpty
 			return .none
 		case let .internal(.system(.loadP2PClientsResult(.failure(error)))):
-			print("Failed to load P2P clients: \(String(describing: error))")
-			// FIXME: Error propagation
+			errorQueue.schedule(error)
 			return .none
 
 		case .child(.manageGatewayAPIEndpoints(.delegate(.dismiss))):

@@ -25,22 +25,22 @@ public extension ChooseAccounts.View {
 			ForceFullScreen {
 				VStack {
 					header(with: viewStore)
-						.padding(24)
+						.padding(.medium1)
 
 					ScrollView {
 						VStack {
-							Image("dapp-placeholder")
+							Image(asset: AssetResource.dappPlaceholder)
 
-							Spacer(minLength: 40)
+							Spacer(minLength: .large1)
 
-							VStack(spacing: 20) {
+							VStack(spacing: .medium2) {
 								Text("Choose \(String(describing: viewStore.oneTimeAccountAddressesRequest.numberOfAddresses))")
 									.textStyle(.secondaryHeader)
 
 								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.requestFromDapp.metadata.dAppId))
 									.foregroundColor(.app.gray2)
 									.textStyle(.body1Regular)
-									.padding(24)
+									.padding(.medium1)
 							}
 							.multilineTextAlignment(.center)
 
@@ -53,7 +53,7 @@ public extension ChooseAccounts.View {
 							)
 						}
 					}
-					Spacer(minLength: 16)
+					Spacer(minLength: .medium3)
 					VStack {
 						Button(
 							action: {},
@@ -63,16 +63,17 @@ public extension ChooseAccounts.View {
 									.textStyle(.body1Regular)
 							}
 						)
-						PrimaryButton(
-							title: L10n.DApp.ConnectionRequest.continueButtonTitle,
-							isEnabled: viewStore.canProceed,
-							action: { viewStore.send(.continueButtonTapped) }
-						)
+
+						Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
+							viewStore.send(.continueButtonTapped)
+						}
+						.buttonStyle(.primary)
+						.enabled(viewStore.canProceed)
 					}
 
-					Spacer(minLength: 16)
+					Spacer(minLength: .medium3)
 				}
-				.padding(.horizontal, 24)
+				.padding(.horizontal, .medium1)
 			}
 		}
 	}

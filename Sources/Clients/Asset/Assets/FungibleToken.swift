@@ -57,7 +57,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public let symbol: String?
 
 	/// Token icon URL.
-	public var iconURL: String?
+	public var iconURL: URL?
 
 	/// Website of the token, e.g. `"https://tokens.radixdlt.com"`
 	public let tokenInfoURL: String?
@@ -78,7 +78,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 		name: String?,
 		symbol: String?,
 		tokenInfoURL: String? = nil,
-		iconURL: String? = nil
+		iconURL: URL? = nil
 	) {
 		self.address = address
 		self.divisibility = divisibility

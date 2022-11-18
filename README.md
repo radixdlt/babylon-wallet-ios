@@ -4,6 +4,18 @@ An iOS wallet for interacting with the [Radix DLT ledger][radixdlt].
 
 Writtin in Swift using SwiftUI as UI framework and [TCA - The Composable Architecture][tca] as architecture.
 
+# Development
+Clone the repo and run bootstrap script:
+```sh
+./scripts/bootstrap
+```
+
+To open the project use:
+
+```sh
+open App/BabylonWallet.xcodeproj
+```
+
 # Architecture
 The structure is the same as [PointfreeCo's game Isowords (source)][isowords] (the authors of TCA). 
 
@@ -130,22 +142,28 @@ extension UserDefaultsClient {
 }
 ```
 
-# Development
-Clone the repo and run bootstrap script:
-```sh
-./scripts/bootstrap
-```
-
-To open the project use:
-
-```sh
-open App/BabylonWallet.xcodeproj
-```
-
 ## Preview Packages
 Thanks to TCA we can create Feature Previews, which are super small apps using a specific Feature's package as entry point, this is extremely useful, because suddenly we can start a small Preview App which takes us directly to Settings, or Directly directly to onboarding. See [Isowords Preview apps here](https://github.com/pointfreeco/isowords/tree/main/App/Previews).
 
 instead of opening the root, otherwise you will not get access to the App and the Packages.
+
+## Fastlane
+
+We use [Bundler](https://bundler.io/) to install and update Fastlane. Follow below steps to have Bundler installed and execute fastlane lanes:
+
+- Install ruby v3.1.2; it is strongly recommend to use a tool like [rbenv](https://github.com/rbenv/rbenv) to manage the rubby version.
+- Install bundler:
+```
+  gem install bundler -v 2.3.25
+```
+- Install this project gems:
+```
+  bundle install
+```
+- Execute a fastlane lane from [App](App) directory:
+```
+  bundle exec fastlane <lane>
+```
 
 # Testing
 1. Unit tests for each package, split into multiple files for each seperate system under test (sut).

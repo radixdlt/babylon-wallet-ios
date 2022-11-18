@@ -1,10 +1,12 @@
 import ComposableArchitecture
 import EngineToolkitClient
+import ErrorQueue
 import Foundation
 import ProfileClient
 
 // MARK: - TransactionSigning
 public struct TransactionSigning: ReducerProtocol {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 	public init() {}
 }
@@ -20,25 +22,21 @@ public extension TransactionSigning {
 				})))
 			}
 
-		case let .internal(.signTransactionResult(result)):
+		case let .internal(.signTransactionResult(.success(txid))):
 			state.isSigningTX = false
-			switch result {
-			case let .success(txid):
-				return .run { [request = state.request] send in
-					await send(.delegate(
-						.signedTXAndSubmittedToGateway(
-							txid,
-							request: request
-						)
-					))
-				}
-			case let .failure(error):
-				state.errorAlert = .init(title: .init("An error ocurred"), message: .init(error.localizedDescription))
-			}
-			return .none
 
-		case .internal(.view(.errorAlertDismissButtonTapped)):
-			state.errorAlert = nil
+			return .run { [request = state.request] send in
+				await send(.delegate(
+					.signedTXAndSubmittedToGateway(
+						txid,
+						request: request
+					)
+				))
+			}
+
+		case let .internal(.signTransactionResult(.failure(error))):
+			state.isSigningTX = false
+			errorQueue.schedule(error)
 			return .none
 
 		case .internal(.view(.closeButtonTapped)):

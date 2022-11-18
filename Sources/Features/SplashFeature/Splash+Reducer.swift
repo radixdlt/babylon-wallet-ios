@@ -1,9 +1,12 @@
 import ComposableArchitecture
+import ErrorQueue
 import Foundation
 import ProfileLoader
 
+// MARK: - Splash
 public struct Splash: ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileLoader) var profileLoader
 
 	public init() {}
@@ -26,19 +29,19 @@ public struct Splash: ReducerProtocol {
 
 		case let .internal(.system(.loadProfileResult(loadResult))):
 			return .run { send in
-				let result: SplashLoadProfileResult = {
-					switch loadResult {
-					case let .success(profile?):
-						return .profileLoaded(profile)
-					case .success(.none):
-						return .noProfile(reason: "No profile saved yet", failedToDecode: false)
-					case let .failure(error):
-						return .noProfile(reason: String(describing: error), failedToDecode: error is Swift.DecodingError)
-					}
-				}()
-
 				try await delay()
-				await send(.delegate(.loadProfileResult(result)))
+
+				switch loadResult {
+				case let .success(profile?):
+					await send(.delegate(.profileLoaded(profile)))
+				case .success(.none):
+					errorQueue.schedule(NoProfileError())
+					await send(.delegate(.profileLoaded(nil)))
+				case let .failure(error as Swift.DecodingError):
+					errorQueue.schedule(FailedToDecodeProfileError(error: error))
+				case let .failure(error):
+					errorQueue.schedule(error)
+				}
 			}
 
 		case .delegate:
@@ -54,5 +57,16 @@ public struct Splash: ReducerProtocol {
 		durationInMS = 700
 		#endif
 		try await mainQueue.sleep(for: .milliseconds(durationInMS))
+	}
+}
+
+public extension Splash {
+	struct FailedToDecodeProfileError: LocalizedError {
+		let error: DecodingError
+		public var errorDescription: String? { "Failed to decode profile: \(String(describing: error))" }
+	}
+
+	struct NoProfileError: LocalizedError {
+		public let errorDescription: String? = "No profile saved yet"
 	}
 }

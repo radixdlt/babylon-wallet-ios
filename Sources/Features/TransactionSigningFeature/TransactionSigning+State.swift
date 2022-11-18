@@ -8,9 +8,8 @@ import SharedModels
 public extension TransactionSigning {
 	struct State: Equatable {
 		public let request: P2P.SignTransactionRequestToHandle
-		public var transactionManifest: TransactionManifest
 		public var isSigningTX: Bool
-		public var errorAlert: AlertState<Action.ViewAction>? = nil
+		public var transactionManifest: TransactionManifest
 
 		public init(
 			request: P2P.SignTransactionRequestToHandle,

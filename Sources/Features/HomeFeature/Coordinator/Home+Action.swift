@@ -2,7 +2,6 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import AggregatedValueFeature
 import AppSettings
 import Collections
 import Common
@@ -31,9 +30,7 @@ public extension Home {
 public extension Home.Action {
 	enum ChildAction: Equatable {
 		case accountList(AccountList.Action)
-		case aggregatedValue(AggregatedValue.Action)
 		case header(Home.Header.Action)
-		case visitHub(Home.VisitHub.Action)
 		case accountPreferences(AccountPreferences.Action)
 		case accountDetails(AccountDetails.Action)
 		case transfer(AccountDetails.Transfer.Action)
@@ -79,7 +76,6 @@ public extension Home.Action {
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)
 		case accountPortfolioResult(TaskResult<AccountPortfolioDictionary>)
-		case viewDidAppearActionFailed(reason: String)
 		case toggleIsCurrencyAmountVisibleFailed(reason: String)
 		case sendResponseBackToDappResult(TaskResult<P2P.SentResponseToClient>)
 	}

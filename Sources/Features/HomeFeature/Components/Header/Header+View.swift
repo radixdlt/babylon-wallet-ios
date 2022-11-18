@@ -46,7 +46,7 @@ private extension Home.Header.View {
 		HStack {
 			Text(L10n.Home.Header.subtitle)
 				.foregroundColor(.app.gray2)
-				.textStyle(.body1Regular)
+				.textStyle(.body1HighImportance)
 		}
 	}
 }
@@ -59,7 +59,7 @@ private struct TitleView: View {
 	public var body: some View {
 		HStack {
 			Text(L10n.Home.Header.title)
-				.foregroundColor(.app.buttonTextBlack)
+				.foregroundColor(.app.gray1)
 				.textStyle(.sheetTitle)
 			Spacer()
 			SettingsButton(
@@ -79,8 +79,9 @@ private struct SettingsButton: View {
 		ZStack(alignment: .topTrailing) {
 			// TODO: use swiftgen for assets
 			Button(action: action) {
-				Image("home-header-settings")
+				Image(asset: AssetResource.homeHeaderSettings)
 			}
+			.frame(.small)
 
 			if shouldShowNotification {
 				Circle()

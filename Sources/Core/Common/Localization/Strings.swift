@@ -102,8 +102,8 @@ public enum L10n {
 		public enum Header {
 			/// Welcome, here are all your accounts on the Radix Network
 			public static let subtitle = L10n.tr("Localizable", "home.header.subtitle", fallback: #"Welcome, here are all your accounts on the Radix Network"#)
-			/// Babylon E2E
-			public static let title = L10n.tr("Localizable", "home.header.title", fallback: #"Babylon E2E"#)
+			/// Radix Wallet
+			public static let title = L10n.tr("Localizable", "home.header.title", fallback: #"Radix Wallet"#)
 		}
 
 		public enum VisitHub {
@@ -126,10 +126,6 @@ public enum L10n {
 		}
 
 		public enum Header {
-			/// - Hide
-			public static let hide = L10n.tr("Localizable", "nftList.header.hide", fallback: #"- Hide"#)
-			/// + Show
-			public static let show = L10n.tr("Localizable", "nftList.header.show", fallback: #"+ Show"#)
 			/// Unknown
 			public static let supplyUnknown = L10n.tr("Localizable", "nftList.header.supplyUnknown", fallback: #"Unknown"#)
 		}
@@ -151,7 +147,13 @@ extension L10n {
 // MARK: - BundleToken
 // swiftlint:disable convenience_type
 private final class BundleToken {
-	static let bundle: Bundle = .init(for: BundleToken.self)
+	static let bundle: Bundle = {
+		#if SWIFT_PACKAGE
+		return Bundle(for: BundleToken.self)
+		#else
+		return Bundle(for: BundleToken.self)
+		#endif
+	}()
 }
 
 // swiftlint:enable convenience_type

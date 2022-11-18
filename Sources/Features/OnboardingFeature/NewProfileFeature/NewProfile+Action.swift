@@ -41,6 +41,5 @@ public extension NewProfile.Action {
 	enum DelegateAction: Equatable {
 		case goBack
 		case finishedCreatingNewProfile(Profile)
-		case failedToCreateNewProfile(reason: String)
 	}
 }

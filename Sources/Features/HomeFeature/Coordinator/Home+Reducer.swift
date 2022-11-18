@@ -2,7 +2,6 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import AggregatedValueFeature
 import Asset
 import Collections
 import ComposableArchitecture
@@ -10,6 +9,7 @@ import CreateAccountFeature
 import Foundation
 import FungibleTokenListFeature
 import IncomingConnectionRequestFromDappReviewFeature
+import LegibleError
 import P2PConnectivityClient
 import PasteboardClient
 import Profile
@@ -22,23 +22,16 @@ public struct Home: ReducerProtocol {
 	@Dependency(\.appSettingsClient) var appSettingsClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
 
-	public var body: some ReducerProtocol<State, Action> {
+	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.header, action: /Action.child .. Action.ChildAction.header) {
 			Home.Header()
-		}
-
-		Scope(state: \.aggregatedValue, action: /Action.child .. Action.ChildAction.aggregatedValue) {
-			AggregatedValue()
-		}
-
-		Scope(state: \.visitHub, action: /Action.child .. Action.ChildAction.visitHub) {
-			Home.VisitHub()
 		}
 
 		accountListReducer()
@@ -46,7 +39,7 @@ public struct Home: ReducerProtocol {
 		Reduce(self.core)
 	}
 
-	func accountListReducer() -> some ReducerProtocol<State, Action> {
+	func accountListReducer() -> some ReducerProtocolOf<Self> {
 		Scope(state: \.accountList, action: /Action.child .. Action.ChildAction.accountList) {
 			AccountList()
 		}
@@ -77,7 +70,7 @@ public struct Home: ReducerProtocol {
 				let accounts = try profileClient.getAccounts()
 				await send(.internal(.system(.createAccount(numberOfExistingAccounts: accounts.count))))
 			} catch: { error, _ in
-				print(error) // handle error
+				errorQueue.schedule(error)
 			}
 
 		case let .internal(.system(.createAccount(numberOfExistingAccounts))):
@@ -108,7 +101,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))):
-			print("Failed to receive message from dApp, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.receiveRequestFromP2PClientResult(.success(requestFromP2P)))):
@@ -126,7 +119,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.connectionsLoadedResult(.failure(error)))):
-			print("Failed to load connections, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.connectionsLoadedResult(.success(connections)))):
@@ -136,7 +129,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.accountsLoadedResult(.failure(error)))):
-			print("Failed to load accounts, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.accountsLoadedResult(.success(accounts)))):
@@ -148,13 +141,12 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.appSettingsLoadedResult(.failure(error)))):
-			print("Failed to load appSettings, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.appSettingsLoadedResult(.success(appSettings)))):
 			// FIXME: Replace currency with value from Profile!
 			let currency = appSettings.currency
-			state.aggregatedValue.currency = currency
 			state.accountList.accounts.forEach {
 				state.accountList.accounts[id: $0.address]?.currency = currency
 			}
@@ -163,16 +155,13 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.isCurrencyAmountVisibleLoaded(isVisible))):
-			// aggregated value
-			state.aggregatedValue.isCurrencyAmountVisible = isVisible
-
 			// account list
 			state.accountList.accounts.forEach {
-				state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = isVisible
+				// TODO: replace hardcoded true value with isVisible value
+				state.accountList.accounts[id: $0.address]?.isCurrencyAmountVisible = true
 			}
 
 			// account details
-			state.accountDetails?.aggregatedValue.isCurrencyAmountVisible = isVisible
 			state.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
 				section.assets.forEach { row in
 					state.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
@@ -208,7 +197,7 @@ public struct Home: ReducerProtocol {
 				state.accountDetails?.assets = .init(
 					fungibleTokenList: .init(
 						sections: .init(uniqueElements: categories.map { category in
-							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: details.aggregatedValue.currency, isCurrencyAmountVisible: details.aggregatedValue.isCurrencyAmountVisible) }
+							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
 							return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
 						})
 					),
@@ -230,15 +219,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.accountPortfolioResult(.failure(error)))):
-			print("⚠️ failed to fetch accout portfolio, error: \(String(describing: error))")
-			return .none
-
-		case let .internal(.system(.viewDidAppearActionFailed(reason: reason))):
-			print(reason)
-			return .none
-
-		case let .internal(.system(.toggleIsCurrencyAmountVisibleFailed(reason: reason))):
-			print(reason)
+			errorQueue.schedule(error)
 			return .none
 
 		case .child(.header(.delegate(.displaySettings))):
@@ -246,19 +227,11 @@ public struct Home: ReducerProtocol {
 				await send(.delegate(.displaySettings))
 			}
 
-		case .child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))):
-			return toggleCurrencyAmountVisible()
-
-		case .child(.visitHub(.delegate(.displayHub))):
-			return .run { _ in
-				await openURL(URL(string: "https://www.apple.com")!)
-			}
-
 		case .child(.accountList(.delegate(.fetchPortfolioForAccounts))):
 			return loadAccountsConnectionsAndSettings()
 
 		case let .internal(.system(.fetchPortfolioResult(.failure(error)))):
-			print("⚠️ failed to fetch portfolio, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .child(.accountList(.delegate(.displayAccountDetails(account)))):
@@ -294,9 +267,6 @@ public struct Home: ReducerProtocol {
 				}))))
 			}
 
-		case .child(.accountDetails(.child(.aggregatedValue(.delegate(.toggleIsCurrencyAmountVisible))))):
-			return toggleCurrencyAmountVisible()
-
 		case .child(.transfer(.delegate(.dismissTransfer))):
 			state.transfer = nil
 			return .none
@@ -309,9 +279,8 @@ public struct Home: ReducerProtocol {
 			state.createAccount = nil
 			return loadAccountsConnectionsAndSettings()
 
-		case let .child(.createAccount(.delegate(.failedToCreateNewAccount(reason: reason)))):
+		case .child(.createAccount(.delegate(.failedToCreateNewAccount))):
 			state.createAccount = nil
-			print("Failed to create account: \(reason)")
 			return .none
 
 		case let .internal(.system(.presentViewForP2PRequest(requestItemToHandle))):
@@ -363,7 +332,7 @@ public struct Home: ReducerProtocol {
 			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
 
 		case let .internal(.system(.sendResponseBackToDappResult(.failure(error)))):
-			print("Failed to send response back over webRTC, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(request)))):

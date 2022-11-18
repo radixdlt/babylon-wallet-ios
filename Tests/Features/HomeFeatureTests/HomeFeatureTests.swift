@@ -82,8 +82,8 @@ final class HomeFeatureTests: TestCase {
 					id: .xrd, assets: [
 						FungibleTokenList.Row.State(
 							container: sortedCategories[0].tokenContainers[0],
-							currency: $0.accountDetails!.aggregatedValue.currency,
-							isCurrencyAmountVisible: $0.accountDetails!.aggregatedValue.isCurrencyAmountVisible
+							currency: .usd,
+							isCurrencyAmountVisible: true
 						),
 					]
 				)
@@ -93,13 +93,13 @@ final class HomeFeatureTests: TestCase {
 					assets: [
 						FungibleTokenList.Row.State(
 							container: sortedCategories[1].tokenContainers[0],
-							currency: $0.accountDetails!.aggregatedValue.currency,
-							isCurrencyAmountVisible: $0.accountDetails!.aggregatedValue.isCurrencyAmountVisible
+							currency: .usd,
+							isCurrencyAmountVisible: true
 						),
 						FungibleTokenList.Row.State(
 							container: sortedCategories[1].tokenContainers[1],
-							currency: $0.accountDetails!.aggregatedValue.currency,
-							isCurrencyAmountVisible: $0.accountDetails!.aggregatedValue.isCurrencyAmountVisible
+							currency: .usd,
+							isCurrencyAmountVisible: true
 						),
 					]
 				)
@@ -145,42 +145,6 @@ final class HomeFeatureTests: TestCase {
 				return
 			}
 			$0.accountPortfolioDictionary[key] = accountPortfolio.first?.value
-		}
-	}
-
-	/*
-	 func testSettingsButtonTapped() {
-	 	let store = TestStore(
-	 		initialState: Home.State(justA: .placeholder),
-	 		reducer: Home.reducer,
-	 		environment: Home.Environment(
-	 			appSettingsClient: .mock,
-	 			accountPortfolioFetcher: .mock,
-	 			pasteboardClient: .noop
-	 		)
-	 	)
-
-	 	store.send(.header(.coordinate(.displaySettings)))
-	 	store.receive(.coordinate(.displaySettings))
-	 }
-	 */
-
-	func testVisitHubButtonTapped() async {
-		let initialState: Home.State = .placeholder
-		let store = TestStore(
-			initialState: initialState,
-			reducer: Home()
-		)
-		let openedURL = ActorIsolated<URL?>(nil)
-		store.dependencies.openURL = .init { url in
-			await openedURL.setValue(url)
-			return true
-		}
-
-		_ = await store.send(.child(.visitHub(.delegate(.displayHub))))
-
-		await openedURL.withValue { openedURL in
-			XCTAssertEqual(openedURL, URL(string: "https://www.apple.com")!)
 		}
 	}
 }

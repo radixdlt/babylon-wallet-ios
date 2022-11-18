@@ -2,6 +2,7 @@ import ComposableArchitecture
 import Converse
 import ConverseCommon
 import DesignSystem
+import ErrorQueue
 import Foundation
 import P2PConnectivityClient
 import SharedModels
@@ -9,6 +10,7 @@ import SwiftUI
 
 // MARK: - ManageP2PClient
 public struct ManageP2PClient: ReducerProtocol {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	public init() {}
 }
@@ -42,7 +44,7 @@ public extension ManageP2PClient {
 			return .none
 
 		case let .internal(.system(.connectionStatusResult(.failure(error)))):
-			print("Failed to get browser connection status update, error \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case .internal(.view(.deleteConnectionButtonTapped)):

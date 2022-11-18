@@ -2,6 +2,7 @@ import ComposableArchitecture
 import ConnectUsingPasswordFeature
 import Converse
 import ConverseCommon
+import ErrorQueue
 import InputPasswordFeature
 import P2PConnectivityClient
 import Profile
@@ -12,11 +13,12 @@ import SharedModels
 public struct ManageP2PClients: ReducerProtocol {
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 }
 
 public extension ManageP2PClients {
-	var body: some ReducerProtocol<State, Action> {
+	var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
 			.forEach(\.connections, action: /Action.child .. Action.ChildAction.connection) {
 				ManageP2PClient()
@@ -49,13 +51,15 @@ public extension ManageP2PClients {
 			return .none
 
 		case let .internal(.system(.loadConnectionsResult(.failure(error)))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .internal(.system(.successfullyOpenedConnection(connection))):
 			return saveNewConnection(state: &state, action: action, connection: connection)
 
 		case let .internal(.system(.saveNewConnectionResult(.failure(error)))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .internal(.system(.saveNewConnectionResult(.success(newConnection)))):
 			state.connections.append(
@@ -96,10 +100,12 @@ public extension ManageP2PClients {
 			return .none
 
 		case let .internal(.system(.initConnectionSecretsResult(.failure(error)))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .child(.connectUsingPassword(.delegate(.establishConnectionResult(.failure(error))))):
-			fatalError(String(describing: error))
+			errorQueue.schedule(error)
+			return .none
 
 		case let .child(.connectUsingPassword(.delegate(.establishConnectionResult(.success(openConnection))))):
 			return saveNewConnection(state: &state, action: action, connection: openConnection)
@@ -130,7 +136,7 @@ public extension ManageP2PClients {
 			return .none
 
 		case let .internal(.system(.deleteConnectionResult(.failure(error)))):
-			print("Failed to delete connection from profile, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.sendTestMessageResult(.success(msgSent)))):
@@ -138,7 +144,7 @@ public extension ManageP2PClients {
 			return .none
 
 		case let .internal(.system(.sendTestMessageResult(.failure(error)))):
-			print("Failed to send message, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case .child, .delegate:

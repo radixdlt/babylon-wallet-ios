@@ -1,0 +1,17 @@
+default_platform(:ios)
+
+platform :ios do
+    before_all do
+        ensure_git_status_clean
+    end
+
+    desc "Runs tests"
+    lane :tests do
+        run_tests(
+            scheme: "Wallet (iOS)",
+            xcodebuild_formatter: "xcbeautify",
+            destination: "platform=iOS Simulator,name=iPhone 14,OS=16.1",
+            xcargs: "-skipPackagePluginValidation",
+        )
+    end
+end

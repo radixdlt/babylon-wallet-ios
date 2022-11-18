@@ -21,7 +21,7 @@ public extension FungibleTokenList.Section.View {
 			store.actionless,
 			observe: ViewState.init(state:)
 		) { _ in
-			LazyVStack(spacing: 0) {
+			LazyVStack(spacing: .zero) {
 				ForEachStore(
 					store.scope(
 						state: \.assets,
@@ -31,11 +31,11 @@ public extension FungibleTokenList.Section.View {
 				)
 			}
 			.background(
-				RoundedRectangle(cornerRadius: 6)
+				RoundedRectangle(cornerRadius: .small1)
 					.fill(Color.white)
-					.shadow(color: .app.shadowBlack, radius: 8, x: 0, y: 9)
+					.tokenRowShadow()
 			)
-			.padding([.leading, .trailing], 18)
+			.padding(.horizontal, .medium3)
 		}
 	}
 }

@@ -39,6 +39,5 @@ public extension ImportProfile.Action {
 	enum DelegateAction: Equatable {
 		case goBack
 		case importedProfileSnapshot(ProfileSnapshot)
-		case failedToImportProfileSnapshot(reason: String)
 	}
 }

@@ -21,8 +21,8 @@ public extension FungibleTokenList.View {
 			store.actionless,
 			observe: ViewState.init(state:)
 		) { _ in
-			VStack(spacing: 30) {
-				LazyVStack(spacing: 20) {
+			VStack(spacing: .large2) {
+				LazyVStack(spacing: .medium2) {
 					ForEachStore(
 						store.scope(
 							state: \.sections,

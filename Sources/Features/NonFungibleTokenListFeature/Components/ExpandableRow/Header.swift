@@ -5,52 +5,42 @@ import SwiftUI
 struct Header: View {
 	let name: String
 	let supply: String
-	let imageURL: String?
+	let iconAsset: ImageAsset
 	let isExpanded: Bool
 
 	var body: some View {
 		HStack(spacing: 18) {
-			Image(imageURL ?? "")
-				.cornerRadius(4)
+			Image(asset: iconAsset)
+				.cornerRadius(.small3)
 
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 6) {
 				Text(name)
-					.foregroundColor(.app.buttonTextBlack)
-					.textStyle(.body1Header)
+					.foregroundColor(.app.gray1)
+					.textStyle(.secondaryHeader)
 				Text(supply)
 					.foregroundColor(.app.gray2)
-					.textStyle(.body2Regular)
+					.textStyle(.body2HighImportance)
 			}
 
 			Spacer()
-
-			Text(toggleDisplayText)
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2Regular)
 		}
-		.padding(25)
+		.padding(.horizontal, .medium1)
+		.padding(.vertical, .large2)
 		.background(
 			ExpandableRowBackgroundView(
 				paddingEdge: edge,
 				paddingValue: value,
 				cornerRadius: opositeValue
 			)
-			.shadow(color: isExpanded ? .clear : .app.shadowBlack, radius: 8, x: 0, y: 9)
+			.tokenRowShadow(condition: isExpanded)
 		)
-	}
-}
-
-// MARK: - Private Computed Propeties
-private extension Header {
-	var toggleDisplayText: String {
-		isExpanded ? L10n.NftList.Header.hide : L10n.NftList.Header.show
 	}
 }
 
 // MARK: Header.Constants
 private extension Header {
 	enum Constants {
-		static let radius: CGFloat = 6
+		static let radius: CGFloat = .small1
 	}
 }
 
@@ -61,10 +51,10 @@ extension Header: ExpandableRow {
 	}
 
 	var value: CGFloat {
-		isExpanded ? Constants.radius : 0
+		isExpanded ? Constants.radius : .zero
 	}
 
 	var opositeValue: CGFloat {
-		isExpanded ? 0 : Constants.radius
+		isExpanded ? .zero : Constants.radius
 	}
 }

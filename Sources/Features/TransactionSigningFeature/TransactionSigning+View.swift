@@ -33,12 +33,11 @@ public extension TransactionSigning.View {
 						}
 						.background(Color(white: 0.9))
 
-						PrimaryButton(
-							title: "Sign Transaction",
-							isEnabled: viewStore.isSignButtonEnabled
-						) {
+						Button("Sign Transaction") {
 							viewStore.send(.signTransactionButtonTapped)
 						}
+						.buttonStyle(.primary)
+						.enabled(viewStore.isSignButtonEnabled)
 					}
 					.padding([.horizontal, .bottom])
 
@@ -46,10 +45,6 @@ public extension TransactionSigning.View {
 						LoadingView()
 					}
 				}
-				.alert(
-					store.scope(state: \.errorAlert, action: { .view($0) }),
-					dismiss: .errorAlertDismissButtonTapped
-				)
 			}
 		}
 	}

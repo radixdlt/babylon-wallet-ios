@@ -1,12 +1,14 @@
 import ComposableArchitecture
+import ErrorQueue
 import ProfileClient
 
 // MARK: - IncomingConnectionRequestFromDappReview
 public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 	public init() {}
 
-	public var body: some ReducerProtocol<State, Action> {
+	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \State.chooseAccounts!, action: /Action.child .. Action.ChildAction.chooseAccounts) {
 			ChooseAccounts()
 		}
@@ -39,7 +41,7 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 			return .none
 
 		case let .internal(.system(.loadAccountsResult(.failure(error)))):
-			print("⚠️ failed to load accounts, error: \(String(describing: error))")
+			errorQueue.schedule(error)
 			return .none
 
 		case .child(.chooseAccounts(.delegate(.dismissChooseAccounts))):

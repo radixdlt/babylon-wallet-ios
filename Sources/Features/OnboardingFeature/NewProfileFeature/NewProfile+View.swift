@@ -29,7 +29,7 @@ public extension NewProfile.View {
 							action: {
 								viewStore.send(.backButtonPressed)
 							}, label: {
-								Image("arrow-back")
+								Image(asset: AssetResource.arrowBack)
 							}
 						)
 						Spacer()
@@ -55,7 +55,7 @@ public extension NewProfile.View {
 						viewStore.send(.createProfileButtonPressed)
 					}
 					.buttonStyle(.borderedProminent)
-					.disabled(!viewStore.isCreateProfileButtonEnabled)
+					.enabled(viewStore.isCreateProfileButtonEnabled)
 
 					Spacer()
 				}

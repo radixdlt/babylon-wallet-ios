@@ -1,3 +1,4 @@
+import Resources
 import SwiftUI
 
 // MARK: - CloseButton
@@ -13,7 +14,7 @@ public extension CloseButton {
 	var body: some View {
 		Button(
 			action: action,
-			label: { Image("close") }
+			label: { Image(asset: AssetResource.close) }
 		)
 	}
 }
