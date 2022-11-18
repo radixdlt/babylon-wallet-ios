@@ -54,7 +54,9 @@ final class ToDappResponseTests: TestCase {
 
 		let decoder = JSONDecoder()
 		let request = try decoder.decode(P2P.FromDapp.Request.self, from: json)
-		let expectedItem = P2P.FromDapp.OneTimeAccountAddressesRequest(isRequiringOwnershipProof: false, numberOfAddresses: .oneOrMore)
+		let expectedItem = P2P.FromDapp.OneTimeAccountAddressesRequest(
+			numberOfAddresses: .oneOrMore
+		)
 		XCTAssertEqual(request.items, [.oneTimeAccountAddresses(expectedItem)])
 		XCTAssertEqual(
 			request.metadata,

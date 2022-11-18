@@ -15,11 +15,15 @@ public extension P2P.FromDapp {
 		Decodable,
 		P2PFromDappWalletRequestItemProtocol
 	{
-		public let isRequiringOwnershipProof: Bool
 		public let numberOfAddresses: Mode
-		internal init(isRequiringOwnershipProof: Bool, numberOfAddresses: Mode) {
-			self.isRequiringOwnershipProof = isRequiringOwnershipProof
+		public let isRequiringOwnershipProof: Bool
+
+		public init(
+			numberOfAddresses: Mode,
+			isRequiringOwnershipProof: Bool = false
+		) {
 			self.numberOfAddresses = numberOfAddresses
+			self.isRequiringOwnershipProof = isRequiringOwnershipProof
 		}
 	}
 }
@@ -33,8 +37,8 @@ public extension P2P.FromDapp.OneTimeAccountAddressesRequest {
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		try self.init(
-			isRequiringOwnershipProof: container.decode(Bool.self, forKey: .isRequiringOwnershipProof),
-			numberOfAddresses: .init(maybeUInt: container.decodeIfPresent(UInt.self, forKey: .numberOfAddresses))
+			numberOfAddresses: .init(maybeUInt: container.decodeIfPresent(UInt.self, forKey: .numberOfAddresses)),
+			isRequiringOwnershipProof: container.decode(Bool.self, forKey: .isRequiringOwnershipProof)
 		)
 	}
 }
@@ -68,3 +72,17 @@ public extension P2P.FromDapp.OneTimeAccountAddressesRequest.Mode {
 		struct ExpectedOneOrMore: Swift.Error {}
 	}
 }
+
+#if DEBUG
+extension P2P.FromDapp.OneTimeAccountAddressesRequest.Mode: ExpressibleByIntegerLiteral {
+	public init(integerLiteral value: UInt) {
+		try! self.init(maybeUInt: value)
+	}
+}
+
+extension P2P.FromDapp.OneTimeAccountAddressesRequest.Mode.NumberOfAddresses: ExpressibleByIntegerLiteral {
+	public init(integerLiteral value: UInt) {
+		try! self.init(oneOrMore: value)
+	}
+}
+#endif

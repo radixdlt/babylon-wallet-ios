@@ -81,8 +81,8 @@ public extension P2P.FromDapp.Request {
 #if DEBUG
 public extension P2P.FromDapp.OneTimeAccountAddressesRequest {
 	static let placeholder: Self = .init(
-		isRequiringOwnershipProof: false,
-		numberOfAddresses: .oneOrMore
+		numberOfAddresses: 1,
+		isRequiringOwnershipProof: false
 	)
 }
 
