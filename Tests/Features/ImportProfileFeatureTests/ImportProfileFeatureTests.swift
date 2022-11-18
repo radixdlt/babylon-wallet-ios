@@ -38,25 +38,33 @@ final class ImportProfileFeatureTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__a_corrupted_profileSnapshot__WHEN__it_is_decoded__THEN__reducer_delegates_error() async throws {
+	func test__GIVEN__a_corrupted_profileSnapshot__WHEN__it_is_decoded__THEN__reducer_delegates_error_and_on_debug_builds_removes_corrupt_data() async throws {
 		let sut = TestStore(
 			initialState: ImportProfile.State(),
 			reducer: ImportProfile()
 		)
-
+		let invalidProfileData = Data("deadbeef".utf8) // invalid data
 		sut.dependencies.data = .init(contentsOfURL: { _, _ in
-			Data("deadbeef".utf8) // invalid data
+			invalidProfileData
 		})
+		sut.dependencies.keychainClient.dataForKey = { _, _ in
+			invalidProfileData
+		}
 
-		let expectation = expectation(description: "Error")
+		let expectation1 = expectation(description: "Remove corrupt Profile data from keychain")
+		sut.dependencies.keychainClient.removeDataForKey = { _ in
+			expectation1.fulfill()
+		}
+
+		let expectation2 = expectation(description: "Error")
 		sut.dependencies.errorQueue.schedule = { error in
 			XCTAssertEqual(String(describing: error), "dataCorrupted(Swift.DecodingError.Context(codingPath: [], debugDescription: \"The given data was not valid JSON.\", underlyingError: Optional(Error Domain=NSCocoaErrorDomain Code=3840 \"Invalid value around line 1, column 0.\" UserInfo={NSDebugDescription=Invalid value around line 1, column 0., NSJSONSerializationErrorIndex=0})))")
-			expectation.fulfill()
+			expectation2.fulfill()
 		}
 
 		_ = await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
 
-		wait(for: [expectation], timeout: 0)
+		wait(for: [expectation1, expectation2], timeout: 0)
 	}
 
 	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__reducer_calls_save_on_keychainClient_and_delegates_snapshot() async throws {
