@@ -1,18 +1,24 @@
 {
   "appPreferences" : {
-      "browserExtensionConnections" : {
-        "connections" : [
-          {
-            "browserName" : "Brave",
-            "computerName" : "Mac Studio",
-            "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
-            "firstEstablishedOn" : "2022-10-19T14:31:30Z",
-            "lastUsedOn" : "2022-10-19T14:31:30Z"
-          }
-        ]
-      },
     "display" : {
       "fiatCurrencyPriceTarget" : "usd"
+    },
+    "networkAndGateway" : {
+      "gatewayAPIEndpointURL" : "https://alphanet.radixdlt.com/v0",
+      "network" : {
+        "id" : 10,
+        "name" : "Adapanet"
+      }
+    },
+    "p2pClients" : {
+      "connections" : [
+        {
+          "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
+          "displayName" : "Brave browser on Mac Studio",
+          "firstEstablishedOn" : "2022-11-16T14:33:24Z",
+          "lastUsedOn" : "2022-11-16T14:33:24Z"
+        }
+      ]
     }
   },
   "factorSources" : {
@@ -38,6 +44,7 @@
           "address" : {
             "address" : "account_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
           },
+          "appearanceID" : 0,
           "derivationPath" : "m/44H/1022H/10H/525H/0H/1238H",
           "displayName" : "First",
           "index" : 0,
@@ -67,6 +74,7 @@
           "address" : {
             "address" : "account_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
           },
+          "appearanceID" : 1,
           "derivationPath" : "m/44H/1022H/10H/525H/1H/1238H",
           "displayName" : "Second",
           "index" : 1,
@@ -96,6 +104,7 @@
           "address" : {
             "address" : "account_tdx_a_1qwum729sanm4ct2dc5cx49qh7xqxcmzcmqjhcvr9tsms5afgmd"
           },
+          "appearanceID" : 2,
           "derivationPath" : "m/44H/1022H/10H/525H/2H/1238H",
           "displayName" : "Third",
           "index" : 2,
