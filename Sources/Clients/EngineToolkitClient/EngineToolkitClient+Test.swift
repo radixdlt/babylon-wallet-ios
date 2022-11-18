@@ -12,9 +12,11 @@ extension EngineToolkitClient: TestDependencyKey {
 		signTransactionIntent: { _ in
 			struct MockedAlwaysFailingTX: Swift.Error {}
 			throw MockedAlwaysFailingTX()
-		}
+		},
+		accountAddressesNeedingToSignTransaction: { _, _, _ in [] }
 	)
 	public static let testValue = Self(
-		signTransactionIntent: unimplemented("\(Self.self).signTransactionIntent")
+		signTransactionIntent: unimplemented("\(Self.self).signTransactionIntent"),
+		accountAddressesNeedingToSignTransaction: unimplemented("\(Self.self).accountAddressesNeedingToSignTransaction")
 	)
 }

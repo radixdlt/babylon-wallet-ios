@@ -11,6 +11,8 @@ import Foundation
 public extension P2P {
 	typealias OneTimeAccountAddressesRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.OneTimeAccountAddressesRequest>
 
+	typealias SignTransactionRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.SignTransactionRequest>
+
 	/// A simple wrapper around a wallet request item to handle and its parent request.
 	struct SpecificRequestItemToHandle<RequestItem: P2PFromDappWalletRequestItemProtocol>: Sendable, Hashable, Identifiable {
 		public let requestItem: RequestItem

@@ -24,20 +24,16 @@ public extension P2P.FromDapp {
 	struct SignTransactionRequest: Sendable, Hashable, Decodable, P2PFromDappWalletRequestItemProtocol {
 		public let version: Version
 
-		public let transactionManifestString: String
-		public let blobsHex: [String]
-
+		public let transactionManifest: TransactionManifest
 		public let message: String?
 
 		public init(
+			transactionManifest: TransactionManifest,
 			version: Version,
-			transactionManifestString: String,
-			blobsHex: [String] = [],
 			message: String?
 		) {
 			self.version = version
-			self.transactionManifestString = transactionManifestString
-			self.blobsHex = blobsHex
+			self.transactionManifest = transactionManifest
 			self.message = message
 		}
 	}
@@ -53,10 +49,20 @@ public extension P2P.FromDapp.SignTransactionRequest {
 
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
+
+		let manifestString = try container.decode(String.self, forKey: .transactionManifestString)
+		let blobsHex = try container.decodeIfPresent([String].self, forKey: .blobsHex) ?? []
+
+		let manifest = try TransactionManifest(
+			instructions: .string(manifestString),
+			blobs: blobsHex.map {
+				try [UInt8](Data(hexString: $0))
+			}
+		)
+
 		try self.init(
+			transactionManifest: manifest,
 			version: container.decode(Version.self, forKey: .version),
-			transactionManifestString: container.decode(String.self, forKey: .transactionManifestString),
-			blobsHex: container.decodeIfPresent([String].self, forKey: .blobsHex) ?? [],
 			message: container.decodeIfPresent(String.self, forKey: .message)
 		)
 	}

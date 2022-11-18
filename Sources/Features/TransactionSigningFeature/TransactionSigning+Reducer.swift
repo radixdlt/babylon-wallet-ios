@@ -6,7 +6,6 @@ import ProfileClient
 // MARK: - TransactionSigning
 public struct TransactionSigning: ReducerProtocol {
 	@Dependency(\.profileClient) var profileClient
-
 	public init() {}
 }
 
@@ -15,12 +14,9 @@ public extension TransactionSigning {
 		switch action {
 		case .internal(.view(.signTransactionButtonTapped)):
 			state.isSigningTX = true
-			return .run { [transactionManifest = state.transactionManifest, addressOfSigner = state.addressOfSigner] send in
+			return .run { [transactionManifest = state.transactionManifest] send in
 				await send(.internal(.signTransactionResult(TaskResult {
-					try await profileClient.signTransaction(
-						manifest: transactionManifest,
-						addressOfSigner: addressOfSigner
-					)
+					try await profileClient.signTransaction(transactionManifest)
 				})))
 			}
 
@@ -28,11 +24,11 @@ public extension TransactionSigning {
 			state.isSigningTX = false
 			switch result {
 			case let .success(txid):
-				return .run { [requestFromClient = state.requestFromClient] send in
+				return .run { [request = state.request] send in
 					await send(.delegate(
 						.signedTXAndSubmittedToGateway(
 							txid,
-							requestFromClient: requestFromClient
+							request: request
 						)
 					))
 				}
@@ -46,8 +42,8 @@ public extension TransactionSigning {
 			return .none
 
 		case .internal(.view(.closeButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismissView))
+			return .run { [dismissedRequest = state.request] send in
+				await send(.delegate(.dismissed(dismissedRequest)))
 			}
 
 		case .delegate:

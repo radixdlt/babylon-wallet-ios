@@ -114,8 +114,14 @@ public extension Home.State {
 					)
 				)
 			case let .signTransaction(item):
-				//                self = .transactionSigning(.init(requestFromClient: <#T##P2P.RequestFromClient#>, addressOfSigner: <#T##AccountAddress#>, transactionManifest: <#T##TransactionManifest#>))
-				fatalError()
+				self = .transactionSigning(
+					.init(
+						request: .init(
+							requestItem: item,
+							parentRequest: requestItemToHandle.parentRequest
+						)
+					)
+				)
 			}
 		}
 	}

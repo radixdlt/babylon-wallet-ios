@@ -7,24 +7,18 @@ import SharedModels
 // MARK: - TransactionSigning.State
 public extension TransactionSigning {
 	struct State: Equatable {
-		/// needed for sending response back
-		public let requestFromClient: P2P.RequestFromClient
-		public var isSigningTX: Bool
-
-		public var addressOfSigner: AccountAddress
+		public let request: P2P.SignTransactionRequestToHandle
 		public var transactionManifest: TransactionManifest
+		public var isSigningTX: Bool
 		public var errorAlert: AlertState<Action.ViewAction>? = nil
 
 		public init(
-			requestFromClient: P2P.RequestFromClient,
-			addressOfSigner: AccountAddress,
-			transactionManifest: TransactionManifest,
+			request: P2P.SignTransactionRequestToHandle,
 			isSigningTX: Bool = false
 		) {
-			self.requestFromClient = requestFromClient
-			self.addressOfSigner = addressOfSigner
-			self.transactionManifest = transactionManifest
+			self.request = request
 			self.isSigningTX = isSigningTX
+			transactionManifest = request.requestItem.transactionManifest
 		}
 	}
 }

@@ -366,7 +366,8 @@ public struct Home: ReducerProtocol {
 			print("Failed to send response back over webRTC, error: \(String(describing: error))")
 			return .none
 
-		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, incomingMessageFromBrowser)))):
+		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(request)))):
+			state.handleRequest = nil
 			//            state.transactionSigning = nil
 			//            let response = RequestMethodWalletResponse(
 			//                method: .request,
@@ -380,11 +381,10 @@ public struct Home: ReducerProtocol {
 			//            }
 			fatalError()
 
-		case .child(.transactionSigning(.delegate(.dismissView))):
-			//            return .run { send in
-			//                await send(.internal(.system(.dismissed(dismissedRequestItem.parentRequest))))
-			//            }
-			fatalError()
+		case let .child(.transactionSigning(.delegate(.dismissed(dismissedRequestItem)))):
+			return .run { send in
+				await send(.internal(.system(.dismissed(dismissedRequestItem.parentRequest))))
+			}
 
 		case .child, .delegate:
 			return .none
