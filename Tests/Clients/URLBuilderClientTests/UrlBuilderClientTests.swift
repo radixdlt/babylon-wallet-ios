@@ -20,7 +20,9 @@ final class URLBuilderClientTests: TestCase {
 		let url = try sut.urlFromInput(.init(
 			host: "alphanet.radixdlt.com",
 			scheme: "https",
-			path: "v0"
+			path: "/v0",
+			port: 12345
 		))
+		XCTAssertEqual(url.port, 12345)
 	}
 }
