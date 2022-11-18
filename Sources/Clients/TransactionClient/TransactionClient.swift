@@ -75,5 +75,15 @@ public extension TransactionClient {
 	}
 }
 
+#if DEBUG
+extension TransactionClient: TestDependencyKey {
+	public static let testValue: TransactionClient = .init(makeAccountNonVirtual: { _ in
+		{ _ in
+			try AccountAddress(address: "mock")
+		}
+	})
+}
+#endif // DEBUG
+
 // MARK: - CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities
 struct CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities: Swift.Error {}

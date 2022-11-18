@@ -87,7 +87,7 @@ final class AppFeatureTests: TestCase {
 		wait(for: [expectation], timeout: 0)
 	}
 
-	func test_loadWalletResult_whenWalletLoadingFailedBecauseDecodingError_thenDoNothingForNow() async throws {
+	func test_loadWalletResult_whenWalletLoadingFailedBecauseDecodingError_then_any_existing_profile_is_deleted_and_we_got_to_onboarding() async throws {
 		// given
 		let initialState = App.State.splash(.init())
 		let reason = "FAIL_FROM_TEST"
@@ -101,7 +101,9 @@ final class AppFeatureTests: TestCase {
 		_ = await store.send(.child(.splash(.delegate(.loadProfileResult(loadProfileResult)))))
 
 		// then
-		// TODO: does nothing for now (prints error)
+		_ = await store.receive(.child(.splash(.delegate(.loadProfileResult(.noProfile(reason: "Deleted Since incompatible JSON", failedToDecode: false)))))) {
+			$0 = .onboarding(.init())
+		}
 	}
 
 	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_thenNavigateToOnboarding() async {

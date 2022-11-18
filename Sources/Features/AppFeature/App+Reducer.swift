@@ -44,7 +44,9 @@ public struct App: ReducerProtocol {
 			if failedToDecode {
 				#if DEBUG
 				return .run { send in
-					try! await profileClient.deleteProfileAndFactorSources()
+					Task {
+						try? await profileClient.deleteProfileAndFactorSources()
+					}
 					await send(.child(.splash(.delegate(.loadProfileResult(.noProfile(reason: "Deleted Since incompatible JSON", failedToDecode: false))))))
 				}
 				#else
