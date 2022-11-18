@@ -3,6 +3,7 @@ import ErrorQueue
 import KeychainClientDependency
 import Profile
 import ProfileClient
+import TransactionClient
 
 // MARK: - CreateAccount
 public struct CreateAccount: ReducerProtocol {
@@ -11,6 +12,7 @@ public struct CreateAccount: ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.transactionClient) var transactionClient
 
 	public init() {}
 }
@@ -28,7 +30,8 @@ public extension CreateAccount {
 						let createAccountRequest = CreateAccountRequest(
 							accountName: accountName
 						)
-						return try await profileClient.createAccount(createAccountRequest)
+						let makeOnLedger: MakeAccountNonVirtual = transactionClient.makeAccountNonVirtual
+						return try await profileClient.createOnLedgerAccount(createAccountRequest, makeOnLedger)
 					}
 				))))
 			}

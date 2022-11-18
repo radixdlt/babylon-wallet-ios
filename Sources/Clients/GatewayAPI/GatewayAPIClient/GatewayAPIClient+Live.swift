@@ -4,7 +4,10 @@ import CryptoKit
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
+import Profile
+import ProfileClient
 import SLIP10
+import URLBuilderClient
 
 // MARK: - Date + Sendable
 extension Date: @unchecked Sendable {}
@@ -19,22 +22,29 @@ struct BadHTTPResponseCode: Swift.Error {
 	static let expected = 200
 }
 
-// MARK: - GatewayAPIClient + DependencyKey
-extension GatewayAPIClient: DependencyKey {
-	public typealias Value = GatewayAPIClient
-	public static let liveValue = GatewayAPIClient.live()
+public extension GatewayAPIClient {
+	typealias Value = GatewayAPIClient
+	static let liveValue = GatewayAPIClient.live()
 
 	static func live(
-		baseURL: URL = .init(string: "https://alphanet.radixdlt.com/v0")!,
 		urlSession: URLSession = .shared,
 		jsonEncoder: JSONEncoder = .init(),
 		jsonDecoder: JSONDecoder = .init()
 	) -> Self {
+		@Dependency(\.profileClient) var profileClient
+		@Dependency(\.urlBuilder) var urlBuilder
+
+		let getCurrentBaseURL: GetCurrentBaseURL = {
+			profileClient.getGatewayAPIEndpointBaseURL()
+		}
+
 		@Sendable
 		func makeRequest<Response>(
-			httpBodyData httpBody: Data?,
+			httpBodyData httpBody: Data? = nil,
 			method: String = "POST",
 			responseType _: Response.Type,
+			baseURL: URL,
+			timeoutInterval: TimeInterval? = nil,
 			urlFromBase: (URL) -> URL
 		) async throws -> Response where Response: Decodable {
 			let url = urlFromBase(baseURL)
@@ -48,6 +58,9 @@ extension GatewayAPIClient: DependencyKey {
 				"accept": "application/json",
 				"Content-Type": "application/json",
 			]
+			if let timeoutInterval {
+				urlRequest.timeoutInterval = timeoutInterval
+			}
 
 			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
 
@@ -62,6 +75,57 @@ extension GatewayAPIClient: DependencyKey {
 			let response = try jsonDecoder.decode(Response.self, from: data)
 
 			return response
+		}
+
+		// FIXME: Change returned type to `Network.Name` once Gateway API migration to Enkinet/Hamunet is done!
+		@Sendable func getNetworkName(baseURL: URL) async throws -> Network.Name {
+			// FIXME: Replace with real `getNetworkInformation` request once we have that!
+			_ = try await makeRequest(
+				responseType: V0StateEpochResponse.self,
+				baseURL: baseURL,
+				timeoutInterval: 2
+			) {
+				$0.appendingPathComponent("state/epoch")
+			}
+			return Network.primary.name
+		}
+
+		let setCurrentBaseURL: SetCurrentBaseURL = { newURL in
+			let currentURL = getCurrentBaseURL()
+			guard newURL != currentURL else {
+				print("same URL, do nothing")
+				return nil
+			}
+			print("not same URL, test! ✅")
+			let name = try await getNetworkName(baseURL: newURL)
+			// FIXME: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
+			// once it returns networkID!
+			let network = try Network.lookupBy(name: name)
+
+			let networkAndGateway = AppPreferences.NetworkAndGateway(
+				network: network,
+				gatewayAPIEndpointURL: newURL
+			)
+
+			try await profileClient.setNetworkAndGateway(networkAndGateway)
+
+			return networkAndGateway
+		}
+
+		@Sendable
+		func makeRequest<Response>(
+			httpBodyData httpBody: Data?,
+			method: String = "POST",
+			responseType: Response.Type,
+			urlFromBase: @escaping (URL) -> URL
+		) async throws -> Response where Response: Decodable {
+			try await makeRequest(
+				httpBodyData: httpBody,
+				method: method,
+				responseType: responseType,
+				baseURL: getCurrentBaseURL(),
+				urlFromBase: urlFromBase
+			)
 		}
 
 		@Sendable
@@ -104,6 +168,8 @@ extension GatewayAPIClient: DependencyKey {
 		}
 
 		return Self(
+			getCurrentBaseURL: getCurrentBaseURL,
+			setCurrentBaseURL: setCurrentBaseURL,
 			getEpoch: getEpoch,
 			accountResourcesByAddress: { accountAddress in
 				try await post(

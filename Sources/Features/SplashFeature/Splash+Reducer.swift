@@ -34,11 +34,13 @@ public struct Splash: ReducerProtocol {
 				switch loadResult {
 				case let .success(profile?):
 					await send(.delegate(.profileLoaded(profile)))
+
 				case .success(.none):
-					errorQueue.schedule(NoProfileError())
 					await send(.delegate(.profileLoaded(nil)))
+
 				case let .failure(error as Swift.DecodingError):
 					errorQueue.schedule(FailedToDecodeProfileError(error: error))
+
 				case let .failure(error):
 					errorQueue.schedule(error)
 				}
@@ -60,13 +62,10 @@ public struct Splash: ReducerProtocol {
 	}
 }
 
+// MARK: Splash.FailedToDecodeProfileError
 public extension Splash {
 	struct FailedToDecodeProfileError: LocalizedError {
 		let error: DecodingError
 		public var errorDescription: String? { "Failed to decode profile: \(String(describing: error))" }
-	}
-
-	struct NoProfileError: LocalizedError {
-		public let errorDescription: String? = "No profile saved yet"
 	}
 }

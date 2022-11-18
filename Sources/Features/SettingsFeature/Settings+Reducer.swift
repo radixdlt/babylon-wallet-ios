@@ -2,7 +2,8 @@ import ComposableArchitecture
 import ErrorQueue
 import GatewayAPI
 import KeychainClient
-import ManageBrowserExtensionConnectionsFeature
+import ManageGatewayAPIEndpointsFeature
+import ManageP2PClientsFeature
 import Profile
 import ProfileClient
 
@@ -18,10 +19,12 @@ public struct Settings: ReducerProtocol {
 public extension Settings {
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
-			.ifLet(\.manageBrowserExtensionConnections, action: /Action.child .. Action.ChildAction.manageBrowserExtensionConnections) {
-				ManageBrowserExtensionConnections()
+			.ifLet(\.manageP2PClients, action: /Action.child .. Action.ChildAction.manageP2PClients) {
+				ManageP2PClients()
 			}
-			._printChanges()
+			.ifLet(\.manageGatewayAPIEndpoints, action: /Action.child .. Action.ChildAction.manageGatewayAPIEndpoints) {
+				ManageGatewayAPIEndpoints()
+			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -36,22 +39,28 @@ public extension Settings {
 				await send(.delegate(.deleteProfileAndFactorSources))
 			}
 
-		case .internal(.view(.manageBrowserExtensionConnectionsButtonTapped)):
-			state.manageBrowserExtensionConnections = .init()
+		case .internal(.view(.manageP2PClientsButtonTapped)):
+			state.manageP2PClients = .init()
 			return .none
 
 		case .internal(.view(.didAppear)):
 			return .run { send in
-				await send(.internal(.system(.loadBrowserExtensionConnectionResult(
-					TaskResult { try profileClient.getBrowserExtensionConnections() }
+				await send(.internal(.system(.loadP2PClientsResult(
+					TaskResult { try profileClient.getP2PClients() }
 				))))
 			}
-		case let .internal(.system(.loadBrowserExtensionConnectionResult(.success(connections)))):
-			state.canAddBrowserExtensionConnection = connections.connections.isEmpty
+		case let .internal(.system(.loadP2PClientsResult(.success(connections)))):
+			state.canAddP2PClient = connections.connections.isEmpty
+			return .none
+		case let .internal(.system(.loadP2PClientsResult(.failure(error)))):
+			errorQueue.schedule(error)
 			return .none
 
-		case let .internal(.system(.loadBrowserExtensionConnectionResult(.failure(error)))):
-			errorQueue.schedule(error)
+		case .child(.manageGatewayAPIEndpoints(.delegate(.dismiss))):
+			state.manageGatewayAPIEndpoints = nil
+			return .none
+
+		case .child(.manageGatewayAPIEndpoints(.internal)):
 			return .none
 
 		#if DEBUG
@@ -76,14 +85,17 @@ public extension Settings {
 			return .none
 		#endif // DEBUG
 
-		case .child(.manageBrowserExtensionConnections(.delegate(.dismiss))):
-			state.manageBrowserExtensionConnections = nil
+		case .child(.manageP2PClients(.delegate(.dismiss))):
+			state.manageP2PClients = nil
 			return .none
 
 		case .child, .delegate:
 			return .none
-		case .internal(.view(.addBrowserExtensionConnectionButtonTapped)):
-			state.manageBrowserExtensionConnections = .init(inputBrowserExtensionConnectionPassword: .init())
+		case .internal(.view(.addP2PClientButtonTapped)):
+			state.manageP2PClients = .init(inputP2PConnectionPassword: .init())
+			return .none
+		case .internal(.view(.editGatewayAPIEndpointButtonTapped)):
+			state.manageGatewayAPIEndpoints = .init()
 			return .none
 		}
 	}

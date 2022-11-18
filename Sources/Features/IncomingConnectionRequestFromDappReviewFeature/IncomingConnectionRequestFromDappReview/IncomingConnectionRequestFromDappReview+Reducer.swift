@@ -19,8 +19,8 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismiss))
+			return .run { [dismissedRequest = state.request] send in
+				await send(.delegate(.dismiss(dismissedRequest)))
 			}
 
 		case .internal(.view(.continueButtonTapped)):
@@ -31,8 +31,9 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 			}
 
 		case let .internal(.system(.loadAccountsResult(.success(accounts)))):
+
 			state.chooseAccounts = .init(
-				incomingConnectionRequestFromDapp: state.incomingConnectionRequestFromDapp,
+				request: state.request,
 				accounts: .init(uniqueElements: accounts.map {
 					ChooseAccounts.Row.State(account: $0)
 				})
@@ -49,9 +50,9 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 
 		case let .child(.chooseAccounts(.delegate(.finishedChoosingAccounts(chosenAccounts)))):
 			state.chooseAccounts = nil
-			return .run { [incomingMessageFromBrowser = state.incomingMessageFromBrowser] send in
+			return .run { [request = state.request] send in
 				await send(.delegate(
-					.finishedChoosingAccounts(chosenAccounts, incomingMessageFromBrowser: incomingMessageFromBrowser)
+					.finishedChoosingAccounts(chosenAccounts, request: request)
 				))
 			}
 

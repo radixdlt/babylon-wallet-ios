@@ -54,6 +54,10 @@ public extension EngineToolkitClient {
 					intentHash: intentHash,
 					compileNotarizedTransactionIntentResponse: notarizedTransactionIntent
 				)
+			},
+			accountAddressesNeedingToSignTransaction: { _, _, _ in
+				// FIXME: use this once we can upgrade to EngineToolkit which now talks Hamunet
+				fatalError()
 			}
 		)
 	}()

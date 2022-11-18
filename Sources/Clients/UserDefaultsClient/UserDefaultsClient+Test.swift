@@ -14,11 +14,13 @@ extension UserDefaultsClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
+		stringForKey: unimplemented("\(Self.self).stringForKey", placeholder: "dummy string"),
 		boolForKey: unimplemented("\(Self.self).boolForKey", placeholder: false),
 		dataForKey: unimplemented("\(Self.self).dataForKey", placeholder: nil),
 		doubleForKey: unimplemented("\(Self.self).doubleForKey", placeholder: 0),
 		integerForKey: unimplemented("\(Self.self).integerForKey", placeholder: 0),
 		remove: unimplemented("\(Self.self).remove"),
+		setString: unimplemented("\(Self.self).setString"),
 		setBool: unimplemented("\(Self.self).setBool"),
 		setData: unimplemented("\(Self.self).setData"),
 		setDouble: unimplemented("\(Self.self).setDouble"),
@@ -28,11 +30,13 @@ extension UserDefaultsClient: TestDependencyKey {
 
 public extension UserDefaultsClient {
 	static let noop = Self(
+		stringForKey: { _ in "dummyString " },
 		boolForKey: { _ in false },
 		dataForKey: { _ in nil },
 		doubleForKey: { _ in 0 },
 		integerForKey: { _ in 0 },
 		remove: { _ in },
+		setString: { _, _ in },
 		setBool: { _, _ in },
 		setData: { _, _ in },
 		setDouble: { _, _ in },

@@ -2,7 +2,8 @@ import ComposableArchitecture
 import DesignSystem
 import GatewayAPI
 import KeychainClientDependency
-import ManageBrowserExtensionConnectionsFeature
+import ManageGatewayAPIEndpointsFeature
+import ManageP2PClientsFeature
 import Profile
 import ProfileClient
 import SwiftUI
@@ -35,14 +36,24 @@ public extension Settings.View {
 				ZStack {
 					settingsView(viewStore: viewStore)
 						.zIndex(0)
+
 					IfLetStore(
 						store.scope(
-							state: \.manageBrowserExtensionConnections,
-							action: { .child(.manageBrowserExtensionConnections($0)) }
+							state: \.manageP2PClients,
+							action: { .child(.manageP2PClients($0)) }
 						),
-						then: ManageBrowserExtensionConnections.View.init(store:)
+						then: ManageP2PClients.View.init(store:)
 					)
 					.zIndex(1)
+
+					IfLetStore(
+						store.scope(
+							state: \.manageGatewayAPIEndpoints,
+							action: { .child(.manageGatewayAPIEndpoints($0)) }
+						),
+						then: ManageGatewayAPIEndpoints.View.init(store:)
+					)
+					.zIndex(2)
 				}
 			}
 			.buttonStyle(.borderedProminent)
@@ -65,15 +76,21 @@ private extension Settings.View {
 					}
 				}
 				#endif // DEBUG
-				Section(header: Text("Browser Connections")) {
+				Section(header: Text("P2P Connections")) {
 					Button("Manage Connections") {
-						viewStore.send(.manageBrowserExtensionConnectionsButtonTapped)
+						viewStore.send(.manageP2PClientsButtonTapped)
 					}
 
-					if viewStore.canAddBrowserExtensionConnection {
+					if viewStore.canAddP2PClient {
 						Button("Add Connection") {
-							viewStore.send(.addBrowserExtensionConnectionButtonTapped)
+							viewStore.send(.addP2PClientButtonTapped)
 						}
+					}
+				}
+
+				Section {
+					Button("Edit Gateway API Endpoint") {
+						viewStore.send(.editGatewayAPIEndpointButtonTapped)
 					}
 				}
 
@@ -123,13 +140,13 @@ public extension Settings.View {
 		public let isDebugProfileViewSheetPresented: Bool
 		public let profileToInspect: Profile?
 		#endif // DEBUG
-		public let canAddBrowserExtensionConnection: Bool
+		public let canAddP2PClient: Bool
 		public init(state: Settings.State) {
 			#if DEBUG
 			isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			profileToInspect = state.profileToInspect
 			#endif // DEBUG
-			canAddBrowserExtensionConnection = state.canAddBrowserExtensionConnection
+			canAddP2PClient = state.canAddP2PClient
 		}
 	}
 }

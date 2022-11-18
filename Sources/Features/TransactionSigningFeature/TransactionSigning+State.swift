@@ -1,29 +1,23 @@
-import BrowserExtensionsConnectivityClient // RequestMethodWalletRequest, FIXME: extract models into seperate package
 import ComposableArchitecture
 import EngineToolkit
 import Foundation
 import Profile
+import SharedModels
 
 // MARK: - TransactionSigning.State
 public extension TransactionSigning {
 	struct State: Equatable {
-		/// needed for sending response back
-		public let incomingMessageFromBrowser: IncomingMessageFromBrowser
+		public let request: P2P.SignTransactionRequestToHandle
 		public var isSigningTX: Bool
-
-		public var addressOfSigner: AccountAddress
 		public var transactionManifest: TransactionManifest
 
 		public init(
-			incomingMessageFromBrowser: IncomingMessageFromBrowser,
-			addressOfSigner: AccountAddress,
-			transactionManifest: TransactionManifest,
+			request: P2P.SignTransactionRequestToHandle,
 			isSigningTX: Bool = false
 		) {
-			self.incomingMessageFromBrowser = incomingMessageFromBrowser
-			self.addressOfSigner = addressOfSigner
-			self.transactionManifest = transactionManifest
+			self.request = request
 			self.isSigningTX = isSigningTX
+			transactionManifest = request.requestItem.transactionManifest
 		}
 	}
 }
@@ -74,32 +68,14 @@ public extension TransactionManifest {
 	}
 }
 
-public extension RequestMethodWalletRequest {
-	static let placeholderSignTXRequets = Self(
-		method: .sendTransaction,
-		requestId: "deadbeef",
-		payloads: [
-			.signTXRequest(
-				.init(
-					accountAddress: try! AccountAddress(address: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
-					version: 1,
-					transactionManifest: "",
-					requestType: .sendTransaction
-				)
-			),
-		],
-		metadata: .init(
-			networkId: 1,
-			dAppId: "RadarSwap"
-		)
-	)
-}
-
 public extension TransactionSigning.State {
-	static let placeholder = Self(
-		incomingMessageFromBrowser: try! .init(requestMethodWalletRequest: .placeholderSignTXRequets, browserExtensionConnection: .placeholder),
-		addressOfSigner: try! AccountAddress(address: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
-		transactionManifest: .mock
-	)
+//	static let placeholder = Self(
+	//        requestFromClient: .placeholderOneTimeAccount,
+//		addressOfSigner: try! AccountAddress(address: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
+//		transactionManifest: .mock
+//	)
+	static var placeholder: Self {
+		fatalError()
+	}
 }
 #endif

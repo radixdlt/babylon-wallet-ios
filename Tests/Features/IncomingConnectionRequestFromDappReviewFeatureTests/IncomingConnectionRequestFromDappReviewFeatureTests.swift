@@ -1,30 +1,30 @@
-import Collections
-import ComposableArchitecture
-@testable import IncomingConnectionRequestFromDappReviewFeature
-import NonEmpty
-import ProfileClient
 import TestUtils
 
-import BrowserExtensionsConnectivityClient
+import Collections
+import ComposableArchitecture
+import NonEmpty
+import ProfileClient
+import SharedModels
 
-extension IncomingMessageFromBrowser {
-	static var placeholderAccountReq: Self {
-		try! .init(
-			requestMethodWalletRequest: .placeholderGetAccountAddressRequest,
-			browserExtensionConnection: .placeholder
-		)
-	}
-}
+@testable import IncomingConnectionRequestFromDappReviewFeature
 
 // MARK: - IncomingConnectionRequestFromDappReviewFeatureTests
 @MainActor
 final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 	func test_dismissIncomingConnectionRequest_whenTappedOnCloseButton_thenCoortinateDismissal() async {
 		// given
-		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
-			incomingMessageFromBrowser: .placeholderAccountReq,
-			incomingConnectionRequestFromDapp: .placeholder
+		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
+			requestItem: .init(numberOfAddresses: 1),
+			parentRequest: .placeholder
 		)
+
+		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
+			request: .init(
+				requestItem: requestItem.requestItem,
+				parentRequest: requestItem.parentRequest
+			)
+		)
+
 		let store = TestStore(
 			initialState: initialState,
 			reducer: IncomingConnectionRequestFromDappReview()
@@ -34,15 +34,21 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		_ = await store.send(.view(.dismissButtonTapped))
 
 		// then
-		_ = await store.receive(.delegate(.dismiss))
+		_ = await store.receive(.delegate(.dismiss(requestItem)))
 	}
 
 	func test_proceedWithConnectionRequest_whenTappedOnContinueButton_thenDisplayChooseAccounts() async {
 		// given
-		let request: IncomingConnectionRequestFromDapp = .placeholder
+		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
+			requestItem: .init(numberOfAddresses: 1),
+			parentRequest: .placeholder
+		)
+
 		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
-			incomingMessageFromBrowser: .placeholderAccountReq,
-			incomingConnectionRequestFromDapp: request
+			request: .init(
+				requestItem: requestItem.requestItem,
+				parentRequest: requestItem.parentRequest
+			)
 		)
 		let store = TestStore(
 			initialState: initialState,
@@ -58,7 +64,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 
 		_ = await store.receive(.internal(.system(.loadAccountsResult(.success(accounts))))) {
 			$0.chooseAccounts = .init(
-				incomingConnectionRequestFromDapp: request,
+				request: requestItem,
 				accounts: .init(uniqueElements: accounts.rawValue.elements.map {
 					ChooseAccounts.Row.State(account: $0)
 				})
@@ -68,10 +74,16 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 
 	func test_dismissChooseAccounts_whenCoordinatedToDismissChooseAccounts_thenDismissChooseAccounts() async {
 		// given
-		let request: IncomingConnectionRequestFromDapp = .placeholder
+		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
+			requestItem: .init(numberOfAddresses: 1),
+			parentRequest: .placeholder
+		)
+
 		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
-			incomingMessageFromBrowser: .placeholderAccountReq,
-			incomingConnectionRequestFromDapp: request,
+			request: .init(
+				requestItem: requestItem.requestItem,
+				parentRequest: requestItem.parentRequest
+			),
 			chooseAccounts: .placeholder
 		)
 		let store = TestStore(

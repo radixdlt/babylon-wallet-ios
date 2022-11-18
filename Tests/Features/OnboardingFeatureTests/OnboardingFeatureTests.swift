@@ -31,9 +31,9 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 			initialState: NewProfile.State(canProceed: true),
 			reducer: NewProfile()
 		)
-		store.dependencies.profileClient.createNewProfile = { req in
+		store.dependencies.profileClient.createNewProfileWithOnLedgerAccount = { req, _ in
 			try! await Profile.new(
-				networkID: .primary,
+				networkAndGateway: .primary,
 				mnemonic: req.curve25519FactorSourceMnemonic
 			)
 		}

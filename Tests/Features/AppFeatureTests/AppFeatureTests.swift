@@ -34,11 +34,10 @@ final class AppFeatureTests: TestCase {
 			initialState: App.State(root: .onboarding(.init(newProfile: .init()))),
 			reducer: App()
 		)
-		let newProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
+		let newProfile = try await Profile.new(networkAndGateway: .primary, mnemonic: .generate())
 		let expectation = expectation(description: "Profile injected")
-		store.dependencies.profileClient.injectProfile = { injected, mode in
+		store.dependencies.profileClient.injectProfile = { injected in
 			XCTAssertEqual(injected, newProfile)
-			XCTAssert(mode == .injectAndPersistInKeychain)
 			expectation.fulfill()
 		}
 
@@ -55,7 +54,7 @@ final class AppFeatureTests: TestCase {
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		// GIVEN: an existing profile
-		let existingProfile = try await Profile.new(networkID: networkID, mnemonic: .generate())
+		let existingProfile = try await Profile.new(networkAndGateway: .primary, mnemonic: .generate())
 
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(
@@ -64,9 +63,8 @@ final class AppFeatureTests: TestCase {
 		)
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 		let expectation = expectation(description: "Profile injected")
-		store.dependencies.profileClient.injectProfile = { injected, mode in
+		store.dependencies.profileClient.injectProfile = { injected in
 			XCTAssertEqual(injected, existingProfile)
-			XCTAssert(mode == .onlyInject)
 			expectation.fulfill()
 		}
 
@@ -87,7 +85,7 @@ final class AppFeatureTests: TestCase {
 		wait(for: [expectation], timeout: 0)
 	}
 
-	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_thenShowErrorAndNavigateToOnboarding() async {
+	func test_loadWalletResult_whenWalletLoadingFailedBecauseNoWalletFound_navigateToOnboarding() async {
 		// given
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
@@ -109,15 +107,6 @@ final class AppFeatureTests: TestCase {
 		// then
 		_ = await store.receive(.child(.splash(.delegate(.profileLoaded(nil))))) {
 			$0.root = .onboarding(.init())
-		}
-		_ = await store.receive(.internal(.system(.displayErrorAlert(App.UserFacingError(Splash.NoProfileError()))))) {
-			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("No profile saved yet"))
-		}
-
-		// when
-		_ = await store.send(.view(.errorAlertDismissButtonTapped)) {
-			// then
-			$0.errorAlert = nil
 		}
 
 		await testScheduler.run() // fast-forward scheduler to the end of time

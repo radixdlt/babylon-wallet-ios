@@ -2,12 +2,15 @@ import CryptoKit
 import Dependencies
 import Foundation
 import Mnemonic
+import Profile
 import XCTestDynamicOverlay
 
 // MARK: - GatewayAPIClient + TestDependencyKey
 extension GatewayAPIClient: TestDependencyKey {
 	public static let previewValue = Self.mock()
 	public static let testValue = Self(
+		getCurrentBaseURL: unimplemented("\(Self.self).getCurrentBaseURL"),
+		setCurrentBaseURL: unimplemented("\(Self.self).setCurrentBaseURL"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
 		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
@@ -23,90 +26,19 @@ extension GatewayAPIClient: TestDependencyKey {
 		txStatus: V0TransactionStatusResponse.IntentStatus? = nil
 	) -> Self {
 		.init(
+			getCurrentBaseURL: { URL(string: "example.com")! },
+			setCurrentBaseURL: { _ in AppPreferences.NetworkAndGateway.primary },
 			getEpoch: { .init(epoch: 1337) },
 			accountResourcesByAddress: { _ in
-//				.init(
-//					address: accountAddress.address,
-//					fungibleResources: .init(
-//						totalCount: fungibleResourceCount,
-//						results: (0 ..< fungibleResourceCount).map { index in
-//							EntityStateResponseFungibleResource(
-//								address: fungibleResourceAddress(at: index),
-//								amountAttos: amountAttos(at: index)
-//							)
-//						}
-//					),
-//					nonFungibleResources: .init(
-//						totalCount: nonFungibleResourceCount,
-//						results: (0 ..< nonFungibleResourceCount).map { index in
-//							EntityStateResponseNonFungibleResource(
-//								address: nonFungibleResourceAddress(at: index),
-//								amount: Double(amount(at: index))
-//							)
-//						}
-//					)
-//				)
 				fatalError()
 			},
 			resourceDetailsByResourceIdentifier: { _ in
-//				let seed = resourceAddress.hashValue
-//				let seed1 = resourceAddress.count.hashValue
-//				let seed2 = resourceAddress.count.bitWidth.hashValue
-//				let fun: EntityDetailsResponseDetails = .typeEntityDetailsResponseFungibleDetails(
-//					.init(
-//						resourceType: "fungible",
-//						isFungible: true,
-//						totalSupplyAttos: amountAttos(at: seed),
-//						totalMintedAttos: amountAttos(at: seed1),
-//						totalBurntAttos: amountAttos(at: seed2)
-//					)
-//				)
-//
-//				let nonFun: EntityDetailsResponseDetails = .typeEntityDetailsResponseNonFungibleDetails(
-//					.init(
-//						resourceType: "non_fungible",
-//						isFungible: false,
-//						tbd: "Unknown undecided property made more unique by seeded value: \(seed)"
-//					)
-//				)
-//
-//				if let _ = nonFungibleResourceAddresses.firstIndex(of: resourceAddress) {
-//					return nonFun
-//				} else if let _ = fungibleResourceAddresses.firstIndex(of: resourceAddress) {
-//					return fun
-//				} else if seed.isMultiple(of: 2) {
-//					return nonFun
-//				} else {
-//					return fun
-//				}
 				fatalError()
 			},
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},
 			transactionStatus: { request in
-//				.init(
-//					ledgerState: .init(
-//						network: "mockNET",
-//						version: 0,
-//						timestamp: String(describing: Date().timeIntervalSince1970),
-//						epoch: 1337,
-//						round: 237
-//					),
-//					transaction: .init(
-//						transactionStatus: .init(
-//							status: txStatus ?? TransactionStatus.Status(seed: request.transactionIdentifier.hashValue)
-//						),
-//
-//						payloadHashHex: Data(SHA256.hash(data: "payloadHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex(),
-//
-//						intentHashHex: Data(SHA256.hash(data: "intentHashHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex(),
-//
-//						transactionAccumulatorHex: Data(SHA256.hash(data: "transactionAccumulatorHex\(request.transactionIdentifier.valueHex)".data(using: .utf8)!)).hex(),
-//
-//						feePaid: TokenAmount(value: "\(request.transactionIdentifier.hashValue)", tokenIdentifier: .init(rri: "resource_rdx1xrd"))
-//					)
-//				)
 				.init(intentStatus: txStatus ?? .committedSuccess, knownPayloads: [
 					.init(payloadHash: Data(SHA256.hash(data: "payloadHashHex\(request.intentHash)".data(using: .utf8)!)).hex(), status: .committedSuccess),
 				])
@@ -117,18 +49,6 @@ extension GatewayAPIClient: TestDependencyKey {
 		)
 	}
 }
-
-// private extension TransactionStatus.Status {
-//	init(seed: Int) {
-//		switch seed % 4 {
-//		case 0: self = .succeeded
-//		case 1: self = .pending
-//		case 2: self = .failed
-//		case 3: self = .rejected
-//		default: self = .succeeded
-//		}
-//	}
-// }
 
 public extension DependencyValues {
 	var gatewayAPIClient: GatewayAPIClient {

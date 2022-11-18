@@ -3,7 +3,6 @@ import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
 import AppSettings
-import BrowserExtensionsConnectivityClient
 import Collections
 import Common
 import ComposableArchitecture
@@ -11,7 +10,9 @@ import CreateAccountFeature
 import Foundation
 import IncomingConnectionRequestFromDappReviewFeature
 import NonEmpty
+import P2PConnectivityClient
 import Profile
+import SharedModels
 import TransactionSigningFeature
 
 // MARK: - Home.Action
@@ -34,6 +35,7 @@ public extension Home.Action {
 		case accountDetails(AccountDetails.Action)
 		case transfer(AccountDetails.Transfer.Action)
 		case createAccount(CreateAccount.Action)
+
 		case chooseAccountRequestFromDapp(IncomingConnectionRequestFromDappReview.Action)
 		case transactionSigning(TransactionSigning.Action)
 	}
@@ -60,19 +62,21 @@ public extension Home.Action {
 	enum SystemAction: Equatable {
 		case createAccount(numberOfExistingAccounts: Int)
 
-		case subscribeToIncomingMessagesFromDappsByBrowserConnectionIDs(OrderedSet<BrowserExtensionConnection.ID>)
+		case subscribeToRequestsFromP2PClientByID(OrderedSet<P2PClient.ID>)
 
-		case receiveRequestMessageFromDappResult(TaskResult<IncomingMessageFromBrowser>)
-		case presentViewForRequestFromBrowser(IncomingMessageFromBrowser)
+		case receiveRequestFromP2PClientResult(TaskResult<P2P.RequestFromClient>)
+
+		case dismissed(P2P.RequestFromClient)
+		case handleNextRequestItemIfNeeded
+		case presentViewForP2PRequest(P2P.RequestItemToHandle)
 
 		case accountsLoadedResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
 		case appSettingsLoadedResult(TaskResult<AppSettings>)
-		case connectionsLoadedResult(TaskResult<[BrowserExtensionWithConnectionStatus]>)
+		case connectionsLoadedResult(TaskResult<[P2P.ClientWithConnectionStatus]>)
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)
 		case accountPortfolioResult(TaskResult<AccountPortfolioDictionary>)
-		case sendResponseBackToDapp(BrowserExtensionConnection.ID, RequestMethodWalletResponse)
-		case sendResponseBackToDappResult(TaskResult<SentMessageToBrowser>)
+		case sendResponseBackToDappResult(TaskResult<P2P.SentResponseToClient>)
 	}
 }
 

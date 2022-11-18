@@ -12,7 +12,15 @@ final class ChooseAccountsTests: TestCase {
 		var singleAccount = ChooseAccounts.Row.State.placeholderOne
 		singleAccount.isSelected = true
 		let store = TestStore(
-			initialState: ChooseAccounts.State(incomingConnectionRequestFromDapp: .placeholder, accounts: [singleAccount]),
+			initialState: ChooseAccounts.State(
+				request: .init(
+					requestItem: .placeholder,
+					parentRequest: .placeholder
+				),
+				accounts: [
+					singleAccount,
+				]
+			),
 			reducer: ChooseAccounts()
 		)
 
@@ -43,15 +51,8 @@ final class ChooseAccountsTests: TestCase {
 		var accountRow = ChooseAccounts.Row.State.placeholderOne
 		accountRow.isSelected = true
 
-		let connectionRequest: IncomingConnectionRequestFromDapp = .init(
-			componentAddress: "deadbeef",
-			name: "Radaswap",
-			permissions: [],
-			numberOfNeededAccounts: .exactly(1)
-		)
-
 		let initialState: ChooseAccounts.State = .init(
-			incomingConnectionRequestFromDapp: connectionRequest,
+			request: .init(requestItem: .init(numberOfAddresses: 1), parentRequest: .placeholder),
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
@@ -81,15 +82,8 @@ final class ChooseAccountsTests: TestCase {
 		var accountRowTwo = ChooseAccounts.Row.State.placeholderTwo
 		accountRowTwo.isSelected = false
 
-		let connectionRequest: IncomingConnectionRequestFromDapp = .init(
-			componentAddress: "deadbeef",
-			name: "Radaswap",
-			permissions: [],
-			numberOfNeededAccounts: .atLeastOne
-		)
-
 		let initialState: ChooseAccounts.State = .init(
-			incomingConnectionRequestFromDapp: connectionRequest,
+			request: .init(requestItem: .init(numberOfAddresses: .oneOrMore), parentRequest: .placeholder),
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
@@ -123,15 +117,8 @@ final class ChooseAccountsTests: TestCase {
 		var accountRow = ChooseAccounts.Row.State.placeholderOne
 		accountRow.isSelected = false
 
-		let connectionRequest: IncomingConnectionRequestFromDapp = .init(
-			componentAddress: "deadbeef",
-			name: "Radaswap",
-			permissions: [],
-			numberOfNeededAccounts: .exactly(1)
-		)
-
 		let initialState: ChooseAccounts.State = .init(
-			incomingConnectionRequestFromDapp: connectionRequest,
+			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .placeholder),
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
@@ -161,15 +148,8 @@ final class ChooseAccountsTests: TestCase {
 		var accountRowTwo = ChooseAccounts.Row.State.placeholderTwo
 		accountRowTwo.isSelected = false
 
-		let connectionRequest: IncomingConnectionRequestFromDapp = .init(
-			componentAddress: "deadbeef",
-			name: "Radaswap",
-			permissions: [],
-			numberOfNeededAccounts: .exactly(1)
-		)
-
 		let initialState: ChooseAccounts.State = .init(
-			incomingConnectionRequestFromDapp: connectionRequest,
+			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .placeholder),
 			canProceed: true,
 			accounts: .init(
 				uniqueElements: [

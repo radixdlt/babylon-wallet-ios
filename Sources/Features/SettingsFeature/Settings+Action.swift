@@ -1,7 +1,8 @@
 import ComposableArchitecture
 import Foundation
 import GatewayAPI
-import ManageBrowserExtensionConnectionsFeature
+import ManageGatewayAPIEndpointsFeature
+import ManageP2PClientsFeature
 import Profile
 
 // MARK: - Settings.Action
@@ -18,7 +19,8 @@ public extension Settings {
 // MARK: - Settings.Action.ChildAction
 public extension Settings.Action {
 	enum ChildAction: Equatable {
-		case manageBrowserExtensionConnections(ManageBrowserExtensionConnections.Action)
+		case manageP2PClients(ManageP2PClients.Action)
+		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
 	}
 }
 
@@ -29,8 +31,11 @@ public extension Settings.Action {
 		case dismissSettingsButtonTapped
 		case deleteProfileAndFactorSourcesButtonTapped
 
-		case manageBrowserExtensionConnectionsButtonTapped
-		case addBrowserExtensionConnectionButtonTapped
+		case manageP2PClientsButtonTapped
+		case addP2PClientButtonTapped
+
+		case editGatewayAPIEndpointButtonTapped
+
 		#if DEBUG
 		case debugInspectProfileButtonTapped
 		case setDebugProfileSheet(isPresented: Bool)
@@ -49,7 +54,7 @@ public extension Settings.Action {
 // MARK: - Settings.Action.InternalAction.SystemAction
 public extension Settings.Action.InternalAction {
 	enum SystemAction: Equatable {
-		case loadBrowserExtensionConnectionResult(TaskResult<BrowserExtensionConnections>)
+		case loadP2PClientsResult(TaskResult<P2PClients>)
 		#if DEBUG
 		case profileToDebugLoaded(Profile)
 		#endif // DEBUG

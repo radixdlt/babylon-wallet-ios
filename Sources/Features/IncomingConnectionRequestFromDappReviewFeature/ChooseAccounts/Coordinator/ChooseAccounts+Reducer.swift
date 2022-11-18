@@ -25,25 +25,26 @@ public struct ChooseAccounts: ReducerProtocol {
 			// and every other action should fall-through - @davdroman-rdx
 			case let .child(.account(id: id, action: action)):
 				guard let account = state.accounts[id: id] else { return .none }
+				let oneTimeAccountRequest = state.request.requestItem
 				switch action {
 				case .internal(.view(.didSelect)):
 					if account.isSelected {
 						state.accounts[id: id]?.isSelected = false
 					} else {
-						switch state.incomingConnectionRequestFromDapp.numberOfNeededAccounts {
-						case .atLeastOne:
+						switch oneTimeAccountRequest.numberOfAddresses {
+						case .oneOrMore:
 							state.accounts[id: id]?.isSelected = true
-						case let .exactly(number):
-							guard state.selectedAccounts.count < number else { break }
+						case let .exactly(numberOfAddresses):
+							guard state.selectedAccounts.count < numberOfAddresses.oneOrMore else { break }
 							state.accounts[id: id]?.isSelected = true
 						}
 					}
 
-					switch state.incomingConnectionRequestFromDapp.numberOfNeededAccounts {
-					case .atLeastOne:
+					switch oneTimeAccountRequest.numberOfAddresses {
+					case .oneOrMore:
 						state.canProceed = state.selectedAccounts.count >= 1
-					case let .exactly(number):
-						state.canProceed = state.selectedAccounts.count == number
+					case let .exactly(numberOfAddresses):
+						state.canProceed = state.selectedAccounts.count == numberOfAddresses.oneOrMore
 					}
 
 					return .none

@@ -3,7 +3,6 @@ import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
 import Asset
-import BrowserExtensionsConnectivityClient
 import Collections
 import ComposableArchitecture
 import CreateAccountFeature
@@ -11,15 +10,17 @@ import Foundation
 import FungibleTokenListFeature
 import IncomingConnectionRequestFromDappReviewFeature
 import LegibleError
+import P2PConnectivityClient
 import PasteboardClient
 import Profile
+import SharedModels
 import TransactionSigningFeature
 
 // MARK: - Home
 public struct Home: ReducerProtocol {
 	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 	@Dependency(\.appSettingsClient) var appSettingsClient
-	@Dependency(\.browserExtensionsConnectivityClient) var browserExtensionsConnectivityClient
+	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.openURL) var openURL
@@ -81,31 +82,41 @@ public struct Home: ReducerProtocol {
 		case .internal(.view(.didAppear)):
 			return loadAccountsConnectionsAndSettings()
 
-		case let .internal(.system(.subscribeToIncomingMessagesFromDappsByBrowserConnectionIDs(ids))):
+		case let .internal(.system(.subscribeToRequestsFromP2PClientByID(ids))):
 			return .run { send in
 				await withThrowingTaskGroup(of: Void.self) { taskGroup in
 					for id in ids {
 						taskGroup.addTask {
 							do {
-								let incomingMsgs = try await browserExtensionsConnectivityClient.getIncomingMessageAsyncSequence(id)
-								for try await incomingMsg in incomingMsgs {
-									await send(.internal(.system(.receiveRequestMessageFromDappResult(.success(incomingMsg)))))
+								let requests = try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(id)
+								for try await request in requests {
+									await send(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
 								}
 							} catch {
-								await send(.internal(.system(.receiveRequestMessageFromDappResult(.failure(error)))))
+								await send(.internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))))
 							}
 						}
 					}
 				}
 			}
 
-		case let .internal(.system(.receiveRequestMessageFromDappResult(.failure(error)))):
+		case let .internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
 
-		case let .internal(.system(.receiveRequestMessageFromDappResult(.success(incomingMessageFromBrowser)))):
-			presentViewForRequestFromBrowser(state: &state, incomingRequestFromBrowser: incomingMessageFromBrowser)
-			return .none
+		case let .internal(.system(.receiveRequestFromP2PClientResult(.success(requestFromP2P)))):
+			state.unfinishedRequestsFromClient.queue(requestFromClient: requestFromP2P)
+
+			guard state.handleRequest == nil else {
+				// already handling a requests
+				return .none
+			}
+			guard let itemToHandle = state.unfinishedRequestsFromClient.next() else {
+				fatalError("We just queued a request, did it contain no RequestItems at all? This is undefined behaviour. Should we return an empty response here?")
+			}
+			return .run { send in
+				await send(.internal(.system(.presentViewForP2PRequest(itemToHandle))))
+			}
 
 		case let .internal(.system(.connectionsLoadedResult(.failure(error)))):
 			errorQueue.schedule(error)
@@ -114,7 +125,7 @@ public struct Home: ReducerProtocol {
 		case let .internal(.system(.connectionsLoadedResult(.success(connections)))):
 			let ids = OrderedSet(connections.map(\.id))
 			return .run { send in
-				await send(.internal(.system(.subscribeToIncomingMessagesFromDappsByBrowserConnectionIDs(ids))))
+				await send(.internal(.system(.subscribeToRequestsFromP2PClientByID(ids))))
 			}
 
 		case let .internal(.system(.accountsLoadedResult(.failure(error)))):
@@ -161,23 +172,14 @@ public struct Home: ReducerProtocol {
 
 		case let .internal(.system(.fetchPortfolioResult(.success(totalPortfolio)))):
 			state.accountPortfolioDictionary = totalPortfolio
-
-			// aggregated value
-			//            state.aggregatedValue.value = totalPortfolio.compactMap(\.value.worth).reduce(0, +)
-
-			// account list
 			state.accountList.accounts.forEach {
-				//                state.accountList.accounts[id: $0.address]?.aggregatedValue = totalPortfolio[$0.address]?.worth
 				let accountPortfolio = totalPortfolio[$0.address] ?? OwnedAssets.empty
 				state.accountList.accounts[id: $0.address]?.portfolio = accountPortfolio
 			}
 
 			// account details
 			if let details = state.accountDetails {
-				// aggregated value
 				let account = details.account
-				// let accountWorth = state.accountPortfolioDictionary[details.address]
-				//                state.accountDetails?.aggregatedValue.value = accountWorth?.worth
 
 				// asset list
 				let accountPortfolio = totalPortfolio[account.address] ?? OwnedAssets.empty
@@ -272,48 +274,50 @@ public struct Home: ReducerProtocol {
 			state.createAccount = nil
 			return .none
 
-		case let .internal(.system(.presentViewForRequestFromBrowser(incomingRequestFromBrowser))):
-			presentViewForRequestFromBrowser(state: &state, incomingRequestFromBrowser: incomingRequestFromBrowser)
+		case let .internal(.system(.presentViewForP2PRequest(requestItemToHandle))):
+			state.handleRequest = .init(requestItemToHandle: requestItemToHandle)
 			return .none
 
-		case .child(.chooseAccountRequestFromDapp(.delegate(.dismiss))):
-			state.chooseAccountRequestFromDapp = nil
+		case let .child(.chooseAccountRequestFromDapp(.delegate(.dismiss(dismissedRequestItem)))):
+			return .run { send in
+				await send(.internal(.system(.dismissed(dismissedRequestItem.parentRequest))))
+			}
+
+		case let .internal(.system(.dismissed(dismissedRequest))):
+			state.handleRequest = nil
+			state.unfinishedRequestsFromClient.dismiss(request: dismissedRequest)
 			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
 
-		case let .child(.chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, incomingMessageFromBrowser)))):
-			state.chooseAccountRequestFromDapp = nil
-			let accountAddresses: [RequestMethodWalletResponse.AccountAddressesRequestMethodWalletResponse.AccountAddress] = selectedAccounts.map {
-				.init(address: $0.address.address, label: $0.displayName ?? "AccountIndex: \($0.index)")
+		case let .child(.chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
+			state.handleRequest = nil
+			let accountAddresses: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
+				.init(account: $0)
 			}
-			let response = RequestMethodWalletResponse(
-				method: .request,
-				requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
-				payload: [
-					.accountAddresses(
-						.init(
-							addresses: accountAddresses
-						)
-					),
-				]
-			)
-			return .run { send in
-				await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
+			let responseItem = P2P.ToDapp.WalletResponseItem.ongoingAccountAddresses(.init(accountAddresses: .init(rawValue: accountAddresses)!))
+
+			guard let responseContent = state.unfinishedRequestsFromClient.finish(
+				.oneTimeAccountAddresses(request.requestItem), with: responseItem
+			) else {
+				return .run { send in
+					await send(.internal(.system(.handleNextRequestItemIfNeeded)))
+				}
 			}
 
-		case let .internal(.system(.sendResponseBackToDapp(browserConnectionID, response))):
+			let response = P2P.ResponseToClientByID(
+				connectionID: request.parentRequest.client.id,
+				responseToDapp: responseContent
+			)
+
 			return .run { send in
 				await send(.internal(.system(.sendResponseBackToDappResult(
 					TaskResult {
-						let outgoingMessage = MessageToDappRequest(
-							browserExtensionConnectionID: browserConnectionID,
-							requestMethodWalletResponse: response
-						)
-
-						return try await browserExtensionsConnectivityClient
-							.sendMessage(outgoingMessage)
+						try await p2pConnectivityClient.sendMessage(response)
 					}
 				))))
 			}
+
+		case .internal(.system(.handleNextRequestItemIfNeeded)):
+			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
 
 		case .internal(.system(.sendResponseBackToDappResult(.success(_)))):
 			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
@@ -322,22 +326,19 @@ public struct Home: ReducerProtocol {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, incomingMessageFromBrowser)))):
-			state.transactionSigning = nil
-			let response = RequestMethodWalletResponse(
-				method: .request,
-				requestId: incomingMessageFromBrowser.requestMethodWalletRequest.requestId,
-				payload: [
-					.signTXRequest(.init(transactionIntentHash: txID)),
-				]
-			)
-			return .run { send in
-				await send(.internal(.system(.sendResponseBackToDapp(incomingMessageFromBrowser.browserExtensionConnection.id, response))))
-			}
+		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(request)))):
+			state.handleRequest = nil
 
-		case .child(.transactionSigning(.delegate(.dismissView))):
-			state.transactionSigning = nil
-			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
+			// FIXME: Betanet: once we have migrated to Hammunet we can use the EngineToolkit to read out required signeres to sign tx.
+			errorQueue.schedule(
+				NSError(domain: "Transaction signing disabled until app is Hammunet compatible. Once we have it in place we should respond back with TXID to dApp here.", code: 1337)
+			)
+			return .none
+
+		case let .child(.transactionSigning(.delegate(.dismissed(dismissedRequestItem)))):
+			return .run { send in
+				await send(.internal(.system(.dismissed(dismissedRequestItem.parentRequest))))
+			}
 
 		case .child, .delegate:
 			return .none
@@ -367,7 +368,7 @@ public struct Home: ReducerProtocol {
 			))))
 			await send(.internal(.system(.connectionsLoadedResult(
 				TaskResult {
-					try await browserExtensionsConnectivityClient.getBrowserExtensionConnections()
+					try await p2pConnectivityClient.getP2PClients()
 				}
 			))))
 		}
@@ -381,42 +382,12 @@ public struct Home: ReducerProtocol {
 	}
 
 	func presentViewForNextBufferedRequestFromBrowserIfNeeded(state: inout State) -> EffectTask<Action> {
-		guard let next = state.unhandledReceivedMessages.first else {
+		guard let next = state.unfinishedRequestsFromClient.next() else {
 			return .none
 		}
-		state.unhandledReceivedMessages.removeFirst()
-
 		return .run { send in
 			try await mainQueue.sleep(for: .seconds(1))
-			await send(.internal(.system(.presentViewForRequestFromBrowser(next))))
-		}
-	}
-
-	func presentViewForRequestFromBrowser(state: inout State, incomingRequestFromBrowser: IncomingMessageFromBrowser) {
-		switch incomingRequestFromBrowser.payload {
-		case let .accountAddresses(accountAddressRequest):
-			if state.chooseAccountRequestFromDapp == nil {
-				state.chooseAccountRequestFromDapp = IncomingConnectionRequestFromDappReview.State(
-					incomingMessageFromBrowser: incomingRequestFromBrowser,
-					incomingConnectionRequestFromDapp: .init(addressRequest: accountAddressRequest, from: incomingRequestFromBrowser.requestMethodWalletRequest)
-				)
-			} else {
-				// Buffer
-				state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
-			}
-		case let .signTXRequest(signTXRequest):
-			if state.transactionSigning == nil {
-				// if `state.chooseAccountRequestFromDapp` is non nil, this will present SignTX view
-				// on top of chooseAccountsView...
-				state.transactionSigning = .init(
-					incomingMessageFromBrowser: incomingRequestFromBrowser,
-					addressOfSigner: signTXRequest.accountAddress,
-					transactionManifest: signTXRequest.transactionManifest
-				)
-			} else {
-				// Buffer
-				state.unhandledReceivedMessages.append(incomingRequestFromBrowser)
-			}
+			await send(.internal(.system(.presentViewForP2PRequest(next))))
 		}
 	}
 }

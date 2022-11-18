@@ -1,8 +1,8 @@
-import BrowserExtensionsConnectivityClient
 import ComposableArchitecture
 import EngineToolkit
 import Foundation
 import ProfileClient
+import SharedModels
 
 // MARK: - TransactionSigning.Action
 public extension TransactionSigning {
@@ -32,11 +32,11 @@ public extension TransactionSigning.Action {
 // MARK: - TransactionSigning.Action.DelegateAction
 public extension TransactionSigning.Action {
 	enum DelegateAction: Equatable {
-		case dismissView
+		case dismissed(P2P.SignTransactionRequestToHandle)
 
 		case signedTXAndSubmittedToGateway(
 			TransactionIntent.TXID,
-			incomingMessageFromBrowser: IncomingMessageFromBrowser
+			request: P2P.SignTransactionRequestToHandle
 		)
 	}
 }

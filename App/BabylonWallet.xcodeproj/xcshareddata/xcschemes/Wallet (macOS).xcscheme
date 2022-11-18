@@ -292,16 +292,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BrowserExtensionsConnectivityClientTests"
-               BuildableName = "BrowserExtensionsConnectivityClientTests"
-               BlueprintName = "BrowserExtensionsConnectivityClientTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "EngineToolkitClientTests"
                BuildableName = "EngineToolkitClientTests"
                BlueprintName = "EngineToolkitClientTests"
@@ -312,9 +302,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ManageBrowserExtensionConnectionsFeatureTests"
-               BuildableName = "ManageBrowserExtensionConnectionsFeatureTests"
-               BlueprintName = "ManageBrowserExtensionConnectionsFeatureTests"
+               BlueprintIdentifier = "TransactionSigningFeatureTests"
+               BuildableName = "TransactionSigningFeatureTests"
+               BlueprintName = "TransactionSigningFeatureTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -322,9 +312,59 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "TransactionSigningFeatureTests"
-               BuildableName = "TransactionSigningFeatureTests"
-               BlueprintName = "TransactionSigningFeatureTests"
+               BlueprintIdentifier = "ManageGatewayAPIEndpointsFeatureTests"
+               BuildableName = "ManageGatewayAPIEndpointsFeatureTests"
+               BlueprintName = "ManageGatewayAPIEndpointsFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ManageP2PClientsFeatureTests"
+               BuildableName = "ManageP2PClientsFeatureTests"
+               BlueprintName = "ManageP2PClientsFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "P2PConnectivityClientTests"
+               BuildableName = "P2PConnectivityClientTests"
+               BlueprintName = "P2PConnectivityClientTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SharedModelsTests"
+               BuildableName = "SharedModelsTests"
+               BlueprintName = "SharedModelsTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "TransactionClientTests"
+               BuildableName = "TransactionClientTests"
+               BlueprintName = "TransactionClientTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "URLBuilderClientTests"
+               BuildableName = "URLBuilderClientTests"
+               BlueprintName = "URLBuilderClientTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>

@@ -20,36 +20,38 @@ extension ProfileClient: TestDependencyKey {
 	// TODO: make every endpoint no-op
 	public static let previewValue = Self(
 		getCurrentNetworkID: { NetworkID.primary },
-		setCurrentNetworkID: { _ in },
-		createNewProfile: { req in
+		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
+		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.primary },
+		setNetworkAndGateway: { _ in },
+		createNewProfileWithOnLedgerAccount: { req, _ in
 			try! await Profile.new(
-				networkID: .primary,
+				networkAndGateway: .primary,
 				mnemonic: req.curve25519FactorSourceMnemonic
 			)
 		},
-		injectProfile: { _, _ in /* Noop */ },
+		injectProfile: { _ in /* Noop */ },
 		extractProfileSnapshot: { fatalError("Impl me") },
-		deleteProfileSnapshot: { /* Noop */ },
+		deleteProfileAndFactorSources: { /* Noop */ },
 		getAccounts: {
 			let accounts: [OnNetwork.Account] = [.mocked0, .mocked1]
 			return NonEmpty(rawValue: OrderedSet(accounts))!
 		},
-		getBrowserExtensionConnections: { fatalError() },
-		addBrowserExtensionConnection: { _ in fatalError() },
-		deleteBrowserExtensionConnection: { _ in fatalError() },
+		getP2PClients: { fatalError() },
+		addP2PClient: { _ in fatalError() },
+		deleteP2PClientByID: { _ in fatalError() },
 		getAppPreferences: {
 			fatalError()
 		},
 		setDisplayAppPreferences: { _ in
 			fatalError()
 		},
-		createAccount: { _ in
+		createOnLedgerAccount: { _, _ in
 			fatalError()
 		},
 		lookupAccountByAddress: { _ in
 			.mocked0
 		},
-		signTransaction: { _, _ in
+		signTransaction: { _ in
 			struct MockError: LocalizedError {
 				let errorDescription: String? = "Transaction signing failed!"
 			}
@@ -59,21 +61,27 @@ extension ProfileClient: TestDependencyKey {
 
 	public static let testValue = Self(
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
-		setCurrentNetworkID: unimplemented("\(Self.self).setCurrentNetworkID"),
-		createNewProfile: unimplemented("\(Self.self).createNewProfile"),
+		getGatewayAPIEndpointBaseURL: unimplemented("\(Self.self).getGatewayAPIEndpointBaseURL"),
+		getNetworkAndGateway: unimplemented("\(Self.self).getNetworkAndGateway"),
+		setNetworkAndGateway: unimplemented("\(Self.self).setNetworkAndGateway"),
+		createNewProfileWithOnLedgerAccount: { _, _ in throw UnimplementedError(description: "\(Self.self).createNewProfileWithOnLedgerAccount is unimplemented") },
 		injectProfile: unimplemented("\(Self.self).injectProfile"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
-		deleteProfileSnapshot: unimplemented("\(Self.self).deleteProfileSnapshot"),
+		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
 		getAccounts: unimplemented("\(Self.self).getAccounts"),
-		getBrowserExtensionConnections: unimplemented("\(Self.self).getBrowserExtensionConnections"),
-		addBrowserExtensionConnection: unimplemented("\(Self.self).addBrowserExtensionConnection"),
-		deleteBrowserExtensionConnection: unimplemented("\(Self.self).deleteBrowserExtensionConnection"),
+		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
+		addP2PClient: unimplemented("\(Self.self).addP2PClient"),
+		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
 		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
-		createAccount: unimplemented("\(Self.self).createAccount"),
+		createOnLedgerAccount: { _, _ in throw UnimplementedError(description: "\(Self.self).createOnLedgerAccount is unimplemented") },
 		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
 		signTransaction: unimplemented("\(Self.self).signTransaction")
 	)
+}
+
+public struct UnimplementedError: Swift.Error {
+	public let description: String
 }
 
 public extension OnNetwork.Account {

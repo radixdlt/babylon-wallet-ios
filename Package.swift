@@ -19,7 +19,9 @@ package.dependencies += [
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.19"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.0.9"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.30"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.32"),
+
+	.package(url: "https://github.com/apple/swift-collections", from: "1.0.3"),
 
 	// Third party dependencies
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
@@ -28,6 +30,7 @@ package.dependencies += [
 	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
 	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
 	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
+	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
 
 	// TCA - ComposableArchitecture used as architecture
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
@@ -44,6 +47,16 @@ let asyncAlgorithms: Target.Dependency = .product(
 let asyncExtensions: Target.Dependency = .product(
 	name: "AsyncExtensions",
 	package: "AsyncExtensions"
+)
+
+let collections: Target.Dependency = .product(
+	name: "Collections",
+	package: "swift-collections"
+)
+
+let nonEmpty: Target.Dependency = .product(
+	name: "NonEmpty",
+	package: "swift-nonempty"
 )
 
 let tca: Target.Dependency = .product(
@@ -317,6 +330,7 @@ package.addModules([
 			"KeychainClientDependency",
 			"ProfileClient",
 			tca,
+			"TransactionClient", // FIXME: remove once we have virtual accounts
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -346,13 +360,14 @@ package.addModules([
 			"AccountPortfolio",
 			"AccountPreferencesFeature",
 			"AppSettings",
-			"BrowserExtensionsConnectivityClient",
+			"P2PConnectivityClient",
 			"Common",
 			"CreateAccountFeature",
 			engineToolkit,
 			"IncomingConnectionRequestFromDappReviewFeature",
 			"PasteboardClient",
 			"ProfileClient",
+			"SharedModels",
 			tca,
 			"TransactionSigningFeature",
 			// ^^^ Sort lexicographically ^^^
@@ -386,11 +401,12 @@ package.addModules([
 		name: "IncomingConnectionRequestFromDappReviewFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
-			"BrowserExtensionsConnectivityClient",
+			"P2PConnectivityClient",
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
 			"ProfileClient",
+			"SharedModels",
 			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
@@ -420,10 +436,9 @@ package.addModules([
 		)
 	),
 	.feature(
-		name: "ManageBrowserExtensionConnectionsFeature",
+		name: "ManageP2PClientsFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
-			"BrowserExtensionsConnectivityClient",
 			"Common",
 			.product(name: "ConnectUsingPasswordFeature", package: "Converse"),
 			converse,
@@ -431,9 +446,27 @@ package.addModules([
 			"DesignSystem",
 			"ErrorQueue",
 			.product(name: "InputPasswordFeature", package: "Converse"),
-			"IncomingConnectionRequestFromDappReviewFeature", // FIXME: extract to Home! just here for test..
+			"P2PConnectivityClient",
 			"ProfileClient",
+			"SharedModels",
 			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.feature(
+		name: "ManageGatewayAPIEndpointsFeature",
+		dependencies: [
+			"Common",
+			dependencies,
+			"ErrorQueue",
+			"DesignSystem",
+			"GatewayAPI",
+			"ProfileClient",
+			tca,
+			"UserDefaultsClient",
+			"URLBuilderClient",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -458,9 +491,11 @@ package.addModules([
 			"DesignSystem",
 			engineToolkit,
 			"ErrorQueue",
+			"GatewayAPI",
 			"ImportProfileFeature",
 			"ProfileClient",
 			tca,
+			"TransactionClient", // FIXME: remove once we have virtual accounts
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -479,7 +514,8 @@ package.addModules([
 			"ErrorQueue",
 			"GatewayAPI",
 			"KeychainClientDependency",
-			"ManageBrowserExtensionConnectionsFeature",
+			"ManageP2PClientsFeature",
+			"ManageGatewayAPIEndpointsFeature",
 			"ProfileClient",
 			.product(name: "ProfileView", package: "swift-profile"),
 			tca,
@@ -508,13 +544,14 @@ package.addModules([
 		name: "TransactionSigningFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
-			"BrowserExtensionsConnectivityClient", // Actually only models needed...
 			"Common",
 			"EngineToolkitClient",
 			"ErrorQueue",
 			"GatewayAPI",
 			"ProfileClient",
+			"SharedModels",
 			tca,
+			"TransactionClient",
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(dependencies: [
@@ -568,7 +605,7 @@ package.addModules([
 		)
 	),
 	.client(
-		name: "BrowserExtensionsConnectivityClient",
+		name: "P2PConnectivityClient",
 		dependencies: [
 			asyncExtensions,
 			"Common",
@@ -578,6 +615,7 @@ package.addModules([
 			"JSON",
 			profile, // Account
 			"ProfileClient",
+			"SharedModels",
 		],
 		tests: .yes(dependencies: [
 			"TestUtils",
@@ -619,11 +657,13 @@ package.addModules([
 			"Asset",
 			bigInt,
 			"Common",
+			dependencies, // XCTestDynamicOverlay + DependencyKey
 			engineToolkit,
 			"EngineToolkitClient",
 			"JSON",
 			profile, // address
-			dependencies, // XCTestDynamicOverlay + DependencyKey
+			"ProfileClient",
+			"URLBuilderClient",
 		],
 		exclude: [
 			"CodeGen/Input/",
@@ -666,10 +706,10 @@ package.addModules([
 		dependencies: [
 			dependencies, // XCTestDynamicOverlay + DependencyKey
 			"EngineToolkitClient", // Create TX
-			"GatewayAPI", // Create Account On Ledger => Submit TX
 			profile,
 			"ProfileLoader",
 			"UserDefaultsClient",
+			"URLBuilderClient",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -682,6 +722,24 @@ package.addModules([
 			"KeychainClientDependency",
 			profile,
 		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.client(
+		name: "TransactionClient",
+		dependencies: [
+			"GatewayAPI",
+			dependencies,
+			"ProfileClient",
+		],
+		tests: .yes(dependencies: [
+			"TestUtils",
+		])
+	),
+	.client(
+		name: "URLBuilderClient",
+		dependencies: [dependencies],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
@@ -709,6 +767,19 @@ package.addModules([
 			profile, // Address
 			"Resources",
 			tagged,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.core(
+		name: "SharedModels",
+		dependencies: [
+			engineToolkit,
+			profile,
+			collections,
+			converse, // FIXME: In `Converse` split out Models package
+			nonEmpty,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]

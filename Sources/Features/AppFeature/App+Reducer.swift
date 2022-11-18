@@ -17,7 +17,7 @@ public struct App: ReducerProtocol {
 		Scope(state: \.root, action: /Action.self) {
 			EmptyReducer()
 				.ifCaseLet(/App.State.Root.main, action: /Action.child .. Action.ChildAction.main) {
-					Main()
+					Main()._printChanges()
 				}
 				.ifCaseLet(/App.State.Root.onboarding, action: /Action.child .. Action.ChildAction.onboarding) {
 					Onboarding()
@@ -55,20 +55,20 @@ public struct App: ReducerProtocol {
 			return .none
 
 		case let .child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))):
-			return injectProfileIntoProfileClient(newProfile, persistIntoKeychain: true)
+			return injectProfileIntoProfileClient(newProfile)
 
 		case let .child(.onboarding(.child(.importMnemonic(.delegate(.finishedImporting(_, profile)))))):
-			return injectProfileIntoProfileClient(profile, persistIntoKeychain: false)
+			return injectProfileIntoProfileClient(profile)
 
 		case let .child(.splash(.delegate(.profileLoaded(profile)))):
 			if let profile {
-				return injectProfileIntoProfileClient(profile, persistIntoKeychain: false)
+				return injectProfileIntoProfileClient(profile)
 			} else {
 				goToOnboarding(state: &state)
 				return .none
 			}
 
-		case let .internal(.system(.injectProfileIntoProfileClientResult(.success(profile)))):
+		case .internal(.system(.injectProfileIntoProfileClientResult(.success(_)))):
 			goToMain(state: &state)
 			return .none
 
@@ -81,12 +81,11 @@ public struct App: ReducerProtocol {
 		}
 	}
 
-	func injectProfileIntoProfileClient(_ profile: Profile, persistIntoKeychain: Bool) -> EffectTask<Action> {
+	func injectProfileIntoProfileClient(_ profile: Profile) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.system(.injectProfileIntoProfileClientResult(
 				TaskResult {
-					let mode = persistIntoKeychain ? InjectProfileMode.injectAndPersistInKeychain : InjectProfileMode.onlyInject
-					try await profileClient.injectProfile(profile, mode)
+					try await profileClient.injectProfile(profile)
 					return profile
 				}
 			))))

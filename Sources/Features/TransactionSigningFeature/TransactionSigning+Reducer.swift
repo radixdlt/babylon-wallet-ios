@@ -2,13 +2,12 @@ import ComposableArchitecture
 import EngineToolkitClient
 import ErrorQueue
 import Foundation
-import ProfileClient
+import TransactionClient
 
 // MARK: - TransactionSigning
 public struct TransactionSigning: ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.profileClient) var profileClient
-
+	@Dependency(\.transactionClient) var transactionClient
 	public init() {}
 }
 
@@ -17,22 +16,20 @@ public extension TransactionSigning {
 		switch action {
 		case .internal(.view(.signTransactionButtonTapped)):
 			state.isSigningTX = true
-			return .run { [transactionManifest = state.transactionManifest, addressOfSigner = state.addressOfSigner] send in
+			return .run { [transactionManifest = state.transactionManifest] send in
 				await send(.internal(.signTransactionResult(TaskResult {
-					try await profileClient.signTransaction(
-						manifest: transactionManifest,
-						addressOfSigner: addressOfSigner
-					)
+					try await transactionClient.signTransaction(transactionManifest)
 				})))
 			}
 
 		case let .internal(.signTransactionResult(.success(txid))):
 			state.isSigningTX = false
-			return .run { [incomingMessageFromBrowser = state.incomingMessageFromBrowser] send in
+
+			return .run { [request = state.request] send in
 				await send(.delegate(
 					.signedTXAndSubmittedToGateway(
 						txid,
-						incomingMessageFromBrowser: incomingMessageFromBrowser
+						request: request
 					)
 				))
 			}
@@ -43,8 +40,8 @@ public extension TransactionSigning {
 			return .none
 
 		case .internal(.view(.closeButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismissView))
+			return .run { [dismissedRequest = state.request] send in
+				await send(.delegate(.dismissed(dismissedRequest)))
 			}
 
 		case .delegate:
