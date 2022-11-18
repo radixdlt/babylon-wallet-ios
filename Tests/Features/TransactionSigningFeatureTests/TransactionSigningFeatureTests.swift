@@ -57,7 +57,7 @@ final class TransactionSigningFeatureTests: TestCase {
 			$0.isSigningTX = false
 		}
 
-		wait(for: [errorExpectation1, errorExpectation2], timeout: 0)
+		wait(for: [errorExpectation2], timeout: 0)
 	}
 
 	func testDismissView() async {
