@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import ErrorQueue
 import Foundation
 import GatewayAPI
 import ProfileClient
@@ -7,6 +8,7 @@ import UserDefaultsClient
 
 // MARK: - ManageGatewayAPIEndpoints
 public struct ManageGatewayAPIEndpoints: ReducerProtocol {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.urlBuilder) var urlBuilder
@@ -56,8 +58,10 @@ public extension ManageGatewayAPIEndpoints {
 			return .none
 
 		case .internal(.view(.switchToButtonTapped)):
-			guard let url = state.url else { return .none }
-
+			guard let url = state.url else {
+				return .none
+			}
+			state.isValidatingEndpoint = true
 			return .run { send in
 				await send(.internal(.system(.setGatewayAPIEndpointResult(
 					TaskResult {
@@ -67,14 +71,15 @@ public extension ManageGatewayAPIEndpoints {
 			}
 
 		case let .internal(.system(.setGatewayAPIEndpointResult(.success(maybeNew)))):
+			state.isValidatingEndpoint = false
 			if let new = maybeNew {
 				state.networkAndGateway = new
 			}
 			return .none
 
 		case let .internal(.system(.setGatewayAPIEndpointResult(.failure(error)))):
-			// FIXME: Error propagation
-			print("Failed to set gateway API url: \(String(describing: error))")
+			state.isValidatingEndpoint = false
+			errorQueue.schedule(error)
 			return .none
 
 		case .delegate:

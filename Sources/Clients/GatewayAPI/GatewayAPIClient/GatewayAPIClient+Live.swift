@@ -44,6 +44,7 @@ public extension GatewayAPIClient {
 			method: String = "POST",
 			responseType _: Response.Type,
 			baseURL: URL,
+			timeoutInterval: TimeInterval? = nil,
 			urlFromBase: (URL) -> URL
 		) async throws -> Response where Response: Decodable {
 			let url = urlFromBase(baseURL)
@@ -57,6 +58,9 @@ public extension GatewayAPIClient {
 				"accept": "application/json",
 				"Content-Type": "application/json",
 			]
+			if let timeoutInterval {
+				urlRequest.timeoutInterval = timeoutInterval
+			}
 
 			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
 
@@ -76,7 +80,11 @@ public extension GatewayAPIClient {
 		// FIXME: Change returned type to `Network.Name` once Gateway API migration to Enkinet/Hamunet is done!
 		@Sendable func getNetworkName(baseURL: URL) async throws -> Network.Name {
 			// FIXME: Replace with real `getNetworkInformation` request once we have that!
-			_ = try await makeRequest(responseType: V0StateEpochResponse.self, baseURL: baseURL) {
+			_ = try await makeRequest(
+				responseType: V0StateEpochResponse.self,
+				baseURL: baseURL,
+				timeoutInterval: 2
+			) {
 				$0.appendingPathComponent("state/epoch")
 			}
 			return Network.primary.name
@@ -85,8 +93,10 @@ public extension GatewayAPIClient {
 		let setCurrentBaseURL: SetCurrentBaseURL = { newURL in
 			let currentURL = getCurrentBaseURL()
 			guard newURL != currentURL else {
+				print("same URL, do nothing")
 				return nil
 			}
+			print("not same URL, test! ✅")
 			let name = try await getNetworkName(baseURL: newURL)
 			// FIXME: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
 			// once it returns networkID!

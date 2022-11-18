@@ -34,40 +34,46 @@ public extension ManageGatewayAPIEndpoints.View {
 
 					Spacer()
 
-					VStack {
-						TextField(
-							"Scheme",
-							text: viewStore.binding(
-								get: \.scheme,
-								send: { .schemeChanged($0) }
+					ZStack {
+						VStack {
+							TextField(
+								"Scheme",
+								text: viewStore.binding(
+									get: \.scheme,
+									send: { .schemeChanged($0) }
+								)
 							)
-						)
 
-						TextField(
-							"Host",
-							text: viewStore.binding(
-								get: \.host,
-								send: { .hostChanged($0) }
+							TextField(
+								"Host",
+								text: viewStore.binding(
+									get: \.host,
+									send: { .hostChanged($0) }
+								)
 							)
-						)
 
-						TextField(
-							"Path",
-							text: viewStore.binding(
-								get: \.path,
-								send: { .pathChanged($0) }
+							TextField(
+								"Path",
+								text: viewStore.binding(
+									get: \.path,
+									send: { .pathChanged($0) }
+								)
 							)
-						)
 
-						TextField(
-							"Port",
-							text: viewStore.binding(
-								get: \.port,
-								send: { .portChanged($0) }
+							TextField(
+								"Port",
+								text: viewStore.binding(
+									get: \.port,
+									send: { .portChanged($0) }
+								)
 							)
-						)
+						}
+						.textFieldStyle(.roundedBorder)
+
+						if viewStore.isShowingLoader {
+							LoadingView()
+						}
 					}
-					.textFieldStyle(.roundedBorder)
 
 					Spacer()
 
@@ -128,6 +134,7 @@ extension ManageGatewayAPIEndpoints.View {
 
 		public var networkAndGateway: AppPreferences.NetworkAndGateway?
 		public var isSwitchToButtonEnabled: Bool
+		public var isShowingLoader: Bool
 
 		init(state: ManageGatewayAPIEndpoints.State) {
 			host = state.host ?? ""
@@ -137,6 +144,7 @@ extension ManageGatewayAPIEndpoints.View {
 
 			isSwitchToButtonEnabled = state.url != nil
 			networkAndGateway = state.networkAndGateway
+			isShowingLoader = state.isValidatingEndpoint
 		}
 	}
 }

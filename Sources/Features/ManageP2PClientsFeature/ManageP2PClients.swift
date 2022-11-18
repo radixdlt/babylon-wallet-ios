@@ -32,7 +32,6 @@ public extension ManageP2PClients {
 			.ifLet(\.connectUsingPassword, action: /Action.child .. Action.ChildAction.connectUsingPassword) {
 				ConnectUsingPassword()
 			}
-			._printChanges()
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {

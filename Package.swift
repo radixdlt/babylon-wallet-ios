@@ -460,6 +460,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			dependencies,
+			"ErrorQueue",
 			"DesignSystem",
 			"GatewayAPI",
 			"ProfileClient",

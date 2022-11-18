@@ -14,6 +14,8 @@ public extension ManageGatewayAPIEndpoints {
 		public var url: URL?
 		public var isSwitchToButtonEnabled: Bool
 
+		public var isValidatingEndpoint: Bool
+
 		public init(
 			networkAndGateway: AppPreferences.NetworkAndGateway? = nil,
 			host: URLInput.Host? = nil,
@@ -21,7 +23,8 @@ public extension ManageGatewayAPIEndpoints {
 			path: URLInput.Path = "",
 			scheme: URLInput.Scheme = "https",
 			url: URL? = nil,
-			isSwitchToButtonEnabled: Bool = false
+			isSwitchToButtonEnabled: Bool = false,
+			isValidatingEndpoint: Bool = false
 		) {
 			self.networkAndGateway = networkAndGateway
 			self.host = host
@@ -30,6 +33,7 @@ public extension ManageGatewayAPIEndpoints {
 			self.scheme = scheme
 			self.url = url
 			self.isSwitchToButtonEnabled = isSwitchToButtonEnabled
+			self.isValidatingEndpoint = isValidatingEndpoint
 		}
 	}
 }
