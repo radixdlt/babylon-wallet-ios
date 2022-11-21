@@ -10,6 +10,7 @@ final class MainFeatureTests: TestCase {
 			initialState: Main.State(home: .placeholder),
 			reducer: Main()
 		)
+		store.exhaustivity = .off
 
 		// when
 		_ = await store.send(.child(.home(.delegate(.displaySettings)))) {
@@ -25,6 +26,10 @@ final class MainFeatureTests: TestCase {
 			reducer: Main()
 		)
 		store.exhaustivity = .off
+		store.dependencies.appSettingsClient.loadSettings = { .default }
+		store.dependencies.profileClient.getAccounts = { .init(rawValue: [.mocked0])! }
+		store.dependencies.p2pConnectivityClient.getP2PClients = { [] }
+		store.dependencies.accountPortfolioFetcher.fetchPortfolio = { _ in [:] }
 
 		// when
 		_ = await store.send(.child(.settings(.delegate(.dismissSettings)))) {
