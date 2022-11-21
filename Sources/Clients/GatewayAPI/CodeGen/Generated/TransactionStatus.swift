@@ -21,9 +21,9 @@ public struct TransactionStatus: Codable, Hashable {
 
 	public private(set) var status: Status
 	public private(set) var stateVersion: Int64?
-	public private(set) var confirmedAt: Date?
+	public private(set) var confirmedAt: String?
 
-	public init(status: Status, stateVersion: Int64? = nil, confirmedAt: Date? = nil) {
+	public init(status: Status, stateVersion: Int64? = nil, confirmedAt: String? = nil) {
 		self.status = status
 		self.stateVersion = stateVersion
 		self.confirmedAt = confirmedAt
