@@ -62,7 +62,7 @@ final class ImportProfileFeatureTests: TestCase {
 			expectation2.fulfill()
 		}
 
-		_ = await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
+		await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!)))).finish()
 
 		wait(for: [expectation1, expectation2], timeout: 0)
 	}
