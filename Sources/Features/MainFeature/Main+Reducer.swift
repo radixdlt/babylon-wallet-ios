@@ -41,9 +41,7 @@ public struct Main: ReducerProtocol {
 
 		case .child(.settings(.delegate(.dismissSettings))):
 			state.settings = nil
-			return .run { send in
-				await send(.child(.handleDappRequest(.internal(.system(.loadConnections)))))
-			}
+			return .none
 
 		case .child, .delegate:
 			return .none

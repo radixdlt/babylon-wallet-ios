@@ -31,8 +31,6 @@ public extension HandleDappRequests {
 private extension HandleDappRequests {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-//        case let .internal(.system(.subscribeToRequestsFromP2PClientByID(ids))):
-
 		case let .internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
@@ -50,16 +48,6 @@ private extension HandleDappRequests {
 			return .run { send in
 				await send(.internal(.system(.presentViewForP2PRequest(itemToHandle))))
 			}
-
-//        case let .internal(.system(.connectionsLoadedResult(.failure(error)))):
-//            errorQueue.schedule(error)
-//            return .none
-//
-//        case let .internal(.system(.connectionsLoadedResult(.success(connections)))):
-//            let ids = OrderedSet(connections.map(\.id))
-//            return .run { send in
-//                await send(.internal(.system(.subscribeToRequestsFromP2PClientByID(ids))))
-//            }
 
 		case let .internal(.system(.presentViewForP2PRequest(requestItemToHandle))):
 			state.currentRequest = .init(requestItemToHandle: requestItemToHandle)
@@ -157,23 +145,16 @@ private extension HandleDappRequests {
 		}
 	}
 
-	func presentViewForNextBufferedRequestFromBrowserIfNeeded(state: inout State) -> EffectTask<Action> {
+	func presentViewForNextBufferedRequestFromBrowserIfNeeded(
+		state: inout State
+	) -> EffectTask<Action> {
 		guard let next = state.unfinishedRequestsFromClient.next() else {
 			return .none
 		}
+
 		return .run { send in
 			try await mainQueue.sleep(for: .seconds(1))
 			await send(.internal(.system(.presentViewForP2PRequest(next))))
 		}
 	}
-
-	//        func loadP2PClientConnections() -> EffectTask<Action> {
-	//            .run { send in
-	//                await send(.internal(.system(.connectionsLoadedResult(
-	//                    TaskResult {
-	//                        try await p2pConnectivityClient.getP2PClients()
-	//                    }
-	//                ))))
-	//            }
-	//        }
 }

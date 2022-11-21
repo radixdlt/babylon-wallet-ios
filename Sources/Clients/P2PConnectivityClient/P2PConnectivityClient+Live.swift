@@ -52,6 +52,9 @@ extension P2PConnectivityClient: DependencyKey {
 				}
 				// connection.connection.close() // when impl in Converse
 				connections.removeValue(forKey: key)
+				var value = p2pClients.value
+				value.removeAll(where: { $0.p2pClient.id == id })
+				p2pClients.send(value)
 			}
 
 			func getConnection(id: P2PClient.ID) throws -> P2P.ConnectedClient {
