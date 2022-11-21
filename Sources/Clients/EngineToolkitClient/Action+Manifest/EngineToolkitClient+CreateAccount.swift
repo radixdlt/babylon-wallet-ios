@@ -17,11 +17,13 @@ public extension EngineToolkitClient {
 		request withoutManifestRequest: BuildAndSignTransactionWithoutManifestRequest
 	) throws -> SignedCompiledNotarizedTX {
 		let engineToolkit = EngineToolkit()
+
 		let nonFungibleAddressString = try engineToolkit.deriveNonFungibleAddressFromPublicKeyRequest(
 			request: withoutManifestRequest.privateKey.publicKey().intoEngine()
 		)
 		.get()
 		.nonFungibleAddress
+
 		let nonFungibleAddress = try NonFungibleAddress(hex: nonFungibleAddressString)
 
 		let manifest = TransactionManifest {
@@ -60,7 +62,10 @@ public extension EngineToolkitClient {
 		}
 
 		return try sign(
-			request: .init(manifest: manifest, withoutManifestRequest: withoutManifestRequest),
+			request: .init(
+				manifest: manifest,
+				withoutManifestRequest: withoutManifestRequest
+			),
 			engineToolkit: engineToolkit
 		)
 	}

@@ -3,6 +3,7 @@ import CryptoKit
 import Dependencies
 import EngineToolkit
 import Foundation
+import struct Profile.AccountAddress
 import enum SLIP10.PrivateKey
 import enum SLIP10.PublicKey
 
@@ -11,6 +12,7 @@ public extension EngineToolkitClient {
 		let engineToolkit = EngineToolkit()
 
 		return Self(
+			getTransactionVersion: { Version.default },
 			signTransactionIntent: { request in
 
 				let privateKey = request.privateKey
@@ -55,10 +57,17 @@ public extension EngineToolkitClient {
 					compileNotarizedTransactionIntentResponse: notarizedTransactionIntent
 				)
 			},
-			accountAddressesNeedingToSignTransaction: { _, _, _ in
-				// FIXME: use this once we can upgrade to EngineToolkit which now talks Hamunet
-				fatalError()
+			accountAddressesNeedingToSignTransaction: { version, transactionManifest, networkID throws -> Set<AccountAddress> in
+				try transactionManifest.accountsRequiredToSign(networkId: networkID, version: version).map {
+					try AccountAddress(componentAddress: $0)
+				}
 			}
 		)
 	}()
+}
+
+public extension AccountAddress {
+	init(componentAddress: ComponentAddress) throws {
+		try self.init(address: componentAddress.address)
+	}
 }

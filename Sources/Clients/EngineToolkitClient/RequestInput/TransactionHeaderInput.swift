@@ -10,18 +10,21 @@ public struct TransactionHeaderInput: Sendable {
 	/// Fetch from GatewayAPI
 	public let startEpoch: Epoch
 
+	public let transactionVersion: Version
 	public let networkID: NetworkID
 	public let costUnitLimit: UInt32
 
 	public init(
 		publicKey: PublicKey,
 		startEpoch: Epoch,
+		transactionVersion: Version,
 		networkID: NetworkID,
 		costUnitLimit: UInt32 = Self.defaultCostUnitLimit
 	) {
 		self.publicKey = publicKey
 		self.startEpoch = startEpoch
 		self.networkID = networkID
+		self.transactionVersion = transactionVersion
 		self.costUnitLimit = costUnitLimit
 	}
 }
@@ -29,12 +32,11 @@ public struct TransactionHeaderInput: Sendable {
 public extension TransactionHeaderInput {
 	func header(
 		epochDuration: Epoch = 2,
-		version: Version = 1,
 		nonce: @autoclosure () -> Nonce = Nonce.secureRandom(),
 		notaryAsSignatory: Bool = true
 	) throws -> TransactionHeader {
 		try .init(
-			version: version,
+			version: transactionVersion,
 			networkId: networkID,
 			startEpochInclusive: startEpoch,
 			endEpochExclusive: startEpoch + epochDuration,

@@ -38,6 +38,7 @@ public extension BuildAndSignTransactionWithManifestRequest {
 		privateKey: PrivateKey,
 		epoch: Epoch,
 		networkID: NetworkID,
+		transactionVersion: Version,
 		costUnitLimit: UInt32 = TransactionHeaderInput.defaultCostUnitLimit
 	) {
 		self.init(
@@ -46,6 +47,7 @@ public extension BuildAndSignTransactionWithManifestRequest {
 			transactionHeaderInput: .init(
 				publicKey: privateKey.publicKey(),
 				startEpoch: epoch,
+				transactionVersion: transactionVersion,
 				networkID: networkID,
 				costUnitLimit: costUnitLimit
 			)
@@ -72,6 +74,7 @@ public extension BuildAndSignTransactionWithoutManifestRequest {
 		privateKey: PrivateKey,
 		epoch: Epoch,
 		networkID: NetworkID,
+		transactionVersion: Version,
 		costUnitLimit: UInt32 = TransactionHeaderInput.defaultCostUnitLimit
 	) {
 		self.init(
@@ -79,6 +82,7 @@ public extension BuildAndSignTransactionWithoutManifestRequest {
 			transactionHeaderInput: .init(
 				publicKey: privateKey.publicKey(),
 				startEpoch: epoch,
+				transactionVersion: transactionVersion,
 				networkID: networkID,
 				costUnitLimit: costUnitLimit
 			)

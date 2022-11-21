@@ -50,7 +50,8 @@ public extension TransactionClient {
 						let buildAndSignTXRequest = BuildAndSignTransactionWithoutManifestRequest(
 							privateKey: privateKey,
 							epoch: epoch,
-							networkID: profileClient.getCurrentNetworkID()
+							networkID: profileClient.getCurrentNetworkID(),
+							transactionVersion: engineToolkitClient.getTransactionVersion()
 						)
 						return try engineToolkitClient.createOnLedgerAccount(
 							request: buildAndSignTXRequest
@@ -69,9 +70,14 @@ public extension TransactionClient {
 					return try AccountAddress(address: accountAddressBech32)
 				}
 			},
+			signTransaction: { manifest in
+				let networkID = try profileClient.getCurrentNetworkID()
+				let version = engineToolkitClient.getTransactionVersion()
 
-			signTransaction: { _ in
-				throw NSError(domain: "Transaction signing disabled until app is Hammunet compatible, once we have it we will use EngineToolkit to get required list of signers and sign.", code: 1337)
+				let addressesNeededToSign = try engineToolkitClient
+					.accountAddressesNeedingToSignTransaction(
+						version, manifest, networkID
+					)
 			}
 		)
 	}

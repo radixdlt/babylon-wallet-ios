@@ -51,7 +51,7 @@ extension ProfileClient: TestDependencyKey {
 		lookupAccountByAddress: { _ in
 			.mocked0
 		},
-		signTransaction: { _ in
+		signTransaction: { _, _ in
 			struct MockError: LocalizedError {
 				let errorDescription: String? = "Transaction signing failed!"
 			}

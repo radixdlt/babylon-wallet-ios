@@ -5,6 +5,7 @@ import KeychainClient
 import Mnemonic
 import NonEmpty
 import Profile
+import enum SLIP10.Signature
 
 public typealias MakeAccountNonVirtual = @Sendable (CreateAccountRequest) -> MakeEntityNonVirtualBySubmittingItToLedger
 
@@ -57,12 +58,10 @@ public extension ProfileClient {
 
 	typealias CreateNewProfileWithOnLedgerAccount = @Sendable (CreateNewProfileRequest, MakeAccountNonVirtual) async throws -> Profile
 
-	// Async throwing because this also
 	typealias InjectProfile = @Sendable (Profile) async throws -> Void
 
 	typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 
-	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 	typealias ExtractProfileSnapshot = @Sendable () throws -> ProfileSnapshot
 	typealias GetAccounts = @Sendable () throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
 	typealias GetP2PClients = @Sendable () throws -> P2PClients
@@ -71,11 +70,14 @@ public extension ProfileClient {
 	typealias GetAppPreferences = @Sendable () throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
 	typealias CreateOnLedgerAccount = @Sendable (CreateAccountRequest, MakeAccountNonVirtual) async throws -> OnNetwork.Account
-	// FIXME: Cyon will hook this up when PR https://github.com/radixdlt/babylon-wallet-ios/pull/67 is merged
-	// Since it contains changes regarding NetworkID, which is now a getter and setter in ProfileClient
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) throws -> OnNetwork.Account
-	typealias SignTransaction = @Sendable (TransactionManifest) async throws -> TransactionIntent.TXID
-	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
+	typealias SignTransaction = @Sendable (any DataProtocol, Set<OnNetwork.Account>) async throws -> Set<AccountSignature>
+}
+
+// MARK: - AccountSignature
+public struct AccountSignature: Sendable, Hashable {
+	public let account: OnNetwork.Account
+	public let signature: SLIP10.Signature
 }
 
 // MARK: - CreateAccountRequest
