@@ -326,7 +326,7 @@ public struct Home: ReducerProtocol {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(request)))):
+		case .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(_, _)))):
 			state.handleRequest = nil
 
 			// FIXME: Betanet: once we have migrated to Hammunet we can use the EngineToolkit to read out required signeres to sign tx.
