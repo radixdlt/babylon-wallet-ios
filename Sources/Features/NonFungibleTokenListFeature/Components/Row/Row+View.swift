@@ -173,7 +173,13 @@ struct Row_Preview: PreviewProvider {
 		NonFungibleTokenList.Row.View(
 			store: .init(
 				initialState: .init(
-					containers: [.init(asset: NonFungibleToken.mock1, metadata: nil)]
+					containers: [
+						.init(
+							owner: try! .init(address: "owner_address"),
+							asset: NonFungibleToken.mock1,
+							metadata: nil
+						),
+					]
 				),
 				reducer: NonFungibleTokenList.Row()
 			)

@@ -1,6 +1,7 @@
 import BigInt
 import Common
 import Foundation
+import Profile
 
 // MARK: - FungibleToken
 /// What we get from GatewayAPIClient, e.g. with this call:
@@ -42,7 +43,7 @@ import Foundation
 ///		}
 public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public let address: ComponentAddress
-	public let totalSupplyAttos: BigUInt
+	public let totalSupplyAttos: BigUInt?
 	public let totalMintedAttos: BigUInt?
 	public let totalBurntAttos: BigUInt?
 
@@ -71,7 +72,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public init(
 		address: ComponentAddress,
 		divisibility: Int?,
-		totalSupplyAttos: BigUInt,
+		totalSupplyAttos: BigUInt?,
 		totalMintedAttos: BigUInt?,
 		totalBurntAttos: BigUInt?,
 		tokenDescription: String?,
@@ -95,6 +96,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 
 // MARK: - FungibleTokenContainer
 public struct FungibleTokenContainer: AssetContainer, Equatable {
+	public var owner: AccountAddress
 	public typealias T = FungibleToken
 	public let asset: FungibleToken
 
@@ -111,10 +113,12 @@ public struct FungibleTokenContainer: AssetContainer, Equatable {
 	}
 
 	public init(
+		owner: AccountAddress,
 		asset: FungibleToken,
 		amountInAttos: BigUInt?,
 		worth: BigUInt?
 	) {
+		self.owner = owner
 		self.asset = asset
 		self.amountInAttos = amountInAttos
 		self.worth = worth

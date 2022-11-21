@@ -1,4 +1,5 @@
 import Foundation
+import Profile
 
 // MARK: - NonFungibleToken
 public struct NonFungibleToken: Sendable, Asset, Token, Hashable {
@@ -30,6 +31,7 @@ public struct NonFungibleToken: Sendable, Asset, Token, Hashable {
 // MARK: - NonFungibleTokenContainer
 // FIXME: Cyon: What is the purpose of this???
 public struct NonFungibleTokenContainer: AssetContainer {
+	public var owner: AccountAddress
 	public typealias T = NonFungibleToken
 	public let asset: NonFungibleToken
 
@@ -37,9 +39,11 @@ public struct NonFungibleTokenContainer: AssetContainer {
 	public var metadata: [[String: String]]?
 
 	public init(
+		owner: AccountAddress,
 		asset: NonFungibleToken,
 		metadata: [[String: String]]?
 	) {
+		self.owner = owner
 		self.asset = asset
 		self.metadata = metadata
 	}

@@ -173,7 +173,7 @@ public struct Home: ReducerProtocol {
 		case let .internal(.system(.fetchPortfolioResult(.success(totalPortfolio)))):
 			state.accountPortfolioDictionary = totalPortfolio
 			state.accountList.accounts.forEach {
-				let accountPortfolio = totalPortfolio[$0.address] ?? OwnedAssets.empty
+				let accountPortfolio = totalPortfolio[$0.address] ?? AccountPortfolio.empty
 				state.accountList.accounts[id: $0.address]?.portfolio = accountPortfolio
 			}
 
@@ -182,7 +182,7 @@ public struct Home: ReducerProtocol {
 				let account = details.account
 
 				// asset list
-				let accountPortfolio = totalPortfolio[account.address] ?? OwnedAssets.empty
+				let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
 				let categories = accountPortfolio.fungibleTokenContainers.sortedIntoCategories()
 
 				state.accountDetails?.assets = .init(

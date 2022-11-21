@@ -1,4 +1,5 @@
 import Foundation
+import Profile
 
 // MARK: - Badge
 public struct Badge: Asset {
@@ -13,6 +14,7 @@ public struct Badge: Asset {
 
 // MARK: - BadgeContainer
 public struct BadgeContainer: AssetContainer {
+	public var owner: AccountAddress
 	public typealias T = Badge
 	public let asset: Badge
 
@@ -20,9 +22,11 @@ public struct BadgeContainer: AssetContainer {
 	public var metadata: [String: String]?
 
 	public init(
+		owner: AccountAddress,
 		asset: Badge,
 		metadata: [String: String]?
 	) {
+		self.owner = owner
 		self.asset = asset
 		self.metadata = metadata
 	}

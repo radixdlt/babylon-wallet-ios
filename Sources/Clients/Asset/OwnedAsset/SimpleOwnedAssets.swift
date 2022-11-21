@@ -1,3 +1,4 @@
+/*
 import BigInt
 import Foundation
 import Profile
@@ -66,3 +67,4 @@ public struct SimpleOwnedNonFungibleToken: Sendable, Hashable {
 		self.tokenResourceAddress = tokenResourceAddress
 	}
 }
+*/

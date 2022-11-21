@@ -10,7 +10,7 @@ extension AccountPortfolioFetcher: DependencyKey {
 			@Dependency(\.assetFetcher) var assetFetcher
 
 			let portfolioDictionary = try await withThrowingTaskGroup(
-				of: (address: AccountAddress, assets: OwnedAssets).self,
+				of: (address: AccountAddress, assets: AccountPortfolio).self,
 				returning: AccountPortfolioDictionary.self,
 				body: { taskGroup in
 					for address in addresses {
