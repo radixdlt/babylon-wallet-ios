@@ -63,10 +63,9 @@ final class ImportProfileFeatureTests: TestCase {
 		}
 
 		await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
+		await sut.finish()
 
 		wait(for: [expectation1, expectation2], timeout: 0)
-
-		await sut.finish()
 	}
 
 	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__reducer_calls_save_on_keychainClient_and_delegates_snapshot() async throws {
