@@ -4,18 +4,18 @@ import DesignSystem
 import SharedModels
 import SwiftUI
 
-// MARK: - IncomingConnectionRequestFromDappReview.View
-public extension IncomingConnectionRequestFromDappReview {
+// MARK: - DappConnectionRequest.View
+public extension DappConnectionRequest {
 	struct View: SwiftUI.View {
-		private let store: StoreOf<IncomingConnectionRequestFromDappReview>
+		private let store: StoreOf<DappConnectionRequest>
 
-		public init(store: StoreOf<IncomingConnectionRequestFromDappReview>) {
+		public init(store: StoreOf<DappConnectionRequest>) {
 			self.store = store
 		}
 	}
 }
 
-public extension IncomingConnectionRequestFromDappReview.View {
+public extension DappConnectionRequest.View {
 	var body: some View {
 		WithViewStore(
 			store,
@@ -41,8 +41,8 @@ public extension IncomingConnectionRequestFromDappReview.View {
 	}
 }
 
-private extension IncomingConnectionRequestFromDappReview.View {
-	func mainView(with viewStore: IncomingConnectionViewStore) -> some View {
+private extension DappConnectionRequest.View {
+	func mainView(with viewStore: ViewStore) -> some View {
 		VStack {
 			header(with: viewStore)
 				.padding(.medium1)
@@ -84,13 +84,13 @@ private extension IncomingConnectionRequestFromDappReview.View {
 	}
 }
 
-// MARK: - IncomingConnectionRequestFromDappReview.View.IncomingConnectionViewStore
-private extension IncomingConnectionRequestFromDappReview.View {
-	typealias IncomingConnectionViewStore = ViewStore<IncomingConnectionRequestFromDappReview.View.ViewState, IncomingConnectionRequestFromDappReview.Action.ViewAction>
+// MARK: - DappConnectionRequest.View.ViewStore
+private extension DappConnectionRequest.View {
+	typealias ViewStore = ComposableArchitecture.ViewStore<ViewState, DappConnectionRequest.Action.ViewAction>
 }
 
-private extension IncomingConnectionRequestFromDappReview.View {
-	func header(with viewStore: IncomingConnectionViewStore) -> some View {
+private extension DappConnectionRequest.View {
+	func header(with viewStore: ViewStore) -> some View {
 		HStack {
 			CloseButton {
 				viewStore.send(.dismissButtonTapped)
@@ -100,11 +100,11 @@ private extension IncomingConnectionRequestFromDappReview.View {
 	}
 }
 
-// MARK: - IncomingConnectionRequestFromDappReview.View.ViewState
-extension IncomingConnectionRequestFromDappReview.View {
+// MARK: - DappConnectionRequest.View.ViewState
+extension DappConnectionRequest.View {
 	struct ViewState: Equatable {
 		var requestFromDapp: P2P.FromDapp.Request
-		init(state: IncomingConnectionRequestFromDappReview.State) {
+		init(state: DappConnectionRequest.State) {
 			requestFromDapp = state.request.parentRequest.requestFromDapp
 		}
 	}
@@ -117,10 +117,10 @@ extension IncomingConnectionRequestFromDappReview.View {
 //	static var previews: some View {
 //		registerFonts()
 //
-//		return IncomingConnectionRequestFromDappReview.View(
+//		return DappConnectionRequest.View(
 //			store: .init(
 //				initialState: .placeholder,
-//				reducer: IncomingConnectionRequestFromDappReview()
+//				reducer: DappConnectionRequest()
 //			)
 //		)
 //	}

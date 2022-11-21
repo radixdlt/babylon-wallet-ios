@@ -2,8 +2,8 @@ import ComposableArchitecture
 import ErrorQueue
 import ProfileClient
 
-// MARK: - IncomingConnectionRequestFromDappReview
-public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
+// MARK: - DappConnectionRequest
+public struct DappConnectionRequest: ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 	public init() {}

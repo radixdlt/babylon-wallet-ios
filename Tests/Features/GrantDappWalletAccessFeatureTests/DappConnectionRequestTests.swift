@@ -6,7 +6,7 @@ import NonEmpty
 import ProfileClient
 import SharedModels
 
-@testable import IncomingConnectionRequestFromDappReviewFeature
+@testable import GrantDappWalletAccessFeature
 
 // MARK: - IncomingConnectionRequestFromDappReviewFeatureTests
 @MainActor
@@ -18,7 +18,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 			parentRequest: .placeholder
 		)
 
-		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
+		let initialState: DappConnectionRequest.State = .init(
 			request: .init(
 				requestItem: requestItem.requestItem,
 				parentRequest: requestItem.parentRequest
@@ -27,7 +27,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 
 		let store = TestStore(
 			initialState: initialState,
-			reducer: IncomingConnectionRequestFromDappReview()
+			reducer: DappConnectionRequest()
 		)
 
 		// when
@@ -44,7 +44,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 			parentRequest: .placeholder
 		)
 
-		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
+		let initialState: DappConnectionRequest.State = .init(
 			request: .init(
 				requestItem: requestItem.requestItem,
 				parentRequest: requestItem.parentRequest
@@ -52,7 +52,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		)
 		let store = TestStore(
 			initialState: initialState,
-			reducer: IncomingConnectionRequestFromDappReview()
+			reducer: DappConnectionRequest()
 		)
 		let accounts: NonEmpty<OrderedSet<OnNetwork.Account>> = .init(rawValue: .init([.mocked0, .mocked1]))!
 		store.dependencies.profileClient.getAccounts = { @Sendable in accounts }
@@ -79,7 +79,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 			parentRequest: .placeholder
 		)
 
-		let initialState: IncomingConnectionRequestFromDappReview.State = .init(
+		let initialState: DappConnectionRequest.State = .init(
 			request: .init(
 				requestItem: requestItem.requestItem,
 				parentRequest: requestItem.parentRequest
@@ -88,7 +88,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		)
 		let store = TestStore(
 			initialState: initialState,
-			reducer: IncomingConnectionRequestFromDappReview()
+			reducer: DappConnectionRequest()
 		)
 
 		// when

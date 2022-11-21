@@ -21,7 +21,7 @@ extension P2PConnectivityClient: TestDependencyKey {
 
 extension P2PConnectivityClient {
 	static let noop = Self(
-		getP2PClients: { [] },
+		getP2PClients: { [].async.eraseToAnyAsyncSequence() },
 		addConnectedP2PClient: { _ in },
 		deleteP2PClientByID: { _ in },
 		getConnectionStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },

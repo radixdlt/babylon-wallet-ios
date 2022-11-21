@@ -2,8 +2,8 @@ import Foundation
 import Profile
 import SharedModels
 
-// MARK: - IncomingConnectionRequestFromDappReview.State
-public extension IncomingConnectionRequestFromDappReview {
+// MARK: - DappConnectionRequest.State
+public extension DappConnectionRequest {
 	struct State: Equatable {
 		public let request: P2P.OneTimeAccountAddressesRequestToHandle
 

@@ -352,6 +352,38 @@ package.addModules([
 		)
 	),
 	.feature(
+		name: "GrantDappWalletAccessFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
+			"DesignSystem",
+			"ErrorQueue",
+			"ProfileClient",
+			"SharedModels",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: [
+				"ProfileClient",
+				tca,
+				"TestUtils",
+			]
+		)
+	),
+	.feature(
+		name: "HandleDappRequests",
+		dependencies: [
+			collections,
+			"GrantDappWalletAccessFeature",
+			"P2PConnectivityClient",
+			profile,
+			"SharedModels",
+			tca,
+			"TransactionSigningFeature",
+		], tests: .yes(dependencies: ["TestUtils"])
+	),
+	.feature(
 		name: "HomeFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
@@ -364,7 +396,7 @@ package.addModules([
 			"Common",
 			"CreateAccountFeature",
 			engineToolkit,
-			"IncomingConnectionRequestFromDappReviewFeature",
+			"GrantDappWalletAccessFeature",
 			"PasteboardClient",
 			"ProfileClient",
 			"SharedModels",
@@ -398,33 +430,13 @@ package.addModules([
 		)
 	),
 	.feature(
-		name: "IncomingConnectionRequestFromDappReviewFeature",
-		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"P2PConnectivityClient",
-			"Common",
-			"DesignSystem",
-			"ErrorQueue",
-			"ProfileClient",
-			"SharedModels",
-			tca,
-			// ^^^ Sort lexicographically ^^^
-		],
-		tests: .yes(
-			dependencies: [
-				"ProfileClient",
-				tca,
-				"TestUtils",
-			]
-		)
-	),
-	.feature(
 		name: "MainFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AppSettings",
 			"AccountPortfolio",
 			engineToolkit,
+			"HandleDappRequests",
 			"HomeFeature",
 			"PasteboardClient",
 			"SettingsFeature",

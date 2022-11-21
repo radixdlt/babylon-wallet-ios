@@ -28,8 +28,8 @@ public extension GatewayAPIClient {
 
 	static func live(
 		urlSession: URLSession = .shared,
-		jsonEncoder: JSONEncoder = .init(),
-		jsonDecoder: JSONDecoder = .init()
+		jsonEncoder: JSONEncoder = .iso8601,
+		jsonDecoder: JSONDecoder = .iso8601
 	) -> Self {
 		@Dependency(\.profileClient) var profileClient
 		@Dependency(\.urlBuilder) var urlBuilder
