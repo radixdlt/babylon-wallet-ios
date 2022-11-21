@@ -183,7 +183,7 @@ public struct Home: ReducerProtocol {
 
 				// asset list
 				let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
-				let categories = accountPortfolio.fungibleTokenContainers.sortedIntoCategories()
+				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
 				state.accountDetails?.assets = .init(
 					fungibleTokenList: .init(
@@ -193,7 +193,7 @@ public struct Home: ReducerProtocol {
 						})
 					),
 					nonFungibleTokenList: .init(
-						rows: .init(uniqueElements: [accountPortfolio.nonFungibleTokenContainers].map {
+						rows: .init(uniqueElements: [accountPortfolio.nonFungibleTokenContainers.elements].map {
 							.init(containers: $0)
 						})
 					)

@@ -98,7 +98,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 public struct FungibleTokenContainer: AssetContainer, Equatable {
 	public var owner: AccountAddress
 	public typealias T = FungibleToken
-	public let asset: FungibleToken
+	public var asset: FungibleToken
 
 	/// Token amount held in one account.
 	public var amountInAttos: BigUInt?

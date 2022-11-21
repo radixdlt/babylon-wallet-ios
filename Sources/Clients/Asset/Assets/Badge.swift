@@ -16,7 +16,7 @@ public struct Badge: Asset {
 public struct BadgeContainer: AssetContainer {
 	public var owner: AccountAddress
 	public typealias T = Badge
-	public let asset: Badge
+	public var asset: Badge
 
 	/// Metadata unique to this asset.
 	public var metadata: [String: String]?

@@ -29,11 +29,10 @@ public struct NonFungibleToken: Sendable, Asset, Token, Hashable {
 }
 
 // MARK: - NonFungibleTokenContainer
-// FIXME: Cyon: What is the purpose of this???
 public struct NonFungibleTokenContainer: AssetContainer {
 	public var owner: AccountAddress
 	public typealias T = NonFungibleToken
-	public let asset: NonFungibleToken
+	public var asset: NonFungibleToken
 
 	/// Metadata unique to this asset.
 	public var metadata: [[String: String]]?

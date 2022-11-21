@@ -5,7 +5,7 @@ import Profile
 public protocol AssetContainer: Identifiable, Equatable {
 	associatedtype T: Asset
 	var owner: AccountAddress { get }
-	var asset: T { get }
+	var asset: T { get set }
 }
 
 public extension AssetContainer {

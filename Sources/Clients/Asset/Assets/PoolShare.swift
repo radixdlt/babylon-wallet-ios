@@ -16,7 +16,7 @@ public struct PoolShare: Asset {
 public struct PoolShareContainer: AssetContainer {
 	public var owner: AccountAddress
 	public typealias T = PoolShare
-	public let asset: PoolShare
+	public var asset: PoolShare
 
 	/// Metadata unique to this asset.
 	public var metadata: [String: String]?
