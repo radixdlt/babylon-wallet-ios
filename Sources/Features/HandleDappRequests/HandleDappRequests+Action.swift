@@ -34,8 +34,6 @@ public extension HandleDappRequests.Action.InternalAction {
 
 	enum SystemAction: Equatable {
 		case loadConnections
-		//        case connectionsLoadedResult(TaskResult<[P2P.ClientWithConnectionStatus]>)
-		//        case subscribeToRequestsFromP2PClientByID(OrderedSet<P2PClient.ID>)
 		case receiveRequestFromP2PClientResult(TaskResult<P2P.RequestFromClient>)
 		case dismissed(P2P.RequestFromClient)
 		case handleNextRequestItemIfNeeded
