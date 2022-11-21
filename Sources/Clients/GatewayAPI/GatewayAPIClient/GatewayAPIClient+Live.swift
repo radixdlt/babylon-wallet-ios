@@ -292,7 +292,7 @@ public extension GatewayAPIClient {
 		let transactionDetailsResponse = try await transactionDetails(transactionDetailsRequest)
 
 		guard transactionDetailsResponse.transaction.transactionStatus.status == .succeeded else {
-			throw FailedToSubmitTransactionWasRejected()
+			throw TXWasSubmittedButNotSuccessfully() // NB: impossible codepath unless API is somehow broken
 		}
 
 		let txID = TXID(rawValue: intentHash)
