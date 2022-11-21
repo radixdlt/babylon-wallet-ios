@@ -33,7 +33,7 @@ package.dependencies += [
 	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
 
 	// TCA - ComposableArchitecture used as architecture
-	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.43.0"),
+	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.46.0"),
 
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
