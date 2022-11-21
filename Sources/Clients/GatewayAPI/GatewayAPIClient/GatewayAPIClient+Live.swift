@@ -204,11 +204,6 @@ public extension GatewayAPIClient {
 					request: transactionDetailsRequest
 				) { $0.appendingPathComponent("transaction/details") }
 			}
-//			getCommittedTransaction: { request in
-//				try await post(
-//					request: request
-//				) { $0.appendingPathComponent("transaction/receipt") }
-//			}
 		)
 	}
 }
@@ -291,22 +286,13 @@ public extension GatewayAPIClient {
 			throw TXWasSubmittedButNotSuccessfully()
 		}
 
-		// MARK: Get Commited TX
+		// MARK: Get Committed TX
 
 		let transactionDetailsRequest = TransactionDetailsRequest(transactionIdentifier: .init(origin: .intent, valueHex: intentHash))
 		let transactionDetailsResponse = try await transactionDetails(transactionDetailsRequest)
 
-		switch transactionDetailsResponse.transaction.transactionStatus.status {
-		case .succeeded:
-			break
-		case .failed:
-			// FIXME: what to do here
-			break
-		case .rejected:
+		guard transactionDetailsResponse.transaction.transactionStatus.status == .succeeded else {
 			throw FailedToSubmitTransactionWasRejected()
-		case .pending:
-			// FIXME: what to do here
-			break
 		}
 
 		let txID = TXID(rawValue: intentHash)
