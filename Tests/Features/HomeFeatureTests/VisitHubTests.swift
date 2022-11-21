@@ -10,7 +10,7 @@ final class VisitHubTests: TestCase {
 			reducer: Home.VisitHub()
 		)
 
-		_ = await store.send(.internal(.view(.visitHubButtonTapped)))
+		await store.send(.internal(.view(.visitHubButtonTapped)))
 		await store.receive(.delegate(.displayHub))
 	}
 }

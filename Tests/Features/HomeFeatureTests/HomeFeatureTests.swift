@@ -73,7 +73,7 @@ final class HomeFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.system(.fetchPortfolioResult(.success(totalPortfolio))))) { [address] in
+		await store.send(.internal(.system(.fetchPortfolioResult(.success(totalPortfolio))))) { [address] in
 			// then
 			// local dictionary
 			$0.accountPortfolioDictionary = totalPortfolio
@@ -152,7 +152,7 @@ final class HomeFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.system(.fetchPortfolioResult(.success(accountPortfolio))))) {
+		await store.send(.internal(.system(.fetchPortfolioResult(.success(accountPortfolio))))) {
 			// then
 			guard let key = accountPortfolio.first?.key else {
 				XCTFail("Failed to fetch first account")

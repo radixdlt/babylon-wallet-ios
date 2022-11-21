@@ -36,7 +36,7 @@ final class TransactionSigningFeatureTests: TestCase {
 			XCTAssertEqual(error.localizedDescription, "SignTransactionError")
 			errorExpectation2.fulfill()
 		}
-		_ = await store.send(.view(.signTransactionButtonTapped)) {
+		await store.send(.view(.signTransactionButtonTapped)) {
 			$0.isSigningTX = true
 		}
 		await store.receive(.internal(.signTransactionResult(.failure(SignTransactionError())))) {
@@ -47,7 +47,7 @@ final class TransactionSigningFeatureTests: TestCase {
 		store.dependencies.transactionClient.signTransaction = { @Sendable _ in
 			"TXID"
 		}
-		_ = await store.send(.view(.signTransactionButtonTapped)) {
+		await store.send(.view(.signTransactionButtonTapped)) {
 			$0.isSigningTX = true
 		}
 		await store.receive(.internal(.signTransactionResult(.success("TXID")))) {
@@ -58,7 +58,7 @@ final class TransactionSigningFeatureTests: TestCase {
 	}
 
 	func testDismissView() async {
-		_ = await store.send(.view(.closeButtonTapped))
+		await store.send(.view(.closeButtonTapped))
 		await store.receive(.delegate(.dismissed(request)))
 	}
 }
