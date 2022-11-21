@@ -11,11 +11,11 @@ final class FungibleTokenListSortingTests: TestCase {
 		let xrd = FungibleToken.xrd
 		let dot = FungibleToken.dot
 
-		let btcContainer = FungibleTokenContainer(asset: btc, amountInAttos: nil, worth: 1)
-		let ethContainer = FungibleTokenContainer(asset: eth, amountInAttos: nil, worth: 2)
-		let ltcContainer = FungibleTokenContainer(asset: ltc, amountInAttos: nil, worth: 3)
-		let xrdContainer = FungibleTokenContainer(asset: xrd, amountInAttos: nil, worth: 4)
-		let dotContainer = FungibleTokenContainer(asset: dot, amountInAttos: nil, worth: 5)
+		let btcContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: btc, amountInAttos: nil, worth: 1)
+		let ethContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: eth, amountInAttos: nil, worth: 2)
+		let ltcContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: ltc, amountInAttos: nil, worth: 3)
+		let xrdContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: xrd, amountInAttos: nil, worth: 4)
+		let dotContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: dot, amountInAttos: nil, worth: 5)
 
 		// when
 		let result = [btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer].sortedIntoCategories()
@@ -36,11 +36,11 @@ final class FungibleTokenListSortingTests: TestCase {
 		let xrd = FungibleToken.xrd
 		let dot = FungibleToken.dot
 
-		let btcContainer = FungibleTokenContainer(asset: btc, amountInAttos: nil, worth: nil)
-		let ethContainer = FungibleTokenContainer(asset: eth, amountInAttos: nil, worth: nil)
-		let ltcContainer = FungibleTokenContainer(asset: ltc, amountInAttos: nil, worth: nil)
-		let xrdContainer = FungibleTokenContainer(asset: xrd, amountInAttos: nil, worth: nil)
-		let dotContainer = FungibleTokenContainer(asset: dot, amountInAttos: nil, worth: nil)
+		let btcContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: btc, amountInAttos: nil, worth: nil)
+		let ethContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: eth, amountInAttos: nil, worth: nil)
+		let ltcContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: ltc, amountInAttos: nil, worth: nil)
+		let xrdContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: xrd, amountInAttos: nil, worth: nil)
+		let dotContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: dot, amountInAttos: nil, worth: nil)
 
 		// when
 		let result = [btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer].sortedIntoCategories()
@@ -61,11 +61,11 @@ final class FungibleTokenListSortingTests: TestCase {
 		let xrd = FungibleToken.xrd
 		let dot = FungibleToken.dot
 
-		let btcContainer = FungibleTokenContainer(asset: btc, amountInAttos: nil, worth: nil)
-		let ethContainer = FungibleTokenContainer(asset: eth, amountInAttos: nil, worth: 2)
-		let ltcContainer = FungibleTokenContainer(asset: ltc, amountInAttos: nil, worth: 3)
-		let xrdContainer = FungibleTokenContainer(asset: xrd, amountInAttos: nil, worth: nil)
-		let dotContainer = FungibleTokenContainer(asset: dot, amountInAttos: nil, worth: nil)
+		let btcContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: btc, amountInAttos: nil, worth: nil)
+		let ethContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: eth, amountInAttos: nil, worth: 2)
+		let ltcContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: ltc, amountInAttos: nil, worth: 3)
+		let xrdContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: xrd, amountInAttos: nil, worth: nil)
+		let dotContainer = FungibleTokenContainer(owner: try! .init(address: "deadbeef-owner"), asset: dot, amountInAttos: nil, worth: nil)
 
 		// when
 		let result = [btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer].sortedIntoCategories()

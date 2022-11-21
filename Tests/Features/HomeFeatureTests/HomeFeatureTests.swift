@@ -39,17 +39,26 @@ final class HomeFeatureTests: TestCase {
 		// given
 
 		// fungible tokens
-		let ownedBTC = OwnedFungibleToken(owner: account.address, amountInAttos: 14.inAttos, token: .btc)
-		let ownedETH = OwnedFungibleToken(owner: account.address, amountInAttos: 2, token: .eth)
-		let ownedXRD = OwnedFungibleToken(owner: account.address, amountInAttos: 4, token: .xrd)
+		let btcContainer = FungibleTokenContainer(owner: address, asset: .btc, amountInAttos: 1234.inAttos, worth: 1234)
+		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amountInAttos: 2345.inAttos, worth: 2345)
+		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amountInAttos: 3456.inAttos, worth: 3456)
+		let expectedAggregatedValue: Float = 7035
 
 		// non fungible tokens
-		let ownedNFT1 = OwnedNonFungibleToken(owner: account.address, nonFungibleIDS: ["1"], token: .mock1)
-		let ownedNFT2 = OwnedNonFungibleToken(owner: account.address, nonFungibleIDS: ["3", "7"], token: .mock2)
-		let ownedNFT3 = OwnedNonFungibleToken(owner: account.address, nonFungibleIDS: ["1337"], token: .mock3)
+		let nft1 = NonFungibleToken.mock1
+		let nft2 = NonFungibleToken.mock2
+		let nft3 = NonFungibleToken.mock3
+		let nftContainer1 = NonFungibleTokenContainer(owner: address, asset: nft1, metadata: nil)
+		let nftContainer2 = NonFungibleTokenContainer(owner: address, asset: nft2, metadata: nil)
+		let nftContainer3 = NonFungibleTokenContainer(owner: address, asset: nft3, metadata: nil)
 
 		let totalPortfolio: AccountPortfolioDictionary = [
-			account.address: .init(ownedFungibleTokens: [ownedBTC, ownedETH, ownedXRD], ownedNonFungibleTokens: [ownedNFT1, ownedNFT2, ownedNFT3]),
+			account.address: .init(
+				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
+				nonFungibleTokenContainers: [nftContainer1, nftContainer2, nftContainer3],
+				poolShareContainers: [],
+				badgeContainers: []
+			),
 		]
 
 		let accountRowState = AccountList.Row.State(account: account)
@@ -76,7 +85,7 @@ final class HomeFeatureTests: TestCase {
 			// account details
 			if let details = $0.accountDetails {
 				// asset list
-				let sortedCategories = accountPortfolio.fungibleTokenContainers.sortedIntoCategories()
+				let sortedCategories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
 				let section0 = FungibleTokenList.Section.State(
 					id: .xrd, assets: [
@@ -105,7 +114,7 @@ final class HomeFeatureTests: TestCase {
 				)
 
 				let nonFungibleRow = NonFungibleTokenList.Row.State(
-					containers: accountPortfolio.nonFungibleTokenContainers
+					containers: accountPortfolio.nonFungibleTokenContainers.elements
 				)
 
 				$0.accountDetails?.assets = .init(
@@ -123,12 +132,17 @@ final class HomeFeatureTests: TestCase {
 	func test_accountWorthLoaded_whenSingleAccountWorthIsLoaded_thenUpdateSingleAccount() async {
 		// given
 		// fungible tokens
-		let ownedBTC = OwnedFungibleToken(owner: account.address, amountInAttos: 14.inAttos, token: .btc)
-		let ownedETH = OwnedFungibleToken(owner: account.address, amountInAttos: 2, token: .eth)
-		let ownedXRD = OwnedFungibleToken(owner: account.address, amountInAttos: 4, token: .xrd)
+		let btcContainer = FungibleTokenContainer(owner: address, asset: .btc, amountInAttos: 1234.inAttos, worth: 1234)
+		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amountInAttos: 2345.inAttos, worth: 2345)
+		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amountInAttos: 3456.inAttos, worth: 3456)
 
 		let accountPortfolio: AccountPortfolioDictionary = [
-			account.address: .init(ownedFungibleTokens: [ownedBTC, ownedETH, ownedXRD], ownedNonFungibleTokens: []),
+			account.address: .init(
+				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
+				nonFungibleTokenContainers: [],
+				poolShareContainers: [],
+				badgeContainers: []
+			),
 		]
 
 		let initialState: Home.State = .placeholder

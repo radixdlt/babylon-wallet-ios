@@ -65,7 +65,7 @@ public extension NonFungibleToken {
 	)
 
 	static let mock3 = Self(
-		address: "nft1-deadbeef",
+		address: "nft3-deadbeef",
 		nonFungibleID: "nft1-deadbeef-nft1-deadbeef",
 		isDeleted: true,
 		nonFungibleDataAsString: "<metadata goes here>"
