@@ -84,7 +84,7 @@ public extension GatewayAPIClient {
 
 		@Sendable func getNetworkName(baseURL: URL) async throws -> Network.Name {
 			let response = try await makeRequest(
-				responseType: GatewayInfoResponse.self,
+				responseType: GatewayAPI.GatewayInfoResponse.self,
 				baseURL: baseURL,
 				timeoutInterval: 2
 			) {
@@ -176,7 +176,7 @@ public extension GatewayAPIClient {
 			getGateway: getGateway,
 			accountResourcesByAddress: { accountAddress in
 				try await post(
-					request: EntityResourcesRequest(address: accountAddress.address)
+					request: GatewayAPI.EntityResourcesRequest(address: accountAddress.address)
 				) { $0.appendingPathComponent("entity/resources") }
 			},
 			resourcesOverview: { resourcesOverviewRequest in
@@ -186,7 +186,7 @@ public extension GatewayAPIClient {
 			},
 			resourceDetailsByResourceIdentifier: { resourceAddress in
 				try await post(
-					request: EntityDetailsRequest(address: resourceAddress)
+					request: GatewayAPI.EntityDetailsRequest(address: resourceAddress)
 				) { $0.appendingPathComponent("entity/details") }
 			},
 			recentTransactions: { recentTransactionsRequest in
@@ -244,7 +244,7 @@ public extension GatewayAPIClient {
 	func submit(
 		pollStrategy: PollStrategy = .default,
 		signedCompiledNotarizedTXGivenEpoch: (Epoch) async throws -> SignedCompiledNotarizedTX
-	) async throws -> (committedTransaction: TransactionDetailsResponse, txID: TXID) {
+	) async throws -> (committedTransaction: GatewayAPI.TransactionDetailsResponse, txID: TXID) {
 		@Dependency(\.mainQueue) var mainQueue
 
 		// MARK: Get Epoch
@@ -255,7 +255,7 @@ public extension GatewayAPIClient {
 		let signedCompiledNotarizedTX = try await signedCompiledNotarizedTXGivenEpoch(epoch)
 
 		// MARK: Submit TX
-		let submitTransactionRequest = TransactionSubmitRequest(
+		let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
 			notarizedTransaction: signedCompiledNotarizedTX.compileNotarizedTransactionIntentResponse.compiledNotarizedIntent.hex
 		)
 
@@ -265,10 +265,10 @@ public extension GatewayAPIClient {
 		}
 
 		// MARK: Poll Status
-		var txStatus: TransactionStatus = .init(status: .pending)
+		var txStatus: GatewayAPI.TransactionStatus = .init(status: .pending)
 		let intentHash = signedCompiledNotarizedTX.intentHash.hex
-		@Sendable func pollTransactionStatus() async throws -> TransactionStatus {
-			let txStatusRequest = TransactionStatusRequest(
+		@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
+			let txStatusRequest = GatewayAPI.TransactionStatusRequest(
 				transactionIdentifier: .init(
 					origin: .intent,
 					valueHex: intentHash
@@ -293,7 +293,7 @@ public extension GatewayAPIClient {
 
 		// MARK: Get Committed TX
 
-		let transactionDetailsRequest = TransactionDetailsRequest(transactionIdentifier: .init(origin: .intent, valueHex: intentHash))
+		let transactionDetailsRequest = GatewayAPI.TransactionDetailsRequest(transactionIdentifier: .init(origin: .intent, valueHex: intentHash))
 		let transactionDetailsResponse = try await transactionDetails(transactionDetailsRequest)
 
 		guard transactionDetailsResponse.transaction.transactionStatus.status == .succeeded else {
@@ -306,7 +306,7 @@ public extension GatewayAPIClient {
 	}
 }
 
-public extension TransactionStatus {
+public extension GatewayAPI.TransactionStatus {
 	var isComplete: Bool {
 		switch status {
 		case .succeeded, .failed, .rejected:

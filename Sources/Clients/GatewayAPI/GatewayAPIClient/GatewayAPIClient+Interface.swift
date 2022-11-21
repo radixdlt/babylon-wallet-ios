@@ -51,14 +51,14 @@ public extension GatewayAPIClient {
 	typealias GetCurrentBaseURL = @Sendable () -> URL
 	typealias SetCurrentBaseURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway?
 
-	typealias GetGateway = @Sendable () async throws -> GatewayInfoResponse
+	typealias GetGateway = @Sendable () async throws -> GatewayAPI.GatewayInfoResponse
 
-	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> EntityResourcesResponse
-	typealias GetResourcesOverview = @Sendable (EntityOverviewRequest) async throws -> EntityOverviewResponse
-	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> EntityDetailsResponse
+	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityResourcesResponse
+	typealias GetResourcesOverview = @Sendable (GatewayAPI.EntityOverviewRequest) async throws -> GatewayAPI.EntityOverviewResponse
+	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.EntityDetailsResponse
 
-	typealias GetRecentTransactions = @Sendable (RecentTransactionsRequest) async throws -> RecentTransactionsResponse
-	typealias SubmitTransaction = @Sendable (TransactionSubmitRequest) async throws -> TransactionSubmitResponse
-	typealias GetTransactionStatus = @Sendable (TransactionStatusRequest) async throws -> TransactionStatusResponse
-	typealias GetTransactionDetails = @Sendable (TransactionDetailsRequest) async throws -> TransactionDetailsResponse
+	typealias GetRecentTransactions = @Sendable (GatewayAPI.RecentTransactionsRequest) async throws -> GatewayAPI.RecentTransactionsResponse
+	typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
+	typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
+	typealias GetTransactionDetails = @Sendable (GatewayAPI.TransactionDetailsRequest) async throws -> GatewayAPI.TransactionDetailsResponse
 }

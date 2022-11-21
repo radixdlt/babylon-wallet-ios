@@ -25,7 +25,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		fungibleResourceCount _: Int = 2,
 		nonFungibleResourceCount _: Int = 2,
 		submittedTXIsDoubleSpend: Bool = false,
-		txStatus: TransactionStatus? = nil
+		txStatus: GatewayAPI.TransactionStatus? = nil
 	) -> Self {
 		.init(
 			getCurrentBaseURL: { URL(string: "example.com")! },

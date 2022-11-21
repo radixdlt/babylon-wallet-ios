@@ -17,7 +17,7 @@ extension AssetFetcher: DependencyKey {
 			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.address)
 			let nonFungibleTokenAddresses = accountPortfolio.nonFungibleTokenContainers.map(\.asset.address)
 
-			let request = EntityOverviewRequest(addresses: fungibleTokenAddresses)
+			let request = GatewayAPI.EntityOverviewRequest(addresses: fungibleTokenAddresses)
 			let overviewResponse = try await gatewayAPIClient.resourcesOverview(request)
 
 			accountPortfolio.update(with: overviewResponse)
@@ -29,7 +29,7 @@ extension AssetFetcher: DependencyKey {
 
 // MARK: - Helpers - Resources response
 extension AccountPortfolio {
-	init(response: EntityResourcesResponse) throws {
+	init(response: GatewayAPI.EntityResourcesResponse) throws {
 		let fungibleContainers = try response.fungibleResources.items.map {
 			FungibleTokenContainer(
 				owner: try .init(address: response.address),
@@ -70,7 +70,7 @@ extension AccountPortfolio {
 
 // MARK: - Helpers - Overview response
 extension AccountPortfolio {
-	mutating func update(with response: EntityOverviewResponse) {
+	mutating func update(with response: GatewayAPI.EntityOverviewResponse) {
 		response.entities.forEach {
 			fungibleTokenContainers[id: $0.address]?.update(with: $0.metadata)
 		}
@@ -78,7 +78,7 @@ extension AccountPortfolio {
 }
 
 extension FungibleTokenContainer {
-	mutating func update(with metadataCollection: EntityMetadataCollection) {
+	mutating func update(with metadataCollection: GatewayAPI.EntityMetadataCollection) {
 		metadataCollection.items.forEach {
 			asset.update(with: $0)
 		}
@@ -86,7 +86,7 @@ extension FungibleTokenContainer {
 }
 
 extension FungibleToken {
-	mutating func update(with metadata: EntityMetadataItem) {
+	mutating func update(with metadata: GatewayAPI.EntityMetadataItem) {
 		switch metadata.key {
 		case "symbol":
 			symbol = metadata.value
