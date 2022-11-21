@@ -10,22 +10,27 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - EntityResourcesResponseNonFungibleResourcesAllOf
-public struct EntityResourcesResponseNonFungibleResourcesAllOf: Codable, Hashable {
-	public private(set) var items: [EntityResourcesResponseNonFungibleResourcesItem]
+@available(*, deprecated, renamed: "GatewayAPI.EntityResourcesResponseNonFungibleResourcesAllOf")
+public typealias EntityResourcesResponseNonFungibleResourcesAllOf = GatewayAPI.EntityResourcesResponseNonFungibleResourcesAllOf
 
-	public init(items: [EntityResourcesResponseNonFungibleResourcesItem]) {
-		self.items = items
-	}
+// MARK: - GatewayAPI.EntityResourcesResponseNonFungibleResourcesAllOf
+public extension GatewayAPI {
+	struct EntityResourcesResponseNonFungibleResourcesAllOf: Codable, Hashable {
+		public private(set) var items: [EntityResourcesResponseNonFungibleResourcesItem]
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case items
-	}
+		public init(items: [EntityResourcesResponseNonFungibleResourcesItem]) {
+			self.items = items
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case items
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(items, forKey: .items)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(items, forKey: .items)
+		}
 	}
 }

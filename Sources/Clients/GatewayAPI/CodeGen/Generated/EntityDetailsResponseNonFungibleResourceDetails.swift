@@ -10,26 +10,31 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - EntityDetailsResponseNonFungibleResourceDetails
-public struct EntityDetailsResponseNonFungibleResourceDetails: Codable, Hashable {
-	public private(set) var discriminator: EntityDetailsResponseDetailsType
-	public private(set) var ids: EntityDetailsResponseNonFungibleResourceDetailsIds
+@available(*, deprecated, renamed: "GatewayAPI.EntityDetailsResponseNonFungibleResourceDetails")
+public typealias EntityDetailsResponseNonFungibleResourceDetails = GatewayAPI.EntityDetailsResponseNonFungibleResourceDetails
 
-	public init(discriminator: EntityDetailsResponseDetailsType, ids: EntityDetailsResponseNonFungibleResourceDetailsIds) {
-		self.discriminator = discriminator
-		self.ids = ids
-	}
+// MARK: - GatewayAPI.EntityDetailsResponseNonFungibleResourceDetails
+public extension GatewayAPI {
+	struct EntityDetailsResponseNonFungibleResourceDetails: Codable, Hashable {
+		public private(set) var discriminator: EntityDetailsResponseDetailsType
+		public private(set) var ids: EntityDetailsResponseNonFungibleResourceDetailsIds
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case discriminator
-		case ids
-	}
+		public init(discriminator: EntityDetailsResponseDetailsType, ids: EntityDetailsResponseNonFungibleResourceDetailsIds) {
+			self.discriminator = discriminator
+			self.ids = ids
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case discriminator
+			case ids
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(discriminator, forKey: .discriminator)
-		try container.encode(ids, forKey: .ids)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(discriminator, forKey: .discriminator)
+			try container.encode(ids, forKey: .ids)
+		}
 	}
 }

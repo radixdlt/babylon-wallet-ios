@@ -10,10 +10,15 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - TransactionLookupOrigin
-public enum TransactionLookupOrigin: String, Codable, CaseIterable {
-	case intent
-	case signedIntent = "signed_intent"
-	case notarized
-	case payload
+@available(*, deprecated, renamed: "GatewayAPI.TransactionLookupOrigin")
+public typealias TransactionLookupOrigin = GatewayAPI.TransactionLookupOrigin
+
+// MARK: - GatewayAPI.TransactionLookupOrigin
+public extension GatewayAPI {
+	enum TransactionLookupOrigin: String, Codable, CaseIterable {
+		case intent
+		case signedIntent = "signed_intent"
+		case notarized
+		case payload
+	}
 }

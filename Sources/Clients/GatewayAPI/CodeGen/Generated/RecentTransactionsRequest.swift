@@ -10,36 +10,41 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - RecentTransactionsRequest
-public struct RecentTransactionsRequest: Codable, Hashable {
-	public private(set) var atStateIdentifier: PartialLedgerStateIdentifier?
-	public private(set) var fromStateIdentifier: PartialLedgerStateIdentifier?
-	/** This cursor allows forward pagination, by providing the cursor from the previous request. */
-	public private(set) var cursor: String?
-	/** The page size requested. */
-	public private(set) var limit: Int?
+@available(*, deprecated, renamed: "GatewayAPI.RecentTransactionsRequest")
+public typealias RecentTransactionsRequest = GatewayAPI.RecentTransactionsRequest
 
-	public init(atStateIdentifier: PartialLedgerStateIdentifier? = nil, fromStateIdentifier: PartialLedgerStateIdentifier? = nil, cursor: String? = nil, limit: Int? = nil) {
-		self.atStateIdentifier = atStateIdentifier
-		self.fromStateIdentifier = fromStateIdentifier
-		self.cursor = cursor
-		self.limit = limit
-	}
+// MARK: - GatewayAPI.RecentTransactionsRequest
+public extension GatewayAPI {
+	struct RecentTransactionsRequest: Codable, Hashable {
+		public private(set) var atStateIdentifier: PartialLedgerStateIdentifier?
+		public private(set) var fromStateIdentifier: PartialLedgerStateIdentifier?
+		/** This cursor allows forward pagination, by providing the cursor from the previous request. */
+		public private(set) var cursor: String?
+		/** The page size requested. */
+		public private(set) var limit: Int?
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case atStateIdentifier = "at_state_identifier"
-		case fromStateIdentifier = "from_state_identifier"
-		case cursor
-		case limit
-	}
+		public init(atStateIdentifier: PartialLedgerStateIdentifier? = nil, fromStateIdentifier: PartialLedgerStateIdentifier? = nil, cursor: String? = nil, limit: Int? = nil) {
+			self.atStateIdentifier = atStateIdentifier
+			self.fromStateIdentifier = fromStateIdentifier
+			self.cursor = cursor
+			self.limit = limit
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case atStateIdentifier = "at_state_identifier"
+			case fromStateIdentifier = "from_state_identifier"
+			case cursor
+			case limit
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encodeIfPresent(atStateIdentifier, forKey: .atStateIdentifier)
-		try container.encodeIfPresent(fromStateIdentifier, forKey: .fromStateIdentifier)
-		try container.encodeIfPresent(cursor, forKey: .cursor)
-		try container.encodeIfPresent(limit, forKey: .limit)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encodeIfPresent(atStateIdentifier, forKey: .atStateIdentifier)
+			try container.encodeIfPresent(fromStateIdentifier, forKey: .fromStateIdentifier)
+			try container.encodeIfPresent(cursor, forKey: .cursor)
+			try container.encodeIfPresent(limit, forKey: .limit)
+		}
 	}
 }

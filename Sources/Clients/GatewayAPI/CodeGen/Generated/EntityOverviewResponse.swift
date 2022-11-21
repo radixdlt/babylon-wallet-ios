@@ -10,26 +10,31 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - EntityOverviewResponse
-public struct EntityOverviewResponse: Codable, Hashable {
-	public private(set) var ledgerState: LedgerState
-	public private(set) var entities: [EntityOverviewResponseEntityItem]
+@available(*, deprecated, renamed: "GatewayAPI.EntityOverviewResponse")
+public typealias EntityOverviewResponse = GatewayAPI.EntityOverviewResponse
 
-	public init(ledgerState: LedgerState, entities: [EntityOverviewResponseEntityItem]) {
-		self.ledgerState = ledgerState
-		self.entities = entities
-	}
+// MARK: - GatewayAPI.EntityOverviewResponse
+public extension GatewayAPI {
+	struct EntityOverviewResponse: Codable, Hashable {
+		public private(set) var ledgerState: LedgerState
+		public private(set) var entities: [EntityOverviewResponseEntityItem]
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case ledgerState = "ledger_state"
-		case entities
-	}
+		public init(ledgerState: LedgerState, entities: [EntityOverviewResponseEntityItem]) {
+			self.ledgerState = ledgerState
+			self.entities = entities
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case ledgerState = "ledger_state"
+			case entities
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(ledgerState, forKey: .ledgerState)
-		try container.encode(entities, forKey: .entities)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(ledgerState, forKey: .ledgerState)
+			try container.encode(entities, forKey: .entities)
+		}
 	}
 }

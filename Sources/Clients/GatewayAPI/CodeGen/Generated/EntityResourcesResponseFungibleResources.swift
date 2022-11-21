@@ -10,37 +10,42 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - EntityResourcesResponseFungibleResources
-public struct EntityResourcesResponseFungibleResources: Codable, Hashable {
-	/** TBD (make it nullable when we're dealing with unknown result set sizes?) */
-	public private(set) var totalCount: Int?
-	/** TBD (maybe we should use HATEOAS-like permalinks?) */
-	public private(set) var previousCursor: String?
-	/** TBD (maybe we should use HATEOAS-like permalinks?) */
-	public private(set) var nextCursor: String?
-	public private(set) var items: [EntityResourcesResponseFungibleResourcesItem]
+@available(*, deprecated, renamed: "GatewayAPI.EntityResourcesResponseFungibleResources")
+public typealias EntityResourcesResponseFungibleResources = GatewayAPI.EntityResourcesResponseFungibleResources
 
-	public init(totalCount: Int? = nil, previousCursor: String? = nil, nextCursor: String? = nil, items: [EntityResourcesResponseFungibleResourcesItem]) {
-		self.totalCount = totalCount
-		self.previousCursor = previousCursor
-		self.nextCursor = nextCursor
-		self.items = items
-	}
+// MARK: - GatewayAPI.EntityResourcesResponseFungibleResources
+public extension GatewayAPI {
+	struct EntityResourcesResponseFungibleResources: Codable, Hashable {
+		/** TBD (make it nullable when we're dealing with unknown result set sizes?) */
+		public private(set) var totalCount: Int?
+		/** TBD (maybe we should use HATEOAS-like permalinks?) */
+		public private(set) var previousCursor: String?
+		/** TBD (maybe we should use HATEOAS-like permalinks?) */
+		public private(set) var nextCursor: String?
+		public private(set) var items: [EntityResourcesResponseFungibleResourcesItem]
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case totalCount = "total_count"
-		case previousCursor = "previous_cursor"
-		case nextCursor = "next_cursor"
-		case items
-	}
+		public init(totalCount: Int? = nil, previousCursor: String? = nil, nextCursor: String? = nil, items: [EntityResourcesResponseFungibleResourcesItem]) {
+			self.totalCount = totalCount
+			self.previousCursor = previousCursor
+			self.nextCursor = nextCursor
+			self.items = items
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case totalCount = "total_count"
+			case previousCursor = "previous_cursor"
+			case nextCursor = "next_cursor"
+			case items
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encodeIfPresent(totalCount, forKey: .totalCount)
-		try container.encodeIfPresent(previousCursor, forKey: .previousCursor)
-		try container.encodeIfPresent(nextCursor, forKey: .nextCursor)
-		try container.encode(items, forKey: .items)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encodeIfPresent(totalCount, forKey: .totalCount)
+			try container.encodeIfPresent(previousCursor, forKey: .previousCursor)
+			try container.encodeIfPresent(nextCursor, forKey: .nextCursor)
+			try container.encode(items, forKey: .items)
+		}
 	}
 }

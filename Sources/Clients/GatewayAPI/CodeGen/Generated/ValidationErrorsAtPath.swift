@@ -10,26 +10,31 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - ValidationErrorsAtPath
-public struct ValidationErrorsAtPath: Codable, Hashable {
-	public private(set) var path: String
-	public private(set) var errors: [String]
+@available(*, deprecated, renamed: "GatewayAPI.ValidationErrorsAtPath")
+public typealias ValidationErrorsAtPath = GatewayAPI.ValidationErrorsAtPath
 
-	public init(path: String, errors: [String]) {
-		self.path = path
-		self.errors = errors
-	}
+// MARK: - GatewayAPI.ValidationErrorsAtPath
+public extension GatewayAPI {
+	struct ValidationErrorsAtPath: Codable, Hashable {
+		public private(set) var path: String
+		public private(set) var errors: [String]
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case path
-		case errors
-	}
+		public init(path: String, errors: [String]) {
+			self.path = path
+			self.errors = errors
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case path
+			case errors
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(path, forKey: .path)
-		try container.encode(errors, forKey: .errors)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(path, forKey: .path)
+			try container.encode(errors, forKey: .errors)
+		}
 	}
 }

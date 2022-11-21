@@ -10,38 +10,43 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - EntityDetailsResponseFungibleResourceDetails
-public struct EntityDetailsResponseFungibleResourceDetails: Codable, Hashable {
-	public private(set) var discriminator: EntityDetailsResponseDetailsType
-	public private(set) var divisibility: Int64
-	public private(set) var totalSupply: TokenAmount
-	public private(set) var totalMinted: TokenAmount
-	public private(set) var totalBurnt: TokenAmount
+@available(*, deprecated, renamed: "GatewayAPI.EntityDetailsResponseFungibleResourceDetails")
+public typealias EntityDetailsResponseFungibleResourceDetails = GatewayAPI.EntityDetailsResponseFungibleResourceDetails
 
-	public init(discriminator: EntityDetailsResponseDetailsType, divisibility: Int64, totalSupply: TokenAmount, totalMinted: TokenAmount, totalBurnt: TokenAmount) {
-		self.discriminator = discriminator
-		self.divisibility = divisibility
-		self.totalSupply = totalSupply
-		self.totalMinted = totalMinted
-		self.totalBurnt = totalBurnt
-	}
+// MARK: - GatewayAPI.EntityDetailsResponseFungibleResourceDetails
+public extension GatewayAPI {
+	struct EntityDetailsResponseFungibleResourceDetails: Codable, Hashable {
+		public private(set) var discriminator: EntityDetailsResponseDetailsType
+		public private(set) var divisibility: Int64
+		public private(set) var totalSupply: TokenAmount
+		public private(set) var totalMinted: TokenAmount
+		public private(set) var totalBurnt: TokenAmount
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case discriminator
-		case divisibility
-		case totalSupply = "total_supply"
-		case totalMinted = "total_minted"
-		case totalBurnt = "total_burnt"
-	}
+		public init(discriminator: EntityDetailsResponseDetailsType, divisibility: Int64, totalSupply: TokenAmount, totalMinted: TokenAmount, totalBurnt: TokenAmount) {
+			self.discriminator = discriminator
+			self.divisibility = divisibility
+			self.totalSupply = totalSupply
+			self.totalMinted = totalMinted
+			self.totalBurnt = totalBurnt
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case discriminator
+			case divisibility
+			case totalSupply = "total_supply"
+			case totalMinted = "total_minted"
+			case totalBurnt = "total_burnt"
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(discriminator, forKey: .discriminator)
-		try container.encode(divisibility, forKey: .divisibility)
-		try container.encode(totalSupply, forKey: .totalSupply)
-		try container.encode(totalMinted, forKey: .totalMinted)
-		try container.encode(totalBurnt, forKey: .totalBurnt)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(discriminator, forKey: .discriminator)
+			try container.encode(divisibility, forKey: .divisibility)
+			try container.encode(totalSupply, forKey: .totalSupply)
+			try container.encode(totalMinted, forKey: .totalMinted)
+			try container.encode(totalBurnt, forKey: .totalBurnt)
+		}
 	}
 }

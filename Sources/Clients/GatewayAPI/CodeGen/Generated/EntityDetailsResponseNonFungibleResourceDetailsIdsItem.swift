@@ -10,30 +10,35 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - EntityDetailsResponseNonFungibleResourceDetailsIdsItem
-public struct EntityDetailsResponseNonFungibleResourceDetailsIdsItem: Codable, Hashable {
-	public private(set) var idHex: String?
-	public private(set) var immutableDataHex: String?
-	public private(set) var mutableDataHex: String?
+@available(*, deprecated, renamed: "GatewayAPI.EntityDetailsResponseNonFungibleResourceDetailsIdsItem")
+public typealias EntityDetailsResponseNonFungibleResourceDetailsIdsItem = GatewayAPI.EntityDetailsResponseNonFungibleResourceDetailsIdsItem
 
-	public init(idHex: String? = nil, immutableDataHex: String? = nil, mutableDataHex: String? = nil) {
-		self.idHex = idHex
-		self.immutableDataHex = immutableDataHex
-		self.mutableDataHex = mutableDataHex
-	}
+// MARK: - GatewayAPI.EntityDetailsResponseNonFungibleResourceDetailsIdsItem
+public extension GatewayAPI {
+	struct EntityDetailsResponseNonFungibleResourceDetailsIdsItem: Codable, Hashable {
+		public private(set) var idHex: String?
+		public private(set) var immutableDataHex: String?
+		public private(set) var mutableDataHex: String?
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case idHex = "id_hex"
-		case immutableDataHex = "immutable_data_hex"
-		case mutableDataHex = "mutable_data_hex"
-	}
+		public init(idHex: String? = nil, immutableDataHex: String? = nil, mutableDataHex: String? = nil) {
+			self.idHex = idHex
+			self.immutableDataHex = immutableDataHex
+			self.mutableDataHex = mutableDataHex
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case idHex = "id_hex"
+			case immutableDataHex = "immutable_data_hex"
+			case mutableDataHex = "mutable_data_hex"
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encodeIfPresent(idHex, forKey: .idHex)
-		try container.encodeIfPresent(immutableDataHex, forKey: .immutableDataHex)
-		try container.encodeIfPresent(mutableDataHex, forKey: .mutableDataHex)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encodeIfPresent(idHex, forKey: .idHex)
+			try container.encodeIfPresent(immutableDataHex, forKey: .immutableDataHex)
+			try container.encodeIfPresent(mutableDataHex, forKey: .mutableDataHex)
+		}
 	}
 }

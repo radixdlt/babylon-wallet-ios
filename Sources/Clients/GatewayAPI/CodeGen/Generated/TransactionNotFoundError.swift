@@ -10,27 +10,32 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - TransactionNotFoundError
-public struct TransactionNotFoundError: Codable, Hashable {
-	/** The type of error. Each subtype may have its own additional structured fields. */
-	public private(set) var type: String
-	public private(set) var transactionNotFound: TransactionLookupIdentifier
+@available(*, deprecated, renamed: "GatewayAPI.TransactionNotFoundError")
+public typealias TransactionNotFoundError = GatewayAPI.TransactionNotFoundError
 
-	public init(type: String, transactionNotFound: TransactionLookupIdentifier) {
-		self.type = type
-		self.transactionNotFound = transactionNotFound
-	}
+// MARK: - GatewayAPI.TransactionNotFoundError
+public extension GatewayAPI {
+	struct TransactionNotFoundError: Codable, Hashable {
+		/** The type of error. Each subtype may have its own additional structured fields. */
+		public private(set) var type: String
+		public private(set) var transactionNotFound: TransactionLookupIdentifier
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case type
-		case transactionNotFound = "transaction_not_found"
-	}
+		public init(type: String, transactionNotFound: TransactionLookupIdentifier) {
+			self.type = type
+			self.transactionNotFound = transactionNotFound
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case type
+			case transactionNotFound = "transaction_not_found"
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(type, forKey: .type)
-		try container.encode(transactionNotFound, forKey: .transactionNotFound)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(type, forKey: .type)
+			try container.encode(transactionNotFound, forKey: .transactionNotFound)
+		}
 	}
 }

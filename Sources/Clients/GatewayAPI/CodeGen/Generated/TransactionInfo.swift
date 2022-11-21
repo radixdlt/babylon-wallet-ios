@@ -10,34 +10,39 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - TransactionInfo
-public struct TransactionInfo: Codable, Hashable {
-	public private(set) var transactionStatus: TransactionStatus
-	public private(set) var payloadHashHex: String
-	public private(set) var intentHashHex: String
-	public private(set) var feePaid: TokenAmount?
+@available(*, deprecated, renamed: "GatewayAPI.TransactionInfo")
+public typealias TransactionInfo = GatewayAPI.TransactionInfo
 
-	public init(transactionStatus: TransactionStatus, payloadHashHex: String, intentHashHex: String, feePaid: TokenAmount? = nil) {
-		self.transactionStatus = transactionStatus
-		self.payloadHashHex = payloadHashHex
-		self.intentHashHex = intentHashHex
-		self.feePaid = feePaid
-	}
+// MARK: - GatewayAPI.TransactionInfo
+public extension GatewayAPI {
+	struct TransactionInfo: Codable, Hashable {
+		public private(set) var transactionStatus: TransactionStatus
+		public private(set) var payloadHashHex: String
+		public private(set) var intentHashHex: String
+		public private(set) var feePaid: TokenAmount?
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case transactionStatus = "transaction_status"
-		case payloadHashHex = "payload_hash_hex"
-		case intentHashHex = "intent_hash_hex"
-		case feePaid = "fee_paid"
-	}
+		public init(transactionStatus: TransactionStatus, payloadHashHex: String, intentHashHex: String, feePaid: TokenAmount? = nil) {
+			self.transactionStatus = transactionStatus
+			self.payloadHashHex = payloadHashHex
+			self.intentHashHex = intentHashHex
+			self.feePaid = feePaid
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case transactionStatus = "transaction_status"
+			case payloadHashHex = "payload_hash_hex"
+			case intentHashHex = "intent_hash_hex"
+			case feePaid = "fee_paid"
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(transactionStatus, forKey: .transactionStatus)
-		try container.encode(payloadHashHex, forKey: .payloadHashHex)
-		try container.encode(intentHashHex, forKey: .intentHashHex)
-		try container.encodeIfPresent(feePaid, forKey: .feePaid)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(transactionStatus, forKey: .transactionStatus)
+			try container.encode(payloadHashHex, forKey: .payloadHashHex)
+			try container.encode(intentHashHex, forKey: .intentHashHex)
+			try container.encodeIfPresent(feePaid, forKey: .feePaid)
+		}
 	}
 }

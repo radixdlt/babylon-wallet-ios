@@ -10,26 +10,31 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - GatewayInfoResponseAllOf
-public struct GatewayInfoResponseAllOf: Codable, Hashable {
-	public private(set) var knownTarget: GatewayInfoResponseKnownTarget
-	public private(set) var releaseInfo: GatewayInfoResponseReleaseInfo
+@available(*, deprecated, renamed: "GatewayAPI.GatewayInfoResponseAllOf")
+public typealias GatewayInfoResponseAllOf = GatewayAPI.GatewayInfoResponseAllOf
 
-	public init(knownTarget: GatewayInfoResponseKnownTarget, releaseInfo: GatewayInfoResponseReleaseInfo) {
-		self.knownTarget = knownTarget
-		self.releaseInfo = releaseInfo
-	}
+// MARK: - GatewayAPI.GatewayInfoResponseAllOf
+public extension GatewayAPI {
+	struct GatewayInfoResponseAllOf: Codable, Hashable {
+		public private(set) var knownTarget: GatewayInfoResponseKnownTarget
+		public private(set) var releaseInfo: GatewayInfoResponseReleaseInfo
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case knownTarget = "known_target"
-		case releaseInfo = "release_info"
-	}
+		public init(knownTarget: GatewayInfoResponseKnownTarget, releaseInfo: GatewayInfoResponseReleaseInfo) {
+			self.knownTarget = knownTarget
+			self.releaseInfo = releaseInfo
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case knownTarget = "known_target"
+			case releaseInfo = "release_info"
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(knownTarget, forKey: .knownTarget)
-		try container.encode(releaseInfo, forKey: .releaseInfo)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(knownTarget, forKey: .knownTarget)
+			try container.encode(releaseInfo, forKey: .releaseInfo)
+		}
 	}
 }

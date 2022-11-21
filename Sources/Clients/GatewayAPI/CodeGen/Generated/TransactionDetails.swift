@@ -10,32 +10,37 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - TransactionDetails
-public struct TransactionDetails: Codable, Hashable {
-	/** The raw transaction payload, hex encoded. */
-	public private(set) var rawHex: String
-	public private(set) var referencedGlobalEntities: [String]
-	/** The message bytes, hex encoded. */
-	public private(set) var messageHex: String?
+@available(*, deprecated, renamed: "GatewayAPI.TransactionDetails")
+public typealias TransactionDetails = GatewayAPI.TransactionDetails
 
-	public init(rawHex: String, referencedGlobalEntities: [String], messageHex: String? = nil) {
-		self.rawHex = rawHex
-		self.referencedGlobalEntities = referencedGlobalEntities
-		self.messageHex = messageHex
-	}
+// MARK: - GatewayAPI.TransactionDetails
+public extension GatewayAPI {
+	struct TransactionDetails: Codable, Hashable {
+		/** The raw transaction payload, hex encoded. */
+		public private(set) var rawHex: String
+		public private(set) var referencedGlobalEntities: [String]
+		/** The message bytes, hex encoded. */
+		public private(set) var messageHex: String?
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case rawHex = "raw_hex"
-		case referencedGlobalEntities = "referenced_global_entities"
-		case messageHex = "message_hex"
-	}
+		public init(rawHex: String, referencedGlobalEntities: [String], messageHex: String? = nil) {
+			self.rawHex = rawHex
+			self.referencedGlobalEntities = referencedGlobalEntities
+			self.messageHex = messageHex
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case rawHex = "raw_hex"
+			case referencedGlobalEntities = "referenced_global_entities"
+			case messageHex = "message_hex"
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(rawHex, forKey: .rawHex)
-		try container.encode(referencedGlobalEntities, forKey: .referencedGlobalEntities)
-		try container.encodeIfPresent(messageHex, forKey: .messageHex)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(rawHex, forKey: .rawHex)
+			try container.encode(referencedGlobalEntities, forKey: .referencedGlobalEntities)
+			try container.encodeIfPresent(messageHex, forKey: .messageHex)
+		}
 	}
 }

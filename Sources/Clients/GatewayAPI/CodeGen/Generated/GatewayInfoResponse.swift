@@ -10,30 +10,35 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - GatewayInfoResponse
-public struct GatewayInfoResponse: Codable, Hashable {
-	public private(set) var ledgerState: LedgerState
-	public private(set) var knownTarget: GatewayInfoResponseKnownTarget
-	public private(set) var releaseInfo: GatewayInfoResponseReleaseInfo
+@available(*, deprecated, renamed: "GatewayAPI.GatewayInfoResponse")
+public typealias GatewayInfoResponse = GatewayAPI.GatewayInfoResponse
 
-	public init(ledgerState: LedgerState, knownTarget: GatewayInfoResponseKnownTarget, releaseInfo: GatewayInfoResponseReleaseInfo) {
-		self.ledgerState = ledgerState
-		self.knownTarget = knownTarget
-		self.releaseInfo = releaseInfo
-	}
+// MARK: - GatewayAPI.GatewayInfoResponse
+public extension GatewayAPI {
+	struct GatewayInfoResponse: Codable, Hashable {
+		public private(set) var ledgerState: LedgerState
+		public private(set) var knownTarget: GatewayInfoResponseKnownTarget
+		public private(set) var releaseInfo: GatewayInfoResponseReleaseInfo
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case ledgerState = "ledger_state"
-		case knownTarget = "known_target"
-		case releaseInfo = "release_info"
-	}
+		public init(ledgerState: LedgerState, knownTarget: GatewayInfoResponseKnownTarget, releaseInfo: GatewayInfoResponseReleaseInfo) {
+			self.ledgerState = ledgerState
+			self.knownTarget = knownTarget
+			self.releaseInfo = releaseInfo
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case ledgerState = "ledger_state"
+			case knownTarget = "known_target"
+			case releaseInfo = "release_info"
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(ledgerState, forKey: .ledgerState)
-		try container.encode(knownTarget, forKey: .knownTarget)
-		try container.encode(releaseInfo, forKey: .releaseInfo)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(ledgerState, forKey: .ledgerState)
+			try container.encode(knownTarget, forKey: .knownTarget)
+			try container.encode(releaseInfo, forKey: .releaseInfo)
+		}
 	}
 }

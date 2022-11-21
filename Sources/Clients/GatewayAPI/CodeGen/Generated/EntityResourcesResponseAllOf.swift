@@ -10,31 +10,36 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - EntityResourcesResponseAllOf
-public struct EntityResourcesResponseAllOf: Codable, Hashable {
-	/** The Bech32m-encoded human readable version of the entity's global address. */
-	public private(set) var address: String
-	public private(set) var fungibleResources: EntityResourcesResponseFungibleResources
-	public private(set) var nonFungibleResources: EntityResourcesResponseNonFungibleResources
+@available(*, deprecated, renamed: "GatewayAPI.EntityResourcesResponseAllOf")
+public typealias EntityResourcesResponseAllOf = GatewayAPI.EntityResourcesResponseAllOf
 
-	public init(address: String, fungibleResources: EntityResourcesResponseFungibleResources, nonFungibleResources: EntityResourcesResponseNonFungibleResources) {
-		self.address = address
-		self.fungibleResources = fungibleResources
-		self.nonFungibleResources = nonFungibleResources
-	}
+// MARK: - GatewayAPI.EntityResourcesResponseAllOf
+public extension GatewayAPI {
+	struct EntityResourcesResponseAllOf: Codable, Hashable {
+		/** The Bech32m-encoded human readable version of the entity's global address. */
+		public private(set) var address: String
+		public private(set) var fungibleResources: EntityResourcesResponseFungibleResources
+		public private(set) var nonFungibleResources: EntityResourcesResponseNonFungibleResources
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case address
-		case fungibleResources = "fungible_resources"
-		case nonFungibleResources = "non_fungible_resources"
-	}
+		public init(address: String, fungibleResources: EntityResourcesResponseFungibleResources, nonFungibleResources: EntityResourcesResponseNonFungibleResources) {
+			self.address = address
+			self.fungibleResources = fungibleResources
+			self.nonFungibleResources = nonFungibleResources
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case address
+			case fungibleResources = "fungible_resources"
+			case nonFungibleResources = "non_fungible_resources"
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(address, forKey: .address)
-		try container.encode(fungibleResources, forKey: .fungibleResources)
-		try container.encode(nonFungibleResources, forKey: .nonFungibleResources)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(address, forKey: .address)
+			try container.encode(fungibleResources, forKey: .fungibleResources)
+			try container.encode(nonFungibleResources, forKey: .nonFungibleResources)
+		}
 	}
 }

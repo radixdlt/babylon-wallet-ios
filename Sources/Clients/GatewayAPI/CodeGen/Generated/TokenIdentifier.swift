@@ -10,23 +10,28 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - TokenIdentifier
-public struct TokenIdentifier: Codable, Hashable {
-	/** The radix resource identifier of the token. */
-	public private(set) var rri: String
+@available(*, deprecated, renamed: "GatewayAPI.TokenIdentifier")
+public typealias TokenIdentifier = GatewayAPI.TokenIdentifier
 
-	public init(rri: String) {
-		self.rri = rri
-	}
+// MARK: - GatewayAPI.TokenIdentifier
+public extension GatewayAPI {
+	struct TokenIdentifier: Codable, Hashable {
+		/** The radix resource identifier of the token. */
+		public private(set) var rri: String
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case rri
-	}
+		public init(rri: String) {
+			self.rri = rri
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case rri
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(rri, forKey: .rri)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(rri, forKey: .rri)
+		}
 	}
 }

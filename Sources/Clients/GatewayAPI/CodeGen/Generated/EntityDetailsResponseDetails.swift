@@ -10,34 +10,39 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - EntityDetailsResponseDetails
-public enum EntityDetailsResponseDetails: Codable, JSONEncodable, Hashable {
-	case typeEntityDetailsResponseAccountComponentDetails(EntityDetailsResponseAccountComponentDetails)
-	case typeEntityDetailsResponseFungibleResourceDetails(EntityDetailsResponseFungibleResourceDetails)
-	case typeEntityDetailsResponseNonFungibleResourceDetails(EntityDetailsResponseNonFungibleResourceDetails)
+@available(*, deprecated, renamed: "GatewayAPI.EntityDetailsResponseDetails")
+public typealias EntityDetailsResponseDetails = GatewayAPI.EntityDetailsResponseDetails
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.singleValueContainer()
-		switch self {
-		case let .typeEntityDetailsResponseAccountComponentDetails(value):
-			try container.encode(value)
-		case let .typeEntityDetailsResponseFungibleResourceDetails(value):
-			try container.encode(value)
-		case let .typeEntityDetailsResponseNonFungibleResourceDetails(value):
-			try container.encode(value)
+// MARK: - GatewayAPI.EntityDetailsResponseDetails
+public extension GatewayAPI {
+	enum EntityDetailsResponseDetails: Codable, JSONEncodable, Hashable {
+		case typeEntityDetailsResponseAccountComponentDetails(EntityDetailsResponseAccountComponentDetails)
+		case typeEntityDetailsResponseFungibleResourceDetails(EntityDetailsResponseFungibleResourceDetails)
+		case typeEntityDetailsResponseNonFungibleResourceDetails(EntityDetailsResponseNonFungibleResourceDetails)
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.singleValueContainer()
+			switch self {
+			case let .typeEntityDetailsResponseAccountComponentDetails(value):
+				try container.encode(value)
+			case let .typeEntityDetailsResponseFungibleResourceDetails(value):
+				try container.encode(value)
+			case let .typeEntityDetailsResponseNonFungibleResourceDetails(value):
+				try container.encode(value)
+			}
 		}
-	}
 
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.singleValueContainer()
-		if let value = try? container.decode(EntityDetailsResponseAccountComponentDetails.self) {
-			self = .typeEntityDetailsResponseAccountComponentDetails(value)
-		} else if let value = try? container.decode(EntityDetailsResponseFungibleResourceDetails.self) {
-			self = .typeEntityDetailsResponseFungibleResourceDetails(value)
-		} else if let value = try? container.decode(EntityDetailsResponseNonFungibleResourceDetails.self) {
-			self = .typeEntityDetailsResponseNonFungibleResourceDetails(value)
-		} else {
-			throw DecodingError.typeMismatch(Self.Type.self, .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode instance of EntityDetailsResponseDetails"))
+		public init(from decoder: Decoder) throws {
+			let container = try decoder.singleValueContainer()
+			if let value = try? container.decode(EntityDetailsResponseAccountComponentDetails.self) {
+				self = .typeEntityDetailsResponseAccountComponentDetails(value)
+			} else if let value = try? container.decode(EntityDetailsResponseFungibleResourceDetails.self) {
+				self = .typeEntityDetailsResponseFungibleResourceDetails(value)
+			} else if let value = try? container.decode(EntityDetailsResponseNonFungibleResourceDetails.self) {
+				self = .typeEntityDetailsResponseNonFungibleResourceDetails(value)
+			} else {
+				throw DecodingError.typeMismatch(Self.Type.self, .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode instance of EntityDetailsResponseDetails"))
+			}
 		}
 	}
 }
