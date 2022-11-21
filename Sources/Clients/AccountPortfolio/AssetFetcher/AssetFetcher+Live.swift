@@ -74,6 +74,23 @@ extension AccountPortfolio {
 	}
 }
 
+extension FungibleToken {
+	mutating func populate(with metadata: EntityMetadataItem) {
+		switch metadata.key {
+		case "symbol":
+			symbol = metadata.value
+		case "description":
+			tokenDescription = metadata.value
+		case "url":
+			tokenInfoURL = metadata.value
+		case "name":
+			name = metadata.value
+		default:
+			break
+		}
+	}
+}
+
 // MARK: - AssetFetcher + DependencyKey
 extension AssetFetcher: DependencyKey {
 	public static let liveValue = Self(
@@ -82,6 +99,15 @@ extension AssetFetcher: DependencyKey {
 
 			let resourcesResponse = try await gatewayAPIClient.accountResourcesByAddress(accountAddress)
 			let accountPortfolio = try AccountPortfolio(response: resourcesResponse)
+
+			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.address)
+//			let nonFungibleTokenAddresses = accountPortfolio.nonFungibleTokenContainers.map { $0.asset.address }
+
+			let request = EntityOverviewRequest(addresses: fungibleTokenAddresses)
+			let temp = try await gatewayAPIClient.resourcesOverview(request)
+
+			temp.entities
+
 			return accountPortfolio
 
 			/*

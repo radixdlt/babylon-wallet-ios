@@ -49,19 +49,19 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 
 	/// An optional desciption of this token, e.g.
 	/// ` "The Radix Public Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes."`
-	public let tokenDescription: String?
+	public var tokenDescription: String?
 
 	/// Short token name, e.g. `"Radix"`.
-	public let name: String?
+	public var name: String?
 
 	/// Symbol of token, e.g. `"XRD"`.
-	public let symbol: String?
+	public var symbol: String?
 
 	/// Token icon URL.
 	public var iconURL: URL?
 
 	/// Website of the token, e.g. `"https://tokens.radixdlt.com"`
-	public let tokenInfoURL: String?
+	public var tokenInfoURL: String?
 
 	/// Also known as `granularity`, often value `18`, meaning each whole unit
 	/// can be divided into 10^18 subunits (attos). In case of `17` one CANNOT

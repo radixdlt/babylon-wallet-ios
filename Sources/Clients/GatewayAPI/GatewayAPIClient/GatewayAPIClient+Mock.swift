@@ -13,6 +13,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		setCurrentBaseURL: unimplemented("\(Self.self).setCurrentBaseURL"),
 		getGateway: unimplemented("\(Self.self).getGateway"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
+		resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
 		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
 		recentTransactions: unimplemented("\(Self.self).recentTransactions"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
@@ -44,6 +45,9 @@ extension GatewayAPIClient: TestDependencyKey {
 				)
 			) },
 			accountResourcesByAddress: { _ in
+				fatalError()
+			},
+			resourcesOverview: { _ in
 				fatalError()
 			},
 			resourceDetailsByResourceIdentifier: { _ in

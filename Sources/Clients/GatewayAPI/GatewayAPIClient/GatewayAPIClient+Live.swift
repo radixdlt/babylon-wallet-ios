@@ -174,6 +174,11 @@ public extension GatewayAPIClient {
 					request: EntityResourcesRequest(address: accountAddress.address)
 				) { $0.appendingPathComponent("entity/resources") }
 			},
+			resourcesOverview: { resourcesOverviewRequest in
+				try await post(
+					request: resourcesOverviewRequest
+				) { $0.appendingPathComponent("entity/overview") }
+			},
 			resourceDetailsByResourceIdentifier: { resourceAddress in
 				try await post(
 					request: EntityDetailsRequest(address: resourceAddress)

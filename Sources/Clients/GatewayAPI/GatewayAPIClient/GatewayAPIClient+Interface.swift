@@ -15,6 +15,7 @@ public struct GatewayAPIClient: DependencyKey {
 	// MARK: Request
 	public var getGateway: GetGateway
 	public var accountResourcesByAddress: GetAccountResourcesByAddress
+	public var resourcesOverview: GetResourcesOverview
 	public var resourceDetailsByResourceIdentifier: GetResourceDetailsByResourceIdentifier
 	public var recentTransactions: GetRecentTransactions
 	public var submitTransaction: SubmitTransaction
@@ -26,6 +27,7 @@ public struct GatewayAPIClient: DependencyKey {
 		setCurrentBaseURL: @escaping SetCurrentBaseURL,
 		getGateway: @escaping GetGateway,
 		accountResourcesByAddress: @escaping GetAccountResourcesByAddress,
+		resourcesOverview: @escaping GetResourcesOverview,
 		resourceDetailsByResourceIdentifier: @escaping GetResourceDetailsByResourceIdentifier,
 		recentTransactions: @escaping GetRecentTransactions,
 		submitTransaction: @escaping SubmitTransaction,
@@ -36,6 +38,7 @@ public struct GatewayAPIClient: DependencyKey {
 		self.setCurrentBaseURL = setCurrentBaseURL
 		self.getGateway = getGateway
 		self.accountResourcesByAddress = accountResourcesByAddress
+		self.resourcesOverview = resourcesOverview
 		self.resourceDetailsByResourceIdentifier = resourceDetailsByResourceIdentifier
 		self.recentTransactions = recentTransactions
 		self.submitTransaction = submitTransaction
@@ -51,6 +54,7 @@ public extension GatewayAPIClient {
 	typealias GetGateway = @Sendable () async throws -> GatewayInfoResponse
 
 	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> EntityResourcesResponse
+	typealias GetResourcesOverview = @Sendable (EntityOverviewRequest) async throws -> EntityOverviewResponse
 	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> EntityDetailsResponse
 
 	typealias GetRecentTransactions = @Sendable (RecentTransactionsRequest) async throws -> RecentTransactionsResponse
