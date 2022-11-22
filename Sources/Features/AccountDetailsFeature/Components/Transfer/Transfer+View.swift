@@ -4,6 +4,7 @@ import SwiftUI
 
 // MARK: - AccountDetails.Transfer.View
 public extension AccountDetails.Transfer {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store

@@ -6,6 +6,7 @@ import URLBuilderClient
 
 // MARK: - ManageGatewayAPIEndpoints.View
 public extension ManageGatewayAPIEndpoints {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<ManageGatewayAPIEndpoints>
 

@@ -4,6 +4,7 @@ import SwiftUI
 
 // MARK: - Home.VisitHub.View
 public extension Home.VisitHub {
+	@MainActor
 	struct View: SwiftUI.View {
 		let store: Store<State, Action>
 	}

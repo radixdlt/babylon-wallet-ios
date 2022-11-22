@@ -200,9 +200,16 @@ extension Package {
 			.target(
 				name: targetName,
 				dependencies: module.dependencies,
+
 				path: targetPath,
 				exclude: module.exclude,
 				resources: module.resources,
+				swiftSettings: [
+					.unsafeFlags([
+						"-Xfrontend", "-warn-concurrency",
+						"-Xfrontend", "-enable-actor-data-race-checks",
+					]),
+				],
 				plugins: module.plugins
 			),
 		]
@@ -218,7 +225,13 @@ extension Package {
 					name: testTargetName,
 					dependencies: [.target(name: targetName)] + testDependencies,
 					path: testTargetPath,
-					resources: resources
+					resources: resources,
+					swiftSettings: [
+						.unsafeFlags([
+							"-Xfrontend", "-warn-concurrency",
+							"-Xfrontend", "-enable-actor-data-race-checks",
+						]),
+					]
 				),
 			]
 		}

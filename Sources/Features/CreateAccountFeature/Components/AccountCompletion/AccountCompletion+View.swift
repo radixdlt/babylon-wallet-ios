@@ -6,6 +6,7 @@ import SwiftUI
 
 // MARK: - AccountCompletion.View
 public extension AccountCompletion {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<AccountCompletion>
 
