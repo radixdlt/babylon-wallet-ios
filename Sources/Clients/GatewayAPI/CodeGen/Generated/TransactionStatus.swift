@@ -10,10 +10,42 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - TransactionStatus
-/** The status of the transaction */
-public enum TransactionStatus: String, Codable, CaseIterable {
-	case succeeded = "Succeeded"
-	case failed = "Failed"
-	case rejected = "Rejected"
+@available(*, deprecated, renamed: "GatewayAPI.TransactionStatus")
+public typealias TransactionStatus = GatewayAPI.TransactionStatus
+
+// MARK: - GatewayAPI.TransactionStatus
+public extension GatewayAPI {
+	struct TransactionStatus: Codable, Hashable {
+		public enum Status: String, Codable, CaseIterable {
+			case succeeded
+			case failed
+			case rejected
+			case pending
+		}
+
+		public private(set) var status: Status
+		public private(set) var stateVersion: Int64?
+		public private(set) var confirmedAt: Date?
+
+		public init(status: Status, stateVersion: Int64? = nil, confirmedAt: Date? = nil) {
+			self.status = status
+			self.stateVersion = stateVersion
+			self.confirmedAt = confirmedAt
+		}
+
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case status
+			case stateVersion = "state_version"
+			case confirmedAt = "confirmed_at"
+		}
+
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(status, forKey: .status)
+			try container.encodeIfPresent(stateVersion, forKey: .stateVersion)
+			try container.encodeIfPresent(confirmedAt, forKey: .confirmedAt)
+		}
+	}
 }

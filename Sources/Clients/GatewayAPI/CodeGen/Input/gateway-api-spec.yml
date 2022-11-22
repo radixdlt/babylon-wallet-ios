@@ -1,90 +1,32 @@
-openapi: 3.0.3 # Cyon: manually changed from 3.1.0 to 3.0.3 since `openapi-generator` lacks 3.1.0 support and Omar suggested this works: https://rdxworks.slack.com/archives/C04188T1ELW/p1666436984569999?thread_ts=1666434721.726419&cid=C04188T1ELW
-# NOTES TO EDITORS:
-#
-# Guidance for integer types (see https://swagger.io/docs/specification/data-models/data-types/#numbers)
-#
-# => If a u8, use type: integer, format: int32, minimum: 0, maximum: 255
-# => If an i8, use type: integer, format: int32, minimum: -128, maximum: 127 (also, why are you using an i8!?)
-# => If a u32:
-#    => If there's a domain-imposed requirement that fits it within an i32 (2,147,483,647 = 2^31 - 1), with bound B use
-#       type: integer, format: int32, minimum: 0, maximum: B
-#       And be sure to validate against B in the code which maps into the type. See EG epoch max length in numerics.rs
-#    => If not, to be compatible with OAS, we need to put it into an int64:
-#       type: integer, format: int64, minimum: 0, maximum: 4294967295 = 2^32 - 1
-# => If an i32, use type: integer, format: int32
-# => If a u64: , use type: integer, format: int64, minimum: 0, maximum: 18446744073709551615 = 2^64 - 1
-#    => If there's a domain-imposed requirement that fits it within an i64 (9,223,372,036,854,775,807 = 2^63 - 1), with bound B use
-#       type: integer, format: int64, minimum: 0, maximum: B
-#       And be sure to validate against B in the code which maps into the type. See EG epoch max length in numerics.rs
-#    => If not, to be compatible with OAS, it won't fit in a numeric type, so use a string instead
-# => If an i64, use type: integer, format: int64
-# => If something over i64/u64, use type: string
-#
-# Regardless of the type, specify in the description what the underlying type and bounds are, by starting with something like:
-# - An integer between 0 and 10^10, giving
-# - A decimal-string-encoded integer between 0 and 2^64 - 1, which
-# - A decimal-string-encoded integer between 0 and 10^123, that
-#
-# Descriptions guidance:
-# => For descriptions of encoded types, we follow this pattern: 'The xyz-encoded, abc-encoded xx of the yy'
-#    EG 'The hex-encoded, SBOR-encoded data' or 'The hex-encoded double-SHA256 hash of the banana payload'
-# => Don't end in a full-stop, unless it is more than 1 sentence, then all sentences should end in a full stop
-# => It's not technically valid to have both $ref and description, but it works in ReDocly, so feel free to do it
-#
-# Naming guidance:
-# => Hex-encoded hashes should end _hash
-# => Hex-encoded bytes/payload should end _hex and not include _bytes
+openapi: 3.0.0
 info:
-  version: '0.1.0'
-  title: 'Babylon Core API'
+  version: 2.0.0
+  title: Radix Babylon Gateway API
   license:
     name: The Radix License, Version 1.0
     url: https://www.radixfoundation.org/licenses/LICENSE-v1
+  description: |
+    See https://docs.radixdlt.com/main/apis/introduction.html
 servers:
-  - url: 'localhost:3333/core'
+  - url: http://localhost:5208
+  - url: https://stokenet.radixdlt.com
+  - url: https://mainnet.radixdlt.com
 tags:
   - name: Status
     x-displayName: Status Endpoints
-    description: To query information about the Node / Ledger status.
+    description: To query information about the Gateway API status.
   - name: Transaction
-    x-displayName: Transaction Submission Endpoints
-    description: To submit transactions to the network.
-  - name: Mempool
-    x-displayName: Mempool Endpoints
-    description: To query mempool status.
-  - name: Ledger State
-    x-displayName: Ledger State Endpoints
-    description: To query the current ledger state.
-  - name: History Stream
-    x-displayName: History Stream Endpoints
-    description: To query the history of the ledger.
-  - name: Key
-    x-displayName: Key Endpoints
-    description: To sign certain transactions with the node's own key.
+    x-displayName: Transaction Endpoints
+    description: To build, finalize and submit transactions, and to query transaction status and contents.
+  - name: Entity
+    x-displayName: Entity State Endpoints
+    description: TBD
 paths:
-  "/status/network-configuration":
+  "/gateway":
     post:
-      summary: Get Network Configuration
-      description: Returns the network configuration of the network the node is connected to.
-      tags:
-        - Status
-      responses:
-        '200':
-          description: Network Configuration
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NetworkConfigurationResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/status/network-status":
-    post:
-      summary: Get Network Status
-      description: Returns the current state and status of the node's copy of the ledger.
+      operationId: GatewayInfo
+      summary: Get Gateway Info
+      description: Returns the Gateway API version, network and current ledger state.
       tags:
         - Status
       requestBody:
@@ -92,80 +34,21 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/NetworkStatusRequest"
+              "$ref": "#/components/schemas/GatewayInfoRequest"
       responses:
         '200':
-          description: Network Status
+          description: The Network
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NetworkStatusResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/mempool/list":
+                "$ref": "#/components/schemas/GatewayInfoResponse"
+  "/transaction/recent":
     post:
-      summary: Get Mempool List
-      description: Returns the hashes of all the transactions currently in the mempool
-      tags:
-        - Mempool
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/MempoolListRequest"
-      responses:
-        '200':
-          description: Mempool List Response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MempoolListResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/mempool/transaction":
-    post:
-      summary: Get Mempool Transaction
-      description: Returns the payload of a transaction currently in the mempool
-      tags:
-        - Mempool
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/MempoolTransactionRequest"
-      responses:
-        '200':
-          description: Mempool Transaction Response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/MempoolTransactionResponse"
-        '404':
-          description: Not found error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/transaction/parse":
-    post:
-      summary: Parse a transaction payload
-      description: Returns the contents and hashes of a notarized transaction, signed transaction or transaction intent.
+      operationId: RecentTransactions
+      summary: Get Recent Transactions
+      description: |
+        Returns user-initiated transactions which have been succesfully committed to the ledger.
+        The transactions are returned in a paginated format, ordered by most recent.
       tags:
         - Transaction
       requestBody:
@@ -173,61 +56,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TransactionParseRequest"
+              "$ref": "#/components/schemas/RecentTransactionsRequest"
       responses:
         '200':
-          description: Transaction Parse Response
+          description: A page of the most recent transactions
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TransactionParseResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/transaction/submit":
-    post:
-      summary: Submit transaction to the network
-      description: Returns whether the transaction submission was accepted.
-      tags:
-        - Transaction
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TransactionSubmitRequest"
-      responses:
-        '200':
-          description: Transaction Submit Response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TransactionSubmitResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                "$ref": "#/components/schemas/RecentTransactionsResponse"
   "/transaction/preview":
     post:
-      summary: Preview a transaction against the latest network state
-      description: Returns the preview response
+      operationId: PreviewTransaction
+      summary: Preview Transaction
+      description: |
+        Previews transaction against the network.
       tags:
         - Transaction
       requestBody:
@@ -235,29 +77,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TransactionPreviewRequest"
+              type: object
       responses:
         '200':
-          description: Transaction preview response
+          description: Successful Preview
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TransactionPreviewResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/transaction/stream":
+                type: object
+  "/transaction/submit":
     post:
-      summary: Get committed transactions
+      operationId: SubmitTransaction
+      summary: Submit Transaction
+      description: |
+        Submits a signed transaction payload to the network.
+        The transaction identifier from finalize or submit can then be used to track the transaction status.
       tags:
         - Transaction
       requestBody:
@@ -265,1341 +99,399 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CommittedTransactionsRequest"
+              "$ref": "#/components/schemas/TransactionSubmitRequest"
       responses:
         '200':
-          description: Committed transactions response
+          description: Successful Submission
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CommittedTransactionsResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-####################
-# v0 API Responses #
-####################
-  "/v0/status/network-configuration":
+                "$ref": "#/components/schemas/TransactionSubmitResponse"
+  "/transaction/status":
     post:
-      summary: Get Network Configuration
-      description: Returns the network configuration.
-      tags:
-        - Status
-      responses:
-        '200':
-          description: Network Configuration
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NetworkConfigurationResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/v0/transaction/submit":
-    post:
-      summary: Transaction Submit
+      operationId: TransactionStatus
+      summary: Transaction Status
+      description: |
+        Returns the status and contents of the transaction with the given transaction identifier. Transaction identifiers which aren't recognised as either belonging to a committed transaction or a transaction submitted through this Network Gateway may return a `TransactionNotFoundError`. Transaction identifiers relating to failed transactions will, after a delay, also be reported as a `TransactionNotFoundError`.
       tags:
         - Transaction
-        - V0
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/V0TransactionSubmitRequest"
+              "$ref": "#/components/schemas/TransactionStatusRequest"
       responses:
         '200':
-          description: Transaction submit response
+          description: Transaction Status
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/V0TransactionSubmitResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/v0/transaction/status":
+                "$ref": "#/components/schemas/TransactionStatusResponse"
+  "/transaction/details":
     post:
-      summary: Read Transaction Status
+      operationId: TransactionDetails
+      summary: Transaction Details
+      description: |
+        Returns the status and contents of the transaction with the given transaction identifier. Transaction identifiers which aren't recognised as either belonging to a committed transaction or a transaction submitted through this Network Gateway may return a `TransactionNotFoundError`. Transaction identifiers relating to failed transactions will, after a delay, also be reported as a `TransactionNotFoundError`.
       tags:
         - Transaction
-        - V0
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/V0TransactionStatusRequest"
+              "$ref": "#/components/schemas/TransactionDetailsRequest"
       responses:
         '200':
-          description: Transaction status response
+          description: Transaction Status
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/V0TransactionStatusResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/v0/transaction/receipt":
+                "$ref": "#/components/schemas/TransactionDetailsResponse"
+  /entity/resources:
     post:
-      summary: Read Committed Transaction
+      operationId: EntityResources
+      summary: Entity Resources
+      description: |
+        TBD
       tags:
-        - Transaction
-        - V0
+        - Entity
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/V0CommittedTransactionRequest"
+              "$ref": "#/components/schemas/EntityResourcesRequest"
       responses:
         '200':
-          description: Committed transaction found response
+          description: Entity Resources
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/V0CommittedTransactionResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '404':
-          description: Committed transaction not found response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/v0/state/epoch":
+                "$ref": "#/components/schemas/EntityResourcesResponse"
+  /entity/details:
     post:
-      summary: Read Current Epoch
+      operationId: EntityDetails
+      summary: Entity Details
+      description: |
+        TBD
       tags:
-        - State
-        - V0
-      responses:
-        '200':
-          description: Current state response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/V0StateEpochResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/v0/state/component":
-    post:
-      summary: Read component data
-      tags:
-        - State
-        - V0
+        - Entity
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/V0StateComponentRequest"
+              "$ref": "#/components/schemas/EntityDetailsRequest"
       responses:
         '200':
-          description: Current state response
+          description: Entity Details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/V0StateComponentResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '404':
-          description: Not found error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/v0/state/resource":
+                "$ref": "#/components/schemas/EntityDetailsResponse"
+  /entity/overview:
     post:
-      summary: Read resource data
+      operationId: EntityOverview
+      summary: Entity Overview
+      description: |
+        TBD
       tags:
-        - State
-        - V0
+        - Entity
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/V0StateResourceRequest"
+              "$ref": "#/components/schemas/EntityOverviewRequest"
       responses:
         '200':
-          description: Current state response
+          description: Entity Details
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/V0StateResourceResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '404':
-          description: Not found error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/v0/state/non-fungible":
+                "$ref": "#/components/schemas/EntityOverviewResponse"
+  /entity/metadata:
     post:
-      summary: Read non-fungible data
+      operationId: EntityMetadata
+      summary: Entity Metadata
+      description: |
+        TBD
       tags:
-        - State
-        - V0
+        - Entity
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/V0StateNonFungibleRequest"
+              "$ref": "#/components/schemas/EntityMetadataRequest"
       responses:
         '200':
-          description: Current state response
+          description: Entity Metadata
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/V0StateNonFungibleResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '404':
-          description: Not found error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-  "/v0/state/package":
-    post:
-      summary: Read package data
-      tags:
-        - State
-        - V0
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/V0StatePackageRequest"
-      responses:
-        '200':
-          description: Current state response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/V0StatePackageResponse"
-        '400':
-          description: Client error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '404':
-          description: Not found error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-#############################################################################################
+                "$ref": "#/components/schemas/EntityMetadataResponse"
+
 components:
   schemas:
-###########################
-# GENERAL / SHARED MODELS #
-###########################
-    TransactionStatus:
+
+    #
+    # Aliases
+    #
+
+    EntityAddress:
       type: string
-      enum:
-        - Succeeded
-        - Failed
-        - Rejected
-      description: The status of the transaction
-    TransactionReceipt:
+      description: The Bech32m-encoded human readable version of the entity's global address.
+    ResourceAddress:
+      type: string
+      description: The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address.
+
+    BigDecimal:
+      type: string
+      description: The string-encoded decimal representing the amount
+
+    #
+    # Generic Types
+    #
+
+    LedgerState:
+      description: |
+        The ledger state against which the response was generated. Can be used to detect if the Network Gateway is returning up-to-date information.
       type: object
-      description: The transaction execution receipt
+      required:
+        - network
+        - state_version
+        - timestamp
+        - epoch
+        - round
+      properties:
+        network:
+          description: The name of the network against which the request is made.
+          type: string
+        state_version:
+          description: The state version of the ledger. Each transaction increments the state version by 1.
+          type: integer
+          format: int64
+        timestamp:
+          description: |
+            The round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.
+          type: string
+        epoch:
+          description: The epoch number of the ledger at this state version.
+          type: integer
+          format: int64
+        round:
+          description: The consensus round in the epoch that this state version was committed in.
+          type: integer
+          format: int64
+    PartialLedgerStateIdentifier:
+      description: Allows a client to request a response referencing an earlier (`at_*` properties) or later (`from_*` properties) ledger state.
+      type: object
+      nullable: true
+      properties:
+        state_version:
+          description: If the version is provided, the latest ledger state <= the given version is returned.
+          nullable: true
+          type: integer
+          format: int64
+        timestamp:
+          description: If a timestamp is provided, the latest ledger state <= the given timestamp is returned.
+          nullable: true
+          type: string
+          format: date-time
+        epoch:
+          description: If an epoch is provided, the ledger state at the given epoch <= the given round (else round 0) is returned.
+          nullable: true
+          type: integer
+          format: int64
+        round:
+          nullable: true
+          type: integer
+          format: int64
+
+    EntityMetadataCollection:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              description: TBD
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityMetadataItem"
+    EntityMetadataItem:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+
+    TransactionInfo:
+      type: object
+      required:
+        - transaction_status
+        - payload_hash_hex
+        - intent_hash_hex
+      properties:
+        transaction_status:
+          "$ref": "#/components/schemas/TransactionStatus"
+        payload_hash_hex:
+          type: string
+        intent_hash_hex:
+          type: string
+        fee_paid:
+          $ref: "#/components/schemas/TokenAmount"
+    TransactionStatus:
+      type: object
       required:
         - status
-        - fee_summary
-        - state_updates
       properties:
         status:
-          $ref: "#/components/schemas/TransactionStatus"
-        fee_summary:
-          $ref: "#/components/schemas/FeeSummary"
-        state_updates:
-          $ref: "#/components/schemas/StateUpdates"
-        output:
-          type: array
-          description: The manifest line-by-line engine return data (only present if status is Succeeded)
-          items:
-            $ref: "#/components/schemas/SborData"
-        error_message:
           type: string
-          description: Error message (only present if status is Failed or Rejected)
-    NotarizedTransaction:
-      type: object
-      required:
-        - hash
-        - payload_hex
-        - signed_intent
-        - notary_signature
-      properties:
-        hash:
-          type: string
-          description: The hex-encoded double-SHA256 hash of the notarized transaction payload. Also known as the payload_hash or the notarized_transaction_hash.
-        payload_hex:
-          type: string
-          description: The hex-encoded full notarized transaction payload
-        signed_intent:
-          $ref: "#/components/schemas/SignedTransactionIntent"
-        notary_signature:
-          $ref: "#/components/schemas/Signature"
-    SignedTransactionIntent:
-      type: object
-      required:
-        - hash
-        - intent
-        - intent_signatures
-      properties:
-        hash:
-          type: string
-          description: The hex-encoded double-SHA256 hash of the signed transaction intent. Also known as the signatures hash.
-        intent:
-          $ref: "#/components/schemas/TransactionIntent"
-        intent_signatures:
-          type: array
-          items:
-            $ref: "#/components/schemas/SignatureWithPublicKey"
-    TransactionIntent:
-      type: object
-      required:
-        - hash
-        - header
-        - manifest
-        - blobs_hex
-      properties:
-        hash:
-          type: string
-          description: |
-            The hex-encoded double-SHA256 hash of the transaction intent.
-            Also known as the Transaction ID, Transaction Hash, or Intent Hash.
-        header:
-          $ref: "#/components/schemas/TransactionHeader"
-        manifest:
-          $ref: "#/components/schemas/TransactionManifest"
-    TransactionHeader:
-      type: object
-      required:
-        - version
-        - network_id
-        - start_epoch_inclusive
-        - end_epoch_exclusive
-        - nonce
-        - notary_public_key
-        - notary_as_signatory
-        - cost_unit_limit
-        - tip_percentage
-      properties:
-        version:
-          type: integer
-          minimum: 0
-          maximum: 255
-        network_id:
-          type: integer
-          minimum: 0
-          maximum: 255
-        start_epoch_inclusive:
+          enum:
+            - succeeded
+            - failed
+            - rejected
+            - pending
+        state_version:
+          nullable: true
           type: integer
           format: int64
-          minimum: 0
-          maximum: 10000000000
-          description: An integer between 0 and 10^10, marking the epoch from which the transaction can be submitted
-        end_epoch_exclusive:
-          type: integer
-          format: int64
-          minimum: 0
-          maximum: 10000000000
-          description: An integer between 0 and 10^10, marking the epoch from which the transaction will no longer be valid, and be rejected
-        nonce:
+        confirmed_at:
+          nullable: true
           type: string
-          description: A decimal-string-encoded integer between 0 and 2^64 - 1, chosen to be unique to allow replay of transaction intents
-        notary_public_key:
-          $ref: "#/components/schemas/PublicKey"
-        notary_as_signatory:
-          type: boolean
-          description: Specifies whether the notary's signature should be included in transaction signers list
-        cost_unit_limit:
-          type: integer
-          format: int64
-          minimum: 0
-          maximum: 4294967295
-          description: An integer between 0 and 2^32 - 1, giving the maximum number of cost units available for transaction execution.
-        tip_percentage:
-          type: integer
-          format: int64
-          minimum: 0
-          maximum: 4294967295
-          description: An integer between 0 and 2^32 - 1, giving the validator tip as a percentage amount. A value of "1" corresponds to 1% of the fee.
-    TransactionManifest:
+          format: date-time
+
+    TokenAmount:
       type: object
       required:
-        - instructions
-        - blobs_hex
+        - value
+        - token_identifier
       properties:
-        instructions:
-          type: string
-          description: The decompiled transaction manifest instructions
-        blobs_hex:
-          type: object
-          description: A map of the hex-encoded blob hash, to hex-encoded blob content
-          additionalProperties:
-            type: string
-            description: The hex-encoded blob content
-    NetworkIdentifier:
-      description: The logical name of the network
-      type: string
-      example: mainnet
-    CommittedStateIdentifier:
+        value:
+          $ref: "#/components/schemas/BigDecimal"
+        address:
+          $ref: "#/components/schemas/ResourceAddress"
+
+    #
+    # Mixins
+    #
+
+    LedgerStateMixin:
       type: object
-      # This should expand to include transaction accumulator and state hash
+      required:
+        - ledger_state
+      properties:
+        ledger_state:
+          $ref: "#/components/schemas/LedgerState"
+
+    ResultSetCursorMixin:
+      type: object
+      properties:
+        total_count:
+          description: TBD (make it nullable when we're dealing with unknown result set sizes?)
+          type: integer
+          nullable: true
+        previous_cursor:
+          description: TBD (maybe we should use HATEOAS-like permalinks?)
+          type: string
+          nullable: true
+        next_cursor:
+          description: TBD (maybe we should use HATEOAS-like permalinks?)
+          type: string
+          nullable: true
+
+    #
+    # "Status" Request & Response Types
+    #
+
+    GatewayInfoRequest:
+      type: object
+      example: {}
+    GatewayInfoResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - known_target
+            - release_info
+          properties:
+            known_target:
+              $ref: "#/components/schemas/GatewayInfoResponseKnownTarget"
+            release_info:
+              $ref: "#/components/schemas/GatewayInfoResponseReleaseInfo"
+    GatewayInfoResponseKnownTarget:
+      type: object
       required:
         - state_version
       properties:
         state_version:
-          type: integer
-          format: int64
-          minimum: 0
-          maximum: 100000000000000
-          description: An integer between 0 and 10^13, representing the state version. The state version increments with each transaction, starting at 0 pre-genesis.
-    TransactionIdentifiers:
-      type: object
-      required:
-        - intent_hash
-        - signatures_hash
-        - payload_hash
-      properties:
-        intent_hash:
-          type: string
-          minLength: 64
-          maxLength: 64
-          description: The hex-encoded transaction intent hash. This is also known as the Transaction Identifier hash for user transactions. This hash is SHA256(SHA256(compiled_intent))
-        signatures_hash:
-          type: string
-          minLength: 64
-          maxLength: 64
-          description: The hex-encoded signed transaction hash. This is the hash which is signed as part of notarization. This hash is SHA256(SHA256(compiled_signed_transaction))
-        payload_hash:
-          type: string
-          minLength: 64
-          maxLength: 64
-          description: The hex-encoded notarized transaction hash. This is also known as the payload hash. This hash is SHA256(SHA256(compiled_notarized_transaction))
-    ErrorResponse:
-      type: object
-      required:
-        - code
-        - message
-      properties:
-        code:
-          type: integer
-          description: A numeric code corresponding to the given HTTP error code.
-        message:
-          description: A human-readable error message.
-          type: string
-        trace_id:
-          description: A GUID to be used when reporting errors, to allow correlation with the Core API's error logs, in the case where the Core API details are hidden.
-          type: string
-#########################################
-# GENERAL / SHARED MODELS - Transaction #
-#########################################
-    FeeSummary:
-      description: Fees paid
-      type: object
-      required:
-        - loan_fully_repaid
-        - cost_unit_limit
-        - cost_unit_consumed
-        - cost_unit_price_attos
-        - tip_percentage
-        - xrd_burned_attos
-        - xrd_tipped_attos
-      properties:
-        loan_fully_repaid:
-          type: boolean
-          description: Specifies whether the transaction execution loan has been fully repaid.
-        cost_unit_limit:
-          type: integer
-          format: int64
-          minimum: 0
-          maximum: 4294967295
-          description: An integer between 0 and 2^32 - 1, representing the maximum amount of cost units available for the transaction execution.
-        cost_unit_consumed:
-          type: integer
-          format: int64
-          minimum: 0
-          maximum: 4294967295
-          description: An integer between 0 and 2^32 - 1, representing the amount of cost units consumed by the transaction execution.
-        cost_unit_price_attos:
-          type: string
           description: |
-            A decimal-string-encoded integer between 0 and 2^255-1, which represents the total number of 10^(-18) subunits in
-            the XRD price of a single cost unit.
-        tip_percentage:
+            The latest-seen state version of the tip of the network's ledger. If this is significantly ahead of the current LedgerState version, the Network Gateway is possibly behind and may be reporting outdated information.
           type: integer
           format: int64
-          minimum: 0
-          maximum: 4294967295
-          description: An integer between 0 and 2^32 - 1, specifying the validator tip as a percentage amount. A value of "1" corresponds to 1% of the fee.
-        xrd_burned_attos:
-          type: string
-          description: |
-            A decimal-string-encoded integer between 0 and 2^255-1, which represents the total number of 10^(-18) subunits in
-            the total amount of XRD burned in the transaction.
-        xrd_tipped_attos:
-          type: string
-          description: |
-            A decimal-string-encoded integer between 0 and 2^255-1, which represents the total number of 10^(-18) subunits in
-            the total amount of XRD tipped to validators in the transaction.
-    StateUpdates:
-      type: object
-      description: Transaction state updates (only present if status is Succeeded or Failed)
-      required:
-        - down_virtual_substates
-        - up_substates
-        - down_substates
-        - new_global_entities
-      properties:
-        down_virtual_substates:
-          type: array
-          items:
-            $ref: "#/components/schemas/SubstateId"
-        up_substates:
-          type: array
-          items:
-            $ref: "#/components/schemas/UpSubstate"
-        down_substates:
-          type: array
-          items:
-            $ref: "#/components/schemas/DownSubstate"
-        new_global_entities:
-          type: array
-          items:
-            $ref: "#/components/schemas/GlobalEntityId"
-    UpSubstate:
+    GatewayInfoResponseReleaseInfo:
       type: object
       required:
-        - substate_id
-        - version
-        - substate_hex
-        - substate_data_hash
-        - substate_data
+        - release_version
+        - open_api_schema_version
       properties:
-        substate_id:
-          $ref: "#/components/schemas/SubstateId"
-        version:
+        release_version:
+          description: The release that is currently deployed to the Gateway API.
+          type: string
+        open_api_schema_version:
+          description: The Open API Schema version that was used to generate the API models.
+          type: string
+
+    #
+    # "Transaction" Request & Response Types
+    #
+
+    RecentTransactionsRequest:
+      type: object
+      properties:
+        at_state_identifier:
+          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+        from_state_identifier:
+          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+        cursor:
+          description: This cursor allows forward pagination, by providing the cursor from the previous request.
+          type: string
+          nullable: true
+        limit:
+          description: The page size requested.
           type: integer
-          format: int64
-          minimum: 0
-          maximum: 100000000000000
-          description: An integer between 0 and 10^13, counting the number of times the substate was updated
-        substate_hex:
-          type: string
-          description: The hex-encoded, SBOR-encoded substate data bytes
-        substate_data_hash:
-          type: string
-          description: The hex-encoded single-SHA256 hash of the substate data bytes
-        substate_data:
-          $ref: "#/components/schemas/Substate"
-    DownSubstate:
-      type: object
-      required:
-        - substate_id
-        - substate_data_hash
-        - version
-      properties:
-        substate_id:
-          $ref: "#/components/schemas/SubstateId"
-        substate_data_hash:
-          type: string
-          description: The hex-encoded single-SHA256 hash of the substate data bytes
-        version:
-          type: integer
-          format: int64
-          minimum: 0
-          maximum: 100000000000000
-          description: An integer between 0 and 10^13, counting the number of times the substate was updated
-    GlobalEntityId:
-      type: object
-      required:
-        - entity_type
-        - entity_address_hex
-        - global_address_hex
-        - global_address
-      properties:
-        entity_type:
-          $ref: "#/components/schemas/EntityType"
-        entity_address_hex:
-          type: string
-          description: The hex-encoded bytes of the entity address
-        global_address_hex:
-          type: string
-          description: The hex-encoded bytes of the entity's global address. This is currently the same as entity_address, but may change in future.
-        global_address:
-          type: string
-          description: The Bech32m-encoded human readable version of the entity's global address
-    EntityId:
-      type: object
-      required:
-        - entity_type
-        - entity_address_hex
-      properties:
-        entity_type:
-          $ref: "#/components/schemas/EntityType"
-        entity_address_hex:
-          type: string
-          description: The hex-encoded bytes of the entity address
-    SubstateId:
-      type: object
-      required:
-        - entity_type
-        - entity_address_hex
-        - substate_type
-        - substate_key_hex
-      properties:
-        entity_type:
-          $ref: "#/components/schemas/EntityType"
-        entity_address_hex:
-          type: string
-          description: The hex-encoded bytes of the entity address
-        substate_type:
-          $ref: "#/components/schemas/SubstateType"
-        substate_key_hex:
-          type: string
-          description: The hex-encoded bytes of the substate key, under the entity
-    ResourceAddress:
-      type: string
-      description: The Bech32m-encoded human readable version of the resource address
-    ComponentAddress:
-      type: string
-      description: The Bech32m-encoded human readable version of the component address
-    PackageAddress:
-      type: string
-      description: The Bech32m-encoded human readable version of the package address
-    ResourceChange:
-      type: object
-      required:
-        - resource_address
-        - component_address
-        - vault_entity_id
-        - amount_attos
-      properties:
-        resource_address:
-          $ref: "#/components/schemas/ResourceAddress"
-        component_address:
-          $ref: "#/components/schemas/ComponentAddress"
-        vault_entity_id:
-          $ref: "#/components/schemas/EntityId"
-        amount_attos:
-          type: string
-          description: |
-            A decimal-string-encoded integer between 0 and 2^255-1, which represents the total number of 10^(-18) subunits in
-            the XRD amount put or taken from the vault
-#################################################
-# GENERAL / SHARED MODELS - keys and signatures #
-#################################################
-    PublicKeyType:
-      type: string
-      enum:
-        - EcdsaSecp256k1
-        - EddsaEd25519
-    PublicKey:
-      oneOf:
-        - $ref: '#/components/schemas/EcdsaSecp256k1PublicKey'
-        - $ref: '#/components/schemas/EddsaEd25519PublicKey'
-      discriminator:
-        propertyName: key_type
-        mapping:
-          # NOTE: These need to match PublicKeyType
-          EcdsaSecp256k1: '#/components/schemas/EcdsaSecp256k1PublicKey'
-          EddsaEd25519: '#/components/schemas/EddsaEd25519PublicKey'
-    EcdsaSecp256k1PublicKey:
-      type: object
-      required:
-        - key_type
-        - key_hex
-      properties:
-        key_type:
-          $ref: '#/components/schemas/PublicKeyType'
-        key_hex:
-          type: string
-          minLength: 66
-          maxLength: 66
-          description: The hex-encoded compressed ECDSA Secp256k1 public key (33 bytes)
-    EddsaEd25519PublicKey:
-      type: object
-      required:
-        - key_type
-        - key_hex
-      properties:
-        key_type:
-          $ref: '#/components/schemas/PublicKeyType'
-        key_hex:
-          type: string
-          minLength: 64
-          maxLength: 64
-          description: The hex-encoded compressed EdDSA Ed25519 public key (32 bytes)
-    Signature:
-      oneOf:
-        - $ref: '#/components/schemas/EcdsaSecp256k1Signature'
-        - $ref: '#/components/schemas/EddsaEd25519Signature'
-      discriminator:
-        propertyName: key_type
-        mapping:
-          # NOTE: These need to match PublicKeyType
-          EcdsaSecp256k1: '#/components/schemas/EcdsaSecp256k1Signature'
-          EddsaEd25519: '#/components/schemas/EddsaEd25519Signature'
-    EcdsaSecp256k1Signature:
-      type: object
-      required:
-        - key_type
-        - signature_hex
-      properties:
-        key_type:
-          $ref: '#/components/schemas/PublicKeyType'
-        signature_hex:
-          type: string
-          minLength: 130
-          maxLength: 130
-          description: A hex-encoded recoverable ECDSA Secp256k1 signature (65 bytes). The first byte is the recovery id, the remaining 64 bytes are the compact signature, ie CONCAT(R, s) where R and s are each 32-bytes in padded big-endian format.
-    EddsaEd25519Signature:
-      type: object
-      required:
-        - key_type
-        - signature_hex
-      properties:
-        key_type:
-          $ref: '#/components/schemas/PublicKeyType'
-        signature_hex:
-          type: string
-          minLength: 128
-          maxLength: 128
-          description: A hex-encoded EdDSA Ed25519 signature (64 bytes). This is CONCAT(R, s) where R and s are each 32-bytes in padded big-endian format.
-    SignatureWithPublicKey:
-      oneOf:
-        - $ref: '#/components/schemas/EcdsaSecp256k1SignatureWithPublicKey'
-        - $ref: '#/components/schemas/EddsaEd25519SignatureWithPublicKey'
-      discriminator:
-        propertyName: key_type
-        mapping:
-          # NOTE: These need to match PublicKeyType
-          EcdsaSecp256k1: '#/components/schemas/EcdsaSecp256k1SignatureWithPublicKey'
-          EddsaEd25519: '#/components/schemas/EddsaEd25519SignatureWithPublicKey'
-    EcdsaSecp256k1SignatureWithPublicKey:
-      type: object
-      required:
-        - key_type
-        - recoverable_signature
-      description: Because ECDSA has recoverable signatures, this only includes a signature
-      properties:
-        key_type:
-          $ref: '#/components/schemas/PublicKeyType'
-        recoverable_signature:
-          $ref: '#/components/schemas/EcdsaSecp256k1Signature'
-    EddsaEd25519SignatureWithPublicKey:
-      type: object
-      required:
-        - key_type
-        - public_key
-        - signature
-      description: The EDDSA public key and signature
-      properties:
-        key_type:
-          $ref: '#/components/schemas/PublicKeyType'
-        public_key:
-          $ref: '#/components/schemas/EddsaEd25519PublicKey'
-        signature:
-          $ref: '#/components/schemas/EddsaEd25519Signature'
-#######################################
-# GENERAL / SHARED MODELS - substates #
-#######################################
-    EntityType:
-      type: string
-      enum:
-        - System
-        - ResourceManager
-        - Component
-        - Package
-        - Vault
-        - KeyValueStore
-    Substate:
-      oneOf:
-        - $ref: '#/components/schemas/SystemSubstate'
-        - $ref: '#/components/schemas/ResourceManagerSubstate'
-        - $ref: '#/components/schemas/ComponentInfoSubstate'
-        - $ref: '#/components/schemas/ComponentStateSubstate'
-        - $ref: '#/components/schemas/PackageSubstate'
-        - $ref: '#/components/schemas/VaultSubstate'
-        - $ref: '#/components/schemas/NonFungibleSubstate'
-        - $ref: '#/components/schemas/KeyValueStoreEntrySubstate'
-      discriminator:
-        propertyName: substate_type
-        mapping:
-          # NOTE: These need to match SubstateType options below
-          System: '#/components/schemas/SystemSubstate'
-          ResourceManager: '#/components/schemas/ResourceManagerSubstate'
-          ComponentInfo: '#/components/schemas/ComponentInfoSubstate'
-          ComponentState: '#/components/schemas/ComponentStateSubstate'
-          Package: '#/components/schemas/PackageSubstate'
-          Vault: '#/components/schemas/VaultSubstate'
-          NonFungible: '#/components/schemas/NonFungibleSubstate'
-          KeyValueStoreEntry: '#/components/schemas/KeyValueStoreEntrySubstate'
-    SubstateType:
-      type: string
-      enum:
-        - System
-        - ResourceManager
-        - ComponentInfo
-        - ComponentState
-        - Package
-        - Vault
-        - NonFungible
-        - KeyValueStoreEntry
-    SubstateBase:
-      type: object
-      required:
-        - entity_type
-        - substate_type
-      properties:
-        entity_type:
-          $ref: '#/components/schemas/EntityType'
-        substate_type:
-          $ref: '#/components/schemas/SubstateType'
-    SystemSubstate:
+          nullable: true
+    RecentTransactionsResponse:
       allOf:
-        - $ref: '#/components/schemas/SubstateBase'
-        - type: object
-          required:
-            - epoch
-          properties:
-            epoch:
-              type: integer
-              format: int64
-              minimum: 0
-              maximum: 10000000000
-              description: An integer between 0 and 10^10, marking the current epoch
-    ResourceManagerSubstate:
-      allOf:
-        - $ref: '#/components/schemas/SubstateBase'
-        - type: object
-          required:
-            - resource_type
-            - metadata
-            - total_supply_attos
-          properties:
-            resource_type:
-              $ref: '#/components/schemas/ResourceType'
-            fungible_divisibility:
-              type: integer
-              minimum: 0
-              maximum: 18
-            metadata:
-              type: array
-              items:
-                type: object
-                required:
-                  - key
-                  - value
-                properties:
-                  key:
-                    type: string
-                  value:
-                    type: string
-            total_supply_attos:
-              type: string
-              description: |
-                A decimal-string-encoded integer between 0 and 2^255-1, which represents the total number of 10^(-18) subunits in
-                the total supply of this resource.
-    ResourceType:
-      type: string
-      enum:
-        - Fungible
-        - NonFungible
-    ComponentInfoSubstate:
-      allOf:
-        - $ref: '#/components/schemas/SubstateBase'
-        - type: object
-          required:
-            - package_address
-            - blueprint_name
-          properties:
-            package_address:
-              $ref: '#/components/schemas/PackageAddress'
-            blueprint_name:
-              type: string
-    ComponentStateSubstate:
-      allOf:
-        - $ref: '#/components/schemas/SubstateBase'
-        - type: object
-          required:
-            - data_struct
-          properties:
-            data_struct:
-              $ref: '#/components/schemas/DataStruct'
-    DataStruct:
-      type: object
-      required:
-        - struct_data
-        - owned_entities
-        - referenced_entities
-      properties:
-        struct_data:
-          $ref: '#/components/schemas/SborData'
-          description: The struct data
-        owned_entities:
-          type: array
-          items:
-            $ref: '#/components/schemas/EntityId'
-        referenced_entities:
-          type: array
-          items:
-            $ref: '#/components/schemas/EntityId'
-    SborData:
-      type: object
-      required:
-        - data_hex
-        - data_json
-      properties:
-        data_hex:
-          type: string
-          description: The hex-encoded, raw SBOR-encoded data
-        data_json:
-          description: An untyped JSON body representing the content of the SBOR data
-    PackageSubstate:
-      allOf:
-        - $ref: '#/components/schemas/SubstateBase'
-        - type: object
-          required:
-            - code_hex
-          properties:
-            code_hex:
-              type: string
-              description: The hex-encoded package code
-    VaultSubstate:
-      allOf:
-        - $ref: '#/components/schemas/SubstateBase'
-        - type: object
-          required:
-            - resource_amount
-          properties:
-            resource_amount:
-              $ref: '#/components/schemas/ResourceAmount'
-    ResourceAmount:
-      oneOf:
-        - $ref: '#/components/schemas/FungibleResourceAmount'
-        - $ref: '#/components/schemas/NonFungibleResourceAmount'
-      discriminator:
-        propertyName: resource_type
-        mapping:
-          # NOTE: These need to match ResourceType options
-          Fungible: '#/components/schemas/FungibleResourceAmount'
-          NonFungible: '#/components/schemas/NonFungibleResourceAmount'
-    ResourceAmountBase:
-      type: object
-      required:
-        - resource_type
-        - resource_address
-      properties:
-        resource_type:
-          $ref: '#/components/schemas/ResourceType'
-        resource_address:
-          $ref: '#/components/schemas/ResourceAddress'
-    FungibleResourceAmount:
-      allOf:
-        - $ref: '#/components/schemas/ResourceAmountBase'
-        - type: object
-          required:
-            - amount_attos
-          properties:
-            amount_attos:
-              type: string
-              description: |
-                The string-encoded decimal subunits of the amount (10^-18) in a signed 256-bit integer.
-                This is string-encoded as it doesn't fit well into common numeric types.
-    NonFungibleResourceAmount:
-      allOf:
-        - $ref: '#/components/schemas/ResourceAmountBase'
-        - type: object
-          required:
-            - nf_ids_hex
-          properties:
-            nf_ids_hex:
-              type: array
-              items:
-                type: string
-                description: The hex-encoded bytes of the non-fungible ids
-    NonFungibleSubstate:
-      allOf:
-        - $ref: '#/components/schemas/SubstateBase'
-        - type: object
-          required:
-            - nf_id_hex
-            - is_deleted
-          properties:
-            nf_id_hex:
-              type: string
-              description: The hex-encoded bytes of its non-fungible id
-            is_deleted:
-              type: boolean
-            non_fungible_data:
-              $ref: '#/components/schemas/NonFungibleData'
-    NonFungibleData:
-      type: object
-      description: Only present if the non fungible isn't deleted
-      required:
-        - immutable_data
-        - mutable_data
-      properties:
-        immutable_data:
-          $ref: '#/components/schemas/DataStruct'
-        mutable_data:
-          $ref: '#/components/schemas/DataStruct'
-    KeyValueStoreEntrySubstate:
-      allOf:
-        - $ref: '#/components/schemas/SubstateBase'
-        - type: object
-          required:
-            - key_hex
-            - is_deleted
-          properties:
-            key_hex:
-              type: string
-              description: The hex-encoded bytes of its key
-            is_deleted:
-              type: boolean
-            data_struct:
-              $ref: '#/components/schemas/DataStruct'
-##########################################
-# REQUEST: /status/network-configuration #
-##########################################
-    NetworkConfigurationResponse:
-      type: object
-      required:
-        - version
-        - network
-        - network_hrp_suffix
-        - well_known_addresses
-      properties:
-        version:
-          description: Different versions regarding the node, network and api.
-          type: object
-          required:
-            - core_version
-            - api_version
-          properties:
-            core_version:
-              type: string
-            api_version:
-              type: string
-        network:
-          $ref: "#/components/schemas/NetworkIdentifier"
-        network_hrp_suffix:
-          type: string
-          description: The network suffix used for Bech32m HRPs used for addressing.
-        well_known_addresses:
-          type: object
-          description: Key addresses for this network.
-          required:
-            - account_package
-            - faucet
-            - ecdsa_secp256k1
-            - eddsa_ed25519
-            - xrd
-          properties:
-            account_package:
-              type: string
-            faucet:
-              type: string
-            ecdsa_secp256k1:
-              type: string
-            eddsa_ed25519:
-              type: string
-            xrd:
-              type: string
-###################################
-# REQUEST: /status/network-status #
-###################################
-    NetworkStatusRequest:
-      type: object
-      required:
-        - network
-      properties:
-        network:
-          "$ref": "#/components/schemas/NetworkIdentifier"
-    NetworkStatusResponse:
-      type: object
-      required:
-        - pre_genesis_state_identifier
-        - post_genesis_state_identifier
-        - current_state_identifier
-      properties:
-        pre_genesis_state_identifier:
-          $ref: "#/components/schemas/CommittedStateIdentifier"
-          description: The ledger state identifier before the genesis transaction
-        post_genesis_state_identifier:
-          $ref: "#/components/schemas/CommittedStateIdentifier"
-          description: The ledger state identifier after the genesis transaction
-        current_state_identifier:
-          $ref: "#/components/schemas/CommittedStateIdentifier"
-          description: |
-            The current state identifier at the top of the node's copy of the ledger.
-            This is also the resultant state identifier of the node's last committed transaction.
-##########################
-# REQUEST: /mempool/list #
-##########################
-    MempoolListRequest:
-      type: object
-      required:
-        - network
-      properties:
-        network:
-          "$ref": "#/components/schemas/NetworkIdentifier"
-    MempoolListResponse:
-      type: object
-      required:
-        - contents
-      properties:
-        contents:
-          type: array
-          items:
-            "$ref": "#/components/schemas/MempoolTransactionHashes"
-    MempoolTransactionHashes:
-      type: object
-      required:
-        - intent_hash
-        - payload_hash
-      properties:
-        intent_hash:
-          type: string
-          minLength: 64
-          maxLength: 64
-          description: The hex-encoded transaction intent hash. This is also known as the Transaction Identifier hash for user transactions. This hash is SHA256(SHA256(compiled_intent))
-        payload_hash:
-          type: string
-          minLength: 64
-          maxLength: 64
-          description: The hex-encoded notarized transaction hash. This is also known as the payload hash. This hash is SHA256(SHA256(compiled_notarized_transaction))
-#################################
-# REQUEST: /mempool/transaction #
-#################################
-    MempoolTransactionRequest:
-      type: object
-      required:
-        - network
-        - payload_hash
-      properties:
-        network:
-          "$ref": "#/components/schemas/NetworkIdentifier"
-        payload_hash:
-          type: string
-          minLength: 64
-          maxLength: 64
-          description: The hex-encoded notarized transaction hash. This is also known as the payload hash. This hash is SHA256(SHA256(compiled_notarized_transaction))
-    MempoolTransactionResponse:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - allOf:
+            - $ref: "#/components/schemas/ResultSetCursorMixin"
+            - type: object
+              required:
+                - items
+              properties:
+                items:
+                  description: The page of user transactions.
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/TransactionInfo"
+
+    TransactionSubmitRequest:
       type: object
       required:
         - notarized_transaction
       properties:
         notarized_transaction:
-          "$ref": "#/components/schemas/NotarizedTransaction"
-###############################
-# REQUEST: /transaction/parse #
-###############################
-    TransactionParseRequest:
-      type: object
-      required:
-        - network
-        - payload_hex
-      properties:
-        network:
-          "$ref": "#/components/schemas/NetworkIdentifier"
-        payload_hex:
-          type: string
-          description: |
-            A hex-encoded payload of a full transaction or a partial transaction - either a notarized transaction,
-            a signed transaction intent an unsigned transaction intent, or a transaction manifest.
-    TransactionParseResponse:
-      type: object
-      required:
-        - parsed
-        - is_valid
-      properties:
-        parsed:
-          "$ref": "#/components/schemas/ParsedTransaction"
-    ParsedTransactionType:
-      type: string
-      description: The type of the parsed (partial) transaction payload
-      enum:
-        - NotarizedTransaction
-        - SignedTransactionIntent
-        - TransactionIntent
-        - TransactionManifest
-    ParsedTransaction:
-      oneOf:
-        - $ref: '#/components/schemas/ParsedNotarizedTransaction'
-        - $ref: '#/components/schemas/ParsedSignedTransactionIntent'
-        - $ref: '#/components/schemas/ParsedTransactionIntent'
-        - $ref: '#/components/schemas/ParsedTransactionManifest'
-      discriminator:
-        propertyName: type
-        mapping:
-          # NOTE: These need to match ParsedTransactionType
-          NotarizedTransaction: '#/components/schemas/ParsedNotarizedTransaction'
-          SignedTransactionIntent: '#/components/schemas/ParsedSignedTransactionIntent'
-          TransactionIntent: '#/components/schemas/ParsedTransactionIntent'
-          TransactionManifest: '#/components/schemas/ParsedTransactionManifest'
-    ParsedTransactionBase:
-      type: object
-      required:
-        - type
-      properties:
-        type:
-          "$ref": "#/components/schemas/ParsedTransactionType"
-    ParsedNotarizedTransaction:
-      allOf:
-        - "$ref": "#/components/schemas/ParsedTransactionType"
-        - type: object
-          required:
-            - notarized_transaction
-            - is_statically_valid
-          properties:
-            notarized_transaction:
-              "$ref": "#/components/schemas/NotarizedTransaction"
-            is_statically_valid:
-              type: boolean
-              description: |
-                Gives if the transaction is statically valid. Note that, even if statically valid, the transaction may
-                still be rejected or fail due to issues at runtime (eg if the loan cannot be repaid).
-            validity_error:
-              type: string
-              description: |
-                If the transaction is not statically valid, this gives a reason.
-    ParsedSignedTransactionIntent:
-      allOf:
-        - "$ref": "#/components/schemas/ParsedTransactionType"
-        - type: object
-          required:
-            - signed_intent
-          properties:
-            signed_intent:
-              "$ref": "#/components/schemas/SignedTransactionIntent"
-    ParsedTransactionIntent:
-      allOf:
-        - "$ref": "#/components/schemas/ParsedTransactionType"
-        - type: object
-          required:
-            - intent
-          properties:
-            intent:
-              "$ref": "#/components/schemas/TransactionIntent"
-    ParsedTransactionManifest:
-      allOf:
-        - "$ref": "#/components/schemas/ParsedTransactionType"
-        - type: object
-          required:
-            - manifest
-          properties:
-            manifest:
-              "$ref": "#/components/schemas/TransactionManifest"
-################################
-# REQUEST: /transaction/submit #
-################################
-    TransactionSubmitRequest:
-      type: object
-      required:
-        - network
-        - notarized_transaction_hex
-      properties:
-        network:
-          $ref: "#/components/schemas/NetworkIdentifier"
-        notarized_transaction_hex:
-          description: A hex-encoded, compiled notarized transaction.
+          description: The notarized transaction payload which can be submitted, hex encoded.
           type: string
     TransactionSubmitResponse:
       type: object
@@ -1607,371 +499,489 @@ components:
         - duplicate
       properties:
         duplicate:
-          description: Is true if the transaction is a duplicate of an existing transaction in the mempool.
           type: boolean
-#################################
-# REQUEST: /transaction/preview #
-#################################
-    TransactionPreviewRequest:
+          description: Is true if the transaction is a duplicate of an existing pending transaction.
+
+    TransactionStatusRequest:
       type: object
       required:
-        - network
-        - manifest
-        - cost_unit_limit
-        - tip_percentage
-        - nonce
-        - signer_public_keys
-        - flags
+        - transaction_identifier
       properties:
-        network:
-          $ref: "#/components/schemas/NetworkIdentifier"
-        manifest:
-          description: A text-representation of a transaction manifest
+        transaction_identifier:
+          $ref: "#/components/schemas/TransactionLookupIdentifier"
+        at_state_identifier:
+          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+      example:
+        transaction_identifier:
+          origin: intent
+          value_hex: ef71a9d6c63444fce6abd2df8fab2755cfb51f6794e578f60d99337193811842
+    TransactionStatusResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - transaction
+          properties:
+            transaction:
+              $ref: "#/components/schemas/TransactionInfo"
+
+    TransactionDetailsRequest:
+      type: object
+      required:
+        - transaction_identifier
+      properties:
+        transaction_identifier:
+          $ref: "#/components/schemas/TransactionLookupIdentifier"
+        at_state_identifier:
+          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+      example:
+        transaction_identifier:
+          origin: intent
+          value_hex: ef71a9d6c63444fce6abd2df8fab2755cfb51f6794e578f60d99337193811842
+    TransactionDetailsResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - transaction
+            - details
+          properties:
+            transaction:
+              $ref: "#/components/schemas/TransactionInfo"
+            details:
+              "$ref": "#/components/schemas/TransactionDetails"
+
+    #
+    # "Entity" Request & Response Types
+    #
+
+    EntityResourcesRequest:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          $ref: "#/components/schemas/EntityAddress"
+        at_state_identifier:
+          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+    EntityResourcesResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - address
+            - fungible_resources
+            - non_fungible_resources
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            fungible_resources:
+              $ref: "#/components/schemas/EntityResourcesResponseFungibleResources"
+            non_fungible_resources:
+              $ref: "#/components/schemas/EntityResourcesResponseNonFungibleResources"
+    EntityResourcesResponseFungibleResources:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityResourcesResponseFungibleResourcesItem"
+    EntityResourcesResponseFungibleResourcesItem:
+      type: object
+      required:
+        - address
+        - amount
+      properties:
+        address:
+          $ref: "#/components/schemas/ResourceAddress"
+        amount:
+          $ref: "#/components/schemas/TokenAmount"
+    EntityResourcesResponseNonFungibleResources:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityResourcesResponseNonFungibleResourcesItem"
+    EntityResourcesResponseNonFungibleResourcesItem:
+      type: object
+      required:
+        - address
+        - amount
+      properties:
+        address:
+          $ref: "#/components/schemas/ResourceAddress"
+        amount:
+          type: number
+
+    EntityDetailsRequest:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          $ref: "#/components/schemas/EntityAddress"
+        at_state_identifier:
+          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+    EntityDetailsResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - address
+            - metadata
+            - details
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            metadata:
+              $ref: "#/components/schemas/EntityMetadataCollection"
+            details:
+              $ref: "#/components/schemas/EntityDetailsResponseDetails"
+    EntityDetailsResponseDetailsType:
+      type: string
+      enum:
+        - fungible_resource
+        - non_fungible_resource
+        - account_component
+    EntityDetailsResponseDetails:
+      oneOf:
+        - $ref: "#/components/schemas/EntityDetailsResponseFungibleResourceDetails"
+        - $ref: "#/components/schemas/EntityDetailsResponseNonFungibleResourceDetails"
+        - $ref: "#/components/schemas/EntityDetailsResponseAccountComponentDetails"
+      discriminator:
+        propertyName: discriminator
+        mapping:
+          # Must match EntityDetailsResponseDetailsType
+          fungible_resource: "#/components/schemas/EntityDetailsResponseFungibleResourceDetails"
+          non_fungible_resource: "#/components/schemas/EntityDetailsResponseNonFungibleResourceDetails"
+          account_component: "#/components/schemas/EntityDetailsResponseAccountComponentDetails"
+    EntityDetailsResponseFungibleResourceDetails:
+      type: object
+      required:
+        - discriminator
+        - divisibility
+        - total_supply
+        - total_minted
+        - total_burnt
+      properties:
+        discriminator:
+          $ref: "#/components/schemas/EntityDetailsResponseDetailsType"
+        divisibility:
+          type: integer
+          format: int64
+          minimum: 0
+        total_supply:
+          $ref: "#/components/schemas/TokenAmount"
+        total_minted:
+          $ref: "#/components/schemas/TokenAmount"
+        total_burnt:
+          $ref: "#/components/schemas/TokenAmount"
+    EntityDetailsResponseNonFungibleResourceDetails:
+      type: object
+      required:
+        - discriminator
+        - ids
+      properties:
+        discriminator:
+          $ref: "#/components/schemas/EntityDetailsResponseDetailsType"
+        ids:
+          $ref: "#/components/schemas/EntityDetailsResponseNonFungibleResourceDetailsIds"
+    EntityDetailsResponseNonFungibleResourceDetailsIds:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityDetailsResponseNonFungibleResourceDetailsIdsItem"
+    EntityDetailsResponseNonFungibleResourceDetailsIdsItem:
+      type: object
+      required:
+        - id
+      properties:
+        id_hex:
           type: string
-        blobs_hex:
-          description: An array of hex-encoded blob data (optional)
+        immutable_data_hex:
+          type: string
+        mutable_data_hex:
+          type: string
+    EntityDetailsResponseAccountComponentDetails:
+      type: object
+      required:
+        - discriminator
+        - package_address
+      properties:
+        discriminator:
+          $ref: "#/components/schemas/EntityDetailsResponseDetailsType"
+        package_address:
+          $ref: "#/components/schemas/EntityAddress"
+
+    EntityOverviewRequest:
+      type: object
+      required:
+        - addresses
+      properties:
+        addresses:
+          type: array
+          items:
+            $ref: "#/components/schemas/EntityAddress"
+        at_state_identifier:
+          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+    EntityOverviewResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - entities
+          properties:
+            entities:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityOverviewResponseEntityItem"
+    EntityOverviewResponseEntityItem:
+       type: object
+       required:
+         - address
+         - metadata
+       properties:
+         address:
+           $ref: "#/components/schemas/EntityAddress"
+         metadata:
+           $ref: "#/components/schemas/EntityMetadataCollection"
+
+    EntityMetadataRequest:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          $ref: "#/components/schemas/EntityAddress"
+        at_state_identifier:
+          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+        cursor:
+          description: This cursor allows forward pagination, by providing the cursor from the previous request.
+          type: string
+          nullable: true
+        limit:
+          description: The page size requested.
+          type: integer
+          nullable: true
+    EntityMetadataResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - address
+            - metadata
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            metadata:
+              $ref: "#/components/schemas/EntityMetadataCollection"
+
+    #
+    # TODO Not categorized/cleaned yet
+    #
+
+    TokenProperties:
+      type: object
+      required:
+        - symbol
+        - is_supply_mutable
+        - granularity
+        - name
+        - description
+        - url
+        - icon_url
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        icon_url:
+          type: string
+        url:
+          type: string
+        symbol:
+          type: string
+        is_supply_mutable:
+          description: If true, the token is allowed to be minted/burned by the owner.
+          type: boolean
+        granularity:
+          "$ref": "#/components/schemas/BigDecimal"
+        owner:
+          "$ref": "#/components/schemas/AccountIdentifier"
+
+    TransactionDetails:
+      type: object
+      required:
+        - raw_hex
+        - referenced_global_entities
+      properties:
+        raw_hex:
+          description: The raw transaction payload, hex encoded.
+          type: string
+        referenced_global_entities:
           type: array
           items:
             type: string
-        cost_unit_limit:
-          type: integer
-          format: int64
-          minimum: 0
-          maximum: 4294967295
-          description: An integer between 0 and 2^32 - 1, giving the maximum number of cost units available for transaction execution
-        tip_percentage:
-          type: integer
-          format: int64
-          minimum: 0
-          maximum: 4294967295
-          description: An integer between 0 and 2^32 - 1, specifying the validator tip as a percentage amount. A value of "1" corresponds to 1% of the fee.
-        nonce:
+        message_hex:
+          description: The message bytes, hex encoded.
           type: string
-          description: A decimal-string-encoded integer between 0 and 2^64-1, used to ensure the transaction intent is unique.
-        signer_public_keys:
-          type: array
-          items:
-            $ref: "#/components/schemas/PublicKey"
-          description: A list of public keys to be used as transaction signers
-        flags:
-          type: object
+
+    AccountIdentifier:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          description: The radix address of the account.
+          type: string
+    ValidatorIdentifier:
+      type: object
+      required:
+        - address
+      properties:
+        address:
+          description: The radix address of the validator.
+          type: string
+    TokenIdentifier:
+      type: object
+      required:
+        - rri
+      properties:
+        rri:
+          description: The radix resource identifier of the token.
+          type: string
+    TransactionLookupOrigin:
+      type: string
+      enum:
+        - intent
+        - signed_intent
+        - notarized
+        - payload
+    TransactionLookupIdentifier:
+      type: object
+      required:
+        - origin
+        - value_hex
+      properties:
+        origin:
+          $ref: "#/components/schemas/TransactionLookupOrigin"
+        value_hex:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          description: A numeric code corresponding to the given error type, roughly aligned with HTTP Status Code semantics (eg 400/404/500).
+          type: integer
+        message:
+          description: A human-readable error message.
+          type: string
+        details:
+          $ref: "#/components/schemas/GatewayError"
+        trace_id:
+          description: A GUID to be used when reporting errors, to allow correlation with the Gateway API's error logs.
+          type: string
+    GatewayError:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          description: The type of error. Each subtype may have its own additional structured fields.
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          NotSyncedUpError: "#/components/schemas/NotSyncedUpError"
+          InvalidRequestError: "#/components/schemas/InvalidRequestError"
+          InvalidTransactionError: "#/components/schemas/InvalidTransactionError"
+          TransactionNotFoundError: "#/components/schemas/TransactionNotFoundError"
+          InternalServerError: "#/components/schemas/InternalServerError"
+    NotSyncedUpError:
+      allOf:
+        - $ref: "#/components/schemas/GatewayError"
+        - type: object
           required:
-            - unlimited_loan
+            - request_type
+            - current_sync_delay_seconds
+            - max_allowed_sync_delay_seconds
           properties:
-            unlimited_loan:
-              type: boolean
-    TransactionPreviewResponse:
+            request_type:
+              description: The request type that triggered this exception.
+              type: string
+            current_sync_delay_seconds:
+              description: The current delay between the Gateway DB and the network ledger round timestamp.
+              type: integer
+              format: int64
+            max_allowed_sync_delay_seconds:
+              description: The maximum allowed delay between the Gateway DB and the network ledger round timestamp for this `request_type`.
+              type: integer
+              format: int64
+    InvalidRequestError:
+      allOf:
+        - $ref: "#/components/schemas/GatewayError"
+        - type: object
+          required:
+            - validation_errors
+          properties:
+            validation_errors:
+              description: One or more validation errors which occurred when validating the request.
+              type: array
+              items:
+                $ref: "#/components/schemas/ValidationErrorsAtPath"
+    ValidationErrorsAtPath:
       type: object
       required:
-        - receipt
-        - resource_changes
-        - logs
+        - path
+        - errors
       properties:
-        receipt:
-          $ref: "#/components/schemas/TransactionReceipt"
-        resource_changes:
+        path:
+          type: string
+        errors:
           type: array
           items:
-            $ref: "#/components/schemas/ResourceChange"
-        logs:
-          type: array
-          items:
-            type: object
-            required:
-              - level
-              - message
-            properties:
-              level:
-                type: string
-              message:
-                type: string
-#################################
-# REQUEST: /transactions/stream #
-#################################
-    CommittedTransactionsRequest:
-      description: |
-        A request to retrieve a sublist of committed transactions from the ledger.
-      type: object
-      required:
-        - network
-        - from_state_version
-        - limit
-      properties:
-        network:
-          $ref: "#/components/schemas/NetworkIdentifier"
-        from_state_version:
-          type: integer
-          format: int64
-          minimum: 1
-          maximum: 100000000000000
-          description: An integer between 1 and 10^13, giving the first (resultant) state version to be returned
-        limit:
-          description: The maximum number of transactions that will be returned.
-          type: integer
-    CommittedTransactionsResponse:
-      type: object
-      required:
-        - from_state_version
-        - to_state_version
-        - max_state_version
-        - transactions
-      properties:
-        from_state_version:
-          type: integer
-          format: int64
-          minimum: 1
-          maximum: 100000000000000
-          description: An integer between 1 and 10^13, giving the first (resultant) state version in the returned response
-        to_state_version:
-          type: integer
-          format: int64
-          minimum: 1
-          maximum: 100000000000000
-          description: An integer between 1 and 10^13, giving the final (resultant) state version in the returned response
-        max_state_version:
-          type: integer
-          format: int64
-          minimum: 1
-          maximum: 100000000000000
-          description: An integer between 1 and 10^13, giving the maximum state version currently committed
-        transactions:
-          description: A committed transactions list starting from the `from_state_version` (inclusive).
-          type: array
-          items:
-            $ref: "#/components/schemas/CommittedTransaction"
-    CommittedTransaction:
-      type: object
-      required:
-        - state_version
-        # Not required for EG genesis - need to change this for when we have genesis transactions
-        # - notarized_transaction
-        - receipt
-      properties:
-        state_version:
-          type: integer
-          format: int64
-          minimum: 1
-          maximum: 100000000000000
-          description: An integer between 1 and 10^13, giving the resultant state version after the transaction has been committed
-        notarized_transaction:
-          $ref: "#/components/schemas/NotarizedTransaction"
-        receipt:
-          $ref: "#/components/schemas/TransactionReceipt"
-############################################################################################################
-# V0
-###################################
-# REQUEST: /v0/transaction/submit #
-###################################
-    V0TransactionSubmitRequest:
-      type: object
-      required:
-        - notarized_transaction_hex
-      properties:
-        notarized_transaction_hex:
-          description: A hex-encoded, compiled notarized transaction.
-          type: string
-    V0TransactionSubmitResponse:
-      type: object
-      required:
-        - duplicate
-      properties:
-        duplicate:
-          description: Is true if the transaction is a duplicate of an existing transaction in the mempool.
-          type: boolean
-###################################
-# REQUEST: /v0/transaction/status #
-###################################
-    V0TransactionStatusRequest:
-      type: object
-      required:
-        - intent_hash
-      properties:
-        intent_hash:
-          description: A hex-encoded transaction intent hash. SHA256(SHA256(compiled_transaction_intent))
-          minLength: 66
-          maxLength: 66
-          type: string
-    V0TransactionStatusResponse:
-      type: object
-      required:
-        - intent_status
-        - known_payloads
-      properties:
-        intent_status:
-          type: string
-          description: The status of the transaction intent
-          enum:
-            - CommittedSuccess
-            - CommittedFailure
-            - InMempool
-            - Rejected
-            - Unknown
-        known_payloads:
-          type: array
-          items:
-            $ref: "#/components/schemas/V0TransactionPayloadStatus"
-    V0TransactionPayloadStatus:
-      type: object
-      required:
-        - payload_hash
-        - status
-      properties:
-        payload_hash:
-          type: string
-          minLength: 64
-          maxLength: 64
-          description: The hex-encoded notarized transaction hash. This is also known as the payload hash. This hash is SHA256(SHA256(compiled_notarized_transaction))
-        status:
-          type: string
-          description: The status of the transaction payload, as per this node
-          enum:
-            - CommittedSuccess
-            - CommittedFailure
-            - InMempool
-            - Rejected
-        error_message:
-          description: An explanation for the error, if failed or rejected
-          type: string
-####################################
-# REQUEST: /v0/transaction/receipt #
-####################################
-    V0CommittedTransactionRequest:
-      type: object
-      required:
-        - intent_hash
-      properties:
-        intent_hash:
-          description: A hex-encoded transaction intent hash. SHA256(SHA256(compiled_transaction_intent))
-          minLength: 66
-          maxLength: 66
-          type: string
-    V0CommittedTransactionResponse:
-      type: object
-      required:
-        - committed
-      properties:
-        committed:
-          $ref: "#/components/schemas/CommittedTransaction"
-############################
-# REQUEST: /v0/state/epoch #
-############################
-    # No request body required
-    V0StateEpochResponse:
-      type: object
-      required:
-        - epoch
-      properties:
-        epoch:
-          type: integer
-          format: int64
-          minimum: 0
-          maximum: 10000000000
-          description: An integer between 0 and 10^10, marking the current epoch
-################################
-# REQUEST: /v0/state/component #
-################################
-    V0StateComponentRequest:
-      type: object
-      required:
-        - component_address
-      properties:
-        component_address:
-          type: string
-          description: The Bech32m-encoded human readable version of the component's global address
-    V0StateComponentResponse:
-      type: object
-      required:
-        - info
-        - state
-        - owned_vaults
-        - descendent_ids
-      properties:
-        info:
-          $ref: "#/components/schemas/Substate"
-        state:
-          $ref: "#/components/schemas/Substate"
-        owned_vaults:
-          type: array
-          description: Any vaults owned directly or indirectly by the component
-          items:
-            $ref: "#/components/schemas/Substate"
-        descendent_ids:
-          type: array
-          description: Any descendent nodes owned directly or indirectly by the component
-          items:
-            $ref: "#/components/schemas/V0StateComponentDescendentId"
-    V0StateComponentDescendentId:
-      type: object
-      required:
-        - parent
-        - entity_id
-        - depth
-      properties:
-        parent:
-          $ref: "#/components/schemas/SubstateId"
-        entity_id:
-          $ref: "#/components/schemas/EntityId"
-        depth:
-          description: Depth under component
-          type: integer
-          format: int32
-          minimum: 0
-          maximum: 100
-###############################
-# REQUEST: /v0/state/resource #
-###############################
-    V0StateResourceRequest:
-      type: object
-      required:
-        - resource_address
-      properties:
-        resource_address:
-          type: string
-          description: The Bech32m-encoded human readable version of the resource's global address
-    V0StateResourceResponse:
-      type: object
-      required:
-        - manager
-      properties:
-        manager:
-          $ref: "#/components/schemas/Substate"
-###################################
-# REQUEST: /v0/state/non-fungible #
-###################################
-    V0StateNonFungibleRequest:
-      type: object
-      required:
-        - resource_address
-        - non_fungible_id_hex
-      properties:
-        resource_address:
-          type: string
-          description: The Bech32m-encoded human readable version of the resource's global address
-        non_fungible_id_hex:
-          type: string
-          description: The hex-encoded non-fungible id
-    V0StateNonFungibleResponse:
-      type: object
-      required:
-        - non_fungible
-      properties:
-        non_fungible:
-          $ref: "#/components/schemas/Substate"
-##############################
-# REQUEST: /v0/state/package #
-##############################
-    V0StatePackageRequest:
-      type: object
-      required:
-        - package_address
-      properties:
-        package_address:
-          type: string
-          description: The Bech32m-encoded human readable version of the package's global address
-    V0StatePackageResponse:
-      type: object
-      required:
-        - package
-      properties:
-        package:
-          $ref: "#/components/schemas/Substate"
+            type: string
+    InternalServerError:
+      allOf:
+        - $ref: "#/components/schemas/GatewayError"
+        - type: object
+          required:
+            - exception
+            - cause
+          properties:
+            exception:
+              description: Gives an error type which occurred within the Gateway API when serving the request.
+              type: string
+            cause:
+              description: Gives a human readable message - likely just a trace ID for reporting the error.
+              type: string
+    InvalidTransactionError:
+      allOf:
+        - $ref: "#/components/schemas/GatewayError"
+    TransactionNotFoundError:
+      allOf:
+        - $ref: "#/components/schemas/GatewayError"
+        - type: object
+          required:
+            - transaction_not_found
+          properties:
+            transaction_not_found:
+              $ref: "#/components/schemas/TransactionLookupIdentifier"

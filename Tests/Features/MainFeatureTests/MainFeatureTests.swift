@@ -12,7 +12,7 @@ final class MainFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.child(.home(.delegate(.displaySettings)))) {
+		await store.send(.child(.home(.delegate(.displaySettings)))) {
 			// then
 			$0.settings = .init()
 		}
@@ -26,7 +26,7 @@ final class MainFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.child(.settings(.delegate(.dismissSettings)))) {
+		await store.send(.child(.settings(.delegate(.dismissSettings)))) {
 			// then
 			$0.settings = nil
 		}

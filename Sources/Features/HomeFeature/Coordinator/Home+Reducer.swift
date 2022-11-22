@@ -173,7 +173,7 @@ public struct Home: ReducerProtocol {
 		case let .internal(.system(.fetchPortfolioResult(.success(totalPortfolio)))):
 			state.accountPortfolioDictionary = totalPortfolio
 			state.accountList.accounts.forEach {
-				let accountPortfolio = totalPortfolio[$0.address] ?? OwnedAssets.empty
+				let accountPortfolio = totalPortfolio[$0.address] ?? AccountPortfolio.empty
 				state.accountList.accounts[id: $0.address]?.portfolio = accountPortfolio
 			}
 
@@ -182,8 +182,8 @@ public struct Home: ReducerProtocol {
 				let account = details.account
 
 				// asset list
-				let accountPortfolio = totalPortfolio[account.address] ?? OwnedAssets.empty
-				let categories = accountPortfolio.fungibleTokenContainers.sortedIntoCategories()
+				let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
+				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
 				state.accountDetails?.assets = .init(
 					fungibleTokenList: .init(
@@ -193,7 +193,7 @@ public struct Home: ReducerProtocol {
 						})
 					),
 					nonFungibleTokenList: .init(
-						rows: .init(uniqueElements: [accountPortfolio.nonFungibleTokenContainers].map {
+						rows: .init(uniqueElements: [accountPortfolio.nonFungibleTokenContainers.elements].map {
 							.init(containers: $0)
 						})
 					)

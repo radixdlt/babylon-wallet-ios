@@ -10,7 +10,7 @@ final class HeaderTests: TestCase {
 			reducer: Home.Header()
 		)
 
-		_ = await store.send(.internal(.view(.settingsButtonTapped)))
+		await store.send(.internal(.view(.settingsButtonTapped)))
 		await store.receive(.delegate(.displaySettings))
 	}
 }

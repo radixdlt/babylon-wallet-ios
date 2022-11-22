@@ -1,9 +1,11 @@
 import Foundation
+import Profile
 
 // MARK: - AssetContainer
 public protocol AssetContainer: Identifiable, Equatable {
 	associatedtype T: Asset
-	var asset: T { get }
+	var owner: AccountAddress { get }
+	var asset: T { get set }
 }
 
 public extension AssetContainer {
