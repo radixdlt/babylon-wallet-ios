@@ -7,6 +7,7 @@ import TransactionSigningFeature
 
 // MARK: - HandleDappRequests.View
 public extension HandleDappRequests {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = StoreOf<HandleDappRequests>
 		public let store: Store

@@ -5,6 +5,7 @@ import SwiftUI
 
 // MARK: - NonFungibleTokenList.Row.View
 public extension NonFungibleTokenList.Row {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store

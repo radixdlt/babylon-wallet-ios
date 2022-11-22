@@ -13,6 +13,7 @@ import ProfileView
 
 // MARK: - Settings.View
 public extension Settings {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.StoreOf<Settings>
 		private let store: Store

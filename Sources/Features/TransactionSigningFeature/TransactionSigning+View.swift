@@ -6,6 +6,7 @@ import SwiftUI
 
 // MARK: - TransactionSigning.View
 public extension TransactionSigning {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<TransactionSigning>
 

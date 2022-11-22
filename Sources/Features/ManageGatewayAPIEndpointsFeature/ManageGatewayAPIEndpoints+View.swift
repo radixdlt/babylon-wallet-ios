@@ -6,6 +6,7 @@ import URLBuilderClient
 
 // MARK: - ManageGatewayAPIEndpoints.View
 public extension ManageGatewayAPIEndpoints {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<ManageGatewayAPIEndpoints>
 
@@ -150,6 +151,7 @@ extension ManageGatewayAPIEndpoints.View {
 }
 
 // MARK: - ManageGatewayAPIEndpoints_Preview
+#if DEBUG
 struct ManageGatewayAPIEndpoints_Preview: PreviewProvider {
 	static var previews: some View {
 		ManageGatewayAPIEndpoints.View(
@@ -160,3 +162,4 @@ struct ManageGatewayAPIEndpoints_Preview: PreviewProvider {
 		)
 	}
 }
+#endif

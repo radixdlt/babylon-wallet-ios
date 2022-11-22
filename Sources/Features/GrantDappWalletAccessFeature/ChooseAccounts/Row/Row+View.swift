@@ -5,6 +5,7 @@ import SwiftUI
 
 // MARK: - ChooseAccounts.Row.View
 public extension ChooseAccounts.Row {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<ChooseAccounts.Row>
 

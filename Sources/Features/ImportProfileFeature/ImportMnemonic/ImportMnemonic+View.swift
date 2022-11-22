@@ -6,6 +6,7 @@ import SwiftUI
 
 // MARK: - ImportMnemonic.View
 public extension ImportMnemonic {
+	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<ImportMnemonic>
 		public init(store: StoreOf<ImportMnemonic>) {

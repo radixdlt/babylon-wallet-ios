@@ -5,6 +5,7 @@ import SwiftUI
 
 // MARK: - AggregatedValue.View
 public extension AggregatedValue {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store

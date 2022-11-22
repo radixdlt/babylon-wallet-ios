@@ -6,6 +6,7 @@ import SwiftUI
 
 // MARK: - DappConnectionRequest.View
 public extension DappConnectionRequest {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<DappConnectionRequest>
 
