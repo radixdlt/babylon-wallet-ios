@@ -151,6 +151,7 @@ extension ManageGatewayAPIEndpoints.View {
 }
 
 // MARK: - ManageGatewayAPIEndpoints_Preview
+#if DEBUG
 struct ManageGatewayAPIEndpoints_Preview: PreviewProvider {
 	static var previews: some View {
 		ManageGatewayAPIEndpoints.View(
@@ -161,3 +162,4 @@ struct ManageGatewayAPIEndpoints_Preview: PreviewProvider {
 		)
 	}
 }
+#endif

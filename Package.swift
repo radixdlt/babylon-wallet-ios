@@ -787,8 +787,9 @@ package.addModules([
 	.core(
 		name: "SharedModels",
 		dependencies: [
-			engineToolkit,
-			profile,
+			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make Converse, EngineToolkit, etc. vend their own Model packages.
+			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
+			profile, // FIXME: In `Profile` split out Models package
 			collections,
 			converse, // FIXME: In `Converse` split out Models package
 			nonEmpty,
