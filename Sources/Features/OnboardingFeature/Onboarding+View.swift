@@ -25,27 +25,20 @@ public extension Onboarding.View {
 			ZStack {
 				ForceFullScreen {
 					VStack {
-						Button {
+						Button("New Account") {
 							viewStore.send(.newProfileButtonTapped)
-						} label: {
-							Text("New Profile")
-								.foregroundColor(.white)
-								.frame(maxWidth: .infinity)
 						}
+						.buttonStyle(.primary)
 
 						LabelledDivider(label: "or")
 
-						Button {
+						Button("Import Account") {
 							viewStore.send(.importProfileButtonTapped)
-						} label: {
-							Text("Import Profile")
-								.foregroundColor(.white)
-								.frame(maxWidth: .infinity)
 						}
+						.buttonStyle(.secondary)
+						.frame(maxWidth: .infinity)
 					}
 					.padding()
-					.buttonStyle(.borderedProminent)
-					.textFieldStyle(.roundedBorder)
 				}
 				.zIndex(0)
 
