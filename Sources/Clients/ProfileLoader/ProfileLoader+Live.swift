@@ -14,10 +14,12 @@ extension ProfileLoader: DependencyKey {
 			guard let profile = try keychainClient.loadProfile(jsonDecoder: jsonDecoder()) else {
 				return nil
 			}
+			#if DEBUG
 			guard (try? profile.perNetwork.onNetwork(id: .primary)) != nil else {
 				try? keychainClient.removeAllFactorSourcesAndProfileSnapshot()
 				return nil
 			}
+			#endif // DEBUG
 			return profile
 		}
 	)
