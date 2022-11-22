@@ -88,13 +88,13 @@ extension FungibleTokenContainer {
 extension FungibleToken {
 	mutating func update(with metadata: GatewayAPI.EntityMetadataItem) {
 		switch metadata.key {
-		case "symbol":
+		case AssetMetadata.Keys.symbol.rawValue:
 			symbol = metadata.value
-		case "description":
+		case AssetMetadata.Keys.description.rawValue:
 			tokenDescription = metadata.value
-		case "url":
+		case AssetMetadata.Keys.url.rawValue:
 			tokenInfoURL = metadata.value
-		case "name":
+		case AssetMetadata.Keys.name.rawValue:
 			name = metadata.value
 		default:
 			break

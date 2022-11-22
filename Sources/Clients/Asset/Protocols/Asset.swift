@@ -9,3 +9,13 @@ public protocol Asset: Equatable, Identifiable where ID == ComponentAddress {
 public extension Asset {
 	var id: ID { address }
 }
+
+// MARK: - AssetMetadata
+public enum AssetMetadata {
+	public enum Keys: String {
+		case symbol
+		case description
+		case url
+		case name
+	}
+}
