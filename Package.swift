@@ -200,7 +200,6 @@ extension Package {
 			.target(
 				name: targetName,
 				dependencies: module.dependencies,
-
 				path: targetPath,
 				exclude: module.exclude,
 				resources: module.resources,
