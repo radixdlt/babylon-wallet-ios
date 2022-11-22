@@ -10,5 +10,6 @@ DerivedData/
 .netrc
 fastlane/report.xml
 fastlane/test_output/
+fastlane/.env.secret
 .bundle
 vendor
