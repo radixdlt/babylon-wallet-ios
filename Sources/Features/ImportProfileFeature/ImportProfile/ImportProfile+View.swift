@@ -6,6 +6,7 @@ import SwiftUI
 
 // MARK: - ImportProfile.View
 public extension ImportProfile {
+	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<ImportProfile>
 		public init(store: StoreOf<ImportProfile>) {

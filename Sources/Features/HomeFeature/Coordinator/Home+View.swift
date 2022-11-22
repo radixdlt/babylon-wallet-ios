@@ -11,6 +11,7 @@ import TransactionSigningFeature
 
 // MARK: - Home.View
 public extension Home {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store

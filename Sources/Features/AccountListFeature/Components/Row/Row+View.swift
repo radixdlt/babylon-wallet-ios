@@ -9,6 +9,7 @@ import SwiftUI
 
 // MARK: - AccountList.Row.View
 public extension AccountList.Row {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store

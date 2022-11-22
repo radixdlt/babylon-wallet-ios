@@ -10,6 +10,7 @@ import SwiftUI
 
 // MARK: - ManageP2PClients.View
 public extension ManageP2PClients {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.StoreOf<ManageP2PClients>
 		public let store: Store

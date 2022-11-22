@@ -6,6 +6,7 @@ import SwiftUI
 
 // MARK: - IncomingConnectionRequestFromDappReview.View
 public extension IncomingConnectionRequestFromDappReview {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<IncomingConnectionRequestFromDappReview>
 

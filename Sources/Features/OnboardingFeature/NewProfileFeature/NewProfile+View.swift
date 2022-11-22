@@ -5,6 +5,7 @@ import SwiftUI
 
 // MARK: - NewProfile.View
 public extension NewProfile {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
