@@ -16,7 +16,7 @@ public extension AccountDetails {
 		public init(for account: AccountList.Row.State) {
 			self.account = account.account
 
-			let fungibleTokenCategories = account.portfolio.fungibleTokenContainers.sortedIntoCategories()
+			let fungibleTokenCategories = account.portfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
 			assets = .init(
 				fungibleTokenList: .init(
@@ -36,7 +36,7 @@ public extension AccountDetails {
 				),
 
 				nonFungibleTokenList: .init(
-					rows: .init(uniqueElements: [account.portfolio.nonFungibleTokenContainers].map {
+					rows: .init(uniqueElements: [account.portfolio.nonFungibleTokenContainers.elements].map {
 						.init(containers: $0)
 					})
 				)

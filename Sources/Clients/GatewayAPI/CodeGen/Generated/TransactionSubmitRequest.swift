@@ -10,28 +10,28 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - TransactionSubmitRequest
-public struct TransactionSubmitRequest: Codable, Hashable {
-	/** The logical name of the network */
-	public private(set) var network: String
-	/** A hex-encoded, compiled notarized transaction. */
-	public private(set) var notarizedTransactionHex: String
+@available(*, deprecated, renamed: "GatewayAPI.TransactionSubmitRequest")
+public typealias TransactionSubmitRequest = GatewayAPI.TransactionSubmitRequest
 
-	public init(network: String, notarizedTransactionHex: String) {
-		self.network = network
-		self.notarizedTransactionHex = notarizedTransactionHex
-	}
+// MARK: - GatewayAPI.TransactionSubmitRequest
+public extension GatewayAPI {
+	struct TransactionSubmitRequest: Codable, Hashable {
+		/** The notarized transaction payload which can be submitted, hex encoded. */
+		public private(set) var notarizedTransaction: String
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case network
-		case notarizedTransactionHex = "notarized_transaction_hex"
-	}
+		public init(notarizedTransaction: String) {
+			self.notarizedTransaction = notarizedTransaction
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case notarizedTransaction = "notarized_transaction"
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(network, forKey: .network)
-		try container.encode(notarizedTransactionHex, forKey: .notarizedTransactionHex)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(notarizedTransaction, forKey: .notarizedTransaction)
+		}
 	}
 }

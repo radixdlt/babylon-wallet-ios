@@ -23,7 +23,7 @@ final class AppFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.child(.main(.delegate(.removedWallet)))) {
+		await store.send(.child(.main(.delegate(.removedWallet)))) {
 			// then
 			$0.root = .onboarding(.init())
 		}
@@ -42,10 +42,10 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// when
-		_ = await store.send(.child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))))
+		await store.send(.child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))))
 
 		// then
-		_ = await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile))))) {
+		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile))))) {
 			$0.root = .main(.init())
 		}
 
@@ -69,14 +69,14 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// WHEN: existing profile is loaded
-		_ = await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(existingProfile)))))))
+		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(existingProfile)))))))
 
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		_ = await store.receive(.child(.splash(.delegate(.profileLoaded(existingProfile)))))
+		await store.receive(.child(.splash(.delegate(.profileLoaded(existingProfile)))))
 
-		_ = await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(existingProfile))))) {
+		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(existingProfile))))) {
 			$0.root = .main(.init())
 		}
 
@@ -100,12 +100,12 @@ final class AppFeatureTests: TestCase {
 		let viewTask = await store.send(.view(.task))
 
 		// when
-		_ = await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(nil)))))))
+		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(nil)))))))
 
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		_ = await store.receive(.child(.splash(.delegate(.profileLoaded(nil))))) {
+		await store.receive(.child(.splash(.delegate(.profileLoaded(nil))))) {
 			$0.root = .onboarding(.init())
 		}
 
@@ -129,17 +129,17 @@ final class AppFeatureTests: TestCase {
 
 		// when
 		let decodingError = DecodingError.valueNotFound(Profile.self, .init(codingPath: [], debugDescription: "Something went wrong"))
-		_ = await store.send(.child(.splash(.internal(.system(.loadProfileResult(.failure(decodingError)))))))
+		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.failure(decodingError)))))))
 
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		_ = await store.receive(.internal(.system(.displayErrorAlert(App.UserFacingError(Splash.FailedToDecodeProfileError(error: decodingError)))))) {
+		await store.receive(.internal(.system(.displayErrorAlert(App.UserFacingError(Splash.FailedToDecodeProfileError(error: decodingError)))))) {
 			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("Failed to decode profile: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))"))
 		}
 
 		// when
-		_ = await store.send(.view(.errorAlertDismissButtonTapped)) {
+		await store.send(.view(.errorAlertDismissButtonTapped)) {
 			// then
 			$0.errorAlert = nil
 		}
