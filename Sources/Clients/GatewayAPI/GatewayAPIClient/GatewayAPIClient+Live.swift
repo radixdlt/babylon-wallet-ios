@@ -74,12 +74,7 @@ public extension GatewayAPIClient {
 				urlRequest.timeoutInterval = timeoutInterval
 			}
 
-			print(urlRequest.url?.absoluteURL.absoluteString)
-			print(urlRequest.httpBody?.prettyPrintedJSONString)
-
 			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
-
-			print(data.prettyPrintedJSONString)
 
 			guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
 				throw ExpectedHTTPURLResponse()
@@ -303,7 +298,7 @@ public extension GatewayAPIClient {
 			throw TXWasSubmittedButNotSuccessfully()
 		}
 
-		// MARK: Get Committed TX
+		// MARK: Get TX Details
 
 		let transactionDetailsRequest = GatewayAPI.TransactionDetailsRequest(transactionIdentifier: .init(origin: .intent, valueHex: intentHash))
 		let transactionDetailsResponse = try await transactionDetails(transactionDetailsRequest)
