@@ -22,14 +22,26 @@ struct BadHTTPResponseCode: Swift.Error {
 	static let expected = 200
 }
 
+extension JSONDecoder {
+	static var `default`: JSONDecoder {
+		let decoder = JSONDecoder()
+		decoder.dateDecodingStrategy = .formatted(CodableHelper.dateFormatter)
+		return decoder
+	}
+}
+
 public extension GatewayAPIClient {
 	typealias Value = GatewayAPIClient
-	static let liveValue = GatewayAPIClient.live()
+	static let liveValue = GatewayAPIClient.live(
+		urlSession: .shared,
+		jsonEncoder: .init(),
+		jsonDecoder: .default
+	)
 
 	static func live(
-		urlSession: URLSession = .shared,
-		jsonEncoder: JSONEncoder = .init(),
-		jsonDecoder: JSONDecoder = .init()
+		urlSession: URLSession,
+		jsonEncoder: JSONEncoder,
+		jsonDecoder: JSONDecoder
 	) -> Self {
 		@Dependency(\.profileClient) var profileClient
 		@Dependency(\.urlBuilder) var urlBuilder
