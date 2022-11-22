@@ -66,12 +66,12 @@ public extension NewProfile {
 
 						let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
 
-						try keychainClient.saveFactorSource(
+						try keychainClient.setFactorSource(
 							mnemonic: curve25519FactorSourceMnemonic,
 							reference: curve25519FactorSourceReference
 						)
 
-						try keychainClient.saveProfile(profile: newProfile)
+						try keychainClient.setProfile(profile: newProfile)
 
 						return newProfile
 					}

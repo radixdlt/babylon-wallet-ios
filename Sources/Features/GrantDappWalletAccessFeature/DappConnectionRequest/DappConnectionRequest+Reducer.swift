@@ -26,7 +26,7 @@ public struct DappConnectionRequest: ReducerProtocol {
 		case .internal(.view(.continueButtonTapped)):
 			return .run { send in
 				await send(.internal(.system(.loadAccountsResult(TaskResult {
-					try profileClient.getAccounts()
+					try await profileClient.getAccounts()
 				}))))
 			}
 

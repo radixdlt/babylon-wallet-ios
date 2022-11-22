@@ -23,14 +23,14 @@ public extension EngineToolkitClient {
 
 		let manifest = TransactionManifest {
 			CallMethod(
-				componentAddress: AlphanetAddresses.faucet,
+				receiver: AlphanetAddresses.faucet,
 				methodName: "lock_fee"
 			) {
 				Decimal_(10.0)
 			}
 
 			CallMethod(
-				componentAddress: AlphanetAddresses.faucet,
+				receiver: AlphanetAddresses.faucet,
 				methodName: "free_xrd"
 			)
 

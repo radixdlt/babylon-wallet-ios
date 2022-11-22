@@ -20,7 +20,15 @@ public extension ManageGatewayAPIEndpoints {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.didAppear)):
-			let currentNetworkAndGateway = profileClient.getNetworkAndGateway()
+			return .run { send in
+				await send(.internal(.system(.loadNetworkAndGatewayResult(
+					TaskResult {
+						await profileClient.getNetworkAndGateway()
+					}
+				))))
+			}
+
+		case let .internal(.system(.loadNetworkAndGatewayResult(.success(currentNetworkAndGateway)))):
 			state.networkAndGateway = currentNetworkAndGateway
 			let url = currentNetworkAndGateway.gatewayAPIEndpointURL
 			state.url = url
@@ -30,6 +38,10 @@ public extension ManageGatewayAPIEndpoints {
 				state.host = components.host
 				state.path = components.path
 			}
+			return .none
+
+		case let .internal(.system(.loadNetworkAndGatewayResult(.failure(error)))):
+			errorQueue.schedule(error)
 			return .none
 
 		case .internal(.view(.dismissButtonTapped)):
@@ -103,7 +115,7 @@ private extension ManageGatewayAPIEndpoints {
 		}
 
 		state.url = newURL
-		let currentURL = gatewayAPIClient.getCurrentBaseURL()
+		let currentURL = state.url
 		state.isSwitchToButtonEnabled = newURL != currentURL
 	}
 }

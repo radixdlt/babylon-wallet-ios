@@ -42,7 +42,7 @@ public struct GatewayAPIClient: DependencyKey {
 }
 
 public extension GatewayAPIClient {
-	typealias GetCurrentBaseURL = @Sendable () -> URL
+	typealias GetCurrentBaseURL = @Sendable () async -> URL
 	typealias SetCurrentBaseURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway?
 
 	typealias GetEpoch = @Sendable () async throws -> V0StateEpochResponse

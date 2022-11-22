@@ -51,7 +51,7 @@ public extension ImportProfile {
 					#endif // DEBUG
 					throw error
 				}
-				try keychainClient.saveProfileSnapshot(profileSnapshot: snapshot)
+				try keychainClient.setProfileSnapshot(profileSnapshot: snapshot)
 				await send(.delegate(.importedProfileSnapshot(snapshot)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)

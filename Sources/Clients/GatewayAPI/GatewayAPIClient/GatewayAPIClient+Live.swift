@@ -35,7 +35,7 @@ public extension GatewayAPIClient {
 		@Dependency(\.urlBuilder) var urlBuilder
 
 		let getCurrentBaseURL: GetCurrentBaseURL = {
-			profileClient.getGatewayAPIEndpointBaseURL()
+			await profileClient.getGatewayAPIEndpointBaseURL()
 		}
 
 		@Sendable
@@ -91,7 +91,7 @@ public extension GatewayAPIClient {
 		}
 
 		let setCurrentBaseURL: SetCurrentBaseURL = { newURL in
-			let currentURL = getCurrentBaseURL()
+			let currentURL = await getCurrentBaseURL()
 			guard newURL != currentURL else {
 				print("same URL, do nothing")
 				return nil

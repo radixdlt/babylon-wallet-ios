@@ -61,7 +61,7 @@ public struct Home: ReducerProtocol {
 		switch action {
 		case .internal(.view(.createAccountButtonTapped)):
 			return .run { send in
-				let accounts = try profileClient.getAccounts()
+				let accounts = try await profileClient.getAccounts()
 				await send(.internal(.system(.createAccount(numberOfExistingAccounts: accounts.count))))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
@@ -240,7 +240,7 @@ public struct Home: ReducerProtocol {
 		.run { send in
 			await send(.internal(.system(.accountsLoadedResult(
 				TaskResult {
-					try profileClient.getAccounts()
+					try await profileClient.getAccounts()
 				}
 			))))
 			await send(.internal(.system(.appSettingsLoadedResult(

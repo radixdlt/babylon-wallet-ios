@@ -47,10 +47,11 @@ public extension TransactionClient {
 					let (committed, txID) = try await gatewayAPIClient.submit(
 						pollStrategy: pollStrategy
 					) { epoch in
+						let networkID = await profileClient.getCurrentNetworkID()
 						let buildAndSignTXRequest = BuildAndSignTransactionWithoutManifestRequest(
 							privateKey: privateKey,
 							epoch: epoch,
-							networkID: profileClient.getCurrentNetworkID()
+							networkID: networkID
 						)
 						return try engineToolkitClient.createAccount(request: buildAndSignTXRequest)
 					}

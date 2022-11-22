@@ -71,7 +71,7 @@ extension P2PConnectivityClient: DependencyKey {
 
 		return Self(
 			getP2PClients: {
-				let connections = try profileClient.getP2PClients()
+				let connections = try await profileClient.getP2PClients()
 				let clientsWithConnectionStatus = try await connections.connections.asyncMap { p2pClient in
 
 					let password = try ConnectionPassword(data: p2pClient.connectionPassword.data)

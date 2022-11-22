@@ -37,6 +37,7 @@ public extension ManageGatewayAPIEndpoints.Action {
 // MARK: - ManageGatewayAPIEndpoints.Action.SystemAction
 public extension ManageGatewayAPIEndpoints.Action {
 	enum SystemAction: Equatable {
+		case loadNetworkAndGatewayResult(TaskResult<AppPreferences.NetworkAndGateway>)
 		/// Nil if no change was needed
 		case setGatewayAPIEndpointResult(TaskResult<AppPreferences.NetworkAndGateway?>)
 	}
