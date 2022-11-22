@@ -13,17 +13,6 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
-### register_new_device
-
-```sh
-[bundle exec] fastlane register_new_device
-```
-
-
-
-----
-
-
 ## iOS
 
 ### ios tests
@@ -56,12 +45,20 @@ Generates new certificates if needed
 [bundle exec] fastlane ios register_new_iphone_device
 ```
 
-
+Registers a new iPhone device and updates the certificates
 
 ----
 
 
 ## Mac
+
+### mac tests
+
+```sh
+[bundle exec] fastlane mac tests
+```
+
+Runs tests
 
 ### mac install_certificates
 
@@ -85,7 +82,7 @@ Generates new certificates if needed
 [bundle exec] fastlane mac register_new_mac_device
 ```
 
-
+Registers a new mac device and updates the certificates
 
 ----
 

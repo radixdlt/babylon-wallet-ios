@@ -1,4 +1,5 @@
 fastlane_require 'dotenv'
+
 default_platform(:ios)
 
 before_all do
@@ -28,8 +29,8 @@ platform :ios do
         code_signing(type: "appstore", readonly: false)
     end
 
-    lane :register_new_iphone_device do
-        
+    desc "Registers a new iPhone device and updates the certificates"
+    lane :register_new_iphone_device do        
         register_new_device
 	generate_new_certificates
     end
@@ -37,6 +38,15 @@ platform :ios do
 end
 
 platform :mac do
+    before_all do
+        Dotenv.load ".env.mac"
+    end
+
+    desc "Runs tests"
+    lane :tests do
+        run_tests
+    end
+
     desc "Installs certificates on the machine"
     lane :install_certificates do
         code_signing(type: "development")
@@ -47,13 +57,14 @@ platform :mac do
         code_signing(type: "development", readonly: false)
     end
     
+    desc "Registers a new mac device and updates the certificates"
     lane :register_new_mac_device do
         register_new_device
 	generate_new_certificates
     end
 end
 
-lane :register_new_device do |options|
+private_lane :register_new_device do |options|
     name = prompt(text: "Device name: ")
     udid = prompt(text: "Device UDID: ")
     devices = {}
