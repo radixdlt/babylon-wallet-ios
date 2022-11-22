@@ -8,7 +8,7 @@ DerivedData/
 .swiftpm/config/registries.json
 .swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
 .netrc
-App/fastlane/report.xml
-App/fastlane/test_output/
+fastlane/report.xml
+fastlane/test_output/
 .bundle
 vendor

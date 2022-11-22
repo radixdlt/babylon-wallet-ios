@@ -13,6 +13,17 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
+### register_new_device
+
+```sh
+[bundle exec] fastlane register_new_device
+```
+
+
+
+----
+
+
 ## iOS
 
 ### ios tests
@@ -23,53 +34,58 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Runs tests
 
-### ios install_development_certs
+### ios install_certificates
 
 ```sh
-[bundle exec] fastlane ios install_development_certs
+[bundle exec] fastlane ios install_certificates
 ```
 
-Installs development certs
+Installs certificates on the machine
 
-### ios install_distribution_certs
+### ios generate_new_certificates
 
 ```sh
-[bundle exec] fastlane ios install_distribution_certs
+[bundle exec] fastlane ios generate_new_certificates
 ```
 
-Installs distribution certs
+Generates new certificates if needed
 
-### ios install_certs
+### ios register_new_iphone_device
 
 ```sh
-[bundle exec] fastlane ios install_certs
+[bundle exec] fastlane ios register_new_iphone_device
 ```
 
-Installs all certs
 
-### ios update_development_certs
+
+----
+
+
+## Mac
+
+### mac install_certificates
 
 ```sh
-[bundle exec] fastlane ios update_development_certs
+[bundle exec] fastlane mac install_certificates
 ```
 
-Updates and installs development certs
+Installs certificates on the machine
 
-### ios update_distribution_certs
+### mac generate_new_certificates
 
 ```sh
-[bundle exec] fastlane ios update_distribution_certs
+[bundle exec] fastlane mac generate_new_certificates
 ```
 
-Updates and installs distribution certs
+Generates new certificates if needed
 
-### ios update_certs
+### mac register_new_mac_device
 
 ```sh
-[bundle exec] fastlane ios update_certs
+[bundle exec] fastlane mac register_new_mac_device
 ```
 
-Updates and installs all certs
+
 
 ----
 
