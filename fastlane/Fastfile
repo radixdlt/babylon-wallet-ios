@@ -32,7 +32,7 @@ platform :ios do
     desc "Registers a new iPhone device and updates the certificates"
     lane :register_new_iphone_device do        
         register_new_device
-	generate_new_certificates
+	    generate_new_certificates
     end
 
 end
@@ -60,7 +60,7 @@ platform :mac do
     desc "Registers a new mac device and updates the certificates"
     lane :register_new_mac_device do
         register_new_device
-	generate_new_certificates
+	    generate_new_certificates
     end
 end
 
@@ -85,7 +85,7 @@ private_lane :code_signing do |options|
     create_keychain(unlock: true)
     sync_code_signing(
         type: type,
-	force_for_new_devices: true,
-	readonly:readonly
+	    force_for_new_devices: true,
+	    readonly:readonly
     )
 end
