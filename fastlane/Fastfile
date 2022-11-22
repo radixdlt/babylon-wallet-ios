@@ -1,0 +1,63 @@
+fastlane_require 'dotenv'
+default_platform(:ios)
+
+before_all do
+    Dotenv.load ".env.secret"
+    # ensure_git_status_clean
+end
+
+platform :ios do
+    before_all do
+        Dotenv.load ".env.ios"
+    end
+
+    desc "Runs tests"
+    lane :tests do
+        run_tests()
+    end
+
+    desc "Installs development certs"
+    lane :install_development_certs do
+        code_signing(type: "development")
+    end
+
+    desc "Installs distribution certs"
+    lane :install_distribution_certs do
+        code_signing(type: "appstore")
+    end
+
+    desc "Installs all certs"
+    lane :install_certs do
+        install_development_certs
+	install_distribution_certs
+    end
+
+    desc "Updates and installs development certs"
+    lane :update_development_certs do
+        code_signing(type: "development", readonly: false)
+    end
+
+    desc "Updates and installs distribution certs"
+    lane :update_distribution_certs do
+        code_signing(type: "appstore", readonly: false)
+    end
+
+    desc "Updates and installs all certs"
+    lane :update_certs do
+        update_development_certs
+	update_distribution_certs
+    end
+
+end
+
+private_lane :code_signing do |options|
+    readonly = options.fetch(:readonly, true)
+    type = options.fetch(:type, "development")
+
+    if !readonly
+        app_store_connect_api_key(is_key_content_base64: true)
+    end
+    
+    create_keychain(unlock: true)
+    sync_code_signing(type: type, readonly:readonly)
+end
