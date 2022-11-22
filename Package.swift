@@ -17,9 +17,9 @@ let package = Package(
 package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.19"),
-	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.2"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.32"),
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.21"),
+	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.3"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.36"),
 
 	.package(url: "https://github.com/apple/swift-collections", from: "1.0.3"),
 
@@ -203,6 +203,12 @@ extension Package {
 				path: targetPath,
 				exclude: module.exclude,
 				resources: module.resources,
+				swiftSettings: [
+					.unsafeFlags([
+						"-Xfrontend", "-warn-concurrency",
+						"-Xfrontend", "-enable-actor-data-race-checks",
+					]),
+				],
 				plugins: module.plugins
 			),
 		]
@@ -218,7 +224,13 @@ extension Package {
 					name: testTargetName,
 					dependencies: [.target(name: targetName)] + testDependencies,
 					path: testTargetPath,
-					resources: resources
+					resources: resources,
+					swiftSettings: [
+						.unsafeFlags([
+							"-Xfrontend", "-warn-concurrency",
+							"-Xfrontend", "-enable-actor-data-race-checks",
+						]),
+					]
 				),
 			]
 		}
@@ -352,6 +364,38 @@ package.addModules([
 		)
 	),
 	.feature(
+		name: "GrantDappWalletAccessFeature",
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"Common",
+			"DesignSystem",
+			"ErrorQueue",
+			"ProfileClient",
+			"SharedModels",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
+		tests: .yes(
+			dependencies: [
+				"ProfileClient",
+				tca,
+				"TestUtils",
+			]
+		)
+	),
+	.feature(
+		name: "HandleDappRequests",
+		dependencies: [
+			collections,
+			"GrantDappWalletAccessFeature",
+			"P2PConnectivityClient",
+			profile,
+			"SharedModels",
+			tca,
+			"TransactionSigningFeature",
+		], tests: .yes(dependencies: ["TestUtils"])
+	),
+	.feature(
 		name: "HomeFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
@@ -364,7 +408,7 @@ package.addModules([
 			"Common",
 			"CreateAccountFeature",
 			engineToolkit,
-			"IncomingConnectionRequestFromDappReviewFeature",
+			"GrantDappWalletAccessFeature",
 			"PasteboardClient",
 			"ProfileClient",
 			"SharedModels",
@@ -398,33 +442,13 @@ package.addModules([
 		)
 	),
 	.feature(
-		name: "IncomingConnectionRequestFromDappReviewFeature",
-		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"P2PConnectivityClient",
-			"Common",
-			"DesignSystem",
-			"ErrorQueue",
-			"ProfileClient",
-			"SharedModels",
-			tca,
-			// ^^^ Sort lexicographically ^^^
-		],
-		tests: .yes(
-			dependencies: [
-				"ProfileClient",
-				tca,
-				"TestUtils",
-			]
-		)
-	),
-	.feature(
 		name: "MainFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AppSettings",
 			"AccountPortfolio",
 			engineToolkit,
+			"HandleDappRequests",
 			"HomeFeature",
 			"PasteboardClient",
 			"SettingsFeature",
@@ -709,6 +733,7 @@ package.addModules([
 			"EngineToolkitClient", // Create TX
 			profile,
 			"ProfileLoader",
+			"SharedModels",
 			"UserDefaultsClient",
 			"URLBuilderClient",
 		],
@@ -776,11 +801,12 @@ package.addModules([
 	.core(
 		name: "SharedModels",
 		dependencies: [
-			engineToolkit,
-			profile,
-			collections,
+			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make Converse, EngineToolkit, etc. vend their own Model packages.
+			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
+			profile, // FIXME: In `Profile` split out Models package
+			collections, // TODO: @_exported import Collections (as they're technically "shared models" too)
 			converse, // FIXME: In `Converse` split out Models package
-			nonEmpty,
+			nonEmpty, // TODO: @_exported import NonEmpty (as they're technically "shared models" too)
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]

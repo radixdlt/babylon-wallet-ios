@@ -7,6 +7,7 @@ import SwiftUI
 
 // MARK: - FungibleTokenList.Row.View
 public extension FungibleTokenList.Row {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -134,7 +135,7 @@ struct Row_Preview: PreviewProvider {
 		FungibleTokenList.Row.View(
 			store: .init(
 				initialState: .init(
-					container: .init(asset: .xrd, amountInAttos: 100.inAttos, worth: 200),
+					container: .init(owner: try! .init(address: "owner_address"), asset: .xrd, amountInAttos: 100.inAttos, worth: 200),
 					currency: .usd,
 					isCurrencyAmountVisible: true
 				),

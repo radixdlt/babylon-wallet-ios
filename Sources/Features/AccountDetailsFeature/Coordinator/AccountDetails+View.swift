@@ -7,6 +7,7 @@ import SwiftUI
 
 // MARK: - AccountDetails.View
 public extension AccountDetails {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store

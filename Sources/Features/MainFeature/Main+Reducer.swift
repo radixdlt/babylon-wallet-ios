@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import HandleDappRequests
 import HomeFeature
 import KeychainClient
 import Profile
@@ -14,6 +15,10 @@ public struct Main: ReducerProtocol {
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.home, action: /Action.child .. Action.ChildAction.home) {
 			Home()
+		}
+
+		Scope(state: \.handleDappRequests, action: /Action.child .. Action.ChildAction.handleDappRequest) {
+			HandleDappRequests()
 		}
 
 		Reduce(self.core)
@@ -36,13 +41,7 @@ public struct Main: ReducerProtocol {
 
 		case .child(.settings(.delegate(.dismissSettings))):
 			state.settings = nil
-			return .run { send in
-				// Semi hacky way to cause Home to refetch connectionIDs which might have changed.
-				// We can also add a boolean value to `.child(.settings(.delegate(.dismissSettings` action
-				// which can indicate if you just added or removed a new P2P connection an only
-				// call this if P2PClients have changed.
-				await send(.child(.home(.internal(.view(.didAppear)))))
-			}
+			return .none
 
 		case .child, .delegate:
 			return .none

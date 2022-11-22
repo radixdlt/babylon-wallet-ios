@@ -46,7 +46,7 @@ public extension Settings {
 		case .internal(.view(.didAppear)):
 			return .run { send in
 				await send(.internal(.system(.loadP2PClientsResult(
-					TaskResult { try profileClient.getP2PClients() }
+					TaskResult { try await profileClient.getP2PClients() }
 				))))
 			}
 		case let .internal(.system(.loadP2PClientsResult(.success(connections)))):
@@ -67,7 +67,7 @@ public extension Settings {
 		case .internal(.view(.debugInspectProfileButtonTapped)):
 			return .run { send in
 				guard
-					let snapshot = try? profileClient.extractProfileSnapshot(),
+					let snapshot = try? await profileClient.extractProfileSnapshot(),
 					let profile = try? Profile(snapshot: snapshot)
 				else {
 					return

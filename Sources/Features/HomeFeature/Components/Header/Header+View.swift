@@ -4,6 +4,7 @@ import SwiftUI
 
 // MARK: - Home.Header.View
 public extension Home.Header {
+	@MainActor
 	struct View: SwiftUI.View {
 		let store: Store<State, Action>
 	}

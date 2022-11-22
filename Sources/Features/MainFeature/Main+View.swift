@@ -1,10 +1,12 @@
 import ComposableArchitecture
+import HandleDappRequests
 import HomeFeature
 import SettingsFeature
 import SwiftUI
 
 // MARK: - Main.View
 public extension Main {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -34,6 +36,14 @@ public extension Main.View {
 				then: Settings.View.init(store:)
 			)
 			.zIndex(1)
+
+			HandleDappRequests.View(
+				store: store.scope(
+					state: \.handleDappRequests,
+					action: { .child(.handleDappRequest($0)) }
+				)
+			)
+			.zIndex(100)
 		}
 	}
 }

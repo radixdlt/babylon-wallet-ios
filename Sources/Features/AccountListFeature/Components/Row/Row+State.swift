@@ -10,7 +10,7 @@ public extension AccountList.Row {
 	struct State: Equatable {
 		public let account: OnNetwork.Account
 		public var aggregatedValue: Float?
-		public var portfolio: OwnedAssets
+		public var portfolio: AccountPortfolio
 
 		// MARK: - AppSettings properties
 		public var currency: FiatCurrency
@@ -19,7 +19,7 @@ public extension AccountList.Row {
 		public init(
 			account: OnNetwork.Account,
 			aggregatedValue: Float?,
-			portfolio: OwnedAssets,
+			portfolio: AccountPortfolio,
 			currency: FiatCurrency,
 			isCurrencyAmountVisible: Bool
 		) {
@@ -57,6 +57,6 @@ extension AccountList.Row.State: Identifiable {
 #if DEBUG
 import ProfileClient
 public extension AccountList.Row.State {
-	static let placeholder = Self(account: .mocked0)
+	static let placeholder = Self(account: .placeholder0)
 }
 #endif

@@ -9,8 +9,6 @@ import SLIP10
 import URLBuilderClient
 import UserDefaultsClient
 
-private let gatewayAPIEndpointURLStringKey = "gatewayAPIEndpointURLStringKey"
-
 // MARK: - ProfileClient + DependencyKey
 extension ProfileClient: DependencyKey {
 	public static let liveValue: Self = {
@@ -22,25 +20,25 @@ extension ProfileClient: DependencyKey {
 		let profileHolder = ProfileHolder.shared
 
 		let getAppPreferences: GetAppPreferences = {
-			try profileHolder.get { profile in
+			try await profileHolder.get { profile in
 				profile.appPreferences
 			}
 		}
 
 		let getNetworkAndGateway: GetNetworkAndGateway = {
 			do {
-				return try getAppPreferences().networkAndGateway
+				return try await getAppPreferences().networkAndGateway
 			} catch {
 				return AppPreferences.NetworkAndGateway.primary
 			}
 		}
 
 		let getCurrentNetworkID: GetCurrentNetworkID = {
-			getNetworkAndGateway().network.id
+			await getNetworkAndGateway().network.id
 		}
 
 		let getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL = {
-			getNetworkAndGateway().gatewayAPIEndpointURL
+			await getNetworkAndGateway().gatewayAPIEndpointURL
 		}
 
 		return Self(
@@ -67,7 +65,7 @@ extension ProfileClient: DependencyKey {
 				try await profileHolder.injectProfile(profile)
 			},
 			extractProfileSnapshot: {
-				try profileHolder.takeProfileSnapshot()
+				try await profileHolder.takeProfileSnapshot()
 			},
 			deleteProfileAndFactorSources: {
 				do {
@@ -75,15 +73,15 @@ extension ProfileClient: DependencyKey {
 				} catch {
 					try keychainClient.removeProfileSnapshot()
 				}
-				profileHolder.removeProfile()
+				await profileHolder.removeProfile()
 			},
 			getAccounts: {
-				try profileHolder.get { profile in
+				try await profileHolder.get { profile in
 					profile.primaryNet.accounts
 				}
 			},
 			getP2PClients: {
-				try profileHolder.get { profile in
+				try await profileHolder.get { profile in
 					profile.appPreferences.p2pClients
 				}
 			},
@@ -118,8 +116,8 @@ extension ProfileClient: DependencyKey {
 			},
 			lookupAccountByAddress: { accountAddress in
 				// Get default NetworkID
-				let networkID = getCurrentNetworkID()
-				return try profileHolder.get { profile in
+				let networkID = await getCurrentNetworkID()
+				return try await profileHolder.get { profile in
 					guard let account = try profile.entity(networkID: networkID, address: accountAddress) as? OnNetwork.Account else {
 						throw ExpectedEntityToBeAccount()
 					}
@@ -155,7 +153,7 @@ struct ExpectedEntityToBeAccount: Swift.Error {}
 public struct NoProfile: Swift.Error {}
 
 // MARK: - ProfileHolder
-private final class ProfileHolder {
+private actor ProfileHolder: GlobalActor {
 	@Dependency(\.keychainClient) var keychainClient
 	private var profile: Profile?
 	private init() {}
@@ -184,7 +182,7 @@ private final class ProfileHolder {
 	// Async because we might wanna add iCloud sync here in future.
 	private func persistProfile() async throws {
 		let profileSnapshot = try takeProfileSnapshot()
-		try keychainClient.saveProfileSnapshot(profileSnapshot: profileSnapshot)
+		try keychainClient.updateProfileSnapshot(profileSnapshot: profileSnapshot)
 	}
 
 	func asyncMutating<T>(_ mutateProfile: (inout Profile) async throws -> T) async throws -> T {

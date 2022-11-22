@@ -10,12 +10,12 @@ import UserDefaultsClient
 final class OnboardingNewProfileFeatureTests: TestCase {
 	func test__GIVEN__no_profile__WHEN__new_profile_button_tapped__THEN__user_is_onboarded_with_new_profile() async throws {
 		// given
-		var keychainClient: KeychainClient = .unimplemented
+		var keychainClient: KeychainClient = .testValue
 
 		let setDataForProfileSnapshotExpectation = expectation(description: "setDataForKey for ProfileSnapshot should have been called")
 		let profileSavedToKeychain = ActorIsolated<Profile?>(nil)
 
-		keychainClient.setDataDataForKey = { data, key in
+		keychainClient.setDataDataForKey = { data, key, _ in
 			if key == "profileSnapshotKeychainKey" {
 				if let snapshot = try? JSONDecoder.liveValue().decode(ProfileSnapshot.self, from: data) {
 					let profile = try? Profile(snapshot: snapshot)
@@ -51,10 +51,10 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 		}
 
 		// when
-		_ = await store.send(.internal(.view(.createProfileButtonPressed)))
+		await store.send(.internal(.view(.createProfileButtonPressed)))
 
 		// then
-		_ = await store.receive(.internal(.system(.createProfile))) {
+		await store.receive(.internal(.system(.createProfile))) {
 			$0.isCreatingProfile = true
 		}
 

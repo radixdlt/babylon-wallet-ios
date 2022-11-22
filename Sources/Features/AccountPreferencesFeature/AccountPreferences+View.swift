@@ -4,6 +4,7 @@ import SwiftUI
 
 // MARK: - AccountPreferences.View
 public extension AccountPreferences {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store

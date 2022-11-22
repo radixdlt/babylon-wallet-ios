@@ -5,12 +5,13 @@ import Common
 import ComposableArchitecture
 import CreateAccountFeature
 import DesignSystem
-import IncomingConnectionRequestFromDappReviewFeature
+import GrantDappWalletAccessFeature
 import SwiftUI
 import TransactionSigningFeature
 
 // MARK: - Home.View
 public extension Home {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -73,24 +74,6 @@ public extension Home.View {
 						then: AccountDetails.Transfer.View.init(store:)
 					)
 					.zIndex(4)
-
-					IfLetStore(
-						store.scope(
-							state: \.chooseAccountRequestFromDapp,
-							action: { .child(.chooseAccountRequestFromDapp($0)) }
-						),
-						then: IncomingConnectionRequestFromDappReview.View.init(store:)
-					)
-					.zIndex(5)
-
-					IfLetStore(
-						store.scope(
-							state: \.transactionSigning,
-							action: { .child(.transactionSigning($0)) }
-						),
-						then: TransactionSigning.View.init(store:)
-					)
-					.zIndex(6)
 				}
 			}
 		}

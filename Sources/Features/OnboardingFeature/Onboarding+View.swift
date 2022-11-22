@@ -5,6 +5,7 @@ import SwiftUI
 
 // MARK: - Onboarding.View
 public extension Onboarding {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<Onboarding>
 

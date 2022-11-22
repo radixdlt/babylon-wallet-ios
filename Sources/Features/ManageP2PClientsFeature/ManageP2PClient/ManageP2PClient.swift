@@ -105,6 +105,7 @@ public extension ManageP2PClient.Action.InternalAction {
 
 // MARK: - ManageP2PClient.View
 public extension ManageP2PClient {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.StoreOf<ManageP2PClient>
 		public let store: Store

@@ -5,6 +5,7 @@ import SwiftUI
 
 // MARK: - CreateAccount.View
 public extension CreateAccount {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<CreateAccount>
 		@FocusState private var focusedField: CreateAccount.State.Field?

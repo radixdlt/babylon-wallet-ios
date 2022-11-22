@@ -5,6 +5,7 @@ import SwiftUI
 
 // MARK: - NonFungibleTokenList.Row.View
 public extension NonFungibleTokenList.Row {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -173,7 +174,13 @@ struct Row_Preview: PreviewProvider {
 		NonFungibleTokenList.Row.View(
 			store: .init(
 				initialState: .init(
-					containers: [.init(asset: NonFungibleToken.mock1, metadata: nil)]
+					containers: [
+						.init(
+							owner: try! .init(address: "owner_address"),
+							asset: NonFungibleToken.mock1,
+							metadata: nil
+						),
+					]
 				),
 				reducer: NonFungibleTokenList.Row()
 			)

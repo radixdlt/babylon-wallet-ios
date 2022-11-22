@@ -51,10 +51,10 @@ public struct ProfileClient {
 }
 
 public extension ProfileClient {
-	typealias GetGatewayAPIEndpointBaseURL = @Sendable () -> URL
-	typealias GetCurrentNetworkID = @Sendable () -> NetworkID
+	typealias GetGatewayAPIEndpointBaseURL = @Sendable () async -> URL
+	typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Void
-	typealias GetNetworkAndGateway = @Sendable () -> AppPreferences.NetworkAndGateway
+	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
 	typealias CreateNewProfileWithOnLedgerAccount = @Sendable (CreateNewProfileRequest, MakeAccountNonVirtual) async throws -> Profile
 
@@ -62,15 +62,16 @@ public extension ProfileClient {
 
 	typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 
-	typealias ExtractProfileSnapshot = @Sendable () throws -> ProfileSnapshot
-	typealias GetAccounts = @Sendable () throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
-	typealias GetP2PClients = @Sendable () throws -> P2PClients
+	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
+	typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
+	typealias GetAccounts = @Sendable () async throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
+	typealias GetP2PClients = @Sendable () async throws -> P2PClients
 	typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
-	typealias GetAppPreferences = @Sendable () throws -> AppPreferences
+	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
 	typealias CreateOnLedgerAccount = @Sendable (CreateAccountRequest, MakeAccountNonVirtual) async throws -> OnNetwork.Account
-	typealias LookupAccountByAddress = @Sendable (AccountAddress) throws -> OnNetwork.Account
+	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 	typealias SignTransaction = @Sendable (any DataProtocol, Set<OnNetwork.Account>) async throws -> Set<AccountSignature>
 }
 

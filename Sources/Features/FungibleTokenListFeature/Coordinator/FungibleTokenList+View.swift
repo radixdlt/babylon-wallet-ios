@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - FungibleTokenList.View
 public extension FungibleTokenList {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store

@@ -9,6 +9,7 @@ import SwiftUI
 
 // MARK: - AccountList.Row.View
 public extension AccountList.Row {
+	@MainActor
 	struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
@@ -86,7 +87,7 @@ extension AccountList.Row.View {
 		let aggregatedValue: Float?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
-		let portfolio: OwnedAssets
+		let portfolio: AccountPortfolio
 
 		init(state: AccountList.Row.State) {
 			name = state.account.displayName

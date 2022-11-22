@@ -47,10 +47,11 @@ public extension TransactionClient {
 					let (committed, txID) = try await gatewayAPIClient.submit(
 						pollStrategy: pollStrategy
 					) { epoch in
+						let networkID = await profileClient.getCurrentNetworkID()
 						let buildAndSignTXRequest = BuildAndSignTransactionWithoutManifestRequest(
 							privateKey: privateKey,
 							epoch: epoch,
-							networkID: profileClient.getCurrentNetworkID(),
+							networkID: networkID,
 							transactionVersion: engineToolkitClient.getTransactionVersion()
 						)
 						return try engineToolkitClient.createOnLedgerAccount(
@@ -58,11 +59,9 @@ public extension TransactionClient {
 						)
 					}
 					guard let accountAddressBech32 = committed
-						.receipt
-						.stateUpdates
-						.newGlobalEntities
-						.first?
-						.globalAddress
+						.details
+						.referencedGlobalEntities
+						.first
 					else {
 						throw CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities()
 					}

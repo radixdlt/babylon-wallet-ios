@@ -1,3 +1,4 @@
+import HandleDappRequests
 import HomeFeature
 import SettingsFeature
 
@@ -15,6 +16,7 @@ public extension Main.Action {
 	enum ChildAction: Equatable {
 		case home(Home.Action)
 		case settings(Settings.Action)
+		case handleDappRequest(HandleDappRequests.Action)
 	}
 }
 

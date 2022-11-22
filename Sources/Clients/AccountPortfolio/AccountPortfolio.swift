@@ -1,18 +1,19 @@
 import Asset
 import BigInt
+import IdentifiedCollections
 
 // MARK: - AccountPortfolio
 public struct AccountPortfolio: Equatable {
-	public let fungibleTokenContainers: [FungibleTokenContainer]
-	public let nonFungibleTokenContainers: [NonFungibleTokenContainer]
-	public let poolShareContainers: [PoolShareContainer]
-	public let badgeContainers: [BadgeContainer]
+	public var fungibleTokenContainers: IdentifiedArrayOf<FungibleTokenContainer>
+	public var nonFungibleTokenContainers: IdentifiedArrayOf<NonFungibleTokenContainer>
+	public var poolShareContainers: IdentifiedArrayOf<PoolShareContainer>
+	public var badgeContainers: IdentifiedArrayOf<BadgeContainer>
 
 	public init(
-		fungibleTokenContainers: [FungibleTokenContainer],
-		nonFungibleTokenContainers: [NonFungibleTokenContainer],
-		poolShareContainers: [PoolShareContainer],
-		badgeContainers: [BadgeContainer]
+		fungibleTokenContainers: IdentifiedArrayOf<FungibleTokenContainer>,
+		nonFungibleTokenContainers: IdentifiedArrayOf<NonFungibleTokenContainer>,
+		poolShareContainers: IdentifiedArrayOf<PoolShareContainer>,
+		badgeContainers: IdentifiedArrayOf<BadgeContainer>
 	) {
 		self.fungibleTokenContainers = fungibleTokenContainers
 		self.nonFungibleTokenContainers = nonFungibleTokenContainers

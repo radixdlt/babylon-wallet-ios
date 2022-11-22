@@ -40,7 +40,7 @@ public extension ManageP2PClients {
 			return .run { send in
 				await send(.internal(.system(.loadConnectionsResult(
 					TaskResult {
-						try await p2pConnectivityClient.getP2PClients()
+						try await p2pConnectivityClient.getP2PClients().first(where: { !$0.isEmpty }) ?? []
 					}
 				))))
 			}
