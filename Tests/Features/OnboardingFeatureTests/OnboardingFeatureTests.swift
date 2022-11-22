@@ -51,10 +51,10 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 		}
 
 		// when
-		_ = await store.send(.internal(.view(.createProfileButtonPressed)))
+		await store.send(.internal(.view(.createProfileButtonPressed)))
 
 		// then
-		_ = await store.receive(.internal(.system(.createProfile))) {
+		await store.receive(.internal(.system(.createProfile))) {
 			$0.isCreatingProfile = true
 		}
 

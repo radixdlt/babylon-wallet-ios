@@ -1,48 +1,12 @@
 import BigInt
 import Common
 import Foundation
+import Profile
 
 // MARK: - FungibleToken
-/// What we get from GatewayAPIClient, e.g. with this call:
-///
-/// 	curl -X 'POST' \
-///			'https://alphanet.radixdlt.com/v0/state/resource' \
-///			-H 'accept: application/json' \
-///			-H 'Content-Type: application/json' \
-///			-d '{
-///			"resource_address": "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9"
-///			}' | python3 -m json.tool
-///
-///	The response is this:
-///
-///		{
-///			"substate_type": "ResourceManager",
-///			"entity_type": "ResourceManager",
-///			"resource_type": "Fungible",
-///			"fungible_divisibility": 18,
-///			"metadata": [
-///				{
-///					"key": "description",
-///					"value": "The Radix Public Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes."
-///				},
-///				{
-///					"key": "symbol",
-///					"value": "XRD"
-///				},
-///				{
-///					"key": "url",
-///					"value": "https://tokens.radixdlt.com"
-///				},
-///				{
-///					"key": "name",
-///					"value": "Radix"
-///				}
-///			],
-///			"total_supply_attos": "1000000000000000000000000000000"
-///		}
 public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public let address: ComponentAddress
-	public let totalSupplyAttos: BigUInt
+	public let totalSupplyAttos: BigUInt?
 	public let totalMintedAttos: BigUInt?
 	public let totalBurntAttos: BigUInt?
 
@@ -57,7 +21,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public let symbol: String?
 
 	/// Token icon URL.
-	public var iconURL: URL?
+	public let iconURL: URL?
 
 	/// Website of the token, e.g. `"https://tokens.radixdlt.com"`
 	public let tokenInfoURL: String?
@@ -71,7 +35,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public init(
 		address: ComponentAddress,
 		divisibility: Int?,
-		totalSupplyAttos: BigUInt,
+		totalSupplyAttos: BigUInt?,
 		totalMintedAttos: BigUInt?,
 		totalBurntAttos: BigUInt?,
 		tokenDescription: String?,
@@ -95,8 +59,9 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 
 // MARK: - FungibleTokenContainer
 public struct FungibleTokenContainer: AssetContainer, Equatable {
+	public let owner: AccountAddress
 	public typealias T = FungibleToken
-	public let asset: FungibleToken
+	public var asset: FungibleToken
 
 	/// Token amount held in one account.
 	public var amountInAttos: BigUInt?
@@ -111,10 +76,12 @@ public struct FungibleTokenContainer: AssetContainer, Equatable {
 	}
 
 	public init(
+		owner: AccountAddress,
 		asset: FungibleToken,
 		amountInAttos: BigUInt?,
 		worth: BigUInt?
 	) {
+		self.owner = owner
 		self.asset = asset
 		self.amountInAttos = amountInAttos
 		self.worth = worth

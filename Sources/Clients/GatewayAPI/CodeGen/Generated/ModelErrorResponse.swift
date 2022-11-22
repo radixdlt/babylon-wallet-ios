@@ -10,33 +10,42 @@ import Foundation
 import AnyCodable
 #endif
 
-// MARK: - ModelErrorResponse
-public struct ModelErrorResponse: Codable, Hashable {
-	/** A numeric code corresponding to the given HTTP error code. */
-	public private(set) var code: Int
-	/** A human-readable error message. */
-	public private(set) var message: String
-	/** A GUID to be used when reporting errors, to allow correlation with the Core API's error logs, in the case where the Core API details are hidden. */
-	public private(set) var traceId: String?
+@available(*, deprecated, renamed: "GatewayAPI.ModelErrorResponse")
+public typealias ModelErrorResponse = GatewayAPI.ModelErrorResponse
 
-	public init(code: Int, message: String, traceId: String? = nil) {
-		self.code = code
-		self.message = message
-		self.traceId = traceId
-	}
+// MARK: - GatewayAPI.ModelErrorResponse
+public extension GatewayAPI {
+	struct ModelErrorResponse: Codable, Hashable {
+		/** A numeric code corresponding to the given error type, roughly aligned with HTTP Status Code semantics (eg 400/404/500). */
+		public private(set) var code: Int
+		/** A human-readable error message. */
+		public private(set) var message: String
+		public private(set) var details: GatewayError?
+		/** A GUID to be used when reporting errors, to allow correlation with the Gateway API's error logs. */
+		public private(set) var traceId: String?
 
-	public enum CodingKeys: String, CodingKey, CaseIterable {
-		case code
-		case message
-		case traceId = "trace_id"
-	}
+		public init(code: Int, message: String, details: GatewayError? = nil, traceId: String? = nil) {
+			self.code = code
+			self.message = message
+			self.details = details
+			self.traceId = traceId
+		}
 
-	// Encodable protocol methods
+		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case code
+			case message
+			case details
+			case traceId = "trace_id"
+		}
 
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(code, forKey: .code)
-		try container.encode(message, forKey: .message)
-		try container.encodeIfPresent(traceId, forKey: .traceId)
+		// Encodable protocol methods
+
+		public func encode(to encoder: Encoder) throws {
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(code, forKey: .code)
+			try container.encode(message, forKey: .message)
+			try container.encodeIfPresent(details, forKey: .details)
+			try container.encodeIfPresent(traceId, forKey: .traceId)
+		}
 	}
 }

@@ -15,7 +15,7 @@ final class CreateAccountFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.view(.closeButtonTapped)))
+		await store.send(.internal(.view(.closeButtonTapped)))
 
 		// then
 		await store.receive(.delegate(.dismissCreateAccount))
@@ -36,7 +36,7 @@ final class CreateAccountFeatureTests: TestCase {
 		let accountName = "My account"
 
 		// when
-		_ = await store.send(.internal(.view(.textFieldChanged(accountName)))) {
+		await store.send(.internal(.view(.textFieldChanged(accountName)))) {
 			// then
 			$0.isValid = true
 			$0.accountName = accountName
@@ -59,7 +59,7 @@ final class CreateAccountFeatureTests: TestCase {
 		accountName = "My account dummy name" // character count == 21, over the limit
 
 		// when
-		_ = await store.send(.internal(.view(.textFieldChanged(accountName))))
+		await store.send(.internal(.view(.textFieldChanged(accountName))))
 		// then
 		// no state change occured
 	}
@@ -79,7 +79,7 @@ final class CreateAccountFeatureTests: TestCase {
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 
 		// when
-		_ = await store.send(.internal(.view(.viewAppeared)))
+		await store.send(.internal(.view(.viewAppeared)))
 
 		// then
 		await testScheduler.advance(by: .seconds(0.5))

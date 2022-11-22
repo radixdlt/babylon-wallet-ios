@@ -31,10 +31,10 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.view(.dismissButtonTapped))
+		await store.send(.view(.dismissButtonTapped))
 
 		// then
-		_ = await store.receive(.delegate(.dismiss(requestItem)))
+		await store.receive(.delegate(.dismiss(requestItem)))
 	}
 
 	func test_proceedWithConnectionRequest_whenTappedOnContinueButton_thenDisplayChooseAccounts() async {
@@ -58,11 +58,11 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		store.dependencies.profileClient.getAccounts = { @Sendable in accounts }
 
 		// when
-		_ = await store.send(.view(.continueButtonTapped))
+		await store.send(.view(.continueButtonTapped))
 
 		// then
 
-		_ = await store.receive(.internal(.system(.loadAccountsResult(.success(accounts))))) {
+		await store.receive(.internal(.system(.loadAccountsResult(.success(accounts))))) {
 			$0.chooseAccounts = .init(
 				request: requestItem,
 				accounts: .init(uniqueElements: accounts.rawValue.elements.map {
@@ -92,7 +92,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.child(.chooseAccounts(.delegate(.dismissChooseAccounts)))) {
+		await store.send(.child(.chooseAccounts(.delegate(.dismissChooseAccounts)))) {
 			// then
 			$0.chooseAccounts = nil
 		}

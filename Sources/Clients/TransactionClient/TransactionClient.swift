@@ -53,14 +53,12 @@ public extension TransactionClient {
 							epoch: epoch,
 							networkID: networkID
 						)
-						return try engineToolkitClient.createAccount(request: buildAndSignTXRequest)
+						return try engineToolkitClient.createOnLedgerAccount(request: buildAndSignTXRequest)
 					}
 					guard let accountAddressBech32 = committed
-						.receipt
-						.stateUpdates
-						.newGlobalEntities
-						.first?
-						.globalAddress
+						.details
+						.referencedGlobalEntities
+						.first
 					else {
 						throw CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities()
 					}

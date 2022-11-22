@@ -39,7 +39,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.view(.dismissAccountDetailsButtonTapped)))
+		await store.send(.internal(.view(.dismissAccountDetailsButtonTapped)))
 
 		// then
 		await store.receive(.delegate(.dismissAccountDetails))
@@ -56,7 +56,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.view(.displayAccountPreferencesButtonTapped)))
+		await store.send(.internal(.view(.displayAccountPreferencesButtonTapped)))
 
 		// then
 		await store.receive(.delegate(.displayAccountPreferences))
@@ -73,7 +73,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.view(.copyAddressButtonTapped)))
+		await store.send(.internal(.view(.copyAddressButtonTapped)))
 
 		// then
 		await store.receive(.delegate(.copyAddress(store.state.address)))
@@ -90,7 +90,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.view(.refreshButtonTapped)))
+		await store.send(.internal(.view(.refreshButtonTapped)))
 
 		// then
 		await store.receive(.delegate(.refresh(store.state.address)))
@@ -107,7 +107,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		_ = await store.send(.internal(.view(.transferButtonTapped)))
+		await store.send(.internal(.view(.transferButtonTapped)))
 
 		await store.receive(.delegate(.displayTransfer))
 	}

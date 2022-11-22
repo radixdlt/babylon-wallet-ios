@@ -11,40 +11,98 @@ extension GatewayAPIClient: TestDependencyKey {
 	public static let testValue = Self(
 		getCurrentBaseURL: unimplemented("\(Self.self).getCurrentBaseURL"),
 		setCurrentBaseURL: unimplemented("\(Self.self).setCurrentBaseURL"),
-		getEpoch: unimplemented("\(Self.self).getEpoch"),
+		getGateway: unimplemented("\(Self.self).getGateway"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
+		resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
 		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
+		recentTransactions: unimplemented("\(Self.self).recentTransactions"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
 		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
-		getCommittedTransaction: unimplemented("\(Self.self).getCommittedTransaction")
+		transactionDetails: unimplemented("\(Self.self).transactionDetails")
 	)
 
 	private static func mock(
 		fungibleResourceCount _: Int = 2,
 		nonFungibleResourceCount _: Int = 2,
 		submittedTXIsDoubleSpend: Bool = false,
-		txStatus: V0TransactionStatusResponse.IntentStatus? = nil
+		txStatus: GatewayAPI.TransactionStatus? = nil
 	) -> Self {
 		.init(
 			getCurrentBaseURL: { URL(string: "example.com")! },
 			setCurrentBaseURL: { _ in AppPreferences.NetworkAndGateway.primary },
-			getEpoch: { .init(epoch: 1337) },
+			getGateway: { .init(
+				ledgerState: .init(
+					network: "Network name",
+					stateVersion: 0,
+					timestamp: "",
+					epoch: 1337,
+					round: 0
+				),
+				knownTarget: .init(stateVersion: 0),
+				releaseInfo: .init(
+					releaseVersion: "release-version",
+					openApiSchemaVersion: "schema-version"
+				)
+			) },
 			accountResourcesByAddress: { _ in
+				fatalError()
+			},
+			resourcesOverview: { _ in
 				fatalError()
 			},
 			resourceDetailsByResourceIdentifier: { _ in
 				fatalError()
 			},
+			recentTransactions: { _ in
+				.init(
+					ledgerState: .init(
+						network: "Network name",
+						stateVersion: 0,
+						timestamp: "",
+						epoch: 1337,
+						round: 0
+					),
+					items: []
+				)
+			},
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},
-			transactionStatus: { request in
-				.init(intentStatus: txStatus ?? .committedSuccess, knownPayloads: [
-					.init(payloadHash: Data(SHA256.hash(data: "payloadHashHex\(request.intentHash)".data(using: .utf8)!)).hex(), status: .committedSuccess),
-				])
+			transactionStatus: { _ in
+				.init(
+					ledgerState: .init(
+						network: "Network name",
+						stateVersion: 0,
+						timestamp: "",
+						epoch: 1337,
+						round: 0
+					),
+					transaction: .init(
+						transactionStatus: .init(status: .succeeded),
+						payloadHashHex: "payload-hash-hex",
+						intentHashHex: "intent-hash-hex"
+					)
+				)
 			},
-			getCommittedTransaction: { _ in
-				fatalError()
+			transactionDetails: { _ in
+				.init(
+					ledgerState: .init(
+						network: "Network name",
+						stateVersion: 0,
+						timestamp: "",
+						epoch: 1337,
+						round: 0
+					),
+					transaction: .init(
+						transactionStatus: .init(status: .succeeded),
+						payloadHashHex: "payload-hash-hex",
+						intentHashHex: "intent-hash-hex"
+					),
+					details: .init(
+						rawHex: "raw-hex",
+						referencedGlobalEntities: []
+					)
+				)
 			}
 		)
 	}

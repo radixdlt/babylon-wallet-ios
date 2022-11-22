@@ -1,4 +1,4 @@
 import Asset
 import Profile
 
-public typealias AccountPortfolioDictionary = [AccountAddress: OwnedAssets]
+public typealias AccountPortfolioDictionary = [AccountAddress: AccountPortfolio]

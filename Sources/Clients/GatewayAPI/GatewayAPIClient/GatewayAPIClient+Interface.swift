@@ -13,31 +13,37 @@ public struct GatewayAPIClient: DependencyKey {
 	public var setCurrentBaseURL: SetCurrentBaseURL
 
 	// MARK: Request
-	public var getEpoch: GetEpoch
+	public var getGateway: GetGateway
 	public var accountResourcesByAddress: GetAccountResourcesByAddress
+	public var resourcesOverview: GetResourcesOverview
 	public var resourceDetailsByResourceIdentifier: GetResourceDetailsByResourceIdentifier
+	public var recentTransactions: GetRecentTransactions
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
-	public var getCommittedTransaction: GetCommittedTransaction
+	public var transactionDetails: GetTransactionDetails
 
 	public init(
 		getCurrentBaseURL: @escaping GetCurrentBaseURL,
 		setCurrentBaseURL: @escaping SetCurrentBaseURL,
-		getEpoch: @escaping GetEpoch,
+		getGateway: @escaping GetGateway,
 		accountResourcesByAddress: @escaping GetAccountResourcesByAddress,
+		resourcesOverview: @escaping GetResourcesOverview,
 		resourceDetailsByResourceIdentifier: @escaping GetResourceDetailsByResourceIdentifier,
+		recentTransactions: @escaping GetRecentTransactions,
 		submitTransaction: @escaping SubmitTransaction,
 		transactionStatus: @escaping GetTransactionStatus,
-		getCommittedTransaction: @escaping GetCommittedTransaction
+		transactionDetails: @escaping GetTransactionDetails
 	) {
 		self.getCurrentBaseURL = getCurrentBaseURL
 		self.setCurrentBaseURL = setCurrentBaseURL
-		self.getEpoch = getEpoch
+		self.getGateway = getGateway
 		self.accountResourcesByAddress = accountResourcesByAddress
+		self.resourcesOverview = resourcesOverview
 		self.resourceDetailsByResourceIdentifier = resourceDetailsByResourceIdentifier
+		self.recentTransactions = recentTransactions
 		self.submitTransaction = submitTransaction
 		self.transactionStatus = transactionStatus
-		self.getCommittedTransaction = getCommittedTransaction
+		self.transactionDetails = transactionDetails
 	}
 }
 
@@ -45,10 +51,14 @@ public extension GatewayAPIClient {
 	typealias GetCurrentBaseURL = @Sendable () async -> URL
 	typealias SetCurrentBaseURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway?
 
-	typealias GetEpoch = @Sendable () async throws -> V0StateEpochResponse
-	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> V0StateComponentResponse
-	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> V0StateResourceResponse
-	typealias SubmitTransaction = @Sendable (V0TransactionSubmitRequest) async throws -> V0TransactionSubmitResponse
-	typealias GetTransactionStatus = @Sendable (V0TransactionStatusRequest) async throws -> V0TransactionStatusResponse
-	typealias GetCommittedTransaction = @Sendable (V0CommittedTransactionRequest) async throws -> V0CommittedTransactionResponse
+	typealias GetGateway = @Sendable () async throws -> GatewayAPI.GatewayInfoResponse
+
+	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityResourcesResponse
+	typealias GetResourcesOverview = @Sendable (GatewayAPI.EntityOverviewRequest) async throws -> GatewayAPI.EntityOverviewResponse
+	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.EntityDetailsResponse
+
+	typealias GetRecentTransactions = @Sendable (GatewayAPI.RecentTransactionsRequest) async throws -> GatewayAPI.RecentTransactionsResponse
+	typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
+	typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
+	typealias GetTransactionDetails = @Sendable (GatewayAPI.TransactionDetailsRequest) async throws -> GatewayAPI.TransactionDetailsResponse
 }

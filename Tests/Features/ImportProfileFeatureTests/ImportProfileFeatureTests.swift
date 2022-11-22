@@ -12,8 +12,8 @@ final class ImportProfileFeatureTests: TestCase {
 			reducer: ImportProfile()
 		)
 
-		_ = await sut.send(.internal(.view(.goBack)))
-		_ = await sut.receive(.delegate(.goBack))
+		await sut.send(.internal(.view(.goBack)))
+		await sut.receive(.delegate(.goBack))
 	}
 
 	func test__GIVEN_fileImport_not_displayed__WHEN__user_wants_to_import_a_profile__THEN__fileImported_displayed() async throws {
@@ -22,7 +22,7 @@ final class ImportProfileFeatureTests: TestCase {
 			reducer: ImportProfile()
 		)
 
-		_ = await sut.send(.internal(.view(.importProfileFileButtonTapped))) {
+		await sut.send(.internal(.view(.importProfileFileButtonTapped))) {
 			$0.isDisplayingFileImporter = true
 		}
 	}
@@ -33,7 +33,7 @@ final class ImportProfileFeatureTests: TestCase {
 			reducer: ImportProfile()
 		)
 
-		_ = await sut.send(.internal(.view(.dismissFileImporter))) {
+		await sut.send(.internal(.view(.dismissFileImporter))) {
 			$0.isDisplayingFileImporter = false
 		}
 	}
@@ -62,7 +62,8 @@ final class ImportProfileFeatureTests: TestCase {
 			expectation2.fulfill()
 		}
 
-		_ = await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
+		await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
+		await sut.finish()
 
 		wait(for: [expectation1, expectation2], timeout: 0)
 	}
@@ -86,8 +87,8 @@ final class ImportProfileFeatureTests: TestCase {
 				}
 			}
 		}
-		_ = await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
-		_ = await sut.receive(.delegate(.importedProfileSnapshot(profileSnapshot)))
+		await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
+		await sut.receive(.delegate(.importedProfileSnapshot(profileSnapshot)))
 
 		try await profileSnapshotDataInKeychain.withValue {
 			guard let jsonData = $0 else {
@@ -97,6 +98,8 @@ final class ImportProfileFeatureTests: TestCase {
 			let decoded = try JSONDecoder.liveValue().decode(ProfileSnapshot.self, from: jsonData)
 			XCTAssertEqual(decoded, profileSnapshot)
 		}
+
+		await sut.finish()
 	}
 }
 

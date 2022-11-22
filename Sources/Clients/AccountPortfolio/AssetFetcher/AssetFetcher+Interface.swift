@@ -16,7 +16,7 @@ public struct AssetFetcher {
 
 // MARK: AssetFetcher.FetchAssets
 public extension AssetFetcher {
-	typealias FetchAssets = @Sendable (AccountAddress) async throws -> OwnedAssets
+	typealias FetchAssets = @Sendable (AccountAddress) async throws -> AccountPortfolio
 }
 
 public extension DependencyValues {
