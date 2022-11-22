@@ -2,8 +2,8 @@ import ComposableArchitecture
 import ErrorQueue
 import ProfileClient
 
-// MARK: - IncomingConnectionRequestFromDappReview
-public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
+// MARK: - DappConnectionRequest
+public struct DappConnectionRequest: ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 	public init() {}
@@ -26,7 +26,7 @@ public struct IncomingConnectionRequestFromDappReview: ReducerProtocol {
 		case .internal(.view(.continueButtonTapped)):
 			return .run { send in
 				await send(.internal(.system(.loadAccountsResult(TaskResult {
-					try profileClient.getAccounts()
+					try await profileClient.getAccounts()
 				}))))
 			}
 

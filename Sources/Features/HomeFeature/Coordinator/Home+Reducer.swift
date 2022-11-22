@@ -8,7 +8,7 @@ import ComposableArchitecture
 import CreateAccountFeature
 import Foundation
 import FungibleTokenListFeature
-import IncomingConnectionRequestFromDappReviewFeature
+import GrantDappWalletAccessFeature
 import LegibleError
 import P2PConnectivityClient
 import PasteboardClient
@@ -55,19 +55,13 @@ public struct Home: ReducerProtocol {
 		.ifLet(\.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
 			CreateAccount()
 		}
-		.ifLet(\.chooseAccountRequestFromDapp, action: /Action.child .. Action.ChildAction.chooseAccountRequestFromDapp) {
-			IncomingConnectionRequestFromDappReview()
-		}
-		.ifLet(\.transactionSigning, action: /Action.child .. Action.ChildAction.transactionSigning) {
-			TransactionSigning()
-		}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.createAccountButtonTapped)):
 			return .run { send in
-				let accounts = try profileClient.getAccounts()
+				let accounts = try await profileClient.getAccounts()
 				await send(.internal(.system(.createAccount(numberOfExistingAccounts: accounts.count))))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
@@ -80,53 +74,7 @@ public struct Home: ReducerProtocol {
 			return .none
 
 		case .internal(.view(.didAppear)):
-			return loadAccountsConnectionsAndSettings()
-
-		case let .internal(.system(.subscribeToRequestsFromP2PClientByID(ids))):
-			return .run { send in
-				await withThrowingTaskGroup(of: Void.self) { taskGroup in
-					for id in ids {
-						taskGroup.addTask {
-							do {
-								let requests = try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(id)
-								for try await request in requests {
-									await send(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
-								}
-							} catch {
-								await send(.internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))))
-							}
-						}
-					}
-				}
-			}
-
-		case let .internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))):
-			errorQueue.schedule(error)
-			return .none
-
-		case let .internal(.system(.receiveRequestFromP2PClientResult(.success(requestFromP2P)))):
-			state.unfinishedRequestsFromClient.queue(requestFromClient: requestFromP2P)
-
-			guard state.handleRequest == nil else {
-				// already handling a requests
-				return .none
-			}
-			guard let itemToHandle = state.unfinishedRequestsFromClient.next() else {
-				fatalError("We just queued a request, did it contain no RequestItems at all? This is undefined behaviour. Should we return an empty response here?")
-			}
-			return .run { send in
-				await send(.internal(.system(.presentViewForP2PRequest(itemToHandle))))
-			}
-
-		case let .internal(.system(.connectionsLoadedResult(.failure(error)))):
-			errorQueue.schedule(error)
-			return .none
-
-		case let .internal(.system(.connectionsLoadedResult(.success(connections)))):
-			let ids = OrderedSet(connections.map(\.id))
-			return .run { send in
-				await send(.internal(.system(.subscribeToRequestsFromP2PClientByID(ids))))
-			}
+			return loadAccountsAndSettings()
 
 		case let .internal(.system(.accountsLoadedResult(.failure(error)))):
 			errorQueue.schedule(error)
@@ -219,7 +167,7 @@ public struct Home: ReducerProtocol {
 			}
 
 		case .child(.accountList(.delegate(.fetchPortfolioForAccounts))):
-			return loadAccountsConnectionsAndSettings()
+			return loadAccountsAndSettings()
 
 		case let .internal(.system(.fetchPortfolioResult(.failure(error)))):
 			errorQueue.schedule(error)
@@ -268,77 +216,11 @@ public struct Home: ReducerProtocol {
 
 		case .child(.createAccount(.delegate(.createdNewAccount))):
 			state.createAccount = nil
-			return loadAccountsConnectionsAndSettings()
+			return loadAccountsAndSettings()
 
 		case .child(.createAccount(.delegate(.failedToCreateNewAccount))):
 			state.createAccount = nil
 			return .none
-
-		case let .internal(.system(.presentViewForP2PRequest(requestItemToHandle))):
-			state.handleRequest = .init(requestItemToHandle: requestItemToHandle)
-			return .none
-
-		case let .child(.chooseAccountRequestFromDapp(.delegate(.dismiss(dismissedRequestItem)))):
-			return .run { send in
-				await send(.internal(.system(.dismissed(dismissedRequestItem.parentRequest))))
-			}
-
-		case let .internal(.system(.dismissed(dismissedRequest))):
-			state.handleRequest = nil
-			state.unfinishedRequestsFromClient.dismiss(request: dismissedRequest)
-			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
-
-		case let .child(.chooseAccountRequestFromDapp(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
-			state.handleRequest = nil
-			let accountAddresses: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
-				.init(account: $0)
-			}
-			let responseItem = P2P.ToDapp.WalletResponseItem.ongoingAccountAddresses(.init(accountAddresses: .init(rawValue: accountAddresses)!))
-
-			guard let responseContent = state.unfinishedRequestsFromClient.finish(
-				.oneTimeAccountAddresses(request.requestItem), with: responseItem
-			) else {
-				return .run { send in
-					await send(.internal(.system(.handleNextRequestItemIfNeeded)))
-				}
-			}
-
-			let response = P2P.ResponseToClientByID(
-				connectionID: request.parentRequest.client.id,
-				responseToDapp: responseContent
-			)
-
-			return .run { send in
-				await send(.internal(.system(.sendResponseBackToDappResult(
-					TaskResult {
-						try await p2pConnectivityClient.sendMessage(response)
-					}
-				))))
-			}
-
-		case .internal(.system(.handleNextRequestItemIfNeeded)):
-			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
-
-		case .internal(.system(.sendResponseBackToDappResult(.success(_)))):
-			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
-
-		case let .internal(.system(.sendResponseBackToDappResult(.failure(error)))):
-			errorQueue.schedule(error)
-			return .none
-
-		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(request)))):
-			state.handleRequest = nil
-
-			// FIXME: Betanet: once we have migrated to Hammunet we can use the EngineToolkit to read out required signeres to sign tx.
-			errorQueue.schedule(
-				NSError(domain: "Transaction signing disabled until app is Hammunet compatible. Once we have it in place we should respond back with TXID to dApp here.", code: 1337)
-			)
-			return .none
-
-		case let .child(.transactionSigning(.delegate(.dismissed(dismissedRequestItem)))):
-			return .run { send in
-				await send(.internal(.system(.dismissed(dismissedRequestItem.parentRequest))))
-			}
 
 		case .child, .delegate:
 			return .none
@@ -354,21 +236,16 @@ public struct Home: ReducerProtocol {
 		}
 	}
 
-	func loadAccountsConnectionsAndSettings() -> EffectTask<Action> {
+	func loadAccountsAndSettings() -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.system(.accountsLoadedResult(
 				TaskResult {
-					try profileClient.getAccounts()
+					try await profileClient.getAccounts()
 				}
 			))))
 			await send(.internal(.system(.appSettingsLoadedResult(
 				TaskResult {
 					try await appSettingsClient.loadSettings()
-				}
-			))))
-			await send(.internal(.system(.connectionsLoadedResult(
-				TaskResult {
-					try await p2pConnectivityClient.getP2PClients()
 				}
 			))))
 		}
@@ -378,16 +255,6 @@ public struct Home: ReducerProtocol {
 		// TODO: display confirmation popup? discuss with po / designer
 		.run { _ in
 			pasteboardClient.copyString(address.wrapAsAddress().address)
-		}
-	}
-
-	func presentViewForNextBufferedRequestFromBrowserIfNeeded(state: inout State) -> EffectTask<Action> {
-		guard let next = state.unfinishedRequestsFromClient.next() else {
-			return .none
-		}
-		return .run { send in
-			try await mainQueue.sleep(for: .seconds(1))
-			await send(.internal(.system(.presentViewForP2PRequest(next))))
 		}
 	}
 }

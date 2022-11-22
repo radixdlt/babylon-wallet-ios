@@ -1,6 +1,6 @@
 import Collections
 import ComposableArchitecture
-@testable import IncomingConnectionRequestFromDappReviewFeature
+@testable import GrantDappWalletAccessFeature
 import NonEmpty
 import Profile
 import TestUtils

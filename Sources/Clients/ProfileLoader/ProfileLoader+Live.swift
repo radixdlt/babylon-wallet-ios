@@ -2,6 +2,7 @@ import Dependencies
 import Foundation
 import JSON
 import KeychainClientDependency
+import Profile
 
 // MARK: - ProfileLoader + DependencyKey
 extension ProfileLoader: DependencyKey {
@@ -10,7 +11,16 @@ extension ProfileLoader: DependencyKey {
 		loadProfile: {
 			@Dependency(\.keychainClient) var keychainClient
 			@Dependency(\.jsonDecoder) var jsonDecoder
-			return try keychainClient.loadProfile(jsonDecoder: jsonDecoder())
+			guard let profile = try keychainClient.loadProfile(jsonDecoder: jsonDecoder()) else {
+				return nil
+			}
+			#if DEBUG
+			guard (try? profile.perNetwork.onNetwork(id: .primary)) != nil else {
+				try? keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+				return nil
+			}
+			#endif // DEBUG
+			return profile
 		}
 	)
 }

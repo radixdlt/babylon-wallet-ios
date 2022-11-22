@@ -10,10 +10,29 @@ public extension P2P {
 	struct SpecificRequestItemToHandle<RequestItem: P2PFromDappWalletRequestItemProtocol>: Sendable, Hashable, Identifiable {
 		public let requestItem: RequestItem
 		public let parentRequest: P2P.RequestFromClient
-		public init(requestItem: RequestItem, parentRequest: P2P.RequestFromClient) {
+
+		public init(
+			requestItem: RequestItem,
+			parentRequest: P2P.RequestFromClient
+		) {
 			self.requestItem = requestItem
 			self.parentRequest = parentRequest
 		}
+	}
+}
+
+public extension P2P.OneTimeAccountAddressesRequestToHandle {
+	init(request: P2P.RequestFromClient) throws {
+		guard
+			let oneTimeAccountRequest = request.requestFromDapp.items.compactMap(\.oneTimeAccountAddresses).first
+		else {
+			throw P2P.FromDapp.WalletRequestItem.ExpectedOneTimeAccountAddressesRequest()
+		}
+
+		self.init(
+			requestItem: oneTimeAccountRequest,
+			parentRequest: request
+		)
 	}
 }
 

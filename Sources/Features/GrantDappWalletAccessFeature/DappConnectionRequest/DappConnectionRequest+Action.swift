@@ -5,8 +5,8 @@ import NonEmpty
 import Profile
 import SharedModels
 
-// MARK: - IncomingConnectionRequestFromDappReview.Action
-public extension IncomingConnectionRequestFromDappReview {
+// MARK: - DappConnectionRequest.Action
+public extension DappConnectionRequest {
 	enum Action: Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
@@ -15,23 +15,23 @@ public extension IncomingConnectionRequestFromDappReview {
 	}
 }
 
-// MARK: - IncomingConnectionRequestFromDappReview.Action.ChildAction
-public extension IncomingConnectionRequestFromDappReview.Action {
+// MARK: - DappConnectionRequest.Action.ChildAction
+public extension DappConnectionRequest.Action {
 	enum ChildAction: Equatable {
 		case chooseAccounts(ChooseAccounts.Action)
 	}
 }
 
-// MARK: - IncomingConnectionRequestFromDappReview.Action.ViewAction
-public extension IncomingConnectionRequestFromDappReview.Action {
+// MARK: - DappConnectionRequest.Action.ViewAction
+public extension DappConnectionRequest.Action {
 	enum ViewAction: Equatable {
 		case dismissButtonTapped
 		case continueButtonTapped
 	}
 }
 
-// MARK: - IncomingConnectionRequestFromDappReview.Action.DelegateAction
-public extension IncomingConnectionRequestFromDappReview.Action {
+// MARK: - DappConnectionRequest.Action.DelegateAction
+public extension DappConnectionRequest.Action {
 	enum DelegateAction: Equatable {
 		case finishedChoosingAccounts(
 			NonEmpty<OrderedSet<OnNetwork.Account>>,
@@ -42,16 +42,16 @@ public extension IncomingConnectionRequestFromDappReview.Action {
 	}
 }
 
-// MARK: - IncomingConnectionRequestFromDappReview.Action.InternalAction
-public extension IncomingConnectionRequestFromDappReview.Action {
+// MARK: - DappConnectionRequest.Action.InternalAction
+public extension DappConnectionRequest.Action {
 	enum InternalAction: Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
-// MARK: - IncomingConnectionRequestFromDappReview.Action.InternalAction.SystemAction
-public extension IncomingConnectionRequestFromDappReview.Action.InternalAction {
+// MARK: - DappConnectionRequest.Action.InternalAction.SystemAction
+public extension DappConnectionRequest.Action.InternalAction {
 	enum SystemAction: Equatable {
 		case loadAccountsResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
 	}

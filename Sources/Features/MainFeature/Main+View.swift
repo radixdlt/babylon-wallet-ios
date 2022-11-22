@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import HandleDappRequests
 import HomeFeature
 import SettingsFeature
 import SwiftUI
@@ -35,6 +36,14 @@ public extension Main.View {
 				then: Settings.View.init(store:)
 			)
 			.zIndex(1)
+
+			HandleDappRequests.View(
+				store: store.scope(
+					state: \.handleDappRequests,
+					action: { .child(.handleDappRequest($0)) }
+				)
+			)
+			.zIndex(100)
 		}
 	}
 }

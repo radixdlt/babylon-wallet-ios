@@ -1,3 +1,4 @@
+import AsyncExtensions
 import Converse
 import ConverseCommon
 import Dependencies
@@ -13,7 +14,7 @@ extension P2PConnectivityClient: DependencyKey {
 
 		final actor ConnectionsHolder: GlobalActor {
 			private var connections: [ConnectionID: P2P.ConnectedClient] = [:]
-
+			public var p2pClients: AsyncCurrentValueSubject<[P2P.ClientWithConnectionStatus]> = .init([])
 			static let shared = ConnectionsHolder()
 
 			func mapID(_ passwordID: P2PClient.ID) throws -> ConnectionID {
@@ -21,17 +22,24 @@ extension P2PConnectivityClient: DependencyKey {
 				return try ConnectionID(password: connectionPassword)
 			}
 
-			func addConnection(_ connection: P2P.ConnectedClient, connect: Bool) {
+			func addConnection(_ connection: P2P.ConnectedClient, connect: Bool, emitUpdate: Bool) {
 				let key = connection.connection.getConnectionID()
 				guard connections[key] == nil else {
 					return
 				}
 				self.connections[key] = connection
+				guard connect else {
+					if emitUpdate {
+						p2pClients.send(p2pClients.value + [.init(p2pClient: connection.client, connectionStatus: .connected)])
+					}
+					return
+				}
 
-				guard connect else { return }
-
-				Task.detached {
+				Task.detached { [p2pClients] in
 					try await connection.connection.establish()
+					if emitUpdate {
+						p2pClients.send(p2pClients.value + [.init(p2pClient: connection.client, connectionStatus: .connected)])
+					}
 				}
 			}
 
@@ -44,6 +52,9 @@ extension P2PConnectivityClient: DependencyKey {
 				}
 				// connection.connection.close() // when impl in Converse
 				connections.removeValue(forKey: key)
+				var value = p2pClients.value
+				value.removeAll(where: { $0.p2pClient.id == id })
+				p2pClients.send(value)
 			}
 
 			func getConnection(id: P2PClient.ID) throws -> P2P.ConnectedClient {
@@ -60,8 +71,8 @@ extension P2PConnectivityClient: DependencyKey {
 
 		return Self(
 			getP2PClients: {
-				let connections = try profileClient.getP2PClients()
-				return try await connections.connections.asyncMap { p2pClient in
+				let connections = try await profileClient.getP2PClients()
+				let clientsWithConnectionStatus = try await connections.connections.asyncMap { p2pClient in
 
 					let password = try ConnectionPassword(data: p2pClient.connectionPassword.data)
 					let secrets = try ConnectionSecrets.from(connectionPassword: password)
@@ -72,14 +83,16 @@ extension P2PConnectivityClient: DependencyKey {
 						connection: connection
 					)
 
-					await connectionsHolder.addConnection(connectedClient, connect: true)
+					await connectionsHolder.addConnection(connectedClient, connect: true, emitUpdate: false)
 
 					return P2P.ClientWithConnectionStatus(p2pClient: p2pClient)
 				}
+				await connectionsHolder.p2pClients.send(clientsWithConnectionStatus)
+				return await connectionsHolder.p2pClients.eraseToAnyAsyncSequence()
 
 			},
 			addConnectedP2PClient: { connectedClient in
-				await connectionsHolder.addConnection(connectedClient, connect: false) // should already be connected
+				await connectionsHolder.addConnection(connectedClient, connect: false, emitUpdate: true) // should already be connected
 				try await profileClient.addP2PClient(connectedClient.client)
 			},
 			deleteP2PClientByID: { id in

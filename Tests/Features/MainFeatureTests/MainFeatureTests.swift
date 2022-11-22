@@ -1,5 +1,6 @@
 import ComposableArchitecture
 @testable import MainFeature
+import SharedModels
 import TestUtils
 
 @MainActor
@@ -10,6 +11,7 @@ final class MainFeatureTests: TestCase {
 			initialState: Main.State(home: .placeholder),
 			reducer: Main()
 		)
+		store.exhaustivity = .off
 
 		// when
 		await store.send(.child(.home(.delegate(.displaySettings)))) {

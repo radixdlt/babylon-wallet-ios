@@ -80,7 +80,7 @@ final class ImportProfileFeatureTests: TestCase {
 			return self.profileSnapshotData
 		})
 		let profileSnapshotDataInKeychain = ActorIsolated<Data?>(nil)
-		sut.dependencies.keychainClient.setDataDataForKey = { data, key in
+		sut.dependencies.keychainClient.setDataDataForKey = { data, key, _ in
 			if key == "profileSnapshotKeychainKey" {
 				Task {
 					await profileSnapshotDataInKeychain.setValue(data)

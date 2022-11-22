@@ -39,8 +39,13 @@ public extension P2PClient {
 }
 
 public extension P2P.RequestFromClient {
-	static let placeholder: Self = try! .init(
+	static let placeholder = Self.placeholderOneTimeAccountAccess
+	static let placeholderOneTimeAccountAccess: Self = try! .init(
 		requestFromDapp: .placeholderOneTimeAccount,
+		client: .placeholder
+	)
+	static let placeholderSignTXRequest: Self = try! .init(
+		requestFromDapp: .placeholderSignTX,
 		client: .placeholder
 	)
 }

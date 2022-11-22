@@ -78,7 +78,9 @@ private extension ManageP2PClients.View {
 		Screen(
 			title: "P2P Connections",
 			navBarActionStyle: .back,
-			action: { viewStore.send(.dismissButtonTapped) }
+			action: {
+				viewStore.send(.dismissButtonTapped)
+			}
 		) {
 			VStack {
 				ScrollView {
@@ -92,13 +94,14 @@ private extension ManageP2PClients.View {
 						)
 					}
 				}
-				Button("Add new connection") { viewStore.send(.addNewConnectionButtonTapped)
+				Button("Add new connection") {
+					viewStore.send(.addNewConnectionButtonTapped)
 				}
 				.enabled(viewStore.canAddMoreConnections)
-
+				.buttonStyle(.primary)
 				Spacer()
 			}
-			.buttonStyle(.primary)
+			.padding()
 			.onAppear { viewStore.send(.viewAppeared) }
 		}
 	}

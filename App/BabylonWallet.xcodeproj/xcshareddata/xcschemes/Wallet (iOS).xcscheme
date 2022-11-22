@@ -192,16 +192,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "IncomingConnectionRequestFromDappReviewFeatureTests"
-               BuildableName = "IncomingConnectionRequestFromDappReviewFeatureTests"
-               BlueprintName = "IncomingConnectionRequestFromDappReviewFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "LocalAuthenticationClientTests"
                BuildableName = "LocalAuthenticationClientTests"
                BlueprintName = "LocalAuthenticationClientTests"
@@ -365,6 +355,26 @@
                BlueprintIdentifier = "URLBuilderClientTests"
                BuildableName = "URLBuilderClientTests"
                BlueprintName = "URLBuilderClientTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "GrantDappWalletAccessFeatureTests"
+               BuildableName = "GrantDappWalletAccessFeatureTests"
+               BlueprintName = "GrantDappWalletAccessFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "HandleDappRequestsTests"
+               BuildableName = "HandleDappRequestsTests"
+               BlueprintName = "HandleDappRequestsTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>

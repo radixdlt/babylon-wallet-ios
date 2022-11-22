@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import HandleDappRequests
 import HomeFeature
 import KeychainClient
 import Profile
@@ -14,6 +15,10 @@ public struct Main: ReducerProtocol {
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.home, action: /Action.child .. Action.ChildAction.home) {
 			Home()
+		}
+
+		Scope(state: \.handleDappRequests, action: /Action.child .. Action.ChildAction.handleDappRequest) {
+			HandleDappRequests()
 		}
 
 		Reduce(self.core)

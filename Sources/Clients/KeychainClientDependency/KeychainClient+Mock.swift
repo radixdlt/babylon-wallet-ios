@@ -6,9 +6,7 @@ import KeychainClient
 // but it's currently in swift-profile and I don't want to create even further chained
 // PRs during this big refactor.
 #if DEBUG
-extension KeychainClient: TestDependencyKey {
-	public static let testValue = KeychainClient.unimplemented
-}
+extension KeychainClient: TestDependencyKey {}
 #endif
 public extension DependencyValues {
 	var keychainClient: KeychainClient {

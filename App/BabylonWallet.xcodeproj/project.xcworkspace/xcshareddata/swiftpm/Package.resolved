@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Converse.git",
       "state" : {
-        "revision" : "aea21e46fe1523ddeb9a7c455be76806369a1723",
-        "version" : "0.1.19"
+        "revision" : "e679ce00e57ff170ffd641c8d9066f86cf570df6",
+        "version" : "0.1.21"
       }
     },
     {
@@ -167,8 +167,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "1fcd53fc875bade47d850749ea53c324f74fd64d",
-        "version" : "0.45.0"
+        "revision" : "52dca7e5edd6ec9e0b529380843a8cb13f57d7d7",
+        "version" : "0.46.0"
       }
     },
     {
@@ -239,8 +239,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "d1560c4a76e1aae3cdb6820508561225059ab50e",
-        "version" : "0.0.35"
+        "revision" : "8004585ad68efbb818f42689d226bfdafee47877",
+        "version" : "0.0.36"
       }
     },
     {
