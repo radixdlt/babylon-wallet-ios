@@ -18,3 +18,15 @@ public extension DappConnectionRequest {
 		}
 	}
 }
+
+public extension DappConnectionRequest.State {
+	init(
+		request: P2P.RequestFromClient,
+		chooseAccounts: ChooseAccounts.State? = nil
+	) throws {
+		try self.init(
+			request: .init(request: request),
+			chooseAccounts: chooseAccounts
+		)
+	}
+}

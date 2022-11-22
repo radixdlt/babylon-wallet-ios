@@ -720,6 +720,7 @@ package.addModules([
 			"EngineToolkitClient", // Create TX
 			profile,
 			"ProfileLoader",
+			"SharedModels",
 			"UserDefaultsClient",
 			"URLBuilderClient",
 		],

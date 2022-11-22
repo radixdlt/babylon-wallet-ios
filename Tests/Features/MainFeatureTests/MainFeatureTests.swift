@@ -1,5 +1,6 @@
 import ComposableArchitecture
 @testable import MainFeature
+import SharedModels
 import TestUtils
 
 @MainActor
