@@ -86,6 +86,6 @@ private_lane :code_signing do |options|
     sync_code_signing(
         type: type,
 	    force_for_new_devices: true,
-	    readonly:readonly
+	    readonly: readonly
     )
 end
