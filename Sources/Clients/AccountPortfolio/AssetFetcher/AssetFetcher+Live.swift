@@ -52,10 +52,7 @@ extension AccountPortfolio {
 			NonFungibleTokenContainer(
 				owner: try .init(address: response.address),
 				asset: .init(
-					address: $0.address,
-					nonFungibleID: "",
-					isDeleted: false,
-					nonFungibleDataAsString: ""
+					address: $0.address
 				),
 				metadata: nil
 			)
@@ -85,21 +82,12 @@ extension FungibleTokenContainer {
 
 extension FungibleToken {
 	func updated(with metadataCollection: GatewayAPI.EntityMetadataCollection) -> Self {
-		var dict: [AssetMetadata.Key: String] = [:]
-		metadataCollection.items.forEach {
-			switch $0.key {
-			case AssetMetadata.Key.symbol.rawValue:
-				dict[.symbol] = $0.value
-			case AssetMetadata.Key.description.rawValue:
-				dict[.description] = $0.value
-			case AssetMetadata.Key.url.rawValue:
-				dict[.url] = $0.value
-			case AssetMetadata.Key.name.rawValue:
-				dict[.name] = $0.value
-			default:
-				break
+		let dict: [AssetMetadata.Key: String] = .init(
+			uniqueKeysWithValues: metadataCollection.items.compactMap { item in
+				guard let key = AssetMetadata.Key(rawValue: item.key) else { return nil }
+				return (key: key, value: item.value)
 			}
-		}
+		)
 
 		return Self(
 			address: address,
