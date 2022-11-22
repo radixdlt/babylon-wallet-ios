@@ -79,25 +79,38 @@ extension AccountPortfolio {
 
 extension FungibleTokenContainer {
 	mutating func update(with metadataCollection: GatewayAPI.EntityMetadataCollection) {
-		metadataCollection.items.forEach {
-			asset.update(with: $0)
-		}
+		asset = asset.updated(with: metadataCollection)
 	}
 }
 
 extension FungibleToken {
-	mutating func update(with metadata: GatewayAPI.EntityMetadataItem) {
-		switch metadata.key {
-		case AssetMetadata.Keys.symbol.rawValue:
-			symbol = metadata.value
-		case AssetMetadata.Keys.description.rawValue:
-			tokenDescription = metadata.value
-		case AssetMetadata.Keys.url.rawValue:
-			tokenInfoURL = metadata.value
-		case AssetMetadata.Keys.name.rawValue:
-			name = metadata.value
-		default:
-			break
+	func updated(with metadataCollection: GatewayAPI.EntityMetadataCollection) -> Self {
+		var dict: [AssetMetadata.Key: String] = [:]
+		metadataCollection.items.forEach {
+			switch $0.key {
+			case AssetMetadata.Key.symbol.rawValue:
+				dict[.symbol] = $0.value
+			case AssetMetadata.Key.description.rawValue:
+				dict[.description] = $0.value
+			case AssetMetadata.Key.url.rawValue:
+				dict[.url] = $0.value
+			case AssetMetadata.Key.name.rawValue:
+				dict[.name] = $0.value
+			default:
+				break
+			}
 		}
+
+		return Self(
+			address: address,
+			divisibility: divisibility,
+			totalSupplyAttos: totalSupplyAttos,
+			totalMintedAttos: totalMintedAttos,
+			totalBurntAttos: totalBurntAttos,
+			tokenDescription: dict[.description],
+			name: dict[.name],
+			symbol: dict[.symbol],
+			tokenInfoURL: dict[.url]
+		)
 	}
 }

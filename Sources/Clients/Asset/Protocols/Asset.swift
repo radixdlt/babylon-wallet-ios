@@ -12,7 +12,7 @@ public extension Asset {
 
 // MARK: - AssetMetadata
 public enum AssetMetadata {
-	public enum Keys: String {
+	public enum Key: String, CaseIterable {
 		case symbol
 		case description
 		case url

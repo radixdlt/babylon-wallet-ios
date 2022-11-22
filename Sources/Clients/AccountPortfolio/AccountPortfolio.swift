@@ -5,9 +5,9 @@ import IdentifiedCollections
 // MARK: - AccountPortfolio
 public struct AccountPortfolio: Equatable {
 	public var fungibleTokenContainers: IdentifiedArrayOf<FungibleTokenContainer>
-	public let nonFungibleTokenContainers: IdentifiedArrayOf<NonFungibleTokenContainer>
-	public let poolShareContainers: IdentifiedArrayOf<PoolShareContainer>
-	public let badgeContainers: IdentifiedArrayOf<BadgeContainer>
+	public var nonFungibleTokenContainers: IdentifiedArrayOf<NonFungibleTokenContainer>
+	public var poolShareContainers: IdentifiedArrayOf<PoolShareContainer>
+	public var badgeContainers: IdentifiedArrayOf<BadgeContainer>
 
 	public init(
 		fungibleTokenContainers: IdentifiedArrayOf<FungibleTokenContainer>,

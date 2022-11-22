@@ -4,43 +4,6 @@ import Foundation
 import Profile
 
 // MARK: - FungibleToken
-/// What we get from GatewayAPIClient, e.g. with this call:
-///
-/// 	curl -X 'POST' \
-///			'https://alphanet.radixdlt.com/v0/state/resource' \
-///			-H 'accept: application/json' \
-///			-H 'Content-Type: application/json' \
-///			-d '{
-///			"resource_address": "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9"
-///			}' | python3 -m json.tool
-///
-///	The response is this:
-///
-///		{
-///			"substate_type": "ResourceManager",
-///			"entity_type": "ResourceManager",
-///			"resource_type": "Fungible",
-///			"fungible_divisibility": 18,
-///			"metadata": [
-///				{
-///					"key": "description",
-///					"value": "The Radix Public Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes."
-///				},
-///				{
-///					"key": "symbol",
-///					"value": "XRD"
-///				},
-///				{
-///					"key": "url",
-///					"value": "https://tokens.radixdlt.com"
-///				},
-///				{
-///					"key": "name",
-///					"value": "Radix"
-///				}
-///			],
-///			"total_supply_attos": "1000000000000000000000000000000"
-///		}
 public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public let address: ComponentAddress
 	public let totalSupplyAttos: BigUInt?
@@ -49,19 +12,19 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 
 	/// An optional desciption of this token, e.g.
 	/// ` "The Radix Public Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes."`
-	public var tokenDescription: String?
+	public let tokenDescription: String?
 
 	/// Short token name, e.g. `"Radix"`.
-	public var name: String?
+	public let name: String?
 
 	/// Symbol of token, e.g. `"XRD"`.
-	public var symbol: String?
+	public let symbol: String?
 
 	/// Token icon URL.
-	public var iconURL: URL?
+	public let iconURL: URL?
 
 	/// Website of the token, e.g. `"https://tokens.radixdlt.com"`
-	public var tokenInfoURL: String?
+	public let tokenInfoURL: String?
 
 	/// Also known as `granularity`, often value `18`, meaning each whole unit
 	/// can be divided into 10^18 subunits (attos). In case of `17` one CANNOT
@@ -96,7 +59,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 
 // MARK: - FungibleTokenContainer
 public struct FungibleTokenContainer: AssetContainer, Equatable {
-	public var owner: AccountAddress
+	public let owner: AccountAddress
 	public typealias T = FungibleToken
 	public var asset: FungibleToken
 

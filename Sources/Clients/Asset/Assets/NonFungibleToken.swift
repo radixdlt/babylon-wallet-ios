@@ -11,7 +11,7 @@ public struct NonFungibleToken: Sendable, Asset, Token, Hashable {
 
 	// FIXME: this needs to be translated into something well structured.
 	public let nonFungibleDataAsString: String
-	public var iconURL: URL?
+	public let iconURL: URL?
 
 	public init(
 		address: ComponentAddress,
@@ -30,7 +30,7 @@ public struct NonFungibleToken: Sendable, Asset, Token, Hashable {
 
 // MARK: - NonFungibleTokenContainer
 public struct NonFungibleTokenContainer: AssetContainer {
-	public var owner: AccountAddress
+	public let owner: AccountAddress
 	public typealias T = NonFungibleToken
 	public var asset: NonFungibleToken
 
