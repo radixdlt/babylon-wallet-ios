@@ -1,0 +1,91 @@
+fastlane_require 'dotenv'
+
+default_platform(:ios)
+
+before_all do
+    Dotenv.load ".env.secret"
+    ensure_git_status_clean
+end
+
+platform :ios do
+    before_all do
+        Dotenv.load ".env.ios"
+    end
+
+    desc "Runs tests"
+    lane :tests do
+        run_tests
+    end
+
+    desc "Installs certificates on the machine"
+    lane :install_certificates do
+        code_signing(type: "development")
+        code_signing(type: "appstore")
+    end
+
+    desc "Generates new certificates if needed"
+    lane :generate_new_certificates do
+        code_signing(type: "development", readonly: false)
+        code_signing(type: "appstore", readonly: false)
+    end
+
+    desc "Registers a new iPhone device and updates the certificates"
+    lane :register_new_iphone_device do
+        register_new_device
+        generate_new_certificates
+    end
+
+end
+
+platform :mac do
+    before_all do
+        Dotenv.load ".env.mac"
+    end
+
+    desc "Runs tests"
+    lane :tests do
+        run_tests
+    end
+
+    desc "Installs certificates on the machine"
+    lane :install_certificates do
+        code_signing(type: "development")
+    end
+
+    desc "Generates new certificates if needed"
+    lane :generate_new_certificates do
+        code_signing(type: "development", readonly: false)
+    end
+
+    desc "Registers a new mac device and updates the certificates"
+    lane :register_new_mac_device do
+        register_new_device
+        generate_new_certificates
+    end
+end
+
+private_lane :register_new_device do |options|
+    name = prompt(text: "Device name: ")
+    udid = prompt(text: "Device UDID: ")
+    devices = {}
+    devices[name] = udid
+
+    app_store_connect_api_key
+    register_devices(devices: devices)
+end
+
+private_lane :code_signing do |options|
+    readonly = options.fetch(:readonly, true)
+    type = options.fetch(:type, "development")
+
+    if !readonly
+        app_store_connect_api_key
+    end
+
+    create_keychain(unlock: true)
+    sync_code_signing(
+        type: type,
+        force_for_new_devices: true,
+        readonly: readonly
+    )
+end

@@ -55,7 +55,6 @@ jobs:
           bundler-cache: true
 
       - name: "Run unit tests"
-        working-directory: App
         run: |
           brew install xcbeautify
           bundle exec fastlane tests
