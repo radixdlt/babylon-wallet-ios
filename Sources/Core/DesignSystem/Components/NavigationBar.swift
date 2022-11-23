@@ -103,7 +103,7 @@ private extension Header {
 
 #if DEBUG
 
-// MARK: - NavigationBar_Preview
+// MARK: - Header_Previews
 struct Header_Previews: PreviewProvider {
 	static var previews: some View {
 		Header(

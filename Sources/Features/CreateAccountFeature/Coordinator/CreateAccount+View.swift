@@ -42,7 +42,20 @@ public extension CreateAccount.View {
 
 						VStack(spacing: .large1) {
 							subtitle
-							textField(with: viewStore)
+
+							textField(
+								placeholder: L10n.CreateAccount.placeholder,
+								text: viewStore.binding(
+									get: \.accountName,
+									send: { .textFieldChanged($0) }
+								),
+								binding: $focusedField,
+								equals: .accountName,
+								first: viewStore.binding(
+									get: \.focusedField,
+									send: { .textFieldFocused($0) }
+								)
+							)
 						}
 
 						Spacer(minLength: .small2)
@@ -110,24 +123,21 @@ private extension CreateAccount.View {
 			.textStyle(.body1Regular)
 	}
 
-	func textField(with viewStore: ViewStore) -> some View {
+	func textField<Value>(
+		placeholder: String,
+		text: Binding<String>,
+		binding: FocusState<Value>.Binding,
+		equals: Value,
+		first: Binding<Value>
+	) -> some View {
 		VStack(alignment: .leading, spacing: .small2) {
 			TextField(
-				L10n.CreateAccount.placeholder,
-				text: viewStore.binding(
-					get: \.accountName,
-					send: { .textFieldChanged($0) }
-				)
-				.removeDuplicates()
+				placeholder,
+				text: text
+					.removeDuplicates()
 			)
-			.focused($focusedField, equals: .accountName)
-			.synchronize(
-				viewStore.binding(
-					get: \.focusedField,
-					send: { .textFieldFocused($0) }
-				),
-				self.$focusedField
-			)
+			.focused(binding, equals: equals)
+			.synchronize(first, binding)
 			.padding()
 			.frame(height: .standardButtonHeight)
 			.background(Color.app.gray5)
