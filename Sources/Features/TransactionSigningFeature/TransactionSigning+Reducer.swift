@@ -18,7 +18,7 @@ public extension TransactionSigning {
 			state.isSigningTX = true
 			return .run { [transactionManifest = state.transactionManifest] send in
 				await send(.internal(.signTransactionResult(TaskResult {
-					try await transactionClient.signTransaction(transactionManifest)
+					try await transactionClient.signAndSubmitTransaction(transactionManifest).txID
 				})))
 			}
 

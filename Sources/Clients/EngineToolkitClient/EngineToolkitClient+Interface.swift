@@ -8,31 +8,42 @@ import enum SLIP10.PrivateKey
 import enum SLIP10.PublicKey
 
 // MARK: - EngineToolkitClient
-public struct EngineToolkitClient: DependencyKey {
+public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var getTransactionVersion: GetTransactionVersion
-	public var signTransactionIntent: SignTransactionIntent
-	public var accountAddressesNeedingToSignTransaction: AccountAddressesNeedingToSignTransaction
+	public var generateTXNonce: GenerateTXNonce
 
-	public init(
-		getTransactionVersion: @escaping GetTransactionVersion,
-		signTransactionIntent: @escaping SignTransactionIntent,
-		accountAddressesNeedingToSignTransaction: @escaping AccountAddressesNeedingToSignTransaction
-	) {
-		self.getTransactionVersion = getTransactionVersion
-		self.signTransactionIntent = signTransactionIntent
-		self.accountAddressesNeedingToSignTransaction = accountAddressesNeedingToSignTransaction
-	}
+	public var compileTransactionIntent: CompileTransactionIntent
+	public var compileSignedTransactionIntent: CompileSignedTransactionIntent
+	public var compileNotarizedTransactionIntent: CompileNotarizedTransactionIntent
+
+	public var generateTXID: GenerateTXID
+	public var accountAddressesNeedingToSignTransaction: AccountAddressesNeedingToSignTransaction
 }
 
 public extension EngineToolkitClient {
 	typealias GetTransactionVersion = @Sendable () -> Version
-	typealias SignTransactionIntent = @Sendable (SignTransactionIntentRequest) throws -> SignedCompiledNotarizedTX
-	typealias AccountAddressesNeedingToSignTransaction = @Sendable (Version, TransactionManifest, NetworkID) throws -> Set<AccountAddress>
+
+	typealias GenerateTXNonce = @Sendable () -> Nonce
+
+	typealias AccountAddressesNeedingToSignTransaction = @Sendable (AccountAddressesNeedingToSignTransactionRequest) throws -> Set<AccountAddress>
+
+	typealias CompileTransactionIntent = @Sendable (TransactionIntent) throws -> CompileTransactionIntentResponse
+
+	typealias CompileSignedTransactionIntent = @Sendable (SignedTransactionIntent) throws -> CompileSignedTransactionIntentResponse
+
+	typealias CompileNotarizedTransactionIntent = @Sendable (NotarizedTransaction) throws -> CompileNotarizedTransactionIntentResponse
+
+	typealias GenerateTXID = @Sendable (TransactionIntent) throws -> TXID
 }
 
-// MARK: - SignedCompiledNotarizedTX
-public struct SignedCompiledNotarizedTX: Sendable, Hashable {
-	public let compileTransactionIntentResponse: CompileTransactionIntentResponse
-	public let intentHash: Data
-	public let compileNotarizedTransactionIntentResponse: CompileNotarizedTransactionIntentResponse
+// MARK: - AccountAddressesNeedingToSignTransactionRequest
+public struct AccountAddressesNeedingToSignTransactionRequest: Sendable, Hashable {
+	public let version: Version
+	public let manifest: TransactionManifest
+	public let networkID: NetworkID
+	public init(version: Version, manifest: TransactionManifest, networkID: NetworkID) {
+		self.version = version
+		self.manifest = manifest
+		self.networkID = networkID
+	}
 }

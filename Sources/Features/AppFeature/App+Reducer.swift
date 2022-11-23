@@ -17,7 +17,8 @@ public struct App: ReducerProtocol {
 		Scope(state: \.root, action: /Action.self) {
 			EmptyReducer()
 				.ifCaseLet(/App.State.Root.main, action: /Action.child .. Action.ChildAction.main) {
-					Main()._printChanges()
+					Main()
+					// ._printChanges()
 				}
 				.ifCaseLet(/App.State.Root.onboarding, action: /Action.child .. Action.ChildAction.onboarding) {
 					Onboarding()
@@ -33,7 +34,7 @@ public struct App: ReducerProtocol {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.task)):
-			return .run { send in
+			return .run { [errorQueue] send in
 				for try await error in errorQueue.errors() {
 					await send(.internal(.system(.displayErrorAlert(UserFacingError(error)))))
 				}

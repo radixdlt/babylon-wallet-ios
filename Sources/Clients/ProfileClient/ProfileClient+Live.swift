@@ -1,9 +1,11 @@
+import Collections
 import ComposableArchitecture
 import CryptoKit
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
 import KeychainClientDependency
+import NonEmpty
 import Profile
 import SLIP10
 import URLBuilderClient
@@ -39,6 +41,17 @@ public extension ProfileClient {
 
 		let getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL = {
 			await getNetworkAndGateway().gatewayAPIEndpointURL
+		}
+
+		let lookupAccountByAddress: LookupAccountByAddress = { accountAddress in
+			// Get default NetworkID
+			let networkID = await getCurrentNetworkID()
+			return try await profileHolder.get { profile in
+				guard let account = try profile.entity(networkID: networkID, address: accountAddress) as? OnNetwork.Account else {
+					throw ExpectedEntityToBeAccount()
+				}
+				return account
+			}
 		}
 
 		return Self(
@@ -114,35 +127,32 @@ public extension ProfileClient {
 					)
 				}
 			},
-			lookupAccountByAddress: { accountAddress in
-				// Get default NetworkID
-				let networkID = await getCurrentNetworkID()
-				return try await profileHolder.get { profile in
-					guard let account = try profile.entity(networkID: networkID, address: accountAddress) as? OnNetwork.Account else {
-						throw ExpectedEntityToBeAccount()
-					}
-					return account
-				}
-			},
-			signTransaction: { _, _ in
+			lookupAccountByAddress: lookupAccountByAddress,
+			privateKeysForAddresses: { addresses in
 				// FIXME: betanet fix me
-				fatalError()
+				let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
 
-//				try await profileHolder.getAsync { profile in
-//
-//					accounts.asyncMap { account in
-//						try await profile.withPrivateKeys(
-//							of: account,
-//							mnemonicForFactorSourceByReference: { [keychainClient] reference in
-//								try keychainClient.loadFactorSourceMnemonic(reference: reference)
-//							}
-//						) { signers in
-				////							let signer = signers.first
-				////							let signature = try privateKey.sign(data: data)
-//
-//						}
-//					}
-//				}
+				let matrix: [Set<PrivateKey>] = try await profileHolder.getAsync { profile -> [Set<PrivateKey>] in
+					try await accounts.asyncMap { account -> Set<PrivateKey> in
+						try await profile.withPrivateKeys(
+							of: account,
+							mnemonicForFactorSourceByReference: { [keychainClient] reference in
+								try keychainClient.loadFactorSourceMnemonic(reference: reference)
+							}
+						) { (keys: NonEmpty<Set<PrivateKey>>) -> Set<PrivateKey> in
+							keys.rawValue
+						}
+					}
+				}
+				var privateKeys = OrderedSet<PrivateKey>()
+				matrix.forEach {
+					privateKeys.append(contentsOf: $0)
+				}
+
+				guard let nonEmptyKeys = NonEmpty(rawValue: privateKeys) else {
+					throw FoundNoKeysForAddresses()
+				}
+				return nonEmptyKeys
 			}
 		)
 	}()
@@ -151,9 +161,11 @@ public extension ProfileClient {
 // MARK: - ExpectedEntityToBeAccount
 struct ExpectedEntityToBeAccount: Swift.Error {}
 
+// MARK: - FoundNoKeysForAddresses
+struct FoundNoKeysForAddresses: Swift.Error {}
+
 // MARK: - NoProfile
-/// Used in GatewayClient as well
-public struct NoProfile: Swift.Error {}
+struct NoProfile: Swift.Error {}
 
 // MARK: - ProfileHolder
 private actor ProfileHolder: GlobalActor {
@@ -167,7 +179,7 @@ private actor ProfileHolder: GlobalActor {
 	}
 
 	@discardableResult
-	func get<T>(_ withProfile: (Profile) throws -> T) throws -> T {
+	func get<T>(_ withProfile: @Sendable (Profile) throws -> T) throws -> T {
 		guard let profile else {
 			throw NoProfile()
 		}
@@ -175,7 +187,7 @@ private actor ProfileHolder: GlobalActor {
 	}
 
 	@discardableResult
-	func getAsync<T>(_ withProfile: (Profile) async throws -> T) async throws -> T {
+	func getAsync<T>(_ withProfile: @Sendable (Profile) async throws -> T) async throws -> T {
 		guard let profile else {
 			throw NoProfile()
 		}
@@ -188,7 +200,7 @@ private actor ProfileHolder: GlobalActor {
 		try keychainClient.updateProfileSnapshot(profileSnapshot: profileSnapshot)
 	}
 
-	func asyncMutating<T>(_ mutateProfile: (inout Profile) async throws -> T) async throws -> T {
+	func asyncMutating<T>(_ mutateProfile: @Sendable (inout Profile) async throws -> T) async throws -> T {
 		guard var profile else {
 			throw NoProfile()
 		}

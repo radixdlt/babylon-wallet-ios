@@ -52,9 +52,9 @@ extension ProfileClient: TestDependencyKey {
 		lookupAccountByAddress: { _ in
 			.placeholder0
 		},
-		signTransaction: { _, _ in
+		privateKeysForAddresses: { _ in
 			struct MockError: LocalizedError {
-				let errorDescription: String? = "Transaction signing failed!"
+				let errorDescription: String? = "Failed to get privateKeys for addresses"
 			}
 			throw MockError()
 		}
@@ -77,7 +77,7 @@ extension ProfileClient: TestDependencyKey {
 		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
 		createOnLedgerAccount: { _, _ in throw UnimplementedError(description: "\(Self.self).createOnLedgerAccount is unimplemented") },
 		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
-		signTransaction: unimplemented("\(Self.self).signTransaction")
+		privateKeysForAddresses: unimplemented("\(Self.self).privateKeysForAddresses")
 	)
 }
 

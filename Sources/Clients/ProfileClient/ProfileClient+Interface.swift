@@ -6,7 +6,7 @@ import KeychainClient
 import Mnemonic
 import NonEmpty
 import Profile
-import enum SLIP10.Signature
+import SLIP10
 
 public typealias MakeAccountNonVirtual = @Sendable (CreateAccountRequest) -> MakeEntityNonVirtualBySubmittingItToLedger
 
@@ -48,7 +48,9 @@ public struct ProfileClient: DependencyKey, Sendable {
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
 	public var createOnLedgerAccount: CreateOnLedgerAccount
 	public var lookupAccountByAddress: LookupAccountByAddress
-	public var signTransaction: SignTransaction
+
+	// FIXME: - mainnet remove this and change to `async throws -> ([Prompt]) async throws -> NonEmpty<Set<Signer>>` when Profile supports multiple factor sources of different kinds.
+	public var privateKeysForAddresses: PrivateKeysForAddresses
 }
 
 public extension ProfileClient {
@@ -73,7 +75,10 @@ public extension ProfileClient {
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
 	typealias CreateOnLedgerAccount = @Sendable (CreateAccountRequest, MakeAccountNonVirtual) async throws -> OnNetwork.Account
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
-	typealias SignTransaction = @Sendable (any DataProtocol, Set<OnNetwork.Account>) async throws -> Set<AccountSignature>
+
+	// typealias SignTransaction = @Sendable (any DataProtocol, Set<OnNetwork.Account>) async throws -> Set<AccountSignature>
+
+	typealias PrivateKeysForAddresses = @Sendable (Set<AccountAddress>) async throws -> NonEmpty<OrderedSet<PrivateKey>>
 }
 
 // MARK: - AccountSignature

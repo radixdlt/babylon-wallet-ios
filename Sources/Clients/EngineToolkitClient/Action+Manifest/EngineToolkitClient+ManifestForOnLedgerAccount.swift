@@ -1,5 +1,6 @@
 import EngineToolkit
 import Foundation
+import SLIP10
 
 // MARK: - HammunetAddresses
 public enum HammunetAddresses {}
@@ -13,20 +14,26 @@ public extension HammunetAddresses {
 }
 
 public extension EngineToolkitClient {
-	func createOnLedgerAccount(
-		request withoutManifestRequest: BuildAndSignTransactionWithoutManifestRequest
-	) throws -> SignedCompiledNotarizedTX {
+	func manifestForOnLedgerAccount(
+		publicKey: PublicKey
+	) throws -> TransactionManifest {
+		try manifestForOnLedgerAccount(publicKey: publicKey.intoEngine())
+	}
+
+	func manifestForOnLedgerAccount(
+		publicKey: Engine.PublicKey
+	) throws -> TransactionManifest {
 		let engineToolkit = EngineToolkit()
 
 		let nonFungibleAddressString = try engineToolkit.deriveNonFungibleAddressFromPublicKeyRequest(
-			request: withoutManifestRequest.privateKey.publicKey().intoEngine()
+			request: publicKey
 		)
 		.get()
 		.nonFungibleAddress
 
 		let nonFungibleAddress = try NonFungibleAddress(hex: nonFungibleAddressString)
 
-		let manifest = TransactionManifest {
+		return TransactionManifest {
 			CallMethod(
 				receiver: HammunetAddresses.faucet,
 				methodName: "lock_fee"
@@ -60,29 +67,5 @@ public extension EngineToolkitClient {
 				xrdBucket
 			}
 		}
-
-		return try sign(
-			request: .init(
-				manifest: manifest,
-				withoutManifestRequest: withoutManifestRequest
-			),
-			engineToolkit: engineToolkit
-		)
-	}
-
-	func sign(
-		request: BuildAndSignTransactionWithManifestRequest,
-		engineToolkit: EngineToolkit = .init()
-	) throws -> SignedCompiledNotarizedTX {
-		let privateKey = request.privateKey
-		let headerInput = request.transactionHeaderInput
-
-		let signTXRequest = try SignTransactionIntentRequest(
-			manifest: request.manifest,
-			headerInput: headerInput,
-			privateKey: privateKey
-		)
-
-		return try signTransactionIntent(signTXRequest)
 	}
 }

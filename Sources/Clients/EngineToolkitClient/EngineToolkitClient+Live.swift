@@ -1,7 +1,7 @@
 import Common
 import CryptoKit
 import Dependencies
-import EngineToolkit
+@preconcurrency import EngineToolkit
 import Foundation
 import struct Profile.AccountAddress
 import enum SLIP10.PrivateKey
@@ -11,56 +11,42 @@ public extension EngineToolkitClient {
 	static let liveValue: Self = {
 		let engineToolkit = EngineToolkit()
 
+		let generateTXNonce: GenerateTXNonce = { Nonce.secureRandom() }
+
+		let compileTransactionIntent: CompileTransactionIntent = { transactionIntent in
+			try engineToolkit.compileTransactionIntentRequest(
+				request: transactionIntent
+			).get()
+		}
+
 		return Self(
 			getTransactionVersion: { Version.default },
-			signTransactionIntent: { request in
-
-				let privateKey = request.privateKey
-
-				let transactionIntent = request.transactionIntent
-
-				let compiledTransactionIntent = try engineToolkit.compileTransactionIntentRequest(
-					request: transactionIntent
-				).get()
-
-				let transactionIntentWithSignatures = SignedTransactionIntent(
-					intent: transactionIntent,
-					intentSignatures: []
-				)
-
-				let compiledSignedIntentResponse = try engineToolkit
-					.compileSignedTransactionIntentRequest(request: transactionIntentWithSignatures)
+			generateTXNonce: generateTXNonce,
+			compileTransactionIntent: compileTransactionIntent,
+			compileSignedTransactionIntent: {
+				try engineToolkit
+					.compileSignedTransactionIntentRequest(request: $0)
 					.get()
-
-				let (signedCompiledSignedTXIntent, _) = try privateKey.signReturningHashOfMessage(
-					data: compiledSignedIntentResponse.compiledSignedIntent
-				)
-
-				let notarySignature = try signedCompiledSignedTXIntent.intoEngine().signature
-
-				let notarizedTX = NotarizedTransaction(
-					signedIntent: transactionIntentWithSignatures,
-					notarySignature: notarySignature
-				)
-
-				let notarizedTransactionIntent = try engineToolkit
-					.compileNotarizedTransactionIntentRequest(request: notarizedTX)
-					.get()
-
-				let intentHash = Data(
+			},
+			compileNotarizedTransactionIntent: {
+				try engineToolkit.compileNotarizedTransactionIntentRequest(request: $0).get()
+			},
+			generateTXID: { transactionIntent in
+				let compiledTransactionIntent = try compileTransactionIntent(transactionIntent)
+				let hash = Data(
 					SHA256.twice(data: Data(compiledTransactionIntent.compiledIntent))
 				)
-
-				return .init(
-					compileTransactionIntentResponse: compiledTransactionIntent,
-					intentHash: intentHash,
-					compileNotarizedTransactionIntentResponse: notarizedTransactionIntent
-				)
+				return TXID(rawValue: hash.hex)
 			},
-			accountAddressesNeedingToSignTransaction: { version, transactionManifest, networkID throws -> Set<AccountAddress> in
-				try Set(transactionManifest.accountsRequiredToSign(networkId: networkID, version: version).map {
-					try AccountAddress(componentAddress: $0)
-				})
+			accountAddressesNeedingToSignTransaction: { request throws -> Set<AccountAddress> in
+				try Set(
+					request.manifest.accountsRequiredToSign(
+						networkId: request.networkID,
+						version: request.version
+					).map {
+						try AccountAddress(componentAddress: $0)
+					}
+				)
 			}
 		)
 	}()

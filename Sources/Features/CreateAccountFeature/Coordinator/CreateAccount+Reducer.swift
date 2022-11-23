@@ -30,8 +30,7 @@ public extension CreateAccount {
 						let createAccountRequest = CreateAccountRequest(
 							accountName: accountName
 						)
-						let makeOnLedger: MakeAccountNonVirtual = transactionClient.makeAccountNonVirtual
-						return try await profileClient.createOnLedgerAccount(createAccountRequest, makeOnLedger)
+						return try await profileClient.createOnLedgerAccount(createAccountRequest, transactionClient.makeAccountNonVirtual)
 					}
 				))))
 			}

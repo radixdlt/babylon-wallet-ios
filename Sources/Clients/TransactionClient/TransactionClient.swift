@@ -1,28 +1,42 @@
+import Collections
+import Common
 import Dependencies
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
 import struct GatewayAPI.GatewayAPIClient
 import struct GatewayAPI.PollStrategy
+import struct GatewayAPI.TransactionDetailsResponse
+import NonEmpty
 import Profile
 import ProfileClient
+import SLIP10
 
 // MARK: - TransactionClient
-public struct TransactionClient: DependencyKey {
+public struct TransactionClient: Sendable, DependencyKey {
+	public var signAndSubmitTransaction: SignAndSubmitTransaction
 	public var makeAccountNonVirtual: MakeAccountNonVirtual
-	public var signTransaction: SignTransaction
+
 	public init(
 		makeAccountNonVirtual: @escaping MakeAccountNonVirtual,
-		signTransaction: @escaping SignTransaction
+		signAndSubmitTransaction: @escaping SignAndSubmitTransaction
 	) {
+		self.signAndSubmitTransaction = signAndSubmitTransaction
 		self.makeAccountNonVirtual = makeAccountNonVirtual
-		self.signTransaction = signTransaction
 	}
 }
 
-// MARK: TransactionClient.SignTransaction
+// MARK: TransactionClient.SignAndSubmitTransaction
 public extension TransactionClient {
-	typealias SignTransaction = @Sendable (TransactionManifest) async throws -> TransactionIntent.TXID
+	typealias SignAndSubmitTransaction = @Sendable (TransactionManifest) async throws -> Transaction
+}
+
+// MARK: TransactionClient.Transaction
+public extension TransactionClient {
+	struct Transaction: Sendable, Hashable {
+		public let txDetails: GatewayAPI.TransactionDetailsResponse
+		public let txID: TXID
+	}
 }
 
 public extension DependencyValues {
@@ -40,51 +54,114 @@ public extension TransactionClient {
 
 		let pollStrategy: PollStrategy = .default
 
+		@Sendable
+		func signAndSubmit(transactionIntent: TransactionIntent, notary notaryPrivateKey: PrivateKey) async throws -> Transaction {
+			let compiled = try engineToolkitClient.compileTransactionIntent(transactionIntent)
+			let txID = try engineToolkitClient.generateTXID(transactionIntent)
+
+			let signedTransactionIntent = SignedTransactionIntent(
+				intent: transactionIntent,
+				intentSignatures: []
+			)
+			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(signedTransactionIntent)
+
+			let (notarySignature, _) = try notaryPrivateKey.signReturningHashOfMessage(data: compiledSignedIntent.compiledSignedIntent)
+
+			let uncompiledNotarized = try NotarizedTransaction(
+				signedIntent: signedTransactionIntent,
+				notarySignature: notarySignature.intoEngine().signature
+			)
+
+			let compilededNotarizedTransaction = try engineToolkitClient.compileNotarizedTransactionIntent(uncompiledNotarized)
+
+			let (details, _txID) = try await gatewayAPIClient.submit(
+				notarizedTransaction: Data(compilededNotarizedTransaction.compiledNotarizedIntent),
+				txID: txID,
+				pollStrategy: pollStrategy
+			)
+			assert(_txID == txID)
+			return Transaction(txDetails: details, txID: txID)
+		}
+
+		@Sendable
+		func signAndSubmit(
+			manifest: TransactionManifest,
+			getNotary: (AccountAddressesNeedingToSignTransactionRequest) async throws -> PrivateKey
+		) async throws -> Transaction {
+			let nonce = engineToolkitClient.generateTXNonce()
+			let epoch = try await gatewayAPIClient.getEpoch()
+			let networkID = await profileClient.getCurrentNetworkID()
+			let version = engineToolkitClient.getTransactionVersion()
+
+			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesNeedingToSignTransactionRequest(
+				version: version,
+				manifest: manifest,
+				networkID: networkID
+			)
+
+			let notaryPrivateKey = try await getNotary(accountAddressesNeedingToSignTransactionRequest)
+
+			let header = TransactionHeader(
+				version: version,
+				networkId: networkID,
+				startEpochInclusive: epoch,
+				endEpochExclusive: epoch + 5,
+				nonce: nonce,
+				publicKey: try notaryPrivateKey.publicKey().intoEngine(),
+				notaryAsSignatory: true, // FIXME: - mainnet: pass as arg
+				costUnitLimit: 10_000_000, // FIXME: - mainnet: pass as arg
+				tipPercentage: 0 // FIXME: - mainnet: pass as arg
+			)
+
+			let intent = TransactionIntent(
+				header: header,
+				manifest: manifest
+			)
+
+			return try await signAndSubmit(transactionIntent: intent, notary: notaryPrivateKey)
+		}
+
 		return Self(
-			makeAccountNonVirtual: { (_: CreateAccountRequest) -> MakeEntityNonVirtualBySubmittingItToLedger in
+			makeAccountNonVirtual: { _ in
 				{ privateKey in
 					print("🎭 Create On-Ledger-Account ✨")
-					let (committed, txID) = try await gatewayAPIClient.submit(
-						pollStrategy: pollStrategy
-					) { epoch in
-						let networkID = await profileClient.getCurrentNetworkID()
-						let buildAndSignTXRequest = BuildAndSignTransactionWithoutManifestRequest(
-							privateKey: privateKey,
-							epoch: epoch,
-							networkID: networkID,
-							transactionVersion: engineToolkitClient.getTransactionVersion()
-						)
-						return try engineToolkitClient.createOnLedgerAccount(
-							request: buildAndSignTXRequest
-						)
-					}
-					guard let accountAddressBech32 = committed
-						.details
-						.referencedGlobalEntities
-						.first
-					else {
+					let manifest = try engineToolkitClient.manifestForOnLedgerAccount(publicKey: privateKey.publicKey())
+
+					let transaction = try await signAndSubmit(manifest: manifest) { _ in privateKey }
+
+					guard let addressBech32 = transaction.txDetails.details.referencedGlobalEntities.first else {
 						throw CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities()
 					}
-					print("🎭 SUCCESSFULLY CREATED ACCOUNT On-Ledger with address: \(accountAddressBech32) ✅ \n txID: \(txID)")
-					return try AccountAddress(address: accountAddressBech32)
+					print("🎭 SUCCESSFULLY CREATED ACCOUNT On-Ledger with address: \(addressBech32) ✅ \n txID: \(transaction.txID)")
+					return try AccountAddress(address: addressBech32)
 				}
 			},
-			signTransaction: { _ in
-				// FIXME: betanet
-				fatalError()
-				//                let networkID = try await profileClient.getCurrentNetworkID()
-				//                let version = engineToolkitClient.getTransactionVersion()
-//
-				//                let addressesNeededToSign = try engineToolkitClient
-				//                    .accountAddressesNeedingToSignTransaction(
-				//                        version, manifest, networkID
-				//                    )
+			signAndSubmitTransaction: { manifest in
+				try await signAndSubmit(manifest: manifest) { accountAddressesNeedingToSignTransactionRequest in
+					let addressesNeededToSign = try engineToolkitClient
+						.accountAddressesNeedingToSignTransaction(
+							accountAddressesNeedingToSignTransactionRequest
+						)
+
+					// FIXME: - mainnet: pass as arg a fn: (NonEmpty<>)
+					let selectNotary: @Sendable (NonEmpty<OrderedSet<PrivateKey>>) -> PrivateKey = {
+						$0.first
+					}
+
+					let privateKeys = try await profileClient.privateKeysForAddresses(addressesNeededToSign)
+
+					let notaryPrivateKey = selectNotary(privateKeys)
+
+					return notaryPrivateKey
+				}
 			}
 		)
 	}
 }
 
 #if DEBUG
+
+import XCTestDynamicOverlay
 extension TransactionClient: TestDependencyKey {
 	public static let testValue: TransactionClient = .init(
 		makeAccountNonVirtual: { _ in
@@ -92,7 +169,7 @@ extension TransactionClient: TestDependencyKey {
 				try AccountAddress(address: "mock")
 			}
 		},
-		signTransaction: { _ in "mock TXID" }
+		signAndSubmitTransaction: unimplemented("\(Self.self).signAndSubmitTransaction")
 	)
 }
 #endif // DEBUG

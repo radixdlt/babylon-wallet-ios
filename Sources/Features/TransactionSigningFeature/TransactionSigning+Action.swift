@@ -6,7 +6,7 @@ import SharedModels
 
 // MARK: - TransactionSigning.Action
 public extension TransactionSigning {
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -15,7 +15,7 @@ public extension TransactionSigning {
 
 // MARK: - TransactionSigning.Action.ViewAction
 public extension TransactionSigning.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case signTransactionButtonTapped
 		case closeButtonTapped
 	}
@@ -23,7 +23,7 @@ public extension TransactionSigning.Action {
 
 // MARK: - TransactionSigning.Action.InternalAction
 public extension TransactionSigning.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case signTransactionResult(TaskResult<TransactionIntent.TXID>)
 	}
@@ -31,7 +31,7 @@ public extension TransactionSigning.Action {
 
 // MARK: - TransactionSigning.Action.DelegateAction
 public extension TransactionSigning.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismissed(P2P.SignTransactionRequestToHandle)
 
 		case signedTXAndSubmittedToGateway(
