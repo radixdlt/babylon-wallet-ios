@@ -12,7 +12,7 @@ public struct PrimaryButtonStyle: ButtonStyle {
 			.frame(height: .standardButtonHeight)
 			.background(isEnabled ? Color.app.blue2 : Color.app.gray4)
 			.cornerRadius(.small2)
-			.opacity(configuration.isPressed ? 0.5 : 1)
+			.brightness(configuration.isPressed ? -0.1 : 0)
 	}
 }
 
