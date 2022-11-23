@@ -4,7 +4,7 @@ default_platform(:ios)
 
 before_all do
     Dotenv.load ".env.secret"
-    ensure_git_status_clean
+    # ensure_git_status_clean
 end
 
 platform :ios do
@@ -15,6 +15,11 @@ platform :ios do
     desc "Runs tests"
     lane :tests do
         run_tests
+    end
+
+    lane :beta do
+    	install_certificates
+	build_app
     end
 
     desc "Installs certificates on the machine"
