@@ -18,14 +18,11 @@ platform :ios do
     end
 
     lane :beta do
-        #install_certificates
-    	#increment_build_number(xcodeproj: ENV['PROJ_PATH'])
-        #commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
-        branch = git_branch
-        puts "current branch is " + branch 
-        puts "env branch is " + ENV['GIT_BRANCH'] 
+        install_certificates
+    	increment_build_number(xcodeproj: ENV['PROJ_PATH'])
+        commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
         #push_to_git_remote
-        #build_app
+        build_app
         #upload_to_testflight
         #push_to_git_remote
     end

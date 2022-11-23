@@ -24,11 +24,10 @@ jobs:
           ruby-version: 3.1.2
           bundler-cache: true
 
-      - name: "Version bump test"
-        run: | 
-          echo "${GITHUB_REF#refs/heads/}" > $GIT_BRANCH
+      - name: "Build and Archive"
+        run: |
+          echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
           bundle exec fastlane beta
-          git log
 
   assertFormated:
     name: "AssertFormated"
