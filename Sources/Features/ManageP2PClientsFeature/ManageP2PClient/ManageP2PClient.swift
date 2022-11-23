@@ -68,7 +68,7 @@ public extension ManageP2PClient {
 
 // MARK: ManageP2PClient.Action
 public extension ManageP2PClient {
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case delegate(DelegateAction)
 		case `internal`(InternalAction)
@@ -77,7 +77,7 @@ public extension ManageP2PClient {
 
 // MARK: - ManageP2PClient.Action.ViewAction
 public extension ManageP2PClient.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case deleteConnectionButtonTapped
 		case sendTestMessageButtonTapped
 		case viewAppeared
@@ -85,12 +85,12 @@ public extension ManageP2PClient.Action {
 }
 
 public extension ManageP2PClient.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case deleteConnection
 		case sendTestMessage
 	}
@@ -98,7 +98,7 @@ public extension ManageP2PClient.Action {
 
 // MARK: - ManageP2PClient.Action.InternalAction.SystemAction
 public extension ManageP2PClient.Action.InternalAction {
-	enum SystemAction: Equatable {
+	enum SystemAction: Sendable, Equatable {
 		case connectionStatusResult(TaskResult<Connection.State>)
 	}
 }

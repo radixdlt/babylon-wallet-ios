@@ -9,9 +9,9 @@ import SLIP10
 import URLBuilderClient
 import UserDefaultsClient
 
-// MARK: - ProfileClient + DependencyKey
-extension ProfileClient: DependencyKey {
-	public static let liveValue: Self = {
+// MARK: - ProfileClient + LiveValue
+public extension ProfileClient {
+	static let liveValue: Self = {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.keychainClient) var keychainClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient

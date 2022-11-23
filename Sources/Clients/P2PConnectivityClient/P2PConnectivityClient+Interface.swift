@@ -18,7 +18,7 @@ public extension DependencyValues {
 // MARK: - P2PConnectivityClient
 
 //  MARK: - P2PConnectivityClient
-public struct P2PConnectivityClient {
+public struct P2PConnectivityClient: DependencyKey, Sendable {
 	public var getP2PClients: GetP2PClients
 	public var addConnectedP2PClient: AddConnectedP2PClient
 	public var deleteP2PClientByID: DeleteP2PClientByID

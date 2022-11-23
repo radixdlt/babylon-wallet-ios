@@ -1,4 +1,5 @@
 import Collections
+import Dependencies
 import EngineToolkit
 import Foundation
 import KeychainClient
@@ -24,7 +25,7 @@ public struct CreateNewProfileRequest {
 }
 
 // MARK: - ProfileClient
-public struct ProfileClient {
+public struct ProfileClient: DependencyKey, Sendable {
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
 	public var getNetworkAndGateway: GetNetworkAndGateway
