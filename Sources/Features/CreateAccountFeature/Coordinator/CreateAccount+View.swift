@@ -25,8 +25,14 @@ public extension CreateAccount.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack(spacing: .zero) {
-					header(with: viewStore)
-						.padding(.medium3)
+					Header(
+						leadingButton: {
+							CloseButton {
+								viewStore.send(.closeButtonTapped)
+							}
+						}
+					)
+					.padding(.medium3)
 
 					VStack {
 						title(with: viewStore)
@@ -87,17 +93,6 @@ private extension CreateAccount.View {
 }
 
 private extension CreateAccount.View {
-	func header(with viewStore: ViewStore) -> some View {
-		HStack {
-			CloseButton {
-				viewStore.send(.closeButtonTapped)
-			}
-			.frame(.small)
-
-			Spacer()
-		}
-	}
-
 	func title(with viewStore: ViewStore) -> some View {
 		let titleText = viewStore.numberOfExistingAccounts == 0 ? L10n.CreateAccount.createFirstAccount : L10n.CreateAccount.createNewAccount
 

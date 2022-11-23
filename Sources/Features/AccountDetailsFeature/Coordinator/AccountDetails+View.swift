@@ -29,8 +29,16 @@ public extension AccountDetails.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack(spacing: .zero) {
-					header(with: viewStore)
-						.padding([.horizontal, .top], .medium3)
+					Header(
+						titleText: viewStore.displayName,
+						leadingButton: {
+							BackButton {
+								viewStore.send(.dismissAccountDetailsButtonTapped)
+							}
+						}
+					)
+					.foregroundColor(.app.white)
+					.padding([.horizontal, .top], .medium3)
 
 					AddressView(
 						address: viewStore.address.wrapAsAddress(),
@@ -71,31 +79,6 @@ private extension AccountDetails.View {
 
 // MARK: - Private Methods
 private extension AccountDetails.View {
-	func header(with viewStore: AccountDetailsViewStore) -> some View {
-		HStack {
-			BackButton {
-				viewStore.send(.dismissAccountDetailsButtonTapped)
-			}
-
-			Spacer()
-
-			Text(viewStore.displayName)
-				.textStyle(.secondaryHeader)
-
-			Spacer()
-
-			// TODO: remove when account preferences screen is implemented
-			Spacer()
-				.frame(.small)
-
-			// TODO: uncomment when account preferences screen is implemented
-			/*
-			 accountPreferencesButton(with: viewStore)
-			 */
-		}
-		.foregroundColor(.app.white)
-	}
-
 	func transferButton(with viewStore: AccountDetailsViewStore) -> some View {
 		Button(action: {
 			viewStore.send(.transferButtonTapped)
@@ -109,6 +92,7 @@ private extension AccountDetails.View {
 		})
 	}
 
+	// TODO: use when account preferences screen is implemented
 	func accountPreferencesButton(with viewStore: AccountDetailsViewStore) -> some View {
 		Button(
 			action: {
