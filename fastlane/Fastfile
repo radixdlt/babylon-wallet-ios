@@ -18,8 +18,9 @@ platform :ios do
     end
 
     lane :beta do
-    	install_certificates
-	build_app
+    	increment_build_number(xcodeproj: ENV['PROJ_PATH'])
+    	#install_certificates
+	# build_app
     end
 
     desc "Installs certificates on the machine"
