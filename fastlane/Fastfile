@@ -23,6 +23,7 @@ platform :ios do
         #commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
         branch = git_branch
         puts "current branch is " + branch 
+        puts "env branch is " + ENV['GIT_BRANCH'] 
         #push_to_git_remote
         #build_app
         #upload_to_testflight
