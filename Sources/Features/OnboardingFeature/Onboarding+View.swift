@@ -35,8 +35,7 @@ public extension Onboarding.View {
 						Button("Import Account") {
 							viewStore.send(.importProfileButtonTapped)
 						}
-						.buttonStyle(.secondary)
-						.frame(maxWidth: .infinity)
+						.buttonStyle(.secondary(isWide: true))
 					}
 					.padding()
 				}
