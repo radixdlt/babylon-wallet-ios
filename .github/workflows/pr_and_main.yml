@@ -26,6 +26,7 @@ jobs:
 
       - name: "Version bump test"
         run: | 
+          echo "##[set-output name=branch;]${GITHUB_REF#refs/heads/}"
           bundle exec fastlane beta
           git log
 
