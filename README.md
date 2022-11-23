@@ -10,6 +10,8 @@ Clone the repo and run bootstrap script:
 ./scripts/bootstrap
 ```
 
+Setup [fastlane](#fastlane).
+
 To open the project use:
 
 ```sh
@@ -149,6 +151,7 @@ instead of opening the root, otherwise you will not get access to the App and th
 
 ## Fastlane
 
+### Bundler setup
 We use [Bundler](https://bundler.io/) to install and update Fastlane. Follow below steps to have Bundler installed and execute fastlane lanes:
 
 - Install ruby v3.1.2; it is strongly recommend to use a tool like [rbenv](https://github.com/rbenv/rbenv) to manage the rubby version.
@@ -160,10 +163,25 @@ We use [Bundler](https://bundler.io/) to install and update Fastlane. Follow bel
 ```
   bundle install
 ```
-- Execute a fastlane lane from [App](App) directory:
+
+### Development config setup
+
+- Download [fastlane secrets](https://start.1password.com/open/i?a=JWO4INKPOFHCDMZ2CYQMY4DRY4&v=srjnzoh2conosxfpkekxlakwzq&i=c75l3mugtfopfd5ebrcn22hssu&h=rdxworks.1password.com).
+- Put the downloaded file in [fastlane](fastlane) folder. Be sure to remove the leading underscore from the file name.
+- Run the below command to bring the necessary certificates for development:
+```sh
+bundle exec fastlane ios install_certificates
+bundle exec fastlane mac install_certificates
 ```
-  bundle exec fastlane <lane>
+- If your device is unregistered, register it with the below command, it will prompt you to enter the device name and device UDID.
+```sh
+# For iPhone
+bundle exec fastlane ios register_new_iphone_device
+# For mac
+bundle exec fastlane mac register_new_mac_device
 ```
+
+After the above setup, you are good to go with building and running the app on iPhone or Mac device.
 
 # Testing
 1. Unit tests for each package, split into multiple files for each seperate system under test (sut).
