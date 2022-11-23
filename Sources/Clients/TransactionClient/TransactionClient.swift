@@ -69,14 +69,16 @@ public extension TransactionClient {
 					return try AccountAddress(address: accountAddressBech32)
 				}
 			},
-			signTransaction: { manifest in
-				let networkID = try profileClient.getCurrentNetworkID()
-				let version = engineToolkitClient.getTransactionVersion()
-
-				let addressesNeededToSign = try engineToolkitClient
-					.accountAddressesNeedingToSignTransaction(
-						version, manifest, networkID
-					)
+			signTransaction: { _ in
+				// FIXME: betanet
+				fatalError()
+				//                let networkID = try await profileClient.getCurrentNetworkID()
+				//                let version = engineToolkitClient.getTransactionVersion()
+//
+				//                let addressesNeededToSign = try engineToolkitClient
+				//                    .accountAddressesNeedingToSignTransaction(
+				//                        version, manifest, networkID
+				//                    )
 			}
 		)
 	}

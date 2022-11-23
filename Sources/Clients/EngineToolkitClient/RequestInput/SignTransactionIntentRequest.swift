@@ -69,12 +69,15 @@ public extension SignTransactionIntentRequest {
 		privateKey: PrivateKey,
 		epoch: Epoch,
 		networkID: NetworkID,
-		costUnitLimit _: UInt32 = TransactionHeaderInput.defaultCostUnitLimit
+		version: Version,
+		costUnitLimit: UInt32 = TransactionHeaderInput.defaultCostUnitLimit
 	) throws {
 		let headerInput = TransactionHeaderInput(
 			publicKey: privateKey.publicKey(),
 			startEpoch: epoch,
-			networkID: networkID
+			transactionVersion: version,
+			networkID: networkID,
+			costUnitLimit: costUnitLimit
 		)
 
 		try self.init(

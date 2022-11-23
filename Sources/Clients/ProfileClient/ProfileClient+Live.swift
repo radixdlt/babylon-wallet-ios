@@ -124,22 +124,25 @@ extension ProfileClient: DependencyKey {
 					return account
 				}
 			},
-			signTransaction: { data, accounts in
+			signTransaction: { _, _ in
+				// FIXME: betanet fix me
+				fatalError()
 
-				try await profileHolder.getAsync { profile in
-
-					accounts.map { account in
-						try await profile.withPrivateKeys(
-							of: account,
-							mnemonicForFactorSourceByReference: { [keychainClient] reference in
-								try keychainClient.loadFactorSourceMnemonic(reference: reference)
-							}
-						) { signers in
-							let signer = signers.first
-							let signature = try privateKey.sign(data: data)
-						}
-					}
-				}
+//				try await profileHolder.getAsync { profile in
+//
+//					accounts.asyncMap { account in
+//						try await profile.withPrivateKeys(
+//							of: account,
+//							mnemonicForFactorSourceByReference: { [keychainClient] reference in
+//								try keychainClient.loadFactorSourceMnemonic(reference: reference)
+//							}
+//						) { signers in
+				////							let signer = signers.first
+				////							let signature = try privateKey.sign(data: data)
+//
+//						}
+//					}
+//				}
 			}
 		)
 	}()

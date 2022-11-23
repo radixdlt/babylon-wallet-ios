@@ -58,9 +58,9 @@ public extension EngineToolkitClient {
 				)
 			},
 			accountAddressesNeedingToSignTransaction: { version, transactionManifest, networkID throws -> Set<AccountAddress> in
-				try transactionManifest.accountsRequiredToSign(networkId: networkID, version: version).map {
+				try Set(transactionManifest.accountsRequiredToSign(networkId: networkID, version: version).map {
 					try AccountAddress(componentAddress: $0)
-				}
+				})
 			}
 		)
 	}()
