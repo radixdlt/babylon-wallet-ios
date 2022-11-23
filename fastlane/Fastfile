@@ -18,12 +18,12 @@ platform :ios do
     end
 
     lane :beta do
-    	install_certificates
+        #install_certificates
     	increment_build_number(xcodeproj: ENV['PROJ_PATH'])
-	commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
-	#build_app
-	#upload_to_testflight
-	#push_to_git_remote
+        commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
+        #build_app
+        #upload_to_testflight
+        #push_to_git_remote
     end
 
     desc "Installs certificates on the machine"

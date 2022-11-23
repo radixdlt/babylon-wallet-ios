@@ -11,6 +11,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  betaDeploy:
+    name: "Beta deploy"
+    runs-on: macos-12
+
+    steps:
+      - uses: actions/checkout@v3.1.0
+
+      - name: "Set up ruby"
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.2
+          bundler-cache: true
+
+      - name: "Version bump test"
+        run: | 
+          bundle exec fastlane beta
+          git log
 
   assertFormated:
     name: "AssertFormated"
