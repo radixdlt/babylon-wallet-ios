@@ -23,6 +23,13 @@ public extension MnemonicGenerator {
 	static let liveValue: Self = .init(generate: { try Mnemonic(wordCount: $0, language: $1) })
 }
 
+#if DEBUG
+import XCTestDynamicOverlay
+extension MnemonicGenerator: TestDependencyKey {
+	public static let testValue: Self = .init(generate: unimplemented("\(Self.self).generate"))
+}
+#endif // DEBUG
+
 public extension DependencyValues {
 	var mnemonicGenerator: MnemonicGenerator {
 		get { self[MnemonicGenerator.self] }

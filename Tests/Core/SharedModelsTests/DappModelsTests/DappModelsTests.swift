@@ -12,7 +12,7 @@ final class ToDappResponseTests: TestCase {
 						rawValue: [.init(
 							accountAddress: try! .init(address: "address"),
 							label: "Label",
-							appearanceID: .fromIndex(0)
+							appearanceId: .fromIndex(0)
 						)]
 					)!
 				))),

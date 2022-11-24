@@ -37,6 +37,14 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 				mnemonic: req.curve25519FactorSourceMnemonic
 			)
 		}
+		store.dependencies.transactionClient.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger = { _ in
+			{ _ in
+				//                return .init
+				//                public typealias MakeEntityNonVirtualBySubmittingItToLedger = @Sendable (PrivateKey) async throws -> any AddressKindProtocol
+				try AccountAddress(address: "mock")
+			}
+		}
+		store.dependencies.transactionClient.signAndSubmitTransaction = { _ in .placeholder }
 		store.dependencies.keychainClient = keychainClient
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 		let generateMnemonicCalled = ActorIsolated<Bool>(false)

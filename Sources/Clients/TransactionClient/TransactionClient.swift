@@ -36,6 +36,12 @@ public extension TransactionClient {
 	}
 }
 
+#if DEBUG
+public extension TransactionClient.Transaction {
+	static let placeholder: Self = .init(txDetails: .init(ledgerState: .init(network: "placeholder", stateVersion: 1, timestamp: "time", epoch: 1, round: 1), transaction: .init(transactionStatus: .init(status: .succeeded), payloadHashHex: "placeholder", intentHashHex: "placeholder"), details: .init(rawHex: "placeholder", referencedGlobalEntities: [])), txID: "placeholder")
+}
+#endif // DEBUG
+
 public extension DependencyValues {
 	var transactionClient: TransactionClient {
 		get { self[TransactionClient.self] }
@@ -213,7 +219,13 @@ extension TransactionClient: TestDependencyKey {
 	public static let testValue: TransactionClient = .init(
 		convertManifestInstructionsToJSONIfItWasString: unimplemented("\(Self.self).convertManifestInstructionsToJSONIfItWasString"),
 		addLockFeeInstructionToManifest: unimplemented("\(Self.self).addLockFeeInstructionToManifest"),
-		defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger: unimplemented("\(Self.self).defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger"),
+
+		defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger:
+		unimplemented(
+			"\(Self.self).defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger",
+			placeholder: unimplemented("\(Self.self).MakeEntityNonVirtualBySubmittingItToLedger")
+		),
+
 		signAndSubmitTransaction: unimplemented("\(Self.self).signAndSubmitTransaction")
 	)
 }
