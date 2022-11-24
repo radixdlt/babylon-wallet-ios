@@ -1,6 +1,9 @@
 name: "Test Flight Deploy"
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - "CAT-14-gh-job-to-upload-to-test-flight"
 
 jobs:
   testFlightDeploy:
