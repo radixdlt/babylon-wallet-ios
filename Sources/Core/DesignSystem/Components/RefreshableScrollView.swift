@@ -29,6 +29,7 @@ public struct RefreshableScrollView<Content: View>: View {
 			#if os(iOS)
 			SwiftUIPullToRefresh.RefreshableScrollView(
 				showsIndicators: showsIndicators,
+				loadingViewBackgroundColor: .clear,
 				onRefresh: { done in
 					Task { @MainActor in
 						await refresh?()
