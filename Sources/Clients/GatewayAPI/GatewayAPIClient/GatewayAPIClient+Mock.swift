@@ -8,10 +8,12 @@ import XCTestDynamicOverlay
 // MARK: - GatewayAPIClient + TestDependencyKey
 extension GatewayAPIClient: TestDependencyKey {
 	public static let previewValue = Self.mock()
+
 	public static let testValue = Self(
 		getCurrentBaseURL: unimplemented("\(Self.self).getCurrentBaseURL"),
 		setCurrentBaseURL: unimplemented("\(Self.self).setCurrentBaseURL"),
-		getGateway: unimplemented("\(Self.self).getGateway"),
+		getGatewayInfo: unimplemented("\(Self.self).getGatewayInfo"),
+		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
 		resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
 		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
@@ -30,7 +32,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		.init(
 			getCurrentBaseURL: { URL(string: "example.com")! },
 			setCurrentBaseURL: { _ in AppPreferences.NetworkAndGateway.primary },
-			getGateway: { .init(
+			getGatewayInfo: { .init(
 				ledgerState: .init(
 					network: "Network name",
 					stateVersion: 0,
@@ -44,6 +46,7 @@ extension GatewayAPIClient: TestDependencyKey {
 					openApiSchemaVersion: "schema-version"
 				)
 			) },
+			getEpoch: { .init(rawValue: 123) },
 			accountResourcesByAddress: { _ in
 				fatalError()
 			},

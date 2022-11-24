@@ -1,29 +1,37 @@
 import Collections
+import Dependencies
 import EngineToolkit
 import Foundation
 import KeychainClient
 import Mnemonic
 import NonEmpty
 import Profile
+import SLIP10
 
-public typealias MakeAccountNonVirtual = @Sendable (CreateAccountRequest) -> MakeEntityNonVirtualBySubmittingItToLedger
+public typealias DefineFunctionToMakeEntityNonVirtualBySubmittingItToLedger = @Sendable (NetworkID) -> MakeEntityNonVirtualBySubmittingItToLedger
 
 // MARK: - CreateNewProfileRequest
-public struct CreateNewProfileRequest {
+public struct CreateNewProfileRequest: Sendable {
+	public let networkAndGateway: AppPreferences.NetworkAndGateway
 	public let curve25519FactorSourceMnemonic: Mnemonic
-	public let createFirstAccountRequest: CreateAccountRequest
+	public let nameOfFirstAccount: String?
+	public let makeFirstAccountNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger
 
 	public init(
+		networkAndGateway: AppPreferences.NetworkAndGateway,
 		curve25519FactorSourceMnemonic: Mnemonic,
-		createFirstAccountRequest: CreateAccountRequest
+		nameOfFirstAccount: String?,
+		makeFirstAccountNonVirtualBySubmittingItToLedger: @escaping MakeEntityNonVirtualBySubmittingItToLedger
 	) {
+		self.networkAndGateway = networkAndGateway
 		self.curve25519FactorSourceMnemonic = curve25519FactorSourceMnemonic
-		self.createFirstAccountRequest = createFirstAccountRequest
+		self.nameOfFirstAccount = nameOfFirstAccount
+		self.makeFirstAccountNonVirtualBySubmittingItToLedger = makeFirstAccountNonVirtualBySubmittingItToLedger
 	}
 }
 
 // MARK: - ProfileClient
-public struct ProfileClient {
+public struct ProfileClient: DependencyKey, Sendable {
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
 	public var getNetworkAndGateway: GetNetworkAndGateway
@@ -46,7 +54,21 @@ public struct ProfileClient {
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
 	public var createOnLedgerAccount: CreateOnLedgerAccount
 	public var lookupAccountByAddress: LookupAccountByAddress
-	public var signTransaction: SignTransaction
+
+	// FIXME: - mainnet remove this and change to `async throws -> ([Prompt]) async throws -> NonEmpty<Set<Signer>>` when Profile supports multiple factor sources of different kinds.
+	public var privateKeysForAddresses: PrivateKeysForAddresses
+}
+
+// MARK: - PrivateKeysForAddressesRequest
+public struct PrivateKeysForAddressesRequest: Sendable, Hashable {
+	// Might be empty! And in case of empty...
+	public let addresses: OrderedSet<AccountAddress>
+	// ... we will use this NetworkID to get the first account and used that to sign
+	public let networkID: NetworkID
+	public init(addresses: OrderedSet<AccountAddress>, networkID: NetworkID) {
+		self.addresses = addresses
+		self.networkID = networkID
+	}
 }
 
 public extension ProfileClient {
@@ -55,9 +77,8 @@ public extension ProfileClient {
 	typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Void
 	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
-	typealias CreateNewProfileWithOnLedgerAccount = @Sendable (CreateNewProfileRequest, MakeAccountNonVirtual) async throws -> Profile
+	typealias CreateNewProfileWithOnLedgerAccount = @Sendable (CreateNewProfileRequest) async throws -> Profile
 
-	// Async throwing because this also
 	typealias InjectProfile = @Sendable (Profile) async throws -> Void
 
 	typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
@@ -70,16 +91,36 @@ public extension ProfileClient {
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
-	typealias CreateOnLedgerAccount = @Sendable (CreateAccountRequest, MakeAccountNonVirtual) async throws -> OnNetwork.Account
-	// FIXME: Cyon will hook this up when PR https://github.com/radixdlt/babylon-wallet-ios/pull/67 is merged
-	// Since it contains changes regarding NetworkID, which is now a getter and setter in ProfileClient
+	typealias CreateOnLedgerAccount = @Sendable (CreateOnLedgerAccountRequest) async throws -> OnNetwork.Account
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
-	typealias SignTransaction = @Sendable (TransactionManifest) async throws -> TransactionIntent.TXID
-	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
+
+	// FIXME: - mainnet remove this and change to `async throws -> ([Prompt]) async throws -> NonEmpty<Set<Signer>>` when Profile supports multiple factor sources of different kinds.
+	typealias PrivateKeysForAddresses = @Sendable (PrivateKeysForAddressesRequest) async throws -> NonEmpty<OrderedSet<PrivateKey>>
 }
 
-// MARK: - CreateAccountRequest
-public struct CreateAccountRequest {
+// MARK: - CreateOnLedgerAccountRequest
+public struct CreateOnLedgerAccountRequest: Sendable {
+	public let nameOfAccount: String?
+
+	public let defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger: DefineFunctionToMakeEntityNonVirtualBySubmittingItToLedger
+
+	public init(
+		nameOfAccount: String?,
+		defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger: @escaping DefineFunctionToMakeEntityNonVirtualBySubmittingItToLedger
+	) {
+		self.nameOfAccount = nameOfAccount
+		self.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger = defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger
+	}
+}
+
+// MARK: - AccountSignature
+public struct AccountSignature: Sendable, Hashable {
+	public let account: OnNetwork.Account
+	public let signature: SLIP10.Signature
+}
+
+// MARK: - CreateAnotherAccountRequest
+public struct CreateAnotherAccountRequest: Sendable, Hashable {
 	public let accountName: String?
 
 	public init(

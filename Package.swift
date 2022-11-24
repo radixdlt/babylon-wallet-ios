@@ -660,6 +660,7 @@ package.addModules([
 			"Common",
 			dependencies,
 			engineToolkit,
+			profile, // AccountAddress
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]

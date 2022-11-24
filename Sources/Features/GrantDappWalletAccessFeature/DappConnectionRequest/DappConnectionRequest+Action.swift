@@ -7,7 +7,7 @@ import SharedModels
 
 // MARK: - DappConnectionRequest.Action
 public extension DappConnectionRequest {
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -17,14 +17,14 @@ public extension DappConnectionRequest {
 
 // MARK: - DappConnectionRequest.Action.ChildAction
 public extension DappConnectionRequest.Action {
-	enum ChildAction: Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case chooseAccounts(ChooseAccounts.Action)
 	}
 }
 
 // MARK: - DappConnectionRequest.Action.ViewAction
 public extension DappConnectionRequest.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case dismissButtonTapped
 		case continueButtonTapped
 	}
@@ -32,7 +32,7 @@ public extension DappConnectionRequest.Action {
 
 // MARK: - DappConnectionRequest.Action.DelegateAction
 public extension DappConnectionRequest.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case finishedChoosingAccounts(
 			NonEmpty<OrderedSet<OnNetwork.Account>>,
 			request: P2P.OneTimeAccountAddressesRequestToHandle
@@ -44,7 +44,7 @@ public extension DappConnectionRequest.Action {
 
 // MARK: - DappConnectionRequest.Action.InternalAction
 public extension DappConnectionRequest.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -52,7 +52,7 @@ public extension DappConnectionRequest.Action {
 
 // MARK: - DappConnectionRequest.Action.InternalAction.SystemAction
 public extension DappConnectionRequest.Action.InternalAction {
-	enum SystemAction: Equatable {
+	enum SystemAction: Sendable, Equatable {
 		case loadAccountsResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
 	}
 }

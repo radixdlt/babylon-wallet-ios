@@ -24,9 +24,9 @@ extension ProfileClient: TestDependencyKey {
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
 		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.primary },
 		setNetworkAndGateway: { _ in },
-		createNewProfileWithOnLedgerAccount: { req, _ in
+		createNewProfileWithOnLedgerAccount: { req in
 			try! await Profile.new(
-				networkAndGateway: .primary,
+				networkAndGateway: req.networkAndGateway,
 				mnemonic: req.curve25519FactorSourceMnemonic
 			)
 		},
@@ -46,15 +46,15 @@ extension ProfileClient: TestDependencyKey {
 		setDisplayAppPreferences: { _ in
 			fatalError()
 		},
-		createOnLedgerAccount: { _, _ in
+		createOnLedgerAccount: { _ in
 			fatalError()
 		},
 		lookupAccountByAddress: { _ in
 			.placeholder0
 		},
-		signTransaction: { _ in
+		privateKeysForAddresses: { _ in
 			struct MockError: LocalizedError {
-				let errorDescription: String? = "Transaction signing failed!"
+				let errorDescription: String? = "Failed to get privateKeys for addresses"
 			}
 			throw MockError()
 		}
@@ -65,7 +65,7 @@ extension ProfileClient: TestDependencyKey {
 		getGatewayAPIEndpointBaseURL: unimplemented("\(Self.self).getGatewayAPIEndpointBaseURL"),
 		getNetworkAndGateway: unimplemented("\(Self.self).getNetworkAndGateway"),
 		setNetworkAndGateway: unimplemented("\(Self.self).setNetworkAndGateway"),
-		createNewProfileWithOnLedgerAccount: { _, _ in throw UnimplementedError(description: "\(Self.self).createNewProfileWithOnLedgerAccount is unimplemented") },
+		createNewProfileWithOnLedgerAccount: unimplemented("\(Self.self).createNewProfileWithOnLedgerAccount"),
 		injectProfile: unimplemented("\(Self.self).injectProfile"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
@@ -75,9 +75,9 @@ extension ProfileClient: TestDependencyKey {
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
 		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
-		createOnLedgerAccount: { _, _ in throw UnimplementedError(description: "\(Self.self).createOnLedgerAccount is unimplemented") },
+		createOnLedgerAccount: unimplemented("\(Self.self).createOnLedgerAccount"),
 		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
-		signTransaction: unimplemented("\(Self.self).signTransaction")
+		privateKeysForAddresses: unimplemented("\(Self.self).privateKeysForAddresses")
 	)
 }
 

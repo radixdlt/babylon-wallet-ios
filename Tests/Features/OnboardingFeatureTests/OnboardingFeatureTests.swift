@@ -31,18 +31,26 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 			initialState: NewProfile.State(canProceed: true),
 			reducer: NewProfile()
 		)
-		store.dependencies.profileClient.createNewProfileWithOnLedgerAccount = { req, _ in
+		store.dependencies.profileClient.createNewProfileWithOnLedgerAccount = { req in
 			try! await Profile.new(
-				networkAndGateway: .primary,
+				networkAndGateway: req.networkAndGateway,
 				mnemonic: req.curve25519FactorSourceMnemonic
 			)
 		}
+		store.dependencies.transactionClient.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger = { _ in
+			{ _ in
+				//                return .init
+				//                public typealias MakeEntityNonVirtualBySubmittingItToLedger = @Sendable (PrivateKey) async throws -> any AddressKindProtocol
+				try AccountAddress(address: "mock")
+			}
+		}
+		store.dependencies.transactionClient.signAndSubmitTransaction = { _ in .placeholder }
 		store.dependencies.keychainClient = keychainClient
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 		let generateMnemonicCalled = ActorIsolated<Bool>(false)
 
 		let mnemonicGeneratorExpectation = expectation(description: "Generate Mnemonic should have been called")
-		store.dependencies.mnemonicGenerator = { _, _ in
+		store.dependencies.mnemonicGenerator.generate = { _, _ in
 			Task {
 				await generateMnemonicCalled.setValue(true)
 				mnemonicGeneratorExpectation.fulfill()

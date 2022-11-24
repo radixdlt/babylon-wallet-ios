@@ -7,14 +7,14 @@ import JSON
 import ProfileClient
 import SharedModels
 
-// MARK: - P2PConnectivityClient + DependencyKey
-extension P2PConnectivityClient: DependencyKey {
-	public static let liveValue: Self = {
+// MARK: - P2PConnectivityClient + :LiveValue
+public extension P2PConnectivityClient {
+	static let liveValue: Self = {
 		@Dependency(\.profileClient) var profileClient
 
 		final actor ConnectionsHolder: GlobalActor {
 			private var connections: [ConnectionID: P2P.ConnectedClient] = [:]
-			public var p2pClients: AsyncCurrentValueSubject<[P2P.ClientWithConnectionStatus]> = .init([])
+			var p2pClients: AsyncCurrentValueSubject<[P2P.ClientWithConnectionStatus]> = .init([])
 			static let shared = ConnectionsHolder()
 
 			func mapID(_ passwordID: P2PClient.ID) throws -> ConnectionID {

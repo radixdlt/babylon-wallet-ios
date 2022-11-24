@@ -115,7 +115,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				E667FFD728F6F7F40015544F /* PBXTargetDependency */,
+				E6A17E57292FB01500D40EDB /* PBXTargetDependency */,
 			);
 			name = "BabylonWallet (iOS)";
 			packageProductDependencies = (
@@ -226,9 +226,9 @@
 			isa = PBXTargetDependency;
 			productRef = E667FFD428F6F7F00015544F /* AppFeature */;
 		};
-		E667FFD728F6F7F40015544F /* PBXTargetDependency */ = {
+		E6A17E57292FB01500D40EDB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			productRef = E667FFD628F6F7F40015544F /* AppFeature */;
+			productRef = E6A17E56292FB01500D40EDB /* AppFeature */;
 		};
 /* End PBXTargetDependency section */
 
@@ -455,13 +455,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = "$(BUILD_NUMBER_GLOBAL_UNIQUE)";
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 7SPGKHD4HZ;
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 7SPGKHD4HZ;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -556,11 +556,11 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = AppFeature;
 		};
-		E667FFD628F6F7F40015544F /* AppFeature */ = {
+		E6805BDE286DB74300861180 /* AppFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppFeature;
 		};
-		E6805BDE286DB74300861180 /* AppFeature */ = {
+		E6A17E56292FB01500D40EDB /* AppFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppFeature;
 		};

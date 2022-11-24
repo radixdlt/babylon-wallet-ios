@@ -8,7 +8,7 @@ import TransactionSigningFeature
 
 // MARK: - HandleDappRequests.Action
 public extension HandleDappRequests {
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		public static func view(_ action: InternalAction.ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case child(ChildAction)
@@ -16,23 +16,23 @@ public extension HandleDappRequests {
 }
 
 public extension HandleDappRequests.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case system(SystemAction)
 		case view(ViewAction)
 	}
 
-	enum ChildAction: Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case grantDappWalletAccess(DappConnectionRequest.Action)
 		case transactionSigning(TransactionSigning.Action)
 	}
 }
 
 public extension HandleDappRequests.Action.InternalAction {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 	}
 
-	enum SystemAction: Equatable {
+	enum SystemAction: Sendable, Equatable {
 		case loadConnections
 		case receiveRequestFromP2PClientResult(TaskResult<P2P.RequestFromClient>)
 		case dismissed(P2P.RequestFromClient)

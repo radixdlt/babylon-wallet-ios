@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - ChooseAccounts.Row.Action
 public extension ChooseAccounts.Row {
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -11,14 +11,14 @@ public extension ChooseAccounts.Row {
 
 // MARK: - ChooseAccounts.Row.Action.ViewAction
 public extension ChooseAccounts.Row.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case didSelect
 	}
 }
 
 // MARK: - ChooseAccounts.Row.Action.InternalAction
 public extension ChooseAccounts.Row.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -26,10 +26,10 @@ public extension ChooseAccounts.Row.Action {
 
 // MARK: - ChooseAccounts.Row.Action.InternalAction.SystemAction
 public extension ChooseAccounts.Row.Action.InternalAction {
-	enum SystemAction: Equatable {}
+	enum SystemAction: Sendable, Equatable {}
 }
 
 // MARK: - ChooseAccounts.Row.Action.DelegateAction
 public extension ChooseAccounts.Row.Action {
-	enum DelegateAction: Equatable {}
+	enum DelegateAction: Sendable, Equatable {}
 }

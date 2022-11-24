@@ -6,7 +6,7 @@ import Profile
 // MARK: - P2P.ClientWithConnectionStatus
 public extension P2P {
 	// MARK: - ClientWithConnectionStatus
-	struct ClientWithConnectionStatus: Identifiable, Equatable {
+	struct ClientWithConnectionStatus: Sendable, Identifiable, Equatable {
 		public let p2pClient: P2PClient
 		public var connectionStatus: Connection.State
 

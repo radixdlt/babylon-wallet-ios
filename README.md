@@ -156,12 +156,14 @@ We use [Bundler](https://bundler.io/) to install and update Fastlane. Follow bel
 
 - Install ruby v3.1.2; it is strongly recommend to use a tool like [rbenv](https://github.com/rbenv/rbenv) to manage the rubby version.
 - Install bundler:
-```
-  gem install bundler -v 2.3.25
+
+```sh
+gem install bundler -v 2.3.25
 ```
 - Install this project gems:
-```
-  bundle install
+
+```sh
+bundle install
 ```
 
 ### Development config setup
@@ -169,15 +171,22 @@ We use [Bundler](https://bundler.io/) to install and update Fastlane. Follow bel
 - Download [fastlane secrets](https://start.1password.com/open/i?a=JWO4INKPOFHCDMZ2CYQMY4DRY4&v=srjnzoh2conosxfpkekxlakwzq&i=c75l3mugtfopfd5ebrcn22hssu&h=rdxworks.1password.com).
 - Put the downloaded file in [fastlane](fastlane) folder. Be sure to remove the leading underscore from the file name.
 - Run the below command to bring the necessary certificates for development:
+
 ```sh
 bundle exec fastlane ios install_certificates
 bundle exec fastlane mac install_certificates
 ```
 - If your device is unregistered, register it with the below command, it will prompt you to enter the device name and device UDID.
+
+#### For iOS
+
 ```sh
-# For iPhone
 bundle exec fastlane ios register_new_iphone_device
-# For mac
+```
+
+#### For macOS
+
+```sh
 bundle exec fastlane mac register_new_mac_device
 ```
 
