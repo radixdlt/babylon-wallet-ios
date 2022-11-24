@@ -18,7 +18,7 @@ public struct Main: ReducerProtocol {
 		}
 
 		Scope(state: \.handleDappRequests, action: /Action.child .. Action.ChildAction.handleDappRequest) {
-			HandleDappRequests()
+			HandleDappRequests()._printChanges()
 		}
 
 		Reduce(self.core)

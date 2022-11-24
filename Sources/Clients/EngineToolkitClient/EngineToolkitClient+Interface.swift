@@ -69,3 +69,10 @@ public struct AccountAddressesNeedingToSignTransactionRequest: Sendable, Hashabl
 		self.networkID = networkID
 	}
 }
+
+// MARK: - TransactionManifest + CustomDumpStringConvertible
+extension TransactionManifest: CustomDumpStringConvertible {
+	public var customDumpDescription: String {
+		toString(blobOutputFormat: .includeBlobsByByteCountOnly, networkID: .primary)
+	}
+}

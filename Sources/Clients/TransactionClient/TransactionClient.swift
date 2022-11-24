@@ -191,6 +191,8 @@ public extension TransactionClient {
 			},
 			signAndSubmitTransaction: { manifest in
 				try await signAndSubmit(manifest: manifest) { accountAddressesNeedingToSignTransactionRequest in
+
+					// Might be empty
 					let addressesNeededToSign = try engineToolkitClient
 						.accountAddressesNeedingToSignTransaction(
 							accountAddressesNeedingToSignTransactionRequest
@@ -201,7 +203,7 @@ public extension TransactionClient {
 						$0.first
 					}
 
-					let privateKeys = try await profileClient.privateKeysForAddresses(addressesNeededToSign)
+					let privateKeys = try await profileClient.privateKeysForAddresses(.init(addresses: .init(addressesNeededToSign), networkID: accountAddressesNeedingToSignTransactionRequest.networkID))
 
 					let notaryPrivateKey = selectNotary(privateKeys)
 

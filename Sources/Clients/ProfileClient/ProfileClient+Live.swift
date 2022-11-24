@@ -129,30 +129,50 @@ public extension ProfileClient {
 				}
 			},
 			lookupAccountByAddress: lookupAccountByAddress,
-			privateKeysForAddresses: { addresses in
-				// FIXME: betanet fix me
-				let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
+			privateKeysForAddresses: { request in
 
-				let matrix: [Set<PrivateKey>] = try await profileHolder.getAsync { profile -> [Set<PrivateKey>] in
-					try await accounts.asyncMap { account -> Set<PrivateKey> in
-						try await profile.withPrivateKeys(
-							of: account,
-							mnemonicForFactorSourceByReference: { [keychainClient] reference in
-								try keychainClient.loadFactorSourceMnemonic(reference: reference)
+				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { [keychainClient] reference in
+					try keychainClient.loadFactorSourceMnemonic(reference: reference)
+				}
+
+				func getPrivateKeysFromAddresses() async throws -> OrderedSet<PrivateKey>? {
+					guard let addresses = NonEmpty(rawValue: request.addresses) else { return nil }
+
+					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
+
+					let matrix: [Set<PrivateKey>] = try await profileHolder.getAsync { profile -> [Set<PrivateKey>] in
+						try await accounts.asyncMap { account -> Set<PrivateKey> in
+							try await profile.withPrivateKeys(
+								of: account,
+								mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
+							) { (keys: NonEmpty<Set<PrivateKey>>) -> Set<PrivateKey> in
+								keys.rawValue
 							}
-						) { (keys: NonEmpty<Set<PrivateKey>>) -> Set<PrivateKey> in
-							keys.rawValue
 						}
 					}
-				}
-				var privateKeys = OrderedSet<PrivateKey>()
-				matrix.forEach {
-					privateKeys.append(contentsOf: $0)
+					var privateKeys = OrderedSet<PrivateKey>()
+					matrix.forEach {
+						privateKeys.append(contentsOf: $0)
+					}
+					return privateKeys
 				}
 
-				guard let nonEmptyKeys = NonEmpty(rawValue: privateKeys) else {
+				func getPrivateKeys() async throws -> OrderedSet<PrivateKey> {
+					guard let fromAddresses = try? await getPrivateKeysFromAddresses() else {
+						// TransactionManifest does not reference any accounts => use any account!
+						return try await profileHolder.getAsync { profile in
+							try await profile.withPrivateKeys(networkID: request.networkID, kind: .account, entityIndex: 0, mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference) {
+								OrderedSet($0)
+							}
+						}
+					}
+					return fromAddresses
+				}
+
+				guard let nonEmptyKeys = try await NonEmpty(rawValue: getPrivateKeys()) else {
 					throw FoundNoKeysForAddresses()
 				}
+
 				return nonEmptyKeys
 			}
 		)
