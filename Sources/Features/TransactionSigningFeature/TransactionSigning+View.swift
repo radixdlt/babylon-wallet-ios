@@ -26,25 +26,32 @@ public extension TransactionSigning.View {
 			Screen(title: "Sign TX", navBarActionStyle: .close, action: { viewStore.send(.closeButtonTapped) }) {
 				ZStack {
 					VStack(spacing: 20) {
-						ScrollView([.vertical], showsIndicators: false) {
-							Text(viewStore.state.manifest)
-								.padding()
-								.font(.system(size: 13, design: .monospaced))
-								.frame(maxHeight: .infinity, alignment: .topLeading)
-						}
-						.background(Color(white: 0.9))
+						if let manifest = viewStore.manifest {
+							ScrollView([.vertical], showsIndicators: false) {
+								Text(manifest)
+									.padding()
+									.font(.system(size: 13, design: .monospaced))
+									.frame(maxHeight: .infinity, alignment: .topLeading)
+							}
+							.background(Color(white: 0.9))
 
-						Button("Sign Transaction") {
-							viewStore.send(.signTransactionButtonTapped)
+							Button("Sign Transaction") {
+								viewStore.send(.signTransactionButtonTapped)
+							}
+							.buttonStyle(.primary)
+							.enabled(viewStore.isSignButtonEnabled)
+						} else {
+							LoadingView()
 						}
-						.buttonStyle(.primary)
-						.enabled(viewStore.isSignButtonEnabled)
 					}
 					.padding([.horizontal, .bottom])
 
 					if viewStore.isShowingLoader {
 						LoadingView()
 					}
+				}
+				.onAppear {
+					viewStore.send(.didAppear)
 				}
 			}
 		}
@@ -54,15 +61,12 @@ public extension TransactionSigning.View {
 // MARK: - TransactionSigning.View.ViewState
 extension TransactionSigning.View {
 	struct ViewState: Equatable {
-		let manifest: String
-		let numberOfLines: Int
+		let manifest: String?
 		let isShowingLoader: Bool
 		let isSignButtonEnabled: Bool
 
 		init(state: TransactionSigning.State) {
-			let manifest = state.transactionManifest.toString(preamble: "", blobOutputFormat: .includeBlobsByByteCountOnly, blobPreamble: "\n\nBLOBS:\n", networkID: .primary)
-			self.manifest = manifest
-			numberOfLines = manifest.lines()
+			manifest = state.transactionWithLockFeeString
 			isShowingLoader = state.isSigningTX
 			isSignButtonEnabled = !state.isSigningTX
 		}

@@ -16,6 +16,7 @@ public extension TransactionSigning {
 // MARK: - TransactionSigning.Action.ViewAction
 public extension TransactionSigning.Action {
 	enum ViewAction: Sendable, Equatable {
+		case didAppear
 		case signTransactionButtonTapped
 		case closeButtonTapped
 	}
@@ -25,6 +26,8 @@ public extension TransactionSigning.Action {
 public extension TransactionSigning.Action {
 	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
+		case loadNetworkIDResult(TaskResult<NetworkID>, manifestWithFeeLock: TransactionManifest)
+		case addLockFeeInstructionToManifestResult(TaskResult<TransactionManifest>)
 		case signTransactionResult(TaskResult<TransactionIntent.TXID>)
 	}
 }

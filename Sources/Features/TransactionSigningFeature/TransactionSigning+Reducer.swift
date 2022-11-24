@@ -8,17 +8,59 @@ import TransactionClient
 public struct TransactionSigning: ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.transactionClient) var transactionClient
+	@Dependency(\.profileClient) var profileClient
 	public init() {}
 }
 
 public extension TransactionSigning {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
+		case .internal(.view(.didAppear)):
+			return .run { [transactionClient, manifest = state.transactionManifestWithoutLockFee] send in
+				await send(.internal(.addLockFeeInstructionToManifestResult(
+					TaskResult {
+						try await transactionClient.addLockFeeInstructionToManifest(manifest)
+					}
+				)))
+			}
+
+		case let .internal(.addLockFeeInstructionToManifestResult(.success(transactionWithLockFee))):
+			return .run { [profileClient] send in
+				await send(.internal(.loadNetworkIDResult(
+					TaskResult { await profileClient.getCurrentNetworkID() },
+					manifestWithFeeLock: transactionWithLockFee
+				)))
+			}
+
+		case let .internal(.loadNetworkIDResult(.success(networkID), manifestWithFeeLock)):
+			state.transactionWithLockFeeString = manifestWithFeeLock.toString(
+				preamble: "",
+				blobOutputFormat: .includeBlobsByByteCountOnly,
+				blobPreamble: "\n\nBLOBS:\n",
+				networkID: networkID
+			)
+			return .none
+
+		case let .internal(.loadNetworkIDResult(.failure(error), _)):
+			errorQueue.schedule(error)
+			return .none
+
+		case let .internal(.addLockFeeInstructionToManifestResult(.failure(error))):
+			errorQueue.schedule(error)
+			return .none
+
 		case .internal(.view(.signTransactionButtonTapped)):
+			guard
+				let transactionWithLockFee = state.transactionWithLockFee
+			else {
+				return .none
+			}
+
 			state.isSigningTX = true
-			return .run { [transactionManifest = state.transactionManifest] send in
+
+			return .run { [transactionClient] send in
 				await send(.internal(.signTransactionResult(TaskResult {
-					try await transactionClient.signAndSubmitTransaction(transactionManifest).txID
+					try await transactionClient.signAndSubmitTransaction(transactionWithLockFee).txID
 				})))
 			}
 
