@@ -1,10 +1,10 @@
-name: Test Flight Deploy
+name: "Test Flight Deploy"
 
 on:
   workflow_dispatch:
 
 jobs:
-  test_flight_deploy:
+  testFlightDeploy:
     name: "Test Flight Deploy"
     runs-on: macos-12
 
