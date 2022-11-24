@@ -31,6 +31,7 @@ package.dependencies += [
 	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
 	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
+	.package(url: "https://github.com/globulus/swiftui-pull-to-refresh", from: "1.1.8"),
 
 	// TCA - ComposableArchitecture used as architecture
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.46.0"),
@@ -816,6 +817,7 @@ package.addModules([
 		name: "DesignSystem",
 		dependencies: [
 			"Resources",
+			.product(name: "SwiftUIPullToRefresh", package: "swiftui-pull-to-refresh", condition: .when(platforms: [.iOS])),
 		],
 		resources: [.process("Fonts")],
 		tests: .no,
