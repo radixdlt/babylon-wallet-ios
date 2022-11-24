@@ -51,6 +51,7 @@ public extension ManageP2PClients.View {
 									.foregroundColor(.app.gray1)
 
 									InputPassword.View(store: inputPasswordStore)
+										.buttonStyle(.secondaryRectangular())
 
 									Spacer()
 								}
