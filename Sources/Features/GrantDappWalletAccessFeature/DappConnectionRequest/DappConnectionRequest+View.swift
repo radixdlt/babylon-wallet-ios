@@ -77,7 +77,7 @@ private extension DappConnectionRequest.View {
 					Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
 						viewStore.send(.continueButtonTapped)
 					}
-					.buttonStyle(.primary)
+					.buttonStyle(.primaryRectangular)
 				}
 				.padding(.horizontal, .medium1)
 			}

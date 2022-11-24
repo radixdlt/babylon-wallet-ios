@@ -23,71 +23,79 @@ public extension ManageGatewayAPIEndpoints.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			Screen(
-				title: "Edit Gateway API URL",
-				navBarActionStyle: .close,
-				action: { viewStore.send(.dismissButtonTapped) }
-			) {
-				VStack(alignment: .leading) {
-					if let networkAndGateway = viewStore.networkAndGateway {
-						networkAndGatewayView(networkAndGateway)
-					}
-
-					Spacer()
-
-					ZStack {
-						VStack {
-							TextField(
-								"Scheme",
-								text: viewStore.binding(
-									get: \.scheme,
-									send: { .schemeChanged($0) }
-								)
-							)
-
-							TextField(
-								"Host",
-								text: viewStore.binding(
-									get: \.host,
-									send: { .hostChanged($0) }
-								)
-							)
-
-							TextField(
-								"Path",
-								text: viewStore.binding(
-									get: \.path,
-									send: { .pathChanged($0) }
-								)
-							)
-
-							TextField(
-								"Port",
-								text: viewStore.binding(
-									get: \.port,
-									send: { .portChanged($0) }
-								)
-							)
+			ForceFullScreen {
+				VStack {
+					NavigationBar(
+						titleText: "Edit Gateway API URL",
+						leadingButton: {
+							CloseButton {
+								viewStore.send(.dismissButtonTapped)
+							}
 						}
-						.textFieldStyle(.roundedBorder)
+					)
+					.padding([.horizontal, .top], .medium3)
 
-						if viewStore.isShowingLoader {
-							LoadingView()
+					VStack(alignment: .leading) {
+						if let networkAndGateway = viewStore.networkAndGateway {
+							networkAndGatewayView(networkAndGateway)
 						}
-					}
 
-					Spacer()
+						Spacer()
 
-					Button("Switch To") {
-						viewStore.send(.switchToButtonTapped)
+						ZStack {
+							VStack {
+								TextField(
+									"Scheme",
+									text: viewStore.binding(
+										get: \.scheme,
+										send: { .schemeChanged($0) }
+									)
+								)
+
+								TextField(
+									"Host",
+									text: viewStore.binding(
+										get: \.host,
+										send: { .hostChanged($0) }
+									)
+								)
+
+								TextField(
+									"Path",
+									text: viewStore.binding(
+										get: \.path,
+										send: { .pathChanged($0) }
+									)
+								)
+
+								TextField(
+									"Port",
+									text: viewStore.binding(
+										get: \.port,
+										send: { .portChanged($0) }
+									)
+								)
+							}
+							.textFieldStyle(.roundedBorder)
+
+							if viewStore.isShowingLoader {
+								LoadingView()
+							}
+						}
+
+						Spacer()
+
+						Button("Switch To") {
+							viewStore.send(.switchToButtonTapped)
+						}
+						.enabled(viewStore.isSwitchToButtonEnabled)
 					}
-					.enabled(viewStore.isSwitchToButtonEnabled)
+					.padding()
+					.buttonStyle(.primaryRectangular)
 				}
-				.padding()
-				.buttonStyle(.primary)
-			}
-			.onAppear {
-				viewStore.send(.didAppear)
+				.onAppear {
+					viewStore.send(.didAppear)
+				}
 			}
 		}
 	}

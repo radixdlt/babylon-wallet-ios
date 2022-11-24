@@ -46,8 +46,9 @@ public extension TransactionSigning.View {
 					}
 					.padding([.horizontal, .bottom])
 
-					if viewStore.isShowingLoader {
-						LoadingView()
+						if viewStore.isShowingLoader {
+							LoadingView()
+						}
 					}
 				}
 				.onAppear {

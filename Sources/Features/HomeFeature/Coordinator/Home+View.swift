@@ -111,7 +111,7 @@ private extension Home.View {
 					Button(L10n.CreateAccount.createNewAccount) {
 						viewStore.send(.createAccountButtonTapped)
 					}
-					.buttonStyle(.secondary())
+					.buttonStyle(.secondaryRectangular())
 
 					Spacer()
 				}

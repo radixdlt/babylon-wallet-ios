@@ -29,7 +29,7 @@ public extension AccountDetails.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack(spacing: .zero) {
-					Header(
+					NavigationBar(
 						titleText: viewStore.displayName,
 						leadingButton: {
 							BackButton {

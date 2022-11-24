@@ -1,7 +1,7 @@
 import SwiftUI
 
-// MARK: - SecondaryButtonStyle
-public struct SecondaryButtonStyle: ButtonStyle {
+// MARK: - SecondaryRectangularButtonStyle
+public struct SecondaryRectangularButtonStyle: ButtonStyle {
 	@Environment(\.isEnabled) var isEnabled: Bool
 	let shouldExpand: Bool
 
@@ -18,8 +18,8 @@ public struct SecondaryButtonStyle: ButtonStyle {
 	}
 }
 
-public extension ButtonStyle where Self == SecondaryButtonStyle {
-	static func secondary(shouldExpand: Bool = false) -> Self {
+public extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
+	static func secondaryRectangular(shouldExpand: Bool = false) -> Self {
 		Self(shouldExpand: shouldExpand)
 	}
 }

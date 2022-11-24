@@ -1,7 +1,7 @@
 import SwiftUI
 
-// MARK: - PrimaryButtonStyle
-public struct PrimaryButtonStyle: ButtonStyle {
+// MARK: - PrimaryRectangularButtonStyle
+public struct PrimaryRectangularButtonStyle: ButtonStyle {
 	@Environment(\.isEnabled) var isEnabled: Bool
 
 	public func makeBody(configuration: Configuration) -> some View {
@@ -16,6 +16,6 @@ public struct PrimaryButtonStyle: ButtonStyle {
 	}
 }
 
-public extension ButtonStyle where Self == PrimaryButtonStyle {
-	static var primary: Self { Self() }
+public extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
+	static var primaryRectangular: Self { Self() }
 }

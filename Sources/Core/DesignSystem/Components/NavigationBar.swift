@@ -1,58 +1,7 @@
-import Foundation
 import SwiftUI
 
 // MARK: - NavigationBar
-public struct NavigationBar: View {
-	let action: () -> Void
-	let style: Style
-	let title: String
-
-	public init(_ title: String, style: Style, action: @escaping () -> Void) {
-		self.style = style
-		self.action = action
-		self.title = title
-	}
-}
-
-/*
- #if DEBUG
-
- // MARK: - NavigationBar_Preview
- struct NavigationBar_Preview: PreviewProvider {
- 	static var previews: some View {
- 		NavigationBar(
- 			"A title",
- 			style: .close,
- 			action: {}
- 		)
- 	}
- }
- #endif // DEBUG
- */
-
-public extension NavigationBar {
-	enum Style {
-		case close, back
-	}
-
-	var body: some View {
-		HStack {
-			switch style {
-			case .back:
-				BackButton(action: action)
-			case .close:
-				CloseButton(action: action)
-			}
-			Spacer()
-			Text(title)
-
-			Spacer()
-		}
-	}
-}
-
-// MARK: - Header
-public struct Header<Content: View>: View {
+public struct NavigationBar<Content>: View where Content: View {
 	let titleText: String?
 	let leadingButton: Content?
 	let trailingButton: Content?
@@ -94,7 +43,7 @@ public struct Header<Content: View>: View {
 }
 
 // MARK: - Private Computed Properties
-private extension Header {
+private extension NavigationBar {
 	var placeholderSpacer: some View {
 		Spacer()
 			.frame(.small)
@@ -103,10 +52,10 @@ private extension Header {
 
 #if DEBUG
 
-// MARK: - Header_Previews
-struct Header_Previews: PreviewProvider {
+// MARK: - NavigationBar_Previews
+struct NavigationBar_Previews: PreviewProvider {
 	static var previews: some View {
-		Header(
+		NavigationBar(
 			titleText: "A title",
 			leadingButton: { Button("Settings", action: {}) },
 			trailingButton: { Button("Settings", action: {}) }

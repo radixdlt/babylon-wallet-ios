@@ -25,14 +25,15 @@ public extension CreateAccount.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack(spacing: .zero) {
-					Header(
+					NavigationBar(
 						leadingButton: {
 							CloseButton {
 								viewStore.send(.closeButtonTapped)
 							}
 						}
 					)
-					.padding(.medium3)
+					.foregroundColor(.app.gray1)
+					.padding([.horizontal, .top], .medium3)
 
 					VStack {
 						title(with: viewStore)
@@ -68,7 +69,7 @@ public extension CreateAccount.View {
 						Button(L10n.CreateAccount.createAccountButtonTitle) {
 							viewStore.send(.createAccountButtonTapped)
 						}
-						.buttonStyle(.primary)
+						.buttonStyle(.primaryRectangular)
 						.enabled(viewStore.isCreateAccountButtonEnabled)
 					}
 					.padding([.horizontal, .bottom], .medium1)

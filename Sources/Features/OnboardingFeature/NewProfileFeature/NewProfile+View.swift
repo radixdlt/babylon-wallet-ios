@@ -25,7 +25,7 @@ public extension NewProfile.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
-					Header(
+					NavigationBar(
 						titleText: "New Profile",
 						leadingButton: {
 							BackButton {
