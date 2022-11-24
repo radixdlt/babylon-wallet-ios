@@ -92,7 +92,12 @@ private_lane :code_signing do |options|
         app_store_connect_api_key
     end
 
-    create_keychain(unlock: true)
+    create_keychain(
+        name: ENV[MATCH_KEYCHAIN_NAME],
+        password: ENV[MATCH_KEYCHAIN_PASSWORD],
+        unlock: false,
+        timeout: false
+    ) 
     sync_code_signing(
         type: type,
         force_for_new_devices: true,
