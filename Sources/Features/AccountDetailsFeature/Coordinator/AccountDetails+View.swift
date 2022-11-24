@@ -41,7 +41,7 @@ public extension AccountDetails.View {
 					.padding([.horizontal, .top], .medium3)
 
 					AddressView(
-						address: viewStore.address.wrapAsAddress(),
+						address: viewStore.address.wrapAsAddress().address,
 						copyAddressAction: {
 							viewStore.send(.copyAddressButtonTapped)
 						}

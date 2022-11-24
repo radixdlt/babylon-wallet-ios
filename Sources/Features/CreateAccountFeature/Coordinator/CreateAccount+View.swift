@@ -49,6 +49,7 @@ public extension CreateAccount.View {
 									get: \.accountName,
 									send: { .textFieldChanged($0) }
 								),
+								hint: L10n.CreateAccount.explanation,
 								binding: $focusedField,
 								equals: .accountName,
 								first: viewStore.binding(
@@ -126,6 +127,7 @@ private extension CreateAccount.View {
 	func textField<Value>(
 		placeholder: String,
 		text: Binding<String>,
+		hint: String,
 		binding: FocusState<Value>.Binding,
 		equals: Value,
 		first: Binding<Value>
@@ -149,7 +151,7 @@ private extension CreateAccount.View {
 					.stroke(Color.app.gray1, lineWidth: 1)
 			)
 
-			Text(L10n.CreateAccount.explanation)
+			Text(hint)
 				.foregroundColor(.app.gray2)
 				.textStyle(.body2Regular)
 		}

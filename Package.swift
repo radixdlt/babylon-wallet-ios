@@ -353,6 +353,7 @@ package.addModules([
 		dependencies: [
 			"Asset",
 			"Common",
+			"DesignSystem",
 			tca,
 		],
 		tests: .yes(
@@ -501,6 +502,7 @@ package.addModules([
 		dependencies: [
 			"Asset",
 			"Common",
+			"DesignSystem",
 			tca,
 		],
 		tests: .yes(
