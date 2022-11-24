@@ -26,10 +26,8 @@ public extension CreateAccount.View {
 			ForceFullScreen {
 				VStack(spacing: .zero) {
 					NavigationBar(
-						leadingButton: {
-							CloseButton {
-								viewStore.send(.closeButtonTapped)
-							}
+						leadingItem: CloseButton {
+							viewStore.send(.closeButtonTapped)
 						}
 					)
 					.foregroundColor(.app.gray1)

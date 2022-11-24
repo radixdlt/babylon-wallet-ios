@@ -42,10 +42,8 @@ public extension ManageP2PClients.View {
 								VStack {
 									NavigationBar(
 										titleText: "New Connection",
-										leadingButton: {
-											CloseButton {
-												viewStore.send(.dismissNewConnectionFlowButtonTapped)
-											}
+										leadingItem: CloseButton {
+											viewStore.send(.dismissNewConnectionFlowButtonTapped)
 										}
 									)
 									.foregroundColor(.app.gray1)
@@ -88,10 +86,8 @@ private extension ManageP2PClients.View {
 			VStack {
 				NavigationBar(
 					titleText: "P2P Connections",
-					leadingButton: {
-						BackButton {
-							viewStore.send(.dismissButtonTapped)
-						}
+					leadingItem: BackButton {
+						viewStore.send(.dismissButtonTapped)
 					}
 				)
 				.foregroundColor(.app.gray1)

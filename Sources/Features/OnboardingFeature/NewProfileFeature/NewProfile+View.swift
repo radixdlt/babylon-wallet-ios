@@ -27,10 +27,8 @@ public extension NewProfile.View {
 				VStack {
 					NavigationBar(
 						titleText: "New Profile",
-						leadingButton: {
-							BackButton {
-								viewStore.send(.backButtonPressed)
-							}
+						leadingItem: BackButton {
+							viewStore.send(.backButtonPressed)
 						}
 					)
 

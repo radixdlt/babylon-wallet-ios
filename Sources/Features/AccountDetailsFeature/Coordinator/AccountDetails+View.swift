@@ -31,10 +31,8 @@ public extension AccountDetails.View {
 				VStack(spacing: .zero) {
 					NavigationBar(
 						titleText: viewStore.displayName,
-						leadingButton: {
-							BackButton {
-								viewStore.send(.dismissAccountDetailsButtonTapped)
-							}
+						leadingItem: BackButton {
+							viewStore.send(.dismissAccountDetailsButtonTapped)
 						}
 					)
 					.foregroundColor(.app.white)

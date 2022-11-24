@@ -27,10 +27,8 @@ public extension ManageGatewayAPIEndpoints.View {
 				VStack {
 					NavigationBar(
 						titleText: "Edit Gateway API URL",
-						leadingButton: {
-							CloseButton {
-								viewStore.send(.dismissButtonTapped)
-							}
+						leadingItem: CloseButton {
+							viewStore.send(.dismissButtonTapped)
 						}
 					)
 					.foregroundColor(.app.gray1)

@@ -67,10 +67,8 @@ private extension Settings.View {
 			VStack {
 				NavigationBar(
 					titleText: "Settings",
-					leadingButton: {
-						CloseButton {
-							viewStore.send(.dismissSettingsButtonTapped)
-						}
+					leadingItem: CloseButton {
+						viewStore.send(.dismissSettingsButtonTapped)
 					}
 				)
 				.foregroundColor(.app.gray1)

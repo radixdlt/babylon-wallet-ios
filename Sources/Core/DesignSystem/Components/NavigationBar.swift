@@ -1,24 +1,24 @@
 import SwiftUI
 
 // MARK: - NavigationBar
-public struct NavigationBar<Content>: View where Content: View {
+public struct NavigationBar<LeadingItem: View, TrailingItem: View>: View {
 	let titleText: String?
-	let leadingButton: Content?
-	let trailingButton: Content?
+	let leadingItem: LeadingItem?
+	let trailingItem: TrailingItem?
 
 	public init(
 		titleText: String? = nil,
-		leadingButton: (() -> Content)? = nil,
-		trailingButton: (() -> Content)? = nil
+		leadingItem: (() -> LeadingItem)? = nil,
+		trailingItem: (() -> TrailingItem)? = nil
 	) {
 		self.titleText = titleText
-		self.leadingButton = leadingButton?()
-		self.trailingButton = trailingButton?()
+		self.leadingItem = leadingItem?()
+		self.trailingItem = trailingItem?()
 	}
 
 	public var body: some View {
 		HStack {
-			if let leadingButton = leadingButton {
+			if let leadingButton = leadingItem {
 				leadingButton
 			} else {
 				placeholderSpacer
@@ -33,12 +33,50 @@ public struct NavigationBar<Content>: View where Content: View {
 
 			Spacer()
 
-			if let trailingButton = trailingButton {
+			if let trailingButton = trailingItem {
 				trailingButton
 			} else {
 				placeholderSpacer
 			}
 		}
+	}
+}
+
+public extension NavigationBar where LeadingItem == EmptyView {
+	init(
+		titleText: String? = nil,
+		trailingItem: TrailingItem
+	) {
+		self.init(
+			titleText: titleText,
+			leadingItem: nil,
+			trailingItem: { trailingItem }
+		)
+	}
+}
+
+public extension NavigationBar where TrailingItem == EmptyView {
+	init(
+		titleText: String? = nil,
+		leadingItem: LeadingItem
+	) {
+		self.init(
+			titleText: titleText,
+			leadingItem: { leadingItem },
+			trailingItem: nil
+		)
+	}
+}
+
+public extension NavigationBar where LeadingItem == EmptyView, TrailingItem == EmptyView {
+	init(
+		titleText: String? = nil
+	) {
+		self.init(
+			titleText: titleText,
+			leadingItem: nil,
+			trailingItem: nil
+		)
 	}
 }
 
@@ -57,8 +95,8 @@ struct NavigationBar_Previews: PreviewProvider {
 	static var previews: some View {
 		NavigationBar(
 			titleText: "A title",
-			leadingButton: { Button("Settings", action: {}) },
-			trailingButton: { Button("Settings", action: {}) }
+			leadingItem: { Button("Settings", action: {}) },
+			trailingItem: { Button("Settings", action: {}) }
 		)
 	}
 }
