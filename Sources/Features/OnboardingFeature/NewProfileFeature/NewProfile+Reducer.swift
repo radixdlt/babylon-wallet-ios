@@ -63,7 +63,7 @@ public extension NewProfile {
 			precondition(state.canProceed)
 			precondition(!state.isCreatingProfile)
 			state.isCreatingProfile = true
-			return .run { [mnemonicGenerator, transactionClient, nameOfFirstAccount = state.nameOfFirstAccount] send in
+			return .run { [nameOfFirstAccount = state.nameOfFirstAccount] send in
 
 				await send(.internal(.system(.createdProfileResult(
 					// FIXME: - mainnet: extract into ProfileCreator client?

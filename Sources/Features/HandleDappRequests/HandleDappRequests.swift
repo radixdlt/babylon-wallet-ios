@@ -122,7 +122,7 @@ private extension HandleDappRequests {
 				responseToDapp: responseToDapp
 			)
 
-			return .run { [p2pConnectivityClient] send in
+			return .run { send in
 				await send(.internal(.system(.sendResponseBackToDappResult(
 					TaskResult {
 						try await p2pConnectivityClient.sendMessage(response)
@@ -139,7 +139,7 @@ private extension HandleDappRequests {
 				await send(.internal(.system(.loadConnections)))
 			}
 		case .internal(.system(.loadConnections)):
-			return .run { [p2pConnectivityClient] send in
+			return .run { send in
 				do {
 					for try await updateList in try await p2pConnectivityClient.getP2PClients() {
 						await withThrowingTaskGroup(of: Void.self) { taskGroup in
