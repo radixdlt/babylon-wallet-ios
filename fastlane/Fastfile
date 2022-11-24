@@ -96,7 +96,7 @@ private_lane :code_signing do |options|
         name: ENV['MATCH_KEYCHAIN_NAME'],
         password: ENV['MATCH_KEYCHAIN_PASSWORD'],
         unlock: false,
-        timeout: false
+        timeout: 0
     ) 
     sync_code_signing(
         type: type,
