@@ -93,8 +93,6 @@ private_lane :code_signing do |options|
     end
 
     create_keychain(
-        name: ENV['MATCH_KEYCHAIN_NAME'],
-        password: ENV['MATCH_KEYCHAIN_PASSWORD'],
         unlock: false,
         timeout: 0
     ) 
@@ -103,5 +101,4 @@ private_lane :code_signing do |options|
         force_for_new_devices: true,
         readonly: readonly
     )
-    sh("security set-key-partition-list -S apple-tool:,apple: -k $MATCH_KEYCHAIN_PASSWORD ~/Library/Keychains/$MATCH_KEYCHAIN_NAME")
 end
