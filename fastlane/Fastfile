@@ -93,8 +93,8 @@ private_lane :code_signing do |options|
     end
 
     create_keychain(
-        name: ENV[MATCH_KEYCHAIN_NAME],
-        password: ENV[MATCH_KEYCHAIN_PASSWORD],
+        name: ENV['MATCH_KEYCHAIN_NAME'],
+        password: ENV['MATCH_KEYCHAIN_PASSWORD'],
         unlock: false,
         timeout: false
     ) 
