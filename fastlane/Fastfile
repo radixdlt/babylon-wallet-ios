@@ -93,10 +93,10 @@ private_lane :code_signing do |options|
     end
 
     create_keychain(unlock: true)
-    sh("security set-key-partition-list -S apple-tool:,apple: -s -k $MATCH_KEYCHAIN_PASSWORD ~/Library/Keychains/$MATCH_KEYCHAIN_NAME")
     sync_code_signing(
         type: type,
         force_for_new_devices: true,
         readonly: readonly
     )
+    sh("security set-key-partition-list -S apple-tool:,apple: -s -k $MATCH_KEYCHAIN_PASSWORD ~/Library/Keychains/$MATCH_KEYCHAIN_NAME")
 end
