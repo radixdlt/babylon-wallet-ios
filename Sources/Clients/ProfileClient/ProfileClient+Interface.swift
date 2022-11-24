@@ -8,10 +8,10 @@ import NonEmpty
 import Profile
 import SLIP10
 
-public typealias MakeAccountNonVirtual = @Sendable (NetworkID) -> MakeEntityNonVirtualBySubmittingItToLedger
+public typealias DefineFunctionToMakeEntityNonVirtualBySubmittingItToLedger = @Sendable (NetworkID) -> MakeEntityNonVirtualBySubmittingItToLedger
 
 // MARK: - CreateNewProfileRequest
-public struct CreateNewProfileRequest: Sendable, Hashable {
+public struct CreateNewProfileRequest: Sendable {
 	public let networkAndGateway: AppPreferences.NetworkAndGateway
 	public let curve25519FactorSourceMnemonic: Mnemonic
 	public let nameOfFirstAccount: String?
@@ -65,7 +65,7 @@ public extension ProfileClient {
 	typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Void
 	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
-	typealias CreateNewProfileWithOnLedgerAccount = @Sendable (CreateNewProfileRequest, MakeAccountNonVirtual) async throws -> Profile
+	typealias CreateNewProfileWithOnLedgerAccount = @Sendable (CreateNewProfileRequest) async throws -> Profile
 
 	typealias InjectProfile = @Sendable (Profile) async throws -> Void
 
@@ -82,15 +82,23 @@ public extension ProfileClient {
 	typealias CreateOnLedgerAccount = @Sendable (CreateOnLedgerAccountRequest) async throws -> OnNetwork.Account
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 
-	// typealias SignTransaction = @Sendable (any DataProtocol, Set<OnNetwork.Account>) async throws -> Set<AccountSignature>
-
+	// FIXME: - mainnet remove this and change to `async throws -> ([Prompt]) async throws -> NonEmpty<Set<Signer>>` when Profile supports multiple factor sources of different kinds.
 	typealias PrivateKeysForAddresses = @Sendable (Set<AccountAddress>) async throws -> NonEmpty<OrderedSet<PrivateKey>>
 }
 
 // MARK: - CreateOnLedgerAccountRequest
-public struct CreateOnLedgerAccountRequest: Sendable, Hashable {
+public struct CreateOnLedgerAccountRequest: Sendable {
 	public let nameOfAccount: String?
-	public let makeAccountNonVirtual: MakeAccountNonVirtual
+
+	public let defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger: DefineFunctionToMakeEntityNonVirtualBySubmittingItToLedger
+
+	public init(
+		nameOfAccount: String?,
+		defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger: @escaping DefineFunctionToMakeEntityNonVirtualBySubmittingItToLedger
+	) {
+		self.nameOfAccount = nameOfAccount
+		self.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger = defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger
+	}
 }
 
 // MARK: - AccountSignature

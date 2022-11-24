@@ -117,11 +117,11 @@ public extension ProfileClient {
 			},
 			createOnLedgerAccount: { request in
 				try await profileHolder.asyncMutating { profile in
-					let networkID = getCurrentNetworkID()
-					try await profile.createNewOnLedgerAccount(
+					let networkID = await getCurrentNetworkID()
+					return try await profile.createNewOnLedgerAccount(
 						networkID: networkID,
 						displayName: request.nameOfAccount,
-						makeEntityNonVirtualBySubmittingItToLedger: request.makeAccountNonVirtual(networkID),
+						makeEntityNonVirtualBySubmittingItToLedger: request.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger(networkID),
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
 							try keychainClient.loadFactorSourceMnemonic(reference: reference)
 						}

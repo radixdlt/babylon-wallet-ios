@@ -4,9 +4,9 @@ import Dependencies
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
-import struct GatewayAPI.GatewayAPIClient
-import struct GatewayAPI.PollStrategy
-import struct GatewayAPI.TransactionDetailsResponse
+@preconcurrency import struct GatewayAPI.GatewayAPIClient
+@preconcurrency import struct GatewayAPI.PollStrategy
+@preconcurrency import struct GatewayAPI.TransactionDetailsResponse
 import NonEmpty
 import Profile
 import ProfileClient
@@ -16,7 +16,7 @@ import SLIP10
 public struct TransactionClient: Sendable, DependencyKey {
 	public var convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString
 	public var addLockFeeInstructionToManifest: AddLockFeeInstructionToManifest
-	public var makeAccountNonVirtual: MakeAccountNonVirtual
+	public var defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger: DefineFunctionToMakeEntityNonVirtualBySubmittingItToLedger
 	public var signAndSubmitTransaction: SignAndSubmitTransaction
 }
 
@@ -154,8 +154,10 @@ public extension TransactionClient {
 				instructions.insert(lockFeeCallMethodInstruction, at: 0)
 				return TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
 			},
-			makeAccountNonVirtual: { networkID in
-				{ privateKey in
+			defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger: { networkID -> MakeEntityNonVirtualBySubmittingItToLedger in
+
+				// Define function
+				let functionToMakeEntityNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger = { privateKey in
 					print("🎭 Create On-Ledger-Account ✨")
 
 					let manifest = try engineToolkitClient.manifestForOnLedgerAccount(
@@ -177,6 +179,9 @@ public extension TransactionClient {
 					print("🎭 SUCCESSFULLY CREATED ACCOUNT On-Ledger with address: \(addressBech32) ✅ \n txID: \(transaction.txID)")
 					return try AccountAddress(address: addressBech32)
 				}
+
+				// FIXME: - betanet to be deleted once we have virtual accounts
+				return functionToMakeEntityNonVirtualBySubmittingItToLedger
 			},
 			signAndSubmitTransaction: { manifest in
 				try await signAndSubmit(manifest: manifest) { accountAddressesNeedingToSignTransactionRequest in
@@ -208,7 +213,7 @@ extension TransactionClient: TestDependencyKey {
 	public static let testValue: TransactionClient = .init(
 		convertManifestInstructionsToJSONIfItWasString: unimplemented("\(Self.self).convertManifestInstructionsToJSONIfItWasString"),
 		addLockFeeInstructionToManifest: unimplemented("\(Self.self).addLockFeeInstructionToManifest"),
-		makeAccountNonVirtual: unimplemented("\(Self.self).makeAccountNonVirtual"),
+		defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger: unimplemented("\(Self.self).defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger"),
 		signAndSubmitTransaction: unimplemented("\(Self.self).signAndSubmitTransaction")
 	)
 }

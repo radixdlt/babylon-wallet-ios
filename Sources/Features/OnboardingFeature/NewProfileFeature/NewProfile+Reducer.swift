@@ -66,13 +66,14 @@ public extension NewProfile {
 						// FIXME: betanet: stop using `.primary` use explicit version!
 						let networkAndGateway = AppPreferences.NetworkAndGateway.primary
 
+						let makeFirstAccountNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger = transactionClient.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger(networkAndGateway.network.id)
+
 						let newProfileRequest = CreateNewProfileRequest(
 							networkAndGateway: networkAndGateway,
 							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
-							nameOfFirstAccount: nameOfFirstAccount
-						) {
-							try await transactionClient.makeAccountNonVirtual(networkAndGateway.network.id)
-						}
+							nameOfFirstAccount: nameOfFirstAccount,
+							makeFirstAccountNonVirtualBySubmittingItToLedger: makeFirstAccountNonVirtualBySubmittingItToLedger
+						)
 
 						let newProfile = try await profileClient.createNewProfileWithOnLedgerAccount(
 							newProfileRequest
