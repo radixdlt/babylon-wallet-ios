@@ -68,7 +68,13 @@ private extension HandleDappRequests {
 			let accountAddresses: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
 				.init(account: $0)
 			}
-			let responseItem = P2P.ToDapp.WalletResponseItem.ongoingAccountAddresses(.init(accountAddresses: .init(rawValue: accountAddresses)!))
+			guard !request.requestItem.isRequiringOwnershipProof else {
+				errorQueue.schedule(NSError(domain: "UnsupportedDappRequest - proofs for account addresses is not yet supported", code: 0))
+				return .none
+			}
+			let responseItem = P2P.ToDapp.WalletResponseItem.oneTimeAccountAddresses(
+				.withoutProof(.init(accountAddresses: .init(rawValue: accountAddresses)!))
+			)
 
 			guard let responseContent = state.unfinishedRequestsFromClient.finish(
 				.oneTimeAccountAddresses(request.requestItem), with: responseItem

@@ -14,12 +14,9 @@ public extension P2P.ToDapp {
 	///
 	enum WalletResponseItem: Sendable, Hashable, Encodable {
 		/// Response to Dapp from wallet, info about a users accounts.
-		///
-		/// Called `OngoingAccountAddressesWithoutProofOfOwnershipResponse` in [CAP21][cap]
-		///
 		/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
 		///
-		case ongoingAccountAddresses(OngoingAccountAddressesResponse)
+		case oneTimeAccountAddresses(OneTimeAccountAddressesResponse)
 
 		/// Response to Dapp from wallet, info about a signed and submitted transaction.
 		///
@@ -36,7 +33,7 @@ private extension P2P.ToDapp.WalletResponseItem {
 	typealias Discriminator = P2P.FromDapp.Discriminator
 	var discriminator: Discriminator {
 		switch self {
-		case .ongoingAccountAddresses: return .ongoingAccountAddresses
+		case .oneTimeAccountAddresses: return .oneTimeAccountAddresses
 		case .signTransaction: return .signTransaction
 		}
 	}
@@ -52,7 +49,7 @@ public extension P2P.ToDapp.WalletResponseItem {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(discriminator, forKey: .disciminator)
 		switch self {
-		case let .ongoingAccountAddresses(response):
+		case let .oneTimeAccountAddresses(response):
 			try response.encode(to: encoder)
 		case let .signTransaction(response):
 			try response.encode(to: encoder)

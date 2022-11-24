@@ -76,7 +76,7 @@ public extension P2P.FromDapp.WalletRequestItem {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(Discriminator.self, forKey: .disciminator)
 		switch discriminator {
-		case .ongoingAccountAddresses:
+		case .oneTimeAccountAddresses:
 			self = try .oneTimeAccountAddresses(P2P.FromDapp.OneTimeAccountAddressesRequest(from: decoder))
 		case .signTransaction:
 			self = try .signTransaction(P2P.FromDapp.SignTransactionRequest(from: decoder))

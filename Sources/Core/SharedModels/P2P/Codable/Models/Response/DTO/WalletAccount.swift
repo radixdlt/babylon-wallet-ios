@@ -25,6 +25,23 @@ public extension P2P.ToDapp {
 			self.appearanceID = appearanceID
 		}
 	}
+
+	/// Response to Dapp from wallet, info about a users account.
+	///
+	/// Called `AccountAddressWithProofOfOwnership` in [CAP21][cap]
+	///
+	/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
+	///
+	struct WalletAccountWithProof: Sendable, Hashable, Encodable {
+		public let account: WalletAccount
+		public let challenge: String
+		public let signature: String
+		public init(account: WalletAccount, challenge: String, signature: String) {
+			self.account = account
+			self.challenge = challenge
+			self.signature = signature
+		}
+	}
 }
 
 public extension P2P.ToDapp.WalletAccount {

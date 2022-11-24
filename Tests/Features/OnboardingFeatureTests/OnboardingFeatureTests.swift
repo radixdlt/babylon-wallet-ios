@@ -31,9 +31,9 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 			initialState: NewProfile.State(canProceed: true),
 			reducer: NewProfile()
 		)
-		store.dependencies.profileClient.createNewProfileWithOnLedgerAccount = { req, _ in
+		store.dependencies.profileClient.createNewProfileWithOnLedgerAccount = { req in
 			try! await Profile.new(
-				networkAndGateway: .primary,
+				networkAndGateway: req.networkAndGateway,
 				mnemonic: req.curve25519FactorSourceMnemonic
 			)
 		}
@@ -42,7 +42,7 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 		let generateMnemonicCalled = ActorIsolated<Bool>(false)
 
 		let mnemonicGeneratorExpectation = expectation(description: "Generate Mnemonic should have been called")
-		store.dependencies.mnemonicGenerator = { _, _ in
+		store.dependencies.mnemonicGenerator.generate = { _, _ in
 			Task {
 				await generateMnemonicCalled.setValue(true)
 				mnemonicGeneratorExpectation.fulfill()
