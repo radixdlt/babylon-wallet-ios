@@ -1,7 +1,6 @@
 name: "Test Flight Deploy"
 
-on:
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
   testFlightDeploy:
