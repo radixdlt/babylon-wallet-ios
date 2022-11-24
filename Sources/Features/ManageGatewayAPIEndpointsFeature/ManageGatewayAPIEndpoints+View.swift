@@ -33,6 +33,7 @@ public extension ManageGatewayAPIEndpoints.View {
 							}
 						}
 					)
+					.foregroundColor(.app.gray1)
 					.padding([.horizontal, .top], .medium3)
 
 					VStack(alignment: .leading) {
@@ -90,7 +91,7 @@ public extension ManageGatewayAPIEndpoints.View {
 						}
 						.enabled(viewStore.isSwitchToButtonEnabled)
 					}
-					.padding()
+					.padding([.horizontal, .bottom], .medium1)
 					.buttonStyle(.primaryRectangular)
 				}
 				.onAppear {
@@ -108,15 +109,17 @@ private extension ManageGatewayAPIEndpoints.View {
 		value: CustomStringConvertible,
 		valueColor: Color = Color.app.gray2
 	) -> some View {
-		Group {
+		VStack(alignment: .leading) {
 			Text(label)
-				.font(.headline)
-				.foregroundColor(Color.app.gray1)
+				.foregroundColor(.app.gray2)
+				.textStyle(.body2HighImportance)
+
 			Text(String(describing: value))
 				.textSelection(.enabled)
-				.font(.title3)
-				.foregroundColor(valueColor)
+				.foregroundColor(.app.gray1)
+				.textStyle(.body1HighImportance)
 		}
+		.padding(.top, .small3)
 	}
 
 	func networkAndGatewayView(
@@ -124,11 +127,12 @@ private extension ManageGatewayAPIEndpoints.View {
 	) -> some View {
 		Group {
 			Text("Current")
-				.font(.title2)
+				.foregroundColor(.app.gray1)
+				.textStyle(.sectionHeader)
 
 			label("Network name", value: networkAndGateway.network.name)
 			label("Network ID", value: networkAndGateway.network.id)
-			label("Gateway API Endpoint", value: URLBuilderClient.liveValue.formatURL(networkAndGateway.gatewayAPIEndpointURL), valueColor: Color.app.blue2)
+			label("Gateway API Endpoint", value: URLBuilderClient.liveValue.formatURL(networkAndGateway.gatewayAPIEndpointURL), valueColor: .app.blue2)
 		}
 	}
 }
