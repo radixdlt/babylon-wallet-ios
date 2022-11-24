@@ -76,7 +76,7 @@ private extension HandleDappRequests {
 				.withoutProof(.init(accountAddresses: .init(rawValue: accountAddresses)!))
 			)
 
-			guard let responseContent = state.unfinishedRequestsFromClient.finish(
+			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(
 				.oneTimeAccountAddresses(request.requestItem), with: responseItem
 			) else {
 				return .run { send in
@@ -86,10 +86,10 @@ private extension HandleDappRequests {
 
 			let response = P2P.ResponseToClientByID(
 				connectionID: request.parentRequest.client.id,
-				responseToDapp: responseContent
+				responseToDapp: responseToDapp
 			)
 
-			return .run { send in
+			return .run { [p2pConnectivityClient] send in
 				await send(.internal(.system(.sendResponseBackToDappResult(
 					TaskResult {
 						try await p2pConnectivityClient.sendMessage(response)
@@ -107,14 +107,28 @@ private extension HandleDappRequests {
 			errorQueue.schedule(error)
 			return .none
 
-		case .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(_, _)))):
+		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, request)))):
 			state.currentRequest = nil
-
-			// FIXME: Betanet: once we have migrated to Hammunet we can use the EngineToolkit to read out required signeres to sign tx.
-			errorQueue.schedule(
-				NSError(domain: "Transaction signing disabled until app is Hammunet compatible. Once we have it in place we should respond back with TXID to dApp here.", code: 1337)
+			let responseItem = P2P.ToDapp.WalletResponseItem.signTransaction(
+				.init(txID: txID)
 			)
-			return .none
+			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(.signTransaction(request.requestItem), with: responseItem) else {
+				return .run { send in
+					await send(.internal(.system(.handleNextRequestItemIfNeeded)))
+				}
+			}
+			let response = P2P.ResponseToClientByID(
+				connectionID: request.parentRequest.client.id,
+				responseToDapp: responseToDapp
+			)
+
+			return .run { [p2pConnectivityClient] send in
+				await send(.internal(.system(.sendResponseBackToDappResult(
+					TaskResult {
+						try await p2pConnectivityClient.sendMessage(response)
+					}
+				))))
+			}
 
 		case let .child(.transactionSigning(.delegate(.dismissed(dismissedRequestItem)))):
 			return .run { send in
