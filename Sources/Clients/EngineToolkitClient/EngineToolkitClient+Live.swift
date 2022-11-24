@@ -22,6 +22,28 @@ public extension EngineToolkitClient {
 		return Self(
 			getTransactionVersion: { Version.default },
 			generateTXNonce: generateTXNonce,
+			convertManifestInstructionsToJSONIfItWasString: { request in
+
+				let converted = try engineToolkit.convertManifest(
+					request: .init(
+						transactionVersion: request.version,
+						manifest: request.manifest,
+						outputFormat: .json,
+						networkId: request.networkID
+					)
+				)
+				.get()
+
+				guard case let .json(instructions) = converted.instructions else {
+					throw FailedToConvertManifestToFormatWhereInstructionsAreJSON()
+				}
+
+				return JSONInstructionsTransactionManifest(
+					instructions: instructions,
+					convertedManifestThatContainsThem: converted
+				)
+
+			},
 			compileTransactionIntent: compileTransactionIntent,
 			compileSignedTransactionIntent: {
 				try engineToolkit
@@ -51,6 +73,9 @@ public extension EngineToolkitClient {
 		)
 	}()
 }
+
+// MARK: - FailedToConvertManifestToFormatWhereInstructionsAreJSON
+struct FailedToConvertManifestToFormatWhereInstructionsAreJSON: Swift.Error {}
 
 public extension AccountAddress {
 	init(componentAddress: ComponentAddress) throws {

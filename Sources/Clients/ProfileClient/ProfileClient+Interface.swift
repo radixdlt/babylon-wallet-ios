@@ -8,19 +8,25 @@ import NonEmpty
 import Profile
 import SLIP10
 
-public typealias MakeAccountNonVirtual = @Sendable (CreateAccountRequest) -> MakeEntityNonVirtualBySubmittingItToLedger
+public typealias MakeAccountNonVirtual = @Sendable (NetworkID) -> MakeEntityNonVirtualBySubmittingItToLedger
 
 // MARK: - CreateNewProfileRequest
-public struct CreateNewProfileRequest {
+public struct CreateNewProfileRequest: Sendable, Hashable {
+	public let networkAndGateway: AppPreferences.NetworkAndGateway
 	public let curve25519FactorSourceMnemonic: Mnemonic
-	public let createFirstAccountRequest: CreateAccountRequest
+	public let nameOfFirstAccount: String?
+	public let makeFirstAccountNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger
 
 	public init(
+		networkAndGateway: AppPreferences.NetworkAndGateway,
 		curve25519FactorSourceMnemonic: Mnemonic,
-		createFirstAccountRequest: CreateAccountRequest
+		nameOfFirstAccount: String?,
+		makeFirstAccountNonVirtualBySubmittingItToLedger: @escaping MakeEntityNonVirtualBySubmittingItToLedger
 	) {
+		self.networkAndGateway = networkAndGateway
 		self.curve25519FactorSourceMnemonic = curve25519FactorSourceMnemonic
-		self.createFirstAccountRequest = createFirstAccountRequest
+		self.nameOfFirstAccount = nameOfFirstAccount
+		self.makeFirstAccountNonVirtualBySubmittingItToLedger = makeFirstAccountNonVirtualBySubmittingItToLedger
 	}
 }
 
@@ -73,12 +79,18 @@ public extension ProfileClient {
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
-	typealias CreateOnLedgerAccount = @Sendable (CreateAccountRequest, MakeAccountNonVirtual) async throws -> OnNetwork.Account
+	typealias CreateOnLedgerAccount = @Sendable (CreateOnLedgerAccountRequest) async throws -> OnNetwork.Account
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 
 	// typealias SignTransaction = @Sendable (any DataProtocol, Set<OnNetwork.Account>) async throws -> Set<AccountSignature>
 
 	typealias PrivateKeysForAddresses = @Sendable (Set<AccountAddress>) async throws -> NonEmpty<OrderedSet<PrivateKey>>
+}
+
+// MARK: - CreateOnLedgerAccountRequest
+public struct CreateOnLedgerAccountRequest: Sendable, Hashable {
+	public let nameOfAccount: String?
+	public let makeAccountNonVirtual: MakeAccountNonVirtual
 }
 
 // MARK: - AccountSignature
@@ -87,8 +99,8 @@ public struct AccountSignature: Sendable, Hashable {
 	public let signature: SLIP10.Signature
 }
 
-// MARK: - CreateAccountRequest
-public struct CreateAccountRequest {
+// MARK: - CreateAnotherAccountRequest
+public struct CreateAnotherAccountRequest: Sendable, Hashable {
 	public let accountName: String?
 
 	public init(

@@ -12,6 +12,8 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var getTransactionVersion: GetTransactionVersion
 	public var generateTXNonce: GenerateTXNonce
 
+	public var convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString
+
 	public var compileTransactionIntent: CompileTransactionIntent
 	public var compileSignedTransactionIntent: CompileSignedTransactionIntent
 	public var compileNotarizedTransactionIntent: CompileNotarizedTransactionIntent
@@ -20,10 +22,30 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 	public var accountAddressesNeedingToSignTransaction: AccountAddressesNeedingToSignTransaction
 }
 
+// MARK: - JSONInstructionsTransactionManifest
+public struct JSONInstructionsTransactionManifest: Sendable, Hashable {
+	public let instructions: [Instruction]
+	public let convertedManifestThatContainsThem: TransactionManifest
+}
+
+// MARK: - ConvertManifestInstructionsToJSONIfItWasStringRequest
+public struct ConvertManifestInstructionsToJSONIfItWasStringRequest: Sendable, Hashable {
+	public let version: Version
+	public let networkID: NetworkID
+	public let manifest: TransactionManifest
+	public init(version: Version, networkID: NetworkID, manifest: TransactionManifest) {
+		self.version = version
+		self.networkID = networkID
+		self.manifest = manifest
+	}
+}
+
 public extension EngineToolkitClient {
 	typealias GetTransactionVersion = @Sendable () -> Version
 
 	typealias GenerateTXNonce = @Sendable () -> Nonce
+
+	typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (ConvertManifestInstructionsToJSONIfItWasStringRequest) throws -> JSONInstructionsTransactionManifest
 
 	typealias AccountAddressesNeedingToSignTransaction = @Sendable (AccountAddressesNeedingToSignTransactionRequest) throws -> Set<AccountAddress>
 

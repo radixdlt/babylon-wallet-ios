@@ -63,18 +63,20 @@ public extension NewProfile {
 					TaskResult {
 						let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
 
-						let newProfileRequest = CreateNewProfileRequest(
-							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
-							createFirstAccountRequest: .init(
-								accountName: nameOfFirstAccount
-							)
-						)
+						// FIXME: betanet: stop using `.primary` use explicit version!
+						let networkAndGateway = AppPreferences.NetworkAndGateway.primary
 
-						let newProfile = try await profileClient
-							.createNewProfileWithOnLedgerAccount(
-								newProfileRequest,
-								transactionClient.makeAccountNonVirtual
-							)
+						let newProfileRequest = CreateNewProfileRequest(
+							networkAndGateway: networkAndGateway,
+							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
+							nameOfFirstAccount: nameOfFirstAccount
+						) {
+							try await transactionClient.makeAccountNonVirtual(networkAndGateway.network.id)
+						}
+
+						let newProfile = try await profileClient.createNewProfileWithOnLedgerAccount(
+							newProfileRequest
+						)
 
 						let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
 

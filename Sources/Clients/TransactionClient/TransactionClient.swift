@@ -14,21 +14,18 @@ import SLIP10
 
 // MARK: - TransactionClient
 public struct TransactionClient: Sendable, DependencyKey {
-	public var signAndSubmitTransaction: SignAndSubmitTransaction
+	public var convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString
+	public var addLockFeeInstructionToManifest: AddLockFeeInstructionToManifest
 	public var makeAccountNonVirtual: MakeAccountNonVirtual
-
-	public init(
-		makeAccountNonVirtual: @escaping MakeAccountNonVirtual,
-		signAndSubmitTransaction: @escaping SignAndSubmitTransaction
-	) {
-		self.signAndSubmitTransaction = signAndSubmitTransaction
-		self.makeAccountNonVirtual = makeAccountNonVirtual
-	}
+	public var signAndSubmitTransaction: SignAndSubmitTransaction
 }
 
 // MARK: TransactionClient.SignAndSubmitTransaction
 public extension TransactionClient {
+	typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> TransactionManifest
 	typealias SignAndSubmitTransaction = @Sendable (TransactionManifest) async throws -> Transaction
+
+	typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
 }
 
 // MARK: TransactionClient.Transaction
@@ -86,11 +83,24 @@ public extension TransactionClient {
 		@Sendable
 		func signAndSubmit(
 			manifest: TransactionManifest,
+			getNotary: @escaping (AccountAddressesNeedingToSignTransactionRequest) async throws -> PrivateKey
+		) async throws -> Transaction {
+			let networkID = await profileClient.getCurrentNetworkID()
+			return try await signAndSubmit(
+				networkID: networkID,
+				manifest: manifest,
+				getNotary: getNotary
+			)
+		}
+
+		@Sendable
+		func signAndSubmit(
+			networkID: NetworkID,
+			manifest: TransactionManifest,
 			getNotary: (AccountAddressesNeedingToSignTransactionRequest) async throws -> PrivateKey
 		) async throws -> Transaction {
 			let nonce = engineToolkitClient.generateTXNonce()
 			let epoch = try await gatewayAPIClient.getEpoch()
-			let networkID = await profileClient.getCurrentNetworkID()
 			let version = engineToolkitClient.getTransactionVersion()
 
 			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesNeedingToSignTransactionRequest(
@@ -121,15 +131,47 @@ public extension TransactionClient {
 			return try await signAndSubmit(transactionIntent: intent, notary: notaryPrivateKey)
 		}
 
+		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
+			let version = engineToolkitClient.getTransactionVersion()
+			let networkID = await profileClient.getCurrentNetworkID()
+
+			let conversionRequest = ConvertManifestInstructionsToJSONIfItWasStringRequest(
+				version: version,
+				networkID: networkID,
+				manifest: manifest
+			)
+
+			return try engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(conversionRequest)
+		}
+
 		return Self(
-			makeAccountNonVirtual: { _ in
+			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
+			addLockFeeInstructionToManifest: { maybeStringManifest in
+				let manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
+				var instructions = manifestWithJSONInstructions.instructions
+				let networkID = await profileClient.getCurrentNetworkID()
+				let lockFeeCallMethodInstruction = try engineToolkitClient.lockFeeCallMethod(faucetForNetwork: networkID).embed()
+				instructions.insert(lockFeeCallMethodInstruction, at: 0)
+				return TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
+			},
+			makeAccountNonVirtual: { networkID in
 				{ privateKey in
 					print("🎭 Create On-Ledger-Account ✨")
-					let manifest = try engineToolkitClient.manifestForOnLedgerAccount(publicKey: privateKey.publicKey())
+
+					let manifest = try engineToolkitClient.manifestForOnLedgerAccount(
+						networkID: networkID,
+						publicKey: privateKey.publicKey()
+					)
 
 					let transaction = try await signAndSubmit(manifest: manifest) { _ in privateKey }
 
-					guard let addressBech32 = transaction.txDetails.details.referencedGlobalEntities.first else {
+					guard
+						let addressBech32 = transaction
+						.txDetails
+						.details
+						.referencedGlobalEntities
+						.first
+					else {
 						throw CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities()
 					}
 					print("🎭 SUCCESSFULLY CREATED ACCOUNT On-Ledger with address: \(addressBech32) ✅ \n txID: \(transaction.txID)")
@@ -164,11 +206,9 @@ public extension TransactionClient {
 import XCTestDynamicOverlay
 extension TransactionClient: TestDependencyKey {
 	public static let testValue: TransactionClient = .init(
-		makeAccountNonVirtual: { _ in
-			{ _ in
-				try AccountAddress(address: "mock")
-			}
-		},
+		convertManifestInstructionsToJSONIfItWasString: unimplemented("\(Self.self).convertManifestInstructionsToJSONIfItWasString"),
+		addLockFeeInstructionToManifest: unimplemented("\(Self.self).addLockFeeInstructionToManifest"),
+		makeAccountNonVirtual: unimplemented("\(Self.self).makeAccountNonVirtual"),
 		signAndSubmitTransaction: unimplemented("\(Self.self).signAndSubmitTransaction")
 	)
 }

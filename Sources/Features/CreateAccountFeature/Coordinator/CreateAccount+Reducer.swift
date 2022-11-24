@@ -27,10 +27,13 @@ public extension CreateAccount {
 			return .run { [accountName = state.accountName] send in
 				await send(.internal(.system(.createdNewAccountResult(
 					TaskResult {
-						let createAccountRequest = CreateAccountRequest(
+						let createAccountRequest = CreateAnotherAccountRequest(
 							accountName: accountName
 						)
-						return try await profileClient.createOnLedgerAccount(createAccountRequest, transactionClient.makeAccountNonVirtual)
+						return try await profileClient.createOnLedgerAccount(
+							createAccountRequest,
+							transactionClient.makeAccountNonVirtual
+						)
 					}
 				))))
 			}
