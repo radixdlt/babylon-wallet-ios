@@ -26,6 +26,7 @@ jobs:
             ${{ secrets.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
             ${{ secrets.CONVERSE_SSH_KEY }}
             ${{ secrets.BITE_SSH_KEY }}
+            ${{ secrets.FASTLANE_MATCH_REPO_SSH_KEY }}
             # TODO: Add certificates repo SSH key
 
       - uses: maxim-lobanov/setup-xcode@v1
