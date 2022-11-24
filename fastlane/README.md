@@ -39,6 +39,22 @@ Runs tests
 
 Installs certificates on the machine
 
+### ios install_distribution_certificate
+
+```sh
+[bundle exec] fastlane ios install_distribution_certificate
+```
+
+Installs distribution certificate
+
+### ios install_development_certificate
+
+```sh
+[bundle exec] fastlane ios install_development_certificate
+```
+
+Installs development certificate
+
 ### ios generate_new_certificates
 
 ```sh

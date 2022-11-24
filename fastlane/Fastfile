@@ -18,19 +18,28 @@ platform :ios do
     end
 
     lane :beta do
-        install_certificates
+        install_distribution_certificate
     	increment_build_number(xcodeproj: ENV['PROJ_PATH'])
         commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
-#        push_to_git_remote
         build_app
         #upload_to_testflight
-        #push_to_git_remote
+        push_to_git_remote
     end
 
     desc "Installs certificates on the machine"
     lane :install_certificates do
-        code_signing(type: "development")
+        install_development_certificate
+        install_distribution_certificate
+    end
+
+    desc "Installs distribution certificate"
+    lane :install_distribution_certificate do
         code_signing(type: "appstore")
+    end
+
+    desc "Installs development certificate"
+    lane :install_development_certificate do
+        code_signing(type: "development")
     end
 
     desc "Generates new certificates if needed"
