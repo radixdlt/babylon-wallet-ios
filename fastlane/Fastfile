@@ -18,7 +18,7 @@ platform :ios do
     desc "Builds and deploys beta app to TestFlight"
     lane :beta_deploy do
         install_distribution_certificate
-    	increment_build_number(xcodeproj: ENV['PROJ_PATH'])
+        increment_build_number(xcodeproj: ENV['PROJ_PATH'])
         commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
         build_app
         upload_to_testflight

@@ -19,7 +19,7 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 [bundle exec] fastlane set_version
 ```
 
-
+Set specific project version; will reset the build number
 
 ----
 
