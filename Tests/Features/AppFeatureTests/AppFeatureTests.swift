@@ -2,6 +2,7 @@
 import ComposableArchitecture
 import OnboardingFeature
 import Profile
+import ProfileLoader
 @testable import SplashFeature
 import TestUtils
 
@@ -34,7 +35,7 @@ final class AppFeatureTests: TestCase {
 			initialState: App.State(root: .onboarding(.init(newProfile: .init()))),
 			reducer: App()
 		)
-		let newProfile = try await Profile.new(networkAndGateway: .primary, mnemonic: .generate())
+		let newProfile = try await Profile.new(networkAndGateway: .hammunet, mnemonic: .generate())
 		let expectation = expectation(description: "Profile injected")
 		store.dependencies.profileClient.injectProfile = { injected in
 			XCTAssertEqual(injected, newProfile)
@@ -54,7 +55,10 @@ final class AppFeatureTests: TestCase {
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		// GIVEN: an existing profile
-		let existingProfile = try await Profile.new(networkAndGateway: .primary, mnemonic: .generate())
+		let existingProfile = try await Profile.new(
+			networkAndGateway: .hammunet,
+			mnemonic: .generate()
+		)
 
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(
@@ -69,12 +73,14 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// WHEN: existing profile is loaded
-		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(existingProfile)))))))
+		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
+			.success(.compatibleProfile(existingProfile))
+		))))))
 
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.profileLoaded(existingProfile)))))
+		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.compatibleProfile(existingProfile))))))
 
 		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(existingProfile))))) {
 			$0.root = .main(.init())
@@ -100,12 +106,12 @@ final class AppFeatureTests: TestCase {
 		let viewTask = await store.send(.view(.task))
 
 		// when
-		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(nil)))))))
+		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(.noProfile)))))))
 
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.profileLoaded(nil))))) {
+		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.noProfile))))) {
 			$0.root = .onboarding(.init())
 		}
 
@@ -129,16 +135,22 @@ final class AppFeatureTests: TestCase {
 
 		// when
 		let decodingError = DecodingError.valueNotFound(Profile.self, .init(codingPath: [], debugDescription: "Something went wrong"))
-		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.failure(decodingError)))))))
+		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.failure(ProfileLoader.JSONDecodingError.KnownDecodingError(decodingError: decodingError))))))))
 
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		await store.receive(.internal(.system(.displayErrorAlert(App.UserFacingError(ProfileLoader.FailedToDecodeProfileError(error: decodingError)))))) {
+		await store.receive(.internal(.system(.displayErrorAlert(App.UserFacingError(ProfileLoader.JSONDecodingError.KnownDecodingError(decodingError: decodingError)))))) {
 			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("Failed to decode profile: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))"))
 		}
 
 		// when
+		await store.receive(.child(.splash(.delegate(.profileResultLoaded(
+			ProfileLoader.Result.noProfile
+		))))) {
+			$0.root = .onboarding(.init())
+		}
+
 		await store.send(.view(.errorAlertDismissButtonTapped)) {
 			// then
 			$0.errorAlert = nil
