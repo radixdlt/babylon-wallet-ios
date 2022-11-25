@@ -251,12 +251,14 @@ package.addModules([
 		name: "AccountDetailsFeature",
 		dependencies: [
 			"AccountListFeature",
+			"AccountPreferencesFeature",
 			"Asset",
 			"AssetsViewFeature",
 			"DesignSystem",
 			engineToolkit,
 			profile,
 			tca,
+
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -280,6 +282,8 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"DesignSystem",
+			"ErrorQueue",
+			"FaucetClient",
 			tca,
 		],
 		tests: .yes(
@@ -682,6 +686,18 @@ package.addModules([
 			dependencies,
 		],
 		tests: .no
+	),
+	.client(
+		name: "FaucetClient",
+		dependencies: [
+			"Common",
+			dependencies,
+			"EngineToolkitClient",
+			"GatewayAPI",
+			profile,
+			"ProfileClient",
+			"TransactionClient",
+		], tests: .no
 	),
 	.client(
 		name: "GatewayAPI",

@@ -188,8 +188,8 @@ public struct Home: ReducerProtocol {
 			state.accountDetails = nil
 			return .none
 
-		case .child(.accountDetails(.delegate(.displayAccountPreferences))):
-			state.accountPreferences = .init()
+		case let .child(.accountDetails(.delegate(.displayAccountPreferences(address)))):
+			state.accountPreferences = .init(address: address)
 			return .none
 
 		case let .child(.accountDetails(.delegate(.copyAddress(address)))):
@@ -200,11 +200,10 @@ public struct Home: ReducerProtocol {
 			return .none
 
 		case let .child(.accountDetails(.delegate(.refresh(address)))):
-			return .run { send in
-				await send(.internal(.system(.accountPortfolioResult(TaskResult {
-					try await accountPortfolioFetcher.fetchPortfolio([address])
-				}))))
-			}
+			return refreshAccount(address)
+
+		case let .child(.accountPreferences(.delegate(.refreshAccount(address)))):
+			return refreshAccount(address)
 
 		case .child(.transfer(.delegate(.dismissTransfer))):
 			state.transfer = nil
@@ -224,6 +223,14 @@ public struct Home: ReducerProtocol {
 
 		case .child, .delegate:
 			return .none
+		}
+	}
+
+	func refreshAccount(_ address: AccountAddress) -> EffectTask<Action> {
+		.run { send in
+			await send(.internal(.system(.accountPortfolioResult(TaskResult {
+				try await accountPortfolioFetcher.fetchPortfolio([address])
+			}))))
 		}
 	}
 

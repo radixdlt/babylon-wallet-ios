@@ -16,8 +16,8 @@ public struct AccountDetails: ReducerProtocol {
 					await send(.delegate(.dismissAccountDetails))
 				}
 			case .internal(.view(.displayAccountPreferencesButtonTapped)):
-				return .run { send in
-					await send(.delegate(.displayAccountPreferences))
+				return .run { [address = state.address] send in
+					await send(.delegate(.displayAccountPreferences(address)))
 				}
 			case .internal(.view(.copyAddressButtonTapped)):
 				return .run { [address = state.address] send in
