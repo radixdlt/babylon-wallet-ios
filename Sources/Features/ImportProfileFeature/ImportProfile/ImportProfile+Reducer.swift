@@ -44,14 +44,14 @@ public extension ImportProfile {
 					snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
 				} catch {
 					#if DEBUG
-					try? keychainClient.removeAllFactorSourcesAndProfileSnapshot()
-					try? keychainClient.removeProfileSnapshot()
+					try? await keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+					try? await keychainClient.removeProfileSnapshot()
 					#else
 					// TODO: Handle conflicting JSON formats of Profile somehow..?
 					#endif // DEBUG
 					throw error
 				}
-				try keychainClient.setProfileSnapshot(profileSnapshot: snapshot)
+				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
 				await send(.delegate(.importedProfileSnapshot(snapshot)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)

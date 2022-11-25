@@ -4,7 +4,7 @@ import Profile
 // MARK: - NewProfile.Action
 public extension NewProfile {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -13,7 +13,7 @@ public extension NewProfile {
 
 // MARK: - NewProfile.Action.ViewAction
 public extension NewProfile.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case backButtonPressed
 		case accountNameTextFieldChanged(String)
 		case createProfileButtonPressed
@@ -22,7 +22,7 @@ public extension NewProfile.Action {
 
 // MARK: - NewProfile.Action.InternalAction
 public extension NewProfile.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -30,7 +30,7 @@ public extension NewProfile.Action {
 
 // MARK: - NewProfile.Action.SystemAction
 public extension NewProfile.Action {
-	enum SystemAction: Equatable {
+	enum SystemAction: Sendable, Equatable {
 		case createProfile
 		case createdProfileResult(TaskResult<Profile>)
 	}
@@ -38,7 +38,7 @@ public extension NewProfile.Action {
 
 // MARK: - NewProfile.Action.DelegateAction
 public extension NewProfile.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case goBack
 		case finishedCreatingNewProfile(Profile)
 	}

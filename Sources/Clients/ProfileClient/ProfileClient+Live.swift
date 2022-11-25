@@ -31,7 +31,7 @@ public extension ProfileClient {
 			do {
 				return try await getAppPreferences().networkAndGateway
 			} catch {
-				return AppPreferences.NetworkAndGateway.primary
+				return AppPreferences.NetworkAndGateway.hammunet
 			}
 		}
 
@@ -83,9 +83,9 @@ public extension ProfileClient {
 			},
 			deleteProfileAndFactorSources: {
 				do {
-					try keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot()
 				} catch {
-					try keychainClient.removeProfileSnapshot()
+					try await keychainClient.removeProfileSnapshot()
 				}
 				await profileHolder.removeProfile()
 			},
@@ -123,7 +123,7 @@ public extension ProfileClient {
 						displayName: request.nameOfAccount,
 						makeEntityNonVirtualBySubmittingItToLedger: request.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger(networkID),
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-							try keychainClient.loadFactorSourceMnemonic(reference: reference)
+							try await keychainClient.loadFactorSourceMnemonic(reference: reference)
 						}
 					)
 				}
@@ -132,7 +132,7 @@ public extension ProfileClient {
 			privateKeysForAddresses: { request in
 
 				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { [keychainClient] reference in
-					try keychainClient.loadFactorSourceMnemonic(reference: reference)
+					try await keychainClient.loadFactorSourceMnemonic(reference: reference)
 				}
 
 				func getPrivateKeysFromAddresses() async throws -> OrderedSet<PrivateKey>? {
@@ -218,7 +218,7 @@ private actor ProfileHolder: GlobalActor {
 	// Async because we might wanna add iCloud sync here in future.
 	private func persistProfile() async throws {
 		let profileSnapshot = try takeProfileSnapshot()
-		try keychainClient.updateProfileSnapshot(profileSnapshot: profileSnapshot)
+		try await keychainClient.updateProfileSnapshot(profileSnapshot: profileSnapshot)
 	}
 
 	func asyncMutating<T>(_ mutateProfile: @Sendable (inout Profile) async throws -> T) async throws -> T {

@@ -134,7 +134,7 @@ final class AppFeatureTests: TestCase {
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		await store.receive(.internal(.system(.displayErrorAlert(App.UserFacingError(Splash.FailedToDecodeProfileError(error: decodingError)))))) {
+		await store.receive(.internal(.system(.displayErrorAlert(App.UserFacingError(ProfileLoader.FailedToDecodeProfileError(error: decodingError)))))) {
 			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("Failed to decode profile: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))"))
 		}
 
