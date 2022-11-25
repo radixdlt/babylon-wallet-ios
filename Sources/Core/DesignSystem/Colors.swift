@@ -64,6 +64,11 @@ public extension Color.App {
 		.white.opacity(0.8)
 	}
 
+	// alert
+	var red1: Color {
+		.init(hex: .red1)
+	}
+
 	var backgroundDark: Color {
 		.black
 	}

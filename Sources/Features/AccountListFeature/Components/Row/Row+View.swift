@@ -43,7 +43,7 @@ public extension AccountList.Row.View {
 					)
 
 					AddressView(
-						address: viewStore.address.wrapAsAddress(),
+						address: viewStore.address.wrapAsAddress().address,
 						copyAddressAction: {
 							viewStore.send(.copyAddressButtonTapped)
 						}
