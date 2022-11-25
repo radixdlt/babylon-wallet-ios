@@ -20,7 +20,7 @@ public extension ManageP2PClients {
 
 // MARK: - ManageP2PClients.Action.ChildAction
 public extension ManageP2PClients.Action {
-	enum ChildAction: Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case inputP2PConnectionPassword(InputPassword.Action)
 		case connectUsingPassword(ConnectUsingPassword.Action)
 		case connection(
@@ -32,7 +32,7 @@ public extension ManageP2PClients.Action {
 
 // MARK: - ManageP2PClients.Action.ViewAction
 public extension ManageP2PClients.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case viewAppeared
 		case dismissButtonTapped
 		case addNewConnectionButtonTapped
@@ -42,7 +42,7 @@ public extension ManageP2PClients.Action {
 
 // MARK: - ManageP2PClients.Action.InternalAction
 public extension ManageP2PClients.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -50,7 +50,7 @@ public extension ManageP2PClients.Action {
 
 // MARK: - ManageP2PClients.Action.InternalAction.SystemAction
 public extension ManageP2PClients.Action.InternalAction {
-	enum SystemAction: Equatable {
+	enum SystemAction: Sendable, Equatable {
 		case successfullyOpenedConnection(Connection)
 
 		case initConnectionSecretsResult(TaskResult<ConnectionSecrets>)

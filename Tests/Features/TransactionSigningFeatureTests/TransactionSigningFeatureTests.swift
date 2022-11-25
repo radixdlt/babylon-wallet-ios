@@ -16,19 +16,20 @@ final class TransactionSigningFeatureTests: TestCase {
 
 	lazy var store: TestStore = .init(
 		initialState: TransactionSigning.State(
-			request: request
+			request: request,
+			transactionWithLockFee: .mock
 		),
 		reducer: TransactionSigning()
 	)
 
 	func testInitialState() {
-		XCTAssertEqual(store.state.transactionManifest, .mock)
+		XCTAssertEqual(store.state.transactionManifestWithoutLockFee, .mock)
 	}
 
 	func testSignTransaction() async {
 		// Unhappy path - sign TX error
 		struct SignTransactionError: LocalizedError, Equatable { let errorDescription: String? = "SignTransactionError" }
-		store.dependencies.transactionClient.signTransaction = { @Sendable _ in
+		store.dependencies.transactionClient.signAndSubmitTransaction = { @Sendable _ in
 			throw SignTransactionError()
 		}
 		let errorExpectation2 = expectation(description: "Error")
@@ -36,6 +37,7 @@ final class TransactionSigningFeatureTests: TestCase {
 			XCTAssertEqual(error.localizedDescription, "SignTransactionError")
 			errorExpectation2.fulfill()
 		}
+
 		await store.send(.view(.signTransactionButtonTapped)) {
 			$0.isSigningTX = true
 		}
@@ -44,13 +46,13 @@ final class TransactionSigningFeatureTests: TestCase {
 		}
 
 		// Happy path
-		store.dependencies.transactionClient.signTransaction = { @Sendable _ in
-			"TXID"
+		store.dependencies.transactionClient.signAndSubmitTransaction = { @Sendable _ in
+			.placeholder
 		}
 		await store.send(.view(.signTransactionButtonTapped)) {
 			$0.isSigningTX = true
 		}
-		await store.receive(.internal(.signTransactionResult(.success("TXID")))) {
+		await store.receive(.internal(.signTransactionResult(.success("placeholder")))) {
 			$0.isSigningTX = false
 		}
 

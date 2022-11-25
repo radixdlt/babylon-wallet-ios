@@ -7,22 +7,22 @@ final class ToDappResponseTests: TestCase {
 	func test_encode_response() throws {
 		let response = P2P.ToDapp.Response(
 			id: "an_id", items: [
-				.ongoingAccountAddresses(.init(
+				.oneTimeAccountAddresses(.withoutProof(.init(
 					accountAddresses: .init(
 						rawValue: [.init(
 							accountAddress: try! .init(address: "address"),
 							label: "Label",
-							appearanceID: .fromIndex(0)
+							appearanceId: .fromIndex(0)
 						)]
 					)!
-				)),
+				))),
 			]
 		)
 		let encoder = JSONEncoder()
 		let jsonData = try encoder.encode(response)
 		let jsonString = try XCTUnwrap(jsonData.prettyPrintedJSONString)
 		print(jsonString)
-		XCTAssertTrue(jsonString.contains(P2P.FromDapp.Discriminator.ongoingAccountAddresses.rawValue))
+		XCTAssertTrue(jsonString.contains(P2P.FromDapp.Discriminator.oneTimeAccountAddresses.rawValue))
 	}
 
 	func test_decode_request_from_dApp() throws {
@@ -31,8 +31,8 @@ final class ToDappResponseTests: TestCase {
 		    "payload":
 		    [
 		        {
-		            "requestType": "ongoingAccountAddresses",
-		            "proofOfOwnership": false
+		            "requestType": "oneTimeAccountAddresses",
+		            "requiresProofOfOwnership": false
 		        }
 		    ],
 		    "requestId": "791638de-cefa-43a8-9319-aa31c582fc7d",

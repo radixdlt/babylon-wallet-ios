@@ -108,7 +108,7 @@ final class HandleDappRequestsTests: TestCase {
 				request: .init(requestItem: item0.oneTimeAccountAddresses!, parentRequest: request)
 			)
 		)))) {
-			$0.unfinishedRequestsFromClient.finish(item0, with: .ongoingAccountAddresses(P2P.ToDapp.OngoingAccountAddressesResponse(accountAddresses: accountAddressesResponse)))
+			XCTAssertNil($0.unfinishedRequestsFromClient.finish(item0, with: .oneTimeAccountAddresses(.withoutProof(.init(accountAddresses: accountAddressesResponse)))))
 			$0.currentRequest = nil
 		}
 		await store.receive(.internal(.system(.handleNextRequestItemIfNeeded)))

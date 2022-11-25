@@ -1,6 +1,5 @@
 import ComposableArchitecture
 import ErrorQueue
-import GatewayAPI
 import KeychainClient
 import Mnemonic
 import Profile
@@ -8,18 +7,33 @@ import ProfileClient
 import TransactionClient
 
 // MARK: - MnemonicGenerator
-public typealias MnemonicGenerator = (BIP39.WordCount, BIP39.Language) throws -> Mnemonic
+public struct MnemonicGenerator: Sendable, DependencyKey {
+	public var generate: Generate
+}
+
+// MARK: MnemonicGenerator.Generate
+public extension MnemonicGenerator {
+	typealias Generate = @Sendable (BIP39.WordCount, BIP39.Language) throws -> Mnemonic
+}
+
+// = @Sendable (BIP39.WordCount, BIP39.Language) throws -> Mnemonic
 
 // MARK: - MnemonicGeneratorKey
-private enum MnemonicGeneratorKey: DependencyKey {
-	typealias Value = MnemonicGenerator
-	static let liveValue = { try Mnemonic(wordCount: $0, language: $1) }
+public extension MnemonicGenerator {
+	static let liveValue: Self = .init(generate: { try Mnemonic(wordCount: $0, language: $1) })
 }
+
+#if DEBUG
+import XCTestDynamicOverlay
+extension MnemonicGenerator: TestDependencyKey {
+	public static let testValue: Self = .init(generate: unimplemented("\(Self.self).generate"))
+}
+#endif // DEBUG
 
 public extension DependencyValues {
 	var mnemonicGenerator: MnemonicGenerator {
-		get { self[MnemonicGeneratorKey.self] }
-		set { self[MnemonicGeneratorKey.self] = newValue }
+		get { self[MnemonicGenerator.self] }
+		set { self[MnemonicGenerator.self] = newValue }
 	}
 }
 
@@ -49,20 +63,28 @@ public extension NewProfile {
 			precondition(state.canProceed)
 			precondition(!state.isCreatingProfile)
 			state.isCreatingProfile = true
-			return .run { [mnemonicGenerator, nameOfFirstAccount = state.nameOfFirstAccount] send in
+			return .run { [nameOfFirstAccount = state.nameOfFirstAccount] send in
 
 				await send(.internal(.system(.createdProfileResult(
+					// FIXME: - mainnet: extract into ProfileCreator client?
 					TaskResult {
-						let curve25519FactorSourceMnemonic = try mnemonicGenerator(BIP39.WordCount.twentyFour, BIP39.Language.english)
+						let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
+
+						// FIXME: betanet: stop using `.primary` use explicit version!
+						let networkAndGateway = AppPreferences.NetworkAndGateway.primary
+
+						let makeFirstAccountNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger = transactionClient.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger(networkAndGateway.network.id)
 
 						let newProfileRequest = CreateNewProfileRequest(
+							networkAndGateway: networkAndGateway,
 							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
-							createFirstAccountRequest: .init(
-								accountName: nameOfFirstAccount
-							)
+							nameOfFirstAccount: nameOfFirstAccount,
+							makeFirstAccountNonVirtualBySubmittingItToLedger: makeFirstAccountNonVirtualBySubmittingItToLedger
 						)
-						let makeOnLedger: MakeAccountNonVirtual = transactionClient.makeAccountNonVirtual
-						let newProfile = try await profileClient.createNewProfileWithOnLedgerAccount(newProfileRequest, makeOnLedger)
+
+						let newProfile = try await profileClient.createNewProfileWithOnLedgerAccount(
+							newProfileRequest
+						)
 
 						let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
 

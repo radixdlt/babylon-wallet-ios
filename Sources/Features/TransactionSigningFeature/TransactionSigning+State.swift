@@ -9,15 +9,21 @@ public extension TransactionSigning {
 	struct State: Equatable {
 		public let request: P2P.SignTransactionRequestToHandle
 		public var isSigningTX: Bool
-		public var transactionManifest: TransactionManifest
+		public var transactionManifestWithoutLockFee: TransactionManifest
+		public var transactionWithLockFee: TransactionManifest?
+		public var transactionWithLockFeeString: String?
 
 		public init(
 			request: P2P.SignTransactionRequestToHandle,
-			isSigningTX: Bool = false
+			isSigningTX: Bool = false,
+			transactionWithLockFee: TransactionManifest? = nil,
+			transactionWithLockFeeString: String? = nil
 		) {
 			self.request = request
 			self.isSigningTX = isSigningTX
-			transactionManifest = request.requestItem.transactionManifest
+			transactionManifestWithoutLockFee = request.requestItem.transactionManifest
+			self.transactionWithLockFee = transactionWithLockFee
+			self.transactionWithLockFeeString = transactionWithLockFeeString
 		}
 	}
 }

@@ -89,24 +89,25 @@ public extension GatewayAPIClient {
 			return response
 		}
 
-		@Sendable func getNetworkName(baseURL: URL) async throws -> Network.Name {
-			let response = try await makeRequest(
+		@Sendable func getGatewayInfo(baseURL: URL, timeoutInterval: TimeInterval?) async throws -> GatewayAPI.GatewayInfoResponse {
+			try await makeRequest(
 				responseType: GatewayAPI.GatewayInfoResponse.self,
 				baseURL: baseURL,
-				timeoutInterval: 2
+				timeoutInterval: timeoutInterval
 			) {
 				$0.appendingPathComponent("gateway")
 			}
-			return Network.Name(rawValue: response.ledgerState.network)
+		}
+		@Sendable func getNetworkName(baseURL: URL) async throws -> Network.Name {
+			let gatewayInfo = try await getGatewayInfo(baseURL: baseURL, timeoutInterval: 2)
+			return Network.Name(rawValue: gatewayInfo.ledgerState.network)
 		}
 
 		let setCurrentBaseURL: SetCurrentBaseURL = { newURL in
 			let currentURL = await getCurrentBaseURL()
 			guard newURL != currentURL else {
-				print("same URL, do nothing")
 				return nil
 			}
-			print("not same URL, test! ✅")
 			let name = try await getNetworkName(baseURL: newURL)
 			// FIXME: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
 			// once it returns networkID!
@@ -173,14 +174,15 @@ public extension GatewayAPIClient {
 			return try await makeRequest(httpBodyData: httpBody, urlFromBase: urlFromBase)
 		}
 
-		let getGateway: GetGateway = {
-			try await post { $0.appendingPathComponent("gateway") }
-		}
+		let getGatewayInfo: GetGatewayInfo = { try await getGatewayInfo(baseURL: getCurrentBaseURL(), timeoutInterval: nil) }
 
 		return Self(
 			getCurrentBaseURL: getCurrentBaseURL,
 			setCurrentBaseURL: setCurrentBaseURL,
-			getGateway: getGateway,
+			getGatewayInfo: getGatewayInfo,
+			getEpoch: {
+				try await Epoch(rawValue: .init(getGatewayInfo().ledgerState.epoch))
+			},
 			accountResourcesByAddress: { accountAddress in
 				try await post(
 					request: GatewayAPI.EntityResourcesRequest(address: accountAddress.address)
@@ -249,21 +251,15 @@ public extension GatewayAPIClient {
 
 	// MARK: Submit TX Flow
 	func submit(
-		pollStrategy: PollStrategy = .default,
-		signedCompiledNotarizedTXGivenEpoch: (Epoch) async throws -> SignedCompiledNotarizedTX
-	) async throws -> (committedTransaction: GatewayAPI.TransactionDetailsResponse, txID: TXID) {
+		notarizedTransaction: Data,
+		txID: TXID,
+		pollStrategy: PollStrategy = .default
+	) async throws -> (txDetails: GatewayAPI.TransactionDetailsResponse, txID: TXID) {
 		@Dependency(\.mainQueue) var mainQueue
-
-		// MARK: Get Epoch
-		let gatewayResponse = try await getGateway()
-		let epoch = Epoch(rawValue: .init(gatewayResponse.ledgerState.epoch))
-
-		// MARK: Build & Sign TX
-		let signedCompiledNotarizedTX = try await signedCompiledNotarizedTXGivenEpoch(epoch)
 
 		// MARK: Submit TX
 		let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
-			notarizedTransaction: signedCompiledNotarizedTX.compileNotarizedTransactionIntentResponse.compiledNotarizedIntent.hex
+			notarizedTransaction: notarizedTransaction.hex
 		)
 
 		let response = try await submitTransaction(submitTransactionRequest)
@@ -271,15 +267,16 @@ public extension GatewayAPIClient {
 			throw FailedToSubmitTransactionWasDuplicate()
 		}
 
+		let transactionIdentifier = GatewayAPI.TransactionLookupIdentifier(
+			origin: .intent,
+			valueHex: txID.rawValue
+		)
+
 		// MARK: Poll Status
 		var txStatus: GatewayAPI.TransactionStatus = .init(status: .pending)
-		let intentHash = signedCompiledNotarizedTX.intentHash.hex
 		@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
 			let txStatusRequest = GatewayAPI.TransactionStatusRequest(
-				transactionIdentifier: .init(
-					origin: .intent,
-					valueHex: intentHash
-				)
+				transactionIdentifier: transactionIdentifier
 			)
 			let txStatusResponse = try await transactionStatus(txStatusRequest)
 			return txStatusResponse.transaction.transactionStatus
@@ -300,7 +297,7 @@ public extension GatewayAPIClient {
 
 		// MARK: Get TX Details
 
-		let transactionDetailsRequest = GatewayAPI.TransactionDetailsRequest(transactionIdentifier: .init(origin: .intent, valueHex: intentHash))
+		let transactionDetailsRequest = GatewayAPI.TransactionDetailsRequest(transactionIdentifier: transactionIdentifier)
 		let transactionDetailsResponse = try await transactionDetails(transactionDetailsRequest)
 
 		guard transactionDetailsResponse.transaction.transactionStatus.status == .succeeded else {
@@ -308,7 +305,6 @@ public extension GatewayAPIClient {
 			throw TXWasSubmittedButNotSuccessfully()
 		}
 
-		let txID = TXID(rawValue: intentHash)
 		return (transactionDetailsResponse, txID)
 	}
 }

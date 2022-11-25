@@ -23,7 +23,7 @@ public extension P2P.FromDapp {
 
 public extension P2P.FromDapp.OneTimeAccountAddressesRequest {
 	private enum CodingKeys: String, CodingKey {
-		case isRequiringOwnershipProof = "proofOfOwnership"
+		case isRequiringOwnershipProof = "requiresProofOfOwnership"
 		case numberOfAddresses
 	}
 

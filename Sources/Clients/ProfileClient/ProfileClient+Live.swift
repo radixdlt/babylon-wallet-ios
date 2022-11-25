@@ -1,17 +1,19 @@
+import Collections
 import ComposableArchitecture
 import CryptoKit
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
 import KeychainClientDependency
+import NonEmpty
 import Profile
 import SLIP10
 import URLBuilderClient
 import UserDefaultsClient
 
-// MARK: - ProfileClient + DependencyKey
-extension ProfileClient: DependencyKey {
-	public static let liveValue: Self = {
+// MARK: - ProfileClient + LiveValue
+public extension ProfileClient {
+	static let liveValue: Self = {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.keychainClient) var keychainClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -41,6 +43,17 @@ extension ProfileClient: DependencyKey {
 			await getNetworkAndGateway().gatewayAPIEndpointURL
 		}
 
+		let lookupAccountByAddress: LookupAccountByAddress = { accountAddress in
+			// Get default NetworkID
+			let networkID = await getCurrentNetworkID()
+			return try await profileHolder.get { profile in
+				guard let account = try profile.entity(networkID: networkID, address: accountAddress) as? OnNetwork.Account else {
+					throw ExpectedEntityToBeAccount()
+				}
+				return account
+			}
+		}
+
 		return Self(
 			getCurrentNetworkID: getCurrentNetworkID,
 			getGatewayAPIEndpointBaseURL: getGatewayAPIEndpointBaseURL,
@@ -50,13 +63,14 @@ extension ProfileClient: DependencyKey {
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
-			createNewProfileWithOnLedgerAccount: { request, makeAccountNonVirtual in
+			createNewProfileWithOnLedgerAccount: { request in
+				let networkAndGateway = request.networkAndGateway
 
 				let newProfile = try await Profile.new(
-					networkAndGateway: .primary,
+					networkAndGateway: networkAndGateway,
 					mnemonic: request.curve25519FactorSourceMnemonic,
-					firstAccountDisplayName: request.createFirstAccountRequest.accountName,
-					makeFirstAccountNonVirtualBySubmittingItToLedger: makeAccountNonVirtual(request.createFirstAccountRequest)
+					firstAccountDisplayName: request.nameOfFirstAccount,
+					makeFirstAccountNonVirtualBySubmittingItToLedger: request.makeFirstAccountNonVirtualBySubmittingItToLedger
 				)
 
 				return newProfile
@@ -101,61 +115,65 @@ extension ProfileClient: DependencyKey {
 					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
-			createOnLedgerAccount: { createAccountRequest, makeAccountNonVirtual in
+			createOnLedgerAccount: { request in
 				try await profileHolder.asyncMutating { profile in
-
-					try await profile.createNewOnLedgerAccount(
-						networkID: getCurrentNetworkID(),
-						displayName: createAccountRequest.accountName,
-						makeEntityNonVirtualBySubmittingItToLedger: makeAccountNonVirtual(createAccountRequest),
+					let networkID = await getCurrentNetworkID()
+					return try await profile.createNewOnLedgerAccount(
+						networkID: networkID,
+						displayName: request.nameOfAccount,
+						makeEntityNonVirtualBySubmittingItToLedger: request.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger(networkID),
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
 							try keychainClient.loadFactorSourceMnemonic(reference: reference)
 						}
 					)
 				}
 			},
-			lookupAccountByAddress: { accountAddress in
-				// Get default NetworkID
-				let networkID = await getCurrentNetworkID()
-				return try await profileHolder.get { profile in
-					guard let account = try profile.entity(networkID: networkID, address: accountAddress) as? OnNetwork.Account else {
-						throw ExpectedEntityToBeAccount()
-					}
-					return account
+			lookupAccountByAddress: lookupAccountByAddress,
+			privateKeysForAddresses: { request in
+
+				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { [keychainClient] reference in
+					try keychainClient.loadFactorSourceMnemonic(reference: reference)
 				}
-			},
-			signTransaction: { _ in
 
-				//                engineToolkitClient.accountAddressesOfSigners()
-				//
-				//				try await profileHolder.getAsync { profile in
-				//					try await profile.withPrivateKeys(
-				//						of: account,
-				//						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-				//							try keychainClient.loadFactorSourceMnemonic(reference: reference)
-				//						}
-				//					) { privateKeys in
-				//						let privateKey = privateKeys.first
-				//						fatalError()
-				//						print("🔏 Signing transaction and submitting to Ledger ✨")
-				//						let (_, txID) = try await gatewayAPIClient.submit(
-				//							pollStrategy: pollStrategy
-				//						) { epoch in
-				//
-				//							let signReq = BuildAndSignTransactionWithManifestRequest(
-				//								manifest: manifest,
-				//								privateKey: privateKey,
-				//								epoch: epoch,
-				//								networkID: getCurrentNetworkID()
-				//							)
-				//
-				//							return try engineToolkitClient.sign(request: signReq)
-				//						}
-				//						print("🔏 SUCCESSFULLY Signing transaction and submitting to Ledger ✅")
-				//						return txID
-				//					}
+				func getPrivateKeysFromAddresses() async throws -> OrderedSet<PrivateKey>? {
+					guard let addresses = NonEmpty(rawValue: request.addresses) else { return nil }
 
-				throw NSError(domain: "Transaction signing disabled until app is Hammunet compatible, once we have it we will use EngineToolkit to get required list of signers and sign.", code: 1337)
+					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
+
+					let matrix: [Set<PrivateKey>] = try await profileHolder.getAsync { profile -> [Set<PrivateKey>] in
+						try await accounts.asyncMap { account -> Set<PrivateKey> in
+							try await profile.withPrivateKeys(
+								of: account,
+								mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
+							) { (keys: NonEmpty<Set<PrivateKey>>) -> Set<PrivateKey> in
+								keys.rawValue
+							}
+						}
+					}
+					var privateKeys = OrderedSet<PrivateKey>()
+					matrix.forEach {
+						privateKeys.append(contentsOf: $0)
+					}
+					return privateKeys
+				}
+
+				func getPrivateKeys() async throws -> OrderedSet<PrivateKey> {
+					guard let fromAddresses = try? await getPrivateKeysFromAddresses() else {
+						// TransactionManifest does not reference any accounts => use any account!
+						return try await profileHolder.getAsync { profile in
+							try await profile.withPrivateKeys(networkID: request.networkID, kind: .account, entityIndex: 0, mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference) {
+								OrderedSet($0)
+							}
+						}
+					}
+					return fromAddresses
+				}
+
+				guard let nonEmptyKeys = try await NonEmpty(rawValue: getPrivateKeys()) else {
+					throw FoundNoKeysForAddresses()
+				}
+
+				return nonEmptyKeys
 			}
 		)
 	}()
@@ -164,9 +182,11 @@ extension ProfileClient: DependencyKey {
 // MARK: - ExpectedEntityToBeAccount
 struct ExpectedEntityToBeAccount: Swift.Error {}
 
+// MARK: - FoundNoKeysForAddresses
+struct FoundNoKeysForAddresses: Swift.Error {}
+
 // MARK: - NoProfile
-/// Used in GatewayClient as well
-public struct NoProfile: Swift.Error {}
+struct NoProfile: Swift.Error {}
 
 // MARK: - ProfileHolder
 private actor ProfileHolder: GlobalActor {
@@ -180,7 +200,7 @@ private actor ProfileHolder: GlobalActor {
 	}
 
 	@discardableResult
-	func get<T>(_ withProfile: (Profile) throws -> T) throws -> T {
+	func get<T>(_ withProfile: @Sendable (Profile) throws -> T) throws -> T {
 		guard let profile else {
 			throw NoProfile()
 		}
@@ -188,7 +208,7 @@ private actor ProfileHolder: GlobalActor {
 	}
 
 	@discardableResult
-	func getAsync<T>(_ withProfile: (Profile) async throws -> T) async throws -> T {
+	func getAsync<T>(_ withProfile: @Sendable (Profile) async throws -> T) async throws -> T {
 		guard let profile else {
 			throw NoProfile()
 		}
@@ -201,7 +221,7 @@ private actor ProfileHolder: GlobalActor {
 		try keychainClient.updateProfileSnapshot(profileSnapshot: profileSnapshot)
 	}
 
-	func asyncMutating<T>(_ mutateProfile: (inout Profile) async throws -> T) async throws -> T {
+	func asyncMutating<T>(_ mutateProfile: @Sendable (inout Profile) async throws -> T) async throws -> T {
 		guard var profile else {
 			throw NoProfile()
 		}

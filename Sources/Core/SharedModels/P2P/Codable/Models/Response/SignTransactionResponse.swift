@@ -10,5 +10,8 @@ public extension P2P.ToDapp {
 	///
 	struct SignTransactionResponse: Sendable, Hashable, Encodable {
 		public let transactionIntentHash: TXID
+		public init(txID: TXID) {
+			transactionIntentHash = txID
+		}
 	}
 }
