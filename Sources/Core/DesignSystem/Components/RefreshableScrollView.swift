@@ -49,9 +49,8 @@ public struct RefreshableScrollView<Content: View>: View {
 struct RefreshableScrollView_Previews: PreviewProvider {
 	static var previews: some View {
 		RefreshableScrollView {
-			Text("Content").padding()
+			Text("Pull me down to refresh!").padding()
 		}
-		.background(Color.blue)
 		.refreshable {
 			try? await Task.sleep(nanoseconds: NSEC_PER_SEC * 2)
 			print("Refreshed")
