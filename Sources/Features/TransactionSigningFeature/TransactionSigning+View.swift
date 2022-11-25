@@ -23,28 +23,36 @@ public extension TransactionSigning.View {
 			observe: ViewState.init,
 			send: { .view($0) }
 		) { viewStore in
-			Screen(title: "Sign TX", navBarActionStyle: .close, action: { viewStore.send(.closeButtonTapped) }) {
-				ZStack {
-					VStack(spacing: 20) {
-						if let manifest = viewStore.manifest {
-							ScrollView([.vertical], showsIndicators: false) {
-								Text(manifest)
-									.padding()
-									.font(.system(size: 13, design: .monospaced))
-									.frame(maxHeight: .infinity, alignment: .topLeading)
-							}
-							.background(Color(white: 0.9))
-
-							Button("Sign Transaction") {
-								viewStore.send(.signTransactionButtonTapped)
-							}
-							.buttonStyle(.primary)
-							.enabled(viewStore.isSignButtonEnabled)
-						} else {
-							LoadingView()
+			ForceFullScreen {
+				VStack {
+					NavigationBar(
+						titleText: "Sign TX",
+						leadingItem: CloseButton {
+							viewStore.send(.closeButtonTapped)
 						}
-					}
-					.padding([.horizontal, .bottom])
+					)
+
+					ZStack {
+						VStack(spacing: 20) {
+							if let manifest = viewStore.manifest {
+								ScrollView([.vertical], showsIndicators: false) {
+									Text(manifest)
+										.padding()
+										.font(.system(size: 13, design: .monospaced))
+										.frame(maxHeight: .infinity, alignment: .topLeading)
+								}
+								.background(Color(white: 0.9))
+
+								Button("Sign Transaction") {
+									viewStore.send(.signTransactionButtonTapped)
+								}
+								.buttonStyle(.primaryRectangular)
+								.enabled(viewStore.isSignButtonEnabled)
+							} else {
+								LoadingView()
+							}
+						}
+						.padding([.horizontal, .bottom])
 
 						if viewStore.isShowingLoader {
 							LoadingView()
