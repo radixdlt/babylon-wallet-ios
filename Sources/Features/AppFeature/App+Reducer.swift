@@ -68,7 +68,7 @@ public struct App: ReducerProtocol {
 				goToOnboarding(state: &state)
 				return .none
 			case let .failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot):
-				return incompatibleSnapshotData(version: failedToCreateProfileFromSnapshot.snapshot.version, state: &state)
+				return incompatibleSnapshotData(version: failedToCreateProfileFromSnapshot.version, state: &state)
 			case .noProfile:
 				goToOnboarding(state: &state)
 				return .none

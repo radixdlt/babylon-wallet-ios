@@ -29,7 +29,7 @@ public extension ProfileLoader {
 								let profile = try Profile(snapshot: profileSnapshot)
 								return .compatibleProfile(profile)
 							} catch {
-								return .failedToCreateProfileFromSnapshot(.init(snapshot: profileSnapshot, error: error))
+								return .failedToCreateProfileFromSnapshot(.init(version: profileSnapshot.version, error: error))
 							}
 						} catch let decodingError as Swift.DecodingError {
 							return .decodingFailure(json: profileSnapshotData, .known(.init(decodingError: decodingError)))

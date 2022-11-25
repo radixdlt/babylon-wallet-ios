@@ -27,12 +27,17 @@ public extension ProfileLoader {
 public extension ProfileLoader {
 	struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Equatable {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
-			lhs.snapshot == rhs.snapshot && lhs.errorDescription == rhs.errorDescription
+			lhs.version == rhs.version && lhs.errorDescription == rhs.errorDescription
 		}
 
-		public let snapshot: ProfileSnapshot
+		public let version: ProfileSnapshot.Version
 		public let error: Swift.Error
-		public var errorDescription: String? { "Failed to create profile from snapshot, error: \(String(describing: error)), snapshot: \(String(describing: snapshot))" }
+		public init(version: ProfileSnapshot.Version, error: Error) {
+			self.version = version
+			self.error = error
+		}
+
+		public var errorDescription: String? { "Failed to create profile from snapshot, error: \(String(describing: error)), version: \(String(describing: version))" }
 	}
 
 	enum JSONDecodingError: Sendable, LocalizedError, Equatable {
