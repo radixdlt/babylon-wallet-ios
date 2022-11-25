@@ -63,27 +63,20 @@ public struct FungibleTokenContainer: AssetContainer, Equatable {
 	public typealias T = FungibleToken
 	public var asset: FungibleToken
 
-	/// Token amount held in one account.
-	public var amountInAttos: BigUInt?
+	/// Token amount held in one account, expressed as regular decimal value, for example: 105.78 XRD
+	public var amount: BigUInt?
 	/// Token worth in currently selected currency.
 	public var worth: BigUInt?
-
-	public var amountInWhole: BigUInt? {
-		guard let amountInAttos else { return nil }
-		// FIXME: what to do if nil? Assume 18.. really?
-		let divisibility = asset.divisibility ?? 18
-		return amountInAttos / BigUInt(10).power(divisibility)
-	}
 
 	public init(
 		owner: AccountAddress,
 		asset: FungibleToken,
-		amountInAttos: BigUInt?,
+		amount: BigUInt?,
 		worth: BigUInt?
 	) {
 		self.owner = owner
 		self.asset = asset
-		self.amountInAttos = amountInAttos
+		self.amount = amount
 		self.worth = worth
 	}
 }
