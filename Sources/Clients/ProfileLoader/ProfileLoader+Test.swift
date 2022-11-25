@@ -1,6 +1,6 @@
+import Dependencies
 import Profile
 #if DEBUG
-import Dependencies
 import XCTestDynamicOverlay
 
 // MARK: - ProfileLoader + TestDependencyKey
