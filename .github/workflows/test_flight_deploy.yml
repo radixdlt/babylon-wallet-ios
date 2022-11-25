@@ -34,4 +34,4 @@ jobs:
         run: |
           echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
-          bundle exec ios fastlane beta
+          bundle exec fastlane ios beta
