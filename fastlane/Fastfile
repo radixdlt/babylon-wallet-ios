@@ -4,7 +4,7 @@ default_platform(:ios)
 
 before_all do
     Dotenv.load ".env.secret"
-    # ensure_git_status_clean
+    ensure_git_status_clean
 end
 
 platform :ios do
@@ -17,12 +17,13 @@ platform :ios do
         run_tests
     end
 
-    lane :beta do
+    desc "Builds and deploys beta app to TestFlight"
+    lane :beta_deploy do
         install_distribution_certificate
     	increment_build_number(xcodeproj: ENV['PROJ_PATH'])
         commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
         build_app
-        #upload_to_testflight
+        upload_to_testflight
         push_to_git_remote
     end
 
