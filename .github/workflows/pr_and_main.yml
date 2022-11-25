@@ -57,7 +57,7 @@ jobs:
       - name: "Run unit tests"
         run: |
           brew install xcbeautify
-          bundle exec fastlane tests
+          bundle exec ios fastlane tests
 
   # snapshot_tests:
   #   name: "Snapshot tests"
