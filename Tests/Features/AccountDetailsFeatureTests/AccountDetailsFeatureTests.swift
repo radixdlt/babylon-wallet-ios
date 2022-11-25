@@ -90,7 +90,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		)
 
 		// when
-		await store.send(.internal(.view(.refreshButtonTapped)))
+		await store.send(.internal(.view(.pullToRefreshStarted)))
 
 		// then
 		await store.receive(.delegate(.refresh(store.state.address)))

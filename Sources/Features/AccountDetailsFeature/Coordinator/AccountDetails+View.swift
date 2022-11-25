@@ -42,7 +42,7 @@ public extension AccountDetails.View {
 					.foregroundColor(.app.whiteTransparent)
 					.padding(.bottom, .medium1)
 
-					ScrollView {
+					RefreshableScrollView {
 						VStack(spacing: .medium3) {
 							AssetsView.View(
 								store: store.scope(
@@ -52,6 +52,9 @@ public extension AccountDetails.View {
 							)
 						}
 						.padding(.bottom, .medium1)
+					}
+					.refreshable {
+						await viewStore.send(.pullToRefreshStarted).finish()
 					}
 					.background(Color.app.gray5)
 					.padding(.bottom, .medium2)
