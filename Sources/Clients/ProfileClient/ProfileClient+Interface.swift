@@ -8,25 +8,20 @@ import NonEmpty
 import Profile
 import SLIP10
 
-public typealias DefineFunctionToMakeEntityNonVirtualBySubmittingItToLedger = @Sendable (NetworkID) -> MakeEntityNonVirtualBySubmittingItToLedger
-
 // MARK: - CreateNewProfileRequest
 public struct CreateNewProfileRequest: Sendable {
 	public let networkAndGateway: AppPreferences.NetworkAndGateway
 	public let curve25519FactorSourceMnemonic: Mnemonic
 	public let nameOfFirstAccount: String?
-	public let makeFirstAccountNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger
 
 	public init(
 		networkAndGateway: AppPreferences.NetworkAndGateway,
 		curve25519FactorSourceMnemonic: Mnemonic,
-		nameOfFirstAccount: String?,
-		makeFirstAccountNonVirtualBySubmittingItToLedger: @escaping MakeEntityNonVirtualBySubmittingItToLedger
+		nameOfFirstAccount: String?
 	) {
 		self.networkAndGateway = networkAndGateway
 		self.curve25519FactorSourceMnemonic = curve25519FactorSourceMnemonic
 		self.nameOfFirstAccount = nameOfFirstAccount
-		self.makeFirstAccountNonVirtualBySubmittingItToLedger = makeFirstAccountNonVirtualBySubmittingItToLedger
 	}
 }
 
@@ -38,7 +33,7 @@ public struct ProfileClient: DependencyKey, Sendable {
 	public var setNetworkAndGateway: SetNetworkAndGateway
 
 	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
-	public var createNewProfileWithOnLedgerAccount: CreateNewProfileWithOnLedgerAccount
+	public var createNewProfile: CreateNewProfile
 
 	public var injectProfile: InjectProfile
 	public var extractProfileSnapshot: ExtractProfileSnapshot
@@ -52,7 +47,7 @@ public struct ProfileClient: DependencyKey, Sendable {
 	public var deleteP2PClientByID: DeleteP2PClientByID
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
-	public var createOnLedgerAccount: CreateOnLedgerAccount
+	public var createVirtualAccount: CreateVirtualAccount
 	public var lookupAccountByAddress: LookupAccountByAddress
 
 	// FIXME: - mainnet remove this and change to `async throws -> ([Prompt]) async throws -> NonEmpty<Set<Signer>>` when Profile supports multiple factor sources of different kinds.
@@ -77,7 +72,7 @@ public extension ProfileClient {
 	typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Void
 	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
-	typealias CreateNewProfileWithOnLedgerAccount = @Sendable (CreateNewProfileRequest) async throws -> Profile
+	typealias CreateNewProfile = @Sendable (CreateNewProfileRequest) async throws -> Profile
 
 	typealias InjectProfile = @Sendable (Profile) async throws -> Void
 
@@ -91,26 +86,11 @@ public extension ProfileClient {
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
-	typealias CreateOnLedgerAccount = @Sendable (CreateOnLedgerAccountRequest) async throws -> OnNetwork.Account
+	typealias CreateVirtualAccount = @Sendable (CreateAnotherAccountRequest) async throws -> OnNetwork.Account
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 
 	// FIXME: - mainnet remove this and change to `async throws -> ([Prompt]) async throws -> NonEmpty<Set<Signer>>` when Profile supports multiple factor sources of different kinds.
 	typealias PrivateKeysForAddresses = @Sendable (PrivateKeysForAddressesRequest) async throws -> NonEmpty<OrderedSet<PrivateKey>>
-}
-
-// MARK: - CreateOnLedgerAccountRequest
-public struct CreateOnLedgerAccountRequest: Sendable {
-	public let nameOfAccount: String?
-
-	public let defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger: DefineFunctionToMakeEntityNonVirtualBySubmittingItToLedger
-
-	public init(
-		nameOfAccount: String?,
-		defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger: @escaping DefineFunctionToMakeEntityNonVirtualBySubmittingItToLedger
-	) {
-		self.nameOfAccount = nameOfAccount
-		self.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger = defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger
-	}
 }
 
 // MARK: - AccountSignature
