@@ -31,33 +31,35 @@ public extension TransactionSigning.View {
 							viewStore.send(.closeButtonTapped)
 						}
 					)
+					ForceFullScreen {
+						ZStack {
+							VStack(spacing: 20) {
+								if let manifest = viewStore.manifest {
+									ScrollView([.vertical], showsIndicators: false) {
+										Text(manifest)
+											.padding()
+											.font(.system(size: 13, design: .monospaced))
+											.frame(maxHeight: .infinity, alignment: .topLeading)
+									}
+									.background(Color(white: 0.9))
 
-					ZStack {
-						VStack(spacing: 20) {
-							if let manifest = viewStore.manifest {
-								ScrollView([.vertical], showsIndicators: false) {
-									Text(manifest)
-										.padding()
-										.font(.system(size: 13, design: .monospaced))
-										.frame(maxHeight: .infinity, alignment: .topLeading)
+									Button("Sign Transaction") {
+										viewStore.send(.signTransactionButtonTapped)
+									}
+									.buttonStyle(.primaryRectangular)
+									.enabled(viewStore.isSignButtonEnabled)
+								} else {
+									LoadingView()
 								}
-								.background(Color(white: 0.9))
+							}
+							.padding([.horizontal, .bottom])
 
-								Button("Sign Transaction") {
-									viewStore.send(.signTransactionButtonTapped)
-								}
-								.buttonStyle(.primaryRectangular)
-								.enabled(viewStore.isSignButtonEnabled)
-							} else {
+							if viewStore.isShowingLoader {
 								LoadingView()
 							}
 						}
-						.padding([.horizontal, .bottom])
-
-						if viewStore.isShowingLoader {
-							LoadingView()
-						}
 					}
+					Spacer()
 				}
 				.onAppear {
 					viewStore.send(.didAppear)
@@ -65,6 +67,14 @@ public extension TransactionSigning.View {
 			}
 		}
 	}
+}
+
+private extension TransactionSigning.View {
+	@ViewBuilder
+	func sign(
+		manifest: String,
+		viewStore: ViewStore<ViewState, TransactionSigning.Action.ViewAction>
+	) -> some View {}
 }
 
 // MARK: - TransactionSigning.View.ViewState
