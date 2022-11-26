@@ -278,6 +278,7 @@ package.addModules([
 		name: "AccountPreferencesFeature",
 		dependencies: [
 			"Common",
+			"DesignSystem",
 			tca,
 		],
 		tests: .yes(
@@ -288,6 +289,7 @@ package.addModules([
 		name: "AggregatedValueFeature",
 		dependencies: [
 			"Common",
+			"DesignSystem",
 			tca,
 		],
 		tests: .yes(
@@ -353,6 +355,7 @@ package.addModules([
 		dependencies: [
 			"Asset",
 			"Common",
+			"DesignSystem",
 			tca,
 		],
 		tests: .yes(
@@ -430,6 +433,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"Data",
+			"DesignSystem",
 			"ErrorQueue",
 			"JSON",
 			"KeychainClientDependency",
@@ -501,6 +505,7 @@ package.addModules([
 		dependencies: [
 			"Asset",
 			"Common",
+			"DesignSystem",
 			tca,
 		],
 		tests: .yes(
@@ -554,6 +559,7 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
+			"DesignSystem",
 			"ErrorQueue",
 			"ProfileClient",
 			"ProfileLoader",
@@ -569,6 +575,7 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
+			"DesignSystem",
 			"EngineToolkitClient",
 			"ErrorQueue",
 			"GatewayAPI",
@@ -787,7 +794,6 @@ package.addModules([
 		dependencies: [
 			bite,
 			bigInt,
-			"DesignSystem",
 			engineToolkit,
 			legibleError,
 			profile, // Address

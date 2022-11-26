@@ -23,71 +23,78 @@ public extension ManageGatewayAPIEndpoints.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			Screen(
-				title: "Edit Gateway API URL",
-				navBarActionStyle: .close,
-				action: { viewStore.send(.dismissButtonTapped) }
-			) {
-				VStack(alignment: .leading) {
-					if let networkAndGateway = viewStore.networkAndGateway {
-						networkAndGatewayView(networkAndGateway)
-					}
-
-					Spacer()
-
-					ZStack {
-						VStack {
-							TextField(
-								"Scheme",
-								text: viewStore.binding(
-									get: \.scheme,
-									send: { .schemeChanged($0) }
-								)
-							)
-
-							TextField(
-								"Host",
-								text: viewStore.binding(
-									get: \.host,
-									send: { .hostChanged($0) }
-								)
-							)
-
-							TextField(
-								"Path",
-								text: viewStore.binding(
-									get: \.path,
-									send: { .pathChanged($0) }
-								)
-							)
-
-							TextField(
-								"Port",
-								text: viewStore.binding(
-									get: \.port,
-									send: { .portChanged($0) }
-								)
-							)
+			ForceFullScreen {
+				VStack {
+					NavigationBar(
+						titleText: "Edit Gateway API URL",
+						leadingItem: CloseButton {
+							viewStore.send(.dismissButtonTapped)
 						}
-						.textFieldStyle(.roundedBorder)
+					)
+					.foregroundColor(.app.gray1)
+					.padding([.horizontal, .top], .medium3)
 
-						if viewStore.isShowingLoader {
-							LoadingView()
+					VStack(alignment: .leading) {
+						if let networkAndGateway = viewStore.networkAndGateway {
+							networkAndGatewayView(networkAndGateway)
 						}
-					}
 
-					Spacer()
+						Spacer()
 
-					Button("Switch To") {
-						viewStore.send(.switchToButtonTapped)
+						ZStack {
+							VStack {
+								TextField(
+									"Scheme",
+									text: viewStore.binding(
+										get: \.scheme,
+										send: { .schemeChanged($0) }
+									)
+								)
+
+								TextField(
+									"Host",
+									text: viewStore.binding(
+										get: \.host,
+										send: { .hostChanged($0) }
+									)
+								)
+
+								TextField(
+									"Path",
+									text: viewStore.binding(
+										get: \.path,
+										send: { .pathChanged($0) }
+									)
+								)
+
+								TextField(
+									"Port",
+									text: viewStore.binding(
+										get: \.port,
+										send: { .portChanged($0) }
+									)
+								)
+							}
+							.textFieldStyle(.roundedBorder)
+
+							if viewStore.isShowingLoader {
+								LoadingView()
+							}
+						}
+
+						Spacer()
+
+						Button("Switch To") {
+							viewStore.send(.switchToButtonTapped)
+						}
+						.enabled(viewStore.isSwitchToButtonEnabled)
 					}
-					.enabled(viewStore.isSwitchToButtonEnabled)
+					.padding([.horizontal, .bottom], .medium1)
+					.buttonStyle(.primaryRectangular)
 				}
-				.padding()
-				.buttonStyle(.primary)
-			}
-			.onAppear {
-				viewStore.send(.didAppear)
+				.onAppear {
+					viewStore.send(.didAppear)
+				}
 			}
 		}
 	}
@@ -100,15 +107,17 @@ private extension ManageGatewayAPIEndpoints.View {
 		value: CustomStringConvertible,
 		valueColor: Color = Color.app.gray2
 	) -> some View {
-		Group {
+		VStack(alignment: .leading) {
 			Text(label)
-				.font(.headline)
-				.foregroundColor(Color.app.gray1)
+				.foregroundColor(.app.gray2)
+				.textStyle(.body2HighImportance)
+
 			Text(String(describing: value))
 				.textSelection(.enabled)
-				.font(.title3)
-				.foregroundColor(valueColor)
+				.foregroundColor(.app.gray1)
+				.textStyle(.body1HighImportance)
 		}
+		.padding(.top, .small3)
 	}
 
 	func networkAndGatewayView(
@@ -116,11 +125,12 @@ private extension ManageGatewayAPIEndpoints.View {
 	) -> some View {
 		Group {
 			Text("Current")
-				.font(.title2)
+				.foregroundColor(.app.gray1)
+				.textStyle(.sectionHeader)
 
 			label("Network name", value: networkAndGateway.network.name)
 			label("Network ID", value: networkAndGateway.network.id)
-			label("Gateway API Endpoint", value: URLBuilderClient.liveValue.formatURL(networkAndGateway.gatewayAPIEndpointURL), valueColor: Color.app.blue2)
+			label("Gateway API Endpoint", value: URLBuilderClient.liveValue.formatURL(networkAndGateway.gatewayAPIEndpointURL), valueColor: .app.blue2)
 		}
 	}
 }

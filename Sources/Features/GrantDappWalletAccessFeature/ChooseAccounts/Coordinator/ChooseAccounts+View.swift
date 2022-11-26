@@ -68,7 +68,7 @@ public extension ChooseAccounts.View {
 						Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
 							viewStore.send(.continueButtonTapped)
 						}
-						.buttonStyle(.primary)
+						.buttonStyle(.primaryRectangular)
 						.enabled(viewStore.canProceed)
 					}
 
