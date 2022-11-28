@@ -3,7 +3,7 @@ import Profile
 
 // MARK: - CreateAccount.State
 public extension CreateAccount {
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public var numberOfExistingAccounts: Int
 		public var accountName: String
 		public var isValid: Bool
@@ -28,7 +28,7 @@ public extension CreateAccount {
 
 // MARK: - CreateAccount.State.Field
 public extension CreateAccount.State {
-	enum Field: String, Hashable {
+	enum Field: String, Sendable, Hashable {
 		case accountName
 	}
 }
