@@ -51,21 +51,16 @@ final class ImportProfileFeatureTests: TestCase {
 			invalidProfileData
 		}
 
-		let expectation1 = expectation(description: "Remove corrupt Profile data from keychain")
-		sut.dependencies.keychainClient.removeDataForKey = { _ in
-			expectation1.fulfill()
-		}
-
-		let expectation2 = expectation(description: "Error")
+		let expectation = expectation(description: "Error")
 		sut.dependencies.errorQueue.schedule = { error in
 			XCTAssertEqual(String(describing: error), "dataCorrupted(Swift.DecodingError.Context(codingPath: [], debugDescription: \"The given data was not valid JSON.\", underlyingError: Optional(Error Domain=NSCocoaErrorDomain Code=3840 \"Invalid value around line 1, column 0.\" UserInfo={NSDebugDescription=Invalid value around line 1, column 0., NSJSONSerializationErrorIndex=0})))")
-			expectation2.fulfill()
+			expectation.fulfill()
 		}
 
 		await sut.send(.view(.profileImported(.success(URL(string: "file://profiledataurl")!))))
 		await sut.finish()
 
-		wait(for: [expectation1, expectation2], timeout: 0)
+		wait(for: [expectation], timeout: 0)
 	}
 
 	func test__GIVEN__a_valid_profileSnapshot__WHEN__it_is_imported__THEN__reducer_calls_save_on_keychainClient_and_delegates_snapshot() async throws {
@@ -73,16 +68,15 @@ final class ImportProfileFeatureTests: TestCase {
 			initialState: ImportProfile.State(),
 			reducer: ImportProfile()
 		)
-
 		sut.dependencies.data = .init(contentsOfURL: { url, options in
 			XCTAssertEqual(url, URL(string: "file://profiledataurl")!)
 			XCTAssertEqual(options, .uncached)
 			return self.profileSnapshotData
 		})
 		let profileSnapshotDataInKeychain = ActorIsolated<Data?>(nil)
-		sut.dependencies.keychainClient.setDataDataForKey = { data, key, _ in
-			if key == "profileSnapshotKeychainKey" {
-				Task {
+		sut.dependencies.keychainClient.updateDataForKey = { @Sendable data, key, _, _ in
+			Task {
+				if key == "profileSnapshotKeychainKey" {
 					await profileSnapshotDataInKeychain.setValue(data)
 				}
 			}

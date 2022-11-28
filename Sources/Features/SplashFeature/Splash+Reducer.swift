@@ -4,7 +4,7 @@ import Foundation
 import ProfileLoader
 
 // MARK: - Splash
-public struct Splash: ReducerProtocol {
+public struct Splash: Sendable, ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileLoader) var profileLoader
@@ -22,28 +22,22 @@ public struct Splash: ReducerProtocol {
 			return .run { [profileLoader] send in
 				await send(.internal(.system(.loadProfileResult(
 					TaskResult {
-						try await profileLoader.loadProfile()
+						try await delay()
+						return await profileLoader.loadProfile()
 					}
 				))))
 			}
 
-		case let .internal(.system(.loadProfileResult(loadResult))):
+		case let .internal(.system(.loadProfileResult(.success(result)))):
 			return .run { send in
-				try await delay()
+				await send(.delegate(.profileResultLoaded(result)))
+			}
 
-				switch loadResult {
-				case let .success(profile?):
-					await send(.delegate(.profileLoaded(profile)))
-
-				case .success(.none):
-					await send(.delegate(.profileLoaded(nil)))
-
-				case let .failure(error as Swift.DecodingError):
-					errorQueue.schedule(FailedToDecodeProfileError(error: error))
-
-				case let .failure(error):
-					errorQueue.schedule(error)
-				}
+		// Failed to sleep?
+		case let .internal(.system(.loadProfileResult(.failure(error)))):
+			errorQueue.schedule(error)
+			return .run { send in
+				await send(.delegate(.profileResultLoaded(.noProfile)))
 			}
 
 		case .delegate:
@@ -59,13 +53,5 @@ public struct Splash: ReducerProtocol {
 		durationInMS = 700
 		#endif
 		try await mainQueue.sleep(for: .milliseconds(durationInMS))
-	}
-}
-
-// MARK: Splash.FailedToDecodeProfileError
-public extension Splash {
-	struct FailedToDecodeProfileError: LocalizedError {
-		let error: DecodingError
-		public var errorDescription: String? { "Failed to decode profile: \(String(describing: error))" }
 	}
 }

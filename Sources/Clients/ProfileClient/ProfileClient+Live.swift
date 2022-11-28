@@ -31,7 +31,7 @@ public extension ProfileClient {
 			do {
 				return try await getAppPreferences().networkAndGateway
 			} catch {
-				return AppPreferences.NetworkAndGateway.primary
+				return AppPreferences.NetworkAndGateway.hammunet
 			}
 		}
 
@@ -63,14 +63,13 @@ public extension ProfileClient {
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
-			createNewProfileWithOnLedgerAccount: { request in
+			createNewProfile: { request in
 				let networkAndGateway = request.networkAndGateway
 
 				let newProfile = try await Profile.new(
 					networkAndGateway: networkAndGateway,
 					mnemonic: request.curve25519FactorSourceMnemonic,
-					firstAccountDisplayName: request.nameOfFirstAccount,
-					makeFirstAccountNonVirtualBySubmittingItToLedger: request.makeFirstAccountNonVirtualBySubmittingItToLedger
+					firstAccountDisplayName: request.nameOfFirstAccount
 				)
 
 				return newProfile
@@ -83,9 +82,9 @@ public extension ProfileClient {
 			},
 			deleteProfileAndFactorSources: {
 				do {
-					try keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot()
 				} catch {
-					try keychainClient.removeProfileSnapshot()
+					try await keychainClient.removeProfileSnapshot()
 				}
 				await profileHolder.removeProfile()
 			},
@@ -115,15 +114,14 @@ public extension ProfileClient {
 					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
-			createOnLedgerAccount: { request in
+			createVirtualAccount: { request in
 				try await profileHolder.asyncMutating { profile in
 					let networkID = await getCurrentNetworkID()
-					return try await profile.createNewOnLedgerAccount(
+					return try await profile.createNewVirtualAccount(
 						networkID: networkID,
-						displayName: request.nameOfAccount,
-						makeEntityNonVirtualBySubmittingItToLedger: request.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger(networkID),
+						displayName: request.accountName,
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-							try keychainClient.loadFactorSourceMnemonic(reference: reference)
+							try await keychainClient.loadFactorSourceMnemonic(reference: reference)
 						}
 					)
 				}
@@ -132,7 +130,7 @@ public extension ProfileClient {
 			privateKeysForAddresses: { request in
 
 				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { [keychainClient] reference in
-					try keychainClient.loadFactorSourceMnemonic(reference: reference)
+					try await keychainClient.loadFactorSourceMnemonic(reference: reference)
 				}
 
 				func getPrivateKeysFromAddresses() async throws -> OrderedSet<PrivateKey>? {
@@ -218,7 +216,7 @@ private actor ProfileHolder: GlobalActor {
 	// Async because we might wanna add iCloud sync here in future.
 	private func persistProfile() async throws {
 		let profileSnapshot = try takeProfileSnapshot()
-		try keychainClient.updateProfileSnapshot(profileSnapshot: profileSnapshot)
+		try await keychainClient.updateProfileSnapshot(profileSnapshot: profileSnapshot)
 	}
 
 	func asyncMutating<T>(_ mutateProfile: @Sendable (inout Profile) async throws -> T) async throws -> T {

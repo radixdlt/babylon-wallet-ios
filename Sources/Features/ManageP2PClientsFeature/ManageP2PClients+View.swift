@@ -38,15 +38,22 @@ public extension ManageP2PClients.View {
 							action: { .child(.inputP2PConnectionPassword($0)) }
 						),
 						then: { inputPasswordStore in
-							Screen(
-								title: "New Connection",
-								navBarActionStyle: .close,
-								action: { viewStore.send(.dismissNewConnectionFlowButtonTapped) }
-							) {
+							ForceFullScreen {
 								VStack {
+									NavigationBar(
+										titleText: "New Connection",
+										leadingItem: CloseButton {
+											viewStore.send(.dismissNewConnectionFlowButtonTapped)
+										}
+									)
+									.foregroundColor(.app.gray1)
+
 									InputPassword.View(store: inputPasswordStore)
+										.buttonStyle(.secondaryRectangular())
+
+									Spacer()
 								}
-								.padding()
+								.padding(.medium3)
 							}
 						}
 					)
@@ -75,34 +82,41 @@ private extension ManageP2PClients.View {
 	func manageP2PClientsView(
 		viewStore: ViewStore<ViewState, ManageP2PClients.Action.ViewAction>
 	) -> some View {
-		Screen(
-			title: "P2P Connections",
-			navBarActionStyle: .back,
-			action: {
-				viewStore.send(.dismissButtonTapped)
-			}
-		) {
+		ForceFullScreen {
 			VStack {
-				ScrollView {
-					VStack {
-						ForEachStore(
-							store.scope(
-								state: \.connections,
-								action: { .child(.connection(id: $0, action: $1)) }
-							),
-							content: ManageP2PClient.View.init(store:)
-						)
+				NavigationBar(
+					titleText: "P2P Connections",
+					leadingItem: BackButton {
+						viewStore.send(.dismissButtonTapped)
 					}
+				)
+				.foregroundColor(.app.gray1)
+				.padding([.horizontal, .top], .medium3)
+
+				VStack {
+					ScrollView {
+						VStack {
+							ForEachStore(
+								store.scope(
+									state: \.connections,
+									action: { .child(.connection(id: $0, action: $1)) }
+								),
+								content: ManageP2PClient.View.init(store:)
+							)
+						}
+					}
+
+					Button("Add new connection") {
+						viewStore.send(.addNewConnectionButtonTapped)
+					}
+					.enabled(viewStore.canAddMoreConnections)
+					.buttonStyle(.primaryRectangular)
+
+					Spacer()
 				}
-				Button("Add new connection") {
-					viewStore.send(.addNewConnectionButtonTapped)
-				}
-				.enabled(viewStore.canAddMoreConnections)
-				.buttonStyle(.primary)
-				Spacer()
+				.padding([.horizontal, .bottom], .medium1)
+				.onAppear { viewStore.send(.viewAppeared) }
 			}
-			.padding()
-			.onAppear { viewStore.send(.viewAppeared) }
 		}
 	}
 }

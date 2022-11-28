@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "9f39744e025c7d377987f30b03770805dcb0bcd1",
-        "version" : "1.1.4"
+        "revision" : "fddd1c00396eed152c45a46bea9f47b98e59301d",
+        "version" : "1.2.0"
       }
     },
     {
@@ -156,7 +156,7 @@
     {
       "identity" : "swift-collections",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-collections.git",
+      "location" : "https://github.com/apple/swift-collections",
       "state" : {
         "revision" : "f504716c27d2e5d4144fa4794b12129301d17729",
         "version" : "1.0.3"
@@ -167,8 +167,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "52dca7e5edd6ec9e0b529380843a8cb13f57d7d7",
-        "version" : "0.46.0"
+        "revision" : "f027afd8f56477f5a4d3548f592dfa80a0aeb417",
+        "version" : "0.47.1"
       }
     },
     {
@@ -239,17 +239,17 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "8004585ad68efbb818f42689d226bfdafee47877",
-        "version" : "0.0.36"
+        "revision" : "e23963575db522ff902e3b444568056d5708a0f3",
+        "version" : "0.0.40"
       }
     },
     {
       "identity" : "swift-tagged",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-tagged.git",
+      "location" : "https://github.com/pointfreeco/swift-tagged",
       "state" : {
-        "revision" : "f3f773a5e13f3c8f0ab1ce2ae6378058acefa87d",
-        "version" : "0.7.0"
+        "revision" : "33f44ceb793b12d6af5019cbe26f8b0e66e6389f",
+        "version" : "0.8.0"
       }
     },
     {
@@ -262,18 +262,36 @@
       }
     },
     {
+      "identity" : "swiftui-navigation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swiftui-navigation",
+      "state" : {
+        "revision" : "4b666bcc59ba1711a7543ecb37e1d181963b180c",
+        "version" : "0.4.2"
+      }
+    },
+    {
       "identity" : "swiftui-pull-to-refresh",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/globulus/swiftui-pull-to-refresh",
       "state" : {
-        "revision" : "82937f911a588f892acbf7dc4129c38d09012501",
-        "version" : "1.1.8"
+        "revision" : "1852a4eb7e7a12a768c64b25b1bd905993ced4eb",
+        "version" : "1.1.9"
+      }
+    },
+    {
+      "identity" : "version",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mxcl/Version",
+      "state" : {
+        "revision" : "1fe824b80d89201652e7eca7c9252269a1d85e25",
+        "version" : "2.0.1"
       }
     },
     {
       "identity" : "webrtc",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/stasel/WebRTC.git",
+      "location" : "https://github.com/stasel/WebRTC",
       "state" : {
         "revision" : "6dd54fc242d3261317b5e6eb17bf178b1359609b",
         "version" : "106.0.0"

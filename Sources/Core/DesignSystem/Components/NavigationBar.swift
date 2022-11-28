@@ -1,35 +1,103 @@
-import Foundation
 import SwiftUI
 
 // MARK: - NavigationBar
-public struct NavigationBar: View {
-	let action: () -> Void
-	let style: Style
-	let title: String
-	public init(_ title: String, style: Style, action: @escaping () -> Void) {
-		self.style = style
-		self.action = action
-		self.title = title
-	}
-}
+public struct NavigationBar<LeadingItem: View, TrailingItem: View>: View {
+	let titleText: String?
+	let leadingItem: LeadingItem?
+	let trailingItem: TrailingItem?
 
-public extension NavigationBar {
-	enum Style {
-		case close, back
+	public init(
+		titleText: String? = nil,
+		leadingItem: (() -> LeadingItem)? = nil,
+		trailingItem: (() -> TrailingItem)? = nil
+	) {
+		self.titleText = titleText
+		self.leadingItem = leadingItem?()
+		self.trailingItem = trailingItem?()
 	}
 
-	var body: some View {
+	public var body: some View {
 		HStack {
-			switch style {
-			case .back:
-				BackButton(action: action)
-			case .close:
-				CloseButton(action: action)
+			if let leadingButton = leadingItem {
+				leadingButton
+			} else {
+				placeholderSpacer
 			}
-			Spacer()
-			Text(title)
 
 			Spacer()
+
+			if let titleText = titleText {
+				Text(titleText)
+					.textStyle(.secondaryHeader)
+			}
+
+			Spacer()
+
+			if let trailingButton = trailingItem {
+				trailingButton
+			} else {
+				placeholderSpacer
+			}
 		}
 	}
 }
+
+public extension NavigationBar where LeadingItem == EmptyView {
+	init(
+		titleText: String? = nil,
+		trailingItem: TrailingItem
+	) {
+		self.init(
+			titleText: titleText,
+			leadingItem: nil,
+			trailingItem: { trailingItem }
+		)
+	}
+}
+
+public extension NavigationBar where TrailingItem == EmptyView {
+	init(
+		titleText: String? = nil,
+		leadingItem: LeadingItem
+	) {
+		self.init(
+			titleText: titleText,
+			leadingItem: { leadingItem },
+			trailingItem: nil
+		)
+	}
+}
+
+public extension NavigationBar where LeadingItem == EmptyView, TrailingItem == EmptyView {
+	init(
+		titleText: String? = nil
+	) {
+		self.init(
+			titleText: titleText,
+			leadingItem: nil,
+			trailingItem: nil
+		)
+	}
+}
+
+// MARK: - Private Computed Properties
+private extension NavigationBar {
+	var placeholderSpacer: some View {
+		Spacer()
+			.frame(.small)
+	}
+}
+
+#if DEBUG
+
+// MARK: - NavigationBar_Previews
+struct NavigationBar_Previews: PreviewProvider {
+	static var previews: some View {
+		NavigationBar(
+			titleText: "A title",
+			leadingItem: { Button("Settings", action: {}) },
+			trailingItem: { Button("Settings", action: {}) }
+		)
+	}
+}
+#endif // DEBUG

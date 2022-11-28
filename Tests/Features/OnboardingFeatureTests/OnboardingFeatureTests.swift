@@ -15,7 +15,7 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 		let setDataForProfileSnapshotExpectation = expectation(description: "setDataForKey for ProfileSnapshot should have been called")
 		let profileSavedToKeychain = ActorIsolated<Profile?>(nil)
 
-		keychainClient.setDataDataForKey = { data, key, _ in
+		keychainClient.updateDataForKey = { data, key, _, _ in
 			if key == "profileSnapshotKeychainKey" {
 				if let snapshot = try? JSONDecoder.liveValue().decode(ProfileSnapshot.self, from: data) {
 					let profile = try? Profile(snapshot: snapshot)
@@ -31,19 +31,13 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 			initialState: NewProfile.State(canProceed: true),
 			reducer: NewProfile()
 		)
-		store.dependencies.profileClient.createNewProfileWithOnLedgerAccount = { req in
+		store.dependencies.profileClient.createNewProfile = { req in
 			try! await Profile.new(
 				networkAndGateway: req.networkAndGateway,
 				mnemonic: req.curve25519FactorSourceMnemonic
 			)
 		}
-		store.dependencies.transactionClient.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger = { _ in
-			{ _ in
-				//                return .init
-				//                public typealias MakeEntityNonVirtualBySubmittingItToLedger = @Sendable (PrivateKey) async throws -> any AddressKindProtocol
-				try AccountAddress(address: "mock")
-			}
-		}
+
 		store.dependencies.transactionClient.signAndSubmitTransaction = { _ in .placeholder }
 		store.dependencies.keychainClient = keychainClient
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)

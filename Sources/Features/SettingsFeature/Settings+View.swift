@@ -57,80 +57,91 @@ public extension Settings.View {
 					.zIndex(2)
 				}
 			}
-			.buttonStyle(.borderedProminent)
 		}
 	}
 }
 
 private extension Settings.View {
 	func settingsView(viewStore: ViewStore<ViewState, Settings.Action.ViewAction>) -> some View {
-		Screen(
-			title: "Settings",
-			navBarActionStyle: .close,
-			action: { viewStore.send(.dismissSettingsButtonTapped) }
-		) {
-			Form {
+		ForceFullScreen {
+			VStack {
+				NavigationBar(
+					titleText: "Settings",
+					leadingItem: CloseButton {
+						viewStore.send(.dismissSettingsButtonTapped)
+					}
+				)
+				.foregroundColor(.app.gray1)
+				.padding([.horizontal, .top], .medium3)
+
+				Form {
+					#if DEBUG
+					Section(header: Text("Debug")) {
+						Button("Inspect Profile") {
+							viewStore.send(.debugInspectProfileButtonTapped)
+						}
+						.buttonStyle(.primaryText())
+					}
+					#endif // DEBUG
+					Section(header: Text("P2P Connections")) {
+						Button("Manage Connections") {
+							viewStore.send(.manageP2PClientsButtonTapped)
+						}
+						.buttonStyle(.primaryText())
+
+						if viewStore.canAddP2PClient {
+							Button("Add Connection") {
+								viewStore.send(.addP2PClientButtonTapped)
+							}
+							.buttonStyle(.primaryText())
+						}
+					}
+
+					Section {
+						Button("Edit Gateway API Endpoint") {
+							viewStore.send(.editGatewayAPIEndpointButtonTapped)
+						}
+						.buttonStyle(.primaryText())
+					}
+
+					Section {
+						Button("Delete all  & Factor Sources") {
+							viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
+						}
+						.buttonStyle(.primaryText(isDestructive: true))
+					} footer: {
+						Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
+							.textStyle(.body2Regular)
+					}
+				}
+				.onAppear {
+					viewStore.send(.didAppear)
+				}
 				#if DEBUG
-				Section(header: Text("Debug")) {
-					Button("Inspect Profile") {
-						viewStore.send(.debugInspectProfileButtonTapped)
+					.sheet(
+						isPresented: viewStore.binding(
+							get: \.isDebugProfileViewSheetPresented,
+							send: { .setDebugProfileSheet(isPresented: $0) }
+						)
+					) {
+						VStack {
+							Button("Close") {
+								viewStore.send(.setDebugProfileSheet(isPresented: false))
+							}
+							if let profile = viewStore.profileToInspect {
+								ProfileView(
+									profile: profile,
+									// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
+									keychainClient: KeychainClient.liveValue
+								)
+							} else {
+								Text("No profile, strange")
+							}
+						}
 					}
-				}
 				#endif // DEBUG
-				Section(header: Text("P2P Connections")) {
-					Button("Manage Connections") {
-						viewStore.send(.manageP2PClientsButtonTapped)
-					}
-
-					if viewStore.canAddP2PClient {
-						Button("Add Connection") {
-							viewStore.send(.addP2PClientButtonTapped)
-						}
-					}
-				}
-
-				Section {
-					Button("Edit Gateway API Endpoint") {
-						viewStore.send(.editGatewayAPIEndpointButtonTapped)
-					}
-				}
-
-				Section {
-					Button("Delete all  & Factor Sources", role: .destructive) {
-						viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
-					}
-
-					Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
-				}
 			}
-			.onAppear {
-				viewStore.send(.didAppear)
-			}
-			#if DEBUG
-				.sheet(
-					isPresented: viewStore.binding(
-						get: \.isDebugProfileViewSheetPresented,
-						send: { .setDebugProfileSheet(isPresented: $0) }
-					)
-				) {
-					VStack {
-						Button("Close") {
-							viewStore.send(.setDebugProfileSheet(isPresented: false))
-						}
-						if let profile = viewStore.profileToInspect {
-							ProfileView(
-								profile: profile,
-								// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-								keychainClient: KeychainClient.liveValue
-							)
-						} else {
-							Text("No profile, strange")
-						}
-					}
-				}
-			#endif // DEBUG
 		}
-		.buttonStyle(.borderless)
 	}
 }
 
