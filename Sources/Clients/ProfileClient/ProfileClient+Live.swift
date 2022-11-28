@@ -63,14 +63,13 @@ public extension ProfileClient {
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
-			createNewProfileWithOnLedgerAccount: { request in
+			createNewProfile: { request in
 				let networkAndGateway = request.networkAndGateway
 
 				let newProfile = try await Profile.new(
 					networkAndGateway: networkAndGateway,
 					mnemonic: request.curve25519FactorSourceMnemonic,
-					firstAccountDisplayName: request.nameOfFirstAccount,
-					makeFirstAccountNonVirtualBySubmittingItToLedger: request.makeFirstAccountNonVirtualBySubmittingItToLedger
+					firstAccountDisplayName: request.nameOfFirstAccount
 				)
 
 				return newProfile
@@ -115,13 +114,12 @@ public extension ProfileClient {
 					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
-			createOnLedgerAccount: { request in
+			createVirtualAccount: { request in
 				try await profileHolder.asyncMutating { profile in
 					let networkID = await getCurrentNetworkID()
-					return try await profile.createNewOnLedgerAccount(
+					return try await profile.createNewVirtualAccount(
 						networkID: networkID,
-						displayName: request.nameOfAccount,
-						makeEntityNonVirtualBySubmittingItToLedger: request.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger(networkID),
+						displayName: request.accountName,
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
 							try await keychainClient.loadFactorSourceMnemonic(reference: reference)
 						}

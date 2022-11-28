@@ -24,7 +24,7 @@ extension ProfileClient: TestDependencyKey {
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
 		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.hammunet },
 		setNetworkAndGateway: { _ in },
-		createNewProfileWithOnLedgerAccount: { req in
+		createNewProfile: { req in
 			try! await Profile.new(
 				networkAndGateway: req.networkAndGateway,
 				mnemonic: req.curve25519FactorSourceMnemonic
@@ -46,7 +46,7 @@ extension ProfileClient: TestDependencyKey {
 		setDisplayAppPreferences: { _ in
 			fatalError()
 		},
-		createOnLedgerAccount: { _ in
+		createVirtualAccount: { _ in
 			fatalError()
 		},
 		lookupAccountByAddress: { _ in
@@ -65,7 +65,7 @@ extension ProfileClient: TestDependencyKey {
 		getGatewayAPIEndpointBaseURL: unimplemented("\(Self.self).getGatewayAPIEndpointBaseURL"),
 		getNetworkAndGateway: unimplemented("\(Self.self).getNetworkAndGateway"),
 		setNetworkAndGateway: unimplemented("\(Self.self).setNetworkAndGateway"),
-		createNewProfileWithOnLedgerAccount: unimplemented("\(Self.self).createNewProfileWithOnLedgerAccount"),
+		createNewProfile: unimplemented("\(Self.self).createNewProfile"),
 		injectProfile: unimplemented("\(Self.self).injectProfile"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
@@ -75,7 +75,7 @@ extension ProfileClient: TestDependencyKey {
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
 		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
-		createOnLedgerAccount: unimplemented("\(Self.self).createOnLedgerAccount"),
+		createVirtualAccount: unimplemented("\(Self.self).createVirtualAccount"),
 		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
 		privateKeysForAddresses: unimplemented("\(Self.self).privateKeysForAddresses")
 	)

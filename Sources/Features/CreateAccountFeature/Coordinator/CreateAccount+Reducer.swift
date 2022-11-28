@@ -6,7 +6,7 @@ import ProfileClient
 import TransactionClient
 
 // MARK: - CreateAccount
-public struct CreateAccount: ReducerProtocol {
+public struct CreateAccount: Sendable, ReducerProtocol {
 	@Dependency(\.accountNameValidator) var accountNameValidator
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
@@ -27,11 +27,10 @@ public extension CreateAccount {
 			return .run { [accountName = state.accountName] send in
 				await send(.internal(.system(.createdNewAccountResult(
 					TaskResult {
-						let request = CreateOnLedgerAccountRequest(
-							nameOfAccount: accountName,
-							defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger: transactionClient.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger
+						let request = CreateAnotherAccountRequest(
+							accountName: accountName
 						)
-						return try await profileClient.createOnLedgerAccount(
+						return try await profileClient.createVirtualAccount(
 							request
 						)
 					}

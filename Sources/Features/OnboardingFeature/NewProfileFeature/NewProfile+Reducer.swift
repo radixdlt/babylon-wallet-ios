@@ -38,7 +38,7 @@ public extension DependencyValues {
 }
 
 // MARK: - NewProfile
-public struct NewProfile: ReducerProtocol {
+public struct NewProfile: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mnemonicGenerator) var mnemonicGenerator
 	@Dependency(\.keychainClient) var keychainClient
@@ -72,16 +72,13 @@ public extension NewProfile {
 
 						let networkAndGateway = AppPreferences.NetworkAndGateway.hammunet
 
-						let makeFirstAccountNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger = transactionClient.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger(networkAndGateway.network.id)
-
 						let newProfileRequest = CreateNewProfileRequest(
 							networkAndGateway: networkAndGateway,
 							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
-							nameOfFirstAccount: nameOfFirstAccount,
-							makeFirstAccountNonVirtualBySubmittingItToLedger: makeFirstAccountNonVirtualBySubmittingItToLedger
+							nameOfFirstAccount: nameOfFirstAccount
 						)
 
-						let newProfile = try await profileClient.createNewProfileWithOnLedgerAccount(
+						let newProfile = try await profileClient.createNewProfile(
 							newProfileRequest
 						)
 
