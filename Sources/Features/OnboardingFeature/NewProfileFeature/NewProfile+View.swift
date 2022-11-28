@@ -25,19 +25,13 @@ public extension NewProfile.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
-					HStack {
-						Button(
-							action: {
-								viewStore.send(.backButtonPressed)
-							}, label: {
-								Image(asset: AssetResource.arrowBack)
-							}
-						)
-						Spacer()
-						Text("New Profile")
-						Spacer()
-						EmptyView()
-					}
+					NavigationBar(
+						titleText: "New Profile",
+						leadingItem: BackButton {
+							viewStore.send(.backButtonPressed)
+						}
+					)
+
 					Spacer()
 
 					TextField(

@@ -25,8 +25,13 @@ public extension CreateAccount.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack(spacing: .zero) {
-					header(with: viewStore)
-						.padding(.medium3)
+					NavigationBar(
+						leadingItem: CloseButton {
+							viewStore.send(.closeButtonTapped)
+						}
+					)
+					.foregroundColor(.app.gray1)
+					.padding([.horizontal, .top], .medium3)
 
 					VStack {
 						title(with: viewStore)
@@ -36,7 +41,21 @@ public extension CreateAccount.View {
 
 						VStack(spacing: .large1) {
 							subtitle
-							textField(with: viewStore)
+
+							textField(
+								placeholder: L10n.CreateAccount.placeholder,
+								text: viewStore.binding(
+									get: \.accountName,
+									send: { .textFieldChanged($0) }
+								),
+								hint: L10n.CreateAccount.explanation,
+								binding: $focusedField,
+								equals: .accountName,
+								first: viewStore.binding(
+									get: \.focusedField,
+									send: { .textFieldFocused($0) }
+								)
+							)
 						}
 
 						Spacer(minLength: .small2)
@@ -48,7 +67,7 @@ public extension CreateAccount.View {
 						Button(L10n.CreateAccount.createAccountButtonTitle) {
 							viewStore.send(.createAccountButtonTapped)
 						}
-						.buttonStyle(.primary)
+						.buttonStyle(.primaryRectangular)
 						.enabled(viewStore.isCreateAccountButtonEnabled)
 					}
 					.padding([.horizontal, .bottom], .medium1)
@@ -87,17 +106,6 @@ private extension CreateAccount.View {
 }
 
 private extension CreateAccount.View {
-	func header(with viewStore: ViewStore) -> some View {
-		HStack {
-			CloseButton {
-				viewStore.send(.closeButtonTapped)
-			}
-			.frame(.small)
-
-			Spacer()
-		}
-	}
-
 	func title(with viewStore: ViewStore) -> some View {
 		let titleText = viewStore.numberOfExistingAccounts == 0 ? L10n.CreateAccount.createFirstAccount : L10n.CreateAccount.createNewAccount
 
@@ -115,24 +123,22 @@ private extension CreateAccount.View {
 			.textStyle(.body1Regular)
 	}
 
-	func textField(with viewStore: ViewStore) -> some View {
+	func textField<Value>(
+		placeholder: String,
+		text: Binding<String>,
+		hint: String,
+		binding: FocusState<Value>.Binding,
+		equals: Value,
+		first: Binding<Value>
+	) -> some View {
 		VStack(alignment: .leading, spacing: .small2) {
 			TextField(
-				L10n.CreateAccount.placeholder,
-				text: viewStore.binding(
-					get: \.accountName,
-					send: { .textFieldChanged($0) }
-				)
-				.removeDuplicates()
+				placeholder,
+				text: text
+					.removeDuplicates()
 			)
-			.focused($focusedField, equals: .accountName)
-			.synchronize(
-				viewStore.binding(
-					get: \.focusedField,
-					send: { .textFieldFocused($0) }
-				),
-				self.$focusedField
-			)
+			.focused(binding, equals: equals)
+			.synchronize(first, binding)
 			.padding()
 			.frame(height: .standardButtonHeight)
 			.background(Color.app.gray5)
@@ -144,7 +150,7 @@ private extension CreateAccount.View {
 					.stroke(Color.app.gray1, lineWidth: 1)
 			)
 
-			Text(L10n.CreateAccount.explanation)
+			Text(hint)
 				.foregroundColor(.app.gray2)
 				.textStyle(.body2Regular)
 		}

@@ -1,5 +1,6 @@
 import Asset
 import Common
+import DesignSystem
 import SwiftUI
 
 // MARK: - Component

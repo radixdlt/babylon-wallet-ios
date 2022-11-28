@@ -68,7 +68,7 @@ public extension AccountCompletion.View {
 				Button(L10n.CreateAccount.Completion.returnToOrigin(viewStore.origin.displayText)) {
 					/* TODO: implement */
 				}
-				.buttonStyle(.primary)
+				.buttonStyle(.primaryRectangular)
 			}
 			.padding(.medium1)
 		}

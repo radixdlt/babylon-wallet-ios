@@ -70,8 +70,7 @@ public extension NewProfile {
 					TaskResult {
 						let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
 
-						// FIXME: betanet: stop using `.primary` use explicit version!
-						let networkAndGateway = AppPreferences.NetworkAndGateway.primary
+						let networkAndGateway = AppPreferences.NetworkAndGateway.hammunet
 
 						let makeFirstAccountNonVirtualBySubmittingItToLedger: MakeEntityNonVirtualBySubmittingItToLedger = transactionClient.defineFunctionToMakeEntityNonVirtualBySubmittingItToLedger(networkAndGateway.network.id)
 
@@ -88,12 +87,12 @@ public extension NewProfile {
 
 						let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
 
-						try keychainClient.setFactorSource(
+						try await keychainClient.updateFactorSource(
 							mnemonic: curve25519FactorSourceMnemonic,
 							reference: curve25519FactorSourceReference
 						)
 
-						try keychainClient.setProfile(profile: newProfile)
+						try await keychainClient.updateProfile(profile: newProfile)
 
 						return newProfile
 					}

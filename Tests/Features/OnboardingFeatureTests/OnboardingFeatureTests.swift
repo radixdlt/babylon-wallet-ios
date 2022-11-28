@@ -15,7 +15,7 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 		let setDataForProfileSnapshotExpectation = expectation(description: "setDataForKey for ProfileSnapshot should have been called")
 		let profileSavedToKeychain = ActorIsolated<Profile?>(nil)
 
-		keychainClient.setDataDataForKey = { data, key, _ in
+		keychainClient.updateDataForKey = { data, key, _, _ in
 			if key == "profileSnapshotKeychainKey" {
 				if let snapshot = try? JSONDecoder.liveValue().decode(ProfileSnapshot.self, from: data) {
 					let profile = try? Profile(snapshot: snapshot)

@@ -16,6 +16,7 @@ public extension CloseButton {
 			action: action,
 			label: { Image(asset: AssetResource.close) }
 		)
+		.frame(.small)
 	}
 }
 

@@ -67,7 +67,7 @@ public extension ImportMnemonic.View {
 				.enabled(viewStore.canImportProfileFromSnapshot)
 			}
 		}
-		.buttonStyle(.primary)
+		.buttonStyle(.primaryRectangular)
 	}
 }
 

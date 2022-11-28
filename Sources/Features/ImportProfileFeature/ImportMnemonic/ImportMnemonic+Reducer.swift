@@ -52,7 +52,7 @@ public extension ImportMnemonic {
 						.system(
 							.saveImportedMnemonicResult(
 								TaskResult(catching: {
-									try keychainClient.setFactorSource(
+									try await keychainClient.updateFactorSource(
 										mnemonic: mnemonic,
 										reference: factorSourceReference
 									)
