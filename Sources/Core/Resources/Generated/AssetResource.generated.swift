@@ -32,6 +32,7 @@ public enum AssetResource {
 	public static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
 	public static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
 	public static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
+	public static let splash = ImageAsset(name: "splash")
 	public static let dappPlaceholder = ImageAsset(name: "dapp-placeholder")
 	public static let nftLogo = ImageAsset(name: "nft-logo")
 	public static let nft = ImageAsset(name: "nft")

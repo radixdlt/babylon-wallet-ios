@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import DesignSystem
+import Resources
 import SwiftUI
 
 // MARK: - Splash.View
@@ -23,10 +24,12 @@ public extension Splash.View {
 			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
-				VStack {
-					Text("Splash")
-				}
-			}
+                Image(asset: AssetResource.splash)
+                    .resizable()
+                    .scaledToFill()
+                   
+            }
+            .edgesIgnoringSafeArea(.all)
 			.onAppear {
 				viewStore.send(.viewAppeared)
 			}
