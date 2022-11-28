@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import DesignSystem
 import GatewayAPI
@@ -66,7 +67,7 @@ private extension Settings.View {
 		ForceFullScreen {
 			VStack {
 				NavigationBar(
-					titleText: "Settings",
+					titleText: L10n.Settings.title,
 					leadingItem: CloseButton {
 						viewStore.send(.dismissSettingsButtonTapped)
 					}
@@ -76,21 +77,21 @@ private extension Settings.View {
 
 				Form {
 					#if DEBUG
-					Section(header: Text("Debug")) {
-						Button("Inspect Profile") {
+					Section(header: Text(L10n.Settings.Section.debug)) {
+						Button(L10n.Settings.inspectProfileButtonTitle) {
 							viewStore.send(.debugInspectProfileButtonTapped)
 						}
 						.buttonStyle(.primaryText())
 					}
 					#endif // DEBUG
-					Section(header: Text("P2P Connections")) {
-						Button("Manage Connections") {
+					Section(header: Text(L10n.Settings.Section.p2Pconnections)) {
+						Button(L10n.Settings.manageConnectionsButtonTitle) {
 							viewStore.send(.manageP2PClientsButtonTapped)
 						}
 						.buttonStyle(.primaryText())
 
 						if viewStore.canAddP2PClient {
-							Button("Add Connection") {
+							Button(L10n.Settings.addConnectionButtonTitle) {
 								viewStore.send(.addP2PClientButtonTapped)
 							}
 							.buttonStyle(.primaryText())
@@ -98,19 +99,19 @@ private extension Settings.View {
 					}
 
 					Section {
-						Button("Edit Gateway API Endpoint") {
+						Button(L10n.Settings.editGatewayAPIEndpointButtonTitle) {
 							viewStore.send(.editGatewayAPIEndpointButtonTapped)
 						}
 						.buttonStyle(.primaryText())
 					}
 
 					Section {
-						Button("Delete all  & Factor Sources") {
+						Button(L10n.Settings.deleteAllButtonTitle) {
 							viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
 						}
 						.buttonStyle(.primaryText(isDestructive: true))
 					} footer: {
-						Text("Version: \(Bundle.main.appVersionLong) build #\(Bundle.main.appBuild)")
+						Text(L10n.Settings.versionInfo(Bundle.main.appVersionLong, Bundle.main.appBuild))
 							.textStyle(.body2Regular)
 					}
 				}
@@ -125,7 +126,7 @@ private extension Settings.View {
 						)
 					) {
 						VStack {
-							Button("Close") {
+							Button(L10n.Settings.closeButtonTitle) {
 								viewStore.send(.setDebugProfileSheet(isPresented: false))
 							}
 							if let profile = viewStore.profileToInspect {
@@ -135,7 +136,7 @@ private extension Settings.View {
 									keychainClient: KeychainClient.liveValue
 								)
 							} else {
-								Text("No profile, strange")
+								Text(L10n.Settings.noProfileText)
 							}
 						}
 					}
@@ -173,17 +174,4 @@ struct HomeView_Previews: PreviewProvider {
 			)
 		)
 	}
-}
-
-public extension Bundle {
-	var appName: String { getInfo("CFBundleName") }
-	var displayName: String { getInfo("CFBundleDisplayName") }
-	var language: String { getInfo("CFBundleDevelopmentRegion") }
-	var identifier: String { getInfo("CFBundleIdentifier") }
-	var copyright: String { getInfo("NSHumanReadableCopyright").replacingOccurrences(of: "\\\\n", with: "\n") }
-
-	var appBuild: String { getInfo("CFBundleVersion") }
-	var appVersionLong: String { getInfo("CFBundleShortVersionString") }
-
-	private func getInfo(_ str: String) -> String { infoDictionary?[str] as? String ?? "⚠️" }
 }

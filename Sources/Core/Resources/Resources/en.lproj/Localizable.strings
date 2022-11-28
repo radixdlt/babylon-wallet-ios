@@ -28,14 +28,60 @@
 "home.visitHub.title" = "Ready to get started using the Radix Network and your Wallet?";
 
 "dApp.chooseAccounts.createNewAccount" = "+ Create a new Account";
+"dApp.chooseAccounts.explanation" = "Choose %@";
+"dApp.chooseAccounts.explanationAtLeastOneAccount" = "at least one account.";
+"dApp.chooseAccounts.explanationExactNumberOfAccounts" = "exactly #%d accounts.";
+"dApp.chooseAccounts.explanationExactlyOneAccount" = "exactly one account.";
 "dApp.chooseAccounts.subtitle" = "Choose the account(s) you wish %@ to know about";
 "dApp.chooseAccounts.title" = "Choose Accounts";
+"dApp.chooseAccounts.unnamedAccount" = "Unnamed account";
 "dApp.connectionRequest.continueButtonTitle" = "Continue";
 "dApp.connectionRequest.subtitle" = "For this dApp to function, it needs the following:";
 "dApp.connectionRequest.title" = "dApp Connection Request";
 "dApp.connectionRequest.wantsToConnect" = "%@ wants to connect to your wallet";
 "dApp.unknownName" = "Unknown dApp";
 
+"importProfile.importMnemonic" = "Import mnemonic";
+"importProfile.importProfile" = "Import profile";
+"importProfile.mnemonicPhrasec" = "Mnemonic phrasec";
+"importProfile.profileFromSnapshot" = "Profile from snapshot";
+"importProfile.saveImportedMnemonic" = "Save imported mnemonic";
+
+"manageGateway.currentGatewayTitle" = "Current";
+"manageGateway.gatewayAPIEndpoint" = "Gateway API Endpoint";
+"manageGateway.host" = "Host";
+"manageGateway.networkID" = "Network ID";
+"manageGateway.networkName" = "Network name";
+"manageGateway.path" = "Path";
+"manageGateway.port" = "Port";
+"manageGateway.scheme" = "Scheme";
+"manageGateway.switchToButtonTitle" = "Switch To";
+"manageGateway.title" = "Edit Gateway API URL";
+
+"manageP2PClients.P2PConnectionsTitle" = "P2P Connections";
+"manageP2PClients.connectionID" = "Connection ID: %@";
+"manageP2PClients.deleteButtonTitle" = "Delete";
+"manageP2PClients.newConnectionButtonTitle" = "Add new connection";
+"manageP2PClients.newConnectionTitle" = "New Connection";
+"manageP2PClients.sendTestMessageButtonTitle" = "Send Test Msg";
+
 "nftList.header.supplyUnknown" = "Unknown";
 "nftList.nftPlural" = "%d NFTs";
 "nftList.ownedOfTotal" = "%d of %d";
+
+"onboarding.newAccountButtonTitle" = "New Account";
+
+"settings.addConnectionButtonTitle" = "Add Connection";
+"settings.closeButtonTitle" = "Close";
+"settings.deleteAllButtonTitle" = "Delete all & Factor Sources";
+"settings.editGatewayAPIEndpointButtonTitle" = "Edit Gateway API Endpoint";
+"settings.inspectProfileButtonTitle" = "Inspect Profile";
+"settings.manageConnectionsButtonTitle" = "Manage Connections";
+"settings.noProfileText" = "No profile, strange";
+"settings.section.P2Pconnections" = "P2P Connections";
+"settings.section.debug" = "Debug";
+"settings.title" = "Settings";
+"settings.versionInfo" = "Version: %@ build #%@";
+
+"transactionSigning.signTransactionButtonTitle" = "Sign Transaction";
+"transactionSigning.title" = "Sign TX";

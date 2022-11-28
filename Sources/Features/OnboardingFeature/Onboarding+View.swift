@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import DesignSystem
 import ImportProfileFeature
@@ -25,7 +26,7 @@ public extension Onboarding.View {
 			ZStack {
 				ForceFullScreen {
 					VStack {
-						Button("New Account") {
+						Button(L10n.Onboarding.newAccountButtonTitle) {
 							viewStore.send(.newProfileButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)

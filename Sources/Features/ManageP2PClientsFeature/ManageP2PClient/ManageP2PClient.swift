@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import Converse
 import ConverseCommon
@@ -123,18 +124,18 @@ public extension ManageP2PClient.View {
 			send: { .view($0) }
 		) { viewStore in
 			VStack {
-				Text("Connection ID: \(viewStore.connectionID)")
+				Text(L10n.ManageP2PClients.connectionID(viewStore.connectionID))
 				HStack {
 					Text(viewStore.connectionStatusDescription)
 					Circle().fill(viewStore.connectionStatusColor).frame(width: 10)
 				}
 
 				HStack {
-					Button("Delete", role: .destructive) {
+					Button(L10n.ManageP2PClients.deleteButtonTitle, role: .destructive) {
 						viewStore.send(.deleteConnectionButtonTapped)
 					}
 
-					Button("Send Test Msg") {
+					Button(L10n.ManageP2PClients.sendTestMessageButtonTitle) {
 						viewStore.send(.sendTestMessageButtonTapped)
 					}
 				}
