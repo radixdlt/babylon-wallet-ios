@@ -23,7 +23,7 @@ public struct AccountDetails: ReducerProtocol {
 				return .run { [address = state.address] send in
 					await send(.delegate(.copyAddress(address)))
 				}
-			case .internal(.view(.refreshButtonTapped)):
+			case .internal(.view(.pullToRefreshStarted)):
 				return .run { [address = state.address] send in
 					await send(.delegate(.refresh(address)))
 				}

@@ -42,6 +42,7 @@ public extension Home.Action {
 public extension Home.Action {
 	enum ViewAction: Equatable {
 		case didAppear
+		case pullToRefreshStarted
 		case createAccountButtonTapped
 	}
 }
