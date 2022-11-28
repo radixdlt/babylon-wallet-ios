@@ -50,8 +50,7 @@ public struct ProfileClient: DependencyKey, Sendable {
 	public var createVirtualAccount: CreateVirtualAccount
 	public var lookupAccountByAddress: LookupAccountByAddress
 
-	// FIXME: - mainnet remove this and change to `async throws -> ([Prompt]) async throws -> NonEmpty<Set<Signer>>` when Profile supports multiple factor sources of different kinds.
-	public var privateKeysForAddresses: PrivateKeysForAddresses
+	public var signersForAccountsGivenAddresses: SignersForAccountsGivenAddresses
 }
 
 // MARK: - SignersForAccountsGivenAddressesRequest
@@ -90,12 +89,12 @@ public extension ProfileClient {
 	typealias CreateVirtualAccount = @Sendable (CreateAnotherAccountRequest) async throws -> OnNetwork.Account
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 
-	// FIXME: - mainnet remove this and change to `async throws -> ([Prompt]) async throws -> NonEmpty<Set<Signer>>` when Profile supports multiple factor sources of different kinds.
 	typealias SignersForAccountsGivenAddresses = @Sendable (SignersForAccountsGivenAddressesRequest) async throws -> NonEmpty<OrderedSet<SignersOfAccount>>
 }
 
-// MARK: - AccountSignature
+public typealias SignersOfAccount = SignersOf<OnNetwork.Account>
 
+// MARK: - AccountSignature
 public struct AccountSignature: Sendable, Hashable {
 	public let account: OnNetwork.Account
 	public let signature: SLIP10.Signature
