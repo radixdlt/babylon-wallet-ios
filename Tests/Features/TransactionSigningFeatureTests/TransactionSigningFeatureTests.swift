@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import SharedModels
 import TestUtils
+import TransactionClient
 import TransactionSigningFeature
 
 @MainActor
@@ -32,8 +33,11 @@ final class TransactionSigningFeatureTests: TestCase {
 			.failure(.failedToCompileOrSign(.failedToCompileTXIntent))
 		}
 		let errorExpectation2 = expectation(description: "Error")
-		store.dependencies.errorQueue.schedule = { error in
-			XCTAssertEqual(error.localizedDescription, "SignTransactionError")
+		store.dependencies.errorQueue.schedule = { anError in
+			guard let error = anError as? TransactionFailure else {
+				return XCTFail("Wrong error type")
+			}
+			XCTAssertEqual(error, .failedToCompileOrSign(.failedToCompileTXIntent))
 			errorExpectation2.fulfill()
 		}
 
@@ -46,12 +50,12 @@ final class TransactionSigningFeatureTests: TestCase {
 
 		// Happy path
 		store.dependencies.transactionClient.signAndSubmitTransaction = { @Sendable _ in
-			.success(.placeholder)
+			.success("MOCKED_TX_ID")
 		}
 		await store.send(.view(.signTransactionButtonTapped)) {
 			$0.isSigningTX = true
 		}
-		await store.receive(.internal(.signTransactionResult(.success(.placeholder)))) {
+		await store.receive(.internal(.signTransactionResult(.success("MOCKED_TX_ID")))) {
 			$0.isSigningTX = false
 		}
 
