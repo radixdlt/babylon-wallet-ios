@@ -15,8 +15,12 @@ extension AssetFetcher: DependencyKey {
 			var accountPortfolio = try AccountPortfolio(response: resourcesResponse)
 
 			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.address)
+			// NOTE: not used currently
 			let nonFungibleTokenAddresses = accountPortfolio.nonFungibleTokenContainers.map(\.asset.address)
 
+			guard !fungibleTokenAddresses.isEmpty else {
+				return .empty
+			}
 			let request = GatewayAPI.EntityOverviewRequest(addresses: fungibleTokenAddresses)
 			let overviewResponse = try await gatewayAPIClient.resourcesOverview(request)
 
@@ -43,7 +47,7 @@ extension AccountPortfolio {
 					name: nil,
 					symbol: nil
 				),
-				amountInAttos: BigUInt(stringLiteral: $0.amount.value),
+				amount: $0.amount.value,
 				worth: nil
 			)
 		}
