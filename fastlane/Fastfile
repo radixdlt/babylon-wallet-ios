@@ -1,7 +1,5 @@
 fastlane_require 'dotenv'
 
-default_platform(:ios)
-
 before_all do
     Dotenv.load ".env.secret"
     ensure_git_status_clean
@@ -17,10 +15,31 @@ platform :ios do
         run_tests
     end
 
+    desc "Builds and deploys beta app to TestFlight"
+    lane :beta_deploy do
+        install_distribution_certificate
+        version = bump_version
+        commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
+        add_git_tag(tag: version)
+        build_app
+        upload_to_testflight
+        push_to_git_remote
+    end
+
     desc "Installs certificates on the machine"
     lane :install_certificates do
-        code_signing(type: "development")
+        install_development_certificate
+        install_distribution_certificate
+    end
+
+    desc "Installs distribution certificate"
+    lane :install_distribution_certificate do
         code_signing(type: "appstore")
+    end
+
+    desc "Installs development certificate"
+    lane :install_development_certificate do
+        code_signing(type: "development")
     end
 
     desc "Generates new certificates if needed"
@@ -64,6 +83,20 @@ platform :mac do
     end
 end
 
+desc "Bumps up the patch version"
+private_lane :bump_version do
+    increment_version_number_in_xcodeproj(
+        bump_type: 'patch',
+        xcodeproj: ENV['PROJ_PATH'],
+        scheme: ENV['SCHEME']
+    )
+
+    get_version_number_from_xcodeproj(
+        xcodeproj: ENV['PROJ_PATH'],
+        scheme: ENV['SCHEME']
+    )
+end
+
 private_lane :register_new_device do |options|
     name = prompt(text: "Device name: ")
     udid = prompt(text: "Device UDID: ")
@@ -82,7 +115,10 @@ private_lane :code_signing do |options|
         app_store_connect_api_key
     end
 
-    create_keychain(unlock: true)
+    create_keychain(
+        unlock: false,
+        timeout: 0
+    ) 
     sync_code_signing(
         type: type,
         force_for_new_devices: true,
