@@ -57,7 +57,7 @@ private extension FungibleTokenList.Row.View {
 				VStack(alignment: .trailing, spacing: .small3) {
 					Text(
 						tokenAmount(
-							amountInWhole: container.amountInWhole,
+							amount: container.amount,
 							isVisible: viewStore.isCurrencyAmountVisible
 						)
 					)
@@ -94,14 +94,14 @@ private extension FungibleTokenList.Row.View {
 	}
 
 	func tokenAmount(
-		amountInWhole: BigUInt?,
+		amount: String?,
 		isVisible: Bool
 	) -> String {
 		guard isVisible else { return "••••" }
-		guard let amountInWhole else {
+		guard let amount else {
 			return "-"
 		}
-		return String(describing: amountInWhole)
+		return String(describing: amount)
 	}
 
 	func tokenValue(_ value: BigUInt?, isVisible: Bool, currency: FiatCurrency) -> String {
@@ -135,7 +135,7 @@ struct Row_Preview: PreviewProvider {
 		FungibleTokenList.Row.View(
 			store: .init(
 				initialState: .init(
-					container: .init(owner: try! .init(address: "owner_address"), asset: .xrd, amountInAttos: 100.inAttos, worth: 200),
+					container: .init(owner: try! .init(address: "owner_address"), asset: .xrd, amount: "100", worth: 200),
 					currency: .usd,
 					isCurrencyAmountVisible: true
 				),

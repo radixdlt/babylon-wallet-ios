@@ -39,9 +39,9 @@ final class HomeFeatureTests: TestCase {
 		// given
 
 		// fungible tokens
-		let btcContainer = FungibleTokenContainer(owner: address, asset: .btc, amountInAttos: 1234.inAttos, worth: 1234)
-		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amountInAttos: 2345.inAttos, worth: 2345)
-		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amountInAttos: 3456.inAttos, worth: 3456)
+		let btcContainer = FungibleTokenContainer(owner: address, asset: .btc, amount: "1234", worth: 1234)
+		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amount: "2345", worth: 2345)
+		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amount: "3456", worth: 3456)
 		let expectedAggregatedValue: Float = 7035
 
 		// non fungible tokens
@@ -132,9 +132,9 @@ final class HomeFeatureTests: TestCase {
 	func test_accountWorthLoaded_whenSingleAccountWorthIsLoaded_thenUpdateSingleAccount() async {
 		// given
 		// fungible tokens
-		let btcContainer = FungibleTokenContainer(owner: address, asset: .btc, amountInAttos: 1234.inAttos, worth: 1234)
-		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amountInAttos: 2345.inAttos, worth: 2345)
-		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amountInAttos: 3456.inAttos, worth: 3456)
+		let btcContainer = FungibleTokenContainer(owner: address, asset: .btc, amount: "1234", worth: 1234)
+		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amount: "2345", worth: 2345)
+		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amount: "3456", worth: 3456)
 
 		let accountPortfolio: AccountPortfolioDictionary = [
 			account.address: .init(
