@@ -78,7 +78,7 @@ public struct Home: ReducerProtocol {
 			return loadAccountsAndSettings()
 
 		case .internal(.view(.pullToRefreshStarted)):
-			return fetchPortfolio(state.accountList.accounts.map(\.account))
+			return loadAccountsAndSettings()
 
 		case let .internal(.system(.accountsLoadedResult(.failure(error)))):
 			errorQueue.schedule(error)
