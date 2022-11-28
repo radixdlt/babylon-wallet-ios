@@ -9,6 +9,7 @@ import SplashFeature
 // MARK: - App
 public struct App: ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
@@ -60,12 +61,21 @@ public struct App: ReducerProtocol {
 		case let .child(.onboarding(.child(.importMnemonic(.delegate(.finishedImporting(_, profile)))))):
 			return injectProfileIntoProfileClient(profile)
 
-		case let .child(.splash(.delegate(.profileLoaded(profile)))):
-			if let profile {
-				return injectProfileIntoProfileClient(profile)
-			} else {
+		case let .child(.splash(.delegate(.profileResultLoaded(profileResult)))):
+			switch profileResult {
+			case let .decodingFailure(_, error):
+				errorQueue.schedule(error)
 				goToOnboarding(state: &state)
 				return .none
+			case let .failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot):
+				return incompatibleSnapshotData(version: failedToCreateProfileFromSnapshot.version, state: &state)
+			case .noProfile:
+				goToOnboarding(state: &state)
+				return .none
+			case let .profileVersionOutdated(_, version):
+				return incompatibleSnapshotData(version: version, state: &state)
+			case let .compatibleProfile(profile):
+				return injectProfileIntoProfileClient(profile)
 			}
 
 		case .internal(.system(.injectProfileIntoProfileClientResult(.success(_)))):
@@ -74,6 +84,19 @@ public struct App: ReducerProtocol {
 
 		case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))):
 			errorQueue.schedule(error)
+			return .none
+
+		case .internal(.view(.deleteIncompatibleProfile)):
+			return .run { send in
+				do {
+					try await keychainClient.removeProfileSnapshot()
+				} catch {
+					await errorQueue.schedule(error)
+				}
+				await send(.internal(.system(.deletedIncompatibleProfile)))
+			}
+		case .internal(.system(.deletedIncompatibleProfile)):
+			goToOnboarding(state: &state)
 			return .none
 
 		case .child:
@@ -90,6 +113,15 @@ public struct App: ReducerProtocol {
 				}
 			))))
 		}
+	}
+
+	func incompatibleSnapshotData(version: ProfileSnapshot.Version, state: inout State) -> EffectTask<Action> {
+		state.errorAlert = .init(
+			title: .init("Incompatible Profile found"),
+			message: .init("Saved Profile has version: \(String(describing: version)), but this app requires a minimum Profile version of \(String(describing: ProfileSnapshot.Version.minimum)). You must delete the Profile and create a new one to use this app."),
+			dismissButton: .destructive(.init("Delete"), action: .send(Action.ViewAction.deleteIncompatibleProfile))
+		)
+		return .none
 	}
 
 	func goToMain(state: inout State) {

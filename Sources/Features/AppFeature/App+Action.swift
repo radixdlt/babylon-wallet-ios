@@ -29,6 +29,7 @@ public extension App.Action {
 	enum ViewAction: Equatable {
 		case task
 		case errorAlertDismissButtonTapped
+		case deleteIncompatibleProfile
 	}
 }
 
@@ -43,6 +44,7 @@ public extension App.Action {
 // MARK: - App.Action.SystemAction
 public extension App.Action {
 	enum SystemAction: Equatable {
+		case deletedIncompatibleProfile
 		case displayErrorAlert(App.UserFacingError)
 		case injectProfileIntoProfileClientResult(TaskResult<Profile>)
 	}

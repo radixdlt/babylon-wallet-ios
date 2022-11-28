@@ -31,7 +31,7 @@ extension GatewayAPIClient: TestDependencyKey {
 	) -> Self {
 		.init(
 			getCurrentBaseURL: { URL(string: "example.com")! },
-			setCurrentBaseURL: { _ in AppPreferences.NetworkAndGateway.primary },
+			setCurrentBaseURL: { _ in AppPreferences.NetworkAndGateway.hammunet },
 			getGatewayInfo: { .init(
 				ledgerState: .init(
 					network: "Network name",

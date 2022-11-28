@@ -4,7 +4,7 @@ import Profile
 
 // MARK: - ImportProfile.Action
 public extension ImportProfile {
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -13,7 +13,7 @@ public extension ImportProfile {
 
 // MARK: - ImportProfile.Action.ViewAction
 public extension ImportProfile.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case goBack
 		case dismissFileImporter
 		case importProfileFileButtonTapped
@@ -23,7 +23,7 @@ public extension ImportProfile.Action {
 
 // MARK: - ImportProfile.Action.InternalAction
 public extension ImportProfile.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -31,12 +31,12 @@ public extension ImportProfile.Action {
 
 // MARK: - ImportProfile.Action.SystemAction
 public extension ImportProfile.Action {
-	enum SystemAction: Equatable {}
+	enum SystemAction: Sendable, Equatable {}
 }
 
 // MARK: - ImportProfile.Action.DelegateAction
 public extension ImportProfile.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case goBack
 		case importedProfileSnapshot(ProfileSnapshot)
 	}

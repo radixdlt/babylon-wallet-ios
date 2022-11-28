@@ -7,7 +7,7 @@ import KeychainClientDependency
 import Profile
 
 // MARK: - ImportProfile
-public struct ImportProfile: ReducerProtocol {
+public struct ImportProfile: Sendable, ReducerProtocol {
 	@Dependency(\.data) var data
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.jsonDecoder) var jsonDecoder
@@ -39,19 +39,8 @@ public extension ImportProfile {
 		case let .internal(.view(.profileImported(.success(profileURL)))):
 			return .run { send in
 				let data = try data(contentsOf: profileURL, options: .uncached)
-				let snapshot: ProfileSnapshot
-				do {
-					snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
-				} catch {
-					#if DEBUG
-					try? keychainClient.removeAllFactorSourcesAndProfileSnapshot()
-					try? keychainClient.removeProfileSnapshot()
-					#else
-					// TODO: Handle conflicting JSON formats of Profile somehow..?
-					#endif // DEBUG
-					throw error
-				}
-				try keychainClient.setProfileSnapshot(profileSnapshot: snapshot)
+				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
+				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
 				await send(.delegate(.importedProfileSnapshot(snapshot)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
