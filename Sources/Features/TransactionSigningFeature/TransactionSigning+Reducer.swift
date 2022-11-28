@@ -65,13 +65,13 @@ public extension TransactionSigning {
 				)))
 			}
 
-		case let .internal(.signTransactionResult(.success(successfullySubmittedTransaction))):
+		case let .internal(.signTransactionResult(.success(txID))):
 			state.isSigningTX = false
 
 			return .run { [request = state.request] send in
 				await send(.delegate(
 					.signedTXAndSubmittedToGateway(
-						successfullySubmittedTransaction.txID,
+						txID,
 						request: request
 					)
 				))

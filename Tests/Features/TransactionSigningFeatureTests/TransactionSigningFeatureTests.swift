@@ -28,9 +28,8 @@ final class TransactionSigningFeatureTests: TestCase {
 
 	func testSignTransaction() async {
 		// Unhappy path - sign TX error
-		struct SignTransactionError: LocalizedError, Equatable { let errorDescription: String? = "SignTransactionError" }
 		store.dependencies.transactionClient.signAndSubmitTransaction = { @Sendable _ in
-			throw SignTransactionError()
+			.failure(.failedToCompileOrSign(.failedToCompileTXIntent))
 		}
 		let errorExpectation2 = expectation(description: "Error")
 		store.dependencies.errorQueue.schedule = { error in
@@ -41,18 +40,18 @@ final class TransactionSigningFeatureTests: TestCase {
 		await store.send(.view(.signTransactionButtonTapped)) {
 			$0.isSigningTX = true
 		}
-		await store.receive(.internal(.signTransactionResult(.failure(SignTransactionError())))) {
+		await store.receive(.internal(.signTransactionResult(.failure(.failedToCompileOrSign(.failedToCompileTXIntent))))) {
 			$0.isSigningTX = false
 		}
 
 		// Happy path
 		store.dependencies.transactionClient.signAndSubmitTransaction = { @Sendable _ in
-			.placeholder
+			.success(.placeholder)
 		}
 		await store.send(.view(.signTransactionButtonTapped)) {
 			$0.isSigningTX = true
 		}
-		await store.receive(.internal(.signTransactionResult(.success("placeholder")))) {
+		await store.receive(.internal(.signTransactionResult(.success(.placeholder)))) {
 			$0.isSigningTX = false
 		}
 

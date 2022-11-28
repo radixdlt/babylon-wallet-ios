@@ -5,10 +5,13 @@ import EngineToolkit
 import EngineToolkitClient
 import Foundation
 import struct GatewayAPI.GatewayAPIClient
-import struct GatewayAPI.PollStrategy
-import enum GatewayAPI.SubmitTXFailure
-import struct GatewayAPI.SuccessfullySubmittedTransaction
 import struct GatewayAPI.TransactionDetailsResponse
+import struct GatewayAPI.TransactionLookupIdentifier
+import struct GatewayAPI.TransactionStatus
+import struct GatewayAPI.TransactionStatusRequest
+import struct GatewayAPI.TransactionStatusResponse
+import struct GatewayAPI.TransactionSubmitRequest
+import struct GatewayAPI.TransactionSubmitResponse
 import NonEmpty
 import Profile
 import ProfileClient
@@ -28,7 +31,7 @@ public extension TransactionClient {
 	typealias SignAndSubmitTransaction = @Sendable (TransactionManifest) async -> TransactionResult
 }
 
-public typealias TransactionResult = Result<SuccessfullySubmittedTransaction, TransactionFailure>
+public typealias TransactionResult = Swift.Result<TXID, TransactionFailure>
 
 // MARK: - TransactionFailure
 public enum TransactionFailure: Sendable, LocalizedError, Equatable {
@@ -135,12 +138,78 @@ public extension TransactionClient {
 		@Sendable
 		func submitNotarizedTX(
 			id txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse
-		) async -> Result<SuccessfullySubmittedTransaction, SubmitTXFailure> {
-			await gatewayAPIClient.submit(
-				notarizedTransaction: Data(compiledNotarizedTXIntent.compiledNotarizedIntent),
-				txID: txID,
-				pollStrategy: pollStrategy
+		) async -> Result<TXID, SubmitTXFailure> {
+			//			await gatewayAPIClient.submit(
+			//				notarizedTransaction: Data(compiledNotarizedTXIntent.compiledNotarizedIntent),
+			//				txID: txID,
+			//				pollStrategy: pollStrategy
+			//			)
+
+			//            public extension GatewayAPIClient {
+			//                // MARK: -
+			//
+			//                // MARK: Submit TX Flow
+			//                func submit(
+			//                    notarizedTransaction: Data,
+			//                    txID: TXID,
+			//                    pollStrategy: PollStrategy = .default
+			//                ) async -> Result<SuccessfullySubmittedTransaction, SubmitTXFailure> {
+			@Dependency(\.mainQueue) var mainQueue
+
+			// MARK: Submit TX
+			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
+				notarizedTransaction: Data(compiledNotarizedTXIntent.compiledNotarizedIntent).hex
 			)
+
+			let response: GatewayAPI.TransactionSubmitResponse
+
+			do {
+				response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
+			} catch {
+				return .failure(.failedToSubmitTX)
+			}
+
+			guard !response.duplicate else {
+				return .failure(.invalidTXWasDuplicate)
+			}
+
+			let transactionIdentifier = GatewayAPI.TransactionLookupIdentifier(
+				origin: .intent,
+				valueHex: txID.rawValue
+			)
+
+			// MARK: Poll Status
+			var txStatus: GatewayAPI.TransactionStatus = .init(status: .pending)
+
+			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
+				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
+					transactionIdentifier: transactionIdentifier
+				)
+				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
+				return txStatusResponse.transaction.transactionStatus
+			}
+
+			var pollCount = 0
+			while !txStatus.isComplete {
+				defer { pollCount += 1 }
+				try? await mainQueue.sleep(for: .seconds(pollStrategy.sleepDuration))
+
+				do {
+					txStatus = try await pollTransactionStatus()
+				} catch {
+					// FIXME: - mainnet: improve hanlding of polling failure, should probably not return failure..
+					return .failure(.failedToPollTX(txID: txID, error: .init(error: error)))
+				}
+
+				if pollCount >= pollStrategy.maxPollTries {
+					return .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCount)))
+				}
+			}
+			guard txStatus.status == .succeeded else {
+				return .failure(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus.status))
+			}
+
+			return .success(txID)
 		}
 
 		@Sendable
@@ -294,3 +363,77 @@ extension TransactionClient: TestDependencyKey {
 
 // MARK: - CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities
 struct CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities: Swift.Error {}
+
+extension GatewayAPI.TransactionStatus {
+	var isComplete: Bool {
+		switch status {
+		case .succeeded, .failed, .rejected:
+			return true
+		case .pending:
+			return false
+		}
+	}
+}
+
+// MARK: - PollStrategy
+public struct PollStrategy {
+	public let maxPollTries: Int
+	public let sleepDuration: TimeInterval
+	public init(maxPollTries: Int, sleepDuration: TimeInterval) {
+		self.maxPollTries = maxPollTries
+		self.sleepDuration = sleepDuration
+	}
+
+	public static let `default` = Self(maxPollTries: 20, sleepDuration: 2)
+}
+
+// MARK: - GatewayAPI.TransactionDetailsResponse + Sendable
+extension GatewayAPI.TransactionDetailsResponse: @unchecked Sendable {}
+
+// MARK: - GatewayAPI.TransactionStatus.Status + Sendable
+extension GatewayAPI.TransactionStatus.Status: @unchecked Sendable {}
+
+// MARK: - FailedToGetDetailsOfSuccessfullySubmittedTX
+struct FailedToGetDetailsOfSuccessfullySubmittedTX: LocalizedError, Equatable {
+	public let txID: TXID
+	var errorDescription: String? {
+		"Successfully submitted TX with txID: \(txID) but failed to get transaction details for it."
+	}
+}
+
+// MARK: - SubmitTXFailure
+// FIXME: - mainnet: improve hanlding of polling failure
+/// This failure might be a false positive, due to i.e. POLLING of tx failed, but TX might have
+/// been submitted successfully. Or we might have successfully submitted the TX but failed to get details about it.
+public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
+	case failedToSubmitTX
+	case invalidTXWasDuplicate
+
+	/// Failed to poll, maybe TX was submitted successfuly?
+	case failedToPollTX(txID: TXID, error: FailedToPollError)
+
+	case failedToGetTransactionStatus(txID: TXID, error: FailedToGetTransactionStatus)
+	case invalidTXWasSubmittedButNotSuccessful(txID: TXID, status: GatewayAPI.TransactionStatus.Status)
+}
+
+// MARK: - FailedToPollError
+public struct FailedToPollError: Sendable, LocalizedError, Equatable {
+	public let error: Swift.Error
+	public var errorDescription: String? {
+		"\(Self.self)(error: \(String(describing: error))"
+	}
+}
+
+// MARK: - FailedToGetTransactionStatus
+public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable {
+	public let pollAttempts: Int
+	public var errorDescription: String? {
+		"\(Self.self)(afterPollAttempts: \(String(describing: pollAttempts))"
+	}
+}
+
+public extension LocalizedError where Self: Equatable {
+	static func == (lhs: Self, rhs: Self) -> Bool {
+		lhs.errorDescription == rhs.errorDescription
+	}
+}
