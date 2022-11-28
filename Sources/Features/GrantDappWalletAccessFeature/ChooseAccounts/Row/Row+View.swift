@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import DesignSystem
 import Profile
@@ -59,7 +60,7 @@ extension ChooseAccounts.Row.View {
 
 		init(state: ChooseAccounts.Row.State) {
 			isSelected = state.isSelected
-			accountName = state.account.displayName ?? "Unnamed account"
+			accountName = state.account.displayName ?? L10n.DApp.ChooseAccounts.unnamedAccount
 			accountAddress = state.account.address
 		}
 	}

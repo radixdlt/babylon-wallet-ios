@@ -41,7 +41,7 @@ public extension ManageP2PClients.View {
 							ForceFullScreen {
 								VStack {
 									NavigationBar(
-										titleText: "New Connection",
+										titleText: L10n.ManageP2PClients.newConnectionTitle,
 										leadingItem: CloseButton {
 											viewStore.send(.dismissNewConnectionFlowButtonTapped)
 										}
@@ -85,7 +85,7 @@ private extension ManageP2PClients.View {
 		ForceFullScreen {
 			VStack {
 				NavigationBar(
-					titleText: "P2P Connections",
+					titleText: L10n.ManageP2PClients.p2PConnectionsTitle,
 					leadingItem: BackButton {
 						viewStore.send(.dismissButtonTapped)
 					}
@@ -106,7 +106,7 @@ private extension ManageP2PClients.View {
 						}
 					}
 
-					Button("Add new connection") {
+					Button(L10n.ManageP2PClients.newConnectionButtonTitle) {
 						viewStore.send(.addNewConnectionButtonTapped)
 					}
 					.enabled(viewStore.canAddMoreConnections)

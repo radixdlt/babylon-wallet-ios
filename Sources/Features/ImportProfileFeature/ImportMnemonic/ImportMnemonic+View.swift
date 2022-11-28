@@ -32,35 +32,35 @@ public extension ImportMnemonic.View {
 						}
 					)
 					Spacer()
-					Text("Import Mnemonic")
+					Text(L10n.ImportProfile.importMnemonic.capitalized)
 					Spacer()
 					EmptyView()
 				}
 				Spacer()
 
 				TextField(
-					"Mnemonic phrasec",
+					L10n.ImportProfile.mnemonicPhrasec,
 					text: viewStore.binding(
 						get: \.phraseOfMnemonicToImport,
 						send: { .phraseOfMnemonicToImportChanged($0) }
 					)
 				)
 				Button(
-					"Import mnemonic"
+					L10n.ImportProfile.importMnemonic
 				) {
 					viewStore.send(.importMnemonicButtonTapped)
 				}
 				.enabled(viewStore.canImportMnemonic)
 
 				Button(
-					"Save imported mnemonic"
+					L10n.ImportProfile.saveImportedMnemonic
 				) {
 					viewStore.send(.saveImportedMnemonicButtonTapped)
 				}
 				.enabled(viewStore.canSaveImportedMnemonic)
 
 				Button(
-					"Profile from snapshot"
+					L10n.ImportProfile.profileFromSnapshot
 				) {
 					viewStore.send(.importProfileFromSnapshotButtonTapped)
 				}

@@ -76,12 +76,12 @@ public enum L10n {
     	}
     	/// at least one account.
     	public static let explanationAtLeastOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationAtLeastOneAccount", fallback: "at least one account.")
+    	/// exactly one account.
+    	public static let explanationExactlyOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactlyOneAccount", fallback: "exactly one account.")
     	/// exactly #%d accounts.
     	public static func explanationExactNumberOfAccounts(_ p1: Int) -> String {
     		return L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactNumberOfAccounts", p1, fallback: "exactly #%d accounts.")
     	}
-    	/// exactly one account.
-    	public static let explanationOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationOneAccount", fallback: "exactly one account.")
     	/// Choose the account(s) you wish %@ to know about
     	public static func subtitle(_ p1: Any) -> String {
     		return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle", String(describing: p1), fallback: "Choose the account(s) you wish %@ to know about")
@@ -121,16 +121,52 @@ public enum L10n {
 	public enum ImportProfile {
   	/// Import mnemonic
   	public static let importMnemonic = L10n.tr("Localizable", "importProfile.importMnemonic", fallback: "Import mnemonic")
+  	/// Import profile
+  	public static let importProfile = L10n.tr("Localizable", "importProfile.importProfile", fallback: "Import profile")
   	/// Mnemonic phrasec
   	public static let mnemonicPhrasec = L10n.tr("Localizable", "importProfile.mnemonicPhrasec", fallback: "Mnemonic phrasec")
   	/// Profile from snapshot
   	public static let profileFromSnapshot = L10n.tr("Localizable", "importProfile.profileFromSnapshot", fallback: "Profile from snapshot")
   	/// Save imported mnemonic
   	public static let saveImportedMnemonic = L10n.tr("Localizable", "importProfile.saveImportedMnemonic", fallback: "Save imported mnemonic")
-  	public enum ImportProfile {
-    	/// Import profile
-    	public static let title = L10n.tr("Localizable", "importProfile.importProfile.title", fallback: "Import profile")
+	}
+	public enum ManageGateway {
+  	/// Current
+  	public static let currentGatewayTitle = L10n.tr("Localizable", "manageGateway.currentGatewayTitle", fallback: "Current")
+  	/// Gateway API Endpoint
+  	public static let gatewayAPIEndpoint = L10n.tr("Localizable", "manageGateway.gatewayAPIEndpoint", fallback: "Gateway API Endpoint")
+  	/// Host
+  	public static let host = L10n.tr("Localizable", "manageGateway.host", fallback: "Host")
+  	/// Network ID
+  	public static let networkID = L10n.tr("Localizable", "manageGateway.networkID", fallback: "Network ID")
+  	/// Network name
+  	public static let networkName = L10n.tr("Localizable", "manageGateway.networkName", fallback: "Network name")
+  	/// Path
+  	public static let path = L10n.tr("Localizable", "manageGateway.path", fallback: "Path")
+  	/// Port
+  	public static let port = L10n.tr("Localizable", "manageGateway.port", fallback: "Port")
+  	/// Scheme
+  	public static let scheme = L10n.tr("Localizable", "manageGateway.scheme", fallback: "Scheme")
+  	/// Switch To
+  	public static let switchToButtonTitle = L10n.tr("Localizable", "manageGateway.switchToButtonTitle", fallback: "Switch To")
+  	/// Edit Gateway API URL
+  	public static let title = L10n.tr("Localizable", "manageGateway.title", fallback: "Edit Gateway API URL")
+	}
+	public enum ManageP2PClients {
+  	/// Connection ID: %@
+  	public static func connectionID(_ p1: Any) -> String {
+  		return L10n.tr("Localizable", "manageP2PClients.connectionID", String(describing: p1), fallback: "Connection ID: %@")
   	}
+  	/// Delete
+  	public static let deleteButtonTitle = L10n.tr("Localizable", "manageP2PClients.deleteButtonTitle", fallback: "Delete")
+  	/// Add new connection
+  	public static let newConnectionButtonTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionButtonTitle", fallback: "Add new connection")
+  	/// New Connection
+  	public static let newConnectionTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionTitle", fallback: "New Connection")
+  	/// P2P Connections
+  	public static let p2PConnectionsTitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsTitle", fallback: "P2P Connections")
+  	/// Send Test Msg
+  	public static let sendTestMessageButtonTitle = L10n.tr("Localizable", "manageP2PClients.sendTestMessageButtonTitle", fallback: "Send Test Msg")
 	}
 	public enum NftList {
   	/// %d NFTs
@@ -145,6 +181,44 @@ public enum L10n {
     	/// Unknown
     	public static let supplyUnknown = L10n.tr("Localizable", "nftList.header.supplyUnknown", fallback: "Unknown")
   	}
+	}
+	public enum Onboarding {
+  	/// New Account
+  	public static let newAccountButtonTitle = L10n.tr("Localizable", "onboarding.newAccountButtonTitle", fallback: "New Account")
+	}
+	public enum Settings {
+  	/// Add Connection
+  	public static let addConnectionButtonTitle = L10n.tr("Localizable", "settings.addConnectionButtonTitle", fallback: "Add Connection")
+  	/// Close
+  	public static let closeButtonTitle = L10n.tr("Localizable", "settings.closeButtonTitle", fallback: "Close")
+  	/// Delete all & Factor Sources
+  	public static let deleteAllButtonTitle = L10n.tr("Localizable", "settings.deleteAllButtonTitle", fallback: "Delete all & Factor Sources")
+  	/// Edit Gateway API Endpoint
+  	public static let editGatewayAPIEndpointButtonTitle = L10n.tr("Localizable", "settings.editGatewayAPIEndpointButtonTitle", fallback: "Edit Gateway API Endpoint")
+  	/// Inspect Profile
+  	public static let inspectProfileButtonTitle = L10n.tr("Localizable", "settings.inspectProfileButtonTitle", fallback: "Inspect Profile")
+  	/// Manage Connections
+  	public static let manageConnectionsButtonTitle = L10n.tr("Localizable", "settings.manageConnectionsButtonTitle", fallback: "Manage Connections")
+  	/// No profile, strange
+  	public static let noProfileText = L10n.tr("Localizable", "settings.noProfileText", fallback: "No profile, strange")
+  	/// Settings
+  	public static let title = L10n.tr("Localizable", "settings.title", fallback: "Settings")
+  	/// Version: %@ build #%@
+  	public static func versionInfo(_ p1: Any, _ p2: Any) -> String {
+  		return L10n.tr("Localizable", "settings.versionInfo", String(describing: p1), String(describing: p2), fallback: "Version: %@ build #%@")
+  	}
+  	public enum Section {
+    	/// Debug
+    	public static let debug = L10n.tr("Localizable", "settings.section.debug", fallback: "Debug")
+    	/// P2P Connections
+    	public static let p2Pconnections = L10n.tr("Localizable", "settings.section.P2Pconnections", fallback: "P2P Connections")
+  	}
+	}
+	public enum TransactionSigning {
+  	/// Sign Transaction
+  	public static let signTransactionButtonTitle = L10n.tr("Localizable", "transactionSigning.signTransactionButtonTitle", fallback: "Sign Transaction")
+  	/// Sign TX
+  	public static let title = L10n.tr("Localizable", "transactionSigning.title", fallback: "Sign TX")
 	}
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length

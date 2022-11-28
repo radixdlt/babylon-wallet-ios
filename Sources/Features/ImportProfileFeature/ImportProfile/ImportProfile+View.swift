@@ -32,13 +32,13 @@ public extension ImportProfile.View {
 						}
 					)
 					Spacer()
-					Text(L10n.ImportProfile.ImportProfile.title)
+					Text(L10n.ImportProfile.importProfile)
 					Spacer()
 					EmptyView()
 				}
 				Spacer()
 
-				Button("Import Profile") {
+				Button(L10n.ImportProfile.importProfile.capitalized) {
 					viewStore.send(.importProfileFileButtonTapped)
 				}
 				.buttonStyle(.borderedProminent)
