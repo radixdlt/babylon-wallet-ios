@@ -36,11 +36,11 @@ final class FungibleTokenListSortingTests: TestCase {
 		let xrd = FungibleToken.xrd
 		let dot = FungibleToken.dot
 
-		let btcContainer = FungibleTokenContainer(owner: address, asset: btc, amountInAttos: nil, worth: 1)
-		let ethContainer = FungibleTokenContainer(owner: address, asset: eth, amountInAttos: nil, worth: 2)
-		let ltcContainer = FungibleTokenContainer(owner: address, asset: ltc, amountInAttos: nil, worth: 3)
-		let xrdContainer = FungibleTokenContainer(owner: address, asset: xrd, amountInAttos: nil, worth: 4)
-		let dotContainer = FungibleTokenContainer(owner: address, asset: dot, amountInAttos: nil, worth: 5)
+		let btcContainer = FungibleTokenContainer(owner: address, asset: btc, amount: nil, worth: 1)
+		let ethContainer = FungibleTokenContainer(owner: address, asset: eth, amount: nil, worth: 2)
+		let ltcContainer = FungibleTokenContainer(owner: address, asset: ltc, amount: nil, worth: 3)
+		let xrdContainer = FungibleTokenContainer(owner: address, asset: xrd, amount: nil, worth: 4)
+		let dotContainer = FungibleTokenContainer(owner: address, asset: dot, amount: nil, worth: 5)
 
 		// when
 		let result = [btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer].sortedIntoCategories()
@@ -61,11 +61,11 @@ final class FungibleTokenListSortingTests: TestCase {
 		let xrd = FungibleToken.xrd
 		let dot = FungibleToken.dot
 
-		let btcContainer = FungibleTokenContainer(owner: address, asset: btc, amountInAttos: nil, worth: nil)
-		let ethContainer = FungibleTokenContainer(owner: address, asset: eth, amountInAttos: nil, worth: nil)
-		let ltcContainer = FungibleTokenContainer(owner: address, asset: ltc, amountInAttos: nil, worth: nil)
-		let xrdContainer = FungibleTokenContainer(owner: address, asset: xrd, amountInAttos: nil, worth: nil)
-		let dotContainer = FungibleTokenContainer(owner: address, asset: dot, amountInAttos: nil, worth: nil)
+		let btcContainer = FungibleTokenContainer(owner: address, asset: btc, amount: nil, worth: nil)
+		let ethContainer = FungibleTokenContainer(owner: address, asset: eth, amount: nil, worth: nil)
+		let ltcContainer = FungibleTokenContainer(owner: address, asset: ltc, amount: nil, worth: nil)
+		let xrdContainer = FungibleTokenContainer(owner: address, asset: xrd, amount: nil, worth: nil)
+		let dotContainer = FungibleTokenContainer(owner: address, asset: dot, amount: nil, worth: nil)
 
 		// when
 		let result = [btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer].sortedIntoCategories()
@@ -86,11 +86,11 @@ final class FungibleTokenListSortingTests: TestCase {
 		let xrd = FungibleToken.xrd
 		let dot = FungibleToken.dot
 
-		let btcContainer = FungibleTokenContainer(owner: address, asset: btc, amountInAttos: nil, worth: nil)
-		let ethContainer = FungibleTokenContainer(owner: address, asset: eth, amountInAttos: nil, worth: 2)
-		let ltcContainer = FungibleTokenContainer(owner: address, asset: ltc, amountInAttos: nil, worth: 3)
-		let xrdContainer = FungibleTokenContainer(owner: address, asset: xrd, amountInAttos: nil, worth: nil)
-		let dotContainer = FungibleTokenContainer(owner: address, asset: dot, amountInAttos: nil, worth: nil)
+		let btcContainer = FungibleTokenContainer(owner: address, asset: btc, amount: nil, worth: nil)
+		let ethContainer = FungibleTokenContainer(owner: address, asset: eth, amount: nil, worth: 2)
+		let ltcContainer = FungibleTokenContainer(owner: address, asset: ltc, amount: nil, worth: 3)
+		let xrdContainer = FungibleTokenContainer(owner: address, asset: xrd, amount: nil, worth: nil)
+		let dotContainer = FungibleTokenContainer(owner: address, asset: dot, amount: nil, worth: nil)
 
 		// when
 		let result = [btcContainer, ethContainer, ltcContainer, xrdContainer, dotContainer].sortedIntoCategories()
