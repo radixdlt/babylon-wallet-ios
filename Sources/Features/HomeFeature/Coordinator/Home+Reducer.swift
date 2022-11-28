@@ -77,7 +77,9 @@ public struct Home: ReducerProtocol {
 			return loadAccountsAndSettings()
 
 		case .internal(.view(.pullToRefreshStarted)):
-			return loadAccounts()
+			return .run { send in
+				await send(.child(.accountList(.view(.viewAppeared))))
+			}
 
 		case let .internal(.system(.accountsLoadedResult(.failure(error)))):
 			errorQueue.schedule(error)
