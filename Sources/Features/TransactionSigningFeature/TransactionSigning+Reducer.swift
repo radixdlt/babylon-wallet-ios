@@ -5,7 +5,7 @@ import Foundation
 import TransactionClient
 
 // MARK: - TransactionSigning
-public struct TransactionSigning: ReducerProtocol {
+public struct TransactionSigning: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.profileClient) var profileClient
@@ -59,9 +59,12 @@ public extension TransactionSigning {
 
 			state.isSigningTX = true
 
-			return .run { [transactionClient] send in
+			return .run { [makeTransactionHeaderInput = state.makeTransactionHeaderInput] send in
 				await send(.internal(.signTransactionResult(
-					await transactionClient.signAndSubmitTransaction(transactionWithLockFee)
+					await transactionClient.signAndSubmitTransaction(
+						transactionWithLockFee,
+						makeTransactionHeaderInput
+					)
 				)))
 			}
 
