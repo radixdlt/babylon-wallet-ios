@@ -2,7 +2,7 @@ fastlane_require 'dotenv'
 
 before_all do
     Dotenv.load ".env.secret"
-#    ensure_git_status_clean
+    ensure_git_status_clean
 end
 
 platform :ios do
