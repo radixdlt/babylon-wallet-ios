@@ -43,7 +43,7 @@ extension AccountPortfolio {
 					name: nil,
 					symbol: nil
 				),
-				amount: BigUInt(stringLiteral: $0.amount.value),
+				amount: $0.amount.value,
 				worth: nil
 			)
 		}

@@ -63,15 +63,16 @@ public struct FungibleTokenContainer: AssetContainer, Equatable {
 	public typealias T = FungibleToken
 	public var asset: FungibleToken
 
+	// TODO: replace String type with appropriate numeric type with 0b2^256 / 0d1e18 ~ 1e60 support
 	/// Token amount held in one account, expressed as regular decimal value, for example: 105.78 XRD
-	public var amount: BigUInt?
+	public var amount: String?
 	/// Token worth in currently selected currency.
 	public var worth: BigUInt?
 
 	public init(
 		owner: AccountAddress,
 		asset: FungibleToken,
-		amount: BigUInt?,
+		amount: String?,
 		worth: BigUInt?
 	) {
 		self.owner = owner
