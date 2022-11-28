@@ -83,6 +83,8 @@ public extension ProfileClient {
 			deleteProfileAndFactorSources: {
 				do {
 					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot(
+						// This should not be be shown due to settings of profile snapshot
+						// item when it was originally stored.
 						authenticationPrompt: "Read profile in order get reference to secrects to delete"
 					)
 				} catch {
