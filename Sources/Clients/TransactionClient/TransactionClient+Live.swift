@@ -47,7 +47,7 @@ public extension TransactionClient {
 			let intentSignatures_: [SignatureWithPublicKey]
 			do {
 				intentSignatures_ = try await notaryAndSigners.signers.asyncMap { signer in
-					// FIXME: mainnet: Sign with ALL signers, not just the single signer (notary)
+					// FIXME: mainnet: Sign with ALL provided signers of the account.
 					try await signer.notarySigner(compiledTransactionIntent.compiledIntent)
 				}
 			} catch {
