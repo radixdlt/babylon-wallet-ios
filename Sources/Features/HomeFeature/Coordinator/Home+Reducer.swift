@@ -243,33 +243,17 @@ public struct Home: ReducerProtocol {
 
 	func loadAccountsAndSettings() -> EffectTask<Action> {
 		.run { send in
-			await loadAccountsAndSendAction(send)
-			await loadSettingsAndSendAction(send)
+			await send(.internal(.system(.accountsLoadedResult(
+				TaskResult {
+					try await profileClient.getAccounts()
+				}
+			))))
+			await send(.internal(.system(.appSettingsLoadedResult(
+				TaskResult {
+					try await appSettingsClient.loadSettings()
+				}
+			))))
 		}
-	}
-
-	func loadAccounts() -> EffectTask<Action> {
-		.run { send in
-			await loadAccountsAndSendAction(send)
-		}
-	}
-
-	@Sendable
-	func loadAccountsAndSendAction(_ send: Send<Action>) async {
-		await send(.internal(.system(.accountsLoadedResult(
-			TaskResult {
-				try await profileClient.getAccounts()
-			}
-		))))
-	}
-
-	@Sendable
-	func loadSettingsAndSendAction(_ send: Send<Action>) async {
-		await send(.internal(.system(.appSettingsLoadedResult(
-			TaskResult {
-				try await appSettingsClient.loadSettings()
-			}
-		))))
 	}
 
 	func copyAddress(_ address: AccountAddress) -> EffectTask<Action> {
