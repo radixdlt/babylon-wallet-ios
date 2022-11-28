@@ -55,14 +55,21 @@ public struct ProfileClient: DependencyKey, Sendable {
 
 // MARK: - SignersForAccountsGivenAddressesRequest
 public struct SignersForAccountsGivenAddressesRequest: Sendable, Hashable {
+	public let keychainAccessFactorSourcesAuthPrompt: String
+
 	// Might be empty! And in case of empty...
 	public let addresses: OrderedSet<AccountAddress>
 	// ... we will use this NetworkID to get the first account and used that to sign
 	public let networkID: NetworkID
 
-	public init(addresses: OrderedSet<AccountAddress>, networkID: NetworkID) {
-		self.addresses = addresses
+	public init(
+		networkID: NetworkID,
+		addresses: OrderedSet<AccountAddress>,
+		keychainAccessFactorSourcesAuthPrompt: String
+	) {
 		self.networkID = networkID
+		self.addresses = addresses
+		self.keychainAccessFactorSourcesAuthPrompt = keychainAccessFactorSourcesAuthPrompt
 	}
 }
 
@@ -102,11 +109,14 @@ public struct AccountSignature: Sendable, Hashable {
 
 // MARK: - CreateAnotherAccountRequest
 public struct CreateAnotherAccountRequest: Sendable, Hashable {
+	public let keychainAccessFactorSourcesAuthPrompt: String
 	public let accountName: String?
 
 	public init(
+		keychainAccessFactorSourcesAuthPrompt: String,
 		accountName: String?
 	) {
+		self.keychainAccessFactorSourcesAuthPrompt = keychainAccessFactorSourcesAuthPrompt
 		self.accountName = accountName
 	}
 }

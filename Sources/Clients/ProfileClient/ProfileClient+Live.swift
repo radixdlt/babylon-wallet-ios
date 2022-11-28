@@ -82,7 +82,9 @@ public extension ProfileClient {
 			},
 			deleteProfileAndFactorSources: {
 				do {
-					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot(
+						authenticationPrompt: "Read profile in order get reference to secrects to delete"
+					)
 				} catch {
 					try await keychainClient.removeProfileSnapshot()
 				}
@@ -121,39 +123,43 @@ public extension ProfileClient {
 						networkID: networkID,
 						displayName: request.accountName,
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-							try await keychainClient.loadFactorSourceMnemonic(reference: reference)
+							try await keychainClient
+								.loadFactorSourceMnemonic(
+									reference: reference,
+									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+								)
 						}
 					)
 				}
 			},
 			lookupAccountByAddress: lookupAccountByAddress,
-			signersForAccountsGivenAddresses: { (request: SignersForAccountsGivenAddressesRequest) -> NonEmpty<OrderedSet<SignersOfAccount>> in
+			signersForAccountsGivenAddresses: { request in
 
-				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { [keychainClient] reference in
-					try await keychainClient.loadFactorSourceMnemonic(reference: reference)
+				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { reference in
+					try await keychainClient.loadFactorSourceMnemonic(
+						reference: reference,
+						authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+					)
 				}
 
 				func getAccountSignersFromAddresses() async throws -> NonEmpty<OrderedSet<SignersOfAccount>>? {
-//					guard let addresses = NonEmpty(rawValue: request.addresses) else { return nil }
-//
-//					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
-//
-//					let matrix: [Set<PrivateKey>] = try await profileHolder.getAsync { profile -> [Set<PrivateKey>] in
-//						try await accounts.asyncMap { account -> Set<PrivateKey> in
-//							try await profile.withPrivateKeys(
-//								of: account,
-//								mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-//							) { (keys: NonEmpty<Set<PrivateKey>>) -> Set<PrivateKey> in
-//								keys.rawValue
-//							}
-//						}
-//					}
-//					var privateKeys = OrderedSet<PrivateKey>()
-//					matrix.forEach {
-//						privateKeys.append(contentsOf: $0)
-//					}
-//					return privateKeys
-					fatalError()
+					guard let addresses = NonEmpty(rawValue: request.addresses) else { return nil }
+
+					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
+
+					let matrix = try await profileHolder.getAsync { profile in
+						try await accounts.asyncMap { account in
+							try await profile.signersOf(
+								of: account,
+								mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
+							)
+						}
+					}
+					var signers = OrderedSet<SignersOfAccount>()
+					matrix.forEach {
+						signers.append(contentsOf: $0)
+					}
+					return NonEmpty(rawValue: signers)
 				}
 
 				guard let fromAddresses = try? await getAccountSignersFromAddresses() else {

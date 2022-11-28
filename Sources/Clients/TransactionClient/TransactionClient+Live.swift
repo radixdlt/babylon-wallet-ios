@@ -28,11 +28,11 @@ public extension TransactionClient {
 		@Sendable
 		func compileAndSign(
 			transactionIntent: TransactionIntent,
-			notary notaryPrivateKey: PrivateKey
+			notaryAndSigners: NotaryAndSigners
 		) async -> Result<(txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse), TransactionFailure.CompileOrSignFailure> {
+			let compiledTransactionIntent: CompileTransactionIntentResponse
 			do {
-				// Generate better error message than `failedToGenerateTXId` if failed to compileTXIntent
-				_ = try engineToolkitClient.compileTransactionIntent(transactionIntent)
+				compiledTransactionIntent = try engineToolkitClient.compileTransactionIntent(transactionIntent)
 			} catch {
 				return .failure(.failedToCompileTXIntent)
 			}
@@ -44,9 +44,26 @@ public extension TransactionClient {
 				return .failure(.failedToGenerateTXId)
 			}
 
+			let intentSignatures_: [SignatureWithPublicKey]
+			do {
+				intentSignatures_ = try await notaryAndSigners.signers.asyncMap { signer in
+					// FIXME: mainnet: Sign with ALL signers, not just the single signer (notary)
+					try await signer.notarySigner(compiledTransactionIntent.compiledIntent)
+				}
+			} catch {
+				return .failure(.failedToSignIntentWithAccountSigners)
+			}
+
+			let intentSignatures: [Engine.SignatureWithPublicKey]
+			do {
+				intentSignatures = try intentSignatures_.map { try $0.intoEngine() }
+			} catch {
+				return .failure(.failedToConvertAccountSignatures)
+			}
+
 			let signedTransactionIntent = SignedTransactionIntent(
 				intent: transactionIntent,
-				intentSignatures: []
+				intentSignatures: intentSignatures
 			)
 			let compiledSignedIntent: CompileSignedTransactionIntentResponse
 			do {
@@ -54,21 +71,21 @@ public extension TransactionClient {
 			} catch {
 				return .failure(.failedToCompileSignedTXIntent)
 			}
+
 			let notarySignatureWithPublicKey: SignatureWithPublicKey
 			do {
-				notarySignatureWithPublicKey = try notaryPrivateKey.signReturningHashOfMessage(
-					data: compiledSignedIntent.compiledSignedIntent
+				notarySignatureWithPublicKey = try await notaryAndSigners.notarySigner.notarySigner(
+					compiledSignedIntent.compiledSignedIntent
 				)
-				.signatureWithPublicKey
 			} catch {
-				return .failure(.failedToSign)
+				return .failure(.failedToSignSignedCompiledIntentWithNotarySigner)
 			}
 
 			let notarySignature: Engine.Signature
 			do {
 				notarySignature = try notarySignatureWithPublicKey.intoEngine().signature
 			} catch {
-				return .failure(.failedToConvertSignature)
+				return .failure(.failedToConvertNotarySignature)
 			}
 			let uncompiledNotarized = NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
@@ -149,9 +166,9 @@ public extension TransactionClient {
 		@Sendable
 		func signAndSubmit(
 			transactionIntent: TransactionIntent,
-			notary notaryPrivateKey: PrivateKey
+			notaryAndSigners: NotaryAndSigners
 		) async -> TransactionResult {
-			await compileAndSign(transactionIntent: transactionIntent, notary: notaryPrivateKey)
+			await compileAndSign(transactionIntent: transactionIntent, notaryAndSigners: notaryAndSigners)
 				.mapError { TransactionFailure.failedToCompileOrSign($0) }
 				.asyncFlatMap { (txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse) in
 					await submitNotarizedTX(id: txID, compiledNotarizedTXIntent: compiledNotarizedTXIntent).mapError {
@@ -165,8 +182,8 @@ public extension TransactionClient {
 			networkID: NetworkID,
 			manifest: TransactionManifest,
 			makeTransactionHeaderInput: MakeTransactionHeaderInput,
-			getNotary: @Sendable (AccountAddressesNeedingToSignTransactionRequest) async throws -> PrivateKey
-		) async -> Result<(intent: TransactionIntent, notaryPrivateKey: PrivateKey), TransactionFailure.FailedToPrepareForTXSigning> {
+			getNotaryAndSigners: @Sendable (AccountAddressesNeedingToSignTransactionRequest) async throws -> NotaryAndSigners
+		) async -> Result<(intent: TransactionIntent, notaryAndSigners: NotaryAndSigners), TransactionFailure.FailedToPrepareForTXSigning> {
 			let nonce = engineToolkitClient.generateTXNonce()
 			let epoch: Epoch
 			do {
@@ -183,15 +200,15 @@ public extension TransactionClient {
 				networkID: networkID
 			)
 
-			let notaryPrivateKey: PrivateKey
+			let notaryAndSigners: NotaryAndSigners
 			do {
-				notaryPrivateKey = try await getNotary(accountAddressesNeedingToSignTransactionRequest)
+				notaryAndSigners = try await getNotaryAndSigners(accountAddressesNeedingToSignTransactionRequest)
 			} catch {
-				return .failure(.failedToLoadNotaryPrivateKey)
+				return .failure(.failedToLoadNotaryAndSigners)
 			}
 			let notaryPublicKey: Engine.PublicKey
 			do {
-				notaryPublicKey = try notaryPrivateKey.publicKey().intoEngine()
+				notaryPublicKey = try notaryAndSigners.notarySigner.notaryPublicKey.intoEngine()
 			} catch {
 				return .failure(.failedToLoadNotaryPublicKey)
 			}
@@ -213,49 +230,52 @@ public extension TransactionClient {
 				manifest: manifest
 			)
 
-			return .success((intent, notaryPrivateKey))
+			return .success((intent, notaryAndSigners))
 		}
 
 		@Sendable
 		func signAndSubmit(
 			manifest: TransactionManifest,
 			makeTransactionHeaderInput: MakeTransactionHeaderInput,
-			getNotary: @escaping @Sendable (AccountAddressesNeedingToSignTransactionRequest) async throws -> PrivateKey
+			getNotaryAndSigners: @escaping @Sendable (AccountAddressesNeedingToSignTransactionRequest) async throws -> NotaryAndSigners
 		) async -> TransactionResult {
 			await buildTransactionIntent(
 				networkID: profileClient.getCurrentNetworkID(),
 				manifest: manifest,
 				makeTransactionHeaderInput: makeTransactionHeaderInput,
-				getNotary: getNotary
+				getNotaryAndSigners: getNotaryAndSigners
 			).mapError {
 				TransactionFailure.failedToPrepareForTXSigning($0)
-			}.asyncFlatMap { intent, notaryPrivateKey in
-				await signAndSubmit(transactionIntent: intent, notary: notaryPrivateKey)
+			}.asyncFlatMap { intent, notaryAndSigners in
+				await signAndSubmit(transactionIntent: intent, notaryAndSigners: notaryAndSigners)
 			}
 		}
 
-		let signAndSubmitTransaction: SignAndSubmitTransaction = { @Sendable manifest, makeTransactionHeaderInput in
+		let signAndSubmitTransaction: SignAndSubmitTransaction = { @Sendable request in
 			await signAndSubmit(
-				manifest: manifest,
-				makeTransactionHeaderInput: makeTransactionHeaderInput
+				manifest: request.manifestToSign,
+				makeTransactionHeaderInput: request.makeTransactionHeaderInput
 			) { accountAddressesNeedingToSignTransactionRequest in
 
 				// Might be empty
-				let addressesNeededToSign = try engineToolkitClient
-					.accountAddressesNeedingToSignTransaction(
-						accountAddressesNeedingToSignTransactionRequest
+				let addressesNeededToSign = try OrderedSet(
+					engineToolkitClient
+						.accountAddressesNeedingToSignTransaction(
+							accountAddressesNeedingToSignTransactionRequest
+						)
+				)
+
+				let signersForAccounts = try await profileClient.signersForAccountsGivenAddresses(
+					.init(
+						networkID: accountAddressesNeedingToSignTransactionRequest.networkID,
+						addresses: addressesNeededToSign,
+						keychainAccessFactorSourcesAuthPrompt: request.unlockKeychainPromptShowToUser
 					)
+				)
 
-				// FIXME: - mainnet: pass as arg a fn: (NonEmpty<>)
-				let selectNotary: @Sendable (NonEmpty<OrderedSet<PrivateKey>>) -> PrivateKey = {
-					$0.first
-				}
+				let notary = await request.selectNotary(signersForAccounts)
 
-				let privateKeys = try await profileClient.privateKeysForAddresses(.init(addresses: .init(addressesNeededToSign), networkID: accountAddressesNeedingToSignTransactionRequest.networkID))
-
-				let notaryPrivateKey = selectNotary(privateKeys)
-
-				return notaryPrivateKey
+				return .init(notarySigner: notary, signers: signersForAccounts)
 			}
 		}
 
@@ -285,6 +305,14 @@ public extension TransactionClient {
 			signAndSubmitTransaction: signAndSubmitTransaction
 		)
 	}
+}
+
+// MARK: - NotaryAndSigners
+struct NotaryAndSigners: Sendable, Hashable {
+	/// Notary signer
+	public let notarySigner: SignersOfAccount
+	/// Never empty, since this also contains the notary signer.
+	public let signers: NonEmpty<OrderedSet<SignersOfAccount>>
 }
 
 // MARK: - CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities

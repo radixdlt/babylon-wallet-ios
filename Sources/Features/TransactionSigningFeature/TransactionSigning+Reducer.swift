@@ -2,6 +2,7 @@ import ComposableArchitecture
 import EngineToolkitClient
 import ErrorQueue
 import Foundation
+import Resources
 import TransactionClient
 
 // MARK: - TransactionSigning
@@ -59,12 +60,15 @@ public extension TransactionSigning {
 
 			state.isSigningTX = true
 
-			return .run { [makeTransactionHeaderInput = state.makeTransactionHeaderInput] send in
+			let signRequest = SignManifestRequest(
+				manifestToSign: transactionWithLockFee,
+				makeTransactionHeaderInput: state.makeTransactionHeaderInput,
+				unlockKeychainPromptShowToUser: L10n.TransactionSigning.biometricsPrompt
+			)
+
+			return .run { send in
 				await send(.internal(.signTransactionResult(
-					await transactionClient.signAndSubmitTransaction(
-						transactionWithLockFee,
-						makeTransactionHeaderInput
-					)
+					await transactionClient.signAndSubmitTransaction(signRequest)
 				)))
 			}
 

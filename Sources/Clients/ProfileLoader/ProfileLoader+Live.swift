@@ -11,9 +11,18 @@ public extension ProfileLoader {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		return Self(
 			loadProfile: { @Sendable in
-				guard let profileSnapshotData = try? await keychainClient.loadProfileSnapshotJSONData() else {
+
+				guard
+					let profileSnapshotData = try? await keychainClient
+					.loadProfileSnapshotJSONData(
+						// This should not be be shown due to settings of profile snapshot
+						// item when it was originally stored.
+						authenticationPrompt: "Load accounts"
+					)
+				else {
 					return .success(nil)
 				}
+
 				let decodedVersion: ProfileSnapshot.Version
 				do {
 					decodedVersion = try ProfileSnapshot.Version.fromJSON(

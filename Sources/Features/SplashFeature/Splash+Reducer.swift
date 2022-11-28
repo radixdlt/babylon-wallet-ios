@@ -22,7 +22,7 @@ public struct Splash: Sendable, ReducerProtocol {
 			return .run { [profileLoader] send in
 				await send(.internal(.system(.loadProfileResult(
 					TaskResult {
-						try await delay()
+						await delay()
 						return await profileLoader.loadProfile()
 					}
 				))))
@@ -44,13 +44,13 @@ public struct Splash: Sendable, ReducerProtocol {
 		}
 	}
 
-	func delay() async throws {
+	func delay() async {
 		let durationInMS: Int
 		#if DEBUG
 		durationInMS = 100
 		#else
 		durationInMS = 700
 		#endif
-		try await mainQueue.sleep(for: .milliseconds(durationInMS))
+		try? await mainQueue.sleep(for: .milliseconds(durationInMS))
 	}
 }

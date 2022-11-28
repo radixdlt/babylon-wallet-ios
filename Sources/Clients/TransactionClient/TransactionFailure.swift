@@ -12,7 +12,7 @@ public enum TransactionFailure: Sendable, LocalizedError, Equatable {
 public extension TransactionFailure {
 	enum FailedToPrepareForTXSigning: Sendable, Swift.Error, Equatable {
 		case failedToGetEpoch
-		case failedToLoadNotaryPrivateKey
+		case failedToLoadNotaryAndSigners
 		case failedToLoadNotaryPublicKey
 	}
 }
@@ -23,8 +23,10 @@ public extension TransactionFailure {
 		case failedToCompileTXIntent
 		case failedToGenerateTXId
 		case failedToCompileSignedTXIntent
-		case failedToSign
-		case failedToConvertSignature
+		case failedToSignIntentWithAccountSigners
+		case failedToSignSignedCompiledIntentWithNotarySigner
+		case failedToConvertAccountSignatures
+		case failedToConvertNotarySignature
 		case failedToCompileNotarizedTXIntent
 	}
 }
