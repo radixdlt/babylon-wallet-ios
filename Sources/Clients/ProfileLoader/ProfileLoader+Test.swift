@@ -6,7 +6,7 @@ import XCTestDynamicOverlay
 // MARK: - ProfileLoader + TestDependencyKey
 extension ProfileLoader: TestDependencyKey {
 	public static let previewValue = Self(
-		loadProfile: { .noProfile }
+		loadProfile: { .success(nil) }
 	)
 
 	public static let testValue = Self(

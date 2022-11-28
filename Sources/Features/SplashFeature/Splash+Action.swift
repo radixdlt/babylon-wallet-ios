@@ -31,13 +31,13 @@ public extension Splash.Action {
 public extension Splash.Action {
 	enum SystemAction: Sendable, Equatable {
 		case loadProfile
-		case loadProfileResult(TaskResult<ProfileLoader.Result>)
+		case loadProfileResult(TaskResult<ProfileLoader.ProfileResult>)
 	}
 }
 
 // MARK: - Splash.Action.DelegateAction
 public extension Splash.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case profileResultLoaded(ProfileLoader.Result)
+		case profileResultLoaded(ProfileLoader.ProfileResult)
 	}
 }

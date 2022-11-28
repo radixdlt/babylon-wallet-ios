@@ -36,7 +36,7 @@ public struct Splash: Sendable, ReducerProtocol {
 		case let .internal(.system(.loadProfileResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .run { send in
-				await send(.delegate(.profileResultLoaded(.noProfile)))
+				await send(.delegate(.profileResultLoaded(.success(nil))))
 			}
 
 		case .delegate:
