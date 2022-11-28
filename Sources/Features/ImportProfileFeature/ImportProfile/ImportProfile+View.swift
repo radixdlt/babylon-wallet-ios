@@ -33,6 +33,7 @@ public extension ImportProfile.View {
 					)
 					Spacer()
 					Text("Import profile")
+//					Text(L10n.ImportProfile.importProfile.title)
 					Spacer()
 					EmptyView()
 				}

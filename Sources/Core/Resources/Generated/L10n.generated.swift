@@ -70,12 +70,26 @@ public enum L10n {
   	public enum ChooseAccounts {
     	/// + Create a new Account
     	public static let createNewAccount = L10n.tr("Localizable", "dApp.chooseAccounts.createNewAccount", fallback: "+ Create a new Account")
+    	/// Choose %@
+    	public static func explanation(_ p1: Any) -> String {
+    		return L10n.tr("Localizable", "dApp.chooseAccounts.explanation", String(describing: p1), fallback: "Choose %@")
+    	}
+    	/// at least one account.
+    	public static let explanationAtLeastOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationAtLeastOneAccount", fallback: "at least one account.")
+    	/// exactly #%d accounts.
+    	public static func explanationExactNumberOfAccounts(_ p1: Int) -> String {
+    		return L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactNumberOfAccounts", p1, fallback: "exactly #%d accounts.")
+    	}
+    	/// exactly one account.
+    	public static let explanationOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationOneAccount", fallback: "exactly one account.")
     	/// Choose the account(s) you wish %@ to know about
     	public static func subtitle(_ p1: Any) -> String {
     		return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle", String(describing: p1), fallback: "Choose the account(s) you wish %@ to know about")
     	}
     	/// Choose Accounts
     	public static let title = L10n.tr("Localizable", "dApp.chooseAccounts.title", fallback: "Choose Accounts")
+    	/// Unnamed account
+    	public static let unnamedAccount = L10n.tr("Localizable", "dApp.chooseAccounts.unnamedAccount", fallback: "Unnamed account")
   	}
   	public enum ConnectionRequest {
     	/// Continue
@@ -102,6 +116,20 @@ public enum L10n {
     	public static let buttonTitle = L10n.tr("Localizable", "home.visitHub.buttonTitle", fallback: "Visit the Radix Hub")
     	/// Ready to get started using the Radix Network and your Wallet?
     	public static let title = L10n.tr("Localizable", "home.visitHub.title", fallback: "Ready to get started using the Radix Network and your Wallet?")
+  	}
+	}
+	public enum ImportProfile {
+  	/// Import mnemonic
+  	public static let importMnemonic = L10n.tr("Localizable", "importProfile.importMnemonic", fallback: "Import mnemonic")
+  	/// Mnemonic phrasec
+  	public static let mnemonicPhrasec = L10n.tr("Localizable", "importProfile.mnemonicPhrasec", fallback: "Mnemonic phrasec")
+  	/// Profile from snapshot
+  	public static let profileFromSnapshot = L10n.tr("Localizable", "importProfile.profileFromSnapshot", fallback: "Profile from snapshot")
+  	/// Save imported mnemonic
+  	public static let saveImportedMnemonic = L10n.tr("Localizable", "importProfile.saveImportedMnemonic", fallback: "Save imported mnemonic")
+  	public enum ImportProfile {
+    	/// Import profile
+    	public static let title = L10n.tr("Localizable", "importProfile.importProfile.title", fallback: "Import profile")
   	}
 	}
 	public enum NftList {

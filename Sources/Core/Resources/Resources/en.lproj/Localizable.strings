@@ -30,11 +30,23 @@
 "dApp.chooseAccounts.createNewAccount" = "+ Create a new Account";
 "dApp.chooseAccounts.subtitle" = "Choose the account(s) you wish %@ to know about";
 "dApp.chooseAccounts.title" = "Choose Accounts";
+"dApp.chooseAccounts.explanation" = "Choose %@";
+"dApp.chooseAccounts.explanationOneAccount" = "exactly one account.";
+"dApp.chooseAccounts.explanationExactNumberOfAccounts" = "exactly #%d accounts.";
+"dApp.chooseAccounts.explanationAtLeastOneAccount" = "at least one account.";
+"dApp.chooseAccounts.unnamedAccount" = "Unnamed account";
 "dApp.connectionRequest.continueButtonTitle" = "Continue";
 "dApp.connectionRequest.subtitle" = "For this dApp to function, it needs the following:";
 "dApp.connectionRequest.title" = "dApp Connection Request";
 "dApp.connectionRequest.wantsToConnect" = "%@ wants to connect to your wallet";
 "dApp.unknownName" = "Unknown dApp";
+
+"importProfile.mnemonicPhrasec" = "Mnemonic phrasec";
+"importProfile.importMnemonic" = "Import mnemonic";
+"importProfile.saveImportedMnemonic" = "Save imported mnemonic";
+"importProfile.profileFromSnapshot" = "Profile from snapshot";
+
+"importProfile.importProfile.title" = "Import profile";
 
 "nftList.header.supplyUnknown" = "Unknown";
 "nftList.nftPlural" = "%d NFTs";
