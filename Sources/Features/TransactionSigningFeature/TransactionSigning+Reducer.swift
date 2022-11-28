@@ -60,26 +60,26 @@ public extension TransactionSigning {
 			state.isSigningTX = true
 
 			return .run { [transactionClient] send in
-				await send(.internal(.signTransactionResult(TaskResult {
-					try await transactionClient.signAndSubmitTransaction(transactionWithLockFee).txID
-				})))
+				await send(.internal(.signTransactionResult(
+					await transactionClient.signAndSubmitTransaction(transactionWithLockFee)
+				)))
 			}
 
-		case let .internal(.signTransactionResult(.success(txid))):
+		case let .internal(.signTransactionResult(.success(successfullySubmittedTransaction))):
 			state.isSigningTX = false
 
 			return .run { [request = state.request] send in
 				await send(.delegate(
 					.signedTXAndSubmittedToGateway(
-						txid,
+						successfullySubmittedTransaction.txID,
 						request: request
 					)
 				))
 			}
 
-		case let .internal(.signTransactionResult(.failure(error))):
+		case let .internal(.signTransactionResult(.failure(transactionFailure))):
 			state.isSigningTX = false
-			errorQueue.schedule(error)
+			errorQueue.schedule(transactionFailure)
 			return .none
 
 		case .internal(.view(.closeButtonTapped)):

@@ -4,9 +4,11 @@ import Dependencies
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
-@preconcurrency import struct GatewayAPI.GatewayAPIClient
-@preconcurrency import struct GatewayAPI.PollStrategy
-@preconcurrency import struct GatewayAPI.TransactionDetailsResponse
+import struct GatewayAPI.GatewayAPIClient
+import struct GatewayAPI.PollStrategy
+import enum GatewayAPI.SubmitTXFailure
+import struct GatewayAPI.SuccessfullySubmittedTransaction
+import struct GatewayAPI.TransactionDetailsResponse
 import NonEmpty
 import Profile
 import ProfileClient
@@ -22,24 +24,39 @@ public struct TransactionClient: Sendable, DependencyKey {
 // MARK: TransactionClient.SignAndSubmitTransaction
 public extension TransactionClient {
 	typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> TransactionManifest
-	typealias SignAndSubmitTransaction = @Sendable (TransactionManifest) async throws -> Transaction
-
 	typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
+	typealias SignAndSubmitTransaction = @Sendable (TransactionManifest) async -> TransactionResult
 }
 
-// MARK: TransactionClient.Transaction
-public extension TransactionClient {
-	struct Transaction: Sendable, Hashable {
-		public let txDetails: GatewayAPI.TransactionDetailsResponse
-		public let txID: TXID
+public typealias TransactionResult = Result<SuccessfullySubmittedTransaction, TransactionFailure>
+
+// MARK: - TransactionFailure
+public enum TransactionFailure: Sendable, LocalizedError, Equatable {
+	case failedToPrepareForTXSigning(FailedToPrepareForTXSigning)
+	case failedToCompileOrSign(CompileOrSignFailure)
+	case failedToSubmit(SubmitTXFailure)
+}
+
+// MARK: TransactionFailure.FailedToPrepareForTXSigning
+public extension TransactionFailure {
+	enum FailedToPrepareForTXSigning: Sendable, Swift.Error, Equatable {
+		case failedToGetEpoch
+		case failedToLoadNotaryPrivateKey
+		case failedToLoadNotaryPublicKey
 	}
 }
 
-#if DEBUG
-public extension TransactionClient.Transaction {
-	static let placeholder: Self = .init(txDetails: .init(ledgerState: .init(network: "placeholder", stateVersion: 1, timestamp: "time", epoch: 1, round: 1), transaction: .init(transactionStatus: .init(status: .succeeded), payloadHashHex: "placeholder", intentHashHex: "placeholder"), details: .init(rawHex: "placeholder", referencedGlobalEntities: [])), txID: "placeholder")
+// MARK: TransactionFailure.CompileOrSignFailure
+public extension TransactionFailure {
+	enum CompileOrSignFailure: Sendable, Swift.Error, Equatable {
+		case failedToCompileTXIntent
+		case failedToGenerateTXId
+		case failedToCompileSignedTXIntent
+		case failedToSign
+		case failedToConvertSignature
+		case failedToCompileNotarizedTXIntent
+	}
 }
-#endif // DEBUG
 
 public extension DependencyValues {
 	var transactionClient: TransactionClient {
@@ -57,41 +74,96 @@ public extension TransactionClient {
 		let pollStrategy: PollStrategy = .default
 
 		@Sendable
-		func signAndSubmit(transactionIntent: TransactionIntent, notary notaryPrivateKey: PrivateKey) async throws -> Transaction {
-			let compiled = try engineToolkitClient.compileTransactionIntent(transactionIntent)
-			let txID = try engineToolkitClient.generateTXID(transactionIntent)
+		func compileAndSign(
+			transactionIntent: TransactionIntent,
+			notary notaryPrivateKey: PrivateKey
+		) async -> Result<(txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse), TransactionFailure.CompileOrSignFailure> {
+			let compiled: CompileTransactionIntentResponse
+			do {
+				compiled = try engineToolkitClient.compileTransactionIntent(transactionIntent)
+			} catch {
+				return .failure(.failedToCompileTXIntent)
+			}
+
+			let txID: TXID
+			do {
+				txID = try engineToolkitClient.generateTXID(transactionIntent)
+			} catch {
+				return .failure(.failedToGenerateTXId)
+			}
 
 			let signedTransactionIntent = SignedTransactionIntent(
 				intent: transactionIntent,
 				intentSignatures: []
 			)
-			let compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(signedTransactionIntent)
+			let compiledSignedIntent: CompileSignedTransactionIntentResponse
+			do {
+				compiledSignedIntent = try engineToolkitClient.compileSignedTransactionIntent(signedTransactionIntent)
+			} catch {
+				return .failure(.failedToCompileSignedTXIntent)
+			}
+			let notarySignatureWithPublicKey: SignatureWithPublicKey
+			do {
+				notarySignatureWithPublicKey = try notaryPrivateKey.signReturningHashOfMessage(
+					data: compiledSignedIntent.compiledSignedIntent
+				)
+				.signatureWithPublicKey
+			} catch {
+				return .failure(.failedToSign)
+			}
 
-			let (notarySignature, _) = try notaryPrivateKey.signReturningHashOfMessage(data: compiledSignedIntent.compiledSignedIntent)
-
-			let uncompiledNotarized = try NotarizedTransaction(
+			let notarySignature: Engine.Signature
+			do {
+				notarySignature = try notarySignatureWithPublicKey.intoEngine().signature
+			} catch {
+				return .failure(.failedToConvertSignature)
+			}
+			let uncompiledNotarized = NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
-				notarySignature: notarySignature.intoEngine().signature
+				notarySignature: notarySignature
 			)
+			let compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse
+			do {
+				compiledNotarizedTXIntent = try engineToolkitClient.compileNotarizedTransactionIntent(uncompiledNotarized)
+			} catch {
+				return .failure(.failedToCompileNotarizedTXIntent)
+			}
 
-			let compilededNotarizedTransaction = try engineToolkitClient.compileNotarizedTransactionIntent(uncompiledNotarized)
+			return .success((txID: txID, compiledNotarizedTXIntent: compiledNotarizedTXIntent))
+		}
 
-			let (details, _txID) = try await gatewayAPIClient.submit(
-				notarizedTransaction: Data(compilededNotarizedTransaction.compiledNotarizedIntent),
+		@Sendable
+		func submitNotarizedTX(
+			id txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse
+		) async -> Result<SuccessfullySubmittedTransaction, SubmitTXFailure> {
+			await gatewayAPIClient.submit(
+				notarizedTransaction: Data(compiledNotarizedTXIntent.compiledNotarizedIntent),
 				txID: txID,
 				pollStrategy: pollStrategy
 			)
-			assert(_txID == txID)
-			return Transaction(txDetails: details, txID: txID)
+		}
+
+		@Sendable
+		func signAndSubmit(
+			transactionIntent: TransactionIntent,
+			notary notaryPrivateKey: PrivateKey
+		) async -> TransactionResult {
+			await compileAndSign(transactionIntent: transactionIntent, notary: notaryPrivateKey)
+				.mapError { TransactionFailure.failedToCompileOrSign($0) }
+				.asyncFlatMap { (txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse) in
+					await submitNotarizedTX(id: txID, compiledNotarizedTXIntent: compiledNotarizedTXIntent).mapError {
+						TransactionFailure.failedToSubmit($0)
+					}
+				}
 		}
 
 		@Sendable
 		func signAndSubmit(
 			manifest: TransactionManifest,
 			getNotary: @escaping (AccountAddressesNeedingToSignTransactionRequest) async throws -> PrivateKey
-		) async throws -> Transaction {
+		) async -> TransactionResult {
 			let networkID = await profileClient.getCurrentNetworkID()
-			return try await signAndSubmit(
+			return await signAndSubmit(
 				networkID: networkID,
 				manifest: manifest,
 				getNotary: getNotary
@@ -103,37 +175,61 @@ public extension TransactionClient {
 			networkID: NetworkID,
 			manifest: TransactionManifest,
 			getNotary: (AccountAddressesNeedingToSignTransactionRequest) async throws -> PrivateKey
-		) async throws -> Transaction {
-			let nonce = engineToolkitClient.generateTXNonce()
-			let epoch = try await gatewayAPIClient.getEpoch()
-			let version = engineToolkitClient.getTransactionVersion()
+		) async -> TransactionResult {
+			func buildTransactionIntent() async -> Result<(intent: TransactionIntent, notaryPrivateKey: PrivateKey), TransactionFailure.FailedToPrepareForTXSigning> {
+				let nonce = engineToolkitClient.generateTXNonce()
+				let epoch: Epoch
+				do {
+					epoch = try await gatewayAPIClient.getEpoch()
+				} catch {
+					return .failure(.failedToGetEpoch)
+				}
 
-			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesNeedingToSignTransactionRequest(
-				version: version,
-				manifest: manifest,
-				networkID: networkID
-			)
+				let version = engineToolkitClient.getTransactionVersion()
 
-			let notaryPrivateKey = try await getNotary(accountAddressesNeedingToSignTransactionRequest)
+				let accountAddressesNeedingToSignTransactionRequest = AccountAddressesNeedingToSignTransactionRequest(
+					version: version,
+					manifest: manifest,
+					networkID: networkID
+				)
 
-			let header = TransactionHeader(
-				version: version,
-				networkId: networkID,
-				startEpochInclusive: epoch,
-				endEpochExclusive: epoch + 5,
-				nonce: nonce,
-				publicKey: try notaryPrivateKey.publicKey().intoEngine(),
-				notaryAsSignatory: true, // FIXME: - mainnet: pass as arg
-				costUnitLimit: 10_000_000, // FIXME: - mainnet: pass as arg
-				tipPercentage: 0 // FIXME: - mainnet: pass as arg
-			)
+				let notaryPrivateKey: PrivateKey
+				do {
+					notaryPrivateKey = try await getNotary(accountAddressesNeedingToSignTransactionRequest)
+				} catch {
+					return .failure(.failedToLoadNotaryPrivateKey)
+				}
+				let notaryPublicKey: Engine.PublicKey
+				do {
+					notaryPublicKey = try notaryPrivateKey.publicKey().intoEngine()
+				} catch {
+					return .failure(.failedToLoadNotaryPublicKey)
+				}
 
-			let intent = TransactionIntent(
-				header: header,
-				manifest: manifest
-			)
+				let header = TransactionHeader(
+					version: version,
+					networkId: networkID,
+					startEpochInclusive: epoch,
+					endEpochExclusive: epoch + 5,
+					nonce: nonce,
+					publicKey: notaryPublicKey,
+					notaryAsSignatory: true, // FIXME: - mainnet: pass as arg
+					costUnitLimit: 10_000_000, // FIXME: - mainnet: pass as arg
+					tipPercentage: 0 // FIXME: - mainnet: pass as arg
+				)
 
-			return try await signAndSubmit(transactionIntent: intent, notary: notaryPrivateKey)
+				let intent = TransactionIntent(
+					header: header,
+					manifest: manifest
+				)
+				return .success((intent, notaryPrivateKey))
+			}
+
+			return await buildTransactionIntent().mapError {
+				TransactionFailure.failedToPrepareForTXSigning($0)
+			}.asyncFlatMap { intent, notaryPrivateKey in
+				await signAndSubmit(transactionIntent: intent, notary: notaryPrivateKey)
+			}
 		}
 
 		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
@@ -160,7 +256,7 @@ public extension TransactionClient {
 				return TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
 			},
 			signAndSubmitTransaction: { manifest in
-				try await signAndSubmit(manifest: manifest) { accountAddressesNeedingToSignTransactionRequest in
+				await signAndSubmit(manifest: manifest) { accountAddressesNeedingToSignTransactionRequest in
 
 					// Might be empty
 					let addressesNeededToSign = try engineToolkitClient

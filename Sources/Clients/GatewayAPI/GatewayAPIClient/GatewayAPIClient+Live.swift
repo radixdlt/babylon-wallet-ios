@@ -57,7 +57,7 @@ public extension GatewayAPIClient {
 			responseType _: Response.Type,
 			baseURL: URL,
 			timeoutInterval: TimeInterval? = nil,
-			urlFromBase: (URL) -> URL
+			urlFromBase: @Sendable (URL) -> URL
 		) async throws -> Response where Response: Decodable {
 			let url = urlFromBase(baseURL)
 			var urlRequest = URLRequest(url: url)
@@ -89,7 +89,8 @@ public extension GatewayAPIClient {
 			return response
 		}
 
-		@Sendable func getGatewayInfo(baseURL: URL, timeoutInterval: TimeInterval?) async throws -> GatewayAPI.GatewayInfoResponse {
+		@Sendable
+		func getGatewayInfo(baseURL: URL, timeoutInterval: TimeInterval?) async throws -> GatewayAPI.GatewayInfoResponse {
 			try await makeRequest(
 				responseType: GatewayAPI.GatewayInfoResponse.self,
 				baseURL: baseURL,
@@ -98,12 +99,14 @@ public extension GatewayAPIClient {
 				$0.appendingPathComponent("gateway")
 			}
 		}
-		@Sendable func getNetworkName(baseURL: URL) async throws -> Network.Name {
+
+		@Sendable
+		func getNetworkName(baseURL: URL) async throws -> Network.Name {
 			let gatewayInfo = try await getGatewayInfo(baseURL: baseURL, timeoutInterval: 2)
 			return Network.Name(rawValue: gatewayInfo.ledgerState.network)
 		}
 
-		let setCurrentBaseURL: SetCurrentBaseURL = { newURL in
+		let setCurrentBaseURL: SetCurrentBaseURL = { @Sendable newURL in
 			let currentURL = await getCurrentBaseURL()
 			guard newURL != currentURL else {
 				return nil
@@ -128,7 +131,7 @@ public extension GatewayAPIClient {
 			httpBodyData httpBody: Data?,
 			method: String = "POST",
 			responseType: Response.Type,
-			urlFromBase: @escaping (URL) -> URL
+			urlFromBase: @escaping @Sendable (URL) -> URL
 		) async throws -> Response where Response: Decodable {
 			try await makeRequest(
 				httpBodyData: httpBody,
@@ -143,7 +146,7 @@ public extension GatewayAPIClient {
 		func makeRequest<Response>(
 			httpBodyData httpBody: Data?,
 			method: String = "POST",
-			urlFromBase: @escaping (URL) -> URL
+			urlFromBase: @escaping @Sendable (URL) -> URL
 		) async throws -> Response where Response: Decodable {
 			try await makeRequest(
 				httpBodyData: httpBody,
@@ -155,7 +158,7 @@ public extension GatewayAPIClient {
 
 		@Sendable
 		func post<Response>(
-			urlFromBase: @escaping (URL) -> URL
+			urlFromBase: @escaping @Sendable (URL) -> URL
 		) async throws -> Response where Response: Decodable {
 			try await makeRequest(httpBodyData: nil, responseType: Response.self, urlFromBase: urlFromBase)
 		}
@@ -163,7 +166,7 @@ public extension GatewayAPIClient {
 		@Sendable
 		func post<Request, Response>(
 			request: Request,
-			urlFromBase: @escaping (URL) -> URL
+			urlFromBase: @escaping @Sendable (URL) -> URL
 		) async throws -> Response
 			where
 			Request: Encodable, Response: Decodable
@@ -183,10 +186,10 @@ public extension GatewayAPIClient {
 			getEpoch: {
 				try await Epoch(rawValue: .init(getGatewayInfo().ledgerState.epoch))
 			},
-			accountResourcesByAddress: { accountAddress in
+			accountResourcesByAddress: { @Sendable accountAddress in
 				try await post(
 					request: GatewayAPI.EntityResourcesRequest(address: accountAddress.address)
-				) { $0.appendingPathComponent("entity/resources") }
+				) { @Sendable base in base.appendingPathComponent("entity/resources") }
 			},
 			resourcesOverview: { resourcesOverviewRequest in
 				try await post(
@@ -222,18 +225,6 @@ public extension GatewayAPIClient {
 	}
 }
 
-// MARK: - FailedToSubmitTransactionWasDuplicate
-struct FailedToSubmitTransactionWasDuplicate: Swift.Error {}
-
-// MARK: - FailedToSubmitTransactionWasRejected
-struct FailedToSubmitTransactionWasRejected: Swift.Error {}
-
-// MARK: - FailedToGetTransactionStatus
-struct FailedToGetTransactionStatus: Swift.Error {}
-
-// MARK: - TXWasSubmittedButNotSuccessfully
-struct TXWasSubmittedButNotSuccessfully: Swift.Error {}
-
 // MARK: - PollStrategy
 public struct PollStrategy {
 	public let maxPollTries: Int
@@ -246,6 +237,80 @@ public struct PollStrategy {
 	public static let `default` = Self(maxPollTries: 20, sleepDuration: 2)
 }
 
+// MARK: - GatewayAPI.TransactionDetailsResponse + Sendable
+extension GatewayAPI.TransactionDetailsResponse: @unchecked Sendable {}
+
+// MARK: - GatewayAPI.TransactionStatus.Status + Sendable
+extension GatewayAPI.TransactionStatus.Status: @unchecked Sendable {}
+
+// MARK: - FailedToGetDetailsOfSuccessfullySubmittedTX
+struct FailedToGetDetailsOfSuccessfullySubmittedTX: LocalizedError, Equatable {
+	public let txID: TXID
+	var errorDescription: String? {
+		"Successfully submitted TX with txID: \(txID) but failed to get transaction details for it."
+	}
+}
+
+// MARK: - SuccessfullySubmittedTransaction
+public struct SuccessfullySubmittedTransaction: Sendable, Hashable {
+	private let txDetails: GatewayAPI.TransactionDetailsResponse?
+	public let txID: TXID
+	public func details() throws -> GatewayAPI.TransactionDetailsResponse {
+		guard let txDetails else {
+			throw FailedToGetDetailsOfSuccessfullySubmittedTX(txID: txID)
+		}
+		return txDetails
+	}
+
+	public init(txDetails: GatewayAPI.TransactionDetailsResponse?, txID: TXID) {
+		self.txDetails = txDetails
+		self.txID = txID
+	}
+}
+
+#if DEBUG
+public extension SuccessfullySubmittedTransaction {
+	static let placeholder: Self = .init(txDetails: .init(ledgerState: .init(network: "placeholder", stateVersion: 1, timestamp: "time", epoch: 1, round: 1), transaction: .init(transactionStatus: .init(status: .succeeded), payloadHashHex: "placeholder", intentHashHex: "placeholder"), details: .init(rawHex: "placeholder", referencedGlobalEntities: [])), txID: "placeholder")
+}
+#endif // DEBUG
+
+// MARK: - SubmitTXFailure
+// FIXME: - mainnet: improve hanlding of polling failure
+/// This failure might be a false positive, due to i.e. POLLING of tx failed, but TX might have
+/// been submitted successfully. Or we might have successfully submitted the TX but failed to get details about it.
+public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
+	case failedToSubmitTX
+	case invalidTXWasDuplicate
+
+	/// Failed to poll, maybe TX was submitted successfuly?
+	case failedToPollTX(txID: TXID, error: FailedToPollError)
+
+	case failedToGetTransactionStatus(txID: TXID, error: FailedToGetTransactionStatus)
+	case invalidTXWasSubmittedButNotSuccessful(txID: TXID, status: GatewayAPI.TransactionStatus.Status)
+}
+
+// MARK: - FailedToPollError
+public struct FailedToPollError: Sendable, LocalizedError, Equatable {
+	public let error: Swift.Error
+	public var errorDescription: String? {
+		"\(Self.self)(error: \(String(describing: error))"
+	}
+}
+
+// MARK: - FailedToGetTransactionStatus
+public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable {
+	public let pollAttempts: Int
+	public var errorDescription: String? {
+		"\(Self.self)(afterPollAttempts: \(String(describing: pollAttempts))"
+	}
+}
+
+public extension LocalizedError where Self: Equatable {
+	static func == (lhs: Self, rhs: Self) -> Bool {
+		lhs.errorDescription == rhs.errorDescription
+	}
+}
+
 public extension GatewayAPIClient {
 	// MARK: -
 
@@ -254,7 +319,7 @@ public extension GatewayAPIClient {
 		notarizedTransaction: Data,
 		txID: TXID,
 		pollStrategy: PollStrategy = .default
-	) async throws -> (txDetails: GatewayAPI.TransactionDetailsResponse, txID: TXID) {
+	) async -> Result<SuccessfullySubmittedTransaction, SubmitTXFailure> {
 		@Dependency(\.mainQueue) var mainQueue
 
 		// MARK: Submit TX
@@ -262,9 +327,16 @@ public extension GatewayAPIClient {
 			notarizedTransaction: notarizedTransaction.hex
 		)
 
-		let response = try await submitTransaction(submitTransactionRequest)
+		let response: GatewayAPI.TransactionSubmitResponse
+
+		do {
+			response = try await submitTransaction(submitTransactionRequest)
+		} catch {
+			return .failure(.failedToSubmitTX)
+		}
+
 		guard !response.duplicate else {
-			throw FailedToSubmitTransactionWasDuplicate()
+			return .failure(.invalidTXWasDuplicate)
 		}
 
 		let transactionIdentifier = GatewayAPI.TransactionLookupIdentifier(
@@ -274,6 +346,7 @@ public extension GatewayAPIClient {
 
 		// MARK: Poll Status
 		var txStatus: GatewayAPI.TransactionStatus = .init(status: .pending)
+
 		@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
 			let txStatusRequest = GatewayAPI.TransactionStatusRequest(
 				transactionIdentifier: transactionIdentifier
@@ -285,27 +358,40 @@ public extension GatewayAPIClient {
 		var pollCount = 0
 		while !txStatus.isComplete {
 			defer { pollCount += 1 }
-			try await mainQueue.sleep(for: .seconds(pollStrategy.sleepDuration))
-			txStatus = try await pollTransactionStatus()
+			try? await mainQueue.sleep(for: .seconds(pollStrategy.sleepDuration))
+
+			do {
+				txStatus = try await pollTransactionStatus()
+			} catch {
+				// FIXME: - mainnet: improve hanlding of polling failure, should probably not return failure..
+				return .failure(.failedToPollTX(txID: txID, error: .init(error: error)))
+			}
+
 			if pollCount >= pollStrategy.maxPollTries {
-				throw FailedToGetTransactionStatus()
+				return .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCount)))
 			}
 		}
 		guard txStatus.status == .succeeded else {
-			throw TXWasSubmittedButNotSuccessfully()
+			return .failure(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus.status))
 		}
 
 		// MARK: Get TX Details
 
 		let transactionDetailsRequest = GatewayAPI.TransactionDetailsRequest(transactionIdentifier: transactionIdentifier)
-		let transactionDetailsResponse = try await transactionDetails(transactionDetailsRequest)
-
-		guard transactionDetailsResponse.transaction.transactionStatus.status == .succeeded else {
-			// NB: impossible codepath unless status and detail endpoints report different statuses for a TX, which means the API is broken
-			throw TXWasSubmittedButNotSuccessfully()
+		let transactionDetailsResponse: GatewayAPI.TransactionDetailsResponse
+		do {
+			transactionDetailsResponse = try await transactionDetails(transactionDetailsRequest)
+		} catch {
+			// Should not consider it a failure if we successfully submitted a transacion but failed to get details for it.
+			return .success(.init(txDetails: nil, txID: txID))
 		}
 
-		return (transactionDetailsResponse, txID)
+		guard transactionDetailsResponse.transaction.transactionStatus.status == .succeeded else {
+			// Should not consider it a failure if we successfully submitted a transacion but failed to get details for it.
+			return .success(.init(txDetails: nil, txID: txID))
+		}
+
+		return .success(.init(txDetails: transactionDetailsResponse, txID: txID))
 	}
 }
 

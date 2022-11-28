@@ -3,6 +3,7 @@ import EngineToolkit
 import Foundation
 import ProfileClient
 import SharedModels
+import enum TransactionClient.TransactionResult
 
 // MARK: - TransactionSigning.Action
 public extension TransactionSigning {
@@ -28,7 +29,7 @@ public extension TransactionSigning.Action {
 		case view(ViewAction)
 		case loadNetworkIDResult(TaskResult<NetworkID>, manifestWithFeeLock: TransactionManifest)
 		case addLockFeeInstructionToManifestResult(TaskResult<TransactionManifest>)
-		case signTransactionResult(TaskResult<TransactionIntent.TXID>)
+		case signTransactionResult(TransactionResult)
 	}
 }
 
