@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import DesignSystem
 import Profile
@@ -26,7 +27,7 @@ public extension ManageGatewayAPIEndpoints.View {
 			ForceFullScreen {
 				VStack {
 					NavigationBar(
-						titleText: "Edit Gateway API URL",
+						titleText: L10n.ManageGateway.title,
 						leadingItem: CloseButton {
 							viewStore.send(.dismissButtonTapped)
 						}
@@ -44,7 +45,7 @@ public extension ManageGatewayAPIEndpoints.View {
 						ZStack {
 							VStack {
 								TextField(
-									"Scheme",
+									L10n.ManageGateway.scheme,
 									text: viewStore.binding(
 										get: \.scheme,
 										send: { .schemeChanged($0) }
@@ -52,7 +53,7 @@ public extension ManageGatewayAPIEndpoints.View {
 								)
 
 								TextField(
-									"Host",
+									L10n.ManageGateway.host,
 									text: viewStore.binding(
 										get: \.host,
 										send: { .hostChanged($0) }
@@ -60,7 +61,7 @@ public extension ManageGatewayAPIEndpoints.View {
 								)
 
 								TextField(
-									"Path",
+									L10n.ManageGateway.path,
 									text: viewStore.binding(
 										get: \.path,
 										send: { .pathChanged($0) }
@@ -68,7 +69,7 @@ public extension ManageGatewayAPIEndpoints.View {
 								)
 
 								TextField(
-									"Port",
+									L10n.ManageGateway.port,
 									text: viewStore.binding(
 										get: \.port,
 										send: { .portChanged($0) }
@@ -84,7 +85,7 @@ public extension ManageGatewayAPIEndpoints.View {
 
 						Spacer()
 
-						Button("Switch To") {
+						Button(L10n.ManageGateway.switchToButtonTitle) {
 							viewStore.send(.switchToButtonTapped)
 						}
 						.enabled(viewStore.isSwitchToButtonEnabled)
@@ -124,13 +125,13 @@ private extension ManageGatewayAPIEndpoints.View {
 		_ networkAndGateway: AppPreferences.NetworkAndGateway
 	) -> some View {
 		Group {
-			Text("Current")
+			Text(L10n.ManageGateway.currentGatewayTitle)
 				.foregroundColor(.app.gray1)
 				.textStyle(.sectionHeader)
 
-			label("Network name", value: networkAndGateway.network.name)
-			label("Network ID", value: networkAndGateway.network.id)
-			label("Gateway API Endpoint", value: URLBuilderClient.liveValue.formatURL(networkAndGateway.gatewayAPIEndpointURL), valueColor: .app.blue2)
+			label(L10n.ManageGateway.networkName, value: networkAndGateway.network.name)
+			label(L10n.ManageGateway.networkID, value: networkAndGateway.network.id)
+			label(L10n.ManageGateway.gatewayAPIEndpoint, value: URLBuilderClient.liveValue.formatURL(networkAndGateway.gatewayAPIEndpointURL), valueColor: .app.blue2)
 		}
 	}
 }

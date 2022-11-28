@@ -26,7 +26,7 @@ public extension TransactionSigning.View {
 			ForceFullScreen {
 				VStack {
 					NavigationBar(
-						titleText: "Sign TX",
+						titleText: L10n.TransactionSigning.title,
 						leadingItem: CloseButton {
 							viewStore.send(.closeButtonTapped)
 						}
@@ -43,7 +43,7 @@ public extension TransactionSigning.View {
 									}
 									.background(Color(white: 0.9))
 
-									Button("Sign Transaction") {
+									Button(L10n.TransactionSigning.signTransactionButtonTitle) {
 										viewStore.send(.signTransactionButtonTapped)
 									}
 									.buttonStyle(.primaryRectangular)

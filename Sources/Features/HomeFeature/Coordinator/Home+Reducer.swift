@@ -10,6 +10,7 @@ import Foundation
 import FungibleTokenListFeature
 import GrantDappWalletAccessFeature
 import LegibleError
+import NonEmpty
 import P2PConnectivityClient
 import PasteboardClient
 import Profile
@@ -76,17 +77,16 @@ public struct Home: ReducerProtocol {
 		case .internal(.view(.didAppear)):
 			return loadAccountsAndSettings()
 
+		case .internal(.view(.pullToRefreshStarted)):
+			return loadAccountsAndSettings()
+
 		case let .internal(.system(.accountsLoadedResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.accountsLoadedResult(.success(accounts)))):
 			state.accountList = .init(nonEmptyOrderedSetOfAccounts: accounts)
-			return .run { send in
-				await send(.internal(.system(.fetchPortfolioResult(TaskResult {
-					try await accountPortfolioFetcher.fetchPortfolio(accounts.map(\.address))
-				}))))
-			}
+			return fetchPortfolio(accounts)
 
 		case let .internal(.system(.appSettingsLoadedResult(.failure(error)))):
 			errorQueue.schedule(error)
@@ -248,6 +248,14 @@ public struct Home: ReducerProtocol {
 					try await appSettingsClient.loadSettings()
 				}
 			))))
+		}
+	}
+
+	func fetchPortfolio(_ accounts: some Collection<OnNetwork.Account>) -> EffectTask<Action> {
+		.run { send in
+			await send(.internal(.system(.fetchPortfolioResult(TaskResult {
+				try await accountPortfolioFetcher.fetchPortfolio(accounts.map(\.address))
+			}))))
 		}
 	}
 

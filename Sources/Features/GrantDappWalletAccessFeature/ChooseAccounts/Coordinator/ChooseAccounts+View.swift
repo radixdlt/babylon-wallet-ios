@@ -35,7 +35,8 @@ public extension ChooseAccounts.View {
 							Spacer(minLength: .large1)
 
 							VStack(spacing: .medium2) {
-								Text("Choose \(String(describing: viewStore.oneTimeAccountAddressesRequest.numberOfAddresses))")
+								let explanation = String(describing: viewStore.oneTimeAccountAddressesRequest.numberOfAddresses)
+								Text(L10n.DApp.ChooseAccounts.explanation(explanation))
 									.textStyle(.secondaryHeader)
 
 								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.requestFromDapp.metadata.dAppId))
@@ -87,13 +88,12 @@ extension P2P.FromDapp.OneTimeAccountAddressesRequest.Mode: CustomStringConverti
 		case let .exactly(exactly):
 			let numberOfAccounts = exactly.oneOrMore
 			if numberOfAccounts == 1 {
-				return "exactly one account."
-
+				return L10n.DApp.ChooseAccounts.explanationExactlyOneAccount
 			} else {
-				return "exactly #\(numberOfAccounts) accounts."
+				return L10n.DApp.ChooseAccounts.explanationExactNumberOfAccounts(Int(numberOfAccounts))
 			}
 		case .oneOrMore:
-			return "at least one account"
+			return L10n.DApp.ChooseAccounts.explanationAtLeastOneAccount
 		}
 	}
 }

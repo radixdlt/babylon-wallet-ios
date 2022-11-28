@@ -26,7 +26,7 @@ public extension AccountDetails.Action {
 		case displayAccountPreferencesButtonTapped
 		case copyAddressButtonTapped
 		case transferButtonTapped
-		case refreshButtonTapped
+		case pullToRefreshStarted
 	}
 }
 
