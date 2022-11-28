@@ -13,17 +13,6 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
-### set_version
-
-```sh
-[bundle exec] fastlane set_version
-```
-
-Set specific project version; will reset the build number
-
-----
-
-
 ## iOS
 
 ### ios tests
