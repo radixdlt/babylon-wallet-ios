@@ -127,13 +127,13 @@ public extension ProfileClient {
 				}
 			},
 			lookupAccountByAddress: lookupAccountByAddress,
-			privateKeysForAddresses: { request in
+			privateKeysForAddresses: { (_: SignersForAccountsGivenAddressesRequest) -> NonEmpty<OrderedSet<SignersOfAccount>> in
 
 				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { [keychainClient] reference in
 					try await keychainClient.loadFactorSourceMnemonic(reference: reference)
 				}
 
-				func getPrivateKeysFromAddresses() async throws -> OrderedSet<PrivateKey>? {
+				func getAccountSignersFromAddresses() async throws -> OrderedSet<SignersOfAccount>? {
 					guard let addresses = NonEmpty(rawValue: request.addresses) else { return nil }
 
 					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
@@ -155,8 +155,8 @@ public extension ProfileClient {
 					return privateKeys
 				}
 
-				func getPrivateKeys() async throws -> OrderedSet<PrivateKey> {
-					guard let fromAddresses = try? await getPrivateKeysFromAddresses() else {
+				func getAccountSigners() async throws -> OrderedSet<SignersOfAccount> {
+					guard let fromAddresses = try? await getAccountSignersFromAddresses() else {
 						// TransactionManifest does not reference any accounts => use any account!
 						return try await profileHolder.getAsync { profile in
 							try await profile.withPrivateKeys(networkID: request.networkID, kind: .account, entityIndex: 0, mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference) {
@@ -167,11 +167,11 @@ public extension ProfileClient {
 					return fromAddresses
 				}
 
-				guard let nonEmptyKeys = try await NonEmpty(rawValue: getPrivateKeys()) else {
-					throw FoundNoKeysForAddresses()
+				guard let nonEmptyAccountSigners = try await NonEmpty(rawValue: getAccountSigners()) else {
+					throw FoundNoSignersForAccounts()
 				}
 
-				return nonEmptyKeys
+				return nonEmptyAccountSigners
 			}
 		)
 	}()
@@ -180,8 +180,8 @@ public extension ProfileClient {
 // MARK: - ExpectedEntityToBeAccount
 struct ExpectedEntityToBeAccount: Swift.Error {}
 
-// MARK: - FoundNoKeysForAddresses
-struct FoundNoKeysForAddresses: Swift.Error {}
+// MARK: - FoundNoSignersForAccounts
+struct FoundNoSignersForAccounts: Swift.Error {}
 
 // MARK: - NoProfile
 struct NoProfile: Swift.Error {}

@@ -54,12 +54,13 @@ public struct ProfileClient: DependencyKey, Sendable {
 	public var privateKeysForAddresses: PrivateKeysForAddresses
 }
 
-// MARK: - PrivateKeysForAddressesRequest
-public struct PrivateKeysForAddressesRequest: Sendable, Hashable {
+// MARK: - SignersForAccountsGivenAddressesRequest
+public struct SignersForAccountsGivenAddressesRequest: Sendable, Hashable {
 	// Might be empty! And in case of empty...
 	public let addresses: OrderedSet<AccountAddress>
 	// ... we will use this NetworkID to get the first account and used that to sign
 	public let networkID: NetworkID
+
 	public init(addresses: OrderedSet<AccountAddress>, networkID: NetworkID) {
 		self.addresses = addresses
 		self.networkID = networkID
@@ -90,10 +91,11 @@ public extension ProfileClient {
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 
 	// FIXME: - mainnet remove this and change to `async throws -> ([Prompt]) async throws -> NonEmpty<Set<Signer>>` when Profile supports multiple factor sources of different kinds.
-	typealias PrivateKeysForAddresses = @Sendable (PrivateKeysForAddressesRequest) async throws -> NonEmpty<OrderedSet<PrivateKey>>
+	typealias SignersForAccountsGivenAddresses = @Sendable (SignersForAccountsGivenAddressesRequest) async throws -> NonEmpty<OrderedSet<SignersOfAccount>>
 }
 
 // MARK: - AccountSignature
+
 public struct AccountSignature: Sendable, Hashable {
 	public let account: OnNetwork.Account
 	public let signature: SLIP10.Signature
