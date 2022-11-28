@@ -81,9 +81,9 @@ public extension TransactionClient {
 			transactionIntent: TransactionIntent,
 			notary notaryPrivateKey: PrivateKey
 		) async -> Result<(txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse), TransactionFailure.CompileOrSignFailure> {
-			let compiled: CompileTransactionIntentResponse
 			do {
-				compiled = try engineToolkitClient.compileTransactionIntent(transactionIntent)
+				// Generate better error message than `failedToGenerateTXId` if failed to compileTXIntent
+				_ = try engineToolkitClient.compileTransactionIntent(transactionIntent)
 			} catch {
 				return .failure(.failedToCompileTXIntent)
 			}
@@ -139,21 +139,6 @@ public extension TransactionClient {
 		func submitNotarizedTX(
 			id txID: TXID, compiledNotarizedTXIntent: CompileNotarizedTransactionIntentResponse
 		) async -> Result<TXID, SubmitTXFailure> {
-			//			await gatewayAPIClient.submit(
-			//				notarizedTransaction: Data(compiledNotarizedTXIntent.compiledNotarizedIntent),
-			//				txID: txID,
-			//				pollStrategy: pollStrategy
-			//			)
-
-			//            public extension GatewayAPIClient {
-			//                // MARK: -
-			//
-			//                // MARK: Submit TX Flow
-			//                func submit(
-			//                    notarizedTransaction: Data,
-			//                    txID: TXID,
-			//                    pollStrategy: PollStrategy = .default
-			//                ) async -> Result<SuccessfullySubmittedTransaction, SubmitTXFailure> {
 			@Dependency(\.mainQueue) var mainQueue
 
 			// MARK: Submit TX
@@ -197,7 +182,7 @@ public extension TransactionClient {
 				do {
 					txStatus = try await pollTransactionStatus()
 				} catch {
-					// FIXME: - mainnet: improve hanlding of polling failure, should probably not return failure..
+					// FIXME: - mainnet: improve handling of polling failure, should probably not return failure..
 					return .failure(.failedToPollTX(txID: txID, error: .init(error: error)))
 				}
 
