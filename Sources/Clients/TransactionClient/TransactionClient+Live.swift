@@ -218,13 +218,12 @@ public extension TransactionClient {
 
 		@Sendable
 		func signAndSubmit(
-			networkID: NetworkID,
 			manifest: TransactionManifest,
 			makeTransactionHeaderInput: MakeTransactionHeaderInput,
 			getNotary: @escaping @Sendable (AccountAddressesNeedingToSignTransactionRequest) async throws -> PrivateKey
 		) async -> TransactionResult {
 			await buildTransactionIntent(
-				networkID: networkID,
+				networkID: profileClient.getCurrentNetworkID(),
 				manifest: manifest,
 				makeTransactionHeaderInput: makeTransactionHeaderInput,
 				getNotary: getNotary
@@ -235,18 +234,29 @@ public extension TransactionClient {
 			}
 		}
 
-		@Sendable
-		func signAndSubmit(
-			manifest: TransactionManifest,
-			makeTransactionHeaderInput: MakeTransactionHeaderInput,
-			getNotary: @escaping @Sendable (AccountAddressesNeedingToSignTransactionRequest) async throws -> PrivateKey
-		) async -> TransactionResult {
+		let signAndSubmitTransaction: SignAndSubmitTransaction = { @Sendable manifest, makeTransactionHeaderInput in
 			await signAndSubmit(
-				networkID: profileClient.getCurrentNetworkID(),
 				manifest: manifest,
-				makeTransactionHeaderInput: makeTransactionHeaderInput,
-				getNotary: getNotary
-			)
+				makeTransactionHeaderInput: makeTransactionHeaderInput
+			) { accountAddressesNeedingToSignTransactionRequest in
+
+				// Might be empty
+				let addressesNeededToSign = try engineToolkitClient
+					.accountAddressesNeedingToSignTransaction(
+						accountAddressesNeedingToSignTransactionRequest
+					)
+
+				// FIXME: - mainnet: pass as arg a fn: (NonEmpty<>)
+				let selectNotary: @Sendable (NonEmpty<OrderedSet<PrivateKey>>) -> PrivateKey = {
+					$0.first
+				}
+
+				let privateKeys = try await profileClient.privateKeysForAddresses(.init(addresses: .init(addressesNeededToSign), networkID: accountAddressesNeedingToSignTransactionRequest.networkID))
+
+				let notaryPrivateKey = selectNotary(privateKeys)
+
+				return notaryPrivateKey
+			}
 		}
 
 		let convertManifestInstructionsToJSONIfItWasString: ConvertManifestInstructionsToJSONIfItWasString = { manifest in
@@ -272,30 +282,7 @@ public extension TransactionClient {
 				instructions.insert(lockFeeCallMethodInstruction, at: 0)
 				return TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
 			},
-			signAndSubmitTransaction: { manifest, makeTransactionHeaderInput in
-				await signAndSubmit(
-					manifest: manifest,
-					makeTransactionHeaderInput: makeTransactionHeaderInput
-				) { accountAddressesNeedingToSignTransactionRequest in
-
-					// Might be empty
-					let addressesNeededToSign = try engineToolkitClient
-						.accountAddressesNeedingToSignTransaction(
-							accountAddressesNeedingToSignTransactionRequest
-						)
-
-					// FIXME: - mainnet: pass as arg a fn: (NonEmpty<>)
-					let selectNotary: @Sendable (NonEmpty<OrderedSet<PrivateKey>>) -> PrivateKey = {
-						$0.first
-					}
-
-					let privateKeys = try await profileClient.privateKeysForAddresses(.init(addresses: .init(addressesNeededToSign), networkID: accountAddressesNeedingToSignTransactionRequest.networkID))
-
-					let notaryPrivateKey = selectNotary(privateKeys)
-
-					return notaryPrivateKey
-				}
-			}
+			signAndSubmitTransaction: signAndSubmitTransaction
 		)
 	}
 }
