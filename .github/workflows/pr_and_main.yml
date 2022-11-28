@@ -33,7 +33,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3.1.0
-      - uses: ./.github/actions/shared-steps
+
+      - uses: webfactory/ssh-agent@v0.6.0
+        with:
+          ssh-private-key: |
+            ${{ secrets.SWIFT_PROFILE_SSH_KEY }}
+            ${{ secrets.SLIP_10_SSH_KEY }}
+            ${{ secrets.MNEMONIC_SSH_KEY }}
+            ${{ secrets.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
+            ${{ secrets.CONVERSE_SSH_KEY }}
+            ${{ secrets.BITE_SSH_KEY }}
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: "14.1"
+
+      - name: "Set up ruby"
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.2
+          bundler-cache: true
+
       - name: "Run unit tests"
         run: |
           brew install xcbeautify
