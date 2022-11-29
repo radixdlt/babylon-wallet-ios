@@ -50,3 +50,49 @@ public struct SignManifestRequest: Sendable {
 		self.selectNotary = selectNotary
 	}
 }
+
+// MARK: - FaucetClient
+/// MOVE TO FaucetClientPackage
+struct FaucetClient {
+	public struct FaucetRequest: Sendable, Hashable {
+		public let recipientAccountAddress: AccountAddress
+		public let unlockKeychainPromptShowToUser: String
+		public let addLockFeeInstructionToManifest: Bool
+		public let makeTransactionHeaderInput: MakeTransactionHeaderInput
+		public init(
+			recipientAccountAddress: AccountAddress,
+			unlockKeychainPromptShowToUser: String,
+			addLockFeeInstructionToManifest: Bool = true,
+			makeTransactionHeaderInput: MakeTransactionHeaderInput = .default
+		) {
+			self.recipientAccountAddress = recipientAccountAddress
+			self.unlockKeychainPromptShowToUser = unlockKeychainPromptShowToUser
+			self.addLockFeeInstructionToManifest = addLockFeeInstructionToManifest
+			self.makeTransactionHeaderInput = makeTransactionHeaderInput
+		}
+	}
+
+	var getFreeXRD: @Sendable (FaucetRequest) async throws -> TXID
+	static var liveValue: Self {
+		@Dependency(\.transactionClient) var transactionClient
+		@Dependency(\.engineToolkitClient) var engineToolkitClient
+		@Dependency(\.profileClient) var profileClient
+
+		return Self(getFreeXRD: { faucetRequest in
+			let networkID = await profileClient.getCurrentNetworkID()
+			let manifest = try engineToolkitClient.manifestForFaucet(
+				includeLockFeeInstruction: faucetRequest.addLockFeeInstructionToManifest,
+				networkID: networkID,
+				accountAddress: faucetRequest.recipientAccountAddress
+			)
+
+			let signSubmitTXRequest = SignManifestRequest(
+				manifestToSign: manifest,
+				makeTransactionHeaderInput: faucetRequest.makeTransactionHeaderInput,
+				unlockKeychainPromptShowToUser: faucetRequest.unlockKeychainPromptShowToUser
+			)
+
+			return try await transactionClient.signAndSubmitTransaction(signSubmitTXRequest).get()
+		})
+	}
+}
