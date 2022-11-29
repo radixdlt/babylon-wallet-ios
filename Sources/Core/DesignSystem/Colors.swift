@@ -12,11 +12,9 @@ public extension Color.App {
 	var blue1: Color { .init(hex: .blue1) }
 	var blue2: Color { .init(hex: .blue2) }
 	var blue3: Color { .init(hex: .blue3) }
-	var blue4: Color { .init(hex: .blue4) }
 
 	// pink
 	var pink1: Color { .init(hex: .pink1) }
-	var pink2: Color { .init(hex: .pink2) }
 
 	// green
 	var green1: Color { .init(hex: .green1) }
@@ -49,6 +47,23 @@ public extension Color.App {
 
 	// gradient
 	var account0green: Color { .init(hex: .account0green) }
+
+	var account1pink: Color { .init(hex: .account1pink) }
+
+	var account5blue: Color { .init(hex: .account5blue) }
+
+	var account7pink: Color { .init(hex: .account7pink) }
+
+	var account9green1: Color { .init(hex: .account9green1) }
+	var account9green2: Color { .init(hex: .account9green2) }
+
+	var account10pink1: Color { .init(hex: .account10pink1) }
+	var account10pink2: Color { .init(hex: .account10pink2) }
+
+	var account11green: Color { .init(hex: .account11green) }
+	var account11blue1: Color { .init(hex: .account11blue1) }
+	var account11pink: Color { .init(hex: .account11pink) }
+	var account11blue2: Color { .init(hex: .account11blue2) }
 }
 
 // MARK: - Color.Hex
@@ -58,7 +73,6 @@ private extension Color {
 		case blue1 = 0x060F8F
 		case blue2 = 0x052CC0
 		case blue3 = 0x20E4FF
-		case blue4 = 0x0DCAE4
 
 		// green
 		case green1 = 0x00AB84
@@ -67,7 +81,6 @@ private extension Color {
 
 		// pink
 		case pink1 = 0xCE0D98
-		case pink2 = 0xFF43CA
 
 		// gray
 		case gray1 = 0x003057
@@ -85,6 +98,23 @@ private extension Color {
 
 		// gradient
 		case account0green = 0x01E2A0
+
+		case account1pink = 0xFF43CA
+
+		case account5blue = 0x0DCAE4
+
+		case account7pink = 0xF31DBE
+
+		case account9green1 = 0x0BA97D
+		case account9green2 = 0x1AF4B5
+
+		case account10pink1 = 0x7E0D5F
+		case account10pink2 = 0xE225B3
+
+		case account11green = 0x03B797
+		case account11blue1 = 0x1544F5
+		case account11pink = 0xFF07E6
+		case account11blue2 = 0x0C35CF
 	}
 }
 
