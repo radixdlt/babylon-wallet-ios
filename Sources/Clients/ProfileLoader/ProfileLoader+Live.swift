@@ -34,10 +34,8 @@ public extension ProfileLoader {
 						json: profileSnapshotData,
 						.unknown(.init(
 							error: NoProfileSnapshotVersionFoundInJSONData()
-						)
-						)
-					)
-					)
+						))
+					))
 				}
 
 				do {
