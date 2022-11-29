@@ -12,6 +12,8 @@ platform :ios do
 
     desc "Runs tests"
     lane :tests do
+        install_distribution_certificate
+        build_app
         run_tests
     end
 
