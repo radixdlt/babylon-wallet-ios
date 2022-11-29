@@ -16,16 +16,13 @@ public extension Onboarding {
 // MARK: - Onboarding.Action.ChildAction
 public extension Onboarding.Action {
 	enum ChildAction: Equatable {
-		case newProfile(NewProfile.Action)
 		case importProfile(ImportProfile.Action)
-		case importMnemonic(ImportMnemonic.Action)
 	}
 }
 
 // MARK: - Onboarding.Action.ViewAction
 public extension Onboarding.Action {
 	enum ViewAction: Equatable {
-		case newProfileButtonTapped
 		case importProfileButtonTapped
 	}
 }

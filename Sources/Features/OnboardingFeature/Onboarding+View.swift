@@ -1,4 +1,3 @@
-import Common
 import ComposableArchitecture
 import DesignSystem
 import ImportProfileFeature
@@ -24,30 +23,6 @@ public extension Onboarding.View {
 			send: { .view($0) }
 		) { viewStore in
 			ZStack {
-				ForceFullScreen {
-					VStack {
-						Button(L10n.Onboarding.newAccountButtonTitle) {
-							viewStore.send(.newProfileButtonTapped)
-						}
-						.buttonStyle(.primaryRectangular)
-					}
-					.padding()
-				}
-				.zIndex(0)
-
-				IfLetStore(
-					store.scope(
-						state: \.newProfile,
-						action: { .child(.newProfile($0)) }
-					),
-					then: { newProfileStore in
-						ForceFullScreen {
-							NewProfile.View(store: newProfileStore)
-						}
-					}
-				)
-				.zIndex(1)
-
 				IfLetStore(
 					store.scope(
 						state: \.importProfile,
@@ -60,19 +35,6 @@ public extension Onboarding.View {
 					}
 				)
 				.zIndex(2)
-
-				IfLetStore(
-					store.scope(
-						state: \.importMnemonic,
-						action: { .child(.importMnemonic($0)) }
-					),
-					then: { importMnemonicStore in
-						ForceFullScreen {
-							ImportMnemonic.View(store: importMnemonicStore)
-						}
-					}
-				)
-				.zIndex(3)
 			}
 		}
 	}
@@ -81,13 +43,9 @@ public extension Onboarding.View {
 // MARK: - Onboarding.View.ViewState
 extension Onboarding.View {
 	struct ViewState: Equatable {
-		public var newProfile: NewProfile.State?
 		public var importProfile: ImportProfile.State?
-		public var importMnemonic: ImportMnemonic.State?
 		public init(state: Onboarding.State) {
-			newProfile = state.newProfile
 			importProfile = state.importProfile
-			importMnemonic = state.importMnemonic
 		}
 	}
 }

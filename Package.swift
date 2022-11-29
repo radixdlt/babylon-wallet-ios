@@ -518,15 +518,10 @@ package.addModules([
 		name: "OnboardingFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
-			"Common",
 			"DesignSystem",
-			engineToolkit,
-			"ErrorQueue",
-			"GatewayAPI",
-			"ImportProfileFeature",
-			"ProfileClient",
+            "CreateAccountFeature",
+            "ImportProfileFeature",
 			tca,
-			"TransactionClient", // FIXME: remove once we have virtual accounts
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
