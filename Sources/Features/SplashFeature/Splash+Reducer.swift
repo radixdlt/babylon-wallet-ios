@@ -20,23 +20,16 @@ public struct Splash: Sendable, ReducerProtocol {
 
 		case .internal(.system(.loadProfile)):
 			return .run { [profileLoader] send in
+				let result = await profileLoader.loadProfile()
 				await send(.internal(.system(.loadProfileResult(
-					TaskResult {
-						await delay()
-						return await profileLoader.loadProfile()
-					}
+					result
 				))))
 			}
 
-		case let .internal(.system(.loadProfileResult(.success(result)))):
+		case let .internal(.system(.loadProfileResult(result))):
 			return .run { send in
+				await delay()
 				await send(.delegate(.profileResultLoaded(result)))
-			}
-
-		case let .internal(.system(.loadProfileResult(.failure(error)))):
-			errorQueue.schedule(error)
-			return .run { send in
-				await send(.delegate(.profileResultLoaded(.success(nil))))
 			}
 
 		case .delegate:

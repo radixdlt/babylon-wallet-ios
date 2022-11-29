@@ -39,6 +39,15 @@ public extension ProfileLoader {
 }
 
 public extension ProfileLoader.JSONDecodingError {
+	var errorDescription: String? {
+		switch self {
+		case let .known(error):
+			return error.localizedDescription
+		case let .unknown(error):
+			return error.localizedDescription
+		}
+	}
+
 	// Swift.DecodingError made `Equatable` inside `EngineToolkit`
 	struct KnownDecodingError: Sendable, LocalizedError, Equatable {
 		public let decodingError: Swift.DecodingError

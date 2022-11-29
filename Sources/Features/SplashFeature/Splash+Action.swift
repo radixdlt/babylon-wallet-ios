@@ -31,7 +31,7 @@ public extension Splash.Action {
 public extension Splash.Action {
 	enum SystemAction: Sendable, Equatable {
 		case loadProfile
-		case loadProfileResult(TaskResult<ProfileLoader.ProfileResult>)
+		case loadProfileResult(ProfileLoader.ProfileResult)
 	}
 }
 
