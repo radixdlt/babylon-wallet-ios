@@ -7,8 +7,8 @@ final class ToDappResponseTests: TestCase {
 	func test_encode_response() throws {
 		let response = P2P.ToDapp.Response(
 			id: "an_id", items: [
-				.oneTimeAccountAddresses(.withoutProof(.init(
-					accountAddresses: .init(
+				.oneTimeAccounts(.withoutProof(.init(
+					accounts: .init(
 						rawValue: [.init(
 							accountAddress: try! .init(address: "address"),
 							label: "Label",
@@ -22,16 +22,16 @@ final class ToDappResponseTests: TestCase {
 		let jsonData = try encoder.encode(response)
 		let jsonString = try XCTUnwrap(jsonData.prettyPrintedJSONString)
 		print(jsonString)
-		XCTAssertTrue(jsonString.contains(P2P.FromDapp.Discriminator.oneTimeAccountAddresses.rawValue))
+		XCTAssertTrue(jsonString.contains(P2P.FromDapp.Discriminator.oneTimeAccountsRead.rawValue))
 	}
 
-	func test_decode_request_from_dApp() throws {
+	func test_decode_dApp_request_with_oneTimeAccountsRead_request_item() throws {
 		let json = """
 		{
-		    "payload":
+		    "items":
 		    [
 		        {
-		            "requestType": "oneTimeAccountAddresses",
+		            "requestType": "oneTimeAccountsRead",
 		            "requiresProofOfOwnership": false
 		        }
 		    ],
@@ -47,10 +47,10 @@ final class ToDappResponseTests: TestCase {
 
 		let decoder = JSONDecoder()
 		let request = try decoder.decode(P2P.FromDapp.Request.self, from: json)
-		let expectedItem = P2P.FromDapp.OneTimeAccountAddressesRequest(
+		let expectedItem = P2P.FromDapp.OneTimeAccountsReadRequestItem(
 			numberOfAddresses: .oneOrMore
 		)
-		XCTAssertEqual(request.items, [.oneTimeAccountAddresses(expectedItem)])
+		XCTAssertEqual(request.items, [.oneTimeAccounts(expectedItem)])
 		XCTAssertEqual(
 			request.metadata,
 			.init(
@@ -62,7 +62,7 @@ final class ToDappResponseTests: TestCase {
 		XCTAssertEqual(request.id, "791638de-cefa-43a8-9319-aa31c582fc7d")
 	}
 
-	func test_decode_sign_tx_request() throws {
+	func test_decode_dApp_request_with_sendTransactionWrite_request_item() throws {
 		let json = """
 		{
 		    "metadata":
@@ -71,11 +71,11 @@ final class ToDappResponseTests: TestCase {
 		        "dAppId": "radixdlt.dashboard.com",
 		        "origin": "https://dashboard-pr-126.rdx-works-main.extratools.works"
 		    },
-		  "payload" : [
+		  "items" : [
 		    {
 		      "version" : 1,
 		      "transactionManifest" : "",
-		      "requestType" : "sendTransaction"
+		      "requestType" : "sendTransactionWrite"
 		    }
 		  ],
 		  "requestId" : "ed987de8-fc30-40d0-81ea-e3eef117a2cc"
@@ -83,7 +83,7 @@ final class ToDappResponseTests: TestCase {
 		""".data(using: .utf8)!
 		let decoder = JSONDecoder()
 		let request = try decoder.decode(P2P.FromDapp.Request.self, from: json)
-		XCTAssertEqual(request.items.first?.signTransaction?.version, 1)
+		XCTAssertEqual(request.items.first?.sendTransaction?.version, 1)
 		XCTAssertEqual(request.id, "ed987de8-fc30-40d0-81ea-e3eef117a2cc")
 	}
 }

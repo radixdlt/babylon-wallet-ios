@@ -20,45 +20,45 @@ public extension P2P.FromDapp {
 		///
 		/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
 		///
-		case signTransaction(SignTransactionRequest)
+		case sendTransaction(SendTransactionWriteRequestItem)
 
-		case oneTimeAccountAddresses(OneTimeAccountAddressesRequest)
+		case oneTimeAccounts(OneTimeAccountsReadRequestItem)
 	}
 }
 
-// MARK: As OneTimeAccountAddressesRequest
+// MARK: As OneTimeAccountsReadRequestItem
 public extension P2P.FromDapp.WalletRequestItem {
-	var oneTimeAccountAddresses: P2P.FromDapp.OneTimeAccountAddressesRequest? {
-		guard case let .oneTimeAccountAddresses(request) = self else {
+	var oneTimeAccounts: P2P.FromDapp.OneTimeAccountsReadRequestItem? {
+		guard case let .oneTimeAccounts(request) = self else {
 			return nil
 		}
 		return request
 	}
 
 	struct ExpectedOneTimeAccountAddressesRequest: Swift.Error {}
-	func asOneTimeAccountAddresses() throws -> P2P.FromDapp.OneTimeAccountAddressesRequest {
-		guard let oneTimeAccountAddresses else {
+	func asOneTimeAccountAddresses() throws -> P2P.FromDapp.OneTimeAccountsReadRequestItem {
+		guard let oneTimeAccounts else {
 			throw ExpectedOneTimeAccountAddressesRequest()
 		}
-		return oneTimeAccountAddresses
+		return oneTimeAccounts
 	}
 }
 
-// MARK: As SignTransactionRequest
+// MARK: As SendTransactionWriteRequestItem
 public extension P2P.FromDapp.WalletRequestItem {
-	var signTransaction: P2P.FromDapp.SignTransactionRequest? {
-		guard case let .signTransaction(request) = self else {
+	var sendTransaction: P2P.FromDapp.SendTransactionWriteRequestItem? {
+		guard case let .sendTransaction(request) = self else {
 			return nil
 		}
 		return request
 	}
 
 	struct ExpectedSignTransactionRequest: Swift.Error {}
-	func asSignTransaction() throws -> P2P.FromDapp.SignTransactionRequest {
-		guard let signTransaction else {
+	func asSignTransaction() throws -> P2P.FromDapp.SendTransactionWriteRequestItem {
+		guard let sendTransaction else {
 			throw ExpectedSignTransactionRequest()
 		}
-		return signTransaction
+		return sendTransaction
 	}
 }
 
@@ -76,10 +76,10 @@ public extension P2P.FromDapp.WalletRequestItem {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(Discriminator.self, forKey: .disciminator)
 		switch discriminator {
-		case .oneTimeAccountAddresses:
-			self = try .oneTimeAccountAddresses(P2P.FromDapp.OneTimeAccountAddressesRequest(from: decoder))
-		case .signTransaction:
-			self = try .signTransaction(P2P.FromDapp.SignTransactionRequest(from: decoder))
+		case .oneTimeAccountsRead:
+			self = try .oneTimeAccounts(P2P.FromDapp.OneTimeAccountsReadRequestItem(from: decoder))
+		case .sendTransactionWrite:
+			self = try .sendTransaction(P2P.FromDapp.SendTransactionWriteRequestItem(from: decoder))
 		}
 	}
 }
