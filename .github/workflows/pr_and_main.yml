@@ -24,7 +24,7 @@ jobs:
           brew install swiftformat
           swiftformat . --lint
 
-  unit_tests:
+  build_and_test:
     name: "Unit tests"
     runs-on: macos-12
 
