@@ -8,7 +8,7 @@ import SharedModels
 import TransactionSigningFeature
 
 // MARK: - HandleDappRequests
-public struct HandleDappRequests: ReducerProtocol {
+public struct HandleDappRequests: Sendable, ReducerProtocol {
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
@@ -43,7 +43,8 @@ private extension HandleDappRequests {
 				return .none
 			}
 			guard let itemToHandle = state.unfinishedRequestsFromClient.next() else {
-				fatalError("We just queued a request, did it contain no RequestItems at all? This is undefined behaviour. Should we return an empty response here?")
+				// We just queued a request, did it contain no RequestItems at all? This is undefined behaviour. Should we return an empty response here?
+				return .none
 			}
 			return .run { send in
 				await send(.internal(.system(.presentViewForP2PRequest(itemToHandle))))
@@ -53,15 +54,27 @@ private extension HandleDappRequests {
 			state.currentRequest = .init(requestItemToHandle: requestItemToHandle)
 			return .none
 
-		case let .child(.grantDappWalletAccess(.delegate(.dismiss(dismissedRequestItem)))):
+		case let .child(.grantDappWalletAccess(.delegate(.rejected(rejectedRequestItem)))):
 			return .run { send in
-				await send(.internal(.system(.dismissed(dismissedRequestItem.parentRequest))))
+				await send(.internal(.system(.rejected(rejectedRequestItem.parentRequest))))
 			}
 
-		case let .internal(.system(.dismissed(dismissedRequest))):
+		case let .internal(.system(.rejected(rejectedRequest))):
 			state.currentRequest = nil
-			state.unfinishedRequestsFromClient.dismiss(request: dismissedRequest)
-			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
+			let responseToDapp = state.unfinishedRequestsFromClient.rejected(request: rejectedRequest)
+
+			let response = P2P.ResponseToClientByID(
+				connectionID: rejectedRequest.client.id,
+				responseToDapp: responseToDapp
+			)
+
+			return .run { [p2pConnectivityClient] send in
+				await send(.internal(.system(.sendResponseBackToDappResult(
+					TaskResult {
+						try await p2pConnectivityClient.sendMessage(response)
+					}
+				))))
+			}
 
 		case let .child(.grantDappWalletAccess(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
 			state.currentRequest = nil
@@ -130,9 +143,9 @@ private extension HandleDappRequests {
 				))))
 			}
 
-		case let .child(.transactionSigning(.delegate(.dismissed(dismissedRequestItem)))):
+		case let .child(.transactionSigning(.delegate(.rejected(rejectedRequestItem)))):
 			return .run { send in
-				await send(.internal(.system(.dismissed(dismissedRequestItem.parentRequest))))
+				await send(.internal(.system(.rejected(rejectedRequestItem.parentRequest))))
 			}
 		case .internal(.view(.task)):
 			return .run { send in
