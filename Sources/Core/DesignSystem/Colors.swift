@@ -9,99 +9,46 @@ public extension Color {
 
 public extension Color.App {
 	// blue
-	var blue1: Color {
-		.init(hex: .blue1)
-	}
-
-	var blue2: Color {
-		.init(hex: .blue2)
-	}
-
-	var blue3: Color {
-		.init(hex: .blue3)
-	}
+	var blue1: Color { .init(hex: .blue1) }
+	var blue2: Color { .init(hex: .blue2) }
+	var blue3: Color { .init(hex: .blue3) }
+	var blue4: Color { .init(hex: .blue4) }
 
 	// pink
-	var pink2: Color {
-		.init(hex: .pink2)
-	}
+	var pink1: Color { .init(hex: .pink1) }
+	var pink2: Color { .init(hex: .pink2) }
 
 	// green
-	var green1: Color {
-		.init(hex: .green1)
-	}
-
-	var green2: Color {
-		.init(hex: .green2)
-	}
-
-	var green3: Color {
-		.init(hex: .green3)
-	}
+	var green1: Color { .init(hex: .green1) }
+	var green2: Color { .init(hex: .green2) }
+	var green3: Color { .init(hex: .green3) }
 
 	// gray
-	var gray1: Color {
-		.init(hex: .gray1)
-	}
-
-	var gray2: Color {
-		.init(hex: .gray2)
-	}
-
-	var gray3: Color {
-		.init(hex: .gray3)
-	}
-
-	var gray4: Color {
-		.init(hex: .gray4)
-	}
-
-	var gray5: Color {
-		.init(hex: .gray5)
-	}
+	var gray1: Color { .init(hex: .gray1) }
+	var gray2: Color { .init(hex: .gray2) }
+	var gray3: Color { .init(hex: .gray3) }
+	var gray4: Color { .init(hex: .gray4) }
+	var gray5: Color { .init(hex: .gray5) }
 
 	// white
-	var white: Color {
-		.init(hex: .white)
-	}
-
-	var whiteTransparent: Color {
-		.white.opacity(0.8)
-	}
+	var white: Color { .init(hex: .white) }
+	var whiteTransparent: Color { .white.opacity(0.8) }
 
 	// alert
-	var red1: Color {
-		.init(hex: .red1)
-	}
+	var red1: Color { .init(hex: .red1) }
 
-	var backgroundDark: Color {
-		.black
-	}
+	var backgroundDark: Color { .black }
+	var backgroundLight: Color { .white }
 
-	var backgroundLight: Color {
-		.white
-	}
+	var notification: Color { .init(hex: .red1) }
 
-	var notification: Color {
-		.init(hex: .red1)
-	}
+	var buttonTextBlack: Color { .black }
+	var buttonTextBlackTransparent: Color { .black.opacity(0.6) }
 
-	var buttonTextBlack: Color {
-		.black
-	}
-
-	var buttonTextBlackTransparent: Color {
-		.black.opacity(0.6)
-	}
-
-	var shadowBlack: Color {
-		.black.opacity(0.08)
-	}
+	var shadowBlack: Color { .black.opacity(0.08) }
 
 	// gradient
-	var account0green: Color {
-		.init(hex: .account0green)
-	}
+	var account0green: Color { .init(hex: .account0green) }
 }
 
 // MARK: - Color.Hex
@@ -111,6 +58,7 @@ private extension Color {
 		case blue1 = 0x060F8F
 		case blue2 = 0x052CC0
 		case blue3 = 0x20E4FF
+		case blue4 = 0x0DCAE4
 
 		// green
 		case green1 = 0x00AB84
