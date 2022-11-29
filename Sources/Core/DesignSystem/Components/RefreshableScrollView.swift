@@ -1,7 +1,7 @@
 import SwiftUI
 
 #if os(iOS)
-@_implementationOnly import SwiftUIPullToRefresh
+import SwiftUIPullToRefresh
 
 extension RefreshAction: @unchecked Sendable {}
 #endif
