@@ -1,9 +1,7 @@
 import ComposableArchitecture
 import ErrorQueue
-import KeychainClientDependency
 import Profile
 import ProfileClient
-import TransactionClient
 
 // MARK: - CreateAccount
 public struct CreateAccount: Sendable, ReducerProtocol {
@@ -11,8 +9,6 @@ public struct CreateAccount: Sendable, ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
-	@Dependency(\.keychainClient) var keychainClient
-	@Dependency(\.transactionClient) var transactionClient
 
 	public init() {}
 }
