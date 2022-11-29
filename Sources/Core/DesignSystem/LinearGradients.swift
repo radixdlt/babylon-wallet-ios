@@ -8,7 +8,11 @@ public extension LinearGradient {
 }
 
 public extension LinearGradient.App {
+	var account0: LinearGradient {
+		LinearGradient(gradient: Gradient(colors: [.app.blue2, .app.account0green]), startPoint: .leading, endPoint: .trailing)
+	}
+
 	var account1: LinearGradient {
-		LinearGradient(gradient: Gradient(colors: [.app.blue2, .app.account1green]), startPoint: .leading, endPoint: .trailing)
+		LinearGradient(gradient: Gradient(colors: [.app.blue2, .app.pink2]), startPoint: .leading, endPoint: .trailing)
 	}
 }

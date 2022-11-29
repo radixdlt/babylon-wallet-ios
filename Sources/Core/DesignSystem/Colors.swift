@@ -21,6 +21,11 @@ public extension Color.App {
 		.init(hex: .blue3)
 	}
 
+	// pink
+	var pink2: Color {
+		.init(hex: .pink2)
+	}
+
 	// green
 	var green1: Color {
 		.init(hex: .green1)
@@ -94,8 +99,8 @@ public extension Color.App {
 	}
 
 	// gradient
-	var account1green: Color {
-		.init(hex: .account1green)
+	var account0green: Color {
+		.init(hex: .account0green)
 	}
 }
 
@@ -131,7 +136,7 @@ private extension Color {
 		case red1 = 0xC82020
 
 		// gradient
-		case account1green = 0x01E2A0
+		case account0green = 0x01E2A0
 	}
 }
 
