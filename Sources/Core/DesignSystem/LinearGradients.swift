@@ -77,8 +77,12 @@ struct LinearGradients_Previews: PreviewProvider {
 		]
 
 		ScrollView {
-			VStack {
-				ForEach(0 ..< gradients.count, id: \.self) { _ in
+			VStack(alignment: .leading) {
+				ForEach(0 ..< gradients.count, id: \.self) { i in
+					HStack(spacing: 20) {
+						Circle().fill(gradients[i]).frame(width: 64, height: 64)
+						Text("Account \(i + 1)")
+					}
 				}
 			}
 		}
