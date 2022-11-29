@@ -2,6 +2,7 @@ import ComposableArchitecture
 import ErrorQueue
 import Profile
 import ProfileClient
+import LocalAuthenticationClient
 
 // MARK: - CreateAccount
 public struct CreateAccount: Sendable, ReducerProtocol {
@@ -9,6 +10,7 @@ public struct CreateAccount: Sendable, ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
+    @Dependency(\.localAuthenticationClient) var localAuthenticationClient
 
 	public init() {}
 }

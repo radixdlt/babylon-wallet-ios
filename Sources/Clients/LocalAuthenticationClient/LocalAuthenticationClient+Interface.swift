@@ -1,4 +1,5 @@
 import Foundation
+import Dependencies
 
 /// A client for querying if passcode and biometrics are set up.
 ///
@@ -34,7 +35,7 @@ import Foundation
 ///          }
 ///      }
 ///
-public struct LocalAuthenticationClient {
+public struct LocalAuthenticationClient: DependencyKey {    
 	/// The return value (`LocalAuthenticationConfig`) might be `nil` if app goes to background or stuff like that.
 	public typealias QueryConfig = @Sendable () async throws -> LocalAuthenticationConfig
 
@@ -42,5 +43,12 @@ public struct LocalAuthenticationClient {
 
 	public init(queryConfig: @escaping QueryConfig) {
 		self.queryConfig = queryConfig
+	}
+}
+
+public extension DependencyValues {
+	var localAuthenticationClient: LocalAuthenticationClient {
+		get { self[LocalAuthenticationClient.self] }
+		set { self[LocalAuthenticationClient.self] = newValue }
 	}
 }

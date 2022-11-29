@@ -1,15 +1,13 @@
 import LocalAuthentication
 
 public extension LocalAuthenticationClient {
-	static func live(
-		localAuthenticationContext laContext: LAContext = .init()
-	) -> Self {
-		.init(
+    static let liveValue: Self = {
+        .init(
 			queryConfig: {
-				try await laContext.queryLocalAuthenticationConfig()
+                try await LAContext().queryLocalAuthenticationConfig()
 			}
 		)
-	}
+    }()
 }
 
 // MARK: - LocalAuthenticationClient.Error

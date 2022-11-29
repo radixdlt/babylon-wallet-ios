@@ -342,6 +342,7 @@ package.addModules([
 			"DesignSystem",
 			"ErrorQueue",
 			"KeychainClientDependency",
+            "LocalAuthenticationClient",
 			"ProfileClient",
 			tca,
 			"TransactionClient", // FIXME: remove once we have virtual accounts
@@ -721,7 +722,9 @@ package.addModules([
 	),
 	.client(
 		name: "LocalAuthenticationClient",
-		dependencies: [],
+		dependencies: [
+            dependencies
+        ],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
