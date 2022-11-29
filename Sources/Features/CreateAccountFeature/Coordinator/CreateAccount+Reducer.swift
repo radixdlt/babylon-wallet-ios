@@ -3,6 +3,7 @@ import ErrorQueue
 import KeychainClientDependency
 import Profile
 import ProfileClient
+import Resources
 import TransactionClient
 
 // MARK: - CreateAccount
@@ -28,6 +29,7 @@ public extension CreateAccount {
 				await send(.internal(.system(.createdNewAccountResult(
 					TaskResult {
 						let request = CreateAnotherAccountRequest(
+							keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
 							accountName: accountName
 						)
 						return try await profileClient.createVirtualAccount(

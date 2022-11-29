@@ -18,7 +18,7 @@ final class ProfileLoaderTests: TestCase {
 		let res = await sut.loadProfile()
 
 		switch res {
-		case let .profileVersionOutdated(gotJson, version):
+		case let .failure(.profileVersionOutdated(gotJson, version)):
 			XCTAssertEqual(version, .init(rawValue: .init(0, 0, 0)))
 			XCTAssertEqual(json, gotJson)
 		default:

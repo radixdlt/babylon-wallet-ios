@@ -7,7 +7,7 @@ import ProfileClient
 import SplashFeature
 
 // MARK: - App
-public struct App: ReducerProtocol {
+public struct App: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
@@ -63,19 +63,20 @@ public struct App: ReducerProtocol {
 
 		case let .child(.splash(.delegate(.profileResultLoaded(profileResult)))):
 			switch profileResult {
-			case let .decodingFailure(_, error):
+			case let .success(.some(profile)):
+				return injectProfileIntoProfileClient(profile)
+			case .success(.none):
+				goToOnboarding(state: &state)
+				return .none
+
+			case let .failure(.decodingFailure(_, error)):
 				errorQueue.schedule(error)
 				goToOnboarding(state: &state)
 				return .none
-			case let .failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot):
+			case let .failure(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot)):
 				return incompatibleSnapshotData(version: failedToCreateProfileFromSnapshot.version, state: &state)
-			case .noProfile:
-				goToOnboarding(state: &state)
-				return .none
-			case let .profileVersionOutdated(_, version):
+			case let .failure(.profileVersionOutdated(_, version)):
 				return incompatibleSnapshotData(version: version, state: &state)
-			case let .compatibleProfile(profile):
-				return injectProfileIntoProfileClient(profile)
 			}
 
 		case .internal(.system(.injectProfileIntoProfileClientResult(.success(_)))):
@@ -91,7 +92,7 @@ public struct App: ReducerProtocol {
 				do {
 					try await keychainClient.removeProfileSnapshot()
 				} catch {
-					await errorQueue.schedule(error)
+					errorQueue.schedule(error)
 				}
 				await send(.internal(.system(.deletedIncompatibleProfile)))
 			}
@@ -136,10 +137,10 @@ public struct App: ReducerProtocol {
 // MARK: App.UserFacingError
 public extension App {
 	/// A purely user-facing error. Not made for developer logging or analytics collection.
-	struct UserFacingError: Equatable, LocalizedError {
-		let underlyingError: Error
+	struct UserFacingError: Sendable, Equatable, LocalizedError {
+		let underlyingError: Swift.Error
 
-		init(_ underlyingError: Error) {
+		init(_ underlyingError: Swift.Error) {
 			self.underlyingError = underlyingError
 		}
 

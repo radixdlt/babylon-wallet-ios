@@ -35,6 +35,8 @@ public enum L10n {
   	public static let tokens = L10n.tr("Localizable", "assetsView.tokens", fallback: "Tokens")
 	}
 	public enum CreateAccount {
+  	/// Unlock secret used to create new account.
+  	public static let biometricsPrompt = L10n.tr("Localizable", "createAccount.biometricsPrompt", fallback: "Unlock secret used to create new account.")
   	/// Create Account
   	public static let createAccountButtonTitle = L10n.tr("Localizable", "createAccount.createAccountButtonTitle", fallback: "Create Account")
   	/// Create First Account
@@ -215,6 +217,8 @@ public enum L10n {
   	}
 	}
 	public enum TransactionSigning {
+  	/// Unlock secret used to sign TX
+  	public static let biometricsPrompt = L10n.tr("Localizable", "transactionSigning.biometricsPrompt", fallback: "Unlock secret used to sign TX")
   	/// Sign Transaction
   	public static let signTransactionButtonTitle = L10n.tr("Localizable", "transactionSigning.signTransactionButtonTitle", fallback: "Sign Transaction")
   	/// Sign TX

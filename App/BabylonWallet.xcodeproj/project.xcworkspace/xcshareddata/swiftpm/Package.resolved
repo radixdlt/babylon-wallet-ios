@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/SLIP10.git",
       "state" : {
-        "revision" : "e8320eff864f1b447108bc002a282146bc1d53af",
-        "version" : "0.0.19"
+        "revision" : "5d496c72282f675bee91b953a74c086ce86f7faa",
+        "version" : "0.0.20"
       }
     },
     {
@@ -156,7 +156,7 @@
     {
       "identity" : "swift-collections",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-collections",
+      "location" : "https://github.com/apple/swift-collections.git",
       "state" : {
         "revision" : "f504716c27d2e5d4144fa4794b12129301d17729",
         "version" : "1.0.3"
@@ -239,8 +239,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "e23963575db522ff902e3b444568056d5708a0f3",
-        "version" : "0.0.40"
+        "revision" : "cbb1f355899f8990b073e1af7ea2ea244aaff275",
+        "version" : "0.0.43"
       }
     },
     {
@@ -291,7 +291,7 @@
     {
       "identity" : "webrtc",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/stasel/WebRTC",
+      "location" : "https://github.com/stasel/WebRTC.git",
       "state" : {
         "revision" : "6dd54fc242d3261317b5e6eb17bf178b1359609b",
         "version" : "106.0.0"

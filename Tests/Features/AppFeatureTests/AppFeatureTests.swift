@@ -74,13 +74,13 @@ final class AppFeatureTests: TestCase {
 
 		// WHEN: existing profile is loaded
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
-			.success(.compatibleProfile(existingProfile))
+			.success(existingProfile)
 		))))))
 
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.compatibleProfile(existingProfile))))))
+		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(existingProfile))))))
 
 		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(existingProfile))))) {
 			$0.root = .main(.init())
@@ -106,12 +106,12 @@ final class AppFeatureTests: TestCase {
 		let viewTask = await store.send(.view(.task))
 
 		// when
-		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(.noProfile)))))))
+		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(nil)))))))
 
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.noProfile))))) {
+		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(nil)))))) {
 			$0.root = .onboarding(.init())
 		}
 
@@ -135,20 +135,30 @@ final class AppFeatureTests: TestCase {
 
 		// when
 		let decodingError = DecodingError.valueNotFound(Profile.self, .init(codingPath: [], debugDescription: "Something went wrong"))
-		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.failure(ProfileLoader.JSONDecodingError.KnownDecodingError(decodingError: decodingError))))))))
+		let error = ProfileLoader.JSONDecodingError.KnownDecodingError(decodingError: decodingError)
+		let foobar: ProfileLoader.JSONDecodingError = .known(error)
+		let failure: ProfileLoader.ProfileLoadingFailure = .decodingFailure(
+			json: "".data(using: .utf8)!,
+			foobar
+		)
+		let result: ProfileLoader.ProfileResult = .failure(
+			failure
+		)
+		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
+			result
+		))))))
 
 		await testScheduler.advance(by: .milliseconds(100))
 
 		// then
-		await store.receive(.internal(.system(.displayErrorAlert(App.UserFacingError(ProfileLoader.JSONDecodingError.KnownDecodingError(decodingError: decodingError)))))) {
-			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("Failed to decode profile: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))"))
+		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
+			$0.root = .onboarding(.init())
 		}
 
-		// when
-		await store.receive(.child(.splash(.delegate(.profileResultLoaded(
-			ProfileLoader.Result.noProfile
-		))))) {
-			$0.root = .onboarding(.init())
+		await store.receive(.internal(.system(.displayErrorAlert(
+			App.UserFacingError(foobar)
+		)))) {
+			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("Failed to decode profile: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))"))
 		}
 
 		await store.send(.view(.errorAlertDismissButtonTapped)) {
@@ -181,9 +191,9 @@ final class AppFeatureTests: TestCase {
 		struct SomeError: Swift.Error {}
 		let badVersion: ProfileSnapshot.Version = .init(rawValue: .init(0, 0, 0))
 		let failedToCreateProfileFromSnapshot = ProfileLoader.FailedToCreateProfileFromSnapshot(version: badVersion, error: SomeError())
-		let result = ProfileLoader.Result.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot)
+		let result = ProfileLoader.ProfileResult.failure(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
-			.success(result)
+			result
 		))))))
 
 		await testScheduler.advance(by: .milliseconds(100))
@@ -225,9 +235,9 @@ final class AppFeatureTests: TestCase {
 		// when
 		struct SomeError: Swift.Error {}
 		let badVersion: ProfileSnapshot.Version = .init(rawValue: .init(0, 0, 0))
-		let result = ProfileLoader.Result.profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion)
+		let result = ProfileLoader.ProfileResult.failure(.profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
-			.success(result)
+			result
 		))))))
 
 		await testScheduler.advance(by: .milliseconds(100))

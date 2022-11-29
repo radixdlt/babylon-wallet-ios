@@ -63,7 +63,12 @@ public struct AccountAddressesNeedingToSignTransactionRequest: Sendable, Hashabl
 	public let version: Version
 	public let manifest: TransactionManifest
 	public let networkID: NetworkID
-	public init(version: Version, manifest: TransactionManifest, networkID: NetworkID) {
+
+	public init(
+		version: Version,
+		manifest: TransactionManifest,
+		networkID: NetworkID
+	) {
 		self.version = version
 		self.manifest = manifest
 		self.networkID = networkID

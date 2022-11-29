@@ -52,9 +52,9 @@ extension ProfileClient: TestDependencyKey {
 		lookupAccountByAddress: { _ in
 			.placeholder0
 		},
-		privateKeysForAddresses: { _ in
+		signersForAccountsGivenAddresses: { _ in
 			struct MockError: LocalizedError {
-				let errorDescription: String? = "Failed to get privateKeys for addresses"
+				let errorDescription: String? = "Failed to get signers for addresses"
 			}
 			throw MockError()
 		}
@@ -77,7 +77,7 @@ extension ProfileClient: TestDependencyKey {
 		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
 		createVirtualAccount: unimplemented("\(Self.self).createVirtualAccount"),
 		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
-		privateKeysForAddresses: unimplemented("\(Self.self).privateKeysForAddresses")
+		signersForAccountsGivenAddresses: unimplemented("\(Self.self).signersForAccountsGivenAddresses")
 	)
 }
 

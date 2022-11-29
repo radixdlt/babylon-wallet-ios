@@ -38,7 +38,6 @@ final class OnboardingNewProfileFeatureTests: TestCase {
 			)
 		}
 
-		store.dependencies.transactionClient.signAndSubmitTransaction = { _ in .placeholder }
 		store.dependencies.keychainClient = keychainClient
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 		let generateMnemonicCalled = ActorIsolated<Bool>(false)
