@@ -26,7 +26,7 @@ public extension LinearGradient.App {
 	}
 
 	var account4: LinearGradient {
-		LinearGradient(gradient: Gradient(colors: [.app.pink1, .app.blue2]), startPoint: .leading, endPoint: .trailing)
+		LinearGradient(gradient: Gradient(colors: [.app.account4pink, .app.blue2]), startPoint: .leading, endPoint: .trailing)
 	}
 
 	var account5: LinearGradient {
@@ -57,3 +57,31 @@ public extension LinearGradient.App {
 		LinearGradient(gradient: Gradient(colors: [.app.account11green, .app.account11blue1, .app.account11pink, .app.account11blue2]), startPoint: .leading, endPoint: .trailing)
 	}
 }
+
+#if DEBUG
+struct LinearGradients_Previews: PreviewProvider {
+	static var previews: some View {
+		let gradients = [
+			LinearGradient.app.account0,
+			LinearGradient.app.account1,
+			LinearGradient.app.account2,
+			LinearGradient.app.account3,
+			LinearGradient.app.account4,
+			LinearGradient.app.account5,
+			LinearGradient.app.account6,
+			LinearGradient.app.account7,
+			LinearGradient.app.account8,
+			LinearGradient.app.account9,
+			LinearGradient.app.account10,
+			LinearGradient.app.account11,
+		]
+
+		ScrollView {
+			VStack {
+				ForEach(0 ..< gradients.count, id: \.self) { _ in
+				}
+			}
+		}
+	}
+}
+#endif
