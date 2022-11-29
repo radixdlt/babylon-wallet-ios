@@ -4,6 +4,7 @@ import SwiftUI
 public extension LinearGradient {
 	/// Namespace only
 	struct App { fileprivate init() {} }
+	/// Namespace containing app-specific linear gradients
 	static let app = App()
 }
 
