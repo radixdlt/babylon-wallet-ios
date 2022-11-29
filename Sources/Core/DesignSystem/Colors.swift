@@ -51,6 +51,8 @@ public extension Color.App {
 
 	var account5blue: Color { .init(hex: .account5blue) }
 
+	var account6green: Color { .init(hex: .account6green) }
+
 	var account7pink: Color { .init(hex: .account7pink) }
 
 	var account9green1: Color { .init(hex: .account9green1) }
@@ -100,6 +102,8 @@ private extension Color {
 		case account4pink = 0xCE0D98
 
 		case account5blue = 0x0DCAE4
+
+		case account6green = 0x03D497
 
 		case account7pink = 0xF31DBE
 

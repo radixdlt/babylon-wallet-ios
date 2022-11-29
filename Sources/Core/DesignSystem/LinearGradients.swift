@@ -34,7 +34,7 @@ public extension LinearGradient.App {
 	}
 
 	var account6: LinearGradient {
-		LinearGradient(gradient: Gradient(colors: [.app.blue3, .app.blue2]), startPoint: .leading, endPoint: .trailing)
+		LinearGradient(gradient: Gradient(colors: [.app.gray1, .app.account6green]), startPoint: .leading, endPoint: .trailing)
 	}
 
 	var account7: LinearGradient {
