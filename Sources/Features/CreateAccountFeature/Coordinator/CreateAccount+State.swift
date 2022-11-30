@@ -8,15 +8,18 @@ public extension CreateAccount {
 		public var accountName: String
 		public var isValid: Bool
 		public var isCreatingAccount: Bool
+        public let shouldCreateProfile: Bool
 		@BindableState public var focusedField: Field?
 
 		public init(
+            shouldCreateProfile: Bool,
 			numberOfExistingAccounts: Int = 0,
 			accountName: String = "",
 			isValid: Bool = false,
 			focusedField: Field? = nil,
 			isCreatingAccount: Bool = false
 		) {
+            self.shouldCreateProfile = shouldCreateProfile
 			self.numberOfExistingAccounts = numberOfExistingAccounts
 			self.accountName = accountName
 			self.isValid = isValid

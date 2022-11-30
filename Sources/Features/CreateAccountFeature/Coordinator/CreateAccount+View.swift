@@ -25,14 +25,15 @@ public extension CreateAccount.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack(spacing: .zero) {
-					NavigationBar(
-						leadingItem: CloseButton {
-							viewStore.send(.closeButtonTapped)
-						}
-					)
-					.foregroundColor(.app.gray1)
-					.padding([.horizontal, .top], .medium3)
-
+                    if viewStore.isDismissButtonVisible {
+                        NavigationBar(
+                            leadingItem: CloseButton {
+                                viewStore.send(.closeButtonTapped)
+                            }
+                        )
+                        .foregroundColor(.app.gray1)
+                        .padding([.horizontal, .top], .medium3)
+                    }
 					VStack {
 						title(with: viewStore)
 
@@ -88,6 +89,7 @@ extension CreateAccount.View {
 		public var accountName: String
 		public var isLoaderVisible: Bool
 		public var isCreateAccountButtonEnabled: Bool
+        public var isDismissButtonVisible: Bool
 		@BindableState public var focusedField: CreateAccount.State.Field?
 
 		init(state: CreateAccount.State) {
@@ -95,6 +97,7 @@ extension CreateAccount.View {
 			accountName = state.accountName
 			isLoaderVisible = state.isCreatingAccount
 			isCreateAccountButtonEnabled = state.isValid && !state.isCreatingAccount
+            isDismissButtonVisible = !state.shouldCreateProfile
 			focusedField = state.focusedField
 		}
 	}
@@ -164,7 +167,7 @@ struct CreateAccount_Previews: PreviewProvider {
 
 		return CreateAccount.View(
 			store: .init(
-				initialState: .init(),
+                initialState: .init(shouldCreateProfile: false),
 				reducer: CreateAccount()
 			)
 		)

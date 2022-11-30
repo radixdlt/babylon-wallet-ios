@@ -341,12 +341,13 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"DesignSystem",
+            engineToolkit,
 			"ErrorQueue",
+            "GatewayAPI",
 			"KeychainClientDependency",
             "LocalAuthenticationClient",
 			"ProfileClient",
 			tca,
-			"TransactionClient", // FIXME: remove once we have virtual accounts
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]

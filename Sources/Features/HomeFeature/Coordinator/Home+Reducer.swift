@@ -70,7 +70,8 @@ public struct Home: ReducerProtocol {
 
 		case let .internal(.system(.createAccount(numberOfExistingAccounts))):
 			state.createAccount = .init(
-				numberOfExistingAccounts: numberOfExistingAccounts
+                shouldCreateProfile: false,
+                numberOfExistingAccounts: numberOfExistingAccounts
 			)
 			return .none
 

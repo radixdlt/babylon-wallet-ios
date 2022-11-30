@@ -13,7 +13,7 @@ public extension Onboarding {
 
         public var root: Root
 
-        public init(root: Root = .createAccount(.init())) {
+        public init(root: Root = .createAccount(.init(shouldCreateProfile: true))) {
             self.root = root
         }
 	}

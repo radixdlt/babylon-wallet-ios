@@ -21,12 +21,12 @@ public extension Onboarding.View {
         SwitchStore(store.scope(state: \.root)) {
             CaseLet(
                 state: /Onboarding.State.Root.importProfile,
-                action: { Onboarding.Action.child(.importProfile($0)) },
+                action: { Onboarding.Action.importProfile($0) },
                 then: ImportProfile.View.init(store:)
             )
             CaseLet(
                 state: /Onboarding.State.Root.createAccount,
-                action: { Onboarding.Action.child(.createAccount($0)) },
+                action: { Onboarding.Action.createAccount($0) },
                 then: CreateAccount.View.init(store:)
             )
         }
