@@ -63,13 +63,13 @@ jobs:
           actor: ${{ secrets.RADIX_BOT_USERNAME }}
           token: ${{ secrets.RADIX_BOT_PAT }}
 
-      - name: "Push to main test"
-        run: bundle exec fastlane ios push_to_main_test 
-
       - name: "Install additional deps"
         run: |
           echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
+
+      - name: "Push to main test"
+        run: bundle exec fastlane ios push_to_main_test 
 
       - name: "Build"
         run: bundle exec fastlane ios build
