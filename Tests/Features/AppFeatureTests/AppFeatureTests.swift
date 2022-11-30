@@ -32,7 +32,7 @@ final class AppFeatureTests: TestCase {
 
 	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		let store = TestStore(
-			initialState: App.State(root: .onboarding(.init(newProfile: .init()))),
+            initialState: App.State(root: .onboarding(.init(root: .createAccount(.init(shouldCreateProfile: true))))),
 			reducer: App()
 		)
 		let newProfile = try await Profile.new(networkAndGateway: .hammunet, mnemonic: .generate())
@@ -43,7 +43,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// when
-		await store.send(.child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))))
+        await store.send(.child(.onboarding(.createAccount(.delegate(.createdNewProfile(newProfile))))))
 
 		// then
 		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile))))) {

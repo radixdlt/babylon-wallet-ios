@@ -347,10 +347,14 @@ package.addModules([
 			"KeychainClientDependency",
             "LocalAuthenticationClient",
 			"ProfileClient",
+            "TransactionClient",
 			tca,
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: [
+                "TestUtils",
+                "UserDefaultsClient",
+            ]
 		)
 	),
 	.feature(
