@@ -289,13 +289,13 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR Code to connect to browser extension";
-				INFOPLIST_KEY_NSDesktopFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
-				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
-				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
+				INFOPLIST_KEY_NSDesktopFolderUsageDescription = "$PRIVACY_ACCESS_BABYLON_PROFILE";
+				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = "$PRIVACY_ACCESS_BABYLON_PROFILE";
+				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = "$PRIVACY_ACCESS_BABYLON_PROFILE";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Access Babylon Wallet Secrets";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.0.6;
+				MARKETING_VERSION = 0.0.8;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -357,13 +357,13 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR Code to connect to browser extension";
-				INFOPLIST_KEY_NSDesktopFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
-				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
-				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
+				INFOPLIST_KEY_NSDesktopFolderUsageDescription = "$PRIVACY_ACCESS_BABYLON_PROFILE";
+				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = "$PRIVACY_ACCESS_BABYLON_PROFILE";
+				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = "$PRIVACY_ACCESS_BABYLON_PROFILE";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Access Babylon Wallet Secrets";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.0.6;
+				MARKETING_VERSION = 0.0.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRIVACY_ACCESS_BABYLON_PROFILE = "Import Babylon Profile file";
@@ -397,7 +397,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.7;
+				MARKETING_VERSION = 0.0.8;
 				PRODUCT_NAME = BabylonWallet;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development works.rdx.e2e.babylon";
@@ -432,7 +432,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.7;
+				MARKETING_VERSION = 0.0.8;
 				PRODUCT_NAME = BabylonWallet;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore works.rdx.e2e.babylon";
@@ -469,7 +469,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.0.7;
+				MARKETING_VERSION = 0.0.8;
 				PRODUCT_NAME = BabylonWallet;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match Development works.rdx.e2e.babylon macos";
@@ -503,7 +503,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.0.7;
+				MARKETING_VERSION = 0.0.8;
 				PRODUCT_NAME = BabylonWallet;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
