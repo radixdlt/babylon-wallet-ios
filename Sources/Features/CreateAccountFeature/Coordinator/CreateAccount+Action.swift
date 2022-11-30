@@ -39,7 +39,7 @@ public extension CreateAccount.Action.InternalAction {
                 case verifyBiometrics
                 case biometricsConfigResult(TaskResult<LocalAuthenticationConfig>)
                 case createProfile
-                case createdProfileResult(TaskResult<Profile>)
+                case createdNewProfileResult(TaskResult<Profile>)
                 case createAccount
                 case createdNewAccountResult(TaskResult<OnNetwork.Account>)
         }

@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import ErrorQueue
-import KeychainClient
+import KeychainClientDependency
 import Mnemonic
 import Profile
 import ProfileClient
@@ -110,7 +110,7 @@ public extension CreateAccount {
                 case .internal(.system(.createProfile)):
                         return .run { [nameOfFirstAccount = state.accountName] send in
 
-                                await send(.internal(.system(.createdProfileResult(
+                                await send(.internal(.system(.createdNewProfileResult(
                                         // FIXME: - mainnet: extract into ProfileCreator client?
                                         TaskResult {
                                                 let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
@@ -141,13 +141,13 @@ public extension CreateAccount {
                                 ))))
                         }
 
-		case let .internal(.system(.createdProfileResult(.success(profile)))):
+		case let .internal(.system(.createdNewProfileResult(.success(profile)))):
 			state.isCreatingAccount = false
 			return .run { send in
 				await send(.delegate(.createdNewProfile(profile)))
 			}
 
-		case let .internal(.system(.createdProfileResult(.failure(error)))):
+		case let .internal(.system(.createdNewProfileResult(.failure(error)))):
 			state.isCreatingAccount = false
 			errorQueue.schedule(error)
 			return .none

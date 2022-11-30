@@ -159,7 +159,7 @@ final class CreateAccountFeatureTests: TestCase {
                 waitForExpectations(timeout: 1)
                 await profileSavedToKeychain.withValue {
                         if let profile = $0 {
-                                await store.receive(.internal(.system(.createdProfileResult(.success(profile))))) {
+                                await store.receive(.internal(.system(.createdNewProfileResult(.success(profile))))) {
                                         $0.isCreatingAccount = false
                                 }
                                 await store.receive(.delegate(.createdNewProfile(profile)))
