@@ -2,9 +2,9 @@ import Collections
 import Foundation
 
 public extension P2P {
-	typealias OneTimeAccountAddressesRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.OneTimeAccountAddressesRequest>
+	typealias OneTimeAccountAddressesRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.OneTimeAccountsReadRequestItem>
 
-	typealias SignTransactionRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.SignTransactionRequest>
+	typealias SignTransactionRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.SendTransactionWriteRequestItem>
 
 	/// A simple wrapper around a wallet request item to handle and its parent request.
 	struct SpecificRequestItemToHandle<RequestItem: P2PFromDappWalletRequestItemProtocol>: Sendable, Hashable, Identifiable {
@@ -24,7 +24,7 @@ public extension P2P {
 public extension P2P.OneTimeAccountAddressesRequestToHandle {
 	init(request: P2P.RequestFromClient) throws {
 		guard
-			let oneTimeAccountRequest = request.requestFromDapp.items.compactMap(\.oneTimeAccountAddresses).first
+			let oneTimeAccountRequest = request.requestFromDapp.items.compactMap(\.oneTimeAccounts).first
 		else {
 			throw P2P.FromDapp.WalletRequestItem.ExpectedOneTimeAccountAddressesRequest()
 		}
@@ -62,7 +62,7 @@ public extension P2P.RequestItemToHandle {
 #if DEBUG
 public extension P2P.RequestItemToHandle {
 	static let placeholderOneTimeAccount: Self = .init(
-		requestItem: .oneTimeAccountAddresses(.placeholder),
+		requestItem: .oneTimeAccounts(.placeholder),
 		parentRequest: try! .init(
 			requestFromDapp: .placeholderOneTimeAccount,
 			client: .init(

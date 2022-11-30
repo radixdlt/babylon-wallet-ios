@@ -58,8 +58,8 @@ final class HandleDappRequestsTests: TestCase {
 	}
 
 	func test__GIVEN__initialState__WHEN__finishing_first_item_of_two_in_a_request__THEN__next_item_is_started() async throws {
-		let item0 = P2P.FromDapp.WalletRequestItem.oneTimeAccountAddresses(.placeholder)
-		let item1 = P2P.FromDapp.WalletRequestItem.signTransaction(.placeholder)
+		let item0 = P2P.FromDapp.WalletRequestItem.oneTimeAccounts(.placeholder)
+		let item1 = P2P.FromDapp.WalletRequestItem.sendTransaction(.placeholder)
 
 		let request = try P2P.RequestFromClient(
 			requestFromDapp: .init(
@@ -100,15 +100,15 @@ final class HandleDappRequestsTests: TestCase {
 		//        }
 
 		let accountAddresses = NonEmpty<OrderedSet<OnNetwork.Account>>(rawValue: .init([.placeholder0]))!
-		let accountAddressesResponse: NonEmpty<[P2P.ToDapp.WalletAccount]> = accountAddresses.map { P2P.ToDapp.WalletAccount(account: $0) }
+		let accountsResponse: NonEmpty<[P2P.ToDapp.WalletAccount]> = accountAddresses.map { P2P.ToDapp.WalletAccount(account: $0) }
 
 		await store.send(.child(.grantDappWalletAccess(.delegate(
 			.finishedChoosingAccounts(
 				accountAddresses,
-				request: .init(requestItem: item0.oneTimeAccountAddresses!, parentRequest: request)
+				request: .init(requestItem: item0.oneTimeAccounts!, parentRequest: request)
 			)
 		)))) {
-			XCTAssertNil($0.unfinishedRequestsFromClient.finish(item0, with: .oneTimeAccountAddresses(.withoutProof(.init(accountAddresses: accountAddressesResponse)))))
+			XCTAssertNil($0.unfinishedRequestsFromClient.finish(item0, with: .oneTimeAccounts(.withoutProof(.init(accounts: accountsResponse)))))
 			$0.currentRequest = nil
 		}
 		await store.receive(.internal(.system(.handleNextRequestItemIfNeeded)))

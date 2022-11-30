@@ -48,9 +48,9 @@ Babylon
        │    │
        ╰────╰─ SLIP10
        │         │
-       ╰─────────╰─ Bite
-       │         │
        ╰─────────╰─ Mnemonic
+       │         │
+       ╰─────────╰─ Bite
 ```
 
 # Navigation
