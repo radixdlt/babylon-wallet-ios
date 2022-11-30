@@ -68,7 +68,7 @@ public extension AccountDetails.View {
 					.cornerRadius(.medium2)
 					.padding(.bottom, .medium2 * -2)
 				}
-				.background(Color.app.blue2)
+				.background(viewStore.appearanceID.gradient)
 			}
 		}
 	}
@@ -110,10 +110,12 @@ private extension AccountDetails.View {
 extension AccountDetails.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		public let address: AccountAddress
-		public let displayName: String
+		let appearanceID: OnNetwork.Account.AppearanceID
+		let address: AccountAddress
+		let displayName: String
 
 		init(state: AccountDetails.State) {
+			appearanceID = state.account.appearanceID
 			address = state.address
 			displayName = state.displayName
 		}

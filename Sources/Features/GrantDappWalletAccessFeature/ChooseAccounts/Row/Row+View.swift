@@ -40,7 +40,7 @@ public extension ChooseAccounts.Row.View {
 			}
 			.padding(.medium1)
 			.background(
-				LinearGradient.app.account0
+				viewStore.appearanceID.gradient
 					.brightness(viewStore.isSelected ? -0.1 : 0)
 			)
 			.cornerRadius(.small1)
@@ -54,11 +54,13 @@ public extension ChooseAccounts.Row.View {
 // MARK: - ChooseAccounts.Row.View.ViewState
 extension ChooseAccounts.Row.View {
 	struct ViewState: Equatable {
+		let appearanceID: OnNetwork.Account.AppearanceID
 		let isSelected: Bool
 		let accountName: String
 		let accountAddress: AccountAddress
 
 		init(state: ChooseAccounts.Row.State) {
+			appearanceID = state.account.appearanceID
 			isSelected = state.isSelected
 			accountName = state.account.displayName ?? L10n.DApp.ChooseAccounts.unnamedAccount
 			accountAddress = state.account.address
