@@ -191,8 +191,8 @@ final class CreateAccountFeatureTests: TestCase {
 		await store.receive(.internal(.system(.biometricsConfigResult(.success(authBiometricsConfig))))) {
 			$0.isCreatingAccount = false
 			$0.alert = .init(
-				title: .init("Biometrics not configured"),
-				message: .init("This apps require your phone to have biometrics configured")
+				title: .init("Biometrics not set up"),
+				message: .init("This app requires your phone having biometrics set up")
 			)
 		}
 	}
