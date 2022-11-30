@@ -23,28 +23,28 @@ public extension CreateAccount.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			ForceFullScreen {
-				VStack(spacing: .zero) {
-                    if viewStore.isDismissButtonVisible {
-                        NavigationBar(
-                            leadingItem: CloseButton {
-                                viewStore.send(.closeButtonTapped)
-                            }
-                        )
-                        .foregroundColor(.app.gray1)
-                        .padding([.horizontal, .top], .medium3)
-                    } else {
-						Spacer()
-							.frame(minHeight: .small2, maxHeight: .large1)
-                    }
-					VStack {
-						title(with: viewStore)
+                        ForceFullScreen {
+                                VStack(spacing: .zero) {
+                                        if viewStore.isDismissButtonVisible {
+                                                NavigationBar(
+                                                        leadingItem: CloseButton {
+                                                                viewStore.send(.closeButtonTapped)
+                                                        }
+                                                )
+                                                .foregroundColor(.app.gray1)
+                                                .padding([.horizontal, .top], .medium3)
+                                        } else {
+                                                Spacer()
+                                                        .frame(minHeight: .small2, maxHeight: .large1)
+                                        }
+                                        VStack {
+                                                title(with: viewStore)
 
-						Spacer()
-							.frame(minHeight: .small2, maxHeight: .large1)
+                                                Spacer()
+                                                        .frame(minHeight: .small2, maxHeight: .large1)
 
-						VStack(spacing: .large1) {
-							subtitle
+                                                VStack(spacing: .large1) {
+                                                        subtitle
 
 							textField(
 								placeholder: L10n.CreateAccount.placeholder,
@@ -64,23 +64,23 @@ public extension CreateAccount.View {
 
 						Spacer(minLength: .small2)
 
-						if viewStore.isLoaderVisible {
-							ProgressView()
-						}
+                                                if viewStore.isLoaderVisible {
+                                                        ProgressView()
+                                                }
 
 						Button(L10n.CreateAccount.createAccountButtonTitle) {
 							viewStore.send(.createAccountButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
 						.enabled(viewStore.isCreateAccountButtonEnabled)
-					}
-					.padding([.horizontal, .bottom], .medium1)
-				}
-                .alert(store.scope(state: \.alert, action: { .view($0) }), dismiss: .alertDismissButtonTapped)
-				.onAppear {
-					viewStore.send(.viewAppeared)
-				}
-			}
+                                        }
+                                        .padding([.horizontal, .bottom], .medium1)
+                                }
+                                .alert(store.scope(state: \.alert, action: { .view($0) }), dismiss: .alertDismissButtonTapped)
+                                .onAppear {
+                                        viewStore.send(.viewAppeared)
+                                }
+                        }
 		}
 	}
 }
@@ -92,17 +92,17 @@ extension CreateAccount.View {
 		public var numberOfExistingAccounts: Int
 		public var accountName: String
 		public var isLoaderVisible: Bool
-		public var isCreateAccountButtonEnabled: Bool
-        public var isDismissButtonVisible: Bool
-		@BindableState public var focusedField: CreateAccount.State.Field?
+                public var isCreateAccountButtonEnabled: Bool
+                public var isDismissButtonVisible: Bool
+                @BindableState public var focusedField: CreateAccount.State.Field?
 
 		init(state: CreateAccount.State) {
 			numberOfExistingAccounts = state.numberOfExistingAccounts
 			accountName = state.accountName
-			isLoaderVisible = state.isCreatingAccount
-			isCreateAccountButtonEnabled = state.isValid && !state.isCreatingAccount
-            isDismissButtonVisible = !state.shouldCreateProfile
-			focusedField = state.focusedField
+                        isLoaderVisible = state.isCreatingAccount
+                        isCreateAccountButtonEnabled = state.isValid && !state.isCreatingAccount
+                        isDismissButtonVisible = !state.shouldCreateProfile
+                        focusedField = state.focusedField
 		}
 	}
 }

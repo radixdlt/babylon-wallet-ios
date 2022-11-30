@@ -69,11 +69,11 @@ public struct Home: ReducerProtocol {
 			}
 
 		case let .internal(.system(.createAccount(numberOfExistingAccounts))):
-			state.createAccount = .init(
-                shouldCreateProfile: false,
-                numberOfExistingAccounts: numberOfExistingAccounts
-			)
-			return .none
+                        state.createAccount = .init(
+                                shouldCreateProfile: false,
+                                numberOfExistingAccounts: numberOfExistingAccounts
+                        )
+                        return .none
 
 		case .internal(.view(.didAppear)):
 			return loadAccountsAndSettings()

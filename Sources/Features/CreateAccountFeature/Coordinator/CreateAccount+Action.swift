@@ -34,15 +34,15 @@ public extension CreateAccount.Action {
 
 // MARK: - CreateAccount.Action.InternalAction.SystemAction
 public extension CreateAccount.Action.InternalAction {
-	enum SystemAction: Sendable, Equatable {
-		case focusTextField(CreateAccount.State.Field?)
-        case verifyBiometrics
-        case biometricsConfigResult(TaskResult<LocalAuthenticationConfig>)
-        case createProfile
-        case createdProfileResult(TaskResult<Profile>)
-        case createAccount
-		case createdNewAccountResult(TaskResult<OnNetwork.Account>)
-	}
+        enum SystemAction: Sendable, Equatable {
+                case focusTextField(CreateAccount.State.Field?)
+                case verifyBiometrics
+                case biometricsConfigResult(TaskResult<LocalAuthenticationConfig>)
+                case createProfile
+                case createdProfileResult(TaskResult<Profile>)
+                case createAccount
+                case createdNewAccountResult(TaskResult<OnNetwork.Account>)
+        }
 }
 
 // MARK: - CreateAccount.Action.DelegateAction
