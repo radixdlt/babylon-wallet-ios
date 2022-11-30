@@ -32,14 +32,6 @@ final class TransactionSigningFeatureTests: TestCase {
 		store.dependencies.transactionClient.signAndSubmitTransaction = { @Sendable _ in
 			.failure(.failedToCompileOrSign(.failedToCompileTXIntent))
 		}
-		let errorExpectation2 = expectation(description: "Error")
-		store.dependencies.errorQueue.schedule = { anError in
-			guard let error = anError as? TransactionFailure else {
-				return XCTFail("Wrong error type")
-			}
-			XCTAssertEqual(error, .failedToCompileOrSign(.failedToCompileTXIntent))
-			errorExpectation2.fulfill()
-		}
 
 		await store.send(.view(.signTransactionButtonTapped)) {
 			$0.isSigningTX = true
@@ -47,6 +39,7 @@ final class TransactionSigningFeatureTests: TestCase {
 		await store.receive(.internal(.signTransactionResult(.failure(.failedToCompileOrSign(.failedToCompileTXIntent))))) {
 			$0.isSigningTX = false
 		}
+		await store.receive(.delegate(.failed(request, .failedToCompileOrSign(.failedToCompileTXIntent))))
 
 		// Happy path
 		store.dependencies.transactionClient.signAndSubmitTransaction = { @Sendable _ in
@@ -58,8 +51,6 @@ final class TransactionSigningFeatureTests: TestCase {
 		await store.receive(.internal(.signTransactionResult(.success("MOCKED_TX_ID")))) {
 			$0.isSigningTX = false
 		}
-
-		wait(for: [errorExpectation2], timeout: 0)
 	}
 
 	func testReject() async {

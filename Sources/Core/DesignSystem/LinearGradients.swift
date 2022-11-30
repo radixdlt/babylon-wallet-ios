@@ -87,7 +87,9 @@ struct LinearGradients_Previews: PreviewProvider {
 					Text("Account \(i + 1)")
 				}
 			}
+			#if os(iOS)
 			.navigationBarTitle(Text("Gradients"))
+			#endif
 		}
 	}
 }
