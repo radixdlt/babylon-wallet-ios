@@ -32,7 +32,6 @@ platform :ios do
         upload_to_testflight(
             api_key: api_key
         )
-        push_to_git_remote
     end
 
     desc "Installs certificates on the machine"
