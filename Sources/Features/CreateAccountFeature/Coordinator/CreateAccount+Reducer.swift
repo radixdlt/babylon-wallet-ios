@@ -6,7 +6,6 @@ import Mnemonic
 import Profile
 import ProfileClient
 import Resources
-import TransactionClient
 
 // MARK: - MnemonicGenerator
 public struct MnemonicGenerator: Sendable, DependencyKey {
@@ -47,7 +46,6 @@ public struct CreateAccount: Sendable, ReducerProtocol {
 	@Dependency(\.mnemonicGenerator) var mnemonicGenerator
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
-	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 
 	public init() {}

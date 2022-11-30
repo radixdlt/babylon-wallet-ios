@@ -129,7 +129,6 @@ final class CreateAccountFeatureTests: TestCase {
 			)
 		}
 
-		store.dependencies.transactionClient.signAndSubmitTransaction = { _ in .placeholder }
 		store.dependencies.keychainClient = keychainClient
 		store.dependencies.localAuthenticationClient = LocalAuthenticationClient {
 			authBiometricsConfig

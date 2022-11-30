@@ -351,7 +351,6 @@ package.addModules([
 			"KeychainClientDependency",
 			"LocalAuthenticationClient",
 			"ProfileClient",
-			"TransactionClient",
 			tca,
 		],
 		tests: .yes(
