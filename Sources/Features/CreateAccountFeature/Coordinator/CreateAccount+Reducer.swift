@@ -84,8 +84,8 @@ public extension CreateAccount {
 			guard config?.isBiometricsSetUp == true else {
 				state.isCreatingAccount = false
 				state.alert = .init(
-                                        title: .init(L10n.Onboarding.biometricsNotSetUpTitle),
-                                        message: .init(L10n.Onboarding.biometricsNotSetUpMessage)
+					title: .init(L10n.Onboarding.biometricsNotSetUpTitle),
+					message: .init(L10n.Onboarding.biometricsNotSetUpMessage)
 				)
 				return .none
 			}
