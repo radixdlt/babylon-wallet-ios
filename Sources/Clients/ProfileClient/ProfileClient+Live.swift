@@ -149,25 +149,18 @@ public extension ProfileClient {
 
 					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
 
-					let matrix = try await profileHolder.getAsync { profile in
-						try await accounts.asyncMap { account in
-							try await profile.signersOf(
-								of: account,
-								mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-							)
-						}
+					return try await profileHolder.getAsync { profile in
+						try await profile.signers(
+							ofEntities: accounts,
+							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
+						)
 					}
-					var signers = OrderedSet<SignersOfAccount>()
-					matrix.forEach {
-						signers.append(contentsOf: $0)
-					}
-					return NonEmpty(rawValue: signers)
 				}
 
 				guard let fromAddresses = try? await getAccountSignersFromAddresses() else {
 					// TransactionManifest does not reference any accounts => use any account!
 					return try await profileHolder.getAsync { profile in
-						try await profile.signersOf(
+						try await profile.signers(
 							networkID: request.networkID,
 							entityType: OnNetwork.Account.self,
 							entityIndex: 0,
