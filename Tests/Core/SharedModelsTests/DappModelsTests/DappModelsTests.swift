@@ -5,7 +5,7 @@ import XCTest
 
 final class ToDappResponseTests: TestCase {
 	func test_encode_response() throws {
-		let response = P2P.ToDapp.Response(
+		let success = P2P.ToDapp.Response.Success(
 			id: "an_id", items: [
 				.oneTimeAccounts(.withoutProof(.init(
 					accounts: .init(
@@ -18,6 +18,7 @@ final class ToDappResponseTests: TestCase {
 				))),
 			]
 		)
+		let response = P2P.ToDapp.Response.success(success)
 		let encoder = JSONEncoder()
 		let jsonData = try encoder.encode(response)
 		let jsonString = try XCTUnwrap(jsonData.prettyPrintedJSONString)

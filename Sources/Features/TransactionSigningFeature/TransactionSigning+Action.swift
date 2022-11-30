@@ -3,6 +3,7 @@ import EngineToolkit
 import Foundation
 import ProfileClient
 import SharedModels
+import enum TransactionClient.TransactionFailure
 import enum TransactionClient.TransactionResult
 
 // MARK: - TransactionSigning.Action
@@ -36,7 +37,8 @@ public extension TransactionSigning.Action {
 // MARK: - TransactionSigning.Action.DelegateAction
 public extension TransactionSigning.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case dismissed(P2P.SignTransactionRequestToHandle)
+		case rejected(P2P.SignTransactionRequestToHandle)
+		case failed(P2P.SignTransactionRequestToHandle, TransactionFailure)
 
 		case signedTXAndSubmittedToGateway(
 			TransactionIntent.TXID,

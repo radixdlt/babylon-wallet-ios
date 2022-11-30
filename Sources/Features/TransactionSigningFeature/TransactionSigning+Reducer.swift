@@ -86,12 +86,13 @@ public extension TransactionSigning {
 
 		case let .internal(.signTransactionResult(.failure(transactionFailure))):
 			state.isSigningTX = false
-			errorQueue.schedule(transactionFailure)
-			return .none
+			return .run { [failedRequest = state.request] send in
+				await send(.delegate(.failed(failedRequest, transactionFailure)))
+			}
 
 		case .internal(.view(.closeButtonTapped)):
-			return .run { [dismissedRequest = state.request] send in
-				await send(.delegate(.dismissed(dismissedRequest)))
+			return .run { [rejectedRequest = state.request] send in
+				await send(.delegate(.rejected(rejectedRequest)))
 			}
 
 		case .delegate:

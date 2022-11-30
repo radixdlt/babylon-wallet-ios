@@ -89,11 +89,11 @@ public extension P2P.UnfinishedRequestsFromClient {
 		queued.append(.init(requestFromClient: requestFromClient))
 	}
 
-	mutating func dismiss(request: P2P.RequestFromClient) {
-		if current?.requestFromClient == request {
+	mutating func failed(requestID: P2P.RequestFromClient.ID) {
+		if current?.requestFromClient.id == requestID {
 			current = nil
 		}
-		queued.removeAll(where: { $0.requestFromClient == request })
+		queued.removeAll(where: { $0.requestFromClient.id == requestID })
 	}
 
 	mutating func finish(

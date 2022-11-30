@@ -35,7 +35,8 @@ public extension HandleDappRequests.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
 		case loadConnections
 		case receiveRequestFromP2PClientResult(TaskResult<P2P.RequestFromClient>)
-		case dismissed(P2P.RequestFromClient)
+		case rejected(P2P.RequestFromClient)
+		case failedWithError(P2P.RequestFromClient, P2P.ToDapp.Response.Failure.Kind.Error, String?)
 		case handleNextRequestItemIfNeeded
 		case presentViewForP2PRequest(P2P.RequestItemToHandle)
 		case sendResponseBackToDappResult(TaskResult<P2P.SentResponseToClient>)
