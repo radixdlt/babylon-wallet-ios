@@ -58,7 +58,7 @@ public extension AccountList.Row.View {
 			}
 			.padding(.horizontal, .medium1)
 			.padding(.vertical, .medium2)
-			.background(Color.app.blue2)
+			.background(viewStore.appearance.gradient)
 			.cornerRadius(.small1)
 			.onTapGesture {
 				viewStore.send(.selected)
@@ -84,6 +84,7 @@ extension AccountList.Row.View {
 	struct ViewState: Equatable {
 		let name: String?
 		let address: AccountAddress
+		let appearance: OnNetwork.Account.AppearanceID
 		let aggregatedValue: Float?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
@@ -92,6 +93,7 @@ extension AccountList.Row.View {
 		init(state: AccountList.Row.State) {
 			name = state.account.displayName
 			address = state.account.address
+			appearance = state.account.appearanceID
 			aggregatedValue = state.aggregatedValue
 			currency = state.currency
 			isCurrencyAmountVisible = state.isCurrencyAmountVisible
