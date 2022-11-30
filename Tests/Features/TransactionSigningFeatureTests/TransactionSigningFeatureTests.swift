@@ -62,8 +62,8 @@ final class TransactionSigningFeatureTests: TestCase {
 		wait(for: [errorExpectation2], timeout: 0)
 	}
 
-	func testDismissView() async {
+	func testReject() async {
 		await store.send(.view(.closeButtonTapped))
-		await store.receive(.delegate(.dismissed(request)))
+		await store.receive(.delegate(.rejected(request)))
 	}
 }
