@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import ImportProfileFeature
-import Profile
+import CreateAccountFeature
 
 // MARK: - Onboarding.Action
 public extension Onboarding {
@@ -17,6 +17,7 @@ public extension Onboarding {
 public extension Onboarding.Action {
 	enum ChildAction: Equatable {
 		case importProfile(ImportProfile.Action)
+        case createAccount(CreateAccount.Action)
 	}
 }
 

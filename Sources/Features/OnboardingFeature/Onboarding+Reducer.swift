@@ -1,27 +1,31 @@
 import ComposableArchitecture
 import ImportProfileFeature
+import CreateAccountFeature
 
 // MARK: - Onboarding
 public struct Onboarding: ReducerProtocol {
 	public init() {}
-}
 
-public extension Onboarding {
-	var body: some ReducerProtocolOf<Self> {
-		Reduce(self.core)
-			.ifLet(\.importProfile, action: /Action.child .. Action.ChildAction.importProfile) {
-				ImportProfile()
-			}
+	public var body: some ReducerProtocolOf<Self> {
+        Scope(state: \.root, action: /Action.self) {
+            EmptyReducer()
+                .ifCaseLet(/Onboarding.State.Root.importProfile, action: /Action.child .. Action.ChildAction.importProfile) {
+                    ImportProfile()
+                }
+                .ifCaseLet(/Onboarding.State.Root.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
+                    CreateAccount()
+                }
+        }
+
+        Reduce(self.core)
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.importProfileButtonTapped)):
-			state.importProfile = .init()
 			return .none
 
 		case .child(.importProfile(.delegate(.goBack))):
-			state.importProfile = nil
 			return .none
 
 		case let .child(.importProfile(.delegate(.importedProfileSnapshot(profileSnapshot)))):

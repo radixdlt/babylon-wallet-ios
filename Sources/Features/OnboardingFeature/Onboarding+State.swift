@@ -1,16 +1,20 @@
 import ComposableArchitecture
 import ImportProfileFeature
+import CreateAccountFeature
 
 // MARK: Onboarding.State
 public extension Onboarding {
 	// MARK: State
-	struct State: Equatable {
-		public var importProfile: ImportProfile.State?
+    struct State: Equatable {
+        public enum Root: Equatable {
+            case importProfile(ImportProfile.State)
+            case createAccount(CreateAccount.State)
+        }
 
-		public init(
-			importProfile: ImportProfile.State? = nil
-		) {
-			self.importProfile = importProfile
-		}
+        public var root: Root
+
+        public init(root: Root = .createAccount(.init())) {
+            self.root = root
+        }
 	}
 }

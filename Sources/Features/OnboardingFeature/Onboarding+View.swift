@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import CreateAccountFeature
 import DesignSystem
 import ImportProfileFeature
 import SwiftUI
@@ -7,9 +8,9 @@ import SwiftUI
 public extension Onboarding {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<Onboarding>
+		private let store: Store<State, Action>
 
-		public init(store: StoreOf<Onboarding>) {
+		public init(store: Store<State, Action>) {
 			self.store = store
 		}
 	}
@@ -17,35 +18,17 @@ public extension Onboarding {
 
 public extension Onboarding.View {
 	var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			ZStack {
-				IfLetStore(
-					store.scope(
-						state: \.importProfile,
-						action: { .child(.importProfile($0)) }
-					),
-					then: { importProfileStore in
-						ForceFullScreen {
-							ImportProfile.View(store: importProfileStore)
-						}
-					}
-				)
-				.zIndex(2)
-			}
-		}
-	}
-}
-
-// MARK: - Onboarding.View.ViewState
-extension Onboarding.View {
-	struct ViewState: Equatable {
-		public var importProfile: ImportProfile.State?
-		public init(state: Onboarding.State) {
-			importProfile = state.importProfile
-		}
+        SwitchStore(store.scope(state: \.root)) {
+            CaseLet(
+                state: /Onboarding.State.Root.importProfile,
+                action: { Onboarding.Action.child(.importProfile($0)) },
+                then: ImportProfile.View.init(store:)
+            )
+            CaseLet(
+                state: /Onboarding.State.Root.createAccount,
+                action: { Onboarding.Action.child(.createAccount($0)) },
+                then: CreateAccount.View.init(store:)
+            )
+        }
 	}
 }
