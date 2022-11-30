@@ -9,6 +9,7 @@ public extension CreateAccount {
 		public var isValid: Bool
 		public var isCreatingAccount: Bool
         public let shouldCreateProfile: Bool
+        public var alert: AlertState<Action.ViewAction>?
 		@BindableState public var focusedField: Field?
 
 		public init(
@@ -17,7 +18,8 @@ public extension CreateAccount {
 			accountName: String = "",
 			isValid: Bool = false,
 			focusedField: Field? = nil,
-			isCreatingAccount: Bool = false
+			isCreatingAccount: Bool = false,
+            alert: AlertState<Action.ViewAction>? = nil
 		) {
             self.shouldCreateProfile = shouldCreateProfile
 			self.numberOfExistingAccounts = numberOfExistingAccounts
@@ -25,6 +27,7 @@ public extension CreateAccount {
 			self.isValid = isValid
 			self.focusedField = focusedField
 			self.isCreatingAccount = isCreatingAccount
+            self.alert = alert
 		}
 	}
 }

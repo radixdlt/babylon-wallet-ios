@@ -60,13 +60,37 @@ public extension CreateAccount {
 
             if state.shouldCreateProfile {
                 return .run { send in
-                    await send(.internal(.system(.createProfile)))
+                    await send(.internal(.system(.verifyBiometrics)))
                 }
             } else {
                 return .run { send in
                     await send(.internal(.system(.createAccount)))
                 }
             }
+        case .internal(.system(.verifyBiometrics)):
+            return .run { send in
+                await send(.internal(.system(.biometricsConfigResult(
+                    TaskResult {
+                        return try await localAuthenticationClient.queryConfig()
+                    }
+                ))))
+            }
+
+        case let .internal(.system(.biometricsConfigResult(result))):
+            let config = try? result.value
+            guard config?.isBiometricsSetUp == true else {
+                state.isCreatingAccount = false
+                state.alert = .init(
+                    title: .init("Biometrics not configured"),
+				    message: .init("This apps require your phone to have biometrics configured")
+                )
+                return .none
+            }
+
+            return .run { send in
+                await send(.internal(.system(.createProfile)))
+            }
+
         case .internal(.system(.createAccount)):
 			return .run { [accountName = state.accountName] send in
 				await send(.internal(.system(.createdNewAccountResult(
@@ -80,6 +104,7 @@ public extension CreateAccount {
 					}
 				))))
 			}
+
         case .internal(.system(.createProfile)):
 			return .run { [nameOfFirstAccount = state.accountName] send in
 
@@ -166,6 +191,10 @@ public extension CreateAccount {
 		case let .internal(.system(.focusTextField(focus))):
 			state.focusedField = focus
 			return .none
+        
+         case .internal(.view(.alertDismissButtonTapped)):
+            state.alert = nil
+            return .none
 
 		case .delegate:
 			return .none
