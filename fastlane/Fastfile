@@ -36,9 +36,6 @@ platform :ios do
     end
 
     lane :push_to_main_test do
-        install_distribution_certificate
-        version = bump_version
-        commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
         push_to_git_remote(
             branch: "main"
         )
