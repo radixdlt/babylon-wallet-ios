@@ -6,7 +6,7 @@ public struct NavigationBar<LeadingItem: View, TrailingItem: View>: View {
 	let leadingItem: LeadingItem?
 	let trailingItem: TrailingItem?
 
-	public init(
+	private init(
 		titleText: String? = nil,
 		leadingItem: (() -> LeadingItem)? = nil,
 		trailingItem: (() -> TrailingItem)? = nil
@@ -15,8 +15,10 @@ public struct NavigationBar<LeadingItem: View, TrailingItem: View>: View {
 		self.leadingItem = leadingItem?()
 		self.trailingItem = trailingItem?()
 	}
+}
 
-	public var body: some View {
+public extension NavigationBar {
+	var body: some View {
 		HStack {
 			if let leadingButton = leadingItem {
 				leadingButton
@@ -39,6 +41,20 @@ public struct NavigationBar<LeadingItem: View, TrailingItem: View>: View {
 				placeholderSpacer
 			}
 		}
+	}
+}
+
+public extension NavigationBar {
+	init(
+		titleText: String? = nil,
+		leadingItem: LeadingItem,
+		trailingItem: TrailingItem
+	) {
+		self.init(
+			titleText: titleText,
+			leadingItem: { leadingItem },
+			trailingItem: { trailingItem }
+		)
 	}
 }
 
@@ -95,8 +111,8 @@ struct NavigationBar_Previews: PreviewProvider {
 	static var previews: some View {
 		NavigationBar(
 			titleText: "A title",
-			leadingItem: { Button("Settings", action: {}) },
-			trailingItem: { Button("Settings", action: {}) }
+			leadingItem: Button("Settings", action: {}),
+			trailingItem: Button("Settings", action: {})
 		)
 	}
 }

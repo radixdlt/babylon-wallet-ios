@@ -59,7 +59,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		await store.send(.internal(.view(.displayAccountPreferencesButtonTapped)))
 
 		// then
-		await store.receive(.delegate(.displayAccountPreferences))
+		await store.receive(.delegate(.displayAccountPreferences(try! .init(address: "account-address-deadbeef"))))
 	}
 
 	func test_copyAddress_whenTappedOnCopyAddress_thenCoordiateCopiedAddress() async {

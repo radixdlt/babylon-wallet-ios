@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import DesignSystem
 import SwiftUI
@@ -24,16 +25,29 @@ public extension AccountPreferences.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			// TODO: implement
 			ForceFullScreen {
 				VStack {
-					Text("Implement: AccountPreferences")
-						.background(Color.yellow)
-						.foregroundColor(.red)
-					Button(
-						action: { viewStore.send(.dismissButtonTapped) },
-						label: { Text("Dismiss AccountPreferences") }
+					NavigationBar(
+						titleText: L10n.AccountPreferences.title,
+						leadingItem: BackButton {
+							viewStore.send(.dismissButtonTapped)
+						}
 					)
+					.foregroundColor(.app.gray1)
+					.padding([.horizontal, .top], .medium3)
+
+					Form {
+						Section {
+							Button(L10n.AccountPreferences.faucetButtonTitle) {
+								viewStore.send(.faucetButtonTapped)
+							}
+							.buttonStyle(.primaryText())
+							.enabled(viewStore.isFaucetButtonEnabled)
+						}
+					}
+				}
+				.onAppear {
+					viewStore.send(.didAppear)
 				}
 			}
 		}
@@ -44,7 +58,11 @@ public extension AccountPreferences.View {
 extension AccountPreferences.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: AccountPreferences.State) {}
+		public var isFaucetButtonEnabled: Bool
+
+		init(state: AccountPreferences.State) {
+			isFaucetButtonEnabled = state.isFaucetButtonEnabled
+		}
 	}
 }
 
@@ -53,7 +71,7 @@ struct AccountPreferences_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountPreferences.View(
 			store: .init(
-				initialState: .init(),
+				initialState: .init(address: try! .init(address: "account-address-deadbeef")),
 				reducer: AccountPreferences()
 			)
 		)
