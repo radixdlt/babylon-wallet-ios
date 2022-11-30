@@ -16,7 +16,7 @@ public extension P2P.ToDapp {
 		/// Response to Dapp from wallet, info about a users accounts.
 		/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
 		///
-		case oneTimeAccountAddresses(OneTimeAccountAddressesResponse)
+		case oneTimeAccounts(OneTimeAccountsResponseItem)
 
 		/// Response to Dapp from wallet, info about a signed and submitted transaction.
 		///
@@ -24,7 +24,7 @@ public extension P2P.ToDapp {
 		///
 		/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
 		///
-		case signTransaction(SignTransactionResponse)
+		case sendTransaction(SendTransactionResponseItem)
 	}
 }
 
@@ -33,8 +33,8 @@ private extension P2P.ToDapp.WalletResponseItem {
 	typealias Discriminator = P2P.FromDapp.Discriminator
 	var discriminator: Discriminator {
 		switch self {
-		case .oneTimeAccountAddresses: return .oneTimeAccountAddresses
-		case .signTransaction: return .signTransaction
+		case .oneTimeAccounts: return .oneTimeAccountsRead
+		case .sendTransaction: return .sendTransactionWrite
 		}
 	}
 
@@ -49,9 +49,9 @@ public extension P2P.ToDapp.WalletResponseItem {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(discriminator, forKey: .disciminator)
 		switch self {
-		case let .oneTimeAccountAddresses(response):
+		case let .oneTimeAccounts(response):
 			try response.encode(to: encoder)
-		case let .signTransaction(response):
+		case let .sendTransaction(response):
 			try response.encode(to: encoder)
 		}
 	}

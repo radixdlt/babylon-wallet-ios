@@ -65,19 +65,20 @@ private extension HandleDappRequests {
 
 		case let .child(.grantDappWalletAccess(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
 			state.currentRequest = nil
-			let accountAddresses: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
+
+			let simpleInfoForAccounts: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
 				.init(account: $0)
 			}
 			guard !request.requestItem.isRequiringOwnershipProof else {
 				errorQueue.schedule(NSError(domain: "UnsupportedDappRequest - proofs for account addresses is not yet supported", code: 0))
 				return .none
 			}
-			let responseItem = P2P.ToDapp.WalletResponseItem.oneTimeAccountAddresses(
-				.withoutProof(.init(accountAddresses: .init(rawValue: accountAddresses)!))
+			let responseItem = P2P.ToDapp.WalletResponseItem.oneTimeAccounts(
+				.withoutProof(.init(accounts: .init(rawValue: simpleInfoForAccounts)!))
 			)
 
 			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(
-				.oneTimeAccountAddresses(request.requestItem), with: responseItem
+				.oneTimeAccounts(request.requestItem), with: responseItem
 			) else {
 				return .run { send in
 					await send(.internal(.system(.handleNextRequestItemIfNeeded)))
@@ -109,10 +110,10 @@ private extension HandleDappRequests {
 
 		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, request)))):
 			state.currentRequest = nil
-			let responseItem = P2P.ToDapp.WalletResponseItem.signTransaction(
+			let responseItem = P2P.ToDapp.WalletResponseItem.sendTransaction(
 				.init(txID: txID)
 			)
-			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(.signTransaction(request.requestItem), with: responseItem) else {
+			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(.sendTransaction(request.requestItem), with: responseItem) else {
 				return .run { send in
 					await send(.internal(.system(.handleNextRequestItemIfNeeded)))
 				}

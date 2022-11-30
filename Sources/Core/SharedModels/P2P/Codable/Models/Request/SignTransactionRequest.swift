@@ -6,7 +6,7 @@ import Profile
 /// Empty Marker protocol
 public protocol P2PFromDappWalletRequestItemProtocol: Sendable, Hashable {}
 
-// MARK: - P2P.FromDapp.SignTransactionRequest
+// MARK: - P2P.FromDapp.SendTransactionWriteRequestItem
 public extension P2P.FromDapp {
 	/// Request from Dapp to wallet, to sign a transaction
 	///
@@ -14,7 +14,7 @@ public extension P2P.FromDapp {
 	///
 	/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
 	///
-	struct SignTransactionRequest: Sendable, Hashable, Decodable, P2PFromDappWalletRequestItemProtocol {
+	struct SendTransactionWriteRequestItem: Sendable, Hashable, Decodable, P2PFromDappWalletRequestItemProtocol {
 		public let version: Version
 
 		public let transactionManifest: TransactionManifest
@@ -32,7 +32,7 @@ public extension P2P.FromDapp {
 	}
 }
 
-public extension P2P.FromDapp.SignTransactionRequest {
+public extension P2P.FromDapp.SendTransactionWriteRequestItem {
 	private enum CodingKeys: String, CodingKey {
 		case blobsHex = "blobs"
 		case message

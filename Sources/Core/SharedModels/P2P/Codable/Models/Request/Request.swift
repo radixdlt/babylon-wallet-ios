@@ -57,7 +57,7 @@ public extension P2P.FromDapp.Request.Metadata {
 public extension P2P.FromDapp.Request {
 	private enum CodingKeys: String, CodingKey {
 		case id = "requestId"
-		case items = "payload"
+		case items
 		case metadata
 	}
 
@@ -116,14 +116,14 @@ DROP_ALL_PROOFS;
 CALL_METHOD ComponentAddress("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum") "complicated_method" Decimal("1") PreciseDecimal("2");
 """
 
-public extension P2P.FromDapp.OneTimeAccountAddressesRequest {
+public extension P2P.FromDapp.OneTimeAccountsReadRequestItem {
 	static let placeholder: Self = .init(
 		numberOfAddresses: 1,
 		isRequiringOwnershipProof: false
 	)
 }
 
-public extension P2P.FromDapp.SignTransactionRequest {
+public extension P2P.FromDapp.SendTransactionWriteRequestItem {
 	static let placeholder: Self = .init(transactionManifest: .placeholder, version: .default, message: nil)
 }
 
@@ -153,7 +153,7 @@ public extension P2P.FromDapp.Request {
 			id: id,
 			metadata: .placeholder,
 			items: [
-				.oneTimeAccountAddresses(.placeholder),
+				.oneTimeAccounts(.placeholder),
 			]
 		)
 	}
@@ -167,7 +167,7 @@ public extension P2P.FromDapp.Request {
 			id: id,
 			metadata: .placeholder,
 			items: [
-				.signTransaction(.placeholder),
+				.sendTransaction(.placeholder),
 			]
 		)
 	}
