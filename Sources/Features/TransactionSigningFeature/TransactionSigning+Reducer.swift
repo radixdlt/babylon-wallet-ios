@@ -90,8 +90,8 @@ public extension TransactionSigning {
 			return .none
 
 		case .internal(.view(.closeButtonTapped)):
-			return .run { [dismissedRequest = state.request] send in
-				await send(.delegate(.dismissed(dismissedRequest)))
+			return .run { [rejectedRequest = state.request] send in
+				await send(.delegate(.rejected(rejectedRequest)))
 			}
 
 		case .delegate:

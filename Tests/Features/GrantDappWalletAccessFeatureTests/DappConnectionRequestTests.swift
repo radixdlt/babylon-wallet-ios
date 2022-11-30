@@ -34,7 +34,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		await store.send(.view(.dismissButtonTapped))
 
 		// then
-		await store.receive(.delegate(.dismiss(requestItem)))
+		await store.receive(.delegate(.rejected(requestItem)))
 	}
 
 	func test_proceedWithConnectionRequest_whenTappedOnContinueButton_thenDisplayChooseAccounts() async {

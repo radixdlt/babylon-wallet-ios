@@ -3,7 +3,7 @@ import ErrorQueue
 import ProfileClient
 
 // MARK: - DappConnectionRequest
-public struct DappConnectionRequest: ReducerProtocol {
+public struct DappConnectionRequest: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 	public init() {}
@@ -19,8 +19,8 @@ public struct DappConnectionRequest: ReducerProtocol {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.dismissButtonTapped)):
-			return .run { [dismissedRequest = state.request] send in
-				await send(.delegate(.dismiss(dismissedRequest)))
+			return .run { [rejectedRequest = state.request] send in
+				await send(.delegate(.rejected(rejectedRequest)))
 			}
 
 		case .internal(.view(.continueButtonTapped)):
