@@ -692,6 +692,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			dependencies,
+			engineToolkit,
 			"EngineToolkitClient",
 			"GatewayAPI",
 			profile,

@@ -1,52 +1,63 @@
 import Common
 import Dependencies
+import EngineToolkit
 import EngineToolkitClient
 import Foundation
 import GatewayAPI
 import ProfileClient
 import TransactionClient
 
-public extension FaucetClient {
-	static func live() -> Self {
-		let isAllowedToUseFaucet: IsAllowedToUseFaucet = { accountAddress in
-			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-			@Dependency(\.userDefaultsClient) var userDefaultsClient
+// MARK: - FaucetClient + DependencyKey
+extension FaucetClient: DependencyKey {
+	public static let liveValue: Self = {
+		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		@Dependency(\.transactionClient) var transactionClient
+		@Dependency(\.engineToolkitClient) var engineToolkitClient
+		@Dependency(\.profileClient) var profileClient
 
-			guard let encodedEpoch = userDefaultsClient.dataForKey(lastUsedEpochUserDefaultsKey(for: accountAddress)) else {
+		let isAllowedToUseFaucet: IsAllowedToUseFaucet = { accountAddress in
+			guard let encodedEpoch = userDefaultsClient.dataForKey(epochsForAccountAddressesUserDefaultsKey) else {
 				return true
 			}
 
 			do {
-				let lastUsedEpoch = try JSONDecoder().decode(LastUsedEpoch.self, from: encodedEpoch)
+				let epochs = try JSONDecoder().decode(EpochsForAccountAddresses.self, from: encodedEpoch)
+				guard let lastUsedEpoch = epochs.getEpoch(for: accountAddress) else {
+					return true
+				}
+
 				let currentEpoch = try await gatewayAPIClient.getEpoch()
+
 				let treshold = 200
-				return Int(currentEpoch.rawValue) - lastUsedEpoch.epoch >= treshold
+				return currentEpoch.rawValue - lastUsedEpoch.rawValue >= treshold
 			} catch {
 				throw error
 			}
 		}
 
 		let saveLastUsedEpoch: SaveLastUsedEpoch = { faucetRequest in
-			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-			@Dependency(\.userDefaultsClient) var userDefaultsClient
-
 			let epoch = try await gatewayAPIClient.getEpoch()
 			let account = faucetRequest.recipientAccountAddress
-			let lastUsedEpoch = LastUsedEpoch(epoch: Int(epoch.rawValue))
+
+			var epochs: EpochsForAccountAddresses
+			if let encodedEpoch = userDefaultsClient.dataForKey(epochsForAccountAddressesUserDefaultsKey) {
+				epochs = try JSONDecoder().decode(EpochsForAccountAddresses.self, from: encodedEpoch)
+			} else {
+				epochs = .init()
+			}
+
+			epochs.update(epoch: epoch, for: account)
 
 			do {
-				let encodedEpoch = try JSONEncoder().encode(lastUsedEpoch)
-				await userDefaultsClient.setData(encodedEpoch, lastUsedEpochUserDefaultsKey(for: account))
+				let encodedEpochs = try JSONEncoder().encode(epochs)
+				await userDefaultsClient.setData(encodedEpochs, epochsForAccountAddressesUserDefaultsKey)
 			} catch {
 				throw error
 			}
 		}
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
-			@Dependency(\.transactionClient) var transactionClient
-			@Dependency(\.engineToolkitClient) var engineToolkitClient
-			@Dependency(\.profileClient) var profileClient
-
 			let networkID = await profileClient.getCurrentNetworkID()
 			let manifest = try engineToolkitClient.manifestForFaucet(
 				includeLockFeeInstruction: faucetRequest.addLockFeeInstructionToManifest,
@@ -71,20 +82,21 @@ public extension FaucetClient {
 			isAllowedToUseFaucet: isAllowedToUseFaucet,
 			saveLastUsedEpoch: saveLastUsedEpoch
 		)
-	}
+	}()
 }
 
-public extension FaucetClient {
-	static func lastUsedEpochUserDefaultsKey(for accountAddress: AccountAddress) -> String {
-		"faucet.lastUsedEpoch.account-\(accountAddress.address)"
-	}
+private extension FaucetClient {
+	static var epochsForAccountAddressesUserDefaultsKey: String { "faucet.epochsForAccountAddresses" }
 
-	struct LastUsedEpoch: Codable {
-		let epoch: Int
-	}
-}
+	struct EpochsForAccountAddresses: Sendable, Hashable, Codable {
+		private var dictionary = [AccountAddress: Epoch]()
 
-// MARK: - FaucetClient + DependencyKey
-extension FaucetClient: DependencyKey {
-	public static var liveValue: FaucetClient = .live()
+		mutating func update(epoch: Epoch, for accountAddress: AccountAddress) {
+			dictionary[accountAddress] = epoch
+		}
+
+		func getEpoch(for accountAddress: AccountAddress) -> Epoch? {
+			dictionary[accountAddress]
+		}
+	}
 }

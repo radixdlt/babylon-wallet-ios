@@ -1,3 +1,4 @@
+import Common
 import ComposableArchitecture
 import ErrorQueue
 import FaucetClient
@@ -21,8 +22,8 @@ public struct AccountPreferences: ReducerProtocol {
 			return loadIsAllowedToUseFaucet(&state)
 		case .internal(.view(.faucetButtonTapped)):
 			return .run { [address = state.address] send in
-				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: address, unlockKeychainPromptShowToUser: "What?"))
 				await send(.internal(.system(.disableGetFreeXRDButton)))
+				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: address, unlockKeychainPromptShowToUser: L10n.TransactionSigning.biometricsPrompt))
 				await send(.delegate(.refreshAccount(address)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
