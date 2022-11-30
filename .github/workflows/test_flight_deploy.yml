@@ -15,6 +15,13 @@ jobs:
           ruby-version: 3.1.2
           bundler-cache: true
 
+      - uses: oleksiyrudenko/gha-git-credentials@v2.1.1
+        with:
+          global: true
+          name: ${{ secrets.RADIX_BOT_USERNAME }}
+          actor: ${{ secrets.RADIX_BOT_USERNAME }}
+          token: ${{ secrets.RADIX_BOT_PAT }}
+
       - uses: webfactory/ssh-agent@v0.6.0
         with:
           ssh-private-key: |

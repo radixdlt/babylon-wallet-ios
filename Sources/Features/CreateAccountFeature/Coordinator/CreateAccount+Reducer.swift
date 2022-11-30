@@ -5,6 +5,7 @@ import Mnemonic
 import Profile
 import ProfileClient
 import LocalAuthenticationClient
+import Resources
 import TransactionClient
 
 // MARK: - MnemonicGenerator
@@ -98,6 +99,7 @@ public extension CreateAccount {
                                 await send(.internal(.system(.createdNewAccountResult(
                                         TaskResult {
                                                 let request = CreateAnotherAccountRequest(
+                                                        keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
                                                         accountName: accountName
                                                 )
                                                 return try await profileClient.createVirtualAccount(

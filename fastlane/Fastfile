@@ -10,7 +10,13 @@ platform :ios do
         Dotenv.load ".env.ios"
     end
 
-    desc "Runs tests"
+    desc "Builds and archives the app"
+    lane :build do
+        install_distribution_certificate
+        build_app
+    end
+
+    desc "Runs test"
     lane :tests do
         run_tests
     end

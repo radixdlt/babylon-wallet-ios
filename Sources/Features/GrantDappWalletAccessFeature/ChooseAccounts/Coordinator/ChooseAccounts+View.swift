@@ -81,8 +81,8 @@ public extension ChooseAccounts.View {
 	}
 }
 
-// MARK: - P2P.FromDapp.OneTimeAccountAddressesRequest.Mode + CustomStringConvertible
-extension P2P.FromDapp.OneTimeAccountAddressesRequest.Mode: CustomStringConvertible {
+// MARK: - P2P.FromDapp.OneTimeAccountsReadRequestItem.Mode + CustomStringConvertible
+extension P2P.FromDapp.OneTimeAccountsReadRequestItem.Mode: CustomStringConvertible {
 	public var description: String {
 		switch self {
 		case let .exactly(exactly):
@@ -118,7 +118,7 @@ private extension ChooseAccounts.View {
 extension ChooseAccounts.View {
 	struct ViewState: Equatable {
 		var canProceed: Bool
-		let oneTimeAccountAddressesRequest: P2P.FromDapp.OneTimeAccountAddressesRequest
+		let oneTimeAccountAddressesRequest: P2P.FromDapp.OneTimeAccountsReadRequestItem
 		let requestFromDapp: P2P.FromDapp.Request
 
 		init(state: ChooseAccounts.State) {

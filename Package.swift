@@ -19,7 +19,7 @@ package.dependencies += [
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.21"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.3"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.40"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.44"),
 
 	.package(url: "https://github.com/apple/swift-collections", from: "1.0.3"),
 
@@ -251,12 +251,14 @@ package.addModules([
 		name: "AccountDetailsFeature",
 		dependencies: [
 			"AccountListFeature",
+			"AccountPreferencesFeature",
 			"Asset",
 			"AssetsViewFeature",
 			"DesignSystem",
 			engineToolkit,
 			profile,
 			tca,
+
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -280,6 +282,8 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"DesignSystem",
+			"ErrorQueue",
+			"FaucetClient",
 			tca,
 		],
 		tests: .yes(
@@ -685,6 +689,19 @@ package.addModules([
 		tests: .no
 	),
 	.client(
+		name: "FaucetClient",
+		dependencies: [
+			"Common",
+			dependencies,
+			engineToolkit,
+			"EngineToolkitClient",
+			"GatewayAPI",
+			profile,
+			"ProfileClient",
+			"TransactionClient",
+		], tests: .no
+	),
+	.client(
 		name: "GatewayAPI",
 		dependencies: [
 			.product(name: "AnyCodable", package: "AnyCodable"),
@@ -798,6 +815,7 @@ package.addModules([
 		dependencies: [
 			bite,
 			bigInt,
+			"DesignSystem",
 			engineToolkit,
 			legibleError,
 			profile, // Address

@@ -3,6 +3,7 @@ import EngineToolkit
 import Foundation
 import Profile
 import SharedModels
+import struct TransactionClient.MakeTransactionHeaderInput
 
 // MARK: - TransactionSigning.State
 public extension TransactionSigning {
@@ -12,13 +13,16 @@ public extension TransactionSigning {
 		public var transactionManifestWithoutLockFee: TransactionManifest
 		public var transactionWithLockFee: TransactionManifest?
 		public var transactionWithLockFeeString: String?
+		public var makeTransactionHeaderInput: MakeTransactionHeaderInput
 
 		public init(
+			makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 			request: P2P.SignTransactionRequestToHandle,
 			isSigningTX: Bool = false,
 			transactionWithLockFee: TransactionManifest? = nil,
 			transactionWithLockFeeString: String? = nil
 		) {
+			self.makeTransactionHeaderInput = makeTransactionHeaderInput
 			self.request = request
 			self.isSigningTX = isSigningTX
 			transactionManifestWithoutLockFee = request.requestItem.transactionManifest
@@ -75,11 +79,6 @@ public extension TransactionManifest {
 }
 
 public extension TransactionSigning.State {
-//	static let placeholder = Self(
-	//        requestFromClient: .placeholderOneTimeAccount,
-//		addressOfSigner: try! AccountAddress(address: "account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064"),
-//		transactionManifest: .mock
-//	)
 	static var placeholder: Self {
 		fatalError()
 	}

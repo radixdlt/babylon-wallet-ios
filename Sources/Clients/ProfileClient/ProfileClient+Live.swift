@@ -82,7 +82,11 @@ public extension ProfileClient {
 			},
 			deleteProfileAndFactorSources: {
 				do {
-					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot()
+					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot(
+						// This should not be be shown due to settings of profile snapshot
+						// item when it was originally stored.
+						authenticationPrompt: "Read profile in order get reference to secrects to delete"
+					)
 				} catch {
 					try await keychainClient.removeProfileSnapshot()
 				}
@@ -121,57 +125,57 @@ public extension ProfileClient {
 						networkID: networkID,
 						displayName: request.accountName,
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-							try await keychainClient.loadFactorSourceMnemonic(reference: reference)
+							try await keychainClient
+								.loadFactorSourceMnemonic(
+									reference: reference,
+									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+								)
 						}
 					)
 				}
 			},
 			lookupAccountByAddress: lookupAccountByAddress,
-			privateKeysForAddresses: { request in
+			signersForAccountsGivenAddresses: { request in
 
-				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { [keychainClient] reference in
-					try await keychainClient.loadFactorSourceMnemonic(reference: reference)
+				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { reference in
+					try await keychainClient.loadFactorSourceMnemonic(
+						reference: reference,
+						authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+					)
 				}
 
-				func getPrivateKeysFromAddresses() async throws -> OrderedSet<PrivateKey>? {
+				func getAccountSignersFromAddresses() async throws -> NonEmpty<OrderedSet<SignersOfAccount>>? {
 					guard let addresses = NonEmpty(rawValue: request.addresses) else { return nil }
 
 					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
 
-					let matrix: [Set<PrivateKey>] = try await profileHolder.getAsync { profile -> [Set<PrivateKey>] in
-						try await accounts.asyncMap { account -> Set<PrivateKey> in
-							try await profile.withPrivateKeys(
+					let matrix = try await profileHolder.getAsync { profile in
+						try await accounts.asyncMap { account in
+							try await profile.signersOf(
 								of: account,
 								mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-							) { (keys: NonEmpty<Set<PrivateKey>>) -> Set<PrivateKey> in
-								keys.rawValue
-							}
+							)
 						}
 					}
-					var privateKeys = OrderedSet<PrivateKey>()
+					var signers = OrderedSet<SignersOfAccount>()
 					matrix.forEach {
-						privateKeys.append(contentsOf: $0)
+						signers.append(contentsOf: $0)
 					}
-					return privateKeys
+					return NonEmpty(rawValue: signers)
 				}
 
-				func getPrivateKeys() async throws -> OrderedSet<PrivateKey> {
-					guard let fromAddresses = try? await getPrivateKeysFromAddresses() else {
-						// TransactionManifest does not reference any accounts => use any account!
-						return try await profileHolder.getAsync { profile in
-							try await profile.withPrivateKeys(networkID: request.networkID, kind: .account, entityIndex: 0, mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference) {
-								OrderedSet($0)
-							}
-						}
+				guard let fromAddresses = try? await getAccountSignersFromAddresses() else {
+					// TransactionManifest does not reference any accounts => use any account!
+					return try await profileHolder.getAsync { profile in
+						try await profile.signersOf(
+							networkID: request.networkID,
+							entityType: OnNetwork.Account.self,
+							entityIndex: 0,
+							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
+						)
 					}
-					return fromAddresses
 				}
-
-				guard let nonEmptyKeys = try await NonEmpty(rawValue: getPrivateKeys()) else {
-					throw FoundNoKeysForAddresses()
-				}
-
-				return nonEmptyKeys
+				return fromAddresses
 			}
 		)
 	}()
@@ -180,8 +184,8 @@ public extension ProfileClient {
 // MARK: - ExpectedEntityToBeAccount
 struct ExpectedEntityToBeAccount: Swift.Error {}
 
-// MARK: - FoundNoKeysForAddresses
-struct FoundNoKeysForAddresses: Swift.Error {}
+// MARK: - FoundNoSignersForAccounts
+struct FoundNoSignersForAccounts: Swift.Error {}
 
 // MARK: - NoProfile
 struct NoProfile: Swift.Error {}

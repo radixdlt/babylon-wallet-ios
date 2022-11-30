@@ -2,6 +2,9 @@
 
 "accountList.row.copyTitle" = "Copy";
 
+"accountPreferences.title" = "Account preferences";
+"accountPreferences.faucetButtonTitle" = "Get free XRD";
+
 "aggregatedValue.title" = "Total value";
 
 "assetsView.badges" = "Badges";
@@ -20,6 +23,8 @@
 "createAccount.explanation" = "This can be changed any time";
 "createAccount.placeholder" = "e.g. My First Account";
 "createAccount.subtitle" = "What would you like to call your account?";
+"createAccount.biometricsPrompt" = "Unlock secret used to create new account.";
+
 
 "home.header.subtitle" = "Welcome, here are all your accounts on the Radix Network";
 "home.header.title" = "Radix Wallet";
@@ -85,3 +90,4 @@
 
 "transactionSigning.signTransactionButtonTitle" = "Sign Transaction";
 "transactionSigning.title" = "Sign TX";
+"transactionSigning.biometricsPrompt" = "Unlock secret used to sign TX";

@@ -1,9 +1,19 @@
 import Foundation
+import Profile
 
 // MARK: AccountPreferences.State
 public extension AccountPreferences {
 	// MARK: State
 	struct State: Equatable {
-		public init() {}
+		public let address: AccountAddress
+		public var isFaucetButtonEnabled: Bool
+
+		public init(
+			address: AccountAddress,
+			isFaucetButtonEnabled: Bool = false
+		) {
+			self.address = address
+			self.isFaucetButtonEnabled = isFaucetButtonEnabled
+		}
 	}
 }

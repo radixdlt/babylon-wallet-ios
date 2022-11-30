@@ -43,16 +43,6 @@ public struct NoKnownAddressForNetworkID: LocalizedError {
 }
 
 public extension EngineToolkitClient {
-	func manifestForOnLedgerAccount(
-		networkID: NetworkID,
-		publicKey: PublicKey
-	) throws -> TransactionManifest {
-		try manifestForOnLedgerAccount(
-			networkID: networkID,
-			publicKey: publicKey.intoEngine()
-		)
-	}
-
 	func lockFeeCallMethod(
 		address: ComponentAddress,
 		fee: Decimal = 10.0
@@ -84,49 +74,57 @@ public extension EngineToolkitClient {
 		return lockFeeCallMethod(address: faucetAddress, fee: fee)
 	}
 
-	func manifestForOnLedgerAccount(
+	func manifestForFaucet(
+		includeLockFeeInstruction: Bool,
 		networkID: NetworkID,
-		publicKey: Engine.PublicKey
+		accountAddress: AccountAddress
 	) throws -> TransactionManifest {
-		let engineToolkit = EngineToolkit()
-
-		let nonFungibleAddressString = try engineToolkit.deriveNonFungibleAddressFromPublicKeyRequest(
-			request: publicKey
+		try manifestForFaucet(
+			includeLockFeeInstruction: includeLockFeeInstruction,
+			networkID: networkID,
+			componentAddress: .init(address: accountAddress.address)
 		)
-		.get()
-		.nonFungibleAddress
+	}
 
+	/// CALL_METHOD
+	///     ComponentAddress("${faucet_component}")
+	///     "lock_fee"
+	///     Decimal("10");
+	/// CALL_METHOD
+	///     ComponentAddress("${faucet_component}")
+	///     "free_xrd";
+	///
+	/// CALL_METHOD
+	///     ComponentAddress("${account_component_address}")
+	///     "deposit"
+	///     Expression("ENTIRE_WORKTOP");
+	func manifestForFaucet(
+		includeLockFeeInstruction: Bool,
+		networkID: NetworkID,
+		componentAddress: ComponentAddress
+	) throws -> TransactionManifest {
 		let knownAddresses = try knownAddresses(for: networkID)
 		let faucetAddress = knownAddresses.faucet
-		let nonFungibleAddress = try NonFungibleAddress(hex: nonFungibleAddressString)
-
-		return TransactionManifest {
-			lockFeeCallMethod(address: faucetAddress)
+		var instructions: [any InstructionProtocol] = [
 			CallMethod(
 				receiver: faucetAddress,
 				methodName: "free"
-			)
+			),
 
-			let xrdBucket: Bucket = "xrd"
-
-			TakeFromWorktop(resourceAddress: knownAddresses.xrd, bucket: xrdBucket)
-
-			CallFunction(
-				packageAddress: knownAddresses.createAccountComponent,
-				blueprintName: "Account",
-				functionName: "new_with_resource"
+			CallMethod(
+				receiver: componentAddress,
+				methodName: "deposit_batch"
 			) {
-				Enum("Protected") {
-					Enum("ProofRule") {
-						Enum("Require") {
-							Enum("StaticNonFungible") {
-								nonFungibleAddress
-							}
-						}
-					}
-				}
-				xrdBucket
-			}
+				Expression("ENTIRE_WORKTOP")
+			},
+		]
+
+		if includeLockFeeInstruction {
+			instructions.insert(
+				lockFeeCallMethod(address: faucetAddress),
+				at: 0
+			)
 		}
+		return .init(instructions: .json(instructions.map { $0.embed() }))
 	}
 }

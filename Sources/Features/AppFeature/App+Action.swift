@@ -8,7 +8,7 @@ import SplashFeature
 // MARK: - App.Action
 public extension App {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -17,7 +17,7 @@ public extension App {
 
 // MARK: - App.Action.ChildAction
 public extension App.Action {
-	enum ChildAction: Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case main(Main.Action)
 		case onboarding(Onboarding.Action)
 		case splash(Splash.Action)
@@ -26,7 +26,7 @@ public extension App.Action {
 
 // MARK: - App.Action.ViewAction
 public extension App.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 		case errorAlertDismissButtonTapped
 		case deleteIncompatibleProfile
@@ -35,7 +35,7 @@ public extension App.Action {
 
 // MARK: - App.Action.InternalAction
 public extension App.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -43,7 +43,7 @@ public extension App.Action {
 
 // MARK: - App.Action.SystemAction
 public extension App.Action {
-	enum SystemAction: Equatable {
+	enum SystemAction: Sendable, Equatable {
 		case deletedIncompatibleProfile
 		case displayErrorAlert(App.UserFacingError)
 		case injectProfileIntoProfileClientResult(TaskResult<Profile>)

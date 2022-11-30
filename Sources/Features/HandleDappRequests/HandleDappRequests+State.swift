@@ -66,7 +66,7 @@ public extension HandleDappRequests.State {
 
 		public init(requestItemToHandle: P2P.RequestItemToHandle) {
 			switch requestItemToHandle.requestItem {
-			case let .oneTimeAccountAddresses(item):
+			case let .oneTimeAccounts(item):
 				self = .grantDappWalletAccess(
 					.init(request: .init(
 						requestItem: item,
@@ -74,7 +74,7 @@ public extension HandleDappRequests.State {
 					)
 					)
 				)
-			case let .signTransaction(item):
+			case let .sendTransaction(item):
 				self = .transactionSigning(
 					.init(
 						request: .init(

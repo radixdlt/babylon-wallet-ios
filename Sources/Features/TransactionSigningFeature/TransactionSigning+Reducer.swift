@@ -2,10 +2,11 @@ import ComposableArchitecture
 import EngineToolkitClient
 import ErrorQueue
 import Foundation
+import Resources
 import TransactionClient
 
 // MARK: - TransactionSigning
-public struct TransactionSigning: ReducerProtocol {
+public struct TransactionSigning: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.profileClient) var profileClient
@@ -59,27 +60,33 @@ public extension TransactionSigning {
 
 			state.isSigningTX = true
 
-			return .run { [transactionClient] send in
-				await send(.internal(.signTransactionResult(TaskResult {
-					try await transactionClient.signAndSubmitTransaction(transactionWithLockFee).txID
-				})))
+			let signRequest = SignManifestRequest(
+				manifestToSign: transactionWithLockFee,
+				makeTransactionHeaderInput: state.makeTransactionHeaderInput,
+				unlockKeychainPromptShowToUser: L10n.TransactionSigning.biometricsPrompt
+			)
+
+			return .run { send in
+				await send(.internal(.signTransactionResult(
+					await transactionClient.signAndSubmitTransaction(signRequest)
+				)))
 			}
 
-		case let .internal(.signTransactionResult(.success(txid))):
+		case let .internal(.signTransactionResult(.success(txID))):
 			state.isSigningTX = false
 
 			return .run { [request = state.request] send in
 				await send(.delegate(
 					.signedTXAndSubmittedToGateway(
-						txid,
+						txID,
 						request: request
 					)
 				))
 			}
 
-		case let .internal(.signTransactionResult(.failure(error))):
+		case let .internal(.signTransactionResult(.failure(transactionFailure))):
 			state.isSigningTX = false
-			errorQueue.schedule(error)
+			errorQueue.schedule(transactionFailure)
 			return .none
 
 		case .internal(.view(.closeButtonTapped)):

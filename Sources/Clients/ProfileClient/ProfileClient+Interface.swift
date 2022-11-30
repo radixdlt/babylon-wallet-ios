@@ -50,19 +50,26 @@ public struct ProfileClient: DependencyKey, Sendable {
 	public var createVirtualAccount: CreateVirtualAccount
 	public var lookupAccountByAddress: LookupAccountByAddress
 
-	// FIXME: - mainnet remove this and change to `async throws -> ([Prompt]) async throws -> NonEmpty<Set<Signer>>` when Profile supports multiple factor sources of different kinds.
-	public var privateKeysForAddresses: PrivateKeysForAddresses
+	public var signersForAccountsGivenAddresses: SignersForAccountsGivenAddresses
 }
 
-// MARK: - PrivateKeysForAddressesRequest
-public struct PrivateKeysForAddressesRequest: Sendable, Hashable {
+// MARK: - SignersForAccountsGivenAddressesRequest
+public struct SignersForAccountsGivenAddressesRequest: Sendable, Hashable {
+	public let keychainAccessFactorSourcesAuthPrompt: String
+
 	// Might be empty! And in case of empty...
 	public let addresses: OrderedSet<AccountAddress>
 	// ... we will use this NetworkID to get the first account and used that to sign
 	public let networkID: NetworkID
-	public init(addresses: OrderedSet<AccountAddress>, networkID: NetworkID) {
-		self.addresses = addresses
+
+	public init(
+		networkID: NetworkID,
+		addresses: OrderedSet<AccountAddress>,
+		keychainAccessFactorSourcesAuthPrompt: String
+	) {
 		self.networkID = networkID
+		self.addresses = addresses
+		self.keychainAccessFactorSourcesAuthPrompt = keychainAccessFactorSourcesAuthPrompt
 	}
 }
 
@@ -89,9 +96,10 @@ public extension ProfileClient {
 	typealias CreateVirtualAccount = @Sendable (CreateAnotherAccountRequest) async throws -> OnNetwork.Account
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 
-	// FIXME: - mainnet remove this and change to `async throws -> ([Prompt]) async throws -> NonEmpty<Set<Signer>>` when Profile supports multiple factor sources of different kinds.
-	typealias PrivateKeysForAddresses = @Sendable (PrivateKeysForAddressesRequest) async throws -> NonEmpty<OrderedSet<PrivateKey>>
+	typealias SignersForAccountsGivenAddresses = @Sendable (SignersForAccountsGivenAddressesRequest) async throws -> NonEmpty<OrderedSet<SignersOfAccount>>
 }
+
+public typealias SignersOfAccount = SignersOf<OnNetwork.Account>
 
 // MARK: - AccountSignature
 public struct AccountSignature: Sendable, Hashable {
@@ -101,11 +109,14 @@ public struct AccountSignature: Sendable, Hashable {
 
 // MARK: - CreateAnotherAccountRequest
 public struct CreateAnotherAccountRequest: Sendable, Hashable {
+	public let keychainAccessFactorSourcesAuthPrompt: String
 	public let accountName: String?
 
 	public init(
+		keychainAccessFactorSourcesAuthPrompt: String,
 		accountName: String?
 	) {
+		self.keychainAccessFactorSourcesAuthPrompt = keychainAccessFactorSourcesAuthPrompt
 		self.accountName = accountName
 	}
 }

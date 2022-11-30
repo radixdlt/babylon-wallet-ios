@@ -1,8 +1,8 @@
 import Foundation
 
-// MARK: - P2P.FromDapp.OneTimeAccountAddressesRequest
+// MARK: - P2P.FromDapp.OneTimeAccountsReadRequestItem
 public extension P2P.FromDapp {
-	struct OneTimeAccountAddressesRequest:
+	struct OneTimeAccountsReadRequestItem:
 		Sendable,
 		Hashable,
 		Decodable,
@@ -21,7 +21,7 @@ public extension P2P.FromDapp {
 	}
 }
 
-public extension P2P.FromDapp.OneTimeAccountAddressesRequest {
+public extension P2P.FromDapp.OneTimeAccountsReadRequestItem {
 	private enum CodingKeys: String, CodingKey {
 		case isRequiringOwnershipProof = "requiresProofOfOwnership"
 		case numberOfAddresses
@@ -36,15 +36,15 @@ public extension P2P.FromDapp.OneTimeAccountAddressesRequest {
 	}
 }
 
-// MARK: - P2P.FromDapp.OneTimeAccountAddressesRequest.Mode
-public extension P2P.FromDapp.OneTimeAccountAddressesRequest {
+// MARK: - P2P.FromDapp.OneTimeAccountsReadRequestItem.Mode
+public extension P2P.FromDapp.OneTimeAccountsReadRequestItem {
 	enum Mode: Sendable, Hashable {
 		case oneOrMore
 		case exactly(NumberOfAddresses)
 	}
 }
 
-public extension P2P.FromDapp.OneTimeAccountAddressesRequest.Mode {
+public extension P2P.FromDapp.OneTimeAccountsReadRequestItem.Mode {
 	init(maybeUInt: UInt?) throws {
 		if let uint = maybeUInt {
 			self = try .exactly(.init(oneOrMore: uint))
@@ -67,13 +67,13 @@ public extension P2P.FromDapp.OneTimeAccountAddressesRequest.Mode {
 }
 
 #if DEBUG
-extension P2P.FromDapp.OneTimeAccountAddressesRequest.Mode: ExpressibleByIntegerLiteral {
+extension P2P.FromDapp.OneTimeAccountsReadRequestItem.Mode: ExpressibleByIntegerLiteral {
 	public init(integerLiteral value: UInt) {
 		try! self.init(maybeUInt: value)
 	}
 }
 
-extension P2P.FromDapp.OneTimeAccountAddressesRequest.Mode.NumberOfAddresses: ExpressibleByIntegerLiteral {
+extension P2P.FromDapp.OneTimeAccountsReadRequestItem.Mode.NumberOfAddresses: ExpressibleByIntegerLiteral {
 	public init(integerLiteral value: UInt) {
 		try! self.init(oneOrMore: value)
 	}
