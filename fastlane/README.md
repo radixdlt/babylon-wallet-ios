@@ -39,6 +39,14 @@ Runs test
 
 Builds and deploys beta app to TestFlight
 
+### ios push_to_main_test
+
+```sh
+[bundle exec] fastlane ios push_to_main_test
+```
+
+
+
 ### ios install_certificates
 
 ```sh

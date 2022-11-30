@@ -35,6 +35,15 @@ platform :ios do
         push_to_git_remote
     end
 
+    lane :push_to_main_test do
+        install_distribution_certificate
+        version = bump_version
+        commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
+        push_to_git_remote(
+            branch: "main"
+        )
+    end
+
     desc "Installs certificates on the machine"
     lane :install_certificates do
         install_development_certificate
