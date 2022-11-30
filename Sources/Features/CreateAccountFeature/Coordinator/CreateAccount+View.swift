@@ -169,11 +169,11 @@ struct CreateAccount_Previews: PreviewProvider {
 	static var previews: some View {
 		registerFonts()
 
-		return CreateAccount.View(
-			store: .init(
-                initialState: .init(shouldCreateProfile: false),
-				reducer: CreateAccount()
-			)
-		)
+                return CreateAccount.View(
+                        store: .init(
+                                initialState: .init(shouldCreateProfile: false),
+                                reducer: CreateAccount()
+                        )
+                )
 	}
 }
