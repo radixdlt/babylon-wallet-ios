@@ -40,7 +40,7 @@ public extension ChooseAccounts.Row.View {
 			}
 			.padding(.medium1)
 			.background(
-				LinearGradient.app.account1
+				LinearGradient.app.account0
 					.brightness(viewStore.isSelected ? -0.1 : 0)
 			)
 			.cornerRadius(.small1)
