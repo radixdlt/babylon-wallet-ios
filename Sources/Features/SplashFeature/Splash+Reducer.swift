@@ -19,7 +19,7 @@ public struct Splash: Sendable, ReducerProtocol {
 			}
 
 		case .internal(.system(.loadProfile)):
-			return .run { [profileLoader] send in
+			return .run { send in
 				let result = await profileLoader.loadProfile()
 				await send(.internal(.system(.loadProfileResult(
 					result
