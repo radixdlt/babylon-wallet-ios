@@ -795,6 +795,7 @@ package.addModules([
 		dependencies: [
 			bite,
 			bigInt,
+			"DesignSystem",
 			engineToolkit,
 			legibleError,
 			profile, // Address
