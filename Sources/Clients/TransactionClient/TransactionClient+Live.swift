@@ -121,7 +121,7 @@ public extension TransactionClient {
 			}
 
 			guard !response.duplicate else {
-				return .failure(.invalidTXWasDuplicate)
+				return .failure(.invalidTXWasDuplicate(txID: txID))
 			}
 
 			let transactionIdentifier = GatewayAPI.TransactionLookupIdentifier(
@@ -157,7 +157,7 @@ public extension TransactionClient {
 				}
 			}
 			guard txStatus.status == .succeeded else {
-				return .failure(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus.status))
+				return .failure(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus.status == .rejected ? .rejected : .failed))
 			}
 
 			return .success(txID)
@@ -361,13 +361,19 @@ struct FailedToGetDetailsOfSuccessfullySubmittedTX: LocalizedError, Equatable {
 /// been submitted successfully. Or we might have successfully submitted the TX but failed to get details about it.
 public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 	case failedToSubmitTX
-	case invalidTXWasDuplicate
+	case invalidTXWasDuplicate(txID: TXID)
 
 	/// Failed to poll, maybe TX was submitted successfuly?
 	case failedToPollTX(txID: TXID, error: FailedToPollError)
 
 	case failedToGetTransactionStatus(txID: TXID, error: FailedToGetTransactionStatus)
-	case invalidTXWasSubmittedButNotSuccessful(txID: TXID, status: GatewayAPI.TransactionStatus.Status)
+	case invalidTXWasSubmittedButNotSuccessful(txID: TXID, status: TXFailureStatus)
+}
+
+// MARK: - TXFailureStatus
+public enum TXFailureStatus: String, Swift.Error, Sendable, Hashable {
+	case rejected
+	case failed
 }
 
 // MARK: - FailedToPollError

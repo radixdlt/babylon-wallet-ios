@@ -31,30 +31,65 @@ public extension P2P.ToDapp.Response {
 	struct Failure: Sendable, Hashable, Encodable, Identifiable {
 		/// *MUST* match an ID from an incoming request from Dapp.
 		public let id: P2P.FromDapp.Request.ID
-		public let error: P2P.ToDapp.Error
+
+		public let kind: P2P.ToDapp.Response.Failure.Kind
 		public let message: String?
-		public init(id: P2P.FromDapp.Request.ID, error: P2P.ToDapp.Error, message: String?) {
+
+		public init(
+			id: P2P.FromDapp.Request.ID,
+			kind: P2P.ToDapp.Response.Failure.Kind,
+			message: String?
+		) {
 			self.id = id
-			self.error = error
+			self.kind = kind
 			self.message = message
+		}
+
+		public static func rejected(_ request: P2P.FromDapp.Request) -> Self {
+			Self(id: request.id, kind: .rejectedByUser, message: nil)
+		}
+
+		public static func request(_ request: P2P.FromDapp.Request, failedWithError error: Kind.Error, message: String?) -> Self {
+			Self(id: request.id, kind: .error(error), message: message)
 		}
 	}
 }
 
-// MARK: - P2P.ToDapp.Error
-public extension P2P.ToDapp {
-	enum Error: String, Swift.Error, Sendable, Encodable, Hashable {
+// MARK: - P2P.ToDapp.Response.Failure.Kind
+public extension P2P.ToDapp.Response.Failure {
+	enum Kind: Sendable, Encodable, Hashable {
+		public var rawValue: String {
+			switch self {
+			case .rejectedByUser: return "rejectedByUser"
+			case let .error(error):
+				return error.rawValue
+			}
+		}
+
 		case rejectedByUser
+		case error(Error)
+		public func encode(to encoder: Encoder) throws {
+			var singleValueContainer = encoder.singleValueContainer()
+			try singleValueContainer.encode(rawValue)
+		}
+	}
+}
+
+// MARK: - P2P.ToDapp.Response.Failure.Kind.Error
+public extension P2P.ToDapp.Response.Failure.Kind {
+	enum Error: String, Sendable, Swift.Error, Hashable {
+		case failedToPrepareTransactoin
+		case failedToCompileTransaction
+		case failedToSignTransaction
+		case failedToSubmitTransaction
+		case failedToPollSubmittedTransaction
+		case submittedTransactionWasDuplicate
+		case submittedTransactionHasFailedTransactionStatus
+		case submittedTransactionHasRejectedTransactionStatus
 	}
 }
 
 public extension P2P.ToDapp.Response {
-	static func reject(
-		request: P2P.FromDapp.Request
-	) -> Self {
-		.failure(.init(id: request.id, error: .rejectedByUser, message: nil))
-	}
-
 	static func to(
 		request: P2P.FromDapp.Request,
 		items responseItems: [P2P.ToDapp.WalletResponseItem]
@@ -85,13 +120,13 @@ public extension P2P.ToDapp.Response.Failure {
 	private enum CodingKeys: String, CodingKey {
 		case id = "requestId"
 		case message
-		case error
+		case kind = "error"
 	}
 
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(id, forKey: .id)
-		try container.encode(error, forKey: .error)
+		try container.encode(kind, forKey: .kind)
 		try container.encodeIfPresent(message, forKey: .message)
 	}
 }
