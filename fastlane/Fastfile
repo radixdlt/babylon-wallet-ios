@@ -37,7 +37,7 @@ platform :ios do
 
     lane :push_to_main_test do
         push_to_git_remote(
-            branch: "main"
+            remote_branch: "main"
         )
     end
 
