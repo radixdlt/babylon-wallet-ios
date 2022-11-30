@@ -2,6 +2,9 @@
 
 "accountList.row.copyTitle" = "Copy";
 
+"accountPreferences.title" = "Account preferences";
+"accountPreferences.faucetButtonTitle" = "Get free XRD";
+
 "aggregatedValue.title" = "Total value";
 
 "assetsView.badges" = "Badges";

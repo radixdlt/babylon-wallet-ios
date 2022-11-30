@@ -41,7 +41,7 @@ public extension AccountDetails.Action {
 public extension AccountDetails.Action {
 	enum DelegateAction: Equatable {
 		case dismissAccountDetails
-		case displayAccountPreferences
+		case displayAccountPreferences(AccountAddress)
 		case copyAddress(AccountAddress)
 		case displayTransfer
 		case refresh(AccountAddress)

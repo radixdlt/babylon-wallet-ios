@@ -33,7 +33,8 @@ public extension AccountDetails.View {
 						titleText: viewStore.displayName,
 						leadingItem: BackButton {
 							viewStore.send(.dismissAccountDetailsButtonTapped)
-						}
+						},
+						trailingItem: accountPreferencesButton(with: viewStore)
 					)
 					.foregroundColor(.app.white)
 					.padding([.horizontal, .top], .medium3)
@@ -93,7 +94,6 @@ private extension AccountDetails.View {
 		})
 	}
 
-	// TODO: use when account preferences screen is implemented
 	func accountPreferencesButton(with viewStore: AccountDetailsViewStore) -> some View {
 		Button(
 			action: {
