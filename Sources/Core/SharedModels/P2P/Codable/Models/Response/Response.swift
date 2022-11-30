@@ -39,7 +39,7 @@ public extension P2P.ToDapp.Response {
 public extension P2P.ToDapp.Response {
 	private enum CodingKeys: String, CodingKey {
 		case id = "requestId"
-		case items = "payload"
+		case items
 	}
 
 	func encode(to encoder: Encoder) throws {
