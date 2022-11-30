@@ -1,4 +1,3 @@
-import Dependencies
 import Foundation
 
 // MARK: - LocalAuthenticationClient
@@ -36,7 +35,7 @@ import Foundation
 ///          }
 ///      }
 ///
-public struct LocalAuthenticationClient: DependencyKey {
+public struct LocalAuthenticationClient: Sendable {
 	/// The return value (`LocalAuthenticationConfig`) might be `nil` if app goes to background or stuff like that.
 	public typealias QueryConfig = @Sendable () async throws -> LocalAuthenticationConfig
 
@@ -44,12 +43,5 @@ public struct LocalAuthenticationClient: DependencyKey {
 
 	public init(queryConfig: @escaping QueryConfig) {
 		self.queryConfig = queryConfig
-	}
-}
-
-public extension DependencyValues {
-	var localAuthenticationClient: LocalAuthenticationClient {
-		get { self[LocalAuthenticationClient.self] }
-		set { self[LocalAuthenticationClient.self] = newValue }
 	}
 }

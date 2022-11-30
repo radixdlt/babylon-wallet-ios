@@ -8,9 +8,9 @@ import SwiftUI
 public extension Onboarding {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: Store<State, Action>
+		private let store: StoreOf<Onboarding>
 
-		public init(store: Store<State, Action>) {
+		public init(store: StoreOf<Onboarding>) {
 			self.store = store
 		}
 	}

@@ -1,7 +1,9 @@
+import Dependencies
 import LocalAuthentication
 
-public extension LocalAuthenticationClient {
-	static let liveValue: Self = .init(
+// MARK: - LocalAuthenticationClient + DependencyKey
+extension LocalAuthenticationClient: DependencyKey {
+	public static let liveValue: Self = .init(
 		queryConfig: {
 			try await LAContext().queryLocalAuthenticationConfig()
 		}
