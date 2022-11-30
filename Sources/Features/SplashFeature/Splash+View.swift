@@ -22,18 +22,17 @@ public extension Splash.View {
 			store,
 			observe: ViewState.init(state:),
 			send: { .view($0) }
-                ) { viewStore in
-                        ForceFullScreen {
-                                Image(asset: AssetResource.splash)
-                                        .resizable()
-                                        .scaledToFill()
-                                
-                        }
-                        .edgesIgnoringSafeArea(.all)
-                        .onAppear {
-                                viewStore.send(.viewAppeared)
-                        }
-                }
+		) { viewStore in
+			ForceFullScreen {
+				Image(asset: AssetResource.splash)
+					.resizable()
+					.scaledToFill()
+			}
+			.edgesIgnoringSafeArea(.all)
+			.onAppear {
+				viewStore.send(.viewAppeared)
+			}
+		}
 	}
 }
 

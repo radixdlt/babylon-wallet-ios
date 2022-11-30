@@ -341,25 +341,25 @@ package.addModules([
 		)
 	),
 	.feature(
-                name: "CreateAccountFeature",
-                dependencies: [
-                        "Common",
-                        "DesignSystem",
-                        engineToolkit,
-                        "ErrorQueue",
-                        "GatewayAPI",
-                        "KeychainClientDependency",
-                        "LocalAuthenticationClient",
-                        "ProfileClient",
-                        "TransactionClient",
-                        tca,
-                ],
-                tests: .yes(
-                        dependencies: [
-                                "TestUtils",
-                                "UserDefaultsClient",
-                        ]
-                )
+		name: "CreateAccountFeature",
+		dependencies: [
+			"Common",
+			"DesignSystem",
+			engineToolkit,
+			"ErrorQueue",
+			"GatewayAPI",
+			"KeychainClientDependency",
+			"LocalAuthenticationClient",
+			"ProfileClient",
+			"TransactionClient",
+			tca,
+		],
+		tests: .yes(
+			dependencies: [
+				"TestUtils",
+				"UserDefaultsClient",
+			]
+		)
 	),
 	.feature(
 		name: "FungibleTokenListFeature",
@@ -525,14 +525,14 @@ package.addModules([
 	),
 	.feature(
 		name: "OnboardingFeature",
-                dependencies: [
-                        // ˅˅˅ Sort lexicographically ˅˅˅
-                        "DesignSystem",
-                        "CreateAccountFeature",
-                        "ImportProfileFeature",
-                        tca,
-                        // ^^^ Sort lexicographically ^^^
-                ],
+		dependencies: [
+			// ˅˅˅ Sort lexicographically ˅˅˅
+			"DesignSystem",
+			"CreateAccountFeature",
+			"ImportProfileFeature",
+			tca,
+			// ^^^ Sort lexicographically ^^^
+		],
 		tests: .yes(
 			dependencies: [
 				"UserDefaultsClient",
@@ -740,12 +740,12 @@ package.addModules([
 	),
 	.client(
 		name: "LocalAuthenticationClient",
-                dependencies: [
-                        dependencies
-                ],
-                tests: .yes(
-                        dependencies: ["TestUtils"]
-                )
+		dependencies: [
+			dependencies,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
 	.client(
 		name: "PasteboardClient",

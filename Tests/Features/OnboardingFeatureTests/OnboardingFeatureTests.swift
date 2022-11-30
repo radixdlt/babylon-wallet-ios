@@ -5,5 +5,4 @@ import TestUtils
 import UserDefaultsClient
 
 @MainActor
-final class OnboardingNewProfileFeatureTests: TestCase {
-}
+final class OnboardingNewProfileFeatureTests: TestCase {}

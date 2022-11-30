@@ -1,6 +1,7 @@
-import Foundation
 import Dependencies
+import Foundation
 
+// MARK: - LocalAuthenticationClient
 /// A client for querying if passcode and biometrics are set up.
 ///
 /// Example usage in SwiftUI:
@@ -35,7 +36,7 @@ import Dependencies
 ///          }
 ///      }
 ///
-public struct LocalAuthenticationClient: DependencyKey {    
+public struct LocalAuthenticationClient: DependencyKey {
 	/// The return value (`LocalAuthenticationConfig`) might be `nil` if app goes to background or stuff like that.
 	public typealias QueryConfig = @Sendable () async throws -> LocalAuthenticationConfig
 

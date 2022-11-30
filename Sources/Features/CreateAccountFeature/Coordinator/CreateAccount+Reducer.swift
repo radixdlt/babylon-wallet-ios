@@ -1,10 +1,10 @@
 import ComposableArchitecture
 import ErrorQueue
 import KeychainClientDependency
+import LocalAuthenticationClient
 import Mnemonic
 import Profile
 import ProfileClient
-import LocalAuthenticationClient
 import Resources
 import TransactionClient
 
@@ -43,12 +43,12 @@ public extension DependencyValues {
 public struct CreateAccount: Sendable, ReducerProtocol {
 	@Dependency(\.accountNameValidator) var accountNameValidator
 	@Dependency(\.mainQueue) var mainQueue
-        @Dependency(\.errorQueue) var errorQueue
-        @Dependency(\.mnemonicGenerator) var mnemonicGenerator
-        @Dependency(\.keychainClient) var keychainClient
-        @Dependency(\.profileClient) var profileClient
-        @Dependency(\.transactionClient) var transactionClient
-        @Dependency(\.localAuthenticationClient) var localAuthenticationClient
+	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.mnemonicGenerator) var mnemonicGenerator
+	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.transactionClient) var transactionClient
+	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 
 	public init() {}
 }
@@ -61,87 +61,87 @@ public extension CreateAccount {
 			precondition(!state.isCreatingAccount)
 			state.isCreatingAccount = true
 
-                        if state.shouldCreateProfile {
-                                return .run { send in
-                                        await send(.internal(.system(.verifyBiometrics)))
-                                }
-                        } else {
-                                return .run { send in
-                                        await send(.internal(.system(.createAccount)))
-                                }
-                        }
-                case .internal(.system(.verifyBiometrics)):
-                        return .run { send in
-                                await send(.internal(.system(.biometricsConfigResult(
-                                        TaskResult {
-                                                return try await localAuthenticationClient.queryConfig()
-                                        }
-                                ))))
-                        }
+			if state.shouldCreateProfile {
+				return .run { send in
+					await send(.internal(.system(.verifyBiometrics)))
+				}
+			} else {
+				return .run { send in
+					await send(.internal(.system(.createAccount)))
+				}
+			}
+		case .internal(.system(.verifyBiometrics)):
+			return .run { send in
+				await send(.internal(.system(.biometricsConfigResult(
+					TaskResult {
+						try await localAuthenticationClient.queryConfig()
+					}
+				))))
+			}
 
-                case let .internal(.system(.biometricsConfigResult(result))):
-                        let config = try? result.value
-                        guard config?.isBiometricsSetUp == true else {
-                                state.isCreatingAccount = false
-                                state.alert = .init(
-                                        title: .init("Biometrics not configured"),
-                                        message: .init("This apps require your phone to have biometrics configured")
-                                )
-                                return .none
-                        }
+		case let .internal(.system(.biometricsConfigResult(result))):
+			let config = try? result.value
+			guard config?.isBiometricsSetUp == true else {
+				state.isCreatingAccount = false
+				state.alert = .init(
+					title: .init("Biometrics not configured"),
+					message: .init("This apps require your phone to have biometrics configured")
+				)
+				return .none
+			}
 
-                        return .run { send in
-                                await send(.internal(.system(.createProfile)))
-                        }
+			return .run { send in
+				await send(.internal(.system(.createProfile)))
+			}
 
-                case .internal(.system(.createAccount)):
-                        return .run { [accountName = state.accountName] send in
-                                await send(.internal(.system(.createdNewAccountResult(
-                                        TaskResult {
-                                                let request = CreateAnotherAccountRequest(
-                                                        keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
-                                                        accountName: accountName
-                                                )
-                                                return try await profileClient.createVirtualAccount(
-                                                        request
-                                                )
-                                        }
-                                ))))
-                        }
+		case .internal(.system(.createAccount)):
+			return .run { [accountName = state.accountName] send in
+				await send(.internal(.system(.createdNewAccountResult(
+					TaskResult {
+						let request = CreateAnotherAccountRequest(
+							keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
+							accountName: accountName
+						)
+						return try await profileClient.createVirtualAccount(
+							request
+						)
+					}
+				))))
+			}
 
-                case .internal(.system(.createProfile)):
-                        return .run { [nameOfFirstAccount = state.accountName] send in
+		case .internal(.system(.createProfile)):
+			return .run { [nameOfFirstAccount = state.accountName] send in
 
-                                await send(.internal(.system(.createdNewProfileResult(
-                                        // FIXME: - mainnet: extract into ProfileCreator client?
-                                        TaskResult {
-                                                let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
+				await send(.internal(.system(.createdNewProfileResult(
+					// FIXME: - mainnet: extract into ProfileCreator client?
+					TaskResult {
+						let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
 
-                                                let networkAndGateway = AppPreferences.NetworkAndGateway.hammunet
+						let networkAndGateway = AppPreferences.NetworkAndGateway.hammunet
 
-                                                let newProfileRequest = CreateNewProfileRequest(
-                                                        networkAndGateway: networkAndGateway,
-                                                        curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
-                                                        nameOfFirstAccount: nameOfFirstAccount
-                                                )
+						let newProfileRequest = CreateNewProfileRequest(
+							networkAndGateway: networkAndGateway,
+							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
+							nameOfFirstAccount: nameOfFirstAccount
+						)
 
-                                                let newProfile = try await profileClient.createNewProfile(
-                                                        newProfileRequest
-                                                )
+						let newProfile = try await profileClient.createNewProfile(
+							newProfileRequest
+						)
 
-                                                let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
+						let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
 
-                                                try await keychainClient.updateFactorSource(
-                                                        mnemonic: curve25519FactorSourceMnemonic,
-                                                        reference: curve25519FactorSourceReference
-                                                )
+						try await keychainClient.updateFactorSource(
+							mnemonic: curve25519FactorSourceMnemonic,
+							reference: curve25519FactorSourceReference
+						)
 
-                                                try await keychainClient.updateProfile(profile: newProfile)
+						try await keychainClient.updateProfile(profile: newProfile)
 
-                                                return newProfile
-                                        }
-                                ))))
-                        }
+						return newProfile
+					}
+				))))
+			}
 
 		case let .internal(.system(.createdNewProfileResult(.success(profile)))):
 			state.isCreatingAccount = false
@@ -192,15 +192,15 @@ public extension CreateAccount {
 				await send(.internal(.system(.focusTextField(.accountName))))
 			}
 
-                case let .internal(.system(.focusTextField(focus))):
-                        state.focusedField = focus
-                        return .none
+		case let .internal(.system(.focusTextField(focus))):
+			state.focusedField = focus
+			return .none
 
-                case .internal(.view(.alertDismissButtonTapped)):
-                        state.alert = nil
-                        return .none
+		case .internal(.view(.alertDismissButtonTapped)):
+			state.alert = nil
+			return .none
 
-                case .delegate:
+		case .delegate:
 			return .none
 		}
 	}
