@@ -65,9 +65,7 @@ public extension ProfileClient {
 			setNetworkAndGateway: { networkAndGateway in
 				try await profileHolder.asyncMutating { profile in
 					// Ensure we have accounts on network, else do not change
-					print("🇸🇪 start of maybe networkAndGateWay to: \(networkAndGateway)")
 					_ = try profile.onNetwork(id: networkAndGateway.network.id)
-					print("🇸🇪 setting networkAndGateWay to: \(networkAndGateway)")
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
