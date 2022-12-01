@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - AssetDetails.View
 public extension AssetDetails {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<AssetDetails>
 

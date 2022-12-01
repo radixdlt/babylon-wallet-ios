@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - ___VARIABLE_featureName___.View
 public extension ___VARIABLE_featureName___ {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<___VARIABLE_featureName___>
 
