@@ -328,6 +328,13 @@ package.addModules([
 		)
 	),
 	.feature(
+		name: "AssetDetailsFeature",
+		dependencies: [
+			tca,
+		],
+		tests: .no
+	),
+	.feature(
 		name: "AssetsViewFeature",
 		dependencies: [
 			"Asset",
