@@ -345,14 +345,19 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"DesignSystem",
+			engineToolkit,
 			"ErrorQueue",
+			"GatewayAPI",
 			"KeychainClientDependency",
+			"LocalAuthenticationClient",
 			"ProfileClient",
 			tca,
-			"TransactionClient", // FIXME: remove once we have virtual accounts
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: [
+				"TestUtils",
+				"UserDefaultsClient",
+			]
 		)
 	),
 	.feature(
@@ -521,15 +526,10 @@ package.addModules([
 		name: "OnboardingFeature",
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
-			"Common",
 			"DesignSystem",
-			engineToolkit,
-			"ErrorQueue",
-			"GatewayAPI",
+			"CreateAccountFeature",
 			"ImportProfileFeature",
-			"ProfileClient",
 			tca,
-			"TransactionClient", // FIXME: remove once we have virtual accounts
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -738,7 +738,9 @@ package.addModules([
 	),
 	.client(
 		name: "LocalAuthenticationClient",
-		dependencies: [],
+		dependencies: [
+			dependencies,
+		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)

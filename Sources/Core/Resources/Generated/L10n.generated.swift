@@ -185,6 +185,10 @@ public enum L10n {
   	}
 	}
 	public enum Onboarding {
+  	/// This app requires your phone having biometrics set up
+  	public static let biometricsNotSetUpMessage = L10n.tr("Localizable", "onboarding.biometricsNotSetUpMessage", fallback: "This app requires your phone having biometrics set up")
+  	/// Biometrics not set up
+  	public static let biometricsNotSetUpTitle = L10n.tr("Localizable", "onboarding.biometricsNotSetUpTitle", fallback: "Biometrics not set up")
   	/// New Account
   	public static let newAccountButtonTitle = L10n.tr("Localizable", "onboarding.newAccountButtonTitle", fallback: "New Account")
 	}
