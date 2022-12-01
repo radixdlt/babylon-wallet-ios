@@ -62,4 +62,44 @@ final class HandleDappRequestsTests: TestCase {
 			XCTAssertEqual($0.currentRequest, currentRequest)
 		}
 	}
+
+	func test__GIVEN__on_network_hammunet__WHEN__received_request_specifying_another_network__THEN__we_respond_back_to_dapp_with_error() async throws {
+		//        let scheduledErrorOnErrorQueue = ActorIsolated<Error?>(nil)
+		let currentNetworkID = NetworkID.hammunet
+		let request = try P2P.RequestFromClient(
+			requestFromDapp: .init(
+				id: .placeholder0,
+				metadata: .init(
+					networkId: .mardunet,
+					origin: "",
+					dAppId: ""
+				), items: [
+					.oneTimeAccounts(.placeholder),
+				]
+			),
+			client: .placeholder
+		)
+
+		let store = TestStore(
+			initialState: HandleDappRequests.State(
+				unfinishedRequestsFromClient: .init()
+			),
+			reducer: HandleDappRequests()
+		) {
+			$0.profileClient.getCurrentNetworkID = { currentNetworkID }
+			$0.errorQueue.schedule = {
+				guard let error = $0 as? P2P.ToDapp.Response.Failure.Kind.Error else {
+					return XCTFail("wrong error type")
+				}
+				XCTAssertEqual(error, .wrongNetwork)
+			}
+		}
+		store.exhaustivity = .off
+
+		await store.send(.internal(.system(.receiveRequestFromP2PClientResult(
+			.success(request)
+		))))
+
+		await store.receive(.internal(.system(.failedWithError(request, .wrongNetwork, "Wallet is using network ID: \(currentNetworkID), request sent specified network ID: \(request.requestFromDapp.metadata.networkId)."))))
+	}
 }
