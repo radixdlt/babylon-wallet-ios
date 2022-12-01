@@ -45,8 +45,8 @@ extension FungibleTokenDetails.View {
 
 #if DEBUG
 
-// MARK: - AssetDetails_Preview
-struct AssetDetails_Preview: PreviewProvider {
+// MARK: - FungibleTokenDetails_Preview
+struct FungibleTokenDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenDetails.View(
 			store: .init(
