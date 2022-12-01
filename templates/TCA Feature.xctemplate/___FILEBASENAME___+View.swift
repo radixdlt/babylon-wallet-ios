@@ -36,14 +36,17 @@ extension ___VARIABLE_featureName___.View {
 	}
 }
 
+#if DEBUG
+
 // MARK: - ___VARIABLE_featureName____Preview
 struct ___VARIABLE_featureName____Preview: PreviewProvider {
 	static var previews: some View {
 		___VARIABLE_featureName___.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .previewValue,
 				reducer: ___VARIABLE_featureName___()
 			)
 		)
 	}
 }
+#endif
