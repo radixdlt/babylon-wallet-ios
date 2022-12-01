@@ -21,7 +21,7 @@ public extension FungibleTokenDetails.View {
 			store.actionless,
 			observe: ViewState.init(state:)
 		) { viewStore in
-			VStack {
+			VStack(spacing: 0) {
 				if let name = viewStore.name {
 					Text(name).textStyle(.body1Header)
 				}
@@ -48,13 +48,29 @@ public extension FungibleTokenDetails.View {
 					}
 					if let id = viewStore.id, let currentSupply = viewStore.currentSupply {
 						divider
-						Text(id)
-							.textStyle(.body1Regular)
-							.frame(maxWidth: .infinity, alignment: .leading)
-							.padding(.horizontal, .large2)
-							.truncationMode(.middle)
-							.lineLimit(1)
-						Text(currentSupply.description)
+						VStack(spacing: .medium3) {
+							HStack {
+								Text("Token ID")
+									.textStyle(.body1Regular)
+									.foregroundColor(.app.gray2)
+								Text(id)
+									.frame(maxWidth: .infinity, alignment: .trailing)
+									.multilineTextAlignment(.trailing)
+							}
+							HStack {
+								Text("Current Supply")
+									.textStyle(.body1Regular)
+									.foregroundColor(.app.gray2)
+								Text(currentSupply.description)
+									.frame(maxWidth: .infinity, alignment: .trailing)
+									.multilineTextAlignment(.trailing)
+							}
+						}
+						.textStyle(.body1Regular)
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.padding(.horizontal, .large2)
+						.truncationMode(.middle)
+						.lineLimit(1)
 					}
 				}
 			}
