@@ -65,15 +65,17 @@ private extension ManageGatewayAPIEndpoints.View {
 					Spacer()
 
 					ZStack {
-						TextField(
-							L10n.ManageGateway.urlString,
-							text: viewStore.binding(
-								get: \.urlString,
-								send: { .urlStringChanged($0) }
+						VStack(alignment: .leading) {
+							Text(L10n.ManageGateway.inputNewGatewayAPIURL)
+							TextField(
+								L10n.ManageGateway.urlString,
+								text: viewStore.binding(
+									get: \.urlString,
+									send: { .urlStringChanged($0) }
+								)
 							)
-						)
-
-						.textFieldStyle(.roundedBorder)
+							.textFieldStyle(.roundedBorder)
+						}
 
 						// FIXME: betanet move loading indicator into button below.
 						if viewStore.isShowingLoader {
@@ -103,7 +105,7 @@ private extension ManageGatewayAPIEndpoints.View {
 		value: CustomStringConvertible,
 		valueColor: Color = Color.app.gray2
 	) -> some View {
-		VStack(alignment: .leading) {
+		VStack(alignment: .leading, spacing: 0) {
 			Text(label)
 				.foregroundColor(.app.gray2)
 				.textStyle(.body2HighImportance)
@@ -124,8 +126,12 @@ private extension ManageGatewayAPIEndpoints.View {
 				.foregroundColor(.app.gray1)
 				.textStyle(.sectionHeader)
 
-			label(L10n.ManageGateway.networkName, value: networkAndGateway.network.name)
-			label(L10n.ManageGateway.networkID, value: networkAndGateway.network.id)
+			HStack {
+				label(L10n.ManageGateway.networkName, value: networkAndGateway.network.name)
+				Spacer()
+				label(L10n.ManageGateway.networkID, value: networkAndGateway.network.id)
+			}
+
 			label(
 				L10n.ManageGateway.gatewayAPIEndpoint,
 				value: networkAndGateway.gatewayAPIEndpointURL.absoluteString, valueColor: .app.blue2

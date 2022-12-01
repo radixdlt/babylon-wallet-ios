@@ -143,6 +143,8 @@ public enum L10n {
   	public static let currentGatewayTitle = L10n.tr("Localizable", "manageGateway.currentGatewayTitle", fallback: "Current")
   	/// Gateway API Endpoint
   	public static let gatewayAPIEndpoint = L10n.tr("Localizable", "manageGateway.gatewayAPIEndpoint", fallback: "Gateway API Endpoint")
+  	/// New URL (https:// required)
+  	public static let inputNewGatewayAPIURL = L10n.tr("Localizable", "manageGateway.inputNewGatewayAPIURL", fallback: "New URL (https:// required)")
   	/// Network ID
   	public static let networkID = L10n.tr("Localizable", "manageGateway.networkID", fallback: "Network ID")
   	/// Network name

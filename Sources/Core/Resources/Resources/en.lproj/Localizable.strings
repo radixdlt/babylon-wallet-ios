@@ -56,6 +56,7 @@
 "manageGateway.gatewayAPIEndpoint" = "Gateway API Endpoint";
 "manageGateway.networkID" = "Network ID";
 "manageGateway.networkName" = "Network name";
+"manageGateway.inputNewGatewayAPIURL" = "New URL (https:// required)";
 "manageGateway.urlString" = "https://example.com:8080";
 "manageGateway.switchToButtonTitle" = "Switch To";
 "manageGateway.title" = "Edit Gateway API URL";
