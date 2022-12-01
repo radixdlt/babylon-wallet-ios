@@ -637,17 +637,6 @@ package.addModules([
 		)
 	),
 	.client(
-		name: "Asset",
-		dependencies: [
-			"Common",
-			profile, // Address
-			bigInt,
-		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
-	),
-	.client(
 		name: "P2PConnectivityClient",
 		dependencies: [
 			asyncExtensions,
@@ -807,6 +796,17 @@ package.addModules([
 // MARK: - Core
 
 package.addModules([
+	.core(
+		name: "Asset",
+		dependencies: [
+			"Common",
+			profile, // Address
+			bigInt,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
 	.core(
 		name: "Common",
 		dependencies: [
