@@ -152,7 +152,7 @@ extension ManageGatewayAPIEndpoints.View {
 		init(state: ManageGatewayAPIEndpoints.State) {
 			urlString = state.urlString
 
-			isSwitchToButtonEnabled = state.url != nil
+			isSwitchToButtonEnabled = state.isSwitchToButtonEnabled
 			networkAndGateway = state.currentNetworkAndGateway
 			isShowingLoader = state.isValidatingEndpoint
 		}

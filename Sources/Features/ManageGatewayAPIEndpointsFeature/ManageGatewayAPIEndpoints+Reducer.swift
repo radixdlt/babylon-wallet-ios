@@ -55,7 +55,9 @@ public extension ManageGatewayAPIEndpoints {
 
 		case let .internal(.view(.urlStringChanged(urlString))):
 			state.urlString = urlString
-			state.url = URL(string: urlString)
+			let maybeURL = URL(string: urlString)
+			state.url = maybeURL
+			state.isSwitchToButtonEnabled = maybeURL != nil && !(state.currentNetworkAndGateway?.gatewayAPIEndpointURL == maybeURL)
 			return .none
 
 		case .internal(.view(.switchToButtonTapped)):
