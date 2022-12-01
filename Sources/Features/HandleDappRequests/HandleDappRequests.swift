@@ -238,7 +238,7 @@ extension TransactionFailure {
 			}
 		case let .failedToPrepareForTXSigning(error):
 
-			return (errorKind: .failedToPrepareTransactoin, message: nil)
+			return (errorKind: .failedToPrepareTransaction, message: nil)
 		case let .failedToSubmit(submissionError):
 			switch submissionError {
 			case .failedToSubmitTX:

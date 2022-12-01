@@ -368,19 +368,40 @@ public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 
 	case failedToGetTransactionStatus(txID: TXID, error: FailedToGetTransactionStatus)
 	case invalidTXWasSubmittedButNotSuccessful(txID: TXID, status: TXFailureStatus)
+
+	public var errorDescription: String? {
+		switch self {
+		case .failedToSubmitTX:
+			return "Failed to submit transaction"
+		case let .invalidTXWasDuplicate(txID):
+			return "Duplicate TX id: \(txID)"
+		case let .failedToPollTX(txID, error):
+			return "\(error.localizedDescription) txID: \(txID)"
+		case let .failedToGetTransactionStatus(txID, error):
+			return "\(error.localizedDescription) txID: \(txID)"
+		case let .invalidTXWasSubmittedButNotSuccessful(txID, status):
+			return "Invalid TX submitted but not successful, status: \(status.localizedDescription) txID: \(txID)"
+		}
+	}
 }
 
 // MARK: - TXFailureStatus
-public enum TXFailureStatus: String, Swift.Error, Sendable, Hashable {
+public enum TXFailureStatus: String, LocalizedError, Sendable, Hashable {
 	case rejected
 	case failed
+	public var errorDescription: String? {
+		switch self {
+		case .rejected: return "Rejected"
+		case .failed: return "Failed"
+		}
+	}
 }
 
 // MARK: - FailedToPollError
 public struct FailedToPollError: Sendable, LocalizedError, Equatable {
 	public let error: Swift.Error
 	public var errorDescription: String? {
-		"\(Self.self)(error: \(String(describing: error))"
+		"Poll failed: \(String(describing: error))"
 	}
 }
 
