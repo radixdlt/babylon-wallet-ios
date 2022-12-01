@@ -40,9 +40,9 @@ public struct Splash: Sendable, ReducerProtocol {
 	func delay() async {
 		let durationInMS: Int
 		#if DEBUG
-		durationInMS = 100
+		durationInMS = 200
 		#else
-		durationInMS = 700
+		durationInMS = 800
 		#endif
 		try? await mainQueue.sleep(for: .milliseconds(durationInMS))
 	}

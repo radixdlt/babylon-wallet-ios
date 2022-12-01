@@ -52,15 +52,23 @@ public extension ProfileClient {
 			}
 		}
 
+		let hasAccountOnNetwork: HasAccountOnNetwork = { networkID in
+			try await profileHolder.get { profile in
+				profile.containsNetwork(withID: networkID)
+			}
+		}
+
 		return Self(
 			getCurrentNetworkID: getCurrentNetworkID,
 			getGatewayAPIEndpointBaseURL: getGatewayAPIEndpointBaseURL,
 			getNetworkAndGateway: getNetworkAndGateway,
 			setNetworkAndGateway: { networkAndGateway in
 				try await profileHolder.asyncMutating { profile in
+					// Ensure we have accounts on network, else do not change
+					print("🇸🇪 start of maybe networkAndGateWay to: \(networkAndGateway)")
+					_ = try profile.onNetwork(id: networkAndGateway.network.id)
+					print("🇸🇪 setting networkAndGateWay to: \(networkAndGateway)")
 					profile.appPreferences.networkAndGateway = networkAndGateway
-					//                    return !profile.hasNetwork(networkAndGateway.network.id)
-					fatalError("update Profile package and uncomment above")
 				}
 			},
 			createNewProfile: { request in
@@ -92,6 +100,7 @@ public extension ProfileClient {
 				}
 				await profileHolder.removeProfile()
 			},
+			hasAccountOnNetwork: hasAccountOnNetwork,
 			getAccounts: {
 				let currentNetworkID = await getCurrentNetworkID()
 				return try await profileHolder.get { profile in
@@ -124,7 +133,7 @@ public extension ProfileClient {
 				try await profileHolder.asyncMutating { profile in
 					let networkID = await getCurrentNetworkID()
 					return try await profile.createNewVirtualAccount(
-						networkID: networkID,
+						networkID: request.overridingNetworkID ?? networkID,
 						displayName: request.accountName,
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
 							try await keychainClient

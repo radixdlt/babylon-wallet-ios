@@ -41,6 +41,7 @@ public struct ProfileClient: DependencyKey, Sendable {
 	/// Also deletes profile and factor sources from keychain
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
+	public var hasAccountOnNetwork: HasAccountOnNetwork
 	public var getAccounts: GetAccounts
 	public var getP2PClients: GetP2PClients
 	public var addP2PClient: AddP2PClient
@@ -77,8 +78,7 @@ public extension ProfileClient {
 	typealias GetGatewayAPIEndpointBaseURL = @Sendable () async -> URL
 	typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 
-	/// Returns `true` if this is a new network for the Profile -> will need to create an account
-	typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Bool
+	typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Void
 
 	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
@@ -90,13 +90,14 @@ public extension ProfileClient {
 
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 	typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
+	typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 	typealias GetAccounts = @Sendable () async throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
 	typealias GetP2PClients = @Sendable () async throws -> P2PClients
 	typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
-	typealias CreateVirtualAccount = @Sendable (CreateAnotherAccountRequest) async throws -> OnNetwork.Account
+	typealias CreateVirtualAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 
 	typealias SignersForAccountsGivenAddresses = @Sendable (SignersForAccountsGivenAddressesRequest) async throws -> NonEmpty<OrderedSet<SignersOfAccount>>
@@ -110,15 +111,18 @@ public struct AccountSignature: Sendable, Hashable {
 	public let signature: SLIP10.Signature
 }
 
-// MARK: - CreateAnotherAccountRequest
-public struct CreateAnotherAccountRequest: Sendable, Hashable {
+// MARK: - CreateAccountRequest
+public struct CreateAccountRequest: Sendable, Hashable {
+	public let overridingNetworkID: NetworkID?
 	public let keychainAccessFactorSourcesAuthPrompt: String
 	public let accountName: String?
 
 	public init(
+		overridingNetworkID: NetworkID?,
 		keychainAccessFactorSourcesAuthPrompt: String,
 		accountName: String?
 	) {
+		self.overridingNetworkID = overridingNetworkID
 		self.keychainAccessFactorSourcesAuthPrompt = keychainAccessFactorSourcesAuthPrompt
 		self.accountName = accountName
 	}

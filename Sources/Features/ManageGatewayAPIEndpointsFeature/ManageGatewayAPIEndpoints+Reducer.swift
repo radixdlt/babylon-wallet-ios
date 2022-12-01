@@ -10,12 +10,20 @@ import UserDefaultsClient
 public struct ManageGatewayAPIEndpoints: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
+	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
 }
 
 public extension ManageGatewayAPIEndpoints {
-	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+	var body: some ReducerProtocolOf<Self> {
+		Reduce(self.core)
+			.ifLet(\.createAccount, action: /Action.createAccount) {
+				CreateAccount()
+			}
+	}
+
+	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.didAppear)):
 			return .run { send in
@@ -27,6 +35,7 @@ public extension ManageGatewayAPIEndpoints {
 			}
 
 		case let .internal(.system(.loadNetworkAndGatewayResult(.success(currentNetworkAndGateway)))):
+			state.currentNetworkAndGateway = currentNetworkAndGateway
 			let url = currentNetworkAndGateway.gatewayAPIEndpointURL
 			state.url = url
 			state.urlString = url.absoluteString
@@ -43,6 +52,7 @@ public extension ManageGatewayAPIEndpoints {
 
 		case let .internal(.view(.urlStringChanged(urlString))):
 			state.urlString = urlString
+			state.url = URL(string: urlString)
 			return .none
 
 		case .internal(.view(.switchToButtonTapped)):
@@ -70,8 +80,20 @@ public extension ManageGatewayAPIEndpoints {
 			}
 			state.validatedNewNetworkAndGatewayToSwitchTo = new
 			return .run { send in
-				let hasAccountOnNetwork = await networkSwitchingClient.hasAccountOnNetwork(new)
-				if hasAccountOnNetwork {
+				await send(.internal(.system(.hasAccountsResult(
+					TaskResult {
+						try await networkSwitchingClient.hasAccountOnNetwork(new)
+					}
+				))))
+			}
+		case let .internal(.system(.hasAccountsResult(.success(hasAccountsOnNetwork)))):
+			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
+				fatalError()
+				// weird state... should not happen.
+				return .none
+			}
+			return .run { send in
+				if hasAccountsOnNetwork {
 					await send(.internal(.system(.switchToResult(
 						TaskResult {
 							try await networkSwitchingClient.switchTo(new)
@@ -82,21 +104,55 @@ public extension ManageGatewayAPIEndpoints {
 				}
 			}
 
+		case let .internal(.system(.hasAccountsResult(.failure(error)))):
+			errorQueue.schedule(error)
+			state.validatedNewNetworkAndGatewayToSwitchTo = nil
+			return .none
+
 		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetwork))):
-			//            state.createAccount = CreateAccount.State
-			fatalError()
+			state.createAccount = CreateAccount.State(
+				onNetworkWithID: newNetwork.network.id,
+				shouldCreateProfile: false,
+				numberOfExistingAccounts: 0
+			)
+			return .none
 
 		case let .internal(.system(.switchToResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
 
-		case let .internal(.system(.switchToResult(.success(onNetwork)))):
+		case let .internal(.system(.switchToResult(.success(_)))):
 			return .run { send in
-				await send(.delegate(.networkChanged(onNetwork)))
+				await send(.delegate(.networkChanged))
 			}
 
+		case .createAccount(.delegate(.dismissCreateAccount)):
+			state.createAccount = nil
+			state.validatedNewNetworkAndGatewayToSwitchTo = nil
+			return .none
+
+		case let .createAccount(.delegate(.createdNewAccount(_))):
+			state.createAccount = nil
+			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
+				fatalError()
+				// weird state... should not happen.
+				return .none
+			}
+			return .run { send in
+				await send(.internal(.system(.switchToResult(
+					TaskResult {
+						try await networkSwitchingClient.switchTo(new)
+					}
+				))))
+			}
+
+		case .createAccount(.delegate(.failedToCreateNewAccount)):
+			state.createAccount = nil
+			state.validatedNewNetworkAndGatewayToSwitchTo = nil
+			return .none
+
 		case .createAccount:
-			fatalError()
+			return .none
 
 		case .delegate:
 			return .none
@@ -121,9 +177,9 @@ public extension DependencyValues {
 
 public extension NetworkSwitchingClient {
 	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
-	typealias ValidateGatewayURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway
-	typealias HasAccountOnNetwork = @Sendable (AppPreferences.NetworkAndGateway) async -> Bool
-	typealias SwitchTo = @Sendable (AppPreferences.NetworkAndGateway) async throws -> OnNetwork
+	typealias ValidateGatewayURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway?
+	typealias HasAccountOnNetwork = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Bool
+	typealias SwitchTo = @Sendable (AppPreferences.NetworkAndGateway) async throws -> AppPreferences.NetworkAndGateway
 
 	static let liveValue: Self = {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -133,19 +189,37 @@ public extension NetworkSwitchingClient {
 			await profileClient.getNetworkAndGateway()
 		}
 
-		let validateGatewayURL: ValidateGatewayURL = { _ in
-			fatalError()
+		let validateGatewayURL: ValidateGatewayURL = { newURL -> AppPreferences.NetworkAndGateway? in
+			let currentURL = await getNetworkAndGateway().gatewayAPIEndpointURL
+			print("Current: \(currentURL.absoluteString)")
+			print("newURL: \(newURL.absoluteString)")
+			guard newURL != currentURL else {
+				return nil
+			}
+			let name = try await gatewayAPIClient.getNameOfNetwork(newURL)
+			// FIXME: mainnet: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
+			// once it returns networkID!
+			let network = try Network.lookupBy(name: name)
+
+			let networkAndGateway = AppPreferences.NetworkAndGateway(
+				network: network,
+				gatewayAPIEndpointURL: newURL
+			)
+
+			return networkAndGateway
 		}
 
-		let hasAccountOnNetwork: HasAccountOnNetwork = { _ in
-			false
+		let hasAccountOnNetwork: HasAccountOnNetwork = { networkAndGateway in
+			try await profileClient.hasAccountOnNetwork(networkAndGateway.network.id)
 		}
 
-		let switchTo: SwitchTo = { url in
-			guard await hasAccountOnNetwork(url) else {
+		let switchTo: SwitchTo = { networkAndGateway in
+			guard try await hasAccountOnNetwork(networkAndGateway) else {
 				throw NoAccountOnNetwork()
 			}
-			fatalError()
+
+			try await profileClient.setNetworkAndGateway(networkAndGateway)
+			return networkAndGateway
 		}
 
 		return Self(

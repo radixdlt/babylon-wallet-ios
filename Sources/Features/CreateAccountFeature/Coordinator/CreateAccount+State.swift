@@ -4,6 +4,7 @@ import Profile
 // MARK: - CreateAccount.State
 public extension CreateAccount {
 	struct State: Sendable, Equatable {
+		public var onNetworkWithID: NetworkID?
 		public var numberOfExistingAccounts: Int
 		public var accountName: String
 		public var isValid: Bool
@@ -13,6 +14,7 @@ public extension CreateAccount {
 		@BindableState public var focusedField: Field?
 
 		public init(
+			onNetworkWithID: NetworkID? = nil,
 			shouldCreateProfile: Bool,
 			numberOfExistingAccounts: Int = 0,
 			accountName: String = "",
@@ -21,6 +23,7 @@ public extension CreateAccount {
 			isCreatingAccount: Bool = false,
 			alert: AlertState<Action.ViewAction>? = nil
 		) {
+			self.onNetworkWithID = onNetworkWithID
 			self.shouldCreateProfile = shouldCreateProfile
 			self.numberOfExistingAccounts = numberOfExistingAccounts
 			self.accountName = accountName

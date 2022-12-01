@@ -41,9 +41,9 @@ public extension ManageGatewayAPIEndpoints.Action {
 		case loadNetworkAndGatewayResult(TaskResult<AppPreferences.NetworkAndGateway>)
 		/// Nil if no change was needed
 		case gatewayValidationResult(TaskResult<AppPreferences.NetworkAndGateway?>)
-
+		case hasAccountsResult(TaskResult<Bool>)
 		case createAccountOnNetworkBeforeSwitchingToIt(AppPreferences.NetworkAndGateway)
-		case switchToResult(TaskResult<OnNetwork>)
+		case switchToResult(TaskResult<AppPreferences.NetworkAndGateway>)
 	}
 }
 
@@ -51,6 +51,6 @@ public extension ManageGatewayAPIEndpoints.Action {
 public extension ManageGatewayAPIEndpoints.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case networkChanged(OnNetwork)
+		case networkChanged
 	}
 }

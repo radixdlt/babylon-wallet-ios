@@ -98,31 +98,6 @@ public extension GatewayAPIClient {
 			}
 		}
 
-//		@Sendable
-//		func getNetworkName(baseURL: URL) async throws -> Network.Name {
-//
-//		}
-//
-//		let setCurrentBaseURL: SetCurrentBaseURL = { @Sendable newURL in
-//			let currentURL = await getCurrentBaseURL()
-//			guard newURL != currentURL else {
-//				return nil
-//			}
-//			let name = try await getNetworkName(baseURL: newURL)
-//			// FIXME mainnet: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
-//			// once it returns networkID!
-//			let network = try Network.lookupBy(name: name)
-//
-//			let networkAndGateway = AppPreferences.NetworkAndGateway(
-//				network: network,
-//				gatewayAPIEndpointURL: newURL
-//			)
-//
-//			try await profileClient.setNetworkAndGateway(networkAndGateway)
-//
-//			return networkAndGateway
-//		}
-
 		@Sendable
 		func makeRequest<Response>(
 			httpBodyData httpBody: Data?,

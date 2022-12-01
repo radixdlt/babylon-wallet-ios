@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import CreateAccountFeature
 import DesignSystem
 import Profile
 import SwiftUI
@@ -24,52 +25,18 @@ public extension ManageGatewayAPIEndpoints.View {
 			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
-				VStack {
-					NavigationBar(
-						titleText: L10n.ManageGateway.title,
-						leadingItem: CloseButton {
-							viewStore.send(.dismissButtonTapped)
-						}
+				ZStack {
+					core(viewStore: viewStore)
+						.zIndex(0)
+
+					IfLetStore(
+						store.scope(
+							state: \.createAccount,
+							action: { .createAccount($0) }
+						),
+						then: CreateAccount.View.init(store:)
 					)
-					.foregroundColor(.app.gray1)
-					.padding([.horizontal, .top], .medium3)
-
-					VStack(alignment: .leading) {
-						if let networkAndGateway = viewStore.networkAndGateway {
-							networkAndGatewayView(networkAndGateway)
-						}
-
-						Spacer()
-
-						ZStack {
-							TextField(
-								L10n.ManageGateway.urlString,
-								text: viewStore.binding(
-									get: \.urlString,
-									send: { .urlStringChanged($0) }
-								)
-							)
-
-							.textFieldStyle(.roundedBorder)
-
-							// FIXME: betanet move loading indicator into button below.
-							if viewStore.isShowingLoader {
-								LoadingView()
-							}
-						}
-
-						Spacer()
-
-						Button(L10n.ManageGateway.switchToButtonTitle) {
-							viewStore.send(.switchToButtonTapped)
-						}
-						.enabled(viewStore.isSwitchToButtonEnabled)
-					}
-					.padding([.horizontal, .bottom], .medium1)
-					.buttonStyle(.primaryRectangular)
-				}
-				.onAppear {
-					viewStore.send(.didAppear)
+					.zIndex(1)
 				}
 			}
 		}
@@ -77,6 +44,59 @@ public extension ManageGatewayAPIEndpoints.View {
 }
 
 private extension ManageGatewayAPIEndpoints.View {
+	@ViewBuilder
+	func core(viewStore: ViewStore<ViewState, ManageGatewayAPIEndpoints.Action.ViewAction>) -> some View {
+		ForceFullScreen {
+			VStack {
+				NavigationBar(
+					titleText: L10n.ManageGateway.title,
+					leadingItem: CloseButton {
+						viewStore.send(.dismissButtonTapped)
+					}
+				)
+				.foregroundColor(.app.gray1)
+				.padding([.horizontal, .top], .medium3)
+
+				VStack(alignment: .leading) {
+					if let networkAndGateway = viewStore.networkAndGateway {
+						networkAndGatewayView(networkAndGateway)
+					}
+
+					Spacer()
+
+					ZStack {
+						TextField(
+							L10n.ManageGateway.urlString,
+							text: viewStore.binding(
+								get: \.urlString,
+								send: { .urlStringChanged($0) }
+							)
+						)
+
+						.textFieldStyle(.roundedBorder)
+
+						// FIXME: betanet move loading indicator into button below.
+						if viewStore.isShowingLoader {
+							LoadingView()
+						}
+					}
+
+					Spacer()
+
+					Button(L10n.ManageGateway.switchToButtonTitle) {
+						viewStore.send(.switchToButtonTapped)
+					}
+					.enabled(viewStore.isSwitchToButtonEnabled)
+				}
+				.padding([.horizontal, .bottom], .medium1)
+				.buttonStyle(.primaryRectangular)
+			}
+			.onAppear {
+				viewStore.send(.didAppear)
+			}
+		}
+	}
+
 	@ViewBuilder
 	func label(
 		_ label: String,
@@ -127,7 +147,7 @@ extension ManageGatewayAPIEndpoints.View {
 			urlString = state.urlString
 
 			isSwitchToButtonEnabled = state.url != nil
-			networkAndGateway = state.networkAndGateway
+			networkAndGateway = state.currentNetworkAndGateway
 			isShowingLoader = state.isValidatingEndpoint
 		}
 	}

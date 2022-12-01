@@ -93,10 +93,11 @@ public extension CreateAccount {
 			}
 
 		case .internal(.system(.createAccount)):
-			return .run { [accountName = state.accountName] send in
+			return .run { [accountName = state.accountName, overridingNetworkID = state.onNetworkWithID] send in
 				await send(.internal(.system(.createdNewAccountResult(
 					TaskResult {
-						let request = CreateAnotherAccountRequest(
+						let request = CreateAccountRequest(
+							overridingNetworkID: overridingNetworkID, // optional
 							keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
 							accountName: accountName
 						)
