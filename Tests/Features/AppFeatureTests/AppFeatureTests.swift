@@ -77,7 +77,7 @@ final class AppFeatureTests: TestCase {
 			.success(existingProfile)
 		))))))
 
-		await testScheduler.advance(by: .milliseconds(100))
+		await testScheduler.advance(by: .seconds(2))
 
 		// then
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(existingProfile))))))
@@ -108,7 +108,7 @@ final class AppFeatureTests: TestCase {
 		// when
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(nil)))))))
 
-		await testScheduler.advance(by: .milliseconds(100))
+		await testScheduler.advance(by: .seconds(2))
 
 		// then
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(nil)))))) {
@@ -148,7 +148,7 @@ final class AppFeatureTests: TestCase {
 			result
 		))))))
 
-		await testScheduler.advance(by: .milliseconds(100))
+		await testScheduler.advance(by: .seconds(2))
 
 		// then
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
@@ -196,7 +196,7 @@ final class AppFeatureTests: TestCase {
 			result
 		))))))
 
-		await testScheduler.advance(by: .milliseconds(100))
+		await testScheduler.advance(by: .seconds(2))
 
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
 			$0.errorAlert = .init(
@@ -240,7 +240,7 @@ final class AppFeatureTests: TestCase {
 			result
 		))))))
 
-		await testScheduler.advance(by: .milliseconds(100))
+		await testScheduler.advance(by: .seconds(2))
 
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
 			$0.errorAlert = .init(
