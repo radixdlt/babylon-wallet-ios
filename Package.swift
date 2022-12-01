@@ -797,7 +797,7 @@ package.addModules([
 
 package.addModules([
 	.core(
-		name: "Asset",
+		name: "Asset", // put in SharedModels?
 		dependencies: [
 			"Common",
 			profile, // Address
