@@ -7,13 +7,16 @@ public extension AccountPreferences {
 	struct State: Equatable {
 		public let address: AccountAddress
 		public var isFaucetButtonEnabled: Bool
+		public var isLoading: Bool
 
 		public init(
 			address: AccountAddress,
-			isFaucetButtonEnabled: Bool = false
+			isFaucetButtonEnabled: Bool = false,
+			isLoading: Bool = false
 		) {
 			self.address = address
 			self.isFaucetButtonEnabled = isFaucetButtonEnabled
+			self.isLoading = isLoading
 		}
 	}
 }
