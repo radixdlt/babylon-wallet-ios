@@ -3,7 +3,6 @@ import ComposableArchitecture
 import DesignSystem
 import Profile
 import SwiftUI
-import URLBuilderClient
 
 // MARK: - ManageGatewayAPIEndpoints.View
 public extension ManageGatewayAPIEndpoints {
@@ -43,41 +42,17 @@ public extension ManageGatewayAPIEndpoints.View {
 						Spacer()
 
 						ZStack {
-							VStack {
-								TextField(
-									L10n.ManageGateway.scheme,
-									text: viewStore.binding(
-										get: \.scheme,
-										send: { .schemeChanged($0) }
-									)
+							TextField(
+								L10n.ManageGateway.urlString,
+								text: viewStore.binding(
+									get: \.urlString,
+									send: { .urlStringChanged($0) }
 								)
+							)
 
-								TextField(
-									L10n.ManageGateway.host,
-									text: viewStore.binding(
-										get: \.host,
-										send: { .hostChanged($0) }
-									)
-								)
-
-								TextField(
-									L10n.ManageGateway.path,
-									text: viewStore.binding(
-										get: \.path,
-										send: { .pathChanged($0) }
-									)
-								)
-
-								TextField(
-									L10n.ManageGateway.port,
-									text: viewStore.binding(
-										get: \.port,
-										send: { .portChanged($0) }
-									)
-								)
-							}
 							.textFieldStyle(.roundedBorder)
 
+							// FIXME: betanet move loading indicator into button below.
 							if viewStore.isShowingLoader {
 								LoadingView()
 							}
@@ -131,7 +106,10 @@ private extension ManageGatewayAPIEndpoints.View {
 
 			label(L10n.ManageGateway.networkName, value: networkAndGateway.network.name)
 			label(L10n.ManageGateway.networkID, value: networkAndGateway.network.id)
-			label(L10n.ManageGateway.gatewayAPIEndpoint, value: URLBuilderClient.liveValue.formatURL(networkAndGateway.gatewayAPIEndpointURL), valueColor: .app.blue2)
+			label(
+				L10n.ManageGateway.gatewayAPIEndpoint,
+				value: networkAndGateway.gatewayAPIEndpointURL.absoluteString, valueColor: .app.blue2
+			)
 		}
 	}
 }
@@ -139,20 +117,14 @@ private extension ManageGatewayAPIEndpoints.View {
 // MARK: - ManageGatewayAPIEndpoints.View.ViewState
 extension ManageGatewayAPIEndpoints.View {
 	struct ViewState: Equatable {
-		public var host: String
-		public var path: String
-		public var scheme: String
-		public var port: String
+		public var urlString: String
 
 		public var networkAndGateway: AppPreferences.NetworkAndGateway?
 		public var isSwitchToButtonEnabled: Bool
 		public var isShowingLoader: Bool
 
 		init(state: ManageGatewayAPIEndpoints.State) {
-			host = state.host ?? ""
-			scheme = state.scheme
-			path = state.path
-			port = state.port?.description ?? ""
+			urlString = state.urlString
 
 			isSwitchToButtonEnabled = state.url != nil
 			networkAndGateway = state.networkAndGateway

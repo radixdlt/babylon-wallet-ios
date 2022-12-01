@@ -7,7 +7,6 @@ import Foundation
 import Profile
 import ProfileClient
 import SLIP10
-import URLBuilderClient
 
 // MARK: - Date + Sendable
 extension Date: @unchecked Sendable {}
@@ -44,9 +43,8 @@ public extension GatewayAPIClient {
 		jsonDecoder: JSONDecoder
 	) -> Self {
 		@Dependency(\.profileClient) var profileClient
-		@Dependency(\.urlBuilder) var urlBuilder
 
-		let getCurrentBaseURL: GetCurrentBaseURL = {
+		let getCurrentBaseURL: @Sendable () async -> URL = {
 			await profileClient.getGatewayAPIEndpointBaseURL()
 		}
 
@@ -90,7 +88,7 @@ public extension GatewayAPIClient {
 		}
 
 		@Sendable
-		func getGatewayInfo(baseURL: URL, timeoutInterval: TimeInterval?) async throws -> GatewayAPI.GatewayInfoResponse {
+		func _getGatewayInfo(baseURL: URL, timeoutInterval: TimeInterval?) async throws -> GatewayAPI.GatewayInfoResponse {
 			try await makeRequest(
 				responseType: GatewayAPI.GatewayInfoResponse.self,
 				baseURL: baseURL,
@@ -100,31 +98,30 @@ public extension GatewayAPIClient {
 			}
 		}
 
-		@Sendable
-		func getNetworkName(baseURL: URL) async throws -> Network.Name {
-			let gatewayInfo = try await getGatewayInfo(baseURL: baseURL, timeoutInterval: 2)
-			return Network.Name(rawValue: gatewayInfo.ledgerState.network)
-		}
-
-		let setCurrentBaseURL: SetCurrentBaseURL = { @Sendable newURL in
-			let currentURL = await getCurrentBaseURL()
-			guard newURL != currentURL else {
-				return nil
-			}
-			let name = try await getNetworkName(baseURL: newURL)
-			// FIXME: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
-			// once it returns networkID!
-			let network = try Network.lookupBy(name: name)
-
-			let networkAndGateway = AppPreferences.NetworkAndGateway(
-				network: network,
-				gatewayAPIEndpointURL: newURL
-			)
-
-			try await profileClient.setNetworkAndGateway(networkAndGateway)
-
-			return networkAndGateway
-		}
+//		@Sendable
+//		func getNetworkName(baseURL: URL) async throws -> Network.Name {
+//
+//		}
+//
+//		let setCurrentBaseURL: SetCurrentBaseURL = { @Sendable newURL in
+//			let currentURL = await getCurrentBaseURL()
+//			guard newURL != currentURL else {
+//				return nil
+//			}
+//			let name = try await getNetworkName(baseURL: newURL)
+//			// FIXME mainnet: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
+//			// once it returns networkID!
+//			let network = try Network.lookupBy(name: name)
+//
+//			let networkAndGateway = AppPreferences.NetworkAndGateway(
+//				network: network,
+//				gatewayAPIEndpointURL: newURL
+//			)
+//
+//			try await profileClient.setNetworkAndGateway(networkAndGateway)
+//
+//			return networkAndGateway
+//		}
 
 		@Sendable
 		func makeRequest<Response>(
@@ -177,12 +174,16 @@ public extension GatewayAPIClient {
 			return try await makeRequest(httpBodyData: httpBody, urlFromBase: urlFromBase)
 		}
 
-		let getGatewayInfo: GetGatewayInfo = { try await getGatewayInfo(baseURL: getCurrentBaseURL(), timeoutInterval: nil) }
+		let getGatewayInfo: GetGatewayInfo = {
+			try await _getGatewayInfo(baseURL: getCurrentBaseURL(), timeoutInterval: nil)
+		}
 
 		return Self(
-			getCurrentBaseURL: getCurrentBaseURL,
-			setCurrentBaseURL: setCurrentBaseURL,
 			getGatewayInfo: getGatewayInfo,
+			getNameOfNetwork: { baseURL in
+				let gatewayInfo = try await _getGatewayInfo(baseURL: baseURL, timeoutInterval: 2)
+				return Network.Name(rawValue: gatewayInfo.ledgerState.network)
+			},
 			getEpoch: {
 				try await Epoch(rawValue: .init(getGatewayInfo().ledgerState.epoch))
 			},

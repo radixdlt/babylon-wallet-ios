@@ -5,7 +5,7 @@ import SettingsFeature
 // MARK: - Main.Action
 public extension Main {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		case delegate(Delegate)
 	}
@@ -13,7 +13,7 @@ public extension Main {
 
 // MARK: - Main.Action.ChildAction
 public extension Main.Action {
-	enum ChildAction: Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
 		case settings(Settings.Action)
 		case handleDappRequest(HandleDappRequests.Action)
@@ -22,7 +22,7 @@ public extension Main.Action {
 
 // MARK: - Main.Action.Delegate
 public extension Main.Action {
-	enum Delegate: Equatable {
+	enum Delegate: Sendable, Equatable {
 		case removedWallet
 	}
 }

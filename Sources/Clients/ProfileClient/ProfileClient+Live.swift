@@ -8,7 +8,6 @@ import KeychainClientDependency
 import NonEmpty
 import Profile
 import SLIP10
-import URLBuilderClient
 import UserDefaultsClient
 
 // MARK: - ProfileClient + LiveValue
@@ -17,7 +16,6 @@ public extension ProfileClient {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.keychainClient) var keychainClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
-		@Dependency(\.urlBuilder) var urlBuilder
 
 		let profileHolder = ProfileHolder.shared
 
@@ -61,6 +59,8 @@ public extension ProfileClient {
 			setNetworkAndGateway: { networkAndGateway in
 				try await profileHolder.asyncMutating { profile in
 					profile.appPreferences.networkAndGateway = networkAndGateway
+					//                    return !profile.hasNetwork(networkAndGateway.network.id)
+					fatalError("update Profile package and uncomment above")
 				}
 			},
 			createNewProfile: { request in
@@ -93,8 +93,10 @@ public extension ProfileClient {
 				await profileHolder.removeProfile()
 			},
 			getAccounts: {
-				try await profileHolder.get { profile in
-					profile.primaryNet.accounts
+				let currentNetworkID = await getCurrentNetworkID()
+				return try await profileHolder.get { profile in
+					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
+					return onNetwork.accounts
 				}
 			},
 			getP2PClients: {

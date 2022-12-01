@@ -138,7 +138,7 @@ public extension P2P.FromDapp.Request.ID {
 
 public extension P2P.FromDapp.Request.Metadata {
 	static let placeholder = Self(
-		networkId: .primary,
+		networkId: .simulator,
 		origin: "Placeholder",
 		dAppId: "Placeholder"
 	)

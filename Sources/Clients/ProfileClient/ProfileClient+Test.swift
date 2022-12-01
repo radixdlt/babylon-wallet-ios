@@ -23,7 +23,7 @@ extension ProfileClient: TestDependencyKey {
 		getCurrentNetworkID: { NetworkID.hammunet },
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
 		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.hammunet },
-		setNetworkAndGateway: { _ in },
+		setNetworkAndGateway: { _ in false },
 		createNewProfile: { req in
 			try! await Profile.new(
 				networkAndGateway: req.networkAndGateway,

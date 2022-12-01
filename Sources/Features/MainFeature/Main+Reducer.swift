@@ -6,7 +6,7 @@ import Profile
 import ProfileClient
 import SettingsFeature
 
-public struct Main: ReducerProtocol {
+public struct Main: Sendable, ReducerProtocol {
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
 
@@ -38,6 +38,10 @@ public struct Main: ReducerProtocol {
 				try await profileClient.deleteProfileAndFactorSources()
 				await send(.delegate(.removedWallet))
 			}
+
+		case .child(.settings(.delegate(.networkChanged))):
+			state.home = .init()
+			return .none
 
 		case .child(.settings(.delegate(.dismissSettings))):
 			state.settings = nil

@@ -8,7 +8,7 @@ import Profile
 // MARK: - Settings.Action
 public extension Settings {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -18,7 +18,7 @@ public extension Settings {
 
 // MARK: - Settings.Action.ChildAction
 public extension Settings.Action {
-	enum ChildAction: Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case manageP2PClients(ManageP2PClients.Action)
 		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
 	}
@@ -26,7 +26,7 @@ public extension Settings.Action {
 
 // MARK: - Settings.Action.ViewAction
 public extension Settings.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case dismissSettingsButtonTapped
 		case deleteProfileAndFactorSourcesButtonTapped
@@ -45,7 +45,7 @@ public extension Settings.Action {
 
 // MARK: - Settings.Action.InternalAction
 public extension Settings.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -53,7 +53,7 @@ public extension Settings.Action {
 
 // MARK: - Settings.Action.InternalAction.SystemAction
 public extension Settings.Action.InternalAction {
-	enum SystemAction: Equatable {
+	enum SystemAction: Sendable, Equatable {
 		case loadP2PClientsResult(TaskResult<P2PClients>)
 		#if DEBUG
 		case profileToDebugLoaded(Profile)
@@ -63,8 +63,9 @@ public extension Settings.Action.InternalAction {
 
 // MARK: - Settings.Action.DelegateAction
 public extension Settings.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismissSettings
 		case deleteProfileAndFactorSources
+		case networkChanged
 	}
 }

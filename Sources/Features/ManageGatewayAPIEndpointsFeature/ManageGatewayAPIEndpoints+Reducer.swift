@@ -1,17 +1,15 @@
 import ComposableArchitecture
+import CreateAccountFeature
 import ErrorQueue
 import Foundation
 import GatewayAPI
 import ProfileClient
-import URLBuilderClient
 import UserDefaultsClient
 
 // MARK: - ManageGatewayAPIEndpoints
-public struct ManageGatewayAPIEndpoints: ReducerProtocol {
+public struct ManageGatewayAPIEndpoints: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-	@Dependency(\.profileClient) var profileClient
-	@Dependency(\.urlBuilder) var urlBuilder
+	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
 
 	public init() {}
 }
@@ -23,21 +21,15 @@ public extension ManageGatewayAPIEndpoints {
 			return .run { send in
 				await send(.internal(.system(.loadNetworkAndGatewayResult(
 					TaskResult {
-						await profileClient.getNetworkAndGateway()
+						await networkSwitchingClient.getNetworkAndGateway()
 					}
 				))))
 			}
 
 		case let .internal(.system(.loadNetworkAndGatewayResult(.success(currentNetworkAndGateway)))):
-			state.networkAndGateway = currentNetworkAndGateway
 			let url = currentNetworkAndGateway.gatewayAPIEndpointURL
 			state.url = url
-			if let components = try? urlBuilder.componentsFromURL(url) {
-				state.scheme = components.scheme
-				state.port = components.port
-				state.host = components.host
-				state.path = components.path
-			}
+			state.urlString = url.absoluteString
 			return .none
 
 		case let .internal(.system(.loadNetworkAndGatewayResult(.failure(error)))):
@@ -49,24 +41,8 @@ public extension ManageGatewayAPIEndpoints {
 				await send(.delegate(.dismiss))
 			}
 
-		case let .internal(.view(.hostChanged(host))):
-			state.host = URLInput.Host(host)
-			updateURL(into: &state)
-			return .none
-
-		case let .internal(.view(.schemeChanged(scheme))):
-			state.scheme = URLInput.Scheme(scheme)
-			updateURL(into: &state)
-			return .none
-
-		case let .internal(.view(.pathChanged(scheme))):
-			state.path = URLInput.Path(scheme)
-			updateURL(into: &state)
-			return .none
-
-		case let .internal(.view(.portChanged(port))):
-			state.port = URLInput.Port(port)
-			updateURL(into: &state)
+		case let .internal(.view(.urlStringChanged(urlString))):
+			state.urlString = urlString
 			return .none
 
 		case .internal(.view(.switchToButtonTapped)):
@@ -75,24 +51,52 @@ public extension ManageGatewayAPIEndpoints {
 			}
 			state.isValidatingEndpoint = true
 			return .run { send in
-				await send(.internal(.system(.setGatewayAPIEndpointResult(
+				await send(.internal(.system(.gatewayValidationResult(
 					TaskResult {
-						try await gatewayAPIClient.setCurrentBaseURL(url)
+						try await networkSwitchingClient.validateGatewayURL(url)
 					}
 				))))
 			}
 
-		case let .internal(.system(.setGatewayAPIEndpointResult(.success(maybeNew)))):
-			state.isValidatingEndpoint = false
-			if let new = maybeNew {
-				state.networkAndGateway = new
-			}
-			return .none
-
-		case let .internal(.system(.setGatewayAPIEndpointResult(.failure(error)))):
+		case let .internal(.system(.gatewayValidationResult(.failure(error)))):
 			state.isValidatingEndpoint = false
 			errorQueue.schedule(error)
 			return .none
+
+		case let .internal(.system(.gatewayValidationResult(.success(maybeNew)))):
+			state.isValidatingEndpoint = false
+			guard let new = maybeNew else {
+				return .none
+			}
+			state.validatedNewNetworkAndGatewayToSwitchTo = new
+			return .run { send in
+				let hasAccountOnNetwork = await networkSwitchingClient.hasAccountOnNetwork(new)
+				if hasAccountOnNetwork {
+					await send(.internal(.system(.switchToResult(
+						TaskResult {
+							try await networkSwitchingClient.switchTo(new)
+						}
+					))))
+				} else {
+					await send(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(new))))
+				}
+			}
+
+		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetwork))):
+			//            state.createAccount = CreateAccount.State
+			fatalError()
+
+		case let .internal(.system(.switchToResult(.failure(error)))):
+			errorQueue.schedule(error)
+			return .none
+
+		case let .internal(.system(.switchToResult(.success(onNetwork)))):
+			return .run { send in
+				await send(.delegate(.networkChanged(onNetwork)))
+			}
+
+		case .createAccount:
+			fatalError()
 
 		case .delegate:
 			return .none
@@ -100,22 +104,58 @@ public extension ManageGatewayAPIEndpoints {
 	}
 }
 
-private extension ManageGatewayAPIEndpoints {
-	func updateURL(into state: inout State) {
-		guard let host = state.host else {
-			state.url = nil
-			return
-		}
-		guard let newURL = try? urlBuilder.urlFromInput(
-			.init(host: host, scheme: state.scheme, path: state.path, port: state.port)
-		) else {
-			state.url = nil
-			state.isSwitchToButtonEnabled = false
-			return
-		}
+// MARK: - NetworkSwitchingClient
+public struct NetworkSwitchingClient: Sendable, DependencyKey {
+	public var getNetworkAndGateway: GetNetworkAndGateway
+	public var validateGatewayURL: ValidateGatewayURL
+	public var hasAccountOnNetwork: HasAccountOnNetwork
+	public var switchTo: SwitchTo
+}
 
-		state.url = newURL
-		let currentURL = state.url
-		state.isSwitchToButtonEnabled = newURL != currentURL
+public extension DependencyValues {
+	var networkSwitchingClient: NetworkSwitchingClient {
+		get { self[NetworkSwitchingClient.self] }
+		set { self[NetworkSwitchingClient.self] = newValue }
 	}
 }
+
+public extension NetworkSwitchingClient {
+	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
+	typealias ValidateGatewayURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway
+	typealias HasAccountOnNetwork = @Sendable (AppPreferences.NetworkAndGateway) async -> Bool
+	typealias SwitchTo = @Sendable (AppPreferences.NetworkAndGateway) async throws -> OnNetwork
+
+	static let liveValue: Self = {
+		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		@Dependency(\.profileClient) var profileClient
+
+		let getNetworkAndGateway: GetNetworkAndGateway = {
+			await profileClient.getNetworkAndGateway()
+		}
+
+		let validateGatewayURL: ValidateGatewayURL = { _ in
+			fatalError()
+		}
+
+		let hasAccountOnNetwork: HasAccountOnNetwork = { _ in
+			false
+		}
+
+		let switchTo: SwitchTo = { url in
+			guard await hasAccountOnNetwork(url) else {
+				throw NoAccountOnNetwork()
+			}
+			fatalError()
+		}
+
+		return Self(
+			getNetworkAndGateway: getNetworkAndGateway,
+			validateGatewayURL: validateGatewayURL,
+			hasAccountOnNetwork: hasAccountOnNetwork,
+			switchTo: switchTo
+		)
+	}()
+}
+
+// MARK: - NoAccountOnNetwork
+struct NoAccountOnNetwork: Swift.Error {}

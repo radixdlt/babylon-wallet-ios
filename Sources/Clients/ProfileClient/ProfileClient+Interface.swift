@@ -76,7 +76,10 @@ public struct SignersForAccountsGivenAddressesRequest: Sendable, Hashable {
 public extension ProfileClient {
 	typealias GetGatewayAPIEndpointBaseURL = @Sendable () async -> URL
 	typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
-	typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Void
+
+	/// Returns `true` if this is a new network for the Profile -> will need to create an account
+	typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Bool
+
 	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
 	typealias CreateNewProfile = @Sendable (CreateNewProfileRequest) async throws -> Profile

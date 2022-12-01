@@ -78,6 +78,6 @@ public struct AccountAddressesNeedingToSignTransactionRequest: Sendable, Hashabl
 // MARK: - TransactionManifest + CustomDumpStringConvertible
 extension TransactionManifest: CustomDumpStringConvertible {
 	public var customDumpDescription: String {
-		toString(blobOutputFormat: .includeBlobsByByteCountOnly, networkID: .primary)
+		description
 	}
 }

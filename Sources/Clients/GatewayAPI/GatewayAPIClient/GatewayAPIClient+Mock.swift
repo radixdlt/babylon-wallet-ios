@@ -10,9 +10,8 @@ extension GatewayAPIClient: TestDependencyKey {
 	public static let previewValue = Self.mock()
 
 	public static let testValue = Self(
-		getCurrentBaseURL: unimplemented("\(Self.self).getCurrentBaseURL"),
-		setCurrentBaseURL: unimplemented("\(Self.self).setCurrentBaseURL"),
 		getGatewayInfo: unimplemented("\(Self.self).getGatewayInfo"),
+		getNameOfNetwork: unimplemented("\(Self.self).getNameOfNetwork"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
 		resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
@@ -30,8 +29,6 @@ extension GatewayAPIClient: TestDependencyKey {
 		txStatus: GatewayAPI.TransactionStatus? = nil
 	) -> Self {
 		.init(
-			getCurrentBaseURL: { URL(string: "example.com")! },
-			setCurrentBaseURL: { _ in AppPreferences.NetworkAndGateway.hammunet },
 			getGatewayInfo: { .init(
 				ledgerState: .init(
 					network: "Network name",
@@ -46,6 +43,7 @@ extension GatewayAPIClient: TestDependencyKey {
 					openApiSchemaVersion: "schema-version"
 				)
 			) },
+			getNameOfNetwork: { _ in .init("Hammunet") },
 			getEpoch: { .init(rawValue: 123) },
 			accountResourcesByAddress: { _ in
 				fatalError()

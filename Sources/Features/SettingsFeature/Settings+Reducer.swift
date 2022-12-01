@@ -8,7 +8,7 @@ import Profile
 import ProfileClient
 
 // MARK: - Settings
-public struct Settings: ReducerProtocol {
+public struct Settings: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
@@ -59,6 +59,11 @@ public extension Settings {
 		case .child(.manageGatewayAPIEndpoints(.delegate(.dismiss))):
 			state.manageGatewayAPIEndpoints = nil
 			return .none
+
+		case .child(.manageGatewayAPIEndpoints(.delegate(.networkChanged))):
+			return .run { send in
+				await send(.delegate(.networkChanged))
+			}
 
 		case .child(.manageGatewayAPIEndpoints(.internal)):
 			return .none

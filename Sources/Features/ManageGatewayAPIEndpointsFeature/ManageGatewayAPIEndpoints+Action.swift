@@ -1,26 +1,27 @@
 import ComposableArchitecture
+import CreateAccountFeature
 import Foundation
 import Profile
 
 // MARK: - ManageGatewayAPIEndpoints.Action
 public extension ManageGatewayAPIEndpoints {
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
+
+		/// Child
+		case createAccount(CreateAccount.Action)
 	}
 }
 
 // MARK: - ManageGatewayAPIEndpoints.Action.ViewAction
 public extension ManageGatewayAPIEndpoints.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case dismissButtonTapped
 
-		case hostChanged(String)
-		case portChanged(String)
-		case pathChanged(String)
-		case schemeChanged(String)
+		case urlStringChanged(String)
 
 		case switchToButtonTapped
 	}
@@ -28,7 +29,7 @@ public extension ManageGatewayAPIEndpoints.Action {
 
 // MARK: - ManageGatewayAPIEndpoints.Action.InternalAction
 public extension ManageGatewayAPIEndpoints.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -36,16 +37,20 @@ public extension ManageGatewayAPIEndpoints.Action {
 
 // MARK: - ManageGatewayAPIEndpoints.Action.SystemAction
 public extension ManageGatewayAPIEndpoints.Action {
-	enum SystemAction: Equatable {
+	enum SystemAction: Sendable, Equatable {
 		case loadNetworkAndGatewayResult(TaskResult<AppPreferences.NetworkAndGateway>)
 		/// Nil if no change was needed
-		case setGatewayAPIEndpointResult(TaskResult<AppPreferences.NetworkAndGateway?>)
+		case gatewayValidationResult(TaskResult<AppPreferences.NetworkAndGateway?>)
+
+		case createAccountOnNetworkBeforeSwitchingToIt(AppPreferences.NetworkAndGateway)
+		case switchToResult(TaskResult<OnNetwork>)
 	}
 }
 
 // MARK: - ManageGatewayAPIEndpoints.Action.DelegateAction
 public extension ManageGatewayAPIEndpoints.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismiss
+		case networkChanged(OnNetwork)
 	}
 }
