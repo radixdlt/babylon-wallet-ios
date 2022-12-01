@@ -11,9 +11,7 @@ public extension FungibleTokenDetails {
 
 // MARK: - FungibleTokenDetails.Action.ViewAction
 public extension FungibleTokenDetails.Action {
-	enum ViewAction: Equatable {
-		case appeared
-	}
+	enum ViewAction: Equatable {}
 }
 
 // MARK: - FungibleTokenDetails.Action.InternalAction
