@@ -3,6 +3,7 @@ import Foundation
 // MARK: - P2P.ToDapp.Response.Failure.Kind.Error
 public extension P2P.ToDapp.Response.Failure.Kind {
 	enum Error: String, Sendable, LocalizedError, Hashable {
+		case wrongNetwork
 		case failedToPrepareTransaction
 		case failedToCompileTransaction
 		case failedToSignTransaction
@@ -14,6 +15,8 @@ public extension P2P.ToDapp.Response.Failure.Kind {
 
 		public var errorDescription: String? {
 			switch self {
+			case .wrongNetwork:
+				return "Wrong network"
 			case .failedToCompileTransaction:
 				return "Failed to compile transaction"
 			case .failedToPrepareTransaction:

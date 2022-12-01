@@ -15,11 +15,43 @@ public extension P2P.FromDapp {
 
 		public let metadata: Metadata
 
+		public enum InvalidRequest: Sendable, Hashable, LocalizedError {
+			case requestContainedOtherItemsApartFromSendTransactionRequest
+			case requestContainsMultipleItemsOfSameType
+			public var errorDescription: String? {
+				switch self {
+				case .requestContainedOtherItemsApartFromSendTransactionRequest:
+					return "Request contains other items apart from SendTransaction"
+				case .requestContainsMultipleItemsOfSameType:
+					return "Request contains multiple items of same type"
+				}
+			}
+		}
+
 		public init(
 			id: ID,
 			metadata: Metadata,
 			items: [WalletRequestItem]
-		) {
+		) throws {
+			let sendTransactionItems = items.compactMap(\.sendTransaction)
+			if !sendTransactionItems.isEmpty {
+				guard
+					sendTransactionItems.count == 1,
+					items.count == 1
+				else {
+					throw InvalidRequest.requestContainedOtherItemsApartFromSendTransactionRequest
+				}
+			}
+			func assertMaxOne(of target: P2P.FromDapp.Discriminator) throws {
+				guard
+					items.map(\.discriminator).filter({ $0 == target }).count <= 1
+				else {
+					throw InvalidRequest.requestContainsMultipleItemsOfSameType
+				}
+			}
+			for discrimnator in P2P.FromDapp.Discriminator.allCases {
+				try assertMaxOne(of: discrimnator)
+			}
 			self.id = id
 			self.metadata = metadata
 			self.items = items
@@ -149,7 +181,7 @@ public extension P2P.FromDapp.Request {
 	static func placeholderOneTimeAccount(
 		id: ID = .placeholder0
 	) -> Self {
-		.init(
+		try! .init(
 			id: id,
 			metadata: .placeholder,
 			items: [
@@ -163,7 +195,7 @@ public extension P2P.FromDapp.Request {
 	static func placeholderSignTX(
 		id: ID = .placeholder0
 	) -> Self {
-		.init(
+		try! .init(
 			id: id,
 			metadata: .placeholder,
 			items: [

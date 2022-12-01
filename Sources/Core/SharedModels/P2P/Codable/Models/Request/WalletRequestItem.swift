@@ -26,6 +26,15 @@ public extension P2P.FromDapp {
 	}
 }
 
+internal extension P2P.FromDapp.WalletRequestItem {
+	var discriminator: P2P.FromDapp.Discriminator {
+		switch self {
+		case .sendTransaction: return .sendTransactionWrite
+		case .oneTimeAccounts: return .oneTimeAccountsRead
+		}
+	}
+}
+
 // MARK: As OneTimeAccountsReadRequestItem
 public extension P2P.FromDapp.WalletRequestItem {
 	var oneTimeAccounts: P2P.FromDapp.OneTimeAccountsReadRequestItem? {

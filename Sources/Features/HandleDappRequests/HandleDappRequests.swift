@@ -10,6 +10,7 @@ import TransactionSigningFeature
 
 // MARK: - HandleDappRequests
 public struct HandleDappRequests: Sendable, ReducerProtocol {
+	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
@@ -37,7 +38,18 @@ private extension HandleDappRequests {
 			return .none
 
 		case let .internal(.system(.receiveRequestFromP2PClientResult(.success(requestFromP2P)))):
-			state.unfinishedRequestsFromClient.queue(requestFromClient: requestFromP2P)
+
+			return .run { send in
+				let currentNetworkID = await profileClient.getCurrentNetworkID()
+				guard requestFromP2P.requestFromDapp.metadata.networkId == currentNetworkID else {
+					await send(.internal(.system(.failedWithError(requestFromP2P, .wrongNetwork, "Wallet is using network ID: \(currentNetworkID), request sent specified network ID: \(requestFromP2P.requestFromDapp.metadata.networkId)."))))
+					return
+				}
+				await send(.internal(.system(.receivedRequestIsValidHandleIt(requestFromP2P))))
+			}
+
+		case let .internal(.system(.receivedRequestIsValidHandleIt(validRequestFromP2P))):
+			state.unfinishedRequestsFromClient.queue(requestFromClient: validRequestFromP2P)
 
 			guard state.currentRequest == nil else {
 				// already handling a requests
