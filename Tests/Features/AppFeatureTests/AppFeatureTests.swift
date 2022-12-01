@@ -8,7 +8,7 @@ import TestUtils
 
 @MainActor
 final class AppFeatureTests: TestCase {
-	let networkID = NetworkID.primary
+	let networkID = NetworkID.hammunet
 
 	func test_initialAppState_whenAppLaunches_thenInitialAppStateIsSplash() {
 		let appState = App.State()
