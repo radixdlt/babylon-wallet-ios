@@ -20,11 +20,14 @@ public extension FungibleTokenDetails.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			// TODO: implement
-			Text("Implement: AssetDetails")
-				.background(Color.yellow)
-				.foregroundColor(.red)
-				.onAppear { viewStore.send(.appeared) }
+			VStack {
+				if let name = viewStore.name {
+					Text(name)
+						.background(Color.yellow)
+						.foregroundColor(.red)
+				}
+			}
+			.onAppear { viewStore.send(.appeared) }
 		}
 	}
 }
@@ -32,8 +35,10 @@ public extension FungibleTokenDetails.View {
 // MARK: - FungibleTokenDetails.View.ViewState
 extension FungibleTokenDetails.View {
 	struct ViewState: Equatable {
+		var name: String?
+
 		init(state: FungibleTokenDetails.State) {
-			// TODO: implement
+			name = state.ownedToken.asset.name
 		}
 	}
 }

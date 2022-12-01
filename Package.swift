@@ -379,6 +379,7 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"Asset",
+				profile,
 				tca,
 				"TestUtils",
 			]
