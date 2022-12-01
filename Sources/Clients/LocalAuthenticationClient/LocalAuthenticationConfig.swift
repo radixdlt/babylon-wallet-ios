@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - LocalAuthenticationConfig
-public struct LocalAuthenticationConfig: Equatable, CustomStringConvertible {
+public struct LocalAuthenticationConfig: Equatable, Sendable, CustomStringConvertible {
 	public let isPasscodeSetUp: Bool
 
 	// Optional since user or app might have cancelled query after passcode query finished

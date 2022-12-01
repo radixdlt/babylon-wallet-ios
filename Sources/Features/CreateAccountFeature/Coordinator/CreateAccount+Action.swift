@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import LocalAuthenticationClient
 import Profile
 
 // MARK: - CreateAccount.Action
@@ -19,6 +20,7 @@ public extension CreateAccount.Action {
 		case createAccountButtonTapped
 		case textFieldChanged(String)
 		case textFieldFocused(CreateAccount.State.Field?)
+		case alertDismissButtonTapped
 	}
 }
 
@@ -34,6 +36,11 @@ public extension CreateAccount.Action {
 public extension CreateAccount.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
 		case focusTextField(CreateAccount.State.Field?)
+		case verifyBiometrics
+		case biometricsConfigResult(TaskResult<LocalAuthenticationConfig>)
+		case createProfile
+		case createdNewProfileResult(TaskResult<Profile>)
+		case createAccount
 		case createdNewAccountResult(TaskResult<OnNetwork.Account>)
 	}
 }
@@ -43,6 +50,7 @@ public extension CreateAccount.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case dismissCreateAccount
 		case createdNewAccount(OnNetwork.Account)
+		case createdNewProfile(Profile)
 		case failedToCreateNewAccount
 	}
 }

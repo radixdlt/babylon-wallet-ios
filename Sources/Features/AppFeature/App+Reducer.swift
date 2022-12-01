@@ -55,11 +55,8 @@ public struct App: Sendable, ReducerProtocol {
 			goToOnboarding(state: &state)
 			return .none
 
-		case let .child(.onboarding(.child(.newProfile(.delegate(.finishedCreatingNewProfile(newProfile)))))):
+		case let .child(.onboarding(.createAccount(.delegate(.createdNewProfile(newProfile))))):
 			return injectProfileIntoProfileClient(newProfile)
-
-		case let .child(.onboarding(.child(.importMnemonic(.delegate(.finishedImporting(_, profile)))))):
-			return injectProfileIntoProfileClient(profile)
 
 		case let .child(.splash(.delegate(.profileResultLoaded(profileResult)))):
 			switch profileResult {

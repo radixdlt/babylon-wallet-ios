@@ -3,7 +3,7 @@ import Foundation
 import TestUtils
 
 final class LocalAuthenticationClientTests: TestCase {
-	let sut = LocalAuthenticationClient.live()
+	let sut = LocalAuthenticationClient.liveValue
 
 	func testTrivial() async throws {
 		let config = try await sut.queryConfig()
