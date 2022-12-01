@@ -1,6 +1,5 @@
-import Asset
 import Foundation
-import Profile
+import SharedModels
 
 // MARK: - FungibleTokenDetails.State
 public extension FungibleTokenDetails {

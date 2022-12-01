@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import DesignSystem
+import SharedModels
 import SwiftUI
 
 // MARK: - FungibleTokenDetails.View
@@ -47,12 +48,14 @@ extension FungibleTokenDetails.View {
 		var iconURL: URL?
 		var amount: String?
 		var symbol: String?
+		var worth: BigUInt?
 
 		init(state: FungibleTokenDetails.State) {
 			name = state.ownedToken.asset.name
 			iconURL = state.ownedToken.asset.iconURL
 			amount = state.ownedToken.amount
 			symbol = state.ownedToken.asset.symbol
+			worth = state.ownedToken.worth
 		}
 	}
 }

@@ -363,7 +363,7 @@ package.addModules([
 	.feature(
 		name: "FungibleTokenDetailsFeature",
 		dependencies: [
-			"Asset",
+			"SharedModels",
 			tca,
 		],
 		tests: .no
@@ -829,12 +829,14 @@ package.addModules([
 	.core(
 		name: "SharedModels",
 		dependencies: [
+			"Asset",
+			bigInt,
 			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make Converse, EngineToolkit, etc. vend their own Model packages.
 			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
 			profile, // FIXME: In `Profile` split out Models package
-			collections, // TODO: @_exported import Collections (as they're technically "shared models" too)
+			collections,
 			converse, // FIXME: In `Converse` split out Models package
-			nonEmpty, // TODO: @_exported import NonEmpty (as they're technically "shared models" too)
+			nonEmpty,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
