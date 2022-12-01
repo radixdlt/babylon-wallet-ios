@@ -1,19 +1,19 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - AssetDetails.View
-public extension AssetDetails {
+// MARK: - FungibleTokenDetails.View
+public extension FungibleTokenDetails {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<AssetDetails>
+		private let store: StoreOf<FungibleTokenDetails>
 
-		public init(store: StoreOf<AssetDetails>) {
+		public init(store: StoreOf<FungibleTokenDetails>) {
 			self.store = store
 		}
 	}
 }
 
-public extension AssetDetails.View {
+public extension FungibleTokenDetails.View {
 	var body: some View {
 		WithViewStore(
 			store,
@@ -29,10 +29,10 @@ public extension AssetDetails.View {
 	}
 }
 
-// MARK: - AssetDetails.View.ViewState
-extension AssetDetails.View {
+// MARK: - FungibleTokenDetails.View.ViewState
+extension FungibleTokenDetails.View {
 	struct ViewState: Equatable {
-		init(state: AssetDetails.State) {
+		init(state: FungibleTokenDetails.State) {
 			// TODO: implement
 		}
 	}
@@ -43,10 +43,10 @@ extension AssetDetails.View {
 // MARK: - AssetDetails_Preview
 struct AssetDetails_Preview: PreviewProvider {
 	static var previews: some View {
-		AssetDetails.View(
+		FungibleTokenDetails.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AssetDetails()
+				reducer: FungibleTokenDetails()
 			)
 		)
 	}
