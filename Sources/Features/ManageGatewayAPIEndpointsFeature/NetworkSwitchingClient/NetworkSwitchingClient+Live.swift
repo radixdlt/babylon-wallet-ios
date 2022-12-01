@@ -24,7 +24,7 @@ public extension NetworkSwitchingClient {
 			guard newURL != currentURL else {
 				return nil
 			}
-			let name = try await gatewayAPIClient.getNameOfNetwork(newURL)
+			let name = try await gatewayAPIClient.getNetworkName(newURL)
 			// FIXME: mainnet: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
 			// once it returns networkID!
 			let network = try Network.lookupBy(name: name)

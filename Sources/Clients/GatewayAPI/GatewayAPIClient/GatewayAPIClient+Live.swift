@@ -155,7 +155,7 @@ public extension GatewayAPIClient {
 
 		return Self(
 			getGatewayInfo: getGatewayInfo,
-			getNameOfNetwork: { baseURL in
+			getNetworkName: { baseURL in
 				let gatewayInfo = try await _getGatewayInfo(baseURL: baseURL, timeoutInterval: 2)
 				return Network.Name(rawValue: gatewayInfo.ledgerState.network)
 			},

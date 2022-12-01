@@ -11,7 +11,7 @@ public typealias ResourceIdentifier = String
 public struct GatewayAPIClient: Sendable, DependencyKey {
 	// MARK: Request
 	public var getGatewayInfo: GetGatewayInfo
-	public var getNameOfNetwork: GetNameOfNetwork
+	public var getNetworkName: GetNetworkName
 	public var getEpoch: GetEpoch
 	public var accountResourcesByAddress: GetAccountResourcesByAddress
 	public var resourcesOverview: GetResourcesOverview
@@ -25,7 +25,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 public extension GatewayAPIClient {
 	typealias GetGatewayInfo = @Sendable () async throws -> GatewayAPI.GatewayInfoResponse
 	typealias GetEpoch = @Sendable () async throws -> Epoch
-	typealias GetNameOfNetwork = @Sendable (URL) async throws -> Network.Name
+	typealias GetNetworkName = @Sendable (URL) async throws -> Network.Name
 
 	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityResourcesResponse
 

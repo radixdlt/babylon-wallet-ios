@@ -18,7 +18,7 @@ public struct App: Sendable, ReducerProtocol {
 		Scope(state: \.root, action: /Action.self) {
 			EmptyReducer()
 				.ifCaseLet(/App.State.Root.main, action: /Action.child .. Action.ChildAction.main) {
-					Main()._printChanges()
+					Main()
 				}
 				.ifCaseLet(/App.State.Root.onboarding, action: /Action.child .. Action.ChildAction.onboarding) {
 					Onboarding()

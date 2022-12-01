@@ -29,10 +29,7 @@ extension FaucetClient: DependencyKey {
 
 				let currentEpoch = try await gatewayAPIClient.getEpoch()
 
-				var threshold = 200
-				#if DEBUG // FIXME: change to `#if ALPHA` once we have that defined
-				threshold = 1
-				#endif
+				let threshold = 1
 				return currentEpoch.rawValue - lastUsedEpoch.rawValue >= threshold
 			} catch {
 				throw error

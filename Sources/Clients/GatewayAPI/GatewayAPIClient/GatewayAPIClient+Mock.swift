@@ -11,7 +11,7 @@ extension GatewayAPIClient: TestDependencyKey {
 
 	public static let testValue = Self(
 		getGatewayInfo: unimplemented("\(Self.self).getGatewayInfo"),
-		getNameOfNetwork: unimplemented("\(Self.self).getNameOfNetwork"),
+		getNetworkName: unimplemented("\(Self.self).getNetworkName"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
 		resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
@@ -43,7 +43,7 @@ extension GatewayAPIClient: TestDependencyKey {
 					openApiSchemaVersion: "schema-version"
 				)
 			) },
-			getNameOfNetwork: { _ in .init("Hammunet") },
+			getNetworkName: { _ in .init("Hammunet") },
 			getEpoch: { .init(rawValue: 123) },
 			accountResourcesByAddress: { _ in
 				fatalError()
