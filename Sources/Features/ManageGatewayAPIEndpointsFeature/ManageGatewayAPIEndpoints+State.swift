@@ -8,7 +8,6 @@ public extension ManageGatewayAPIEndpoints {
 		public var createAccount: CreateAccount.State?
 
 		public var urlString: String
-		public var url: URL?
 		public var currentNetworkAndGateway: AppPreferences.NetworkAndGateway?
 		public var isValidatingEndpoint: Bool
 		public var isSwitchToButtonEnabled: Bool
@@ -18,7 +17,6 @@ public extension ManageGatewayAPIEndpoints {
 		public init(
 			createAccount: CreateAccount.State? = nil,
 			urlString: String = "",
-			url: URL? = nil,
 			currentNetworkAndGateway: AppPreferences.NetworkAndGateway? = nil,
 			validatedNewNetworkAndGatewayToSwitchTo: AppPreferences.NetworkAndGateway? = nil,
 			isSwitchToButtonEnabled: Bool = false,
@@ -26,7 +24,6 @@ public extension ManageGatewayAPIEndpoints {
 		) {
 			self.createAccount = createAccount
 			self.urlString = urlString
-			self.url = url
 			self.currentNetworkAndGateway = currentNetworkAndGateway
 			self.validatedNewNetworkAndGatewayToSwitchTo = validatedNewNetworkAndGatewayToSwitchTo
 			self.isSwitchToButtonEnabled = isSwitchToButtonEnabled

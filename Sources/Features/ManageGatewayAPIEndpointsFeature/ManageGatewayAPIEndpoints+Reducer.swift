@@ -36,11 +36,9 @@ public extension ManageGatewayAPIEndpoints {
 
 		case let .internal(.system(.loadNetworkAndGatewayResult(.success(currentNetworkAndGateway)))):
 			state.currentNetworkAndGateway = currentNetworkAndGateway
-			let url = currentNetworkAndGateway.gatewayAPIEndpointURL
-			state.url = url
 			#if DEBUG
 			// convenient when testing
-			state.urlString = url.absoluteString
+			state.urlString = currentNetworkAndGateway.gatewayAPIEndpointURL.absoluteString
 			#endif
 			return .none
 
@@ -56,12 +54,12 @@ public extension ManageGatewayAPIEndpoints {
 		case let .internal(.view(.urlStringChanged(urlString))):
 			state.urlString = urlString
 			let maybeURL = URL(string: urlString)
-			state.url = maybeURL
 			state.isSwitchToButtonEnabled = maybeURL != nil && !(state.currentNetworkAndGateway?.gatewayAPIEndpointURL == maybeURL)
 			return .none
 
 		case .internal(.view(.switchToButtonTapped)):
-			guard let url = state.url else {
+			assert(state.isSwitchToButtonEnabled)
+			guard let url = URL(string: state.urlString) else {
 				return .none
 			}
 			state.isValidatingEndpoint = true
@@ -110,8 +108,7 @@ public extension ManageGatewayAPIEndpoints {
 
 		case let .internal(.system(.hasAccountsResult(.failure(error)))):
 			errorQueue.schedule(error)
-			state.validatedNewNetworkAndGatewayToSwitchTo = nil
-			return .none
+			return skipSwitching(state: &state)
 
 		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetwork))):
 			state.createAccount = CreateAccount.State(
@@ -131,9 +128,10 @@ public extension ManageGatewayAPIEndpoints {
 			}
 
 		case .createAccount(.delegate(.dismissCreateAccount)):
-			state.createAccount = nil
-			state.validatedNewNetworkAndGatewayToSwitchTo = nil
-			return .none
+			return skipSwitching(state: &state)
+
+		case .createAccount(.delegate(.failedToCreateNewAccount)):
+			return skipSwitching(state: &state)
 
 		case .createAccount(.delegate(.createdNewAccount)):
 			state.createAccount = nil
@@ -149,16 +147,17 @@ public extension ManageGatewayAPIEndpoints {
 				))))
 			}
 
-		case .createAccount(.delegate(.failedToCreateNewAccount)):
-			state.createAccount = nil
-			state.validatedNewNetworkAndGatewayToSwitchTo = nil
-			return .none
-
 		case .createAccount:
 			return .none
 
 		case .delegate:
 			return .none
 		}
+	}
+
+	func skipSwitching(state: inout State) -> EffectTask<Action> {
+		state.createAccount = nil
+		state.validatedNewNetworkAndGatewayToSwitchTo = nil
+		return .none
 	}
 }
