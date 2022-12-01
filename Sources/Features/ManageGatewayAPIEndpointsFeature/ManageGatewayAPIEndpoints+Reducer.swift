@@ -38,7 +38,10 @@ public extension ManageGatewayAPIEndpoints {
 			state.currentNetworkAndGateway = currentNetworkAndGateway
 			let url = currentNetworkAndGateway.gatewayAPIEndpointURL
 			state.url = url
+			#if DEBUG
+			// convenient when testing
 			state.urlString = url.absoluteString
+			#endif
 			return .none
 
 		case let .internal(.system(.loadNetworkAndGatewayResult(.failure(error)))):
@@ -88,7 +91,6 @@ public extension ManageGatewayAPIEndpoints {
 			}
 		case let .internal(.system(.hasAccountsResult(.success(hasAccountsOnNetwork)))):
 			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
-				fatalError()
 				// weird state... should not happen.
 				return .none
 			}
@@ -121,7 +123,7 @@ public extension ManageGatewayAPIEndpoints {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .internal(.system(.switchToResult(.success(_)))):
+		case .internal(.system(.switchToResult(.success))):
 			return .run { send in
 				await send(.delegate(.networkChanged))
 			}
@@ -131,10 +133,9 @@ public extension ManageGatewayAPIEndpoints {
 			state.validatedNewNetworkAndGatewayToSwitchTo = nil
 			return .none
 
-		case let .createAccount(.delegate(.createdNewAccount(_))):
+		case .createAccount(.delegate(.createdNewAccount)):
 			state.createAccount = nil
 			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
-				fatalError()
 				// weird state... should not happen.
 				return .none
 			}
@@ -159,77 +160,3 @@ public extension ManageGatewayAPIEndpoints {
 		}
 	}
 }
-
-// MARK: - NetworkSwitchingClient
-public struct NetworkSwitchingClient: Sendable, DependencyKey {
-	public var getNetworkAndGateway: GetNetworkAndGateway
-	public var validateGatewayURL: ValidateGatewayURL
-	public var hasAccountOnNetwork: HasAccountOnNetwork
-	public var switchTo: SwitchTo
-}
-
-public extension DependencyValues {
-	var networkSwitchingClient: NetworkSwitchingClient {
-		get { self[NetworkSwitchingClient.self] }
-		set { self[NetworkSwitchingClient.self] = newValue }
-	}
-}
-
-public extension NetworkSwitchingClient {
-	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
-	typealias ValidateGatewayURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway?
-	typealias HasAccountOnNetwork = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Bool
-	typealias SwitchTo = @Sendable (AppPreferences.NetworkAndGateway) async throws -> AppPreferences.NetworkAndGateway
-
-	static let liveValue: Self = {
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		@Dependency(\.profileClient) var profileClient
-
-		let getNetworkAndGateway: GetNetworkAndGateway = {
-			await profileClient.getNetworkAndGateway()
-		}
-
-		let validateGatewayURL: ValidateGatewayURL = { newURL -> AppPreferences.NetworkAndGateway? in
-			let currentURL = await getNetworkAndGateway().gatewayAPIEndpointURL
-			print("Current: \(currentURL.absoluteString)")
-			print("newURL: \(newURL.absoluteString)")
-			guard newURL != currentURL else {
-				return nil
-			}
-			let name = try await gatewayAPIClient.getNameOfNetwork(newURL)
-			// FIXME: mainnet: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
-			// once it returns networkID!
-			let network = try Network.lookupBy(name: name)
-
-			let networkAndGateway = AppPreferences.NetworkAndGateway(
-				network: network,
-				gatewayAPIEndpointURL: newURL
-			)
-
-			return networkAndGateway
-		}
-
-		let hasAccountOnNetwork: HasAccountOnNetwork = { networkAndGateway in
-			try await profileClient.hasAccountOnNetwork(networkAndGateway.network.id)
-		}
-
-		let switchTo: SwitchTo = { networkAndGateway in
-			guard try await hasAccountOnNetwork(networkAndGateway) else {
-				throw NoAccountOnNetwork()
-			}
-
-			try await profileClient.setNetworkAndGateway(networkAndGateway)
-			return networkAndGateway
-		}
-
-		return Self(
-			getNetworkAndGateway: getNetworkAndGateway,
-			validateGatewayURL: validateGatewayURL,
-			hasAccountOnNetwork: hasAccountOnNetwork,
-			switchTo: switchTo
-		)
-	}()
-}
-
-// MARK: - NoAccountOnNetwork
-struct NoAccountOnNetwork: Swift.Error {}

@@ -13,19 +13,13 @@ public extension ManageGatewayAPIEndpoints {
 		public var isValidatingEndpoint: Bool
 		public var isSwitchToButtonEnabled: Bool
 
-		//        public var networkToSwitchTo: NetworkToSwitchTo?
-//
-		//        public struct NetworkToSwitchTo: Sendable, Equatable {
 		public var validatedNewNetworkAndGatewayToSwitchTo: AppPreferences.NetworkAndGateway?
-		//            public var hasAccountsOnNetwork: Bool?
-		//        }
 
 		public init(
 			createAccount: CreateAccount.State? = nil,
 			urlString: String = "",
 			url: URL? = nil,
 			currentNetworkAndGateway: AppPreferences.NetworkAndGateway? = nil,
-//			networkToSwitchTo: NetworkToSwitchTo? = nil,
 			validatedNewNetworkAndGatewayToSwitchTo: AppPreferences.NetworkAndGateway? = nil,
 			isSwitchToButtonEnabled: Bool = false,
 			isValidatingEndpoint: Bool = false
@@ -34,7 +28,6 @@ public extension ManageGatewayAPIEndpoints {
 			self.urlString = urlString
 			self.url = url
 			self.currentNetworkAndGateway = currentNetworkAndGateway
-//			self.networkToSwitchTo = networkToSwitchTo
 			self.validatedNewNetworkAndGatewayToSwitchTo = validatedNewNetworkAndGatewayToSwitchTo
 			self.isSwitchToButtonEnabled = isSwitchToButtonEnabled
 			self.isValidatingEndpoint = isValidatingEndpoint
