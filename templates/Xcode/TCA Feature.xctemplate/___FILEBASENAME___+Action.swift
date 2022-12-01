@@ -11,7 +11,9 @@ public extension ___VARIABLE_featureName___ {
 
 // MARK: - ___VARIABLE_featureName___.Action.ViewAction
 public extension ___VARIABLE_featureName___.Action {
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case appeared
+	}
 }
 
 // MARK: - ___VARIABLE_featureName___.Action.InternalAction

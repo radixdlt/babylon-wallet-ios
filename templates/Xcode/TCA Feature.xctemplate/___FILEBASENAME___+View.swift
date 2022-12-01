@@ -19,11 +19,12 @@ public extension ___VARIABLE_featureName___.View {
 			store,
 			observe: ViewState.init(state:),
 			send: { .view($0) }
-		) { _ in
+		) { viewStore in
 			// TODO: implement
 			Text("Implement: ___VARIABLE_featureName___")
 				.background(Color.yellow)
 				.foregroundColor(.red)
+				.onAppear { viewStore.send(.appeared) }
 		}
 	}
 }

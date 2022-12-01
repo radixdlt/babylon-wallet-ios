@@ -11,7 +11,9 @@ public extension AssetDetails {
 
 // MARK: - AssetDetails.Action.ViewAction
 public extension AssetDetails.Action {
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case appeared
+	}
 }
 
 // MARK: - AssetDetails.Action.InternalAction

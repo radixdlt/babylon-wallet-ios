@@ -19,11 +19,12 @@ public extension AssetDetails.View {
 			store,
 			observe: ViewState.init(state:),
 			send: { .view($0) }
-		) { _ in
+		) { viewStore in
 			// TODO: implement
 			Text("Implement: AssetDetails")
 				.background(Color.yellow)
 				.foregroundColor(.red)
+				.onAppear { viewStore.send(.appeared) }
 		}
 	}
 }
