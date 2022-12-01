@@ -20,7 +20,7 @@ ln -sf "$(realpath --relative-to=.git/hooks scripts)/pre-commit" "$GIT_HOOKS_DIR
 echo "Importing custom Xcode templates"
 XCODE_TEMPLATES_DIR="$HOME/Library/Developer/Xcode/Templates/File Templates"
 mkdir -p "$XCODE_TEMPLATES_DIR"
-gln -sf -T "$(realpath --relative-to="$XCODE_TEMPLATES_DIR" templates)" "$XCODE_TEMPLATES_DIR/babylon-wallet-ios"
+gln -sf -T "$(realpath --relative-to="$XCODE_TEMPLATES_DIR" templates/Xcode)" "$XCODE_TEMPLATES_DIR/babylon-wallet-ios"
 
 echo "Done ✅"
 

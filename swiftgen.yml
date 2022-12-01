@@ -6,7 +6,7 @@ strings:
   outputs:
     params:
       publicAccess: true
-    templatePath: templates/L10n.stencil
+    templatePath: templates/SwiftGen/L10n.stencil
     output: L10n.generated.swift
 
 xcassets:
@@ -14,5 +14,5 @@ xcassets:
   outputs:
     params:
       publicAccess: true
-    templatePath: templates/AssetResource.stencil
+    templatePath: templates/SwiftGen/AssetResource.stencil
     output: AssetResource.generated.swift
