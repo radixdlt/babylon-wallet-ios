@@ -9,10 +9,6 @@ public typealias ResourceIdentifier = String
 
 // MARK: - GatewayAPIClient
 public struct GatewayAPIClient: Sendable, DependencyKey {
-//	// MARK: BaseURL management
-//	public var getCurrentBaseURL: GetCurrentBaseURL
-//	public var setCurrentBaseURL: SetCurrentBaseURL
-
 	// MARK: Request
 	public var getGatewayInfo: GetGatewayInfo
 	public var getNameOfNetwork: GetNameOfNetwork
@@ -27,9 +23,6 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 }
 
 public extension GatewayAPIClient {
-//	typealias GetCurrentBaseURL = @Sendable () async -> URL
-//	typealias SetCurrentBaseURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway?
-
 	typealias GetGatewayInfo = @Sendable () async throws -> GatewayAPI.GatewayInfoResponse
 	typealias GetEpoch = @Sendable () async throws -> Epoch
 	typealias GetNameOfNetwork = @Sendable (URL) async throws -> Network.Name
