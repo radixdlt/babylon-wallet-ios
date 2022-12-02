@@ -1,7 +1,7 @@
 import SwiftUI
 
-// MARK: - Style
-public enum Style {
+// MARK: - TextStyle
+public enum TextStyle {
 	case sheetTitle
 	case sectionHeader
 	case secondaryHeader
@@ -18,39 +18,39 @@ public enum Style {
 }
 
 public extension View {
-	@ViewBuilder func textStyle(_ style: Style) -> some View {
+	@ViewBuilder func textStyle(_ style: TextStyle) -> some View {
 		switch style {
 		case .sheetTitle:
-			modifier(Style.SheetTitle())
+			modifier(TextStyle.SheetTitle())
 		case .sectionHeader:
-			modifier(Style.SectionHeader())
+			modifier(TextStyle.SectionHeader())
 		case .secondaryHeader:
-			modifier(Style.SecondaryHeader())
+			modifier(TextStyle.SecondaryHeader())
 		case .body1Header:
-			modifier(Style.Body1Header())
+			modifier(TextStyle.Body1Header())
 		case .body1HighImportance:
-			modifier(Style.Body1HighImportance())
+			modifier(TextStyle.Body1HighImportance())
 		case .body1Regular:
-			modifier(Style.Body1Regular())
+			modifier(TextStyle.Body1Regular())
 		case .body1StandaloneLink:
-			modifier(Style.Body1StandaloneLink())
+			modifier(TextStyle.Body1StandaloneLink())
 		case .body1Link:
-			modifier(Style.Body1Link())
+			modifier(TextStyle.Body1Link())
 		case .body2Header:
-			modifier(Style.Body2Header())
+			modifier(TextStyle.Body2Header())
 		case .body2HighImportance:
-			modifier(Style.Body2HighImportance())
+			modifier(TextStyle.Body2HighImportance())
 		case .body2Regular:
-			modifier(Style.Body2Regular())
+			modifier(TextStyle.Body2Regular())
 		case .body2Link:
-			modifier(Style.Body2Link())
+			modifier(TextStyle.Body2Link())
 		case .button:
-			modifier(Style.Button())
+			modifier(TextStyle.Button())
 		}
 	}
 }
 
-private extension Style {
+private extension TextStyle {
 	struct SheetTitle: ViewModifier {
 		func body(content: Content) -> some View {
 			content
