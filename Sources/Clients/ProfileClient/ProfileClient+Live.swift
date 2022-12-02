@@ -8,7 +8,6 @@ import KeychainClientDependency
 import NonEmpty
 import Profile
 import SLIP10
-import URLBuilderClient
 import UserDefaultsClient
 
 // MARK: - ProfileClient + LiveValue
@@ -17,7 +16,6 @@ public extension ProfileClient {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.keychainClient) var keychainClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
-		@Dependency(\.urlBuilder) var urlBuilder
 
 		let profileHolder = ProfileHolder.shared
 
@@ -54,12 +52,20 @@ public extension ProfileClient {
 			}
 		}
 
+		let hasAccountOnNetwork: HasAccountOnNetwork = { networkID in
+			try await profileHolder.get { profile in
+				profile.containsNetwork(withID: networkID)
+			}
+		}
+
 		return Self(
 			getCurrentNetworkID: getCurrentNetworkID,
 			getGatewayAPIEndpointBaseURL: getGatewayAPIEndpointBaseURL,
 			getNetworkAndGateway: getNetworkAndGateway,
 			setNetworkAndGateway: { networkAndGateway in
 				try await profileHolder.asyncMutating { profile in
+					// Ensure we have accounts on network, else do not change
+					_ = try profile.onNetwork(id: networkAndGateway.network.id)
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
@@ -92,9 +98,12 @@ public extension ProfileClient {
 				}
 				await profileHolder.removeProfile()
 			},
+			hasAccountOnNetwork: hasAccountOnNetwork,
 			getAccounts: {
-				try await profileHolder.get { profile in
-					profile.primaryNet.accounts
+				let currentNetworkID = await getCurrentNetworkID()
+				return try await profileHolder.get { profile in
+					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
+					return onNetwork.accounts
 				}
 			},
 			getP2PClients: {
@@ -122,7 +131,7 @@ public extension ProfileClient {
 				try await profileHolder.asyncMutating { profile in
 					let networkID = await getCurrentNetworkID()
 					return try await profile.createNewVirtualAccount(
-						networkID: networkID,
+						networkID: request.overridingNetworkID ?? networkID,
 						displayName: request.accountName,
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
 							try await keychainClient

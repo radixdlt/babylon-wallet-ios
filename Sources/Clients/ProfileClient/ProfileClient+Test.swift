@@ -33,6 +33,7 @@ extension ProfileClient: TestDependencyKey {
 		injectProfile: { _ in /* Noop */ },
 		extractProfileSnapshot: { fatalError("Impl me") },
 		deleteProfileAndFactorSources: { /* Noop */ },
+		hasAccountOnNetwork: { _ in false },
 		getAccounts: {
 			let accounts: [OnNetwork.Account] = [.placeholder0, .placeholder1]
 			return NonEmpty(rawValue: OrderedSet(accounts))!
@@ -69,6 +70,7 @@ extension ProfileClient: TestDependencyKey {
 		injectProfile: unimplemented("\(Self.self).injectProfile"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
+		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork"),
 		getAccounts: unimplemented("\(Self.self).getAccounts"),
 		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
 		addP2PClient: unimplemented("\(Self.self).addP2PClient"),

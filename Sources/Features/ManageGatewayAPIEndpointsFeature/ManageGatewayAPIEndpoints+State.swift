@@ -1,37 +1,31 @@
+import CreateAccountFeature
 import Foundation
 import Profile
-import URLBuilderClient
 
 // MARK: - ManageGatewayAPIEndpoints.State
 public extension ManageGatewayAPIEndpoints {
 	struct State: Equatable {
-		public var networkAndGateway: AppPreferences.NetworkAndGateway?
+		public var createAccount: CreateAccount.State?
 
-		public var host: URLInput.Host?
-		public var port: URLInput.Port?
-		public var path: URLInput.Path
-		public var scheme: URLInput.Scheme
-		public var url: URL?
+		public var urlString: String
+		public var currentNetworkAndGateway: AppPreferences.NetworkAndGateway?
+		public var isValidatingEndpoint: Bool
 		public var isSwitchToButtonEnabled: Bool
 
-		public var isValidatingEndpoint: Bool
+		public var validatedNewNetworkAndGatewayToSwitchTo: AppPreferences.NetworkAndGateway?
 
 		public init(
-			networkAndGateway: AppPreferences.NetworkAndGateway? = nil,
-			host: URLInput.Host? = nil,
-			port: URLInput.Port? = nil,
-			path: URLInput.Path = "",
-			scheme: URLInput.Scheme = "https",
-			url: URL? = nil,
+			createAccount: CreateAccount.State? = nil,
+			urlString: String = "",
+			currentNetworkAndGateway: AppPreferences.NetworkAndGateway? = nil,
+			validatedNewNetworkAndGatewayToSwitchTo: AppPreferences.NetworkAndGateway? = nil,
 			isSwitchToButtonEnabled: Bool = false,
 			isValidatingEndpoint: Bool = false
 		) {
-			self.networkAndGateway = networkAndGateway
-			self.host = host
-			self.port = port
-			self.path = path
-			self.scheme = scheme
-			self.url = url
+			self.createAccount = createAccount
+			self.urlString = urlString
+			self.currentNetworkAndGateway = currentNetworkAndGateway
+			self.validatedNewNetworkAndGatewayToSwitchTo = validatedNewNetworkAndGatewayToSwitchTo
 			self.isSwitchToButtonEnabled = isSwitchToButtonEnabled
 			self.isValidatingEndpoint = isValidatingEndpoint
 		}

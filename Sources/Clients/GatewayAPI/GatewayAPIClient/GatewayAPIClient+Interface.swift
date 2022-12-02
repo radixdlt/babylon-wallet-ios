@@ -9,12 +9,9 @@ public typealias ResourceIdentifier = String
 
 // MARK: - GatewayAPIClient
 public struct GatewayAPIClient: Sendable, DependencyKey {
-	// MARK: BaseURL management
-	public var getCurrentBaseURL: GetCurrentBaseURL
-	public var setCurrentBaseURL: SetCurrentBaseURL
-
 	// MARK: Request
 	public var getGatewayInfo: GetGatewayInfo
+	public var getNetworkName: GetNetworkName
 	public var getEpoch: GetEpoch
 	public var accountResourcesByAddress: GetAccountResourcesByAddress
 	public var resourcesOverview: GetResourcesOverview
@@ -23,40 +20,12 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
 	public var transactionDetails: GetTransactionDetails
-
-	public init(
-		getCurrentBaseURL: @escaping GetCurrentBaseURL,
-		setCurrentBaseURL: @escaping SetCurrentBaseURL,
-		getGatewayInfo: @escaping GetGatewayInfo,
-		getEpoch: @escaping GetEpoch,
-		accountResourcesByAddress: @escaping GetAccountResourcesByAddress,
-		resourcesOverview: @escaping GetResourcesOverview,
-		resourceDetailsByResourceIdentifier: @escaping GetResourceDetailsByResourceIdentifier,
-		recentTransactions: @escaping GetRecentTransactions,
-		submitTransaction: @escaping SubmitTransaction,
-		transactionStatus: @escaping GetTransactionStatus,
-		transactionDetails: @escaping GetTransactionDetails
-	) {
-		self.getCurrentBaseURL = getCurrentBaseURL
-		self.setCurrentBaseURL = setCurrentBaseURL
-		self.getGatewayInfo = getGatewayInfo
-		self.getEpoch = getEpoch
-		self.accountResourcesByAddress = accountResourcesByAddress
-		self.resourcesOverview = resourcesOverview
-		self.resourceDetailsByResourceIdentifier = resourceDetailsByResourceIdentifier
-		self.recentTransactions = recentTransactions
-		self.submitTransaction = submitTransaction
-		self.transactionStatus = transactionStatus
-		self.transactionDetails = transactionDetails
-	}
 }
 
 public extension GatewayAPIClient {
-	typealias GetCurrentBaseURL = @Sendable () async -> URL
-	typealias SetCurrentBaseURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway?
-
 	typealias GetGatewayInfo = @Sendable () async throws -> GatewayAPI.GatewayInfoResponse
 	typealias GetEpoch = @Sendable () async throws -> Epoch
+	typealias GetNetworkName = @Sendable (URL) async throws -> Network.Name
 
 	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityResourcesResponse
 

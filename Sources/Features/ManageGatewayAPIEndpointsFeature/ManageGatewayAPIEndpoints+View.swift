@@ -1,9 +1,9 @@
 import Common
 import ComposableArchitecture
+import CreateAccountFeature
 import DesignSystem
 import Profile
 import SwiftUI
-import URLBuilderClient
 
 // MARK: - ManageGatewayAPIEndpoints.View
 public extension ManageGatewayAPIEndpoints {
@@ -25,76 +25,18 @@ public extension ManageGatewayAPIEndpoints.View {
 			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
-				VStack {
-					NavigationBar(
-						titleText: L10n.ManageGateway.title,
-						leadingItem: CloseButton {
-							viewStore.send(.dismissButtonTapped)
-						}
+				ZStack {
+					core(viewStore: viewStore)
+						.zIndex(0)
+
+					IfLetStore(
+						store.scope(
+							state: \.createAccount,
+							action: { .createAccount($0) }
+						),
+						then: CreateAccount.View.init(store:)
 					)
-					.foregroundColor(.app.gray1)
-					.padding([.horizontal, .top], .medium3)
-
-					VStack(alignment: .leading) {
-						if let networkAndGateway = viewStore.networkAndGateway {
-							networkAndGatewayView(networkAndGateway)
-						}
-
-						Spacer()
-
-						ZStack {
-							VStack {
-								TextField(
-									L10n.ManageGateway.scheme,
-									text: viewStore.binding(
-										get: \.scheme,
-										send: { .schemeChanged($0) }
-									)
-								)
-
-								TextField(
-									L10n.ManageGateway.host,
-									text: viewStore.binding(
-										get: \.host,
-										send: { .hostChanged($0) }
-									)
-								)
-
-								TextField(
-									L10n.ManageGateway.path,
-									text: viewStore.binding(
-										get: \.path,
-										send: { .pathChanged($0) }
-									)
-								)
-
-								TextField(
-									L10n.ManageGateway.port,
-									text: viewStore.binding(
-										get: \.port,
-										send: { .portChanged($0) }
-									)
-								)
-							}
-							.textFieldStyle(.roundedBorder)
-
-							if viewStore.isShowingLoader {
-								LoadingView()
-							}
-						}
-
-						Spacer()
-
-						Button(L10n.ManageGateway.switchToButtonTitle) {
-							viewStore.send(.switchToButtonTapped)
-						}
-						.enabled(viewStore.isSwitchToButtonEnabled)
-					}
-					.padding([.horizontal, .bottom], .medium1)
-					.buttonStyle(.primaryRectangular)
-				}
-				.onAppear {
-					viewStore.send(.didAppear)
+					.zIndex(1)
 				}
 			}
 		}
@@ -103,12 +45,67 @@ public extension ManageGatewayAPIEndpoints.View {
 
 private extension ManageGatewayAPIEndpoints.View {
 	@ViewBuilder
+	func core(viewStore: ViewStore<ViewState, ManageGatewayAPIEndpoints.Action.ViewAction>) -> some View {
+		ForceFullScreen {
+			VStack {
+				NavigationBar(
+					titleText: L10n.ManageGateway.title,
+					leadingItem: CloseButton {
+						viewStore.send(.dismissButtonTapped)
+					}
+				)
+				.foregroundColor(.app.gray1)
+				.padding([.horizontal, .top], .medium3)
+
+				VStack(alignment: .leading) {
+					if let networkAndGateway = viewStore.networkAndGateway {
+						networkAndGatewayView(networkAndGateway)
+					}
+
+					Spacer()
+
+					ZStack {
+						VStack(alignment: .leading) {
+							Text(L10n.ManageGateway.inputNewGatewayAPIURL)
+							TextField(
+								L10n.ManageGateway.urlString,
+								text: viewStore.binding(
+									get: \.urlString,
+									send: { .urlStringChanged($0) }
+								)
+							)
+							.textFieldStyle(.roundedBorder)
+						}
+
+						// FIXME: betanet move loading indicator into button below.
+						if viewStore.isShowingLoader {
+							LoadingView()
+						}
+					}
+
+					Spacer()
+
+					Button(L10n.ManageGateway.switchToButtonTitle) {
+						viewStore.send(.switchToButtonTapped)
+					}
+					.enabled(viewStore.isSwitchToButtonEnabled)
+				}
+				.padding([.horizontal, .bottom], .medium1)
+				.buttonStyle(.primaryRectangular)
+			}
+			.onAppear {
+				viewStore.send(.didAppear)
+			}
+		}
+	}
+
+	@ViewBuilder
 	func label(
 		_ label: String,
 		value: CustomStringConvertible,
 		valueColor: Color = Color.app.gray2
 	) -> some View {
-		VStack(alignment: .leading) {
+		VStack(alignment: .leading, spacing: 0) {
 			Text(label)
 				.foregroundColor(.app.gray2)
 				.textStyle(.body2HighImportance)
@@ -129,9 +126,16 @@ private extension ManageGatewayAPIEndpoints.View {
 				.foregroundColor(.app.gray1)
 				.textStyle(.sectionHeader)
 
-			label(L10n.ManageGateway.networkName, value: networkAndGateway.network.name)
-			label(L10n.ManageGateway.networkID, value: networkAndGateway.network.id)
-			label(L10n.ManageGateway.gatewayAPIEndpoint, value: URLBuilderClient.liveValue.formatURL(networkAndGateway.gatewayAPIEndpointURL), valueColor: .app.blue2)
+			HStack {
+				label(L10n.ManageGateway.networkName, value: networkAndGateway.network.name)
+				Spacer()
+				label(L10n.ManageGateway.networkID, value: networkAndGateway.network.id)
+			}
+
+			label(
+				L10n.ManageGateway.gatewayAPIEndpoint,
+				value: networkAndGateway.gatewayAPIEndpointURL.absoluteString, valueColor: .app.blue2
+			)
 		}
 	}
 }
@@ -139,23 +143,17 @@ private extension ManageGatewayAPIEndpoints.View {
 // MARK: - ManageGatewayAPIEndpoints.View.ViewState
 extension ManageGatewayAPIEndpoints.View {
 	struct ViewState: Equatable {
-		public var host: String
-		public var path: String
-		public var scheme: String
-		public var port: String
+		public var urlString: String
 
 		public var networkAndGateway: AppPreferences.NetworkAndGateway?
 		public var isSwitchToButtonEnabled: Bool
 		public var isShowingLoader: Bool
 
 		init(state: ManageGatewayAPIEndpoints.State) {
-			host = state.host ?? ""
-			scheme = state.scheme
-			path = state.path
-			port = state.port?.description ?? ""
+			urlString = state.urlString
 
-			isSwitchToButtonEnabled = state.url != nil
-			networkAndGateway = state.networkAndGateway
+			isSwitchToButtonEnabled = state.isSwitchToButtonEnabled
+			networkAndGateway = state.currentNetworkAndGateway
 			isShowingLoader = state.isValidatingEndpoint
 		}
 	}

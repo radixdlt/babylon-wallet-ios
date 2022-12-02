@@ -17,9 +17,9 @@ let package = Package(
 package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.21"),
-	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.3"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.45"),
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.22"),
+	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.4"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.48"),
 
 	.package(url: "https://github.com/apple/swift-collections", from: "1.0.3"),
 
@@ -497,6 +497,7 @@ package.addModules([
 		name: "ManageGatewayAPIEndpointsFeature",
 		dependencies: [
 			"Common",
+			"CreateAccountFeature",
 			dependencies,
 			"ErrorQueue",
 			"DesignSystem",
@@ -504,7 +505,6 @@ package.addModules([
 			"ProfileClient",
 			tca,
 			"UserDefaultsClient",
-			"URLBuilderClient",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -713,7 +713,6 @@ package.addModules([
 			"JSON",
 			profile, // address
 			"ProfileClient",
-			"URLBuilderClient",
 		],
 		exclude: [
 			"CodeGen/Input/",
@@ -762,7 +761,6 @@ package.addModules([
 			"ProfileLoader",
 			"SharedModels",
 			"UserDefaultsClient",
-			"URLBuilderClient",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -789,13 +787,6 @@ package.addModules([
 		tests: .yes(dependencies: [
 			"TestUtils",
 		])
-	),
-	.client(
-		name: "URLBuilderClient",
-		dependencies: [dependencies],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
 	),
 	.client(
 		name: "UserDefaultsClient",

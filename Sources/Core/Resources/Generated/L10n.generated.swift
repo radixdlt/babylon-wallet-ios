@@ -143,22 +143,18 @@ public enum L10n {
   	public static let currentGatewayTitle = L10n.tr("Localizable", "manageGateway.currentGatewayTitle", fallback: "Current")
   	/// Gateway API Endpoint
   	public static let gatewayAPIEndpoint = L10n.tr("Localizable", "manageGateway.gatewayAPIEndpoint", fallback: "Gateway API Endpoint")
-  	/// Host
-  	public static let host = L10n.tr("Localizable", "manageGateway.host", fallback: "Host")
+  	/// New URL (https:// required)
+  	public static let inputNewGatewayAPIURL = L10n.tr("Localizable", "manageGateway.inputNewGatewayAPIURL", fallback: "New URL (https:// required)")
   	/// Network ID
   	public static let networkID = L10n.tr("Localizable", "manageGateway.networkID", fallback: "Network ID")
   	/// Network name
   	public static let networkName = L10n.tr("Localizable", "manageGateway.networkName", fallback: "Network name")
-  	/// Path
-  	public static let path = L10n.tr("Localizable", "manageGateway.path", fallback: "Path")
-  	/// Port
-  	public static let port = L10n.tr("Localizable", "manageGateway.port", fallback: "Port")
-  	/// Scheme
-  	public static let scheme = L10n.tr("Localizable", "manageGateway.scheme", fallback: "Scheme")
   	/// Switch To
   	public static let switchToButtonTitle = L10n.tr("Localizable", "manageGateway.switchToButtonTitle", fallback: "Switch To")
   	/// Edit Gateway API URL
   	public static let title = L10n.tr("Localizable", "manageGateway.title", fallback: "Edit Gateway API URL")
+  	/// https://example.com:8080
+  	public static let urlString = L10n.tr("Localizable", "manageGateway.urlString", fallback: "https://example.com:8080")
 	}
 	public enum ManageP2PClients {
   	/// Connection ID: %@
