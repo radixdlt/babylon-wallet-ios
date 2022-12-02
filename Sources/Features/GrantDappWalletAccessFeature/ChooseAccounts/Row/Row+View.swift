@@ -29,7 +29,7 @@ public extension ChooseAccounts.Row.View {
 						.foregroundColor(.app.white)
 						.textStyle(.body1Header)
 
-					Text(viewStore.accountAddress.address)
+					AddressView(viewStore.accountAddress, copyAddressAction: .none)
 						.foregroundColor(.app.white.opacity(0.8))
 						.textStyle(.body2HighImportance)
 				}
@@ -57,13 +57,13 @@ extension ChooseAccounts.Row.View {
 		let appearanceID: OnNetwork.Account.AppearanceID
 		let isSelected: Bool
 		let accountName: String
-		let accountAddress: AccountAddress
+		let accountAddress: AddressView.ViewState
 
 		init(state: ChooseAccounts.Row.State) {
 			appearanceID = state.account.appearanceID
 			isSelected = state.isSelected
 			accountName = state.account.displayName ?? L10n.DApp.ChooseAccounts.unnamedAccount
-			accountAddress = state.account.address
+			accountAddress = .init(address: state.account.address.address, format: .short())
 		}
 	}
 }
