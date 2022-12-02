@@ -41,37 +41,35 @@ public extension FungibleTokenDetails.View {
 							.frame(maxWidth: .infinity, alignment: .leading)
 							.padding(.horizontal, .large2)
 					}
-					if let id = viewStore.id, let currentSupply = viewStore.currentSupply {
-						divider
-						VStack(spacing: .medium3) {
-							HStack {
-								Text("Token ID")
-									.textStyle(.body1Regular)
-									.foregroundColor(.app.gray2)
-								AddressView(
-									address: id,
-									textStyle: .body1Regular,
-									copyAddressAction: .none
-								)
-								.frame(maxWidth: .infinity, alignment: .trailing)
-								.multilineTextAlignment(.trailing)
-							}
+					divider
+					VStack(spacing: .medium3) {
+						HStack {
+							Text("Token ID")
+								.textStyle(.body1Regular)
+								.foregroundColor(.app.gray2)
+							AddressView(
+								viewStore.address,
+								textStyle: .body1Regular,
+								copyAddressAction: .none
+							)
+							.frame(maxWidth: .infinity, alignment: .trailing)
+							.multilineTextAlignment(.trailing)
+						}
+						if let currentSupply = viewStore.currentSupply {
 							HStack {
 								Text("Current Supply")
 									.textStyle(.body1Regular)
 									.foregroundColor(.app.gray2)
-								AddressView(
-									address: currentSupply.description,
-									textStyle: .body1Regular,
-									copyAddressAction: .none
-								)
-								.frame(maxWidth: .infinity, alignment: .trailing)
-								.multilineTextAlignment(.trailing)
+								Text(currentSupply.description)
+									.frame(maxWidth: .infinity, alignment: .trailing)
+									.multilineTextAlignment(.trailing)
 							}
 						}
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(.horizontal, .large2)
 					}
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.padding(.horizontal, .large2)
+					.textStyle(.body1Regular)
+					.lineLimit(1)
 				}
 			}
 			.foregroundColor(.app.gray1)
@@ -87,7 +85,7 @@ extension FungibleTokenDetails.View {
 		var amount: String?
 		var symbol: String?
 		var description: String?
-		var id: String
+		var address: AddressView.ViewState
 		var currentSupply: BigUInt?
 
 		init(state: FungibleTokenDetails.State) {
@@ -96,7 +94,7 @@ extension FungibleTokenDetails.View {
 			amount = state.ownedToken.amount
 			symbol = state.ownedToken.asset.symbol
 			description = state.ownedToken.asset.tokenDescription
-			id = state.ownedToken.asset.id
+			address = .init(address: state.ownedToken.asset.address.description, format: .short())
 			currentSupply = state.ownedToken.asset.totalMintedAttos
 		}
 	}
