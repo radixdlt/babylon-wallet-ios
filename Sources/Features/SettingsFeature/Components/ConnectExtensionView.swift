@@ -16,7 +16,6 @@ struct ConnectExtensionView: View {
 extension ConnectExtensionView {
 	var body: some View {
 		VStack(spacing: .medium2) {
-			// TODO: replace with image when ready
 			Image(asset: AssetResource.browsers)
 				.padding([.top, .horizontal], .medium1)
 
