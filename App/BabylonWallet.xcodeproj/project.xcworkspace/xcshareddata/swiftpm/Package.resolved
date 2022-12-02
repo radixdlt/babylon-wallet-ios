@@ -39,10 +39,10 @@
     {
       "identity" : "codescanner",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Sajjon/CodeScanner",
+      "location" : "https://github.com/twostraws/CodeScanner",
       "state" : {
-        "revision" : "e99827ca985d9e1ed35daf38be1b5f774269aeb1",
-        "version" : "2.1.2"
+        "revision" : "c7859712034a08bb5a018fbe8751c1f1edc4b248",
+        "version" : "2.2.1"
       }
     },
     {

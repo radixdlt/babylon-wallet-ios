@@ -1,28 +1,29 @@
 import ComposableArchitecture
-import ConnectUsingPasswordFeature
 import Converse
 import ConverseCommon
 import Foundation
-import InputPasswordFeature
+import NewConnectionFeature
 import P2PConnectivityClient
 import Profile
 import SharedModels
 
 // MARK: - ManageP2PClients.Action
 public extension ManageP2PClients {
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		case child(ChildAction)
-		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
 }
 
+public extension ManageP2PClients.Action {
+	static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
+}
+
 // MARK: - ManageP2PClients.Action.ChildAction
 public extension ManageP2PClients.Action {
 	enum ChildAction: Sendable, Equatable {
-		case inputP2PConnectionPassword(InputPassword.Action)
-		case connectUsingPassword(ConnectUsingPassword.Action)
+		case newConnection(NewConnection.Action)
 		case connection(
 			id: ManageP2PClient.State.ID,
 			action: ManageP2PClient.Action
@@ -51,13 +52,10 @@ public extension ManageP2PClients.Action {
 // MARK: - ManageP2PClients.Action.InternalAction.SystemAction
 public extension ManageP2PClients.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
-		case successfullyOpenedConnection(Connection)
-
-		case initConnectionSecretsResult(TaskResult<ConnectionSecrets>)
 		case loadConnectionsResult(TaskResult<[P2P.ClientWithConnectionStatus]>)
 
+		case successfullyOpenedConnection(Connection)
 		case saveNewConnectionResult(TaskResult<P2P.ConnectedClient>)
-
 		case deleteConnectionResult(TaskResult<P2PClient.ID>)
 		case sendTestMessageResult(TaskResult<String>)
 	}
@@ -65,7 +63,7 @@ public extension ManageP2PClients.Action.InternalAction {
 
 // MARK: - ManageP2PClients.Action.DelegateAction
 public extension ManageP2PClients.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismiss
 	}
 }

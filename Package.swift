@@ -21,20 +21,23 @@ package.dependencies += [
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.4"),
 	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.48"),
 
+	// ~~~ THIRD PARTY ~~~
+	// APPLE
 	.package(url: "https://github.com/apple/swift-collections", from: "1.0.3"),
-
-	// Third party dependencies
-	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
-	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
-	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
-	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
 	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
-	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
-	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
-	.package(url: "https://github.com/globulus/swiftui-pull-to-refresh", from: "1.1.8"),
 
-	// TCA - ComposableArchitecture used as architecture
+	// PointFreeCo
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.46.0"),
+	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
+	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
+
+	// Other
+	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
+	.package(url: "https://github.com/globulus/swiftui-pull-to-refresh", from: "1.1.8"),
+	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
+	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
+	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
+	.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1"),
 
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
@@ -488,12 +491,11 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-			.product(name: "ConnectUsingPasswordFeature", package: "Converse"),
 			converse,
 			dependencies,
 			"DesignSystem",
 			"ErrorQueue",
-			.product(name: "InputPasswordFeature", package: "Converse"),
+			"NewConnectionFeature",
 			"P2PConnectivityClient",
 			"ProfileClient",
 			"SharedModels",
@@ -519,6 +521,17 @@ package.addModules([
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.feature(
+		name: "NewConnectionFeature",
+		dependencies: [
+			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])),
+			converse,
+			"Common",
+			"DesignSystem",
+			tca,
+		], tests: .yes(
+			dependencies: ["TestUtils"])
 	),
 	.feature(
 		name: "NonFungibleTokenListFeature",

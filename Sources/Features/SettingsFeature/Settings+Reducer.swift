@@ -94,7 +94,7 @@ public extension Settings {
 		case .child, .delegate:
 			return .none
 		case .internal(.view(.addP2PClientButtonTapped)):
-			state.manageP2PClients = .init(inputP2PConnectionPassword: .init())
+			state.manageP2PClients = .init(newConnection: .init())
 			return .none
 		case .internal(.view(.editGatewayAPIEndpointButtonTapped)):
 			state.manageGatewayAPIEndpoints = .init()

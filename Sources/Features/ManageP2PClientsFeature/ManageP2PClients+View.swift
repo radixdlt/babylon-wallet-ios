@@ -1,9 +1,8 @@
 import Common
 import ComposableArchitecture
-import ConnectUsingPasswordFeature
 import DesignSystem
 import Foundation
-import InputPasswordFeature
+import NewConnectionFeature
 import P2PConnectivityClient
 import SharedModels
 import SwiftUI
@@ -34,39 +33,12 @@ public extension ManageP2PClients.View {
 
 					IfLetStore(
 						store.scope(
-							state: \.inputP2PConnectionPassword,
-							action: { .child(.inputP2PConnectionPassword($0)) }
+							state: \.newConnection,
+							action: { .child(.newConnection($0)) }
 						),
-						then: { inputPasswordStore in
+						then: { newConnectionStore in
 							ForceFullScreen {
-								VStack {
-									NavigationBar(
-										titleText: L10n.ManageP2PClients.newConnectionTitle,
-										leadingItem: CloseButton {
-											viewStore.send(.dismissNewConnectionFlowButtonTapped)
-										}
-									)
-									.foregroundColor(.app.gray1)
-
-									InputPassword.View(store: inputPasswordStore)
-										.buttonStyle(.secondaryRectangular())
-
-									Spacer()
-								}
-								.padding(.medium3)
-							}
-						}
-					)
-					.zIndex(1)
-
-					IfLetStore(
-						store.scope(
-							state: \.connectUsingPassword,
-							action: { .child(.connectUsingPassword($0)) }
-						),
-						then: { connectUsingPasswordStore in
-							ForceFullScreen {
-								ConnectUsingPassword.View(store: connectUsingPasswordStore)
+								NewConnection.View(store: newConnectionStore)
 							}
 							.padding()
 						}
@@ -101,7 +73,7 @@ private extension ManageP2PClients.View {
 									state: \.connections,
 									action: { .child(.connection(id: $0, action: $1)) }
 								),
-								content: ManageP2PClient.View.init(store:)
+								content: { ManageP2PClient.View(store: $0) }
 							)
 						}
 					}

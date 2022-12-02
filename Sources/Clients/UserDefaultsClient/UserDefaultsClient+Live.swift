@@ -4,7 +4,7 @@ import Foundation
 // MARK: - UserDefaultsClient + DependencyKey
 extension UserDefaultsClient: DependencyKey {
 	public static let liveValue: Self = {
-		let userDefaults = { UserDefaults(suiteName: "group.works.rdx.babylon")! }
+		let userDefaults = { @Sendable in UserDefaults(suiteName: "group.works.rdx.babylon")! }
 		return Self(
 			stringForKey: { userDefaults().string(forKey: $0) },
 			boolForKey: { userDefaults().bool(forKey: $0) },

@@ -2,23 +2,26 @@ import Foundation
 
 // MARK: - ___VARIABLE_featureName___.Action
 public extension ___VARIABLE_featureName___ {
-	enum Action: Equatable {
-		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
+	enum Action: Sendable, Equatable {
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
 }
 
+public extension ___VARIABLE_featureName___ {
+	static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
+}
+
 // MARK: - ___VARIABLE_featureName___.Action.ViewAction
 public extension ___VARIABLE_featureName___.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 	}
 }
 
 // MARK: - ___VARIABLE_featureName___.Action.InternalAction
 public extension ___VARIABLE_featureName___.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -26,10 +29,10 @@ public extension ___VARIABLE_featureName___.Action {
 
 // MARK: - ___VARIABLE_featureName___.Action.SystemAction
 public extension ___VARIABLE_featureName___.Action {
-	enum SystemAction: Equatable {}
+	enum SystemAction: Sendable, Equatable {}
 }
 
 // MARK: - ___VARIABLE_featureName___.Action.DelegateAction
 public extension ___VARIABLE_featureName___.Action {
-	enum DelegateAction: Equatable {}
+	enum DelegateAction: Sendable, Equatable {}
 }

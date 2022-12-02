@@ -58,7 +58,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 }
 
 // MARK: - FungibleTokenContainer
-public struct FungibleTokenContainer: AssetContainer, Equatable {
+public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
 	public let owner: AccountAddress
 	public typealias T = FungibleToken
 	public var asset: FungibleToken

@@ -4,7 +4,7 @@ import Foundation
 public typealias Key = String
 
 // MARK: - UserDefaultsClient
-public struct UserDefaultsClient {
+public struct UserDefaultsClient: Sendable {
 	public var stringForKey: @Sendable (Key) -> String?
 	public var boolForKey: @Sendable (Key) -> Bool
 	public var dataForKey: @Sendable (Key) -> Data?
