@@ -848,8 +848,14 @@ package.addModules([
 			"Resources",
 			.product(name: "SwiftUIPullToRefresh", package: "swiftui-pull-to-refresh", condition: .when(platforms: [.iOS])),
 		],
-		resources: [.process("Fonts")],
-		tests: .no,
+		resources: [
+			.process("Fonts"),
+		],
+		tests: .yes(
+			dependencies: [
+				"TestUtils",
+			]
+		),
 		isProduct: true
 	),
 	.core(

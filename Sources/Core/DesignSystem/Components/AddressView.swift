@@ -41,7 +41,7 @@ public extension AddressView {
 // MARK: AddressView.ViewState
 public extension AddressView {
 	struct ViewState: Equatable {
-		var formattedAddress: String
+		public var formattedAddress: String
 
 		public init(address: String, format: AddressFormat) {
 			switch format {
