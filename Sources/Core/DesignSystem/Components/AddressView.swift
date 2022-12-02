@@ -10,7 +10,7 @@ public struct AddressView: View {
 	public init(
 		address: String,
 		textStyle: TextStyle = .body2HighImportance,
-		copyAddressAction: @escaping () -> Void
+		copyAddressAction: (() -> Void)?
 	) {
 		self.address = address
 		self.textStyle = textStyle

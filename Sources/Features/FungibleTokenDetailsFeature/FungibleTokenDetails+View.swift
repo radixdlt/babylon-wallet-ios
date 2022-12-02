@@ -32,11 +32,6 @@ public extension FungibleTokenDetails.View {
 					Text(amount).font(.app.sheetTitle).kerning(-0.5) +
 						Text(" " + symbol).font(.app.sectionHeader)
 				}
-				if let worth = viewStore.worth {
-					Text("$\(worth.description)")
-						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray2)
-				}
 				VStack(spacing: .medium1) {
 					let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
 					if let description = viewStore.description {
@@ -53,24 +48,29 @@ public extension FungibleTokenDetails.View {
 								Text("Token ID")
 									.textStyle(.body1Regular)
 									.foregroundColor(.app.gray2)
-								Text(id)
-									.frame(maxWidth: .infinity, alignment: .trailing)
-									.multilineTextAlignment(.trailing)
+								AddressView(
+									address: id,
+									textStyle: .body1Regular,
+									copyAddressAction: .none
+								)
+								.frame(maxWidth: .infinity, alignment: .trailing)
+								.multilineTextAlignment(.trailing)
 							}
 							HStack {
 								Text("Current Supply")
 									.textStyle(.body1Regular)
 									.foregroundColor(.app.gray2)
-								Text(currentSupply.description)
-									.frame(maxWidth: .infinity, alignment: .trailing)
-									.multilineTextAlignment(.trailing)
+								AddressView(
+									address: currentSupply.description,
+									textStyle: .body1Regular,
+									copyAddressAction: .none
+								)
+								.frame(maxWidth: .infinity, alignment: .trailing)
+								.multilineTextAlignment(.trailing)
 							}
 						}
-						.textStyle(.body1Regular)
 						.frame(maxWidth: .infinity, alignment: .leading)
 						.padding(.horizontal, .large2)
-						.truncationMode(.middle)
-						.lineLimit(1)
 					}
 				}
 			}
@@ -86,7 +86,6 @@ extension FungibleTokenDetails.View {
 		var iconURL: URL?
 		var amount: String?
 		var symbol: String?
-		var worth: BigUInt?
 		var description: String?
 		var id: String
 		var currentSupply: BigUInt?
@@ -96,7 +95,6 @@ extension FungibleTokenDetails.View {
 			iconURL = state.ownedToken.asset.iconURL
 			amount = state.ownedToken.amount
 			symbol = state.ownedToken.asset.symbol
-			worth = state.ownedToken.worth
 			description = state.ownedToken.asset.tokenDescription
 			id = state.ownedToken.asset.id
 			currentSupply = state.ownedToken.asset.totalMintedAttos
