@@ -38,4 +38,7 @@ public extension Grid {
 public extension CGFloat {
 	/// 50
 	static let standardButtonHeight: Self = 50
+
+	/// 75
+	static let largeButtonHeight: Self = 75
 }
