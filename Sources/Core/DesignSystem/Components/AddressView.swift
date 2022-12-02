@@ -23,6 +23,7 @@ public extension AddressView {
 		HStack(spacing: .zero) {
 			Text(state.formattedAddress)
 				.lineLimit(1)
+				.minimumScaleFactor(0.5)
 				.textStyle(textStyle)
 
 			if let copyAddressAction {
@@ -73,3 +74,17 @@ public extension AddressView.ViewState.AddressFormat {
 		public static let `default` = Self(first: 4, last: 6)
 	}
 }
+
+#if DEBUG
+struct AddressView_Previews: PreviewProvider {
+	static var previews: some View {
+		AddressView(
+			AddressView.ViewState(
+				address: "account_wqs8qxdx7qw8c",
+				format: .short()
+			),
+			copyAddressAction: nil
+		)
+	}
+}
+#endif
