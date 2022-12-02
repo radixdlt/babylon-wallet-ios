@@ -45,7 +45,6 @@ public extension AccountDetails.View {
 							viewStore.send(.copyAddressButtonTapped)
 						}
 					)
-					.frame(maxWidth: 140)
 					.foregroundColor(.app.whiteTransparent)
 					.padding(.bottom, .medium1)
 

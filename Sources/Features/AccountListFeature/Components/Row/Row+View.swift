@@ -49,7 +49,6 @@ public extension AccountList.Row.View {
 						}
 					)
 					.foregroundColor(.app.whiteTransparent)
-					.frame(maxWidth: 160)
 
 					// TODO: replace spacer with token list when API is available
 					Spacer()
