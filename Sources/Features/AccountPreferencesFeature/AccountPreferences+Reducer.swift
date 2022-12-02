@@ -24,8 +24,8 @@ public struct AccountPreferences: ReducerProtocol {
 			return loadIsAllowedToUseFaucet(&state)
 
 		case .internal(.view(.faucetButtonTapped)):
+			state.isLoading = true
 			return .run { [address = state.address] send in
-				await send(.internal(.system(.presentLoadingState)))
 				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: address, unlockKeychainPromptShowToUser: L10n.TransactionSigning.biometricsPrompt))
 				await send(.delegate(.refreshAccount(address)))
 			} catch: { error, _ in
@@ -42,14 +42,6 @@ public struct AccountPreferences: ReducerProtocol {
 			errorQueue.schedule(error)
 			return .none
 
-		case .internal(.system(.presentLoadingState)):
-			state.isLoading = true
-			return .none
-
-		case .internal(.system(.dismissLoadingState)):
-			state.isLoading = false
-			return .none
-
 		case .internal(.system(.refreshAccountCompleted)):
 			state.isLoading = false
 			state.isFaucetButtonEnabled = false
@@ -60,8 +52,8 @@ public struct AccountPreferences: ReducerProtocol {
 
 private extension AccountPreferences {
 	func loadIsAllowedToUseFaucet(_ state: inout State) -> EffectTask<Action> {
-		.run { [address = state.address] send in
-			await send(.internal(.system(.presentLoadingState)))
+		state.isLoading = true
+		return .run { [address = state.address] send in
 			await send(.internal(.system(.isAllowedToUseFaucet(
 				TaskResult {
 					try await faucetClient.isAllowedToUseFaucet(address)
