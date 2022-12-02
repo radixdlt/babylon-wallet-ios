@@ -9,6 +9,6 @@ public extension ___VARIABLE_featureName___ {
 
 #if DEBUG
 public extension ___VARIABLE_featureName___.State {
-	static let placeholder: Self = .init()
+	static let previewValue: Self = .init()
 }
 #endif

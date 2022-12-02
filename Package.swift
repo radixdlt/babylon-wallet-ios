@@ -361,6 +361,14 @@ package.addModules([
 		)
 	),
 	.feature(
+		name: "FungibleTokenDetailsFeature",
+		dependencies: [
+			"SharedModels",
+			tca,
+		],
+		tests: .no
+	),
+	.feature(
 		name: "FungibleTokenListFeature",
 		dependencies: [
 			"Asset",
@@ -371,6 +379,8 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"Asset",
+				"DesignSystem",
+				profile,
 				tca,
 				"TestUtils",
 			]
@@ -630,17 +640,6 @@ package.addModules([
 		)
 	),
 	.client(
-		name: "Asset",
-		dependencies: [
-			"Common",
-			profile, // Address
-			bigInt,
-		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
-	),
-	.client(
 		name: "P2PConnectivityClient",
 		dependencies: [
 			asyncExtensions,
@@ -801,6 +800,17 @@ package.addModules([
 
 package.addModules([
 	.core(
+		name: "Asset", // put in SharedModels?
+		dependencies: [
+			"Common",
+			profile, // Address
+			bigInt,
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
+	),
+	.core(
 		name: "Common",
 		dependencies: [
 			bite,
@@ -819,12 +829,14 @@ package.addModules([
 	.core(
 		name: "SharedModels",
 		dependencies: [
+			"Asset",
+			bigInt,
 			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make Converse, EngineToolkit, etc. vend their own Model packages.
 			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
 			profile, // FIXME: In `Profile` split out Models package
-			collections, // TODO: @_exported import Collections (as they're technically "shared models" too)
+			collections,
 			converse, // FIXME: In `Converse` split out Models package
-			nonEmpty, // TODO: @_exported import NonEmpty (as they're technically "shared models" too)
+			nonEmpty,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -836,8 +848,14 @@ package.addModules([
 			"Resources",
 			.product(name: "SwiftUIPullToRefresh", package: "swiftui-pull-to-refresh", condition: .when(platforms: [.iOS])),
 		],
-		resources: [.process("Fonts")],
-		tests: .no,
+		resources: [
+			.process("Fonts"),
+		],
+		tests: .yes(
+			dependencies: [
+				"TestUtils",
+			]
+		),
 		isProduct: true
 	),
 	.core(

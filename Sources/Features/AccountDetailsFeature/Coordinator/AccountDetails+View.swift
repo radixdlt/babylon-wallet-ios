@@ -40,12 +40,11 @@ public extension AccountDetails.View {
 					.padding([.horizontal, .top], .medium3)
 
 					AddressView(
-						address: viewStore.address.wrapAsAddress().address,
+						viewStore.address,
 						copyAddressAction: {
 							viewStore.send(.copyAddressButtonTapped)
 						}
 					)
-					.frame(maxWidth: 140)
 					.foregroundColor(.app.whiteTransparent)
 					.padding(.bottom, .medium1)
 
@@ -111,12 +110,12 @@ extension AccountDetails.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		let appearanceID: OnNetwork.Account.AppearanceID
-		let address: AccountAddress
+		let address: AddressView.ViewState
 		let displayName: String
 
 		init(state: AccountDetails.State) {
 			appearanceID = state.account.appearanceID
-			address = state.address
+			address = .init(address: state.address.address, format: .short())
 			displayName = state.displayName
 		}
 	}

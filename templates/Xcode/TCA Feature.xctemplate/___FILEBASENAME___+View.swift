@@ -3,6 +3,7 @@ import SwiftUI
 
 // MARK: - ___VARIABLE_featureName___.View
 public extension ___VARIABLE_featureName___ {
+	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<___VARIABLE_featureName___>
 
@@ -18,11 +19,12 @@ public extension ___VARIABLE_featureName___.View {
 			store,
 			observe: ViewState.init(state:),
 			send: { .view($0) }
-		) { _ in
+		) { viewStore in
 			// TODO: implement
 			Text("Implement: ___VARIABLE_featureName___")
 				.background(Color.yellow)
 				.foregroundColor(.red)
+				.onAppear { viewStore.send(.appeared) }
 		}
 	}
 }
@@ -36,14 +38,17 @@ extension ___VARIABLE_featureName___.View {
 	}
 }
 
+#if DEBUG
+
 // MARK: - ___VARIABLE_featureName____Preview
 struct ___VARIABLE_featureName____Preview: PreviewProvider {
 	static var previews: some View {
 		___VARIABLE_featureName___.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .previewValue,
 				reducer: ___VARIABLE_featureName___()
 			)
 		)
 	}
 }
+#endif
