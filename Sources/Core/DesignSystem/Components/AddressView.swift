@@ -5,12 +5,12 @@ import SwiftUI
 public struct AddressView: View {
 	let state: ViewState
 	let textStyle: TextStyle
-	let copyAddressAction: ((String) -> Void)?
+	let copyAddressAction: (() -> Void)?
 
 	public init(
 		_ state: ViewState,
 		textStyle: TextStyle = .body2HighImportance,
-		copyAddressAction: ((String) -> Void)?
+		copyAddressAction: (() -> Void)?
 	) {
 		self.state = state
 		self.textStyle = textStyle
@@ -27,7 +27,7 @@ public extension AddressView {
 
 			if let copyAddressAction = copyAddressAction {
 				Button(
-					action: { copyAddressAction(state.fullAddress) },
+					action: copyAddressAction,
 					label: {
 						Image(asset: AssetResource.copy)
 							.frame(width: 28, height: 28)
@@ -41,11 +41,9 @@ public extension AddressView {
 // MARK: AddressView.ViewState
 public extension AddressView {
 	struct ViewState: Equatable {
-		var fullAddress: String
 		var formattedAddress: String
 
 		public init(address: String, format: AddressFormat) {
-			fullAddress = address
 			switch format {
 			case let .short(format):
 				let total = format.first + format.last
