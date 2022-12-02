@@ -5,8 +5,7 @@ public struct Separator: View {
 	public init() {}
 
 	public var body: some View {
-		Rectangle()
-			.foregroundColor(.app.gray5)
+		Color.app.gray5
 			.frame(height: 1)
 	}
 }
