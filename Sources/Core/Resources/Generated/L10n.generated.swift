@@ -21,8 +21,8 @@ public enum L10n {
   	}
 	}
 	public enum AccountPreferences {
-  	/// Get free XRD
-  	public static let faucetButtonTitle = L10n.tr("Localizable", "accountPreferences.faucetButtonTitle", fallback: "Get free XRD")
+  	/// Get betanet XRD test tokens
+  	public static let faucetButtonTitle = L10n.tr("Localizable", "accountPreferences.faucetButtonTitle", fallback: "Get betanet XRD test tokens")
   	/// Account preferences
   	public static let title = L10n.tr("Localizable", "accountPreferences.title", fallback: "Account preferences")
 	}
