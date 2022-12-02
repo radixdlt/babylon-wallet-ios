@@ -204,7 +204,12 @@ public struct Home: ReducerProtocol {
 			return refreshAccount(address)
 
 		case let .child(.accountPreferences(.delegate(.refreshAccount(address)))):
-			return refreshAccount(address)
+			return .run { send in
+				await send(.internal(.system(.accountPortfolioResult(TaskResult {
+					try await accountPortfolioFetcher.fetchPortfolio([address])
+				}))))
+				await send(.child(.accountPreferences(.internal(.system(.refreshAccountCompleted)))))
+			}
 
 		case .child(.transfer(.delegate(.dismissTransfer))):
 			state.transfer = nil

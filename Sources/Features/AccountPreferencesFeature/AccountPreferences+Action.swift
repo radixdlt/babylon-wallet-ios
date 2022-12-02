@@ -33,7 +33,7 @@ public extension AccountPreferences.Action {
 public extension AccountPreferences.Action {
 	enum SystemAction: Sendable, Equatable {
 		case isAllowedToUseFaucet(TaskResult<Bool>)
-		case disableGetFreeXRDButton
+		case refreshAccountCompleted
 	}
 }
 
