@@ -25,7 +25,7 @@ public extension AddressView {
 				.lineLimit(1)
 				.textStyle(textStyle)
 
-			if let copyAddressAction = copyAddressAction {
+			if let copyAddressAction {
 				Button(
 					action: copyAddressAction,
 					label: {
