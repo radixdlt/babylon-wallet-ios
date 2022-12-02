@@ -16,6 +16,8 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		XCTAssertEqual(url.port, 12345)
 	}
 
+	//    func test__GIVEN__intialState__WHEN__an_invalid__URL
+
 	func test__GIVEN__initialState__WHEN__view_did_appear__THEN__current_networkAndGateway_is_loaded() async throws {
 		let getNetworkAndGatewayCalled = ActorIsolated(false)
 		let store = TestStore(
@@ -115,6 +117,9 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			$0.networkSwitchingClient.validateGatewayURL = {
 				await validatedGatewayURL.setValue($0)
 				return newNetworkAndGateway
+			}
+			$0.networkSwitchingClient.hasAccountOnNetwork = { _ in
+				false
 			}
 		}
 		store.exhaustivity = .off
