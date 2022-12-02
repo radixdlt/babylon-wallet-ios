@@ -81,16 +81,10 @@ private extension FungibleTokenList.Row.View {
 
 			VStack {
 				Spacer()
-				separator()
+				Separator()
 			}
 		}
 		.frame(height: .large1 * 2)
-	}
-
-	func separator() -> some View {
-		Rectangle()
-			.foregroundColor(.app.gray5)
-			.frame(height: 1)
 	}
 
 	func tokenAmount(

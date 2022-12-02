@@ -27,7 +27,7 @@ public extension AddressView {
 				action: copyAddressAction,
 				label: {
 					Image(asset: AssetResource.copy)
-						.frame(width: 28, height: 28)
+						.frame(.verySmall)
 				}
 			)
 		}

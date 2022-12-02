@@ -68,51 +68,54 @@ private extension Settings.View {
 			VStack {
 				NavigationBar(
 					titleText: L10n.Settings.title,
-					leadingItem: CloseButton {
+					leadingItem: BackButton {
 						viewStore.send(.dismissSettingsButtonTapped)
 					}
 				)
 				.foregroundColor(.app.gray1)
 				.padding([.horizontal, .top], .medium3)
 
-				Form {
-					#if DEBUG
-					Section(header: Text(L10n.Settings.Section.debug)) {
-						Button(L10n.Settings.inspectProfileButtonTitle) {
-							viewStore.send(.debugInspectProfileButtonTapped)
-						}
-						.buttonStyle(.primaryText())
-					}
-					#endif // DEBUG
-					Section(header: Text(L10n.Settings.Section.p2Pconnections)) {
-						Button(L10n.Settings.manageConnectionsButtonTitle) {
-							viewStore.send(.manageP2PClientsButtonTapped)
-						}
-						.buttonStyle(.primaryText())
-
+				ScrollView {
+					VStack(spacing: .zero) {
 						if viewStore.canAddP2PClient {
-							Button(L10n.Settings.addConnectionButtonTitle) {
+							ConnectExtensionView {
 								viewStore.send(.addP2PClientButtonTapped)
 							}
-							.buttonStyle(.primaryText())
+							Spacer()
+								.frame(height: .medium3)
 						}
-					}
 
-					Section {
-						Button(L10n.Settings.editGatewayAPIEndpointButtonTitle) {
+						#if DEBUG
+						Row(L10n.Settings.inspectProfileButtonTitle) {
+							viewStore.send(.debugInspectProfileButtonTapped)
+						}
+						#endif // DEBUG
+
+						Row(L10n.Settings.desktopConnectionsButtonTitle) {
+							viewStore.send(.manageP2PClientsButtonTapped)
+						}
+
+						Row(L10n.Settings.gatewayButtonTitle) {
 							viewStore.send(.editGatewayAPIEndpointButtonTapped)
 						}
-						.buttonStyle(.primaryText())
-					}
 
-					Section {
+						Spacer()
+							.frame(height: .large3)
+
 						Button(L10n.Settings.deleteAllButtonTitle) {
 							viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
 						}
-						.buttonStyle(.primaryText(isDestructive: true))
-					} footer: {
+						.buttonStyle(.secondaryRectangular(isDestructive: true))
+
+						Spacer()
+							.frame(height: .large1)
+
 						Text(L10n.Settings.versionInfo(Bundle.main.appVersionLong, Bundle.main.appBuild))
+							.foregroundColor(.app.gray2)
 							.textStyle(.body2Regular)
+
+						Spacer()
+							.frame(height: .medium1)
 					}
 				}
 				.onAppear {
@@ -164,8 +167,8 @@ public extension Settings.View {
 	}
 }
 
-// MARK: - HomeView_Previews
-struct HomeView_Previews: PreviewProvider {
+// MARK: - SettingsView_Previews
+struct SettingsView_Previews: PreviewProvider {
 	static var previews: some View {
 		Settings.View(
 			store: .init(

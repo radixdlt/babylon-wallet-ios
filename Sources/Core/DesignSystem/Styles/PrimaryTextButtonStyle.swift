@@ -7,9 +7,19 @@ public struct PrimaryTextButtonStyle: ButtonStyle {
 
 	public func makeBody(configuration: Configuration) -> some View {
 		configuration.label
-			.foregroundColor(isEnabled ? (isDestructive ? .app.red1 : .app.blue2) : Color.app.gray3)
+			.foregroundColor(foregroundColor)
 			.font(.app.body1StandaloneLink)
 			.brightness(configuration.isPressed ? -0.3 : 0)
+	}
+}
+
+private extension PrimaryTextButtonStyle {
+	var foregroundColor: Color {
+		if isEnabled {
+			return isDestructive ? .app.red1 : .app.blue2
+		} else {
+			return .app.gray3
+		}
 	}
 }
 

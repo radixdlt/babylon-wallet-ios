@@ -195,18 +195,16 @@ public enum L10n {
   	public static let newAccountButtonTitle = L10n.tr("Localizable", "onboarding.newAccountButtonTitle", fallback: "New Account")
 	}
 	public enum Settings {
-  	/// Add Connection
-  	public static let addConnectionButtonTitle = L10n.tr("Localizable", "settings.addConnectionButtonTitle", fallback: "Add Connection")
   	/// Close
   	public static let closeButtonTitle = L10n.tr("Localizable", "settings.closeButtonTitle", fallback: "Close")
   	/// Delete all & Factor Sources
   	public static let deleteAllButtonTitle = L10n.tr("Localizable", "settings.deleteAllButtonTitle", fallback: "Delete all & Factor Sources")
-  	/// Edit Gateway API Endpoint
-  	public static let editGatewayAPIEndpointButtonTitle = L10n.tr("Localizable", "settings.editGatewayAPIEndpointButtonTitle", fallback: "Edit Gateway API Endpoint")
+  	/// Desktop Connections
+  	public static let desktopConnectionsButtonTitle = L10n.tr("Localizable", "settings.desktopConnectionsButtonTitle", fallback: "Desktop Connections")
+  	/// Gateway
+  	public static let gatewayButtonTitle = L10n.tr("Localizable", "settings.gatewayButtonTitle", fallback: "Gateway")
   	/// Inspect Profile
   	public static let inspectProfileButtonTitle = L10n.tr("Localizable", "settings.inspectProfileButtonTitle", fallback: "Inspect Profile")
-  	/// Manage Connections
-  	public static let manageConnectionsButtonTitle = L10n.tr("Localizable", "settings.manageConnectionsButtonTitle", fallback: "Manage Connections")
   	/// No profile, strange
   	public static let noProfileText = L10n.tr("Localizable", "settings.noProfileText", fallback: "No profile, strange")
   	/// Settings
@@ -215,11 +213,13 @@ public enum L10n {
   	public static func versionInfo(_ p1: Any, _ p2: Any) -> String {
   		return L10n.tr("Localizable", "settings.versionInfo", String(describing: p1), String(describing: p2), fallback: "Version: %@ build #%@")
   	}
-  	public enum Section {
-    	/// Debug
-    	public static let debug = L10n.tr("Localizable", "settings.section.debug", fallback: "Debug")
-    	/// P2P Connections
-    	public static let p2Pconnections = L10n.tr("Localizable", "settings.section.P2Pconnections", fallback: "P2P Connections")
+  	public enum ConnectExtension {
+    	/// Connect Extension
+    	public static let buttonTitle = L10n.tr("Localizable", "settings.connectExtension.buttonTitle", fallback: "Connect Extension")
+    	/// Scan your browser extension code to confirm your connection
+    	public static let subtitle = L10n.tr("Localizable", "settings.connectExtension.subtitle", fallback: "Scan your browser extension code to confirm your connection")
+    	/// Connect your wallet to a browser
+    	public static let title = L10n.tr("Localizable", "settings.connectExtension.title", fallback: "Connect your wallet to a browser")
   	}
 	}
 	public enum TransactionSigning {

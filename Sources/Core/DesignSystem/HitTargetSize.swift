@@ -2,13 +2,14 @@ import SwiftUI
 
 // MARK: - HitTargetSize
 public enum HitTargetSize: CGFloat {
+	/// 28
+	case verySmall = 28
+
+	/// 44
 	case small = 44
 
 	public var frame: CGSize {
-		switch self {
-		case .small:
-			return .init(width: rawValue, height: rawValue)
-		}
+		.init(width: rawValue, height: rawValue)
 	}
 }
 

@@ -2,8 +2,8 @@
 
 "accountList.row.copyTitle" = "Copy";
 
-"accountPreferences.title" = "Account preferences";
 "accountPreferences.faucetButtonTitle" = "Get free XRD";
+"accountPreferences.title" = "Account preferences";
 
 "aggregatedValue.title" = "Total value";
 
@@ -12,6 +12,7 @@
 "assetsView.poolShare" = "Pool Share";
 "assetsView.tokens" = "Tokens";
 
+"createAccount.biometricsPrompt" = "Unlock secret used to create new account.";
 "createAccount.completion.explanation" = "Your account lives on the Radix Network and you can access it anytime in Radix Wallet.";
 "createAccount.completion.origin.home" = "Home";
 "createAccount.completion.returnToOrigin" = "Go to %@";
@@ -23,8 +24,6 @@
 "createAccount.explanation" = "This can be changed any time";
 "createAccount.placeholder" = "e.g. My First Account";
 "createAccount.subtitle" = "What would you like to call your account?";
-"createAccount.biometricsPrompt" = "Unlock secret used to create new account.";
-
 
 "home.header.subtitle" = "Welcome, here are all your accounts on the Radix Network";
 "home.header.title" = "Radix Wallet";
@@ -72,22 +71,22 @@
 "nftList.nftPlural" = "%d NFTs";
 "nftList.ownedOfTotal" = "%d of %d";
 
-"onboarding.newAccountButtonTitle" = "New Account";
-"onboarding.biometricsNotSetUpTitle" = "Biometrics not set up";
 "onboarding.biometricsNotSetUpMessage" = "This app requires your phone having biometrics set up";
+"onboarding.biometricsNotSetUpTitle" = "Biometrics not set up";
+"onboarding.newAccountButtonTitle" = "New Account";
 
-"settings.addConnectionButtonTitle" = "Add Connection";
 "settings.closeButtonTitle" = "Close";
+"settings.connectExtension.buttonTitle" = "Connect Extension";
+"settings.connectExtension.subtitle" = "Scan your browser extension code to confirm your connection";
+"settings.connectExtension.title" = "Connect your wallet to a browser";
 "settings.deleteAllButtonTitle" = "Delete all & Factor Sources";
-"settings.editGatewayAPIEndpointButtonTitle" = "Edit Gateway API Endpoint";
+"settings.desktopConnectionsButtonTitle" = "Desktop Connections";
+"settings.gatewayButtonTitle" = "Gateway";
 "settings.inspectProfileButtonTitle" = "Inspect Profile";
-"settings.manageConnectionsButtonTitle" = "Manage Connections";
 "settings.noProfileText" = "No profile, strange";
-"settings.section.P2Pconnections" = "P2P Connections";
-"settings.section.debug" = "Debug";
 "settings.title" = "Settings";
 "settings.versionInfo" = "Version: %@ build #%@";
 
+"transactionSigning.biometricsPrompt" = "Unlock secret used to sign TX";
 "transactionSigning.signTransactionButtonTitle" = "Sign Transaction";
 "transactionSigning.title" = "Sign TX";
-"transactionSigning.biometricsPrompt" = "Unlock secret used to sign TX";
