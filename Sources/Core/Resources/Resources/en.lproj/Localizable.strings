@@ -63,6 +63,9 @@
 "newConnection.title" = "Connect Extension";
 "newConnection.scanRadixConnectorExtensionQRCode" = "Scan QR code displayed by the Radix Wallet Connector browser extension.";
 "newConnection.connecting" = "Connecting...";
+"newConnection.nameConnectionInstruction" = "Name this connection, e.g. \"Chrome on Macbook Pro\"";
+"newConnection.nameConnectionTextFieldHint" = "Name of connection";
+"newConnection.saveNamedConnectionButton" = "Save connection";
 
 "manageP2PClients.P2PConnectionsTitle" = "Desktop Connections";
 "manageP2PClients.connectionID" = "Connection ID: %@";

@@ -50,9 +50,6 @@ public extension ManageP2PClients {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .internal(.system(.successfullyOpenedConnection(connection))):
-			return saveNewConnection(state: &state, connection: connection)
-
 		case let .internal(.system(.saveNewConnectionResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
@@ -110,8 +107,8 @@ public extension ManageP2PClients {
 			state.newConnection = .init()
 			return .none
 
-		case let .child(.newConnection(.delegate(.newConnection(connection)))):
-			return saveNewConnection(state: &state, connection: connection)
+		case let .child(.newConnection(.delegate(.newConnection(connectedClient)))):
+			return save(connectedClient: connectedClient, state: &state)
 
 		case .child(.newConnection(.delegate(.dismiss))):
 			state.newConnection = nil
@@ -122,16 +119,8 @@ public extension ManageP2PClients {
 		}
 	}
 
-	func saveNewConnection(state: inout State, connection: Connection) -> EffectTask<Action> {
+	func save(connectedClient: P2P.ConnectedClient, state: inout State) -> EffectTask<Action> {
 		state.newConnection = nil
-
-		let connectedClient = P2P.ConnectedClient(
-			client: .init(
-				displayName: "Unknown",
-				connectionPassword: connection.getConnectionPassword().data.data
-			),
-			connection: connection
-		)
 
 		return .run { send in
 			await send(.internal(.system(.saveNewConnectionResult(

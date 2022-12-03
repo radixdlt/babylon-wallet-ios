@@ -26,7 +26,7 @@ public extension ScanQR.View {
 			send: { .view($0) }
 		) { viewStore in
 			VStack(alignment: .center, spacing: .large3) {
-				scanQRCode(viewStore: viewStore)
+				contentView(viewStore: viewStore)
 				Spacer()
 			}
 			.padding(.all, .large3)

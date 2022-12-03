@@ -1,3 +1,4 @@
+import Converse
 import ConverseCommon
 import Foundation
 
@@ -5,8 +6,22 @@ import Foundation
 public extension ConnectUsingSecrets {
 	struct State: Equatable {
 		public var connectionSecrets: ConnectionSecrets
-		public init(connectionSecrets: ConnectionSecrets) {
+		public var isConnecting: Bool
+		public var isPromptingForName: Bool
+		public var nameOfConnection: String
+		public var connectedConnection: Connection?
+		public init(
+			connectionSecrets: ConnectionSecrets,
+			isConnecting: Bool = true,
+			connectedConnection: Connection? = nil,
+			isPromptingForName: Bool = false,
+			nameOfConnection: String = ""
+		) {
 			self.connectionSecrets = connectionSecrets
+			self.isConnecting = isConnecting
+			self.isPromptingForName = isPromptingForName
+			self.nameOfConnection = nameOfConnection
+			self.connectedConnection = connectedConnection
 		}
 	}
 }

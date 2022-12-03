@@ -175,6 +175,12 @@ public enum L10n {
 	public enum NewConnection {
   	/// Connecting...
   	public static let connecting = L10n.tr("Localizable", "newConnection.connecting", fallback: "Connecting...")
+  	/// Name this connection, e.g. "Chrome on Macbook Pro"
+  	public static let nameConnectionInstruction = L10n.tr("Localizable", "newConnection.nameConnectionInstruction", fallback: "Name this connection, e.g. \"Chrome on Macbook Pro\"")
+  	/// Name of connection
+  	public static let nameConnectionTextFieldHint = L10n.tr("Localizable", "newConnection.nameConnectionTextFieldHint", fallback: "Name of connection")
+  	/// Save connection
+  	public static let saveNamedConnectionButton = L10n.tr("Localizable", "newConnection.saveNamedConnectionButton", fallback: "Save connection")
   	/// Scan QR code displayed by the Radix Wallet Connector browser extension.
   	public static let scanRadixConnectorExtensionQRCode = L10n.tr("Localizable", "newConnection.scanRadixConnectorExtensionQRCode", fallback: "Scan QR code displayed by the Radix Wallet Connector browser extension.")
   	/// Connect Extension

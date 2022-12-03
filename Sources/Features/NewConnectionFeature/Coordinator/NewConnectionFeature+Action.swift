@@ -1,5 +1,6 @@
 import Converse
 import Foundation
+import SharedModels
 
 // MARK: - NewConnection.Action
 public extension NewConnection {
@@ -41,6 +42,6 @@ public extension NewConnection.Action {
 public extension NewConnection.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case newConnection(Connection)
+		case newConnection(P2P.ConnectedClient)
 	}
 }

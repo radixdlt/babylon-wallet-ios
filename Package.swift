@@ -530,6 +530,7 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
+			"SharedModels",
 			tca,
 		], tests: .yes(
 			dependencies: ["TestUtils"])

@@ -2,6 +2,7 @@ import ChunkingTransport
 import ComposableArchitecture
 import Converse
 import Foundation
+import SharedModels
 
 // MARK: - ConnectUsingSecrets.Action
 public extension ConnectUsingSecrets {
@@ -19,6 +20,8 @@ public extension ConnectUsingSecrets.Action {
 public extension ConnectUsingSecrets.Action {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
+		case nameOfConnectionChanged(String)
+		case confirmNameButtonTapped
 	}
 }
 
@@ -40,6 +43,6 @@ public extension ConnectUsingSecrets.Action {
 // MARK: - ConnectUsingSecrets.Action.DelegateAction
 public extension ConnectUsingSecrets.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case connected(Connection)
+		case connected(P2P.ConnectedClient)
 	}
 }

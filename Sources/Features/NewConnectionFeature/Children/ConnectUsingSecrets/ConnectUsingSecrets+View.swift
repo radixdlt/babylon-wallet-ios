@@ -3,42 +3,6 @@ import DesignSystem
 import Resources
 import SwiftUI
 
-// MARK: - LoadingOverlayView
-public struct LoadingOverlayView: View {
-	private let text: String?
-	public init(_ text: String?) {
-		self.text = text
-	}
-
-	public var body: some View {
-		ZStack {
-			Color.app.gray2
-				.cornerRadius(.small1)
-
-			VStack {
-				LoadingView()
-				if let text {
-					Text(text)
-						.textStyle(.body1Regular)
-						.foregroundColor(.app.white)
-				}
-			}
-			.frame(width: 100, height: 100)
-		}
-		.frame(width: 170, height: 170)
-	}
-}
-
-#if DEBUG
-
-// MARK: - ConnectUsingPassword_Preview
-struct LoadingOverlayView_Preview: PreviewProvider {
-	static var previews: some View {
-		LoadingOverlayView("Connecting")
-	}
-}
-#endif
-
 // MARK: - ConnectUsingSecrets.View
 public extension ConnectUsingSecrets {
 	@MainActor
@@ -58,10 +22,34 @@ public extension ConnectUsingSecrets.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			LoadingOverlayView(L10n.NewConnection.connecting)
-				.onAppear {
-					viewStore.send(.appeared)
+			VStack {
+				if viewStore.isConnecting {
+					LoadingOverlayView(L10n.NewConnection.connecting)
+				} else if viewStore.isPromptingForName {
+					Group {
+						Text(L10n.NewConnection.nameConnectionInstruction)
+							.textStyle(.body1HighImportance)
+
+						TextField(
+							L10n.NewConnection.nameConnectionTextFieldHint,
+							text: viewStore.binding(
+								get: \.nameOfConnection,
+								send: { .nameOfConnectionChanged($0) }
+							)
+						)
+						.textFieldStyle(.roundedBorder)
+
+						Button(L10n.NewConnection.saveNamedConnectionButton) {
+							viewStore.send(.confirmNameButtonTapped)
+						}
+						.buttonStyle(.primaryRectangular)
+					}
+					.padding()
 				}
+			}
+			.onAppear {
+				viewStore.send(.appeared)
+			}
 		}
 	}
 }
@@ -69,7 +57,15 @@ public extension ConnectUsingSecrets.View {
 // MARK: - ConnectUsingSecrets.View.ViewState
 extension ConnectUsingSecrets.View {
 	struct ViewState: Equatable {
-		init(state: ConnectUsingSecrets.State) {}
+		public var isConnecting: Bool
+		public var isPromptingForName: Bool
+		public var nameOfConnection: String
+
+		init(state: ConnectUsingSecrets.State) {
+			nameOfConnection = state.nameOfConnection
+			isPromptingForName = state.isPromptingForName
+			isConnecting = state.isConnecting
+		}
 	}
 }
 
