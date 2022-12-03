@@ -1,19 +1,19 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - NewConnection.View
-public extension NewConnection {
+// MARK: - ConnectUsingSecrets.View
+public extension ConnectUsingSecrets {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<NewConnection>
+		private let store: StoreOf<ConnectUsingSecrets>
 
-		public init(store: StoreOf<NewConnection>) {
+		public init(store: StoreOf<ConnectUsingSecrets>) {
 			self.store = store
 		}
 	}
 }
 
-public extension NewConnection.View {
+public extension ConnectUsingSecrets.View {
 	var body: some View {
 		WithViewStore(
 			store,
@@ -21,7 +21,7 @@ public extension NewConnection.View {
 			send: { .view($0) }
 		) { viewStore in
 			// TODO: implement
-			Text("Implement: NewConnection")
+			Text("Implement: ConnectUsingSecrets")
 				.background(Color.yellow)
 				.foregroundColor(.red)
 				.onAppear { viewStore.send(.appeared) }
@@ -29,10 +29,10 @@ public extension NewConnection.View {
 	}
 }
 
-// MARK: - NewConnection.View.ViewState
-extension NewConnection.View {
+// MARK: - ConnectUsingSecrets.View.ViewState
+extension ConnectUsingSecrets.View {
 	struct ViewState: Equatable {
-		init(state: NewConnection.State) {
+		init(state: ConnectUsingSecrets.State) {
 			// TODO: implement
 		}
 	}
@@ -40,13 +40,13 @@ extension NewConnection.View {
 
 #if DEBUG
 
-// MARK: - NewConnection_Preview
-struct NewConnection_Preview: PreviewProvider {
+// MARK: - ConnectUsingPassword_Preview
+struct ConnectUsingPassword_Preview: PreviewProvider {
 	static var previews: some View {
-		NewConnection.View(
+		ConnectUsingSecrets.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: NewConnection()
+				reducer: ConnectUsingSecrets()
 			)
 		)
 	}

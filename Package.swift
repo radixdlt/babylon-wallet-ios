@@ -529,6 +529,7 @@ package.addModules([
 			converse,
 			"Common",
 			"DesignSystem",
+			"ErrorQueue",
 			tca,
 		], tests: .yes(
 			dependencies: ["TestUtils"])

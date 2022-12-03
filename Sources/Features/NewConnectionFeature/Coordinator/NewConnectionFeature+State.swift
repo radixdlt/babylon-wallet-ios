@@ -2,8 +2,13 @@ import Foundation
 
 // MARK: - NewConnection.State
 public extension NewConnection {
-	struct State: Equatable {
-		public init() {}
+	enum State: Equatable {
+		case scanQR(ScanQR.State)
+		case connectUsingSecrets(ConnectUsingSecrets.State)
+
+		public init() {
+			self = .scanQR(.init())
+		}
 	}
 }
 

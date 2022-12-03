@@ -27,6 +27,7 @@ public extension ManageP2PClients {
 				action: /Action.child .. Action.ChildAction.newConnection
 			) {
 				NewConnection()
+					._printChanges()
 			}
 	}
 
@@ -50,7 +51,7 @@ public extension ManageP2PClients {
 			return .none
 
 		case let .internal(.system(.successfullyOpenedConnection(connection))):
-			return saveNewConnection(state: &state, action: action, connection: connection)
+			return saveNewConnection(state: &state, connection: connection)
 
 		case let .internal(.system(.saveNewConnectionResult(.failure(error)))):
 			errorQueue.schedule(error)
@@ -109,43 +110,19 @@ public extension ManageP2PClients {
 			state.newConnection = .init()
 			return .none
 
-		case .internal(.view(.dismissNewConnectionFlowButtonTapped)):
+		case let .child(.newConnection(.delegate(.newConnection(connection)))):
+			return saveNewConnection(state: &state, connection: connection)
+
+		case .child(.newConnection(.delegate(.dismiss))):
 			state.newConnection = nil
 			return .none
-
-            //        case let .internal(.system(.initConnectionSecretsResult(.success(connectionSecrets)))):
-            //            let connection = Connection.live(connectionSecrets: connectionSecrets)
-            //            state.connectUsingPassword = ConnectUsingPassword.State(connection: connection)
-            //            return .none
-            //
-            //        case let .internal(.system(.initConnectionSecretsResult(.failure(error)))):
-            //            errorQueue.schedule(error)
-            //            return .none
-
-//        case let .child(.inputP2PConnectionPassword(.delegate(.connect(password)))):
-//            return .run { send in
-//                await send(
-//                    .internal(.system(.initConnectionSecretsResult(
-//                        TaskResult<ConnectionSecrets> {
-//                            try ConnectionSecrets.from(connectionPassword: password)
-//                        }
-//                    )))
-//                )
-//            }
-//
-//        case let .child(.connectUsingPassword(.delegate(.establishConnectionResult(.failure(error))))):
-//            errorQueue.schedule(error)
-//            return .none
-//
-//        case let .child(.connectUsingPassword(.delegate(.establishConnectionResult(.success(openConnection))))):
-//            return saveNewConnection(state: &state, action: action, connection: openConnection)
 
 		case .child, .delegate:
 			return .none
 		}
 	}
 
-	func saveNewConnection(state: inout State, action: Action, connection: Connection) -> EffectTask<Action> {
+	func saveNewConnection(state: inout State, connection: Connection) -> EffectTask<Action> {
 		state.newConnection = nil
 
 		let connectedClient = P2P.ConnectedClient(

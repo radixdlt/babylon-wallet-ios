@@ -167,10 +167,14 @@ public enum L10n {
   	public static let newConnectionButtonTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionButtonTitle", fallback: "Add new connection")
   	/// New Connection
   	public static let newConnectionTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionTitle", fallback: "New Connection")
-  	/// P2P Connections
-  	public static let p2PConnectionsTitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsTitle", fallback: "P2P Connections")
+  	/// Desktop Connections
+  	public static let p2PConnectionsTitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsTitle", fallback: "Desktop Connections")
   	/// Send Test Msg
   	public static let sendTestMessageButtonTitle = L10n.tr("Localizable", "manageP2PClients.sendTestMessageButtonTitle", fallback: "Send Test Msg")
+	}
+	public enum NewConnection {
+  	/// Connect Extension
+  	public static let title = L10n.tr("Localizable", "newConnection.title", fallback: "Connect Extension")
 	}
 	public enum NftList {
   	/// %d NFTs

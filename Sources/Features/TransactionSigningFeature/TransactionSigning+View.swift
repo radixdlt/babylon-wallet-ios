@@ -69,14 +69,6 @@ public extension TransactionSigning.View {
 	}
 }
 
-private extension TransactionSigning.View {
-	@ViewBuilder
-	func sign(
-		manifest: String,
-		viewStore: ViewStore<ViewState, TransactionSigning.Action.ViewAction>
-	) -> some View {}
-}
-
 // MARK: - TransactionSigning.View.ViewState
 extension TransactionSigning.View {
 	struct ViewState: Equatable {

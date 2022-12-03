@@ -8,7 +8,7 @@ public extension ___VARIABLE_featureName___ {
 	}
 }
 
-public extension ___VARIABLE_featureName___ {
+public extension ___VARIABLE_featureName___.Action {
 	static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 }
 

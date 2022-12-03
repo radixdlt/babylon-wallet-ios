@@ -36,12 +36,7 @@ public extension ManageP2PClients.View {
 							state: \.newConnection,
 							action: { .child(.newConnection($0)) }
 						),
-						then: { newConnectionStore in
-							ForceFullScreen {
-								NewConnection.View(store: newConnectionStore)
-							}
-							.padding()
-						}
+						then: { NewConnection.View(store: $0) }
 					)
 					.zIndex(2)
 				}

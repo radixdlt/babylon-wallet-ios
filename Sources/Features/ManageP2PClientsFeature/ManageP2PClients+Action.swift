@@ -37,7 +37,6 @@ public extension ManageP2PClients.Action {
 		case viewAppeared
 		case dismissButtonTapped
 		case addNewConnectionButtonTapped
-		case dismissNewConnectionFlowButtonTapped
 	}
 }
 

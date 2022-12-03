@@ -1,3 +1,4 @@
+import Converse
 import Foundation
 
 // MARK: - NewConnection.Action
@@ -5,6 +6,9 @@ public extension NewConnection {
 	enum Action: Sendable, Equatable {
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
+
+		case scanQR(ScanQR.Action)
+		case connectUsingSecrets(ConnectUsingSecrets.Action)
 	}
 }
 
@@ -16,6 +20,7 @@ public extension NewConnection.Action {
 public extension NewConnection.Action {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
+		case dismissButtonTapped
 	}
 }
 
@@ -34,5 +39,8 @@ public extension NewConnection.Action {
 
 // MARK: - NewConnection.Action.DelegateAction
 public extension NewConnection.Action {
-	enum DelegateAction: Sendable, Equatable {}
+	enum DelegateAction: Sendable, Equatable {
+		case dismiss
+		case newConnection(Connection)
+	}
 }
