@@ -12,7 +12,7 @@ public struct LoadingOverlayView: View {
 
 	public var body: some View {
 		ZStack {
-			Color.app.gray1
+			Color.app.gray2
 				.cornerRadius(.small1)
 
 			VStack {
@@ -57,8 +57,11 @@ public extension ConnectUsingSecrets.View {
 			store,
 			observe: ViewState.init(state:),
 			send: { .view($0) }
-		) { _ in
+		) { viewStore in
 			LoadingOverlayView(L10n.NewConnection.connecting)
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 		}
 	}
 }
@@ -66,9 +69,7 @@ public extension ConnectUsingSecrets.View {
 // MARK: - ConnectUsingSecrets.View.ViewState
 extension ConnectUsingSecrets.View {
 	struct ViewState: Equatable {
-		init(state: ConnectUsingSecrets.State) {
-			// TODO: implement
-		}
+		init(state: ConnectUsingSecrets.State) {}
 	}
 }
 

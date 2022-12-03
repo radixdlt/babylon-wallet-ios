@@ -61,6 +61,7 @@
 "manageGateway.switchToButtonTitle" = "Switch To";
 
 "newConnection.title" = "Connect Extension";
+"newConnection.scanRadixConnectorExtensionQRCode" = "Scan QR code displayed by the Radix Wallet Connector browser extension.";
 "newConnection.connecting" = "Connecting...";
 
 "manageP2PClients.P2PConnectionsTitle" = "Desktop Connections";

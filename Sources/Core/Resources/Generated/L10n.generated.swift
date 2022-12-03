@@ -175,6 +175,8 @@ public enum L10n {
 	public enum NewConnection {
   	/// Connecting...
   	public static let connecting = L10n.tr("Localizable", "newConnection.connecting", fallback: "Connecting...")
+  	/// Scan QR code displayed by the Radix Wallet Connector browser extension.
+  	public static let scanRadixConnectorExtensionQRCode = L10n.tr("Localizable", "newConnection.scanRadixConnectorExtensionQRCode", fallback: "Scan QR code displayed by the Radix Wallet Connector browser extension.")
   	/// Connect Extension
   	public static let title = L10n.tr("Localizable", "newConnection.title", fallback: "Connect Extension")
 	}

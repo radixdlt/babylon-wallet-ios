@@ -1,5 +1,7 @@
 import ComposableArchitecture
+import Resources
 import SwiftUI
+
 #if os(iOS)
 import CodeScanner
 #endif // iOS
@@ -23,7 +25,7 @@ public extension ScanQR.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			VStack(alignment: .center) {
+			VStack(alignment: .center, spacing: .large3) {
 				scanQRCode(viewStore: viewStore)
 				Spacer()
 			}
@@ -36,10 +38,22 @@ public extension ScanQR.View {
 
 private extension ScanQR.View {
 	@ViewBuilder
+	func contentView(
+		viewStore: ViewStore<ViewState, ScanQR.Action.ViewAction>
+	) -> some View {
+		#if os(iOS) && !targetEnvironment(simulator)
+		scanQRCode(viewStore: viewStore)
+		#else
+		macOSInputView(viewStore: viewStore)
+		#endif
+	}
+
+	@ViewBuilder
 	func scanQRCode(
 		viewStore: ViewStore<ViewState, ScanQR.Action.ViewAction>
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
+
 		CodeScannerView(
 			codeTypes: [.qr]
 		) { response in
@@ -51,8 +65,20 @@ private extension ScanQR.View {
 			}
 		}
 		.aspectRatio(1, contentMode: .fit)
-		.cornerRadius(.large3)
+		.cornerRadius(.large1)
+
+		Text(L10n.NewConnection.scanRadixConnectorExtensionQRCode)
+			.foregroundColor(.app.gray1)
+			.textStyle(.body1HighImportance)
+
 		#else
+		EmptyView()
+		#endif // os(iOS) && !TARGET_OS_SIMULATOR
+	}
+
+	@ViewBuilder
+	func macOSInputView(viewStore: ViewStore<ViewState, ScanQR.Action.ViewAction>) -> some View {
+		#if os(macOS)
 		VStack(alignment: .center) {
 			Text("Manually input connection password which you can see if you right click and inspect the browser window.")
 			TextField(
@@ -67,8 +93,9 @@ private extension ScanQR.View {
 				viewStore.send(.macConnectButtonTapped)
 			}
 		}
-
-		#endif // os(iOS) && !TARGET_OS_SIMULATOR
+		#else
+		EmptyView()
+		#endif // macOS
 	}
 }
 
