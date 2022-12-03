@@ -19,7 +19,7 @@ public struct LoadingOverlayView: View {
 				LoadingView()
 				if let text {
 					Text(text)
-						.textStyle(.1)
+						.textStyle(.body1Regular)
 						.foregroundColor(.app.white)
 				}
 			}
