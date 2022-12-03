@@ -34,18 +34,19 @@ public extension NewConnection.View {
 					.padding([.horizontal, .top], .medium3)
 
 					Spacer()
-
-					SwitchStore(store) {
-						CaseLet(
-							state: /NewConnection.State.scanQR,
-							action: { NewConnection.Action.scanQR($0) },
-							then: { ScanQR.View(store: $0) }
-						)
-						CaseLet(
-							state: /NewConnection.State.connectUsingSecrets,
-							action: { NewConnection.Action.connectUsingSecrets($0) },
-							then: { ConnectUsingSecrets.View(store: $0) }
-						)
+					ForceFullScreen {
+						SwitchStore(store) {
+							CaseLet(
+								state: /NewConnection.State.scanQR,
+								action: { NewConnection.Action.scanQR($0) },
+								then: { ScanQR.View(store: $0) }
+							)
+							CaseLet(
+								state: /NewConnection.State.connectUsingSecrets,
+								action: { NewConnection.Action.connectUsingSecrets($0) },
+								then: { ConnectUsingSecrets.View(store: $0) }
+							)
+						}
 					}
 				}
 			}

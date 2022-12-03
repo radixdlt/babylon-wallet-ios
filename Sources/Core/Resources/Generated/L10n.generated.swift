@@ -173,6 +173,8 @@ public enum L10n {
   	public static let sendTestMessageButtonTitle = L10n.tr("Localizable", "manageP2PClients.sendTestMessageButtonTitle", fallback: "Send Test Msg")
 	}
 	public enum NewConnection {
+  	/// Connecting...
+  	public static let connecting = L10n.tr("Localizable", "newConnection.connecting", fallback: "Connecting...")
   	/// Connect Extension
   	public static let title = L10n.tr("Localizable", "newConnection.title", fallback: "Connect Extension")
 	}

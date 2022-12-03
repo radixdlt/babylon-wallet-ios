@@ -51,6 +51,7 @@ private extension ScanQR.View {
 			}
 		}
 		.aspectRatio(1, contentMode: .fit)
+		.cornerRadius(.large3)
 		#else
 		VStack(alignment: .center) {
 			Text("Manually input connection password which you can see if you right click and inspect the browser window.")

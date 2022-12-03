@@ -17,7 +17,8 @@ public struct PrimaryRectangularButtonStyle: ButtonStyle {
 				.brightness(configuration.isPressed ? -0.1 : 0)
 
 			if isLoading {
-				LoaderView()
+				LoadingView()
+					.frame(width: .medium3, height: .medium3)
 			}
 		}
 		.allowsHitTesting(!isLoading)
