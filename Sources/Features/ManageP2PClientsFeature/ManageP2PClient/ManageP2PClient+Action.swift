@@ -28,7 +28,9 @@ public extension ManageP2PClient.Action {
 
 	enum DelegateAction: Sendable, Equatable {
 		case deleteConnection
+		#if DEBUG
 		case sendTestMessage
+		#endif // DEBUG
 	}
 }
 

@@ -25,7 +25,7 @@ public extension ManageP2PClient.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			VStack {
+			VStack(alignment: .leading) {
 				Text(viewStore.connectionName)
 					.textStyle(.body1Header)
 

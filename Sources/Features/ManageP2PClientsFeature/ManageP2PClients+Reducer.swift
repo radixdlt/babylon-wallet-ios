@@ -67,6 +67,7 @@ public extension ManageP2PClients {
 			return .run { send in
 				await send(.delegate(.dismiss))
 			}
+		#if DEBUG
 		case let .child(.connection(id, .delegate(.sendTestMessage))):
 			return .run { send in
 				await send(.internal(.system(.sendTestMessageResult(
@@ -77,6 +78,7 @@ public extension ManageP2PClients {
 					}
 				))))
 			}
+		#endif // DEBUG
 
 		case let .child(.connection(id, .delegate(.deleteConnection))):
 			return .run { send in

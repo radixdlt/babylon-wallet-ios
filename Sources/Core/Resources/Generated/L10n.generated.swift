@@ -151,8 +151,8 @@ public enum L10n {
   	public static let networkName = L10n.tr("Localizable", "manageGateway.networkName", fallback: "Network name")
   	/// Switch To
   	public static let switchToButtonTitle = L10n.tr("Localizable", "manageGateway.switchToButtonTitle", fallback: "Switch To")
-  	/// Edit Gateway API URL
-  	public static let title = L10n.tr("Localizable", "manageGateway.title", fallback: "Edit Gateway API URL")
+  	/// Gateway
+  	public static let title = L10n.tr("Localizable", "manageGateway.title", fallback: "Gateway")
   	/// https://example.com:8080
   	public static let urlString = L10n.tr("Localizable", "manageGateway.urlString", fallback: "https://example.com:8080")
 	}
@@ -211,8 +211,8 @@ public enum L10n {
 	public enum Settings {
   	/// Close
   	public static let closeButtonTitle = L10n.tr("Localizable", "settings.closeButtonTitle", fallback: "Close")
-  	/// Delete all & Factor Sources
-  	public static let deleteAllButtonTitle = L10n.tr("Localizable", "settings.deleteAllButtonTitle", fallback: "Delete all & Factor Sources")
+  	/// Delete wallet
+  	public static let deleteAllButtonTitle = L10n.tr("Localizable", "settings.deleteAllButtonTitle", fallback: "Delete wallet")
   	/// Desktop Connections
   	public static let desktopConnectionsButtonTitle = L10n.tr("Localizable", "settings.desktopConnectionsButtonTitle", fallback: "Desktop Connections")
   	/// Gateway

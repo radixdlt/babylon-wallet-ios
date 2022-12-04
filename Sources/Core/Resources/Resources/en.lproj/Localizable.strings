@@ -51,7 +51,7 @@
 "importProfile.profileFromSnapshot" = "Profile from snapshot";
 "importProfile.saveImportedMnemonic" = "Save imported mnemonic";
 
-"manageGateway.title" = "Edit Gateway API URL";
+"manageGateway.title" = "Gateway";
 "manageGateway.currentGatewayTitle" = "Current";
 "manageGateway.gatewayAPIEndpoint" = "Gateway API Endpoint";
 "manageGateway.networkID" = "Network ID";
@@ -86,7 +86,7 @@
 "settings.connectExtension.buttonTitle" = "Connect Extension";
 "settings.connectExtension.subtitle" = "Scan your browser extension code to confirm your connection";
 "settings.connectExtension.title" = "Connect your wallet to a browser";
-"settings.deleteAllButtonTitle" = "Delete all & Factor Sources";
+"settings.deleteAllButtonTitle" = "Delete wallet";
 "settings.desktopConnectionsButtonTitle" = "Desktop Connections";
 "settings.gatewayButtonTitle" = "Gateway";
 "settings.inspectProfileButtonTitle" = "Inspect Profile";

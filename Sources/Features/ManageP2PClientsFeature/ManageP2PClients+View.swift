@@ -60,9 +60,9 @@ private extension ManageP2PClients.View {
 				.foregroundColor(.app.gray1)
 				.padding([.horizontal, .top], .medium3)
 
-				VStack {
+				VStack(alignment: .leading) {
 					ScrollView {
-						VStack {
+						VStack(alignment: .leading) {
 							ForEachStore(
 								store.scope(
 									state: \.connections,
@@ -81,7 +81,7 @@ private extension ManageP2PClients.View {
 
 					Spacer()
 				}
-				.padding([.horizontal, .bottom], .medium1)
+				.padding([.bottom, .horizontal], .medium3)
 				.onAppear { viewStore.send(.viewAppeared) }
 			}
 		}
