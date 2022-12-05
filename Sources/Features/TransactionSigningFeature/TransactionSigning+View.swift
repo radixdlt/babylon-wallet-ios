@@ -2,6 +2,7 @@ import Common
 import ComposableArchitecture
 import DesignSystem
 import EngineToolkit
+import Resources
 import SwiftUI
 
 // MARK: - TransactionSigning.View
@@ -49,13 +50,13 @@ public extension TransactionSigning.View {
 									.buttonStyle(.primaryRectangular)
 									.enabled(viewStore.isSignButtonEnabled)
 								} else {
-									LoadingView()
+									LoadingOverlayView(L10n.TransactionSigning.preparingTransactionLoadingText)
 								}
 							}
 							.padding([.horizontal, .bottom])
 
 							if viewStore.isShowingLoader {
-								LoadingView()
+								LoadingOverlayView(L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText)
 							}
 						}
 					}

@@ -96,5 +96,7 @@
 "settings.versionInfo" = "Version: %@ build #%@";
 
 "transactionSigning.biometricsPrompt" = "Unlock secret used to sign TX";
-"transactionSigning.signTransactionButtonTitle" = "Sign Transaction";
-"transactionSigning.title" = "Sign TX";
+"transactionSigning.signTransactionButtonTitle" = "Approve Transaction";
+"transactionSigning.title" = "Approve transaction";
+"transactionSigning.preparingTransactionLoadingText" = "Preparing transaction";
+"transactionSigning.signingAndSubmittingTransactionLoadingText" = "Submitting transaction";
