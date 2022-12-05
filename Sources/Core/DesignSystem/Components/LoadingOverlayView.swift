@@ -16,13 +16,14 @@ public struct LoadingOverlayView: View {
 				LoadingView()
 				if let text {
 					Text(text)
+						.lineLimit(2)
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.white)
 				}
 			}
-			.frame(width: 100, height: 100)
+			.padding()
 		}
-		.frame(width: 170, height: 170)
+		.frame(width: 180, height: 180)
 	}
 }
 

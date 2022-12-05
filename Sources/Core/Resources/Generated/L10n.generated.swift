@@ -241,10 +241,14 @@ public enum L10n {
 	public enum TransactionSigning {
   	/// Unlock secret used to sign TX
   	public static let biometricsPrompt = L10n.tr("Localizable", "transactionSigning.biometricsPrompt", fallback: "Unlock secret used to sign TX")
-  	/// Sign Transaction
-  	public static let signTransactionButtonTitle = L10n.tr("Localizable", "transactionSigning.signTransactionButtonTitle", fallback: "Sign Transaction")
-  	/// Sign TX
-  	public static let title = L10n.tr("Localizable", "transactionSigning.title", fallback: "Sign TX")
+  	/// Preparing transaction
+  	public static let preparingTransactionLoadingText = L10n.tr("Localizable", "transactionSigning.preparingTransactionLoadingText", fallback: "Preparing transaction")
+  	/// Submitting transaction
+  	public static let signingAndSubmittingTransactionLoadingText = L10n.tr("Localizable", "transactionSigning.signingAndSubmittingTransactionLoadingText", fallback: "Submitting transaction")
+  	/// Approve Transaction
+  	public static let signTransactionButtonTitle = L10n.tr("Localizable", "transactionSigning.signTransactionButtonTitle", fallback: "Approve Transaction")
+  	/// Approve transaction
+  	public static let title = L10n.tr("Localizable", "transactionSigning.title", fallback: "Approve transaction")
 	}
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length
