@@ -25,8 +25,13 @@ public extension ChooseAccounts.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
-					header(with: viewStore)
-						.padding(.medium1)
+					NavigationBar(
+						leadingItem: BackButton {
+							viewStore.send(.backButtonTapped)
+						}
+					)
+					.foregroundColor(.app.gray1)
+					.padding([.horizontal, .top], .medium3)
 
 					ScrollView {
 						VStack {
@@ -37,10 +42,11 @@ public extension ChooseAccounts.View {
 							VStack(spacing: .medium2) {
 								let explanation = String(describing: viewStore.oneTimeAccountAddressesRequest.numberOfAddresses)
 								Text(L10n.DApp.ChooseAccounts.explanation(explanation))
+									.foregroundColor(.app.gray1)
 									.textStyle(.secondaryHeader)
 
 								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.requestFromDapp.metadata.dAppId))
-									.foregroundColor(.app.gray2)
+									.foregroundColor(.app.gray1)
 									.textStyle(.body1Regular)
 									.padding(.medium1)
 							}
@@ -53,29 +59,23 @@ public extension ChooseAccounts.View {
 								),
 								content: ChooseAccounts.Row.View.init(store:)
 							)
-						}
-					}
-					Spacer(minLength: .medium3)
-					VStack {
-						Button(
-							action: {},
-							label: {
-								Text(L10n.DApp.ChooseAccounts.createNewAccount)
-									.foregroundColor(.app.gray1)
-									.textStyle(.body1Regular)
+
+							Button(L10n.DApp.ChooseAccounts.createNewAccount) {
+								// TODO: implement
 							}
-						)
-
-						Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
-							viewStore.send(.continueButtonTapped)
+							.buttonStyle(.primaryText())
+							.padding(.medium1)
 						}
-						.buttonStyle(.primaryRectangular)
-						.enabled(viewStore.canProceed)
+						.padding(.horizontal, .medium1)
 					}
 
-					Spacer(minLength: .medium3)
+					Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
+						viewStore.send(.continueButtonTapped)
+					}
+					.buttonStyle(.primaryRectangular)
+					.enabled(viewStore.canProceed)
+					.padding(.medium1)
 				}
-				.padding(.horizontal, .medium1)
 			}
 		}
 	}
@@ -101,17 +101,6 @@ extension P2P.FromDapp.OneTimeAccountsReadRequestItem.Mode: CustomStringConverti
 // MARK: - ChooseAccounts.View.ChooseAccountsViewStore
 private extension ChooseAccounts.View {
 	typealias ChooseAccountsViewStore = ComposableArchitecture.ViewStore<ChooseAccounts.View.ViewState, ChooseAccounts.Action.ViewAction>
-}
-
-private extension ChooseAccounts.View {
-	func header(with viewStore: ChooseAccountsViewStore) -> some View {
-		HStack {
-			BackButton {
-				viewStore.send(.backButtonTapped)
-			}
-			Spacer()
-		}
-	}
 }
 
 // MARK: - ChooseAccounts.View.ViewState

@@ -2,6 +2,7 @@ import Asset
 import BigInt
 import Common
 import ComposableArchitecture
+import NukeUI
 import Profile
 import SwiftUI
 
@@ -43,9 +44,11 @@ private extension FungibleTokenList.Row.View {
 		ZStack {
 			HStack(alignment: .center) {
 				HStack(spacing: .small1) {
-					Circle()
-						.frame(.small)
-						.foregroundColor(.app.gray3)
+					LazyImage(url: container.asset.iconURL) { _ in
+						Image(asset: container.asset.placeholderImage)
+							.resizable()
+							.frame(.small)
+					}
 
 					Text(container.asset.symbol ?? "")
 						.foregroundColor(.app.gray1)

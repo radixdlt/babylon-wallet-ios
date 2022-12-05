@@ -34,11 +34,14 @@ public enum AssetResource {
 	public static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
 	public static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
 	public static let browsers = ImageAsset(name: "browsers")
+	public static let desktopConnections = ImageAsset(name: "desktop-connections")
+	public static let gateway = ImageAsset(name: "gateway")
 	public static let qrCodeScanner = ImageAsset(name: "qr-code-scanner")
 	public static let splash = ImageAsset(name: "Splash")
-	public static let dappPlaceholder = ImageAsset(name: "dapp-placeholder")
-	public static let nftLogo = ImageAsset(name: "nft-logo")
+	public static let fungibleToken = ImageAsset(name: "fungible-token")
 	public static let nft = ImageAsset(name: "nft")
+	public static let xrd = ImageAsset(name: "xrd")
+	public static let dappPlaceholder = ImageAsset(name: "dapp-placeholder")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 

@@ -96,14 +96,14 @@ private extension Settings.View {
 
 						Row(
 							L10n.Settings.desktopConnectionsButtonTitle,
-							icon: Image(systemName: "desktopcomputer")
+							icon: Image(asset: AssetResource.desktopConnections)
 						) {
 							viewStore.send(.manageP2PClientsButtonTapped)
 						}
 
 						Row(
 							L10n.Settings.gatewayButtonTitle,
-							icon: Image(systemName: "point.3.filled.connected.trianglepath.dotted")
+							icon: Image(asset: AssetResource.gateway)
 						) {
 							viewStore.send(.editGatewayAPIEndpointButtonTapped)
 						}
