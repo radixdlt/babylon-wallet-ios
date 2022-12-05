@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Resources
 
 // MARK: - NewConnection
 public struct NewConnection: ReducerProtocol {
@@ -22,8 +23,29 @@ public extension NewConnection {
 			return .none
 
 		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismiss))
+			switch state {
+			case .scanQR:
+				return .run { send in
+					await send(.delegate(.dismiss))
+				}
+			case let .connectUsingSecrets(connectUsingSecrets):
+				guard let connection = connectUsingSecrets.connectedConnection else {
+					return .run { send in
+						await send(.delegate(.dismiss))
+					}
+				}
+				return body.reduce(
+					into: &state,
+					action: .connectUsingSecrets(.delegate(.connected(
+						.init(
+							client: .init(
+								displayName: L10n.NewConnection.defaultNameOfConnection,
+								connectionPassword: connectUsingSecrets.connectionSecrets.connectionPassword.data.data
+							),
+							connection: connection
+						)
+					)))
+				)
 			}
 
 		case let .scanQR(.delegate(.connectionSecretsFromScannedQR(connectionSecrets))):

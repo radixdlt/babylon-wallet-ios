@@ -66,6 +66,7 @@
 "newConnection.nameConnectionInstruction" = "Name this connection, e.g. \"Chrome on Macbook Pro\"";
 "newConnection.nameConnectionTextFieldHint" = "Name of connection";
 "newConnection.saveNamedConnectionButton" = "Save connection";
+"newConnection.defaultNameOfConnection" = "Unnamed";
 
 "manageP2PClients.P2PConnectionsTitle" = "Desktop Connections";
 "manageP2PClients.connectionID" = "Connection ID: %@";

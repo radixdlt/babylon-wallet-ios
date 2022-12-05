@@ -175,6 +175,8 @@ public enum L10n {
 	public enum NewConnection {
   	/// Connecting...
   	public static let connecting = L10n.tr("Localizable", "newConnection.connecting", fallback: "Connecting...")
+  	/// Unnamed
+  	public static let defaultNameOfConnection = L10n.tr("Localizable", "newConnection.defaultNameOfConnection", fallback: "Unnamed")
   	/// Name this connection, e.g. "Chrome on Macbook Pro"
   	public static let nameConnectionInstruction = L10n.tr("Localizable", "newConnection.nameConnectionInstruction", fallback: "Name this connection, e.g. \"Chrome on Macbook Pro\"")
   	/// Name of connection

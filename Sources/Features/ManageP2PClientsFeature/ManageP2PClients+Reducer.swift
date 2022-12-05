@@ -43,7 +43,7 @@ public extension ManageP2PClients {
 			}
 
 		case let .internal(.system(.loadConnectionsResult(.success(connectionsFromProfile)))):
-			state.connections.append(contentsOf: connectionsFromProfile)
+			state.connections = .init(uniqueElements: connectionsFromProfile)
 			return .none
 
 		case let .internal(.system(.loadConnectionsResult(.failure(error)))):

@@ -22,7 +22,7 @@ public extension ConnectUsingSecrets.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			VStack {
+			VStack(alignment: .leading) {
 				if viewStore.isConnecting {
 					LoadingOverlayView(L10n.NewConnection.connecting)
 				} else if viewStore.isPromptingForName {
@@ -44,9 +44,9 @@ public extension ConnectUsingSecrets.View {
 						}
 						.buttonStyle(.primaryRectangular)
 					}
-					.padding()
 				}
 			}
+			.padding()
 			.onAppear {
 				viewStore.send(.appeared)
 			}
