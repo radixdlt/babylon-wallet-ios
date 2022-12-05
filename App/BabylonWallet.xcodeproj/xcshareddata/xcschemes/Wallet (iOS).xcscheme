@@ -352,16 +352,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "URLBuilderClientTests"
-               BuildableName = "URLBuilderClientTests"
-               BlueprintName = "URLBuilderClientTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "GrantDappWalletAccessFeatureTests"
                BuildableName = "GrantDappWalletAccessFeatureTests"
                BlueprintName = "GrantDappWalletAccessFeatureTests"
@@ -385,6 +375,16 @@
                BlueprintIdentifier = "DesignSystemTests"
                BuildableName = "DesignSystemTests"
                BlueprintName = "DesignSystemTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "NewConnectionFeatureTests"
+               BuildableName = "NewConnectionFeatureTests"
+               BlueprintName = "NewConnectionFeatureTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
