@@ -162,6 +162,10 @@ public struct Home: ReducerProtocol {
 			errorQueue.schedule(error)
 			return .none
 
+		case .internal(.system(.temp)):
+			print("🟢🟢🟢 temp")
+			return .none
+
 		case .child(.header(.delegate(.displaySettings))):
 			return .run { send in
 				await send(.delegate(.displaySettings))

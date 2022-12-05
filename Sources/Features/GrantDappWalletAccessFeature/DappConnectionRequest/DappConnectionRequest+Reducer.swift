@@ -31,7 +31,6 @@ public struct DappConnectionRequest: Sendable, ReducerProtocol {
 			}
 
 		case let .internal(.system(.loadAccountsResult(.success(accounts)))):
-
 			state.chooseAccounts = .init(
 				request: state.request,
 				accounts: .init(uniqueElements: accounts.map {

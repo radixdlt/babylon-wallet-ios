@@ -1,10 +1,16 @@
 import Collections
 import ComposableArchitecture
+import CreateAccountFeature
+import ErrorQueue
 import NonEmpty
 import Profile
+import ProfileClient
 
 // MARK: - ChooseAccounts
 public struct ChooseAccounts: ReducerProtocol {
+	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.errorQueue) var errorQueue
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -20,6 +26,10 @@ public struct ChooseAccounts: ReducerProtocol {
 				return .run { send in
 					await send(.delegate(.dismissChooseAccounts))
 				}
+
+			case .internal(.view(.createAccountButtonTapped)):
+				state.createAccount = .init(shouldCreateProfile: false)
+				return .none
 
 			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child
 			// and every other action should fall-through - @davdroman-rdx
@@ -50,12 +60,44 @@ public struct ChooseAccounts: ReducerProtocol {
 					return .none
 				}
 
+			case .delegate(.dismissChooseAccounts):
+				state.createAccount = nil
+				return .none
+
 			case .delegate:
+				return .none
+
+			case .child(.createAccount(.delegate(.dismissCreateAccount))):
+				state.createAccount = nil
+				return .none
+
+			case .child(.createAccount(.delegate(.createdNewAccount(_)))):
+				state.createAccount = nil
+				return .run { send in
+					await send(.internal(.system(.loadAccountsResult(TaskResult {
+						try await profileClient.getAccounts()
+					}))))
+				}
+
+			case let .internal(.system(.loadAccountsResult(.success(accounts)))):
+				state.accounts = .init(uniqueElements: accounts.map {
+					ChooseAccounts.Row.State(account: $0)
+				})
+				return .none
+
+			case let .internal(.system(.loadAccountsResult(.failure(error)))):
+				errorQueue.schedule(error)
+				return .none
+
+			case .child:
 				return .none
 			}
 		}
 		.forEach(\.accounts, action: /Action.child .. Action.ChildAction.account) {
 			ChooseAccounts.Row()
+		}
+		.ifLet(\.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
+			CreateAccount()
 		}
 	}
 }
