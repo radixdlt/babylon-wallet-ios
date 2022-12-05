@@ -23,7 +23,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 }
 
 public extension GatewayAPIClient {
-	typealias GetGatewayInfo = @Sendable () async throws -> GatewayAPI.GatewayInfoResponse
+	typealias GetGatewayInfo = @Sendable () async throws -> GatewayAPI.GatewayInformationResponse
 	typealias GetEpoch = @Sendable () async throws -> Epoch
 	typealias GetNetworkName = @Sendable (URL) async throws -> Network.Name
 
@@ -33,11 +33,11 @@ public extension GatewayAPIClient {
 
 	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.EntityDetailsResponse
 
-	typealias GetRecentTransactions = @Sendable (GatewayAPI.RecentTransactionsRequest) async throws -> GatewayAPI.RecentTransactionsResponse
+	typealias GetRecentTransactions = @Sendable (GatewayAPI.TransactionRecentResponse) async throws -> GatewayAPI.TransactionRecentResponse
 
 	typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 
 	typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
 
-	typealias GetTransactionDetails = @Sendable (GatewayAPI.TransactionDetailsRequest) async throws -> GatewayAPI.TransactionDetailsResponse
+	typealias GetTransactionDetails = @Sendable (GatewayAPI.TransactionCommittedDetailsResponse) async throws -> GatewayAPI.TransactionCommittedDetailsResponse
 }

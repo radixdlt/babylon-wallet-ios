@@ -41,7 +41,8 @@ extension GatewayAPIClient: TestDependencyKey {
 				releaseInfo: .init(
 					releaseVersion: "release-version",
 					openApiSchemaVersion: "schema-version"
-				)
+				),
+				wellKnownAddresses: .init(accountPackage: "", faucet: "", ecdsaSecp256k1: "", eddsaEd25519: "", xrd: "") // TODO:
 			) },
 			getNetworkName: { _ in .init("Hammunet") },
 			getEpoch: { .init(rawValue: 123) },
@@ -78,11 +79,9 @@ extension GatewayAPIClient: TestDependencyKey {
 						epoch: 1337,
 						round: 0
 					),
-					transaction: .init(
-						transactionStatus: .init(status: .succeeded),
-						payloadHashHex: "payload-hash-hex",
-						intentHashHex: "intent-hash-hex"
-					)
+					status: .committedSuccess,
+					knownPayloads: [.init(payloadHashHex: "payload-hash-hex", status: .committedSuccess)],
+					errorMessage: nil
 				)
 			},
 			transactionDetails: { _ in
@@ -95,12 +94,14 @@ extension GatewayAPIClient: TestDependencyKey {
 						round: 0
 					),
 					transaction: .init(
-						transactionStatus: .init(status: .succeeded),
+						stateVersion: nil,
+						transactionStatus: .committedSuccess,
 						payloadHashHex: "payload-hash-hex",
 						intentHashHex: "intent-hash-hex"
 					),
 					details: .init(
 						rawHex: "raw-hex",
+						receipt: .init("receipt"),
 						referencedGlobalEntities: []
 					)
 				)
