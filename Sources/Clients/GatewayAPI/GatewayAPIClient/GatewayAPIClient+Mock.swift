@@ -16,10 +16,8 @@ extension GatewayAPIClient: TestDependencyKey {
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
 		resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
 		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
-		recentTransactions: unimplemented("\(Self.self).recentTransactions"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
-		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
-		transactionDetails: unimplemented("\(Self.self).transactionDetails")
+		transactionStatus: unimplemented("\(Self.self).transactionStatus")
 	)
 
 	private static func mock(
@@ -55,18 +53,6 @@ extension GatewayAPIClient: TestDependencyKey {
 			resourceDetailsByResourceIdentifier: { _ in
 				fatalError()
 			},
-			recentTransactions: { _ in
-				.init(
-					ledgerState: .init(
-						network: "Network name",
-						stateVersion: 0,
-						timestamp: "",
-						epoch: 1337,
-						round: 0
-					),
-					items: []
-				)
-			},
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},
@@ -82,28 +68,6 @@ extension GatewayAPIClient: TestDependencyKey {
 					status: .committedSuccess,
 					knownPayloads: [.init(payloadHashHex: "payload-hash-hex", status: .committedSuccess)],
 					errorMessage: nil
-				)
-			},
-			transactionDetails: { _ in
-				.init(
-					ledgerState: .init(
-						network: "Network name",
-						stateVersion: 0,
-						timestamp: "",
-						epoch: 1337,
-						round: 0
-					),
-					transaction: .init(
-						stateVersion: nil,
-						transactionStatus: .committedSuccess,
-						payloadHashHex: "payload-hash-hex",
-						intentHashHex: "intent-hash-hex"
-					),
-					details: .init(
-						rawHex: "raw-hex",
-						receipt: .init("receipt"),
-						referencedGlobalEntities: []
-					)
 				)
 			}
 		)

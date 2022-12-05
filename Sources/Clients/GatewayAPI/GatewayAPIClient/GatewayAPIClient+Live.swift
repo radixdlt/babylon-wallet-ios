@@ -177,11 +177,6 @@ public extension GatewayAPIClient {
 					request: GatewayAPI.EntityDetailsRequest(address: resourceAddress)
 				) { $0.appendingPathComponent("entity/details") }
 			},
-			recentTransactions: { recentTransactionsRequest in
-				try await post(
-					request: recentTransactionsRequest
-				) { $0.appendingPathComponent("transaction/recent") }
-			},
 			submitTransaction: { transactionSubmitRequest in
 				try await post(
 					request: transactionSubmitRequest
@@ -191,11 +186,6 @@ public extension GatewayAPIClient {
 				try await post(
 					request: transactionStatusRequest
 				) { $0.appendingPathComponent("transaction/status") }
-			},
-			transactionDetails: { transactionDetailsRequest in
-				try await post(
-					request: transactionDetailsRequest
-				) { $0.appendingPathComponent("transaction/details") }
 			}
 		)
 	}
