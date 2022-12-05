@@ -15,7 +15,9 @@ public extension ManageP2PClient {
 public extension ManageP2PClient.Action {
 	enum ViewAction: Sendable, Equatable {
 		case deleteConnectionButtonTapped
+		#if DEBUG
 		case sendTestMessageButtonTapped
+		#endif // DEBUG
 		case viewAppeared
 	}
 }

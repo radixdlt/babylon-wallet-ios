@@ -51,10 +51,12 @@ public extension ManageP2PClient {
 			return .run { send in
 				await send(.delegate(.deleteConnection))
 			}
+		#if DEBUG
 		case .internal(.view(.sendTestMessageButtonTapped)):
 			return .run { send in
 				await send(.delegate(.sendTestMessage))
 			}
+		#endif // DEBUG
 		case .delegate:
 			return .none
 		}
