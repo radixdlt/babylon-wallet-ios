@@ -19,10 +19,10 @@ public extension GatewayAPI {
 		public private(set) var ledgerState: LedgerState
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
-		public private(set) var fungibleResources: EntityResourcesResponseFungibleResources
-		public private(set) var nonFungibleResources: EntityResourcesResponseNonFungibleResources
+		public private(set) var fungibleResources: FungibleResourcesCollection
+		public private(set) var nonFungibleResources: NonFungibleResourcesCollection
 
-		public init(ledgerState: LedgerState, address: String, fungibleResources: EntityResourcesResponseFungibleResources, nonFungibleResources: EntityResourcesResponseNonFungibleResources) {
+		public init(ledgerState: LedgerState, address: String, fungibleResources: FungibleResourcesCollection, nonFungibleResources: NonFungibleResourcesCollection) {
 			self.ledgerState = ledgerState
 			self.address = address
 			self.fungibleResources = fungibleResources

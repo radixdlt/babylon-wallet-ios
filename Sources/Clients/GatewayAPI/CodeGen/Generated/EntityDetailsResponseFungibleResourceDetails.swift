@@ -17,13 +17,15 @@ public typealias EntityDetailsResponseFungibleResourceDetails = GatewayAPI.Entit
 public extension GatewayAPI {
 	struct EntityDetailsResponseFungibleResourceDetails: Codable, Hashable {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
-		public private(set) var divisibility: Int64
+		public private(set) var authRules: AnyCodable
+		public private(set) var divisibility: Int
 		public private(set) var totalSupply: TokenAmount
 		public private(set) var totalMinted: TokenAmount
 		public private(set) var totalBurnt: TokenAmount
 
-		public init(discriminator: EntityDetailsResponseDetailsType, divisibility: Int64, totalSupply: TokenAmount, totalMinted: TokenAmount, totalBurnt: TokenAmount) {
+		public init(discriminator: EntityDetailsResponseDetailsType, authRules: AnyCodable, divisibility: Int, totalSupply: TokenAmount, totalMinted: TokenAmount, totalBurnt: TokenAmount) {
 			self.discriminator = discriminator
+			self.authRules = authRules
 			self.divisibility = divisibility
 			self.totalSupply = totalSupply
 			self.totalMinted = totalMinted
@@ -32,6 +34,7 @@ public extension GatewayAPI {
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case discriminator
+			case authRules = "auth_rules"
 			case divisibility
 			case totalSupply = "total_supply"
 			case totalMinted = "total_minted"
@@ -43,6 +46,7 @@ public extension GatewayAPI {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(discriminator, forKey: .discriminator)
+			try container.encode(authRules, forKey: .authRules)
 			try container.encode(divisibility, forKey: .divisibility)
 			try container.encode(totalSupply, forKey: .totalSupply)
 			try container.encode(totalMinted, forKey: .totalMinted)

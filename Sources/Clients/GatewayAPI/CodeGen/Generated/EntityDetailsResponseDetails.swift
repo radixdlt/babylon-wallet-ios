@@ -16,30 +16,35 @@ public typealias EntityDetailsResponseDetails = GatewayAPI.EntityDetailsResponse
 // MARK: - GatewayAPI.EntityDetailsResponseDetails
 public extension GatewayAPI {
 	enum EntityDetailsResponseDetails: Codable, JSONEncodable, Hashable {
-		case typeEntityDetailsResponseAccountComponentDetails(EntityDetailsResponseAccountComponentDetails)
+		case typeEntityDetailsResponseComponentDetails(EntityDetailsResponseComponentDetails)
 		case typeEntityDetailsResponseFungibleResourceDetails(EntityDetailsResponseFungibleResourceDetails)
 		case typeEntityDetailsResponseNonFungibleResourceDetails(EntityDetailsResponseNonFungibleResourceDetails)
+		case typeEntityDetailsResponsePackageDetails(EntityDetailsResponsePackageDetails)
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.singleValueContainer()
 			switch self {
-			case let .typeEntityDetailsResponseAccountComponentDetails(value):
+			case let .typeEntityDetailsResponseComponentDetails(value):
 				try container.encode(value)
 			case let .typeEntityDetailsResponseFungibleResourceDetails(value):
 				try container.encode(value)
 			case let .typeEntityDetailsResponseNonFungibleResourceDetails(value):
+				try container.encode(value)
+			case let .typeEntityDetailsResponsePackageDetails(value):
 				try container.encode(value)
 			}
 		}
 
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.singleValueContainer()
-			if let value = try? container.decode(EntityDetailsResponseAccountComponentDetails.self) {
-				self = .typeEntityDetailsResponseAccountComponentDetails(value)
+			if let value = try? container.decode(EntityDetailsResponseComponentDetails.self) {
+				self = .typeEntityDetailsResponseComponentDetails(value)
 			} else if let value = try? container.decode(EntityDetailsResponseFungibleResourceDetails.self) {
 				self = .typeEntityDetailsResponseFungibleResourceDetails(value)
 			} else if let value = try? container.decode(EntityDetailsResponseNonFungibleResourceDetails.self) {
 				self = .typeEntityDetailsResponseNonFungibleResourceDetails(value)
+			} else if let value = try? container.decode(EntityDetailsResponsePackageDetails.self) {
+				self = .typeEntityDetailsResponsePackageDetails(value)
 			} else {
 				throw DecodingError.typeMismatch(Self.Type.self, .init(codingPath: decoder.codingPath, debugDescription: "Unable to decode instance of EntityDetailsResponseDetails"))
 			}

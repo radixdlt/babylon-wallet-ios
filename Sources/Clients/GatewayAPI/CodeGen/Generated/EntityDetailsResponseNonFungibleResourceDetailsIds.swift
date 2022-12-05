@@ -17,14 +17,14 @@ public typealias EntityDetailsResponseNonFungibleResourceDetailsIds = GatewayAPI
 public extension GatewayAPI {
 	struct EntityDetailsResponseNonFungibleResourceDetailsIds: Codable, Hashable {
 		/** TBD (make it nullable when we're dealing with unknown result set sizes?) */
-		public private(set) var totalCount: Int?
+		public private(set) var totalCount: Int64?
 		/** TBD (maybe we should use HATEOAS-like permalinks?) */
 		public private(set) var previousCursor: String?
 		/** TBD (maybe we should use HATEOAS-like permalinks?) */
 		public private(set) var nextCursor: String?
 		public private(set) var items: [EntityDetailsResponseNonFungibleResourceDetailsIdsItem]
 
-		public init(totalCount: Int? = nil, previousCursor: String? = nil, nextCursor: String? = nil, items: [EntityDetailsResponseNonFungibleResourceDetailsIdsItem]) {
+		public init(totalCount: Int64? = nil, previousCursor: String? = nil, nextCursor: String? = nil, items: [EntityDetailsResponseNonFungibleResourceDetailsIdsItem]) {
 			self.totalCount = totalCount
 			self.previousCursor = previousCursor
 			self.nextCursor = nextCursor

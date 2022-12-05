@@ -17,15 +17,18 @@ public typealias EntityDetailsResponseNonFungibleResourceDetails = GatewayAPI.En
 public extension GatewayAPI {
 	struct EntityDetailsResponseNonFungibleResourceDetails: Codable, Hashable {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
+		public private(set) var authRules: AnyCodable
 		public private(set) var ids: EntityDetailsResponseNonFungibleResourceDetailsIds
 
-		public init(discriminator: EntityDetailsResponseDetailsType, ids: EntityDetailsResponseNonFungibleResourceDetailsIds) {
+		public init(discriminator: EntityDetailsResponseDetailsType, authRules: AnyCodable, ids: EntityDetailsResponseNonFungibleResourceDetailsIds) {
 			self.discriminator = discriminator
+			self.authRules = authRules
 			self.ids = ids
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case discriminator
+			case authRules = "auth_rules"
 			case ids
 		}
 
@@ -34,6 +37,7 @@ public extension GatewayAPI {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(discriminator, forKey: .discriminator)
+			try container.encode(authRules, forKey: .authRules)
 			try container.encode(ids, forKey: .ids)
 		}
 	}

@@ -18,6 +18,7 @@ public extension GatewayAPI {
 	enum EntityDetailsResponseDetailsType: String, Codable, CaseIterable {
 		case fungibleResource = "fungible_resource"
 		case nonFungibleResource = "non_fungible_resource"
-		case accountComponent = "account_component"
+		case package
+		case component
 	}
 }

@@ -16,16 +16,16 @@ public typealias TransactionStatusRequest = GatewayAPI.TransactionStatusRequest
 // MARK: - GatewayAPI.TransactionStatusRequest
 public extension GatewayAPI {
 	struct TransactionStatusRequest: Codable, Hashable {
-		public private(set) var transactionIdentifier: TransactionLookupIdentifier
+		public private(set) var intentHashHex: String?
 		public private(set) var atStateIdentifier: PartialLedgerStateIdentifier?
 
-		public init(transactionIdentifier: TransactionLookupIdentifier, atStateIdentifier: PartialLedgerStateIdentifier? = nil) {
-			self.transactionIdentifier = transactionIdentifier
+		public init(intentHashHex: String? = nil, atStateIdentifier: PartialLedgerStateIdentifier? = nil) {
+			self.intentHashHex = intentHashHex
 			self.atStateIdentifier = atStateIdentifier
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
-			case transactionIdentifier = "transaction_identifier"
+			case intentHashHex = "intent_hash_hex"
 			case atStateIdentifier = "at_state_identifier"
 		}
 
@@ -33,7 +33,7 @@ public extension GatewayAPI {
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(transactionIdentifier, forKey: .transactionIdentifier)
+			try container.encodeIfPresent(intentHashHex, forKey: .intentHashHex)
 			try container.encodeIfPresent(atStateIdentifier, forKey: .atStateIdentifier)
 		}
 	}
