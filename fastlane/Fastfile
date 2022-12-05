@@ -26,9 +26,9 @@ platform :ios do
         install_distribution_certificate
         
         # version = bump_version
-        # commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
         
         build_number = bump_build_number
+        commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
         build_app
         version = get_version
         version_and_build_number = "%s#%s" % [version, build_number]
