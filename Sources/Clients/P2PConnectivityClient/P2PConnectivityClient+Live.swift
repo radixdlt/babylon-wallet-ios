@@ -50,18 +50,22 @@ public extension P2PConnectivityClient {
 				else {
 					return
 				}
-				// connection.connection.close() // when impl in Converse
-				connections.removeValue(forKey: key)
+				if let removed = connections.removeValue(forKey: key) {
+					Task {
+						await removed.connection.close()
+					}
+				}
 				var value = p2pClients.value
 				value.removeAll(where: { $0.p2pClient.id == id })
 				p2pClients.send(value)
 			}
 
-			func getConnection(id: P2PClient.ID) throws -> P2P.ConnectedClient {
-				let key = try mapID(id)
-				guard let connection = connections[key] else {
-					struct NoConnectionMatchingIDFound: Swift.Error {}
-					throw NoConnectionMatchingIDFound()
+			func getConnection(id: P2PClient.ID) -> P2P.ConnectedClient? {
+				guard
+					let key = try? mapID(id),
+					let connection = connections[key]
+				else {
+					return nil
 				}
 				return connection
 			}
@@ -100,7 +104,9 @@ public extension P2PConnectivityClient {
 				try await profileClient.deleteP2PClientByID(id)
 			},
 			getConnectionStatusAsyncSequence: { id in
-				let connection = try await connectionsHolder.getConnection(id: id)
+				guard let connection = await connectionsHolder.getConnection(id: id) else {
+					return [P2P.ConnectionUpdate]().async.eraseToAnyAsyncSequence()
+				}
 				return connection.connection.connectionStatus().map { newStatus in
 					P2P.ConnectionUpdate(
 						connectionStatus: newStatus,
@@ -109,7 +115,9 @@ public extension P2PConnectivityClient {
 				}.eraseToAnyAsyncSequence()
 			},
 			getRequestsFromP2PClientAsyncSequence: { id in
-				let connection = try await connectionsHolder.getConnection(id: id)
+				guard let connection = await connectionsHolder.getConnection(id: id) else {
+					return [P2P.RequestFromClient]().async.eraseToAnyAsyncSequence()
+				}
 				return await connection.connection.receive().map { msg in
 					@Dependency(\.jsonDecoder) var jsonDecoder
 
@@ -126,7 +134,15 @@ public extension P2PConnectivityClient {
 			sendMessage: { outgoingMsg in
 				@Dependency(\.jsonEncoder) var jsonEncoder
 
-				let connection = try await connectionsHolder.getConnection(id: outgoingMsg.connectionID)
+				guard let connection = await connectionsHolder.getConnection(id: outgoingMsg.connectionID) else {
+					struct NoConnection: LocalizedError {
+						init() {}
+						var errorDescription: String? {
+							"Connection offline."
+						}
+					}
+					throw NoConnection()
+				}
 				let responseToDappData = try jsonEncoder().encode(outgoingMsg.responseToDapp)
 				let p2pChannelRequestID = UUID().uuidString
 
@@ -148,13 +164,13 @@ public extension P2PConnectivityClient {
 				throw FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp()
 			},
 			_sendTestMessage: { id, message in
-				let connection = try await connectionsHolder.getConnection(id: id)
+				let connection = await connectionsHolder.getConnection(id: id)
 				let outgoingMessage = Connection.OutgoingMessage(
 					data: Data(message.utf8),
 					id: UUID().uuidString
 				)
 
-				try await connection.connection.send(outgoingMessage)
+				try await connection?.connection.send(outgoingMessage)
 
 				// does not care about sent message receipts
 			}

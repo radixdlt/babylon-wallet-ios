@@ -86,16 +86,25 @@ private extension Settings.View {
 						}
 
 						#if DEBUG
-						Row(L10n.Settings.inspectProfileButtonTitle) {
+						Row(
+							L10n.Settings.inspectProfileButtonTitle,
+							icon: Image(systemName: "wallet.pass")
+						) {
 							viewStore.send(.debugInspectProfileButtonTapped)
 						}
 						#endif // DEBUG
 
-						Row(L10n.Settings.desktopConnectionsButtonTitle) {
+						Row(
+							L10n.Settings.desktopConnectionsButtonTitle,
+							icon: Image(systemName: "desktopcomputer")
+						) {
 							viewStore.send(.manageP2PClientsButtonTapped)
 						}
 
-						Row(L10n.Settings.gatewayButtonTitle) {
+						Row(
+							L10n.Settings.gatewayButtonTitle,
+							icon: Image(systemName: "point.3.filled.connected.trianglepath.dotted")
+						) {
 							viewStore.send(.editGatewayAPIEndpointButtonTapped)
 						}
 

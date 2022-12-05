@@ -1,9 +1,8 @@
 import Common
 import ComposableArchitecture
-import ConnectUsingPasswordFeature
 import DesignSystem
 import Foundation
-import InputPasswordFeature
+import NewConnectionFeature
 import P2PConnectivityClient
 import SharedModels
 import SwiftUI
@@ -34,42 +33,10 @@ public extension ManageP2PClients.View {
 
 					IfLetStore(
 						store.scope(
-							state: \.inputP2PConnectionPassword,
-							action: { .child(.inputP2PConnectionPassword($0)) }
+							state: \.newConnection,
+							action: { .child(.newConnection($0)) }
 						),
-						then: { inputPasswordStore in
-							ForceFullScreen {
-								VStack {
-									NavigationBar(
-										titleText: L10n.ManageP2PClients.newConnectionTitle,
-										leadingItem: CloseButton {
-											viewStore.send(.dismissNewConnectionFlowButtonTapped)
-										}
-									)
-									.foregroundColor(.app.gray1)
-
-									InputPassword.View(store: inputPasswordStore)
-										.buttonStyle(.secondaryRectangular())
-
-									Spacer()
-								}
-								.padding(.medium3)
-							}
-						}
-					)
-					.zIndex(1)
-
-					IfLetStore(
-						store.scope(
-							state: \.connectUsingPassword,
-							action: { .child(.connectUsingPassword($0)) }
-						),
-						then: { connectUsingPasswordStore in
-							ForceFullScreen {
-								ConnectUsingPassword.View(store: connectUsingPasswordStore)
-							}
-							.padding()
-						}
+						then: { NewConnection.View(store: $0) }
 					)
 					.zIndex(2)
 				}
@@ -93,15 +60,15 @@ private extension ManageP2PClients.View {
 				.foregroundColor(.app.gray1)
 				.padding([.horizontal, .top], .medium3)
 
-				VStack {
+				VStack(alignment: .leading) {
 					ScrollView {
-						VStack {
+						VStack(alignment: .leading) {
 							ForEachStore(
 								store.scope(
 									state: \.connections,
 									action: { .child(.connection(id: $0, action: $1)) }
 								),
-								content: ManageP2PClient.View.init(store:)
+								content: { ManageP2PClient.View(store: $0) }
 							)
 						}
 					}
@@ -114,7 +81,7 @@ private extension ManageP2PClients.View {
 
 					Spacer()
 				}
-				.padding([.horizontal, .bottom], .medium1)
+				.padding([.bottom, .horizontal], .medium3)
 				.onAppear { viewStore.send(.viewAppeared) }
 			}
 		}

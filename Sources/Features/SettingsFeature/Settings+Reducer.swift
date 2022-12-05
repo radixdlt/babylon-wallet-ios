@@ -44,11 +44,8 @@ public extension Settings {
 			return .none
 
 		case .internal(.view(.didAppear)):
-			return .run { send in
-				await send(.internal(.system(.loadP2PClientsResult(
-					TaskResult { try await profileClient.getP2PClients() }
-				))))
-			}
+			return loadP2PClients()
+
 		case let .internal(.system(.loadP2PClientsResult(.success(connections)))):
 			state.canAddP2PClient = connections.connections.isEmpty
 			return .none
@@ -92,16 +89,27 @@ public extension Settings {
 
 		case .child(.manageP2PClients(.delegate(.dismiss))):
 			state.manageP2PClients = nil
-			return .none
+			return loadP2PClients()
 
 		case .child, .delegate:
 			return .none
 		case .internal(.view(.addP2PClientButtonTapped)):
-			state.manageP2PClients = .init(inputP2PConnectionPassword: .init())
+			state.manageP2PClients = .init(newConnection: .init())
 			return .none
 		case .internal(.view(.editGatewayAPIEndpointButtonTapped)):
 			state.manageGatewayAPIEndpoints = .init()
 			return .none
+		}
+	}
+}
+
+// MARK: Private
+private extension Settings {
+	func loadP2PClients() -> EffectTask<Action> {
+		.run { send in
+			await send(.internal(.system(.loadP2PClientsResult(
+				TaskResult { try await profileClient.getP2PClients() }
+			))))
 		}
 	}
 }

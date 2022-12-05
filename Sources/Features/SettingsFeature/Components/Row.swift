@@ -5,13 +5,16 @@ import SwiftUI
 // MARK: - Row
 struct Row: View {
 	let title: String
+	let icon: Image
 	let action: () -> Void
 
 	init(
 		_ title: String,
+		icon: Image,
 		action: @escaping () -> Void
 	) {
 		self.title = title
+		self.icon = icon
 		self.action = action
 	}
 }
@@ -24,10 +27,8 @@ extension Row {
 			}, label: {
 				ZStack {
 					HStack {
-						// TODO: replace appropriate settings icon when ready
-						Rectangle()
+						icon
 							.frame(.verySmall)
-							.foregroundColor(.app.gray4)
 							.cornerRadius(.small3)
 
 						Spacer()
@@ -67,6 +68,6 @@ struct SettingsRowStyle: ButtonStyle {
 // MARK: - Row_Previews
 struct Row_Previews: PreviewProvider {
 	static var previews: some View {
-		Row("Title", action: {})
+		Row("Title", icon: Image(systemName: "wallet.pass"), action: {})
 	}
 }

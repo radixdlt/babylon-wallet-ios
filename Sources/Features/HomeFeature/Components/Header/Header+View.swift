@@ -44,10 +44,11 @@ extension Home.Header.View {
 
 private extension Home.Header.View {
 	var subtitleView: some SwiftUI.View {
-		HStack {
+		HStack(spacing: .large1) {
 			Text(L10n.Home.Header.subtitle)
 				.foregroundColor(.app.gray2)
 				.textStyle(.body1HighImportance)
+			Spacer(minLength: .large1)
 		}
 	}
 }

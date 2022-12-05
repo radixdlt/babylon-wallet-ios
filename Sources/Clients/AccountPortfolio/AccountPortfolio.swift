@@ -3,7 +3,7 @@ import BigInt
 import IdentifiedCollections
 
 // MARK: - AccountPortfolio
-public struct AccountPortfolio: Equatable {
+public struct AccountPortfolio: Sendable, Equatable {
 	public var fungibleTokenContainers: IdentifiedArrayOf<FungibleTokenContainer>
 	public var nonFungibleTokenContainers: IdentifiedArrayOf<NonFungibleTokenContainer>
 	public var poolShareContainers: IdentifiedArrayOf<PoolShareContainer>

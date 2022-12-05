@@ -1,26 +1,53 @@
 import SwiftUI
 
-// An ugly temporary LoadingView
+// MARK: - LoadingView
 public struct LoadingView: View {
-	@State public var isLoading = false
+	@State private var rotationDegrees: CGFloat
+	private let lineWidth: CGFloat
+	private let stroke: Color
+	public init(
+		rotationDegrees: CGFloat = 0.0,
+		lineWidth: CGFloat = 2,
+		stroke: Color = Color.app.white
+	) {
+		self.stroke = stroke
+		_rotationDegrees = .init(initialValue: rotationDegrees)
+		self.lineWidth = lineWidth
+	}
+}
 
-	public init() {}
-
-	public var body: some View {
+public extension LoadingView {
+	var body: some View {
 		ZStack {
 			Circle()
-				.stroke(Color(.systemGray), lineWidth: 14)
-				.frame(width: 100, height: 100)
-
+				.stroke(
+					stroke.opacity(0.3),
+					lineWidth: lineWidth
+				)
 			Circle()
-				.trim(from: 0, to: 0.2)
-				.stroke(Color.green, lineWidth: 7)
-				.frame(width: 100, height: 100)
-				.rotationEffect(Angle(degrees: isLoading ? 360 : 0))
-				.animation(Animation.linear(duration: 1).repeatForever(autoreverses: false), value: self.isLoading)
-				.onAppear {
-					self.isLoading = true
+				.trim(from: 0, to: 0.35)
+				.stroke(
+					stroke,
+					lineWidth: lineWidth
+				)
+				.rotationEffect(.degrees(rotationDegrees))
+		}
+		.onAppear {
+			withAnimation(.linear(duration: 1)
+				.speed(0.7)
+				.repeatForever(autoreverses: false)) {
+					rotationDegrees = 360.0
 				}
+		}
+	}
+}
+
+// MARK: - LoaderView_Previews
+struct LoaderView_Previews: PreviewProvider {
+	static var previews: some View {
+		ZStack {
+			Color.app.blue2
+			LoadingView()
 		}
 	}
 }

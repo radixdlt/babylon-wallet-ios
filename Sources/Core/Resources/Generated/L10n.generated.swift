@@ -151,8 +151,8 @@ public enum L10n {
   	public static let networkName = L10n.tr("Localizable", "manageGateway.networkName", fallback: "Network name")
   	/// Switch To
   	public static let switchToButtonTitle = L10n.tr("Localizable", "manageGateway.switchToButtonTitle", fallback: "Switch To")
-  	/// Edit Gateway API URL
-  	public static let title = L10n.tr("Localizable", "manageGateway.title", fallback: "Edit Gateway API URL")
+  	/// Gateway
+  	public static let title = L10n.tr("Localizable", "manageGateway.title", fallback: "Gateway")
   	/// https://example.com:8080
   	public static let urlString = L10n.tr("Localizable", "manageGateway.urlString", fallback: "https://example.com:8080")
 	}
@@ -167,10 +167,26 @@ public enum L10n {
   	public static let newConnectionButtonTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionButtonTitle", fallback: "Add new connection")
   	/// New Connection
   	public static let newConnectionTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionTitle", fallback: "New Connection")
-  	/// P2P Connections
-  	public static let p2PConnectionsTitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsTitle", fallback: "P2P Connections")
+  	/// Desktop Connections
+  	public static let p2PConnectionsTitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsTitle", fallback: "Desktop Connections")
   	/// Send Test Msg
   	public static let sendTestMessageButtonTitle = L10n.tr("Localizable", "manageP2PClients.sendTestMessageButtonTitle", fallback: "Send Test Msg")
+	}
+	public enum NewConnection {
+  	/// Connecting...
+  	public static let connecting = L10n.tr("Localizable", "newConnection.connecting", fallback: "Connecting...")
+  	/// Unnamed
+  	public static let defaultNameOfConnection = L10n.tr("Localizable", "newConnection.defaultNameOfConnection", fallback: "Unnamed")
+  	/// Name this connection, e.g. "Chrome on Macbook Pro"
+  	public static let nameConnectionInstruction = L10n.tr("Localizable", "newConnection.nameConnectionInstruction", fallback: "Name this connection, e.g. \"Chrome on Macbook Pro\"")
+  	/// Name of connection
+  	public static let nameConnectionTextFieldHint = L10n.tr("Localizable", "newConnection.nameConnectionTextFieldHint", fallback: "Name of connection")
+  	/// Save connection
+  	public static let saveNamedConnectionButton = L10n.tr("Localizable", "newConnection.saveNamedConnectionButton", fallback: "Save connection")
+  	/// Scan QR code displayed by the Radix Wallet Connector browser extension.
+  	public static let scanRadixConnectorExtensionQRCode = L10n.tr("Localizable", "newConnection.scanRadixConnectorExtensionQRCode", fallback: "Scan QR code displayed by the Radix Wallet Connector browser extension.")
+  	/// Connect Extension
+  	public static let title = L10n.tr("Localizable", "newConnection.title", fallback: "Connect Extension")
 	}
 	public enum NftList {
   	/// %d NFTs
@@ -197,8 +213,8 @@ public enum L10n {
 	public enum Settings {
   	/// Close
   	public static let closeButtonTitle = L10n.tr("Localizable", "settings.closeButtonTitle", fallback: "Close")
-  	/// Delete all & Factor Sources
-  	public static let deleteAllButtonTitle = L10n.tr("Localizable", "settings.deleteAllButtonTitle", fallback: "Delete all & Factor Sources")
+  	/// Delete wallet
+  	public static let deleteAllButtonTitle = L10n.tr("Localizable", "settings.deleteAllButtonTitle", fallback: "Delete wallet")
   	/// Desktop Connections
   	public static let desktopConnectionsButtonTitle = L10n.tr("Localizable", "settings.desktopConnectionsButtonTitle", fallback: "Desktop Connections")
   	/// Gateway

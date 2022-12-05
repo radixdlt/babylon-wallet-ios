@@ -51,6 +51,7 @@
 "importProfile.profileFromSnapshot" = "Profile from snapshot";
 "importProfile.saveImportedMnemonic" = "Save imported mnemonic";
 
+"manageGateway.title" = "Gateway";
 "manageGateway.currentGatewayTitle" = "Current";
 "manageGateway.gatewayAPIEndpoint" = "Gateway API Endpoint";
 "manageGateway.networkID" = "Network ID";
@@ -58,9 +59,16 @@
 "manageGateway.inputNewGatewayAPIURL" = "New URL (https:// required)";
 "manageGateway.urlString" = "https://example.com:8080";
 "manageGateway.switchToButtonTitle" = "Switch To";
-"manageGateway.title" = "Edit Gateway API URL";
 
-"manageP2PClients.P2PConnectionsTitle" = "P2P Connections";
+"newConnection.title" = "Connect Extension";
+"newConnection.scanRadixConnectorExtensionQRCode" = "Scan QR code displayed by the Radix Wallet Connector browser extension.";
+"newConnection.connecting" = "Connecting...";
+"newConnection.nameConnectionInstruction" = "Name this connection, e.g. \"Chrome on Macbook Pro\"";
+"newConnection.nameConnectionTextFieldHint" = "Name of connection";
+"newConnection.saveNamedConnectionButton" = "Save connection";
+"newConnection.defaultNameOfConnection" = "Unnamed";
+
+"manageP2PClients.P2PConnectionsTitle" = "Desktop Connections";
 "manageP2PClients.connectionID" = "Connection ID: %@";
 "manageP2PClients.deleteButtonTitle" = "Delete";
 "manageP2PClients.newConnectionButtonTitle" = "Add new connection";
@@ -79,7 +87,7 @@
 "settings.connectExtension.buttonTitle" = "Connect Extension";
 "settings.connectExtension.subtitle" = "Scan your browser extension code to confirm your connection";
 "settings.connectExtension.title" = "Connect your wallet to a browser";
-"settings.deleteAllButtonTitle" = "Delete all & Factor Sources";
+"settings.deleteAllButtonTitle" = "Delete wallet";
 "settings.desktopConnectionsButtonTitle" = "Desktop Connections";
 "settings.gatewayButtonTitle" = "Gateway";
 "settings.inspectProfileButtonTitle" = "Inspect Profile";

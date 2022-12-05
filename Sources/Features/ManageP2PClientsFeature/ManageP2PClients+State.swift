@@ -1,9 +1,8 @@
-import ConnectUsingPasswordFeature
 import Converse
 import ConverseCommon
 import Foundation
 import IdentifiedCollections
-import InputPasswordFeature
+import NewConnectionFeature
 import P2PConnectivityClient
 import Profile
 import SharedModels
@@ -13,18 +12,15 @@ public extension ManageP2PClients {
 	struct State: Equatable {
 		public var connections: IdentifiedArrayOf<P2P.ClientWithConnectionStatus>
 
-		public var inputP2PConnectionPassword: InputPassword.State?
-		public var connectUsingPassword: ConnectUsingPassword.State?
+		public var newConnection: NewConnection.State?
 
 		public init(
 			connections: IdentifiedArrayOf<P2P.ClientWithConnectionStatus> = .init(),
-			inputP2PConnectionPassword: InputPassword.State? = nil,
-			connectUsingPassword: ConnectUsingPassword.State? = nil
+			newConnection: NewConnection.State? = nil
 		) {
 			self.connections = connections
 
-			self.inputP2PConnectionPassword = inputP2PConnectionPassword
-			self.connectUsingPassword = connectUsingPassword
+			self.newConnection = newConnection
 		}
 	}
 }
