@@ -57,6 +57,17 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	}
 }
 
+public extension FungibleToken {
+	var placeholderImage: ImageAsset {
+		switch symbol {
+		case "XRD":
+			return AssetResource.xrd
+		default:
+			return AssetResource.fungibleToken
+		}
+	}
+}
+
 // MARK: - FungibleTokenContainer
 public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
 	public let owner: AccountAddress

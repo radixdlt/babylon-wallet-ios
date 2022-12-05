@@ -33,37 +33,41 @@ public extension NonFungibleTokenList.Row.View {
 			send: { .view($0) }
 		) { viewStore in
 			VStack(spacing: 1) {
-				ForEach(-1 ..< viewStore.containers.count) { index in
-					Group {
-						switch index {
-						case -1:
-							Header(
-								name: headerNameText,
-								supply: headerSupplyText(with: viewStore),
-								iconAsset: headerIconAsset,
-								isExpanded: viewStore.isExpanded
-							)
-							.zIndex(reversedZIndex(count: viewStore.containers.count, index: index))
-							.onTapGesture {
-								viewStore.send(.isExpandedToggled, animation: Animation.easeInOut)
+				if viewStore.containers.isEmpty {
+					EmptyView()
+				} else {
+					ForEach(-1 ..< viewStore.containers.count) { index in
+						Group {
+							switch index {
+							case -1:
+								Header(
+									name: headerNameText,
+									supply: headerSupplyText(with: viewStore),
+									iconAsset: headerIconAsset,
+									isExpanded: viewStore.isExpanded
+								)
+								.zIndex(reversedZIndex(count: viewStore.containers.count, index: index))
+								.onTapGesture {
+									viewStore.send(.isExpandedToggled, animation: Animation.easeInOut)
+								}
+							default:
+								Component(
+									container: viewStore.containers[index],
+									isLast: index == viewStore.containers.count - 1,
+									isExpanded: viewStore.isExpanded
+								)
+								.scaleEffect(scale(with: viewStore, index: index))
+								.offset(y: offset(with: viewStore, index: index))
+								.zIndex(reversedZIndex(count: viewStore.containers.count, index: index))
+								.transition(.move(edge: .bottom))
 							}
-						default:
-							Component(
-								container: viewStore.containers[index],
-								isLast: index == viewStore.containers.count - 1,
-								isExpanded: viewStore.isExpanded
-							)
-							.scaleEffect(scale(with: viewStore, index: index))
-							.offset(y: offset(with: viewStore, index: index))
-							.zIndex(reversedZIndex(count: viewStore.containers.count, index: index))
-							.transition(.move(edge: .bottom))
+						}
+						.onSizeChanged(ReferenceView.self) { size in
+							rowHeights[index] = size.height
 						}
 					}
-					.onSizeChanged(ReferenceView.self) { size in
-						rowHeights[index] = size.height
-					}
+					.padding(.horizontal, .medium3)
 				}
-				.padding(.horizontal, .medium3)
 			}
 			.frame(height: viewStore.isExpanded ? expandedHeight : collapsedHeight(with: viewStore), alignment: .top)
 		}
@@ -147,7 +151,7 @@ private extension NonFungibleTokenList.Row.View {
 
 	var headerIconAsset: ImageAsset {
 		// TODO: implement depending on the API design
-		AssetResource.nftLogo
+		AssetResource.nft
 	}
 }
 

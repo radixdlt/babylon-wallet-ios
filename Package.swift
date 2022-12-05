@@ -38,6 +38,7 @@ package.dependencies += [
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
 	.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1"),
+    .package(url: "https://github.com/kean/Nuke", from: "11.3.1"),
 
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
@@ -377,6 +378,7 @@ package.addModules([
 			"Asset",
 			"Common",
 			"DesignSystem",
+			.product(name: "NukeUI", package: "Nuke"),
 			tca,
 		],
 		tests: .yes(

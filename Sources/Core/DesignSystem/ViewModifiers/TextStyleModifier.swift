@@ -158,7 +158,7 @@ private extension TextStyle {
 
 private extension CGFloat {
 	static func lineSpacing(_ value: LineSpacing) -> CGFloat {
-		value.rawValue / 3
+		value.rawValue / 4
 	}
 }
 

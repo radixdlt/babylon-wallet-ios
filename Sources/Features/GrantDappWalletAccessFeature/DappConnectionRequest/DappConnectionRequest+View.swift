@@ -45,13 +45,19 @@ public extension DappConnectionRequest.View {
 private extension DappConnectionRequest.View {
 	func mainView(with viewStore: ViewStore) -> some View {
 		VStack {
-			header(with: viewStore)
-				.padding(.medium1)
+			NavigationBar(
+				leadingItem: CloseButton {
+					viewStore.send(.dismissButtonTapped)
+				}
+			)
+			.foregroundColor(.app.gray1)
+			.padding([.horizontal, .top], .medium3)
 
 			ScrollView {
 				VStack {
 					VStack(spacing: .large1) {
 						Text(L10n.DApp.ConnectionRequest.title)
+							.foregroundColor(.app.gray1)
 							.textStyle(.sectionHeader)
 							.multilineTextAlignment(.center)
 
@@ -62,10 +68,11 @@ private extension DappConnectionRequest.View {
 
 					VStack(spacing: .medium2) {
 						Text(L10n.DApp.ConnectionRequest.wantsToConnect(viewStore.requestFromDapp.metadata.dAppId))
+							.foregroundColor(.app.gray1)
 							.textStyle(.secondaryHeader)
 
 						Text(L10n.DApp.ConnectionRequest.subtitle)
-							.foregroundColor(.app.gray2)
+							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 					}
 					.multilineTextAlignment(.center)
@@ -88,17 +95,6 @@ private extension DappConnectionRequest.View {
 // MARK: - DappConnectionRequest.View.ViewStore
 private extension DappConnectionRequest.View {
 	typealias ViewStore = ComposableArchitecture.ViewStore<ViewState, DappConnectionRequest.Action.ViewAction>
-}
-
-private extension DappConnectionRequest.View {
-	func header(with viewStore: ViewStore) -> some View {
-		HStack {
-			CloseButton {
-				viewStore.send(.dismissButtonTapped)
-			}
-			Spacer()
-		}
-	}
 }
 
 // MARK: - DappConnectionRequest.View.ViewState

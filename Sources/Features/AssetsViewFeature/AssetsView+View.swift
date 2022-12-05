@@ -64,19 +64,16 @@ private extension AssetsView.View {
 // MARK: - Private Methods
 private extension AssetsView.View {
 	func selectorView(with viewStore: AssetsViewViewStore) -> some View {
-		ScrollView(.horizontal, showsIndicators: false) {
-			ScrollViewReader { proxy in
-				HStack(spacing: .zero) {
-					ForEach(AssetsView.AssetsViewType.allCases) { type in
-						selectorButton(type: type, with: viewStore) {
-							viewStore.send(.listSelectorTapped(type))
-							withAnimation {
-								proxy.scrollTo(type, anchor: .center)
-							}
-						}
-					}
+		HStack(spacing: .zero) {
+			Spacer()
+
+			ForEach(AssetsView.AssetsViewType.allCases) { type in
+				selectorButton(type: type, with: viewStore) {
+					viewStore.send(.listSelectorTapped(type))
 				}
 			}
+
+			Spacer()
 		}
 	}
 
