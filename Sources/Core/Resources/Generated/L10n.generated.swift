@@ -82,13 +82,13 @@ public enum L10n {
     	public static func explanation(_ p1: Any) -> String {
     		return L10n.tr("Localizable", "dApp.chooseAccounts.explanation", String(describing: p1), fallback: "Choose %@")
     	}
-    	/// at least one account.
-    	public static let explanationAtLeastOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationAtLeastOneAccount", fallback: "at least one account.")
-    	/// exactly one account.
-    	public static let explanationExactlyOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactlyOneAccount", fallback: "exactly one account.")
-    	/// exactly #%d accounts.
+    	/// at least one account
+    	public static let explanationAtLeastOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationAtLeastOneAccount", fallback: "at least one account")
+    	/// exactly one account
+    	public static let explanationExactlyOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactlyOneAccount", fallback: "exactly one account")
+    	/// exactly #%d accounts
     	public static func explanationExactNumberOfAccounts(_ p1: Int) -> String {
-    		return L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactNumberOfAccounts", p1, fallback: "exactly #%d accounts.")
+    		return L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactNumberOfAccounts", p1, fallback: "exactly #%d accounts")
     	}
     	/// Choose the account(s) you wish %@ to know about
     	public static func subtitle(_ p1: Any) -> String {

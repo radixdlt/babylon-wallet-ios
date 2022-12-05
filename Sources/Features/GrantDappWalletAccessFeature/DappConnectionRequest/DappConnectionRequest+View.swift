@@ -55,14 +55,10 @@ private extension DappConnectionRequest.View {
 
 			ScrollView {
 				VStack {
-					VStack(spacing: .large1) {
-						Text(L10n.DApp.ConnectionRequest.title)
-							.foregroundColor(.app.gray1)
-							.textStyle(.sectionHeader)
-							.multilineTextAlignment(.center)
-
-						Image(asset: AssetResource.dappPlaceholder)
-					}
+					Text(L10n.DApp.ConnectionRequest.title)
+						.foregroundColor(.app.gray1)
+						.textStyle(.sheetTitle)
+						.multilineTextAlignment(.center)
 
 					Spacer(minLength: .large1)
 
@@ -77,9 +73,7 @@ private extension DappConnectionRequest.View {
 					}
 					.multilineTextAlignment(.center)
 
-					Spacer(minLength: .large1 * 1.5)
-
-					Spacer()
+					Spacer(minLength: .large1 * 2)
 
 					Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
 						viewStore.send(.continueButtonTapped)

@@ -227,6 +227,9 @@ public struct Home: ReducerProtocol {
 			state.createAccount = nil
 			return .none
 
+		case .delegate(.reloadAccounts):
+			return loadAccountsAndSettings()
+
 		case .child, .delegate:
 			return .none
 		}
