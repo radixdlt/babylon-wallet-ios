@@ -25,37 +25,45 @@ public extension ManageP2PClient.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			VStack(alignment: .leading) {
-				Text(viewStore.connectionName)
-					.textStyle(.body1Header)
-
-				#if DEBUG
-				Text(L10n.ManageP2PClients.connectionID(viewStore.connectionID))
-					.textStyle(.body2Regular)
-				#endif // DEBUG
-
-				HStack {
-					Text(viewStore.connectionStatusDescription)
-						.textStyle(.body2Regular)
-
-					Circle()
-						.fill(viewStore.connectionStatusColor)
-						.frame(width: 10)
-				}
-
-				HStack {
-					Button(L10n.ManageP2PClients.deleteButtonTitle, role: .destructive) {
-						viewStore.send(.deleteConnectionButtonTapped)
-					}
-					.buttonStyle(.secondaryRectangular(isDestructive: true))
+			HStack {
+				VStack(alignment: .leading) {
+					Text(viewStore.connectionName)
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1HighImportance)
 
 					#if DEBUG
+					Text(L10n.ManageP2PClients.connectionID(viewStore.connectionID))
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1Regular)
+
+					HStack {
+						Text(viewStore.connectionStatusDescription)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body2Regular)
+
+						Circle()
+							.fill(viewStore.connectionStatusColor)
+							.frame(width: 10)
+					}
+
 					Button(L10n.ManageP2PClients.sendTestMessageButtonTitle) {
 						viewStore.send(.sendTestMessageButtonTapped)
 					}
 					.buttonStyle(.secondaryRectangular())
-					#endif
+					#endif // DEBUG
 				}
+
+				Spacer()
+
+				Button(
+					action: {
+						viewStore.send(.deleteConnectionButtonTapped)
+					},
+					label: {
+						Image(asset: AssetResource.delete)
+							.foregroundColor(.app.gray1)
+					}
+				)
 			}
 			.onAppear {
 				viewStore.send(.viewAppeared)
