@@ -10,7 +10,7 @@ extension P2PConnectivityClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 	public static let testValue = Self(
 		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
-		addConnectedP2PClient: unimplemented("\(Self.self).addConnectedP2PClient"),
+		addP2PClientWithConnection: unimplemented("\(Self.self).addP2PClientWithConnection"),
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getConnectionStatusAsyncSequence: unimplemented("\(Self.self).getConnectionStatusAsyncSequence"),
 		getRequestsFromP2PClientAsyncSequence: unimplemented("\(Self.self).getRequestsFromP2PClientAsyncSequence"),
@@ -22,7 +22,7 @@ extension P2PConnectivityClient: TestDependencyKey {
 extension P2PConnectivityClient {
 	static let noop = Self(
 		getP2PClients: { [].async.eraseToAnyAsyncSequence() },
-		addConnectedP2PClient: { _ in },
+		addP2PClientWithConnection: { _, _ in },
 		deleteP2PClientByID: { _ in },
 		getConnectionStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getRequestsFromP2PClientAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },

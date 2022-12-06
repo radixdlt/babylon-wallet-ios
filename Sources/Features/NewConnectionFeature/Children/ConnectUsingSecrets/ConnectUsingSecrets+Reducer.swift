@@ -5,6 +5,7 @@ import SharedModels
 // MARK: - ConnectUsingSecrets
 public struct ConnectUsingSecrets: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.mainQueue) var mainQueue
 	public init() {}
 }
 
@@ -28,8 +29,30 @@ public extension ConnectUsingSecrets {
 
 		case let .internal(.system(.establishConnectionResult(.success(connection)))):
 			state.connectedConnection = connection
+			return .run { send in
+				// A bit hacky, but what we do here is that we save some time, the browser extension
+				// just closed the pop-up with the QR code => webRTC connection is closing.
+				// but instead of waiting for iOS to detect that the webRTC connection closed and
+				// trigger reconnect, we will eagerly close and then connect when this client is
+				// saved to the `p2pConnectivityClient`
+				await connection.close()
+				await send(.internal(.system(.closedConnectionInOrderToTriggerEagerReconnect)))
+			}
+
+		case .internal(.system(.closedConnectionInOrderToTriggerEagerReconnect)):
 			state.isConnecting = false
 			state.isPromptingForName = true
+
+			return .none
+
+		case let .internal(.view(.textFieldFocused(focus))):
+			return .run { send in
+				try? await self.mainQueue.sleep(for: .seconds(0.5))
+				await send(.internal(.system(.focusTextField(focus))))
+			}
+
+		case let .internal(.system(.focusTextField(focus))):
+			state.focusedField = focus
 			return .none
 
 		case .internal(.view(.confirmNameButtonTapped)):
@@ -38,7 +61,7 @@ public extension ConnectUsingSecrets {
 				return .none
 			}
 
-			let connectedClient = P2P.ConnectedClient(
+			let connectedClient = P2P.ConnectionForClient(
 				client: .init(
 					displayName: state.nameOfConnection.trimmed(),
 					connectionPassword: state.connectionSecrets.connectionPassword.data.data
@@ -47,6 +70,7 @@ public extension ConnectUsingSecrets {
 			)
 
 			return .run { send in
+				await send(.internal(.view(.textFieldFocused(nil))))
 				await send(.delegate(.connected(connectedClient)))
 			}
 

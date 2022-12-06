@@ -1,14 +1,22 @@
+import Common
 import ComposableArchitecture
 import DesignSystem
 import Resources
 import SwiftUI
+
+// MARK: - ConnectUsingSecrets.State.Field
+public extension ConnectUsingSecrets.State {
+	enum Field: String, Sendable, Hashable {
+		case connectionName
+	}
+}
 
 // MARK: - ConnectUsingSecrets.View
 public extension ConnectUsingSecrets {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<ConnectUsingSecrets>
-
+		@FocusState private var focusedField: ConnectUsingSecrets.State.Field?
 		public init(store: StoreOf<ConnectUsingSecrets>) {
 			self.store = store
 		}
@@ -37,6 +45,11 @@ public extension ConnectUsingSecrets.View {
 								send: { .nameOfConnectionChanged($0) }
 							)
 						)
+						.focused($focusedField, equals: .connectionName)
+						.synchronize(viewStore.binding(
+							get: \.focusedField,
+							send: { .textFieldFocused($0) }
+						), $focusedField)
 						.textFieldStyle(.roundedBorder)
 
 						Button(L10n.NewConnection.saveNamedConnectionButton) {
@@ -60,11 +73,12 @@ extension ConnectUsingSecrets.View {
 		public var isConnecting: Bool
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String
-
+		@BindableState public var focusedField: ConnectUsingSecrets.State.Field?
 		init(state: ConnectUsingSecrets.State) {
 			nameOfConnection = state.nameOfConnection
 			isPromptingForName = state.isPromptingForName
 			isConnecting = state.isConnecting
+			focusedField = state.focusedField
 		}
 	}
 }

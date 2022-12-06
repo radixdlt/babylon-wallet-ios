@@ -29,7 +29,7 @@ final class NewConnectionTests: TestCase {
 			),
 			reducer: NewConnection()
 		)
-		let connectedClient = P2P.ConnectedClient(
+		let connectedClient = P2P.ConnectionForClient(
 			client: P2PClient(
 				displayName: "test",
 				connectionPassword: secrets.connectionPassword.data.data
@@ -73,7 +73,7 @@ final class NewConnectionTests: TestCase {
 			$0 = .connectUsingSecrets(.init(connectionSecrets: secrets, connectedConnection: connection, nameOfConnection: connectionName + " "))
 		}
 		await store.send(.connectUsingSecrets(.view(.confirmNameButtonTapped)))
-		let connectedClient = P2P.ConnectedClient(
+		let connectedClient = P2P.ConnectionForClient(
 			client: .init(
 				displayName: connectionName,
 				connectionPassword: secrets.connectionPassword.data.data
