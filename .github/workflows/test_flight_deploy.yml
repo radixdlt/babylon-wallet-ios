@@ -9,7 +9,10 @@ jobs:
     runs-on: macos-12
 
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
+        with:
+          token: ${{ secrets.RADIX_BOT_PAT }}
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.1.2
@@ -35,4 +38,5 @@ jobs:
           echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
           bundle exec fastlane ios beta_deploy
-          git push --atomic https://${{ secrets.RADIX_BOT_USERNAME }}:${{ secrets.RADIX_BOT_PAT }}@github.com/radixdlt/babylon-wallet-ios.git main --tags
+        env:
+          GIT_USER: ${{ secrets.RADIX_BOT_USERNAME }}
