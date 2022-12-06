@@ -46,7 +46,7 @@ public extension CreateAccount.View {
 						VStack(spacing: .large1) {
 							subtitle
 
-							textField(
+							AppTextField(
 								placeholder: L10n.CreateAccount.placeholder,
 								text: viewStore.binding(
 									get: \.accountName,

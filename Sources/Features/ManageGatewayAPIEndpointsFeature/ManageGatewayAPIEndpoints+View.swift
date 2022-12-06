@@ -47,15 +47,28 @@ private extension ManageGatewayAPIEndpoints.View {
 	@ViewBuilder
 	func core(viewStore: ViewStore<ViewState, ManageGatewayAPIEndpoints.Action.ViewAction>) -> some View {
 		ForceFullScreen {
-			VStack {
+			VStack(spacing: .zero) {
 				NavigationBar(
 					titleText: L10n.ManageGateway.title,
-					leadingItem: CloseButton {
+					leadingItem: BackButton {
 						viewStore.send(.dismissButtonTapped)
 					}
 				)
 				.foregroundColor(.app.gray1)
 				.padding([.horizontal, .top], .medium3)
+
+				Separator()
+
+				HStack {
+					Text(L10n.ManageP2PClients.p2PConnectionsSubtitle)
+						.foregroundColor(.app.gray2)
+						.textStyle(.body1HighImportance)
+						.padding(.medium3)
+
+					Spacer()
+				}
+
+				Separator()
 
 				VStack(alignment: .leading) {
 					if let networkAndGateway = viewStore.networkAndGateway {
@@ -90,7 +103,7 @@ private extension ManageGatewayAPIEndpoints.View {
 					}
 					.enabled(viewStore.isSwitchToButtonEnabled)
 				}
-				.padding([.horizontal, .bottom], .medium1)
+				.padding(.medium1)
 				.buttonStyle(.primaryRectangular)
 			}
 			.onAppear {
@@ -107,13 +120,13 @@ private extension ManageGatewayAPIEndpoints.View {
 	) -> some View {
 		VStack(alignment: .leading, spacing: 0) {
 			Text(label)
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2HighImportance)
+				.foregroundColor(.app.gray1)
+				.textStyle(.body1HighImportance)
 
 			Text(String(describing: value))
 				.textSelection(.enabled)
-				.foregroundColor(.app.gray1)
-				.textStyle(.body1HighImportance)
+				.foregroundColor(.app.gray2)
+				.textStyle(.body2Regular)
 		}
 		.padding(.top, .small3)
 	}
@@ -124,7 +137,7 @@ private extension ManageGatewayAPIEndpoints.View {
 		Group {
 			Text(L10n.ManageGateway.currentGatewayTitle)
 				.foregroundColor(.app.gray1)
-				.textStyle(.sectionHeader)
+				.textStyle(.secondaryHeader)
 
 			HStack {
 				label(L10n.ManageGateway.networkName, value: networkAndGateway.network.name)
