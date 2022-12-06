@@ -29,15 +29,18 @@ public extension ConnectUsingSecrets {
 
 		case let .internal(.system(.establishConnectionResult(.success(connection)))):
 			state.connectedConnection = connection
-			return .run { send in
-				// A bit hacky, but what we do here is that we save some time, the browser extension
-				// just closed the pop-up with the QR code => webRTC connection is closing.
-				// but instead of waiting for iOS to detect that the webRTC connection closed and
-				// trigger reconnect, we will eagerly close and then connect when this client is
-				// saved to the `p2pConnectivityClient`
-				await connection.close()
-				await send(.internal(.system(.closedConnectionInOrderToTriggerEagerReconnect)))
-			}
+//			return .run { send in
+//				// A bit hacky, but what we do here is that we save some time, the browser extension
+//				// just closed the pop-up with the QR code => webRTC connection is closing.
+//				// but instead of waiting for iOS to detect that the webRTC connection closed and
+//				// trigger reconnect, we will eagerly close and then connect when this client is
+//				// saved to the `p2pConnectivityClient`
+//				await connection.close()
+//				await send(.internal(.system(.closedConnectionInOrderToTriggerEagerReconnect)))
+//			}
+			state.isConnecting = false
+			state.isPromptingForName = true
+			return .none
 
 		case .internal(.system(.closedConnectionInOrderToTriggerEagerReconnect)):
 			state.isConnecting = false
