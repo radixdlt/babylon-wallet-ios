@@ -310,9 +310,9 @@ struct CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities: Swif
 extension GatewayAPI.TransactionStatus {
 	var isComplete: Bool {
 		switch self {
-		case .committedSuccess, .committedFailure, .rejected, .unknown:
+		case .committedSuccess, .committedFailure, .rejected:
 			return true
-		case .pending:
+		case .pending, .unknown:
 			return false
 		}
 	}
