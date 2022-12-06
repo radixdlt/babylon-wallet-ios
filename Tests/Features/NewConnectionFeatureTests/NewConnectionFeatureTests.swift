@@ -72,7 +72,10 @@ final class NewConnectionTests: TestCase {
 		await store.send(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + " ")))) {
 			$0 = .connectUsingSecrets(.init(connectionSecrets: secrets, connectedConnection: connection, nameOfConnection: connectionName + " "))
 		}
+		let testScheduler = DispatchQueue.test
+		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 		await store.send(.connectUsingSecrets(.view(.confirmNameButtonTapped)))
+		await testScheduler.advance(by: .seconds(1))
 		let connectedClient = P2P.ConnectionForClient(
 			client: .init(
 				displayName: connectionName,
@@ -80,10 +83,14 @@ final class NewConnectionTests: TestCase {
 			),
 			connection: connection
 		)
+
+		await store.receive(.connectUsingSecrets(.internal(.view(.textFieldFocused(nil)))))
 		await store.receive(.connectUsingSecrets(.delegate(.connected(connectedClient))))
 		await store.receive(.delegate(.newConnection(
 			connectedClient
 		))
 		)
+
+		await store.receive(.connectUsingSecrets(.internal(.system(.focusTextField(.none)))))
 	}
 }
