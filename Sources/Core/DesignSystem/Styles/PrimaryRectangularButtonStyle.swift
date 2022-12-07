@@ -42,7 +42,7 @@ public extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
 }
 
 // MARK: - LoadingState
-// TODO: evolve into a `ControlState` enum with `enabled`, `loading(context: LoadingContext)` and `disabled` cases.
+// TODO: potentially evolve into a `ControlState` enum with `enabled`, `loading(context: LoadingContext)` and `disabled` cases.
 public struct LoadingState {
 	public let context: LoadingContext
 }
