@@ -30,12 +30,7 @@ public struct SecondaryRectangularButtonStyle: ButtonStyle {
 	}
 
 	var shouldShowSpinner: Bool {
-		switch controlState {
-		case .loading(.local):
-			return true
-		default:
-			return false
-		}
+		controlState == .loading(.local)
 	}
 }
 
