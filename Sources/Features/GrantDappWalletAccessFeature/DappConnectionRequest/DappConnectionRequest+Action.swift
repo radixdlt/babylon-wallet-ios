@@ -52,7 +52,5 @@ public extension DappConnectionRequest.Action {
 
 // MARK: - DappConnectionRequest.Action.InternalAction.SystemAction
 public extension DappConnectionRequest.Action.InternalAction {
-	enum SystemAction: Sendable, Equatable {
-		case loadAccountsResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
-	}
+	enum SystemAction: Sendable, Equatable {}
 }

@@ -21,8 +21,8 @@ public struct HandleDappRequests: Sendable, ReducerProtocol {
 public extension HandleDappRequests {
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
-			.ifLet(\.grantDappWalletAccess, action: /Action.child .. Action.ChildAction.grantDappWalletAccess) {
-				DappConnectionRequest()
+			.ifLet(\.chooseAccounts, action: /Action.child .. Action.ChildAction.chooseAccounts) {
+				ChooseAccounts()
 			}
 			.ifLet(\.transactionSigning, action: /Action.child .. Action.ChildAction.transactionSigning) {
 				TransactionSigning()
@@ -67,7 +67,7 @@ private extension HandleDappRequests {
 			state.currentRequest = .init(requestItemToHandle: requestItemToHandle)
 			return .none
 
-		case let .child(.grantDappWalletAccess(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
+		case let .child(.chooseAccounts(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
 			state.currentRequest = nil
 
 			let simpleInfoForAccounts: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
@@ -151,7 +151,7 @@ private extension HandleDappRequests {
 				await send(.internal(.system(.rejected(rejectedRequestItem.parentRequest))))
 			}
 
-		case let .child(.grantDappWalletAccess(.delegate(.rejected(rejectedRequestItem)))):
+		case let .child(.chooseAccounts(.delegate(.dismissChooseAccounts(rejectedRequestItem)))):
 			return .run { send in
 				await send(.internal(.system(.rejected(rejectedRequestItem.parentRequest))))
 			}

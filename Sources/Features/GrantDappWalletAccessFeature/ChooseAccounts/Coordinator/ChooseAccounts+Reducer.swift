@@ -2,9 +2,13 @@ import Collections
 import ComposableArchitecture
 import NonEmpty
 import Profile
+import ProfileClient
 
 // MARK: - ChooseAccounts
 public struct ChooseAccounts: ReducerProtocol {
+        @Dependency(\.errorQueue) var errorQueue
+        @Dependency(\.profileClient) var profileClient
+        
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -12,14 +16,31 @@ public struct ChooseAccounts: ReducerProtocol {
 			switch action {
 			case .internal(.view(.continueButtonTapped)):
 				let nonEmptySelectedAccounts = NonEmpty(rawValue: OrderedSet(state.accounts.filter(\.isSelected).map(\.account)))!
-				return .run { send in
-					await send(.delegate(.finishedChoosingAccounts(nonEmptySelectedAccounts)))
+                                return .run { [request = state.request] send in
+                                        await send(.delegate(.finishedChoosingAccounts(nonEmptySelectedAccounts,
+                                                                                       request)))
 				}
 
-			case .internal(.view(.backButtonTapped)):
-				return .run { send in
-					await send(.delegate(.dismissChooseAccounts))
+                        case .internal(.view(.backButtonTapped)):
+                            // .internal(.view(.dismissButtonTapped)):
+				return .run { [request = state.request] send in
+                                        await send(.delegate(.dismissChooseAccounts(request)))
 				}
+                        case .internal(.view(.didAppear)):
+                                return .run { send in
+                                        await send(.internal(.system(.loadAccountsResult(TaskResult {
+                                                try await profileClient.getAccounts()
+                                        }))))
+                                }
+                        case let .internal(.system(.loadAccountsResult(.success(accounts)))):
+                                state.accounts = .init(uniqueElements: accounts.map {
+                                                ChooseAccounts.Row.State(account: $0)
+                                        })
+                                return .none
+
+                        case let .internal(.system(.loadAccountsResult(.failure(error)))):
+                                errorQueue.schedule(error)
+                                return .none
 
 			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child
 			// and every other action should fall-through - @davdroman-rdx

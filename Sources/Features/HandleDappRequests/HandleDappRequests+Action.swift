@@ -22,7 +22,7 @@ public extension HandleDappRequests.Action {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case grantDappWalletAccess(DappConnectionRequest.Action)
+		case chooseAccounts(ChooseAccounts.Action)
 		case transactionSigning(TransactionSigning.Action)
 	}
 }
