@@ -49,8 +49,7 @@ enum IsLoadingKey: EnvironmentKey, PreferenceKey {
 	static let defaultValue: Value = (isLoading: false, configuration: nil)
 
 	static func reduce(value: inout Value, nextValue: () -> Value) {
-		// prioritizes isLoading = true, as it indicates loading is happening somewhere in the view tree
-		// regardless of the parent preference
+		// float up isLoading = true if happening somewhere in the view tree regardless of the parent preference
 		if !value.isLoading {
 			value = nextValue()
 		}
