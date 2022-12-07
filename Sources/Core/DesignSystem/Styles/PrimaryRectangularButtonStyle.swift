@@ -2,8 +2,7 @@ import SwiftUI
 
 // MARK: - PrimaryRectangularButtonStyle
 public struct PrimaryRectangularButtonStyle: ButtonStyle {
-	@Environment(\.isEnabled) var isEnabled
-	@Environment(\.loadingState.isLoading) var isLoading
+	@Environment(\.controlState) var controlState
 
 	public func makeBody(configuration: Configuration) -> some View {
 		ZStack {
@@ -12,26 +11,35 @@ public struct PrimaryRectangularButtonStyle: ButtonStyle {
 				.font(.app.body1Header)
 				.frame(maxWidth: .infinity)
 				.frame(height: .standardButtonHeight)
-				.background(isEnabled ? Color.app.blue2 : Color.app.gray4)
+				.background(controlState.isEnabled ? Color.app.blue2 : Color.app.gray4)
 				.cornerRadius(.small2)
 				.brightness(configuration.isPressed ? -0.1 : 0)
 
-			if isLoading {
+			if shouldShowSpinner {
 				LoadingView()
 					.frame(width: .medium3, height: .medium3)
 			}
 		}
-		.allowsHitTesting(!isLoading)
+	}
+
+	var shouldShowSpinner: Bool {
+		switch controlState {
+		case .loading(.local):
+			return true
+		default:
+			return false
+		}
 	}
 }
 
 private extension PrimaryRectangularButtonStyle {
 	var foregroundColor: Color {
-		if isLoading {
-			return .clear
-		} else if isEnabled {
+		switch controlState {
+		case .enabled:
 			return .app.white
-		} else {
+		case .loading:
+			return .clear
+		case .disabled:
 			return .app.gray3
 		}
 	}

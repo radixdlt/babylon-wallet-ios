@@ -54,13 +54,13 @@ public extension TransactionSigning.View {
 					}
 					Spacer()
 				}
-				.loadingState {
+				.controlState {
 					if viewStore.manifest == nil {
-						return LoadingState(context: .global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
+						return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
 					} else if viewStore.isShowingLoader {
-						return LoadingState(context: .global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
+						return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
 					} else {
-						return nil
+						return .enabled
 					}
 				}
 				.onAppear {

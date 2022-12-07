@@ -2,8 +2,7 @@ import SwiftUI
 
 // MARK: - SecondaryRectangularButtonStyle
 public struct SecondaryRectangularButtonStyle: ButtonStyle {
-	@Environment(\.isEnabled) var isEnabled
-	@Environment(\.loadingState.isLoading) var isLoading
+	@Environment(\.controlState) var controlState
 	let shouldExpand: Bool
 	let isDestructive: Bool
 	let image: Image?
@@ -23,22 +22,31 @@ public struct SecondaryRectangularButtonStyle: ButtonStyle {
 			.cornerRadius(.small2)
 			.brightness(configuration.isPressed ? -0.1 : 0)
 
-			if isLoading {
+			if shouldShowSpinner {
 				LoadingView()
 					.frame(width: .medium3, height: .medium3)
 			}
 		}
-		.allowsHitTesting(!isLoading)
+	}
+
+	var shouldShowSpinner: Bool {
+		switch controlState {
+		case .loading(.local):
+			return true
+		default:
+			return false
+		}
 	}
 }
 
 private extension SecondaryRectangularButtonStyle {
 	var foregroundColor: Color {
-		if isLoading {
-			return .clear
-		} else if isEnabled {
+		switch controlState {
+		case .enabled:
 			return isDestructive ? .app.red1 : .app.gray1
-		} else {
+		case .loading:
+			return .clear
+		case .disabled:
 			return .app.gray3
 		}
 	}
