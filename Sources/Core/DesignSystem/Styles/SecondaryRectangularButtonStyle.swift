@@ -2,8 +2,8 @@ import SwiftUI
 
 // MARK: - SecondaryRectangularButtonStyle
 public struct SecondaryRectangularButtonStyle: ButtonStyle {
-	@Environment(\.isEnabled) var isEnabled: Bool
-	@Environment(\.isLoading) var isLoading: Bool
+	@Environment(\.isEnabled) var isEnabled
+	@Environment(\.loadingState.isLoading) var isLoading
 	let shouldExpand: Bool
 	let isDestructive: Bool
 	let image: Image?
