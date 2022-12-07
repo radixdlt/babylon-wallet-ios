@@ -69,9 +69,9 @@
 "newConnection.defaultNameOfConnection" = "Unnamed";
 
 "manageP2PClients.P2PConnectionsTitle" = "Desktop Connections";
+"manageP2PClients.P2PConnectionsSubtitle" = "Your wallet is connected to the following desktop browsers via Radix Connect";
 "manageP2PClients.connectionID" = "Connection ID: %@";
-"manageP2PClients.deleteButtonTitle" = "Delete";
-"manageP2PClients.newConnectionButtonTitle" = "Add new connection";
+"manageP2PClients.newConnectionButtonTitle" = "New Connection";
 "manageP2PClients.newConnectionTitle" = "New Connection";
 "manageP2PClients.sendTestMessageButtonTitle" = "Send Test Msg";
 

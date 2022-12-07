@@ -161,12 +161,12 @@ public enum L10n {
   	public static func connectionID(_ p1: Any) -> String {
   		return L10n.tr("Localizable", "manageP2PClients.connectionID", String(describing: p1), fallback: "Connection ID: %@")
   	}
-  	/// Delete
-  	public static let deleteButtonTitle = L10n.tr("Localizable", "manageP2PClients.deleteButtonTitle", fallback: "Delete")
-  	/// Add new connection
-  	public static let newConnectionButtonTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionButtonTitle", fallback: "Add new connection")
+  	/// New Connection
+  	public static let newConnectionButtonTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionButtonTitle", fallback: "New Connection")
   	/// New Connection
   	public static let newConnectionTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionTitle", fallback: "New Connection")
+  	/// Your wallet is connected to the following desktop browsers via Radix Connect
+  	public static let p2PConnectionsSubtitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsSubtitle", fallback: "Your wallet is connected to the following desktop browsers via Radix Connect")
   	/// Desktop Connections
   	public static let p2PConnectionsTitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsTitle", fallback: "Desktop Connections")
   	/// Send Test Msg
