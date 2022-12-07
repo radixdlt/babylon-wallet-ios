@@ -298,7 +298,33 @@ public extension TransactionClient {
 				let manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
 				var instructions = manifestWithJSONInstructions.instructions
 				let networkID = await profileClient.getCurrentNetworkID()
-				let lockFeeCallMethodInstruction = try engineToolkitClient.lockFeeCallMethod(faucetForNetwork: networkID).embed()
+
+				let version = engineToolkitClient.getTransactionVersion()
+
+				let accountAddressesNeedingToSignTransactionRequest = AccountAddressesNeedingToSignTransactionRequest(
+					version: version,
+					manifest: manifestWithJSONInstructions.convertedManifestThatContainsThem,
+					networkID: networkID
+				)
+
+				let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
+					// Might be empty
+					let addressesManifestReferences =
+						try engineToolkitClient.accountAddressesNeedingToSignTransaction(
+							accountAddressesNeedingToSignTransactionRequest
+						)
+					if let address = addressesManifestReferences.first {
+						return address
+					} else {
+						let accounts = try await profileClient.getAccounts()
+						return accounts.first.address
+					}
+				}()
+
+				let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
+					address: ComponentAddress(address: accountAddress.address)
+				).embed()
+
 				instructions.insert(lockFeeCallMethodInstruction, at: 0)
 				return TransactionManifest(instructions: instructions, blobs: maybeStringManifest.blobs)
 			},
