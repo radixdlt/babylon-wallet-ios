@@ -71,7 +71,7 @@ public enum LoadingConfiguration {
 
 public extension View {
 	func isLoading(_ isLoading: Bool, _ configuration: LoadingConfiguration? = nil) -> some View {
-		environment(\.isLoading, isLoading)
+		self.environment(\.isLoading, isLoading)
 			.preference(key: IsLoadingKey.self, value: (isLoading, configuration))
 	}
 }
