@@ -1,3 +1,4 @@
+import ComposableArchitecture
 import Converse
 import ConverseCommon
 import Foundation
@@ -9,19 +10,22 @@ public extension ConnectUsingSecrets {
 		public var isConnecting: Bool
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String
-		public var connectedConnection: Connection?
+		public var newConnection: Connection?
+		@BindableState public var focusedField: Field?
 		public init(
 			connectionSecrets: ConnectionSecrets,
 			isConnecting: Bool = true,
 			connectedConnection: Connection? = nil,
+			focusedField: Field? = nil,
 			isPromptingForName: Bool = false,
 			nameOfConnection: String = ""
 		) {
+			self.focusedField = focusedField
 			self.connectionSecrets = connectionSecrets
 			self.isConnecting = isConnecting
 			self.isPromptingForName = isPromptingForName
 			self.nameOfConnection = nameOfConnection
-			self.connectedConnection = connectedConnection
+			newConnection = connectedConnection
 		}
 	}
 }

@@ -13,7 +13,7 @@ public extension P2PConnectivityClient {
 		@Dependency(\.profileClient) var profileClient
 
 		final actor ConnectionsHolder: GlobalActor {
-			private var connections: [ConnectionID: P2P.ConnectedClient] = [:]
+			private var connections: [ConnectionID: P2P.ConnectionForClient] = [:]
 			var p2pClients: AsyncCurrentValueSubject<[P2P.ClientWithConnectionStatus]> = .init([])
 			static let shared = ConnectionsHolder()
 
@@ -22,7 +22,7 @@ public extension P2PConnectivityClient {
 				return try ConnectionID(password: connectionPassword)
 			}
 
-			func addConnection(_ connection: P2P.ConnectedClient, connect: Bool, emitUpdate: Bool) {
+			func addConnection(_ connection: P2P.ConnectionForClient, connect: Bool, emitUpdate: Bool) {
 				let key = connection.connection.getConnectionID()
 				guard connections[key] == nil else {
 					return
@@ -60,7 +60,7 @@ public extension P2PConnectivityClient {
 				p2pClients.send(value)
 			}
 
-			func getConnection(id: P2PClient.ID) -> P2P.ConnectedClient? {
+			func getConnection(id: P2PClient.ID) -> P2P.ConnectionForClient? {
 				guard
 					let key = try? mapID(id),
 					let connection = connections[key]
@@ -82,7 +82,7 @@ public extension P2PConnectivityClient {
 					let secrets = try ConnectionSecrets.from(connectionPassword: password)
 					let connection = Connection.live(connectionSecrets: secrets)
 
-					let connectedClient = P2P.ConnectedClient(
+					let connectedClient = P2P.ConnectionForClient(
 						client: p2pClient,
 						connection: connection
 					)
@@ -95,9 +95,9 @@ public extension P2PConnectivityClient {
 				return await connectionsHolder.p2pClients.eraseToAnyAsyncSequence()
 
 			},
-			addConnectedP2PClient: { connectedClient in
-				await connectionsHolder.addConnection(connectedClient, connect: false, emitUpdate: true) // should already be connected
-				try await profileClient.addP2PClient(connectedClient.client)
+			addP2PClientWithConnection: { clientWithConnection, alsoConnect in
+				await connectionsHolder.addConnection(clientWithConnection, connect: alsoConnect, emitUpdate: true)
+				try await profileClient.addP2PClient(clientWithConnection.client)
 			},
 			deleteP2PClientByID: { id in
 				await connectionsHolder.disconnectedAndRemove(id)

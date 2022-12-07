@@ -4,8 +4,8 @@ import Foundation
 import Profile
 
 public extension P2P {
-	// MARK: - ConnectedClient
-	struct ConnectedClient: Equatable, Sendable {
+	// MARK: - ConnectionForClient
+	struct ConnectionForClient: Equatable, Sendable {
 		public let client: P2PClient
 		public private(set) var connection: Connection
 

@@ -29,7 +29,7 @@ public extension NewConnection {
 					await send(.delegate(.dismiss))
 				}
 			case let .connectUsingSecrets(connectUsingSecrets):
-				guard let connection = connectUsingSecrets.connectedConnection else {
+				guard let connection = connectUsingSecrets.newConnection else {
 					return .run { send in
 						await send(.delegate(.dismiss))
 					}
