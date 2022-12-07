@@ -29,12 +29,9 @@ public struct LoadingOverlayView: View {
 
 public extension View {
 	func overlayLoadingView() -> some View {
-		overlayPreferenceValue(LoadingStateKey.self, alignment: .center) { value in
-			if value.isLoading, let configuration = value.configuration {
-				switch configuration {
-				case let .global(text):
-					LoadingOverlayView(text)
-				}
+		overlayPreferenceValue(LoadingStateKey.self, alignment: .center) { state in
+			if case let .global(text) = state?.context {
+				LoadingOverlayView(text)
 			}
 		}
 	}

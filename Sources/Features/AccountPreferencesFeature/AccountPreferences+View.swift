@@ -45,7 +45,7 @@ public extension AccountPreferences.View {
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
 						.enabled(viewStore.isFaucetButtonEnabled)
-						.isLoading(viewStore.isLoading, configuration: .global(text: <#T##String?#>))
+						.isLoading(viewStore.isLoading, context: .local)
 
 						Spacer()
 					}

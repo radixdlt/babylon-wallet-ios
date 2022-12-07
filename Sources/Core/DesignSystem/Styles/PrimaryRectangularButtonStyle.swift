@@ -41,39 +41,44 @@ public extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
 	static var primaryRectangular: Self { Self() }
 }
 
-// MARK: - LoadingConfiguration
-public enum LoadingConfiguration {
+// MARK: - LoadingState
+// TODO: evolve into a `ControlState` enum with `enabled`, `loading(context: LoadingContext)` and `disabled` cases.
+public struct LoadingState {
+	public let context: LoadingContext
+}
+
+// MARK: - LoadingContext
+public enum LoadingContext {
+	case local
 	case global(text: String?)
 }
 
 // MARK: - LoadingStateKey
 enum LoadingStateKey: EnvironmentKey, PreferenceKey {
-	// TODO: evolve into a `ControlState` enum with `enabled`, `loading(configuration: LoadingConfiguration)` and `disabled` cases.
-	struct LoadingState {
-		let isLoading: Bool
-		let configuration: LoadingConfiguration?
-	}
+	static let defaultValue: LoadingState? = nil
 
-	static let defaultValue: LoadingState = .init(isLoading: false, configuration: nil)
-
-	static func reduce(value: inout LoadingState, nextValue: () -> LoadingState) {
-		// float up isLoading = true if happening somewhere in the view tree regardless of the parent preference
-		if !value.isLoading {
-			value = nextValue()
+	static func reduce(value: inout LoadingState?, nextValue: () -> LoadingState?) {
+		// floats up non-nil loading state from anywhere in the view tree
+		if let next = nextValue() {
+			value = next
 		}
 	}
 }
 
 extension EnvironmentValues {
-	var isLoading: Bool {
-		get { self[LoadingStateKey.self].isLoading }
-		set { self[LoadingStateKey.self] = .init(isLoading: newValue, configuration: nil) }
+	var isLoading: Bool { self[LoadingStateKey.self] != nil }
+
+	var loadingState: LoadingState? {
+		get { self[LoadingStateKey.self] }
+		set { self[LoadingStateKey.self] = newValue }
 	}
 }
 
 public extension View {
-	func isLoading(_ isLoading: Bool, _ configuration: LoadingConfiguration? = nil) -> some View {
-		self.environment(\.isLoading, isLoading)
-			.preference(key: LoadingStateKey.self, value: .init(isLoading: isLoading, configuration: configuration))
+	@ViewBuilder
+	func isLoading(_ isLoading: Bool, context: LoadingContext) -> some View {
+		let state = isLoading ? LoadingState(context: context) : nil
+		self.environment(\.loadingState, state)
+			.preference(key: LoadingStateKey.self, value: state)
 	}
 }
