@@ -45,6 +45,10 @@ public extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
 // TODO: potentially evolve into a `ControlState` enum with `enabled`, `loading(context: LoadingContext)` and `disabled` cases.
 public struct LoadingState {
 	public let context: LoadingContext
+
+	public init(context: LoadingContext) {
+		self.context = context
+	}
 }
 
 // MARK: - LoadingContext
@@ -76,9 +80,23 @@ extension EnvironmentValues {
 
 public extension View {
 	@ViewBuilder
+	/// This modifier may only be called once within a view's body.
+	/// For multiple loading scenarios, use the `loadingState` modifier instead.
 	func isLoading(_ isLoading: Bool, context: LoadingContext) -> some View {
 		let state = isLoading ? LoadingState(context: context) : nil
 		self.environment(\.loadingState, state)
 			.preference(key: LoadingStateKey.self, value: state)
+	}
+
+	@ViewBuilder
+	func loadingState(_ state: @autoclosure () -> LoadingState?) -> some View {
+		let state = state()
+		self.environment(\.loadingState, state)
+			.preference(key: LoadingStateKey.self, value: state)
+	}
+
+	@ViewBuilder
+	func loadingState(_ state: () -> LoadingState?) -> some View {
+		self.loadingState(state())
 	}
 }

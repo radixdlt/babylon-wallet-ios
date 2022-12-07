@@ -51,10 +51,17 @@ public extension TransactionSigning.View {
 							.enabled(viewStore.isSignButtonEnabled)
 						}
 						.padding([.horizontal, .bottom])
-						.isLoading(viewStore.manifest == nil, context: .global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
-						.isLoading(viewStore.isShowingLoader, context: .global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
 					}
 					Spacer()
+				}
+				.loadingState {
+					if viewStore.manifest == nil {
+						return LoadingState(context: .global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
+					} else if viewStore.isShowingLoader {
+						return LoadingState(context: .global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
+					} else {
+						return nil
+					}
 				}
 				.onAppear {
 					viewStore.send(.didAppear)
