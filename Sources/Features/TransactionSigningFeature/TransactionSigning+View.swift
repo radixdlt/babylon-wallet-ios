@@ -34,21 +34,21 @@ public extension TransactionSigning.View {
 					)
 					ForceFullScreen {
 						VStack(spacing: 20) {
-							ScrollView([.vertical], showsIndicators: false) {
-								if let manifest = viewStore.manifest {
+							if let manifest = viewStore.manifest {
+								ScrollView([.vertical], showsIndicators: false) {
 									Text(manifest)
 										.padding()
 										.font(.system(size: 13, design: .monospaced))
 										.frame(maxHeight: .infinity, alignment: .topLeading)
 								}
-							}
-							.background(Color(white: 0.9))
+								.background(Color(white: 0.9))
 
-							Button(L10n.TransactionSigning.signTransactionButtonTitle) {
-								viewStore.send(.signTransactionButtonTapped)
+								Button(L10n.TransactionSigning.signTransactionButtonTitle) {
+									viewStore.send(.signTransactionButtonTapped)
+								}
+								.buttonStyle(.primaryRectangular)
+								.enabled(viewStore.isSignButtonEnabled)
 							}
-							.buttonStyle(.primaryRectangular)
-							.enabled(viewStore.isSignButtonEnabled)
 						}
 						.padding([.horizontal, .bottom])
 					}
