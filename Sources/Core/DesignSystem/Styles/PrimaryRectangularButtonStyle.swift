@@ -41,14 +41,22 @@ public extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
 	static var primaryRectangular: Self { Self() }
 }
 
-// MARK: - IsLoadingKey
-enum IsLoadingKey: EnvironmentKey, PreferenceKey {
-	// TODO: evolve into enum with `enabled`, `loading(global: Bool)` and `disabled` cases.
-	typealias Value = (isLoading: Bool, configuration: LoadingConfiguration?)
+// MARK: - LoadingConfiguration
+public enum LoadingConfiguration {
+	case global(text: String?)
+}
 
-	static let defaultValue: Value = (isLoading: false, configuration: nil)
+// MARK: - LoadingStateKey
+enum LoadingStateKey: EnvironmentKey, PreferenceKey {
+	// TODO: evolve into a `ControlState` enum with `enabled`, `loading(configuration: LoadingConfiguration)` and `disabled` cases.
+	struct LoadingState {
+		let isLoading: Bool
+		let configuration: LoadingConfiguration?
+	}
 
-	static func reduce(value: inout Value, nextValue: () -> Value) {
+	static let defaultValue: LoadingState = .init(isLoading: false, configuration: nil)
+
+	static func reduce(value: inout LoadingState, nextValue: () -> LoadingState) {
 		// float up isLoading = true if happening somewhere in the view tree regardless of the parent preference
 		if !value.isLoading {
 			value = nextValue()
@@ -58,19 +66,14 @@ enum IsLoadingKey: EnvironmentKey, PreferenceKey {
 
 extension EnvironmentValues {
 	var isLoading: Bool {
-		get { self[IsLoadingKey.self].isLoading }
-		set { self[IsLoadingKey.self] = (newValue, nil) }
+		get { self[LoadingStateKey.self].isLoading }
+		set { self[LoadingStateKey.self] = .init(isLoading: newValue, configuration: nil) }
 	}
-}
-
-// MARK: - LoadingConfiguration
-public enum LoadingConfiguration {
-	case global(text: String?)
 }
 
 public extension View {
 	func isLoading(_ isLoading: Bool, _ configuration: LoadingConfiguration? = nil) -> some View {
 		self.environment(\.isLoading, isLoading)
-			.preference(key: IsLoadingKey.self, value: (isLoading, configuration))
+			.preference(key: LoadingStateKey.self, value: .init(isLoading: isLoading, configuration: configuration))
 	}
 }

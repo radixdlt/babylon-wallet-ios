@@ -29,7 +29,7 @@ public struct LoadingOverlayView: View {
 
 public extension View {
 	func overlayLoadingView() -> some View {
-		overlayPreferenceValue(IsLoadingKey.self, alignment: .center) { value in
+		overlayPreferenceValue(LoadingStateKey.self, alignment: .center) { value in
 			if value.isLoading, let configuration = value.configuration {
 				switch configuration {
 				case let .global(text):
