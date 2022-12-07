@@ -1,7 +1,17 @@
 import SwiftUI
 
+public extension View {
+	func overlayLoadingView() -> some View {
+		overlayPreferenceValue(LoadingStateKey.self, alignment: .center) { state in
+			if case let .global(text) = state?.context {
+				LoadingOverlayView(text)
+			}
+		}
+	}
+}
+
 // MARK: - LoadingOverlayView
-public struct LoadingOverlayView: View {
+private struct LoadingOverlayView: View {
 	private let text: String?
 	public init(_ text: String?) {
 		self.text = text
@@ -24,16 +34,6 @@ public struct LoadingOverlayView: View {
 			.padding()
 		}
 		.frame(width: 180, height: 180)
-	}
-}
-
-public extension View {
-	func overlayLoadingView() -> some View {
-		overlayPreferenceValue(LoadingStateKey.self, alignment: .center) { state in
-			if case let .global(text) = state?.context {
-				LoadingOverlayView(text)
-			}
-		}
 	}
 }
 

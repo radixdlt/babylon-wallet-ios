@@ -33,32 +33,26 @@ public extension TransactionSigning.View {
 						}
 					)
 					ForceFullScreen {
-						ZStack {
-							VStack(spacing: 20) {
+						VStack(spacing: 20) {
+							ScrollView([.vertical], showsIndicators: false) {
 								if let manifest = viewStore.manifest {
-									ScrollView([.vertical], showsIndicators: false) {
-										Text(manifest)
-											.padding()
-											.font(.system(size: 13, design: .monospaced))
-											.frame(maxHeight: .infinity, alignment: .topLeading)
-									}
-									.background(Color(white: 0.9))
-
-									Button(L10n.TransactionSigning.signTransactionButtonTitle) {
-										viewStore.send(.signTransactionButtonTapped)
-									}
-									.buttonStyle(.primaryRectangular)
-									.enabled(viewStore.isSignButtonEnabled)
-								} else {
-									LoadingOverlayView(L10n.TransactionSigning.preparingTransactionLoadingText)
+									Text(manifest)
+										.padding()
+										.font(.system(size: 13, design: .monospaced))
+										.frame(maxHeight: .infinity, alignment: .topLeading)
 								}
 							}
-							.padding([.horizontal, .bottom])
+							.background(Color(white: 0.9))
 
-							if viewStore.isShowingLoader {
-								LoadingOverlayView(L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText)
+							Button(L10n.TransactionSigning.signTransactionButtonTitle) {
+								viewStore.send(.signTransactionButtonTapped)
 							}
+							.buttonStyle(.primaryRectangular)
+							.enabled(viewStore.isSignButtonEnabled)
 						}
+						.padding([.horizontal, .bottom])
+						.isLoading(viewStore.manifest == nil, context: .global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
+						.isLoading(viewStore.isShowingLoader, context: .global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
 					}
 					Spacer()
 				}
