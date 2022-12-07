@@ -1,7 +1,6 @@
 import SwiftUI
 
 // MARK: - ControlState
-// TODO: potentially evolve into a `ControlState` enum with `enabled`, `loading(context: LoadingContext)` and `disabled` cases.
 public enum ControlState: Equatable {
 	case enabled
 	case loading(LoadingContext)
