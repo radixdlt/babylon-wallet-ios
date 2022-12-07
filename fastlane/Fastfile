@@ -25,12 +25,10 @@ platform :ios do
     lane :beta_deploy do
         install_distribution_certificate
         
-        # version = bump_version
-        
         build_number = bump_build_number
         commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
         build_app
-        version = get_version
+        version = get_version 
         version_and_build_number = "%s#%s" % [version, build_number]
         add_git_tag(tag: version_and_build_number)
         api_key = app_store_connect_api_key
@@ -110,17 +108,6 @@ private_lane :get_version do
         xcodeproj: ENV['PROJ_PATH'],
         scheme: ENV['SCHEME']
     )
-end
-
-desc "Bumps up the patch version"
-private_lane :bump_version do
-    increment_version_number_in_xcodeproj(
-        bump_type: 'patch',
-        xcodeproj: ENV['PROJ_PATH'],
-        scheme: ENV['SCHEME']
-    )
-
-    get_version
 end
 
 private_lane :register_new_device do |options|
