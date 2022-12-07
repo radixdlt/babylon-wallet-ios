@@ -50,7 +50,7 @@ private extension ManageP2PClients.View {
 		viewStore: ViewStore<ViewState, ManageP2PClients.Action.ViewAction>
 	) -> some View {
 		ForceFullScreen {
-			VStack {
+			VStack(spacing: .zero) {
 				NavigationBar(
 					titleText: L10n.ManageP2PClients.p2PConnectionsTitle,
 					leadingItem: BackButton {
@@ -60,30 +60,49 @@ private extension ManageP2PClients.View {
 				.foregroundColor(.app.gray1)
 				.padding([.horizontal, .top], .medium3)
 
-				VStack(alignment: .leading) {
-					ScrollView {
-						VStack(alignment: .leading) {
-							ForEachStore(
-								store.scope(
-									state: \.connections,
-									action: { .child(.connection(id: $0, action: $1)) }
-								),
-								content: { ManageP2PClient.View(store: $0) }
-							)
-						}
+				Separator()
+
+				ScrollView {
+					HStack {
+						Text(L10n.ManageP2PClients.p2PConnectionsSubtitle)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1HighImportance)
+							.padding([.horizontal, .top], .medium3)
+							.padding(.bottom, .small2)
+
+						Spacer()
+					}
+
+					Separator()
+
+					VStack(alignment: .leading) {
+						ForEachStore(
+							store.scope(
+								state: \.connections,
+								action: { .child(.connection(id: $0, action: $1)) }
+							),
+							content: {
+								ManageP2PClient.View(store: $0)
+									.padding(.medium3)
+
+								Separator()
+							}
+						)
 					}
 
 					Button(L10n.ManageP2PClients.newConnectionButtonTitle) {
 						viewStore.send(.addNewConnectionButtonTapped)
 					}
 					.enabled(viewStore.canAddMoreConnections)
-					.buttonStyle(.primaryRectangular)
-
-					Spacer()
+					.buttonStyle(.secondaryRectangular(
+						shouldExpand: true,
+						image: .init(asset: AssetResource.qrCodeScanner)
+					))
+					.padding(.horizontal, .medium3)
+					.padding(.vertical, .large1)
 				}
-				.padding([.bottom, .horizontal], .medium3)
-				.onAppear { viewStore.send(.viewAppeared) }
 			}
+			.onAppear { viewStore.send(.viewAppeared) }
 		}
 	}
 }

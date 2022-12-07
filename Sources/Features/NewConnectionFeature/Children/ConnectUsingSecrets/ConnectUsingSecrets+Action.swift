@@ -22,6 +22,7 @@ public extension ConnectUsingSecrets.Action {
 		case appeared
 		case nameOfConnectionChanged(String)
 		case confirmNameButtonTapped
+		case textFieldFocused(ConnectUsingSecrets.State.Field?)
 	}
 }
 
@@ -36,6 +37,8 @@ public extension ConnectUsingSecrets.Action {
 // MARK: - ConnectUsingSecrets.Action.SystemAction
 public extension ConnectUsingSecrets.Action {
 	enum SystemAction: Sendable, Equatable {
+		case closedConnectionInOrderToTriggerEagerReconnect
+		case focusTextField(ConnectUsingSecrets.State.Field?)
 		case establishConnectionResult(TaskResult<Connection>)
 	}
 }
@@ -43,6 +46,6 @@ public extension ConnectUsingSecrets.Action {
 // MARK: - ConnectUsingSecrets.Action.DelegateAction
 public extension ConnectUsingSecrets.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case connected(P2P.ConnectedClient)
+		case connected(P2P.ConnectionForClient)
 	}
 }

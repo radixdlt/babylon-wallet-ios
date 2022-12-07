@@ -111,9 +111,9 @@ public extension ProfileClient {
 					profile.appPreferences.p2pClients
 				}
 			},
-			addP2PClient: { newConnection in
+			addP2PClient: { newClient in
 				try await profileHolder.asyncMutating { profile in
-					_ = profile.appPreferences.p2pClients.connections.append(newConnection)
+					_ = profile.appendP2PClient(newClient)
 				}
 			},
 			deleteP2PClientByID: { id in

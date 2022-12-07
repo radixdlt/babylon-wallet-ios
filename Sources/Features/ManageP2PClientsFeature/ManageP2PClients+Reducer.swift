@@ -110,7 +110,17 @@ public extension ManageP2PClients {
 			return .none
 
 		case let .child(.newConnection(.delegate(.newConnection(connectedClient)))):
-			return save(connectedClient: connectedClient, state: &state)
+			state.newConnection = nil
+			return .run { send in
+				await send(.internal(.system(.saveNewConnectionResult(
+					TaskResult {
+						try await p2pConnectivityClient.addP2PClientWithConnection(
+							connectedClient,
+							true // connect since we actuall disconnected the new connection in order to trigger faster reconnect
+						)
+					}.map { connectedClient }
+				))))
+			}
 
 		case .child(.newConnection(.delegate(.dismiss))):
 			state.newConnection = nil
@@ -118,20 +128,6 @@ public extension ManageP2PClients {
 
 		case .child, .delegate:
 			return .none
-		}
-	}
-
-	func save(connectedClient: P2P.ConnectedClient, state: inout State) -> EffectTask<Action> {
-		state.newConnection = nil
-
-		return .run { send in
-			await send(.internal(.system(.saveNewConnectionResult(
-				TaskResult {
-					try await p2pConnectivityClient.addConnectedP2PClient(
-						connectedClient
-					)
-				}.map { connectedClient }
-			))))
 		}
 	}
 }
