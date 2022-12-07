@@ -42,19 +42,34 @@ public extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
 }
 
 // MARK: - IsLoadingKey
-private struct IsLoadingKey: EnvironmentKey {
-	static let defaultValue: Bool = false
+private enum IsLoadingKey: EnvironmentKey, PreferenceKey {
+	// TODO: evolve into enum with `enabled`, `loading(global: Bool)` and `disabled` cases.
+	static let defaultValue = (isLoading: false, configuration: LoadingConfiguration?.none)
+
+	static func reduce(value: inout Value, nextValue: () -> Value) {
+		// prioritizes isLoading = true, as it indicates loading is happening somewhere in the view tree
+		// regardless of the parent preference
+		if !value.isLoading {
+			value = nextValue()
+		}
+	}
 }
 
 extension EnvironmentValues {
 	var isLoading: Bool {
-		get { self[IsLoadingKey.self] }
-		set { self[IsLoadingKey.self] = newValue }
+		get { self[IsLoadingKey.self].isLoading }
+		set { self[IsLoadingKey.self] = (newValue, nil) }
 	}
 }
 
+// MARK: - LoadingConfiguration
+public enum LoadingConfiguration {
+	case global(text: String?)
+}
+
 public extension View {
-	func isLoading(_ value: Bool) -> some View {
-		environment(\.isLoading, value)
+	func isLoading(_ isLoading: Bool, _ configuration: LoadingConfiguration? = nil) -> some View {
+		environment(\.isLoading, isLoading)
+			.preference(key: IsLoadingKey.self, value: (isLoading, configuration))
 	}
 }
