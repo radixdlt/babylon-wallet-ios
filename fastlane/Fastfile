@@ -23,21 +23,19 @@ platform :ios do
 
     desc "Builds and deploys beta app to TestFlight"
     lane :beta_deploy do
-        install_distribution_certificate
+#        install_distribution_certificate
         
-        # version = bump_version
-        
-        build_number = bump_build_number
+        build_number = increment_build_number
         commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
-        build_app
+ #       build_app
         version = get_version
         version_and_build_number = "%s#%s" % [version, build_number]
         add_git_tag(tag: version_and_build_number)
-        api_key = app_store_connect_api_key
-        upload_to_testflight(
-            api_key: api_key
-        )
-        push_to_git_remote
+  #      api_key = app_store_connect_api_key
+   #     upload_to_testflight(
+    #        api_key: api_key
+     #   )
+      #  push_to_git_remote
     end
 
     desc "Installs certificates on the machine"
@@ -95,32 +93,6 @@ platform :mac do
         register_new_device
         generate_new_certificates
     end
-end
-
-desc "Bumps up the build number"
-private_lane :bump_build_number do
-    increment_build_number(
-        xcodeproj: ENV['PROJ_PATH']
-    )
-end
-
-desc "Reads the version"
-private_lane :get_version do
-    get_version_number_from_xcodeproj(
-        xcodeproj: ENV['PROJ_PATH'],
-        scheme: ENV['SCHEME']
-    )
-end
-
-desc "Bumps up the patch version"
-private_lane :bump_version do
-    increment_version_number_in_xcodeproj(
-        bump_type: 'patch',
-        xcodeproj: ENV['PROJ_PATH'],
-        scheme: ENV['SCHEME']
-    )
-
-    get_version
 end
 
 private_lane :register_new_device do |options|
