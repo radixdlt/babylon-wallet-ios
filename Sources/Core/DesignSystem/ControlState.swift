@@ -69,7 +69,7 @@ public extension View {
 				$0 = context
 			}
 		}
-		.allowsHitTesting(!isLoading)
+		.disabled(isLoading)
 	}
 
 	@available(*, deprecated, message: "Compute the appropriate 'ControlState' from your TCA State and use the non-closure based 'controlState' modifier instead.")
@@ -87,6 +87,6 @@ public extension View {
 					break
 				}
 			}
-			.allowsHitTesting(state.isEnabled)
+			.disabled(state != .enabled)
 	}
 }
