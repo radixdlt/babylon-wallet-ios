@@ -27,6 +27,19 @@ public struct LoadingOverlayView: View {
 	}
 }
 
+public extension View {
+	func overlayLoadingView() -> some View {
+		overlayPreferenceValue(IsLoadingKey.self, alignment: .center) { value in
+			if value.isLoading, let configuration = value.configuration {
+				switch configuration {
+				case let .global(text):
+					LoadingOverlayView(text)
+				}
+			}
+		}
+	}
+}
+
 #if DEBUG
 
 // MARK: - ConnectUsingPassword_Preview
