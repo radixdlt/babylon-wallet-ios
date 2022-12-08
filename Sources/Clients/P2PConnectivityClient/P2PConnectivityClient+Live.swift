@@ -132,9 +132,7 @@ public extension P2PConnectivityClient {
 					} catch {
 						throw FailedToDecodeRequestFromDappError(
 							error: error,
-							jsonString: jsonData.prettyPrintedJSONString.map { String($0) } ?? (
-								String(data: jsonData, encoding: .utf8) ?? jsonData.hex
-							)
+							jsonString: String(data: jsonData, encoding: .utf8) ?? jsonData.hex
 						)
 					}
 
