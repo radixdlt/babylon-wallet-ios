@@ -17,11 +17,8 @@ public typealias TransactionRecentResponse = GatewayAPI.TransactionRecentRespons
 public extension GatewayAPI {
 	struct TransactionRecentResponse: Codable, Hashable {
 		public private(set) var ledgerState: LedgerState
-		/** TBD (make it nullable when we're dealing with unknown result set sizes?) */
 		public private(set) var totalCount: Int64?
-		/** TBD (maybe we should use HATEOAS-like permalinks?) */
 		public private(set) var previousCursor: String?
-		/** TBD (maybe we should use HATEOAS-like permalinks?) */
 		public private(set) var nextCursor: String?
 		/** The page of user transactions. */
 		public private(set) var items: [CommittedTransactionInfo]

@@ -17,19 +17,22 @@ public typealias EntityDetailsResponseNonFungibleResourceDetails = GatewayAPI.En
 public extension GatewayAPI {
 	struct EntityDetailsResponseNonFungibleResourceDetails: Codable, Hashable {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
-		public private(set) var authRules: AnyCodable
-		public private(set) var ids: EntityDetailsResponseNonFungibleResourceDetailsIds
+		public private(set) var accessRulesChain: AnyCodable
+		public private(set) var vaultAccessRulesChain: AnyCodable
+		public private(set) var nonFungibleIdType: NonFungibleIdType
 
-		public init(discriminator: EntityDetailsResponseDetailsType, authRules: AnyCodable, ids: EntityDetailsResponseNonFungibleResourceDetailsIds) {
+		public init(discriminator: EntityDetailsResponseDetailsType, accessRulesChain: AnyCodable, vaultAccessRulesChain: AnyCodable, nonFungibleIdType: NonFungibleIdType) {
 			self.discriminator = discriminator
-			self.authRules = authRules
-			self.ids = ids
+			self.accessRulesChain = accessRulesChain
+			self.vaultAccessRulesChain = vaultAccessRulesChain
+			self.nonFungibleIdType = nonFungibleIdType
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case discriminator
-			case authRules = "auth_rules"
-			case ids
+			case accessRulesChain = "access_rules_chain"
+			case vaultAccessRulesChain = "vault_access_rules_chain"
+			case nonFungibleIdType = "non_fungible_id_type"
 		}
 
 		// Encodable protocol methods
@@ -37,8 +40,9 @@ public extension GatewayAPI {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(discriminator, forKey: .discriminator)
-			try container.encode(authRules, forKey: .authRules)
-			try container.encode(ids, forKey: .ids)
+			try container.encode(accessRulesChain, forKey: .accessRulesChain)
+			try container.encode(vaultAccessRulesChain, forKey: .vaultAccessRulesChain)
+			try container.encode(nonFungibleIdType, forKey: .nonFungibleIdType)
 		}
 	}
 }

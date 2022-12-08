@@ -16,11 +16,8 @@ public typealias ResultSetCursorMixin = GatewayAPI.ResultSetCursorMixin
 // MARK: - GatewayAPI.ResultSetCursorMixin
 public extension GatewayAPI {
 	struct ResultSetCursorMixin: Codable, Hashable {
-		/** TBD (make it nullable when we're dealing with unknown result set sizes?) */
 		public private(set) var totalCount: Int64?
-		/** TBD (maybe we should use HATEOAS-like permalinks?) */
 		public private(set) var previousCursor: String?
-		/** TBD (maybe we should use HATEOAS-like permalinks?) */
 		public private(set) var nextCursor: String?
 
 		public init(totalCount: Int64? = nil, previousCursor: String? = nil, nextCursor: String? = nil) {

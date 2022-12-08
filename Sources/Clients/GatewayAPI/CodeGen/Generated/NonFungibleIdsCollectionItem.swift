@@ -16,21 +16,21 @@ public typealias NonFungibleIdsCollectionItem = GatewayAPI.NonFungibleIdsCollect
 // MARK: - GatewayAPI.NonFungibleIdsCollectionItem
 public extension GatewayAPI {
 	struct NonFungibleIdsCollectionItem: Codable, Hashable {
-		public private(set) var idHex: String
+		public private(set) var nonFungibleId: String
 
-		public init(idHex: String) {
-			self.idHex = idHex
+		public init(nonFungibleId: String) {
+			self.nonFungibleId = nonFungibleId
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
-			case idHex = "id_hex"
+			case nonFungibleId = "non_fungible_id"
 		}
 
 		// Encodable protocol methods
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(idHex, forKey: .idHex)
+			try container.encode(nonFungibleId, forKey: .nonFungibleId)
 		}
 	}
 }

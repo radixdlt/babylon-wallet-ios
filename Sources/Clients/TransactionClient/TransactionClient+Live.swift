@@ -122,8 +122,8 @@ public extension TransactionClient {
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
-					intentHashHex: txID.rawValue,
-					atStateIdentifier: nil
+					atLedgerState: nil,
+					intentHashHex: txID.rawValue
 				)
 				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
 				return txStatusResponse.status

@@ -21,14 +21,14 @@ public extension GatewayAPI {
 		public private(set) var packageAddress: String
 		public private(set) var blueprintName: String
 		public private(set) var state: AnyCodable
-		public private(set) var accessRulesLayers: AnyCodable
+		public private(set) var accessRulesChain: AnyCodable
 
-		public init(discriminator: EntityDetailsResponseDetailsType, packageAddress: String, blueprintName: String, state: AnyCodable, accessRulesLayers: AnyCodable) {
+		public init(discriminator: EntityDetailsResponseDetailsType, packageAddress: String, blueprintName: String, state: AnyCodable, accessRulesChain: AnyCodable) {
 			self.discriminator = discriminator
 			self.packageAddress = packageAddress
 			self.blueprintName = blueprintName
 			self.state = state
-			self.accessRulesLayers = accessRulesLayers
+			self.accessRulesChain = accessRulesChain
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -36,7 +36,7 @@ public extension GatewayAPI {
 			case packageAddress = "package_address"
 			case blueprintName = "blueprint_name"
 			case state
-			case accessRulesLayers = "access_rules_layers"
+			case accessRulesChain = "access_rules_chain"
 		}
 
 		// Encodable protocol methods
@@ -47,7 +47,7 @@ public extension GatewayAPI {
 			try container.encode(packageAddress, forKey: .packageAddress)
 			try container.encode(blueprintName, forKey: .blueprintName)
 			try container.encode(state, forKey: .state)
-			try container.encode(accessRulesLayers, forKey: .accessRulesLayers)
+			try container.encode(accessRulesChain, forKey: .accessRulesChain)
 		}
 	}
 }

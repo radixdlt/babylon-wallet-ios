@@ -16,11 +16,8 @@ public typealias NonFungibleResourcesCollection = GatewayAPI.NonFungibleResource
 // MARK: - GatewayAPI.NonFungibleResourcesCollection
 public extension GatewayAPI {
 	struct NonFungibleResourcesCollection: Codable, Hashable {
-		/** TBD (make it nullable when we're dealing with unknown result set sizes?) */
 		public private(set) var totalCount: Int64?
-		/** TBD (maybe we should use HATEOAS-like permalinks?) */
 		public private(set) var previousCursor: String?
-		/** TBD (maybe we should use HATEOAS-like permalinks?) */
 		public private(set) var nextCursor: String?
 		public private(set) var items: [NonFungibleResourcesCollectionItem]
 

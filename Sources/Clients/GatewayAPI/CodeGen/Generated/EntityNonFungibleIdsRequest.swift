@@ -16,28 +16,28 @@ public typealias EntityNonFungibleIdsRequest = GatewayAPI.EntityNonFungibleIdsRe
 // MARK: - GatewayAPI.EntityNonFungibleIdsRequest
 public extension GatewayAPI {
 	struct EntityNonFungibleIdsRequest: Codable, Hashable {
+		public private(set) var atLedgerState: LedgerStateSelector?
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
 		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var resourceAddress: String?
-		public private(set) var atStateIdentifier: PartialLedgerStateIdentifier?
 		/** This cursor allows forward pagination, by providing the cursor from the previous request. */
 		public private(set) var cursor: String?
 		/** The page size requested. */
 		public private(set) var limit: Int?
 
-		public init(address: String, resourceAddress: String? = nil, atStateIdentifier: PartialLedgerStateIdentifier? = nil, cursor: String? = nil, limit: Int? = nil) {
+		public init(atLedgerState: LedgerStateSelector? = nil, address: String, resourceAddress: String? = nil, cursor: String? = nil, limit: Int? = nil) {
+			self.atLedgerState = atLedgerState
 			self.address = address
 			self.resourceAddress = resourceAddress
-			self.atStateIdentifier = atStateIdentifier
 			self.cursor = cursor
 			self.limit = limit
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case atLedgerState = "at_ledger_state"
 			case address
 			case resourceAddress = "resource_address"
-			case atStateIdentifier = "at_state_identifier"
 			case cursor
 			case limit
 		}
@@ -46,9 +46,9 @@ public extension GatewayAPI {
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
 			try container.encode(address, forKey: .address)
 			try container.encodeIfPresent(resourceAddress, forKey: .resourceAddress)
-			try container.encodeIfPresent(atStateIdentifier, forKey: .atStateIdentifier)
 			try container.encodeIfPresent(cursor, forKey: .cursor)
 			try container.encodeIfPresent(limit, forKey: .limit)
 		}

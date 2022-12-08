@@ -16,27 +16,27 @@ public typealias NonFungibleDataRequest = GatewayAPI.NonFungibleDataRequest
 // MARK: - GatewayAPI.NonFungibleDataRequest
 public extension GatewayAPI {
 	struct NonFungibleDataRequest: Codable, Hashable {
+		public private(set) var atLedgerState: LedgerStateSelector?
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
-		public private(set) var nonFungibleIdHex: String
-		public private(set) var atStateIdentifier: PartialLedgerStateIdentifier?
+		public private(set) var nonFungibleId: String
 		/** This cursor allows forward pagination, by providing the cursor from the previous request. */
 		public private(set) var cursor: String?
 		/** The page size requested. */
 		public private(set) var limit: Int?
 
-		public init(address: String, nonFungibleIdHex: String, atStateIdentifier: PartialLedgerStateIdentifier? = nil, cursor: String? = nil, limit: Int? = nil) {
+		public init(atLedgerState: LedgerStateSelector? = nil, address: String, nonFungibleId: String, cursor: String? = nil, limit: Int? = nil) {
+			self.atLedgerState = atLedgerState
 			self.address = address
-			self.nonFungibleIdHex = nonFungibleIdHex
-			self.atStateIdentifier = atStateIdentifier
+			self.nonFungibleId = nonFungibleId
 			self.cursor = cursor
 			self.limit = limit
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case atLedgerState = "at_ledger_state"
 			case address
-			case nonFungibleIdHex = "non_fungible_id_hex"
-			case atStateIdentifier = "at_state_identifier"
+			case nonFungibleId = "non_fungible_id"
 			case cursor
 			case limit
 		}
@@ -45,9 +45,9 @@ public extension GatewayAPI {
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
 			try container.encode(address, forKey: .address)
-			try container.encode(nonFungibleIdHex, forKey: .nonFungibleIdHex)
-			try container.encodeIfPresent(atStateIdentifier, forKey: .atStateIdentifier)
+			try container.encode(nonFungibleId, forKey: .nonFungibleId)
 			try container.encodeIfPresent(cursor, forKey: .cursor)
 			try container.encodeIfPresent(limit, forKey: .limit)
 		}

@@ -31,7 +31,7 @@ extension GatewayAPIClient: TestDependencyKey {
 				ledgerState: .init(
 					network: "Network name",
 					stateVersion: 0,
-					timestamp: "",
+					proposerRoundTimestamp: "",
 					epoch: 1337,
 					round: 0
 				)
@@ -55,7 +55,7 @@ extension GatewayAPIClient: TestDependencyKey {
 					ledgerState: .init(
 						network: "Network name",
 						stateVersion: 0,
-						timestamp: "",
+						proposerRoundTimestamp: "",
 						epoch: 1337,
 						round: 0
 					),

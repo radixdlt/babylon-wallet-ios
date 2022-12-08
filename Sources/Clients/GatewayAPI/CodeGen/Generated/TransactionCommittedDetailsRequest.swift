@@ -16,25 +16,25 @@ public typealias TransactionCommittedDetailsRequest = GatewayAPI.TransactionComm
 // MARK: - GatewayAPI.TransactionCommittedDetailsRequest
 public extension GatewayAPI {
 	struct TransactionCommittedDetailsRequest: Codable, Hashable {
+		public private(set) var atLedgerState: LedgerStateSelector?
 		public private(set) var transactionIdentifier: TransactionCommittedDetailsRequestIdentifier
-		public private(set) var atStateIdentifier: PartialLedgerStateIdentifier?
 
-		public init(transactionIdentifier: TransactionCommittedDetailsRequestIdentifier, atStateIdentifier: PartialLedgerStateIdentifier? = nil) {
+		public init(atLedgerState: LedgerStateSelector? = nil, transactionIdentifier: TransactionCommittedDetailsRequestIdentifier) {
+			self.atLedgerState = atLedgerState
 			self.transactionIdentifier = transactionIdentifier
-			self.atStateIdentifier = atStateIdentifier
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case atLedgerState = "at_ledger_state"
 			case transactionIdentifier = "transaction_identifier"
-			case atStateIdentifier = "at_state_identifier"
 		}
 
 		// Encodable protocol methods
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
 			try container.encode(transactionIdentifier, forKey: .transactionIdentifier)
-			try container.encodeIfPresent(atStateIdentifier, forKey: .atStateIdentifier)
 		}
 	}
 }

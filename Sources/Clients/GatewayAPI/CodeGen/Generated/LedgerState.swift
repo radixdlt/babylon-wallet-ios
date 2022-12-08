@@ -22,16 +22,16 @@ public extension GatewayAPI {
 		/** The state version of the ledger. Each transaction increments the state version by 1. */
 		public private(set) var stateVersion: Int64
 		/** The round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.  */
-		public private(set) var timestamp: String
+		public private(set) var proposerRoundTimestamp: String
 		/** The epoch number of the ledger at this state version. */
 		public private(set) var epoch: Int64
 		/** The consensus round in the epoch that this state version was committed in. */
 		public private(set) var round: Int64
 
-		public init(network: String, stateVersion: Int64, timestamp: String, epoch: Int64, round: Int64) {
+		public init(network: String, stateVersion: Int64, proposerRoundTimestamp: String, epoch: Int64, round: Int64) {
 			self.network = network
 			self.stateVersion = stateVersion
-			self.timestamp = timestamp
+			self.proposerRoundTimestamp = proposerRoundTimestamp
 			self.epoch = epoch
 			self.round = round
 		}
@@ -39,7 +39,7 @@ public extension GatewayAPI {
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case network
 			case stateVersion = "state_version"
-			case timestamp
+			case proposerRoundTimestamp = "proposer_round_timestamp"
 			case epoch
 			case round
 		}
@@ -50,7 +50,7 @@ public extension GatewayAPI {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(network, forKey: .network)
 			try container.encode(stateVersion, forKey: .stateVersion)
-			try container.encode(timestamp, forKey: .timestamp)
+			try container.encode(proposerRoundTimestamp, forKey: .proposerRoundTimestamp)
 			try container.encode(epoch, forKey: .epoch)
 			try container.encode(round, forKey: .round)
 		}

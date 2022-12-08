@@ -18,20 +18,23 @@ public extension GatewayAPI {
 	struct NonFungibleDataResponseAllOf: Codable, Hashable {
 		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var address: String
-		public private(set) var nonFungibleIdHex: String
+		public private(set) var nonFungibleIdType: NonFungibleIdType
+		public private(set) var nonFungibleId: String
 		public private(set) var mutableDataHex: String
 		public private(set) var immutableDataHex: String
 
-		public init(address: String, nonFungibleIdHex: String, mutableDataHex: String, immutableDataHex: String) {
+		public init(address: String, nonFungibleIdType: NonFungibleIdType, nonFungibleId: String, mutableDataHex: String, immutableDataHex: String) {
 			self.address = address
-			self.nonFungibleIdHex = nonFungibleIdHex
+			self.nonFungibleIdType = nonFungibleIdType
+			self.nonFungibleId = nonFungibleId
 			self.mutableDataHex = mutableDataHex
 			self.immutableDataHex = immutableDataHex
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case address
-			case nonFungibleIdHex = "non_fungible_id_hex"
+			case nonFungibleIdType = "non_fungible_id_type"
+			case nonFungibleId = "non_fungible_id"
 			case mutableDataHex = "mutable_data_hex"
 			case immutableDataHex = "immutable_data_hex"
 		}
@@ -41,7 +44,8 @@ public extension GatewayAPI {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(address, forKey: .address)
-			try container.encode(nonFungibleIdHex, forKey: .nonFungibleIdHex)
+			try container.encode(nonFungibleIdType, forKey: .nonFungibleIdType)
+			try container.encode(nonFungibleId, forKey: .nonFungibleId)
 			try container.encode(mutableDataHex, forKey: .mutableDataHex)
 			try container.encode(immutableDataHex, forKey: .immutableDataHex)
 		}
