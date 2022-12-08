@@ -101,9 +101,9 @@ public struct ChooseAccounts: ReducerProtocol {
 				)
 				return .none
 
-                        case .delegate(.dismissChooseAccounts):
-                                state.createAccount = nil
-                                return .none
+			case .delegate(.dismissChooseAccounts):
+				state.createAccount = nil
+				return .none
 
 			case .child, .delegate:
 				return .none
