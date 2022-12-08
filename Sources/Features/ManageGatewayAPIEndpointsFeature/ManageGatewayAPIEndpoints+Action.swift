@@ -20,10 +20,9 @@ public extension ManageGatewayAPIEndpoints.Action {
 	enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case dismissButtonTapped
-
 		case urlStringChanged(String)
-
 		case switchToButtonTapped
+		case textFieldFocused(ManageGatewayAPIEndpoints.State.Field?)
 	}
 }
 
@@ -44,6 +43,7 @@ public extension ManageGatewayAPIEndpoints.Action {
 		case hasAccountsResult(TaskResult<Bool>)
 		case createAccountOnNetworkBeforeSwitchingToIt(AppPreferences.NetworkAndGateway)
 		case switchToResult(TaskResult<AppPreferences.NetworkAndGateway>)
+		case focusTextField(ManageGatewayAPIEndpoints.State.Field?)
 	}
 }
 

@@ -152,6 +152,14 @@ public extension ManageGatewayAPIEndpoints {
 
 		case .delegate:
 			return .none
+		case let .internal(.view(.textFieldFocused(focus))):
+			return .run { send in
+				await send(.internal(.system(.focusTextField(focus))))
+			}
+
+		case let .internal(.system(.focusTextField(focus))):
+			state.focusedField = focus
+			return .none
 		}
 	}
 

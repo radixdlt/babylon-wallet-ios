@@ -10,6 +10,7 @@ public extension ManageGatewayAPIEndpoints {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<ManageGatewayAPIEndpoints>
+		@FocusState private var focusedField: ManageGatewayAPIEndpoints.State.Field?
 
 		public init(store: StoreOf<ManageGatewayAPIEndpoints>) {
 			self.store = store
@@ -59,52 +60,59 @@ private extension ManageGatewayAPIEndpoints.View {
 
 				Separator()
 
-				HStack {
-					Text(L10n.ManageP2PClients.p2PConnectionsSubtitle)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body1HighImportance)
-						.padding(.medium3)
+				ScrollView {
+					HStack {
+						Text(L10n.ManageP2PClients.p2PConnectionsSubtitle)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1HighImportance)
+							.padding(.medium3)
 
-					Spacer()
-				}
-
-				Separator()
-
-				VStack(alignment: .leading) {
-					if let networkAndGateway = viewStore.networkAndGateway {
-						networkAndGatewayView(networkAndGateway)
+						Spacer()
 					}
 
-					Spacer()
+					Separator()
 
-					ZStack {
-						VStack(alignment: .leading) {
-							Text(L10n.ManageGateway.inputNewGatewayAPIURL)
-							TextField(
-								L10n.ManageGateway.urlString,
-								text: viewStore.binding(
-									get: \.urlString,
-									send: { .urlStringChanged($0) }
-								)
-							)
-							.textFieldStyle(.roundedBorder)
+					VStack(alignment: .leading) {
+						if let networkAndGateway = viewStore.networkAndGateway {
+							networkAndGatewayView(networkAndGateway)
 						}
 
-						// FIXME: betanet move loading indicator into button below.
+						Spacer(minLength: .large1 * 2)
+
+						AppTextField(
+							placeholder: L10n.ManageGateway.textFieldPlaceholder,
+							text: viewStore.binding(
+								get: \.urlString,
+								send: { .urlStringChanged($0) }
+							),
+							hint: L10n.ManageGateway.textFieldHint,
+							binding: $focusedField,
+							equals: .gatewayURL,
+							first: viewStore.binding(
+								get: \.focusedField,
+								send: { .textFieldFocused($0) }
+							)
+						)
+						.keyboardType(.URL)
+						.autocorrectionDisabled()
+						.textInputAutocapitalization(.never)
+
+						// FIXME: betanet remove this loader and use button loader instead
 						if viewStore.isShowingLoader {
 							LoadingView()
 						}
-					}
 
-					Spacer()
+						Spacer(minLength: .large1 * 2)
 
-					Button(L10n.ManageGateway.switchToButtonTitle) {
-						viewStore.send(.switchToButtonTapped)
+						// FIXME: betanet move loading indicator into button below
+						Button(L10n.ManageGateway.switchToButtonTitle) {
+							viewStore.send(.switchToButtonTapped)
+						}
+						.buttonStyle(.primaryRectangular)
+						.enabled(viewStore.isSwitchToButtonEnabled)
 					}
-					.enabled(viewStore.isSwitchToButtonEnabled)
+					.padding(.medium1)
 				}
-				.padding(.medium1)
-				.buttonStyle(.primaryRectangular)
 			}
 			.onAppear {
 				viewStore.send(.didAppear)
@@ -161,6 +169,7 @@ extension ManageGatewayAPIEndpoints.View {
 		public var networkAndGateway: AppPreferences.NetworkAndGateway?
 		public var isSwitchToButtonEnabled: Bool
 		public var isShowingLoader: Bool
+		@BindableState public var focusedField: ManageGatewayAPIEndpoints.State.Field?
 
 		init(state: ManageGatewayAPIEndpoints.State) {
 			urlString = state.urlString
@@ -168,6 +177,7 @@ extension ManageGatewayAPIEndpoints.View {
 			isSwitchToButtonEnabled = state.isSwitchToButtonEnabled
 			networkAndGateway = state.currentNetworkAndGateway
 			isShowingLoader = state.isValidatingEndpoint
+			focusedField = state.focusedField
 		}
 	}
 }
