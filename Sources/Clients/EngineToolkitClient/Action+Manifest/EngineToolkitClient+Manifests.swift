@@ -110,13 +110,14 @@ public extension EngineToolkitClient {
 	///     ComponentAddress("${faucet_component}")
 	///     "lock_fee"
 	///     Decimal("10");
+	///
 	/// CALL_METHOD
 	///     ComponentAddress("${faucet_component}")
-	///     "free_xrd";
+	///     "free";
 	///
 	/// CALL_METHOD
 	///     ComponentAddress("${account_component_address}")
-	///     "deposit"
+	///     "deposit_batch"
 	///     Expression("ENTIRE_WORKTOP");
 	func manifestForFaucet(
 		includeLockFeeInstruction: Bool,

@@ -72,5 +72,6 @@ public extension Home.Action {
 public extension Home.Action {
 	enum DelegateAction: Equatable {
 		case displaySettings
+		case reloadAccounts
 	}
 }

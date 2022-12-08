@@ -1,4 +1,6 @@
 import Collections
+import ComposableArchitecture
+import CreateAccountFeature
 import Foundation
 import NonEmpty
 import Profile
@@ -17,6 +19,7 @@ public extension ChooseAccounts {
 public extension ChooseAccounts.Action {
 	enum ChildAction: Sendable, Equatable {
 		case account(id: ChooseAccounts.Row.State.ID, action: ChooseAccounts.Row.Action)
+		case createAccount(CreateAccount.Action)
 	}
 }
 
@@ -25,6 +28,7 @@ public extension ChooseAccounts.Action {
 	enum ViewAction: Sendable, Equatable {
 		case continueButtonTapped
 		case backButtonTapped
+		case createAccountButtonTapped
 	}
 }
 
@@ -38,7 +42,10 @@ public extension ChooseAccounts.Action {
 
 // MARK: - ChooseAccounts.Action.InternalAction.SystemAction
 public extension ChooseAccounts.Action.InternalAction {
-	enum SystemAction: Sendable, Equatable {}
+	enum SystemAction: Sendable, Equatable {
+		case loadAccountsResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
+		case createAccount(numberOfExistingAccounts: Int)
+	}
 }
 
 // MARK: - ChooseAccounts.Action.DelegateAction
