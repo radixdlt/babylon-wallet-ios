@@ -55,7 +55,7 @@ extension UUID: JSONEncodable {
 }
 
 extension RawRepresentable where RawValue: JSONEncodable {
-	func encodeToJSON() -> Any { rawValue }
+	func encodeToJSON() -> Any { self.rawValue }
 }
 
 private func encodeIfPossible<T>(_ object: T) -> Any {
@@ -69,7 +69,7 @@ private func encodeIfPossible<T>(_ object: T) -> Any {
 // MARK: - Array + JSONEncodable
 extension Array: JSONEncodable {
 	func encodeToJSON() -> Any {
-		map(encodeIfPossible)
+		self.map(encodeIfPossible)
 	}
 }
 
@@ -94,7 +94,7 @@ extension Dictionary: JSONEncodable {
 // MARK: - Data + JSONEncodable
 extension Data: JSONEncodable {
 	func encodeToJSON() -> Any {
-		base64EncodedString(options: Data.Base64EncodingOptions())
+		self.base64EncodedString(options: Data.Base64EncodingOptions())
 	}
 }
 
