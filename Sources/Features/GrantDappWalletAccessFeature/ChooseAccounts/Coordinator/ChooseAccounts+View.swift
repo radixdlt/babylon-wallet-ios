@@ -25,23 +25,13 @@ public extension ChooseAccounts.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
-//                                        if viewStore.isRoot {
-//                                                NavigationBar(
-//                                                        leadingItem: CloseButton {
-//                                                                viewStore.send(.dismissButtonTapped)
-//                                                        }
-//                                                )
-//                                                .foregroundColor(.app.gray1)
-//                                                .padding([.horizontal, .top], .medium3)
-//                                        } else {
-                                                NavigationBar(
-                                                        leadingItem: BackButton {
-                                                                viewStore.send(.backButtonTapped)
-                                                        }
-                                                )
-                                                .foregroundColor(.app.gray1)
-                                                .padding([.horizontal, .top], .medium3)
-//                                        }
+                                        NavigationBar(
+                                                leadingItem: CloseButton {
+                                                        viewStore.send(.dismissButtonTapped)
+                                                }
+                                        )
+                                        .foregroundColor(.app.gray1)
+                                        .padding([.horizontal, .top], .medium3)
 
 					ScrollView {
 						VStack {
@@ -83,7 +73,7 @@ public extension ChooseAccounts.View {
 						viewStore.send(.continueButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
-					.enabled(viewStore.canProceed)
+                                        .controlState(viewStore.canProceed ? .enabled : .disabled)
 					.padding(.medium1)
 				}
 			}
@@ -122,14 +112,12 @@ extension ChooseAccounts.View {
 		var canProceed: Bool
 		let oneTimeAccountAddressesRequest: P2P.FromDapp.OneTimeAccountsReadRequestItem
 		let requestFromDapp: P2P.FromDapp.Request
-                let isRoot: Bool
 
 		init(state: ChooseAccounts.State) {
 			canProceed = state.canProceed
 			// FIXME: remove Force Unwrap
 			oneTimeAccountAddressesRequest = state.request.requestItem
 			requestFromDapp = state.request.parentRequest.requestFromDapp
-                        isRoot = state.isRoot
 		}
 	}
 }

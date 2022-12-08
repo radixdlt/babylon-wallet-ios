@@ -21,8 +21,7 @@ public struct ChooseAccounts: ReducerProtocol {
                                                                                        request)))
 				}
 
-                        case .internal(.view(.backButtonTapped)):
-                            // .internal(.view(.dismissButtonTapped)):
+                        case .internal(.view(.dismissButtonTapped)):
 				return .run { [request = state.request] send in
                                         await send(.delegate(.dismissChooseAccounts(request)))
 				}

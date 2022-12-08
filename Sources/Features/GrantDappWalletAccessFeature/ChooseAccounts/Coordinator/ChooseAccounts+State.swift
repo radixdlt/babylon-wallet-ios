@@ -6,19 +6,16 @@ import SharedModels
 public extension ChooseAccounts {
 	struct State: Equatable {
 		public let request: P2P.OneTimeAccountAddressesRequestToHandle
-                public let isRoot: Bool
 
 		public var canProceed: Bool
 		public var accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
 
 		public init(
 			request: P2P.OneTimeAccountAddressesRequestToHandle,
-                        isRoot: Bool = false,
 			canProceed: Bool = false,
                         accounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = []
 		) {
 			self.request = request
-                        self.isRoot = isRoot
 
 			self.canProceed = canProceed
 			self.accounts = accounts

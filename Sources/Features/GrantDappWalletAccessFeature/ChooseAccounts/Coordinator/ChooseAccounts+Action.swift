@@ -27,8 +27,7 @@ public extension ChooseAccounts.Action {
 	enum ViewAction: Sendable, Equatable {
                 case didAppear
 		case continueButtonTapped
-		case backButtonTapped
-//                case dismissButtonTapped
+		case dismissButtonTapped
 	}
 }
 

@@ -23,72 +23,54 @@ public extension DappConnectionRequest.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			ForceFullScreen {
-				ZStack {
-					mainView(with: viewStore)
-						.zIndex(0)
-				}
+                        ForceFullScreen {
+                                VStack {
+                                        NavigationBar(
+                                                leadingItem: CloseButton {
+                                                        viewStore.send(.dismissButtonTapped)
+                                                }
+                                        )
+                                        .foregroundColor(.app.gray1)
+                                        .padding([.horizontal, .top], .medium3)
 
-				IfLetStore(
-					store.scope(
-						state: \.chooseAccounts,
-						action: { .child(.chooseAccounts($0)) }
-					),
-					then: ChooseAccounts.View.init(store:)
-				)
-				.zIndex(1)
-			}
-		}
-	}
-}
+                                        ScrollView {
+                                                VStack {
+                                                        VStack(spacing: .large1) {
+                                                                Text(L10n.DApp.ConnectionRequest.title)
+                                                                        .foregroundColor(.app.gray1)
+                                                                        .textStyle(.sectionHeader)
+                                                                        .multilineTextAlignment(.center)
 
-private extension DappConnectionRequest.View {
-	func mainView(with viewStore: ViewStore) -> some View {
-		VStack {
-			NavigationBar(
-				leadingItem: CloseButton {
-					viewStore.send(.dismissButtonTapped)
-				}
-			)
-			.foregroundColor(.app.gray1)
-			.padding([.horizontal, .top], .medium3)
+                                                                Image(asset: AssetResource.dappPlaceholder)
+                                                        }
 
-			ScrollView {
-				VStack {
-					VStack(spacing: .large1) {
-						Text(L10n.DApp.ConnectionRequest.title)
-							.foregroundColor(.app.gray1)
-							.textStyle(.sectionHeader)
-							.multilineTextAlignment(.center)
+                                                        Spacer(minLength: .large1)
 
-						Image(asset: AssetResource.dappPlaceholder)
-					}
+                                                        VStack(spacing: .medium2) {
+                                                                Text(L10n.DApp.ConnectionRequest.wantsToConnect(viewStore.requestFromDapp.metadata.dAppId))
+                                                                        .foregroundColor(.app.gray1)
+                                                                        .textStyle(.secondaryHeader)
 
-					Spacer(minLength: .large1)
+                                                                Text(L10n.DApp.ConnectionRequest.subtitle)
+                                                                        .foregroundColor(.app.gray1)
+                                                                        .textStyle(.body1Regular)
+                                                        }
+                                                        .multilineTextAlignment(.center)
 
-					VStack(spacing: .medium2) {
-						Text(L10n.DApp.ConnectionRequest.wantsToConnect(viewStore.requestFromDapp.metadata.dAppId))
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
+                                                        Spacer(minLength: .large1 * 1.5)
 
-						Text(L10n.DApp.ConnectionRequest.subtitle)
-							.foregroundColor(.app.gray1)
-							.textStyle(.body1Regular)
-					}
-					.multilineTextAlignment(.center)
+                                                        Spacer()
 
-					Spacer(minLength: .large1 * 1.5)
-
-					Spacer()
-
-					Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
-						viewStore.send(.continueButtonTapped)
-					}
-					.buttonStyle(.primaryRectangular)
-				}
-				.padding(.horizontal, .medium1)
-			}
-		}
+                                                        Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
+                                                                viewStore.send(.continueButtonTapped)
+                                                        }
+                                                        .buttonStyle(.primaryRectangular)
+                                                }
+                                                .padding(.horizontal, .medium1)
+                                        }
+                                }
+                        }
+                }
 	}
 }
 
