@@ -37,7 +37,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		await store.receive(.delegate(.rejected(requestItem)))
 	}
 
-	func test_proceedWithConnectionRequest_whenTappedOnContinueButton_thenDisplayChooseAccounts() async {
+	func test_proceedWithConnectionRequest_whenTappedOnContinueButton_thenNotifiesDelegate() async {
 		// given
 		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
 			requestItem: .init(numberOfAddresses: 1),
@@ -61,40 +61,6 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		await store.send(.view(.continueButtonTapped))
 
 		// then
-
-		await store.receive(.internal(.system(.loadAccountsResult(.success(accounts))))) {
-			$0.chooseAccounts = .init(
-				request: requestItem,
-				accounts: .init(uniqueElements: accounts.rawValue.elements.map {
-					ChooseAccounts.Row.State(account: $0)
-				})
-			)
-		}
-	}
-
-	func test_dismissChooseAccounts_whenCoordinatedToDismissChooseAccounts_thenDismissChooseAccounts() async {
-		// given
-		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
-			requestItem: .init(numberOfAddresses: 1),
-			parentRequest: .placeholder
-		)
-
-		let initialState: DappConnectionRequest.State = .init(
-			request: .init(
-				requestItem: requestItem.requestItem,
-				parentRequest: requestItem.parentRequest
-			),
-			chooseAccounts: .placeholder
-		)
-		let store = TestStore(
-			initialState: initialState,
-			reducer: DappConnectionRequest()
-		)
-
-		// when
-		await store.send(.child(.chooseAccounts(.delegate(.dismissChooseAccounts)))) {
-			// then
-			$0.chooseAccounts = nil
-		}
+		await store.receive(.delegate(.allowed(requestItem)))
 	}
 }

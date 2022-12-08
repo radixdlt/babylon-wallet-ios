@@ -17,9 +17,7 @@ public extension DappConnectionRequest {
 
 // MARK: - DappConnectionRequest.Action.ChildAction
 public extension DappConnectionRequest.Action {
-	enum ChildAction: Sendable, Equatable {
-		case chooseAccounts(ChooseAccounts.Action)
-	}
+	enum ChildAction: Sendable, Equatable {}
 }
 
 // MARK: - DappConnectionRequest.Action.ViewAction
@@ -33,11 +31,7 @@ public extension DappConnectionRequest.Action {
 // MARK: - DappConnectionRequest.Action.DelegateAction
 public extension DappConnectionRequest.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case finishedChoosingAccounts(
-			NonEmpty<OrderedSet<OnNetwork.Account>>,
-			request: P2P.OneTimeAccountAddressesRequestToHandle
-		)
-
+		case allowed(P2P.OneTimeAccountAddressesRequestToHandle)
 		case rejected(P2P.OneTimeAccountAddressesRequestToHandle)
 	}
 }
@@ -52,7 +46,5 @@ public extension DappConnectionRequest.Action {
 
 // MARK: - DappConnectionRequest.Action.InternalAction.SystemAction
 public extension DappConnectionRequest.Action.InternalAction {
-	enum SystemAction: Sendable, Equatable {
-		case loadAccountsResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
-	}
+	enum SystemAction: Sendable, Equatable {}
 }

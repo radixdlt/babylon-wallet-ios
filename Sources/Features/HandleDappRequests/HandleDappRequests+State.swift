@@ -24,18 +24,18 @@ public extension HandleDappRequests {
 
 // MARK: - Home.State.HandleRequest
 public extension HandleDappRequests.State {
-	var grantDappWalletAccess: DappConnectionRequest.State? {
+	var chooseAccounts: ChooseAccounts.State? {
 		get {
 			guard let currentRequest else { return nil }
 			switch currentRequest {
-			case let .grantDappWalletAccess(state):
+			case let .chooseAccounts(state):
 				return state
 			default: return nil
 			}
 		}
 		set {
 			if let newValue {
-				currentRequest = .grantDappWalletAccess(newValue)
+				currentRequest = .chooseAccounts(newValue)
 			} else {
 				currentRequest = nil
 			}
@@ -62,16 +62,17 @@ public extension HandleDappRequests.State {
 
 	enum CurrentRequest: Equatable {
 		case transactionSigning(TransactionSigning.State)
-		case grantDappWalletAccess(DappConnectionRequest.State)
+		case chooseAccounts(ChooseAccounts.State)
 
 		public init(requestItemToHandle: P2P.RequestItemToHandle) {
 			switch requestItemToHandle.requestItem {
 			case let .oneTimeAccounts(item):
-				self = .grantDappWalletAccess(
-					.init(request: .init(
-						requestItem: item,
-						parentRequest: requestItemToHandle.parentRequest
-					)
+				self = .chooseAccounts(
+					.init(request:
+						.init(
+							requestItem: item,
+							parentRequest: requestItemToHandle.parentRequest
+						)
 					)
 				)
 			case let .sendTransaction(item):

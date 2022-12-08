@@ -3,20 +3,22 @@ import ComposableArchitecture
 @testable import GrantDappWalletAccessFeature
 import NonEmpty
 import Profile
+import SharedModels
 import TestUtils
 
 @MainActor
 final class ChooseAccountsTests: TestCase {
-	func test_continueFromChooseAccounts_whenTappedOnContinue_thenCoordinateToNextScreen() async {
+	func test_continueFromChooseAccounts_whenTappedOnContinue_thenFinishAccountSelection() async {
 		// given
+		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
+			requestItem: .init(numberOfAddresses: 1),
+			parentRequest: .placeholder
+		)
 		var singleAccount = ChooseAccounts.Row.State.placeholderOne
 		singleAccount.isSelected = true
 		let store = TestStore(
 			initialState: ChooseAccounts.State(
-				request: .init(
-					requestItem: .placeholder,
-					parentRequest: .placeholder
-				),
+				request: requestItem,
 				accounts: [
 					singleAccount,
 				]
@@ -29,21 +31,25 @@ final class ChooseAccountsTests: TestCase {
 
 		// then
 		let expectedAccounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: [singleAccount.account]))!
-		await store.receive(.delegate(.finishedChoosingAccounts(expectedAccounts)))
+		await store.receive(.delegate(.finishedChoosingAccounts(expectedAccounts, requestItem)))
 	}
 
 	func test_dismissChooseAccounts_whenTappedOnDismiss_thenCoordinateDismissal() async {
 		// given
+		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
+			requestItem: .init(numberOfAddresses: 1),
+			parentRequest: .placeholder
+		)
 		let store = TestStore(
-			initialState: ChooseAccounts.State.placeholder,
+			initialState: ChooseAccounts.State(request: requestItem),
 			reducer: ChooseAccounts()
 		)
 
 		// when
-		await store.send(.view(.backButtonTapped))
+		await store.send(.view(.dismissButtonTapped))
 
 		// then
-		await store.receive(.delegate(.dismissChooseAccounts))
+		await store.receive(.delegate(.dismissChooseAccounts(requestItem)))
 	}
 
 	func test_didSelectAccount_whenTappedOnSelectedAccount_thenDeselectThatAccount() async {

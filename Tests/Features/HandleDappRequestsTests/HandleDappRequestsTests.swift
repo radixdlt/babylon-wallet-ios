@@ -10,7 +10,7 @@ import XCTest
 
 @MainActor
 final class HandleDappRequestsTests: TestCase {
-	func test__GIVEN__initialState__WHEN__receiveRequest__THEN__request_is_queued_and_immediately_handled() async throws {
+	func test__GIVEN__initialState__WHEN__receiveChooseAccountRequest__THEN__request_is_queued_and_immediately_handled() async throws {
 		let store = TestStore(
 			initialState: HandleDappRequests.State(),
 			reducer: HandleDappRequests()
@@ -30,7 +30,7 @@ final class HandleDappRequestsTests: TestCase {
 		}
 
 		await store.receive(.internal(.system(.presentViewForP2PRequest(.init(requestItem: request.requestFromDapp.items.first!, parentRequest: request))))) {
-			try $0.currentRequest = .grantDappWalletAccess(
+			try $0.currentRequest = .chooseAccounts(
 				.init(request: request)
 			)
 		}
@@ -39,7 +39,7 @@ final class HandleDappRequestsTests: TestCase {
 	func test__GIVEN__already_handling_a_request__WHEN__receiveRequest__THEN__new_request_is_queued() async throws {
 		let request = P2P.RequestFromClient.placeholderOneTimeAccountAccess
 
-		let currentRequest: HandleDappRequests.State.CurrentRequest = try .grantDappWalletAccess(
+		let currentRequest: HandleDappRequests.State.CurrentRequest = try .chooseAccounts(
 			.init(request: request)
 		)
 

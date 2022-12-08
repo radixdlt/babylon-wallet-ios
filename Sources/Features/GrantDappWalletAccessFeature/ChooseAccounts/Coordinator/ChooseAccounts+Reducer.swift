@@ -8,8 +8,8 @@ import ProfileClient
 
 // MARK: - ChooseAccounts
 public struct ChooseAccounts: ReducerProtocol {
-	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
 
@@ -18,14 +18,32 @@ public struct ChooseAccounts: ReducerProtocol {
 			switch action {
 			case .internal(.view(.continueButtonTapped)):
 				let nonEmptySelectedAccounts = NonEmpty(rawValue: OrderedSet(state.accounts.filter(\.isSelected).map(\.account)))!
-				return .run { send in
-					await send(.delegate(.finishedChoosingAccounts(nonEmptySelectedAccounts)))
+				return .run { [request = state.request] send in
+					await send(.delegate(.finishedChoosingAccounts(nonEmptySelectedAccounts,
+					                                               request)))
 				}
 
-			case .internal(.view(.backButtonTapped)):
-				return .run { send in
-					await send(.delegate(.dismissChooseAccounts))
+			case .internal(.view(.dismissButtonTapped)):
+				return .run { [request = state.request] send in
+					await send(.delegate(.dismissChooseAccounts(request)))
 				}
+
+			case .internal(.view(.didAppear)):
+				return .run { send in
+					await send(.internal(.system(.loadAccountsResult(TaskResult {
+						try await profileClient.getAccounts()
+					}))))
+				}
+
+			case let .internal(.system(.loadAccountsResult(.success(accounts)))):
+				state.accounts = .init(uniqueElements: accounts.map {
+					ChooseAccounts.Row.State(account: $0)
+				})
+				return .none
+
+			case let .internal(.system(.loadAccountsResult(.failure(error)))):
+				errorQueue.schedule(error)
+				return .none
 
 			case .internal(.view(.createAccountButtonTapped)):
 				return .run { send in
@@ -64,13 +82,6 @@ public struct ChooseAccounts: ReducerProtocol {
 					return .none
 				}
 
-			case .delegate(.dismissChooseAccounts):
-				state.createAccount = nil
-				return .none
-
-			case .delegate:
-				return .none
-
 			case .child(.createAccount(.delegate(.dismissCreateAccount))):
 				state.createAccount = nil
 				return .none
@@ -83,12 +94,6 @@ public struct ChooseAccounts: ReducerProtocol {
 					}))))
 				}
 
-			case let .internal(.system(.loadAccountsResult(.success(accounts)))):
-				state.accounts = .init(uniqueElements: accounts.map {
-					ChooseAccounts.Row.State(account: $0)
-				})
-				return .none
-
 			case let .internal(.system(.createAccount(numberOfExistingAccounts: numberOfExistingAccounts))):
 				state.createAccount = .init(
 					shouldCreateProfile: false,
@@ -96,11 +101,11 @@ public struct ChooseAccounts: ReducerProtocol {
 				)
 				return .none
 
-			case let .internal(.system(.loadAccountsResult(.failure(error)))):
-				errorQueue.schedule(error)
+			case .delegate(.dismissChooseAccounts):
+				state.createAccount = nil
 				return .none
 
-			case .child:
+			case .child, .delegate:
 				return .none
 			}
 		}

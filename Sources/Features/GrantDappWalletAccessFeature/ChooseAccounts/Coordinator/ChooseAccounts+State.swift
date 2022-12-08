@@ -14,7 +14,7 @@ public extension ChooseAccounts {
 		public init(
 			request: P2P.OneTimeAccountAddressesRequestToHandle,
 			canProceed: Bool = false,
-			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>,
+			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = [],
 			createAccount: CreateAccount.State? = nil
 		) {
 			self.request = request
@@ -22,6 +22,16 @@ public extension ChooseAccounts {
 			self.accounts = accounts
 			self.createAccount = createAccount
 		}
+	}
+}
+
+public extension ChooseAccounts.State {
+	init(
+		request: P2P.RequestFromClient
+	) throws {
+		try self.init(
+			request: .init(request: request)
+		)
 	}
 }
 

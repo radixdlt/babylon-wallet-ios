@@ -4,6 +4,7 @@ import CreateAccountFeature
 import Foundation
 import NonEmpty
 import Profile
+import SharedModels
 
 // MARK: - ChooseAccounts.Action
 public extension ChooseAccounts {
@@ -26,8 +27,9 @@ public extension ChooseAccounts.Action {
 // MARK: - ChooseAccounts.Action.ViewAction
 public extension ChooseAccounts.Action {
 	enum ViewAction: Sendable, Equatable {
+		case didAppear
 		case continueButtonTapped
-		case backButtonTapped
+		case dismissButtonTapped
 		case createAccountButtonTapped
 	}
 }
@@ -51,7 +53,7 @@ public extension ChooseAccounts.Action.InternalAction {
 // MARK: - ChooseAccounts.Action.DelegateAction
 public extension ChooseAccounts.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case finishedChoosingAccounts(NonEmpty<OrderedSet<OnNetwork.Account>>)
-		case dismissChooseAccounts
+		case finishedChoosingAccounts(NonEmpty<OrderedSet<OnNetwork.Account>>, P2P.OneTimeAccountAddressesRequestToHandle)
+		case dismissChooseAccounts(P2P.OneTimeAccountAddressesRequestToHandle)
 	}
 }

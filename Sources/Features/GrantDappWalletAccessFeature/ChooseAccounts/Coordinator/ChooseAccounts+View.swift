@@ -36,8 +36,8 @@ public extension ChooseAccounts.View {
 
 				VStack {
 					NavigationBar(
-						leadingItem: BackButton {
-							viewStore.send(.backButtonTapped)
+						leadingItem: CloseButton {
+							viewStore.send(.dismissButtonTapped)
 						}
 					)
 					.foregroundColor(.app.gray1)
@@ -80,10 +80,13 @@ public extension ChooseAccounts.View {
 							viewStore.send(.continueButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
-						.enabled(viewStore.canProceed)
+						.controlState(viewStore.canProceed ? .enabled : .disabled)
 						.padding(.medium1)
 					}
 				}
+			}
+			.onAppear {
+				viewStore.send(.didAppear)
 			}
 		}
 	}

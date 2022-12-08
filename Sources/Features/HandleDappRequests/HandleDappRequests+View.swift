@@ -22,10 +22,10 @@ public extension HandleDappRequests.View {
 		Group {
 			IfLetStore(
 				store.scope(
-					state: \.grantDappWalletAccess,
-					action: { .child(.grantDappWalletAccess($0)) }
+					state: \.chooseAccounts,
+					action: { .child(.chooseAccounts($0)) }
 				),
-				then: DappConnectionRequest.View.init(store:)
+				then: ChooseAccounts.View.init(store:)
 			)
 
 			IfLetStore(
