@@ -33,34 +33,35 @@ public extension TransactionSigning.View {
 						}
 					)
 					ForceFullScreen {
-						ZStack {
-							VStack(spacing: 20) {
-								if let manifest = viewStore.manifest {
-									ScrollView([.vertical], showsIndicators: false) {
-										Text(manifest)
-											.padding()
-											.font(.system(size: 13, design: .monospaced))
-											.frame(maxHeight: .infinity, alignment: .topLeading)
-									}
-									.background(Color(white: 0.9))
-
-									Button(L10n.TransactionSigning.signTransactionButtonTitle) {
-										viewStore.send(.signTransactionButtonTapped)
-									}
-									.buttonStyle(.primaryRectangular)
-									.enabled(viewStore.isSignButtonEnabled)
-								} else {
-									LoadingOverlayView(L10n.TransactionSigning.preparingTransactionLoadingText)
+						VStack(spacing: 20) {
+							if let manifest = viewStore.manifest {
+								ScrollView([.vertical], showsIndicators: false) {
+									Text(manifest)
+										.padding()
+										.font(.system(size: 13, design: .monospaced))
+										.frame(maxHeight: .infinity, alignment: .topLeading)
 								}
-							}
-							.padding([.horizontal, .bottom])
+								.background(Color(white: 0.9))
 
-							if viewStore.isShowingLoader {
-								LoadingOverlayView(L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText)
+								Button(L10n.TransactionSigning.signTransactionButtonTitle) {
+									viewStore.send(.signTransactionButtonTapped)
+								}
+								.buttonStyle(.primaryRectangular)
+								.enabled(viewStore.isSignButtonEnabled)
 							}
 						}
+						.padding([.horizontal, .bottom])
 					}
 					Spacer()
+				}
+				.controlState {
+					if viewStore.manifest == nil {
+						return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
+					} else if viewStore.isShowingLoader {
+						return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
+					} else {
+						return .enabled
+					}
 				}
 				.onAppear {
 					viewStore.send(.didAppear)
