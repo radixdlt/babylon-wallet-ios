@@ -1,5 +1,6 @@
 import Common
 import ComposableArchitecture
+import CreateAccountFeature
 import DesignSystem
 import SharedModels
 import SwiftUI
@@ -24,6 +25,15 @@ public extension ChooseAccounts.View {
 			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
+				IfLetStore(
+					store.scope(
+						state: \.createAccount,
+						action: { .child(.createAccount($0)) }
+					),
+					then: CreateAccount.View.init(store:)
+				)
+				.zIndex(1)
+
 				VStack {
 					NavigationBar(
 						leadingItem: BackButton {
@@ -35,15 +45,11 @@ public extension ChooseAccounts.View {
 
 					ScrollView {
 						VStack {
-							Image(asset: AssetResource.dappPlaceholder)
-
-							Spacer(minLength: .large1)
-
 							VStack(spacing: .medium2) {
 								let explanation = String(describing: viewStore.oneTimeAccountAddressesRequest.numberOfAddresses)
 								Text(L10n.DApp.ChooseAccounts.explanation(explanation))
 									.foregroundColor(.app.gray1)
-									.textStyle(.secondaryHeader)
+									.textStyle(.sheetTitle)
 
 								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.requestFromDapp.metadata.dAppId))
 									.foregroundColor(.app.gray1)
@@ -61,20 +67,22 @@ public extension ChooseAccounts.View {
 							)
 
 							Button(L10n.DApp.ChooseAccounts.createNewAccount) {
-								// TODO: implement
+								viewStore.send(.createAccountButtonTapped)
 							}
 							.buttonStyle(.primaryText())
 							.padding(.medium1)
 						}
 						.padding(.horizontal, .medium1)
-					}
 
-					Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
-						viewStore.send(.continueButtonTapped)
+						Spacer(minLength: .large1 * 2)
+
+						Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
+							viewStore.send(.continueButtonTapped)
+						}
+						.buttonStyle(.primaryRectangular)
+						.enabled(viewStore.canProceed)
+						.padding(.medium1)
 					}
-					.buttonStyle(.primaryRectangular)
-					.enabled(viewStore.canProceed)
-					.padding(.medium1)
 				}
 			}
 		}
