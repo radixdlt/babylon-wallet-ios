@@ -25,13 +25,13 @@ public extension ChooseAccounts.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack {
-                                        NavigationBar(
-                                                leadingItem: CloseButton {
-                                                        viewStore.send(.dismissButtonTapped)
-                                                }
-                                        )
-                                        .foregroundColor(.app.gray1)
-                                        .padding([.horizontal, .top], .medium3)
+					NavigationBar(
+						leadingItem: CloseButton {
+							viewStore.send(.dismissButtonTapped)
+						}
+					)
+					.foregroundColor(.app.gray1)
+					.padding([.horizontal, .top], .medium3)
 
 					ScrollView {
 						VStack {
@@ -73,13 +73,13 @@ public extension ChooseAccounts.View {
 						viewStore.send(.continueButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
-                                        .controlState(viewStore.canProceed ? .enabled : .disabled)
+					.controlState(viewStore.canProceed ? .enabled : .disabled)
 					.padding(.medium1)
 				}
 			}
-                        .onAppear {
-                            viewStore.send(.didAppear)
-                        }
+			.onAppear {
+				viewStore.send(.didAppear)
+			}
 		}
 	}
 }

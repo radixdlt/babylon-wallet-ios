@@ -61,6 +61,6 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		await store.send(.view(.continueButtonTapped))
 
 		// then
-                await store.receive(.delegate(.allowed(requestItem)))
+		await store.receive(.delegate(.allowed(requestItem)))
 	}
 }

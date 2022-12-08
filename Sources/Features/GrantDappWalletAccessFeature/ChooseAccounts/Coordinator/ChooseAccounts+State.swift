@@ -13,7 +13,7 @@ public extension ChooseAccounts {
 		public init(
 			request: P2P.OneTimeAccountAddressesRequestToHandle,
 			canProceed: Bool = false,
-                        accounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = []
+			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = []
 		) {
 			self.request = request
 
@@ -24,13 +24,13 @@ public extension ChooseAccounts {
 }
 
 public extension ChooseAccounts.State {
-        init(
-                request: P2P.RequestFromClient
-        ) throws {
-                try self.init(
-                        request: .init(request: request)
-                )
-        }
+	init(
+		request: P2P.RequestFromClient
+	) throws {
+		try self.init(
+			request: .init(request: request)
+		)
+	}
 }
 
 // MARK: - Computed Properties

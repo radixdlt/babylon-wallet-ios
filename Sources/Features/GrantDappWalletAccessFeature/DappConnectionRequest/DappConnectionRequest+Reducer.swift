@@ -18,12 +18,12 @@ public struct DappConnectionRequest: Sendable, ReducerProtocol {
 			}
 
 		case .internal(.view(.continueButtonTapped)):
-                        return .run { [allowedRequest = state.request] send in
-                                await send(.delegate(.allowed(allowedRequest)))
-                        }
+			return .run { [allowedRequest = state.request] send in
+				await send(.delegate(.allowed(allowedRequest)))
+			}
 
 		case .child, .delegate:
 			return .none
-                }
+		}
 	}
 }

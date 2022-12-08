@@ -67,14 +67,14 @@ public extension HandleDappRequests.State {
 		public init(requestItemToHandle: P2P.RequestItemToHandle) {
 			switch requestItemToHandle.requestItem {
 			case let .oneTimeAccounts(item):
-                                self = .chooseAccounts(
-                                        .init(request:
-                                                        .init(
-                                                                requestItem: item,
-                                                                parentRequest: requestItemToHandle.parentRequest
-                                                        )
-                                        )
-                                )
+				self = .chooseAccounts(
+					.init(request:
+						.init(
+							requestItem: item,
+							parentRequest: requestItemToHandle.parentRequest
+						)
+					)
+				)
 			case let .sendTransaction(item):
 				self = .transactionSigning(
 					.init(

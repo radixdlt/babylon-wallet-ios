@@ -10,10 +10,10 @@ import TestUtils
 final class ChooseAccountsTests: TestCase {
 	func test_continueFromChooseAccounts_whenTappedOnContinue_thenFinishAccountSelection() async {
 		// given
-                let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
-                        requestItem: .init(numberOfAddresses: 1),
-                        parentRequest: .placeholder
-                )
+		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
+			requestItem: .init(numberOfAddresses: 1),
+			parentRequest: .placeholder
+		)
 		var singleAccount = ChooseAccounts.Row.State.placeholderOne
 		singleAccount.isSelected = true
 		let store = TestStore(
@@ -36,10 +36,10 @@ final class ChooseAccountsTests: TestCase {
 
 	func test_dismissChooseAccounts_whenTappedOnDismiss_thenCoordinateDismissal() async {
 		// given
-                let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
-                        requestItem: .init(numberOfAddresses: 1),
-                        parentRequest: .placeholder
-                )
+		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
+			requestItem: .init(numberOfAddresses: 1),
+			parentRequest: .placeholder
+		)
 		let store = TestStore(
 			initialState: ChooseAccounts.State(request: requestItem),
 			reducer: ChooseAccounts()
@@ -49,7 +49,7 @@ final class ChooseAccountsTests: TestCase {
 		await store.send(.view(.dismissButtonTapped))
 
 		// then
-                await store.receive(.delegate(.dismissChooseAccounts(requestItem)))
+		await store.receive(.delegate(.dismissChooseAccounts(requestItem)))
 	}
 
 	func test_didSelectAccount_whenTappedOnSelectedAccount_thenDeselectThatAccount() async {

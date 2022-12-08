@@ -30,8 +30,8 @@ final class HandleDappRequestsTests: TestCase {
 		}
 
 		await store.receive(.internal(.system(.presentViewForP2PRequest(.init(requestItem: request.requestFromDapp.items.first!, parentRequest: request))))) {
-                        try $0.currentRequest = .chooseAccounts(
-                                .init(request: request)
+			try $0.currentRequest = .chooseAccounts(
+				.init(request: request)
 			)
 		}
 	}
