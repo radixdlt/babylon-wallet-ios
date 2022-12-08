@@ -5,7 +5,13 @@ import Version
 
 // MARK: - ProfileLoader
 public struct ProfileLoader: Sendable, DependencyKey {
-	public var loadProfile: @Sendable () async -> ProfileResult
+	public typealias LoadProfile = @Sendable () async -> ProfileResult
+
+	public var loadProfile: LoadProfile
+
+	public init(loadProfile: @escaping LoadProfile) {
+		self.loadProfile = loadProfile
+	}
 }
 
 // MARK: ProfileLoader.ProfileResult
