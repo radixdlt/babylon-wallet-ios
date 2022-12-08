@@ -29,7 +29,7 @@ public extension ProfileClient {
 			do {
 				return try await getAppPreferences().networkAndGateway
 			} catch {
-				return AppPreferences.NetworkAndGateway.hammunet
+				return AppPreferences.NetworkAndGateway.nebunet
 			}
 		}
 

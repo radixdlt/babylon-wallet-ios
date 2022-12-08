@@ -22,6 +22,12 @@ public extension Network {
 }
 
 public extension Network.KnownAddresses {
+	static let nebunet = Self(
+		faucet: "component_tdx_b_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7qdxyth4",
+		createAccountComponent: "package_tdx_b_1qy4hrp8a9apxldp5cazvxgwdj80cxad4u8cpkaqqnhlssf7lg2",
+		xrd: "resource_tdx_b_1qzxcrac59cy2v9lpcpmf82qel3cjj25v3k5m09rxurgqujd9fe"
+	)
+
 	static let gilganet = Self(
 		faucet: "component_tdx_20_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7qlnye7x",
 		createAccountComponent: "package_tdx_20_1qy4hrp8a9apxldp5cazvxgwdj80cxad4u8cpkaqqnhlskx38d7",
@@ -46,8 +52,8 @@ public extension Network.KnownAddresses {
 	)
 }
 
-// FIXME: - betanet: add betanet knownAddress here for faucet and XRD
 private let knownAddressByNetworkID: [NetworkID: Network.KnownAddresses] = [
+	.nebunet: .nebunet,
 	.gilganet: .gilganet,
 	.enkinet: .enkinet,
 	.hammunet: .hammunet,

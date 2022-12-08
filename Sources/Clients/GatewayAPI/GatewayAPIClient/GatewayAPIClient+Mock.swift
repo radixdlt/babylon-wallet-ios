@@ -36,7 +36,7 @@ extension GatewayAPIClient: TestDependencyKey {
 					round: 0
 				)
 			) },
-			getNetworkName: { _ in .init("Hammunet") },
+			getNetworkName: { _ in .init("Nebunet") },
 			getEpoch: { .init(rawValue: 123) },
 			accountResourcesByAddress: { _ in
 				fatalError()

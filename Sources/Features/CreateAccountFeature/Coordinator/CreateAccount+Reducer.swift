@@ -116,7 +116,7 @@ public extension CreateAccount {
 					TaskResult {
 						let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
 
-						let networkAndGateway = AppPreferences.NetworkAndGateway.hammunet
+						let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
 
 						let newProfileRequest = CreateNewProfileRequest(
 							networkAndGateway: networkAndGateway,
