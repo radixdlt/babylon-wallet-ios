@@ -49,9 +49,8 @@ public struct Main: Sendable, ReducerProtocol {
 			return .none
 
 		case .child(.handleDappRequest(.child(.chooseAccounts(.child(.createAccount(.delegate(.createdNewAccount))))))):
-			print("🟡🟡🟡 root")
 			return .run { send in
-				await send(.child(.home(.internal(.system(.temp)))))
+				await send(.child(.home(.delegate(.reloadAccounts))))
 			}
 
 		case .child, .delegate:
