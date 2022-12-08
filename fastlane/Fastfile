@@ -25,8 +25,6 @@ platform :ios do
     lane :beta_deploy do
         install_distribution_certificate
         
-        # version = bump_version
-        
         build_number = bump_build_number
         commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
         build_app
@@ -37,6 +35,7 @@ platform :ios do
         upload_to_testflight(
             api_key: api_key
         )
+        push_to_git_remote
     end
 
     desc "Installs certificates on the machine"
@@ -109,17 +108,6 @@ private_lane :get_version do
         xcodeproj: ENV['PROJ_PATH'],
         scheme: ENV['SCHEME']
     )
-end
-
-desc "Bumps up the patch version"
-private_lane :bump_version do
-    increment_version_number_in_xcodeproj(
-        bump_type: 'patch',
-        xcodeproj: ENV['PROJ_PATH'],
-        scheme: ENV['SCHEME']
-    )
-
-    get_version
 end
 
 private_lane :register_new_device do |options|

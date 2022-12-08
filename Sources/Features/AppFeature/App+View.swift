@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DesignSystem
 import MainFeature
 import OnboardingFeature
 import SplashFeature
@@ -48,6 +49,7 @@ public extension App.View {
 		.task { @MainActor in
 			await ViewStore(store.stateless).send(.view(.task)).finish()
 		}
+		.overlayLoadingView()
 	}
 }
 

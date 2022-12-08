@@ -31,34 +31,31 @@ public extension ConnectUsingSecrets.View {
 			send: { .view($0) }
 		) { viewStore in
 			VStack(alignment: .leading) {
-				if viewStore.isConnecting {
-					LoadingOverlayView(L10n.NewConnection.connecting)
-				} else if viewStore.isPromptingForName {
-					Group {
-						Text(L10n.NewConnection.nameConnectionInstruction)
-							.textStyle(.body1HighImportance)
+				if viewStore.isPromptingForName {
+					Text(L10n.NewConnection.nameConnectionInstruction)
+						.textStyle(.body1HighImportance)
 
-						TextField(
-							L10n.NewConnection.nameConnectionTextFieldHint,
-							text: viewStore.binding(
-								get: \.nameOfConnection,
-								send: { .nameOfConnectionChanged($0) }
-							)
+					TextField(
+						L10n.NewConnection.nameConnectionTextFieldHint,
+						text: viewStore.binding(
+							get: \.nameOfConnection,
+							send: { .nameOfConnectionChanged($0) }
 						)
-						.focused($focusedField, equals: .connectionName)
-						.synchronize(viewStore.binding(
-							get: \.focusedField,
-							send: { .textFieldFocused($0) }
-						), $focusedField)
-						.textFieldStyle(.roundedBorder)
+					)
+					.focused($focusedField, equals: .connectionName)
+					.synchronize(viewStore.binding(
+						get: \.focusedField,
+						send: { .textFieldFocused($0) }
+					), $focusedField)
+					.textFieldStyle(.roundedBorder)
 
-						Button(L10n.NewConnection.saveNamedConnectionButton) {
-							viewStore.send(.confirmNameButtonTapped)
-						}
-						.buttonStyle(.primaryRectangular)
+					Button(L10n.NewConnection.saveNamedConnectionButton) {
+						viewStore.send(.confirmNameButtonTapped)
 					}
+					.buttonStyle(.primaryRectangular)
 				}
 			}
+			.isLoading(viewStore.isConnecting, context: .global(text: L10n.NewConnection.connecting))
 			.padding()
 			.onAppear {
 				viewStore.send(.appeared)
