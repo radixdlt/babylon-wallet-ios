@@ -65,8 +65,6 @@ public extension Home.Action {
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)
 		case accountPortfolioResult(TaskResult<AccountPortfolioDictionary>)
-
-		case temp
 	}
 }
 
