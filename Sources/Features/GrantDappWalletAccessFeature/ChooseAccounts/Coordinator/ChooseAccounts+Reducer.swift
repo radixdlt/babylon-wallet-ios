@@ -28,8 +28,12 @@ public struct ChooseAccounts: ReducerProtocol {
 				}
 
 			case .internal(.view(.createAccountButtonTapped)):
-				state.createAccount = .init(shouldCreateProfile: false)
-				return .none
+				return .run { send in
+					let accounts = try await profileClient.getAccounts()
+					await send(.internal(.system(.createAccount(numberOfExistingAccounts: accounts.count))))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
+				}
 
 			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child
 			// and every other action should fall-through - @davdroman-rdx
@@ -83,6 +87,13 @@ public struct ChooseAccounts: ReducerProtocol {
 				state.accounts = .init(uniqueElements: accounts.map {
 					ChooseAccounts.Row.State(account: $0)
 				})
+				return .none
+
+			case let .internal(.system(.createAccount(numberOfExistingAccounts: numberOfExistingAccounts))):
+				state.createAccount = .init(
+					shouldCreateProfile: false,
+					numberOfExistingAccounts: numberOfExistingAccounts
+				)
 				return .none
 
 			case let .internal(.system(.loadAccountsResult(.failure(error)))):
