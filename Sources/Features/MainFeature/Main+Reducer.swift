@@ -48,6 +48,12 @@ public struct Main: Sendable, ReducerProtocol {
 			state.settings = nil
 			return .none
 
+		case .child(.handleDappRequest(.child(.grantDappWalletAccess(.child(.chooseAccounts(.child(.createAccount(.delegate(.createdNewAccount(_)))))))))):
+			print("🟡🟡🟡 root")
+			return .run { send in
+				await send(.child(.home(.internal(.system(.temp)))))
+			}
+
 		case .child, .delegate:
 			return .none
 		}

@@ -1,5 +1,6 @@
 import Collections
 import ComposableArchitecture
+import CreateAccountFeature
 import Foundation
 import NonEmpty
 import Profile
@@ -19,6 +20,7 @@ public extension ChooseAccounts {
 public extension ChooseAccounts.Action {
 	enum ChildAction: Sendable, Equatable {
 		case account(id: ChooseAccounts.Row.State.ID, action: ChooseAccounts.Row.Action)
+		case createAccount(CreateAccount.Action)
 	}
 }
 
@@ -28,6 +30,7 @@ public extension ChooseAccounts.Action {
 		case didAppear
 		case continueButtonTapped
 		case dismissButtonTapped
+		case createAccountButtonTapped
 	}
 }
 

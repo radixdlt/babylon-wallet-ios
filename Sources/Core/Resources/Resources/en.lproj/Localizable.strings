@@ -33,9 +33,9 @@
 
 "dApp.chooseAccounts.createNewAccount" = "+ Create a new Account";
 "dApp.chooseAccounts.explanation" = "Choose %@";
-"dApp.chooseAccounts.explanationAtLeastOneAccount" = "at least one account.";
-"dApp.chooseAccounts.explanationExactNumberOfAccounts" = "exactly #%d accounts.";
-"dApp.chooseAccounts.explanationExactlyOneAccount" = "exactly one account.";
+"dApp.chooseAccounts.explanationAtLeastOneAccount" = "at least one account";
+"dApp.chooseAccounts.explanationExactNumberOfAccounts" = "exactly #%d accounts";
+"dApp.chooseAccounts.explanationExactlyOneAccount" = "exactly one account";
 "dApp.chooseAccounts.subtitle" = "Choose the account(s) you wish %@ to know about";
 "dApp.chooseAccounts.title" = "Choose Accounts";
 "dApp.chooseAccounts.unnamedAccount" = "Unnamed account";

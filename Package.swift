@@ -396,6 +396,7 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
+			"CreateAccountFeature",
 			"DesignSystem",
 			"ErrorQueue",
 			"ProfileClient",
