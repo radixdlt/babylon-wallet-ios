@@ -76,7 +76,6 @@ public extension CreateAccount.View {
 					}
 					.padding([.horizontal, .bottom], .medium1)
 				}
-				.alert(store.scope(state: \.alert, action: { .view($0) }), dismiss: .alertDismissButtonTapped)
 				.onAppear {
 					viewStore.send(.viewAppeared)
 				}
