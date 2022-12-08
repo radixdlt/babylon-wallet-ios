@@ -37,9 +37,6 @@ public struct Splash: Sendable, ReducerProtocol {
 				state.alert = .init(
 					title: .init(L10n.Splash.biometricsNotSetUpTitle),
 					message: .init(L10n.Splash.biometricsNotSetUpMessage)
-					//                                        dismissButton: .init(label: {
-					//                                                TextState(L10n.Splash.biometricsNotSetUpMessage)
-					//                                        })
 				)
 				return .none
 			}
