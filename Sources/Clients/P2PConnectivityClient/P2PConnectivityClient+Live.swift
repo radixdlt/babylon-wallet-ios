@@ -122,12 +122,21 @@ public extension P2PConnectivityClient {
 					@Dependency(\.jsonDecoder) var jsonDecoder
 
 					let jsonData = msg.messagePayload
-					let requestFromDapp = try jsonDecoder().decode(P2P.FromDapp.Request.self, from: jsonData)
+					do {
+						let requestFromDapp = try jsonDecoder().decode(P2P.FromDapp.Request.self, from: jsonData)
 
-					return try P2P.RequestFromClient(
-						requestFromDapp: requestFromDapp,
-						client: connection.client
-					)
+						return try P2P.RequestFromClient(
+							requestFromDapp: requestFromDapp,
+							client: connection.client
+						)
+					} catch {
+						throw FailedToDecodeRequestFromDappError(
+							error: error,
+							jsonString: jsonData.prettyPrintedJSONString.map { String($0) } ?? (
+								String(data: jsonData, encoding: .utf8) ?? jsonData.hex
+							)
+						)
+					}
 
 				}.eraseToAnyAsyncSequence()
 			},
@@ -180,3 +189,17 @@ public extension P2PConnectivityClient {
 
 // MARK: - FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp
 struct FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp: Swift.Error {}
+
+// MARK: - FailedToDecodeRequestFromDappError
+public struct FailedToDecodeRequestFromDappError: LocalizedError {
+	public let error: Error
+	public let jsonString: String
+	public init(error: Error, jsonString: String) {
+		self.error = error
+		self.jsonString = jsonString
+	}
+
+	public var errorDescription: String? {
+		"Failed to decode request from Dapp got: \(jsonString)\nerror: \(String(describing: error))"
+	}
+}
