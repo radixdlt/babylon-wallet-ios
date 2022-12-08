@@ -10,7 +10,6 @@ extension GatewayAPIClient: TestDependencyKey {
 	public static let previewValue = Self.mock()
 
 	public static let testValue = Self(
-		getGatewayInfo: unimplemented("\(Self.self).getGatewayInfo"),
 		getNetworkName: unimplemented("\(Self.self).getNetworkName"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
@@ -27,15 +26,6 @@ extension GatewayAPIClient: TestDependencyKey {
 		txStatus: GatewayAPI.TransactionStatus? = nil
 	) -> Self {
 		.init(
-			getGatewayInfo: { .init(
-				ledgerState: .init(
-					network: "Network name",
-					stateVersion: 0,
-					proposerRoundTimestamp: "",
-					epoch: 1337,
-					round: 0
-				)
-			) },
 			getNetworkName: { _ in .init("Nebunet") },
 			getEpoch: { .init(rawValue: 123) },
 			accountResourcesByAddress: { _ in
