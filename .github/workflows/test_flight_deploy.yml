@@ -35,9 +35,6 @@ jobs:
 
       - name: "Deploy"
         run: |
-          if [ "$GROUPS" == "no" ]; then
-            GROUPS=''
-          fi
           git config user.name $GIT_USER
           git config user.email $GIT_USER
           echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
@@ -45,4 +42,3 @@ jobs:
           bundle exec fastlane ios beta_deploy
         env:
           GIT_USER: ${{ secrets.RADIX_BOT_USERNAME }}
-          GROUPS: ${{ github.event.inputs.groups }}
