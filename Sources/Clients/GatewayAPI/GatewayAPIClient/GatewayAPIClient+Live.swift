@@ -88,13 +88,13 @@ public extension GatewayAPIClient {
 		}
 
 		@Sendable
-		func _getGatewayInfo(baseURL: URL, timeoutInterval: TimeInterval?) async throws -> GatewayAPI.GatewayInformationResponse {
+		func _getGatewayInfo(baseURL: URL, timeoutInterval: TimeInterval?) async throws -> GatewayAPI.TransactionConstructionResponse {
 			try await makeRequest(
-				responseType: GatewayAPI.GatewayInformationResponse.self,
+				responseType: GatewayAPI.TransactionConstructionResponse.self,
 				baseURL: baseURL,
 				timeoutInterval: timeoutInterval
 			) {
-				$0.appendingPathComponent("gateway")
+				$0.appendingPathComponent("transaction/construction")
 			}
 		}
 

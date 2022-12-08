@@ -36,6 +36,7 @@ public struct App: Sendable, ReducerProtocol {
 		case .internal(.view(.task)):
 			return .run { send in
 				for try await error in errorQueue.errors() {
+					print(String(describing: error))
 					await send(.internal(.system(.displayErrorAlert(UserFacingError(error)))))
 				}
 			}

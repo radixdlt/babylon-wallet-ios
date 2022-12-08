@@ -21,7 +21,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 }
 
 public extension GatewayAPIClient {
-	typealias GetGatewayInfo = @Sendable () async throws -> GatewayAPI.GatewayInformationResponse
+	typealias GetGatewayInfo = @Sendable () async throws -> GatewayAPI.TransactionConstructionResponse
 	typealias GetEpoch = @Sendable () async throws -> Epoch
 	typealias GetNetworkName = @Sendable (URL) async throws -> Network.Name
 

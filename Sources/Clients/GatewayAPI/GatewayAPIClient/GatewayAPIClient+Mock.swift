@@ -34,13 +34,7 @@ extension GatewayAPIClient: TestDependencyKey {
 					timestamp: "",
 					epoch: 1337,
 					round: 0
-				),
-				knownTarget: .init(stateVersion: 0),
-				releaseInfo: .init(
-					releaseVersion: "release-version",
-					openApiSchemaVersion: "schema-version"
-				),
-				wellKnownAddresses: .init(accountPackage: "", faucet: "", ecdsaSecp256k1: "", eddsaEd25519: "", xrd: "") // TODO:
+				)
 			) },
 			getNetworkName: { _ in .init("Hammunet") },
 			getEpoch: { .init(rawValue: 123) },
