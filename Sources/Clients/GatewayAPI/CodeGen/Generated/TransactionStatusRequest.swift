@@ -16,25 +16,25 @@ public typealias TransactionStatusRequest = GatewayAPI.TransactionStatusRequest
 // MARK: - GatewayAPI.TransactionStatusRequest
 public extension GatewayAPI {
 	struct TransactionStatusRequest: Codable, Hashable {
-		public private(set) var transactionIdentifier: TransactionLookupIdentifier
-		public private(set) var atStateIdentifier: PartialLedgerStateIdentifier?
+		public private(set) var atLedgerState: LedgerStateSelector?
+		public private(set) var intentHashHex: String?
 
-		public init(transactionIdentifier: TransactionLookupIdentifier, atStateIdentifier: PartialLedgerStateIdentifier? = nil) {
-			self.transactionIdentifier = transactionIdentifier
-			self.atStateIdentifier = atStateIdentifier
+		public init(atLedgerState: LedgerStateSelector? = nil, intentHashHex: String? = nil) {
+			self.atLedgerState = atLedgerState
+			self.intentHashHex = intentHashHex
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
-			case transactionIdentifier = "transaction_identifier"
-			case atStateIdentifier = "at_state_identifier"
+			case atLedgerState = "at_ledger_state"
+			case intentHashHex = "intent_hash_hex"
 		}
 
 		// Encodable protocol methods
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(transactionIdentifier, forKey: .transactionIdentifier)
-			try container.encodeIfPresent(atStateIdentifier, forKey: .atStateIdentifier)
+			try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
+			try container.encodeIfPresent(intentHashHex, forKey: .intentHashHex)
 		}
 	}
 }

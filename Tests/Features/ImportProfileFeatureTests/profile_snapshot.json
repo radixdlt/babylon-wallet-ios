@@ -4,32 +4,32 @@
       "fiatCurrencyPriceTarget" : "usd"
     },
     "networkAndGateway" : {
-      "gatewayAPIEndpointURL" : "https://hammunet-gateway.radixdlt.com",
+      "gatewayAPIEndpointURL" : "https://nebunet-gateway.radixdlt.com",
       "network" : {
-        "id" : 34,
-        "name" : "Hammunet"
+        "id" : 11,
+        "name" : "nebunet"
       }
     },
     "p2pClients" : [
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
-        "firstEstablishedOn" : "2022-11-28T14:10:17Z",
-        "lastUsedOn" : "2022-11-28T14:10:17Z"
+        "firstEstablishedOn" : "2022-12-08T11:26:22Z",
+        "lastUsedOn" : "2022-12-08T11:26:22Z"
       }
     ]
   },
   "factorSources" : {
     "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources" : [
       {
-        "creationDate" : "2022-11-28T14:10:17Z",
+        "creationDate" : "2022-12-08T11:26:22Z",
         "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
         "label" : "DeviceFactorSource"
       }
     ],
     "secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources" : [
       {
-        "creationDate" : "2022-11-28T14:10:17Z",
+        "creationDate" : "2022-12-08T11:26:22Z",
         "factorSourceID" : "85d985e6861e3fb4b39c753b09b9be67d43896d53b0d1dfcb2682ae261d32eb2",
         "label" : "OlympiaFactorSource"
       }
@@ -40,10 +40,10 @@
       "accounts" : [
         {
           "address" : {
-            "address" : "account_tdx_22_1q6yhfyz7rk6mhmrk4ssp55xt48pejcwravhyxuzdjh2q05ejck"
+            "address" : "account_tdx_b_1qu53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqt2xqvl"
           },
           "appearanceID" : 0,
-          "derivationPath" : "m/44H/1022H/34H/525H/0H/1238H",
+          "derivationPath" : "m/44H/1022H/11H/525H/0H/1238H",
           "displayName" : "First",
           "index" : 0,
           "securityState" : {
@@ -51,17 +51,17 @@
             "unsecuredEntityControl" : {
               "genesisFactorInstance" : {
                 "derivationPath" : {
-                  "derivationPath" : "m/44H/1022H/34H/525H/0H/1238H",
+                  "derivationPath" : "m/44H/1022H/11H/525H/0H/1238H",
                   "discriminator" : "accountPath"
                 },
-                "factorInstanceID" : "873692e7b1cb8d2efa20633eedbeb9dab389cfb9ed1258b12ff4fd74dde05f02",
+                "factorInstanceID" : "92d321eb65f30a38c8a0cb45e775402d936f539a2fb05395d25a5c2002ca89c4",
                 "factorSourceReference" : {
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2022-11-28T14:10:17Z",
+                "initializationDate" : "2022-12-08T11:26:22Z",
                 "publicKey" : {
-                  "compressedData" : "7496f8cf4033c69ddb81d8c051351b981b9f652861f8996dca94ec97a2debabe",
+                  "compressedData" : "b9c37926187c6ecfee40577e29942ecc1371c5bb6350288aca92033b16ce595c",
                   "curve" : "curve25519"
                 }
               }
@@ -70,10 +70,10 @@
         },
         {
           "address" : {
-            "address" : "account_tdx_22_1q6dqkuwwcn0k3c2ekep7tnltpa0myescyy6lu945w4aq2djh2t"
+            "address" : "account_tdx_b_1qavvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqxgpf32"
           },
           "appearanceID" : 1,
-          "derivationPath" : "m/44H/1022H/34H/525H/1H/1238H",
+          "derivationPath" : "m/44H/1022H/11H/525H/1H/1238H",
           "displayName" : "Second",
           "index" : 1,
           "securityState" : {
@@ -81,17 +81,17 @@
             "unsecuredEntityControl" : {
               "genesisFactorInstance" : {
                 "derivationPath" : {
-                  "derivationPath" : "m/44H/1022H/34H/525H/1H/1238H",
+                  "derivationPath" : "m/44H/1022H/11H/525H/1H/1238H",
                   "discriminator" : "accountPath"
                 },
-                "factorInstanceID" : "825f3656e3f8b41d43d19925861bca2743e8a2389dc96bc3a0cdaca2ad584f0c",
+                "factorInstanceID" : "90338e0f7afb84b7181d2c63bb0446c895d9924f0b0561237b835fa80e5db6ef",
                 "factorSourceReference" : {
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2022-11-28T14:10:17Z",
+                "initializationDate" : "2022-12-08T11:26:22Z",
                 "publicKey" : {
-                  "compressedData" : "7607ee384e380bc0869ea56f12cd4f5cf9fbb0fd471df77d01639ab150f44796",
+                  "compressedData" : "7c906945cf3d4b4ab27ebf11b6f98e07c506323809f9b501275914f72739ed86",
                   "curve" : "curve25519"
                 }
               }
@@ -100,10 +100,10 @@
         },
         {
           "address" : {
-            "address" : "account_tdx_22_1qe4cww59l9hgrx6576esvrad28fteuxfl79xkksmcl0qk8tnxs"
+            "address" : "account_tdx_b_1ql2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54ts25dgyv"
           },
           "appearanceID" : 2,
-          "derivationPath" : "m/44H/1022H/34H/525H/2H/1238H",
+          "derivationPath" : "m/44H/1022H/11H/525H/2H/1238H",
           "displayName" : "Third",
           "index" : 2,
           "securityState" : {
@@ -111,17 +111,17 @@
             "unsecuredEntityControl" : {
               "genesisFactorInstance" : {
                 "derivationPath" : {
-                  "derivationPath" : "m/44H/1022H/34H/525H/2H/1238H",
+                  "derivationPath" : "m/44H/1022H/11H/525H/2H/1238H",
                   "discriminator" : "accountPath"
                 },
-                "factorInstanceID" : "53d9ca4e0d412c30d0a54ab92a36db95bb6f4479796479224d155309b453db4f",
+                "factorInstanceID" : "5e80ae87441a8cf6d796a88c634b2bf801305448878db9b068365713c53a6626",
                 "factorSourceReference" : {
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2022-11-28T14:10:17Z",
+                "initializationDate" : "2022-12-08T11:26:22Z",
                 "publicKey" : {
-                  "compressedData" : "0b8cf0e239a2bdc04f62bd89b6e31e4c8df98ed5448b078270cffca4f4db9a1d",
+                  "compressedData" : "3f9d3dbae544a46d58703baab5db8d0643879733f7b6e01b39bf96c16ea827d6",
                   "curve" : "curve25519"
                 }
               }
@@ -132,22 +132,22 @@
       "connectedDapps" : [
 
       ],
-      "networkID" : 34,
+      "networkID" : 11,
       "personas" : [
         {
           "address" : {
-            "address" : "account_tdx_22_1qe803nvt5fqp89wg7lrayga3r727s5fsgxcdanrqmjvsh69fxt"
+            "address" : "account_tdx_b_1q7vt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpskvpcn0"
           },
-          "derivationPath" : "m/44H/1022H/34H/618H/0H/1238H",
+          "derivationPath" : "m/44H/1022H/11H/618H/0H/1238H",
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "4BBAC523-C1AB-4C11-8505-DEA5DDB72444",
+              "id" : "AAAF0B45-B45A-442C-9973-9657C3BE3537",
               "kind" : "firstName",
               "value" : "Jane"
             },
             {
-              "id" : "5E9E43CE-4170-42F6-858B-4B0DE8FFEC37",
+              "id" : "9632CEAA-C437-4944-B05E-FBE0E07BC00A",
               "kind" : "lastName",
               "value" : "Incognitoson"
             }
@@ -158,17 +158,17 @@
             "unsecuredEntityControl" : {
               "genesisFactorInstance" : {
                 "derivationPath" : {
-                  "derivationPath" : "m/44H/1022H/34H/618H/0H/1238H",
+                  "derivationPath" : "m/44H/1022H/11H/618H/0H/1238H",
                   "discriminator" : "identityPath"
                 },
-                "factorInstanceID" : "98c2226ad06da150c912aca9505d20dd634da5efb3c74cc78670f304799a5608",
+                "factorInstanceID" : "faede376ebdc65438e5ec07654a740f07b75c2b503c9769629fc87888916e704",
                 "factorSourceReference" : {
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2022-11-28T14:10:17Z",
+                "initializationDate" : "2022-12-08T11:26:22Z",
                 "publicKey" : {
-                  "compressedData" : "d5e609e06bd842aeacaf7e5e9a3872dade8932e354702e84ce689c6e07ede04b",
+                  "compressedData" : "f361cef2453721ed1b67e4c9266697325766513413de39d19746371466f9f63b",
                   "curve" : "curve25519"
                 }
               }
@@ -177,18 +177,18 @@
         },
         {
           "address" : {
-            "address" : "account_tdx_22_1qmqsyd546xn0fzzyl3czlkjgpvm779ftfa4r0mxqly4s7t8hs2"
+            "address" : "account_tdx_b_1qlvtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkschfnr8"
           },
-          "derivationPath" : "m/44H/1022H/34H/618H/1H/1238H",
+          "derivationPath" : "m/44H/1022H/11H/618H/1H/1238H",
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "28FDC437-D11D-4E27-96BC-E3A719EAF83E",
+              "id" : "7B016B92-1DF3-47F3-9671-DCEFDBD8B56F",
               "kind" : "firstName",
               "value" : "Maria"
             },
             {
-              "id" : "BBCBE457-AEE9-4298-9FE9-F55960946F18",
+              "id" : "544B2916-35F1-4C92-8C99-DB1C9292ECD8",
               "kind" : "lastName",
               "value" : "Publicson"
             }
@@ -199,17 +199,17 @@
             "unsecuredEntityControl" : {
               "genesisFactorInstance" : {
                 "derivationPath" : {
-                  "derivationPath" : "m/44H/1022H/34H/618H/1H/1238H",
+                  "derivationPath" : "m/44H/1022H/11H/618H/1H/1238H",
                   "discriminator" : "identityPath"
                 },
-                "factorInstanceID" : "ffb256f691902bc5ae694423b93001dbe31da401d7740710461c9416afc4cd9e",
+                "factorInstanceID" : "0fd393fcfa09a5d6552b3f5b79ad1427d2d991e6602cd2cbef6828185c5a4cf0",
                 "factorSourceReference" : {
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2022-11-28T14:10:17Z",
+                "initializationDate" : "2022-12-08T11:26:22Z",
                 "publicKey" : {
-                  "compressedData" : "1ff79982fe2e38aeb6de5953cefdbe00c90788d17cdb828646862060bbc90416",
+                  "compressedData" : "772ba0ebe12a1637458fefef15299bc57f8e9e21fcf106181d3d780ad1e2bf51",
                   "curve" : "curve25519"
                 }
               }

@@ -4,12 +4,12 @@ import EngineToolkit
 public struct MakeTransactionHeaderInput: Sendable, Hashable {
 	public var epochWindow: Epoch
 	public var costUnitLimit: UInt32
-	public var tipPercentage: UInt32
+	public var tipPercentage: UInt8
 
 	public init(
 		epochWindow: Epoch = 10,
 		costUnitLimit: UInt32 = 10_000_000,
-		tipPercentage: UInt32 = 0
+		tipPercentage: UInt8 = 0
 	) {
 		self.epochWindow = epochWindow
 		self.costUnitLimit = costUnitLimit

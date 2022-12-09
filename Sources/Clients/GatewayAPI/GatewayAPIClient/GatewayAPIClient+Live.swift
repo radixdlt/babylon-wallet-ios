@@ -88,17 +88,6 @@ public extension GatewayAPIClient {
 		}
 
 		@Sendable
-		func _getGatewayInfo(baseURL: URL, timeoutInterval: TimeInterval?) async throws -> GatewayAPI.GatewayInfoResponse {
-			try await makeRequest(
-				responseType: GatewayAPI.GatewayInfoResponse.self,
-				baseURL: baseURL,
-				timeoutInterval: timeoutInterval
-			) {
-				$0.appendingPathComponent("gateway")
-			}
-		}
-
-		@Sendable
 		func makeRequest<Response>(
 			httpBodyData httpBody: Data?,
 			method: String = "POST",
@@ -149,18 +138,26 @@ public extension GatewayAPIClient {
 			return try await makeRequest(httpBodyData: httpBody, urlFromBase: urlFromBase)
 		}
 
-		let getGatewayInfo: GetGatewayInfo = {
-			try await _getGatewayInfo(baseURL: getCurrentBaseURL(), timeoutInterval: nil)
-		}
-
 		return Self(
-			getGatewayInfo: getGatewayInfo,
 			getNetworkName: { baseURL in
-				let gatewayInfo = try await _getGatewayInfo(baseURL: baseURL, timeoutInterval: 2)
-				return Network.Name(rawValue: gatewayInfo.ledgerState.network)
+				let response = try await makeRequest(
+					responseType: GatewayAPI.GatewayInformationResponse.self,
+					baseURL: baseURL,
+					timeoutInterval: nil
+				) {
+					$0.appendingPathComponent("gateway/information")
+				}
+				return Network.Name(response.ledgerState.network)
 			},
 			getEpoch: {
-				try await Epoch(rawValue: .init(getGatewayInfo().ledgerState.epoch))
+				let response = try await makeRequest(
+					responseType: GatewayAPI.TransactionConstructionResponse.self,
+					baseURL: getCurrentBaseURL(),
+					timeoutInterval: nil
+				) {
+					$0.appendingPathComponent("transaction/construction")
+				}
+				return Epoch(rawValue: .init(response.ledgerState.epoch))
 			},
 			accountResourcesByAddress: { @Sendable accountAddress in
 				try await post(
@@ -177,11 +174,6 @@ public extension GatewayAPIClient {
 					request: GatewayAPI.EntityDetailsRequest(address: resourceAddress)
 				) { $0.appendingPathComponent("entity/details") }
 			},
-			recentTransactions: { recentTransactionsRequest in
-				try await post(
-					request: recentTransactionsRequest
-				) { $0.appendingPathComponent("transaction/recent") }
-			},
 			submitTransaction: { transactionSubmitRequest in
 				try await post(
 					request: transactionSubmitRequest
@@ -191,11 +183,6 @@ public extension GatewayAPIClient {
 				try await post(
 					request: transactionStatusRequest
 				) { $0.appendingPathComponent("transaction/status") }
-			},
-			transactionDetails: { transactionDetailsRequest in
-				try await post(
-					request: transactionDetailsRequest
-				) { $0.appendingPathComponent("transaction/details") }
 			}
 		)
 	}

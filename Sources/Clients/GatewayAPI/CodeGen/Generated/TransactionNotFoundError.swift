@@ -18,9 +18,9 @@ public extension GatewayAPI {
 	struct TransactionNotFoundError: Codable, Hashable {
 		/** The type of error. Each subtype may have its own additional structured fields. */
 		public private(set) var type: String
-		public private(set) var transactionNotFound: TransactionLookupIdentifier
+		public private(set) var transactionNotFound: TransactionCommittedDetailsRequestIdentifier
 
-		public init(type: String, transactionNotFound: TransactionLookupIdentifier) {
+		public init(type: String, transactionNotFound: TransactionCommittedDetailsRequestIdentifier) {
 			self.type = type
 			self.transactionNotFound = transactionNotFound
 		}

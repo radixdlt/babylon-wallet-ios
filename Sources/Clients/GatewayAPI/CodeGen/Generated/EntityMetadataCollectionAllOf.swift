@@ -16,7 +16,6 @@ public typealias EntityMetadataCollectionAllOf = GatewayAPI.EntityMetadataCollec
 // MARK: - GatewayAPI.EntityMetadataCollectionAllOf
 public extension GatewayAPI {
 	struct EntityMetadataCollectionAllOf: Codable, Hashable {
-		/** TBD */
 		public private(set) var items: [EntityMetadataItem]
 
 		public init(items: [EntityMetadataItem]) {

@@ -8,7 +8,7 @@ import TestUtils
 
 @MainActor
 final class AppFeatureTests: TestCase {
-	let networkID = NetworkID.hammunet
+	let networkID = NetworkID.nebunet
 
 	func test_initialAppState_whenAppLaunches_thenInitialAppStateIsSplash() {
 		let appState = App.State()
@@ -35,7 +35,7 @@ final class AppFeatureTests: TestCase {
 			initialState: App.State(root: .onboarding(.init(root: .createAccount(.init(shouldCreateProfile: true))))),
 			reducer: App()
 		)
-		let newProfile = try await Profile.new(networkAndGateway: .hammunet, mnemonic: .generate())
+		let newProfile = try await Profile.new(networkAndGateway: .nebunet, mnemonic: .generate())
 		let expectation = expectation(description: "Profile injected")
 		store.dependencies.profileClient.injectProfile = { injected in
 			XCTAssertEqual(injected, newProfile)
@@ -56,7 +56,7 @@ final class AppFeatureTests: TestCase {
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		// GIVEN: an existing profile
 		let existingProfile = try await Profile.new(
-			networkAndGateway: .hammunet,
+			networkAndGateway: .nebunet,
 			mnemonic: .generate()
 		)
 

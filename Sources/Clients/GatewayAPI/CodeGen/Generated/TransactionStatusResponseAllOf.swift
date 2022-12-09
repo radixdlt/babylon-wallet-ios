@@ -16,21 +16,29 @@ public typealias TransactionStatusResponseAllOf = GatewayAPI.TransactionStatusRe
 // MARK: - GatewayAPI.TransactionStatusResponseAllOf
 public extension GatewayAPI {
 	struct TransactionStatusResponseAllOf: Codable, Hashable {
-		public private(set) var transaction: TransactionInfo
+		public private(set) var status: TransactionStatus
+		public private(set) var knownPayloads: [TransactionStatusResponseKnownPayloadItem]
+		public private(set) var errorMessage: String?
 
-		public init(transaction: TransactionInfo) {
-			self.transaction = transaction
+		public init(status: TransactionStatus, knownPayloads: [TransactionStatusResponseKnownPayloadItem], errorMessage: String? = nil) {
+			self.status = status
+			self.knownPayloads = knownPayloads
+			self.errorMessage = errorMessage
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
-			case transaction
+			case status
+			case knownPayloads = "known_payloads"
+			case errorMessage = "error_message"
 		}
 
 		// Encodable protocol methods
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(transaction, forKey: .transaction)
+			try container.encode(status, forKey: .status)
+			try container.encode(knownPayloads, forKey: .knownPayloads)
+			try container.encodeIfPresent(errorMessage, forKey: .errorMessage)
 		}
 	}
 }

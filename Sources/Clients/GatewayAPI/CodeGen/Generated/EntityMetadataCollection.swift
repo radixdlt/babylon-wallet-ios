@@ -16,16 +16,12 @@ public typealias EntityMetadataCollection = GatewayAPI.EntityMetadataCollection
 // MARK: - GatewayAPI.EntityMetadataCollection
 public extension GatewayAPI {
 	struct EntityMetadataCollection: Codable, Hashable {
-		/** TBD (make it nullable when we're dealing with unknown result set sizes?) */
-		public private(set) var totalCount: Int?
-		/** TBD (maybe we should use HATEOAS-like permalinks?) */
+		public private(set) var totalCount: Int64?
 		public private(set) var previousCursor: String?
-		/** TBD (maybe we should use HATEOAS-like permalinks?) */
 		public private(set) var nextCursor: String?
-		/** TBD */
 		public private(set) var items: [EntityMetadataItem]
 
-		public init(totalCount: Int? = nil, previousCursor: String? = nil, nextCursor: String? = nil, items: [EntityMetadataItem]) {
+		public init(totalCount: Int64? = nil, previousCursor: String? = nil, nextCursor: String? = nil, items: [EntityMetadataItem]) {
 			self.totalCount = totalCount
 			self.previousCursor = previousCursor
 			self.nextCursor = nextCursor

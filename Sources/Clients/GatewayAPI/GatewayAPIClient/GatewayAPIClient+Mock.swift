@@ -10,16 +10,13 @@ extension GatewayAPIClient: TestDependencyKey {
 	public static let previewValue = Self.mock()
 
 	public static let testValue = Self(
-		getGatewayInfo: unimplemented("\(Self.self).getGatewayInfo"),
 		getNetworkName: unimplemented("\(Self.self).getNetworkName"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
 		resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
 		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
-		recentTransactions: unimplemented("\(Self.self).recentTransactions"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
-		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
-		transactionDetails: unimplemented("\(Self.self).transactionDetails")
+		transactionStatus: unimplemented("\(Self.self).transactionStatus")
 	)
 
 	private static func mock(
@@ -29,21 +26,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		txStatus: GatewayAPI.TransactionStatus? = nil
 	) -> Self {
 		.init(
-			getGatewayInfo: { .init(
-				ledgerState: .init(
-					network: "Network name",
-					stateVersion: 0,
-					timestamp: "",
-					epoch: 1337,
-					round: 0
-				),
-				knownTarget: .init(stateVersion: 0),
-				releaseInfo: .init(
-					releaseVersion: "release-version",
-					openApiSchemaVersion: "schema-version"
-				)
-			) },
-			getNetworkName: { _ in .init("Hammunet") },
+			getNetworkName: { _ in .init("Nebunet") },
 			getEpoch: { .init(rawValue: 123) },
 			accountResourcesByAddress: { _ in
 				fatalError()
@@ -54,18 +37,6 @@ extension GatewayAPIClient: TestDependencyKey {
 			resourceDetailsByResourceIdentifier: { _ in
 				fatalError()
 			},
-			recentTransactions: { _ in
-				.init(
-					ledgerState: .init(
-						network: "Network name",
-						stateVersion: 0,
-						timestamp: "",
-						epoch: 1337,
-						round: 0
-					),
-					items: []
-				)
-			},
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},
@@ -74,35 +45,13 @@ extension GatewayAPIClient: TestDependencyKey {
 					ledgerState: .init(
 						network: "Network name",
 						stateVersion: 0,
-						timestamp: "",
+						proposerRoundTimestamp: "",
 						epoch: 1337,
 						round: 0
 					),
-					transaction: .init(
-						transactionStatus: .init(status: .succeeded),
-						payloadHashHex: "payload-hash-hex",
-						intentHashHex: "intent-hash-hex"
-					)
-				)
-			},
-			transactionDetails: { _ in
-				.init(
-					ledgerState: .init(
-						network: "Network name",
-						stateVersion: 0,
-						timestamp: "",
-						epoch: 1337,
-						round: 0
-					),
-					transaction: .init(
-						transactionStatus: .init(status: .succeeded),
-						payloadHashHex: "payload-hash-hex",
-						intentHashHex: "intent-hash-hex"
-					),
-					details: .init(
-						rawHex: "raw-hex",
-						referencedGlobalEntities: []
-					)
+					status: .committedSuccess,
+					knownPayloads: [.init(payloadHashHex: "payload-hash-hex", status: .committedSuccess)],
+					errorMessage: nil
 				)
 			}
 		)

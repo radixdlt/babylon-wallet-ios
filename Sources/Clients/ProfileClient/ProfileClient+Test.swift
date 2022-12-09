@@ -20,9 +20,9 @@ public extension DependencyValues {
 extension ProfileClient: TestDependencyKey {
 	// TODO: make every endpoint no-op
 	public static let previewValue = Self(
-		getCurrentNetworkID: { NetworkID.hammunet },
+		getCurrentNetworkID: { NetworkID.nebunet },
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
-		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.hammunet },
+		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.nebunet },
 		setNetworkAndGateway: { _ in },
 		createNewProfile: { req in
 			try! await Profile.new(

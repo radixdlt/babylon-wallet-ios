@@ -16,25 +16,25 @@ public typealias EntityOverviewRequest = GatewayAPI.EntityOverviewRequest
 // MARK: - GatewayAPI.EntityOverviewRequest
 public extension GatewayAPI {
 	struct EntityOverviewRequest: Codable, Hashable {
+		public private(set) var atLedgerState: LedgerStateSelector?
 		public private(set) var addresses: [String]
-		public private(set) var atStateIdentifier: PartialLedgerStateIdentifier?
 
-		public init(addresses: [String], atStateIdentifier: PartialLedgerStateIdentifier? = nil) {
+		public init(atLedgerState: LedgerStateSelector? = nil, addresses: [String]) {
+			self.atLedgerState = atLedgerState
 			self.addresses = addresses
-			self.atStateIdentifier = atStateIdentifier
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case atLedgerState = "at_ledger_state"
 			case addresses
-			case atStateIdentifier = "at_state_identifier"
 		}
 
 		// Encodable protocol methods
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
 			try container.encode(addresses, forKey: .addresses)
-			try container.encodeIfPresent(atStateIdentifier, forKey: .atStateIdentifier)
 		}
 	}
 }

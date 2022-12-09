@@ -17,13 +17,20 @@ public typealias EntityDetailsResponseFungibleResourceDetails = GatewayAPI.Entit
 public extension GatewayAPI {
 	struct EntityDetailsResponseFungibleResourceDetails: Codable, Hashable {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
-		public private(set) var divisibility: Int64
-		public private(set) var totalSupply: TokenAmount
-		public private(set) var totalMinted: TokenAmount
-		public private(set) var totalBurnt: TokenAmount
+		public private(set) var accessRulesChain: AnyCodable
+		public private(set) var vaultAccessRulesChain: AnyCodable
+		public private(set) var divisibility: Int
+		/** The string-encoded decimal representing the amount */
+		public private(set) var totalSupply: String
+		/** The string-encoded decimal representing the amount */
+		public private(set) var totalMinted: String
+		/** The string-encoded decimal representing the amount */
+		public private(set) var totalBurnt: String
 
-		public init(discriminator: EntityDetailsResponseDetailsType, divisibility: Int64, totalSupply: TokenAmount, totalMinted: TokenAmount, totalBurnt: TokenAmount) {
+		public init(discriminator: EntityDetailsResponseDetailsType, accessRulesChain: AnyCodable, vaultAccessRulesChain: AnyCodable, divisibility: Int, totalSupply: String, totalMinted: String, totalBurnt: String) {
 			self.discriminator = discriminator
+			self.accessRulesChain = accessRulesChain
+			self.vaultAccessRulesChain = vaultAccessRulesChain
 			self.divisibility = divisibility
 			self.totalSupply = totalSupply
 			self.totalMinted = totalMinted
@@ -32,6 +39,8 @@ public extension GatewayAPI {
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case discriminator
+			case accessRulesChain = "access_rules_chain"
+			case vaultAccessRulesChain = "vault_access_rules_chain"
 			case divisibility
 			case totalSupply = "total_supply"
 			case totalMinted = "total_minted"
@@ -43,6 +52,8 @@ public extension GatewayAPI {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(discriminator, forKey: .discriminator)
+			try container.encode(accessRulesChain, forKey: .accessRulesChain)
+			try container.encode(vaultAccessRulesChain, forKey: .vaultAccessRulesChain)
 			try container.encode(divisibility, forKey: .divisibility)
 			try container.encode(totalSupply, forKey: .totalSupply)
 			try container.encode(totalMinted, forKey: .totalMinted)

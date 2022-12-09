@@ -13,41 +13,46 @@ servers:
   - url: https://mainnet.radixdlt.com
 tags:
   - name: Status
-    x-displayName: Status Endpoints
-    description: To query information about the Gateway API status.
+    description: Query information about the Gateway API status.
   - name: Transaction
-    x-displayName: Transaction Endpoints
-    description: To build, finalize and submit transactions, and to query transaction status and contents.
+    description: Preview and submit transactions, and query transaction status and contents.
   - name: Entity
-    x-displayName: Entity State Endpoints
-    description: TBD
+  - name: Non-Fungible
 paths:
-  "/gateway":
+  "/gateway/information":
     post:
-      operationId: GatewayInfo
-      summary: Get Gateway Info
+      operationId: GatewayInformation
+      summary: Get Gateway Information
       description: Returns the Gateway API version, network and current ledger state.
       tags:
         - Status
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/GatewayInfoRequest"
       responses:
-        '200':
+        "200":
           description: The Network
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/GatewayInfoResponse"
+                $ref: "#/components/schemas/GatewayInformationResponse"
+
+  "/transaction/construction":
+    post:
+      operationId: TransactionConstruction
+      tags:
+        - Transaction
+      responses:
+        "200":
+          description: |
+            Returns information needed to construct transaction.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionConstructionResponse"
   "/transaction/recent":
     post:
-      operationId: RecentTransactions
+      operationId: TransactionRecent
       summary: Get Recent Transactions
       description: |
-        Returns user-initiated transactions which have been succesfully committed to the ledger.
+        Returns user-initiated transactions which have been successfully committed to the ledger.
         The transactions are returned in a paginated format, ordered by most recent.
       tags:
         - Transaction
@@ -56,17 +61,19 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/RecentTransactionsRequest"
+              $ref: "#/components/schemas/TransactionRecentRequest"
       responses:
-        '200':
+        "200":
           description: A page of the most recent transactions
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RecentTransactionsResponse"
+                $ref: "#/components/schemas/TransactionRecentResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
   "/transaction/preview":
     post:
-      operationId: PreviewTransaction
+      operationId: TransactionPreview
       summary: Preview Transaction
       description: |
         Previews transaction against the network.
@@ -79,15 +86,17 @@ paths:
             schema:
               type: object
       responses:
-        '200':
+        "200":
           description: Successful Preview
           content:
             application/json:
               schema:
                 type: object
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
   "/transaction/submit":
     post:
-      operationId: SubmitTransaction
+      operationId: TransactionSubmit
       summary: Submit Transaction
       description: |
         Submits a signed transaction payload to the network.
@@ -99,20 +108,43 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/TransactionSubmitRequest"
+              $ref: "#/components/schemas/TransactionSubmitRequest"
       responses:
-        '200':
+        "200":
           description: Successful Submission
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/TransactionSubmitResponse"
+                $ref: "#/components/schemas/TransactionSubmitResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+  "/transaction/committed-details":
+    post:
+      operationId: TransactionCommittedDetails
+      summary: Transaction Committed Details
+      description: |
+        Returns the status and contents of the transaction with the given transaction identifier. Transaction identifiers which aren't recognised as either belonging to a committed transaction or a transaction submitted through this Network Gateway may return a `TransactionNotFoundError`. Transaction identifiers relating to failed transactions will, after a delay, also be reported as a `TransactionNotFoundError`.
+      tags:
+        - Transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionCommittedDetailsRequest"
+      responses:
+        "200":
+          description: Transaction Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionCommittedDetailsResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
   "/transaction/status":
     post:
       operationId: TransactionStatus
       summary: Transaction Status
-      description: |
-        Returns the status and contents of the transaction with the given transaction identifier. Transaction identifiers which aren't recognised as either belonging to a committed transaction or a transaction submitted through this Network Gateway may return a `TransactionNotFoundError`. Transaction identifiers relating to failed transactions will, after a delay, also be reported as a `TransactionNotFoundError`.
       tags:
         - Transaction
       requestBody:
@@ -120,41 +152,21 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/TransactionStatusRequest"
+              $ref: "#/components/schemas/TransactionStatusRequest"
       responses:
-        '200':
+        "200":
           description: Transaction Status
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/TransactionStatusResponse"
-  "/transaction/details":
+                $ref: "#/components/schemas/TransactionStatusResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /entity/overview:
     post:
-      operationId: TransactionDetails
-      summary: Transaction Details
-      description: |
-        Returns the status and contents of the transaction with the given transaction identifier. Transaction identifiers which aren't recognised as either belonging to a committed transaction or a transaction submitted through this Network Gateway may return a `TransactionNotFoundError`. Transaction identifiers relating to failed transactions will, after a delay, also be reported as a `TransactionNotFoundError`.
-      tags:
-        - Transaction
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/TransactionDetailsRequest"
-      responses:
-        '200':
-          description: Transaction Status
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/TransactionDetailsResponse"
-  /entity/resources:
-    post:
-      operationId: EntityResources
-      summary: Entity Resources
-      description: |
-        TBD
+      operationId: EntityOverview
+      summary: Returns incomplete collection of basic information for a given collection of entities.
       tags:
         - Entity
       requestBody:
@@ -162,62 +174,62 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/EntityResourcesRequest"
+              $ref: "#/components/schemas/EntityOverviewRequest"
       responses:
-        '200':
+        "200":
+          description: Entity Details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityOverviewResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+  /entity/details:
+    post:
+      operationId: EntityDetails
+      summary: Returns detailed information for a given entity.
+      tags:
+        - Entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntityDetailsRequest"
+      responses:
+        "200":
+          description: Entity Details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityDetailsResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+  /entity/resources:
+    post:
+      operationId: EntityResources
+      summary: Returns incomplete collection of fungible and non-fungible resources associated with a given entity.
+      tags:
+        - Entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntityResourcesRequest"
+      responses:
+        "200":
           description: Entity Resources
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/EntityResourcesResponse"
-  /entity/details:
-    post:
-      operationId: EntityDetails
-      summary: Entity Details
-      description: |
-        TBD
-      tags:
-        - Entity
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/EntityDetailsRequest"
-      responses:
-        '200':
-          description: Entity Details
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/EntityDetailsResponse"
-  /entity/overview:
-    post:
-      operationId: EntityOverview
-      summary: Entity Overview
-      description: |
-        TBD
-      tags:
-        - Entity
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              "$ref": "#/components/schemas/EntityOverviewRequest"
-      responses:
-        '200':
-          description: Entity Details
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/EntityOverviewResponse"
+                $ref: "#/components/schemas/EntityResourcesResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
   /entity/metadata:
     post:
       operationId: EntityMetadata
-      summary: Entity Metadata
-      description: |
-        TBD
+      summary: Iterates through all metadata associated with a given entity.
       tags:
         - Entity
       requestBody:
@@ -225,16 +237,132 @@ paths:
         content:
           application/json:
             schema:
-              "$ref": "#/components/schemas/EntityMetadataRequest"
+              $ref: "#/components/schemas/EntityMetadataRequest"
       responses:
-        '200':
+        "200":
           description: Entity Metadata
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/EntityMetadataResponse"
+                $ref: "#/components/schemas/EntityMetadataResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+  /entity/fungibles:
+    post:
+      operationId: EntityFungibles
+      summary: Iterates through all fungible resources associated with a given entity.
+      tags:
+        - Entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntityFungiblesRequest"
+      responses:
+        "200":
+          description: Entity Fungibles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityFungiblesResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+  /entity/non-fungibles:
+    post:
+      operationId: EntityNonFungibles
+      summary: Iterates through all non-fungible resources associated with a given entity.
+      tags:
+        - Entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntityNonFungiblesRequest"
+      responses:
+        "200":
+          description: Entity Non-Fungibles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityNonFungiblesResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+  /entity/non-fungible/ids:
+    post:
+      operationId: EntityNonFungibleIds
+      summary: Iterates through all non-fungible ids associated with a given non-fungible resource of a given entity.
+      tags:
+        - Entity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EntityNonFungibleIdsRequest"
+      responses:
+        "200":
+          description: Entity Non-Fungibles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityNonFungibleIdsResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /non-fungible/ids:
+    post:
+      operationId: NonFungibleIds
+      summary: Iterates through all non-fungible ids of a given non-fungible resource.
+      tags:
+        - Non-Fungible
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NonFungibleIdsRequest"
+      responses:
+        "200":
+          description: Non-Fungible Ids
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NonFungibleIdsResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+  /non-fungible/data:
+    post:
+      operationId: NonFungibleData
+      summary: Returns data associated with a given non-fungible id.
+      tags:
+        - Non-Fungible
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NonFungibleDataRequest"
+      responses:
+        "200":
+          description: Non-Fungible Data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NonFungibleDataResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
 
 components:
+  responses:
+    ErrorResponse:
+      description: Client-originated request error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
   schemas:
 
     #
@@ -244,6 +372,9 @@ components:
     EntityAddress:
       type: string
       description: The Bech32m-encoded human readable version of the entity's global address.
+    ComponentAddress:
+      type: string
+      description: The Bech32m-encoded human readable version of the component (normal, account, system) global address.
     ResourceAddress:
       type: string
       description: The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address.
@@ -253,40 +384,16 @@ components:
       description: The string-encoded decimal representing the amount
 
     #
-    # Generic Types
+    # Common Request Types
     #
 
-    LedgerState:
-      description: |
-        The ledger state against which the response was generated. Can be used to detect if the Network Gateway is returning up-to-date information.
+    AtLedgerStateMixin:
       type: object
-      required:
-        - network
-        - state_version
-        - timestamp
-        - epoch
-        - round
       properties:
-        network:
-          description: The name of the network against which the request is made.
-          type: string
-        state_version:
-          description: The state version of the ledger. Each transaction increments the state version by 1.
-          type: integer
-          format: int64
-        timestamp:
-          description: |
-            The round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.
-          type: string
-        epoch:
-          description: The epoch number of the ledger at this state version.
-          type: integer
-          format: int64
-        round:
-          description: The consensus round in the epoch that this state version was committed in.
-          type: integer
-          format: int64
-    PartialLedgerStateIdentifier:
+        at_ledger_state:
+          $ref: "#/components/schemas/LedgerStateSelector"
+
+    LedgerStateSelector:
       description: Allows a client to request a response referencing an earlier (`at_*` properties) or later (`from_*` properties) ledger state.
       type: object
       nullable: true
@@ -311,6 +418,63 @@ components:
           type: integer
           format: int64
 
+    #
+    # Common Response Types
+    #
+
+    LedgerStateMixin:
+      type: object
+      required:
+        - ledger_state
+      properties:
+        ledger_state:
+          $ref: "#/components/schemas/LedgerState"
+    ResultSetCursorMixin:
+      type: object
+      properties:
+        total_count:
+          type: integer
+          format: int64
+          nullable: true
+        previous_cursor:
+          type: string
+          nullable: true
+        next_cursor:
+          type: string
+          nullable: true
+
+    LedgerState:
+      description: |
+        The ledger state against which the response was generated. Can be used to detect if the Network Gateway is returning up-to-date information.
+      type: object
+      required:
+        - network
+        - state_version
+        - proposer_round_timestamp
+        - epoch
+        - round
+      properties:
+        network:
+          description: The name of the network against which the request is made.
+          type: string
+        state_version:
+          description: The state version of the ledger. Each transaction increments the state version by 1.
+          type: integer
+          format: int64
+        proposer_round_timestamp:
+          description: |
+            The round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.
+          type: string
+          # TODO add format: date-time once OAS generator get fixed support for required value-types
+        epoch:
+          description: The epoch number of the ledger at this state version.
+          type: integer
+          format: int64
+        round:
+          description: The consensus round in the epoch that this state version was committed in.
+          type: integer
+          format: int64
+
     EntityMetadataCollection:
       allOf:
         - $ref: "#/components/schemas/ResultSetCursorMixin"
@@ -319,7 +483,6 @@ components:
             - items
           properties:
             items:
-              description: TBD
               type: array
               items:
                 $ref: "#/components/schemas/EntityMetadataItem"
@@ -334,41 +497,104 @@ components:
         value:
           type: string
 
-    TransactionInfo:
+    FungibleResourcesCollection:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/FungibleResourcesCollectionItem"
+    FungibleResourcesCollectionItem:
       type: object
       required:
+        - address
+        - amount
+      properties:
+        address:
+          $ref: "#/components/schemas/ResourceAddress"
+        amount:
+          $ref: "#/components/schemas/TokenAmount"
+    NonFungibleResourcesCollection:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/NonFungibleResourcesCollectionItem"
+    NonFungibleResourcesCollectionItem:
+      type: object
+      required:
+        - address
+        - amount
+      properties:
+        address:
+          $ref: "#/components/schemas/ResourceAddress"
+        amount:
+          type: integer
+          format: int64
+    NonFungibleIdsCollection:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/NonFungibleIdsCollectionItem"
+    NonFungibleIdsCollectionItem:
+      type: object
+      required:
+        - non_fungible_id
+      properties:
+        non_fungible_id:
+          type: string
+
+    CommittedTransactionInfo:
+      type: object
+      required:
+        - state_version
         - transaction_status
         - payload_hash_hex
         - intent_hash_hex
       properties:
+        state_version:
+          nullable: true
+          type: integer
+          format: int64
         transaction_status:
-          "$ref": "#/components/schemas/TransactionStatus"
+          $ref: "#/components/schemas/TransactionStatus"
         payload_hash_hex:
           type: string
         intent_hash_hex:
           type: string
         fee_paid:
           $ref: "#/components/schemas/TokenAmount"
-    TransactionStatus:
-      type: object
-      required:
-        - status
-      properties:
-        status:
-          type: string
-          enum:
-            - succeeded
-            - failed
-            - rejected
-            - pending
-        state_version:
-          nullable: true
-          type: integer
-          format: int64
         confirmed_at:
           nullable: true
           type: string
           format: date-time
+        error_message:
+          type: string
+          nullable: true
+
+    TransactionStatus:
+      type: string
+      enum:
+        - unknown
+        - committed_success
+        - committed_failure
+        - pending
+        - rejected
 
     TokenAmount:
       type: object
@@ -381,53 +607,57 @@ components:
         address:
           $ref: "#/components/schemas/ResourceAddress"
 
-    #
-    # Mixins
-    #
-
-    LedgerStateMixin:
-      type: object
-      required:
-        - ledger_state
-      properties:
-        ledger_state:
-          $ref: "#/components/schemas/LedgerState"
-
-    ResultSetCursorMixin:
-      type: object
-      properties:
-        total_count:
-          description: TBD (make it nullable when we're dealing with unknown result set sizes?)
-          type: integer
-          nullable: true
-        previous_cursor:
-          description: TBD (maybe we should use HATEOAS-like permalinks?)
-          type: string
-          nullable: true
-        next_cursor:
-          description: TBD (maybe we should use HATEOAS-like permalinks?)
-          type: string
-          nullable: true
+    NonFungibleIdType:
+      type: string
+      enum:
+        - string
+        - u32
+        - u64
+        - bytes
+        - uuid
 
     #
-    # "Status" Request & Response Types
+    # /gateway/* Request & Response Types
     #
 
-    GatewayInfoRequest:
-      type: object
-      example: {}
-    GatewayInfoResponse:
+    GatewayInformationResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
         - type: object
           required:
             - known_target
             - release_info
+            - well_known_addresses
           properties:
             known_target:
               $ref: "#/components/schemas/GatewayInfoResponseKnownTarget"
             release_info:
               $ref: "#/components/schemas/GatewayInfoResponseReleaseInfo"
+            well_known_addresses:
+              type: object
+              required:
+                - account_package
+                - faucet
+                - epoch_manager
+                - clock
+                - ecdsa_secp256k1
+                - eddsa_ed25519
+                - xrd
+              properties:
+                account_package:
+                  $ref: "#/components/schemas/EntityAddress"
+                faucet:
+                  $ref: "#/components/schemas/ComponentAddress"
+                epoch_manager:
+                  $ref: "#/components/schemas/EntityAddress"
+                clock:
+                  $ref: "#/components/schemas/EntityAddress"
+                ecdsa_secp256k1:
+                  $ref: "#/components/schemas/ResourceAddress"
+                eddsa_ed25519:
+                  $ref: "#/components/schemas/ResourceAddress"
+                xrd:
+                  $ref: "#/components/schemas/ResourceAddress"
     GatewayInfoResponseKnownTarget:
       type: object
       required:
@@ -452,25 +682,31 @@ components:
           type: string
 
     #
-    # "Transaction" Request & Response Types
+    # /transaction/* Request & Response Types
     #
 
-    RecentTransactionsRequest:
-      type: object
-      properties:
-        at_state_identifier:
-          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
-        from_state_identifier:
-          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
-        cursor:
-          description: This cursor allows forward pagination, by providing the cursor from the previous request.
-          type: string
-          nullable: true
-        limit:
-          description: The page size requested.
-          type: integer
-          nullable: true
-    RecentTransactionsResponse:
+    TransactionConstructionResponse:
+      allOf:
+        - type: object
+        - $ref: "#/components/schemas/LedgerStateMixin"
+    TransactionRecentRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          properties:
+            from_ledger_state:
+              $ref: "#/components/schemas/LedgerStateSelector"
+            cursor:
+              description: This cursor allows forward pagination, by providing the cursor from the previous request.
+              type: string
+              nullable: true
+            limit:
+              description: The page size requested.
+              type: integer
+              nullable: true
+      example:
+        limit: 5
+    TransactionRecentResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
         - allOf:
@@ -483,14 +719,14 @@ components:
                   description: The page of user transactions.
                   type: array
                   items:
-                    $ref: "#/components/schemas/TransactionInfo"
+                    $ref: "#/components/schemas/CommittedTransactionInfo"
 
     TransactionSubmitRequest:
       type: object
       required:
-        - notarized_transaction
+        - notarized_transaction_hex
       properties:
-        notarized_transaction:
+        notarized_transaction_hex:
           description: The notarized transaction payload which can be submitted, hex encoded.
           type: string
     TransactionSubmitResponse:
@@ -503,42 +739,77 @@ components:
           description: Is true if the transaction is a duplicate of an existing pending transaction.
 
     TransactionStatusRequest:
-      type: object
-      required:
-        - transaction_identifier
-      properties:
-        transaction_identifier:
-          $ref: "#/components/schemas/TransactionLookupIdentifier"
-        at_state_identifier:
-          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - transaction_identifier
+          properties:
+            intent_hash_hex:
+              type: string
       example:
-        transaction_identifier:
-          origin: intent
-          value_hex: ef71a9d6c63444fce6abd2df8fab2755cfb51f6794e578f60d99337193811842
+        intent_hash_hex: "<transaction-intent-hash>"
     TransactionStatusResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
         - type: object
           required:
-            - transaction
+            - status
+            - known_payloads
           properties:
-            transaction:
-              $ref: "#/components/schemas/TransactionInfo"
-
-    TransactionDetailsRequest:
+            status:
+              $ref: "#/components/schemas/TransactionStatus"
+            known_payloads:
+              type: array
+              items:
+                $ref: "#/components/schemas/TransactionStatusResponseKnownPayloadItem"
+            error_message:
+              type: string
+              nullable: true
+    TransactionStatusResponseKnownPayloadItem:
       type: object
       required:
-        - transaction_identifier
+        - payload_hash_hex
+        - status
       properties:
-        transaction_identifier:
-          $ref: "#/components/schemas/TransactionLookupIdentifier"
-        at_state_identifier:
-          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+        payload_hash_hex:
+          type: string
+        status:
+          $ref: "#/components/schemas/TransactionStatus"
+        error_message:
+          type: string
+          nullable: true
+
+    TransactionCommittedDetailsRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - transaction_identifier
+          properties:
+            transaction_identifier:
+              $ref: "#/components/schemas/TransactionCommittedDetailsRequestIdentifier"
       example:
         transaction_identifier:
-          origin: intent
-          value_hex: ef71a9d6c63444fce6abd2df8fab2755cfb51f6794e578f60d99337193811842
-    TransactionDetailsResponse:
+          type: payload_hash
+          value_hex: "<transaction-payload-hash>"
+    TransactionCommittedDetailsRequestIdentifierType:
+      type: string
+      enum:
+        - intent_hash
+        - signed_intent_hash
+        - payload_hash
+    TransactionCommittedDetailsRequestIdentifier:
+      type: object
+      required:
+        - type
+        - value_hex
+      properties:
+        type:
+          $ref: "#/components/schemas/TransactionCommittedDetailsRequestIdentifierType"
+        value_hex:
+          type: string
+    TransactionCommittedDetailsResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
         - type: object
@@ -547,23 +818,44 @@ components:
             - details
           properties:
             transaction:
-              $ref: "#/components/schemas/TransactionInfo"
+              $ref: "#/components/schemas/CommittedTransactionInfo"
             details:
-              "$ref": "#/components/schemas/TransactionDetails"
+              $ref: "#/components/schemas/TransactionCommittedDetailsResponseDetails"
+    TransactionCommittedDetailsResponseDetails:
+      type: object
+      required:
+        - raw_hex
+        - receipt
+        - referenced_global_entities
+      properties:
+        raw_hex:
+          description: The raw transaction payload, hex encoded.
+          type: string
+        receipt:
+          type: object
+        referenced_global_entities:
+          type: array
+          items:
+            type: string
+        message_hex:
+          description: The message bytes, hex encoded.
+          type: string
 
     #
-    # "Entity" Request & Response Types
+    # /entity/* Request & Response Types
     #
 
     EntityResourcesRequest:
-      type: object
-      required:
-        - address
-      properties:
-        address:
-          $ref: "#/components/schemas/EntityAddress"
-        at_state_identifier:
-          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - address
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+      example:
+        address: "<component-entity-address>"
     EntityResourcesResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
@@ -576,61 +868,21 @@ components:
             address:
               $ref: "#/components/schemas/EntityAddress"
             fungible_resources:
-              $ref: "#/components/schemas/EntityResourcesResponseFungibleResources"
+              $ref: "#/components/schemas/FungibleResourcesCollection"
             non_fungible_resources:
-              $ref: "#/components/schemas/EntityResourcesResponseNonFungibleResources"
-    EntityResourcesResponseFungibleResources:
-      allOf:
-        - $ref: "#/components/schemas/ResultSetCursorMixin"
-        - type: object
-          required:
-            - items
-          properties:
-            items:
-              type: array
-              items:
-                $ref: "#/components/schemas/EntityResourcesResponseFungibleResourcesItem"
-    EntityResourcesResponseFungibleResourcesItem:
-      type: object
-      required:
-        - address
-        - amount
-      properties:
-        address:
-          $ref: "#/components/schemas/ResourceAddress"
-        amount:
-          $ref: "#/components/schemas/TokenAmount"
-    EntityResourcesResponseNonFungibleResources:
-      allOf:
-        - $ref: "#/components/schemas/ResultSetCursorMixin"
-        - type: object
-          required:
-            - items
-          properties:
-            items:
-              type: array
-              items:
-                $ref: "#/components/schemas/EntityResourcesResponseNonFungibleResourcesItem"
-    EntityResourcesResponseNonFungibleResourcesItem:
-      type: object
-      required:
-        - address
-        - amount
-      properties:
-        address:
-          $ref: "#/components/schemas/ResourceAddress"
-        amount:
-          type: number
+              $ref: "#/components/schemas/NonFungibleResourcesCollection"
 
     EntityDetailsRequest:
-      type: object
-      required:
-        - address
-      properties:
-        address:
-          $ref: "#/components/schemas/EntityAddress"
-        at_state_identifier:
-          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - address
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+      example:
+        address: "<entity-address>"
     EntityDetailsResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
@@ -651,23 +903,28 @@ components:
       enum:
         - fungible_resource
         - non_fungible_resource
-        - account_component
+        - package
+        - component
     EntityDetailsResponseDetails:
       oneOf:
         - $ref: "#/components/schemas/EntityDetailsResponseFungibleResourceDetails"
         - $ref: "#/components/schemas/EntityDetailsResponseNonFungibleResourceDetails"
-        - $ref: "#/components/schemas/EntityDetailsResponseAccountComponentDetails"
+        - $ref: "#/components/schemas/EntityDetailsResponsePackageDetails"
+        - $ref: "#/components/schemas/EntityDetailsResponseComponentDetails"
       discriminator:
         propertyName: discriminator
         mapping:
           # Must match EntityDetailsResponseDetailsType
           fungible_resource: "#/components/schemas/EntityDetailsResponseFungibleResourceDetails"
           non_fungible_resource: "#/components/schemas/EntityDetailsResponseNonFungibleResourceDetails"
-          account_component: "#/components/schemas/EntityDetailsResponseAccountComponentDetails"
+          package: "#/components/schemas/EntityDetailsResponsePackageDetails"
+          component: "#/components/schemas/EntityDetailsResponseComponentDetails"
     EntityDetailsResponseFungibleResourceDetails:
       type: object
       required:
         - discriminator
+        - access_rules_chain
+        - vault_access_rules_chain
         - divisibility
         - total_supply
         - total_minted
@@ -675,70 +932,79 @@ components:
       properties:
         discriminator:
           $ref: "#/components/schemas/EntityDetailsResponseDetailsType"
+        access_rules_chain:
+          type: object
+        vault_access_rules_chain:
+          type: object
         divisibility:
           type: integer
-          format: int64
           minimum: 0
         total_supply:
-          $ref: "#/components/schemas/TokenAmount"
+          $ref: "#/components/schemas/BigDecimal"
         total_minted:
-          $ref: "#/components/schemas/TokenAmount"
+          $ref: "#/components/schemas/BigDecimal"
         total_burnt:
-          $ref: "#/components/schemas/TokenAmount"
+          $ref: "#/components/schemas/BigDecimal"
     EntityDetailsResponseNonFungibleResourceDetails:
       type: object
       required:
         - discriminator
-        - ids
+        - access_rules_chain
+        - vault_access_rules_chain
+        - non_fungible_id_type
       properties:
         discriminator:
           $ref: "#/components/schemas/EntityDetailsResponseDetailsType"
-        ids:
-          $ref: "#/components/schemas/EntityDetailsResponseNonFungibleResourceDetailsIds"
-    EntityDetailsResponseNonFungibleResourceDetailsIds:
-      allOf:
-        - $ref: "#/components/schemas/ResultSetCursorMixin"
-        - type: object
-          required:
-            - items
-          properties:
-            items:
-              type: array
-              items:
-                $ref: "#/components/schemas/EntityDetailsResponseNonFungibleResourceDetailsIdsItem"
-    EntityDetailsResponseNonFungibleResourceDetailsIdsItem:
+        access_rules_chain:
+          type: object
+        vault_access_rules_chain:
+          type: object
+        non_fungible_id_type:
+          $ref: "#/components/schemas/NonFungibleIdType"
+    EntityDetailsResponsePackageDetails:
       type: object
       required:
-        - id
+        - discriminator
+        - code_hex
       properties:
-        id_hex:
+        discriminator:
+          $ref: "#/components/schemas/EntityDetailsResponseDetailsType"
+        code_hex:
           type: string
-        immutable_data_hex:
-          type: string
-        mutable_data_hex:
-          type: string
-    EntityDetailsResponseAccountComponentDetails:
+    EntityDetailsResponseComponentDetails:
       type: object
       required:
         - discriminator
         - package_address
+        - blueprint_name
+        - state
+        - access_rules_chain
       properties:
         discriminator:
           $ref: "#/components/schemas/EntityDetailsResponseDetailsType"
         package_address:
           $ref: "#/components/schemas/EntityAddress"
+        blueprint_name:
+          type: string
+        state:
+          type: object
+        access_rules_chain:
+          type: object
 
     EntityOverviewRequest:
-      type: object
-      required:
-        - addresses
-      properties:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - addresses
+          properties:
+            addresses:
+              type: array
+              items:
+                $ref: "#/components/schemas/EntityAddress"
+      example:
         addresses:
-          type: array
-          items:
-            $ref: "#/components/schemas/EntityAddress"
-        at_state_identifier:
-          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
+          - "<entity-address>"
     EntityOverviewResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
@@ -762,22 +1028,24 @@ components:
            $ref: "#/components/schemas/EntityMetadataCollection"
 
     EntityMetadataRequest:
-      type: object
-      required:
-        - address
-      properties:
-        address:
-          $ref: "#/components/schemas/EntityAddress"
-        at_state_identifier:
-          $ref: "#/components/schemas/PartialLedgerStateIdentifier"
-        cursor:
-          description: This cursor allows forward pagination, by providing the cursor from the previous request.
-          type: string
-          nullable: true
-        limit:
-          description: The page size requested.
-          type: integer
-          nullable: true
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - address
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            cursor:
+              description: This cursor allows forward pagination, by providing the cursor from the previous request.
+              type: string
+              nullable: true
+            limit:
+              description: The page size requested.
+              type: integer
+              nullable: true
+      example:
+        address: "<entity-address>"
     EntityMetadataResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
@@ -791,114 +1059,206 @@ components:
             metadata:
               $ref: "#/components/schemas/EntityMetadataCollection"
 
+    EntityFungiblesRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - address
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            cursor:
+              description: This cursor allows forward pagination, by providing the cursor from the previous request.
+              type: string
+              nullable: true
+            limit:
+              description: The page size requested.
+              type: integer
+              nullable: true
+      example:
+        address: "<component-entity-address>"
+    EntityFungiblesResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - address
+            - fungibles
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            fungibles:
+              $ref: "#/components/schemas/FungibleResourcesCollection"
+
+    EntityNonFungiblesRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - address
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            cursor:
+              description: This cursor allows forward pagination, by providing the cursor from the previous request.
+              type: string
+              nullable: true
+            limit:
+              description: The page size requested.
+              type: integer
+              nullable: true
+      example:
+        address: "<component-entity-address>"
+    EntityNonFungiblesResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - address
+            - non_fungibles
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            non_fungibles:
+              $ref: "#/components/schemas/NonFungibleResourcesCollection"
+
+    EntityNonFungibleIdsRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - address
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            resource_address:
+              $ref: "#/components/schemas/ResourceAddress"
+            cursor:
+              description: This cursor allows forward pagination, by providing the cursor from the previous request.
+              type: string
+              nullable: true
+            limit:
+              description: The page size requested.
+              type: integer
+              nullable: true
+      example:
+        address: "<component-entity-address>"
+        resource_address: "<non-fungible-resource-entity-address>"
+    EntityNonFungibleIdsResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - address
+            - resource_address
+            - non_fungible_ids
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            resource_address:
+              $ref: "#/components/schemas/ResourceAddress"
+            non_fungible_ids:
+              $ref: "#/components/schemas/NonFungibleIdsCollection"
+
+    NonFungibleIdsRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - address
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            cursor:
+              description: This cursor allows forward pagination, by providing the cursor from the previous request.
+              type: string
+              nullable: true
+            limit:
+              description: The page size requested.
+              type: integer
+              nullable: true
+      example:
+        address: "<non-fungible-entity-address>"
+    NonFungibleIdsResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - address
+            - non_fungible_ids
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            non_fungible_ids:
+              $ref: "#/components/schemas/NonFungibleIdsCollection"
+
+    NonFungibleDataRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          required:
+            - address
+            - non_fungible_id
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+            non_fungible_id:
+              type: string
+            cursor:
+              description: This cursor allows forward pagination, by providing the cursor from the previous request.
+              type: string
+              nullable: true
+            limit:
+              description: The page size requested.
+              type: integer
+              nullable: true
+      example:
+        address: "<non-fungible-entity-address>"
+        non_fungible_id: "0a0100000000"
+    NonFungibleDataResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - address
+            - non_fungible_id_type
+            - non_fungible_id
+            - mutable_data_hex
+            - immutable_data_hex
+          properties:
+            address:
+              $ref: "#/components/schemas/ResourceAddress"
+            non_fungible_id_type:
+              $ref: "#/components/schemas/NonFungibleIdType"
+            non_fungible_id:
+              type: string
+            mutable_data_hex:
+              type: string
+            immutable_data_hex:
+              type: string
+
     #
-    # TODO Not categorized/cleaned yet
+    # Errors
     #
 
-    TokenProperties:
-      type: object
-      required:
-        - symbol
-        - is_supply_mutable
-        - granularity
-        - name
-        - description
-        - url
-        - icon_url
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-        icon_url:
-          type: string
-        url:
-          type: string
-        symbol:
-          type: string
-        is_supply_mutable:
-          description: If true, the token is allowed to be minted/burned by the owner.
-          type: boolean
-        granularity:
-          "$ref": "#/components/schemas/BigDecimal"
-        owner:
-          "$ref": "#/components/schemas/AccountIdentifier"
-
-    TransactionDetails:
-      type: object
-      required:
-        - raw_hex
-        - referenced_global_entities
-      properties:
-        raw_hex:
-          description: The raw transaction payload, hex encoded.
-          type: string
-        referenced_global_entities:
-          type: array
-          items:
-            type: string
-        message_hex:
-          description: The message bytes, hex encoded.
-          type: string
-
-    AccountIdentifier:
-      type: object
-      required:
-        - address
-      properties:
-        address:
-          description: The radix address of the account.
-          type: string
-    ValidatorIdentifier:
-      type: object
-      required:
-        - address
-      properties:
-        address:
-          description: The radix address of the validator.
-          type: string
-    TokenIdentifier:
-      type: object
-      required:
-        - rri
-      properties:
-        rri:
-          description: The radix resource identifier of the token.
-          type: string
-    TransactionLookupOrigin:
-      type: string
-      enum:
-        - intent
-        - signed_intent
-        - notarized
-        - payload
-    TransactionLookupIdentifier:
-      type: object
-      required:
-        - origin
-        - value_hex
-      properties:
-        origin:
-          $ref: "#/components/schemas/TransactionLookupOrigin"
-        value_hex:
-          type: string
     ErrorResponse:
       type: object
       required:
-        - code
         - message
       properties:
-        code:
-          description: A numeric code corresponding to the given error type, roughly aligned with HTTP Status Code semantics (eg 400/404/500).
-          type: integer
         message:
           description: A human-readable error message.
           type: string
+        code:
+          description: A numeric code corresponding to the given error type.
+          type: integer
         details:
           $ref: "#/components/schemas/GatewayError"
         trace_id:
-          description: A GUID to be used when reporting errors, to allow correlation with the Gateway API's error logs.
+          description: A unique request identifier to be used when reporting errors, to allow correlation with the Gateway API's error logs.
           type: string
+
     GatewayError:
       type: object
       required:
@@ -910,11 +1270,31 @@ components:
       discriminator:
         propertyName: type
         mapping:
+          EntityNotFoundError: "#/components/schemas/EntityNotFoundError"
+          InvalidEntityError: "#/components/schemas/InvalidEntityError"
           NotSyncedUpError: "#/components/schemas/NotSyncedUpError"
           InvalidRequestError: "#/components/schemas/InvalidRequestError"
           InvalidTransactionError: "#/components/schemas/InvalidTransactionError"
           TransactionNotFoundError: "#/components/schemas/TransactionNotFoundError"
           InternalServerError: "#/components/schemas/InternalServerError"
+    EntityNotFoundError:
+      allOf:
+        - $ref: "#/components/schemas/GatewayError"
+        - type: object
+          required:
+            - address
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
+    InvalidEntityError:
+      allOf:
+        - $ref: "#/components/schemas/GatewayError"
+        - type: object
+          required:
+            - address
+          properties:
+            address:
+              $ref: "#/components/schemas/EntityAddress"
     NotSyncedUpError:
       allOf:
         - $ref: "#/components/schemas/GatewayError"
@@ -947,18 +1327,19 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/ValidationErrorsAtPath"
-    ValidationErrorsAtPath:
-      type: object
-      required:
-        - path
-        - errors
-      properties:
-        path:
-          type: string
-        errors:
-          type: array
-          items:
-            type: string
+    InvalidTransactionError:
+      allOf:
+        - $ref: "#/components/schemas/GatewayError"
+        - type: object
+    TransactionNotFoundError:
+      allOf:
+        - $ref: "#/components/schemas/GatewayError"
+        - type: object
+          required:
+            - transaction_not_found
+          properties:
+            transaction_not_found:
+              $ref: "#/components/schemas/TransactionCommittedDetailsRequestIdentifier"
     InternalServerError:
       allOf:
         - $ref: "#/components/schemas/GatewayError"
@@ -973,15 +1354,15 @@ components:
             cause:
               description: Gives a human readable message - likely just a trace ID for reporting the error.
               type: string
-    InvalidTransactionError:
-      allOf:
-        - $ref: "#/components/schemas/GatewayError"
-    TransactionNotFoundError:
-      allOf:
-        - $ref: "#/components/schemas/GatewayError"
-        - type: object
-          required:
-            - transaction_not_found
-          properties:
-            transaction_not_found:
-              $ref: "#/components/schemas/TransactionLookupIdentifier"
+    ValidationErrorsAtPath:
+      type: object
+      required:
+        - path
+        - errors
+      properties:
+        path:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string

@@ -63,14 +63,14 @@ final class HandleDappRequestsTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__on_network_hammunet__WHEN__received_request_specifying_another_network__THEN__we_respond_back_to_dapp_with_error() async throws {
+	func test__GIVEN__on_network_nebunet__WHEN__received_request_specifying_another_network__THEN__we_respond_back_to_dapp_with_error() async throws {
 		let messageSentToDapp = ActorIsolated<P2P.ResponseToClientByID?>(nil)
-		let currentNetworkID = NetworkID.hammunet
+		let currentNetworkID = NetworkID.mardunet
 		let request = try P2P.RequestFromClient(
 			requestFromDapp: .init(
 				id: .placeholder0,
 				metadata: .init(
-					networkId: .mardunet,
+					networkId: .nebunet,
 					origin: "",
 					dAppId: ""
 				), items: [

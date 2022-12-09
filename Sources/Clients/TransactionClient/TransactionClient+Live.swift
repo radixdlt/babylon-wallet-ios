@@ -4,14 +4,7 @@ import Dependencies
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
-import struct GatewayAPI.GatewayAPIClient
-import struct GatewayAPI.TransactionDetailsResponse
-import struct GatewayAPI.TransactionLookupIdentifier
-import struct GatewayAPI.TransactionStatus
-import struct GatewayAPI.TransactionStatusRequest
-import struct GatewayAPI.TransactionStatusResponse
-import struct GatewayAPI.TransactionSubmitRequest
-import struct GatewayAPI.TransactionSubmitResponse
+import GatewayAPI
 import NonEmpty
 import Profile
 import ProfileClient
@@ -109,7 +102,7 @@ public extension TransactionClient {
 
 			// MARK: Submit TX
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
-				notarizedTransaction: Data(compiledNotarizedTXIntent.compiledNotarizedIntent).hex
+				notarizedTransactionHex: Data(compiledNotarizedTXIntent.compiledNotarizedIntent).hex
 			)
 
 			let response: GatewayAPI.TransactionSubmitResponse
@@ -124,20 +117,16 @@ public extension TransactionClient {
 				return .failure(.invalidTXWasDuplicate(txID: txID))
 			}
 
-			let transactionIdentifier = GatewayAPI.TransactionLookupIdentifier(
-				origin: .intent,
-				valueHex: txID.rawValue
-			)
-
 			// MARK: Poll Status
-			var txStatus: GatewayAPI.TransactionStatus = .init(status: .pending)
+			var txStatus: GatewayAPI.TransactionStatus = .pending
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
-					transactionIdentifier: transactionIdentifier
+					atLedgerState: nil,
+					intentHashHex: txID.rawValue
 				)
 				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
-				return txStatusResponse.transaction.transactionStatus
+				return txStatusResponse.status
 			}
 
 			var pollCount = 0
@@ -156,8 +145,8 @@ public extension TransactionClient {
 					return .failure(.failedToGetTransactionStatus(txID: txID, error: .init(pollAttempts: pollCount)))
 				}
 			}
-			guard txStatus.status == .succeeded else {
-				return .failure(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus.status == .rejected ? .rejected : .failed))
+			guard txStatus == .committedSuccess else {
+				return .failure(.invalidTXWasSubmittedButNotSuccessful(txID: txID, status: txStatus == .rejected ? .rejected : .failed))
 			}
 
 			return .success(txID)
@@ -346,10 +335,10 @@ struct CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities: Swif
 
 extension GatewayAPI.TransactionStatus {
 	var isComplete: Bool {
-		switch status {
-		case .succeeded, .failed, .rejected:
+		switch self {
+		case .committedSuccess, .committedFailure, .rejected:
 			return true
-		case .pending:
+		case .pending, .unknown:
 			return false
 		}
 	}
@@ -367,11 +356,11 @@ public struct PollStrategy {
 	public static let `default` = Self(maxPollTries: 20, sleepDuration: 2)
 }
 
-// MARK: - GatewayAPI.TransactionDetailsResponse + Sendable
-extension GatewayAPI.TransactionDetailsResponse: @unchecked Sendable {}
+// MARK: - GatewayAPI.TransactionCommittedDetailsResponse + Sendable
+extension GatewayAPI.TransactionCommittedDetailsResponse: @unchecked Sendable {}
 
-// MARK: - GatewayAPI.TransactionStatus.Status + Sendable
-extension GatewayAPI.TransactionStatus.Status: @unchecked Sendable {}
+// MARK: - GatewayAPI.TransactionStatus + Sendable
+extension GatewayAPI.TransactionStatus: @unchecked Sendable {}
 
 // MARK: - FailedToGetDetailsOfSuccessfullySubmittedTX
 struct FailedToGetDetailsOfSuccessfullySubmittedTX: LocalizedError, Equatable {

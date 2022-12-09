@@ -16,26 +16,26 @@ public typealias EntityDetailsRequest = GatewayAPI.EntityDetailsRequest
 // MARK: - GatewayAPI.EntityDetailsRequest
 public extension GatewayAPI {
 	struct EntityDetailsRequest: Codable, Hashable {
+		public private(set) var atLedgerState: LedgerStateSelector?
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
-		public private(set) var atStateIdentifier: PartialLedgerStateIdentifier?
 
-		public init(address: String, atStateIdentifier: PartialLedgerStateIdentifier? = nil) {
+		public init(atLedgerState: LedgerStateSelector? = nil, address: String) {
+			self.atLedgerState = atLedgerState
 			self.address = address
-			self.atStateIdentifier = atStateIdentifier
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
+			case atLedgerState = "at_ledger_state"
 			case address
-			case atStateIdentifier = "at_state_identifier"
 		}
 
 		// Encodable protocol methods
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
 			try container.encode(address, forKey: .address)
-			try container.encodeIfPresent(atStateIdentifier, forKey: .atStateIdentifier)
 		}
 	}
 }

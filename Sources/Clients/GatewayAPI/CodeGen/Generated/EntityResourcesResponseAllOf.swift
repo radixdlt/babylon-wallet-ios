@@ -18,10 +18,10 @@ public extension GatewayAPI {
 	struct EntityResourcesResponseAllOf: Codable, Hashable {
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
-		public private(set) var fungibleResources: EntityResourcesResponseFungibleResources
-		public private(set) var nonFungibleResources: EntityResourcesResponseNonFungibleResources
+		public private(set) var fungibleResources: FungibleResourcesCollection
+		public private(set) var nonFungibleResources: NonFungibleResourcesCollection
 
-		public init(address: String, fungibleResources: EntityResourcesResponseFungibleResources, nonFungibleResources: EntityResourcesResponseNonFungibleResources) {
+		public init(address: String, fungibleResources: FungibleResourcesCollection, nonFungibleResources: NonFungibleResourcesCollection) {
 			self.address = address
 			self.fungibleResources = fungibleResources
 			self.nonFungibleResources = nonFungibleResources
