@@ -95,7 +95,7 @@ private extension ManageGatewayAPIEndpoints.View {
 							equals: .gatewayURL,
 							first: viewStore.binding(
 								get: \.focusedField,
-								send: { .textFieldFocused($0) }
+								send: { .focusTextField($0) }
 							)
 						)
 						.keyboardType(.URL)

@@ -22,7 +22,7 @@ public extension ManageGatewayAPIEndpoints.Action {
 		case dismissButtonTapped
 		case urlStringChanged(String)
 		case switchToButtonTapped
-		case textFieldFocused(ManageGatewayAPIEndpoints.State.Field?)
+		case focusTextField(ManageGatewayAPIEndpoints.State.Field?)
 	}
 }
 
@@ -43,7 +43,6 @@ public extension ManageGatewayAPIEndpoints.Action {
 		case hasAccountsResult(TaskResult<Bool>)
 		case createAccountOnNetworkBeforeSwitchingToIt(AppPreferences.NetworkAndGateway)
 		case switchToResult(TaskResult<AppPreferences.NetworkAndGateway>)
-		case focusTextField(ManageGatewayAPIEndpoints.State.Field?)
 	}
 }
 

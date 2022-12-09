@@ -71,6 +71,10 @@ public extension ManageGatewayAPIEndpoints {
 				))))
 			}
 
+		case let .internal(.view(.focusTextField(focus))):
+			state.focusedField = focus
+			return .none
+
 		case let .internal(.system(.gatewayValidationResult(.failure(error)))):
 			state.isValidatingEndpoint = false
 			errorQueue.schedule(error)
@@ -151,14 +155,6 @@ public extension ManageGatewayAPIEndpoints {
 			return .none
 
 		case .delegate:
-			return .none
-		case let .internal(.view(.textFieldFocused(focus))):
-			return .run { send in
-				await send(.internal(.system(.focusTextField(focus))))
-			}
-
-		case let .internal(.system(.focusTextField(focus))):
-			state.focusedField = focus
 			return .none
 		}
 	}
