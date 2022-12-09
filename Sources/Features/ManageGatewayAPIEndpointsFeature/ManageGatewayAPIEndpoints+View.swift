@@ -108,7 +108,7 @@ private extension ManageGatewayAPIEndpoints.View {
 							viewStore.send(.switchToButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
-						.controlState(controlState(viewStore: viewStore))
+						.controlState(viewStore.controlState)
 					}
 					.padding(.medium3)
 				}
@@ -116,16 +116,6 @@ private extension ManageGatewayAPIEndpoints.View {
 			.onAppear {
 				viewStore.send(.didAppear)
 			}
-		}
-	}
-
-	func controlState(viewStore: ViewStore) -> ControlState {
-		if viewStore.isShowingLoader {
-			return .loading(.local)
-		} else if viewStore.isSwitchToButtonEnabled {
-			return .enabled
-		} else {
-			return .disabled
 		}
 	}
 
@@ -174,18 +164,14 @@ private extension ManageGatewayAPIEndpoints.View {
 extension ManageGatewayAPIEndpoints.View {
 	struct ViewState: Equatable {
 		public var urlString: String
-
 		public var networkAndGateway: AppPreferences.NetworkAndGateway?
-		public var isSwitchToButtonEnabled: Bool
-		public var isShowingLoader: Bool
+		public var controlState: ControlState
 		@BindableState public var focusedField: ManageGatewayAPIEndpoints.State.Field?
 
 		init(state: ManageGatewayAPIEndpoints.State) {
 			urlString = state.urlString
-
-			isSwitchToButtonEnabled = state.isSwitchToButtonEnabled
 			networkAndGateway = state.currentNetworkAndGateway
-			isShowingLoader = state.isValidatingEndpoint
+			controlState = state.controlState
 			focusedField = state.focusedField
 		}
 	}

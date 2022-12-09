@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import CreateAccountFeature
+import DesignSystem
 import Foundation
 import Profile
 
@@ -38,6 +39,18 @@ public extension ManageGatewayAPIEndpoints {
 public extension ManageGatewayAPIEndpoints.State {
 	enum Field: String, Sendable, Hashable {
 		case gatewayURL
+	}
+}
+
+extension ManageGatewayAPIEndpoints.State {
+	var controlState: ControlState {
+		if isValidatingEndpoint {
+			return .loading(.local)
+		} else if isSwitchToButtonEnabled {
+			return .enabled
+		} else {
+			return .disabled
+		}
 	}
 }
 
