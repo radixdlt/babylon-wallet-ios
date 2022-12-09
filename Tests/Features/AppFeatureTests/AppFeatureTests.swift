@@ -80,7 +80,6 @@ final class AppFeatureTests: TestCase {
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.system(.verifyBiometrics)))))
 		await store.receive(.child(.splash(.internal(.system(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp)))))))
 
 		// then
@@ -115,7 +114,6 @@ final class AppFeatureTests: TestCase {
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.system(.verifyBiometrics)))))
 		await store.receive(.child(.splash(.internal(.system(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp)))))))
 
 		// then
@@ -159,7 +157,6 @@ final class AppFeatureTests: TestCase {
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.system(.verifyBiometrics)))))
 		await store.receive(.child(.splash(.internal(.system(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp)))))))
 
 		// then
@@ -211,7 +208,6 @@ final class AppFeatureTests: TestCase {
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.system(.verifyBiometrics)))))
 		await store.receive(.child(.splash(.internal(.system(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp)))))))
 
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
@@ -259,7 +255,6 @@ final class AppFeatureTests: TestCase {
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.system(.verifyBiometrics)))))
 		await store.receive(.child(.splash(.internal(.system(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp)))))))
 
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {

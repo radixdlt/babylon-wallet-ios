@@ -33,12 +33,10 @@ final class SplashFeatureTests: TestCase {
 		await store.send(.internal(.view(.viewAppeared)))
 
 		// then
-		await store.receive(.internal(.system(.loadProfile)))
 		await store.receive(.internal(.system(.loadProfileResult(.success(newProfile))))) {
 			$0.profileResult = .success(newProfile)
 		}
 		await testScheduler.advance(by: .seconds(0.2))
-		await store.receive(.internal(.system(.verifyBiometrics)))
 		await store.receive(.internal(.system(.biometricsConfigResult(.success(authBiometricsConfig))))) {
 			$0.alert = .init(
 				title: .init("Biometrics not set up"),
@@ -87,12 +85,10 @@ final class SplashFeatureTests: TestCase {
 		await store.send(.internal(.view(.viewAppeared)))
 
 		// then
-		await store.receive(.internal(.system(.loadProfile)))
 		await store.receive(.internal(.system(.loadProfileResult(result)))) {
 			$0.profileResult = result
 		}
 		await testScheduler.advance(by: .seconds(0.2))
-		await store.receive(.internal(.system(.verifyBiometrics)))
 		await store.receive(.internal(.system(.biometricsConfigResult(.success(authBiometricsConfig)))))
 		await store.receive(.delegate(.profileResultLoaded(result)))
 	}

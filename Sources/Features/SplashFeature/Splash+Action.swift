@@ -32,9 +32,7 @@ public extension Splash.Action {
 // MARK: - Splash.Action.SystemAction
 public extension Splash.Action {
 	enum SystemAction: Sendable, Equatable {
-		case verifyBiometrics
 		case biometricsConfigResult(TaskResult<LocalAuthenticationConfig>)
-		case loadProfile
 		case loadProfileResult(ProfileLoader.ProfileResult)
 	}
 }

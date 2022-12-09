@@ -17,23 +17,11 @@ public struct Splash: Sendable, ReducerProtocol {
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.viewAppeared)):
-			return .run { send in
-				await send(.internal(.system(.loadProfile)))
-			}
+			return loadProfile()
 
 		case .internal(.view(.alertRetryButtonTapped)):
-			return .run { send in
-				await send(.internal(.system(.verifyBiometrics)))
-			}
-
-		case .internal(.system(.verifyBiometrics)):
-			return .run { send in
-				await send(.internal(.system(.biometricsConfigResult(
-					TaskResult {
-						try await localAuthenticationClient.queryConfig()
-					}
-				))))
-			}
+			state.alert = nil
+			return verifyBiometrics()
 
 		case let .internal(.system(.biometricsConfigResult(result))):
 			let config = try? result.value
@@ -51,20 +39,11 @@ public struct Splash: Sendable, ReducerProtocol {
 				await send(.delegate(.profileResultLoaded(profileResult!)))
 			}
 
-		case .internal(.system(.loadProfile)):
-			return .run { send in
-				let result = await profileLoader.loadProfile()
-				await send(.internal(.system(.loadProfileResult(
-					result
-				))))
-			}
-
 		case let .internal(.system(.loadProfileResult(result))):
 			state.profileResult = result
-			return .run { send in
+			return .run { _ in
 				await delay()
-				await send(.internal(.system(.verifyBiometrics)))
-			}
+			}.concatenate(with: verifyBiometrics())
 
 		case .delegate:
 			return .none
@@ -79,5 +58,24 @@ public struct Splash: Sendable, ReducerProtocol {
 		durationInMS = 800
 		#endif
 		try? await mainQueue.sleep(for: .milliseconds(durationInMS))
+	}
+
+	func loadProfile() -> EffectTask<Action> {
+		.run { send in
+			let result = await profileLoader.loadProfile()
+			await send(.internal(.system(.loadProfileResult(
+				result
+			))))
+		}
+	}
+
+	func verifyBiometrics() -> EffectTask<Action> {
+		.run { send in
+			await send(.internal(.system(.biometricsConfigResult(
+				TaskResult {
+					try await localAuthenticationClient.queryConfig()
+				}
+			))))
+		}
 	}
 }
