@@ -16,8 +16,12 @@ public struct Splash: Sendable, ReducerProtocol {
 
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.view(.viewAppeared)),
-		     .internal(.view(.alertRetryButtonTapped)):
+		case .internal(.view(.viewAppeared)):
+			return .run { send in
+				await send(.internal(.system(.loadProfile)))
+			}
+
+		case .internal(.view(.alertRetryButtonTapped)):
 			return .run { send in
 				await send(.internal(.system(.verifyBiometrics)))
 			}
@@ -41,8 +45,10 @@ public struct Splash: Sendable, ReducerProtocol {
 				return .none
 			}
 
-			return .run { send in
-				await send(.internal(.system(.loadProfile)))
+			precondition(state.profileResult != nil)
+
+			return .run { [profileResult = state.profileResult] send in
+				await send(.delegate(.profileResultLoaded(profileResult!)))
 			}
 
 		case .internal(.system(.loadProfile)):
@@ -54,9 +60,10 @@ public struct Splash: Sendable, ReducerProtocol {
 			}
 
 		case let .internal(.system(.loadProfileResult(result))):
+			state.profileResult = result
 			return .run { send in
 				await delay()
-				await send(.delegate(.profileResultLoaded(result)))
+				await send(.internal(.system(.verifyBiometrics)))
 			}
 
 		case .delegate:
