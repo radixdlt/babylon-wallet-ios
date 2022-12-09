@@ -11,21 +11,25 @@ public extension ConnectUsingSecrets {
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String
 		public var newConnection: Connection?
+		public var isNameValid: Bool
 		@BindableState public var focusedField: Field?
+
 		public init(
 			connectionSecrets: ConnectionSecrets,
 			isConnecting: Bool = true,
 			connectedConnection: Connection? = nil,
 			focusedField: Field? = nil,
 			isPromptingForName: Bool = false,
-			nameOfConnection: String = ""
+			nameOfConnection: String = "",
+			isNameValid: Bool = false
 		) {
 			self.focusedField = focusedField
 			self.connectionSecrets = connectionSecrets
 			self.isConnecting = isConnecting
 			self.isPromptingForName = isPromptingForName
 			self.nameOfConnection = nameOfConnection
-			newConnection = connectedConnection
+			self.newConnection = connectedConnection
+			self.isNameValid = isNameValid
 		}
 	}
 }
