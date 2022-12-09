@@ -116,7 +116,7 @@ public extension ManageP2PClients {
 					TaskResult {
 						try await p2pConnectivityClient.addP2PClientWithConnection(
 							connectedClient,
-							true // connect since we actuall disconnected the new connection in order to trigger faster reconnect
+							false
 						)
 					}.map { connectedClient }
 				))))

@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Converse.git",
       "state" : {
-        "revision" : "850abbb5713252f0a7ea9a6f6b43f5416ed34cc2",
-        "version" : "0.1.30"
+        "revision" : "572bb34fd680bf7c3503ccbc3e612cc2d45bd7c8",
+        "version" : "0.2.0"
       }
     },
     {
@@ -165,10 +165,10 @@
     {
       "identity" : "swift-collections",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-collections.git",
+      "location" : "https://github.com/apple/swift-collections",
       "state" : {
-        "revision" : "f504716c27d2e5d4144fa4794b12129301d17729",
-        "version" : "1.0.3"
+        "revision" : "937e904258d22af6e447a0b72c0bc67583ef64a2",
+        "version" : "1.0.4"
       }
     },
     {
@@ -176,8 +176,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "f027afd8f56477f5a4d3548f592dfa80a0aeb417",
-        "version" : "0.47.1"
+        "revision" : "c9259b5f74892690cb04a9a8088b4a1789b05a7d",
+        "version" : "0.47.2"
       }
     },
     {
@@ -275,8 +275,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swiftui-navigation",
       "state" : {
-        "revision" : "4b666bcc59ba1711a7543ecb37e1d181963b180c",
-        "version" : "0.4.2"
+        "revision" : "a4a84e387c83a735e56d03bf9736d49a07b3c3ae",
+        "version" : "0.4.3"
       }
     },
     {
@@ -300,7 +300,7 @@
     {
       "identity" : "webrtc",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/stasel/WebRTC.git",
+      "location" : "https://github.com/stasel/WebRTC",
       "state" : {
         "revision" : "6dd54fc242d3261317b5e6eb17bf178b1359609b",
         "version" : "106.0.0"

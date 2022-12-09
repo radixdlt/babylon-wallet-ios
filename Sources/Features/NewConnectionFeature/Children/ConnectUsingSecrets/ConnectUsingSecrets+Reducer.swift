@@ -27,23 +27,24 @@ public extension ConnectUsingSecrets {
 						// but instead of waiting for iOS to detect that the webRTC connection closed and
 						// trigger reconnect, we will eagerly close and then connect when this client is
 						// saved to the `p2pConnectivityClient`
-						await connection.close()
-						return try! .live(connectionSecrets: .from(connectionPassword: connection.getConnectionPassword()))
+//						await connection.close()
+//						return try! .live(connectionSecrets: .from(connectionPassword: connection.getConnectionPassword()))
+						return connection
 					}
 				))))
 			}
 
 		case let .internal(.system(.establishConnectionResult(.success(connection)))):
 			state.newConnection = connection
-			return .run { send in
-				await send(.internal(.system(.closedConnectionInOrderToTriggerEagerReconnect)))
-			}
-
-		case .internal(.system(.closedConnectionInOrderToTriggerEagerReconnect)):
 			state.isConnecting = false
 			state.isPromptingForName = true
 
 			return .none
+//			return .run { send in
+//				await send(.internal(.system(.closedConnectionInOrderToTriggerEagerReconnect)))
+//			}
+//
+//		case .internal(.system(.closedConnectionInOrderToTriggerEagerReconnect)):
 
 		case let .internal(.view(.textFieldFocused(focus))):
 			return .run { send in
