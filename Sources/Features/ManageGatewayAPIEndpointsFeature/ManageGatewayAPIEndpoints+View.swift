@@ -44,9 +44,14 @@ public extension ManageGatewayAPIEndpoints.View {
 	}
 }
 
+// MARK: - ManageGatewayAPIEndpoints.View.ViewStore
+private extension ManageGatewayAPIEndpoints.View {
+	typealias ViewStore = ComposableArchitecture.ViewStore<ViewState, ManageGatewayAPIEndpoints.Action.ViewAction>
+}
+
 private extension ManageGatewayAPIEndpoints.View {
 	@ViewBuilder
-	func core(viewStore: ViewStore<ViewState, ManageGatewayAPIEndpoints.Action.ViewAction>) -> some View {
+	func core(viewStore: ViewStore) -> some View {
 		ForceFullScreen {
 			VStack(spacing: .zero) {
 				NavigationBar(
@@ -97,26 +102,30 @@ private extension ManageGatewayAPIEndpoints.View {
 						.autocorrectionDisabled()
 						.textInputAutocapitalization(.never)
 
-						// FIXME: betanet remove this loader and use button loader instead
-						if viewStore.isShowingLoader {
-							LoadingView()
-						}
-
 						Spacer(minLength: .large1 * 2)
 
-						// FIXME: betanet move loading indicator into button below
 						Button(L10n.ManageGateway.switchToButtonTitle) {
 							viewStore.send(.switchToButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
-						.enabled(viewStore.isSwitchToButtonEnabled)
+						.controlState(controlState(viewStore: viewStore))
 					}
-					.padding(.medium1)
+					.padding(.medium3)
 				}
 			}
 			.onAppear {
 				viewStore.send(.didAppear)
 			}
+		}
+	}
+
+	func controlState(viewStore: ViewStore) -> ControlState {
+		if viewStore.isShowingLoader {
+			return .loading(.local)
+		} else if viewStore.isSwitchToButtonEnabled {
+			return .enabled
+		} else {
+			return .disabled
 		}
 	}
 
