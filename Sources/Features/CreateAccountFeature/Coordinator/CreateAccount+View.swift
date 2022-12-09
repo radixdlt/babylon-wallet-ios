@@ -128,39 +128,6 @@ private extension CreateAccount.View {
 			.foregroundColor(.app.gray1)
 			.textStyle(.body1Regular)
 	}
-
-	func textField<Value>(
-		placeholder: String,
-		text: Binding<String>,
-		hint: String,
-		binding: FocusState<Value>.Binding,
-		equals: Value,
-		first: Binding<Value>
-	) -> some View {
-		VStack(alignment: .leading, spacing: .small2) {
-			TextField(
-				placeholder,
-				text: text
-					.removeDuplicates()
-			)
-			.focused(binding, equals: equals)
-			.synchronize(first, binding)
-			.padding()
-			.frame(height: .standardButtonHeight)
-			.background(Color.app.gray5)
-			.foregroundColor(.app.gray1)
-			.textStyle(.body1Regular)
-			.cornerRadius(.small2)
-			.overlay(
-				RoundedRectangle(cornerRadius: .small2)
-					.stroke(Color.app.gray1, lineWidth: 1)
-			)
-
-			Text(hint)
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2Regular)
-		}
-	}
 }
 
 // MARK: - CreateAccount_Previews

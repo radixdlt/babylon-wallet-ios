@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftUINavigation
 
 // MARK: - AppTextField
 public struct AppTextField<Value: Hashable>: View {
@@ -33,7 +34,7 @@ public struct AppTextField<Value: Hashable>: View {
 					.removeDuplicates()
 			)
 			.focused(binding, equals: equals)
-			.synchronize(first, binding)
+			.bind(first, to: binding)
 			.padding()
 			.frame(height: .standardButtonHeight)
 			.background(Color.app.gray5)
@@ -49,22 +50,6 @@ public struct AppTextField<Value: Hashable>: View {
 				.foregroundColor(.app.gray2)
 				.textStyle(.body2Regular)
 		}
-	}
-}
-
-// TODO: extract / delete duplicate
-extension View {
-	func synchronize<Value>(
-		_ first: Binding<Value>,
-		_ second: FocusState<Value>.Binding
-	) -> some View {
-		onChange(of: first.wrappedValue) { second.wrappedValue = $0 }
-			.onChange(of: second.wrappedValue) { first.wrappedValue = $0 }
-	}
-
-	@inlinable
-	func enabled(_ enabled: @autoclosure () -> Bool) -> some View {
-		disabled(!enabled())
 	}
 }
 
