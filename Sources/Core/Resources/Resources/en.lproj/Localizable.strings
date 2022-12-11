@@ -2,43 +2,43 @@
 
 "accountList.row.copyTitle" = "Copy";
 
-"accountPreferences.faucetButtonTitle" = "Get betanet XRD test tokens";
-"accountPreferences.title" = "Account preferences";
+"accountPreferences.faucetButtonTitle" = "Get Betanet XRD Test Tokens";
+"accountPreferences.title" = "Account Preferences";
 
 "aggregatedValue.title" = "Total value";
 
 "assetsView.badges" = "Badges";
 "assetsView.nfts" = "NFTs";
-"assetsView.poolShare" = "Pool Share";
+"assetsView.poolShare" = "Pool Shares";
 "assetsView.tokens" = "Tokens";
 
 "createAccount.biometricsPrompt" = "Unlock secret used to create new account.";
-"createAccount.completion.explanation" = "Your account lives on the Radix Network and you can access it anytime in Radix Wallet.";
-"createAccount.completion.origin.home" = "Home";
+"createAccount.completion.explanation" = "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.";
+"createAccount.completion.origin.home" = "Account List";
 "createAccount.completion.returnToOrigin" = "Go to %@";
-"createAccount.completion.subtitle" = "You’ve created your account.";
+"createAccount.completion.subtitle" = "Your account has been created.";
 "createAccount.completion.title" = "Congratulations";
 "createAccount.createAccountButtonTitle" = "Create Account";
 "createAccount.createFirstAccount" = "Create First Account";
 "createAccount.createNewAccount" = "Create New Account";
 "createAccount.explanation" = "This can be changed any time";
-"createAccount.placeholder" = "e.g. My First Account";
+"createAccount.placeholder" = "e.g. My Main Account";
 "createAccount.subtitle" = "What would you like to call your account?";
 
 "home.header.subtitle" = "Welcome, here are all your accounts on the Radix Network";
 "home.header.title" = "Radix Wallet";
 
-"home.visitHub.buttonTitle" = "Visit the Radix Hub";
+"home.visitHub.buttonTitle" = "Visit the Radix Dashboard";
 "home.visitHub.title" = "Ready to get started using the Radix Network and your Wallet?";
 
-"dApp.chooseAccounts.createNewAccount" = "+ Create a new Account";
+"dApp.chooseAccounts.createNewAccount" = "+ Create a New Account";
 "dApp.chooseAccounts.explanation" = "Choose %@";
-"dApp.chooseAccounts.explanationAtLeastOneAccount" = "at least one account";
-"dApp.chooseAccounts.explanationExactNumberOfAccounts" = "exactly #%d accounts";
-"dApp.chooseAccounts.explanationExactlyOneAccount" = "exactly one account";
-"dApp.chooseAccounts.subtitle" = "Choose the account(s) you wish %@ to know about";
+"dApp.chooseAccounts.explanationAtLeastOneAccount" = "At Least One Account";
+"dApp.chooseAccounts.explanationExactNumberOfAccounts" = "#%d Accounts";
+"dApp.chooseAccounts.explanationExactlyOneAccount" = "One Account";
+"dApp.chooseAccounts.subtitle" = "Choose the account(s) you want %@ to know about.";
 "dApp.chooseAccounts.title" = "Choose Accounts";
-"dApp.chooseAccounts.unnamedAccount" = "Unnamed account";
+"dApp.chooseAccounts.unnamedAccount" = "Unnamed Account";
 "dApp.connectionRequest.continueButtonTitle" = "Continue";
 "dApp.connectionRequest.subtitle" = "For this dApp to function, it needs the following:";
 "dApp.connectionRequest.title" = "dApp Connection Request";
@@ -46,57 +46,57 @@
 "dApp.unknownName" = "Unknown dApp";
 
 "importProfile.importMnemonic" = "Import mnemonic";
-"importProfile.importProfile" = "Import profile";
-"importProfile.mnemonicPhrasec" = "Mnemonic phrasec";
-"importProfile.profileFromSnapshot" = "Profile from snapshot";
+"importProfile.importProfile" = "Import Radix Wallet backup";
+"importProfile.mnemonicPhrasec" = "Mnemonic phrase";
+"importProfile.profileFromSnapshot" = "Radix Wallet backup from file";
 "importProfile.saveImportedMnemonic" = "Save imported mnemonic";
 
-"manageGateway.title" = "Gateway";
-"manageGateway.currentGatewayTitle" = "Current";
-"manageGateway.gatewayAPIEndpoint" = "Gateway API Endpoint";
+"manageGateway.title" = "Network Gateway";
+"manageGateway.currentGatewayTitle" = "Current Network Gateway";
+"manageGateway.gatewayAPIEndpoint" = "Gateway URL";
 "manageGateway.networkID" = "Network ID";
-"manageGateway.networkName" = "Network name";
-"manageGateway.inputNewGatewayAPIURL" = "New URL (https:// required)";
+"manageGateway.networkName" = "Network Name";
+"manageGateway.inputNewGatewayAPIURL" = "New Gateway URL";
 "manageGateway.urlString" = "https://example.com:8080";
-"manageGateway.switchToButtonTitle" = "Switch To";
+"manageGateway.switchToButtonTitle" = "Update Gateway";
 
-"newConnection.title" = "Connect Extension";
-"newConnection.scanRadixConnectorExtensionQRCode" = "Scan QR code displayed by the Radix Wallet Connector browser extension.";
-"newConnection.connecting" = "Connecting...";
-"newConnection.nameConnectionInstruction" = "Name this connection, e.g. \"Chrome on Macbook Pro\"";
-"newConnection.nameConnectionTextFieldHint" = "Name of connection";
-"newConnection.saveNamedConnectionButton" = "Save connection";
+"newConnection.title" = "Link to Connector";
+"newConnection.scanRadixConnectorExtensionQRCode" = "Scan the QR code displayed by the Radix Wallet Connector browser extension.";
+"newConnection.connecting" = "Linking...";
+"newConnection.nameConnectionInstruction" = "Name this Connector, e.g. \"Chrome on Macbook Pro\"";
+"newConnection.nameConnectionTextFieldHint" = "Name of Connector";
+"newConnection.saveNamedConnectionButton" = "Save Link";
 "newConnection.defaultNameOfConnection" = "Unnamed";
 
-"manageP2PClients.P2PConnectionsTitle" = "Desktop Connections";
-"manageP2PClients.P2PConnectionsSubtitle" = "Your wallet is connected to the following desktop browsers via Radix Connect";
-"manageP2PClients.connectionID" = "Connection ID: %@";
-"manageP2PClients.newConnectionButtonTitle" = "New Connection";
-"manageP2PClients.newConnectionTitle" = "New Connection";
+"manageP2PClients.P2PConnectionsTitle" = "Linked Connector";
+"manageP2PClients.P2PConnectionsSubtitle" = "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.";
+"manageP2PClients.connectionID" = "Connector Name: %@";
+"manageP2PClients.newConnectionButtonTitle" = "Link New Connector";
+"manageP2PClients.newConnectionTitle" = "Link New Connector";
 "manageP2PClients.sendTestMessageButtonTitle" = "Send Test Msg";
 
 "nftList.header.supplyUnknown" = "Unknown";
 "nftList.nftPlural" = "%d NFTs";
 "nftList.ownedOfTotal" = "%d of %d";
 
-"onboarding.biometricsNotSetUpMessage" = "This app requires your phone having biometrics set up";
-"onboarding.biometricsNotSetUpTitle" = "Biometrics not set up";
+"onboarding.biometricsNotSetUpMessage" = "Using Radix Wallet currently requires biometrics be enabled on your phone";
+"onboarding.biometricsNotSetUpTitle" = "Biometrics Not Configured";
 "onboarding.newAccountButtonTitle" = "New Account";
 
 "settings.closeButtonTitle" = "Close";
-"settings.connectExtension.buttonTitle" = "Connect Extension";
-"settings.connectExtension.subtitle" = "Scan your browser extension code to confirm your connection";
-"settings.connectExtension.title" = "Connect your wallet to a browser";
-"settings.deleteAllButtonTitle" = "Delete wallet";
-"settings.desktopConnectionsButtonTitle" = "Desktop Connections";
-"settings.gatewayButtonTitle" = "Gateway";
-"settings.inspectProfileButtonTitle" = "Inspect Profile";
-"settings.noProfileText" = "No profile, strange";
-"settings.title" = "Settings";
+"settings.connectExtension.buttonTitle" = "Link to Connector";
+"settings.connectExtension.subtitle" = "Scan the QR code in the Radix Wallet Connector extension";
+"settings.connectExtension.title" = "Link your Wallet to a Desktop Browser";
+"settings.deleteAllButtonTitle" = "Delete Wallet Data";
+"settings.desktopConnectionsButtonTitle" = "Linked Connector";
+"settings.gatewayButtonTitle" = "Network Gateway";
+"settings.inspectProfileButtonTitle" = "Inspect Radix Wallet Data";
+"settings.noProfileText" = "Error: No Wallet Data Found";
+"settings.title" = "Wallet Settings";
 "settings.versionInfo" = "Version: %@ build #%@";
 
-"transactionSigning.biometricsPrompt" = "Unlock secret used to sign TX";
+"transactionSigning.biometricsPrompt" = "Unlock secret used to sign transaction";
 "transactionSigning.signTransactionButtonTitle" = "Approve Transaction";
-"transactionSigning.title" = "Approve transaction";
-"transactionSigning.preparingTransactionLoadingText" = "Preparing transaction";
-"transactionSigning.signingAndSubmittingTransactionLoadingText" = "Submitting transaction";
+"transactionSigning.title" = "Approve Transaction";
+"transactionSigning.preparingTransactionLoadingText" = "Preparing transaction...";
+"transactionSigning.signingAndSubmittingTransactionLoadingText" = "Submitting transaction...";
