@@ -167,7 +167,10 @@ final class AppFeatureTests: TestCase {
 		await store.receive(.internal(.system(.displayErrorAlert(
 			App.UserFacingError(foobar)
 		)))) {
-			$0.errorAlert = .init(title: .init("An error ocurred"), message: .init("Failed to decode profile: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))"))
+			$0.errorAlert = .init(
+				title: .init("An error ocurred"),
+				message: .init("Failed to create Wallet from backup: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))")
+			)
 		}
 
 		await store.send(.view(.errorAlertDismissButtonTapped)) {

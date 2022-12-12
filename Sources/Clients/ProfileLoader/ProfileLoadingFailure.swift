@@ -1,3 +1,4 @@
+import Common
 import Foundation
 import Profile
 import Version
@@ -29,7 +30,7 @@ public extension ProfileLoader {
 			self.error = error
 		}
 
-		public var errorDescription: String? { "Failed to create profile from snapshot, error: \(String(describing: error)), version: \(String(describing: version))" }
+		public var errorDescription: String? { L10n.ProfileLoad.failedToCreateProfileFromSnapshotError(error, version) }
 	}
 
 	enum JSONDecodingError: Sendable, LocalizedError, Equatable {
@@ -55,7 +56,7 @@ public extension ProfileLoader.JSONDecodingError {
 			self.decodingError = decodingError
 		}
 
-		public var errorDescription: String? { "Failed to decode profile: \(String(describing: decodingError))" }
+		public var errorDescription: String? { L10n.ProfileLoad.decodingError(decodingError) }
 	}
 
 	struct UnknownDecodingError: Sendable, LocalizedError, Equatable {
@@ -64,7 +65,7 @@ public extension ProfileLoader.JSONDecodingError {
 		}
 
 		public let error: Swift.Error
-		public var errorDescription: String? { "Failed to decode profile: \(String(describing: error))" }
+		public var errorDescription: String? { L10n.ProfileLoad.decodingError(error) }
 
 		public init(error: Error) {
 			self.error = error

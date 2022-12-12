@@ -21,10 +21,10 @@ public enum L10n {
   	}
 	}
 	public enum AccountPreferences {
-  	/// Get betanet XRD test tokens
-  	public static let faucetButtonTitle = L10n.tr("Localizable", "accountPreferences.faucetButtonTitle", fallback: "Get betanet XRD test tokens")
-  	/// Account preferences
-  	public static let title = L10n.tr("Localizable", "accountPreferences.title", fallback: "Account preferences")
+  	/// Get Betanet XRD Test Tokens
+  	public static let faucetButtonTitle = L10n.tr("Localizable", "accountPreferences.faucetButtonTitle", fallback: "Get Betanet XRD Test Tokens")
+  	/// Account Preferences
+  	public static let title = L10n.tr("Localizable", "accountPreferences.title", fallback: "Account Preferences")
 	}
 	public enum AggregatedValue {
   	/// Total value
@@ -39,14 +39,14 @@ public enum L10n {
   	public static let badges = L10n.tr("Localizable", "assetsView.badges", fallback: "Badges")
   	/// NFTs
   	public static let nfts = L10n.tr("Localizable", "assetsView.nfts", fallback: "NFTs")
-  	/// Pool Share
-  	public static let poolShare = L10n.tr("Localizable", "assetsView.poolShare", fallback: "Pool Share")
+  	/// Pool Shares
+  	public static let poolShare = L10n.tr("Localizable", "assetsView.poolShare", fallback: "Pool Shares")
   	/// Tokens
   	public static let tokens = L10n.tr("Localizable", "assetsView.tokens", fallback: "Tokens")
 	}
 	public enum CreateAccount {
-  	/// Unlock secret used to create new account.
-  	public static let biometricsPrompt = L10n.tr("Localizable", "createAccount.biometricsPrompt", fallback: "Unlock secret used to create new account.")
+  	/// Authenticate to create new account with this phone.
+  	public static let biometricsPrompt = L10n.tr("Localizable", "createAccount.biometricsPrompt", fallback: "Authenticate to create new account with this phone.")
   	/// Create Account
   	public static let createAccountButtonTitle = L10n.tr("Localizable", "createAccount.createAccountButtonTitle", fallback: "Create Account")
   	/// Create First Account
@@ -55,24 +55,24 @@ public enum L10n {
   	public static let createNewAccount = L10n.tr("Localizable", "createAccount.createNewAccount", fallback: "Create New Account")
   	/// This can be changed any time
   	public static let explanation = L10n.tr("Localizable", "createAccount.explanation", fallback: "This can be changed any time")
-  	/// e.g. My First Account
-  	public static let placeholder = L10n.tr("Localizable", "createAccount.placeholder", fallback: "e.g. My First Account")
+  	/// e.g. My Main Account
+  	public static let placeholder = L10n.tr("Localizable", "createAccount.placeholder", fallback: "e.g. My Main Account")
   	/// What would you like to call your account?
   	public static let subtitle = L10n.tr("Localizable", "createAccount.subtitle", fallback: "What would you like to call your account?")
   	public enum Completion {
-    	/// Your account lives on the Radix Network and you can access it anytime in Radix Wallet.
-    	public static let explanation = L10n.tr("Localizable", "createAccount.completion.explanation", fallback: "Your account lives on the Radix Network and you can access it anytime in Radix Wallet.")
+    	/// Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.
+    	public static let explanation = L10n.tr("Localizable", "createAccount.completion.explanation", fallback: "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.")
     	/// Go to %@
     	public static func returnToOrigin(_ p1: Any) -> String {
     		return L10n.tr("Localizable", "createAccount.completion.returnToOrigin", String(describing: p1), fallback: "Go to %@")
     	}
-    	/// You’ve created your account.
-    	public static let subtitle = L10n.tr("Localizable", "createAccount.completion.subtitle", fallback: "You’ve created your account.")
+    	/// Your account has been created.
+    	public static let subtitle = L10n.tr("Localizable", "createAccount.completion.subtitle", fallback: "Your account has been created.")
     	/// Congratulations
     	public static let title = L10n.tr("Localizable", "createAccount.completion.title", fallback: "Congratulations")
     	public enum Origin {
-      	/// Home
-      	public static let home = L10n.tr("Localizable", "createAccount.completion.origin.home", fallback: "Home")
+      	/// Account List
+      	public static let home = L10n.tr("Localizable", "createAccount.completion.origin.home", fallback: "Account List")
     	}
   	}
 	}
@@ -80,28 +80,28 @@ public enum L10n {
   	/// Unknown dApp
   	public static let unknownName = L10n.tr("Localizable", "dApp.unknownName", fallback: "Unknown dApp")
   	public enum ChooseAccounts {
-    	/// + Create a new Account
-    	public static let createNewAccount = L10n.tr("Localizable", "dApp.chooseAccounts.createNewAccount", fallback: "+ Create a new Account")
+    	/// + Create a New Account
+    	public static let createNewAccount = L10n.tr("Localizable", "dApp.chooseAccounts.createNewAccount", fallback: "+ Create a New Account")
     	/// Choose %@
     	public static func explanation(_ p1: Any) -> String {
     		return L10n.tr("Localizable", "dApp.chooseAccounts.explanation", String(describing: p1), fallback: "Choose %@")
     	}
-    	/// at least one account
-    	public static let explanationAtLeastOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationAtLeastOneAccount", fallback: "at least one account")
-    	/// exactly one account
-    	public static let explanationExactlyOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactlyOneAccount", fallback: "exactly one account")
-    	/// exactly #%d accounts
+    	/// At Least One Account
+    	public static let explanationAtLeastOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationAtLeastOneAccount", fallback: "At Least One Account")
+    	/// One Account
+    	public static let explanationExactlyOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactlyOneAccount", fallback: "One Account")
+    	/// #%d Accounts
     	public static func explanationExactNumberOfAccounts(_ p1: Int) -> String {
-    		return L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactNumberOfAccounts", p1, fallback: "exactly #%d accounts")
+    		return L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactNumberOfAccounts", p1, fallback: "#%d Accounts")
     	}
-    	/// Choose the account(s) you wish %@ to know about
+    	/// Choose the account(s) you want %@ to know about.
     	public static func subtitle(_ p1: Any) -> String {
-    		return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle", String(describing: p1), fallback: "Choose the account(s) you wish %@ to know about")
+    		return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle", String(describing: p1), fallback: "Choose the account(s) you want %@ to know about.")
     	}
     	/// Choose Accounts
     	public static let title = L10n.tr("Localizable", "dApp.chooseAccounts.title", fallback: "Choose Accounts")
-    	/// Unnamed account
-    	public static let unnamedAccount = L10n.tr("Localizable", "dApp.chooseAccounts.unnamedAccount", fallback: "Unnamed account")
+    	/// Unnamed Account
+    	public static let unnamedAccount = L10n.tr("Localizable", "dApp.chooseAccounts.unnamedAccount", fallback: "Unnamed Account")
   	}
   	public enum ConnectionRequest {
     	/// Continue
@@ -124,8 +124,8 @@ public enum L10n {
     	public static let title = L10n.tr("Localizable", "home.header.title", fallback: "Radix Wallet")
   	}
   	public enum VisitHub {
-    	/// Visit the Radix Hub
-    	public static let buttonTitle = L10n.tr("Localizable", "home.visitHub.buttonTitle", fallback: "Visit the Radix Hub")
+    	/// Visit the Radix Dashboard
+    	public static let buttonTitle = L10n.tr("Localizable", "home.visitHub.buttonTitle", fallback: "Visit the Radix Dashboard")
     	/// Ready to get started using the Radix Network and your Wallet?
     	public static let title = L10n.tr("Localizable", "home.visitHub.title", fallback: "Ready to get started using the Radix Network and your Wallet?")
   	}
@@ -133,66 +133,66 @@ public enum L10n {
 	public enum ImportProfile {
   	/// Import mnemonic
   	public static let importMnemonic = L10n.tr("Localizable", "importProfile.importMnemonic", fallback: "Import mnemonic")
-  	/// Import profile
-  	public static let importProfile = L10n.tr("Localizable", "importProfile.importProfile", fallback: "Import profile")
-  	/// Mnemonic phrasec
-  	public static let mnemonicPhrasec = L10n.tr("Localizable", "importProfile.mnemonicPhrasec", fallback: "Mnemonic phrasec")
-  	/// Profile from snapshot
-  	public static let profileFromSnapshot = L10n.tr("Localizable", "importProfile.profileFromSnapshot", fallback: "Profile from snapshot")
+  	/// Import Radix Wallet backup
+  	public static let importProfile = L10n.tr("Localizable", "importProfile.importProfile", fallback: "Import Radix Wallet backup")
+  	/// Mnemonic phrase
+  	public static let mnemonicPhrasec = L10n.tr("Localizable", "importProfile.mnemonicPhrasec", fallback: "Mnemonic phrase")
+  	/// Radix Wallet backup from file
+  	public static let profileFromSnapshot = L10n.tr("Localizable", "importProfile.profileFromSnapshot", fallback: "Radix Wallet backup from file")
   	/// Save imported mnemonic
   	public static let saveImportedMnemonic = L10n.tr("Localizable", "importProfile.saveImportedMnemonic", fallback: "Save imported mnemonic")
 	}
 	public enum ManageGateway {
-  	/// Current
-  	public static let currentGatewayTitle = L10n.tr("Localizable", "manageGateway.currentGatewayTitle", fallback: "Current")
-  	/// Gateway API Endpoint
-  	public static let gatewayAPIEndpoint = L10n.tr("Localizable", "manageGateway.gatewayAPIEndpoint", fallback: "Gateway API Endpoint")
+  	/// Current Network Gateway
+  	public static let currentGatewayTitle = L10n.tr("Localizable", "manageGateway.currentGatewayTitle", fallback: "Current Network Gateway")
+  	/// Gateway URL
+  	public static let gatewayAPIEndpoint = L10n.tr("Localizable", "manageGateway.gatewayAPIEndpoint", fallback: "Gateway URL")
   	/// Network ID
   	public static let networkID = L10n.tr("Localizable", "manageGateway.networkID", fallback: "Network ID")
-  	/// Network name
-  	public static let networkName = L10n.tr("Localizable", "manageGateway.networkName", fallback: "Network name")
-  	/// Switch To
-  	public static let switchToButtonTitle = L10n.tr("Localizable", "manageGateway.switchToButtonTitle", fallback: "Switch To")
-  	/// New URL (https:// required)
-  	public static let textFieldHint = L10n.tr("Localizable", "manageGateway.textFieldHint", fallback: "New URL (https:// required)")
+  	/// Network Name
+  	public static let networkName = L10n.tr("Localizable", "manageGateway.networkName", fallback: "Network Name")
+  	/// Update Gateway
+  	public static let switchToButtonTitle = L10n.tr("Localizable", "manageGateway.switchToButtonTitle", fallback: "Update Gateway")
+  	/// New Gateway URL
+  	public static let textFieldHint = L10n.tr("Localizable", "manageGateway.textFieldHint", fallback: "New Gateway URL")
   	/// Enter full URL
   	public static let textFieldPlaceholder = L10n.tr("Localizable", "manageGateway.textFieldPlaceholder", fallback: "Enter full URL")
-  	/// Gateway
-  	public static let title = L10n.tr("Localizable", "manageGateway.title", fallback: "Gateway")
+  	/// Network Gateway
+  	public static let title = L10n.tr("Localizable", "manageGateway.title", fallback: "Network Gateway")
   	/// https://example.com:8080
   	public static let urlString = L10n.tr("Localizable", "manageGateway.urlString", fallback: "https://example.com:8080")
 	}
 	public enum ManageP2PClients {
-  	/// Connection ID: %@
+  	/// Connector ID: %@
   	public static func connectionID(_ p1: Any) -> String {
-  		return L10n.tr("Localizable", "manageP2PClients.connectionID", String(describing: p1), fallback: "Connection ID: %@")
+  		return L10n.tr("Localizable", "manageP2PClients.connectionID", String(describing: p1), fallback: "Connector ID: %@")
   	}
-  	/// New Connection
-  	public static let newConnectionButtonTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionButtonTitle", fallback: "New Connection")
-  	/// New Connection
-  	public static let newConnectionTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionTitle", fallback: "New Connection")
-  	/// Your wallet is connected to the following desktop browsers via Radix Connect
-  	public static let p2PConnectionsSubtitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsSubtitle", fallback: "Your wallet is connected to the following desktop browsers via Radix Connect")
-  	/// Desktop Connections
-  	public static let p2PConnectionsTitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsTitle", fallback: "Desktop Connections")
+  	/// Link New Connector
+  	public static let newConnectionButtonTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionButtonTitle", fallback: "Link New Connector")
+  	/// Link New Connector
+  	public static let newConnectionTitle = L10n.tr("Localizable", "manageP2PClients.newConnectionTitle", fallback: "Link New Connector")
+  	/// Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.
+  	public static let p2PConnectionsSubtitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsSubtitle", fallback: "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.")
+  	/// Linked Connector
+  	public static let p2PConnectionsTitle = L10n.tr("Localizable", "manageP2PClients.P2PConnectionsTitle", fallback: "Linked Connector")
   	/// Send Test Msg
   	public static let sendTestMessageButtonTitle = L10n.tr("Localizable", "manageP2PClients.sendTestMessageButtonTitle", fallback: "Send Test Msg")
 	}
 	public enum NewConnection {
-  	/// Connecting...
-  	public static let connecting = L10n.tr("Localizable", "newConnection.connecting", fallback: "Connecting...")
+  	/// Linking...
+  	public static let connecting = L10n.tr("Localizable", "newConnection.connecting", fallback: "Linking...")
   	/// Unnamed
   	public static let defaultNameOfConnection = L10n.tr("Localizable", "newConnection.defaultNameOfConnection", fallback: "Unnamed")
-  	/// Save Connection
-  	public static let saveNamedConnectionButton = L10n.tr("Localizable", "newConnection.saveNamedConnectionButton", fallback: "Save Connection")
-  	/// Scan your QR code to connect your wallet with a browser extension
-  	public static let subtitle = L10n.tr("Localizable", "newConnection.subtitle", fallback: "Scan your QR code to connect your wallet with a browser extension")
-  	/// Name this connection, e.g. "Chrome on Macbook Pro"
-  	public static let textFieldHint = L10n.tr("Localizable", "newConnection.textFieldHint", fallback: "Name this connection, e.g. \"Chrome on Macbook Pro\"")
-  	/// Connection name
-  	public static let textFieldPlaceholder = L10n.tr("Localizable", "newConnection.textFieldPlaceholder", fallback: "Connection name")
-  	/// New Connection
-  	public static let title = L10n.tr("Localizable", "newConnection.title", fallback: "New Connection")
+  	/// Save Link
+  	public static let saveNamedConnectionButton = L10n.tr("Localizable", "newConnection.saveNamedConnectionButton", fallback: "Save Link")
+  	/// Scan your QR code to link your wallet with a browser extension
+  	public static let subtitle = L10n.tr("Localizable", "newConnection.subtitle", fallback: "Scan your QR code to link your wallet with a browser extension")
+  	/// Name this Connector, e.g. "Chrome on Macbook Pro"
+  	public static let textFieldHint = L10n.tr("Localizable", "newConnection.textFieldHint", fallback: "Name this Connector, e.g. \"Chrome on Macbook Pro\"")
+  	/// Name of Connector
+  	public static let textFieldPlaceholder = L10n.tr("Localizable", "newConnection.textFieldPlaceholder", fallback: "Name of Connector")
+  	/// Link to Connector
+  	public static let title = L10n.tr("Localizable", "newConnection.title", fallback: "Link to Connector")
 	}
 	public enum NftList {
   	/// %d NFTs
@@ -212,32 +212,42 @@ public enum L10n {
   	/// New Account
   	public static let newAccountButtonTitle = L10n.tr("Localizable", "onboarding.newAccountButtonTitle", fallback: "New Account")
 	}
+	public enum ProfileLoad {
+  	/// Failed to create Wallet from backup: %@
+  	public static func decodingError(_ p1: Any) -> String {
+  		return L10n.tr("Localizable", "profileLoad.decodingError", String(describing: p1), fallback: "Failed to create Wallet from backup: %@")
+  	}
+  	/// Failed to create Wallet from backup, error: %@, version: %@
+  	public static func failedToCreateProfileFromSnapshotError(_ p1: Any, _ p2: Any) -> String {
+  		return L10n.tr("Localizable", "profileLoad.failedToCreateProfileFromSnapshotError", String(describing: p1), String(describing: p2), fallback: "Failed to create Wallet from backup, error: %@, version: %@")
+  	}
+	}
 	public enum Settings {
   	/// Close
   	public static let closeButtonTitle = L10n.tr("Localizable", "settings.closeButtonTitle", fallback: "Close")
-  	/// Delete wallet
-  	public static let deleteAllButtonTitle = L10n.tr("Localizable", "settings.deleteAllButtonTitle", fallback: "Delete wallet")
-  	/// Desktop Connections
-  	public static let desktopConnectionsButtonTitle = L10n.tr("Localizable", "settings.desktopConnectionsButtonTitle", fallback: "Desktop Connections")
-  	/// Gateway
-  	public static let gatewayButtonTitle = L10n.tr("Localizable", "settings.gatewayButtonTitle", fallback: "Gateway")
+  	/// Delete Wallet Data
+  	public static let deleteAllButtonTitle = L10n.tr("Localizable", "settings.deleteAllButtonTitle", fallback: "Delete Wallet Data")
+  	/// Linked Connector
+  	public static let desktopConnectionsButtonTitle = L10n.tr("Localizable", "settings.desktopConnectionsButtonTitle", fallback: "Linked Connector")
+  	/// Network Gateway
+  	public static let gatewayButtonTitle = L10n.tr("Localizable", "settings.gatewayButtonTitle", fallback: "Network Gateway")
   	/// Inspect Profile
   	public static let inspectProfileButtonTitle = L10n.tr("Localizable", "settings.inspectProfileButtonTitle", fallback: "Inspect Profile")
-  	/// No profile, strange
-  	public static let noProfileText = L10n.tr("Localizable", "settings.noProfileText", fallback: "No profile, strange")
-  	/// Settings
-  	public static let title = L10n.tr("Localizable", "settings.title", fallback: "Settings")
+  	/// No Wallet Data Found
+  	public static let noProfileText = L10n.tr("Localizable", "settings.noProfileText", fallback: "No Wallet Data Found")
+  	/// Wallet Settings
+  	public static let title = L10n.tr("Localizable", "settings.title", fallback: "Wallet Settings")
   	/// Version: %@ build #%@
   	public static func versionInfo(_ p1: Any, _ p2: Any) -> String {
   		return L10n.tr("Localizable", "settings.versionInfo", String(describing: p1), String(describing: p2), fallback: "Version: %@ build #%@")
   	}
   	public enum ConnectExtension {
-    	/// Connect Extension
-    	public static let buttonTitle = L10n.tr("Localizable", "settings.connectExtension.buttonTitle", fallback: "Connect Extension")
-    	/// Scan your browser extension code to confirm your connection
-    	public static let subtitle = L10n.tr("Localizable", "settings.connectExtension.subtitle", fallback: "Scan your browser extension code to confirm your connection")
-    	/// Connect your wallet to a browser
-    	public static let title = L10n.tr("Localizable", "settings.connectExtension.title", fallback: "Connect your wallet to a browser")
+    	/// Link to Connector
+    	public static let buttonTitle = L10n.tr("Localizable", "settings.connectExtension.buttonTitle", fallback: "Link to Connector")
+    	/// Scan the QR code in the Radix Wallet Connector extension
+    	public static let subtitle = L10n.tr("Localizable", "settings.connectExtension.subtitle", fallback: "Scan the QR code in the Radix Wallet Connector extension")
+    	/// Link your Wallet to a Desktop Browser
+    	public static let title = L10n.tr("Localizable", "settings.connectExtension.title", fallback: "Link your Wallet to a Desktop Browser")
   	}
 	}
 	public enum Splash {
@@ -247,16 +257,16 @@ public enum L10n {
   	public static let biometricsNotSetUpTitle = L10n.tr("Localizable", "splash.biometricsNotSetUpTitle", fallback: "Biometrics not set up")
 	}
 	public enum TransactionSigning {
-  	/// Unlock secret used to sign TX
-  	public static let biometricsPrompt = L10n.tr("Localizable", "transactionSigning.biometricsPrompt", fallback: "Unlock secret used to sign TX")
-  	/// Preparing transaction
-  	public static let preparingTransactionLoadingText = L10n.tr("Localizable", "transactionSigning.preparingTransactionLoadingText", fallback: "Preparing transaction")
-  	/// Submitting transaction
-  	public static let signingAndSubmittingTransactionLoadingText = L10n.tr("Localizable", "transactionSigning.signingAndSubmittingTransactionLoadingText", fallback: "Submitting transaction")
+  	/// Authenticate to sign transaction with this phone.
+  	public static let biometricsPrompt = L10n.tr("Localizable", "transactionSigning.biometricsPrompt", fallback: "Authenticate to sign transaction with this phone.")
+  	/// Preparing transaction...
+  	public static let preparingTransactionLoadingText = L10n.tr("Localizable", "transactionSigning.preparingTransactionLoadingText", fallback: "Preparing transaction...")
+  	/// Submitting transaction...
+  	public static let signingAndSubmittingTransactionLoadingText = L10n.tr("Localizable", "transactionSigning.signingAndSubmittingTransactionLoadingText", fallback: "Submitting transaction...")
   	/// Approve Transaction
   	public static let signTransactionButtonTitle = L10n.tr("Localizable", "transactionSigning.signTransactionButtonTitle", fallback: "Approve Transaction")
-  	/// Approve transaction
-  	public static let title = L10n.tr("Localizable", "transactionSigning.title", fallback: "Approve transaction")
+  	/// Approve Transaction
+  	public static let title = L10n.tr("Localizable", "transactionSigning.title", fallback: "Approve Transaction")
 	}
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length
