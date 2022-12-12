@@ -1,4 +1,5 @@
 import Asset
+import FungibleTokenDetailsFeature
 
 // MARK: - FungibleTokenList.Action
 public extension FungibleTokenList {
@@ -14,6 +15,7 @@ public extension FungibleTokenList {
 public extension FungibleTokenList.Action {
 	enum ChildAction: Equatable {
 		case section(id: FungibleTokenCategory.CategoryType, action: FungibleTokenList.Section.Action)
+		case details(FungibleTokenDetails.Action)
 	}
 }
 

@@ -379,6 +379,7 @@ package.addModules([
 			"Asset",
 			"Common",
 			"DesignSystem",
+			"FungibleTokenDetailsFeature",
 			tca,
 		],
 		tests: .yes(

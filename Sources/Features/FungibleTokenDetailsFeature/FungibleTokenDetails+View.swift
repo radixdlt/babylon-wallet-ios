@@ -93,14 +93,14 @@ extension FungibleTokenDetails.View {
 		var currentSupply: BigUInt?
 
 		init(state: FungibleTokenDetails.State) {
-			name = state.ownedToken.asset.name
-			iconURL = state.ownedToken.asset.iconURL
-			placeholderAsset = state.ownedToken.asset.placeholderImage
-			amount = state.ownedToken.amount
-			symbol = state.ownedToken.asset.symbol
-			description = state.ownedToken.asset.tokenDescription
-			address = .init(address: state.ownedToken.asset.address.description, format: .short())
-			currentSupply = state.ownedToken.asset.totalMintedAttos
+			name = state.asset.name
+			iconURL = state.asset.iconURL
+			placeholderAsset = state.asset.placeholderImage
+			amount = state.amount
+			symbol = state.asset.symbol
+			description = state.asset.tokenDescription
+			address = .init(address: state.asset.componentAddress.address, format: .short())
+			currentSupply = state.asset.totalMintedAttos
 		}
 	}
 }

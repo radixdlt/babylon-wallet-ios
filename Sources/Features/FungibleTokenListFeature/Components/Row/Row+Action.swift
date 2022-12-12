@@ -1,3 +1,4 @@
+import Asset
 import Foundation
 
 // MARK: - FungibleTokenList.Row.Action
@@ -12,7 +13,9 @@ public extension FungibleTokenList.Row {
 
 // MARK: - FungibleTokenList.Row.Action.ViewAction
 public extension FungibleTokenList.Row.Action {
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case selected
+	}
 }
 
 // MARK: - FungibleTokenList.Row.Action.InternalAction
@@ -30,5 +33,7 @@ public extension FungibleTokenList.Row.Action {
 
 // MARK: - FungibleTokenList.Row.Action.DelegateAction
 public extension FungibleTokenList.Row.Action {
-	enum DelegateAction: Equatable {}
+	enum DelegateAction: Equatable {
+		case selected(FungibleTokenContainer)
+	}
 }

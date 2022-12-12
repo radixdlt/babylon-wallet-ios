@@ -1,3 +1,4 @@
+import Asset
 import Common
 import ComposableArchitecture
 
@@ -6,11 +7,14 @@ public extension FungibleTokenList {
 	// MARK: State
 	struct State: Equatable {
 		public var sections: IdentifiedArrayOf<FungibleTokenList.Section.State>
+		public var selectedToken: FungibleTokenContainer?
 
 		public init(
-			sections: IdentifiedArrayOf<FungibleTokenList.Section.State>
+			sections: IdentifiedArrayOf<FungibleTokenList.Section.State>,
+			selectedToken: FungibleTokenContainer? = nil
 		) {
 			self.sections = sections
+			self.selectedToken = selectedToken
 		}
 	}
 }

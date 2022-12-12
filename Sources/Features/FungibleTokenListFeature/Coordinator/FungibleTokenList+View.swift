@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import DesignSystem
+import FungibleTokenDetailsFeature
 import SwiftUI
 
 // MARK: - FungibleTokenList.View
@@ -23,16 +24,26 @@ public extension FungibleTokenList.View {
 			store.actionless,
 			observe: ViewState.init(state:)
 		) { _ in
-			VStack(spacing: .large2) {
-				LazyVStack(spacing: .medium2) {
-					ForEachStore(
-						store.scope(
-							state: \.sections,
-							action: { .child(.section(id: $0, action: $1)) }
-						),
-						content: FungibleTokenList.Section.View.init(store:)
-					)
+			ZStack {
+				VStack(spacing: .large2) {
+					LazyVStack(spacing: .medium2) {
+						ForEachStore(
+							store.scope(
+								state: \.sections,
+								action: { .child(.section(id: $0, action: $1)) }
+							),
+							content: FungibleTokenList.Section.View.init(store:)
+						)
+					}
 				}
+
+				IfLetStore(
+					store.scope(
+						state: \.selectedToken,
+						action: { .child(.details($0)) }
+					),
+					then: { FungibleTokenDetails.View(store: $0) }
+				)
 			}
 		}
 	}
