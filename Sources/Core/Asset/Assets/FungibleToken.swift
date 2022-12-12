@@ -1,5 +1,6 @@
 import BigInt
 import Common
+import EngineToolkit
 import EngineToolkitClient
 import Foundation
 import Profile
@@ -73,7 +74,7 @@ public extension FungibleToken {
 		for networkID in NetworkID.allCases {
 			if
 				let xrdAddress = Network.KnownAddresses.addressMap[networkID]?.xrd,
-				self.address.description == xrdAddress.address
+				self.address.address == xrdAddress.address
 			{
 				return true
 			}

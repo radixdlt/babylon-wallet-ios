@@ -29,7 +29,7 @@ extension Component {
 				}
 
 			VStack(alignment: .leading, spacing: .small2) {
-				Text(container.asset.address)
+				Text(container.asset.address.address)
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
 
