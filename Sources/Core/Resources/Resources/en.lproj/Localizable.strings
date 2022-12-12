@@ -100,3 +100,6 @@
 "transactionSigning.title" = "Approve Transaction";
 "transactionSigning.preparingTransactionLoadingText" = "Preparing transaction...";
 "transactionSigning.signingAndSubmittingTransactionLoadingText" = "Submitting transaction...";
+
+"profileLoad.failedToCreateProfileFromSnapshotError" = "Failed to create Wallet Data from snapshot, error: %@, version: %@";
+"profileLoad.decodingError" = "Failed to decode Wallet Data: %@";

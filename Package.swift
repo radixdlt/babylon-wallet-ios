@@ -786,6 +786,7 @@ package.addModules([
 	.client(
 		name: "ProfileLoader",
 		dependencies: [
+			"Common",
 			"JSON",
 			"KeychainClientDependency",
 			profile,
