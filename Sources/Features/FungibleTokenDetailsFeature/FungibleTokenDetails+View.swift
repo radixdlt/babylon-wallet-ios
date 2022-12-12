@@ -22,23 +22,25 @@ public extension FungibleTokenDetails.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			ForceFullScreen {
-				VStack(spacing: .zero) {
-					NavigationBar(
-						titleText: viewStore.displayName,
-						leadingItem: CloseButton { viewStore.send(.closeButtonTapped) }
-					)
-					.padding([.horizontal, .top], .medium3)
+			VStack(spacing: .medium2) {
+				NavigationBar(
+					titleText: viewStore.displayName,
+					leadingItem: CloseButton { viewStore.send(.closeButtonTapped) }
+				)
+				.padding([.horizontal, .top], .medium3)
 
-					LazyImage(url: viewStore.iconURL) { _ in
-						Image(asset: viewStore.placeholderAsset)
-							.resizable()
-					}
-					.frame(width: 104, height: 104)
-					.clipShape(Circle())
-					if let amount = viewStore.amount, let symbol = viewStore.symbol {
-						Text(amount).font(.app.sheetTitle).kerning(-0.5) +
-							Text(" " + symbol).font(.app.sectionHeader)
+				ScrollView {
+					VStack(spacing: .medium3) {
+						LazyImage(url: viewStore.iconURL) { _ in
+							Image(asset: viewStore.placeholderAsset)
+								.resizable()
+						}
+						.frame(width: 104, height: 104)
+						.clipShape(Circle())
+						if let amount = viewStore.amount, let symbol = viewStore.symbol {
+							Text(amount).font(.app.sheetTitle).kerning(-0.5) +
+								Text(" " + symbol).font(.app.sectionHeader)
+						}
 					}
 					VStack(spacing: .medium1) {
 						let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
@@ -80,8 +82,8 @@ public extension FungibleTokenDetails.View {
 						.lineLimit(1)
 					}
 				}
-				.foregroundColor(.app.gray1)
 			}
+			.foregroundColor(.app.gray1)
 		}
 	}
 }
