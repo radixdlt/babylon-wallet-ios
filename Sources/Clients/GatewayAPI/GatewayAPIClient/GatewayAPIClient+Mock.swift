@@ -15,6 +15,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
 		resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
 		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
+		getNonFungibleIds: unimplemented("\(Self.self).getNonFungibleIds"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
 		transactionStatus: unimplemented("\(Self.self).transactionStatus")
 	)
@@ -35,6 +36,9 @@ extension GatewayAPIClient: TestDependencyKey {
 				fatalError()
 			},
 			resourceDetailsByResourceIdentifier: { _ in
+				fatalError()
+			},
+			getNonFungibleIds: { _, _ in
 				fatalError()
 			},
 			submitTransaction: { _ in

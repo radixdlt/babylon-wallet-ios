@@ -119,8 +119,7 @@ public extension FungibleToken {
 		tokenDescription: "The native token of the Radix Ledger",
 		name: "Radix",
 		symbol: "XRD",
-		tokenInfoURL: "https://tokens.radixdlt.com",
-		iconURL: nil
+		tokenInfoURL: "https://tokens.radixdlt.com"
 	)
 }
 

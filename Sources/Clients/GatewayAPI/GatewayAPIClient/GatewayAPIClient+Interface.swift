@@ -15,6 +15,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var accountResourcesByAddress: GetAccountResourcesByAddress
 	public var resourcesOverview: GetResourcesOverview
 	public var resourceDetailsByResourceIdentifier: GetResourceDetailsByResourceIdentifier
+	public var getNonFungibleIds: GetNonFungibleIds
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
 }
@@ -29,6 +30,8 @@ public extension GatewayAPIClient {
 	typealias GetResourcesOverview = @Sendable (GatewayAPI.EntityOverviewRequest) async throws -> GatewayAPI.EntityOverviewResponse
 
 	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.EntityDetailsResponse
+
+	typealias GetNonFungibleIds = @Sendable (AccountAddress, ResourceIdentifier) async throws -> GatewayAPI.NonFungibleIdsResponseAllOf
 
 	typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 

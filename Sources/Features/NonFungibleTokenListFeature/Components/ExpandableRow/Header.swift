@@ -25,7 +25,7 @@ struct Header: View {
 			Spacer()
 		}
 		.padding(.horizontal, .medium1)
-		.padding(.vertical, .large2)
+		.padding(.vertical, .large3)
 		.background(
 			ExpandableRowBackgroundView(
 				paddingEdge: edge,
