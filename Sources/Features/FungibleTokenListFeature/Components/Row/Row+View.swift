@@ -2,9 +2,8 @@ import Asset
 import BigInt
 import Common
 import ComposableArchitecture
-import NukeUI
+import DesignSystem
 import Profile
-import SwiftUI
 
 // MARK: - FungibleTokenList.Row.View
 public extension FungibleTokenList.Row {

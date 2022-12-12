@@ -367,6 +367,7 @@ package.addModules([
 	.feature(
 		name: "FungibleTokenDetailsFeature",
 		dependencies: [
+			"DesignSystem",
 			"SharedModels",
 			tca,
 		],
@@ -378,7 +379,6 @@ package.addModules([
 			"Asset",
 			"Common",
 			"DesignSystem",
-			.product(name: "NukeUI", package: "Nuke"),
 			tca,
 		],
 		tests: .yes(
@@ -866,6 +866,7 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
+			.product(name: "NukeUI", package: "Nuke"),
 			"Resources",
 			.product(name: "SwiftUIPullToRefresh", package: "swiftui-pull-to-refresh", condition: .when(platforms: [.iOS])),
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation"),

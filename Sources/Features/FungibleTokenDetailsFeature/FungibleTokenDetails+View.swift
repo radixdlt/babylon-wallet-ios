@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import DesignSystem
+import Resources
 import SharedModels
-import SwiftUI
 
 // MARK: - FungibleTokenDetails.View
 public extension FungibleTokenDetails {
@@ -25,9 +25,12 @@ public extension FungibleTokenDetails.View {
 				if let name = viewStore.name {
 					Text(name).textStyle(.body1Header)
 				}
-				AsyncImage(url: viewStore.iconURL)
-					.frame(width: 104, height: 104)
-					.clipShape(Circle())
+				LazyImage(url: viewStore.iconURL) { _ in
+					Image(asset: viewStore.placeholderAsset)
+						.resizable()
+				}
+				.frame(width: 104, height: 104)
+				.clipShape(Circle())
 				if let amount = viewStore.amount, let symbol = viewStore.symbol {
 					Text(amount).font(.app.sheetTitle).kerning(-0.5) +
 						Text(" " + symbol).font(.app.sectionHeader)
@@ -82,6 +85,7 @@ extension FungibleTokenDetails.View {
 	struct ViewState: Equatable {
 		var name: String?
 		var iconURL: URL?
+		var placeholderAsset: ImageAsset
 		var amount: String?
 		var symbol: String?
 		var description: String?
@@ -91,6 +95,7 @@ extension FungibleTokenDetails.View {
 		init(state: FungibleTokenDetails.State) {
 			name = state.ownedToken.asset.name
 			iconURL = state.ownedToken.asset.iconURL
+			placeholderAsset = state.ownedToken.asset.placeholderImage
 			amount = state.ownedToken.amount
 			symbol = state.ownedToken.asset.symbol
 			description = state.ownedToken.asset.tokenDescription
