@@ -4,12 +4,12 @@ import Profile
 
 // MARK: - PoolShare
 public struct PoolShare: Asset {
-	public let address: ComponentAddress
+	public let componentAddress: ComponentAddress
 
 	public init(
 		address: ComponentAddress
 	) {
-		self.address = address
+		self.componentAddress = address
 	}
 }
 

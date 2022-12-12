@@ -4,7 +4,7 @@ import Profile
 
 // MARK: - NonFungibleToken
 public struct NonFungibleToken: Sendable, Asset, Token, Hashable {
-	public let address: ComponentAddress
+	public let componentAddress: ComponentAddress
 
 	public let iconURL: URL?
 
@@ -12,7 +12,7 @@ public struct NonFungibleToken: Sendable, Asset, Token, Hashable {
 		address: ComponentAddress,
 		iconURL: URL? = nil
 	) {
-		self.address = address
+		self.componentAddress = address
 		self.iconURL = iconURL
 	}
 }
@@ -40,15 +40,15 @@ public struct NonFungibleTokenContainer: AssetContainer {
 #if DEBUG
 public extension NonFungibleToken {
 	static let mock1 = Self(
-		address: "nft1-deadbeef"
+		componentAddress: "nft1-deadbeef"
 	)
 
 	static let mock2 = Self(
-		address: "nft2-deadbeef"
+		componentAddress: "nft2-deadbeef"
 	)
 
 	static let mock3 = Self(
-		address: "nft3-deadbeef"
+		componentAddress: "nft3-deadbeef"
 	)
 }
 #endif

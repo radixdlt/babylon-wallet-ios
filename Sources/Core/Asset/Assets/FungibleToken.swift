@@ -7,7 +7,7 @@ import Profile
 
 // MARK: - FungibleToken
 public struct FungibleToken: Sendable, Asset, Token, Hashable {
-	public let address: ComponentAddress
+	public let componentAddress: ComponentAddress
 	public let totalSupplyAttos: BigUInt?
 	public let totalMintedAttos: BigUInt?
 	public let totalBurntAttos: BigUInt?
@@ -46,7 +46,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 		tokenInfoURL: String? = nil,
 		iconURL: URL? = nil
 	) {
-		self.address = address
+		self.componentAddress = address
 		self.divisibility = divisibility
 		self.totalSupplyAttos = totalSupplyAttos
 		self.totalMintedAttos = totalMintedAttos
@@ -74,7 +74,7 @@ public extension FungibleToken {
 		for networkID in NetworkID.allCases {
 			if
 				let xrdAddress = Network.KnownAddresses.addressMap[networkID]?.xrd,
-				self.address.address == xrdAddress.address
+				self.componentAddress.address == xrdAddress.address
 			{
 				return true
 			}
@@ -127,7 +127,7 @@ public extension FungibleToken {
 #if DEBUG
 public extension FungibleToken {
 	static let btc = Self(
-		address: "btc-deadbeef",
+		componentAddress: "btc-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -138,7 +138,7 @@ public extension FungibleToken {
 	)
 
 	static let dot = Self(
-		address: "dot-deadbeef",
+		componentAddress: "dot-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -149,7 +149,7 @@ public extension FungibleToken {
 	)
 
 	static let eth = Self(
-		address: "eth-deadbeef",
+		componentAddress: "eth-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -160,7 +160,7 @@ public extension FungibleToken {
 	)
 
 	static let ltc = Self(
-		address: "ltc-deadbeef",
+		componentAddress: "ltc-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -171,7 +171,7 @@ public extension FungibleToken {
 	)
 
 	static let sol = Self(
-		address: "sol-deadbeef",
+		componentAddress: "sol-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -182,7 +182,7 @@ public extension FungibleToken {
 	)
 
 	static let usdt = Self(
-		address: "usdt-deadbeef",
+		componentAddress: "usdt-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -193,7 +193,7 @@ public extension FungibleToken {
 	)
 
 	static let xrp = Self(
-		address: "xrp-deadbeef",
+		componentAddress: "xrp-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,

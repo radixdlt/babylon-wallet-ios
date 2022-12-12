@@ -14,9 +14,9 @@ extension AssetFetcher: DependencyKey {
 			let resourcesResponse = try await gatewayAPIClient.accountResourcesByAddress(accountAddress)
 			var accountPortfolio = try AccountPortfolio(response: resourcesResponse)
 
-			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.address)
+			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.componentAddress)
 			// NOTE: not used currently
-			let nonFungibleTokenAddresses = accountPortfolio.nonFungibleTokenContainers.map(\.asset.address)
+			let nonFungibleTokenAddresses = accountPortfolio.nonFungibleTokenContainers.map(\.asset.componentAddress)
 
 			guard !fungibleTokenAddresses.isEmpty else {
 				return .empty
@@ -94,7 +94,7 @@ extension FungibleToken {
 		)
 
 		return Self(
-			address: address,
+			address: componentAddress,
 			divisibility: divisibility,
 			totalSupplyAttos: totalSupplyAttos,
 			totalMintedAttos: totalMintedAttos,

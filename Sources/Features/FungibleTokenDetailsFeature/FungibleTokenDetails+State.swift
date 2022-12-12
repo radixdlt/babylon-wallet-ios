@@ -18,7 +18,7 @@ public extension FungibleTokenDetails {
 public extension FungibleTokenDetails.State {
 	static let previewValue: Self = .init(
 		ownedToken: FungibleTokenContainer(
-			owner: try! .init(address: "owner_address"),
+			owner: try! .init(componentAddress: "owner_address"),
 			asset: .xrd,
 			amount: "30.0",
 			worth: 500
