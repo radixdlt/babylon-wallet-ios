@@ -39,7 +39,7 @@ public extension AccountCompletion.State {
 public extension AccountCompletion.State {
 	static let placeholder: Self = .init(
 		accountName: "My main account",
-		accountAddress: .account(try! .init(componentAddress: "some_account_address")),
+		accountAddress: .account(try! .init(address: "some_account_address")),
 		origin: .home
 	)
 }

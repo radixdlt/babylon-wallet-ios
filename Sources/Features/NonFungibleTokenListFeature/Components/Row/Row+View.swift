@@ -180,7 +180,7 @@ struct Row_Preview: PreviewProvider {
 				initialState: .init(
 					containers: [
 						.init(
-							owner: try! .init(componentAddress: "owner_address"),
+							owner: try! .init(address: "owner_address"),
 							asset: NonFungibleToken.mock1,
 							metadata: nil
 						),
