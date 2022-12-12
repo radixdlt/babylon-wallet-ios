@@ -41,8 +41,8 @@ public enum L10n {
   	public static let tokens = L10n.tr("Localizable", "assetsView.tokens", fallback: "Tokens")
 	}
 	public enum CreateAccount {
-  	/// Unlock secret used to create new account.
-  	public static let biometricsPrompt = L10n.tr("Localizable", "createAccount.biometricsPrompt", fallback: "Unlock secret used to create new account.")
+  	/// Authenticate to create new account with this phone.
+  	public static let biometricsPrompt = L10n.tr("Localizable", "createAccount.biometricsPrompt", fallback: "Authenticate to create new account with this phone.")
   	/// Create Account
   	public static let createAccountButtonTitle = L10n.tr("Localizable", "createAccount.createAccountButtonTitle", fallback: "Create Account")
   	/// Create First Account
@@ -253,8 +253,8 @@ public enum L10n {
   	public static let biometricsNotSetUpTitle = L10n.tr("Localizable", "splash.biometricsNotSetUpTitle", fallback: "Biometrics not set up")
 	}
 	public enum TransactionSigning {
-  	/// Unlock secret used to sign transaction
-  	public static let biometricsPrompt = L10n.tr("Localizable", "transactionSigning.biometricsPrompt", fallback: "Unlock secret used to sign transaction")
+  	/// Authenticate to sign transaction with this phone.
+  	public static let biometricsPrompt = L10n.tr("Localizable", "transactionSigning.biometricsPrompt", fallback: "Authenticate to sign transaction with this phone.")
   	/// Preparing transaction...
   	public static let preparingTransactionLoadingText = L10n.tr("Localizable", "transactionSigning.preparingTransactionLoadingText", fallback: "Preparing transaction...")
   	/// Submitting transaction...
