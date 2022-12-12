@@ -19,7 +19,7 @@ package.dependencies += [
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.30"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.6"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.50"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.51"),
 
 	// ~~~ THIRD PARTY ~~~
 	// APPLE
