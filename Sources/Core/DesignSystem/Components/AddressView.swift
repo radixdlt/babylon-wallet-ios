@@ -80,7 +80,7 @@ struct AddressView_Previews: PreviewProvider {
 	static var previews: some View {
 		AddressView(
 			AddressView.ViewState(
-				componentAddress: "account_wqs8qxdx7qw8c",
+				address: "account_wqs8qxdx7qw8c",
 				format: .short()
 			),
 			copyAddressAction: nil

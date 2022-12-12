@@ -38,7 +38,7 @@ extension AccountPortfolio {
 			FungibleTokenContainer(
 				owner: try .init(address: response.address),
 				asset: .init(
-					address: .init(address: $0.address),
+					componentAddress: .init(address: $0.address),
 					divisibility: nil,
 					totalSupplyAttos: nil,
 					totalMintedAttos: nil,
@@ -94,7 +94,7 @@ extension FungibleToken {
 		)
 
 		return Self(
-			address: componentAddress,
+			componentAddress: componentAddress,
 			divisibility: divisibility,
 			totalSupplyAttos: totalSupplyAttos,
 			totalMintedAttos: totalMintedAttos,

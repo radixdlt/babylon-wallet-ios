@@ -35,7 +35,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public let divisibility: Int?
 
 	public init(
-		address: ComponentAddress,
+		componentAddress: ComponentAddress,
 		divisibility: Int?,
 		totalSupplyAttos: BigUInt?,
 		totalMintedAttos: BigUInt?,
@@ -46,7 +46,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 		tokenInfoURL: String? = nil,
 		iconURL: URL? = nil
 	) {
-		self.componentAddress = address
+		self.componentAddress = componentAddress
 		self.divisibility = divisibility
 		self.totalSupplyAttos = totalSupplyAttos
 		self.totalMintedAttos = totalMintedAttos
@@ -111,7 +111,7 @@ public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
 public extension FungibleToken {
 	/// The native token of the Radix Ledger
 	static let xrd = Self(
-		address: "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9",
+		componentAddress: "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9",
 		divisibility: 18,
 		totalSupplyAttos: 24_000_000_000.inAttos,
 		totalMintedAttos: 0,
