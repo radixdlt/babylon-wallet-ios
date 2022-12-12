@@ -1,12 +1,15 @@
+import Common
 import ComposableArchitecture
 import ErrorQueue
 import Foundation
+import LocalAuthenticationClient
 import ProfileLoader
 
 // MARK: - Splash
 public struct Splash: Sendable, ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.profileLoader) var profileLoader
 
 	public init() {}
@@ -14,23 +17,33 @@ public struct Splash: Sendable, ReducerProtocol {
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.viewAppeared)):
-			return .run { send in
-				await send(.internal(.system(.loadProfile)))
+			return loadProfile()
+
+		case .internal(.view(.alertRetryButtonTapped)):
+			state.alert = nil
+			return verifyBiometrics()
+
+		case let .internal(.system(.biometricsConfigResult(result))):
+			let config = try? result.value
+			guard config?.isBiometricsSetUp == true else {
+				state.alert = .init(
+					title: .init(L10n.Splash.biometricsNotSetUpTitle),
+					message: .init(L10n.Splash.biometricsNotSetUpMessage)
+				)
+				return .none
 			}
 
-		case .internal(.system(.loadProfile)):
-			return .run { send in
-				let result = await profileLoader.loadProfile()
-				await send(.internal(.system(.loadProfileResult(
-					result
-				))))
+			precondition(state.profileResult != nil)
+
+			return .run { [profileResult = state.profileResult] send in
+				await send(.delegate(.profileResultLoaded(profileResult!)))
 			}
 
 		case let .internal(.system(.loadProfileResult(result))):
-			return .run { send in
+			state.profileResult = result
+			return .run { _ in
 				await delay()
-				await send(.delegate(.profileResultLoaded(result)))
-			}
+			}.concatenate(with: verifyBiometrics())
 
 		case .delegate:
 			return .none
@@ -45,5 +58,24 @@ public struct Splash: Sendable, ReducerProtocol {
 		durationInMS = 800
 		#endif
 		try? await mainQueue.sleep(for: .milliseconds(durationInMS))
+	}
+
+	func loadProfile() -> EffectTask<Action> {
+		.run { send in
+			let result = await profileLoader.loadProfile()
+			await send(.internal(.system(.loadProfileResult(
+				result
+			))))
+		}
+	}
+
+	func verifyBiometrics() -> EffectTask<Action> {
+		.run { send in
+			await send(.internal(.system(.biometricsConfigResult(
+				TaskResult {
+					try await localAuthenticationClient.queryConfig()
+				}
+			))))
+		}
 	}
 }

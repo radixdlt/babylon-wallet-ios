@@ -79,8 +79,9 @@
 "nftList.nftPlural" = "%d NFTs";
 "nftList.ownedOfTotal" = "%d of %d";
 
-"onboarding.biometricsNotSetUpMessage" = "Using Radix Wallet currently requires biometrics be enabled on your phone";
-"onboarding.biometricsNotSetUpTitle" = "Biometrics Not Configured";
+"splash.biometricsNotSetUpMessage" = "This app requires your phone to have biometrics set up";
+"splash.biometricsNotSetUpTitle" = "Biometrics not set up";
+
 "onboarding.newAccountButtonTitle" = "New Account";
 
 "settings.closeButtonTitle" = "Close";

@@ -203,10 +203,6 @@ public enum L10n {
   	}
 	}
 	public enum Onboarding {
-  	/// Using Radix Wallet currently requires biometrics be enabled on your phone
-  	public static let biometricsNotSetUpMessage = L10n.tr("Localizable", "onboarding.biometricsNotSetUpMessage", fallback: "Using Radix Wallet currently requires biometrics be enabled on your phone")
-  	/// Biometrics Not Configured
-  	public static let biometricsNotSetUpTitle = L10n.tr("Localizable", "onboarding.biometricsNotSetUpTitle", fallback: "Biometrics Not Configured")
   	/// New Account
   	public static let newAccountButtonTitle = L10n.tr("Localizable", "onboarding.newAccountButtonTitle", fallback: "New Account")
 	}
@@ -247,6 +243,12 @@ public enum L10n {
     	/// Link your Wallet to a Desktop Browser
     	public static let title = L10n.tr("Localizable", "settings.connectExtension.title", fallback: "Link your Wallet to a Desktop Browser")
   	}
+	}
+	public enum Splash {
+  	/// This app requires your phone to have biometrics set up
+  	public static let biometricsNotSetUpMessage = L10n.tr("Localizable", "splash.biometricsNotSetUpMessage", fallback: "This app requires your phone to have biometrics set up")
+  	/// Biometrics not set up
+  	public static let biometricsNotSetUpTitle = L10n.tr("Localizable", "splash.biometricsNotSetUpTitle", fallback: "Biometrics not set up")
 	}
 	public enum TransactionSigning {
   	/// Unlock secret used to sign transaction
