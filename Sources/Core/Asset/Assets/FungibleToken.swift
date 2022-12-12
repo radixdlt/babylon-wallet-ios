@@ -1,11 +1,13 @@
 import BigInt
 import Common
+import EngineToolkit
+import EngineToolkitClient
 import Foundation
 import Profile
 
 // MARK: - FungibleToken
 public struct FungibleToken: Sendable, Asset, Token, Hashable {
-	public let address: ComponentAddress
+	public let componentAddress: ComponentAddress
 	public let totalSupplyAttos: BigUInt?
 	public let totalMintedAttos: BigUInt?
 	public let totalBurntAttos: BigUInt?
@@ -33,7 +35,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public let divisibility: Int?
 
 	public init(
-		address: ComponentAddress,
+		componentAddress: ComponentAddress,
 		divisibility: Int?,
 		totalSupplyAttos: BigUInt?,
 		totalMintedAttos: BigUInt?,
@@ -44,7 +46,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 		tokenInfoURL: String? = nil,
 		iconURL: URL? = nil
 	) {
-		self.address = address
+		self.componentAddress = componentAddress
 		self.divisibility = divisibility
 		self.totalSupplyAttos = totalSupplyAttos
 		self.totalMintedAttos = totalMintedAttos
@@ -59,12 +61,25 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 
 public extension FungibleToken {
 	var placeholderImage: ImageAsset {
-		switch symbol {
-		case "XRD":
+		if isXRD {
 			return AssetResource.xrd
-		default:
+		} else {
 			return AssetResource.fungibleToken
 		}
+	}
+}
+
+public extension FungibleToken {
+	var isXRD: Bool {
+		for networkID in NetworkID.allCases {
+			if
+				let xrdAddress = Network.KnownAddresses.addressMap[networkID]?.xrd,
+				self.componentAddress.address == xrdAddress.address
+			{
+				return true
+			}
+		}
+		return false
 	}
 }
 
@@ -96,7 +111,7 @@ public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
 public extension FungibleToken {
 	/// The native token of the Radix Ledger
 	static let xrd = Self(
-		address: "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9",
+		componentAddress: "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9",
 		divisibility: 18,
 		totalSupplyAttos: 24_000_000_000.inAttos,
 		totalMintedAttos: 0,
@@ -112,7 +127,7 @@ public extension FungibleToken {
 #if DEBUG
 public extension FungibleToken {
 	static let btc = Self(
-		address: "btc-deadbeef",
+		componentAddress: "btc-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -123,7 +138,7 @@ public extension FungibleToken {
 	)
 
 	static let dot = Self(
-		address: "dot-deadbeef",
+		componentAddress: "dot-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -134,7 +149,7 @@ public extension FungibleToken {
 	)
 
 	static let eth = Self(
-		address: "eth-deadbeef",
+		componentAddress: "eth-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -145,7 +160,7 @@ public extension FungibleToken {
 	)
 
 	static let ltc = Self(
-		address: "ltc-deadbeef",
+		componentAddress: "ltc-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -156,7 +171,7 @@ public extension FungibleToken {
 	)
 
 	static let sol = Self(
-		address: "sol-deadbeef",
+		componentAddress: "sol-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -167,7 +182,7 @@ public extension FungibleToken {
 	)
 
 	static let usdt = Self(
-		address: "usdt-deadbeef",
+		componentAddress: "usdt-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,
@@ -178,7 +193,7 @@ public extension FungibleToken {
 	)
 
 	static let xrp = Self(
-		address: "xrp-deadbeef",
+		componentAddress: "xrp-deadbeef",
 		divisibility: 18,
 		totalSupplyAttos: 0,
 		totalMintedAttos: 0,

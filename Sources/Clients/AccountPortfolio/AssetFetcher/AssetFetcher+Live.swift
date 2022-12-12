@@ -14,14 +14,14 @@ extension AssetFetcher: DependencyKey {
 			let resourcesResponse = try await gatewayAPIClient.accountResourcesByAddress(accountAddress)
 			var accountPortfolio = try AccountPortfolio(response: resourcesResponse)
 
-			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.address)
+			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.componentAddress)
 			// NOTE: not used currently
-			let nonFungibleTokenAddresses = accountPortfolio.nonFungibleTokenContainers.map(\.asset.address)
+			let nonFungibleTokenAddresses = accountPortfolio.nonFungibleTokenContainers.map(\.asset.componentAddress)
 
 			guard !fungibleTokenAddresses.isEmpty else {
 				return .empty
 			}
-			let request = GatewayAPI.EntityOverviewRequest(addresses: fungibleTokenAddresses)
+			let request = GatewayAPI.EntityOverviewRequest(addresses: fungibleTokenAddresses.map(\.address))
 			let overviewResponse = try await gatewayAPIClient.resourcesOverview(request)
 
 			accountPortfolio.update(with: overviewResponse)
@@ -38,7 +38,7 @@ extension AccountPortfolio {
 			FungibleTokenContainer(
 				owner: try .init(address: response.address),
 				asset: .init(
-					address: $0.address,
+					componentAddress: .init(address: $0.address),
 					divisibility: nil,
 					totalSupplyAttos: nil,
 					totalMintedAttos: nil,
@@ -56,7 +56,7 @@ extension AccountPortfolio {
 			NonFungibleTokenContainer(
 				owner: try .init(address: response.address),
 				asset: .init(
-					address: $0.address
+					componentAddress: .init(address: $0.address)
 				),
 				metadata: nil
 			)
@@ -73,7 +73,7 @@ extension AccountPortfolio {
 extension AccountPortfolio {
 	mutating func update(with response: GatewayAPI.EntityOverviewResponse) {
 		response.entities.forEach {
-			fungibleTokenContainers[id: $0.address]?.update(with: $0.metadata)
+			fungibleTokenContainers[id: .init(address: $0.address)]?.update(with: $0.metadata)
 		}
 	}
 }
@@ -94,7 +94,7 @@ extension FungibleToken {
 		)
 
 		return Self(
-			address: address,
+			componentAddress: componentAddress,
 			divisibility: divisibility,
 			totalSupplyAttos: totalSupplyAttos,
 			totalMintedAttos: totalMintedAttos,

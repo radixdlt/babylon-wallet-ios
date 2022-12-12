@@ -1,3 +1,4 @@
+import Dependencies
 import KeychainClient
 @testable import ProfileLoader
 import TestUtils
@@ -11,18 +12,19 @@ final class ProfileLoaderTests: TestCase {
 		}
 		""".data(using: .utf8)!
 
-		KeychainClient.liveValue.dataForKey = { @Sendable _, _ in
-			json
-		}
+		await DependencyValues.withValues {
+			$0.context = .test
+			$0.keychainClient.dataForKey = { _, _ in json }
+		} operation: {
+			let res = await sut.loadProfile()
 
-		let res = await sut.loadProfile()
-
-		switch res {
-		case let .failure(.profileVersionOutdated(gotJson, version)):
-			XCTAssertEqual(version, .init(rawValue: .init(0, 0, 0)))
-			XCTAssertEqual(json, gotJson)
-		default:
-			XCTFail("wrong res, got: \(String(describing: res))")
+			switch res {
+			case let .failure(.profileVersionOutdated(gotJson, version)):
+				XCTAssertEqual(version, .init(rawValue: .init(0, 0, 0)))
+				XCTAssertEqual(json, gotJson)
+			default:
+				XCTFail("wrong res, got: \(String(describing: res))")
+			}
 		}
 	}
 }

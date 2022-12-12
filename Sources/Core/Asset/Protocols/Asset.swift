@@ -1,13 +1,14 @@
+import EngineToolkit
 import Foundation
 
 // MARK: - Asset
 public protocol Asset: Equatable, Identifiable where ID == ComponentAddress {
 	/// The Scrypto Component address of asset.
-	var address: ComponentAddress { get }
+	var componentAddress: ComponentAddress { get }
 }
 
 public extension Asset {
-	var id: ID { address }
+	var id: ID { componentAddress }
 }
 
 // MARK: - AssetMetadata
