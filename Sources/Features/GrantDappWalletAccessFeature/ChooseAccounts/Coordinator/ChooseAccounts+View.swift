@@ -74,7 +74,8 @@ public extension ChooseAccounts.View {
 						}
 						.padding(.horizontal, .medium1)
 
-						Spacer(minLength: .large1 * 2)
+						Spacer()
+							.frame(height: .large1 * 1.5)
 
 						Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
 							viewStore.send(.continueButtonTapped)

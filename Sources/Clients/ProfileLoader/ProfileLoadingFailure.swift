@@ -65,5 +65,9 @@ public extension ProfileLoader.JSONDecodingError {
 
 		public let error: Swift.Error
 		public var errorDescription: String? { "Failed to decode profile: \(String(describing: error))" }
+
+		public init(error: Error) {
+			self.error = error
+		}
 	}
 }

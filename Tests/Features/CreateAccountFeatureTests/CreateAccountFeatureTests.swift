@@ -2,7 +2,6 @@ import ComposableArchitecture
 @testable import CreateAccountFeature
 import JSON
 import KeychainClient
-import LocalAuthenticationClient
 import Mnemonic
 import Profile
 import TestUtils
@@ -64,7 +63,7 @@ final class CreateAccountFeatureTests: TestCase {
 			reducer: CreateAccount()
 				.dependency(\.accountNameValidator, .liveValue)
 		)
-		accountName = "My account dummy name" // character count == 21, over the limit
+		accountName = "My account very long dummy name" // character count == 31, over the limit
 
 		// when
 		await store.send(.internal(.view(.textFieldChanged(accountName))))
@@ -104,7 +103,6 @@ final class CreateAccountFeatureTests: TestCase {
 
 		let setDataForProfileSnapshotExpectation = expectation(description: "setDataForKey for ProfileSnapshot should have been called")
 		let profileSavedToKeychain = ActorIsolated<Profile?>(nil)
-		let authBiometricsConfig = LocalAuthenticationConfig.biometricsAndPasscodeSetUp
 
 		keychainClient.updateDataForKey = { data, key, _, _ in
 			if key == "profileSnapshotKeychainKey" {
@@ -130,9 +128,6 @@ final class CreateAccountFeatureTests: TestCase {
 		}
 
 		store.dependencies.keychainClient = keychainClient
-		store.dependencies.localAuthenticationClient = LocalAuthenticationClient {
-			authBiometricsConfig
-		}
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 		let generateMnemonicCalled = ActorIsolated<Bool>(false)
 
@@ -151,8 +146,6 @@ final class CreateAccountFeatureTests: TestCase {
 		}
 
 		// then
-		await store.receive(.internal(.system(.verifyBiometrics)))
-		await store.receive(.internal(.system(.biometricsConfigResult(.success(authBiometricsConfig)))))
 		await store.receive(.internal(.system(.createProfile)))
 
 		waitForExpectations(timeout: 1)
@@ -166,34 +159,6 @@ final class CreateAccountFeatureTests: TestCase {
 		}
 		await generateMnemonicCalled.withValue {
 			XCTAssertTrue($0)
-		}
-	}
-
-	func test__GIVEN__no_profile__WHEN__no_biometrics_config__THEN__alert_is_shown() async throws {
-		let authBiometricsConfig = LocalAuthenticationConfig.neitherBiometricsNorPasscodeSetUp
-
-		let store = TestStore(
-			initialState: CreateAccount.State(shouldCreateProfile: true, isValid: true),
-			reducer: CreateAccount()
-		)
-
-		store.dependencies.localAuthenticationClient = LocalAuthenticationClient {
-			authBiometricsConfig
-		}
-
-		// when
-		await store.send(.internal(.view(.createAccountButtonTapped))) {
-			$0.isCreatingAccount = true
-		}
-
-		// then
-		await store.receive(.internal(.system(.verifyBiometrics)))
-		await store.receive(.internal(.system(.biometricsConfigResult(.success(authBiometricsConfig))))) {
-			$0.isCreatingAccount = false
-			$0.alert = .init(
-				title: .init("Biometrics not set up"),
-				message: .init("This app requires your phone having biometrics set up")
-			)
 		}
 	}
 }

@@ -18,8 +18,8 @@ package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.2.0"),
-	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.6"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.50"),
+	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.7"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.52"),
 
 	// ~~~ THIRD PARTY ~~~
 	// APPLE
@@ -30,6 +30,7 @@ package.dependencies += [
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.46.0"),
 	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
 	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
+	.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3"),
 
 	// Other
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
@@ -353,7 +354,6 @@ package.addModules([
 			"ErrorQueue",
 			"GatewayAPI",
 			"KeychainClientDependency",
-			"LocalAuthenticationClient",
 			"ProfileClient",
 			tca,
 		],
@@ -594,6 +594,7 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
+			"LocalAuthenticationClient",
 			"ProfileClient",
 			"ProfileLoader",
 			tca,
@@ -865,6 +866,7 @@ package.addModules([
 		dependencies: [
 			"Resources",
 			.product(name: "SwiftUIPullToRefresh", package: "swiftui-pull-to-refresh", condition: .when(platforms: [.iOS])),
+			.product(name: "SwiftUINavigation", package: "swiftui-navigation"),
 		],
 		resources: [
 			.process("Fonts"),

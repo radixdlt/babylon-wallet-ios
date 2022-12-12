@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import LocalAuthenticationClient
 import Profile
 import ProfileLoader
 
@@ -16,6 +17,7 @@ public extension Splash {
 public extension Splash.Action {
 	enum ViewAction: Sendable, Equatable {
 		case viewAppeared
+		case alertRetryButtonTapped
 	}
 }
 
@@ -30,7 +32,7 @@ public extension Splash.Action {
 // MARK: - Splash.Action.SystemAction
 public extension Splash.Action {
 	enum SystemAction: Sendable, Equatable {
-		case loadProfile
+		case biometricsConfigResult(TaskResult<LocalAuthenticationConfig>)
 		case loadProfileResult(ProfileLoader.ProfileResult)
 	}
 }

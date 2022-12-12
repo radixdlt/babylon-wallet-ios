@@ -20,10 +20,9 @@ public extension ManageGatewayAPIEndpoints.Action {
 	enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case dismissButtonTapped
-
 		case urlStringChanged(String)
-
 		case switchToButtonTapped
+		case focusTextField(ManageGatewayAPIEndpoints.State.Field?)
 	}
 }
 

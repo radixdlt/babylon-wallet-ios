@@ -54,6 +54,10 @@ private extension ScanQR.View {
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
 
+		Text(L10n.NewConnection.subtitle)
+			.foregroundColor(.app.gray1)
+			.textStyle(.body1Regular)
+
 		CodeScannerView(
 			codeTypes: [.qr]
 		) { response in
@@ -65,11 +69,7 @@ private extension ScanQR.View {
 			}
 		}
 		.aspectRatio(1, contentMode: .fit)
-		.cornerRadius(.large1)
-
-		Text(L10n.NewConnection.scanRadixConnectorExtensionQRCode)
-			.foregroundColor(.app.gray1)
-			.textStyle(.body1HighImportance)
+		.cornerRadius(.small2)
 
 		#else
 		EmptyView()

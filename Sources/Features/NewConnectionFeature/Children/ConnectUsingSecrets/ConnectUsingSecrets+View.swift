@@ -32,31 +32,33 @@ public extension ConnectUsingSecrets.View {
 		) { viewStore in
 			VStack(alignment: .leading) {
 				if viewStore.isPromptingForName {
-					Text(L10n.NewConnection.nameConnectionInstruction)
-						.textStyle(.body1HighImportance)
-
-					TextField(
-						L10n.NewConnection.nameConnectionTextFieldHint,
+					AppTextField(
+						placeholder: L10n.NewConnection.textFieldPlaceholder,
 						text: viewStore.binding(
 							get: \.nameOfConnection,
 							send: { .nameOfConnectionChanged($0) }
+						),
+						hint: L10n.NewConnection.textFieldHint,
+						binding: $focusedField,
+						equals: .connectionName,
+						first: viewStore.binding(
+							get: \.focusedField,
+							send: { .textFieldFocused($0) }
 						)
 					)
-					.focused($focusedField, equals: .connectionName)
-					.synchronize(viewStore.binding(
-						get: \.focusedField,
-						send: { .textFieldFocused($0) }
-					), $focusedField)
-					.textFieldStyle(.roundedBorder)
+					.padding(.medium3)
+
+					Spacer()
 
 					Button(L10n.NewConnection.saveNamedConnectionButton) {
 						viewStore.send(.confirmNameButtonTapped)
 					}
+					.controlState(viewStore.isSaveConnectionButtonEnabled ? .enabled : .disabled)
 					.buttonStyle(.primaryRectangular)
+					.padding(.medium3)
 				}
 			}
 			.isLoading(viewStore.isConnecting, context: .global(text: L10n.NewConnection.connecting))
-			.padding()
 			.onAppear {
 				viewStore.send(.appeared)
 			}
@@ -70,12 +72,15 @@ extension ConnectUsingSecrets.View {
 		public var isConnecting: Bool
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String
+		public var isSaveConnectionButtonEnabled: Bool
 		@BindableState public var focusedField: ConnectUsingSecrets.State.Field?
+
 		init(state: ConnectUsingSecrets.State) {
 			nameOfConnection = state.nameOfConnection
 			isPromptingForName = state.isPromptingForName
 			isConnecting = state.isConnecting
 			focusedField = state.focusedField
+			isSaveConnectionButtonEnabled = state.isNameValid
 		}
 	}
 }

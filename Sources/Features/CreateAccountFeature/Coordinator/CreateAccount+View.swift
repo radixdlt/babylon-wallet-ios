@@ -46,7 +46,7 @@ public extension CreateAccount.View {
 						VStack(spacing: .large1) {
 							subtitle
 
-							textField(
+							AppTextField(
 								placeholder: L10n.CreateAccount.placeholder,
 								text: viewStore.binding(
 									get: \.accountName,
@@ -76,7 +76,6 @@ public extension CreateAccount.View {
 					}
 					.padding([.horizontal, .bottom], .medium1)
 				}
-				.alert(store.scope(state: \.alert, action: { .view($0) }), dismiss: .alertDismissButtonTapped)
 				.onAppear {
 					viewStore.send(.viewAppeared)
 				}
@@ -128,39 +127,6 @@ private extension CreateAccount.View {
 			.multilineTextAlignment(.center)
 			.foregroundColor(.app.gray1)
 			.textStyle(.body1Regular)
-	}
-
-	func textField<Value>(
-		placeholder: String,
-		text: Binding<String>,
-		hint: String,
-		binding: FocusState<Value>.Binding,
-		equals: Value,
-		first: Binding<Value>
-	) -> some View {
-		VStack(alignment: .leading, spacing: .small2) {
-			TextField(
-				placeholder,
-				text: text
-					.removeDuplicates()
-			)
-			.focused(binding, equals: equals)
-			.synchronize(first, binding)
-			.padding()
-			.frame(height: .standardButtonHeight)
-			.background(Color.app.gray5)
-			.foregroundColor(.app.gray1)
-			.textStyle(.body1Regular)
-			.cornerRadius(.small2)
-			.overlay(
-				RoundedRectangle(cornerRadius: .small2)
-					.stroke(Color.app.gray1, lineWidth: 1)
-			)
-
-			Text(hint)
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2Regular)
-		}
 	}
 }
 

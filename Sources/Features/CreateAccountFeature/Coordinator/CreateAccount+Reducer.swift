@@ -1,7 +1,6 @@
 import ComposableArchitecture
 import ErrorQueue
 import KeychainClientDependency
-import LocalAuthenticationClient
 import Mnemonic
 import Profile
 import ProfileClient
@@ -46,7 +45,6 @@ public struct CreateAccount: Sendable, ReducerProtocol {
 	@Dependency(\.mnemonicGenerator) var mnemonicGenerator
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
-	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 
 	public init() {}
 }
@@ -61,39 +59,15 @@ public extension CreateAccount {
 
 			if state.shouldCreateProfile {
 				return .run { send in
-					await send(.internal(.system(.verifyBiometrics)))
+					await send(.internal(.system(.createProfile)))
 				}
 			} else {
 				return .run { send in
 					await send(.internal(.system(.createAccount)))
 				}
 			}
-		case .internal(.system(.verifyBiometrics)):
-			return .run { send in
-				await send(.internal(.system(.biometricsConfigResult(
-					TaskResult {
-						try await localAuthenticationClient.queryConfig()
-					}
-				))))
-			}
-
-		case let .internal(.system(.biometricsConfigResult(result))):
-			let config = try? result.value
-			guard config?.isBiometricsSetUp == true else {
-				state.isCreatingAccount = false
-				state.alert = .init(
-					title: .init(L10n.Onboarding.biometricsNotSetUpTitle),
-					message: .init(L10n.Onboarding.biometricsNotSetUpMessage)
-				)
-				return .none
-			}
-
-			return .run { send in
-				await send(.internal(.system(.createProfile)))
-			}
-
 		case .internal(.system(.createAccount)):
-			return .run { [accountName = state.accountName, overridingNetworkID = state.onNetworkWithID] send in
+			return .run { [accountName = state.accountName.trimmed(), overridingNetworkID = state.onNetworkWithID] send in
 				await send(.internal(.system(.createdNewAccountResult(
 					TaskResult {
 						let request = CreateAccountRequest(
@@ -193,10 +167,6 @@ public extension CreateAccount {
 
 		case let .internal(.system(.focusTextField(focus))):
 			state.focusedField = focus
-			return .none
-
-		case .internal(.view(.alertDismissButtonTapped)):
-			state.alert = nil
 			return .none
 
 		case .delegate:
