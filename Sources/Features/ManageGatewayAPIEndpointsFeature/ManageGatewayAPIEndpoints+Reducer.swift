@@ -71,6 +71,10 @@ public extension ManageGatewayAPIEndpoints {
 				))))
 			}
 
+		case let .internal(.view(.focusTextField(focus))):
+			state.focusedField = focus
+			return .none
+
 		case let .internal(.system(.gatewayValidationResult(.failure(error)))):
 			state.isValidatingEndpoint = false
 			errorQueue.schedule(error)

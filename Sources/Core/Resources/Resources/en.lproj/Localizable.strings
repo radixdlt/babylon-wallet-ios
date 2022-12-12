@@ -51,22 +51,23 @@
 "importProfile.profileFromSnapshot" = "Radix Wallet backup from file";
 "importProfile.saveImportedMnemonic" = "Save imported mnemonic";
 
-"manageGateway.title" = "Network Gateway";
 "manageGateway.currentGatewayTitle" = "Current Network Gateway";
 "manageGateway.gatewayAPIEndpoint" = "Gateway URL";
 "manageGateway.networkID" = "Network ID";
 "manageGateway.networkName" = "Network Name";
-"manageGateway.inputNewGatewayAPIURL" = "New Gateway URL";
-"manageGateway.urlString" = "https://example.com:8080";
 "manageGateway.switchToButtonTitle" = "Update Gateway";
+"manageGateway.textFieldHint" = "New Gateway URL";
+"manageGateway.textFieldPlaceholder" = "Enter full URL";
+"manageGateway.title" = "Network Gateway";
+"manageGateway.urlString" = "https://example.com:8080";
 
-"newConnection.title" = "Link to Connector";
-"newConnection.scanRadixConnectorExtensionQRCode" = "Scan the QR code displayed by the Radix Wallet Connector browser extension.";
 "newConnection.connecting" = "Linking...";
-"newConnection.nameConnectionInstruction" = "Name this Connector, e.g. \"Chrome on Macbook Pro\"";
-"newConnection.nameConnectionTextFieldHint" = "Name of Connector";
-"newConnection.saveNamedConnectionButton" = "Save Link";
 "newConnection.defaultNameOfConnection" = "Unnamed";
+"newConnection.saveNamedConnectionButton" = "Save Link";
+"newConnection.subtitle" = "Scan your QR code to link your wallet with a browser extension";
+"newConnection.textFieldHint" = "Name this Connector, e.g. \"Chrome on Macbook Pro\"";
+"newConnection.textFieldPlaceholder" = "Name of Connector";
+"newConnection.title" = "Link to Connector";
 
 "manageP2PClients.P2PConnectionsTitle" = "Linked Connector";
 "manageP2PClients.P2PConnectionsSubtitle" = "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.";
@@ -97,10 +98,10 @@
 "settings.versionInfo" = "Version: %@ build #%@";
 
 "transactionSigning.biometricsPrompt" = "Unlock secret used to sign transaction";
-"transactionSigning.signTransactionButtonTitle" = "Approve Transaction";
-"transactionSigning.title" = "Approve Transaction";
 "transactionSigning.preparingTransactionLoadingText" = "Preparing transaction...";
+"transactionSigning.signTransactionButtonTitle" = "Approve Transaction";
 "transactionSigning.signingAndSubmittingTransactionLoadingText" = "Submitting transaction...";
+"transactionSigning.title" = "Approve Transaction";
 
 "profileLoad.failedToCreateProfileFromSnapshotError" = "Failed to create Wallet from backup, error: %@, version: %@";
 "profileLoad.decodingError" = "Failed to create Wallet from backup: %@";

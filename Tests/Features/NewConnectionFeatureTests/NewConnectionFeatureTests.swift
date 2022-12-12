@@ -70,7 +70,7 @@ final class NewConnectionTests: TestCase {
 		)
 		let connectionName = "Foobar"
 		await store.send(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + " ")))) {
-			$0 = .connectUsingSecrets(.init(connectionSecrets: secrets, connectedConnection: connection, nameOfConnection: connectionName + " "))
+			$0 = .connectUsingSecrets(.init(connectionSecrets: secrets, connectedConnection: connection, nameOfConnection: connectionName + " ", isNameValid: true))
 		}
 		let testScheduler = DispatchQueue.test
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()

@@ -10,6 +10,7 @@ public extension ManageGatewayAPIEndpoints {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<ManageGatewayAPIEndpoints>
+		@FocusState private var focusedField: ManageGatewayAPIEndpoints.State.Field?
 
 		public init(store: StoreOf<ManageGatewayAPIEndpoints>) {
 			self.store = store
@@ -43,55 +44,74 @@ public extension ManageGatewayAPIEndpoints.View {
 	}
 }
 
+// MARK: - ManageGatewayAPIEndpoints.View.ViewStore
+private extension ManageGatewayAPIEndpoints.View {
+	typealias ViewStore = ComposableArchitecture.ViewStore<ViewState, ManageGatewayAPIEndpoints.Action.ViewAction>
+}
+
 private extension ManageGatewayAPIEndpoints.View {
 	@ViewBuilder
-	func core(viewStore: ViewStore<ViewState, ManageGatewayAPIEndpoints.Action.ViewAction>) -> some View {
+	func core(viewStore: ViewStore) -> some View {
 		ForceFullScreen {
-			VStack {
+			VStack(spacing: .zero) {
 				NavigationBar(
 					titleText: L10n.ManageGateway.title,
-					leadingItem: CloseButton {
+					leadingItem: BackButton {
 						viewStore.send(.dismissButtonTapped)
 					}
 				)
 				.foregroundColor(.app.gray1)
 				.padding([.horizontal, .top], .medium3)
 
-				VStack(alignment: .leading) {
-					if let networkAndGateway = viewStore.networkAndGateway {
-						networkAndGatewayView(networkAndGateway)
+				Separator()
+
+				ScrollView {
+					HStack {
+						Text(L10n.ManageP2PClients.p2PConnectionsSubtitle)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1HighImportance)
+							.padding(.medium3)
+
+						Spacer()
 					}
 
-					Spacer()
+					Separator()
 
-					ZStack {
-						VStack(alignment: .leading) {
-							Text(L10n.ManageGateway.inputNewGatewayAPIURL)
-							TextField(
-								L10n.ManageGateway.urlString,
-								text: viewStore.binding(
-									get: \.urlString,
-									send: { .urlStringChanged($0) }
-								)
+					VStack(alignment: .leading) {
+						if let networkAndGateway = viewStore.networkAndGateway {
+							networkAndGatewayView(networkAndGateway)
+						}
+
+						Spacer(minLength: .large1 * 2)
+
+						AppTextField(
+							placeholder: L10n.ManageGateway.textFieldPlaceholder,
+							text: viewStore.binding(
+								get: \.urlString,
+								send: { .urlStringChanged($0) }
+							),
+							hint: L10n.ManageGateway.textFieldHint,
+							binding: $focusedField,
+							equals: .gatewayURL,
+							first: viewStore.binding(
+								get: \.focusedField,
+								send: { .focusTextField($0) }
 							)
-							.textFieldStyle(.roundedBorder)
+						)
+						.keyboardType(.URL)
+						.autocorrectionDisabled()
+						.textInputAutocapitalization(.never)
+
+						Spacer(minLength: .large1 * 2)
+
+						Button(L10n.ManageGateway.switchToButtonTitle) {
+							viewStore.send(.switchToButtonTapped)
 						}
-
-						// FIXME: betanet move loading indicator into button below.
-						if viewStore.isShowingLoader {
-							LoadingView()
-						}
+						.buttonStyle(.primaryRectangular)
+						.controlState(viewStore.controlState)
 					}
-
-					Spacer()
-
-					Button(L10n.ManageGateway.switchToButtonTitle) {
-						viewStore.send(.switchToButtonTapped)
-					}
-					.enabled(viewStore.isSwitchToButtonEnabled)
+					.padding(.medium3)
 				}
-				.padding([.horizontal, .bottom], .medium1)
-				.buttonStyle(.primaryRectangular)
 			}
 			.onAppear {
 				viewStore.send(.didAppear)
@@ -107,13 +127,13 @@ private extension ManageGatewayAPIEndpoints.View {
 	) -> some View {
 		VStack(alignment: .leading, spacing: 0) {
 			Text(label)
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2HighImportance)
+				.foregroundColor(.app.gray1)
+				.textStyle(.body1HighImportance)
 
 			Text(String(describing: value))
 				.textSelection(.enabled)
-				.foregroundColor(.app.gray1)
-				.textStyle(.body1HighImportance)
+				.foregroundColor(.app.gray2)
+				.textStyle(.body2Regular)
 		}
 		.padding(.top, .small3)
 	}
@@ -124,7 +144,7 @@ private extension ManageGatewayAPIEndpoints.View {
 		Group {
 			Text(L10n.ManageGateway.currentGatewayTitle)
 				.foregroundColor(.app.gray1)
-				.textStyle(.sectionHeader)
+				.textStyle(.secondaryHeader)
 
 			HStack {
 				label(L10n.ManageGateway.networkName, value: networkAndGateway.network.name)
@@ -144,17 +164,15 @@ private extension ManageGatewayAPIEndpoints.View {
 extension ManageGatewayAPIEndpoints.View {
 	struct ViewState: Equatable {
 		public var urlString: String
-
 		public var networkAndGateway: AppPreferences.NetworkAndGateway?
-		public var isSwitchToButtonEnabled: Bool
-		public var isShowingLoader: Bool
+		public var controlState: ControlState
+		@BindableState public var focusedField: ManageGatewayAPIEndpoints.State.Field?
 
 		init(state: ManageGatewayAPIEndpoints.State) {
 			urlString = state.urlString
-
-			isSwitchToButtonEnabled = state.isSwitchToButtonEnabled
 			networkAndGateway = state.currentNetworkAndGateway
-			isShowingLoader = state.isValidatingEndpoint
+			controlState = state.controlState
+			focusedField = state.focusedField
 		}
 	}
 }
