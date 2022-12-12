@@ -823,6 +823,7 @@ package.addModules([
 		name: "Asset", // put in SharedModels?
 		dependencies: [
 			"Common",
+			"EngineToolkitClient", // I know, this is very wrong. Apologies. Let's revisit our dependency levels post betanet.
 			profile, // Address
 			bigInt,
 		],
