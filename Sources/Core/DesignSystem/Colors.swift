@@ -29,6 +29,10 @@ public extension Color.App {
 	var white: Color { .init(hex: .white) }
 	var whiteTransparent: Color { .white.opacity(0.8) }
 
+	// orange
+	var orange1: Color { .init(hex: .orange1) }
+	var orange2: Color { .init(hex: .orange2) }
+
 	// alert
 	var red1: Color { .init(hex: .red1) }
 
@@ -89,8 +93,11 @@ private extension Color {
 		// white
 		case white = 0xFFFFFF
 
-		// alert
+		// orange
 		case orange1 = 0xF2AD21
+		case orange2 = 0xEC633E
+
+		// alert
 		case red1 = 0xC82020
 
 		// gradient
