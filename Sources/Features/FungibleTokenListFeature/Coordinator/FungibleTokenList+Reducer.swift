@@ -7,11 +7,14 @@ public struct FungibleTokenList: ReducerProtocol {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce { state, action in
 			switch action {
+			case .child(.section(_, action: .child(.asset(_, action: .delegate(.selected(let token)))))):
+				state.selectedToken = token
+				return .none
 			case let .internal(.view(.selectedTokenChanged(token))):
 				state.selectedToken = token
 				return .none
-			case .child(.section(_, action: .child(.asset(_, action: .delegate(.selected(let token)))))):
-				state.selectedToken = token
+			case .child(.details(.delegate(.closeButtonTapped))):
+				state.selectedToken = nil
 				return .none
 			case .child:
 				return .none

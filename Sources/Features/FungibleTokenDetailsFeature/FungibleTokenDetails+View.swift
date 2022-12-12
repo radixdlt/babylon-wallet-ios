@@ -18,64 +18,70 @@ public extension FungibleTokenDetails {
 public extension FungibleTokenDetails.View {
 	var body: some View {
 		WithViewStore(
-			store.actionless,
-			observe: ViewState.init(state:)
+			store,
+			observe: ViewState.init(state:),
+			send: { .view($0) }
 		) { viewStore in
-			VStack(spacing: 0) {
-				if let name = viewStore.name {
-					Text(name).textStyle(.body1Header)
-				}
-				LazyImage(url: viewStore.iconURL) { _ in
-					Image(asset: viewStore.placeholderAsset)
-						.resizable()
-				}
-				.frame(width: 104, height: 104)
-				.clipShape(Circle())
-				if let amount = viewStore.amount, let symbol = viewStore.symbol {
-					Text(amount).font(.app.sheetTitle).kerning(-0.5) +
-						Text(" " + symbol).font(.app.sectionHeader)
-				}
-				VStack(spacing: .medium1) {
-					let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
-					if let description = viewStore.description {
-						divider
-						Text(description)
-							.textStyle(.body1Regular)
-							.frame(maxWidth: .infinity, alignment: .leading)
-							.padding(.horizontal, .large2)
+			ForceFullScreen {
+				VStack(spacing: .zero) {
+					NavigationBar(
+						titleText: viewStore.displayName,
+						leadingItem: CloseButton { viewStore.send(.closeButtonTapped) }
+					)
+					.padding([.horizontal, .top], .medium3)
+
+					LazyImage(url: viewStore.iconURL) { _ in
+						Image(asset: viewStore.placeholderAsset)
+							.resizable()
 					}
-					divider
-					VStack(spacing: .medium3) {
-						HStack {
-							Text("Token ID")
+					.frame(width: 104, height: 104)
+					.clipShape(Circle())
+					if let amount = viewStore.amount, let symbol = viewStore.symbol {
+						Text(amount).font(.app.sheetTitle).kerning(-0.5) +
+							Text(" " + symbol).font(.app.sectionHeader)
+					}
+					VStack(spacing: .medium1) {
+						let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
+						if let description = viewStore.description {
+							divider
+							Text(description)
 								.textStyle(.body1Regular)
-								.foregroundColor(.app.gray2)
-							AddressView(
-								viewStore.address,
-								textStyle: .body1Regular,
-								copyAddressAction: .none
-							)
-							.frame(maxWidth: .infinity, alignment: .trailing)
-							.multilineTextAlignment(.trailing)
+								.frame(maxWidth: .infinity, alignment: .leading)
+								.padding(.horizontal, .large2)
 						}
-						if let currentSupply = viewStore.currentSupply {
+						divider
+						VStack(spacing: .medium3) {
 							HStack {
-								Text("Current Supply")
+								Text("Token ID")
 									.textStyle(.body1Regular)
 									.foregroundColor(.app.gray2)
-								Text(currentSupply.description)
-									.frame(maxWidth: .infinity, alignment: .trailing)
-									.multilineTextAlignment(.trailing)
+								AddressView(
+									viewStore.address,
+									textStyle: .body1Regular,
+									copyAddressAction: .none
+								)
+								.frame(maxWidth: .infinity, alignment: .trailing)
+								.multilineTextAlignment(.trailing)
+							}
+							if let currentSupply = viewStore.currentSupply {
+								HStack {
+									Text("Current Supply")
+										.textStyle(.body1Regular)
+										.foregroundColor(.app.gray2)
+									Text(currentSupply.description)
+										.frame(maxWidth: .infinity, alignment: .trailing)
+										.multilineTextAlignment(.trailing)
+								}
 							}
 						}
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.padding(.horizontal, .large2)
+						.textStyle(.body1Regular)
+						.lineLimit(1)
 					}
-					.frame(maxWidth: .infinity, alignment: .leading)
-					.padding(.horizontal, .large2)
-					.textStyle(.body1Regular)
-					.lineLimit(1)
 				}
+				.foregroundColor(.app.gray1)
 			}
-			.foregroundColor(.app.gray1)
 		}
 	}
 }
@@ -83,7 +89,7 @@ public extension FungibleTokenDetails.View {
 // MARK: - FungibleTokenDetails.View.ViewState
 extension FungibleTokenDetails.View {
 	struct ViewState: Equatable {
-		var name: String?
+		var displayName: String?
 		var iconURL: URL?
 		var placeholderAsset: ImageAsset
 		var amount: String?
@@ -93,7 +99,7 @@ extension FungibleTokenDetails.View {
 		var currentSupply: BigUInt?
 
 		init(state: FungibleTokenDetails.State) {
-			name = state.asset.name
+			displayName = state.asset.name
 			iconURL = state.asset.iconURL
 			placeholderAsset = state.asset.placeholderImage
 			amount = state.amount
