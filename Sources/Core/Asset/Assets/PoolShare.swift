@@ -7,9 +7,9 @@ public struct PoolShare: Asset {
 	public let componentAddress: ComponentAddress
 
 	public init(
-		address: ComponentAddress
+		componentAddress: ComponentAddress
 	) {
-		self.componentAddress = address
+		self.componentAddress = componentAddress
 	}
 }
 

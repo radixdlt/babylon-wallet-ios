@@ -9,10 +9,10 @@ public struct NonFungibleToken: Sendable, Asset, Token, Hashable {
 	public let iconURL: URL?
 
 	public init(
-		address: ComponentAddress,
+		componentAddress: ComponentAddress,
 		iconURL: URL? = nil
 	) {
-		self.componentAddress = address
+		self.componentAddress = componentAddress
 		self.iconURL = iconURL
 	}
 }

@@ -56,7 +56,7 @@ extension AccountPortfolio {
 			NonFungibleTokenContainer(
 				owner: try .init(address: response.address),
 				asset: .init(
-					address: .init(address: $0.address)
+					componentAddress: .init(address: $0.address)
 				),
 				metadata: nil
 			)
