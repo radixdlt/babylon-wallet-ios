@@ -45,11 +45,15 @@ public extension TransactionSigning {
 
 		case let .internal(.loadNetworkIDResult(.failure(error), _)):
 			errorQueue.schedule(error)
-			return .none
+			return .run { [failedRequest = state.request] send in
+				await send(.delegate(.failed(failedRequest, ApproveTransactionFailure.prepareTransactionFailure(.loadNetworkID(error)))))
+			}
 
 		case let .internal(.addLockFeeInstructionToManifestResult(.failure(error))):
 			errorQueue.schedule(error)
-			return .none
+			return .run { [failedRequest = state.request] send in
+				await send(.delegate(.failed(failedRequest, ApproveTransactionFailure.prepareTransactionFailure(.addTransactionFee(error)))))
+			}
 
 		case .internal(.view(.signTransactionButtonTapped)):
 			guard
@@ -87,7 +91,7 @@ public extension TransactionSigning {
 		case let .internal(.signTransactionResult(.failure(transactionFailure))):
 			state.isSigningTX = false
 			return .run { [failedRequest = state.request] send in
-				await send(.delegate(.failed(failedRequest, transactionFailure)))
+				await send(.delegate(.failed(failedRequest, .transactionFailure(transactionFailure))))
 			}
 
 		case .internal(.view(.closeButtonTapped)):

@@ -98,9 +98,11 @@ private extension ManageGatewayAPIEndpoints.View {
 								send: { .focusTextField($0) }
 							)
 						)
-						.keyboardType(.URL)
 						.autocorrectionDisabled()
-						.textInputAutocapitalization(.never)
+						#if os(iOS)
+							.textInputAutocapitalization(.never)
+							.keyboardType(.URL)
+						#endif // iOS
 
 						Spacer(minLength: .large1 * 2)
 

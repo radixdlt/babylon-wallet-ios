@@ -238,33 +238,45 @@ private extension HandleDappRequests {
 	}
 }
 
-extension TransactionFailure {
+extension ApproveTransactionFailure {
 	var errorKindAndMessage: (errorKind: P2P.ToDapp.Response.Failure.Kind.Error, message: String?) {
 		switch self {
-		case let .failedToCompileOrSign(error):
-			switch error {
-			case .failedToCompileNotarizedTXIntent, .failedToCompileTXIntent, .failedToCompileSignedTXIntent, .failedToGenerateTXId:
-				return (errorKind: .failedToCompileTransaction, message: nil)
-			case .failedToSignIntentWithAccountSigners, .failedToSignSignedCompiledIntentWithNotarySigner, .failedToConvertNotarySignature, .failedToConvertAccountSignatures:
-				return (errorKind: .failedToSignTransaction, message: nil)
-			}
-		case let .failedToPrepareForTXSigning(error):
+		case let .transactionFailure(transactionFailure):
+			switch transactionFailure {
+			case let .failedToCompileOrSign(error):
+				switch error {
+				case .failedToCompileNotarizedTXIntent, .failedToCompileTXIntent, .failedToCompileSignedTXIntent, .failedToGenerateTXId:
+					return (errorKind: .failedToCompileTransaction, message: nil)
+				case .failedToSignIntentWithAccountSigners, .failedToSignSignedCompiledIntentWithNotarySigner, .failedToConvertNotarySignature, .failedToConvertAccountSignatures:
+					return (errorKind: .failedToSignTransaction, message: nil)
+				}
+			case let .failedToPrepareForTXSigning(error):
+				return (errorKind: .failedToPrepareTransaction, message: error.errorDescription)
 
-			return (errorKind: .failedToPrepareTransaction, message: nil)
-		case let .failedToSubmit(submissionError):
-			switch submissionError {
-			case .failedToSubmitTX:
-				return (errorKind: .failedToSubmitTransaction, message: nil)
-			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .rejected):
-				return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TXID: \(txID)")
-			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
-				return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TXID: \(txID)")
-			case let .failedToPollTX(txID, pollError):
-				return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
-			case let .invalidTXWasDuplicate(txID):
-				return (errorKind: .submittedTransactionWasDuplicate, message: "TXID: \(txID)")
-			case let .failedToGetTransactionStatus(txID, error):
-				return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+			case let .failedToSubmit(submissionError):
+
+				switch submissionError {
+				case .failedToSubmitTX:
+					return (errorKind: .failedToSubmitTransaction, message: nil)
+				case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .rejected):
+					return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TXID: \(txID)")
+				case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
+					return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TXID: \(txID)")
+				case let .failedToPollTX(txID, pollError):
+					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+				case let .invalidTXWasDuplicate(txID):
+					return (errorKind: .submittedTransactionWasDuplicate, message: "TXID: \(txID)")
+				case let .failedToGetTransactionStatus(txID, error):
+					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+				}
+			}
+
+		case let .prepareTransactionFailure(prepareTransactionFailure):
+			switch prepareTransactionFailure {
+			case let .addTransactionFee(addTransactionFeeError):
+				return (errorKind: .failedToPrepareTransaction, message: addTransactionFeeError.localizedDescription)
+			case let .loadNetworkID(loadNetworkIDError):
+				return (errorKind: .failedToPrepareTransaction, message: loadNetworkIDError.localizedDescription)
 			}
 		}
 	}

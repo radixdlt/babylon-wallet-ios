@@ -39,7 +39,7 @@ final class TransactionSigningFeatureTests: TestCase {
 		await store.receive(.internal(.signTransactionResult(.failure(.failedToCompileOrSign(.failedToCompileTXIntent))))) {
 			$0.isSigningTX = false
 		}
-		await store.receive(.delegate(.failed(request, .failedToCompileOrSign(.failedToCompileTXIntent))))
+		await store.receive(.delegate(.failed(request, .transactionFailure(.failedToCompileOrSign(.failedToCompileTXIntent)))))
 
 		// Happy path
 		store.dependencies.transactionClient.signAndSubmitTransaction = { @Sendable _ in
