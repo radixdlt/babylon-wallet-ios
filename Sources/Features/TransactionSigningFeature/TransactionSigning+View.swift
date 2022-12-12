@@ -47,21 +47,13 @@ public extension TransactionSigning.View {
 									viewStore.send(.signTransactionButtonTapped)
 								}
 								.buttonStyle(.primaryRectangular)
-								.enabled(viewStore.isSignButtonEnabled)
+								.controlState(viewStore.signButtonState)
 							}
 						}
 						.padding([.horizontal, .bottom])
 					}
+					.controlState(viewStore.viewControlState)
 					Spacer()
-				}
-				.controlState {
-					if viewStore.manifest == nil {
-						return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
-					} else if viewStore.isShowingLoader {
-						return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
-					} else {
-						return .enabled
-					}
 				}
 				.onAppear {
 					viewStore.send(.didAppear)
@@ -76,12 +68,30 @@ extension TransactionSigning.View {
 	struct ViewState: Equatable {
 		let manifest: String?
 		let isShowingLoader: Bool
-		let isSignButtonEnabled: Bool
+		let signButtonState: ControlState
+		let viewControlState: ControlState
 
 		init(state: TransactionSigning.State) {
 			manifest = state.transactionWithLockFeeString
 			isShowingLoader = state.isSigningTX
-			isSignButtonEnabled = !state.isSigningTX
+
+			signButtonState = {
+				if !state.isSigningTX {
+					return .enabled
+				} else {
+					return .disabled
+				}
+			}()
+
+			viewControlState = {
+				if state.transactionWithLockFeeString == nil {
+					return .loading(.global(text: L10n.TransactionSigning.preparingTransactionLoadingText))
+				} else if state.isSigningTX {
+					return .loading(.global(text: L10n.TransactionSigning.signingAndSubmittingTransactionLoadingText))
+				} else {
+					return .enabled
+				}
+			}()
 		}
 	}
 }
