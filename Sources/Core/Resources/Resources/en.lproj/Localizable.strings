@@ -12,7 +12,7 @@
 "assetsView.poolShare" = "Pool Shares";
 "assetsView.tokens" = "Tokens";
 
-"createAccount.biometricsPrompt" = "Unlock secret used to create new account.";
+"createAccount.biometricsPrompt" = "Authenticate to create new account with this phone.";
 "createAccount.completion.explanation" = "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.";
 "createAccount.completion.origin.home" = "Account List";
 "createAccount.completion.returnToOrigin" = "Go to %@";
@@ -97,7 +97,7 @@
 "settings.title" = "Wallet Settings";
 "settings.versionInfo" = "Version: %@ build #%@";
 
-"transactionSigning.biometricsPrompt" = "Unlock secret used to sign transaction";
+"transactionSigning.biometricsPrompt" = "Authenticate to sign transaction with this phone.";
 "transactionSigning.preparingTransactionLoadingText" = "Preparing transaction...";
 "transactionSigning.signTransactionButtonTitle" = "Approve Transaction";
 "transactionSigning.signingAndSubmittingTransactionLoadingText" = "Submitting transaction...";
