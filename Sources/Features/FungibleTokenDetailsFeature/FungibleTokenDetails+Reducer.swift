@@ -7,6 +7,11 @@ public struct FungibleTokenDetails: ReducerProtocol {
 
 public extension FungibleTokenDetails {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-		.none
+		switch action {
+		case .internal(.view(.closeButtonTapped)):
+			return .run { send in await send(.delegate(.closeButtonTapped)) }
+		case .delegate:
+			return .none
+		}
 	}
 }

@@ -11,7 +11,9 @@ public extension FungibleTokenDetails {
 
 // MARK: - FungibleTokenDetails.Action.ViewAction
 public extension FungibleTokenDetails.Action {
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case closeButtonTapped
+	}
 }
 
 // MARK: - FungibleTokenDetails.Action.InternalAction
@@ -29,5 +31,7 @@ public extension FungibleTokenDetails.Action {
 
 // MARK: - FungibleTokenDetails.Action.DelegateAction
 public extension FungibleTokenDetails.Action {
-	enum DelegateAction: Equatable {}
+	enum DelegateAction: Equatable {
+		case closeButtonTapped
+	}
 }

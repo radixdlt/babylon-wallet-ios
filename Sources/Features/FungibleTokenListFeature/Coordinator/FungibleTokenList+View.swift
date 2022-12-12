@@ -1,6 +1,9 @@
+import Asset
 import ComposableArchitecture
 import DesignSystem
+import FungibleTokenDetailsFeature
 import SwiftUI
+import SwiftUINavigation
 
 // MARK: - FungibleTokenList.View
 public extension FungibleTokenList {
@@ -20,20 +23,38 @@ public extension FungibleTokenList {
 public extension FungibleTokenList.View {
 	var body: some View {
 		WithViewStore(
-			store.actionless,
-			observe: ViewState.init(state:)
-		) { _ in
-			VStack(spacing: .large2) {
-				LazyVStack(spacing: .medium2) {
-					ForEachStore(
-						store.scope(
-							state: \.sections,
-							action: { .child(.section(id: $0, action: $1)) }
-						),
-						content: FungibleTokenList.Section.View.init(store:)
-					)
+			store,
+			observe: ViewState.init(state:),
+			send: { .view($0) }
+		) { viewStore in
+			ZStack {
+				VStack(spacing: .large2) {
+					LazyVStack(spacing: .medium2) {
+						ForEachStore(
+							store.scope(
+								state: \.sections,
+								action: { .child(.section(id: $0, action: $1)) }
+							),
+							content: FungibleTokenList.Section.View.init(store:)
+						)
+					}
 				}
 			}
+			.sheet(
+				unwrapping: viewStore.binding(
+					get: \.selectedToken,
+					send: { .selectedTokenChanged($0) }
+				),
+				content: { _ in
+					IfLetStore(
+						store.scope(
+							state: \.selectedToken,
+							action: { .child(.details($0)) }
+						),
+						then: { FungibleTokenDetails.View(store: $0) }
+					)
+				}
+			)
 		}
 	}
 }
@@ -42,7 +63,11 @@ public extension FungibleTokenList.View {
 extension FungibleTokenList.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: FungibleTokenList.State) {}
+		var selectedToken: FungibleTokenContainer?
+
+		init(state: FungibleTokenList.State) {
+			self.selectedToken = state.selectedToken
+		}
 	}
 }
 

@@ -2,9 +2,8 @@ import Asset
 import BigInt
 import Common
 import ComposableArchitecture
-import NukeUI
+import DesignSystem
 import Profile
-import SwiftUI
 
 // MARK: - FungibleTokenList.Row.View
 public extension FungibleTokenList.Row {
@@ -24,18 +23,21 @@ public extension FungibleTokenList.Row {
 public extension FungibleTokenList.Row.View {
 	var body: some View {
 		WithViewStore(
-			store.actionless,
-			observe: ViewState.init(state:)
+			store,
+			observe: ViewState.init(state:),
+			send: { .view($0) }
 		) { viewStore in
 			tokenRow(with: viewStore, container: viewStore.container)
 				.padding(.horizontal, .medium1)
+				.contentShape(Rectangle())
+				.onTapGesture { viewStore.send(.selected) }
 		}
 	}
 }
 
 // MARK: - FungibleTokenList.Row.View.RowViewStore
 private extension FungibleTokenList.Row.View {
-	typealias RowViewStore = ViewStore<FungibleTokenList.Row.View.ViewState, Never>
+	typealias RowViewStore = ViewStore<FungibleTokenList.Row.View.ViewState, FungibleTokenList.Row.Action.ViewAction>
 }
 
 // MARK: - Private Methods
