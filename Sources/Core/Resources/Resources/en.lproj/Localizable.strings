@@ -79,8 +79,9 @@
 "nftList.nftPlural" = "%d NFTs";
 "nftList.ownedOfTotal" = "%d of %d";
 
-"onboarding.biometricsNotSetUpMessage" = "This app requires your phone having biometrics set up";
-"onboarding.biometricsNotSetUpTitle" = "Biometrics not set up";
+"splash.biometricsNotSetUpMessage" = "This app requires your phone to have biometrics set up";
+"splash.biometricsNotSetUpTitle" = "Biometrics not set up";
+
 "onboarding.newAccountButtonTitle" = "New Account";
 
 "settings.closeButtonTitle" = "Close";

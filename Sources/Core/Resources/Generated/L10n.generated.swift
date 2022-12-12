@@ -203,10 +203,6 @@ public enum L10n {
   	}
 	}
 	public enum Onboarding {
-  	/// This app requires your phone having biometrics set up
-  	public static let biometricsNotSetUpMessage = L10n.tr("Localizable", "onboarding.biometricsNotSetUpMessage", fallback: "This app requires your phone having biometrics set up")
-  	/// Biometrics not set up
-  	public static let biometricsNotSetUpTitle = L10n.tr("Localizable", "onboarding.biometricsNotSetUpTitle", fallback: "Biometrics not set up")
   	/// New Account
   	public static let newAccountButtonTitle = L10n.tr("Localizable", "onboarding.newAccountButtonTitle", fallback: "New Account")
 	}
@@ -237,6 +233,12 @@ public enum L10n {
     	/// Connect your wallet to a browser
     	public static let title = L10n.tr("Localizable", "settings.connectExtension.title", fallback: "Connect your wallet to a browser")
   	}
+	}
+	public enum Splash {
+  	/// This app requires your phone to have biometrics set up
+  	public static let biometricsNotSetUpMessage = L10n.tr("Localizable", "splash.biometricsNotSetUpMessage", fallback: "This app requires your phone to have biometrics set up")
+  	/// Biometrics not set up
+  	public static let biometricsNotSetUpTitle = L10n.tr("Localizable", "splash.biometricsNotSetUpTitle", fallback: "Biometrics not set up")
 	}
 	public enum TransactionSigning {
   	/// Unlock secret used to sign TX
