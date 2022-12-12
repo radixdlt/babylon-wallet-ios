@@ -1,3 +1,5 @@
+"app.developmentOnlyInfo" = "Development use only. Not usable on Radix mainnet.";
+
 "accountDetails.transferButtonTitle" = "Transfer";
 
 "accountList.row.copyTitle" = "Copy";

@@ -30,6 +30,10 @@ public enum L10n {
   	/// Total value
   	public static let title = L10n.tr("Localizable", "aggregatedValue.title", fallback: "Total value")
 	}
+	public enum App {
+  	/// Development use only. Not usable on Radix mainnet.
+  	public static let developmentOnlyInfo = L10n.tr("Localizable", "app.developmentOnlyInfo", fallback: "Development use only. Not usable on Radix mainnet.")
+	}
 	public enum AssetsView {
   	/// Badges
   	public static let badges = L10n.tr("Localizable", "assetsView.badges", fallback: "Badges")
