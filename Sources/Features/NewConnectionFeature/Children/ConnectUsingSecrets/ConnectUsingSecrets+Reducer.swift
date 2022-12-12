@@ -31,6 +31,9 @@ public extension ConnectUsingSecrets {
 						return try! .live(connectionSecrets: .from(connectionPassword: connection.getConnectionPassword()))
 					}
 				))))
+
+				try await self.mainQueue.sleep(for: .seconds(0.5))
+				await send(.internal(.system(.focusTextField(.connectionName))))
 			}
 
 		case let .internal(.system(.establishConnectionResult(.success(connection)))):
@@ -76,6 +79,7 @@ public extension ConnectUsingSecrets {
 
 		case let .internal(.view(.nameOfConnectionChanged(connectionName))):
 			state.nameOfConnection = connectionName
+			state.isNameValid = !connectionName.trimmed().isEmpty
 			return .none
 
 		case let .internal(.system(.establishConnectionResult(.failure(error)))):

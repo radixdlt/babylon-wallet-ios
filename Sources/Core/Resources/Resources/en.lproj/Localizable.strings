@@ -51,22 +51,23 @@
 "importProfile.profileFromSnapshot" = "Profile from snapshot";
 "importProfile.saveImportedMnemonic" = "Save imported mnemonic";
 
-"manageGateway.title" = "Gateway";
 "manageGateway.currentGatewayTitle" = "Current";
 "manageGateway.gatewayAPIEndpoint" = "Gateway API Endpoint";
 "manageGateway.networkID" = "Network ID";
 "manageGateway.networkName" = "Network name";
-"manageGateway.inputNewGatewayAPIURL" = "New URL (https:// required)";
-"manageGateway.urlString" = "https://example.com:8080";
 "manageGateway.switchToButtonTitle" = "Switch To";
+"manageGateway.textFieldHint" = "New URL (https:// required)";
+"manageGateway.textFieldPlaceholder" = "Enter full URL";
+"manageGateway.title" = "Gateway";
+"manageGateway.urlString" = "https://example.com:8080";
 
-"newConnection.title" = "Connect Extension";
-"newConnection.scanRadixConnectorExtensionQRCode" = "Scan QR code displayed by the Radix Wallet Connector browser extension.";
 "newConnection.connecting" = "Connecting...";
-"newConnection.nameConnectionInstruction" = "Name this connection, e.g. \"Chrome on Macbook Pro\"";
-"newConnection.nameConnectionTextFieldHint" = "Name of connection";
-"newConnection.saveNamedConnectionButton" = "Save connection";
 "newConnection.defaultNameOfConnection" = "Unnamed";
+"newConnection.saveNamedConnectionButton" = "Save Connection";
+"newConnection.subtitle" = "Scan your QR code to connect your wallet with a browser extension";
+"newConnection.textFieldHint" = "Name this connection, e.g. \"Chrome on Macbook Pro\"";
+"newConnection.textFieldPlaceholder" = "Connection name";
+"newConnection.title" = "New Connection";
 
 "manageP2PClients.P2PConnectionsTitle" = "Desktop Connections";
 "manageP2PClients.P2PConnectionsSubtitle" = "Your wallet is connected to the following desktop browsers via Radix Connect";
@@ -97,7 +98,7 @@
 "settings.versionInfo" = "Version: %@ build #%@";
 
 "transactionSigning.biometricsPrompt" = "Unlock secret used to sign TX";
-"transactionSigning.signTransactionButtonTitle" = "Approve Transaction";
-"transactionSigning.title" = "Approve transaction";
 "transactionSigning.preparingTransactionLoadingText" = "Preparing transaction";
+"transactionSigning.signTransactionButtonTitle" = "Approve Transaction";
 "transactionSigning.signingAndSubmittingTransactionLoadingText" = "Submitting transaction";
+"transactionSigning.title" = "Approve transaction";

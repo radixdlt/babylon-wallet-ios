@@ -143,14 +143,16 @@ public enum L10n {
   	public static let currentGatewayTitle = L10n.tr("Localizable", "manageGateway.currentGatewayTitle", fallback: "Current")
   	/// Gateway API Endpoint
   	public static let gatewayAPIEndpoint = L10n.tr("Localizable", "manageGateway.gatewayAPIEndpoint", fallback: "Gateway API Endpoint")
-  	/// New URL (https:// required)
-  	public static let inputNewGatewayAPIURL = L10n.tr("Localizable", "manageGateway.inputNewGatewayAPIURL", fallback: "New URL (https:// required)")
   	/// Network ID
   	public static let networkID = L10n.tr("Localizable", "manageGateway.networkID", fallback: "Network ID")
   	/// Network name
   	public static let networkName = L10n.tr("Localizable", "manageGateway.networkName", fallback: "Network name")
   	/// Switch To
   	public static let switchToButtonTitle = L10n.tr("Localizable", "manageGateway.switchToButtonTitle", fallback: "Switch To")
+  	/// New URL (https:// required)
+  	public static let textFieldHint = L10n.tr("Localizable", "manageGateway.textFieldHint", fallback: "New URL (https:// required)")
+  	/// Enter full URL
+  	public static let textFieldPlaceholder = L10n.tr("Localizable", "manageGateway.textFieldPlaceholder", fallback: "Enter full URL")
   	/// Gateway
   	public static let title = L10n.tr("Localizable", "manageGateway.title", fallback: "Gateway")
   	/// https://example.com:8080
@@ -177,16 +179,16 @@ public enum L10n {
   	public static let connecting = L10n.tr("Localizable", "newConnection.connecting", fallback: "Connecting...")
   	/// Unnamed
   	public static let defaultNameOfConnection = L10n.tr("Localizable", "newConnection.defaultNameOfConnection", fallback: "Unnamed")
+  	/// Save Connection
+  	public static let saveNamedConnectionButton = L10n.tr("Localizable", "newConnection.saveNamedConnectionButton", fallback: "Save Connection")
+  	/// Scan your QR code to connect your wallet with a browser extension
+  	public static let subtitle = L10n.tr("Localizable", "newConnection.subtitle", fallback: "Scan your QR code to connect your wallet with a browser extension")
   	/// Name this connection, e.g. "Chrome on Macbook Pro"
-  	public static let nameConnectionInstruction = L10n.tr("Localizable", "newConnection.nameConnectionInstruction", fallback: "Name this connection, e.g. \"Chrome on Macbook Pro\"")
-  	/// Name of connection
-  	public static let nameConnectionTextFieldHint = L10n.tr("Localizable", "newConnection.nameConnectionTextFieldHint", fallback: "Name of connection")
-  	/// Save connection
-  	public static let saveNamedConnectionButton = L10n.tr("Localizable", "newConnection.saveNamedConnectionButton", fallback: "Save connection")
-  	/// Scan QR code displayed by the Radix Wallet Connector browser extension.
-  	public static let scanRadixConnectorExtensionQRCode = L10n.tr("Localizable", "newConnection.scanRadixConnectorExtensionQRCode", fallback: "Scan QR code displayed by the Radix Wallet Connector browser extension.")
-  	/// Connect Extension
-  	public static let title = L10n.tr("Localizable", "newConnection.title", fallback: "Connect Extension")
+  	public static let textFieldHint = L10n.tr("Localizable", "newConnection.textFieldHint", fallback: "Name this connection, e.g. \"Chrome on Macbook Pro\"")
+  	/// Connection name
+  	public static let textFieldPlaceholder = L10n.tr("Localizable", "newConnection.textFieldPlaceholder", fallback: "Connection name")
+  	/// New Connection
+  	public static let title = L10n.tr("Localizable", "newConnection.title", fallback: "New Connection")
 	}
 	public enum NftList {
   	/// %d NFTs

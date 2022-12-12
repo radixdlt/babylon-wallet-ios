@@ -63,7 +63,7 @@ final class CreateAccountFeatureTests: TestCase {
 			reducer: CreateAccount()
 				.dependency(\.accountNameValidator, .liveValue)
 		)
-		accountName = "My account dummy name" // character count == 21, over the limit
+		accountName = "My account very long dummy name" // character count == 31, over the limit
 
 		// when
 		await store.send(.internal(.view(.textFieldChanged(accountName))))

@@ -1,4 +1,6 @@
+import ComposableArchitecture
 import CreateAccountFeature
+import DesignSystem
 import Foundation
 import Profile
 
@@ -13,6 +15,7 @@ public extension ManageGatewayAPIEndpoints {
 		public var isSwitchToButtonEnabled: Bool
 
 		public var validatedNewNetworkAndGatewayToSwitchTo: AppPreferences.NetworkAndGateway?
+		@BindableState public var focusedField: Field?
 
 		public init(
 			createAccount: CreateAccount.State? = nil,
@@ -28,6 +31,25 @@ public extension ManageGatewayAPIEndpoints {
 			self.validatedNewNetworkAndGatewayToSwitchTo = validatedNewNetworkAndGatewayToSwitchTo
 			self.isSwitchToButtonEnabled = isSwitchToButtonEnabled
 			self.isValidatingEndpoint = isValidatingEndpoint
+		}
+	}
+}
+
+// MARK: - ManageGatewayAPIEndpoints.State.Field
+public extension ManageGatewayAPIEndpoints.State {
+	enum Field: String, Sendable, Hashable {
+		case gatewayURL
+	}
+}
+
+extension ManageGatewayAPIEndpoints.State {
+	var controlState: ControlState {
+		if isValidatingEndpoint {
+			return .loading(.local)
+		} else if isSwitchToButtonEnabled {
+			return .enabled
+		} else {
+			return .disabled
 		}
 	}
 }
