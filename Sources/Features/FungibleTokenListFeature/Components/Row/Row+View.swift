@@ -29,6 +29,8 @@ public extension FungibleTokenList.Row.View {
 		) { viewStore in
 			tokenRow(with: viewStore, container: viewStore.container)
 				.padding(.horizontal, .medium1)
+				.contentShape(Rectangle())
+				.onTapGesture { viewStore.send(.selected) }
 		}
 	}
 }
@@ -88,7 +90,6 @@ private extension FungibleTokenList.Row.View {
 			}
 		}
 		.frame(height: .large1 * 2)
-		.onTapGesture { viewStore.send(.selected) }
 	}
 
 	func tokenAmount(
