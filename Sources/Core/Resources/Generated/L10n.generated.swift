@@ -207,13 +207,13 @@ public enum L10n {
   	public static let newAccountButtonTitle = L10n.tr("Localizable", "onboarding.newAccountButtonTitle", fallback: "New Account")
 	}
 	public enum ProfileLoad {
-  	/// Failed to decode Wallet Data: %@
+  	/// Failed to create Wallet from backup: %@
   	public static func decodingError(_ p1: Any) -> String {
-  		return L10n.tr("Localizable", "profileLoad.decodingError", String(describing: p1), fallback: "Failed to decode Wallet Data: %@")
+  		return L10n.tr("Localizable", "profileLoad.decodingError", String(describing: p1), fallback: "Failed to create Wallet from backup: %@")
   	}
-  	/// Failed to create Wallet Data from snapshot, error: %@, version: %@
+  	/// Failed to create Wallet from backup, error: %@, version: %@
   	public static func failedToCreateProfileFromSnapshotError(_ p1: Any, _ p2: Any) -> String {
-  		return L10n.tr("Localizable", "profileLoad.failedToCreateProfileFromSnapshotError", String(describing: p1), String(describing: p2), fallback: "Failed to create Wallet Data from snapshot, error: %@, version: %@")
+  		return L10n.tr("Localizable", "profileLoad.failedToCreateProfileFromSnapshotError", String(describing: p1), String(describing: p2), fallback: "Failed to create Wallet from backup, error: %@, version: %@")
   	}
 	}
 	public enum Settings {
