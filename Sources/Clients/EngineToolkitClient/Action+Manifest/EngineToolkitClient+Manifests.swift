@@ -22,6 +22,14 @@ public extension Network {
 }
 
 public extension Network.KnownAddresses {
+	static let addressMap: [NetworkID: Network.KnownAddresses] = [
+		.nebunet: .nebunet,
+		.gilganet: .gilganet,
+		.enkinet: .enkinet,
+		.hammunet: .hammunet,
+		.mardunet: .mardunet,
+	]
+
 	static let nebunet = Self(
 		faucet: "component_tdx_b_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7qdxyth4",
 		createAccountComponent: "package_tdx_b_1qy4hrp8a9apxldp5cazvxgwdj80cxad4u8cpkaqqnhlssf7lg2",
@@ -52,14 +60,6 @@ public extension Network.KnownAddresses {
 	)
 }
 
-private let knownAddressByNetworkID: [NetworkID: Network.KnownAddresses] = [
-	.nebunet: .nebunet,
-	.gilganet: .gilganet,
-	.enkinet: .enkinet,
-	.hammunet: .hammunet,
-	.mardunet: .mardunet,
-]
-
 // MARK: - NoKnownAddressForNetworkID
 public struct NoKnownAddressForNetworkID: LocalizedError {
 	public let unknownNetworkID: NetworkID
@@ -82,7 +82,7 @@ public extension EngineToolkitClient {
 	}
 
 	private func knownAddresses(for networkID: NetworkID) throws -> Network.KnownAddresses {
-		guard let knownAddresses = knownAddressByNetworkID[networkID] else {
+		guard let knownAddresses = Network.KnownAddresses.addressMap[networkID] else {
 			throw NoKnownAddressForNetworkID(unknownNetworkID: networkID)
 		}
 		return knownAddresses

@@ -1,5 +1,6 @@
 import BigInt
 import Common
+import EngineToolkitClient
 import Foundation
 import Profile
 
@@ -59,12 +60,25 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 
 public extension FungibleToken {
 	var placeholderImage: ImageAsset {
-		switch symbol {
-		case "XRD":
+		if isXRD {
 			return AssetResource.xrd
-		default:
+		} else {
 			return AssetResource.fungibleToken
 		}
+	}
+}
+
+public extension FungibleToken {
+	var isXRD: Bool {
+		for networkID in NetworkID.allCases {
+			if
+				let xrdAddress = Network.KnownAddresses.addressMap[networkID]?.xrd,
+				self.address.description == xrdAddress.address
+			{
+				return true
+			}
+		}
+		return false
 	}
 }
 
