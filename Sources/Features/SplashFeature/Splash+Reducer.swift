@@ -32,18 +32,18 @@ public struct Splash: Sendable, ReducerProtocol {
 				)
 				return .none
 			}
-
-			precondition(state.profileResult != nil)
-
-			return .run { [profileResult = state.profileResult] send in
-				await send(.delegate(.profileResultLoaded(profileResult!)))
-			}
+			return notifyDelegate(state: state)
 
 		case let .internal(.system(.loadProfileResult(result))):
 			state.profileResult = result
 			return .run { _ in
 				await delay()
-			}.concatenate(with: verifyBiometrics())
+			}
+			#if targetEnvironment(simulator)
+			.concatenate(with: notifyDelegate(state: state))
+			#else
+			.concatenate(with: verifyBiometrics())
+			#endif
 
 		case .delegate:
 			return .none
@@ -66,6 +66,14 @@ public struct Splash: Sendable, ReducerProtocol {
 			await send(.internal(.system(.loadProfileResult(
 				result
 			))))
+		}
+	}
+
+	func notifyDelegate(state: State) -> EffectTask<Action> {
+		precondition(state.profileResult != nil)
+
+		return .run { [profileResult = state.profileResult] send in
+			await send(.delegate(.profileResultLoaded(profileResult!)))
 		}
 	}
 
