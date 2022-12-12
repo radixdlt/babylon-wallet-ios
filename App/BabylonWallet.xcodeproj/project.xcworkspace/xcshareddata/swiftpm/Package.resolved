@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Converse.git",
       "state" : {
-        "revision" : "572bb34fd680bf7c3503ccbc3e612cc2d45bd7c8",
-        "version" : "0.2.0"
+        "revision" : "32144d48513778dd4ce9e50504ef7ba4e0eeced3",
+        "version" : "0.2.1"
       }
     },
     {
