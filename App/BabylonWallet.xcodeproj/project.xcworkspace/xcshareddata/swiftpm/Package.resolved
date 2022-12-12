@@ -248,8 +248,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "99c2b07ba64021756a503dbff331bcac0bcdf631",
-        "version" : "0.0.50"
+        "revision" : "4804827c45c316e913382b62e4b43fc9ce49e36d",
+        "version" : "0.0.51"
       }
     },
     {
