@@ -18,8 +18,8 @@ package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.1.30"),
-	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.6"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.51"),
+	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.7"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.52"),
 
 	// ~~~ THIRD PARTY ~~~
 	// APPLE
