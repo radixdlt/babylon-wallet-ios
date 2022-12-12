@@ -13,7 +13,6 @@ public extension ConnectUsingSecrets {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
-
 			let connection = Connection.live(
 				connectionSecrets: state.connectionSecrets
 			)
@@ -22,13 +21,7 @@ public extension ConnectUsingSecrets {
 				await send(.internal(.system(.establishConnectionResult(
 					TaskResult {
 						try await connection.establish()
-						// A bit hacky, but what we do here is that we save some time, the browser extension
-						// just closed the pop-up with the QR code => webRTC connection is closing.
-						// but instead of waiting for iOS to detect that the webRTC connection closed and
-						// trigger reconnect, we will eagerly close and then connect when this client is
-						// saved to the `p2pConnectivityClient`
-						await connection.close()
-						return try! .live(connectionSecrets: .from(connectionPassword: connection.getConnectionPassword()))
+						return connection
 					}
 				))))
 
@@ -38,16 +31,10 @@ public extension ConnectUsingSecrets {
 
 		case let .internal(.system(.establishConnectionResult(.success(connection)))):
 			state.newConnection = connection
-			return .run { send in
-				await send(.internal(.system(.closedConnectionInOrderToTriggerEagerReconnect)))
-			}
-
-		case .internal(.system(.closedConnectionInOrderToTriggerEagerReconnect)):
 			state.isConnecting = false
 			state.isPromptingForName = true
 
 			return .none
-
 		case let .internal(.view(.textFieldFocused(focus))):
 			return .run { send in
 				try? await self.mainQueue.sleep(for: .seconds(0.5))

@@ -37,7 +37,6 @@ public extension ConnectUsingSecrets.Action {
 // MARK: - ConnectUsingSecrets.Action.SystemAction
 public extension ConnectUsingSecrets.Action {
 	enum SystemAction: Sendable, Equatable {
-		case closedConnectionInOrderToTriggerEagerReconnect
 		case focusTextField(ConnectUsingSecrets.State.Field?)
 		case establishConnectionResult(TaskResult<Connection>)
 	}

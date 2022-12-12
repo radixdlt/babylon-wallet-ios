@@ -11,7 +11,7 @@ final class ProfileLoaderTests: TestCase {
 		}
 		""".data(using: .utf8)!
 
-		KeychainClient.testValue.dataForKey = { @Sendable _, _ in
+		KeychainClient.liveValue.dataForKey = { @Sendable _, _ in
 			json
 		}
 
@@ -22,7 +22,7 @@ final class ProfileLoaderTests: TestCase {
 			XCTAssertEqual(version, .init(rawValue: .init(0, 0, 0)))
 			XCTAssertEqual(json, gotJson)
 		default:
-			XCTFail("wrong res")
+			XCTFail("wrong res, got: \(String(describing: res))")
 		}
 	}
 }
