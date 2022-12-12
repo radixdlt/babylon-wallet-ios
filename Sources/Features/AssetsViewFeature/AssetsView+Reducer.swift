@@ -10,6 +10,10 @@ public struct AssetsView: ReducerProtocol {
 			NonFungibleTokenList()
 		}
 
+		Scope(state: \.fungibleTokenList, action: /Action.child .. Action.ChildAction.fungibleTokenList) {
+			FungibleTokenList()
+		}
+
 		Reduce(self.core)
 	}
 
