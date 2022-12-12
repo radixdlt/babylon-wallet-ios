@@ -769,6 +769,11 @@ package.addModules([
 			dependencies: ["TestUtils"]
 		)
 	),
+        .client(
+                name: "PlatformEnvironmentClient",
+                dependencies: [dependencies],
+                tests: .no
+        ),
 	.client(
 		name: "ProfileClient",
 		dependencies: [
