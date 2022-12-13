@@ -32,7 +32,7 @@ extension Component {
 				.hidden()
 
 			VStack(alignment: .leading, spacing: .small2) {
-				Text(token.nonFungibleId)
+				Text(tokenIdStringRepresentation)
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
 					.offset(y: -.small2)
@@ -83,6 +83,21 @@ private extension Component {
 		// TODO: refactor when API returns NFT metadata
 //		token.metadata ?? []
 		[]
+	}
+
+	var tokenIdStringRepresentation: String {
+		switch token.nonFungibleId {
+		case let .u32(value):
+			return "\(value)"
+		case let .u64(value):
+			return "\(value)"
+		case let .uuid(value):
+			return "\(value)"
+		case let .string(value):
+			return value
+		case let .bytes(value):
+			return "\(value.description)"
+		}
 	}
 }
 

@@ -144,7 +144,7 @@ extension NonFungibleTokenContainer {
 		Self(
 			owner: owner,
 			resourceAddress: resourceAddress,
-			assets: ids.map { NonFungibleToken(nonFungibleId: $0) },
+			assets: ids.map { NonFungibleToken(nonFungibleId: .string($0)) },
 			name: name,
 			symbol: symbol
 		)
