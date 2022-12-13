@@ -1,10 +1,10 @@
 import Foundation
 
-public struct PlatformEnvironmentClient {
-        typealias IsSimulator = () -> Bool
-        var isSimulator: IsSimulator
+public struct PlatformEnvironmentClient: Sendable {
+	public typealias IsSimulator = @Sendable () -> Bool
+	public var isSimulator: IsSimulator
 
-        init(isSimulator: @escaping IsSimulator) {
-                self.isSimulator = isSimulator
-        }
+	public init(isSimulator: @escaping IsSimulator) {
+		self.isSimulator = isSimulator
+	}
 }

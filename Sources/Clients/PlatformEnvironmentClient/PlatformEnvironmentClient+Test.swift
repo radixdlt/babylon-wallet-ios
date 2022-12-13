@@ -1,16 +1,16 @@
 import Dependencies
 import XCTestDynamicOverlay
 
-// MARK: - PasteboardClient + TestDependencyKey
+// MARK: - PlatformEnvironmentClient + TestDependencyKey
 extension PlatformEnvironmentClient: TestDependencyKey {
-        public static let testValue = Self(
-                isSimulator: unimplemented("\(Self.self).copyString")
-        )
+	public static let testValue = Self(
+		isSimulator: { false }
+	)
 }
 
 public extension DependencyValues {
-        var platformEnvironmnetClient: PlatformEnvironmnetClient {
-                get { self[PlatformEnvironmnetClient.self] }
-                set { self[PlatformEnvironmnetClient.self] = newValue }
-        }
+	var platformEnvironmentClient: PlatformEnvironmentClient {
+		get { self[PlatformEnvironmentClient.self] }
+		set { self[PlatformEnvironmentClient.self] = newValue }
+	}
 }
