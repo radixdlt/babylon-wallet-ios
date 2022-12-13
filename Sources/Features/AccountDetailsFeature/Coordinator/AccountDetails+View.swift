@@ -69,6 +69,9 @@ public extension AccountDetails.View {
 				}
 				.background(viewStore.appearanceID.gradient)
 			}
+			.onAppear {
+				viewStore.send(.appeared)
+			}
 		}
 	}
 }
