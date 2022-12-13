@@ -45,12 +45,9 @@ final class HomeFeatureTests: TestCase {
 		let expectedAggregatedValue: Float = 7035
 
 		// non fungible tokens
-		let nft1 = NonFungibleToken.mock1
-		let nft2 = NonFungibleToken.mock2
-		let nft3 = NonFungibleToken.mock3
-		let nftContainer1 = NonFungibleTokenContainer(owner: address, asset: nft1, metadata: nil)
-		let nftContainer2 = NonFungibleTokenContainer(owner: address, asset: nft2, metadata: nil)
-		let nftContainer3 = NonFungibleTokenContainer(owner: address, asset: nft3, metadata: nil)
+		let nftContainer1 = NonFungibleTokenContainer.mock1
+		let nftContainer2 = NonFungibleTokenContainer.mock2
+		let nftContainer3 = NonFungibleTokenContainer.mock3
 
 		let totalPortfolio: AccountPortfolioDictionary = [
 			account.address: .init(
@@ -113,16 +110,14 @@ final class HomeFeatureTests: TestCase {
 					]
 				)
 
-				let nonFungibleRow = NonFungibleTokenList.Row.State(
-					containers: accountPortfolio.nonFungibleTokenContainers.elements
-				)
+				let nonFungibleRows: [NonFungibleTokenList.Row.State] = accountPortfolio.nonFungibleTokenContainers.elements.map { .init(container: $0) }
 
 				$0.accountDetails?.assets = .init(
 					fungibleTokenList: .init(
 						sections: [section0, section1]
 					),
 					nonFungibleTokenList: .init(
-						rows: [nonFungibleRow]
+						rows: .init(uniqueElements: nonFungibleRows)
 					)
 				)
 			}

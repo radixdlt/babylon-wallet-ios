@@ -5,7 +5,7 @@ import SwiftUI
 
 // MARK: - Component
 struct Component: View {
-	let container: NonFungibleTokenContainer
+	let token: NonFungibleToken
 	let isLast: Bool
 	let isExpanded: Bool
 
@@ -19,7 +19,8 @@ struct Component: View {
 extension Component {
 	var body: some View {
 		VStack(spacing: .medium2) {
-			AsyncImage(url: container.asset.iconURL)
+			// TODO: refactor when API returns individual NFT image
+			AsyncImage(url: URL(string: ""))
 				.frame(height: isExpanded ? imageHeight : collapsedImageHeight)
 				.cornerRadius(.small3)
 				.onSizeChanged(ReferenceView.self) { size in
@@ -27,11 +28,14 @@ extension Component {
 						imageHeight = size.height
 					}
 				}
+				// TODO: remove when API returns individual NFT image
+				.hidden()
 
 			VStack(alignment: .leading, spacing: .small2) {
-				Text(container.asset.componentAddress.address)
+				Text(tokenIdStringRepresentation)
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
+					.offset(y: -.small2)
 
 				ForEach(metadata, id: \.self) { element in
 					HStack(alignment: .top) {
@@ -61,7 +65,7 @@ extension Component {
 				}
 			}
 		}
-		.padding(25)
+		.padding(.medium1)
 		.background(
 			ExpandableRowBackgroundView(
 				paddingEdge: edge,
@@ -76,7 +80,24 @@ extension Component {
 // MARK: - Private Computed Properties
 private extension Component {
 	var metadata: [[String: String]] {
-		container.metadata ?? []
+		// TODO: refactor when API returns NFT metadata
+//		token.metadata ?? []
+		[]
+	}
+
+	var tokenIdStringRepresentation: String {
+		switch token.nonFungibleId {
+		case let .u32(value):
+			return "\(value)"
+		case let .u64(value):
+			return "\(value)"
+		case let .uuid(value):
+			return "\(value)"
+		case let .string(value):
+			return value
+		case let .bytes(value):
+			return "\(value.description)"
+		}
 	}
 }
 

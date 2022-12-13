@@ -15,6 +15,7 @@ extension AccountPortfolioFetcher: DependencyKey {
 				body: { taskGroup in
 					for address in addresses {
 						taskGroup.addTask {
+							try Task.checkCancellation()
 							let assets = try await assetFetcher.fetchAssets(address)
 							return (address, assets)
 						}

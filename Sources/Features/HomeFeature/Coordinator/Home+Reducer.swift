@@ -142,8 +142,8 @@ public struct Home: ReducerProtocol {
 						})
 					),
 					nonFungibleTokenList: .init(
-						rows: .init(uniqueElements: [accountPortfolio.nonFungibleTokenContainers.elements].map {
-							.init(containers: $0)
+						rows: .init(uniqueElements: accountPortfolio.nonFungibleTokenContainers.elements.map {
+							.init(container: $0)
 						})
 					)
 				)

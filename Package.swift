@@ -638,6 +638,7 @@ package.addModules([
 			"Asset",
 			bigInt,
 			"Common",
+			engineToolkit,
 			"GatewayAPI",
 			profile,
 			dependencies,
