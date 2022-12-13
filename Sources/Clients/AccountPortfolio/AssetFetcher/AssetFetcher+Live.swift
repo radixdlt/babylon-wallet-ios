@@ -39,6 +39,7 @@ extension AssetFetcher: DependencyKey {
 					body: { taskGroup in
 						for resourceAddress in nonFungibleTokenAddresses {
 							taskGroup.addTask {
+								try Task.checkCancellation()
 								let response = try await gatewayAPIClient.getNonFungibleIds(accountAddress, resourceAddress.address)
 								let nonFungibleIds = response.nonFungibleIds.items.map(\.nonFungibleId)
 								return (resourceAddress, nonFungibleIds)
