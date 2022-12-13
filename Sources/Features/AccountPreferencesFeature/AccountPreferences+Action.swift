@@ -18,7 +18,6 @@ public extension AccountPreferences.Action {
 		case didAppear
 		case dismissButtonTapped
 		case faucetButtonTapped
-		case disappeared
 	}
 }
 
