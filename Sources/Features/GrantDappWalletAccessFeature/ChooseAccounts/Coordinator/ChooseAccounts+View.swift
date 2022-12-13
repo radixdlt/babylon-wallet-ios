@@ -76,14 +76,13 @@ public extension ChooseAccounts.View {
 
 						Spacer()
 							.frame(height: .large1 * 1.5)
-
-						Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
-							viewStore.send(.continueButtonTapped)
-						}
-						.buttonStyle(.primaryRectangular)
-						.controlState(viewStore.canProceed ? .enabled : .disabled)
-						.padding(.medium1)
 					}
+					Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
+						viewStore.send(.continueButtonTapped)
+					}
+					.buttonStyle(.primaryRectangular)
+					.controlState(viewStore.canProceed ? .enabled : .disabled)
+					.padding(.medium1)
 				}
 			}
 			.onAppear {
