@@ -20,22 +20,24 @@ public struct AddressView: View {
 
 public extension AddressView {
 	var body: some View {
-		HStack(spacing: .zero) {
-			Text(state.formattedAddress)
-				.lineLimit(1)
-				.minimumScaleFactor(0.5)
-				.textStyle(textStyle)
+		Button(action: copyAddressAction ?? {}) {
+			HStack(spacing: .zero) {
+				Text(state.formattedAddress)
+					.lineLimit(1)
+					.minimumScaleFactor(0.5)
+					.textStyle(textStyle)
 
-			if let copyAddressAction {
-				Button(
-					action: copyAddressAction,
-					label: {
-						Image(asset: AssetResource.copy)
-							.frame(.verySmall)
-					}
-				)
+				if copyAddressAction != nil {
+					Image(asset: AssetResource.copy)
+						.frame(.verySmall)
+				}
 			}
 		}
+		.controlState(controlState)
+	}
+
+	var controlState: ControlState {
+		copyAddressAction != nil ? .enabled : .disabled
 	}
 }
 

@@ -368,6 +368,7 @@ package.addModules([
 		name: "FungibleTokenDetailsFeature",
 		dependencies: [
 			"DesignSystem",
+			"PasteboardClient",
 			"SharedModels",
 			tca,
 		],
