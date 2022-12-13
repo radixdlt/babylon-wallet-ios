@@ -54,6 +54,9 @@ public extension AccountPreferences.View {
 				.onAppear {
 					viewStore.send(.didAppear)
 				}
+				.onDisappear {
+					viewStore.send(.disappeared)
+				}
 			}
 		}
 	}

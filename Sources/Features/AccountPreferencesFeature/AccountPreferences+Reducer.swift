@@ -23,6 +23,11 @@ public struct AccountPreferences: ReducerProtocol {
 		case .internal(.view(.didAppear)):
 			return loadIsAllowedToUseFaucet(&state)
 
+		case .internal(.view(.disappeared)):
+			return .run { [address = state.address] send in
+				await send(.delegate(.refreshAccount(address)))
+			}
+
 		case .internal(.view(.faucetButtonTapped)):
 			state.isLoading = true
 			return .run { [address = state.address] send in
