@@ -3,6 +3,7 @@ import ComposableArchitecture
 import ErrorQueue
 import Foundation
 import LocalAuthenticationClient
+import PlatformEnvironmentClient
 import ProfileLoader
 
 // MARK: - Splash
@@ -10,6 +11,7 @@ public struct Splash: Sendable, ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
+	@Dependency(\.platformEnvironmentClient) var platformEnvironmentClient
 	@Dependency(\.profileLoader) var profileLoader
 
 	public init() {}
@@ -32,32 +34,32 @@ public struct Splash: Sendable, ReducerProtocol {
 				)
 				return .none
 			}
-
-			precondition(state.profileResult != nil)
-
-			return .run { [profileResult = state.profileResult] send in
-				await send(.delegate(.profileResultLoaded(profileResult!)))
-			}
+			return notifyDelegate(profileResult: state.profileResult)
 
 		case let .internal(.system(.loadProfileResult(result))):
 			state.profileResult = result
-			return .run { _ in
-				await delay()
-			}.concatenate(with: verifyBiometrics())
+
+			if platformEnvironmentClient.isSimulator() {
+				return delay().concatenate(with: notifyDelegate(profileResult: state.profileResult))
+			} else {
+				return delay().concatenate(with: verifyBiometrics())
+			}
 
 		case .delegate:
 			return .none
 		}
 	}
 
-	func delay() async {
-		let durationInMS: Int
-		#if DEBUG
-		durationInMS = 200
-		#else
-		durationInMS = 800
-		#endif
-		try? await mainQueue.sleep(for: .milliseconds(durationInMS))
+	func delay() -> EffectTask<Action> {
+		.run { _ in
+			let durationInMS: Int
+			#if DEBUG
+			durationInMS = 200
+			#else
+			durationInMS = 800
+			#endif
+			try? await mainQueue.sleep(for: .milliseconds(durationInMS))
+		}
 	}
 
 	func loadProfile() -> EffectTask<Action> {
@@ -66,6 +68,14 @@ public struct Splash: Sendable, ReducerProtocol {
 			await send(.internal(.system(.loadProfileResult(
 				result
 			))))
+		}
+	}
+
+	func notifyDelegate(profileResult: ProfileLoader.ProfileResult?) -> EffectTask<Action> {
+		precondition(profileResult != nil)
+
+		return .run { send in
+			await send(.delegate(.profileResultLoaded(profileResult!)))
 		}
 	}
 

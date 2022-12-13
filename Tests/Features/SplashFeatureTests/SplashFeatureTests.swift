@@ -23,6 +23,7 @@ final class SplashFeatureTests: TestCase {
 		}
 
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
+		store.dependencies.platformEnvironmentClient.isSimulator = { false }
 
 		let newProfile = try await Profile.new(networkAndGateway: .hammunet, mnemonic: .generate())
 		store.dependencies.profileLoader = ProfileLoader(loadProfile: {

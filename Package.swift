@@ -596,6 +596,7 @@ package.addModules([
 			"DesignSystem",
 			"ErrorQueue",
 			"LocalAuthenticationClient",
+			"PlatformEnvironmentClient",
 			"ProfileClient",
 			"ProfileLoader",
 			tca,
@@ -770,6 +771,11 @@ package.addModules([
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.client(
+		name: "PlatformEnvironmentClient",
+		dependencies: [dependencies],
+		tests: .no
 	),
 	.client(
 		name: "ProfileClient",
