@@ -46,6 +46,32 @@ public struct NonFungibleTokenContainer: Identifiable, Equatable {
 }
 
 #if DEBUG
+public extension NonFungibleTokenContainer {
+	static let mock1 = Self(
+		owner: try! .init(address: "account-address"),
+		resourceAddress: .init(address: "resource-address-1"),
+		assets: [.mock1, .mock2, .mock3],
+		name: "Name",
+		symbol: "Symbol"
+	)
+
+	static let mock2 = Self(
+		owner: try! .init(address: "account-address"),
+		resourceAddress: .init(address: "resource-address-2"),
+		assets: [.mock1, .mock2, .mock3],
+		name: "Name",
+		symbol: "Symbol"
+	)
+
+	static let mock3 = Self(
+		owner: try! .init(address: "account-address"),
+		resourceAddress: .init(address: "resource-address-3"),
+		assets: [.mock1, .mock2, .mock3],
+		name: "Name",
+		symbol: "Symbol"
+	)
+}
+
 public extension NonFungibleToken {
 	static let mock1 = Self(
 		nonFungibleId: .string("nft1-deadbeef")

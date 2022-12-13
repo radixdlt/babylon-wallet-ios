@@ -20,3 +20,11 @@ public extension NonFungibleTokenList.Row {
 extension NonFungibleTokenList.Row.State: Identifiable {
 	public var id: NonFungibleTokenContainer.ID { container.id }
 }
+
+#if DEBUG
+public extension NonFungibleTokenList.Row.State {
+	static let placeholder = Self(
+		container: .mock1
+	)
+}
+#endif

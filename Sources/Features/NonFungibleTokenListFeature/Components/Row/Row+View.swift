@@ -204,15 +204,7 @@ struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleTokenList.Row.View(
 			store: .init(
-				initialState: .init(
-					container: .init(
-						owner: try! .init(address: "owner_address"),
-						resourceAddress: "dead-beef",
-						assets: [.mock1, .mock2, .mock3],
-						name: "A sample NFT",
-						symbol: "A symbol"
-					)
-				),
+				initialState: .placeholder,
 				reducer: NonFungibleTokenList.Row()
 			)
 		)
