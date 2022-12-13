@@ -1,7 +1,10 @@
 import ComposableArchitecture
+import PasteboardClient
 
 // MARK: - FungibleTokenDetails
 public struct FungibleTokenDetails: ReducerProtocol {
+	@Dependency(\.pasteboardClient) var pasteboardClient
+
 	public init() {}
 }
 
@@ -10,6 +13,10 @@ public extension FungibleTokenDetails {
 		switch action {
 		case .internal(.view(.closeButtonTapped)):
 			return .run { send in await send(.delegate(.closeButtonTapped)) }
+		case .internal(.view(.copyAddressButtonTapped)):
+			return .run { [address = state.asset.componentAddress.address] _ in
+				pasteboardClient.copyString(address)
+			}
 		case .delegate:
 			return .none
 		}

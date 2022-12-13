@@ -60,7 +60,9 @@ public extension FungibleTokenDetails.View {
 								AddressView(
 									viewStore.address,
 									textStyle: .body1Regular,
-									copyAddressAction: .none
+									copyAddressAction: {
+										viewStore.send(.copyAddressButtonTapped)
+									}
 								)
 								.frame(maxWidth: .infinity, alignment: .trailing)
 								.multilineTextAlignment(.trailing)
