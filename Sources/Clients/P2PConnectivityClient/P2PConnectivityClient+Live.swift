@@ -218,16 +218,14 @@ private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 		self.browser = browser
 		browser.stateUpdateHandler = { newState in
 			switch newState {
+			case .setup, .ready, .cancelled:
+				break
 			case let .failed(error):
 				print(error.localizedDescription)
-			case .ready, .cancelled:
-				break
 			case let .waiting(error):
 				print("Local network permission has been denied: \(error)")
 				self.reset()
 				self.completion?(false)
-			default:
-				break
 			}
 		}
 
@@ -249,7 +247,7 @@ private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 
 // MARK: NetServiceDelegate
 extension LocalNetworkAuthorization: NetServiceDelegate {
-	public func netServiceDidPublish(_ sender: NetService) {
+	func netServiceDidPublish(_ sender: NetService) {
 		self.reset()
 		print("Local network permission has been granted")
 		completion?(true)
