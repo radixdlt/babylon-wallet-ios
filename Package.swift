@@ -538,8 +538,10 @@ package.addModules([
 			"P2PConnectivityClient",
 			"SharedModels",
 			tca,
-		], tests: .yes(
-			dependencies: ["TestUtils"])
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
 	.feature(
 		name: "NonFungibleTokenListFeature",

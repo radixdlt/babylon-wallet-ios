@@ -1,7 +1,9 @@
 import Common
 import ComposableArchitecture
 import P2PConnectivityClient
-import UIKit
+#if os(iOS)
+import class UIKit.UIApplication
+#endif
 
 // MARK: - LocalNetworkAuthorization
 public struct LocalNetworkAuthorization: Sendable, ReducerProtocol {
@@ -55,7 +57,9 @@ public extension LocalNetworkAuthorization {
 			case .openSettingsButtonTapped:
 				return .run { send in
 					await send(.delegate(.localNetworkAuthorizationResponse(false)))
+					#if os(iOS)
 					await openURL(URL(string: UIApplication.openSettingsURLString)!)
+					#endif
 				}
 			}
 
