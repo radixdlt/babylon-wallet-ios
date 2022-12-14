@@ -20,8 +20,14 @@ public extension NewConnection.Action {
 // MARK: - NewConnection.Action.ViewAction
 public extension NewConnection.Action {
 	enum ViewAction: Sendable, Equatable {
+		public enum LocalAuthorizationDeniedAlertAction: Sendable, Equatable {
+			case dismissButtonTapped
+			case openSettingsButtonTapped
+		}
+
 		case appeared
 		case dismissButtonTapped
+		case localAuthorizationDeniedAlert(LocalAuthorizationDeniedAlertAction)
 	}
 }
 
@@ -35,7 +41,9 @@ public extension NewConnection.Action {
 
 // MARK: - NewConnection.Action.SystemAction
 public extension NewConnection.Action {
-	enum SystemAction: Sendable, Equatable {}
+	enum SystemAction: Sendable, Equatable {
+		case displayLocalAuthorizationDeniedAlert
+	}
 }
 
 // MARK: - NewConnection.Action.DelegateAction

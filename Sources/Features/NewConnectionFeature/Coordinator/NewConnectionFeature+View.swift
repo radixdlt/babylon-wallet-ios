@@ -35,14 +35,14 @@ public extension NewConnection.View {
 
 					Spacer()
 					ForceFullScreen {
-						SwitchStore(store) {
+						SwitchStore(store.scope(state: \.route)) {
 							CaseLet(
-								state: /NewConnection.State.scanQR,
+								state: /NewConnection.State.Route.scanQR,
 								action: { NewConnection.Action.scanQR($0) },
 								then: { ScanQR.View(store: $0) }
 							)
 							CaseLet(
-								state: /NewConnection.State.connectUsingSecrets,
+								state: /NewConnection.State.Route.connectUsingSecrets,
 								action: { NewConnection.Action.connectUsingSecrets($0) },
 								then: { ConnectUsingSecrets.View(store: $0) }
 							)
@@ -50,6 +50,13 @@ public extension NewConnection.View {
 					}
 				}
 			}
+			.alert(
+				store.scope(
+					state: \.localAuthorizationDeniedAlert,
+					action: { .view(.localAuthorizationDeniedAlert($0)) }
+				),
+				dismiss: .dismissButtonTapped
+			)
 			.onAppear { viewStore.send(.appeared) }
 		}
 	}

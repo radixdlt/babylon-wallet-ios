@@ -1,31 +1,67 @@
 import ComposableArchitecture
 import P2PConnectivityClient
 import Resources
+import UIKit
 
 // MARK: - NewConnection
 public struct NewConnection: Sendable, ReducerProtocol {
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
+	@Dependency(\.openURL) var openURL
 
 	public init() {}
 }
 
 public extension NewConnection {
 	var body: some ReducerProtocolOf<Self> {
+		Scope(state: \.route, action: /.self) {
+			EmptyReducer()
+				.ifCaseLet(/NewConnection.State.Route.scanQR, action: /NewConnection.Action.scanQR) {
+					ScanQR()
+				}
+				.ifCaseLet(/NewConnection.State.Route.connectUsingSecrets, action: /NewConnection.Action.connectUsingSecrets) {
+					ConnectUsingSecrets()
+				}
+		}
+
 		Reduce(core)
-			.ifCaseLet(/NewConnection.State.scanQR, action: /NewConnection.Action.scanQR) {
-				ScanQR()
-			}
-			.ifCaseLet(/NewConnection.State.connectUsingSecrets, action: /NewConnection.Action.connectUsingSecrets) {
-				ConnectUsingSecrets()
-			}
 	}
 
 	func core(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
-			return .run { _ in
+			return .run { send in
 				let isLocalNetworkAuthorized = await p2pConnectivityClient.getLocalNetworkAuthorization()
-				print("isLocalNetworkAuthorized", isLocalNetworkAuthorized)
+				if !isLocalNetworkAuthorized {
+					await send(.internal(.system(.displayLocalAuthorizationDeniedAlert)))
+				}
+			}
+
+		case .internal(.system(.displayLocalAuthorizationDeniedAlert)):
+			state.localAuthorizationDeniedAlert = .init(
+				title: TextState("Permission Denied"),
+				actions: [
+					ButtonState(
+						role: .cancel,
+						action: .send(.dismissButtonTapped),
+						label: TextState("Cancel")
+					),
+					ButtonState(
+						role: .none,
+						action: .send(.openSettingsButtonTapped),
+						label: TextState("Settings")
+					),
+				],
+				message: TextState("Local Network access is required to link to connector.")
+			)
+			return .none
+
+		case .internal(.view(.localAuthorizationDeniedAlert(.dismissButtonTapped))):
+			state.localAuthorizationDeniedAlert = nil
+			return .none
+
+		case .internal(.view(.localAuthorizationDeniedAlert(.openSettingsButtonTapped))):
+			return .run { _ in
+				await openURL(URL(string: UIApplication.openSettingsURLString)!)
 			}
 
 		case .internal(.view(.dismissButtonTapped)):

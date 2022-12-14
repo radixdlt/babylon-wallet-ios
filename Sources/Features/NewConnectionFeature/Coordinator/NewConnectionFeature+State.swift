@@ -1,13 +1,21 @@
+import ComposableArchitecture
 import Foundation
+import SwiftUI
 
 // MARK: - NewConnection.State
 public extension NewConnection {
-	enum State: Equatable {
-		case scanQR(ScanQR.State)
-		case connectUsingSecrets(ConnectUsingSecrets.State)
+	struct State: Equatable {
+		enum Route: Equatable {
+			case scanQR(ScanQR.State)
+			case connectUsingSecrets(ConnectUsingSecrets.State)
+		}
+
+		var route: Route
+		var localAuthorizationDeniedAlert: AlertState<NewConnection.Action.ViewAction.LocalAuthorizationDeniedAlertAction>?
 
 		public init() {
-			self = .scanQR(.init())
+			self.route = .scanQR(.init())
+			self.localAuthorizationDeniedAlert = nil
 		}
 	}
 }
