@@ -5,30 +5,26 @@ import SharedModels
 // MARK: - NewConnection.Action
 public extension NewConnection {
 	enum Action: Sendable, Equatable {
+		case child(ChildAction)
+		static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
+	}
+}
 
+// MARK: - NewConnection.Action.ChildAction
+public extension NewConnection.Action {
+	enum ChildAction: Sendable, Equatable {
+		case localNetworkAuthorization(LocalNetworkAuthorization.Action)
 		case scanQR(ScanQR.Action)
 		case connectUsingSecrets(ConnectUsingSecrets.Action)
 	}
 }
 
-public extension NewConnection.Action {
-	static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
-}
-
 // MARK: - NewConnection.Action.ViewAction
 public extension NewConnection.Action {
 	enum ViewAction: Sendable, Equatable {
-		public enum LocalAuthorizationDeniedAlertAction: Sendable, Equatable {
-			case dismissed
-			case cancelButtonTapped
-			case openSettingsButtonTapped
-		}
-
-		case appeared
 		case dismissButtonTapped
-		case localAuthorizationDeniedAlert(LocalAuthorizationDeniedAlertAction)
 	}
 }
 
@@ -42,9 +38,7 @@ public extension NewConnection.Action {
 
 // MARK: - NewConnection.Action.SystemAction
 public extension NewConnection.Action {
-	enum SystemAction: Sendable, Equatable {
-		case displayLocalAuthorizationDeniedAlert
-	}
+	enum SystemAction: Sendable, Equatable {}
 }
 
 // MARK: - NewConnection.Action.DelegateAction

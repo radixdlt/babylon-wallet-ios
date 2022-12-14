@@ -4,19 +4,13 @@ import SwiftUI
 
 // MARK: - NewConnection.State
 public extension NewConnection {
-	struct State: Equatable {
-		enum Route: Equatable {
-			case localNetworkAuthorization
-			case scanQR(ScanQR.State)
-			case connectUsingSecrets(ConnectUsingSecrets.State)
-		}
-
-		var route: Route
-		var localAuthorizationDeniedAlert: AlertState<Action.ViewAction.LocalAuthorizationDeniedAlertAction>?
+	enum State: Equatable {
+		case localNetworkAuthorization(LocalNetworkAuthorization.State)
+		case scanQR(ScanQR.State)
+		case connectUsingSecrets(ConnectUsingSecrets.State)
 
 		public init() {
-			self.route = .localNetworkAuthorization
-			self.localAuthorizationDeniedAlert = nil
+			self = .localNetworkAuthorization(.init())
 		}
 	}
 }
