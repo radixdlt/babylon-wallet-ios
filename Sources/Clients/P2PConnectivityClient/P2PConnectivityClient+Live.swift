@@ -193,7 +193,7 @@ public extension P2PConnectivityClient {
 
 // MARK: - LocalNetworkAuthorization
 /// Source: https://stackoverflow.com/a/67758105/705761
-private class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
+private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 	private var browser: NWBrowser?
 	private var netService: NetService?
 	private var completion: ((Bool) -> Void)?
