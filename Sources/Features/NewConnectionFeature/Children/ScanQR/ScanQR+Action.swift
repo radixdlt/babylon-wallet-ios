@@ -17,7 +17,6 @@ public extension ScanQR.Action {
 // MARK: - ScanQR.Action.ViewAction
 public extension ScanQR.Action {
 	enum ViewAction: Sendable, Equatable {
-		case appeared
 		case scanResult(TaskResult<String>)
 		#if os(macOS)
 		case macInputConnectionPasswordChanged(String)

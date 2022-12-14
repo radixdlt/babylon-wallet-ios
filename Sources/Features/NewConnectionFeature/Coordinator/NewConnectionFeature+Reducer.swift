@@ -1,8 +1,11 @@
 import ComposableArchitecture
+import P2PConnectivityClient
 import Resources
 
 // MARK: - NewConnection
-public struct NewConnection: ReducerProtocol {
+public struct NewConnection: Sendable, ReducerProtocol {
+	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
+
 	public init() {}
 }
 
@@ -20,7 +23,10 @@ public extension NewConnection {
 	func core(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
-			return .none
+			return .run { _ in
+				let isLocalNetworkAuthorized = await p2pConnectivityClient.getLocalNetworkAuthorization()
+				print("isLocalNetworkAuthorized", isLocalNetworkAuthorized)
+			}
 
 		case .internal(.view(.dismissButtonTapped)):
 			switch state {

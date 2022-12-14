@@ -50,6 +50,7 @@ public extension NewConnection.View {
 					}
 				}
 			}
+			.onAppear { viewStore.send(.appeared) }
 		}
 	}
 }
