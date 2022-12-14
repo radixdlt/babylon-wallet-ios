@@ -39,25 +39,27 @@ public extension NewConnection {
 		case .internal(.system(.displayLocalAuthorizationDeniedAlert)):
 			state.localAuthorizationDeniedAlert = .init(
 				title: { TextState("Permission Denied") },
-				actions: [
+				actions: {
 					ButtonState(
 						role: .cancel,
 						action: .send(.cancelButtonTapped),
 						label: { TextState("Cancel") }
-					),
+					)
 					ButtonState(
 						role: .none,
 						action: .send(.openSettingsButtonTapped),
 						label: { TextState("Settings") }
-					),
-				],
+					)
+				},
 				message: { TextState("Local Network access is required to link to connector.") }
 			)
 			return .none
 
-		case .internal(.view(.localAuthorizationDeniedAlert(.dismissButtonTapped))):
+		case .internal(.view(.localAuthorizationDeniedAlert(.cancelButtonTapped))):
 			state.localAuthorizationDeniedAlert = nil
-			return .none
+			return .run { send in
+				await send(.delegate(.dismiss))
+			}
 
 		case .internal(.view(.localAuthorizationDeniedAlert(.openSettingsButtonTapped))):
 			return .run { _ in

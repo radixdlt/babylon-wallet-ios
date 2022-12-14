@@ -11,7 +11,7 @@ public extension NewConnection {
 		}
 
 		var route: Route
-		var localAuthorizationDeniedAlert: AlertState<NewConnection.Action.ViewAction.LocalAuthorizationDeniedAlertAction>?
+		var localAuthorizationDeniedAlert: AlertState<Action.ViewAction.LocalAuthorizationDeniedAlertAction>?
 
 		public init() {
 			self.route = .scanQR(.init())
