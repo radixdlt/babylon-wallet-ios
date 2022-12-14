@@ -11,4 +11,7 @@
 #include "common.xcconfig"
 
 SDKROOT = iphoneos
+IPHONEOS_DEPLOYMENT_TARGET = 16.0
+DEVELOPMENT_TEAM[sdk=iphoneos*] = $(DEVELOPMENT_TEAM)
+
 

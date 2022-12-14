@@ -278,7 +278,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -306,7 +306,7 @@
 				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
 				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Access Babylon Wallet Secrets";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = "";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = "";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -325,15 +325,16 @@
 			baseConfigurationReference = 83DEEED92949CA77003557D7 /* ios-dev.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "$(inherited)";
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "$(inherited)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "$(inherited)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 11;
-				DEVELOPMENT_TEAM = 7SPGKHD4HZ;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7SPGKHD4HZ;
+				DEVELOPMENT_TEAM = "$(inherited)";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = "$(inherited)";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "BabylonWallet--iOS--Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(PRODUCT_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR Code to connect to browser extension";
 				INFOPLIST_KEY_NSDesktopFolderUsageDescription = "Import Babylon Profile file";
@@ -346,7 +347,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = "$(inherited)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -354,8 +355,8 @@
 				MARKETING_VERSION = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited)";
 				PRODUCT_NAME = "$(inherited)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development works.rdx.e2e.babylon.dev";
+				PROVISIONING_PROFILE_SPECIFIER = "$(inherited)";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "$(inherited)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -439,7 +440,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -467,7 +468,7 @@
 				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
 				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Access Babylon Wallet Secrets";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = "";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = "";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -486,16 +487,16 @@
 			baseConfigurationReference = 83F7F2B72949DCE600E118D3 /* ios-alpha.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "$(inherited)";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "$(inherited)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "$(inherited)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 11;
-				DEVELOPMENT_TEAM = 7SPGKHD4HZ;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7SPGKHD4HZ;
+				DEVELOPMENT_TEAM = "$(inherited)";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = "$(inherited)";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "BabylonWallet--iOS--Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(PRODUCT_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR Code to connect to browser extension";
 				INFOPLIST_KEY_NSDesktopFolderUsageDescription = "Import Babylon Profile file";
@@ -508,7 +509,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = "$(inherited)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -516,8 +517,8 @@
 				MARKETING_VERSION = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited)";
 				PRODUCT_NAME = "$(inherited)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development works.rdx.e2e.babylon.alpha";
+				PROVISIONING_PROFILE_SPECIFIER = "$(inherited)";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "$(inherited)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -601,7 +602,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: RADIX DLT LIMITED (7SPGKHD4HZ)";
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -623,7 +624,7 @@
 				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
 				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Access Babylon Wallet Secrets";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = "";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = "";
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -641,16 +642,16 @@
 			baseConfigurationReference = 83F7F2B82949DD0A00E118D3 /* ios-beta.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "$(inherited)";
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "$(inherited)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "$(inherited)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 11;
-				DEVELOPMENT_TEAM = 7SPGKHD4HZ;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7SPGKHD4HZ;
+				DEVELOPMENT_TEAM = "$(inherited)";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = "$(inherited)";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "BabylonWallet--iOS--Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(PRODUCT_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR Code to connect to browser extension";
 				INFOPLIST_KEY_NSDesktopFolderUsageDescription = "Import Babylon Profile file";
@@ -663,7 +664,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = "$(inherited)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -671,8 +672,8 @@
 				MARKETING_VERSION = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited)";
 				PRODUCT_NAME = "$(inherited)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development works.rdx.e2e.babylon.beta";
+				PROVISIONING_PROFILE_SPECIFIER = "$(inherited)";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "$(inherited)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -755,7 +756,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: RADIX DLT LIMITED (7SPGKHD4HZ)";
+				CODE_SIGN_IDENTITY = "";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -777,7 +778,7 @@
 				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
 				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Access Babylon Wallet Secrets";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = "";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = "";
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -795,16 +796,16 @@
 			baseConfigurationReference = 83F7F2B92949DDCD00E118D3 /* ios-release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "$(inherited)";
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "$(inherited)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "$(inherited)";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 11;
-				DEVELOPMENT_TEAM = 7SPGKHD4HZ;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7SPGKHD4HZ;
+				DEVELOPMENT_TEAM = "$(inherited)";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = "$(inherited)";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "BabylonWallet--iOS--Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(PRODUCT_NAME)";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR Code to connect to browser extension";
 				INFOPLIST_KEY_NSDesktopFolderUsageDescription = "Import Babylon Profile file";
@@ -817,7 +818,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = "$(inherited)";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -825,8 +826,8 @@
 				MARKETING_VERSION = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(inherited)";
 				PRODUCT_NAME = "$(inherited)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore works.rdx.e2e.babylon";
+				PROVISIONING_PROFILE_SPECIFIER = "$(inherited)";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "$(inherited)";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
