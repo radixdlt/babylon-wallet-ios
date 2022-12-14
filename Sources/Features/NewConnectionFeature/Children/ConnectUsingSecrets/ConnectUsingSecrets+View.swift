@@ -46,6 +46,7 @@ public extension ConnectUsingSecrets.View {
 							send: { .textFieldFocused($0) }
 						)
 					)
+					.autocorrectionDisabled()
 					.padding(.medium3)
 
 					Spacer()
