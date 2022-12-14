@@ -38,20 +38,20 @@ public extension NewConnection {
 
 		case .internal(.system(.displayLocalAuthorizationDeniedAlert)):
 			state.localAuthorizationDeniedAlert = .init(
-				title: TextState("Permission Denied"),
+				title: { TextState("Permission Denied") },
 				actions: [
 					ButtonState(
 						role: .cancel,
 						action: .send(.dismissButtonTapped),
-						label: TextState("Cancel")
+						label: { TextState("Cancel") }
 					),
 					ButtonState(
 						role: .none,
 						action: .send(.openSettingsButtonTapped),
-						label: TextState("Settings")
+						label: { TextState("Settings") }
 					),
 				],
-				message: TextState("Local Network access is required to link to connector.")
+				message: { TextState("Local Network access is required to link to connector.") }
 			)
 			return .none
 
@@ -65,7 +65,7 @@ public extension NewConnection {
 			}
 
 		case .internal(.view(.dismissButtonTapped)):
-			switch state {
+			switch state.route {
 			case .scanQR:
 				return .run { send in
 					await send(.delegate(.dismiss))
@@ -91,7 +91,7 @@ public extension NewConnection {
 			}
 
 		case let .scanQR(.delegate(.connectionSecretsFromScannedQR(connectionSecrets))):
-			state = .connectUsingSecrets(.init(connectionSecrets: connectionSecrets))
+			state.route = .connectUsingSecrets(.init(connectionSecrets: connectionSecrets))
 			return .none
 
 		case let .connectUsingSecrets(.delegate(.connected(connection))):
