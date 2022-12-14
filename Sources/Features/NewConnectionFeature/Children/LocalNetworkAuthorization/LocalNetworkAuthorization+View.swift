@@ -21,7 +21,7 @@ public extension LocalNetworkAuthorization.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			Color.white
+			Color.clear
 				.alert(
 					store.scope(
 						state: \.authorizationDeniedAlert,
