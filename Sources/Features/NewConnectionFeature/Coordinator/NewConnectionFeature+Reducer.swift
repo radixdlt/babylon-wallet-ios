@@ -42,7 +42,7 @@ public extension NewConnection {
 				actions: [
 					ButtonState(
 						role: .cancel,
-						action: .send(.dismissButtonTapped),
+						action: .send(.cancelButtonTapped),
 						label: { TextState("Cancel") }
 					),
 					ButtonState(

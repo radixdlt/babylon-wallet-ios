@@ -55,7 +55,7 @@ public extension NewConnection.View {
 					state: \.localAuthorizationDeniedAlert,
 					action: { .view(.localAuthorizationDeniedAlert($0)) }
 				),
-				dismiss: .dismissButtonTapped
+				dismiss: .cancelButtonTapped
 			)
 			.onAppear { viewStore.send(.appeared) }
 		}

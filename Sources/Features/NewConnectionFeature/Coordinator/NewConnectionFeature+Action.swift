@@ -21,7 +21,7 @@ public extension NewConnection.Action {
 public extension NewConnection.Action {
 	enum ViewAction: Sendable, Equatable {
 		public enum LocalAuthorizationDeniedAlertAction: Sendable, Equatable {
-			case dismissButtonTapped
+			case cancelButtonTapped
 			case openSettingsButtonTapped
 		}
 
