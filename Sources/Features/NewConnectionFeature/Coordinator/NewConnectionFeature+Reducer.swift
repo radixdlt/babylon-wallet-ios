@@ -12,7 +12,10 @@ public struct NewConnection: Sendable, ReducerProtocol {
 }
 
 public extension NewConnection {
+	@ReducerBuilderOf<Self>
 	var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+
 		Scope(state: \.route, action: /.self) {
 			EmptyReducer()
 				.ifCaseLet(/NewConnection.State.Route.scanQR, action: /NewConnection.Action.scanQR) {
@@ -22,8 +25,6 @@ public extension NewConnection {
 					ConnectUsingSecrets()
 				}
 		}
-
-		Reduce(core)
 	}
 
 	func core(into state: inout State, action: Action) -> EffectTask<Action> {
@@ -55,15 +56,17 @@ public extension NewConnection {
 			)
 			return .none
 
-		case .internal(.view(.localAuthorizationDeniedAlert(.cancelButtonTapped))):
+		case let .internal(.view(.localAuthorizationDeniedAlert(action))):
 			state.localAuthorizationDeniedAlert = nil
-			return .run { send in
-				await send(.delegate(.dismiss))
-			}
-
-		case .internal(.view(.localAuthorizationDeniedAlert(.openSettingsButtonTapped))):
-			return .run { _ in
-				await openURL(URL(string: UIApplication.openSettingsURLString)!)
+			switch action {
+			case .cancelButtonTapped:
+				return .run { send in
+					await send(.delegate(.dismiss))
+				}
+			case .openSettingsButtonTapped:
+				return .run { _ in
+					await openURL(URL(string: UIApplication.openSettingsURLString)!)
+				}
 			}
 
 		case .internal(.view(.dismissButtonTapped)):
