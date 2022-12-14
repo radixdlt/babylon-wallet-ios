@@ -2,7 +2,7 @@ fastlane_require 'dotenv'
 
 before_all do
     Dotenv.load ".env.secret"
-    ensure_git_status_clean
+    #ensure_git_status_clean
 end
 
 platform :ios do
@@ -58,6 +58,24 @@ platform :ios do
     lane :generate_new_certificates do
         code_signing(type: "development", readonly: false)
         code_signing(type: "appstore", readonly: false)
+    end
+
+    desc "Generate new deve certificates"
+    lane :generate_new_dev_certificates do
+        Dotenv.load ".env.dev"
+        code_signing(type: "development", readonly: false)
+    end
+
+    desc "Generate new alpha certificates"
+    lane :generate_new_alpha_certificates do
+        Dotenv.load ".env.alpha"
+        code_signing(type: "development", readonly: false)
+    end
+
+    desc "Generate new beta certificates"
+    lane :generate_new_beta_certificates do
+        Dotenv.load ".env.beta"
+        code_signing(type: "development", readonly: false)
     end
 
     desc "Registers a new iPhone device and updates the certificates"

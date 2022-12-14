@@ -71,6 +71,30 @@ Installs development certificate
 
 Generates new certificates if needed
 
+### ios generate_new_dev_certificates
+
+```sh
+[bundle exec] fastlane ios generate_new_dev_certificates
+```
+
+Generate new deve certificates
+
+### ios generate_new_alpha_certificates
+
+```sh
+[bundle exec] fastlane ios generate_new_alpha_certificates
+```
+
+Generate new alpha certificates
+
+### ios generate_new_beta_certificates
+
+```sh
+[bundle exec] fastlane ios generate_new_beta_certificates
+```
+
+Generate new beta certificates
+
 ### ios register_new_iphone_device
 
 ```sh
