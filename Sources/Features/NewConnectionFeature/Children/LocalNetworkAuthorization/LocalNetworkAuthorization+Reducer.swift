@@ -26,20 +26,20 @@ public extension LocalNetworkAuthorization {
 
 		case .internal(.system(.displayAuthorizationDeniedAlert)):
 			state.authorizationDeniedAlert = .init(
-				title: { TextState("Permission Denied") },
+				title: { TextState(L10n.NewConnection.LocalNetworkAuthorization.DeniedAlert.title) },
 				actions: {
 					ButtonState(
 						role: .cancel,
 						action: .send(.cancelButtonTapped),
-						label: { TextState("Cancel") }
+						label: { TextState(L10n.NewConnection.LocalNetworkAuthorization.DeniedAlert.cancelButtonTitle) }
 					)
 					ButtonState(
 						role: .none,
 						action: .send(.openSettingsButtonTapped),
-						label: { TextState("Settings") }
+						label: { TextState(L10n.NewConnection.LocalNetworkAuthorization.DeniedAlert.settingsButtonTitle) }
 					)
 				},
-				message: { TextState("Local Network access is required to link to connector.") }
+				message: { TextState(L10n.NewConnection.LocalNetworkAuthorization.DeniedAlert.message) }
 			)
 			return .none
 
