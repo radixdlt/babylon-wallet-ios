@@ -60,6 +60,7 @@ public extension CreateAccount.View {
 									send: { .textFieldFocused($0) }
 								)
 							)
+							.autocorrectionDisabled()
 						}
 
 						Spacer(minLength: .small2)
