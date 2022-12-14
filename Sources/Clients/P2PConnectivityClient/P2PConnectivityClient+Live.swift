@@ -233,6 +233,7 @@ private class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 
 		self.netService = NetService(domain: "local.", type: "_lnp._tcp.", name: "LocalNetworkPrivacy", port: 1100)
 		self.netService?.delegate = self
+		self.netService?.schedule(in: .main, forMode: .common)
 
 		self.browser?.start(queue: .main)
 		self.netService?.publish()

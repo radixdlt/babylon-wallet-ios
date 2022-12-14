@@ -30,6 +30,7 @@ public extension ScanQR.View {
 				Spacer()
 			}
 			.padding(.all, .large3)
+			.onAppear { viewStore.send(.appeared) }
 		}
 	}
 }

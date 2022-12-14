@@ -2,10 +2,13 @@ import Common
 import ComposableArchitecture
 import ConverseCommon
 import ErrorQueue
+import P2PConnectivityClient
 
 // MARK: - ScanQR
 public struct ScanQR: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
+
 	public init() {}
 }
 
@@ -13,7 +16,10 @@ public extension ScanQR {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
-			return .none
+			return .run { _ in
+				let isLocalNetworkAuthorized = await p2pConnectivityClient.getLocalNetworkAuthorization()
+				print("isLocalNetworkAuthorized", isLocalNetworkAuthorized)
+			}
 		#if os(macOS)
 		case let .internal(.view(.macInputConnectionPasswordChanged(connectionPassword))):
 			state.connectionPassword = connectionPassword

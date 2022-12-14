@@ -535,6 +535,7 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
+			"P2PConnectivityClient",
 			"SharedModels",
 			tca,
 		], tests: .yes(
