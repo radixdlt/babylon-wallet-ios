@@ -535,10 +535,13 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
+			"P2PConnectivityClient",
 			"SharedModels",
 			tca,
-		], tests: .yes(
-			dependencies: ["TestUtils"])
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
 	.feature(
 		name: "NonFungibleTokenListFeature",

@@ -1,13 +1,16 @@
+import ComposableArchitecture
 import Foundation
+import SwiftUI
 
 // MARK: - NewConnection.State
 public extension NewConnection {
 	enum State: Equatable {
+		case localNetworkAuthorization(LocalNetworkAuthorization.State)
 		case scanQR(ScanQR.State)
 		case connectUsingSecrets(ConnectUsingSecrets.State)
 
 		public init() {
-			self = .scanQR(.init())
+			self = .localNetworkAuthorization(.init())
 		}
 	}
 }
