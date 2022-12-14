@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E6805BC3286DB3ED00861180"
-               BuildableName = ".app"
-               BlueprintName = "BabylonWallet (iOS)"
+               BuildableName = "Radix Wallet.app"
+               BlueprintName = "Radix Wallet (iOS)"
                ReferencedContainer = "container:BabylonWallet.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -405,8 +405,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E6805BC3286DB3ED00861180"
-            BuildableName = ".app"
-            BlueprintName = "BabylonWallet (iOS)"
+            BuildableName = "Radix Wallet.app"
+            BlueprintName = "Radix Wallet (iOS)"
             ReferencedContainer = "container:BabylonWallet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -422,8 +422,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E6805BC3286DB3ED00861180"
-            BuildableName = ".app"
-            BlueprintName = "BabylonWallet (iOS)"
+            BuildableName = "Radix Wallet.app"
+            BlueprintName = "Radix Wallet (iOS)"
             ReferencedContainer = "container:BabylonWallet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

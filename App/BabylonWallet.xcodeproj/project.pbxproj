@@ -116,9 +116,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E6805BC3286DB3ED00861180 /* BabylonWallet (iOS) */ = {
+		E6805BC3286DB3ED00861180 /* Radix Wallet (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (iOS)" */;
+			buildConfigurationList = E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (iOS)" */;
 			buildPhases = (
 				E6805BC0286DB3ED00861180 /* Sources */,
 				E6805BC1286DB3ED00861180 /* Frameworks */,
@@ -129,7 +129,7 @@
 			dependencies = (
 				E6A17E57292FB01500D40EDB /* PBXTargetDependency */,
 			);
-			name = "BabylonWallet (iOS)";
+			name = "Radix Wallet (iOS)";
 			packageProductDependencies = (
 				E6805BDE286DB74300861180 /* AppFeature */,
 			);
@@ -137,9 +137,9 @@
 			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet-Δ.app */;
 			productType = "com.apple.product-type.application";
 		};
-		E6805BC9286DB3ED00861180 /* BabylonWallet (macOS) */ = {
+		E6805BC9286DB3ED00861180 /* Radix Wallet (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (macOS)" */;
+			buildConfigurationList = E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (macOS)" */;
 			buildPhases = (
 				E6805BC6286DB3ED00861180 /* Sources */,
 				E6805BC7286DB3ED00861180 /* Frameworks */,
@@ -150,7 +150,7 @@
 			dependencies = (
 				E667FFD528F6F7F00015544F /* PBXTargetDependency */,
 			);
-			name = "BabylonWallet (macOS)";
+			name = "Radix Wallet (macOS)";
 			packageProductDependencies = (
 				E667FFD228F6F7ED0015544F /* AppFeature */,
 			);
@@ -189,8 +189,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E6805BC3286DB3ED00861180 /* BabylonWallet (iOS) */,
-				E6805BC9286DB3ED00861180 /* BabylonWallet (macOS) */,
+				E6805BC3286DB3ED00861180 /* Radix Wallet (iOS) */,
+				E6805BC9286DB3ED00861180 /* Radix Wallet (macOS) */,
 			);
 		};
 /* End PBXProject section */
@@ -887,7 +887,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (iOS)" */ = {
+		E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83DEEED72949CA5A003557D7 /* Dev */,
@@ -898,7 +898,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (macOS)" */ = {
+		E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				83DEEED82949CA5A003557D7 /* Dev */,
