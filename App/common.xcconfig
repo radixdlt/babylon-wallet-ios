@@ -12,3 +12,4 @@ APP_NAME = Radix Wallet
 APP_BUNDLE_ID = works.rdx.e2e.babylon
 APPICON_NAME=AppIcon
 CODE_SIGN_STYLE = Manual
+MARKETING_VERSION = 0.0.11
