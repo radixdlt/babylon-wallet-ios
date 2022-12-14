@@ -1,0 +1,15 @@
+//
+//  ios-dev.xcconfig
+//  BabylonWallet
+//
+//  Created by Ghenadie Vasiliev-Pusca on 14.12.2022.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+#include "ios.xcconfig"
+
+PRODUCT_NAME = $(APP_NAME)-β
+PRODUCT_BUNDLE_IDENTIFIER=$(APP_BUNDLE_ID).beta
+ASSETCATALOG_COMPILER_APPICON_NAME = $(APPICON_NAME)

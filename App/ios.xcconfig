@@ -1,0 +1,14 @@
+//
+//  ios.xcconfig
+//  BabylonWallet
+//
+//  Created by Ghenadie Vasiliev-Pusca on 14.12.2022.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+#include "common.xcconfig"
+
+SDKROOT = iphoneos
+
