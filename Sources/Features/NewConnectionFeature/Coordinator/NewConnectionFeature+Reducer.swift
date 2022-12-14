@@ -59,13 +59,16 @@ public extension NewConnection {
 		case let .internal(.view(.localAuthorizationDeniedAlert(action))):
 			state.localAuthorizationDeniedAlert = nil
 			switch action {
+			case .dismissed:
+				return .none
 			case .cancelButtonTapped:
 				return .run { send in
 					await send(.delegate(.dismiss))
 				}
 			case .openSettingsButtonTapped:
-				return .run { _ in
+				return .run { send in
 					await openURL(URL(string: UIApplication.openSettingsURLString)!)
+					await send(.delegate(.dismiss))
 				}
 			}
 
