@@ -31,10 +31,34 @@ Builds and archives the app
 
 Runs test
 
+### ios alpha_deploy
+
+```sh
+[bundle exec] fastlane ios alpha_deploy
+```
+
+
+
 ### ios beta_deploy
 
 ```sh
 [bundle exec] fastlane ios beta_deploy
+```
+
+
+
+### ios deploy
+
+```sh
+[bundle exec] fastlane ios deploy
+```
+
+
+
+### ios release_deploy
+
+```sh
+[bundle exec] fastlane ios release_deploy
 ```
 
 Builds and deploys beta app to TestFlight

@@ -21,8 +21,37 @@ platform :ios do
         run_tests
     end
 
+    lane :alpha_deploy do 
+        Dotenv.load ".env.ios.alpha"
+        deploy
+    end
+
+    lane :beta_deploy do 
+        Dotenv.load ".env.ios.beta"
+        deploy
+    end
+
+    lane :deploy do
+        install_distribution_certificate
+        
+        api_key = app_store_connect_api_key
+        build_number = latest_testflight_build_number(
+            version: ENV['APP_VERSION'],
+            app_identifier: ENV['APP_IDENTIFIER'],
+            initial_build_number: 0
+        )
+        increment_build_number(
+            xcodeproj: ENV['PROJ_PATH'],
+            build_number: build_number + 1
+        )
+        build_app
+        upload_to_testflight(
+            api_key: api_key
+        )
+    end
+
     desc "Builds and deploys beta app to TestFlight"
-    lane :beta_deploy do
+    lane :release_deploy do
         install_distribution_certificate
         
         build_number = bump_build_number
@@ -69,13 +98,13 @@ platform :ios do
     desc "Generate new alpha certificates"
     lane :generate_new_alpha_certificates do
         Dotenv.load ".env.alpha"
-        code_signing(type: "development", readonly: false)
+        code_signing(type: "appstore", readonly: false)
     end
 
     desc "Generate new beta certificates"
     lane :generate_new_beta_certificates do
         Dotenv.load ".env.beta"
-        code_signing(type: "development", readonly: false)
+        code_signing(type: "appstore", readonly: false)
     end
 
     desc "Registers a new iPhone device and updates the certificates"

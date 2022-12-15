@@ -1,0 +1,14 @@
+//
+//  iOS-dev.xcconfig
+//  BabylonWallet
+//
+//  Created by Ghenadie Vasiliev-Pusca on 15.12.2022.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+#include "iOS-shared.xcconfig"
+#include "iOS-release-opt.xcconfig"
+
+PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*] = match AppStore works.rdx.e2e.babylon
