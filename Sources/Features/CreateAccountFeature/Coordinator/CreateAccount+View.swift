@@ -52,6 +52,7 @@ public extension CreateAccount.View {
 									get: \.accountName,
 									send: { .textFieldChanged($0) }
 								),
+								characterLimit: 30,
 								hint: L10n.CreateAccount.explanation,
 								binding: $focusedField,
 								equals: .accountName,
@@ -73,7 +74,7 @@ public extension CreateAccount.View {
 							viewStore.send(.createAccountButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
-						.enabled(viewStore.isCreateAccountButtonEnabled)
+						.controlState(viewStore.createAccountButtonState)
 					}
 					.padding([.horizontal, .bottom], .medium1)
 				}
@@ -92,15 +93,16 @@ extension CreateAccount.View {
 		public var numberOfExistingAccounts: Int
 		public var accountName: String
 		public var isLoaderVisible: Bool
-		public var isCreateAccountButtonEnabled: Bool
+		public var createAccountButtonState: ControlState
 		public var isDismissButtonVisible: Bool
 		@BindableState public var focusedField: CreateAccount.State.Field?
 
 		init(state: CreateAccount.State) {
 			numberOfExistingAccounts = state.numberOfExistingAccounts
-			accountName = state.accountName
+			accountName = state.accountNameInput
 			isLoaderVisible = state.isCreatingAccount
-			isCreateAccountButtonEnabled = state.isValid && !state.isCreatingAccount
+			let isNameValid = !state.sanitizedAccountName.isEmpty
+			createAccountButtonState = (isNameValid && !state.isCreatingAccount) ? .enabled : .disabled
 			isDismissButtonVisible = !state.shouldCreateProfile
 			focusedField = state.focusedField
 		}

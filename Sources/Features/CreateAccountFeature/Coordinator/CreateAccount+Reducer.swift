@@ -39,7 +39,6 @@ public extension DependencyValues {
 
 // MARK: - CreateAccount
 public struct CreateAccount: Sendable, ReducerProtocol {
-	@Dependency(\.accountNameValidator) var accountNameValidator
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mnemonicGenerator) var mnemonicGenerator
@@ -146,11 +145,7 @@ public extension CreateAccount {
 			}
 
 		case let .internal(.view(.textFieldChanged(accountName))):
-			let result = accountNameValidator.validate(accountName)
-			if !accountNameValidator.isCharacterCountOverLimit(result.trimmedName) {
-				state.isValid = result.isValid
-				state.accountName = accountName
-			}
+			state.accountNameInput = accountName
 			return .none
 
 		case let .internal(.view(.textFieldFocused(focus))):
