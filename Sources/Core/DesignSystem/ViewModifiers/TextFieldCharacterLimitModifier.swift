@@ -1,3 +1,4 @@
+#if os(iOS)
 import Introspect
 import SwiftUI
 
@@ -110,3 +111,4 @@ private final class SwizzledUITextFieldDelegate {
 		}
 	}
 }
+#endif

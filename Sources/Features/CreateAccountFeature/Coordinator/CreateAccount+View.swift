@@ -62,7 +62,9 @@ public extension CreateAccount.View {
 									send: { .textFieldFocused($0) }
 								)
 							)
+							#if os(iOS)
 							.textFieldCharacterLimit(30, forText: accountNameBinding)
+							#endif
 							.autocorrectionDisabled()
 						}
 
