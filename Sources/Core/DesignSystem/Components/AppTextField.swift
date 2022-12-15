@@ -152,10 +152,14 @@ private final class SwizzledUITextFieldDelegate {
 
 		let newString = currentString.replacingCharacters(in: Range(range, in: currentString)!, with: string)
 
-		if newString.count <= characterLimit {
-			return true
+		print(newString)
+
+		if newString.count > characterLimit {
+			DispatchQueue.main.async {
+				textField.text = String(newString.prefix(characterLimit))
+			}
+			return false
 		} else {
-			textField.text = String(newString.prefix(characterLimit))
 			return true
 		}
 	}
