@@ -10,13 +10,15 @@
 
 ASSETCATALOG_COMPILER_APPICON_NAME = $(APP_ICON).beta
 
+PRODUCT_NAME = $(APP_NAME) Beta
+
 // Bundle Display Name
 //
 // When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
 // [CFBundleDisplayName](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundledisplayname)
 // key in the Info.plist file to the value of this build setting.
 
-INFOPLIST_KEY_CFBundleDisplayName = $(APP_NAME) Beta
+INFOPLIST_KEY_CFBundleDisplayName = $(PRODUCT_NAME)
 
 
 // Product Bundle Identifier

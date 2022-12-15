@@ -8,6 +8,8 @@ APP_BUNDLE_ID = works.rdx.e2e.babylon
 
 // MARK: - System flags
 
+CURRENT_PROJECT_VERSION = 1
+
 // Always Search User Paths (Deprecated)
 //
 // This setting is deprecated as of Xcode 8.3 and may not be supported in future

@@ -29,18 +29,13 @@
 		839D88DF294B53C60098B586 /* Project-Release-Opt.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Release-Opt.xcconfig"; sourceTree = "<group>"; };
 		839D88E0294B54C00098B586 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		839D88E1294B576C0098B586 /* iOS-release-opt.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "iOS-release-opt.xcconfig"; sourceTree = "<group>"; };
-		839D88E2294B63910098B586 /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
-		83DEEED42949C711003557D7 /* ios.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = ios.xcconfig; sourceTree = "<group>"; };
-		83DEEED52949C916003557D7 /* common.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = common.xcconfig; sourceTree = "<group>"; };
-		83DEEED92949CA77003557D7 /* ios-dev.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ios-dev.xcconfig"; sourceTree = "<group>"; };
-		83F7F2B72949DCE600E118D3 /* ios-alpha.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ios-alpha.xcconfig"; sourceTree = "<group>"; };
-		83F7F2B82949DD0A00E118D3 /* ios-beta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ios-beta.xcconfig"; sourceTree = "<group>"; };
-		83F7F2B92949DDCD00E118D3 /* ios-release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "ios-release.xcconfig"; sourceTree = "<group>"; };
+		839D88E5294B6B880098B586 /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
+		839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "macOS-shared.xcconfig"; sourceTree = "<group>"; };
 		D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E667FFD128F6F7E50015544F /* Babylon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Babylon; path = ..; sourceTree = "<group>"; };
 		E6805BBD286DB3EC00861180 /* WalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApp.swift; sourceTree = "<group>"; };
-		E6805BC4286DB3ED00861180 /* .app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = .app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E6805BCA286DB3ED00861180 /* .app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = .app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6805BCC286DB3ED00861180 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
 		E6FD0074290C599300B9A340 /* BabylonWallet--macOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "BabylonWallet--macOS--Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -68,6 +63,7 @@
 		839D88D2294B34040098B586 /* Config */ = {
 			isa = PBXGroup;
 			children = (
+				839D88E6294B6D8F0098B586 /* macOS */,
 				839D88DE294B53760098B586 /* iOS */,
 				839D88DD294B534B0098B586 /* Project */,
 			);
@@ -101,18 +97,20 @@
 			path = iOS;
 			sourceTree = "<group>";
 		};
+		839D88E6294B6D8F0098B586 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
 		E6805BB7286DB3EB00861180 = {
 			isa = PBXGroup;
 			children = (
 				839D88D2294B34040098B586 /* Config */,
-				83DEEED52949C916003557D7 /* common.xcconfig */,
-				83DEEED42949C711003557D7 /* ios.xcconfig */,
-				83DEEED92949CA77003557D7 /* ios-dev.xcconfig */,
-				83F7F2B72949DCE600E118D3 /* ios-alpha.xcconfig */,
-				83F7F2B82949DD0A00E118D3 /* ios-beta.xcconfig */,
-				83F7F2B92949DDCD00E118D3 /* ios-release.xcconfig */,
 				E6FD0074290C599300B9A340 /* BabylonWallet--macOS--Info.plist */,
-				839D88E2294B63910098B586 /* Radix-Wallet--iOS--Info.plist */,
+				839D88E5294B6B880098B586 /* Radix-Wallet--iOS--Info.plist */,
 				E6805BDB286DB44400861180 /* Packages */,
 				E6805BBC286DB3EC00861180 /* Shared */,
 				E6805BCB286DB3ED00861180 /* macOS */,
@@ -134,8 +132,8 @@
 		E6805BC5286DB3ED00861180 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E6805BC4286DB3ED00861180 /* .app */,
-				E6805BCA286DB3ED00861180 /* .app */,
+				E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */,
+				E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -184,7 +182,7 @@
 				E6805BDE286DB74300861180 /* AppFeature */,
 			);
 			productName = "Wallet (iOS)";
-			productReference = E6805BC4286DB3ED00861180 /* .app */;
+			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E6805BC9286DB3ED00861180 /* Radix Wallet (macOS) */ = {
@@ -205,7 +203,7 @@
 				E667FFD228F6F7ED0015544F /* AppFeature */,
 			);
 			productName = "Wallet (macOS)";
-			productReference = E6805BCA286DB3ED00861180 /* .app */;
+			productReference = E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
