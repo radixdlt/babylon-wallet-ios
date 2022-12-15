@@ -7,11 +7,8 @@ public extension CreateAccount {
 	struct State: Sendable, Equatable {
 		public var onNetworkWithID: NetworkID?
 		public var numberOfExistingAccounts: Int
-		public var accountNameInput: String
-		public var sanitizedAccountName: String {
-			accountNameInput.trimmed()
-		}
-
+		public var inputtedAccountName: String
+		public var sanitizedAccountName: String { inputtedAccountName.trimmed() }
 		public var isCreatingAccount: Bool
 		public let shouldCreateProfile: Bool
 		@BindableState public var focusedField: Field?
@@ -27,7 +24,7 @@ public extension CreateAccount {
 			self.onNetworkWithID = onNetworkWithID
 			self.shouldCreateProfile = shouldCreateProfile
 			self.numberOfExistingAccounts = numberOfExistingAccounts
-			self.accountNameInput = accountNameInput
+			self.inputtedAccountName = accountNameInput
 			self.focusedField = focusedField
 			self.isCreatingAccount = isCreatingAccount
 		}

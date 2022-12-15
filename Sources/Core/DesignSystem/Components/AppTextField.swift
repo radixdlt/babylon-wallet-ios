@@ -85,7 +85,6 @@ private extension UITextField {
 }
 
 private extension UITextFieldDelegate {
-	@MainActor
 	func swizzle() {
 		guard !SwizzledUITextFieldDelegate.isActive else { return }
 
@@ -122,8 +121,6 @@ private final class SwizzledUITextFieldDelegate {
 		shouldChangeCharactersIn range: NSRange,
 		replacementString string: String
 	) -> Bool {
-		print("something")
-
 		guard
 			let characterLimit = textField.characterLimit,
 			let currentString = textField.text

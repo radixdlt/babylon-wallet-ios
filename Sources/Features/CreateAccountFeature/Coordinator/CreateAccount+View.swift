@@ -99,7 +99,7 @@ extension CreateAccount.View {
 
 		init(state: CreateAccount.State) {
 			numberOfExistingAccounts = state.numberOfExistingAccounts
-			accountName = state.accountNameInput
+			accountName = state.inputtedAccountName
 			isLoaderVisible = state.isCreatingAccount
 			let isNameValid = !state.sanitizedAccountName.isEmpty
 			createAccountButtonState = (isNameValid && !state.isCreatingAccount) ? .enabled : .disabled
