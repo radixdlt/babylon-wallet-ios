@@ -1,4 +1,3 @@
-import Introspect
 import SwiftUI
 import SwiftUINavigation
 
@@ -6,7 +5,6 @@ import SwiftUINavigation
 public struct AppTextField<Value: Hashable>: View {
 	let placeholder: String
 	let text: Binding<String>
-	let characterLimit: Int?
 	let hint: String
 	let binding: FocusState<Value>.Binding
 	let equals: Value
@@ -23,7 +21,6 @@ public struct AppTextField<Value: Hashable>: View {
 	) {
 		self.placeholder = placeholder
 		self.text = text
-		self.characterLimit = characterLimit
 		self.hint = hint
 		self.binding = binding
 		self.equals = equals
@@ -36,7 +33,6 @@ public struct AppTextField<Value: Hashable>: View {
 				placeholder,
 				text: text.removeDuplicates()
 			)
-			.introspectTextField { $0.characterLimit = characterLimit }
 			.focused(binding, equals: equals)
 			.bind(first, to: binding)
 			.padding()
@@ -67,98 +63,5 @@ extension Binding where Value: Equatable {
 				self.transaction(transaction).wrappedValue = newValue
 			}
 		)
-	}
-}
-
-private extension UITextField {
-	var characterLimit: Int? {
-		get {
-			let key = unsafeBitCast(Selector(#function), to: UnsafeRawPointer.self)
-			return objc_getAssociatedObject(self, key) as? Int
-		}
-		set {
-			let key = unsafeBitCast(Selector(#function), to: UnsafeRawPointer.self)
-			objc_setAssociatedObject(self, key, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-			delegate?.swizzle()
-		}
-	}
-}
-
-private extension UITextFieldDelegate {
-	func swizzle() {
-		guard !SwizzledUITextFieldDelegate.state.isActive else { return }
-
-		guard let delegateClass = object_getClass(self) else {
-			return
-		}
-
-		let originalSelector = #selector(UITextFieldDelegate.textField(_:shouldChangeCharactersIn:replacementString:))
-		let swizzledSelector = #selector(SwizzledUITextFieldDelegate.swizzled_textField(_:shouldChangeCharactersIn:replacementString:))
-
-		guard let swizzledMethod = class_getInstanceMethod(SwizzledUITextFieldDelegate.self, swizzledSelector) else {
-			return
-		}
-
-		if let originalMethod = class_getInstanceMethod(delegateClass, originalSelector) {
-			// exchange implementation
-			method_exchangeImplementations(originalMethod, swizzledMethod)
-			SwizzledUITextFieldDelegate.state = .active(.exchanged)
-		} else {
-			// add implementation
-			class_addMethod(delegateClass, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
-			SwizzledUITextFieldDelegate.state = .active(.added)
-		}
-	}
-}
-
-// MARK: - SwizzledUITextFieldDelegate
-private final class SwizzledUITextFieldDelegate {
-	enum State {
-		enum ActivationType {
-			case exchanged
-			case added
-		}
-
-		case inactive
-		case active(ActivationType)
-
-		var isActive: Bool {
-			guard case .active = self else { return false }
-			return true
-		}
-	}
-
-	static var state: State = .inactive
-
-	@MainActor
-	@objc func swizzled_textField(
-		_ textField: UITextField,
-		shouldChangeCharactersIn range: NSRange,
-		replacementString string: String
-	) -> Bool {
-		guard
-			let characterLimit = textField.characterLimit,
-			let currentString = textField.text
-		else {
-			switch Self.state {
-			case .inactive:
-				return true
-			case .active(.exchanged):
-				return swizzled_textField(textField, shouldChangeCharactersIn: range, replacementString: string)
-			case .active(.added):
-				return true
-			}
-		}
-
-		let newString = currentString.replacingCharacters(in: Range(range, in: currentString)!, with: string)
-
-		if newString.count > characterLimit {
-			DispatchQueue.main.async {
-				textField.text = String(newString.prefix(characterLimit))
-			}
-			return false
-		} else {
-			return true
-		}
 	}
 }

@@ -46,13 +46,14 @@ public extension CreateAccount.View {
 						VStack(spacing: .large1) {
 							subtitle
 
+							let accountNameBinding = viewStore.binding(
+								get: \.accountName,
+								send: { .textFieldChanged($0) }
+							)
+
 							AppTextField(
 								placeholder: L10n.CreateAccount.placeholder,
-								text: viewStore.binding(
-									get: \.accountName,
-									send: { .textFieldChanged($0) }
-								),
-								characterLimit: 30,
+								text: accountNameBinding,
 								hint: L10n.CreateAccount.explanation,
 								binding: $focusedField,
 								equals: .accountName,
@@ -61,6 +62,7 @@ public extension CreateAccount.View {
 									send: { .textFieldFocused($0) }
 								)
 							)
+							.textFieldCharacterLimit(30, forText: accountNameBinding)
 							.autocorrectionDisabled()
 						}
 
