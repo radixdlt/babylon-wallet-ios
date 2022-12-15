@@ -13,7 +13,6 @@ public struct AppTextField<Value: Hashable>: View {
 	public init(
 		placeholder: String,
 		text: Binding<String>,
-		characterLimit: Int? = nil,
 		hint: String,
 		binding: FocusState<Value>.Binding,
 		equals: Value,
