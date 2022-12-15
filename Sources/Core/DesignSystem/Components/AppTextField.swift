@@ -86,14 +86,14 @@ private extension UITextField {
 
 private extension UITextFieldDelegate {
 	func swizzle() {
-		guard !SwizzledUITextFieldDelegate.isActive else { return }
+		guard !SwizzledUITextFieldDelegate.state.isActive else { return }
 
 		guard let delegateClass = object_getClass(self) else {
 			return
 		}
 
 		let originalSelector = #selector(UITextFieldDelegate.textField(_:shouldChangeCharactersIn:replacementString:))
-		let swizzledSelector = #selector(SwizzledUITextFieldDelegate.textField(_:shouldChangeCharactersIn:replacementString:))
+		let swizzledSelector = #selector(SwizzledUITextFieldDelegate.swizzled_textField(_:shouldChangeCharactersIn:replacementString:))
 
 		guard let swizzledMethod = class_getInstanceMethod(SwizzledUITextFieldDelegate.self, swizzledSelector) else {
 			return
@@ -102,21 +102,36 @@ private extension UITextFieldDelegate {
 		if let originalMethod = class_getInstanceMethod(delegateClass, originalSelector) {
 			// exchange implementation
 			method_exchangeImplementations(originalMethod, swizzledMethod)
+			SwizzledUITextFieldDelegate.state = .active(.exchanged)
 		} else {
 			// add implementation
 			class_addMethod(delegateClass, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
+			SwizzledUITextFieldDelegate.state = .active(.added)
 		}
-
-		SwizzledUITextFieldDelegate.isActive = true
 	}
 }
 
 // MARK: - SwizzledUITextFieldDelegate
 private final class SwizzledUITextFieldDelegate {
-	static var isActive = false
+	enum State {
+		enum ActivationType {
+			case exchanged
+			case added
+		}
+
+		case inactive
+		case active(ActivationType)
+
+		var isActive: Bool {
+			guard case .active = self else { return false }
+			return true
+		}
+	}
+
+	static var state: State = .inactive
 
 	@MainActor
-	@objc func textField(
+	@objc func swizzled_textField(
 		_ textField: UITextField,
 		shouldChangeCharactersIn range: NSRange,
 		replacementString string: String
@@ -125,11 +140,23 @@ private final class SwizzledUITextFieldDelegate {
 			let characterLimit = textField.characterLimit,
 			let currentString = textField.text
 		else {
-			return self.textField(textField, shouldChangeCharactersIn: range, replacementString: string)
+			switch Self.state {
+			case .inactive:
+				return true
+			case .active(.exchanged):
+				return swizzled_textField(textField, shouldChangeCharactersIn: range, replacementString: string)
+			case .active(.added):
+				return true
+			}
 		}
 
 		let newString = currentString.replacingCharacters(in: Range(range, in: currentString)!, with: string)
 
-		return newString.count <= characterLimit
+		if newString.count <= characterLimit {
+			return true
+		} else {
+			textField.text = String(newString.prefix(characterLimit))
+			return true
+		}
 	}
 }
