@@ -97,11 +97,13 @@ private final class SwizzledUITextFieldDelegate {
 		let proposedString = currentString.replacingCharacters(in: Range(range, in: currentString)!, with: string)
 
 		if proposedString.count > characterLimit {
-//			DispatchQueue.main.async {
 			let newString = String(proposedString.prefix(characterLimit))
-			textBinding.wrappedValue = newString
-			textField.text = newString
-//			}
+
+			DispatchQueue.main.async {
+				textBinding.wrappedValue = newString
+				textField.text = newString
+			}
+
 			return false
 		} else {
 			return true
