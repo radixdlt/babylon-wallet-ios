@@ -137,7 +137,12 @@ public extension ManageGatewayAPIEndpoints {
 		case .createAccount(.delegate(.failedToCreateNewAccount)):
 			return skipSwitching(state: &state)
 
-		case .createAccount(.delegate(.createdNewAccount)):
+		case let .createAccount(.delegate(.createdNewAccount(account))):
+			return .run { send in
+				await send(.createAccount(.delegate(.displayCreateAccountCompletion(account, isFirstAccount: true, destination: .home))))
+			}
+
+		case .createAccount(.child(.accountCompletion(.delegate(.displayHome)))):
 			state.createAccount = nil
 			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
 				// weird state... should not happen.

@@ -5,42 +5,57 @@ import Profile
 // MARK: - AccountCompletion.State
 public extension AccountCompletion {
 	struct State: Equatable {
-		public let accountName: String
-		public let accountAddress: Address
-		public let origin: Origin
+		public let account: OnNetwork.Account
+		public let isFirstAccount: Bool
+		public let destination: Destination
 
 		public init(
-			accountName: String,
-			accountAddress: Address,
-			origin: Origin
+			account: OnNetwork.Account,
+			isFirstAccount: Bool,
+			destination: Destination
 		) {
-			self.accountName = accountName
-			self.accountAddress = accountAddress
-			self.origin = origin
+			self.account = account
+			self.isFirstAccount = isFirstAccount
+			self.destination = destination
 		}
 	}
 }
 
 // MARK: - AccountCompletion.State.Origin
 public extension AccountCompletion.State {
-	enum Origin: String {
+	enum Destination: String, Sendable {
 		case home
+		case chooseAccounts
 
 		var displayText: String {
 			switch self {
 			case .home:
-				return L10n.CreateAccount.Completion.Origin.home
+				return L10n.CreateAccount.Completion.Destination.home
+			case .chooseAccounts:
+				return L10n.CreateAccount.Completion.Destination.chooseAccounts
 			}
 		}
+	}
+
+	var accountAddress: AccountAddress {
+		account.address
+	}
+
+	var accountName: String {
+		account.displayName ?? "Unnamed account"
+	}
+
+	var accountIndex: Int {
+		account.index
 	}
 }
 
 #if DEBUG
 public extension AccountCompletion.State {
 	static let placeholder: Self = .init(
-		accountName: "My main account",
-		accountAddress: .account(try! .init(address: "some_account_address")),
-		origin: .home
+		account: .placeholder0,
+		isFirstAccount: true,
+		destination: .home
 	)
 }
 #endif

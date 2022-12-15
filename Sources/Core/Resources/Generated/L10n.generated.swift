@@ -63,16 +63,20 @@ public enum L10n {
     	/// Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.
     	public static let explanation = L10n.tr("Localizable", "createAccount.completion.explanation", fallback: "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.")
     	/// Go to %@
-    	public static func returnToOrigin(_ p1: Any) -> String {
-    		return L10n.tr("Localizable", "createAccount.completion.returnToOrigin", String(describing: p1), fallback: "Go to %@")
+    	public static func goToDestination(_ p1: Any) -> String {
+    		return L10n.tr("Localizable", "createAccount.completion.goToDestination", String(describing: p1), fallback: "Go to %@")
     	}
     	/// Your account has been created.
     	public static let subtitle = L10n.tr("Localizable", "createAccount.completion.subtitle", fallback: "Your account has been created.")
+    	/// You’ve created your first account.
+    	public static let subtitleFirstAccount = L10n.tr("Localizable", "createAccount.completion.subtitleFirstAccount", fallback: "You’ve created your first account.")
     	/// Congratulations
     	public static let title = L10n.tr("Localizable", "createAccount.completion.title", fallback: "Congratulations")
-    	public enum Origin {
+    	public enum Destination {
+      	/// Choose Accounts
+      	public static let chooseAccounts = L10n.tr("Localizable", "createAccount.completion.destination.chooseAccounts", fallback: "Choose Accounts")
       	/// Account List
-      	public static let home = L10n.tr("Localizable", "createAccount.completion.origin.home", fallback: "Account List")
+      	public static let home = L10n.tr("Localizable", "createAccount.completion.destination.home", fallback: "Account List")
     	}
   	}
 	}

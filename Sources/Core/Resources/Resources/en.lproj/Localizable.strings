@@ -16,9 +16,11 @@
 
 "createAccount.biometricsPrompt" = "Authenticate to create new account with this phone.";
 "createAccount.completion.explanation" = "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.";
-"createAccount.completion.origin.home" = "Account List";
-"createAccount.completion.returnToOrigin" = "Go to %@";
+"createAccount.completion.destination.home" = "Account List";
+"createAccount.completion.destination.chooseAccounts" = "Choose Accounts";
+"createAccount.completion.goToDestination" = "Go to %@";
 "createAccount.completion.subtitle" = "Your account has been created.";
+"createAccount.completion.subtitleFirstAccount" = "You’ve created your first account.";
 "createAccount.completion.title" = "Congratulations";
 "createAccount.createAccountButtonTitle" = "Create Account";
 "createAccount.createFirstAccount" = "Create First Account";

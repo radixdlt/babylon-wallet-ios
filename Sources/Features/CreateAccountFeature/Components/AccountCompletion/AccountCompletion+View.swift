@@ -8,9 +8,10 @@ import SwiftUI
 public extension AccountCompletion {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<AccountCompletion>
+		public typealias Store = ComposableArchitecture.Store<State, Action>
+		private let store: Store
 
-		public init(store: StoreOf<AccountCompletion>) {
+		public init(store: Store) {
 			self.store = store
 		}
 	}
@@ -19,60 +20,120 @@ public extension AccountCompletion {
 public extension AccountCompletion.View {
 	var body: some View {
 		WithViewStore(
-			store.actionless,
-			observe: ViewState.init(state:)
+			store,
+			observe: ViewState.init(state:),
+			send: { .view($0) }
 		) { viewStore in
-			VStack(spacing: .medium2) {
-				Spacer()
+			ForceFullScreen {
+				VStack(spacing: .medium2) {
+					Spacer()
 
-				Image(asset: AssetResource.createAccountSafe)
+					accountsStackView(with: viewStore)
 
-				Text(L10n.CreateAccount.Completion.title)
-					.foregroundColor(.app.buttonTextBlack)
-					.textStyle(.sectionHeader)
+					Spacer()
 
-				Text(L10n.CreateAccount.Completion.subtitle)
-					.foregroundColor(.app.gray1)
-					.textStyle(.body1Regular)
+					VStack(spacing: .medium1) {
+						Text(L10n.CreateAccount.Completion.title)
+							.foregroundColor(.app.gray1)
+							.textStyle(.sheetTitle)
 
-				Spacer()
+						Text(subtitleText(with: viewStore))
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Regular)
 
-				VStack(spacing: .medium3) {
-					Text(viewStore.accountName)
-						.foregroundColor(.app.buttonTextBlack)
-						.textStyle(.secondaryHeader)
-						.multilineTextAlignment(.center)
-
-					HStack {
-						Text(viewStore.accountAddress.address)
-							.foregroundColor(.app.buttonTextBlackTransparent)
-							.textStyle(.body2Regular)
-
-						Image(asset: AssetResource.copy)
+						Text(L10n.CreateAccount.Completion.explanation)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Regular)
+							.multilineTextAlignment(.center)
 					}
+					.padding(.horizontal, .small1)
+
+					Spacer()
+
+					Button(L10n.CreateAccount.Completion.goToDestination(viewStore.destination.displayText)) {
+						viewStore.send(.goToDestination)
+					}
+					.buttonStyle(.primaryRectangular)
 				}
-				.frame(maxWidth: .infinity)
-				.padding(.large2)
-				.background(Color.app.gray3)
-				.cornerRadius(.small2)
-
-				Text(L10n.CreateAccount.Completion.explanation)
-					.foregroundColor(.app.gray1)
-					.textStyle(.body1Regular)
-					.textStyle(.sheetTitle)
-					.multilineTextAlignment(.center)
-					.padding(.horizontal, .medium1)
-
-				Spacer()
-
-				Button(L10n.CreateAccount.Completion.returnToOrigin(viewStore.origin.displayText)) {
-					/* TODO: implement */
-				}
-				.buttonStyle(.primaryRectangular)
+				.padding(.medium1)
 			}
-			.padding(.medium1)
 		}
 	}
+}
+
+private extension AccountCompletion.View {
+	func accountsStackView(with viewStore: AccountCompletionViewStore) -> some View {
+		ZStack {
+			VStack(spacing: .small2) {
+				Text(viewStore.accountName)
+					.foregroundColor(.app.white)
+					.textStyle(.body1Header)
+					.multilineTextAlignment(.center)
+
+				AddressView(viewStore.accountAddress)
+					.foregroundColor(.app.whiteTransparent)
+			}
+			.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
+			.background(viewStore.appearanceID.gradient)
+			.cornerRadius(.small1)
+			.padding(.horizontal, .medium1)
+			.zIndex(4)
+
+			Group {
+				ForEach(0 ..< Constants.transparentCardsCount, id: \.self) { index in
+					nextAppearanceId(from: viewStore.accountIndex + index).gradient.opacity(0.2)
+						.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
+						.cornerRadius(.small1)
+						.scaleEffect(scale(index: index))
+						.zIndex(reversedZIndex(count: Constants.transparentCardsCount, index: index))
+						.offset(y: Constants.transparentCardOffset * CGFloat(index))
+				}
+			}
+			.offset(y: Constants.transparentCardOffset)
+		}
+	}
+
+	func scale(index: Int) -> CGFloat {
+		1 - (CGFloat(index + 1) * 0.05)
+	}
+
+	func reversedZIndex(count: Int, index: Int) -> Double {
+		Double(count - index)
+	}
+
+	func nextAppearanceId(from accountIndex: OnNetwork.Account.Index) -> OnNetwork.Account.AppearanceID {
+		OnNetwork.Account.AppearanceID.fromIndex(accountIndex + 1)
+	}
+
+	enum Constants {
+		static let cardFrame: CGSize = .init(width: 277, height: 85)
+		static let transparentCardsCount: Int = 3
+		static let transparentCardOffset: CGFloat = .small1
+	}
+
+	func subtitleText(with viewStore: AccountCompletionViewStore) -> String {
+		if viewStore.isFirstAccount {
+			return L10n.CreateAccount.Completion.subtitleFirstAccount
+		} else {
+			return L10n.CreateAccount.Completion.subtitle
+		}
+	}
+}
+
+// TODO: dzoni delete me
+extension Color {
+	static var random: Color {
+		Color(
+			red: .random(in: 0 ... 1),
+			green: .random(in: 0 ... 1),
+			blue: .random(in: 0 ... 1)
+		)
+	}
+}
+
+// MARK: - AccountCompletion.View.AccountCompletionViewStore
+private extension AccountCompletion.View {
+	typealias AccountCompletionViewStore = ViewStore<AccountCompletion.View.ViewState, AccountCompletion.Action.ViewAction>
 }
 
 // MARK: - AccountCompletion.View.ViewState
@@ -80,13 +141,19 @@ extension AccountCompletion.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		let accountName: String
-		let accountAddress: Address
-		let origin: AccountCompletion.State.Origin
+		let accountAddress: AddressView.ViewState
+		let accountIndex: Int
+		let destination: AccountCompletion.State.Destination
+		let appearanceID: OnNetwork.Account.AppearanceID
+		let isFirstAccount: Bool
 
 		init(state: AccountCompletion.State) {
 			accountName = state.accountName
-			accountAddress = state.accountAddress
-			origin = state.origin
+			accountAddress = .init(address: state.accountAddress.address, format: .short())
+			accountIndex = state.accountIndex
+			destination = state.destination
+			appearanceID = state.account.appearanceID
+			isFirstAccount = state.isFirstAccount
 		}
 	}
 }
