@@ -31,13 +31,14 @@
 		839D88E1294B576C0098B586 /* iOS-release-opt.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "iOS-release-opt.xcconfig"; sourceTree = "<group>"; };
 		839D88E5294B6B880098B586 /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
 		839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "macOS-shared.xcconfig"; sourceTree = "<group>"; };
+		839D88E8294B7A270098B586 /* App */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = App; sourceTree = "<group>"; };
+		839D88E9294B7A620098B586 /* Radix-Wallet--macOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--macOS--Info.plist"; sourceTree = "<group>"; };
 		D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E667FFD128F6F7E50015544F /* Babylon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Babylon; path = ..; sourceTree = "<group>"; };
 		E6805BBD286DB3EC00861180 /* WalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApp.swift; sourceTree = "<group>"; };
 		E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6805BCC286DB3ED00861180 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
-		E6FD0074290C599300B9A340 /* BabylonWallet--macOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "BabylonWallet--macOS--Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,8 +110,9 @@
 			isa = PBXGroup;
 			children = (
 				839D88D2294B34040098B586 /* Config */,
-				E6FD0074290C599300B9A340 /* BabylonWallet--macOS--Info.plist */,
 				839D88E5294B6B880098B586 /* Radix-Wallet--iOS--Info.plist */,
+				839D88E9294B7A620098B586 /* Radix-Wallet--macOS--Info.plist */,
+				839D88E8294B7A270098B586 /* App */,
 				E6805BDB286DB44400861180 /* Packages */,
 				E6805BBC286DB3EC00861180 /* Shared */,
 				E6805BCB286DB3ED00861180 /* macOS */,
@@ -309,19 +311,8 @@
 		};
 		83DEEED82949CA5A003557D7 /* Dev */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = "BabylonWallet--macOS--Info.plist";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				SDKROOT = macosx;
 			};
 			name = Dev;
 		};
@@ -341,19 +332,8 @@
 		};
 		83E1AEDD2949BB4B00D74788 /* Beta */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = "BabylonWallet--macOS--Info.plist";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				SDKROOT = macosx;
 			};
 			name = Beta;
 		};
@@ -373,19 +353,8 @@
 		};
 		83F41365294B185300EE5EBC /* Alpha */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = "BabylonWallet--macOS--Info.plist";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				SDKROOT = macosx;
 			};
 			name = Alpha;
 		};
@@ -405,19 +374,8 @@
 		};
 		E6805BDA286DB3ED00861180 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_HARDENED_RUNTIME = YES;
-				INFOPLIST_FILE = "BabylonWallet--macOS--Info.plist";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				SDKROOT = macosx;
 			};
 			name = Release;
 		};

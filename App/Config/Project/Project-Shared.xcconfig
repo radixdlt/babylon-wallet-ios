@@ -5,10 +5,11 @@
 APP_ICON = AppIcon
 APP_NAME = Radix Wallet
 APP_BUNDLE_ID = works.rdx.e2e.babylon
+DEV_TEAM = 7SPGKHD4HZ
 
 // MARK: - System flags
 
-CURRENT_PROJECT_VERSION = 1
+CURRENT_PROJECT_VERSION = 0
 
 // Always Search User Paths (Deprecated)
 //
@@ -310,15 +311,6 @@ DEAD_CODE_STRIPPING = YES
 
 
 
-// Development Team
-//
-// The team ID of a development team to use for signing certificates and provisioning
-// profiles.
-
-DEVELOPMENT_TEAM = 7SPGKHD4HZ
-
-
-
 // Enable Strict Checking of objc_msgSend Calls
 //
 // Controls whether `objc_msgSend` calls must be cast to the appropriate function pointer
@@ -500,16 +492,6 @@ IPHONEOS_DEPLOYMENT_TARGET = 15.0
 
 
 
-// macOS Deployment Target
-//
-// Code will load on this and later versions of macOS. Framework APIs that are
-// unavailable in earlier versions will be weak-linked; your code should check for `null`
-// function pointers or specific system versions before calling newer APIs.
-
-MACOSX_DEPLOYMENT_TARGET = 12.0
-
-
-
 // Marketing Version
 //
 // This setting defines the user-visible version of the project. The value corresponds to
@@ -569,4 +551,13 @@ GENERATE_INFOPLIST_FILE = YES
 // When enabled, the Swift compiler will be used to extract Swift string literal
 // and interpolation LocalizedStringKey and LocalizationKey types during localization export.
 SWIFT_EMIT_LOC_STRINGS = YES
+
+
+// User Interface Style
+//
+// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
+// [UIUserInterfaceStyle](https://developer.apple.com/documentation/bundleresources/information_property_list/uiuserinterfacestyle)
+// key in the Info.plist file to the value of this build setting.
+
+INFOPLIST_KEY_UIUserInterfaceStyle = Light
 

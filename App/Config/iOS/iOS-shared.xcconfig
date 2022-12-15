@@ -74,16 +74,6 @@ INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLand
 
 
 
-// User Interface Style
-//
-// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
-// [UIUserInterfaceStyle](https://developer.apple.com/documentation/bundleresources/information_property_list/uiuserinterfacestyle)
-// key in the Info.plist file to the value of this build setting.
-
-INFOPLIST_KEY_UIUserInterfaceStyle = Light
-
-
-
 // Runpath Search Paths
 //
 // This is a list of paths to be added to the `runpath` search path list for the image
