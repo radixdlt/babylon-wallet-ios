@@ -26,57 +26,31 @@ final class CreateAccountFeatureTests: TestCase {
 		await store.receive(.delegate(.dismissCreateAccount))
 	}
 
-	func test_textFieldDidChange_whenUserEntersValidAccountName_thenUpdateState() async {
+	func test_textFieldDidChange_whenUserEntersAccountName_thenUpdateState() async {
 		// given
 		let initialState = CreateAccount.State(
 			shouldCreateProfile: false,
-			accountName: "",
-			isValid: false,
+			inputtedAccountName: "",
 			focusedField: nil
 		)
 		let store = TestStore(
 			initialState: initialState,
 			reducer: CreateAccount()
-				.dependency(\.accountNameValidator, .liveValue)
 		)
-		let accountName = "My account"
+		let inputtedAccountName = "My account"
 
 		// when
-		await store.send(.internal(.view(.textFieldChanged(accountName)))) {
+		await store.send(.internal(.view(.textFieldChanged(inputtedAccountName)))) {
 			// then
-			$0.isValid = true
-			$0.accountName = accountName
+			$0.inputtedAccountName = inputtedAccountName
 		}
-	}
-
-	func test_textFieldDidChange_whenUserEntersTooLongAccountName_thenDoNothing() async {
-		// given
-		var accountName = "My account dummy nam" // character count == 20
-		let initialState = CreateAccount.State(
-			shouldCreateProfile: false,
-			accountName: accountName,
-			isValid: true,
-			focusedField: .accountName
-		)
-		let store = TestStore(
-			initialState: initialState,
-			reducer: CreateAccount()
-				.dependency(\.accountNameValidator, .liveValue)
-		)
-		accountName = "My account very long dummy name" // character count == 31, over the limit
-
-		// when
-		await store.send(.internal(.view(.textFieldChanged(accountName))))
-		// then
-		// no state change occured
 	}
 
 	func test_viewDidAppear_whenViewAppears_thenFocusOnTextFieldAfterDelay() async {
 		// given
 		let initialState = CreateAccount.State(
 			shouldCreateProfile: false,
-			accountName: "",
-			isValid: false,
+			inputtedAccountName: "",
 			focusedField: nil
 		)
 		let store = TestStore(
@@ -117,7 +91,7 @@ final class CreateAccountFeatureTests: TestCase {
 		}
 
 		let store = TestStore(
-			initialState: CreateAccount.State(shouldCreateProfile: true, isValid: true),
+			initialState: CreateAccount.State(shouldCreateProfile: true),
 			reducer: CreateAccount()
 		)
 		store.dependencies.profileClient.createNewProfile = { req in

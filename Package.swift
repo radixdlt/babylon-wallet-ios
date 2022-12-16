@@ -40,6 +40,7 @@ package.dependencies += [
 	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
 	.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1"),
 	.package(url: "https://github.com/kean/Nuke", from: "11.3.1"),
+	.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4"),
 
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
@@ -878,6 +879,7 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
+			.product(name: "Introspect", package: "SwiftUI-Introspect"),
 			.product(name: "NukeUI", package: "Nuke"),
 			"Resources",
 			.product(name: "SwiftUIPullToRefresh", package: "swiftui-pull-to-refresh", condition: .when(platforms: [.iOS])),
