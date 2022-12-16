@@ -85,8 +85,7 @@ public struct App: Sendable, ReducerProtocol {
 			if createdNewProfile {
 				return .run { send in
 					let accounts = try await profileClient.getAccounts()
-					guard let firstAccount = accounts.first else { return }
-					await send(.child(.onboarding(.createAccount(.delegate(.displayCreateAccountCompletion(firstAccount, isFirstAccount: true, destination: .home))))))
+					await send(.child(.onboarding(.createAccount(.delegate(.displayCreateAccountCompletion(accounts.first, isFirstAccount: true, destination: .home))))))
 				}
 			} else {
 				goToMain(state: &state)

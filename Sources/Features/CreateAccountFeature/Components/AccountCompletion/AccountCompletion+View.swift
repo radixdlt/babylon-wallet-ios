@@ -120,17 +120,6 @@ private extension AccountCompletion.View {
 	}
 }
 
-// TODO: dzoni delete me
-extension Color {
-	static var random: Color {
-		Color(
-			red: .random(in: 0 ... 1),
-			green: .random(in: 0 ... 1),
-			blue: .random(in: 0 ... 1)
-		)
-	}
-}
-
 // MARK: - AccountCompletion.View.AccountCompletionViewStore
 private extension AccountCompletion.View {
 	typealias AccountCompletionViewStore = ViewStore<AccountCompletion.View.ViewState, AccountCompletion.Action.ViewAction>
