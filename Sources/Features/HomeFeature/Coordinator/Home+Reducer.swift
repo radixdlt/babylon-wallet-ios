@@ -135,6 +135,7 @@ public struct Home: ReducerProtocol {
 				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
 				state.accountDetails?.assets = .init(
+					type: details.assets.type,
 					fungibleTokenList: .init(
 						sections: .init(uniqueElements: categories.map { category in
 							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }

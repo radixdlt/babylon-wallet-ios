@@ -110,7 +110,6 @@ private extension NonFungibleTokenList.Row.View {
 	func headerView(with viewStore: ViewStore, index: Int) -> some View {
 		Header(
 			name: viewStore.container.name ?? "",
-			supply: viewStore.container.symbol ?? "",
 			iconAsset: headerIconAsset,
 			isExpanded: viewStore.isExpanded
 		)

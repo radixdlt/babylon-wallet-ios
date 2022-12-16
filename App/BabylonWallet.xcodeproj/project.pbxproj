@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		83B9D894294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
+		83B9D895294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
 		D5B1769F29267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
 		D5B176A029267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
 		E667FFD328F6F7ED0015544F /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E667FFD228F6F7ED0015544F /* AppFeature */; };
@@ -16,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		83B9D896294CAEBA00C4582D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E667FFD128F6F7E50015544F /* Babylon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Babylon; path = ..; sourceTree = "<group>"; };
 		E6805BBD286DB3EC00861180 /* WalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApp.swift; sourceTree = "<group>"; };
@@ -51,6 +54,7 @@
 			children = (
 				E6FD0074290C599300B9A340 /* BabylonWallet--macOS--Info.plist */,
 				E6FD0073290C598700B9A340 /* BabylonWallet--iOS--Info.plist */,
+				83B9D897294CAEBA00C4582D /* InfoPlist.strings */,
 				E6805BDB286DB44400861180 /* Packages */,
 				E6805BBC286DB3EC00861180 /* Shared */,
 				E6805BCB286DB3ED00861180 /* macOS */,
@@ -189,6 +193,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5B1769F29267C1F00AAE13B /* AppIcon.xcassets in Resources */,
+				83B9D894294CAEBA00C4582D /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,6 +202,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5B176A029267C1F00AAE13B /* AppIcon.xcassets in Resources */,
+				83B9D895294CAEBA00C4582D /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,6 +237,17 @@
 			productRef = E6A17E56292FB01500D40EDB /* AppFeature */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		83B9D897294CAEBA00C4582D /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				83B9D896294CAEBA00C4582D /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		E6805BD3286DB3ED00861180 /* Debug */ = {
@@ -269,7 +286,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 7SPGKHD4HZ;
+				DEVELOPMENT_TEAM = MDH99V28LM;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -288,14 +305,9 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR Code to connect to browser extension";
-				INFOPLIST_KEY_NSDesktopFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
-				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
-				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Access Babylon Wallet Secrets";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.0.11;
+				MARKETING_VERSION = 0.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -339,11 +351,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: RADIX DLT LIMITED (7SPGKHD4HZ)";
+				CODE_SIGN_IDENTITY = "Apple Distribution";
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 7SPGKHD4HZ;
+				DEVELOPMENT_TEAM = MDH99V28LM;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -356,14 +368,9 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Scan QR Code to connect to browser extension";
-				INFOPLIST_KEY_NSDesktopFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
-				INFOPLIST_KEY_NSDocumentsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
-				INFOPLIST_KEY_NSDownloadsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE;
-				INFOPLIST_KEY_NSFaceIDUsageDescription = "Access Babylon Wallet Secrets";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.0.11;
+				MARKETING_VERSION = 0.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRIVACY_ACCESS_BABYLON_PROFILE = "Import Babylon Profile file";
@@ -379,13 +386,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 14;
-				DEVELOPMENT_TEAM = 7SPGKHD4HZ;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7SPGKHD4HZ;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = MDH99V28LM;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "BabylonWallet--iOS--Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet Preview";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -397,10 +407,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.11;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.radixwallet.ios.beta;
 				PRODUCT_NAME = BabylonWallet;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development works.rdx.e2e.babylon";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.radixpublishing.radixwallet.ios.beta";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -414,13 +425,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 14;
-				DEVELOPMENT_TEAM = 7SPGKHD4HZ;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 7SPGKHD4HZ;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = MDH99V28LM;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "BabylonWallet--iOS--Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet Preview";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -432,10 +446,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.0.11;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.radixwallet.ios.beta;
 				PRODUCT_NAME = BabylonWallet;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore works.rdx.e2e.babylon";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.radixpublishing.radixwallet.ios.beta";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -451,17 +466,19 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 7SPGKHD4HZ;
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = 7SPGKHD4HZ;
+				DEVELOPMENT_TEAM = MDH99V28LM;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = MDH99V28LM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "BabylonWallet--macOS--Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -469,10 +486,11 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.0.11;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.radixwallet.macos.dev;
 				PRODUCT_NAME = BabylonWallet;
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match Development works.rdx.e2e.babylon macos";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match Development com.radixpublishing.radixwallet.macos.dev macos";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -485,17 +503,20 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 14;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 7SPGKHD4HZ;
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = "";
+				DEVELOPMENT_TEAM = MDH99V28LM;
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = MDH99V28LM;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "BabylonWallet--macOS--Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -503,9 +524,11 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.0.11;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.radixwallet.macos.dev;
 				PRODUCT_NAME = BabylonWallet;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match Development com.radixpublishing.radixwallet.macos.dev macos";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
