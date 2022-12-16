@@ -25,6 +25,7 @@ public struct NonFungibleTokenContainer: Identifiable, Equatable {
 	public var id: ID { resourceAddress }
 
 	public let name: String?
+	public let description: String?
 	public let symbol: String?
 	public let iconURL: URL?
 
