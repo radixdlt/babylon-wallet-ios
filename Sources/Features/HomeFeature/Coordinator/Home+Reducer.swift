@@ -220,7 +220,12 @@ public struct Home: ReducerProtocol {
 			state.createAccount = nil
 			return .none
 
-		case .child(.createAccount(.delegate(.createdNewAccount))):
+		case let .child(.createAccount(.delegate(.createdNewAccount(account)))):
+			return .run { send in
+				await send(.child(.createAccount(.delegate(.displayCreateAccountCompletion(account, isFirstAccount: false, destination: .home)))))
+			}
+
+		case .child(.createAccount(.child(.accountCompletion(.delegate(.displayHome))))):
 			state.createAccount = nil
 			return loadAccountsAndSettings()
 
