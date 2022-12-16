@@ -22,6 +22,7 @@ public extension AccountDetails.Action {
 // MARK: - AccountDetails.Action.ViewAction
 public extension AccountDetails.Action {
 	enum ViewAction: Equatable {
+		case appeared
 		case dismissAccountDetailsButtonTapped
 		case displayAccountPreferencesButtonTapped
 		case copyAddressButtonTapped

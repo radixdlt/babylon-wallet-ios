@@ -4,5 +4,10 @@
 <dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_bonjour._tcp</string>
+		<string>_lnp._tcp.</string>
+	</array>
 </dict>
 </plist>

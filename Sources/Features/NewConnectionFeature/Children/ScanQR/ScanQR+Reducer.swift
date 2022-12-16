@@ -6,14 +6,13 @@ import ErrorQueue
 // MARK: - ScanQR
 public struct ScanQR: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
+
 	public init() {}
 }
 
 public extension ScanQR {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.view(.appeared)):
-			return .none
 		#if os(macOS)
 		case let .internal(.view(.macInputConnectionPasswordChanged(connectionPassword))):
 			state.connectionPassword = connectionPassword

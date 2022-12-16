@@ -39,7 +39,6 @@ public extension DependencyValues {
 
 // MARK: - CreateAccount
 public struct CreateAccount: Sendable, ReducerProtocol {
-	@Dependency(\.accountNameValidator) var accountNameValidator
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mnemonicGenerator) var mnemonicGenerator
@@ -53,7 +52,6 @@ public extension CreateAccount {
 	func reduce(into state: inout State, action: Action) -> ComposableArchitecture.Effect<Action, Never> {
 		switch action {
 		case .internal(.view(.createAccountButtonTapped)):
-			precondition(state.isValid)
 			precondition(!state.isCreatingAccount)
 			state.isCreatingAccount = true
 
@@ -67,7 +65,7 @@ public extension CreateAccount {
 				}
 			}
 		case .internal(.system(.createAccount)):
-			return .run { [accountName = state.accountName.trimmed(), overridingNetworkID = state.onNetworkWithID] send in
+			return .run { [accountName = state.sanitizedAccountName, overridingNetworkID = state.onNetworkWithID] send in
 				await send(.internal(.system(.createdNewAccountResult(
 					TaskResult {
 						let request = CreateAccountRequest(
@@ -83,7 +81,7 @@ public extension CreateAccount {
 			}
 
 		case .internal(.system(.createProfile)):
-			return .run { [nameOfFirstAccount = state.accountName] send in
+			return .run { [nameOfFirstAccount = state.sanitizedAccountName] send in
 
 				await send(.internal(.system(.createdNewProfileResult(
 					// FIXME: - mainnet: extract into ProfileCreator client?
@@ -146,11 +144,7 @@ public extension CreateAccount {
 			}
 
 		case let .internal(.view(.textFieldChanged(accountName))):
-			let result = accountNameValidator.validate(accountName)
-			if !accountNameValidator.isCharacterCountOverLimit(result.trimmedName) {
-				state.isValid = result.isValid
-				state.accountName = accountName
-			}
+			state.inputtedAccountName = accountName
 			return .none
 
 		case let .internal(.view(.textFieldFocused(focus))):

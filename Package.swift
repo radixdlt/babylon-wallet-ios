@@ -18,8 +18,8 @@ package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.2.1"),
-	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.9"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.54"),
+	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.10"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.0.55"),
 
 	// ~~~ THIRD PARTY ~~~
 	// APPLE
@@ -40,6 +40,7 @@ package.dependencies += [
 	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
 	.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1"),
 	.package(url: "https://github.com/kean/Nuke", from: "11.3.1"),
+	.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4"),
 
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
@@ -368,6 +369,7 @@ package.addModules([
 		name: "FungibleTokenDetailsFeature",
 		dependencies: [
 			"DesignSystem",
+			"PasteboardClient",
 			"SharedModels",
 			tca,
 		],
@@ -534,10 +536,13 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
+			"P2PConnectivityClient",
 			"SharedModels",
 			tca,
-		], tests: .yes(
-			dependencies: ["TestUtils"])
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
 	.feature(
 		name: "NonFungibleTokenListFeature",
@@ -596,6 +601,7 @@ package.addModules([
 			"DesignSystem",
 			"ErrorQueue",
 			"LocalAuthenticationClient",
+			"PlatformEnvironmentClient",
 			"ProfileClient",
 			"ProfileLoader",
 			tca,
@@ -636,6 +642,7 @@ package.addModules([
 			"Asset",
 			bigInt,
 			"Common",
+			engineToolkit,
 			"GatewayAPI",
 			profile,
 			dependencies,
@@ -772,6 +779,11 @@ package.addModules([
 		)
 	),
 	.client(
+		name: "PlatformEnvironmentClient",
+		dependencies: [dependencies],
+		tests: .no
+	),
+	.client(
 		name: "ProfileClient",
 		dependencies: [
 			dependencies, // XCTestDynamicOverlay + DependencyKey
@@ -867,6 +879,7 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
+			.product(name: "Introspect", package: "SwiftUI-Introspect"),
 			.product(name: "NukeUI", package: "Nuke"),
 			"Resources",
 			.product(name: "SwiftUIPullToRefresh", package: "swiftui-pull-to-refresh", condition: .when(platforms: [.iOS])),

@@ -30,8 +30,7 @@ public struct AppTextField<Value: Hashable>: View {
 		VStack(alignment: .leading, spacing: .small2) {
 			TextField(
 				placeholder,
-				text: text
-					.removeDuplicates()
+				text: text.removeDuplicates()
 			)
 			.focused(binding, equals: equals)
 			.bind(first, to: binding)

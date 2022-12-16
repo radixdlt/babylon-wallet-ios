@@ -173,6 +173,13 @@ public extension GatewayAPIClient {
 				try await post(
 					request: GatewayAPI.EntityDetailsRequest(address: resourceAddress)
 				) { $0.appendingPathComponent("entity/details") }
+			}, getNonFungibleIds: { accountAddress, resourceAddress in
+				try await post(
+					request: GatewayAPI.EntityNonFungibleIdsRequestAllOf(
+						address: accountAddress.address,
+						resourceAddress: resourceAddress
+					)
+				) { $0.appendingPathComponent("entity/non-fungible/ids") }
 			},
 			submitTransaction: { transactionSubmitRequest in
 				try await post(

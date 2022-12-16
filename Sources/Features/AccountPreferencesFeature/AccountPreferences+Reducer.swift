@@ -13,7 +13,8 @@ public struct AccountPreferences: ReducerProtocol {
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
+			return .run { [address = state.address] send in
+				await send(.delegate(.refreshAccount(address)))
 				await send(.delegate(.dismissAccountPreferences))
 			}
 

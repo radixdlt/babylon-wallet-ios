@@ -46,12 +46,14 @@ public extension CreateAccount.View {
 						VStack(spacing: .large1) {
 							subtitle
 
+							let accountNameBinding = viewStore.binding(
+								get: \.accountName,
+								send: { .textFieldChanged($0) }
+							)
+
 							AppTextField(
 								placeholder: L10n.CreateAccount.placeholder,
-								text: viewStore.binding(
-									get: \.accountName,
-									send: { .textFieldChanged($0) }
-								),
+								text: accountNameBinding,
 								hint: L10n.CreateAccount.explanation,
 								binding: $focusedField,
 								equals: .accountName,
@@ -60,6 +62,10 @@ public extension CreateAccount.View {
 									send: { .textFieldFocused($0) }
 								)
 							)
+							#if os(iOS)
+							.textFieldCharacterLimit(30, forText: accountNameBinding)
+							#endif
+							.autocorrectionDisabled()
 						}
 
 						Spacer(minLength: .small2)
@@ -72,7 +78,7 @@ public extension CreateAccount.View {
 							viewStore.send(.createAccountButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
-						.enabled(viewStore.isCreateAccountButtonEnabled)
+						.controlState(viewStore.createAccountButtonState)
 					}
 					.padding([.horizontal, .bottom], .medium1)
 				}
@@ -91,15 +97,16 @@ extension CreateAccount.View {
 		public var numberOfExistingAccounts: Int
 		public var accountName: String
 		public var isLoaderVisible: Bool
-		public var isCreateAccountButtonEnabled: Bool
+		public var createAccountButtonState: ControlState
 		public var isDismissButtonVisible: Bool
 		@BindableState public var focusedField: CreateAccount.State.Field?
 
 		init(state: CreateAccount.State) {
 			numberOfExistingAccounts = state.numberOfExistingAccounts
-			accountName = state.accountName
+			accountName = state.inputtedAccountName
 			isLoaderVisible = state.isCreatingAccount
-			isCreateAccountButtonEnabled = state.isValid && !state.isCreatingAccount
+			let isNameValid = !state.sanitizedAccountName.isEmpty
+			createAccountButtonState = (isNameValid && !state.isCreatingAccount) ? .enabled : .disabled
 			isDismissButtonVisible = !state.shouldCreateProfile
 			focusedField = state.focusedField
 		}

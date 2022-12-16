@@ -36,8 +36,8 @@ public extension AccountDetails {
 				),
 
 				nonFungibleTokenList: .init(
-					rows: .init(uniqueElements: [account.portfolio.nonFungibleTokenContainers.elements].map {
-						.init(containers: $0)
+					rows: .init(uniqueElements: account.portfolio.nonFungibleTokenContainers.elements.map {
+						.init(container: $0)
 					})
 				)
 			)

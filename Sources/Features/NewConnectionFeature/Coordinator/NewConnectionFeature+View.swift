@@ -37,13 +37,18 @@ public extension NewConnection.View {
 					ForceFullScreen {
 						SwitchStore(store) {
 							CaseLet(
+								state: /NewConnection.State.localNetworkAuthorization,
+								action: { NewConnection.Action.child(.localNetworkAuthorization($0)) },
+								then: { LocalNetworkAuthorization.View(store: $0) }
+							)
+							CaseLet(
 								state: /NewConnection.State.scanQR,
-								action: { NewConnection.Action.scanQR($0) },
+								action: { NewConnection.Action.child(.scanQR($0)) },
 								then: { ScanQR.View(store: $0) }
 							)
 							CaseLet(
 								state: /NewConnection.State.connectUsingSecrets,
-								action: { NewConnection.Action.connectUsingSecrets($0) },
+								action: { NewConnection.Action.child(.connectUsingSecrets($0)) },
 								then: { ConnectUsingSecrets.View(store: $0) }
 							)
 						}

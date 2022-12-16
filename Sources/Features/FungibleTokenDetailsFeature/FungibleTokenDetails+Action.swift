@@ -13,6 +13,7 @@ public extension FungibleTokenDetails {
 public extension FungibleTokenDetails.Action {
 	enum ViewAction: Equatable {
 		case closeButtonTapped
+		case copyAddressButtonTapped
 	}
 }
 

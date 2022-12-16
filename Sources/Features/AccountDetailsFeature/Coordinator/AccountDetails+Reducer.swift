@@ -11,6 +11,10 @@ public struct AccountDetails: ReducerProtocol {
 
 		Reduce { state, action in
 			switch action {
+			case .internal(.view(.appeared)):
+				return .run { [address = state.address] send in
+					await send(.delegate(.refresh(address)))
+				}
 			case .internal(.view(.dismissAccountDetailsButtonTapped)):
 				return .run { send in
 					await send(.delegate(.dismissAccountDetails))

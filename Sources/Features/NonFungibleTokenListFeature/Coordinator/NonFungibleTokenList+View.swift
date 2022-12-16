@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import DesignSystem
 import SwiftUI
 
 // MARK: - NonFungibleTokenList.View
@@ -22,7 +23,7 @@ public extension NonFungibleTokenList.View {
 			store.actionless,
 			observe: ViewState.init(state:)
 		) { _ in
-			VStack(spacing: 25) {
+			VStack(spacing: .medium1) {
 				ForEachStore(
 					store.scope(
 						state: \.rows,
