@@ -4,7 +4,6 @@ import SwiftUI
 // MARK: - Header
 struct Header: View {
 	let name: String
-	let supply: String
 	let iconAsset: ImageAsset
 	let isExpanded: Bool
 
@@ -17,9 +16,9 @@ struct Header: View {
 				Text(name)
 					.foregroundColor(.app.gray1)
 					.textStyle(.secondaryHeader)
-				Text(supply)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2HighImportance)
+//				Text(supply)
+//					.foregroundColor(.app.gray2)
+//					.textStyle(.body2HighImportance)
 			}
 
 			Spacer()

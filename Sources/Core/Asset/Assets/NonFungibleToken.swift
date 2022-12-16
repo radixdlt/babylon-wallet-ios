@@ -26,7 +26,6 @@ public struct NonFungibleTokenContainer: Identifiable, Equatable {
 
 	public let name: String?
 	public let description: String?
-	public let symbol: String?
 	public let iconURL: URL?
 
 	public init(
@@ -34,14 +33,14 @@ public struct NonFungibleTokenContainer: Identifiable, Equatable {
 		resourceAddress: ComponentAddress,
 		assets: [NonFungibleToken],
 		name: String?,
-		symbol: String?,
-		iconURL: URL? = nil
+		description: String?,
+		iconURL: URL?
 	) {
 		self.owner = owner
 		self.resourceAddress = resourceAddress
 		self.assets = assets
 		self.name = name
-		self.symbol = symbol
+		self.description = description
 		self.iconURL = iconURL
 	}
 }
@@ -53,7 +52,8 @@ public extension NonFungibleTokenContainer {
 		resourceAddress: .init(address: "resource-address-1"),
 		assets: [.mock1, .mock2, .mock3],
 		name: "Name",
-		symbol: "Symbol"
+		description: nil,
+		iconURL: nil
 	)
 
 	static let mock2 = Self(
@@ -61,7 +61,8 @@ public extension NonFungibleTokenContainer {
 		resourceAddress: .init(address: "resource-address-2"),
 		assets: [.mock1, .mock2, .mock3],
 		name: "Name",
-		symbol: "Symbol"
+		description: nil,
+		iconURL: nil
 	)
 
 	static let mock3 = Self(
@@ -69,7 +70,8 @@ public extension NonFungibleTokenContainer {
 		resourceAddress: .init(address: "resource-address-3"),
 		assets: [.mock1, .mock2, .mock3],
 		name: "Name",
-		symbol: "Symbol"
+		description: nil,
+		iconURL: nil
 	)
 }
 
