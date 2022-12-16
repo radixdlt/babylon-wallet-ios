@@ -24,6 +24,15 @@ public extension CreateAccount.View {
 			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
+				IfLetStore(
+					store.scope(
+						state: \.accountCompletion,
+						action: { .child(.accountCompletion($0)) }
+					),
+					then: AccountCompletion.View.init(store:)
+				)
+				.zIndex(2)
+
 				VStack(spacing: .zero) {
 					if viewStore.isDismissButtonVisible {
 						NavigationBar(
@@ -73,6 +82,8 @@ public extension CreateAccount.View {
 						if viewStore.isLoaderVisible {
 							ProgressView()
 						}
+
+						Spacer()
 
 						Button(L10n.CreateAccount.createAccountButtonTitle) {
 							viewStore.send(.createAccountButtonTapped)

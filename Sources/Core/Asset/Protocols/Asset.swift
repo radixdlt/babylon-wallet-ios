@@ -14,9 +14,13 @@ public extension Asset {
 // MARK: - AssetMetadata
 public enum AssetMetadata {
 	public enum Key: String, Sendable, Hashable {
-		case symbol
-		case description
-		case url
+		// common
 		case name
+		case description
+		case icon
+
+		// fungible-only
+		case url
+		case symbol
 	}
 }

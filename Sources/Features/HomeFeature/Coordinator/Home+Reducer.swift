@@ -135,6 +135,7 @@ public struct Home: ReducerProtocol {
 				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
 				state.accountDetails?.assets = .init(
+					type: details.assets.type,
 					fungibleTokenList: .init(
 						sections: .init(uniqueElements: categories.map { category in
 							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
@@ -219,7 +220,12 @@ public struct Home: ReducerProtocol {
 			state.createAccount = nil
 			return .none
 
-		case .child(.createAccount(.delegate(.createdNewAccount))):
+		case let .child(.createAccount(.delegate(.createdNewAccount(account)))):
+			return .run { send in
+				await send(.child(.createAccount(.delegate(.displayCreateAccountCompletion(account, isFirstAccount: false, destination: .home)))))
+			}
+
+		case .child(.createAccount(.child(.accountCompletion(.delegate(.displayHome))))):
 			state.createAccount = nil
 			return loadAccountsAndSettings()
 

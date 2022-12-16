@@ -10,7 +10,7 @@ public struct AddressView: View {
 	public init(
 		_ state: ViewState,
 		textStyle: TextStyle = .body2HighImportance,
-		copyAddressAction: (() -> Void)?
+		copyAddressAction: (() -> Void)? = nil
 	) {
 		self.state = state
 		self.textStyle = textStyle

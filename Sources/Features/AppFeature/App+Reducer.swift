@@ -57,12 +57,16 @@ public struct App: Sendable, ReducerProtocol {
 			return .none
 
 		case let .child(.onboarding(.createAccount(.delegate(.createdNewProfile(newProfile))))):
-			return injectProfileIntoProfileClient(newProfile)
+			return injectProfileIntoProfileClient(newProfile, createdNewProfile: true)
+
+		case .child(.onboarding(.createAccount(.child(.accountCompletion(.delegate(.displayHome)))))):
+			goToMain(state: &state)
+			return .none
 
 		case let .child(.splash(.delegate(.profileResultLoaded(profileResult)))):
 			switch profileResult {
 			case let .success(.some(profile)):
-				return injectProfileIntoProfileClient(profile)
+				return injectProfileIntoProfileClient(profile, createdNewProfile: false)
 			case .success(.none):
 				goToOnboarding(state: &state)
 				return .none
@@ -77,11 +81,18 @@ public struct App: Sendable, ReducerProtocol {
 				return incompatibleSnapshotData(version: version, state: &state)
 			}
 
-		case .internal(.system(.injectProfileIntoProfileClientResult(.success(_)))):
-			goToMain(state: &state)
-			return .none
+		case let .internal(.system(.injectProfileIntoProfileClientResult(.success(_), createdNewProfile: createdNewProfile))):
+			if createdNewProfile {
+				return .run { send in
+					let accounts = try await profileClient.getAccounts()
+					await send(.child(.onboarding(.createAccount(.delegate(.displayCreateAccountCompletion(accounts.first, isFirstAccount: true, destination: .home))))))
+				}
+			} else {
+				goToMain(state: &state)
+				return .none
+			}
 
-		case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))):
+		case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error), createdNewProfile: _))):
 			errorQueue.schedule(error)
 			return .none
 
@@ -103,13 +114,14 @@ public struct App: Sendable, ReducerProtocol {
 		}
 	}
 
-	func injectProfileIntoProfileClient(_ profile: Profile) -> EffectTask<Action> {
+	func injectProfileIntoProfileClient(_ profile: Profile, createdNewProfile: Bool) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.system(.injectProfileIntoProfileClientResult(
 				TaskResult {
 					try await profileClient.injectProfile(profile)
 					return profile
-				}
+				},
+				createdNewProfile: createdNewProfile
 			))))
 		}
 	}

@@ -29,7 +29,6 @@ public enum AssetResource {
 	public static let close = ImageAsset(name: "close")
 	public static let copy = ImageAsset(name: "copy")
 	public static let ellipsis = ImageAsset(name: "ellipsis")
-	public static let createAccountSafe = ImageAsset(name: "createAccount-safe")
 	public static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
 	public static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
 	public static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
