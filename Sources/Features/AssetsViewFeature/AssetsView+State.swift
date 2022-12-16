@@ -7,14 +7,16 @@ import NonFungibleTokenListFeature
 public extension AssetsView {
 	// MARK: State
 	struct State: Equatable {
-		public var type: AssetsViewType = .tokens
+		public var type: AssetsViewType
 		public var fungibleTokenList: FungibleTokenList.State
 		public var nonFungibleTokenList: NonFungibleTokenList.State
 
 		public init(
+			type: AssetsViewType = .tokens,
 			fungibleTokenList: FungibleTokenList.State,
 			nonFungibleTokenList: NonFungibleTokenList.State
 		) {
+			self.type = type
 			self.fungibleTokenList = fungibleTokenList
 			self.nonFungibleTokenList = nonFungibleTokenList
 		}
