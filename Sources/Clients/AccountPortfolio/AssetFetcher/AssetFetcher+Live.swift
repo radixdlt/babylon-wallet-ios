@@ -87,7 +87,8 @@ extension AccountPortfolio {
 				resourceAddress: .init(address: $0.address),
 				assets: [],
 				name: nil,
-				symbol: nil
+				description: nil,
+				iconURL: nil
 			)
 		}
 
@@ -137,7 +138,8 @@ extension NonFungibleTokenContainer {
 			resourceAddress: resourceAddress,
 			assets: assets,
 			name: dict[.name],
-			symbol: dict[.symbol]
+			description: dict[.description],
+			iconURL: dict[.icon].flatMap(URL.init(string:))
 		)
 	}
 
@@ -147,7 +149,8 @@ extension NonFungibleTokenContainer {
 			resourceAddress: resourceAddress,
 			assets: ids.map { NonFungibleToken(nonFungibleId: .string($0)) },
 			name: name,
-			symbol: symbol
+			description: description,
+			iconURL: iconURL
 		)
 	}
 }
