@@ -1,0 +1,14 @@
+// A message that tells the user why the app is requesting access to the device’s camera.
+NSCameraUsageDescription = "Scan QR Code to connect to browser extension";
+
+// A message that tells the user why the app needs access to the user’s Desktop folder.
+NSDesktopFolderUsageDescription = "Import Babylon Profile file";
+
+// A message that tells the user why the app needs access to the user’s Documents folder.
+NSDocumentsFolderUsageDescription = "Import Babylon Profile file";
+
+// A message that tells the user why the app needs access to the user’s Downloads folder.
+NSDownloadsFolderUsageDescription = "Import Babylon Profile file";
+
+// A message that tells the user why the app is requesting the ability to authenticate with Face ID.
+NSFaceIDUsageDescription = "Access Babylon Wallet Secrets";
