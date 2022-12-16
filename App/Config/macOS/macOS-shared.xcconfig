@@ -1,5 +1,12 @@
 // Shared macOS target config
 
+#include "../Common.xcconfig"
+// MARK: - Custom declarations
+
+iOS_APP_BUNDLE_ID = $(APP_BUNDLE_ID).macos
+
+// MARK: - System flags
+
 // macOS Deployment Target
 //
 // Code will load on this and later versions of macOS. Framework APIs that are
@@ -23,7 +30,7 @@ SDKROOT = macosx
 
 
 // The team ID of a development team to use for signing certificates and provisioning profiles.
-DEVELOPMENT_TEAM[sdk=macosx*] = 7SPGKHD4HZ
+DEVELOPMENT_TEAM[sdk=macosx*] = $(DEV_TEAM)
 
 
 

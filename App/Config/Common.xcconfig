@@ -1,0 +1,8 @@
+// MARK: - Custom flags
+
+APP_VERSION = 0.1.0
+
+APP_ICON = AppIcon
+APP_NAME = Radix Wallet
+APP_BUNDLE_ID = com.radixpublishing.radixwallet
+DEV_TEAM = MDH99V28LM

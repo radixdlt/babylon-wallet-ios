@@ -1,15 +1,18 @@
 // Shared Application config
 
-// MARK: - Custom flags
-
-APP_ICON = AppIcon
-APP_NAME = Radix Wallet
-APP_BUNDLE_ID = works.rdx.e2e.babylon
-DEV_TEAM = 7SPGKHD4HZ
+#include "../common.xcconfig"
 
 // MARK: - System flags
 
 CURRENT_PROJECT_VERSION = 0
+
+
+// Marketing Version
+//
+// This setting defines the user-visible version of the project. The value corresponds to
+// the `CFBundleShortVersionString` key in your app's Info.plist.
+
+MARKETING_VERSION = $(APP_VERSION)
 
 // Always Search User Paths (Deprecated)
 //
@@ -429,59 +432,6 @@ GCC_WARN_UNUSED_VARIABLE = YES
 INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.finance
 
 
-
-// Privacy - Camera Usage Description
-//
-// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
-// [NSCameraUsageDescription](https://developer.apple.com/documentation/bundleresources/information_property_list/nscamerausagedescription)
-// key in the Info.plist file to the value of this build setting.
-
-INFOPLIST_KEY_NSCameraUsageDescription = Scan QR Code to connect to browser extension
-
-
-
-PRIVACY_ACCESS_BABYLON_PROFILE = Import Babylon Profile file
-
-// Privacy - Desktop Folder Usage Description
-//
-// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
-// [NSDesktopFolderUsageDescription](https://developer.apple.com/documentation/bundleresources/information_property_list/nsdesktopfolderusagedescription)
-// key in the Info.plist file to the value of this build setting.
-
-INFOPLIST_KEY_NSDesktopFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE
-
-
-
-// Privacy - Documents Folder Usage Description
-//
-// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
-// [NSDocumentsFolderUsageDescription](https://developer.apple.com/documentation/bundleresources/information_property_list/nsdocumentsfolderusagedescription)
-// key in the Info.plist file to the value of this build setting.
-
-INFOPLIST_KEY_NSDocumentsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE
-
-
-
-// Privacy - Downloads Folder Usage Description
-//
-// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
-// [NSDownloadsFolderUsageDescription](https://developer.apple.com/documentation/bundleresources/information_property_list/nsdownloadsfolderusagedescription)
-// key in the Info.plist file to the value of this build setting.
-
-INFOPLIST_KEY_NSDownloadsFolderUsageDescription = $PRIVACY_ACCESS_BABYLON_PROFILE
-
-
-
-// Privacy - Face ID Usage Description
-//
-// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
-// [NSFaceIDUsageDescription](https://developer.apple.com/documentation/bundleresources/information_property_list/nsfaceidusagedescription)
-// key in the Info.plist file to the value of this build setting.
-
-INFOPLIST_KEY_NSFaceIDUsageDescription = Access Babylon Wallet Secrets
-
-
-
 // iOS Deployment Target
 //
 // Code will load on this and later versions of iOS. Framework APIs that are unavailable
@@ -489,15 +439,6 @@ INFOPLIST_KEY_NSFaceIDUsageDescription = Access Babylon Wallet Secrets
 // pointers or specific system versions before calling newer APIs.
 
 IPHONEOS_DEPLOYMENT_TARGET = 15.0
-
-
-
-// Marketing Version
-//
-// This setting defines the user-visible version of the project. The value corresponds to
-// the `CFBundleShortVersionString` key in your app's Info.plist.
-
-MARKETING_VERSION = 0.0.11
 
 
 

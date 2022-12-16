@@ -18,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		83357231294CC633007E0AB4 /* Common.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Common.xcconfig; sourceTree = "<group>"; };
 		839D88D3294B34140098B586 /* Project-Beta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Beta.xcconfig"; sourceTree = "<group>"; };
 		839D88D4294B34140098B586 /* Project-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Shared.xcconfig"; sourceTree = "<group>"; };
 		839D88D5294B34150098B586 /* Project-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Release.xcconfig"; sourceTree = "<group>"; };
@@ -33,7 +34,6 @@
 		839D88E1294B576C0098B586 /* iOS-release-opt.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "iOS-release-opt.xcconfig"; sourceTree = "<group>"; };
 		839D88E5294B6B880098B586 /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
 		839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "macOS-shared.xcconfig"; sourceTree = "<group>"; };
-		839D88E8294B7A270098B586 /* App */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = App; sourceTree = "<group>"; };
 		839D88E9294B7A620098B586 /* Radix-Wallet--macOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--macOS--Info.plist"; sourceTree = "<group>"; };
 		83B9D896294CAEBA00C4582D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
@@ -70,6 +70,7 @@
 				839D88E6294B6D8F0098B586 /* macOS */,
 				839D88DE294B53760098B586 /* iOS */,
 				839D88DD294B534B0098B586 /* Project */,
+				83357231294CC633007E0AB4 /* Common.xcconfig */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -115,7 +116,6 @@
 				839D88D2294B34040098B586 /* Config */,
 				839D88E5294B6B880098B586 /* Radix-Wallet--iOS--Info.plist */,
 				839D88E9294B7A620098B586 /* Radix-Wallet--macOS--Info.plist */,
-				839D88E8294B7A270098B586 /* App */,
 				83B9D897294CAEBA00C4582D /* InfoPlist.strings */,
 				E6805BDB286DB44400861180 /* Packages */,
 				E6805BBC286DB3EC00861180 /* Shared */,
@@ -382,7 +382,6 @@
 			};
 			name = Release;
 		};
-
 		E6805BD7286DB3ED00861180 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88DC294B50BD0098B586 /* iOS-release.xcconfig */;
@@ -390,7 +389,6 @@
 			};
 			name = Release;
 		};
-
 		E6805BDA286DB3ED00861180 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;

@@ -1,6 +1,10 @@
 // Shared iOS target config
 
-DEVELOPMENT_TEAM[sdk=iphoneos*] = 7SPGKHD4HZ
+#include "../Common.xcconfig"
+
+// MARK: - System flags
+
+DEVELOPMENT_TEAM[sdk=iphoneos*] = $(DEV_TEAM)
 
 // Base SDK
 //
