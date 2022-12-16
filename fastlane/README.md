@@ -47,6 +47,14 @@ Runs test
 
 
 
+### ios release_deploy
+
+```sh
+[bundle exec] fastlane ios release_deploy
+```
+
+
+
 ### ios deploy
 
 ```sh
@@ -54,14 +62,6 @@ Runs test
 ```
 
 
-
-### ios release_deploy
-
-```sh
-[bundle exec] fastlane ios release_deploy
-```
-
-Builds and deploys beta app to TestFlight
 
 ### ios install_certificates
 
