@@ -3,7 +3,8 @@ import Foundation
 // MARK: - AccountCompletion.Action
 public extension AccountCompletion {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
@@ -11,12 +12,14 @@ public extension AccountCompletion {
 
 // MARK: - AccountCompletion.Action.ViewAction
 public extension AccountCompletion.Action {
-	enum ViewAction: Equatable {}
+	enum ViewAction: Sendable, Equatable {
+		case goToDestination
+	}
 }
 
 // MARK: - AccountCompletion.Action.InternalAction
 public extension AccountCompletion.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -24,10 +27,13 @@ public extension AccountCompletion.Action {
 
 // MARK: - AccountCompletion.Action.InternalAction.SystemAction
 public extension AccountCompletion.Action.InternalAction {
-	enum SystemAction: Equatable {}
+	enum SystemAction: Sendable, Equatable {}
 }
 
 // MARK: - AccountCompletion.Action.DelegateAction
 public extension AccountCompletion.Action {
-	enum DelegateAction: Equatable {}
+	enum DelegateAction: Sendable, Equatable {
+		case displayHome
+		case displayChooseAccounts
+	}
 }

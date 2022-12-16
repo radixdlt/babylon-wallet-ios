@@ -86,7 +86,12 @@ public struct ChooseAccounts: ReducerProtocol {
 				state.createAccount = nil
 				return .none
 
-			case .child(.createAccount(.delegate(.createdNewAccount(_)))):
+			case let .child(.createAccount(.delegate(.createdNewAccount(account)))):
+				return .run { send in
+					await send(.child(.createAccount(.delegate(.displayCreateAccountCompletion(account, isFirstAccount: false, destination: .chooseAccounts)))))
+				}
+
+			case .child(.createAccount(.child(.accountCompletion(.delegate(.displayChooseAccounts))))):
 				state.createAccount = nil
 				return .run { send in
 					await send(.internal(.system(.loadAccountsResult(TaskResult {

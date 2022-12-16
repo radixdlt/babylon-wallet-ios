@@ -193,8 +193,13 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		}
 		store.exhaustivity = .off
 		await store.send(.createAccount(.delegate(.createdNewAccount(.placeholder0)))) {
-			$0.createAccount = nil
+			$0.createAccount = .init(onNetworkWithID: newNetworkAndGateway.network.id, shouldCreateProfile: false)
 		}
+
+		await store.receive(.createAccount(.delegate(.displayCreateAccountCompletion(.placeholder0, isFirstAccount: true, destination: .home))))
+
+		await store.send(.createAccount(.child(.accountCompletion(.delegate(.displayHome)))))
+
 		await store.receive(.internal(.system(.switchToResult(.success(newNetworkAndGateway)))))
 		await networkSwitchedTo.withValue {
 			XCTAssertEqual($0, newNetworkAndGateway)

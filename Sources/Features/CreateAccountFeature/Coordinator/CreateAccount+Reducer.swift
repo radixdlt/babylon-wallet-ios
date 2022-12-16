@@ -46,13 +46,24 @@ public struct CreateAccount: Sendable, ReducerProtocol {
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
+
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(self.core)
+			.ifLet(\.accountCompletion, action: /Action.child .. Action.ChildAction.accountCompletion) {
+				AccountCompletion()
+			}
+	}
 }
 
 public extension CreateAccount {
-	func reduce(into state: inout State, action: Action) -> ComposableArchitecture.Effect<Action, Never> {
+	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
+		case .child(.accountCompletion(_)):
+			return .none
+
 		case .internal(.view(.createAccountButtonTapped)):
 			precondition(!state.isCreatingAccount)
+			state.focusedField = nil
 			state.isCreatingAccount = true
 
 			if state.shouldCreateProfile {
@@ -64,6 +75,7 @@ public extension CreateAccount {
 					await send(.internal(.system(.createAccount)))
 				}
 			}
+
 		case .internal(.system(.createAccount)):
 			return .run { [accountName = state.sanitizedAccountName, overridingNetworkID = state.onNetworkWithID] send in
 				await send(.internal(.system(.createdNewAccountResult(
@@ -161,6 +173,14 @@ public extension CreateAccount {
 
 		case let .internal(.system(.focusTextField(focus))):
 			state.focusedField = focus
+			return .none
+
+		case let .delegate(.displayCreateAccountCompletion(account, isFirstAccount, destination)):
+			state.accountCompletion = .init(
+				account: account,
+				isFirstAccount: isFirstAccount,
+				destination: destination
+			)
 			return .none
 
 		case .delegate:
