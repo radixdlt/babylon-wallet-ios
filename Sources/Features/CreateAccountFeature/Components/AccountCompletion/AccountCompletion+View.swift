@@ -8,7 +8,7 @@ import SwiftUI
 public extension AccountCompletion {
 	@MainActor
 	struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
+		public typealias Store = ComposableArchitecture.StoreOf<AccountCompletion>
 		private let store: Store
 
 		public init(store: Store) {
