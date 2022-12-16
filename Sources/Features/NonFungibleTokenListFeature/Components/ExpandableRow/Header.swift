@@ -16,9 +16,6 @@ struct Header: View {
 				Text(name)
 					.foregroundColor(.app.gray1)
 					.textStyle(.secondaryHeader)
-//				Text(supply)
-//					.foregroundColor(.app.gray2)
-//					.textStyle(.body2HighImportance)
 			}
 
 			Spacer()
