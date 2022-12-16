@@ -17,14 +17,14 @@ public extension CreateAccount {
 			onNetworkWithID: NetworkID? = nil,
 			shouldCreateProfile: Bool,
 			numberOfExistingAccounts: Int = 0,
-			accountNameInput: String = "",
+			inputtedAccountName: String = "",
 			focusedField: Field? = nil,
 			isCreatingAccount: Bool = false
 		) {
 			self.onNetworkWithID = onNetworkWithID
 			self.shouldCreateProfile = shouldCreateProfile
 			self.numberOfExistingAccounts = numberOfExistingAccounts
-			self.inputtedAccountName = accountNameInput
+			self.inputtedAccountName = inputtedAccountName
 			self.focusedField = focusedField
 			self.isCreatingAccount = isCreatingAccount
 		}
