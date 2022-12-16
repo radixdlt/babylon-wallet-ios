@@ -1,7 +1,7 @@
 import Common
 import ComposableArchitecture
-import ConverseCommon
 import ErrorQueue
+import Models
 
 // MARK: - ScanQR
 public struct ScanQR: Sendable, ReducerProtocol {

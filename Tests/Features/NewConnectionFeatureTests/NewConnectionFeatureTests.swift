@@ -1,11 +1,17 @@
 import ComposableArchitecture
-import Converse
-import ConverseCommon
 import Foundation
 @testable import NewConnectionFeature
+import Peer
 import SharedModels
 import TestUtils
 
+public extension Peer {
+	static let noop: Peer = {
+		fatalError()
+	}()
+}
+
+// MARK: - NewConnectionTests
 @MainActor
 final class NewConnectionTests: TestCase {
 	// FIXME: failing for some reason
@@ -35,7 +41,7 @@ final class NewConnectionTests: TestCase {
 				displayName: "test",
 				connectionPassword: secrets.connectionPassword.data.data
 			),
-			connection: Connection.noop
+			peer: Peer.noop
 		)
 		await store.send(.child(.connectUsingSecrets(.delegate(.connected(
 			connectedClient
@@ -45,33 +51,39 @@ final class NewConnectionTests: TestCase {
 
 	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_saved_but_without_name() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let connection = Connection.noop
+		let peer = Peer.noop
 
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionSecrets: .placeholder, connectedConnection: connection)
+				ConnectUsingSecrets.State(connectionSecrets: .placeholder, connectedpeer: peer)
 			),
 			reducer: NewConnection()
 		)
 
 		await store.send(.internal(.view(.dismissButtonTapped)))
-		await store.receive(.delegate(.newConnection(.init(client: .init(displayName: "Unnamed", connectionPassword: secrets.connectionPassword.data.data), connection: connection))))
+		await store.receive(.delegate(.newConnection(.init(client: .init(displayName: "Unnamed", connectionPassword: secrets.connectionPassword.data.data), peer: peer))))
 	}
 
 	func test__GIVEN_new_connected_client__WHEN__user_confirms_name__THEN__connection_is_saved_with_that_name_trimmed() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let connection = Connection.noop
+		let peer = Peer.noop
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionSecrets: secrets, connectedConnection: connection)
+				ConnectUsingSecrets.State(connectionSecrets: secrets, connectedpeer: peer)
 			),
 			reducer: NewConnection()
 		)
 		let connectionName = "Foobar"
 		await store.send(.child(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + " "))))) {
-			$0 = .connectUsingSecrets(.init(connectionSecrets: secrets, connectedConnection: connection, nameOfConnection: connectionName + " ", isNameValid: true))
+			$0 = .connectUsingSecrets(.init(
+				connectionSecrets: secrets,
+				connectedpeer: peer,
+				nameOfConnection: connectionName + " ",
+				isNameValid: true
+			)
+			)
 		}
 		let testScheduler = DispatchQueue.test
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
@@ -82,7 +94,7 @@ final class NewConnectionTests: TestCase {
 				displayName: connectionName,
 				connectionPassword: secrets.connectionPassword.data.data
 			),
-			connection: connection
+			peer: peer
 		)
 
 		await store.receive(.child(.connectUsingSecrets(.internal(.view(.textFieldFocused(nil))))))

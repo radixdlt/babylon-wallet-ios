@@ -1,10 +1,9 @@
 import AsyncExtensions
-import Converse
-import ConverseCommon
 import Dependencies
 import Foundation
 import JSON
 import Network
+import Peer
 import ProfileClient
 import SharedModels
 
@@ -24,7 +23,7 @@ public extension P2PConnectivityClient {
 			}
 
 			func addConnection(_ connection: P2P.ConnectionForClient, connect: Bool, emitUpdate: Bool) {
-				let key = connection.connection.getConnectionID()
+				let key = connection.peer.connectionID
 				guard connections[key] == nil else {
 					return
 				}
@@ -37,7 +36,7 @@ public extension P2PConnectivityClient {
 				}
 
 				Task.detached { [p2pClients] in
-					try await connection.connection.establish()
+					try await connection.peer.connect()
 					if emitUpdate {
 						p2pClients.send(p2pClients.value + [.init(p2pClient: connection.client, connectionStatus: .connected)])
 					}
@@ -52,9 +51,7 @@ public extension P2PConnectivityClient {
 					return
 				}
 				if let removed = connections.removeValue(forKey: key) {
-					Task {
-						await removed.connection.close()
-					}
+					removed.peer.disconnect()
 				}
 				var value = p2pClients.value
 				value.removeAll(where: { $0.p2pClient.id == id })
@@ -64,11 +61,11 @@ public extension P2PConnectivityClient {
 			func getConnection(id: P2PClient.ID) -> P2P.ConnectionForClient? {
 				guard
 					let key = try? mapID(id),
-					let connection = connections[key]
+					let peer = connections[key]
 				else {
 					return nil
 				}
-				return connection
+				return peer
 			}
 		}
 
@@ -86,11 +83,11 @@ public extension P2PConnectivityClient {
 
 					let password = try ConnectionPassword(data: p2pClient.connectionPassword.data)
 					let secrets = try ConnectionSecrets.from(connectionPassword: password)
-					let connection = Connection.live(connectionSecrets: secrets)
+					let peer = Peer(connectionSecrets: secrets)
 
 					let connectedClient = P2P.ConnectionForClient(
 						client: p2pClient,
-						connection: connection
+						peer: peer
 					)
 
 					await connectionsHolder.addConnection(connectedClient, connect: true, emitUpdate: false)
@@ -113,18 +110,20 @@ public extension P2PConnectivityClient {
 				guard let connection = await connectionsHolder.getConnection(id: id) else {
 					return [P2P.ConnectionUpdate]().async.eraseToAnyAsyncSequence()
 				}
-				return connection.connection.connectionStatus().map { newStatus in
+				return connection.peer.connectionStatusPublisher.map { newStatus in
 					P2P.ConnectionUpdate(
 						connectionStatus: newStatus,
 						p2pClient: connection.client
 					)
-				}.eraseToAnyAsyncSequence()
+				}
+				.values
+				.eraseToAnyAsyncSequence()
 			},
 			getRequestsFromP2PClientAsyncSequence: { id in
 				guard let connection = await connectionsHolder.getConnection(id: id) else {
 					return [P2P.RequestFromClient]().async.eraseToAnyAsyncSequence()
 				}
-				return await connection.connection.receive().map { msg in
+				return connection.peer.incomingMessagesPublisher.tryMap { (msg: ChunkingTransportIncomingMessage) in
 					@Dependency(\.jsonDecoder) var jsonDecoder
 
 					let jsonData = msg.messagePayload
@@ -141,8 +140,7 @@ public extension P2PConnectivityClient {
 							jsonString: String(data: jsonData, encoding: .utf8) ?? jsonData.hex
 						)
 					}
-
-				}.eraseToAnyAsyncSequence()
+				}.values.eraseToAnyAsyncSequence()
 			},
 			sendMessage: { outgoingMsg in
 				@Dependency(\.jsonEncoder) var jsonEncoder
@@ -159,15 +157,13 @@ public extension P2PConnectivityClient {
 				let responseToDappData = try jsonEncoder().encode(outgoingMsg.responseToDapp)
 				let p2pChannelRequestID = UUID().uuidString
 
-				try await connection.connection.send(
-					Connection.OutgoingMessage(
-						data: responseToDappData,
-						id: p2pChannelRequestID
-					)
+				try await connection.peer.send(
+					data: responseToDappData,
+					id: p2pChannelRequestID
 				)
 
-				for try await receipt in connection.connection.sentReceipts() {
-					guard receipt.messageID == p2pChannelRequestID else { continue }
+				for try await receipt in connection.peer.sentReceiptsPublisher.values {
+					guard receipt.messageSent.messageID == p2pChannelRequestID else { continue }
 					return P2P.SentResponseToClient(
 						sentReceipt: receipt,
 						responseToDapp: outgoingMsg.responseToDapp,
@@ -178,12 +174,7 @@ public extension P2PConnectivityClient {
 			},
 			_sendTestMessage: { id, message in
 				let connection = await connectionsHolder.getConnection(id: id)
-				let outgoingMessage = Connection.OutgoingMessage(
-					data: Data(message.utf8),
-					id: UUID().uuidString
-				)
-
-				try await connection?.connection.send(outgoingMessage)
+				try await connection?.peer.send(data: Data(message.utf8), id: UUID().uuidString)
 
 				// does not care about sent message receipts
 			}

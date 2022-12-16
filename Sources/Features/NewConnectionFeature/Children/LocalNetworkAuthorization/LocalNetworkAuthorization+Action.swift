@@ -1,6 +1,6 @@
 import ComposableArchitecture
-import ConverseCommon
 import Foundation
+import Models
 
 // MARK: - LocalNetworkAuthorization.Action
 public extension LocalNetworkAuthorization {

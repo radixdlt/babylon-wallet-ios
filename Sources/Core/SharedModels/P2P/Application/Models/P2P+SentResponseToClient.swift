@@ -1,6 +1,6 @@
-import Converse
-import ConverseCommon
 import Foundation
+import Models
+import Peer
 import Profile
 
 // MARK: - P2P.SentResponseToClient
@@ -23,7 +23,7 @@ public extension P2P {
 }
 
 public extension P2P.SentResponseToClient {
-	typealias SentReceipt = Connection.ConfirmedSentMessage
+	typealias SentReceipt = Peer.SentReceipt
 	typealias ID = P2P.ToDapp.Response.ID
 	var id: ID { responseToDapp.id }
 }

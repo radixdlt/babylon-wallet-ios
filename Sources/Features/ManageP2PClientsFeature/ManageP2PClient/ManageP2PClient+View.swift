@@ -1,7 +1,6 @@
 import ComposableArchitecture
-import Converse
-import ConverseCommon
 import DesignSystem
+import Peer
 import Resources
 import SharedModels
 import SwiftUI
@@ -76,7 +75,7 @@ public extension ManageP2PClient.View {
 public extension ManageP2PClient.View {
 	struct ViewState: Equatable {
 		public var connectionName: String
-		public var connectionStatus: Connection.State
+		public var connectionStatus: ConnectionStatus
 		#if DEBUG
 		public var connectionID: String
 		#endif // DEBUG
@@ -102,9 +101,9 @@ public extension ManageP2PClient.View.ViewState {
 
 	var connectionStatusColor: Color {
 		switch connectionStatus {
-		case .disconnected:
+		case .disconnected, .failed, .closed, .closing:
 			return .red
-		case .connecting:
+		case .connecting, .new:
 			return .yellow
 		case .connected:
 			return .green

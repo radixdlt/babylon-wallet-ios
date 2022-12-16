@@ -91,8 +91,13 @@ let profile: Target.Dependency = .product(
 	package: "swift-profile"
 )
 
-let converse: Target.Dependency = .product(
-	name: "Converse",
+let peer: Target.Dependency = .product(
+	name: "Peer",
+	package: "Converse"
+)
+
+let peerModels: Target.Dependency = .product(
+	name: "Models",
 	package: "Converse"
 )
 
@@ -497,7 +502,7 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-			converse,
+			peer,
 			dependencies,
 			"DesignSystem",
 			"ErrorQueue",
@@ -532,7 +537,7 @@ package.addModules([
 		name: "NewConnectionFeature",
 		dependencies: [
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])),
-			converse,
+			peer,
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
@@ -671,7 +676,7 @@ package.addModules([
 		dependencies: [
 			asyncExtensions,
 			"Common",
-			converse,
+			peer,
 			dependencies,
 			engineToolkit, // Model: SignTX contains Manifest
 			"JSON",
@@ -865,12 +870,13 @@ package.addModules([
 		dependencies: [
 			"Asset",
 			bigInt,
-			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make Converse, EngineToolkit, etc. vend their own Model packages.
-			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
-			profile, // FIXME: In `Profile` split out Models package
 			collections,
-			converse, // FIXME: In `Converse` split out Models package
+			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make EngineToolkit, etc. vend their own Model packages.
+			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
 			nonEmpty,
+			peer,
+			peerModels,
+			profile, // FIXME: In `Profile` split out Models package
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]

@@ -1,6 +1,5 @@
-import Converse
-import ConverseCommon
 import Foundation
+import Models
 import Profile
 
 // MARK: - P2P.ClientWithConnectionStatus
@@ -8,11 +7,11 @@ public extension P2P {
 	// MARK: - ClientWithConnectionStatus
 	struct ClientWithConnectionStatus: Sendable, Identifiable, Equatable {
 		public let p2pClient: P2PClient
-		public var connectionStatus: Connection.State
+		public var connectionStatus: ConnectionStatus
 
 		public init(
 			p2pClient: P2PClient,
-			connectionStatus: Connection.State = .disconnected
+			connectionStatus: ConnectionStatus = .disconnected
 		) {
 			self.p2pClient = p2pClient
 			self.connectionStatus = connectionStatus

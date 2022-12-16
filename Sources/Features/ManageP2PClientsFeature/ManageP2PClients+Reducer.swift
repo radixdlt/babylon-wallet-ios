@@ -1,9 +1,8 @@
 import ComposableArchitecture
-import Converse
-import ConverseCommon
 import ErrorQueue
 import NewConnectionFeature
 import P2PConnectivityClient
+import Peer
 import Profile
 import ProfileClient
 import SharedModels
