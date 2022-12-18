@@ -131,6 +131,7 @@ public extension P2PConnectivityClient {
 						let requestFromDapp = try jsonDecoder().decode(P2P.FromDapp.Request.self, from: jsonData)
 
 						return try P2P.RequestFromClient(
+							msgReceivedReceiptID: msg.messageID,
 							requestFromDapp: requestFromDapp,
 							client: connection.client
 						)
@@ -141,6 +142,18 @@ public extension P2PConnectivityClient {
 						)
 					}
 				}.values.eraseToAnyAsyncSequence()
+			},
+			sendMessageReadReceipt: { id, msgID in
+				guard let connection = await connectionsHolder.getConnection(id: id) else {
+					struct NoConnection: LocalizedError {
+						init() {}
+						var errorDescription: String? {
+							"Connection offline."
+						}
+					}
+					throw NoConnection()
+				}
+				try await connection.peer.sendReadReceipt(messageID: msgID)
 			},
 			sendMessage: { outgoingMsg in
 				@Dependency(\.jsonEncoder) var jsonEncoder

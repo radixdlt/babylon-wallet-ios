@@ -1,0 +1,22 @@
+// Project Alpha config
+
+#include "Project-Shared.xcconfig"
+#include "Project-Release-Opt.xcconfig"
+
+// Primary App Icon Set Name
+//
+// Name of an app icon set for the target's default app icon. The contents will be merged
+// into the `Info.plist`.
+
+ASSETCATALOG_COMPILER_APPICON_NAME = $(APP_ICON).alpha
+
+
+PRODUCT_NAME = $(APP_NAME) Alpha
+
+// Bundle Display Name
+//
+// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
+// [CFBundleDisplayName](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundledisplayname)
+// key in the Info.plist file to the value of this build setting.
+
+INFOPLIST_KEY_CFBundleDisplayName = $(PRODUCT_NAME)

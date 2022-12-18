@@ -18,15 +18,30 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		83357231294CC633007E0AB4 /* Common.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Common.xcconfig; sourceTree = "<group>"; };
+		839D88D3294B34140098B586 /* Project-Beta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Beta.xcconfig"; sourceTree = "<group>"; };
+		839D88D4294B34140098B586 /* Project-Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Shared.xcconfig"; sourceTree = "<group>"; };
+		839D88D5294B34150098B586 /* Project-Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Release.xcconfig"; sourceTree = "<group>"; };
+		839D88D6294B34150098B586 /* Project-Alpha.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Alpha.xcconfig"; sourceTree = "<group>"; };
+		839D88D7294B34150098B586 /* Project-Dev.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Dev.xcconfig"; sourceTree = "<group>"; };
+		839D88D8294B509C0098B586 /* iOS-shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "iOS-shared.xcconfig"; sourceTree = "<group>"; };
+		839D88D9294B50AC0098B586 /* iOS-dev.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "iOS-dev.xcconfig"; sourceTree = "<group>"; };
+		839D88DA294B50B20098B586 /* iOS-alpha.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "iOS-alpha.xcconfig"; sourceTree = "<group>"; };
+		839D88DB294B50B60098B586 /* iOS-beta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "iOS-beta.xcconfig"; sourceTree = "<group>"; };
+		839D88DC294B50BD0098B586 /* iOS-release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "iOS-release.xcconfig"; sourceTree = "<group>"; };
+		839D88DF294B53C60098B586 /* Project-Release-Opt.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Release-Opt.xcconfig"; sourceTree = "<group>"; };
+		839D88E0294B54C00098B586 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		839D88E1294B576C0098B586 /* iOS-release-opt.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "iOS-release-opt.xcconfig"; sourceTree = "<group>"; };
+		839D88E5294B6B880098B586 /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
+		839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "macOS-shared.xcconfig"; sourceTree = "<group>"; };
+		839D88E9294B7A620098B586 /* Radix-Wallet--macOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--macOS--Info.plist"; sourceTree = "<group>"; };
 		83B9D896294CAEBA00C4582D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E667FFD128F6F7E50015544F /* Babylon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Babylon; path = ..; sourceTree = "<group>"; };
 		E6805BBD286DB3EC00861180 /* WalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApp.swift; sourceTree = "<group>"; };
-		E6805BC4286DB3ED00861180 /* BabylonWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabylonWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E6805BCA286DB3ED00861180 /* BabylonWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabylonWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6805BCC286DB3ED00861180 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
-		E6FD0073290C598700B9A340 /* BabylonWallet--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "BabylonWallet--iOS--Info.plist"; sourceTree = "<group>"; };
-		E6FD0074290C599300B9A340 /* BabylonWallet--macOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "BabylonWallet--macOS--Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,11 +64,58 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		839D88D2294B34040098B586 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				839D88E6294B6D8F0098B586 /* macOS */,
+				839D88DE294B53760098B586 /* iOS */,
+				839D88DD294B534B0098B586 /* Project */,
+				83357231294CC633007E0AB4 /* Common.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		839D88DD294B534B0098B586 /* Project */ = {
+			isa = PBXGroup;
+			children = (
+				839D88D6294B34150098B586 /* Project-Alpha.xcconfig */,
+				839D88D3294B34140098B586 /* Project-Beta.xcconfig */,
+				839D88D7294B34150098B586 /* Project-Dev.xcconfig */,
+				839D88DF294B53C60098B586 /* Project-Release-Opt.xcconfig */,
+				839D88D5294B34150098B586 /* Project-Release.xcconfig */,
+				839D88D4294B34140098B586 /* Project-Shared.xcconfig */,
+				839D88E0294B54C00098B586 /* README.md */,
+			);
+			path = Project;
+			sourceTree = "<group>";
+		};
+		839D88DE294B53760098B586 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				839D88D8294B509C0098B586 /* iOS-shared.xcconfig */,
+				839D88D9294B50AC0098B586 /* iOS-dev.xcconfig */,
+				839D88DA294B50B20098B586 /* iOS-alpha.xcconfig */,
+				839D88DB294B50B60098B586 /* iOS-beta.xcconfig */,
+				839D88DC294B50BD0098B586 /* iOS-release.xcconfig */,
+				839D88E1294B576C0098B586 /* iOS-release-opt.xcconfig */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		839D88E6294B6D8F0098B586 /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
 		E6805BB7286DB3EB00861180 = {
 			isa = PBXGroup;
 			children = (
-				E6FD0074290C599300B9A340 /* BabylonWallet--macOS--Info.plist */,
-				E6FD0073290C598700B9A340 /* BabylonWallet--iOS--Info.plist */,
+				839D88D2294B34040098B586 /* Config */,
+				839D88E5294B6B880098B586 /* Radix-Wallet--iOS--Info.plist */,
+				839D88E9294B7A620098B586 /* Radix-Wallet--macOS--Info.plist */,
 				83B9D897294CAEBA00C4582D /* InfoPlist.strings */,
 				E6805BDB286DB44400861180 /* Packages */,
 				E6805BBC286DB3EC00861180 /* Shared */,
@@ -76,8 +138,8 @@
 		E6805BC5286DB3ED00861180 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E6805BC4286DB3ED00861180 /* BabylonWallet.app */,
-				E6805BCA286DB3ED00861180 /* BabylonWallet.app */,
+				E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */,
+				E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -108,9 +170,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E6805BC3286DB3ED00861180 /* BabylonWallet (iOS) */ = {
+		E6805BC3286DB3ED00861180 /* Radix Wallet (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (iOS)" */;
+			buildConfigurationList = E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (iOS)" */;
 			buildPhases = (
 				E6805BC0286DB3ED00861180 /* Sources */,
 				E6805BC1286DB3ED00861180 /* Frameworks */,
@@ -121,17 +183,17 @@
 			dependencies = (
 				E6A17E57292FB01500D40EDB /* PBXTargetDependency */,
 			);
-			name = "BabylonWallet (iOS)";
+			name = "Radix Wallet (iOS)";
 			packageProductDependencies = (
 				E6805BDE286DB74300861180 /* AppFeature */,
 			);
 			productName = "Wallet (iOS)";
-			productReference = E6805BC4286DB3ED00861180 /* BabylonWallet.app */;
+			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
-		E6805BC9286DB3ED00861180 /* BabylonWallet (macOS) */ = {
+		E6805BC9286DB3ED00861180 /* Radix Wallet (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (macOS)" */;
+			buildConfigurationList = E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (macOS)" */;
 			buildPhases = (
 				E6805BC6286DB3ED00861180 /* Sources */,
 				E6805BC7286DB3ED00861180 /* Frameworks */,
@@ -142,12 +204,12 @@
 			dependencies = (
 				E667FFD528F6F7F00015544F /* PBXTargetDependency */,
 			);
-			name = "BabylonWallet (macOS)";
+			name = "Radix Wallet (macOS)";
 			packageProductDependencies = (
 				E667FFD228F6F7ED0015544F /* AppFeature */,
 			);
 			productName = "Wallet (macOS)";
-			productReference = E6805BCA286DB3ED00861180 /* BabylonWallet.app */;
+			productReference = E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -181,8 +243,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E6805BC3286DB3ED00861180 /* BabylonWallet (iOS) */,
-				E6805BC9286DB3ED00861180 /* BabylonWallet (macOS) */,
+				E6805BC3286DB3ED00861180 /* Radix Wallet (iOS) */,
+				E6805BC9286DB3ED00861180 /* Radix Wallet (macOS) */,
 			);
 		};
 /* End PBXProject section */
@@ -250,289 +312,91 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		E6805BD3286DB3ED00861180 /* Debug */ = {
+		83DEEED62949CA5A003557D7 /* Dev */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88D7294B34150098B586 /* Project-Dev.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = MDH99V28LM;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.1.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRIVACY_ACCESS_BABYLON_PROFILE = "Import Babylon Profile file";
-				PRODUCT_BUNDLE_IDENTIFIER = works.rdx.e2e.babylon;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_STRICT_CONCURRENCY = complete;
 			};
-			name = Debug;
+			name = Dev;
+		};
+		83DEEED72949CA5A003557D7 /* Dev */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88D9294B50AC0098B586 /* iOS-dev.xcconfig */;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 3;
+			};
+			name = Dev;
+		};
+		83DEEED82949CA5A003557D7 /* Dev */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
+			buildSettings = {
+			};
+			name = Dev;
+		};
+		83E1AEDB2949BB4B00D74788 /* Beta */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88D3294B34140098B586 /* Project-Beta.xcconfig */;
+			buildSettings = {
+			};
+			name = Beta;
+		};
+		83E1AEDC2949BB4B00D74788 /* Beta */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88DB294B50B60098B586 /* iOS-beta.xcconfig */;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 3;
+			};
+			name = Beta;
+		};
+		83E1AEDD2949BB4B00D74788 /* Beta */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
+			buildSettings = {
+			};
+			name = Beta;
+		};
+		83F41363294B185300EE5EBC /* Alpha */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88D6294B34150098B586 /* Project-Alpha.xcconfig */;
+			buildSettings = {
+			};
+			name = Alpha;
+		};
+		83F41364294B185300EE5EBC /* Alpha */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88DA294B50B20098B586 /* iOS-alpha.xcconfig */;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 3;
+			};
+			name = Alpha;
+		};
+		83F41365294B185300EE5EBC /* Alpha */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
+			buildSettings = {
+			};
+			name = Alpha;
 		};
 		E6805BD4286DB3ED00861180 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88D5294B34150098B586 /* Project-Release.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_COMMA = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INFINITE_RECURSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
-				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
-				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
-				CLANG_WARN_STRICT_PROTOTYPES = YES;
-				CLANG_WARN_SUSPICIOUS_MOVE = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				COPY_PHASE_STRIP = NO;
-				DEAD_CODE_STRIPPING = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = MDH99V28LM;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.1.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
-				PRIVACY_ACCESS_BABYLON_PROFILE = "Import Babylon Profile file";
-				PRODUCT_BUNDLE_IDENTIFIER = works.rdx.e2e.babylon;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_STRICT_CONCURRENCY = complete;
 			};
 			name = Release;
-		};
-		E6805BD6286DB3ED00861180 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = MDH99V28LM;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "BabylonWallet--iOS--Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet Preview";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.radixwallet.ios.beta;
-				PRODUCT_NAME = BabylonWallet;
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.radixpublishing.radixwallet.ios.beta";
-				SDKROOT = iphoneos;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Debug;
 		};
 		E6805BD7286DB3ED00861180 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88DC294B50BD0098B586 /* iOS-release.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
-				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 3;
-				DEVELOPMENT_TEAM = MDH99V28LM;
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "BabylonWallet--iOS--Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet Preview";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.radixwallet.ios.beta;
-				PRODUCT_NAME = BabylonWallet;
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.radixpublishing.radixwallet.ios.beta";
-				SDKROOT = iphoneos;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
 		};
-		E6805BD9286DB3ED00861180 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
-				CODE_SIGN_STYLE = Manual;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = MDH99V28LM;
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = MDH99V28LM;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "BabylonWallet--macOS--Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.radixwallet.macos.dev;
-				PRODUCT_NAME = BabylonWallet;
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match Development com.radixpublishing.radixwallet.macos.dev macos";
-				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				VERSIONING_SYSTEM = "apple-generic";
-			};
-			name = Debug;
-		};
 		E6805BDA286DB3ED00861180 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
-				CODE_SIGN_STYLE = Manual;
-				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = MDH99V28LM;
-				"DEVELOPMENT_TEAM[sdk=macosx*]" = MDH99V28LM;
-				ENABLE_HARDENED_RUNTIME = YES;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "BabylonWallet--macOS--Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.radixwallet.macos.dev;
-				PRODUCT_NAME = BabylonWallet;
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "match Development com.radixpublishing.radixwallet.macos.dev macos";
-				SDKROOT = macosx;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
 		};
@@ -542,26 +406,32 @@
 		E6805BBB286DB3EB00861180 /* Build configuration list for PBXProject "BabylonWallet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E6805BD3286DB3ED00861180 /* Debug */,
+				83DEEED62949CA5A003557D7 /* Dev */,
 				E6805BD4286DB3ED00861180 /* Release */,
+				83F41363294B185300EE5EBC /* Alpha */,
+				83E1AEDB2949BB4B00D74788 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (iOS)" */ = {
+		E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E6805BD6286DB3ED00861180 /* Debug */,
+				83DEEED72949CA5A003557D7 /* Dev */,
 				E6805BD7286DB3ED00861180 /* Release */,
+				83F41364294B185300EE5EBC /* Alpha */,
+				83E1AEDC2949BB4B00D74788 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "BabylonWallet (macOS)" */ = {
+		E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E6805BD9286DB3ED00861180 /* Debug */,
+				83DEEED82949CA5A003557D7 /* Dev */,
 				E6805BDA286DB3ED00861180 /* Release */,
+				83F41365294B185300EE5EBC /* Alpha */,
+				83E1AEDD2949BB4B00D74788 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

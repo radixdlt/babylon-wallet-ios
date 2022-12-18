@@ -18,7 +18,7 @@ public extension ScanQR.Action {
 public extension ScanQR.Action {
 	enum ViewAction: Sendable, Equatable {
 		case scanResult(TaskResult<String>)
-		#if os(macOS)
+		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		case macInputConnectionPasswordChanged(String)
 		case macConnectButtonTapped
 		#endif // macOS

@@ -31,13 +31,37 @@ Builds and archives the app
 
 Runs test
 
+### ios alpha_deploy
+
+```sh
+[bundle exec] fastlane ios alpha_deploy
+```
+
+
+
 ### ios beta_deploy
 
 ```sh
 [bundle exec] fastlane ios beta_deploy
 ```
 
-Builds and deploys beta app to TestFlight
+
+
+### ios release_deploy
+
+```sh
+[bundle exec] fastlane ios release_deploy
+```
+
+
+
+### ios deploy
+
+```sh
+[bundle exec] fastlane ios deploy
+```
+
+
 
 ### ios install_certificates
 
@@ -70,6 +94,30 @@ Installs development certificate
 ```
 
 Generates new certificates if needed
+
+### ios generate_new_dev_certificates
+
+```sh
+[bundle exec] fastlane ios generate_new_dev_certificates
+```
+
+Generate new deve certificates
+
+### ios generate_new_alpha_certificates
+
+```sh
+[bundle exec] fastlane ios generate_new_alpha_certificates
+```
+
+Generate new alpha certificates
+
+### ios generate_new_beta_certificates
+
+```sh
+[bundle exec] fastlane ios generate_new_beta_certificates
+```
+
+Generate new beta certificates
 
 ### ios register_new_iphone_device
 

@@ -13,7 +13,7 @@ public struct ScanQR: Sendable, ReducerProtocol {
 public extension ScanQR {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		#if os(macOS)
+		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		case let .internal(.view(.macInputConnectionPasswordChanged(connectionPassword))):
 			state.connectionPassword = connectionPassword
 			return .none

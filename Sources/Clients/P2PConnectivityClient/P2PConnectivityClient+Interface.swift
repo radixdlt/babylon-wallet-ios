@@ -3,6 +3,8 @@ import Collections
 import Common
 import Dependencies
 import Foundation
+import Models
+import Peer
 import ProfileClient
 import SharedModels
 import XCTestDynamicOverlay
@@ -26,6 +28,7 @@ public struct P2PConnectivityClient: DependencyKey, Sendable {
 
 	public var getConnectionStatusAsyncSequence: GetConnectionStatusAsyncSequence
 	public var getRequestsFromP2PClientAsyncSequence: GetRequestsFromP2PClientAsyncSequence
+	public var sendMessageReadReceipt: SendMessageReadReceipt
 	public var sendMessage: SendMessage
 	public var _sendTestMessage: _SendTestMessage
 }
@@ -38,6 +41,7 @@ public extension P2PConnectivityClient {
 
 	typealias GetConnectionStatusAsyncSequence = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<P2P.ConnectionUpdate>
 	typealias GetRequestsFromP2PClientAsyncSequence = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<P2P.RequestFromClient>
+	typealias SendMessageReadReceipt = @Sendable (P2PClient.ID, Peer.MessageID) async throws -> Void
 	typealias SendMessage = @Sendable (P2P.ResponseToClientByID) async throws -> P2P.SentResponseToClient
 	typealias _SendTestMessage = @Sendable (P2PClient.ID, String) async throws -> Void
 }

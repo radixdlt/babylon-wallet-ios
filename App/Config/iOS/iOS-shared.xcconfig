@@ -1,0 +1,97 @@
+// Shared iOS target config
+
+#include "../Common.xcconfig"
+
+// MARK: - System flags
+
+DEVELOPMENT_TEAM[sdk=iphoneos*] = $(DEV_TEAM)
+
+// Base SDK
+//
+// The name or path of the base SDK being used during the build. The product will be
+// built against the headers and libraries located inside the indicated SDK. This path
+// will be prepended to all search paths, and will be passed through the environment to
+// the compiler and linker. Additional SDKs can be specified in the `ADDITIONAL_SDKS`
+// setting.
+
+SDKROOT = iphoneos
+
+
+
+// Info.plist File
+//
+// The project-relative path to the property list file that contains the `Info.plist`
+// information used by bundles. For details on information property list files, see
+// [Information Property
+// List](https://developer.apple.com/documentation/bundleresources/information_property_list).
+
+INFOPLIST_FILE = Radix-Wallet--iOS--Info.plist
+
+
+// Application Scene Manifest (Generation)
+//
+// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
+// [UIApplicationSceneManifest](https://developer.apple.com/documentation/bundleresources/information_property_list/uiapplicationscenemanifest)
+// key in the Info.plist file to an entry suitable for a multi-window application.
+
+INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES
+
+
+
+// Supports Indirect Events
+//
+// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
+// [UIApplicationSupportsIndirectInputEvents](https://developer.apple.com/documentation/bundleresources/information_property_list/uiapplicationsupportsindirectinputevents)
+// key in the Info.plist file to the value of this build setting.
+
+INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES
+
+
+
+// Launch Screen (Generation)
+//
+// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
+// [UILaunchScreen](https://developer.apple.com/documentation/bundleresources/information_property_list/uilaunchscreen)
+// key in the Info.plist file to an empty dictionary.
+
+INFOPLIST_KEY_UILaunchScreen_Generation = YES
+
+
+
+// Supported Interface Orientations
+//
+// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
+// [UISupportedInterfaceOrientations](https://developer.apple.com/documentation/bundleresources/information_property_list/uisupportedinterfaceorientations)
+// key in the Info.plist file to the value of this build setting.
+
+INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait
+
+
+
+// Supported Interface Orientations (iPad)
+//
+// When `GENERATE_INFOPLIST_FILE` is enabled, sets the value of the
+// [UISupportedInterfaceOrientations~iPad](https://developer.apple.com/documentation/bundleresources/information_property_list/uisupportedinterfaceorientations)
+// key in the Info.plist file to the value of this build setting.
+
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown
+
+
+
+// Runpath Search Paths
+//
+// This is a list of paths to be added to the `runpath` search path list for the image
+// being created. At runtime, `dyld` uses the `runpath` when searching for dylibs whose
+// load path begins with `@rpath/`. See [Dynamic Library Programming
+// Topics](https://developer.apple.com/library/content/documentation/DeveloperTools/Conceptual/DynamicLibraries/000-Introduction/Introduction.html).
+
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks
+
+// Targeted Device Families
+//
+// The build system uses the selected device to set the correct value for the
+// `UIDeviceFamily` key it adds to the target's `Info.plist` file. This also drives the
+// --target-device flag to actool, which determines the idioms selected during catalog
+// compilation.
+
+TARGETED_DEVICE_FAMILY = 1

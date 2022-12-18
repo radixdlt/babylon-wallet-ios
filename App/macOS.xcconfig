@@ -1,0 +1,30 @@
+ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon
+CODE_SIGN_ENTITLEMENTS=macOS/macOS.entitlements
+CODE_SIGN_STYLE=Manual
+COMBINE_HIDPI_IMAGES=YES
+CURRENT_PROJECT_VERSION=11
+DEAD_CODE_STRIPPING=YES
+DEVELOPMENT_TEAM=7SPGKHD4HZ
+ENABLE_HARDENED_RUNTIME=YES
+ENABLE_PREVIEWS=YES
+GENERATE_INFOPLIST_FILE=YES
+INFOPLIST_FILE=BabylonWallet--macOS--Info.plist
+INFOPLIST_KEY_NSHumanReadableCopyright=
+INFOPLIST_KEY_UIUserInterfaceStyle=Light
+MACOSX_DEPLOYMENT_TARGET=12.0
+MARKETING_VERSION=0.0.11
+PRODUCT_NAME=BabylonWallet
+PROVISIONING_PROFILE_SPECIFIER=
+SDKROOT=macosx
+SWIFT_EMIT_LOC_STRINGS=YES
+SWIFT_VERSION=5.0
+VERSIONING_SYSTEM=apple-generic
+
+CODE_SIGN_IDENTITY[config=Debug]=Apple Development
+CODE_SIGN_IDENTITY[config=Release]=-
+CODE_SIGN_IDENTITY[sdk=macosx*][config=Debug]=Apple Development
+DEVELOPMENT_TEAM[sdk=macosx*][config=Debug]=7SPGKHD4HZ
+DEVELOPMENT_TEAM[sdk=macosx*][config=Release]=
+LD_RUNPATH_SEARCH_PATHS[config=Debug]=$(inherited) @executable_path/../Frameworks
+LD_RUNPATH_SEARCH_PATHS[config=Release]=$(inherited) @executable_path/../Frameworks
+PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*][config=Debug]=match Development works.rdx.e2e.babylon macos
