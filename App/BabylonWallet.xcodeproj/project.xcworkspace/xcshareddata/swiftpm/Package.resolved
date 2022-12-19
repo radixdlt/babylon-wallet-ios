@@ -59,8 +59,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Converse.git",
       "state" : {
-        "branch" : "abw_659_pyrus_pyrifolia",
-        "revision" : "eea9566b2c791bee6ee163a8c84d8de08e682371"
+        "revision" : "9b569df6f5349431355cd61c276843ca9c5401d5"
       }
     },
     {

@@ -37,12 +37,12 @@ private extension HandleDappRequests {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .internal(.system(.sendMessageReceivedReceiptBackToPeer(client, msgID))):
+		case let .internal(.system(.sendMessageReceivedReceiptBackToPeer(client, readMessage))):
 			return .run { send in
 				await send(.internal(.system(.sendMessageReceivedReceiptBackToPeerResult(
 					TaskResult {
-						try await p2pConnectivityClient.sendMessageReadReceipt(client.id, msgID)
-						return msgID
+						try await p2pConnectivityClient.sendMessageReadReceipt(client.id, readMessage)
+						return readMessage
 					}
 				))))
 			}
@@ -59,7 +59,7 @@ private extension HandleDappRequests {
 			return .run { send in
 				let currentNetworkID = await profileClient.getCurrentNetworkID()
 
-				await send(.internal(.system(.sendMessageReceivedReceiptBackToPeer(requestFromP2P.client, msgID: requestFromP2P.msgReceivedReceiptID))))
+				await send(.internal(.system(.sendMessageReceivedReceiptBackToPeer(requestFromP2P.client, readMessage: requestFromP2P.originalMessage))))
 
 				guard requestFromP2P.requestFromDapp.metadata.networkId == currentNetworkID else {
 					await send(.internal(.system(.failedWithError(requestFromP2P, .wrongNetwork, "Wallet is using network ID: \(currentNetworkID), request sent specified network ID: \(requestFromP2P.requestFromDapp.metadata.networkId)."))))
