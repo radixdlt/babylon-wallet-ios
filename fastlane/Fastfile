@@ -44,7 +44,7 @@ platform :ios do
             api_key: api_key
         )
 
-        tag = "%s#%s-%s" % [version, build_number, ENV['FLAVOUR']]
+        tag = "%s#%s-%s" % [app_version, build_number, ENV['FLAVOUR']]
         add_git_tag(tag: version_and_build_number)
         push_to_git_remote
     end
