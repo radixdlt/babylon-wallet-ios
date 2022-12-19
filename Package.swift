@@ -552,6 +552,7 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			engineToolkit,
+			"PasteboardClient",
 			"SharedModels",
 			tca,
 		],

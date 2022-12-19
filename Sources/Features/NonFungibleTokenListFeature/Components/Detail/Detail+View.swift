@@ -37,7 +37,7 @@ public extension NonFungibleTokenList.Detail.View {
 								Text("NFT ID")
 									.textStyle(.body1Regular)
 									.foregroundColor(.app.gray2)
-								Text(viewStore.displayID)
+								Text(viewStore.nftID)
 									.frame(maxWidth: .infinity, alignment: .trailing)
 									.multilineTextAlignment(.trailing)
 							}
@@ -47,21 +47,55 @@ public extension NonFungibleTokenList.Detail.View {
 						.textStyle(.body1Regular)
 						.lineLimit(1)
 
-						VStack(alignment: .leading, spacing: .medium3) {
-							Text("Associated dApp")
-								.textStyle(.body1Regular)
-								.foregroundColor(.app.gray2)
-								.padding(.horizontal, .large2)
+						ZStack {
+							Color.app.gray5.edgesIgnoringSafeArea(.bottom)
 
-							Header(
-								name: viewStore.containerName ?? "",
-								iconAsset: headerIconAsset,
-								isExpanded: false
-							)
-							.padding(.horizontal, .medium3)
+							VStack(spacing: .medium1) {
+								Image(asset: headerIconAsset)
+									.resizable()
+									.frame(width: 104, height: 104)
+									.clipShape(RoundedRectangle(cornerRadius: .small1, style: .circular))
+
+								let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
+								if let description = viewStore.description {
+									divider
+									Text(description)
+										.textStyle(.body1Regular)
+										.frame(maxWidth: .infinity, alignment: .leading)
+										.padding(.horizontal, .large2)
+								}
+
+								divider
+								VStack(spacing: .medium3) {
+									HStack {
+										Text("Resource Address")
+											.textStyle(.body1Regular)
+											.foregroundColor(.app.gray2)
+										AddressView(
+											viewStore.resourceAddress,
+											textStyle: .body1Regular,
+											copyAddressAction: {
+												viewStore.send(.copyAddressButtonTapped)
+											}
+										)
+										.frame(maxWidth: .infinity, alignment: .trailing)
+										.multilineTextAlignment(.trailing)
+									}
+									if let name = viewStore.resourceName {
+										HStack {
+											Text("Name")
+												.textStyle(.body1Regular)
+												.foregroundColor(.app.gray2)
+											Text(name)
+												.frame(maxWidth: .infinity, alignment: .trailing)
+												.multilineTextAlignment(.trailing)
+										}
+									}
+									divider
+								}
+							}
+							.padding(.vertical, .medium1)
 						}
-						.padding(.vertical, .medium1)
-						.background(Color.app.gray5)
 					}
 				}
 			}
@@ -78,12 +112,19 @@ public extension NonFungibleTokenList.Detail.View {
 // MARK: - NonFungibleTokenList.Detail.View.ViewState
 extension NonFungibleTokenList.Detail.View {
 	struct ViewState: Equatable {
-		var displayID: String
-		var containerName: String?
+		var nftID: String
+		var description: String?
+		var resourceAddress: AddressView.ViewState
+		var resourceName: String?
 
 		init(state: NonFungibleTokenList.Detail.State) {
-			displayID = state.asset.id.stringRepresentation
-			containerName = state.container.name
+			nftID = state.asset.id.stringRepresentation
+			description = state.container.description
+			resourceAddress = .init(
+				address: state.container.resourceAddress.address,
+				format: .short()
+			)
+			resourceName = state.container.name
 		}
 	}
 }
