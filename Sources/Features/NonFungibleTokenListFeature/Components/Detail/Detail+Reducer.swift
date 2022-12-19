@@ -4,7 +4,7 @@ import PasteboardClient
 // MARK: - NonFungibleTokenList.Detail
 public extension NonFungibleTokenList {
 	// MARK: - NonFungibleTokenDetails
-	struct Detail: ReducerProtocol {
+	struct Detail: Sendable, ReducerProtocol {
 		@Dependency(\.pasteboardClient) var pasteboardClient
 
 		public init() {}
@@ -16,8 +16,8 @@ public extension NonFungibleTokenList.Detail {
 		switch action {
 		case .internal(.view(.closeButtonTapped)):
 			return .run { send in await send(.delegate(.closeButtonTapped)) }
-		case .internal(.view(.copyAddressButtonTapped)):
-			return .run { [address = state.container.resourceAddress.address] _ in
+		case let .internal(.view(.copyAddressButtonTapped(address))):
+			return .run { _ in
 				pasteboardClient.copyString(address)
 			}
 		case .delegate:

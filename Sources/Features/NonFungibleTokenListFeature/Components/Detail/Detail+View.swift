@@ -37,9 +37,15 @@ public extension NonFungibleTokenList.Detail.View {
 								Text("NFT ID")
 									.textStyle(.body1Regular)
 									.foregroundColor(.app.gray2)
-								Text(viewStore.nftID)
-									.frame(maxWidth: .infinity, alignment: .trailing)
-									.multilineTextAlignment(.trailing)
+								AddressView(
+									viewStore.nftID,
+									textStyle: .body1Regular,
+									copyAddressAction: {
+										viewStore.send(.copyAddressButtonTapped(viewStore.state.fullNFTAddress))
+									}
+								)
+								.frame(maxWidth: .infinity, alignment: .trailing)
+								.multilineTextAlignment(.trailing)
 							}
 						}
 						.frame(maxWidth: .infinity, alignment: .leading)
@@ -76,7 +82,7 @@ public extension NonFungibleTokenList.Detail.View {
 											viewStore.resourceAddress,
 											textStyle: .body1Regular,
 											copyAddressAction: {
-												viewStore.send(.copyAddressButtonTapped)
+												viewStore.send(.copyAddressButtonTapped(viewStore.state.fullResourceAddress))
 											}
 										)
 										.frame(maxWidth: .infinity, alignment: .trailing)
@@ -115,18 +121,22 @@ public extension NonFungibleTokenList.Detail.View {
 // MARK: - NonFungibleTokenList.Detail.View.ViewState
 extension NonFungibleTokenList.Detail.View {
 	struct ViewState: Equatable {
-		var nftID: String
+		var nftID: AddressView.ViewState
+		var fullNFTAddress: String
 		var description: String?
 		var resourceAddress: AddressView.ViewState
+		var fullResourceAddress: String
 		var resourceName: String?
 
 		init(state: NonFungibleTokenList.Detail.State) {
-			nftID = state.asset.id.stringRepresentation
+			nftID = .init(address: state.asset.id.stringRepresentation, format: .full)
+			fullNFTAddress = state.container.resourceAddress.address + ":" + state.asset.id.stringRepresentation
 			description = state.container.description
 			resourceAddress = .init(
 				address: state.container.resourceAddress.address,
 				format: .short()
 			)
+			fullResourceAddress = state.container.resourceAddress.address
 			resourceName = state.container.name
 		}
 	}

@@ -13,7 +13,7 @@ public extension NonFungibleTokenList.Detail {
 public extension NonFungibleTokenList.Detail.Action {
 	enum ViewAction: Equatable {
 		case closeButtonTapped
-		case copyAddressButtonTapped
+		case copyAddressButtonTapped(String)
 	}
 }
 

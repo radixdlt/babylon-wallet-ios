@@ -54,6 +54,8 @@ public extension AddressView {
 				} else {
 					formattedAddress = address.prefix(format.first) + "..." + address.suffix(format.last)
 				}
+			case .full:
+				formattedAddress = address
 			}
 		}
 	}
@@ -63,6 +65,7 @@ public extension AddressView {
 public extension AddressView.ViewState {
 	enum AddressFormat {
 		case short(ShortAddressFormat = .default)
+		case full
 	}
 }
 
