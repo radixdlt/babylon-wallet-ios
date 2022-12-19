@@ -19,7 +19,7 @@ platform :ios do
 
     desc "Runs test"
     lane :tests do
-        Dotenv.load ".env.ios.alpha"
+        Dotenv.load ".env.ios.dev"
         run_tests
     end
 
