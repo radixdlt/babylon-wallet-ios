@@ -312,26 +312,26 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		83DEEED62949CA5A003557D7 /* Dev */ = {
+		83DEEED62949CA5A003557D7 /* Debug-Dev */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D7294B34150098B586 /* Project-Dev.xcconfig */;
 			buildSettings = {
 			};
-			name = Dev;
+			name = "Debug-Dev";
 		};
-		83DEEED72949CA5A003557D7 /* Dev */ = {
+		83DEEED72949CA5A003557D7 /* Debug-Dev */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D9294B50AC0098B586 /* iOS-dev.xcconfig */;
 			buildSettings = {
 			};
-			name = Dev;
+			name = "Debug-Dev";
 		};
-		83DEEED82949CA5A003557D7 /* Dev */ = {
+		83DEEED82949CA5A003557D7 /* Debug-Dev */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
 			buildSettings = {
 			};
-			name = Dev;
+			name = "Debug-Dev";
 		};
 		83E1AEDB2949BB4B00D74788 /* Beta */ = {
 			isa = XCBuildConfiguration;
@@ -382,7 +382,6 @@
 			};
 			name = Release;
 		};
-
 		E6805BD7286DB3ED00861180 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88DC294B50BD0098B586 /* iOS-release.xcconfig */;
@@ -390,7 +389,6 @@
 			};
 			name = Release;
 		};
-
 		E6805BDA286DB3ED00861180 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
@@ -404,7 +402,7 @@
 		E6805BBB286DB3EB00861180 /* Build configuration list for PBXProject "BabylonWallet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				83DEEED62949CA5A003557D7 /* Dev */,
+				83DEEED62949CA5A003557D7 /* Debug-Dev */,
 				E6805BD4286DB3ED00861180 /* Release */,
 				83F41363294B185300EE5EBC /* Alpha */,
 				83E1AEDB2949BB4B00D74788 /* Beta */,
@@ -415,7 +413,7 @@
 		E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				83DEEED72949CA5A003557D7 /* Dev */,
+				83DEEED72949CA5A003557D7 /* Debug-Dev */,
 				E6805BD7286DB3ED00861180 /* Release */,
 				83F41364294B185300EE5EBC /* Alpha */,
 				83E1AEDC2949BB4B00D74788 /* Beta */,
@@ -426,7 +424,7 @@
 		E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				83DEEED82949CA5A003557D7 /* Dev */,
+				83DEEED82949CA5A003557D7 /* Debug-Dev */,
 				E6805BDA286DB3ED00861180 /* Release */,
 				83F41365294B185300EE5EBC /* Alpha */,
 				83E1AEDD2949BB4B00D74788 /* Beta */,

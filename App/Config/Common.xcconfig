@@ -1,8 +1,16 @@
 // MARK: - Custom flags
 
+/// Application version shared across all targets and flavours
 APP_VERSION = 0.1.0
 
+/// App Icon base name
 APP_ICON = AppIcon
+
+/// Application's base name
 APP_NAME = Radix Wallet
+
+/// Application's base bundle id
 APP_BUNDLE_ID = com.radixpublishing.radixwallet
+
+/// Application's dev team id
 DEV_TEAM = MDH99V28LM

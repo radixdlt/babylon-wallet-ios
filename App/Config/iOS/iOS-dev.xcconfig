@@ -1,16 +1,15 @@
-//
-//  iOS-dev.xcconfig
-//  BabylonWallet
-//
-//  Created by Ghenadie Vasiliev-Pusca on 15.12.2022.
-//
-
-// Configuration settings file format documentation can be found at:
-// https://help.apple.com/xcode/#/dev745c5c974
+// DEV iOS config
 
 #include "iOS-shared.xcconfig"
 
+// Code Singing Identity
+//
+// The name, also known as the common name, of a valid code-signing certificate in a keychain within
+// your keychain path. A missing or invalid certificate will cause a build error.
+
 CODE_SIGN_IDENTITY[sdk=iphoneos*] = Apple Development
+
+
 
 // Product Bundle Identifier
 //
@@ -22,5 +21,10 @@ CODE_SIGN_IDENTITY[sdk=iphoneos*] = Apple Development
 PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.radixwallet.ios.dev
 
 
-PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*] = match Development $(PRODUCT_BUNDLE_IDENTIFIER)
 
+// Provisioning Profile
+//
+// Must contain a profile name (or UUID). A missing or invalid profile will cause a build error.
+// Use in conjunction with [DEVELOPMENT_TEAM] to fully specify provisioning profile.
+
+PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*] = match Development $(PRODUCT_BUNDLE_IDENTIFIER)
