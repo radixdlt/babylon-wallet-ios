@@ -1,3 +1,4 @@
+import DesignSystem
 import Foundation
 import Profile
 
@@ -6,17 +7,14 @@ public extension AccountPreferences {
 	// MARK: State
 	struct State: Equatable {
 		public let address: AccountAddress
-		public var isFaucetButtonEnabled: Bool
-		public var isLoading: Bool
+		public var faucetButtonState: ControlState
 
 		public init(
 			address: AccountAddress,
-			isFaucetButtonEnabled: Bool = false,
-			isLoading: Bool = false
+			faucetButtonState: ControlState = .enabled
 		) {
 			self.address = address
-			self.isFaucetButtonEnabled = isFaucetButtonEnabled
-			self.isLoading = isLoading
+			self.faucetButtonState = faucetButtonState
 		}
 	}
 }

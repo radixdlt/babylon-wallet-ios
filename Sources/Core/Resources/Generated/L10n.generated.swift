@@ -23,6 +23,8 @@ public enum L10n {
 	public enum AccountPreferences {
   	/// Get Betanet XRD Test Tokens
   	public static let faucetButtonTitle = L10n.tr("Localizable", "accountPreferences.faucetButtonTitle", fallback: "Get Betanet XRD Test Tokens")
+  	/// This may take several seconds, please wait for completion
+  	public static let loadingPrompt = L10n.tr("Localizable", "accountPreferences.loadingPrompt", fallback: "This may take several seconds, please wait for completion")
   	/// Account Preferences
   	public static let title = L10n.tr("Localizable", "accountPreferences.title", fallback: "Account Preferences")
 	}
