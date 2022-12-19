@@ -9,7 +9,7 @@ on:
         options:
           - alpha
           - beta
-          - release
+          # - release
 
 jobs:
 
