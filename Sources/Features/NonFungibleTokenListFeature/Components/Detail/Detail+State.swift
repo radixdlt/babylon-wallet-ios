@@ -3,13 +3,13 @@ import EngineToolkit
 import Foundation
 import SharedModels
 
-// MARK: - NonFungibleTokenDetails.State
-public extension NonFungibleTokenDetails {
+// MARK: - NonFungibleTokenList.Detail.State
+public extension NonFungibleTokenList.Detail {
 	typealias State = NonFungibleTokenContainer
 }
 
 #if DEBUG
-public extension NonFungibleTokenDetails.State {
+public extension NonFungibleTokenList.Detail.State {
 	static let previewValue = NonFungibleTokenContainer(
 		owner: try! .init(address: "owner_address"),
 		resourceAddress: .init(address: "resource_address"),

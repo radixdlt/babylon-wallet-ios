@@ -1,5 +1,4 @@
 import ComposableArchitecture
-import NonFungibleTokenDetailsFeature
 
 public struct NonFungibleTokenList: ReducerProtocol {
 	public init() {}
@@ -24,7 +23,7 @@ public struct NonFungibleTokenList: ReducerProtocol {
 			NonFungibleTokenList.Row()
 		}
 		.ifLet(\.selectedToken, action: /Action.child .. Action.ChildAction.details) {
-			NonFungibleTokenDetails()
+			NonFungibleTokenList.Detail()
 		}
 	}
 }

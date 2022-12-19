@@ -1,7 +1,6 @@
 import Asset
 import ComposableArchitecture
 import DesignSystem
-import NonFungibleTokenDetailsFeature
 import SwiftUI
 
 // MARK: - NonFungibleTokenList.View
@@ -46,7 +45,7 @@ public extension NonFungibleTokenList.View {
 							state: \.selectedToken,
 							action: { .child(.details($0)) }
 						),
-						then: { NonFungibleTokenDetails.View(store: $0) }
+						then: { NonFungibleTokenList.Detail.View(store: $0) }
 					)
 				}
 			)

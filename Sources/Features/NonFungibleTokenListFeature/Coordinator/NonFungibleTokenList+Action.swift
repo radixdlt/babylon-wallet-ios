@@ -1,6 +1,5 @@
 import Asset
 import Foundation
-import NonFungibleTokenDetailsFeature
 
 // MARK: - NonFungibleTokenList.Action
 public extension NonFungibleTokenList {
@@ -17,7 +16,7 @@ public extension NonFungibleTokenList {
 public extension NonFungibleTokenList.Action {
 	enum ChildAction: Equatable {
 		case asset(id: NonFungibleTokenContainer.ID, action: NonFungibleTokenList.Row.Action)
-		case details(NonFungibleTokenDetails.Action)
+		case details(NonFungibleTokenList.Detail.Action)
 	}
 }
 

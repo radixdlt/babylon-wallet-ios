@@ -1,11 +1,14 @@
 import ComposableArchitecture
 
-// MARK: - NonFungibleTokenDetails
-public struct NonFungibleTokenDetails: ReducerProtocol {
-	public init() {}
+// MARK: - NonFungibleTokenList.Detail
+public extension NonFungibleTokenList {
+	// MARK: - NonFungibleTokenDetails
+	struct Detail: ReducerProtocol {
+		public init() {}
+	}
 }
 
-public extension NonFungibleTokenDetails {
+public extension NonFungibleTokenList.Detail {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.closeButtonTapped)):
