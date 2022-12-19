@@ -39,6 +39,8 @@ Runs test
 
 Deploy the app for a given flavour: alpha, beta, release
 
+Usage `bundle exec fastlane ios deploy --env ios.<specific env>`
+
 ### ios install_distribution_certificates
 
 ```sh
@@ -47,7 +49,7 @@ Deploy the app for a given flavour: alpha, beta, release
 
 Installs distribution certificates
 
-Usage `bundle exec fasltane ios install_distribution_certificate --env .env.ios.<specific env>`
+Usage `bundle exec fastlane ios install_distribution_certificate --env ios.<specific env>`
 
 ### ios install_development_certificates
 
@@ -73,7 +75,7 @@ Generate new dev certificates
 
 Generate new appstore certificates
 
-Usage bundle exec fasltane ios generate_new_appstore_certificates --env .env.ios.<specific env>
+Usage bundle exec fastlane ios generate_new_appstore_certificates --env ios.<specific env>
 
 ### ios register_new_iphone_device
 
