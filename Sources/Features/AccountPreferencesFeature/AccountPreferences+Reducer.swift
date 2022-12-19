@@ -38,6 +38,7 @@ public struct AccountPreferences: ReducerProtocol {
 			return .none
 
 		case let .internal(.system(.isAllowedToUseFaucet(.failure(error)))):
+			state.faucetButtonState = .disabled
 			errorQueue.schedule(error)
 			return .none
 
