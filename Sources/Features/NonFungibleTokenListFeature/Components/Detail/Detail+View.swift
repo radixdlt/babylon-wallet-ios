@@ -66,6 +66,7 @@ public extension NonFungibleTokenList.Detail.View {
 								}
 
 								divider
+
 								VStack(spacing: .medium3) {
 									HStack {
 										Text("Resource Address")
@@ -93,7 +94,8 @@ public extension NonFungibleTokenList.Detail.View {
 									}
 								}
 								.padding(.horizontal, .large2)
-								divider
+								.textStyle(.body1Regular)
+								.lineLimit(1)
 							}
 							.padding(.vertical, .medium1)
 						}
