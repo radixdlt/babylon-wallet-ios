@@ -547,6 +547,7 @@ package.addModules([
 	.feature(
 		name: "NonFungibleTokenDetailsFeature",
 		dependencies: [
+			"Asset",
 			"DesignSystem",
 			engineToolkit,
 			"SharedModels",
@@ -560,6 +561,7 @@ package.addModules([
 			"Asset",
 			"Common",
 			"DesignSystem",
+			"NonFungibleTokenDetailsFeature",
 			tca,
 		],
 		tests: .yes(

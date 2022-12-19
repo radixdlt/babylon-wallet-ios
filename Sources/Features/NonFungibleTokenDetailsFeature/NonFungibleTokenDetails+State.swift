@@ -1,3 +1,4 @@
+import Asset
 import EngineToolkit
 import Foundation
 import SharedModels
