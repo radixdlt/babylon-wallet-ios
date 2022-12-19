@@ -130,7 +130,7 @@ extension NonFungibleTokenList.Detail.View {
 
 		init(state: NonFungibleTokenList.Detail.State) {
 			nftID = .init(address: state.asset.id.stringRepresentation, format: .full)
-			fullNFTAddress = state.container.resourceAddress.address + ":" + state.asset.id.stringRepresentation
+			fullNFTAddress = state.container.nftAddress(for: state.asset)
 			description = state.container.description
 			resourceAddress = .init(
 				address: state.container.resourceAddress.address,
@@ -139,6 +139,13 @@ extension NonFungibleTokenList.Detail.View {
 			fullResourceAddress = state.container.resourceAddress.address
 			resourceName = state.container.name
 		}
+	}
+}
+
+extension NonFungibleTokenContainer {
+	// TODO: unit test
+	func nftAddress(for asset: NonFungibleToken) -> String {
+		resourceAddress.address + ":" + asset.id.stringRepresentation
 	}
 }
 
