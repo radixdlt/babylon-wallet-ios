@@ -355,6 +355,7 @@ package.addModules([
 			"ErrorQueue",
 			"GatewayAPI",
 			"KeychainClientDependency",
+			"LocalAuthenticationClient",
 			"ProfileClient",
 			tca,
 		],

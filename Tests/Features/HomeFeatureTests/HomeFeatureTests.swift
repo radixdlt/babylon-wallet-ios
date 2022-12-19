@@ -140,7 +140,7 @@ final class HomeFeatureTests: TestCase {
 			),
 		]
 
-		let initialState: Home.State = .placeholder
+		let initialState: Home.State = .init()
 		let store = TestStore(
 			initialState: initialState,
 			reducer: Home()
