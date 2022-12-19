@@ -91,8 +91,9 @@ public extension NonFungibleTokenList.Detail.View {
 												.multilineTextAlignment(.trailing)
 										}
 									}
-									divider
 								}
+								.padding(.horizontal, .large2)
+								divider
 							}
 							.padding(.vertical, .medium1)
 						}
