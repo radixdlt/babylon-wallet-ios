@@ -1,3 +1,4 @@
+import Asset
 import ComposableArchitecture
 import DesignSystem
 import SwiftUI
@@ -20,9 +21,10 @@ public extension NonFungibleTokenList {
 public extension NonFungibleTokenList.View {
 	var body: some View {
 		WithViewStore(
-			store.actionless,
-			observe: ViewState.init(state:)
-		) { _ in
+			store,
+			observe: ViewState.init(state:),
+			send: { .view($0) }
+		) { viewStore in
 			VStack(spacing: .medium1) {
 				ForEachStore(
 					store.scope(
@@ -32,6 +34,21 @@ public extension NonFungibleTokenList.View {
 					content: NonFungibleTokenList.Row.View.init(store:)
 				)
 			}
+			.sheet(
+				unwrapping: viewStore.binding(
+					get: \.selectedToken,
+					send: { .selectedTokenChanged($0) }
+				),
+				content: { _ in
+					IfLetStore(
+						store.scope(
+							state: \.selectedToken,
+							action: { .child(.details($0)) }
+						),
+						then: { NonFungibleTokenList.Detail.View(store: $0) }
+					)
+				}
+			)
 		}
 	}
 }
@@ -40,7 +57,11 @@ public extension NonFungibleTokenList.View {
 extension NonFungibleTokenList.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		init(state _: NonFungibleTokenList.State) {}
+		var selectedToken: NonFungibleTokenList.Detail.State?
+
+		init(state: NonFungibleTokenList.State) {
+			self.selectedToken = state.selectedToken
+		}
 	}
 }
 

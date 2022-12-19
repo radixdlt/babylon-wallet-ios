@@ -32,7 +32,7 @@ extension Component {
 				.hidden()
 
 			VStack(alignment: .leading, spacing: .small2) {
-				Text(tokenIdStringRepresentation)
+				Text(token.id.stringRepresentation)
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
 					.offset(y: -.small2)
@@ -84,9 +84,11 @@ private extension Component {
 //		token.metadata ?? []
 		[]
 	}
+}
 
-	var tokenIdStringRepresentation: String {
-		switch token.nonFungibleId {
+extension NonFungibleToken.ID {
+	var stringRepresentation: String {
+		switch self {
 		case let .u32(value):
 			return "\(value)"
 		case let .u64(value):
@@ -101,7 +103,7 @@ private extension Component {
 	}
 }
 
-// MARK: ExpandableRow
+// MARK: - Component + ExpandableRow
 extension Component: ExpandableRow {
 	var edge: Edge.Set {
 		if isLast {
@@ -120,7 +122,7 @@ extension Component: ExpandableRow {
 	}
 }
 
-// MARK: Component.Constants
+// MARK: - Component.Constants
 private extension Component {
 	enum Constants {
 		static let radius: CGFloat = .small1

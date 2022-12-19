@@ -355,6 +355,7 @@ package.addModules([
 			"ErrorQueue",
 			"GatewayAPI",
 			"KeychainClientDependency",
+			"LocalAuthenticationClient",
 			"ProfileClient",
 			tca,
 		],
@@ -550,6 +551,9 @@ package.addModules([
 			"Asset",
 			"Common",
 			"DesignSystem",
+			engineToolkit,
+			"PasteboardClient",
+			"SharedModels",
 			tca,
 		],
 		tests: .yes(

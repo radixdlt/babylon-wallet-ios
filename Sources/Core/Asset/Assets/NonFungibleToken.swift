@@ -51,8 +51,8 @@ public extension NonFungibleTokenContainer {
 		owner: try! .init(address: "account-address"),
 		resourceAddress: .init(address: "resource-address-1"),
 		assets: [.mock1, .mock2, .mock3],
-		name: "Name",
-		description: nil,
+		name: "Mock Resource 1",
+		description: "A description for Mock Resource 1",
 		iconURL: nil
 	)
 

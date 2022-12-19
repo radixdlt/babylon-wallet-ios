@@ -120,6 +120,14 @@ public enum L10n {
     	}
   	}
 	}
+	public enum FungibleTokenList {
+  	public enum Detail {
+    	/// Current Supply
+    	public static let currentSupply = L10n.tr("Localizable", "fungibleTokenList.detail.currentSupply", fallback: "Current Supply")
+    	/// Resource Address
+    	public static let resourceAddress = L10n.tr("Localizable", "fungibleTokenList.detail.resourceAddress", fallback: "Resource Address")
+  	}
+	}
 	public enum Home {
   	public enum Header {
     	/// Welcome, here are all your accounts on the Radix Network
@@ -218,6 +226,14 @@ public enum L10n {
   	/// %d of %d
   	public static func ownedOfTotal(_ p1: Int, _ p2: Int) -> String {
   		return L10n.tr("Localizable", "nftList.ownedOfTotal", p1, p2, fallback: "%d of %d")
+  	}
+  	public enum Detail {
+    	/// NFT ID
+    	public static let nftID = L10n.tr("Localizable", "nftList.detail.nftID", fallback: "NFT ID")
+    	/// Resource Address
+    	public static let resourceAddress = L10n.tr("Localizable", "nftList.detail.resourceAddress", fallback: "Resource Address")
+    	/// Name
+    	public static let resourceName = L10n.tr("Localizable", "nftList.detail.resourceName", fallback: "Name")
   	}
   	public enum Header {
     	/// Unknown

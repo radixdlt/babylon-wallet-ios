@@ -54,7 +54,7 @@ public extension FungibleTokenDetails.View {
 						divider
 						VStack(spacing: .medium3) {
 							HStack {
-								Text("Token ID")
+								Text(L10n.FungibleTokenList.Detail.resourceAddress)
 									.textStyle(.body1Regular)
 									.foregroundColor(.app.gray2)
 								AddressView(
@@ -69,7 +69,7 @@ public extension FungibleTokenDetails.View {
 							}
 							if let currentSupply = viewStore.currentSupply {
 								HStack {
-									Text("Current Supply")
+									Text(L10n.FungibleTokenList.Detail.currentSupply)
 										.textStyle(.body1Regular)
 										.foregroundColor(.app.gray2)
 									Text(currentSupply.description)
