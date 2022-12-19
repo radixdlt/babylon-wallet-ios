@@ -129,6 +129,8 @@ private extension NonFungibleTokenList.Row.View {
 		.offset(y: offset(with: viewStore, index: index))
 		.zIndex(reversedZIndex(count: nftCount(with: viewStore), index: index))
 		.transition(.move(edge: .bottom))
+		.contentShape(Rectangle())
+		.onTapGesture { viewStore.send(.selected(viewStore.container)) }
 	}
 
 	func collapsedHeight(with viewStore: ViewStore) -> CGFloat {

@@ -1,3 +1,4 @@
+import Asset
 import Foundation
 
 // MARK: - NonFungibleTokenList.Row.Action
@@ -14,6 +15,7 @@ public extension NonFungibleTokenList.Row {
 public extension NonFungibleTokenList.Row.Action {
 	enum ViewAction: Equatable {
 		case isExpandedToggled
+		case selected(NonFungibleTokenContainer)
 	}
 }
 
@@ -32,5 +34,7 @@ public extension NonFungibleTokenList.Row.Action {
 
 // MARK: - NonFungibleTokenList.Row.Action.DelegateAction
 public extension NonFungibleTokenList.Row.Action {
-	enum DelegateAction: Equatable {}
+	enum DelegateAction: Equatable {
+		case selected(NonFungibleTokenContainer)
+	}
 }
