@@ -43,7 +43,7 @@ public struct AccountPreferences: ReducerProtocol {
 			return .none
 
 		case .internal(.system(.refreshAccountCompleted)):
-			state.faucetButtonState = .enabled
+			state.faucetButtonState = .disabled
 			return .none
 		}
 	}
