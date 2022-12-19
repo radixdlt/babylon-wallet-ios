@@ -7,11 +7,11 @@ public extension NonFungibleTokenList {
 	// MARK: State
 	struct State: Equatable {
 		public var rows: IdentifiedArrayOf<NonFungibleTokenList.Row.State>
-		public var selectedToken: NonFungibleTokenContainer?
+		public var selectedToken: NonFungibleTokenList.Detail.State?
 
 		public init(
 			rows: IdentifiedArrayOf<NonFungibleTokenList.Row.State>,
-			selectedToken: NonFungibleTokenContainer? = nil
+			selectedToken: NonFungibleTokenList.Detail.State? = nil
 		) {
 			self.rows = rows
 			self.selectedToken = selectedToken

@@ -57,7 +57,7 @@ public extension NonFungibleTokenList.View {
 extension NonFungibleTokenList.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		var selectedToken: NonFungibleTokenContainer?
+		var selectedToken: NonFungibleTokenList.Detail.State?
 
 		init(state: NonFungibleTokenList.State) {
 			self.selectedToken = state.selectedToken

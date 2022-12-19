@@ -82,8 +82,8 @@ extension NonFungibleTokenList.Detail.View {
 		var containerName: String?
 
 		init(state: NonFungibleTokenList.Detail.State) {
-			displayID = state.id.address
-			containerName = state.name
+			displayID = state.asset.id.stringRepresentation
+			containerName = state.container.name
 		}
 	}
 }

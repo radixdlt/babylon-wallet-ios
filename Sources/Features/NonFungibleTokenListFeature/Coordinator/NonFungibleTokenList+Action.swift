@@ -23,7 +23,7 @@ public extension NonFungibleTokenList.Action {
 // MARK: - NonFungibleTokenList.Action.ViewAction
 public extension NonFungibleTokenList.Action {
 	enum ViewAction: Equatable {
-		case selectedTokenChanged(NonFungibleTokenContainer?)
+		case selectedTokenChanged(NonFungibleTokenList.Detail.State?)
 	}
 }
 
