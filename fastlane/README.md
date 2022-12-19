@@ -31,45 +31,51 @@ Builds and archives the app
 
 Runs test
 
-### ios beta_deploy
+### ios deploy
 
 ```sh
-[bundle exec] fastlane ios beta_deploy
+[bundle exec] fastlane ios deploy
 ```
 
-Builds and deploys beta app to TestFlight
+Deploy the app for a given flavour: alpha, beta, release
 
-### ios install_certificates
+Usage `bundle exec fastlane ios deploy --env ios.<specific env>`
+
+### ios install_distribution_certificates
 
 ```sh
-[bundle exec] fastlane ios install_certificates
+[bundle exec] fastlane ios install_distribution_certificates
 ```
 
-Installs certificates on the machine
+Installs distribution certificates
 
-### ios install_distribution_certificate
+Usage `bundle exec fastlane ios install_distribution_certificate --env ios.<specific env>`
+
+### ios install_development_certificates
 
 ```sh
-[bundle exec] fastlane ios install_distribution_certificate
+[bundle exec] fastlane ios install_development_certificates
 ```
 
-Installs distribution certificate
+Installs development certificates
 
-### ios install_development_certificate
+### ios generate_new_dev_certificates
 
 ```sh
-[bundle exec] fastlane ios install_development_certificate
+[bundle exec] fastlane ios generate_new_dev_certificates
 ```
 
-Installs development certificate
+Generate new dev certificates
 
-### ios generate_new_certificates
+### ios generate_new_appstore_certificates
 
 ```sh
-[bundle exec] fastlane ios generate_new_certificates
+[bundle exec] fastlane ios generate_new_appstore_certificates
 ```
 
-Generates new certificates if needed
+Generate new appstore certificates
+
+Usage bundle exec fastlane ios generate_new_appstore_certificates --env ios.<specific env>
 
 ### ios register_new_iphone_device
 

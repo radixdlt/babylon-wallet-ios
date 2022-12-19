@@ -12,58 +12,70 @@ platform :ios do
 
     desc "Builds and archives the app"
     lane :build do
-        install_distribution_certificate
+        Dotenv.load ".env.ios.alpha"
+        install_distribution_certificates
         build_app
     end
 
     desc "Runs test"
     lane :tests do
+        Dotenv.load ".env.ios.dev"
         run_tests
     end
 
-    desc "Builds and deploys beta app to TestFlight"
-    lane :beta_deploy do
-        install_distribution_certificate
+    desc "Deploy the app for a given flavour: alpha, beta, release"
+    desc "Usage `bundle exec fastlane ios deploy --env ios.<specific env>`"
+    lane :deploy do |options|
+        install_distribution_certificates
         
-        build_number = bump_build_number
-        commit_version_bump(xcodeproj: ENV['PROJ_PATH'])
-        build_app
-        version = get_version
-        version_and_build_number = "%s#%s" % [version, build_number]
-        add_git_tag(tag: version_and_build_number)
         api_key = app_store_connect_api_key
+        app_version = read_common_config(key: "APP_VERSION")
+        build_number = latest_testflight_build_number(
+            version: app_version,
+            app_identifier: read_env_config(key: "PRODUCT_BUNDLE_IDENTIFIER"),
+            initial_build_number: 0
+        ) + 1
+        increment_build_number(
+            xcodeproj: ENV['PROJ_PATH'],
+            build_number: build_number 
+        )
+        build_app
         upload_to_testflight(
             api_key: api_key
         )
+
+        tag = "%s#%s-%s" % [version, build_number, ENV['FLAVOUR']]
+        add_git_tag(tag: version_and_build_number)
         push_to_git_remote
     end
 
-    desc "Installs certificates on the machine"
-    lane :install_certificates do
-        install_development_certificate
-        install_distribution_certificate
-    end
-
-    desc "Installs distribution certificate"
-    lane :install_distribution_certificate do
+    desc "Installs distribution certificates"
+    desc "Usage `bundle exec fastlane ios install_distribution_certificate --env ios.<specific env>`"
+    lane :install_distribution_certificates do
         code_signing(type: "appstore")
     end
 
-    desc "Installs development certificate"
-    lane :install_development_certificate do
+    desc "Installs development certificates"
+    lane :install_development_certificates do
+        Dotenv.load ".env.ios.dev"
         code_signing(type: "development")
     end
 
-    desc "Generates new certificates if needed"
-    lane :generate_new_certificates do
+    desc "Generate new dev certificates"
+    lane :generate_new_dev_certificates do
         code_signing(type: "development", readonly: false)
+    end
+
+    desc "Generate new appstore certificates"
+    desc "Usage bundle exec fastlane ios generate_new_appstore_certificates --env ios.<specific env>"
+    lane :generate_new_appstore_certificates do
         code_signing(type: "appstore", readonly: false)
     end
 
     desc "Registers a new iPhone device and updates the certificates"
     lane :register_new_iphone_device do
         register_new_device
-        generate_new_certificates
+        generate_new_dev_certificates
     end
 
 end
@@ -95,21 +107,6 @@ platform :mac do
     end
 end
 
-desc "Bumps up the build number"
-private_lane :bump_build_number do
-    increment_build_number(
-        xcodeproj: ENV['PROJ_PATH']
-    )
-end
-
-desc "Reads the version"
-private_lane :get_version do
-    get_version_number_from_xcodeproj(
-        xcodeproj: ENV['PROJ_PATH'],
-        scheme: ENV['SCHEME']
-    )
-end
-
 private_lane :register_new_device do |options|
     name = prompt(text: "Device name: ")
     udid = prompt(text: "Device UDID: ")
@@ -118,6 +115,22 @@ private_lane :register_new_device do |options|
 
     app_store_connect_api_key
     register_devices(devices: devices)
+end
+
+private_lane :read_common_config do |options|
+    key = options.fetch(:key, "")
+    get_xcconfig_value(
+        path: ENV['COMMON_XCCONFIG_PATH'],
+        name: key
+    )
+end
+
+private_lane :read_env_config do |options|
+    key = options.fetch(:key, "")
+    get_xcconfig_value(
+        path: ENV['XCCONFIG_PATH'],
+        name: key
+    )
 end
 
 private_lane :code_signing do |options|
@@ -135,6 +148,8 @@ private_lane :code_signing do |options|
     sync_code_signing(
         type: type,
         force_for_new_devices: true,
-        readonly: readonly
+        readonly: readonly,
+        app_identifier: read_env_config(key: "PRODUCT_BUNDLE_IDENTIFIER"),
+        team_id: read_common_config(key: "DEV_TEAM")
     )
 end
