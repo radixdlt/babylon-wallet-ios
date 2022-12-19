@@ -4,8 +4,9 @@
 
 "accountList.row.copyTitle" = "Copy";
 
-"accountPreferences.faucetButtonTitle" = "Get Betanet XRD Test Tokens";
 "accountPreferences.title" = "Account Preferences";
+"accountPreferences.faucetButtonTitle" = "Get Betanet XRD Test Tokens";
+"accountPreferences.loadingPrompt" = "This may take several seconds, please wait for completion";
 
 "aggregatedValue.title" = "Total value";
 

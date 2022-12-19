@@ -47,6 +47,11 @@ public extension AccountPreferences.View {
 						.enabled(viewStore.isFaucetButtonEnabled)
 						.isLoading(viewStore.isLoading, context: .local)
 
+						if isLoading {
+							Text(L10n.AccountPreferences.loadingPrompt)
+								.font(.app.body2Regular)
+						}
+
 						Spacer()
 					}
 					.padding([.horizontal, .bottom], .medium1)
