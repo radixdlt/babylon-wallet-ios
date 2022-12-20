@@ -42,6 +42,11 @@ public extension NewConnection.View {
 								then: { LocalNetworkAuthorization.View(store: $0) }
 							)
 							CaseLet(
+								state: /NewConnection.State.cameraPermission,
+								action: { NewConnection.Action.child(.cameraPermission($0)) },
+								then: { CameraPermission.View(store: $0) }
+							)
+							CaseLet(
 								state: /NewConnection.State.scanQR,
 								action: { NewConnection.Action.child(.scanQR($0)) },
 								then: { ScanQR.View(store: $0) }

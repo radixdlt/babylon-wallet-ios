@@ -16,6 +16,9 @@ public extension NewConnection {
 			.ifCaseLet(/State.localNetworkAuthorization, action: /Action.child .. Action.ChildAction.localNetworkAuthorization) {
 				LocalNetworkAuthorization()
 			}
+			.ifCaseLet(/State.cameraPermission, action: /Action.child .. Action.ChildAction.cameraPermission) {
+				CameraPermission()
+			}
 			.ifCaseLet(/State.scanQR, action: /Action.child .. Action.ChildAction.scanQR) {
 				ScanQR()
 			}
@@ -28,7 +31,7 @@ public extension NewConnection {
 		switch action {
 		case .internal(.view(.dismissButtonTapped)):
 			switch state {
-			case .localNetworkAuthorization, .scanQR:
+			case .localNetworkAuthorization, .cameraPermission, .scanQR:
 				return .run { send in
 					await send(.delegate(.dismiss))
 				}
@@ -52,8 +55,20 @@ public extension NewConnection {
 				)
 			}
 
-		case let .child(.localNetworkAuthorization(.delegate(.localNetworkAuthorizationResponse(isAuthorized)))):
-			if isAuthorized {
+		case let .child(.localNetworkAuthorization(.delegate(.localNetworkAuthorizationResponse(allowed)))):
+			if allowed {
+				#if os(iOS)
+				state = .cameraPermission(.init())
+				#elseif os(macOS)
+				state = .scanQR(.init())
+				#endif
+				return .none
+			} else {
+				return .run { send in await send(.delegate(.dismiss)) }
+			}
+
+		case let .child(.cameraPermission(.delegate(.permissionResponse(allowed)))):
+			if allowed {
 				state = .scanQR(.init())
 				return .none
 			} else {

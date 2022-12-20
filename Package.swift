@@ -533,6 +533,7 @@ package.addModules([
 	.feature(
 		name: "NewConnectionFeature",
 		dependencies: [
+			"CameraPermissionClient",
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])),
 			converse,
 			"Common",
@@ -670,6 +671,13 @@ package.addModules([
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.client(
+		name: "CameraPermissionClient",
+		dependencies: [
+			dependencies,
+		],
+		tests: .no
 	),
 	.client(
 		name: "Data",
