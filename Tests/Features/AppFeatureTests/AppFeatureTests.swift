@@ -191,7 +191,7 @@ final class AppFeatureTests: TestCase {
 			App.UserFacingError(foobar)
 		)))) {
 			$0.errorAlert = .init(
-				title: .init("An error ocurred"),
+				title: .init("An error occurred"),
 				message: .init("Failed to create Wallet from backup: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))")
 			)
 		}
@@ -238,9 +238,9 @@ final class AppFeatureTests: TestCase {
 
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
 			$0.errorAlert = .init(
-				title: .init("Incompatible Profile found"),
-				message: .init("Saved Profile has version: \(String(describing: badVersion)), but this app requires a minimum Profile version of \(String(describing: ProfileSnapshot.Version.minimum)). You must delete the Profile and create a new one to use this app."),
-				dismissButton: .destructive(.init("Delete"), action: .send(App.Action.ViewAction.deleteIncompatibleProfile))
+				title: .init("Incompatible Wallet Backup found"),
+				message: .init("Saved Wallet Backup has version: \(String(describing: badVersion)), but this app requires a minimum Wallet version of \(String(describing: ProfileSnapshot.Version.minimum)). You must delete the Wallet and create a new one to use this app."),
+				dismissButton: .destructive(.init("Delete & create new wallet"), action: .send(App.Action.ViewAction.deleteIncompatibleProfile))
 			)
 		}
 
@@ -285,9 +285,9 @@ final class AppFeatureTests: TestCase {
 
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
 			$0.errorAlert = .init(
-				title: .init("Incompatible Profile found"),
-				message: .init("Saved Profile has version: \(String(describing: badVersion)), but this app requires a minimum Profile version of \(String(describing: ProfileSnapshot.Version.minimum)). You must delete the Profile and create a new one to use this app."),
-				dismissButton: .destructive(.init("Delete"), action: .send(App.Action.ViewAction.deleteIncompatibleProfile))
+				title: .init("Incompatible Wallet Backup found"),
+				message: .init("Saved Wallet Backup has version: \(String(describing: badVersion)), but this app requires a minimum Wallet version of \(String(describing: ProfileSnapshot.Version.minimum)). You must delete the Wallet and create a new one to use this app."),
+				dismissButton: .destructive(.init("Delete & create new wallet"), action: .send(App.Action.ViewAction.deleteIncompatibleProfile))
 			)
 		}
 

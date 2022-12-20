@@ -79,7 +79,6 @@ private struct SettingsButton: View {
 
 	public var body: some View {
 		ZStack(alignment: .topTrailing) {
-			// TODO: use swiftgen for assets
 			Button(action: action) {
 				Image(asset: AssetResource.homeHeaderSettings)
 			}

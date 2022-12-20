@@ -150,7 +150,7 @@ public enum L10n {
   	/// Import Radix Wallet backup
   	public static let importProfile = L10n.tr("Localizable", "importProfile.importProfile", fallback: "Import Radix Wallet backup")
   	/// Mnemonic phrase
-  	public static let mnemonicPhrasec = L10n.tr("Localizable", "importProfile.mnemonicPhrasec", fallback: "Mnemonic phrase")
+  	public static let mnemonicPhrase = L10n.tr("Localizable", "importProfile.mnemonicPhrase", fallback: "Mnemonic phrase")
   	/// Radix Wallet backup from file
   	public static let profileFromSnapshot = L10n.tr("Localizable", "importProfile.profileFromSnapshot", fallback: "Radix Wallet backup from file")
   	/// Save imported mnemonic
@@ -289,6 +289,14 @@ public enum L10n {
   	public static let biometricsNotSetUpMessage = L10n.tr("Localizable", "splash.biometricsNotSetUpMessage", fallback: "This app requires your phone to have biometrics set up")
   	/// Biometrics not set up
   	public static let biometricsNotSetUpTitle = L10n.tr("Localizable", "splash.biometricsNotSetUpTitle", fallback: "Biometrics not set up")
+  	/// Delete & create new wallet
+  	public static let incompatibleProfileVersionAlertDeleteButton = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertDeleteButton", fallback: "Delete & create new wallet")
+  	/// Saved Wallet Backup has version: %@, but this app requires a minimum Wallet version of %@. You must delete the Wallet and create a new one to use this app.
+  	public static func incompatibleProfileVersionAlertMessage(_ p1: Any, _ p2: Any) -> String {
+  		return L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertMessage", String(describing: p1), String(describing: p2), fallback: "Saved Wallet Backup has version: %@, but this app requires a minimum Wallet version of %@. You must delete the Wallet and create a new one to use this app.")
+  	}
+  	/// Incompatible Wallet Backup found
+  	public static let incompatibleProfileVersionAlertTitle = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertTitle", fallback: "Incompatible Wallet Backup found")
 	}
 	public enum TransactionSigning {
   	/// Authenticate to sign transaction with this phone.

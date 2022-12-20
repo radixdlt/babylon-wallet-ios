@@ -17,15 +17,3 @@ public struct UserDefaultsClient: Sendable {
 	public var setDouble: @Sendable (Double, Key) async -> Void
 	public var setInteger: @Sendable (Int, Key) async -> Void
 }
-
-public extension UserDefaultsClient {
-	var hasShownFirstLaunchOnboarding: Bool {
-		boolForKey(hasShownFirstLaunchOnboardingKey)
-	}
-
-	func setHasShownFirstLaunchOnboarding(_ bool: Bool) async {
-		await setBool(bool, hasShownFirstLaunchOnboardingKey)
-	}
-}
-
-let hasShownFirstLaunchOnboardingKey = "hasShownFirstLaunchOnboardingKey"

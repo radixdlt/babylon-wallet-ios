@@ -70,7 +70,7 @@ extension Component {
 			ExpandableRowBackgroundView(
 				paddingEdge: edge,
 				paddingValue: value,
-				cornerRadius: opositeValue
+				cornerRadius: oppositeValue
 			)
 			.tokenRowShadow(condition: isExpanded && !isLast)
 		)
@@ -117,7 +117,7 @@ extension Component: ExpandableRow {
 		isExpanded ? Constants.radius : 0
 	}
 
-	var opositeValue: CGFloat {
+	var oppositeValue: CGFloat {
 		isExpanded ? 0 : Constants.radius
 	}
 }

@@ -39,7 +39,7 @@ public extension ImportMnemonic.View {
 				Spacer()
 
 				TextField(
-					L10n.ImportProfile.mnemonicPhrasec,
+					L10n.ImportProfile.mnemonicPhrase,
 					text: viewStore.binding(
 						get: \.phraseOfMnemonicToImport,
 						send: { .phraseOfMnemonicToImportChanged($0) }
