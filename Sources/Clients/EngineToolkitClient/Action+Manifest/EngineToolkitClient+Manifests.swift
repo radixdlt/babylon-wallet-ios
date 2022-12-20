@@ -71,7 +71,7 @@ public struct NoKnownAddressForNetworkID: LocalizedError {
 public extension EngineToolkitClient {
 	func lockFeeCallMethod(
 		address: ComponentAddress,
-		fee: Decimal = 10.0
+		fee: String = "10"
 	) -> CallMethod {
 		CallMethod(
 			receiver: address,
@@ -94,7 +94,7 @@ public extension EngineToolkitClient {
 
 	func lockFeeCallMethod(
 		faucetForNetwork networkID: NetworkID,
-		fee: Decimal = 10.0
+		fee: String = "10"
 	) throws -> CallMethod {
 		let faucetAddress = try faucetAddress(for: networkID)
 		return lockFeeCallMethod(address: faucetAddress, fee: fee)
