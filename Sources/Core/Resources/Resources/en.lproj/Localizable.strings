@@ -1,4 +1,5 @@
 "app.developmentOnlyInfo" = "Development use only. Not usable on Radix mainnet.";
+"app.errorOccurredTitle" = "An Error Occurred";
 
 "accountDetails.transferButtonTitle" = "Transfer";
 
@@ -49,7 +50,7 @@
 "dApp.connectionRequest.title" = "dApp Connection Request";
 "dApp.connectionRequest.wantsToConnect" = "%@ wants to connect to your wallet";
 "dApp.unknownName" = "Unknown dApp";
-
+"dApp.request.wrongNetworkError" = "Request received from dApp for network %@, but you are currently connected to %@.";
 "fungibleTokenList.detail.resourceAddress" = "Resource Address";
 "fungibleTokenList.detail.currentSupply" = "Current Supply";
 

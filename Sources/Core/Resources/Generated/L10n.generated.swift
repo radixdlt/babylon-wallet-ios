@@ -35,6 +35,8 @@ public enum L10n {
 	public enum App {
   	/// Development use only. Not usable on Radix mainnet.
   	public static let developmentOnlyInfo = L10n.tr("Localizable", "app.developmentOnlyInfo", fallback: "Development use only. Not usable on Radix mainnet.")
+  	/// An Error Occurred
+  	public static let errorOccurredTitle = L10n.tr("Localizable", "app.errorOccurredTitle", fallback: "An Error Occurred")
 	}
 	public enum AssetsView {
   	/// Badges
@@ -119,6 +121,12 @@ public enum L10n {
     	/// %@ wants to connect to your wallet
     	public static func wantsToConnect(_ p1: Any) -> String {
     		return L10n.tr("Localizable", "dApp.connectionRequest.wantsToConnect", String(describing: p1), fallback: "%@ wants to connect to your wallet")
+    	}
+  	}
+  	public enum Request {
+    	/// Request received from dApp for network %@, but you are currently connected to %@.
+    	public static func wrongNetworkError(_ p1: Any, _ p2: Any) -> String {
+    		return L10n.tr("Localizable", "dApp.request.wrongNetworkError", String(describing: p1), String(describing: p2), fallback: "Request received from dApp for network %@, but you are currently connected to %@.")
     	}
   	}
 	}
