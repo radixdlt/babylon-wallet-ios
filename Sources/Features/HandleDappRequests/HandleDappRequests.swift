@@ -50,7 +50,7 @@ private extension HandleDappRequests {
 					await send(.internal(.system(.failedWithError(
 						requestFromP2P,
 						.wrongNetwork,
-						L10n.DApp.Request.wrongNetworkError(currentNetwork.name, incommingRequestNetwork.name)
+						L10n.DApp.Request.wrongNetworkError(incommingRequestNetwork.name, currentNetwork.name)
 					))))
 					return
 				}

@@ -81,7 +81,7 @@ final class HandleDappRequestsTests: TestCase {
 		)
 
 		let error = P2P.ToDapp.Response.Failure.Kind.Error.wrongNetwork
-		let errorMsg = "Wallet is using network ID: \(currentNetworkID), request sent specified network ID: \(request.requestFromDapp.metadata.networkId)."
+		let errorMsg = "Request received from dApp for network nebunet, but you are currently connected to mardunet."
 		let response = P2P.ToDapp.Response.failure(.init(id: request.id, kind: .error(error), message: errorMsg))
 		let store = TestStore(
 			initialState: HandleDappRequests.State(
