@@ -282,7 +282,7 @@ public struct Home: ReducerProtocol {
 	}
 
 	func copyAddress(_ address: AccountAddress) -> EffectTask<Action> {
-		// TODO: display confirmation popup? discuss with po / designer
+		// TODO: display confirmation popup? discuss with PO / designer
 		.run { _ in
 			pasteboardClient.copyString(address.wrapAsAddress().address)
 		}

@@ -12,7 +12,7 @@ public extension ProfileLoader {
 
 		// This might happen to due to incompatible version, and some
 		// potential discrepancy in version check, or due to some internal
-		// error when creatin a profile from a snapshot.
+		// error when creating a profile from a snapshot.
 		case failedToCreateProfileFromSnapshot(FailedToCreateProfileFromSnapshot)
 	}
 }

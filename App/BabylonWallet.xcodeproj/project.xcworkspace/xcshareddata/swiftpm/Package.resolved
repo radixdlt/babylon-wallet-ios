@@ -248,8 +248,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "edb0d3bc9d1aa1e61e4ebf22d3c51ef8de791372",
-        "version" : "0.0.55"
+        "revision" : "e29f50940ddafa788b140ace4e078030d51cb6a0",
+        "version" : "0.1.0"
       }
     },
     {
@@ -309,7 +309,7 @@
     {
       "identity" : "webrtc",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/stasel/WebRTC",
+      "location" : "https://github.com/stasel/WebRTC.git",
       "state" : {
         "revision" : "6dd54fc242d3261317b5e6eb17bf178b1359609b",
         "version" : "106.0.0"

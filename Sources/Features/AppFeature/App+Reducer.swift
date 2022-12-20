@@ -36,14 +36,14 @@ public struct App: Sendable, ReducerProtocol {
 		case .internal(.view(.task)):
 			return .run { send in
 				for try await error in errorQueue.errors() {
-					print("An error ocurred", String(describing: error))
+					print("An error occurred", String(describing: error))
 					await send(.internal(.system(.displayErrorAlert(UserFacingError(error)))))
 				}
 			}
 
 		case let .internal(.system(.displayErrorAlert(error))):
 			state.errorAlert = .init(
-				title: .init("An error ocurred"),
+				title: .init("An error occurred"),
 				message: .init(error.legibleLocalizedDescription)
 			)
 			return .none

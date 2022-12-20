@@ -56,7 +56,7 @@ private extension HandleDappRequests {
 				return .none
 			}
 			guard let itemToHandle = state.unfinishedRequestsFromClient.next() else {
-				// We just queued a request, did it contain no RequestItems at all? This is undefined behaviour. Should we return an empty response here?
+				// We just queued a request, did it contain no RequestItems at all? This is undefined behavior. Should we return an empty response here?
 				return .none
 			}
 			return .run { send in

@@ -55,7 +55,7 @@
 
 "importProfile.importMnemonic" = "Import mnemonic";
 "importProfile.importProfile" = "Import Radix Wallet backup";
-"importProfile.mnemonicPhrasec" = "Mnemonic phrase";
+"importProfile.mnemonicPhrase" = "Mnemonic phrase";
 "importProfile.profileFromSnapshot" = "Radix Wallet backup from file";
 "importProfile.saveImportedMnemonic" = "Save imported mnemonic";
 

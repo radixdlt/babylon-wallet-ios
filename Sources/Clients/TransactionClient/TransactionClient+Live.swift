@@ -371,14 +371,14 @@ struct FailedToGetDetailsOfSuccessfullySubmittedTX: LocalizedError, Equatable {
 }
 
 // MARK: - SubmitTXFailure
-// FIXME: - mainnet: improve hanlding of polling failure
+// FIXME: - mainnet: improve handling of polling failure
 /// This failure might be a false positive, due to i.e. POLLING of tx failed, but TX might have
 /// been submitted successfully. Or we might have successfully submitted the TX but failed to get details about it.
 public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 	case failedToSubmitTX
 	case invalidTXWasDuplicate(txID: TXID)
 
-	/// Failed to poll, maybe TX was submitted successfuly?
+	/// Failed to poll, maybe TX was submitted successfully?
 	case failedToPollTX(txID: TXID, error: FailedToPollError)
 
 	case failedToGetTransactionStatus(txID: TXID, error: FailedToGetTransactionStatus)

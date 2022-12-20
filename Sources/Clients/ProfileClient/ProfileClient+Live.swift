@@ -91,7 +91,7 @@ public extension ProfileClient {
 					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot(
 						// This should not be be shown due to settings of profile snapshot
 						// item when it was originally stored.
-						authenticationPrompt: "Read profile in order get reference to secrects to delete"
+						authenticationPrompt: "Read wallet data in order get reference to secret's to delete"
 					)
 				} catch {
 					try await keychainClient.removeProfileSnapshot()
