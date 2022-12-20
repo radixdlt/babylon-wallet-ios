@@ -98,9 +98,9 @@
 
 "splash.biometricsNotSetUpMessage" = "This app requires your phone to have biometrics set up";
 "splash.biometricsNotSetUpTitle" = "Biometrics not set up";
-"splash.incompatibleProfileVersionAlertTitle" = "Incompatible Wallet Backup found";
-"splash.incompatibleProfileVersionAlertMessage" = "Saved Wallet Backup has version: %@, but this app requires a minimum Wallet version of %@. You must delete the Wallet and create a new one to use this app.";
-"splash.incompatibleProfileVersionAlertDeleteButton" = "Delete & create new wallet";
+"splash.incompatibleProfileVersionAlertTitle" = "Wallet Data is Incompatible";
+"splash.incompatibleProfileVersionAlertMessage" = "For this Preview wallet version, you must delete your wallet data to continue.";
+"splash.incompatibleProfileVersionAlertDeleteButton" = "Delete Wallet Data";
 
 "onboarding.newAccountButtonTitle" = "New Account";
 

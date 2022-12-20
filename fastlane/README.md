@@ -31,6 +31,14 @@ Builds and archives the app
 
 Runs test
 
+### ios make_badge
+
+```sh
+[bundle exec] fastlane ios make_badge
+```
+
+
+
 ### ios deploy
 
 ```sh
