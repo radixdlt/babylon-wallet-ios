@@ -672,23 +672,6 @@ package.addModules([
 		)
 	),
 	.client(
-		name: "P2PConnectivityClient",
-		dependencies: [
-			asyncExtensions,
-			"Common",
-			converse,
-			dependencies,
-			engineToolkit, // Model: SignTX contains Manifest
-			"JSON",
-			profile, // Account
-			"ProfileClient",
-			"SharedModels",
-		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
-	),
-	.client(
 		name: "Data",
 		dependencies: [
 			dependencies,
@@ -775,6 +758,23 @@ package.addModules([
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.client(
+		name: "P2PConnectivityClient",
+		dependencies: [
+			asyncExtensions,
+			"Common",
+			converse,
+			dependencies,
+			engineToolkit, // Model: SignTX contains Manifest
+			"JSON",
+			profile, // Account
+			"ProfileClient",
+			"SharedModels",
+		],
+		tests: .yes(dependencies: [
+			"TestUtils",
+		])
 	),
 	.client(
 		name: "PasteboardClient",
