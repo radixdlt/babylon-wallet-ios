@@ -77,7 +77,7 @@ public extension P2PConnectivityClient {
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
 		return Self(
-			getLocalNetworkAuthorization: {
+			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
 			},
 			getP2PClients: {

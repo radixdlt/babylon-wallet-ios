@@ -14,7 +14,7 @@ public extension NewConnection {
 
 		EmptyReducer()
 			.ifCaseLet(/State.localNetworkAuthorization, action: /Action.child .. Action.ChildAction.localNetworkAuthorization) {
-				LocalNetworkAuthorization()
+				LocalNetworkPermission()
 			}
 			.ifCaseLet(/State.cameraPermission, action: /Action.child .. Action.ChildAction.cameraPermission) {
 				CameraPermission()
@@ -55,7 +55,7 @@ public extension NewConnection {
 				)
 			}
 
-		case let .child(.localNetworkAuthorization(.delegate(.localNetworkAuthorizationResponse(allowed)))):
+		case let .child(.localNetworkAuthorization(.delegate(.permissionResponse(allowed)))):
 			if allowed {
 				#if os(iOS)
 				state = .cameraPermission(.init())

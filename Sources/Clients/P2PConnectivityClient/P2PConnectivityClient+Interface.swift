@@ -19,7 +19,7 @@ public extension DependencyValues {
 
 //  MARK: - P2PConnectivityClient
 public struct P2PConnectivityClient: DependencyKey, Sendable {
-	public var getLocalNetworkAuthorization: GetLocalNetworkAuthorization
+	public var getLocalNetworkAccess: GetLocalNetworkAccess
 	public var getP2PClients: GetP2PClients
 	public var addP2PClientWithConnection: AddP2PClientWithConnection
 	public var deleteP2PClientByID: DeleteP2PClientByID
@@ -31,7 +31,7 @@ public struct P2PConnectivityClient: DependencyKey, Sendable {
 }
 
 public extension P2PConnectivityClient {
-	typealias GetLocalNetworkAuthorization = @Sendable () async -> Bool
+	typealias GetLocalNetworkAccess = @Sendable () async -> Bool
 	typealias GetP2PClients = @Sendable () async throws -> AnyAsyncSequence<[P2P.ClientWithConnectionStatus]>
 	typealias AddP2PClientWithConnection = @Sendable (P2P.ConnectionForClient, AlsoConnect) async throws -> Void; typealias AlsoConnect = Bool
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void

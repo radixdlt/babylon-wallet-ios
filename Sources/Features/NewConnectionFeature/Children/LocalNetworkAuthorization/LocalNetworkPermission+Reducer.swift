@@ -5,29 +5,29 @@ import P2PConnectivityClient
 import class UIKit.UIApplication
 #endif
 
-// MARK: - LocalNetworkAuthorization
-public struct LocalNetworkAuthorization: Sendable, ReducerProtocol {
+// MARK: - LocalNetworkPermission
+public struct LocalNetworkPermission: Sendable, ReducerProtocol {
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.openURL) var openURL
 
 	public init() {}
 }
 
-public extension LocalNetworkAuthorization {
+public extension LocalNetworkPermission {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
 			return .run { send in
-				let isLocalNetworkAuthorized = await p2pConnectivityClient.getLocalNetworkAuthorization()
-				if isLocalNetworkAuthorized {
-					await send(.delegate(.localNetworkAuthorizationResponse(true)))
+				let allowed = await p2pConnectivityClient.getLocalNetworkAccess()
+				if allowed {
+					await send(.delegate(.permissionResponse(true)))
 				} else {
-					await send(.internal(.system(.displayAuthorizationDeniedAlert)))
+					await send(.internal(.system(.displayPermissionDeniedAlert)))
 				}
 			}
 
-		case .internal(.system(.displayAuthorizationDeniedAlert)):
-			state.authorizationDeniedAlert = .init(
+		case .internal(.system(.displayPermissionDeniedAlert)):
+			state.permissionDeniedAlert = .init(
 				title: { TextState(L10n.NewConnection.LocalNetworkAuthorization.DeniedAlert.title) },
 				actions: {
 					ButtonState(
@@ -45,18 +45,18 @@ public extension LocalNetworkAuthorization {
 			)
 			return .none
 
-		case let .internal(.view(.authorizationDeniedAlert(action))):
-			state.authorizationDeniedAlert = nil
+		case let .internal(.view(.permissionDeniedAlert(action))):
+			state.permissionDeniedAlert = nil
 			switch action {
 			case .dismissed:
 				return .none
 			case .cancelButtonTapped:
 				return .run { send in
-					await send(.delegate(.localNetworkAuthorizationResponse(false)))
+					await send(.delegate(.permissionResponse(false)))
 				}
 			case .openSettingsButtonTapped:
 				return .run { send in
-					await send(.delegate(.localNetworkAuthorizationResponse(false)))
+					await send(.delegate(.permissionResponse(false)))
 					#if os(iOS)
 					await openURL(URL(string: UIApplication.openSettingsURLString)!)
 					#endif

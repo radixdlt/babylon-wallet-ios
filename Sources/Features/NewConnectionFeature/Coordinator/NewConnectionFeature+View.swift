@@ -39,7 +39,7 @@ public extension NewConnection.View {
 							CaseLet(
 								state: /NewConnection.State.localNetworkAuthorization,
 								action: { NewConnection.Action.child(.localNetworkAuthorization($0)) },
-								then: { LocalNetworkAuthorization.View(store: $0) }
+								then: { LocalNetworkPermission.View(store: $0) }
 							)
 							CaseLet(
 								state: /NewConnection.State.cameraPermission,
