@@ -17,7 +17,7 @@ let package = Package(
 package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", revision: "c1ec654784d4d1feb5779a02b30d8f13e99e1b87"),
+	.package(url: "git@github.com:radixdlt/Converse.git", revision: "16306bf903ad0df3119aa143dfb6ac536dace7d9"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.10"),
 	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.1.0"),
 

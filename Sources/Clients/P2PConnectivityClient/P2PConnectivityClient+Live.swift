@@ -40,44 +40,30 @@ public extension P2PConnectivityClient {
 			}
 
 			@Sendable func emit() async {
-				print("🚨 emitting: \(connections.values.map(\.client.displayName))")
 				base.send(
 					connections.values.map { $0 }
 				)
-				print("🚨 emmitted!")
 			}
 
 			func addConnection(_ connection: P2P.ConnectionForClient, connect: Bool, emitUpdate: Bool) async {
-				print("💩 addConnection START")
 				let key = connection.peer.connectionID
 				guard connections[key] == nil else {
-					print("💩 addConnection key exists, returning...")
 					return
 				}
 				self.connections[key] = connection
-				print("💩 addConnection set connection for key")
 				guard connect else {
-					print("💩 addConnection not connecting...")
 					if emitUpdate {
-						print("💩 addConnection emitting,..?")
 						await emit()
-						print("💩 addConnection emitted!")
 					}
-					print("💩 addConnection return from guard")
 					return
 				}
-				print("💩 addConnection detatch connecting..")
 				Task.detached { [connection] in
 					try await connection.peer.connect()
 				}
-				print("💩 addConnection detatch connected end")
 				guard emitUpdate else {
-					print("💩 addConnection not emit, returning")
 					return
 				}
-				print("💩 addConnection emitting..?")
 				await emit()
-				print("💩 addConnection emitted!?")
 			}
 
 			func disconnectedAndRemove(_ id: P2PClient.ID) async {
@@ -94,20 +80,16 @@ public extension P2PConnectivityClient {
 			}
 
 			func getConnection(id: P2PClient.ID) async -> P2P.ConnectionForClient? {
-				print("🫁 getting connection for ID: \(id)")
 				guard
 					let key = try? mapID(id)
 				else {
-					print("🫁 failed to map id to key")
 					return nil
 				}
 				guard
 					let peer = connections[key]
 				else {
-					print("🫁 no connection found for: \(id) or key=\(key), only have: \(connections.values)")
 					return nil
 				}
-				print("🫁 got connection for ID: \(id)")
 				return peer
 			}
 		}
@@ -121,45 +103,30 @@ public extension P2PConnectivityClient {
 				await localNetworkAuthorization.requestAuthorization()
 			},
 			getP2PClients: {
-				print("🧝‍♀️ getP2PClients start")
 				let connections = try await profileClient.getP2PClients()
-				print("🧝‍♀️ getP2PClients read #\(connections.connections.count) connections from profile")
 				let clientsWithConnectionStatus = try await connections.connections.asyncMap { p2pClient in
-					print("🧝‍♀️ getP2PClients async map to peer START")
 
 					let password = try ConnectionPassword(data: p2pClient.connectionPassword.data)
-					print("🧝‍♀️ getP2PClients async map to peer created password")
 					let secrets = try ConnectionSecrets.from(connectionPassword: password)
-					print("🧝‍♀️ getP2PClients async map to peer created secrets")
 					let peer = Peer(connectionSecrets: secrets)
-					print("🧝‍♀️ getP2PClients async map to peer created peer")
 
 					let connectedClient = P2P.ConnectionForClient(
 						client: p2pClient,
 						peer: peer
 					)
-					print("🧝‍♀️ getP2PClients async map to peer created connectedClient")
 					await connectionsHolder.addConnection(connectedClient, connect: true, emitUpdate: false)
-					print("🧝‍♀️ getP2PClients async map to added Connection to connections holder")
 
-					print("🧝‍♀️ getP2PClients async map to peer END")
 					return P2P.ClientWithConnectionStatus(p2pClient: p2pClient)
 				}
-				print("🧝‍♀️ getP2PClients async mapped ALL to peer")
 				Task.detached {
-					print("🧝‍♀️ emitting detatched")
 					await connectionsHolder.emit()
-					print("🧝‍♀️ emitted detatched")
 				}
-				print("🧝‍♀️ returning asyncSequence")
 				return connectionsHolder.multicasted.autoconnect()
 
 			},
 			addP2PClientWithConnection: { clientWithConnection, alsoConnect in
 				try await profileClient.addP2PClient(clientWithConnection.client)
-				print("🎃 adding new and emitting!")
 				await connectionsHolder.addConnection(clientWithConnection, connect: alsoConnect, emitUpdate: true)
-				print("🎃 adding new finished!")
 			},
 			deleteP2PClientByID: { id in
 				try await profileClient.deleteP2PClientByID(id)
@@ -179,12 +146,9 @@ public extension P2PConnectivityClient {
 				.eraseToAnyAsyncSequence()
 			},
 			getRequestsFromP2PClientAsyncSequence: { id in
-				print("👹 getRequestsFromP2PClientAsyncSequence START id=\(id)")
 				guard let connection = await connectionsHolder.getConnection(id: id) else {
-					print("👹 getRequestsFromP2PClientAsyncSequence not found for connectionID: \(id)")
 					return AsyncLazySequence([]).eraseToAnyAsyncSequence()
 				}
-				print("👹 getRequestsFromP2PClientAsyncSequence connection.name: \(connection.client.displayName)")
 				return await connection.peer.incomingMessagesPublisher.tryMap { (msg: ChunkingTransportIncomingMessage) in
 					@Dependency(\.jsonDecoder) var jsonDecoder
 
@@ -207,27 +171,14 @@ public extension P2PConnectivityClient {
 			},
 			sendMessageReadReceipt: { id, readMessage in
 				guard let connection = await connectionsHolder.getConnection(id: id) else {
-					struct NoConnection: LocalizedError {
-						init() {}
-						var errorDescription: String? {
-							"Connection offline."
-						}
-					}
 					throw NoConnection()
 				}
-//				try await connection.peer.sendReadReceipt(messageID: msgID)
 				try await connection.peer.sendReadReceipt(for: readMessage)
 			},
 			sendMessage: { outgoingMsg in
 				@Dependency(\.jsonEncoder) var jsonEncoder
 
 				guard let connection = await connectionsHolder.getConnection(id: outgoingMsg.connectionID) else {
-					struct NoConnection: LocalizedError {
-						init() {}
-						var errorDescription: String? {
-							"Connection offline."
-						}
-					}
 					throw NoConnection()
 				}
 				let responseToDappData = try jsonEncoder().encode(outgoingMsg.responseToDapp)
@@ -249,23 +200,28 @@ public extension P2PConnectivityClient {
 				throw FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp()
 			},
 			_sendTestMessage: { id, message in
-				print("💄 Sending test message to connection with id: \(id)")
 				guard let connection = await connectionsHolder.getConnection(id: id) else {
-					print("💄 no connection found for: \(id)")
+					print("No connection found for: \(id)")
 					return
 				}
-				print("💄 got connection, will try to send message...")
 				do {
 					try await connection.peer.send(data: Data(message.utf8), id: UUID().uuidString)
-					print("💄✅ successfully sent message?! :D ")
 				} catch {
-					print("💄 failed to send test message, error: \(String(describing: error))")
+					print("Failed to send test message, error: \(String(describing: error))")
 				}
 
 				// does not care about sent message receipts
 			}
 		)
 	}()
+}
+
+// MARK: - NoConnection
+struct NoConnection: LocalizedError {
+	init() {}
+	var errorDescription: String? {
+		"Connection offline."
+	}
 }
 
 // MARK: - LocalNetworkAuthorization

@@ -198,8 +198,6 @@ private extension HandleDappRequests {
 				do {
 					for try await p2pClients in try await p2pConnectivityClient.getP2PClients() {
 						print("✅ HandleDappRequests got p2pClients: \(p2pClients.map(\.client.displayName)) ")
-						//                    print("An error ocurred", String(describing: error))
-						//                    await send(.internal(.system(.displayErrorAlert(UserFacingError(error)))))
 						await send(.internal(.system(.loadConnectionsResult(.success(p2pClients)))))
 					}
 				} catch {
