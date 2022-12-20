@@ -1,4 +1,5 @@
 import Collections
+import Common
 import ComposableArchitecture
 import Foundation
 import GrantDappWalletAccessFeature
@@ -41,8 +42,16 @@ private extension HandleDappRequests {
 
 			return .run { send in
 				let currentNetworkID = await profileClient.getCurrentNetworkID()
+
 				guard requestFromP2P.requestFromDapp.metadata.networkId == currentNetworkID else {
-					await send(.internal(.system(.failedWithError(requestFromP2P, .wrongNetwork, "Wallet is using network ID: \(currentNetworkID), request sent specified network ID: \(requestFromP2P.requestFromDapp.metadata.networkId)."))))
+					let incommingRequestNetwork = try Network.lookupBy(id: requestFromP2P.requestFromDapp.metadata.networkId)
+					let currentNetwork = try Network.lookupBy(id: currentNetworkID)
+
+					await send(.internal(.system(.failedWithError(
+						requestFromP2P,
+						.wrongNetwork,
+						L10n.DApp.Request.wrongNetworkError(currentNetwork.name, incommingRequestNetwork.name)
+					))))
 					return
 				}
 				await send(.internal(.system(.receivedRequestIsValidHandleIt(requestFromP2P))))
