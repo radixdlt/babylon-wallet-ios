@@ -2,7 +2,7 @@ fastlane_require 'dotenv'
 
 before_all do
     Dotenv.load ".env.secret"
-#    ensure_git_status_clean
+    ensure_git_status_clean
 end
 
 platform :ios do
@@ -23,9 +23,6 @@ platform :ios do
         run_tests
     end
 
-    lane :make_badge do
-        add_badge(custom: "PREVIEW.png")
-    end
     desc "Deploy the app for a given flavour: alpha, beta, release"
     desc "Usage `bundle exec fastlane ios deploy --env ios.<specific env>`"
     lane :deploy do |options|
