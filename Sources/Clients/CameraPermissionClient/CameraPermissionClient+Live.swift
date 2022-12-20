@@ -8,7 +8,7 @@ extension CameraPermissionClient: DependencyKey {
 		getCameraAccess: {
 			await withUnsafeContinuation { continuation in
 				AVCaptureDevice.requestAccess(for: .video) { access in
-					continuation.resume(with: .success(access))
+					continuation.resume(returning: access)
 				}
 			}
 		}
