@@ -10,7 +10,9 @@ extension P2PConnectivityClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 	public static let testValue = Self(
 		getLocalNetworkAuthorization: unimplemented("\(Self.self).getLocalNetworkAuthorization"),
-		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
+		getP2PClients: {
+			fatalError()
+		},
 		addP2PClientWithConnection: unimplemented("\(Self.self).addP2PClientWithConnection"),
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getConnectionStatusAsyncSequence: unimplemented("\(Self.self).getConnectionStatusAsyncSequence"),
@@ -24,7 +26,7 @@ extension P2PConnectivityClient: TestDependencyKey {
 extension P2PConnectivityClient {
 	static let noop = Self(
 		getLocalNetworkAuthorization: { false },
-		getP2PClients: { [].async.eraseToAnyAsyncSequence() },
+		getP2PClients: { fatalError() },
 		addP2PClientWithConnection: { _, _ in },
 		deleteP2PClientByID: { _ in },
 		getConnectionStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },

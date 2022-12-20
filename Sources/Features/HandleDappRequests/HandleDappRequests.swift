@@ -192,30 +192,40 @@ private extension HandleDappRequests {
 			)
 
 		case .internal(.view(.task)):
+			print("☑️ HandleDappRequests getting p2pClients...")
 			return .run { send in
-				await send(.internal(.system(.loadConnections)))
-			}
-		case .internal(.system(.loadConnections)):
-			return .run { send in
+				print("☑️ HandleDappRequests getting p2pClients.......")
 				do {
-					for try await updateList in try await p2pConnectivityClient.getP2PClients() {
-						await withThrowingTaskGroup(of: Void.self) { taskGroup in
-							for id in updateList.map(\.id) {
-								taskGroup.addTask {
-									do {
-										let requests = try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(id)
-										for try await request in requests {
-											await send(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
-										}
-									} catch {
-										await send(.internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))))
-									}
-								}
-							}
-						}
+					for try await p2pClients in try await p2pConnectivityClient.getP2PClients() {
+						print("✅ HandleDappRequests got p2pClients: \(p2pClients.map(\.client.displayName)) ")
+						//                    print("An error ocurred", String(describing: error))
+						//                    await send(.internal(.system(.displayErrorAlert(UserFacingError(error)))))
+						await send(.internal(.system(.loadConnectionsResult(.success(p2pClients)))))
 					}
-				} catch {}
+				} catch {
+					await send(.internal(.system(.loadConnectionsResult(.failure(error)))))
+				}
 			}
+
+		case let .internal(.system(.loadConnectionsResult(.success(clients)))):
+			print("☑️ HandleDappRequests getting requests for #\(clients.count) clients...")
+			return .run { send in
+				for connectedClient in clients {
+					print("☑️ HandleDappRequests getting requests for client: '\(connectedClient.client.displayName)'.......")
+					do {
+						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(connectedClient.client.id) {
+							print("✅ HandleDappRequests got requests for client: '\(connectedClient.client.displayName)'!!!!")
+							await send(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
+						}
+					} catch {
+						await send(.internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))))
+					}
+				}
+			}
+
+		case let .internal(.system(.loadConnectionsResult(.failure(error)))):
+			errorQueue.schedule(error)
+			return .none
 
 		case .child:
 			return .none

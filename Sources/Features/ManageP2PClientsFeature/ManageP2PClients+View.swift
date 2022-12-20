@@ -102,7 +102,10 @@ private extension ManageP2PClients.View {
 					.padding(.vertical, .large1)
 				}
 			}
-			.onAppear { viewStore.send(.viewAppeared) }
+//			.onAppear { viewStore.send(.viewAppeared) }
+		}
+		.task { @MainActor in
+			await ViewStore(store.stateless).send(.view(.task)).finish()
 		}
 	}
 }
