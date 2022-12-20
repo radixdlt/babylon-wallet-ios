@@ -2,9 +2,6 @@
 
 #include "../common.xcconfig"
 
-// MARK: - System flags
-
-CURRENT_PROJECT_VERSION = 0
 
 
 // Marketing Version
@@ -13,6 +10,8 @@ CURRENT_PROJECT_VERSION = 0
 // the `CFBundleShortVersionString` key in your app's Info.plist.
 
 MARKETING_VERSION = $(APP_VERSION)
+
+
 
 // Always Search User Paths (Deprecated)
 //
@@ -32,11 +31,15 @@ MARKETING_VERSION = $(APP_VERSION)
 
 ALWAYS_SEARCH_USER_PATHS = NO
 
+
+
 // Misuse of 'nonnull'
 //
 // Check for misuses of `nonnull` parameter and return types.
 
 CLANG_ANALYZER_NONNULL = YES
+
+
 
 // Suspicious Conversions of NSNumber and CFNumberRef
 //
@@ -432,15 +435,6 @@ GCC_WARN_UNUSED_VARIABLE = YES
 INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.finance
 
 
-// iOS Deployment Target
-//
-// Code will load on this and later versions of iOS. Framework APIs that are unavailable
-// in earlier versions will be weak-linked; your code should check for null function
-// pointers or specific system versions before calling newer APIs.
-
-IPHONEOS_DEPLOYMENT_TARGET = 15.0
-
-
 
 // Enable Fast Math
 //
@@ -449,6 +443,7 @@ IPHONEOS_DEPLOYMENT_TARGET = 15.0
 // precision floating-point.
 
 MTL_FAST_MATH = YES
+
 
 
 //
@@ -464,17 +459,24 @@ MTL_FAST_MATH = YES
 
 SWIFT_STRICT_CONCURRENCY = complete
 
+
+
 //
 // If enabled, the product will be built with options appropriate for supporting previews.
 ENABLE_PREVIEWS = YES
+
+
 
 //
 // Selects the process used for version-stamping generated files.
 VERSIONING_SYSTEM = apple-generic
 
+
+
 //
 // The language version used to compile the target's Swift code.
 SWIFT_VERSION = 5.0
+
 
 
 //
@@ -483,15 +485,19 @@ SWIFT_VERSION = 5.0
 // Choose Manual to create and update these yourself on the developer website.
 CODE_SIGN_STYLE = Manual
 
+
+
 //
 // If enabled, automatically generate an Info.plist file with content from build settings.
 GENERATE_INFOPLIST_FILE = YES
+
 
 
 //
 // When enabled, the Swift compiler will be used to extract Swift string literal
 // and interpolation LocalizedStringKey and LocalizationKey types during localization export.
 SWIFT_EMIT_LOC_STRINGS = YES
+
 
 
 // User Interface Style
@@ -501,4 +507,3 @@ SWIFT_EMIT_LOC_STRINGS = YES
 // key in the Info.plist file to the value of this build setting.
 
 INFOPLIST_KEY_UIUserInterfaceStyle = Light
-

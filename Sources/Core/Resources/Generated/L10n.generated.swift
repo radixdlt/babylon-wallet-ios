@@ -23,6 +23,8 @@ public enum L10n {
 	public enum AccountPreferences {
   	/// Get Betanet XRD Test Tokens
   	public static let faucetButtonTitle = L10n.tr("Localizable", "accountPreferences.faucetButtonTitle", fallback: "Get Betanet XRD Test Tokens")
+  	/// This may take several seconds, please wait for completion
+  	public static let loadingPrompt = L10n.tr("Localizable", "accountPreferences.loadingPrompt", fallback: "This may take several seconds, please wait for completion")
   	/// Account Preferences
   	public static let title = L10n.tr("Localizable", "accountPreferences.title", fallback: "Account Preferences")
 	}
@@ -120,6 +122,14 @@ public enum L10n {
     	}
   	}
 	}
+	public enum FungibleTokenList {
+  	public enum Detail {
+    	/// Current Supply
+    	public static let currentSupply = L10n.tr("Localizable", "fungibleTokenList.detail.currentSupply", fallback: "Current Supply")
+    	/// Resource Address
+    	public static let resourceAddress = L10n.tr("Localizable", "fungibleTokenList.detail.resourceAddress", fallback: "Resource Address")
+  	}
+	}
 	public enum Home {
   	public enum Header {
     	/// Welcome, here are all your accounts on the Radix Network
@@ -140,7 +150,7 @@ public enum L10n {
   	/// Import Radix Wallet backup
   	public static let importProfile = L10n.tr("Localizable", "importProfile.importProfile", fallback: "Import Radix Wallet backup")
   	/// Mnemonic phrase
-  	public static let mnemonicPhrasec = L10n.tr("Localizable", "importProfile.mnemonicPhrasec", fallback: "Mnemonic phrase")
+  	public static let mnemonicPhrase = L10n.tr("Localizable", "importProfile.mnemonicPhrase", fallback: "Mnemonic phrase")
   	/// Radix Wallet backup from file
   	public static let profileFromSnapshot = L10n.tr("Localizable", "importProfile.profileFromSnapshot", fallback: "Radix Wallet backup from file")
   	/// Save imported mnemonic
@@ -219,6 +229,14 @@ public enum L10n {
   	public static func ownedOfTotal(_ p1: Int, _ p2: Int) -> String {
   		return L10n.tr("Localizable", "nftList.ownedOfTotal", p1, p2, fallback: "%d of %d")
   	}
+  	public enum Detail {
+    	/// NFT ID
+    	public static let nftID = L10n.tr("Localizable", "nftList.detail.nftID", fallback: "NFT ID")
+    	/// Resource Address
+    	public static let resourceAddress = L10n.tr("Localizable", "nftList.detail.resourceAddress", fallback: "Resource Address")
+    	/// Name
+    	public static let resourceName = L10n.tr("Localizable", "nftList.detail.resourceName", fallback: "Name")
+  	}
   	public enum Header {
     	/// Unknown
     	public static let supplyUnknown = L10n.tr("Localizable", "nftList.header.supplyUnknown", fallback: "Unknown")
@@ -271,6 +289,14 @@ public enum L10n {
   	public static let biometricsNotSetUpMessage = L10n.tr("Localizable", "splash.biometricsNotSetUpMessage", fallback: "This app requires your phone to have biometrics set up")
   	/// Biometrics not set up
   	public static let biometricsNotSetUpTitle = L10n.tr("Localizable", "splash.biometricsNotSetUpTitle", fallback: "Biometrics not set up")
+  	/// Delete & create new wallet
+  	public static let incompatibleProfileVersionAlertDeleteButton = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertDeleteButton", fallback: "Delete & create new wallet")
+  	/// Saved Wallet Backup has version: %@, but this app requires a minimum Wallet version of %@. You must delete the Wallet and create a new one to use this app.
+  	public static func incompatibleProfileVersionAlertMessage(_ p1: Any, _ p2: Any) -> String {
+  		return L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertMessage", String(describing: p1), String(describing: p2), fallback: "Saved Wallet Backup has version: %@, but this app requires a minimum Wallet version of %@. You must delete the Wallet and create a new one to use this app.")
+  	}
+  	/// Incompatible Wallet Backup found
+  	public static let incompatibleProfileVersionAlertTitle = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertTitle", fallback: "Incompatible Wallet Backup found")
 	}
 	public enum TransactionSigning {
   	/// Authenticate to sign transaction with this phone.

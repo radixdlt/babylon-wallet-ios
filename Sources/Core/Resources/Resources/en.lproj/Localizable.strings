@@ -4,8 +4,9 @@
 
 "accountList.row.copyTitle" = "Copy";
 
-"accountPreferences.faucetButtonTitle" = "Get Betanet XRD Test Tokens";
 "accountPreferences.title" = "Account Preferences";
+"accountPreferences.faucetButtonTitle" = "Get Betanet XRD Test Tokens";
+"accountPreferences.loadingPrompt" = "This may take several seconds, please wait for completion";
 
 "aggregatedValue.title" = "Total value";
 
@@ -49,9 +50,12 @@
 "dApp.connectionRequest.wantsToConnect" = "%@ wants to connect to your wallet";
 "dApp.unknownName" = "Unknown dApp";
 
+"fungibleTokenList.detail.resourceAddress" = "Resource Address";
+"fungibleTokenList.detail.currentSupply" = "Current Supply";
+
 "importProfile.importMnemonic" = "Import mnemonic";
 "importProfile.importProfile" = "Import Radix Wallet backup";
-"importProfile.mnemonicPhrasec" = "Mnemonic phrase";
+"importProfile.mnemonicPhrase" = "Mnemonic phrase";
 "importProfile.profileFromSnapshot" = "Radix Wallet backup from file";
 "importProfile.saveImportedMnemonic" = "Save imported mnemonic";
 
@@ -88,8 +92,15 @@
 "nftList.nftPlural" = "%d NFTs";
 "nftList.ownedOfTotal" = "%d of %d";
 
+"nftList.detail.nftID" = "NFT ID";
+"nftList.detail.resourceAddress" = "Resource Address";
+"nftList.detail.resourceName" = "Name";
+
 "splash.biometricsNotSetUpMessage" = "This app requires your phone to have biometrics set up";
 "splash.biometricsNotSetUpTitle" = "Biometrics not set up";
+"splash.incompatibleProfileVersionAlertTitle" = "Incompatible Wallet Backup found";
+"splash.incompatibleProfileVersionAlertMessage" = "Saved Wallet Backup has version: %@, but this app requires a minimum Wallet version of %@. You must delete the Wallet and create a new one to use this app.";
+"splash.incompatibleProfileVersionAlertDeleteButton" = "Delete & create new wallet";
 
 "onboarding.newAccountButtonTitle" = "New Account";
 

@@ -4,7 +4,12 @@
 
 // MARK: - System flags
 
+// Development Team
+//
+// The team ID of a development team to use for signing certificates and provisioning profiles.
 DEVELOPMENT_TEAM[sdk=iphoneos*] = $(DEV_TEAM)
+
+
 
 // Base SDK
 //
@@ -87,6 +92,8 @@ INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLand
 
 LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks
 
+
+
 // Targeted Device Families
 //
 // The build system uses the selected device to set the correct value for the
@@ -95,3 +102,13 @@ LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks
 // compilation.
 
 TARGETED_DEVICE_FAMILY = 1
+
+
+
+// iOS Deployment Target
+//
+// Code will load on this and later versions of iOS. Framework APIs that are unavailable
+// in earlier versions will be weak-linked; your code should check for null function
+// pointers or specific system versions before calling newer APIs.
+
+IPHONEOS_DEPLOYMENT_TARGET = 15.0

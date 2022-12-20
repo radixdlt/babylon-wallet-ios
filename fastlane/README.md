@@ -31,69 +31,33 @@ Builds and archives the app
 
 Runs test
 
-### ios alpha_deploy
-
-```sh
-[bundle exec] fastlane ios alpha_deploy
-```
-
-
-
-### ios beta_deploy
-
-```sh
-[bundle exec] fastlane ios beta_deploy
-```
-
-
-
-### ios release_deploy
-
-```sh
-[bundle exec] fastlane ios release_deploy
-```
-
-
-
 ### ios deploy
 
 ```sh
 [bundle exec] fastlane ios deploy
 ```
 
+Deploy the app for a given flavour: alpha, beta, release
 
+Usage `bundle exec fastlane ios deploy --env ios.<specific env>`
 
-### ios install_certificates
-
-```sh
-[bundle exec] fastlane ios install_certificates
-```
-
-Installs certificates on the machine
-
-### ios install_distribution_certificate
+### ios install_distribution_certificates
 
 ```sh
-[bundle exec] fastlane ios install_distribution_certificate
+[bundle exec] fastlane ios install_distribution_certificates
 ```
 
-Installs distribution certificate
+Installs distribution certificates
 
-### ios install_development_certificate
+Usage `bundle exec fastlane ios install_distribution_certificate --env ios.<specific env>`
+
+### ios install_development_certificates
 
 ```sh
-[bundle exec] fastlane ios install_development_certificate
+[bundle exec] fastlane ios install_development_certificates
 ```
 
-Installs development certificate
-
-### ios generate_new_certificates
-
-```sh
-[bundle exec] fastlane ios generate_new_certificates
-```
-
-Generates new certificates if needed
+Installs development certificates
 
 ### ios generate_new_dev_certificates
 
@@ -101,23 +65,17 @@ Generates new certificates if needed
 [bundle exec] fastlane ios generate_new_dev_certificates
 ```
 
-Generate new deve certificates
+Generate new dev certificates
 
-### ios generate_new_alpha_certificates
-
-```sh
-[bundle exec] fastlane ios generate_new_alpha_certificates
-```
-
-Generate new alpha certificates
-
-### ios generate_new_beta_certificates
+### ios generate_new_appstore_certificates
 
 ```sh
-[bundle exec] fastlane ios generate_new_beta_certificates
+[bundle exec] fastlane ios generate_new_appstore_certificates
 ```
 
-Generate new beta certificates
+Generate new appstore certificates
+
+Usage bundle exec fastlane ios generate_new_appstore_certificates --env ios.<specific env>
 
 ### ios register_new_iphone_device
 

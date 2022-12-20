@@ -32,7 +32,7 @@ extension Component {
 				.hidden()
 
 			VStack(alignment: .leading, spacing: .small2) {
-				Text(tokenIdStringRepresentation)
+				Text(token.id.stringRepresentation)
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)
 					.offset(y: -.small2)
@@ -70,7 +70,7 @@ extension Component {
 			ExpandableRowBackgroundView(
 				paddingEdge: edge,
 				paddingValue: value,
-				cornerRadius: opositeValue
+				cornerRadius: oppositeValue
 			)
 			.tokenRowShadow(condition: isExpanded && !isLast)
 		)
@@ -84,9 +84,11 @@ private extension Component {
 //		token.metadata ?? []
 		[]
 	}
+}
 
-	var tokenIdStringRepresentation: String {
-		switch token.nonFungibleId {
+extension NonFungibleToken.ID {
+	var stringRepresentation: String {
+		switch self {
 		case let .u32(value):
 			return "\(value)"
 		case let .u64(value):
@@ -101,7 +103,7 @@ private extension Component {
 	}
 }
 
-// MARK: ExpandableRow
+// MARK: - Component + ExpandableRow
 extension Component: ExpandableRow {
 	var edge: Edge.Set {
 		if isLast {
@@ -115,12 +117,12 @@ extension Component: ExpandableRow {
 		isExpanded ? Constants.radius : 0
 	}
 
-	var opositeValue: CGFloat {
+	var oppositeValue: CGFloat {
 		isExpanded ? 0 : Constants.radius
 	}
 }
 
-// MARK: Component.Constants
+// MARK: - Component.Constants
 private extension Component {
 	enum Constants {
 		static let radius: CGFloat = .small1

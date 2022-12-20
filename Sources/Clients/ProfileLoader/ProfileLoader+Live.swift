@@ -11,7 +11,6 @@ public extension ProfileLoader {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		return Self(
 			loadProfile: { @Sendable in
-
 				guard
 					let profileSnapshotData = try? await keychainClient
 					.loadProfileSnapshotJSONData(

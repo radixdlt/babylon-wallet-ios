@@ -119,9 +119,11 @@ private extension NonFungibleTokenList.Row.View {
 		}
 	}
 
+	@ViewBuilder
 	func componentView(with viewStore: ViewStore, index: Int) -> some View {
+		let asset = viewStore.container.assets[index]
 		Component(
-			token: viewStore.container.assets[index],
+			token: asset,
 			isLast: index == nftCount(with: viewStore) - 1,
 			isExpanded: viewStore.isExpanded
 		)
@@ -129,6 +131,8 @@ private extension NonFungibleTokenList.Row.View {
 		.offset(y: offset(with: viewStore, index: index))
 		.zIndex(reversedZIndex(count: nftCount(with: viewStore), index: index))
 		.transition(.move(edge: .bottom))
+		.contentShape(Rectangle())
+		.onTapGesture { viewStore.send(.selected(.init(container: viewStore.container, asset: asset))) }
 	}
 
 	func collapsedHeight(with viewStore: ViewStore) -> CGFloat {

@@ -36,7 +36,7 @@ public extension AccountPreferences.View {
 					.foregroundColor(.app.gray1)
 					.padding([.horizontal, .top], .medium3)
 
-					VStack {
+					VStack(alignment: .leading) {
 						Spacer()
 							.frame(height: .large1)
 
@@ -44,8 +44,13 @@ public extension AccountPreferences.View {
 							viewStore.send(.faucetButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: true))
-						.enabled(viewStore.isFaucetButtonEnabled)
-						.isLoading(viewStore.isLoading, context: .local)
+						.controlState(viewStore.faucetButtonState)
+
+						if viewStore.faucetButtonState.isLoading {
+							Text(L10n.AccountPreferences.loadingPrompt)
+								.font(.app.body2Regular)
+								.foregroundColor(.app.gray1)
+						}
 
 						Spacer()
 					}
@@ -63,12 +68,10 @@ public extension AccountPreferences.View {
 extension AccountPreferences.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		public var isFaucetButtonEnabled: Bool
-		public var isLoading: Bool
+		public var faucetButtonState: ControlState
 
 		init(state: AccountPreferences.State) {
-			isFaucetButtonEnabled = state.isFaucetButtonEnabled
-			isLoading = state.isLoading
+			faucetButtonState = state.faucetButtonState
 		}
 	}
 }

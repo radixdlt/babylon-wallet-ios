@@ -39,8 +39,8 @@
 		D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E667FFD128F6F7E50015544F /* Babylon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Babylon; path = ..; sourceTree = "<group>"; };
 		E6805BBD286DB3EC00861180 /* WalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApp.swift; sourceTree = "<group>"; };
-		E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6805BC4286DB3ED00861180 /* δ-Radix Wallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "δ-Radix Wallet.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6805BCA286DB3ED00861180 /* δ-Radix Wallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "δ-Radix Wallet.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6805BCC286DB3ED00861180 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -138,8 +138,8 @@
 		E6805BC5286DB3ED00861180 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */,
-				E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */,
+				E6805BC4286DB3ED00861180 /* δ-Radix Wallet.app */,
+				E6805BCA286DB3ED00861180 /* δ-Radix Wallet.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -188,7 +188,7 @@
 				E6805BDE286DB74300861180 /* AppFeature */,
 			);
 			productName = "Wallet (iOS)";
-			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
+			productReference = E6805BC4286DB3ED00861180 /* δ-Radix Wallet.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E6805BC9286DB3ED00861180 /* Radix Wallet (macOS) */ = {
@@ -209,7 +209,7 @@
 				E667FFD228F6F7ED0015544F /* AppFeature */,
 			);
 			productName = "Wallet (macOS)";
-			productReference = E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */;
+			productReference = E6805BCA286DB3ED00861180 /* δ-Radix Wallet.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -312,32 +312,33 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		83DEEED62949CA5A003557D7 /* Dev */ = {
+		83DEEED62949CA5A003557D7 /* Debug-Dev */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D7294B34150098B586 /* Project-Dev.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
 			};
-			name = Dev;
+			name = "Debug-Dev";
 		};
-		83DEEED72949CA5A003557D7 /* Dev */ = {
+		83DEEED72949CA5A003557D7 /* Debug-Dev */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D9294B50AC0098B586 /* iOS-dev.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 3;
 			};
-			name = Dev;
+			name = "Debug-Dev";
 		};
-		83DEEED82949CA5A003557D7 /* Dev */ = {
+		83DEEED82949CA5A003557D7 /* Debug-Dev */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
 			buildSettings = {
 			};
-			name = Dev;
+			name = "Debug-Dev";
 		};
 		83E1AEDB2949BB4B00D74788 /* Beta */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D3294B34140098B586 /* Project-Beta.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
 			};
 			name = Beta;
 		};
@@ -345,7 +346,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88DB294B50B60098B586 /* iOS-beta.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 3;
 			};
 			name = Beta;
 		};
@@ -360,6 +360,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D6294B34150098B586 /* Project-Alpha.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
 			};
 			name = Alpha;
 		};
@@ -367,7 +368,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88DA294B50B20098B586 /* iOS-alpha.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 3;
 			};
 			name = Alpha;
 		};
@@ -382,6 +382,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D5294B34150098B586 /* Project-Release.xcconfig */;
 			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
 			};
 			name = Release;
 		};
@@ -389,7 +390,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88DC294B50BD0098B586 /* iOS-release.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 3;
 			};
 			name = Release;
 		};
@@ -406,7 +406,7 @@
 		E6805BBB286DB3EB00861180 /* Build configuration list for PBXProject "BabylonWallet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				83DEEED62949CA5A003557D7 /* Dev */,
+				83DEEED62949CA5A003557D7 /* Debug-Dev */,
 				E6805BD4286DB3ED00861180 /* Release */,
 				83F41363294B185300EE5EBC /* Alpha */,
 				83E1AEDB2949BB4B00D74788 /* Beta */,
@@ -417,7 +417,7 @@
 		E6805BD5286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				83DEEED72949CA5A003557D7 /* Dev */,
+				83DEEED72949CA5A003557D7 /* Debug-Dev */,
 				E6805BD7286DB3ED00861180 /* Release */,
 				83F41364294B185300EE5EBC /* Alpha */,
 				83E1AEDC2949BB4B00D74788 /* Beta */,
@@ -428,7 +428,7 @@
 		E6805BD8286DB3ED00861180 /* Build configuration list for PBXNativeTarget "Radix Wallet (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				83DEEED82949CA5A003557D7 /* Dev */,
+				83DEEED82949CA5A003557D7 /* Debug-Dev */,
 				E6805BDA286DB3ED00861180 /* Release */,
 				83F41365294B185300EE5EBC /* Alpha */,
 				83E1AEDD2949BB4B00D74788 /* Beta */,

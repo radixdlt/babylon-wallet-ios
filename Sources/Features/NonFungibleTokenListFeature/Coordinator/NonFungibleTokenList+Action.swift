@@ -16,12 +16,15 @@ public extension NonFungibleTokenList {
 public extension NonFungibleTokenList.Action {
 	enum ChildAction: Equatable {
 		case asset(id: NonFungibleTokenContainer.ID, action: NonFungibleTokenList.Row.Action)
+		case details(NonFungibleTokenList.Detail.Action)
 	}
 }
 
 // MARK: - NonFungibleTokenList.Action.ViewAction
 public extension NonFungibleTokenList.Action {
-	enum ViewAction: Equatable {}
+	enum ViewAction: Equatable {
+		case selectedTokenChanged(NonFungibleTokenList.Detail.State?)
+	}
 }
 
 // MARK: - NonFungibleTokenList.Action.InternalAction

@@ -26,7 +26,7 @@ struct Header: View {
 			ExpandableRowBackgroundView(
 				paddingEdge: edge,
 				paddingValue: value,
-				cornerRadius: opositeValue
+				cornerRadius: oppositeValue
 			)
 			.tokenRowShadow(condition: isExpanded)
 		)
@@ -50,7 +50,7 @@ extension Header: ExpandableRow {
 		isExpanded ? Constants.radius : .zero
 	}
 
-	var opositeValue: CGFloat {
+	var oppositeValue: CGFloat {
 		isExpanded ? .zero : Constants.radius
 	}
 }

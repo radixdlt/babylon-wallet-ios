@@ -48,7 +48,21 @@ public extension Home {
 
 public extension Home.State {
 	static let placeholder = Home.State(
-		header: .init(hasNotification: false)
+		header: .init(hasNotification: false),
+		accountDetails: AccountDetails.State(
+			for: .init(
+				account: .placeholder0,
+				aggregatedValue: nil,
+				portfolio: AccountPortfolio(
+					fungibleTokenContainers: [],
+					nonFungibleTokenContainers: [.mock1, .mock2, .mock3],
+					poolShareContainers: [],
+					badgeContainers: []
+				),
+				currency: .gbp,
+				isCurrencyAmountVisible: false
+			)
+		)
 	)
 }
 #endif

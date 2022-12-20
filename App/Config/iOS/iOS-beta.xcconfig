@@ -1,12 +1,4 @@
-//
-//  iOS-dev.xcconfig
-//  BabylonWallet
-//
-//  Created by Ghenadie Vasiliev-Pusca on 15.12.2022.
-//
-
-// Configuration settings file format documentation can be found at:
-// https://help.apple.com/xcode/#/dev745c5c974
+// BETA iOS config
 
 #include "iOS-shared.xcconfig"
 #include "iOS-release-opt.xcconfig"
@@ -19,5 +11,12 @@
 // of the built bundle.
 
 PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.radixwallet.ios.beta
+
+
+
+// Provisioning Profile
+//
+// Must contain a profile name (or UUID). A missing or invalid profile will cause a build error.
+// Use in conjunction with [DEVELOPMENT_TEAM] to fully specify provisioning profile.
 
 PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*] = match AppStore $(PRODUCT_BUNDLE_IDENTIFIER)

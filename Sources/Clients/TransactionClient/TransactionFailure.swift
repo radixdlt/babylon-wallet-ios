@@ -33,7 +33,7 @@ public extension TransactionFailure {
 			case .failedToLoadNotaryPublicKey:
 				return "Failed to load notary public key"
 			case .failedToLoadNotaryAndSigners:
-				return "Faied to load notary and signers"
+				return "Failed to load notary and signers"
 			}
 		}
 	}

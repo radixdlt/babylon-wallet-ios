@@ -21,7 +21,7 @@ public struct AddressView: View {
 public extension AddressView {
 	var body: some View {
 		Button(action: copyAddressAction ?? {}) {
-			HStack(spacing: .zero) {
+			HStack(spacing: .small2) {
 				Text(state.formattedAddress)
 					.lineLimit(1)
 					.minimumScaleFactor(0.5)
@@ -29,7 +29,6 @@ public extension AddressView {
 
 				if copyAddressAction != nil {
 					Image(asset: AssetResource.copy)
-						.frame(.verySmall)
 				}
 			}
 		}
@@ -55,6 +54,8 @@ public extension AddressView {
 				} else {
 					formattedAddress = address.prefix(format.first) + "..." + address.suffix(format.last)
 				}
+			case .full:
+				formattedAddress = address
 			}
 		}
 	}
@@ -64,6 +65,7 @@ public extension AddressView {
 public extension AddressView.ViewState {
 	enum AddressFormat {
 		case short(ShortAddressFormat = .default)
+		case full
 	}
 }
 

@@ -76,14 +76,14 @@ private extension P2P.FromDapp.WalletRequestItem {
 	typealias Discriminator = P2P.FromDapp.Discriminator
 
 	enum CodingKeys: String, CodingKey {
-		case disciminator = "requestType"
+		case discriminator = "requestType"
 	}
 }
 
 public extension P2P.FromDapp.WalletRequestItem {
 	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let discriminator = try container.decode(Discriminator.self, forKey: .disciminator)
+		let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
 		switch discriminator {
 		case .oneTimeAccountsRead:
 			self = try .oneTimeAccounts(P2P.FromDapp.OneTimeAccountsReadRequestItem(from: decoder))
