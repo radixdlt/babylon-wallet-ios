@@ -289,15 +289,6 @@
       }
     },
     {
-      "identity" : "swiftui-pull-to-refresh",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/globulus/swiftui-pull-to-refresh",
-      "state" : {
-        "revision" : "1852a4eb7e7a12a768c64b25b1bd905993ced4eb",
-        "version" : "1.1.9"
-      }
-    },
-    {
       "identity" : "version",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mxcl/Version",
