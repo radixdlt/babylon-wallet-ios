@@ -48,9 +48,7 @@ public extension LocalNetworkPermission {
 		case let .internal(.view(.permissionDeniedAlert(action))):
 			state.permissionDeniedAlert = nil
 			switch action {
-			case .dismissed:
-				return .none
-			case .cancelButtonTapped:
+			case .dismissed, .cancelButtonTapped:
 				return .run { send in
 					await send(.delegate(.permissionResponse(false)))
 				}
