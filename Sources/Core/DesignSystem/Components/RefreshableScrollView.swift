@@ -1,46 +1,46 @@
 import SwiftUI
 
-#if os(iOS)
-import SwiftUIPullToRefresh
-
-extension RefreshAction: @unchecked Sendable {}
-#endif
-
 // MARK: - RefreshableScrollView
+/// This view simulates pull-to-refresh support on ScrollView before iOS 16.
+///
+/// On iOS 16+ it uses ScrollView.
+/// On iOS 15 it falls back to List with modifiers removing all its default rows styling.
+///
 @MainActor
 public struct RefreshableScrollView<Content: View>: View {
 	@Environment(\.refresh) var refresh
 
 	var showsIndicators: Bool
-	var content: Content
+	var content: () -> Content
 
 	public init(
 		showsIndicators: Bool = true,
-		@ViewBuilder content: () -> Content
+		@ViewBuilder content: @escaping () -> Content
 	) {
 		self.showsIndicators = showsIndicators
-		self.content = content()
+		self.content = content
 	}
 
 	public var body: some View {
-		if #available(iOS 16, macOS 13, *) {
-			ScrollView(showsIndicators: showsIndicators, content: { content })
-		} else {
-			#if os(iOS)
-			SwiftUIPullToRefresh.RefreshableScrollView(
+		if #available(iOS 16, *) {
+			ScrollView(
 				showsIndicators: showsIndicators,
-				loadingViewBackgroundColor: .clear,
-				onRefresh: { done in
-					Task { @MainActor in
-						await refresh?()
-						done()
-					}
-				},
-				content: { content }
+				content: content
 			)
-			#else
-			ScrollView(showsIndicators: showsIndicators, content: { content })
-			#endif
+			.refreshable {
+				await refresh?()
+			}
+		} else {
+			List {
+				content()
+					.listRowSeparatorTint(.clear)
+					.listRowBackground(Color.clear)
+					.listRowInsets(EdgeInsets())
+			}
+			.listStyle(.plain)
+			.refreshable {
+				await refresh?()
+			}
 		}
 	}
 }

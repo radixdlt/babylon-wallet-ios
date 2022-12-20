@@ -34,7 +34,6 @@ package.dependencies += [
 
 	// Other
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
-	.package(url: "https://github.com/globulus/swiftui-pull-to-refresh", from: "1.1.8"),
 	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
@@ -903,7 +902,6 @@ package.addModules([
 			.product(name: "Introspect", package: "SwiftUI-Introspect"),
 			.product(name: "NukeUI", package: "Nuke"),
 			"Resources",
-			.product(name: "SwiftUIPullToRefresh", package: "swiftui-pull-to-refresh", condition: .when(platforms: [.iOS])),
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation"),
 		],
 		resources: [
