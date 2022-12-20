@@ -76,10 +76,10 @@
 "newConnection.textFieldHint" = "Name this Connector, e.g. \"Chrome on Macbook Pro\"";
 "newConnection.textFieldPlaceholder" = "Name of Connector";
 "newConnection.title" = "Link to Connector";
-"newConnection.localNetworkAuthorization.deniedAlert.title" = "Access Required";
-"newConnection.localNetworkAuthorization.deniedAlert.message" = "Local Network access is required to link to connector.";
-"newConnection.localNetworkAuthorization.deniedAlert.cancelButtonTitle" = "Cancel";
-"newConnection.localNetworkAuthorization.deniedAlert.settingsButtonTitle" = "Settings";
+"newConnection.localNetworkPermission.deniedAlert.title" = "Access Required";
+"newConnection.localNetworkPermission.deniedAlert.message" = "Local Network access is required to link to connector.";
+"newConnection.localNetworkPermission.deniedAlert.cancelButtonTitle" = "Cancel";
+"newConnection.localNetworkPermission.deniedAlert.settingsButtonTitle" = "Settings";
 "newConnection.cameraPermission.deniedAlert.title" = "Access Required";
 "newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";
 "newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";

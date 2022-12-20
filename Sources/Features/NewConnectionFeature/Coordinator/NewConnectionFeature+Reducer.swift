@@ -13,7 +13,7 @@ public extension NewConnection {
 		Reduce(core)
 
 		EmptyReducer()
-			.ifCaseLet(/State.localNetworkAuthorization, action: /Action.child .. Action.ChildAction.localNetworkAuthorization) {
+			.ifCaseLet(/State.localNetworkPermission, action: /Action.child .. Action.ChildAction.localNetworkPermission) {
 				LocalNetworkPermission()
 			}
 			.ifCaseLet(/State.cameraPermission, action: /Action.child .. Action.ChildAction.cameraPermission) {
@@ -31,7 +31,7 @@ public extension NewConnection {
 		switch action {
 		case .internal(.view(.dismissButtonTapped)):
 			switch state {
-			case .localNetworkAuthorization, .cameraPermission, .scanQR:
+			case .localNetworkPermission, .cameraPermission, .scanQR:
 				return .run { send in
 					await send(.delegate(.dismiss))
 				}
@@ -55,7 +55,7 @@ public extension NewConnection {
 				)
 			}
 
-		case let .child(.localNetworkAuthorization(.delegate(.permissionResponse(allowed)))):
+		case let .child(.localNetworkPermission(.delegate(.permissionResponse(allowed)))):
 			if allowed {
 				#if os(iOS)
 				state = .cameraPermission(.init())

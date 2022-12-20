@@ -219,16 +219,16 @@ public enum L10n {
       	public static let title = L10n.tr("Localizable", "newConnection.cameraPermission.deniedAlert.title", fallback: "Access Required")
     	}
   	}
-  	public enum LocalNetworkAuthorization {
+  	public enum LocalNetworkPermission {
     	public enum DeniedAlert {
       	/// Cancel
-      	public static let cancelButtonTitle = L10n.tr("Localizable", "newConnection.localNetworkAuthorization.deniedAlert.cancelButtonTitle", fallback: "Cancel")
+      	public static let cancelButtonTitle = L10n.tr("Localizable", "newConnection.localNetworkPermission.deniedAlert.cancelButtonTitle", fallback: "Cancel")
       	/// Local Network access is required to link to connector.
-      	public static let message = L10n.tr("Localizable", "newConnection.localNetworkAuthorization.deniedAlert.message", fallback: "Local Network access is required to link to connector.")
+      	public static let message = L10n.tr("Localizable", "newConnection.localNetworkPermission.deniedAlert.message", fallback: "Local Network access is required to link to connector.")
       	/// Settings
-      	public static let settingsButtonTitle = L10n.tr("Localizable", "newConnection.localNetworkAuthorization.deniedAlert.settingsButtonTitle", fallback: "Settings")
+      	public static let settingsButtonTitle = L10n.tr("Localizable", "newConnection.localNetworkPermission.deniedAlert.settingsButtonTitle", fallback: "Settings")
       	/// Access Required
-      	public static let title = L10n.tr("Localizable", "newConnection.localNetworkAuthorization.deniedAlert.title", fallback: "Access Required")
+      	public static let title = L10n.tr("Localizable", "newConnection.localNetworkPermission.deniedAlert.title", fallback: "Access Required")
     	}
   	}
 	}

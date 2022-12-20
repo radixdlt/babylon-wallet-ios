@@ -44,14 +44,16 @@ extension LocalNetworkPermission.View {
 #if DEBUG
 
 // MARK: - ScanQR_Preview
-struct LocalNetworkAuthorization_Preview: PreviewProvider {
-	static var previews: some View {
-		LocalNetworkPermission.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: LocalNetworkPermission()
+extension LocalNetworkPermission {
+	struct Preview: PreviewProvider {
+		static var previews: some SwiftUI.View {
+			LocalNetworkPermission.View(
+				store: .init(
+					initialState: .previewValue,
+					reducer: LocalNetworkPermission()
+				)
 			)
-		)
+		}
 	}
 }
 #endif

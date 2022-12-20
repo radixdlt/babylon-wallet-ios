@@ -9,7 +9,7 @@ import XCTestDynamicOverlay
 extension P2PConnectivityClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 	public static let testValue = Self(
-		getLocalNetworkAccess: unimplemented("\(Self.self).getLocalNetworkAuthorization"),
+		getLocalNetworkAccess: unimplemented("\(Self.self).getLocalNetworkAccess"),
 		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
 		addP2PClientWithConnection: unimplemented("\(Self.self).addP2PClientWithConnection"),
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),

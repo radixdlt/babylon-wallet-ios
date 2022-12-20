@@ -28,20 +28,20 @@ public extension LocalNetworkPermission {
 
 		case .internal(.system(.displayPermissionDeniedAlert)):
 			state.permissionDeniedAlert = .init(
-				title: { TextState(L10n.NewConnection.LocalNetworkAuthorization.DeniedAlert.title) },
+				title: { TextState(L10n.NewConnection.LocalNetworkPermission.DeniedAlert.title) },
 				actions: {
 					ButtonState(
 						role: .cancel,
 						action: .send(.cancelButtonTapped),
-						label: { TextState(L10n.NewConnection.LocalNetworkAuthorization.DeniedAlert.cancelButtonTitle) }
+						label: { TextState(L10n.NewConnection.LocalNetworkPermission.DeniedAlert.cancelButtonTitle) }
 					)
 					ButtonState(
 						role: .none,
 						action: .send(.openSettingsButtonTapped),
-						label: { TextState(L10n.NewConnection.LocalNetworkAuthorization.DeniedAlert.settingsButtonTitle) }
+						label: { TextState(L10n.NewConnection.LocalNetworkPermission.DeniedAlert.settingsButtonTitle) }
 					)
 				},
-				message: { TextState(L10n.NewConnection.LocalNetworkAuthorization.DeniedAlert.message) }
+				message: { TextState(L10n.NewConnection.LocalNetworkPermission.DeniedAlert.message) }
 			)
 			return .none
 
