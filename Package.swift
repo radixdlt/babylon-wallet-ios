@@ -533,6 +533,7 @@ package.addModules([
 	.feature(
 		name: "NewConnectionFeature",
 		dependencies: [
+			"CameraPermissionClient",
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])),
 			converse,
 			"Common",
@@ -672,21 +673,11 @@ package.addModules([
 		)
 	),
 	.client(
-		name: "P2PConnectivityClient",
+		name: "CameraPermissionClient",
 		dependencies: [
-			asyncExtensions,
-			"Common",
-			converse,
 			dependencies,
-			engineToolkit, // Model: SignTX contains Manifest
-			"JSON",
-			profile, // Account
-			"ProfileClient",
-			"SharedModels",
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
+		tests: .no
 	),
 	.client(
 		name: "Data",
@@ -775,6 +766,23 @@ package.addModules([
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.client(
+		name: "P2PConnectivityClient",
+		dependencies: [
+			asyncExtensions,
+			"Common",
+			converse,
+			dependencies,
+			engineToolkit, // Model: SignTX contains Manifest
+			"JSON",
+			profile, // Account
+			"ProfileClient",
+			"SharedModels",
+		],
+		tests: .yes(dependencies: [
+			"TestUtils",
+		])
 	),
 	.client(
 		name: "PasteboardClient",

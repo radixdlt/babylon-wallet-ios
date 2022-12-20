@@ -215,16 +215,28 @@ public enum L10n {
   	public static let textFieldPlaceholder = L10n.tr("Localizable", "newConnection.textFieldPlaceholder", fallback: "Name of Connector")
   	/// Link to Connector
   	public static let title = L10n.tr("Localizable", "newConnection.title", fallback: "Link to Connector")
-  	public enum LocalNetworkAuthorization {
+  	public enum CameraPermission {
     	public enum DeniedAlert {
       	/// Cancel
-      	public static let cancelButtonTitle = L10n.tr("Localizable", "newConnection.LocalNetworkAuthorization.DeniedAlert.cancelButtonTitle", fallback: "Cancel")
-      	/// Local Network access is required to link to connector.
-      	public static let message = L10n.tr("Localizable", "newConnection.LocalNetworkAuthorization.DeniedAlert.message", fallback: "Local Network access is required to link to connector.")
+      	public static let cancelButtonTitle = L10n.tr("Localizable", "newConnection.cameraPermission.deniedAlert.cancelButtonTitle", fallback: "Cancel")
+      	/// Camera access is required to link to connector.
+      	public static let message = L10n.tr("Localizable", "newConnection.cameraPermission.deniedAlert.message", fallback: "Camera access is required to link to connector.")
       	/// Settings
-      	public static let settingsButtonTitle = L10n.tr("Localizable", "newConnection.LocalNetworkAuthorization.DeniedAlert.settingsButtonTitle", fallback: "Settings")
-      	/// Permission Required
-      	public static let title = L10n.tr("Localizable", "newConnection.LocalNetworkAuthorization.DeniedAlert.title", fallback: "Permission Required")
+      	public static let settingsButtonTitle = L10n.tr("Localizable", "newConnection.cameraPermission.deniedAlert.settingsButtonTitle", fallback: "Settings")
+      	/// Access Required
+      	public static let title = L10n.tr("Localizable", "newConnection.cameraPermission.deniedAlert.title", fallback: "Access Required")
+    	}
+  	}
+  	public enum LocalNetworkPermission {
+    	public enum DeniedAlert {
+      	/// Cancel
+      	public static let cancelButtonTitle = L10n.tr("Localizable", "newConnection.localNetworkPermission.deniedAlert.cancelButtonTitle", fallback: "Cancel")
+      	/// Local Network access is required to link to connector.
+      	public static let message = L10n.tr("Localizable", "newConnection.localNetworkPermission.deniedAlert.message", fallback: "Local Network access is required to link to connector.")
+      	/// Settings
+      	public static let settingsButtonTitle = L10n.tr("Localizable", "newConnection.localNetworkPermission.deniedAlert.settingsButtonTitle", fallback: "Settings")
+      	/// Access Required
+      	public static let title = L10n.tr("Localizable", "newConnection.localNetworkPermission.deniedAlert.title", fallback: "Access Required")
     	}
   	}
 	}
