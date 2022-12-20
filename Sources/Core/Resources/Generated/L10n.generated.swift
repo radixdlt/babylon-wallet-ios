@@ -35,6 +35,8 @@ public enum L10n {
 	public enum App {
   	/// Development use only. Not usable on Radix mainnet.
   	public static let developmentOnlyInfo = L10n.tr("Localizable", "app.developmentOnlyInfo", fallback: "Development use only. Not usable on Radix mainnet.")
+  	/// An Error Occurred
+  	public static let errorOccurredTitle = L10n.tr("Localizable", "app.errorOccurredTitle", fallback: "An Error Occurred")
 	}
 	public enum AssetsView {
   	/// Badges
@@ -119,6 +121,12 @@ public enum L10n {
     	/// %@ wants to connect to your wallet
     	public static func wantsToConnect(_ p1: Any) -> String {
     		return L10n.tr("Localizable", "dApp.connectionRequest.wantsToConnect", String(describing: p1), fallback: "%@ wants to connect to your wallet")
+    	}
+  	}
+  	public enum Request {
+    	/// Request received from dApp for network %@, but you are currently connected to %@.
+    	public static func wrongNetworkError(_ p1: Any, _ p2: Any) -> String {
+    		return L10n.tr("Localizable", "dApp.request.wrongNetworkError", String(describing: p1), String(describing: p2), fallback: "Request received from dApp for network %@, but you are currently connected to %@.")
     	}
   	}
 	}
@@ -289,14 +297,12 @@ public enum L10n {
   	public static let biometricsNotSetUpMessage = L10n.tr("Localizable", "splash.biometricsNotSetUpMessage", fallback: "This app requires your phone to have biometrics set up")
   	/// Biometrics not set up
   	public static let biometricsNotSetUpTitle = L10n.tr("Localizable", "splash.biometricsNotSetUpTitle", fallback: "Biometrics not set up")
-  	/// Delete & create new wallet
-  	public static let incompatibleProfileVersionAlertDeleteButton = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertDeleteButton", fallback: "Delete & create new wallet")
-  	/// Saved Wallet Backup has version: %@, but this app requires a minimum Wallet version of %@. You must delete the Wallet and create a new one to use this app.
-  	public static func incompatibleProfileVersionAlertMessage(_ p1: Any, _ p2: Any) -> String {
-  		return L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertMessage", String(describing: p1), String(describing: p2), fallback: "Saved Wallet Backup has version: %@, but this app requires a minimum Wallet version of %@. You must delete the Wallet and create a new one to use this app.")
-  	}
-  	/// Incompatible Wallet Backup found
-  	public static let incompatibleProfileVersionAlertTitle = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertTitle", fallback: "Incompatible Wallet Backup found")
+  	/// Delete Wallet Data
+  	public static let incompatibleProfileVersionAlertDeleteButton = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertDeleteButton", fallback: "Delete Wallet Data")
+  	/// For this Preview wallet version, you must delete your wallet data to continue.
+  	public static let incompatibleProfileVersionAlertMessage = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertMessage", fallback: "For this Preview wallet version, you must delete your wallet data to continue.")
+  	/// Wallet Data is Incompatible
+  	public static let incompatibleProfileVersionAlertTitle = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertTitle", fallback: "Wallet Data is Incompatible")
 	}
 	public enum TransactionSigning {
   	/// Authenticate to sign transaction with this phone.
