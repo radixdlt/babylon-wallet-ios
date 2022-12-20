@@ -21,7 +21,7 @@ public extension LocalNetworkPermission.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			Color.clear
+			ZStack {}
 				.alert(
 					store.scope(
 						state: \.permissionDeniedAlert,
