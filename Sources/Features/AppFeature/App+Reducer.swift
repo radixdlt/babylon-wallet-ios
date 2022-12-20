@@ -44,7 +44,7 @@ public struct App: Sendable, ReducerProtocol {
 
 		case let .internal(.system(.displayErrorAlert(error))):
 			state.errorAlert = .init(
-                                title: .init(L10n.App.errorOccurredTitle),
+				title: .init(L10n.App.errorOccurredTitle),
 				message: .init(error.legibleLocalizedDescription)
 			)
 			return .none
