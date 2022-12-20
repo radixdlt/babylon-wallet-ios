@@ -4,6 +4,7 @@ import Foundation
 import MainFeature
 import OnboardingFeature
 import ProfileClient
+import Resources
 import SplashFeature
 
 // MARK: - App
@@ -128,9 +129,12 @@ public struct App: Sendable, ReducerProtocol {
 
 	func incompatibleSnapshotData(version: ProfileSnapshot.Version, state: inout State) -> EffectTask<Action> {
 		state.errorAlert = .init(
-			title: .init("Incompatible Profile found"),
-			message: .init("Saved Profile has version: \(String(describing: version)), but this app requires a minimum Profile version of \(String(describing: ProfileSnapshot.Version.minimum)). You must delete the Profile and create a new one to use this app."),
-			dismissButton: .destructive(.init("Delete"), action: .send(Action.ViewAction.deleteIncompatibleProfile))
+			title: .init(L10n.Splash.incompatibleProfileVersionAlertTitle),
+			message: .init(L10n.Splash.incompatibleProfileVersionAlertMessage(String(describing: version), String(describing: ProfileSnapshot.Version.minimum))),
+			dismissButton: .destructive(
+				.init(L10n.Splash.incompatibleProfileVersionAlertDeleteButton),
+				action: .send(Action.ViewAction.deleteIncompatibleProfile)
+			)
 		)
 		return .none
 	}

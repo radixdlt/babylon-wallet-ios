@@ -320,6 +320,7 @@ package.addModules([
 			"PasteboardClient",
 			"ProfileLoader",
 			"ProfileClient",
+			"Resources",
 			"SplashFeature",
 			tca,
 			"UserDefaultsClient",
