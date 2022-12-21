@@ -775,6 +775,7 @@ package.addModules([
 	.client(
 		name: "P2PConnectivityClient",
 		dependencies: [
+			asyncAlgorithms,
 			asyncExtensions,
 			"Common",
 			dependencies,
