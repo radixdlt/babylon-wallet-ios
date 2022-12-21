@@ -5,12 +5,13 @@ import SwiftUI
 // MARK: - NewConnection.State
 public extension NewConnection {
 	enum State: Equatable {
-		case localNetworkAuthorization(LocalNetworkAuthorization.State)
+		case localNetworkPermission(LocalNetworkPermission.State)
+		case cameraPermission(CameraPermission.State)
 		case scanQR(ScanQR.State)
 		case connectUsingSecrets(ConnectUsingSecrets.State)
 
 		public init() {
-			self = .localNetworkAuthorization(.init())
+			self = .localNetworkPermission(.init())
 		}
 	}
 }

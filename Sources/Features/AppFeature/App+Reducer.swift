@@ -44,7 +44,7 @@ public struct App: Sendable, ReducerProtocol {
 
 		case let .internal(.system(.displayErrorAlert(error))):
 			state.errorAlert = .init(
-				title: .init("An error occurred"),
+				title: .init(L10n.App.errorOccurredTitle),
 				message: .init(error.legibleLocalizedDescription)
 			)
 			return .none
@@ -130,7 +130,7 @@ public struct App: Sendable, ReducerProtocol {
 	func incompatibleSnapshotData(version: ProfileSnapshot.Version, state: inout State) -> EffectTask<Action> {
 		state.errorAlert = .init(
 			title: .init(L10n.Splash.incompatibleProfileVersionAlertTitle),
-			message: .init(L10n.Splash.incompatibleProfileVersionAlertMessage(String(describing: version), String(describing: ProfileSnapshot.Version.minimum))),
+			message: .init(L10n.Splash.incompatibleProfileVersionAlertMessage),
 			dismissButton: .destructive(
 				.init(L10n.Splash.incompatibleProfileVersionAlertDeleteButton),
 				action: .send(Action.ViewAction.deleteIncompatibleProfile)

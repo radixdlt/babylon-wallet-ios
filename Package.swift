@@ -18,8 +18,8 @@ package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", revision: "16306bf903ad0df3119aa143dfb6ac536dace7d9"),
-	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.10"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.1.0"),
+	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.11"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.1.2"),
 
 	// ~~~ THIRD PARTY ~~~
 	// APPLE
@@ -538,6 +538,7 @@ package.addModules([
 	.feature(
 		name: "NewConnectionFeature",
 		dependencies: [
+			"CameraPermissionClient",
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])),
 			peer,
 			"Common",
@@ -677,22 +678,11 @@ package.addModules([
 		)
 	),
 	.client(
-		name: "P2PConnectivityClient",
+		name: "CameraPermissionClient",
 		dependencies: [
-			asyncAlgorithms,
-			asyncExtensions,
-			"Common",
-			peer,
 			dependencies,
-			engineToolkit, // Model: SignTX contains Manifest
-			"JSON",
-			profile, // Account
-			"ProfileClient",
-			"SharedModels",
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
+		tests: .no
 	),
 	.client(
 		name: "Data",
@@ -781,6 +771,23 @@ package.addModules([
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
+	),
+	.client(
+		name: "P2PConnectivityClient",
+		dependencies: [
+			asyncExtensions,
+			"Common",
+			dependencies,
+			engineToolkit, // Model: SignTX contains Manifest
+			"JSON",
+			profile, // Account
+			peer,
+			"ProfileClient",
+			"SharedModels",
+		],
+		tests: .yes(dependencies: [
+			"TestUtils",
+		])
 	),
 	.client(
 		name: "PasteboardClient",

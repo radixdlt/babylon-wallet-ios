@@ -1,3 +1,4 @@
+import CameraPermissionClient
 import Common
 import ComposableArchitecture
 import ErrorQueue

@@ -14,7 +14,8 @@ public extension NewConnection {
 // MARK: - NewConnection.Action.ChildAction
 public extension NewConnection.Action {
 	enum ChildAction: Sendable, Equatable {
-		case localNetworkAuthorization(LocalNetworkAuthorization.Action)
+		case cameraPermission(CameraPermission.Action)
+		case localNetworkPermission(LocalNetworkPermission.Action)
 		case scanQR(ScanQR.Action)
 		case connectUsingSecrets(ConnectUsingSecrets.Action)
 	}

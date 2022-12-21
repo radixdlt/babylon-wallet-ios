@@ -9,7 +9,7 @@ import XCTestDynamicOverlay
 extension P2PConnectivityClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 	public static let testValue = Self(
-		getLocalNetworkAuthorization: unimplemented("\(Self.self).getLocalNetworkAuthorization"),
+		getLocalNetworkAccess: unimplemented("\(Self.self).getLocalNetworkAccess"),
 		getP2PClients: {
 			fatalError()
 		},
@@ -25,7 +25,7 @@ extension P2PConnectivityClient: TestDependencyKey {
 
 extension P2PConnectivityClient {
 	static let noop = Self(
-		getLocalNetworkAuthorization: { false },
+		getLocalNetworkAccess: { false },
 		getP2PClients: { fatalError() },
 		addP2PClientWithConnection: { _, _ in },
 		deleteP2PClientByID: { _ in },
