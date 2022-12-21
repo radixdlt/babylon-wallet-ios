@@ -46,7 +46,7 @@ public extension P2PClient {
 	)
 }
 
-extension Peer.IncomingMessage {
+public extension Peer.IncomingMessage {
 	static let placeholder = Self(messagePayload: .deadbeef32Bytes, messageID: "placeholder", messageHash: .deadbeef32Bytes)
 }
 

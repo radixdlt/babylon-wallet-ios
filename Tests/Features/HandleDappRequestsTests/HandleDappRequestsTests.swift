@@ -2,7 +2,9 @@ import Collections
 import ComposableArchitecture
 import Foundation
 @testable import HandleDappRequests
+import Models
 import NonEmpty
+import Peer
 import Profile
 import SharedModels
 import TestUtils
@@ -65,8 +67,11 @@ final class HandleDappRequestsTests: TestCase {
 
 	func test__GIVEN__on_network_nebunet__WHEN__received_request_specifying_another_network__THEN__we_respond_back_to_dapp_with_error() async throws {
 		let messageSentToDapp = ActorIsolated<P2P.ResponseToClientByID?>(nil)
+		let sentMessageReceivedConfirmationBackToDapp = ActorIsolated<Peer.IncomingMessage?>(nil)
+
 		let currentNetworkID = NetworkID.mardunet
 		let request = try P2P.RequestFromClient(
+			originalMessage: .placeholder,
 			requestFromDapp: .init(
 				id: .placeholder0,
 				metadata: .init(
@@ -82,7 +87,15 @@ final class HandleDappRequestsTests: TestCase {
 
 		let error = P2P.ToDapp.Response.Failure.Kind.Error.wrongNetwork
 		let errorMsg = "Request received from dApp for network nebunet, but you are currently connected to mardunet."
-		let response = P2P.ToDapp.Response.failure(.init(id: request.id, kind: .error(error), message: errorMsg))
+
+		let response = P2P.ToDapp.Response.failure(
+			.init(
+				id: request.id,
+				kind: .error(error),
+				message: errorMsg
+			)
+		)
+
 		let store = TestStore(
 			initialState: HandleDappRequests.State(
 				unfinishedRequestsFromClient: .init()
@@ -96,9 +109,18 @@ final class HandleDappRequestsTests: TestCase {
 				}
 				XCTAssertEqual(error, .wrongNetwork)
 			}
+			$0.p2pConnectivityClient.sendMessageReadReceipt = { _, sent in
+				await sentMessageReceivedConfirmationBackToDapp.setValue(sent)
+			}
 			$0.p2pConnectivityClient.sendMessage = {
 				await messageSentToDapp.setValue($0)
-				return .init(sentReceipt: .init(data: .deadbeef32Bytes, messageID: .deadbeef32Bytes), responseToDapp: $0.responseToDapp, client: .placeholder)
+				return P2P.SentResponseToClient(
+					sentReceipt: .init(
+						messageSent: .init(data: .deadbeef32Bytes, messageID: .deadbeef32Bytes)
+					),
+					responseToDapp: $0.responseToDapp,
+					client: .placeholder
+				)
 			}
 		}
 		store.exhaustivity = .off
@@ -111,6 +133,9 @@ final class HandleDappRequestsTests: TestCase {
 
 		await messageSentToDapp.withValue {
 			XCTAssertEqual($0?.responseToDapp, response)
+		}
+		await sentMessageReceivedConfirmationBackToDapp.withValue {
+			XCTAssertEqual($0?.messageID, request.originalMessage.messageID)
 		}
 	}
 }

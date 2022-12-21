@@ -5,30 +5,25 @@ import Peer
 import SharedModels
 import TestUtils
 
-public extension Peer {
-	static let noop: Peer = {
-		fatalError()
-	}()
-}
-
 // MARK: - NewConnectionTests
 @MainActor
 final class NewConnectionTests: TestCase {
 	// FIXME: failing for some reason
-//	func test__GIVEN__scanQR_screen__WHEN__secrets_are_scanned__THEN__we_start_connect_using_secrets() async throws {
-//		let store = TestStore(
-//			// GIVEN initial state
-//			initialState: NewConnection.State.scanQR(.init()),
-//			reducer: NewConnection()
-//		)
-//		let secrets = ConnectionSecrets.placeholder
-//		await store.send(.child(.scanQR(.delegate(.connectionSecretsFromScannedQR(secrets))))) {
-//			$0 = .connectUsingSecrets(.init(connectionSecrets: secrets))
-//		}
-//	}
+	func test__GIVEN__scanQR_screen__WHEN__secrets_are_scanned__THEN__we_start_connect_using_secrets() async throws {
+		let store = TestStore(
+			// GIVEN initial state
+			initialState: NewConnection.State.scanQR(.init()),
+			reducer: NewConnection()
+		)
+		let secrets = ConnectionSecrets.placeholder
+		await store.send(.child(.scanQR(.delegate(.connectionSecretsFromScannedQR(secrets))))) {
+			$0 = .connectUsingSecrets(.init(connectionSecrets: secrets))
+		}
+	}
 
 	func test__GIVEN__connecting__WHEN__connected__THEN_we_delegate_to_parent_reducer() async throws {
 		let secrets = ConnectionSecrets.placeholder
+		let peer = Peer(connectionSecrets: secrets)
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
@@ -41,7 +36,7 @@ final class NewConnectionTests: TestCase {
 				displayName: "test",
 				connectionPassword: secrets.connectionPassword.data.data
 			),
-			peer: Peer.noop
+			peer: peer
 		)
 		await store.send(.child(.connectUsingSecrets(.delegate(.connected(
 			connectedClient
@@ -51,12 +46,12 @@ final class NewConnectionTests: TestCase {
 
 	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_saved_but_without_name() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let peer = Peer.noop
+		let peer = Peer(connectionSecrets: secrets)
 
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionSecrets: .placeholder, connectedpeer: peer)
+				ConnectUsingSecrets.State(connectionSecrets: .placeholder, connectedPeer: peer)
 			),
 			reducer: NewConnection()
 		)
@@ -67,11 +62,11 @@ final class NewConnectionTests: TestCase {
 
 	func test__GIVEN_new_connected_client__WHEN__user_confirms_name__THEN__connection_is_saved_with_that_name_trimmed() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let peer = Peer.noop
+		let peer = Peer(connectionSecrets: secrets)
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionSecrets: secrets, connectedpeer: peer)
+				ConnectUsingSecrets.State(connectionSecrets: secrets, connectedPeer: peer)
 			),
 			reducer: NewConnection()
 		)
@@ -79,7 +74,7 @@ final class NewConnectionTests: TestCase {
 		await store.send(.child(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + " "))))) {
 			$0 = .connectUsingSecrets(.init(
 				connectionSecrets: secrets,
-				connectedpeer: peer,
+				connectedPeer: peer,
 				nameOfConnection: connectionName + " ",
 				isNameValid: true
 			)
