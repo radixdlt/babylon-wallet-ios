@@ -15,6 +15,10 @@ public extension P2PConnectivityClient {
 
 		final actor ConnectionsHolder: GlobalActor {
 			private var connections: [ConnectionID: P2P.ConnectionForClient]
+			private let justClientsWithStatusChannel: AsyncChannel<[P2P.ClientWithConnectionStatus]> = .init()
+			fileprivate nonisolated var justClientsWithStatusAsyncSequence: AnyAsyncSequence<[P2P.ClientWithConnectionStatus]> {
+				justClientsWithStatusChannel.eraseToAnyAsyncSequence()
+			}
 
 			private let base: P2PConnectivityClient.Base
 			private let subject: P2PConnectivityClient.Subject
@@ -43,6 +47,11 @@ public extension P2PConnectivityClient {
 				base.send(
 					connections.values.map { $0 }
 				)
+				Task {
+					await justClientsWithStatusChannel.send(
+						connections.values.map { .init(p2pClient: $0.client, connectionStatus: .new) }
+					)
+				}
 			}
 
 			func addConnection(_ connection: P2P.ConnectionForClient, connect: Bool, emitUpdate: Bool) async {
@@ -57,7 +66,7 @@ public extension P2PConnectivityClient {
 					}
 					return
 				}
-				Task.detached { [connection] in
+				Task { [connection] in
 					try await connection.peer.connect()
 				}
 				guard emitUpdate else {
@@ -92,20 +101,14 @@ public extension P2PConnectivityClient {
 				}
 				return peer
 			}
-		}
 
-		let connectionsHolder = ConnectionsHolder.shared
-
-		let localNetworkAuthorization = LocalNetworkAuthorization()
-
-		return Self(
-			getLocalNetworkAccess: {
-				await localNetworkAuthorization.requestAuthorization()
-			},
-			getP2PClients: {
-				let connections = try await profileClient.getP2PClients()
-				let clientsWithConnectionStatus = try await connections.connections.asyncMap { p2pClient in
-
+			func loadedFromProfile(connections: P2PClients) async throws {
+				for connection in self.connections.values {
+					if !connections.connections.contains(connection.client) {
+						await self.disconnectedAndRemove(connection.client.id)
+					}
+				}
+				for p2pClient in connections.connections {
 					let password = try ConnectionPassword(data: p2pClient.connectionPassword.data)
 					let secrets = try ConnectionSecrets.from(connectionPassword: password)
 					let peer = Peer(connectionSecrets: secrets)
@@ -114,15 +117,32 @@ public extension P2PConnectivityClient {
 						client: p2pClient,
 						peer: peer
 					)
-					await connectionsHolder.addConnection(connectedClient, connect: true, emitUpdate: false)
+					await self.addConnection(connectedClient, connect: true, emitUpdate: false)
+				}
+				await self.emit()
+			}
+		}
 
-					return P2P.ClientWithConnectionStatus(p2pClient: p2pClient)
-				}
-				Task {
-					await connectionsHolder.emit()
-				}
+		let connectionsHolder = ConnectionsHolder.shared
+
+		@Sendable func loadFromProfile() async throws {
+			let connections = try await profileClient.getP2PClients()
+			try await connectionsHolder.loadedFromProfile(connections: connections)
+		}
+
+		let localNetworkAuthorization = LocalNetworkAuthorization()
+
+		return Self(
+			getLocalNetworkAccess: {
+				await localNetworkAuthorization.requestAuthorization()
+			},
+			getP2PClients: {
+				try await loadFromProfile()
+				return connectionsHolder.justClientsWithStatusAsyncSequence
+			},
+			getP2PConnections: {
+				try await loadFromProfile()
 				return connectionsHolder.multicasted.autoconnect()
-
 			},
 			addP2PClientWithConnection: { clientWithConnection, alsoConnect in
 				try await profileClient.addP2PClient(clientWithConnection.client)

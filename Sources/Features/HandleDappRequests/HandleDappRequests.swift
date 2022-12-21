@@ -204,7 +204,7 @@ private extension HandleDappRequests {
 			return .run { send in
 				print("☑️ HandleDappRequests getting p2pClients.......")
 				do {
-					for try await p2pClients in try await p2pConnectivityClient.getP2PClients() {
+					for try await p2pClients in try await p2pConnectivityClient.getP2PConnections() {
 						print("✅ HandleDappRequests got p2pClients: \(p2pClients.map(\.client.displayName)) ")
 						await send(.internal(.system(.loadConnectionsResult(.success(p2pClients)))))
 					}
