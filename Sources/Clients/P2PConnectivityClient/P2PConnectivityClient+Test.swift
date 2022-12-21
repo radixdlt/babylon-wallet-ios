@@ -13,6 +13,9 @@ extension P2PConnectivityClient: TestDependencyKey {
 		getP2PClients: {
 			fatalError()
 		},
+		getP2PConnections: {
+			fatalError()
+		},
 		addP2PClientWithConnection: unimplemented("\(Self.self).addP2PClientWithConnection"),
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getConnectionStatusAsyncSequence: unimplemented("\(Self.self).getConnectionStatusAsyncSequence"),
@@ -27,6 +30,7 @@ extension P2PConnectivityClient {
 	static let noop = Self(
 		getLocalNetworkAccess: { false },
 		getP2PClients: { fatalError() },
+		getP2PConnections: { fatalError() },
 		addP2PClientWithConnection: { _, _ in },
 		deleteP2PClientByID: { _ in },
 		getConnectionStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
