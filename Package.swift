@@ -17,7 +17,7 @@ let package = Package(
 package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", revision: "16306bf903ad0df3119aa143dfb6ac536dace7d9"),
+	.package(url: "git@github.com:radixdlt/Converse.git", revision: "d9c48f49f54c842bddbc8f1444d311fb1b05382e"), // triggers reconnect when remote connects to SS
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.11"),
 	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.1.2"),
 
