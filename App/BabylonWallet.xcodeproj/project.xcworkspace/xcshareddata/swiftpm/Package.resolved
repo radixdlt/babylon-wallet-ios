@@ -73,15 +73,6 @@
       }
     },
     {
-      "identity" : "keychainaccess",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
-      "state" : {
-        "revision" : "84e546727d66f1adc5439debad16270d0fdd04e7",
-        "version" : "4.2.2"
-      }
-    },
-    {
       "identity" : "legibleerror",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mxcl/LegibleError",
@@ -95,8 +86,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Mnemonic.git",
       "state" : {
-        "revision" : "c16383ddf78bc7ff71435f78fa0c4bdecc186a96",
-        "version" : "0.0.5"
+        "branch" : "implicit-deps",
+        "revision" : "132321f8311c829eed7011b519434cec445e6908"
       }
     },
     {
@@ -113,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/SLIP10.git",
       "state" : {
-        "revision" : "5d496c72282f675bee91b953a74c086ce86f7faa",
-        "version" : "0.0.20"
+        "branch" : "implicit-deps",
+        "revision" : "890db9824d864cf2ffc413c34c15f2fe81458061"
       }
     },
     {
@@ -194,8 +185,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-engine-toolkit.git",
       "state" : {
-        "revision" : "78c46361e0a025b2603959c3b21868fb2308d1e0",
-        "version" : "0.1.11"
+        "branch" : "implicit-deps",
+        "revision" : "7ddfb2338e02e3e9a9646bf27d588a347ad8bcdf"
       }
     },
     {
@@ -244,15 +235,6 @@
       }
     },
     {
-      "identity" : "swift-profile",
-      "kind" : "remoteSourceControl",
-      "location" : "git@github.com:radixdlt/swift-profile.git",
-      "state" : {
-        "revision" : "74ff518cd6d6c4687fdcf615422292047e1aa368",
-        "version" : "0.1.2"
-      }
-    },
-    {
       "identity" : "swift-tagged",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-tagged",
@@ -295,15 +277,6 @@
       "state" : {
         "revision" : "1852a4eb7e7a12a768c64b25b1bd905993ced4eb",
         "version" : "1.1.9"
-      }
-    },
-    {
-      "identity" : "version",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mxcl/Version",
-      "state" : {
-        "revision" : "1fe824b80d89201652e7eca7c9252269a1d85e25",
-        "version" : "2.0.1"
       }
     },
     {
