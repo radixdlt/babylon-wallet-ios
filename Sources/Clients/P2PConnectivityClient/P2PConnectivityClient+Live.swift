@@ -118,7 +118,7 @@ public extension P2PConnectivityClient {
 
 					return P2P.ClientWithConnectionStatus(p2pClient: p2pClient)
 				}
-				Task.detached {
+				Task {
 					await connectionsHolder.emit()
 				}
 				return connectionsHolder.multicasted.autoconnect()
