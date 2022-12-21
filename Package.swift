@@ -16,10 +16,8 @@ let package = Package(
 
 package.dependencies += [
 	// RDX Works dependencies
-	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.2.1"),
-	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.11"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.1.2"),
+	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", branch: "implicit-deps"),
 
 	// ~~~ THIRD PARTY ~~~
 	// APPLE
@@ -33,7 +31,6 @@ package.dependencies += [
 	.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3"),
 
 	// Other
-	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
 	.package(url: "https://github.com/globulus/swiftui-pull-to-refresh", from: "1.1.8"),
 	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
@@ -86,29 +83,14 @@ let legibleError: Target.Dependency = .product(
 	package: "LegibleError"
 )
 
-let profile: Target.Dependency = .product(
-	name: "Profile",
-	package: "swift-profile"
-)
-
 let converse: Target.Dependency = .product(
 	name: "Converse",
 	package: "Converse"
 )
 
-let bigInt: Target.Dependency = .product(
-	name: "BigInt",
-	package: "BigInt"
-)
-
 let engineToolkit: Target.Dependency = .product(
 	name: "EngineToolkit",
 	package: "swift-engine-toolkit"
-)
-
-let bite: Target.Dependency = .product(
-	name: "Bite",
-	package: "Bite"
 )
 
 // MARK: - Defining TCA Modules
@@ -262,7 +244,6 @@ package.addModules([
 			"AssetsViewFeature",
 			"DesignSystem",
 			engineToolkit,
-			profile,
 			tca,
 
 		],
@@ -390,7 +371,7 @@ package.addModules([
 			dependencies: [
 				"Asset",
 				"DesignSystem",
-				profile,
+				engineToolkit,
 				tca,
 				"TestUtils",
 			]
@@ -421,9 +402,9 @@ package.addModules([
 		name: "HandleDappRequests",
 		dependencies: [
 			collections,
+			engineToolkit,
 			"GrantDappWalletAccessFeature",
 			"P2PConnectivityClient",
-			profile,
 			"SharedModels",
 			tca,
 			"TransactionSigningFeature",
@@ -584,14 +565,13 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-			profile,
+			engineToolkit,
 			"ErrorQueue",
 			"GatewayAPI",
 			"KeychainClientDependency",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"ProfileClient",
-			.product(name: "ProfileView", package: "swift-profile"),
 			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
@@ -646,11 +626,9 @@ package.addModules([
 		dependencies: [
 			"AppSettings",
 			"Asset",
-			bigInt,
 			"Common",
 			engineToolkit,
 			"GatewayAPI",
-			profile,
 			dependencies,
 		],
 		tests: .yes(
@@ -689,12 +667,9 @@ package.addModules([
 	.client(
 		name: "EngineToolkitClient",
 		dependencies: [
-			bigInt,
-			bite,
 			"Common",
 			dependencies,
 			engineToolkit,
-			profile, // AccountAddress
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -717,7 +692,6 @@ package.addModules([
 			engineToolkit,
 			"EngineToolkitClient",
 			"GatewayAPI",
-			profile,
 			"ProfileClient",
 			"TransactionClient",
 		], tests: .no
@@ -727,13 +701,11 @@ package.addModules([
 		dependencies: [
 			.product(name: "AnyCodable", package: "AnyCodable"),
 			"Asset",
-			bigInt,
 			"Common",
 			dependencies, // XCTestDynamicOverlay + DependencyKey
 			engineToolkit,
 			"EngineToolkitClient",
 			"JSON",
-			profile, // address
 			"ProfileClient",
 		],
 		exclude: [
@@ -754,7 +726,7 @@ package.addModules([
 		name: "KeychainClientDependency",
 		dependencies: [
 			dependencies,
-			.product(name: "KeychainClient", package: "swift-profile"),
+			engineToolkit,
 		],
 		tests: .no
 	),
@@ -774,9 +746,8 @@ package.addModules([
 			"Common",
 			converse,
 			dependencies,
-			engineToolkit, // Model: SignTX contains Manifest
+			engineToolkit, // Model: SignTX contains Manifest, Account
 			"JSON",
-			profile, // Account
 			"ProfileClient",
 			"SharedModels",
 		],
@@ -801,7 +772,6 @@ package.addModules([
 		dependencies: [
 			dependencies, // XCTestDynamicOverlay + DependencyKey
 			"EngineToolkitClient", // Create TX
-			profile,
 			"ProfileLoader",
 			"SharedModels",
 			"UserDefaultsClient",
@@ -814,9 +784,9 @@ package.addModules([
 		name: "ProfileLoader",
 		dependencies: [
 			"Common",
+			engineToolkit,
 			"JSON",
 			"KeychainClientDependency",
-			profile,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -850,8 +820,6 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"EngineToolkitClient", // I know, this is very wrong. Apologies. Let's revisit our dependency levels post betanet.
-			profile, // Address
-			bigInt,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -860,12 +828,9 @@ package.addModules([
 	.core(
 		name: "Common",
 		dependencies: [
-			bite,
-			bigInt,
 			"DesignSystem",
 			engineToolkit,
 			legibleError,
-			profile, // Address
 			"Resources",
 			tagged,
 		],
@@ -877,10 +842,8 @@ package.addModules([
 		name: "SharedModels",
 		dependencies: [
 			"Asset",
-			bigInt,
 			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make Converse, EngineToolkit, etc. vend their own Model packages.
 			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
-			profile, // FIXME: In `Profile` split out Models package
 			collections,
 			converse, // FIXME: In `Converse` split out Models package
 			nonEmpty,
@@ -922,7 +885,7 @@ package.addModules([
 	.core(
 		name: "TestUtils",
 		dependencies: [
-			bite,
+			engineToolkit,
 			"Common",
 			tca,
 		],
