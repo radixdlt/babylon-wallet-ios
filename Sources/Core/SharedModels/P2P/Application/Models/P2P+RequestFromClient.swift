@@ -1,17 +1,22 @@
 import Foundation
+import P2PConnection
 import Profile
 
 // MARK: - P2P.RequestFromClient
 public extension P2P {
 	// MARK: - RequestFromClient
 	struct RequestFromClient: Sendable, Hashable, Identifiable {
+		public let originalMessage: P2PConnection.IncomingMessage
+
 		public let requestFromDapp: FromDapp.Request
 		public let client: P2PClient
 
 		public init(
+			originalMessage: P2PConnection.IncomingMessage,
 			requestFromDapp: FromDapp.Request,
 			client: P2PClient
 		) throws {
+			self.originalMessage = originalMessage
 			self.requestFromDapp = requestFromDapp
 			self.client = client
 		}
@@ -20,6 +25,9 @@ public extension P2P {
 
 public extension P2P.RequestFromClient {
 	typealias ID = P2P.FromDapp.Request.ID
+
+	/// Not to be confused with `msgReceivedReceiptID` (which is a transport layer msg ID), whereas
+	/// this is an Application Layer identifer.
 	var id: ID {
 		requestFromDapp.id
 	}
@@ -38,13 +46,19 @@ public extension P2PClient {
 	)
 }
 
+public extension P2PConnection.IncomingMessage {
+	static let placeholder = Self(messagePayload: .deadbeef32Bytes, messageID: "placeholder", messageHash: .deadbeef32Bytes)
+}
+
 public extension P2P.RequestFromClient {
 	static let placeholder = Self.placeholderOneTimeAccountAccess
 	static let placeholderOneTimeAccountAccess: Self = try! .init(
+		originalMessage: .placeholder,
 		requestFromDapp: .placeholderOneTimeAccount,
 		client: .placeholder
 	)
 	static let placeholderSignTXRequest: Self = try! .init(
+		originalMessage: .placeholder,
 		requestFromDapp: .placeholderSignTX,
 		client: .placeholder
 	)

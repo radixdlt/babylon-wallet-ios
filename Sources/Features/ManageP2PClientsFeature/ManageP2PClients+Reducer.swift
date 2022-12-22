@@ -1,8 +1,7 @@
 import ComposableArchitecture
-import Converse
-import ConverseCommon
 import ErrorQueue
 import NewConnectionFeature
+import P2PConnection
 import P2PConnectivityClient
 import Profile
 import ProfileClient
@@ -33,13 +32,16 @@ public extension ManageP2PClients {
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.view(.viewAppeared)):
+		case .internal(.view(.task)):
+			print("☑️ ManageP2PClients getting p2pClients...")
 			return .run { send in
-				await send(.internal(.system(.loadConnectionsResult(
-					TaskResult {
-						try await p2pConnectivityClient.getP2PClients().first(where: { !$0.isEmpty }) ?? []
-					}
-				))))
+				print("☑️ ManageP2PClients getting p2pClients.......")
+				for try await p2pClients in try await p2pConnectivityClient.getP2PClients() {
+					print("✅ ManageP2PClients got p2pClients: \(p2pClients.map(\.p2pClient.displayName)) ")
+					await send(.internal(.system(.loadConnectionsResult(
+						.success(p2pClients)
+					))))
+				}
 			}
 
 		case let .internal(.system(.loadConnectionsResult(.success(connectionsFromProfile)))):

@@ -78,7 +78,7 @@ private extension ScanQR.View {
 
 	@ViewBuilder
 	func macOSInputView(viewStore: ViewStore<ViewState, ScanQR.Action.ViewAction>) -> some View {
-		#if os(macOS)
+		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		VStack(alignment: .center) {
 			Text("Manually input connection password which you can see if you right click and inspect the browser window.")
 			TextField(
@@ -102,11 +102,11 @@ private extension ScanQR.View {
 // MARK: - ScanQR.View.ViewState
 extension ScanQR.View {
 	struct ViewState: Equatable {
-		#if os(macOS)
+		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		public var connectionPassword: String
 		#endif // macOS
 		init(state: ScanQR.State) {
-			#if os(macOS)
+			#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 			connectionPassword = state.connectionPassword
 			#endif // macOS
 		}

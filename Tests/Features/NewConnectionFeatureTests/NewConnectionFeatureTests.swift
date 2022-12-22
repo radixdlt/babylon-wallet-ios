@@ -1,11 +1,11 @@
 import ComposableArchitecture
-import Converse
-import ConverseCommon
 import Foundation
 @testable import NewConnectionFeature
+import P2PConnection
 import SharedModels
 import TestUtils
 
+// MARK: - NewConnectionTests
 @MainActor
 final class NewConnectionTests: TestCase {
 	func test__GIVEN__scanQR_screen__WHEN__secrets_are_scanned__THEN__we_start_connect_using_secrets() async throws {
@@ -22,6 +22,7 @@ final class NewConnectionTests: TestCase {
 
 	func test__GIVEN__connecting__WHEN__connected__THEN_we_delegate_to_parent_reducer() async throws {
 		let secrets = ConnectionSecrets.placeholder
+		let p2pConnection = P2PConnection(connectionSecrets: secrets)
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
@@ -34,7 +35,7 @@ final class NewConnectionTests: TestCase {
 				displayName: "test",
 				connectionPassword: secrets.connectionPassword.data.data
 			),
-			connection: Connection.noop
+			p2pConnection: p2pConnection
 		)
 		await store.send(.child(.connectUsingSecrets(.delegate(.connected(
 			connectedClient
@@ -44,33 +45,39 @@ final class NewConnectionTests: TestCase {
 
 	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_saved_but_without_name() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let connection = Connection.noop
+		let p2pConnection = P2PConnection(connectionSecrets: secrets)
 
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionSecrets: .placeholder, connectedConnection: connection)
+				ConnectUsingSecrets.State(connectionSecrets: .placeholder, newP2PConnection: p2pConnection)
 			),
 			reducer: NewConnection()
 		)
 
 		await store.send(.internal(.view(.dismissButtonTapped)))
-		await store.receive(.delegate(.newConnection(.init(client: .init(displayName: "Unnamed", connectionPassword: secrets.connectionPassword.data.data), connection: connection))))
+		await store.receive(.delegate(.newConnection(.init(client: .init(displayName: "Unnamed", connectionPassword: secrets.connectionPassword.data.data), p2pConnection: p2pConnection))))
 	}
 
 	func test__GIVEN_new_connected_client__WHEN__user_confirms_name__THEN__connection_is_saved_with_that_name_trimmed() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let connection = Connection.noop
+		let p2pConnection = P2PConnection(connectionSecrets: secrets)
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionSecrets: secrets, connectedConnection: connection)
+				ConnectUsingSecrets.State(connectionSecrets: secrets, newP2PConnection: p2pConnection)
 			),
 			reducer: NewConnection()
 		)
 		let connectionName = "Foobar"
 		await store.send(.child(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + " "))))) {
-			$0 = .connectUsingSecrets(.init(connectionSecrets: secrets, connectedConnection: connection, nameOfConnection: connectionName + " ", isNameValid: true))
+			$0 = .connectUsingSecrets(.init(
+				connectionSecrets: secrets,
+				newP2PConnection: p2pConnection,
+				nameOfConnection: connectionName + " ",
+				isNameValid: true
+			)
+			)
 		}
 		let testScheduler = DispatchQueue.test
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
@@ -81,7 +88,7 @@ final class NewConnectionTests: TestCase {
 				displayName: connectionName,
 				connectionPassword: secrets.connectionPassword.data.data
 			),
-			connection: connection
+			p2pConnection: p2pConnection
 		)
 
 		await store.receive(.child(.connectUsingSecrets(.internal(.view(.textFieldFocused(nil))))))

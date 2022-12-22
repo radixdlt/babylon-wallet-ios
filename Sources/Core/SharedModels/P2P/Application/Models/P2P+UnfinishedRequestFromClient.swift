@@ -64,6 +64,7 @@ public extension P2P.RequestItemToHandle {
 	static let placeholderOneTimeAccount: Self = .init(
 		requestItem: .oneTimeAccounts(.placeholder),
 		parentRequest: try! .init(
+			originalMessage: .placeholder,
 			requestFromDapp: .placeholderOneTimeAccount,
 			client: .init(
 				displayName: "Placeholder",

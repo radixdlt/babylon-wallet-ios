@@ -48,6 +48,10 @@ public enum L10n {
   	/// Tokens
   	public static let tokens = L10n.tr("Localizable", "assetsView.tokens", fallback: "Tokens")
 	}
+	public enum Common {
+  	/// Linked Connector Offline
+  	public static let p2PConnectionOffline = L10n.tr("Localizable", "common.P2PConnectionOffline", fallback: "Linked Connector Offline")
+	}
 	public enum CreateAccount {
   	/// Authenticate to create new account with this phone.
   	public static let biometricsPrompt = L10n.tr("Localizable", "createAccount.biometricsPrompt", fallback: "Authenticate to create new account with this phone.")

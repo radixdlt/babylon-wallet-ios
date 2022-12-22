@@ -1,5 +1,6 @@
 import ComposableArchitecture
-import Converse
+import P2PConnection
+import P2PModels
 import SharedModels
 
 // MARK: - ConnectUsingSecrets
@@ -13,15 +14,15 @@ public extension ConnectUsingSecrets {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
-			let connection = Connection.live(
+			let p2pConnection = P2PConnection(
 				connectionSecrets: state.connectionSecrets
 			)
 
 			return .run { send in
 				await send(.internal(.system(.establishConnectionResult(
 					TaskResult {
-						try await connection.establish()
-						return connection
+						try await p2pConnection.connect()
+						return p2pConnection
 					}
 				))))
 
@@ -29,8 +30,8 @@ public extension ConnectUsingSecrets {
 				await send(.internal(.system(.focusTextField(.connectionName))))
 			}
 
-		case let .internal(.system(.establishConnectionResult(.success(connection)))):
-			state.newConnection = connection
+		case let .internal(.system(.establishConnectionResult(.success(p2pConnection)))):
+			state.newP2PConnection = p2pConnection
 			state.isConnecting = false
 			state.isPromptingForName = true
 
@@ -46,7 +47,7 @@ public extension ConnectUsingSecrets {
 			return .none
 
 		case .internal(.view(.confirmNameButtonTapped)):
-			guard let newConnection = state.newConnection else {
+			guard let newP2PConnection = state.newP2PConnection else {
 				// invalid state
 				return .none
 			}
@@ -56,7 +57,7 @@ public extension ConnectUsingSecrets {
 					displayName: state.nameOfConnection.trimmed(),
 					connectionPassword: state.connectionSecrets.connectionPassword.data.data
 				),
-				connection: newConnection
+				p2pConnection: newP2PConnection
 			)
 
 			return .run { send in

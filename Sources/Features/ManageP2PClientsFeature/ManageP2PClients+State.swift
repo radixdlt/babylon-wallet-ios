@@ -1,8 +1,7 @@
-import Converse
-import ConverseCommon
 import Foundation
 import IdentifiedCollections
 import NewConnectionFeature
+import P2PConnection
 import P2PConnectivityClient
 import Profile
 import SharedModels

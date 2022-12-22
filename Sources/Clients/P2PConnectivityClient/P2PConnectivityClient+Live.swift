@@ -1,11 +1,12 @@
+import AsyncAlgorithms
 import AsyncExtensions
-import Converse
-import ConverseCommon
 import Dependencies
 import Foundation
 import JSON
 import Network
+import P2PConnection
 import ProfileClient
+import Resources
 import SharedModels
 
 // MARK: - P2PConnectivityClient + :LiveValue
@@ -15,7 +16,16 @@ public extension P2PConnectivityClient {
 
 		final actor ConnectionsHolder: GlobalActor {
 			private var connections: [ConnectionID: P2P.ConnectionForClient] = [:]
-			var p2pClients: AsyncCurrentValueSubject<[P2P.ClientWithConnectionStatus]> = .init([])
+			private let connectionsChannel: AsyncChannel<[P2P.ConnectionForClient]> = .init()
+			private let justClientsWithStatusChannel: AsyncChannel<[P2P.ClientWithConnectionStatus]> = .init()
+			fileprivate nonisolated var justClientsWithStatusAsyncSequence: AnyAsyncSequence<[P2P.ClientWithConnectionStatus]> {
+				justClientsWithStatusChannel.eraseToAnyAsyncSequence()
+			}
+
+			fileprivate nonisolated var connectionsAsyncSequence: AnyAsyncSequence<[P2P.ConnectionForClient]> {
+				connectionsChannel.eraseToAnyAsyncSequence()
+			}
+
 			static let shared = ConnectionsHolder()
 
 			func mapID(_ passwordID: P2PClient.ID) throws -> ConnectionID {
@@ -23,28 +33,41 @@ public extension P2PConnectivityClient {
 				return try ConnectionID(password: connectionPassword)
 			}
 
-			func addConnection(_ connection: P2P.ConnectionForClient, connect: Bool, emitUpdate: Bool) {
-				let key = connection.connection.getConnectionID()
+			@Sendable func emit() async {
+				Task {
+					await connectionsChannel.send(
+						connections.values.map { $0 }
+					)
+				}
+				Task {
+					await justClientsWithStatusChannel.send(
+						connections.values.map { .init(p2pClient: $0.client, connectionStatus: .new) }
+					)
+				}
+			}
+
+			func addConnection(_ connection: P2P.ConnectionForClient, connect: Bool, emitUpdate: Bool) async {
+				let key = connection.p2pConnection.connectionID
 				guard connections[key] == nil else {
 					return
 				}
 				self.connections[key] = connection
 				guard connect else {
 					if emitUpdate {
-						p2pClients.send(p2pClients.value + [.init(p2pClient: connection.client, connectionStatus: .connected)])
+						await emit()
 					}
 					return
 				}
-
-				Task.detached { [p2pClients] in
-					try await connection.connection.establish()
-					if emitUpdate {
-						p2pClients.send(p2pClients.value + [.init(p2pClient: connection.client, connectionStatus: .connected)])
-					}
+				Task { [connection] in
+					try await connection.p2pConnection.connect()
 				}
+				guard emitUpdate else {
+					return
+				}
+				await emit()
 			}
 
-			func disconnectedAndRemove(_ id: P2PClient.ID) {
+			func disconnectedAndRemove(_ id: P2PClient.ID) async {
 				guard
 					let key = try? mapID(id),
 					let _ = connections[key]
@@ -52,27 +75,47 @@ public extension P2PConnectivityClient {
 					return
 				}
 				if let removed = connections.removeValue(forKey: key) {
-					Task {
-						await removed.connection.close()
-					}
+					await removed.p2pConnection.disconnect()
 				}
-				var value = p2pClients.value
-				value.removeAll(where: { $0.p2pClient.id == id })
-				p2pClients.send(value)
+				await emit()
 			}
 
-			func getConnection(id: P2PClient.ID) -> P2P.ConnectionForClient? {
+			func getConnection(id: P2PClient.ID) async -> P2P.ConnectionForClient? {
 				guard
-					let key = try? mapID(id),
-					let connection = connections[key]
+					let key = try? mapID(id)
 				else {
 					return nil
 				}
-				return connection
+				return connections[key]
+			}
+
+			func loadedFromProfile(connections: P2PClients) async throws {
+				for connection in self.connections.values {
+					if !connections.connections.contains(connection.client) {
+						await self.disconnectedAndRemove(connection.client.id)
+					}
+				}
+				for p2pClient in connections.connections {
+					let password = try ConnectionPassword(data: p2pClient.connectionPassword.data)
+					let secrets = try ConnectionSecrets.from(connectionPassword: password)
+					let p2pConnection = P2PConnection(connectionSecrets: secrets)
+
+					let connectedClient = P2P.ConnectionForClient(
+						client: p2pClient,
+						p2pConnection: p2pConnection
+					)
+					await self.addConnection(connectedClient, connect: true, emitUpdate: false)
+				}
+				await self.emit()
 			}
 		}
 
 		let connectionsHolder = ConnectionsHolder.shared
+
+		@Sendable func loadFromProfile() async throws {
+			let connections = try await profileClient.getP2PClients()
+			try await connectionsHolder.loadedFromProfile(connections: connections)
+		}
 
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
@@ -81,50 +124,39 @@ public extension P2PConnectivityClient {
 				await localNetworkAuthorization.requestAuthorization()
 			},
 			getP2PClients: {
-				let connections = try await profileClient.getP2PClients()
-				let clientsWithConnectionStatus = try await connections.connections.asyncMap { p2pClient in
-
-					let password = try ConnectionPassword(data: p2pClient.connectionPassword.data)
-					let secrets = try ConnectionSecrets.from(connectionPassword: password)
-					let connection = Connection.live(connectionSecrets: secrets)
-
-					let connectedClient = P2P.ConnectionForClient(
-						client: p2pClient,
-						connection: connection
-					)
-
-					await connectionsHolder.addConnection(connectedClient, connect: true, emitUpdate: false)
-
-					return P2P.ClientWithConnectionStatus(p2pClient: p2pClient)
-				}
-				await connectionsHolder.p2pClients.send(clientsWithConnectionStatus)
-				return await connectionsHolder.p2pClients.eraseToAnyAsyncSequence()
-
+				try await loadFromProfile()
+				return connectionsHolder.justClientsWithStatusAsyncSequence
+			},
+			getP2PConnections: {
+				try await loadFromProfile()
+				return connectionsHolder.connectionsAsyncSequence
 			},
 			addP2PClientWithConnection: { clientWithConnection, alsoConnect in
-				await connectionsHolder.addConnection(clientWithConnection, connect: alsoConnect, emitUpdate: true)
 				try await profileClient.addP2PClient(clientWithConnection.client)
+				await connectionsHolder.addConnection(clientWithConnection, connect: alsoConnect, emitUpdate: true)
 			},
 			deleteP2PClientByID: { id in
-				await connectionsHolder.disconnectedAndRemove(id)
 				try await profileClient.deleteP2PClientByID(id)
+				await connectionsHolder.disconnectedAndRemove(id)
 			},
 			getConnectionStatusAsyncSequence: { id in
 				guard let connection = await connectionsHolder.getConnection(id: id) else {
-					return [P2P.ConnectionUpdate]().async.eraseToAnyAsyncSequence()
+					return AsyncLazySequence([]).eraseToAnyAsyncSequence()
 				}
-				return connection.connection.connectionStatus().map { newStatus in
+				return await connection.p2pConnection.connectionStatusPublisher.map { newStatus in
 					P2P.ConnectionUpdate(
 						connectionStatus: newStatus,
 						p2pClient: connection.client
 					)
-				}.eraseToAnyAsyncSequence()
+				}
+				.values
+				.eraseToAnyAsyncSequence()
 			},
 			getRequestsFromP2PClientAsyncSequence: { id in
 				guard let connection = await connectionsHolder.getConnection(id: id) else {
-					return [P2P.RequestFromClient]().async.eraseToAnyAsyncSequence()
+					return AsyncLazySequence([]).eraseToAnyAsyncSequence()
 				}
-				return await connection.connection.receive().map { msg in
+				return await connection.p2pConnection.incomingMessagesPublisher.tryMap { (msg: ChunkingTransportIncomingMessage) in
 					@Dependency(\.jsonDecoder) var jsonDecoder
 
 					let jsonData = msg.messagePayload
@@ -132,6 +164,7 @@ public extension P2PConnectivityClient {
 						let requestFromDapp = try jsonDecoder().decode(P2P.FromDapp.Request.self, from: jsonData)
 
 						return try P2P.RequestFromClient(
+							originalMessage: msg,
 							requestFromDapp: requestFromDapp,
 							client: connection.client
 						)
@@ -141,33 +174,30 @@ public extension P2PConnectivityClient {
 							jsonString: String(data: jsonData, encoding: .utf8) ?? jsonData.hex
 						)
 					}
-
-				}.eraseToAnyAsyncSequence()
+				}.values.eraseToAnyAsyncSequence()
+			},
+			sendMessageReadReceipt: { id, readMessage in
+				guard let connection = await connectionsHolder.getConnection(id: id) else {
+					throw P2PConnectionOffline()
+				}
+				try await connection.p2pConnection.sendReadReceipt(for: readMessage)
 			},
 			sendMessage: { outgoingMsg in
 				@Dependency(\.jsonEncoder) var jsonEncoder
 
 				guard let connection = await connectionsHolder.getConnection(id: outgoingMsg.connectionID) else {
-					struct NoConnection: LocalizedError {
-						init() {}
-						var errorDescription: String? {
-							"Connection offline."
-						}
-					}
-					throw NoConnection()
+					throw P2PConnectionOffline()
 				}
 				let responseToDappData = try jsonEncoder().encode(outgoingMsg.responseToDapp)
 				let p2pChannelRequestID = UUID().uuidString
 
-				try await connection.connection.send(
-					Connection.OutgoingMessage(
-						data: responseToDappData,
-						id: p2pChannelRequestID
-					)
+				try await connection.p2pConnection.send(
+					data: responseToDappData,
+					id: p2pChannelRequestID
 				)
 
-				for try await receipt in connection.connection.sentReceipts() {
-					guard receipt.messageID == p2pChannelRequestID else { continue }
+				for try await receipt in await connection.p2pConnection.sentReceiptsPublisher.values {
+					guard receipt.messageSent.messageID == p2pChannelRequestID else { continue }
 					return P2P.SentResponseToClient(
 						sentReceipt: receipt,
 						responseToDapp: outgoingMsg.responseToDapp,
@@ -177,18 +207,28 @@ public extension P2PConnectivityClient {
 				throw FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp()
 			},
 			_sendTestMessage: { id, message in
-				let connection = await connectionsHolder.getConnection(id: id)
-				let outgoingMessage = Connection.OutgoingMessage(
-					data: Data(message.utf8),
-					id: UUID().uuidString
-				)
-
-				try await connection?.connection.send(outgoingMessage)
+				guard let connection = await connectionsHolder.getConnection(id: id) else {
+					print("No connection found for: \(id)")
+					return
+				}
+				do {
+					try await connection.p2pConnection.send(data: Data(message.utf8), id: UUID().uuidString)
+				} catch {
+					print("Failed to send test message, error: \(String(describing: error))")
+				}
 
 				// does not care about sent message receipts
 			}
 		)
 	}()
+}
+
+// MARK: - P2PConnectionOffline
+struct P2PConnectionOffline: LocalizedError {
+	init() {}
+	var errorDescription: String? {
+		L10n.Common.p2PConnectionOffline
+	}
 }
 
 // MARK: - LocalNetworkAuthorization
@@ -209,7 +249,7 @@ private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 	private func requestAuthorization(completion: @escaping (Bool) -> Void) {
 		self.completion = completion
 
-		// Create parameters, and allow browsing over peer-to-peer link.
+		// Create parameters, and allow browsing over p2pConnection-to-p2pConnection link.
 		let parameters = NWParameters()
 		parameters.includePeerToPeer = true
 
@@ -226,6 +266,8 @@ private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 				print("Local network permission has been denied: \(error)")
 				self.reset()
 				self.completion?(false)
+			@unknown default:
+				print("Local network permission unknown state: \(String(describing: newState))")
 			}
 		}
 

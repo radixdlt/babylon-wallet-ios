@@ -1,4 +1,3 @@
-import Converse
 import Foundation
 import SharedModels
 

@@ -17,7 +17,7 @@ let package = Package(
 package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.2.1"),
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.3.0"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.11"),
 	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.1.2"),
 
@@ -91,8 +91,13 @@ let profile: Target.Dependency = .product(
 	package: "swift-profile"
 )
 
-let converse: Target.Dependency = .product(
-	name: "Converse",
+let p2pConnection: Target.Dependency = .product(
+	name: "P2PConnection",
+	package: "Converse"
+)
+
+let p2pModels: Target.Dependency = .product(
+	name: "P2PModels",
 	package: "Converse"
 )
 
@@ -499,7 +504,7 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-			converse,
+			p2pConnection,
 			dependencies,
 			"DesignSystem",
 			"ErrorQueue",
@@ -535,7 +540,7 @@ package.addModules([
 		dependencies: [
 			"CameraPermissionClient",
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])),
-			converse,
+			p2pConnection,
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
@@ -770,14 +775,16 @@ package.addModules([
 	.client(
 		name: "P2PConnectivityClient",
 		dependencies: [
+			asyncAlgorithms,
 			asyncExtensions,
 			"Common",
-			converse,
 			dependencies,
 			engineToolkit, // Model: SignTX contains Manifest
 			"JSON",
 			profile, // Account
+			p2pConnection,
 			"ProfileClient",
+			"Resources",
 			"SharedModels",
 		],
 		tests: .yes(dependencies: [
@@ -878,12 +885,13 @@ package.addModules([
 		dependencies: [
 			"Asset",
 			bigInt,
-			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make Converse, EngineToolkit, etc. vend their own Model packages.
-			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
-			profile, // FIXME: In `Profile` split out Models package
 			collections,
-			converse, // FIXME: In `Converse` split out Models package
+			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make EngineToolkit, etc. vend their own Model packages.
+			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
 			nonEmpty,
+			p2pModels,
+			p2pConnection,
+			profile, // FIXME: In `Profile` split out Models package
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]

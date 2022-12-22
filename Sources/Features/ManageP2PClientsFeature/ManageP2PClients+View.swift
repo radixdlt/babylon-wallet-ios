@@ -93,7 +93,7 @@ private extension ManageP2PClients.View {
 					Button(L10n.ManageP2PClients.newConnectionButtonTitle) {
 						viewStore.send(.addNewConnectionButtonTapped)
 					}
-					.enabled(viewStore.canAddMoreConnections)
+					.controlState(viewStore.canAddMoreConnections ? .enabled : .disabled)
 					.buttonStyle(.secondaryRectangular(
 						shouldExpand: true,
 						image: .init(asset: AssetResource.qrCodeScanner)
@@ -102,7 +102,9 @@ private extension ManageP2PClients.View {
 					.padding(.vertical, .large1)
 				}
 			}
-			.onAppear { viewStore.send(.viewAppeared) }
+		}
+		.task { @MainActor in
+			await ViewStore(store.stateless).send(.view(.task)).finish()
 		}
 	}
 }

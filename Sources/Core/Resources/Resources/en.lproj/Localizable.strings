@@ -129,3 +129,5 @@
 
 "profileLoad.failedToCreateProfileFromSnapshotError" = "Failed to create Wallet from backup, error: %@, version: %@";
 "profileLoad.decodingError" = "Failed to create Wallet from backup: %@";
+
+"common.P2PConnectionOffline" = "Linked Connector Offline";

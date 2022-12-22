@@ -19,7 +19,7 @@ public extension HandleDappRequests {
 
 public extension HandleDappRequests.View {
 	var body: some View {
-		Group {
+		ZStack {
 			IfLetStore(
 				store.scope(
 					state: \.chooseAccounts,
@@ -35,11 +35,9 @@ public extension HandleDappRequests.View {
 				),
 				then: TransactionSigning.View.init(store:)
 			)
-
-			Color.clear
-				.task { @MainActor in
-					await ViewStore(store.stateless).send(.view(.task)).finish()
-				}
+		}
+		.task { @MainActor in
+			await ViewStore(store.stateless).send(.view(.task)).finish()
 		}
 	}
 }

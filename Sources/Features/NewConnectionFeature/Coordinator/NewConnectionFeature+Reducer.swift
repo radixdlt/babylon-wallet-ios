@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import P2PConnection
 import P2PConnectivityClient
 import Resources
 
@@ -36,7 +37,7 @@ public extension NewConnection {
 					await send(.delegate(.dismiss))
 				}
 			case let .connectUsingSecrets(connectUsingSecrets):
-				guard let connection = connectUsingSecrets.newConnection else {
+				guard let newP2PConnection = connectUsingSecrets.newP2PConnection else {
 					return .run { send in
 						await send(.delegate(.dismiss))
 					}
@@ -49,7 +50,7 @@ public extension NewConnection {
 								displayName: L10n.NewConnection.defaultNameOfConnection,
 								connectionPassword: connectUsingSecrets.connectionSecrets.connectionPassword.data.data
 							),
-							connection: connection
+							p2pConnection: newP2PConnection
 						)
 					))))
 				)
