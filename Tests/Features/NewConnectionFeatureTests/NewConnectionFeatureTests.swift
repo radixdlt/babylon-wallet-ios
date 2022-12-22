@@ -50,7 +50,7 @@ final class NewConnectionTests: TestCase {
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionSecrets: .placeholder, connectedPeer: p2pConnection)
+				ConnectUsingSecrets.State(connectionSecrets: .placeholder, newP2PConnection: p2pConnection)
 			),
 			reducer: NewConnection()
 		)
@@ -65,7 +65,7 @@ final class NewConnectionTests: TestCase {
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionSecrets: secrets, connectedPeer: p2pConnection)
+				ConnectUsingSecrets.State(connectionSecrets: secrets, newP2PConnection: p2pConnection)
 			),
 			reducer: NewConnection()
 		)
@@ -73,7 +73,7 @@ final class NewConnectionTests: TestCase {
 		await store.send(.child(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + " "))))) {
 			$0 = .connectUsingSecrets(.init(
 				connectionSecrets: secrets,
-				connectedPeer: p2pConnection,
+				newP2PConnection: p2pConnection,
 				nameOfConnection: connectionName + " ",
 				isNameValid: true
 			)

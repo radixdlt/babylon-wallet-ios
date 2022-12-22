@@ -37,7 +37,7 @@ public extension NewConnection {
 					await send(.delegate(.dismiss))
 				}
 			case let .connectUsingSecrets(connectUsingSecrets):
-				guard let newPeer = connectUsingSecrets.newPeer else {
+				guard let newP2PConnection = connectUsingSecrets.newP2PConnection else {
 					return .run { send in
 						await send(.delegate(.dismiss))
 					}
@@ -50,7 +50,7 @@ public extension NewConnection {
 								displayName: L10n.NewConnection.defaultNameOfConnection,
 								connectionPassword: connectUsingSecrets.connectionSecrets.connectionPassword.data.data
 							),
-							p2pConnection: newPeer
+							p2pConnection: newP2PConnection
 						)
 					))))
 				)

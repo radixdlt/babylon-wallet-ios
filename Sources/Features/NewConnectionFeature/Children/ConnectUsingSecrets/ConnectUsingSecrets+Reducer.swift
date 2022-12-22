@@ -31,7 +31,7 @@ public extension ConnectUsingSecrets {
 			}
 
 		case let .internal(.system(.establishConnectionResult(.success(p2pConnection)))):
-			state.newPeer = p2pConnection
+			state.newP2PConnection = p2pConnection
 			state.isConnecting = false
 			state.isPromptingForName = true
 
@@ -47,7 +47,7 @@ public extension ConnectUsingSecrets {
 			return .none
 
 		case .internal(.view(.confirmNameButtonTapped)):
-			guard let newPeer = state.newPeer else {
+			guard let newP2PConnection = state.newP2PConnection else {
 				// invalid state
 				return .none
 			}
@@ -57,7 +57,7 @@ public extension ConnectUsingSecrets {
 					displayName: state.nameOfConnection.trimmed(),
 					connectionPassword: state.connectionSecrets.connectionPassword.data.data
 				),
-				p2pConnection: newPeer
+				p2pConnection: newP2PConnection
 			)
 
 			return .run { send in
