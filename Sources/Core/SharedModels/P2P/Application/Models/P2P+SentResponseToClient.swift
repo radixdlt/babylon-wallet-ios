@@ -27,3 +27,21 @@ public extension P2P.SentResponseToClient {
 	typealias ID = P2P.ToDapp.Response.ID
 	var id: ID { responseToDapp.id }
 }
+
+#if DEBUG
+public extension P2P.ToDapp.Response {
+	static let placeholder: Self = .success(.init(id: .placeholder, items: []))
+}
+
+public extension ChunkingTransportOutgoingMessage {
+	static let placeholder = Self(data: .deadbeef32Bytes, messageID: MessageID())
+}
+
+public extension P2PConnection.SentReceipt {
+	static let placeholder = Self(messageSent: .placeholder)
+}
+
+public extension P2P.SentResponseToClient {
+	static let placeholder = Self(sentReceipt: .placeholder, responseToDapp: .placeholder, client: .placeholder)
+}
+#endif // DEBUG

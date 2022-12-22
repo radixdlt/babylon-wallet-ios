@@ -10,12 +10,8 @@ extension P2PConnectivityClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 	public static let testValue = Self(
 		getLocalNetworkAccess: unimplemented("\(Self.self).getLocalNetworkAccess"),
-		getP2PClients: {
-			fatalError()
-		},
-		getP2PConnections: {
-			fatalError()
-		},
+		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
+		getP2PConnections: unimplemented("\(Self.self).getP2PConnections"),
 		addP2PClientWithConnection: unimplemented("\(Self.self).addP2PClientWithConnection"),
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getConnectionStatusAsyncSequence: unimplemented("\(Self.self).getConnectionStatusAsyncSequence"),
@@ -29,15 +25,15 @@ extension P2PConnectivityClient: TestDependencyKey {
 extension P2PConnectivityClient {
 	static let noop = Self(
 		getLocalNetworkAccess: { false },
-		getP2PClients: { fatalError() },
-		getP2PConnections: { fatalError() },
+		getP2PClients: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		getP2PConnections: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		addP2PClientWithConnection: { _, _ in },
 		deleteP2PClientByID: { _ in },
 		getConnectionStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getRequestsFromP2PClientAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		sendMessageReadReceipt: { _, _ in fatalError() },
-		sendMessage: { _ in fatalError() },
-		_sendTestMessage: { _, _ in fatalError() }
+		sendMessageReadReceipt: { _, _ in },
+		sendMessage: { _ in .placeholder },
+		_sendTestMessage: { _, _ in }
 	)
 }
 
