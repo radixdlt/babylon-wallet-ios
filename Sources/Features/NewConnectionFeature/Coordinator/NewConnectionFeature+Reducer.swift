@@ -50,7 +50,7 @@ public extension NewConnection {
 								displayName: L10n.NewConnection.defaultNameOfConnection,
 								connectionPassword: connectUsingSecrets.connectionSecrets.connectionPassword.data.data
 							),
-							peer: newPeer
+							p2pConnection: newPeer
 						)
 					))))
 				)

@@ -14,15 +14,15 @@ public extension ConnectUsingSecrets {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
-			let peer = P2PConnection(
+			let p2pConnection = P2PConnection(
 				connectionSecrets: state.connectionSecrets
 			)
 
 			return .run { send in
 				await send(.internal(.system(.establishConnectionResult(
 					TaskResult {
-						try await peer.connect()
-						return peer
+						try await p2pConnection.connect()
+						return p2pConnection
 					}
 				))))
 
@@ -30,8 +30,8 @@ public extension ConnectUsingSecrets {
 				await send(.internal(.system(.focusTextField(.connectionName))))
 			}
 
-		case let .internal(.system(.establishConnectionResult(.success(peer)))):
-			state.newPeer = peer
+		case let .internal(.system(.establishConnectionResult(.success(p2pConnection)))):
+			state.newPeer = p2pConnection
 			state.isConnecting = false
 			state.isPromptingForName = true
 
@@ -57,7 +57,7 @@ public extension ConnectUsingSecrets {
 					displayName: state.nameOfConnection.trimmed(),
 					connectionPassword: state.connectionSecrets.connectionPassword.data.data
 				),
-				peer: newPeer
+				p2pConnection: newPeer
 			)
 
 			return .run { send in

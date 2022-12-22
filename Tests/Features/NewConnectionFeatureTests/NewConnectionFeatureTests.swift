@@ -22,7 +22,7 @@ final class NewConnectionTests: TestCase {
 
 	func test__GIVEN__connecting__WHEN__connected__THEN_we_delegate_to_parent_reducer() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let peer = P2PConnection(connectionSecrets: secrets)
+		let p2pConnection = P2PConnection(connectionSecrets: secrets)
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
@@ -35,7 +35,7 @@ final class NewConnectionTests: TestCase {
 				displayName: "test",
 				connectionPassword: secrets.connectionPassword.data.data
 			),
-			peer: peer
+			p2pConnection: p2pConnection
 		)
 		await store.send(.child(.connectUsingSecrets(.delegate(.connected(
 			connectedClient
@@ -45,27 +45,27 @@ final class NewConnectionTests: TestCase {
 
 	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_saved_but_without_name() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let peer = P2PConnection(connectionSecrets: secrets)
+		let p2pConnection = P2PConnection(connectionSecrets: secrets)
 
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionSecrets: .placeholder, connectedPeer: peer)
+				ConnectUsingSecrets.State(connectionSecrets: .placeholder, connectedPeer: p2pConnection)
 			),
 			reducer: NewConnection()
 		)
 
 		await store.send(.internal(.view(.dismissButtonTapped)))
-		await store.receive(.delegate(.newConnection(.init(client: .init(displayName: "Unnamed", connectionPassword: secrets.connectionPassword.data.data), peer: peer))))
+		await store.receive(.delegate(.newConnection(.init(client: .init(displayName: "Unnamed", connectionPassword: secrets.connectionPassword.data.data), p2pConnection: p2pConnection))))
 	}
 
 	func test__GIVEN_new_connected_client__WHEN__user_confirms_name__THEN__connection_is_saved_with_that_name_trimmed() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let peer = P2PConnection(connectionSecrets: secrets)
+		let p2pConnection = P2PConnection(connectionSecrets: secrets)
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionSecrets: secrets, connectedPeer: peer)
+				ConnectUsingSecrets.State(connectionSecrets: secrets, connectedPeer: p2pConnection)
 			),
 			reducer: NewConnection()
 		)
@@ -73,7 +73,7 @@ final class NewConnectionTests: TestCase {
 		await store.send(.child(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + " "))))) {
 			$0 = .connectUsingSecrets(.init(
 				connectionSecrets: secrets,
-				connectedPeer: peer,
+				connectedPeer: p2pConnection,
 				nameOfConnection: connectionName + " ",
 				isNameValid: true
 			)
@@ -88,7 +88,7 @@ final class NewConnectionTests: TestCase {
 				displayName: connectionName,
 				connectionPassword: secrets.connectionPassword.data.data
 			),
-			peer: peer
+			p2pConnection: p2pConnection
 		)
 
 		await store.receive(.child(.connectUsingSecrets(.internal(.view(.textFieldFocused(nil))))))
