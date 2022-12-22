@@ -14,26 +14,15 @@ public extension P2PConnectivityClient {
 		@Dependency(\.profileClient) var profileClient
 
 		final actor ConnectionsHolder: GlobalActor {
-			private var connections: [ConnectionID: P2P.ConnectionForClient]
+			private var connections: [ConnectionID: P2P.ConnectionForClient] = [:]
+			private let connectionsChannel: AsyncChannel<[P2P.ConnectionForClient]> = .init()
 			private let justClientsWithStatusChannel: AsyncChannel<[P2P.ClientWithConnectionStatus]> = .init()
 			fileprivate nonisolated var justClientsWithStatusAsyncSequence: AnyAsyncSequence<[P2P.ClientWithConnectionStatus]> {
 				justClientsWithStatusChannel.eraseToAnyAsyncSequence()
 			}
 
-			private let base: P2PConnectivityClient.Base
-			private let subject: P2PConnectivityClient.Subject
-			fileprivate nonisolated let multicasted: P2PConnectivityClient.Multicasted
-
-			init() {
-				connections = [:]
-
-				let base: Base = .init(bufferSize: 1)
-				let subject: Subject = .init()
-				let multicasted: Multicasted = base.multicast(subject)
-
-				self.base = base
-				self.subject = subject
-				self.multicasted = multicasted
+			fileprivate nonisolated var connectionsAsyncSequence: AnyAsyncSequence<[P2P.ConnectionForClient]> {
+				connectionsChannel.eraseToAnyAsyncSequence()
 			}
 
 			static let shared = ConnectionsHolder()
@@ -44,9 +33,11 @@ public extension P2PConnectivityClient {
 			}
 
 			@Sendable func emit() async {
-				base.send(
-					connections.values.map { $0 }
-				)
+				Task {
+					await connectionsChannel.send(
+						connections.values.map { $0 }
+					)
+				}
 				Task {
 					await justClientsWithStatusChannel.send(
 						connections.values.map { .init(p2pClient: $0.client, connectionStatus: .new) }
@@ -142,7 +133,7 @@ public extension P2PConnectivityClient {
 			},
 			getP2PConnections: {
 				try await loadFromProfile()
-				return connectionsHolder.multicasted.autoconnect()
+				return connectionsHolder.connectionsAsyncSequence
 			},
 			addP2PClientWithConnection: { clientWithConnection, alsoConnect in
 				try await profileClient.addP2PClient(clientWithConnection.client)
