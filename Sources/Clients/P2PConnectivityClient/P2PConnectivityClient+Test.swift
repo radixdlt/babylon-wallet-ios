@@ -5,6 +5,8 @@ import Profile
 import SharedModels
 import XCTestDynamicOverlay
 
+#if DEBUG
+
 // MARK: - P2PConnectivityClient + TestDependencyKey
 extension P2PConnectivityClient: TestDependencyKey {
 	public static let previewValue = Self.noop
@@ -37,7 +39,6 @@ extension P2PConnectivityClient {
 	)
 }
 
-#if DEBUG
 public extension P2PClient {
 	static let placeholder = try! Self(
 		displayName: "Placeholder",
