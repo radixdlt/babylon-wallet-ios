@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import Foundation
-import Peer
+import P2PConnection
 
 // MARK: - ConnectUsingSecrets.State
 public extension ConnectUsingSecrets {
@@ -9,14 +9,14 @@ public extension ConnectUsingSecrets {
 		public var isConnecting: Bool
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String
-		public var newPeer: Peer?
+		public var newPeer: P2PConnection?
 		public var isNameValid: Bool
 		@BindableState public var focusedField: Field?
 
 		public init(
 			connectionSecrets: ConnectionSecrets,
 			isConnecting: Bool = true,
-			connectedPeer: Peer? = nil,
+			connectedPeer: P2PConnection? = nil,
 			focusedField: Field? = nil,
 			isPromptingForName: Bool = false,
 			nameOfConnection: String = "",

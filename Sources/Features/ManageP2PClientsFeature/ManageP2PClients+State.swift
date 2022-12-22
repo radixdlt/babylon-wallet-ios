@@ -1,8 +1,8 @@
 import Foundation
 import IdentifiedCollections
 import NewConnectionFeature
+import P2PConnection
 import P2PConnectivityClient
-import Peer
 import Profile
 import SharedModels
 

@@ -1,6 +1,6 @@
 import ComposableArchitecture
+import P2PConnection
 import P2PConnectivityClient
-import Peer
 import Resources
 
 // MARK: - NewConnection

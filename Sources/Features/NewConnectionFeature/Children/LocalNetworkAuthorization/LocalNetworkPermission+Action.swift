@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import Foundation
-import Models
+import P2PModels
 
 // MARK: - LocalNetworkPermission.Action
 public extension LocalNetworkPermission {

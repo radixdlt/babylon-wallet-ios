@@ -17,7 +17,7 @@ let package = Package(
 package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.1"),
-	.package(url: "git@github.com:radixdlt/Converse.git", revision: "d9c48f49f54c842bddbc8f1444d311fb1b05382e"), // triggers reconnect when remote connects to SS
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.3.0"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.11"),
 	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.1.2"),
 
@@ -91,13 +91,13 @@ let profile: Target.Dependency = .product(
 	package: "swift-profile"
 )
 
-let peer: Target.Dependency = .product(
-	name: "Peer",
+let p2pConnection: Target.Dependency = .product(
+	name: "P2PConnection",
 	package: "Converse"
 )
 
-let peerModels: Target.Dependency = .product(
-	name: "Models",
+let p2pModels: Target.Dependency = .product(
+	name: "P2PModels",
 	package: "Converse"
 )
 
@@ -504,7 +504,7 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-			peer,
+			p2pConnection,
 			dependencies,
 			"DesignSystem",
 			"ErrorQueue",
@@ -540,7 +540,7 @@ package.addModules([
 		dependencies: [
 			"CameraPermissionClient",
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])),
-			peer,
+			p2pConnection,
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
@@ -782,7 +782,7 @@ package.addModules([
 			engineToolkit, // Model: SignTX contains Manifest
 			"JSON",
 			profile, // Account
-			peer,
+			p2pConnection,
 			"ProfileClient",
 			"SharedModels",
 		],
@@ -888,8 +888,8 @@ package.addModules([
 			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make EngineToolkit, etc. vend their own Model packages.
 			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
 			nonEmpty,
-			peer,
-			peerModels,
+			p2pModels,
+			p2pConnection,
 			profile, // FIXME: In `Profile` split out Models package
 		],
 		tests: .yes(

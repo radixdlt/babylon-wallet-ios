@@ -4,7 +4,7 @@ import Dependencies
 import Foundation
 import JSON
 import Network
-import Peer
+import P2PConnection
 import ProfileClient
 import SharedModels
 
@@ -111,7 +111,7 @@ public extension P2PConnectivityClient {
 				for p2pClient in connections.connections {
 					let password = try ConnectionPassword(data: p2pClient.connectionPassword.data)
 					let secrets = try ConnectionSecrets.from(connectionPassword: password)
-					let peer = Peer(connectionSecrets: secrets)
+					let peer = P2PConnection(connectionSecrets: secrets)
 
 					let connectedClient = P2P.ConnectionForClient(
 						client: p2pClient,

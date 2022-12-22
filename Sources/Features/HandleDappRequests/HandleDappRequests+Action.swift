@@ -2,7 +2,7 @@ import Collections
 import ComposableArchitecture
 import Foundation
 import GrantDappWalletAccessFeature
-import Peer
+import P2PConnection
 import Profile
 import SharedModels
 import TransactionSigningFeature
@@ -36,8 +36,8 @@ public extension HandleDappRequests.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
 		case loadConnectionsResult(TaskResult<[P2P.ConnectionForClient]>)
 		case receivedRequestIsValidHandleIt(P2P.RequestFromClient)
-		case sendMessageReceivedReceiptBackToPeer(P2PClient, readMessage: Peer.IncomingMessage)
-		case sendMessageReceivedReceiptBackToPeerResult(TaskResult<Peer.IncomingMessage>)
+		case sendMessageReceivedReceiptBackToPeer(P2PClient, readMessage: P2PConnection.IncomingMessage)
+		case sendMessageReceivedReceiptBackToPeerResult(TaskResult<P2PConnection.IncomingMessage>)
 		case receiveRequestFromP2PClientResult(TaskResult<P2P.RequestFromClient>)
 		case rejected(P2P.RequestFromClient)
 		case failedWithError(P2P.RequestFromClient, P2P.ToDapp.Response.Failure.Kind.Error, String?)

@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import Foundation
-import Models
+import P2PModels
 
 // MARK: - ScanQR.Action
 public extension ScanQR {

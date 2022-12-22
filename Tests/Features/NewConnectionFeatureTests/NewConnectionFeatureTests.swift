@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import Foundation
 @testable import NewConnectionFeature
-import Peer
+import P2PConnection
 import SharedModels
 import TestUtils
 
@@ -22,7 +22,7 @@ final class NewConnectionTests: TestCase {
 
 	func test__GIVEN__connecting__WHEN__connected__THEN_we_delegate_to_parent_reducer() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let peer = Peer(connectionSecrets: secrets)
+		let peer = P2PConnection(connectionSecrets: secrets)
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
@@ -45,7 +45,7 @@ final class NewConnectionTests: TestCase {
 
 	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_saved_but_without_name() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let peer = Peer(connectionSecrets: secrets)
+		let peer = P2PConnection(connectionSecrets: secrets)
 
 		let store = TestStore(
 			// GIVEN initial state
@@ -61,7 +61,7 @@ final class NewConnectionTests: TestCase {
 
 	func test__GIVEN_new_connected_client__WHEN__user_confirms_name__THEN__connection_is_saved_with_that_name_trimmed() async throws {
 		let secrets = ConnectionSecrets.placeholder
-		let peer = Peer(connectionSecrets: secrets)
+		let peer = P2PConnection(connectionSecrets: secrets)
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(

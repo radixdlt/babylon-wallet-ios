@@ -1,6 +1,6 @@
 import Foundation
-import Models
-import Peer
+import P2PConnection
+import P2PModels
 import Profile
 
 // MARK: - P2P.SentResponseToClient
@@ -23,7 +23,7 @@ public extension P2P {
 }
 
 public extension P2P.SentResponseToClient {
-	typealias SentReceipt = Peer.SentReceipt
+	typealias SentReceipt = P2PConnection.SentReceipt
 	typealias ID = P2P.ToDapp.Response.ID
 	var id: ID { responseToDapp.id }
 }

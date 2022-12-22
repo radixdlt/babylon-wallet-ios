@@ -1,5 +1,5 @@
 import ComposableArchitecture
-import Peer
+import P2PConnection
 
 // MARK: - ManageP2PClient.Action
 public extension ManageP2PClient {

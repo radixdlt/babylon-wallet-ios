@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import ErrorQueue
 import NewConnectionFeature
+import P2PConnection
 import P2PConnectivityClient
-import Peer
 import Profile
 import ProfileClient
 import SharedModels

@@ -2,9 +2,9 @@ import Collections
 import ComposableArchitecture
 import Foundation
 @testable import HandleDappRequests
-import Models
 import NonEmpty
-import Peer
+import P2PConnection
+import P2PModels
 import Profile
 import SharedModels
 import TestUtils
@@ -78,7 +78,7 @@ final class HandleDappRequestsTests: TestCase {
 
 	func test__GIVEN__on_network_nebunet__WHEN__received_request_specifying_another_network__THEN__we_respond_back_to_dapp_with_error() async throws {
 		let messageSentToDapp = ActorIsolated<P2P.ResponseToClientByID?>(nil)
-		let sentMessageReceivedConfirmationBackToDapp = ActorIsolated<Peer.IncomingMessage?>(nil)
+		let sentMessageReceivedConfirmationBackToDapp = ActorIsolated<P2PConnection.IncomingMessage?>(nil)
 
 		let currentNetworkID = NetworkID.mardunet
 		let request = try P2P.RequestFromClient(

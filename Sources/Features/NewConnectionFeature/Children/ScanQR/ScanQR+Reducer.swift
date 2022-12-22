@@ -2,7 +2,7 @@ import CameraPermissionClient
 import Common
 import ComposableArchitecture
 import ErrorQueue
-import Models
+import P2PModels
 
 // MARK: - ScanQR
 public struct ScanQR: Sendable, ReducerProtocol {

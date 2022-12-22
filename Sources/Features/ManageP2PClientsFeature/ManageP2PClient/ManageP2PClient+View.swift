@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import DesignSystem
-import Peer
+import P2PConnection
 import Resources
 import SharedModels
 import SwiftUI

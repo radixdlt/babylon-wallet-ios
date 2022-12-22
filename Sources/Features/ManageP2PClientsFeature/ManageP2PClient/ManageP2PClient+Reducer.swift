@@ -2,8 +2,8 @@ import Common
 import ComposableArchitecture
 import ErrorQueue
 import Foundation
+import P2PConnection
 import P2PConnectivityClient
-import Peer
 import SharedModels
 import SwiftUI
 

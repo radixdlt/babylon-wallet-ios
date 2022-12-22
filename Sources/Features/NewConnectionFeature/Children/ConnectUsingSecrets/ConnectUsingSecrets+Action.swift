@@ -1,7 +1,7 @@
 import ChunkingTransport
 import ComposableArchitecture
 import Foundation
-import Peer
+import P2PConnection
 import SharedModels
 
 // MARK: - ConnectUsingSecrets.Action
@@ -38,7 +38,7 @@ public extension ConnectUsingSecrets.Action {
 public extension ConnectUsingSecrets.Action {
 	enum SystemAction: Sendable, Equatable {
 		case focusTextField(ConnectUsingSecrets.State.Field?)
-		case establishConnectionResult(TaskResult<Peer>)
+		case establishConnectionResult(TaskResult<P2PConnection>)
 	}
 }
 

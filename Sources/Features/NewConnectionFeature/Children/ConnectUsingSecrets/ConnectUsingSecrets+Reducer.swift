@@ -1,6 +1,6 @@
 import ComposableArchitecture
-import Models
-import Peer
+import P2PConnection
+import P2PModels
 import SharedModels
 
 // MARK: - ConnectUsingSecrets
@@ -14,7 +14,7 @@ public extension ConnectUsingSecrets {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
-			let peer = Peer(
+			let peer = P2PConnection(
 				connectionSecrets: state.connectionSecrets
 			)
 
