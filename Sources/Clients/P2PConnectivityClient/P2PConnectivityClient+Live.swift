@@ -6,6 +6,7 @@ import JSON
 import Network
 import P2PConnection
 import ProfileClient
+import Resources
 import SharedModels
 
 // MARK: - P2PConnectivityClient + :LiveValue
@@ -85,12 +86,7 @@ public extension P2PConnectivityClient {
 				else {
 					return nil
 				}
-				guard
-					let p2pConnection = connections[key]
-				else {
-					return nil
-				}
-				return p2pConnection
+				return connections[key]
 			}
 
 			func loadedFromProfile(connections: P2PClients) async throws {
@@ -182,7 +178,7 @@ public extension P2PConnectivityClient {
 			},
 			sendMessageReadReceipt: { id, readMessage in
 				guard let connection = await connectionsHolder.getConnection(id: id) else {
-					throw NoConnection()
+					throw P2PConnectionOffline()
 				}
 				try await connection.p2pConnection.sendReadReceipt(for: readMessage)
 			},
@@ -190,7 +186,7 @@ public extension P2PConnectivityClient {
 				@Dependency(\.jsonEncoder) var jsonEncoder
 
 				guard let connection = await connectionsHolder.getConnection(id: outgoingMsg.connectionID) else {
-					throw NoConnection()
+					throw P2PConnectionOffline()
 				}
 				let responseToDappData = try jsonEncoder().encode(outgoingMsg.responseToDapp)
 				let p2pChannelRequestID = UUID().uuidString
@@ -227,11 +223,11 @@ public extension P2PConnectivityClient {
 	}()
 }
 
-// MARK: - NoConnection
-struct NoConnection: LocalizedError {
+// MARK: - P2PConnectionOffline
+struct P2PConnectionOffline: LocalizedError {
 	init() {}
 	var errorDescription: String? {
-		"Connection offline."
+		L10n.Common.p2PConnectionOffline
 	}
 }
 
@@ -270,6 +266,8 @@ private final class LocalNetworkAuthorization: NSObject, @unchecked Sendable {
 				print("Local network permission has been denied: \(error)")
 				self.reset()
 				self.completion?(false)
+			@unknown default:
+				print("Local network permission unknown state: \(String(describing: newState))")
 			}
 		}
 

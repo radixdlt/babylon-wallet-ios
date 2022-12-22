@@ -784,6 +784,7 @@ package.addModules([
 			profile, // Account
 			p2pConnection,
 			"ProfileClient",
+			"Resources",
 			"SharedModels",
 		],
 		tests: .yes(dependencies: [
