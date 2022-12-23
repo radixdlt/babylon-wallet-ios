@@ -50,9 +50,9 @@ public extension ManageP2PClients.Action {
 // MARK: - ManageP2PClients.Action.InternalAction.SystemAction
 public extension ManageP2PClients.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
-		case loadConnectionsResult(TaskResult<[P2P.ClientWithConnectionStatus]>)
+		case loadConnectionsResult(TaskResult<OrderedSet<P2P.ClientWithConnectionStatus>>)
 
-		case saveNewConnectionResult(TaskResult<P2P.ConnectionForClient>)
+		case saveNewConnectionResult(TaskResult<P2P.ClientWithConnectionStatus>)
 		case deleteConnectionResult(TaskResult<P2PClient.ID>)
 		case sendTestMessageResult(TaskResult<String>)
 	}

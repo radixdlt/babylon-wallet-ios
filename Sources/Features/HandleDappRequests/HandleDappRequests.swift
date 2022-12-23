@@ -204,8 +204,8 @@ private extension HandleDappRequests {
 			return .run { send in
 				print("☑️ HandleDappRequests getting p2pClients.......")
 				do {
-					for try await p2pClients in try await p2pConnectivityClient.getP2PConnections() {
-						print("✅ HandleDappRequests got p2pClients: \(p2pClients.map(\.client.displayName)) ")
+					for try await p2pClients in try await p2pConnectivityClient.getP2PClients() {
+						print("✅ HandleDappRequests got p2pClients: \(p2pClients.map(\.p2pClient.displayName)) ")
 						await send(.internal(.system(.loadConnectionsResult(.success(p2pClients)))))
 					}
 				} catch {
@@ -217,10 +217,10 @@ private extension HandleDappRequests {
 			print("☑️ HandleDappRequests getting requests for #\(clients.count) clients...")
 			return .run { send in
 				for connectedClient in clients {
-					print("☑️ HandleDappRequests getting requests for client: '\(connectedClient.client.displayName)'.......")
+					print("☑️ HandleDappRequests getting requests for client: '\(connectedClient.p2pClient.displayName)'.......")
 					do {
-						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(connectedClient.client.id) {
-							print("✅ HandleDappRequests got requests for client: '\(connectedClient.client.displayName)'!!!!")
+						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(connectedClient.p2pClient.id) {
+							print("✅ HandleDappRequests got requests for client: '\(connectedClient.p2pClient.displayName)'!!!!")
 							await send(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
 						}
 					} catch {

@@ -58,10 +58,7 @@ public extension ManageP2PClients {
 
 		case let .internal(.system(.saveNewConnectionResult(.success(newConnection)))):
 			state.connections.append(
-				P2P.ClientWithConnectionStatus(
-					p2pClient: newConnection.client,
-					connectionStatus: .connected
-				)
+				newConnection
 			)
 			return .none
 
@@ -114,10 +111,10 @@ public extension ManageP2PClients {
 		case let .child(.newConnection(.delegate(.newConnection(connectedClient)))):
 			state.newConnection = nil
 			return .run { send in
-				await send(.internal(.system(.saveNewConnectionResult(
+				await send(.internal(.system(.p2saveNewConnectionResult(
 					TaskResult {
 						try await p2pConnectivityClient.addP2PClientWithConnection(
-							connectedClient,
+							connectedClient.p2pClient,
 							false // no need to connect, already connected.
 						)
 					}.map { connectedClient }

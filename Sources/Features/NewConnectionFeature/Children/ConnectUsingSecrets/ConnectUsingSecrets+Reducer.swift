@@ -14,15 +14,12 @@ public extension ConnectUsingSecrets {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
-			let p2pConnection = P2PConnection(
-				connectionSecrets: state.connectionSecrets
-			)
-
-			return .run { send in
+			return .run { [connectionPassword = state.connectionSecrets.connectionPassword] send in
 				await send(.internal(.system(.establishConnectionResult(
 					TaskResult {
-						try await p2pConnection.connect()
-						return p2pConnection
+						try await P2PConnections.shared.add(
+							connectionPassword: connectionPassword, autoconnect: true
+						)
 					}
 				))))
 
@@ -30,8 +27,8 @@ public extension ConnectUsingSecrets {
 				await send(.internal(.system(.focusTextField(.connectionName))))
 			}
 
-		case let .internal(.system(.establishConnectionResult(.success(p2pConnection)))):
-			state.newP2PConnection = p2pConnection
+		case let .internal(.system(.establishConnectionResult(.success(idOfNewConnection)))):
+			state.idOfNewConnection = idOfNewConnection
 			state.isConnecting = false
 			state.isPromptingForName = true
 
@@ -47,22 +44,23 @@ public extension ConnectUsingSecrets {
 			return .none
 
 		case .internal(.view(.confirmNameButtonTapped)):
-			guard let newP2PConnection = state.newP2PConnection else {
+			// determines if we are indeed connected...
+			guard let _ = state.idOfNewConnection else {
 				// invalid state
 				return .none
 			}
 
-			let connectedClient = P2P.ConnectionForClient(
-				client: .init(
+			let clientWithConnectionStatus = P2P.ClientWithConnectionStatus(
+				p2pClient: .init(
 					displayName: state.nameOfConnection.trimmed(),
 					connectionPassword: state.connectionSecrets.connectionPassword.data.data
 				),
-				p2pConnection: newP2PConnection
+				connectionStatus: .connected
 			)
 
 			return .run { send in
 				await send(.internal(.view(.textFieldFocused(nil))))
-				await send(.delegate(.connected(connectedClient)))
+				await send(.delegate(.connected(clientWithConnectionStatus)))
 			}
 
 		case let .internal(.view(.nameOfConnectionChanged(connectionName))):

@@ -6,13 +6,13 @@ import Profile
 public extension P2P {
 	// MARK: - RequestFromClient
 	struct RequestFromClient: Sendable, Hashable, Identifiable {
-		public let originalMessage: P2PConnection.IncomingMessage
+		public let originalMessage: P2PConnections.IncomingMessage
 
 		public let requestFromDapp: FromDapp.Request
 		public let client: P2PClient
 
 		public init(
-			originalMessage: P2PConnection.IncomingMessage,
+			originalMessage: P2PConnections.IncomingMessage,
 			requestFromDapp: FromDapp.Request,
 			client: P2PClient
 		) throws {
@@ -46,7 +46,7 @@ public extension P2PClient {
 	)
 }
 
-public extension P2PConnection.IncomingMessage {
+public extension P2PConnections.IncomingMessage {
 	static let placeholder = Self(messagePayload: .deadbeef32Bytes, messageID: "placeholder", messageHash: .deadbeef32Bytes)
 }
 
