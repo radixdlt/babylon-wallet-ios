@@ -10,7 +10,7 @@
 // the hyphen (`-`). This value is used as the `CFBundleIdentifier` in the `Info.plist`
 // of the built bundle.
 
-PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_ID).macos
+PRODUCT_BUNDLE_IDENTIFIER = com.radixpublishing.radixwallet.macos.dev
 
 
 

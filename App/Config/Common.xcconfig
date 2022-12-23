@@ -9,8 +9,5 @@ APP_ICON = AppIcon
 /// Application's base name
 APP_NAME = Radix Wallet
 
-/// Application's base bundle id
-APP_BUNDLE_ID = com.radixpublishing.radixwallet
-
 /// Application's dev team id
 DEV_TEAM = MDH99V28LM

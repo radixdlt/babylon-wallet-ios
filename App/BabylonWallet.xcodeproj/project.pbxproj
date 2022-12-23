@@ -39,8 +39,8 @@
 		D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E667FFD128F6F7E50015544F /* Babylon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Babylon; path = ..; sourceTree = "<group>"; };
 		E6805BBD286DB3EC00861180 /* WalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApp.swift; sourceTree = "<group>"; };
-		E6805BC4286DB3ED00861180 /* δ-Radix Wallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "δ-Radix Wallet.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		E6805BCA286DB3ED00861180 /* δ-Radix Wallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "δ-Radix Wallet.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E6805BCC286DB3ED00861180 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -138,8 +138,8 @@
 		E6805BC5286DB3ED00861180 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E6805BC4286DB3ED00861180 /* δ-Radix Wallet.app */,
-				E6805BCA286DB3ED00861180 /* δ-Radix Wallet.app */,
+				E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */,
+				E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -188,7 +188,7 @@
 				E6805BDE286DB74300861180 /* AppFeature */,
 			);
 			productName = "Wallet (iOS)";
-			productReference = E6805BC4286DB3ED00861180 /* δ-Radix Wallet.app */;
+			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E6805BC9286DB3ED00861180 /* Radix Wallet (macOS) */ = {
@@ -209,7 +209,7 @@
 				E667FFD228F6F7ED0015544F /* AppFeature */,
 			);
 			productName = "Wallet (macOS)";
-			productReference = E6805BCA286DB3ED00861180 /* δ-Radix Wallet.app */;
+			productReference = E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
