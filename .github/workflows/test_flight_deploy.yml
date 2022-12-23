@@ -10,11 +10,15 @@ on:
           - alpha
           - beta
           # - release
+  pull_request:
+    branches:
+      - main
 
 jobs:
 
   testFlightDeploy:
     name: "Test Flight Deploy"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip cd]')"
     runs-on: macos-12
 
     steps:
@@ -42,12 +46,20 @@ jobs:
         with:
           xcode-version: "14.1"
 
-      - name: "Deploy"
+      - name: Config local env
         run: |
           git config user.name $GIT_USER
           git config user.email $GIT_USER
           echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
-          bundle exec fastlane ios deploy --env ios.${{ github.event.inputs.flavour }} 
+
+      - name: "Deploy"
+        run: |
+          FLAVOUR=alpha
+          if [[ ${{ github.event.workflow_dispatch }} ]]
+          then
+            FLAVOUR=${{ github.event.inputs.flavour }} 
+          fi
+          bundle exec fastlane ios deploy --env ios.${FLAVOUR}
         env:
           GIT_USER: ${{ secrets.RADIX_BOT_USERNAME }}
