@@ -62,4 +62,4 @@ jobs:
           then
             FLAVOUR=${{ github.event.inputs.flavour }}
           fi
-          bundle exec fastlane ios deploy --env ios.${FLAVOUR}
+          bundle exec fastlane ios deploy --env ios.$FLAVOUR
