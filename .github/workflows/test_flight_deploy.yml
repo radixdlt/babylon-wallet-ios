@@ -54,10 +54,6 @@ jobs:
           brew install xcbeautify
         env:
           GIT_USER: ${{ secrets.RADIX_BOT_USERNAME }}
-
-      - name: "Deploy on merge"
-        if: github.event.pull_request
-        run: bundle exec fastlane ios deploy --env ios.alpha
         
       - name: "Deploy"
         run: |
