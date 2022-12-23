@@ -10,12 +10,9 @@ on:
           - alpha
           - beta
           # - release
-  #pull_request:
-   # branches:
-     # - main
-  push:
+  pull_request:
     branches:
-      - ABW-745-cd-automatic-alpha-build-deploys
+      - main
 
 jobs:
 
