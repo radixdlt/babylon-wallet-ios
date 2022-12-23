@@ -27,13 +27,14 @@ extension FaucetClient: DependencyKey {
 					return true
 				}
 
-				let currentEpoch = try await gatewayAPIClient.getEpoch()
-				guard currentEpoch.rawValue >= lastUsedEpoch.rawValue else {
-					return false
-				}
-
-				let threshold = 1
-				return currentEpoch.rawValue - lastUsedEpoch.rawValue >= threshold
+//				let currentEpoch = try await gatewayAPIClient.getEpoch()
+//				guard currentEpoch.rawValue >= lastUsedEpoch.rawValue else {
+//					return false
+//				}
+//
+//				let threshold = 1
+//				return currentEpoch.rawValue - lastUsedEpoch.rawValue >= threshold
+				return true
 			} catch {
 				throw error
 			}
