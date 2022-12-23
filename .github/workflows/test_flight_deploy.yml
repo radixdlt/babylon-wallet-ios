@@ -18,7 +18,7 @@ jobs:
 
   testFlightDeploy:
     name: "Test Flight Deploy"
-    if: "! contains(toJSON(github.event.commits.*.message), '[skip cd]')"
+    if: "! contains(toJSON(github.event.commits[0].message), '[skip cd]')"
     runs-on: macos-12
 
     steps:
