@@ -55,11 +55,10 @@ jobs:
         env:
           GIT_USER: ${{ secrets.RADIX_BOT_USERNAME }}
 
+      - name: "Deploy on merge"
+        if: github.event.pull_request
+        run: bundle exec fastlane ios deploy --env ios.alpha
+        
       - name: "Deploy"
-        run: |
-          FLAVOUR=alpha
-          if [[ ${{ github.event.workflow_dispatch }} ]]
-          then
-            FLAVOUR=${{ github.event.inputs.flavour }} 
-          fi
-          bundle exec fastlane ios deploy --env ios.${FLAVOUR}
+        if: github.event.workflow_dispatch
+        run: bundle exec fastlane ios deploy --env ios.${{ github.event.inputs.flavour }}
