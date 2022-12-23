@@ -18,7 +18,7 @@ jobs:
 
   testFlightDeploy:
     name: "Test Flight Deploy"
-    if: "!contains(github.event.head_commit.message, '[skip cd]')"
+    if: ${{ !contains(github.event.head_commit.message, '[skip cd]') }}
     runs-on: macos-12
 
     steps:
@@ -52,6 +52,8 @@ jobs:
           git config user.email $GIT_USER
           echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
+        env:
+          GIT_USER: ${{ secrets.RADIX_BOT_USERNAME }}
 
       - name: "Deploy"
         run: |
@@ -61,5 +63,3 @@ jobs:
             FLAVOUR=${{ github.event.inputs.flavour }} 
           fi
           bundle exec fastlane ios deploy --env ios.${FLAVOUR}
-        env:
-          GIT_USER: ${{ secrets.RADIX_BOT_USERNAME }}
