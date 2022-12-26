@@ -30,7 +30,7 @@ public extension ChooseAccounts.View {
 						state: \.createAccount,
 						action: { .child(.createAccount($0)) }
 					),
-					then: CreateAccount.View.init(store:)
+					then: { CreateAccount.View(store: $0) }
 				)
 				.zIndex(1)
 
@@ -63,7 +63,7 @@ public extension ChooseAccounts.View {
 									state: \.accounts,
 									action: { .child(.account(id: $0, action: $1)) }
 								),
-								content: ChooseAccounts.Row.View.init(store:)
+								content: { ChooseAccounts.Row.View(store: $0) }
 							)
 
 							Button(L10n.DApp.ChooseAccounts.createNewAccount) {

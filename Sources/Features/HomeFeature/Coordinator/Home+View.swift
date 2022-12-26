@@ -44,7 +44,7 @@ public extension Home.View {
 							state: \.createAccount,
 							action: { .child(.createAccount($0)) }
 						),
-						then: CreateAccount.View.init(store:)
+						then: { CreateAccount.View(store: $0) }
 					)
 					.zIndex(1)
 

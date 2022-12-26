@@ -2,7 +2,7 @@ import ComposableArchitecture
 import FungibleTokenListFeature
 import NonFungibleTokenListFeature
 
-public struct AssetsView: ReducerProtocol {
+public struct AssetsView: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {

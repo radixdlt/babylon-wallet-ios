@@ -28,7 +28,7 @@ public extension FungibleTokenList.Section.View {
 						state: \.assets,
 						action: { .child(.asset(id: $0, action: $1)) }
 					),
-					content: FungibleTokenList.Row.View.init(store:)
+					content: { FungibleTokenList.Row.View(store: $0) }
 				)
 			}
 			.background(

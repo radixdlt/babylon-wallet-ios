@@ -29,7 +29,7 @@ public extension CreateAccount.View {
 						state: \.accountCompletion,
 						action: { .child(.accountCompletion($0)) }
 					),
-					then: AccountCompletion.View.init(store:)
+					then: { AccountCompletion.View(store: $0) }
 				)
 				.zIndex(2)
 
