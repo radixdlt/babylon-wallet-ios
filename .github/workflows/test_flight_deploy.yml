@@ -57,9 +57,10 @@ jobs:
         
       - name: "Deploy"
         run: |
-          FLAVOUR="alpha"
           if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]
           then
             FLAVOUR=${{ github.event.inputs.flavour }}
+          else
+            FLAVOUR=alpha
           fi
           bundle exec fastlane ios deploy --env ios.$FLAVOUR
