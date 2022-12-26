@@ -4,7 +4,7 @@ import FungibleTokenDetailsFeature
 // MARK: - FungibleTokenList.Action
 public extension FungibleTokenList {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -14,7 +14,7 @@ public extension FungibleTokenList {
 
 // MARK: - FungibleTokenList.Action.ChildAction
 public extension FungibleTokenList.Action {
-	enum ChildAction: Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case section(id: FungibleTokenCategory.CategoryType, action: FungibleTokenList.Section.Action)
 		case details(FungibleTokenDetails.Action)
 	}
@@ -22,19 +22,19 @@ public extension FungibleTokenList.Action {
 
 // MARK: - FungibleTokenList.Action.InternalAction
 public extension FungibleTokenList.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 	}
 }
 
 // MARK: - FungibleTokenList.Action.ViewAction
 public extension FungibleTokenList.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case selectedTokenChanged(FungibleTokenContainer?)
 	}
 }
 
 // MARK: - FungibleTokenList.Action.DelegateAction
 public extension FungibleTokenList.Action {
-	enum DelegateAction: Equatable {}
+	enum DelegateAction: Sendable, Equatable {}
 }
