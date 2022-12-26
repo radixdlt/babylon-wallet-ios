@@ -57,6 +57,7 @@ jobs:
         
       - name: "Deploy"
         run: |
+          echo "xyz"
           FLAVOUR=alpha
           if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]
           then
