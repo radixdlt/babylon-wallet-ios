@@ -1,6 +1,6 @@
 import ComposableArchitecture
-import Data
 import ErrorQueue
+import FileClient
 import Foundation
 import JSON
 import KeychainClientDependency
@@ -8,8 +8,8 @@ import Profile
 
 // MARK: - ImportProfile
 public struct ImportProfile: Sendable, ReducerProtocol {
-	@Dependency(\.data) var data
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.fileClient) var fileClient
 	@Dependency(\.jsonDecoder) var jsonDecoder
 	@Dependency(\.keychainClient) var keychainClient
 	public init() {}
@@ -37,7 +37,7 @@ public extension ImportProfile {
 
 		case let .internal(.view(.profileImported(.success(profileURL)))):
 			return .run { send in
-				let data = try data(contentsOf: profileURL, options: .uncached)
+				let data = try fileClient.read(from: profileURL, options: .uncached)
 				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
 				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
 				await send(.delegate(.importedProfileSnapshot(snapshot)))
