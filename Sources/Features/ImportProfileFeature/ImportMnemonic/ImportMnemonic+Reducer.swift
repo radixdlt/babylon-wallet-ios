@@ -14,7 +14,6 @@ public struct ImportMnemonic: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-// MARK: ReducerProtocol Conformance
 public extension ImportMnemonic {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {

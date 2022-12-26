@@ -1,7 +1,7 @@
 import ComposableArchitecture
 
 // MARK: - AccountCompletion
-public struct AccountCompletion: ReducerProtocol {
+public struct AccountCompletion: Sendable, ReducerProtocol {
 	public init() {}
 }
 

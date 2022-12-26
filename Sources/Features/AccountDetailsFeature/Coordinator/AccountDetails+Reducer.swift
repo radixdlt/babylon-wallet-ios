@@ -1,7 +1,7 @@
 import AssetsViewFeature
 import ComposableArchitecture
 
-public struct AccountDetails: ReducerProtocol {
+public struct AccountDetails: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {

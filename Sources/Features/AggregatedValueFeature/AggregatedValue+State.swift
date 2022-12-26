@@ -5,7 +5,7 @@ import Profile
 // MARK: - AggregatedValue.State
 public extension AggregatedValue {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public var value: Float?
 
 		// MARK: - AppSettings properties

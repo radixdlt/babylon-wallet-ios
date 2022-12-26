@@ -15,7 +15,6 @@ public struct ImportProfile: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-// MARK: ReducerProtocol Conformance
 public extension ImportProfile {
 	func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
 		switch action {
