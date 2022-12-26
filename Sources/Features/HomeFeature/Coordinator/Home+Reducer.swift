@@ -18,7 +18,7 @@ import SharedModels
 import TransactionSigningFeature
 
 // MARK: - Home
-public struct Home: ReducerProtocol {
+public struct Home: Sendable, ReducerProtocol {
 	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 	@Dependency(\.appSettingsClient) var appSettingsClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient

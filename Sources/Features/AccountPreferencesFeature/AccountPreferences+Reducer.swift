@@ -4,7 +4,7 @@ import ErrorQueue
 import FaucetClient
 
 // MARK: - AccountPreferences
-public struct AccountPreferences: ReducerProtocol {
+public struct AccountPreferences: Sendable, ReducerProtocol {
 	@Dependency(\.faucetClient) var faucetClient
 	@Dependency(\.errorQueue) var errorQueue
 

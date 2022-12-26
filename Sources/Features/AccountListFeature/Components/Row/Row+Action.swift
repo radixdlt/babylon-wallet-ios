@@ -3,7 +3,7 @@ import Foundation
 // MARK: - AccountList.Row.Action
 public extension AccountList.Row {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 	}
@@ -11,7 +11,7 @@ public extension AccountList.Row {
 
 // MARK: - AccountList.Row.Action.ViewAction
 public extension AccountList.Row.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case copyAddressButtonTapped
 		case selected
 	}
@@ -19,7 +19,7 @@ public extension AccountList.Row.Action {
 
 // MARK: - AccountList.Row.Action.InternalAction
 public extension AccountList.Row.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 	}
 }
