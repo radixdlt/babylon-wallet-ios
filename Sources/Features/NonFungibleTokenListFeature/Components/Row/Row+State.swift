@@ -4,7 +4,7 @@ import Foundation
 // MARK: - NonFungibleTokenList.Row.State
 public extension NonFungibleTokenList.Row {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public var container: NonFungibleTokenContainer
 		public var isExpanded = false
 

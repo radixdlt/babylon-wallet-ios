@@ -6,7 +6,7 @@ import Profile
 import SwiftUI
 
 // MARK: - ImportMnemonic
-public struct ImportMnemonic: ReducerProtocol {
+public struct ImportMnemonic: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.mnemonicImporter) var mnemonicImporter

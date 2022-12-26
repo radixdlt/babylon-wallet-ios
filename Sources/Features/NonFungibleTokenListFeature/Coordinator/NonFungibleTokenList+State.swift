@@ -5,7 +5,7 @@ import Foundation
 // MARK: NonFungibleTokenList.State
 public extension NonFungibleTokenList {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public var rows: IdentifiedArrayOf<NonFungibleTokenList.Row.State>
 		public var selectedToken: NonFungibleTokenList.Detail.State?
 
