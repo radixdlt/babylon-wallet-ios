@@ -61,7 +61,7 @@ jobs:
           FLAVOUR=alpha
           if [[ ${{ github.event_name == 'pull_request' }} ]]
           then
-            FLAVOUR=beta #${{ github.event.inputs.flavour }}
+            FLAVOUR=${{ github.event_name }}
             echo "======= workflow dispatch"
           fi
           bundle exec fastlane ios deploy --env ios.$FLAVOUR
