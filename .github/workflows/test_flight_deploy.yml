@@ -18,7 +18,7 @@ jobs:
 
   testFlightDeploy:
     name: "Test Flight Deploy"
-    if: ${{ github.event_name != 'pull_request' && !contains(github.event.head_commit.message, '[skip cd]') }}
+    if: ${{ github.event_name != 'workflow_dispatch' && !contains(github.event.head_commit.message, '[skip cd]') }}
     runs-on: macos-12
 
     steps:
