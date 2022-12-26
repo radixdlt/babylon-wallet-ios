@@ -18,7 +18,7 @@ jobs:
 
   testFlightDeploy:
     name: "Test Flight Deploy"
-    if: ${{ !contains(github.event.head_commit.message, '[skip cd]') }}
+    if: ${{ github.event_name != 'pull_request' && !contains(github.event.head_commit.message, '[skip cd]') }}
     runs-on: macos-12
 
     steps:
@@ -57,11 +57,9 @@ jobs:
         
       - name: "Deploy"
         run: |
-          echo ${{ github.event_name }}
           FLAVOUR=alpha
-          if [[ ${{ github.event_name == 'pull_request' }} ]]
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} ]]
           then
-            FLAVOUR=${{ github.event_name }}
-            echo "======= workflow dispatch"
+            FLAVOUR=${{ github.event.inputs.flavour }}
           fi
           bundle exec fastlane ios deploy --env ios.$FLAVOUR
