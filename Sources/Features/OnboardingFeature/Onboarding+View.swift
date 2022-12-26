@@ -22,12 +22,12 @@ public extension Onboarding.View {
 			CaseLet(
 				state: /Onboarding.State.Root.importProfile,
 				action: { Onboarding.Action.importProfile($0) },
-				then: ImportProfile.View.init(store:)
+				then: { ImportProfile.View(store: $0) }
 			)
 			CaseLet(
 				state: /Onboarding.State.Root.createAccount,
 				action: { Onboarding.Action.createAccount($0) },
-				then: CreateAccount.View.init(store:)
+				then: { CreateAccount.View(store: $0) }
 			)
 		}
 	}

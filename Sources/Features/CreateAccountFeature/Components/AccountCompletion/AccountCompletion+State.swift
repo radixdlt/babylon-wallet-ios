@@ -4,7 +4,7 @@ import Profile
 
 // MARK: - AccountCompletion.State
 public extension AccountCompletion {
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public let account: OnNetwork.Account
 		public let isFirstAccount: Bool
 		public let destination: Destination

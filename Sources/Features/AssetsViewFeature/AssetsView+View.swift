@@ -111,6 +111,7 @@ extension AssetsView.View {
 }
 
 // MARK: - AssetsView_Preview
+#if DEBUG
 struct AssetsView_Preview: PreviewProvider {
 	static var previews: some View {
 		AssetsView.View(
@@ -124,3 +125,4 @@ struct AssetsView_Preview: PreviewProvider {
 		)
 	}
 }
+#endif

@@ -4,7 +4,7 @@ import ErrorQueue
 import FaucetClient
 
 // MARK: - AccountPreferences
-public struct AccountPreferences: ReducerProtocol {
+public struct AccountPreferences: Sendable, ReducerProtocol {
 	@Dependency(\.faucetClient) var faucetClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -27,7 +27,10 @@ public struct AccountPreferences: ReducerProtocol {
 		case .internal(.view(.faucetButtonTapped)):
 			state.faucetButtonState = .loading(.local)
 			return .run { [address = state.address] send in
-				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: address, unlockKeychainPromptShowToUser: L10n.TransactionSigning.biometricsPrompt))
+				_ = try await faucetClient.getFreeXRD(.init(
+					recipientAccountAddress: address,
+					unlockKeychainPromptShowToUser: L10n.TransactionSigning.biometricsPrompt
+				))
 				await send(.delegate(.refreshAccount(address)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)

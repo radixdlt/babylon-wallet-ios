@@ -1,7 +1,7 @@
 import ComposableArchitecture
 
 public extension Home {
-	struct Header: ReducerProtocol {
+	struct Header: Sendable, ReducerProtocol {
 		public init() {}
 
 		public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {

@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Home.Header.State
 public extension Home.Header {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public var hasNotification: Bool
 
 		public init(

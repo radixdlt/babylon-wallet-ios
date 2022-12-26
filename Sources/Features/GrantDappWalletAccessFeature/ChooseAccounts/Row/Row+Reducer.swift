@@ -3,7 +3,7 @@ import ComposableArchitecture
 // MARK: - ChooseAccounts.Row
 /// Namespace for Row
 public extension ChooseAccounts {
-	struct Row: ReducerProtocol {
+	struct Row: Sendable, ReducerProtocol {
 		public init() {}
 	}
 }

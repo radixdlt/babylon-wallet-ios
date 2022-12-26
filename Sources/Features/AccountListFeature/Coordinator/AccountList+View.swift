@@ -29,7 +29,7 @@ public extension AccountList.View {
 						state: \.accounts,
 						action: { .child(.account(id: $0, action: $1)) }
 					),
-					content: AccountList.Row.View.init(store:)
+					content: { AccountList.Row.View(store: $0) }
 				)
 			}
 			.onAppear {

@@ -31,7 +31,7 @@ public extension NonFungibleTokenList.View {
 						state: \.rows,
 						action: { .child(.asset(id: $0, action: $1)) }
 					),
-					content: NonFungibleTokenList.Row.View.init(store:)
+					content: { NonFungibleTokenList.Row.View(store: $0) }
 				)
 			}
 			.sheet(

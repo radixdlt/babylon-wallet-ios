@@ -5,7 +5,7 @@ import SharedModels
 
 // MARK: - NonFungibleTokenList.Detail.State
 public extension NonFungibleTokenList.Detail {
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		var container: NonFungibleTokenContainer
 		var asset: NonFungibleToken
 	}

@@ -1,7 +1,7 @@
 import ComposableArchitecture
 
 // MARK: - ___VARIABLE_featureName___
-public struct ___VARIABLE_featureName___: ReducerProtocol {
+public struct ___VARIABLE_featureName___: Sendable, ReducerProtocol {
 	public init() {}
 }
 

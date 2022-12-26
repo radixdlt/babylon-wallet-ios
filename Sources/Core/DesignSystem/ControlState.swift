@@ -53,29 +53,6 @@ extension EnvironmentValues {
 }
 
 public extension View {
-	/// This modifier may only be called once within a view's body.
-	/// When applied multiple times, only the last modifier will be applied.
-	/// For multiple loading scenarios, use the `controlState` modifier instead.
-	@available(*, deprecated, message: "Compute the appropriate 'ControlState' from your TCA State and use the 'controlState' modifier instead.")
-	func isLoading(_ isLoading: Bool, context: LoadingContext) -> some View {
-		self.transformEnvironment(\.controlState) {
-			if isLoading {
-				$0 = .loading(context)
-			}
-		}
-		.transformPreference(LoadingContextKey.self) {
-			if isLoading {
-				$0 = context
-			}
-		}
-		.disabled(isLoading)
-	}
-
-	@available(*, deprecated, message: "Compute the appropriate 'ControlState' from your TCA State and use the non-closure based 'controlState' modifier instead.")
-	func controlState(_ state: () -> ControlState) -> some View {
-		self.controlState(state())
-	}
-
 	func controlState(_ state: ControlState) -> some View {
 		self.environment(\.controlState, state)
 			.transformPreference(LoadingContextKey.self) {

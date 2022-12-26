@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - FungibleTokenCategory
-public struct FungibleTokenCategory: Equatable {
+public struct FungibleTokenCategory: Sendable, Equatable {
 	public let type: CategoryType
 	public let tokenContainers: [FungibleTokenContainer]
 
@@ -22,7 +22,7 @@ extension FungibleTokenCategory: Identifiable {
 
 // MARK: FungibleTokenCategory.CategoryType
 public extension FungibleTokenCategory {
-	enum CategoryType {
+	enum CategoryType: Sendable {
 		case xrd
 		case nonXrd
 	}

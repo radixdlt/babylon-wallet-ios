@@ -44,7 +44,7 @@ public extension Home.View {
 							state: \.createAccount,
 							action: { .child(.createAccount($0)) }
 						),
-						then: CreateAccount.View.init(store:)
+						then: { CreateAccount.View(store: $0) }
 					)
 					.zIndex(1)
 
@@ -53,7 +53,7 @@ public extension Home.View {
 							state: \.accountDetails,
 							action: { .child(.accountDetails($0)) }
 						),
-						then: AccountDetails.View.init(store:)
+						then: { AccountDetails.View(store: $0) }
 					)
 					.zIndex(2)
 
@@ -62,7 +62,7 @@ public extension Home.View {
 							state: \.accountPreferences,
 							action: { .child(.accountPreferences($0)) }
 						),
-						then: AccountPreferences.View.init(store:)
+						then: { AccountPreferences.View(store: $0) }
 					)
 					.zIndex(3)
 
@@ -71,7 +71,7 @@ public extension Home.View {
 							state: \.transfer,
 							action: { .child(.transfer($0)) }
 						),
-						then: AccountDetails.Transfer.View.init(store:)
+						then: { AccountDetails.Transfer.View(store: $0) }
 					)
 					.zIndex(4)
 				}

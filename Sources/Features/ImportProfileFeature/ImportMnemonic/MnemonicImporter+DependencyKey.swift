@@ -2,12 +2,12 @@ import Dependencies
 import Foundation
 import Mnemonic
 
-public typealias MnemonicImporter = (String) throws -> Mnemonic
+public typealias MnemonicImporter = @Sendable (String) throws -> Mnemonic
 
 // MARK: - MnemonicImporterKey
 private enum MnemonicImporterKey: DependencyKey {
 	typealias Value = MnemonicImporter
-	static let liveValue = { try Mnemonic(phrase: $0, language: nil) }
+	static let liveValue = { @Sendable in try Mnemonic(phrase: $0, language: nil) }
 }
 
 public extension DependencyValues {

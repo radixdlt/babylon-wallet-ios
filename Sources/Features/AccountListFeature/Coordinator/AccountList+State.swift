@@ -6,7 +6,7 @@ import Profile
 // MARK: - AccountList.State
 public extension AccountList {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public var accounts: IdentifiedArrayOf<AccountList.Row.State>
 		public var alert: AlertState<Action.ViewAction>?
 

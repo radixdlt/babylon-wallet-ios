@@ -35,7 +35,7 @@ public extension ManageGatewayAPIEndpoints.View {
 							state: \.createAccount,
 							action: { .createAccount($0) }
 						),
-						then: CreateAccount.View.init(store:)
+						then: { CreateAccount.View(store: $0) }
 					)
 					.zIndex(1)
 				}

@@ -1,7 +1,7 @@
 import ComposableArchitecture
 
 // MARK: - AccountList
-public struct AccountList: ReducerProtocol {
+public struct AccountList: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
