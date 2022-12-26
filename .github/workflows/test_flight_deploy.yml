@@ -59,7 +59,7 @@ jobs:
         run: |
           echo ${{ github.event_name }}
           FLAVOUR=alpha
-          if [[ -z ${{ github.event_name == 'pull_request' }} ]]
+          if [[ ${{ github.event_name == 'pull_request' }} ]]
           then
             FLAVOUR=beta #${{ github.event.inputs.flavour }}
             echo "======= workflow dispatch"
