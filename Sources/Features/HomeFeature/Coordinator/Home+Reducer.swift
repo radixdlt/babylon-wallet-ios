@@ -273,7 +273,7 @@ public struct Home: Sendable, ReducerProtocol {
 		}
 	}
 
-	func fetchPortfolio(_ accounts: some Collection<OnNetwork.Account>) -> EffectTask<Action> {
+	func fetchPortfolio(_ accounts: some Collection<OnNetwork.Account> & Sendable) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.system(.fetchPortfolioResult(TaskResult {
 				try await accountPortfolioFetcher.fetchPortfolio(accounts.map(\.address))
