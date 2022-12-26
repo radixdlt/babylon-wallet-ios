@@ -58,7 +58,7 @@ jobs:
       - name: "Deploy"
         run: |
           FLAVOUR=alpha
-          if [[ -z ${{ github.event_name == 'pull_request' }} ]]
+          if [[ ${{ github.event_name == 'pull_request' }} == true ]]
           then
             FLAVOUR=beta #${{ github.event.inputs.flavour }}
           fi
