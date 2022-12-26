@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - FungibleTokenDetails.Action
 public extension FungibleTokenDetails {
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -11,7 +11,7 @@ public extension FungibleTokenDetails {
 
 // MARK: - FungibleTokenDetails.Action.ViewAction
 public extension FungibleTokenDetails.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case copyAddressButtonTapped
 	}
@@ -19,7 +19,7 @@ public extension FungibleTokenDetails.Action {
 
 // MARK: - FungibleTokenDetails.Action.InternalAction
 public extension FungibleTokenDetails.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -27,12 +27,12 @@ public extension FungibleTokenDetails.Action {
 
 // MARK: - FungibleTokenDetails.Action.SystemAction
 public extension FungibleTokenDetails.Action {
-	enum SystemAction: Equatable {}
+	enum SystemAction: Sendable, Equatable {}
 }
 
 // MARK: - FungibleTokenDetails.Action.DelegateAction
 public extension FungibleTokenDetails.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case closeButtonTapped
 	}
 }
