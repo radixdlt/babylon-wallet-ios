@@ -2,7 +2,7 @@ fastlane_require 'dotenv'
 
 before_all do
     Dotenv.load ".env.secret"
- #   ensure_git_status_clean
+    #ensure_git_status_clean
 end
 
 platform :ios do
@@ -13,6 +13,7 @@ platform :ios do
     desc "Builds and archives the app"
     lane :build do
         Dotenv.load ".env.ios.alpha"
+        create_release
         install_distribution_certificates
         build_app
     end
@@ -21,15 +22,6 @@ platform :ios do
     lane :tests do
         Dotenv.load ".env.ios.dev"
         run_tests
-    end
-
-    lane :rev do
-        most_recent_tags = sh("git tag | grep 'Beta' | sort -r | head -2").split("\n")
-        changelog_from_git_commits(
-          between: most_recent_tags,
-          pretty: "- %s",
-          merge_commit_filtering: 'exclude_merges'
-        )
     end
 
     desc "Deploy the app for a given flavour: alpha, beta, release"
@@ -114,6 +106,38 @@ platform :mac do
         register_new_device
         generate_new_certificates
     end
+end
+
+private_lane :create_release do
+    most_recent_tags = sh("git tag | grep 'Beta' | sort -r | head -2").split("\n")
+    last_tag = most_recent_tags[0]
+    rev_changelog = changelog_from_git_commits(
+      between: most_recent_tags,
+      pretty: "- %s",
+      merge_commit_filtering: 'exclude_merges'
+    )
+    dependencies = read_json(
+        json_path: ENV['SWIFT_PACKAGE_RESOLVED_PATH'] 
+    )[:pins]
+
+    core_deps = ["converse", "swift-engine-toolkit", "swift-profile", "bite", "mnemonic", "slip10", "swift-composable-architecture"]
+    versions = Hash.new
+    dependencies.each do |child|
+        if core_deps.include? child[:identity]
+            versions[child[:identity]] = child[:state][:version]
+        end
+    end
+    versions_string = versions.map { |k, v| "- #{k}: #{v}" }.join("\n")
+    release_description = "**Dependencies**: \n" + versions_string + "\n\v**Changelog**: \n" + rev_changelog
+
+    set_github_release(
+        repository_name: "radixdlt/babylon-wallet-ios",
+        api_token: ENV['GIT_TOKEN'] ,
+        name: last_tag,
+        tag_name: last_tag,
+        description: release_string,
+        is_draft: true # temporary use for debugging
+    )
 end
 
 private_lane :register_new_device do |options|
