@@ -29,18 +29,10 @@ extension GatewayAPIClient: TestDependencyKey {
 		.init(
 			getNetworkName: { _ in .init("Nebunet") },
 			getEpoch: { .init(rawValue: 123) },
-			accountResourcesByAddress: { _ in
-				fatalError()
-			},
-			resourcesOverview: { _ in
-				fatalError()
-			},
-			resourceDetailsByResourceIdentifier: { _ in
-				fatalError()
-			},
-			getNonFungibleIds: { _, _ in
-				fatalError()
-			},
+			accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
+			resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
+			resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
+			getNonFungibleIds: unimplemented("\(Self.self).getNonFungibleIds"),
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},
