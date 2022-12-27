@@ -59,7 +59,6 @@ jobs:
         
       - name: "Deploy"
         run: |
-          git fetch --tags origin # fetch the tags, needed to create the release page
           FLAVOUR=alpha
           if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]
           then
