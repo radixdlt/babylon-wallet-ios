@@ -16,6 +16,6 @@ extension FileClient: TestDependencyKey {
 	)
 
 	public static let testValue = Self(
-		read: unimplemented("\(Self.self).contentsOfURL")
+		read: unimplemented("\(Self.self).read")
 	)
 }
