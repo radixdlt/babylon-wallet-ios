@@ -68,15 +68,8 @@ public extension ProfileClient {
 		getAppPreferences: { throw CancellationError() },
 		setDisplayAppPreferences: { _ in throw CancellationError() },
 		createVirtualAccount: { _ in throw CancellationError() },
-		lookupAccountByAddress: { _ in
-			.placeholder0
-		},
-		signersForAccountsGivenAddresses: { _ in
-			struct MockError: LocalizedError {
-				let errorDescription: String? = "Failed to get signers for addresses"
-			}
-			throw MockError()
-		}
+		lookupAccountByAddress: { _ in .placeholder0 },
+		signersForAccountsGivenAddresses: { _ in throw CancellationError() }
 	)
 }
 #endif
