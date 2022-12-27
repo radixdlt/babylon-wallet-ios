@@ -109,8 +109,7 @@ platform :mac do
 end
 
 private_lane :create_release do
-    puts ENV['GIT_TOKEN']
-    puts ENV['GITHUB_API_TOKEN']
+    puts ENV
     sh('git fetch --tags')
     most_recent_tags = sh("git tag | grep 'Beta' | sort -r | head -2").split("\n")
     last_tag = most_recent_tags[0]
@@ -135,7 +134,7 @@ private_lane :create_release do
 
     set_github_release(
         repository_name: "radixdlt/babylon-wallet-ios",
-        api_token: ENV['GITHUB_API_TOKEN'] ,
+        api_token: ENV['GIT_TOKEN'] ,
         name: last_tag,
         tag_name: last_tag,
         description: release_description,
