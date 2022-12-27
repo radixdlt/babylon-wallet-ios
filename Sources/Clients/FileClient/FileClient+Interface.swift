@@ -1,15 +1,25 @@
 import Foundation
 
+// MARK: - FileClient
 public struct FileClient: Sendable {
-	public typealias Read = @Sendable (URL, Data.ReadingOptions) throws -> Data
+	public var read: ReadEffect
 
-	private let read: Read
+	public init(read: @escaping ReadEffect.ReadAction) {
+		self.read = .init(read)
+	}
+}
 
-	public init(read: @escaping Read) {
+// MARK: - ReadEffect
+public struct ReadEffect: Sendable {
+	public typealias ReadAction = @Sendable (URL, Data.ReadingOptions) throws -> Data
+
+	private let read: ReadAction
+
+	public init(_ read: @escaping ReadAction) {
 		self.read = read
 	}
 
-	public func read(from url: URL, options: Data.ReadingOptions) throws -> Data {
+	public func callAsFunction(from url: URL, options: Data.ReadingOptions) throws -> Data {
 		try read(url, options)
 	}
 }

@@ -44,9 +44,9 @@ final class ImportProfileFeatureTests: TestCase {
 			reducer: ImportProfile()
 		)
 		let invalidProfileData = Data("deadbeef".utf8) // invalid data
-		sut.dependencies.data = .init(contentsOfURL: { _, _ in
+		sut.dependencies.fileClient.read = .init { _, _ in
 			invalidProfileData
-		})
+		}
 		sut.dependencies.keychainClient.dataForKey = { _, _ in
 			invalidProfileData
 		}
@@ -68,11 +68,11 @@ final class ImportProfileFeatureTests: TestCase {
 			initialState: ImportProfile.State(),
 			reducer: ImportProfile()
 		)
-		sut.dependencies.data = .init(contentsOfURL: { url, options in
+		sut.dependencies.fileClient.read = .init { url, options in
 			XCTAssertEqual(url, URL(string: "file://profiledataurl")!)
 			XCTAssertEqual(options, .uncached)
 			return self.profileSnapshotData
-		})
+		}
 		let profileSnapshotDataInKeychain = ActorIsolated<Data?>(nil)
 		sut.dependencies.keychainClient.updateDataForKey = { @Sendable data, key, _, _ in
 			Task {
