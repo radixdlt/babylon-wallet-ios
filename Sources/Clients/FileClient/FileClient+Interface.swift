@@ -1,6 +1,10 @@
 import Foundation
 
 // MARK: - FileClient
+/// A file client, able to load a local file from a given file URL and options.
+///
+/// While usage in remote contexts is possible, this is strictly discouraged.
+/// For such use case, please start a download task on a `URLSession` instead.
 public struct FileClient: Sendable {
 	public var read: ReadEffect
 
