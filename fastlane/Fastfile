@@ -132,7 +132,7 @@ private_lane :create_release do
     release_description = "**Dependencies**: \n" + versions_string + "\n\v**Changelog**: \n" + rev_changelog
 
     set_github_release(
-        repository_name: "radixdlt/babylon-wallet-ios",
+        repository_name: "babylon-wallet-ios",
         api_token: ENV['GIT_TOKEN'] ,
         name: last_tag,
         tag_name: last_tag,
