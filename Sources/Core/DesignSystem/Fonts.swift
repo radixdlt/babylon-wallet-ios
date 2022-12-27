@@ -35,7 +35,8 @@ extension Font {
 			case .bold:
 				return IBMPlexSans.bold.rawValue
 			default:
-				fatalError("Font weight not defined in design system")
+				assertionFailure("Font weight not defined in design system")
+				return IBMPlexSans.regular.rawValue
 			}
 		}
 	}

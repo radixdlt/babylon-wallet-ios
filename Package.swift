@@ -468,9 +468,9 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Common",
-			"Data",
 			"DesignSystem",
 			"ErrorQueue",
+			"FileClient",
 			"JSON",
 			"KeychainClientDependency",
 			"ProfileClient",
@@ -685,13 +685,6 @@ package.addModules([
 		tests: .no
 	),
 	.client(
-		name: "Data",
-		dependencies: [
-			dependencies,
-		],
-		tests: .no
-	),
-	.client(
 		name: "EngineToolkitClient",
 		dependencies: [
 			bigInt,
@@ -726,6 +719,13 @@ package.addModules([
 			"ProfileClient",
 			"TransactionClient",
 		], tests: .no
+	),
+	.client(
+		name: "FileClient",
+		dependencies: [
+			dependencies,
+		],
+		tests: .no
 	),
 	.client(
 		name: "GatewayAPI",
