@@ -38,18 +38,12 @@ extension ProfileClient: TestDependencyKey {
 			let accounts: [OnNetwork.Account] = [.placeholder0, .placeholder1]
 			return NonEmpty(rawValue: OrderedSet(accounts))!
 		},
-		getP2PClients: { fatalError() },
-		addP2PClient: { _ in fatalError() },
-		deleteP2PClientByID: { _ in fatalError() },
-		getAppPreferences: {
-			fatalError()
-		},
-		setDisplayAppPreferences: { _ in
-			fatalError()
-		},
-		createVirtualAccount: { _ in
-			fatalError()
-		},
+		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
+		addP2PClient: unimplemented("\(Self.self).addP2PClient"),
+		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
+		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
+		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
+		createVirtualAccount: unimplemented("\(Self.self).createVirtualAccount"),
 		lookupAccountByAddress: { _ in
 			.placeholder0
 		},

@@ -79,8 +79,8 @@ public extension TransactionManifest {
 }
 
 public extension TransactionSigning.State {
-	static var placeholder: Self {
-		fatalError()
+	static var previewValue: Self {
+		.init(request: .init(requestItem: .placeholder, parentRequest: .placeholder))
 	}
 }
 #endif
