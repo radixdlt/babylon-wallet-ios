@@ -9,17 +9,19 @@ public struct FileClient: Sendable {
 	}
 }
 
-// MARK: - ReadEffect
-public struct ReadEffect: Sendable {
-	public typealias ReadAction = @Sendable (URL, Data.ReadingOptions) throws -> Data
+// MARK: FileClient.ReadEffect
+public extension FileClient {
+	struct ReadEffect: Sendable {
+		public typealias ReadAction = @Sendable (URL, Data.ReadingOptions) throws -> Data
 
-	private let read: ReadAction
+		private let read: ReadAction
 
-	public init(_ read: @escaping ReadAction) {
-		self.read = read
-	}
+		public init(_ read: @escaping ReadAction) {
+			self.read = read
+		}
 
-	public func callAsFunction(from url: URL, options: Data.ReadingOptions) throws -> Data {
-		try read(url, options)
+		public func callAsFunction(from url: URL, options: Data.ReadingOptions) throws -> Data {
+			try read(url, options)
+		}
 	}
 }
