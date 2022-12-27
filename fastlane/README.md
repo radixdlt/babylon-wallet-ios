@@ -31,6 +31,14 @@ Builds and archives the app
 
 Runs test
 
+### ios rev
+
+```sh
+[bundle exec] fastlane ios rev
+```
+
+
+
 ### ios deploy
 
 ```sh

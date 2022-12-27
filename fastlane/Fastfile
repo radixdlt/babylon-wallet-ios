@@ -2,7 +2,7 @@ fastlane_require 'dotenv'
 
 before_all do
     Dotenv.load ".env.secret"
-    ensure_git_status_clean
+ #   ensure_git_status_clean
 end
 
 platform :ios do
@@ -21,6 +21,15 @@ platform :ios do
     lane :tests do
         Dotenv.load ".env.ios.dev"
         run_tests
+    end
+
+    lane :rev do
+        most_recent_tags = sh("git tag | grep 'Beta' | sort -r | head -2").split("\n")
+        changelog_from_git_commits(
+          between: most_recent_tags,
+          pretty: "- %s",
+          merge_commit_filtering: 'exclude_merges'
+        )
     end
 
     desc "Deploy the app for a given flavour: alpha, beta, release"
