@@ -20,7 +20,7 @@ jobs:
 
   testFlightDeploy:
     name: "Test Flight Deploy"
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true && !contains(github.event.head_commit.message, '[skip cd]') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true && !(contains(github.event.head_commit.message, '[skip cd]') || contains(github.event.head_commit.message, '[cd skip]') }}
     runs-on: macos-12
 
     steps:
