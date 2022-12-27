@@ -140,7 +140,7 @@ struct ChooseAccounts_Preview: PreviewProvider {
 
 		return ChooseAccounts.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .previewValue,
 				reducer: ChooseAccounts()
 			)
 		)

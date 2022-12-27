@@ -192,11 +192,11 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			}
 		}
 		store.exhaustivity = .off
-		await store.send(.createAccount(.delegate(.createdNewAccount(.placeholder0)))) {
+		await store.send(.createAccount(.delegate(.createdNewAccount(.previewValue0)))) {
 			$0.createAccount = .init(onNetworkWithID: newNetworkAndGateway.network.id, shouldCreateProfile: false)
 		}
 
-		await store.receive(.createAccount(.delegate(.displayCreateAccountCompletion(.placeholder0, isFirstAccount: true, destination: .home))))
+		await store.receive(.createAccount(.delegate(.displayCreateAccountCompletion(.previewValue0, isFirstAccount: true, destination: .home))))
 
 		await store.send(.createAccount(.child(.accountCompletion(.delegate(.displayHome)))))
 
@@ -255,19 +255,17 @@ import ProfileClient
 #if DEBUG
 
 public extension URL {
-	static let placeholder = URL(string: "https://example.com")!
+	static let previewValue = URL(string: "https://example.com")!
 }
 
 public extension Network {
-	static let placeholder = Self(name: "Placeholder", id: .simulator)
+	static let previewValue = Self(name: "Placeholder", id: .simulator)
 }
 
 public extension AppPreferences.NetworkAndGateway {
-	static var placeholder: Self {
-		.init(
-			network: .placeholder,
-			gatewayAPIEndpointURL: .placeholder
-		)
-	}
+	static let previewValue = Self(
+		network: .previewValue,
+		gatewayAPIEndpointURL: .previewValue
+	)
 }
 #endif // DEBUG

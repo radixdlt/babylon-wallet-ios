@@ -59,7 +59,7 @@ public extension ProfileClient {
 		deleteProfileAndFactorSources: {},
 		hasAccountOnNetwork: { _ in false },
 		getAccounts: {
-			let accounts: [OnNetwork.Account] = [.placeholder0, .placeholder1]
+			let accounts: [OnNetwork.Account] = [.previewValue0, .previewValue1]
 			return NonEmpty(rawValue: OrderedSet(accounts))!
 		},
 		getP2PClients: { throw CancellationError() },
@@ -68,7 +68,7 @@ public extension ProfileClient {
 		getAppPreferences: { throw CancellationError() },
 		setDisplayAppPreferences: { _ in throw CancellationError() },
 		createVirtualAccount: { _ in throw CancellationError() },
-		lookupAccountByAddress: { _ in .placeholder0 },
+		lookupAccountByAddress: { _ in .previewValue0 },
 		signersForAccountsGivenAddresses: { _ in throw CancellationError() }
 	)
 }

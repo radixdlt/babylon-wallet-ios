@@ -42,7 +42,7 @@ final class AppFeatureTests: TestCase {
 
 		var profileClient: ProfileClient = .testValue
 		profileClient.getAccounts = {
-			let accounts: [OnNetwork.Account] = [.placeholder0]
+			let accounts: [OnNetwork.Account] = [.previewValue0]
 			return NonEmpty(rawValue: OrderedSet(accounts))!
 		}
 		store.dependencies.profileClient = profileClient

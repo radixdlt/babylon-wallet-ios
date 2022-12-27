@@ -185,7 +185,7 @@ struct ManageGatewayAPIEndpoints_Preview: PreviewProvider {
 	static var previews: some View {
 		ManageGatewayAPIEndpoints.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .previewValue,
 				reducer: ManageGatewayAPIEndpoints()
 			)
 		)

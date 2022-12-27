@@ -140,7 +140,7 @@ struct HomeView_Previews: PreviewProvider {
 	static var previews: some View {
 		Home.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .previewValue,
 				reducer: Home()
 			)
 		)

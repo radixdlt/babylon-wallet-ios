@@ -91,7 +91,7 @@ extension DappConnectionRequest.View {
 //
 //		return DappConnectionRequest.View(
 //			store: .init(
-//				initialState: .placeholder,
+//				initialState: .previewValue,
 //				reducer: DappConnectionRequest()
 //			)
 //		)

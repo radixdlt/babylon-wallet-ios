@@ -130,7 +130,7 @@ struct Row_Preview: PreviewProvider {
 
 		return AccountList.Row.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .previewValue,
 				reducer: AccountList.Row()
 			)
 		)

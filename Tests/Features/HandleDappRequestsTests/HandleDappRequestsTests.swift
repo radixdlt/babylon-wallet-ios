@@ -21,7 +21,7 @@ final class HandleDappRequestsTests: TestCase {
 			$0.p2pConnectivityClient.sendMessageReadReceipt = { _, _ in /* do nothing */ }
 		}
 
-		let request = P2P.RequestFromClient.placeholderOneTimeAccountAccess
+		let request = P2P.RequestFromClient.previewValueOneTimeAccountAccess
 
 		await store.send(.internal(.system(.receiveRequestFromP2PClientResult(
 			.success(request)
@@ -44,7 +44,7 @@ final class HandleDappRequestsTests: TestCase {
 	}
 
 	func test__GIVEN__already_handling_a_request__WHEN__receiveRequest__THEN__new_request_is_queued() async throws {
-		let request = P2P.RequestFromClient.placeholderOneTimeAccountAccess
+		let request = P2P.RequestFromClient.previewValueOneTimeAccountAccess
 
 		let currentRequest: HandleDappRequests.State.CurrentRequest = try .chooseAccounts(
 			.init(request: request)
@@ -61,7 +61,7 @@ final class HandleDappRequestsTests: TestCase {
 			$0.p2pConnectivityClient.sendMessageReadReceipt = { _, _ in /* do nothing */ }
 		}
 
-		let newRequest = P2P.RequestFromClient.placeholderSignTXRequest
+		let newRequest = P2P.RequestFromClient.previewValueSignTXRequest
 		await store.send(.internal(.system(.receiveRequestFromP2PClientResult(
 			.success(newRequest)
 		))))
@@ -84,7 +84,7 @@ final class HandleDappRequestsTests: TestCase {
 		let request = try P2P.RequestFromClient(
 			originalMessage: .placeholder,
 			requestFromDapp: .init(
-				id: .placeholder0,
+				id: .previewValue0,
 				metadata: .init(
 					networkId: .nebunet,
 					origin: "",

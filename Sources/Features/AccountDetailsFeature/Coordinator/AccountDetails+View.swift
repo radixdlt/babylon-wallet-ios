@@ -131,7 +131,7 @@ struct AccountDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountDetails.View(
 			store: .init(
-				initialState: .init(for: .placeholder),
+				initialState: .init(for: .previewValue),
 				reducer: AccountDetails()
 			)
 		)
