@@ -10,11 +10,17 @@ on:
           - alpha
           - beta
           # - release
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
 
 jobs:
 
   testFlightDeploy:
     name: "Test Flight Deploy"
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true && !(contains(github.event.head_commit.message, '[skip cd]') || contains(github.event.head_commit.message, '[cd skip]') }}
     runs-on: macos-12
 
     steps:
@@ -42,12 +48,20 @@ jobs:
         with:
           xcode-version: "14.1"
 
-      - name: "Deploy"
+      - name: Config local env
         run: |
           git config user.name $GIT_USER
           git config user.email $GIT_USER
           echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
-          bundle exec fastlane ios deploy --env ios.${{ github.event.inputs.flavour }} 
         env:
           GIT_USER: ${{ secrets.RADIX_BOT_USERNAME }}
+        
+      - name: "Deploy"
+        run: |
+          FLAVOUR=alpha
+          if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]
+          then
+            FLAVOUR=${{ github.event.inputs.flavour }}
+          fi
+          bundle exec fastlane ios deploy --env ios.$FLAVOUR
