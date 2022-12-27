@@ -15,7 +15,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		// given
 		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
 			requestItem: .init(numberOfAddresses: 1),
-			parentRequest: .placeholder
+			parentRequest: .previewValue
 		)
 
 		let initialState: DappConnectionRequest.State = .init(
@@ -41,7 +41,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		// given
 		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
 			requestItem: .init(numberOfAddresses: 1),
-			parentRequest: .placeholder
+			parentRequest: .previewValue
 		)
 
 		let initialState: DappConnectionRequest.State = .init(
