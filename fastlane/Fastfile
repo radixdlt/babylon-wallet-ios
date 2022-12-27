@@ -109,6 +109,7 @@ platform :mac do
 end
 
 private_lane :create_release do
+    sh('git fetch --tags')
     most_recent_tags = sh("git tag | grep 'Beta' | sort -r | head -2").split("\n")
     last_tag = most_recent_tags[0]
     rev_changelog = changelog_from_git_commits(
