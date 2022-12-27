@@ -76,9 +76,4 @@ extension ProfileClient: TestDependencyKey {
 		signersForAccountsGivenAddresses: unimplemented("\(Self.self).signersForAccountsGivenAddresses")
 	)
 }
-
-public struct UnimplementedError: Swift.Error {
-	public let description: String
-}
-
 #endif
