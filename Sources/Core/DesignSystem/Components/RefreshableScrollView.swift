@@ -5,11 +5,8 @@ import SwiftUI
 ///
 /// On iOS 16+ it uses ScrollView.
 /// On iOS 15 it falls back to List with modifiers removing all its default rows styling.
-///
 @MainActor
 public struct RefreshableScrollView<Content: View>: View {
-	@Environment(\.refresh) var refresh
-
 	var showsIndicators: Bool
 	var content: () -> Content
 
@@ -27,20 +24,15 @@ public struct RefreshableScrollView<Content: View>: View {
 				showsIndicators: showsIndicators,
 				content: content
 			)
-			.refreshable {
-				await refresh?()
-			}
 		} else {
 			List {
 				content()
+					.frame(maxWidth: .infinity, alignment: .center)
 					.listRowSeparatorTint(.clear)
 					.listRowBackground(Color.clear)
 					.listRowInsets(EdgeInsets())
 			}
 			.listStyle(.plain)
-			.refreshable {
-				await refresh?()
-			}
 		}
 	}
 }
