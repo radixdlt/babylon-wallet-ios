@@ -59,7 +59,7 @@ jobs:
         
       - name: "Deploy"
         run: |
-          echo "GIT_TOKEN_KEY=$GIT_TOKEN" >> .env.secrets
+          echo "GIT_TOKEN_KEY=$GIT_TOKEN" >> fastlane/.env.secret
           FLAVOUR=alpha
           if [[ ${{ github.event_name == 'workflow_dispatch' }} == true ]]
           then
