@@ -2,7 +2,7 @@ fastlane_require 'dotenv'
 
 before_all do
     Dotenv.load ".env.secret"
-    #ensure_git_status_clean
+    ensure_git_status_clean
 end
 
 platform :ios do
@@ -13,7 +13,6 @@ platform :ios do
     desc "Builds and archives the app"
     lane :build do
         Dotenv.load ".env.ios.alpha"
-        create_release
         install_distribution_certificates
         build_app
     end
@@ -48,6 +47,9 @@ platform :ios do
         tag = "%s#%s-%s" % [app_version, build_number, ENV['FLAVOUR']]
         add_git_tag(tag: tag)
         push_to_git_remote
+        if ENV['FLAVOUR'] == Beta
+            create_beta_gh_release
+        end
     end
 
     desc "Installs distribution certificates"
@@ -108,7 +110,7 @@ platform :mac do
     end
 end
 
-private_lane :create_release do
+private_lane :create_beta_gh_release do
     sh('git fetch --tags')
     most_recent_tags = sh("git tag | grep 'Beta' | sort -r | head -2").split("\n")
     last_tag = most_recent_tags[0]

@@ -62,8 +62,6 @@ jobs:
 
       - name: "Build"
         run: bundle exec fastlane ios build
-        env:
-          GIT_TOKEN: ${{ secrets.RADIX_BOT_PAT }}
 
       - name: "Build unit tests"
         run: bundle exec fastlane ios tests
