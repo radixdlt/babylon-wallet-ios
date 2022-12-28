@@ -27,7 +27,7 @@ final class HandleDappRequestsTests: TestCase {
 			.success(request)
 		))))
 
-		await store.receive(.internal(.system(.sendMessageReceivedReceiptBackToPeer(.placeholder, readMessage: request.originalMessage))))
+		await store.receive(.internal(.system(.sendMessageReceivedReceiptBackToPeer(.previewValue, readMessage: request.originalMessage))))
 
 		await store.receive(.internal(.system(.receivedRequestIsValidHandleIt(request)))) {
 			$0.unfinishedRequestsFromClient.queue(requestFromClient: request)
@@ -66,7 +66,7 @@ final class HandleDappRequestsTests: TestCase {
 			.success(newRequest)
 		))))
 
-		await store.receive(.internal(.system(.sendMessageReceivedReceiptBackToPeer(.placeholder, readMessage: newRequest.originalMessage))))
+		await store.receive(.internal(.system(.sendMessageReceivedReceiptBackToPeer(.previewValue, readMessage: newRequest.originalMessage))))
 
 		await store.receive(.internal(.system(.receivedRequestIsValidHandleIt(newRequest)))) {
 			$0.unfinishedRequestsFromClient.queue(requestFromClient: newRequest)
@@ -82,7 +82,7 @@ final class HandleDappRequestsTests: TestCase {
 
 		let currentNetworkID = NetworkID.mardunet
 		let request = try P2P.RequestFromClient(
-			originalMessage: .placeholder,
+			originalMessage: .previewValue,
 			requestFromDapp: .init(
 				id: .previewValue0,
 				metadata: .init(
@@ -90,10 +90,10 @@ final class HandleDappRequestsTests: TestCase {
 					origin: "",
 					dAppId: ""
 				), items: [
-					.oneTimeAccounts(.placeholder),
+					.oneTimeAccounts(.previewValue),
 				]
 			),
-			client: .placeholder
+			client: .previewValue
 		)
 
 		let error = P2P.ToDapp.Response.Failure.Kind.Error.wrongNetwork
@@ -130,7 +130,7 @@ final class HandleDappRequestsTests: TestCase {
 						messageSent: .init(data: .deadbeef32Bytes, messageID: .deadbeef32Bytes)
 					),
 					responseToDapp: $0.responseToDapp,
-					client: .placeholder
+					client: .previewValue
 				)
 			}
 		}
