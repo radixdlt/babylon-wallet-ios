@@ -22,7 +22,7 @@ final class AppFeatureTests: TestCase {
 	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() async {
 		// given
 		let store = TestStore(
-			initialState: App.State(root: .main(.placeholder)),
+			initialState: App.State(root: .main(.previewValue)),
 			reducer: App()
 		)
 
