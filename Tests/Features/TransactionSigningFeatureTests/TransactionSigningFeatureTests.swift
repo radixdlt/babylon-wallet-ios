@@ -12,7 +12,7 @@ final class TransactionSigningFeatureTests: TestCase {
 			version: .default,
 			message: nil
 		),
-		parentRequest: .placeholder
+		parentRequest: .previewValue
 	)
 
 	lazy var store: TestStore = .init(

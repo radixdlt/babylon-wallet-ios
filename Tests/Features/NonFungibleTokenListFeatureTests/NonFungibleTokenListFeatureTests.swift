@@ -7,7 +7,7 @@ import TestUtils
 final class NonFungibleTokenListFeatureTests: TestCase {
 	func test_toggleIsExpanded_whenTappedOnHeaderRow_thenToggleBetweenExpanedAndCollapsed() async {
 		// given
-		var initialState = NonFungibleTokenList.Row.State.placeholder
+		var initialState = NonFungibleTokenList.Row.State.previewValue
 		initialState.isExpanded = false
 
 		let store = TestStore(

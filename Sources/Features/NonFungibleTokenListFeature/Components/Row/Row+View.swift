@@ -207,7 +207,7 @@ struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleTokenList.Row.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .previewValue,
 				reducer: NonFungibleTokenList.Row()
 			)
 		)

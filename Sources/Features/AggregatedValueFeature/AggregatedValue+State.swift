@@ -26,7 +26,7 @@ public extension AggregatedValue {
 
 #if DEBUG
 public extension AggregatedValue.State {
-	static let placeholder = AggregatedValue.State(
+	static let previewValue = AggregatedValue.State(
 		value: 1_000_000,
 		currency: .usd
 	)

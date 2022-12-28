@@ -106,7 +106,7 @@ public extension P2P.FromDapp.Request {
 #if DEBUG
 
 public extension TransactionManifest {
-	static let placeholder = Self(instructions: .string(complexManifestString))
+	static let previewValue = Self(instructions: .string(complexManifestString))
 }
 
 private let complexManifestString = """
@@ -149,27 +149,27 @@ CALL_METHOD ComponentAddress("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9
 """
 
 public extension P2P.FromDapp.OneTimeAccountsReadRequestItem {
-	static let placeholder: Self = .init(
+	static let previewValue: Self = .init(
 		numberOfAddresses: 1,
 		isRequiringOwnershipProof: false
 	)
 }
 
 public extension P2P.FromDapp.SendTransactionWriteRequestItem {
-	static let placeholder: Self = .init(transactionManifest: .placeholder, version: .default, message: nil)
+	static let previewValue: Self = .init(transactionManifest: .previewValue, version: .default, message: nil)
 }
 
 public extension P2P.FromDapp.Request.ID {
-	static let placeholder = Self.placeholder0
-	static let placeholder0 = Self("E621E1F8-C36C-495A-93FC-0C247A3E6E5F")
-	static let placeholder1 = Self("D621E1F8-C36C-495A-93FC-0C247A3E6E5F")
-	static let placeholder2 = Self("C621E1F8-C36C-495A-93FC-0C247A3E6E5F")
-	static let placeholder3 = Self("B621E1F8-C36C-495A-93FC-0C247A3E6E5F")
-	static let placeholder4 = Self("A621E1F8-C36C-495A-93FC-0C247A3E6E5F")
+	static let previewValue = Self.previewValue0
+	static let previewValue0 = Self("E621E1F8-C36C-495A-93FC-0C247A3E6E5F")
+	static let previewValue1 = Self("D621E1F8-C36C-495A-93FC-0C247A3E6E5F")
+	static let previewValue2 = Self("C621E1F8-C36C-495A-93FC-0C247A3E6E5F")
+	static let previewValue3 = Self("B621E1F8-C36C-495A-93FC-0C247A3E6E5F")
+	static let previewValue4 = Self("A621E1F8-C36C-495A-93FC-0C247A3E6E5F")
 }
 
 public extension P2P.FromDapp.Request.Metadata {
-	static let placeholder = Self(
+	static let previewValue = Self(
 		networkId: .simulator,
 		origin: "Placeholder",
 		dAppId: "Placeholder"
@@ -177,29 +177,29 @@ public extension P2P.FromDapp.Request.Metadata {
 }
 
 public extension P2P.FromDapp.Request {
-	static let placeholderOneTimeAccount: Self = .placeholderOneTimeAccount()
-	static func placeholderOneTimeAccount(
-		id: ID = .placeholder0
+	static let previewValueOneTimeAccount: Self = .previewValueOneTimeAccount()
+	static func previewValueOneTimeAccount(
+		id: ID = .previewValue0
 	) -> Self {
 		try! .init(
 			id: id,
-			metadata: .placeholder,
+			metadata: .previewValue,
 			items: [
-				.oneTimeAccounts(.placeholder),
+				.oneTimeAccounts(.previewValue),
 			]
 		)
 	}
 
-	static let placeholderSignTX: Self = .placeholderSignTX()
+	static let previewValueSignTX: Self = .previewValueSignTX()
 
-	static func placeholderSignTX(
-		id: ID = .placeholder0
+	static func previewValueSignTX(
+		id: ID = .previewValue0
 	) -> Self {
 		try! .init(
 			id: id,
-			metadata: .placeholder,
+			metadata: .previewValue,
 			items: [
-				.sendTransaction(.placeholder),
+				.sendTransaction(.previewValue),
 			]
 		)
 	}

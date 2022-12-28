@@ -52,8 +52,8 @@ public extension AccountCompletion.State {
 
 #if DEBUG
 public extension AccountCompletion.State {
-	static let placeholder: Self = .init(
-		account: .placeholder0,
+	static let previewValue: Self = .init(
+		account: .previewValue0,
 		isFirstAccount: true,
 		destination: .home
 	)

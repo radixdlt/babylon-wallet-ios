@@ -23,7 +23,7 @@ extension NonFungibleTokenList.Row.State: Identifiable {
 
 #if DEBUG
 public extension NonFungibleTokenList.Row.State {
-	static let placeholder = Self(
+	static let previewValue = Self(
 		container: .mock1
 	)
 }

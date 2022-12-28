@@ -156,7 +156,7 @@ struct AccountCompletion_Preview: PreviewProvider {
 
 		return AccountCompletion.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .previewValue,
 				reducer: AccountCompletion()
 			)
 		)

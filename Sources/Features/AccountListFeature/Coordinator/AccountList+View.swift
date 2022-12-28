@@ -56,7 +56,7 @@ struct AccountList_Preview: PreviewProvider {
 		AccountList.View(
 			store: .init(
 				initialState: .init(
-					accounts: .placeholder,
+					accounts: .previewValue,
 					alert: nil
 				),
 				reducer: AccountList()

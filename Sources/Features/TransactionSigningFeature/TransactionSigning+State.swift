@@ -80,7 +80,7 @@ public extension TransactionManifest {
 
 public extension TransactionSigning.State {
 	static var previewValue: Self {
-		.init(request: .init(requestItem: .placeholder, parentRequest: .placeholder))
+		.init(request: .init(requestItem: .previewValue, parentRequest: .previewValue))
 	}
 }
 #endif

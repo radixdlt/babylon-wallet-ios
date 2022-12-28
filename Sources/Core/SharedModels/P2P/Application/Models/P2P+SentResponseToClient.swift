@@ -30,18 +30,18 @@ public extension P2P.SentResponseToClient {
 
 #if DEBUG
 public extension P2P.ToDapp.Response {
-	static let placeholder: Self = .success(.init(id: .placeholder, items: []))
+	static let previewValue: Self = .success(.init(id: .previewValue, items: []))
 }
 
 public extension ChunkingTransportOutgoingMessage {
-	static let placeholder = Self(data: .deadbeef32Bytes, messageID: MessageID())
+	static let previewValue = Self(data: .deadbeef32Bytes, messageID: MessageID())
 }
 
 public extension P2PConnection.SentReceipt {
-	static let placeholder = Self(messageSent: .placeholder)
+	static let previewValue = Self(messageSent: .previewValue)
 }
 
 public extension P2P.SentResponseToClient {
-	static let placeholder = Self(sentReceipt: .placeholder, responseToDapp: .placeholder, client: .placeholder)
+	static let previewValue = Self(sentReceipt: .previewValue, responseToDapp: .previewValue, client: .previewValue)
 }
 #endif // DEBUG

@@ -61,11 +61,11 @@ public extension P2P.RequestItemToHandle {
 
 #if DEBUG
 public extension P2P.RequestItemToHandle {
-	static let placeholderOneTimeAccount: Self = .init(
-		requestItem: .oneTimeAccounts(.placeholder),
+	static let previewValueOneTimeAccount: Self = .init(
+		requestItem: .oneTimeAccounts(.previewValue),
 		parentRequest: try! .init(
-			originalMessage: .placeholder,
-			requestFromDapp: .placeholderOneTimeAccount,
+			originalMessage: .previewValue,
+			requestFromDapp: .previewValueOneTimeAccount,
 			client: .init(
 				displayName: "Placeholder",
 				connectionPassword: Data([0xDE, 0xAD])

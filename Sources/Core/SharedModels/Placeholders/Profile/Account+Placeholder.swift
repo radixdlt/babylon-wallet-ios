@@ -3,7 +3,7 @@ import Foundation
 import Profile
 
 public extension OnNetwork.Account {
-	static var placeholder0: Self {
+	static var previewValue0: Self {
 		try! OnNetwork.Account(
 			address: OnNetwork.Account.EntityAddress(
 				address: "account_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
@@ -28,7 +28,7 @@ public extension OnNetwork.Account {
 		)
 	}
 
-	static var placeholder1: Self {
+	static var previewValue1: Self {
 		try! OnNetwork.Account(
 			address: OnNetwork.Account.EntityAddress(
 				address: "account_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"

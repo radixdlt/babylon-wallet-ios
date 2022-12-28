@@ -27,7 +27,7 @@ extension ChooseAccounts.Row.State: Identifiable {
 #if DEBUG
 import ProfileClient
 public extension ChooseAccounts.Row.State {
-	static let placeholderOne = Self(account: .placeholder0)
-	static let placeholderTwo = Self(account: .placeholder1)
+	static let previewValueOne = Self(account: .previewValue0)
+	static let previewValueTwo = Self(account: .previewValue1)
 }
 #endif
