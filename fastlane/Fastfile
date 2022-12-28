@@ -109,7 +109,7 @@ platform :mac do
 end
 
 private_lane :create_release do
-    puts ENV
+    sh('env')
     sh('git fetch --tags')
     most_recent_tags = sh("git tag | grep 'Beta' | sort -r | head -2").split("\n")
     last_tag = most_recent_tags[0]
