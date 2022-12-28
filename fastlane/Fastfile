@@ -129,7 +129,7 @@ private_lane :create_release do
         end
     end
     versions_string = versions.map { |k, v| "- #{k}: #{v}" }.join("\n")
-    release_description = "**Dependencies**: \n" + versions_string + "\n**Changelog**: \n" + rev_changelog
+    release_description = "**Dependencies**: \n" + versions_string + "\n\n**Changelog**: \n" + rev_changelog
 
     set_github_release(
         repository_name: ENV['REPO_NAME'],
