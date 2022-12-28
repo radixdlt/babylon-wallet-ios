@@ -109,7 +109,6 @@ platform :mac do
 end
 
 private_lane :create_release do
-    sh('env')
     sh('git fetch --tags')
     most_recent_tags = sh("git tag | grep 'Beta' | sort -r | head -2").split("\n")
     last_tag = most_recent_tags[0]
@@ -130,10 +129,10 @@ private_lane :create_release do
         end
     end
     versions_string = versions.map { |k, v| "- #{k}: #{v}" }.join("\n")
-    release_description = "**Dependencies**: \n" + versions_string + "\n\v**Changelog**: \n" + rev_changelog
+    release_description = "**Dependencies**: \n" + versions_string + "\n**Changelog**: \n" + rev_changelog
 
     set_github_release(
-        repository_name: "radixdlt/babylon-wallet-ios",
+        repository_name: ENV['REPO_NAME'],
         api_token: ENV['GIT_TOKEN'] ,
         name: last_tag,
         tag_name: last_tag,
