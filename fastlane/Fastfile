@@ -138,8 +138,7 @@ private_lane :create_beta_gh_release do
         api_token: ENV['GIT_TOKEN'] ,
         name: last_tag,
         tag_name: last_tag,
-        description: release_description,
-        is_draft: true # temporary use for debugging
+        description: release_description
     )
 end
 
