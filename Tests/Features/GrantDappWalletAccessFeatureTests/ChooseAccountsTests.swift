@@ -12,7 +12,7 @@ final class ChooseAccountsTests: TestCase {
 		// given
 		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
 			requestItem: .init(numberOfAddresses: 1),
-			parentRequest: .placeholder
+			parentRequest: .previewValue
 		)
 		var singleAccount = ChooseAccounts.Row.State.previewValueOne
 		singleAccount.isSelected = true
@@ -38,7 +38,7 @@ final class ChooseAccountsTests: TestCase {
 		// given
 		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
 			requestItem: .init(numberOfAddresses: 1),
-			parentRequest: .placeholder
+			parentRequest: .previewValue
 		)
 		let store = TestStore(
 			initialState: ChooseAccounts.State(request: requestItem),
@@ -58,7 +58,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = true
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: 1), parentRequest: .placeholder),
+			request: .init(requestItem: .init(numberOfAddresses: 1), parentRequest: .previewValue),
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
@@ -89,7 +89,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: .oneOrMore), parentRequest: .placeholder),
+			request: .init(requestItem: .init(numberOfAddresses: .oneOrMore), parentRequest: .previewValue),
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
@@ -124,7 +124,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .placeholder),
+			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .previewValue),
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
@@ -155,7 +155,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .placeholder),
+			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .previewValue),
 			canProceed: true,
 			accounts: .init(
 				uniqueElements: [
