@@ -63,3 +63,5 @@ jobs:
             FLAVOUR=${{ github.event.inputs.flavour }}
           fi
           bundle exec fastlane ios deploy --env ios.$FLAVOUR
+        env:
+          GIT_TOKEN: ${{ secrets.RADIX_BOT_PAT }}
