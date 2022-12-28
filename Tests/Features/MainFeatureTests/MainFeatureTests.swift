@@ -8,7 +8,7 @@ final class MainFeatureTests: TestCase {
 	func test_displaySettings_whenCoordinatedToDispaySettings_thenDisplaySettings() async {
 		// given
 		let store = TestStore(
-			initialState: Main.State(home: .placeholder),
+			initialState: Main.State(home: .previewValue),
 			reducer: Main()
 		)
 		store.exhaustivity = .off
@@ -23,7 +23,7 @@ final class MainFeatureTests: TestCase {
 	func test_dismissSettings_whenCoordinatedToDismissSettings_thenDismissSettings() async {
 		// given
 		let store = TestStore(
-			initialState: Main.State(home: .placeholder, settings: .init()),
+			initialState: Main.State(home: .previewValue, settings: .init()),
 			reducer: Main()
 		)
 
