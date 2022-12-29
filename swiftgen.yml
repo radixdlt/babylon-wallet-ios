@@ -22,5 +22,5 @@ fonts:
   outputs:
     params:
       publicAccess: true
-    templateName: templates/SwiftGen/Fonts.stencil
+    templateName: swift5
     output: Fonts.generated.swift
