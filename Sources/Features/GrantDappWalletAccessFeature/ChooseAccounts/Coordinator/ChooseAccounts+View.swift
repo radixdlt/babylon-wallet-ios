@@ -136,9 +136,7 @@ extension ChooseAccounts.View {
 // MARK: - ChooseAccounts_Preview
 struct ChooseAccounts_Preview: PreviewProvider {
 	static var previews: some View {
-		registerFonts()
-
-		return ChooseAccounts.View(
+		ChooseAccounts.View(
 			store: .init(
 				initialState: .previewValue,
 				reducer: ChooseAccounts()

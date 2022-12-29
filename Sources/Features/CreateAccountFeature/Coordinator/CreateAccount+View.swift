@@ -151,9 +151,7 @@ private extension CreateAccount.View {
 // MARK: - CreateAccount_Previews
 struct CreateAccount_Previews: PreviewProvider {
 	static var previews: some View {
-		registerFonts()
-
-		return CreateAccount.View(
+		CreateAccount.View(
 			store: .init(
 				initialState: .init(shouldCreateProfile: false),
 				reducer: CreateAccount()
