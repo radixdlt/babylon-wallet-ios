@@ -16,3 +16,11 @@ xcassets:
       publicAccess: true
     templatePath: templates/SwiftGen/AssetResource.stencil
     output: AssetResource.generated.swift
+
+fonts:
+  inputs: Fonts
+  outputs:
+    params:
+      publicAccess: true
+    templateName: swift5
+    output: Fonts.generated.swift

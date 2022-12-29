@@ -904,9 +904,6 @@ package.addModules([
 			"Resources",
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation"),
 		],
-		resources: [
-			.process("Fonts"),
-		],
 		tests: .yes(
 			dependencies: [
 				"TestUtils",
@@ -923,7 +920,8 @@ package.addModules([
 		plugins: [
 			.plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin"),
 		],
-		tests: .no
+		tests: .no,
+		isProduct: true
 	),
 	.core(
 		name: "TestUtils",
