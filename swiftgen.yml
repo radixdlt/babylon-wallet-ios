@@ -13,8 +13,9 @@ xcassets:
   inputs: Assets.xcassets
   outputs:
     params:
+      enumName: AssetResource
       publicAccess: true
-    templatePath: templates/SwiftGen/AssetResource.stencil
+    templateName: swift5
     output: AssetResource.generated.swift
 
 fonts:
