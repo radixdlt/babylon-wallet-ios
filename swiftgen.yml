@@ -6,7 +6,7 @@ strings:
   outputs:
     params:
       publicAccess: true
-    templatePath: templates/SwiftGen/L10n.stencil
+    templateName: structured-swift5
     output: L10n.generated.swift
 
 xcassets:
