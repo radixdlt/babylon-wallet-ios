@@ -47,7 +47,7 @@ platform :ios do
         tag = "%s#%s-%s" % [app_version, build_number, ENV['FLAVOUR']]
         add_git_tag(tag: tag)
         push_to_git_remote
-        if ENV['FLAVOUR'] == Beta
+        if ENV['FLAVOUR'] == "Beta"
             create_beta_gh_release
         end
     end
