@@ -57,7 +57,6 @@ public extension ImportProfile.View {
 }
 
 #if DEBUG
-
 struct ImportProfile_Preview: PreviewProvider {
 	static var previews: some View {
 		ImportProfile.View(
