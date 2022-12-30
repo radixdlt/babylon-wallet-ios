@@ -69,8 +69,6 @@ extension ChooseAccounts.Row.View {
 }
 
 #if DEBUG
-
-// MARK: - Row_Preview
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		ChooseAccounts.Row.View(
@@ -81,4 +79,4 @@ struct Row_Preview: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
+#endif
