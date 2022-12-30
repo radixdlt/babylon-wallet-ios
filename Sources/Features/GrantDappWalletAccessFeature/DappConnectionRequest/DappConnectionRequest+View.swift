@@ -82,19 +82,17 @@ extension DappConnectionRequest.View {
 	}
 }
 
-// #if DEBUG
-//
-//// MARK: - IncomingConnectionRequestFromDappReview_Preview
-// struct IncomingConnectionRequestFromDappReview_Preview: PreviewProvider {
-//	static var previews: some View {
-//		registerFonts()
-//
-//		return DappConnectionRequest.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: DappConnectionRequest()
-//			)
-//		)
-//	}
-// }
-// #endif // DEBUG
+#if DEBUG
+
+// MARK: - IncomingConnectionRequestFromDappReview_Preview
+struct IncomingConnectionRequestFromDappReview_Preview: PreviewProvider {
+	static var previews: some View {
+		DappConnectionRequest.View(
+			store: .init(
+				initialState: .previewValue,
+				reducer: DappConnectionRequest()
+			)
+		)
+	}
+}
+#endif // DEBUG

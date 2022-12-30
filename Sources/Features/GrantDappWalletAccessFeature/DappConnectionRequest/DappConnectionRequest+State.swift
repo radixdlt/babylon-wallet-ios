@@ -24,3 +24,9 @@ public extension DappConnectionRequest.State {
 		)
 	}
 }
+
+#if DEBUG
+public extension DappConnectionRequest.State {
+	static var previewValue: Self { try! .init(request: .previewValue) }
+}
+#endif
