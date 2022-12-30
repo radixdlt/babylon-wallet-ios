@@ -1,6 +1,6 @@
 import Foundation
 
-// MARK: ImportProfile.State
+// MARK: - ImportProfile.State
 public extension ImportProfile {
 	struct State: Equatable {
 		public var isDisplayingFileImporter = false
@@ -12,3 +12,9 @@ public extension ImportProfile {
 		}
 	}
 }
+
+#if DEBUG
+public extension ImportProfile.State {
+	static let previewValue: Self = .init()
+}
+#endif
