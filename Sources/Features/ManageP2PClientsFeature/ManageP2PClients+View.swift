@@ -123,3 +123,16 @@ public extension ManageP2PClients.View {
 		}
 	}
 }
+
+#if DEBUG
+struct ManageP2PClients_Preview: PreviewProvider {
+	static var previews: some View {
+		ManageP2PClients.View(
+			store: .init(
+				initialState: .previewValue,
+				reducer: ManageP2PClients()
+			)
+		)
+	}
+}
+#endif
