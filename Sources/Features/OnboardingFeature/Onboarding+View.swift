@@ -32,3 +32,16 @@ public extension Onboarding.View {
 		}
 	}
 }
+
+#if DEBUG
+struct Onboarding_Preview: PreviewProvider {
+	static var previews: some View {
+		Onboarding.View(
+			store: .init(
+				initialState: .previewValue,
+				reducer: Onboarding()
+			)
+		)
+	}
+}
+#endif

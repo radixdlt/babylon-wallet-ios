@@ -2,7 +2,7 @@ import ComposableArchitecture
 import CreateAccountFeature
 import ImportProfileFeature
 
-// MARK: Onboarding.State
+// MARK: - Onboarding.State
 public extension Onboarding {
 	// MARK: State
 	struct State: Equatable {
@@ -18,3 +18,9 @@ public extension Onboarding {
 		}
 	}
 }
+
+#if DEBUG
+public extension Onboarding.State {
+	static let previewValue: Self = .init()
+}
+#endif
