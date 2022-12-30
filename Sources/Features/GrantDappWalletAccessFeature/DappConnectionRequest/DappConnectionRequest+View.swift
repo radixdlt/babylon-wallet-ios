@@ -95,4 +95,4 @@ struct IncomingConnectionRequestFromDappReview_Preview: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
+#endif
