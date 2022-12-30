@@ -176,7 +176,7 @@ public extension Settings.View {
 	}
 }
 
-// MARK: - SettingsView_Previews
+#if DEBUG
 struct SettingsView_Previews: PreviewProvider {
 	static var previews: some View {
 		Settings.View(
@@ -187,3 +187,4 @@ struct SettingsView_Previews: PreviewProvider {
 		)
 	}
 }
+#endif
