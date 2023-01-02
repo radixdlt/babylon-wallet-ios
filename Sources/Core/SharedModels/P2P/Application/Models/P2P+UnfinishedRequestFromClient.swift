@@ -164,12 +164,12 @@ internal extension P2P.UnfinishedRequestFromClient {
 		if !unfinishedRequestItems.contains(where: { $0 == newlyFinished }) {
 //			throw UnknownRequestItem()
 			assertionFailure("Unknown request item")
-                        return nil
+			return nil
 		}
 		if finishedResponseItems.contains(where: { $0 == responseItem }) {
 //			throw AlreadyFinishItem()
-                        assertionFailure("Finished already finished item")
-                        return nil
+			assertionFailure("Finished already finished item")
+			return nil
 		}
 		unfinishedRequestItems.removeAll(where: { $0 == newlyFinished })
 		finishedResponseItems.append(responseItem)
