@@ -341,7 +341,6 @@ package.addModules([
 			engineToolkit,
 			"ErrorQueue",
 			"GatewayAPI",
-			"KeychainClientDependency",
 			"LocalAuthenticationClient",
 			"ProfileClient",
 			tca,
@@ -453,7 +452,6 @@ package.addModules([
 			"ErrorQueue",
 			"FileClient",
 			"JSON",
-			"KeychainClientDependency",
 			"ProfileClient",
 			tca,
 		],
@@ -573,7 +571,6 @@ package.addModules([
 			engineToolkit,
 			"ErrorQueue",
 			"GatewayAPI",
-			"KeychainClientDependency",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"ProfileClient",
@@ -728,14 +725,6 @@ package.addModules([
 		tests: .no
 	),
 	.client(
-		name: "KeychainClientDependency",
-		dependencies: [
-			dependencies,
-			engineToolkit,
-		],
-		tests: .no
-	),
-	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [
 			dependencies,
@@ -779,7 +768,6 @@ package.addModules([
 		dependencies: [
 			dependencies, // XCTestDynamicOverlay + DependencyKey
 			"EngineToolkitClient", // Create TX
-			"ProfileLoader",
 			"SharedModels",
 			"UserDefaultsClient",
 		],
@@ -793,7 +781,7 @@ package.addModules([
 			"Common",
 			engineToolkit,
 			"JSON",
-			"KeychainClientDependency",
+			"ProfileClient",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
