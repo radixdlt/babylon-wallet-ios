@@ -101,7 +101,10 @@ public extension P2P.UnfinishedRequestsFromClient {
 		_ newlyFinished: P2P.FromDapp.WalletRequestItem,
 		with responseItem: P2P.ToDapp.WalletResponseItem
 	) -> P2P.ToDapp.Response? {
-		if current == nil { preconditionFailure("Expected current") }
+		if current == nil {
+			assertionFailure("Expected current")
+			return nil
+		}
 		guard let finished = current?.finish(newlyFinished, with: responseItem) else {
 			return nil
 		}
