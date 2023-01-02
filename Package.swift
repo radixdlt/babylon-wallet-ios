@@ -17,7 +17,7 @@ let package = Package(
 package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.2.1"),
-	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", branch: "implicit-deps"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", branch: "implicit-deps"),
 
 	// ~~~ THIRD PARTY ~~~
 	// APPLE
@@ -93,9 +93,9 @@ let p2pModels: Target.Dependency = .product(
 	package: "Converse"
 )
 
-let engineToolkit: Target.Dependency = .product(
-	name: "EngineToolkit",
-	package: "swift-engine-toolkit"
+let profile: Target.Dependency = .product(
+	name: "Profile",
+	package: "swift-profile"
 )
 
 // MARK: - Defining TCA Modules
@@ -248,7 +248,7 @@ package.addModules([
 			"Asset",
 			"AssetsViewFeature",
 			"DesignSystem",
-			engineToolkit,
+			profile,
 			tca,
 
 		],
@@ -299,7 +299,6 @@ package.addModules([
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AccountPortfolio",
 			"AppSettings",
-			engineToolkit,
 			"ErrorQueue",
 			"MainFeature",
 			"OnboardingFeature",
@@ -307,6 +306,7 @@ package.addModules([
 			"ProfileLoader",
 			"ProfileClient",
 			"Resources",
+			profile,
 			"SplashFeature",
 			tca,
 			"UserDefaultsClient",
@@ -338,7 +338,6 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"DesignSystem",
-			engineToolkit,
 			"ErrorQueue",
 			"GatewayAPI",
 			"LocalAuthenticationClient",
@@ -375,7 +374,7 @@ package.addModules([
 			dependencies: [
 				"Asset",
 				"DesignSystem",
-				engineToolkit,
+				profile,
 				tca,
 				"TestUtils",
 			]
@@ -406,8 +405,8 @@ package.addModules([
 		name: "HandleDappRequests",
 		dependencies: [
 			collections,
-			engineToolkit,
 			"GrantDappWalletAccessFeature",
+			profile,
 			"P2PConnectivityClient",
 			"SharedModels",
 			tca,
@@ -426,7 +425,6 @@ package.addModules([
 			"P2PConnectivityClient",
 			"Common",
 			"CreateAccountFeature",
-			engineToolkit,
 			"GrantDappWalletAccessFeature",
 			"PasteboardClient",
 			"ProfileClient",
@@ -466,10 +464,10 @@ package.addModules([
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AppSettings",
 			"AccountPortfolio",
-			engineToolkit,
 			"HandleDappRequests",
 			"HomeFeature",
 			"PasteboardClient",
+			profile,
 			"SettingsFeature",
 			tca,
 			// ^^^ Sort lexicographically ^^^
@@ -537,8 +535,8 @@ package.addModules([
 			"Asset",
 			"Common",
 			"DesignSystem",
-			engineToolkit,
 			"PasteboardClient",
+			profile,
 			"SharedModels",
 			tca,
 		],
@@ -568,7 +566,6 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-			engineToolkit,
 			"ErrorQueue",
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
@@ -629,9 +626,9 @@ package.addModules([
 			"AppSettings",
 			"Asset",
 			"Common",
-			engineToolkit,
 			"GatewayAPI",
 			dependencies,
+			profile,
 		],
 		tests: .yes(
 			dependencies: [
@@ -664,7 +661,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			dependencies,
-			engineToolkit,
+			profile,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -684,7 +681,6 @@ package.addModules([
 		dependencies: [
 			"Common",
 			dependencies,
-			engineToolkit,
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"ProfileClient",
@@ -705,7 +701,6 @@ package.addModules([
 			"Asset",
 			"Common",
 			dependencies, // XCTestDynamicOverlay + DependencyKey
-			engineToolkit,
 			"EngineToolkitClient",
 			"JSON",
 			"ProfileClient",
@@ -740,7 +735,6 @@ package.addModules([
 			asyncExtensions,
 			"Common",
 			dependencies,
-			engineToolkit, // Model: SignTX contains Manifest, Account
 			"JSON",
 			p2pConnection,
 			"ProfileClient",
@@ -779,7 +773,6 @@ package.addModules([
 		name: "ProfileLoader",
 		dependencies: [
 			"Common",
-			engineToolkit,
 			"JSON",
 			"ProfileClient",
 		],
@@ -824,8 +817,8 @@ package.addModules([
 		name: "Common",
 		dependencies: [
 			"DesignSystem",
-			engineToolkit,
 			legibleError,
+			profile,
 			"Resources",
 			tagged,
 		],
@@ -838,10 +831,9 @@ package.addModules([
 		dependencies: [
 			"Asset",
 			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make Converse, EngineToolkit, etc. vend their own Model packages.
-			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
 			collections,
 			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make EngineToolkit, etc. vend their own Model packages.
-			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
+			profile, // FIXME: In `Profile` split out Models package
 			nonEmpty,
 			p2pModels,
 			p2pConnection,
@@ -880,8 +872,8 @@ package.addModules([
 	.core(
 		name: "TestUtils",
 		dependencies: [
-			engineToolkit,
 			"Common",
+			profile,
 			tca,
 		],
 		tests: .no

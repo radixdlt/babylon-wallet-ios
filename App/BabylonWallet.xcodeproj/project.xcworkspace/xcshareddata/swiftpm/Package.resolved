@@ -73,6 +73,15 @@
       }
     },
     {
+      "identity" : "keychainaccess",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
+      "state" : {
+        "revision" : "84e546727d66f1adc5439debad16270d0fdd04e7",
+        "version" : "4.2.2"
+      }
+    },
+    {
       "identity" : "legibleerror",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mxcl/LegibleError",
@@ -235,6 +244,15 @@
       }
     },
     {
+      "identity" : "swift-profile",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:radixdlt/swift-profile.git",
+      "state" : {
+        "branch" : "implicit-deps",
+        "revision" : "f1657901089d77625eb67906fc31dedc79f17b2f"
+      }
+    },
+    {
       "identity" : "swift-tagged",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-tagged.git",
@@ -268,6 +286,15 @@
       "state" : {
         "revision" : "46acf5ecc1cabdb28d7fe03289f6c8b13a023f52",
         "version" : "0.4.5"
+      }
+    },
+    {
+      "identity" : "version",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mxcl/Version",
+      "state" : {
+        "revision" : "1fe824b80d89201652e7eca7c9252269a1d85e25",
+        "version" : "2.0.1"
       }
     },
     {
