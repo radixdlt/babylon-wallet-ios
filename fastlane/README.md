@@ -98,10 +98,10 @@ Registers a new iPhone device and updates the certificates
 
 Runs tests
 
-### mac install_certificates
+### mac install_development_certificates
 
 ```sh
-[bundle exec] fastlane mac install_certificates
+[bundle exec] fastlane mac install_development_certificates
 ```
 
 Installs certificates on the machine
