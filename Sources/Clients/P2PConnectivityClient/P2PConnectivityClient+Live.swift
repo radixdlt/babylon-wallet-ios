@@ -38,6 +38,13 @@ public extension P2PConnectivityClient {
 
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
+		@Sendable func client(byID id: P2PClient.ID) async throws -> P2PClient {
+			guard let client = try await profileClient.p2pClient(for: id) else {
+				throw P2PClientNotFoundInProfile()
+			}
+			return client
+		}
+
 		return Self(
 			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
@@ -62,94 +69,73 @@ public extension P2PConnectivityClient {
 					)
 				})
 			},
-			addP2PClientWithConnection: { _, _ in
-//				try await profileClient.addP2PClient(clientWithConnection.client)
-//				await connectionsHolder.addConnection(clientWithConnection, connect: alsoConnect, emitUpdate: true)
-				fatalError()
+			addP2PClientWithConnection: { client, autoconnect in
+				try await profileClient.addP2PClient(client)
+				_ = try await P2PConnections.shared.add(config: client.config, autoconnect: autoconnect)
 			},
-			deleteP2PClientByID: { _ in
-//				try await profileClient.deleteP2PClientByID(id)
-//				await connectionsHolder.disconnectedAndRemove(id)
-				fatalError()
+			deleteP2PClientByID: { id in
+				try await profileClient.deleteP2PClientByID(id)
+				try await P2PConnections.shared.removeAndDisconnect(id: id)
 			},
 			getConnectionStatusAsyncSequence: { id in
 				try await P2PConnections.shared.connectionStatusChangeEventAsyncSequence(for: id).map {
-					guard let client = try await profileClient.p2pClient(for: id) else {
-						throw P2PClientNotFoundInProfile()
-					}
-					return P2P.ConnectionUpdate(connectionStatus: $0.connectionStatus, p2pClient: client)
+					try await P2P.ConnectionUpdate(
+						connectionStatus: $0.connectionStatus,
+						p2pClient: client(byID: id)
+					)
 				}.eraseToAnyAsyncSequence()
 			},
-			getRequestsFromP2PClientAsyncSequence: { _ in
-//				guard let connection = await connectionsHolder.getConnection(id: id) else {
-//					return AsyncLazySequence([]).eraseToAnyAsyncSequence()
-//				}
-//				return await connection.p2pConnection.incomingMessagesPublisher.tryMap { (msg: ChunkingTransportIncomingMessage) in
-//					@Dependency(\.jsonDecoder) var jsonDecoder
-//
-//					let jsonData = msg.messagePayload
-//					do {
-//						let requestFromDapp = try jsonDecoder().decode(P2P.FromDapp.Request.self, from: jsonData)
-//
-//						return try P2P.RequestFromClient(
-//							originalMessage: msg,
-//							requestFromDapp: requestFromDapp,
-//							client: connection.client
-//						)
-//					} catch {
-//						throw FailedToDecodeRequestFromDappError(
-//							error: error,
-//							jsonString: String(data: jsonData, encoding: .utf8) ?? jsonData.hex
-//						)
-//					}
-//				}.values.eraseToAnyAsyncSequence()
-				fatalError()
+			getRequestsFromP2PClientAsyncSequence: { id in
+				try await P2PConnections.shared.incomingMessagesAsyncSequence(for: id).map { msg in
+					@Dependency(\.jsonDecoder) var jsonDecoder
+
+					let jsonData = msg.messagePayload
+					do {
+						let requestFromDapp = try jsonDecoder().decode(P2P.FromDapp.Request.self, from: jsonData)
+						return try await P2P.RequestFromClient(
+							originalMessage: msg,
+							requestFromDapp: requestFromDapp,
+							client: client(byID: id)
+						)
+					} catch {
+						throw FailedToDecodeRequestFromDappError(
+							error: error,
+							jsonString: String(data: jsonData, encoding: .utf8) ?? jsonData.hex
+						)
+					}
+				}
+				.eraseToAnyAsyncSequence()
+
 			},
-			sendMessageReadReceipt: { _, _ in
-//				guard let connection = await connectionsHolder.getConnection(id: id) else {
-//					throw P2PConnectionOffline()
-//				}
-//				try await connection.p2pConnection.sendReadReceipt(for: readMessage)
-				fatalError()
+			sendMessageReadReceipt: { id, msg in
+				try await P2PConnections.shared.sendReceipt(for: id, readMessage: msg)
 			},
-			sendMessage: { _ in
-//				@Dependency(\.jsonEncoder) var jsonEncoder
-//
-//				guard let connection = await connectionsHolder.getConnection(id: outgoingMsg.connectionID) else {
-//					throw P2PConnectionOffline()
-//				}
-//				let responseToDappData = try jsonEncoder().encode(outgoingMsg.responseToDapp)
-//				let p2pChannelRequestID = UUID().uuidString
-//
-//				try await connection.p2pConnection.send(
-//					data: responseToDappData,
-//					id: p2pChannelRequestID
-//				)
-//
-//				for try await receipt in await connection.p2pConnection.sentReceiptsPublisher.values {
-//					guard receipt.messageSent.messageID == p2pChannelRequestID else { continue }
-//					return P2P.SentResponseToClient(
-//						sentReceipt: receipt,
-//						responseToDapp: outgoingMsg.responseToDapp,
-//						client: connection.client
-//					)
-//				}
-//				throw FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp()
-				fatalError()
+			sendMessage: { outgoingMsg in
+				@Dependency(\.jsonEncoder) var jsonEncoder
+				let id = outgoingMsg.connectionID
+				let responseToDappData = try jsonEncoder().encode(outgoingMsg.responseToDapp)
+				let p2pChannelRequestID = UUID().uuidString
+				try await P2PConnections.shared.sendData(for: id, data: responseToDappData, messageID: p2pChannelRequestID)
+
+				for try await receipt in try await P2PConnections.shared.sentReceiptsAsyncSequence(for: id) {
+					guard receipt.messageSent.messageID == p2pChannelRequestID else { continue }
+					return try await P2P.SentResponseToClient(
+						sentReceipt: receipt,
+						responseToDapp: outgoingMsg.responseToDapp,
+						client: client(byID: id)
+					)
+				}
+
+				throw FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp()
 			},
-			_sendTestMessage: { _, _ in
-//				guard let connection = await connectionsHolder.getConnection(id: id) else {
-//					print("No connection found for: \(id)")
-//					return
-//				}
-//				do {
-//					try await connection.p2pConnection.send(data: Data(message.utf8), id: UUID().uuidString)
-//				} catch {
-//					print("Failed to send test message, error: \(String(describing: error))")
-//				}
-//
-//				// does not care about sent message receipts
-				fatalError()
+			_sendTestMessage: { id, message in
+				let msgID = UUID().uuidString
+				do {
+					try await P2PConnections.shared.sendData(for: id, data: Data(message.utf8), messageID: msgID)
+				} catch {
+					print("Failed to send test message, error: \(String(describing: error))")
+				}
+				// does not care about sent message receipts
 			}
 		)
 	}()
@@ -167,7 +153,7 @@ struct P2PConnectionOffline: LocalizedError {
 struct P2PClientNotFoundInProfile: LocalizedError {
 	init() {}
 	var errorDescription: String? {
-		"P2PClient not found in profile"
+		L10n.Common.p2PClientNotFoundInProfile
 	}
 }
 
