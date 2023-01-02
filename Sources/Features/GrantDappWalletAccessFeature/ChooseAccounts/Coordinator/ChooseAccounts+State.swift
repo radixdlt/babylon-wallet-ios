@@ -44,12 +44,12 @@ extension ChooseAccounts.State {
 
 #if DEBUG
 public extension ChooseAccounts.State {
-	static let placeholder: Self = .init(
-		request: .init(requestItem: .placeholder, parentRequest: .placeholder),
+	static let previewValue: Self = .init(
+		request: .init(requestItem: .previewValue, parentRequest: .previewValue),
 		canProceed: false,
 		accounts: .init(
 			uniqueElements: [
-				.placeholderOne,
+				.previewValueOne,
 			]
 		),
 		createAccount: nil

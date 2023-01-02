@@ -4,7 +4,7 @@ import Profile
 // MARK: - AccountDetails.Action
 public extension AccountDetails {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -14,14 +14,14 @@ public extension AccountDetails {
 
 // MARK: - AccountDetails.Action.ChildAction
 public extension AccountDetails.Action {
-	enum ChildAction: Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case assets(AssetsView.Action)
 	}
 }
 
 // MARK: - AccountDetails.Action.ViewAction
 public extension AccountDetails.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case dismissAccountDetailsButtonTapped
 		case displayAccountPreferencesButtonTapped
@@ -33,14 +33,14 @@ public extension AccountDetails.Action {
 
 // MARK: - AccountDetails.Action.InternalAction
 public extension AccountDetails.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 	}
 }
 
 // MARK: - AccountDetails.Action.DelegateAction
 public extension AccountDetails.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case dismissAccountDetails
 		case displayAccountPreferences(AccountAddress)
 		case copyAddress(AccountAddress)

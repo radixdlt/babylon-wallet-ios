@@ -173,8 +173,8 @@ bundle install
 - Run the below command to bring the necessary certificates for development:
 
 ```sh
-bundle exec fastlane ios install_certificates
-bundle exec fastlane mac install_certificates
+bundle exec fastlane ios install_development_certificates
+bundle exec fastlane mac install_development_certificates
 ```
 - If your device is unregistered, register it with the below command, it will prompt you to enter the device name and device UDID.
 
@@ -201,22 +201,8 @@ After the above setup, you are good to go with building and running the app on i
 # Releasing
 
 ## Versioning
-We use SemVer, semantically versioning on format `MAJOR.MINOR.PATCH` (with a "build #\(BUILD)" suffix in UI).
-
-To to update the version number or build number, you only have to change the value in one place (disregarding of targets) and that is in Project Settings (not target) and scroll down to the buttom under "User-Defined" section an update values of keys accordinly:
-
-```
-BUILD_NUMBER_GLOBAL_UNIQUE
-BUILD_VERSION_MAJOR
-BUILD_VERSION_MINOR
-BUILD_VERSION_PATCH
-```
-
-Note that `BUILD_NUMBER_GLOBAL_UNIQUE` is not per version, it is a "globally unique" number, which always should uniquely identify the build.
-
-If you add a new target you need to go to "Build Settings" for the new target and under section "Versioning":
-set `MARKETING_VERSION` to `$(BUILD_VERSION_MAJOR).$(BUILD_VERSION_MINOR).$(BUILD_VERSION_PATCH)` 
-and set `CURRENT_PROJECT_VERSION` to `$(BUILD_NUMBER_GLOBAL_UNIQUE)`.
+We use SemVer, semantically versioning on format `MAJOR.MINOR.PATCH` (with a "build #\(BUILD)" suffix in UI). 
+Application version is specified in [Common.xcconfig](App/Config/Common.xcconfig), and is shared between all targets with their respective `.xcconfig` file.
 
 [radixdlt]: https://radixdlt.com
 [tca]: https://github.com/pointfreeco/swift-composable-architecture

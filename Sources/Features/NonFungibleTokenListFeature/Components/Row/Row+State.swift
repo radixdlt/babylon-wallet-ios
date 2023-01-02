@@ -4,7 +4,7 @@ import Foundation
 // MARK: - NonFungibleTokenList.Row.State
 public extension NonFungibleTokenList.Row {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public var container: NonFungibleTokenContainer
 		public var isExpanded = false
 
@@ -23,7 +23,7 @@ extension NonFungibleTokenList.Row.State: Identifiable {
 
 #if DEBUG
 public extension NonFungibleTokenList.Row.State {
-	static let placeholder = Self(
+	static let previewValue = Self(
 		container: .mock1
 	)
 }

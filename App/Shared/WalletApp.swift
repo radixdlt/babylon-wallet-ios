@@ -10,10 +10,6 @@ import XCTestDynamicOverlay
 // MARK: - WalletApp
 @main
 struct WalletApp: SwiftUI.App {
-	init() {
-		DesignSystem.registerFonts()
-	}
-
 	var body: some SwiftUI.Scene {
 		WindowGroup {
 			// Disable starting app when running tests, see TCA discussion:

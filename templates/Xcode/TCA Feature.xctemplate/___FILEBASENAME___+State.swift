@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - ___VARIABLE_featureName___.State
 public extension ___VARIABLE_featureName___ {
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public init() {}
 	}
 }

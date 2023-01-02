@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import FungibleTokenDetailsFeature
 
-public struct FungibleTokenList: ReducerProtocol {
+public struct FungibleTokenList: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {

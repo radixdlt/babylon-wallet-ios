@@ -4,7 +4,7 @@ import Profile
 
 // MARK: - AccountCompletion.State
 public extension AccountCompletion {
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public let account: OnNetwork.Account
 		public let isFirstAccount: Bool
 		public let destination: Destination
@@ -52,8 +52,8 @@ public extension AccountCompletion.State {
 
 #if DEBUG
 public extension AccountCompletion.State {
-	static let placeholder: Self = .init(
-		account: .placeholder0,
+	static let previewValue: Self = .init(
+		account: .previewValue0,
 		isFirstAccount: true,
 		destination: .home
 	)

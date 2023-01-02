@@ -27,14 +27,14 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		) {
 			$0.networkSwitchingClient.getNetworkAndGateway = {
 				await getNetworkAndGatewayCalled.setValue(true)
-				return .placeholder
+				return .previewValue
 			}
 		}
 		store.exhaustivity = .off
 		// WHEN view did appear
 		await store.send(.internal(.view(.didAppear)))
 		// THEN current network is loaded
-		await store.receive(.internal(.system(.loadNetworkAndGatewayResult(.success(.placeholder)))))
+		await store.receive(.internal(.system(.loadNetworkAndGatewayResult(.success(.previewValue)))))
 		await getNetworkAndGatewayCalled.withValue {
 			XCTAssertTrue($0)
 		}
@@ -42,7 +42,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 
 	func test__GIVEN__current_network_and_gateway__WHEN__user_inputs_same_url__THEN__switchToButton_remains_disabled() async throws {
 		// GIVEN a current network and gateway
-		let currentNetworkAndGateway: AppPreferences.NetworkAndGateway = .placeholder
+		let currentNetworkAndGateway: AppPreferences.NetworkAndGateway = .previewValue
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
 				currentNetworkAndGateway: currentNetworkAndGateway,
@@ -82,7 +82,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 
 	func test__GIVEN__switchToButton_is_enabled__WHEN__user_inputs_an_invalid_url__THEN__switchToButton_is_disabled() async throws {
 		// GIVEN a current network and gateway
-		let currentNetworkAndGateway: AppPreferences.NetworkAndGateway = .placeholder
+		let currentNetworkAndGateway: AppPreferences.NetworkAndGateway = .previewValue
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
 				currentNetworkAndGateway: currentNetworkAndGateway,
@@ -192,11 +192,11 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			}
 		}
 		store.exhaustivity = .off
-		await store.send(.createAccount(.delegate(.createdNewAccount(.placeholder0)))) {
+		await store.send(.createAccount(.delegate(.createdNewAccount(.previewValue0)))) {
 			$0.createAccount = .init(onNetworkWithID: newNetworkAndGateway.network.id, shouldCreateProfile: false)
 		}
 
-		await store.receive(.createAccount(.delegate(.displayCreateAccountCompletion(.placeholder0, isFirstAccount: true, destination: .home))))
+		await store.receive(.createAccount(.delegate(.displayCreateAccountCompletion(.previewValue0, isFirstAccount: true, destination: .home))))
 
 		await store.send(.createAccount(.child(.accountCompletion(.delegate(.displayHome)))))
 
@@ -255,19 +255,17 @@ import ProfileClient
 #if DEBUG
 
 public extension URL {
-	static let placeholder = URL(string: "https://example.com")!
+	static let previewValue = URL(string: "https://example.com")!
 }
 
 public extension Network {
-	static let placeholder = Self(name: "Placeholder", id: .simulator)
+	static let previewValue = Self(name: "Placeholder", id: .simulator)
 }
 
 public extension AppPreferences.NetworkAndGateway {
-	static var placeholder: Self {
-		.init(
-			network: .placeholder,
-			gatewayAPIEndpointURL: .placeholder
-		)
-	}
+	static let previewValue = Self(
+		network: .previewValue,
+		gatewayAPIEndpointURL: .previewValue
+	)
 }
 #endif // DEBUG

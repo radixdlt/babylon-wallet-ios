@@ -44,7 +44,7 @@ public extension Settings.View {
 							state: \.manageP2PClients,
 							action: { .child(.manageP2PClients($0)) }
 						),
-						then: ManageP2PClients.View.init(store:)
+						then: { ManageP2PClients.View(store: $0) }
 					)
 					.zIndex(1)
 
@@ -53,7 +53,7 @@ public extension Settings.View {
 							state: \.manageGatewayAPIEndpoints,
 							action: { .child(.manageGatewayAPIEndpoints($0)) }
 						),
-						then: ManageGatewayAPIEndpoints.View.init(store:)
+						then: { ManageGatewayAPIEndpoints.View(store: $0) }
 					)
 					.zIndex(2)
 				}
@@ -176,7 +176,7 @@ public extension Settings.View {
 	}
 }
 
-// MARK: - SettingsView_Previews
+#if DEBUG
 struct SettingsView_Previews: PreviewProvider {
 	static var previews: some View {
 		Settings.View(
@@ -187,3 +187,4 @@ struct SettingsView_Previews: PreviewProvider {
 		)
 	}
 }
+#endif

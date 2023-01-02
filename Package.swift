@@ -34,7 +34,6 @@ package.dependencies += [
 
 	// Other
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
-	.package(url: "https://github.com/globulus/swiftui-pull-to-refresh", from: "1.1.8"),
 	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
@@ -468,9 +467,9 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Common",
-			"Data",
 			"DesignSystem",
 			"ErrorQueue",
+			"FileClient",
 			"JSON",
 			"KeychainClientDependency",
 			"ProfileClient",
@@ -685,13 +684,6 @@ package.addModules([
 		tests: .no
 	),
 	.client(
-		name: "Data",
-		dependencies: [
-			dependencies,
-		],
-		tests: .no
-	),
-	.client(
 		name: "EngineToolkitClient",
 		dependencies: [
 			bigInt,
@@ -726,6 +718,13 @@ package.addModules([
 			"ProfileClient",
 			"TransactionClient",
 		], tests: .no
+	),
+	.client(
+		name: "FileClient",
+		dependencies: [
+			dependencies,
+		],
+		tests: .no
 	),
 	.client(
 		name: "GatewayAPI",
@@ -904,11 +903,7 @@ package.addModules([
 			.product(name: "Introspect", package: "SwiftUI-Introspect"),
 			.product(name: "NukeUI", package: "Nuke"),
 			"Resources",
-			.product(name: "SwiftUIPullToRefresh", package: "swiftui-pull-to-refresh", condition: .when(platforms: [.iOS])),
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation"),
-		],
-		resources: [
-			.process("Fonts"),
 		],
 		tests: .yes(
 			dependencies: [
@@ -926,7 +921,8 @@ package.addModules([
 		plugins: [
 			.plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin"),
 		],
-		tests: .no
+		tests: .no,
+		isProduct: true
 	),
 	.core(
 		name: "TestUtils",

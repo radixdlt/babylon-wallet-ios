@@ -4,7 +4,7 @@ import Foundation
 // MARK: - NonFungibleTokenList.Action
 public extension NonFungibleTokenList {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -14,7 +14,7 @@ public extension NonFungibleTokenList {
 
 // MARK: - NonFungibleTokenList.Action.ChildAction
 public extension NonFungibleTokenList.Action {
-	enum ChildAction: Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case asset(id: NonFungibleTokenContainer.ID, action: NonFungibleTokenList.Row.Action)
 		case details(NonFungibleTokenList.Detail.Action)
 	}
@@ -22,14 +22,14 @@ public extension NonFungibleTokenList.Action {
 
 // MARK: - NonFungibleTokenList.Action.ViewAction
 public extension NonFungibleTokenList.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case selectedTokenChanged(NonFungibleTokenList.Detail.State?)
 	}
 }
 
 // MARK: - NonFungibleTokenList.Action.InternalAction
 public extension NonFungibleTokenList.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -37,10 +37,10 @@ public extension NonFungibleTokenList.Action {
 
 // MARK: - NonFungibleTokenList.Action.SystemAction
 public extension NonFungibleTokenList.Action {
-	enum SystemAction: Equatable {}
+	enum SystemAction: Sendable, Equatable {}
 }
 
 // MARK: - NonFungibleTokenList.Action.DelegateAction
 public extension NonFungibleTokenList.Action {
-	enum DelegateAction: Equatable {}
+	enum DelegateAction: Sendable, Equatable {}
 }

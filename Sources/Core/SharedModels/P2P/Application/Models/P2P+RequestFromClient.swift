@@ -40,27 +40,27 @@ public struct InvalidRequestFromDapp: Swift.Error, Equatable, CustomStringConver
 
 #if DEBUG
 public extension P2PClient {
-	static let placeholder: Self = try! .init(
+	static let previewValue: Self = try! .init(
 		connectionPassword: ConnectionPassword(hex: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
 		displayName: "Placeholder"
 	)
 }
 
 public extension P2PConnections.IncomingMessage {
-	static let placeholder = Self(messagePayload: .deadbeef32Bytes, messageID: "placeholder", messageHash: .deadbeef32Bytes)
+	static let previewValue = Self(messagePayload: .deadbeef32Bytes, messageID: "previewValue", messageHash: .deadbeef32Bytes)
 }
 
 public extension P2P.RequestFromClient {
-	static let placeholder = Self.placeholderOneTimeAccountAccess
-	static let placeholderOneTimeAccountAccess: Self = try! .init(
-		originalMessage: .placeholder,
-		requestFromDapp: .placeholderOneTimeAccount,
-		client: .placeholder
+	static let previewValue = Self.previewValueOneTimeAccountAccess
+	static let previewValueOneTimeAccountAccess: Self = try! .init(
+		originalMessage: .previewValue,
+		requestFromDapp: .previewValueOneTimeAccount,
+		client: .previewValue
 	)
-	static let placeholderSignTXRequest: Self = try! .init(
-		originalMessage: .placeholder,
-		requestFromDapp: .placeholderSignTX,
-		client: .placeholder
+	static let previewValueSignTXRequest: Self = try! .init(
+		originalMessage: .previewValue,
+		requestFromDapp: .previewValueSignTX,
+		client: .previewValue
 	)
 }
 #endif // DEBUG

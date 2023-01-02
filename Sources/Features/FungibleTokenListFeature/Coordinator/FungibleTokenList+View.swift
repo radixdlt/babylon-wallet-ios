@@ -35,7 +35,7 @@ public extension FungibleTokenList.View {
 								state: \.sections,
 								action: { .child(.section(id: $0, action: $1)) }
 							),
-							content: FungibleTokenList.Section.View.init(store:)
+							content: { FungibleTokenList.Section.View(store: $0) }
 						)
 					}
 				}

@@ -29,7 +29,7 @@ public extension AccountList.View {
 						state: \.accounts,
 						action: { .child(.account(id: $0, action: $1)) }
 					),
-					content: AccountList.Row.View.init(store:)
+					content: { AccountList.Row.View(store: $0) }
 				)
 			}
 			.onAppear {
@@ -56,7 +56,7 @@ struct AccountList_Preview: PreviewProvider {
 		AccountList.View(
 			store: .init(
 				initialState: .init(
-					accounts: .placeholder,
+					accounts: .previewValue,
 					alert: nil
 				),
 				reducer: AccountList()

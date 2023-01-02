@@ -25,7 +25,7 @@ public extension HandleDappRequests.View {
 					state: \.chooseAccounts,
 					action: { .child(.chooseAccounts($0)) }
 				),
-				then: ChooseAccounts.View.init(store:)
+				then: { ChooseAccounts.View(store: $0) }
 			)
 
 			IfLetStore(
@@ -33,7 +33,7 @@ public extension HandleDappRequests.View {
 					state: \.transactionSigning,
 					action: { .child(.transactionSigning($0)) }
 				),
-				then: TransactionSigning.View.init(store:)
+				then: { TransactionSigning.View(store: $0) }
 			)
 		}
 		.task { @MainActor in

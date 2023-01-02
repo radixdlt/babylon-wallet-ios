@@ -49,7 +49,7 @@ private extension HandleDappRequests {
 				))))
 			}
 
-		case let .internal(.system(.sendMessageReceivedReceiptBackToPeerResult(.success(_)))):
+		case .internal(.system(.sendMessageReceivedReceiptBackToPeerResult(.success(_)))):
 			return .none
 
 		case let .internal(.system(.sendMessageReceivedReceiptBackToPeerResult(.failure(error)))):
@@ -299,11 +299,11 @@ extension ApproveTransactionFailure {
 					return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TXID: \(txID)")
 				case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
 					return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TXID: \(txID)")
-				case let .failedToPollTX(txID, pollError):
+				case let .failedToPollTX(txID, _):
 					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
 				case let .invalidTXWasDuplicate(txID):
 					return (errorKind: .submittedTransactionWasDuplicate, message: "TXID: \(txID)")
-				case let .failedToGetTransactionStatus(txID, error):
+				case let .failedToGetTransactionStatus(txID, _):
 					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
 				}
 			}

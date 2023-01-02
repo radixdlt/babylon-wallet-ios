@@ -15,7 +15,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		// given
 		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
 			requestItem: .init(numberOfAddresses: 1),
-			parentRequest: .placeholder
+			parentRequest: .previewValue
 		)
 
 		let initialState: DappConnectionRequest.State = .init(
@@ -41,7 +41,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 		// given
 		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
 			requestItem: .init(numberOfAddresses: 1),
-			parentRequest: .placeholder
+			parentRequest: .previewValue
 		)
 
 		let initialState: DappConnectionRequest.State = .init(
@@ -54,7 +54,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 			initialState: initialState,
 			reducer: DappConnectionRequest()
 		)
-		let accounts: NonEmpty<OrderedSet<OnNetwork.Account>> = .init(rawValue: .init([.placeholder0, .placeholder1]))!
+		let accounts: NonEmpty<OrderedSet<OnNetwork.Account>> = .init(rawValue: .init([.previewValue0, .previewValue1]))!
 		store.dependencies.profileClient.getAccounts = { @Sendable in accounts }
 
 		// when

@@ -6,7 +6,7 @@ import Profile
 // MARK: - AccountList.State
 public extension AccountList {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public var accounts: IdentifiedArrayOf<AccountList.Row.State>
 		public var alert: AlertState<Action.ViewAction>?
 
@@ -31,11 +31,11 @@ public extension AccountList.State {
 
 #if DEBUG
 public extension Array where Element == AccountList.Row.State {
-	static let placeholder: Self = []
+	static let previewValue: Self = []
 }
 
 public extension IdentifiedArray where Element == AccountList.Row.State, ID == AccountList.Row.State.ID {
-	static let placeholder: Self = .init(uniqueElements: Array<AccountList.Row.State>.placeholder)
+	static let previewValue: Self = .init(uniqueElements: Array<AccountList.Row.State>.previewValue)
 }
 
 #endif

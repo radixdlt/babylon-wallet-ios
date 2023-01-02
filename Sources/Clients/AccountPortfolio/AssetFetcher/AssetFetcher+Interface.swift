@@ -4,7 +4,7 @@ import Dependencies
 import Profile
 
 // MARK: - AssetFetcher
-public struct AssetFetcher {
+public struct AssetFetcher: Sendable {
 	public var fetchAssets: FetchAssets
 
 	public init(

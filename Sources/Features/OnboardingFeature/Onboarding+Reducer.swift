@@ -3,7 +3,7 @@ import CreateAccountFeature
 import ImportProfileFeature
 
 // MARK: - Onboarding
-public struct Onboarding: ReducerProtocol {
+public struct Onboarding: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {

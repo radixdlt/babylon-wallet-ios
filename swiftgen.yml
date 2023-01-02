@@ -6,13 +6,22 @@ strings:
   outputs:
     params:
       publicAccess: true
-    templatePath: templates/SwiftGen/L10n.stencil
+    templateName: structured-swift5
     output: L10n.generated.swift
 
 xcassets:
   inputs: Assets.xcassets
   outputs:
     params:
+      enumName: AssetResource
       publicAccess: true
-    templatePath: templates/SwiftGen/AssetResource.stencil
+    templateName: swift5
     output: AssetResource.generated.swift
+
+fonts:
+  inputs: Fonts
+  outputs:
+    params:
+      publicAccess: true
+    templateName: swift5
+    output: Fonts.generated.swift

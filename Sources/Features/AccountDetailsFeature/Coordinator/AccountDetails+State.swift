@@ -9,7 +9,7 @@ import Profile
 // MARK: - AccountDetails.State
 public extension AccountDetails {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public let account: OnNetwork.Account
 		public var assets: AssetsView.State
 

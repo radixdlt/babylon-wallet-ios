@@ -5,7 +5,7 @@ import Profile
 // MARK: - AggregatedValue.State
 public extension AggregatedValue {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public var value: Float?
 
 		// MARK: - AppSettings properties
@@ -26,7 +26,7 @@ public extension AggregatedValue {
 
 #if DEBUG
 public extension AggregatedValue.State {
-	static let placeholder = AggregatedValue.State(
+	static let previewValue = AggregatedValue.State(
 		value: 1_000_000,
 		currency: .usd
 	)

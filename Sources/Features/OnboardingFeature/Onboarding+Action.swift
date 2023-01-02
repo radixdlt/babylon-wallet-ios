@@ -5,7 +5,7 @@ import ImportProfileFeature
 // MARK: - Onboarding.Action
 public extension Onboarding {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		case importProfile(ImportProfile.Action)
 		case createAccount(CreateAccount.Action)
 	}

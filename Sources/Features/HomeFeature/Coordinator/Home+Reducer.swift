@@ -18,7 +18,7 @@ import SharedModels
 import TransactionSigningFeature
 
 // MARK: - Home
-public struct Home: ReducerProtocol {
+public struct Home: Sendable, ReducerProtocol {
 	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 	@Dependency(\.appSettingsClient) var appSettingsClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
@@ -273,7 +273,7 @@ public struct Home: ReducerProtocol {
 		}
 	}
 
-	func fetchPortfolio(_ accounts: some Collection<OnNetwork.Account>) -> EffectTask<Action> {
+	func fetchPortfolio(_ accounts: some Collection<OnNetwork.Account> & Sendable) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.system(.fetchPortfolioResult(TaskResult {
 				try await accountPortfolioFetcher.fetchPortfolio(accounts.map(\.address))

@@ -18,48 +18,7 @@ public extension DependencyValues {
 
 // MARK: - ProfileClient + TestDependencyKey
 extension ProfileClient: TestDependencyKey {
-	// TODO: make every endpoint no-op
-	public static let previewValue = Self(
-		getCurrentNetworkID: { NetworkID.nebunet },
-		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
-		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.nebunet },
-		setNetworkAndGateway: { _ in },
-		createNewProfile: { req in
-			try! await Profile.new(
-				networkAndGateway: req.networkAndGateway,
-				mnemonic: req.curve25519FactorSourceMnemonic
-			)
-		},
-		injectProfile: { _ in /* Noop */ },
-		extractProfileSnapshot: { fatalError("Impl me") },
-		deleteProfileAndFactorSources: { /* Noop */ },
-		hasAccountOnNetwork: { _ in false },
-		getAccounts: {
-			let accounts: [OnNetwork.Account] = [.placeholder0, .placeholder1]
-			return NonEmpty(rawValue: OrderedSet(accounts))!
-		},
-		getP2PClients: { fatalError() },
-		addP2PClient: { _ in fatalError() },
-		deleteP2PClientByID: { _ in fatalError() },
-		getAppPreferences: {
-			fatalError()
-		},
-		setDisplayAppPreferences: { _ in
-			fatalError()
-		},
-		createVirtualAccount: { _ in
-			fatalError()
-		},
-		lookupAccountByAddress: { _ in
-			.placeholder0
-		},
-		signersForAccountsGivenAddresses: { _ in
-			struct MockError: LocalizedError {
-				let errorDescription: String? = "Failed to get signers for addresses"
-			}
-			throw MockError()
-		}
-	)
+	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
@@ -83,8 +42,34 @@ extension ProfileClient: TestDependencyKey {
 	)
 }
 
-public struct UnimplementedError: Swift.Error {
-	public let description: String
+public extension ProfileClient {
+	static let noop = Self(
+		getCurrentNetworkID: { NetworkID.nebunet },
+		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
+		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.nebunet },
+		setNetworkAndGateway: { _ in },
+		createNewProfile: { req in
+			try! await Profile.new(
+				networkAndGateway: req.networkAndGateway,
+				mnemonic: req.curve25519FactorSourceMnemonic
+			)
+		},
+		injectProfile: { _ in },
+		extractProfileSnapshot: { throw CancellationError() },
+		deleteProfileAndFactorSources: {},
+		hasAccountOnNetwork: { _ in false },
+		getAccounts: {
+			let accounts: [OnNetwork.Account] = [.previewValue0, .previewValue1]
+			return NonEmpty(rawValue: OrderedSet(accounts))!
+		},
+		getP2PClients: { throw CancellationError() },
+		addP2PClient: { _ in throw CancellationError() },
+		deleteP2PClientByID: { _ in throw CancellationError() },
+		getAppPreferences: { throw CancellationError() },
+		setDisplayAppPreferences: { _ in throw CancellationError() },
+		createVirtualAccount: { _ in throw CancellationError() },
+		lookupAccountByAddress: { _ in .previewValue0 },
+		signersForAccountsGivenAddresses: { _ in throw CancellationError() }
+	)
 }
-
 #endif

@@ -56,6 +56,6 @@ extension ManageGatewayAPIEndpoints.State {
 
 #if DEBUG
 public extension ManageGatewayAPIEndpoints.State {
-	static let placeholder: Self = .init()
+	static let previewValue: Self = .init()
 }
 #endif

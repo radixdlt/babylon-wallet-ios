@@ -33,8 +33,15 @@ extension P2PConnectivityClient {
 		getConnectionStatusAsyncSequence: { _ in fatalError() },
 		getRequestsFromP2PClientAsyncSequence: { _ in fatalError() },
 		sendMessageReadReceipt: { _, _ in },
-		sendMessage: { _ in .placeholder },
+		sendMessage: { _ in .previewValue },
 		_sendTestMessage: { _, _ in }
+	)
+}
+
+public extension P2PClient {
+	static let previewValue = try! Self(
+		displayName: "Placeholder",
+		connectionPassword: Data(hexString: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
 	)
 }
 #endif // DEBUG
