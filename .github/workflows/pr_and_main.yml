@@ -25,7 +25,7 @@ jobs:
           swiftformat . --lint
 
   build_and_test:
-    name: "Unit tests"
+    name: "Build and test"
     runs-on: macos-12
 
     needs:
@@ -63,7 +63,7 @@ jobs:
       - name: "Build"
         run: bundle exec fastlane ios build
 
-      - name: "Build unit tests"
+      - name: "Unit tests"
         run: bundle exec fastlane ios tests
 
   # snapshot_tests:

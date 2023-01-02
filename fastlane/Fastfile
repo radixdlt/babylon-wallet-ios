@@ -94,7 +94,7 @@ platform :mac do
     end
 
     desc "Installs certificates on the machine"
-    lane :install_certificates do
+    lane :install_development_certificates do
         code_signing(type: "development")
     end
 
