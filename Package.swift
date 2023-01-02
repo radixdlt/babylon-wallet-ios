@@ -83,11 +83,6 @@ let legibleError: Target.Dependency = .product(
 	package: "LegibleError"
 )
 
-let profile: Target.Dependency = .product(
-	name: "Profile",
-	package: "swift-profile"
-)
-
 let p2pConnection: Target.Dependency = .product(
 	name: "P2PConnection",
 	package: "Converse"
@@ -758,7 +753,6 @@ package.addModules([
 			dependencies,
 			engineToolkit, // Model: SignTX contains Manifest, Account
 			"JSON",
-			profile, // Account
 			p2pConnection,
 			"ProfileClient",
 			"Resources",
@@ -863,7 +857,6 @@ package.addModules([
 			nonEmpty,
 			p2pModels,
 			p2pConnection,
-			profile, // FIXME: In `Profile` split out Models package
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
