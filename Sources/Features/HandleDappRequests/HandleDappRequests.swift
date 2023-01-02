@@ -4,6 +4,7 @@ import ComposableArchitecture
 import Foundation
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
+import P2PModels
 import Profile
 import SharedModels
 import TransactionClient

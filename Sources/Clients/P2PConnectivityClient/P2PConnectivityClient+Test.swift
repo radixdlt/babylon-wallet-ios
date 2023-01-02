@@ -1,6 +1,7 @@
 import AsyncExtensions
 import Dependencies
 import Foundation
+import P2PModels
 import Profile
 import SharedModels
 import XCTestDynamicOverlay
@@ -34,13 +35,6 @@ extension P2PConnectivityClient {
 		sendMessageReadReceipt: { _, _ in },
 		sendMessage: { _ in .placeholder },
 		_sendTestMessage: { _, _ in }
-	)
-}
-
-public extension P2PClient {
-	static let placeholder = try! Self(
-		displayName: "Placeholder",
-		connectionPassword: Data(hexString: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
 	)
 }
 #endif // DEBUG

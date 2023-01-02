@@ -85,9 +85,9 @@ public extension ManageP2PClient.View {
 
 			#if DEBUG
 			connectionID = [
-				state.p2pClient.id.prefix(4),
+				state.p2pClient.id.hex().prefix(4),
 				"...",
-				state.p2pClient.id.suffix(6),
+				state.p2pClient.id.hex().suffix(6),
 			].joined()
 			#endif // DEBUG
 		}

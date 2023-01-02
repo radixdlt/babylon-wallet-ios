@@ -111,7 +111,7 @@ public extension ManageP2PClients {
 		case let .child(.newConnection(.delegate(.newConnection(connectedClient)))):
 			state.newConnection = nil
 			return .run { send in
-				await send(.internal(.system(.p2saveNewConnectionResult(
+				await send(.internal(.system(.saveNewConnectionResult(
 					TaskResult {
 						try await p2pConnectivityClient.addP2PClientWithConnection(
 							connectedClient.p2pClient,

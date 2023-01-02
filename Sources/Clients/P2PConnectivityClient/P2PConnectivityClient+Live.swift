@@ -9,15 +9,32 @@ import ProfileClient
 import Resources
 import SharedModels
 
+extension P2P.ClientWithConnectionStatus {
+	func connected() -> Self {
+		.init(p2pClient: p2pClient, connectionStatus: .connected)
+	}
+}
+
+extension ProfileClient {
+	func p2pClient(for id: P2PConnectionID) async throws -> P2PClient? {
+		try await getP2PClients().filter { client in
+			client.id == id
+		}.first
+	}
+}
+
 // MARK: - P2PConnectivityClient + :LiveValue
 public extension P2PConnectivityClient {
 	static let liveValue: Self = {
+		actor Once: GlobalActor {
+			init() {}
+			static let shared = Once()
+			fileprivate var hasLoadedP2PClientsFromProfile = false
+			func setHasLoaded(_ hasLoadedP2PClientsFromProfile: Bool) async {
+				self.hasLoadedP2PClientsFromProfile = hasLoadedP2PClientsFromProfile
+			}
+		}
 		@Dependency(\.profileClient) var profileClient
-
-		//        actor ConnectionsHolder: GlobalActor {
-		//            init() {}
-		//            static let shared = ConnectionsHolder()
-		//        }
 
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
@@ -26,8 +43,24 @@ public extension P2PConnectivityClient {
 				await localNetworkAuthorization.requestAuthorization()
 			},
 			getP2PClients: {
-				//                try await ConnectionsHolder.shared.getP2PClients()
-				fatalError()
+				if await Once.shared.hasLoadedP2PClientsFromProfile == false {
+					let clients = try await profileClient.getP2PClients()
+					try await P2PConnections.shared.add(
+						connectionsFor: clients,
+						autoconnect: true
+					)
+					await Once.shared.setHasLoaded(true)
+				}
+				return try await AsyncStream(P2PConnections.shared.connectionsAsyncSequence().map { clientIDs in
+					try await OrderedSet(
+						clientIDs.asyncMap {
+							try await profileClient.p2pClient(for: $0)
+						}.compactMap { client in
+							guard let client else { return nil }
+							return P2P.ClientWithConnectionStatus(p2pClient: client, connectionStatus: .connected)
+						}
+					)
+				})
 			},
 			addP2PClientWithConnection: { _, _ in
 //				try await profileClient.addP2PClient(clientWithConnection.client)
@@ -39,8 +72,13 @@ public extension P2PConnectivityClient {
 //				await connectionsHolder.disconnectedAndRemove(id)
 				fatalError()
 			},
-			getConnectionStatusAsyncSequence: { _ in
-				fatalError()
+			getConnectionStatusAsyncSequence: { id in
+				try await P2PConnections.shared.connectionStatusChangeEventAsyncSequence(for: id).map {
+					guard let client = try await profileClient.p2pClient(for: id) else {
+						throw P2PClientNotFoundInProfile()
+					}
+					return P2P.ConnectionUpdate(connectionStatus: $0.connectionStatus, p2pClient: client)
+				}.eraseToAnyAsyncSequence()
 			},
 			getRequestsFromP2PClientAsyncSequence: { _ in
 //				guard let connection = await connectionsHolder.getConnection(id: id) else {
@@ -122,6 +160,14 @@ struct P2PConnectionOffline: LocalizedError {
 	init() {}
 	var errorDescription: String? {
 		L10n.Common.p2PConnectionOffline
+	}
+}
+
+// MARK: - P2PClientNotFoundInProfile
+struct P2PClientNotFoundInProfile: LocalizedError {
+	init() {}
+	var errorDescription: String? {
+		"P2PClient not found in profile"
 	}
 }
 

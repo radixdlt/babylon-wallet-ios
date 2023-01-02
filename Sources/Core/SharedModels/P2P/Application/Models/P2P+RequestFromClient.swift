@@ -41,8 +41,8 @@ public struct InvalidRequestFromDapp: Swift.Error, Equatable, CustomStringConver
 #if DEBUG
 public extension P2PClient {
 	static let placeholder: Self = try! .init(
-		displayName: "Placeholder",
-		connectionPassword: Data(hexString: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+		connectionPassword: ConnectionPassword(hex: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
+		displayName: "Placeholder"
 	)
 }
 

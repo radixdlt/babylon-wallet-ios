@@ -52,8 +52,8 @@ public extension ConnectUsingSecrets {
 
 			let clientWithConnectionStatus = P2P.ClientWithConnectionStatus(
 				p2pClient: .init(
-					displayName: state.nameOfConnection.trimmed(),
-					connectionPassword: state.connectionSecrets.connectionPassword.data.data
+					connectionPassword: state.connectionSecrets.connectionPassword,
+					displayName: state.nameOfConnection.trimmed()
 				),
 				connectionStatus: .connected
 			)

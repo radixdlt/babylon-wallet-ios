@@ -1,14 +1,15 @@
 import Foundation
+import P2PModels
 import Profile
 
 // MARK: - P2P.ResponseToClientByID
 public extension P2P {
 	// MARK: - ResponseToClientByID
 	struct ResponseToClientByID: Sendable, Equatable, Identifiable {
-		public let connectionID: P2PClient.ID
+		public let connectionID: P2PConnectionID
 		public let responseToDapp: ToDapp.Response
 		public init(
-			connectionID: P2PClient.ID,
+			connectionID: P2PConnectionID,
 			responseToDapp: ToDapp.Response
 		) {
 			self.connectionID = connectionID
@@ -18,10 +19,10 @@ public extension P2P {
 }
 
 public extension P2P.ResponseToClientByID {
-	var requestID: ID {
+	var requestID: P2P.ToDapp.Response.ID {
 		responseToDapp.id
 	}
 
 	typealias ID = P2P.ToDapp.Response.ID
-	var id: ID { requestID }
+	var id: P2P.ToDapp.Response.ID { requestID }
 }

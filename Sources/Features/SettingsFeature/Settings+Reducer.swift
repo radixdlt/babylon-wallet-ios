@@ -46,8 +46,8 @@ public extension Settings {
 		case .internal(.view(.didAppear)):
 			return loadP2PClients()
 
-		case let .internal(.system(.loadP2PClientsResult(.success(connections)))):
-			state.canAddP2PClient = connections.connections.isEmpty
+		case let .internal(.system(.loadP2PClientsResult(.success(clients)))):
+			state.canAddP2PClient = clients.isEmpty
 			return .none
 		case let .internal(.system(.loadP2PClientsResult(.failure(error)))):
 			errorQueue.schedule(error)

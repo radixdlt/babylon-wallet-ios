@@ -48,8 +48,8 @@ public extension NewConnection {
 					action: .child(.connectUsingSecrets(.delegate(.connected(
 						.init(
 							p2pClient: .init(
-								displayName: L10n.NewConnection.defaultNameOfConnection,
-								connectionPassword: connectUsingSecrets.connectionSecrets.connectionPassword.data.data
+								connectionPassword: connectUsingSecrets.connectionSecrets.connectionPassword,
+								displayName: L10n.NewConnection.defaultNameOfConnection
 							),
 							connectionStatus: .connected
 						)
