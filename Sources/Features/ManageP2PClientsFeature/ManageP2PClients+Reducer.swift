@@ -36,10 +36,18 @@ public extension ManageP2PClients {
 			print("☑️ ManageP2PClients getting p2pClients...")
 			return .run { send in
 				print("☑️ ManageP2PClients getting p2pClients.......")
-				for try await p2pClients in try await p2pConnectivityClient.getP2PClients() {
-					print("✅ ManageP2PClients got p2pClients: \(p2pClients.map(\.p2pClient.displayName)) ")
+				do {
+					for try await p2pClients in try await p2pConnectivityClient.getP2PClients() {
+						guard !Task.isCancelled else { return }
+						print("✅ ManageP2PClients got p2pClients: \(p2pClients.map(\.p2pClient.displayName)) ")
+						await send(.internal(.system(.loadConnectionsResult(
+							.success(p2pClients)
+						))))
+					}
+				} catch {
+					print("❌ ManageP2PClients failed to get p2pClients, error: \(String(describing: error))")
 					await send(.internal(.system(.loadConnectionsResult(
-						.success(p2pClients)
+						.failure(error)
 					))))
 				}
 			}

@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Bite.git",
       "state" : {
-        "revision" : "b6801c0d4e269063ebc7b4930269d9d728b64e47",
-        "version" : "0.0.1"
+        "revision" : "96fd910f1a65e7224d1c0c8022738e6a34a1296a",
+        "version" : "0.0.4"
       }
     },
     {
@@ -59,7 +59,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Converse.git",
       "state" : {
-        "revision" : "daf801dd034469c14e8f55136a0d1a5912106371"
+        "revision" : "8b4dda567feb8b866045753e9ae3d7e355967863"
       }
     },
     {
@@ -94,8 +94,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Mnemonic.git",
       "state" : {
-        "revision" : "c16383ddf78bc7ff71435f78fa0c4bdecc186a96",
-        "version" : "0.0.5"
+        "revision" : "4a4b3642c3cd4584684b758f77068eafac6784f4",
+        "version" : "0.0.8"
       }
     },
     {
@@ -247,8 +247,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "74ff518cd6d6c4687fdcf615422292047e1aa368",
-        "version" : "0.1.2"
+        "revision" : "9b22f60b9dec44556abc400fdb5c26ddb9934803"
       }
     },
     {

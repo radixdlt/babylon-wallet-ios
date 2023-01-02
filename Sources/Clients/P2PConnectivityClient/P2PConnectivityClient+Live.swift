@@ -58,7 +58,10 @@ public extension P2PConnectivityClient {
 					)
 					await Once.shared.setHasLoaded(true)
 				}
-				return try await AsyncStream(P2PConnections.shared.connectionsAsyncSequence().map { clientIDs in
+				let multicastSubject = AsyncThrowingPassthroughSubject<OrderedSet<P2P.ClientWithConnectionStatus>, Swift.Error>()
+
+				// We MUST make sure to multicast because both HandleDappRequest and ManageP2PClients features use this method `getP2PClients`, and AsyncSequence does not support multicast
+				return try await P2PConnections.shared.connectionsAsyncSequence().map { clientIDs in
 					try await OrderedSet(
 						clientIDs.asyncMap {
 							try await profileClient.p2pClient(for: $0)
@@ -67,7 +70,10 @@ public extension P2PConnectivityClient {
 							return P2P.ClientWithConnectionStatus(p2pClient: client, connectionStatus: .connected)
 						}
 					)
-				})
+				}
+				.multicast(multicastSubject)
+				.autoconnect()
+				.eraseToAnyAsyncSequence()
 			},
 			addP2PClientWithConnection: { client, autoconnect in
 				try await profileClient.addP2PClient(client)
