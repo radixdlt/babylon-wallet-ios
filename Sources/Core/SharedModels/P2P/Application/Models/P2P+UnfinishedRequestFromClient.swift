@@ -163,11 +163,13 @@ internal extension P2P.UnfinishedRequestFromClient {
 	) -> P2P.ToDapp.Response? {
 		if !unfinishedRequestItems.contains(where: { $0 == newlyFinished }) {
 //			throw UnknownRequestItem()
-			preconditionFailure("Unknown request item")
+			assertionFailure("Unknown request item")
+                        return nil
 		}
 		if finishedResponseItems.contains(where: { $0 == responseItem }) {
 //			throw AlreadyFinishItem()
-			preconditionFailure("Finished already finished item")
+                        assertionFailure("Finished already finished item")
+                        return nil
 		}
 		unfinishedRequestItems.removeAll(where: { $0 == newlyFinished })
 		finishedResponseItems.append(responseItem)
