@@ -59,7 +59,7 @@ public extension ConnectUsingSecrets.View {
 					.padding(.medium3)
 				}
 			}
-			.isLoading(viewStore.isConnecting, context: .global(text: L10n.NewConnection.connecting))
+			.controlState(viewStore.screenState)
 			.onAppear {
 				viewStore.send(.appeared)
 			}
@@ -70,7 +70,7 @@ public extension ConnectUsingSecrets.View {
 // MARK: - ConnectUsingSecrets.View.ViewState
 extension ConnectUsingSecrets.View {
 	struct ViewState: Equatable {
-		public var isConnecting: Bool
+		public var screenState: ControlState
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String
 		public var isSaveConnectionButtonEnabled: Bool
@@ -79,7 +79,7 @@ extension ConnectUsingSecrets.View {
 		init(state: ConnectUsingSecrets.State) {
 			nameOfConnection = state.nameOfConnection
 			isPromptingForName = state.isPromptingForName
-			isConnecting = state.isConnecting
+			screenState = state.isConnecting ? .loading(.global(text: L10n.NewConnection.connecting)) : .enabled
 			focusedField = state.focusedField
 			isSaveConnectionButtonEnabled = state.isNameValid
 		}

@@ -3,7 +3,7 @@ import Foundation
 // MARK: - ScanQR.State
 public extension ScanQR {
 	struct State: Equatable {
-		#if os(macOS)
+		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		public var connectionPassword: String
 
 		public init(

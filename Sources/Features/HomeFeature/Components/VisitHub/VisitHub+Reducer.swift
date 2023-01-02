@@ -2,7 +2,7 @@ import ComposableArchitecture
 
 // MARK: - Home.VisitHub
 public extension Home {
-	struct VisitHub: ReducerProtocol {
+	struct VisitHub: Sendable, ReducerProtocol {
 		public init() {}
 
 		public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {

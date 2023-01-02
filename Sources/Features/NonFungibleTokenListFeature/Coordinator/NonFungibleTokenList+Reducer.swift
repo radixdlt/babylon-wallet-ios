@@ -1,6 +1,6 @@
 import ComposableArchitecture
 
-public struct NonFungibleTokenList: ReducerProtocol {
+public struct NonFungibleTokenList: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {

@@ -2,7 +2,7 @@ import ComposableArchitecture
 
 // MARK: - AccountDetails.Transfer
 public extension AccountDetails {
-	struct Transfer: ReducerProtocol {
+	struct Transfer: Sendable, ReducerProtocol {
 		public init() {}
 
 		public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {

@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import P2PConnection
 import P2PConnectivityClient
 import Resources
 
@@ -10,8 +11,6 @@ public struct NewConnection: Sendable, ReducerProtocol {
 public extension NewConnection {
 	@ReducerBuilderOf<Self>
 	var body: some ReducerProtocolOf<Self> {
-		Reduce(core)
-
 		EmptyReducer()
 			.ifCaseLet(/State.localNetworkPermission, action: /Action.child .. Action.ChildAction.localNetworkPermission) {
 				LocalNetworkPermission()
@@ -25,6 +24,8 @@ public extension NewConnection {
 			.ifCaseLet(/State.connectUsingSecrets, action: /Action.child .. Action.ChildAction.connectUsingSecrets) {
 				ConnectUsingSecrets()
 			}
+
+		Reduce(core)
 	}
 
 	func core(into state: inout State, action: Action) -> EffectTask<Action> {
@@ -36,7 +37,7 @@ public extension NewConnection {
 					await send(.delegate(.dismiss))
 				}
 			case let .connectUsingSecrets(connectUsingSecrets):
-				guard let connection = connectUsingSecrets.newConnection else {
+				guard let newP2PConnection = connectUsingSecrets.newP2PConnection else {
 					return .run { send in
 						await send(.delegate(.dismiss))
 					}
@@ -49,7 +50,7 @@ public extension NewConnection {
 								displayName: L10n.NewConnection.defaultNameOfConnection,
 								connectionPassword: connectUsingSecrets.connectionSecrets.connectionPassword.data.data
 							),
-							connection: connection
+							p2pConnection: newP2PConnection
 						)
 					))))
 				)

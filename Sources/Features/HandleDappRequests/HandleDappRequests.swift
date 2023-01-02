@@ -38,9 +38,28 @@ private extension HandleDappRequests {
 			errorQueue.schedule(error)
 			return .none
 
+		case let .internal(.system(.sendMessageReceivedReceiptBackToPeer(client, readMessage))):
+			return .run { send in
+				await send(.internal(.system(.sendMessageReceivedReceiptBackToPeerResult(
+					TaskResult {
+						try await p2pConnectivityClient.sendMessageReadReceipt(client.id, readMessage)
+						return readMessage
+					}
+				))))
+			}
+
+		case .internal(.system(.sendMessageReceivedReceiptBackToPeerResult(.success(_)))):
+			return .none
+
+		case let .internal(.system(.sendMessageReceivedReceiptBackToPeerResult(.failure(error)))):
+			errorQueue.schedule(error)
+			return .none
+
 		case let .internal(.system(.receiveRequestFromP2PClientResult(.success(requestFromP2P)))):
 
 			return .run { send in
+				await send(.internal(.system(.sendMessageReceivedReceiptBackToPeer(requestFromP2P.client, readMessage: requestFromP2P.originalMessage))))
+
 				let currentNetworkID = await profileClient.getCurrentNetworkID()
 
 				guard requestFromP2P.requestFromDapp.metadata.networkId == currentNetworkID else {
@@ -181,30 +200,38 @@ private extension HandleDappRequests {
 			)
 
 		case .internal(.view(.task)):
+			print("☑️ HandleDappRequests getting p2pClients...")
 			return .run { send in
-				await send(.internal(.system(.loadConnections)))
-			}
-		case .internal(.system(.loadConnections)):
-			return .run { send in
+				print("☑️ HandleDappRequests getting p2pClients.......")
 				do {
-					for try await updateList in try await p2pConnectivityClient.getP2PClients() {
-						await withThrowingTaskGroup(of: Void.self) { taskGroup in
-							for id in updateList.map(\.id) {
-								taskGroup.addTask {
-									do {
-										let requests = try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(id)
-										for try await request in requests {
-											await send(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
-										}
-									} catch {
-										await send(.internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))))
-									}
-								}
-							}
-						}
+					for try await p2pClients in try await p2pConnectivityClient.getP2PConnections() {
+						print("✅ HandleDappRequests got p2pClients: \(p2pClients.map(\.client.displayName)) ")
+						await send(.internal(.system(.loadConnectionsResult(.success(p2pClients)))))
 					}
-				} catch {}
+				} catch {
+					await send(.internal(.system(.loadConnectionsResult(.failure(error)))))
+				}
 			}
+
+		case let .internal(.system(.loadConnectionsResult(.success(clients)))):
+			print("☑️ HandleDappRequests getting requests for #\(clients.count) clients...")
+			return .run { send in
+				for connectedClient in clients {
+					print("☑️ HandleDappRequests getting requests for client: '\(connectedClient.client.displayName)'.......")
+					do {
+						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(connectedClient.client.id) {
+							print("✅ HandleDappRequests got requests for client: '\(connectedClient.client.displayName)'!!!!")
+							await send(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
+						}
+					} catch {
+						await send(.internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))))
+					}
+				}
+			}
+
+		case let .internal(.system(.loadConnectionsResult(.failure(error)))):
+			errorQueue.schedule(error)
+			return .none
 
 		case .child:
 			return .none
@@ -271,11 +298,11 @@ extension ApproveTransactionFailure {
 					return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TXID: \(txID)")
 				case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
 					return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TXID: \(txID)")
-				case let .failedToPollTX(txID, pollError):
+				case let .failedToPollTX(txID, _):
 					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
 				case let .invalidTXWasDuplicate(txID):
 					return (errorKind: .submittedTransactionWasDuplicate, message: "TXID: \(txID)")
-				case let .failedToGetTransactionStatus(txID, error):
+				case let .failedToGetTransactionStatus(txID, _):
 					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
 				}
 			}

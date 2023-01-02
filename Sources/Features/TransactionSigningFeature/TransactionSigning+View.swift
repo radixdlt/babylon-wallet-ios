@@ -103,7 +103,7 @@ struct TransactionSigning_Preview: PreviewProvider {
 	static var previews: some View {
 		TransactionSigning.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .previewValue,
 				reducer: TransactionSigning()
 			)
 		)

@@ -5,7 +5,7 @@ import Profile
 import UserDefaultsClient
 
 // MARK: - AppSettingsClient
-public struct AppSettingsClient {
+public struct AppSettingsClient: Sendable {
 	public var saveSettings: SaveSettings
 	public var loadSettings: LoadSettings
 

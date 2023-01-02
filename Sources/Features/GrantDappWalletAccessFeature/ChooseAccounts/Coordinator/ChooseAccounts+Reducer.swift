@@ -7,7 +7,7 @@ import Profile
 import ProfileClient
 
 // MARK: - ChooseAccounts
-public struct ChooseAccounts: ReducerProtocol {
+public struct ChooseAccounts: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 

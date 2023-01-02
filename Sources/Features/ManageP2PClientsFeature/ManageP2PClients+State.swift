@@ -1,8 +1,7 @@
-import Converse
-import ConverseCommon
 import Foundation
 import IdentifiedCollections
 import NewConnectionFeature
+import P2PConnection
 import P2PConnectivityClient
 import Profile
 import SharedModels
@@ -24,3 +23,9 @@ public extension ManageP2PClients {
 		}
 	}
 }
+
+#if DEBUG
+public extension ManageP2PClients.State {
+	static let previewValue: Self = .init()
+}
+#endif

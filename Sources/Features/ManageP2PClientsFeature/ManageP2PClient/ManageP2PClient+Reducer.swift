@@ -1,9 +1,8 @@
 import Common
 import ComposableArchitecture
-import Converse
-import ConverseCommon
 import ErrorQueue
 import Foundation
+import P2PConnection
 import P2PConnectivityClient
 import SharedModels
 import SwiftUI

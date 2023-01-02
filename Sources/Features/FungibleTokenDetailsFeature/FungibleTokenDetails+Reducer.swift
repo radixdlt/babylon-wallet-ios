@@ -2,7 +2,7 @@ import ComposableArchitecture
 import PasteboardClient
 
 // MARK: - FungibleTokenDetails
-public struct FungibleTokenDetails: ReducerProtocol {
+public struct FungibleTokenDetails: Sendable, ReducerProtocol {
 	@Dependency(\.pasteboardClient) var pasteboardClient
 
 	public init() {}

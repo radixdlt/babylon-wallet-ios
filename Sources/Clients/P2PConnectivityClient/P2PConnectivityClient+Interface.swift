@@ -3,6 +3,8 @@ import Collections
 import Common
 import Dependencies
 import Foundation
+import P2PConnection
+import P2PModels
 import ProfileClient
 import SharedModels
 import XCTestDynamicOverlay
@@ -21,23 +23,29 @@ public extension DependencyValues {
 public struct P2PConnectivityClient: DependencyKey, Sendable {
 	public var getLocalNetworkAccess: GetLocalNetworkAccess
 	public var getP2PClients: GetP2PClients
+	public var getP2PConnections: GetP2PConnections
 	public var addP2PClientWithConnection: AddP2PClientWithConnection
 	public var deleteP2PClientByID: DeleteP2PClientByID
 
 	public var getConnectionStatusAsyncSequence: GetConnectionStatusAsyncSequence
 	public var getRequestsFromP2PClientAsyncSequence: GetRequestsFromP2PClientAsyncSequence
+	public var sendMessageReadReceipt: SendMessageReadReceipt
 	public var sendMessage: SendMessage
 	public var _sendTestMessage: _SendTestMessage
 }
 
 public extension P2PConnectivityClient {
 	typealias GetLocalNetworkAccess = @Sendable () async -> Bool
+
 	typealias GetP2PClients = @Sendable () async throws -> AnyAsyncSequence<[P2P.ClientWithConnectionStatus]>
+	typealias GetP2PConnections = @Sendable () async throws -> AnyAsyncSequence<[P2P.ConnectionForClient]>
+
 	typealias AddP2PClientWithConnection = @Sendable (P2P.ConnectionForClient, AlsoConnect) async throws -> Void; typealias AlsoConnect = Bool
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 
 	typealias GetConnectionStatusAsyncSequence = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<P2P.ConnectionUpdate>
 	typealias GetRequestsFromP2PClientAsyncSequence = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<P2P.RequestFromClient>
+	typealias SendMessageReadReceipt = @Sendable (P2PClient.ID, P2PConnection.IncomingMessage) async throws -> Void
 	typealias SendMessage = @Sendable (P2P.ResponseToClientByID) async throws -> P2P.SentResponseToClient
 	typealias _SendTestMessage = @Sendable (P2PClient.ID, String) async throws -> Void
 }

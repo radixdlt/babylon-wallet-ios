@@ -31,7 +31,7 @@ package.dependencies += [
 	.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3"),
 
 	// Other
-	.package(url: "https://github.com/globulus/swiftui-pull-to-refresh", from: "1.1.8"),
+	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
 	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
@@ -83,8 +83,18 @@ let legibleError: Target.Dependency = .product(
 	package: "LegibleError"
 )
 
-let converse: Target.Dependency = .product(
-	name: "Converse",
+let profile: Target.Dependency = .product(
+	name: "Profile",
+	package: "swift-profile"
+)
+
+let p2pConnection: Target.Dependency = .product(
+	name: "P2PConnection",
+	package: "Converse"
+)
+
+let p2pModels: Target.Dependency = .product(
+	name: "P2PModels",
 	package: "Converse"
 )
 
@@ -444,9 +454,9 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Common",
-			"Data",
 			"DesignSystem",
 			"ErrorQueue",
+			"FileClient",
 			"JSON",
 			"KeychainClientDependency",
 			"ProfileClient",
@@ -480,7 +490,7 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-			converse,
+			p2pConnection,
 			dependencies,
 			"DesignSystem",
 			"ErrorQueue",
@@ -516,7 +526,7 @@ package.addModules([
 		dependencies: [
 			"CameraPermissionClient",
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])),
-			converse,
+			p2pConnection,
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
@@ -658,13 +668,6 @@ package.addModules([
 		tests: .no
 	),
 	.client(
-		name: "Data",
-		dependencies: [
-			dependencies,
-		],
-		tests: .no
-	),
-	.client(
 		name: "EngineToolkitClient",
 		dependencies: [
 			"Common",
@@ -695,6 +698,13 @@ package.addModules([
 			"ProfileClient",
 			"TransactionClient",
 		], tests: .no
+	),
+	.client(
+		name: "FileClient",
+		dependencies: [
+			dependencies,
+		],
+		tests: .no
 	),
 	.client(
 		name: "GatewayAPI",
@@ -742,13 +752,16 @@ package.addModules([
 	.client(
 		name: "P2PConnectivityClient",
 		dependencies: [
+			asyncAlgorithms,
 			asyncExtensions,
 			"Common",
-			converse,
 			dependencies,
 			engineToolkit, // Model: SignTX contains Manifest, Account
 			"JSON",
+			profile, // Account
+			p2pConnection,
 			"ProfileClient",
+			"Resources",
 			"SharedModels",
 		],
 		tests: .yes(dependencies: [
@@ -845,8 +858,12 @@ package.addModules([
 			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make Converse, EngineToolkit, etc. vend their own Model packages.
 			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
 			collections,
-			converse, // FIXME: In `Converse` split out Models package
+			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make EngineToolkit, etc. vend their own Model packages.
+			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
 			nonEmpty,
+			p2pModels,
+			p2pConnection,
+			profile, // FIXME: In `Profile` split out Models package
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -858,11 +875,7 @@ package.addModules([
 			.product(name: "Introspect", package: "SwiftUI-Introspect"),
 			.product(name: "NukeUI", package: "Nuke"),
 			"Resources",
-			.product(name: "SwiftUIPullToRefresh", package: "swiftui-pull-to-refresh", condition: .when(platforms: [.iOS])),
 			.product(name: "SwiftUINavigation", package: "swiftui-navigation"),
-		],
-		resources: [
-			.process("Fonts"),
 		],
 		tests: .yes(
 			dependencies: [
@@ -880,7 +893,8 @@ package.addModules([
 		plugins: [
 			.plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin"),
 		],
-		tests: .no
+		tests: .no,
+		isProduct: true
 	),
 	.core(
 		name: "TestUtils",

@@ -22,7 +22,7 @@ final class AppFeatureTests: TestCase {
 	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() async {
 		// given
 		let store = TestStore(
-			initialState: App.State(root: .main(.placeholder)),
+			initialState: App.State(root: .main(.previewValue)),
 			reducer: App()
 		)
 
@@ -42,7 +42,7 @@ final class AppFeatureTests: TestCase {
 
 		var profileClient: ProfileClient = .testValue
 		profileClient.getAccounts = {
-			let accounts: [OnNetwork.Account] = [.placeholder0]
+			let accounts: [OnNetwork.Account] = [.previewValue0]
 			return NonEmpty(rawValue: OrderedSet(accounts))!
 		}
 		store.dependencies.profileClient = profileClient

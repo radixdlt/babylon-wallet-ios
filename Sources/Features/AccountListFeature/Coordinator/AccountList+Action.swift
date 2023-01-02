@@ -4,7 +4,7 @@ import Profile
 // MARK: - AccountList.Action
 public extension AccountList {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -14,14 +14,14 @@ public extension AccountList {
 
 // MARK: - AccountList.Action.ChildAction
 public extension AccountList.Action {
-	enum ChildAction: Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case account(id: AccountList.Row.State.ID, action: AccountList.Row.Action)
 	}
 }
 
 // MARK: - AccountList.Action.ViewAction
 public extension AccountList.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case viewAppeared
 		case alertDismissButtonTapped
 	}
@@ -29,7 +29,7 @@ public extension AccountList.Action {
 
 // MARK: - AccountList.Action.InternalAction
 public extension AccountList.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -37,12 +37,12 @@ public extension AccountList.Action {
 
 // MARK: - AccountList.Action.InternalAction.SystemAction
 public extension AccountList.Action.InternalAction {
-	enum SystemAction: Equatable {}
+	enum SystemAction: Sendable, Equatable {}
 }
 
 // MARK: - AccountList.Action.DelegateAction
 public extension AccountList.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case displayAccountDetails(AccountList.Row.State)
 		case copyAddress(AccountAddress)
 		case fetchPortfolioForAccounts

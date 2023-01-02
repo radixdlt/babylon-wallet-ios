@@ -5,7 +5,7 @@ import Profile
 import TransactionClient
 
 // MARK: - FaucetClient
-public struct FaucetClient {
+public struct FaucetClient: Sendable {
 	public var getFreeXRD: GetFreeXRD
 	public var isAllowedToUseFaucet: IsAllowedToUseFaucet
 	public var saveLastUsedEpoch: SaveLastUsedEpoch

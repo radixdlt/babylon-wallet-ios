@@ -1,7 +1,6 @@
 import ComposableArchitecture
-import Converse
-import ConverseCommon
 import Foundation
+import P2PConnection
 
 // MARK: - ConnectUsingSecrets.State
 public extension ConnectUsingSecrets {
@@ -10,14 +9,14 @@ public extension ConnectUsingSecrets {
 		public var isConnecting: Bool
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String
-		public var newConnection: Connection?
+		public var newP2PConnection: P2PConnection?
 		public var isNameValid: Bool
 		@BindableState public var focusedField: Field?
 
 		public init(
 			connectionSecrets: ConnectionSecrets,
 			isConnecting: Bool = true,
-			connectedConnection: Connection? = nil,
+			newP2PConnection: P2PConnection? = nil,
 			focusedField: Field? = nil,
 			isPromptingForName: Bool = false,
 			nameOfConnection: String = "",
@@ -28,7 +27,7 @@ public extension ConnectUsingSecrets {
 			self.isConnecting = isConnecting
 			self.isPromptingForName = isPromptingForName
 			self.nameOfConnection = nameOfConnection
-			self.newConnection = connectedConnection
+			self.newP2PConnection = newP2PConnection
 			self.isNameValid = isNameValid
 		}
 	}

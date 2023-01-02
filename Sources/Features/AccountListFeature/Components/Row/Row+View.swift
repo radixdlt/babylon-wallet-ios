@@ -126,11 +126,9 @@ private struct HeaderView: View {
 // MARK: - Row_Preview
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
-		registerFonts()
-
-		return AccountList.Row.View(
+		AccountList.Row.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .previewValue,
 				reducer: AccountList.Row()
 			)
 		)

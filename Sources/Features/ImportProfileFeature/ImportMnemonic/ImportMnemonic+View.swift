@@ -50,21 +50,21 @@ public extension ImportMnemonic.View {
 				) {
 					viewStore.send(.importMnemonicButtonTapped)
 				}
-				.enabled(viewStore.canImportMnemonic)
+				.controlState(viewStore.importMnemonicButtonState)
 
 				Button(
 					L10n.ImportProfile.saveImportedMnemonic
 				) {
 					viewStore.send(.saveImportedMnemonicButtonTapped)
 				}
-				.enabled(viewStore.canSaveImportedMnemonic)
+				.controlState(viewStore.saveImportedMnemonicButtonState)
 
 				Button(
 					L10n.ImportProfile.profileFromSnapshot
 				) {
 					viewStore.send(.importProfileFromSnapshotButtonTapped)
 				}
-				.enabled(viewStore.canImportProfileFromSnapshot)
+				.controlState(viewStore.importProfileFromSnapshotButtonState)
 			}
 		}
 		.buttonStyle(.primaryRectangular)
@@ -75,14 +75,15 @@ public extension ImportMnemonic.View {
 public extension ImportMnemonic.View {
 	struct ViewState: Equatable {
 		public let phraseOfMnemonicToImport: String
-		public let canImportMnemonic: Bool
-		public let canSaveImportedMnemonic: Bool
-		public let canImportProfileFromSnapshot: Bool
+		public let importMnemonicButtonState: ControlState
+		public let saveImportedMnemonicButtonState: ControlState
+		public let importProfileFromSnapshotButtonState: ControlState
+
 		public init(state: ImportMnemonic.State) {
 			phraseOfMnemonicToImport = state.phraseOfMnemonicToImport
-			canImportMnemonic = !state.phraseOfMnemonicToImport.isEmpty
-			canSaveImportedMnemonic = state.importedMnemonic != nil
-			canImportProfileFromSnapshot = state.savedMnemonic != nil
+			importMnemonicButtonState = !state.phraseOfMnemonicToImport.isEmpty ? .enabled : .disabled
+			saveImportedMnemonicButtonState = state.importedMnemonic != nil ? .enabled : .disabled
+			importProfileFromSnapshotButtonState = state.savedMnemonic != nil ? .enabled : .disabled
 		}
 	}
 }

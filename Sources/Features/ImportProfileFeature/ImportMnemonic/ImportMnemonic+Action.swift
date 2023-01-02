@@ -5,7 +5,7 @@ import Profile
 
 // MARK: - ImportMnemonic.Action
 public extension ImportMnemonic {
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -14,7 +14,7 @@ public extension ImportMnemonic {
 
 // MARK: - ImportMnemonic.Action.ViewAction
 public extension ImportMnemonic.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case goBackButtonTapped
 		case importMnemonicButtonTapped
 		case importProfileFromSnapshotButtonTapped
@@ -25,7 +25,7 @@ public extension ImportMnemonic.Action {
 
 // MARK: - ImportMnemonic.Action.InternalAction
 public extension ImportMnemonic.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -33,7 +33,7 @@ public extension ImportMnemonic.Action {
 
 // MARK: - ImportMnemonic.Action.SystemAction
 public extension ImportMnemonic.Action {
-	enum SystemAction: Equatable {
+	enum SystemAction: Sendable, Equatable {
 		case importMnemonicResult(TaskResult<Mnemonic>)
 		case saveImportedMnemonicResult(TaskResult<Mnemonic>)
 		case profileFromSnapshotResult(TaskResult<Profile>)
@@ -42,7 +42,7 @@ public extension ImportMnemonic.Action {
 
 // MARK: - ImportMnemonic.Action.DelegateAction
 public extension ImportMnemonic.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case goBack
 		case finishedImporting(mnemonic: Mnemonic, andProfile: Profile)
 	}

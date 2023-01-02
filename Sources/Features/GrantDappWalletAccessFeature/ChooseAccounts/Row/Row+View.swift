@@ -69,18 +69,14 @@ extension ChooseAccounts.Row.View {
 }
 
 #if DEBUG
-
-// MARK: - Row_Preview
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
-		registerFonts()
-
-		return ChooseAccounts.Row.View(
+		ChooseAccounts.Row.View(
 			store: .init(
-				initialState: .placeholderOne,
+				initialState: .previewValueOne,
 				reducer: ChooseAccounts.Row()
 			)
 		)
 	}
 }
-#endif // DEBUG
+#endif

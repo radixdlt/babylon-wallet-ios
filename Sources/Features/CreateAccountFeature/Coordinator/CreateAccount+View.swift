@@ -29,7 +29,7 @@ public extension CreateAccount.View {
 						state: \.accountCompletion,
 						action: { .child(.accountCompletion($0)) }
 					),
-					then: AccountCompletion.View.init(store:)
+					then: { AccountCompletion.View(store: $0) }
 				)
 				.zIndex(2)
 
@@ -151,9 +151,7 @@ private extension CreateAccount.View {
 // MARK: - CreateAccount_Previews
 struct CreateAccount_Previews: PreviewProvider {
 	static var previews: some View {
-		registerFonts()
-
-		return CreateAccount.View(
+		CreateAccount.View(
 			store: .init(
 				initialState: .init(shouldCreateProfile: false),
 				reducer: CreateAccount()

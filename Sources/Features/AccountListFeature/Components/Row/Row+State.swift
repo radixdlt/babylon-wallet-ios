@@ -7,7 +7,7 @@ import Profile
 // MARK: - AccountList.Row.State
 public extension AccountList.Row {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public let account: OnNetwork.Account
 		public var aggregatedValue: Float?
 		public var portfolio: AccountPortfolio
@@ -57,6 +57,6 @@ extension AccountList.Row.State: Identifiable {
 #if DEBUG
 import ProfileClient
 public extension AccountList.Row.State {
-	static let placeholder = Self(account: .placeholder0)
+	static let previewValue = Self(account: .previewValue0)
 }
 #endif

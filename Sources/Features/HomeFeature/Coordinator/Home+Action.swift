@@ -18,7 +18,7 @@ import TransactionSigningFeature
 // MARK: - Home.Action
 public extension Home {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -28,7 +28,7 @@ public extension Home {
 
 // MARK: - Home.Action.ChildAction
 public extension Home.Action {
-	enum ChildAction: Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case accountList(AccountList.Action)
 		case header(Home.Header.Action)
 		case accountPreferences(AccountPreferences.Action)
@@ -40,7 +40,7 @@ public extension Home.Action {
 
 // MARK: - Home.Action.ViewAction
 public extension Home.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case pullToRefreshStarted
 		case createAccountButtonTapped
@@ -49,7 +49,7 @@ public extension Home.Action {
 
 // MARK: - Home.Action.InternalAction
 public extension Home.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
@@ -57,7 +57,7 @@ public extension Home.Action {
 
 // MARK: - Home.Action.SystemAction
 public extension Home.Action {
-	enum SystemAction: Equatable {
+	enum SystemAction: Sendable, Equatable {
 		case createAccount(numberOfExistingAccounts: Int)
 
 		case accountsLoadedResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
@@ -70,7 +70,7 @@ public extension Home.Action {
 
 // MARK: - Home.Action.DelegateAction
 public extension Home.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case displaySettings
 		case reloadAccounts
 	}

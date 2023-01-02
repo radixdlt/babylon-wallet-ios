@@ -2,7 +2,7 @@ import Dependencies
 import Profile
 
 // MARK: - AccountPortfolioFetcher
-public struct AccountPortfolioFetcher {
+public struct AccountPortfolioFetcher: Sendable {
 	public var fetchPortfolio: FetchPortfolio
 
 	public init(

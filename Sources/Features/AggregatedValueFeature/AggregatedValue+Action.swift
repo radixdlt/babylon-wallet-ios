@@ -3,7 +3,7 @@ import Foundation
 // MARK: - AggregatedValue.Action
 public extension AggregatedValue {
 	// MARK: Action
-	enum Action: Equatable {
+	enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -12,21 +12,21 @@ public extension AggregatedValue {
 
 // MARK: - AggregatedValue.Action.ViewAction
 public extension AggregatedValue.Action {
-	enum ViewAction: Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case toggleVisibilityButtonTapped
 	}
 }
 
 // MARK: - AggregatedValue.Action.InternalAction
 public extension AggregatedValue.Action {
-	enum InternalAction: Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 	}
 }
 
 // MARK: - AggregatedValue.Action.DelegateAction
 public extension AggregatedValue.Action {
-	enum DelegateAction: Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case toggleIsCurrencyAmountVisible
 	}
 }

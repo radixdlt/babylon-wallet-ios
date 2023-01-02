@@ -1,7 +1,7 @@
 import ComposableArchitecture
 
 public extension FungibleTokenList {
-	struct Section: ReducerProtocol {
+	struct Section: Sendable, ReducerProtocol {
 		public init() {}
 
 		public var body: some ReducerProtocolOf<Self> {

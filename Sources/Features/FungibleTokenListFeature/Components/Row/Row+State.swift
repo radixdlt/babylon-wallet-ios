@@ -6,7 +6,7 @@ import Profile
 // MARK: - FungibleTokenList.Row.State
 public extension FungibleTokenList.Row {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public var container: FungibleTokenContainer
 
 		// MARK: - AppSettings properties

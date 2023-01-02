@@ -1,8 +1,7 @@
 import ComposableArchitecture
-import Converse
-import ConverseCommon
 import Foundation
 import NewConnectionFeature
+import P2PConnection
 import P2PConnectivityClient
 import Profile
 import SharedModels
@@ -34,7 +33,7 @@ public extension ManageP2PClients.Action {
 // MARK: - ManageP2PClients.Action.ViewAction
 public extension ManageP2PClients.Action {
 	enum ViewAction: Sendable, Equatable {
-		case viewAppeared
+		case task
 		case dismissButtonTapped
 		case addNewConnectionButtonTapped
 	}

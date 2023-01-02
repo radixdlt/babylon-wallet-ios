@@ -5,7 +5,7 @@ import ComposableArchitecture
 // MARK: FungibleTokenList.State
 public extension FungibleTokenList {
 	// MARK: State
-	struct State: Equatable {
+	struct State: Sendable, Equatable {
 		public var sections: IdentifiedArrayOf<FungibleTokenList.Section.State>
 		public var selectedToken: FungibleTokenContainer?
 

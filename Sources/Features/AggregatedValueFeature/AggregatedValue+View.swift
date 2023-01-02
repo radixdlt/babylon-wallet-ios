@@ -135,17 +135,15 @@ private struct VisibilityButton: View {
 	}
 }
 
-/*
- // MARK: - AggregatedValue_Preview
- struct AggregatedValue_Preview: PreviewProvider {
- 	static var previews: some View {
- 		Home.AggregatedValue.View(
- 			store: .init(
- 				initialState: .placeholder,
- 				reducer: Home.AggregatedValue.reducer,
- 				environment: .init()
- 			)
- 		)
- 	}
- }
- */
+#if DEBUG
+struct AggregatedValue_Preview: PreviewProvider {
+	static var previews: some View {
+		AggregatedValue.View(
+			store: .init(
+				initialState: .previewValue,
+				reducer: AggregatedValue()
+			)
+		)
+	}
+}
+#endif

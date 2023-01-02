@@ -47,11 +47,11 @@ public extension Home {
 #if DEBUG
 
 public extension Home.State {
-	static let placeholder = Home.State(
+	static let previewValue = Home.State(
 		header: .init(hasNotification: false),
 		accountDetails: AccountDetails.State(
 			for: .init(
-				account: .placeholder0,
+				account: .previewValue0,
 				aggregatedValue: nil,
 				portfolio: AccountPortfolio(
 					fungibleTokenContainers: [],

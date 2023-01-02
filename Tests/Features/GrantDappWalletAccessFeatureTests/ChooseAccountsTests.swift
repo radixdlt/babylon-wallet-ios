@@ -12,9 +12,9 @@ final class ChooseAccountsTests: TestCase {
 		// given
 		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
 			requestItem: .init(numberOfAddresses: 1),
-			parentRequest: .placeholder
+			parentRequest: .previewValue
 		)
-		var singleAccount = ChooseAccounts.Row.State.placeholderOne
+		var singleAccount = ChooseAccounts.Row.State.previewValueOne
 		singleAccount.isSelected = true
 		let store = TestStore(
 			initialState: ChooseAccounts.State(
@@ -38,7 +38,7 @@ final class ChooseAccountsTests: TestCase {
 		// given
 		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
 			requestItem: .init(numberOfAddresses: 1),
-			parentRequest: .placeholder
+			parentRequest: .previewValue
 		)
 		let store = TestStore(
 			initialState: ChooseAccounts.State(request: requestItem),
@@ -54,11 +54,11 @@ final class ChooseAccountsTests: TestCase {
 
 	func test_didSelectAccount_whenTappedOnSelectedAccount_thenDeselectThatAccount() async {
 		// given
-		var accountRow = ChooseAccounts.Row.State.placeholderOne
+		var accountRow = ChooseAccounts.Row.State.previewValueOne
 		accountRow.isSelected = true
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: 1), parentRequest: .placeholder),
+			request: .init(requestItem: .init(numberOfAddresses: 1), parentRequest: .previewValue),
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
@@ -82,14 +82,14 @@ final class ChooseAccountsTests: TestCase {
 
 	func test_didSelectAccount_whenTappedOnDeselectedAccount_thenSelectThatAccount_ifMustSelectAtLeastOneAccount() async {
 		// given
-		var accountRowOne = ChooseAccounts.Row.State.placeholderOne
+		var accountRowOne = ChooseAccounts.Row.State.previewValueOne
 		accountRowOne.isSelected = false
 
-		var accountRowTwo = ChooseAccounts.Row.State.placeholderTwo
+		var accountRowTwo = ChooseAccounts.Row.State.previewValueTwo
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: .oneOrMore), parentRequest: .placeholder),
+			request: .init(requestItem: .init(numberOfAddresses: .oneOrMore), parentRequest: .previewValue),
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
@@ -120,11 +120,11 @@ final class ChooseAccountsTests: TestCase {
 
 	func test_didSelectAccount_whenTappedOnDeselectedAccount_thenSelectThatAccount_ifNotOverSelectedAccountLimit() async {
 		// given
-		var accountRow = ChooseAccounts.Row.State.placeholderOne
+		var accountRow = ChooseAccounts.Row.State.previewValueOne
 		accountRow.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .placeholder),
+			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .previewValue),
 			canProceed: false,
 			accounts: .init(
 				uniqueElements: [
@@ -148,14 +148,14 @@ final class ChooseAccountsTests: TestCase {
 
 	func test_didSelectAccount_whenTappedOnDeselectedAccount_thenDontSelectThatAccount_ifOverSelectedAccountLimit() async {
 		// given
-		var accountRowOne = ChooseAccounts.Row.State.placeholderOne
+		var accountRowOne = ChooseAccounts.Row.State.previewValueOne
 		accountRowOne.isSelected = true
 
-		var accountRowTwo = ChooseAccounts.Row.State.placeholderTwo
+		var accountRowTwo = ChooseAccounts.Row.State.previewValueTwo
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .placeholder),
+			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .previewValue),
 			canProceed: true,
 			accounts: .init(
 				uniqueElements: [

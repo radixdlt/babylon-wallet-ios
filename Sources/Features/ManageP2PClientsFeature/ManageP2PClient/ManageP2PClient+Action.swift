@@ -1,6 +1,5 @@
 import ComposableArchitecture
-import Converse
-import ConverseCommon
+import P2PConnection
 
 // MARK: - ManageP2PClient.Action
 public extension ManageP2PClient {
@@ -39,6 +38,6 @@ public extension ManageP2PClient.Action {
 // MARK: - ManageP2PClient.Action.InternalAction.SystemAction
 public extension ManageP2PClient.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
-		case connectionStatusResult(TaskResult<Connection.State>)
+		case connectionStatusResult(TaskResult<ConnectionStatus>)
 	}
 }

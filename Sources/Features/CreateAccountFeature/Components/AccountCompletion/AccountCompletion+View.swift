@@ -152,11 +152,9 @@ extension AccountCompletion.View {
 // MARK: - AccountCompletion_Preview
 struct AccountCompletion_Preview: PreviewProvider {
 	static var previews: some View {
-		registerFonts()
-
-		return AccountCompletion.View(
+		AccountCompletion.View(
 			store: .init(
-				initialState: .placeholder,
+				initialState: .previewValue,
 				reducer: AccountCompletion()
 			)
 		)
