@@ -49,6 +49,8 @@ public enum L10n {
     public static let tokens = L10n.tr("Localizable", "assetsView.tokens", fallback: "Tokens")
   }
   public enum Common {
+    /// Inconsistency trying to use deleted Linked Connector.
+    public static let p2PClientNotFoundInProfile = L10n.tr("Localizable", "common.P2PClientNotFoundInProfile", fallback: "Inconsistency trying to use deleted Linked Connector.")
     /// Linked Connector Offline
     public static let p2PConnectionOffline = L10n.tr("Localizable", "common.P2PConnectionOffline", fallback: "Linked Connector Offline")
   }

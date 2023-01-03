@@ -17,17 +17,20 @@ public struct ManageP2PClients: Sendable, ReducerProtocol {
 
 public extension ManageP2PClients {
 	var body: some ReducerProtocolOf<Self> {
-		Reduce(self.core)
-			.forEach(\.connections, action: /Action.child .. Action.ChildAction.connection) {
-				ManageP2PClient()
-			}
-			.ifLet(
-				\.newConnection,
-				action: /Action.child .. Action.ChildAction.newConnection
-			) {
-				NewConnection()
-					._printChanges()
-			}
+		CombineReducers {
+			EmptyReducer()
+				.forEach(\.connections, action: /Action.child .. Action.ChildAction.connection) {
+					ManageP2PClient()
+				}
+				.ifLet(
+					\.newConnection,
+					action: /Action.child .. Action.ChildAction.newConnection
+				) {
+					NewConnection()
+				}
+
+			Reduce(self.core)
+		}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -38,8 +41,11 @@ public extension ManageP2PClients {
 				print("☑️ ManageP2PClients getting p2pClients.......")
 				do {
 					for try await p2pClients in try await p2pConnectivityClient.getP2PClients() {
-						guard !Task.isCancelled else { return }
-						print("✅ ManageP2PClients got p2pClients: \(p2pClients.map(\.p2pClient.displayName)) ")
+						guard !Task.isCancelled else {
+							print("❌  ManageP2PClients cancelled getting p2pClients..?")
+							return
+						}
+						print("✅ ManageP2PClients got p2pClients: \(p2pClients.map(\.displayName)) ")
 						await send(.internal(.system(.loadConnectionsResult(
 							.success(p2pClients)
 						))))
@@ -53,7 +59,7 @@ public extension ManageP2PClients {
 			}
 
 		case let .internal(.system(.loadConnectionsResult(.success(connectionsFromProfile)))):
-			state.connections = .init(uniqueElements: connectionsFromProfile)
+			state.connections = .init(uniqueElements: connectionsFromProfile.map { .init(p2pClient: $0, connectionStatus: .new) })
 			return .none
 
 		case let .internal(.system(.loadConnectionsResult(.failure(error)))):

@@ -11,9 +11,11 @@ public struct ConnectUsingSecrets: Sendable, ReducerProtocol {
 }
 
 public extension ConnectUsingSecrets {
+	private enum FocusFieldID {}
+	private enum ConnectID {}
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.view(.appeared)):
+		case .internal(.view(.task)):
 			return .run { [connectionPassword = state.connectionSecrets.connectionPassword] send in
 				await send(.internal(.system(.establishConnectionResult(
 					TaskResult {
@@ -22,22 +24,33 @@ public extension ConnectUsingSecrets {
 						)
 					}
 				))))
-
-				try await self.mainQueue.sleep(for: .seconds(0.5))
-				await send(.internal(.system(.focusTextField(.connectionName))))
 			}
+			.cancellable(id: ConnectID.self)
+
+		case .internal(.view(.appeared)):
+			return .task {
+				return .view(.textFieldFocused(.connectionName))
+			}
+			.cancellable(id: FocusFieldID.self)
 
 		case let .internal(.system(.establishConnectionResult(.success(idOfNewConnection)))):
 			state.idOfNewConnection = idOfNewConnection
 			state.isConnecting = false
 			state.isPromptingForName = true
-
 			return .none
+
 		case let .internal(.view(.textFieldFocused(focus))):
 			return .run { send in
-				try? await self.mainQueue.sleep(for: .seconds(0.5))
-				await send(.internal(.system(.focusTextField(focus))))
+				do {
+					try await self.mainQueue.sleep(for: .seconds(0.5))
+					try Task.checkCancellation()
+					await send(.internal(.system(.focusTextField(focus))))
+				} catch {
+					/* noop */
+					print("failed to sleep or task cancelled? error: \(String(describing: error))")
+				}
 			}
+			.cancellable(id: FocusFieldID.self)
 
 		case let .internal(.system(.focusTextField(focus))):
 			state.focusedField = focus
@@ -59,7 +72,6 @@ public extension ConnectUsingSecrets {
 			)
 
 			return .run { send in
-				await send(.internal(.view(.textFieldFocused(nil))))
 				await send(.delegate(.connected(clientWithConnectionStatus)))
 			}
 
@@ -74,7 +86,7 @@ public extension ConnectUsingSecrets {
 			return .none
 
 		case .delegate:
-			return .none
+			return .cancel(ids: [FocusFieldID.self, ConnectID.self])
 		}
 	}
 }

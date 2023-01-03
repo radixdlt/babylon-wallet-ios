@@ -19,6 +19,7 @@ public extension ConnectUsingSecrets.Action {
 // MARK: - ConnectUsingSecrets.Action.ViewAction
 public extension ConnectUsingSecrets.Action {
 	enum ViewAction: Sendable, Equatable {
+		case task
 		case appeared
 		case nameOfConnectionChanged(String)
 		case confirmNameButtonTapped

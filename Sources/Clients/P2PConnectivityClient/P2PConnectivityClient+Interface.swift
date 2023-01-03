@@ -35,12 +35,12 @@ public struct P2PConnectivityClient: DependencyKey, Sendable {
 
 public extension P2PConnectivityClient {
 	typealias GetLocalNetworkAccess = @Sendable () async -> Bool
-	typealias GetP2PClients = @Sendable () async throws -> AnyAsyncSequence<OrderedSet<P2P.ClientWithConnectionStatus>>
+	typealias GetP2PClients = @Sendable () async throws -> AnyAsyncSequence<OrderedSet<P2PClient>>
 
 	typealias AddP2PClientWithConnection = @Sendable (P2PClient, AlsoConnect) async throws -> Void; typealias AlsoConnect = Bool
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 
-	typealias GetConnectionStatusAsyncSequence = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<P2P.ConnectionUpdate>
+	typealias GetConnectionStatusAsyncSequence = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<P2P.ClientWithConnectionStatus>
 	typealias GetRequestsFromP2PClientAsyncSequence = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<P2P.RequestFromClient>
 
 	typealias SendMessageReadReceipt = @Sendable (P2PClient.ID, P2PConnections.IncomingMessage) async throws -> Void

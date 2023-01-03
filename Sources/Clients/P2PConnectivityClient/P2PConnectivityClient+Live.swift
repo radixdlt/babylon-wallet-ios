@@ -9,6 +9,15 @@ import ProfileClient
 import Resources
 import SharedModels
 
+// MARK: - AnyAsyncIterator + Sendable
+extension AnyAsyncIterator: @unchecked Sendable where Element: Sendable {}
+
+// MARK: - AnyAsyncSequence + Sendable
+extension AnyAsyncSequence: @unchecked Sendable where Element: Sendable {}
+
+// MARK: - AsyncThrowingStream.Iterator + Sendable
+extension AsyncThrowingStream.Iterator: @unchecked Sendable where Element: Sendable {}
+
 extension P2P.ClientWithConnectionStatus {
 	func connected() -> Self {
 		.init(p2pClient: p2pClient, connectionStatus: .connected)
@@ -26,14 +35,6 @@ extension ProfileClient {
 // MARK: - P2PConnectivityClient + :LiveValue
 public extension P2PConnectivityClient {
 	static let liveValue: Self = {
-		actor Once: GlobalActor {
-			init() {}
-			static let shared = Once()
-			fileprivate var hasLoadedP2PClientsFromProfile = false
-			func setHasLoaded(_ hasLoadedP2PClientsFromProfile: Bool) async {
-				self.hasLoadedP2PClientsFromProfile = hasLoadedP2PClientsFromProfile
-			}
-		}
 		@Dependency(\.profileClient) var profileClient
 
 		let localNetworkAuthorization = LocalNetworkAuthorization()
@@ -45,49 +46,60 @@ public extension P2PConnectivityClient {
 			return client
 		}
 
+		actor ClientsHolder: GlobalActor {
+			typealias Value = OrderedSet<P2PClient>
+			private let subject = AsyncCurrentValueSubject<Value>([])
+			static let shared = ClientsHolder()
+			init() {}
+
+			func emit(_ value: Value) {
+				subject.send(value)
+			}
+
+			func emit(_ value: P2PClients) {
+				emit(OrderedSet(value))
+			}
+
+			func clientsAsyncSequence() -> AnyAsyncSequence<Value> {
+				subject
+					.eraseToAnyAsyncSequence()
+			}
+		}
+
 		return Self(
 			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
 			},
 			getP2PClients: {
-				if await Once.shared.hasLoadedP2PClientsFromProfile == false {
-					let clients = try await profileClient.getP2PClients()
+				let savedClients = try await profileClient.getP2PClients()
+				await ClientsHolder.shared.emit(savedClients)
+				Task {
 					try await P2PConnections.shared.add(
-						connectionsFor: clients,
+						connectionsFor: profileClient.getP2PClients(),
 						autoconnect: true
 					)
-					await Once.shared.setHasLoaded(true)
 				}
-				let multicastSubject = AsyncThrowingPassthroughSubject<OrderedSet<P2P.ClientWithConnectionStatus>, Swift.Error>()
-
-				// We MUST make sure to multicast because both HandleDappRequest and ManageP2PClients features use this method `getP2PClients`, and AsyncSequence does not support multicast
-				return try await P2PConnections.shared.connectionsAsyncSequence().map { clientIDs in
-					try await OrderedSet(
-						clientIDs.asyncMap {
-							try await profileClient.p2pClient(for: $0)
-						}.compactMap { client in
-							guard let client else { return nil }
-							return P2P.ClientWithConnectionStatus(p2pClient: client, connectionStatus: .connected)
-						}
-					)
-				}
-				.multicast(multicastSubject)
-				.autoconnect()
-				.eraseToAnyAsyncSequence()
+				return await ClientsHolder.shared.clientsAsyncSequence()
 			},
 			addP2PClientWithConnection: { client, autoconnect in
 				try await profileClient.addP2PClient(client)
+				Task {
+					try await ClientsHolder.shared.emit(profileClient.getP2PClients())
+				}
 				_ = try await P2PConnections.shared.add(config: client.config, autoconnect: autoconnect)
 			},
 			deleteP2PClientByID: { id in
 				try await profileClient.deleteP2PClientByID(id)
+				Task {
+					try await ClientsHolder.shared.emit(profileClient.getP2PClients())
+				}
 				try await P2PConnections.shared.removeAndDisconnect(id: id)
 			},
 			getConnectionStatusAsyncSequence: { id in
 				try await P2PConnections.shared.connectionStatusChangeEventAsyncSequence(for: id).map {
-					try await P2P.ConnectionUpdate(
-						connectionStatus: $0.connectionStatus,
-						p2pClient: client(byID: id)
+					try await P2P.ClientWithConnectionStatus(
+						p2pClient: client(byID: id),
+						connectionStatus: $0.connectionStatus
 					)
 				}.eraseToAnyAsyncSequence()
 			},

@@ -39,9 +39,9 @@ extension P2PConnectivityClient {
 }
 
 public extension P2PClient {
-	static let previewValue = try! Self(
-		displayName: "Placeholder",
-		connectionPassword: Data(hexString: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
+	static let previewValue = Self(
+		connectionPassword: .placeholder,
+		displayName: "Placeholder"
 	)
 }
 #endif // DEBUG
