@@ -15,11 +15,11 @@ public struct ManageP2PClient: Sendable, ReducerProtocol {
 }
 
 public extension ManageP2PClient {
-	private enum EmitConnectionStatusID {}
+	private enum ConnectionUpdateTasksID {}
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.viewAppeared)):
-			return .run { [id = state.id] send in
+			return .run { [id = state.client.id] send in
 				await withThrowingTaskGroup(of: Void.self) { taskGroup in
 					_ = taskGroup.addTaskUnlessCancelled {
 						do {
@@ -37,9 +37,17 @@ public extension ManageP2PClient {
 							))))
 						}
 					}
+
+					//                    _ = taskGroup.addTaskUnlessCancelled {
+					//                        do {
+//
+					//                        } catch {
+//
+					//                        }
+					//                    }
 				}
 			}
-			.cancellable(id: EmitConnectionStatusID.self)
+			.cancellable(id: ConnectionUpdateTasksID.self)
 
 		case let .internal(.system(.connectionStatusResult(.success(newStatus)))):
 			state.connectionStatus = newStatus
@@ -60,7 +68,7 @@ public extension ManageP2PClient {
 			}
 		#endif // DEBUG
 		case .delegate:
-			return .cancel(id: EmitConnectionStatusID.self)
+			return .cancel(id: ConnectionUpdateTasksID.self)
 		}
 	}
 }

@@ -28,13 +28,13 @@ final class NewConnectionTests: TestCase {
 			),
 			reducer: NewConnection()
 		)
-		let connectedClient = P2P.ClientWithConnectionStatus(p2pClient: .placeholder)
+		let connectedClient = P2P.ClientWithConnectionStatus(p2pClient: .previewValue)
 		await store.send(.child(.connectUsingSecrets(.delegate(.connected(connectedClient)))))
 		await store.receive(.delegate(.newConnection(connectedClient)))
 	}
 
 	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_saved_but_without_name() async throws {
-		let connectedClient = P2P.ClientWithConnectionStatus(p2pClient: .placeholder, connectionStatus: .connected)
+		let connectedClient = P2P.ClientWithConnectionStatus(p2pClient: .previewValue, connectionStatus: .connected)
 
 		let store = TestStore(
 			// GIVEN initial state
@@ -78,13 +78,10 @@ final class NewConnectionTests: TestCase {
 		await testScheduler.advance(by: .seconds(1))
 		let connectedClient = P2P.ClientWithConnectionStatus(p2pClient: .init(connectionPassword: secrets.connectionPassword, displayName: connectionName), connectionStatus: .connected)
 
-		await store.receive(.child(.connectUsingSecrets(.internal(.view(.textFieldFocused(nil))))))
 		await store.receive(.child(.connectUsingSecrets(.delegate(.connected(connectedClient)))))
 		await store.receive(.delegate(.newConnection(
 			connectedClient
 		))
 		)
-
-		await store.receive(.child(.connectUsingSecrets(.internal(.system(.focusTextField(.none))))))
 	}
 }

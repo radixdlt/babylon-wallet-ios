@@ -26,9 +26,7 @@ extension P2P.ClientWithConnectionStatus {
 
 extension ProfileClient {
 	func p2pClient(for id: P2PConnectionID) async throws -> P2PClient? {
-		try await getP2PClients().filter { client in
-			client.id == id
-		}.first
+		try await getP2PClients().first(where: { $0.id == id })
 	}
 }
 
@@ -154,6 +152,9 @@ public extension P2PConnectivityClient {
 					print("Failed to send test message, error: \(String(describing: error))")
 				}
 				// does not care about sent message receipts
+			},
+			_debugWebsocketStatusAsyncSequence: { id in
+				try await P2PConnections.shared.debugWebSocketState(for: id).eraseToAnyAsyncSequence()
 			}
 		)
 	}()

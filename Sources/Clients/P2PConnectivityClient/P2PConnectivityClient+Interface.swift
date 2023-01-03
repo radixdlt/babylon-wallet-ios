@@ -30,7 +30,10 @@ public struct P2PConnectivityClient: DependencyKey, Sendable {
 	public var getRequestsFromP2PClientAsyncSequence: GetRequestsFromP2PClientAsyncSequence
 	public var sendMessageReadReceipt: SendMessageReadReceipt
 	public var sendMessage: SendMessage
+
+	// MARK: Debug functionality
 	public var _sendTestMessage: _SendTestMessage
+	public var _debugWebsocketStatusAsyncSequence: DebugGetWebsocketStatusAsyncSequence
 }
 
 public extension P2PConnectivityClient {
@@ -45,5 +48,8 @@ public extension P2PConnectivityClient {
 
 	typealias SendMessageReadReceipt = @Sendable (P2PClient.ID, P2PConnections.IncomingMessage) async throws -> Void
 	typealias SendMessage = @Sendable (P2P.ResponseToClientByID) async throws -> P2P.SentResponseToClient
+
+	// MARK: Debug functionality
 	typealias _SendTestMessage = @Sendable (P2PClient.ID, String) async throws -> Void
+	typealias DebugGetWebsocketStatusAsyncSequence = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<WebSocketState>
 }

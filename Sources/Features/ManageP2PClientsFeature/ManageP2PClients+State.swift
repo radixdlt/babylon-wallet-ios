@@ -9,16 +9,15 @@ import SharedModels
 // MARK: - ManageP2PClients.State
 public extension ManageP2PClients {
 	struct State: Equatable {
-		public var connections: IdentifiedArrayOf<P2P.ClientWithConnectionStatus>
+		public var clients: IdentifiedArrayOf<ManageP2PClient.State>
 
 		public var newConnection: NewConnection.State?
 
 		public init(
-			connections: IdentifiedArrayOf<P2P.ClientWithConnectionStatus> = .init(),
+			clients: IdentifiedArrayOf<ManageP2PClient.State> = .init(),
 			newConnection: NewConnection.State? = nil
 		) {
-			self.connections = connections
-
+			self.clients = clients
 			self.newConnection = newConnection
 		}
 	}

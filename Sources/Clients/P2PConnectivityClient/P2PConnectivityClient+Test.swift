@@ -20,7 +20,8 @@ extension P2PConnectivityClient: TestDependencyKey {
 		getRequestsFromP2PClientAsyncSequence: unimplemented("\(Self.self).getRequestsFromP2PClientAsyncSequence"),
 		sendMessageReadReceipt: unimplemented("\(Self.self).sendMessageReadReceipt"),
 		sendMessage: unimplemented("\(Self.self).sendMessage"),
-		_sendTestMessage: unimplemented("\(Self.self)._sendTestMessage")
+		_sendTestMessage: unimplemented("\(Self.self)._sendTestMessage"),
+		_debugWebsocketStatusAsyncSequence: unimplemented("\(Self.self)._debugWebsocketStatusAsyncSequence")
 	)
 }
 
@@ -34,7 +35,8 @@ extension P2PConnectivityClient {
 		getRequestsFromP2PClientAsyncSequence: { _ in fatalError() },
 		sendMessageReadReceipt: { _, _ in },
 		sendMessage: { _ in .previewValue },
-		_sendTestMessage: { _, _ in }
+		_sendTestMessage: { _, _ in },
+		_debugWebsocketStatusAsyncSequence: { _ in [].async.eraseToAnyAsyncSequence() }
 	)
 }
 

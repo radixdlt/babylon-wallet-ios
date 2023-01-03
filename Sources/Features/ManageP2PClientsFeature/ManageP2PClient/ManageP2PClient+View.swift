@@ -75,25 +75,26 @@ public extension ManageP2PClient.View {
 public extension ManageP2PClient.View {
 	struct ViewState: Equatable {
 		public var connectionName: String
-		public var connectionStatus: ConnectionStatus
 		#if DEBUG
+		public var connectionStatus: ConnectionStatus
 		public var connectionID: String
 		#endif // DEBUG
 		init(state: ManageP2PClient.State) {
-			connectionName = state.p2pClient.displayName
-			connectionStatus = state.connectionStatus
+			connectionName = state.client.displayName
 
 			#if DEBUG
+			connectionStatus = state.connectionStatus
 			connectionID = [
-				state.p2pClient.id.hex().prefix(4),
+				state.client.id.hex().prefix(4),
 				"...",
-				state.p2pClient.id.hex().suffix(6),
+				state.client.id.hex().suffix(6),
 			].joined()
 			#endif // DEBUG
 		}
 	}
 }
 
+#if DEBUG
 public extension ManageP2PClient.View.ViewState {
 	var connectionStatusDescription: String {
 		connectionStatus.rawValue.capitalized
@@ -110,3 +111,4 @@ public extension ManageP2PClient.View.ViewState {
 		}
 	}
 }
+#endif // DEBUG

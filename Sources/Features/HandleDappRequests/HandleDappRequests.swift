@@ -59,8 +59,6 @@ private extension HandleDappRequests {
 		case let .internal(.system(.receiveRequestFromP2PClientResult(.success(requestFromP2P)))):
 
 			return .run { send in
-				await send(.internal(.system(.sendMessageReceivedReceiptBackToPeer(requestFromP2P.client, readMessage: requestFromP2P.originalMessage))))
-
 				let currentNetworkID = await profileClient.getCurrentNetworkID()
 
 				guard requestFromP2P.requestFromDapp.metadata.networkId == currentNetworkID else {
@@ -226,6 +224,11 @@ private extension HandleDappRequests {
 					do {
 						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(connectedClient.id) {
 							print("✅ HandleDappRequests got requests for client: '\(connectedClient.displayName)'!!!!")
+
+							await send(.internal(.system(.sendMessageReceivedReceiptBackToPeer(
+								request.client, readMessage: request.originalMessage
+							))))
+
 							await send(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
 						}
 					} catch {

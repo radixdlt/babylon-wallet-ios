@@ -19,7 +19,7 @@ public extension ManageP2PClients {
 	var body: some ReducerProtocolOf<Self> {
 		CombineReducers {
 			EmptyReducer()
-				.forEach(\.connections, action: /Action.child .. Action.ChildAction.connection) {
+				.forEach(\.clients, action: /Action.child .. Action.ChildAction.connection) {
 					ManageP2PClient()
 				}
 				.ifLet(
@@ -46,23 +46,27 @@ public extension ManageP2PClients {
 							return
 						}
 						print("✅ ManageP2PClients got p2pClients: \(p2pClients.map(\.displayName)) ")
-						await send(.internal(.system(.loadConnectionsResult(
+						await send(.internal(.system(.loadClientsResult(
 							.success(p2pClients)
 						))))
 					}
 				} catch {
 					print("❌ ManageP2PClients failed to get p2pClients, error: \(String(describing: error))")
-					await send(.internal(.system(.loadConnectionsResult(
+					await send(.internal(.system(.loadClientsResult(
 						.failure(error)
 					))))
 				}
 			}
 
-		case let .internal(.system(.loadConnectionsResult(.success(connectionsFromProfile)))):
-			state.connections = .init(uniqueElements: connectionsFromProfile.map { .init(p2pClient: $0, connectionStatus: .new) })
+		case let .internal(.system(.loadClientsResult(.success(clientsFromProfile)))):
+
+			state.clients = .init(
+				uniqueElements: clientsFromProfile.map { ManageP2PClient.State(client: $0) }
+			)
+
 			return .none
 
-		case let .internal(.system(.loadConnectionsResult(.failure(error)))):
+		case let .internal(.system(.loadClientsResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
 
@@ -71,8 +75,8 @@ public extension ManageP2PClients {
 			return .none
 
 		case let .internal(.system(.saveNewConnectionResult(.success(newConnection)))):
-			state.connections.append(
-				newConnection
+			state.clients.append(
+				ManageP2PClient.State(clientWithConnectionStatus: newConnection)
 			)
 			return .none
 
@@ -104,7 +108,7 @@ public extension ManageP2PClients {
 			}
 
 		case let .internal(.system(.deleteConnectionResult(.success(deletedID)))):
-			state.connections.remove(id: deletedID)
+			state.clients.remove(id: deletedID)
 			return .none
 
 		case let .internal(.system(.deleteConnectionResult(.failure(error)))):
