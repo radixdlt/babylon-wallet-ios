@@ -8,7 +8,7 @@ public struct MakeTransactionHeaderInput: Sendable, Hashable {
 
 	public init(
 		epochWindow: Epoch = 10,
-		costUnitLimit: UInt32 = 10_000_000,
+		costUnitLimit: UInt32 = 100_000_000,
 		tipPercentage: UInt8 = 0
 	) {
 		self.epochWindow = epochWindow
