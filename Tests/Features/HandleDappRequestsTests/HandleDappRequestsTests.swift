@@ -127,7 +127,7 @@ final class HandleDappRequestsTests: TestCase {
 				await messageSentToDapp.setValue($0)
 				return P2P.SentResponseToClient(
 					sentReceipt: .init(
-						messageSent: .init(data: .deadbeef32Bytes, messageID: .deadbeef32Bytes)
+						messageSent: .init(data: try! Data(hexString: String(repeating: "deadbeef", count: 8)), messageID: String(repeating: "deadbeef", count: 8))
 					),
 					responseToDapp: $0.responseToDapp,
 					client: .previewValue
