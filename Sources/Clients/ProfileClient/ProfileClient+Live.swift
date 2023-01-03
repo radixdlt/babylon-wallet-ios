@@ -4,7 +4,7 @@ import CryptoKit
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
-import KeychainClientDependency
+import KeychainClient
 import NonEmpty
 import Profile
 import SLIP10

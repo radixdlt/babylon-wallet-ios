@@ -1,6 +1,6 @@
 import ComposableArchitecture
 import ErrorQueue
-import KeychainClientDependency
+import KeychainClient
 import Mnemonic
 import Profile
 import ProfileClient

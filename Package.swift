@@ -571,6 +571,7 @@ package.addModules([
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"ProfileClient",
+			.product(name: "ProfileView", package: "swift-profile"),
 			tca,
 			// ^^^ Sort lexicographically ^^^
 		],

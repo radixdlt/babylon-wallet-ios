@@ -2,7 +2,7 @@ import Common
 import ComposableArchitecture
 import DesignSystem
 import GatewayAPI
-import KeychainClientDependency
+import KeychainClient
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
 import Profile

@@ -1,7 +1,7 @@
 import Dependencies
 import Foundation
 import JSON
-import KeychainClientDependency
+import KeychainClient
 import Profile
 
 public extension ProfileLoader {

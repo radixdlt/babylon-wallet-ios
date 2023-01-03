@@ -34,7 +34,7 @@ public extension P2P.ToDapp.Response {
 }
 
 public extension ChunkingTransportOutgoingMessage {
-	static let previewValue = Self(data: .deadbeef32Bytes, messageID: MessageID())
+	static let previewValue = Self(data: try! Data(hexString: String(repeating: "deadbeef", count: 8)), messageID: MessageID())
 }
 
 public extension P2PConnection.SentReceipt {

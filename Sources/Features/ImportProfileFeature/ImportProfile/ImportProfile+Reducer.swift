@@ -3,7 +3,7 @@ import ErrorQueue
 import FileClient
 import Foundation
 import JSON
-import KeychainClientDependency
+import KeychainClient
 import Profile
 
 // MARK: - ImportProfile

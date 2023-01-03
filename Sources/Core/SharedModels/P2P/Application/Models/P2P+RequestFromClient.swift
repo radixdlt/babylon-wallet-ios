@@ -47,7 +47,7 @@ public extension P2PClient {
 }
 
 public extension P2PConnection.IncomingMessage {
-	static let previewValue = Self(messagePayload: .deadbeef32Bytes, messageID: "previewValue", messageHash: .deadbeef32Bytes)
+	static let previewValue = Self(messagePayload: try! Data(hexString: String(repeating: "deadbeef", count: 8)), messageID: "previewValue", messageHash: try! Data(hexString: String(repeating: "deadbeef", count: 8)))
 }
 
 public extension P2P.RequestFromClient {

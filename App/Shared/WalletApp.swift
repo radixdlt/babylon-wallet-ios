@@ -1,7 +1,7 @@
 import AppFeature
 import ComposableArchitecture
 import DesignSystem
-import KeychainClientDependency
+import KeychainClient
 import ProfileClient
 import SwiftUI
 import UserDefaultsClient
