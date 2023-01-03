@@ -27,9 +27,8 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 					await send(.delegate(.displayAccountPreferences(address)))
 				}
 			case .internal(.view(.copyAddressButtonTapped)):
-				return .run { [address = state.address] _ in
-					pasteboardClient.copyString(address.wrapAsAddress().address)
-				}
+				let address = state.address.address
+				return .fireAndForget { pasteboardClient.copyString(address) }
 			case .internal(.view(.pullToRefreshStarted)):
 				return .run { [address = state.address] send in
 					await send(.delegate(.refresh(address)))
