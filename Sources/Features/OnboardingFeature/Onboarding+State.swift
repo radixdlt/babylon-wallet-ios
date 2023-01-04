@@ -10,12 +10,12 @@ public extension Onboarding {
 		case createAccountFlow(CreateAccountCoordinator.State)
 
 		public init() {
-                        self = .createAccountFlow(
-                                .init(
-                                        completionDestination: .home,
-                                        rootState: .init(shouldCreateProfile: true)
-                                )
-                        )
+			self = .createAccountFlow(
+				.init(
+					completionDestination: .home,
+					rootState: .init(shouldCreateProfile: true)
+				)
+			)
 		}
 	}
 }

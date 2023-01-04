@@ -23,7 +23,6 @@ public extension AccountCompletion {
 
 // MARK: - AccountCompletion.State.Origin
 public extension AccountCompletion.State {
-
 	var accountAddress: AccountAddress {
 		account.address
 	}

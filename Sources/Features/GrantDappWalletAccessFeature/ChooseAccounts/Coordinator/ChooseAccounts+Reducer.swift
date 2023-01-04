@@ -95,13 +95,13 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 				}
 
 			case let .internal(.system(.createAccount(numberOfExistingAccounts: numberOfExistingAccounts))):
-                                state.createAccountFlow = .init(
-                                        completionDestination: .chooseAccounts,
-                                        rootState: .init(
-                                                shouldCreateProfile: false,
-                                                numberOfExistingAccounts: numberOfExistingAccounts
-                                        )
-                                )
+				state.createAccountFlow = .init(
+					completionDestination: .chooseAccounts,
+					rootState: .init(
+						shouldCreateProfile: false,
+						numberOfExistingAccounts: numberOfExistingAccounts
+					)
+				)
 				return .none
 
 			case .delegate(.dismissChooseAccounts):

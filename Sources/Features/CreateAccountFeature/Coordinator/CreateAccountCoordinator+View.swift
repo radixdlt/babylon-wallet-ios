@@ -15,14 +15,14 @@ public extension CreateAccountCoordinator {
 
 public extension CreateAccountCoordinator.View {
 	var body: some View {
-                SwitchStore(store.scope(state: \.root)) {
+		SwitchStore(store.scope(state: \.root)) {
 			CaseLet(
-                                state: /CreateAccountCoordinator.State.Root.createAccount,
+				state: /CreateAccountCoordinator.State.Root.createAccount,
 				action: { CreateAccountCoordinator.Action.child(.createAccount($0)) },
 				then: { CreateAccount.View(store: $0) }
 			)
 			CaseLet(
-                                state: /CreateAccountCoordinator.State.Root.accountCompletion,
+				state: /CreateAccountCoordinator.State.Root.accountCompletion,
 				action: { CreateAccountCoordinator.Action.child(.accountCompletion($0)) },
 				then: { AccountCompletion.View(store: $0) }
 			)
