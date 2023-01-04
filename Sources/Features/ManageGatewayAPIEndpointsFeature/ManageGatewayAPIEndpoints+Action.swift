@@ -11,7 +11,7 @@ public extension ManageGatewayAPIEndpoints {
 		case delegate(DelegateAction)
 
 		/// Child
-		case createAccount(CreateAccount.Action)
+		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 }
 
