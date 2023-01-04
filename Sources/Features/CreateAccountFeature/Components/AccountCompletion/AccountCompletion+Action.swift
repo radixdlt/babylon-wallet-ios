@@ -35,5 +35,6 @@ public extension AccountCompletion.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case displayHome
 		case displayChooseAccounts
+		case completed
 	}
 }

@@ -46,6 +46,6 @@ public extension App.Action {
 	enum SystemAction: Sendable, Equatable {
 		case deletedIncompatibleProfile
 		case displayErrorAlert(App.UserFacingError)
-		case injectProfileIntoProfileClientResult(TaskResult<Profile>, createdNewProfile: Bool)
+		case injectProfileIntoProfileClientResult(TaskResult<Profile>)
 	}
 }

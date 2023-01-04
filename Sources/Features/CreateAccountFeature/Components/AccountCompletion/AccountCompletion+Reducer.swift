@@ -9,15 +9,8 @@ public extension AccountCompletion {
 	func reduce(into state: inout State, action: Action) -> ComposableArchitecture.Effect<Action, Never> {
 		switch action {
 		case .internal(.view(.goToDestination)):
-			switch state.destination {
-			case .home:
-				return .run { send in
-					await send(.delegate(.displayHome))
-				}
-			case .chooseAccounts:
-				return .run { send in
-					await send(.delegate(.displayChooseAccounts))
-				}
+			return .run { send in
+				await send(.delegate(.completed))
 			}
 
 		case .delegate:
