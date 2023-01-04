@@ -20,6 +20,6 @@ final class AccountListFeatureTests: TestCase {
 
 		// when
 		await store.send(.child(.account(id: initialState.accounts.first!.id, action: .view(.copyAddressButtonTapped))))
-		wait(for: [expectation], timeout: 1.0)
+		wait(for: [expectation], timeout: 0)
 	}
 }

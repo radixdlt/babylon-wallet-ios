@@ -58,7 +58,7 @@ final class AccountDetailsFeatureTests: TestCase {
 
 		// when
 		await store.send(.internal(.view(.copyAddressButtonTapped)))
-		wait(for: [expectation], timeout: 1.0)
+		wait(for: [expectation], timeout: 0)
 	}
 
 	func test_refresh_whenInitiatedRefresh_thenCoordinateRefreshForAddress() async {
