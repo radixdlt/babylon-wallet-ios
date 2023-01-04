@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sideeffect-io/AsyncExtensions",
       "state" : {
-        "revision" : "ee170c270dc9b8518c7d46d2d85157359f76299c",
-        "version" : "0.5.1"
+        "revision" : "1f0729e4f1f6c7166acfac3cec43b3cbe83be0e6",
+        "version" : "0.5.2"
       }
     },
     {
@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Converse.git",
       "state" : {
-        "revision" : "bd12abb1594eb9dd7316e31c5fd6e150e3519eab",
-        "version" : "0.2.4"
+        "revision" : "fdc3a3ae96b88c2998c95402b9fb226345139358",
+        "version" : "0.2.6"
       }
     },
     {
@@ -248,7 +248,7 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "d0270bf8741c8a3bb32abf98fd1599e8eb8dcf78"
+        "revision" : "1d6f3d39674341698a152d95ed65b0df5cf11be9"
       }
     },
     {

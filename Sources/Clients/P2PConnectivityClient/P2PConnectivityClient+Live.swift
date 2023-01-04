@@ -69,11 +69,13 @@ public extension P2PConnectivityClient {
 				await localNetworkAuthorization.requestAuthorization()
 			},
 			getP2PClients: {
-				let savedClients = try await profileClient.getP2PClients()
-				await ClientsHolder.shared.emit(savedClients)
+				let saved = try await profileClient.getP2PClients()
+				Task {
+					await ClientsHolder.shared.emit(saved)
+				}
 				Task {
 					try await P2PConnections.shared.add(
-						connectionsFor: profileClient.getP2PClients(),
+						connectionsFor: saved,
 						autoconnect: true
 					)
 				}
@@ -91,7 +93,9 @@ public extension P2PConnectivityClient {
 				Task {
 					try await ClientsHolder.shared.emit(profileClient.getP2PClients())
 				}
-				try await P2PConnections.shared.removeAndDisconnect(id: id)
+				do { try await P2PConnections.shared.removeAndDisconnect(id: id) } catch {
+					print("Failed to remove/disconnect client? error: \(error)")
+				}
 			},
 			getConnectionStatusAsyncSequence: { id in
 				try await P2PConnections.shared.connectionStatusChangeEventAsyncSequence(for: id).map {

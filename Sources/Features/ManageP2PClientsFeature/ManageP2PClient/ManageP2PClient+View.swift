@@ -36,12 +36,24 @@ public extension ManageP2PClient.View {
 						.textStyle(.body1Regular)
 
 					HStack {
+						Text("RTC Connection Status")
 						Text(viewStore.connectionStatusDescription)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body2Regular)
 
 						Circle()
 							.fill(viewStore.connectionStatusColor)
+							.frame(width: 10)
+					}
+
+					HStack {
+						Text("WebSocket Connection Status")
+						Text(viewStore.wsConnectionStatusDescription)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body2Regular)
+
+						Circle()
+							.fill(viewStore.wsConnectionStatusColor)
 							.frame(width: 10)
 					}
 
@@ -77,6 +89,7 @@ public extension ManageP2PClient.View {
 		public var connectionName: String
 		#if DEBUG
 		public var connectionStatus: ConnectionStatus
+		public var webSocketStatus: WebSocketState
 		public var connectionID: String
 		#endif // DEBUG
 		init(state: ManageP2PClient.State) {
@@ -84,6 +97,7 @@ public extension ManageP2PClient.View {
 
 			#if DEBUG
 			connectionStatus = state.connectionStatus
+			webSocketStatus = state.webSocketState
 			connectionID = [
 				state.client.id.hex().prefix(4),
 				"...",
@@ -108,6 +122,20 @@ public extension ManageP2PClient.View.ViewState {
 			return .yellow
 		case .connected:
 			return .green
+		}
+	}
+
+	var wsConnectionStatusDescription: String {
+		webSocketStatus.description.capitalized
+	}
+
+	var wsConnectionStatusColor: Color {
+		switch webSocketStatus {
+		case .new: return .blue
+		case .connecting: return .yellow
+		case .open: return .green
+		case .closing: return .orange
+		case .closed: return .red
 		}
 	}
 }

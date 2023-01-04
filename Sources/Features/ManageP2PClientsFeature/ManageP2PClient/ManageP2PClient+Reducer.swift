@@ -23,8 +23,7 @@ public extension ManageP2PClient {
 				await withThrowingTaskGroup(of: Void.self) { taskGroup in
 					_ = taskGroup.addTaskUnlessCancelled {
 						do {
-							let statusUpdates = try await p2pConnectivityClient.getConnectionStatusAsyncSequence(id)
-							for try await status in statusUpdates {
+							for try await status in try await p2pConnectivityClient.getConnectionStatusAsyncSequence(id) {
 								guard !Task.isCancelled else { return }
 								assert(status.p2pClient.id == id)
 								await send(.internal(.system(.connectionStatusResult(
@@ -37,14 +36,18 @@ public extension ManageP2PClient {
 							))))
 						}
 					}
-
-					//                    _ = taskGroup.addTaskUnlessCancelled {
-					//                        do {
-//
-					//                        } catch {
-//
-					//                        }
-					//                    }
+					#if DEBUG
+					_ = taskGroup.addTaskUnlessCancelled {
+						do {
+							for try await webSocketStatus in try await p2pConnectivityClient._debugWebsocketStatusAsyncSequence(id) {
+								guard !Task.isCancelled else { return }
+								await send(.internal(.system(.webSocketStatusResult(.success(webSocketStatus)))))
+							}
+						} catch {
+							await send(.internal(.system(.webSocketStatusResult(.failure(error)))))
+						}
+					}
+					#endif // DEBUG
 				}
 			}
 			.cancellable(id: ConnectionUpdateTasksID.self)
@@ -66,6 +69,14 @@ public extension ManageP2PClient {
 			return .run { send in
 				await send(.delegate(.sendTestMessage))
 			}
+		case let .internal(.system(.webSocketStatusResult(.success(webSocketStatus)))):
+			state.webSocketState = webSocketStatus
+			return .none
+
+		case let .internal(.system(.webSocketStatusResult(.failure(error)))):
+			errorQueue.schedule(error)
+			return .none
+
 		#endif // DEBUG
 		case .delegate:
 			return .cancel(id: ConnectionUpdateTasksID.self)

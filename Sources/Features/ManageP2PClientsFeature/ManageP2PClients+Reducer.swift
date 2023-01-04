@@ -30,7 +30,7 @@ public extension ManageP2PClients {
 				}
 
 			Reduce(self.core)
-		}
+		} // ._printChanges()
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {

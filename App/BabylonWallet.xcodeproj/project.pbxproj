@@ -11,6 +11,20 @@
 		83B9D895294CAEBA00C4582D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 83B9D897294CAEBA00C4582D /* InfoPlist.strings */; };
 		D5B1769F29267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
 		D5B176A029267C1F00AAE13B /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */; };
+		E62B6BD42965C14900AA08E4 /* ProfileClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BD32965C14900AA08E4 /* ProfileClient */; };
+		E62B6BD62965C15100AA08E4 /* P2PConnectivityClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BD52965C15100AA08E4 /* P2PConnectivityClient */; };
+		E62B6BD82965C15800AA08E4 /* TransactionClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BD72965C15800AA08E4 /* TransactionClient */; };
+		E62B6BDA2965C16600AA08E4 /* EngineToolkitClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BD92965C16600AA08E4 /* EngineToolkitClient */; };
+		E62B6BE42965C18300AA08E4 /* KeychainClientDependency in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BE32965C18300AA08E4 /* KeychainClientDependency */; };
+		E62B6BE62965C18700AA08E4 /* FileClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BE52965C18700AA08E4 /* FileClient */; };
+		E62B6BE82965C18D00AA08E4 /* UserDefaultsClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BE72965C18D00AA08E4 /* UserDefaultsClient */; };
+		E62B6BF02965C1AD00AA08E4 /* EngineToolkitClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BEF2965C1AD00AA08E4 /* EngineToolkitClient */; };
+		E62B6BF22965C1AD00AA08E4 /* FileClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF12965C1AD00AA08E4 /* FileClient */; };
+		E62B6BF42965C1AD00AA08E4 /* KeychainClientDependency in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF32965C1AD00AA08E4 /* KeychainClientDependency */; };
+		E62B6BF62965C1AD00AA08E4 /* P2PConnectivityClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF52965C1AD00AA08E4 /* P2PConnectivityClient */; };
+		E62B6BF82965C1AD00AA08E4 /* ProfileClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF72965C1AD00AA08E4 /* ProfileClient */; };
+		E62B6BFA2965C1AD00AA08E4 /* TransactionClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF92965C1AD00AA08E4 /* TransactionClient */; };
+		E62B6BFC2965C1AD00AA08E4 /* UserDefaultsClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BFB2965C1AD00AA08E4 /* UserDefaultsClient */; };
 		E667FFD328F6F7ED0015544F /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E667FFD228F6F7ED0015544F /* AppFeature */; };
 		E6805BCD286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
 		E6805BCE286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
@@ -49,7 +63,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E62B6BE82965C18D00AA08E4 /* UserDefaultsClient in Frameworks */,
 				E6805BDF286DB74300861180 /* AppFeature in Frameworks */,
+				E62B6BD42965C14900AA08E4 /* ProfileClient in Frameworks */,
+				E62B6BD82965C15800AA08E4 /* TransactionClient in Frameworks */,
+				E62B6BDA2965C16600AA08E4 /* EngineToolkitClient in Frameworks */,
+				E62B6BE62965C18700AA08E4 /* FileClient in Frameworks */,
+				E62B6BE42965C18300AA08E4 /* KeychainClientDependency in Frameworks */,
+				E62B6BD62965C15100AA08E4 /* P2PConnectivityClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,6 +78,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E62B6BFC2965C1AD00AA08E4 /* UserDefaultsClient in Frameworks */,
+				E62B6BF22965C1AD00AA08E4 /* FileClient in Frameworks */,
+				E62B6BFA2965C1AD00AA08E4 /* TransactionClient in Frameworks */,
+				E62B6BF82965C1AD00AA08E4 /* ProfileClient in Frameworks */,
+				E62B6BF02965C1AD00AA08E4 /* EngineToolkitClient in Frameworks */,
+				E62B6BF62965C1AD00AA08E4 /* P2PConnectivityClient in Frameworks */,
+				E62B6BF42965C1AD00AA08E4 /* KeychainClientDependency in Frameworks */,
 				E667FFD328F6F7ED0015544F /* AppFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -181,11 +209,25 @@
 			buildRules = (
 			);
 			dependencies = (
+				E62B6BEE2965C19D00AA08E4 /* PBXTargetDependency */,
+				E62B6BEC2965C19800AA08E4 /* PBXTargetDependency */,
+				E62B6BEA2965C19200AA08E4 /* PBXTargetDependency */,
+				E62B6BDC2965C17D00AA08E4 /* PBXTargetDependency */,
+				E62B6BDE2965C17D00AA08E4 /* PBXTargetDependency */,
+				E62B6BE02965C17D00AA08E4 /* PBXTargetDependency */,
+				E62B6BE22965C17D00AA08E4 /* PBXTargetDependency */,
 				E6A17E57292FB01500D40EDB /* PBXTargetDependency */,
 			);
 			name = "Radix Wallet (iOS)";
 			packageProductDependencies = (
 				E6805BDE286DB74300861180 /* AppFeature */,
+				E62B6BD32965C14900AA08E4 /* ProfileClient */,
+				E62B6BD52965C15100AA08E4 /* P2PConnectivityClient */,
+				E62B6BD72965C15800AA08E4 /* TransactionClient */,
+				E62B6BD92965C16600AA08E4 /* EngineToolkitClient */,
+				E62B6BE32965C18300AA08E4 /* KeychainClientDependency */,
+				E62B6BE52965C18700AA08E4 /* FileClient */,
+				E62B6BE72965C18D00AA08E4 /* UserDefaultsClient */,
 			);
 			productName = "Wallet (iOS)";
 			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -202,11 +244,25 @@
 			buildRules = (
 			);
 			dependencies = (
+				E62B6BFE2965C1BF00AA08E4 /* PBXTargetDependency */,
+				E62B6C002965C1BF00AA08E4 /* PBXTargetDependency */,
+				E62B6C022965C1BF00AA08E4 /* PBXTargetDependency */,
+				E62B6C042965C1BF00AA08E4 /* PBXTargetDependency */,
+				E62B6C062965C1BF00AA08E4 /* PBXTargetDependency */,
+				E62B6C082965C1BF00AA08E4 /* PBXTargetDependency */,
+				E62B6C0A2965C1BF00AA08E4 /* PBXTargetDependency */,
 				E667FFD528F6F7F00015544F /* PBXTargetDependency */,
 			);
 			name = "Radix Wallet (macOS)";
 			packageProductDependencies = (
 				E667FFD228F6F7ED0015544F /* AppFeature */,
+				E62B6BEF2965C1AD00AA08E4 /* EngineToolkitClient */,
+				E62B6BF12965C1AD00AA08E4 /* FileClient */,
+				E62B6BF32965C1AD00AA08E4 /* KeychainClientDependency */,
+				E62B6BF52965C1AD00AA08E4 /* P2PConnectivityClient */,
+				E62B6BF72965C1AD00AA08E4 /* ProfileClient */,
+				E62B6BF92965C1AD00AA08E4 /* TransactionClient */,
+				E62B6BFB2965C1AD00AA08E4 /* UserDefaultsClient */,
 			);
 			productName = "Wallet (macOS)";
 			productReference = E6805BCA286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -290,6 +346,62 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		E62B6BDC2965C17D00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6BDB2965C17D00AA08E4 /* EngineToolkitClient */;
+		};
+		E62B6BDE2965C17D00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6BDD2965C17D00AA08E4 /* P2PConnectivityClient */;
+		};
+		E62B6BE02965C17D00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6BDF2965C17D00AA08E4 /* ProfileClient */;
+		};
+		E62B6BE22965C17D00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6BE12965C17D00AA08E4 /* TransactionClient */;
+		};
+		E62B6BEA2965C19200AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6BE92965C19200AA08E4 /* KeychainClientDependency */;
+		};
+		E62B6BEC2965C19800AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6BEB2965C19800AA08E4 /* FileClient */;
+		};
+		E62B6BEE2965C19D00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6BED2965C19D00AA08E4 /* UserDefaultsClient */;
+		};
+		E62B6BFE2965C1BF00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6BFD2965C1BF00AA08E4 /* EngineToolkitClient */;
+		};
+		E62B6C002965C1BF00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6BFF2965C1BF00AA08E4 /* FileClient */;
+		};
+		E62B6C022965C1BF00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6C012965C1BF00AA08E4 /* KeychainClientDependency */;
+		};
+		E62B6C042965C1BF00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6C032965C1BF00AA08E4 /* P2PConnectivityClient */;
+		};
+		E62B6C062965C1BF00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6C052965C1BF00AA08E4 /* ProfileClient */;
+		};
+		E62B6C082965C1BF00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6C072965C1BF00AA08E4 /* TransactionClient */;
+		};
+		E62B6C0A2965C1BF00AA08E4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E62B6C092965C1BF00AA08E4 /* UserDefaultsClient */;
+		};
 		E667FFD528F6F7F00015544F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = E667FFD428F6F7F00015544F /* AppFeature */;
@@ -439,6 +551,118 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E62B6BD32965C14900AA08E4 /* ProfileClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ProfileClient;
+		};
+		E62B6BD52965C15100AA08E4 /* P2PConnectivityClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = P2PConnectivityClient;
+		};
+		E62B6BD72965C15800AA08E4 /* TransactionClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TransactionClient;
+		};
+		E62B6BD92965C16600AA08E4 /* EngineToolkitClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EngineToolkitClient;
+		};
+		E62B6BDB2965C17D00AA08E4 /* EngineToolkitClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EngineToolkitClient;
+		};
+		E62B6BDD2965C17D00AA08E4 /* P2PConnectivityClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = P2PConnectivityClient;
+		};
+		E62B6BDF2965C17D00AA08E4 /* ProfileClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ProfileClient;
+		};
+		E62B6BE12965C17D00AA08E4 /* TransactionClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TransactionClient;
+		};
+		E62B6BE32965C18300AA08E4 /* KeychainClientDependency */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KeychainClientDependency;
+		};
+		E62B6BE52965C18700AA08E4 /* FileClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FileClient;
+		};
+		E62B6BE72965C18D00AA08E4 /* UserDefaultsClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UserDefaultsClient;
+		};
+		E62B6BE92965C19200AA08E4 /* KeychainClientDependency */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KeychainClientDependency;
+		};
+		E62B6BEB2965C19800AA08E4 /* FileClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FileClient;
+		};
+		E62B6BED2965C19D00AA08E4 /* UserDefaultsClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UserDefaultsClient;
+		};
+		E62B6BEF2965C1AD00AA08E4 /* EngineToolkitClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EngineToolkitClient;
+		};
+		E62B6BF12965C1AD00AA08E4 /* FileClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FileClient;
+		};
+		E62B6BF32965C1AD00AA08E4 /* KeychainClientDependency */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KeychainClientDependency;
+		};
+		E62B6BF52965C1AD00AA08E4 /* P2PConnectivityClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = P2PConnectivityClient;
+		};
+		E62B6BF72965C1AD00AA08E4 /* ProfileClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ProfileClient;
+		};
+		E62B6BF92965C1AD00AA08E4 /* TransactionClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TransactionClient;
+		};
+		E62B6BFB2965C1AD00AA08E4 /* UserDefaultsClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UserDefaultsClient;
+		};
+		E62B6BFD2965C1BF00AA08E4 /* EngineToolkitClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = EngineToolkitClient;
+		};
+		E62B6BFF2965C1BF00AA08E4 /* FileClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FileClient;
+		};
+		E62B6C012965C1BF00AA08E4 /* KeychainClientDependency */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KeychainClientDependency;
+		};
+		E62B6C032965C1BF00AA08E4 /* P2PConnectivityClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = P2PConnectivityClient;
+		};
+		E62B6C052965C1BF00AA08E4 /* ProfileClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ProfileClient;
+		};
+		E62B6C072965C1BF00AA08E4 /* TransactionClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TransactionClient;
+		};
+		E62B6C092965C1BF00AA08E4 /* UserDefaultsClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = UserDefaultsClient;
+		};
 		E667FFD228F6F7ED0015544F /* AppFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppFeature;
