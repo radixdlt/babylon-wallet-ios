@@ -11,17 +11,15 @@ public extension CreateAccount {
 		public var sanitizedAccountName: String { inputtedAccountName.trimmed() }
 		public var isCreatingAccount: Bool
 		public let shouldCreateProfile: Bool
-		public var accountCompletion: AccountCompletion.State?
 		@BindableState public var focusedField: Field?
 
 		public init(
 			onNetworkWithID: NetworkID? = nil,
-			shouldCreateProfile: Bool,
+			shouldCreateProfile: Bool = false,
 			numberOfExistingAccounts: Int = 0,
 			inputtedAccountName: String = "",
 			focusedField: Field? = nil,
-			isCreatingAccount: Bool = false,
-			accountCompletion: AccountCompletion.State? = nil
+			isCreatingAccount: Bool = false
 		) {
 			self.onNetworkWithID = onNetworkWithID
 			self.shouldCreateProfile = shouldCreateProfile
@@ -29,7 +27,6 @@ public extension CreateAccount {
 			self.inputtedAccountName = inputtedAccountName
 			self.focusedField = focusedField
 			self.isCreatingAccount = isCreatingAccount
-			self.accountCompletion = accountCompletion
 		}
 	}
 }

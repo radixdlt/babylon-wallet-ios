@@ -10,7 +10,7 @@ public extension Onboarding {
 		case createAccountFlow(CreateAccountCoordinator.State)
 
 		public init() {
-			self = .createAccountFlow(.createAccount(.init(shouldCreateProfile: true)))
+                        self = .createAccountFlow(.init(state: .init(shouldCreateProfile: true)))
 		}
 	}
 }

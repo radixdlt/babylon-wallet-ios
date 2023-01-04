@@ -106,6 +106,7 @@ public extension ManageGatewayAPIEndpoints {
 						}
 					))))
 				} else {
+					let accounts = try await profileClient.getAccounts()
 					await send(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(new))))
 				}
 			}
@@ -115,9 +116,9 @@ public extension ManageGatewayAPIEndpoints {
 			return skipSwitching(state: &state)
 
 		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetwork))):
-			state.createAccountCoordinator = .createAccount(.init(
+			state.createAccountCoordinator = .init(state: .init(
 				onNetworkWithID: newNetwork.network.id,
-				shouldCreateProfile: false,
+
 				numberOfExistingAccounts: 0
 			))
 			return .none

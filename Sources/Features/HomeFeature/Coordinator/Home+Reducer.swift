@@ -69,10 +69,9 @@ public struct Home: Sendable, ReducerProtocol {
 			}
 
 		case let .internal(.system(.createAccount(numberOfExistingAccounts))):
-			state.createAccountFlow = .createAccount(.init(
-				shouldCreateProfile: false,
-				numberOfExistingAccounts: numberOfExistingAccounts
-			))
+			state.createAccountFlow = .init(state:
+				.init(numberOfExistingAccounts: numberOfExistingAccounts)
+			)
 			return .none
 
 		case .internal(.view(.didAppear)):

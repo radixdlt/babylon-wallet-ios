@@ -49,18 +49,12 @@ public struct CreateAccount: Sendable, ReducerProtocol {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
-			.ifLet(\.accountCompletion, action: /Action.child .. Action.ChildAction.accountCompletion) {
-				AccountCompletion()
-			}
 	}
 }
 
 public extension CreateAccount {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .child(.accountCompletion(_)):
-			return .none
-
 		case .internal(.view(.createAccountButtonTapped)):
 			precondition(!state.isCreatingAccount)
 			state.focusedField = nil
@@ -146,9 +140,7 @@ public extension CreateAccount {
 		case let .internal(.system(.createdNewAccountResult(.failure(error)))):
 			state.isCreatingAccount = false
 			errorQueue.schedule(error)
-			return .run { send in
-				await send(.delegate(.failedToCreateNewAccount))
-			}
+			return .none
 
 		case .internal(.view(.closeButtonTapped)):
 			return .run { send in
@@ -173,14 +165,6 @@ public extension CreateAccount {
 
 		case let .internal(.system(.focusTextField(focus))):
 			state.focusedField = focus
-			return .none
-
-		case let .delegate(.displayCreateAccountCompletion(account, isFirstAccount, destination)):
-			state.accountCompletion = .init(
-				account: account,
-				isFirstAccount: isFirstAccount,
-				destination: destination
-			)
 			return .none
 
 		case .delegate:

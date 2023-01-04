@@ -6,7 +6,6 @@ import Profile
 public extension CreateAccount {
 	// MARK: Action
 	enum Action: Sendable, Equatable {
-		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -21,13 +20,6 @@ public extension CreateAccount.Action {
 		case createAccountButtonTapped
 		case textFieldChanged(String)
 		case textFieldFocused(CreateAccount.State.Field?)
-	}
-}
-
-// MARK: - CreateAccount.Action.ChildAction
-public extension CreateAccount.Action {
-	enum ChildAction: Sendable, Equatable {
-		case accountCompletion(AccountCompletion.Action)
 	}
 }
 
@@ -56,7 +48,5 @@ public extension CreateAccount.Action {
 		case dismissCreateAccount
 		case createdNewAccount(OnNetwork.Account)
 		case createdNewProfile(Profile)
-		case failedToCreateNewAccount
-		case displayCreateAccountCompletion(OnNetwork.Account, isFirstAccount: Bool, destination: AccountCompletion.State.Destination)
 	}
 }

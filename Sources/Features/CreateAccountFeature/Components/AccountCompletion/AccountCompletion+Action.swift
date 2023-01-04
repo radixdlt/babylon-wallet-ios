@@ -33,8 +33,6 @@ public extension AccountCompletion.Action.InternalAction {
 // MARK: - AccountCompletion.Action.DelegateAction
 public extension AccountCompletion.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case displayHome
-		case displayChooseAccounts
 		case completed
 	}
 }

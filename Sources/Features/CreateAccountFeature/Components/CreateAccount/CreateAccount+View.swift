@@ -24,15 +24,6 @@ public extension CreateAccount.View {
 			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
-				IfLetStore(
-					store.scope(
-						state: \.accountCompletion,
-						action: { .child(.accountCompletion($0)) }
-					),
-					then: { AccountCompletion.View(store: $0) }
-				)
-				.zIndex(2)
-
 				VStack(spacing: .zero) {
 					if viewStore.isDismissButtonVisible {
 						NavigationBar(
