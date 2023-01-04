@@ -2,7 +2,7 @@ import Foundation
 import Profile
 
 public extension OnNetwork.Account {
-	static var any: Self {
+	static var testValue: Self {
 		try! OnNetwork.Account(
 			address: OnNetwork.Account.EntityAddress(
 				address: "account_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"

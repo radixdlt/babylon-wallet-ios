@@ -7,7 +7,7 @@ import TestUtils
 final class AccountListFeatureTests: TestCase {
 	func test_copyAddress_whenTappedOnCopyAddress_thenCopyToPasteboard() async {
 		// given
-		let account = OnNetwork.Account.any
+		let account = OnNetwork.Account.testValue
 		let initialState = AccountList.State(nonEmptyOrderedSetOfAccounts: .init(rawValue: [account])!)
 		let store = TestStore(initialState: initialState,
 		                      reducer: AccountList())

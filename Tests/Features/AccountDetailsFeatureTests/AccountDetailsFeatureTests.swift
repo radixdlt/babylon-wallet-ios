@@ -8,7 +8,7 @@ import TestUtils
 final class AccountDetailsFeatureTests: TestCase {
 	func test_dismissAccountDetails_whenTappedOnBackButton_thenCoordinateDismissal() async {
 		// given
-		let accountListRowState = AccountList.Row.State(account: .any)
+		let accountListRowState = AccountList.Row.State(account: .testValue)
 		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(
 			initialState: initialState,
@@ -24,7 +24,7 @@ final class AccountDetailsFeatureTests: TestCase {
 
 	func test_navigateToAccountPreferences_whenTappedOnPreferencesButton_thenCoordinateNavigationToPreferences() async {
 		// given
-		let account = OnNetwork.Account.any
+		let account = OnNetwork.Account.testValue
 		let accountListRowState = AccountList.Row.State(account: account)
 		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(
@@ -41,7 +41,7 @@ final class AccountDetailsFeatureTests: TestCase {
 
 	func test_copyAddress_whenTappedOnCopyAddress_thenCopyToPasteboard() async {
 		// given
-		let account = OnNetwork.Account.any
+		let account = OnNetwork.Account.testValue
 		let accountListRowState = AccountList.Row.State(account: account)
 		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(
@@ -63,7 +63,7 @@ final class AccountDetailsFeatureTests: TestCase {
 
 	func test_refresh_whenInitiatedRefresh_thenCoordinateRefreshForAddress() async {
 		// given
-		let account = OnNetwork.Account.any
+		let account = OnNetwork.Account.testValue
 		let accountListRowState = AccountList.Row.State(account: account)
 		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(
@@ -80,7 +80,7 @@ final class AccountDetailsFeatureTests: TestCase {
 
 	func test_displayTransfer_whenTappedOnDisplayTransfer_thenCoordinateNavigationToTransfer() async {
 		// given
-		let accountListRowState = AccountList.Row.State(account: .any)
+		let accountListRowState = AccountList.Row.State(account: .testValue)
 		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(
 			initialState: initialState,
