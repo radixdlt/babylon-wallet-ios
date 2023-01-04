@@ -2,40 +2,40 @@ import Foundation
 import Common
 
 public extension CreateAccountCoordinator {
-
         struct State: Equatable {
-                public let completionDestination: CompletionDestination
-                public private(set) var root: Root
+                public let completionDestination: CrateAccountCompletionDestination
+                public var root: Root
 
-                public init(completionDestination: CompletionDestination,
-                            root: Root = .init()) {
+                public init(completionDestination: CrateAccountCompletionDestination,
+                            rootState: Root.InitialState = .init()) {
                         self.completionDestination = completionDestination
-                        self.root = root
+                        self.root = .init(state: rootState)
                 }
         }
 }
 
 public extension CreateAccountCoordinator.State {
         enum Root: Equatable {
+                public typealias InitialState = CreateAccount.State
                 case createAccount(CreateAccount.State)
                 case accountCompletion(AccountCompletion.State)
 
-                public init(state: CreateAccount.State = .init()) {
+                public init(state: InitialState = .init()) {
                         self = .createAccount(state)
                 }
         }
+}
 
-        enum CompletionDestination: String, Sendable {
-                case home
-                case chooseAccounts
+public enum CrateAccountCompletionDestination: String, Sendable {
+        case home
+        case chooseAccounts
 
-                var displayText: String {
-                        switch self {
-                        case .home:
-                                return L10n.CreateAccount.Completion.Destination.home
-                        case .chooseAccounts:
-                                return L10n.CreateAccount.Completion.Destination.chooseAccounts
-                        }
+        var displayText: String {
+                switch self {
+                case .home:
+                        return L10n.CreateAccount.Completion.Destination.home
+                case .chooseAccounts:
+                        return L10n.CreateAccount.Completion.Destination.chooseAccounts
                 }
         }
 }

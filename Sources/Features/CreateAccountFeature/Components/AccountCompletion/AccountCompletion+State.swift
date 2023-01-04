@@ -7,12 +7,12 @@ public extension AccountCompletion {
 	struct State: Sendable, Equatable {
 		public let account: OnNetwork.Account
 		public let isFirstAccount: Bool
-		public let destination: Destination
+		public let destination: CrateAccountCompletionDestination
 
 		public init(
 			account: OnNetwork.Account,
 			isFirstAccount: Bool,
-			destination: Destination
+			destination: CrateAccountCompletionDestination
 		) {
 			self.account = account
 			self.isFirstAccount = isFirstAccount
@@ -23,19 +23,6 @@ public extension AccountCompletion {
 
 // MARK: - AccountCompletion.State.Origin
 public extension AccountCompletion.State {
-	enum Destination: String, Sendable {
-		case home
-		case chooseAccounts
-
-		var displayText: String {
-			switch self {
-			case .home:
-				return L10n.CreateAccount.Completion.Destination.home
-			case .chooseAccounts:
-				return L10n.CreateAccount.Completion.Destination.chooseAccounts
-			}
-		}
-	}
 
 	var accountAddress: AccountAddress {
 		account.address

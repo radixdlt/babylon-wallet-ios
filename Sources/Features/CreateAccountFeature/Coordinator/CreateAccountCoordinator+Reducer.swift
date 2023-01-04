@@ -11,18 +11,27 @@ public struct CreateAccountCoordinator: Sendable, ReducerProtocol {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
-			.ifCaseLet(/State.createAccount, action: /Action.child .. ChildAction.createAccount) {
-				CreateAccount()
-			}
-			.ifCaseLet(/State.accountCompletion, action: /Action.child .. ChildAction.accountCompletion) {
-				AccountCompletion()
-			}
+                Scope(state: \.root, action: /Action.self) {
+                        EmptyReducer()
+                                .ifCaseLet(/State.Root.createAccount, action: /Action.child .. ChildAction.createAccount) {
+                                        CreateAccount()
+                                }
+                                .ifCaseLet(/State.Root.accountCompletion, action: /Action.child .. ChildAction.accountCompletion) {
+                                        AccountCompletion()
+                                }
+                }
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case let .child(.createAccount(.delegate(.createdNewAccount(account)))):
-			state = .accountCompletion(.init(account: account, isFirstAccount: false, destination: .chooseAccounts))
+                        state.root = .accountCompletion(
+                                .init(
+                                        account: account,
+                                        isFirstAccount: false,
+                                        destination: state.completionDestination
+                                )
+                        )
 			return .none
 		case .internal(.system(.injectProfileIntoProfileClientResult(.success))):
 			return .run { send in
@@ -36,7 +45,13 @@ public struct CreateAccountCoordinator: Sendable, ReducerProtocol {
 			errorQueue.schedule(error)
 			return .none
 		case let .internal(.system(.loadAccountResult(.success(account)))):
-			state = .accountCompletion(.init(account: account, isFirstAccount: true, destination: .chooseAccounts))
+                        state.root = .accountCompletion(
+                                .init(
+                                        account: account,
+                                        isFirstAccount: true,
+                                        destination: state.completionDestination
+                                )
+                        )
 			return .none
 		case let .child(.createAccount(.delegate(.createdNewProfile(profile)))):
 			return .run { send in
