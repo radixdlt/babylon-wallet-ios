@@ -41,10 +41,10 @@ public extension Home.View {
 
 					IfLetStore(
 						store.scope(
-							state: \.createAccount,
-							action: { .child(.createAccount($0)) }
+							state: \.createAccountFlow,
+							action: { .child(.createAccountFlow($0)) }
 						),
-						then: { CreateAccount.View(store: $0) }
+						then: { CreateAccountCoordinator.View(store: $0) }
 					)
 					.zIndex(1)
 
