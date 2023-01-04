@@ -20,7 +20,7 @@ public extension ChooseAccounts {
 public extension ChooseAccounts.Action {
 	enum ChildAction: Sendable, Equatable {
 		case account(id: ChooseAccounts.Row.State.ID, action: ChooseAccounts.Row.Action)
-		case createAccount(CreateAccount.Action)
+		case createAccountFlow(CreateAccountCoordinator.Action)
 	}
 }
 

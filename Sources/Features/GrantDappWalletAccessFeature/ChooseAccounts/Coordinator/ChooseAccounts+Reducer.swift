@@ -82,17 +82,12 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 					return .none
 				}
 
-			case .child(.createAccount(.delegate(.dismissCreateAccount))):
-				state.createAccount = nil
+			case .child(.createAccountFlow(.delegate(.dismissed))):
+				state.createAccountFlow = nil
 				return .none
 
-			case let .child(.createAccount(.delegate(.createdNewAccount(account)))):
-				return .run { send in
-					await send(.child(.createAccount(.delegate(.displayCreateAccountCompletion(account, isFirstAccount: false, destination: .chooseAccounts)))))
-				}
-
-			case .child(.createAccount(.child(.accountCompletion(.delegate(.displayChooseAccounts))))):
-				state.createAccount = nil
+			case .child(.createAccountFlow(.delegate(.completed))):
+				state.createAccountFlow = nil
 				return .run { send in
 					await send(.internal(.system(.loadAccountsResult(TaskResult {
 						try await profileClient.getAccounts()
@@ -100,14 +95,14 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 				}
 
 			case let .internal(.system(.createAccount(numberOfExistingAccounts: numberOfExistingAccounts))):
-				state.createAccount = .init(
+				state.createAccountFlow = .createAccount(.init(
 					shouldCreateProfile: false,
 					numberOfExistingAccounts: numberOfExistingAccounts
-				)
+				))
 				return .none
 
 			case .delegate(.dismissChooseAccounts):
-				state.createAccount = nil
+				state.createAccountFlow = nil
 				return .none
 
 			case .child, .delegate:
@@ -117,8 +112,8 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 		.forEach(\.accounts, action: /Action.child .. Action.ChildAction.account) {
 			ChooseAccounts.Row()
 		}
-		.ifLet(\.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
-			CreateAccount()
+		.ifLet(\.createAccountFlow, action: /Action.child .. Action.ChildAction.createAccountFlow) {
+			CreateAccountCoordinator()
 		}
 	}
 }
