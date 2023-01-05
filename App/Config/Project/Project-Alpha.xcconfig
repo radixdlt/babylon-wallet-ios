@@ -1,7 +1,7 @@
 // Project Alpha configuration
 
 #include "Project-Shared.xcconfig"
-#include "Project-Release-Opt.xcconfig"
+#include "Project-Debug-Opt.xcconfig"
 
 // Primary App Icon Set Name
 //
