@@ -106,7 +106,6 @@ public extension ManageGatewayAPIEndpoints {
 						}
 					))))
 				} else {
-					let accounts = try await profileClient.getAccounts()
 					await send(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(new))))
 				}
 			}
