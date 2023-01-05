@@ -43,7 +43,6 @@ public extension AccountDetails.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case dismissAccountDetails
 		case displayAccountPreferences(AccountAddress)
-		case copyAddress(AccountAddress)
 		case displayTransfer
 		case refresh(AccountAddress)
 	}

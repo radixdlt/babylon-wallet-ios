@@ -44,7 +44,6 @@ public extension AccountList.Action.InternalAction {
 public extension AccountList.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case displayAccountDetails(AccountList.Row.State)
-		case copyAddress(AccountAddress)
 		case fetchPortfolioForAccounts
 	}
 }

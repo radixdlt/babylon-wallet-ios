@@ -1,7 +1,10 @@
 import ComposableArchitecture
+import PasteboardClient
 
 // MARK: - AccountList
 public struct AccountList: Sendable, ReducerProtocol {
+	@Dependency(\.pasteboardClient) var pasteboardClient
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -19,9 +22,8 @@ public struct AccountList: Sendable, ReducerProtocol {
 				}
 				switch action {
 				case .internal(.view(.copyAddressButtonTapped)):
-					return .run { send in
-						await send(.delegate(.copyAddress(account.address)))
-					}
+					let address = account.address.address
+					return .fireAndForget { pasteboardClient.copyString(address) }
 				case .internal(.view(.selected)):
 					return .run { send in
 						await send(.delegate(.displayAccountDetails(account)))

@@ -25,7 +25,6 @@ public struct Home: Sendable, ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.openURL) var openURL
-	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
@@ -179,9 +178,6 @@ public struct Home: Sendable, ReducerProtocol {
 			state.accountDetails = .init(for: account)
 			return .none
 
-		case let .child(.accountList(.delegate(.copyAddress(address)))):
-			return copyAddress(address)
-
 		case .child(.accountPreferences(.delegate(.dismissAccountPreferences))):
 			state.accountPreferences = nil
 			return .none
@@ -193,9 +189,6 @@ public struct Home: Sendable, ReducerProtocol {
 		case let .child(.accountDetails(.delegate(.displayAccountPreferences(address)))):
 			state.accountPreferences = .init(address: address)
 			return .none
-
-		case let .child(.accountDetails(.delegate(.copyAddress(address)))):
-			return copyAddress(address)
 
 		case .child(.accountDetails(.delegate(.displayTransfer))):
 			state.transfer = .init()
@@ -269,13 +262,6 @@ public struct Home: Sendable, ReducerProtocol {
 			await send(.internal(.system(.fetchPortfolioResult(TaskResult {
 				try await accountPortfolioFetcher.fetchPortfolio(accounts.map(\.address))
 			}))))
-		}
-	}
-
-	func copyAddress(_ address: AccountAddress) -> EffectTask<Action> {
-		// TODO: display confirmation popup? discuss with PO / designer
-		.run { _ in
-			pasteboardClient.copyString(address.wrapAsAddress().address)
 		}
 	}
 }
