@@ -118,8 +118,7 @@ public extension ManageGatewayAPIEndpoints {
 			state.createAccountCoordinator = .init(completionDestination: .home,
 			                                       rootState: .init(
 			                                       	onNetworkWithID: newNetwork.network.id,
-
-			                                       	numberOfExistingAccounts: 0
+			                                       	isFirstAccount: true
 			                                       ))
 			return .none
 

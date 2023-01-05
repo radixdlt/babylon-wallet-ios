@@ -96,7 +96,7 @@ public extension CreateAccount.View {
 extension CreateAccount.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		public var numberOfExistingAccounts: Int
+		public var titleText: String
 		public var accountName: String
 		public var isLoaderVisible: Bool
 		public var createAccountButtonState: ControlState
@@ -104,7 +104,7 @@ extension CreateAccount.View {
 		@BindableState public var focusedField: CreateAccount.State.Field?
 
 		init(state: CreateAccount.State) {
-			numberOfExistingAccounts = state.numberOfExistingAccounts
+			titleText = state.isFirstAccount ? L10n.CreateAccount.createFirstAccount : L10n.CreateAccount.createNewAccount
 			accountName = state.inputtedAccountName
 			isLoaderVisible = state.isCreatingAccount
 			let isNameValid = !state.sanitizedAccountName.isEmpty
@@ -122,9 +122,7 @@ private extension CreateAccount.View {
 
 private extension CreateAccount.View {
 	func title(with viewStore: ViewStore) -> some View {
-		let titleText = viewStore.numberOfExistingAccounts == 0 ? L10n.CreateAccount.createFirstAccount : L10n.CreateAccount.createNewAccount
-
-		return Text(titleText)
+		Text(viewStore.titleText)
 			.foregroundColor(.app.gray1)
 			.textStyle(.sheetTitle)
 	}

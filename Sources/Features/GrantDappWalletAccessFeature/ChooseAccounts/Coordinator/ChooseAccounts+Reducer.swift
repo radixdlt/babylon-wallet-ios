@@ -99,7 +99,7 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 					completionDestination: .chooseAccounts,
 					rootState: .init(
 						shouldCreateProfile: false,
-						numberOfExistingAccounts: numberOfExistingAccounts
+						isFirstAccount: numberOfExistingAccounts == 0
 					)
 				)
 				return .none

@@ -70,7 +70,7 @@ public struct Home: Sendable, ReducerProtocol {
 		case let .internal(.system(.createAccount(numberOfExistingAccounts))):
 			state.createAccountFlow = .init(
 				completionDestination: .home,
-				rootState: .init(numberOfExistingAccounts: numberOfExistingAccounts)
+				rootState: .init(isFirstAccount: numberOfExistingAccounts == 0)
 			)
 			return .none
 

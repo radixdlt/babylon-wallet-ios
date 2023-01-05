@@ -170,13 +170,13 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		store.exhaustivity = .off
 		await store.send(.internal(.system(.hasAccountsResult(.success(false)))))
 		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway)))) {
-                        $0.createAccountCoordinator = .init(
-                                completionDestination: .home,
-                                rootState: .init(
-                                        onNetworkWithID: newNetworkAndGateway.network.id,
-                                        numberOfExistingAccounts: 0
-                                )
-                        )
+			$0.createAccountCoordinator = .init(
+				completionDestination: .home,
+				rootState: .init(
+					onNetworkWithID: newNetworkAndGateway.network.id,
+					isFirstAccount: 0
+				)
+			)
 		}
 	}
 
@@ -187,12 +187,12 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
 				createAccountCoordinator: .init(
-                                        completionDestination: .home,
-                                        rootState: .init(
-                                                onNetworkWithID: newNetworkAndGateway.network.id,
-                                                numberOfExistingAccounts: 0
-                                        )
-                                ),
+					completionDestination: .home,
+					rootState: .init(
+						onNetworkWithID: newNetworkAndGateway.network.id,
+						isFirstAccount: 0
+					)
+				),
 				currentNetworkAndGateway: currentNetworkAndGateway,
 				validatedNewNetworkAndGatewayToSwitchTo: newNetworkAndGateway
 			),
@@ -204,7 +204,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			}
 		}
 		store.exhaustivity = .off
-                await store.send(.createAccountCoordinator(.delegate(.completed))) {
+		await store.send(.createAccountCoordinator(.delegate(.completed))) {
 			$0.createAccountCoordinator = nil
 		}
 
@@ -219,19 +219,19 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
 				createAccountCoordinator: .init(
-                                        completionDestination: .home,
-                                        rootState: .init(
-                                                onNetworkWithID: newNetworkAndGateway.network.id,
-                                                numberOfExistingAccounts: 0
-                                        )
-                                ),
+					completionDestination: .home,
+					rootState: .init(
+						onNetworkWithID: newNetworkAndGateway.network.id,
+						isFirstAccount: 0
+					)
+				),
 				currentNetworkAndGateway: .mardunet,
 				validatedNewNetworkAndGatewayToSwitchTo: newNetworkAndGateway
 			),
 			reducer: ManageGatewayAPIEndpoints()
 		)
 		store.exhaustivity = .on // we ensure `exhaustivity` is on, to assert nothing happens, i.e. `switchTo` is not called on networkSwitchingClient
-                await store.send(.createAccountCoordinator(.delegate(.dismissed))) {
+		await store.send(.createAccountCoordinator(.delegate(.dismissed))) {
 			$0.createAccountCoordinator = nil
 			$0.validatedNewNetworkAndGatewayToSwitchTo = nil
 		}
