@@ -24,44 +24,16 @@ public struct CreateAccountCoordinator: Sendable, ReducerProtocol {
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case let .child(.createAccount(.delegate(.createdNewAccount(account)))):
+		case let .child(.createAccount(.delegate(.createdNewAccount(account, isFirstAccount)))):
 			state.root = .accountCompletion(
 				.init(
 					account: account,
-					isFirstAccount: false,
+					isFirstAccount: isFirstAccount,
 					destination: state.completionDestination
 				)
 			)
 			return .none
-		case .internal(.system(.injectProfileIntoProfileClientResult(.success))):
-			return .run { send in
-				await send(.internal(.system(.loadAccountResult(
-					TaskResult {
-						try await profileClient.getAccounts().first
-					}
-				))))
-			}
-		case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))):
-			errorQueue.schedule(error)
-			return .none
-		case let .internal(.system(.loadAccountResult(.success(account)))):
-			state.root = .accountCompletion(
-				.init(
-					account: account,
-					isFirstAccount: true,
-					destination: state.completionDestination
-				)
-			)
-			return .none
-		case let .child(.createAccount(.delegate(.createdNewProfile(profile)))):
-			return .run { send in
-				await send(.internal(.system(.injectProfileIntoProfileClientResult(
-					TaskResult {
-						try await profileClient.injectProfile(profile)
-						return profile
-					}
-				))))
-			}
+
 		case .child(.createAccount(.delegate(.dismissCreateAccount))):
 			return .run { send in
 				await send(.delegate(.dismissed))

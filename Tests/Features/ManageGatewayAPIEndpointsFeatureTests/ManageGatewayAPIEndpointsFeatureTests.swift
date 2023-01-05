@@ -173,8 +173,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			$0.createAccountCoordinator = .init(
 				completionDestination: .home,
 				rootState: .init(
-					onNetworkWithID: newNetworkAndGateway.network.id,
-					isFirstAccount: 0
+					networkAndGateway: newNetworkAndGateway
 				)
 			)
 		}
@@ -189,8 +188,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 				createAccountCoordinator: .init(
 					completionDestination: .home,
 					rootState: .init(
-						onNetworkWithID: newNetworkAndGateway.network.id,
-						isFirstAccount: 0
+						networkAndGateway: newNetworkAndGateway
 					)
 				),
 				currentNetworkAndGateway: currentNetworkAndGateway,
@@ -221,8 +219,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 				createAccountCoordinator: .init(
 					completionDestination: .home,
 					rootState: .init(
-						onNetworkWithID: newNetworkAndGateway.network.id,
-						isFirstAccount: 0
+						networkAndGateway: newNetworkAndGateway
 					)
 				),
 				currentNetworkAndGateway: .mardunet,

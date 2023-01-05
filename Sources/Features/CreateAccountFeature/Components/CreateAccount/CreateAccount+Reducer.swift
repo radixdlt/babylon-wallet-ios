@@ -61,85 +61,47 @@ public extension CreateAccount {
 			state.isCreatingAccount = true
 
 			if state.shouldCreateProfile {
-				return .run { send in
-					await send(.internal(.system(.createProfile)))
-				}
+				return createProfile(state: &state)
 			} else {
-				return .run { send in
-					await send(.internal(.system(.createAccount)))
-				}
-			}
-
-		case .internal(.system(.createAccount)):
-			return .run { [accountName = state.sanitizedAccountName, overridingNetworkID = state.networkAndGateway.network.id] send in
-				await send(.internal(.system(.createdNewAccountResult(
-					TaskResult {
-						let request = CreateAccountRequest(
-							overridingNetworkID: overridingNetworkID, // optional
-							keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
-							accountName: accountName
-						)
-						return try await profileClient.createVirtualAccount(
-							request
-						)
-					}
-				))))
-			}
-
-		case .internal(.system(.createProfile)):
-			return .run { [nameOfFirstAccount = state.sanitizedAccountName,
-			               networkAndGateway = state.networkAndGateway] send in
-
-					await send(.internal(.system(.createdNewProfileResult(
-						// FIXME: - mainnet: extract into ProfileCreator client?
-						TaskResult {
-							let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
-
-							let newProfileRequest = CreateNewProfileRequest(
-								networkAndGateway: networkAndGateway,
-								curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
-								nameOfFirstAccount: nameOfFirstAccount
-							)
-
-							let newProfile = try await profileClient.createNewProfile(
-								newProfileRequest
-							)
-
-							let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
-
-							try await keychainClient.updateFactorSource(
-								mnemonic: curve25519FactorSourceMnemonic,
-								reference: curve25519FactorSourceReference
-							)
-
-							try await keychainClient.updateProfile(profile: newProfile)
-
-							return newProfile
-						}
-					))))
+				return createAccount(state: &state)
 			}
 
 		case let .internal(.system(.createdNewProfileResult(.success(profile)))):
 			state.isCreatingAccount = false
 			return .run { send in
-				await send(.delegate(.createdNewProfile(profile)))
+				await send(.internal(.system(.injectProfileIntoProfileClientResult(
+					TaskResult {
+						try await profileClient.injectProfile(profile)
+						return profile
+					}
+				))))
 			}
 
-		case let .internal(.system(.createdNewProfileResult(.failure(error)))):
-			state.isCreatingAccount = false
-			errorQueue.schedule(error)
-			return .none
-
-		case let .internal(.system(.createdNewAccountResult(.success(account)))):
-			state.isCreatingAccount = false
+		case .internal(.system(.injectProfileIntoProfileClientResult(.success))):
 			return .run { send in
-				await send(.delegate(.createdNewAccount(account)))
+				await send(.internal(.system(.loadAccountResult(
+					TaskResult {
+						try await profileClient.getAccounts().first
+					}
+				))))
 			}
 
-		case let .internal(.system(.createdNewAccountResult(.failure(error)))):
+		case let .internal(.system(.loadAccountResult(.failure(error)))),
+		     let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))),
+		     let .internal(.system(.createdNewProfileResult(.failure(error)))),
+		     let .internal(.system(.createdNewAccountResult(.failure(error)))):
+
 			state.isCreatingAccount = false
 			errorQueue.schedule(error)
 			return .none
+
+		case let .internal(.system(.createdNewAccountResult(.success(account)))),
+		     let .internal(.system(.loadAccountResult(.success(account)))):
+			state.isCreatingAccount = false
+			let isFirstAccount = state.isFirstAccount ?? true
+			return .run { send in
+				await send(.delegate(.createdNewAccount(account: account, isFirstAccount: isFirstAccount)))
+			}
 
 		case .internal(.view(.closeButtonTapped)):
 			return .run { send in
@@ -158,19 +120,19 @@ public extension CreateAccount {
 
 		case .internal(.view(.viewAppeared)):
 			let networkID = state.networkAndGateway.network.id
-			return
-				.run { send in
-					await send(.internal(.system(.hasAccountOnNetworkResult(
-						TaskResult {
-							try await profileClient.hasAccountOnNetwork(networkID)
-						}
-					))))
-					try await self.mainQueue.sleep(for: .seconds(0.5))
-					await send(.internal(.system(.focusTextField(.accountName))))
-				}
+			return .run { send in
+				await send(.internal(.system(.hasAccountOnNetworkResult(
+					TaskResult {
+						try await profileClient.hasAccountOnNetwork(networkID)
+					}
+				))))
+				try await self.mainQueue.sleep(for: .seconds(0.5))
+				await send(.internal(.system(.focusTextField(.accountName))))
+			}
 		case let .internal(.system(.hasAccountOnNetworkResult(.success(hasAccount)))):
 			state.isFirstAccount = !hasAccount
 			return .none
+
 		case .internal(.system(.hasAccountOnNetworkResult(.failure))):
 			state.isFirstAccount = true
 			return .none
@@ -181,6 +143,57 @@ public extension CreateAccount {
 
 		case .delegate:
 			return .none
+		}
+	}
+
+	private func createAccount(state: inout State) -> EffectTask<Action> {
+		.run { [accountName = state.sanitizedAccountName, overridingNetworkID = state.networkAndGateway.network.id] send in
+			await send(.internal(.system(.createdNewAccountResult(
+				TaskResult {
+					let request = CreateAccountRequest(
+						overridingNetworkID: overridingNetworkID, // optional
+						keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
+						accountName: accountName
+					)
+					return try await profileClient.createVirtualAccount(
+						request
+					)
+				}
+			))))
+		}
+	}
+
+	private func createProfile(state: inout State) -> EffectTask<Action> {
+		.run { [nameOfFirstAccount = state.sanitizedAccountName,
+		        networkAndGateway = state.networkAndGateway] send in
+
+				await send(.internal(.system(.createdNewProfileResult(
+					// FIXME: - mainnet: extract into ProfileCreator client?
+					TaskResult {
+						let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
+
+						let newProfileRequest = CreateNewProfileRequest(
+							networkAndGateway: networkAndGateway,
+							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
+							nameOfFirstAccount: nameOfFirstAccount
+						)
+
+						let newProfile = try await profileClient.createNewProfile(
+							newProfileRequest
+						)
+
+						let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
+
+						try await keychainClient.updateFactorSource(
+							mnemonic: curve25519FactorSourceMnemonic,
+							reference: curve25519FactorSourceReference
+						)
+
+						try await keychainClient.updateProfile(profile: newProfile)
+
+						return newProfile
+					}
+				))))
 		}
 	}
 }
