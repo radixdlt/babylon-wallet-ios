@@ -37,6 +37,14 @@ public extension P2PConnectivityClient {
 
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
+		Task {
+			_ = try await P2PConnections.shared.add(
+				connectionsFor: profileClient.getP2PClients(),
+				connectMode: .connect(force: true, inBackground: true),
+				emitConnectionsUpdate: true
+			)
+		}
+
 		@Sendable func client(byID id: P2PClient.ID) async throws -> P2PClient {
 			guard let client = try await profileClient.p2pClient(for: id) else {
 				throw P2PClientNotFoundInProfile()
@@ -44,23 +52,28 @@ public extension P2PConnectivityClient {
 			return client
 		}
 
-		actor ClientsHolder: GlobalActor {
-			typealias Value = OrderedSet<P2PClient>
+		actor MulticastHolder: GlobalActor {
+			typealias Value = OrderedSet<P2PClient.ID>
 			private let subject = AsyncCurrentValueSubject<Value>([])
-			static let shared = ClientsHolder()
+			static let shared = MulticastHolder()
 			init() {}
 
 			func emit(_ value: Value) {
 				subject.send(value)
 			}
 
-			func emit(_ value: P2PClients) {
-				emit(OrderedSet(value))
-			}
-
-			func clientsAsyncSequence() -> AnyAsyncSequence<Value> {
+			func clientIDsAsyncSequence() -> AnyAsyncSequence<Value> {
 				subject
 					.eraseToAnyAsyncSequence()
+			}
+		}
+
+		Task {
+			for try await ids in try await P2PConnections
+				.shared
+				.connectionIDsAsyncSequence()
+			{
+				await MulticastHolder.shared.emit(ids)
 			}
 		}
 
@@ -68,34 +81,27 @@ public extension P2PConnectivityClient {
 			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
 			},
-			getP2PClients: {
-				let saved = try await profileClient.getP2PClients()
-				Task {
-					await ClientsHolder.shared.emit(saved)
-				}
-				Task {
-					try await P2PConnections.shared.add(
-						connectionsFor: saved,
-						autoconnect: true
-					)
-				}
-				return await ClientsHolder.shared.clientsAsyncSequence()
+			getP2PClientIDs: {
+				print("🎉 MulticastHolder.shared.clientIDsAsyncSequence()")
+				return await MulticastHolder.shared.clientIDsAsyncSequence()
+
+			},
+			getP2PClientsByIDs: { ids in
+				try await OrderedSet(ids.asyncMap {
+					try await client(byID: $0)
+				})
 			},
 			addP2PClientWithConnection: { client in
 				try await profileClient.addP2PClient(client)
-				Task {
-					try await ClientsHolder.shared.emit(profileClient.getP2PClients())
-				}
-				_ = try await P2PConnections.shared.add(config: client.config, autoconnect: false)
+				_ = try await P2PConnections.shared.add(
+					config: client.config,
+					connectMode: .skipConnecting, // should already be committed
+					emitConnectionsUpdate: true // important to emit!
+				)
 			},
 			deleteP2PClientByID: { id in
 				try await profileClient.deleteP2PClientByID(id)
-				Task {
-					try await ClientsHolder.shared.emit(profileClient.getP2PClients())
-				}
-				do { try await P2PConnections.shared.removeAndDisconnect(id: id) } catch {
-					print("Failed to remove/disconnect client? error: \(error)")
-				}
+				try await P2PConnections.shared.removeAndDisconnect(id: id)
 			},
 			getConnectionStatusAsyncSequence: { id in
 				try await P2PConnections.shared.connectionStatusChangeEventAsyncSequence(for: id).map {
@@ -106,10 +112,12 @@ public extension P2PConnectivityClient {
 				}.eraseToAnyAsyncSequence()
 			},
 			getRequestsFromP2PClientAsyncSequence: { id in
-				try await P2PConnections.shared.incomingMessagesAsyncSequence(for: id).map { msg in
-					@Dependency(\.jsonDecoder) var jsonDecoder
+				print("🔵🔵🔵 \(id) SUBSCRIBING FOR REQUEST")
 
+				return try await P2PConnections.shared.incomingMessagesAsyncSequence(for: id).map { msg in
+					@Dependency(\.jsonDecoder) var jsonDecoder
 					let jsonData = msg.messagePayload
+					print("🟢🟢🟢🟢 RECEIVED REQUEST")
 					do {
 						let requestFromDapp = try jsonDecoder().decode(P2P.FromDapp.Request.self, from: jsonData)
 						return try await P2P.RequestFromClient(

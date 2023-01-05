@@ -40,25 +40,41 @@ public extension ManageP2PClients {
 			return .run { send in
 				print("☑️ ManageP2PClients getting p2pClients.......")
 				do {
-					for try await p2pClients in try await p2pConnectivityClient.getP2PClients() {
+					for try await p2pClientIDs in try await p2pConnectivityClient.getP2PClientIDs() {
 						guard !Task.isCancelled else {
-							print("❌  ManageP2PClients cancelled getting p2pClients..?")
+							print("❌ ManageP2PClients cancelled getting p2pClientIDs..?")
 							return
 						}
-						print("✅ ManageP2PClients got p2pClients: \(p2pClients.map(\.displayName)) ")
-						await send(.internal(.system(.loadClientsResult(
-							.success(p2pClients)
+						print("✅ ManageP2PClients got p2pClientIDs: #\(p2pClientIDs.count) \(p2pClientIDs)")
+						await send(.internal(.system(.loadClientIDsResult(
+							.success(p2pClientIDs)
 						))))
 					}
 				} catch {
 					print("❌ ManageP2PClients failed to get p2pClients, error: \(String(describing: error))")
-					await send(.internal(.system(.loadClientsResult(
+					await send(.internal(.system(.loadClientIDsResult(
 						.failure(error)
 					))))
 				}
 			}
 
-		case let .internal(.system(.loadClientsResult(.success(clientsFromProfile)))):
+		case let .internal(.system(.loadClientIDsResult(.success(clientIDs)))):
+			guard !clientIDs.isEmpty else {
+				return .none
+			}
+			return .run { send in
+				await send(.internal(.system(.loadClientsByIDsResult(
+					TaskResult {
+						try await p2pConnectivityClient.getP2PClientsByIDs(clientIDs)
+					}
+				))))
+			}
+
+		case let .internal(.system(.loadClientIDsResult(.failure(error)))):
+			errorQueue.schedule(error)
+			return .none
+
+		case let .internal(.system(.loadClientsByIDsResult(.success(clientsFromProfile)))):
 
 			state.clients = .init(
 				uniqueElements: clientsFromProfile.map { ManageP2PClient.State(client: $0) }
@@ -66,7 +82,7 @@ public extension ManageP2PClients {
 
 			return .none
 
-		case let .internal(.system(.loadClientsResult(.failure(error)))):
+		case let .internal(.system(.loadClientsByIDsResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
 

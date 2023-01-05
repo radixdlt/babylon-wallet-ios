@@ -20,7 +20,9 @@ public extension ConnectUsingSecrets {
 				await send(.internal(.system(.establishConnectionResult(
 					TaskResult {
 						try await P2PConnections.shared.add(
-							connectionPassword: connectionPassword, autoconnect: true
+							connectionPassword: connectionPassword,
+							connectMode: .connect(force: true, inBackground: false),
+							emitConnectionsUpdate: false // we wanna emit after we have added the connectionID to Profile
 						)
 					}
 				))))

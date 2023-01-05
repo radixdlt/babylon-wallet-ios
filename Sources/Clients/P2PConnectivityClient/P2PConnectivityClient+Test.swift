@@ -13,7 +13,8 @@ extension P2PConnectivityClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 	public static let testValue = Self(
 		getLocalNetworkAccess: unimplemented("\(Self.self).getLocalNetworkAccess"),
-		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
+		getP2PClientIDs: unimplemented("\(Self.self).getP2PClientIDs"),
+		getP2PClientsByIDs: unimplemented("\(Self.self).getP2PClientsByIDs"),
 		addP2PClientWithConnection: unimplemented("\(Self.self).addP2PClientWithConnection"),
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getConnectionStatusAsyncSequence: unimplemented("\(Self.self).getConnectionStatusAsyncSequence"),
@@ -29,7 +30,8 @@ extension P2PConnectivityClient: TestDependencyKey {
 extension P2PConnectivityClient {
 	static let noop = Self(
 		getLocalNetworkAccess: { false },
-		getP2PClients: { [].async.eraseToAnyAsyncSequence() },
+		getP2PClientIDs: { [].async.eraseToAnyAsyncSequence() },
+		getP2PClientsByIDs: { _ in .init() },
 		addP2PClientWithConnection: { _ in },
 		deleteP2PClientByID: { _ in },
 		getConnectionStatusAsyncSequence: { _ in [].async.eraseToAnyAsyncSequence() },
@@ -45,7 +47,7 @@ extension P2PConnectivityClient {
 public extension P2PClient {
 	static let previewValue = Self(
 		connectionPassword: .placeholder,
-		displayName: "Placeholder"
+		displayName: "PreviewValue"
 	)
 }
 #endif // DEBUG

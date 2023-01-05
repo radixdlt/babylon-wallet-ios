@@ -203,27 +203,27 @@ private extension HandleDappRequests {
 			return .run { send in
 				print("☑️ HandleDappRequests getting p2pClients.......")
 				do {
-					for try await p2pClients in try await p2pConnectivityClient.getP2PClients() {
+					for try await clientIDs in try await p2pConnectivityClient.getP2PClientIDs() {
 						guard !Task.isCancelled else {
 							print("❌ HandleDappRequests getting p2pClients CANCELLED?")
 							return
 						}
-						print("✅ HandleDappRequests got p2pClients: \(p2pClients.map(\.displayName)) ")
-						await send(.internal(.system(.loadConnectionsResult(.success(p2pClients)))))
+						print("✅ HandleDappRequests got clientIDs: #\(clientIDs.count) \(clientIDs)")
+						await send(.internal(.system(.loadClientIDsResult(.success(clientIDs)))))
 					}
 				} catch {
-					await send(.internal(.system(.loadConnectionsResult(.failure(error)))))
+					await send(.internal(.system(.loadClientIDsResult(.failure(error)))))
 				}
 			}
 
-		case let .internal(.system(.loadConnectionsResult(.success(clients)))):
-			print("☑️ HandleDappRequests getting requests for #\(clients.count) clients...")
+		case let .internal(.system(.loadClientIDsResult(.success(clientIDs)))):
+			print("☑️ HandleDappRequests getting requests for #\(clientIDs.count) clients...")
 			return .run { send in
-				for connectedClient in clients {
-					print("☑️ HandleDappRequests getting requests for client: '\(connectedClient.displayName)'.......")
+				for clientID in clientIDs {
+					print("☑️ HandleDappRequests getting requests for client: '\(clientID)'.......")
 					do {
-						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(connectedClient.id) {
-							print("✅ HandleDappRequests got requests for client: '\(connectedClient.displayName)'!!!!")
+						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(clientID) {
+							print("✅ HandleDappRequests got requests for client: '\(clientID)'!!!!")
 
 							await send(.internal(.system(.sendMessageReceivedReceiptBackToPeer(
 								request.client, readMessage: request.originalMessage
@@ -237,7 +237,7 @@ private extension HandleDappRequests {
 				}
 			}
 
-		case let .internal(.system(.loadConnectionsResult(.failure(error)))):
+		case let .internal(.system(.loadClientIDsResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
 
