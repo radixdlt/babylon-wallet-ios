@@ -1,6 +1,7 @@
 fastlane_require 'dotenv'
 
 before_all do
+    xcodes(select_for_current_build_only: true)
     Dotenv.load ".env.secret"
     ensure_git_status_clean
 end
@@ -27,7 +28,7 @@ platform :ios do
     desc "Usage `bundle exec fastlane ios deploy --env ios.<specific env>`"
     lane :deploy do |options|
         install_distribution_certificates
-        
+
         api_key = app_store_connect_api_key
         app_version = read_common_config(key: "APP_VERSION")
         build_number = latest_testflight_build_number(
@@ -37,7 +38,7 @@ platform :ios do
         ) + 1
         increment_build_number(
             xcodeproj: ENV['PROJ_PATH'],
-            build_number: build_number 
+            build_number: build_number
         )
         build_app
         upload_to_testflight(
@@ -120,7 +121,7 @@ private_lane :create_beta_gh_release do
       merge_commit_filtering: 'exclude_merges'
     )
     dependencies = read_json(
-        json_path: ENV['SWIFT_PACKAGE_RESOLVED_PATH'] 
+        json_path: ENV['SWIFT_PACKAGE_RESOLVED_PATH']
     )[:pins]
 
     core_deps = ["converse", "swift-engine-toolkit", "swift-profile", "bite", "mnemonic", "slip10", "swift-composable-architecture"]
@@ -179,7 +180,7 @@ private_lane :code_signing do |options|
     create_keychain(
         unlock: false,
         timeout: 0
-    ) 
+    )
     sync_code_signing(
         type: type,
         force_for_new_devices: true,

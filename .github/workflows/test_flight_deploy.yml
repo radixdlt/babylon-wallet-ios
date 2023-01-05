@@ -1,6 +1,6 @@
 name: "Test Flight Deploy"
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       flavour:
@@ -46,19 +46,16 @@ jobs:
             ${{ secrets.BITE_SSH_KEY }}
             ${{ secrets.FASTLANE_MATCH_REPO_SSH_KEY }}
 
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: "14.1"
-
       - name: Config local env
         run: |
           git config user.name $GIT_USER
           git config user.email $GIT_USER
           echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
           brew install xcbeautify
+          brew install robotsandpencils/made/xcodes
         env:
           GIT_USER: ${{ secrets.RADIX_BOT_USERNAME }}
-        
+
       - name: "Deploy"
         run: |
           FLAVOUR=alpha
