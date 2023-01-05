@@ -58,8 +58,6 @@ public extension Home.Action {
 // MARK: - Home.Action.SystemAction
 public extension Home.Action {
 	enum SystemAction: Sendable, Equatable {
-		case createAccount(numberOfExistingAccounts: Int)
-
 		case accountsLoadedResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
 		case appSettingsLoadedResult(TaskResult<AppSettings>)
 		case isCurrencyAmountVisibleLoaded(Bool)

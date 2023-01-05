@@ -71,7 +71,7 @@ public extension CreateAccount {
 			}
 
 		case .internal(.system(.createAccount)):
-			return .run { [accountName = state.sanitizedAccountName, overridingNetworkID = state.onNetworkWithID] send in
+			return .run { [accountName = state.sanitizedAccountName, overridingNetworkID = state.networkAndGateway.network.id] send in
 				await send(.internal(.system(.createdNewAccountResult(
 					TaskResult {
 						let request = CreateAccountRequest(
@@ -87,37 +87,36 @@ public extension CreateAccount {
 			}
 
 		case .internal(.system(.createProfile)):
-			return .run { [nameOfFirstAccount = state.sanitizedAccountName] send in
+			return .run { [nameOfFirstAccount = state.sanitizedAccountName,
+			               networkAndGateway = state.networkAndGateway] send in
 
-				await send(.internal(.system(.createdNewProfileResult(
-					// FIXME: - mainnet: extract into ProfileCreator client?
-					TaskResult {
-						let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
+					await send(.internal(.system(.createdNewProfileResult(
+						// FIXME: - mainnet: extract into ProfileCreator client?
+						TaskResult {
+							let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
 
-						let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
+							let newProfileRequest = CreateNewProfileRequest(
+								networkAndGateway: networkAndGateway,
+								curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
+								nameOfFirstAccount: nameOfFirstAccount
+							)
 
-						let newProfileRequest = CreateNewProfileRequest(
-							networkAndGateway: networkAndGateway,
-							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
-							nameOfFirstAccount: nameOfFirstAccount
-						)
+							let newProfile = try await profileClient.createNewProfile(
+								newProfileRequest
+							)
 
-						let newProfile = try await profileClient.createNewProfile(
-							newProfileRequest
-						)
+							let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
 
-						let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
+							try await keychainClient.updateFactorSource(
+								mnemonic: curve25519FactorSourceMnemonic,
+								reference: curve25519FactorSourceReference
+							)
 
-						try await keychainClient.updateFactorSource(
-							mnemonic: curve25519FactorSourceMnemonic,
-							reference: curve25519FactorSourceReference
-						)
+							try await keychainClient.updateProfile(profile: newProfile)
 
-						try await keychainClient.updateProfile(profile: newProfile)
-
-						return newProfile
-					}
-				))))
+							return newProfile
+						}
+					))))
 			}
 
 		case let .internal(.system(.createdNewProfileResult(.success(profile)))):
@@ -158,10 +157,23 @@ public extension CreateAccount {
 			}
 
 		case .internal(.view(.viewAppeared)):
-			return .run { send in
-				try await self.mainQueue.sleep(for: .seconds(0.5))
-				await send(.internal(.system(.focusTextField(.accountName))))
-			}
+			let networkID = state.networkAndGateway.network.id
+			return
+				.run { send in
+					await send(.internal(.system(.hasAccountOnNetworkResult(
+						TaskResult {
+							try await profileClient.hasAccountOnNetwork(networkID)
+						}
+					))))
+					try await self.mainQueue.sleep(for: .seconds(0.5))
+					await send(.internal(.system(.focusTextField(.accountName))))
+				}
+		case let .internal(.system(.hasAccountOnNetworkResult(.success(hasAccount)))):
+			state.isFirstAccount = !hasAccount
+			return .none
+		case .internal(.system(.hasAccountOnNetworkResult(.failure))):
+			state.isFirstAccount = true
+			return .none
 
 		case let .internal(.system(.focusTextField(focus))):
 			state.focusedField = focus

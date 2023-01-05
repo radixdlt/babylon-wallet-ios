@@ -5,8 +5,8 @@ import Profile
 // MARK: - CreateAccount.State
 public extension CreateAccount {
 	struct State: Sendable, Equatable {
-		public var onNetworkWithID: NetworkID?
-		public var isFirstAccount: Bool
+		public var networkAndGateway: AppPreferences.NetworkAndGateway
+		var isFirstAccount: Bool?
 		public var inputtedAccountName: String
 		public var sanitizedAccountName: String { inputtedAccountName.trimmed() }
 		public var isCreatingAccount: Bool
@@ -14,16 +14,14 @@ public extension CreateAccount {
 		@BindableState public var focusedField: Field?
 
 		public init(
-			onNetworkWithID: NetworkID? = nil,
+			networkAndGateway: AppPreferences.NetworkAndGateway = .nebunet,
 			shouldCreateProfile: Bool = false,
-			isFirstAccount: Bool = true,
 			inputtedAccountName: String = "",
 			focusedField: Field? = nil,
 			isCreatingAccount: Bool = false
 		) {
-			self.onNetworkWithID = onNetworkWithID
+			self.networkAndGateway = networkAndGateway
 			self.shouldCreateProfile = shouldCreateProfile
-			self.isFirstAccount = isFirstAccount
 			self.inputtedAccountName = inputtedAccountName
 			self.focusedField = focusedField
 			self.isCreatingAccount = isCreatingAccount

@@ -46,7 +46,6 @@ public extension ChooseAccounts.Action {
 public extension ChooseAccounts.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
 		case loadAccountsResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
-		case createAccount(numberOfExistingAccounts: Int)
 	}
 }
 

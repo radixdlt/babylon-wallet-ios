@@ -104,7 +104,7 @@ extension CreateAccount.View {
 		@BindableState public var focusedField: CreateAccount.State.Field?
 
 		init(state: CreateAccount.State) {
-			titleText = state.isFirstAccount ? L10n.CreateAccount.createFirstAccount : L10n.CreateAccount.createNewAccount
+			titleText = state.isFirstAccount == false ? L10n.CreateAccount.createNewAccount : L10n.CreateAccount.createFirstAccount
 			accountName = state.inputtedAccountName
 			isLoaderVisible = state.isCreatingAccount
 			let isNameValid = !state.sanitizedAccountName.isEmpty

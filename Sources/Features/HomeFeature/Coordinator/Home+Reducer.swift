@@ -60,17 +60,9 @@ public struct Home: Sendable, ReducerProtocol {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.createAccountButtonTapped)):
-			return .run { send in
-				let accounts = try await profileClient.getAccounts()
-				await send(.internal(.system(.createAccount(numberOfExistingAccounts: accounts.count))))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
-
-		case let .internal(.system(.createAccount(numberOfExistingAccounts))):
 			state.createAccountFlow = .init(
 				completionDestination: .home,
-				rootState: .init(isFirstAccount: numberOfExistingAccounts == 0)
+				rootState: .init()
 			)
 			return .none
 

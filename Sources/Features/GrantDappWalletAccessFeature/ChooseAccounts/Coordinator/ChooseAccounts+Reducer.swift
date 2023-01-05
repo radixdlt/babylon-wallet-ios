@@ -46,12 +46,11 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 				return .none
 
 			case .internal(.view(.createAccountButtonTapped)):
-				return .run { send in
-					let accounts = try await profileClient.getAccounts()
-					await send(.internal(.system(.createAccount(numberOfExistingAccounts: accounts.count))))
-				} catch: { error, _ in
-					errorQueue.schedule(error)
-				}
+				state.createAccountFlow = .init(
+					completionDestination: .chooseAccounts,
+					rootState: .init()
+				)
+				return .none
 
 			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child
 			// and every other action should fall-through - @davdroman-rdx
@@ -93,16 +92,6 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 						try await profileClient.getAccounts()
 					}))))
 				}
-
-			case let .internal(.system(.createAccount(numberOfExistingAccounts: numberOfExistingAccounts))):
-				state.createAccountFlow = .init(
-					completionDestination: .chooseAccounts,
-					rootState: .init(
-						shouldCreateProfile: false,
-						isFirstAccount: numberOfExistingAccounts == 0
-					)
-				)
-				return .none
 
 			case .delegate(.dismissChooseAccounts):
 				state.createAccountFlow = nil
