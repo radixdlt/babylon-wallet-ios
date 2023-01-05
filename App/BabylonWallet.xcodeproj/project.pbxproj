@@ -318,7 +318,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D7294B34150098B586 /* Project-Dev.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 21;
 			};
 			name = "Debug-Dev";
 		};
@@ -340,7 +340,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D3294B34140098B586 /* Project-Beta.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 21;
 			};
 			name = Beta;
 		};
@@ -362,7 +362,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D6294B34150098B586 /* Project-Alpha.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 21;
 			};
 			name = "Debug-Alpha";
 		};
@@ -384,7 +384,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D5294B34150098B586 /* Project-Release.xcconfig */;
 			buildSettings = {
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 21;
 			};
 			name = Release;
 		};
