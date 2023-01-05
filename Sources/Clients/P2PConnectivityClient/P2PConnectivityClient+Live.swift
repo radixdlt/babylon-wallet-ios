@@ -81,12 +81,12 @@ public extension P2PConnectivityClient {
 				}
 				return await ClientsHolder.shared.clientsAsyncSequence()
 			},
-			addP2PClientWithConnection: { client, autoconnect in
+			addP2PClientWithConnection: { client in
 				try await profileClient.addP2PClient(client)
 				Task {
 					try await ClientsHolder.shared.emit(profileClient.getP2PClients())
 				}
-				_ = try await P2PConnections.shared.add(config: client.config, autoconnect: autoconnect)
+				_ = try await P2PConnections.shared.add(config: client.config, autoconnect: false)
 			},
 			deleteP2PClientByID: { id in
 				try await profileClient.deleteP2PClientByID(id)
@@ -159,6 +159,9 @@ public extension P2PConnectivityClient {
 			},
 			_debugWebsocketStatusAsyncSequence: { id in
 				try await P2PConnections.shared.debugWebSocketState(for: id).eraseToAnyAsyncSequence()
+			},
+			_debugDataChannelStatusAsyncSequence: { id in
+				try await P2PConnections.shared.debugDataChannelState(for: id).eraseToAnyAsyncSequence()
 			}
 		)
 	}()

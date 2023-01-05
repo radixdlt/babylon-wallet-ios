@@ -21,22 +21,24 @@ extension P2PConnectivityClient: TestDependencyKey {
 		sendMessageReadReceipt: unimplemented("\(Self.self).sendMessageReadReceipt"),
 		sendMessage: unimplemented("\(Self.self).sendMessage"),
 		_sendTestMessage: unimplemented("\(Self.self)._sendTestMessage"),
-		_debugWebsocketStatusAsyncSequence: unimplemented("\(Self.self)._debugWebsocketStatusAsyncSequence")
+		_debugWebsocketStatusAsyncSequence: unimplemented("\(Self.self)._debugWebsocketStatusAsyncSequence"),
+		_debugDataChannelStatusAsyncSequence: unimplemented("\(Self.self)._debugDataChannelStatusAsyncSequence")
 	)
 }
 
 extension P2PConnectivityClient {
 	static let noop = Self(
 		getLocalNetworkAccess: { false },
-		getP2PClients: { fatalError() },
-		addP2PClientWithConnection: { _, _ in },
+		getP2PClients: { [].async.eraseToAnyAsyncSequence() },
+		addP2PClientWithConnection: { _ in },
 		deleteP2PClientByID: { _ in },
-		getConnectionStatusAsyncSequence: { _ in fatalError() },
-		getRequestsFromP2PClientAsyncSequence: { _ in fatalError() },
+		getConnectionStatusAsyncSequence: { _ in [].async.eraseToAnyAsyncSequence() },
+		getRequestsFromP2PClientAsyncSequence: { _ in [].async.eraseToAnyAsyncSequence() },
 		sendMessageReadReceipt: { _, _ in },
 		sendMessage: { _ in .previewValue },
 		_sendTestMessage: { _, _ in },
-		_debugWebsocketStatusAsyncSequence: { _ in [].async.eraseToAnyAsyncSequence() }
+		_debugWebsocketStatusAsyncSequence: { _ in [].async.eraseToAnyAsyncSequence() },
+		_debugDataChannelStatusAsyncSequence: { _ in [].async.eraseToAnyAsyncSequence() }
 	)
 }
 

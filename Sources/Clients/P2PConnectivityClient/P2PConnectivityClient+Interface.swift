@@ -34,22 +34,26 @@ public struct P2PConnectivityClient: DependencyKey, Sendable {
 	// MARK: Debug functionality
 	public var _sendTestMessage: _SendTestMessage
 	public var _debugWebsocketStatusAsyncSequence: DebugGetWebsocketStatusAsyncSequence
+	public var _debugDataChannelStatusAsyncSequence: DebugGetDataChannelStatusAsyncSequence
 }
 
 public extension P2PConnectivityClient {
+	typealias GetAsyncSequenceOfByP2PClientID<Value> = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<Value>
+
 	typealias GetLocalNetworkAccess = @Sendable () async -> Bool
 	typealias GetP2PClients = @Sendable () async throws -> AnyAsyncSequence<OrderedSet<P2PClient>>
 
-	typealias AddP2PClientWithConnection = @Sendable (P2PClient, AlsoConnect) async throws -> Void; typealias AlsoConnect = Bool
+	typealias AddP2PClientWithConnection = @Sendable (P2PClient) async throws -> Void
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 
-	typealias GetConnectionStatusAsyncSequence = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<P2P.ClientWithConnectionStatus>
-	typealias GetRequestsFromP2PClientAsyncSequence = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<P2P.RequestFromClient>
+	typealias GetConnectionStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<P2P.ClientWithConnectionStatus>
+	typealias GetRequestsFromP2PClientAsyncSequence = GetAsyncSequenceOfByP2PClientID<P2P.RequestFromClient>
 
 	typealias SendMessageReadReceipt = @Sendable (P2PClient.ID, P2PConnections.IncomingMessage) async throws -> Void
 	typealias SendMessage = @Sendable (P2P.ResponseToClientByID) async throws -> P2P.SentResponseToClient
 
 	// MARK: Debug functionality
 	typealias _SendTestMessage = @Sendable (P2PClient.ID, String) async throws -> Void
-	typealias DebugGetWebsocketStatusAsyncSequence = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<WebSocketState>
+	typealias DebugGetWebsocketStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<WebSocketState>
+	typealias DebugGetDataChannelStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<DataChannelState>
 }

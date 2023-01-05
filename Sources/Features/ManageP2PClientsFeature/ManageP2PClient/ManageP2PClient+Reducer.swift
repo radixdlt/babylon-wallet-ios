@@ -47,6 +47,16 @@ public extension ManageP2PClient {
 							await send(.internal(.system(.webSocketStatusResult(.failure(error)))))
 						}
 					}
+					_ = taskGroup.addTaskUnlessCancelled {
+						do {
+							for try await dataChannelState in try await p2pConnectivityClient._debugDataChannelStatusAsyncSequence(id) {
+								guard !Task.isCancelled else { return }
+								await send(.internal(.system(.dataChannelStateResult(.success(dataChannelState)))))
+							}
+						} catch {
+							await send(.internal(.system(.dataChannelStateResult(.failure(error)))))
+						}
+					}
 					#endif // DEBUG
 				}
 			}
@@ -74,6 +84,14 @@ public extension ManageP2PClient {
 			return .none
 
 		case let .internal(.system(.webSocketStatusResult(.failure(error)))):
+			errorQueue.schedule(error)
+			return .none
+
+		case let .internal(.system(.dataChannelStateResult(.success(dataChannelState)))):
+			state.dataChannelStatus = dataChannelState
+			return .none
+
+		case let .internal(.system(.dataChannelStateResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
 

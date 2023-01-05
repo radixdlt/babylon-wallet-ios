@@ -132,8 +132,7 @@ public extension ManageP2PClients {
 				await send(.internal(.system(.saveNewConnectionResult(
 					TaskResult {
 						try await p2pConnectivityClient.addP2PClientWithConnection(
-							connectedClient.p2pClient,
-							false // no need to connect, already connected.
+							connectedClient.p2pClient
 						)
 					}.map { connectedClient }
 				))))

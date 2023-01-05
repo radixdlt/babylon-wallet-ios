@@ -41,6 +41,7 @@ public extension ManageP2PClient.Action.InternalAction {
 		case connectionStatusResult(TaskResult<ConnectionStatus>)
 		#if DEBUG
 		case webSocketStatusResult(TaskResult<WebSocketState>)
+		case dataChannelStateResult(TaskResult<DataChannelState>)
 		#endif
 	}
 }
