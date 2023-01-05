@@ -49,6 +49,7 @@
 		839D88E5294B6B880098B586 /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
 		839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "macOS-shared.xcconfig"; sourceTree = "<group>"; };
 		839D88E9294B7A620098B586 /* Radix-Wallet--macOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--macOS--Info.plist"; sourceTree = "<group>"; };
+		83AAF5DF2966BCF7008102F0 /* Project-Debug-Opt.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Project-Debug-Opt.xcconfig"; sourceTree = "<group>"; };
 		83B9D896294CAEBA00C4582D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		D5B1769E29267C1F00AAE13B /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		E667FFD128F6F7E50015544F /* Babylon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Babylon; path = ..; sourceTree = "<group>"; };
@@ -109,6 +110,7 @@
 				839D88D6294B34150098B586 /* Project-Alpha.xcconfig */,
 				839D88D3294B34140098B586 /* Project-Beta.xcconfig */,
 				839D88D7294B34150098B586 /* Project-Dev.xcconfig */,
+				83AAF5DF2966BCF7008102F0 /* Project-Debug-Opt.xcconfig */,
 				839D88DF294B53C60098B586 /* Project-Release-Opt.xcconfig */,
 				839D88D5294B34150098B586 /* Project-Release.xcconfig */,
 				839D88D4294B34140098B586 /* Project-Shared.xcconfig */,
@@ -468,27 +470,27 @@
 			};
 			name = Beta;
 		};
-		83F41363294B185300EE5EBC /* Alpha */ = {
+		83F41363294B185300EE5EBC /* Debug-Alpha */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88D6294B34150098B586 /* Project-Alpha.xcconfig */;
 			buildSettings = {
 				CURRENT_PROJECT_VERSION = 1;
 			};
-			name = Alpha;
+			name = "Debug-Alpha";
 		};
-		83F41364294B185300EE5EBC /* Alpha */ = {
+		83F41364294B185300EE5EBC /* Debug-Alpha */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88DA294B50B20098B586 /* iOS-alpha.xcconfig */;
 			buildSettings = {
 			};
-			name = Alpha;
+			name = "Debug-Alpha";
 		};
-		83F41365294B185300EE5EBC /* Alpha */ = {
+		83F41365294B185300EE5EBC /* Debug-Alpha */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 839D88E7294B6DA80098B586 /* macOS-shared.xcconfig */;
 			buildSettings = {
 			};
-			name = Alpha;
+			name = "Debug-Alpha";
 		};
 		E6805BD4286DB3ED00861180 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -520,7 +522,7 @@
 			buildConfigurations = (
 				83DEEED62949CA5A003557D7 /* Debug-Dev */,
 				E6805BD4286DB3ED00861180 /* Release */,
-				83F41363294B185300EE5EBC /* Alpha */,
+				83F41363294B185300EE5EBC /* Debug-Alpha */,
 				83E1AEDB2949BB4B00D74788 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -531,7 +533,7 @@
 			buildConfigurations = (
 				83DEEED72949CA5A003557D7 /* Debug-Dev */,
 				E6805BD7286DB3ED00861180 /* Release */,
-				83F41364294B185300EE5EBC /* Alpha */,
+				83F41364294B185300EE5EBC /* Debug-Alpha */,
 				83E1AEDC2949BB4B00D74788 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -542,7 +544,7 @@
 			buildConfigurations = (
 				83DEEED82949CA5A003557D7 /* Debug-Dev */,
 				E6805BDA286DB3ED00861180 /* Release */,
-				83F41365294B185300EE5EBC /* Alpha */,
+				83F41365294B185300EE5EBC /* Debug-Alpha */,
 				83E1AEDD2949BB4B00D74788 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
