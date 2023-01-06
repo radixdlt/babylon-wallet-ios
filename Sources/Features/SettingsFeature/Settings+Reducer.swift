@@ -12,6 +12,7 @@ public struct Settings: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 
 	public init() {}
 }
@@ -36,6 +37,7 @@ public extension Settings {
 
 		case .internal(.view(.deleteProfileAndFactorSourcesButtonTapped)):
 			return .run { send in
+				await p2pConnectivityClient.disconnectAndRemoveAll()
 				await send(.delegate(.deleteProfileAndFactorSources))
 			}
 

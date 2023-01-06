@@ -30,28 +30,23 @@ public extension ManageP2PClients {
 				}
 
 			Reduce(self.core)
-		} // ._printChanges()
+		}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.task)):
-			print("☑️ ManageP2PClients getting p2pClients...")
 			return .run { send in
-				print("☑️ ManageP2PClients getting p2pClients.......")
 				do {
 					for try await p2pClientIDs in try await p2pConnectivityClient.getP2PClientIDs() {
 						guard !Task.isCancelled else {
-							print("❌ ManageP2PClients cancelled getting p2pClientIDs..?")
 							return
 						}
-						print("✅ ManageP2PClients got p2pClientIDs: #\(p2pClientIDs.count) \(p2pClientIDs)")
 						await send(.internal(.system(.loadClientIDsResult(
 							.success(p2pClientIDs)
 						))))
 					}
 				} catch {
-					print("❌ ManageP2PClients failed to get p2pClients, error: \(String(describing: error))")
 					await send(.internal(.system(.loadClientIDsResult(
 						.failure(error)
 					))))

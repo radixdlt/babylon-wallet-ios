@@ -121,9 +121,14 @@ struct ConnectionInfoView: SwiftUI.View {
 				Circle()
 					.fill(connectionInfo.color)
 					.frame(width: 10)
+
+				Text(connectionInfo.status)
+					.foregroundColor(.app.gray2)
+					.textStyle(.body1Link)
 			}
+
 			Text(connectionInfo.description)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(.app.gray3)
 				.textStyle(.body2Regular)
 		}
 	}

@@ -37,14 +37,6 @@ public extension P2PConnectivityClient {
 
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
-		Task {
-			_ = try await P2PConnections.shared.add(
-				connectionsFor: profileClient.getP2PClients(),
-				connectMode: .connect(force: true, inBackground: true),
-				emitConnectionsUpdate: true
-			)
-		}
-
 		@Sendable func client(byID id: P2PClient.ID) async throws -> P2PClient {
 			guard let client = try await profileClient.p2pClient(for: id) else {
 				throw P2PClientNotFoundInProfile()
@@ -52,6 +44,8 @@ public extension P2PConnectivityClient {
 			return client
 		}
 
+		// It is unfortunate that this actor is needed. The intention is that ONLY the `P2PConnections`
+		// actor should be needed. And using the
 		actor MulticastHolder: GlobalActor {
 			typealias Value = OrderedSet<P2PClient.ID>
 			private let subject = AsyncCurrentValueSubject<Value>([])
@@ -77,14 +71,32 @@ public extension P2PConnectivityClient {
 			}
 		}
 
+		let loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll = {
+			Task {
+				print("🔌 Loading and connecting all P2P connections")
+				_ = try await P2PConnections.shared.add(
+					connectionsFor: profileClient.getP2PClients(),
+					connectMode: .connect(force: true, inBackground: true),
+					emitConnectionsUpdate: true
+				)
+			}
+		}
+
 		return Self(
+			loadFromProfileAndConnectAll: loadFromProfileAndConnectAll,
+			disconnectAndRemoveAll: {
+				print("🔌 Disconnecting and removing all P2P connections")
+				do {
+					try await P2PConnections.shared.removeAndDisconnectAll()
+				} catch {
+					print("Failed to delete all P2P connections: \(String(describing: error))")
+				}
+			},
 			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
 			},
 			getP2PClientIDs: {
-				print("🎉 MulticastHolder.shared.clientIDsAsyncSequence()")
-				return await MulticastHolder.shared.clientIDsAsyncSequence()
-
+				await MulticastHolder.shared.clientIDsAsyncSequence()
 			},
 			getP2PClientsByIDs: { ids in
 				try await OrderedSet(ids.asyncMap {
@@ -112,12 +124,9 @@ public extension P2PConnectivityClient {
 				}.eraseToAnyAsyncSequence()
 			},
 			getRequestsFromP2PClientAsyncSequence: { id in
-				print("🔵🔵🔵 \(id) SUBSCRIBING FOR REQUEST")
-
-				return try await P2PConnections.shared.incomingMessagesAsyncSequence(for: id).map { msg in
+				try await P2PConnections.shared.incomingMessagesAsyncSequence(for: id).map { msg in
 					@Dependency(\.jsonDecoder) var jsonDecoder
 					let jsonData = msg.messagePayload
-					print("🟢🟢🟢🟢 RECEIVED REQUEST")
 					do {
 						let requestFromDapp = try jsonDecoder().decode(P2P.FromDapp.Request.self, from: jsonData)
 						return try await P2P.RequestFromClient(

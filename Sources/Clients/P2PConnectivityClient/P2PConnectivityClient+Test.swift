@@ -12,6 +12,8 @@ import XCTestDynamicOverlay
 extension P2PConnectivityClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 	public static let testValue = Self(
+		loadFromProfileAndConnectAll: unimplemented("\(Self.self).loadFromProfileAndConnectAll"),
+		disconnectAndRemoveAll: unimplemented("\(Self.self).disconnectAndRemoveAll"),
 		getLocalNetworkAccess: unimplemented("\(Self.self).getLocalNetworkAccess"),
 		getP2PClientIDs: unimplemented("\(Self.self).getP2PClientIDs"),
 		getP2PClientsByIDs: unimplemented("\(Self.self).getP2PClientsByIDs"),
@@ -29,6 +31,8 @@ extension P2PConnectivityClient: TestDependencyKey {
 
 extension P2PConnectivityClient {
 	static let noop = Self(
+		loadFromProfileAndConnectAll: {},
+		disconnectAndRemoveAll: {},
 		getLocalNetworkAccess: { false },
 		getP2PClientIDs: { [].async.eraseToAnyAsyncSequence() },
 		getP2PClientsByIDs: { _ in .init() },

@@ -21,6 +21,9 @@ public extension DependencyValues {
 
 //  MARK: - P2PConnectivityClient
 public struct P2PConnectivityClient: DependencyKey, Sendable {
+	public var loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll
+	public var disconnectAndRemoveAll: DisconnectAndRemoveAll
+
 	public var getLocalNetworkAccess: GetLocalNetworkAccess
 
 	//	public var getP2PClients: GetP2PClients
@@ -42,6 +45,9 @@ public struct P2PConnectivityClient: DependencyKey, Sendable {
 }
 
 public extension P2PConnectivityClient {
+	typealias LoadFromProfileAndConnectAll = @Sendable () async throws -> Void
+	typealias DisconnectAndRemoveAll = @Sendable () async -> Void
+
 	typealias GetAsyncSequenceOfByP2PClientID<Value> = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<Value>
 
 	typealias GetLocalNetworkAccess = @Sendable () async -> Bool

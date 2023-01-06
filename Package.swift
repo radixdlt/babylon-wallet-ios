@@ -18,8 +18,8 @@ package.dependencies += [
 	// RDX Works dependencies
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.3"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.11"),
-	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.2.10"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", revision: "c494c29df76264ec84913aefc5f6b329e24f9511"), // Conv 0.2.10
+	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.2.11"),
+	.package(url: "git@github.com:radixdlt/swift-profile.git", revision: "3a02da18cd238529c06b9fcd248c2a04ea6cf221"), // Conv 0.2.11
 
 	// ~~~ THIRD PARTY ~~~
 	// APPLE
@@ -595,6 +595,7 @@ package.addModules([
 			"KeychainClientDependency",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
+			"P2PConnectivityClient", // deleting connections when wallet is deleted
 			"ProfileClient",
 			.product(name: "ProfileView", package: "swift-profile"),
 			tca,
