@@ -9,15 +9,15 @@ public extension AssetTransfer {
 	struct State: Sendable, Equatable {
 		public typealias From = OnNetwork.Account
 
-		public let from: From
-		public var asset: AssetToTransfer
-		public var amount: Decimal_?
-		public var to: To?
-
 		public enum To: Sendable, Equatable {
 			case account(OnNetwork.Account)
 			case address(AccountAddress)
 		}
+
+		public let from: From
+		public var asset: AssetToTransfer
+		public var amount: Decimal_?
+		public var to: To?
 
 		public init(
 			from: From,
