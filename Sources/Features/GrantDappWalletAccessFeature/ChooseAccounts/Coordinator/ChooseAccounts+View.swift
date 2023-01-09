@@ -27,8 +27,8 @@ public extension ChooseAccounts.View {
 			ForceFullScreen {
 				IfLetStore(
 					store.scope(
-						state: \.createAccountFlow,
-						action: { .child(.createAccountFlow($0)) }
+						state: \.createAccountCoordinator,
+						action: { .child(.createAccountCoordinator($0)) }
 					),
 					then: { CreateAccountCoordinator.View(store: $0) }
 				)

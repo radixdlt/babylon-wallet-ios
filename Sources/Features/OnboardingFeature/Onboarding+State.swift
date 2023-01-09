@@ -7,10 +7,10 @@ public extension Onboarding {
 	// MARK: State
 	enum State: Equatable {
 		case importProfile(ImportProfile.State)
-		case createAccountFlow(CreateAccountCoordinator.State)
+		case createAccountCoordinator(CreateAccountCoordinator.State)
 
 		public init() {
-			self = .createAccountFlow(
+			self = .createAccountCoordinator(
 				.init(
 					completionDestination: .home,
 					rootState: .init(shouldCreateProfile: true)

@@ -34,7 +34,7 @@ public extension Home.Action {
 		case accountPreferences(AccountPreferences.Action)
 		case accountDetails(AccountDetails.Action)
 		case transfer(AccountDetails.Transfer.Action)
-		case createAccountFlow(CreateAccountCoordinator.Action)
+		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 }
 

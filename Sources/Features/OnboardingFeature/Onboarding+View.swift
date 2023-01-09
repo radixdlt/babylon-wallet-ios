@@ -25,8 +25,8 @@ public extension Onboarding.View {
 				then: { ImportProfile.View(store: $0) }
 			)
 			CaseLet(
-				state: /Onboarding.State.createAccountFlow,
-				action: { Onboarding.Action.child(.createAccountFlow($0)) },
+				state: /Onboarding.State.createAccountCoordinator,
+				action: { Onboarding.Action.child(.createAccountCoordinator($0)) },
 				then: { CreateAccountCoordinator.View(store: $0) }
 			)
 		}

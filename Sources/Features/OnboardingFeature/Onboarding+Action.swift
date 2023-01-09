@@ -15,7 +15,7 @@ public extension Onboarding {
 public extension Onboarding.Action {
 	enum ChildAction: Sendable, Equatable {
 		case importProfile(ImportProfile.Action)
-		case createAccountFlow(CreateAccountCoordinator.Action)
+		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 }
 

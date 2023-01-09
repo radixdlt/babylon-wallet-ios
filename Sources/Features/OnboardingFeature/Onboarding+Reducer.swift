@@ -12,15 +12,15 @@ public struct Onboarding: Sendable, ReducerProtocol {
 			           action: /Action.child .. Action.ChildAction.importProfile) {
 				ImportProfile()
 			}
-			.ifCaseLet(/Onboarding.State.createAccountFlow,
-			           action: /Action.child .. Action.ChildAction.createAccountFlow) {
+			.ifCaseLet(/Onboarding.State.createAccountCoordinator,
+			           action: /Action.child .. Action.ChildAction.createAccountCoordinator) {
 				CreateAccountCoordinator()
 			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .child(.createAccountFlow(.delegate(.completed))):
+		case .child(.createAccountCoordinator(.delegate(.completed))):
 			return .run { send in
 				await send(.delegate(.completed))
 			}

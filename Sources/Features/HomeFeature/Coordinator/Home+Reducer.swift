@@ -52,7 +52,7 @@ public struct Home: Sendable, ReducerProtocol {
 		.ifLet(\.transfer, action: /Action.child .. Action.ChildAction.transfer) {
 			AccountDetails.Transfer()
 		}
-		.ifLet(\.createAccountFlow, action: /Action.child .. Action.ChildAction.createAccountFlow) {
+		.ifLet(\.createAccountCoordinator, action: /Action.child .. Action.ChildAction.createAccountCoordinator) {
 			CreateAccountCoordinator()
 		}
 	}
@@ -60,7 +60,7 @@ public struct Home: Sendable, ReducerProtocol {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.createAccountButtonTapped)):
-			state.createAccountFlow = .init(
+			state.createAccountCoordinator = .init(
 				completionDestination: .home,
 				rootState: .init()
 			)
@@ -201,12 +201,12 @@ public struct Home: Sendable, ReducerProtocol {
 			state.transfer = nil
 			return .none
 
-		case .child(.createAccountFlow(.delegate(.dismissed))):
-			state.createAccountFlow = nil
+		case .child(.createAccountCoordinator(.delegate(.dismissed))):
+			state.createAccountCoordinator = nil
 			return .none
 
-		case .child(.createAccountFlow(.delegate(.completed))):
-			state.createAccountFlow = nil
+		case .child(.createAccountCoordinator(.delegate(.completed))):
+			state.createAccountCoordinator = nil
 			return loadAccountsAndSettings()
 
 		case .delegate(.reloadAccounts):

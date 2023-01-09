@@ -21,7 +21,7 @@ public extension Home {
 		// MARK: - Children
 		public var accountDetails: AccountDetails.State?
 		public var accountPreferences: AccountPreferences.State?
-		public var createAccountFlow: CreateAccountCoordinator.State?
+		public var createAccountCoordinator: CreateAccountCoordinator.State?
 		public var transfer: AccountDetails.Transfer.State?
 
 		public init(
@@ -38,7 +38,7 @@ public extension Home {
 			self.accountList = accountList
 			self.accountDetails = accountDetails
 			self.accountPreferences = accountPreferences
-			self.createAccountFlow = createAccount
+			self.createAccountCoordinator = createAccount
 			self.transfer = transfer
 		}
 	}

@@ -46,7 +46,7 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 				return .none
 
 			case .internal(.view(.createAccountButtonTapped)):
-				state.createAccountFlow = .init(
+				state.createAccountCoordinator = .init(
 					completionDestination: .chooseAccounts,
 					rootState: .init()
 				)
@@ -81,12 +81,12 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 					return .none
 				}
 
-			case .child(.createAccountFlow(.delegate(.dismissed))):
-				state.createAccountFlow = nil
+			case .child(.createAccountCoordinator(.delegate(.dismissed))):
+				state.createAccountCoordinator = nil
 				return .none
 
-			case .child(.createAccountFlow(.delegate(.completed))):
-				state.createAccountFlow = nil
+			case .child(.createAccountCoordinator(.delegate(.completed))):
+				state.createAccountCoordinator = nil
 				return .run { send in
 					await send(.internal(.system(.loadAccountsResult(TaskResult {
 						try await profileClient.getAccounts()
@@ -94,7 +94,7 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 				}
 
 			case .delegate(.dismissChooseAccounts):
-				state.createAccountFlow = nil
+				state.createAccountCoordinator = nil
 				return .none
 
 			case .child, .delegate:
@@ -104,7 +104,7 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 		.forEach(\.accounts, action: /Action.child .. Action.ChildAction.account) {
 			ChooseAccounts.Row()
 		}
-		.ifLet(\.createAccountFlow, action: /Action.child .. Action.ChildAction.createAccountFlow) {
+		.ifLet(\.createAccountCoordinator, action: /Action.child .. Action.ChildAction.createAccountCoordinator) {
 			CreateAccountCoordinator()
 		}
 	}
