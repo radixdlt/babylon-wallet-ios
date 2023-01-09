@@ -11,7 +11,7 @@ public extension AssetTransfer {
 
 		public let from: From
 		public var asset: AssetToTransfer
-		public var amount: Decimal_
+		public var amount: Decimal_?
 		public var to: To?
 
 		public enum To: Sendable, Equatable {
@@ -22,7 +22,7 @@ public extension AssetTransfer {
 		public init(
 			from: From,
 			asset: AssetToTransfer = .token(.xrd),
-			amount: Decimal_,
+			amount: Decimal_? = nil,
 			to: To? = nil
 		) {
 			self.from = from
