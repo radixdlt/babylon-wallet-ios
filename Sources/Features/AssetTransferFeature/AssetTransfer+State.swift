@@ -9,6 +9,11 @@ public extension AssetTransfer {
 	struct State: Sendable, Equatable {
 		public typealias From = OnNetwork.Account
 
+		public enum AssetToTransfer: Sendable, Equatable {
+			case token(FungibleToken)
+//			case nft(NonFungibleToken)
+		}
+
 		public enum To: Sendable, Equatable {
 			case account(OnNetwork.Account)
 			case address(AccountAddress)
@@ -30,13 +35,5 @@ public extension AssetTransfer {
 			self.amount = amount
 			self.to = to
 		}
-	}
-}
-
-// MARK: - AssetTransfer.AssetToTransfer
-public extension AssetTransfer {
-	enum AssetToTransfer: Sendable, Equatable {
-		case token(FungibleToken)
-		//		case nft
 	}
 }
