@@ -10,7 +10,6 @@ public struct CreateAccountCoordinator: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Reduce(self.core)
 		Scope(state: \.root, action: /Action.self) {
 			EmptyReducer()
 				.ifCaseLet(/State.Root.createAccount, action: /Action.child .. ChildAction.createAccount) {
@@ -20,9 +19,10 @@ public struct CreateAccountCoordinator: Sendable, ReducerProtocol {
 					AccountCompletion()
 				}
 		}
+		Reduce(self.core)
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
+	private func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case let .child(.createAccount(.delegate(.createdNewAccount(account, isFirstAccount)))):
 			state.root = .accountCompletion(
@@ -38,6 +38,7 @@ public struct CreateAccountCoordinator: Sendable, ReducerProtocol {
 			return .run { send in
 				await send(.delegate(.dismissed))
 			}
+
 		case .child(.accountCompletion(.delegate(.completed))):
 			return .run { send in
 				await send(.delegate(.completed))
