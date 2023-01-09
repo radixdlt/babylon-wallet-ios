@@ -18,7 +18,9 @@ public extension AssetTransfer.Action {
 
 // MARK: - AssetTransfer.Action.ViewAction
 public extension AssetTransfer.Action {
-	enum ViewAction: Sendable, Equatable {}
+	enum ViewAction: Sendable, Equatable {
+		case appeared
+	}
 }
 
 // MARK: - AssetTransfer.Action.InternalAction
