@@ -118,8 +118,8 @@ public extension CreateAccount {
 			}
 
 		case .internal(.view(.viewAppeared)):
-                        return .run { [networkAndGateway = state.networkAndGateway] send in
-                                let networkID: NetworkID = await Self.networkAndGateway(networkAndGateway, profileClient: profileClient).network.id
+			return .run { [networkAndGateway = state.networkAndGateway] send in
+				let networkID: NetworkID = await Self.networkAndGateway(networkAndGateway, profileClient: profileClient).network.id
 
 				await send(.internal(.system(.hasAccountOnNetworkResult(
 					TaskResult {
@@ -146,49 +146,49 @@ public extension CreateAccount {
 		}
 	}
 
-        private static func networkAndGateway(_ configuredNetworkAndGateway: AppPreferences.NetworkAndGateway?, profileClient: ProfileClient) async -> AppPreferences.NetworkAndGateway {
-                if let configuredNetworkAndGateway {
-                        return configuredNetworkAndGateway
-                }
+	private static func networkAndGateway(_ configuredNetworkAndGateway: AppPreferences.NetworkAndGateway?, profileClient: ProfileClient) async -> AppPreferences.NetworkAndGateway {
+		if let configuredNetworkAndGateway {
+			return configuredNetworkAndGateway
+		}
 
-                return await profileClient.getNetworkAndGateway()
-        }
+		return await profileClient.getNetworkAndGateway()
+	}
 
 	private func createAccount(state: inout State) -> EffectTask<Action> {
-                return .run { [accountName = state.sanitizedAccountName, networkAndGateway = state.networkAndGateway] send in
-                        await send(.internal(.system(.createdNewAccountResult(
-                                TaskResult {
-                                        let networkID: NetworkID = await Self.networkAndGateway(
-                                                networkAndGateway,
-                                                profileClient: profileClient
-                                        ).network.id
-                                        let request = CreateAccountRequest(
-                                                overridingNetworkID: networkID, // optional
-                                                keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
-                                                accountName: accountName
-                                        )
-                                        return try await profileClient.createVirtualAccount(
-                                                request
-                                        )
-                                }
-                        ))))
-                }
-        }
+		.run { [accountName = state.sanitizedAccountName, networkAndGateway = state.networkAndGateway] send in
+			await send(.internal(.system(.createdNewAccountResult(
+				TaskResult {
+					let networkID: NetworkID = await Self.networkAndGateway(
+						networkAndGateway,
+						profileClient: profileClient
+					).network.id
+					let request = CreateAccountRequest(
+						overridingNetworkID: networkID, // optional
+						keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
+						accountName: accountName
+					)
+					return try await profileClient.createVirtualAccount(
+						request
+					)
+				}
+			))))
+		}
+	}
 
 	private func createProfile(state: inout State) -> EffectTask<Action> {
 		.run { [nameOfFirstAccount = state.sanitizedAccountName,
-                        configuredNetworkAndGateway = state.networkAndGateway] send in
+		        configuredNetworkAndGateway = state.networkAndGateway] send in
 
 				await send(.internal(.system(.createdNewProfileResult(
 					// FIXME: - mainnet: extract into ProfileCreator client?
 					TaskResult {
 						let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
 
-                                                let currentNetwork = await profileClient.getNetworkAndGateway()
-                                                let networkAndGateway = await Self.networkAndGateway(
-                                                        configuredNetworkAndGateway,
-                                                        profileClient: profileClient
-                                                )
+						let currentNetwork = await profileClient.getNetworkAndGateway()
+						let networkAndGateway = await Self.networkAndGateway(
+							configuredNetworkAndGateway,
+							profileClient: profileClient
+						)
 						let newProfileRequest = CreateNewProfileRequest(
 							networkAndGateway: networkAndGateway,
 							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
