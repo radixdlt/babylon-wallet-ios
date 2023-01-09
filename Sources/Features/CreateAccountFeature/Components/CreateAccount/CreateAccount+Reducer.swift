@@ -90,7 +90,6 @@ public extension CreateAccount {
 		     let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))),
 		     let .internal(.system(.createdNewProfileResult(.failure(error)))),
 		     let .internal(.system(.createdNewAccountResult(.failure(error)))):
-
 			state.isCreatingAccount = false
 			errorQueue.schedule(error)
 			return .none

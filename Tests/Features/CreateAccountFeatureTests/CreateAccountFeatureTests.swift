@@ -144,15 +144,19 @@ final class CreateAccountFeatureTests: TestCase {
 			$0.isCreatingAccount = true
 		}
 
+		// then
+
+		// assert the proper flow is followed
+
 		await store.receive(.internal(.system(.createdNewProfileResult(.success(newProfile))))) {
 			$0.isCreatingAccount = false
 		}
-
 		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile)))))
 		await store.receive(.internal(.system(.loadAccountResult(.success(.previewValue0)))))
 		await store.receive(.delegate(.createdNewAccount(account: .previewValue0, isFirstAccount: true)))
 
-		// then
+		// assert that clients are called with proper arguments
+
 		await generateMnemonicCalled.withValue {
 			XCTAssertEqual($0?.wordCount, .twentyFour)
 			XCTAssertEqual($0?.language, .english)
@@ -165,12 +169,97 @@ final class CreateAccountFeatureTests: TestCase {
 		}
 
 		await keychainUpdateData.withValue {
+			// assert correct profile was stored in keychain
 			let profileData = try! JSONEncoder.iso8601.encode(newProfile.snaphot())
 			XCTAssertEqual($0["profileSnapshotKeychainKey"], profileData)
 
+			// assert correct mnemonic was stored in keychain
 			let newProfileReferenceId = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference.id
-
 			XCTAssertEqual($0[newProfileReferenceId], mnemonic.entropy().data)
+		}
+	}
+
+	func test__GIVEN__profile_exists__WHEN__new_account_button_tapped__THEN__new_account_is_created() async throws {
+		// given
+		let newAccountName = "newAccount"
+		let isFirstAccount = false
+		let initialState = CreateAccount.State()
+		let expectedCreateAccountRequest = CreateAccountRequest(
+			overridingNetworkID: initialState.networkAndGateway.network.id,
+			keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
+			accountName: newAccountName
+		)
+		let createdAccount = OnNetwork.Account.testValue
+
+		let store = TestStore(
+			initialState: initialState,
+			reducer: CreateAccount()
+		)
+
+		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
+
+		let createAccountRequest = ActorIsolated<CreateAccountRequest?>(nil)
+		store.dependencies.profileClient.createVirtualAccount = { request in
+			await createAccountRequest.setValue(request)
+			return createdAccount
+		}
+
+		// when
+		await store.send(.internal(.system(.hasAccountOnNetworkResult(.success(!isFirstAccount))))) {
+			$0.isFirstAccount = isFirstAccount
+		}
+
+		await store.send(.internal(.view(.textFieldChanged(newAccountName)))) {
+			$0.inputtedAccountName = newAccountName
+		}
+
+		await store.send(.internal(.view(.createAccountButtonTapped))) {
+			$0.isCreatingAccount = true
+		}
+
+		// then
+
+		await store.receive(.internal(.system(.createdNewAccountResult(.success(createdAccount))))) {
+			$0.isCreatingAccount = false
+		}
+		await store.receive(.delegate(.createdNewAccount(account: createdAccount, isFirstAccount: isFirstAccount)))
+
+		await createAccountRequest.withValue { request in
+			XCTAssertEqual(request, expectedCreateAccountRequest)
+		}
+	}
+
+	func test__GIVEN__clients_failure__WHEN__creating_account__THEN__propagates_the_error() async throws {
+		// given
+		let initialState = CreateAccount.State()
+		let createNewAccountError = NSError.testValue(domain: "Create New Account Request")
+		let createNewProfileError = NSError.testValue(domain: "Create New Profile Request")
+		let loadAccountsError = NSError.testValue(domain: "Load Accounts Request")
+		let injectProfileError = NSError.testValue(domain: "Inject Profile Request")
+
+		let expectedErrors = Set([createNewAccountError, createNewProfileError, loadAccountsError, injectProfileError])
+
+		let store = TestStore(
+			initialState: initialState,
+			reducer: CreateAccount()
+		)
+
+		let errorQueue = ActorIsolated<Set<NSError>>([])
+		store.dependencies.errorQueue.schedule = { error in
+			Task {
+				await errorQueue.withValue { queue in
+					queue.insert(error as NSError)
+				}
+			}
+		}
+
+		await store.send(.internal(.system(.createdNewAccountResult(.failure(createNewAccountError)))))
+		await store.send(.internal(.system(.createdNewProfileResult(.failure(createNewProfileError)))))
+		await store.send(.internal(.system(.loadAccountResult(.failure(loadAccountsError)))))
+		await store.send(.internal(.system(.injectProfileIntoProfileClientResult(.failure(injectProfileError)))))
+
+		await errorQueue.withValue { errors in
+			XCTAssertEqual(errors, expectedErrors)
 		}
 	}
 }
