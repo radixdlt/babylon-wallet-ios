@@ -12,10 +12,10 @@ public struct CreateAccountCoordinator: Sendable, ReducerProtocol {
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.root, action: /Action.self) {
 			EmptyReducer()
-				.ifCaseLet(/State.Root.createAccount, action: /Action.child .. ChildAction.createAccount) {
+				.ifCaseLet(/State.Root.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
 					CreateAccount()
 				}
-				.ifCaseLet(/State.Root.accountCompletion, action: /Action.child .. ChildAction.accountCompletion) {
+				.ifCaseLet(/State.Root.accountCompletion, action: /Action.child .. Action.ChildAction.accountCompletion) {
 					AccountCompletion()
 				}
 		}
