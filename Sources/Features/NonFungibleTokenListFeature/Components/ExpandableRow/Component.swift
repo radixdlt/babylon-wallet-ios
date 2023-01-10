@@ -23,7 +23,7 @@ extension Component {
 			AsyncImage(url: URL(string: ""))
 				.frame(height: isExpanded ? imageHeight : collapsedImageHeight)
 				.cornerRadius(.small3)
-				.onSizeChanged(ReferenceView.self) { size in
+				.onSizeChanged { size in
 					if imageHeight == nil, size.height != collapsedImageHeight {
 						imageHeight = size.height
 					}
@@ -59,7 +59,7 @@ extension Component {
 			}
 			.opacity(isExpanded ? 1 : 0)
 			.frame(height: isExpanded ? height : collapsedHeight)
-			.onSizeChanged(ReferenceView.self) { size in
+			.onSizeChanged { size in
 				if height == nil, size.height != collapsedHeight {
 					height = size.height
 				}
