@@ -1,9 +1,9 @@
 import Asset
-import BigInt
 import Common
 import ComposableArchitecture
 import DesignSystem
 import Profile
+import RadixFoundation
 
 // MARK: - FungibleTokenList.Row.View
 public extension FungibleTokenList.Row {

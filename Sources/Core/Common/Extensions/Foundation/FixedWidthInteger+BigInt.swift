@@ -1,5 +1,4 @@
-import BigInt
-import Foundation
+import RadixFoundation
 
 public extension FixedWidthInteger {
 	var inAttos: BigUInt {

@@ -1,7 +1,5 @@
-import AsyncAlgorithms
-import AsyncExtensions
 import Dependencies
-import Foundation
+import RadixFoundation
 
 extension ErrorQueue: DependencyKey {
 	public typealias Value = ErrorQueue

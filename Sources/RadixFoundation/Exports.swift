@@ -1,3 +1,5 @@
+@_exported import Foundation
+
 @_exported import AsyncAlgorithms
 @_exported import AsyncExtensions
 @_exported import BigInt

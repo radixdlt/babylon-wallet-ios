@@ -1,10 +1,9 @@
-import Collections
 import ComposableArchitecture
 import CreateAccountFeature
 import ErrorQueue
-import NonEmpty
 import Profile
 import ProfileClient
+import RadixFoundation
 
 // MARK: - ChooseAccounts
 public struct ChooseAccounts: Sendable, ReducerProtocol {

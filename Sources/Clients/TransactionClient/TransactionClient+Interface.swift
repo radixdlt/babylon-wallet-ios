@@ -26,10 +26,9 @@ public extension DependencyValues {
 	}
 }
 
-import Collections
-import NonEmpty
 import Profile
 import ProfileClient
+import RadixFoundation
 
 // MARK: - SignManifestRequest
 public struct SignManifestRequest: Sendable {

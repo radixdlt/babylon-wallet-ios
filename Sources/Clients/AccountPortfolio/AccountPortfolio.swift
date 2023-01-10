@@ -1,6 +1,6 @@
 import Asset
-import BigInt
 import IdentifiedCollections
+import RadixFoundation
 
 // MARK: - AccountPortfolio
 public struct AccountPortfolio: Sendable, Equatable {

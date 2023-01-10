@@ -1,12 +1,9 @@
-import AsyncExtensions
-import Collections
 import ComposableArchitecture
-import Foundation
 @testable import HandleDappRequests
-import NonEmpty
 import P2PConnection
 import P2PModels
 import Profile
+import RadixFoundation
 import SharedModels
 import TestUtils
 import XCTest

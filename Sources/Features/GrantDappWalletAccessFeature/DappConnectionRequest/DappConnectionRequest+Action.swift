@@ -1,8 +1,6 @@
-import Collections
 import ComposableArchitecture
-import Foundation
-import NonEmpty
 import Profile
+import RadixFoundation
 import SharedModels
 
 // MARK: - DappConnectionRequest.Action

@@ -1,11 +1,10 @@
-import Collections
 import Common
 import ComposableArchitecture
-import Foundation
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
 import P2PModels
 import Profile
+import RadixFoundation
 import SharedModels
 import TransactionClient
 import TransactionSigningFeature

@@ -1,10 +1,10 @@
 import Asset
-import BigInt
 import Common
 import Dependencies
 import EngineToolkit
 import GatewayAPI
 import Profile
+import RadixFoundation
 
 // MARK: - AssetFetcher + DependencyKey
 extension AssetFetcher: DependencyKey {

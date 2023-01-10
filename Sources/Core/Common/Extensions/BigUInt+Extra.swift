@@ -1,4 +1,4 @@
-import BigInt
+import RadixFoundation
 
 // MARK: - BigUInt + Sendable
 extension BigUInt: @unchecked Sendable {}

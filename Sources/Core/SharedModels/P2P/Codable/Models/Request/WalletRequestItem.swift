@@ -1,5 +1,4 @@
-import Foundation
-import Tagged
+import RadixFoundation
 
 // MARK: - P2P.FromDapp
 public extension P2P {

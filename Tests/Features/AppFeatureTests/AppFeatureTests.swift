@@ -1,11 +1,10 @@
 @testable import AppFeature
-import Collections
 import ComposableArchitecture
-import NonEmpty
 import OnboardingFeature
 import Profile
 import ProfileClient
 import ProfileLoader
+import RadixFoundation
 @testable import SplashFeature
 import TestUtils
 

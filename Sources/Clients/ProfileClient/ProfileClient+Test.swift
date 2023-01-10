@@ -1,9 +1,7 @@
-import Collections
 import Dependencies
-import Foundation
 import Mnemonic
-import NonEmpty
 import Profile
+import RadixFoundation
 import SharedModels
 import XCTestDynamicOverlay
 

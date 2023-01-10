@@ -1,5 +1,4 @@
-import Collections
-import Foundation
+import RadixFoundation
 
 public extension P2P {
 	typealias OneTimeAccountAddressesRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.OneTimeAccountsReadRequestItem>
