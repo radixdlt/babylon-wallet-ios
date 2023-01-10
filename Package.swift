@@ -27,7 +27,8 @@ package.dependencies += [
 	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
 
 	// PointFreeCo
-	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.46.0"),
+	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1"),
+	.package(url: "https://github.com/pointfreeco/swift-dependencies", from: "0.1.1"),
 	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
 	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
 	.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3"),
@@ -72,7 +73,7 @@ let tca: Target.Dependency = .product(
 
 let dependencies: Target.Dependency = .product(
 	name: "Dependencies",
-	package: "swift-composable-architecture"
+	package: "swift-dependencies"
 )
 
 let tagged: Target.Dependency = .product(
