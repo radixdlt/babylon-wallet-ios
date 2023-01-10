@@ -136,11 +136,11 @@ final class CreateAccountFeatureTests: TestCase {
 
 		// assert the proper flow is followed
 
-		await store.receive(.internal(.system(.createdNewProfileResult(.success(newProfile))))) {
+		await store.receive(.internal(.system(.createdNewProfileResult(.success(newProfile)))))
+		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile)))))
+		await store.receive(.internal(.system(.loadAccountResult(.success(.previewValue0))))) {
 			$0.isCreatingAccount = false
 		}
-		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile)))))
-		await store.receive(.internal(.system(.loadAccountResult(.success(.previewValue0)))))
 		await store.receive(.delegate(.createdNewAccount(account: .previewValue0, isFirstAccount: true)))
 
 		// assert that clients are called with proper arguments

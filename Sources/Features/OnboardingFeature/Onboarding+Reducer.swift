@@ -18,7 +18,7 @@ public struct Onboarding: Sendable, ReducerProtocol {
 			}
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
+	private func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .child(.createAccountCoordinator(.delegate(.completed))):
 			return .run { send in

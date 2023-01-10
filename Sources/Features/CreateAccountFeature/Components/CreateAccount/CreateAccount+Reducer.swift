@@ -67,7 +67,6 @@ public extension CreateAccount {
 			}
 
 		case let .internal(.system(.createdNewProfileResult(.success(profile)))):
-			state.isCreatingAccount = false
 			return .run { send in
 				await send(.internal(.system(.injectProfileIntoProfileClientResult(
 					TaskResult {

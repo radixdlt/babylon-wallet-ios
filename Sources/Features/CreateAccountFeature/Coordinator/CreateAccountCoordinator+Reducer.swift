@@ -1,12 +1,7 @@
 import ComposableArchitecture
-import ErrorQueue
 import Foundation
-import ProfileClient
 
 public struct CreateAccountCoordinator: Sendable, ReducerProtocol {
-	@Dependency(\.profileClient) var profileClient
-	@Dependency(\.errorQueue) var errorQueue
-
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {

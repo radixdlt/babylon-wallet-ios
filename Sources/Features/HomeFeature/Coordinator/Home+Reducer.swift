@@ -61,8 +61,7 @@ public struct Home: Sendable, ReducerProtocol {
 		switch action {
 		case .internal(.view(.createAccountButtonTapped)):
 			state.createAccountCoordinator = .init(
-				completionDestination: .home,
-				rootState: .init()
+				completionDestination: .home
 			)
 			return .none
 
