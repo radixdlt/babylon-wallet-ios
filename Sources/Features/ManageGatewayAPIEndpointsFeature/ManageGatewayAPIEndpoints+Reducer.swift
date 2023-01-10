@@ -114,9 +114,9 @@ public extension ManageGatewayAPIEndpoints {
 			errorQueue.schedule(error)
 			return skipSwitching(state: &state)
 
-		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetwork))):
+		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway))):
 			state.createAccountCoordinator = .init(completionDestination: .home,
-			                                       rootState: .init(networkAndGateway: newNetwork))
+                                                               rootState: .init(onNetworkWithID: newNetworkAndGateway.network.id, isFirstAccount: true))
 			return .none
 
 		case let .internal(.system(.switchToResult(.failure(error)))):

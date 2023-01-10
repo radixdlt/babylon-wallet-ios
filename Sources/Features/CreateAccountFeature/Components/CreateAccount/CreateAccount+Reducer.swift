@@ -97,8 +97,7 @@ public extension CreateAccount {
 		case let .internal(.system(.createdNewAccountResult(.success(account)))),
 		     let .internal(.system(.loadAccountResult(.success(account)))):
 			state.isCreatingAccount = false
-			let isFirstAccount = state.isFirstAccount ?? true
-			return .run { send in
+			return .run { [isFirstAccount = state.isFirstAccount] send in
 				await send(.delegate(.createdNewAccount(account: account, isFirstAccount: isFirstAccount)))
 			}
 
@@ -118,24 +117,10 @@ public extension CreateAccount {
 			}
 
 		case .internal(.view(.viewAppeared)):
-			return .run { [networkAndGateway = state.networkAndGateway] send in
-				let networkID: NetworkID = await Self.networkAndGateway(networkAndGateway, profileClient: profileClient).network.id
-
-				await send(.internal(.system(.hasAccountOnNetworkResult(
-					TaskResult {
-						try await profileClient.hasAccountOnNetwork(networkID)
-					}
-				))))
+			return .run { send in
 				try await self.mainQueue.sleep(for: .seconds(0.5))
 				await send(.internal(.system(.focusTextField(.accountName))))
 			}
-		case let .internal(.system(.hasAccountOnNetworkResult(.success(hasAccount)))):
-			state.isFirstAccount = !hasAccount
-			return .none
-
-		case .internal(.system(.hasAccountOnNetworkResult(.failure))):
-			state.isFirstAccount = true
-			return .none
 
 		case let .internal(.system(.focusTextField(focus))):
 			state.focusedField = focus
@@ -155,15 +140,11 @@ public extension CreateAccount {
 	}
 
 	private func createAccount(state: inout State) -> EffectTask<Action> {
-		.run { [accountName = state.sanitizedAccountName, networkAndGateway = state.networkAndGateway] send in
+		.run { [accountName = state.sanitizedAccountName, onNetworkWithID = state.onNetworkWithID] send in
 			await send(.internal(.system(.createdNewAccountResult(
 				TaskResult {
-					let networkID: NetworkID = await Self.networkAndGateway(
-						networkAndGateway,
-						profileClient: profileClient
-					).network.id
 					let request = CreateAccountRequest(
-						overridingNetworkID: networkID, // optional
+						overridingNetworkID: onNetworkWithID, // optional
 						keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
 						accountName: accountName
 					)
@@ -176,19 +157,14 @@ public extension CreateAccount {
 	}
 
 	private func createProfile(state: inout State) -> EffectTask<Action> {
-		.run { [nameOfFirstAccount = state.sanitizedAccountName,
-		        configuredNetworkAndGateway = state.networkAndGateway] send in
-
+		.run { [nameOfFirstAccount = state.sanitizedAccountName] send in
 				await send(.internal(.system(.createdNewProfileResult(
 					// FIXME: - mainnet: extract into ProfileCreator client?
 					TaskResult {
 						let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
 
-						let currentNetwork = await profileClient.getNetworkAndGateway()
-						let networkAndGateway = await Self.networkAndGateway(
-							configuredNetworkAndGateway,
-							profileClient: profileClient
-						)
+                                                let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
+
 						let newProfileRequest = CreateNewProfileRequest(
 							networkAndGateway: networkAndGateway,
 							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,

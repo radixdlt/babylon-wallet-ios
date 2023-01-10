@@ -13,7 +13,7 @@ public extension Onboarding {
 			self = .createAccountCoordinator(
 				.init(
 					completionDestination: .home,
-					rootState: .init(shouldCreateProfile: true)
+					rootState: .init(shouldCreateProfile: true, isFirstAccount: true)
 				)
 			)
 		}
