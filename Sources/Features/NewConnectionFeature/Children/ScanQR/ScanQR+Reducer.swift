@@ -46,7 +46,7 @@ private extension ScanQR {
 		.run { send in
 			await send(.internal(.system(.connectionSecretsFromScannedStringResult(
 				TaskResult {
-					let password = try ConnectionPassword(hexString: hexString)
+					let password = try ConnectionPassword(hex: hexString)
 					return try ConnectionSecrets.from(connectionPassword: password)
 				}
 			))))

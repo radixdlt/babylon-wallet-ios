@@ -66,10 +66,7 @@ public extension P2P.RequestItemToHandle {
 		parentRequest: try! .init(
 			originalMessage: .previewValue,
 			requestFromDapp: .previewValueOneTimeAccount,
-			client: .init(
-				displayName: "Placeholder",
-				connectionPassword: Data([0xDE, 0xAD])
-			)
+			client: .previewValue
 		)
 	)
 }

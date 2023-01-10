@@ -9,7 +9,7 @@ public struct AccountPreferences: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
-
+	private enum RefreshID {}
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.dismissButtonTapped)):
@@ -19,7 +19,7 @@ public struct AccountPreferences: Sendable, ReducerProtocol {
 			}
 
 		case .delegate:
-			return .none
+			return .cancel(id: RefreshID.self)
 
 		case .internal(.view(.didAppear)):
 			return loadIsAllowedToUseFaucet(&state)
@@ -27,14 +27,19 @@ public struct AccountPreferences: Sendable, ReducerProtocol {
 		case .internal(.view(.faucetButtonTapped)):
 			state.faucetButtonState = .loading(.local)
 			return .run { [address = state.address] send in
-				_ = try await faucetClient.getFreeXRD(.init(
-					recipientAccountAddress: address,
-					unlockKeychainPromptShowToUser: L10n.TransactionSigning.biometricsPrompt
-				))
-				await send(.delegate(.refreshAccount(address)))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
+				do {
+					_ = try await faucetClient.getFreeXRD(.init(
+						recipientAccountAddress: address,
+						unlockKeychainPromptShowToUser: L10n.TransactionSigning.biometricsPrompt
+					))
+					guard !Task.isCancelled else { return }
+					await send(.delegate(.refreshAccount(address)))
+				} catch {
+					guard !Task.isCancelled else { return }
+					errorQueue.schedule(error)
+				}
 			}
+			.cancellable(id: RefreshID.self)
 
 		case let .internal(.system(.isAllowedToUseFaucet(.success(value)))):
 			state.faucetButtonState = value ? .enabled : .disabled

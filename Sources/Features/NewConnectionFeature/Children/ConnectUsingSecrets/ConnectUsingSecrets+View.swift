@@ -63,6 +63,9 @@ public extension ConnectUsingSecrets.View {
 			.onAppear {
 				viewStore.send(.appeared)
 			}
+			.task { @MainActor in
+				await ViewStore(store.stateless).send(.view(.task)).finish()
+			}
 		}
 	}
 }

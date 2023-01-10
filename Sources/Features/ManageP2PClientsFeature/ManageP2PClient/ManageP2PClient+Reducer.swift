@@ -15,15 +15,16 @@ public struct ManageP2PClient: Sendable, ReducerProtocol {
 }
 
 public extension ManageP2PClient {
+	private enum ConnectionUpdateTasksID {}
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.viewAppeared)):
-			return .run { [id = state.id] send in
+			return .run { [id = state.client.id] send in
 				await withThrowingTaskGroup(of: Void.self) { taskGroup in
-					taskGroup.addTask {
+					_ = taskGroup.addTaskUnlessCancelled {
 						do {
-							let statusUpdates = try await p2pConnectivityClient.getConnectionStatusAsyncSequence(id)
-							for try await status in statusUpdates {
+							for try await status in try await p2pConnectivityClient.getConnectionStatusAsyncSequence(id) {
+								guard !Task.isCancelled else { return }
 								assert(status.p2pClient.id == id)
 								await send(.internal(.system(.connectionStatusResult(
 									TaskResult.success(status.connectionStatus)
@@ -35,8 +36,31 @@ public extension ManageP2PClient {
 							))))
 						}
 					}
+					#if DEBUG
+					_ = taskGroup.addTaskUnlessCancelled {
+						do {
+							for try await webSocketStatus in try await p2pConnectivityClient._debugWebsocketStatusAsyncSequence(id) {
+								guard !Task.isCancelled else { return }
+								await send(.internal(.system(.webSocketStatusResult(.success(webSocketStatus)))))
+							}
+						} catch {
+							await send(.internal(.system(.webSocketStatusResult(.failure(error)))))
+						}
+					}
+					_ = taskGroup.addTaskUnlessCancelled {
+						do {
+							for try await dataChannelState in try await p2pConnectivityClient._debugDataChannelStatusAsyncSequence(id) {
+								guard !Task.isCancelled else { return }
+								await send(.internal(.system(.dataChannelStateResult(.success(dataChannelState)))))
+							}
+						} catch {
+							await send(.internal(.system(.dataChannelStateResult(.failure(error)))))
+						}
+					}
+					#endif // DEBUG
 				}
 			}
+			.cancellable(id: ConnectionUpdateTasksID.self)
 
 		case let .internal(.system(.connectionStatusResult(.success(newStatus)))):
 			state.connectionStatus = newStatus
@@ -55,9 +79,25 @@ public extension ManageP2PClient {
 			return .run { send in
 				await send(.delegate(.sendTestMessage))
 			}
+		case let .internal(.system(.webSocketStatusResult(.success(webSocketStatus)))):
+			state.webSocketState = webSocketStatus
+			return .none
+
+		case let .internal(.system(.webSocketStatusResult(.failure(error)))):
+			errorQueue.schedule(error)
+			return .none
+
+		case let .internal(.system(.dataChannelStateResult(.success(dataChannelState)))):
+			state.dataChannelStatus = dataChannelState
+			return .none
+
+		case let .internal(.system(.dataChannelStateResult(.failure(error)))):
+			errorQueue.schedule(error)
+			return .none
+
 		#endif // DEBUG
 		case .delegate:
-			return .none
+			return .cancel(id: ConnectionUpdateTasksID.self)
 		}
 	}
 }

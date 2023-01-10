@@ -5,6 +5,7 @@ import Foundation
 import KeychainClient
 import Mnemonic
 import NonEmpty
+import P2PModels
 import Profile
 import SLIP10
 

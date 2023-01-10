@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sideeffect-io/AsyncExtensions",
       "state" : {
-        "revision" : "ee170c270dc9b8518c7d46d2d85157359f76299c",
-        "version" : "0.5.1"
+        "revision" : "1f0729e4f1f6c7166acfac3cec43b3cbe83be0e6",
+        "version" : "0.5.2"
       }
     },
     {
@@ -32,8 +32,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Bite.git",
       "state" : {
-        "revision" : "b6801c0d4e269063ebc7b4930269d9d728b64e47",
-        "version" : "0.0.1"
+        "revision" : "96fd910f1a65e7224d1c0c8022738e6a34a1296a",
+        "version" : "0.0.4"
       }
     },
     {
@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Converse.git",
       "state" : {
-        "revision" : "3262c4ffba141685660a930228975414c1e4b6eb",
-        "version" : "0.3.0"
+        "revision" : "4713bc218d06e94bc4aaedcf08462c1c816354a3",
+        "version" : "0.4.0"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/Mnemonic.git",
       "state" : {
-        "revision" : "c16383ddf78bc7ff71435f78fa0c4bdecc186a96",
-        "version" : "0.0.5"
+        "revision" : "4a4b3642c3cd4584684b758f77068eafac6784f4",
+        "version" : "0.0.8"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kean/Nuke",
       "state" : {
-        "revision" : "93c8dc78fbc0aa3538a0db460eb389d4180af242",
-        "version" : "11.3.1"
+        "revision" : "2e9337168d08acccf72c039bf9324be24a1cf7d7",
+        "version" : "11.5.3"
       }
     },
     {
@@ -140,8 +140,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-async-algorithms",
       "state" : {
-        "revision" : "cca423ff03ab657062f3781847e65a867b51bb01",
-        "version" : "0.0.3"
+        "revision" : "aed5422380244498344a036b8d94e27f370d9a22",
+        "version" : "0.0.4"
       }
     },
     {
@@ -149,8 +149,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "revision" : "bb436421f57269fbcfe7360735985321585a86e5",
-        "version" : "0.10.1"
+        "revision" : "c3a42e8d1a76ff557cf565ed6d8b0aee0e6e75af",
+        "version" : "0.11.0"
       }
     },
     {
@@ -176,8 +176,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "c9259b5f74892690cb04a9a8088b4a1789b05a7d",
-        "version" : "0.47.2"
+        "revision" : "be4940de78d65a9bd34de12f9b4457e27dec68a8",
+        "version" : "0.49.1"
       }
     },
     {
@@ -187,6 +187,15 @@
       "state" : {
         "revision" : "ead7d30cc224c3642c150b546f4f1080d1c411a8",
         "version" : "0.6.1"
+      }
+    },
+    {
+      "identity" : "swift-dependencies",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-dependencies",
+      "state" : {
+        "revision" : "e49dfe4d9e4c5c06f3334361360b801aef41631c",
+        "version" : "0.1.1"
       }
     },
     {
@@ -203,8 +212,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-identified-collections",
       "state" : {
-        "revision" : "a08887de589e3829d488e0b4b707b2ca804b1060",
-        "version" : "0.5.0"
+        "revision" : "fd34c544ad27f3ba6b19142b348005bfa85b6005",
+        "version" : "0.6.0"
       }
     },
     {
@@ -248,8 +257,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:radixdlt/swift-profile.git",
       "state" : {
-        "revision" : "74ff518cd6d6c4687fdcf615422292047e1aa368",
-        "version" : "0.1.2"
+        "revision" : "3c103b4c07b85a79f72f70949bbb96155fc72b08",
+        "version" : "0.1.4"
       }
     },
     {
@@ -257,8 +266,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-tagged",
       "state" : {
-        "revision" : "33f44ceb793b12d6af5019cbe26f8b0e66e6389f",
-        "version" : "0.8.0"
+        "revision" : "af06825aaa6adffd636c10a2570b2010c7c07e6a",
+        "version" : "0.9.0"
       }
     },
     {
@@ -284,8 +293,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swiftui-navigation",
       "state" : {
-        "revision" : "a4a84e387c83a735e56d03bf9736d49a07b3c3ae",
-        "version" : "0.4.3"
+        "revision" : "ddc01cdcddfd30ef7a966049b2e1d251e224ad93",
+        "version" : "0.5.0"
       }
     },
     {
@@ -300,7 +309,7 @@
     {
       "identity" : "webrtc",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/stasel/WebRTC.git",
+      "location" : "https://github.com/stasel/WebRTC",
       "state" : {
         "revision" : "6dd54fc242d3261317b5e6eb17bf178b1359609b",
         "version" : "106.0.0"
@@ -311,8 +320,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "5a5457a744239896e9b0b03a8e1a5069c3e7b91f",
-        "version" : "0.6.0"
+        "revision" : "a9daebf0bf65981fd159c885d504481a65a75f02",
+        "version" : "0.8.0"
       }
     }
   ],

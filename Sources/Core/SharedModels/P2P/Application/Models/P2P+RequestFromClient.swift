@@ -6,13 +6,13 @@ import Profile
 public extension P2P {
 	// MARK: - RequestFromClient
 	struct RequestFromClient: Sendable, Hashable, Identifiable {
-		public let originalMessage: P2PConnection.IncomingMessage
+		public let originalMessage: P2PConnections.IncomingMessage
 
 		public let requestFromDapp: FromDapp.Request
 		public let client: P2PClient
 
 		public init(
-			originalMessage: P2PConnection.IncomingMessage,
+			originalMessage: P2PConnections.IncomingMessage,
 			requestFromDapp: FromDapp.Request,
 			client: P2PClient
 		) throws {
@@ -41,12 +41,12 @@ public struct InvalidRequestFromDapp: Swift.Error, Equatable, CustomStringConver
 #if DEBUG
 public extension P2PClient {
 	static let previewValue: Self = try! .init(
-		displayName: "Placeholder",
-		connectionPassword: Data(hexString: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+		connectionPassword: ConnectionPassword(hex: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
+		displayName: "Placeholder"
 	)
 }
 
-public extension P2PConnection.IncomingMessage {
+public extension P2PConnections.IncomingMessage {
 	static let previewValue = Self(messagePayload: .deadbeef32Bytes, messageID: "previewValue", messageHash: .deadbeef32Bytes)
 }
 

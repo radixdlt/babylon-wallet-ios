@@ -78,7 +78,7 @@ private extension ManageP2PClients.View {
 					VStack(alignment: .leading) {
 						ForEachStore(
 							store.scope(
-								state: \.connections,
+								state: \.clients,
 								action: { .child(.connection(id: $0, action: $1)) }
 							),
 							content: {
@@ -112,14 +112,14 @@ private extension ManageP2PClients.View {
 // MARK: - ManageP2PClients.View.ViewState
 public extension ManageP2PClients.View {
 	struct ViewState: Equatable {
-		public var connections: IdentifiedArrayOf<P2P.ClientWithConnectionStatus>
+		public var clients: IdentifiedArrayOf<ManageP2PClient.State>
 		public var canAddMoreConnections: Bool {
 			// FIXME: Post betanet we should allow multiple connections...
-			connections.isEmpty
+			clients.isEmpty
 		}
 
 		init(state: ManageP2PClients.State) {
-			connections = state.connections
+			clients = state.clients
 		}
 	}
 }

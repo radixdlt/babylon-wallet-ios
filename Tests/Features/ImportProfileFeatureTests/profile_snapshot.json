@@ -4,7 +4,7 @@
       "fiatCurrencyPriceTarget" : "usd"
     },
     "networkAndGateway" : {
-      "gatewayAPIEndpointURL" : "https://nebunet-gateway.radixdlt.com",
+      "gatewayAPIEndpointURL" : "https://betanet.radixdlt.com",
       "network" : {
         "id" : 11,
         "name" : "nebunet"
@@ -14,22 +14,58 @@
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
-        "firstEstablishedOn" : "2022-12-08T11:26:22Z",
-        "lastUsedOn" : "2022-12-08T11:26:22Z"
+        "firstEstablishedOn" : "2023-01-02T13:15:53Z",
+        "lastUsedOn" : "2023-01-02T13:15:53Z",
+        "platform" : "browser"
+      },
+      {
+        "connectionPassword" : "beefbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadebeef",
+        "displayName" : "iPhone 13",
+        "firstEstablishedOn" : "2023-01-02T13:15:53Z",
+        "lastUsedOn" : "2023-01-02T13:15:53Z",
+        "platform" : "iPhone",
+        "signalingServerConfig" : {
+          "signalingServerBaseURL" : "custom.signal.com",
+          "websocketPingInterval" : 10
+        },
+        "webRTCConfig" : {
+          "dataChannelConfig" : {
+            "dataChannelLabelledID" : {
+              "channelId" : 0,
+              "channelLabel" : "data"
+            },
+            "isNegotiated" : true,
+            "isOrdered" : true,
+            "maxPacketLifeTime" : -1,
+            "maxRetransmits" : -1
+          },
+          "peerConnectionConfig" : {
+            "continualGatheringPolicy" : "gatherContinually",
+            "iceServerConfigs" : [
+              {
+                "url" : "example.com"
+              },
+              {
+                "url" : "anotherexample.com"
+              }
+            ],
+            "sdpSemantics" : "unifiedPlan"
+          }
+        }
       }
     ]
   },
   "factorSources" : {
     "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources" : [
       {
-        "creationDate" : "2022-12-08T11:26:22Z",
+        "creationDate" : "2023-01-02T13:15:53Z",
         "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
         "label" : "DeviceFactorSource"
       }
     ],
     "secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources" : [
       {
-        "creationDate" : "2022-12-08T11:26:22Z",
+        "creationDate" : "2023-01-02T13:15:53Z",
         "factorSourceID" : "85d985e6861e3fb4b39c753b09b9be67d43896d53b0d1dfcb2682ae261d32eb2",
         "label" : "OlympiaFactorSource"
       }
@@ -59,7 +95,7 @@
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2022-12-08T11:26:22Z",
+                "initializationDate" : "2023-01-02T13:15:53Z",
                 "publicKey" : {
                   "compressedData" : "b9c37926187c6ecfee40577e29942ecc1371c5bb6350288aca92033b16ce595c",
                   "curve" : "curve25519"
@@ -89,7 +125,7 @@
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2022-12-08T11:26:22Z",
+                "initializationDate" : "2023-01-02T13:15:53Z",
                 "publicKey" : {
                   "compressedData" : "7c906945cf3d4b4ab27ebf11b6f98e07c506323809f9b501275914f72739ed86",
                   "curve" : "curve25519"
@@ -119,7 +155,7 @@
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2022-12-08T11:26:22Z",
+                "initializationDate" : "2023-01-02T13:15:53Z",
                 "publicKey" : {
                   "compressedData" : "3f9d3dbae544a46d58703baab5db8d0643879733f7b6e01b39bf96c16ea827d6",
                   "curve" : "curve25519"
@@ -142,12 +178,12 @@
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "AAAF0B45-B45A-442C-9973-9657C3BE3537",
+              "id" : "790A90CC-F05A-45F0-9122-67423BE23CCA",
               "kind" : "firstName",
               "value" : "Jane"
             },
             {
-              "id" : "9632CEAA-C437-4944-B05E-FBE0E07BC00A",
+              "id" : "EF205BA8-77F8-48D8-A1C7-FB58FF51E4EA",
               "kind" : "lastName",
               "value" : "Incognitoson"
             }
@@ -166,7 +202,7 @@
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2022-12-08T11:26:22Z",
+                "initializationDate" : "2023-01-02T13:15:53Z",
                 "publicKey" : {
                   "compressedData" : "f361cef2453721ed1b67e4c9266697325766513413de39d19746371466f9f63b",
                   "curve" : "curve25519"
@@ -183,12 +219,12 @@
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "7B016B92-1DF3-47F3-9671-DCEFDBD8B56F",
+              "id" : "44C4D7D4-A7B7-4FE9-B9E5-534F7C9EB13B",
               "kind" : "firstName",
               "value" : "Maria"
             },
             {
-              "id" : "544B2916-35F1-4C92-8C99-DB1C9292ECD8",
+              "id" : "80A8EE3D-99A8-41B6-9BAA-3F25A5EC55BD",
               "kind" : "lastName",
               "value" : "Publicson"
             }
@@ -207,7 +243,7 @@
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2022-12-08T11:26:22Z",
+                "initializationDate" : "2023-01-02T13:15:53Z",
                 "publicKey" : {
                   "compressedData" : "772ba0ebe12a1637458fefef15299bc57f8e9e21fcf106181d3d780ad1e2bf51",
                   "curve" : "curve25519"
@@ -219,5 +255,5 @@
       ]
     }
   ],
-  "version" : "0.0.3"
+  "version" : "0.0.5"
 }

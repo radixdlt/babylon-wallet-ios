@@ -23,7 +23,7 @@ public extension P2P {
 }
 
 public extension P2P.SentResponseToClient {
-	typealias SentReceipt = P2PConnection.SentReceipt
+	typealias SentReceipt = P2PConnections.SentReceipt
 	typealias ID = P2P.ToDapp.Response.ID
 	var id: ID { responseToDapp.id }
 }
@@ -37,7 +37,7 @@ public extension ChunkingTransportOutgoingMessage {
 	static let previewValue = Self(data: .deadbeef32Bytes, messageID: MessageID())
 }
 
-public extension P2PConnection.SentReceipt {
+public extension P2PConnections.SentReceipt {
 	static let previewValue = Self(messageSent: .previewValue)
 }
 

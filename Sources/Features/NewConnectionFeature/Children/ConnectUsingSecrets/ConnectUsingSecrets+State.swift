@@ -9,14 +9,14 @@ public extension ConnectUsingSecrets {
 		public var isConnecting: Bool
 		public var isPromptingForName: Bool
 		public var nameOfConnection: String
-		public var newP2PConnection: P2PConnection?
+		public var idOfNewConnection: P2PConnectionID?
 		public var isNameValid: Bool
 		@BindableState public var focusedField: Field?
 
 		public init(
 			connectionSecrets: ConnectionSecrets,
 			isConnecting: Bool = true,
-			newP2PConnection: P2PConnection? = nil,
+			idOfNewConnection: P2PConnectionID? = nil,
 			focusedField: Field? = nil,
 			isPromptingForName: Bool = false,
 			nameOfConnection: String = "",
@@ -27,7 +27,7 @@ public extension ConnectUsingSecrets {
 			self.isConnecting = isConnecting
 			self.isPromptingForName = isPromptingForName
 			self.nameOfConnection = nameOfConnection
-			self.newP2PConnection = newP2PConnection
+			self.idOfNewConnection = idOfNewConnection
 			self.isNameValid = isNameValid
 		}
 	}

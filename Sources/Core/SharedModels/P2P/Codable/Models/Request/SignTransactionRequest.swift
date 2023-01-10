@@ -49,7 +49,7 @@ public extension P2P.FromDapp.SendTransactionWriteRequestItem {
 		let manifest = try TransactionManifest(
 			instructions: .string(manifestString),
 			blobs: blobsHex.map {
-				try [UInt8](Data(hexString: $0))
+				try [UInt8](Data(hex: $0))
 			}
 		)
 

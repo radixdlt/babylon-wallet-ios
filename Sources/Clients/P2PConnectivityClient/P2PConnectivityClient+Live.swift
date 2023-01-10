@@ -9,164 +9,130 @@ import ProfileClient
 import Resources
 import SharedModels
 
+// MARK: - AnyAsyncIterator + Sendable
+extension AnyAsyncIterator: @unchecked Sendable where Element: Sendable {}
+
+// MARK: - AnyAsyncSequence + Sendable
+extension AnyAsyncSequence: @unchecked Sendable where Element: Sendable {}
+
+// MARK: - AsyncThrowingStream.Iterator + Sendable
+extension AsyncThrowingStream.Iterator: @unchecked Sendable where Element: Sendable {}
+
+extension P2P.ClientWithConnectionStatus {
+	func connected() -> Self {
+		.init(p2pClient: p2pClient, connectionStatus: .connected)
+	}
+}
+
+extension ProfileClient {
+	func p2pClient(for id: P2PConnectionID) async throws -> P2PClient? {
+		try await getP2PClients().first(where: { $0.id == id })
+	}
+}
+
 // MARK: - P2PConnectivityClient + :LiveValue
 public extension P2PConnectivityClient {
 	static let liveValue: Self = {
 		@Dependency(\.profileClient) var profileClient
 
-		final actor ConnectionsHolder: GlobalActor {
-			private var connections: [ConnectionID: P2P.ConnectionForClient] = [:]
-			private let connectionsChannel: AsyncChannel<[P2P.ConnectionForClient]> = .init()
-			private let justClientsWithStatusChannel: AsyncChannel<[P2P.ClientWithConnectionStatus]> = .init()
-			fileprivate nonisolated var justClientsWithStatusAsyncSequence: AnyAsyncSequence<[P2P.ClientWithConnectionStatus]> {
-				justClientsWithStatusChannel.eraseToAnyAsyncSequence()
-			}
-
-			fileprivate nonisolated var connectionsAsyncSequence: AnyAsyncSequence<[P2P.ConnectionForClient]> {
-				connectionsChannel.eraseToAnyAsyncSequence()
-			}
-
-			static let shared = ConnectionsHolder()
-
-			func mapID(_ passwordID: P2PClient.ID) throws -> ConnectionID {
-				let connectionPassword = try ConnectionPassword(data: Data(hexString: passwordID))
-				return try ConnectionID(password: connectionPassword)
-			}
-
-			@Sendable func emit() async {
-				Task {
-					await connectionsChannel.send(
-						connections.values.map { $0 }
-					)
-				}
-				Task {
-					await justClientsWithStatusChannel.send(
-						connections.values.map { .init(p2pClient: $0.client, connectionStatus: .new) }
-					)
-				}
-			}
-
-			func addConnection(_ connection: P2P.ConnectionForClient, connect: Bool, emitUpdate: Bool) async {
-				let key = connection.p2pConnection.connectionID
-				guard connections[key] == nil else {
-					return
-				}
-				self.connections[key] = connection
-				guard connect else {
-					if emitUpdate {
-						await emit()
-					}
-					return
-				}
-				Task { [connection] in
-					try await connection.p2pConnection.connect()
-				}
-				guard emitUpdate else {
-					return
-				}
-				await emit()
-			}
-
-			func disconnectedAndRemove(_ id: P2PClient.ID) async {
-				guard
-					let key = try? mapID(id),
-					let _ = connections[key]
-				else {
-					return
-				}
-				if let removed = connections.removeValue(forKey: key) {
-					await removed.p2pConnection.disconnect()
-				}
-				await emit()
-			}
-
-			func getConnection(id: P2PClient.ID) async -> P2P.ConnectionForClient? {
-				guard
-					let key = try? mapID(id)
-				else {
-					return nil
-				}
-				return connections[key]
-			}
-
-			func loadedFromProfile(connections: P2PClients) async throws {
-				for connection in self.connections.values {
-					if !connections.connections.contains(connection.client) {
-						await self.disconnectedAndRemove(connection.client.id)
-					}
-				}
-				for p2pClient in connections.connections {
-					let password = try ConnectionPassword(data: p2pClient.connectionPassword.data)
-					let secrets = try ConnectionSecrets.from(connectionPassword: password)
-					let p2pConnection = P2PConnection(connectionSecrets: secrets)
-
-					let connectedClient = P2P.ConnectionForClient(
-						client: p2pClient,
-						p2pConnection: p2pConnection
-					)
-					await self.addConnection(connectedClient, connect: true, emitUpdate: false)
-				}
-				await self.emit()
-			}
-		}
-
-		let connectionsHolder = ConnectionsHolder.shared
-
-		@Sendable func loadFromProfile() async throws {
-			let connections = try await profileClient.getP2PClients()
-			try await connectionsHolder.loadedFromProfile(connections: connections)
-		}
-
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
+		@Sendable func client(byID id: P2PClient.ID) async throws -> P2PClient {
+			guard let client = try await profileClient.p2pClient(for: id) else {
+				throw P2PClientNotFoundInProfile()
+			}
+			return client
+		}
+
+		// It is unfortunate that this actor is needed. The intention is that ONLY the `P2PConnections`
+		// actor should be needed. And using the
+		actor MulticastHolder: GlobalActor {
+			typealias Value = OrderedSet<P2PClient.ID>
+			private let subject = AsyncCurrentValueSubject<Value>([])
+			static let shared = MulticastHolder()
+			init() {}
+
+			func emit(_ value: Value) {
+				subject.send(value)
+			}
+
+			func clientIDsAsyncSequence() -> AnyAsyncSequence<Value> {
+				subject
+					.eraseToAnyAsyncSequence()
+			}
+		}
+
+		Task {
+			for try await ids in try await P2PConnections
+				.shared
+				.connectionIDsAsyncSequence()
+			{
+				await MulticastHolder.shared.emit(ids)
+			}
+		}
+
+		let loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll = {
+			Task {
+				print("🔌 Loading and connecting all P2P connections")
+				_ = try await P2PConnections.shared.add(
+					connectionsFor: profileClient.getP2PClients(),
+					connectMode: .connect(force: true, inBackground: true),
+					emitConnectionsUpdate: true
+				)
+			}
+		}
+
 		return Self(
+			loadFromProfileAndConnectAll: loadFromProfileAndConnectAll,
+			disconnectAndRemoveAll: {
+				print("🔌 Disconnecting and removing all P2P connections")
+				do {
+					try await P2PConnections.shared.removeAndDisconnectAll()
+				} catch {
+					print("Failed to delete all P2P connections: \(String(describing: error))")
+				}
+			},
 			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
 			},
-			getP2PClients: {
-				try await loadFromProfile()
-				return connectionsHolder.justClientsWithStatusAsyncSequence
+			getP2PClientIDs: {
+				await MulticastHolder.shared.clientIDsAsyncSequence()
 			},
-			getP2PConnections: {
-				try await loadFromProfile()
-				return connectionsHolder.connectionsAsyncSequence
+			getP2PClientsByIDs: { ids in
+				try await OrderedSet(ids.asyncMap {
+					try await client(byID: $0)
+				})
 			},
-			addP2PClientWithConnection: { clientWithConnection, alsoConnect in
-				try await profileClient.addP2PClient(clientWithConnection.client)
-				await connectionsHolder.addConnection(clientWithConnection, connect: alsoConnect, emitUpdate: true)
+			addP2PClientWithConnection: { client in
+				try await profileClient.addP2PClient(client)
+				_ = try await P2PConnections.shared.add(
+					config: client.config,
+					connectMode: .skipConnecting, // should already be committed
+					emitConnectionsUpdate: true // important to emit!
+				)
 			},
 			deleteP2PClientByID: { id in
 				try await profileClient.deleteP2PClientByID(id)
-				await connectionsHolder.disconnectedAndRemove(id)
+				try await P2PConnections.shared.removeAndDisconnect(id: id)
 			},
 			getConnectionStatusAsyncSequence: { id in
-				guard let connection = await connectionsHolder.getConnection(id: id) else {
-					return AsyncLazySequence([]).eraseToAnyAsyncSequence()
-				}
-				return await connection.p2pConnection.connectionStatusPublisher.map { newStatus in
-					P2P.ConnectionUpdate(
-						connectionStatus: newStatus,
-						p2pClient: connection.client
+				try await P2PConnections.shared.connectionStatusChangeEventAsyncSequence(for: id).map {
+					try await P2P.ClientWithConnectionStatus(
+						p2pClient: client(byID: id),
+						connectionStatus: $0.connectionStatus
 					)
-				}
-				.values
-				.eraseToAnyAsyncSequence()
+				}.eraseToAnyAsyncSequence()
 			},
 			getRequestsFromP2PClientAsyncSequence: { id in
-				guard let connection = await connectionsHolder.getConnection(id: id) else {
-					return AsyncLazySequence([]).eraseToAnyAsyncSequence()
-				}
-				return await connection.p2pConnection.incomingMessagesPublisher.tryMap { (msg: ChunkingTransportIncomingMessage) in
+				try await P2PConnections.shared.incomingMessagesAsyncSequence(for: id).map { msg in
 					@Dependency(\.jsonDecoder) var jsonDecoder
-
 					let jsonData = msg.messagePayload
 					do {
 						let requestFromDapp = try jsonDecoder().decode(P2P.FromDapp.Request.self, from: jsonData)
-
-						return try P2P.RequestFromClient(
+						return try await P2P.RequestFromClient(
 							originalMessage: msg,
 							requestFromDapp: requestFromDapp,
-							client: connection.client
+							client: client(byID: id)
 						)
 					} catch {
 						throw FailedToDecodeRequestFromDappError(
@@ -174,50 +140,45 @@ public extension P2PConnectivityClient {
 							jsonString: String(data: jsonData, encoding: .utf8) ?? jsonData.hex
 						)
 					}
-				}.values.eraseToAnyAsyncSequence()
-			},
-			sendMessageReadReceipt: { id, readMessage in
-				guard let connection = await connectionsHolder.getConnection(id: id) else {
-					throw P2PConnectionOffline()
 				}
-				try await connection.p2pConnection.sendReadReceipt(for: readMessage)
+				.eraseToAnyAsyncSequence()
+
+			},
+			sendMessageReadReceipt: { id, msg in
+				try await P2PConnections.shared.sendReceipt(for: id, readMessage: msg)
 			},
 			sendMessage: { outgoingMsg in
 				@Dependency(\.jsonEncoder) var jsonEncoder
-
-				guard let connection = await connectionsHolder.getConnection(id: outgoingMsg.connectionID) else {
-					throw P2PConnectionOffline()
-				}
+				let id = outgoingMsg.connectionID
 				let responseToDappData = try jsonEncoder().encode(outgoingMsg.responseToDapp)
 				let p2pChannelRequestID = UUID().uuidString
+				try await P2PConnections.shared.sendData(for: id, data: responseToDappData, messageID: p2pChannelRequestID)
 
-				try await connection.p2pConnection.send(
-					data: responseToDappData,
-					id: p2pChannelRequestID
-				)
-
-				for try await receipt in await connection.p2pConnection.sentReceiptsPublisher.values {
+				for try await receipt in try await P2PConnections.shared.sentReceiptsAsyncSequence(for: id) {
 					guard receipt.messageSent.messageID == p2pChannelRequestID else { continue }
-					return P2P.SentResponseToClient(
+					return try await P2P.SentResponseToClient(
 						sentReceipt: receipt,
 						responseToDapp: outgoingMsg.responseToDapp,
-						client: connection.client
+						client: client(byID: id)
 					)
 				}
+
 				throw FailedToReceiveSentReceiptForSuccessfullyDispatchedMsgToDapp()
 			},
 			_sendTestMessage: { id, message in
-				guard let connection = await connectionsHolder.getConnection(id: id) else {
-					print("No connection found for: \(id)")
-					return
-				}
+				let msgID = UUID().uuidString
 				do {
-					try await connection.p2pConnection.send(data: Data(message.utf8), id: UUID().uuidString)
+					try await P2PConnections.shared.sendData(for: id, data: Data(message.utf8), messageID: msgID)
 				} catch {
 					print("Failed to send test message, error: \(String(describing: error))")
 				}
-
 				// does not care about sent message receipts
+			},
+			_debugWebsocketStatusAsyncSequence: { id in
+				try await P2PConnections.shared.debugWebSocketState(for: id).eraseToAnyAsyncSequence()
+			},
+			_debugDataChannelStatusAsyncSequence: { id in
+				try await P2PConnections.shared.debugDataChannelState(for: id).eraseToAnyAsyncSequence()
 			}
 		)
 	}()
@@ -228,6 +189,14 @@ struct P2PConnectionOffline: LocalizedError {
 	init() {}
 	var errorDescription: String? {
 		L10n.Common.p2PConnectionOffline
+	}
+}
+
+// MARK: - P2PClientNotFoundInProfile
+struct P2PClientNotFoundInProfile: LocalizedError {
+	init() {}
+	var errorDescription: String? {
+		L10n.Common.p2PClientNotFoundInProfile
 	}
 }
 
