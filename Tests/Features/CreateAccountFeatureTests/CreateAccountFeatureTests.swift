@@ -13,7 +13,6 @@ import UserDefaultsClient
 @MainActor
 final class CreateAccountFeatureTests: TestCase {
 	let testScheduler = DispatchQueue.test
-	static let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
 
 	func test_closeButtonTapped_whenTappedOnCloseButton_thenCoordinateDismissal() async {
 		// given
@@ -62,43 +61,28 @@ final class CreateAccountFeatureTests: TestCase {
 			reducer: CreateAccount()
 		)
 
-		let isFirstAccount = true
-		let didCheckIfHasAccountOnNetwork = ActorIsolated<NetworkID?>(nil)
-		store.dependencies.profileClient.hasAccountOnNetwork = { networkID in
-			await didCheckIfHasAccountOnNetwork.setValue(networkID)
-			return !isFirstAccount
-		}
-		store.dependencies.profileClient.getNetworkAndGateway = {
-			Self.networkAndGateway
-		}
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 
 		// when
 		await store.send(.internal(.view(.viewAppeared)))
 
 		// then
-		await store.receive(.internal(.system(.hasAccountOnNetworkResult(.success(!isFirstAccount))))) {
-			$0.isFirstAccount = isFirstAccount
-		}
 		await testScheduler.advance(by: .seconds(0.5))
 		await store.receive(.internal(.system(.focusTextField(.accountName)))) {
 			$0.focusedField = .accountName
 		}
 		await testScheduler.run() // fast-forward scheduler to the end of time
-
-		await didCheckIfHasAccountOnNetwork.withValue {
-			XCTAssertEqual($0, .some(Self.networkAndGateway.network.id))
-		}
 	}
 
 	func test__GIVEN__no_profile__WHEN__new_profile_button_tapped__THEN__user_is_onboarded_with_new_profile() async throws {
 		// given
 		let newAccountName = "newAccount"
-		let initialState = CreateAccount.State(shouldCreateProfile: true)
+		let initialState = CreateAccount.State(shouldCreateProfile: true, isFirstAccount: true)
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
-		let newProfile = try await Profile.new(networkAndGateway: Self.networkAndGateway, mnemonic: mnemonic)
+		let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
+		let newProfile = try await Profile.new(networkAndGateway: networkAndGateway, mnemonic: mnemonic)
 		let expectedCreateNewProfileRequest = CreateNewProfileRequest(
-			networkAndGateway: Self.networkAndGateway,
+			networkAndGateway: networkAndGateway,
 			curve25519FactorSourceMnemonic: mnemonic,
 			nameOfFirstAccount: newAccountName
 		)
@@ -137,10 +121,6 @@ final class CreateAccountFeatureTests: TestCase {
 		store.dependencies.profileClient.getAccounts = {
 			let accounts: [OnNetwork.Account] = [.previewValue0]
 			return NonEmpty(rawValue: OrderedSet(accounts))!
-		}
-
-		store.dependencies.profileClient.getNetworkAndGateway = {
-			Self.networkAndGateway
 		}
 
 		// when
@@ -193,7 +173,7 @@ final class CreateAccountFeatureTests: TestCase {
 		let isFirstAccount = false
 		let initialState = CreateAccount.State()
 		let expectedCreateAccountRequest = CreateAccountRequest(
-			overridingNetworkID: Self.networkAndGateway.network.id,
+			overridingNetworkID: nil,
 			keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
 			accountName: newAccountName
 		)
@@ -212,14 +192,7 @@ final class CreateAccountFeatureTests: TestCase {
 			return createdAccount
 		}
 
-		store.dependencies.profileClient.getNetworkAndGateway = {
-			Self.networkAndGateway
-		}
-
 		// when
-		await store.send(.internal(.system(.hasAccountOnNetworkResult(.success(!isFirstAccount))))) {
-			$0.isFirstAccount = isFirstAccount
-		}
 
 		await store.send(.internal(.view(.textFieldChanged(newAccountName)))) {
 			$0.inputtedAccountName = newAccountName
@@ -263,10 +236,6 @@ final class CreateAccountFeatureTests: TestCase {
 					queue.insert(error as NSError)
 				}
 			}
-		}
-
-		store.dependencies.profileClient.getNetworkAndGateway = {
-			Self.networkAndGateway
 		}
 
 		// when

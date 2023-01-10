@@ -158,35 +158,35 @@ public extension CreateAccount {
 
 	private func createProfile(state: inout State) -> EffectTask<Action> {
 		.run { [nameOfFirstAccount = state.sanitizedAccountName] send in
-				await send(.internal(.system(.createdNewProfileResult(
-					// FIXME: - mainnet: extract into ProfileCreator client?
-					TaskResult {
-						let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
+			await send(.internal(.system(.createdNewProfileResult(
+				// FIXME: - mainnet: extract into ProfileCreator client?
+				TaskResult {
+					let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
 
-                                                let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
+					let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
 
-						let newProfileRequest = CreateNewProfileRequest(
-							networkAndGateway: networkAndGateway,
-							curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
-							nameOfFirstAccount: nameOfFirstAccount
-						)
+					let newProfileRequest = CreateNewProfileRequest(
+						networkAndGateway: networkAndGateway,
+						curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
+						nameOfFirstAccount: nameOfFirstAccount
+					)
 
-						let newProfile = try await profileClient.createNewProfile(
-							newProfileRequest
-						)
+					let newProfile = try await profileClient.createNewProfile(
+						newProfileRequest
+					)
 
-						let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
+					let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
 
-						try await keychainClient.updateFactorSource(
-							mnemonic: curve25519FactorSourceMnemonic,
-							reference: curve25519FactorSourceReference
-						)
+					try await keychainClient.updateFactorSource(
+						mnemonic: curve25519FactorSourceMnemonic,
+						reference: curve25519FactorSourceReference
+					)
 
-						try await keychainClient.updateProfile(profile: newProfile)
+					try await keychainClient.updateProfile(profile: newProfile)
 
-						return newProfile
-					}
-				))))
+					return newProfile
+				}
+			))))
 		}
 	}
 }

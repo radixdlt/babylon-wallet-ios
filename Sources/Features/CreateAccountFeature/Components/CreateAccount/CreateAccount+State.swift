@@ -16,7 +16,7 @@ public extension CreateAccount {
 		public init(
 			onNetworkWithID: NetworkID? = nil,
 			shouldCreateProfile: Bool = false,
-                        isFirstAccount: Bool = false,
+			isFirstAccount: Bool = false,
 			inputtedAccountName: String = "",
 			focusedField: Field? = nil,
 			isCreatingAccount: Bool = false
@@ -26,7 +26,7 @@ public extension CreateAccount {
 			self.inputtedAccountName = inputtedAccountName
 			self.focusedField = focusedField
 			self.isCreatingAccount = isCreatingAccount
-                        self.isFirstAccount = isFirstAccount
+			self.isFirstAccount = isFirstAccount
 		}
 	}
 }
