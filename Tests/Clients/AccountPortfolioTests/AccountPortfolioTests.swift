@@ -1,5 +1,5 @@
 @testable import AccountPortfolio
-import ComposableArchitecture
+import Dependencies
 import TestUtils
 
 final class AccountPortfolioTests: TestCase {

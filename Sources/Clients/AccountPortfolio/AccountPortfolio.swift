@@ -1,5 +1,4 @@
 import Asset
-import IdentifiedCollections
 import Prelude
 
 // MARK: - AccountPortfolio

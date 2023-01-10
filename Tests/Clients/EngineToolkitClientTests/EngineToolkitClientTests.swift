@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import Dependencies
 @testable import EngineToolkitClient
 import Foundation
 import TestUtils
