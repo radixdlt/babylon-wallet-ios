@@ -37,7 +37,8 @@ public extension NewConnection {
 					await send(.delegate(.dismiss))
 				}
 			case let .connectUsingSecrets(connectUsingSecrets):
-				guard let newP2PConnection = connectUsingSecrets.newP2PConnection else {
+				// checks if we are indded connected
+				guard let _ = connectUsingSecrets.idOfNewConnection else {
 					return .run { send in
 						await send(.delegate(.dismiss))
 					}
@@ -46,11 +47,11 @@ public extension NewConnection {
 					into: &state,
 					action: .child(.connectUsingSecrets(.delegate(.connected(
 						.init(
-							client: .init(
-								displayName: L10n.NewConnection.defaultNameOfConnection,
-								connectionPassword: connectUsingSecrets.connectionSecrets.connectionPassword.data.data
+							p2pClient: .init(
+								connectionPassword: connectUsingSecrets.connectionSecrets.connectionPassword,
+								displayName: L10n.NewConnection.defaultNameOfConnection
 							),
-							p2pConnection: newP2PConnection
+							connectionStatus: .connected
 						)
 					))))
 				)

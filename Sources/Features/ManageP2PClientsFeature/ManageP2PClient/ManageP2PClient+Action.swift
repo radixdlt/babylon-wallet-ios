@@ -39,5 +39,9 @@ public extension ManageP2PClient.Action {
 public extension ManageP2PClient.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
 		case connectionStatusResult(TaskResult<ConnectionStatus>)
+		#if DEBUG
+		case webSocketStatusResult(TaskResult<WebSocketState>)
+		case dataChannelStateResult(TaskResult<DataChannelState>)
+		#endif
 	}
 }

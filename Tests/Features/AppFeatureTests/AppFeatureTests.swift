@@ -73,7 +73,7 @@ final class AppFeatureTests: TestCase {
 			))))
 		}
 
-		wait(for: [expectation], timeout: 0)
+		wait(for: [expectation], timeout: 0.1)
 	}
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
@@ -114,7 +114,7 @@ final class AppFeatureTests: TestCase {
 
 		await testScheduler.run() // fast-forward scheduler to the end of time
 
-		wait(for: [expectation], timeout: 0)
+		wait(for: [expectation], timeout: 0.1)
 	}
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_noProfile__THEN__navigate_to_onboarding() async {

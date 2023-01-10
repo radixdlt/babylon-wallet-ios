@@ -4,6 +4,7 @@ import ComposableArchitecture
 import Foundation
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
+import P2PModels
 import Profile
 import SharedModels
 import TransactionClient
@@ -58,8 +59,6 @@ private extension HandleDappRequests {
 		case let .internal(.system(.receiveRequestFromP2PClientResult(.success(requestFromP2P)))):
 
 			return .run { send in
-				await send(.internal(.system(.sendMessageReceivedReceiptBackToPeer(requestFromP2P.client, readMessage: requestFromP2P.originalMessage))))
-
 				let currentNetworkID = await profileClient.getCurrentNetworkID()
 
 				guard requestFromP2P.requestFromDapp.metadata.networkId == currentNetworkID else {
@@ -200,27 +199,29 @@ private extension HandleDappRequests {
 			)
 
 		case .internal(.view(.task)):
-			print("☑️ HandleDappRequests getting p2pClients...")
 			return .run { send in
-				print("☑️ HandleDappRequests getting p2pClients.......")
 				do {
-					for try await p2pClients in try await p2pConnectivityClient.getP2PConnections() {
-						print("✅ HandleDappRequests got p2pClients: \(p2pClients.map(\.client.displayName)) ")
-						await send(.internal(.system(.loadConnectionsResult(.success(p2pClients)))))
+					try await p2pConnectivityClient.loadFromProfileAndConnectAll()
+					for try await clientIDs in try await p2pConnectivityClient.getP2PClientIDs() {
+						guard !Task.isCancelled else {
+							return
+						}
+						await send(.internal(.system(.loadClientIDsResult(.success(clientIDs)))))
 					}
 				} catch {
-					await send(.internal(.system(.loadConnectionsResult(.failure(error)))))
+					await send(.internal(.system(.loadClientIDsResult(.failure(error)))))
 				}
 			}
 
-		case let .internal(.system(.loadConnectionsResult(.success(clients)))):
-			print("☑️ HandleDappRequests getting requests for #\(clients.count) clients...")
+		case let .internal(.system(.loadClientIDsResult(.success(clientIDs)))):
 			return .run { send in
-				for connectedClient in clients {
-					print("☑️ HandleDappRequests getting requests for client: '\(connectedClient.client.displayName)'.......")
+				for clientID in clientIDs {
 					do {
-						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(connectedClient.client.id) {
-							print("✅ HandleDappRequests got requests for client: '\(connectedClient.client.displayName)'!!!!")
+						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(clientID) {
+							await send(.internal(.system(.sendMessageReceivedReceiptBackToPeer(
+								request.client, readMessage: request.originalMessage
+							))))
+
 							await send(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
 						}
 					} catch {
@@ -229,7 +230,7 @@ private extension HandleDappRequests {
 				}
 			}
 
-		case let .internal(.system(.loadConnectionsResult(.failure(error)))):
+		case let .internal(.system(.loadClientIDsResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
 

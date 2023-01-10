@@ -17,38 +17,67 @@ public struct ManageP2PClients: Sendable, ReducerProtocol {
 
 public extension ManageP2PClients {
 	var body: some ReducerProtocolOf<Self> {
-		Reduce(self.core)
-			.forEach(\.connections, action: /Action.child .. Action.ChildAction.connection) {
-				ManageP2PClient()
-			}
-			.ifLet(
-				\.newConnection,
-				action: /Action.child .. Action.ChildAction.newConnection
-			) {
-				NewConnection()
-					._printChanges()
-			}
+		CombineReducers {
+			EmptyReducer()
+				.forEach(\.clients, action: /Action.child .. Action.ChildAction.connection) {
+					ManageP2PClient()
+				}
+				.ifLet(
+					\.newConnection,
+					action: /Action.child .. Action.ChildAction.newConnection
+				) {
+					NewConnection()
+				}
+
+			Reduce(self.core)
+		}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.task)):
-			print("☑️ ManageP2PClients getting p2pClients...")
 			return .run { send in
-				print("☑️ ManageP2PClients getting p2pClients.......")
-				for try await p2pClients in try await p2pConnectivityClient.getP2PClients() {
-					print("✅ ManageP2PClients got p2pClients: \(p2pClients.map(\.p2pClient.displayName)) ")
-					await send(.internal(.system(.loadConnectionsResult(
-						.success(p2pClients)
+				do {
+					for try await p2pClientIDs in try await p2pConnectivityClient.getP2PClientIDs() {
+						guard !Task.isCancelled else {
+							return
+						}
+						await send(.internal(.system(.loadClientIDsResult(
+							.success(p2pClientIDs)
+						))))
+					}
+				} catch {
+					await send(.internal(.system(.loadClientIDsResult(
+						.failure(error)
 					))))
 				}
 			}
 
-		case let .internal(.system(.loadConnectionsResult(.success(connectionsFromProfile)))):
-			state.connections = .init(uniqueElements: connectionsFromProfile)
+		case let .internal(.system(.loadClientIDsResult(.success(clientIDs)))):
+			guard !clientIDs.isEmpty else {
+				return .none
+			}
+			return .run { send in
+				await send(.internal(.system(.loadClientsByIDsResult(
+					TaskResult {
+						try await p2pConnectivityClient.getP2PClientsByIDs(clientIDs)
+					}
+				))))
+			}
+
+		case let .internal(.system(.loadClientIDsResult(.failure(error)))):
+			errorQueue.schedule(error)
 			return .none
 
-		case let .internal(.system(.loadConnectionsResult(.failure(error)))):
+		case let .internal(.system(.loadClientsByIDsResult(.success(clientsFromProfile)))):
+
+			state.clients = .init(
+				uniqueElements: clientsFromProfile.map { ManageP2PClient.State(client: $0) }
+			)
+
+			return .none
+
+		case let .internal(.system(.loadClientsByIDsResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
 
@@ -57,11 +86,8 @@ public extension ManageP2PClients {
 			return .none
 
 		case let .internal(.system(.saveNewConnectionResult(.success(newConnection)))):
-			state.connections.append(
-				P2P.ClientWithConnectionStatus(
-					p2pClient: newConnection.client,
-					connectionStatus: .connected
-				)
+			state.clients.append(
+				ManageP2PClient.State(clientWithConnectionStatus: newConnection)
 			)
 			return .none
 
@@ -93,7 +119,7 @@ public extension ManageP2PClients {
 			}
 
 		case let .internal(.system(.deleteConnectionResult(.success(deletedID)))):
-			state.connections.remove(id: deletedID)
+			state.clients.remove(id: deletedID)
 			return .none
 
 		case let .internal(.system(.deleteConnectionResult(.failure(error)))):
@@ -117,8 +143,7 @@ public extension ManageP2PClients {
 				await send(.internal(.system(.saveNewConnectionResult(
 					TaskResult {
 						try await p2pConnectivityClient.addP2PClientWithConnection(
-							connectedClient,
-							false // no need to connect, already connected.
+							connectedClient.p2pClient
 						)
 					}.map { connectedClient }
 				))))

@@ -131,3 +131,4 @@
 "profileLoad.decodingError" = "Failed to create Wallet from backup: %@";
 
 "common.P2PConnectionOffline" = "Linked Connector Offline";
+"common.P2PClientNotFoundInProfile" = "Inconsistency trying to use deleted Linked Connector.";
