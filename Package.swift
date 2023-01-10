@@ -126,7 +126,7 @@ extension Package {
 		}
 
 		let name: String
-		let category: String
+		let category: String?
 		let dependencies: [Target.Dependency]
 		let exclude: [String]
 		let resources: [Resource]?
@@ -196,6 +196,27 @@ extension Package {
 				isProduct: isProduct
 			)
 		}
+
+		static func module(
+			name: String,
+			dependencies: [Target.Dependency],
+			exclude: [String] = [],
+			resources: [Resource]? = nil,
+			plugins: [Target.PluginUsage]? = nil,
+			tests: Tests,
+			isProduct: Bool = true
+		) -> Self {
+			.init(
+				name: name,
+				category: nil,
+				dependencies: dependencies,
+				exclude: exclude,
+				resources: resources,
+				plugins: plugins,
+				tests: tests,
+				isProduct: isProduct
+			)
+		}
 	}
 
 	func addModules(_ modules: [Module]) {
@@ -206,7 +227,13 @@ extension Package {
 
 	private func addModule(_ module: Module) {
 		let targetName = module.name
-		let targetPath = "Sources/\(module.category)/\(targetName)"
+		let targetPath = {
+			if let category = module.category {
+				return "Sources/\(category)/\(targetName)"
+			} else {
+				return "Sources/\(targetName)"
+			}
+		}()
 
 		package.targets += [
 			.target(
@@ -230,7 +257,13 @@ extension Package {
 			break
 		case let .yes(nameSuffix, testDependencies, resources):
 			let testTargetName = targetName + nameSuffix
-			let testTargetPath = "Tests/\(module.category)/\(testTargetName)"
+			let testTargetPath = {
+				if let category = module.category {
+					return "Tests/\(category)/\(testTargetName)"
+				} else {
+					return "Tests/\(testTargetName)"
+				}
+			}()
 			package.targets += [
 				.testTarget(
 					name: testTargetName,
