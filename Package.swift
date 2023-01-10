@@ -88,8 +88,8 @@ extension Package {
 				name: name,
 				category: "Features",
 				dependencies: dependencies + [
-					"RadixFoundation",
 					.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+					"RadixFoundation",
 				],
 				exclude: exclude,
 				resources: resources,
@@ -112,8 +112,8 @@ extension Package {
 				name: name,
 				category: "Clients",
 				dependencies: dependencies + [
-					"RadixFoundation",
 					.product(name: "Dependencies", package: "swift-dependencies"),
+					"RadixFoundation",
 				],
 				exclude: exclude,
 				resources: resources,
@@ -135,7 +135,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Core",
-				dependencies: ["RadixFoundation"] + dependencies,
+				dependencies: dependencies + ["RadixFoundation"],
 				exclude: exclude,
 				resources: resources,
 				plugins: plugins,
