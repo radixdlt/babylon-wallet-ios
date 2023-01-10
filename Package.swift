@@ -16,28 +16,19 @@ let package = Package(
 
 package.dependencies += [
 	// RDX Works dependencies
-	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.3"),
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.11"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.4.0"),
 	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.1.4"),
 
-	// ~~~ THIRD PARTY ~~~
-	// APPLE
-	.package(url: "https://github.com/apple/swift-collections", from: "1.0.3"),
-	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
-
-	// PointFreeCo
+	// TCA
 	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1"),
 	.package(url: "https://github.com/pointfreeco/swift-dependencies", from: "0.1.1"),
-	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
-	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
-	.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3"),
+	.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3"), // TODO: remove when new TCA tools are available
 
-	// Other
-	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
-	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
-	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
+	// Build tools
 	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
+
+	// UI
 	.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1"),
 	.package(url: "https://github.com/kean/Nuke", from: "11.3.1"),
 	.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4"),
@@ -45,46 +36,6 @@ package.dependencies += [
 	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
 ]
-
-let asyncAlgorithms: Target.Dependency = .product(
-	name: "AsyncAlgorithms",
-	package: "swift-async-algorithms"
-)
-
-let asyncExtensions: Target.Dependency = .product(
-	name: "AsyncExtensions",
-	package: "AsyncExtensions"
-)
-
-let collections: Target.Dependency = .product(
-	name: "Collections",
-	package: "swift-collections"
-)
-
-let nonEmpty: Target.Dependency = .product(
-	name: "NonEmpty",
-	package: "swift-nonempty"
-)
-
-let tca: Target.Dependency = .product(
-	name: "ComposableArchitecture",
-	package: "swift-composable-architecture"
-)
-
-let dependencies: Target.Dependency = .product(
-	name: "Dependencies",
-	package: "swift-dependencies"
-)
-
-let tagged: Target.Dependency = .product(
-	name: "Tagged",
-	package: "swift-tagged"
-)
-
-let legibleError: Target.Dependency = .product(
-	name: "LegibleError",
-	package: "LegibleError"
-)
 
 let profile: Target.Dependency = .product(
 	name: "Profile",
@@ -101,19 +52,9 @@ let p2pModels: Target.Dependency = .product(
 	package: "Converse"
 )
 
-let bigInt: Target.Dependency = .product(
-	name: "BigInt",
-	package: "BigInt"
-)
-
 let engineToolkit: Target.Dependency = .product(
 	name: "EngineToolkit",
 	package: "swift-engine-toolkit"
-)
-
-let bite: Target.Dependency = .product(
-	name: "Bite",
-	package: "Bite"
 )
 
 // MARK: - Defining TCA Modules
@@ -146,7 +87,10 @@ extension Package {
 			.init(
 				name: name,
 				category: "Features",
-				dependencies: dependencies,
+				dependencies: dependencies + [
+					"RadixFoundation",
+					.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
+				],
 				exclude: exclude,
 				resources: resources,
 				plugins: plugins,
@@ -167,7 +111,10 @@ extension Package {
 			.init(
 				name: name,
 				category: "Clients",
-				dependencies: dependencies,
+				dependencies: dependencies + [
+					"RadixFoundation",
+					.product(name: "Dependencies", package: "swift-dependencies"),
+				],
 				exclude: exclude,
 				resources: resources,
 				plugins: plugins,
@@ -188,7 +135,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Core",
-				dependencies: dependencies,
+				dependencies: ["RadixFoundation"] + dependencies,
 				exclude: exclude,
 				resources: resources,
 				plugins: plugins,
@@ -302,7 +249,6 @@ package.addModules([
 			"PasteboardClient",
 			engineToolkit,
 			profile,
-			tca,
 
 		],
 		tests: .yes(
@@ -317,7 +263,6 @@ package.addModules([
 			"FungibleTokenListFeature",
 			"PasteboardClient",
 			"ProfileClient",
-			tca,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -330,7 +275,6 @@ package.addModules([
 			"DesignSystem",
 			"ErrorQueue",
 			"FaucetClient",
-			tca,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -341,7 +285,6 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"DesignSystem",
-			tca,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -362,7 +305,6 @@ package.addModules([
 			"ProfileClient",
 			"Resources",
 			"SplashFeature",
-			tca,
 			"UserDefaultsClient",
 			// ^^^ Sort lexicographically ^^^
 		],
@@ -381,7 +323,6 @@ package.addModules([
 			"Common",
 			"FungibleTokenListFeature",
 			"NonFungibleTokenListFeature",
-			tca,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -398,7 +339,6 @@ package.addModules([
 			"KeychainClientDependency",
 			"LocalAuthenticationClient",
 			"ProfileClient",
-			tca,
 		],
 		tests: .yes(
 			dependencies: [
@@ -413,7 +353,6 @@ package.addModules([
 			"DesignSystem",
 			"PasteboardClient",
 			"SharedModels",
-			tca,
 		],
 		tests: .no
 	),
@@ -424,14 +363,12 @@ package.addModules([
 			"Common",
 			"DesignSystem",
 			"FungibleTokenDetailsFeature",
-			tca,
 		],
 		tests: .yes(
 			dependencies: [
 				"Asset",
 				"DesignSystem",
 				profile,
-				tca,
 				"TestUtils",
 			]
 		)
@@ -446,13 +383,11 @@ package.addModules([
 			"ErrorQueue",
 			"ProfileClient",
 			"SharedModels",
-			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: [
 				"ProfileClient",
-				tca,
 				"TestUtils",
 			]
 		)
@@ -460,12 +395,10 @@ package.addModules([
 	.feature(
 		name: "HandleDappRequests",
 		dependencies: [
-			collections,
 			"GrantDappWalletAccessFeature",
 			"P2PConnectivityClient",
 			profile,
 			"SharedModels",
-			tca,
 			"TransactionSigningFeature",
 		], tests: .yes(dependencies: ["TestUtils"])
 	),
@@ -485,7 +418,6 @@ package.addModules([
 			"GrantDappWalletAccessFeature",
 			"ProfileClient",
 			"SharedModels",
-			tca,
 			"TransactionSigningFeature",
 			// ^^^ Sort lexicographically ^^^
 		],
@@ -508,7 +440,6 @@ package.addModules([
 			"JSON",
 			"KeychainClientDependency",
 			"ProfileClient",
-			tca,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"],
@@ -526,7 +457,6 @@ package.addModules([
 			"HomeFeature",
 			"PasteboardClient",
 			"SettingsFeature",
-			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -539,7 +469,6 @@ package.addModules([
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			p2pConnection,
-			dependencies,
 			"DesignSystem",
 			"ErrorQueue",
 			"NewConnectionFeature",
@@ -557,12 +486,10 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"CreateAccountFeature",
-			dependencies,
 			"ErrorQueue",
 			"DesignSystem",
 			"GatewayAPI",
 			"ProfileClient",
-			tca,
 			"UserDefaultsClient",
 		],
 		tests: .yes(
@@ -580,7 +507,6 @@ package.addModules([
 			"ErrorQueue",
 			"P2PConnectivityClient",
 			"SharedModels",
-			tca,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -595,7 +521,6 @@ package.addModules([
 			engineToolkit,
 			"PasteboardClient",
 			"SharedModels",
-			tca,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -608,7 +533,6 @@ package.addModules([
 			"DesignSystem",
 			"CreateAccountFeature",
 			"ImportProfileFeature",
-			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -632,7 +556,6 @@ package.addModules([
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
 			"ProfileClient",
 			.product(name: "ProfileView", package: "swift-profile"),
-			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -650,7 +573,6 @@ package.addModules([
 			"PlatformEnvironmentClient",
 			"ProfileClient",
 			"ProfileLoader",
-			tca,
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -668,7 +590,6 @@ package.addModules([
 			"GatewayAPI",
 			"ProfileClient",
 			"SharedModels",
-			tca,
 			"TransactionClient",
 			// ^^^ Sort lexicographically ^^^
 		],
@@ -686,16 +607,13 @@ package.addModules([
 		dependencies: [
 			"AppSettings",
 			"Asset",
-			bigInt,
 			"Common",
 			engineToolkit,
 			"GatewayAPI",
 			profile,
-			dependencies,
 		],
 		tests: .yes(
 			dependencies: [
-				dependencies,
 				"TestUtils",
 			]
 		)
@@ -704,7 +622,6 @@ package.addModules([
 		name: "AppSettings",
 		dependencies: [
 			"Common",
-			dependencies,
 			"JSON",
 			"UserDefaultsClient",
 		],
@@ -714,18 +631,13 @@ package.addModules([
 	),
 	.client(
 		name: "CameraPermissionClient",
-		dependencies: [
-			dependencies,
-		],
+		dependencies: [],
 		tests: .no
 	),
 	.client(
 		name: "EngineToolkitClient",
 		dependencies: [
-			bigInt,
-			bite,
 			"Common",
-			dependencies,
 			engineToolkit,
 			profile, // AccountAddress
 		],
@@ -735,18 +647,13 @@ package.addModules([
 	),
 	.client(
 		name: "ErrorQueue",
-		dependencies: [
-			asyncAlgorithms,
-			asyncExtensions,
-			dependencies,
-		],
+		dependencies: [],
 		tests: .no
 	),
 	.client(
 		name: "FaucetClient",
 		dependencies: [
 			"Common",
-			dependencies,
 			engineToolkit,
 			"EngineToolkitClient",
 			"GatewayAPI",
@@ -757,9 +664,7 @@ package.addModules([
 	),
 	.client(
 		name: "FileClient",
-		dependencies: [
-			dependencies,
-		],
+		dependencies: [],
 		tests: .no
 	),
 	.client(
@@ -767,9 +672,7 @@ package.addModules([
 		dependencies: [
 			.product(name: "AnyCodable", package: "AnyCodable"),
 			"Asset",
-			bigInt,
 			"Common",
-			dependencies, // XCTestDynamicOverlay + DependencyKey
 			engineToolkit,
 			"EngineToolkitClient",
 			"JSON",
@@ -784,25 +687,21 @@ package.addModules([
 		)
 	),
 	.client(
-		name: "JSON", // TODO: extract into external CoreDependencies package, or just as part of Common
-		dependencies: [
-			dependencies,
-		],
+		name: "JSON", // TODO: extract into RadixFoundation package
+		dependencies: [],
 		tests: .no
 	),
+	// TODO: remove KeychainClientDependency
 	.client(
 		name: "KeychainClientDependency",
 		dependencies: [
-			dependencies,
 			.product(name: "KeychainClient", package: "swift-profile"),
 		],
 		tests: .no
 	),
 	.client(
 		name: "LocalAuthenticationClient",
-		dependencies: [
-			dependencies,
-		],
+		dependencies: [],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
@@ -810,10 +709,7 @@ package.addModules([
 	.client(
 		name: "P2PConnectivityClient",
 		dependencies: [
-			asyncAlgorithms,
-			asyncExtensions,
 			"Common",
-			dependencies,
 			engineToolkit, // Model: SignTX contains Manifest
 			"JSON",
 			profile, // Account
@@ -828,20 +724,19 @@ package.addModules([
 	),
 	.client(
 		name: "PasteboardClient",
-		dependencies: [dependencies],
+		dependencies: [],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
 	),
 	.client(
 		name: "PlatformEnvironmentClient",
-		dependencies: [dependencies],
+		dependencies: [],
 		tests: .no
 	),
 	.client(
 		name: "ProfileClient",
 		dependencies: [
-			dependencies, // XCTestDynamicOverlay + DependencyKey
 			"EngineToolkitClient", // Create TX
 			p2pModels,
 			profile,
@@ -869,7 +764,6 @@ package.addModules([
 		name: "TransactionClient",
 		dependencies: [
 			"GatewayAPI",
-			dependencies,
 			"ProfileClient",
 		],
 		tests: .yes(dependencies: [
@@ -878,7 +772,7 @@ package.addModules([
 	),
 	.client(
 		name: "UserDefaultsClient",
-		dependencies: [dependencies],
+		dependencies: [],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
@@ -894,7 +788,6 @@ package.addModules([
 			"Common",
 			"EngineToolkitClient", // I know, this is very wrong. Apologies. Let's revisit our dependency levels post betanet.
 			profile, // Address
-			bigInt,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -903,14 +796,10 @@ package.addModules([
 	.core(
 		name: "Common",
 		dependencies: [
-			bite,
-			bigInt,
 			"DesignSystem",
 			engineToolkit,
-			legibleError,
 			profile, // Address
 			"Resources",
-			tagged,
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -920,11 +809,8 @@ package.addModules([
 		name: "SharedModels",
 		dependencies: [
 			"Asset",
-			bigInt,
-			collections,
 			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make EngineToolkit, etc. vend their own Model packages.
 			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
-			nonEmpty,
 			p2pModels,
 			p2pConnection,
 			profile, // FIXME: In `Profile` split out Models package
@@ -963,10 +849,39 @@ package.addModules([
 	.core(
 		name: "TestUtils",
 		dependencies: [
-			bite,
 			"Common",
-			tca,
 		],
 		tests: .no
 	),
 ])
+
+// MARK: - Modules
+
+package.addModules([
+	.module(
+		name: "RadixFoundation",
+		dependencies: [
+			.product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
+			.product(name: "AsyncExtensions", package: "AsyncExtensions"),
+			.product(name: "BigInt", package: "BigInt"),
+			.product(name: "Bite", package: "Bite"),
+			.product(name: "Collections", package: "swift-collections"),
+			.product(name: "LegibleError", package: "LegibleError"),
+			.product(name: "NonEmpty", package: "swift-nonempty"),
+			.product(name: "Tagged", package: "swift-tagged"),
+		],
+		tests: .no
+	),
+])
+
+package.dependencies += [
+	// ~ RadixFoundation-only dependencies ~
+	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
+	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
+	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
+	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.3"), // TODO: move in locally
+	.package(url: "https://github.com/apple/swift-collections", from: "1.0.3"),
+	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
+	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
+	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
+]
