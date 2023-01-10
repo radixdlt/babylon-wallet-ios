@@ -1,5 +1,5 @@
 import EngineToolkit
-import RadixFoundation
+import Prelude
 
 // MARK: - TransactionIntent.TXID
 public extension TransactionIntent {

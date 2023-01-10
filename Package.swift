@@ -89,7 +89,7 @@ extension Package {
 				category: "Features",
 				dependencies: dependencies + [
 					.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-					"RadixFoundation",
+					"Prelude",
 				],
 				exclude: exclude,
 				resources: resources,
@@ -113,7 +113,7 @@ extension Package {
 				category: "Clients",
 				dependencies: dependencies + [
 					.product(name: "Dependencies", package: "swift-dependencies"),
-					"RadixFoundation",
+					"Prelude",
 				],
 				exclude: exclude,
 				resources: resources,
@@ -135,7 +135,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Core",
-				dependencies: dependencies + ["RadixFoundation"],
+				dependencies: dependencies + ["Prelude"],
 				exclude: exclude,
 				resources: resources,
 				plugins: plugins,
@@ -687,7 +687,7 @@ package.addModules([
 		)
 	),
 	.client(
-		name: "JSON", // TODO: extract into RadixFoundation package
+		name: "JSON", // TODO: extract into Prelude package
 		dependencies: [],
 		tests: .no
 	),
@@ -859,7 +859,7 @@ package.addModules([
 
 package.addModules([
 	.module(
-		name: "RadixFoundation",
+		name: "Prelude",
 		dependencies: [
 			.product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
 			.product(name: "AsyncExtensions", package: "AsyncExtensions"),
@@ -875,7 +875,7 @@ package.addModules([
 ])
 
 package.dependencies += [
-	// ~ RadixFoundation-only dependencies ~
+	// ~ Prelude-only dependencies ~
 	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
 	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),

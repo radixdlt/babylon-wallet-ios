@@ -1,5 +1,5 @@
 import Dependencies
-import RadixFoundation
+import Prelude
 
 extension ErrorQueue: DependencyKey {
 	public typealias Value = ErrorQueue

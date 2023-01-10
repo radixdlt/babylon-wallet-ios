@@ -1,8 +1,8 @@
 import TestUtils
 
 import ComposableArchitecture
+import Prelude
 import ProfileClient
-import RadixFoundation
 import SharedModels
 
 @testable import GrantDappWalletAccessFeature

@@ -1,7 +1,7 @@
 import Dependencies
 import P2PModels
+import Prelude
 import Profile
-import RadixFoundation
 import SharedModels
 import XCTestDynamicOverlay
 

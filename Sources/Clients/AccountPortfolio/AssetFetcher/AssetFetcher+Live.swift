@@ -3,8 +3,8 @@ import Common
 import Dependencies
 import EngineToolkit
 import GatewayAPI
+import Prelude
 import Profile
-import RadixFoundation
 
 // MARK: - AssetFetcher + DependencyKey
 extension AssetFetcher: DependencyKey {

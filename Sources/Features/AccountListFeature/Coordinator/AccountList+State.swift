@@ -1,6 +1,6 @@
 import ComposableArchitecture
+import Prelude
 import Profile
-import RadixFoundation
 
 // MARK: - AccountList.State
 public extension AccountList {

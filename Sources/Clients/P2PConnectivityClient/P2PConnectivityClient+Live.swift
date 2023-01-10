@@ -2,8 +2,8 @@ import Dependencies
 import JSON
 import Network
 import P2PConnection
+import Prelude
 import ProfileClient
-import RadixFoundation
 import Resources
 import SharedModels
 

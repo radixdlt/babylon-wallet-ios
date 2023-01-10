@@ -1,8 +1,8 @@
 import Common
 import EngineToolkit
 import EngineToolkitClient
+import Prelude
 import Profile
-import RadixFoundation
 
 // MARK: - FungibleToken
 public struct FungibleToken: Sendable, Asset, Token, Hashable {

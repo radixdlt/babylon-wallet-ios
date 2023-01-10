@@ -1,4 +1,4 @@
-import RadixFoundation
+import Prelude
 
 public extension FixedWidthInteger {
 	var inAttos: BigUInt {

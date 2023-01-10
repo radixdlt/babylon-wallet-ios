@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import GrantDappWalletAccessFeature
+import Prelude
 import Profile
-import RadixFoundation
 import SharedModels
 import TransactionSigningFeature
 

@@ -1,7 +1,7 @@
 import ComposableArchitecture
 @testable import GrantDappWalletAccessFeature
+import Prelude
 import Profile
-import RadixFoundation
 import SharedModels
 import TestUtils
 

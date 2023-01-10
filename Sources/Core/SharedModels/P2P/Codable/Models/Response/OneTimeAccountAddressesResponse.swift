@@ -1,4 +1,4 @@
-import RadixFoundation
+import Prelude
 
 // MARK: - P2P.ToDapp.OneTimeAccountsResponseItem
 public extension P2P.ToDapp {

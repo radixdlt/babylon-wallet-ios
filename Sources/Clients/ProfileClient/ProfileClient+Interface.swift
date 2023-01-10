@@ -3,8 +3,8 @@ import EngineToolkit
 import KeychainClient
 import Mnemonic
 import P2PModels
+import Prelude
 import Profile
-import RadixFoundation
 import SLIP10
 
 // MARK: - CreateNewProfileRequest

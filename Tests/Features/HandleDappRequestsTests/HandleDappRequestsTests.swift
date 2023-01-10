@@ -2,8 +2,8 @@ import ComposableArchitecture
 @testable import HandleDappRequests
 import P2PConnection
 import P2PModels
+import Prelude
 import Profile
-import RadixFoundation
 import SharedModels
 import TestUtils
 import XCTest

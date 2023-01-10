@@ -9,8 +9,8 @@ import FungibleTokenListFeature
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
 import PasteboardClient
+import Prelude
 import Profile
-import RadixFoundation
 import SharedModels
 import TransactionSigningFeature
 

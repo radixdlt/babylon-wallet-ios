@@ -3,9 +3,9 @@ import Dependencies
 import EngineToolkit
 import EngineToolkitClient
 import GatewayAPI
+import Prelude
 import Profile
 import ProfileClient
-import RadixFoundation
 import SLIP10
 
 public extension TransactionClient {

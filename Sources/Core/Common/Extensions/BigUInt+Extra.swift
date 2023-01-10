@@ -1,4 +1,4 @@
-import RadixFoundation
+import Prelude
 
 // MARK: - BigUInt + Sendable
 extension BigUInt: @unchecked Sendable {}

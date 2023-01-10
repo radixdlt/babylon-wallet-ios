@@ -1,7 +1,7 @@
 import Asset
 import Dependencies
+import Prelude
 import Profile
-import RadixFoundation
 
 // MARK: - AssetFetcher
 public struct AssetFetcher: Sendable {

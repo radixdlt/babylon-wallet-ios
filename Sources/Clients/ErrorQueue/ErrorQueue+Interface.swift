@@ -1,4 +1,4 @@
-import RadixFoundation
+import Prelude
 
 public struct ErrorQueue {
 	public var errors: @Sendable () -> AnyAsyncSequence<Error>

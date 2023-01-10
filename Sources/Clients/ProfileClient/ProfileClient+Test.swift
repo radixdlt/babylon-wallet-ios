@@ -1,7 +1,7 @@
 import Dependencies
 import Mnemonic
+import Prelude
 import Profile
-import RadixFoundation
 import SharedModels
 import XCTestDynamicOverlay
 

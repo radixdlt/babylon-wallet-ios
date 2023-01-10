@@ -8,8 +8,8 @@ import ComposableArchitecture
 import CreateAccountFeature
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
+import Prelude
 import Profile
-import RadixFoundation
 import SharedModels
 import TransactionSigningFeature
 
