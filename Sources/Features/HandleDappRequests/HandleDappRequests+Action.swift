@@ -1,8 +1,7 @@
-import Collections
 import ComposableArchitecture
-import Foundation
 import GrantDappWalletAccessFeature
 import P2PConnection
+import Prelude
 import Profile
 import SharedModels
 import TransactionSigningFeature

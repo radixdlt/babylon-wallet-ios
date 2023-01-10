@@ -1,7 +1,5 @@
-import AsyncAlgorithms
-import AsyncExtensions
 import Dependencies
-import Foundation
+import Prelude
 
 extension ErrorQueue: DependencyKey {
 	public typealias Value = ErrorQueue

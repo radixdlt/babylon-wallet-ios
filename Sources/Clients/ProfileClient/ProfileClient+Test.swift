@@ -1,8 +1,6 @@
-import Collections
 import Dependencies
-import Foundation
 import Mnemonic
-import NonEmpty
+import Prelude
 import Profile
 import SharedModels
 import XCTestDynamicOverlay

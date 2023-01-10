@@ -1,7 +1,5 @@
-import Collections
 import ComposableArchitecture
-import Foundation
-import NonEmpty
+import Prelude
 import Profile
 import SharedModels
 

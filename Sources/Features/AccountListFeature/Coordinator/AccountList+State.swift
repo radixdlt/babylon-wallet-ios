@@ -1,6 +1,5 @@
-import Collections
 import ComposableArchitecture
-import NonEmpty
+import Prelude
 import Profile
 
 // MARK: - AccountList.State

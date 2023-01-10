@@ -3,14 +3,12 @@ import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
 import AppSettings
-import Collections
 import Common
 import ComposableArchitecture
 import CreateAccountFeature
-import Foundation
 import GrantDappWalletAccessFeature
-import NonEmpty
 import P2PConnectivityClient
+import Prelude
 import Profile
 import SharedModels
 import TransactionSigningFeature

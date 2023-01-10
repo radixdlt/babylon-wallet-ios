@@ -1,6 +1,4 @@
-import AsyncAlgorithms
-import AsyncExtensions
-import Foundation
+import Prelude
 
 public struct ErrorQueue {
 	public var errors: @Sendable () -> AnyAsyncSequence<Error>

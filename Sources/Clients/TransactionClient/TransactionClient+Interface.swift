@@ -26,8 +26,7 @@ public extension DependencyValues {
 	}
 }
 
-import Collections
-import NonEmpty
+import Prelude
 import Profile
 import ProfileClient
 

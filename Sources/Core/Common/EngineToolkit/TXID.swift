@@ -1,6 +1,5 @@
 import EngineToolkit
-import Foundation
-import Tagged
+import Prelude
 
 // MARK: - TransactionIntent.TXID
 public extension TransactionIntent {

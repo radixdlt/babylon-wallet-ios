@@ -1,10 +1,9 @@
-import Collections
 import Common
 import ComposableArchitecture
-import Foundation
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
 import P2PModels
+import Prelude
 import Profile
 import SharedModels
 import TransactionClient

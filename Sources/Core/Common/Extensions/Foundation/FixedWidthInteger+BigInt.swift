@@ -1,5 +1,4 @@
-import BigInt
-import Foundation
+import Prelude
 
 public extension FixedWidthInteger {
 	var inAttos: BigUInt {

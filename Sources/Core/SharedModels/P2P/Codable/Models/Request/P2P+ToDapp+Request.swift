@@ -1,6 +1,5 @@
 import EngineToolkit
-import Foundation
-import Tagged
+import Prelude
 
 // MARK: - P2P.FromDapp.Request
 public extension P2P.FromDapp {
