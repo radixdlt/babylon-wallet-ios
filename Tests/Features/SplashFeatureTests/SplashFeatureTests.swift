@@ -38,9 +38,21 @@ final class SplashFeatureTests: TestCase {
 		}
 		await testScheduler.advance(by: .seconds(0.2))
 		await store.receive(.internal(.system(.biometricsConfigResult(.success(authBiometricsConfig))))) {
-			$0.alert = .init(
-				title: .init("Biometrics not set up"),
-				message: .init("This app requires your phone to have biometrics set up")
+			$0.biometricsCheckFailedAlert = .init(
+				title: { .init(L10n.Splash.Alert.BiometricsCheckFailed.title) },
+				actions: {
+					ButtonState(
+						role: .cancel,
+						action: .send(.cancelButtonTapped),
+						label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.cancelButtonTitle) }
+					)
+					ButtonState(
+						role: .none,
+						action: .send(.openSettingsButtonTapped),
+						label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.settingsButtonTitle) }
+					)
+				},
+				message: { .init(L10n.Splash.Alert.BiometricsCheckFailed.message) }
 			)
 		}
 	}

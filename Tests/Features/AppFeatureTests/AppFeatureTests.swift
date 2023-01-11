@@ -53,7 +53,7 @@ final class AppFeatureTests: TestCase {
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
 			.success(existingProfile)
 		)))))) {
-			$0.root = .splash(.init(alert: nil, profileResult: .success(existingProfile)))
+			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: .success(existingProfile)))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
@@ -87,7 +87,7 @@ final class AppFeatureTests: TestCase {
 
 		// when
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(nil))))))) {
-			$0.root = .splash(.init(alert: nil, profileResult: .success(nil)))
+			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: .success(nil)))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
@@ -130,7 +130,7 @@ final class AppFeatureTests: TestCase {
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
 			result
 		)))))) {
-			$0.root = .splash(.init(alert: nil, profileResult: result))
+			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: result))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
@@ -184,7 +184,7 @@ final class AppFeatureTests: TestCase {
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
 			result
 		)))))) {
-			$0.root = .splash(.init(alert: nil, profileResult: result))
+			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: result))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
@@ -231,7 +231,7 @@ final class AppFeatureTests: TestCase {
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
 			result
 		)))))) {
-			$0.root = .splash(.init(alert: nil, profileResult: result))
+			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: result))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
