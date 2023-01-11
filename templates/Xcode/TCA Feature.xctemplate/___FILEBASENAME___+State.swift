@@ -1,4 +1,5 @@
-import Foundation
+import ComposableArchitecture
+import Prelude
 
 // MARK: - ___VARIABLE_featureName___.State
 public extension ___VARIABLE_featureName___ {
