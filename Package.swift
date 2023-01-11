@@ -689,9 +689,6 @@ package.addModules([
 			.product(name: "BigInt", package: "BigInt") {
 				.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0")
 			},
-			.product(name: "Bite", package: "Bite") {
-				.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.3") // TODO: move in locally
-			},
 			.product(name: "Collections", package: "swift-collections") {
 				.package(url: "https://github.com/apple/swift-collections", from: "1.0.3")
 			},
