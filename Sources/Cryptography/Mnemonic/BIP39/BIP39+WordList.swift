@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 // MARK: - BIP39.WordList
 public extension BIP39 {
