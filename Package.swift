@@ -19,22 +19,6 @@ package.dependencies += [
 	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.11"),
 	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.4.0"),
 	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.1.4"),
-
-	// TCA
-	.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1"),
-	.package(url: "https://github.com/pointfreeco/swift-dependencies", from: "0.1.1"),
-	.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3"), // TODO: remove when new TCA tools are available
-
-	// Build tools
-	.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0"),
-
-	// UI
-	.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1"),
-	.package(url: "https://github.com/kean/Nuke", from: "11.3.1"),
-	.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4"),
-
-	// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
-	.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6"),
 ]
 
 let profile: Target.Dependency = .product(
@@ -56,184 +40,6 @@ let engineToolkit: Target.Dependency = .product(
 	name: "EngineToolkit",
 	package: "swift-engine-toolkit"
 )
-
-// MARK: - Defining TCA Modules
-
-extension Package {
-	struct Module {
-		enum Tests {
-			case no
-			case yes(nameSuffix: String = "Tests", dependencies: [Target.Dependency], resources: [Resource]? = nil)
-		}
-
-		let name: String
-		let category: String?
-		let dependencies: [Target.Dependency]
-		let exclude: [String]
-		let resources: [Resource]?
-		let plugins: [Target.PluginUsage]?
-		let tests: Tests
-		let isProduct: Bool
-
-		static func feature(
-			name: String,
-			dependencies: [Target.Dependency],
-			exclude: [String] = [],
-			resources: [Resource]? = nil,
-			plugins: [Target.PluginUsage]? = nil,
-			tests: Tests,
-			isProduct: Bool = true
-		) -> Self {
-			.init(
-				name: name,
-				category: "Features",
-				dependencies: dependencies + [
-					.product(name: "ComposableArchitecture", package: "swift-composable-architecture"),
-					"Prelude",
-				],
-				exclude: exclude,
-				resources: resources,
-				plugins: plugins,
-				tests: tests,
-				isProduct: isProduct
-			)
-		}
-
-		static func client(
-			name: String,
-			dependencies: [Target.Dependency],
-			exclude: [String] = [],
-			resources: [Resource]? = nil,
-			plugins: [Target.PluginUsage]? = nil,
-			tests: Tests,
-			isProduct: Bool = true
-		) -> Self {
-			.init(
-				name: name,
-				category: "Clients",
-				dependencies: dependencies + [
-					.product(name: "Dependencies", package: "swift-dependencies"),
-					"Prelude",
-				],
-				exclude: exclude,
-				resources: resources,
-				plugins: plugins,
-				tests: tests,
-				isProduct: isProduct
-			)
-		}
-
-		static func core(
-			name: String,
-			dependencies: [Target.Dependency],
-			exclude: [String] = [],
-			resources: [Resource]? = nil,
-			plugins: [Target.PluginUsage]? = nil,
-			tests: Tests,
-			isProduct: Bool = false
-		) -> Self {
-			.init(
-				name: name,
-				category: "Core",
-				dependencies: dependencies + ["Prelude"],
-				exclude: exclude,
-				resources: resources,
-				plugins: plugins,
-				tests: tests,
-				isProduct: isProduct
-			)
-		}
-
-		static func module(
-			name: String,
-			dependencies: [Target.Dependency],
-			exclude: [String] = [],
-			resources: [Resource]? = nil,
-			plugins: [Target.PluginUsage]? = nil,
-			tests: Tests,
-			isProduct: Bool = true
-		) -> Self {
-			.init(
-				name: name,
-				category: nil,
-				dependencies: dependencies,
-				exclude: exclude,
-				resources: resources,
-				plugins: plugins,
-				tests: tests,
-				isProduct: isProduct
-			)
-		}
-	}
-
-	func addModules(_ modules: [Module]) {
-		for module in modules {
-			addModule(module)
-		}
-	}
-
-	private func addModule(_ module: Module) {
-		let targetName = module.name
-		let targetPath = {
-			if let category = module.category {
-				return "Sources/\(category)/\(targetName)"
-			} else {
-				return "Sources/\(targetName)"
-			}
-		}()
-
-		package.targets += [
-			.target(
-				name: targetName,
-				dependencies: module.dependencies,
-				path: targetPath,
-				exclude: module.exclude,
-				resources: module.resources,
-				swiftSettings: [
-					.unsafeFlags([
-						"-Xfrontend", "-warn-concurrency",
-						"-Xfrontend", "-enable-actor-data-race-checks",
-					]),
-				],
-				plugins: module.plugins
-			),
-		]
-
-		switch module.tests {
-		case .no:
-			break
-		case let .yes(nameSuffix, testDependencies, resources):
-			let testTargetName = targetName + nameSuffix
-			let testTargetPath = {
-				if let category = module.category {
-					return "Tests/\(category)/\(testTargetName)"
-				} else {
-					return "Tests/\(testTargetName)"
-				}
-			}()
-			package.targets += [
-				.testTarget(
-					name: testTargetName,
-					dependencies: [.target(name: targetName)] + testDependencies,
-					path: testTargetPath,
-					resources: resources,
-					swiftSettings: [
-						.unsafeFlags([
-							"-Xfrontend", "-warn-concurrency",
-							"-Xfrontend", "-enable-actor-data-race-checks",
-						]),
-					]
-				),
-			]
-		}
-
-		if module.isProduct {
-			package.products += [
-				.library(name: targetName, targets: [targetName]),
-			]
-		}
-	}
-}
 
 // MARK: - Features
 
@@ -500,7 +306,9 @@ package.addModules([
 		name: "NewConnectionFeature",
 		dependencies: [
 			"CameraPermissionClient",
-			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])),
+			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
+				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
+			},
 			p2pConnection,
 			"Common",
 			"DesignSystem",
@@ -670,7 +478,10 @@ package.addModules([
 	.client(
 		name: "GatewayAPI",
 		dependencies: [
-			.product(name: "AnyCodable", package: "AnyCodable"),
+			.product(name: "AnyCodable", package: "AnyCodable") {
+				// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
+				.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6")
+			},
 			"Asset",
 			"Common",
 			engineToolkit,
@@ -822,10 +633,16 @@ package.addModules([
 	.core(
 		name: "DesignSystem",
 		dependencies: [
-			.product(name: "Introspect", package: "SwiftUI-Introspect"),
-			.product(name: "NukeUI", package: "Nuke"),
+			.product(name: "Introspect", package: "SwiftUI-Introspect") {
+				.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4")
+			},
+			.product(name: "NukeUI", package: "Nuke") {
+				.package(url: "https://github.com/kean/Nuke", from: "11.3.1")
+			},
 			"Resources",
-			.product(name: "SwiftUINavigation", package: "swiftui-navigation"),
+			.product(name: "SwiftUINavigation", package: "swiftui-navigation") {
+				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3")
+			},
 		],
 		tests: .yes(
 			dependencies: [
@@ -841,7 +658,9 @@ package.addModules([
 			.process("Resources/"),
 		],
 		plugins: [
-			.plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin"),
+			.plugin(name: "SwiftGenPlugin", package: "SwiftGenPlugin") {
+				.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0")
+			},
 		],
 		tests: .no,
 		isProduct: true
@@ -861,31 +680,251 @@ package.addModules([
 	.module(
 		name: "Prelude",
 		dependencies: [
-			.product(name: "AsyncAlgorithms", package: "swift-async-algorithms"),
-			.product(name: "AsyncExtensions", package: "AsyncExtensions"),
-			.product(name: "BigInt", package: "BigInt"),
-			.product(name: "Bite", package: "Bite"),
-			.product(name: "Collections", package: "swift-collections"),
-			.product(name: "CustomDump", package: "swift-custom-dump"),
-			.product(name: "IdentifiedCollections", package: "swift-identified-collections"),
-			.product(name: "LegibleError", package: "LegibleError"),
-			.product(name: "NonEmpty", package: "swift-nonempty"),
-			.product(name: "Tagged", package: "swift-tagged"),
+			.product(name: "AsyncAlgorithms", package: "swift-async-algorithms") {
+				.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3")
+			},
+			.product(name: "AsyncExtensions", package: "AsyncExtensions") {
+				.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1")
+			},
+			.product(name: "BigInt", package: "BigInt") {
+				.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0")
+			},
+			.product(name: "Bite", package: "Bite") {
+				.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.3") // TODO: move in locally
+			},
+			.product(name: "Collections", package: "swift-collections") {
+				.package(url: "https://github.com/apple/swift-collections", from: "1.0.3")
+			},
+			.product(name: "CustomDump", package: "swift-custom-dump") {
+				.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.1")
+			},
+			.product(name: "Dependencies", package: "swift-dependencies") {
+				.package(url: "https://github.com/pointfreeco/swift-dependencies", from: "0.1.1")
+			},
+			.product(name: "IdentifiedCollections", package: "swift-identified-collections") {
+				.package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "0.6.0")
+			},
+			.product(name: "LegibleError", package: "LegibleError") {
+				.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6")
+			},
+			.product(name: "NonEmpty", package: "swift-nonempty") {
+				.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0")
+			},
+			.product(name: "Tagged", package: "swift-tagged") {
+				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
+			},
 		],
 		tests: .no
 	),
 ])
 
-package.dependencies += [
-	// ~ Prelude-only dependencies ~
-	.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3"),
-	.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1"),
-	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
-	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.3"), // TODO: move in locally
-	.package(url: "https://github.com/apple/swift-collections", from: "1.0.3"),
-	.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.1"),
-	.package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "0.6.0"),
-	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
-	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
-	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
-]
+// MARK: - Extensions
+
+extension Package {
+	struct Module {
+		enum Tests {
+			case no
+			case yes(nameSuffix: String = "Tests", dependencies: [Target.Dependency], resources: [Resource]? = nil)
+		}
+
+		let name: String
+		let category: String?
+		let dependencies: [Target.Dependency]
+		let exclude: [String]
+		let resources: [Resource]?
+		let plugins: [Target.PluginUsage]?
+		let tests: Tests
+		let isProduct: Bool
+
+		static func feature(
+			name: String,
+			dependencies: [Target.Dependency],
+			exclude: [String] = [],
+			resources: [Resource]? = nil,
+			plugins: [Target.PluginUsage]? = nil,
+			tests: Tests,
+			isProduct: Bool = true
+		) -> Self {
+			.init(
+				name: name,
+				category: "Features",
+				dependencies: dependencies + [
+					.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
+						.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1")
+					},
+					"DesignSystem",
+				],
+				exclude: exclude,
+				resources: resources,
+				plugins: plugins,
+				tests: tests,
+				isProduct: isProduct
+			)
+		}
+
+		static func client(
+			name: String,
+			dependencies: [Target.Dependency],
+			exclude: [String] = [],
+			resources: [Resource]? = nil,
+			plugins: [Target.PluginUsage]? = nil,
+			tests: Tests,
+			isProduct: Bool = true
+		) -> Self {
+			.init(
+				name: name,
+				category: "Clients",
+				dependencies: dependencies,
+				exclude: exclude,
+				resources: resources,
+				plugins: plugins,
+				tests: tests,
+				isProduct: isProduct
+			)
+		}
+
+		static func core(
+			name: String,
+			dependencies: [Target.Dependency],
+			exclude: [String] = [],
+			resources: [Resource]? = nil,
+			plugins: [Target.PluginUsage]? = nil,
+			tests: Tests,
+			isProduct: Bool = false
+		) -> Self {
+			.init(
+				name: name,
+				category: "Core",
+				dependencies: dependencies + ["Prelude"],
+				exclude: exclude,
+				resources: resources,
+				plugins: plugins,
+				tests: tests,
+				isProduct: isProduct
+			)
+		}
+
+		static func module(
+			name: String,
+			dependencies: [Target.Dependency],
+			exclude: [String] = [],
+			resources: [Resource]? = nil,
+			plugins: [Target.PluginUsage]? = nil,
+			tests: Tests,
+			isProduct: Bool = true
+		) -> Self {
+			.init(
+				name: name,
+				category: nil,
+				dependencies: dependencies,
+				exclude: exclude,
+				resources: resources,
+				plugins: plugins,
+				tests: tests,
+				isProduct: isProduct
+			)
+		}
+	}
+
+	func addModules(_ modules: [Module]) {
+		for module in modules {
+			addModule(module)
+		}
+	}
+
+	private func addModule(_ module: Module) {
+		let targetName = module.name
+		let targetPath = {
+			if let category = module.category {
+				return "Sources/\(category)/\(targetName)"
+			} else {
+				return "Sources/\(targetName)"
+			}
+		}()
+		let dependencies = {
+			if module.name == "Prelude" {
+				return module.dependencies
+			} else {
+				return module.dependencies + ["Prelude"]
+			}
+		}()
+
+		package.targets += [
+			.target(
+				name: targetName,
+				dependencies: dependencies,
+				path: targetPath,
+				exclude: module.exclude,
+				resources: module.resources,
+				swiftSettings: [
+					.unsafeFlags([
+						"-Xfrontend", "-warn-concurrency",
+						"-Xfrontend", "-enable-actor-data-race-checks",
+					]),
+				],
+				plugins: module.plugins
+			),
+		]
+
+		switch module.tests {
+		case .no:
+			break
+		case let .yes(nameSuffix, testDependencies, resources):
+			let testTargetName = targetName + nameSuffix
+			let testTargetPath = {
+				if let category = module.category {
+					return "Tests/\(category)/\(testTargetName)"
+				} else {
+					return "Tests/\(testTargetName)"
+				}
+			}()
+			package.targets += [
+				.testTarget(
+					name: testTargetName,
+					dependencies: [.target(name: targetName)] + testDependencies,
+					path: testTargetPath,
+					resources: resources,
+					swiftSettings: [
+						.unsafeFlags([
+							"-Xfrontend", "-warn-concurrency",
+							"-Xfrontend", "-enable-actor-data-race-checks",
+						]),
+					]
+				),
+			]
+		}
+
+		if module.isProduct {
+			package.products += [
+				.library(name: targetName, targets: [targetName]),
+			]
+		}
+	}
+}
+
+extension Target.Dependency {
+	static func product(
+		name: String,
+		package packageName: String,
+		condition: TargetDependencyCondition? = nil,
+		packageDependency: () -> Package.Dependency
+	) -> Self {
+		package.addDependencyIfNeeded(packageDependency())
+		return .product(name: name, package: packageName, condition: condition)
+	}
+}
+
+extension Target.PluginUsage {
+	static func plugin(name: String, package packageName: String, packageDependency: () -> Package.Dependency) -> Self {
+		package.addDependencyIfNeeded(packageDependency())
+		return .plugin(name: name, package: packageName)
+	}
+}
+
+extension Package {
+	func addDependencyIfNeeded(_ dependency: Package.Dependency) {
+		if !package.dependencies.contains(where: { $0.url == dependency.url }) {
+			package.dependencies.append(dependency)
+		}
+	}
+}
