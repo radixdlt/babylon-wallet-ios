@@ -1,5 +1,5 @@
 import EngineToolkit
-import Foundation
+import Prelude
 import Profile
 
 // MARK: - P2PFromDappWalletRequestItemProtocol
@@ -15,14 +15,14 @@ public extension P2P.FromDapp {
 	/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
 	///
 	struct SendTransactionWriteRequestItem: Sendable, Hashable, Decodable, P2PFromDappWalletRequestItemProtocol {
-		public let version: Version
+		public let version: TXVersion
 
 		public let transactionManifest: TransactionManifest
 		public let message: String?
 
 		public init(
 			transactionManifest: TransactionManifest,
-			version: Version,
+			version: TXVersion,
 			message: String?
 		) {
 			self.version = version
@@ -55,7 +55,7 @@ public extension P2P.FromDapp.SendTransactionWriteRequestItem {
 
 		try self.init(
 			transactionManifest: manifest,
-			version: container.decode(Version.self, forKey: .version),
+			version: container.decode(TXVersion.self, forKey: .version),
 			message: container.decodeIfPresent(String.self, forKey: .message)
 		)
 	}

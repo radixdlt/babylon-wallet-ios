@@ -1,5 +1,4 @@
-import Foundation
-import Mnemonic
+import Cryptography
 import Prelude
 
 public typealias MnemonicImporter = @Sendable (String) throws -> Mnemonic

@@ -1,7 +1,7 @@
+import Cryptography
 import EngineToolkit
-import Foundation
+import Prelude
 import Profile
-import SLIP10
 
 // MARK: - Network.KnownAddresses
 public extension Network {

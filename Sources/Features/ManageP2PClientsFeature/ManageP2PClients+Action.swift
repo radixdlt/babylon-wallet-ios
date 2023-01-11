@@ -1,8 +1,7 @@
 import ComposableArchitecture
-import Foundation
 import NewConnectionFeature
-import P2PConnection
 import P2PConnectivityClient
+import Prelude
 import Profile
 import SharedModels
 

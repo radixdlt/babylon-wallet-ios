@@ -1,6 +1,5 @@
 import Foundation
 import JSON
-import KeychainClientDependency
 import Prelude
 import Profile
 

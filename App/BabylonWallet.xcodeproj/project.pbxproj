@@ -15,12 +15,10 @@
 		E62B6BD62965C15100AA08E4 /* P2PConnectivityClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BD52965C15100AA08E4 /* P2PConnectivityClient */; };
 		E62B6BD82965C15800AA08E4 /* TransactionClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BD72965C15800AA08E4 /* TransactionClient */; };
 		E62B6BDA2965C16600AA08E4 /* EngineToolkitClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BD92965C16600AA08E4 /* EngineToolkitClient */; };
-		E62B6BE42965C18300AA08E4 /* KeychainClientDependency in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BE32965C18300AA08E4 /* KeychainClientDependency */; };
 		E62B6BE62965C18700AA08E4 /* FileClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BE52965C18700AA08E4 /* FileClient */; };
 		E62B6BE82965C18D00AA08E4 /* UserDefaultsClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BE72965C18D00AA08E4 /* UserDefaultsClient */; };
 		E62B6BF02965C1AD00AA08E4 /* EngineToolkitClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BEF2965C1AD00AA08E4 /* EngineToolkitClient */; };
 		E62B6BF22965C1AD00AA08E4 /* FileClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF12965C1AD00AA08E4 /* FileClient */; };
-		E62B6BF42965C1AD00AA08E4 /* KeychainClientDependency in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF32965C1AD00AA08E4 /* KeychainClientDependency */; };
 		E62B6BF62965C1AD00AA08E4 /* P2PConnectivityClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF52965C1AD00AA08E4 /* P2PConnectivityClient */; };
 		E62B6BF82965C1AD00AA08E4 /* ProfileClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF72965C1AD00AA08E4 /* ProfileClient */; };
 		E62B6BFA2965C1AD00AA08E4 /* TransactionClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF92965C1AD00AA08E4 /* TransactionClient */; };
@@ -70,7 +68,6 @@
 				E62B6BD82965C15800AA08E4 /* TransactionClient in Frameworks */,
 				E62B6BDA2965C16600AA08E4 /* EngineToolkitClient in Frameworks */,
 				E62B6BE62965C18700AA08E4 /* FileClient in Frameworks */,
-				E62B6BE42965C18300AA08E4 /* KeychainClientDependency in Frameworks */,
 				E62B6BD62965C15100AA08E4 /* P2PConnectivityClient in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -85,7 +82,6 @@
 				E62B6BF82965C1AD00AA08E4 /* ProfileClient in Frameworks */,
 				E62B6BF02965C1AD00AA08E4 /* EngineToolkitClient in Frameworks */,
 				E62B6BF62965C1AD00AA08E4 /* P2PConnectivityClient in Frameworks */,
-				E62B6BF42965C1AD00AA08E4 /* KeychainClientDependency in Frameworks */,
 				E667FFD328F6F7ED0015544F /* AppFeature in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -227,7 +223,6 @@
 				E62B6BD52965C15100AA08E4 /* P2PConnectivityClient */,
 				E62B6BD72965C15800AA08E4 /* TransactionClient */,
 				E62B6BD92965C16600AA08E4 /* EngineToolkitClient */,
-				E62B6BE32965C18300AA08E4 /* KeychainClientDependency */,
 				E62B6BE52965C18700AA08E4 /* FileClient */,
 				E62B6BE72965C18D00AA08E4 /* UserDefaultsClient */,
 			);
@@ -260,7 +255,6 @@
 				E667FFD228F6F7ED0015544F /* AppFeature */,
 				E62B6BEF2965C1AD00AA08E4 /* EngineToolkitClient */,
 				E62B6BF12965C1AD00AA08E4 /* FileClient */,
-				E62B6BF32965C1AD00AA08E4 /* KeychainClientDependency */,
 				E62B6BF52965C1AD00AA08E4 /* P2PConnectivityClient */,
 				E62B6BF72965C1AD00AA08E4 /* ProfileClient */,
 				E62B6BF92965C1AD00AA08E4 /* TransactionClient */,
@@ -585,10 +579,6 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = TransactionClient;
 		};
-		E62B6BE32965C18300AA08E4 /* KeychainClientDependency */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = KeychainClientDependency;
-		};
 		E62B6BE52965C18700AA08E4 /* FileClient */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FileClient;
@@ -616,10 +606,6 @@
 		E62B6BF12965C1AD00AA08E4 /* FileClient */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FileClient;
-		};
-		E62B6BF32965C1AD00AA08E4 /* KeychainClientDependency */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = KeychainClientDependency;
 		};
 		E62B6BF52965C1AD00AA08E4 /* P2PConnectivityClient */ = {
 			isa = XCSwiftPackageProductDependency;

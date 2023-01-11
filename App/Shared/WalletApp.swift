@@ -1,7 +1,6 @@
 import AppFeature
 import ComposableArchitecture
 import DesignSystem
-import KeychainClientDependency
 import Prelude
 import ProfileClient
 import SwiftUI

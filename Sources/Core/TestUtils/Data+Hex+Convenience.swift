@@ -1,6 +1,4 @@
-import Bite
-import Common
-import Foundation
+import Prelude
 
 public extension String {
 	var hexData: Data {

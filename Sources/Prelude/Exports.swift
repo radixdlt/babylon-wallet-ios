@@ -7,7 +7,8 @@
 @_exported import CustomDump
 @_exported import Dependencies
 @_exported import IdentifiedCollections
+@_exported import KeychainAccess
 @_exported import LegibleError
 @_exported import NonEmpty
 @_exported import Tagged
-@_exported import XCTestDynamicOverlay
+@_exported import Version

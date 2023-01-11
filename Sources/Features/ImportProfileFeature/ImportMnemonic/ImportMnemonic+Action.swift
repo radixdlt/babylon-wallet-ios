@@ -1,6 +1,6 @@
 import ComposableArchitecture
-import Foundation
-import Mnemonic
+import Cryptography
+import Prelude
 import Profile
 
 // MARK: - ImportMnemonic.Action

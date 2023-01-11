@@ -12,35 +12,6 @@ let package = Package(
 	]
 )
 
-// MARK: - Dependencies
-
-package.dependencies += [
-	// RDX Works dependencies
-	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.11"),
-	.package(url: "git@github.com:radixdlt/Converse.git", from: "0.4.0"),
-	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.1.4"),
-]
-
-let profile: Target.Dependency = .product(
-	name: "Profile",
-	package: "swift-profile"
-)
-
-let p2pConnection: Target.Dependency = .product(
-	name: "P2PConnection",
-	package: "Converse"
-)
-
-let p2pModels: Target.Dependency = .product(
-	name: "P2PModels",
-	package: "Converse"
-)
-
-let engineToolkit: Target.Dependency = .product(
-	name: "EngineToolkit",
-	package: "swift-engine-toolkit"
-)
-
 // MARK: - Features
 
 package.addModules([
@@ -53,8 +24,8 @@ package.addModules([
 			"AssetsViewFeature",
 			"DesignSystem",
 			"PasteboardClient",
-			engineToolkit,
-			profile,
+			"EngineToolkit",
+			"Profile",
 
 		],
 		tests: .yes(
@@ -102,7 +73,7 @@ package.addModules([
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AccountPortfolio",
 			"AppSettings",
-			engineToolkit,
+			"EngineToolkit",
 			"ErrorQueue",
 			"MainFeature",
 			"OnboardingFeature",
@@ -138,11 +109,12 @@ package.addModules([
 		name: "CreateAccountFeature",
 		dependencies: [
 			"Common",
+			"Cryptography",
 			"DesignSystem",
-			engineToolkit,
+			"EngineToolkit",
 			"ErrorQueue",
 			"GatewayAPI",
-			"KeychainClientDependency",
+//			"KeychainClientDependency",
 			"LocalAuthenticationClient",
 			"ProfileClient",
 		],
@@ -174,7 +146,7 @@ package.addModules([
 			dependencies: [
 				"Asset",
 				"DesignSystem",
-				profile,
+				"Profile",
 				"TestUtils",
 			]
 		)
@@ -203,7 +175,7 @@ package.addModules([
 		dependencies: [
 			"GrantDappWalletAccessFeature",
 			"P2PConnectivityClient",
-			profile,
+			"Profile",
 			"SharedModels",
 			"TransactionSigningFeature",
 		], tests: .yes(dependencies: ["TestUtils"])
@@ -220,7 +192,7 @@ package.addModules([
 			"P2PConnectivityClient",
 			"Common",
 			"CreateAccountFeature",
-			engineToolkit,
+			"EngineToolkit",
 			"GrantDappWalletAccessFeature",
 			"ProfileClient",
 			"SharedModels",
@@ -239,12 +211,13 @@ package.addModules([
 	.feature(
 		name: "ImportProfileFeature",
 		dependencies: [
+			"Cryptography",
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
 			"FileClient",
 			"JSON",
-			"KeychainClientDependency",
+//			"KeychainClientDependency",
 			"ProfileClient",
 		],
 		tests: .yes(
@@ -258,7 +231,7 @@ package.addModules([
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AppSettings",
 			"AccountPortfolio",
-			engineToolkit,
+//			"EngineToolkit",
 			"HandleDappRequests",
 			"HomeFeature",
 			"PasteboardClient",
@@ -274,7 +247,6 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-			p2pConnection,
 			"DesignSystem",
 			"ErrorQueue",
 			"NewConnectionFeature",
@@ -309,7 +281,6 @@ package.addModules([
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
-			p2pConnection,
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
@@ -326,7 +297,7 @@ package.addModules([
 			"Asset",
 			"Common",
 			"DesignSystem",
-			engineToolkit,
+			"EngineToolkit",
 			"PasteboardClient",
 			"SharedModels",
 		],
@@ -355,15 +326,13 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-			profile,
 			"ErrorQueue",
 			"GatewayAPI",
-			"KeychainClientDependency",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
 			"ProfileClient",
-			.product(name: "ProfileView", package: "swift-profile"),
+			"ProfileView",
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -416,9 +385,9 @@ package.addModules([
 			"AppSettings",
 			"Asset",
 			"Common",
-			engineToolkit,
+			"EngineToolkit",
 			"GatewayAPI",
-			profile,
+			"Profile",
 		],
 		tests: .yes(
 			dependencies: [
@@ -446,8 +415,9 @@ package.addModules([
 		name: "EngineToolkitClient",
 		dependencies: [
 			"Common",
-			engineToolkit,
-			profile, // AccountAddress
+			"Cryptography",
+			"EngineToolkit",
+			"Profile", // AccountAddress
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -462,10 +432,10 @@ package.addModules([
 		name: "FaucetClient",
 		dependencies: [
 			"Common",
-			engineToolkit,
+			"EngineToolkit",
 			"EngineToolkitClient",
 			"GatewayAPI",
-			profile,
+			"Profile",
 			"ProfileClient",
 			"TransactionClient",
 		], tests: .no
@@ -484,10 +454,11 @@ package.addModules([
 			},
 			"Asset",
 			"Common",
-			engineToolkit,
+			"Cryptography",
+			"EngineToolkit",
 			"EngineToolkitClient",
 			"JSON",
-			profile, // address
+			"Profile", // address
 			"ProfileClient",
 		],
 		exclude: [
@@ -502,14 +473,6 @@ package.addModules([
 		dependencies: [],
 		tests: .no
 	),
-	// TODO: remove KeychainClientDependency
-	.client(
-		name: "KeychainClientDependency",
-		dependencies: [
-			.product(name: "KeychainClient", package: "swift-profile"),
-		],
-		tests: .no
-	),
 	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],
@@ -521,11 +484,11 @@ package.addModules([
 		name: "P2PConnectivityClient",
 		dependencies: [
 			"Common",
-			engineToolkit, // Model: SignTX contains Manifest
+			"EngineToolkit", // Model: SignTX contains Manifest
 			"JSON",
-			profile, // Account
-			p2pConnection,
+			"Profile", // Account
 			"ProfileClient",
+			"P2PConnection",
 			"Resources",
 			"SharedModels",
 		],
@@ -548,9 +511,9 @@ package.addModules([
 	.client(
 		name: "ProfileClient",
 		dependencies: [
+			"Cryptography",
 			"EngineToolkitClient", // Create TX
-			p2pModels,
-			profile,
+			"Profile",
 			"ProfileLoader",
 			"SharedModels",
 			"UserDefaultsClient",
@@ -564,8 +527,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"JSON",
-			"KeychainClientDependency",
-			profile,
+			"Profile",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -598,7 +560,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"EngineToolkitClient", // I know, this is very wrong. Apologies. Let's revisit our dependency levels post betanet.
-			profile, // Address
+			"Profile", // Address
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -608,8 +570,8 @@ package.addModules([
 		name: "Common",
 		dependencies: [
 			"DesignSystem",
-			engineToolkit,
-			profile, // Address
+			"EngineToolkit",
+			"Profile", // Address
 			"Resources",
 		],
 		tests: .yes(
@@ -620,11 +582,11 @@ package.addModules([
 		name: "SharedModels",
 		dependencies: [
 			"Asset",
-			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make EngineToolkit, etc. vend their own Model packages.
-			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
-			p2pModels,
-			p2pConnection,
-			profile, // FIXME: In `Profile` split out Models package
+			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make "EngineToolkit", etc. vend their own Model packages.
+			"EngineToolkit", // FIXME: In `EngineToolkit` split out Models package
+			"Profile", // FIXME: In `Profile` split out Models package
+			"P2PConnection",
+			"P2PModels",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -648,8 +610,7 @@ package.addModules([
 			dependencies: [
 				"TestUtils",
 			]
-		),
-		isProduct: true
+		)
 	),
 	.core(
 		name: "Resources",
@@ -662,8 +623,7 @@ package.addModules([
 				.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0")
 			},
 		],
-		tests: .no,
-		isProduct: true
+		tests: .no
 	),
 	.core(
 		name: "TestUtils",
@@ -678,6 +638,87 @@ package.addModules([
 
 package.addModules([
 	.module(
+		name: "Profile",
+		category: "Profile",
+		dependencies: [
+			"Cryptography",
+			"EngineToolkit",
+			"P2PModels",
+		],
+		tests: .yes(
+			dependencies: [],
+			resources: [
+				.process("TestVectors/"),
+			]
+		)
+	),
+	.module(
+		name: "ProfileView",
+		category: "Profile",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.module(
+		name: "EngineToolkit",
+		category: "EngineToolkit",
+		dependencies: [
+			"Cryptography",
+			"RadixEngineToolkit",
+		],
+		tests: .yes(
+			dependencies: [],
+			resources: [
+				.process("TestVectors/"),
+			]
+		)
+	),
+	.module(
+		name: "P2PConnection",
+		category: "RadixConnect",
+		dependencies: [
+			"Cryptography",
+			"P2PModels",
+			.product(name: "WebRTC", package: "WebRTC") {
+				.package(url: "https://github.com/stasel/WebRTC", from: "106.0.0")
+			},
+		],
+		tests: .yes(
+			dependencies: [],
+			resources: [
+				.process("SignalingServerTests/TestVectors/"),
+			]
+		)
+	),
+	.module(
+		name: "P2PModels",
+		category: "RadixConnect",
+		dependencies: [
+			.product(name: "SwiftLogConsoleColors", package: "swift-log-console-colors") {
+				.package(url: "https://github.com/nneuberger1/swift-log-console-colors", from: "1.0.3")
+			},
+		],
+		tests: .yes(
+			dependencies: []
+		)
+	),
+	.module(
+		name: "Cryptography",
+		dependencies: [
+			.product(name: "K1", package: "K1") {
+				.package(url: "https://github.com/Sajjon/K1.git", from: "0.0.4")
+			},
+		],
+		tests: .yes(
+			dependencies: [],
+			resources: [
+				.process("MnemonicTests/TestVectors/"),
+				.process("SLIP10Tests/TestVectors/"),
+			]
+		)
+	),
+	.module(
 		name: "Prelude",
 		dependencies: [
 			.product(name: "AsyncAlgorithms", package: "swift-async-algorithms") {
@@ -688,9 +729,6 @@ package.addModules([
 			},
 			.product(name: "BigInt", package: "BigInt") {
 				.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0")
-			},
-			.product(name: "Bite", package: "Bite") {
-				.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.3") // TODO: move in locally
 			},
 			.product(name: "Collections", package: "swift-collections") {
 				.package(url: "https://github.com/apple/swift-collections", from: "1.0.3")
@@ -704,6 +742,9 @@ package.addModules([
 			.product(name: "IdentifiedCollections", package: "swift-identified-collections") {
 				.package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "0.6.0")
 			},
+			.product(name: "KeychainAccess", package: "KeychainAccess") {
+				.package(url: "https://github.com/kishikawakatsumi/KeychainAccess", from: "4.2.2")
+			},
 			.product(name: "LegibleError", package: "LegibleError") {
 				.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6")
 			},
@@ -713,10 +754,20 @@ package.addModules([
 			.product(name: "Tagged", package: "swift-tagged") {
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
 			},
+			.product(name: "Version", package: "Version") {
+				.package(url: "https://github.com/mxcl/Version", from: "2.0.1")
+			},
 		],
-		tests: .no
+		tests: .yes(dependencies: [])
 	),
 ])
+
+package.targets.append(
+	.binaryTarget(
+		name: "RadixEngineToolkit",
+		path: "Sources/EngineToolkit/RadixEngineToolkit/RadixEngineToolkit.xcframework"
+	)
+)
 
 // MARK: - Extensions
 
@@ -724,7 +775,11 @@ extension Package {
 	struct Module {
 		enum Tests {
 			case no
-			case yes(nameSuffix: String = "Tests", dependencies: [Target.Dependency], resources: [Resource]? = nil)
+			case yes(
+				nameSuffix: String = "Tests",
+				dependencies: [Target.Dependency],
+				resources: [Resource]? = nil
+			)
 		}
 
 		let name: String
@@ -790,7 +845,7 @@ extension Package {
 			resources: [Resource]? = nil,
 			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
-			isProduct: Bool = false
+			isProduct: Bool = true
 		) -> Self {
 			.init(
 				name: name,
@@ -806,6 +861,7 @@ extension Package {
 
 		static func module(
 			name: String,
+			category: String? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -815,7 +871,7 @@ extension Package {
 		) -> Self {
 			.init(
 				name: name,
-				category: nil,
+				category: category,
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,

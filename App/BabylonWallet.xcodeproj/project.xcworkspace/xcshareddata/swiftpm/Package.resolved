@@ -28,15 +28,6 @@
       }
     },
     {
-      "identity" : "bite",
-      "kind" : "remoteSourceControl",
-      "location" : "git@github.com:radixdlt/Bite.git",
-      "state" : {
-        "revision" : "96fd910f1a65e7224d1c0c8022738e6a34a1296a",
-        "version" : "0.0.4"
-      }
-    },
-    {
       "identity" : "codescanner",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/twostraws/CodeScanner",
@@ -52,15 +43,6 @@
       "state" : {
         "revision" : "882ac01eb7ef9e36d4467eb4b1151e74fcef85ab",
         "version" : "0.9.1"
-      }
-    },
-    {
-      "identity" : "converse",
-      "kind" : "remoteSourceControl",
-      "location" : "git@github.com:radixdlt/Converse.git",
-      "state" : {
-        "revision" : "4713bc218d06e94bc4aaedcf08462c1c816354a3",
-        "version" : "0.4.0"
       }
     },
     {
@@ -91,48 +73,12 @@
       }
     },
     {
-      "identity" : "mnemonic",
-      "kind" : "remoteSourceControl",
-      "location" : "git@github.com:radixdlt/Mnemonic.git",
-      "state" : {
-        "revision" : "4a4b3642c3cd4584684b758f77068eafac6784f4",
-        "version" : "0.0.8"
-      }
-    },
-    {
       "identity" : "nuke",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kean/Nuke",
       "state" : {
         "revision" : "2e9337168d08acccf72c039bf9324be24a1cf7d7",
         "version" : "11.5.3"
-      }
-    },
-    {
-      "identity" : "slip10",
-      "kind" : "remoteSourceControl",
-      "location" : "git@github.com:radixdlt/SLIP10.git",
-      "state" : {
-        "revision" : "5d496c72282f675bee91b953a74c086ce86f7faa",
-        "version" : "0.0.20"
-      }
-    },
-    {
-      "identity" : "swift-algorithms",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-algorithms",
-      "state" : {
-        "revision" : "b14b7f4c528c942f121c8b860b9410b2bf57825e",
-        "version" : "1.0.0"
-      }
-    },
-    {
-      "identity" : "swift-argument-parser",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-argument-parser",
-      "state" : {
-        "revision" : "fddd1c00396eed152c45a46bea9f47b98e59301d",
-        "version" : "1.2.0"
       }
     },
     {
@@ -199,15 +145,6 @@
       }
     },
     {
-      "identity" : "swift-engine-toolkit",
-      "kind" : "remoteSourceControl",
-      "location" : "git@github.com:radixdlt/swift-engine-toolkit.git",
-      "state" : {
-        "revision" : "78c46361e0a025b2603959c3b21868fb2308d1e0",
-        "version" : "0.1.11"
-      }
-    },
-    {
       "identity" : "swift-identified-collections",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-identified-collections",
@@ -241,24 +178,6 @@
       "state" : {
         "revision" : "8074e5f2e4a6de5a42476e545cc33438021aa2a4",
         "version" : "0.4.0"
-      }
-    },
-    {
-      "identity" : "swift-numerics",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-numerics",
-      "state" : {
-        "revision" : "0a5bc04095a675662cf24757cc0640aa2204253b",
-        "version" : "1.0.2"
-      }
-    },
-    {
-      "identity" : "swift-profile",
-      "kind" : "remoteSourceControl",
-      "location" : "git@github.com:radixdlt/swift-profile.git",
-      "state" : {
-        "revision" : "3c103b4c07b85a79f72f70949bbb96155fc72b08",
-        "version" : "0.1.4"
       }
     },
     {

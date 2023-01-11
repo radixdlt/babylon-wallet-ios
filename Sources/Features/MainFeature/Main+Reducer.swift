@@ -1,8 +1,7 @@
 import ComposableArchitecture
 import HandleDappRequests
 import HomeFeature
-import KeychainClient
-import Profile
+import Prelude
 import ProfileClient
 import SettingsFeature
 

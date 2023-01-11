@@ -1,11 +1,9 @@
 import Common
-import EngineToolkit
+import Cryptography
 import EngineToolkitClient
 import GatewayAPI
 import Prelude
-import Profile
 import ProfileClient
-import SLIP10
 
 public extension TransactionClient {
 	static var liveValue: Self {
