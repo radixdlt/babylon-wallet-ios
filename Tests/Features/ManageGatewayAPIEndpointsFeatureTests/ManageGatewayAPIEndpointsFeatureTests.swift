@@ -170,7 +170,13 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		store.exhaustivity = .off
 		await store.send(.internal(.system(.hasAccountsResult(.success(false)))))
 		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway)))) {
-			$0.createAccount = .init(onNetworkWithID: newNetworkAndGateway.network.id, shouldCreateProfile: false, numberOfExistingAccounts: 0)
+			$0.createAccountCoordinator = .init(
+				completionDestination: .home,
+				rootState: .init(
+					onNetworkWithID: newNetworkAndGateway.network.id,
+					isFirstAccount: true
+				)
+			)
 		}
 	}
 
@@ -180,7 +186,12 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				createAccount: .init(onNetworkWithID: newNetworkAndGateway.network.id, shouldCreateProfile: false, numberOfExistingAccounts: 0),
+				createAccountCoordinator: .init(
+					completionDestination: .home,
+					rootState: .init(
+						onNetworkWithID: newNetworkAndGateway.network.id
+					)
+				),
 				currentNetworkAndGateway: currentNetworkAndGateway,
 				validatedNewNetworkAndGatewayToSwitchTo: newNetworkAndGateway
 			),
@@ -192,13 +203,9 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			}
 		}
 		store.exhaustivity = .off
-		await store.send(.createAccount(.delegate(.createdNewAccount(.previewValue0)))) {
-			$0.createAccount = .init(onNetworkWithID: newNetworkAndGateway.network.id, shouldCreateProfile: false)
+		await store.send(.createAccountCoordinator(.delegate(.completed))) {
+			$0.createAccountCoordinator = nil
 		}
-
-		await store.receive(.createAccount(.delegate(.displayCreateAccountCompletion(.previewValue0, isFirstAccount: true, destination: .home))))
-
-		await store.send(.createAccount(.child(.accountCompletion(.delegate(.displayHome)))))
 
 		await store.receive(.internal(.system(.switchToResult(.success(newNetworkAndGateway)))))
 		await networkSwitchedTo.withValue {
@@ -210,10 +217,11 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				createAccount: .init(
-					onNetworkWithID: newNetworkAndGateway.network.id,
-					shouldCreateProfile: false,
-					numberOfExistingAccounts: 0
+				createAccountCoordinator: .init(
+					completionDestination: .home,
+					rootState: .init(
+						onNetworkWithID: newNetworkAndGateway.network.id
+					)
 				),
 				currentNetworkAndGateway: .mardunet,
 				validatedNewNetworkAndGatewayToSwitchTo: newNetworkAndGateway
@@ -221,30 +229,8 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			reducer: ManageGatewayAPIEndpoints()
 		)
 		store.exhaustivity = .on // we ensure `exhaustivity` is on, to assert nothing happens, i.e. `switchTo` is not called on networkSwitchingClient
-		await store.send(.createAccount(.delegate(.dismissCreateAccount))) {
-			$0.createAccount = nil
-			$0.validatedNewNetworkAndGatewayToSwitchTo = nil
-		}
-		// nothing else should happen
-	}
-
-	func test__GIVEN__apa__WHEN__createAccount_fails_during_network_switching__THEN__network_remains_unchanged() async throws {
-		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
-		let store = TestStore(
-			initialState: ManageGatewayAPIEndpoints.State(
-				createAccount: .init(
-					onNetworkWithID: newNetworkAndGateway.network.id,
-					shouldCreateProfile: false,
-					numberOfExistingAccounts: 0
-				),
-				currentNetworkAndGateway: .mardunet,
-				validatedNewNetworkAndGatewayToSwitchTo: newNetworkAndGateway
-			),
-			reducer: ManageGatewayAPIEndpoints()
-		)
-		store.exhaustivity = .on // we ensure `exhaustivity` is on, to assert nothing happens, i.e. `switchTo` is not called on networkSwitchingClient
-		await store.send(.createAccount(.delegate(.failedToCreateNewAccount))) {
-			$0.createAccount = nil
+		await store.send(.createAccountCoordinator(.delegate(.dismissed))) {
+			$0.createAccountCoordinator = nil
 			$0.validatedNewNetworkAndGatewayToSwitchTo = nil
 		}
 		// nothing else should happen

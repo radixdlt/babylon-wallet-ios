@@ -32,49 +32,6 @@ final class AppFeatureTests: TestCase {
 		}
 	}
 
-	func test_onboaring__GIVEN__no_profile__WHEN__new_profile_created__THEN__it_is_injected_into_profileClient_and_we_navigate_to_create_account_completion() async throws {
-		// given
-		let store = TestStore(
-			initialState: App.State(root: .onboarding(.init(root: .createAccount(.init(shouldCreateProfile: true))))),
-			reducer: App()
-		)
-
-		var profileClient: ProfileClient = .testValue
-		profileClient.getAccounts = {
-			let accounts: [OnNetwork.Account] = [.previewValue0]
-			return NonEmpty(rawValue: OrderedSet(accounts))!
-		}
-		store.dependencies.profileClient = profileClient
-
-		let newProfile = try await Profile.new(networkAndGateway: .nebunet, mnemonic: .generate())
-		let expectation = expectation(description: "Profile injected")
-		store.dependencies.profileClient.injectProfile = { injected in
-			XCTAssertEqual(injected, newProfile)
-			expectation.fulfill()
-		}
-
-		// when
-		await store.send(.child(.onboarding(.createAccount(.delegate(.createdNewProfile(newProfile))))))
-
-		// then
-		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile), createdNewProfile: true))))
-
-		let account = try! await profileClient.getAccounts().first
-
-		await store.receive(.child(.onboarding(.createAccount(.delegate(.displayCreateAccountCompletion(account, isFirstAccount: true, destination: .home)))))) {
-			$0.root = .onboarding(.init(root: .createAccount(.init(
-				shouldCreateProfile: true,
-				accountCompletion: .init(
-					account: account,
-					isFirstAccount: true,
-					destination: .home
-				)
-			))))
-		}
-
-		wait(for: [expectation], timeout: 0.1)
-	}
-
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
 		// GIVEN: an existing profile
 		let existingProfile = try await Profile.new(
@@ -107,7 +64,7 @@ final class AppFeatureTests: TestCase {
 		// then
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(existingProfile))))))
 
-		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(existingProfile), createdNewProfile: false)))) {
+		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(existingProfile))))) {
 			$0.root = .main(.init())
 		}
 

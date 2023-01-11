@@ -7,14 +7,29 @@ public struct Onboarding: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.root, action: /Action.self) {
-			EmptyReducer()
-				.ifCaseLet(/Onboarding.State.Root.importProfile, action: /Action.importProfile) {
-					ImportProfile()
-				}
-				.ifCaseLet(/Onboarding.State.Root.createAccount, action: /Action.createAccount) {
-					CreateAccount()
-				}
+		Reduce(core)
+			.ifCaseLet(
+				/Onboarding.State.importProfile,
+				action: /Action.child .. Action.ChildAction.importProfile
+			) {
+				ImportProfile()
+			}
+			.ifCaseLet(
+				/Onboarding.State.createAccountCoordinator,
+				action: /Action.child .. Action.ChildAction.createAccountCoordinator
+			) {
+				CreateAccountCoordinator()
+			}
+	}
+
+	private func core(state: inout State, action: Action) -> EffectTask<Action> {
+		switch action {
+		case .child(.createAccountCoordinator(.delegate(.completed))):
+			return .run { send in
+				await send(.delegate(.completed))
+			}
+		default:
+			return .none
 		}
 	}
 }

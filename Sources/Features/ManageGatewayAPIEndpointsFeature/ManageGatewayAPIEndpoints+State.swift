@@ -7,7 +7,7 @@ import Profile
 // MARK: - ManageGatewayAPIEndpoints.State
 public extension ManageGatewayAPIEndpoints {
 	struct State: Equatable {
-		public var createAccount: CreateAccount.State?
+		public var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		public var urlString: String
 		public var currentNetworkAndGateway: AppPreferences.NetworkAndGateway?
@@ -18,14 +18,14 @@ public extension ManageGatewayAPIEndpoints {
 		@BindableState public var focusedField: Field?
 
 		public init(
-			createAccount: CreateAccount.State? = nil,
+			createAccountCoordinator: CreateAccountCoordinator.State? = nil,
 			urlString: String = "",
 			currentNetworkAndGateway: AppPreferences.NetworkAndGateway? = nil,
 			validatedNewNetworkAndGatewayToSwitchTo: AppPreferences.NetworkAndGateway? = nil,
 			isSwitchToButtonEnabled: Bool = false,
 			isValidatingEndpoint: Bool = false
 		) {
-			self.createAccount = createAccount
+			self.createAccountCoordinator = createAccountCoordinator
 			self.urlString = urlString
 			self.currentNetworkAndGateway = currentNetworkAndGateway
 			self.validatedNewNetworkAndGatewayToSwitchTo = validatedNewNetworkAndGatewayToSwitchTo

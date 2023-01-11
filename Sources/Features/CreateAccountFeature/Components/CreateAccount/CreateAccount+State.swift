@@ -6,30 +6,27 @@ import Profile
 public extension CreateAccount {
 	struct State: Sendable, Equatable {
 		public var onNetworkWithID: NetworkID?
-		public var numberOfExistingAccounts: Int
+		public var isFirstAccount: Bool
 		public var inputtedAccountName: String
 		public var sanitizedAccountName: String { inputtedAccountName.trimmed() }
 		public var isCreatingAccount: Bool
 		public let shouldCreateProfile: Bool
-		public var accountCompletion: AccountCompletion.State?
 		@BindableState public var focusedField: Field?
 
 		public init(
 			onNetworkWithID: NetworkID? = nil,
-			shouldCreateProfile: Bool,
-			numberOfExistingAccounts: Int = 0,
+			shouldCreateProfile: Bool = false,
+			isFirstAccount: Bool = false,
 			inputtedAccountName: String = "",
 			focusedField: Field? = nil,
-			isCreatingAccount: Bool = false,
-			accountCompletion: AccountCompletion.State? = nil
+			isCreatingAccount: Bool = false
 		) {
 			self.onNetworkWithID = onNetworkWithID
 			self.shouldCreateProfile = shouldCreateProfile
-			self.numberOfExistingAccounts = numberOfExistingAccounts
 			self.inputtedAccountName = inputtedAccountName
 			self.focusedField = focusedField
 			self.isCreatingAccount = isCreatingAccount
-			self.accountCompletion = accountCompletion
+			self.isFirstAccount = isFirstAccount
 		}
 	}
 }

@@ -27,10 +27,10 @@ public extension ChooseAccounts.View {
 			ForceFullScreen {
 				IfLetStore(
 					store.scope(
-						state: \.createAccount,
-						action: { .child(.createAccount($0)) }
+						state: \.createAccountCoordinator,
+						action: { .child(.createAccountCoordinator($0)) }
 					),
-					then: { CreateAccount.View(store: $0) }
+					then: { CreateAccountCoordinator.View(store: $0) }
 				)
 				.zIndex(1)
 
