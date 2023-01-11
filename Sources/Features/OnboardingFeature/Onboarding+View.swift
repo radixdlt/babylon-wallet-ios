@@ -18,16 +18,16 @@ public extension Onboarding {
 
 public extension Onboarding.View {
 	var body: some View {
-		SwitchStore(store.scope(state: \.root)) {
+		SwitchStore(store) {
 			CaseLet(
-				state: /Onboarding.State.Root.importProfile,
-				action: { Onboarding.Action.importProfile($0) },
+				state: /Onboarding.State.importProfile,
+				action: { Onboarding.Action.child(.importProfile($0)) },
 				then: { ImportProfile.View(store: $0) }
 			)
 			CaseLet(
-				state: /Onboarding.State.Root.createAccount,
-				action: { Onboarding.Action.createAccount($0) },
-				then: { CreateAccount.View(store: $0) }
+				state: /Onboarding.State.createAccountCoordinator,
+				action: { Onboarding.Action.child(.createAccountCoordinator($0)) },
+				then: { CreateAccountCoordinator.View(store: $0) }
 			)
 		}
 	}

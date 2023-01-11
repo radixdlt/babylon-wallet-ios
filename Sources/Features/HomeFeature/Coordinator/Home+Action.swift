@@ -32,7 +32,7 @@ public extension Home.Action {
 		case accountPreferences(AccountPreferences.Action)
 		case accountDetails(AccountDetails.Action)
 		case transfer(AccountDetails.Transfer.Action)
-		case createAccount(CreateAccount.Action)
+		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 }
 
@@ -56,8 +56,6 @@ public extension Home.Action {
 // MARK: - Home.Action.SystemAction
 public extension Home.Action {
 	enum SystemAction: Sendable, Equatable {
-		case createAccount(numberOfExistingAccounts: Int)
-
 		case accountsLoadedResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
 		case appSettingsLoadedResult(TaskResult<AppSettings>)
 		case isCurrencyAmountVisibleLoaded(Bool)

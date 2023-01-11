@@ -9,18 +9,18 @@ public extension ChooseAccounts {
 		public let request: P2P.OneTimeAccountAddressesRequestToHandle
 		public var canProceed: Bool
 		public var accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
-		public var createAccount: CreateAccount.State?
+		public var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		public init(
 			request: P2P.OneTimeAccountAddressesRequestToHandle,
 			canProceed: Bool = false,
 			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = [],
-			createAccount: CreateAccount.State? = nil
+			createAccountCoordinator: CreateAccountCoordinator.State? = nil
 		) {
 			self.request = request
 			self.canProceed = canProceed
 			self.accounts = accounts
-			self.createAccount = createAccount
+			self.createAccountCoordinator = createAccountCoordinator
 		}
 	}
 }
@@ -52,7 +52,7 @@ public extension ChooseAccounts.State {
 				.previewValueOne,
 			]
 		),
-		createAccount: nil
+		createAccountCoordinator: nil
 	)
 }
 #endif

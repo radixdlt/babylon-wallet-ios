@@ -49,25 +49,16 @@ public struct Home: Sendable, ReducerProtocol {
 		.ifLet(\.transfer, action: /Action.child .. Action.ChildAction.transfer) {
 			AccountDetails.Transfer()
 		}
-		.ifLet(\.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
-			CreateAccount()
+		.ifLet(\.createAccountCoordinator, action: /Action.child .. Action.ChildAction.createAccountCoordinator) {
+			CreateAccountCoordinator()
 		}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.createAccountButtonTapped)):
-			return .run { send in
-				let accounts = try await profileClient.getAccounts()
-				await send(.internal(.system(.createAccount(numberOfExistingAccounts: accounts.count))))
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
-
-		case let .internal(.system(.createAccount(numberOfExistingAccounts))):
-			state.createAccount = .init(
-				shouldCreateProfile: false,
-				numberOfExistingAccounts: numberOfExistingAccounts
+			state.createAccountCoordinator = .init(
+				completionDestination: .home
 			)
 			return .none
 
@@ -206,22 +197,13 @@ public struct Home: Sendable, ReducerProtocol {
 			state.transfer = nil
 			return .none
 
-		case .child(.createAccount(.delegate(.dismissCreateAccount))):
-			state.createAccount = nil
+		case .child(.createAccountCoordinator(.delegate(.dismissed))):
+			state.createAccountCoordinator = nil
 			return .none
 
-		case let .child(.createAccount(.delegate(.createdNewAccount(account)))):
-			return .run { send in
-				await send(.child(.createAccount(.delegate(.displayCreateAccountCompletion(account, isFirstAccount: false, destination: .home)))))
-			}
-
-		case .child(.createAccount(.child(.accountCompletion(.delegate(.displayHome))))):
-			state.createAccount = nil
+		case .child(.createAccountCoordinator(.delegate(.completed))):
+			state.createAccountCoordinator = nil
 			return loadAccountsAndSettings()
-
-		case .child(.createAccount(.delegate(.failedToCreateNewAccount))):
-			state.createAccount = nil
-			return .none
 
 		case .delegate(.reloadAccounts):
 			return loadAccountsAndSettings()

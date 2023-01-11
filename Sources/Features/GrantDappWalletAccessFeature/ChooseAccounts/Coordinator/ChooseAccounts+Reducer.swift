@@ -45,12 +45,10 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 				return .none
 
 			case .internal(.view(.createAccountButtonTapped)):
-				return .run { send in
-					let accounts = try await profileClient.getAccounts()
-					await send(.internal(.system(.createAccount(numberOfExistingAccounts: accounts.count))))
-				} catch: { error, _ in
-					errorQueue.schedule(error)
-				}
+				state.createAccountCoordinator = .init(
+					completionDestination: .chooseAccounts
+				)
+				return .none
 
 			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child
 			// and every other action should fall-through - @davdroman-rdx
@@ -81,32 +79,20 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 					return .none
 				}
 
-			case .child(.createAccount(.delegate(.dismissCreateAccount))):
-				state.createAccount = nil
+			case .child(.createAccountCoordinator(.delegate(.dismissed))):
+				state.createAccountCoordinator = nil
 				return .none
 
-			case let .child(.createAccount(.delegate(.createdNewAccount(account)))):
-				return .run { send in
-					await send(.child(.createAccount(.delegate(.displayCreateAccountCompletion(account, isFirstAccount: false, destination: .chooseAccounts)))))
-				}
-
-			case .child(.createAccount(.child(.accountCompletion(.delegate(.displayChooseAccounts))))):
-				state.createAccount = nil
+			case .child(.createAccountCoordinator(.delegate(.completed))):
+				state.createAccountCoordinator = nil
 				return .run { send in
 					await send(.internal(.system(.loadAccountsResult(TaskResult {
 						try await profileClient.getAccounts()
 					}))))
 				}
 
-			case let .internal(.system(.createAccount(numberOfExistingAccounts: numberOfExistingAccounts))):
-				state.createAccount = .init(
-					shouldCreateProfile: false,
-					numberOfExistingAccounts: numberOfExistingAccounts
-				)
-				return .none
-
 			case .delegate(.dismissChooseAccounts):
-				state.createAccount = nil
+				state.createAccountCoordinator = nil
 				return .none
 
 			case .child, .delegate:
@@ -116,8 +102,8 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 		.forEach(\.accounts, action: /Action.child .. Action.ChildAction.account) {
 			ChooseAccounts.Row()
 		}
-		.ifLet(\.createAccount, action: /Action.child .. Action.ChildAction.createAccount) {
-			CreateAccount()
+		.ifLet(\.createAccountCoordinator, action: /Action.child .. Action.ChildAction.createAccountCoordinator) {
+			CreateAccountCoordinator()
 		}
 	}
 }

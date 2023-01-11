@@ -18,8 +18,8 @@ public struct ManageGatewayAPIEndpoints: Sendable, ReducerProtocol {
 public extension ManageGatewayAPIEndpoints {
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
-			.ifLet(\.createAccount, action: /Action.createAccount) {
-				CreateAccount()
+			.ifLet(\.createAccountCoordinator, action: /Action.createAccountCoordinator) {
+				CreateAccountCoordinator()
 			}
 	}
 
@@ -114,11 +114,10 @@ public extension ManageGatewayAPIEndpoints {
 			errorQueue.schedule(error)
 			return skipSwitching(state: &state)
 
-		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetwork))):
-			state.createAccount = CreateAccount.State(
-				onNetworkWithID: newNetwork.network.id,
-				shouldCreateProfile: false,
-				numberOfExistingAccounts: 0
+		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway))):
+			state.createAccountCoordinator = .init(
+				completionDestination: .home,
+				rootState: .init(onNetworkWithID: newNetworkAndGateway.network.id, isFirstAccount: true)
 			)
 			return .none
 
@@ -131,19 +130,11 @@ public extension ManageGatewayAPIEndpoints {
 				await send(.delegate(.networkChanged))
 			}
 
-		case .createAccount(.delegate(.dismissCreateAccount)):
+		case .createAccountCoordinator(.delegate(.dismissed)):
 			return skipSwitching(state: &state)
 
-		case .createAccount(.delegate(.failedToCreateNewAccount)):
-			return skipSwitching(state: &state)
-
-		case let .createAccount(.delegate(.createdNewAccount(account))):
-			return .run { send in
-				await send(.createAccount(.delegate(.displayCreateAccountCompletion(account, isFirstAccount: true, destination: .home))))
-			}
-
-		case .createAccount(.child(.accountCompletion(.delegate(.displayHome)))):
-			state.createAccount = nil
+		case .createAccountCoordinator(.delegate(.completed)):
+			state.createAccountCoordinator = nil
 			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
 				// weird state... should not happen.
 				return .none
@@ -156,16 +147,13 @@ public extension ManageGatewayAPIEndpoints {
 				))))
 			}
 
-		case .createAccount:
-			return .none
-
-		case .delegate:
+		case .createAccountCoordinator, .delegate:
 			return .none
 		}
 	}
 
 	func skipSwitching(state: inout State) -> EffectTask<Action> {
-		state.createAccount = nil
+		state.createAccountCoordinator = nil
 		state.validatedNewNetworkAndGatewayToSwitchTo = nil
 		return .none
 	}

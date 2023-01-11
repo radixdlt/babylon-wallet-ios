@@ -6,7 +6,6 @@ import Profile
 public extension CreateAccount {
 	// MARK: Action
 	enum Action: Sendable, Equatable {
-		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -24,13 +23,6 @@ public extension CreateAccount.Action {
 	}
 }
 
-// MARK: - CreateAccount.Action.ChildAction
-public extension CreateAccount.Action {
-	enum ChildAction: Sendable, Equatable {
-		case accountCompletion(AccountCompletion.Action)
-	}
-}
-
 // MARK: - CreateAccount.Action.InternalAction
 public extension CreateAccount.Action {
 	enum InternalAction: Sendable, Equatable {
@@ -43,10 +35,10 @@ public extension CreateAccount.Action {
 public extension CreateAccount.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
 		case focusTextField(CreateAccount.State.Field?)
-		case createProfile
 		case createdNewProfileResult(TaskResult<Profile>)
-		case createAccount
 		case createdNewAccountResult(TaskResult<OnNetwork.Account>)
+		case injectProfileIntoProfileClientResult(TaskResult<Profile>)
+		case loadAccountResult(TaskResult<OnNetwork.Account>)
 	}
 }
 
@@ -54,9 +46,6 @@ public extension CreateAccount.Action.InternalAction {
 public extension CreateAccount.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case dismissCreateAccount
-		case createdNewAccount(OnNetwork.Account)
-		case createdNewProfile(Profile)
-		case failedToCreateNewAccount
-		case displayCreateAccountCompletion(OnNetwork.Account, isFirstAccount: Bool, destination: AccountCompletion.State.Destination)
+		case createdNewAccount(account: OnNetwork.Account, isFirstAccount: Bool)
 	}
 }

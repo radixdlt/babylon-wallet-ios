@@ -132,7 +132,7 @@ extension AccountCompletion.View {
 		let accountName: String
 		let accountAddress: AddressView.ViewState
 		let accountIndex: Int
-		let destination: AccountCompletion.State.Destination
+		let destination: CreateAccountCompletionDestination
 		let appearanceID: OnNetwork.Account.AppearanceID
 		let isFirstAccount: Bool
 

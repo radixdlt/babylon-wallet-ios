@@ -57,10 +57,7 @@ public struct App: Sendable, ReducerProtocol {
 			goToOnboarding(state: &state)
 			return .none
 
-		case let .child(.onboarding(.createAccount(.delegate(.createdNewProfile(newProfile))))):
-			return injectProfileIntoProfileClient(newProfile, createdNewProfile: true)
-
-		case .child(.onboarding(.createAccount(.child(.accountCompletion(.delegate(.displayHome)))))):
+		case .child(.onboarding(.delegate(.completed))):
 			goToMain(state: &state)
 			return .none
 
@@ -82,18 +79,11 @@ public struct App: Sendable, ReducerProtocol {
 				return incompatibleSnapshotData(version: version, state: &state)
 			}
 
-		case let .internal(.system(.injectProfileIntoProfileClientResult(.success(_), createdNewProfile: createdNewProfile))):
-			if createdNewProfile {
-				return .run { send in
-					let accounts = try await profileClient.getAccounts()
-					await send(.child(.onboarding(.createAccount(.delegate(.displayCreateAccountCompletion(accounts.first, isFirstAccount: true, destination: .home))))))
-				}
-			} else {
-				goToMain(state: &state)
-				return .none
-			}
+		case .internal(.system(.injectProfileIntoProfileClientResult(.success))):
+			goToMain(state: &state)
+			return .none
 
-		case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error), createdNewProfile: _))):
+		case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
 
@@ -121,8 +111,7 @@ public struct App: Sendable, ReducerProtocol {
 				TaskResult {
 					try await profileClient.injectProfile(profile)
 					return profile
-				},
-				createdNewProfile: createdNewProfile
+				}
 			))))
 		}
 	}

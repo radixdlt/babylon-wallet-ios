@@ -5,16 +5,17 @@ import ImportProfileFeature
 // MARK: - Onboarding.State
 public extension Onboarding {
 	// MARK: State
-	struct State: Equatable {
-		public enum Root: Equatable {
-			case importProfile(ImportProfile.State)
-			case createAccount(CreateAccount.State)
-		}
+	enum State: Equatable {
+		case importProfile(ImportProfile.State)
+		case createAccountCoordinator(CreateAccountCoordinator.State)
 
-		public var root: Root
-
-		public init(root: Root = .createAccount(.init(shouldCreateProfile: true))) {
-			self.root = root
+		public init() {
+			self = .createAccountCoordinator(
+				.init(
+					completionDestination: .home,
+					rootState: .init(shouldCreateProfile: true, isFirstAccount: true)
+				)
+			)
 		}
 	}
 }
