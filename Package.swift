@@ -138,6 +138,7 @@ package.addModules([
 		name: "CreateAccountFeature",
 		dependencies: [
 			"Common",
+			"Cryptography",
 			"DesignSystem",
 			engineToolkit,
 			"ErrorQueue",
@@ -239,6 +240,7 @@ package.addModules([
 	.feature(
 		name: "ImportProfileFeature",
 		dependencies: [
+			"Cryptography",
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
@@ -484,6 +486,7 @@ package.addModules([
 			},
 			"Asset",
 			"Common",
+			"Cryptography",
 			engineToolkit,
 			"EngineToolkitClient",
 			"JSON",
@@ -548,6 +551,7 @@ package.addModules([
 	.client(
 		name: "ProfileClient",
 		dependencies: [
+			"Cryptography",
 			"EngineToolkitClient", // Create TX
 			p2pModels,
 			profile,
@@ -648,8 +652,7 @@ package.addModules([
 			dependencies: [
 				"TestUtils",
 			]
-		),
-		isProduct: true
+		)
 	),
 	.core(
 		name: "Resources",
@@ -662,8 +665,7 @@ package.addModules([
 				.package(url: "https://github.com/SwiftGen/SwiftGenPlugin", from: "6.6.0")
 			},
 		],
-		tests: .no,
-		isProduct: true
+		tests: .no
 	),
 	.core(
 		name: "TestUtils",
@@ -677,6 +679,15 @@ package.addModules([
 // MARK: - Modules
 
 package.addModules([
+	.module(
+		name: "Cryptography",
+		dependencies: [
+			.product(name: "K1", package: "K1") {
+				.package(url: "https://github.com/Sajjon/K1.git", from: "0.0.4")
+			},
+		],
+		tests: .no
+	),
 	.module(
 		name: "Prelude",
 		dependencies: [
@@ -787,7 +798,7 @@ extension Package {
 			resources: [Resource]? = nil,
 			plugins: [Target.PluginUsage]? = nil,
 			tests: Tests,
-			isProduct: Bool = false
+			isProduct: Bool = true
 		) -> Self {
 			.init(
 				name: name,
