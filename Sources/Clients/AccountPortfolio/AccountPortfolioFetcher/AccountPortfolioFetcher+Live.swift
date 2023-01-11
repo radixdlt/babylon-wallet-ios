@@ -1,7 +1,7 @@
 import AppSettings
 import Asset
-import Dependencies
 import GatewayAPI
+import Prelude
 import Profile
 
 extension AccountPortfolioFetcher: DependencyKey {

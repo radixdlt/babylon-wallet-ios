@@ -1,5 +1,5 @@
-import Dependencies
 import LocalAuthentication
+import Prelude
 
 // MARK: - LocalAuthenticationClient + DependencyKey
 extension LocalAuthenticationClient: DependencyKey {

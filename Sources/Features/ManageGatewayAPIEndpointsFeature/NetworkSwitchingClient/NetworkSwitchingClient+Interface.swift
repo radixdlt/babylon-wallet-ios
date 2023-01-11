@@ -1,5 +1,5 @@
-import Dependencies
 import Foundation
+import Prelude
 import ProfileClient
 
 // MARK: - NetworkSwitchingClient

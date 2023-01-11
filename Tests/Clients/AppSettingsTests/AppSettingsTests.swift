@@ -1,5 +1,5 @@
 @testable import AppSettings
-import Dependencies
+import Prelude
 import TestUtils
 
 final class AppSettingsTests: TestCase {

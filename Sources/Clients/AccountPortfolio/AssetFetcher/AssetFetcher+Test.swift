@@ -1,5 +1,5 @@
 import Asset
-import Dependencies
+import Prelude
 import XCTestDynamicOverlay
 
 // MARK: - AssetFetcher + TestDependencyKey

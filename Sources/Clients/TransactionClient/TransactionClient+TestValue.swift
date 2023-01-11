@@ -1,5 +1,5 @@
 #if DEBUG
-import Dependencies
+import Prelude
 import XCTestDynamicOverlay
 
 extension TransactionClient: TestDependencyKey {

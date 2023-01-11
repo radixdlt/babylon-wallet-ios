@@ -1,7 +1,7 @@
 import CryptoKit
-import Dependencies
 import Foundation
 import Mnemonic
+import Prelude
 import Profile
 import XCTestDynamicOverlay
 

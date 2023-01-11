@@ -1,4 +1,4 @@
-import Dependencies
+import Prelude
 import XCTestDynamicOverlay
 
 // MARK: - AccountPortfolioFetcher + TestDependencyKey

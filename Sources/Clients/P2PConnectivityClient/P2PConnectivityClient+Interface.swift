@@ -1,5 +1,4 @@
 import Common
-import Dependencies
 import P2PConnection
 import P2PModels
 import Prelude

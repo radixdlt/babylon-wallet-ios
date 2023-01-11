@@ -1,6 +1,6 @@
 import Common
-import Dependencies
 import Foundation
+import Prelude
 import Profile
 import TransactionClient
 
