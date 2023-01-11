@@ -701,6 +701,9 @@ package.addModules([
 	),
 	.module(
 		name: "Prelude",
+		remoteDependencies: [
+			.package(url: "https://github.com/apple/swift-collections", branch: "main"), // TODO: peg to specific version once main is tagged
+		],
 		dependencies: [
 			.product(name: "AsyncAlgorithms", package: "swift-async-algorithms") {
 				.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3")
@@ -711,9 +714,10 @@ package.addModules([
 			.product(name: "BigInt", package: "BigInt") {
 				.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0")
 			},
-			.product(name: "Collections", package: "swift-collections") {
-				.package(url: "https://github.com/apple/swift-collections", from: "1.0.3")
-			},
+
+			.product(name: "BitCollections", package: "swift-collections"),
+			.product(name: "Collections", package: "swift-collections"),
+
 			.product(name: "CustomDump", package: "swift-custom-dump") {
 				.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.1")
 			},
@@ -765,6 +769,7 @@ extension Package {
 
 		let name: String
 		let category: String?
+		let remoteDependencies: [Package.Dependency]?
 		let dependencies: [Target.Dependency]
 		let exclude: [String]
 		let resources: [Resource]?
@@ -784,6 +789,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Features",
+				remoteDependencies: nil,
 				dependencies: dependencies + [
 					.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
 						.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1")
@@ -810,6 +816,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Clients",
+				remoteDependencies: nil,
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
@@ -831,6 +838,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Core",
+				remoteDependencies: nil,
 				dependencies: dependencies + ["Prelude"],
 				exclude: exclude,
 				resources: resources,
@@ -843,6 +851,7 @@ extension Package {
 		static func module(
 			name: String,
 			category: String? = nil,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -853,6 +862,7 @@ extension Package {
 			.init(
 				name: name,
 				category: category,
+				remoteDependencies: remoteDependencies,
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
@@ -870,6 +880,10 @@ extension Package {
 	}
 
 	private func addModule(_ module: Module) {
+		if let remoteDependencies = module.remoteDependencies {
+			package.dependencies.append(contentsOf: remoteDependencies)
+		}
+
 		let targetName = module.name
 		let targetPath = {
 			if let category = module.category {

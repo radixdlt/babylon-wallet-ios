@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 public extension Mnemonic {
 	/// Translates this mnemonic into the original entropy that was used to

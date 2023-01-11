@@ -1,5 +1,5 @@
 import struct CryptoKit.SHA256
-import Foundation
+import Prelude
 
 internal extension BIP39 {
 	static func mapEntropyToWords(
