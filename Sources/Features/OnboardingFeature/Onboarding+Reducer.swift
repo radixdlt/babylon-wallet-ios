@@ -8,12 +8,16 @@ public struct Onboarding: Sendable, ReducerProtocol {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifCaseLet(/Onboarding.State.importProfile,
-			           action: /Action.child .. Action.ChildAction.importProfile) {
+			.ifCaseLet(
+				/Onboarding.State.importProfile,
+				action: /Action.child .. Action.ChildAction.importProfile
+			) {
 				ImportProfile()
 			}
-			.ifCaseLet(/Onboarding.State.createAccountCoordinator,
-			           action: /Action.child .. Action.ChildAction.createAccountCoordinator) {
+			.ifCaseLet(
+				/Onboarding.State.createAccountCoordinator,
+				action: /Action.child .. Action.ChildAction.createAccountCoordinator
+			) {
 				CreateAccountCoordinator()
 			}
 	}

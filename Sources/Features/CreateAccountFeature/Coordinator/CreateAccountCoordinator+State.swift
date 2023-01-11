@@ -7,9 +7,10 @@ public extension CreateAccountCoordinator {
 		public let completionDestination: CrateAccountCompletionDestination
 		public var root: Root
 
-		public init(completionDestination: CrateAccountCompletionDestination,
-		            rootState: Root.InitialState = .init())
-		{
+		public init(
+			completionDestination: CrateAccountCompletionDestination,
+			rootState: Root.InitialState = .init()
+		) {
 			self.completionDestination = completionDestination
 			self.root = .init(state: rootState)
 		}
