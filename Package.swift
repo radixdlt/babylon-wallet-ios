@@ -780,6 +780,7 @@ extension Package {
 
 		static func feature(
 			name: String,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -790,7 +791,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Features",
-				remoteDependencies: nil,
+				remoteDependencies: remoteDependencies,
 				dependencies: dependencies + [
 					.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
 						.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1")
@@ -807,6 +808,7 @@ extension Package {
 
 		static func client(
 			name: String,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -817,7 +819,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Clients",
-				remoteDependencies: nil,
+				remoteDependencies: remoteDependencies,
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
@@ -829,6 +831,7 @@ extension Package {
 
 		static func core(
 			name: String,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -839,7 +842,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Core",
-				remoteDependencies: nil,
+				remoteDependencies: remoteDependencies,
 				dependencies: dependencies + ["Prelude"],
 				exclude: exclude,
 				resources: resources,
