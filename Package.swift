@@ -26,7 +26,6 @@ package.addModules([
 			"PasteboardClient",
 			"EngineToolkit",
 			"Profile",
-
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -70,7 +69,6 @@ package.addModules([
 	.feature(
 		name: "AppFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AccountPortfolio",
 			"AppSettings",
 			"EngineToolkit",
@@ -83,7 +81,6 @@ package.addModules([
 			"Resources",
 			"SplashFeature",
 			"UserDefaultsClient",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: [
@@ -114,7 +111,6 @@ package.addModules([
 			"EngineToolkit",
 			"ErrorQueue",
 			"GatewayAPI",
-//			"KeychainClientDependency",
 			"LocalAuthenticationClient",
 			"ProfileClient",
 		],
@@ -154,14 +150,12 @@ package.addModules([
 	.feature(
 		name: "GrantDappWalletAccessFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"CreateAccountFeature",
 			"DesignSystem",
 			"ErrorQueue",
 			"ProfileClient",
 			"SharedModels",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: [
@@ -178,12 +172,14 @@ package.addModules([
 			"Profile",
 			"SharedModels",
 			"TransactionSigningFeature",
-		], tests: .yes(dependencies: ["TestUtils"])
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
 	.feature(
 		name: "HomeFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AccountListFeature",
 			"AccountDetailsFeature",
 			"AccountPortfolio",
@@ -197,7 +193,6 @@ package.addModules([
 			"ProfileClient",
 			"SharedModels",
 			"TransactionSigningFeature",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: [
@@ -217,7 +212,6 @@ package.addModules([
 			"ErrorQueue",
 			"FileClient",
 			"JSON",
-//			"KeychainClientDependency",
 			"ProfileClient",
 		],
 		tests: .yes(
@@ -228,15 +222,12 @@ package.addModules([
 	.feature(
 		name: "MainFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AppSettings",
 			"AccountPortfolio",
-//			"EngineToolkit",
 			"HandleDappRequests",
 			"HomeFeature",
 			"PasteboardClient",
 			"SettingsFeature",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -245,7 +236,6 @@ package.addModules([
 	.feature(
 		name: "ManageP2PClientsFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
@@ -253,7 +243,6 @@ package.addModules([
 			"P2PConnectivityClient",
 			"ProfileClient",
 			"SharedModels",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -308,11 +297,9 @@ package.addModules([
 	.feature(
 		name: "OnboardingFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"DesignSystem",
 			"CreateAccountFeature",
 			"ImportProfileFeature",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: [
@@ -324,7 +311,6 @@ package.addModules([
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"ErrorQueue",
 			"GatewayAPI",
@@ -333,7 +319,6 @@ package.addModules([
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
 			"ProfileClient",
 			"ProfileView",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -342,7 +327,6 @@ package.addModules([
 	.feature(
 		name: "SplashFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
@@ -350,7 +334,6 @@ package.addModules([
 			"PlatformEnvironmentClient",
 			"ProfileClient",
 			"ProfileLoader",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -359,7 +342,6 @@ package.addModules([
 	.feature(
 		name: "TransactionSigningFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"DesignSystem",
 			"EngineToolkitClient",
@@ -368,7 +350,6 @@ package.addModules([
 			"ProfileClient",
 			"SharedModels",
 			"TransactionClient",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(dependencies: [
 			"TestUtils",
