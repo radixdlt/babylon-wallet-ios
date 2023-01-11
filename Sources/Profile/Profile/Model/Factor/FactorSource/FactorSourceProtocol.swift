@@ -1,6 +1,6 @@
+import Cryptography
 import EngineToolkit
-import Foundation
-import SLIP10
+import Prelude
 
 // MARK: - FactorSourceProtocol
 /// A protocol **all** FactorSources conform to.
@@ -73,8 +73,8 @@ public protocol SLIP10FactorSourceHierarchicalDeterministicProtocol:
 	Instance: FactorInstanceHierarchicalDeterministicSLIP10Protocol,
 	Instance.Curve == Self.Curve
 {
-	static func embedPublicKey(_ publicKey: Self.Curve.PublicKey) -> PublicKey
-	static func embedPrivateKey(_ privateKey: Self.Curve.PrivateKey) -> PrivateKey
+	static func embedPublicKey(_ publicKey: Self.Curve.PublicKey) -> SLIP10.PublicKey
+	static func embedPrivateKey(_ privateKey: Self.Curve.PrivateKey) -> SLIP10.PrivateKey
 }
 
 // MARK: - FactorSourceNonHardwareHierarchicalDeterministicProtocol

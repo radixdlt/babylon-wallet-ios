@@ -1,6 +1,5 @@
-import CustomDump
-import Foundation
-import SLIP10
+import Cryptography
+import Prelude
 
 // MARK: - SLIP10DerivationPathComponent
 /// A type which is component inside the default SLIP10 deriation path scheme

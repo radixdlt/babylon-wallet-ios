@@ -3,8 +3,6 @@ import Cryptography
 import EngineToolkit
 import Prelude
 import struct Profile.AccountAddress
-import enum SLIP10.PrivateKey
-import enum SLIP10.PublicKey
 
 // MARK: - EngineToolkitClient
 public struct EngineToolkitClient: Sendable, DependencyKey {
@@ -29,10 +27,10 @@ public struct JSONInstructionsTransactionManifest: Sendable, Hashable {
 
 // MARK: - ConvertManifestInstructionsToJSONIfItWasStringRequest
 public struct ConvertManifestInstructionsToJSONIfItWasStringRequest: Sendable, Hashable {
-	public let version: Version
+	public let version: TXVersion
 	public let networkID: NetworkID
 	public let manifest: TransactionManifest
-	public init(version: Version, networkID: NetworkID, manifest: TransactionManifest) {
+	public init(version: TXVersion, networkID: NetworkID, manifest: TransactionManifest) {
 		self.version = version
 		self.networkID = networkID
 		self.manifest = manifest
@@ -40,7 +38,7 @@ public struct ConvertManifestInstructionsToJSONIfItWasStringRequest: Sendable, H
 }
 
 public extension EngineToolkitClient {
-	typealias GetTransactionVersion = @Sendable () -> Version
+	typealias GetTransactionVersion = @Sendable () -> TXVersion
 
 	typealias GenerateTXNonce = @Sendable () -> Nonce
 
@@ -59,12 +57,12 @@ public extension EngineToolkitClient {
 
 // MARK: - AccountAddressesNeedingToSignTransactionRequest
 public struct AccountAddressesNeedingToSignTransactionRequest: Sendable, Hashable {
-	public let version: Version
+	public let version: TXVersion
 	public let manifest: TransactionManifest
 	public let networkID: NetworkID
 
 	public init(
-		version: Version,
+		version: TXVersion,
 		manifest: TransactionManifest,
 		networkID: NetworkID
 	) {

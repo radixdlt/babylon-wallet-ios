@@ -1,9 +1,6 @@
-import CryptoKit
-import CustomDump
+import Cryptography
 import EngineToolkit
-import Foundation
-import Mnemonic
-import SLIP10
+import Prelude
 
 // MARK: - Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource
 /// A Hierarchical Deterministic factor source based on a BIP39 Mnemonic that is stored on the device,
@@ -75,11 +72,11 @@ public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10
 		}
 	}
 
-	static func embedPrivateKey(_ privateKey: Self.Curve.PrivateKey) -> PrivateKey {
+	static func embedPrivateKey(_ privateKey: Self.Curve.PrivateKey) -> SLIP10.PrivateKey {
 		.curve25519(privateKey)
 	}
 
-	static func embedPublicKey(_ publicKey: Self.Curve.PublicKey) -> PublicKey {
+	static func embedPublicKey(_ publicKey: Self.Curve.PublicKey) -> SLIP10.PublicKey {
 		.eddsaEd25519(publicKey)
 	}
 }

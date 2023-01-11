@@ -1,9 +1,6 @@
-import Collections
+import Cryptography
 import EngineToolkit
-import Foundation
-import Mnemonic
-import NonEmpty
-import SLIP10
+import Prelude
 
 // MARK: - AnyCreateFactorInstanceForResponse
 public struct AnyCreateFactorInstanceForResponse: Sendable {
@@ -12,8 +9,8 @@ public struct AnyCreateFactorInstanceForResponse: Sendable {
 
 	public let factorInstance: FactorInstance
 
-	public let privateKey: PrivateKey?
-	public func getPrivateKey() throws -> PrivateKey {
+	public let privateKey: SLIP10.PrivateKey?
+	public func getPrivateKey() throws -> SLIP10.PrivateKey {
 		guard let privateKey else {
 			throw NoPrivateKeyError()
 		}
@@ -24,7 +21,7 @@ public struct AnyCreateFactorInstanceForResponse: Sendable {
 		try self.init(factorInstance: concrete.factorInstance.wrapAsFactorInstance(), privateKey: concrete.privateKey)
 	}
 
-	public init(factorInstance: FactorInstance, privateKey: PrivateKey?) throws {
+	public init(factorInstance: FactorInstance, privateKey: SLIP10.PrivateKey?) throws {
 		if
 			let privateKey,
 			let hdFactorInstane = factorInstance.any() as? FactorInstanceHierarchicalDeterministicProtocol
@@ -49,15 +46,15 @@ public struct CreateFactorInstanceWithKey<Instance: Sendable & FactorInstancePro
 		try .init(self)
 	}
 
-	public let privateKey: PrivateKey?
-	public func getPrivateKey() throws -> PrivateKey {
+	public let privateKey: SLIP10.PrivateKey?
+	public func getPrivateKey() throws -> SLIP10.PrivateKey {
 		guard let privateKey else {
 			throw NoPrivateKeyError()
 		}
 		return privateKey
 	}
 
-	public init(factorInstance: Instance, privateKey: PrivateKey?) throws {
+	public init(factorInstance: Instance, privateKey: SLIP10.PrivateKey?) throws {
 		if
 			let privateKey,
 			let hdFactorInstane = factorInstance as? FactorInstanceHierarchicalDeterministicProtocol
@@ -259,14 +256,14 @@ public extension Profile {
 // MARK: - SignersOf
 public struct SignersOf<Entity: EntityProtocol & Sendable & Hashable>: Sendable, Hashable {
 	public let entity: Entity
-	public let notaryPublicKey: PublicKey
+	public let notaryPublicKey: SLIP10.PublicKey
 	public let notarySigner: Signer
 	public let signers: [Signer]
 
 	// FIXME: mainnet - add other signers here, probably as type: `@Sendable (any DataProtocol) async throws -> ((Prompt) async throws -> SignatureWithPublicKey)`, where `Prompt` is a type which can inform caller that user needs to do something, e.g. input answers to security questions inside the prompt, or asked to connect a Ledger Nano S to the computer etc.
 	public init(
 		entity: Entity,
-		notaryPublicKey: PublicKey,
+		notaryPublicKey: SLIP10.PublicKey,
 		notarySigner: @escaping Signer
 	) {
 		self.entity = entity
@@ -288,7 +285,7 @@ public extension SignersOf {
 
 	typealias Signer = @Sendable (any DataProtocol) async throws -> SignatureWithPublicKey
 
-	init(entity: Entity, notaryPrivateKey: PrivateKey) {
+	init(entity: Entity, notaryPrivateKey: SLIP10.PrivateKey) {
 		self.init(
 			entity: entity,
 			notaryPublicKey: notaryPrivateKey.publicKey(),

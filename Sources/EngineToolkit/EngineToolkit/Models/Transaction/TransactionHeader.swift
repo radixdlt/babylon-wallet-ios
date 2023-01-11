@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - TransactionHeader
 public struct TransactionHeader: Sendable, Codable, Hashable {
-	public let version: Version
+	public let version: TXVersion
 	public let networkId: NetworkID
 	public let startEpochInclusive: Epoch
 	public let endEpochExclusive: Epoch
@@ -26,7 +26,7 @@ public struct TransactionHeader: Sendable, Codable, Hashable {
 
 	// MARK: Init
 	public init(
-		version: Version,
+		version: TXVersion,
 		networkId: NetworkID,
 		startEpochInclusive: Epoch,
 		endEpochExclusive: Epoch,

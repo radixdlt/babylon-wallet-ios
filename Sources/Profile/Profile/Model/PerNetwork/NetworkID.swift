@@ -1,7 +1,6 @@
-import CustomDump
+import Cryptography
 @_exported import struct EngineToolkit.NetworkID
-import Foundation
-import SLIP10
+import Prelude
 
 public extension NetworkID {
 	var derivationPathComponentNonHardenedValue: HD.Path.Component.Child.Value { .init(self.id) }

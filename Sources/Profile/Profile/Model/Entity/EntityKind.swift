@@ -1,6 +1,5 @@
-import CustomDump
-import Foundation
-import SLIP10
+import Cryptography
+import Prelude
 
 // MARK: - EntityKind
 /// A kind of entity, e.g. the kind `account` or the kind `identity` (used by Persona), used in derivation path scheme.

@@ -1,1 +1,1 @@
-@_exported import RadixConnect
+@_exported import P2PConnection

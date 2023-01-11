@@ -3,8 +3,6 @@ import Cryptography
 @preconcurrency import EngineToolkit
 import Prelude
 import struct Profile.AccountAddress
-import enum SLIP10.PrivateKey
-import enum SLIP10.PublicKey
 
 public extension EngineToolkitClient {
 	static let liveValue: Self = {
@@ -19,7 +17,7 @@ public extension EngineToolkitClient {
 		}
 
 		return Self(
-			getTransactionVersion: { Version.default },
+			getTransactionVersion: { TXVersion.default },
 			generateTXNonce: generateTXNonce,
 			convertManifestInstructionsToJSONIfItWasString: { request in
 

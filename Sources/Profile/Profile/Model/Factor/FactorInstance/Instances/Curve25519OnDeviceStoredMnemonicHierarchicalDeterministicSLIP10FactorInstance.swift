@@ -1,8 +1,6 @@
-import CryptoKit
-import CustomDump
+import Cryptography
 import EngineToolkit
-import Foundation
-import SLIP10
+import Prelude
 
 // MARK: - Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance
 /// An instance of a factor derived from some `Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource`
@@ -18,14 +16,14 @@ public struct Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10Fac
 	CustomDumpReflectable
 {
 	public let factorSourceReference: FactorSourceReference
-	public let publicKey: PublicKey
+	public let publicKey: SLIP10.PublicKey
 	public let initializationDate: Date
 	public let derivationPath: DerivationPath
 	public let factorInstanceID: FactorInstanceID
 
 	public init(
 		factorSourceReference: FactorSourceReference,
-		publicKey: PublicKey,
+		publicKey: SLIP10.PublicKey,
 		derivationPath: DerivationPath,
 		initializationDate: Date = .init()
 	) {

@@ -1,6 +1,6 @@
-import Foundation
+import Cryptography
+import Prelude
 import Profile
-import SLIP10
 
 // MARK: - P2P.ToDapp.WalletAccount
 public extension P2P.ToDapp {

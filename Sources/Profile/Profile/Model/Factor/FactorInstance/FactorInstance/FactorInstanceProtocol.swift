@@ -1,6 +1,4 @@
-import Bite
-import Foundation
-import Tagged
+import Prelude
 
 /// An identifier for some factor identifier, it **MUST** be a a stable and unique identifer.
 public typealias FactorInstanceID = Tagged<FactorInstance, HexCodable>

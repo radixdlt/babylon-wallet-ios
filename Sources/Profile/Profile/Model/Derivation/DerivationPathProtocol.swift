@@ -1,5 +1,5 @@
-import CustomDump
-import Foundation
+import Cryptography
+import Prelude
 
 // MARK: - DerivationScheme
 /// A derivation scheme used to derive keys using some derivation path.
@@ -128,7 +128,6 @@ public extension DerivationPath {
 	}
 }
 
-import SLIP10
 public extension DerivationPath {
 	func hdFullPath() throws -> HD.Path.Full {
 		switch self {

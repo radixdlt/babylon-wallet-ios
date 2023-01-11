@@ -2,12 +2,10 @@ import Common
 import Cryptography
 import EngineToolkit
 import Prelude
-import enum SLIP10.PrivateKey
-import enum SLIP10.PublicKey
 
 extension EngineToolkitClient: TestDependencyKey {
 	public static let previewValue = Self(
-		getTransactionVersion: { Version.default },
+		getTransactionVersion: { TXVersion.default },
 		generateTXNonce: { .init(rawValue: 1) },
 		convertManifestInstructionsToJSONIfItWasString: { _ in
 			.init(

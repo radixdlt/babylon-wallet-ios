@@ -1,9 +1,6 @@
-import CryptoKit
-import CustomDump
+import Cryptography
 import EngineToolkit
-import Foundation
-import Mnemonic
-import SLIP10
+import Prelude
 
 // MARK: - Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource
 /// A Hierarchical Deterministic factor source based on a BIP39 Mnemonic that is stored on the device,
@@ -76,11 +73,11 @@ public extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44Fa
 		}
 	}
 
-	static func embedPrivateKey(_ privateKey: Self.Curve.PrivateKey) -> PrivateKey {
+	static func embedPrivateKey(_ privateKey: Self.Curve.PrivateKey) -> SLIP10.PrivateKey {
 		.secp256k1(privateKey)
 	}
 
-	static func embedPublicKey(_ publicKey: Self.Curve.PublicKey) -> PublicKey {
+	static func embedPublicKey(_ publicKey: Self.Curve.PublicKey) -> SLIP10.PublicKey {
 		.ecdsaSecp256k1(publicKey)
 	}
 }

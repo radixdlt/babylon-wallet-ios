@@ -1,12 +1,12 @@
 // MARK: - ConvertManifestRequest
 public struct ConvertManifestRequest: Sendable, Codable, Hashable {
-	public let transactionVersion: Version
+	public let transactionVersion: TXVersion
 	public let networkId: NetworkID
 	public let manifestInstructionsOutputFormat: ManifestInstructionsKind
 	public let manifest: TransactionManifest
 
 	public init(
-		transactionVersion: Version,
+		transactionVersion: TXVersion,
 		manifest: TransactionManifest,
 		outputFormat: ManifestInstructionsKind,
 		networkId: NetworkID

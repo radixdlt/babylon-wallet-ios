@@ -1,8 +1,6 @@
-import struct CryptoKit.SHA256
-import CustomDump
+import Cryptography
 import EngineToolkit
-import Foundation
-import SLIP10
+import Prelude
 
 // MARK: - Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance
 /// An instance of a factor derived from some `Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource`
@@ -18,14 +16,14 @@ public struct Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44Facto
 	CustomDumpReflectable
 {
 	public let factorSourceReference: FactorSourceReference
-	public let publicKey: PublicKey
+	public let publicKey: SLIP10.PublicKey
 	public let initializationDate: Date
 	public let derivationPath: DerivationPath
 	public let factorInstanceID: FactorInstanceID
 
 	public init(
 		factorSourceReference: FactorSourceReference,
-		publicKey: PublicKey,
+		publicKey: SLIP10.PublicKey,
 		derivationPath: DerivationPath,
 		initializationDate: Date = .init()
 	) {

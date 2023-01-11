@@ -1,10 +1,6 @@
-import Collections
-import CryptoKit
-import CustomDump
+import Cryptography
 import EngineToolkit
-import Foundation
-import Mnemonic
-import SLIP10
+import Prelude
 
 // MARK: - EncodeAddressRequest
 // FIXME: replace with real EngineToolKit once we added binaries and made a release.
@@ -14,7 +10,7 @@ struct EncodeAddressRequest {
 	let networkID: NetworkID
 
 	init(
-		publicKey: PublicKey,
+		publicKey: SLIP10.PublicKey,
 		addressKind: AddressKind,
 		networkID: NetworkID
 	) {

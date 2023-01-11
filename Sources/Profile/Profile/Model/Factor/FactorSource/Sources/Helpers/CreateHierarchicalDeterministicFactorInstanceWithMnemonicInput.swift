@@ -1,5 +1,5 @@
-import Foundation
-import Mnemonic
+import Cryptography
+import Prelude
 
 public struct CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput: CreateHierarchicalDeterministicFactorInstanceInputProtocol {
 	public let mnemonic: Mnemonic

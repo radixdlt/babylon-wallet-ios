@@ -1,9 +1,6 @@
-import Bite
-import CryptoKit
+import Cryptography
 import EngineToolkit
-import Foundation
-import SLIP10
-import Tagged
+import Prelude
 
 /// An identifier for some factor source, it **MUST** be a a stable and unique identifer.
 public typealias FactorSourceID = Tagged<FactorSource, HexCodable>
@@ -53,7 +50,7 @@ public extension SHA256 {
 	}
 
 	/// Creates a `FactorInstanceID` using `SHA256(SHA256(publicKey.compressedForm)` of the `publickey`
-	static func factorInstanceID(publicKey: PublicKey) -> FactorInstanceID {
+	static func factorInstanceID(publicKey: SLIP10.PublicKey) -> FactorInstanceID {
 		FactorInstanceID(
 			rawValue: HexCodable(
 				data: Self.hash(publicKey: publicKey.compressedData)

@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import Cryptography
 import ErrorQueue
-import KeychainClientDependency
+import Prelude
 import Profile
 import ProfileClient
 import Resources

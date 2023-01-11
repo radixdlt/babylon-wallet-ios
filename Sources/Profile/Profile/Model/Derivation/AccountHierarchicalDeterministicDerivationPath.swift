@@ -1,6 +1,5 @@
-import CustomDump
-import Foundation
-import SLIP10
+import Cryptography
+import Prelude
 
 // MARK: - CannotCreateDerivationPathEntityIndexIsOutOfBound
 struct CannotCreateDerivationPathEntityIndexIsOutOfBound: Swift.Error {}

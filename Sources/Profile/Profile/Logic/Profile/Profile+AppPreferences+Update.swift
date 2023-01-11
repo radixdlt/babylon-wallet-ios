@@ -1,5 +1,5 @@
-import Foundation
 import P2PModels
+import Prelude
 
 public extension AppPreferences {
 	mutating func updateDisplay(_ display: Display) {

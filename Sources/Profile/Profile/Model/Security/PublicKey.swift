@@ -1,8 +1,6 @@
-import Bite
-import CryptoKit
+import Cryptography
 import EngineToolkit
-import Foundation
-import SLIP10
+import Prelude
 
 // MARK: - ECCurve
 public enum ECCurve: String, Codable {
@@ -10,9 +8,9 @@ public enum ECCurve: String, Codable {
 	case secp256k1
 }
 
-// MARK: - PublicKey + Codable
-extension PublicKey: Codable {}
-public extension PublicKey {
+// MARK: - SLIP10.PublicKey + Codable
+extension SLIP10.PublicKey: Codable {}
+public extension SLIP10.PublicKey {
 	private enum CodingKeys: String, CodingKey {
 		case curve, compressedData
 	}
@@ -45,7 +43,7 @@ public extension PublicKey {
 	}
 }
 
-public extension PublicKey {
+public extension SLIP10.PublicKey {
 	var compressedData: Data {
 		switch self {
 		case let .eddsaEd25519(key): return key.compressedRepresentation

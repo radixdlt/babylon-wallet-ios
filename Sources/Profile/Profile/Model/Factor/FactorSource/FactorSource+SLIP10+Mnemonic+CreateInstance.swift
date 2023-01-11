@@ -1,7 +1,5 @@
-import struct CryptoKit.SHA256
-import Foundation
-import Mnemonic
-import SLIP10
+import Cryptography
+import Prelude
 
 // MARK: - OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource
 public protocol OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource:
@@ -60,7 +58,7 @@ public extension OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSour
 			initializationDate: Date()
 		)
 
-		let privateKey: PrivateKey? = { () -> PrivateKey? in
+		let privateKey: SLIP10.PrivateKey? = { () -> SLIP10.PrivateKey? in
 			guard input.includePrivateKey, let privateKey = key.privateKey else {
 				return nil
 			}

@@ -25,7 +25,7 @@ package.addModules([
 			"DesignSystem",
 			"PasteboardClient",
 			"EngineToolkit",
-//			profile,
+			"Profile",
 
 		],
 		tests: .yes(
@@ -146,7 +146,7 @@ package.addModules([
 			dependencies: [
 				"Asset",
 				"DesignSystem",
-//				profile,
+				"Profile",
 				"TestUtils",
 			]
 		)
@@ -175,7 +175,7 @@ package.addModules([
 		dependencies: [
 			"GrantDappWalletAccessFeature",
 			"P2PConnectivityClient",
-//			profile,
+			"Profile",
 			"SharedModels",
 			"TransactionSigningFeature",
 		], tests: .yes(dependencies: ["TestUtils"])
@@ -192,7 +192,7 @@ package.addModules([
 			"P2PConnectivityClient",
 			"Common",
 			"CreateAccountFeature",
-//			"EngineToolkit",
+			"EngineToolkit",
 			"GrantDappWalletAccessFeature",
 			"ProfileClient",
 			"SharedModels",
@@ -326,15 +326,13 @@ package.addModules([
 		dependencies: [
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
-//			profile,
 			"ErrorQueue",
 			"GatewayAPI",
-//			"KeychainClientDependency",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
 			"ProfileClient",
-//			.product(name: "ProfileView", package: "swift-profile"),
+			"ProfileView",
 			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
@@ -389,7 +387,7 @@ package.addModules([
 			"Common",
 			"EngineToolkit",
 			"GatewayAPI",
-//			profile,
+			"Profile",
 		],
 		tests: .yes(
 			dependencies: [
@@ -419,7 +417,7 @@ package.addModules([
 			"Common",
 			"Cryptography",
 			"EngineToolkit",
-//			profile, // AccountAddress
+			"Profile", // AccountAddress
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -437,7 +435,7 @@ package.addModules([
 			"EngineToolkit",
 			"EngineToolkitClient",
 			"GatewayAPI",
-//			profile,
+			"Profile",
 			"ProfileClient",
 			"TransactionClient",
 		], tests: .no
@@ -460,7 +458,7 @@ package.addModules([
 			"EngineToolkit",
 			"EngineToolkitClient",
 			"JSON",
-//			profile, // address
+			"Profile", // address
 			"ProfileClient",
 		],
 		exclude: [
@@ -475,14 +473,6 @@ package.addModules([
 		dependencies: [],
 		tests: .no
 	),
-	// TODO: remove KeychainClientDependency
-//	.client(
-//		name: "KeychainClientDependency",
-//		dependencies: [
-//			.product(name: "KeychainClient", package: "swift-profile"),
-//		],
-//		tests: .no
-//	),
 	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],
@@ -496,7 +486,7 @@ package.addModules([
 			"Common",
 			"EngineToolkit", // Model: SignTX contains Manifest
 			"JSON",
-//			profile, // Account
+			"Profile", // Account
 			"ProfileClient",
 			"P2PConnection",
 			"Resources",
@@ -523,7 +513,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			"EngineToolkitClient", // Create TX
-//			profile,
+			"Profile",
 			"ProfileLoader",
 			"SharedModels",
 			"UserDefaultsClient",
@@ -537,8 +527,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"JSON",
-//			"KeychainClientDependency",
-//			profile,
+			"Profile",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -571,7 +560,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"EngineToolkitClient", // I know, this is very wrong. Apologies. Let's revisit our dependency levels post betanet.
-//			profile, // Address
+			"Profile", // Address
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -582,7 +571,7 @@ package.addModules([
 		dependencies: [
 			"DesignSystem",
 			"EngineToolkit",
-//			profile, // Address
+			"Profile", // Address
 			"Resources",
 		],
 		tests: .yes(
@@ -595,7 +584,7 @@ package.addModules([
 			"Asset",
 			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make "EngineToolkit", etc. vend their own Model packages.
 			"EngineToolkit", // FIXME: In `EngineToolkit` split out Models package
-			//            profile, // FIXME: In `Profile` split out Models package
+			"Profile", // FIXME: In `Profile` split out Models package
 			"P2PModels",
 		],
 		tests: .yes(
@@ -652,13 +641,23 @@ package.addModules([
 		category: "Profile",
 		dependencies: [
 			"Cryptography",
+			"EngineToolkit",
+			"P2PModels",
 		],
 		tests: .yes(
-			dependencies: []
-//			resources: [
-//				.process("TestVectors/"),
-//			]
+			dependencies: [],
+			resources: [
+				.process("TestVectors/"),
+			]
 		)
+	),
+	.module(
+		name: "ProfileView",
+		category: "Profile",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
 	),
 	.module(
 		name: "EngineToolkit",
@@ -753,6 +752,9 @@ package.addModules([
 			},
 			.product(name: "Tagged", package: "swift-tagged") {
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
+			},
+			.product(name: "Version", package: "Version") {
+				.package(url: "https://github.com/mxcl/Version", from: "2.0.1")
 			},
 		],
 		tests: .yes(dependencies: [])

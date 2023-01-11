@@ -204,7 +204,7 @@ public extension TransactionManifest {
 
 	func accountsRequiredToSign(
 		networkId: NetworkID,
-		version: Version = .default
+		version: TXVersion = .default
 	) throws -> Set<ComponentAddress> {
 		let convertedManifest = try EngineToolkit().convertManifest(request: ConvertManifestRequest(
 			transactionVersion: version,

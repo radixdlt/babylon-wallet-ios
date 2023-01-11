@@ -1,12 +1,12 @@
 import Foundation
 import Tagged
 
-// MARK: - VersionTag
-public enum VersionTag: Sendable {}
+// MARK: - TXVersionTag
+public enum TXVersionTag: Sendable {}
 
 /// Transaction Version
-public typealias Version = Tagged<VersionTag, UInt8>
+public typealias TXVersion = Tagged<TXVersionTag, UInt8>
 
-public extension Version {
+public extension TXVersion {
 	static let `default`: Self = 1
 }

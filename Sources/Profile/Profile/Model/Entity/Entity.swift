@@ -1,6 +1,6 @@
+import Cryptography
 import EngineToolkit
-import Foundation
-import SLIP10
+import Prelude
 
 // MARK: - EntityProtocol
 /// An `Account` or a `Persona`
@@ -34,7 +34,7 @@ public protocol EntityProtocol {
 public extension EntityProtocol {
 	static func deriveAddress(
 		networkID: NetworkID,
-		publicKey: PublicKey
+		publicKey: SLIP10.PublicKey
 	) throws -> EntityAddress {
 		let response = try EngineToolkit().deriveVirtualAccountAddressRequest(
 			request: .init(

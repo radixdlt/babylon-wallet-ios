@@ -467,6 +467,16 @@
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ProfileTests"
+               BuildableName = "ProfileTests"
+               BlueprintName = "ProfileTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

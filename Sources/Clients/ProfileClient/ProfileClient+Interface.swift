@@ -1,6 +1,5 @@
 import Cryptography
 import EngineToolkit
-import KeychainClient
 import P2PModels
 import Prelude
 import Profile
