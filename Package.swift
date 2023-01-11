@@ -676,9 +676,7 @@ package.addModules([
 		name: "P2PModels",
 		category: "RadixConnect",
 		dependencies: [
-			.product(name: "SwiftLogConsoleColors", package: "swift-log-console-colors") {
-				.package(url: "https://github.com/nneuberger1/swift-log-console-colors", from: "1.0.3")
-			},
+			"Cryptography",
 		],
 		tests: .yes(
 			dependencies: []
@@ -735,6 +733,9 @@ package.addModules([
 			},
 			.product(name: "NonEmpty", package: "swift-nonempty") {
 				.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0")
+			},
+			.product(name: "SwiftLogConsoleColors", package: "swift-log-console-colors") {
+				.package(url: "https://github.com/nneuberger1/swift-log-console-colors", from: "1.0.3")
 			},
 			.product(name: "Tagged", package: "swift-tagged") {
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")

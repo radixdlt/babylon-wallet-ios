@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 // MARK: - ChunkedMessageChunkPackage
 public struct ChunkedMessageChunkPackage: Sendable, Codable, Comparable {
