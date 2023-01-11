@@ -585,6 +585,7 @@ package.addModules([
 			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make "EngineToolkit", etc. vend their own Model packages.
 			"EngineToolkit", // FIXME: In `EngineToolkit` split out Models package
 			"Profile", // FIXME: In `Profile` split out Models package
+			"P2PConnection",
 			"P2PModels",
 		],
 		tests: .yes(
