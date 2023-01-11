@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import Dependencies
 @testable import PasteboardClient
 import TestUtils
 

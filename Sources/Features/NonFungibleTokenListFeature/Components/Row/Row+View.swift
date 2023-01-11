@@ -45,7 +45,7 @@ public extension NonFungibleTokenList.Row.View {
 								componentView(with: viewStore, index: index)
 							}
 						}
-						.onSizeChanged(ReferenceView.self) { size in
+						.onSizeChanged { size in
 							if rowHeights[index] == nil {
 								rowHeights[index] = size.height
 							} else {

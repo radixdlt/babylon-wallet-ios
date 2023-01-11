@@ -866,6 +866,8 @@ package.addModules([
 			.product(name: "BigInt", package: "BigInt"),
 			.product(name: "Bite", package: "Bite"),
 			.product(name: "Collections", package: "swift-collections"),
+			.product(name: "CustomDump", package: "swift-custom-dump"),
+			.product(name: "IdentifiedCollections", package: "swift-identified-collections"),
 			.product(name: "LegibleError", package: "LegibleError"),
 			.product(name: "NonEmpty", package: "swift-nonempty"),
 			.product(name: "Tagged", package: "swift-tagged"),
@@ -881,6 +883,8 @@ package.dependencies += [
 	.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0"),
 	.package(url: "git@github.com:radixdlt/Bite.git", from: "0.0.3"), // TODO: move in locally
 	.package(url: "https://github.com/apple/swift-collections", from: "1.0.3"),
+	.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.1"),
+	.package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "0.6.0"),
 	.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6"),
 	.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0"),
 	.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0"),
