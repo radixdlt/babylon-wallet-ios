@@ -56,7 +56,7 @@ public extension CreateAccount {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.createAccountButtonTapped)):
-			precondition(!state.isCreatingAccount)
+			assert(!state.isCreatingAccount)
 			state.focusedField = nil
 			state.isCreatingAccount = true
 
