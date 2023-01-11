@@ -11,6 +11,7 @@ public struct Splash: Sendable, ReducerProtocol {
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
 	@Dependency(\.platformEnvironmentClient) var platformEnvironmentClient
 	@Dependency(\.profileLoader) var profileLoader
+	@Dependency(\.openURL) var openURL
 
 	public init() {}
 
@@ -19,19 +20,30 @@ public struct Splash: Sendable, ReducerProtocol {
 		case .internal(.view(.viewAppeared)):
 			return loadProfile()
 
-		case .internal(.view(.alertRetryButtonTapped)):
-			state.alert = nil
-			return verifyBiometrics()
-
 		case let .internal(.system(.biometricsConfigResult(result))):
 			let config = try? result.value
+
 			guard config?.isBiometricsSetUp == true else {
-				state.alert = .init(
-					title: .init(L10n.Splash.biometricsNotSetUpTitle),
-					message: .init(L10n.Splash.biometricsNotSetUpMessage)
+				state.biometricsCheckFailedAlert = .init(
+					title: { .init(L10n.Splash.Alert.BiometricsCheckFailed.title) },
+					actions: {
+						ButtonState(
+							role: .cancel,
+							action: .send(.cancelButtonTapped),
+							label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.cancelButtonTitle) }
+						)
+						ButtonState(
+							role: .none,
+							action: .send(.openSettingsButtonTapped),
+							label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.settingsButtonTitle) }
+						)
+					},
+					message: { .init(L10n.Splash.Alert.BiometricsCheckFailed.message) }
 				)
+
 				return .none
 			}
+
 			return notifyDelegate(profileResult: state.profileResult)
 
 		case let .internal(.system(.loadProfileResult(result))):
@@ -45,6 +57,21 @@ public struct Splash: Sendable, ReducerProtocol {
 
 		case .delegate:
 			return .none
+
+		case let .internal(.view(.biometricsCheckFailed(action))):
+			state.biometricsCheckFailedAlert = nil
+
+			switch action {
+			case .dismissed, .cancelButtonTapped:
+				return notifyDelegate(profileResult: state.profileResult)
+
+			case .openSettingsButtonTapped:
+				return .run { _ in
+					#if os(iOS)
+					await openURL(URL(string: UIApplication.openSettingsURLString)!)
+					#endif
+				}
+			}
 		}
 	}
 
