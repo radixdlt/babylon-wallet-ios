@@ -1,5 +1,3 @@
-import Foundation
-
 // MARK: - UInt11
 public struct UInt11: Hashable, ExpressibleByIntegerLiteral {
 	public let valueBoundBy16Bits: UInt16
