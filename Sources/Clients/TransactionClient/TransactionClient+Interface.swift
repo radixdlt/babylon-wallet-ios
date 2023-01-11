@@ -1,7 +1,7 @@
 import Common
-import Dependencies
 import EngineToolkit
 import EngineToolkitClient
+import Prelude
 
 // MARK: - TransactionClient
 public struct TransactionClient: Sendable, DependencyKey {
@@ -26,8 +26,7 @@ public extension DependencyValues {
 	}
 }
 
-import Collections
-import NonEmpty
+import Prelude
 import Profile
 import ProfileClient
 

@@ -1,4 +1,4 @@
-import BigInt
+import Foundation
 
 // MARK: - BigUInt + Sendable
 extension BigUInt: @unchecked Sendable {}

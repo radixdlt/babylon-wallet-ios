@@ -1,5 +1,5 @@
-import Dependencies
 import Foundation
+import Prelude
 
 // MARK: - JSONEncoder + DependencyKey
 extension JSONEncoder: DependencyKey {

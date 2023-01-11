@@ -1,5 +1,4 @@
-import Dependencies
-import XCTestDynamicOverlay
+import Prelude
 
 // MARK: - PlatformEnvironmentClient + TestDependencyKey
 extension PlatformEnvironmentClient: TestDependencyKey {

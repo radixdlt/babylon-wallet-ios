@@ -1,10 +1,7 @@
-import AsyncExtensions
-import Dependencies
-import Foundation
 import P2PModels
+import Prelude
 import Profile
 import SharedModels
-import XCTestDynamicOverlay
 
 #if DEBUG
 
@@ -34,17 +31,17 @@ extension P2PConnectivityClient {
 		loadFromProfileAndConnectAll: {},
 		disconnectAndRemoveAll: {},
 		getLocalNetworkAccess: { false },
-		getP2PClientIDs: { [].async.eraseToAnyAsyncSequence() },
+		getP2PClientIDs: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getP2PClientsByIDs: { _ in .init() },
 		addP2PClientWithConnection: { _ in },
 		deleteP2PClientByID: { _ in },
-		getConnectionStatusAsyncSequence: { _ in [].async.eraseToAnyAsyncSequence() },
-		getRequestsFromP2PClientAsyncSequence: { _ in [].async.eraseToAnyAsyncSequence() },
+		getConnectionStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		getRequestsFromP2PClientAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		sendMessageReadReceipt: { _, _ in },
 		sendMessage: { _ in .previewValue },
 		_sendTestMessage: { _, _ in },
-		_debugWebsocketStatusAsyncSequence: { _ in [].async.eraseToAnyAsyncSequence() },
-		_debugDataChannelStatusAsyncSequence: { _ in [].async.eraseToAnyAsyncSequence() }
+		_debugWebsocketStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		_debugDataChannelStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)
 }
 

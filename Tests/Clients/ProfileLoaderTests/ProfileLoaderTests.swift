@@ -1,5 +1,5 @@
-import Dependencies
 import KeychainClient
+import Prelude
 @testable import ProfileLoader
 import TestUtils
 
@@ -12,8 +12,7 @@ final class ProfileLoaderTests: TestCase {
 		}
 		""".data(using: .utf8)!
 
-		await DependencyValues.withValues {
-			$0.context = .test
+		await withDependencies {
 			$0.keychainClient.dataForKey = { _, _ in json }
 		} operation: {
 			let res = await sut.loadProfile()

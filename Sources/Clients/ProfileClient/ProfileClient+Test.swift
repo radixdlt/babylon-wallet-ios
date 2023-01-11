@@ -1,11 +1,7 @@
-import Collections
-import Dependencies
-import Foundation
 import Mnemonic
-import NonEmpty
+import Prelude
 import Profile
 import SharedModels
-import XCTestDynamicOverlay
 
 public extension DependencyValues {
 	var profileClient: ProfileClient {

@@ -1,8 +1,7 @@
-import Collections
 import ComposableArchitecture
 import CreateAccountFeature
 import ErrorQueue
-import NonEmpty
+import Prelude
 import Profile
 import ProfileClient
 

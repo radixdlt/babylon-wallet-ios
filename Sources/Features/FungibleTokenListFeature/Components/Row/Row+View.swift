@@ -1,8 +1,8 @@
 import Asset
-import BigInt
 import Common
 import ComposableArchitecture
 import DesignSystem
+import Prelude
 import Profile
 
 // MARK: - FungibleTokenList.Row.View

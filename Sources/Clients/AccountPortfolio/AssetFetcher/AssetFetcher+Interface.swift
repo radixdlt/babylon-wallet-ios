@@ -1,6 +1,5 @@
 import Asset
-import BigInt
-import Dependencies
+import Prelude
 import Profile
 
 // MARK: - AssetFetcher

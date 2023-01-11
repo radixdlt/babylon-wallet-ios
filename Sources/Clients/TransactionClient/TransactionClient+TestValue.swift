@@ -1,6 +1,5 @@
 #if DEBUG
-import Dependencies
-import XCTestDynamicOverlay
+import Prelude
 
 extension TransactionClient: TestDependencyKey {
 	public static let testValue: TransactionClient = .init(

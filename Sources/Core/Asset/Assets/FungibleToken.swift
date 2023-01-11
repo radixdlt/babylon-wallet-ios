@@ -1,8 +1,7 @@
-import BigInt
 import Common
 import EngineToolkit
 import EngineToolkitClient
-import Foundation
+import Prelude
 import Profile
 
 // MARK: - FungibleToken

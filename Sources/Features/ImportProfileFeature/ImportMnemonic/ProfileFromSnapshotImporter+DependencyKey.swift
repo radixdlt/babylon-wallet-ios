@@ -1,5 +1,5 @@
-import Dependencies
 import Foundation
+import Prelude
 import Profile
 
 public typealias ProfileFromSnapshotImporter = @Sendable (ProfileSnapshot) throws -> Profile

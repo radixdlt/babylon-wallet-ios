@@ -1,8 +1,7 @@
 import TestUtils
 
-import Collections
 import ComposableArchitecture
-import NonEmpty
+import Prelude
 import ProfileClient
 import SharedModels
 

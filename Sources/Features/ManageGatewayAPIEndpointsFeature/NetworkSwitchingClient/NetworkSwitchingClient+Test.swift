@@ -1,8 +1,7 @@
 import Foundation
 
 #if DEBUG
-import Dependencies
-import XCTestDynamicOverlay
+import Prelude
 extension NetworkSwitchingClient: TestDependencyKey {
 	public static let testValue: Self = .init(
 		getNetworkAndGateway: unimplemented("\(Self.self).getNetworkAndGateway"),

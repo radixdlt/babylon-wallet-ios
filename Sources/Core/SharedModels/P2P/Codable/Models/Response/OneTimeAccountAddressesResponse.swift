@@ -1,5 +1,4 @@
-import Foundation
-import NonEmpty
+import Prelude
 
 // MARK: - P2P.ToDapp.OneTimeAccountsResponseItem
 public extension P2P.ToDapp {

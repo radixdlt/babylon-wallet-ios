@@ -1,7 +1,6 @@
-import Collections
 import ComposableArchitecture
 @testable import GrantDappWalletAccessFeature
-import NonEmpty
+import Prelude
 import Profile
 import SharedModels
 import TestUtils

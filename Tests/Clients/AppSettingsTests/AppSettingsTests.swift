@@ -1,5 +1,5 @@
 @testable import AppSettings
-import ComposableArchitecture
+import Prelude
 import TestUtils
 
 final class AppSettingsTests: TestCase {

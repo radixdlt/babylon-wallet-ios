@@ -1,5 +1,4 @@
-import Dependencies
-import XCTestDynamicOverlay
+import Prelude
 
 // MARK: - PasteboardClient + TestDependencyKey
 extension PasteboardClient: TestDependencyKey {
