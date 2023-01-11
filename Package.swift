@@ -722,7 +722,7 @@ package.addModules([
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
 			},
 		],
-		tests: .no
+		tests: .yes(dependencies: [])
 	),
 ])
 
