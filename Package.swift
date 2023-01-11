@@ -687,7 +687,6 @@ package.addModules([
 				.package(url: "https://github.com/Sajjon/K1.git", from: "0.0.4")
 			},
 		],
-		exclude: ["Mnemonic/DataStructures/BitArray/BitCollections/README.md"],
 		tests: .yes(
 			dependencies: [],
 			resources: [
