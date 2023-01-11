@@ -1,5 +1,5 @@
-import Foundation
 import P2PModels
+import Prelude
 
 // MARK: - ChunkedMessagePackageAssembler
 public final class ChunkedMessagePackageAssembler: Sendable {

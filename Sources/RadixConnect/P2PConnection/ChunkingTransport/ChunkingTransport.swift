@@ -1,7 +1,7 @@
 import Combine
-import Foundation
 import Logging
 import P2PModels
+import Prelude
 
 // MARK: - HandledMessagesByPeers
 // The rationale for using a GlobalActor here is that if we destroy and recreate peers we still do
