@@ -648,6 +648,19 @@ package.addModules([
 
 package.addModules([
 	.module(
+		name: "Profile",
+		category: "Profile",
+		dependencies: [
+			"Cryptography",
+		],
+		tests: .yes(
+			dependencies: []
+//			resources: [
+//				.process("TestVectors/"),
+//			]
+		)
+	),
+	.module(
 		name: "EngineToolkit",
 		category: "EngineToolkit",
 		dependencies: [
@@ -728,6 +741,9 @@ package.addModules([
 			},
 			.product(name: "IdentifiedCollections", package: "swift-identified-collections") {
 				.package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "0.6.0")
+			},
+			.product(name: "KeychainAccess", package: "KeychainAccess") {
+				.package(url: "https://github.com/kishikawakatsumi/KeychainAccess", from: "4.2.2")
 			},
 			.product(name: "LegibleError", package: "LegibleError") {
 				.package(url: "https://github.com/mxcl/LegibleError", from: "1.0.6")
