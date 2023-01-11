@@ -1,6 +1,5 @@
 import Foundation
 import Prelude
-import XCTestDynamicOverlay
 
 // MARK: - FaucetClient + TestDependencyKey
 extension FaucetClient: TestDependencyKey {

@@ -4,7 +4,6 @@ import P2PModels
 import Prelude
 import ProfileClient
 import SharedModels
-import XCTestDynamicOverlay
 
 // MARK: - DependencyValues
 public extension DependencyValues {

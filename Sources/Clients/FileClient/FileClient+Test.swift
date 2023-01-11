@@ -1,6 +1,5 @@
 import Foundation
 import Prelude
-import XCTestDynamicOverlay
 
 public extension DependencyValues {
 	var fileClient: FileClient {

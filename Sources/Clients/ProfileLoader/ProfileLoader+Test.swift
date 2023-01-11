@@ -1,7 +1,7 @@
 import Prelude
 import Profile
 #if DEBUG
-import XCTestDynamicOverlay
+import Prelude
 
 // MARK: - ProfileLoader + TestDependencyKey
 extension ProfileLoader: TestDependencyKey {

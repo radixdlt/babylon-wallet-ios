@@ -3,7 +3,6 @@ import Foundation
 import Mnemonic
 import Prelude
 import Profile
-import XCTestDynamicOverlay
 
 // MARK: - GatewayAPIClient + TestDependencyKey
 extension GatewayAPIClient: TestDependencyKey {
