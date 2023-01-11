@@ -29,10 +29,6 @@ public extension HexCodable {
 	init(hex: String) throws {
 		try self.init(data: Data(hex: hex))
 	}
-
-	func hex(options: Data.HexEncodingOptions = []) -> String {
-		data.hex(options: options)
-	}
 }
 
 // MARK: Identifiable

@@ -33,7 +33,7 @@ public extension PublicKey {
 	}
 }
 
-public extension SLIP10.PublicKey {
+public extension PublicKey {
 	/// For ECDSA secp256k1 public keys this will use the compressed representation
 	/// For EdDSA Curve25519 there is no difference between compressed and uncompressed.
 	var compressedRepresentation: Data {

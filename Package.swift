@@ -686,7 +686,8 @@ package.addModules([
 				.package(url: "https://github.com/Sajjon/K1.git", from: "0.0.4")
 			},
 		],
-		tests: .no
+		exclude: ["Mnemonic/DataStructures/BitArray/BitCollections/README.md"],
+		tests: .yes(dependencies: [], resources: [.process("MnemonicTests/TestVectors/")])
 	),
 	.module(
 		name: "Prelude",
