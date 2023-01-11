@@ -4,11 +4,11 @@ import Foundation
 // MARK: - CreateAccountCoordinator.State
 public extension CreateAccountCoordinator {
 	struct State: Equatable {
-		public let completionDestination: CrateAccountCompletionDestination
+		public let completionDestination: CreateAccountCompletionDestination
 		public var root: Root
 
 		public init(
-			completionDestination: CrateAccountCompletionDestination,
+			completionDestination: CreateAccountCompletionDestination,
 			rootState: Root.InitialState = .init()
 		) {
 			self.completionDestination = completionDestination
@@ -31,7 +31,7 @@ public extension CreateAccountCoordinator.State {
 }
 
 // MARK: - CrateAccountCompletionDestination
-public enum CrateAccountCompletionDestination: String, Sendable {
+public enum CreateAccountCompletionDestination: String, Sendable {
 	case home
 	case chooseAccounts
 

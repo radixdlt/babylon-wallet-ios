@@ -7,12 +7,12 @@ public extension AccountCompletion {
 	struct State: Sendable, Equatable {
 		public let account: OnNetwork.Account
 		public let isFirstAccount: Bool
-		public let destination: CrateAccountCompletionDestination
+		public let destination: CreateAccountCompletionDestination
 
 		public init(
 			account: OnNetwork.Account,
 			isFirstAccount: Bool,
-			destination: CrateAccountCompletionDestination
+			destination: CreateAccountCompletionDestination
 		) {
 			self.account = account
 			self.isFirstAccount = isFirstAccount
