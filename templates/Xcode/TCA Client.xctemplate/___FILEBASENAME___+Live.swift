@@ -1,5 +1,4 @@
-import Dependencies
-import Foundation
+import Prelude
 
 extension ___VARIABLE_clientName___: DependencyKey {
 	public typealias Value = ___VARIABLE_clientName___

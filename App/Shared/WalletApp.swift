@@ -2,10 +2,10 @@ import AppFeature
 import ComposableArchitecture
 import DesignSystem
 import KeychainClientDependency
+import Prelude
 import ProfileClient
 import SwiftUI
 import UserDefaultsClient
-import XCTestDynamicOverlay
 
 // MARK: - WalletApp
 @main

@@ -1,5 +1,5 @@
-import Dependencies
 @testable import PasteboardClient
+import Prelude
 import TestUtils
 
 // MARK: - PasteboardClientTests

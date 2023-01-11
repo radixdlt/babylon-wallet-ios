@@ -1,5 +1,5 @@
 @testable import AccountPortfolio
-import Dependencies
+import Prelude
 import TestUtils
 
 final class AccountPortfolioTests: TestCase {

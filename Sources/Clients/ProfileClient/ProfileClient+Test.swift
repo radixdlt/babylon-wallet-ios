@@ -1,9 +1,7 @@
-import Dependencies
 import Mnemonic
 import Prelude
 import Profile
 import SharedModels
-import XCTestDynamicOverlay
 
 public extension DependencyValues {
 	var profileClient: ProfileClient {

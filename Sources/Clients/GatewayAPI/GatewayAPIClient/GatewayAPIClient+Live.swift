@@ -1,9 +1,9 @@
 import Common
 import CryptoKit
-import Dependencies
 import EngineToolkit
 import EngineToolkitClient
 import Foundation
+import Prelude
 import Profile
 import ProfileClient
 import SLIP10

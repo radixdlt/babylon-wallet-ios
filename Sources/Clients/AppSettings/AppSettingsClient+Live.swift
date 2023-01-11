@@ -1,6 +1,6 @@
-import Dependencies
 import Foundation
 import JSON
+import Prelude
 import UserDefaultsClient
 
 // MARK: - AppSettingsClient + DependencyKey

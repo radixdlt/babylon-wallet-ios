@@ -1,5 +1,5 @@
-import Dependencies
 import KeychainClient
+import Prelude
 @testable import ProfileLoader
 import TestUtils
 

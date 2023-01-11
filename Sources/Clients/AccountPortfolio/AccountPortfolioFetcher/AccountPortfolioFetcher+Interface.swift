@@ -1,4 +1,4 @@
-import Dependencies
+import Prelude
 import Profile
 
 // MARK: - AccountPortfolioFetcher

@@ -1,11 +1,10 @@
 import Common
 import CryptoKit
-import Dependencies
 import EngineToolkit
 import Foundation
+import Prelude
 import enum SLIP10.PrivateKey
 import enum SLIP10.PublicKey
-import XCTestDynamicOverlay
 
 extension EngineToolkitClient: TestDependencyKey {
 	public static let previewValue = Self(

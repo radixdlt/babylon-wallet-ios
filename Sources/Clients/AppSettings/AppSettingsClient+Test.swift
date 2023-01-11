@@ -1,6 +1,5 @@
-import Dependencies
 import Foundation
-import XCTestDynamicOverlay
+import Prelude
 
 // MARK: - AppSettingsClient + TestDependencyKey
 extension AppSettingsClient: TestDependencyKey {

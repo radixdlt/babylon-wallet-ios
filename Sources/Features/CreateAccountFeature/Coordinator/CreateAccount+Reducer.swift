@@ -24,7 +24,7 @@ public extension MnemonicGenerator {
 }
 
 #if DEBUG
-import XCTestDynamicOverlay
+import Prelude
 extension MnemonicGenerator: TestDependencyKey {
 	public static let testValue: Self = .init(generate: unimplemented("\(Self.self).generate"))
 }

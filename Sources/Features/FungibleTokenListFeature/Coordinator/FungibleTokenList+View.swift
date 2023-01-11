@@ -2,8 +2,6 @@ import Asset
 import ComposableArchitecture
 import DesignSystem
 import FungibleTokenDetailsFeature
-import SwiftUI
-import SwiftUINavigation
 
 // MARK: - FungibleTokenList.View
 public extension FungibleTokenList {
