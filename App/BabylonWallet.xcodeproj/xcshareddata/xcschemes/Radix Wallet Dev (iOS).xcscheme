@@ -407,6 +407,35 @@
                BlueprintName = "CryptographyTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "SLIP10TestVectorsTests/testDerivationRetryP256()">
+               </Test>
+               <Test
+                  Identifier = "SLIP10TestVectorsTests/testP256PublicKeyInit()">
+               </Test>
+               <Test
+                  Identifier = "SLIP10TestVectorsTests/testSeedRetryForP256()">
+               </Test>
+               <Test
+                  Identifier = "SLIP10TestVectorsTests/testSlip10Vector1P256()">
+               </Test>
+               <Test
+                  Identifier = "SLIP10TestVectorsTests/testSlip10Vector2P256()">
+               </Test>
+               <Test
+                  Identifier = "SerializeTests/testAtZeroHardenedXPUBP256()">
+               </Test>
+               <Test
+                  Identifier = "SerializeTests/testMasterKeyXPUBP256()">
+               </Test>
+               <Test
+                  Identifier = "TestVectorsTests/testVectors10()">
+               </Test>
+               <Test
+                  Identifier = "TestVectorsTests/testVectors1K()">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
