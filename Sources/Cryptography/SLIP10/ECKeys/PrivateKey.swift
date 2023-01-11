@@ -18,10 +18,12 @@ public extension Curve25519.Signing.PrivateKey {
 	}
 }
 
-// MARK: - PrivateKey
-public enum PrivateKey: Sendable, Hashable {
-	case curve25519(Curve25519.Signing.PrivateKey)
-	case secp256k1(K1.PrivateKey)
+// MARK: - SLIP10.PrivateKey
+public extension SLIP10 {
+	enum PrivateKey: Sendable, Hashable {
+		case curve25519(Curve25519.Signing.PrivateKey)
+		case secp256k1(K1.PrivateKey)
+	}
 }
 
 public extension SHA256 {
@@ -31,7 +33,7 @@ public extension SHA256 {
 	}
 }
 
-public extension PrivateKey {
+public extension SLIP10.PrivateKey {
 	/// Expects a non hashed `data`, will SHA256 double hash it for secp256k1,
 	/// but not for Curve25519, before signing, for secp256k1 we produce a
 	/// recoverable ECDSA signature.
@@ -95,8 +97,8 @@ public extension PrivateKey {
 // MARK: - SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong
 struct SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong: Swift.Error {}
 
-public extension PrivateKey {
-	func publicKey() -> PublicKey {
+public extension SLIP10.PrivateKey {
+	func publicKey() -> SLIP10.PublicKey {
 		switch self {
 		case let .secp256k1(privateKey):
 			return .ecdsaSecp256k1(privateKey.publicKey)
@@ -106,7 +108,7 @@ public extension PrivateKey {
 	}
 }
 
-public extension PrivateKey {
+public extension SLIP10.PrivateKey {
 	var rawRepresentation: Data {
 		switch self {
 		case let .secp256k1(privateKey):

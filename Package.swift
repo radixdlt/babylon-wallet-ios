@@ -12,24 +12,6 @@ let package = Package(
 	]
 )
 
-// MARK: - Dependencies
-
-// package.dependencies += [
-//	// RDX Works dependencies
-//	.package(url: "git@github.com:radixdlt/swift-engine-toolkit.git", from: "0.1.11"),
-//	.package(url: "git@github.com:radixdlt/swift-profile.git", from: "0.1.4"),
-// ]
-//
-// let profile: Target.Dependency = .product(
-//	name: "Profile",
-//	package: "swift-profile"
-// )
-//
-// let engineToolkit: Target.Dependency = .product(
-//	name: "EngineToolkit",
-//	package: "swift-engine-toolkit"
-// )
-
 // MARK: - Features
 
 package.addModules([
@@ -42,7 +24,7 @@ package.addModules([
 			"AssetsViewFeature",
 			"DesignSystem",
 			"PasteboardClient",
-//			engineToolkit,
+			"EngineToolkit",
 //			profile,
 
 		],
@@ -91,7 +73,7 @@ package.addModules([
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AccountPortfolio",
 			"AppSettings",
-//			engineToolkit,
+			"EngineToolkit",
 			"ErrorQueue",
 			"MainFeature",
 			"OnboardingFeature",
@@ -129,7 +111,7 @@ package.addModules([
 			"Common",
 			"Cryptography",
 			"DesignSystem",
-//			engineToolkit,
+			"EngineToolkit",
 			"ErrorQueue",
 			"GatewayAPI",
 //			"KeychainClientDependency",
@@ -210,7 +192,7 @@ package.addModules([
 			"P2PConnectivityClient",
 			"Common",
 			"CreateAccountFeature",
-//			engineToolkit,
+//			"EngineToolkit",
 			"GrantDappWalletAccessFeature",
 			"ProfileClient",
 			"SharedModels",
@@ -249,7 +231,7 @@ package.addModules([
 			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AppSettings",
 			"AccountPortfolio",
-//			engineToolkit,
+//			"EngineToolkit",
 			"HandleDappRequests",
 			"HomeFeature",
 			"PasteboardClient",
@@ -315,7 +297,7 @@ package.addModules([
 			"Asset",
 			"Common",
 			"DesignSystem",
-//			engineToolkit,
+			"EngineToolkit",
 			"PasteboardClient",
 			"SharedModels",
 		],
@@ -405,7 +387,7 @@ package.addModules([
 			"AppSettings",
 			"Asset",
 			"Common",
-//			engineToolkit,
+			"EngineToolkit",
 			"GatewayAPI",
 //			profile,
 		],
@@ -436,7 +418,7 @@ package.addModules([
 		dependencies: [
 			"Common",
 			"Cryptography",
-//			engineToolkit,
+			"EngineToolkit",
 //			profile, // AccountAddress
 		],
 		tests: .yes(
@@ -452,7 +434,7 @@ package.addModules([
 		name: "FaucetClient",
 		dependencies: [
 			"Common",
-//			engineToolkit,
+			"EngineToolkit",
 			"EngineToolkitClient",
 			"GatewayAPI",
 //			profile,
@@ -475,7 +457,7 @@ package.addModules([
 			"Asset",
 			"Common",
 			"Cryptography",
-//			engineToolkit,
+			"EngineToolkit",
 			"EngineToolkitClient",
 			"JSON",
 //			profile, // address
@@ -512,7 +494,7 @@ package.addModules([
 		name: "P2PConnectivityClient",
 		dependencies: [
 			"Common",
-//			engineToolkit, // Model: SignTX contains Manifest
+			"EngineToolkit", // Model: SignTX contains Manifest
 			"JSON",
 //			profile, // Account
 			"ProfileClient",
@@ -599,7 +581,7 @@ package.addModules([
 		name: "Common",
 		dependencies: [
 			"DesignSystem",
-//			engineToolkit,
+			"EngineToolkit",
 //			profile, // Address
 			"Resources",
 		],
@@ -611,8 +593,8 @@ package.addModules([
 		name: "SharedModels",
 		dependencies: [
 			"Asset",
-			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make EngineToolkit, etc. vend their own Model packages.
-//			engineToolkit, // FIXME: In `EngineToolkit` split out Models package
+			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make "EngineToolkit", etc. vend their own Model packages.
+			"EngineToolkit", // FIXME: In `EngineToolkit` split out Models package
 			//            profile, // FIXME: In `Profile` split out Models package
 			"P2PModels",
 		],
@@ -665,6 +647,20 @@ package.addModules([
 // MARK: - Modules
 
 package.addModules([
+	.module(
+		name: "EngineToolkit",
+		category: "EngineToolkit",
+		dependencies: [
+			"Cryptography",
+			"RadixEngineToolkit",
+		],
+		tests: .yes(
+			dependencies: [],
+			resources: [
+				.process("TestVectors/"),
+			]
+		)
+	),
 	.module(
 		name: "P2PConnection",
 		category: "RadixConnect",
@@ -746,6 +742,13 @@ package.addModules([
 		tests: .yes(dependencies: [])
 	),
 ])
+
+package.targets.append(
+	.binaryTarget(
+		name: "RadixEngineToolkit",
+		path: "Sources/EngineToolkit/RadixEngineToolkit/RadixEngineToolkit.xcframework"
+	)
+)
 
 // MARK: - Extensions
 

@@ -2,17 +2,19 @@ import CryptoKit
 import Foundation
 import K1
 
-// MARK: - PublicKey
-public enum PublicKey: Sendable, Hashable {
-	case ecdsaSecp256k1(K1.PublicKey)
-	case eddsaEd25519(Curve25519.Signing.PublicKey)
+// MARK: - SLIP10.PublicKey
+public extension SLIP10 {
+	enum PublicKey: Sendable, Hashable {
+		case ecdsaSecp256k1(K1.PublicKey)
+		case eddsaEd25519(Curve25519.Signing.PublicKey)
+	}
 }
 
-public extension PublicKey {
+public extension SLIP10.PublicKey {
 	/// Expects a non hashed `message`, will SHA256 double hash it for secp256k1,
 	/// but not for Curve25519.
 	func isValidSignature(
-		_ signatureWrapper: Signature,
+		_ signatureWrapper: SLIP10.Signature,
 		for message: any DataProtocol
 	) -> Bool {
 		switch (signatureWrapper, self) {
@@ -33,7 +35,7 @@ public extension PublicKey {
 	}
 }
 
-public extension PublicKey {
+public extension SLIP10.PublicKey {
 	/// For ECDSA secp256k1 public keys this will use the compressed representation
 	/// For EdDSA Curve25519 there is no difference between compressed and uncompressed.
 	var compressedRepresentation: Data {
