@@ -1,7 +1,6 @@
 import Common
-import CryptoKit
+import Cryptography
 import EngineToolkit
-import Foundation
 import Prelude
 import enum SLIP10.PrivateKey
 import enum SLIP10.PublicKey

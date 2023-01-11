@@ -22,7 +22,6 @@ extension XCTestCase {
 		testFunction: (T) throws -> Void
 	) throws {
 		let fileURL = Bundle.module.url(forResource: jsonName, withExtension: ".json")
-//		let data = try Data(contentsOf: fileURL!)
 
 		let data = try orFail(file: file, line: line) { try Data(contentsOf: unwrap(fileURL, file: file, line: line)) }
 

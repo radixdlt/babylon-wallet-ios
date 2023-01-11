@@ -448,6 +448,7 @@ package.addModules([
 		name: "EngineToolkitClient",
 		dependencies: [
 			"Common",
+			"Cryptography",
 			engineToolkit,
 			profile, // AccountAddress
 		],
@@ -687,7 +688,13 @@ package.addModules([
 			},
 		],
 		exclude: ["Mnemonic/DataStructures/BitArray/BitCollections/README.md"],
-		tests: .yes(dependencies: [], resources: [.process("MnemonicTests/TestVectors/")])
+		tests: .yes(
+			dependencies: [],
+			resources: [
+				.process("MnemonicTests/TestVectors/"),
+				.process("SLIP10Tests/TestVectors/"),
+			]
+		)
 	),
 	.module(
 		name: "Prelude",
