@@ -671,11 +671,11 @@ package.addModules([
 				.package(url: "https://github.com/stasel/WebRTC", from: "106.0.0")
 			},
 		],
-		resources: [
-			.process("SignalingServerTests/TestVectors/"),
-		],
 		tests: .yes(
-			dependencies: []
+			dependencies: [],
+			resources: [
+				.process("SignalingServerTests/TestVectors/"),
+			]
 		)
 	),
 	.module(
