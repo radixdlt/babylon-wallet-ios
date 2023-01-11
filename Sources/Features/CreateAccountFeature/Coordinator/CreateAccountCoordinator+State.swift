@@ -30,7 +30,7 @@ public extension CreateAccountCoordinator.State {
 	}
 }
 
-// MARK: - CrateAccountCompletionDestination
+// MARK: - CreateAccountCompletionDestination
 public enum CreateAccountCompletionDestination: String, Sendable {
 	case home
 	case chooseAccounts
