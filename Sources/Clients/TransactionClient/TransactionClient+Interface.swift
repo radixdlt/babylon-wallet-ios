@@ -1,5 +1,5 @@
 import EngineToolkitClient
-import FeaturePrelude
+import Prelude
 
 // MARK: - TransactionClient
 public struct TransactionClient: Sendable, DependencyKey {

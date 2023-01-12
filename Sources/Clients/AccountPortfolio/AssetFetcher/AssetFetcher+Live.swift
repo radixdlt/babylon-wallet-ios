@@ -1,7 +1,7 @@
 import Asset
 import EngineToolkit
-import FeaturePrelude
 import GatewayAPI
+import Prelude
 import Profile
 
 // MARK: - AssetFetcher + DependencyKey

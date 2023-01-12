@@ -351,6 +351,7 @@ package.addModules([
 		name: "AppSettings",
 		dependencies: [
 			"JSON",
+			"Profile",
 			"UserDefaultsClient",
 		],
 		tests: .yes(
