@@ -1,5 +1,5 @@
+import ClientPrelude
 import EngineToolkit
-import Prelude
 import Profile
 
 public extension EngineToolkitClient {
