@@ -1,7 +1,5 @@
 import Asset
-import Common
-import ComposableArchitecture
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Row.View
 public extension NonFungibleTokenList.Row {

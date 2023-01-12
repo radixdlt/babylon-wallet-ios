@@ -1,6 +1,5 @@
 import CameraPermissionClient
-import Common
-import ComposableArchitecture
+import FeaturePrelude
 #if os(iOS)
 import class UIKit.UIApplication
 #endif

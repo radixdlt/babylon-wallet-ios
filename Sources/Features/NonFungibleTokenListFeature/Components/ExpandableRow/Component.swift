@@ -1,7 +1,5 @@
 import Asset
-import Common
-import DesignSystem
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - Component
 struct Component: View {

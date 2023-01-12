@@ -1,12 +1,9 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPreferencesFeature
-import Common
-import ComposableArchitecture
 import CreateAccountFeature
-import DesignSystem
+import FeaturePrelude
 import GrantDappWalletAccessFeature
-import SwiftUI
 import TransactionSigningFeature
 
 // MARK: - Home.View

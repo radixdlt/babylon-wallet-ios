@@ -1,8 +1,4 @@
-import Common
-import ComposableArchitecture
-import DesignSystem
-import SharedModels
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - DappConnectionRequest.View
 public extension DappConnectionRequest {

@@ -1,5 +1,4 @@
-import Common
-import ComposableArchitecture
+import FeaturePrelude
 import FungibleTokenListFeature
 import NonFungibleTokenListFeature
 

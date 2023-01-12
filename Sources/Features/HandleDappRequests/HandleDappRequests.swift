@@ -1,11 +1,7 @@
-import Common
-import ComposableArchitecture
+import FeaturePrelude
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
-import P2PModels
-import Prelude
 import Profile
-import SharedModels
 import TransactionClient
 import TransactionSigningFeature
 

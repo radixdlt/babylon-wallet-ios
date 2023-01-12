@@ -1,4 +1,3 @@
-import Foundation
 import Prelude
 
 // MARK: - AppSettingsClient + TestDependencyKey

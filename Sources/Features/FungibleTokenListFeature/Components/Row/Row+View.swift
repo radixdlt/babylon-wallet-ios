@@ -1,8 +1,5 @@
 import Asset
-import Common
-import ComposableArchitecture
-import DesignSystem
-import Prelude
+import FeaturePrelude
 import Profile
 
 // MARK: - FungibleTokenList.Row.View

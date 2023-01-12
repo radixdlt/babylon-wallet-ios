@@ -1,9 +1,6 @@
-import Common
-import ComposableArchitecture
 import CreateAccountFeature
-import DesignSystem
+import FeaturePrelude
 import Profile
-import SwiftUI
 
 // MARK: - ManageGatewayAPIEndpoints.View
 public extension ManageGatewayAPIEndpoints {

@@ -1,11 +1,6 @@
-import Common
-import ComposableArchitecture
 import ErrorQueue
-import Foundation
-import P2PConnection
+import FeaturePrelude
 import P2PConnectivityClient
-import SharedModels
-import SwiftUI
 
 // MARK: - ManageP2PClient
 public struct ManageP2PClient: Sendable, ReducerProtocol {

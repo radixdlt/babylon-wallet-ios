@@ -1,11 +1,8 @@
 import AccountPortfolio
 import Asset
-import Common
-import ComposableArchitecture
-import DesignSystem
+import FeaturePrelude
 import FungibleTokenListFeature
 import Profile
-import SwiftUI
 
 // MARK: - AccountList.Row.View
 public extension AccountList.Row {

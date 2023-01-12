@@ -1,8 +1,5 @@
-import Common
-import ComposableArchitecture
-import DesignSystem
+import FeaturePrelude
 import Profile
-import SwiftUI
 
 // MARK: - ChooseAccounts.Row.View
 public extension ChooseAccounts.Row {
