@@ -65,7 +65,6 @@ package.addModules([
 			"OnboardingFeature",
 			"ProfileLoader",
 			"ProfileClient",
-			"Resources",
 			"SplashFeature",
 		],
 		tests: .yes(
@@ -119,7 +118,6 @@ package.addModules([
 		dependencies: [
 			"CreateAccountFeature",
 			"ProfileClient",
-			"SharedModels",
 		],
 		tests: .yes(
 			dependencies: [
@@ -133,7 +131,6 @@ package.addModules([
 			"GrantDappWalletAccessFeature",
 			"P2PConnectivityClient",
 			"Profile",
-			"SharedModels",
 			"TransactionSigningFeature",
 		],
 		tests: .yes()
@@ -151,7 +148,6 @@ package.addModules([
 			"EngineToolkit",
 			"GrantDappWalletAccessFeature",
 			"ProfileClient",
-			"SharedModels",
 			"TransactionSigningFeature",
 		],
 		tests: .yes(
@@ -189,7 +185,6 @@ package.addModules([
 			"NewConnectionFeature",
 			"P2PConnectivityClient",
 			"ProfileClient",
-			"SharedModels",
 		],
 		tests: .yes()
 	),
@@ -210,7 +205,6 @@ package.addModules([
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
 			"P2PConnectivityClient",
-			"SharedModels",
 		],
 		tests: .yes()
 	),
@@ -256,7 +250,6 @@ package.addModules([
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"ProfileClient",
-			"SharedModels",
 			"TransactionClient",
 		],
 		tests: .yes()
@@ -346,7 +339,6 @@ package.addModules([
 			"EngineToolkitClient", // Create TX
 			"Profile",
 			"ProfileLoader",
-			"SharedModels",
 		],
 		tests: .yes()
 	),
