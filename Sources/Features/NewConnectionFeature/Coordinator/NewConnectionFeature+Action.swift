@@ -1,5 +1,4 @@
-import Foundation
-import SharedModels
+import FeaturePrelude
 
 // MARK: - NewConnection.Action
 public extension NewConnection {

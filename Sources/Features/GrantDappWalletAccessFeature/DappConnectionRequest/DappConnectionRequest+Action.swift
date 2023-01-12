@@ -1,7 +1,5 @@
-import ComposableArchitecture
-import Prelude
+import FeaturePrelude
 import Profile
-import SharedModels
 
 // MARK: - DappConnectionRequest.Action
 public extension DappConnectionRequest {

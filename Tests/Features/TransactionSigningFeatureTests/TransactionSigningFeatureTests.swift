@@ -1,5 +1,4 @@
-import ComposableArchitecture
-import SharedModels
+import FeaturePrelude
 import TestUtils
 import TransactionClient
 import TransactionSigningFeature

@@ -1,7 +1,5 @@
-import ComposableArchitecture
-import P2PConnection
+import FeaturePrelude
 import P2PConnectivityClient
-import Resources
 
 // MARK: - NewConnection
 public struct NewConnection: Sendable, ReducerProtocol {

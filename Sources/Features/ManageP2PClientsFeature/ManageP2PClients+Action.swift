@@ -1,9 +1,7 @@
-import ComposableArchitecture
+import FeaturePrelude
 import NewConnectionFeature
 import P2PConnectivityClient
-import Prelude
 import Profile
-import SharedModels
 
 // MARK: - ManageP2PClients.Action
 public extension ManageP2PClients {

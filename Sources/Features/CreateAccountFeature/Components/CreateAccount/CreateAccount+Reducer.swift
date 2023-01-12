@@ -1,9 +1,7 @@
-import ComposableArchitecture
 import Cryptography
 import ErrorQueue
-import Prelude
+import FeaturePrelude
 import ProfileClient
-import Resources
 
 // MARK: - MnemonicGenerator
 public struct MnemonicGenerator: Sendable, DependencyKey {
