@@ -1,5 +1,5 @@
-import Foundation
 import P2PConnection
+import Prelude
 import Profile
 
 // MARK: - P2P.RequestFromClient

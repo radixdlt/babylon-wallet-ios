@@ -1,10 +1,8 @@
-import ComposableArchitecture
 import ErrorQueue
-import Foundation
+import FeaturePrelude
 import MainFeature
 import OnboardingFeature
 import ProfileClient
-import Resources
 import SplashFeature
 
 // MARK: - App

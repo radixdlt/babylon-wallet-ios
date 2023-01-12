@@ -1,4 +1,4 @@
-import Prelude
+import ClientPrelude
 @testable import ProfileLoader
 import TestUtils
 

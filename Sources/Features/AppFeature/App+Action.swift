@@ -1,5 +1,4 @@
-import ComposableArchitecture
-import Foundation
+import FeaturePrelude
 import MainFeature
 import OnboardingFeature
 import Profile

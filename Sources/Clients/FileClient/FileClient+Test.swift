@@ -1,5 +1,4 @@
-import Foundation
-import Prelude
+import ClientPrelude
 
 public extension DependencyValues {
 	var fileClient: FileClient {

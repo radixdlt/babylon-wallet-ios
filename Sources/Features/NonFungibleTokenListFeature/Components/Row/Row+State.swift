@@ -1,5 +1,4 @@
-import Asset
-import Foundation
+import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Row.State
 public extension NonFungibleTokenList.Row {

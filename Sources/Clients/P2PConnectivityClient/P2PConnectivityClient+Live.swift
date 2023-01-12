@@ -1,10 +1,8 @@
+import ClientPrelude
 import JSON
 import Network
 import P2PConnection
-import Prelude
 import ProfileClient
-import Resources
-import SharedModels
 
 // MARK: - AnyAsyncIterator + Sendable
 extension AnyAsyncIterator: @unchecked Sendable where Element: Sendable {}

@@ -1,6 +1,4 @@
-import Asset
-import Common
-import Foundation
+import FeaturePrelude
 import Profile
 
 // MARK: - FungibleTokenList.Row.State

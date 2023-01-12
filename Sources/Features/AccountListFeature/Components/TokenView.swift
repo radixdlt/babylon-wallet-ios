@@ -1,5 +1,4 @@
-import DesignSystem
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - TokenView
 public struct TokenView: View {

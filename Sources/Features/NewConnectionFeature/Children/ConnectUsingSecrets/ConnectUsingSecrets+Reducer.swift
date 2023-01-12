@@ -1,7 +1,5 @@
-import ComposableArchitecture
+import FeaturePrelude
 import P2PConnection
-import P2PModels
-import SharedModels
 
 // MARK: - ConnectUsingSecrets
 public struct ConnectUsingSecrets: Sendable, ReducerProtocol {

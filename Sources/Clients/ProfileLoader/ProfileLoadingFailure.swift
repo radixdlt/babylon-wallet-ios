@@ -1,5 +1,4 @@
-import Common
-import Prelude
+import ClientPrelude
 import Profile
 
 // MARK: - ProfileLoader.ProfileLoadingFailure

@@ -1,5 +1,4 @@
-import Common
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - Header
 struct Header: View {

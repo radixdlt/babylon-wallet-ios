@@ -1,5 +1,4 @@
-import Foundation
-import Prelude
+import ClientPrelude
 
 // MARK: - AppSettingsClient + TestDependencyKey
 extension AppSettingsClient: TestDependencyKey {

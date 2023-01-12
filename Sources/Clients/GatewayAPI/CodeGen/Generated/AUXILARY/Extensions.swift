@@ -4,7 +4,7 @@
 // https://openapi-generator.tech
 //
 
-import Foundation
+import ClientPrelude
 #if canImport(AnyCodable)
 import AnyCodable
 #endif

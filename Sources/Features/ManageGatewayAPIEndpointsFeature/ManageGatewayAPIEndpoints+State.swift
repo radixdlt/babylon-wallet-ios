@@ -1,7 +1,5 @@
-import ComposableArchitecture
 import CreateAccountFeature
-import DesignSystem
-import Foundation
+import FeaturePrelude
 import Profile
 
 // MARK: - ManageGatewayAPIEndpoints.State

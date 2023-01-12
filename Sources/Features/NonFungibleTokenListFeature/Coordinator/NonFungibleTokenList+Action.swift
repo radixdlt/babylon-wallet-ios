@@ -1,5 +1,4 @@
-import Asset
-import Foundation
+import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Action
 public extension NonFungibleTokenList {

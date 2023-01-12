@@ -1,5 +1,4 @@
-import ComposableArchitecture
-import Prelude
+import FeaturePrelude
 
 // MARK: - ___VARIABLE_featureName___
 public struct ___VARIABLE_featureName___: Sendable, ReducerProtocol {

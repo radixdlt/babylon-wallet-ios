@@ -1,5 +1,5 @@
 @testable import AccountPortfolio
-import Prelude
+import ClientPrelude
 import TestUtils
 
 final class AccountPortfolioTests: TestCase {

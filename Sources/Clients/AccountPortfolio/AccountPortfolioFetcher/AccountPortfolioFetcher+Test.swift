@@ -1,4 +1,4 @@
-import Prelude
+import ClientPrelude
 
 // MARK: - AccountPortfolioFetcher + TestDependencyKey
 extension AccountPortfolioFetcher: TestDependencyKey {

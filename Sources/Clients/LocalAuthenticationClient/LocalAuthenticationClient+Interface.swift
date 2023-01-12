@@ -1,4 +1,4 @@
-import Foundation
+import ClientPrelude
 
 // MARK: - LocalAuthenticationClient
 /// A client for querying if passcode and biometrics are set up.

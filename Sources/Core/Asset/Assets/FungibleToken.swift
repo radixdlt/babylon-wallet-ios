@@ -1,6 +1,4 @@
-import Common
 import EngineToolkit
-import EngineToolkitClient
 import Prelude
 import Profile
 
@@ -55,16 +53,6 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 		self.symbol = symbol
 		self.tokenInfoURL = tokenInfoURL
 		self.iconURL = iconURL
-	}
-}
-
-public extension FungibleToken {
-	var placeholderImage: ImageAsset {
-		if isXRD {
-			return AssetResource.xrd
-		} else {
-			return AssetResource.fungibleToken
-		}
 	}
 }
 

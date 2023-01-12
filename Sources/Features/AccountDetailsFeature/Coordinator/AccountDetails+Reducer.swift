@@ -1,5 +1,5 @@
 import AssetsViewFeature
-import ComposableArchitecture
+import FeaturePrelude
 import PasteboardClient
 
 public struct AccountDetails: Sendable, ReducerProtocol {

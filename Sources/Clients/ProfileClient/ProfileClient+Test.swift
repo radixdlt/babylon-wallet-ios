@@ -1,7 +1,6 @@
+import ClientPrelude
 import Cryptography
-import Prelude
 import Profile
-import SharedModels
 
 public extension DependencyValues {
 	var profileClient: ProfileClient {

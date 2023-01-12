@@ -1,5 +1,4 @@
-import Asset
-import Foundation
+import FeaturePrelude
 
 // MARK: - FungibleTokenList.Section.Action
 public extension FungibleTokenList.Section {

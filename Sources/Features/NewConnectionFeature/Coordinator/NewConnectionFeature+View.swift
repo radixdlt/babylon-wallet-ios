@@ -1,7 +1,4 @@
-import ComposableArchitecture
-import DesignSystem
-import Resources
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - NewConnection.View
 public extension NewConnection {

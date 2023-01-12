@@ -1,5 +1,4 @@
-import ComposableArchitecture
-import Foundation
+import FeaturePrelude
 
 // MARK: - CameraPermission.State
 public extension CameraPermission {

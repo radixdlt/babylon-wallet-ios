@@ -1,6 +1,4 @@
-import ComposableArchitecture
-import Resources
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - CameraPermission.View
 public extension CameraPermission {

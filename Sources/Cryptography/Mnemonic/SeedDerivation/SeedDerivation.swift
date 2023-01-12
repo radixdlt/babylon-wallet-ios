@@ -1,5 +1,5 @@
 import CommonCrypto
-import Foundation
+import Prelude
 
 // MARK: - SeedDerivation
 public enum SeedDerivation {}

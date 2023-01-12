@@ -1,4 +1,4 @@
-import Prelude
+import ClientPrelude
 
 public extension DependencyValues {
 	var ___VARIABLE_dependencyKey___: ___VARIABLE_clientName___ {

@@ -1,5 +1,4 @@
-import Asset
-import Prelude
+import ClientPrelude
 import Profile
 
 // MARK: - AssetFetcher

@@ -1,5 +1,4 @@
-import Foundation
-import Prelude
+import ClientPrelude
 
 // MARK: - UserDefaultsClient + DependencyKey
 extension UserDefaultsClient: DependencyKey {

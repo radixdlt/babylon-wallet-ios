@@ -1,11 +1,7 @@
-import TestUtils
-
-import ComposableArchitecture
-import Prelude
-import ProfileClient
-import SharedModels
-
+import FeaturePrelude
 @testable import GrantDappWalletAccessFeature
+import ProfileClient
+import TestUtils
 
 // MARK: - IncomingConnectionRequestFromDappReviewFeatureTests
 @MainActor

@@ -1,6 +1,5 @@
+import ClientPrelude
 @testable import EngineToolkitClient
-import Foundation
-import Prelude
 import TestUtils
 
 // MARK: - EngineToolkitClientTests

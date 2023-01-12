@@ -1,4 +1,4 @@
-import Foundation
+import FeaturePrelude
 
 // MARK: - AccountCompletion.Action
 public extension AccountCompletion {

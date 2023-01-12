@@ -1,8 +1,6 @@
-import ComposableArchitecture
+import FeaturePrelude
 @testable import GrantDappWalletAccessFeature
-import Prelude
 import Profile
-import SharedModels
 import TestUtils
 
 @MainActor

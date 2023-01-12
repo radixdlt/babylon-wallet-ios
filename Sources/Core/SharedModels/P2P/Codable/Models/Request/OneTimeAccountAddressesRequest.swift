@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 // MARK: - P2P.FromDapp.OneTimeAccountsReadRequestItem
 public extension P2P.FromDapp {

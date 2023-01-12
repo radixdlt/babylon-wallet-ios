@@ -1,7 +1,5 @@
-import P2PModels
-import Prelude
+import ClientPrelude
 import Profile
-import SharedModels
 
 #if DEBUG
 

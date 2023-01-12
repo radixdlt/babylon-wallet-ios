@@ -1,7 +1,6 @@
-import ComposableArchitecture
 import CreateAccountFeature
 import ErrorQueue
-import Foundation
+import FeaturePrelude
 import GatewayAPI
 import ProfileClient
 import UserDefaultsClient

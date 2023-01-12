@@ -1,5 +1,5 @@
 @testable import AppSettings
-import Prelude
+import ClientPrelude
 import TestUtils
 
 final class AppSettingsTests: TestCase {

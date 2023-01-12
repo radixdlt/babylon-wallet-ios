@@ -1,4 +1,4 @@
-import SwiftUI
+import FeaturePrelude
 
 protocol ExpandableRow {
 	var edge: Edge.Set { get }

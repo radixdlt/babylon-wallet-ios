@@ -1,6 +1,5 @@
-import Foundation
+import FeaturePrelude
 import Profile
-import SharedModels
 
 // MARK: - DappConnectionRequest.State
 public extension DappConnectionRequest {

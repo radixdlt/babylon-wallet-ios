@@ -1,13 +1,9 @@
-import Common
-import ComposableArchitecture
-import DesignSystem
+import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
-import Prelude
 import Profile
 import ProfileClient
-import SwiftUI
 #if DEBUG
 import ProfileView
 #endif // DEBUG

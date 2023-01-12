@@ -1,5 +1,4 @@
-import ComposableArchitecture
-import Prelude
+import FeaturePrelude
 import Profile
 
 // MARK: - AccountList.State

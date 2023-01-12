@@ -1,5 +1,5 @@
 @testable import AccountDetailsFeature
-import ComposableArchitecture
+import FeaturePrelude
 import TestUtils
 
 final class TransferTests: TestCase {

@@ -1,6 +1,4 @@
-import Common
-import Foundation
-import Prelude
+import ClientPrelude
 import Profile
 import UserDefaultsClient
 

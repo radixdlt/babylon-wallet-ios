@@ -1,9 +1,9 @@
+import FeaturePrelude
 import GrantDappWalletAccessFeature
 import HandleDappRequests
 import HomeFeature
 import P2PConnectivityClient
 import SettingsFeature
-import SharedModels
 import TransactionSigningFeature
 
 // MARK: - Main.State

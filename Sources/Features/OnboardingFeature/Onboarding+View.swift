@@ -1,8 +1,6 @@
-import ComposableArchitecture
 import CreateAccountFeature
-import DesignSystem
+import FeaturePrelude
 import ImportProfileFeature
-import SwiftUI
 
 // MARK: - Onboarding.View
 public extension Onboarding {

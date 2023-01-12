@@ -1,9 +1,6 @@
 import AppFeature
-import ComposableArchitecture
-import DesignSystem
-import Prelude
+import FeaturePrelude
 import ProfileClient
-import SwiftUI
 import UserDefaultsClient
 
 // MARK: - WalletApp

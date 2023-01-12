@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 import ManageGatewayAPIEndpointsFeature
 import Profile
 import TestUtils

@@ -1,8 +1,7 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
-import Asset
-import ComposableArchitecture
+import FeaturePrelude
 import FungibleTokenListFeature
 @testable import HomeFeature
 import NonFungibleTokenListFeature

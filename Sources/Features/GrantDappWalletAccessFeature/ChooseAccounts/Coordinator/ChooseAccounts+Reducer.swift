@@ -1,7 +1,6 @@
-import ComposableArchitecture
 import CreateAccountFeature
 import ErrorQueue
-import Prelude
+import FeaturePrelude
 import Profile
 import ProfileClient
 

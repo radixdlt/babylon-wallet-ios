@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 import LocalAuthenticationClient
 import Profile
 import ProfileLoader

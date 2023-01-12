@@ -1,4 +1,4 @@
-import Foundation
+import FeaturePrelude
 
 // MARK: - FungibleTokenDetails.Action
 public extension FungibleTokenDetails {

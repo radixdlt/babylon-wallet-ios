@@ -1,8 +1,6 @@
 import AccountListFeature
-import Asset
 import AssetsViewFeature
-import ComposableArchitecture
-import Foundation
+import FeaturePrelude
 import FungibleTokenListFeature
 import Profile
 

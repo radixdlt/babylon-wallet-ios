@@ -1,8 +1,6 @@
-import ComposableArchitecture
+import FeaturePrelude
 import GrantDappWalletAccessFeature
-import Prelude
 import Profile
-import SharedModels
 import TransactionSigningFeature
 
 // MARK: - HandleDappRequests.State

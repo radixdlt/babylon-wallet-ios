@@ -1,5 +1,4 @@
-import Common
-import ComposableArchitecture
+import FeaturePrelude
 import P2PConnectivityClient
 #if os(iOS)
 import class UIKit.UIApplication

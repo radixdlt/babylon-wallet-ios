@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 /// Namespace for all P2P communcation related models.
 /// Primarily the iOS Wallet will be communicating with a Dapp running

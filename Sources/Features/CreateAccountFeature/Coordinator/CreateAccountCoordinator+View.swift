@@ -1,5 +1,4 @@
-import ComposableArchitecture
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - CreateAccountCoordinator.View
 public extension CreateAccountCoordinator {

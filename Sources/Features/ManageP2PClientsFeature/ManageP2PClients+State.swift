@@ -1,9 +1,7 @@
+import FeaturePrelude
 import NewConnectionFeature
-import P2PConnection
 import P2PConnectivityClient
-import Prelude
 import Profile
-import SharedModels
 
 // MARK: - ManageP2PClients.State
 public extension ManageP2PClients {

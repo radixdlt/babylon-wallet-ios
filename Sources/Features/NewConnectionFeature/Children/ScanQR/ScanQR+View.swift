@@ -1,6 +1,4 @@
-import ComposableArchitecture
-import Resources
-import SwiftUI
+import FeaturePrelude
 
 #if os(iOS)
 import CodeScanner

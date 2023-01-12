@@ -1,4 +1,4 @@
-import Prelude
+import ClientPrelude
 
 extension ErrorQueue: DependencyKey {
 	public typealias Value = ErrorQueue

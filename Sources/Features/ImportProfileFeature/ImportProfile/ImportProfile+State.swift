@@ -1,4 +1,4 @@
-import Foundation
+import FeaturePrelude
 
 // MARK: - ImportProfile.State
 public extension ImportProfile {

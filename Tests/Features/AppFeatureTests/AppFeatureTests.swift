@@ -1,8 +1,6 @@
 @testable import AppFeature
-import ComposableArchitecture
+import FeaturePrelude
 import OnboardingFeature
-import Prelude
-import Profile
 import ProfileClient
 import ProfileLoader
 @testable import SplashFeature

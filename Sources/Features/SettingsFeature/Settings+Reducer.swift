@@ -1,9 +1,8 @@
-import ComposableArchitecture
 import ErrorQueue
+import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
-import Prelude
 import ProfileClient
 
 // MARK: - Settings

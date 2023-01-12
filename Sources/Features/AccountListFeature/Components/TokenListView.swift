@@ -1,6 +1,5 @@
-import Asset
+import FeaturePrelude
 import FungibleTokenListFeature
-import SwiftUI
 
 // MARK: - TokenListView
 public struct TokenListView: View {

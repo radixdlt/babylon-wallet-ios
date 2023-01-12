@@ -1,5 +1,5 @@
 @testable import AssetsViewFeature
-import ComposableArchitecture
+import FeaturePrelude
 import TestUtils
 
 final class AssetsViewFeatureTests: TestCase {

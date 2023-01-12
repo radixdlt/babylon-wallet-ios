@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 import P2PConnection
 
 // MARK: - ManageP2PClient.Action

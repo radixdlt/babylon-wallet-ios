@@ -1,4 +1,4 @@
-import Foundation
+import ClientPrelude
 import UniformTypeIdentifiers
 
 public extension UTType {

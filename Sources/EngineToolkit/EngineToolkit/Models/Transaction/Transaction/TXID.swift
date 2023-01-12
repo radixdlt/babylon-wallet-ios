@@ -1,4 +1,3 @@
-import EngineToolkit
 import Prelude
 
 // MARK: - TransactionIntent.TXID

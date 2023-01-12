@@ -1,9 +1,7 @@
-import ComposableArchitecture
 import Cryptography
 import ErrorQueue
-import Prelude
+import FeaturePrelude
 import ProfileClient
-import Resources
 
 // MARK: - MnemonicGenerator
 public struct MnemonicGenerator: Sendable, DependencyKey {
@@ -23,7 +21,6 @@ public extension MnemonicGenerator {
 }
 
 #if DEBUG
-import Prelude
 extension MnemonicGenerator: TestDependencyKey {
 	public static let testValue: Self = .init(generate: unimplemented("\(Self.self).generate"))
 }

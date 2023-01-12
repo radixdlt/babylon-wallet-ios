@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 // MARK: - P2P.ToDapp.Response.Failure.Kind.Error
 public extension P2P.ToDapp.Response.Failure.Kind {

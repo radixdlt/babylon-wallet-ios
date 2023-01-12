@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 @testable import ImportProfileFeature
 import Profile
 import TestUtils

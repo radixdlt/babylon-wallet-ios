@@ -1,8 +1,4 @@
-import Common
-import ComposableArchitecture
-import DesignSystem
-import Foundation
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - ImportMnemonic.View
 public extension ImportMnemonic {

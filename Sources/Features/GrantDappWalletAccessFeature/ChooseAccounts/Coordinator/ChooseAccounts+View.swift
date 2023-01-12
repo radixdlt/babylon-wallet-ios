@@ -1,9 +1,5 @@
-import Common
-import ComposableArchitecture
 import CreateAccountFeature
-import DesignSystem
-import SharedModels
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - ChooseAccounts.View
 public extension ChooseAccounts {

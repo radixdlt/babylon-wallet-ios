@@ -1,6 +1,4 @@
-import ComposableArchitecture
-import Foundation
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - NewConnection.State
 public extension NewConnection {
