@@ -1,10 +1,8 @@
 import Cryptography
 import Prelude
 
-public typealias SemVer = Version
-
-// MARK: ExpressibleByStringLiteral
-extension SemVer: ExpressibleByStringLiteral {
+// MARK: - SemanticVersion + ExpressibleByStringLiteral
+extension SemanticVersion: ExpressibleByStringLiteral {
 	public init(stringLiteral value: String) {
 		self.init(value)!
 	}
@@ -12,11 +10,11 @@ extension SemVer: ExpressibleByStringLiteral {
 
 public extension ProfileSnapshot {
 	enum VersionTag: Hashable {}
-	typealias Version = Tagged<VersionTag, SemVer>
+	typealias Version = Tagged<VersionTag, SemanticVersion>
 }
 
-// MARK: - Version + Sendable
-extension Version: @unchecked Sendable {}
+// MARK: - SemanticVersion + Sendable
+extension SemanticVersion: @unchecked Sendable {}
 
 // MARK: - ProfileSnapshot.Version.ProfileVersionHolder
 private extension ProfileSnapshot.Version {

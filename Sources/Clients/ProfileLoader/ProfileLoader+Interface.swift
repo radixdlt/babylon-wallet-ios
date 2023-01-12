@@ -1,7 +1,5 @@
-import Foundation
 import Prelude
 import Profile
-import Version
 
 // MARK: - ProfileLoader
 public struct ProfileLoader: Sendable, DependencyKey {

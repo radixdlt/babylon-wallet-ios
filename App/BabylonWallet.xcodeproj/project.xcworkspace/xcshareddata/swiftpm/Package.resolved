@@ -82,6 +82,15 @@
       }
     },
     {
+      "identity" : "semanticversion",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftPackageIndex/SemanticVersion",
+      "state" : {
+        "revision" : "fc670910dc0903cc269b3d0b776cda5703979c4e",
+        "version" : "0.3.5"
+      }
+    },
+    {
       "identity" : "swift-async-algorithms",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-async-algorithms",
@@ -214,15 +223,6 @@
       "state" : {
         "revision" : "ddc01cdcddfd30ef7a966049b2e1d251e224ad93",
         "version" : "0.5.0"
-      }
-    },
-    {
-      "identity" : "version",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mxcl/Version",
-      "state" : {
-        "revision" : "1fe824b80d89201652e7eca7c9252269a1d85e25",
-        "version" : "2.0.1"
       }
     },
     {

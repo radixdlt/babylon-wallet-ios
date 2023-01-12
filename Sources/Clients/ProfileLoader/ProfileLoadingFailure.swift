@@ -1,7 +1,6 @@
 import Common
-import Foundation
+import Prelude
 import Profile
-import Version
 
 // MARK: - ProfileLoader.ProfileLoadingFailure
 public extension ProfileLoader {
