@@ -1,7 +1,7 @@
 import Prelude
-import TestUtils
+import XCTest
 
-final class HexStringToDataTests: TestCase {
+final class HexStringToDataTests: XCTestCase {
 	func testAssertDataFromHexStringWithOddLengthThrows() throws {
 		XCTAssertThrowsError(try Data(hex: "deadbee"))
 	}
