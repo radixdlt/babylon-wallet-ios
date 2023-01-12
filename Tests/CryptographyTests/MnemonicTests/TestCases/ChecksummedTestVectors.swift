@@ -64,7 +64,7 @@ private extension ChecksummedTestVectors {
 	) throws {
 		try orFail {
 			try testFixture(
-				bundleType: self,
+				bundle: .module,
 				jsonName: jsonName
 			) { (vectors: ChecksummedVectors) in
 				try orFail {

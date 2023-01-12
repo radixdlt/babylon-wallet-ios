@@ -54,52 +54,13 @@ final class RPCMessageUnencryptedUnitTests: XCTestCase {
 
 	func testVectors() throws {
 		try testFixture(
-			json: "RPCMessageVectors"
+			bundle: .module,
+			jsonName: "RPCMessageVectors"
 		) { (messages: [RPCMessage]) in
 			XCTAssertGreaterThan(messages.count, 0)
 			messages.forEach { rpcMessage in
 				XCTAssertFalse(rpcMessage.requestId.isEmpty)
 			}
 		}
-	}
-}
-
-//===----------------------------------------------------------------------===//
-//
-// This source file is part of the SwiftCrypto open source project
-//
-// Copyright (c) 2019-2022 Apple Inc. and the SwiftCrypto project authors
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-// See CONTRIBUTORS.md for the list of SwiftCrypto project authors
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-//===----------------------------------------------------------------------===//
-public extension XCTestCase {
-	func testFixture<T: Decodable>(
-		json: String,
-		file: StaticString = #file,
-		line: UInt = #line,
-		testFunction: (T) throws -> Void
-	) throws {
-		let fileDirectory = URL(
-			fileURLWithPath: "\(file)"
-		)
-
-		let testsDirectory = fileDirectory
-			.pathComponents
-			.dropLast(1)
-			.joined(separator: "/")
-
-		let fileURL = try XCTUnwrap(URL(fileURLWithPath: "\(testsDirectory)/TestVectors/\(json).json"), file: file, line: line)
-
-		let data = try Data(contentsOf: fileURL)
-
-		let decoder = JSONDecoder()
-		let test = try decoder.decode(T.self, from: data)
-
-		try testFunction(test)
 	}
 }

@@ -1,5 +1,5 @@
 @testable import EngineToolkit
-import Prelude
+import TestingPrelude
 
 // MARK: - ConvertManifestTests
 final class ConvertManifestTests: TestCase {
