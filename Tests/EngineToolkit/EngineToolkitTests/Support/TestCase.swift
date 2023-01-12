@@ -1,5 +1,5 @@
-@_exported @testable import EngineToolkit
-@_exported import TestingPrelude
+@testable import EngineToolkit
+import TestingPrelude
 
 class TestCase: TestingPrelude.TestCase {
 	var sut = EngineToolkit()

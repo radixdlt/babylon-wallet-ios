@@ -94,6 +94,7 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"UserDefaultsClient",
+				"SharedTestingModels",
 			]
 		)
 	),
