@@ -579,8 +579,10 @@ package.addModules([
 		tests: .no
 	),
 	.core(
-		name: "TestUtils",
-		dependencies: [],
+		name: "TestUtils", // TODO: split out into `Core/TestingModels` and `TestingPrelude`
+		dependencies: [
+			"Profile",
+		],
 		tests: .no
 	),
 ])
