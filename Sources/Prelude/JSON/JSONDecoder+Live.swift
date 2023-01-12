@@ -1,4 +1,4 @@
-import ClientPrelude
+import Dependencies
 
 // MARK: - JSONDecoder + DependencyKey
 extension JSONDecoder: DependencyKey {

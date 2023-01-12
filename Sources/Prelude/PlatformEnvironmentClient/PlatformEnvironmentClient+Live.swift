@@ -1,4 +1,4 @@
-import ClientPrelude
+import Dependencies
 
 extension PlatformEnvironmentClient: DependencyKey {
 	public static let liveValue: Self = .init(

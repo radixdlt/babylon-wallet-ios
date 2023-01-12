@@ -1,4 +1,4 @@
-import ClientPrelude
+import Dependencies
 
 // MARK: - FileClient
 /// A file client, able to load a local file from a given file URL and options.

@@ -1,4 +1,4 @@
-import ClientPrelude
+import Dependencies
 
 // MARK: - PlatformEnvironmentClient + TestDependencyKey
 extension PlatformEnvironmentClient: TestDependencyKey {

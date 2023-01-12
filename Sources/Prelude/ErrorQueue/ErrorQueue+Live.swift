@@ -1,4 +1,5 @@
-import ClientPrelude
+import AsyncAlgorithms
+import Dependencies
 
 extension ErrorQueue: DependencyKey {
 	public typealias Value = ErrorQueue

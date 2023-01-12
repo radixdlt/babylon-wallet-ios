@@ -1,4 +1,4 @@
-import ClientPrelude
+import Dependencies
 
 public struct PlatformEnvironmentClient: Sendable {
 	public typealias IsSimulator = @Sendable () -> Bool
