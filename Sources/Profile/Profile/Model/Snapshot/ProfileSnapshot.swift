@@ -1,20 +1,10 @@
 import Cryptography
 import Prelude
 
-// MARK: - SemanticVersion + ExpressibleByStringLiteral
-extension SemanticVersion: ExpressibleByStringLiteral {
-	public init(stringLiteral value: String) {
-		self.init(value)!
-	}
-}
-
+// MARK: - ProfileSnapshot.Version
 public extension ProfileSnapshot {
-	enum VersionTag: Hashable {}
-	typealias Version = Tagged<VersionTag, SemanticVersion>
+	typealias Version = Tagged<Self, SemanticVersion>
 }
-
-// MARK: - SemanticVersion + Sendable
-extension SemanticVersion: @unchecked Sendable {}
 
 // MARK: - ProfileSnapshot.Version.ProfileVersionHolder
 private extension ProfileSnapshot.Version {
