@@ -1,4 +1,3 @@
-import Asset
 import FeaturePrelude
 
 // MARK: - Component

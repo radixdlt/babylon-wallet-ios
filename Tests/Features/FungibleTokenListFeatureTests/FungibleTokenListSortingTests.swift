@@ -1,4 +1,4 @@
-import Asset
+import FeaturePrelude
 import FungibleTokenListFeature
 import Profile
 import TestUtils

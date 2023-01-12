@@ -1,4 +1,4 @@
-import Asset
+import FeaturePrelude
 
 public extension Array where Element == FungibleTokenContainer {
 	func sortedIntoCategories() -> [FungibleTokenCategory] {

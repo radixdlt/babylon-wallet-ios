@@ -1,4 +1,4 @@
-import Asset
+import FeaturePrelude
 import FungibleTokenDetailsFeature
 
 // MARK: - FungibleTokenList.Action

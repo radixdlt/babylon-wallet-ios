@@ -2,16 +2,13 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import Asset
-import ComposableArchitecture
 import CreateAccountFeature
+import FeaturePrelude
 import FungibleTokenListFeature
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
 import PasteboardClient
-import Prelude
 import Profile
-import SharedModels
 import TransactionSigningFeature
 
 // MARK: - Home
