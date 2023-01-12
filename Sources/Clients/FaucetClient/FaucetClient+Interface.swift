@@ -1,4 +1,4 @@
-import Prelude
+import ClientPrelude
 import Profile
 import TransactionClient
 

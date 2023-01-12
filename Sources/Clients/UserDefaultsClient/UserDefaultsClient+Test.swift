@@ -1,5 +1,5 @@
+import ClientPrelude
 import Foundation
-import Prelude
 
 public extension DependencyValues {
 	var userDefaultsClient: UserDefaultsClient {

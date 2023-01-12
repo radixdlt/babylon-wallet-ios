@@ -1,5 +1,5 @@
 import Asset
-import Prelude
+import ClientPrelude
 
 // MARK: - AssetFetcher + TestDependencyKey
 extension AssetFetcher: TestDependencyKey {

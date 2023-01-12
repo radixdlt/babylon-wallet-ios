@@ -1,6 +1,6 @@
+import ClientPrelude
 import Cryptography
 @preconcurrency import EngineToolkit
-import Prelude
 import struct Profile.AccountAddress
 
 public extension EngineToolkitClient {

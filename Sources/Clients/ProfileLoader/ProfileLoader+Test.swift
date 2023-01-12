@@ -1,7 +1,7 @@
-import Prelude
+import ClientPrelude
 import Profile
 #if DEBUG
-import Prelude
+import ClientPrelude
 
 // MARK: - ProfileLoader + TestDependencyKey
 extension ProfileLoader: TestDependencyKey {

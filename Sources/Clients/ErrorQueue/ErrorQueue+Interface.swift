@@ -1,4 +1,4 @@
-import Prelude
+import ClientPrelude
 
 public struct ErrorQueue {
 	public var errors: @Sendable () -> AnyAsyncSequence<Error>

@@ -5,7 +5,7 @@ public typealias Pasteboard = UIPasteboard
 import AppKit
 public typealias Pasteboard = NSPasteboard
 #endif
-import Prelude
+import ClientPrelude
 
 // MARK: - PasteboardClient + DependencyKey
 extension PasteboardClient: DependencyKey {

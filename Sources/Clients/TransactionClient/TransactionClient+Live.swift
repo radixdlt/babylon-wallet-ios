@@ -1,7 +1,7 @@
+import ClientPrelude
 import Cryptography
 import EngineToolkitClient
 import GatewayAPI
-import Prelude
 import ProfileClient
 
 public extension TransactionClient {

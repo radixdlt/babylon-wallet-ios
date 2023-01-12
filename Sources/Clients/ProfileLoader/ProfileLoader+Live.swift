@@ -1,6 +1,6 @@
+import ClientPrelude
 import Foundation
 import JSON
-import Prelude
 import Profile
 
 public extension ProfileLoader {

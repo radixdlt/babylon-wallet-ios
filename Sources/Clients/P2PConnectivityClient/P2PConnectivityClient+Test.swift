@@ -1,5 +1,5 @@
+import ClientPrelude
 import P2PModels
-import Prelude
 import Profile
 import SharedModels
 

@@ -1,5 +1,5 @@
+import ClientPrelude
 import Cryptography
-import Prelude
 import Profile
 import SharedModels
 

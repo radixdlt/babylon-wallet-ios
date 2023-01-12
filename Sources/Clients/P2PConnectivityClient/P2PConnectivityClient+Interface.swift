@@ -1,5 +1,5 @@
+import ClientPrelude
 import P2PConnection
-import Prelude
 import ProfileClient
 
 // MARK: - DependencyValues
