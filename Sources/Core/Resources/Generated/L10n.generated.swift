@@ -1,7 +1,7 @@
 // swiftlint:disable all
 // Generated using SwiftGen — https://github.com/SwiftGen/SwiftGen
 
-import Prelude
+import Foundation
 
 // swiftlint:disable superfluous_disable_command file_length implicit_return prefer_self_in_static_references
 
