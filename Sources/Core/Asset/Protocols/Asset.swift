@@ -1,5 +1,5 @@
 import EngineToolkit
-import Foundation
+import Prelude
 
 // MARK: - Asset
 public protocol Asset: Sendable, Equatable, Identifiable where ID == ComponentAddress {

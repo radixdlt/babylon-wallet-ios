@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 import XCTest
 
 open class TestCase: XCTestCase {

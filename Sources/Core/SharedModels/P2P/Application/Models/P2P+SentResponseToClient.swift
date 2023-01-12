@@ -1,6 +1,6 @@
-import Foundation
 import P2PConnection
 import P2PModels
+import Prelude
 import Profile
 
 // MARK: - P2P.SentResponseToClient

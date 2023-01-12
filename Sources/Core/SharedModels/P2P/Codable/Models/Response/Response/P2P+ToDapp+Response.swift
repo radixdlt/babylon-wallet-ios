@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 // MARK: - P2P.ToDapp.Response
 public extension P2P.ToDapp {

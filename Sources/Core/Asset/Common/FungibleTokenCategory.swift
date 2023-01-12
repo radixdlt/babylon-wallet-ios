@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 // MARK: - FungibleTokenCategory
 public struct FungibleTokenCategory: Sendable, Equatable {

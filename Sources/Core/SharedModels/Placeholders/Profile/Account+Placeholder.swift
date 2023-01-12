@@ -1,5 +1,5 @@
 #if DEBUG
-import Foundation
+import Prelude
 import Profile
 
 public extension OnNetwork.Account {

@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 // MARK: - Token
 public protocol Token: Sendable, Equatable, Identifiable {

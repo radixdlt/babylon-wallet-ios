@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 internal extension P2P.FromDapp {
 	// Used by Responses and Requests

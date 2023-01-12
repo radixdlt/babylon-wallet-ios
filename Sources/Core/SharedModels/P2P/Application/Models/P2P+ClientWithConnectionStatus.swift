@@ -1,5 +1,5 @@
-import Foundation
 import P2PModels
+import Prelude
 import Profile
 
 // MARK: - P2P.ClientWithConnectionStatus

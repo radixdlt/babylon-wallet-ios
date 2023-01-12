@@ -1,7 +1,7 @@
 // TODO: fixme post betanet
 /*
  #if DEBUG
- import Foundation
+ import Prelude
 
  public enum AssetGenerator {
  	public static var mockAssets: [[any Asset]] {

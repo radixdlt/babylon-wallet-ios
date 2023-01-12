@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 public extension NSError {
 	static func testValue(domain: String = "Test") -> NSError {
