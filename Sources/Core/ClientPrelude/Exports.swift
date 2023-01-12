@@ -1,3 +1,3 @@
 @_exported import Prelude
-@_exported import Resources
+@_exported import enum Resources.L10n
 @_exported import SharedModels
