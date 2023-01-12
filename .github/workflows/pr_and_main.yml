@@ -57,11 +57,11 @@ jobs:
           brew install xcbeautify
           brew install robotsandpencils/made/xcodes
 
-      - name: "Build"
-        run: bundle exec fastlane ios build
-
-      - name: "Unit tests"
+      - name: "Unit tests (debug)"
         run: bundle exec fastlane ios tests
+
+      - name: "Build and archive (release)"
+        run: bundle exec fastlane ios build
 
   # snapshot_tests:
   #   name: "Snapshot tests"
