@@ -25,9 +25,7 @@ package.addModules([
 			"EngineToolkit",
 			"Profile",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AccountListFeature",
@@ -37,9 +35,7 @@ package.addModules([
 			"PasteboardClient",
 			"ProfileClient",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AccountPreferencesFeature",
@@ -47,16 +43,12 @@ package.addModules([
 			"ErrorQueue",
 			"FaucetClient",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AggregatedValueFeature",
 		dependencies: [],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AppFeature",
@@ -87,9 +79,7 @@ package.addModules([
 			"FungibleTokenListFeature",
 			"NonFungibleTokenListFeature",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "CreateAccountFeature",
@@ -148,9 +138,7 @@ package.addModules([
 			"SharedModels",
 			"TransactionSigningFeature",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "HomeFeature",
@@ -199,9 +187,7 @@ package.addModules([
 			"PasteboardClient",
 			"SettingsFeature",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "ManageP2PClientsFeature",
@@ -212,9 +198,7 @@ package.addModules([
 			"ProfileClient",
 			"SharedModels",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "ManageGatewayAPIEndpointsFeature",
@@ -225,9 +209,7 @@ package.addModules([
 			"ProfileClient",
 			"UserDefaultsClient",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "NewConnectionFeature",
@@ -240,9 +222,7 @@ package.addModules([
 			"P2PConnectivityClient",
 			"SharedModels",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "NonFungibleTokenListFeature",
@@ -250,9 +230,7 @@ package.addModules([
 			"EngineToolkit",
 			"PasteboardClient",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "OnboardingFeature",
@@ -277,9 +255,7 @@ package.addModules([
 			"ProfileClient",
 			"ProfileView",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "SplashFeature",
@@ -290,9 +266,7 @@ package.addModules([
 			"ProfileClient",
 			"ProfileLoader",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "TransactionSigningFeature",
@@ -304,9 +278,7 @@ package.addModules([
 			"SharedModels",
 			"TransactionClient",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 ])
 
@@ -321,9 +293,7 @@ package.addModules([
 			"GatewayAPI",
 			"Profile",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "AppSettings",
@@ -332,9 +302,7 @@ package.addModules([
 			"Profile",
 			"UserDefaultsClient",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "CameraPermissionClient",
@@ -348,9 +316,7 @@ package.addModules([
 			"EngineToolkit",
 			"Profile", // AccountAddress
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "ErrorQueue",
@@ -388,9 +354,7 @@ package.addModules([
 		exclude: [
 			"CodeGen/Input/",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "JSON", // TODO: extract into Prelude package
@@ -400,9 +364,7 @@ package.addModules([
 	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "P2PConnectivityClient",
@@ -415,16 +377,12 @@ package.addModules([
 			"Resources",
 			"SharedModels",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "PasteboardClient",
 		dependencies: [],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "PlatformEnvironmentClient",
@@ -441,9 +399,7 @@ package.addModules([
 			"SharedModels",
 			"UserDefaultsClient",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "ProfileLoader",
@@ -451,9 +407,7 @@ package.addModules([
 			"JSON",
 			"Profile",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "TransactionClient",
@@ -461,16 +415,12 @@ package.addModules([
 			"GatewayAPI",
 			"ProfileClient",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "UserDefaultsClient",
 		dependencies: [],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 ])
 
@@ -503,9 +453,7 @@ package.addModules([
 			"EngineToolkit",
 			"Profile", // Address
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.core(
 		name: "DesignSystem",
@@ -521,9 +469,7 @@ package.addModules([
 				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3")
 			},
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.core(
 		name: "Resources",
@@ -554,9 +500,7 @@ package.addModules([
 			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
 			"P2PModels",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 ])
 
@@ -623,9 +567,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.module(
 		name: "Cryptography",
@@ -710,7 +652,7 @@ extension Package {
 			case no
 			case yes(
 				nameSuffix: String = "Tests",
-				dependencies: [Target.Dependency],
+				dependencies: [Target.Dependency] = [],
 				resources: [Resource]? = nil
 			)
 		}
