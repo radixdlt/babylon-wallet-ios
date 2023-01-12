@@ -70,8 +70,8 @@ package.addModules([
 		],
 		tests: .yes(
 			dependencies: [
-				"SplashFeature",
 				"ProfileClient",
+				"SplashFeature",
 			]
 		)
 	),
@@ -336,8 +336,6 @@ package.addModules([
 			"Profile", // Account
 			"ProfileClient",
 			"P2PConnection",
-			"Resources",
-			"SharedModels",
 		],
 		tests: .yes()
 	),

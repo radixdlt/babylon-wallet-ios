@@ -1,3 +1,4 @@
+#if os(macOS) // testing on macOS only as iOS requires prompt approval to copy-paste 🤦‍♂️
 import Dependencies
 import TestingPrelude
 
@@ -8,3 +9,4 @@ final class PasteboardClientTests: TestCase {
 		XCTAssertEqual(DependencyValues.live.pasteboardClient.getString(), "test")
 	}
 }
+#endif
