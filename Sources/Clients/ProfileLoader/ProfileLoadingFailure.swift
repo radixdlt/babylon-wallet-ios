@@ -1,5 +1,4 @@
-import Common
-import Prelude
+import FeaturePrelude
 import Profile
 
 // MARK: - ProfileLoader.ProfileLoadingFailure

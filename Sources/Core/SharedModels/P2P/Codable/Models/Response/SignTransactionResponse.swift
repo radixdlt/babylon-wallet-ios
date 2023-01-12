@@ -1,5 +1,4 @@
-import Common
-import Foundation
+import Prelude
 
 public extension P2P.ToDapp {
 	/// Response to Dapp from wallet, info about a signed and submitted transaction, see [CAP21][cap].
