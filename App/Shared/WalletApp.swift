@@ -1,7 +1,6 @@
 import AppFeature
 import FeaturePrelude
 import ProfileClient
-import UserDefaultsClient
 
 // MARK: - WalletApp
 @main
