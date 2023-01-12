@@ -6,12 +6,12 @@ import TestingPrelude
 struct TestVector<Curve: Slip10SupportedECCurve> {
 	let seed: Data
 	let vectorID: Int
-	let testCases: [TestCase]
+	let testCases: [TestScenario]
 
 	init(
 		seed: String,
 		vectorID: Int,
-		testCases: [TestCase]
+		testCases: [TestScenario]
 	) throws {
 		self.seed = try Data(hex: seed)
 		self.vectorID = vectorID
@@ -19,9 +19,9 @@ struct TestVector<Curve: Slip10SupportedECCurve> {
 	}
 }
 
-// MARK: TestVector.TestCase
+// MARK: TestVector.TestScenario
 extension TestVector {
-	struct TestCase {
+	struct TestScenario {
 		let path: HD.Path.Full
 		let expected: Expected
 
@@ -71,12 +71,7 @@ extension TestVector {
 }
 
 // MARK: - SLIP10TestVectorsTests
-final class SLIP10TestVectorsTests: XCTestCase {
-	override func setUp() {
-		super.setUp()
-		continueAfterFailure = false
-	}
-
+final class SLIP10TestVectorsTests: TestCase {
 	func testPath_m() throws {
 		let path: HD.Path.Full = "m"
 		XCTAssertEqual(path.components, [.root(onlyPublic: false)])
@@ -816,7 +811,7 @@ private extension SLIP10TestVectorsTests {
 
 	func doTestCase<C>(
 		root: HD.Root,
-		case testCase: TestVector<C>.TestCase,
+		case testCase: TestVector<C>.TestScenario,
 		testIndex: Int,
 		line: UInt = #line
 	) throws where C: Slip10SupportedECCurve, C.PrivateKey: Equatable, C.PublicKey: Equatable {

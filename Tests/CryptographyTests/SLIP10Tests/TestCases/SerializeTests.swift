@@ -1,7 +1,7 @@
 @testable import Cryptography
 import TestingPrelude
 
-final class SerializeTests: XCTestCase {
+final class SerializeTests: TestCase {
 	/// Expected values generated with Python ref impl: https://github.com/satoshilabs/slips/blob/master/slip-0010/testvectors.py
 	func testMasterKeyXPUBCurve25519() throws {
 		let seed = "65143633982249957359862559fd46e6aeb93e78477e73c6bd6d8f25d87c7972d587b6120134899667a3fec2631d31f3884d838fc1e65220c081c866ce64d676"

@@ -1,7 +1,7 @@
 @testable import Cryptography
 import TestingPrelude
 
-public final class MnemonicTests: XCTestCase {
+public final class MnemonicTests: TestCase {
 	func testGenerateManyAndVerifyChecksummed() {
 		for wordCount in BIP39.WordCount.allCases {
 			for language in BIP39.Language.allCases {
