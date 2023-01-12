@@ -734,9 +734,6 @@ package.addModules([
 			.product(name: "NonEmpty", package: "swift-nonempty") {
 				.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0")
 			},
-			.product(name: "SemanticVersion", package: "SemanticVersion") {
-				.package(url: "https://github.com/SwiftPackageIndex/SemanticVersion", from: "0.3.5")
-			},
 			.product(name: "SwiftLogConsoleColors", package: "swift-log-console-colors") {
 				.package(url: "https://github.com/nneuberger1/swift-log-console-colors", from: "1.0.3")
 			},

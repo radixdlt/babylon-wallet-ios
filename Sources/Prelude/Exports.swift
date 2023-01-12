@@ -11,5 +11,4 @@
 @_exported import KeychainAccess
 @_exported import LegibleError
 @_exported import NonEmpty
-@_exported import SemanticVersion
 @_exported import Tagged

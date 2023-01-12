@@ -305,7 +305,7 @@ final class ProfileTests: XCTestCase {
 
 	func test_version_compatability_check_too_low() throws {
 		let json = """
-		{ "version": "0.0.0" }
+		{ "version": 0 }
 		""".data(using: .utf8)!
 
 		XCTAssertThrowsError(
@@ -314,13 +314,13 @@ final class ProfileTests: XCTestCase {
 			guard let error = anyError as? IncompatibleProfileVersion else {
 				return XCTFail("WrongErrorType")
 			}
-			XCTAssertEqual(error, .init(decodedVersion: "0.0.0", minimumRequiredVersion: .minimum))
+			XCTAssertEqual(error, .init(decodedVersion: 0, minimumRequiredVersion: .minimum))
 		}
 	}
 
 	func test_version_compatability_check_ok() throws {
 		let json = """
-		{ "version": "\(String(describing: ProfileSnapshot.Version.minimum))" }
+		{ "version": \(ProfileSnapshot.Version.minimum) }
 		""".data(using: .utf8)!
 
 		XCTAssertNoThrow(
