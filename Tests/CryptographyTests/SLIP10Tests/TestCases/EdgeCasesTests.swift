@@ -1,6 +1,5 @@
 @testable import Cryptography
 import CryptoKit
-import Foundation
 import TestingPrelude
 
 final class EdgeCasesTests: XCTestCase {

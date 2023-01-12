@@ -1,5 +1,4 @@
 @testable import Cryptography
-import Foundation
 import TestingPrelude
 
 final class PathTests: XCTestCase {

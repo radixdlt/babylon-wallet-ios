@@ -1,6 +1,4 @@
-import Foundation
 @testable import SharedModels
-import TestingPrelude
 import TestingPrelude
 
 final class ToDappResponseTests: TestCase {

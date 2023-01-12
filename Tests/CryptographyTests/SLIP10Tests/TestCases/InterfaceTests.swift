@@ -1,6 +1,4 @@
 @testable import Cryptography
-import CryptoKit
-import Foundation
 import TestingPrelude
 
 // MARK: - InterfaceTests
