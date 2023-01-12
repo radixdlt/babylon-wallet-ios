@@ -1,4 +1,4 @@
-name: "Test and build"
+name: CI
 
 on:
   pull_request:
@@ -25,7 +25,7 @@ jobs:
           swiftformat . --lint
 
   build_and_test:
-    name: "Build and test"
+    name: "Test and build"
     runs-on: macos-12
 
     needs:
