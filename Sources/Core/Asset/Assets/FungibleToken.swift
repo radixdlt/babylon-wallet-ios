@@ -58,16 +58,6 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 }
 
 public extension FungibleToken {
-	var placeholderImage: ImageAsset {
-		if isXRD {
-			return AssetResource.xrd
-		} else {
-			return AssetResource.fungibleToken
-		}
-	}
-}
-
-public extension FungibleToken {
 	var isXRD: Bool {
 		for networkID in NetworkID.allCases {
 			if
