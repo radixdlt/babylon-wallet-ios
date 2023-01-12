@@ -1,5 +1,4 @@
 import ClientPrelude
-import Foundation
 import JSON
 import Profile
 

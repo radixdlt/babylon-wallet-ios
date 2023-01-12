@@ -1,5 +1,4 @@
 import ClientPrelude
-import Foundation
 
 // MARK: - JSONDecoder + DependencyKey
 extension JSONDecoder: DependencyKey {

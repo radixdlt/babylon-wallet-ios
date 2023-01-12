@@ -1,4 +1,4 @@
-import Foundation
+import ClientPrelude
 
 // MARK: - PasteboardClient
 public struct PasteboardClient {

@@ -1,4 +1,4 @@
-import Foundation
+import ClientPrelude
 
 // MARK: - LocalAuthenticationConfig
 public struct LocalAuthenticationConfig: Equatable, Sendable, CustomStringConvertible {

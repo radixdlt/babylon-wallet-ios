@@ -1,5 +1,4 @@
 import ClientPrelude
-import Foundation
 
 extension PlatformEnvironmentClient: DependencyKey {
 	public static let liveValue: Self = .init(

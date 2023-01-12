@@ -1,4 +1,4 @@
-import Foundation
+import ClientPrelude
 @testable import LocalAuthenticationClient
 import TestUtils
 

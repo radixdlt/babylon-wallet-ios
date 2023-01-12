@@ -1,6 +1,5 @@
 import AVKit
 import ClientPrelude
-import Foundation
 
 // MARK: - UserDefaultsClient + DependencyKey
 extension CameraPermissionClient: DependencyKey {

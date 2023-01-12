@@ -1,5 +1,4 @@
 import ClientPrelude
-import Foundation
 
 public extension DependencyValues {
 	var cameraPermissionClient: CameraPermissionClient {
