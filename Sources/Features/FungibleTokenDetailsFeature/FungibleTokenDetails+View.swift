@@ -1,8 +1,4 @@
-import ComposableArchitecture
-import DesignSystem
-import Prelude
-import Resources
-import SharedModels
+import FeaturePrelude
 
 // MARK: - FungibleTokenDetails.View
 public extension FungibleTokenDetails {
