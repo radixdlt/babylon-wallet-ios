@@ -25,7 +25,11 @@ package.addModules([
 			"EngineToolkit",
 			"Profile",
 		],
-		tests: .yes()
+		tests: .yes(
+			dependencies: [
+				"SharedTestingModels",
+			]
+		)
 	),
 	.feature(
 		name: "AccountListFeature",
