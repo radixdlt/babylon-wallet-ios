@@ -1,4 +1,3 @@
-import ErrorQueue
 import FaucetClient
 import FeaturePrelude
 

@@ -1,7 +1,5 @@
-import ErrorQueue
 import FeaturePrelude
 import LocalAuthenticationClient
-import PlatformEnvironmentClient
 import ProfileLoader
 
 // MARK: - Splash

@@ -1,5 +1,4 @@
 import Cryptography
-import ErrorQueue
 import FeaturePrelude
 import ProfileClient
 

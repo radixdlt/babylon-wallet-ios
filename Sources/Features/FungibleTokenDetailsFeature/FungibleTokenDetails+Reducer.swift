@@ -1,5 +1,4 @@
 import FeaturePrelude
-import PasteboardClient
 
 // MARK: - FungibleTokenDetails
 public struct FungibleTokenDetails: Sendable, ReducerProtocol {

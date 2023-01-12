@@ -1,5 +1,4 @@
 import ClientPrelude
-@testable import PasteboardClient
 import TestingPrelude
 
 // MARK: - PasteboardClientTests

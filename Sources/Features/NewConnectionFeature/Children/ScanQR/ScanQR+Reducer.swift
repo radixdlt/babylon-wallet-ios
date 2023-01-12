@@ -1,5 +1,4 @@
 import CameraPermissionClient
-import ErrorQueue
 import FeaturePrelude
 
 // MARK: - ScanQR

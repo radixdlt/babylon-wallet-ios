@@ -1,6 +1,5 @@
 import AssetsViewFeature
 import FeaturePrelude
-import PasteboardClient
 
 public struct AccountDetails: Sendable, ReducerProtocol {
 	@Dependency(\.pasteboardClient) var pasteboardClient

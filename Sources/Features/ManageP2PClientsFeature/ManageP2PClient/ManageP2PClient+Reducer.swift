@@ -1,4 +1,3 @@
-import ErrorQueue
 import FeaturePrelude
 import P2PConnectivityClient
 
