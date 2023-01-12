@@ -515,6 +515,13 @@ package.addModules([
 		tests: .no
 	),
 	.core(
+		name: "ClientPrelude",
+		dependencies: [
+			"Resources", // TODO: should be L10n on its own. We'll split L10n into its own module at some point.
+		],
+		tests: .no
+	),
+	.core(
 		name: "Asset", // put in SharedModels
 		dependencies: [
 			"EngineToolkitClient", // I know, this is very wrong. Apologies. Let's revisit our dependency levels post betanet.
@@ -774,7 +781,7 @@ extension Package {
 				name: name,
 				category: "Clients",
 				remoteDependencies: remoteDependencies,
-				dependencies: dependencies,
+				dependencies: dependencies + ["ClientPrelude"],
 				exclude: exclude,
 				resources: resources,
 				plugins: plugins,
