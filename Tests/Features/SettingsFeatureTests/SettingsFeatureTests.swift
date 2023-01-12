@@ -1,4 +1,4 @@
-import Foundation
+import FeaturePrelude
 @testable import SettingsFeature
 import TestUtils
 

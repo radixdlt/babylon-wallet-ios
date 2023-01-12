@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Foundation
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature

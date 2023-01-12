@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Foundation
 @testable import NonFungibleTokenListFeature
 import TestUtils
 

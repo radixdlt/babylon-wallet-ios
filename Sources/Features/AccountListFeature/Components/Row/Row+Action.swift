@@ -1,4 +1,4 @@
-import Foundation
+import FeaturePrelude
 
 // MARK: - AccountList.Row.Action
 public extension AccountList.Row {

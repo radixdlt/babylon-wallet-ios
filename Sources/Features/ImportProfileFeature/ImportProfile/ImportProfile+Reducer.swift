@@ -1,7 +1,6 @@
 import ErrorQueue
 import FeaturePrelude
 import FileClient
-import Foundation
 import JSON
 import Profile
 

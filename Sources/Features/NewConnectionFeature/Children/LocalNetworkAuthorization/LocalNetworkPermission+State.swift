@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Foundation
 
 // MARK: - LocalNetworkPermission.State
 public extension LocalNetworkPermission {

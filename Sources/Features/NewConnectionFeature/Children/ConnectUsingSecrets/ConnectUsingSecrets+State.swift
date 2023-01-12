@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Foundation
 import P2PConnection
 
 // MARK: - ConnectUsingSecrets.State

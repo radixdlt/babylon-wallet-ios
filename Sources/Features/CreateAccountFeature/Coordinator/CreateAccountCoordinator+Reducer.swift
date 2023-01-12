@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Foundation
 
 public struct CreateAccountCoordinator: Sendable, ReducerProtocol {
 	public init() {}

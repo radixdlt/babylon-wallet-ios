@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Foundation
 import MainFeature
 import OnboardingFeature
 import Profile

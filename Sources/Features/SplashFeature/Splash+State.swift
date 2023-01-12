@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Foundation
 import ProfileLoader
 
 // MARK: Splash.State

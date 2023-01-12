@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Foundation
 import P2PModels
 
 // MARK: - LocalNetworkPermission.Action

@@ -1,4 +1,4 @@
-import Foundation
+import FeaturePrelude
 
 // MARK: - ScanQR.State
 public extension ScanQR {

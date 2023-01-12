@@ -1,6 +1,5 @@
 import CreateAccountFeature
 import FeaturePrelude
-import Foundation
 import Profile
 
 // MARK: - ManageGatewayAPIEndpoints.Action

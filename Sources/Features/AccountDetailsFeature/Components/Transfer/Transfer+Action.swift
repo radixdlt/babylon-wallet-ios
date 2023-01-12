@@ -1,4 +1,4 @@
-import Foundation
+import FeaturePrelude
 
 // MARK: - AccountDetails.Transfer.Action
 public extension AccountDetails.Transfer {

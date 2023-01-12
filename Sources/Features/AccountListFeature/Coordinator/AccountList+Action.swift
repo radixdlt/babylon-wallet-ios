@@ -1,4 +1,4 @@
-import Foundation
+import FeaturePrelude
 import Profile
 
 // MARK: - AccountList.Action

@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Foundation
 
 // MARK: - CameraPermission.State
 public extension CameraPermission {

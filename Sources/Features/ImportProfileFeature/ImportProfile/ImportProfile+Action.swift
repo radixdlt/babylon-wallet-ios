@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Foundation
 import Profile
 
 // MARK: - ImportProfile.Action
