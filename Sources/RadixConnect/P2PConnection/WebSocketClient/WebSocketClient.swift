@@ -1,6 +1,6 @@
 import Combine
-import Foundation
 import P2PModels
+import Prelude
 
 // MARK: - WebSocketClient
 public final class WebSocketClient {

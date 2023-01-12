@@ -1,5 +1,5 @@
-import CryptoKit
-import Foundation
+import Cryptography
+import Prelude
 
 // MARK: - EncryptionKey
 // `Data` is `Sendable`, but `CryptoKit.SymmetricKey` (`EncryptionKey`) is not.

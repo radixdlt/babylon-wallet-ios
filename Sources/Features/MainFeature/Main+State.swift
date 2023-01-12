@@ -1,4 +1,3 @@
-import EngineToolkit
 import GrantDappWalletAccessFeature
 import HandleDappRequests
 import HomeFeature

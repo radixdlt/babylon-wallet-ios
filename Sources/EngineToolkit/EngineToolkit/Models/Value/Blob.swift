@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 // MARK: - Blob
 public struct Blob: ValueProtocol, Sendable, Codable, Hashable {

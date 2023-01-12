@@ -1,5 +1,3 @@
-import Foundation
-
 // MARK: - UInt11
 public struct UInt11: Hashable, ExpressibleByIntegerLiteral {
 	public let valueBoundBy16Bits: UInt16
@@ -67,7 +65,7 @@ extension Sequence where Element == Bool {
 
 extension FixedWidthInteger {
 	var byteCount: Int {
-		Self.bitWidth / bitsPerByte
+		Self.bitWidth / .bitsPerByte
 	}
 
 	// Inspired by: https://developer.apple.com/documentation/swift/fixedwidthinteger
@@ -84,7 +82,9 @@ extension FixedWidthInteger {
 	}
 }
 
-internal let bitsPerByte = 8
+public extension Int {
+	static let bitsPerByte = 8
+}
 
 extension Data {
 	// Inspired by: https://developer.apple.com/documentation/swift/fixedwidthinteger

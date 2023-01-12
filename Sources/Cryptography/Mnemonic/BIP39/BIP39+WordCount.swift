@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 // MARK: - BIP39.WordCount
 public extension BIP39 {
@@ -25,7 +25,7 @@ public extension BIP39.WordCount {
 	}
 
 	init?(byteCount: Int) {
-		let bitCount = byteCount * bitsPerByte
+		let bitCount = byteCount * .bitsPerByte
 		self.init(entropyInBits: bitCount)
 	}
 }
@@ -49,7 +49,7 @@ internal extension BIP39.WordCount {
 	static let checksumBitsPerWord = 3
 
 	var byteCount: Int {
-		let byteCount = Self.entropyInBitsFrom(wordCount: wordCount) / bitsPerByte
+		let byteCount = Self.entropyInBitsFrom(wordCount: wordCount) / .bitsPerByte
 		return byteCount
 	}
 

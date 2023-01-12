@@ -26,7 +26,6 @@ package.addModules([
 			"PasteboardClient",
 			"EngineToolkit",
 			"Profile",
-
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -70,7 +69,6 @@ package.addModules([
 	.feature(
 		name: "AppFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AccountPortfolio",
 			"AppSettings",
 			"EngineToolkit",
@@ -83,7 +81,6 @@ package.addModules([
 			"Resources",
 			"SplashFeature",
 			"UserDefaultsClient",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: [
@@ -114,7 +111,6 @@ package.addModules([
 			"EngineToolkit",
 			"ErrorQueue",
 			"GatewayAPI",
-//			"KeychainClientDependency",
 			"LocalAuthenticationClient",
 			"ProfileClient",
 		],
@@ -154,14 +150,12 @@ package.addModules([
 	.feature(
 		name: "GrantDappWalletAccessFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"CreateAccountFeature",
 			"DesignSystem",
 			"ErrorQueue",
 			"ProfileClient",
 			"SharedModels",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: [
@@ -178,12 +172,14 @@ package.addModules([
 			"Profile",
 			"SharedModels",
 			"TransactionSigningFeature",
-		], tests: .yes(dependencies: ["TestUtils"])
+		],
+		tests: .yes(
+			dependencies: ["TestUtils"]
+		)
 	),
 	.feature(
 		name: "HomeFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AccountListFeature",
 			"AccountDetailsFeature",
 			"AccountPortfolio",
@@ -197,7 +193,6 @@ package.addModules([
 			"ProfileClient",
 			"SharedModels",
 			"TransactionSigningFeature",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: [
@@ -217,7 +212,6 @@ package.addModules([
 			"ErrorQueue",
 			"FileClient",
 			"JSON",
-//			"KeychainClientDependency",
 			"ProfileClient",
 		],
 		tests: .yes(
@@ -228,15 +222,12 @@ package.addModules([
 	.feature(
 		name: "MainFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AppSettings",
 			"AccountPortfolio",
-//			"EngineToolkit",
 			"HandleDappRequests",
 			"HomeFeature",
 			"PasteboardClient",
 			"SettingsFeature",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -245,7 +236,6 @@ package.addModules([
 	.feature(
 		name: "ManageP2PClientsFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
@@ -253,7 +243,6 @@ package.addModules([
 			"P2PConnectivityClient",
 			"ProfileClient",
 			"SharedModels",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -308,11 +297,9 @@ package.addModules([
 	.feature(
 		name: "OnboardingFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"DesignSystem",
 			"CreateAccountFeature",
 			"ImportProfileFeature",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: [
@@ -324,7 +311,6 @@ package.addModules([
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"ErrorQueue",
 			"GatewayAPI",
@@ -333,7 +319,6 @@ package.addModules([
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
 			"ProfileClient",
 			"ProfileView",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -342,7 +327,6 @@ package.addModules([
 	.feature(
 		name: "SplashFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"DesignSystem",
 			"ErrorQueue",
@@ -350,7 +334,6 @@ package.addModules([
 			"PlatformEnvironmentClient",
 			"ProfileClient",
 			"ProfileLoader",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -359,7 +342,6 @@ package.addModules([
 	.feature(
 		name: "TransactionSigningFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"Common",
 			"DesignSystem",
 			"EngineToolkitClient",
@@ -368,7 +350,6 @@ package.addModules([
 			"ProfileClient",
 			"SharedModels",
 			"TransactionClient",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(dependencies: [
 			"TestUtils",
@@ -695,9 +676,7 @@ package.addModules([
 		name: "P2PModels",
 		category: "RadixConnect",
 		dependencies: [
-			.product(name: "SwiftLogConsoleColors", package: "swift-log-console-colors") {
-				.package(url: "https://github.com/nneuberger1/swift-log-console-colors", from: "1.0.3")
-			},
+			"Cryptography",
 		],
 		tests: .yes(
 			dependencies: []
@@ -720,6 +699,9 @@ package.addModules([
 	),
 	.module(
 		name: "Prelude",
+		remoteDependencies: [
+			.package(url: "https://github.com/apple/swift-collections", branch: "main"), // TODO: peg to specific version once main is tagged
+		],
 		dependencies: [
 			.product(name: "AsyncAlgorithms", package: "swift-async-algorithms") {
 				.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3")
@@ -730,9 +712,10 @@ package.addModules([
 			.product(name: "BigInt", package: "BigInt") {
 				.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0")
 			},
-			.product(name: "Collections", package: "swift-collections") {
-				.package(url: "https://github.com/apple/swift-collections", from: "1.0.3")
-			},
+
+			.product(name: "BitCollections", package: "swift-collections"),
+			.product(name: "Collections", package: "swift-collections"),
+
 			.product(name: "CustomDump", package: "swift-custom-dump") {
 				.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.1")
 			},
@@ -750,6 +733,9 @@ package.addModules([
 			},
 			.product(name: "NonEmpty", package: "swift-nonempty") {
 				.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0")
+			},
+			.product(name: "SwiftLogConsoleColors", package: "swift-log-console-colors") {
+				.package(url: "https://github.com/nneuberger1/swift-log-console-colors", from: "1.0.3")
 			},
 			.product(name: "Tagged", package: "swift-tagged") {
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
@@ -784,6 +770,7 @@ extension Package {
 
 		let name: String
 		let category: String?
+		let remoteDependencies: [Package.Dependency]?
 		let dependencies: [Target.Dependency]
 		let exclude: [String]
 		let resources: [Resource]?
@@ -793,6 +780,7 @@ extension Package {
 
 		static func feature(
 			name: String,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -803,6 +791,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Features",
+				remoteDependencies: remoteDependencies,
 				dependencies: dependencies + [
 					.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
 						.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1")
@@ -819,6 +808,7 @@ extension Package {
 
 		static func client(
 			name: String,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -829,6 +819,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Clients",
+				remoteDependencies: remoteDependencies,
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
@@ -840,6 +831,7 @@ extension Package {
 
 		static func core(
 			name: String,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -850,6 +842,7 @@ extension Package {
 			.init(
 				name: name,
 				category: "Core",
+				remoteDependencies: remoteDependencies,
 				dependencies: dependencies + ["Prelude"],
 				exclude: exclude,
 				resources: resources,
@@ -862,6 +855,7 @@ extension Package {
 		static func module(
 			name: String,
 			category: String? = nil,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -872,6 +866,7 @@ extension Package {
 			.init(
 				name: name,
 				category: category,
+				remoteDependencies: remoteDependencies,
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
@@ -889,6 +884,10 @@ extension Package {
 	}
 
 	private func addModule(_ module: Module) {
+		if let remoteDependencies = module.remoteDependencies {
+			package.dependencies.append(contentsOf: remoteDependencies)
+		}
+
 		let targetName = module.name
 		let targetPath = {
 			if let category = module.category {
