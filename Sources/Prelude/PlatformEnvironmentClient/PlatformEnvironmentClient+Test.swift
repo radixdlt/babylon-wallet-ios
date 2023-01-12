@@ -3,7 +3,7 @@ import ClientPrelude
 // MARK: - PlatformEnvironmentClient + TestDependencyKey
 extension PlatformEnvironmentClient: TestDependencyKey {
 	public static let testValue = Self(
-		isSimulator: { false }
+		isSimulator: unimplemented("\(Self.self).isSimulator")
 	)
 }
 

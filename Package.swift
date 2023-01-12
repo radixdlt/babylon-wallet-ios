@@ -21,7 +21,6 @@ package.addModules([
 			"AccountListFeature",
 			"AccountPreferencesFeature",
 			"AssetsViewFeature",
-			"PasteboardClient",
 			"EngineToolkit",
 			"Profile",
 		],
@@ -36,7 +35,6 @@ package.addModules([
 		dependencies: [
 			"AccountPortfolio",
 			"FungibleTokenListFeature",
-			"PasteboardClient",
 			"ProfileClient",
 		],
 		tests: .yes(
@@ -48,7 +46,6 @@ package.addModules([
 	.feature(
 		name: "AccountPreferencesFeature",
 		dependencies: [
-			"ErrorQueue",
 			"FaucetClient",
 		],
 		tests: .yes()
@@ -64,15 +61,12 @@ package.addModules([
 			"AccountPortfolio",
 			"AppSettings",
 			"EngineToolkit",
-			"ErrorQueue",
 			"MainFeature",
 			"OnboardingFeature",
-			"PasteboardClient",
 			"ProfileLoader",
 			"ProfileClient",
 			"Resources",
 			"SplashFeature",
-			"UserDefaultsClient",
 		],
 		tests: .yes(
 			dependencies: [
@@ -94,23 +88,19 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			"EngineToolkit",
-			"ErrorQueue",
 			"GatewayAPI",
 			"LocalAuthenticationClient",
 			"ProfileClient",
 		],
 		tests: .yes(
 			dependencies: [
-				"UserDefaultsClient",
 				"SharedTestingModels",
 			]
 		)
 	),
 	.feature(
 		name: "FungibleTokenDetailsFeature",
-		dependencies: [
-			"PasteboardClient",
-		],
+		dependencies: [],
 		tests: .no
 	),
 	.feature(
@@ -128,7 +118,6 @@ package.addModules([
 		name: "GrantDappWalletAccessFeature",
 		dependencies: [
 			"CreateAccountFeature",
-			"ErrorQueue",
 			"ProfileClient",
 			"SharedModels",
 		],
@@ -176,9 +165,6 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Cryptography",
-			"ErrorQueue",
-			"FileClient",
-			"JSON",
 			"ProfileClient",
 		],
 		tests: .yes(
@@ -193,7 +179,6 @@ package.addModules([
 			"AccountPortfolio",
 			"HandleDappRequests",
 			"HomeFeature",
-			"PasteboardClient",
 			"SettingsFeature",
 		],
 		tests: .yes()
@@ -201,7 +186,6 @@ package.addModules([
 	.feature(
 		name: "ManageP2PClientsFeature",
 		dependencies: [
-			"ErrorQueue",
 			"NewConnectionFeature",
 			"P2PConnectivityClient",
 			"ProfileClient",
@@ -213,10 +197,8 @@ package.addModules([
 		name: "ManageGatewayAPIEndpointsFeature",
 		dependencies: [
 			"CreateAccountFeature",
-			"ErrorQueue",
 			"GatewayAPI",
 			"ProfileClient",
-			"UserDefaultsClient",
 		],
 		tests: .yes()
 	),
@@ -227,7 +209,6 @@ package.addModules([
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
-			"ErrorQueue",
 			"P2PConnectivityClient",
 			"SharedModels",
 		],
@@ -237,7 +218,6 @@ package.addModules([
 		name: "NonFungibleTokenListFeature",
 		dependencies: [
 			"EngineToolkit",
-			"PasteboardClient",
 		],
 		tests: .yes()
 	),
@@ -247,16 +227,11 @@ package.addModules([
 			"CreateAccountFeature",
 			"ImportProfileFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				"UserDefaultsClient",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
-			"ErrorQueue",
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
@@ -269,9 +244,7 @@ package.addModules([
 	.feature(
 		name: "SplashFeature",
 		dependencies: [
-			"ErrorQueue",
 			"LocalAuthenticationClient",
-			"PlatformEnvironmentClient",
 			"ProfileClient",
 			"ProfileLoader",
 		],
@@ -281,7 +254,6 @@ package.addModules([
 		name: "TransactionSigningFeature",
 		dependencies: [
 			"EngineToolkitClient",
-			"ErrorQueue",
 			"GatewayAPI",
 			"ProfileClient",
 			"SharedModels",
@@ -307,9 +279,7 @@ package.addModules([
 	.client(
 		name: "AppSettings",
 		dependencies: [
-			"JSON",
 			"Profile",
-			"UserDefaultsClient",
 		],
 		tests: .yes()
 	),
@@ -328,11 +298,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "ErrorQueue",
-		dependencies: [],
-		tests: .no
-	),
-	.client(
 		name: "FaucetClient",
 		dependencies: [
 			"EngineToolkit",
@@ -344,11 +309,6 @@ package.addModules([
 		], tests: .no
 	),
 	.client(
-		name: "FileClient",
-		dependencies: [],
-		tests: .no
-	),
-	.client(
 		name: "GatewayAPI",
 		dependencies: [
 			.product(name: "AnyCodable", package: "AnyCodable") {
@@ -357,18 +317,12 @@ package.addModules([
 			},
 			"Cryptography",
 			"EngineToolkitClient",
-			"JSON",
 			"ProfileClient",
 		],
 		exclude: [
 			"CodeGen/Input/",
 		],
 		tests: .yes()
-	),
-	.client(
-		name: "JSON", // TODO: extract into Prelude package
-		dependencies: [],
-		tests: .no
 	),
 	.client(
 		name: "LocalAuthenticationClient",
@@ -379,7 +333,6 @@ package.addModules([
 		name: "P2PConnectivityClient",
 		dependencies: [
 			"EngineToolkit", // Model: SignTX contains Manifest
-			"JSON",
 			"Profile", // Account
 			"ProfileClient",
 			"P2PConnection",
@@ -389,16 +342,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "PasteboardClient",
-		dependencies: [],
-		tests: .yes()
-	),
-	.client(
-		name: "PlatformEnvironmentClient",
-		dependencies: [],
-		tests: .no
-	),
-	.client(
 		name: "ProfileClient",
 		dependencies: [
 			"Cryptography",
@@ -406,14 +349,12 @@ package.addModules([
 			"Profile",
 			"ProfileLoader",
 			"SharedModels",
-			"UserDefaultsClient",
 		],
 		tests: .yes()
 	),
 	.client(
 		name: "ProfileLoader",
 		dependencies: [
-			"JSON",
 			"Profile",
 		],
 		tests: .yes()
@@ -424,11 +365,6 @@ package.addModules([
 			"GatewayAPI",
 			"ProfileClient",
 		],
-		tests: .yes()
-	),
-	.client(
-		name: "UserDefaultsClient",
-		dependencies: [],
 		tests: .yes()
 	),
 ])
