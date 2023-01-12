@@ -66,11 +66,13 @@ public struct Splash: Sendable, ReducerProtocol {
 				return notifyDelegate(profileResult: state.profileResult)
 
 			case .openSettingsButtonTapped:
+				#if os(iOS)
 				return .run { _ in
-					#if os(iOS)
 					await openURL(URL(string: UIApplication.openSettingsURLString)!)
-					#endif
 				}
+				#else
+				return .none
+				#endif
 			}
 		}
 	}
