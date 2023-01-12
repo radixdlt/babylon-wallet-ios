@@ -1,22 +1,10 @@
 import Cryptography
 import Prelude
 
-public typealias SemVer = Version
-
-// MARK: ExpressibleByStringLiteral
-extension SemVer: ExpressibleByStringLiteral {
-	public init(stringLiteral value: String) {
-		self.init(value)!
-	}
-}
-
+// MARK: - ProfileSnapshot.Version
 public extension ProfileSnapshot {
-	enum VersionTag: Hashable {}
-	typealias Version = Tagged<VersionTag, SemVer>
+	typealias Version = Tagged<Self, UInt32>
 }
-
-// MARK: - Version + Sendable
-extension Version: @unchecked Sendable {}
 
 // MARK: - ProfileSnapshot.Version.ProfileVersionHolder
 private extension ProfileSnapshot.Version {

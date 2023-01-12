@@ -740,9 +740,6 @@ package.addModules([
 			.product(name: "Tagged", package: "swift-tagged") {
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
 			},
-			.product(name: "Version", package: "Version") {
-				.package(url: "https://github.com/mxcl/Version", from: "2.0.1")
-			},
 		],
 		tests: .yes(dependencies: [])
 	),

@@ -7,7 +7,7 @@ final class ProfileLoaderTests: TestCase {
 		let sut = ProfileLoader.liveValue
 		let json = """
 		{
-		    "version": "0.0.0"
+		    "version": 0
 		}
 		""".data(using: .utf8)!
 
@@ -18,7 +18,7 @@ final class ProfileLoaderTests: TestCase {
 
 			switch res {
 			case let .failure(.profileVersionOutdated(gotJson, version)):
-				XCTAssertEqual(version, .init(rawValue: .init(0, 0, 0)))
+				XCTAssertEqual(version, 0)
 				XCTAssertEqual(json, gotJson)
 			default:
 				XCTFail("wrong res, got: \(String(describing: res))")

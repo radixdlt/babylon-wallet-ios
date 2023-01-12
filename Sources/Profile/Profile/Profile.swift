@@ -4,7 +4,7 @@ import Foundation
 public extension ProfileSnapshot.Version {
 	/// Semantic versioning of the Profile Snapshot data format
 	/// other libraries should sync with this, i.e. Kotlin lib.
-	static let minimum: Self = "0.0.6"
+	static let minimum: Self = 6
 }
 
 // MARK: - Profile

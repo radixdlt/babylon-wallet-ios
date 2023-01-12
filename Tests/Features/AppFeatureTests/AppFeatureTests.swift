@@ -180,7 +180,7 @@ final class AppFeatureTests: TestCase {
 
 		// when
 		struct SomeError: Swift.Error {}
-		let badVersion: ProfileSnapshot.Version = .init(rawValue: .init(0, 0, 0))
+		let badVersion: ProfileSnapshot.Version = 0
 		let failedToCreateProfileFromSnapshot = ProfileLoader.FailedToCreateProfileFromSnapshot(version: badVersion, error: SomeError())
 		let result = ProfileLoader.ProfileResult.failure(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
@@ -228,7 +228,7 @@ final class AppFeatureTests: TestCase {
 
 		// when
 		struct SomeError: Swift.Error {}
-		let badVersion: ProfileSnapshot.Version = .init(rawValue: .init(0, 0, 0))
+		let badVersion: ProfileSnapshot.Version = 0
 		let result = ProfileLoader.ProfileResult.failure(.profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
 			result
