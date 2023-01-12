@@ -1,4 +1,3 @@
-import Asset
 import ClientPrelude
 import Profile
 

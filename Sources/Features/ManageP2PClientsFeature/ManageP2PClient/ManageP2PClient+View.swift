@@ -1,9 +1,5 @@
-import ComposableArchitecture
-import DesignSystem
+import FeaturePrelude
 import P2PConnection
-import Resources
-import SharedModels
-import SwiftUI
 
 // MARK: - ManageP2PClient.View
 public extension ManageP2PClient {

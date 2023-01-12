@@ -1,5 +1,4 @@
 import AppSettings
-import Asset
 import ClientPrelude
 import GatewayAPI
 import Profile

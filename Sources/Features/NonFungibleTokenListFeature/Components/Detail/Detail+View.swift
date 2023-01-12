@@ -1,8 +1,5 @@
-import ComposableArchitecture
-import DesignSystem
 import EngineToolkit
-import Resources
-import SharedModels
+import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Detail.View
 public extension NonFungibleTokenList.Detail {

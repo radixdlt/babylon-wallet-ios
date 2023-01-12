@@ -1,5 +1,4 @@
-import DesignSystem
-import Foundation
+import FeaturePrelude
 import Profile
 
 // MARK: AccountPreferences.State

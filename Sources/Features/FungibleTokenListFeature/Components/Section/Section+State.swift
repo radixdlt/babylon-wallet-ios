@@ -1,5 +1,4 @@
-import Asset
-import ComposableArchitecture
+import FeaturePrelude
 
 // MARK: - FungibleTokenList.Section.State
 public extension FungibleTokenList.Section {

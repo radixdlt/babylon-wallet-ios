@@ -1,5 +1,4 @@
-import Asset
-import Foundation
+import FeaturePrelude
 
 // MARK: - FungibleTokenList.Row.Action
 public extension FungibleTokenList.Row {

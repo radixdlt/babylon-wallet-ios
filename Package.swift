@@ -20,9 +20,7 @@ package.addModules([
 		dependencies: [
 			"AccountListFeature",
 			"AccountPreferencesFeature",
-			"Asset",
 			"AssetsViewFeature",
-			"DesignSystem",
 			"PasteboardClient",
 			"EngineToolkit",
 			"Profile",
@@ -35,7 +33,6 @@ package.addModules([
 		name: "AccountListFeature",
 		dependencies: [
 			"AccountPortfolio",
-			"Asset",
 			"FungibleTokenListFeature",
 			"PasteboardClient",
 			"ProfileClient",
@@ -88,7 +85,6 @@ package.addModules([
 	.feature(
 		name: "AssetsViewFeature",
 		dependencies: [
-			"Asset",
 			"FungibleTokenListFeature",
 			"NonFungibleTokenListFeature",
 		],
@@ -116,22 +112,17 @@ package.addModules([
 	.feature(
 		name: "FungibleTokenDetailsFeature",
 		dependencies: [
-			"DesignSystem",
 			"PasteboardClient",
-			"SharedModels",
 		],
 		tests: .no
 	),
 	.feature(
 		name: "FungibleTokenListFeature",
 		dependencies: [
-			"Asset",
 			"FungibleTokenDetailsFeature",
 		],
 		tests: .yes(
 			dependencies: [
-				"Asset",
-				"DesignSystem",
 				"Profile",
 				"TestUtils",
 			]
@@ -183,7 +174,6 @@ package.addModules([
 		],
 		tests: .yes(
 			dependencies: [
-				"Asset",
 				"FungibleTokenListFeature",
 				"NonFungibleTokenListFeature",
 				"TestUtils",
@@ -262,10 +252,8 @@ package.addModules([
 	.feature(
 		name: "NonFungibleTokenListFeature",
 		dependencies: [
-			"Asset",
 			"EngineToolkit",
 			"PasteboardClient",
-			"SharedModels",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -274,7 +262,6 @@ package.addModules([
 	.feature(
 		name: "OnboardingFeature",
 		dependencies: [
-			"DesignSystem",
 			"CreateAccountFeature",
 			"ImportProfileFeature",
 		],
@@ -336,7 +323,6 @@ package.addModules([
 		name: "AccountPortfolio",
 		dependencies: [
 			"AppSettings",
-			"Asset",
 			"EngineToolkit",
 			"GatewayAPI",
 			"Profile",
@@ -402,12 +388,9 @@ package.addModules([
 				// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 				.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6")
 			},
-			"Asset",
 			"Cryptography",
-			"EngineToolkit",
 			"EngineToolkitClient",
 			"JSON",
-			"Profile", // address
 			"ProfileClient",
 		],
 		exclude: [

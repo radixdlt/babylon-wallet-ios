@@ -1,4 +1,4 @@
-import DesignSystem
+import FeaturePrelude
 import TestUtils
 
 final class AddressViewStateTests: TestCase {

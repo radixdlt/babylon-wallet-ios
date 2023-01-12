@@ -1,6 +1,4 @@
-import ComposableArchitecture
-import DesignSystem
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - AccountDetails.Transfer.View
 public extension AccountDetails.Transfer {
