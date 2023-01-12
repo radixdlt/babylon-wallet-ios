@@ -1,24 +1,10 @@
-import ClientPrelude
+import Dependencies
 import TestingPrelude
 
 // MARK: - PasteboardClientTests
 final class PasteboardClientTests: TestCase {
-	func testTrivial() {
-		XCTAssert(true)
+	func testCopyStringSetsStringToPasteboard() {
+		DependencyValues.live.pasteboardClient.copyString("test")
+		XCTAssertEqual(DependencyValues.live.pasteboardClient.getString(), "test")
 	}
-
-	/*
-	 private var sut: PasteboardClient!
-
-	 override func setUp() {
-	 	super.setUp()
-	 	sut = PasteboardClient.live()
-	 }
-
-	 func testCopyStringSetsStringToPasteboard() {
-	 	let aString = "test"
-	 	sut.copyString(aString)
-	 	XCTAssertEqual(sut.getString(), aString)
-	 }
-	 */
 }
