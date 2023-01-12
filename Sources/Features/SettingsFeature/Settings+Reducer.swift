@@ -5,8 +5,8 @@ import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
 import ProfileClient
 
-// MARK: - Settings
-public struct Settings: Sendable, ReducerProtocol {
+// MARK: - AppSettings
+public struct AppSettings: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
@@ -15,7 +15,7 @@ public struct Settings: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension Settings {
+public extension AppSettings {
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
 			.ifLet(\.manageP2PClients, action: /Action.child .. Action.ChildAction.manageP2PClients) {
@@ -104,7 +104,7 @@ public extension Settings {
 }
 
 // MARK: Private
-private extension Settings {
+private extension AppSettings {
 	func loadP2PClients() -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.system(.loadP2PClientsResult(
