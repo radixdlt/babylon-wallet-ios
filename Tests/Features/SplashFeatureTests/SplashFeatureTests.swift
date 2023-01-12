@@ -81,17 +81,16 @@ final class SplashFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Splash.State(),
 			reducer: Splash()
-		)
-
-		store.dependencies.localAuthenticationClient = LocalAuthenticationClient {
-			authBiometricsConfig
+		) {
+			$0.localAuthenticationClient = LocalAuthenticationClient {
+				authBiometricsConfig
+			}
+			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.profileLoader = ProfileLoader(loadProfile: {
+				result
+			})
+			$0.platformEnvironmentClient.isSimulator = { false }
 		}
-
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-
-		store.dependencies.profileLoader = ProfileLoader(loadProfile: {
-			result
-		})
 
 		// when
 		await store.send(.internal(.view(.viewAppeared)))
