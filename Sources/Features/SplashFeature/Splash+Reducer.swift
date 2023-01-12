@@ -7,7 +7,6 @@ public struct Splash: Sendable, ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
-	@Dependency(\.platformEnvironmentClient) var platformEnvironmentClient
 	@Dependency(\.profileLoader) var profileLoader
 	@Dependency(\.openURL) var openURL
 
@@ -46,12 +45,7 @@ public struct Splash: Sendable, ReducerProtocol {
 
 		case let .internal(.system(.loadProfileResult(result))):
 			state.profileResult = result
-
-			if platformEnvironmentClient.isSimulator() {
-				return delay().concatenate(with: notifyDelegate(profileResult: state.profileResult))
-			} else {
-				return delay().concatenate(with: verifyBiometrics())
-			}
+			return delay().concatenate(with: verifyBiometrics())
 
 		case .delegate:
 			return .none

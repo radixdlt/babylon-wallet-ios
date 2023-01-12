@@ -48,7 +48,6 @@ final class AppFeatureTests: TestCase {
 				XCTAssertEqual(injected, existingProfile)
 				expectation.fulfill()
 			}
-			$0.platformEnvironmentClient.isSimulator = { false }
 		}
 
 		// WHEN: existing profile is loaded
@@ -82,7 +81,6 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.platformEnvironmentClient.isSimulator = { false }
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -113,7 +111,6 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.platformEnvironmentClient.isSimulator = { false }
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -173,7 +170,6 @@ final class AppFeatureTests: TestCase {
 			$0.keychainClient.removeDataForKey = { key in
 				XCTAssertEqual(key, "profileSnapshotKeychainKey")
 			}
-			$0.platformEnvironmentClient.isSimulator = { false }
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -221,7 +217,6 @@ final class AppFeatureTests: TestCase {
 			$0.keychainClient.removeDataForKey = { key in
 				XCTAssertEqual(key, "profileSnapshotKeychainKey")
 			}
-			$0.platformEnvironmentClient.isSimulator = { false }
 		}
 
 		let viewTask = await store.send(.view(.task))
