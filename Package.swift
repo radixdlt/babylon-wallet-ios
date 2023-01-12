@@ -47,8 +47,6 @@ package.addModules([
 	.feature(
 		name: "AccountPreferencesFeature",
 		dependencies: [
-			"Common",
-			"DesignSystem",
 			"ErrorQueue",
 			"FaucetClient",
 		],
@@ -58,10 +56,7 @@ package.addModules([
 	),
 	.feature(
 		name: "AggregatedValueFeature",
-		dependencies: [
-			"Common",
-			"DesignSystem",
-		],
+		dependencies: [],
 		tests: .yes(
 			dependencies: ["TestUtils"]
 		)
@@ -94,7 +89,6 @@ package.addModules([
 		name: "AssetsViewFeature",
 		dependencies: [
 			"Asset",
-			"Common",
 			"FungibleTokenListFeature",
 			"NonFungibleTokenListFeature",
 		],
@@ -105,9 +99,7 @@ package.addModules([
 	.feature(
 		name: "CreateAccountFeature",
 		dependencies: [
-			"Common",
 			"Cryptography",
-			"DesignSystem",
 			"EngineToolkit",
 			"ErrorQueue",
 			"GatewayAPI",
@@ -134,8 +126,6 @@ package.addModules([
 		name: "FungibleTokenListFeature",
 		dependencies: [
 			"Asset",
-			"Common",
-			"DesignSystem",
 			"FungibleTokenDetailsFeature",
 		],
 		tests: .yes(
@@ -150,9 +140,7 @@ package.addModules([
 	.feature(
 		name: "GrantDappWalletAccessFeature",
 		dependencies: [
-			"Common",
 			"CreateAccountFeature",
-			"DesignSystem",
 			"ErrorQueue",
 			"ProfileClient",
 			"SharedModels",
@@ -186,7 +174,6 @@ package.addModules([
 			"AccountPreferencesFeature",
 			"AppSettings",
 			"P2PConnectivityClient",
-			"Common",
 			"CreateAccountFeature",
 			"EngineToolkit",
 			"GrantDappWalletAccessFeature",
@@ -207,8 +194,6 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Cryptography",
-			"Common",
-			"DesignSystem",
 			"ErrorQueue",
 			"FileClient",
 			"JSON",
@@ -236,8 +221,6 @@ package.addModules([
 	.feature(
 		name: "ManageP2PClientsFeature",
 		dependencies: [
-			"Common",
-			"DesignSystem",
 			"ErrorQueue",
 			"NewConnectionFeature",
 			"P2PConnectivityClient",
@@ -251,10 +234,8 @@ package.addModules([
 	.feature(
 		name: "ManageGatewayAPIEndpointsFeature",
 		dependencies: [
-			"Common",
 			"CreateAccountFeature",
 			"ErrorQueue",
-			"DesignSystem",
 			"GatewayAPI",
 			"ProfileClient",
 			"UserDefaultsClient",
@@ -270,8 +251,6 @@ package.addModules([
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
-			"Common",
-			"DesignSystem",
 			"ErrorQueue",
 			"P2PConnectivityClient",
 			"SharedModels",
@@ -284,8 +263,6 @@ package.addModules([
 		name: "NonFungibleTokenListFeature",
 		dependencies: [
 			"Asset",
-			"Common",
-			"DesignSystem",
 			"EngineToolkit",
 			"PasteboardClient",
 			"SharedModels",
@@ -311,7 +288,6 @@ package.addModules([
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
-			"Common",
 			"ErrorQueue",
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
@@ -327,8 +303,6 @@ package.addModules([
 	.feature(
 		name: "SplashFeature",
 		dependencies: [
-			"Common",
-			"DesignSystem",
 			"ErrorQueue",
 			"LocalAuthenticationClient",
 			"PlatformEnvironmentClient",
@@ -342,8 +316,6 @@ package.addModules([
 	.feature(
 		name: "TransactionSigningFeature",
 		dependencies: [
-			"Common",
-			"DesignSystem",
 			"EngineToolkitClient",
 			"ErrorQueue",
 			"GatewayAPI",
@@ -365,7 +337,6 @@ package.addModules([
 		dependencies: [
 			"AppSettings",
 			"Asset",
-			"Common",
 			"EngineToolkit",
 			"GatewayAPI",
 			"Profile",
@@ -379,7 +350,6 @@ package.addModules([
 	.client(
 		name: "AppSettings",
 		dependencies: [
-			"Common",
 			"JSON",
 			"UserDefaultsClient",
 		],
@@ -395,7 +365,6 @@ package.addModules([
 	.client(
 		name: "EngineToolkitClient",
 		dependencies: [
-			"Common",
 			"Cryptography",
 			"EngineToolkit",
 			"Profile", // AccountAddress
@@ -412,7 +381,6 @@ package.addModules([
 	.client(
 		name: "FaucetClient",
 		dependencies: [
-			"Common",
 			"EngineToolkit",
 			"EngineToolkitClient",
 			"GatewayAPI",
@@ -434,7 +402,6 @@ package.addModules([
 				.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6")
 			},
 			"Asset",
-			"Common",
 			"Cryptography",
 			"EngineToolkit",
 			"EngineToolkitClient",
@@ -464,7 +431,6 @@ package.addModules([
 	.client(
 		name: "P2PConnectivityClient",
 		dependencies: [
-			"Common",
 			"EngineToolkit", // Model: SignTX contains Manifest
 			"JSON",
 			"Profile", // Account
@@ -506,7 +472,6 @@ package.addModules([
 	.client(
 		name: "ProfileLoader",
 		dependencies: [
-			"Common",
 			"JSON",
 			"Profile",
 		],
@@ -537,23 +502,22 @@ package.addModules([
 
 package.addModules([
 	.core(
-		name: "Asset", // put in SharedModels?
+		name: "FeaturePrelude",
 		dependencies: [
-			"Common",
-			"EngineToolkitClient", // I know, this is very wrong. Apologies. Let's revisit our dependency levels post betanet.
-			"Profile", // Address
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
+				.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1")
+			},
+			"DesignSystem",
+			"Resources",
+			"SharedModels",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .no
 	),
 	.core(
-		name: "Common",
+		name: "Asset", // put in SharedModels
 		dependencies: [
-			"DesignSystem",
-			"EngineToolkit",
+			"EngineToolkitClient", // I know, this is very wrong. Apologies. Let's revisit our dependency levels post betanet.
 			"Profile", // Address
-			"Resources",
 		],
 		tests: .yes(
 			dependencies: ["TestUtils"]
@@ -563,10 +527,9 @@ package.addModules([
 		name: "SharedModels",
 		dependencies: [
 			"Asset",
-			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make "EngineToolkit", etc. vend their own Model packages.
 			"EngineToolkit", // FIXME: In `EngineToolkit` split out Models package
 			"Profile", // FIXME: In `Profile` split out Models package
-			"P2PConnection",
+			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
 			"P2PModels",
 		],
 		tests: .yes(
@@ -608,9 +571,7 @@ package.addModules([
 	),
 	.core(
 		name: "TestUtils",
-		dependencies: [
-			"Common",
-		],
+		dependencies: [],
 		tests: .no
 	),
 ])
@@ -789,12 +750,7 @@ extension Package {
 				name: name,
 				category: "Features",
 				remoteDependencies: remoteDependencies,
-				dependencies: dependencies + [
-					.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-						.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1")
-					},
-					"DesignSystem",
-				],
+				dependencies: dependencies + ["FeaturePrelude"],
 				exclude: exclude,
 				resources: resources,
 				plugins: plugins,

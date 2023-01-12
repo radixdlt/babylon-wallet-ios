@@ -1,4 +1,4 @@
-import Common
+import Prelude
 import TestUtils
 
 final class HexStringToDataTests: TestCase {
