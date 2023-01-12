@@ -321,6 +321,18 @@ public enum L10n {
     public static let incompatibleProfileVersionAlertMessage = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertMessage", fallback: "For this Preview wallet version, you must delete your wallet data to continue.")
     /// Wallet Data is Incompatible
     public static let incompatibleProfileVersionAlertTitle = L10n.tr("Localizable", "splash.incompatibleProfileVersionAlertTitle", fallback: "Wallet Data is Incompatible")
+    public enum Alert {
+      public enum BiometricsCheckFailed {
+        /// Cancel
+        public static let cancelButtonTitle = L10n.tr("Localizable", "splash.alert.biometricsCheckFailed.cancelButtonTitle", fallback: "Cancel")
+        /// Biometrics are not set up. Please update settings.
+        public static let message = L10n.tr("Localizable", "splash.alert.biometricsCheckFailed.message", fallback: "Biometrics are not set up. Please update settings.")
+        /// Settings
+        public static let settingsButtonTitle = L10n.tr("Localizable", "splash.alert.biometricsCheckFailed.settingsButtonTitle", fallback: "Settings")
+        /// Warning
+        public static let title = L10n.tr("Localizable", "splash.alert.biometricsCheckFailed.title", fallback: "Warning")
+      }
+    }
   }
   public enum TransactionSigning {
     /// Authenticate to sign transaction with this phone.

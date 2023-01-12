@@ -5,14 +5,14 @@ import ProfileLoader
 public extension Splash {
 	// MARK: State
 	struct State: Equatable {
-		public var alert: AlertState<Action.ViewAction>?
+		public var biometricsCheckFailedAlert: AlertState<Action.ViewAction.BiometricsCheckFailedAlertAction>?
 		public var profileResult: ProfileLoader.ProfileResult?
 
 		public init(
-			alert: AlertState<Action.ViewAction>? = nil,
+			biometricsCheckFailedAlert: AlertState<Action.ViewAction.BiometricsCheckFailedAlertAction>? = nil,
 			profileResult: ProfileLoader.ProfileResult? = nil
 		) {
-			self.alert = alert
+			self.biometricsCheckFailedAlert = biometricsCheckFailedAlert
 			self.profileResult = profileResult
 		}
 	}

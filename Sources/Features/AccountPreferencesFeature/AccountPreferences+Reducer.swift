@@ -35,6 +35,7 @@ public struct AccountPreferences: Sendable, ReducerProtocol {
 					await send(.delegate(.refreshAccount(address)))
 				} catch {
 					guard !Task.isCancelled else { return }
+					await send(.internal(.system(.hideLoader)))
 					errorQueue.schedule(error)
 				}
 			}
@@ -51,6 +52,10 @@ public struct AccountPreferences: Sendable, ReducerProtocol {
 
 		case .internal(.system(.refreshAccountCompleted)):
 			state.faucetButtonState = .disabled
+			return .none
+
+		case .internal(.system(.hideLoader)):
+			state.faucetButtonState = .enabled
 			return .none
 		}
 	}
