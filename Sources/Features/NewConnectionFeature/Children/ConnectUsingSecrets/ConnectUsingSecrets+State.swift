@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 import Foundation
 import P2PConnection
 

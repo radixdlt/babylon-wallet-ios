@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 @testable import FungibleTokenListFeature
 import TestUtils
 

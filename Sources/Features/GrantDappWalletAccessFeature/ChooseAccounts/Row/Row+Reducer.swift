@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 
 // MARK: - ChooseAccounts.Row
 /// Namespace for Row

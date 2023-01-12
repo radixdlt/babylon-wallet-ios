@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 import Foundation
 
 public struct CreateAccountCoordinator: Sendable, ReducerProtocol {

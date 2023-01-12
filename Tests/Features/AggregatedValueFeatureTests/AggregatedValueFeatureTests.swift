@@ -1,5 +1,5 @@
 @testable import AggregatedValueFeature
-import ComposableArchitecture
+import FeaturePrelude
 import TestUtils
 
 final class AggregatedValueFeatureTests: TestCase {

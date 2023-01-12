@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 
 public struct NonFungibleTokenList: Sendable, ReducerProtocol {
 	public init() {}

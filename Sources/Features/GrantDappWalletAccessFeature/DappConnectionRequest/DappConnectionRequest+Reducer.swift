@@ -1,5 +1,5 @@
-import ComposableArchitecture
 import ErrorQueue
+import FeaturePrelude
 import ProfileClient
 
 // MARK: - DappConnectionRequest

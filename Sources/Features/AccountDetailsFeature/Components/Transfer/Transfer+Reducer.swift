@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 
 // MARK: - AccountDetails.Transfer
 public extension AccountDetails {

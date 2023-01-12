@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 
 public extension FungibleTokenList {
 	struct Row: Sendable, ReducerProtocol {

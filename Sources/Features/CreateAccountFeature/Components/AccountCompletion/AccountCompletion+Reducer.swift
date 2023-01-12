@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 
 // MARK: - AccountCompletion
 public struct AccountCompletion: Sendable, ReducerProtocol {

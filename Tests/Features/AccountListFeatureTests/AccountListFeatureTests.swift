@@ -1,5 +1,5 @@
 @testable import AccountListFeature
-import ComposableArchitecture
+import FeaturePrelude
 import Profile
 import TestUtils
 

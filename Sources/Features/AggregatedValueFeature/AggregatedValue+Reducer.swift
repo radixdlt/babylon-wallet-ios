@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 
 public struct AggregatedValue: Sendable, ReducerProtocol {
 	public init() {}

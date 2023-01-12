@@ -1,5 +1,5 @@
 @testable import AppFeature
-import ComposableArchitecture
+import FeaturePrelude
 import OnboardingFeature
 import Prelude
 import Profile

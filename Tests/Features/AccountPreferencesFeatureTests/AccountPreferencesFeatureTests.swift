@@ -1,5 +1,5 @@
 @testable import AccountPreferencesFeature
-import ComposableArchitecture
+import FeaturePrelude
 import TestUtils
 
 final class AccountPreferencesFeatureTests: TestCase {

@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 
 // MARK: - Home.VisitHub
 public extension Home {
