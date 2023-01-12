@@ -1,7 +1,7 @@
 import FeaturePrelude
 import FungibleTokenListFeature
 import Profile
-import TestUtils
+import TestingPrelude
 
 final class FungibleTokenListSortingTests: TestCase {
 	let account = try! OnNetwork.Account(

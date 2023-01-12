@@ -1,6 +1,6 @@
 @testable import Cryptography
 import Prelude
-import XCTest
+import TestingPrelude
 
 // MARK: - BIP39Vector
 struct BIP39Vector: Equatable {
@@ -115,7 +115,7 @@ final class BIP39TestVectors: XCTestCase {
 	func testEnglishVectors() throws {
 		try orFail {
 			try testFixture(
-				bundleType: self,
+				bundle: .module,
 				jsonName: "bip39_english_test_vectors"
 			) { (vectors: EnglishVectors) in
 				try orFail {
@@ -131,7 +131,7 @@ final class BIP39TestVectors: XCTestCase {
 	func testJapanseVectors() throws {
 		try orFail {
 			try testFixture(
-				bundleType: self,
+				bundle: .module,
 				jsonName: "bip39_japanese_test_vectors"
 			) { (vectors: JapaneseVectors) in
 				try orFail {

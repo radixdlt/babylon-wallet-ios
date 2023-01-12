@@ -13,15 +13,15 @@
 //===----------------------------------------------------------------------===//
 import XCTest
 
-extension XCTestCase {
+public extension XCTestCase {
 	func testFixture<T: Decodable>(
-		bundleType: AnyObject,
+		bundle: Bundle,
 		jsonName: String,
 		file: StaticString = #file,
 		line: UInt = #line,
 		testFunction: (T) throws -> Void
 	) throws {
-		let fileURL = Bundle.module.url(forResource: jsonName, withExtension: ".json")
+		let fileURL = bundle.url(forResource: jsonName, withExtension: ".json")
 
 		let data = try orFail(file: file, line: line) { try Data(contentsOf: unwrap(fileURL, file: file, line: line)) }
 

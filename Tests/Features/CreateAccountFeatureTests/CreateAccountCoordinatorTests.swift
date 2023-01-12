@@ -1,7 +1,8 @@
 @testable import CreateAccountFeature
 import FeaturePrelude
 import Profile
-import TestUtils
+import SharedTestingModels
+import TestingPrelude
 
 @MainActor
 final class CreateAccountCoordainatorTests: TestCase {

@@ -26,7 +26,9 @@ package.addModules([
 			"Profile",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: [
+				"SharedTestingModels",
+			]
 		)
 	),
 	.feature(
@@ -38,7 +40,9 @@ package.addModules([
 			"ProfileClient",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: [
+				"SharedTestingModels",
+			]
 		)
 	),
 	.feature(
@@ -47,16 +51,12 @@ package.addModules([
 			"ErrorQueue",
 			"FaucetClient",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AggregatedValueFeature",
 		dependencies: [],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AppFeature",
@@ -77,7 +77,6 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"SplashFeature",
-				"TestUtils",
 				"ProfileClient",
 			]
 		)
@@ -88,9 +87,7 @@ package.addModules([
 			"FungibleTokenListFeature",
 			"NonFungibleTokenListFeature",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "CreateAccountFeature",
@@ -104,8 +101,8 @@ package.addModules([
 		],
 		tests: .yes(
 			dependencies: [
-				"TestUtils",
 				"UserDefaultsClient",
+				"SharedTestingModels",
 			]
 		)
 	),
@@ -124,7 +121,6 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"Profile",
-				"TestUtils",
 			]
 		)
 	),
@@ -139,7 +135,6 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"ProfileClient",
-				"TestUtils",
 			]
 		)
 	),
@@ -152,9 +147,7 @@ package.addModules([
 			"SharedModels",
 			"TransactionSigningFeature",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "HomeFeature",
@@ -176,7 +169,6 @@ package.addModules([
 			dependencies: [
 				"FungibleTokenListFeature",
 				"NonFungibleTokenListFeature",
-				"TestUtils",
 			]
 		)
 	),
@@ -190,7 +182,7 @@ package.addModules([
 			"ProfileClient",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"],
+			dependencies: [],
 			resources: [.process("profile_snapshot.json")]
 		)
 	),
@@ -204,9 +196,7 @@ package.addModules([
 			"PasteboardClient",
 			"SettingsFeature",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "ManageP2PClientsFeature",
@@ -217,9 +207,7 @@ package.addModules([
 			"ProfileClient",
 			"SharedModels",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "ManageGatewayAPIEndpointsFeature",
@@ -230,9 +218,7 @@ package.addModules([
 			"ProfileClient",
 			"UserDefaultsClient",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "NewConnectionFeature",
@@ -245,9 +231,7 @@ package.addModules([
 			"P2PConnectivityClient",
 			"SharedModels",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "NonFungibleTokenListFeature",
@@ -255,9 +239,7 @@ package.addModules([
 			"EngineToolkit",
 			"PasteboardClient",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "OnboardingFeature",
@@ -268,7 +250,6 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"UserDefaultsClient",
-				"TestUtils",
 			]
 		)
 	),
@@ -283,9 +264,7 @@ package.addModules([
 			"ProfileClient",
 			"ProfileView",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "SplashFeature",
@@ -296,9 +275,7 @@ package.addModules([
 			"ProfileClient",
 			"ProfileLoader",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "TransactionSigningFeature",
@@ -310,9 +287,7 @@ package.addModules([
 			"SharedModels",
 			"TransactionClient",
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
+		tests: .yes()
 	),
 ])
 
@@ -327,11 +302,7 @@ package.addModules([
 			"GatewayAPI",
 			"Profile",
 		],
-		tests: .yes(
-			dependencies: [
-				"TestUtils",
-			]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "AppSettings",
@@ -340,9 +311,7 @@ package.addModules([
 			"Profile",
 			"UserDefaultsClient",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "CameraPermissionClient",
@@ -356,9 +325,7 @@ package.addModules([
 			"EngineToolkit",
 			"Profile", // AccountAddress
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "ErrorQueue",
@@ -396,9 +363,7 @@ package.addModules([
 		exclude: [
 			"CodeGen/Input/",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "JSON", // TODO: extract into Prelude package
@@ -408,9 +373,7 @@ package.addModules([
 	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "P2PConnectivityClient",
@@ -423,16 +386,12 @@ package.addModules([
 			"Resources",
 			"SharedModels",
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
+		tests: .yes()
 	),
 	.client(
 		name: "PasteboardClient",
 		dependencies: [],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "PlatformEnvironmentClient",
@@ -449,9 +408,7 @@ package.addModules([
 			"SharedModels",
 			"UserDefaultsClient",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "ProfileLoader",
@@ -459,9 +416,7 @@ package.addModules([
 			"JSON",
 			"Profile",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "TransactionClient",
@@ -469,16 +424,12 @@ package.addModules([
 			"GatewayAPI",
 			"ProfileClient",
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
+		tests: .yes()
 	),
 	.client(
 		name: "UserDefaultsClient",
 		dependencies: [],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 ])
 
@@ -511,22 +462,7 @@ package.addModules([
 			"EngineToolkit",
 			"Profile", // Address
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
-	),
-	.core(
-		name: "SharedModels",
-		dependencies: [
-			"Asset",
-			"EngineToolkit", // FIXME: In `EngineToolkit` split out Models package
-			"Profile", // FIXME: In `Profile` split out Models package
-			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
-			"P2PModels",
-		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.core(
 		name: "DesignSystem",
@@ -542,11 +478,7 @@ package.addModules([
 				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3")
 			},
 		],
-		tests: .yes(
-			dependencies: [
-				"TestUtils",
-			]
-		)
+		tests: .yes()
 	),
 	.core(
 		name: "Resources",
@@ -562,11 +494,22 @@ package.addModules([
 		tests: .no
 	),
 	.core(
-		name: "TestUtils", // TODO: split out into `Core/TestingModels` and `TestingPrelude`
+		name: "SharedTestingModels",
 		dependencies: [
-			"Profile",
+			"SharedModels",
 		],
 		tests: .no
+	),
+	.core(
+		name: "SharedModels",
+		dependencies: [
+			"Asset",
+			"EngineToolkit", // FIXME: In `EngineToolkit` split out Models package
+			"Profile", // FIXME: In `Profile` split out Models package
+			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
+			"P2PModels",
+		],
+		tests: .yes()
 	),
 ])
 
@@ -633,9 +576,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.module(
 		name: "Cryptography",
@@ -651,6 +592,11 @@ package.addModules([
 				.process("SLIP10Tests/TestVectors/"),
 			]
 		)
+	),
+	.module(
+		name: "TestingPrelude",
+		dependencies: [],
+		tests: .no
 	),
 	.module(
 		name: "Prelude",
@@ -715,7 +661,7 @@ extension Package {
 			case no
 			case yes(
 				nameSuffix: String = "Tests",
-				dependencies: [Target.Dependency],
+				dependencies: [Target.Dependency] = [],
 				resources: [Resource]? = nil
 			)
 		}
@@ -883,7 +829,7 @@ extension Package {
 			package.targets += [
 				.testTarget(
 					name: testTargetName,
-					dependencies: [.target(name: targetName)] + testDependencies,
+					dependencies: [.target(name: targetName)] + testDependencies + ["TestingPrelude"],
 					path: testTargetPath,
 					resources: resources,
 					swiftSettings: [

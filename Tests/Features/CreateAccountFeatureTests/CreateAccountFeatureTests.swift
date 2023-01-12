@@ -3,7 +3,7 @@ import Cryptography
 import FeaturePrelude
 import JSON
 import ProfileClient
-import TestUtils
+import TestingPrelude
 import UserDefaultsClient
 
 @MainActor

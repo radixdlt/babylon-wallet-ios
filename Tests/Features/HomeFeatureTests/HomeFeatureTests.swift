@@ -6,7 +6,7 @@ import FungibleTokenListFeature
 @testable import HomeFeature
 import NonFungibleTokenListFeature
 import Profile
-import TestUtils
+import TestingPrelude
 
 @MainActor
 final class HomeFeatureTests: TestCase {

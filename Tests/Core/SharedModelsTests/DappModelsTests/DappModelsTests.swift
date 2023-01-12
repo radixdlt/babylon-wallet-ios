@@ -1,7 +1,5 @@
-import Foundation
 @testable import SharedModels
-import TestUtils
-import XCTest
+import TestingPrelude
 
 final class ToDappResponseTests: TestCase {
 	func test_encode_response() throws {

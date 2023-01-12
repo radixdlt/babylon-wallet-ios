@@ -1,7 +1,6 @@
 @testable import Cryptography
 import CryptoKit
-import Foundation
-import XCTest
+import TestingPrelude
 
 final class EdgeCasesTests: XCTestCase {
 	/// This test was found by: https://github.com/radixdlt/GenerateSLIP10Vectors

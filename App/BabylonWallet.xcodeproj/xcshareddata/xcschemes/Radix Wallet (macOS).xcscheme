@@ -42,16 +42,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CommonTests"
-               BuildableName = "CommonTests"
-               BlueprintName = "CommonTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "HomeFeatureTests"
                BuildableName = "HomeFeatureTests"
                BlueprintName = "HomeFeatureTests"
@@ -385,6 +375,56 @@
                BlueprintIdentifier = "NewConnectionFeatureTests"
                BuildableName = "NewConnectionFeatureTests"
                BlueprintName = "NewConnectionFeatureTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "EngineToolkitTests"
+               BuildableName = "EngineToolkitTests"
+               BlueprintName = "EngineToolkitTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "P2PConnectionTests"
+               BuildableName = "P2PConnectionTests"
+               BlueprintName = "P2PConnectionTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "P2PModelsTests"
+               BuildableName = "P2PModelsTests"
+               BlueprintName = "P2PModelsTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "PreludeTests"
+               BuildableName = "PreludeTests"
+               BlueprintName = "PreludeTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ProfileTests"
+               BuildableName = "ProfileTests"
+               BlueprintName = "ProfileTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>

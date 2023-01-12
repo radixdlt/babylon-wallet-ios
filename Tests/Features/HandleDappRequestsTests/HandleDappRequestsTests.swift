@@ -2,7 +2,7 @@ import FeaturePrelude
 @testable import HandleDappRequests
 import P2PConnection
 import Profile
-import TestUtils
+import TestingPrelude
 
 @MainActor
 final class HandleDappRequestsTests: TestCase {

@@ -3,7 +3,7 @@ import LocalAuthenticationClient
 import Profile
 import ProfileLoader
 @testable import SplashFeature
-import TestUtils
+import TestingPrelude
 
 // MARK: - SplashFeatureTests
 @MainActor

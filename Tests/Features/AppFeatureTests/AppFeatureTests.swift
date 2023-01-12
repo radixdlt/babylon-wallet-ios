@@ -4,7 +4,7 @@ import OnboardingFeature
 import ProfileClient
 import ProfileLoader
 @testable import SplashFeature
-import TestUtils
+import TestingPrelude
 
 @MainActor
 final class AppFeatureTests: TestCase {

@@ -1,7 +1,7 @@
 import FeaturePrelude
 @testable import GrantDappWalletAccessFeature
 import Profile
-import TestUtils
+import TestingPrelude
 
 @MainActor
 final class ChooseAccountsTests: TestCase {

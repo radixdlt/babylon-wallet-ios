@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 
 private extension BIP39 {
 	static var cachedWordLists: [Language: WordList] = [:]

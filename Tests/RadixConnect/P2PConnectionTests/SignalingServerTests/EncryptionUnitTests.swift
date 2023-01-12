@@ -1,5 +1,5 @@
 @testable import P2PConnection
-import XCTest
+import TestingPrelude
 
 final class EncryptionUnitTests: XCTestCase {
 	func testRoundtrip() throws {

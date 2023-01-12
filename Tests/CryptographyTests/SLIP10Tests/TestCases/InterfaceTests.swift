@@ -1,7 +1,5 @@
 @testable import Cryptography
-import CryptoKit
-import Foundation
-import XCTest
+import TestingPrelude
 
 // MARK: - InterfaceTests
 final class InterfaceTests: XCTestCase {

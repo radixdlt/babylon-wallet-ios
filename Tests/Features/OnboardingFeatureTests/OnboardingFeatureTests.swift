@@ -1,7 +1,7 @@
 import FeaturePrelude
 @testable import OnboardingFeature
 import Profile
-import TestUtils
+import TestingPrelude
 import UserDefaultsClient
 
 @MainActor

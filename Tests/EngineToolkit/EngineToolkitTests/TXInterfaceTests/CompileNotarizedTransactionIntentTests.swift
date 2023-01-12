@@ -1,5 +1,6 @@
+import Cryptography
 @testable import EngineToolkit
-import K1
+import TestingPrelude
 
 final class CompileNotarizedTransactionIntentTests: TestCase {
 	override func setUp() {

@@ -1,6 +1,5 @@
 @testable import Cryptography
-import Foundation
-import XCTest
+import TestingPrelude
 
 // MARK: - TestVectorsTests
 final class TestVectorsTests: XCTestCase {
@@ -12,7 +11,7 @@ final class TestVectorsTests: XCTestCase {
 	func testVectors10() throws {
 		try orFail {
 			try testFixture(
-				bundleType: self,
+				bundle: .module,
 				jsonName: "slip10_tests_#10"
 			) { (testFile: TestFile) in
 				try orFail {
@@ -28,7 +27,7 @@ final class TestVectorsTests: XCTestCase {
 	func testVectors1K() throws {
 		try orFail {
 			try testFixture(
-				bundleType: self,
+				bundle: .module,
 				jsonName: "slip10_tests_#1000"
 			) { (testFile: TestFile) in
 				try orFail {

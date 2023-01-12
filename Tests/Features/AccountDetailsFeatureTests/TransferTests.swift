@@ -1,6 +1,6 @@
 @testable import AccountDetailsFeature
 import FeaturePrelude
-import TestUtils
+import TestingPrelude
 
 final class TransferTests: TestCase {
 	func testTrivial() {

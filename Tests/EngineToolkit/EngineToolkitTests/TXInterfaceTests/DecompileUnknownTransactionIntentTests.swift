@@ -1,4 +1,5 @@
 @testable import EngineToolkit
+import TestingPrelude
 
 final class DecompileUnknownTransactionIntentTests: TestCase {
 	func test__decompile_unknown_transaction_intent_does_not_throw_on_a_transaction_intent_ed25519() throws {

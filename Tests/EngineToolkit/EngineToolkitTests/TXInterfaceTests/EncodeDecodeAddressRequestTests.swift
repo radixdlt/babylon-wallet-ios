@@ -1,4 +1,5 @@
-import Prelude
+import EngineToolkit
+import TestingPrelude
 
 // MARK: - EncodeDecodeAddressRequestTests
 final class EncodeDecodeAddressRequestTests: TestCase {

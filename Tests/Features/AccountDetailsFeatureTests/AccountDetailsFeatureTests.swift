@@ -2,7 +2,8 @@
 import AccountListFeature
 import FeaturePrelude
 import Profile
-import TestUtils
+import SharedTestingModels
+import TestingPrelude
 
 @MainActor
 final class AccountDetailsFeatureTests: TestCase {

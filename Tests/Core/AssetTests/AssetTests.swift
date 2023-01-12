@@ -1,5 +1,5 @@
 @testable import Asset
-import TestUtils
+import TestingPrelude
 
 final class AssetTests: TestCase {
 	func testTrivial() {
