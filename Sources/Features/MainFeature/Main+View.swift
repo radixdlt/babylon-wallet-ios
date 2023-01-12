@@ -32,7 +32,7 @@ public extension Main.View {
 					state: \.settings,
 					action: { .child(.settings($0)) }
 				),
-				then: { Settings.View(store: $0) }
+				then: { AppSettings.View(store: $0) }
 			)
 			.zIndex(1)
 

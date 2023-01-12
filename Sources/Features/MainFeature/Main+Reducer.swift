@@ -21,7 +21,7 @@ public struct Main: Sendable, ReducerProtocol {
 
 		Reduce(self.core)
 			.ifLet(\.settings, action: /Action.child .. Action.ChildAction.settings) {
-				Settings()
+				AppSettings()
 			}
 	}
 

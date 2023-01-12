@@ -8,11 +8,11 @@ import ProfileClient
 import ProfileView
 #endif // DEBUG
 
-// MARK: - Settings.View
-public extension Settings {
+// MARK: - AppSettings.View
+public extension AppSettings {
 	@MainActor
 	struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.StoreOf<Settings>
+		public typealias Store = ComposableArchitecture.StoreOf<AppSettings>
 		private let store: Store
 
 		public init(
@@ -23,7 +23,7 @@ public extension Settings {
 	}
 }
 
-public extension Settings.View {
+public extension AppSettings.View {
 	var body: some View {
 		WithViewStore(
 			store,
@@ -58,8 +58,8 @@ public extension Settings.View {
 	}
 }
 
-private extension Settings.View {
-	func settingsView(viewStore: ViewStore<ViewState, Settings.Action.ViewAction>) -> some View {
+private extension AppSettings.View {
+	func settingsView(viewStore: ViewStore<ViewState, AppSettings.Action.ViewAction>) -> some View {
 		ForceFullScreen {
 			VStack {
 				NavigationBar(
@@ -154,15 +154,15 @@ private extension Settings.View {
 	}
 }
 
-// MARK: - Settings.View.ViewState
-public extension Settings.View {
+// MARK: - AppSettings.View.ViewState
+public extension AppSettings.View {
 	struct ViewState: Equatable {
 		#if DEBUG
 		public let isDebugProfileViewSheetPresented: Bool
 		public let profileToInspect: Profile?
 		#endif // DEBUG
 		public let canAddP2PClient: Bool
-		public init(state: Settings.State) {
+		public init(state: AppSettings.State) {
 			#if DEBUG
 			isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			profileToInspect = state.profileToInspect
@@ -175,10 +175,10 @@ public extension Settings.View {
 #if DEBUG
 struct SettingsView_Previews: PreviewProvider {
 	static var previews: some View {
-		Settings.View(
+		AppSettings.View(
 			store: .init(
 				initialState: .init(),
-				reducer: Settings()
+				reducer: AppSettings()
 			)
 		)
 	}

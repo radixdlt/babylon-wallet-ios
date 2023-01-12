@@ -4,8 +4,8 @@ import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
 import Profile
 
-// MARK: Settings.State
-public extension Settings {
+// MARK: AppSettings.State
+public extension AppSettings {
 	// MARK: State
 	struct State: Equatable {
 		public var manageP2PClients: ManageP2PClients.State?
