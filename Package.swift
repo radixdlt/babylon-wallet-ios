@@ -35,7 +35,11 @@ package.addModules([
 			"PasteboardClient",
 			"ProfileClient",
 		],
-		tests: .yes()
+		tests: .yes(
+			dependencies: [
+				"SharedTestingModels",
+			]
+		)
 	),
 	.feature(
 		name: "AccountPreferencesFeature",
