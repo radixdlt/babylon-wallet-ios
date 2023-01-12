@@ -26,7 +26,7 @@ package.addModules([
 			"Profile",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -38,7 +38,7 @@ package.addModules([
 			"ProfileClient",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -48,14 +48,14 @@ package.addModules([
 			"FaucetClient",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
 		name: "AggregatedValueFeature",
 		dependencies: [],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -77,7 +77,6 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"SplashFeature",
-				"TestUtils",
 				"ProfileClient",
 			]
 		)
@@ -89,7 +88,7 @@ package.addModules([
 			"NonFungibleTokenListFeature",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -104,7 +103,6 @@ package.addModules([
 		],
 		tests: .yes(
 			dependencies: [
-				"TestUtils",
 				"UserDefaultsClient",
 			]
 		)
@@ -124,7 +122,6 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"Profile",
-				"TestUtils",
 			]
 		)
 	),
@@ -139,7 +136,6 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"ProfileClient",
-				"TestUtils",
 			]
 		)
 	),
@@ -153,7 +149,7 @@ package.addModules([
 			"TransactionSigningFeature",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -176,7 +172,6 @@ package.addModules([
 			dependencies: [
 				"FungibleTokenListFeature",
 				"NonFungibleTokenListFeature",
-				"TestUtils",
 			]
 		)
 	),
@@ -190,7 +185,7 @@ package.addModules([
 			"ProfileClient",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"],
+			dependencies: [],
 			resources: [.process("profile_snapshot.json")]
 		)
 	),
@@ -205,7 +200,7 @@ package.addModules([
 			"SettingsFeature",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -218,7 +213,7 @@ package.addModules([
 			"SharedModels",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -231,7 +226,7 @@ package.addModules([
 			"UserDefaultsClient",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -246,7 +241,7 @@ package.addModules([
 			"SharedModels",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -256,7 +251,7 @@ package.addModules([
 			"PasteboardClient",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -268,7 +263,6 @@ package.addModules([
 		tests: .yes(
 			dependencies: [
 				"UserDefaultsClient",
-				"TestUtils",
 			]
 		)
 	),
@@ -284,7 +278,7 @@ package.addModules([
 			"ProfileView",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -297,7 +291,7 @@ package.addModules([
 			"ProfileLoader",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.feature(
@@ -310,9 +304,9 @@ package.addModules([
 			"SharedModels",
 			"TransactionClient",
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
+		tests: .yes(
+			dependencies: []
+		)
 	),
 ])
 
@@ -328,9 +322,7 @@ package.addModules([
 			"Profile",
 		],
 		tests: .yes(
-			dependencies: [
-				"TestUtils",
-			]
+			dependencies: []
 		)
 	),
 	.client(
@@ -341,7 +333,7 @@ package.addModules([
 			"UserDefaultsClient",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.client(
@@ -357,7 +349,7 @@ package.addModules([
 			"Profile", // AccountAddress
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.client(
@@ -397,7 +389,7 @@ package.addModules([
 			"CodeGen/Input/",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.client(
@@ -409,7 +401,7 @@ package.addModules([
 		name: "LocalAuthenticationClient",
 		dependencies: [],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.client(
@@ -423,15 +415,15 @@ package.addModules([
 			"Resources",
 			"SharedModels",
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
+		tests: .yes(
+			dependencies: []
+		)
 	),
 	.client(
 		name: "PasteboardClient",
 		dependencies: [],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.client(
@@ -450,7 +442,7 @@ package.addModules([
 			"UserDefaultsClient",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.client(
@@ -460,7 +452,7 @@ package.addModules([
 			"Profile",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.client(
@@ -469,15 +461,15 @@ package.addModules([
 			"GatewayAPI",
 			"ProfileClient",
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
+		tests: .yes(
+			dependencies: []
+		)
 	),
 	.client(
 		name: "UserDefaultsClient",
 		dependencies: [],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 ])
@@ -512,20 +504,7 @@ package.addModules([
 			"Profile", // Address
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
-	),
-	.core(
-		name: "SharedModels",
-		dependencies: [
-			"Asset",
-			"EngineToolkit", // FIXME: In `EngineToolkit` split out Models package
-			"Profile", // FIXME: In `Profile` split out Models package
-			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
-			"P2PModels",
-		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: []
 		)
 	),
 	.core(
@@ -543,9 +522,7 @@ package.addModules([
 			},
 		],
 		tests: .yes(
-			dependencies: [
-				"TestUtils",
-			]
+			dependencies: []
 		)
 	),
 	.core(
@@ -562,11 +539,24 @@ package.addModules([
 		tests: .no
 	),
 	.core(
-		name: "TestUtils", // TODO: split out into `Core/TestingModels` and `TestingPrelude`
+		name: "SharedTestingModels",
 		dependencies: [
-			"Profile",
+			"SharedModels",
 		],
 		tests: .no
+	),
+	.core(
+		name: "SharedModels",
+		dependencies: [
+			"Asset",
+			"EngineToolkit", // FIXME: In `EngineToolkit` split out Models package
+			"Profile", // FIXME: In `Profile` split out Models package
+			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
+			"P2PModels",
+		],
+		tests: .yes(
+			dependencies: []
+		)
 	),
 ])
 
@@ -651,6 +641,11 @@ package.addModules([
 				.process("SLIP10Tests/TestVectors/"),
 			]
 		)
+	),
+	.module(
+		name: "TestingPrelude",
+		dependencies: [],
+		tests: .no
 	),
 	.module(
 		name: "Prelude",
@@ -883,7 +878,7 @@ extension Package {
 			package.targets += [
 				.testTarget(
 					name: testTargetName,
-					dependencies: [.target(name: targetName)] + testDependencies,
+					dependencies: [.target(name: targetName)] + testDependencies + ["TestingPrelude"],
 					path: testTargetPath,
 					resources: resources,
 					swiftSettings: [
