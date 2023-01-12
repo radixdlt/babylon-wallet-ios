@@ -1,5 +1,4 @@
 import FeaturePrelude
-import SwiftUI
 
 // MARK: - AccountList.View
 public extension AccountList {

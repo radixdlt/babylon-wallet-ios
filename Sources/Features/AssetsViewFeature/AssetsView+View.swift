@@ -1,7 +1,6 @@
 import FeaturePrelude
 import FungibleTokenListFeature
 import NonFungibleTokenListFeature
-import SwiftUI
 
 // MARK: - AssetsView.View
 public extension AssetsView {

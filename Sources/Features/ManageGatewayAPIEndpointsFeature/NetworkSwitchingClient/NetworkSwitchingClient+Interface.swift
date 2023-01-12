@@ -1,5 +1,4 @@
-import Foundation
-import Prelude
+import FeaturePrelude
 import ProfileClient
 
 // MARK: - NetworkSwitchingClient

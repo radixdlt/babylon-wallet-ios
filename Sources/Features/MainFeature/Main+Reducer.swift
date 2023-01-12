@@ -1,7 +1,6 @@
 import FeaturePrelude
 import HandleDappRequests
 import HomeFeature
-import Prelude
 import ProfileClient
 import SettingsFeature
 

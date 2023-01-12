@@ -4,8 +4,7 @@ import AccountPortfolio
 import AccountPreferencesFeature
 import CreateAccountFeature
 import EngineToolkit
-import Prelude
-import Profile
+import FeaturePrelude
 import ProfileClient
 
 // MARK: - Home.State

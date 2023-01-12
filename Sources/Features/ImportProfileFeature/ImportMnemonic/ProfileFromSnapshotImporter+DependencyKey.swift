@@ -1,5 +1,4 @@
-import Foundation
-import Prelude
+import FeaturePrelude
 import Profile
 
 public typealias ProfileFromSnapshotImporter = @Sendable (ProfileSnapshot) throws -> Profile

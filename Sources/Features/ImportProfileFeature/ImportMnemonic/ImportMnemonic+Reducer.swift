@@ -1,9 +1,7 @@
 import Cryptography
 import ErrorQueue
 import FeaturePrelude
-import Prelude
 import Profile
-import SwiftUI
 
 // MARK: - ImportMnemonic
 public struct ImportMnemonic: Sendable, ReducerProtocol {

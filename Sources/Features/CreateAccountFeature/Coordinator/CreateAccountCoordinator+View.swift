@@ -1,5 +1,4 @@
 import FeaturePrelude
-import SwiftUI
 
 // MARK: - CreateAccountCoordinator.View
 public extension CreateAccountCoordinator {

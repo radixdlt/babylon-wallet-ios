@@ -1,6 +1,4 @@
 import FeaturePrelude
-import Foundation
-import SwiftUI
 
 // MARK: - NewConnection.State
 public extension NewConnection {

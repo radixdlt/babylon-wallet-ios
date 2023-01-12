@@ -2,7 +2,6 @@ import FeaturePrelude
 import HandleDappRequests
 import HomeFeature
 import SettingsFeature
-import SwiftUI
 
 // MARK: - Main.View
 public extension Main {

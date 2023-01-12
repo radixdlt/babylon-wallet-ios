@@ -1,5 +1,4 @@
 import FeaturePrelude
-import SwiftUI
 
 // MARK: - FungibleTokenList.Section.View
 public extension FungibleTokenList.Section {
