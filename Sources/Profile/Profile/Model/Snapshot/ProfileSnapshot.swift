@@ -3,7 +3,7 @@ import Prelude
 
 // MARK: - ProfileSnapshot.Version
 public extension ProfileSnapshot {
-	typealias Version = Tagged<Self, UInt8>
+	typealias Version = Tagged<Self, UInt32>
 }
 
 // MARK: - ProfileSnapshot.Version.ProfileVersionHolder
