@@ -141,7 +141,6 @@ public extension Profile {
 // MARK: - WrongAddressType
 struct WrongAddressType: Swift.Error {}
 
-import NonEmpty
 public extension NonEmpty where Collection == OrderedSet<OnNetwork.Account> {
 	// FIXME: uh terrible, please fix this.
 	@discardableResult

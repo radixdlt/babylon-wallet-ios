@@ -1,5 +1,4 @@
-import CustomDump
-import Foundation
+import Prelude
 
 /// A kind of factor instance.
 public enum FactorInstanceKind:

@@ -1,5 +1,4 @@
-import CustomDump
-import Foundation
+import Prelude
 
 // MARK: - OnNetwork.ConnectedDapp
 public extension OnNetwork {
