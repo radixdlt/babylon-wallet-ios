@@ -1,8 +1,7 @@
 @_exported @testable import EngineToolkit
-@_exported import Foundation
-@_exported import XCTest
+@_exported import TestingPrelude
 
-class TestCase: XCTestCase {
+class TestCase: TestingPrelude.TestCase {
 	var sut = EngineToolkit()
 	var debugPrint = false
 

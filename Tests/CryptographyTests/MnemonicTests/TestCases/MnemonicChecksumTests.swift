@@ -1,5 +1,5 @@
 @testable import Cryptography
-import XCTest
+import TestingPrelude
 
 public final class MnemonicTests: XCTestCase {
 	func testGenerateManyAndVerifyChecksummed() {

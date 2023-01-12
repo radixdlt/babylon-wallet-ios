@@ -1,7 +1,7 @@
 import FeaturePrelude
 import ManageGatewayAPIEndpointsFeature
 import Profile
-import TestUtils
+import TestingPrelude
 
 // MARK: - ManageGatewayAPIEndpointsFeatureTests
 @MainActor

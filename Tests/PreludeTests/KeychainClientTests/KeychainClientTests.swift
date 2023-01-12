@@ -1,5 +1,5 @@
 import Prelude
-import XCTest
+import TestingPrelude
 
 final class KeychainClientTests: XCTestCase {
 	func test_trivial() {

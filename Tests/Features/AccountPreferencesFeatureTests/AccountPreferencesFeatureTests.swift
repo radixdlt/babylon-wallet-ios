@@ -1,6 +1,6 @@
 @testable import AccountPreferencesFeature
 import FeaturePrelude
-import TestUtils
+import TestingPrelude
 
 final class AccountPreferencesFeatureTests: TestCase {
 	func testTrivial() {

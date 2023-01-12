@@ -1,5 +1,5 @@
 import FeaturePrelude
-import TestUtils
+import TestingPrelude
 import TransactionClient
 import TransactionSigningFeature
 

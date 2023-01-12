@@ -1,7 +1,7 @@
 import FeaturePrelude
 @testable import GrantDappWalletAccessFeature
 import ProfileClient
-import TestUtils
+import TestingPrelude
 
 // MARK: - IncomingConnectionRequestFromDappReviewFeatureTests
 @MainActor

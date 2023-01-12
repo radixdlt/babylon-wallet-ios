@@ -1,6 +1,6 @@
 @testable import EngineToolkit
 import Prelude
-import XCTest
+import TestingPrelude
 
 func XCTAssertThrowsFailure<Success, Failure: Swift.Error & Equatable>(
 	_ expression: @autoclosure () -> Result<Success, Failure>,

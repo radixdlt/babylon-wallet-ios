@@ -1,6 +1,6 @@
 @testable import Cryptography
 import Prelude
-import XCTest
+import TestingPrelude
 
 // MARK: - BIP39Vector
 struct BIP39Vector: Equatable {

@@ -1,6 +1,6 @@
 import ClientPrelude
 @testable import ProfileLoader
-import TestUtils
+import TestingPrelude
 
 final class ProfileLoaderTests: TestCase {
 	func testTrivial() async {

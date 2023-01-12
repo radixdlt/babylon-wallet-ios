@@ -1,6 +1,6 @@
 import FeaturePrelude
 @testable import HomeFeature
-import TestUtils
+import TestingPrelude
 
 @MainActor
 final class VisitHubTests: TestCase {

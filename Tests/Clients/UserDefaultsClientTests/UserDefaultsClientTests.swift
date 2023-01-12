@@ -1,4 +1,4 @@
-import TestUtils
+import TestingPrelude
 @testable import UserDefaultsClient
 
 // MARK: - UserDefaultsClientLiveTests

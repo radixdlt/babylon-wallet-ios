@@ -1,5 +1,5 @@
 import ClientPrelude
 @testable import P2PConnectivityClient
-import TestUtils
+import TestingPrelude
 
 final class P2PConnectivityClientTests: TestCase {}

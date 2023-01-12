@@ -1,6 +1,6 @@
 @testable import Cryptography
 import CryptoKit
-import XCTest
+import TestingPrelude
 
 public extension HD.Root {
 	init(mnemonic: Mnemonic, passphrase: String = "") throws {

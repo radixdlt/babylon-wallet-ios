@@ -3,7 +3,7 @@ import EngineToolkit
 import P2PModels
 import Prelude
 @testable import Profile
-import XCTest
+import TestingPrelude
 
 // MARK: - ProfileTests
 final class ProfileTests: XCTestCase {

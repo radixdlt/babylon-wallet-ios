@@ -1,5 +1,5 @@
 @testable import Prelude
-import XCTest
+import TestingPrelude
 
 final class BiteTests: XCTestCase {
 	let deadbeef = Data([0xDE, 0xAD, 0xBE, 0xEF])

@@ -1,6 +1,6 @@
 @testable import Cryptography
 import CryptoKit
-import XCTest
+import TestingPrelude
 
 // MARK: - TestVector
 struct TestVector<Curve: Slip10SupportedECCurve> {

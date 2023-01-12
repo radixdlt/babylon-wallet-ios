@@ -1,4 +1,4 @@
-import XCTest
+import TestingPrelude
 
 open class TestCase: XCTestCase {
 	override open func setUp() {

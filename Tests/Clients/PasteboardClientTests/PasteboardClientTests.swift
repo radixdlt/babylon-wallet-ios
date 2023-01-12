@@ -1,6 +1,6 @@
 import ClientPrelude
 @testable import PasteboardClient
-import TestUtils
+import TestingPrelude
 
 // MARK: - PasteboardClientTests
 final class PasteboardClientTests: TestCase {

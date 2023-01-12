@@ -1,5 +1,5 @@
 @testable import Cryptography
-import XCTest
+import TestingPrelude
 
 // MARK: - ChecksummedVector
 struct ChecksummedVector: Decodable, Equatable {

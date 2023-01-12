@@ -1,6 +1,6 @@
 @testable import Cryptography
 import Foundation
-import XCTest
+import TestingPrelude
 
 final class PathTests: XCTestCase {
 	func testInvalidPaths() throws {

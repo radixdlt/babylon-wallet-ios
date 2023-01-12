@@ -1,6 +1,6 @@
 import ClientPrelude
 @testable import EngineToolkitClient
-import TestUtils
+import TestingPrelude
 
 // MARK: - EngineToolkitClientTests
 final class EngineToolkitClientTests: TestCase {

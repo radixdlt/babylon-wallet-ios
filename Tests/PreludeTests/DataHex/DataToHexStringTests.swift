@@ -1,5 +1,5 @@
 import Prelude
-import XCTest
+import TestingPrelude
 
 final class DataToHexStringTests: XCTestCase {
 	func testAssertHexFromDataIsLowerCasedByDefault() throws {

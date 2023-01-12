@@ -1,5 +1,5 @@
 @testable import GatewayAPI
-import TestUtils
+import TestingPrelude
 
 final class GatewayAPITests: TestCase {
 	func test_trivial() {

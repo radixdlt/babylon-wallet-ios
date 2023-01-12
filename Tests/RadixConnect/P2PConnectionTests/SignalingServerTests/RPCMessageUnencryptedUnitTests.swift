@@ -1,5 +1,5 @@
 @testable import P2PConnection
-import XCTest
+import TestingPrelude
 
 // MARK: - RPCMessageUnencryptedUnitTests
 final class RPCMessageUnencryptedUnitTests: XCTestCase {

@@ -1,5 +1,5 @@
 @testable import ProfileClient
-import TestUtils
+import TestingPrelude
 
 final class ProfileClientTests: TestCase {
 	func testTrivial() {

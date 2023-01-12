@@ -1,6 +1,6 @@
 @testable import Cryptography
 import Foundation
-import XCTest
+import TestingPrelude
 
 // MARK: - TestVectorsTests
 final class TestVectorsTests: XCTestCase {
