@@ -7,6 +7,8 @@ public struct DropAllProofs: InstructionProtocol {
 	public func embed() -> Instruction {
 		.dropAllProofs(self)
 	}
+
+	public init() {}
 }
 
 public extension DropAllProofs {
