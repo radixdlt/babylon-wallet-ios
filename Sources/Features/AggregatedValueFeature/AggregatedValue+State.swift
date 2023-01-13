@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Profile
 
 // MARK: - AggregatedValue.State
 public extension AggregatedValue {

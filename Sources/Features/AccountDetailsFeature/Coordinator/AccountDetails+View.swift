@@ -1,6 +1,5 @@
 import AssetsViewFeature
 import FeaturePrelude
-import Profile
 
 // MARK: - AccountDetails.View
 public extension AccountDetails {

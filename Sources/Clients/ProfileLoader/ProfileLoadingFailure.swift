@@ -1,5 +1,4 @@
 import ClientPrelude
-import Profile
 
 // MARK: - ProfileLoader.ProfileLoadingFailure
 public extension ProfileLoader {

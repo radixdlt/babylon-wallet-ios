@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Profile
 
 // MARK: AccountPreferences.State
 public extension AccountPreferences {

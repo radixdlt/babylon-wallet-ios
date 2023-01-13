@@ -1,5 +1,5 @@
 import AssetsViewFeature
-import Profile
+import FeaturePrelude
 
 // MARK: - AccountDetails.Action
 public extension AccountDetails {

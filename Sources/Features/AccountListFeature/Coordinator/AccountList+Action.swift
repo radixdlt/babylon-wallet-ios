@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Profile
 
 // MARK: - AccountList.Action
 public extension AccountList {
