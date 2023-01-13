@@ -1,5 +1,5 @@
 import Prelude
-import Profile
+import ProfileModels
 
 public extension OnNetwork.Account {
 	static var testValue: Self {
