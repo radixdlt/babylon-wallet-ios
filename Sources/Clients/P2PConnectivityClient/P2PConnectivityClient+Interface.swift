@@ -1,6 +1,4 @@
 import ClientPrelude
-import P2PConnection
-import ProfileClient
 
 // MARK: - DependencyValues
 public extension DependencyValues {

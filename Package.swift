@@ -141,6 +141,7 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Cryptography",
+			"ProfileClient",
 		],
 		tests: .yes(
 			dependencies: [],
@@ -286,6 +287,7 @@ package.addModules([
 		name: "P2PConnectivityClient",
 		dependencies: [
 			"P2PConnection",
+			"ProfileClient",
 		],
 		tests: .yes()
 	),
