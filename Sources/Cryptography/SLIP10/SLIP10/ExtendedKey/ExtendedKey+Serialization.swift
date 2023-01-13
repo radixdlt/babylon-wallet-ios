@@ -34,8 +34,11 @@ public extension HD.ExtendedKey {
 	}
 
 	init(string: String) throws {
-		guard let contents = Base58Check.decode(string), contents.count == serializedByteCount else {
-			fatalError()
+		guard let contents = Base58Check.decode(string) else {
+			throw DeserializationError.failedToBase58Decode
+		}
+		guard contents.count == serializedByteCount else {
+			throw DeserializationError.base58DecodedHasIncorrectLength
 		}
 
 		let dataReader = DataReader(data: contents)
@@ -76,6 +79,14 @@ public extension HD.ExtendedKey {
 }
 
 private let serializedByteCount = 78
+
+// MARK: - HD.ExtendedKey.DeserializationError
+public extension HD.ExtendedKey {
+	enum DeserializationError: Swift.Error, Equatable {
+		case failedToBase58Decode
+		case base58DecodedHasIncorrectLength
+	}
+}
 
 // MARK: - HD.ExtendedKey.SerializationError
 public extension HD.ExtendedKey {

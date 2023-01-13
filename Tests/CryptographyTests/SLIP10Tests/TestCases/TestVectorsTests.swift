@@ -190,11 +190,19 @@ enum Slip10Curve: String, Decodable, Hashable {
 	case curve25519 = "ed25519"
 
 	init(curveType: Slip10CurveType) {
-		switch curveType {
-		case .secp256k1: self = .secp256k1
-		case .p256: self = .p256
-		case .curve25519: self = .curve25519
-		default: fatalError("Unsupported curve")
+		if #available(macOS 13, *) {
+			switch curveType {
+			case .secp256k1: self = .secp256k1
+			case .p256: self = .p256
+			case .curve25519: self = .curve25519
+			default: fatalError("Unsupported curve")
+			}
+		} else {
+			switch curveType {
+			case .secp256k1: self = .secp256k1
+			case .curve25519: self = .curve25519
+			default: fatalError("Unsupported curve")
+			}
 		}
 	}
 
@@ -202,7 +210,11 @@ enum Slip10Curve: String, Decodable, Hashable {
 		switch self {
 		case .curve25519: return .curve25519
 		case .secp256k1: return .secp256k1
-		case .p256: return .p256
+		case .p256: if #available(macOS 13, *) {
+				return .p256
+			} else {
+				fatalError("unsupported")
+			}
 		}
 	}
 }
@@ -237,12 +249,16 @@ extension HD.Root {
 			)
 
 		case .p256:
-			return try .init(
-				concrete: derivePrivateKey(
-					path: path,
-					curve: P256.self
+			if #available(macOS 13, *) {
+				return try .init(
+					concrete: derivePrivateKey(
+						path: path,
+						curve: P256.self
+					)
 				)
-			)
+			} else {
+				fatalError("unsupported")
+			}
 		}
 	}
 }
