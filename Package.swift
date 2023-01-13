@@ -431,7 +431,7 @@ package.addModules([
 		dependencies: [
 			"Asset",
 			"EngineToolkitModels",
-			"Profile", // FIXME: In `Profile` split out Models package
+			"ProfileModels",
 			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
 			"P2PModels",
 		],
