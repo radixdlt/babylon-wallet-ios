@@ -19,7 +19,7 @@ open App/BabylonWallet.xcodeproj
 ```
 
 # Architecture
-The structure is the same as [PointfreeCo's game Isowords (source)][isowords] (the authors of TCA).
+The structure is the same as [Point-Free's game Isowords (source)][isowords] (the authors of TCA).
 
 ## SPM + App structure
 A "gotcha" of this structure is that the project root contains the Package.swift and `Source` and `Tests` of the Swift Packages. The actual app is an ultra thin entrypoint, using `AppFeature` package, and is put in `App` folder. This is how the app references the local packages:
@@ -32,7 +32,7 @@ A "gotcha" of this structure is that the project root contains the Package.swift
 6. "Add Other" button in bottom left
 7. "Add Package Dependency"
 8. And selecting the whole project ROOT (yes the root, and we will use a trick below to avoid "recursion")
-9. This would not work if we did not use PointfreeCos trick to create a "Dummy" Package.swift inside `./App/` folder, which we have done.
+9. This would not work if we did not use Point-Free's trick to create a "Dummy" Package.swift inside `./App/` folder, which we have done.
 10. Again click "+"button in bottom of "Link Binary With Libraries" section and you should see "AppFeature" (and all other packages) there, add "AppFeature"!
 11. This setup only needs to happen once, for all targets, but any other targets need to perform the last step, of adding the actual package as dependency, e.g. for macOS (for development purpuses).
 
@@ -57,7 +57,7 @@ We are not doing navigation, for now. We defer choice of Navigation solution to 
 
 The reason for this is that some of us iOS devs still hope for Apple to back-deploy its new NavigationStack API introduced in iOS 16 to iOS 15. Maybe maybe they will do that.
 
-Or PointFreeCo will make something amazing and iOS 15 compatible, follow [thread related to iOS 16 NavigationStack in TCA here](https://github.com/pointfreeco/swift-composable-architecture/discussions/1140).
+Or Point-Free will make something amazing and iOS 15 compatible, follow [thread related to iOS 16 NavigationStack in TCA here](https://github.com/pointfreeco/swift-composable-architecture/discussions/1140).
 
 So for now, we just use `IfletStore` and `SwitchStore` for displaying correct screen according to state.
 
@@ -75,10 +75,10 @@ We do not use classes at all (maybe with a few ultrarare exceptions), instead we
 We use SwiftFormat to format code, rules are defined in `.swiftformat`.
 
 ## Packages
-We use the super modular design that PointFreeCo uses in [Isowords](https://github.com/pointfreeco/isowords/blob/main/Package.swift) - with almost 100 different packages.
+We use the super modular design that Point-Free uses in [Isowords](https://github.com/pointfreeco/isowords/blob/main/Package.swift) - with almost 100 different packages.
 
 ## Encapsulate ALL dependencies
-We encapsulate ALL real world APIs, dependencies and inputs such as UserDefaults, Keychain, NotificationCenter, API Clients etc, we follow the pattern of [PointFreeCo's Isoword here UserDefaults][https://github.com/pointfreeco/isowords/tree/main/Sources/UserDefaultsClient].
+We encapsulate ALL real world APIs, dependencies and inputs such as UserDefaults, Keychain, NotificationCenter, API Clients etc, we follow the pattern of [Point-Free's Isoword here UserDefaults][https://github.com/pointfreeco/isowords/tree/main/Sources/UserDefaultsClient].
 
 ```swift
 public struct UserDefaultsClient {
@@ -193,7 +193,7 @@ After the above setup, you are good to go with building and running the app on i
 
 # Testing
 1. Unit tests for each package, split into multiple files for each seperate system under test (sut).
-2. UI testing using [PointFreeCo's Snapsshot testing Package][snapshotTesting] (Only when UI becomes stable)
+2. UI testing using [Point-Free's Snapshot testing Package][snapshotTesting] (Only when UI becomes stable)
 3. Integration tests can be enabled later on using locally running Gateway service with Docker. Which has been [done before in ancient deprecated Swift SDK](https://github.com/radixdlt/radixdlt-swift-archive/tree/develop/Tests/TestCases/IntegrationTests)
 
 
