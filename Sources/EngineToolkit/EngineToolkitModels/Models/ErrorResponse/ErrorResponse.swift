@@ -165,6 +165,9 @@ public enum ErrorKind: String, Swift.Error, Sendable, Equatable, Codable, Custom
 public struct AddressError: ErrorResponseWithStringValueProtocol {
 	public static let errorKind: ErrorKind = .addressError
 	public let value: String
+	public init(value: String) {
+		self.value = value
+	}
 }
 
 // MARK: - UnrecognizedAddressFormat
