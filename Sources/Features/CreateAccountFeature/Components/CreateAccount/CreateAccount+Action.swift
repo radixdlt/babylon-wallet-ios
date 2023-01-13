@@ -1,6 +1,5 @@
 import FeaturePrelude
 import LocalAuthenticationClient
-import Profile
 
 // MARK: - CreateAccount.Action
 public extension CreateAccount {

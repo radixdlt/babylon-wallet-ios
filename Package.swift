@@ -59,7 +59,7 @@ package.addModules([
 			"AppSettings",
 			"MainFeature",
 			"OnboardingFeature",
-			"ProfileLoader",
+			"ProfileClient",
 			"SplashFeature",
 		],
 		tests: .yes(
