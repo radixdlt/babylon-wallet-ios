@@ -293,6 +293,7 @@ package.addModules([
 		name: "ProfileClient",
 		dependencies: [
 			"Cryptography",
+			"EngineToolkitClient",
 			"ProfileLoader",
 		],
 		tests: .yes()
