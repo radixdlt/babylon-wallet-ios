@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkit
+import EngineToolkitModels
 import Prelude
 
 // MARK: - Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource

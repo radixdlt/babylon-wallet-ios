@@ -443,6 +443,14 @@ package.addModules([
 
 package.addModules([
 	.module(
+		name: "ProfileView",
+		category: "Profile",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.module(
 		name: "Profile",
 		category: "Profile",
 		dependencies: [
@@ -465,14 +473,6 @@ package.addModules([
 			"Cryptography",
 			"EngineToolkitModels",
 			"P2PModels",
-		],
-		tests: .no
-	),
-	.module(
-		name: "ProfileView",
-		category: "Profile",
-		dependencies: [
-			"Profile",
 		],
 		tests: .no
 	),
