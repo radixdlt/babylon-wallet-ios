@@ -1,7 +1,6 @@
 import FeaturePrelude
 import NewConnectionFeature
 import P2PConnectivityClient
-import ProfileClient
 
 // MARK: - ManageP2PClients
 public struct ManageP2PClients: Sendable, ReducerProtocol {

@@ -2,7 +2,6 @@ import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
-import Profile
 import ProfileClient
 #if DEBUG
 import ProfileView
