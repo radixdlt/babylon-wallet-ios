@@ -1,5 +1,4 @@
-import Foundation
-import Tagged
+import Prelude
 
 // MARK: - TXVersionTag
 public enum TXVersionTag: Sendable {}

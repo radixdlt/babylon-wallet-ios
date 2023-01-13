@@ -1,6 +1,5 @@
 import ClientPrelude
 import Profile
-import UserDefaultsClient
 
 // MARK: - AppSettingsClient
 public struct AppSettingsClient: Sendable {

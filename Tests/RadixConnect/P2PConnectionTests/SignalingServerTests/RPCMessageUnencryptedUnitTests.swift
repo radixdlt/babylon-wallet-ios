@@ -2,7 +2,7 @@
 import TestingPrelude
 
 // MARK: - RPCMessageUnencryptedUnitTests
-final class RPCMessageUnencryptedUnitTests: XCTestCase {
+final class RPCMessageUnencryptedUnitTests: TestCase {
 	func testJSONEncodingRPCMessage() throws {
 		let unencryptedMessage = RPCMessageUnencrypted(
 			method: .answer,

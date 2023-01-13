@@ -1,10 +1,8 @@
 @testable import CreateAccountFeature
 import Cryptography
 import FeaturePrelude
-import JSON
 import ProfileClient
 import TestingPrelude
-import UserDefaultsClient
 
 @MainActor
 final class CreateAccountFeatureTests: TestCase {

@@ -1,7 +1,4 @@
-import Collections
-import CustomDump
-import Foundation
-import NonEmpty
+import Prelude
 
 // MARK: - FactorSources
 /// All the FactorSources the user have added.

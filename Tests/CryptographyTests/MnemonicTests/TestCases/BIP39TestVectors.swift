@@ -111,7 +111,7 @@ struct JapaneseVectors: Decodable {
 }
 
 // MARK: - BIP39TestVectors
-final class BIP39TestVectors: XCTestCase {
+final class BIP39TestVectors: TestCase {
 	func testEnglishVectors() throws {
 		try orFail {
 			try testFixture(

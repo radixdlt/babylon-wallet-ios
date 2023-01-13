@@ -1,5 +1,4 @@
-import CustomDump
-import Foundation
+import Prelude
 
 // MARK: - FactorSourceKind
 /// A kind of factor source.

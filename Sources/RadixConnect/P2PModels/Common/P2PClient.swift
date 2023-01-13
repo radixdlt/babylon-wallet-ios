@@ -181,15 +181,14 @@ public extension Date {
 	}
 }
 
-#if canImport(CustomDump)
-import CustomDump
-
+// MARK: - P2PClient.Platform + CustomDumpRepresentable
 extension P2PClient.Platform: CustomDumpRepresentable {
 	public var customDumpValue: Any {
 		rawValue
 	}
 }
 
+// MARK: - P2PClient + CustomDumpReflectable
 extension P2PClient: CustomDumpReflectable {
 	public var customDumpMirror: Mirror {
 		.init(
@@ -208,4 +207,3 @@ extension P2PClient: CustomDumpReflectable {
 		)
 	}
 }
-#endif // canImport(CustomDump)

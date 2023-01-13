@@ -1,5 +1,4 @@
-import CustomDump
-import Foundation
+import Prelude
 
 public extension ProfileSnapshot.Version {
 	/// Semantic versioning of the Profile Snapshot data format

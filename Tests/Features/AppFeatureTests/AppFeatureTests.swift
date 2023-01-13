@@ -37,16 +37,17 @@ final class AppFeatureTests: TestCase {
 			mnemonic: .generate()
 		)
 
+		let expectation = expectation(description: "Profile injected")
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
-		)
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-		let expectation = expectation(description: "Profile injected")
-		store.dependencies.profileClient.injectProfile = { injected in
-			XCTAssertEqual(injected, existingProfile)
-			expectation.fulfill()
+		) {
+			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.profileClient.injectProfile = { injected in
+				XCTAssertEqual(injected, existingProfile)
+				expectation.fulfill()
+			}
 		}
 
 		// WHEN: existing profile is loaded
@@ -73,15 +74,14 @@ final class AppFeatureTests: TestCase {
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_noProfile__THEN__navigate_to_onboarding() async {
 		// given
+		let testScheduler = DispatchQueue.test
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
-		)
-
-		let testScheduler = DispatchQueue.test
-
-		store.dependencies.errorQueue = .liveValue
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
+		) {
+			$0.errorQueue = .liveValue
+			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+		}
 
 		let viewTask = await store.send(.view(.task))
 
@@ -104,15 +104,14 @@ final class AppFeatureTests: TestCase {
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_decodingError__THEN__display_errorAlert_and_navigate_to_onboarding() async throws {
 		// given
+		let testScheduler = DispatchQueue.test
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
-		)
-
-		let testScheduler = DispatchQueue.test
-
-		store.dependencies.errorQueue = .liveValue
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
+		) {
+			$0.errorQueue = .liveValue
+			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+		}
 
 		let viewTask = await store.send(.view(.task))
 
@@ -161,17 +160,16 @@ final class AppFeatureTests: TestCase {
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_failedToCreateProfileFromSnapshot__THEN__display_errorAlert_when_user_proceeds_incompatible_profile_is_deleted_from_keychain_and_navigate_to_onboarding() async throws {
 		// given
+		let testScheduler = DispatchQueue.test
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
-		)
-
-		let testScheduler = DispatchQueue.test
-
-		store.dependencies.errorQueue = .liveValue
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-		store.dependencies.keychainClient.removeDataForKey = { key in
-			XCTAssertEqual(key, "profileSnapshotKeychainKey")
+		) {
+			$0.errorQueue = .liveValue
+			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.keychainClient.removeDataForKey = { key in
+				XCTAssertEqual(key, "profileSnapshotKeychainKey")
+			}
 		}
 
 		let viewTask = await store.send(.view(.task))
@@ -209,17 +207,16 @@ final class AppFeatureTests: TestCase {
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_profileVersionOutdated__THEN__display_errorAlert_when_user_proceeds_incompatible_profile_is_deleted_from_keychain_and_navigate_to_onboarding() async throws {
 		// given
+		let testScheduler = DispatchQueue.test
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
-		)
-
-		let testScheduler = DispatchQueue.test
-
-		store.dependencies.errorQueue = .liveValue
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-		store.dependencies.keychainClient.removeDataForKey = { key in
-			XCTAssertEqual(key, "profileSnapshotKeychainKey")
+		) {
+			$0.errorQueue = .liveValue
+			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.keychainClient.removeDataForKey = { key in
+				XCTAssertEqual(key, "profileSnapshotKeychainKey")
+			}
 		}
 
 		let viewTask = await store.send(.view(.task))

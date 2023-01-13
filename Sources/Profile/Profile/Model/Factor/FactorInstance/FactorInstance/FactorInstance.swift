@@ -1,5 +1,4 @@
-import CustomDump
-import Foundation
+import Prelude
 
 // MARK: - FactorInstance
 /// Shared nominal type for all factor instances.

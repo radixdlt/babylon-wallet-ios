@@ -1,5 +1,5 @@
+import Prelude
 import TestingPrelude
-@testable import UserDefaultsClient
 
 // MARK: - UserDefaultsClientLiveTests
 final class UserDefaultsClientLiveTests: TestCase {

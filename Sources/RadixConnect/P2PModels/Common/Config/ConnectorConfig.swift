@@ -1,5 +1,4 @@
-import Collections
-import Foundation
+import Prelude
 
 // MARK: - OrderedSet + Sendable
 extension OrderedSet: @unchecked Sendable where Element: Sendable {}

@@ -2,7 +2,7 @@
 import TestingPrelude
 
 // MARK: - InterfaceTests
-final class InterfaceTests: XCTestCase {
+final class InterfaceTests: TestCase {
 	func testSlip10() throws {
 		let insecureSeed = "insecure seed of at least 128 bit".data(using: .utf8)!
 		let root = try HD.Root(seed: insecureSeed)

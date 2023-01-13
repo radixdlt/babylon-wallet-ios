@@ -2,12 +2,7 @@
 import TestingPrelude
 
 // MARK: - TestVectorsTests
-final class TestVectorsTests: XCTestCase {
-	override func setUp() {
-		super.setUp()
-		continueAfterFailure = false
-	}
-
+final class TestVectorsTests: TestCase {
 	func testVectors10() throws {
 		try orFail {
 			try testFixture(
@@ -45,7 +40,7 @@ private extension TestVectorsTests {
 		testFile: TestFile,
 		file: StaticString = #file, line: UInt = #line
 	) throws {
-		print("✨ Testing group with #\(testFile.testGroups.reduce(0) { $0 + $1.testCases.map(\.childKeys.count).reduce(0, +) }) test cases", terminator: "")
+		print("✨ Testing group with #\(testFile.testGroups.reduce(0) { $0 + $1.testScenarios.map(\.childKeys.count).reduce(0, +) }) test scenarios", terminator: "")
 		for group in testFile.testGroups {
 			try orFail {
 				try doTestGroup(
@@ -89,28 +84,28 @@ private extension TestVectorsTests {
 			)
 		}
 
-		for (testCaseIndex, testCase) in group.testCases.enumerated() {
+		for (testScenarioIndex, testScenario) in group.testScenarios.enumerated() {
 			try orFail {
-				try doTestCase(root: root, testCase: testCase, groupId: group.groupId, testCaseIndex: testCaseIndex)
+				try doTestScenario(root: root, testScenario: testScenario, groupId: group.groupId, testScenarioIndex: testScenarioIndex)
 			}
 		}
 	}
 
-	func doTestCase(
+	func doTestScenario(
 		root: HD.Root,
-		testCase: TestCase,
+		testScenario: TestScenario,
 		groupId: Int,
-		testCaseIndex: Int,
+		testScenarioIndex: Int,
 		file: StaticString = #file, line: UInt = #line
 	) throws {
-		for expectedChildKey in testCase.childKeys {
+		for expectedChildKey in testScenario.childKeys {
 			let childKey = try root.deriveAnyPrivateKey(
-				path: testCase.path,
+				path: testScenario.path,
 				curve: expectedChildKey.curve
 			)
 			XCTAssertKeysEqual(
 				childKey, expected: expectedChildKey,
-				"ChildKey in groupId=\(groupId) case=\(testCaseIndex) path\(testCase.path)",
+				"ChildKey in groupId=\(groupId) case=\(testScenarioIndex) path\(testScenario.path)",
 				file: file, line: line
 			)
 		}
@@ -333,8 +328,8 @@ extension ExtendedKey {
 	}
 }
 
-// MARK: - TestCase
-struct TestCase: Decodable, Equatable {
+// MARK: - TestScenario
+struct TestScenario: Decodable, Equatable {
 	let path: HD.Path.Full
 	let childKeys: [ExtendedKey]
 
@@ -360,10 +355,10 @@ struct TestGroup: Decodable, Equatable {
 	let mnemonicPhrase: String
 	let passphrase: String
 	let masterKeys: [ExtendedKey]
-	let testCases: [TestCase]
+	let testScenarios: [TestScenario]
 
 	enum CodingKeys: String, CodingKey {
-		case groupId, seed, mnemonicPhrase, entropy, passphrase, masterKeys, testCases
+		case groupId, seed, mnemonicPhrase, entropy, passphrase, masterKeys, testScenarios
 	}
 
 	init(from decoder: Decoder) throws {
@@ -379,7 +374,7 @@ struct TestGroup: Decodable, Equatable {
 		self.groupId = try container.decode(Int.self, forKey: .groupId)
 		self.mnemonicPhrase = try container.decode(String.self, forKey: .mnemonicPhrase)
 		self.passphrase = try container.decode(String.self, forKey: .passphrase)
-		self.testCases = try container.decode([TestCase].self, forKey: .testCases)
+		self.testScenarios = try container.decode([TestScenario].self, forKey: .testScenarios)
 	}
 }
 
