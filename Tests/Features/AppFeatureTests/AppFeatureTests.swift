@@ -1,7 +1,6 @@
 @testable import AppFeature
 import FeaturePrelude
 import OnboardingFeature
-import ProfileClient
 import ProfileLoader
 @testable import SplashFeature
 import TestingPrelude

@@ -1,7 +1,6 @@
 @testable import AccountDetailsFeature
 import AccountListFeature
 import FeaturePrelude
-import Profile
 import SharedTestingModels
 import TestingPrelude
 

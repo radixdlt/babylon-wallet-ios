@@ -1,6 +1,5 @@
 @testable import CreateAccountFeature
 import FeaturePrelude
-import Profile
 import SharedTestingModels
 import TestingPrelude
 
