@@ -82,6 +82,7 @@ package.addModules([
 			"Cryptography",
 			"GatewayAPI",
 			"LocalAuthenticationClient",
+			"ProfileClient",
 		],
 		tests: .yes(
 			dependencies: [
