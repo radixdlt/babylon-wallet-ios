@@ -1,4 +1,4 @@
-import ClientPrelude
+import Dependencies
 
 public extension DependencyValues {
 	var userDefaultsClient: UserDefaultsClient {

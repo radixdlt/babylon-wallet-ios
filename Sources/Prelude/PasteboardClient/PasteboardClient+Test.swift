@@ -1,4 +1,4 @@
-import ClientPrelude
+import Dependencies
 
 // MARK: - PasteboardClient + TestDependencyKey
 extension PasteboardClient: TestDependencyKey {

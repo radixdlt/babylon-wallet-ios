@@ -1,4 +1,3 @@
-import ErrorQueue
 import FeaturePrelude
 import MainFeature
 import OnboardingFeature

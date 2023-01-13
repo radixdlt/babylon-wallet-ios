@@ -1,10 +1,9 @@
-import ClientPrelude
-
-// MARK: - UserDefaultsClient
-public typealias Key = String
+import Dependencies
 
 // MARK: - UserDefaultsClient
 public struct UserDefaultsClient: Sendable {
+	public typealias Key = String
+
 	public var stringForKey: @Sendable (Key) -> String?
 	public var boolForKey: @Sendable (Key) -> Bool
 	public var dataForKey: @Sendable (Key) -> Data?

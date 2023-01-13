@@ -1,5 +1,4 @@
-import CustomDump
-import Foundation
+import Prelude
 
 // MARK: - AppPreferences.NetworkAndGateway
 public extension AppPreferences {

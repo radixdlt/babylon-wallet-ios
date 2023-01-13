@@ -1,5 +1,4 @@
-import CustomDump
-import Foundation
+import Prelude
 
 // MARK: - FactorSourceReference
 /// Just a reference to a factor source, identifiable a stable ID and hint of the factor source kind.

@@ -1,5 +1,4 @@
 import FeaturePrelude
-import PasteboardClient
 
 // MARK: - NonFungibleTokenList.Detail
 public extension NonFungibleTokenList {

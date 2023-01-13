@@ -9,7 +9,7 @@ public extension HD.Root {
 }
 
 // MARK: - ComboTests
-final class ComboTests: XCTestCase {
+final class ComboTests: TestCase {
 	func testInterface() throws {
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 		let root = try HD.Root(mnemonic: mnemonic)

@@ -1,5 +1,4 @@
 import ClientPrelude
-import JSON
 import Profile
 
 public extension ProfileLoader {

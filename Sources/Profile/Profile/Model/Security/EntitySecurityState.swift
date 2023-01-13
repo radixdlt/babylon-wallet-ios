@@ -1,5 +1,4 @@
-import CustomDump
-import Foundation
+import Prelude
 
 // MARK: - EntitySecurityState
 /// Security state of an entity (Account/Persona).

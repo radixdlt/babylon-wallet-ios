@@ -2,7 +2,7 @@
 import TestingPrelude
 
 // MARK: - SignalingServerMessageUnitTests
-final class SignalingServerMessageUnitTests: XCTestCase {
+final class SignalingServerMessageUnitTests: TestCase {
 	func testSingleValidationError() throws {
 		let jsonString = """
 		{

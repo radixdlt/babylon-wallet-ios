@@ -1,5 +1,4 @@
 import FeaturePrelude
-import PasteboardClient
 
 // MARK: - AccountList
 public struct AccountList: Sendable, ReducerProtocol {

@@ -22,7 +22,6 @@ final class SplashFeatureTests: TestCase {
 		}
 
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-		store.dependencies.platformEnvironmentClient.isSimulator = { false }
 
 		let newProfile = try await Profile.new(networkAndGateway: .hammunet, mnemonic: .generate())
 		store.dependencies.profileLoader = ProfileLoader(loadProfile: {
@@ -81,17 +80,15 @@ final class SplashFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Splash.State(),
 			reducer: Splash()
-		)
-
-		store.dependencies.localAuthenticationClient = LocalAuthenticationClient {
-			authBiometricsConfig
+		) {
+			$0.localAuthenticationClient = LocalAuthenticationClient {
+				authBiometricsConfig
+			}
+			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.profileLoader = ProfileLoader(loadProfile: {
+				result
+			})
 		}
-
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-
-		store.dependencies.profileLoader = ProfileLoader(loadProfile: {
-			result
-		})
 
 		// when
 		await store.send(.internal(.view(.viewAppeared)))

@@ -1,5 +1,4 @@
-import CustomDump
-import Foundation
+import Prelude
 
 /// A kind of address, e.g. the kind `account` or the kind `identity` or `component` used
 /// by `Dapp`.

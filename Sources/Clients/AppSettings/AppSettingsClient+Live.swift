@@ -1,6 +1,4 @@
 import ClientPrelude
-import JSON
-import UserDefaultsClient
 
 // MARK: - AppSettingsClient + DependencyKey
 extension AppSettingsClient: DependencyKey {

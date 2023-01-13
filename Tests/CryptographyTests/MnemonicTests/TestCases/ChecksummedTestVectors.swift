@@ -36,7 +36,7 @@ struct ChecksummedVectors: Decodable, Equatable {
 }
 
 // MARK: - ChecksummedTestVectors
-final class ChecksummedTestVectors: XCTestCase {
+final class ChecksummedTestVectors: TestCase {
 	func testChecksummedWithWordCountOf12() throws {
 		try orFail {
 			try doTestChecksummed(

@@ -1,5 +1,4 @@
-import CustomDump
-import Foundation
+import Prelude
 
 // MARK: - IdentityAddress
 /// The address to an `Identity` on the Radix network, used by `Persona`s.

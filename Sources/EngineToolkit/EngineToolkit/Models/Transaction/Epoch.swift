@@ -1,5 +1,4 @@
-import Foundation
-import Tagged
+import Prelude
 
 // MARK: - EpochTag
 public enum EpochTag: Sendable {}

@@ -23,7 +23,7 @@ private extension DeriveNonFungibleAddressRequestTests {
 }
 
 // MARK: - DeriveNonFungibleAddressTestVectors
-// TODO: Test cases have been removed since this request type will be removed and deprecated soon.
+// TODO: Test scenarios have been removed since this request type will be removed and deprecated soon.
 enum DeriveNonFungibleAddressTestVectors {
 	typealias Vector = (resourceAddress: ResourceAddress, nonFungibleId: NonFungibleId, nonFungibleAddress: NonFungibleAddress)
 	static let vectors: [Vector] = []

@@ -1,5 +1,4 @@
-import Foundation
-import Tagged
+import Prelude
 
 // MARK: - DataChannelLabelledID
 public struct DataChannelLabelledID: Sendable, Hashable, Codable, CustomStringConvertible {

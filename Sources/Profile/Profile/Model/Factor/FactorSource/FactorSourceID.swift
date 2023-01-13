@@ -59,8 +59,6 @@ public extension SHA256 {
 	}
 }
 
-import CustomDump
-
 // MARK: - Tagged + CustomDumpStringConvertible
 extension Tagged: CustomDumpStringConvertible where Self.RawValue: CustomDumpStringConvertible {
 	public var customDumpDescription: String {

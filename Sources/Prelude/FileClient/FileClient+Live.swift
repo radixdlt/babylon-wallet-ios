@@ -1,4 +1,4 @@
-import ClientPrelude
+import Dependencies
 
 extension FileClient: DependencyKey {
 	public static let liveValue = Self(
