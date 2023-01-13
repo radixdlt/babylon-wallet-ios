@@ -1,7 +1,6 @@
 import ClientPrelude
 import Cryptography
 import EngineToolkit
-import struct Profile.AccountAddress
 
 // MARK: - EngineToolkitClient
 public struct EngineToolkitClient: Sendable, DependencyKey {

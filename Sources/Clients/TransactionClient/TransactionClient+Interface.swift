@@ -24,8 +24,6 @@ public extension DependencyValues {
 	}
 }
 
-import ClientPrelude
-import Profile
 import ProfileClient
 
 // MARK: - SignManifestRequest

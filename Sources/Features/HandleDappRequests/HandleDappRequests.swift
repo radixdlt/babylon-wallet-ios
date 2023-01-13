@@ -1,7 +1,7 @@
 import FeaturePrelude
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
-import Profile
+import ProfileClient
 import TransactionClient
 import TransactionSigningFeature
 

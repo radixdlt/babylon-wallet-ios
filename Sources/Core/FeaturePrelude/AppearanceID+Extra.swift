@@ -1,5 +1,5 @@
 import DesignSystem
-import Profile
+import SharedModels
 import SwiftUI
 
 public extension OnNetwork.Account.AppearanceID {

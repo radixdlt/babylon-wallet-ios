@@ -1,7 +1,6 @@
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
-import Profile
 
 // MARK: - ProfileClient + LiveValue
 public extension ProfileClient {

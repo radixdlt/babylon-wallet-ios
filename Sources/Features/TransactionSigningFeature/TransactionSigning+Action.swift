@@ -1,6 +1,5 @@
-import EngineToolkit
+import EngineToolkitClient
 import FeaturePrelude
-import ProfileClient
 import enum TransactionClient.TransactionFailure
 import enum TransactionClient.TransactionResult
 
@@ -44,9 +43,6 @@ public extension TransactionSigning.Action {
 		)
 	}
 }
-
-// MARK: - ApproveTransactionFailure
-import EngineToolkit
 
 // MARK: - ApproveTransactionFailure
 public enum ApproveTransactionFailure: Sendable, LocalizedError, Equatable {

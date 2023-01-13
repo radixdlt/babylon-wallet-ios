@@ -1,4 +1,5 @@
-import Foundation
+import EngineToolkitModels
+import Prelude
 import RadixEngineToolkit
 
 typealias UnderlyingPointerType = CChar

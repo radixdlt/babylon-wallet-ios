@@ -1,6 +1,5 @@
 import CreateAccountFeature
 import FeaturePrelude
-import Profile
 
 // MARK: - ManageGatewayAPIEndpoints.View
 public extension ManageGatewayAPIEndpoints {

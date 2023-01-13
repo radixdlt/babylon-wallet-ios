@@ -1,6 +1,5 @@
 import FeaturePrelude
 import FungibleTokenListFeature
-import Profile
 import TestingPrelude
 
 final class FungibleTokenListSortingTests: TestCase {

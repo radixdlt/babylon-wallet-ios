@@ -1,6 +1,5 @@
 import Cryptography
 import FeaturePrelude
-import Profile
 
 // MARK: - ImportMnemonic
 public struct ImportMnemonic: Sendable, ReducerProtocol {

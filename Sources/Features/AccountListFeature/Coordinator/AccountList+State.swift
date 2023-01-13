@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Profile
 
 // MARK: - AccountList.State
 public extension AccountList {

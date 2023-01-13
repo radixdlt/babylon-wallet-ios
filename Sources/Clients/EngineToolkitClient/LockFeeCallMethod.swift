@@ -1,6 +1,5 @@
 import ClientPrelude
 import EngineToolkit
-import Profile
 
 public extension EngineToolkitClient {
 	func lockFeeCallMethod(

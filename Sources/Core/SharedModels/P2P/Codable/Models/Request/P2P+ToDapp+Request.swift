@@ -1,4 +1,4 @@
-import EngineToolkit
+import EngineToolkitModels
 import Prelude
 
 // MARK: - P2P.FromDapp.Request

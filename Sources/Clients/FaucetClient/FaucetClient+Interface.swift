@@ -1,5 +1,4 @@
 import ClientPrelude
-import Profile
 import TransactionClient
 
 // MARK: - FaucetClient

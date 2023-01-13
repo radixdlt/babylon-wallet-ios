@@ -1,7 +1,6 @@
 import AccountPortfolio
 import FeaturePrelude
 import FungibleTokenListFeature
-import Profile
 
 // MARK: - AccountList.Row.View
 public extension AccountList.Row {

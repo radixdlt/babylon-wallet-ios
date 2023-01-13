@@ -1,7 +1,6 @@
 import FeaturePrelude
 import NewConnectionFeature
 import P2PConnectivityClient
-import Profile
 
 // MARK: - ManageP2PClients.State
 public extension ManageP2PClients {

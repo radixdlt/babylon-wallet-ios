@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Profile
 
 // MARK: - DappConnectionRequest.State
 public extension DappConnectionRequest {

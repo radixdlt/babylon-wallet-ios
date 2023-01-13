@@ -1,5 +1,5 @@
 import FeaturePrelude
-import Profile
+import ProfileClient
 
 public typealias ProfileFromSnapshotImporter = @Sendable (ProfileSnapshot) throws -> Profile
 

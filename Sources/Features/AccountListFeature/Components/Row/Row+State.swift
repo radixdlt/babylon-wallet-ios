@@ -1,6 +1,5 @@
 import AccountPortfolio
 import FeaturePrelude
-import Profile
 
 // MARK: - AccountList.Row.State
 public extension AccountList.Row {
@@ -53,7 +52,6 @@ extension AccountList.Row.State: Identifiable {
 }
 
 #if DEBUG
-import ProfileClient
 public extension AccountList.Row.State {
 	static let previewValue = Self(account: .previewValue0)
 }

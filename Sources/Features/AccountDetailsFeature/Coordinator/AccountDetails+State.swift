@@ -2,7 +2,6 @@ import AccountListFeature
 import AssetsViewFeature
 import FeaturePrelude
 import FungibleTokenListFeature
-import Profile
 
 // MARK: - AccountDetails.State
 public extension AccountDetails {

@@ -1,6 +1,6 @@
 import P2PConnection
 import Prelude
-import Profile
+import ProfileModels
 
 // MARK: - P2P.RequestFromClient
 public extension P2P {

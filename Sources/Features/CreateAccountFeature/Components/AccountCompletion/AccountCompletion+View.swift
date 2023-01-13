@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Profile
 
 // MARK: - AccountCompletion.View
 public extension AccountCompletion {

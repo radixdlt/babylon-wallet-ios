@@ -1,5 +1,4 @@
 import ClientPrelude
-import Profile
 
 public extension ProfileLoader {
 	typealias Value = ProfileLoader

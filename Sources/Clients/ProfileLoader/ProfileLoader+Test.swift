@@ -1,7 +1,4 @@
 import ClientPrelude
-import Profile
-#if DEBUG
-import ClientPrelude
 
 // MARK: - ProfileLoader + TestDependencyKey
 extension ProfileLoader: TestDependencyKey {
@@ -12,7 +9,6 @@ extension ProfileLoader: TestDependencyKey {
 		loadProfile: unimplemented("\(Self.self).loadProfile")
 	)
 }
-#endif // DEBUG
 
 public extension DependencyValues {
 	var profileLoader: ProfileLoader {

@@ -1,5 +1,4 @@
 import FeaturePrelude
-import ProfileClient
 
 // MARK: - DappConnectionRequest
 public struct DappConnectionRequest: Sendable, ReducerProtocol {

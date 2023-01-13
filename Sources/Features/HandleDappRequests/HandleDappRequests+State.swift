@@ -1,6 +1,5 @@
 import FeaturePrelude
 import GrantDappWalletAccessFeature
-import Profile
 import TransactionSigningFeature
 
 // MARK: - HandleDappRequests.State

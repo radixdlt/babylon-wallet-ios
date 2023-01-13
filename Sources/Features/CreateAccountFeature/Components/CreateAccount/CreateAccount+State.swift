@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Profile
 
 // MARK: - CreateAccount.State
 public extension CreateAccount {

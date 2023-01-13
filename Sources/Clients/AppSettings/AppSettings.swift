@@ -1,5 +1,4 @@
 import ClientPrelude
-import Profile
 
 // MARK: - AppSettings
 public struct AppSettings: Sendable, Codable, Hashable {
