@@ -1,5 +1,5 @@
 import Cryptography
-import struct EngineToolkit.NetworkID
+import EngineToolkitModels
 import Prelude
 
 public extension NetworkID {

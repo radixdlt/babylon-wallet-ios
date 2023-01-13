@@ -1,8 +1,5 @@
-import EngineToolkit
+import EngineToolkitModels
 import Prelude
-
-// MARK: - NonEmpty + Sendable
-extension NonEmpty: @unchecked Sendable where Element: Sendable {}
 
 // MARK: - OnNetwork
 /// **For a given network**: a list of accounts, personas and connected dApps.
@@ -18,13 +15,25 @@ public struct OnNetwork:
 	public let networkID: NetworkID
 
 	/// Accounts created by the user for this network.
-	public internal(set) var accounts: NonEmpty<OrderedSet<Account>>
+	public var accounts: NonEmpty<OrderedSet<Account>>
 
 	/// Personas created by the user for this network.
-	public internal(set) var personas: OrderedSet<Persona>
+	public var personas: OrderedSet<Persona>
 
 	/// ConnectedDapp the user has connected with on this network.
-	public internal(set) var connectedDapps: OrderedSet<ConnectedDapp>
+	public var connectedDapps: OrderedSet<ConnectedDapp>
+
+	public init(
+		networkID: NetworkID,
+		accounts: NonEmpty<OrderedSet<Account>>,
+		personas: OrderedSet<Persona>,
+		connectedDapps: OrderedSet<ConnectedDapp>
+	) {
+		self.networkID = networkID
+		self.accounts = accounts
+		self.personas = personas
+		self.connectedDapps = connectedDapps
+	}
 }
 
 public extension OnNetwork {

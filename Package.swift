@@ -448,6 +448,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			"EngineToolkit",
+			"ProfileModels",
 			"P2PModels",
 		],
 		tests: .yes(
@@ -456,6 +457,16 @@ package.addModules([
 				.process("TestVectors/"),
 			]
 		)
+	),
+	.module(
+		name: "ProfileModels",
+		category: "Profile",
+		dependencies: [
+			"Cryptography",
+			"EngineToolkitModels",
+			"P2PModels",
+		],
+		tests: .no
 	),
 	.module(
 		name: "ProfileView",

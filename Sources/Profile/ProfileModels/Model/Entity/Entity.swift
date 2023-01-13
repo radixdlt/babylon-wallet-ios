@@ -1,5 +1,5 @@
 import Cryptography
-import EngineToolkit
+import EngineToolkitModels
 import Prelude
 
 // MARK: - EntityProtocol
@@ -29,20 +29,4 @@ public protocol EntityProtocol {
 
 	/// An optional displayName or label, used by presentation layer only.
 	var displayName: String? { get }
-}
-
-public extension EntityProtocol {
-	static func deriveAddress(
-		networkID: NetworkID,
-		publicKey: SLIP10.PublicKey
-	) throws -> EntityAddress {
-		let response = try EngineToolkit().deriveVirtualAccountAddressRequest(
-			request: .init(
-				publicKey: publicKey.intoEngine(),
-				networkId: networkID
-			)
-		).get()
-
-		return try EntityAddress(address: response.virtualAccountAddress.address)
-	}
 }
