@@ -108,7 +108,7 @@ package.addModules([
 			"CreateAccountFeature",
 			"ProfileClient",
 		],
-		tests: .yes(dependencies: [])
+		tests: .yes()
 	),
 	.feature(
 		name: "HandleDappRequests",
