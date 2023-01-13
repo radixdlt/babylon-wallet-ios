@@ -4,33 +4,25 @@ import TestingPrelude
 // MARK: - TestVectorsTests
 final class TestVectorsTests: TestCase {
 	func testVectors10() throws {
-		try orFail {
-			try testFixture(
-				bundle: .module,
-				jsonName: "slip10_tests_#10"
-			) { (testFile: TestFile) in
-				try orFail {
-					try doTestFile(
-						testFile: testFile
-					)
-				}
-			}
+		try testFixture(
+			bundle: .module,
+			jsonName: "slip10_tests_#10"
+		) { (testFile: TestFile) in
+			try doTestFile(
+				testFile: testFile
+			)
 		}
 	}
 
 	// With optimization flag takes ~3 sec on a Mac Studio.
 	func testVectors1K() throws {
-		try orFail {
-			try testFixture(
-				bundle: .module,
-				jsonName: "slip10_tests_#1000"
-			) { (testFile: TestFile) in
-				try orFail {
-					try doTestFile(
-						testFile: testFile
-					)
-				}
-			}
+		try testFixture(
+			bundle: .module,
+			jsonName: "slip10_tests_#1000"
+		) { (testFile: TestFile) in
+			try doTestFile(
+				testFile: testFile
+			)
 		}
 	}
 }
@@ -42,12 +34,10 @@ private extension TestVectorsTests {
 	) throws {
 		print("✨ Testing group with #\(testFile.testGroups.reduce(0) { $0 + $1.testScenarios.map(\.childKeys.count).reduce(0, +) }) test scenarios", terminator: "")
 		for group in testFile.testGroups {
-			try orFail {
-				try doTestGroup(
-					group: group,
-					file: file, line: line
-				)
-			}
+			try doTestGroup(
+				group: group,
+				file: file, line: line
+			)
 		}
 		print(" - PASSED ✅")
 	}
@@ -85,9 +75,7 @@ private extension TestVectorsTests {
 		}
 
 		for (testScenarioIndex, testScenario) in group.testScenarios.enumerated() {
-			try orFail {
-				try doTestScenario(root: root, testScenario: testScenario, groupId: group.groupId, testScenarioIndex: testScenarioIndex)
-			}
+			try doTestScenario(root: root, testScenario: testScenario, groupId: group.groupId, testScenarioIndex: testScenarioIndex)
 		}
 	}
 
@@ -185,11 +173,19 @@ enum Slip10Curve: String, Decodable, Hashable {
 	case curve25519 = "ed25519"
 
 	init(curveType: Slip10CurveType) {
-		switch curveType {
-		case .secp256k1: self = .secp256k1
-		case .p256: self = .p256
-		case .curve25519: self = .curve25519
-		default: fatalError("Unsupported curve")
+		if #available(macOS 13, iOS 16, *) {
+			switch curveType {
+			case .secp256k1: self = .secp256k1
+			case .p256: self = .p256
+			case .curve25519: self = .curve25519
+			default: fatalError("Unsupported curve")
+			}
+		} else {
+			switch curveType {
+			case .secp256k1: self = .secp256k1
+			case .curve25519: self = .curve25519
+			default: fatalError("Unsupported curve")
+			}
 		}
 	}
 
@@ -197,7 +193,11 @@ enum Slip10Curve: String, Decodable, Hashable {
 		switch self {
 		case .curve25519: return .curve25519
 		case .secp256k1: return .secp256k1
-		case .p256: return .p256
+		case .p256: if #available(macOS 13, iOS 16, *) {
+				return .p256
+			} else {
+				fatalError("unsupported")
+			}
 		}
 	}
 }
@@ -232,12 +232,16 @@ extension HD.Root {
 			)
 
 		case .p256:
-			return try .init(
-				concrete: derivePrivateKey(
-					path: path,
-					curve: P256.self
+			if #available(macOS 13, iOS 16, *) {
+				return try .init(
+					concrete: derivePrivateKey(
+						path: path,
+						curve: P256.self
+					)
 				)
-			)
+			} else {
+				fatalError("unsupported")
+			}
 		}
 	}
 }
@@ -342,7 +346,7 @@ struct TestGroup: Decodable, Equatable {
 	let testScenarios: [TestScenario]
 
 	enum CodingKeys: String, CodingKey {
-		case groupId, seed, mnemonicPhrase, entropy, passphrase, masterKeys, testScenarios
+		case groupId, seed, mnemonicPhrase, entropy, passphrase, masterKeys, testScenarios = "testCases"
 	}
 
 	init(from decoder: Decoder) throws {

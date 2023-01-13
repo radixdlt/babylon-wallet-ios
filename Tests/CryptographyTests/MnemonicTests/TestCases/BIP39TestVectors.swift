@@ -113,34 +113,26 @@ struct JapaneseVectors: Decodable {
 // MARK: - BIP39TestVectors
 final class BIP39TestVectors: TestCase {
 	func testEnglishVectors() throws {
-		try orFail {
-			try testFixture(
-				bundle: .module,
-				jsonName: "bip39_english_test_vectors"
-			) { (vectors: EnglishVectors) in
-				try orFail {
-					try doTest(
-						vectors: vectors.vectors,
-						language: .english
-					)
-				}
-			}
+		try testFixture(
+			bundle: .module,
+			jsonName: "bip39_english_test_vectors"
+		) { (vectors: EnglishVectors) in
+			try doTest(
+				vectors: vectors.vectors,
+				language: .english
+			)
 		}
 	}
 
 	func testJapanseVectors() throws {
-		try orFail {
-			try testFixture(
-				bundle: .module,
-				jsonName: "bip39_japanese_test_vectors"
-			) { (vectors: JapaneseVectors) in
-				try orFail {
-					try doTest(
-						vectors: vectors.vectors,
-						language: .japanese
-					)
-				}
-			}
+		try testFixture(
+			bundle: .module,
+			jsonName: "bip39_japanese_test_vectors"
+		) { (vectors: JapaneseVectors) in
+			try doTest(
+				vectors: vectors.vectors,
+				language: .japanese
+			)
 		}
 	}
 }

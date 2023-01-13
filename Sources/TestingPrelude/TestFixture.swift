@@ -21,13 +21,17 @@ public extension XCTestCase {
 		line: UInt = #line,
 		testFunction: (T) throws -> Void
 	) throws {
-		let fileURL = bundle.url(forResource: jsonName, withExtension: ".json")
+		let fileURL = try XCTUnwrap(
+			bundle.url(forResource: jsonName, withExtension: ".json"),
+			file: file,
+			line: line
+		)
 
-		let data = try orFail(file: file, line: line) { try Data(contentsOf: unwrap(fileURL, file: file, line: line)) }
+		let data = try Data(contentsOf: fileURL)
 
 		let decoder = JSONDecoder()
-		let test = try orFail(file: file, line: line) { try decoder.decode(T.self, from: data) }
+		let test = try decoder.decode(T.self, from: data)
 
-		try orFail(file: file, line: line) { try testFunction(test) }
+		try testFunction(test)
 	}
 }

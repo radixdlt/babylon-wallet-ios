@@ -160,7 +160,7 @@ public extension HD.Path {
 		public var onlyPublic: Bool {
 			switch components[0] {
 			case let .root(onlyPublic): return onlyPublic
-			case .child: fatalError()
+			case .child: fatalError("A child component does not contain information about wether the root specifies only public or not.")
 			}
 		}
 

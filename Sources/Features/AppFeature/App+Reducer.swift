@@ -34,7 +34,10 @@ public struct App: Sendable, ReducerProtocol {
 		case .internal(.view(.task)):
 			return .run { send in
 				for try await error in errorQueue.errors() {
-					print("An error occurred", String(describing: error))
+					if !_XCTIsTesting {
+						// easy to think a test failed if we print this warning during tests.
+						loggerGlobal.error("An error occurred: \(String(describing: error))")
+					}
 					await send(.internal(.system(.displayErrorAlert(UserFacingError(error)))))
 				}
 			}
