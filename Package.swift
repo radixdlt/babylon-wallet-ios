@@ -640,7 +640,7 @@ extension Package {
 				name: name,
 				category: "Core",
 				remoteDependencies: remoteDependencies,
-				dependencies: dependencies + ["Prelude"],
+				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
 				plugins: plugins,
@@ -775,8 +775,23 @@ extension Target.PluginUsage {
 
 extension Package {
 	func addDependencyIfNeeded(_ dependency: Package.Dependency) {
-		if !package.dependencies.contains(where: { $0.url == dependency.url }) {
+		if !package.dependencies.contains(where: { $0.id == dependency.id }) {
 			package.dependencies.append(dependency)
+		}
+	}
+}
+
+extension Package.Dependency {
+	var id: String {
+		switch kind {
+		case let .fileSystem(_, path):
+			return path
+		case let .registry(id, _):
+			return id
+		case let .sourceControl(_, url, _):
+			return url
+		@unknown default:
+			fatalError()
 		}
 	}
 }
