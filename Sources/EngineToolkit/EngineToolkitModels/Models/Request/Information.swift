@@ -1,5 +1,7 @@
 // MARK: - InformationRequest
-public struct InformationRequest: Sendable, Codable, Hashable {}
+public struct InformationRequest: Sendable, Codable, Hashable {
+	public init() {}
+}
 
 // MARK: - InformationResponse
 public struct InformationResponse: Sendable, Codable, Hashable {

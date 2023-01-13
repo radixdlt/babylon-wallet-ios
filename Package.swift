@@ -430,7 +430,7 @@ package.addModules([
 		name: "SharedModels",
 		dependencies: [
 			"Asset",
-			"EngineToolkit", // FIXME: In `EngineToolkit` split out Models package
+			"EngineToolkitModels",
 			"Profile", // FIXME: In `Profile` split out Models package
 			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
 			"P2PModels",
@@ -470,6 +470,7 @@ package.addModules([
 		category: "EngineToolkit",
 		dependencies: [
 			"Cryptography",
+			"EngineToolkitModels",
 			"RadixEngineToolkit",
 		],
 		tests: .yes(
@@ -478,6 +479,14 @@ package.addModules([
 				.process("TestVectors/"),
 			]
 		)
+	),
+	.module(
+		name: "EngineToolkitModels",
+		category: "EngineToolkit",
+		dependencies: [
+			"Cryptography",
+		],
+		tests: .no
 	),
 	.module(
 		name: "P2PConnection",

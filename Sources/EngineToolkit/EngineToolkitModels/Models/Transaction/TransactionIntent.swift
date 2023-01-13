@@ -10,12 +10,3 @@ public struct TransactionIntent: Sendable, Codable, Hashable {
 		self.manifest = manifest
 	}
 }
-
-public extension TransactionIntent {
-	func accountsRequiredToSign() throws -> Set<ComponentAddress> {
-		try manifest.accountsRequiredToSign(
-			networkId: header.networkId,
-			version: header.version
-		)
-	}
-}

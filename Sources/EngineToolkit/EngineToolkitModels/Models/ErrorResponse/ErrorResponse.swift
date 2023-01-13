@@ -177,12 +177,18 @@ public struct UnrecognizedAddressFormat: EmptyErrorResponseProtocol {
 public struct SborDecodeError: ErrorResponseWithStringValueProtocol {
 	public static let errorKind: ErrorKind = .sborDecodeError
 	public let value: String
+	public init(value: String) {
+		self.value = value
+	}
 }
 
 // MARK: - SborEncodeError
 public struct SborEncodeError: ErrorResponseWithStringValueProtocol {
 	public static let errorKind: ErrorKind = .sborEncodeError
 	public let value: String
+	public init(value: String) {
+		self.value = value
+	}
 }
 
 // MARK: - DeserializationError
@@ -190,12 +196,18 @@ public struct SborEncodeError: ErrorResponseWithStringValueProtocol {
 public struct DeserializationError: ErrorResponseWithStringValueProtocol {
 	public static let errorKind: ErrorKind = .deserializationError
 	public let value: String
+	public init(value: String) {
+		self.value = value
+	}
 }
 
 // MARK: - InvalidRequestString
 public struct InvalidRequestString: ErrorResponseWithStringValueProtocol {
 	public static let errorKind: ErrorKind = .invalidRequestString
 	public let value: String
+	public init(value: String) {
+		self.value = value
+	}
 }
 
 // MARK: - UnexpectedContents

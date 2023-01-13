@@ -1,4 +1,5 @@
 import Cryptography
+import EngineToolkitModels
 import Prelude
 
 public extension TransactionManifest {

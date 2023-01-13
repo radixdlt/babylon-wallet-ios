@@ -1,4 +1,5 @@
-import Foundation
+import EngineToolkitModels
+import Prelude
 
 // MARK: - EngineToolkit.Error
 public extension EngineToolkit {
