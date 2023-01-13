@@ -1,6 +1,6 @@
 #if DEBUG
 import Prelude
-import Profile
+import ProfileModels
 
 public extension OnNetwork.Account {
 	static var previewValue0: Self {
