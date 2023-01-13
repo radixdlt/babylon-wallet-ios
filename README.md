@@ -49,8 +49,7 @@ A blanket rule for what to import in which situation is:
 - If you're writing tests:
   - Import the module you're testing (automatically linked to its corresponding test target).
   - `import TestingPrelude` (automatically linked to all test targets).
-  - Link and import any client or core modules your tests depend on (e.g. `EngineToolkitClient`, `Cryptography`).
-  - Link and `import SharedTestingModels` if needed.
+  - Link and import any client or core modules your tests depend on (e.g. `EngineToolkitClient`, `Cryptography`, `SharedTestingModels`).
 
 # Navigation
 We are not doing navigation, for now. We defer choice of Navigation solution to "as late as possible". What this means is that we do not use any navigation stack, maybe no NavigationView, at all, for now. So we will have zero transition animation, and no automatic means of "go back" (which means that *for now* we will not try to impl any "go back" logic at all).
