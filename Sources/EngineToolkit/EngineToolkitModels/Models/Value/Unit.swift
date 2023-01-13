@@ -7,6 +7,8 @@ public struct Unit: ValueProtocol, Sendable, Codable, Hashable {
 	public func embedValue() -> Value_ {
 		.unit(self)
 	}
+
+	public init() {}
 }
 
 public extension Unit {
