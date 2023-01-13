@@ -185,8 +185,10 @@ final class ProfileTests: TestCase {
 
 		let snapshot = profile.snaphot()
 		let jsonEncoder = JSONEncoder.iso8601
-		let data = try jsonEncoder.encode(snapshot)
-		print(String(data: data, encoding: .utf8)!)
+		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
+		// let data = try jsonEncoder.encode(snapshot)
+		/* Uncomment to generate a new test vector */
+//		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {

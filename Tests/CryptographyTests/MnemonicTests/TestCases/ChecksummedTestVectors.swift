@@ -38,21 +38,17 @@ struct ChecksummedVectors: Decodable, Equatable {
 // MARK: - ChecksummedTestVectors
 final class ChecksummedTestVectors: TestCase {
 	func testChecksummedWithWordCountOf12() throws {
-		try orFail {
-			try doTestChecksummed(
-				jsonName: "bip39_iancoleman_generated_checksummed_wordcount_of_12",
-				language: .english
-			)
-		}
+		try doTestChecksummed(
+			jsonName: "bip39_iancoleman_generated_checksummed_wordcount_of_12",
+			language: .english
+		)
 	}
 
 	func testChecksummedWithWordCountOf24() throws {
-		try orFail {
-			try doTestChecksummed(
-				jsonName: "bip39_iancoleman_generated_checksummed_wordcount_of_24",
-				language: .english
-			)
-		}
+		try doTestChecksummed(
+			jsonName: "bip39_iancoleman_generated_checksummed_wordcount_of_24",
+			language: .english
+		)
 	}
 }
 
@@ -62,19 +58,15 @@ private extension ChecksummedTestVectors {
 		language: BIP39.Language,
 		file: StaticString = #file, line: UInt = #line
 	) throws {
-		try orFail {
-			try testFixture(
-				bundle: .module,
-				jsonName: jsonName
-			) { (vectors: ChecksummedVectors) in
-				try orFail {
-					try doTest(
-						vectors: vectors.vectors,
-						language: language,
-						file: file, line: line
-					)
-				}
-			}
+		try testFixture(
+			bundle: .module,
+			jsonName: jsonName
+		) { (vectors: ChecksummedVectors) in
+			try doTest(
+				vectors: vectors.vectors,
+				language: language,
+				file: file, line: line
+			)
 		}
 	}
 
@@ -95,7 +87,7 @@ private extension ChecksummedTestVectors {
 	func doTest(
 		vector: ChecksummedVector,
 		language: BIP39.Language,
-		file: StaticString = #file, line: UInt = #line
+		file: StaticString = #filePath, line: UInt = #line
 	) throws {
 		let mnemonic = try Mnemonic(phrase: vector.mnemonic, language: language)
 		let seed = try mnemonic.seed()

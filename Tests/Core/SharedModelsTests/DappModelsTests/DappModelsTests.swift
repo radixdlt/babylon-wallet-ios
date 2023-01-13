@@ -20,7 +20,6 @@ final class ToDappResponseTests: TestCase {
 		let encoder = JSONEncoder()
 		let jsonData = try encoder.encode(response)
 		let jsonString = try XCTUnwrap(jsonData.prettyPrintedJSONString)
-		print(jsonString)
 		XCTAssertTrue(jsonString.contains(P2P.FromDapp.Discriminator.oneTimeAccountsRead.rawValue))
 	}
 

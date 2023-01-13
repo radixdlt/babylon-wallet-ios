@@ -2,6 +2,9 @@ import Dependencies
 import Foundation
 import KeychainAccess
 
+// MARK: - Keychain + Sendable
+extension Keychain: @unchecked Sendable {}
+
 public extension DependencyValues {
 	var keychainClient: KeychainClient {
 		get { self[KeychainClient.self] }

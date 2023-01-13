@@ -41,7 +41,6 @@ final class HomeFeatureTests: TestCase {
 		let btcContainer = FungibleTokenContainer(owner: address, asset: .btc, amount: "1234", worth: 1234)
 		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amount: "2345", worth: 2345)
 		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amount: "3456", worth: 3456)
-		let expectedAggregatedValue: Float = 7035
 
 		// non fungible tokens
 		let nftContainer1 = NonFungibleTokenContainer.mock1
@@ -79,7 +78,7 @@ final class HomeFeatureTests: TestCase {
 			$0.accountList.accounts[id: address]!.portfolio = accountPortfolio
 
 			// account details
-			if let details = $0.accountDetails {
+			if $0.accountDetails != nil {
 				// asset list
 				let sortedCategories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 

@@ -22,7 +22,7 @@ private func makeLogger(
 	}
 }
 
-public var loggerGlobal = makeLogger(label: baseLabel)
+public let loggerGlobal = makeLogger(label: baseLabel)
 
 public extension Logger {
 	func feature(

@@ -222,16 +222,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PasteboardClientTests"
-               BuildableName = "PasteboardClientTests"
-               BlueprintName = "PasteboardClientTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "ProfileClientTests"
                BuildableName = "ProfileClientTests"
                BlueprintName = "ProfileClientTests"
@@ -275,16 +265,6 @@
                BlueprintIdentifier = "TransactionSigningFeatureTests"
                BuildableName = "TransactionSigningFeatureTests"
                BlueprintName = "TransactionSigningFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "UserDefaultsClientTests"
-               BuildableName = "UserDefaultsClientTests"
-               BlueprintName = "UserDefaultsClientTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -392,45 +372,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CryptographyTests"
-               BuildableName = "CryptographyTests"
-               BlueprintName = "CryptographyTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-            <SkippedTests>
-               <Test
-                  Identifier = "SLIP10TestVectorsTests/testDerivationRetryP256()">
-               </Test>
-               <Test
-                  Identifier = "SLIP10TestVectorsTests/testP256PublicKeyInit()">
-               </Test>
-               <Test
-                  Identifier = "SLIP10TestVectorsTests/testSeedRetryForP256()">
-               </Test>
-               <Test
-                  Identifier = "SLIP10TestVectorsTests/testSlip10Vector1P256()">
-               </Test>
-               <Test
-                  Identifier = "SLIP10TestVectorsTests/testSlip10Vector2P256()">
-               </Test>
-               <Test
-                  Identifier = "SerializeTests/testAtZeroHardenedXPUBP256()">
-               </Test>
-               <Test
-                  Identifier = "SerializeTests/testMasterKeyXPUBP256()">
-               </Test>
-               <Test
-                  Identifier = "TestVectorsTests/testVectors10()">
-               </Test>
-               <Test
-                  Identifier = "TestVectorsTests/testVectors1K()">
-               </Test>
-            </SkippedTests>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "P2PConnectionTests"
                BuildableName = "P2PConnectionTests"
                BlueprintName = "P2PConnectionTests"
@@ -464,6 +405,16 @@
                BlueprintIdentifier = "ProfileTests"
                BuildableName = "ProfileTests"
                BlueprintName = "ProfileTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "CryptographyTests"
+               BuildableName = "CryptographyTests"
+               BlueprintName = "CryptographyTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
