@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Profile
 
 // MARK: - CreateAccountCoordinator.Action
 public extension CreateAccountCoordinator {

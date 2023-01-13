@@ -7,7 +7,7 @@ import FeaturePrelude
 import FungibleTokenListFeature
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
-import Profile
+import ProfileClient
 import TransactionSigningFeature
 
 // MARK: - Home

@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Profile
 
 // MARK: - ChooseAccounts.Row.View
 public extension ChooseAccounts.Row {

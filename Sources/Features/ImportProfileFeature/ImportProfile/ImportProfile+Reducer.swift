@@ -1,5 +1,5 @@
 import FeaturePrelude
-import Profile
+import ProfileClient
 
 // MARK: - ImportProfile
 public struct ImportProfile: Sendable, ReducerProtocol {

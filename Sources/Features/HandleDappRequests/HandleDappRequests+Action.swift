@@ -1,7 +1,6 @@
 import FeaturePrelude
 import GrantDappWalletAccessFeature
 import P2PConnection
-import Profile
 import TransactionSigningFeature
 
 // MARK: - HandleDappRequests.Action

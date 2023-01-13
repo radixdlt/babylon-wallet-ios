@@ -7,7 +7,6 @@ import CreateAccountFeature
 import FeaturePrelude
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
-import Profile
 import TransactionSigningFeature
 
 // MARK: - Home.Action

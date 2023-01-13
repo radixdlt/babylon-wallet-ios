@@ -106,6 +106,7 @@ package.addModules([
 		name: "GrantDappWalletAccessFeature",
 		dependencies: [
 			"CreateAccountFeature",
+			"ProfileClient",
 		],
 		tests: .yes(dependencies: [])
 	),
@@ -126,9 +127,10 @@ package.addModules([
 			"AccountPortfolio",
 			"AccountPreferencesFeature",
 			"AppSettings",
-			"P2PConnectivityClient",
 			"CreateAccountFeature",
 			"GrantDappWalletAccessFeature",
+			"P2PConnectivityClient",
+			"ProfileClient",
 			"TransactionSigningFeature",
 		],
 		tests: .yes(
