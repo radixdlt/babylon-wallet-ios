@@ -389,6 +389,7 @@ package.addModules([
 		name: "SharedModels",
 		dependencies: [
 			"EngineToolkitModels",
+			"EngineToolkit", // first to remove
 			"ProfileModels",
 			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
 			"P2PModels",
