@@ -1,6 +1,6 @@
-import EngineToolkit
+import EngineToolkitModels
 import Prelude
-import Profile
+import ProfileModels
 
 // MARK: - NonFungibleToken
 public struct NonFungibleToken: Sendable, Token, Hashable {

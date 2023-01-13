@@ -1,9 +1,9 @@
-import EngineToolkit
+import EngineToolkitModels
 import Prelude
-import Profile
+import ProfileModels
 
-// MARK: - Badge
-public struct Badge: Asset {
+// MARK: - PoolShare
+public struct PoolShare: Asset {
 	public let componentAddress: ComponentAddress
 
 	public init(
@@ -13,18 +13,18 @@ public struct Badge: Asset {
 	}
 }
 
-// MARK: - BadgeContainer
-public struct BadgeContainer: AssetContainer {
+// MARK: - PoolShareContainer
+public struct PoolShareContainer: AssetContainer {
 	public var owner: AccountAddress
-	public typealias T = Badge
-	public var asset: Badge
+	public typealias T = PoolShare
+	public var asset: PoolShare
 
 	/// Metadata unique to this asset.
 	public var metadata: [String: String]?
 
 	public init(
 		owner: AccountAddress,
-		asset: Badge,
+		asset: PoolShare,
 		metadata: [String: String]?
 	) {
 		self.owner = owner

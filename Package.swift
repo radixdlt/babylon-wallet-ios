@@ -21,8 +21,6 @@ package.addModules([
 			"AccountListFeature",
 			"AccountPreferencesFeature",
 			"AssetsViewFeature",
-			"EngineToolkit",
-			"Profile",
 		],
 		tests: .yes(
 			dependencies: [
@@ -35,7 +33,6 @@ package.addModules([
 		dependencies: [
 			"AccountPortfolio",
 			"FungibleTokenListFeature",
-			"ProfileClient",
 		],
 		tests: .yes(
 			dependencies: [
@@ -60,16 +57,13 @@ package.addModules([
 		dependencies: [
 			"AccountPortfolio",
 			"AppSettings",
-			"EngineToolkit",
 			"MainFeature",
 			"OnboardingFeature",
 			"ProfileLoader",
-			"ProfileClient",
 			"SplashFeature",
 		],
 		tests: .yes(
 			dependencies: [
-				"ProfileClient",
 				"SplashFeature",
 			]
 		)
@@ -89,7 +83,6 @@ package.addModules([
 			"EngineToolkit",
 			"GatewayAPI",
 			"LocalAuthenticationClient",
-			"ProfileClient",
 		],
 		tests: .yes(
 			dependencies: [
@@ -107,30 +100,20 @@ package.addModules([
 		dependencies: [
 			"FungibleTokenDetailsFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				"Profile",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "GrantDappWalletAccessFeature",
 		dependencies: [
 			"CreateAccountFeature",
-			"ProfileClient",
 		],
-		tests: .yes(
-			dependencies: [
-				"ProfileClient",
-			]
-		)
+		tests: .yes(dependencies: [])
 	),
 	.feature(
 		name: "HandleDappRequests",
 		dependencies: [
 			"GrantDappWalletAccessFeature",
 			"P2PConnectivityClient",
-			"Profile",
 			"TransactionSigningFeature",
 		],
 		tests: .yes()
@@ -145,9 +128,7 @@ package.addModules([
 			"AppSettings",
 			"P2PConnectivityClient",
 			"CreateAccountFeature",
-			"EngineToolkit",
 			"GrantDappWalletAccessFeature",
-			"ProfileClient",
 			"TransactionSigningFeature",
 		],
 		tests: .yes(
@@ -161,7 +142,6 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Cryptography",
-			"ProfileClient",
 		],
 		tests: .yes(
 			dependencies: [],
@@ -184,7 +164,6 @@ package.addModules([
 		dependencies: [
 			"NewConnectionFeature",
 			"P2PConnectivityClient",
-			"ProfileClient",
 		],
 		tests: .yes()
 	),
@@ -193,7 +172,6 @@ package.addModules([
 		dependencies: [
 			"CreateAccountFeature",
 			"GatewayAPI",
-			"ProfileClient",
 		],
 		tests: .yes()
 	),
@@ -210,9 +188,7 @@ package.addModules([
 	),
 	.feature(
 		name: "NonFungibleTokenListFeature",
-		dependencies: [
-			"EngineToolkit",
-		],
+		dependencies: [],
 		tests: .yes()
 	),
 	.feature(
@@ -230,7 +206,6 @@ package.addModules([
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
-			"ProfileClient",
 			"ProfileView",
 		],
 		tests: .yes()
@@ -239,7 +214,6 @@ package.addModules([
 		name: "SplashFeature",
 		dependencies: [
 			"LocalAuthenticationClient",
-			"ProfileClient",
 			"ProfileLoader",
 		],
 		tests: .yes()
@@ -247,9 +221,7 @@ package.addModules([
 	.feature(
 		name: "TransactionSigningFeature",
 		dependencies: [
-			"EngineToolkitClient",
 			"GatewayAPI",
-			"ProfileClient",
 			"TransactionClient",
 		],
 		tests: .yes()
@@ -263,17 +235,13 @@ package.addModules([
 		name: "AccountPortfolio",
 		dependencies: [
 			"AppSettings",
-			"EngineToolkit",
 			"GatewayAPI",
-			"Profile",
 		],
 		tests: .yes()
 	),
 	.client(
 		name: "AppSettings",
-		dependencies: [
-			"Profile",
-		],
+		dependencies: [],
 		tests: .yes()
 	),
 	.client(
@@ -285,19 +253,13 @@ package.addModules([
 		name: "EngineToolkitClient",
 		dependencies: [
 			"Cryptography",
-			"EngineToolkit",
-			"Profile", // AccountAddress
 		],
 		tests: .yes()
 	),
 	.client(
 		name: "FaucetClient",
 		dependencies: [
-			"EngineToolkit",
-			"EngineToolkitClient",
 			"GatewayAPI",
-			"Profile",
-			"ProfileClient",
 			"TransactionClient",
 		], tests: .no
 	),
@@ -309,8 +271,6 @@ package.addModules([
 				.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6")
 			},
 			"Cryptography",
-			"EngineToolkitClient",
-			"ProfileClient",
 		],
 		exclude: [
 			"CodeGen/Input/",
@@ -325,9 +285,6 @@ package.addModules([
 	.client(
 		name: "P2PConnectivityClient",
 		dependencies: [
-			"EngineToolkit", // Model: SignTX contains Manifest
-			"Profile", // Account
-			"ProfileClient",
 			"P2PConnection",
 		],
 		tests: .yes()
@@ -336,24 +293,19 @@ package.addModules([
 		name: "ProfileClient",
 		dependencies: [
 			"Cryptography",
-			"EngineToolkitClient", // Create TX
-			"Profile",
 			"ProfileLoader",
 		],
 		tests: .yes()
 	),
 	.client(
 		name: "ProfileLoader",
-		dependencies: [
-			"Profile",
-		],
+		dependencies: [],
 		tests: .yes()
 	),
 	.client(
 		name: "TransactionClient",
 		dependencies: [
 			"GatewayAPI",
-			"ProfileClient",
 		],
 		tests: .yes()
 	),
@@ -381,14 +333,6 @@ package.addModules([
 			"SharedModels",
 		],
 		tests: .no
-	),
-	.core(
-		name: "Asset", // put in SharedModels
-		dependencies: [
-			"EngineToolkit",
-			"Profile", // Address
-		],
-		tests: .yes()
 	),
 	.core(
 		name: "DesignSystem",
@@ -429,7 +373,6 @@ package.addModules([
 	.core(
 		name: "SharedModels",
 		dependencies: [
-			"Asset",
 			"EngineToolkitModels",
 			"ProfileModels",
 			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels

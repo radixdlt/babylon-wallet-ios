@@ -1,5 +1,5 @@
 import Prelude
-import Profile
+import ProfileModels
 
 // MARK: - AssetContainer
 public protocol AssetContainer: Sendable, Identifiable, Equatable {
