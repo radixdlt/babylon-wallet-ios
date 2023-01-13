@@ -80,7 +80,6 @@ package.addModules([
 		name: "CreateAccountFeature",
 		dependencies: [
 			"Cryptography",
-			"EngineToolkit",
 			"GatewayAPI",
 			"LocalAuthenticationClient",
 		],
@@ -271,6 +270,7 @@ package.addModules([
 				.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6")
 			},
 			"Cryptography",
+			"ProfileClient",
 		],
 		exclude: [
 			"CodeGen/Input/",
@@ -299,7 +299,9 @@ package.addModules([
 	),
 	.client(
 		name: "ProfileLoader",
-		dependencies: [],
+		dependencies: [
+			"Profile",
+		],
 		tests: .yes()
 	),
 	.client(

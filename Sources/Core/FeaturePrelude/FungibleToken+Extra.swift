@@ -1,5 +1,5 @@
-import Asset
 import Resources
+import SharedModels
 
 public extension FungibleToken {
 	var placeholderImage: ImageAsset {

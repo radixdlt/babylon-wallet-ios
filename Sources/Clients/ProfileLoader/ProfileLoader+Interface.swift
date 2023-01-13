@@ -1,5 +1,4 @@
 import ClientPrelude
-import Profile
 
 // MARK: - ProfileLoader
 public struct ProfileLoader: Sendable, DependencyKey {

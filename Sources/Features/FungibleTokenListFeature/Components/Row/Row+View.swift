@@ -1,5 +1,4 @@
 import FeaturePrelude
-import Profile
 
 // MARK: - FungibleTokenList.Row.View
 public extension FungibleTokenList.Row {
