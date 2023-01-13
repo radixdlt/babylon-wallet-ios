@@ -1,6 +1,5 @@
 import FeaturePrelude
 @testable import GrantDappWalletAccessFeature
-import Profile
 import TestingPrelude
 
 @MainActor

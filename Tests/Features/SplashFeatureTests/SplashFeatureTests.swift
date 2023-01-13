@@ -1,6 +1,5 @@
 import FeaturePrelude
 import LocalAuthenticationClient
-import Profile
 import ProfileLoader
 @testable import SplashFeature
 import TestingPrelude

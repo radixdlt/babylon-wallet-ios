@@ -1,4 +1,4 @@
-@testable import Asset
+import SharedModels
 import TestingPrelude
 
 final class AssetTests: TestCase {

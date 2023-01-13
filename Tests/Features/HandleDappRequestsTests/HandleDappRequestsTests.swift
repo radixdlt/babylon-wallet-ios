@@ -1,7 +1,5 @@
 import FeaturePrelude
 @testable import HandleDappRequests
-import P2PConnection
-import Profile
 import TestingPrelude
 
 @MainActor

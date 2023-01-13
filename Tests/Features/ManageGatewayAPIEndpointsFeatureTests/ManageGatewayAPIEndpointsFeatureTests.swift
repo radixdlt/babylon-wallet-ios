@@ -1,6 +1,5 @@
 import FeaturePrelude
 import ManageGatewayAPIEndpointsFeature
-import Profile
 import TestingPrelude
 
 // MARK: - ManageGatewayAPIEndpointsFeatureTests
@@ -237,7 +236,6 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 	}
 }
 
-import ProfileClient
 #if DEBUG
 
 public extension URL {

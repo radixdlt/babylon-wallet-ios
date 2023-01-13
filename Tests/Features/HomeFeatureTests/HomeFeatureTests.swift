@@ -5,7 +5,6 @@ import FeaturePrelude
 import FungibleTokenListFeature
 @testable import HomeFeature
 import NonFungibleTokenListFeature
-import Profile
 import TestingPrelude
 
 @MainActor
