@@ -236,6 +236,7 @@ package.addModules([
 		dependencies: [
 			"AppSettings",
 			"GatewayAPI",
+			"ProfileClient",
 		],
 		tests: .yes()
 	),
@@ -253,13 +254,17 @@ package.addModules([
 		name: "EngineToolkitClient",
 		dependencies: [
 			"Cryptography",
+			"EngineToolkit",
+			"Profile",
 		],
 		tests: .yes()
 	),
 	.client(
 		name: "FaucetClient",
 		dependencies: [
+			"EngineToolkitClient",
 			"GatewayAPI",
+			"ProfileClient",
 			"TransactionClient",
 		], tests: .no
 	),
@@ -310,7 +315,9 @@ package.addModules([
 	.client(
 		name: "TransactionClient",
 		dependencies: [
+			"EngineToolkitClient",
 			"GatewayAPI",
+			"ProfileClient",
 		],
 		tests: .yes()
 	),

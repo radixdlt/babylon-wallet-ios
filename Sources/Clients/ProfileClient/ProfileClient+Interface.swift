@@ -1,8 +1,5 @@
 import ClientPrelude
 import Cryptography
-import EngineToolkit
-import P2PModels
-import Profile
 
 // MARK: - CreateNewProfileRequest
 public struct CreateNewProfileRequest: Sendable {

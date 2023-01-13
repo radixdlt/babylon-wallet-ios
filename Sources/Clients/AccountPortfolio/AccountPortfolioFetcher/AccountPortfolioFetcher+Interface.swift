@@ -1,5 +1,5 @@
 import ClientPrelude
-import Profile
+import struct Profile.AccountAddress // FIXME: should probably be in ProfileModels so we can remove this import altogether
 
 // MARK: - AccountPortfolioFetcher
 public struct AccountPortfolioFetcher: Sendable {
