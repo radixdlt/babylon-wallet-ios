@@ -29,7 +29,7 @@ public extension AssetTransfer.View {
 					}
 
 					TextField(
-						"From",
+						"XRD amount",
 						text: viewStore.binding(
 							get: \.amount,
 							send: { .amountTextFieldChanged($0) }
@@ -41,7 +41,7 @@ public extension AssetTransfer.View {
 					VStack(alignment: .leading) {
 						Text("To")
 						TextField(
-							"To",
+							"To address",
 							text: viewStore.binding(
 								get: \.toAddress,
 								send: { .toAddressTextFieldChanged($0) }
