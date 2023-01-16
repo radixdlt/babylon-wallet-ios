@@ -12,7 +12,7 @@ public extension AssetTransfer {
 		}
 
 		public enum To: Sendable, Equatable {
-			case account(OnNetwork.Account)
+//			case account(OnNetwork.Account)
 			case address(AccountAddress)
 		}
 

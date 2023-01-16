@@ -8,6 +8,17 @@ public struct AssetTransfer: Sendable, ReducerProtocol {
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
-		.none
+		switch action {
+		case .internal(.view(.appeared)):
+			return .none
+		case let .internal(.view(.amountTextFieldChanged(amount))):
+			state.amount = .init(value: amount)
+			return .none
+		case let .internal(.view(.toAddressTextFieldChanged(address))):
+			if let address = try? AccountAddress(address: address) {
+				state.to = .address(address)
+			}
+			return .none
+		}
 	}
 }

@@ -19,9 +19,41 @@ public extension AssetTransfer.View {
 			store,
 			observe: ViewState.init(state:),
 			send: { .view($0) }
-		) { _ in
-			TextField("", text: .constant(""), prompt: Text("Enter amount"))
-				.keyboardType(.numberPad)
+		) { viewStore in
+			NavigationView {
+				Form {
+					VStack(alignment: .leading) {
+						Text("From")
+						AddressView(viewStore.fromAddress)
+							.foregroundColor(.gray)
+					}
+
+					TextField(
+						"From",
+						text: viewStore.binding(
+							get: \.amount,
+							send: { .amountTextFieldChanged($0) }
+						),
+						prompt: Text("Enter amount...")
+					)
+					.keyboardType(.numberPad)
+
+					VStack(alignment: .leading) {
+						Text("To")
+						TextField(
+							"To",
+							text: viewStore.binding(
+								get: \.toAddress,
+								send: { .toAddressTextFieldChanged($0) }
+							),
+							prompt: Text("Enter address...")
+						)
+					}
+				}
+				.navigationTitle(Text("Send XRD"))
+				.navigationBarTitleDisplayMode(.large)
+			}
+			.navigationViewStyle(.stack)
 		}
 	}
 }
@@ -29,8 +61,25 @@ public extension AssetTransfer.View {
 // MARK: - AssetTransfer.View.ViewState
 extension AssetTransfer.View {
 	// MARK: ViewState
+
 	struct ViewState: Equatable {
-		init(state: AssetTransfer.State) {}
+		var fromAddress: AddressView.ViewState
+		var amount: String
+		var toAddress: String
+
+		init(state: AssetTransfer.State) {
+			self.fromAddress = .init(
+				address: state.from.address.address,
+				format: .short()
+			)
+			self.amount = state.amount?.value ?? ""
+			switch state.to {
+			case let .address(address):
+				self.toAddress = address.address
+			case nil:
+				self.toAddress = ""
+			}
+		}
 	}
 }
 

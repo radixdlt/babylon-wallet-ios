@@ -20,6 +20,8 @@ public extension AssetTransfer.Action {
 public extension AssetTransfer.Action {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
+		case amountTextFieldChanged(String)
+		case toAddressTextFieldChanged(String)
 	}
 }
 
