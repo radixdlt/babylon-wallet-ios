@@ -42,10 +42,10 @@ A blanket rule for what to import in which situation is:
 
 - If you're working on a **Feature**:
   - Import `FeaturePrelude` (automatically linked to all Feature modules).
-  - Link and import any client or core modules your feature depends on (e.g. `EngineToolkitClient`, `Cryptography`).
+  - Link and import any client or core modules this new feature depends on (e.g. `EngineToolkitClient`, `Cryptography`).
 - If you're working on a **Client**:
   - `import ClientPrelude` (automatically linked to all Client modules).
-  - Link and import any core modules your client depends on (e.g. `EngineToolkit`, `Cryptography`).
+  - Link and import any core modules this new client depends on (e.g. `EngineToolkit`, `Cryptography`).
 - If you're writing tests:
   - Import the module you're testing (automatically linked to its corresponding test target).
   - `import TestingPrelude` (automatically linked to all test targets).
