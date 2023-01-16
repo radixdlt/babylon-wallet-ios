@@ -310,8 +310,9 @@ public extension TransactionClient {
 
 						for accountPortfolio in accountPortfolioDictionary.values {
 							for tokenContainer in accountPortfolio.fungibleTokenContainers {
-								if tokenContainer.asset.isXRD,
-								   let value = Float(tokenContainer.amount!), value >= Float(lockFee)
+								if
+									tokenContainer.asset.isXRD,
+									let value = Float(tokenContainer.amount!), value >= Float(lockFee)
 								{
 									firstWithEnoughFunds = tokenContainer.owner
 									break
