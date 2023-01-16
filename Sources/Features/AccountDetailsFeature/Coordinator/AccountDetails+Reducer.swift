@@ -1,4 +1,5 @@
 import AssetsViewFeature
+import AssetTransferFeature
 import FeaturePrelude
 
 public struct AccountDetails: Sendable, ReducerProtocol {
@@ -33,9 +34,8 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 					await send(.delegate(.refresh(address)))
 				}
 			case .internal(.view(.transferButtonTapped)):
-				return .run { send in
-					await send(.delegate(.displayTransfer))
-				}
+				state.destination = .transfer(AssetTransfer.State(from: state.account))
+				return .none
 			case .child, .delegate:
 				return .none
 			}

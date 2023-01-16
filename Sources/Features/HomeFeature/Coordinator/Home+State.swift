@@ -19,7 +19,6 @@ public extension Home {
 		public var accountDetails: AccountDetails.State?
 		public var accountPreferences: AccountPreferences.State?
 		public var createAccountCoordinator: CreateAccountCoordinator.State?
-		public var transfer: AccountDetails.Transfer.State?
 
 		public init(
 			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
@@ -27,8 +26,7 @@ public extension Home {
 			accountList: AccountList.State = .init(accounts: []),
 			accountDetails: AccountDetails.State? = nil,
 			accountPreferences: AccountPreferences.State? = nil,
-			createAccount: CreateAccountCoordinator.State? = nil,
-			transfer: AccountDetails.Transfer.State? = nil
+			createAccount: CreateAccountCoordinator.State? = nil
 		) {
 			self.accountPortfolioDictionary = accountPortfolioDictionary
 			self.header = header
@@ -36,7 +34,6 @@ public extension Home {
 			self.accountDetails = accountDetails
 			self.accountPreferences = accountPreferences
 			self.createAccountCoordinator = createAccount
-			self.transfer = transfer
 		}
 	}
 }

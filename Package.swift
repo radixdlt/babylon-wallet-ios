@@ -21,6 +21,7 @@ package.addModules([
 			"AccountListFeature",
 			"AccountPreferencesFeature",
 			"AssetsViewFeature",
+			"AssetTransferFeature",
 		],
 		tests: .yes(
 			dependencies: [
