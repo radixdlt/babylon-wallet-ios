@@ -44,6 +44,15 @@ public extension AccountDetails.View {
 					.foregroundColor(.app.whiteTransparent)
 					.padding(.bottom, .medium1)
 
+					#if DEBUG // FF
+					Button(
+						"Transfer",
+						action: { viewStore.send(.transferButtonTapped) }
+					)
+					.buttonStyle(.secondaryRectangular())
+					.padding(.bottom)
+					#endif
+
 					RefreshableScrollView {
 						VStack(spacing: .medium3) {
 							AssetsView.View(
@@ -79,19 +88,6 @@ private extension AccountDetails.View {
 
 // MARK: - Private Methods
 private extension AccountDetails.View {
-	func transferButton(with viewStore: AccountDetailsViewStore) -> some View {
-		Button(action: {
-			viewStore.send(.transferButtonTapped)
-		}, label: {
-			Text(L10n.AccountDetails.transferButtonTitle)
-				.foregroundColor(.app.buttonTextBlack)
-				.textStyle(.body1Regular)
-				.padding()
-				.background(Color.app.gray4)
-				.cornerRadius(.small2)
-		})
-	}
-
 	func accountPreferencesButton(with viewStore: AccountDetailsViewStore) -> some View {
 		Button(
 			action: {
