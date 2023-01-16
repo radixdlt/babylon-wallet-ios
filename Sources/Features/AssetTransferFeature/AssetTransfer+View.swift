@@ -20,7 +20,8 @@ public extension AssetTransfer.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { _ in
-			Text("Implement me")
+			TextField("", text: .constant(""), prompt: Text("Enter amount"))
+				.keyboardType(.numberPad)
 		}
 	}
 }
