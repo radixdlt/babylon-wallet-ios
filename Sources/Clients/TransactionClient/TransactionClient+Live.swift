@@ -305,8 +305,7 @@ public extension TransactionClient {
 						return address
 					} else {
 						var firstWithEnoughFunds: AccountAddress?
-						var accountAddresses = [AccountAddress]()
-						try await profileClient.getAccounts().map(\.address).forEach { accountAddresses.append($0) }
+						let accountAddresses: [AccountAddress] = try await profileClient.getAccounts().map(\.address)
 						let accountPortfolioDictionary = try await accountPortfolioFetcher.fetchPortfolio(accountAddresses)
 
 						for accountPortfolio in accountPortfolioDictionary.values {
