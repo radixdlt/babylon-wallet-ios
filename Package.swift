@@ -8,7 +8,7 @@ let package = Package(
 	defaultLocalization: "en",
 	platforms: [
 		.macOS(.v12), // for development purposes
-		.iOS(.v15), // `task` in SwiftUI
+		.iOS(.v15),
 	]
 )
 
