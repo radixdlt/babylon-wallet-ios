@@ -58,13 +58,8 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 
 public extension FungibleToken {
 	var isXRD: Bool {
-		for networkID in NetworkID.allCases {
-			if
-				let xrdAddress = Network.KnownAddresses.addressMap[networkID]?.xrd,
-				self.componentAddress.address == xrdAddress.address
-			{
-				return true
-			}
+		for networkID in NetworkID.allCases where isXRD(on: networkID) {
+			return true
 		}
 		return false
 	}
