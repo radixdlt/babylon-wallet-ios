@@ -3,9 +3,8 @@ import FeaturePrelude
 public struct AssetTransfer: Sendable, ReducerProtocol {
 	public init() {}
 
-	@ReducerBuilderOf<Self>
 	public var body: some ReducerProtocolOf<Self> {
-		Reduce(self.core)
+		Reduce(core)
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
