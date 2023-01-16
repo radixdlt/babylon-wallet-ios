@@ -77,6 +77,11 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "AssetTransferFeature",
+		dependencies: [],
+		tests: .no
+	),
+	.feature(
 		name: "CreateAccountFeature",
 		dependencies: [
 			"Cryptography",

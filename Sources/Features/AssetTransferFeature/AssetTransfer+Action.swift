@@ -1,4 +1,4 @@
-import Asset
+import FeaturePrelude
 
 // MARK: - AssetTransfer.Action
 public extension AssetTransfer {

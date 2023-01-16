@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 
 public struct AssetTransfer: Sendable, ReducerProtocol {
 	public init() {}

@@ -1,6 +1,4 @@
-import ComposableArchitecture
-import SharedModels
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - AssetTransfer.View
 public extension AssetTransfer {
