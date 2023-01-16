@@ -39,7 +39,7 @@ public extension AppSettings.Action {
 		#if DEBUG
 		case debugInspectProfileButtonTapped
 		case setDebugProfileSheet(isPresented: Bool)
-		#endif // DEBUG
+		#endif
 	}
 }
 
@@ -57,7 +57,7 @@ public extension AppSettings.Action.InternalAction {
 		case loadP2PClientsResult(TaskResult<P2PClients>)
 		#if DEBUG
 		case profileToDebugLoaded(Profile)
-		#endif // DEBUG
+		#endif
 	}
 }
 

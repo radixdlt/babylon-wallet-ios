@@ -33,7 +33,6 @@ extension AssetTransfer.View {
 	}
 }
 
-// MARK: - AssetTransfer_Preview
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 

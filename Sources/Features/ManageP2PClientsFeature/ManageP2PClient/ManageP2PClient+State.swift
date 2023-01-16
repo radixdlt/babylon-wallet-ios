@@ -32,7 +32,7 @@ public extension ManageP2PClient {
 			self.client = client
 			self.connectionStatus = connectionStatus
 		}
-		#endif // DEBUG
+		#endif
 	}
 }
 

@@ -92,8 +92,8 @@ extension TransactionSigning.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - TransactionSigning_Preview
 struct TransactionSigning_Preview: PreviewProvider {
 	static var previews: some View {
 		TransactionSigning.View(
@@ -104,4 +104,4 @@ struct TransactionSigning_Preview: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
+#endif

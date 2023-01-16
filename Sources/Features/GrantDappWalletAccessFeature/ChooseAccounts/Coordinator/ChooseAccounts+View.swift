@@ -128,8 +128,8 @@ extension ChooseAccounts.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - ChooseAccounts_Preview
 struct ChooseAccounts_Preview: PreviewProvider {
 	static var previews: some View {
 		ChooseAccounts.View(
@@ -140,4 +140,4 @@ struct ChooseAccounts_Preview: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
+#endif

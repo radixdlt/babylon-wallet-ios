@@ -51,7 +51,7 @@ public extension ManageP2PClient {
 							await send(.internal(.system(.dataChannelStateResult(.failure(error)))))
 						}
 					}
-					#endif // DEBUG
+					#endif
 				}
 			}
 			.cancellable(id: ConnectionUpdateTasksID.self)
@@ -89,7 +89,7 @@ public extension ManageP2PClient {
 			errorQueue.schedule(error)
 			return .none
 
-		#endif // DEBUG
+		#endif
 		case .delegate:
 			return .cancel(id: ConnectionUpdateTasksID.self)
 		}

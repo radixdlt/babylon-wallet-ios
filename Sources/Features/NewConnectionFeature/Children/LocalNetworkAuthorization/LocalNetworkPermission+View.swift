@@ -40,8 +40,8 @@ extension LocalNetworkPermission.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - ScanQR_Preview
 extension LocalNetworkPermission {
 	struct Preview: PreviewProvider {
 		static var previews: some SwiftUI.View {

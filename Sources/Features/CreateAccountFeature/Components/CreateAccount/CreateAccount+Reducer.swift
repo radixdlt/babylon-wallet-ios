@@ -23,7 +23,7 @@ public extension MnemonicGenerator {
 extension MnemonicGenerator: TestDependencyKey {
 	public static let testValue: Self = .init(generate: unimplemented("\(Self.self).generate"))
 }
-#endif // DEBUG
+#endif
 
 public extension DependencyValues {
 	var mnemonicGenerator: MnemonicGenerator {

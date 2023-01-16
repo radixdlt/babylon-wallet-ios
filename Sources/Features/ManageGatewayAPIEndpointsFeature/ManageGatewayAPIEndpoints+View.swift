@@ -175,8 +175,9 @@ extension ManageGatewayAPIEndpoints.View {
 	}
 }
 
-// MARK: - ManageGatewayAPIEndpoints_Preview
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct ManageGatewayAPIEndpoints_Preview: PreviewProvider {
 	static var previews: some View {
 		ManageGatewayAPIEndpoints.View(

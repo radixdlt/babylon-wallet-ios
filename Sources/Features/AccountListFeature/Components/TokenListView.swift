@@ -28,9 +28,12 @@ public extension TokenListView {
 	}
 }
 
-// MARK: - TokenListView_Previews
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct TokenListView_Previews: PreviewProvider {
 	static var previews: some View {
 		TokenListView(containers: [])
 	}
 }
+#endif

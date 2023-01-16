@@ -40,8 +40,8 @@ extension CameraPermission.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - ScanQR_Preview
 struct CameraPermission_Preview: PreviewProvider {
 	static var previews: some View {
 		CameraPermission.View(

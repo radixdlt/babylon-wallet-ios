@@ -44,9 +44,12 @@ extension ConnectExtensionView {
 	}
 }
 
-// MARK: - ConnectExtensionView_Previews
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct ConnectExtensionView_Previews: PreviewProvider {
 	static var previews: some View {
 		ConnectExtensionView {}
 	}
 }
+#endif

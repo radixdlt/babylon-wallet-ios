@@ -117,8 +117,8 @@ private struct HeaderView: View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - Row_Preview
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountList.Row.View(
@@ -129,4 +129,4 @@ struct Row_Preview: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
+#endif

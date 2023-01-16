@@ -60,8 +60,8 @@ public extension App.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - AppView_Previews
 struct AppView_Previews: PreviewProvider {
 	static var previews: some View {
 		App.View(
@@ -73,4 +73,4 @@ struct AppView_Previews: PreviewProvider {
 	}
 }
 
-#endif // DEBUG
+#endif

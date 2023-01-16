@@ -86,8 +86,8 @@ extension ConnectUsingSecrets.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - ConnectUsingPassword_Preview
 struct ConnectUsingPassword_Preview: PreviewProvider {
 	static var previews: some View {
 		ConnectUsingSecrets.View(

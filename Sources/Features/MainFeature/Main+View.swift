@@ -48,6 +48,8 @@ public extension Main.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct MainView_Previews: PreviewProvider {
 	static var previews: some View {
 		Main.View(

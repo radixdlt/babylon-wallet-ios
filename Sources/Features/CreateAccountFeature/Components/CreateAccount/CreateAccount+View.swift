@@ -134,7 +134,9 @@ private extension CreateAccount.View {
 	}
 }
 
-// MARK: - CreateAccount_Previews
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct CreateAccount_Previews: PreviewProvider {
 	static var previews: some View {
 		CreateAccount.View(
@@ -145,3 +147,4 @@ struct CreateAccount_Previews: PreviewProvider {
 		)
 	}
 }
+#endif

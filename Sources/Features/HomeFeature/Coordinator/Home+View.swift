@@ -131,8 +131,8 @@ private extension Home.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - HomeView_Previews
 struct HomeView_Previews: PreviewProvider {
 	static var previews: some View {
 		Home.View(
@@ -143,4 +143,4 @@ struct HomeView_Previews: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
+#endif

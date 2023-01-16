@@ -123,7 +123,9 @@ extension FungibleTokenList.Row.View {
 	}
 }
 
-// MARK: - Row_Preview
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenList.Row.View(
@@ -138,3 +140,4 @@ struct Row_Preview: PreviewProvider {
 		)
 	}
 }
+#endif

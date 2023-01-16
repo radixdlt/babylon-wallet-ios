@@ -146,8 +146,8 @@ extension NonFungibleTokenContainer {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - NonFungibleTokenDetails_Preview
 struct NonFungibleTokenListDetail_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleTokenList.Detail.View(

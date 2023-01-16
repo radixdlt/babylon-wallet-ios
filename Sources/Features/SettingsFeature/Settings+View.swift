@@ -5,7 +5,7 @@ import ManageP2PClientsFeature
 import ProfileClient
 #if DEBUG
 import ProfileView
-#endif // DEBUG
+#endif
 
 // MARK: - AppSettings.View
 public extension AppSettings {
@@ -87,7 +87,7 @@ private extension AppSettings.View {
 						) {
 							viewStore.send(.debugInspectProfileButtonTapped)
 						}
-						#endif // DEBUG
+						#endif
 
 						Row(
 							L10n.Settings.desktopConnectionsButtonTitle,
@@ -147,7 +147,7 @@ private extension AppSettings.View {
 							}
 						}
 					}
-				#endif // DEBUG
+				#endif
 			}
 		}
 	}
@@ -159,19 +159,21 @@ public extension AppSettings.View {
 		#if DEBUG
 		public let isDebugProfileViewSheetPresented: Bool
 		public let profileToInspect: Profile?
-		#endif // DEBUG
+		#endif
 		public let canAddP2PClient: Bool
 		public init(state: AppSettings.State) {
 			#if DEBUG
 			isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			profileToInspect = state.profileToInspect
-			#endif // DEBUG
+			#endif
 			canAddP2PClient = state.canAddP2PClient
 		}
 	}
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct SettingsView_Previews: PreviewProvider {
 	static var previews: some View {
 		AppSettings.View(

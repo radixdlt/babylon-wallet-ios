@@ -121,8 +121,8 @@ extension AccountDetails.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - AccountDetails_Preview
 struct AccountDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountDetails.View(
@@ -133,4 +133,4 @@ struct AccountDetails_Preview: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
+#endif

@@ -91,7 +91,9 @@ private struct SettingsButton: View {
 	}
 }
 
-// MARK: - Header_Preview
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct Header_Preview: PreviewProvider {
 	static var previews: some View {
 		Home.Header.View(
@@ -102,3 +104,4 @@ struct Header_Preview: PreviewProvider {
 		)
 	}
 }
+#endif

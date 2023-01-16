@@ -63,9 +63,12 @@ struct SettingsRowStyle: ButtonStyle {
 	}
 }
 
-// MARK: - Row_Previews
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct Row_Previews: PreviewProvider {
 	static var previews: some View {
 		Row("Title", icon: Image(systemName: "wallet.pass"), action: {})
 	}
 }
+#endif

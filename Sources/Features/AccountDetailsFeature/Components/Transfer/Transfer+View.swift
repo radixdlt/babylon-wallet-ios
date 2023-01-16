@@ -46,7 +46,9 @@ extension AccountDetails.Transfer.View {
 	}
 }
 
-// MARK: - Transfer_Preview
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct Transfer_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountDetails.Transfer.View(
@@ -57,3 +59,4 @@ struct Transfer_Preview: PreviewProvider {
 		)
 	}
 }
+#endif
