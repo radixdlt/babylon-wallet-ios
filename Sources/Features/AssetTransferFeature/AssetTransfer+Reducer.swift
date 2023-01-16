@@ -19,6 +19,8 @@ public struct AssetTransfer: Sendable, ReducerProtocol {
 				state.to = .address(address)
 			}
 			return .none
+		case .internal(.view(.nextButtonTapped)):
+			return .none
 		}
 	}
 }

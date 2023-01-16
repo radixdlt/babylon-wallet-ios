@@ -52,6 +52,12 @@ public extension AssetTransfer.View {
 				}
 				.navigationTitle(Text("Send XRD"))
 				.navigationBarTitleDisplayMode(.large)
+				.safeAreaInset(edge: .bottom) {
+					Button("Next", action: { viewStore.send(.nextButtonTapped) })
+						.buttonStyle(.primaryRectangular)
+						.padding()
+						.controlState(viewStore.nextButtonState)
+				}
 			}
 			.navigationViewStyle(.stack)
 		}
@@ -66,6 +72,7 @@ extension AssetTransfer.View {
 		var fromAddress: AddressView.ViewState
 		var amount: String
 		var toAddress: String
+		var nextButtonState: ControlState
 
 		init(state: AssetTransfer.State) {
 			self.fromAddress = .init(
@@ -73,11 +80,11 @@ extension AssetTransfer.View {
 				format: .short()
 			)
 			self.amount = state.amount?.value ?? ""
-			switch state.to {
-			case let .address(address):
-				self.toAddress = address.address
-			case nil:
-				self.toAddress = ""
+			self.toAddress = state.to?.address ?? ""
+			if (state.amount?.value).isNilOrBlank || (state.to?.address).isNilOrBlank {
+				self.nextButtonState = .disabled
+			} else {
+				self.nextButtonState = .enabled
 			}
 		}
 	}

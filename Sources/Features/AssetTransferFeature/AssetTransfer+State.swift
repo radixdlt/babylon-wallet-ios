@@ -14,6 +14,13 @@ public extension AssetTransfer {
 		public enum To: Sendable, Equatable {
 //			case account(OnNetwork.Account)
 			case address(AccountAddress)
+
+			var address: String {
+				switch self {
+				case let .address(address):
+					return address.address
+				}
+			}
 		}
 
 		public let from: From
