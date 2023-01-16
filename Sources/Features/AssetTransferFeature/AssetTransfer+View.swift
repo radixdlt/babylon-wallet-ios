@@ -35,6 +35,8 @@ extension AssetTransfer.View {
 
 // MARK: - AssetTransfer_Preview
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct AssetTransfer_Preview: PreviewProvider {
 	static var previews: some View {
 		AssetTransfer.View(
