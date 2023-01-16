@@ -2,6 +2,7 @@ import AppSettings
 import ClientPrelude
 import GatewayAPI
 
+// MARK: - AccountPortfolioFetcher + DependencyKey
 extension AccountPortfolioFetcher: DependencyKey {
 	public static let liveValue = Self(
 		fetchPortfolio: { addresses in
@@ -31,4 +32,29 @@ extension AccountPortfolioFetcher: DependencyKey {
 			return portfolioDictionary
 		}
 	)
+}
+
+public extension AccountPortfolioFetcher {
+	/// Returns an array of FungibleTokenContainers containing XRD.
+	func fetchXRDBalance(for accountAddresses: [AccountAddress], on networkID: NetworkID) async throws -> [FungibleTokenContainer] {
+		let accountPortfolioDictionary = try await fetchPortfolio(accountAddresses)
+		return accountPortfolioDictionary.values
+			.map(\.fungibleTokenContainers)
+			.flatMap(\.elements)
+			.filter { $0.asset.isXRD(on: networkID) }
+	}
+
+	/// Returns an AccountAddress with enough funds for a given lock fee.
+	func firstAccountWithEnoughXRDForLockFee(xrdContainers: [FungibleTokenContainer], lockFee: Int) -> AccountAddress? {
+		let container = xrdContainers.first { container in
+			if let amount = container.amount,
+			   let value = Float(amount),
+			   value >= Float(lockFee)
+			{
+				return true
+			}
+			return false
+		}
+		return container?.owner
+	}
 }

@@ -304,21 +304,9 @@ public extension TransactionClient {
 					if let address = addressesManifestReferences.first {
 						return address
 					} else {
-						var firstWithEnoughFunds: AccountAddress?
 						let accountAddresses: [AccountAddress] = try await profileClient.getAccounts().map(\.address)
-						let accountPortfolioDictionary = try await accountPortfolioFetcher.fetchPortfolio(accountAddresses)
-
-						for accountPortfolio in accountPortfolioDictionary.values {
-							for tokenContainer in accountPortfolio.fungibleTokenContainers {
-								if
-									tokenContainer.asset.isXRD,
-									let value = Float(tokenContainer.amount!), value >= Float(lockFee)
-								{
-									firstWithEnoughFunds = tokenContainer.owner
-									break
-								}
-							}
-						}
+						let xrdContainers = try await accountPortfolioFetcher.fetchXRDBalance(for: accountAddresses, on: networkID)
+						let firstWithEnoughFunds = accountPortfolioFetcher.firstAccountWithEnoughXRDForLockFee(xrdContainers: xrdContainers, lockFee: lockFee)
 
 						if let firstWithEnoughFunds = firstWithEnoughFunds {
 							return firstWithEnoughFunds

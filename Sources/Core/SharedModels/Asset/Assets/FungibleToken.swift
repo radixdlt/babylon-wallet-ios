@@ -68,6 +68,15 @@ public extension FungibleToken {
 		}
 		return false
 	}
+
+	func isXRD(on networkID: NetworkID) -> Bool {
+		guard let xrdAddress = Network.KnownAddresses.addressMap[networkID]?.xrd,
+		      self.componentAddress.address == xrdAddress.address
+		else {
+			return false
+		}
+		return true
+	}
 }
 
 // MARK: - FungibleTokenContainer
