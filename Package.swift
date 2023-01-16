@@ -321,6 +321,7 @@ package.addModules([
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"ProfileClient",
+			"AccountPortfolio",
 		],
 		tests: .yes()
 	),

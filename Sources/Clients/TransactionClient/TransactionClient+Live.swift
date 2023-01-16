@@ -1,3 +1,4 @@
+import AccountPortfolio
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
@@ -9,6 +10,7 @@ public extension TransactionClient {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.profileClient) var profileClient
+		@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 
 		let pollStrategy: PollStrategy = .default
 
@@ -290,22 +292,45 @@ public extension TransactionClient {
 					networkID: networkID
 				)
 
+				let lockFee = 10
+
 				let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
 					// Might be empty
 					let addressesManifestReferences =
 						try engineToolkitClient.accountAddressesNeedingToSignTransaction(
 							accountAddressesNeedingToSignTransactionRequest
 						)
+
 					if let address = addressesManifestReferences.first {
 						return address
 					} else {
-						let accounts = try await profileClient.getAccounts()
-						return accounts.first.address
+						var firstWithEnoughFunds: AccountAddress?
+						var accountAddresses = [AccountAddress]()
+						try await profileClient.getAccounts().map(\.address).forEach { accountAddresses.append($0) }
+						let accountPortfolioDictionary = try await accountPortfolioFetcher.fetchPortfolio(accountAddresses)
+
+						for accountPortfolio in accountPortfolioDictionary.values {
+							for tokenContainer in accountPortfolio.fungibleTokenContainers {
+								if tokenContainer.asset.isXRD,
+								   let value = Float(tokenContainer.amount!), value >= Float(lockFee)
+								{
+									firstWithEnoughFunds = tokenContainer.owner
+									break
+								}
+							}
+						}
+
+						if let firstWithEnoughFunds = firstWithEnoughFunds {
+							return firstWithEnoughFunds
+						} else {
+							throw AddLockFeeError.failedToFindAccountWithEnoughFundsToLockFee
+						}
 					}
 				}()
 
 				let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
-					address: ComponentAddress(address: accountAddress.address)
+					address: ComponentAddress(address: accountAddress.address),
+					fee: String(lockFee)
 				).embed()
 
 				instructions.insert(lockFeeCallMethodInstruction, at: 0)
@@ -425,5 +450,16 @@ public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable 
 public extension LocalizedError where Self: Equatable {
 	static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.errorDescription == rhs.errorDescription
+	}
+}
+
+// MARK: - AddLockFeeError
+public enum AddLockFeeError: Sendable, LocalizedError, Equatable {
+	case failedToFindAccountWithEnoughFundsToLockFee
+	public var errorDescription: String? {
+		switch self {
+		case .failedToFindAccountWithEnoughFundsToLockFee:
+			return "Failed to find an account with enough funds to lock fee"
+		}
 	}
 }
