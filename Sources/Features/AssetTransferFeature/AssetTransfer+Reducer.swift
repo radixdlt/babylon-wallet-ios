@@ -32,8 +32,23 @@ public struct AssetTransfer: Sendable, ReducerProtocol {
 			}
 			return .none
 		case let .internal(.view(.nextButtonTapped(amount, toAddress))):
-//			let manifest =
-			state.destination = .transactionSigning(.init(origin: .local(manifest: .mock)))
+			let manifest = TransactionManifest(instructions: .string(
+				"""
+				# Withdrawing 100 XRD from the account component
+				CALL_METHOD
+					ComponentAddress("\(state.from.address.address)")
+					"withdraw_by_amount"
+					Decimal("\(amount.value)")
+					ResourceAddress("\(FungibleToken.xrd.componentAddress.address)");
+
+				# Depositing all of the XRD withdrawn from the account into the other account
+				CALL_METHOD
+					ComponentAddress("\(toAddress.address)")
+					"deposit_batch"
+					Expression("ENTIRE_WORKTOP");
+				"""
+			))
+			state.destination = .transactionSigning(.init(origin: .local(manifest: manifest)))
 			return .none
 		case .child:
 			return .none
