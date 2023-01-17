@@ -1,5 +1,4 @@
 import SwiftUI
-import struct SwiftUINavigation.WithState
 
 // MARK: - WithControlRequirements
 // TODO: simplify with variadic generics in the future
@@ -79,6 +78,8 @@ public struct WithControlRequirements<Control: View>: View {
 }
 
 #if DEBUG
+import struct SwiftUINavigation.WithState
+
 struct WithControlRequirements_Previews: PreviewProvider {
 	static var previews: some View {
 		WithState(initialValue: "") { $name in

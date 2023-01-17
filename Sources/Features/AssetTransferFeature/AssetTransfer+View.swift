@@ -37,7 +37,9 @@ public extension AssetTransfer.View {
 						),
 						prompt: Text("Enter amount...")
 					)
+					#if os(iOS)
 					.keyboardType(.numberPad)
+					#endif
 
 					VStack(alignment: .leading) {
 						Text("To")
@@ -52,29 +54,33 @@ public extension AssetTransfer.View {
 					}
 				}
 				.navigationTitle(Text("Send XRD"))
-				.navigationBarTitleDisplayMode(.large)
-				.safeAreaInset(edge: .bottom) {
-					WithControlRequirements(
-						viewStore.output,
-						forAction: {
-							viewStore.send(
-								.nextButtonTapped(amount: $0.amount, toAddress: $0.toAddress)
-							)
+				#if os(iOS)
+					.navigationBarTitleDisplayMode(.large)
+				#endif
+					.safeAreaInset(edge: .bottom) {
+						WithControlRequirements(
+							viewStore.output,
+							forAction: {
+								viewStore.send(
+									.nextButtonTapped(amount: $0.amount, toAddress: $0.toAddress)
+								)
+							}
+						) { action in
+							Button("Next", action: action)
+								.buttonStyle(.primaryRectangular)
+								.padding()
 						}
-					) { action in
-						Button("Next", action: action)
-							.buttonStyle(.primaryRectangular)
-							.padding()
 					}
-				}
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AssetTransfer.Destinations.State.transactionSigning,
-					action: AssetTransfer.Destinations.Action.transactionSigning,
-					content: { TransactionSigning.View(store: $0) }
-				)
+					.sheet(
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /AssetTransfer.Destinations.State.transactionSigning,
+						action: AssetTransfer.Destinations.Action.transactionSigning,
+						content: { TransactionSigning.View(store: $0) }
+					)
 			}
+			#if os(iOS)
 			.navigationViewStyle(.stack)
+			#endif
 		}
 	}
 }
