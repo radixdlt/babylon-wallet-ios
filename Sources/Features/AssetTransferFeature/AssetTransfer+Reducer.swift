@@ -64,18 +64,3 @@ public struct AssetTransfer: Sendable, ReducerProtocol {
 		}
 	}
 }
-
-// MARK: - AssetTransferError
-public enum AssetTransferError: LocalizedError {
-	case amountRequired
-	case toAddressRequired
-
-	public var errorDescription: String? {
-		switch self {
-		case .amountRequired:
-			return "Please enter a valid amount"
-		case .toAddressRequired:
-			return "Please enter a valid destination address"
-		}
-	}
-}
