@@ -16,6 +16,7 @@ public extension AccountDetails {
 public extension AccountDetails.Action {
 	enum ChildAction: Sendable, Equatable {
 		case assets(AssetsView.Action)
+		case destination(PresentationActionOf<AccountDetails.Destinations>)
 	}
 }
 

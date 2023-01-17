@@ -42,9 +42,6 @@ public struct Home: Sendable, ReducerProtocol {
 		.ifLet(\.accountPreferences, action: /Action.child .. Action.ChildAction.accountPreferences) {
 			AccountPreferences()
 		}
-		.ifLet(\.transfer, action: /Action.child .. Action.ChildAction.transfer) {
-			AccountDetails.Transfer()
-		}
 		.ifLet(\.createAccountCoordinator, action: /Action.child .. Action.ChildAction.createAccountCoordinator) {
 			CreateAccountCoordinator()
 		}
@@ -174,10 +171,6 @@ public struct Home: Sendable, ReducerProtocol {
 			state.accountPreferences = .init(address: address)
 			return .none
 
-		case .child(.accountDetails(.delegate(.displayTransfer))):
-			state.transfer = .init()
-			return .none
-
 		case let .child(.accountDetails(.delegate(.refresh(address)))):
 			return refreshAccount(address)
 
@@ -188,10 +181,6 @@ public struct Home: Sendable, ReducerProtocol {
 				}))))
 				await send(.child(.accountPreferences(.internal(.system(.refreshAccountCompleted)))))
 			}
-
-		case .child(.transfer(.delegate(.dismissTransfer))):
-			state.transfer = nil
-			return .none
 
 		case .child(.createAccountCoordinator(.delegate(.dismissed))):
 			state.createAccountCoordinator = nil

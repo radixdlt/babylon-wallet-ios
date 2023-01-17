@@ -43,8 +43,8 @@ extension Splash.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - SplashView_Previews
 struct SplashView_Previews: PreviewProvider {
 	static var previews: some View {
 		Splash.View(
@@ -56,4 +56,4 @@ struct SplashView_Previews: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
+#endif

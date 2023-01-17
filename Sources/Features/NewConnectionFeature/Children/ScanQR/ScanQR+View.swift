@@ -112,8 +112,8 @@ extension ScanQR.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - ScanQR_Preview
 struct ScanQR_Preview: PreviewProvider {
 	static var previews: some View {
 		ScanQR.View(

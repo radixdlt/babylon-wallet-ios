@@ -14,7 +14,7 @@ public extension TransactionSigning {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.didAppear)):
-			return .run { [transactionClient, manifest = state.transactionManifestWithoutLockFee] send in
+			return .run { [manifest = state.transactionManifestWithoutLockFee] send in
 				await send(.internal(.addLockFeeInstructionToManifestResult(
 					TaskResult {
 						try await transactionClient.addLockFeeInstructionToManifest(manifest)
@@ -24,7 +24,7 @@ public extension TransactionSigning {
 
 		case let .internal(.addLockFeeInstructionToManifestResult(.success(transactionWithLockFee))):
 			state.transactionWithLockFee = transactionWithLockFee
-			return .run { [profileClient] send in
+			return .run { send in
 				await send(.internal(.loadNetworkIDResult(
 					TaskResult { await profileClient.getCurrentNetworkID() },
 					manifestWithFeeLock: transactionWithLockFee

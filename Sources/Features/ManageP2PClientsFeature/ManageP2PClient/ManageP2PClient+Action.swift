@@ -16,7 +16,7 @@ public extension ManageP2PClient.Action {
 		case deleteConnectionButtonTapped
 		#if DEBUG
 		case sendTestMessageButtonTapped
-		#endif // DEBUG
+		#endif
 		case viewAppeared
 	}
 }
@@ -31,7 +31,7 @@ public extension ManageP2PClient.Action {
 		case deleteConnection
 		#if DEBUG
 		case sendTestMessage
-		#endif // DEBUG
+		#endif
 	}
 }
 

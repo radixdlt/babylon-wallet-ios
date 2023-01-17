@@ -13,7 +13,7 @@ public extension AppSettings {
 		public var canAddP2PClient: Bool
 		#if DEBUG
 		public var profileToInspect: Profile?
-		#endif // DEBUG
+		#endif
 
 		public init(
 			manageP2PClients: ManageP2PClients.State? = nil,

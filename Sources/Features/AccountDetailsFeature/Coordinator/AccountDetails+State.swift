@@ -1,5 +1,6 @@
 import AccountListFeature
 import AssetsViewFeature
+import AssetTransferFeature
 import FeaturePrelude
 import FungibleTokenListFeature
 
@@ -9,6 +10,9 @@ public extension AccountDetails {
 	struct State: Sendable, Equatable {
 		public let account: OnNetwork.Account
 		public var assets: AssetsView.State
+
+		@PresentationStateOf<Destinations>
+		public var destination
 
 		public init(for account: AccountList.Row.State) {
 			self.account = account.account

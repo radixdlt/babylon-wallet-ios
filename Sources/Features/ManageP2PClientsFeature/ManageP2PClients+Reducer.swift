@@ -101,7 +101,7 @@ public extension ManageP2PClients {
 					}
 				))))
 			}
-		#endif // DEBUG
+		#endif
 
 		case let .child(.connection(id, .delegate(.deleteConnection))):
 			return .run { send in

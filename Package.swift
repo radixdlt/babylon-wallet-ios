@@ -8,7 +8,7 @@ let package = Package(
 	defaultLocalization: "en",
 	platforms: [
 		.macOS(.v12), // for development purposes
-		.iOS(.v15), // `task` in SwiftUI
+		.iOS(.v15),
 	]
 )
 
@@ -21,6 +21,7 @@ package.addModules([
 			"AccountListFeature",
 			"AccountPreferencesFeature",
 			"AssetsViewFeature",
+			"AssetTransferFeature",
 		],
 		tests: .yes(
 			dependencies: [
@@ -75,6 +76,13 @@ package.addModules([
 			"NonFungibleTokenListFeature",
 		],
 		tests: .yes()
+	),
+	.feature(
+		name: "AssetTransferFeature",
+		dependencies: [
+			"TransactionSigningFeature",
+		],
+		tests: .no
 	),
 	.feature(
 		name: "CreateAccountFeature",
@@ -333,7 +341,7 @@ package.addModules([
 		name: "FeaturePrelude",
 		dependencies: [
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-				.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1")
+				.package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "navigation")
 			},
 			"DesignSystem",
 			"Resources",

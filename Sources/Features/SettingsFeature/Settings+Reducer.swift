@@ -84,7 +84,7 @@ public extension AppSettings {
 			precondition(!isPresented)
 			state.profileToInspect = nil
 			return .none
-		#endif // DEBUG
+		#endif
 
 		case .child(.manageP2PClients(.delegate(.dismiss))):
 			state.manageP2PClients = nil

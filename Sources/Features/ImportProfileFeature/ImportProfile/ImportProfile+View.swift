@@ -53,6 +53,8 @@ public extension ImportProfile.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct ImportProfile_Preview: PreviewProvider {
 	static var previews: some View {
 		ImportProfile.View(

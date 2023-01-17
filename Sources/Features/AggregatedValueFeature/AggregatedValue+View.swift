@@ -132,6 +132,8 @@ private struct VisibilityButton: View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct AggregatedValue_Preview: PreviewProvider {
 	static var previews: some View {
 		AggregatedValue.View(

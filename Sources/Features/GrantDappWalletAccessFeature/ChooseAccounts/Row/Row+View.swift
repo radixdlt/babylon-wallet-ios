@@ -65,6 +65,8 @@ extension ChooseAccounts.Row.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		ChooseAccounts.Row.View(

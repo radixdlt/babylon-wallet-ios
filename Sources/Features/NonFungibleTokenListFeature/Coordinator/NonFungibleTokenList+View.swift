@@ -62,7 +62,9 @@ extension NonFungibleTokenList.View {
 	}
 }
 
-// MARK: - NonFungibleTokenList_Preview
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct NonFungibleTokenList_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleTokenList.View(
@@ -73,3 +75,4 @@ struct NonFungibleTokenList_Preview: PreviewProvider {
 		)
 	}
 }
+#endif

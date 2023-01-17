@@ -38,6 +38,7 @@ extension ___VARIABLE_featureName___.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
 // MARK: - ___VARIABLE_featureName____Preview
 struct ___VARIABLE_featureName____Preview: PreviewProvider {

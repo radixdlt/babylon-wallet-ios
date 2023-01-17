@@ -20,9 +20,12 @@ public extension TokenView {
 	}
 }
 
-// MARK: - TokenView_Previews
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct TokenView_Previews: PreviewProvider {
 	static var previews: some View {
 		TokenView(code: "XRD")
 	}
 }
+#endif

@@ -144,8 +144,8 @@ extension AccountCompletion.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - AccountCompletion_Preview
 struct AccountCompletion_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountCompletion.View(
@@ -157,4 +157,4 @@ struct AccountCompletion_Preview: PreviewProvider {
 	}
 }
 
-#endif // DEBUG
+#endif

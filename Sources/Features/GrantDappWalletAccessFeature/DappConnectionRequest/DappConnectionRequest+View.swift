@@ -79,8 +79,8 @@ extension DappConnectionRequest.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - IncomingConnectionRequestFromDappReview_Preview
 struct IncomingConnectionRequestFromDappReview_Preview: PreviewProvider {
 	static var previews: some View {
 		DappConnectionRequest.View(

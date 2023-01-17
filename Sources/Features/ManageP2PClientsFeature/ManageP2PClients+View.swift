@@ -120,6 +120,8 @@ public extension ManageP2PClients.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct ManageP2PClients_Preview: PreviewProvider {
 	static var previews: some View {
 		ManageP2PClients.View(

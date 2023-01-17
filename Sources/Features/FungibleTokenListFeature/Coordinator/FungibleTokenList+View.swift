@@ -67,7 +67,9 @@ extension FungibleTokenList.View {
 	}
 }
 
-// MARK: - FungibleTokenList_Preview
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct FungibleTokenList_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenList.View(
@@ -80,3 +82,4 @@ struct FungibleTokenList_Preview: PreviewProvider {
 		)
 	}
 }
+#endif

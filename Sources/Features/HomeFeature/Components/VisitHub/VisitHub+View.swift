@@ -60,7 +60,9 @@ private extension Home.VisitHub.View {
 	}
 }
 
-// MARK: - VisitHub_Preview
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct VisitHub_Preview: PreviewProvider {
 	static var previews: some View {
 		Home.VisitHub.View(
@@ -71,3 +73,4 @@ struct VisitHub_Preview: PreviewProvider {
 		)
 	}
 }
+#endif

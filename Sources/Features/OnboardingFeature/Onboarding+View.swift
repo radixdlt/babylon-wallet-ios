@@ -32,6 +32,8 @@ public extension Onboarding.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct Onboarding_Preview: PreviewProvider {
 	static var previews: some View {
 		Onboarding.View(

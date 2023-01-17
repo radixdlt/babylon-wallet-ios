@@ -4,26 +4,33 @@ import struct TransactionClient.MakeTransactionHeaderInput
 // MARK: - TransactionSigning.State
 public extension TransactionSigning {
 	struct State: Equatable {
-		public let request: P2P.SignTransactionRequestToHandle
-		public var isSigningTX: Bool
-		public var transactionManifestWithoutLockFee: TransactionManifest
+		public enum Origin: Equatable {
+			case p2p(request: P2P.SignTransactionRequestToHandle)
+			case local(manifest: TransactionManifest)
+		}
+
+		public let request: P2P.SignTransactionRequestToHandle?
+		public let transactionManifestWithoutLockFee: TransactionManifest
 		public var transactionWithLockFee: TransactionManifest?
 		public var transactionWithLockFeeString: String?
 		public var makeTransactionHeaderInput: MakeTransactionHeaderInput
+		public var isSigningTX: Bool = false
 
 		public init(
-			makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
-			request: P2P.SignTransactionRequestToHandle,
-			isSigningTX: Bool = false,
-			transactionWithLockFee: TransactionManifest? = nil,
-			transactionWithLockFeeString: String? = nil
+			origin: Origin,
+			transactionWithLockFee: TransactionManifest? = nil, // TODO: remove?
+			makeTransactionHeaderInput: MakeTransactionHeaderInput = .default
 		) {
-			self.makeTransactionHeaderInput = makeTransactionHeaderInput
-			self.request = request
-			self.isSigningTX = isSigningTX
-			transactionManifestWithoutLockFee = request.requestItem.transactionManifest
+			switch origin {
+			case let .p2p(request):
+				self.request = request
+				self.transactionManifestWithoutLockFee = request.requestItem.transactionManifest
+			case let .local(manifest):
+				self.request = nil
+				self.transactionManifestWithoutLockFee = manifest
+			}
 			self.transactionWithLockFee = transactionWithLockFee
-			self.transactionWithLockFeeString = transactionWithLockFeeString
+			self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		}
 	}
 }
@@ -76,7 +83,14 @@ public extension TransactionManifest {
 
 public extension TransactionSigning.State {
 	static var previewValue: Self {
-		.init(request: .init(requestItem: .previewValue, parentRequest: .previewValue))
+		.init(
+			origin: .p2p(
+				request: P2P.SignTransactionRequestToHandle(
+					requestItem: .previewValue,
+					parentRequest: .previewValue
+				)
+			)
+		)
 	}
 }
 #endif

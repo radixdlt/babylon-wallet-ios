@@ -109,8 +109,9 @@ extension AssetsView.View {
 	}
 }
 
-// MARK: - AssetsView_Preview
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct AssetsView_Preview: PreviewProvider {
 	static var previews: some View {
 		AssetsView.View(

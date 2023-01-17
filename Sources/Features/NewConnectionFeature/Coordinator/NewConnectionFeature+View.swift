@@ -69,8 +69,8 @@ public extension NewConnection.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - NewConnection_Preview
 struct NewConnection_Preview: PreviewProvider {
 	static var previews: some View {
 		NewConnection.View(

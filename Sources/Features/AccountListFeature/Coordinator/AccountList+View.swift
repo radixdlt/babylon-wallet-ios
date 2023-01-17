@@ -48,8 +48,8 @@ extension AccountList.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - AccountList_Preview
 struct AccountList_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountList.View(
@@ -63,4 +63,4 @@ struct AccountList_Preview: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
+#endif

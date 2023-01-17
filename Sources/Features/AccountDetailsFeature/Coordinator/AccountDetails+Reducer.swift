@@ -1,4 +1,5 @@
 import AssetsViewFeature
+import AssetTransferFeature
 import FeaturePrelude
 
 public struct AccountDetails: Sendable, ReducerProtocol {
@@ -11,34 +12,38 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 			AssetsView()
 		}
 
-		Reduce { state, action in
-			switch action {
-			case .internal(.view(.appeared)):
-				return .run { [address = state.address] send in
-					await send(.delegate(.refresh(address)))
-				}
-			case .internal(.view(.dismissAccountDetailsButtonTapped)):
-				return .run { send in
-					await send(.delegate(.dismissAccountDetails))
-				}
-			case .internal(.view(.displayAccountPreferencesButtonTapped)):
-				return .run { [address = state.address] send in
-					await send(.delegate(.displayAccountPreferences(address)))
-				}
-			case .internal(.view(.copyAddressButtonTapped)):
-				let address = state.address.address
-				return .fireAndForget { pasteboardClient.copyString(address) }
-			case .internal(.view(.pullToRefreshStarted)):
-				return .run { [address = state.address] send in
-					await send(.delegate(.refresh(address)))
-				}
-			case .internal(.view(.transferButtonTapped)):
-				return .run { send in
-					await send(.delegate(.displayTransfer))
-				}
-			case .child, .delegate:
-				return .none
+		Reduce(core)
+			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+				Destinations()
 			}
+	}
+
+	func core(state: inout State, action: Action) -> EffectTask<Action> {
+		switch action {
+		case .internal(.view(.appeared)):
+			return .run { [address = state.address] send in
+				await send(.delegate(.refresh(address)))
+			}
+		case .internal(.view(.dismissAccountDetailsButtonTapped)):
+			return .run { send in
+				await send(.delegate(.dismissAccountDetails))
+			}
+		case .internal(.view(.displayAccountPreferencesButtonTapped)):
+			return .run { [address = state.address] send in
+				await send(.delegate(.displayAccountPreferences(address)))
+			}
+		case .internal(.view(.copyAddressButtonTapped)):
+			let address = state.address.address
+			return .fireAndForget { pasteboardClient.copyString(address) }
+		case .internal(.view(.pullToRefreshStarted)):
+			return .run { [address = state.address] send in
+				await send(.delegate(.refresh(address)))
+			}
+		case .internal(.view(.transferButtonTapped)):
+			state.destination = .transfer(AssetTransfer.State(from: state.account))
+			return .none
+		case .child, .delegate:
+			return .none
 		}
 	}
 }

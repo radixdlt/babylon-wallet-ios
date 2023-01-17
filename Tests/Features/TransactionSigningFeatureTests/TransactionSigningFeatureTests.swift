@@ -16,7 +16,7 @@ final class TransactionSigningFeatureTests: TestCase {
 
 	lazy var store: TestStore = .init(
 		initialState: TransactionSigning.State(
-			request: request,
+			origin: .p2p(request: request),
 			transactionWithLockFee: .mock
 		),
 		reducer: TransactionSigning()

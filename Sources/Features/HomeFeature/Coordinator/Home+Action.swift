@@ -27,7 +27,6 @@ public extension Home.Action {
 		case header(Home.Header.Action)
 		case accountPreferences(AccountPreferences.Action)
 		case accountDetails(AccountDetails.Action)
-		case transfer(AccountDetails.Transfer.Action)
 		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 }

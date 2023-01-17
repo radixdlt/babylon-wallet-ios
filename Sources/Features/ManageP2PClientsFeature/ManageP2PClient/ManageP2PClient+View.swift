@@ -61,7 +61,7 @@ public extension ManageP2PClient.View {
 		public var dataChannelStatus: DataChannelState
 		public var webSocketStatus: WebSocketState
 		public var connectionID: String
-		#endif // DEBUG
+		#endif
 
 		init(state: ManageP2PClient.State) {
 			connectionName = state.client.displayName
@@ -75,7 +75,7 @@ public extension ManageP2PClient.View {
 				"...",
 				state.client.id.hex().suffix(6),
 			].joined()
-			#endif // DEBUG
+			#endif
 		}
 	}
 }
@@ -216,4 +216,4 @@ private extension Color {
 	static let connected: Self = .green
 	static let closed: Self = .red
 }
-#endif // DEBUG
+#endif

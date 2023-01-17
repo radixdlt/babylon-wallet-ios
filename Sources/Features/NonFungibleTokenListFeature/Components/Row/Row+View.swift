@@ -198,8 +198,8 @@ private extension NonFungibleTokenList.Row.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - Row_Preview
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleTokenList.Row.View(

@@ -1,4 +1,5 @@
 import AssetsViewFeature
+import AssetTransferFeature
 import FeaturePrelude
 
 // MARK: - AccountDetails.View
@@ -44,6 +45,15 @@ public extension AccountDetails.View {
 					.foregroundColor(.app.whiteTransparent)
 					.padding(.bottom, .medium1)
 
+					#if DEBUG // FF
+					Button(
+						"Transfer",
+						action: { viewStore.send(.transferButtonTapped) }
+					)
+					.buttonStyle(.secondaryRectangular())
+					.padding(.bottom)
+					#endif
+
 					RefreshableScrollView {
 						VStack(spacing: .medium3) {
 							AssetsView.View(
@@ -68,6 +78,12 @@ public extension AccountDetails.View {
 			.onAppear {
 				viewStore.send(.appeared)
 			}
+			.sheet(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /AccountDetails.Destinations.State.transfer,
+				action: AccountDetails.Destinations.Action.transfer,
+				content: { AssetTransfer.View(store: $0) }
+			)
 		}
 	}
 }
@@ -79,19 +95,6 @@ private extension AccountDetails.View {
 
 // MARK: - Private Methods
 private extension AccountDetails.View {
-	func transferButton(with viewStore: AccountDetailsViewStore) -> some View {
-		Button(action: {
-			viewStore.send(.transferButtonTapped)
-		}, label: {
-			Text(L10n.AccountDetails.transferButtonTitle)
-				.foregroundColor(.app.buttonTextBlack)
-				.textStyle(.body1Regular)
-				.padding()
-				.background(Color.app.gray4)
-				.cornerRadius(.small2)
-		})
-	}
-
 	func accountPreferencesButton(with viewStore: AccountDetailsViewStore) -> some View {
 		Button(
 			action: {
@@ -121,8 +124,8 @@ extension AccountDetails.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - AccountDetails_Preview
 struct AccountDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountDetails.View(
@@ -133,4 +136,4 @@ struct AccountDetails_Preview: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
+#endif

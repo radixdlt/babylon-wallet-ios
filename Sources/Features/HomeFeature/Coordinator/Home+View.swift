@@ -62,15 +62,6 @@ public extension Home.View {
 						then: { AccountPreferences.View(store: $0) }
 					)
 					.zIndex(3)
-
-					IfLetStore(
-						store.scope(
-							state: \.transfer,
-							action: { .child(.transfer($0)) }
-						),
-						then: { AccountDetails.Transfer.View(store: $0) }
-					)
-					.zIndex(4)
 				}
 			}
 		}
@@ -131,8 +122,8 @@ private extension Home.View {
 }
 
 #if DEBUG
+import SwiftUI // NB: necessary for previews to appear
 
-// MARK: - HomeView_Previews
 struct HomeView_Previews: PreviewProvider {
 	static var previews: some View {
 		Home.View(
@@ -143,4 +134,4 @@ struct HomeView_Previews: PreviewProvider {
 		)
 	}
 }
-#endif // DEBUG
+#endif

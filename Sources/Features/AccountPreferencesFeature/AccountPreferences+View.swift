@@ -73,7 +73,9 @@ extension AccountPreferences.View {
 	}
 }
 
-// MARK: - AccountPreferences_Preview
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct AccountPreferences_Preview: PreviewProvider {
 	static var previews: some View {
 		AccountPreferences.View(
@@ -84,3 +86,4 @@ struct AccountPreferences_Preview: PreviewProvider {
 		)
 	}
 }
+#endif

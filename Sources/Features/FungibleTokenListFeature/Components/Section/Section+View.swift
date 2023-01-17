@@ -48,7 +48,9 @@ extension FungibleTokenList.Section.View {
 	}
 }
 
-// MARK: - Section_Preview
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
 struct Section_Preview: PreviewProvider {
 	static var previews: some View {
 		FungibleTokenList.Section.View(
@@ -61,3 +63,4 @@ struct Section_Preview: PreviewProvider {
 		)
 	}
 }
+#endif
