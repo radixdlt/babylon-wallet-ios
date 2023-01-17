@@ -1,4 +1,5 @@
 import FeaturePrelude
+import TransactionSigningFeature
 
 // MARK: - AssetTransfer.View
 public extension AssetTransfer {
@@ -58,6 +59,12 @@ public extension AssetTransfer.View {
 						.padding()
 						.controlState(viewStore.nextButtonState)
 				}
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /AssetTransfer.Destinations.State.transactionSigning,
+					action: AssetTransfer.Destinations.Action.transactionSigning,
+					content: { TransactionSigning.View(store: $0) }
+				)
 			}
 			.navigationViewStyle(.stack)
 		}

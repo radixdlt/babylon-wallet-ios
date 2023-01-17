@@ -41,8 +41,6 @@ public extension AccountDetails {
 					})
 				)
 			)
-
-			self.destination = destination
 		}
 	}
 }

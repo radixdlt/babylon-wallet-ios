@@ -12,6 +12,14 @@ public extension StringProtocol {
 	func lines() -> Int {
 		split(separator: "\n", omittingEmptySubsequences: false).count
 	}
+
+	var nilIfEmpty: Self? {
+		isEmpty ? nil : self
+	}
+
+	var nilIfBlank: Self? {
+		isBlank ? nil : self
+	}
 }
 
 public extension Optional where Wrapped: StringProtocol {

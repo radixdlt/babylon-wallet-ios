@@ -27,6 +27,8 @@ public extension AssetTransfer {
 		public var asset: AssetToTransfer
 		public var amount: Decimal_?
 		public var to: To?
+		@PresentationStateOf<Destinations>
+		public var destination
 
 		public init(
 			from: From,

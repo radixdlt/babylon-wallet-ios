@@ -79,7 +79,9 @@ package.addModules([
 	),
 	.feature(
 		name: "AssetTransferFeature",
-		dependencies: [],
+		dependencies: [
+			"TransactionSigningFeature",
+		],
 		tests: .no
 	),
 	.feature(
