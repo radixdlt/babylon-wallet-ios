@@ -680,9 +680,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			"P2PModels",
-			.product(name: "WebRTC", package: "WebRTC") {
-				.package(url: "https://github.com/stasel/WebRTC", from: "106.0.0")
-			},
+                        "WebRTC"
 		],
 		tests: .yes(
 			dependencies: [],
@@ -759,7 +757,7 @@ package.addModules([
 			},
 		],
 		tests: .yes(dependencies: [])
-	),
+	)
 ])
 
 package.targets.append(
@@ -767,6 +765,13 @@ package.targets.append(
 		name: "RadixEngineToolkit",
 		path: "Sources/EngineToolkit/RadixEngineToolkit/RadixEngineToolkit.xcframework"
 	)
+)
+
+package.targets.append(
+        .binaryTarget(
+            name: "WebRTC",
+            path: "Sources/RadixConnect/WebRTC/WebRTC.xcframework"
+        )
 )
 
 // MARK: - Extensions
