@@ -10,6 +10,7 @@ public extension AccountDetails {
 	struct State: Sendable, Equatable {
 		public let account: OnNetwork.Account
 		public var assets: AssetsView.State
+
 		@PresentationStateOf<Destinations>
 		public var destination
 

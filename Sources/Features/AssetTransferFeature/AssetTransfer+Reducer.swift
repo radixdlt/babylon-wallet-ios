@@ -31,6 +31,7 @@ public struct AssetTransfer: Sendable, ReducerProtocol {
 			}
 			return .none
 		case let .internal(.view(.nextButtonTapped(amount, toAddress))):
+			// TODO: move somewhere more practical (like Faucet manifest)
 			let manifest = TransactionManifest(instructions: .string(
 				"""
 				CALL_METHOD

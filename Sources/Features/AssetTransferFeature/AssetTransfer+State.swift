@@ -6,6 +6,7 @@ public extension AssetTransfer {
 	struct State: Sendable, Equatable {
 		public typealias From = OnNetwork.Account
 
+		// TODO: declare union type for this in SharedModels
 		public enum AssetToTransfer: Sendable, Equatable {
 			case token(FungibleToken)
 //			case nft(NonFungibleToken)
@@ -27,6 +28,7 @@ public extension AssetTransfer {
 		public var asset: AssetToTransfer
 		public var amount: Decimal_?
 		public var to: To?
+
 		@PresentationStateOf<Destinations>
 		public var destination
 
