@@ -18,6 +18,7 @@ public extension TransactionSigning {
 
 		public init(
 			origin: Origin,
+			transactionWithLockFee: TransactionManifest? = nil, // TODO: remove?
 			makeTransactionHeaderInput: MakeTransactionHeaderInput = .default
 		) {
 			switch origin {
@@ -28,6 +29,7 @@ public extension TransactionSigning {
 				self.request = nil
 				self.transactionManifestWithoutLockFee = manifest
 			}
+			self.transactionWithLockFee = transactionWithLockFee
 			self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		}
 	}
