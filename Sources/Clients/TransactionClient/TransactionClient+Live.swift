@@ -277,6 +277,21 @@ public extension TransactionClient {
 			return try engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(conversionRequest)
 		}
 
+		/// Returns an AccountAddress with enough funds for a given lock fee.
+		@Sendable
+		func firstAccountWithEnoughXRDForLockFee(in xrdContainers: [FungibleTokenContainer], lockFee: Int) -> AccountAddress? {
+			let container = xrdContainers.first { container in
+				if let amount = container.amount,
+				   let value = Float(amount),
+				   value >= Float(lockFee)
+				{
+					return true
+				}
+				return false
+			}
+			return container?.owner
+		}
+
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			addLockFeeInstructionToManifest: { maybeStringManifest in
@@ -306,7 +321,7 @@ public extension TransactionClient {
 					} else {
 						let accountAddresses: [AccountAddress] = try await profileClient.getAccounts().map(\.address)
 						let xrdContainers = try await accountPortfolioFetcher.fetchXRDBalance(for: accountAddresses, on: networkID)
-						let firstWithEnoughFunds = accountPortfolioFetcher.firstAccountWithEnoughXRDForLockFee(xrdContainers: xrdContainers, lockFee: lockFee)
+						let firstWithEnoughFunds = firstAccountWithEnoughXRDForLockFee(in: xrdContainers, lockFee: lockFee)
 
 						if let firstWithEnoughFunds = firstWithEnoughFunds {
 							return firstWithEnoughFunds

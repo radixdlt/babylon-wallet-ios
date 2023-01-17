@@ -43,18 +43,4 @@ public extension AccountPortfolioFetcher {
 			.flatMap(\.elements)
 			.filter { $0.asset.isXRD(on: networkID) }
 	}
-
-	/// Returns an AccountAddress with enough funds for a given lock fee.
-	func firstAccountWithEnoughXRDForLockFee(xrdContainers: [FungibleTokenContainer], lockFee: Int) -> AccountAddress? {
-		let container = xrdContainers.first { container in
-			if let amount = container.amount,
-			   let value = Float(amount),
-			   value >= Float(lockFee)
-			{
-				return true
-			}
-			return false
-		}
-		return container?.owner
-	}
 }
