@@ -8,16 +8,12 @@ import FungibleTokenListFeature
 public extension AccountDetails {
 	// MARK: State
 	struct State: Sendable, Equatable {
-		public enum Destination: Sendable, Equatable {
-			// TODO: case preferences(AccountPreferences.State)
-			case transfer(AssetTransfer.State)
-		}
-
 		public let account: OnNetwork.Account
 		public var assets: AssetsView.State
-		public var destination: Destination?
+		@PresentationStateOf<Destinations>
+		public var destination
 
-		public init(for account: AccountList.Row.State, destination: Destination? = nil) {
+		public init(for account: AccountList.Row.State) {
 			self.account = account.account
 
 			let fungibleTokenCategories = account.portfolio.fungibleTokenContainers.elements.sortedIntoCategories()

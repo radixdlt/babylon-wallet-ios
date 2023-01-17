@@ -1,4 +1,5 @@
 import AssetsViewFeature
+import AssetTransferFeature
 import FeaturePrelude
 
 // MARK: - AccountDetails.View
@@ -77,6 +78,15 @@ public extension AccountDetails.View {
 			.onAppear {
 				viewStore.send(.appeared)
 			}
+			.sheet(
+				store: self.store.scope(
+					state: \.$destination,
+					action: { .internal(.destination($0)) }
+				),
+				state: /AccountDetails.Destinations.State.transfer,
+				action: AccountDetails.Destinations.Action.transfer,
+				content: { AssetTransfer.View(store: $0) }
+			)
 		}
 	}
 }

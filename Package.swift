@@ -339,7 +339,7 @@ package.addModules([
 		name: "FeaturePrelude",
 		dependencies: [
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-				.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1")
+				.package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "navigation")
 			},
 			"DesignSystem",
 			"Resources",

@@ -35,6 +35,7 @@ public extension AccountDetails.Action {
 public extension AccountDetails.Action {
 	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
+		case destination(PresentationActionOf<AccountDetails.Destinations>)
 	}
 }
 
