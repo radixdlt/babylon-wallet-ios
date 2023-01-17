@@ -1,4 +1,5 @@
 import FeaturePrelude
+import TransactionSigningFeature
 
 // MARK: - AssetTransfer
 public struct AssetTransfer: Sendable, ReducerProtocol {
@@ -32,6 +33,11 @@ public struct AssetTransfer: Sendable, ReducerProtocol {
 		case let .internal(.view(.nextButtonTapped(amount, toAddress))):
 			let manifest = TransactionManifest(instructions: .string(
 				"""
+				CALL_METHOD
+					ComponentAddress("\(state.from.address.address)")
+					"lock_fee"
+					Decimal("10");
+
 				# Withdrawing 100 XRD from the account component
 				CALL_METHOD
 					ComponentAddress("\(state.from.address.address)")
@@ -46,7 +52,12 @@ public struct AssetTransfer: Sendable, ReducerProtocol {
 					Expression("ENTIRE_WORKTOP");
 				"""
 			))
-			state.destination = .transactionSigning(.init(origin: .local(manifest: manifest)))
+			state.destination = .transactionSigning(
+				TransactionSigning.State(
+					origin: .local(manifest: manifest),
+					transactionWithLockFee: manifest
+				)
+			)
 			return .none
 		case .child:
 			return .none
