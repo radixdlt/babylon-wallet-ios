@@ -24,7 +24,7 @@ public extension TransactionSigning {
 
 		case let .internal(.addLockFeeInstructionToManifestResult(.success(transactionWithLockFee))):
 			state.transactionWithLockFee = transactionWithLockFee
-			return .run { [profileClient] send in
+			return .run { send in
 				await send(.internal(.loadNetworkIDResult(
 					TaskResult { await profileClient.getCurrentNetworkID() },
 					manifestWithFeeLock: transactionWithLockFee
