@@ -4,7 +4,7 @@ import SwiftUINavigation
 // MARK: - WithControlRequirements
 // TODO: simplify with variadic generics in the future
 //
-// public struct ControlRequirements<Control: View>: View {
+// public struct WithControlRequirements<Control: View>: View {
 //     [...]
 //
 //     public init<T...>(
