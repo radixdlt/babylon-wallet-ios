@@ -79,7 +79,7 @@ public extension AccountDetails.View {
 				viewStore.send(.appeared)
 			}
 			.sheet(
-				store: self.store.scope(
+				store: store.scope(
 					state: \.$destination,
 					action: { .child(.destination($0)) }
 				),
