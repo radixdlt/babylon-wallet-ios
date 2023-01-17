@@ -2,8 +2,6 @@ import FeaturePrelude
 
 // MARK: - AssetTransfer
 public struct AssetTransfer: Sendable, ReducerProtocol {
-	@Dependency(\.errorQueue) var errorQueue
-
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
