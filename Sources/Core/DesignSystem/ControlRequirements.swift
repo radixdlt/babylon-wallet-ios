@@ -1,4 +1,5 @@
 import SwiftUI
+import struct SwiftUINavigation.WithState
 
 // MARK: - WithControlRequirements
 // TODO: simplify with variadic generics in the future
@@ -80,17 +81,14 @@ public struct WithControlRequirements<Control: View>: View {
 #if DEBUG
 struct WithControlRequirements_Previews: PreviewProvider {
 	static var previews: some View {
-		WithState2("", String?.none) { $name, $submittedName in
+		WithState(initialValue: "") { $name in
 			Form {
 				TextField("Name", text: $name, prompt: Text("Name"))
-				if let submittedName {
-					Text("Hello \(submittedName)!")
-				}
 			}
 			.safeAreaInset(edge: .bottom) {
 				WithControlRequirements(
 					name.nilIfBlank,
-					forAction: { name in submittedName = name }
+					forAction: { name in print("Hello \(name)!") }
 				) { action in
 					Button("Submit", action: action)
 						.buttonStyle(.primaryRectangular)
