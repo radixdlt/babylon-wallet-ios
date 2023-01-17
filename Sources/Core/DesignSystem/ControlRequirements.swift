@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftUINavigation
 
 // MARK: - WithControlRequirements
 // TODO: simplify with variadic generics in the future
