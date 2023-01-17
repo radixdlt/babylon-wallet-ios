@@ -1,10 +1,7 @@
-import ComposableArchitecture
 import CreateAccountFeature
-import ErrorQueue
-import Foundation
+import FeaturePrelude
 import GatewayAPI
 import ProfileClient
-import UserDefaultsClient
 
 // MARK: - ManageGatewayAPIEndpoints
 public struct ManageGatewayAPIEndpoints: Sendable, ReducerProtocol {

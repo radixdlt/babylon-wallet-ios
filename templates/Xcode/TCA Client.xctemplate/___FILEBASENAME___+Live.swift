@@ -1,4 +1,4 @@
-import Prelude
+import ClientPrelude
 
 extension ___VARIABLE_clientName___: DependencyKey {
 	public typealias Value = ___VARIABLE_clientName___

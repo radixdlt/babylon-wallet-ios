@@ -1,6 +1,4 @@
-import Common
-import ComposableArchitecture
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - Home.Header.View
 public extension Home.Header {

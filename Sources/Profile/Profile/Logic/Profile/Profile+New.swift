@@ -1,37 +1,24 @@
 import Cryptography
 import EngineToolkit
 import Prelude
+import ProfileModels
 
 // MARK: - EncodeAddressRequest
 // FIXME: replace with real EngineToolKit once we added binaries and made a release.
 struct EncodeAddressRequest {
 	let data: Data
-	let addressKind: AddressKind // This is missing in EngineToolkit today
+	let addressKind: ProfileModels.AddressKind // This is missing in EngineToolkit today
 	let networkID: NetworkID
 
 	init(
 		publicKey: SLIP10.PublicKey,
-		addressKind: AddressKind,
+		addressKind: ProfileModels.AddressKind,
 		networkID: NetworkID
 	) {
 		// https://rdxworks.slack.com/archives/C040KJQN5CL/p1665740463911069?thread_ts=1665738831.815739&cid=C040KJQN5CL
 		self.data = publicKey.compressedData.prefix(25)
 		self.addressKind = addressKind
 		self.networkID = networkID
-	}
-}
-
-// MARK: - CreateFactorInstanceRequest
-public enum CreateFactorInstanceRequest {
-	case fromNonHardwareHierarchicalDeterministicMnemonicFactorSource(FromNonHardwareHierarchicalDeterministicMnemonicFactorSource)
-}
-
-// MARK: CreateFactorInstanceRequest.FromNonHardwareHierarchicalDeterministicMnemonicFactorSource
-public extension CreateFactorInstanceRequest {
-	/// A request that can be used by any Non-Hardware Hierarchical Deterministic Factor Source.
-	struct FromNonHardwareHierarchicalDeterministicMnemonicFactorSource {
-		public let reference: FactorSourceReference
-		public let derivationPath: DerivationPath
 	}
 }
 
@@ -140,29 +127,3 @@ public extension Profile {
 
 // MARK: - WrongAddressType
 struct WrongAddressType: Swift.Error {}
-
-import NonEmpty
-public extension NonEmpty where Collection == OrderedSet<OnNetwork.Account> {
-	// FIXME: uh terrible, please fix this.
-	@discardableResult
-	mutating func appendAccount(_ account: OnNetwork.Account) -> OnNetwork.Account {
-		var orderedSet = self.rawValue
-		orderedSet.append(account)
-		self = .init(rawValue: orderedSet)!
-		return account
-	}
-}
-
-public extension NonEmpty where Collection == OrderedSet<Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource> {
-	// FIXME: uh terrible, please fix this.
-	@discardableResult
-	mutating func appendFactorSource(_ factorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource) -> Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource? {
-		var orderedSet = self.rawValue
-		let (wasInserted, _) = orderedSet.append(factorSource)
-		guard wasInserted else {
-			return nil
-		}
-		self = .init(rawValue: orderedSet)!
-		return factorSource
-	}
-}

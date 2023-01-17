@@ -1,6 +1,6 @@
-import Foundation
+import FeaturePrelude
 @testable import SettingsFeature
-import TestUtils
+import TestingPrelude
 
 final class SettingsFeatureTests: TestCase {
 	func testTrivial() {

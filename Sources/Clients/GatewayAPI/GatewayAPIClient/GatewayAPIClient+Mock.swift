@@ -1,6 +1,5 @@
+import ClientPrelude
 import Cryptography
-import Prelude
-import Profile
 
 // MARK: - GatewayAPIClient + TestDependencyKey
 extension GatewayAPIClient: TestDependencyKey {

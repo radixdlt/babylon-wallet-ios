@@ -1,9 +1,4 @@
-import Common
-import ComposableArchitecture
-import DesignSystem
-import EngineToolkit
-import Resources
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - TransactionSigning.View
 public extension TransactionSigning {

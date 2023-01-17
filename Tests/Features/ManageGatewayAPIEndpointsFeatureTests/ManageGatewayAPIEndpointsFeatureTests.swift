@@ -1,7 +1,6 @@
-import ComposableArchitecture
+import FeaturePrelude
 import ManageGatewayAPIEndpointsFeature
-import Profile
-import TestUtils
+import TestingPrelude
 
 // MARK: - ManageGatewayAPIEndpointsFeatureTests
 @MainActor
@@ -237,7 +236,6 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 	}
 }
 
-import ProfileClient
 #if DEBUG
 
 public extension URL {

@@ -1,6 +1,6 @@
 @testable import AccountPreferencesFeature
-import ComposableArchitecture
-import TestUtils
+import FeaturePrelude
+import TestingPrelude
 
 final class AccountPreferencesFeatureTests: TestCase {
 	func testTrivial() {

@@ -1,7 +1,5 @@
-import Common
-import EngineToolkit
+import ClientPrelude
 import EngineToolkitClient
-import Prelude
 
 // MARK: - TransactionClient
 public struct TransactionClient: Sendable, DependencyKey {
@@ -26,8 +24,6 @@ public extension DependencyValues {
 	}
 }
 
-import Prelude
-import Profile
 import ProfileClient
 
 // MARK: - SignManifestRequest

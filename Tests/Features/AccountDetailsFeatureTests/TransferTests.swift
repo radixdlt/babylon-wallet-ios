@@ -1,6 +1,6 @@
 @testable import AccountDetailsFeature
-import ComposableArchitecture
-import TestUtils
+import FeaturePrelude
+import TestingPrelude
 
 final class TransferTests: TestCase {
 	func testTrivial() {

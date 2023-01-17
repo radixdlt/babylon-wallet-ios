@@ -1,6 +1,6 @@
-import ComposableArchitecture
+import FeaturePrelude
 import LocalAuthenticationClient
-import Profile
+import ProfileClient
 
 // MARK: - CreateAccount.Action
 public extension CreateAccount {

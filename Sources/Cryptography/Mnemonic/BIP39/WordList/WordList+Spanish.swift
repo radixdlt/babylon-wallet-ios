@@ -2,7 +2,7 @@ import Foundation
 
 // swiftlint:disable file_length
 public extension BIP39.WordList {
-	static var spanish: [String] = {
+	static let spanish: [String] = {
 		let words =
 			"""
 			ábaco

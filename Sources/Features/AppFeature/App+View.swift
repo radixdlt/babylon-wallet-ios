@@ -1,10 +1,7 @@
-import Common
-import ComposableArchitecture
-import DesignSystem
+import FeaturePrelude
 import MainFeature
 import OnboardingFeature
 import SplashFeature
-import SwiftUI
 
 // MARK: - App.View
 public extension App {

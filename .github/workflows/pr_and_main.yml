@@ -1,4 +1,4 @@
-name: "Test and build"
+name: CI
 
 on:
   pull_request:
@@ -12,8 +12,8 @@ concurrency:
 
 jobs:
 
-  assertFormated:
-    name: "AssertFormated"
+  linting:
+    name: "Linting"
     runs-on: macos-12
 
     steps:
@@ -24,12 +24,12 @@ jobs:
           brew install swiftformat
           swiftformat . --lint
 
-  build_and_test:
-    name: "Build and test"
+  test-and-build:
+    name: "Test and build"
     runs-on: macos-12
 
     needs:
-      - assertFormated
+      - linting
 
     steps:
       - uses: actions/checkout@v3.1.0
@@ -57,11 +57,11 @@ jobs:
           brew install xcbeautify
           brew install robotsandpencils/made/xcodes
 
-      - name: "Build"
-        run: bundle exec fastlane ios build
-
-      - name: "Unit tests"
+      - name: "Unit tests (debug)"
         run: bundle exec fastlane ios tests
+
+      - name: "Build and archive (release)"
+        run: bundle exec fastlane ios build
 
   # snapshot_tests:
   #   name: "Snapshot tests"

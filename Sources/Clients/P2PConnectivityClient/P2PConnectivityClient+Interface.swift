@@ -1,9 +1,4 @@
-import Common
-import P2PConnection
-import P2PModels
-import Prelude
-import ProfileClient
-import SharedModels
+import ClientPrelude
 
 // MARK: - DependencyValues
 public extension DependencyValues {

@@ -1,13 +1,8 @@
 @testable import EngineToolkit
-import Prelude
+import TestingPrelude
 
 // MARK: - ConvertManifestTests
 final class ConvertManifestTests: TestCase {
-	override func setUp() {
-		debugPrint = true
-		super.setUp()
-	}
-
 	func test__convertManifest_from_string_to_json_does_not_throw_ed25519() throws {
 		let request = makeRequest(outputFormat: .json, manifest: try testTransactionEd25519(signerCount: 0).notarizedTransaction.signedIntent.intent.manifest)
 		XCTAssertNoThrow(try sut.convertManifest(request: request).get())
@@ -120,7 +115,7 @@ final class ConvertManifestTests: TestCase {
 				try EcdsaSecp256k1Signature(hex: "0079224ea514206706298d8d620f660828f7987068d6d02757e6f3cbbf4a51ab133395db69db1bc9b2726dd99e34efc252d8258dcb003ebaba42be349f50f7765e")
 				try EddsaEd25519PublicKey(hex: "4cb5abf6ad79fbf5abbccafcc269d85cd2651ed4b885b5869f241aedf0a5ba29")
 				try EddsaEd25519Signature(hex: "ce993adc51111309a041faa65cbcf1154d21ed0ecdc2d54070bc90b9deb744aa8605b3f686fa178fba21070b4a4678e54eee3486a881e0e328251cd37966de09")
-				try Decimal_(value: "1.2")
+				Decimal_(value: "1.2")
 				PreciseDecimal("1.2")
 				try NonFungibleId.bytes([UInt8](hex: "031b84c5567b126440995d3ed5aaba0565d71e1834604819ff9c17f5e9d5dd078f"))
 				NonFungibleId.u32(12)

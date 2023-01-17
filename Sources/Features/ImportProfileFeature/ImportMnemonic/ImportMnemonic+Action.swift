@@ -1,7 +1,6 @@
-import ComposableArchitecture
 import Cryptography
-import Prelude
-import Profile
+import FeaturePrelude
+import ProfileClient
 
 // MARK: - ImportMnemonic.Action
 public extension ImportMnemonic {

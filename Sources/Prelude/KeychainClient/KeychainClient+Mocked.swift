@@ -1,6 +1,5 @@
 #if DEBUG
-import Foundation
-import XCTestDynamicOverlay
+import Dependencies
 
 public extension KeychainClient {
 	static var testValue = Self(

@@ -1,6 +1,4 @@
-import Asset
-import Common
-import ComposableArchitecture
+import FeaturePrelude
 
 // MARK: FungibleTokenList.State
 public extension FungibleTokenList {

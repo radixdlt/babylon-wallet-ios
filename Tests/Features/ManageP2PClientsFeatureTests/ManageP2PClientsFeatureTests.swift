@@ -1,6 +1,6 @@
-import ComposableArchitecture
+import FeaturePrelude
 @testable import ManageP2PClientsFeature
-import TestUtils
+import TestingPrelude
 
 // MARK: - ManageP2PClientsFeatureTests
 final class ManageP2PClientsFeatureTests: TestCase {

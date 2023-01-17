@@ -1,4 +1,4 @@
-import Foundation
+import Prelude
 public extension P2P.ToDapp.Response.Success {
 	private enum CodingKeys: String, CodingKey {
 		case id = "requestId"

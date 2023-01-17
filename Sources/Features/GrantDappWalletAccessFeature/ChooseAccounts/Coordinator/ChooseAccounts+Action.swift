@@ -1,8 +1,5 @@
-import ComposableArchitecture
 import CreateAccountFeature
-import Prelude
-import Profile
-import SharedModels
+import FeaturePrelude
 
 // MARK: - ChooseAccounts.Action
 public extension ChooseAccounts {

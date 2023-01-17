@@ -1,7 +1,6 @@
-import ComposableArchitecture
+import FeaturePrelude
 import HandleDappRequests
 import HomeFeature
-import Prelude
 import ProfileClient
 import SettingsFeature
 
@@ -22,7 +21,7 @@ public struct Main: Sendable, ReducerProtocol {
 
 		Reduce(self.core)
 			.ifLet(\.settings, action: /Action.child .. Action.ChildAction.settings) {
-				Settings()
+				AppSettings()
 			}
 	}
 

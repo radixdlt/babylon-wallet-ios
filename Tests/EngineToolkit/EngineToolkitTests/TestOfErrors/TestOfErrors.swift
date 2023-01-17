@@ -1,6 +1,6 @@
 @testable import EngineToolkit
 import Prelude
-import XCTest
+import TestingPrelude
 
 // MARK: - TestOfErrors
 final class TestOfErrors: TestCase {

@@ -1,5 +1,4 @@
-import ComposableArchitecture
-import PasteboardClient
+import FeaturePrelude
 
 // MARK: - AccountList
 public struct AccountList: Sendable, ReducerProtocol {

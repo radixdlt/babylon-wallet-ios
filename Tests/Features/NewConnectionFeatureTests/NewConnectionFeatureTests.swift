@@ -1,9 +1,7 @@
-import ComposableArchitecture
-import Foundation
+import FeaturePrelude
 @testable import NewConnectionFeature
 import P2PConnection
-import SharedModels
-import TestUtils
+import TestingPrelude
 
 // MARK: - NewConnectionTests
 @MainActor

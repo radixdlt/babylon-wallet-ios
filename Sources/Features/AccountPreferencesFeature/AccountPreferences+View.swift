@@ -1,7 +1,4 @@
-import Common
-import ComposableArchitecture
-import DesignSystem
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - AccountPreferences.View
 public extension AccountPreferences {

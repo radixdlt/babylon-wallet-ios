@@ -1,9 +1,5 @@
 import AssetsViewFeature
-import Common
-import ComposableArchitecture
-import DesignSystem
-import Profile
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - AccountDetails.View
 public extension AccountDetails {

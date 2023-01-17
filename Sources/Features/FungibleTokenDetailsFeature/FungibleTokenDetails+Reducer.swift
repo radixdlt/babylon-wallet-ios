@@ -1,5 +1,4 @@
-import ComposableArchitecture
-import PasteboardClient
+import FeaturePrelude
 
 // MARK: - FungibleTokenDetails
 public struct FungibleTokenDetails: Sendable, ReducerProtocol {

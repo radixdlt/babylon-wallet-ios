@@ -2,7 +2,7 @@ import Foundation
 
 // swiftlint:disable file_length
 public extension BIP39.WordList {
-	static var chineseSimplified: [String] = {
+	static let chineseSimplified: [String] = {
 		let words =
 			"""
 			的

@@ -1,6 +1,5 @@
-import Foundation
+import FeaturePrelude
 import GatewayAPI
-import Prelude
 import ProfileClient
 
 public extension DependencyValues {

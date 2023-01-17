@@ -1,5 +1,5 @@
 
-import Foundation
+import ClientPrelude
 
 // MARK: - TransactionFailure
 public enum TransactionFailure: Sendable, LocalizedError, Equatable {

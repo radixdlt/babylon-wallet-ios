@@ -1,7 +1,4 @@
-import Asset
-import ComposableArchitecture
-import DesignSystem
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.View
 public extension NonFungibleTokenList {

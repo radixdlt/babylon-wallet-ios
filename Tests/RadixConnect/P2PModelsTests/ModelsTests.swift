@@ -1,8 +1,7 @@
-import Foundation
 import P2PModels
-import XCTest
+import TestingPrelude
 
-final class ModelsTests: XCTestCase {
+final class ModelsTests: TestCase {
 	func test_trivial() {
 		XCTAssert(true)
 	}

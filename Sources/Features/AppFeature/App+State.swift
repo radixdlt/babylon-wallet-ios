@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 import MainFeature
 import OnboardingFeature
 import SplashFeature

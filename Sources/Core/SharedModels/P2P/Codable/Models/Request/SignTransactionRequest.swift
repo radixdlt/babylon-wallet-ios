@@ -1,6 +1,6 @@
-import EngineToolkit
+import EngineToolkitModels
 import Prelude
-import Profile
+import ProfileModels
 
 // MARK: - P2PFromDappWalletRequestItemProtocol
 /// Empty Marker protocol

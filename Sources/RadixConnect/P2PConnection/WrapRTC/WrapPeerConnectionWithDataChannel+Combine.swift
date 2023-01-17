@@ -1,6 +1,6 @@
 import Combine
-import Foundation
 import P2PModels
+import Prelude
 
 public extension WrapPeerConnectionWithDataChannel {
 	func createOffer() -> Future<WebRTCOffer, ConverseError.WebRTC> {

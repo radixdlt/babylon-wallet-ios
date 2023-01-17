@@ -1,42 +1,28 @@
 @testable import Cryptography
-import Foundation
-import XCTest
+import TestingPrelude
 
 // MARK: - TestVectorsTests
-final class TestVectorsTests: XCTestCase {
-	override func setUp() {
-		super.setUp()
-		continueAfterFailure = false
-	}
-
+final class TestVectorsTests: TestCase {
 	func testVectors10() throws {
-		try orFail {
-			try testFixture(
-				bundleType: self,
-				jsonName: "slip10_tests_#10"
-			) { (testFile: TestFile) in
-				try orFail {
-					try doTestFile(
-						testFile: testFile
-					)
-				}
-			}
+		try testFixture(
+			bundle: .module,
+			jsonName: "slip10_tests_#10"
+		) { (testFile: TestFile) in
+			try doTestFile(
+				testFile: testFile
+			)
 		}
 	}
 
 	// With optimization flag takes ~3 sec on a Mac Studio.
 	func testVectors1K() throws {
-		try orFail {
-			try testFixture(
-				bundleType: self,
-				jsonName: "slip10_tests_#1000"
-			) { (testFile: TestFile) in
-				try orFail {
-					try doTestFile(
-						testFile: testFile
-					)
-				}
-			}
+		try testFixture(
+			bundle: .module,
+			jsonName: "slip10_tests_#1000"
+		) { (testFile: TestFile) in
+			try doTestFile(
+				testFile: testFile
+			)
 		}
 	}
 }
@@ -46,14 +32,12 @@ private extension TestVectorsTests {
 		testFile: TestFile,
 		file: StaticString = #file, line: UInt = #line
 	) throws {
-		print("✨ Testing group with #\(testFile.testGroups.reduce(0) { $0 + $1.testCases.map(\.childKeys.count).reduce(0, +) }) test cases", terminator: "")
+		print("✨ Testing group with #\(testFile.testGroups.reduce(0) { $0 + $1.testScenarios.map(\.childKeys.count).reduce(0, +) }) test scenarios", terminator: "")
 		for group in testFile.testGroups {
-			try orFail {
-				try doTestGroup(
-					group: group,
-					file: file, line: line
-				)
-			}
+			try doTestGroup(
+				group: group,
+				file: file, line: line
+			)
 		}
 		print(" - PASSED ✅")
 	}
@@ -90,28 +74,26 @@ private extension TestVectorsTests {
 			)
 		}
 
-		for (testCaseIndex, testCase) in group.testCases.enumerated() {
-			try orFail {
-				try doTestCase(root: root, testCase: testCase, groupId: group.groupId, testCaseIndex: testCaseIndex)
-			}
+		for (testScenarioIndex, testScenario) in group.testScenarios.enumerated() {
+			try doTestScenario(root: root, testScenario: testScenario, groupId: group.groupId, testScenarioIndex: testScenarioIndex)
 		}
 	}
 
-	func doTestCase(
+	func doTestScenario(
 		root: HD.Root,
-		testCase: TestCase,
+		testScenario: TestScenario,
 		groupId: Int,
-		testCaseIndex: Int,
+		testScenarioIndex: Int,
 		file: StaticString = #file, line: UInt = #line
 	) throws {
-		for expectedChildKey in testCase.childKeys {
+		for expectedChildKey in testScenario.childKeys {
 			let childKey = try root.deriveAnyPrivateKey(
-				path: testCase.path,
+				path: testScenario.path,
 				curve: expectedChildKey.curve
 			)
 			XCTAssertKeysEqual(
 				childKey, expected: expectedChildKey,
-				"ChildKey in groupId=\(groupId) case=\(testCaseIndex) path\(testCase.path)",
+				"ChildKey in groupId=\(groupId) case=\(testScenarioIndex) path\(testScenario.path)",
 				file: file, line: line
 			)
 		}
@@ -191,11 +173,19 @@ enum Slip10Curve: String, Decodable, Hashable {
 	case curve25519 = "ed25519"
 
 	init(curveType: Slip10CurveType) {
-		switch curveType {
-		case .secp256k1: self = .secp256k1
-		case .p256: self = .p256
-		case .curve25519: self = .curve25519
-		default: fatalError("Unsupported curve")
+		if #available(macOS 13, iOS 16, *) {
+			switch curveType {
+			case .secp256k1: self = .secp256k1
+			case .p256: self = .p256
+			case .curve25519: self = .curve25519
+			default: fatalError("Unsupported curve")
+			}
+		} else {
+			switch curveType {
+			case .secp256k1: self = .secp256k1
+			case .curve25519: self = .curve25519
+			default: fatalError("Unsupported curve")
+			}
 		}
 	}
 
@@ -203,7 +193,11 @@ enum Slip10Curve: String, Decodable, Hashable {
 		switch self {
 		case .curve25519: return .curve25519
 		case .secp256k1: return .secp256k1
-		case .p256: return .p256
+		case .p256: if #available(macOS 13, iOS 16, *) {
+				return .p256
+			} else {
+				fatalError("unsupported")
+			}
 		}
 	}
 }
@@ -238,12 +232,16 @@ extension HD.Root {
 			)
 
 		case .p256:
-			return try .init(
-				concrete: derivePrivateKey(
-					path: path,
-					curve: P256.self
+			if #available(macOS 13, iOS 16, *) {
+				return try .init(
+					concrete: derivePrivateKey(
+						path: path,
+						curve: P256.self
+					)
 				)
-			)
+			} else {
+				fatalError("unsupported")
+			}
 		}
 	}
 }
@@ -318,8 +316,8 @@ extension ExtendedKey {
 	}
 }
 
-// MARK: - TestCase
-struct TestCase: Decodable, Equatable {
+// MARK: - TestScenario
+struct TestScenario: Decodable, Equatable {
 	let path: HD.Path.Full
 	let childKeys: [ExtendedKey]
 
@@ -345,10 +343,10 @@ struct TestGroup: Decodable, Equatable {
 	let mnemonicPhrase: String
 	let passphrase: String
 	let masterKeys: [ExtendedKey]
-	let testCases: [TestCase]
+	let testScenarios: [TestScenario]
 
 	enum CodingKeys: String, CodingKey {
-		case groupId, seed, mnemonicPhrase, entropy, passphrase, masterKeys, testCases
+		case groupId, seed, mnemonicPhrase, entropy, passphrase, masterKeys, testScenarios = "testCases"
 	}
 
 	init(from decoder: Decoder) throws {
@@ -364,7 +362,7 @@ struct TestGroup: Decodable, Equatable {
 		self.groupId = try container.decode(Int.self, forKey: .groupId)
 		self.mnemonicPhrase = try container.decode(String.self, forKey: .mnemonicPhrase)
 		self.passphrase = try container.decode(String.self, forKey: .passphrase)
-		self.testCases = try container.decode([TestCase].self, forKey: .testCases)
+		self.testScenarios = try container.decode([TestScenario].self, forKey: .testScenarios)
 	}
 }
 

@@ -1,6 +1,6 @@
-import Foundation
 import Logging
 import P2PModels
+import Prelude
 
 // MARK: - ChunkedMessageReceiver
 public final class ChunkedMessageReceiver {

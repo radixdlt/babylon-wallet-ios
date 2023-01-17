@@ -1,5 +1,4 @@
-import Foundation
-import SharedModels
+import FeaturePrelude
 
 // MARK: - FungibleTokenDetails.State
 public extension FungibleTokenDetails {

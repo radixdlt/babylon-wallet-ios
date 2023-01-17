@@ -1,7 +1,7 @@
-import ComposableArchitecture
 @testable import CreateAccountFeature
-import Profile
-import TestUtils
+import FeaturePrelude
+import SharedTestingModels
+import TestingPrelude
 
 @MainActor
 final class CreateAccountCoordainatorTests: TestCase {

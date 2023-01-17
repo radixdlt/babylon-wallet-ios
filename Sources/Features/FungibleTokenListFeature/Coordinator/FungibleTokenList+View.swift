@@ -1,6 +1,4 @@
-import Asset
-import ComposableArchitecture
-import DesignSystem
+import FeaturePrelude
 import FungibleTokenDetailsFeature
 
 // MARK: - FungibleTokenList.View

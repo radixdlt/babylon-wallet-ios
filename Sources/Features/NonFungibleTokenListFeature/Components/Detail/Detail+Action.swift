@@ -1,4 +1,4 @@
-import Foundation
+import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Detail.Action
 public extension NonFungibleTokenList.Detail {

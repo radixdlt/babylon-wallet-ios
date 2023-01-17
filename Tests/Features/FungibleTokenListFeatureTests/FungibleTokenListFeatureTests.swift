@@ -1,6 +1,6 @@
-import ComposableArchitecture
+import FeaturePrelude
 @testable import FungibleTokenListFeature
-import TestUtils
+import TestingPrelude
 
 final class FungibleTokenListFeatureTests: TestCase {
 	func testTrivial() {

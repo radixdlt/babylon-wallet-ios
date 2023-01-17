@@ -1,8 +1,5 @@
-import ComposableArchitecture
-import EngineToolkit
-import Foundation
-import ProfileClient
-import SharedModels
+import EngineToolkitClient
+import FeaturePrelude
 import enum TransactionClient.TransactionFailure
 import enum TransactionClient.TransactionResult
 
@@ -46,9 +43,6 @@ public extension TransactionSigning.Action {
 		)
 	}
 }
-
-// MARK: - ApproveTransactionFailure
-import EngineToolkit
 
 // MARK: - ApproveTransactionFailure
 public enum ApproveTransactionFailure: Sendable, LocalizedError, Equatable {

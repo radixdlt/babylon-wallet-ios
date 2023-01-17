@@ -1,7 +1,7 @@
 @testable import P2PConnection
-import XCTest
+import TestingPrelude
 
-final class EncryptionUnitTests: XCTestCase {
+final class EncryptionUnitTests: TestCase {
 	func testRoundtrip() throws {
 		let cryption = try SignalingServerEncryption(
 			key: .init(data: .deadbeef32Bytes)

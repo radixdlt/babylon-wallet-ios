@@ -1,4 +1,4 @@
-import SharedModels
+import FeaturePrelude
 
 // MARK: - ManageP2PClient.State
 public extension ManageP2PClient {

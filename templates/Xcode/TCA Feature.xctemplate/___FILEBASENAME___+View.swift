@@ -1,6 +1,4 @@
-import ComposableArchitecture
-import Prelude
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - ___VARIABLE_featureName___.View
 public extension ___VARIABLE_featureName___ {

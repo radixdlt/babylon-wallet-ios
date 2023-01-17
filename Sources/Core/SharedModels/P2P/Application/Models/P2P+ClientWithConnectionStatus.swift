@@ -1,6 +1,6 @@
-import Foundation
 import P2PModels
-import Profile
+import Prelude
+import ProfileModels
 
 // MARK: - P2P.ClientWithConnectionStatus
 public extension P2P {

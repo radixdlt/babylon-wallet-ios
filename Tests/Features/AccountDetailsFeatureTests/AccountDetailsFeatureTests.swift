@@ -1,8 +1,8 @@
 @testable import AccountDetailsFeature
 import AccountListFeature
-import ComposableArchitecture
-import Profile
-import TestUtils
+import FeaturePrelude
+import SharedTestingModels
+import TestingPrelude
 
 @MainActor
 final class AccountDetailsFeatureTests: TestCase {

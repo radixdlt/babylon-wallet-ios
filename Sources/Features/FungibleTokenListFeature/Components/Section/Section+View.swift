@@ -1,5 +1,4 @@
-import ComposableArchitecture
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - FungibleTokenList.Section.View
 public extension FungibleTokenList.Section {

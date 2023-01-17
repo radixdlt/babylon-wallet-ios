@@ -1,4 +1,4 @@
-import Foundation
+import ClientPrelude
 
 // MARK: - UserDefaultsClient
 public struct CameraPermissionClient: Sendable {

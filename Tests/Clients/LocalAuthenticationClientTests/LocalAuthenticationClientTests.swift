@@ -1,6 +1,6 @@
-import Foundation
+import ClientPrelude
 @testable import LocalAuthenticationClient
-import TestUtils
+import TestingPrelude
 
 final class LocalAuthenticationClientTests: TestCase {
 	let sut = LocalAuthenticationClient.liveValue

@@ -1,5 +1,4 @@
-import ComposableArchitecture
-import PasteboardClient
+import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Detail
 public extension NonFungibleTokenList {

@@ -1,11 +1,6 @@
-import ComposableArchitecture
-import ErrorQueue
+import FeaturePrelude
 import NewConnectionFeature
-import P2PConnection
 import P2PConnectivityClient
-import Profile
-import ProfileClient
-import SharedModels
 
 // MARK: - ManageP2PClients
 public struct ManageP2PClients: Sendable, ReducerProtocol {

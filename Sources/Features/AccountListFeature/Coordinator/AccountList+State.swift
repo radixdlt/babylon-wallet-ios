@@ -1,6 +1,4 @@
-import ComposableArchitecture
-import Prelude
-import Profile
+import FeaturePrelude
 
 // MARK: - AccountList.State
 public extension AccountList {

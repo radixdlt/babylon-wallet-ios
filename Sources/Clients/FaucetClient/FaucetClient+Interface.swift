@@ -1,7 +1,4 @@
-import Common
-import Foundation
-import Prelude
-import Profile
+import ClientPrelude
 import TransactionClient
 
 // MARK: - FaucetClient

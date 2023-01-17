@@ -1,6 +1,4 @@
-import Common
-import ComposableArchitecture
-import Profile
+import FeaturePrelude
 
 // MARK: - CreateAccount.State
 public extension CreateAccount {

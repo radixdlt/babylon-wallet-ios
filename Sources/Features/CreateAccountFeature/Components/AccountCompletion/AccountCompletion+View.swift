@@ -1,8 +1,4 @@
-import Common
-import ComposableArchitecture
-import DesignSystem
-import Profile
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - AccountCompletion.View
 public extension AccountCompletion {

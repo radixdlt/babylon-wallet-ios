@@ -1,11 +1,11 @@
-import Foundation
+import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
-import Profile
+import ProfileClient
 
-// MARK: Settings.State
-public extension Settings {
+// MARK: AppSettings.State
+public extension AppSettings {
 	// MARK: State
 	struct State: Equatable {
 		public var manageP2PClients: ManageP2PClients.State?

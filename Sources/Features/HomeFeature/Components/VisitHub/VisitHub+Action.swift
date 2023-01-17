@@ -1,4 +1,4 @@
-import Foundation
+import FeaturePrelude
 
 // MARK: - Home.VisitHub.Action
 public extension Home.VisitHub {

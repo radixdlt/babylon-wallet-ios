@@ -1,12 +1,11 @@
 import Cryptography
 import EngineToolkit
 import P2PModels
-import Prelude
 @testable import Profile
-import XCTest
+import TestingPrelude
 
 // MARK: - ProfileTests
-final class ProfileTests: XCTestCase {
+final class ProfileTests: TestCase {
 	let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
 
 	func test_p2p_client_eq() throws {
@@ -186,8 +185,10 @@ final class ProfileTests: XCTestCase {
 
 		let snapshot = profile.snaphot()
 		let jsonEncoder = JSONEncoder.iso8601
-		let data = try jsonEncoder.encode(snapshot)
-		print(String(data: data, encoding: .utf8)!)
+		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
+		// let data = try jsonEncoder.encode(snapshot)
+		/* Uncomment to generate a new test vector */
+//		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {
@@ -305,7 +306,7 @@ final class ProfileTests: XCTestCase {
 
 	func test_version_compatability_check_too_low() throws {
 		let json = """
-		{ "version": "0.0.0" }
+		{ "version": 0 }
 		""".data(using: .utf8)!
 
 		XCTAssertThrowsError(
@@ -314,13 +315,13 @@ final class ProfileTests: XCTestCase {
 			guard let error = anyError as? IncompatibleProfileVersion else {
 				return XCTFail("WrongErrorType")
 			}
-			XCTAssertEqual(error, .init(decodedVersion: "0.0.0", minimumRequiredVersion: .minimum))
+			XCTAssertEqual(error, .init(decodedVersion: 0, minimumRequiredVersion: .minimum))
 		}
 	}
 
 	func test_version_compatability_check_ok() throws {
 		let json = """
-		{ "version": "\(String(describing: ProfileSnapshot.Version.minimum))" }
+		{ "version": \(ProfileSnapshot.Version.minimum) }
 		""".data(using: .utf8)!
 
 		XCTAssertNoThrow(

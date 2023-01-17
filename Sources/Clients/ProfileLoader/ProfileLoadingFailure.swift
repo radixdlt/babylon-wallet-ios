@@ -1,7 +1,4 @@
-import Common
-import Foundation
-import Profile
-import Version
+import ClientPrelude
 
 // MARK: - ProfileLoader.ProfileLoadingFailure
 public extension ProfileLoader {

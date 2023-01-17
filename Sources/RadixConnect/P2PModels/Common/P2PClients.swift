@@ -1,5 +1,4 @@
-import Collections
-import Foundation
+import Prelude
 
 // MARK: - P2PClients
 /// Collection of clients user have connected P2P with, typically these
@@ -88,11 +87,9 @@ public extension P2PClients {
 	}
 }
 
-#if canImport(CustomDump)
-import CustomDump
+// MARK: CustomDumpStringConvertible
 extension P2PClients: CustomDumpStringConvertible {
 	public var customDumpDescription: String {
 		_description
 	}
 }
-#endif // canImport(CustomDump)

@@ -1,6 +1,5 @@
 import AssetsViewFeature
-import ComposableArchitecture
-import PasteboardClient
+import FeaturePrelude
 
 public struct AccountDetails: Sendable, ReducerProtocol {
 	@Dependency(\.pasteboardClient) var pasteboardClient

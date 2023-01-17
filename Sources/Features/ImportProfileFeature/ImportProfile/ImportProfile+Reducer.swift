@@ -1,9 +1,5 @@
-import ComposableArchitecture
-import ErrorQueue
-import FileClient
-import Foundation
-import JSON
-import Profile
+import FeaturePrelude
+import ProfileClient
 
 // MARK: - ImportProfile
 public struct ImportProfile: Sendable, ReducerProtocol {

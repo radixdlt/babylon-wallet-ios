@@ -1,7 +1,4 @@
-import Foundation
-import JSON
-import Prelude
-import UserDefaultsClient
+import ClientPrelude
 
 // MARK: - AppSettingsClient + DependencyKey
 extension AppSettingsClient: DependencyKey {

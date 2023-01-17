@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 
 // MARK: - AccountList.Row
 public extension AccountList {

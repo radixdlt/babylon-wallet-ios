@@ -1,25 +1,28 @@
-"app.developmentOnlyInfo" = "Development use only. Not usable on Radix mainnet.";
-"app.errorOccurredTitle" = "An Error Occurred";
-
 "accountDetails.transferButtonTitle" = "Transfer";
 
 "accountList.row.copyTitle" = "Copy";
 
-"accountPreferences.title" = "Account Preferences";
 "accountPreferences.faucetButtonTitle" = "Get Betanet XRD Test Tokens";
 "accountPreferences.loadingPrompt" = "This may take several seconds, please wait for completion";
+"accountPreferences.title" = "Account Preferences";
 
 "aggregatedValue.title" = "Total value";
+
+"app.developmentOnlyInfo" = "Development use only. Not usable on Radix mainnet.";
+"app.errorOccurredTitle" = "An Error Occurred";
 
 "assetsView.badges" = "Badges";
 "assetsView.nfts" = "NFTs";
 "assetsView.poolShare" = "Pool Shares";
 "assetsView.tokens" = "Tokens";
 
+"common.P2PClientNotFoundInProfile" = "Inconsistency trying to use deleted Linked Connector.";
+"common.P2PConnectionOffline" = "Linked Connector Offline";
+
 "createAccount.biometricsPrompt" = "Authenticate to create new account with this phone.";
-"createAccount.completion.explanation" = "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.";
-"createAccount.completion.destination.home" = "Account List";
 "createAccount.completion.destination.chooseAccounts" = "Choose Accounts";
+"createAccount.completion.destination.home" = "Account List";
+"createAccount.completion.explanation" = "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.";
 "createAccount.completion.goToDestination" = "Go to %@";
 "createAccount.completion.subtitle" = "Your account has been created.";
 "createAccount.completion.subtitleFirstAccount" = "You’ve created your first account.";
@@ -30,12 +33,6 @@
 "createAccount.explanation" = "This can be changed any time";
 "createAccount.placeholder" = "e.g. My Main Account";
 "createAccount.subtitle" = "What would you like to call your account?";
-
-"home.header.subtitle" = "Welcome, here are all your accounts on the Radix Network";
-"home.header.title" = "Radix Wallet";
-
-"home.visitHub.buttonTitle" = "Visit the Radix Dashboard";
-"home.visitHub.title" = "Ready to get started using the Radix Network and your Wallet?";
 
 "dApp.chooseAccounts.createNewAccount" = "+ Create a New Account";
 "dApp.chooseAccounts.explanation" = "Choose %@";
@@ -49,10 +46,16 @@
 "dApp.connectionRequest.subtitle" = "For this dApp to function, it needs the following:";
 "dApp.connectionRequest.title" = "dApp Connection Request";
 "dApp.connectionRequest.wantsToConnect" = "%@ wants to connect to your wallet";
-"dApp.unknownName" = "Unknown dApp";
 "dApp.request.wrongNetworkError" = "Request received from dApp for network %@, but you are currently connected to %@.";
-"fungibleTokenList.detail.resourceAddress" = "Resource Address";
+"dApp.unknownName" = "Unknown dApp";
+
 "fungibleTokenList.detail.currentSupply" = "Current Supply";
+"fungibleTokenList.detail.resourceAddress" = "Resource Address";
+
+"home.header.subtitle" = "Welcome, here are all your accounts on the Radix Network";
+"home.header.title" = "Radix Wallet";
+"home.visitHub.buttonTitle" = "Visit the Radix Dashboard";
+"home.visitHub.title" = "Ready to get started using the Radix Network and your Wallet?";
 
 "importProfile.importMnemonic" = "Import mnemonic";
 "importProfile.importProfile" = "Import Radix Wallet backup";
@@ -70,44 +73,40 @@
 "manageGateway.title" = "Network Gateway";
 "manageGateway.urlString" = "https://example.com:8080";
 
-"newConnection.connecting" = "Linking...";
-"newConnection.defaultNameOfConnection" = "Unnamed";
-"newConnection.saveNamedConnectionButton" = "Save Link";
-"newConnection.subtitle" = "Scan your QR code to link your wallet with a browser extension";
-"newConnection.textFieldHint" = "Name this Connector, e.g. \"Chrome on Macbook Pro\"";
-"newConnection.textFieldPlaceholder" = "Name of Connector";
-"newConnection.title" = "Link to Connector";
-"newConnection.localNetworkPermission.deniedAlert.title" = "Access Required";
-"newConnection.localNetworkPermission.deniedAlert.message" = "Local Network access is required to link to connector.";
-"newConnection.localNetworkPermission.deniedAlert.cancelButtonTitle" = "Cancel";
-"newConnection.localNetworkPermission.deniedAlert.settingsButtonTitle" = "Settings";
-"newConnection.cameraPermission.deniedAlert.title" = "Access Required";
-"newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";
-"newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
-"newConnection.cameraPermission.deniedAlert.settingsButtonTitle" = "Settings";
-
-"manageP2PClients.P2PConnectionsTitle" = "Linked Connector";
 "manageP2PClients.P2PConnectionsSubtitle" = "Your Radix Wallet is linked to the following desktop browser using the Connector browser extension.";
+"manageP2PClients.P2PConnectionsTitle" = "Linked Connector";
 "manageP2PClients.connectionID" = "Connector ID: %@";
 "manageP2PClients.newConnectionButtonTitle" = "Link New Connector";
 "manageP2PClients.newConnectionTitle" = "Link New Connector";
 "manageP2PClients.sendTestMessageButtonTitle" = "Send Test Msg";
 
-"nftList.header.supplyUnknown" = "Unknown";
-"nftList.nftPlural" = "%d NFTs";
-"nftList.ownedOfTotal" = "%d of %d";
+"newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
+"newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";
+"newConnection.cameraPermission.deniedAlert.settingsButtonTitle" = "Settings";
+"newConnection.cameraPermission.deniedAlert.title" = "Access Required";
+"newConnection.connecting" = "Linking...";
+"newConnection.defaultNameOfConnection" = "Unnamed";
+"newConnection.localNetworkPermission.deniedAlert.cancelButtonTitle" = "Cancel";
+"newConnection.localNetworkPermission.deniedAlert.message" = "Local Network access is required to link to connector.";
+"newConnection.localNetworkPermission.deniedAlert.settingsButtonTitle" = "Settings";
+"newConnection.localNetworkPermission.deniedAlert.title" = "Access Required";
+"newConnection.saveNamedConnectionButton" = "Save Link";
+"newConnection.subtitle" = "Scan your QR code to link your wallet with a browser extension";
+"newConnection.textFieldHint" = "Name this Connector, e.g. \"Chrome on Macbook Pro\"";
+"newConnection.textFieldPlaceholder" = "Name of Connector";
+"newConnection.title" = "Link to Connector";
 
 "nftList.detail.nftID" = "NFT ID";
 "nftList.detail.resourceAddress" = "Resource Address";
 "nftList.detail.resourceName" = "Name";
-
-"splash.biometricsNotSetUpMessage" = "This app requires your phone to have biometrics set up";
-"splash.biometricsNotSetUpTitle" = "Biometrics not set up";
-"splash.incompatibleProfileVersionAlertTitle" = "Wallet Data is Incompatible";
-"splash.incompatibleProfileVersionAlertMessage" = "For this Preview wallet version, you must delete your wallet data to continue.";
-"splash.incompatibleProfileVersionAlertDeleteButton" = "Delete Wallet Data";
+"nftList.header.supplyUnknown" = "Unknown";
+"nftList.nftPlural" = "%d NFTs";
+"nftList.ownedOfTotal" = "%d of %d";
 
 "onboarding.newAccountButtonTitle" = "New Account";
+
+"profileLoad.decodingError" = "Failed to create Wallet from backup: %@";
+"profileLoad.failedToCreateProfileFromSnapshotError" = "Failed to create Wallet from backup, error: %@, version: %@";
 
 "settings.closeButtonTitle" = "Close";
 "settings.connectExtension.buttonTitle" = "Link to Connector";
@@ -121,14 +120,18 @@
 "settings.title" = "Wallet Settings";
 "settings.versionInfo" = "Version: %@ build #%@";
 
+"splash.alert.biometricsCheckFailed.cancelButtonTitle" = "Cancel";
+"splash.alert.biometricsCheckFailed.message" = "Biometrics are not set up. Please update settings.";
+"splash.alert.biometricsCheckFailed.settingsButtonTitle" = "Settings";
+"splash.alert.biometricsCheckFailed.title" = "Warning";
+"splash.biometricsNotSetUpMessage" = "This app requires your phone to have biometrics set up";
+"splash.biometricsNotSetUpTitle" = "Biometrics not set up";
+"splash.incompatibleProfileVersionAlertDeleteButton" = "Delete Wallet Data";
+"splash.incompatibleProfileVersionAlertMessage" = "For this Preview wallet version, you must delete your wallet data to continue.";
+"splash.incompatibleProfileVersionAlertTitle" = "Wallet Data is Incompatible";
+
 "transactionSigning.biometricsPrompt" = "Authenticate to sign transaction with this phone.";
 "transactionSigning.preparingTransactionLoadingText" = "Preparing transaction...";
 "transactionSigning.signTransactionButtonTitle" = "Approve Transaction";
 "transactionSigning.signingAndSubmittingTransactionLoadingText" = "Submitting transaction...";
 "transactionSigning.title" = "Approve Transaction";
-
-"profileLoad.failedToCreateProfileFromSnapshotError" = "Failed to create Wallet from backup, error: %@, version: %@";
-"profileLoad.decodingError" = "Failed to create Wallet from backup: %@";
-
-"common.P2PConnectionOffline" = "Linked Connector Offline";
-"common.P2PClientNotFoundInProfile" = "Inconsistency trying to use deleted Linked Connector.";

@@ -1,17 +1,17 @@
 @testable import Cryptography
 import CryptoKit
-import XCTest
+import TestingPrelude
 
 // MARK: - TestVector
 struct TestVector<Curve: Slip10SupportedECCurve> {
 	let seed: Data
 	let vectorID: Int
-	let testCases: [TestCase]
+	let testCases: [TestScenario]
 
 	init(
 		seed: String,
 		vectorID: Int,
-		testCases: [TestCase]
+		testCases: [TestScenario]
 	) throws {
 		self.seed = try Data(hex: seed)
 		self.vectorID = vectorID
@@ -19,9 +19,9 @@ struct TestVector<Curve: Slip10SupportedECCurve> {
 	}
 }
 
-// MARK: TestVector.TestCase
+// MARK: TestVector.TestScenario
 extension TestVector {
-	struct TestCase {
+	struct TestScenario {
 		let path: HD.Path.Full
 		let expected: Expected
 
@@ -71,12 +71,7 @@ extension TestVector {
 }
 
 // MARK: - SLIP10TestVectorsTests
-final class SLIP10TestVectorsTests: XCTestCase {
-	override func setUp() {
-		super.setUp()
-		continueAfterFailure = false
-	}
-
+final class SLIP10TestVectorsTests: TestCase {
 	func testPath_m() throws {
 		let path: HD.Path.Full = "m"
 		XCTAssertEqual(path.components, [.root(onlyPublic: false)])
@@ -118,19 +113,6 @@ final class SLIP10TestVectorsTests: XCTestCase {
 			try root.derivePrivateKey(path: path, curve: SECP256K1.self),
 			"SECP256K1 accepts non hardened keys"
 		)
-	}
-
-	func testP256PublicKeyInit() throws {
-		let privateKeyHex = "612091aaa12e22dd2abef664f8a01a82cae99ad7441b7ef8110424915c268bc2"
-		let publicKeyHex = "0266874dc6ade47b3ecd096745ca09bcd29638dd52c2c12117b11ed3e458cfa9e8"
-		let privateKey = try P256.Signing.PrivateKey(rawRepresentation: Data(hex: privateKeyHex))
-		let publicKey = try P256.Signing.PublicKey(x963Representation: Data(hex: publicKeyHex))
-		XCTAssertEqual(publicKey.rawRepresentation.hex(), privateKey.publicKey.rawRepresentation.hex())
-		XCTAssertEqual(privateKey.publicKey.rawRepresentation.hex().dropLast(64), publicKeyHex.dropFirst(2))
-
-		XCTAssertNil(privateKey.publicKey.compactRepresentation)
-		let x963Representation = try privateKey.publicKey.x963Representation()
-		XCTAssertEqual(x963Representation.hex(), publicKeyHex)
 	}
 
 	func testAssociativity() throws {
@@ -222,22 +204,6 @@ final class SLIP10TestVectorsTests: XCTestCase {
 		)
 	}
 
-	// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-1-for-nist256p1
-	func testSlip10Vector1P256() throws {
-		try doTest(
-			curve: P256.self,
-			vector: vector1P256
-		)
-	}
-
-	// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-2-for-nist256p1
-	func testSlip10Vector2P256() throws {
-		try doTest(
-			curve: P256.self,
-			vector: vector2P256
-		)
-	}
-
 	// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-1-for-ed25519
 	func testSlip10Vector1Curve25519() throws {
 		try doTest(
@@ -270,6 +236,39 @@ final class SLIP10TestVectorsTests: XCTestCase {
 		)
 	}
 
+	// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-1-for-nist256p1
+	@available(macOS 13, iOS 16, *)
+	func testSlip10Vector1P256() throws {
+		try doTest(
+			curve: P256.self,
+			vector: vector1P256
+		)
+	}
+}
+
+@available(macOS 13, iOS 16, *)
+extension SLIP10TestVectorsTests {
+	// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-2-for-nist256p1
+	func testSlip10Vector2P256() throws {
+		try doTest(
+			curve: P256.self,
+			vector: vector2P256
+		)
+	}
+
+	func testP256PublicKeyInit() throws {
+		let privateKeyHex = "612091aaa12e22dd2abef664f8a01a82cae99ad7441b7ef8110424915c268bc2"
+		let publicKeyHex = "0266874dc6ade47b3ecd096745ca09bcd29638dd52c2c12117b11ed3e458cfa9e8"
+		let privateKey = try P256.Signing.PrivateKey(rawRepresentation: Data(hex: privateKeyHex))
+		let publicKey = try P256.Signing.PublicKey(compressedRepresentation: Data(hex: publicKeyHex))
+		XCTAssertEqual(publicKey.rawRepresentation.hex(), privateKey.publicKey.rawRepresentation.hex())
+		XCTAssertEqual(privateKey.publicKey.rawRepresentation.hex().dropLast(64), publicKeyHex.dropFirst(2))
+
+		XCTAssertNil(privateKey.publicKey.compactRepresentation)
+		let compressedRepresentation = privateKey.publicKey.compressedRepresentation
+		XCTAssertEqual(compressedRepresentation.hex(), publicKeyHex)
+	}
+
 	func testDerivationRetryP256() throws {
 		try doTest(
 			curve: P256.self,
@@ -285,6 +284,7 @@ final class SLIP10TestVectorsTests: XCTestCase {
 	}
 }
 
+@available(macOS 13, iOS 16, *)
 private let seedRetryVectorP256 = try! TestVector<P256>(
 	seed: "a7305bc8df8d0951f0cb224c0e95d7707cbdf2c6ce7e8d481fec69c7ff5e9446",
 	vectorID: 1,
@@ -303,6 +303,7 @@ private let seedRetryVectorP256 = try! TestVector<P256>(
 	]
 )
 
+@available(macOS 13, iOS 16, *)
 private let derivationRetryVectorP256 = try! TestVector<P256>(
 	seed: "000102030405060708090a0b0c0d0e0f",
 	vectorID: 1,
@@ -343,6 +344,7 @@ private let derivationRetryVectorP256 = try! TestVector<P256>(
 	]
 )
 
+@available(macOS 13, iOS 16, *)
 private let vector1P256 = try! TestVector<P256>(
 	seed: "000102030405060708090a0b0c0d0e0f",
 	vectorID: 1,
@@ -420,6 +422,7 @@ private let vector1P256 = try! TestVector<P256>(
 	]
 )
 
+@available(macOS 13, iOS 16, *)
 private let vector2P256 = try! TestVector<P256>(
 	seed: "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542",
 	vectorID: 2,
@@ -816,7 +819,7 @@ private extension SLIP10TestVectorsTests {
 
 	func doTestCase<C>(
 		root: HD.Root,
-		case testCase: TestVector<C>.TestCase,
+		case testCase: TestVector<C>.TestScenario,
 		testIndex: Int,
 		line: UInt = #line
 	) throws where C: Slip10SupportedECCurve, C.PrivateKey: Equatable, C.PublicKey: Equatable {
@@ -903,5 +906,39 @@ private extension SLIP10TestVectorsTests {
 				expectPrivateToBePresent: false
 			)
 		}
+	}
+}
+
+// MARK: P256
+import BigInt
+@available(macOS 13, iOS 16, *)
+public extension Slip10CurveType {
+	/// The elliptic curve `P256`, `secp256r1`, `prime256v1` or as SLIP-0010 calls it `Nist256p1`
+	static let p256 = Self(
+		// For some strange reason SLIP-0010 calls P256 "Nist256p1" instead of
+		// either `P256`, `secp256r1` or `prime256v1`. Unfortunate!
+		// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#master-key-generation
+		slip10CurveID: "Nist256p1 seed",
+		curveOrder: BigUInt("FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551", radix: 16)!
+	)
+}
+
+// MARK: - P256 + Slip10SupportedECCurve
+@available(macOS 13, iOS 16, *)
+extension P256: Slip10SupportedECCurve {
+	public typealias PrivateKey = P256.Signing.PrivateKey
+	public typealias PublicKey = P256.Signing.PublicKey
+	public static let slip10Curve = Slip10CurveType.p256
+}
+
+// MARK: - P256.Signing.PrivateKey + ECPrivateKey
+@available(macOS 13, iOS 16, *)
+extension P256.Signing.PrivateKey: ECPrivateKey {}
+
+// MARK: - P256.Signing.PublicKey + ECPublicKey
+@available(macOS 13, iOS 16, *)
+extension P256.Signing.PublicKey: ECPublicKey {
+	public init<D>(uncompressedRepresentation: D) throws where D: ContiguousBytes {
+		try self.init(rawRepresentation: uncompressedRepresentation)
 	}
 }

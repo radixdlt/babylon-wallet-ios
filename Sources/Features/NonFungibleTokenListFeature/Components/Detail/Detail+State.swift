@@ -1,7 +1,4 @@
-import Asset
-import EngineToolkit
-import Foundation
-import SharedModels
+import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Detail.State
 public extension NonFungibleTokenList.Detail {

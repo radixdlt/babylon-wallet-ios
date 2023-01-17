@@ -1,6 +1,4 @@
-import Common
-import Foundation
-import Profile
+import ClientPrelude
 
 // MARK: - AppSettings
 public struct AppSettings: Sendable, Codable, Hashable {

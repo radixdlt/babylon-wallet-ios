@@ -1,5 +1,5 @@
 #if DEBUG
-import Prelude
+import ClientPrelude
 
 extension TransactionClient: TestDependencyKey {
 	public static let testValue: TransactionClient = .init(

@@ -1,6 +1,6 @@
 @testable import AssetsViewFeature
-import ComposableArchitecture
-import TestUtils
+import FeaturePrelude
+import TestingPrelude
 
 final class AssetsViewFeatureTests: TestCase {
 	func testTrivial() {

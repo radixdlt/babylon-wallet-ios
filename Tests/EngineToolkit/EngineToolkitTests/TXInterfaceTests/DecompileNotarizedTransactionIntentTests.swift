@@ -1,4 +1,5 @@
 @testable import EngineToolkit
+import TestingPrelude
 
 final class DecompileNotarizedTransactionIntentTests: TestCase {
 	func test__decompile_notarized_transaction_intent_does_not_throw_ed25519() throws {

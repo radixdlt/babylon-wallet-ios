@@ -1,7 +1,4 @@
-import Foundation
-import Prelude
-import Profile
-import Version
+import ClientPrelude
 
 // MARK: - ProfileLoader
 public struct ProfileLoader: Sendable, DependencyKey {

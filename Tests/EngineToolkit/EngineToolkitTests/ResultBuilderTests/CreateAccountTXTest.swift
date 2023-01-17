@@ -1,6 +1,6 @@
 import Cryptography
 @testable import EngineToolkit
-import Prelude
+import TestingPrelude
 
 // MARK: - HammunetAddresses
 public enum HammunetAddresses {}

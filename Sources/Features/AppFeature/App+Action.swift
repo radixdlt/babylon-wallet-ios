@@ -1,8 +1,7 @@
-import ComposableArchitecture
-import Foundation
+import FeaturePrelude
 import MainFeature
 import OnboardingFeature
-import Profile
+import ProfileClient
 import SplashFeature
 
 // MARK: - App.Action

@@ -1,6 +1,4 @@
-import ComposableArchitecture
-import Foundation
-import Profile
+import FeaturePrelude
 
 // MARK: - AccountPreferences.Action
 public extension AccountPreferences {
@@ -34,6 +32,7 @@ public extension AccountPreferences.Action {
 	enum SystemAction: Sendable, Equatable {
 		case isAllowedToUseFaucet(TaskResult<Bool>)
 		case refreshAccountCompleted
+		case hideLoader
 	}
 }
 

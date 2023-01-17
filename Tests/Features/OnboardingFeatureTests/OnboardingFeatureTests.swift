@@ -1,8 +1,6 @@
-import ComposableArchitecture
+import FeaturePrelude
 @testable import OnboardingFeature
-import Profile
-import TestUtils
-import UserDefaultsClient
+import TestingPrelude
 
 @MainActor
 final class OnboardingNewProfileFeatureTests: TestCase {}

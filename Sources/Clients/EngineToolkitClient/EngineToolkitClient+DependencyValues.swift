@@ -1,4 +1,4 @@
-import Prelude
+import ClientPrelude
 
 public extension DependencyValues {
 	var engineToolkitClient: EngineToolkitClient {

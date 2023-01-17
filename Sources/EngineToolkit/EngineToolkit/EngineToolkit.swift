@@ -1,5 +1,6 @@
-import Foundation
-import RadixEngineToolkit
+import EngineToolkitModels
+import Prelude
+@_implementationOnly import RadixEngineToolkit
 
 typealias UnderlyingPointerType = CChar
 typealias MutableToolkitPointer = UnsafeMutablePointer<UnderlyingPointerType>

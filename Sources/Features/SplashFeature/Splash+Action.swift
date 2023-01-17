@@ -1,6 +1,5 @@
-import ComposableArchitecture
+import FeaturePrelude
 import LocalAuthenticationClient
-import Profile
 import ProfileLoader
 
 // MARK: - Splash.Action
@@ -16,8 +15,14 @@ public extension Splash {
 // MARK: - Splash.Action.ViewAction
 public extension Splash.Action {
 	enum ViewAction: Sendable, Equatable {
+		public enum BiometricsCheckFailedAlertAction: Sendable, Equatable {
+			case dismissed
+			case cancelButtonTapped
+			case openSettingsButtonTapped
+		}
+
 		case viewAppeared
-		case alertRetryButtonTapped
+		case biometricsCheckFailed(BiometricsCheckFailedAlertAction)
 	}
 }
 

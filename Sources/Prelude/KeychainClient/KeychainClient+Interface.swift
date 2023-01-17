@@ -4,6 +4,8 @@ import Foundation
 
 // MARK: - KeychainClient
 public struct KeychainClient: Sendable, DependencyKey {
+	public typealias Key = String
+
 	public var dataForKey: DataForKey
 	public var removeDataForKey: RemoveDataForKey
 
@@ -45,5 +47,4 @@ public extension KeychainClient {
 	}
 }
 
-public typealias Key = String
 public typealias AuthenticationPrompt = String

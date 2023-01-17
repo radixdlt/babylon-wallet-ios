@@ -1,7 +1,4 @@
-import Asset
-import Common
-import Foundation
-import Profile
+import FeaturePrelude
 
 // MARK: - FungibleTokenList.Row.State
 public extension FungibleTokenList.Row {

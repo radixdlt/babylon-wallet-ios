@@ -1,4 +1,4 @@
-// swift-tools-version: 5.6
+// swift-tools-version: 5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -20,191 +20,123 @@ package.addModules([
 		dependencies: [
 			"AccountListFeature",
 			"AccountPreferencesFeature",
-			"Asset",
 			"AssetsViewFeature",
-			"DesignSystem",
-			"PasteboardClient",
-			"EngineToolkit",
-			"Profile",
-
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: [
+				"SharedTestingModels",
+			]
 		)
 	),
 	.feature(
 		name: "AccountListFeature",
 		dependencies: [
 			"AccountPortfolio",
-			"Asset",
 			"FungibleTokenListFeature",
-			"PasteboardClient",
-			"ProfileClient",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"]
+			dependencies: [
+				"SharedTestingModels",
+			]
 		)
 	),
 	.feature(
 		name: "AccountPreferencesFeature",
 		dependencies: [
-			"Common",
-			"DesignSystem",
-			"ErrorQueue",
 			"FaucetClient",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AggregatedValueFeature",
-		dependencies: [
-			"Common",
-			"DesignSystem",
-		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		dependencies: [],
+		tests: .yes()
 	),
 	.feature(
 		name: "AppFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AccountPortfolio",
 			"AppSettings",
-			"EngineToolkit",
-			"ErrorQueue",
 			"MainFeature",
 			"OnboardingFeature",
-			"PasteboardClient",
-			"ProfileLoader",
 			"ProfileClient",
-			"Resources",
 			"SplashFeature",
-			"UserDefaultsClient",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: [
 				"SplashFeature",
-				"TestUtils",
-				"ProfileClient",
 			]
 		)
 	),
 	.feature(
 		name: "AssetsViewFeature",
 		dependencies: [
-			"Asset",
-			"Common",
 			"FungibleTokenListFeature",
 			"NonFungibleTokenListFeature",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "CreateAccountFeature",
 		dependencies: [
-			"Common",
 			"Cryptography",
-			"DesignSystem",
-			"EngineToolkit",
-			"ErrorQueue",
 			"GatewayAPI",
-//			"KeychainClientDependency",
 			"LocalAuthenticationClient",
 			"ProfileClient",
 		],
 		tests: .yes(
 			dependencies: [
-				"TestUtils",
-				"UserDefaultsClient",
+				"SharedTestingModels",
 			]
 		)
 	),
 	.feature(
 		name: "FungibleTokenDetailsFeature",
-		dependencies: [
-			"DesignSystem",
-			"PasteboardClient",
-			"SharedModels",
-		],
+		dependencies: [],
 		tests: .no
 	),
 	.feature(
 		name: "FungibleTokenListFeature",
 		dependencies: [
-			"Asset",
-			"Common",
-			"DesignSystem",
 			"FungibleTokenDetailsFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				"Asset",
-				"DesignSystem",
-				"Profile",
-				"TestUtils",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "GrantDappWalletAccessFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"Common",
 			"CreateAccountFeature",
-			"DesignSystem",
-			"ErrorQueue",
 			"ProfileClient",
-			"SharedModels",
-			// ^^^ Sort lexicographically ^^^
 		],
-		tests: .yes(
-			dependencies: [
-				"ProfileClient",
-				"TestUtils",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "HandleDappRequests",
 		dependencies: [
 			"GrantDappWalletAccessFeature",
 			"P2PConnectivityClient",
-			"Profile",
-			"SharedModels",
 			"TransactionSigningFeature",
-		], tests: .yes(dependencies: ["TestUtils"])
+		],
+		tests: .yes()
 	),
 	.feature(
 		name: "HomeFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AccountListFeature",
 			"AccountDetailsFeature",
 			"AccountPortfolio",
 			"AccountPreferencesFeature",
 			"AppSettings",
-			"P2PConnectivityClient",
-			"Common",
 			"CreateAccountFeature",
-			"EngineToolkit",
 			"GrantDappWalletAccessFeature",
+			"P2PConnectivityClient",
 			"ProfileClient",
-			"SharedModels",
 			"TransactionSigningFeature",
-			// ^^^ Sort lexicographically ^^^
 		],
 		tests: .yes(
 			dependencies: [
-				"Asset",
 				"FungibleTokenListFeature",
 				"NonFungibleTokenListFeature",
-				"TestUtils",
 			]
 		)
 	),
@@ -212,67 +144,39 @@ package.addModules([
 		name: "ImportProfileFeature",
 		dependencies: [
 			"Cryptography",
-			"Common",
-			"DesignSystem",
-			"ErrorQueue",
-			"FileClient",
-			"JSON",
-//			"KeychainClientDependency",
 			"ProfileClient",
 		],
 		tests: .yes(
-			dependencies: ["TestUtils"],
+			dependencies: [],
 			resources: [.process("profile_snapshot.json")]
 		)
 	),
 	.feature(
 		name: "MainFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
 			"AppSettings",
 			"AccountPortfolio",
-//			"EngineToolkit",
 			"HandleDappRequests",
 			"HomeFeature",
-			"PasteboardClient",
 			"SettingsFeature",
-			// ^^^ Sort lexicographically ^^^
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "ManageP2PClientsFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"Common",
-			"DesignSystem",
-			"ErrorQueue",
 			"NewConnectionFeature",
 			"P2PConnectivityClient",
-			"ProfileClient",
-			"SharedModels",
-			// ^^^ Sort lexicographically ^^^
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "ManageGatewayAPIEndpointsFeature",
 		dependencies: [
-			"Common",
 			"CreateAccountFeature",
-			"ErrorQueue",
-			"DesignSystem",
 			"GatewayAPI",
-			"ProfileClient",
-			"UserDefaultsClient",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "NewConnectionFeature",
@@ -281,98 +185,49 @@ package.addModules([
 			.product(name: "CodeScanner", package: "CodeScanner", condition: .when(platforms: [.iOS])) {
 				.package(url: "https://github.com/twostraws/CodeScanner", from: "2.2.1")
 			},
-			"Common",
-			"DesignSystem",
-			"ErrorQueue",
 			"P2PConnectivityClient",
-			"SharedModels",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "NonFungibleTokenListFeature",
-		dependencies: [
-			"Asset",
-			"Common",
-			"DesignSystem",
-			"EngineToolkit",
-			"PasteboardClient",
-			"SharedModels",
-		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		dependencies: [],
+		tests: .yes()
 	),
 	.feature(
 		name: "OnboardingFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"DesignSystem",
 			"CreateAccountFeature",
 			"ImportProfileFeature",
-			// ^^^ Sort lexicographically ^^^
 		],
-		tests: .yes(
-			dependencies: [
-				"UserDefaultsClient",
-				"TestUtils",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"Common",
-			"ErrorQueue",
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
-			"ProfileClient",
 			"ProfileView",
-			// ^^^ Sort lexicographically ^^^
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "SplashFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"Common",
-			"DesignSystem",
-			"ErrorQueue",
 			"LocalAuthenticationClient",
-			"PlatformEnvironmentClient",
-			"ProfileClient",
 			"ProfileLoader",
-			// ^^^ Sort lexicographically ^^^
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "TransactionSigningFeature",
 		dependencies: [
-			// ˅˅˅ Sort lexicographically ˅˅˅
-			"Common",
-			"DesignSystem",
-			"EngineToolkitClient",
-			"ErrorQueue",
 			"GatewayAPI",
-			"ProfileClient",
-			"SharedModels",
 			"TransactionClient",
-			// ^^^ Sort lexicographically ^^^
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
+		tests: .yes()
 	),
 ])
 
@@ -383,28 +238,15 @@ package.addModules([
 		name: "AccountPortfolio",
 		dependencies: [
 			"AppSettings",
-			"Asset",
-			"Common",
-			"EngineToolkit",
 			"GatewayAPI",
-			"Profile",
+			"ProfileClient",
 		],
-		tests: .yes(
-			dependencies: [
-				"TestUtils",
-			]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "AppSettings",
-		dependencies: [
-			"Common",
-			"JSON",
-			"UserDefaultsClient",
-		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		dependencies: [],
+		tests: .yes()
 	),
 	.client(
 		name: "CameraPermissionClient",
@@ -414,36 +256,20 @@ package.addModules([
 	.client(
 		name: "EngineToolkitClient",
 		dependencies: [
-			"Common",
 			"Cryptography",
 			"EngineToolkit",
-			"Profile", // AccountAddress
+			"Profile",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
-	),
-	.client(
-		name: "ErrorQueue",
-		dependencies: [],
-		tests: .no
+		tests: .yes()
 	),
 	.client(
 		name: "FaucetClient",
 		dependencies: [
-			"Common",
-			"EngineToolkit",
 			"EngineToolkitClient",
 			"GatewayAPI",
-			"Profile",
 			"ProfileClient",
 			"TransactionClient",
 		], tests: .no
-	),
-	.client(
-		name: "FileClient",
-		dependencies: [],
-		tests: .no
 	),
 	.client(
 		name: "GatewayAPI",
@@ -452,103 +278,51 @@ package.addModules([
 				// Unfortunate GatewayAPI OpenAPI Generated Model dependency :/
 				.package(url: "https://github.com/Flight-School/AnyCodable", from: "0.6.6")
 			},
-			"Asset",
-			"Common",
 			"Cryptography",
-			"EngineToolkit",
-			"EngineToolkitClient",
-			"JSON",
-			"Profile", // address
 			"ProfileClient",
 		],
 		exclude: [
 			"CodeGen/Input/",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
-	),
-	.client(
-		name: "JSON", // TODO: extract into Prelude package
-		dependencies: [],
-		tests: .no
+		tests: .yes()
 	),
 	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "P2PConnectivityClient",
 		dependencies: [
-			"Common",
-			"EngineToolkit", // Model: SignTX contains Manifest
-			"JSON",
-			"Profile", // Account
-			"ProfileClient",
 			"P2PConnection",
-			"Resources",
-			"SharedModels",
+			"ProfileClient",
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
-	),
-	.client(
-		name: "PasteboardClient",
-		dependencies: [],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
-	),
-	.client(
-		name: "PlatformEnvironmentClient",
-		dependencies: [],
-		tests: .no
+		tests: .yes()
 	),
 	.client(
 		name: "ProfileClient",
 		dependencies: [
 			"Cryptography",
-			"EngineToolkitClient", // Create TX
-			"Profile",
+			"EngineToolkitClient",
 			"ProfileLoader",
-			"SharedModels",
-			"UserDefaultsClient",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "ProfileLoader",
 		dependencies: [
-			"Common",
-			"JSON",
 			"Profile",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 	.client(
 		name: "TransactionClient",
 		dependencies: [
+			"EngineToolkitClient",
 			"GatewayAPI",
 			"ProfileClient",
 		],
-		tests: .yes(dependencies: [
-			"TestUtils",
-		])
-	),
-	.client(
-		name: "UserDefaultsClient",
-		dependencies: [],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .yes()
 	),
 ])
 
@@ -556,41 +330,24 @@ package.addModules([
 
 package.addModules([
 	.core(
-		name: "Asset", // put in SharedModels?
+		name: "FeaturePrelude",
 		dependencies: [
-			"Common",
-			"EngineToolkitClient", // I know, this is very wrong. Apologies. Let's revisit our dependency levels post betanet.
-			"Profile", // Address
-		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
-	),
-	.core(
-		name: "Common",
-		dependencies: [
+			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
+				.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1")
+			},
 			"DesignSystem",
-			"EngineToolkit",
-			"Profile", // Address
 			"Resources",
+			"SharedModels",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .no
 	),
 	.core(
-		name: "SharedModels",
+		name: "ClientPrelude",
 		dependencies: [
-			"Asset",
-			"Common", // FIXME: it should be the other way around — Common should depend on SharedModels and @_exported import it. However, first we need to make "EngineToolkit", etc. vend their own Model packages.
-			"EngineToolkit", // FIXME: In `EngineToolkit` split out Models package
-			"Profile", // FIXME: In `Profile` split out Models package
-			"P2PConnection",
-			"P2PModels",
+			"Resources", // TODO: should be L10n on its own. We'll split L10n into its own module at some point.
+			"SharedModels",
 		],
-		tests: .yes(
-			dependencies: ["TestUtils"]
-		)
+		tests: .no
 	),
 	.core(
 		name: "DesignSystem",
@@ -606,11 +363,7 @@ package.addModules([
 				.package(url: "https://github.com/pointfreeco/swiftui-navigation", from: "0.4.3")
 			},
 		],
-		tests: .yes(
-			dependencies: [
-				"TestUtils",
-			]
-		)
+		tests: .yes()
 	),
 	.core(
 		name: "Resources",
@@ -626,11 +379,21 @@ package.addModules([
 		tests: .no
 	),
 	.core(
-		name: "TestUtils",
+		name: "SharedTestingModels",
 		dependencies: [
-			"Common",
+			"SharedModels",
 		],
 		tests: .no
+	),
+	.core(
+		name: "SharedModels",
+		dependencies: [
+			"EngineToolkitModels",
+			"ProfileModels",
+			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
+			"P2PModels",
+		],
+		tests: .yes()
 	),
 ])
 
@@ -638,11 +401,20 @@ package.addModules([
 
 package.addModules([
 	.module(
+		name: "ProfileView",
+		category: "Profile",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.module(
 		name: "Profile",
 		category: "Profile",
 		dependencies: [
 			"Cryptography",
 			"EngineToolkit",
+			"ProfileModels",
 			"P2PModels",
 		],
 		tests: .yes(
@@ -653,10 +425,12 @@ package.addModules([
 		)
 	),
 	.module(
-		name: "ProfileView",
+		name: "ProfileModels",
 		category: "Profile",
 		dependencies: [
-			"Profile",
+			"Cryptography",
+			"EngineToolkitModels",
+			"P2PModels",
 		],
 		tests: .no
 	),
@@ -665,6 +439,7 @@ package.addModules([
 		category: "EngineToolkit",
 		dependencies: [
 			"Cryptography",
+			"EngineToolkitModels",
 			"RadixEngineToolkit",
 		],
 		tests: .yes(
@@ -673,6 +448,14 @@ package.addModules([
 				.process("TestVectors/"),
 			]
 		)
+	),
+	.module(
+		name: "EngineToolkitModels",
+		category: "EngineToolkit",
+		dependencies: [
+			"Cryptography",
+		],
+		tests: .no
 	),
 	.module(
 		name: "P2PConnection",
@@ -693,13 +476,9 @@ package.addModules([
 		name: "P2PModels",
 		category: "RadixConnect",
 		dependencies: [
-			.product(name: "SwiftLogConsoleColors", package: "swift-log-console-colors") {
-				.package(url: "https://github.com/nneuberger1/swift-log-console-colors", from: "1.0.3")
-			},
+			"Cryptography",
 		],
-		tests: .yes(
-			dependencies: []
-		)
+		tests: .yes()
 	),
 	.module(
 		name: "Cryptography",
@@ -717,7 +496,15 @@ package.addModules([
 		)
 	),
 	.module(
+		name: "TestingPrelude",
+		dependencies: [],
+		tests: .no
+	),
+	.module(
 		name: "Prelude",
+		remoteDependencies: [
+			.package(url: "https://github.com/apple/swift-collections", branch: "main"), // TODO: peg to specific version once main is tagged
+		],
 		dependencies: [
 			.product(name: "AsyncAlgorithms", package: "swift-async-algorithms") {
 				.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3")
@@ -728,9 +515,10 @@ package.addModules([
 			.product(name: "BigInt", package: "BigInt") {
 				.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0")
 			},
-			.product(name: "Collections", package: "swift-collections") {
-				.package(url: "https://github.com/apple/swift-collections", from: "1.0.3")
-			},
+
+			.product(name: "BitCollections", package: "swift-collections"),
+			.product(name: "Collections", package: "swift-collections"),
+
 			.product(name: "CustomDump", package: "swift-custom-dump") {
 				.package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.1")
 			},
@@ -749,11 +537,11 @@ package.addModules([
 			.product(name: "NonEmpty", package: "swift-nonempty") {
 				.package(url: "https://github.com/pointfreeco/swift-nonempty", from: "0.4.0")
 			},
+			.product(name: "SwiftLogConsoleColors", package: "swift-log-console-colors") {
+				.package(url: "https://github.com/nneuberger1/swift-log-console-colors", from: "1.0.3")
+			},
 			.product(name: "Tagged", package: "swift-tagged") {
 				.package(url: "https://github.com/pointfreeco/swift-tagged", from: "0.7.0")
-			},
-			.product(name: "Version", package: "Version") {
-				.package(url: "https://github.com/mxcl/Version", from: "2.0.1")
 			},
 		],
 		tests: .yes(dependencies: [])
@@ -782,13 +570,14 @@ extension Package {
 			case no
 			case yes(
 				nameSuffix: String = "Tests",
-				dependencies: [Target.Dependency],
+				dependencies: [Target.Dependency] = [],
 				resources: [Resource]? = nil
 			)
 		}
 
 		let name: String
 		let category: String?
+		let remoteDependencies: [Package.Dependency]?
 		let dependencies: [Target.Dependency]
 		let exclude: [String]
 		let resources: [Resource]?
@@ -798,6 +587,7 @@ extension Package {
 
 		static func feature(
 			name: String,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -808,12 +598,8 @@ extension Package {
 			.init(
 				name: name,
 				category: "Features",
-				dependencies: dependencies + [
-					.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-						.package(url: "https://github.com/pointfreeco/swift-composable-architecture", from: "0.49.1")
-					},
-					"DesignSystem",
-				],
+				remoteDependencies: remoteDependencies,
+				dependencies: dependencies + ["FeaturePrelude"],
 				exclude: exclude,
 				resources: resources,
 				plugins: plugins,
@@ -824,6 +610,7 @@ extension Package {
 
 		static func client(
 			name: String,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -834,7 +621,8 @@ extension Package {
 			.init(
 				name: name,
 				category: "Clients",
-				dependencies: dependencies,
+				remoteDependencies: remoteDependencies,
+				dependencies: dependencies + ["ClientPrelude"],
 				exclude: exclude,
 				resources: resources,
 				plugins: plugins,
@@ -845,6 +633,7 @@ extension Package {
 
 		static func core(
 			name: String,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -855,7 +644,8 @@ extension Package {
 			.init(
 				name: name,
 				category: "Core",
-				dependencies: dependencies + ["Prelude"],
+				remoteDependencies: remoteDependencies,
+				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
 				plugins: plugins,
@@ -867,6 +657,7 @@ extension Package {
 		static func module(
 			name: String,
 			category: String? = nil,
+			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
 			resources: [Resource]? = nil,
@@ -877,6 +668,7 @@ extension Package {
 			.init(
 				name: name,
 				category: category,
+				remoteDependencies: remoteDependencies,
 				dependencies: dependencies,
 				exclude: exclude,
 				resources: resources,
@@ -894,6 +686,10 @@ extension Package {
 	}
 
 	private func addModule(_ module: Module) {
+		if let remoteDependencies = module.remoteDependencies {
+			package.dependencies.append(contentsOf: remoteDependencies)
+		}
+
 		let targetName = module.name
 		let targetPath = {
 			if let category = module.category {
@@ -942,7 +738,7 @@ extension Package {
 			package.targets += [
 				.testTarget(
 					name: testTargetName,
-					dependencies: [.target(name: targetName)] + testDependencies,
+					dependencies: [.target(name: targetName)] + testDependencies + ["TestingPrelude"],
 					path: testTargetPath,
 					resources: resources,
 					swiftSettings: [
@@ -984,8 +780,23 @@ extension Target.PluginUsage {
 
 extension Package {
 	func addDependencyIfNeeded(_ dependency: Package.Dependency) {
-		if !package.dependencies.contains(where: { $0.url == dependency.url }) {
+		if !package.dependencies.contains(where: { $0.id == dependency.id }) {
 			package.dependencies.append(dependency)
+		}
+	}
+}
+
+extension Package.Dependency {
+	var id: String {
+		switch kind {
+		case let .fileSystem(_, path):
+			return path
+		case let .registry(id, _):
+			return id
+		case let .sourceControl(_, url, _):
+			return url
+		@unknown default:
+			fatalError()
 		}
 	}
 }

@@ -1,5 +1,4 @@
-import ComposableArchitecture
-import Foundation
+import FeaturePrelude
 import P2PModels
 
 // MARK: - LocalNetworkPermission.Action

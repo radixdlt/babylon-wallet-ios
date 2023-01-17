@@ -1,4 +1,4 @@
-import ComposableArchitecture
+import FeaturePrelude
 
 public extension Home {
 	struct Header: Sendable, ReducerProtocol {

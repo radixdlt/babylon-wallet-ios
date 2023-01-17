@@ -1,6 +1,4 @@
-import Common
-import DesignSystem
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - Row
 struct Row: View {

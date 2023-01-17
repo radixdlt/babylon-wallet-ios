@@ -1,8 +1,7 @@
-import ComposableArchitecture
+import FeaturePrelude
 import HandleDappRequests
 import HomeFeature
 import SettingsFeature
-import SwiftUI
 
 // MARK: - Main.View
 public extension Main {
@@ -33,7 +32,7 @@ public extension Main.View {
 					state: \.settings,
 					action: { .child(.settings($0)) }
 				),
-				then: { Settings.View(store: $0) }
+				then: { AppSettings.View(store: $0) }
 			)
 			.zIndex(1)
 

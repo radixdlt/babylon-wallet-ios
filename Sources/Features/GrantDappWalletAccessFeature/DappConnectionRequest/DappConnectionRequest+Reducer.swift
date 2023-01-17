@@ -1,6 +1,4 @@
-import ComposableArchitecture
-import ErrorQueue
-import ProfileClient
+import FeaturePrelude
 
 // MARK: - DappConnectionRequest
 public struct DappConnectionRequest: Sendable, ReducerProtocol {

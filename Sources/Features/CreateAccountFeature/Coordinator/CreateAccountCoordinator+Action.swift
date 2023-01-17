@@ -1,6 +1,4 @@
-import ComposableArchitecture
-import Foundation
-import Profile
+import FeaturePrelude
 
 // MARK: - CreateAccountCoordinator.Action
 public extension CreateAccountCoordinator {

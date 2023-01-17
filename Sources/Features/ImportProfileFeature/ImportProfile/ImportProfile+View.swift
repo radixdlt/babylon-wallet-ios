@@ -1,8 +1,4 @@
-import Common
-import ComposableArchitecture
-import Foundation
-import ProfileClient
-import SwiftUI
+import FeaturePrelude
 
 // MARK: - ImportProfile.View
 public extension ImportProfile {

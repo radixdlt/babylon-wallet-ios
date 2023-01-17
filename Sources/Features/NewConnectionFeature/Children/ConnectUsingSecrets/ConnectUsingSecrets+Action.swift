@@ -1,7 +1,5 @@
-import ComposableArchitecture
+import FeaturePrelude
 import P2PConnection
-import Prelude
-import SharedModels
 
 // MARK: - ConnectUsingSecrets.Action
 public extension ConnectUsingSecrets {

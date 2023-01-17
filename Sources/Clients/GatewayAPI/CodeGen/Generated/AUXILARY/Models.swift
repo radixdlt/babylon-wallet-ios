@@ -4,7 +4,7 @@
 // https://openapi-generator.tech
 //
 
-import Foundation
+import ClientPrelude
 
 // MARK: - JSONEncodable
 protocol JSONEncodable {

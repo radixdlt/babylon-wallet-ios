@@ -1,7 +1,5 @@
-import ComposableArchitecture
 import CreateAccountFeature
-import Foundation
-import Profile
+import FeaturePrelude
 
 // MARK: - ManageGatewayAPIEndpoints.Action
 public extension ManageGatewayAPIEndpoints {

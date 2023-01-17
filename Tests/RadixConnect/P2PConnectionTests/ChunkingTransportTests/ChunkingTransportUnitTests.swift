@@ -1,7 +1,7 @@
 @testable import P2PConnection
-import XCTest
+import TestingPrelude
 
-final class ChunkingTransportUnitTests: XCTestCase {
+final class ChunkingTransportUnitTests: TestCase {
 	func test_split_reassemble() throws {
 		let longMessage = "A message that is long, " + String(repeating: "very ", count: 10000) + "long."
 

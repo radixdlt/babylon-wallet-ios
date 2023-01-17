@@ -1,5 +1,4 @@
-import Foundation
-import Profile
+import FeaturePrelude
 
 // MARK: - ChooseAccounts.Row.State
 public extension ChooseAccounts.Row {
@@ -25,7 +24,6 @@ extension ChooseAccounts.Row.State: Identifiable {
 }
 
 #if DEBUG
-import ProfileClient
 public extension ChooseAccounts.Row.State {
 	static let previewValueOne = Self(account: .previewValue0)
 	static let previewValueTwo = Self(account: .previewValue1)

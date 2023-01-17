@@ -1,5 +1,5 @@
 import Cryptography
-import Prelude
+import FeaturePrelude
 
 public typealias MnemonicImporter = @Sendable (String) throws -> Mnemonic
 

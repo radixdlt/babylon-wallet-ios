@@ -1,8 +1,7 @@
 @testable import Cryptography
-import Foundation
-import XCTest
+import TestingPrelude
 
-final class PathTests: XCTestCase {
+final class PathTests: TestCase {
 	func testInvalidPaths() throws {
 		let invalidPaths = [
 			"44'/2147483648",

@@ -1,7 +1,6 @@
-import ComposableArchitecture
-import Foundation
+import FeaturePrelude
 @testable import NonFungibleTokenListFeature
-import TestUtils
+import TestingPrelude
 
 @MainActor
 final class NonFungibleTokenListFeatureTests: TestCase {

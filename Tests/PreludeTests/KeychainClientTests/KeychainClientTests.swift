@@ -1,7 +1,7 @@
 import Prelude
-import XCTest
+import TestingPrelude
 
-final class KeychainClientTests: XCTestCase {
+final class KeychainClientTests: TestCase {
 	func test_trivial() {
 		XCTAssertTrue(true)
 	}

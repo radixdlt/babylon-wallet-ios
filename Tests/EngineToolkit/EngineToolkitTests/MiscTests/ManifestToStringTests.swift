@@ -1,5 +1,6 @@
-import CryptoKit
+import Cryptography
 @testable import EngineToolkit
+import TestingPrelude
 
 // MARK: - ManifestToStringTests
 final class ManifestToStringTests: TestCase {

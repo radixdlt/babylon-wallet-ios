@@ -1,8 +1,5 @@
-import ComposableArchitecture
-import DesignSystem
-import Foundation
+import FeaturePrelude
 import GrantDappWalletAccessFeature
-import SwiftUI
 import TransactionSigningFeature
 
 // MARK: - HandleDappRequests.View

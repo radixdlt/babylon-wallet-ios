@@ -1,7 +1,4 @@
-import Foundation
-import JSON
-import Prelude
-import Profile
+import ClientPrelude
 
 public extension ProfileLoader {
 	typealias Value = ProfileLoader

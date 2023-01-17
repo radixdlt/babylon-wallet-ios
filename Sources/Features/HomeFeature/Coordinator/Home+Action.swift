@@ -3,14 +3,10 @@ import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
 import AppSettings
-import Common
-import ComposableArchitecture
 import CreateAccountFeature
+import FeaturePrelude
 import GrantDappWalletAccessFeature
 import P2PConnectivityClient
-import Prelude
-import Profile
-import SharedModels
 import TransactionSigningFeature
 
 // MARK: - Home.Action

@@ -1,6 +1,4 @@
-import DesignSystem
-import Foundation
-import Profile
+import FeaturePrelude
 
 // MARK: AccountPreferences.State
 public extension AccountPreferences {

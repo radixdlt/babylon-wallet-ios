@@ -1,12 +1,6 @@
-import ComposableArchitecture
+import FeaturePrelude
 @testable import HandleDappRequests
-import P2PConnection
-import P2PModels
-import Prelude
-import Profile
-import SharedModels
-import TestUtils
-import XCTest
+import TestingPrelude
 
 @MainActor
 final class HandleDappRequestsTests: TestCase {

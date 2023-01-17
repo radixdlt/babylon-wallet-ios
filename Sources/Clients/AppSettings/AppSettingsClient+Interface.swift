@@ -1,8 +1,4 @@
-import Common
-import Foundation
-import Prelude
-import Profile
-import UserDefaultsClient
+import ClientPrelude
 
 // MARK: - AppSettingsClient
 public struct AppSettingsClient: Sendable {

@@ -1,10 +1,6 @@
 import AppFeature
-import ComposableArchitecture
-import DesignSystem
-import Prelude
+import FeaturePrelude
 import ProfileClient
-import SwiftUI
-import UserDefaultsClient
 
 // MARK: - WalletApp
 @main
@@ -18,6 +14,9 @@ struct WalletApp: SwiftUI.App {
 					store: Store(
 						initialState: App.State(),
 						reducer: App()
+						#if targetEnvironment(simulator)
+							.dependency(\.localAuthenticationClient.queryConfig) { .biometricsAndPasscodeSetUp }
+						#endif
 					)
 				)
 				#if os(macOS)

@@ -1,4 +1,4 @@
-import Foundation
+import FeaturePrelude
 
 // MARK: - AggregatedValue.Action
 public extension AggregatedValue {

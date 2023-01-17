@@ -1,9 +1,8 @@
 @testable import Cryptography
 import CryptoKit
-import Foundation
-import XCTest
+import TestingPrelude
 
-final class EdgeCasesTests: XCTestCase {
+final class EdgeCasesTests: TestCase {
 	/// This test was found by: https://github.com/radixdlt/GenerateSLIP10Vectors
 	/// in group with id `1`.
 	func testIncorrectKeySize() throws {

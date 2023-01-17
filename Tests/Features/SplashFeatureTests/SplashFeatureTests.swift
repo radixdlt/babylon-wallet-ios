@@ -1,10 +1,8 @@
-import ComposableArchitecture
-import Foundation
+import FeaturePrelude
 import LocalAuthenticationClient
-import Profile
 import ProfileLoader
 @testable import SplashFeature
-import TestUtils
+import TestingPrelude
 
 // MARK: - SplashFeatureTests
 @MainActor
@@ -23,7 +21,6 @@ final class SplashFeatureTests: TestCase {
 		}
 
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-		store.dependencies.platformEnvironmentClient.isSimulator = { false }
 
 		let newProfile = try await Profile.new(networkAndGateway: .hammunet, mnemonic: .generate())
 		store.dependencies.profileLoader = ProfileLoader(loadProfile: {
@@ -39,9 +36,21 @@ final class SplashFeatureTests: TestCase {
 		}
 		await testScheduler.advance(by: .seconds(0.2))
 		await store.receive(.internal(.system(.biometricsConfigResult(.success(authBiometricsConfig))))) {
-			$0.alert = .init(
-				title: .init("Biometrics not set up"),
-				message: .init("This app requires your phone to have biometrics set up")
+			$0.biometricsCheckFailedAlert = .init(
+				title: { .init(L10n.Splash.Alert.BiometricsCheckFailed.title) },
+				actions: {
+					ButtonState(
+						role: .cancel,
+						action: .send(.cancelButtonTapped),
+						label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.cancelButtonTitle) }
+					)
+					ButtonState(
+						role: .none,
+						action: .send(.openSettingsButtonTapped),
+						label: { TextState(L10n.Splash.Alert.BiometricsCheckFailed.settingsButtonTitle) }
+					)
+				},
+				message: { .init(L10n.Splash.Alert.BiometricsCheckFailed.message) }
 			)
 		}
 	}
@@ -70,17 +79,15 @@ final class SplashFeatureTests: TestCase {
 		let store = TestStore(
 			initialState: Splash.State(),
 			reducer: Splash()
-		)
-
-		store.dependencies.localAuthenticationClient = LocalAuthenticationClient {
-			authBiometricsConfig
+		) {
+			$0.localAuthenticationClient = LocalAuthenticationClient {
+				authBiometricsConfig
+			}
+			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			$0.profileLoader = ProfileLoader(loadProfile: {
+				result
+			})
 		}
-
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-
-		store.dependencies.profileLoader = ProfileLoader(loadProfile: {
-			result
-		})
 
 		// when
 		await store.send(.internal(.view(.viewAppeared)))

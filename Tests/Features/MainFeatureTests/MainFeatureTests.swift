@@ -1,7 +1,6 @@
-import ComposableArchitecture
+import FeaturePrelude
 @testable import MainFeature
-import SharedModels
-import TestUtils
+import TestingPrelude
 
 @MainActor
 final class MainFeatureTests: TestCase {

@@ -1,5 +1,5 @@
 import DesignSystem
-import TestUtils
+import TestingPrelude
 
 final class AddressViewStateTests: TestCase {
 	func test__GIVEN__addressShorterThan10Characters__WHEN__addressFormatIsShort__THEN__addressIsLeftAsIs() {

@@ -1,8 +1,6 @@
 import AppSettings
-import Asset
+import ClientPrelude
 import GatewayAPI
-import Prelude
-import Profile
 
 extension AccountPortfolioFetcher: DependencyKey {
 	public static let liveValue = Self(

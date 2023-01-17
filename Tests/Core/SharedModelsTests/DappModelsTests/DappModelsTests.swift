@@ -1,7 +1,5 @@
-import Foundation
 @testable import SharedModels
-import TestUtils
-import XCTest
+import TestingPrelude
 
 final class ToDappResponseTests: TestCase {
 	func test_encode_response() throws {
@@ -22,7 +20,6 @@ final class ToDappResponseTests: TestCase {
 		let encoder = JSONEncoder()
 		let jsonData = try encoder.encode(response)
 		let jsonString = try XCTUnwrap(jsonData.prettyPrintedJSONString)
-		print(jsonString)
 		XCTAssertTrue(jsonString.contains(P2P.FromDapp.Discriminator.oneTimeAccountsRead.rawValue))
 	}
 

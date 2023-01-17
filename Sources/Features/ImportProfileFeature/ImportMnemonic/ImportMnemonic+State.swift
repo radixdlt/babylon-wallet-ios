@@ -1,6 +1,6 @@
 import Cryptography
-import Prelude
-import Profile
+import FeaturePrelude
+import ProfileClient
 
 // MARK: ImportMnemonic.State
 public extension ImportMnemonic {
