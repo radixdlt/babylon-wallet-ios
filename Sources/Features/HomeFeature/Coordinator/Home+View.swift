@@ -62,15 +62,6 @@ public extension Home.View {
 						then: { AccountPreferences.View(store: $0) }
 					)
 					.zIndex(3)
-
-					IfLetStore(
-						store.scope(
-							state: \.transfer,
-							action: { .child(.transfer($0)) }
-						),
-						then: { AccountDetails.Transfer.View(store: $0) }
-					)
-					.zIndex(4)
 				}
 			}
 		}
