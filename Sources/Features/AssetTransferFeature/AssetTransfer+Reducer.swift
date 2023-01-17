@@ -18,11 +18,17 @@ public struct AssetTransfer: Sendable, ReducerProtocol {
 		case .internal(.view(.appeared)):
 			return .none
 		case let .internal(.view(.amountTextFieldChanged(amount))):
-			state.amount = .init(value: amount)
+			if let amount = amount.nilIfBlank {
+				state.amount = .init(value: amount)
+			} else {
+				state.amount = nil
+			}
 			return .none
 		case let .internal(.view(.toAddressTextFieldChanged(address))):
 			if let address = try? AccountAddress(address: address) {
 				state.to = .address(address)
+			} else {
+				state.to = nil
 			}
 			return .none
 		case let .internal(.view(.nextButtonTapped(amount, toAddress))):
