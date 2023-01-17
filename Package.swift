@@ -302,6 +302,7 @@ package.addModules([
 	.client(
 		name: "ProfileClient",
 		dependencies: [
+			"Profile",
 			"Cryptography",
 		],
 		tests: .no
