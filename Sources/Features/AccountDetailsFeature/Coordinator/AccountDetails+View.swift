@@ -81,7 +81,7 @@ public extension AccountDetails.View {
 			.sheet(
 				store: self.store.scope(
 					state: \.$destination,
-					action: { .internal(.destination($0)) }
+					action: { .child(.destination($0)) }
 				),
 				state: /AccountDetails.Destinations.State.transfer,
 				action: AccountDetails.Destinations.Action.transfer,

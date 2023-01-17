@@ -13,7 +13,7 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 		}
 
 		Reduce(core)
-			.presentationDestination(\.$destination, action: /Action.internal .. Action.InternalAction.destination) {
+			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
 				Destinations()
 			}
 	}
@@ -41,8 +41,6 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 			}
 		case .internal(.view(.transferButtonTapped)):
 			state.destination = .transfer(AssetTransfer.State(from: state.account))
-			return .none
-		case .internal(.destination):
 			return .none
 		case .child, .delegate:
 			return .none
