@@ -303,6 +303,13 @@ package.addModules([
 		name: "ProfileClient",
 		dependencies: [
 			"Cryptography",
+		],
+		tests: .no
+	),
+	.client(
+		name: "ProfileClientLive",
+		dependencies: [
+			"ProfileClient",
 			"EngineToolkitClient",
 			"ProfileLoader",
 		],
