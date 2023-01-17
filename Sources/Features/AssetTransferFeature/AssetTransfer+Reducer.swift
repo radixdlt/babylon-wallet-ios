@@ -25,13 +25,7 @@ public struct AssetTransfer: Sendable, ReducerProtocol {
 				state.to = .address(address)
 			}
 			return .none
-		case .internal(.view(.nextButtonTapped)):
-			guard
-				let amount = state.amount,
-				let toAddress = state.to?.address
-			else {
-				errorQueue.schedule(AssetTransferError.amountRequired)
-			}
+		case let .internal(.view(.nextButtonTapped(amount, toAddress))):
 //			let manifest =
 			state.destination = .transactionSigning(.init(origin: .local(manifest: .mock)))
 			return .none

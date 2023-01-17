@@ -24,7 +24,7 @@ public extension AssetTransfer.Action {
 		case appeared
 		case amountTextFieldChanged(String)
 		case toAddressTextFieldChanged(String)
-		case nextButtonTapped
+		case nextButtonTapped(amount: Decimal_, toAddress: AccountAddress)
 	}
 }
 

@@ -15,10 +15,10 @@ public extension AssetTransfer {
 //			case account(OnNetwork.Account)
 			case address(AccountAddress)
 
-			var address: String {
+			var address: AccountAddress {
 				switch self {
 				case let .address(address):
-					return address.address
+					return address
 				}
 			}
 		}

@@ -25,14 +25,14 @@ public extension AssetTransfer.View {
 				Form {
 					VStack(alignment: .leading) {
 						Text("From")
-						AddressView(viewStore.fromAddress)
+						AddressView(viewStore.input.fromAddress)
 							.foregroundColor(.gray)
 					}
 
 					TextField(
 						"XRD amount",
 						text: viewStore.binding(
-							get: \.amount,
+							get: \.input.amount,
 							send: { .amountTextFieldChanged($0) }
 						),
 						prompt: Text("Enter amount...")
@@ -44,7 +44,7 @@ public extension AssetTransfer.View {
 						TextField(
 							"To address",
 							text: viewStore.binding(
-								get: \.toAddress,
+								get: \.input.toAddress,
 								send: { .toAddressTextFieldChanged($0) }
 							),
 							prompt: Text("Enter address...")
@@ -54,10 +54,18 @@ public extension AssetTransfer.View {
 				.navigationTitle(Text("Send XRD"))
 				.navigationBarTitleDisplayMode(.large)
 				.safeAreaInset(edge: .bottom) {
-					Button("Next", action: { viewStore.send(.nextButtonTapped) })
-						.buttonStyle(.primaryRectangular)
-						.padding()
-						.controlState(viewStore.nextButtonState)
+					WithControlRequirements(
+						viewStore.output,
+						forAction: {
+							viewStore.send(
+								.nextButtonTapped(amount: $0.amount, toAddress: $0.toAddress)
+							)
+						}
+					) { action in
+						Button("Next", action: action)
+							.buttonStyle(.primaryRectangular)
+							.padding()
+					}
 				}
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -76,23 +84,39 @@ extension AssetTransfer.View {
 	// MARK: ViewState
 
 	struct ViewState: Equatable {
-		var fromAddress: AddressView.ViewState
-		var amount: String
-		var toAddress: String
-		var nextButtonState: ControlState
+		struct Input: Equatable {
+			let fromAddress: AddressView.ViewState
+			let amount: String
+			let toAddress: String
+		}
+
+		struct Output: Equatable {
+			let amount: Decimal_
+			let toAddress: AccountAddress
+		}
+
+		let input: Input
+		let output: Output?
 
 		init(state: AssetTransfer.State) {
-			self.fromAddress = .init(
-				address: state.from.address.address,
-				format: .short()
+			self.input = .init(
+				fromAddress: .init(
+					address: state.from.address.address,
+					format: .short()
+				),
+				amount: state.amount?.value ?? "",
+				toAddress: state.to?.address.address ?? ""
 			)
-			self.amount = state.amount?.value ?? ""
-			self.toAddress = state.to?.address ?? ""
-			if (state.amount?.value).isNilOrBlank || (state.to?.address).isNilOrBlank {
-				self.nextButtonState = .disabled
-			} else {
-				self.nextButtonState = .enabled
-			}
+			self.output = {
+				if
+					let amount = state.amount,
+					let toAddress = state.to?.address
+				{
+					return .init(amount: amount, toAddress: toAddress)
+				} else {
+					return nil
+				}
+			}()
 		}
 	}
 }
