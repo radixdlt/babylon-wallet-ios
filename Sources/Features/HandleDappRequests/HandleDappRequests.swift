@@ -134,7 +134,7 @@ private extension HandleDappRequests {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .child(.transactionSigning(.delegate(.failed(failedRequest, txFailure)))):
+		case let .child(.transactionSigning(.delegate(.failed(failedRequest?, txFailure)))):
 			return .run { send in
 				let (errorKind, message) = txFailure.errorKindAndMessage
 				await send(.internal(.system(
@@ -145,7 +145,7 @@ private extension HandleDappRequests {
 					))))
 			}
 
-		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, request)))):
+		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, request?)))):
 			state.currentRequest = nil
 			let responseItem = P2P.ToDapp.WalletResponseItem.sendTransaction(
 				.init(txID: txID)
@@ -168,7 +168,7 @@ private extension HandleDappRequests {
 				))))
 			}
 
-		case let .child(.transactionSigning(.delegate(.rejected(rejectedRequestItem)))):
+		case let .child(.transactionSigning(.delegate(.rejected(rejectedRequestItem?)))):
 			return .run { send in
 				await send(.internal(.system(.rejected(rejectedRequestItem.parentRequest))))
 			}

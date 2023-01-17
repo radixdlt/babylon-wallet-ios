@@ -74,9 +74,11 @@ public extension HandleDappRequests.State {
 			case let .sendTransaction(item):
 				self = .transactionSigning(
 					.init(
-						request: .init(
-							requestItem: item,
-							parentRequest: requestItemToHandle.parentRequest
+						origin: .p2p(
+							request: .init(
+								requestItem: item,
+								parentRequest: requestItemToHandle.parentRequest
+							)
 						)
 					)
 				)
