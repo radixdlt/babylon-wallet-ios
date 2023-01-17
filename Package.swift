@@ -463,7 +463,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			"P2PModels",
-                        "WebRTC"
+			"WebRTC",
 		],
 		tests: .yes(
 			dependencies: [],
@@ -545,7 +545,7 @@ package.addModules([
 			},
 		],
 		tests: .yes(dependencies: [])
-	)
+	),
 ])
 
 package.targets.append(
@@ -556,10 +556,10 @@ package.targets.append(
 )
 
 package.targets.append(
-        .binaryTarget(
-            name: "WebRTC",
-            path: "Sources/RadixConnect/WebRTC/WebRTC.xcframework"
-        )
+	.binaryTarget(
+		name: "WebRTC",
+		path: "Sources/RadixConnect/WebRTC/WebRTC.xcframework"
+	)
 )
 
 // MARK: - Extensions
