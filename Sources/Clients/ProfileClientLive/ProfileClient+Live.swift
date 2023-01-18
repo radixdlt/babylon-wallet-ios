@@ -66,18 +66,102 @@ public extension ProfileClient {
 				}
 			},
 			createNewProfile: { request in
-				let networkAndGateway = request.networkAndGateway
 
+				@Dependency(\.mnemonicClient.generate) var generateMnemonic
+
+				let mnemonic = try generateMnemonic(BIP39.WordCount.twentyFour, BIP39.Language.english)
+
+				let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
 				let newProfile = try await Profile.new(
 					networkAndGateway: networkAndGateway,
-					mnemonic: request.curve25519FactorSourceMnemonic,
+					mnemonic: mnemonic,
 					firstAccountDisplayName: request.nameOfFirstAccount
 				)
 
-				return newProfile
+				let factorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
+
+				try await keychainClient.updateFactorSource(
+					mnemonic: mnemonic,
+					reference: factorSourceReference
+				)
+				try await keychainClient.updateProfile(profile: newProfile)
+
+				await profileHolder.injectProfile(newProfile)
+
+				let accountOnCurrentNetwork = try newProfile.onNetwork(id: networkAndGateway.network.id).accounts.first
+
+				return accountOnCurrentNetwork
 			},
-			injectProfile: { profile in
-				try await profileHolder.injectProfile(profile)
+			loadProfile: {
+				@Dependency(\.jsonDecoder) var jsonDecoder
+
+				guard
+					let profileSnapshotData = try? await keychainClient
+					.loadProfileSnapshotJSONData(
+						// This should not be be shown due to settings of profile snapshot
+						// item when it was originally stored.
+						authenticationPrompt: "Load accounts"
+					)
+				else {
+					return .success(nil)
+				}
+
+				let decodedVersion: ProfileSnapshot.Version
+				do {
+					decodedVersion = try ProfileSnapshot.Version.fromJSON(
+						data: profileSnapshotData,
+						jsonDecoder: jsonDecoder()
+					)
+				} catch {
+					return .failure(
+						.decodingFailure(
+							json: profileSnapshotData,
+							.known(.noProfileSnapshotVersionFoundInJSON
+							)
+						)
+					)
+				}
+
+				do {
+					try ProfileSnapshot.validateCompatability(version: decodedVersion)
+				} catch {
+					// Incompatible Versions
+					return .failure(.profileVersionOutdated(
+						json: profileSnapshotData,
+						version: decodedVersion
+					))
+				}
+
+				let profileSnapshot: ProfileSnapshot
+				do {
+					profileSnapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: profileSnapshotData)
+				} catch let decodingError as Swift.DecodingError {
+					return .failure(.decodingFailure(
+						json: profileSnapshotData,
+						.known(.decodingError(.init(decodingError: decodingError)))
+					)
+					)
+				} catch {
+					return .failure(.decodingFailure(
+						json: profileSnapshotData,
+						.unknown(.init(error: error))
+					))
+				}
+
+				let profile: Profile
+				do {
+					profile = try Profile(snapshot: profileSnapshot)
+				} catch {
+					return .failure(.failedToCreateProfileFromSnapshot(
+						.init(
+							version: profileSnapshot.version,
+							error: error
+						))
+					)
+				}
+
+				await profileHolder.injectProfile(profile)
+				return .success(profile)
 			},
 			extractProfileSnapshot: {
 				try await profileHolder.takeProfileSnapshot()
@@ -231,7 +315,7 @@ private actor ProfileHolder: GlobalActor {
 		return result
 	}
 
-	func injectProfile(_ profile: Profile) async throws {
+	func injectProfile(_ profile: Profile) async {
 		self.profile = profile
 	}
 

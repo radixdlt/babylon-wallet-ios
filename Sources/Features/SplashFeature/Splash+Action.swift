@@ -1,6 +1,6 @@
 import FeaturePrelude
 import LocalAuthenticationClient
-import ProfileLoader
+import ProfileClient
 
 // MARK: - Splash.Action
 public extension Splash {
@@ -38,13 +38,13 @@ public extension Splash.Action {
 public extension Splash.Action {
 	enum SystemAction: Sendable, Equatable {
 		case biometricsConfigResult(TaskResult<LocalAuthenticationConfig>)
-		case loadProfileResult(ProfileLoader.ProfileResult)
+		case loadProfileResult(ProfileClient.LoadProfileResult)
 	}
 }
 
 // MARK: - Splash.Action.DelegateAction
 public extension Splash.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case profileResultLoaded(ProfileLoader.ProfileResult)
+		case profileResultLoaded(ProfileClient.LoadProfileResult)
 	}
 }

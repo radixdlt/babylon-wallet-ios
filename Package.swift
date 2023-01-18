@@ -225,7 +225,7 @@ package.addModules([
 		name: "SplashFeature",
 		dependencies: [
 			"LocalAuthenticationClient",
-			"ProfileLoader",
+			"ProfileClient",
 		],
 		tests: .yes()
 	),
@@ -320,14 +320,6 @@ package.addModules([
 		dependencies: [
 			"ProfileClient",
 			"EngineToolkitClient",
-			"ProfileLoader",
-		],
-		tests: .yes()
-	),
-	.client(
-		name: "ProfileLoader",
-		dependencies: [
-			"Profile",
 		],
 		tests: .yes()
 	),

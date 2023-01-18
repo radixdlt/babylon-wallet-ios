@@ -1,7 +1,7 @@
 @testable import AppFeature
 import FeaturePrelude
 import OnboardingFeature
-import ProfileLoader
+import ProfileClient
 @testable import SplashFeature
 import TestingPrelude
 
@@ -29,24 +29,19 @@ final class AppFeatureTests: TestCase {
 		}
 	}
 
-	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__it_is_injected_into_profileClient_and_we_navigate_to_main() async throws {
+	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
 		// GIVEN: an existing profile
 		let existingProfile = try await Profile.new(
 			networkAndGateway: .nebunet,
 			mnemonic: .generate()
 		)
 
-		let expectation = expectation(description: "Profile injected")
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
 			reducer: App()
 		) {
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.profileClient.injectProfile = { injected in
-				XCTAssertEqual(injected, existingProfile)
-				expectation.fulfill()
-			}
 		}
 
 		// WHEN: existing profile is loaded
@@ -60,15 +55,11 @@ final class AppFeatureTests: TestCase {
 		await store.receive(.child(.splash(.internal(.system(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp)))))))
 
 		// then
-		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(existingProfile))))))
-
-		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(existingProfile))))) {
+		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(existingProfile)))))) {
 			$0.root = .main(.init())
 		}
 
 		await testScheduler.run() // fast-forward scheduler to the end of time
-
-		wait(for: [expectation], timeout: 0.1)
 	}
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_noProfile__THEN__navigate_to_onboarding() async {
@@ -116,13 +107,10 @@ final class AppFeatureTests: TestCase {
 
 		// when
 		let decodingError = DecodingError.valueNotFound(Profile.self, .init(codingPath: [], debugDescription: "Something went wrong"))
-		let error = ProfileLoader.JSONDecodingError.KnownDecodingError(decodingError: decodingError)
-		let foobar: ProfileLoader.JSONDecodingError = .known(error)
-		let failure: ProfileLoader.ProfileLoadingFailure = .decodingFailure(
-			json: "".data(using: .utf8)!,
-			foobar
-		)
-		let result: ProfileLoader.ProfileResult = .failure(
+		let error = Profile.JSONDecodingError.KnownDecodingError.decodingError(.init(decodingError: decodingError))
+		let foobar: Profile.JSONDecodingError = .known(error)
+		let failure: Profile.LoadingFailure = .decodingFailure(json: Data(), foobar)
+		let result: ProfileClient.LoadProfileResult = .failure(
 			failure
 		)
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
@@ -176,8 +164,8 @@ final class AppFeatureTests: TestCase {
 		// when
 		struct SomeError: Swift.Error {}
 		let badVersion: ProfileSnapshot.Version = 0
-		let failedToCreateProfileFromSnapshot = ProfileLoader.FailedToCreateProfileFromSnapshot(version: badVersion, error: SomeError())
-		let result = ProfileLoader.ProfileResult.failure(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
+		let failedToCreateProfileFromSnapshot = Profile.FailedToCreateProfileFromSnapshot(version: badVersion, error: SomeError())
+		let result = ProfileClient.LoadProfileResult.failure(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
 			result
 		)))))) {
@@ -223,7 +211,7 @@ final class AppFeatureTests: TestCase {
 		// when
 		struct SomeError: Swift.Error {}
 		let badVersion: ProfileSnapshot.Version = 0
-		let result = ProfileLoader.ProfileResult.failure(.profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
+		let result = ProfileClient.LoadProfileResult.failure(.profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
 		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
 			result
 		)))))) {

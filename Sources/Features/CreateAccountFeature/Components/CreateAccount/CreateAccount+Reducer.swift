@@ -2,42 +2,10 @@ import Cryptography
 import FeaturePrelude
 import ProfileClient
 
-// MARK: - MnemonicGenerator
-public struct MnemonicGenerator: Sendable, DependencyKey {
-	public var generate: Generate
-}
-
-// MARK: MnemonicGenerator.Generate
-public extension MnemonicGenerator {
-	typealias Generate = @Sendable (BIP39.WordCount, BIP39.Language) throws -> Mnemonic
-}
-
-// = @Sendable (BIP39.WordCount, BIP39.Language) throws -> Mnemonic
-
-// MARK: - MnemonicGeneratorKey
-public extension MnemonicGenerator {
-	static let liveValue: Self = .init(generate: { try Mnemonic(wordCount: $0, language: $1) })
-}
-
-#if DEBUG
-extension MnemonicGenerator: TestDependencyKey {
-	public static let testValue: Self = .init(generate: unimplemented("\(Self.self).generate"))
-}
-#endif
-
-public extension DependencyValues {
-	var mnemonicGenerator: MnemonicGenerator {
-		get { self[MnemonicGenerator.self] }
-		set { self[MnemonicGenerator.self] = newValue }
-	}
-}
-
 // MARK: - CreateAccount
 public struct CreateAccount: Sendable, ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.mnemonicGenerator) var mnemonicGenerator
-	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
@@ -47,6 +15,7 @@ public struct CreateAccount: Sendable, ReducerProtocol {
 	}
 }
 
+// MARK: Public
 public extension CreateAccount {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
@@ -61,35 +30,12 @@ public extension CreateAccount {
 				return createAccount(state: &state)
 			}
 
-		case let .internal(.system(.createdNewProfileResult(.success(profile)))):
-			return .run { send in
-				await send(.internal(.system(.injectProfileIntoProfileClientResult(
-					TaskResult {
-						try await profileClient.injectProfile(profile)
-						return profile
-					}
-				))))
-			}
-
-		case .internal(.system(.injectProfileIntoProfileClientResult(.success))):
-			return .run { send in
-				await send(.internal(.system(.loadAccountResult(
-					TaskResult {
-						try await profileClient.getAccounts().first
-					}
-				))))
-			}
-
-		case let .internal(.system(.loadAccountResult(.failure(error)))),
-		     let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))),
-		     let .internal(.system(.createdNewProfileResult(.failure(error)))),
-		     let .internal(.system(.createdNewAccountResult(.failure(error)))):
+		case let .internal(.system(.createdNewAccountResult(.failure(error)))):
 			state.isCreatingAccount = false
 			errorQueue.schedule(error)
 			return .none
 
-		case let .internal(.system(.createdNewAccountResult(.success(account)))),
-		     let .internal(.system(.loadAccountResult(.success(account)))):
+		case let .internal(.system(.createdNewAccountResult(.success(account)))):
 			state.isCreatingAccount = false
 			return .run { [isFirstAccount = state.isFirstAccount] send in
 				await send(.delegate(.createdNewAccount(account: account, isFirstAccount: isFirstAccount)))
@@ -124,8 +70,11 @@ public extension CreateAccount {
 			return .none
 		}
 	}
+}
 
-	private static func networkAndGateway(_ configuredNetworkAndGateway: AppPreferences.NetworkAndGateway?, profileClient: ProfileClient) async -> AppPreferences.NetworkAndGateway {
+// MARK: Private
+private extension CreateAccount {
+	static func networkAndGateway(_ configuredNetworkAndGateway: AppPreferences.NetworkAndGateway?, profileClient: ProfileClient) async -> AppPreferences.NetworkAndGateway {
 		if let configuredNetworkAndGateway {
 			return configuredNetworkAndGateway
 		}
@@ -133,7 +82,7 @@ public extension CreateAccount {
 		return await profileClient.getNetworkAndGateway()
 	}
 
-	private func createAccount(state: inout State) -> EffectTask<Action> {
+	func createAccount(state: inout State) -> EffectTask<Action> {
 		.run { [accountName = state.sanitizedAccountName, onNetworkWithID = state.onNetworkWithID] send in
 			await send(.internal(.system(.createdNewAccountResult(
 				TaskResult {
@@ -150,35 +99,16 @@ public extension CreateAccount {
 		}
 	}
 
-	private func createProfile(state: inout State) -> EffectTask<Action> {
+	func createProfile(state: inout State) -> EffectTask<Action> {
 		.run { [nameOfFirstAccount = state.sanitizedAccountName] send in
-			await send(.internal(.system(.createdNewProfileResult(
-				// FIXME: - mainnet: extract into ProfileCreator client?
+			await send(.internal(.system(.createdNewAccountResult(
 				TaskResult {
-					let curve25519FactorSourceMnemonic = try mnemonicGenerator.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
-
-					let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
-
-					let newProfileRequest = CreateNewProfileRequest(
-						networkAndGateway: networkAndGateway,
-						curve25519FactorSourceMnemonic: curve25519FactorSourceMnemonic,
-						nameOfFirstAccount: nameOfFirstAccount
+					let accountOnCurrentNetwork = try await profileClient.createNewProfile(
+						CreateNewProfileRequest(
+							nameOfFirstAccount: nameOfFirstAccount
+						)
 					)
-
-					let newProfile = try await profileClient.createNewProfile(
-						newProfileRequest
-					)
-
-					let curve25519FactorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
-
-					try await keychainClient.updateFactorSource(
-						mnemonic: curve25519FactorSourceMnemonic,
-						reference: curve25519FactorSourceReference
-					)
-
-					try await keychainClient.updateProfile(profile: newProfile)
-
-					return newProfile
+					return accountOnCurrentNetwork
 				}
 			))))
 		}

@@ -1,10 +1,10 @@
 import ClientPrelude
+import Profile
 
-// MARK: - ProfileLoader.ProfileLoadingFailure
-public extension ProfileLoader {
-	enum ProfileLoadingFailure: Sendable, Swift.Error, Equatable {
+// MARK: - Profile.LoadingFailure
+public extension Profile {
+	enum LoadingFailure: Sendable, Swift.Error, Equatable {
 		case profileVersionOutdated(json: Data, version: ProfileSnapshot.Version)
-
 		case decodingFailure(json: Data, JSONDecodingError)
 
 		// This might happen to due to incompatible version, and some
@@ -14,7 +14,7 @@ public extension ProfileLoader {
 	}
 }
 
-public extension ProfileLoader {
+public extension Profile {
 	struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Equatable {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
 			lhs.version == rhs.version && lhs.errorDescription == rhs.errorDescription
@@ -36,7 +36,7 @@ public extension ProfileLoader {
 	}
 }
 
-public extension ProfileLoader.JSONDecodingError {
+public extension Profile.JSONDecodingError {
 	var errorDescription: String? {
 		switch self {
 		case let .known(error):
@@ -46,8 +46,22 @@ public extension ProfileLoader.JSONDecodingError {
 		}
 	}
 
-	// Swift.DecodingError made `Equatable` inside `EngineToolkit`
-	struct KnownDecodingError: Sendable, LocalizedError, Equatable {
+	enum KnownDecodingError: Sendable, LocalizedError, Equatable {
+		case noProfileSnapshotVersionFoundInJSON
+		case decodingError(FailedToDecodeProfile)
+
+		public var errorDescription: String? {
+			switch self {
+			case .noProfileSnapshotVersionFoundInJSON:
+				return L10n.ProfileLoad.decodingError("Unknown version")
+			case let .decodingError(error):
+				return error.localizedDescription
+			}
+		}
+	}
+
+	// Swift.DecodingError made `Equatable` inside `EngineToolkitModels`
+	struct FailedToDecodeProfile: Sendable, LocalizedError, Equatable {
 		public let decodingError: Swift.DecodingError
 		public init(decodingError: DecodingError) {
 			self.decodingError = decodingError

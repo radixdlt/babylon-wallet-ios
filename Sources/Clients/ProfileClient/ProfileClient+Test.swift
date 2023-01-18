@@ -21,7 +21,7 @@ extension ProfileClient: TestDependencyKey {
 		getNetworkAndGateway: unimplemented("\(Self.self).getNetworkAndGateway"),
 		setNetworkAndGateway: unimplemented("\(Self.self).setNetworkAndGateway"),
 		createNewProfile: unimplemented("\(Self.self).createNewProfile"),
-		injectProfile: unimplemented("\(Self.self).injectProfile"),
+		loadProfile: unimplemented("\(Self.self).loadProfile"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
 		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork"),
@@ -43,13 +43,10 @@ public extension ProfileClient {
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
 		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.nebunet },
 		setNetworkAndGateway: { _ in },
-		createNewProfile: { req in
-			try! await Profile.new(
-				networkAndGateway: req.networkAndGateway,
-				mnemonic: req.curve25519FactorSourceMnemonic
-			)
+		createNewProfile: { _ in
+			OnNetwork.Account.previewValue0
 		},
-		injectProfile: { _ in },
+		loadProfile: { .success(nil) },
 		extractProfileSnapshot: { throw CancellationError() },
 		deleteProfileAndFactorSources: {},
 		hasAccountOnNetwork: { _ in false },
