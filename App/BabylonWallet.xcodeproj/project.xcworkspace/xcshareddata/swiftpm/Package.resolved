@@ -19,15 +19,6 @@
       }
     },
     {
-      "identity" : "bigint",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/attaswift/BigInt",
-      "state" : {
-        "revision" : "0ed110f7555c34ff468e72e1686e59721f2b0da6",
-        "version" : "5.3.0"
-      }
-    },
-    {
       "identity" : "codescanner",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/twostraws/CodeScanner",
@@ -97,6 +88,15 @@
       "state" : {
         "revision" : "aed5422380244498344a036b8d94e27f370d9a22",
         "version" : "0.0.4"
+      }
+    },
+    {
+      "identity" : "swift-bigint",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mkrd/Swift-BigInt",
+      "state" : {
+        "branch" : "master",
+        "revision" : "4167d2fe7b1d39af86be41328fcd08b809b7d6ad"
       }
     },
     {

@@ -22,7 +22,7 @@ public struct AccountPortfolio: Sendable, Equatable {
 
 // MARK: - Computed Properties
 public extension AccountPortfolio {
-	var worth: BigUInt? {
+	var worth: BDouble? {
 		fungibleTokenContainers.compactMap(\.worth).reduce(0, +)
 	}
 }

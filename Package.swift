@@ -523,8 +523,8 @@ package.addModules([
 			.product(name: "AsyncExtensions", package: "AsyncExtensions") {
 				.package(url: "https://github.com/sideeffect-io/AsyncExtensions", from: "0.5.1")
 			},
-			.product(name: "BigInt", package: "BigInt") {
-				.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0")
+			.product(name: "BigNumber", package: "Swift-BigInt") {
+				.package(url: "https://github.com/mkrd/Swift-BigInt.git", branch: "master")
 			},
 
 			.product(name: "BitCollections", package: "swift-collections"),

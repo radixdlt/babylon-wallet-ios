@@ -97,7 +97,7 @@ extension FungibleTokenDetails.View {
 		var symbol: String?
 		var description: String?
 		var address: AddressView.ViewState
-		var currentSupply: BigUInt?
+		var currentSupply: BDouble?
 
 		init(state: FungibleTokenDetails.State) {
 			displayName = state.asset.name
@@ -107,7 +107,7 @@ extension FungibleTokenDetails.View {
 			symbol = state.asset.symbol
 			description = state.asset.tokenDescription
 			address = .init(address: state.asset.componentAddress.address, format: .short())
-			currentSupply = state.asset.totalMintedAttos
+			currentSupply = state.asset.totalMinted
 		}
 	}
 }

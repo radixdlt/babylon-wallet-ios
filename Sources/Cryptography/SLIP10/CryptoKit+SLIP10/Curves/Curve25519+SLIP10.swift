@@ -5,7 +5,7 @@ public extension Slip10CurveType {
 	/// Curve25519 or Ed25519
 	static let curve25519 = Self(
 		slip10CurveID: "ed25519 seed",
-		curveOrder: BigUInt(2).power(252) + BigUInt("27742317777372353535851937790883648493", radix: 16)!
+		curveOrder: (BInt("2")! ** 252) + BInt("27742317777372353535851937790883648493", radix: 16)!
 	)
 }
 

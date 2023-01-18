@@ -5,9 +5,9 @@ import ProfileModels
 // MARK: - FungibleToken
 public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public let componentAddress: ComponentAddress
-	public let totalSupplyAttos: BigUInt?
-	public let totalMintedAttos: BigUInt?
-	public let totalBurntAttos: BigUInt?
+	public let totalSupply: BDouble?
+	public let totalMinted: BDouble?
+	public let totalBurnt: BDouble?
 
 	/// An optional desciption of this token, e.g.
 	/// ` "The Radix Public Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes."`
@@ -34,9 +34,9 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public init(
 		componentAddress: ComponentAddress,
 		divisibility: Int?,
-		totalSupplyAttos: BigUInt?,
-		totalMintedAttos: BigUInt?,
-		totalBurntAttos: BigUInt?,
+		totalSupply: BDouble?,
+		totalMinted: BDouble?,
+		totalBurnt: BDouble?,
 		tokenDescription: String?,
 		name: String?,
 		symbol: String?,
@@ -45,9 +45,9 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	) {
 		self.componentAddress = componentAddress
 		self.divisibility = divisibility
-		self.totalSupplyAttos = totalSupplyAttos
-		self.totalMintedAttos = totalMintedAttos
-		self.totalBurntAttos = totalBurntAttos
+		self.totalSupply = totalSupply
+		self.totalMinted = totalMinted
+		self.totalBurnt = totalBurnt
 		self.tokenDescription = tokenDescription
 		self.name = name
 		self.symbol = symbol
@@ -81,13 +81,13 @@ public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
 	/// Token amount held in one account, expressed as regular decimal value, for example: 105.78 XRD
 	public var amount: String?
 	/// Token worth in currently selected currency.
-	public var worth: BigUInt?
+	public var worth: BDouble?
 
 	public init(
 		owner: AccountAddress,
 		asset: FungibleToken,
 		amount: String?,
-		worth: BigUInt?
+		worth: BDouble?
 	) {
 		self.owner = owner
 		self.asset = asset
@@ -114,9 +114,9 @@ public extension FungibleToken {
 	static let xrd = Self(
 		componentAddress: "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9",
 		divisibility: 18,
-		totalSupplyAttos: 24_000_000_000.inAttos,
-		totalMintedAttos: 0,
-		totalBurntAttos: 0,
+		totalSupply: 24_000_000_000,
+		totalMinted: 0,
+		totalBurnt: 0,
 		tokenDescription: "The native token of the Radix Ledger",
 		name: "Radix",
 		symbol: "XRD",
@@ -129,9 +129,9 @@ public extension FungibleToken {
 	static let btc = Self(
 		componentAddress: "btc-deadbeef",
 		divisibility: 18,
-		totalSupplyAttos: 0,
-		totalMintedAttos: 0,
-		totalBurntAttos: 0,
+		totalSupply: 0,
+		totalMinted: 0,
+		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Bitcoin",
 		symbol: "BTC"
@@ -140,9 +140,9 @@ public extension FungibleToken {
 	static let dot = Self(
 		componentAddress: "dot-deadbeef",
 		divisibility: 18,
-		totalSupplyAttos: 0,
-		totalMintedAttos: 0,
-		totalBurntAttos: 0,
+		totalSupply: 0,
+		totalMinted: 0,
+		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Polkadot",
 		symbol: "DOT"
@@ -151,9 +151,9 @@ public extension FungibleToken {
 	static let eth = Self(
 		componentAddress: "eth-deadbeef",
 		divisibility: 18,
-		totalSupplyAttos: 0,
-		totalMintedAttos: 0,
-		totalBurntAttos: 0,
+		totalSupply: 0,
+		totalMinted: 0,
+		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Ethereum",
 		symbol: "ETH"
@@ -162,9 +162,9 @@ public extension FungibleToken {
 	static let ltc = Self(
 		componentAddress: "ltc-deadbeef",
 		divisibility: 18,
-		totalSupplyAttos: 0,
-		totalMintedAttos: 0,
-		totalBurntAttos: 0,
+		totalSupply: 0,
+		totalMinted: 0,
+		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Litecoin",
 		symbol: "LTC"
@@ -173,9 +173,9 @@ public extension FungibleToken {
 	static let sol = Self(
 		componentAddress: "sol-deadbeef",
 		divisibility: 18,
-		totalSupplyAttos: 0,
-		totalMintedAttos: 0,
-		totalBurntAttos: 0,
+		totalSupply: 0,
+		totalMinted: 0,
+		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Solana",
 		symbol: "SOL"
@@ -184,9 +184,9 @@ public extension FungibleToken {
 	static let usdt = Self(
 		componentAddress: "usdt-deadbeef",
 		divisibility: 18,
-		totalSupplyAttos: 0,
-		totalMintedAttos: 0,
-		totalBurntAttos: 0,
+		totalSupply: 0,
+		totalMinted: 0,
+		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Tether",
 		symbol: "USDT"
@@ -195,9 +195,9 @@ public extension FungibleToken {
 	static let xrp = Self(
 		componentAddress: "xrp-deadbeef",
 		divisibility: 18,
-		totalSupplyAttos: 0,
-		totalMintedAttos: 0,
-		totalBurntAttos: 0,
+		totalSupply: 0,
+		totalMinted: 0,
+		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "XRP token",
 		symbol: "XRP"

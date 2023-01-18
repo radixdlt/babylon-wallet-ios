@@ -2,7 +2,7 @@
 
 @_exported import AsyncAlgorithms
 @_exported import AsyncExtensions
-@_exported import BigInt
+@_exported import BigNumber
 @_exported import BitCollections
 @_exported import CollectionConcurrencyKit
 @_exported import Collections
