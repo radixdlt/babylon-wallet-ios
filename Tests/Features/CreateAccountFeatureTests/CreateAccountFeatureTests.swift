@@ -69,95 +69,50 @@ final class CreateAccountFeatureTests: TestCase {
 	}
 
 	func test__GIVEN__no_profile__WHEN__new_profile_button_tapped__THEN__user_is_onboarded_with_new_profile() async throws {
-		// given
-		let newAccountName = "newAccount"
+		// GIVEN no profile
 		let initialState = CreateAccount.State(shouldCreateProfile: true, isFirstAccount: true)
-		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
+
+		let newAccountName = "newAccount"
 		let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
-		let newProfile = try await Profile.new(networkAndGateway: networkAndGateway, mnemonic: mnemonic)
+		let newProfile = try await Profile.new(networkAndGateway: networkAndGateway, mnemonic: .init())
+		let accounts = try newProfile.onNetwork(id: networkAndGateway.network.id).accounts
+		let account = accounts.first
 		let expectedCreateNewProfileRequest = CreateNewProfileRequest(
-			networkAndGateway: networkAndGateway,
-			curve25519FactorSourceMnemonic: mnemonic,
 			nameOfFirstAccount: newAccountName
 		)
+
+		let createNewProfileRequest = ActorIsolated<CreateNewProfileRequest?>(nil)
 
 		let store = TestStore(
 			initialState: initialState,
 			reducer: CreateAccount()
-		)
-
-		let generateMnemonicCalled = ActorIsolated<(wordCount: BIP39.WordCount, language: BIP39.Language)?>(nil)
-		store.dependencies.mnemonicGenerator.generate = { wordCount, language in
-			Task {
-				await generateMnemonicCalled.setValue((wordCount, language))
+		) {
+			$0.profileClient.createNewProfile = { req in
+				await createNewProfileRequest.setValue(req)
+				return account
 			}
-			return mnemonic
-		}
-
-		let createNewProfileRequest = ActorIsolated<CreateNewProfileRequest?>(nil)
-		store.dependencies.profileClient.createNewProfile = { req in
-			await createNewProfileRequest.setValue(req)
-			return newProfile
-		}
-
-		let keychainUpdateData = ActorIsolated<[String: Data]>([:])
-		store.dependencies.keychainClient.updateDataForKey = { data, key, _, _ in
-			await keychainUpdateData.withValue {
-				$0[key] = data
+			$0.profileClient.getAccounts = {
+				accounts
 			}
 		}
 
-		let injectedProfile = ActorIsolated<Profile?>(nil)
-		store.dependencies.profileClient.injectProfile = { injected in
-			await injectedProfile.setValue(injected)
-		}
-
-		store.dependencies.profileClient.getAccounts = {
-			let accounts: [OnNetwork.Account] = [.previewValue0]
-			return NonEmpty(rawValue: OrderedSet(accounts))!
-		}
-
-		// when
 		await store.send(.internal(.view(.textFieldChanged(newAccountName)))) {
 			$0.inputtedAccountName = newAccountName
 		}
 
+		// WHEN create Account button is tapped
 		await store.send(.internal(.view(.createAccountButtonTapped))) {
 			$0.isCreatingAccount = true
 		}
 
-		// then
-
-		// assert the proper flow is followed
-
-		await store.receive(.internal(.system(.createdNewProfileResult(.success(newProfile)))))
-		await store.receive(.internal(.system(.injectProfileIntoProfileClientResult(.success(newProfile)))))
-		await store.receive(.internal(.system(.loadAccountResult(.success(.previewValue0))))) {
+		// THEN a new profile should be created
+		await store.receive(.internal(.system(.createdNewAccountResult(.success(account))))) {
 			$0.isCreatingAccount = false
 		}
-		await store.receive(.delegate(.createdNewAccount(account: .previewValue0, isFirstAccount: true)))
-
-		// assert that clients are called with proper arguments
-
-		await generateMnemonicCalled.withValue {
-			XCTAssertEqual($0?.wordCount, .twentyFour)
-			XCTAssertEqual($0?.language, .english)
-		}
+		await store.receive(.delegate(.createdNewAccount(account: account, isFirstAccount: true)))
 
 		await createNewProfileRequest.withValue {
-			XCTAssertEqual($0?.networkAndGateway, expectedCreateNewProfileRequest.networkAndGateway)
-			XCTAssertEqual($0?.curve25519FactorSourceMnemonic, expectedCreateNewProfileRequest.curve25519FactorSourceMnemonic)
 			XCTAssertEqual($0?.nameOfFirstAccount, expectedCreateNewProfileRequest.nameOfFirstAccount)
-		}
-
-		await keychainUpdateData.withValue {
-			// assert correct profile was stored in keychain
-			let profileData = try! JSONEncoder.iso8601.encode(newProfile.snaphot())
-			XCTAssertEqual($0["profileSnapshotKeychainKey"], profileData)
-
-			// assert correct mnemonic was stored in keychain
-			let newProfileReferenceId = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference.id
-			XCTAssertEqual($0[newProfileReferenceId], mnemonic.entropy().data)
 		}
 	}
 
@@ -212,11 +167,8 @@ final class CreateAccountFeatureTests: TestCase {
 		// given
 		let initialState = CreateAccount.State()
 		let createNewAccountError = NSError.testValue(domain: "Create New Account Request")
-		let createNewProfileError = NSError.testValue(domain: "Create New Profile Request")
-		let loadAccountsError = NSError.testValue(domain: "Load Accounts Request")
-		let injectProfileError = NSError.testValue(domain: "Inject Profile Request")
 
-		let expectedErrors = Set([createNewAccountError, createNewProfileError, loadAccountsError, injectProfileError])
+		let expectedErrors = Set([createNewAccountError])
 
 		let store = TestStore(
 			initialState: initialState,
@@ -235,9 +187,6 @@ final class CreateAccountFeatureTests: TestCase {
 		// when
 
 		await store.send(.internal(.system(.createdNewAccountResult(.failure(createNewAccountError)))))
-		await store.send(.internal(.system(.createdNewProfileResult(.failure(createNewProfileError)))))
-		await store.send(.internal(.system(.loadAccountResult(.failure(loadAccountsError)))))
-		await store.send(.internal(.system(.injectProfileIntoProfileClientResult(.failure(injectProfileError)))))
 
 		// then
 

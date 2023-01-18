@@ -49,6 +49,15 @@ public extension Profile.JSONDecodingError {
 	enum KnownDecodingError: Sendable, LocalizedError, Equatable {
 		case noProfileSnapshotVersionFoundInJSON
 		case decodingError(FailedToDecodeProfile)
+
+		public var errorDescription: String? {
+			switch self {
+			case .noProfileSnapshotVersionFoundInJSON:
+				return L10n.ProfileLoad.decodingError("Unknown version")
+			case let .decodingError(error):
+				return error.localizedDescription
+			}
+		}
 	}
 
 	// Swift.DecodingError made `Equatable` inside `EngineToolkitModels`
