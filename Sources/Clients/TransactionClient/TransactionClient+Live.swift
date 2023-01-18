@@ -310,24 +310,18 @@ public extension TransactionClient {
 				let lockFee = 10
 
 				let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
-					// Might be empty
 					let addressesManifestReferences =
 						try engineToolkitClient.accountAddressesNeedingToSignTransaction(
 							accountAddressesNeedingToSignTransactionRequest
 						)
 
-					if let address = addressesManifestReferences.first {
-						return address
-					} else {
-						let accountAddresses: [AccountAddress] = try await profileClient.getAccounts().map(\.address)
-						let xrdContainers = try await accountPortfolioFetcher.fetchXRDBalance(for: accountAddresses, on: networkID)
-						let firstWithEnoughFunds = firstAccountWithEnoughXRDForLockFee(in: xrdContainers, lockFee: lockFee)
+					let xrdContainers = try await accountPortfolioFetcher.fetchXRDBalance(for: Array(addressesManifestReferences), on: networkID)
+					let firstWithEnoughFunds = firstAccountWithEnoughXRDForLockFee(in: xrdContainers, lockFee: lockFee)
 
-						if let firstWithEnoughFunds = firstWithEnoughFunds {
-							return firstWithEnoughFunds
-						} else {
-							throw AddLockFeeError.failedToFindAccountWithEnoughFundsToLockFee
-						}
+					if let firstWithEnoughFunds = firstWithEnoughFunds {
+						return firstWithEnoughFunds
+					} else {
+						throw AddLockFeeError.failedToFindAccountWithEnoughFundsToLockFee
 					}
 				}()
 
