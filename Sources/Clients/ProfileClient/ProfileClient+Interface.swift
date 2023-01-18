@@ -1,25 +1,8 @@
 import ClientPrelude
 import Cryptography
 
-// MARK: - CreateNewProfileRequest
-public struct CreateNewProfileRequest: Sendable {
-	public let networkAndGateway: AppPreferences.NetworkAndGateway
-	public let curve25519FactorSourceMnemonic: Mnemonic
-	public let nameOfFirstAccount: String?
-
-	public init(
-		networkAndGateway: AppPreferences.NetworkAndGateway,
-		curve25519FactorSourceMnemonic: Mnemonic,
-		nameOfFirstAccount: String?
-	) {
-		self.networkAndGateway = networkAndGateway
-		self.curve25519FactorSourceMnemonic = curve25519FactorSourceMnemonic
-		self.nameOfFirstAccount = nameOfFirstAccount
-	}
-}
-
 // MARK: - ProfileClient
-public struct ProfileClient: DependencyKey, Sendable {
+public struct ProfileClient: Sendable {
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
 	public var getNetworkAndGateway: GetNetworkAndGateway
@@ -45,25 +28,45 @@ public struct ProfileClient: DependencyKey, Sendable {
 	public var lookupAccountByAddress: LookupAccountByAddress
 
 	public var signersForAccountsGivenAddresses: SignersForAccountsGivenAddresses
-}
-
-// MARK: - SignersForAccountsGivenAddressesRequest
-public struct SignersForAccountsGivenAddressesRequest: Sendable, Hashable {
-	public let keychainAccessFactorSourcesAuthPrompt: String
-
-	// Might be empty! And in case of empty...
-	public let addresses: OrderedSet<AccountAddress>
-	// ... we will use this NetworkID to get the first account and used that to sign
-	public let networkID: NetworkID
 
 	public init(
-		networkID: NetworkID,
-		addresses: OrderedSet<AccountAddress>,
-		keychainAccessFactorSourcesAuthPrompt: String
+		getCurrentNetworkID: @escaping GetCurrentNetworkID,
+		getGatewayAPIEndpointBaseURL: @escaping GetGatewayAPIEndpointBaseURL,
+		getNetworkAndGateway: @escaping GetNetworkAndGateway,
+		setNetworkAndGateway: @escaping SetNetworkAndGateway,
+		createNewProfile: @escaping CreateNewProfile,
+		injectProfile: @escaping InjectProfile,
+		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
+		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
+		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
+		getAccounts: @escaping GetAccounts,
+		getP2PClients: @escaping GetP2PClients,
+		addP2PClient: @escaping AddP2PClient,
+		deleteP2PClientByID: @escaping DeleteP2PClientByID,
+		getAppPreferences: @escaping GetAppPreferences,
+		setDisplayAppPreferences: @escaping SetDisplayAppPreferences,
+		createVirtualAccount: @escaping CreateVirtualAccount,
+		lookupAccountByAddress: @escaping LookupAccountByAddress,
+		signersForAccountsGivenAddresses: @escaping SignersForAccountsGivenAddresses
 	) {
-		self.networkID = networkID
-		self.addresses = addresses
-		self.keychainAccessFactorSourcesAuthPrompt = keychainAccessFactorSourcesAuthPrompt
+		self.getCurrentNetworkID = getCurrentNetworkID
+		self.getGatewayAPIEndpointBaseURL = getGatewayAPIEndpointBaseURL
+		self.getNetworkAndGateway = getNetworkAndGateway
+		self.setNetworkAndGateway = setNetworkAndGateway
+		self.createNewProfile = createNewProfile
+		self.injectProfile = injectProfile
+		self.extractProfileSnapshot = extractProfileSnapshot
+		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
+		self.hasAccountOnNetwork = hasAccountOnNetwork
+		self.getAccounts = getAccounts
+		self.getP2PClients = getP2PClients
+		self.addP2PClient = addP2PClient
+		self.deleteP2PClientByID = deleteP2PClientByID
+		self.getAppPreferences = getAppPreferences
+		self.setDisplayAppPreferences = setDisplayAppPreferences
+		self.createVirtualAccount = createVirtualAccount
+		self.lookupAccountByAddress = lookupAccountByAddress
+		self.signersForAccountsGivenAddresses = signersForAccountsGivenAddresses
 	}
 }
 
@@ -97,26 +100,3 @@ public extension ProfileClient {
 }
 
 public typealias SignersOfAccount = SignersOf<OnNetwork.Account>
-
-// MARK: - AccountSignature
-public struct AccountSignature: Sendable, Hashable {
-	public let account: OnNetwork.Account
-	public let signature: SLIP10.Signature
-}
-
-// MARK: - CreateAccountRequest
-public struct CreateAccountRequest: Sendable, Hashable {
-	public let overridingNetworkID: NetworkID?
-	public let keychainAccessFactorSourcesAuthPrompt: String
-	public let accountName: String?
-
-	public init(
-		overridingNetworkID: NetworkID?,
-		keychainAccessFactorSourcesAuthPrompt: String,
-		accountName: String?
-	) {
-		self.overridingNetworkID = overridingNetworkID
-		self.keychainAccessFactorSourcesAuthPrompt = keychainAccessFactorSourcesAuthPrompt
-		self.accountName = accountName
-	}
-}

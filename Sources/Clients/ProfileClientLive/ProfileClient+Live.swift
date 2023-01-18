@@ -1,6 +1,10 @@
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
+import ProfileClient
+
+// MARK: - ProfileClient + DependencyKey
+extension ProfileClient: DependencyKey {}
 
 // MARK: - ProfileClient + LiveValue
 public extension ProfileClient {
