@@ -72,29 +72,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProfileLoaderTests"
-               BuildableName = "ProfileLoaderTests"
-               BlueprintName = "ProfileLoaderTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "SplashFeatureTests"
                BuildableName = "SplashFeatureTests"
                BlueprintName = "SplashFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "UserDefaultsClientTests"
-               BuildableName = "UserDefaultsClientTests"
-               BlueprintName = "UserDefaultsClientTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -182,16 +162,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AssetTests"
-               BuildableName = "AssetTests"
-               BlueprintName = "AssetTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "AssetsViewFeatureTests"
                BuildableName = "AssetsViewFeatureTests"
                BlueprintName = "AssetsViewFeatureTests"
@@ -235,26 +205,6 @@
                BlueprintIdentifier = "NonFungibleTokenListFeatureTests"
                BuildableName = "NonFungibleTokenListFeatureTests"
                BlueprintName = "NonFungibleTokenListFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PasteboardClientTests"
-               BuildableName = "PasteboardClientTests"
-               BlueprintName = "PasteboardClientTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProfileClientTests"
-               BuildableName = "ProfileClientTests"
-               BlueprintName = "ProfileClientTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -435,6 +385,16 @@
                BlueprintIdentifier = "ProfileTests"
                BuildableName = "ProfileTests"
                BlueprintName = "ProfileTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ProfileClientLiveTests"
+               BuildableName = "ProfileClientLiveTests"
+               BlueprintName = "ProfileClientLiveTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>

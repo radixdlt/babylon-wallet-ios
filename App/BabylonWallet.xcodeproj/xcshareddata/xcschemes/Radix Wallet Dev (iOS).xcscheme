@@ -102,16 +102,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AssetTests"
-               BuildableName = "AssetTests"
-               BlueprintName = "AssetTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "AssetsViewFeatureTests"
                BuildableName = "AssetsViewFeatureTests"
                BlueprintName = "AssetsViewFeatureTests"
@@ -215,26 +205,6 @@
                BlueprintIdentifier = "OnboardingFeatureTests"
                BuildableName = "OnboardingFeatureTests"
                BlueprintName = "OnboardingFeatureTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProfileClientTests"
-               BuildableName = "ProfileClientTests"
-               BlueprintName = "ProfileClientTests"
-               ReferencedContainer = "container:..">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ProfileLoaderTests"
-               BuildableName = "ProfileLoaderTests"
-               BlueprintName = "ProfileLoaderTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
@@ -415,6 +385,16 @@
                BlueprintIdentifier = "CryptographyTests"
                BuildableName = "CryptographyTests"
                BlueprintName = "CryptographyTests"
+               ReferencedContainer = "container:..">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "ProfileClientLiveTests"
+               BuildableName = "ProfileClientLiveTests"
+               BlueprintName = "ProfileClientLiveTests"
                ReferencedContainer = "container:..">
             </BuildableReference>
          </TestableReference>
