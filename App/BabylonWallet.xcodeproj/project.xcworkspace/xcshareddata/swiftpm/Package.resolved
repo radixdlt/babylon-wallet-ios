@@ -123,7 +123,7 @@
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
         "branch" : "navigation",
-        "revision" : "0308f022feaa7ca17355a2d27ba235c5f24c4d00"
+        "revision" : "53e45d21857285148052cde8df3087a393580ca3"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "6fe203dc33195667ce1759bf0182975e4653ba1c",
-        "version" : "1.4.4"
+        "revision" : "e6ca651cbc30b9117aa5586c6e0f8ebbc0a63e0e",
+        "version" : "1.5.0"
       }
     },
     {
