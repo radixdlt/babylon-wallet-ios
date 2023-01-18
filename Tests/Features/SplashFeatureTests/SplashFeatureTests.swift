@@ -1,6 +1,6 @@
 import FeaturePrelude
 import LocalAuthenticationClient
-import ProfileLoader
+import ProfileClient
 @testable import SplashFeature
 import TestingPrelude
 
@@ -23,16 +23,16 @@ final class SplashFeatureTests: TestCase {
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 
 		let newProfile = try await Profile.new(networkAndGateway: .hammunet, mnemonic: .generate())
-		store.dependencies.profileLoader = ProfileLoader(loadProfile: {
+		store.dependencies.profileClient.loadProfile = {
 			.success(newProfile)
-		})
+		}
 
 		// when
 		await store.send(.internal(.view(.viewAppeared)))
 
 		// then
 		await store.receive(.internal(.system(.loadProfileResult(.success(newProfile))))) {
-			$0.profileResult = .success(newProfile)
+			$0.loadProfileResult = .success(newProfile)
 		}
 		await testScheduler.advance(by: .seconds(0.2))
 		await store.receive(.internal(.system(.biometricsConfigResult(.success(authBiometricsConfig))))) {
@@ -73,7 +73,7 @@ final class SplashFeatureTests: TestCase {
 		)
 	}
 
-	func assertNotifiesDelegateWithProfileResult(_ result: ProfileLoader.ProfileResult) async throws {
+	func assertNotifiesDelegateWithProfileResult(_ result: ProfileClient.LoadProfileResult) async throws {
 		let authBiometricsConfig = LocalAuthenticationConfig.biometricsAndPasscodeSetUp
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(
@@ -84,9 +84,9 @@ final class SplashFeatureTests: TestCase {
 				authBiometricsConfig
 			}
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.profileLoader = ProfileLoader(loadProfile: {
+			$0.profileClient.loadProfile = {
 				result
-			})
+			}
 		}
 
 		// when
@@ -94,7 +94,7 @@ final class SplashFeatureTests: TestCase {
 
 		// then
 		await store.receive(.internal(.system(.loadProfileResult(result)))) {
-			$0.profileResult = result
+			$0.loadProfileResult = result
 		}
 		await testScheduler.advance(by: .seconds(0.2))
 		await store.receive(.internal(.system(.biometricsConfigResult(.success(authBiometricsConfig)))))

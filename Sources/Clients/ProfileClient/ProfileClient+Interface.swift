@@ -11,7 +11,7 @@ public struct ProfileClient: Sendable {
 	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
 	public var createNewProfile: CreateNewProfile
 
-	public var injectProfile: InjectProfile
+	public var loadProfile: LoadProfile
 	public var extractProfileSnapshot: ExtractProfileSnapshot
 
 	/// Also deletes profile and factor sources from keychain
@@ -35,7 +35,7 @@ public struct ProfileClient: Sendable {
 		getNetworkAndGateway: @escaping GetNetworkAndGateway,
 		setNetworkAndGateway: @escaping SetNetworkAndGateway,
 		createNewProfile: @escaping CreateNewProfile,
-		injectProfile: @escaping InjectProfile,
+		loadProfile: @escaping LoadProfile,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
@@ -54,7 +54,7 @@ public struct ProfileClient: Sendable {
 		self.getNetworkAndGateway = getNetworkAndGateway
 		self.setNetworkAndGateway = setNetworkAndGateway
 		self.createNewProfile = createNewProfile
-		self.injectProfile = injectProfile
+		self.loadProfile = loadProfile
 		self.extractProfileSnapshot = extractProfileSnapshot
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
 		self.hasAccountOnNetwork = hasAccountOnNetwork
@@ -71,6 +71,9 @@ public struct ProfileClient: Sendable {
 }
 
 public extension ProfileClient {
+	typealias LoadProfileResult = Swift.Result<Profile?, Profile.LoadingFailure>
+	typealias LoadProfile = @Sendable () async -> LoadProfileResult
+
 	typealias GetGatewayAPIEndpointBaseURL = @Sendable () async -> URL
 	typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 
@@ -78,9 +81,8 @@ public extension ProfileClient {
 
 	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
-	typealias CreateNewProfile = @Sendable (CreateNewProfileRequest) async throws -> Profile
-
-	typealias InjectProfile = @Sendable (Profile) async throws -> Void
+	// Returns the first account on the current Network for this new Profile. Which is what the `CreateAccount` feature uses (used during Onboarding).
+	typealias CreateNewProfile = @Sendable (CreateNewProfileRequest) async throws -> OnNetwork.Account
 
 	typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 

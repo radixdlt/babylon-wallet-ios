@@ -1,7 +1,7 @@
 import Logging
 import SwiftLogConsoleColors
 
-private let baseLabel = "com.radixpublishing.converse"
+private let baseLabel = "com.radixpublishing"
 
 private func makeLogger(
 	label: String,

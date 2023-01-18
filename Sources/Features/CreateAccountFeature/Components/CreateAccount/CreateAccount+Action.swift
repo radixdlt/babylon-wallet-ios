@@ -35,10 +35,7 @@ public extension CreateAccount.Action {
 public extension CreateAccount.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
 		case focusTextField(CreateAccount.State.Field?)
-		case createdNewProfileResult(TaskResult<Profile>)
 		case createdNewAccountResult(TaskResult<OnNetwork.Account>)
-		case injectProfileIntoProfileClientResult(TaskResult<Profile>)
-		case loadAccountResult(TaskResult<OnNetwork.Account>)
 	}
 }
 

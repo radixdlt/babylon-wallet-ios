@@ -54,38 +54,29 @@ public struct App: Sendable, ReducerProtocol {
 			return .none
 
 		case .child(.main(.delegate(.removedWallet))):
-			goToOnboarding(state: &state)
-			return .none
+			return goToOnboarding(state: &state)
 
 		case .child(.onboarding(.delegate(.completed))):
-			goToMain(state: &state)
-			return .none
+			return goToMain(state: &state)
 
 		case let .child(.splash(.delegate(.profileResultLoaded(profileResult)))):
 			switch profileResult {
-			case let .success(.some(profile)):
-				return injectProfileIntoProfileClient(profile, createdNewProfile: false)
 			case .success(.none):
-				goToOnboarding(state: &state)
-				return .none
+				return goToOnboarding(state: &state)
+
+			case .success(.some(_)):
+				return goToMain(state: &state)
 
 			case let .failure(.decodingFailure(_, error)):
 				errorQueue.schedule(error)
-				goToOnboarding(state: &state)
-				return .none
+				return goToOnboarding(state: &state)
+
 			case let .failure(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot)):
 				return incompatibleSnapshotData(version: failedToCreateProfileFromSnapshot.version, state: &state)
+
 			case let .failure(.profileVersionOutdated(_, version)):
 				return incompatibleSnapshotData(version: version, state: &state)
 			}
-
-		case .internal(.system(.injectProfileIntoProfileClientResult(.success))):
-			goToMain(state: &state)
-			return .none
-
-		case let .internal(.system(.injectProfileIntoProfileClientResult(.failure(error)))):
-			errorQueue.schedule(error)
-			return .none
 
 		case .internal(.view(.deleteIncompatibleProfile)):
 			return .run { send in
@@ -97,22 +88,10 @@ public struct App: Sendable, ReducerProtocol {
 				await send(.internal(.system(.deletedIncompatibleProfile)))
 			}
 		case .internal(.system(.deletedIncompatibleProfile)):
-			goToOnboarding(state: &state)
-			return .none
+			return goToOnboarding(state: &state)
 
 		case .child:
 			return .none
-		}
-	}
-
-	func injectProfileIntoProfileClient(_ profile: Profile, createdNewProfile: Bool) -> EffectTask<Action> {
-		.run { send in
-			await send(.internal(.system(.injectProfileIntoProfileClientResult(
-				TaskResult {
-					try await profileClient.injectProfile(profile)
-					return profile
-				}
-			))))
 		}
 	}
 
@@ -128,12 +107,14 @@ public struct App: Sendable, ReducerProtocol {
 		return .none
 	}
 
-	func goToMain(state: inout State) {
+	func goToMain(state: inout State) -> EffectTask<Action> {
 		state.root = .main(.init())
+		return .none
 	}
 
-	func goToOnboarding(state: inout State) {
+	func goToOnboarding(state: inout State) -> EffectTask<Action> {
 		state.root = .onboarding(.init())
+		return .none
 	}
 }
 

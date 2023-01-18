@@ -1,13 +1,13 @@
 import FeaturePrelude
 import LocalAuthenticationClient
-import ProfileLoader
+import ProfileClient
 
 // MARK: - Splash
 public struct Splash: Sendable, ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.localAuthenticationClient) var localAuthenticationClient
-	@Dependency(\.profileLoader) var profileLoader
+	@Dependency(\.profileClient.loadProfile) var loadProfile
 	@Dependency(\.openURL) var openURL
 
 	public init() {}
@@ -15,7 +15,11 @@ public struct Splash: Sendable, ReducerProtocol {
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.viewAppeared)):
-			return loadProfile()
+			return .run { send in
+				await send(.internal(.system(.loadProfileResult(
+					loadProfile()
+				))))
+			}
 
 		case let .internal(.system(.biometricsConfigResult(result))):
 			let config = try? result.value
@@ -41,10 +45,10 @@ public struct Splash: Sendable, ReducerProtocol {
 				return .none
 			}
 
-			return notifyDelegate(profileResult: state.profileResult)
+			return notifyDelegate(profileResult: state.loadProfileResult)
 
 		case let .internal(.system(.loadProfileResult(result))):
-			state.profileResult = result
+			state.loadProfileResult = result
 			return delay().concatenate(with: verifyBiometrics())
 
 		case .delegate:
@@ -55,7 +59,7 @@ public struct Splash: Sendable, ReducerProtocol {
 
 			switch action {
 			case .dismissed, .cancelButtonTapped:
-				return notifyDelegate(profileResult: state.profileResult)
+				return notifyDelegate(profileResult: state.loadProfileResult)
 
 			case .openSettingsButtonTapped:
 				#if os(iOS)
@@ -81,16 +85,7 @@ public struct Splash: Sendable, ReducerProtocol {
 		}
 	}
 
-	func loadProfile() -> EffectTask<Action> {
-		.run { send in
-			let result = await profileLoader.loadProfile()
-			await send(.internal(.system(.loadProfileResult(
-				result
-			))))
-		}
-	}
-
-	func notifyDelegate(profileResult: ProfileLoader.ProfileResult?) -> EffectTask<Action> {
+	func notifyDelegate(profileResult: ProfileClient.LoadProfileResult?) -> EffectTask<Action> {
 		precondition(profileResult != nil)
 
 		return .run { send in
