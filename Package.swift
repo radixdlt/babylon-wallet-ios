@@ -535,6 +535,9 @@ package.addModules([
 			.product(name: "Dependencies", package: "swift-dependencies") {
 				.package(url: "https://github.com/pointfreeco/swift-dependencies", from: "0.1.1")
 			},
+			.product(name: "DependenciesAdditions", package: "swift-dependencies-additions") {
+				.package(url: "https://github.com/tgrapperon/swift-dependencies-additions", from: "0.2.0")
+			},
 			.product(name: "IdentifiedCollections", package: "swift-identified-collections") {
 				.package(url: "https://github.com/pointfreeco/swift-identified-collections", from: "0.6.0")
 			},

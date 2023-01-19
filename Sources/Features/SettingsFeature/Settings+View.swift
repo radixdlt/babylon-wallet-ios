@@ -114,7 +114,7 @@ private extension AppSettings.View {
 						Spacer()
 							.frame(height: .large1)
 
-						Text(L10n.Settings.versionInfo(Bundle.main.appVersionLong, Bundle.main.appBuild))
+						Text(viewStore.appVersion)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body2Regular)
 
@@ -161,12 +161,16 @@ public extension AppSettings.View {
 		public let profileToInspect: Profile?
 		#endif
 		public let canAddP2PClient: Bool
+		public let appVersion: String
+
 		public init(state: AppSettings.State) {
 			#if DEBUG
 			isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			profileToInspect = state.profileToInspect
 			#endif
 			canAddP2PClient = state.canAddP2PClient
+			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
+			appVersion = L10n.Settings.versionInfo(bundleInfo.shortVersion, bundleInfo.version)
 		}
 	}
 }
