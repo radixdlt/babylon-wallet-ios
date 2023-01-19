@@ -58,15 +58,16 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 
 public extension FungibleToken {
 	var isXRD: Bool {
-		for networkID in NetworkID.allCases {
-			if
-				let xrdAddress = Network.KnownAddresses.addressMap[networkID]?.xrd,
-				self.componentAddress.address == xrdAddress.address
-			{
-				return true
-			}
+		NetworkID.allCases.contains(where: isXRD(on:))
+	}
+
+	func isXRD(on networkID: NetworkID) -> Bool {
+		guard let xrdAddress = Network.KnownAddresses.addressMap[networkID]?.xrd,
+		      self.componentAddress.address == xrdAddress.address
+		else {
+			return false
 		}
-		return false
+		return true
 	}
 }
 
@@ -92,6 +93,19 @@ public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
 		self.asset = asset
 		self.amount = amount
 		self.worth = worth
+	}
+}
+
+// TODO: delete this when support for big decimals is added
+public extension FungibleTokenContainer {
+	var unsafeFailingAmountWithoutPrecision: Float {
+		if let amount = amount,
+		   let floatAmount = Float(amount)
+		{
+			return floatAmount
+		} else {
+			return 0
+		}
 	}
 }
 

@@ -1,3 +1,4 @@
+import AccountPortfolio
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
@@ -9,6 +10,7 @@ public extension TransactionClient {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.profileClient) var profileClient
+		@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 
 		let pollStrategy: PollStrategy = .default
 
@@ -290,22 +292,27 @@ public extension TransactionClient {
 					networkID: networkID
 				)
 
+				let lockFeeAmount = 10
+
 				let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
-					// Might be empty
 					let addressesManifestReferences =
 						try engineToolkitClient.accountAddressesNeedingToSignTransaction(
 							accountAddressesNeedingToSignTransactionRequest
 						)
-					if let address = addressesManifestReferences.first {
-						return address
+
+					let xrdContainers = try await addressesManifestReferences.concurrentMap { try await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
+					let firstWithEnoughFunds = xrdContainers.first(where: { $0.unsafeFailingAmountWithoutPrecision >= Float(lockFeeAmount) })?.owner
+
+					if let firstWithEnoughFunds = firstWithEnoughFunds {
+						return firstWithEnoughFunds
 					} else {
-						let accounts = try await profileClient.getAccounts()
-						return accounts.first.address
+						throw P2P.ToDapp.Response.Failure.Kind.Error.failedToFindAccountWithEnoughFundsToLockFee
 					}
 				}()
 
 				let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
-					address: ComponentAddress(address: accountAddress.address)
+					address: ComponentAddress(address: accountAddress.address),
+					fee: String(lockFeeAmount)
 				).embed()
 
 				instructions.insert(lockFeeCallMethodInstruction, at: 0)
