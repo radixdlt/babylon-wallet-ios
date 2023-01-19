@@ -277,21 +277,6 @@ public extension TransactionClient {
 			return try engineToolkitClient.convertManifestInstructionsToJSONIfItWasString(conversionRequest)
 		}
 
-		/// Returns an AccountAddress with enough funds for a given lock fee.
-		@Sendable
-		func firstAccountWithEnoughXRDForLockFee(in xrdContainers: [FungibleTokenContainer], lockFee: Int) -> AccountAddress? {
-			let container = xrdContainers.first { container in
-				if let amount = container.amount,
-				   let value = Float(amount),
-				   value >= Float(lockFee)
-				{
-					return true
-				}
-				return false
-			}
-			return container?.owner
-		}
-
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			addLockFeeInstructionToManifest: { maybeStringManifest in
@@ -307,7 +292,7 @@ public extension TransactionClient {
 					networkID: networkID
 				)
 
-				let lockFee = 10
+				let lockFeeAmount = 10
 
 				let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
 					let addressesManifestReferences =
@@ -315,8 +300,8 @@ public extension TransactionClient {
 							accountAddressesNeedingToSignTransactionRequest
 						)
 
-					let xrdContainers = try await accountPortfolioFetcher.fetchXRDBalance(for: Array(addressesManifestReferences), on: networkID)
-					let firstWithEnoughFunds = firstAccountWithEnoughXRDForLockFee(in: xrdContainers, lockFee: lockFee)
+					let xrdContainers = try await addressesManifestReferences.concurrentMap { try await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
+					let firstWithEnoughFunds = xrdContainers.first(where: { $0.unsafeFailingAmountWithoutPrecision >= Float(lockFeeAmount) })?.owner
 
 					if let firstWithEnoughFunds = firstWithEnoughFunds {
 						return firstWithEnoughFunds
@@ -327,7 +312,7 @@ public extension TransactionClient {
 
 				let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
 					address: ComponentAddress(address: accountAddress.address),
-					fee: String(lockFee)
+					fee: String(lockFeeAmount)
 				).embed()
 
 				instructions.insert(lockFeeCallMethodInstruction, at: 0)

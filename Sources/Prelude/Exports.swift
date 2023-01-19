@@ -4,6 +4,7 @@
 @_exported import AsyncExtensions
 @_exported import BigInt
 @_exported import BitCollections
+@_exported import CollectionConcurrencyKit
 @_exported import Collections
 @_exported import CustomDump
 @_exported import Dependencies
