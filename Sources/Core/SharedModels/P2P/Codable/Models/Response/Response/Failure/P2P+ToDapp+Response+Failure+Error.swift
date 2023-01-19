@@ -9,6 +9,7 @@ public extension P2P.ToDapp.Response.Failure.Kind {
 		case failedToSignTransaction
 		case failedToSubmitTransaction
 		case failedToPollSubmittedTransaction
+		case failedToFindAccountWithEnoughFundsToLockFee
 		case submittedTransactionWasDuplicate
 		case submittedTransactionHasFailedTransactionStatus
 		case submittedTransactionHasRejectedTransactionStatus
@@ -27,6 +28,8 @@ public extension P2P.ToDapp.Response.Failure.Kind {
 				return "Failed to submit transaction"
 			case .failedToPollSubmittedTransaction:
 				return "Failed to poll submitted transaction"
+			case .failedToFindAccountWithEnoughFundsToLockFee:
+				return "Failed to find an account with enough funds to lock fee"
 			case .submittedTransactionWasDuplicate:
 				return "Submitted transaction was a duplicate"
 			case .submittedTransactionHasFailedTransactionStatus:

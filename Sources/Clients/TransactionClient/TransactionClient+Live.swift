@@ -306,7 +306,7 @@ public extension TransactionClient {
 					if let firstWithEnoughFunds = firstWithEnoughFunds {
 						return firstWithEnoughFunds
 					} else {
-						throw AddLockFeeError.failedToFindAccountWithEnoughFundsToLockFee
+						throw P2P.ToDapp.Response.Failure.Kind.Error.failedToFindAccountWithEnoughFundsToLockFee
 					}
 				}()
 
@@ -432,16 +432,5 @@ public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable 
 public extension LocalizedError where Self: Equatable {
 	static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.errorDescription == rhs.errorDescription
-	}
-}
-
-// MARK: - AddLockFeeError
-public enum AddLockFeeError: Sendable, LocalizedError, Equatable {
-	case failedToFindAccountWithEnoughFundsToLockFee
-	public var errorDescription: String? {
-		switch self {
-		case .failedToFindAccountWithEnoughFundsToLockFee:
-			return "Failed to find an account with enough funds to lock fee"
-		}
 	}
 }
