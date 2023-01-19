@@ -4,7 +4,7 @@ import Prelude
 public extension Slip10CurveType {
 	static let secp256k1 = Self(
 		slip10CurveID: "Bitcoin seed",
-		curveOrder: BInt("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", radix: 16)!
+		curveOrder: BigUInt("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", radix: 16)!
 	)
 }
 

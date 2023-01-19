@@ -5,9 +5,9 @@ import ProfileModels
 // MARK: - FungibleToken
 public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public let componentAddress: ComponentAddress
-	public let totalSupply: BDouble?
-	public let totalMinted: BDouble?
-	public let totalBurnt: BDouble?
+	public let totalSupply: BigDecimal?
+	public let totalMinted: BigDecimal?
+	public let totalBurnt: BigDecimal?
 
 	/// An optional desciption of this token, e.g.
 	/// ` "The Radix Public Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes."`
@@ -34,9 +34,9 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	public init(
 		componentAddress: ComponentAddress,
 		divisibility: Int?,
-		totalSupply: BDouble?,
-		totalMinted: BDouble?,
-		totalBurnt: BDouble?,
+		totalSupply: BigDecimal?,
+		totalMinted: BigDecimal?,
+		totalBurnt: BigDecimal?,
 		tokenDescription: String?,
 		name: String?,
 		symbol: String?,
@@ -81,13 +81,13 @@ public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
 	/// Token amount held in one account, expressed as regular decimal value, for example: 105.78 XRD
 	public var amount: String?
 	/// Token worth in currently selected currency.
-	public var worth: BDouble?
+	public var worth: BigDecimal?
 
 	public init(
 		owner: AccountAddress,
 		asset: FungibleToken,
 		amount: String?,
-		worth: BDouble?
+		worth: BigDecimal?
 	) {
 		self.owner = owner
 		self.asset = asset

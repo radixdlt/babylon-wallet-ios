@@ -918,7 +918,7 @@ public extension Slip10CurveType {
 		// either `P256`, `secp256r1` or `prime256v1`. Unfortunate!
 		// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#master-key-generation
 		slip10CurveID: "Nist256p1 seed",
-		curveOrder: BInt("FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551", radix: 16)!
+		curveOrder: BigUInt("FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551", radix: 16)!
 	)
 }
 

@@ -102,8 +102,8 @@ internal extension HD.ExtendedKey {
 		return serializedBytes
 	}
 
-	func keyAsScalar(forceSelectPublicKey: Bool) -> BInt {
-		BInt(bytes: keyAsData(forceSelectPublicKey: forceSelectPublicKey).bytes)
+	func keyAsScalar(forceSelectPublicKey: Bool) -> BigUInt {
+		BigUInt(keyAsData(forceSelectPublicKey: forceSelectPublicKey))
 	}
 }
 
@@ -121,17 +121,17 @@ internal enum KeyToDerive: Equatable {
 }
 
 internal func serializeByPrependingByteToReachKeyLength(
-	scalar: BInt,
+	scalar: BigUInt,
 	keyLength targetBytecount: Int = 32,
 	prependingByte byteToPrepend: UInt8 = 0x00
 ) -> Data {
-	var bytes = scalar.getBytes().bytes
+	var bytes = scalar.serialize()
 	while bytes.count < targetBytecount {
 		bytes.insert(byteToPrepend, at: 0)
 	}
 
 	assert(bytes.count == targetBytecount)
-	return Data(bytes)
+	return bytes
 }
 
 private extension HD.ExtendedKey {
@@ -266,12 +266,12 @@ internal func keyAndChainCode<Curve: Slip10SupportedECCurve>(
 	curve: Curve.Type,
 	hmacKeyData: Data,
 	s: @autoclosure () throws -> Data,
-	formKey: (BInt) -> BInt,
-	updateS: (_ s: inout Data, _ i: Data, _ iL: BInt, _ iR: Data) -> Void
-) throws -> (secretKey: BInt, chainCode: ChainCode) {
+	formKey: (BigUInt) -> BigUInt,
+	updateS: (_ s: inout Data, _ i: Data, _ iL: BigUInt, _ iR: Data) -> Void
+) throws -> (secretKey: BigUInt, chainCode: ChainCode) {
 	let n = Curve.slip10Curve.curveOrder
 	let hmacKey = SymmetricKey(data: hmacKeyData)
-	var secretKey: BInt!
+	var secretKey: BigUInt!
 	var chainCode = Data()
 	var s = try s()
 
@@ -282,7 +282,7 @@ internal func keyAndChainCode<Curve: Slip10SupportedECCurve>(
 		let iR = Data(i.suffix(32))
 
 		chainCode = iR
-		let iL = BInt(bytes: iLData.bytes)
+		let iL = BigUInt(iLData)
 		if Curve.isCurve25519 {
 			secretKey = iL
 		} else {

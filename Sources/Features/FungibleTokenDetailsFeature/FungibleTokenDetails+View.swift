@@ -97,7 +97,7 @@ extension FungibleTokenDetails.View {
 		var symbol: String?
 		var description: String?
 		var address: AddressView.ViewState
-		var currentSupply: BDouble?
+		var currentSupply: BigDecimal?
 
 		init(state: FungibleTokenDetails.State) {
 			displayName = state.asset.name

@@ -98,9 +98,13 @@ private extension FungibleTokenList.Row.View {
 		return String(describing: amount)
 	}
 
-	func tokenValue(_ value: BDouble?, isVisible: Bool, currency: FiatCurrency) -> String {
-		if isVisible, let value = value {
-			return Double("\(value)")?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign) -"
+	func tokenValue(_ value: BigDecimal?, isVisible: Bool, currency: FiatCurrency) -> String {
+		if isVisible {
+			if let value = value, let doubleValue = Double(value.description) {
+				return doubleValue.formatted(.currency(code: currency.symbol))
+			} else {
+				return "\(currency.sign) -"
+			}
 		} else {
 			return "\(currency.sign) ••••"
 		}
