@@ -37,7 +37,7 @@ public extension OnNetwork {
 		public let displayName: String?
 
 		/// Fields containing personal information you have inputted.
-		public let fields: [Field]
+		public let fields: OrderedSet<Field>
 
 		public init(
 			address: EntityAddress,
@@ -45,7 +45,7 @@ public extension OnNetwork {
 			index: Index,
 			derivationPath: EntityDerivationPath,
 			displayName: String?,
-			fields: [Field]
+			fields: OrderedSet<Field>
 		) {
 			self.address = address
 			self.securityState = securityState

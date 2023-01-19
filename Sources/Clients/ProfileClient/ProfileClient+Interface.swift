@@ -25,6 +25,7 @@ public struct ProfileClient: Sendable {
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
 	public var createVirtualAccount: CreateVirtualAccount
+	public var createVirtualPersona: CreateVirtualPersona
 	public var lookupAccountByAddress: LookupAccountByAddress
 
 	public var signersForAccountsGivenAddresses: SignersForAccountsGivenAddresses
@@ -46,6 +47,7 @@ public struct ProfileClient: Sendable {
 		getAppPreferences: @escaping GetAppPreferences,
 		setDisplayAppPreferences: @escaping SetDisplayAppPreferences,
 		createVirtualAccount: @escaping CreateVirtualAccount,
+		createVirtualPersona: @escaping CreateVirtualPersona,
 		lookupAccountByAddress: @escaping LookupAccountByAddress,
 		signersForAccountsGivenAddresses: @escaping SignersForAccountsGivenAddresses
 	) {
@@ -65,6 +67,7 @@ public struct ProfileClient: Sendable {
 		self.getAppPreferences = getAppPreferences
 		self.setDisplayAppPreferences = setDisplayAppPreferences
 		self.createVirtualAccount = createVirtualAccount
+		self.createVirtualPersona = createVirtualPersona
 		self.lookupAccountByAddress = lookupAccountByAddress
 		self.signersForAccountsGivenAddresses = signersForAccountsGivenAddresses
 	}
@@ -96,6 +99,7 @@ public extension ProfileClient {
 	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
 	typealias CreateVirtualAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
+	typealias CreateVirtualPersona = @Sendable (CreatePersonaRequest) async throws -> OnNetwork.Persona
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 
 	typealias SignersForAccountsGivenAddresses = @Sendable (SignersForAccountsGivenAddressesRequest) async throws -> NonEmpty<OrderedSet<SignersOfAccount>>

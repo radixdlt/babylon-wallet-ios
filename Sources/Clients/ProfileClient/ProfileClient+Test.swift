@@ -32,6 +32,7 @@ extension ProfileClient: TestDependencyKey {
 		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
 		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
 		createVirtualAccount: unimplemented("\(Self.self).createVirtualAccount"),
+		createVirtualPersona: unimplemented("\(Self.self).createVirtualPersona"),
 		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
 		signersForAccountsGivenAddresses: unimplemented("\(Self.self).signersForAccountsGivenAddresses")
 	)
@@ -60,6 +61,7 @@ public extension ProfileClient {
 		getAppPreferences: { throw CancellationError() },
 		setDisplayAppPreferences: { _ in throw CancellationError() },
 		createVirtualAccount: { _ in throw CancellationError() },
+		createVirtualPersona: { _ in throw CancellationError() },
 		lookupAccountByAddress: { _ in .previewValue0 },
 		signersForAccountsGivenAddresses: { _ in throw CancellationError() }
 	)

@@ -223,6 +223,23 @@ public extension ProfileClient {
 					)
 				}
 			},
+			createVirtualPersona: { request in
+				try await profileHolder.asyncMutating { profile in
+					let networkID = await getCurrentNetworkID()
+					return try await profile.createNewVirtualPersona(
+						networkID: request.overridingNetworkID ?? networkID,
+						displayName: request.personaName,
+						fields: request.fields,
+						mnemonicForFactorSourceByReference: { [keychainClient] reference in
+							try await keychainClient
+								.loadFactorSourceMnemonic(
+									reference: reference,
+									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+								)
+						}
+					)
+				}
+			},
 			lookupAccountByAddress: lookupAccountByAddress,
 			signersForAccountsGivenAddresses: { request in
 
