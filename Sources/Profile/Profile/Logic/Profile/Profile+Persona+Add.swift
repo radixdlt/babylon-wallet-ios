@@ -34,9 +34,7 @@ public extension Profile {
 	) async throws -> OnNetwork.Persona {
 		var onNetwork = try onNetwork(id: networkID)
 
-		let persona = try await Self.createNewVirtualPersona(
-			factorSources: self.factorSources,
-			personaIndex: onNetwork.personas.count,
+		let persona = try await creatingNewVirtualPersona(
 			networkID: networkID,
 			displayName: displayName,
 			fields: fields,
@@ -46,6 +44,40 @@ public extension Profile {
 		let updatedElement = onNetwork.personas.updateOrAppend(persona)
 		assert(updatedElement == nil)
 		try updateOnNetwork(onNetwork)
+
+		return persona
+	}
+
+	/// Creates a new **Virtual**  `Persona` without saving it into the profile.
+	func creatingNewVirtualPersona(
+		networkID: NetworkID,
+		displayName: String? = nil,
+		fields: OrderedSet<OnNetwork.Persona.Field> = .init(),
+		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
+	) async throws -> OnNetwork.Persona {
+		try await creatingNewVirtualPersona(networkID: networkID, displayName: displayName, fields: fields, createFactorInstance: mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+			includePrivateKey: false,
+			mnemonicForFactorSourceByReference
+		))
+	}
+
+	/// Creates a new **Virtual**  `Persona` without saving it into the profile.
+	func creatingNewVirtualPersona(
+		networkID: NetworkID,
+		displayName: String? = nil,
+		fields: OrderedSet<OnNetwork.Persona.Field> = .init(),
+		createFactorInstance: @escaping CreateFactorInstanceForRequest
+	) async throws -> OnNetwork.Persona {
+		let onNetwork = try onNetwork(id: networkID)
+
+		let persona = try await Self.createNewVirtualPersona(
+			factorSources: self.factorSources,
+			personaIndex: onNetwork.personas.count,
+			networkID: networkID,
+			displayName: displayName,
+			fields: fields,
+			createFactorInstance: createFactorInstance
+		)
 
 		return persona
 	}

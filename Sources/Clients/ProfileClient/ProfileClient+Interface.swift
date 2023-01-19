@@ -19,13 +19,14 @@ public struct ProfileClient: Sendable {
 
 	public var hasAccountOnNetwork: HasAccountOnNetwork
 	public var getAccounts: GetAccounts
+	public var getPersonas: GetPersonas
 	public var getP2PClients: GetP2PClients
 	public var addP2PClient: AddP2PClient
 	public var deleteP2PClientByID: DeleteP2PClientByID
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
 	public var createVirtualAccount: CreateVirtualAccount
-	public var createVirtualPersona: CreateVirtualPersona
+	public var creatingUnsavedVirtualPersona: CreateVirtualPersona
 	public var lookupAccountByAddress: LookupAccountByAddress
 
 	public var signersForAccountsGivenAddresses: SignersForAccountsGivenAddresses
@@ -41,13 +42,14 @@ public struct ProfileClient: Sendable {
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
 		getAccounts: @escaping GetAccounts,
+		getPersonas: @escaping GetPersonas,
 		getP2PClients: @escaping GetP2PClients,
 		addP2PClient: @escaping AddP2PClient,
 		deleteP2PClientByID: @escaping DeleteP2PClientByID,
 		getAppPreferences: @escaping GetAppPreferences,
 		setDisplayAppPreferences: @escaping SetDisplayAppPreferences,
 		createVirtualAccount: @escaping CreateVirtualAccount,
-		createVirtualPersona: @escaping CreateVirtualPersona,
+		creatingUnsavedVirtualPersona: @escaping CreateVirtualPersona,
 		lookupAccountByAddress: @escaping LookupAccountByAddress,
 		signersForAccountsGivenAddresses: @escaping SignersForAccountsGivenAddresses
 	) {
@@ -61,13 +63,14 @@ public struct ProfileClient: Sendable {
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
 		self.hasAccountOnNetwork = hasAccountOnNetwork
 		self.getAccounts = getAccounts
+		self.getPersonas = getPersonas
 		self.getP2PClients = getP2PClients
 		self.addP2PClient = addP2PClient
 		self.deleteP2PClientByID = deleteP2PClientByID
 		self.getAppPreferences = getAppPreferences
 		self.setDisplayAppPreferences = setDisplayAppPreferences
 		self.createVirtualAccount = createVirtualAccount
-		self.createVirtualPersona = createVirtualPersona
+		self.creatingUnsavedVirtualPersona = creatingUnsavedVirtualPersona
 		self.lookupAccountByAddress = lookupAccountByAddress
 		self.signersForAccountsGivenAddresses = signersForAccountsGivenAddresses
 	}
@@ -93,6 +96,7 @@ public extension ProfileClient {
 	typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
 	typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 	typealias GetAccounts = @Sendable () async throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
+	typealias GetPersonas = @Sendable () async throws -> OrderedSet<OnNetwork.Persona>
 	typealias GetP2PClients = @Sendable () async throws -> P2PClients
 	typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void

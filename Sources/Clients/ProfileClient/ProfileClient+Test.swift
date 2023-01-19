@@ -26,13 +26,14 @@ extension ProfileClient: TestDependencyKey {
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
 		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork"),
 		getAccounts: unimplemented("\(Self.self).getAccounts"),
+		getPersonas: unimplemented("\(Self.self).getPersonas"),
 		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
 		addP2PClient: unimplemented("\(Self.self).addP2PClient"),
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
 		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
 		createVirtualAccount: unimplemented("\(Self.self).createVirtualAccount"),
-		createVirtualPersona: unimplemented("\(Self.self).createVirtualPersona"),
+		creatingUnsavedVirtualPersona: unimplemented("\(Self.self).creatingUnsavedVirtualPersona"),
 		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
 		signersForAccountsGivenAddresses: unimplemented("\(Self.self).signersForAccountsGivenAddresses")
 	)
@@ -55,13 +56,18 @@ public extension ProfileClient {
 			let accounts: [OnNetwork.Account] = [.previewValue0, .previewValue1]
 			return NonEmpty(rawValue: OrderedSet(accounts))!
 		},
+		getPersonas: {
+			//            let accounts: [OnNetwork.Persona] = [.previewValue0, .previewValue1]
+			//            return OrderedSet(accounts)
+			fatalError()
+		},
 		getP2PClients: { throw CancellationError() },
 		addP2PClient: { _ in throw CancellationError() },
 		deleteP2PClientByID: { _ in throw CancellationError() },
 		getAppPreferences: { throw CancellationError() },
 		setDisplayAppPreferences: { _ in throw CancellationError() },
 		createVirtualAccount: { _ in throw CancellationError() },
-		createVirtualPersona: { _ in throw CancellationError() },
+		creatingUnsavedVirtualPersona: { _ in throw CancellationError() },
 		lookupAccountByAddress: { _ in .previewValue0 },
 		signersForAccountsGivenAddresses: { _ in throw CancellationError() }
 	)

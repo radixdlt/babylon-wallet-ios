@@ -152,11 +152,12 @@ public extension Profile {
 }
 
 internal extension Profile {
-	func mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+	static func mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+		factorSources: FactorSources,
 		includePrivateKey: Bool,
 		_ mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
 	) -> CreateFactorInstanceForRequest {
-		{ [factorSources] createFactorInstanceRequest in
+		{ createFactorInstanceRequest in
 			switch createFactorInstanceRequest {
 			case let .fromNonHardwareHierarchicalDeterministicMnemonicFactorSource(nonHWHDRequest):
 				guard let factorSource = factorSources.onDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(byReference: nonHWHDRequest.reference) else {
@@ -175,6 +176,17 @@ internal extension Profile {
 				)
 			}
 		}
+	}
+
+	func mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+		includePrivateKey: Bool,
+		_ mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
+	) -> CreateFactorInstanceForRequest {
+		Self.mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+			factorSources: self.factorSources,
+			includePrivateKey: includePrivateKey,
+			mnemonicForFactorSourceByReference
+		)
 	}
 }
 

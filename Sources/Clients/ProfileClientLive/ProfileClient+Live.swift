@@ -186,6 +186,13 @@ public extension ProfileClient {
 					return onNetwork.accounts
 				}
 			},
+			getPersonas: {
+				let currentNetworkID = await getCurrentNetworkID()
+				return try await profileHolder.get { profile in
+					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
+					return onNetwork.personas
+				}
+			},
 			getP2PClients: {
 				try await profileHolder.get { profile in
 					profile.appPreferences.p2pClients
@@ -223,10 +230,10 @@ public extension ProfileClient {
 					)
 				}
 			},
-			createVirtualPersona: { request in
-				try await profileHolder.asyncMutating { profile in
+			creatingUnsavedVirtualPersona: { request in
+				try await profileHolder.getAsync { profile in
 					let networkID = await getCurrentNetworkID()
-					return try await profile.createNewVirtualPersona(
+					return try await profile.creatingNewVirtualPersona(
 						networkID: request.overridingNetworkID ?? networkID,
 						displayName: request.personaName,
 						fields: request.fields,
