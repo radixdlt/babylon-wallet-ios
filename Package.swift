@@ -524,6 +524,9 @@ package.addModules([
 			.package(url: "https://github.com/apple/swift-collections", branch: "main"), // TODO: peg to specific version once main is tagged
 		],
 		dependencies: [
+			.product(name: "Algorithms", package: "swift-algorithms") {
+				.package(url: "https://github.com/apple/swift-algorithms", from: "1.0.0")
+			},
 			.product(name: "AsyncAlgorithms", package: "swift-async-algorithms") {
 				.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3")
 			},
