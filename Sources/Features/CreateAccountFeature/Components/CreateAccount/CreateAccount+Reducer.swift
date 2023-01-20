@@ -91,9 +91,9 @@ private extension CreateAccount {
 						keychainAccessFactorSourcesAuthPrompt: L10n.CreateAccount.biometricsPrompt,
 						accountName: accountName
 					)
-					return try await profileClient.createVirtualAccount(
-						request
-					)
+					let account = try await profileClient.createUnsavedVirtualAccount(request)
+					try await profileClient.addAccount(account)
+					return account
 				}
 			))))
 		}

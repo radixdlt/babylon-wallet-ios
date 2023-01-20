@@ -214,10 +214,10 @@ public extension ProfileClient {
 					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
-			createVirtualAccount: { request in
-				try await profileHolder.asyncMutating { profile in
+			createUnsavedVirtualAccount: { request in
+				try await profileHolder.getAsync { profile in
 					let networkID = await getCurrentNetworkID()
-					return try await profile.createNewVirtualAccount(
+					return try await profile.creatingNewVirtualAccount(
 						networkID: request.overridingNetworkID ?? networkID,
 						displayName: request.accountName,
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
@@ -230,7 +230,7 @@ public extension ProfileClient {
 					)
 				}
 			},
-			creatingUnsavedVirtualPersona: { request in
+			createUnsavedVirtualPersona: { request in
 				try await profileHolder.getAsync { profile in
 					let networkID = await getCurrentNetworkID()
 					return try await profile.creatingNewVirtualPersona(
@@ -246,6 +246,14 @@ public extension ProfileClient {
 						}
 					)
 				}
+			},
+			addAccount: { account in
+				try await profileHolder.asyncMutating { profile in
+					try await profile.addAccount(account)
+				}
+			},
+			addPersona: { _ in
+				fatalError()
 			},
 			lookupAccountByAddress: lookupAccountByAddress,
 			signersForAccountsGivenAddresses: { request in

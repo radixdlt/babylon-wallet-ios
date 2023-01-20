@@ -25,8 +25,10 @@ public struct ProfileClient: Sendable {
 	public var deleteP2PClientByID: DeleteP2PClientByID
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
-	public var createVirtualAccount: CreateVirtualAccount
-	public var creatingUnsavedVirtualPersona: CreateVirtualPersona
+	public var createUnsavedVirtualAccount: CreateUnsavedVirtualAccount
+	public var createUnsavedVirtualPersona: CreateUnsavedVirtualPersona
+	public var addAccount: AddAccount
+	public var addPersona: AddPersona
 	public var lookupAccountByAddress: LookupAccountByAddress
 
 	public var signersForAccountsGivenAddresses: SignersForAccountsGivenAddresses
@@ -48,8 +50,10 @@ public struct ProfileClient: Sendable {
 		deleteP2PClientByID: @escaping DeleteP2PClientByID,
 		getAppPreferences: @escaping GetAppPreferences,
 		setDisplayAppPreferences: @escaping SetDisplayAppPreferences,
-		createVirtualAccount: @escaping CreateVirtualAccount,
-		creatingUnsavedVirtualPersona: @escaping CreateVirtualPersona,
+		createUnsavedVirtualAccount: @escaping CreateUnsavedVirtualAccount,
+		createUnsavedVirtualPersona: @escaping CreateUnsavedVirtualPersona,
+		addAccount: @escaping AddAccount,
+		addPersona: @escaping AddPersona,
 		lookupAccountByAddress: @escaping LookupAccountByAddress,
 		signersForAccountsGivenAddresses: @escaping SignersForAccountsGivenAddresses
 	) {
@@ -69,8 +73,10 @@ public struct ProfileClient: Sendable {
 		self.deleteP2PClientByID = deleteP2PClientByID
 		self.getAppPreferences = getAppPreferences
 		self.setDisplayAppPreferences = setDisplayAppPreferences
-		self.createVirtualAccount = createVirtualAccount
-		self.creatingUnsavedVirtualPersona = creatingUnsavedVirtualPersona
+		self.createUnsavedVirtualAccount = createUnsavedVirtualAccount
+		self.createUnsavedVirtualPersona = createUnsavedVirtualPersona
+		self.addAccount = addAccount
+		self.addPersona = addPersona
 		self.lookupAccountByAddress = lookupAccountByAddress
 		self.signersForAccountsGivenAddresses = signersForAccountsGivenAddresses
 	}
@@ -102,8 +108,10 @@ public extension ProfileClient {
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
-	typealias CreateVirtualAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
-	typealias CreateVirtualPersona = @Sendable (CreatePersonaRequest) async throws -> OnNetwork.Persona
+	typealias CreateUnsavedVirtualAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
+	typealias CreateUnsavedVirtualPersona = @Sendable (CreatePersonaRequest) async throws -> OnNetwork.Persona
+	typealias AddAccount = @Sendable (OnNetwork.Account) async throws -> Void
+	typealias AddPersona = @Sendable (OnNetwork.Persona) async throws -> Void
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 
 	typealias SignersForAccountsGivenAddresses = @Sendable (SignersForAccountsGivenAddressesRequest) async throws -> NonEmpty<OrderedSet<SignersOfAccount>>

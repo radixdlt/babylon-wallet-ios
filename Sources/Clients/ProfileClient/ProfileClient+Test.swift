@@ -32,8 +32,10 @@ extension ProfileClient: TestDependencyKey {
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
 		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
-		createVirtualAccount: unimplemented("\(Self.self).createVirtualAccount"),
-		creatingUnsavedVirtualPersona: unimplemented("\(Self.self).creatingUnsavedVirtualPersona"),
+		createUnsavedVirtualAccount: unimplemented("\(Self.self).createUnsavedVirtualAccount"),
+		createUnsavedVirtualPersona: unimplemented("\(Self.self).createUnsavedVirtualPersona"),
+		addAccount: unimplemented("\(Self.self).addAccount"),
+		addPersona: unimplemented("\(Self.self).addPersona"),
 		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
 		signersForAccountsGivenAddresses: unimplemented("\(Self.self).signersForAccountsGivenAddresses")
 	)
@@ -57,17 +59,18 @@ public extension ProfileClient {
 			return NonEmpty(rawValue: OrderedSet(accounts))!
 		},
 		getPersonas: {
-			//            let accounts: [OnNetwork.Persona] = [.previewValue0, .previewValue1]
-			//            return OrderedSet(accounts)
-			fatalError()
+			let accounts: [OnNetwork.Persona] = [.previewValue0, .previewValue1]
+			return OrderedSet(accounts)
 		},
 		getP2PClients: { throw CancellationError() },
 		addP2PClient: { _ in throw CancellationError() },
 		deleteP2PClientByID: { _ in throw CancellationError() },
 		getAppPreferences: { throw CancellationError() },
 		setDisplayAppPreferences: { _ in throw CancellationError() },
-		createVirtualAccount: { _ in throw CancellationError() },
-		creatingUnsavedVirtualPersona: { _ in throw CancellationError() },
+		createUnsavedVirtualAccount: { _ in throw CancellationError() },
+		createUnsavedVirtualPersona: { _ in throw CancellationError() },
+		addAccount: { _ in },
+		addPersona: { _ in },
 		lookupAccountByAddress: { _ in .previewValue0 },
 		signersForAccountsGivenAddresses: { _ in throw CancellationError() }
 	)

@@ -99,6 +99,7 @@ public extension Profile {
 			createFactorInstance: createFactorInstance,
 			makeEntity: {
 				OnNetwork.Persona(
+					networkID: networkID,
 					address: $0,
 					securityState: $1,
 					index: $2,

@@ -23,11 +23,7 @@ package.addModules([
 			"AssetsViewFeature",
 			"AssetTransferFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				"SharedTestingModels",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AccountListFeature",
@@ -35,11 +31,7 @@ package.addModules([
 			"AccountPortfolio",
 			"FungibleTokenListFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				"SharedTestingModels",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AccountPreferencesFeature",
@@ -92,11 +84,7 @@ package.addModules([
 			"LocalAuthenticationClient",
 			"ProfileClient",
 		],
-		tests: .yes(
-			dependencies: [
-				"SharedTestingModels",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "FungibleTokenDetailsFeature",
@@ -508,7 +496,7 @@ package.addModules([
 	),
 	.module(
 		name: "TestingPrelude",
-		dependencies: [],
+		dependencies: ["SharedTestingModels"],
 		tests: .no
 	),
 	.module(
