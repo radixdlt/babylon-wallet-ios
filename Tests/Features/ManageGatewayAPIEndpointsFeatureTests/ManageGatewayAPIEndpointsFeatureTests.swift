@@ -1,6 +1,5 @@
-import FeaturePrelude
+import FeatureTestingPrelude
 import ManageGatewayAPIEndpointsFeature
-import TestingPrelude
 
 // MARK: - ManageGatewayAPIEndpointsFeatureTests
 @MainActor

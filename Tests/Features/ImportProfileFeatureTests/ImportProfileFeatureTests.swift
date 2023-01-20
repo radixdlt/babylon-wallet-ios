@@ -1,7 +1,6 @@
-import FeaturePrelude
+import FeatureTestingPrelude
 @testable import ImportProfileFeature
 import Profile
-import TestingPrelude
 
 // MARK: - ImportProfileFeatureTests
 @MainActor

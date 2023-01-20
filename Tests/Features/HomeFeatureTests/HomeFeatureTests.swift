@@ -1,11 +1,10 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
-import FeaturePrelude
+import FeatureTestingPrelude
 import FungibleTokenListFeature
 @testable import HomeFeature
 import NonFungibleTokenListFeature
-import TestingPrelude
 
 @MainActor
 final class HomeFeatureTests: TestCase {

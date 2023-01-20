@@ -1,6 +1,5 @@
 @testable import AssetsViewFeature
-import FeaturePrelude
-import TestingPrelude
+import FeatureTestingPrelude
 
 final class AssetsViewFeatureTests: TestCase {
 	func testTrivial() {

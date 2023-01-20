@@ -1,6 +1,5 @@
-import FeaturePrelude
+import FeatureTestingPrelude
 @testable import MainFeature
-import TestingPrelude
 
 @MainActor
 final class MainFeatureTests: TestCase {

@@ -1,8 +1,7 @@
 @testable import CreateAccountFeature
 import Cryptography
-import FeaturePrelude
+import FeatureTestingPrelude
 import ProfileClient
-import TestingPrelude
 
 @MainActor
 final class CreateAccountFeatureTests: TestCase {

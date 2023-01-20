@@ -395,7 +395,7 @@ package.addModules([
 package.addModules([
 	.module(
 		name: "ProfileView",
-		category: "Profile",
+		radixTechStackLayer: .profile,
 		dependencies: [
 			"Profile",
 		],
@@ -403,7 +403,7 @@ package.addModules([
 	),
 	.module(
 		name: "Profile",
-		category: "Profile",
+		radixTechStackLayer: .profile,
 		dependencies: [
 			"Cryptography",
 			"EngineToolkit",
@@ -419,7 +419,7 @@ package.addModules([
 	),
 	.module(
 		name: "ProfileModels",
-		category: "Profile",
+		radixTechStackLayer: .profile,
 		dependencies: [
 			"Cryptography",
 			"EngineToolkitModels",
@@ -429,7 +429,7 @@ package.addModules([
 	),
 	.module(
 		name: "EngineToolkit",
-		category: "EngineToolkit",
+		radixTechStackLayer: .engineToolkit,
 		dependencies: [
 			"Cryptography",
 			"EngineToolkitModels",
@@ -444,7 +444,7 @@ package.addModules([
 	),
 	.module(
 		name: "EngineToolkitModels",
-		category: "EngineToolkit",
+		radixTechStackLayer: .engineToolkit,
 		dependencies: [
 			"Cryptography",
 		],
@@ -452,7 +452,7 @@ package.addModules([
 	),
 	.module(
 		name: "P2PConnection",
-		category: "RadixConnect",
+		radixTechStackLayer: .radixConnect,
 		dependencies: [
 			"Cryptography",
 			"P2PModels",
@@ -469,7 +469,7 @@ package.addModules([
 	),
 	.module(
 		name: "P2PModels",
-		category: "RadixConnect",
+		radixTechStackLayer: .radixConnect,
 		dependencies: [
 			"Cryptography",
 		],
@@ -477,6 +477,7 @@ package.addModules([
 	),
 	.module(
 		name: "Cryptography",
+		radixTechStackLayer: .crypto,
 		dependencies: [
 			.product(name: "K1", package: "K1") {
 				.package(url: "https://github.com/Sajjon/K1.git", from: "0.0.4")
@@ -492,7 +493,21 @@ package.addModules([
 	),
 	.module(
 		name: "TestingPrelude",
-		dependencies: ["SharedTestingModels"],
+		dependencies: [],
+		tests: .no
+	),
+	.module(
+		name: "FeatureTestingPrelude",
+		dependencies: [
+			"FeaturePrelude", "TestingPrelude", "SharedTestingModels",
+		],
+		tests: .no
+	),
+	.module(
+		name: "ClientTestingPrelude",
+		dependencies: [
+			"ClientPrelude", "TestingPrelude", "SharedTestingModels",
+		],
 		tests: .no
 	),
 	.module(
@@ -566,8 +581,39 @@ extension Package {
 			)
 		}
 
+		enum Category {
+			case client
+			case feature
+			case core
+			case module(layer: RadixTechStackLayer)
+			var pathComponent: String {
+				switch self {
+				case .client: return "Clients"
+				case .feature: return "Features"
+				case .core: return "Core"
+				case let .module(layer):
+					return layer.pathComponent
+				}
+			}
+		}
+
+		enum RadixTechStackLayer {
+			case engineToolkit
+			case profile
+			case radixConnect
+			case crypto
+			var pathComponent: String {
+				switch self {
+				case .engineToolkit: return "EngineToolkit"
+				case .crypto: return "" // No folder called "Cryptography" inside "Cryptography"
+				case .profile: return "Profile"
+				case .radixConnect: return "RadixConnect"
+				}
+			}
+		}
+
 		let name: String
-		let category: String?
+		let category: Category?
 		let remoteDependencies: [Package.Dependency]?
 		let dependencies: [Target.Dependency]
 		let exclude: [String]
@@ -588,7 +634,7 @@ extension Package {
 		) -> Self {
 			.init(
 				name: name,
-				category: "Features",
+				category: .feature,
 				remoteDependencies: remoteDependencies,
 				dependencies: dependencies + ["FeaturePrelude"],
 				exclude: exclude,
@@ -611,7 +657,7 @@ extension Package {
 		) -> Self {
 			.init(
 				name: name,
-				category: "Clients",
+				category: .client,
 				remoteDependencies: remoteDependencies,
 				dependencies: dependencies + ["ClientPrelude"],
 				exclude: exclude,
@@ -634,7 +680,7 @@ extension Package {
 		) -> Self {
 			.init(
 				name: name,
-				category: "Core",
+				category: .core,
 				remoteDependencies: remoteDependencies,
 				dependencies: dependencies,
 				exclude: exclude,
@@ -647,7 +693,7 @@ extension Package {
 
 		static func module(
 			name: String,
-			category: String? = nil,
+			radixTechStackLayer: RadixTechStackLayer? = nil,
 			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
@@ -658,7 +704,7 @@ extension Package {
 		) -> Self {
 			.init(
 				name: name,
-				category: category,
+				category: radixTechStackLayer.map { .module(layer: $0) },
 				remoteDependencies: remoteDependencies,
 				dependencies: dependencies,
 				exclude: exclude,
@@ -684,7 +730,7 @@ extension Package {
 		let targetName = module.name
 		let targetPath = {
 			if let category = module.category {
-				return "Sources/\(category)/\(targetName)"
+				return "Sources/\(category.pathComponent)/\(targetName)"
 			} else {
 				return "Sources/\(targetName)"
 			}
@@ -717,19 +763,30 @@ extension Package {
 		switch module.tests {
 		case .no:
 			break
-		case let .yes(nameSuffix, testDependencies, resources):
+		case let .yes(nameSuffix, customAdditionalTestDependencies, resources):
 			let testTargetName = targetName + nameSuffix
 			let testTargetPath = {
 				if let category = module.category {
-					return "Tests/\(category)/\(testTargetName)"
+					return "Tests/\(category.pathComponent)/\(testTargetName)"
 				} else {
 					return "Tests/\(testTargetName)"
 				}
 			}()
+
+			var testTargetDependencies = customAdditionalTestDependencies + [.target(name: targetName)]
+			switch module.category {
+			case .some(.feature):
+				testTargetDependencies.append("FeatureTestingPrelude")
+			case .some(.client):
+				testTargetDependencies.append("ClientTestingPrelude")
+			case .some(.core), .some(.module), .none:
+				testTargetDependencies.append("TestingPrelude")
+			}
+
 			package.targets += [
 				.testTarget(
 					name: testTargetName,
-					dependencies: [.target(name: targetName)] + testDependencies + ["TestingPrelude"],
+					dependencies: testTargetDependencies,
 					path: testTargetPath,
 					resources: resources,
 					swiftSettings: [

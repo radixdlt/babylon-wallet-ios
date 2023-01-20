@@ -1,8 +1,7 @@
-import FeaturePrelude
+import FeatureTestingPrelude
 import LocalAuthenticationClient
 import ProfileClient
 @testable import SplashFeature
-import TestingPrelude
 
 // MARK: - SplashFeatureTests
 @MainActor

@@ -1,6 +1,5 @@
-import FeaturePrelude
+import FeatureTestingPrelude
 import FungibleTokenListFeature
-import TestingPrelude
 
 final class FungibleTokenListSortingTests: TestCase {
 	let account = OnNetwork.Account.testValue

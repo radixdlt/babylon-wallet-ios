@@ -1,9 +1,8 @@
 @testable import AppFeature
-import FeaturePrelude
+import FeatureTestingPrelude
 import OnboardingFeature
 import ProfileClient
 @testable import SplashFeature
-import TestingPrelude
 
 @MainActor
 final class AppFeatureTests: TestCase {
