@@ -60,22 +60,22 @@ public extension ProfileClient {
 			OnNetwork.Account.previewValue0
 		},
 		loadProfile: { .success(nil) },
-		extractProfileSnapshot: { try fail() },
+		extractProfileSnapshot: { throw NoopError() },
 		deleteProfileAndFactorSources: {},
 		hasAccountOnNetwork: { _ in false },
-		getAccounts: { try fail() },
-		getPersonas: { try fail() },
-		getP2PClients: { try fail() },
-		addP2PClient: { _ in try fail() },
-		deleteP2PClientByID: { _ in try fail() },
-		getAppPreferences: { try fail() },
-		setDisplayAppPreferences: { _ in try fail() },
-		createUnsavedVirtualAccount: { _ in try fail() },
-		createUnsavedVirtualPersona: { _ in try fail() },
+		getAccounts: { throw NoopError() },
+		getPersonas: { throw NoopError() },
+		getP2PClients: { throw NoopError() },
+		addP2PClient: { _ in throw NoopError() },
+		deleteP2PClientByID: { _ in throw NoopError() },
+		getAppPreferences: { throw NoopError() },
+		setDisplayAppPreferences: { _ in throw NoopError() },
+		createUnsavedVirtualAccount: { _ in throw NoopError() },
+		createUnsavedVirtualPersona: { _ in throw NoopError() },
 		addAccount: { _ in },
 		addPersona: { _ in },
 		lookupAccountByAddress: { _ in .previewValue0 },
-		signersForAccountsGivenAddresses: { _ in try fail() }
+		signersForAccountsGivenAddresses: { _ in throw NoopError() }
 	)
 }
 #endif
