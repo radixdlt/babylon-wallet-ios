@@ -67,10 +67,12 @@ final class ImportProfileFeatureTests: TestCase {
 			initialState: ImportProfile.State(),
 			reducer: ImportProfile()
 		)
+		let profileSnapshotData = try profileSnapshotData()
+		let profileSnapshot = try profileSnapshot()
 		sut.dependencies.fileClient.read = .init { url, options in
 			XCTAssertEqual(url, URL(string: "file://profiledataurl")!)
 			XCTAssertEqual(options, .uncached)
-			return self.profileSnapshotData
+			return profileSnapshotData
 		}
 		let profileSnapshotDataInKeychain = ActorIsolated<Data?>(nil)
 		sut.dependencies.keychainClient.updateDataForKey = { @Sendable data, key, _, _ in
@@ -97,13 +99,13 @@ final class ImportProfileFeatureTests: TestCase {
 }
 
 private extension ImportProfileFeatureTests {
-	nonisolated var profileSnapshotData: Data {
-		let url = Bundle.module.url(forResource: "profile_snapshot", withExtension: "json")!
-		return try! Data(contentsOf: url)
+	func profileSnapshotData() throws -> Data {
+		try readTestFixtureData(jsonName: "profile_snapshot")
 	}
 
-	nonisolated var profileSnapshot: ProfileSnapshot {
+	func profileSnapshot() throws -> ProfileSnapshot {
 		let jsonDecoder = JSONDecoder.iso8601
-		return try! jsonDecoder.decode(ProfileSnapshot.self, from: profileSnapshotData)
+		let data = try profileSnapshotData()
+		return try jsonDecoder.decode(ProfileSnapshot.self, from: data)
 	}
 }

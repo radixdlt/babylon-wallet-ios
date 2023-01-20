@@ -192,10 +192,8 @@ final class ProfileTests: TestCase {
 	}
 
 	func test_decode() throws {
-		let fileURL = try XCTUnwrap(Bundle.module.url(forResource: "profile_snapshot", withExtension: "json"))
-		let snapshotJSONData = try Data(contentsOf: fileURL)
-		let decoder = JSONDecoder.iso8601
-		let snapshot = try decoder.decode(ProfileSnapshot.self, from: snapshotJSONData)
+		let snapshot: ProfileSnapshot = try readTestFixture(jsonName: "profile_snapshot")
+
 		let profile = try Profile(snapshot: snapshot)
 
 		XCTAssertEqual(profile.factorSources.secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources.count, 1)

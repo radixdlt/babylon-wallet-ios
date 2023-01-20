@@ -138,10 +138,7 @@ package.addModules([
 			"Cryptography",
 			"ProfileClient",
 		],
-		tests: .yes(
-			dependencies: [],
-			resources: [.process("profile_snapshot.json")]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "MainFeature",
@@ -410,12 +407,7 @@ package.addModules([
 			"ProfileModels",
 			"P2PModels",
 		],
-		tests: .yes(
-			dependencies: [],
-			resources: [
-				.process("TestVectors/"),
-			]
-		)
+		tests: .yes()
 	),
 	.module(
 		name: "ProfileModels",
@@ -494,6 +486,9 @@ package.addModules([
 	.module(
 		name: "TestingPrelude",
 		dependencies: [],
+		resources: [
+			.process("TestVectors/"),
+		],
 		tests: .no
 	),
 	.module(
