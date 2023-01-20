@@ -132,7 +132,7 @@
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
         "branch" : "navigation",
-        "revision" : "918d239e13a8d9b31ebb74251e50b8e609b8a22a"
+        "revision" : "53e45d21857285148052cde8df3087a393580ca3"
       }
     },
     {
@@ -154,6 +154,15 @@
       }
     },
     {
+      "identity" : "swift-dependencies-additions",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tgrapperon/swift-dependencies-additions",
+      "state" : {
+        "revision" : "2e5d138090b643fa8ed398a94d0e1a3fb00375b1",
+        "version" : "0.2.0"
+      }
+    },
+    {
       "identity" : "swift-identified-collections",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-identified-collections",
@@ -167,8 +176,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "6fe203dc33195667ce1759bf0182975e4653ba1c",
-        "version" : "1.4.4"
+        "revision" : "e6ca651cbc30b9117aa5586c6e0f8ebbc0a63e0e",
+        "version" : "1.5.0"
       }
     },
     {

@@ -43,7 +43,7 @@ final class ImportProfileFeatureTests: TestCase {
 			reducer: ImportProfile()
 		)
 		let invalidProfileData = Data("deadbeef".utf8) // invalid data
-		sut.dependencies.fileClient.read = .init { _, _ in
+		sut.dependencies.dataReader = .init { _, _ in
 			invalidProfileData
 		}
 		sut.dependencies.keychainClient.dataForKey = { _, _ in
@@ -69,7 +69,7 @@ final class ImportProfileFeatureTests: TestCase {
 		)
 		let profileSnapshotData = try profileSnapshotData()
 		let profileSnapshot = try profileSnapshot()
-		sut.dependencies.fileClient.read = .init { url, options in
+		sut.dependencies.dataReader = .init { url, options in
 			XCTAssertEqual(url, URL(string: "file://profiledataurl")!)
 			XCTAssertEqual(options, .uncached)
 			return profileSnapshotData
