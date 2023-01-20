@@ -373,6 +373,9 @@ package.addModules([
 		dependencies: [
 			"SharedModels",
 		],
+		resources: [
+			.process("TestVectorsSharedByMultipleTargets/"),
+		],
 		tests: .no
 	),
 	.core(
@@ -497,9 +500,6 @@ package.addModules([
 		name: "TestingPrelude",
 		category: .testing,
 		dependencies: [],
-		resources: [
-			.process("TestVectorsSharedByMultipleTargets/"),
-		],
 		tests: .no
 	),
 	.module(
