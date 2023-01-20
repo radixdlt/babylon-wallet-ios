@@ -136,7 +136,7 @@ public extension Profile {
 		return account
 	}
 
-	/// Creates a new **Virtual** `Account` and saves it into the profile.
+	/// Saves an account into the profile an `Account`
 	mutating func addAccount(
 		_ account: OnNetwork.Account
 	) async throws {
@@ -145,6 +145,9 @@ public extension Profile {
 		let maybeNetwork = try? onNetwork(id: networkID)
 
 		if var onNetwork = maybeNetwork {
+			guard !onNetwork.accounts.contains(where: { $0 == account }) else {
+				throw AccountAlreadyExists()
+			}
 			onNetwork.accounts.appendAccount(account)
 			try updateOnNetwork(onNetwork)
 		} else {

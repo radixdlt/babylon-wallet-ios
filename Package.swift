@@ -469,7 +469,6 @@ package.addModules([
 	),
 	.module(
 		name: "Cryptography",
-		radixTechStackLayer: .crypto,
 		dependencies: [
 			.product(name: "K1", package: "K1") {
 				.package(url: "https://github.com/Sajjon/K1.git", from: "0.0.4")
@@ -602,13 +601,11 @@ extension Package {
 			case engineToolkit
 			case profile
 			case radixConnect
-			case crypto
 			case testSupport
 
 			var pathComponent: String {
 				switch self {
 				case .engineToolkit: return "EngineToolkit"
-				case .crypto: return "" // No folder called "Cryptography" inside "Cryptography"
 				case .profile: return "Profile"
 				case .radixConnect: return "RadixConnect"
 				case .testSupport: return "Testing"

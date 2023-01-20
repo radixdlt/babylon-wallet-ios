@@ -24,7 +24,7 @@ public extension Profile {
 		)
 	}
 
-	/// Creates a new **Virtual**  `Persona` and saves it into the profile.
+	/// Creates a new **Virtual** `Persona` and saves it into the profile.
 	@discardableResult
 	mutating func createNewVirtualPersona(
 		networkID: NetworkID,
@@ -32,8 +32,6 @@ public extension Profile {
 		fields: OrderedSet<OnNetwork.Persona.Field> = .init(),
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
 	) async throws -> OnNetwork.Persona {
-		var onNetwork = try onNetwork(id: networkID)
-
 		let persona = try await creatingNewVirtualPersona(
 			networkID: networkID,
 			displayName: displayName,
@@ -41,11 +39,23 @@ public extension Profile {
 			createFactorInstance: createFactorInstance
 		)
 
+		try await addPersona(persona)
+		return persona
+	}
+
+	mutating func addPersona(
+		_ persona: OnNetwork.Persona
+	) async throws {
+		let networkID = persona.networkID
+		var onNetwork = try onNetwork(id: networkID)
+
+		guard !onNetwork.personas.contains(where: { $0 == persona }) else {
+			throw PersonaAlreadyExists()
+		}
+
 		let updatedElement = onNetwork.personas.updateOrAppend(persona)
 		assert(updatedElement == nil)
 		try updateOnNetwork(onNetwork)
-
-		return persona
 	}
 
 	/// Creates a new **Virtual**  `Persona` without saving it into the profile.

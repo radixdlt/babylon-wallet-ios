@@ -252,8 +252,10 @@ public extension ProfileClient {
 					try await profile.addAccount(account)
 				}
 			},
-			addPersona: { _ in
-				fatalError()
+			addPersona: { persona in
+				try await profileHolder.asyncMutating { profile in
+					try await profile.addPersona(persona)
+				}
 			},
 			lookupAccountByAddress: lookupAccountByAddress,
 			signersForAccountsGivenAddresses: { request in
