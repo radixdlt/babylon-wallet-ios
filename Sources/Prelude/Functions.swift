@@ -10,7 +10,7 @@ public func with<T>(
 }
 
 // MARK: - ToldToFail
-struct ToldToFail: Swift.Error, LocalizedError {
+struct NoopError: LocalizedError {
 	let message: String
 	let file: StaticString
 	let line: UInt
