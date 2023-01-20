@@ -1,31 +1,19 @@
-import Foundation
+import Prelude
 
-// MARK: - NetworkID
-public struct NetworkID: Sendable, Codable, Hashable, Identifiable, CaseIterable, CustomStringConvertible, ExpressibleByIntegerLiteral {
-	public typealias ID = UInt8
-	public typealias IntegerLiteralType = ID
-	public var description: String { String(describing: id) }
-	public let id: ID
-	public init(_ id: ID) {
-		self.id = id
-	}
+// MARK: - NetworkIDType
+// TODO: move this type to Network.swift.
+//
+// public typealias NetworkID = Network.ID // or even deprecate it?
+//
+// ```
+// public struct Network {
+//     public typealias ID = Tagged<Self, UInt8>
+// }
+// ```
+//
+// Probably best to do when we move all models into a single package.
 
-	public init(integerLiteral id: IntegerLiteralType) {
-		self.init(id)
-	}
-}
-
-public extension NetworkID {
-	func encode(to encoder: Encoder) throws {
-		var container = encoder.singleValueContainer()
-		try container.encode(self.id)
-	}
-
-	init(from decoder: Decoder) throws {
-		let container = try decoder.singleValueContainer()
-		self.id = try container.decode(NetworkID.ID.self)
-	}
-}
+public typealias NetworkID = Tagged<(network: (), id: ()), UInt8>
 
 public extension NetworkID {
 	/// Public Facing Permanent Networks (0x00 - 0x09)
