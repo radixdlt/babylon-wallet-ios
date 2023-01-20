@@ -383,6 +383,10 @@ package.addModules([
 			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
 			"P2PModels",
 		],
+		exclude: [
+			"P2P/Codable/README.md",
+			"P2P/Application/README.md",
+		],
 		tests: .yes()
 	),
 ])
@@ -452,6 +456,9 @@ package.addModules([
 				.package(url: "https://github.com/stasel/WebRTC", from: "109.0.1")
 			},
 		],
+		exclude: [
+			"ChunkingTransport/README.md",
+		],
 		tests: .yes(
 			dependencies: [],
 			resources: [
@@ -473,6 +480,10 @@ package.addModules([
 			.product(name: "K1", package: "K1") {
 				.package(url: "https://github.com/Sajjon/K1.git", from: "0.0.4")
 			},
+		],
+		exclude: [
+			"Mnemonic/README.md",
+			"SLIP10/README.md",
 		],
 		tests: .yes(
 			dependencies: [],
