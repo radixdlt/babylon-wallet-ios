@@ -64,9 +64,9 @@ extension AccountPortfolio {
 				asset: .init(
 					componentAddress: .init(address: $0.address),
 					divisibility: nil,
-					totalSupplyAttos: nil,
-					totalMintedAttos: nil,
-					totalBurntAttos: nil,
+					totalSupply: nil,
+					totalMinted: nil,
+					totalBurnt: nil,
 					tokenDescription: nil,
 					name: nil,
 					symbol: nil
@@ -162,9 +162,9 @@ extension FungibleToken {
 		return Self(
 			componentAddress: componentAddress,
 			divisibility: divisibility,
-			totalSupplyAttos: totalSupplyAttos,
-			totalMintedAttos: totalMintedAttos,
-			totalBurntAttos: totalBurntAttos,
+			totalSupply: totalSupply,
+			totalMinted: totalMinted,
+			totalBurnt: totalBurnt,
 			tokenDescription: dict[.description],
 			name: dict[.name],
 			symbol: dict[.symbol],
