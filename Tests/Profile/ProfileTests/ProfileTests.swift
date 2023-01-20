@@ -186,7 +186,7 @@ final class ProfileTests: TestCase {
 		let snapshot = profile.snaphot()
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
-		// let data = try jsonEncoder.encode(snapshot)
+//		 let data = try jsonEncoder.encode(snapshot)
 		/* Uncomment to generate a new test vector */
 //		print(String(data: data, encoding: .utf8)!)
 	}
@@ -206,9 +206,11 @@ final class ProfileTests: TestCase {
 		let onNetwork = try profile.perNetwork.onNetwork(id: networkID)
 		XCTAssertEqual(onNetwork.accounts.count, 3)
 
+		XCTAssertEqual(onNetwork.accounts[0].networkID, networkID)
 		XCTAssertEqual(onNetwork.accounts[0].displayName, "First")
 		XCTAssertEqual(onNetwork.accounts[1].displayName, "Second")
 		XCTAssertEqual(onNetwork.accounts[2].displayName, "Third")
+		XCTAssertEqual(onNetwork.personas[0].networkID, networkID)
 		XCTAssertEqual(onNetwork.personas[0].displayName, "Mrs Incognito")
 		XCTAssertEqual(onNetwork.personas[1].displayName, "Mrs Public")
 		XCTAssertEqual(onNetwork.personas.count, 2)
@@ -306,7 +308,7 @@ final class ProfileTests: TestCase {
 
 	func test_version_compatability_check_too_low() throws {
 		let json = """
-		{ "version": 0 }
+		{ "version": 6 }
 		""".data(using: .utf8)!
 
 		XCTAssertThrowsError(
@@ -315,7 +317,7 @@ final class ProfileTests: TestCase {
 			guard let error = anyError as? IncompatibleProfileVersion else {
 				return XCTFail("WrongErrorType")
 			}
-			XCTAssertEqual(error, .init(decodedVersion: 0, minimumRequiredVersion: .minimum))
+			XCTAssertEqual(error, .init(decodedVersion: 6, minimumRequiredVersion: .minimum))
 		}
 	}
 

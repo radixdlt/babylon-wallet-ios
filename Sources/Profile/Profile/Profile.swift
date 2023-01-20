@@ -1,9 +1,12 @@
 import Prelude
 
 public extension ProfileSnapshot.Version {
-	/// Semantic versioning of the Profile Snapshot data format
+	/// Versioning of the Profile Snapshot data format
 	/// other libraries should sync with this, i.e. Kotlin lib.
-	static let minimum: Self = 6
+	///
+	/// Changelog:
+	/// - 7: Added networkID in Account and Persona
+	static let minimum: Self = 7
 }
 
 // MARK: - Profile

@@ -55,11 +55,7 @@ package.addModules([
 			"ProfileClient",
 			"SplashFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				"SplashFeature",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AssetsViewFeature",
