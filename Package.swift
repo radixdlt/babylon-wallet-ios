@@ -536,6 +536,9 @@ package.addModules([
 			.product(name: "BigInt", package: "BigInt") {
 				.package(url: "https://github.com/attaswift/BigInt", from: "5.3.0")
 			},
+			.product(name: "BigDecimal", package: "BigDecimal") {
+				.package(url: "https://github.com/Zollerboy1/BigDecimal.git", from: "1.0.0")
+			},
 
 			.product(name: "BitCollections", package: "swift-collections"),
 			.product(name: "Collections", package: "swift-collections"),

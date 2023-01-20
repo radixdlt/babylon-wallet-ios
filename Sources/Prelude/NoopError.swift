@@ -1,5 +1,4 @@
 // MARK: - NoopError
-
 public struct NoopError: LocalizedError {
 	public let message: String
 	public let file: StaticString

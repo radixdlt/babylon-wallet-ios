@@ -910,7 +910,6 @@ private extension SLIP10TestVectorsTests {
 }
 
 // MARK: P256
-import BigInt
 @available(macOS 13, iOS 16, *)
 public extension Slip10CurveType {
 	/// The elliptic curve `P256`, `secp256r1`, `prime256v1` or as SLIP-0010 calls it `Nist256p1`
