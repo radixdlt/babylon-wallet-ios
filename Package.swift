@@ -23,11 +23,7 @@ package.addModules([
 			"AssetsViewFeature",
 			"AssetTransferFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				"SharedTestingModels",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AccountListFeature",
@@ -35,11 +31,7 @@ package.addModules([
 			"AccountPortfolio",
 			"FungibleTokenListFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				"SharedTestingModels",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AccountPreferencesFeature",
@@ -63,11 +55,7 @@ package.addModules([
 			"ProfileClient",
 			"SplashFeature",
 		],
-		tests: .yes(
-			dependencies: [
-				"SplashFeature",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "AssetsViewFeature",
@@ -92,11 +80,7 @@ package.addModules([
 			"LocalAuthenticationClient",
 			"ProfileClient",
 		],
-		tests: .yes(
-			dependencies: [
-				"SharedTestingModels",
-			]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "FungibleTokenDetailsFeature",
@@ -154,10 +138,7 @@ package.addModules([
 			"Cryptography",
 			"ProfileClient",
 		],
-		tests: .yes(
-			dependencies: [],
-			resources: [.process("profile_snapshot.json")]
-		)
+		tests: .yes()
 	),
 	.feature(
 		name: "MainFeature",
@@ -392,6 +373,9 @@ package.addModules([
 		dependencies: [
 			"SharedModels",
 		],
+		resources: [
+			.process("TestVectorsSharedByMultipleTargets/"),
+		],
 		tests: .no
 	),
 	.core(
@@ -402,6 +386,10 @@ package.addModules([
 			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
 			"P2PModels",
 		],
+		exclude: [
+			"P2P/Codable/README.md",
+			"P2P/Application/README.md",
+		],
 		tests: .yes()
 	),
 ])
@@ -411,7 +399,7 @@ package.addModules([
 package.addModules([
 	.module(
 		name: "ProfileView",
-		category: "Profile",
+		category: .profile,
 		dependencies: [
 			"Profile",
 		],
@@ -419,7 +407,7 @@ package.addModules([
 	),
 	.module(
 		name: "Profile",
-		category: "Profile",
+		category: .profile,
 		dependencies: [
 			"Cryptography",
 			"EngineToolkit",
@@ -427,15 +415,14 @@ package.addModules([
 			"P2PModels",
 		],
 		tests: .yes(
-			dependencies: [],
-			resources: [
-				.process("TestVectors/"),
+			dependencies: [
+				"SharedTestingModels",
 			]
 		)
 	),
 	.module(
 		name: "ProfileModels",
-		category: "Profile",
+		category: .profile,
 		dependencies: [
 			"Cryptography",
 			"EngineToolkitModels",
@@ -445,7 +432,7 @@ package.addModules([
 	),
 	.module(
 		name: "EngineToolkit",
-		category: "EngineToolkit",
+		category: .engineToolkit,
 		dependencies: [
 			"Cryptography",
 			"EngineToolkitModels",
@@ -460,7 +447,7 @@ package.addModules([
 	),
 	.module(
 		name: "EngineToolkitModels",
-		category: "EngineToolkit",
+		category: .engineToolkit,
 		dependencies: [
 			"Cryptography",
 		],
@@ -468,7 +455,7 @@ package.addModules([
 	),
 	.module(
 		name: "P2PConnection",
-		category: "RadixConnect",
+		category: .radixConnect,
 		dependencies: [
 			"Cryptography",
 			"P2PModels",
@@ -476,8 +463,13 @@ package.addModules([
 				.package(url: "https://github.com/stasel/WebRTC", from: "109.0.1")
 			},
 		],
+		exclude: [
+			"ChunkingTransport/README.md",
+		],
 		tests: .yes(
-			dependencies: [],
+			dependencies: [
+				"SharedTestingModels",
+			],
 			resources: [
 				.process("SignalingServerTests/TestVectors/"),
 			]
@@ -485,7 +477,7 @@ package.addModules([
 	),
 	.module(
 		name: "P2PModels",
-		category: "RadixConnect",
+		category: .radixConnect,
 		dependencies: [
 			"Cryptography",
 		],
@@ -498,8 +490,14 @@ package.addModules([
 				.package(url: "https://github.com/Sajjon/K1.git", from: "0.0.4")
 			},
 		],
+		exclude: [
+			"Mnemonic/README.md",
+			"SLIP10/README.md",
+		],
 		tests: .yes(
-			dependencies: [],
+			dependencies: [
+				"SharedTestingModels",
+			],
 			resources: [
 				.process("MnemonicTests/TestVectors/"),
 				.process("SLIP10Tests/TestVectors/"),
@@ -508,7 +506,24 @@ package.addModules([
 	),
 	.module(
 		name: "TestingPrelude",
+		category: .testing,
 		dependencies: [],
+		tests: .no
+	),
+	.module(
+		name: "FeatureTestingPrelude",
+		category: .testing,
+		dependencies: [
+			"FeaturePrelude", "TestingPrelude", "SharedTestingModels",
+		],
+		tests: .no
+	),
+	.module(
+		name: "ClientTestingPrelude",
+		category: .testing,
+		dependencies: [
+			"ClientPrelude", "TestingPrelude", "SharedTestingModels",
+		],
 		tests: .no
 	),
 	.module(
@@ -517,6 +532,9 @@ package.addModules([
 			.package(url: "https://github.com/apple/swift-collections", branch: "main"), // TODO: peg to specific version once main is tagged
 		],
 		dependencies: [
+			.product(name: "Algorithms", package: "swift-algorithms") {
+				.package(url: "https://github.com/apple/swift-algorithms", from: "1.0.0")
+			},
 			.product(name: "AsyncAlgorithms", package: "swift-async-algorithms") {
 				.package(url: "https://github.com/apple/swift-async-algorithms", from: "0.0.3")
 			},
@@ -588,8 +606,28 @@ extension Package {
 			)
 		}
 
+		enum Category {
+			case client
+			case feature
+			case core
+			case module(name: String)
+			static let testing: Self = .module(name: "Testing")
+			static let engineToolkit: Self = .module(name: "EngineToolkit")
+			static let radixConnect: Self = .module(name: "RadixConnect")
+			static let profile: Self = .module(name: "Profile")
+			var pathComponent: String {
+				switch self {
+				case .client: return "Clients"
+				case .feature: return "Features"
+				case .core: return "Core"
+				case let .module(name):
+					return name
+				}
+			}
+		}
+
 		let name: String
-		let category: String?
+		let category: Category?
 		let remoteDependencies: [Package.Dependency]?
 		let dependencies: [Target.Dependency]
 		let exclude: [String]
@@ -610,7 +648,7 @@ extension Package {
 		) -> Self {
 			.init(
 				name: name,
-				category: "Features",
+				category: .feature,
 				remoteDependencies: remoteDependencies,
 				dependencies: dependencies + ["FeaturePrelude"],
 				exclude: exclude,
@@ -633,7 +671,7 @@ extension Package {
 		) -> Self {
 			.init(
 				name: name,
-				category: "Clients",
+				category: .client,
 				remoteDependencies: remoteDependencies,
 				dependencies: dependencies + ["ClientPrelude"],
 				exclude: exclude,
@@ -656,7 +694,7 @@ extension Package {
 		) -> Self {
 			.init(
 				name: name,
-				category: "Core",
+				category: .core,
 				remoteDependencies: remoteDependencies,
 				dependencies: dependencies,
 				exclude: exclude,
@@ -669,7 +707,7 @@ extension Package {
 
 		static func module(
 			name: String,
-			category: String? = nil,
+			category: Category? = nil,
 			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
@@ -706,7 +744,7 @@ extension Package {
 		let targetName = module.name
 		let targetPath = {
 			if let category = module.category {
-				return "Sources/\(category)/\(targetName)"
+				return "Sources/\(category.pathComponent)/\(targetName)"
 			} else {
 				return "Sources/\(targetName)"
 			}
@@ -739,19 +777,31 @@ extension Package {
 		switch module.tests {
 		case .no:
 			break
-		case let .yes(nameSuffix, testDependencies, resources):
+		case let .yes(nameSuffix, customAdditionalTestDependencies, resources):
 			let testTargetName = targetName + nameSuffix
 			let testTargetPath = {
 				if let category = module.category {
-					return "Tests/\(category)/\(testTargetName)"
+					return "Tests/\(category.pathComponent)/\(testTargetName)"
 				} else {
 					return "Tests/\(testTargetName)"
 				}
 			}()
+
+			let testTargetDependencies = [.target(name: targetName)] + customAdditionalTestDependencies + {
+				switch module.category {
+				case .some(.feature):
+					return ["FeatureTestingPrelude"]
+				case .some(.client):
+					return ["ClientTestingPrelude"]
+				case .some(.core), .some(.module), .none:
+					return ["TestingPrelude"]
+				}
+			}()
+
 			package.targets += [
 				.testTarget(
 					name: testTargetName,
-					dependencies: [.target(name: targetName)] + testDependencies + ["TestingPrelude"],
+					dependencies: testTargetDependencies,
 					path: testTargetPath,
 					resources: resources,
 					swiftSettings: [

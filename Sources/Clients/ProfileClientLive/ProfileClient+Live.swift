@@ -186,6 +186,13 @@ public extension ProfileClient {
 					return onNetwork.accounts
 				}
 			},
+			getPersonas: {
+				let currentNetworkID = await getCurrentNetworkID()
+				return try await profileHolder.get { profile in
+					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
+					return onNetwork.personas
+				}
+			},
 			getP2PClients: {
 				try await profileHolder.get { profile in
 					profile.appPreferences.p2pClients
@@ -207,10 +214,10 @@ public extension ProfileClient {
 					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
-			createVirtualAccount: { request in
-				try await profileHolder.asyncMutating { profile in
+			createUnsavedVirtualAccount: { request in
+				try await profileHolder.getAsync { profile in
 					let networkID = await getCurrentNetworkID()
-					return try await profile.createNewVirtualAccount(
+					return try await profile.creatingNewVirtualAccount(
 						networkID: request.overridingNetworkID ?? networkID,
 						displayName: request.accountName,
 						mnemonicForFactorSourceByReference: { [keychainClient] reference in
@@ -221,6 +228,33 @@ public extension ProfileClient {
 								)
 						}
 					)
+				}
+			},
+			createUnsavedVirtualPersona: { request in
+				try await profileHolder.getAsync { profile in
+					let networkID = await getCurrentNetworkID()
+					return try await profile.creatingNewVirtualPersona(
+						networkID: request.overridingNetworkID ?? networkID,
+						displayName: request.personaName,
+						fields: request.fields,
+						mnemonicForFactorSourceByReference: { [keychainClient] reference in
+							try await keychainClient
+								.loadFactorSourceMnemonic(
+									reference: reference,
+									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+								)
+						}
+					)
+				}
+			},
+			addAccount: { account in
+				try await profileHolder.asyncMutating { profile in
+					try await profile.addAccount(account)
+				}
+			},
+			addPersona: { persona in
+				try await profileHolder.asyncMutating { profile in
+					try await profile.addPersona(persona)
 				}
 			},
 			lookupAccountByAddress: lookupAccountByAddress,

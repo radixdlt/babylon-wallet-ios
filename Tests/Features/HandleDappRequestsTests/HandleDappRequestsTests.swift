@@ -1,6 +1,5 @@
-import FeaturePrelude
+import FeatureTestingPrelude
 @testable import HandleDappRequests
-import TestingPrelude
 
 @MainActor
 final class HandleDappRequestsTests: TestCase {

@@ -1,3 +1,4 @@
+import EngineToolkitModels
 import Prelude
 
 // MARK: - OnNetwork.Persona
@@ -15,6 +16,9 @@ public extension OnNetwork {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
+		/// The ID of the network this persona exists on.
+		public let networkID: NetworkID
+
 		/// The globally unique and identifiable Radix component address of this persona. Can be used as
 		/// a stable ID. Cryptographically derived from a seeding public key which typically was created by
 		/// the `DeviceFactorSource`
@@ -37,16 +41,18 @@ public extension OnNetwork {
 		public let displayName: String?
 
 		/// Fields containing personal information you have inputted.
-		public let fields: [Field]
+		public let fields: OrderedSet<Field>
 
 		public init(
+			networkID: NetworkID,
 			address: EntityAddress,
 			securityState: EntitySecurityState,
 			index: Index,
 			derivationPath: EntityDerivationPath,
 			displayName: String?,
-			fields: [Field]
+			fields: OrderedSet<Field>
 		) {
+			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
 			self.index = index

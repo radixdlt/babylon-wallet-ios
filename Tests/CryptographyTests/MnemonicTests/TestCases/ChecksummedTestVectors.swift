@@ -1,4 +1,5 @@
 @testable import Cryptography
+import SharedTestingModels
 import TestingPrelude
 
 // MARK: - ChecksummedVector

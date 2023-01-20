@@ -1,6 +1,5 @@
 @testable import AggregatedValueFeature
-import FeaturePrelude
-import TestingPrelude
+import FeatureTestingPrelude
 
 final class AggregatedValueFeatureTests: TestCase {
 	/*

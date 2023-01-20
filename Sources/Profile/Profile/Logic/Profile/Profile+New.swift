@@ -127,3 +127,9 @@ public extension Profile {
 
 // MARK: - WrongAddressType
 struct WrongAddressType: Swift.Error {}
+
+// MARK: - AccountAlreadyExists
+struct AccountAlreadyExists: Swift.Error {}
+
+// MARK: - PersonaAlreadyExists
+struct PersonaAlreadyExists: Swift.Error {}

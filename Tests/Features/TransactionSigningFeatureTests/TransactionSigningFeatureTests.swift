@@ -1,5 +1,4 @@
-import FeaturePrelude
-import TestingPrelude
+import FeatureTestingPrelude
 import TransactionClient
 import TransactionSigningFeature
 

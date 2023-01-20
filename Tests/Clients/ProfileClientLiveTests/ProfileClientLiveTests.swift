@@ -1,5 +1,5 @@
+import ClientTestingPrelude
 @testable import ProfileClientLive
-import TestingPrelude
 
 final class ProfileClientLiveTests: TestCase {
 	func test_loading_profile() async {

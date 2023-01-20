@@ -1,6 +1,5 @@
-import FeaturePrelude
+import FeatureTestingPrelude
 @testable import NonFungibleTokenListFeature
-import TestingPrelude
 
 @MainActor
 final class NonFungibleTokenListFeatureTests: TestCase {

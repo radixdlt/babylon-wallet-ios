@@ -1,7 +1,6 @@
-import FeaturePrelude
+import FeatureTestingPrelude
 @testable import NewConnectionFeature
 import P2PConnection
-import TestingPrelude
 
 // MARK: - NewConnectionTests
 @MainActor

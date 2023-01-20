@@ -1,6 +1,5 @@
 @testable import AppSettings
-import ClientPrelude
-import TestingPrelude
+import ClientTestingPrelude
 
 final class AppSettingsTests: TestCase {
 	func testTrivial() {

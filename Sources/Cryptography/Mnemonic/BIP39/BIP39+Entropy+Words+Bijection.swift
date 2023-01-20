@@ -1,3 +1,4 @@
+import Algorithms
 import struct CryptoKit.SHA256
 import Prelude
 

@@ -13,6 +13,9 @@ public protocol EntityProtocol {
 
 	static var entityKind: EntityKind { get }
 
+	/// The ID of the network this entity exists on.
+	var networkID: NetworkID { get }
+
 	/// Index of the entity in some collection if entities of the same type.
 	var index: Int { get }
 

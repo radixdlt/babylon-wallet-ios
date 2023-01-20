@@ -1,8 +1,7 @@
 @testable import CreateAccountFeature
 import Cryptography
-import FeaturePrelude
+import FeatureTestingPrelude
 import ProfileClient
-import TestingPrelude
 
 @MainActor
 final class CreateAccountFeatureTests: TestCase {
@@ -128,17 +127,21 @@ final class CreateAccountFeatureTests: TestCase {
 		)
 		let createdAccount = OnNetwork.Account.testValue
 
+		let createAccountRequest = ActorIsolated<CreateAccountRequest?>(nil)
+		let addedAccount = ActorIsolated<OnNetwork.Account?>(nil)
+
 		let store = TestStore(
 			initialState: initialState,
 			reducer: CreateAccount()
-		)
-
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
-
-		let createAccountRequest = ActorIsolated<CreateAccountRequest?>(nil)
-		store.dependencies.profileClient.createVirtualAccount = { request in
-			await createAccountRequest.setValue(request)
-			return createdAccount
+		) {
+			$0.profileClient.createUnsavedVirtualAccount = { request in
+				await createAccountRequest.setValue(request)
+				return createdAccount
+			}
+			$0.profileClient.addAccount = {
+				await addedAccount.setValue($0)
+			}
+			$0.mainQueue = testScheduler.eraseToAnyScheduler()
 		}
 
 		// when
@@ -160,6 +163,9 @@ final class CreateAccountFeatureTests: TestCase {
 
 		await createAccountRequest.withValue { request in
 			XCTAssertEqual(request, expectedCreateAccountRequest)
+		}
+		await addedAccount.withValue { account in
+			XCTAssertEqual(account, createdAccount)
 		}
 	}
 

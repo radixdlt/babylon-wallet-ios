@@ -1,3 +1,4 @@
+import EngineToolkitModels
 import Prelude
 
 // MARK: - OnNetwork.Account
@@ -15,6 +16,9 @@ public extension OnNetwork {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
+		/// The ID of the network this account exists on.
+		public let networkID: NetworkID
+
 		/// The globally unique and identifiable Radix component address of this account. Can be used as
 		/// a stable ID. Cryptographically derived from a seeding public key which typically was created by
 		/// the `DeviceFactorSource` (and typically the same public key as an instance of the device factor
@@ -42,6 +46,7 @@ public extension OnNetwork {
 		public let displayName: String?
 
 		public init(
+			networkID: NetworkID,
 			address: EntityAddress,
 			securityState: EntitySecurityState,
 			index: Index,
@@ -49,6 +54,7 @@ public extension OnNetwork {
 			derivationPath: EntityDerivationPath,
 			displayName: String?
 		) {
+			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
 			self.index = index

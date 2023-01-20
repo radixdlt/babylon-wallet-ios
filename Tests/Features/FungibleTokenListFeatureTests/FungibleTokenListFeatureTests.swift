@@ -1,6 +1,5 @@
-import FeaturePrelude
+import FeatureTestingPrelude
 @testable import FungibleTokenListFeature
-import TestingPrelude
 
 final class FungibleTokenListFeatureTests: TestCase {
 	func testTrivial() {

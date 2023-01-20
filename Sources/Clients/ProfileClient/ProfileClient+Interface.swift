@@ -19,12 +19,16 @@ public struct ProfileClient: Sendable {
 
 	public var hasAccountOnNetwork: HasAccountOnNetwork
 	public var getAccounts: GetAccounts
+	public var getPersonas: GetPersonas
 	public var getP2PClients: GetP2PClients
 	public var addP2PClient: AddP2PClient
 	public var deleteP2PClientByID: DeleteP2PClientByID
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
-	public var createVirtualAccount: CreateVirtualAccount
+	public var createUnsavedVirtualAccount: CreateUnsavedVirtualAccount
+	public var createUnsavedVirtualPersona: CreateUnsavedVirtualPersona
+	public var addAccount: AddAccount
+	public var addPersona: AddPersona
 	public var lookupAccountByAddress: LookupAccountByAddress
 
 	public var signersForAccountsGivenAddresses: SignersForAccountsGivenAddresses
@@ -40,12 +44,16 @@ public struct ProfileClient: Sendable {
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
 		getAccounts: @escaping GetAccounts,
+		getPersonas: @escaping GetPersonas,
 		getP2PClients: @escaping GetP2PClients,
 		addP2PClient: @escaping AddP2PClient,
 		deleteP2PClientByID: @escaping DeleteP2PClientByID,
 		getAppPreferences: @escaping GetAppPreferences,
 		setDisplayAppPreferences: @escaping SetDisplayAppPreferences,
-		createVirtualAccount: @escaping CreateVirtualAccount,
+		createUnsavedVirtualAccount: @escaping CreateUnsavedVirtualAccount,
+		createUnsavedVirtualPersona: @escaping CreateUnsavedVirtualPersona,
+		addAccount: @escaping AddAccount,
+		addPersona: @escaping AddPersona,
 		lookupAccountByAddress: @escaping LookupAccountByAddress,
 		signersForAccountsGivenAddresses: @escaping SignersForAccountsGivenAddresses
 	) {
@@ -59,12 +67,16 @@ public struct ProfileClient: Sendable {
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
 		self.hasAccountOnNetwork = hasAccountOnNetwork
 		self.getAccounts = getAccounts
+		self.getPersonas = getPersonas
 		self.getP2PClients = getP2PClients
 		self.addP2PClient = addP2PClient
 		self.deleteP2PClientByID = deleteP2PClientByID
 		self.getAppPreferences = getAppPreferences
 		self.setDisplayAppPreferences = setDisplayAppPreferences
-		self.createVirtualAccount = createVirtualAccount
+		self.createUnsavedVirtualAccount = createUnsavedVirtualAccount
+		self.createUnsavedVirtualPersona = createUnsavedVirtualPersona
+		self.addAccount = addAccount
+		self.addPersona = addPersona
 		self.lookupAccountByAddress = lookupAccountByAddress
 		self.signersForAccountsGivenAddresses = signersForAccountsGivenAddresses
 	}
@@ -90,12 +102,16 @@ public extension ProfileClient {
 	typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
 	typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 	typealias GetAccounts = @Sendable () async throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
+	typealias GetPersonas = @Sendable () async throws -> OrderedSet<OnNetwork.Persona>
 	typealias GetP2PClients = @Sendable () async throws -> P2PClients
 	typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
-	typealias CreateVirtualAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
+	typealias CreateUnsavedVirtualAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
+	typealias CreateUnsavedVirtualPersona = @Sendable (CreatePersonaRequest) async throws -> OnNetwork.Persona
+	typealias AddAccount = @Sendable (OnNetwork.Account) async throws -> Void
+	typealias AddPersona = @Sendable (OnNetwork.Persona) async throws -> Void
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 
 	typealias SignersForAccountsGivenAddresses = @Sendable (SignersForAccountsGivenAddressesRequest) async throws -> NonEmpty<OrderedSet<SignersOfAccount>>

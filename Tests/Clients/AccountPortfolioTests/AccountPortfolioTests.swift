@@ -1,6 +1,5 @@
 @testable import AccountPortfolio
-import ClientPrelude
-import TestingPrelude
+import ClientTestingPrelude
 
 final class AccountPortfolioTests: TestCase {
 	func testTrivial() {
