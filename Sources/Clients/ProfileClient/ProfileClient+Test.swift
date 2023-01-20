@@ -13,7 +13,16 @@ public extension DependencyValues {
 
 // MARK: - ProfileClient + TestDependencyKey
 extension ProfileClient: TestDependencyKey {
-	public static let previewValue = Self.noop
+	public static let previewValue: Self = with(.noop) {
+		$0.getAccounts = {
+			let accounts: [OnNetwork.Account] = [.previewValue0, .previewValue1]
+			return NonEmpty(rawValue: OrderedSet(accounts))!
+		}
+		$0.getPersonas = {
+			let accounts: [OnNetwork.Persona] = [.previewValue0, .previewValue1]
+			return OrderedSet(accounts)
+		}
+	}
 
 	public static let testValue = Self(
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
@@ -51,28 +60,22 @@ public extension ProfileClient {
 			OnNetwork.Account.previewValue0
 		},
 		loadProfile: { .success(nil) },
-		extractProfileSnapshot: { throw CancellationError() },
+		extractProfileSnapshot: { try fail() },
 		deleteProfileAndFactorSources: {},
 		hasAccountOnNetwork: { _ in false },
-		getAccounts: {
-			let accounts: [OnNetwork.Account] = [.previewValue0, .previewValue1]
-			return NonEmpty(rawValue: OrderedSet(accounts))!
-		},
-		getPersonas: {
-			let accounts: [OnNetwork.Persona] = [.previewValue0, .previewValue1]
-			return OrderedSet(accounts)
-		},
-		getP2PClients: { throw CancellationError() },
-		addP2PClient: { _ in throw CancellationError() },
-		deleteP2PClientByID: { _ in throw CancellationError() },
-		getAppPreferences: { throw CancellationError() },
-		setDisplayAppPreferences: { _ in throw CancellationError() },
-		createUnsavedVirtualAccount: { _ in throw CancellationError() },
-		createUnsavedVirtualPersona: { _ in throw CancellationError() },
+		getAccounts: { try fail() },
+		getPersonas: { try fail() },
+		getP2PClients: { try fail() },
+		addP2PClient: { _ in try fail() },
+		deleteP2PClientByID: { _ in try fail() },
+		getAppPreferences: { try fail() },
+		setDisplayAppPreferences: { _ in try fail() },
+		createUnsavedVirtualAccount: { _ in try fail() },
+		createUnsavedVirtualPersona: { _ in try fail() },
 		addAccount: { _ in },
 		addPersona: { _ in },
 		lookupAccountByAddress: { _ in .previewValue0 },
-		signersForAccountsGivenAddresses: { _ in throw CancellationError() }
+		signersForAccountsGivenAddresses: { _ in try fail() }
 	)
 }
 #endif
