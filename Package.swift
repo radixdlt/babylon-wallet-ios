@@ -392,7 +392,7 @@ package.addModules([
 package.addModules([
 	.module(
 		name: "ProfileView",
-		radixTechStackLayer: .profile,
+		category: .profile,
 		dependencies: [
 			"Profile",
 		],
@@ -400,7 +400,7 @@ package.addModules([
 	),
 	.module(
 		name: "Profile",
-		radixTechStackLayer: .profile,
+		category: .profile,
 		dependencies: [
 			"Cryptography",
 			"EngineToolkit",
@@ -411,7 +411,7 @@ package.addModules([
 	),
 	.module(
 		name: "ProfileModels",
-		radixTechStackLayer: .profile,
+		category: .profile,
 		dependencies: [
 			"Cryptography",
 			"EngineToolkitModels",
@@ -421,7 +421,7 @@ package.addModules([
 	),
 	.module(
 		name: "EngineToolkit",
-		radixTechStackLayer: .engineToolkit,
+		category: .engineToolkit,
 		dependencies: [
 			"Cryptography",
 			"EngineToolkitModels",
@@ -436,7 +436,7 @@ package.addModules([
 	),
 	.module(
 		name: "EngineToolkitModels",
-		radixTechStackLayer: .engineToolkit,
+		category: .engineToolkit,
 		dependencies: [
 			"Cryptography",
 		],
@@ -444,7 +444,7 @@ package.addModules([
 	),
 	.module(
 		name: "P2PConnection",
-		radixTechStackLayer: .radixConnect,
+		category: .radixConnect,
 		dependencies: [
 			"Cryptography",
 			"P2PModels",
@@ -461,7 +461,7 @@ package.addModules([
 	),
 	.module(
 		name: "P2PModels",
-		radixTechStackLayer: .radixConnect,
+		category: .radixConnect,
 		dependencies: [
 			"Cryptography",
 		],
@@ -484,16 +484,16 @@ package.addModules([
 	),
 	.module(
 		name: "TestingPrelude",
-		radixTechStackLayer: .testSupport,
+		category: .testing,
 		dependencies: [],
 		resources: [
-			.process("TestVectors/"),
+			.process("TestVectorsSharedByMultipleTargets/"),
 		],
 		tests: .no
 	),
 	.module(
 		name: "FeatureTestingPrelude",
-		radixTechStackLayer: .testSupport,
+		category: .testing,
 		dependencies: [
 			"FeaturePrelude", "TestingPrelude", "SharedTestingModels",
 		],
@@ -501,7 +501,7 @@ package.addModules([
 	),
 	.module(
 		name: "ClientTestingPrelude",
-		radixTechStackLayer: .testSupport,
+		category: .testing,
 		dependencies: [
 			"ClientPrelude", "TestingPrelude", "SharedTestingModels",
 		],
@@ -585,30 +585,18 @@ extension Package {
 			case client
 			case feature
 			case core
-			case module(layer: RadixTechStackLayer)
+			case module(name: String)
+			static let testing: Self = .module(name: "Testing")
+			static let engineToolkit: Self = .module(name: "EngineToolkit")
+			static let radixConnect: Self = .module(name: "RadixConnect")
+			static let profile: Self = .module(name: "Profile")
 			var pathComponent: String {
 				switch self {
 				case .client: return "Clients"
 				case .feature: return "Features"
 				case .core: return "Core"
-				case let .module(layer):
-					return layer.pathComponent
-				}
-			}
-		}
-
-		enum RadixTechStackLayer {
-			case engineToolkit
-			case profile
-			case radixConnect
-			case testSupport
-
-			var pathComponent: String {
-				switch self {
-				case .engineToolkit: return "EngineToolkit"
-				case .profile: return "Profile"
-				case .radixConnect: return "RadixConnect"
-				case .testSupport: return "Testing"
+				case let .module(name):
+					return name
 				}
 			}
 		}
@@ -694,7 +682,7 @@ extension Package {
 
 		static func module(
 			name: String,
-			radixTechStackLayer: RadixTechStackLayer? = nil,
+			category: Category? = nil,
 			remoteDependencies: [Package.Dependency]? = nil,
 			dependencies: [Target.Dependency],
 			exclude: [String] = [],
@@ -705,7 +693,7 @@ extension Package {
 		) -> Self {
 			.init(
 				name: name,
-				category: radixTechStackLayer.map { .module(layer: $0) },
+				category: category,
 				remoteDependencies: remoteDependencies,
 				dependencies: dependencies,
 				exclude: exclude,
@@ -774,15 +762,16 @@ extension Package {
 				}
 			}()
 
-			var testTargetDependencies = customAdditionalTestDependencies + [.target(name: targetName)]
-			switch module.category {
-			case .some(.feature):
-				testTargetDependencies.append("FeatureTestingPrelude")
-			case .some(.client):
-				testTargetDependencies.append("ClientTestingPrelude")
-			case .some(.core), .some(.module), .none:
-				testTargetDependencies.append("TestingPrelude")
-			}
+			let testTargetDependencies = [.target(name: targetName)] + customAdditionalTestDependencies + {
+				switch module.category {
+				case .some(.feature):
+					return ["FeatureTestingPrelude"]
+				case .some(.client):
+					return ["ClientTestingPrelude"]
+				case .some(.core), .some(.module), .none:
+					return ["TestingPrelude"]
+				}
+			}()
 
 			package.targets += [
 				.testTarget(
