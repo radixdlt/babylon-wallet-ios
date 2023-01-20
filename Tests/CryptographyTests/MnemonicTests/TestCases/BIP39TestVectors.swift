@@ -1,5 +1,6 @@
 @testable import Cryptography
 import Prelude
+import SharedTestingModels
 import TestingPrelude
 
 // MARK: - BIP39Vector

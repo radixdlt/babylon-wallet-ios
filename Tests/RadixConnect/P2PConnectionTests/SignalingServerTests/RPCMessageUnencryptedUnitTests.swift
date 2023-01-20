@@ -1,4 +1,5 @@
 @testable import P2PConnection
+import SharedTestingModels
 import TestingPrelude
 
 // MARK: - RPCMessageUnencryptedUnitTests

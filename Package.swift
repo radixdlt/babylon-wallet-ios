@@ -414,7 +414,11 @@ package.addModules([
 			"ProfileModels",
 			"P2PModels",
 		],
-		tests: .yes()
+		tests: .yes(
+			dependencies: [
+				"SharedTestingModels",
+			]
+		)
 	),
 	.module(
 		name: "ProfileModels",
@@ -463,7 +467,9 @@ package.addModules([
 			"ChunkingTransport/README.md",
 		],
 		tests: .yes(
-			dependencies: [],
+			dependencies: [
+				"SharedTestingModels",
+			],
 			resources: [
 				.process("SignalingServerTests/TestVectors/"),
 			]
@@ -489,7 +495,9 @@ package.addModules([
 			"SLIP10/README.md",
 		],
 		tests: .yes(
-			dependencies: [],
+			dependencies: [
+				"SharedTestingModels",
+			],
 			resources: [
 				.process("MnemonicTests/TestVectors/"),
 				.process("SLIP10Tests/TestVectors/"),
