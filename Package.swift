@@ -485,6 +485,7 @@ package.addModules([
 	),
 	.module(
 		name: "TestingPrelude",
+		radixTechStackLayer: .testSupport,
 		dependencies: [],
 		resources: [
 			.process("TestVectors/"),
@@ -493,6 +494,7 @@ package.addModules([
 	),
 	.module(
 		name: "FeatureTestingPrelude",
+		radixTechStackLayer: .testSupport,
 		dependencies: [
 			"FeaturePrelude", "TestingPrelude", "SharedTestingModels",
 		],
@@ -500,6 +502,7 @@ package.addModules([
 	),
 	.module(
 		name: "ClientTestingPrelude",
+		radixTechStackLayer: .testSupport,
 		dependencies: [
 			"ClientPrelude", "TestingPrelude", "SharedTestingModels",
 		],
@@ -597,12 +600,15 @@ extension Package {
 			case profile
 			case radixConnect
 			case crypto
+			case testSupport
+
 			var pathComponent: String {
 				switch self {
 				case .engineToolkit: return "EngineToolkit"
 				case .crypto: return "" // No folder called "Cryptography" inside "Cryptography"
 				case .profile: return "Profile"
 				case .radixConnect: return "RadixConnect"
+				case .testSupport: return "Testing"
 				}
 			}
 		}
