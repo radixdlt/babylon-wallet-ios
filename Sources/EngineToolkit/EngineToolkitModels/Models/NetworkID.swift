@@ -7,7 +7,7 @@ import Prelude
 //
 // ```
 // public struct Network {
-//     public typealias ID = Tagged<Self, UInt8>
+//     public typealias ID = Tagged<(Self, id: ()), UInt8>
 // }
 // ```
 //
