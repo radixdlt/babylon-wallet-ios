@@ -22,6 +22,8 @@ public extension P2P.ToDapp {
 
 // MARK: - P2P.ToDapp.WalletInteractionFailureResponse.ErrorType
 public extension P2P.ToDapp.WalletInteractionFailureResponse {
+	// TODO: ask if we should do associated values here for `message` construction,
+	// in which case we'll need to declare discriminators
 	enum ErrorType: String, Sendable, LocalizedError, Hashable, Encodable {
 		case rejectedByUser
 		case wrongNetwork
