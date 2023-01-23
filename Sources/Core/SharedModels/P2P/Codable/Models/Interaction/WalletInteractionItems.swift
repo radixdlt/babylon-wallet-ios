@@ -7,7 +7,7 @@ public extension P2P.FromDapp.WalletInteraction {
 			case discriminator
 		}
 
-		private enum Discriminator: String, Decodable {
+		enum Discriminator: String, Decodable {
 			case unauthorizedRequest
 			case authorizedRequest
 			case transaction
@@ -32,7 +32,7 @@ public extension P2P.FromDapp.WalletInteraction {
 }
 
 public extension P2P.FromDapp.WalletInteraction {
-	enum RequestItems: Sendable, Hashable, Decodable {
+	enum RequestItems: Sendable, Hashable {
 		case unauthorized(UnauthorizedRequestItems)
 		case authorized(AuthorizedRequestItems)
 	}
