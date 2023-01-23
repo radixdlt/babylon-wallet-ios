@@ -8,12 +8,12 @@ public extension P2P {
 	struct RequestFromClient: Sendable, Hashable, Identifiable {
 		public let originalMessage: P2PConnections.IncomingMessage
 
-		public let requestFromDapp: FromDapp.Request
+		public let requestFromDapp: FromDapp.WalletInteraction
 		public let client: P2PClient
 
 		public init(
 			originalMessage: P2PConnections.IncomingMessage,
-			requestFromDapp: FromDapp.Request,
+			requestFromDapp: FromDapp.WalletInteraction,
 			client: P2PClient
 		) throws {
 			self.originalMessage = originalMessage
@@ -24,7 +24,7 @@ public extension P2P {
 }
 
 public extension P2P.RequestFromClient {
-	typealias ID = P2P.FromDapp.Request.ID
+	typealias ID = P2P.FromDapp.WalletInteraction.ID
 
 	/// Not to be confused with `msgReceivedReceiptID` (which is a transport layer msg ID), whereas
 	/// this is an Application Layer identifer.

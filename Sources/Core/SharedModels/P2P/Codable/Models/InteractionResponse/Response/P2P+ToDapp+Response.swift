@@ -10,7 +10,7 @@ public extension P2P.ToDapp {
 
 public extension P2P.ToDapp.Response {
 	static func to(
-		request: P2P.FromDapp.Request,
+		request: P2P.FromDapp.WalletInteraction,
 		items responseItems: [P2P.ToDapp.WalletResponseItem]
 	) throws -> Self {
 		guard responseItems.count == request.items.count else {
@@ -23,7 +23,7 @@ public extension P2P.ToDapp.Response {
 }
 
 public extension P2P.ToDapp.Response {
-	var id: P2P.FromDapp.Request.ID {
+	var id: P2P.FromDapp.WalletInteraction.ID {
 		switch self {
 		case let .failure(failure):
 			return failure.id

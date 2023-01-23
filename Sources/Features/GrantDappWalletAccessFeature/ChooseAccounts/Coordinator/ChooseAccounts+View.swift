@@ -116,7 +116,7 @@ extension ChooseAccounts.View {
 	struct ViewState: Equatable {
 		var canProceed: Bool
 		let oneTimeAccountAddressesRequest: P2P.FromDapp.OneTimeAccountsReadRequestItem
-		let requestFromDapp: P2P.FromDapp.Request
+		let requestFromDapp: P2P.FromDapp.WalletInteraction
 
 		init(state: ChooseAccounts.State) {
 			canProceed = state.canProceed

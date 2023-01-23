@@ -6,12 +6,12 @@ public extension P2P.ToDapp.Response {
 	///
 	struct Success: Sendable, Hashable, Encodable, Identifiable {
 		/// *MUST* match an ID from an incoming request from Dapp.
-		public let id: P2P.FromDapp.Request.ID
+		public let id: P2P.FromDapp.WalletInteraction.ID
 
 		public let items: [P2P.ToDapp.WalletResponseItem]
 
 		public init(
-			id: P2P.FromDapp.Request.ID,
+			id: P2P.FromDapp.WalletInteraction.ID,
 			items: [P2P.ToDapp.WalletResponseItem]
 		) {
 			self.id = id

@@ -22,16 +22,18 @@ public extension P2P {
 
 public extension P2P.OneTimeAccountAddressesRequestToHandle {
 	init(request: P2P.RequestFromClient) throws {
-		guard
-			let oneTimeAccountRequest = request.requestFromDapp.items.compactMap(\.oneTimeAccounts).first
-		else {
-			throw P2P.FromDapp.WalletRequestItem.ExpectedOneTimeAccountAddressesRequest()
-		}
+//		guard
+//			let oneTimeAccountRequest = request.requestFromDapp.items.compactMap(\.oneTimeAccounts).first
+//		else {
+//			throw P2P.FromDapp.WalletRequestItem.ExpectedOneTimeAccountAddressesRequest()
+//		}
 
-		self.init(
-			requestItem: oneTimeAccountRequest,
-			parentRequest: request
-		)
+//		self.init(
+//			requestItem: oneTimeAccountRequest,
+//			parentRequest: request
+//		)
+
+		fatalError("Implement me")
 	}
 }
 
@@ -149,7 +151,7 @@ internal extension P2P {
 }
 
 internal extension P2P.UnfinishedRequestFromClient {
-	var requestFromDapp: P2P.FromDapp.Request { requestFromClient.requestFromDapp }
+	var requestFromDapp: P2P.FromDapp.WalletInteraction { requestFromClient.requestFromDapp }
 	typealias ID = P2P.RequestFromClient.ID
 	var id: ID { requestFromDapp.id }
 

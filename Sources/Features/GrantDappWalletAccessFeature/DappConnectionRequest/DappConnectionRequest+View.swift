@@ -71,7 +71,7 @@ private extension DappConnectionRequest.View {
 // MARK: - DappConnectionRequest.View.ViewState
 extension DappConnectionRequest.View {
 	struct ViewState: Equatable {
-		var requestFromDapp: P2P.FromDapp.Request
+		var requestFromDapp: P2P.FromDapp.WalletInteraction
 		init(state: DappConnectionRequest.State) {
 			requestFromDapp = state.request.parentRequest.requestFromDapp
 		}
