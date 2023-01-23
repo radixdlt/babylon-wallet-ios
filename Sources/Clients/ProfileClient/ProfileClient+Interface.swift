@@ -3,6 +3,7 @@ import Cryptography
 
 // MARK: - ProfileClient
 public struct ProfileClient: Sendable {
+	public var getFactorSources: GetFactorSources
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
 	public var getNetworkAndGateway: GetNetworkAndGateway
@@ -34,6 +35,7 @@ public struct ProfileClient: Sendable {
 	public var signersForAccountsGivenAddresses: SignersForAccountsGivenAddresses
 
 	public init(
+		getFactorSources: @escaping GetFactorSources,
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
 		getGatewayAPIEndpointBaseURL: @escaping GetGatewayAPIEndpointBaseURL,
 		getNetworkAndGateway: @escaping GetNetworkAndGateway,
@@ -57,6 +59,7 @@ public struct ProfileClient: Sendable {
 		lookupAccountByAddress: @escaping LookupAccountByAddress,
 		signersForAccountsGivenAddresses: @escaping SignersForAccountsGivenAddresses
 	) {
+		self.getFactorSources = getFactorSources
 		self.getCurrentNetworkID = getCurrentNetworkID
 		self.getGatewayAPIEndpointBaseURL = getGatewayAPIEndpointBaseURL
 		self.getNetworkAndGateway = getNetworkAndGateway
@@ -101,6 +104,7 @@ public extension ProfileClient {
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 	typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
 	typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
+	typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	typealias GetAccounts = @Sendable () async throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
 	typealias GetPersonas = @Sendable () async throws -> OrderedSet<OnNetwork.Persona>
 	typealias GetP2PClients = @Sendable () async throws -> P2PClients

@@ -55,6 +55,9 @@ public extension ProfileClient {
 		}
 
 		return Self(
+			getFactorSources: {
+				try await profileHolder.getAsync { $0.factorSources }
+			},
 			getCurrentNetworkID: getCurrentNetworkID,
 			getGatewayAPIEndpointBaseURL: getGatewayAPIEndpointBaseURL,
 			getNetworkAndGateway: getNetworkAndGateway,

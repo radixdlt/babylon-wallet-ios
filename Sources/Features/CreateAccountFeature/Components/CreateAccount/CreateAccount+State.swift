@@ -1,4 +1,5 @@
 import FeaturePrelude
+import GatherFactorsFeature
 
 // MARK: - CreateAccount.State
 public extension CreateAccount {
@@ -7,8 +8,15 @@ public extension CreateAccount {
 		public var isFirstAccount: Bool
 		public var inputtedAccountName: String
 		public var sanitizedAccountName: String { inputtedAccountName.trimmed() }
-		public var isCreatingAccount: Bool
+		public var isCreatingAccount: Bool {
+			gatherFactors != nil
+		}
+
 		public let shouldCreateProfile: Bool
+
+		public var factorSources: FactorSources?
+		public var gatherFactors: GatherFactors.State?
+
 		@BindableState public var focusedField: Field?
 
 		public init(
@@ -17,13 +25,15 @@ public extension CreateAccount {
 			isFirstAccount: Bool = false,
 			inputtedAccountName: String = "",
 			focusedField: Field? = nil,
-			isCreatingAccount: Bool = false
+			factorSources: FactorSources? = nil,
+			gatherFactors: GatherFactors.State? = nil
 		) {
 			self.onNetworkWithID = onNetworkWithID
 			self.shouldCreateProfile = shouldCreateProfile
 			self.inputtedAccountName = inputtedAccountName
 			self.focusedField = focusedField
-			self.isCreatingAccount = isCreatingAccount
+			self.factorSources = factorSources
+			self.gatherFactors = gatherFactors
 			self.isFirstAccount = isFirstAccount
 		}
 	}

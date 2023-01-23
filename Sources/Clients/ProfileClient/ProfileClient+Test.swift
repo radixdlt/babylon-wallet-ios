@@ -25,6 +25,7 @@ extension ProfileClient: TestDependencyKey {
 	}
 
 	public static let testValue = Self(
+		getFactorSources: unimplemented("\(Self.self).getFactorSources"),
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
 		getGatewayAPIEndpointBaseURL: unimplemented("\(Self.self).getGatewayAPIEndpointBaseURL"),
 		getNetworkAndGateway: unimplemented("\(Self.self).getNetworkAndGateway"),
@@ -52,6 +53,7 @@ extension ProfileClient: TestDependencyKey {
 
 public extension ProfileClient {
 	static let noop = Self(
+		getFactorSources: { throw NoopError() },
 		getCurrentNetworkID: { NetworkID.nebunet },
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
 		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.nebunet },

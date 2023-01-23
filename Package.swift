@@ -77,6 +77,7 @@ package.addModules([
 		dependencies: [
 			"Cryptography",
 			"GatewayAPI",
+			"GatherFactorsFeature",
 			"LocalAuthenticationClient",
 			"ProfileClient",
 		],
@@ -91,6 +92,13 @@ package.addModules([
 		name: "FungibleTokenListFeature",
 		dependencies: [
 			"FungibleTokenDetailsFeature",
+		],
+		tests: .yes()
+	),
+	.feature(
+		name: "GatherFactorsFeature",
+		dependencies: [
+			"ProfileClient",
 		],
 		tests: .yes()
 	),

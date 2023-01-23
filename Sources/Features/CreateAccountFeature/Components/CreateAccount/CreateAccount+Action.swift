@@ -1,4 +1,5 @@
 import FeaturePrelude
+import GatherFactorsFeature
 import LocalAuthenticationClient
 import ProfileClient
 
@@ -8,6 +9,7 @@ public extension CreateAccount {
 	enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
+		case child(ChildAction)
 		case delegate(DelegateAction)
 	}
 }
@@ -20,6 +22,10 @@ public extension CreateAccount.Action {
 		case createAccountButtonTapped
 		case textFieldChanged(String)
 		case textFieldFocused(CreateAccount.State.Field?)
+	}
+
+	enum ChildAction: Sendable, Equatable {
+		case gatherFactors(GatherFactors.Action)
 	}
 }
 
@@ -34,6 +40,7 @@ public extension CreateAccount.Action {
 // MARK: - CreateAccount.Action.InternalAction.SystemAction
 public extension CreateAccount.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
+		case loadFactorSourcesResult(TaskResult<FactorSources>)
 		case focusTextField(CreateAccount.State.Field?)
 		case createdNewAccountResult(TaskResult<OnNetwork.Account>)
 	}
