@@ -7,7 +7,7 @@ public extension P2P.FromDapp.WalletInteraction {
 			case discriminator
 		}
 
-		private enum Discriminator: String, Decodable {
+		enum Discriminator: String, Decodable {
 			case login
 			case usePersona
 		}
