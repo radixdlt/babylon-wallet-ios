@@ -48,6 +48,6 @@ public extension ChooseAccounts.Action.InternalAction {
 public extension ChooseAccounts.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case finishedChoosingAccounts(NonEmpty<OrderedSet<OnNetwork.Account>>, P2P.OneTimeAccountAddressesRequestToHandle)
-		case dismissChooseAccounts(P2P.OneTimeAccountAddressesRequestToHandle)
+		case dismissChooseAccounts(P2P.OneTimeAccountsRequestToHandle)
 	}
 }

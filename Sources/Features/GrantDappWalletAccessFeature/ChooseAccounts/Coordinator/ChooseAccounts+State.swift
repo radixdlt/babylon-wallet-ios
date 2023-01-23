@@ -4,13 +4,13 @@ import FeaturePrelude
 // MARK: - ChooseAccounts.State
 public extension ChooseAccounts {
 	struct State: Equatable {
-		public let request: P2P.OneTimeAccountAddressesRequestToHandle
+		public let request: P2P.OneTimeAccountsRequestToHandle
 		public var canProceed: Bool
 		public var accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
 		public var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		public init(
-			request: P2P.OneTimeAccountAddressesRequestToHandle,
+			request: P2P.OneTimeAccountsRequestToHandle,
 			canProceed: Bool = false,
 			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = [],
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil

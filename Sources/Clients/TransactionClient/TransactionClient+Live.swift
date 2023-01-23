@@ -306,7 +306,7 @@ public extension TransactionClient {
 					if let firstWithEnoughFunds = firstWithEnoughFunds {
 						return firstWithEnoughFunds
 					} else {
-						throw P2P.ToDapp.Response.Failure.Kind.Error.failedToFindAccountWithEnoughFundsToLockFee
+						throw P2P.ToDapp.WalletInteractionFailureResponse.ErrorType.failedToFindAccountWithEnoughFundsToLockFee
 					}
 				}()
 
