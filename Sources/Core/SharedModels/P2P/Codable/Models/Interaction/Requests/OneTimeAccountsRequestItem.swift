@@ -26,5 +26,13 @@ public extension P2P.FromDapp.WalletInteraction {
 
 		public let quantifier: Quantifier
 		public let quantity: Int
+
+		public static func exactly(_ quantity: Int) -> Self {
+			.init(quantifier: .exactly, quantity: quantity)
+		}
+
+		public static func atLeast(_ quantity: Int) -> Self {
+			.init(quantifier: .atLeast, quantity: quantity)
+		}
 	}
 }

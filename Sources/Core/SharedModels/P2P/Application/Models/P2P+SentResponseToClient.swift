@@ -6,13 +6,13 @@ import ProfileModels
 // MARK: - P2P.SentResponseToClient
 public extension P2P {
 	// MARK: - SentResponseToClient
-	struct SentResponseToClient: Sendable, Equatable, Identifiable {
+	struct SentResponseToClient: Sendable, Equatable {
 		public let sentReceipt: SentReceipt
-		public let responseToDapp: P2P.ToDapp.Response
+		public let responseToDapp: P2P.ToDapp.WalletInteractionResponse
 		public let client: P2PClient
 		public init(
 			sentReceipt: SentReceipt,
-			responseToDapp: P2P.ToDapp.Response,
+			responseToDapp: P2P.ToDapp.WalletInteractionResponse,
 			client: P2PClient
 		) {
 			self.sentReceipt = sentReceipt
@@ -22,15 +22,21 @@ public extension P2P {
 	}
 }
 
+// MARK: - P2P.SentResponseToClient.SentReceipt
 public extension P2P.SentResponseToClient {
 	typealias SentReceipt = P2PConnections.SentReceipt
-	typealias ID = P2P.ToDapp.Response.ID
-	var id: ID { responseToDapp.id }
+//	typealias ID = P2P.ToDapp.Response.ID
+//	var id: ID { responseToDapp.id }
 }
 
 #if DEBUG
-public extension P2P.ToDapp.Response {
-	static let previewValue: Self = .success(.init(id: .previewValue, items: []))
+public extension P2P.ToDapp.WalletInteractionResponse {
+	static let previewValue: Self = .success(.init(
+		interactionId: .previewValue,
+		items: .request(.unauthorized(.init(
+			oneTimeAccounts: nil
+		)))
+	))
 }
 
 public extension ChunkingTransportOutgoingMessage {
