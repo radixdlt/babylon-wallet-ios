@@ -13,18 +13,8 @@ public extension DappConnectionRequest {
 	}
 }
 
-public extension DappConnectionRequest.State {
-	init(
-		request: P2P.RequestFromClient
-	) throws {
-		try self.init(
-			request: .init(request: request)
-		)
-	}
-}
-
 #if DEBUG
 public extension DappConnectionRequest.State {
-	static var previewValue: Self { try! .init(request: .previewValue) }
+	static var previewValue: Self { .init(request: .init(request: .previewValueOneTimeAccountAccess)!) }
 }
 #endif

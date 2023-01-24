@@ -20,16 +20,6 @@ public extension ChooseAccounts {
 	}
 }
 
-public extension ChooseAccounts.State {
-	init(
-		request: P2P.RequestFromClient
-	) throws {
-		try self.init(
-			request: .init(request: request)
-		)
-	}
-}
-
 // MARK: - Computed Properties
 extension ChooseAccounts.State {
 	var selectedAccounts: [ChooseAccounts.Row.State] {
@@ -40,7 +30,7 @@ extension ChooseAccounts.State {
 #if DEBUG
 public extension ChooseAccounts.State {
 	static let previewValue: Self = .init(
-		request: .init(requestItem: .previewValue, parentRequest: .previewValue),
+		request: .init(request: .previewValueOneTimeAccountAccess)!,
 		accounts: .init(
 			uniqueElements: [
 				.previewValueOne,

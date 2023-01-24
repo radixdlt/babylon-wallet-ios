@@ -20,19 +20,20 @@ public extension P2P {
 }
 
 public extension P2P.OneTimeAccountsRequestToHandle {
-	init(request: P2P.RequestFromClient) throws {
-//		guard
-//			let oneTimeAccountRequest = request.requestFromDapp.items.compactMap(\.oneTimeAccounts).first
-//		else {
-//			throw P2P.FromDapp.WalletRequestItem.ExpectedOneTimeAccountAddressesRequest()
-//		}
-//
-//		self.init(
-//			requestItem: oneTimeAccountRequest,
-//			parentRequest: request
-//		)
-
-		fatalError("Implement me!")
+	init?(request: P2P.RequestFromClient) {
+		switch request.interaction.items {
+		case let .request(.authorized(items)):
+			if let item = items.oneTimeAccounts {
+				self = .init(requestItem: item, parentRequest: request)
+			}
+		case let .request(.unauthorized(items)):
+			if let item = items.oneTimeAccounts {
+				self = .init(requestItem: item, parentRequest: request)
+			}
+		case .transaction:
+			break
+		}
+		return nil
 	}
 }
 
