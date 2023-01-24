@@ -24,11 +24,11 @@ public extension P2P.OneTimeAccountsRequestToHandle {
 		switch request.interaction.items {
 		case let .request(.authorized(items)):
 			if let item = items.oneTimeAccounts {
-				self = .init(requestItem: item, parentRequest: request)
+				self.init(requestItem: item, parentRequest: request)
 			}
 		case let .request(.unauthorized(items)):
 			if let item = items.oneTimeAccounts {
-				self = .init(requestItem: item, parentRequest: request)
+				self.init(requestItem: item, parentRequest: request)
 			}
 		case .transaction:
 			break
