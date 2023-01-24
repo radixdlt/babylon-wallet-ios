@@ -5,7 +5,7 @@ import ProfileModels
 // MARK: - P2P.RequestFromClient
 public extension P2P {
 	// MARK: - RequestFromClient
-	struct RequestFromClient: Sendable, Hashable, Identifiable {
+	struct RequestFromClient: Sendable, Hashable {
 		public let originalMessage: P2PConnections.IncomingMessage
 
 		public let interaction: FromDapp.WalletInteraction

@@ -56,8 +56,8 @@ private extension HandleDappRequests {
 			return .run { send in
 				let currentNetworkID = await profileClient.getCurrentNetworkID()
 
-				guard requestFromP2P.requestFromDapp.metadata.networkId == currentNetworkID else {
-					let incommingRequestNetwork = try Network.lookupBy(id: requestFromP2P.requestFromDapp.metadata.networkId)
+				guard requestFromP2P.interaction.metadata.networkId == currentNetworkID else {
+					let incommingRequestNetwork = try Network.lookupBy(id: requestFromP2P.interaction.metadata.networkId)
 					let currentNetwork = try Network.lookupBy(id: currentNetworkID)
 
 					await send(.internal(.system(.failedWithError(
@@ -95,11 +95,11 @@ private extension HandleDappRequests {
 			let simpleInfoForAccounts: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
 				.init(account: $0)
 			}
-			guard !request.requestItem.isRequiringOwnershipProof else {
+			guard !request.requestItem.requiresProofOfOwnership else {
 				errorQueue.schedule(NSError(domain: "UnsupportedDappRequest - proofs for account addresses is not yet supported", code: 0))
 				return .none
 			}
-			let responseItem = P2P.ToDapp.WalletResponseItem.oneTimeAccounts(
+			let responseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem.oneTimeAccounts(
 				.withoutProof(.init(accounts: .init(rawValue: simpleInfoForAccounts)!))
 			)
 
@@ -147,10 +147,10 @@ private extension HandleDappRequests {
 
 		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, request?)))):
 			state.currentRequest = nil
-			let responseItem = P2P.ToDapp.WalletResponseItem.sendTransaction(
+			let responseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem.send(
 				.init(txID: txID)
 			)
-			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(.sendTransaction(request.requestItem), with: responseItem) else {
+			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(.send(request.requestItem), with: responseItem) else {
 				return .run { send in
 					await send(.internal(.system(.handleNextRequestItemIfNeeded)))
 				}
@@ -179,19 +179,23 @@ private extension HandleDappRequests {
 			}
 
 		case let .internal(.system(.rejected(rejected))):
-			return respondBackWithFailure(
-				state: &state,
-				connectionID: rejected.client.id,
-				failure: .rejected(rejected.requestFromDapp)
-			)
+			// FIXME:
+			return .none
+//			return respondBackWithFailure(
+//				state: &state,
+//				connectionID: rejected.client.id,
+//				failure: .rejected(rejected.requestFromDapp)
+//			)
 
 		case let .internal(.system(.failedWithError(request, error, message))):
-			errorQueue.schedule(error)
-			return respondBackWithFailure(
-				state: &state,
-				connectionID: request.client.id,
-				failure: .request(request.requestFromDapp, failedWithError: error, message: message)
-			)
+			// FIXME:
+			return .none
+//			errorQueue.schedule(error)
+//			return respondBackWithFailure(
+//				state: &state,
+//				connectionID: request.client.id,
+//				failure: .request(request.interaction, failedWithError: error, message: message)
+//			)
 
 		case .internal(.view(.task)):
 			return .run { send in
@@ -237,10 +241,10 @@ private extension HandleDappRequests {
 	func respondBackWithFailure(
 		state: inout State,
 		connectionID: P2PClient.ID,
-		failure: P2P.ToDapp.Response.Failure
+		failure: P2P.ToDapp.WalletInteractionFailureResponse
 	) -> EffectTask<Action> {
 		state.currentRequest = nil
-		state.unfinishedRequestsFromClient.failed(requestID: failure.id)
+		state.unfinishedRequestsFromClient.failed(interactionId: failure.interactionId)
 
 		let response = P2P.ResponseToClientByID(
 			connectionID: connectionID,
@@ -271,7 +275,7 @@ private extension HandleDappRequests {
 }
 
 extension ApproveTransactionFailure {
-	var errorKindAndMessage: (errorKind: P2P.ToDapp.Response.Failure.Kind.Error, message: String?) {
+	var errorKindAndMessage: (errorKind: P2P.ToDapp.WalletInteractionFailureResponse.ErrorType, message: String?) {
 		switch self {
 		case let .transactionFailure(transactionFailure):
 			switch transactionFailure {

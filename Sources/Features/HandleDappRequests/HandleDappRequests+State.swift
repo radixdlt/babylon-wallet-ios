@@ -71,7 +71,7 @@ public extension HandleDappRequests.State {
 						)
 					)
 				)
-			case let .sendTransaction(item):
+			case let .send(item):
 				self = .transactionSigning(
 					.init(
 						origin: .p2p(

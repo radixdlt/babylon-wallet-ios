@@ -2,7 +2,7 @@ import Prelude
 
 public extension P2P {
 	typealias OneTimeAccountsRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.WalletInteraction.OneTimeAccountsRequestItem>
-	typealias SendTransactionRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.WalletInteraction.SendTransactionItem>
+	typealias SendTransactionToHandle = SpecificRequestItemToHandle<P2P.FromDapp.WalletInteraction.SendTransactionItem>
 
 	/// A simple wrapper around a wallet request item to handle and its parent request.
 	struct SpecificRequestItemToHandle<RequestItem: Sendable & Hashable>: Sendable, Hashable {
@@ -192,7 +192,7 @@ internal extension P2P.UnfinishedRequestFromClient {
 				... with the following response items:
 				\(finishedResponseItems)
 
-				This is because the interaction is of type `transaction` but no `sendTransaction` response item was collected.
+				This is because the interaction is of type `transaction` but no `send` response item was collected.
 
 				Please carefully check the implementation for potential code paths skipped by mistake.
 				"""
@@ -261,7 +261,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 				}
 			}
 
-			// NB: remove this check and the init's optionality when `sendTransaction` becomes optional (when we introduce more transaction item fields)
+			// NB: remove this check and the init's optionality when `send` becomes optional (when we introduce more transaction item fields)
 			guard let send else {
 				return nil
 			}
