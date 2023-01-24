@@ -178,24 +178,28 @@ private extension HandleDappRequests {
 				await send(.internal(.system(.rejected(rejectedRequestItem.parentRequest))))
 			}
 
-		case let .internal(.system(.rejected(rejected))):
-			// FIXME:
-			return .none
-//			return respondBackWithFailure(
-//				state: &state,
-//				connectionID: rejected.client.id,
-//				failure: .rejected(rejected.requestFromDapp)
-//			)
+		case let .internal(.system(.rejected(request))):
+			return respondBackWithFailure(
+				state: &state,
+				connectionID: request.client.id,
+				failure: .init(
+					interactionId: request.interaction.id,
+					errorType: .rejectedByUser,
+					message: nil
+				)
+			)
 
 		case let .internal(.system(.failedWithError(request, error, message))):
-			// FIXME:
-			return .none
-//			errorQueue.schedule(error)
-//			return respondBackWithFailure(
-//				state: &state,
-//				connectionID: request.client.id,
-//				failure: .request(request.interaction, failedWithError: error, message: message)
-//			)
+			errorQueue.schedule(error)
+			return respondBackWithFailure(
+				state: &state,
+				connectionID: request.client.id,
+				failure: .init(
+					interactionId: request.interaction.id,
+					errorType: error,
+					message: message
+				)
+			)
 
 		case .internal(.view(.task)):
 			return .run { send in

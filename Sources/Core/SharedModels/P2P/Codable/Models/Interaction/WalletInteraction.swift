@@ -26,7 +26,7 @@ public extension P2P.FromDapp {
 			id: ID,
 			items: Items,
 			metadata: Metadata
-		) throws {
+		) {
 			self.id = id
 			self.items = items
 			self.metadata = metadata

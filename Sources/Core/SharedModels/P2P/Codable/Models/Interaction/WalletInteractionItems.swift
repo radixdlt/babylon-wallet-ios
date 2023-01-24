@@ -39,11 +39,23 @@ public extension P2P.FromDapp.WalletInteraction {
 
 	struct UnauthorizedRequestItems: Sendable, Hashable, Decodable {
 		public let oneTimeAccounts: OneTimeAccountsRequestItem?
+
+		public init(oneTimeAccounts: OneTimeAccountsRequestItem) {
+			self.oneTimeAccounts = oneTimeAccounts
+		}
 	}
 
 	struct AuthorizedRequestItems: Sendable, Hashable, Decodable {
 		public let auth: AuthRequestItem
 		public let oneTimeAccounts: OneTimeAccountsRequestItem?
+
+		public init(
+			auth: AuthRequestItem,
+			oneTimeAccounts: OneTimeAccountsRequestItem
+		) {
+			self.auth = auth
+			self.oneTimeAccounts = oneTimeAccounts
+		}
 	}
 }
 

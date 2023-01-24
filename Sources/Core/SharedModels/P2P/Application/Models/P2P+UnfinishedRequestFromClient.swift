@@ -25,15 +25,18 @@ public extension P2P.OneTimeAccountsRequestToHandle {
 		case let .request(.authorized(items)):
 			if let item = items.oneTimeAccounts {
 				self.init(requestItem: item, parentRequest: request)
+			} else {
+				return nil
 			}
 		case let .request(.unauthorized(items)):
 			if let item = items.oneTimeAccounts {
 				self.init(requestItem: item, parentRequest: request)
+			} else {
+				return nil
 			}
 		case .transaction:
-			break
+			return nil
 		}
-		return nil
 	}
 }
 
