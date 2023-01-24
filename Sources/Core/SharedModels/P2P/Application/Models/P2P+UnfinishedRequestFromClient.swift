@@ -218,23 +218,19 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 				self.init(
 					interactionId: interaction.id,
 					items: .request(
-						.authorized(
-							.init(
-								auth: auth,
-								oneTimeAccounts: oneTimeAccounts
-							)
-						)
+						.authorized(.init(
+							auth: auth,
+							oneTimeAccounts: oneTimeAccounts
+						))
 					)
 				)
 			} else {
 				self.init(
 					interactionId: interaction.id,
 					items: .request(
-						.unauthorized(
-							.init(
-								oneTimeAccounts: oneTimeAccounts
-							)
-						)
+						.unauthorized(.init(
+							oneTimeAccounts: oneTimeAccounts
+						))
 					)
 				)
 			}
