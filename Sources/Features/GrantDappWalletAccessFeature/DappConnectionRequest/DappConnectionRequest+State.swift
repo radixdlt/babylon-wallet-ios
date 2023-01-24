@@ -3,10 +3,10 @@ import FeaturePrelude
 // MARK: - DappConnectionRequest.State
 public extension DappConnectionRequest {
 	struct State: Equatable {
-		public let request: P2P.OneTimeAccountAddressesRequestToHandle
+		public let request: P2P.OneTimeAccountsRequestToHandle
 
 		public init(
-			request: P2P.OneTimeAccountAddressesRequestToHandle
+			request: P2P.OneTimeAccountsRequestToHandle
 		) {
 			self.request = request
 		}

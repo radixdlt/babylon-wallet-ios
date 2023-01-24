@@ -96,13 +96,21 @@ private extension ChooseAccounts.View {
 // MARK: - ChooseAccounts.View.ViewState
 extension ChooseAccounts.View {
 	struct ViewState: Equatable {
-		var canProceed: Bool
+		let canProceed: Bool
 		let oneTimeAccountAddressesRequest: P2P.FromDapp.WalletInteraction.OneTimeAccountsRequestItem
 		let numberOfAccountsExplanation: String
 		let interaction: P2P.FromDapp.WalletInteraction
 
 		init(state: ChooseAccounts.State) {
-			canProceed = state.canProceed
+			canProceed = {
+				let numberOfAccounts = state.request.requestItem.numberOfAccounts
+				switch numberOfAccounts.quantifier {
+				case .atLeast:
+					return state.selectedAccounts.count >= numberOfAccounts.quantity
+				case .exactly:
+					return state.selectedAccounts.count == numberOfAccounts.quantity
+				}
+			}()
 			// FIXME: remove Force Unwrap
 			oneTimeAccountAddressesRequest = state.request.requestItem
 			interaction = state.request.parentRequest.interaction
