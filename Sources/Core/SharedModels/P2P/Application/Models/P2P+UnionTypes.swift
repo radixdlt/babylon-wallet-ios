@@ -13,25 +13,24 @@ public extension P2P.FromDapp.WalletInteraction {
 	}
 
 	// NB: keep this logic synced up with the enum above
-	var erasedItems: [P2P.FromDapp.WalletInteraction.AnyInteractionItem] {
+	var erasedItems: [AnyInteractionItem] {
 		switch items {
 		case let .request(.authorized(items)):
-			return .build {
-				.auth(items.auth)
-				if let oneTimeAccounts = items.oneTimeAccounts {
-					.oneTimeAccounts(oneTimeAccounts)
-				}
-			}
+			return [
+				.auth(items.auth),
+				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
+			]
+			.compactMap { $0 }
 		case let .request(.unauthorized(items)):
-			return .build {
-				if let oneTimeAccounts = items.oneTimeAccounts {
-					.oneTimeAccounts(oneTimeAccounts)
-				}
-			}
+			return [
+				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
+			]
+			.compactMap { $0 }
 		case let .transaction(items):
-			return .build {
-				.send(items.send)
-			}
+			return [
+				.send(items.send),
+			]
+			.compactMap { $0 }
 		}
 	}
 }

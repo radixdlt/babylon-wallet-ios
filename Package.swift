@@ -549,11 +549,6 @@ package.addModules([
 			},
 
 			.product(name: "BitCollections", package: "swift-collections"),
-
-			.product(name: "Builders", package: "swift-builders") {
-				.package(url: "https://github.com/davdroman/swift-builders", from: "0.1.0")
-			},
-
 			.product(name: "Collections", package: "swift-collections"),
 
 			.product(name: "CustomDump", package: "swift-custom-dump") {
