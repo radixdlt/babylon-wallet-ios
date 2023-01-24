@@ -38,11 +38,6 @@ public extension P2P.OneTimeAccountsRequestToHandle {
 }
 
 // MARK: - P2P.RequestItemToHandle
-// public extension P2P.SpecificRequestItemToHandle {
-//	typealias ID = P2P.RequestFromClient.ID
-//	var id: ID { parentRequest.id }
-// }
-
 public extension P2P {
 	/// A simple wrapper around a wallet request item to handle and its parent request.
 	struct RequestItemToHandle: Sendable, Hashable {
@@ -55,23 +50,18 @@ public extension P2P {
 	}
 }
 
-// public extension P2P.RequestItemToHandle {
-//	typealias ID = P2P.RequestFromClient.ID
-//	var id: ID { parentRequest.id }
-// }
-
 #if DEBUG
 public extension P2P.RequestItemToHandle {
 	static let previewValueOneTimeAccount: Self = .init(
 		requestItem: .oneTimeAccounts(.previewValue),
-		parentRequest: try! .init(
+		parentRequest: .init(
 			originalMessage: .previewValue,
 			interaction: .previewValueOneTimeAccount,
 			client: .previewValue
 		)
 	)
 }
-#endif // DEBUG
+#endif
 
 // MARK: - P2P.UnfinishedRequestsFromClient
 public extension P2P {

@@ -15,7 +15,7 @@ public extension P2P {
 			originalMessage: P2PConnections.IncomingMessage,
 			interaction: FromDapp.WalletInteraction,
 			client: P2PClient
-		) throws {
+		) {
 			self.originalMessage = originalMessage
 			self.interaction = interaction
 			self.client = client
@@ -42,12 +42,12 @@ public extension P2PConnections.IncomingMessage {
 
 public extension P2P.RequestFromClient {
 	static let previewValue = Self.previewValueOneTimeAccountAccess
-	static let previewValueOneTimeAccountAccess: Self = try! .init(
+	static let previewValueOneTimeAccountAccess: Self = .init(
 		originalMessage: .previewValue,
 		interaction: .previewValueOneTimeAccount,
 		client: .previewValue
 	)
-	static let previewValueSignTXRequest: Self = try! .init(
+	static let previewValueSignTXRequest: Self = .init(
 		originalMessage: .previewValue,
 		interaction: .previewValueSignTX,
 		client: .previewValue

@@ -17,12 +17,3 @@ public extension P2P {
 		}
 	}
 }
-
-public extension P2P.ResponseToClientByID {
-//	var requestID: P2P.ToDapp.Response.ID {
-//		responseToDapp.id
-//	}
-//
-//	typealias ID = P2P.ToDapp.Response.ID
-//	var id: P2P.ToDapp.Response.ID { requestID }
-}
