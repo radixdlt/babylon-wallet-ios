@@ -23,16 +23,6 @@ public extension P2P {
 	}
 }
 
-public extension P2P.RequestFromClient {
-	typealias ID = P2P.FromDapp.WalletInteraction.ID
-
-	/// Not to be confused with `msgReceivedReceiptID` (which is a transport layer msg ID), whereas
-	/// this is an Application Layer identifer.
-	var id: ID {
-		interaction.id
-	}
-}
-
 // MARK: - InvalidRequestFromDapp
 public struct InvalidRequestFromDapp: Swift.Error, Equatable, CustomStringConvertible {
 	public let description: String

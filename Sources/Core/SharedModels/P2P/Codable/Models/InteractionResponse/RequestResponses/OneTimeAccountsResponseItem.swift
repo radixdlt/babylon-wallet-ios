@@ -1,14 +1,14 @@
 import Prelude
 
-// MARK: - P2P.ToDapp.WalletInteractionSuccessResponse.OneTimeAccountsResponseItem
+// MARK: - P2P.ToDapp.WalletInteractionSuccessResponse.OneTimeAccountsRequestResponseItem
 public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 	/// Response to Dapp from wallet, info about a users accounts.
 	///
 	/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
 	///
-	enum OneTimeAccountsResponseItem: Sendable, Hashable, Encodable {
-		case withoutProof(OneTimeAccountsWithoutProofOfOwnershipResponseItem)
-		case withProof(OneTimeAccountsWithProofOfOwnershipResponseItem)
+	enum OneTimeAccountsRequestResponseItem: Sendable, Hashable, Encodable {
+		case withoutProof(OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem)
+		case withProof(OneTimeAccountsWithProofOfOwnershipRequestResponseItem)
 
 		public func encode(to encoder: Encoder) throws {
 			switch self {
@@ -21,8 +21,8 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 	}
 }
 
-public extension P2P.ToDapp.WalletInteractionSuccessResponse.OneTimeAccountsResponseItem {
-	struct OneTimeAccountsWithoutProofOfOwnershipResponseItem: Sendable, Hashable, Encodable {
+public extension P2P.ToDapp.WalletInteractionSuccessResponse {
+	struct OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
 		public let accounts: [P2P.ToDapp.WalletAccount]
 
 		public init(accounts: NonEmpty<[P2P.ToDapp.WalletAccount]>) {
@@ -30,7 +30,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse.OneTimeAccountsResp
 		}
 	}
 
-	struct OneTimeAccountsWithProofOfOwnershipResponseItem: Sendable, Hashable, Encodable {
+	struct OneTimeAccountsWithProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
 		public let accounts: [P2P.ToDapp.WalletAccountWithProof]
 
 		public init(accounts: NonEmpty<[P2P.ToDapp.WalletAccountWithProof]>) {

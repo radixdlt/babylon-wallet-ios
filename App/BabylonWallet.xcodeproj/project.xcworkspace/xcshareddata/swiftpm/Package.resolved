@@ -118,6 +118,15 @@
       }
     },
     {
+      "identity" : "swift-builders",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/davdroman/swift-builders",
+      "state" : {
+        "revision" : "a9f8a8bce70b5c36dae99505e5a3d0442c485255",
+        "version" : "0.3.1"
+      }
+    },
+    {
       "identity" : "swift-case-paths",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
