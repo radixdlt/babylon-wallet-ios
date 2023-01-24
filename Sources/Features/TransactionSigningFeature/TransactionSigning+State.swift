@@ -5,11 +5,11 @@ import struct TransactionClient.MakeTransactionHeaderInput
 public extension TransactionSigning {
 	struct State: Equatable {
 		public enum Origin: Equatable {
-			case p2p(request: P2P.SignTransactionRequestToHandle)
+			case p2p(request: P2P.SendTransactionToHandle)
 			case local(manifest: TransactionManifest)
 		}
 
-		public let request: P2P.SignTransactionRequestToHandle?
+		public let request: P2P.SendTransactionToHandle?
 		public let transactionManifestWithoutLockFee: TransactionManifest
 		public var transactionWithLockFee: TransactionManifest?
 		public var transactionWithLockFeeString: String?
@@ -85,7 +85,7 @@ public extension TransactionSigning.State {
 	static var previewValue: Self {
 		.init(
 			origin: .p2p(
-				request: P2P.SignTransactionRequestToHandle(
+				request: P2P.SendTransactionToHandle(
 					requestItem: .previewValue,
 					parentRequest: .previewValue
 				)

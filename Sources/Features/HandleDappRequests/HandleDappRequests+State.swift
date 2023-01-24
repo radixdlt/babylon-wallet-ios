@@ -62,6 +62,8 @@ public extension HandleDappRequests.State {
 
 		public init(requestItemToHandle: P2P.RequestItemToHandle) {
 			switch requestItemToHandle.requestItem {
+			case let .auth(item):
+				preconditionFailure("Implement auth! :D")
 			case let .oneTimeAccounts(item):
 				self = .chooseAccounts(
 					.init(request:
