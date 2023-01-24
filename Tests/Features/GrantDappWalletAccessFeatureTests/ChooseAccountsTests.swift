@@ -5,8 +5,8 @@ import FeatureTestingPrelude
 final class ChooseAccountsTests: TestCase {
 	func test_continueFromChooseAccounts_whenTappedOnContinue_thenFinishAccountSelection() async {
 		// given
-		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
-			requestItem: .init(numberOfAddresses: 1),
+		let requestItem: P2P.OneTimeAccountsRequestToHandle = .init(
+			requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
 			parentRequest: .previewValue
 		)
 		var singleAccount = ChooseAccounts.Row.State.previewValueOne
@@ -31,8 +31,8 @@ final class ChooseAccountsTests: TestCase {
 
 	func test_dismissChooseAccounts_whenTappedOnDismiss_thenCoordinateDismissal() async {
 		// given
-		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
-			requestItem: .init(numberOfAddresses: 1),
+		let requestItem: P2P.OneTimeAccountsRequestToHandle = .init(
+			requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
 			parentRequest: .previewValue
 		)
 		let store = TestStore(
@@ -53,8 +53,10 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = true
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: 1), parentRequest: .previewValue),
-			canProceed: false,
+			request: .init(
+				requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
+				parentRequest: .previewValue
+			),
 			accounts: .init(
 				uniqueElements: [
 					accountRow,
@@ -71,7 +73,6 @@ final class ChooseAccountsTests: TestCase {
 		await store.send(.child(.account(id: accountRow.id, action: .view(.didSelect)))) {
 			// then
 			$0.accounts[id: accountRow.id]?.isSelected = false
-			$0.canProceed = false
 		}
 	}
 
@@ -84,8 +85,10 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: .oneOrMore), parentRequest: .previewValue),
-			canProceed: false,
+			request: .init(
+				requestItem: .init(numberOfAccounts: .atLeast(1), requiresProofOfOwnership: false),
+				parentRequest: .previewValue
+			),
 			accounts: .init(
 				uniqueElements: [
 					accountRowOne,
@@ -103,7 +106,6 @@ final class ChooseAccountsTests: TestCase {
 		await store.send(.child(.account(id: accountRowOne.id, action: .view(.didSelect)))) {
 			// then
 			$0.accounts[id: accountRowOne.id]?.isSelected = true
-			$0.canProceed = true
 		}
 
 		// when
@@ -119,8 +121,10 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .previewValue),
-			canProceed: false,
+			request: .init(
+				requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
+				parentRequest: .previewValue
+			),
 			accounts: .init(
 				uniqueElements: [
 					accountRow,
@@ -137,7 +141,6 @@ final class ChooseAccountsTests: TestCase {
 		await store.send(.child(.account(id: accountRow.id, action: .view(.didSelect)))) {
 			// then
 			$0.accounts[id: accountRow.id]?.isSelected = true
-			$0.canProceed = true
 		}
 	}
 
@@ -150,8 +153,10 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			request: .init(requestItem: .init(numberOfAddresses: .exactly(1)), parentRequest: .previewValue),
-			canProceed: true,
+			request: .init(
+				requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
+				parentRequest: .previewValue
+			),
 			accounts: .init(
 				uniqueElements: [
 					accountRowOne,
