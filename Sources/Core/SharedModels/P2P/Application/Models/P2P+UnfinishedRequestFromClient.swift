@@ -199,7 +199,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 		with items: [P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem]
 	) {
 		switch interaction.items {
-		case let .request(request):
+		case .request:
 			// NB: variadic generics + native case paths should greatly help to simplify this "picking" logic
 			var auth: AuthRequestResponseItem? = nil
 			var oneTimeAccounts: OneTimeAccountsRequestResponseItem? = nil
@@ -235,7 +235,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 				)
 			}
 
-		case let .transaction(transaction):
+		case .transaction:
 			var send: SendTransactionResponseItem? = nil
 			for item in items {
 				switch item {
