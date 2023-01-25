@@ -1,28 +1,45 @@
-// @testable import SharedModels
-// import TestingPrelude
-//
-// final class ToDappResponseTests: TestCase {
-//	func test_encode_response() throws {
-//		let success = P2P.ToDapp.Response.Success(
-//			id: "an_id", items: [
-//				.oneTimeAccounts(.withoutProof(.init(
-//					accounts: .init(
-//						rawValue: [.init(
-//							accountAddress: try! .init(address: "address"),
-//							label: "Label",
-//							appearanceId: .fromIndex(0)
-//						)]
-//					)!
-//				))),
-//			]
-//		)
-//		let response = P2P.ToDapp.Response.success(success)
-//		let encoder = JSONEncoder()
-//		let jsonData = try encoder.encode(response)
-//		let jsonString = try XCTUnwrap(jsonData.prettyPrintedJSONString)
-//		XCTAssertTrue(jsonString.contains(P2P.FromDapp.Discriminator.oneTimeAccountsRead.rawValue))
-//	}
-//
+@testable import SharedModels
+import TestingPrelude
+
+final class ToDappResponseTests: TestCase {
+	func test_encode_response() throws {
+		let sut = P2P.ToDapp.WalletInteractionResponse.success(.init(
+			interactionId: "an_id",
+			items: .request(
+				.unauthorized(.init(
+					oneTimeAccounts: .withoutProof(.init(
+						accounts: .init(
+							rawValue: [.init(
+								accountAddress: try! .init(address: "address"),
+								label: "Label",
+								appearanceId: .fromIndex(0)
+							)]
+						)!
+					))
+				))
+			)
+		))
+		try XCTAssertJSONEncoding(
+			sut,
+			[
+				"discriminator": "success",
+				"interactionId": "an_id",
+				"items": [
+					"discriminator": "unauthorizedRequest",
+					"oneTimeAccounts": [
+						"accounts": [
+							[
+								"address": "address",
+								"appearanceId": 0,
+								"label": "Label",
+							],
+						],
+					],
+				],
+			]
+		)
+	}
+
 //	func test_decode_dApp_request_with_oneTimeAccountsRead_request_item() throws {
 //		let json = """
 //		{
@@ -84,4 +101,4 @@
 //		XCTAssertEqual(request.items.first?.sendTransaction?.version, 1)
 //		XCTAssertEqual(request.id, "ed987de8-fc30-40d0-81ea-e3eef117a2cc")
 //	}
-// }
+}

@@ -190,6 +190,15 @@
       }
     },
     {
+      "identity" : "swift-json-testing",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/davdroman/swift-json-testing",
+      "state" : {
+        "revision" : "9223048c0e9de244b6ba4f4f81a16828f44db13e",
+        "version" : "0.1.0"
+      }
+    },
+    {
       "identity" : "swift-log",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",

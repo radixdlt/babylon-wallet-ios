@@ -507,7 +507,11 @@ package.addModules([
 	.module(
 		name: "TestingPrelude",
 		category: .testing,
-		dependencies: [],
+		dependencies: [
+			.product(name: "JSONTesting", package: "swift-json-testing") {
+				.package(url: "https://github.com/davdroman/swift-json-testing", from: "0.1.0")
+			},
+		],
 		tests: .no
 	),
 	.module(
