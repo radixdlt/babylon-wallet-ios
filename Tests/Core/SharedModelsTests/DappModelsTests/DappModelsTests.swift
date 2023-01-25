@@ -80,28 +80,40 @@ final class ToDappResponseTests: TestCase {
 		)
 	}
 
-//	func test_decode_dApp_request_with_sendTransactionWrite_request_item() throws {
-//		let json = """
-//		{
-//		    "metadata":
-//		    {
-//		        "networkId": 34,
-//		        "dAppId": "radixdlt.dashboard.com",
-//		        "origin": "https://dashboard-pr-126.rdx-works-main.extratools.works"
-//		    },
-//		  "items" : [
-//		    {
-//		      "version" : 1,
-//		      "transactionManifest" : "",
-//		      "requestType" : "sendTransactionWrite"
-//		    }
-//		  ],
-//		  "requestId" : "ed987de8-fc30-40d0-81ea-e3eef117a2cc"
-//		}
-//		""".data(using: .utf8)!
-//		let decoder = JSONDecoder()
-//		let request = try decoder.decode(P2P.FromDapp.Request.self, from: json)
-//		XCTAssertEqual(request.items.first?.sendTransaction?.version, 1)
-//		XCTAssertEqual(request.id, "ed987de8-fc30-40d0-81ea-e3eef117a2cc")
-//	}
+	func test_decode_dApp_request_with_sendTransactionWrite_request_item() throws {
+		let json: JSON = [
+			"interactionId": "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
+			"items": [
+				"discriminator": "transaction",
+				"send": [
+					"version": 1,
+					"transactionManifest": "",
+					"message": "MSG",
+				],
+			],
+			"metadata": [
+				"networkId": 34,
+				"origin": "https://dashboard-pr-126.rdx-works-main.extratools.works",
+				"dAppId": "radixdlt.dashboard.com",
+			],
+		]
+		try XCTAssertJSONDecoding(
+			json,
+			P2P.FromDapp.WalletInteraction(
+				id: "ed987de8-fc30-40d0-81ea-e3eef117a2cc",
+				items: .transaction(.init(
+					send: .init(
+						version: 1,
+						transactionManifest: .init(instructions: .string("")),
+						message: "MSG"
+					)
+				)),
+				metadata: .init(
+					networkId: 34,
+					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
+					dAppId: "radixdlt.dashboard.com"
+				)
+			)
+		)
+	}
 }
