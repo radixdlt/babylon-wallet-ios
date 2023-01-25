@@ -40,43 +40,46 @@ final class ToDappResponseTests: TestCase {
 		)
 	}
 
-//	func test_decode_dApp_request_with_oneTimeAccountsRead_request_item() throws {
-//		let json = """
-//		{
-//		    "items":
-//		    [
-//		        {
-//		            "requestType": "oneTimeAccountsRead",
-//		            "requiresProofOfOwnership": false
-//		        }
-//		    ],
-//		    "requestId": "791638de-cefa-43a8-9319-aa31c582fc7d",
-//		    "metadata":
-//		    {
-//		        "networkId": 34,
-//		        "dAppId": "radixdlt.dashboard.com",
-//		        "origin": "https://dashboard-pr-126.rdx-works-main.extratools.works"
-//		    }
-//		}
-//		""".data(using: .utf8)!
-//
-//		let decoder = JSONDecoder()
-//		let request = try decoder.decode(P2P.FromDapp.Request.self, from: json)
-//		let expectedItem = P2P.FromDapp.OneTimeAccountsReadRequestItem(
-//			numberOfAddresses: .oneOrMore
-//		)
-//		XCTAssertEqual(request.items, [.oneTimeAccounts(expectedItem)])
-//		XCTAssertEqual(
-//			request.metadata,
-//			.init(
-//				networkId: .init(34),
-//				origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-//				dAppId: "radixdlt.dashboard.com"
-//			)
-//		)
-//		XCTAssertEqual(request.id, "791638de-cefa-43a8-9319-aa31c582fc7d")
-//	}
-//
+	func test_decode_dApp_request_with_oneTimeAccountsRead_request_item() throws {
+		let json: JSON = [
+			"interactionId": "791638de-cefa-43a8-9319-aa31c582fc7d",
+			"items": [
+				"discriminator": "unauthorizedRequest",
+				"oneTimeAccounts": [
+					"numberOfAccounts": [
+						"quantifier": "exactly",
+						"quantity": 2,
+					],
+					"requiresProofOfOwnership": true,
+				],
+			],
+			"metadata": [
+				"networkId": 34,
+				"origin": "radixdlt.dashboard.com",
+				"dAppId": "https://dashboard-pr-126.rdx-works-main.extratools.works",
+			],
+		]
+		try XCTAssertJSONDecoding(
+			json,
+			P2P.FromDapp.WalletInteraction(
+				id: "791638de-cefa-43a8-9319-aa31c582fc7d",
+				items: .request(
+					.unauthorized(.init(
+						oneTimeAccounts: .init(
+							numberOfAccounts: .exactly(2),
+							requiresProofOfOwnership: true
+						)
+					))
+				),
+				metadata: .init(
+					networkId: 34,
+					origin: "radixdlt.dashboard.com",
+					dAppId: "https://dashboard-pr-126.rdx-works-main.extratools.works"
+				)
+			)
+		)
+	}
+
 //	func test_decode_dApp_request_with_sendTransactionWrite_request_item() throws {
 //		let json = """
 //		{
