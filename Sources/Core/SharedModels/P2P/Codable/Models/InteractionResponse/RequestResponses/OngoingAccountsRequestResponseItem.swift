@@ -1,10 +1,10 @@
 import Prelude
 
-// MARK: - P2P.ToDapp.WalletInteractionSuccessResponse.OneTimeAccountsRequestResponseItem
+// MARK: - P2P.ToDapp.WalletInteractionSuccessResponse.OngoingAccountsRequestResponseItem
 public extension P2P.ToDapp.WalletInteractionSuccessResponse {
-	enum OneTimeAccountsRequestResponseItem: Sendable, Hashable, Encodable {
-		case withoutProof(OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem)
-		case withProof(OneTimeAccountsWithProofOfOwnershipRequestResponseItem)
+	enum OngoingAccountsRequestResponseItem: Sendable, Hashable, Encodable {
+		case withoutProof(OngoingAccountsWithoutProofOfOwnershipRequestResponseItem)
+		case withProof(OngoingAccountsWithProofOfOwnershipRequestResponseItem)
 
 		public func encode(to encoder: Encoder) throws {
 			switch self {
@@ -18,7 +18,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 }
 
 public extension P2P.ToDapp.WalletInteractionSuccessResponse {
-	struct OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
+	struct OngoingAccountsWithoutProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
 		public let accounts: [P2P.ToDapp.WalletAccount]
 
 		public init(accounts: NonEmpty<[P2P.ToDapp.WalletAccount]>) {
@@ -26,7 +26,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 		}
 	}
 
-	struct OneTimeAccountsWithProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
+	struct OngoingAccountsWithProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
 		public let accounts: [P2P.ToDapp.WalletAccountWithProof]
 
 		public init(accounts: NonEmpty<[P2P.ToDapp.WalletAccountWithProof]>) {

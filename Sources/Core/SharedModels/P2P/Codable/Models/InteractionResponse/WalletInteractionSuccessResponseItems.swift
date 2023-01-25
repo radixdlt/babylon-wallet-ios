@@ -45,13 +45,16 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 		public let discriminator = P2P.FromDapp.WalletInteraction.Items.Discriminator.authorizedRequest.rawValue
 		public let auth: AuthRequestResponseItem
 		public let oneTimeAccounts: OneTimeAccountsRequestResponseItem?
+		public let ongoingAccounts: OngoingAccountsRequestResponseItem?
 
 		public init(
 			auth: AuthRequestResponseItem,
-			oneTimeAccounts: OneTimeAccountsRequestResponseItem?
+			oneTimeAccounts: OneTimeAccountsRequestResponseItem?,
+			ongoingAccounts: OngoingAccountsRequestResponseItem?
 		) {
 			self.auth = auth
 			self.oneTimeAccounts = oneTimeAccounts
+			self.ongoingAccounts = ongoingAccounts
 		}
 	}
 }

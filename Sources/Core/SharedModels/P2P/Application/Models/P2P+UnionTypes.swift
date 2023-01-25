@@ -7,18 +7,22 @@ public extension P2P.FromDapp.WalletInteraction {
 		// requests
 		case auth(AuthRequestItem)
 		case oneTimeAccounts(OneTimeAccountsRequestItem)
+		case ongoingAccounts(OngoingAccountsRequestItem)
 
 		// transactions
 		case send(SendTransactionItem)
 	}
 
 	// NB: keep this logic synced up with the enum above
+	// Future reflection metadata capabilities should make this
+	// implementation simpler and with no need to keep it manually synced up.
 	var erasedItems: [AnyInteractionItem] {
 		switch items {
 		case let .request(.authorized(items)):
 			return [
 				.auth(items.auth),
 				items.oneTimeAccounts.map(AnyInteractionItem.oneTimeAccounts),
+				items.ongoingAccounts.map(AnyInteractionItem.ongoingAccounts),
 			]
 			.compactMap { $0 }
 		case let .request(.unauthorized(items)):
@@ -41,6 +45,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 		// request responses
 		case auth(AuthRequestResponseItem)
 		case oneTimeAccounts(OneTimeAccountsRequestResponseItem)
+		case ongoingAccounts(OngoingAccountsRequestResponseItem)
 
 		// transaction responses
 		case send(SendTransactionResponseItem)

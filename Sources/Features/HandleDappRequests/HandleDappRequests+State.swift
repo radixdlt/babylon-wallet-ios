@@ -73,6 +73,8 @@ public extension HandleDappRequests.State {
 						)
 					)
 				)
+			case let .ongoingAccounts(item):
+				preconditionFailure("Implement ongoing accounts! :D")
 			case let .send(item):
 				self = .transactionSigning(
 					.init(
