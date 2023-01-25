@@ -142,8 +142,8 @@ final class HandleDappRequestsTests: TestCase {
 
 		await store.receive(.internal(.system(.failedWithError(request, error, errorMsg))))
 
-		await messageSentToDapp.withValue { msg in
-			XCTAssertEqual(msg?.responseToDapp, .failure(response))
+		await messageSentToDapp.withValue {
+			XCTAssertEqual($0?.responseToDapp, .failure(response))
 		}
 	}
 }
