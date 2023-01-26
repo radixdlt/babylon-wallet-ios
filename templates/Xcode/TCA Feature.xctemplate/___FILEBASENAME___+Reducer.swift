@@ -3,10 +3,12 @@ import FeaturePrelude
 // MARK: - ___VARIABLE_featureName___
 public struct ___VARIABLE_featureName___: Sendable, ReducerProtocol {
 	public init() {}
-}
 
-public extension ___VARIABLE_featureName___ {
-	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+	}
+
+	func core(into state: inout State, action: Action) -> EffectTask<Action> {
 		.none
 	}
 }
