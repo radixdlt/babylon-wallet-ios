@@ -16,9 +16,14 @@ public extension CreateAccountCoordinator.View {
 	var body: some View {
 		SwitchStore(store.scope(state: \.root)) {
 			CaseLet(
-				state: /CreateAccountCoordinator.State.Root.createAccount,
-				action: { CreateAccountCoordinator.Action.child(.createAccount($0)) },
-				then: { CreateAccount.View(store: $0) }
+				state: /CreateAccountCoordinator.State.Root.nameNewEntity,
+				action: { CreateAccountCoordinator.Action.child(.nameNewEntity($0)) },
+				then: { NameNewEntity.View(store: $0) }
+			)
+			CaseLet(
+				state: /CreateAccountCoordinator.State.Root.selectGenesisFactorSource,
+				action: { CreateAccountCoordinator.Action.child(.selectGenesisFactorSource($0)) },
+				then: { SelectGenesisFactorSource.View(store: $0) }
 			)
 			CaseLet(
 				state: /CreateAccountCoordinator.State.Root.accountCompletion,

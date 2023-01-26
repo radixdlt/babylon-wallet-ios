@@ -17,7 +17,7 @@ public extension GatherFactors.Action {
 public extension GatherFactors.Action {
 	enum ChildAction: Sendable, Equatable {
 		case gatherFactor(
-			GatherFactor.Action
+			GatherFactor<Purpose>.Action
 		)
 	}
 }
@@ -47,6 +47,6 @@ public extension GatherFactors.Action {
 public extension GatherFactors.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case finishedWithResult(GatherFactorsResult)
+		case finishedWithResult(Purpose.Produce)
 	}
 }

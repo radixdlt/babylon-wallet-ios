@@ -35,6 +35,6 @@ public extension GatherFactor.Action {
 // MARK: - GatherFactor.Action.DelegateAction
 public extension GatherFactor.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case finishedWithResult(id: GatherFactor.State.ID, GatherFactorResult)
+		case finishedWithResult(id: GatherFactor.State.ID, Purpose.Produce)
 	}
 }

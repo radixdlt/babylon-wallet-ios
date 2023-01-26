@@ -2,18 +2,20 @@ import FeaturePrelude
 
 // MARK: - AccountCompletion.State
 public extension AccountCompletion {
-	struct State: Sendable, Equatable {
-		public let account: OnNetwork.Account
-		public let isFirstAccount: Bool
-		public let destination: CreateAccountCompletionDestination
+	struct State: CreateEntityCompletionStateProtocol {
+		public typealias Entity = OnNetwork.Account
+		public typealias Destination = CreateAccountCompletionDestination
+		public let entity: Entity
+		public let isFirstOnNetwork: Bool
+		public let destination: Destination
 
 		public init(
-			account: OnNetwork.Account,
-			isFirstAccount: Bool,
-			destination: CreateAccountCompletionDestination
+			entity: Entity,
+			isFirstOnNetwork: Bool,
+			destination: Destination
 		) {
-			self.account = account
-			self.isFirstAccount = isFirstAccount
+			self.entity = entity
+			self.isFirstOnNetwork = isFirstOnNetwork
 			self.destination = destination
 		}
 	}
@@ -21,24 +23,27 @@ public extension AccountCompletion {
 
 // MARK: - AccountCompletion.State.Origin
 public extension AccountCompletion.State {
-	var accountAddress: AccountAddress {
-		account.address
+	var entityAddress: Entity.EntityAddress {
+		entity.address
 	}
 
-	var accountName: String {
-		account.displayName ?? "Unnamed account"
+	var displayName: String {
+		if let displayName = entity.displayName {
+			return displayName
+		}
+		return "Unnamed " + (entity.kind == .account ? "account" : "persona")
 	}
 
-	var accountIndex: Int {
-		account.index
+	var index: Entity.Index {
+		entity.index
 	}
 }
 
 #if DEBUG
-public extension AccountCompletion.State {
+public extension AccountCompletion.State where Entity == OnNetwork.Account, Destination == CreateAccountCompletionDestination {
 	static let previewValue: Self = .init(
-		account: .previewValue0,
-		isFirstAccount: true,
+		entity: OnNetwork.Account.previewValue0,
+		isFirstOnNetwork: true,
 		destination: .home
 	)
 }

@@ -1,8 +1,8 @@
 import FeaturePrelude
 import GatherFactorsFeature
 
-// MARK: - CreateAccount.View
-public extension CreateAccount {
+// MARK: - NameNewEntity.View
+public extension NameNewEntity {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<CreateAccount>
@@ -14,7 +14,7 @@ public extension CreateAccount {
 	}
 }
 
-public extension CreateAccount.View {
+public extension NameNewEntity.View {
 	var body: some View {
 		ForceFullScreen {
 			ZStack {
@@ -23,10 +23,10 @@ public extension CreateAccount.View {
 
 				IfLetStore(
 					store.scope(
-						state: \.gatherFactors,
-						action: { .child(.gatherFactors($0)) }
+						state: \.gatherFactor,
+						action: { .child(.gatherFactor($0)) }
 					),
-					then: { GatherFactors.View(store: $0) }
+					then: { GatherFactor.View(store: $0) }
 				)
 				.zIndex(1)
 			}
@@ -34,7 +34,7 @@ public extension CreateAccount.View {
 	}
 }
 
-internal extension CreateAccount.View {
+internal extension NameNewEntity.View {
 	@ViewBuilder
 	var createAccountView: some View {
 		WithViewStore(
@@ -109,8 +109,8 @@ internal extension CreateAccount.View {
 	}
 }
 
-// MARK: - CreateAccount.View.ViewState
-extension CreateAccount.View {
+// MARK: - NameNewEntity.View.ViewState
+extension NameNewEntity.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		public var titleText: String
@@ -118,10 +118,9 @@ extension CreateAccount.View {
 		public var isLoaderVisible: Bool
 		public var createAccountButtonState: ControlState
 		public var isDismissButtonVisible: Bool
-		public var gatherFactors: GatherFactors.State?
-		@BindableState public var focusedField: CreateAccount.State.Field?
+		@BindableState public var focusedField: NameNewEntity.State.Field?
 
-		init(state: CreateAccount.State) {
+		init(state: NameNewEntity.State) {
 			titleText = state.isFirstAccount == false ? L10n.CreateAccount.createNewAccount : L10n.CreateAccount.createFirstAccount
 			accountName = state.inputtedAccountName
 			isLoaderVisible = state.isCreatingAccount
@@ -129,17 +128,16 @@ extension CreateAccount.View {
 			createAccountButtonState = (isNameValid && !state.isCreatingAccount) ? .enabled : .disabled
 			isDismissButtonVisible = !state.shouldCreateProfile && state.factorSources != nil
 			focusedField = state.focusedField
-			gatherFactors = state.gatherFactors
 		}
 	}
 }
 
-// MARK: - CreateAccount.View.ViewStore
-private extension CreateAccount.View {
-	typealias ViewStore = ComposableArchitecture.ViewStore<CreateAccount.View.ViewState, CreateAccount.Action.ViewAction>
+// MARK: - NameNewEntity.View.ViewStore
+private extension NameNewEntity.View {
+	typealias ViewStore = ComposableArchitecture.ViewStore<NameNewEntity.View.ViewState, NameNewEntity.Action.ViewAction>
 }
 
-private extension CreateAccount.View {
+private extension NameNewEntity.View {
 	func title(with viewStore: ViewStore) -> some View {
 		Text(viewStore.titleText)
 			.foregroundColor(.app.gray1)
@@ -159,12 +157,12 @@ private extension CreateAccount.View {
 #if DEBUG
 import SwiftUI // NB: necessary for previews to appear
 
-struct CreateAccount_Previews: PreviewProvider {
+struct NameNewEntity_Previews: PreviewProvider {
 	static var previews: some View {
-		CreateAccount.View(
+		NameNewEntity.View(
 			store: .init(
 				initialState: .init(shouldCreateProfile: false),
-				reducer: CreateAccount()
+				reducer: NameNewEntity()
 			)
 		)
 	}

@@ -22,7 +22,7 @@ public extension GatherFactors.View {
 			ForceFullScreen {
 				VStack {
 					NavigationBar(
-						titleText: viewStore.purpose.display,
+						titleText: viewStore.purpose.purpose.display,
 						leadingItem:
 						Text("\(viewStore.index + 1)/\(viewStore.factorCount)")
 							.padding(),
@@ -54,7 +54,7 @@ extension GatherFactors.View {
 	struct ViewState: Equatable {
 		public var factorCount: Int
 		public var index: Int
-		public var purpose: GatherFactorPurpose
+		public var purpose: Purpose
 		public var isLast: Bool { index == factorCount - 1 }
 		public var canProceed: Bool
 		init(state: GatherFactors.State) {
@@ -66,44 +66,43 @@ extension GatherFactors.View {
 	}
 }
 
-extension GatherFactorPurpose {
+extension GatherFactorPurpose_ {
 	var display: String {
 		switch self {
 		case .derivePublicKey(.createAccount):
 			return "Derive PubKey: Create Account"
 		case .derivePublicKey(.createPersona):
 			return "Derive PubKey: Create Persona"
-		case let .sign(toSign):
-			switch toSign.mode {
-			case .proofOfOwnership:
-				return "Sign Proof of ownership"
-			case .transaction(.fromDapp):
-				return "Sign TX: From Dapp"
-			case .transaction(.fromFallet(.faucet)):
-				return "Sign TX: Use faucet"
-			case .transaction(.fromFallet(.transfer)):
-				return "Sign TX: Transfer"
-			case .transaction(.fromFallet(.securitize(.account))):
-				return "Sign TX: Securitize account"
-			case .transaction(.fromFallet(.securitize(.persona))):
-				return "Sign TX: Securitize persona"
-			}
+		case .sign(.proofOfOwnership):
+			return "Sign Proof of ownership"
+//			case .transaction(.fromDapp):
+//				return "Sign TX: From Dapp"
+//			case .transaction(.fromFallet(.faucet)):
+//				return "Sign TX: Use faucet"
+//			case .transaction(.fromFallet(.transfer)):
+//				return "Sign TX: Transfer"
+//			case .transaction(.fromFallet(.securitize(.account))):
+//				return "Sign TX: Securitize account"
+//			case .transaction(.fromFallet(.securitize(.persona))):
+//				return "Sign TX: Securitize persona"
+//			}
+		default: fatalError()
 		}
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - GatherFactors_Preview
-struct GatherFactors_Preview: PreviewProvider {
-	static var previews: some View {
-		GatherFactors.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: GatherFactors()
-			)
-		)
-	}
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - GatherFactors_Preview
+// struct GatherFactors_Preview: PreviewProvider {
+//	static var previews: some View {
+//		GatherFactors.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: GatherFactors()
+//			)
+//		)
+//	}
+// }
+// #endif

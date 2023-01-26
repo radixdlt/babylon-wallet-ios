@@ -2,7 +2,7 @@ import FeaturePrelude
 import ProfileClient
 
 // MARK: - GatherFactors
-public struct GatherFactors: Sendable, ReducerProtocol {
+public struct GatherFactors<Purpose: GatherFactorPurposeProtocol>: Sendable, ReducerProtocol {
 	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.keychainClient) var keychainClient
 	public init() {}
@@ -24,13 +24,14 @@ extension GatherFactors {
 		case .internal(.view(.proceed)):
 			precondition(state.canProceed)
 			if state.isLast {
-				let result = try! GatherFactorsResult(
-					purpose: state.purpose,
-					results: .init(state.results.values)
-				)
-				return .run { send in
-					await send(.delegate(.finishedWithResult(result)))
-				}
+//				let result = try! GatherFactorsResult(
+//					purpose: state.purpose,
+//					results: .init(state.results.values)
+//				)
+//				return .run { send in
+//					await send(.delegate(.finishedWithResult(result)))
+//				}
+				return .none
 			} else {
 				state.index += 1
 				return .none

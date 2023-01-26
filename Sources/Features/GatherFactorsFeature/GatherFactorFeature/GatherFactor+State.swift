@@ -3,11 +3,11 @@ import FeaturePrelude
 // MARK: - GatherFactor.State
 public extension GatherFactor {
 	struct State: Sendable, Equatable, Identifiable {
-		public let purpose: GatherFactorPurpose
+		public let purpose: Purpose
 		public let factorSource: FactorSource
 
 		public init(
-			purpose: GatherFactorPurpose,
+			purpose: Purpose,
 			factorSource: FactorSource
 		) {
 			self.purpose = purpose
@@ -21,11 +21,11 @@ public extension GatherFactor.State {
 	var id: ID { factorSource.any().factorSourceID }
 }
 
-#if DEBUG
-public extension GatherFactor.State {
-	static let previewValue: Self = try! .init(
-		purpose: .previewValue,
-		factorSource: .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(.init(mnemonic: .generate()))
-	)
-}
-#endif
+// #if DEBUG
+// public extension GatherFactor.State where Purpose == GatherFactorPurposeDerivePublicKey {
+//	static let previewValue: Self = try! .init(
+//        purpose: ,
+//		factorSource: .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(.init(mnemonic: .generate()))
+//	)
+// }
+// #endif

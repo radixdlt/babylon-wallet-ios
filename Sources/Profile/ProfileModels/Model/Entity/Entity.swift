@@ -33,3 +33,7 @@ public protocol EntityProtocol {
 	/// An optional displayName or label, used by presentation layer only.
 	var displayName: String? { get }
 }
+
+public extension EntityProtocol {
+	var kind: EntityKind { Self.entityKind }
+}

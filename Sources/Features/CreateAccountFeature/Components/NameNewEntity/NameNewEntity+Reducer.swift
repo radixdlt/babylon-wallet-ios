@@ -3,8 +3,8 @@ import FeaturePrelude
 import GatherFactorsFeature
 import ProfileClient
 
-// MARK: - CreateAccount
-public struct CreateAccount: Sendable, ReducerProtocol {
+// MARK: - NameNewEntity
+public struct NameNewEntity: Sendable, ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
@@ -13,8 +13,8 @@ public struct CreateAccount: Sendable, ReducerProtocol {
 
 	public var body: some ReducerProtocolOf<Self> {
 		EmptyReducer()
-			.ifLet(\.gatherFactors, action: /Action.child .. Action.ChildAction.gatherFactors) {
-				GatherFactors()
+			.ifLet(\.gatherFactor, action: /Action.child .. Action.ChildAction.gatherFactor) {
+				GatherFactor()
 					._printChanges()
 			}
 		Reduce(self.core)
@@ -22,30 +22,21 @@ public struct CreateAccount: Sendable, ReducerProtocol {
 }
 
 // MARK: Public
-public extension CreateAccount {
+public extension NameNewEntity {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.createAccountButtonTapped)):
-			guard let factorSources = state.factorSources else {
-				assertionFailure("Should not have allowed to tap continue button if factorSources is nil")
+			guard let genesisFactorSource = state.genesisFactorSource else {
+				assertionFailure("Should not have allowed to tap continue button if genesisFactorSource is nil")
 				return .none
 			}
 			assert(!state.isCreatingAccount)
 			state.focusedField = nil
 
-			// FIXME: read from profile.
-			let accountDerivationPath: AccountHierarchicalDeterministicDerivationPath = try! .init(networkID: .nebunet, index: 1, keyKind: .transactionSigningKey)
-
-			let purpose: GatherFactorPurpose = .derivePublicKey(.createAccount(accountDerivationPath))
-
-			state.gatherFactors = GatherFactors.State(
-				purpose: purpose,
-				gatherFactors: .init(
-					uniqueElements: factorSources.factorSources.map { .init(
-						purpose: purpose,
-						factorSource: $0
-					) }
-				)
+			// FIXME: get
+			state.gatherFactor = .init(
+				purpose: .init(purpose: .createAccount),
+				factorSource: genesisFactorSource
 			)
 
 			if state.shouldCreateProfile {
@@ -55,12 +46,12 @@ public extension CreateAccount {
 			}
 
 		case let .internal(.system(.createdNewAccountResult(.failure(error)))):
-			state.gatherFactors = nil
+			state.gatherFactor = nil
 			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.system(.createdNewAccountResult(.success(account)))):
-			state.gatherFactors = nil
+			state.gatherFactor = nil
 			return .run { [isFirstAccount = state.isFirstAccount] send in
 				await send(.delegate(.createdNewAccount(account: account, isFirstAccount: isFirstAccount)))
 			}
@@ -103,11 +94,12 @@ public extension CreateAccount {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .child(.gatherFactors(.delegate(.finishedWithResult(result)))):
+		case let .child(.gatherFactor(.delegate(.finishedWithResult(result)))):
 			loggerGlobal.critical("🔮 \(String(describing: result))")
+			state.gatherFactor = nil
 			return .none
 
-		case .child(.gatherFactors):
+		case .child(.gatherFactor):
 			return .none
 
 		case .delegate:
@@ -117,7 +109,7 @@ public extension CreateAccount {
 }
 
 // MARK: Private
-private extension CreateAccount {
+private extension NameNewEntity {
 	static func networkAndGateway(_ configuredNetworkAndGateway: AppPreferences.NetworkAndGateway?, profileClient: ProfileClient) async -> AppPreferences.NetworkAndGateway {
 		if let configuredNetworkAndGateway {
 			return configuredNetworkAndGateway

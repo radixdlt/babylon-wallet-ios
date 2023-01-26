@@ -48,18 +48,18 @@ extension GatherFactor.View {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - GatherFactor_Preview
-struct GatherFactor_Preview: PreviewProvider {
-	static var previews: some View {
-		GatherFactor.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: GatherFactor()
-			)
-		)
-	}
-}
-#endif
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+//// MARK: - GatherFactor_Preview
+// struct GatherFactor_Preview: PreviewProvider {
+//	static var previews: some View {
+//		GatherFactor.View(
+//			store: .init(
+//				initialState: .previewValue,
+//				reducer: GatherFactor()
+//			)
+//		)
+//	}
+// }
+// #endif

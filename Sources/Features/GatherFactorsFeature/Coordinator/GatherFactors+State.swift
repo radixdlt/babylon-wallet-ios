@@ -3,23 +3,23 @@ import FeaturePrelude
 // MARK: - GatherFactors.State
 public extension GatherFactors {
 	struct State: Sendable, Equatable {
-		public var purpose: GatherFactorPurpose
-		public var gatherFactors: IdentifiedArrayOf<GatherFactor.State>
-		public var index: IdentifiedArrayOf<GatherFactor.State>.Index
-		public var currentFactor: GatherFactor.State {
+		public var purpose: Purpose
+		public var gatherFactors: IdentifiedArrayOf<GatherFactor<Purpose>.State>
+		public var index: IdentifiedArrayOf<GatherFactor<Purpose>.State>.Index
+		public var currentFactor: GatherFactor<Purpose>.State {
 			get { gatherFactors[index] }
 			set {
 				self.gatherFactors[id: newValue.id] = newValue
 			}
 		}
 
-		public var results: OrderedDictionary<GatherFactor.State.ID, GatherFactorResult>
+		public var results: OrderedDictionary<GatherFactor<Purpose>.State.ID, Purpose.Produce>
 
 		public init(
-			purpose: GatherFactorPurpose,
-			gatherFactors: IdentifiedArrayOf<GatherFactor.State>,
-			index: IdentifiedArrayOf<GatherFactor.State>.Index = 0,
-			results: OrderedDictionary<GatherFactor.State.ID, GatherFactorResult> = [:]
+			purpose: Purpose,
+			gatherFactors: IdentifiedArrayOf<GatherFactor<Purpose>.State>,
+			index: IdentifiedArrayOf<GatherFactor<Purpose>.State>.Index = 0,
+			results: OrderedDictionary<GatherFactor<Purpose>.State.ID, Purpose.Produce> = [:]
 		) {
 			precondition(!gatherFactors.isEmpty, "gatherFactors cannot be empty")
 			self.purpose = purpose
@@ -30,11 +30,11 @@ public extension GatherFactors {
 	}
 }
 
-#if DEBUG
-public extension GatherFactors.State {
-	static let previewValue: Self = .init(
-		purpose: .previewValue,
-		gatherFactors: [.previewValue]
-	)
-}
-#endif
+// #if DEBUG
+// public extension GatherFactors.State {
+//	static let previewValue: Self = .init(
+//		purpose: .previewValue,
+//		gatherFactors: [.previewValue]
+//	)
+// }
+// #endif
