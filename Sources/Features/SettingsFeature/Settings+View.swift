@@ -2,6 +2,7 @@ import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
+import PersonasFeature
 import ProfileClient
 #if DEBUG
 import ProfileView
@@ -49,6 +50,15 @@ public extension AppSettings.View {
 							action: { .child(.manageGatewayAPIEndpoints($0)) }
 						),
 						then: { ManageGatewayAPIEndpoints.View(store: $0) }
+					)
+					.zIndex(2)
+
+					IfLetStore(
+						store.scope(
+							state: \.personas,
+							action: { .child(.personas($0)) }
+						),
+						then: { Personas.View(store: $0) }
 					)
 					.zIndex(2)
 				}

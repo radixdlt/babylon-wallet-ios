@@ -202,6 +202,7 @@ package.addModules([
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
+			"PersonasFeature",
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
 			"ProfileView",
 		],

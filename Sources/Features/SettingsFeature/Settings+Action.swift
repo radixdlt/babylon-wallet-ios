@@ -3,6 +3,7 @@ import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
 import P2PModels
+import PersonasFeature
 import Profile
 
 // MARK: - AppSettings.Action
@@ -21,6 +22,7 @@ public extension AppSettings.Action {
 	enum ChildAction: Sendable, Equatable {
 		case manageP2PClients(ManageP2PClients.Action)
 		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
+		case personas(Personas.Action)
 	}
 }
 

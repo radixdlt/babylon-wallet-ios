@@ -103,7 +103,7 @@ public extension AppSettings {
 			return .none
 
 		case .internal(.view(.personasButtonTapped)):
-			// TODO: init persona state
+			state.personas = .init()
 			return .none
 		}
 	}
