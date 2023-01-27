@@ -483,6 +483,22 @@ package.addModules([
 		],
 		tests: .yes()
 	),
+        .module(
+                name: "RadixConnectModels",
+                category: .radixConnectRewrite,
+                dependencies: [
+                        "Cryptography",
+                ],
+                tests: .yes()
+        ),
+        .module(
+                name: "SignalingClient",
+                category: .radixConnectRewrite,
+                dependencies: [
+                        "RadixConnectModels",
+                ],
+                tests: .yes()
+        ),
 	.module(
 		name: "Cryptography",
 		dependencies: [
@@ -614,6 +630,7 @@ extension Package {
 			static let testing: Self = .module(name: "Testing")
 			static let engineToolkit: Self = .module(name: "EngineToolkit")
 			static let radixConnect: Self = .module(name: "RadixConnect")
+                        static let radixConnectRewrite: Self = .module(name: "RadixConnectRewrite")
 			static let profile: Self = .module(name: "Profile")
 			var pathComponent: String {
 				switch self {
