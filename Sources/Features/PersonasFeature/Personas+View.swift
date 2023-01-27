@@ -19,11 +19,67 @@ public extension Personas.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			// TODO: implement
-			Text("Implement: Personas")
-				.background(Color.yellow)
-				.foregroundColor(.red)
-				.onAppear { viewStore.send(.appeared) }
+			ForceFullScreen {
+				VStack(spacing: .zero) {
+					NavigationBar(
+						// TODO: implement
+						titleText: "Personas",
+						leadingItem: BackButton {
+							viewStore.send(.dismissButtonTapped)
+						}
+					)
+					.foregroundColor(.app.gray1)
+					.padding([.horizontal, .top], .medium3)
+
+					Separator()
+
+					ScrollView {
+						HStack {
+							// TODO: implement
+							Text("Personas description text")
+								.foregroundColor(.app.gray2)
+								.textStyle(.body1HighImportance)
+								.padding([.horizontal, .top], .medium3)
+								.padding(.bottom, .small2)
+
+							Spacer()
+						}
+
+						Separator()
+
+						// TODO: implement
+						/*
+						 VStack(alignment: .leading) {
+						 	ForEachStore(
+						 		store.scope(
+						 			state: \.clients,
+						 			action: { .child(.connection(id: $0, action: $1)) }
+						 		),
+						 		content: {
+						 			ManageP2PClient.View(store: $0)
+						 				.padding(.medium3)
+
+						 			Separator()
+						 		}
+						 	)
+						 }
+						 */
+
+						Button("Create new persona") {
+							// TODO: implement
+						}
+						/*
+						 .controlState(viewStore.canAddMoreConnections ? .enabled : .disabled)
+						 .buttonStyle(.secondaryRectangular(
+						 	shouldExpand: true,
+						 	image: .init(asset: AssetResource.qrCodeScanner)
+						 ))
+						 */
+						.padding(.horizontal, .medium3)
+						.padding(.vertical, .large1)
+					}
+				}
+			}
 		}
 	}
 }
