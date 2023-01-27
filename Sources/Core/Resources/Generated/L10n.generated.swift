@@ -295,6 +295,8 @@ public enum L10n {
     public static let inspectProfileButtonTitle = L10n.tr("Localizable", "settings.inspectProfileButtonTitle", fallback: "Inspect Profile")
     /// No Wallet Data Found
     public static let noProfileText = L10n.tr("Localizable", "settings.noProfileText", fallback: "No Wallet Data Found")
+    /// Personas
+    public static let personasButtonTitle = L10n.tr("Localizable", "settings.personasButtonTitle", fallback: "Personas")
     /// Wallet Settings
     public static let title = L10n.tr("Localizable", "settings.title", fallback: "Wallet Settings")
     /// Version: %@ build #%@

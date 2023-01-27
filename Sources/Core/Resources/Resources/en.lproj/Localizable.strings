@@ -117,6 +117,7 @@
 "settings.gatewayButtonTitle" = "Network Gateway";
 "settings.inspectProfileButtonTitle" = "Inspect Profile";
 "settings.noProfileText" = "No Wallet Data Found";
+"settings.personasButtonTitle" = "Personas";
 "settings.title" = "Wallet Settings";
 "settings.versionInfo" = "Version: %@ build #%@";
 

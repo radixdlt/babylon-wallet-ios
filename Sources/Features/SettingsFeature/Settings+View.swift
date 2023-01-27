@@ -103,6 +103,13 @@ private extension AppSettings.View {
 							viewStore.send(.editGatewayAPIEndpointButtonTapped)
 						}
 
+						Row(
+							L10n.Settings.personasButtonTitle,
+							icon: Image(asset: AssetResource.personas)
+						) {
+							// TODO: implement personas screen
+						}
+
 						Spacer()
 							.frame(height: .large3)
 
