@@ -107,7 +107,7 @@ private extension AppSettings.View {
 							L10n.Settings.personasButtonTitle,
 							icon: Image(asset: AssetResource.personas)
 						) {
-							// TODO: implement personas screen
+							viewStore.send(.personasButtonTapped)
 						}
 
 						Spacer()

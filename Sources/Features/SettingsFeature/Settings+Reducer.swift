@@ -48,6 +48,7 @@ public extension AppSettings {
 		case let .internal(.system(.loadP2PClientsResult(.success(clients)))):
 			state.canAddP2PClient = clients.isEmpty
 			return .none
+
 		case let .internal(.system(.loadP2PClientsResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
@@ -92,11 +93,17 @@ public extension AppSettings {
 
 		case .child, .delegate:
 			return .none
+
 		case .internal(.view(.addP2PClientButtonTapped)):
 			state.manageP2PClients = .init(newConnection: .init())
 			return .none
+
 		case .internal(.view(.editGatewayAPIEndpointButtonTapped)):
 			state.manageGatewayAPIEndpoints = .init()
+			return .none
+
+		case .internal(.view(.personasButtonTapped)):
+			// TODO: init persona state
 			return .none
 		}
 	}

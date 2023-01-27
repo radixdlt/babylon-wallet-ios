@@ -35,6 +35,7 @@ public extension AppSettings.Action {
 		case addP2PClientButtonTapped
 
 		case editGatewayAPIEndpointButtonTapped
+		case personasButtonTapped
 
 		#if DEBUG
 		case debugInspectProfileButtonTapped
