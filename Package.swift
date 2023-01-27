@@ -192,6 +192,11 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "PersonasFeature",
+		dependencies: [],
+		tests: .yes()
+	),
+	.feature(
 		name: "SettingsFeature",
 		dependencies: [
 			"GatewayAPI",
