@@ -1,8 +1,31 @@
 import Prelude
 
-// MARK: - P2P.ToDapp.Response.Failure.Kind.Error
-public extension P2P.ToDapp.Response.Failure.Kind {
-	enum Error: String, Sendable, LocalizedError, Hashable {
+// MARK: - P2P.ToDapp.WalletInteractionFailureResponse
+public extension P2P.ToDapp {
+	struct WalletInteractionFailureResponse: Sendable, Hashable, Encodable {
+		/// *MUST* match an ID from an incoming request from Dapp.
+		public let interactionId: P2P.FromDapp.WalletInteraction.ID
+		public let errorType: ErrorType
+		public let message: String?
+
+		public init(
+			interactionId: P2P.FromDapp.WalletInteraction.ID,
+			errorType: ErrorType,
+			message: String?
+		) {
+			self.interactionId = interactionId
+			self.errorType = errorType
+			self.message = message
+		}
+	}
+}
+
+// MARK: - P2P.ToDapp.WalletInteractionFailureResponse.ErrorType
+public extension P2P.ToDapp.WalletInteractionFailureResponse {
+	// TODO: ask if we should do associated values here for `message` construction,
+	// in which case we'll need to declare discriminators
+	enum ErrorType: String, Sendable, LocalizedError, Hashable, Encodable {
+		case rejectedByUser
 		case wrongNetwork
 		case failedToPrepareTransaction
 		case failedToCompileTransaction
@@ -16,6 +39,8 @@ public extension P2P.ToDapp.Response.Failure.Kind {
 
 		public var errorDescription: String? {
 			switch self {
+			case .rejectedByUser:
+				return "Rejected by user"
 			case .wrongNetwork:
 				return "Wrong network"
 			case .failedToCompileTransaction:

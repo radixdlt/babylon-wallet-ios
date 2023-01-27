@@ -62,6 +62,8 @@ public extension HandleDappRequests.State {
 
 		public init(requestItemToHandle: P2P.RequestItemToHandle) {
 			switch requestItemToHandle.requestItem {
+			case let .auth(item):
+				preconditionFailure("Implement auth! :D")
 			case let .oneTimeAccounts(item):
 				self = .chooseAccounts(
 					.init(request:
@@ -71,7 +73,9 @@ public extension HandleDappRequests.State {
 						)
 					)
 				)
-			case let .sendTransaction(item):
+			case let .ongoingAccounts(item):
+				preconditionFailure("Implement ongoing accounts! :D")
+			case let .send(item):
 				self = .transactionSigning(
 					.init(
 						origin: .p2p(

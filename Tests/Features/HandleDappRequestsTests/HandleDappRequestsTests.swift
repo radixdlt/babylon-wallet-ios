@@ -40,9 +40,9 @@ final class HandleDappRequestsTests: TestCase {
 			XCTAssertNotNil($0.unfinishedRequestsFromClient.next())
 		}
 
-		await store.receive(.internal(.system(.presentViewForP2PRequest(.init(requestItem: request.requestFromDapp.items.first!, parentRequest: request))))) {
-			try $0.currentRequest = .chooseAccounts(
-				.init(request: request)
+		await store.receive(.internal(.system(.presentViewForP2PRequest(.init(requestItem: request.interaction.erasedItems.first!, parentRequest: request))))) {
+			$0.currentRequest = .chooseAccounts(
+				.init(request: try XCTUnwrap(P2P.OneTimeAccountsRequestToHandle(request: request)))
 			)
 		}
 		await clientsWasLoaded.withValue {
@@ -52,10 +52,8 @@ final class HandleDappRequestsTests: TestCase {
 	}
 
 	func test__GIVEN__already_handling_a_request__WHEN__receiveRequest__THEN__new_request_is_queued() async throws {
-		let request = P2P.RequestFromClient.previewValueOneTimeAccountAccess
-
-		let currentRequest: HandleDappRequests.State.CurrentRequest = try .chooseAccounts(
-			.init(request: request)
+		let currentRequest: HandleDappRequests.State.CurrentRequest = .chooseAccounts(
+			.init(request: try XCTUnwrap(P2P.OneTimeAccountsRequestToHandle(request: .previewValueOneTimeAccountAccess)))
 		)
 
 		let store = TestStore(
@@ -84,30 +82,31 @@ final class HandleDappRequestsTests: TestCase {
 		let messageSentToDapp = ActorIsolated<P2P.ResponseToClientByID?>(nil)
 
 		let currentNetworkID = NetworkID.mardunet
-		let request = try P2P.RequestFromClient(
+		let request = P2P.RequestFromClient(
 			originalMessage: .previewValue,
-			requestFromDapp: .init(
+			interaction: .init(
 				id: .previewValue0,
+				items: .request(
+					.unauthorized(.init(
+						oneTimeAccounts: .previewValue // FIXME: should be testValue
+					))
+				),
 				metadata: .init(
 					networkId: .nebunet,
 					origin: "",
 					dAppId: ""
-				), items: [
-					.oneTimeAccounts(.previewValue),
-				]
+				)
 			),
 			client: .previewValue
 		)
 
-		let error = P2P.ToDapp.Response.Failure.Kind.Error.wrongNetwork
+		let error = P2P.ToDapp.WalletInteractionFailureResponse.ErrorType.wrongNetwork
 		let errorMsg = "Request received from dApp for network nebunet, but you are currently connected to mardunet."
 
-		let response = P2P.ToDapp.Response.failure(
-			.init(
-				id: request.id,
-				kind: .error(error),
-				message: errorMsg
-			)
+		let response = P2P.ToDapp.WalletInteractionFailureResponse(
+			interactionId: request.interaction.id,
+			errorType: error,
+			message: errorMsg
 		)
 
 		let store = TestStore(
@@ -118,7 +117,7 @@ final class HandleDappRequestsTests: TestCase {
 		) {
 			$0.profileClient.getCurrentNetworkID = { currentNetworkID }
 			$0.errorQueue.schedule = {
-				guard let error = $0 as? P2P.ToDapp.Response.Failure.Kind.Error else {
+				guard let error = $0 as? P2P.ToDapp.WalletInteractionFailureResponse.ErrorType else {
 					return XCTFail("wrong error type")
 				}
 				XCTAssertEqual(error, .wrongNetwork)
@@ -144,7 +143,7 @@ final class HandleDappRequestsTests: TestCase {
 		await store.receive(.internal(.system(.failedWithError(request, error, errorMsg))))
 
 		await messageSentToDapp.withValue {
-			XCTAssertEqual($0?.responseToDapp, response)
+			XCTAssertEqual($0?.responseToDapp, .failure(response))
 		}
 	}
 }

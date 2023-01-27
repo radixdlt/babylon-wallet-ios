@@ -3,28 +3,18 @@ import FeaturePrelude
 // MARK: - DappConnectionRequest.State
 public extension DappConnectionRequest {
 	struct State: Equatable {
-		public let request: P2P.OneTimeAccountAddressesRequestToHandle
+		public let request: P2P.OneTimeAccountsRequestToHandle
 
 		public init(
-			request: P2P.OneTimeAccountAddressesRequestToHandle
+			request: P2P.OneTimeAccountsRequestToHandle
 		) {
 			self.request = request
 		}
 	}
 }
 
-public extension DappConnectionRequest.State {
-	init(
-		request: P2P.RequestFromClient
-	) throws {
-		try self.init(
-			request: .init(request: request)
-		)
-	}
-}
-
 #if DEBUG
 public extension DappConnectionRequest.State {
-	static var previewValue: Self { try! .init(request: .previewValue) }
+	static var previewValue: Self { .init(request: .init(request: .previewValueOneTimeAccountAccess)!) }
 }
 #endif

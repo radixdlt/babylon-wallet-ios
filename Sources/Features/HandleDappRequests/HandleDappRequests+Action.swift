@@ -36,7 +36,7 @@ public extension HandleDappRequests.Action.InternalAction {
 		case sendMessageReceivedReceiptBackToPeerResult(TaskResult<P2PConnections.IncomingMessage>)
 		case receiveRequestFromP2PClientResult(TaskResult<P2P.RequestFromClient>)
 		case rejected(P2P.RequestFromClient)
-		case failedWithError(P2P.RequestFromClient, P2P.ToDapp.Response.Failure.Kind.Error, String?)
+		case failedWithError(P2P.RequestFromClient, P2P.ToDapp.WalletInteractionFailureResponse.ErrorType, String?)
 		case handleNextRequestItemIfNeeded
 		case presentViewForP2PRequest(P2P.RequestItemToHandle)
 		case sendResponseBackToDappResult(TaskResult<P2P.SentResponseToClient>)

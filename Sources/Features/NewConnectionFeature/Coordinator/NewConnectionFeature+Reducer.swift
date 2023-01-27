@@ -4,11 +4,8 @@ import P2PConnectivityClient
 // MARK: - NewConnection
 public struct NewConnection: Sendable, ReducerProtocol {
 	public init() {}
-}
 
-public extension NewConnection {
-	@ReducerBuilderOf<Self>
-	var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerProtocolOf<Self> {
 		EmptyReducer()
 			.ifCaseLet(/State.localNetworkPermission, action: /Action.child .. Action.ChildAction.localNetworkPermission) {
 				LocalNetworkPermission()

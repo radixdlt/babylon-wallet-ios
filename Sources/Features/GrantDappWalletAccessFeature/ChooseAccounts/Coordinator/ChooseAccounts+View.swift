@@ -42,12 +42,11 @@ public extension ChooseAccounts.View {
 					ScrollView {
 						VStack {
 							VStack(spacing: .medium2) {
-								let explanation = String(describing: viewStore.oneTimeAccountAddressesRequest.numberOfAddresses)
-								Text(L10n.DApp.ChooseAccounts.explanation(explanation))
+								Text(L10n.DApp.ChooseAccounts.explanation(viewStore.numberOfAccountsExplanation))
 									.foregroundColor(.app.gray1)
 									.textStyle(.sheetTitle)
 
-								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.requestFromDapp.metadata.dAppId))
+								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.interaction.metadata.dAppId))
 									.foregroundColor(.app.gray1)
 									.textStyle(.body1Regular)
 									.padding(.medium1)
@@ -89,23 +88,6 @@ public extension ChooseAccounts.View {
 	}
 }
 
-// MARK: - P2P.FromDapp.OneTimeAccountsReadRequestItem.Mode + CustomStringConvertible
-extension P2P.FromDapp.OneTimeAccountsReadRequestItem.Mode: CustomStringConvertible {
-	public var description: String {
-		switch self {
-		case let .exactly(exactly):
-			let numberOfAccounts = exactly.oneOrMore
-			if numberOfAccounts == 1 {
-				return L10n.DApp.ChooseAccounts.explanationExactlyOneAccount
-			} else {
-				return L10n.DApp.ChooseAccounts.explanationExactNumberOfAccounts(Int(numberOfAccounts))
-			}
-		case .oneOrMore:
-			return L10n.DApp.ChooseAccounts.explanationAtLeastOneAccount
-		}
-	}
-}
-
 // MARK: - ChooseAccounts.View.ChooseAccountsViewStore
 private extension ChooseAccounts.View {
 	typealias ChooseAccountsViewStore = ComposableArchitecture.ViewStore<ChooseAccounts.View.ViewState, ChooseAccounts.Action.ViewAction>
@@ -114,15 +96,39 @@ private extension ChooseAccounts.View {
 // MARK: - ChooseAccounts.View.ViewState
 extension ChooseAccounts.View {
 	struct ViewState: Equatable {
-		var canProceed: Bool
-		let oneTimeAccountAddressesRequest: P2P.FromDapp.OneTimeAccountsReadRequestItem
-		let requestFromDapp: P2P.FromDapp.Request
+		let canProceed: Bool
+		let oneTimeAccountAddressesRequest: P2P.FromDapp.WalletInteraction.OneTimeAccountsRequestItem
+		let numberOfAccountsExplanation: String
+		let interaction: P2P.FromDapp.WalletInteraction
 
 		init(state: ChooseAccounts.State) {
-			canProceed = state.canProceed
+			canProceed = {
+				let numberOfAccounts = state.request.requestItem.numberOfAccounts
+				switch numberOfAccounts.quantifier {
+				case .atLeast:
+					return state.selectedAccounts.count >= numberOfAccounts.quantity
+				case .exactly:
+					return state.selectedAccounts.count == numberOfAccounts.quantity
+				}
+			}()
 			// FIXME: remove Force Unwrap
 			oneTimeAccountAddressesRequest = state.request.requestItem
-			requestFromDapp = state.request.parentRequest.requestFromDapp
+			interaction = state.request.parentRequest.interaction
+			numberOfAccountsExplanation = {
+				let numberOfAccounts = state.request.requestItem.numberOfAccounts
+				switch numberOfAccounts.quantifier {
+				case .exactly:
+					let quantity = numberOfAccounts.quantity
+					if quantity == 1 {
+						return L10n.DApp.ChooseAccounts.explanationExactlyOneAccount
+					} else {
+						return L10n.DApp.ChooseAccounts.explanationExactNumberOfAccounts(quantity)
+					}
+				case .atLeast:
+					// TODO: revise this localization
+					return L10n.DApp.ChooseAccounts.explanationAtLeastOneAccount
+				}
+			}()
 		}
 	}
 }
