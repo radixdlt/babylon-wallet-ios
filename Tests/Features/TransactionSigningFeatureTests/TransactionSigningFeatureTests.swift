@@ -4,10 +4,10 @@ import TransactionSigningFeature
 
 @MainActor
 final class TransactionSigningFeatureTests: TestCase {
-	let request = P2P.SignTransactionRequestToHandle(
+	let request = P2P.SendTransactionToHandle(
 		requestItem: .init(
-			transactionManifest: .mock,
 			version: .default,
+			transactionManifest: .mock,
 			message: nil
 		),
 		parentRequest: .previewValue

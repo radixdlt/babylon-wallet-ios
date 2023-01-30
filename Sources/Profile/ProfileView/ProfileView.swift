@@ -351,7 +351,7 @@ public extension PerNetworkView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			ForEach(perNetwork.dictionary.keys) { networkID in
+			ForEach(perNetwork.dictionary.keys, id: \.self) { networkID in
 				OnNetworkView(
 					onNetwork: try! perNetwork.onNetwork(id: networkID),
 					indentation: inOneLevel

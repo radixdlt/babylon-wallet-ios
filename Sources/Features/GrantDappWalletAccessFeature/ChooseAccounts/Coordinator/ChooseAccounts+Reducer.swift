@@ -54,23 +54,18 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 				let oneTimeAccountRequest = state.request.requestItem
 				switch action {
 				case .internal(.view(.didSelect)):
+					let numberOfAccounts = oneTimeAccountRequest.numberOfAccounts
+
 					if account.isSelected {
 						state.accounts[id: id]?.isSelected = false
 					} else {
-						switch oneTimeAccountRequest.numberOfAddresses {
-						case .oneOrMore:
+						switch numberOfAccounts.quantifier {
+						case .atLeast:
 							state.accounts[id: id]?.isSelected = true
-						case let .exactly(numberOfAddresses):
-							guard state.selectedAccounts.count < numberOfAddresses.oneOrMore else { break }
+						case .exactly:
+							guard state.selectedAccounts.count < numberOfAccounts.quantity else { break }
 							state.accounts[id: id]?.isSelected = true
 						}
-					}
-
-					switch oneTimeAccountRequest.numberOfAddresses {
-					case .oneOrMore:
-						state.canProceed = state.selectedAccounts.count >= 1
-					case let .exactly(numberOfAddresses):
-						state.canProceed = state.selectedAccounts.count == numberOfAddresses.oneOrMore
 					}
 
 					return .none

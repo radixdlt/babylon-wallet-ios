@@ -26,8 +26,8 @@ public extension DappConnectionRequest.Action {
 // MARK: - DappConnectionRequest.Action.DelegateAction
 public extension DappConnectionRequest.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case allowed(P2P.OneTimeAccountAddressesRequestToHandle)
-		case rejected(P2P.OneTimeAccountAddressesRequestToHandle)
+		case allowed(P2P.OneTimeAccountsRequestToHandle)
+		case rejected(P2P.OneTimeAccountsRequestToHandle)
 	}
 }
 

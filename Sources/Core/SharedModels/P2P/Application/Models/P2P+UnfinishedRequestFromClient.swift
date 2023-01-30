@@ -1,12 +1,11 @@
 import Prelude
 
 public extension P2P {
-	typealias OneTimeAccountAddressesRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.OneTimeAccountsReadRequestItem>
-
-	typealias SignTransactionRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.SendTransactionWriteRequestItem>
+	typealias OneTimeAccountsRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.WalletInteraction.OneTimeAccountsRequestItem>
+	typealias SendTransactionToHandle = SpecificRequestItemToHandle<P2P.FromDapp.WalletInteraction.SendTransactionItem>
 
 	/// A simple wrapper around a wallet request item to handle and its parent request.
-	struct SpecificRequestItemToHandle<RequestItem: P2PFromDappWalletRequestItemProtocol>: Sendable, Hashable, Identifiable {
+	struct SpecificRequestItemToHandle<RequestItem: Sendable & Hashable>: Sendable, Hashable {
 		public let requestItem: RequestItem
 		public let parentRequest: P2P.RequestFromClient
 
@@ -20,56 +19,52 @@ public extension P2P {
 	}
 }
 
-public extension P2P.OneTimeAccountAddressesRequestToHandle {
-	init(request: P2P.RequestFromClient) throws {
-		guard
-			let oneTimeAccountRequest = request.requestFromDapp.items.compactMap(\.oneTimeAccounts).first
-		else {
-			throw P2P.FromDapp.WalletRequestItem.ExpectedOneTimeAccountAddressesRequest()
+public extension P2P.OneTimeAccountsRequestToHandle {
+	init?(request: P2P.RequestFromClient) {
+		switch request.interaction.items {
+		case let .request(.authorized(items)):
+			if let item = items.oneTimeAccounts {
+				self.init(requestItem: item, parentRequest: request)
+			} else {
+				return nil
+			}
+		case let .request(.unauthorized(items)):
+			if let item = items.oneTimeAccounts {
+				self.init(requestItem: item, parentRequest: request)
+			} else {
+				return nil
+			}
+		case .transaction:
+			return nil
 		}
-
-		self.init(
-			requestItem: oneTimeAccountRequest,
-			parentRequest: request
-		)
 	}
-}
-
-public extension P2P.SpecificRequestItemToHandle {
-	typealias ID = P2P.RequestFromClient.ID
-	var id: ID { parentRequest.id }
 }
 
 // MARK: - P2P.RequestItemToHandle
 public extension P2P {
 	/// A simple wrapper around a wallet request item to handle and its parent request.
-	struct RequestItemToHandle: Sendable, Hashable, Identifiable {
-		public let requestItem: P2P.FromDapp.WalletRequestItem
+	struct RequestItemToHandle: Sendable, Hashable {
+		public let requestItem: P2P.FromDapp.WalletInteraction.AnyInteractionItem
 		public let parentRequest: P2P.RequestFromClient
-		public init(requestItem: P2P.FromDapp.WalletRequestItem, parentRequest: P2P.RequestFromClient) {
+		public init(requestItem: P2P.FromDapp.WalletInteraction.AnyInteractionItem, parentRequest: P2P.RequestFromClient) {
 			self.requestItem = requestItem
 			self.parentRequest = parentRequest
 		}
 	}
 }
 
-public extension P2P.RequestItemToHandle {
-	typealias ID = P2P.RequestFromClient.ID
-	var id: ID { parentRequest.id }
-}
-
 #if DEBUG
 public extension P2P.RequestItemToHandle {
 	static let previewValueOneTimeAccount: Self = .init(
 		requestItem: .oneTimeAccounts(.previewValue),
-		parentRequest: try! .init(
+		parentRequest: .init(
 			originalMessage: .previewValue,
-			requestFromDapp: .previewValueOneTimeAccount,
+			interaction: .previewValueOneTimeAccount,
 			client: .previewValue
 		)
 	)
 }
-#endif // DEBUG
+#endif
 
 // MARK: - P2P.UnfinishedRequestsFromClient
 public extension P2P {
@@ -82,21 +77,21 @@ public extension P2P {
 
 public extension P2P.UnfinishedRequestsFromClient {
 	mutating func queue(requestFromClient: P2P.RequestFromClient) {
-		guard !queued.contains(where: { $0.id == requestFromClient.id }) else { return }
+		guard !queued.contains(where: { $0.requestFromClient.interaction.id == requestFromClient.interaction.id }) else { return }
 		queued.append(.init(requestFromClient: requestFromClient))
 	}
 
-	mutating func failed(requestID: P2P.RequestFromClient.ID) {
-		if current?.requestFromClient.id == requestID {
+	mutating func failed(interactionId: P2P.FromDapp.WalletInteraction.ID) {
+		if current?.requestFromClient.interaction.id == interactionId {
 			current = nil
 		}
-		queued.removeAll(where: { $0.requestFromClient.id == requestID })
+		queued.removeAll(where: { $0.requestFromClient.interaction.id == interactionId })
 	}
 
 	mutating func finish(
-		_ newlyFinished: P2P.FromDapp.WalletRequestItem,
-		with responseItem: P2P.ToDapp.WalletResponseItem
-	) -> P2P.ToDapp.Response? {
+		_ newlyFinished: P2P.FromDapp.WalletInteraction.AnyInteractionItem,
+		with responseItem: P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem
+	) -> P2P.ToDapp.WalletInteractionResponse? {
 		if current == nil {
 			assertionFailure("Expected current")
 			return nil
@@ -117,7 +112,7 @@ public extension P2P.UnfinishedRequestsFromClient {
 			assertionFailure("What? Do we need to handle requests with no request items? Or bad logic inside `UnfinishedRequestFromClient` type!")
 			return nil
 		}
-		queued.removeAll(where: { $0.id == nextUnfinished.id })
+		queued.removeAll(where: { $0.requestFromClient.interaction.id == nextUnfinished.requestFromClient.interaction.id })
 		return .init(
 			requestItem: requestItem,
 			parentRequest: nextUnfinished.requestFromClient
@@ -135,31 +130,27 @@ internal extension P2P {
 	/// item for each request item. Only once ALL request items have a corresponding response can should
 	/// the wallet respond back with a `P2P.ToDapp.Response`. This data structure keeps track of all
 	/// finished response items and unfinished requests items, for a given `P2P.FromDapp.Request`.
-	struct UnfinishedRequestFromClient: Identifiable, Hashable {
+	struct UnfinishedRequestFromClient: Sendable, Hashable {
 		internal let requestFromClient: P2P.RequestFromClient
-		internal private(set) var finishedResponseItems: [P2P.ToDapp.WalletResponseItem]
-		internal private(set) var unfinishedRequestItems: [P2P.FromDapp.WalletRequestItem]
+		internal private(set) var finishedResponseItems: [P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem]
+		internal private(set) var unfinishedRequestItems: [P2P.FromDapp.WalletInteraction.AnyInteractionItem]
 
 		internal init(requestFromClient: P2P.RequestFromClient) {
 			self.requestFromClient = requestFromClient
 			finishedResponseItems = []
-			unfinishedRequestItems = requestFromClient.requestFromDapp.items
+			unfinishedRequestItems = requestFromClient.interaction.erasedItems
 		}
 	}
 }
 
 internal extension P2P.UnfinishedRequestFromClient {
-	var requestFromDapp: P2P.FromDapp.Request { requestFromClient.requestFromDapp }
-	typealias ID = P2P.RequestFromClient.ID
-	var id: ID { requestFromDapp.id }
-
 	struct AlreadyFinishItem: Swift.Error {}
 	struct UnknownRequestItem: Swift.Error {}
 
 	mutating func finish(
-		_ newlyFinished: P2P.FromDapp.WalletRequestItem,
-		with responseItem: P2P.ToDapp.WalletResponseItem
-	) -> P2P.ToDapp.Response? {
+		_ newlyFinished: P2P.FromDapp.WalletInteraction.AnyInteractionItem,
+		with responseItem: P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem
+	) -> P2P.ToDapp.WalletInteractionResponse? {
 		if !unfinishedRequestItems.contains(where: { $0 == newlyFinished }) {
 //			throw UnknownRequestItem()
 			assertionFailure("Unknown request item")
@@ -177,11 +168,104 @@ internal extension P2P.UnfinishedRequestFromClient {
 			return nil
 		}
 
-		do {
-			return try P2P.ToDapp.Response.to(request: requestFromDapp, items: finishedResponseItems)
-		} catch {
-			assertionFailure("Failed to create response: \(error), discrepancy somewhere in implementation, please fix!")
+		let interaction = requestFromClient.interaction
+
+		if
+			let response = P2P.ToDapp.WalletInteractionSuccessResponse(
+				for: interaction,
+				with: finishedResponseItems
+			)
+		{
+			return .success(response)
+		} else {
+			assertionFailure(
+				"""
+				Failed to create response for interaction:
+				\(interaction)
+
+				... with the following response items:
+				\(finishedResponseItems)
+
+				This is because the interaction is of type `transaction` but no `send` response item was collected.
+
+				Please carefully check the implementation for potential code paths skipped by mistake.
+				"""
+			)
 			return nil
+		}
+	}
+}
+
+public extension P2P.ToDapp.WalletInteractionSuccessResponse {
+	init?(
+		for interaction: P2P.FromDapp.WalletInteraction,
+		with items: [P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem]
+	) {
+		switch interaction.items {
+		case .request:
+			// NB: variadic generics + native case paths should greatly help to simplify this "picking" logic
+			var auth: AuthRequestResponseItem? = nil
+			var oneTimeAccounts: OneTimeAccountsRequestResponseItem? = nil
+			var ongoingAccounts: OngoingAccountsRequestResponseItem? = nil
+			for item in items {
+				switch item {
+				case let .auth(item):
+					auth = item
+				case let .oneTimeAccounts(item):
+					oneTimeAccounts = item
+				case let .ongoingAccounts(item):
+					ongoingAccounts = item
+				case .send:
+					continue
+				}
+			}
+
+			if let auth {
+				self.init(
+					interactionId: interaction.id,
+					items: .request(
+						.authorized(.init(
+							auth: auth,
+							oneTimeAccounts: oneTimeAccounts,
+							ongoingAccounts: ongoingAccounts
+						))
+					)
+				)
+			} else {
+				self.init(
+					interactionId: interaction.id,
+					items: .request(
+						.unauthorized(.init(
+							oneTimeAccounts: oneTimeAccounts
+						))
+					)
+				)
+			}
+
+		case .transaction:
+			var send: SendTransactionResponseItem? = nil
+			for item in items {
+				switch item {
+				case .auth:
+					continue
+				case .oneTimeAccounts:
+					continue
+				case .ongoingAccounts:
+					continue
+				case let .send(item):
+					send = item
+				}
+			}
+
+			// NB: remove this check and the init's optionality when `send` becomes optional (when we introduce more transaction item fields)
+			guard let send else {
+				return nil
+			}
+
+			self.init(
+				interactionId: interaction.id,
+				items: .transaction(.init(send: send))
+			)
 		}
 	}
 }
