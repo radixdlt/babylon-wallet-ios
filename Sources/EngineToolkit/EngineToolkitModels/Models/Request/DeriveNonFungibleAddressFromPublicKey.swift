@@ -1,5 +1,5 @@
-// MARK: - DeriveNonFungibleAddressFromPublicKeyRequest
-public struct DeriveNonFungibleAddressFromPublicKeyRequest: Sendable, Codable, Hashable {
+// MARK: - DeriveNonFungibleGlobalIdFromPublicKeyRequest
+public struct DeriveNonFungibleGlobalIdFromPublicKeyRequest: Sendable, Codable, Hashable {
 	// MARK: Stored properties
 	public let publicKey: Engine.PublicKey
 	public let networkId: NetworkID
@@ -17,18 +17,18 @@ public struct DeriveNonFungibleAddressFromPublicKeyRequest: Sendable, Codable, H
 	}
 }
 
-// MARK: - DeriveNonFungibleAddressFromPublicKeyResponse
-public struct DeriveNonFungibleAddressFromPublicKeyResponse: Sendable, Codable, Hashable {
+// MARK: - DeriveNonFungibleGlobalIdFromPublicKeyResponse
+public struct DeriveNonFungibleGlobalIdFromPublicKeyResponse: Sendable, Codable, Hashable {
 	// MARK: Stored properties
-	public let nonFungibleAddress: NonFungibleAddress
+	public let nonFungibleGlobalId: NonFungibleGlobalId
 
 	// MARK: Init
-	public init(nonFungibleAddress: NonFungibleAddress) {
-		self.nonFungibleAddress = nonFungibleAddress
+	public init(nonFungibleGlobalId: NonFungibleGlobalId) {
+		self.nonFungibleGlobalId = nonFungibleGlobalId
 	}
 
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
-		case nonFungibleAddress = "non_fungible_address"
+		case nonFungibleGlobalId = "non_fungible_address"
 	}
 }

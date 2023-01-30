@@ -52,7 +52,7 @@ CREATE_RESOURCE
         Enum(
             "NonFungible", 
             Array<Tuple>(
-                Tuple(NonFungibleId(1u32), Tuple(Bytes("5c2100"), Bytes("5c2100")))
+                Tuple(NonFungibleLocalId(1u32), Tuple(Bytes("5c2100"), Bytes("5c2100")))
             )
         )
     );

@@ -51,7 +51,6 @@ public enum ErrorResponse: Swift.Error, Sendable, Equatable, Decodable {
 	case deserializationError(DeserializationError)
 	case invalidRequestString(InvalidRequestString)
 	case unexpectedContents(UnexpectedContents)
-	case unexpectedReNodeContents(UnexpectedReNodeContents)
 	case invalidType(InvalidType)
 	case unknownTypeId(UnknownTypeId)
 	case parseError(ParseError)
@@ -106,8 +105,6 @@ public extension ErrorResponse {
 			self = try .transactionValidationError(.init(from: decoder))
 		case .networkMismatchError:
 			self = try .networkMismatchError(.init(from: decoder))
-		case .unexpectedReNodeContents:
-			self = try .unexpectedReNodeContents(.init(from: decoder))
 		}
 	}
 }
@@ -122,7 +119,6 @@ public extension ErrorResponse {
 		case .deserializationError: return .deserializationError
 		case .invalidRequestString: return .invalidRequestString
 		case .unexpectedContents: return .unexpectedContents
-		case .unexpectedReNodeContents: return .unexpectedReNodeContents
 		case .invalidType: return .invalidType
 		case .unknownTypeId: return .unknownTypeId
 		case .parseError: return .parseError
@@ -147,7 +143,6 @@ public enum ErrorKind: String, Swift.Error, Sendable, Equatable, Codable, Custom
 	case deserializationError = "DeserializationError"
 	case invalidRequestString = "InvalidRequestString"
 	case unexpectedContents = "UnexpectedContents"
-	case unexpectedReNodeContents = "UnexpectedReNodeContents"
 	case invalidType = "InvalidType"
 	case unknownTypeId = "UnknownTypeId"
 	case parseError = "ParseError"
@@ -235,21 +230,6 @@ public struct UnexpectedContents: ErrorResponseProtocol {
 	/// The kind that was parsed, e.g. a `Bucket`, which we expect to contain either a `u32` or a `String`,
 	/// which is the `expectedKind` property
 	public let kindBeingParsed: ValueKind
-
-	/// We expect to find any of these types, but found `foundChildKind`.
-	public let allowedChildrenKinds: [ValueKind]
-
-	/// The unexpected type we found, instead of any of the `allowedChildrenKinds`, when parsing the `kindBeingParsed`.
-	public let foundChildKind: ValueKind
-}
-
-// MARK: - UnexpectedReNodeContents
-public struct UnexpectedReNodeContents: ErrorResponseProtocol {
-	public static let errorKind: ErrorKind = .unexpectedContents
-
-	/// The kind that was parsed, e.g. a `Bucket`, which we expect to contain either a `u32` or a `String`,
-	/// which is the `expectedKind` property
-	public let kindBeingParsed: RENode.Kind
 
 	/// We expect to find any of these types, but found `foundChildKind`.
 	public let allowedChildrenKinds: [ValueKind]
@@ -410,23 +390,6 @@ public extension UnexpectedContents {
 		let container = try Self.containerAssertingErrorKind(from: decoder)
 
 		let kindBeingParsed = try container.decode(ValueKind.self, forKey: .kindBeingParsed)
-		let allowedChildrenKinds = try container.decode([ValueKind].self, forKey: .allowedChildrenKinds)
-		let foundChildKind = try container.decode(ValueKind.self, forKey: .foundChildKind)
-
-		self.init(
-			kindBeingParsed: kindBeingParsed,
-			allowedChildrenKinds: allowedChildrenKinds,
-			foundChildKind: foundChildKind
-		)
-	}
-}
-
-// MARK: UnexpectedReNodeContents + Decodable
-public extension UnexpectedReNodeContents {
-	init(from decoder: Decoder) throws {
-		let container = try Self.containerAssertingErrorKind(from: decoder)
-
-		let kindBeingParsed = try container.decode(RENode.Kind.self, forKey: .kindBeingParsed)
 		let allowedChildrenKinds = try container.decode([ValueKind].self, forKey: .allowedChildrenKinds)
 		let foundChildKind = try container.decode(ValueKind.self, forKey: .foundChildKind)
 

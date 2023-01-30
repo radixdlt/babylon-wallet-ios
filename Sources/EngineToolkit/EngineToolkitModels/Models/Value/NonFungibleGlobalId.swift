@@ -1,31 +1,31 @@
 import Foundation
 
-// MARK: - NonFungibleAddress
-public struct NonFungibleAddress: ValueProtocol, Sendable, Codable, Hashable {
+// MARK: - NonFungibleGlobalId
+public struct NonFungibleGlobalId: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .nonFungibleAddress
+	public static let kind: ValueKind = .nonFungibleGlobalId
 	public func embedValue() -> Value_ {
-		.nonFungibleAddress(self)
+		.nonFungibleGlobalId(self)
 	}
 
 	// MARK: Stored properties
 	public let resourceAddress: ResourceAddress
-	public let nonFungibleId: NonFungibleId
+	public let nonFungibleLocalId: NonFungibleLocalId
 
 	// MARK: Init
 
-	public init(resourceAddress: ResourceAddress, nonFungibleId: NonFungibleId) {
+	public init(resourceAddress: ResourceAddress, nonFungibleLocalId: NonFungibleLocalId) {
 		self.resourceAddress = resourceAddress
-		self.nonFungibleId = nonFungibleId
+		self.nonFungibleLocalId = nonFungibleLocalId
 	}
 }
 
-public extension NonFungibleAddress {
+public extension NonFungibleGlobalId {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type
 		case resourceAddress = "resource_address"
-		case nonFungibleId = "non_fungible_id"
+		case nonFungibleLocalId = "non_fungible_id"
 	}
 
 	// MARK: Codable
@@ -33,7 +33,7 @@ public extension NonFungibleAddress {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 		try container.encode(resourceAddress, forKey: .resourceAddress)
-		try container.encode(nonFungibleId, forKey: .nonFungibleId)
+		try container.encode(nonFungibleLocalId, forKey: .nonFungibleLocalId)
 	}
 
 	init(from decoder: Decoder) throws {
@@ -46,7 +46,7 @@ public extension NonFungibleAddress {
 
 		self.init(
 			resourceAddress: try container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			nonFungibleId: try container.decode(NonFungibleId.self, forKey: .nonFungibleId)
+			nonFungibleLocalId: try container.decode(NonFungibleLocalId.self, forKey: .nonFungibleLocalId)
 		)
 	}
 }

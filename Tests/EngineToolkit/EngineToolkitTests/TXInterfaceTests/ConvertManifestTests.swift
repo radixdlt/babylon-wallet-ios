@@ -52,11 +52,11 @@ final class ConvertManifestTests: TestCase {
 
 		    # Other interpreted types
 		    Expression("ALL_WORKTOP_RESOURCES")
-		    NonFungibleAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag", "value")
-		    NonFungibleAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag", 123u32)
-		    NonFungibleAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag", 456u64)
-		    NonFungibleAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag", Bytes("031b84c5567b126440995d3ed5aaba0565d71e1834604819ff9c17f5e9d5dd078f"))
-		    NonFungibleAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag", 1234567890u128)
+		    NonFungibleGlobalId("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag", "value")
+		    NonFungibleGlobalId("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag", 123u32)
+		    NonFungibleGlobalId("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag", 456u64)
+		    NonFungibleGlobalId("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag", Bytes("031b84c5567b126440995d3ed5aaba0565d71e1834604819ff9c17f5e9d5dd078f"))
+		    NonFungibleGlobalId("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag", 1234567890u128)
 
 		    # Uninterpreted
 		    Hash("2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")
@@ -66,11 +66,11 @@ final class ConvertManifestTests: TestCase {
 		    EddsaEd25519Signature("ce993adc51111309a041faa65cbcf1154d21ed0ecdc2d54070bc90b9deb744aa8605b3f686fa178fba21070b4a4678e54eee3486a881e0e328251cd37966de09")
 		    Decimal("1.2")
 		    PreciseDecimal("1.2")
-		    NonFungibleId(Bytes("031b84c5567b126440995d3ed5aaba0565d71e1834604819ff9c17f5e9d5dd078f"))
-		    NonFungibleId(12u32)
-		    NonFungibleId(12345u64)
-		    NonFungibleId(1234567890u128)
-		    NonFungibleId("SomeId");
+		    NonFungibleLocalId(Bytes("031b84c5567b126440995d3ed5aaba0565d71e1834604819ff9c17f5e9d5dd078f"))
+		    NonFungibleLocalId(12u32)
+		    NonFungibleLocalId(12345u64)
+		    NonFungibleLocalId(1234567890u128)
+		    NonFungibleLocalId("SomeId");
 		"""
 
 		let expectedManifest = try TransactionManifest {
@@ -103,11 +103,11 @@ final class ConvertManifestTests: TestCase {
 
 				// Other interpreted types
 				Expression("ALL_WORKTOP_RESOURCES")
-				NonFungibleAddress(resourceAddress: ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"), nonFungibleId: .string("value"))
-				NonFungibleAddress(resourceAddress: ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"), nonFungibleId: .u32(123))
-				NonFungibleAddress(resourceAddress: ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"), nonFungibleId: .u64(456))
-				NonFungibleAddress(resourceAddress: ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"), nonFungibleId: try .bytes([UInt8](hex: "031b84c5567b126440995d3ed5aaba0565d71e1834604819ff9c17f5e9d5dd078f")))
-				NonFungibleAddress(resourceAddress: ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"), nonFungibleId: .uuid("1234567890"))
+				NonFungibleGlobalId(resourceAddress: ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"), nonFungibleLocalId: .string("value"))
+				NonFungibleGlobalId(resourceAddress: ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"), nonFungibleLocalId: .u32(123))
+				NonFungibleGlobalId(resourceAddress: ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"), nonFungibleLocalId: .u64(456))
+				NonFungibleGlobalId(resourceAddress: ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"), nonFungibleLocalId: try .bytes([UInt8](hex: "031b84c5567b126440995d3ed5aaba0565d71e1834604819ff9c17f5e9d5dd078f")))
+				NonFungibleGlobalId(resourceAddress: ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag"), nonFungibleLocalId: .uuid("1234567890"))
 
 				// Uninterpreted
 				try Hash(hex: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")
@@ -117,11 +117,11 @@ final class ConvertManifestTests: TestCase {
 				try EddsaEd25519Signature(hex: "ce993adc51111309a041faa65cbcf1154d21ed0ecdc2d54070bc90b9deb744aa8605b3f686fa178fba21070b4a4678e54eee3486a881e0e328251cd37966de09")
 				Decimal_(value: "1.2")
 				PreciseDecimal("1.2")
-				try NonFungibleId.bytes([UInt8](hex: "031b84c5567b126440995d3ed5aaba0565d71e1834604819ff9c17f5e9d5dd078f"))
-				NonFungibleId.u32(12)
-				NonFungibleId.u64(12345)
-				NonFungibleId.uuid("1234567890")
-				NonFungibleId.string("SomeId")
+				try NonFungibleLocalId.bytes([UInt8](hex: "031b84c5567b126440995d3ed5aaba0565d71e1834604819ff9c17f5e9d5dd078f"))
+				NonFungibleLocalId.u32(12)
+				NonFungibleLocalId.u64(12345)
+				NonFungibleLocalId.uuid("1234567890")
+				NonFungibleLocalId.string("SomeId")
 			}
 		}
 
@@ -298,9 +298,9 @@ final class ConvertManifestTests: TestCase {
 		    Tuple(Enum("Burn"), Tuple(Enum("AllowAll"), Enum("DenyAll")))
 		  )
 		  Some(Enum("NonFungible", Array<Tuple>(
-		    Tuple(NonFungibleId(1u128), Tuple(Array<U8>(92u8, 0u8, 0u8), Array<U8>(92u8, 0u8, 0u8))),
-		    Tuple(NonFungibleId(2u128), Tuple(Array<U8>(92u8, 0u8, 0u8), Array<U8>(92u8, 0u8, 0u8))),
-		    Tuple(NonFungibleId(3u128), Tuple(Array<U8>(92u8, 0u8, 0u8), Array<U8>(92u8, 0u8, 0u8))),
+		    Tuple(NonFungibleLocalId(1u128), Tuple(Array<U8>(92u8, 0u8, 0u8), Array<U8>(92u8, 0u8, 0u8))),
+		    Tuple(NonFungibleLocalId(2u128), Tuple(Array<U8>(92u8, 0u8, 0u8), Array<U8>(92u8, 0u8, 0u8))),
+		    Tuple(NonFungibleLocalId(3u128), Tuple(Array<U8>(92u8, 0u8, 0u8), Array<U8>(92u8, 0u8, 0u8))),
 		  )));
 
 		CALL_METHOD
@@ -355,7 +355,7 @@ final class ConvertManifestTests: TestCase {
 									.array(try .init(elementType: .tuple, elements: [
 										.tuple(
 											.init(values: [
-												.nonFungibleId(.uuid("1")),
+												.nonFungibleLocalId(.uuid("1")),
 												.tuple(
 													.init(values: [
 														.array(
@@ -366,7 +366,7 @@ final class ConvertManifestTests: TestCase {
 											])),
 										.tuple(
 											.init(values: [
-												.nonFungibleId(.uuid("2")),
+												.nonFungibleLocalId(.uuid("2")),
 												.tuple(
 													.init(values: [
 														.array(
@@ -377,7 +377,7 @@ final class ConvertManifestTests: TestCase {
 											])),
 										.tuple(
 											.init(values: [
-												.nonFungibleId(.uuid("3")),
+												.nonFungibleLocalId(.uuid("3")),
 												.tuple(
 													.init(values: [
 														.array(
@@ -434,7 +434,7 @@ final class ConvertManifestTests: TestCase {
 		      Enum(
 		          "NonFungible",
 		          Array<Tuple>(
-		              Tuple(NonFungibleId(1u32), Tuple(Bytes("5c2100"), Bytes("5c2100")))
+		              Tuple(NonFungibleLocalId(1u32), Tuple(Bytes("5c2100"), Bytes("5c2100")))
 		          )
 		      )
 		  );

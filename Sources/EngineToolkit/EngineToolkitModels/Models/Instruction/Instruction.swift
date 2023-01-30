@@ -12,9 +12,6 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 	case callFunction(CallFunction)
 	case callMethod(CallMethod)
 
-	case callNativeFunction(CallNativeFunction)
-	case callNativeMethod(CallNativeMethod)
-
 	case takeFromWorktop(TakeFromWorktop)
 	case takeFromWorktopByAmount(TakeFromWorktopByAmount)
 	case takeFromWorktopByIds(TakeFromWorktopByIds)
@@ -55,12 +52,6 @@ public extension Instruction {
 
 		case .callMethod:
 			return .callMethod
-
-		case .callNativeFunction:
-			return .callNativeFunction
-
-		case .callNativeMethod:
-			return .callNativeMethod
 
 		case .takeFromWorktop:
 			return .takeFromWorktop
@@ -143,12 +134,6 @@ public extension Instruction {
 		case let .callMethod(instruction):
 			try instruction.encode(to: encoder)
 
-		case let .callNativeFunction(instruction):
-			try instruction.encode(to: encoder)
-
-		case let .callNativeMethod(instruction):
-			try instruction.encode(to: encoder)
-
 		case let .takeFromWorktop(instruction):
 			try instruction.encode(to: encoder)
 
@@ -225,12 +210,6 @@ public extension Instruction {
 
 		case .callMethod:
 			self = try .callMethod(.init(from: decoder))
-
-		case .callNativeFunction:
-			self = try .callNativeFunction(.init(from: decoder))
-
-		case .callNativeMethod:
-			self = try .callNativeMethod(.init(from: decoder))
 
 		case .takeFromWorktop:
 			self = try .takeFromWorktop(.init(from: decoder))

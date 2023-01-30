@@ -1,35 +1,35 @@
-// MARK: - DeriveNonFungibleAddressRequest
-public struct DeriveNonFungibleAddressRequest: Sendable, Codable, Hashable {
+// MARK: - DeriveNonFungibleGlobalIdRequest
+public struct DeriveNonFungibleGlobalIdRequest: Sendable, Codable, Hashable {
 	// MARK: Stored properties
 	public let resourceAddress: ResourceAddress
-	public let nonFungibleId: NonFungibleId
+	public let nonFungibleLocalId: NonFungibleLocalId
 
 	// MARK: Init
-	public init(resourceAddress: ResourceAddress, nonFungibleId: NonFungibleId) {
+	public init(resourceAddress: ResourceAddress, nonFungibleLocalId: NonFungibleLocalId) {
 		self.resourceAddress = resourceAddress
-		self.nonFungibleId = nonFungibleId
+		self.nonFungibleLocalId = nonFungibleLocalId
 	}
 
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case resourceAddress = "resource_address"
-		case nonFungibleId = "non_fungible_id"
+		case nonFungibleLocalId = "non_fungible_id"
 	}
 }
 
-// MARK: - DeriveNonFungibleAddressResponse
-public struct DeriveNonFungibleAddressResponse: Sendable, Codable, Hashable {
+// MARK: - DeriveNonFungibleGlobalIdResponse
+public struct DeriveNonFungibleGlobalIdResponse: Sendable, Codable, Hashable {
 	// MARK: Stored properties
-	public let nonFungibleAddress: NonFungibleAddress
+	public let nonFungibleGlobalId: NonFungibleGlobalId
 
 	// MARK: Init
 
-	public init(nonFungibleAddress: NonFungibleAddress) {
-		self.nonFungibleAddress = nonFungibleAddress
+	public init(nonFungibleGlobalId: NonFungibleGlobalId) {
+		self.nonFungibleGlobalId = nonFungibleGlobalId
 	}
 
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
-		case nonFungibleAddress = "non_fungible_address"
+		case nonFungibleGlobalId = "non_fungible_address"
 	}
 }

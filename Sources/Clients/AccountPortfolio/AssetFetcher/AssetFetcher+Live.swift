@@ -35,9 +35,9 @@ extension AssetFetcher: DependencyKey {
 						for resourceAddress in nonFungibleTokenAddresses {
 							taskGroup.addTask {
 								try Task.checkCancellation()
-								let response = try await gatewayAPIClient.getNonFungibleIds(accountAddress, resourceAddress.address)
-								let nonFungibleIds = response.nonFungibleIds.items.map(\.nonFungibleId)
-								return (resourceAddress, nonFungibleIds)
+								let response = try await gatewayAPIClient.getNonFungibleLocalIds(accountAddress, resourceAddress.address)
+								let nonFungibleLocalIds = response.nonFungibleLocalIds.items.map(\.nonFungibleLocalId)
+								return (resourceAddress, nonFungibleLocalIds)
 							}
 						}
 
@@ -142,7 +142,7 @@ extension NonFungibleTokenContainer {
 		Self(
 			owner: owner,
 			resourceAddress: resourceAddress,
-			assets: ids.map { NonFungibleToken(nonFungibleId: .string($0)) },
+			assets: ids.map { NonFungibleToken(nonFungibleLocalId: .string($0)) },
 			name: name,
 			description: description,
 			iconURL: iconURL

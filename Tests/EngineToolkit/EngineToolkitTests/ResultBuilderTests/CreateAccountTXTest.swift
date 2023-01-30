@@ -27,13 +27,13 @@ final class CreateAccountTXTest: TestCase {
 		let privateKeyData = try Data(hex: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
 		let privateKey = try Engine.PrivateKey.curve25519(.init(rawRepresentation: privateKeyData))
 
-		let nonFungibleAddress = try sut.deriveNonFungibleAddressFromPublicKeyRequest(
-			request: DeriveNonFungibleAddressFromPublicKeyRequest(
+		let nonFungibleGlobalId = try sut.deriveNonFungibleGlobalIdFromPublicKeyRequest(
+			request: DeriveNonFungibleGlobalIdFromPublicKeyRequest(
 				publicKey: privateKey.publicKey(),
 				networkId: networkID
 			))
 			.get()
-			.nonFungibleAddress
+			.nonFungibleGlobalId
 
 		let transactionManifest = TransactionManifest {
 			CallMethod(
@@ -61,7 +61,7 @@ final class CreateAccountTXTest: TestCase {
 					Enum("ProofRule") {
 						Enum("Require") {
 							Enum("StaticNonFungible") {
-								nonFungibleAddress
+								nonFungibleGlobalId
 							}
 						}
 					}
@@ -100,7 +100,7 @@ final class CreateAccountTXTest: TestCase {
 			networkID: networkID
 		)
 		let expected = """
-		CALL_METHOD ComponentAddress("component_tdx_22_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7ql6v973") "lock_fee" Decimal("10");CALL_METHOD ComponentAddress("component_tdx_22_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7ql6v973") "free";TAKE_FROM_WORKTOP ResourceAddress("resource_tdx_22_1qzxcrac59cy2v9lpcpmf82qel3cjj25v3k5m09rxurgqfpm3gw") Bucket("bucket1");CALL_FUNCTION PackageAddress("package_tdx_22_1qy4hrp8a9apxldp5cazvxgwdj80cxad4u8cpkaqqnhlsk0emdf") "Account" "new_with_resource" Enum("Protected", Enum("ProofRule", Enum("Require", Enum("StaticNonFungible", NonFungibleAddress("resource_tdx_22_1qq8cays25704xdyap2vhgmshkkfyr023uxdtk59ddd4qq3t577", Bytes("71cf1c6fc032e971de8fd8349a2b05dcb6d57ff15bef8bfbe98e")))))) Bucket("bucket1");
+		CALL_METHOD ComponentAddress("component_tdx_22_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7ql6v973") "lock_fee" Decimal("10");CALL_METHOD ComponentAddress("component_tdx_22_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7ql6v973") "free";TAKE_FROM_WORKTOP ResourceAddress("resource_tdx_22_1qzxcrac59cy2v9lpcpmf82qel3cjj25v3k5m09rxurgqfpm3gw") Bucket("bucket1");CALL_FUNCTION PackageAddress("package_tdx_22_1qy4hrp8a9apxldp5cazvxgwdj80cxad4u8cpkaqqnhlsk0emdf") "Account" "new_with_resource" Enum("Protected", Enum("ProofRule", Enum("Require", Enum("StaticNonFungible", NonFungibleGlobalId("resource_tdx_22_1qq8cays25704xdyap2vhgmshkkfyr023uxdtk59ddd4qq3t577", Bytes("71cf1c6fc032e971de8fd8349a2b05dcb6d57ff15bef8bfbe98e")))))) Bucket("bucket1");
 		"""
 		XCTAssertNoDifference(expected, manifestString)
 

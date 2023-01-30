@@ -291,7 +291,7 @@ paths:
           $ref: "#/components/responses/ErrorResponse"
   /entity/non-fungible/ids:
     post:
-      operationId: EntityNonFungibleIds
+      operationId: EntityNonFungibleLocalIds
       summary: Iterates through all non-fungible ids associated with a given non-fungible resource of a given entity.
       tags:
         - Entity
@@ -300,20 +300,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EntityNonFungibleIdsRequest"
+              $ref: "#/components/schemas/EntityNonFungibleLocalIdsRequest"
       responses:
         "200":
           description: Entity Non-Fungibles
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EntityNonFungibleIdsResponse"
+                $ref: "#/components/schemas/EntityNonFungibleLocalIdsResponse"
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
 
   /non-fungible/ids:
     post:
-      operationId: NonFungibleIds
+      operationId: NonFungibleLocalIds
       summary: Iterates through all non-fungible ids of a given non-fungible resource.
       tags:
         - Non-Fungible
@@ -322,14 +322,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NonFungibleIdsRequest"
+              $ref: "#/components/schemas/NonFungibleLocalIdsRequest"
       responses:
         "200":
           description: Non-Fungible Ids
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NonFungibleIdsResponse"
+                $ref: "#/components/schemas/NonFungibleLocalIdsResponse"
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
   /non-fungible/data:
@@ -540,7 +540,7 @@ components:
         amount:
           type: integer
           format: int64
-    NonFungibleIdsCollection:
+    NonFungibleLocalIdsCollection:
       allOf:
         - $ref: "#/components/schemas/ResultSetCursorMixin"
         - type: object
@@ -550,8 +550,8 @@ components:
             items:
               type: array
               items:
-                $ref: "#/components/schemas/NonFungibleIdsCollectionItem"
-    NonFungibleIdsCollectionItem:
+                $ref: "#/components/schemas/NonFungibleLocalIdsCollectionItem"
+    NonFungibleLocalIdsCollectionItem:
       type: object
       required:
         - non_fungible_id
@@ -607,7 +607,7 @@ components:
         address:
           $ref: "#/components/schemas/ResourceAddress"
 
-    NonFungibleIdType:
+    NonFungibleLocalIdType:
       type: string
       enum:
         - string
@@ -960,7 +960,7 @@ components:
         vault_access_rules_chain:
           type: object
         non_fungible_id_type:
-          $ref: "#/components/schemas/NonFungibleIdType"
+          $ref: "#/components/schemas/NonFungibleLocalIdType"
     EntityDetailsResponsePackageDetails:
       type: object
       required:
@@ -1123,7 +1123,7 @@ components:
             non_fungibles:
               $ref: "#/components/schemas/NonFungibleResourcesCollection"
 
-    EntityNonFungibleIdsRequest:
+    EntityNonFungibleLocalIdsRequest:
       allOf:
         - $ref: "#/components/schemas/AtLedgerStateMixin"
         - type: object
@@ -1145,7 +1145,7 @@ components:
       example:
         address: "<component-entity-address>"
         resource_address: "<non-fungible-resource-entity-address>"
-    EntityNonFungibleIdsResponse:
+    EntityNonFungibleLocalIdsResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
         - type: object
@@ -1159,9 +1159,9 @@ components:
             resource_address:
               $ref: "#/components/schemas/ResourceAddress"
             non_fungible_ids:
-              $ref: "#/components/schemas/NonFungibleIdsCollection"
+              $ref: "#/components/schemas/NonFungibleLocalIdsCollection"
 
-    NonFungibleIdsRequest:
+    NonFungibleLocalIdsRequest:
       allOf:
         - $ref: "#/components/schemas/AtLedgerStateMixin"
         - type: object
@@ -1180,7 +1180,7 @@ components:
               nullable: true
       example:
         address: "<non-fungible-entity-address>"
-    NonFungibleIdsResponse:
+    NonFungibleLocalIdsResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
         - type: object
@@ -1191,7 +1191,7 @@ components:
             address:
               $ref: "#/components/schemas/EntityAddress"
             non_fungible_ids:
-              $ref: "#/components/schemas/NonFungibleIdsCollection"
+              $ref: "#/components/schemas/NonFungibleLocalIdsCollection"
 
     NonFungibleDataRequest:
       allOf:
@@ -1230,7 +1230,7 @@ components:
             address:
               $ref: "#/components/schemas/ResourceAddress"
             non_fungible_id_type:
-              $ref: "#/components/schemas/NonFungibleIdType"
+              $ref: "#/components/schemas/NonFungibleLocalIdType"
             non_fungible_id:
               type: string
             mutable_data_hex:

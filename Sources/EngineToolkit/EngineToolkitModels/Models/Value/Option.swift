@@ -3,9 +3,9 @@ import Foundation
 // MARK: - Optional + ValueProtocol
 extension Optional: ValueProtocol where Wrapped == Value_ {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .option
+	public static let kind: ValueKind = .some // TODO: Incorrect!
 	public func embedValue() -> Value_ {
-		.option(self)
+		.none // TODO: Incorrect!
 	}
 }
 

@@ -43,9 +43,9 @@ final class ManifestToStringTests: TestCase {
 				PublishPackageWithOwner(
 					code: Blob(data: sha256(data: package.code)),
 					abi: Blob(data: sha256(data: package.abi)),
-					ownerBadge: NonFungibleAddress(
+					ownerBadge: NonFungibleGlobalId(
 						resourceAddress: .init(address: "resource_sim1qzf8hl3azz2q0e5s33nh2mt8wmvqjfxdrv06ysus4alqh0994h"),
-						nonFungibleId: .u32(12)
+						nonFungibleLocalId: .u32(12)
 					)
 				)
 			}.instructions

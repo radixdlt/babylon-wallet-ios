@@ -1,7 +1,7 @@
 import Foundation
 
-// MARK: - NonFungibleId
-public enum NonFungibleId {
+// MARK: - NonFungibleLocalId
+public enum NonFungibleLocalId {
 	case u32(UInt32)
 	case u64(UInt64)
 	case uuid(String)
@@ -9,8 +9,8 @@ public enum NonFungibleId {
 	case bytes([UInt8])
 }
 
-// MARK: NonFungibleId.Kind
-public extension NonFungibleId {
+// MARK: NonFungibleLocalId.Kind
+public extension NonFungibleLocalId {
 	// MARK: Kind
 	enum Kind: String, Codable {
 		case u32 = "U32"
@@ -22,15 +22,15 @@ public extension NonFungibleId {
 }
 
 // MARK: ValueProtocol, Sendable, Codable, Hashable
-extension NonFungibleId: ValueProtocol, Sendable, Codable, Hashable {
+extension NonFungibleLocalId: ValueProtocol, Sendable, Codable, Hashable {
 	// Type name, used as a discriminator
-	public static let kind: ValueKind = .nonFungibleId
+	public static let kind: ValueKind = .nonFungibleLocalId
 	public func embedValue() -> Value_ {
-		.nonFungibleId(self)
+		.nonFungibleLocalId(self)
 	}
 }
 
-public extension NonFungibleId {
+public extension NonFungibleLocalId {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case value, type, variant

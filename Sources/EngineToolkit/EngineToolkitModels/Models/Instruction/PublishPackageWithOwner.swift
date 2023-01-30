@@ -11,11 +11,11 @@ public struct PublishPackageWithOwner: InstructionProtocol {
 	// MARK: Stored properties
 	public let code: Blob
 	public let abi: Blob
-	public let ownerBadge: NonFungibleAddress
+	public let ownerBadge: NonFungibleGlobalId
 
 	// MARK: Init
 
-	public init(code: Blob, abi: Blob, ownerBadge: NonFungibleAddress) {
+	public init(code: Blob, abi: Blob, ownerBadge: NonFungibleGlobalId) {
 		self.code = code
 		self.abi = abi
 		self.ownerBadge = ownerBadge
@@ -52,7 +52,7 @@ public extension PublishPackageWithOwner {
 		try self.init(
 			code: container.decode(Blob.self, forKey: .code),
 			abi: container.decode(Blob.self, forKey: .abi),
-			ownerBadge: container.decode(NonFungibleAddress.self, forKey: .ownerBadge)
+			ownerBadge: container.decode(NonFungibleGlobalId.self, forKey: .ownerBadge)
 		)
 	}
 }

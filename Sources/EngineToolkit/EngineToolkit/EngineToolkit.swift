@@ -168,9 +168,9 @@ public extension EngineToolkit {
 		)
 	}
 
-	func deriveNonFungibleAddressFromPublicKeyRequest(
-		request: DeriveNonFungibleAddressFromPublicKeyRequest
-	) -> Result<DeriveNonFungibleAddressFromPublicKeyResponse, Error> {
+	func deriveNonFungibleGlobalIdFromPublicKeyRequest(
+		request: DeriveNonFungibleGlobalIdFromPublicKeyRequest
+	) -> Result<DeriveNonFungibleGlobalIdFromPublicKeyResponse, Error> {
 		callLibraryFunction(
 			request: request,
 			function: derive_non_fungible_global_id_from_public_key
