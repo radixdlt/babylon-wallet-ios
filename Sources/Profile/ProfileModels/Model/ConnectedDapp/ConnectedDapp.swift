@@ -17,9 +17,7 @@ public extension OnNetwork {
 
 		public let displayName: String
 
-		/// Non-public because this is not the thing we should send to the Dapp, see method
-		/// `authorizedPersonas:dapp` in `OnNetwork`
-		internal let referencesToAuthorizedPersonas: OrderedSet<AuthorizedPersonaSimple> // see below
+		public let referencesToAuthorizedPersonas: OrderedSet<AuthorizedPersonaSimple>
 	}
 }
 

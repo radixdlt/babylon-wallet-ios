@@ -273,6 +273,7 @@ public extension P2PClientsView {
 public struct ConnectedDappsView: IndentedView {
 	public let connectedDapps: [OnNetwork.ConnectedDapp]
 	public let indentation: Indentation
+	public let authorizedPersonasForDapp: (OnNetwork.ConnectedDapp) -> OrderedSet<OnNetwork.AuthorizedPersona>
 }
 
 public extension ConnectedDappsView {
@@ -289,7 +290,8 @@ public extension ConnectedDappsView {
 				ForEach(connectedDapps) { connectedDapp in
 					ConnectedDappView(
 						connectedDapp: connectedDapp,
-						indentation: inOneLevel
+						indentation: inOneLevel,
+						authorizedPersonas: authorizedPersonasForDapp(connectedDapp)
 					)
 				}
 			}
@@ -302,12 +304,14 @@ public extension ConnectedDappsView {
 public struct ConnectedDappView: IndentedView {
 	public let connectedDapp: OnNetwork.ConnectedDapp
 	public let indentation: Indentation
+	public let authorizedPersonas: OrderedSet<OnNetwork.AuthorizedPersona>
 }
 
 public extension ConnectedDappView {
 	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("Name", value: String(describing: connectedDapp.name))
+			Labeled("Name", value: String(describing: connectedDapp.displayName))
+			Labeled("Dapp def address", value: String(describing: connectedDapp.dAppDefinitionAddress))
 		}
 		.padding([.leading], leadingPadding)
 	}
@@ -392,7 +396,9 @@ public extension OnNetworkView {
 			ConnectedDappsView(
 				connectedDapps: onNetwork.connectedDapps.elements,
 				indentation: inOneLevel
-			)
+			) {
+				try! onNetwork.authorizedPersonas(dapp: $0)
+			}
 		}
 		.padding([.leading], leadingPadding)
 	}
