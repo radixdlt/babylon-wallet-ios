@@ -111,7 +111,8 @@ public extension AppSettings {
 			return .none
 
 		case .internal(.view(.personasButtonTapped)):
-			state.personas = .init()
+			// TODO: implement
+			state.personas = .init(personas: .init())
 			return .none
 		}
 	}
