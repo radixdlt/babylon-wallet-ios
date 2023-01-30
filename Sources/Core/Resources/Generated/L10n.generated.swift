@@ -272,6 +272,14 @@ public enum L10n {
     /// New Account
     public static let newAccountButtonTitle = L10n.tr("Localizable", "onboarding.newAccountButtonTitle", fallback: "New Account")
   }
+  public enum Personas {
+    /// Create new persona
+    public static let createNewPersonaButtonTitle = L10n.tr("Localizable", "personas.createNewPersonaButtonTitle", fallback: "Create new persona")
+    /// Here are all the Personas connected to your account
+    public static let subtitle = L10n.tr("Localizable", "personas.subtitle", fallback: "Here are all the Personas connected to your account")
+    /// Personas
+    public static let title = L10n.tr("Localizable", "personas.title", fallback: "Personas")
+  }
   public enum ProfileLoad {
     /// Failed to create Wallet from backup: %@
     public static func decodingError(_ p1: Any) -> String {
