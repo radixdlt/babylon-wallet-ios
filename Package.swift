@@ -597,6 +597,12 @@ package.targets.append(
 	)
 )
 
+// MARK: - Unit Tests
+
+package.addModules([
+	.module(name: "Unit Tests", dependencies: [], tests: .no),
+])
+
 // MARK: - Extensions
 
 extension Package {
