@@ -83,6 +83,11 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "DappInteractionFeature",
+		dependencies: [],
+		tests: .no
+	),
+	.feature(
 		name: "FungibleTokenDetailsFeature",
 		dependencies: [],
 		tests: .no
