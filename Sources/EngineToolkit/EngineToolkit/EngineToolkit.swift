@@ -110,7 +110,7 @@ public extension EngineToolkit {
 	) -> Result<CompileNotarizedTransactionIntentResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: compile_notarized_transaction_intent
+			function: compile_notarized_transaction
 		)
 	}
 
@@ -119,7 +119,7 @@ public extension EngineToolkit {
 	) -> Result<DecompileNotarizedTransactionIntentResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: decompile_notarized_transaction_intent
+			function: decompile_notarized_transaction
 		)
 	}
 
@@ -173,16 +173,7 @@ public extension EngineToolkit {
 	) -> Result<DeriveNonFungibleAddressFromPublicKeyResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: derive_non_fungible_address_from_public_key
-		)
-	}
-
-	func deriveNonFungibleAddressRequest(
-		request: DeriveNonFungibleAddressRequest
-	) -> Result<DeriveNonFungibleAddressResponse, Error> {
-		callLibraryFunction(
-			request: request,
-			function: derive_non_fungible_address
+			function: derive_non_fungible_global_id_from_public_key
 		)
 	}
 
