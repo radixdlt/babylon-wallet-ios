@@ -22,8 +22,7 @@ public extension Personas.View {
 			ForceFullScreen {
 				VStack(spacing: .zero) {
 					NavigationBar(
-						// TODO: implement
-						titleText: "Personas",
+						titleText: L10n.Personas.title,
 						leadingItem: BackButton {
 							viewStore.send(.dismissButtonTapped)
 						}
@@ -35,8 +34,7 @@ public extension Personas.View {
 
 					ScrollView {
 						HStack {
-							// TODO: implement
-							Text("Personas description text")
+							Text(L10n.Personas.subtitle)
 								.foregroundColor(.app.gray2)
 								.textStyle(.body1HighImportance)
 								.padding([.horizontal, .top], .medium3)
@@ -65,16 +63,12 @@ public extension Personas.View {
 						 }
 						 */
 
-						Button("Create new persona") {
-							// TODO: implement
+						Button(L10n.Personas.createNewPersonaButtonTitle) {
+							viewStore.send(.createNewPersonaButtonTapped)
 						}
-						/*
-						 .controlState(viewStore.canAddMoreConnections ? .enabled : .disabled)
-						 .buttonStyle(.secondaryRectangular(
-						 	shouldExpand: true,
-						 	image: .init(asset: AssetResource.qrCodeScanner)
-						 ))
-						 */
+						.buttonStyle(.secondaryRectangular(
+							shouldExpand: true
+						))
 						.padding(.horizontal, .medium3)
 						.padding(.vertical, .large1)
 					}
