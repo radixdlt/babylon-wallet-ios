@@ -17,7 +17,8 @@ public extension OnNetwork {
 
 		public let displayName: String
 
-		public let referencesToAuthorizedPersonas: OrderedSet<AuthorizedPersonaSimple>
+		// mutable so that we can add new authorized personas
+		public var referencesToAuthorizedPersonas: OrderedSet<AuthorizedPersonaSimple>
 	}
 }
 
@@ -33,10 +34,12 @@ public extension OnNetwork.ConnectedDapp {
 		public let identityAddress: IdentityAddress
 
 		/// List of "ongoing personaData" (identified by OnNetwork.Persona.Field.ID) that user has given the Dapp access to.
-		public let fieldIDs: OrderedSet<OnNetwork.Persona.Field.ID>
+		/// mutable so that we can mutate the fields
+		public var fieldIDs: OrderedSet<OnNetwork.Persona.Field.ID>
 
 		/// List of "ongoing accountAddresses" that user given the dApp access to.
-		public let sharedAccounts: SharedAccounts
+		public var sharedAccounts: SharedAccounts
+
 		public struct SharedAccounts:
 			Sendable,
 			Hashable,
@@ -46,7 +49,24 @@ public extension OnNetwork.ConnectedDapp {
 
 			// FIXME: When we have **value** generics we would use something like:
 			// `OrderedSet<N; AccountAddress` (however that would be encodoed)
-			public let accountsReferencedByAddress: OrderedSet<AccountAddress>
+			public private(set) var accountsReferencedByAddress: OrderedSet<AccountAddress>
+
+			public mutating func updateAccounts(_ new: OrderedSet<AccountAddress>) throws {
+				switch self.mode {
+				case .exactly:
+					guard new.count == self.accountsReferencedByAddress.count else {
+						struct MustBeExactlyAccountLength: Swift.Error {}
+						throw MustBeExactlyAccountLength()
+					}
+					self.accountsReferencedByAddress = new
+				case .orMore:
+					guard new.count >= self.accountsReferencedByAddress.count else {
+						struct MustBeSameOrMoreAccounts: Swift.Error {}
+						throw MustBeSameOrMoreAccounts()
+					}
+					self.accountsReferencedByAddress = new
+				}
+			}
 
 			public enum Mode {
 				case exactly(OrderedSet<AccountAddress>)

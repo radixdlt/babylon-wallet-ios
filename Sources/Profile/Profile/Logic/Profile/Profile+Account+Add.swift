@@ -136,7 +136,7 @@ public extension Profile {
 		return account
 	}
 
-	/// Saves an account into the profile an `Account`
+	/// Saves an `Account` into the profile
 	mutating func addAccount(
 		_ account: OnNetwork.Account
 	) async throws {
@@ -159,6 +159,36 @@ public extension Profile {
 			)
 			try perNetwork.add(onNetwork)
 		}
+	}
+
+	/// Saves a `ConnectedDapp` into the profile
+	mutating func addConnectedDapp(
+		_ connectedDapp: OnNetwork.ConnectedDapp
+	) async throws {
+		let networkID = connectedDapp.networkID
+		var network = try onNetwork(id: networkID)
+		guard !network.connectedDapps.contains(where: { $0.dAppDefinitionAddress == connectedDapp.dAppDefinitionAddress }) else {
+			throw ConnectedDappAlreadyExists()
+		}
+		guard network.connectedDapps.updateOrAppend(connectedDapp) == nil else {
+			fatalError("Incorrect implementation, should have been a new ConnectedDapp")
+		}
+		try updateOnNetwork(network)
+	}
+
+	/// Updates a `ConnectedDapp` in the profile
+	mutating func updateConnectedDapp(
+		_ connectedDapp: OnNetwork.ConnectedDapp
+	) async throws {
+		let networkID = connectedDapp.networkID
+		var network = try onNetwork(id: networkID)
+		guard network.connectedDapps.contains(where: { $0.dAppDefinitionAddress == connectedDapp.dAppDefinitionAddress }) else {
+			throw ConnectedDappDoesNotExists()
+		}
+		guard network.connectedDapps.updateOrAppend(connectedDapp) != nil else {
+			fatalError("Incorrect implementation, should have been an existing ConnectedDapp")
+		}
+		try updateOnNetwork(network)
 	}
 
 	/// Creates a new **Virtual** `Account` without saving it into the profile.

@@ -131,5 +131,11 @@ struct WrongAddressType: Swift.Error {}
 // MARK: - AccountAlreadyExists
 struct AccountAlreadyExists: Swift.Error {}
 
+// MARK: - ConnectedDappAlreadyExists
+struct ConnectedDappAlreadyExists: Swift.Error {}
+
+// MARK: - ConnectedDappDoesNotExists
+struct ConnectedDappDoesNotExists: Swift.Error {}
+
 // MARK: - PersonaAlreadyExists
 struct PersonaAlreadyExists: Swift.Error {}

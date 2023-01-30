@@ -21,7 +21,10 @@ public struct ProfileClient: Sendable {
 	public var getAccounts: GetAccounts
 	public var getPersonas: GetPersonas
 	public var getP2PClients: GetP2PClients
+	public var getConnectedDapps: GetConnectedDapps
+	public var addConnectedDapp: AddConnectedDapp
 	public var addP2PClient: AddP2PClient
+	public var updateConnectedDapp: UpdateConnectedDapp
 	public var deleteP2PClientByID: DeleteP2PClientByID
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
@@ -46,6 +49,9 @@ public struct ProfileClient: Sendable {
 		getAccounts: @escaping GetAccounts,
 		getPersonas: @escaping GetPersonas,
 		getP2PClients: @escaping GetP2PClients,
+		getConnectedDapps: @escaping GetConnectedDapps,
+		addConnectedDapp: @escaping AddConnectedDapp,
+		updateConnectedDapp: @escaping UpdateConnectedDapp,
 		addP2PClient: @escaping AddP2PClient,
 		deleteP2PClientByID: @escaping DeleteP2PClientByID,
 		getAppPreferences: @escaping GetAppPreferences,
@@ -68,6 +74,9 @@ public struct ProfileClient: Sendable {
 		self.hasAccountOnNetwork = hasAccountOnNetwork
 		self.getAccounts = getAccounts
 		self.getPersonas = getPersonas
+		self.getConnectedDapps = getConnectedDapps
+		self.addConnectedDapp = addConnectedDapp
+		self.updateConnectedDapp = updateConnectedDapp
 		self.getP2PClients = getP2PClients
 		self.addP2PClient = addP2PClient
 		self.deleteP2PClientByID = deleteP2PClientByID
@@ -103,8 +112,11 @@ public extension ProfileClient {
 	typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 	typealias GetAccounts = @Sendable () async throws -> NonEmpty<OrderedSet<OnNetwork.Account>>
 	typealias GetPersonas = @Sendable () async throws -> OrderedSet<OnNetwork.Persona>
+	typealias GetConnectedDapps = @Sendable () async throws -> OrderedSet<OnNetwork.ConnectedDapp>
 	typealias GetP2PClients = @Sendable () async throws -> P2PClients
 	typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
+	typealias AddConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
+	typealias UpdateConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
