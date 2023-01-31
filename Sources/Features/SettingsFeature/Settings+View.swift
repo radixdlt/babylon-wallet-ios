@@ -60,7 +60,7 @@ public extension AppSettings.View {
 						),
 						then: { Personas.View(store: $0) }
 					)
-					.zIndex(2)
+					.zIndex(3)
 				}
 			}
 		}
