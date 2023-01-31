@@ -5,10 +5,10 @@ import GatherFactorsFeature
 public extension NameNewEntity {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<CreateAccount>
-		@FocusState private var focusedField: CreateAccount.State.Field?
+		private let store: StoreOf<NameNewEntity>
+		@FocusState private var focusedField: NameNewEntity.State.Field?
 
-		public init(store: StoreOf<CreateAccount>) {
+		public init(store: StoreOf<NameNewEntity>) {
 			self.store = store
 		}
 	}

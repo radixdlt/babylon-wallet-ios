@@ -98,6 +98,7 @@ public struct ProfileClient: Sendable {
 }
 
 public extension ProfileClient {
+	typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	typealias LoadProfileResult = Swift.Result<Profile?, Profile.LoadingFailure>
 	typealias LoadProfile = @Sendable () async -> LoadProfileResult
 

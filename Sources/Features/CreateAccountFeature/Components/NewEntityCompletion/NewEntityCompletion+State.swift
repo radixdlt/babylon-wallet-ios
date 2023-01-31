@@ -1,10 +1,8 @@
 import FeaturePrelude
 
-// MARK: - AccountCompletion.State
-public extension AccountCompletion {
+// MARK: - NewEntityCompletion.State
+public extension NewEntityCompletion {
 	struct State: CreateEntityCompletionStateProtocol {
-		public typealias Entity = OnNetwork.Account
-		public typealias Destination = CreateAccountCompletionDestination
 		public let entity: Entity
 		public let isFirstOnNetwork: Bool
 		public let destination: Destination
@@ -21,8 +19,8 @@ public extension AccountCompletion {
 	}
 }
 
-// MARK: - AccountCompletion.State.Origin
-public extension AccountCompletion.State {
+// MARK: - NewEntityCompletion.State.Origin
+public extension NewEntityCompletion.State {
 	var entityAddress: Entity.EntityAddress {
 		entity.address
 	}
@@ -34,17 +32,18 @@ public extension AccountCompletion.State {
 		return "Unnamed " + (entity.kind == .account ? "account" : "persona")
 	}
 
-	var index: Entity.Index {
+	var index: Int {
 		entity.index
 	}
 }
 
-#if DEBUG
-public extension AccountCompletion.State where Entity == OnNetwork.Account, Destination == CreateAccountCompletionDestination {
-	static let previewValue: Self = .init(
-		entity: OnNetwork.Account.previewValue0,
-		isFirstOnNetwork: true,
-		destination: .home
-	)
-}
-#endif
+//
+// #if DEBUG
+// public extension NewEntityCompletion.State where Entity == OnNetwork.Account, Destination == CreateAccountCompletionDestination {
+//	static let previewValue: Self = .init(
+//		entity: OnNetwork.Account.previewValue0,
+//		isFirstOnNetwork: true,
+//		destination: .home
+//	)
+// }
+// #endif

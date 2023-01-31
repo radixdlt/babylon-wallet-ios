@@ -1,35 +1,35 @@
 import FeaturePrelude
 
-// MARK: - CreateAccountCoordinator.View
-public extension CreateAccountCoordinator {
+// MARK: - CreateEntityCoordinator.View
+public extension CreateEntityCoordinator {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<CreateAccountCoordinator>
+		private let store: StoreOf<CreateEntityCoordinator>
 
-		public init(store: StoreOf<CreateAccountCoordinator>) {
+		public init(store: StoreOf<CreateEntityCoordinator>) {
 			self.store = store
 		}
 	}
 }
 
-public extension CreateAccountCoordinator.View {
+public extension CreateEntityCoordinator.View {
 	var body: some View {
 		SwitchStore(store.scope(state: \.root)) {
 			CaseLet(
-				state: /CreateAccountCoordinator.State.Root.nameNewEntity,
-				action: { CreateAccountCoordinator.Action.child(.nameNewEntity($0)) },
+				state: /CreateEntityCoordinator.State.Root.nameNewEntity,
+				action: { CreateEntityCoordinator.Action.child(.nameNewEntity($0)) },
 				then: { NameNewEntity.View(store: $0) }
 			)
 			CaseLet(
-				state: /CreateAccountCoordinator.State.Root.selectGenesisFactorSource,
-				action: { CreateAccountCoordinator.Action.child(.selectGenesisFactorSource($0)) },
+				state: /CreateEntityCoordinator.State.Root.selectGenesisFactorSource,
+				action: { CreateEntityCoordinator.Action.child(.selectGenesisFactorSource($0)) },
 				then: { SelectGenesisFactorSource.View(store: $0) }
 			)
-			CaseLet(
-				state: /CreateAccountCoordinator.State.Root.accountCompletion,
-				action: { CreateAccountCoordinator.Action.child(.accountCompletion($0)) },
-				then: { AccountCompletion.View(store: $0) }
-			)
+//			CaseLet(
+//				state: /CreateEntityCoordinator.State.Root.completion,
+//				action: { CreateEntityCoordinator.Action.child(.completion($0)) },
+			//                then: { NewEntityCompletion<CompletionState.Entity>.View(store: $0) }
+//			)
 		}
 	}
 }

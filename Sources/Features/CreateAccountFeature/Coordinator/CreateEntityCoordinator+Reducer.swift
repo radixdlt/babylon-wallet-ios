@@ -1,5 +1,7 @@
 import FeaturePrelude
 
+public typealias CreateAccountCoordinator = CreateEntityCoordinator<CreateAccountCompletionState, CreateAccountCompletionAction>
+
 // MARK: - CreateEntityCompletionDestinationProtocol
 public protocol CreateEntityCompletionDestinationProtocol: Sendable, Equatable {
 	var displayText: String { get }
@@ -20,23 +22,48 @@ public protocol CreateEntityCompletionActionProtocol: Sendable, Equatable {
 	static var completed: Self { get }
 }
 
-// MARK: - CreateAccountCompletionDestination
-public enum CreateAccountCompletionDestination: String, CreateEntityCompletionDestinationProtocol {
-	case home
-	case chooseAccounts
+// MARK: - CreateAccountCompletionState
+public struct CreateAccountCompletionState: CreateEntityCompletionStateProtocol {
+	public typealias Entity = OnNetwork.Account
 
-	public var displayText: String {
-		switch self {
-		case .home:
-			return L10n.CreateAccount.Completion.Destination.home
-		case .chooseAccounts:
-			return L10n.CreateAccount.Completion.Destination.chooseAccounts
+	public enum Destination: String, CreateEntityCompletionDestinationProtocol {
+		case home
+		case chooseAccounts
+
+		public var displayText: String {
+			switch self {
+			case .home:
+				return L10n.CreateAccount.Completion.Destination.home
+			case .chooseAccounts:
+				return L10n.CreateAccount.Completion.Destination.chooseAccounts
+			}
 		}
+	}
+
+	public var entity: OnNetwork.Account
+	public var isFirstOnNetwork: Bool
+	public var destination: Destination
+	public init(
+		entity: Entity,
+		isFirstOnNetwork: Bool,
+		destination: Destination
+	) {
+		self.entity = entity
+		self.isFirstOnNetwork = isFirstOnNetwork
+		self.destination = destination
 	}
 }
 
+// MARK: - CreateAccountCompletionAction
+public enum CreateAccountCompletionAction: CreateEntityCompletionActionProtocol {
+	public static var completed: Self { fatalError() }
+}
+
 // MARK: - CreateEntityCoordinator
-public struct CreateEntityCoordinator<CompletionState: CreateEntityCompletionStateProtocol, CompletionAction: CreateEntityCompletionActionProtocol>: Sendable, ReducerProtocol {
+public struct CreateEntityCoordinator<
+	CompletionState: CreateEntityCompletionStateProtocol,
+	CompletionAction: CreateEntityCompletionActionProtocol
+>: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -56,30 +83,22 @@ public struct CreateEntityCoordinator<CompletionState: CreateEntityCompletionSta
 	}
 
 	private func core(state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case let .child(.nameNewEntity(.delegate(.named))):
-			state.root = .completion(<#T##AccountCompletion.State#>)
-
-//            state.root = .accountCompletion(
-//				.init(
-//					account: account,
-//					isFirstAccount: isFirstAccount,
-//					destination: state.completionDestination
-//				)
-//			)
+//		switch action {
+//		case let .child(.nameNewEntity(.delegate(.named))):
+//
+		//            fatalError()
+//		case .child(.nameNewEntity(.delegate(.dismiss))):
+//			return .run { send in
+//				await send(.delegate(.dismissed))
+//			}
+//
+//		case .child(.accountCompletion(.delegate(.completed))):
+//			return .run { send in
+//				await send(.delegate(.completed))
+//			}
+//		default:
 //			return .none
-
-		case .child(.nameNewEntity(.delegate(.dismiss))):
-			return .run { send in
-				await send(.delegate(.dismissed))
-			}
-
-		case .child(.accountCompletion(.delegate(.completed))):
-			return .run { send in
-				await send(.delegate(.completed))
-			}
-		default:
-			return .none
-		}
+//		}
+		fatalError()
 	}
 }

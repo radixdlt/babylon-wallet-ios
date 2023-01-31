@@ -12,11 +12,11 @@ public struct NameNewEntity: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		EmptyReducer()
-			.ifLet(\.gatherFactor, action: /Action.child .. Action.ChildAction.gatherFactor) {
-				GatherFactor()
-					._printChanges()
-			}
+//		EmptyReducer()
+//			.ifLet(\.gatherFactor, action: /Action.child .. Action.ChildAction.gatherFactor) {
+//				GatherFactor()
+//					._printChanges()
+//			}
 		Reduce(self.core)
 	}
 }
@@ -24,87 +24,88 @@ public struct NameNewEntity: Sendable, ReducerProtocol {
 // MARK: Public
 public extension NameNewEntity {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case .internal(.view(.createAccountButtonTapped)):
-			guard let genesisFactorSource = state.genesisFactorSource else {
-				assertionFailure("Should not have allowed to tap continue button if genesisFactorSource is nil")
-				return .none
-			}
-			assert(!state.isCreatingAccount)
-			state.focusedField = nil
-
-			// FIXME: get
-			state.gatherFactor = .init(
-				purpose: .init(purpose: .createAccount),
-				factorSource: genesisFactorSource
-			)
-
-			if state.shouldCreateProfile {
-				return createProfile(state: &state)
-			} else {
-				return createAccount(state: &state)
-			}
-
-		case let .internal(.system(.createdNewAccountResult(.failure(error)))):
-			state.gatherFactor = nil
-			errorQueue.schedule(error)
-			return .none
-
-		case let .internal(.system(.createdNewAccountResult(.success(account)))):
-			state.gatherFactor = nil
-			return .run { [isFirstAccount = state.isFirstAccount] send in
-				await send(.delegate(.createdNewAccount(account: account, isFirstAccount: isFirstAccount)))
-			}
-
-		case .internal(.view(.closeButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismissCreateAccount))
-			}
-
-		case let .internal(.view(.textFieldChanged(accountName))):
-			state.inputtedAccountName = accountName
-			return .none
-
-		case let .internal(.view(.textFieldFocused(focus))):
-			return .run { send in
-				try await self.mainQueue.sleep(for: .seconds(0.5))
-				await send(.internal(.system(.focusTextField(focus))))
-			}
-
-		case .internal(.view(.viewAppeared)):
-			return .run { send in
-				await send(.internal(.system(.loadFactorSourcesResult(
-					TaskResult {
-						try await profileClient.getFactorSources()
-					}
-				))))
-				try await self.mainQueue.sleep(for: .seconds(0.5))
-				await send(.internal(.system(.focusTextField(.accountName))))
-			}
-
-		case let .internal(.system(.focusTextField(focus))):
-			state.focusedField = focus
-			return .none
-
-		case let .internal(.system(.loadFactorSourcesResult(.success(factorSources)))):
-			state.factorSources = factorSources
-			return .none
-
-		case let .internal(.system(.loadFactorSourcesResult(.failure(error)))):
-			errorQueue.schedule(error)
-			return .none
-
-		case let .child(.gatherFactor(.delegate(.finishedWithResult(result)))):
-			loggerGlobal.critical("🔮 \(String(describing: result))")
-			state.gatherFactor = nil
-			return .none
-
-		case .child(.gatherFactor):
-			return .none
-
-		case .delegate:
-			return .none
-		}
+//		switch action {
+//		case .internal(.view(.createAccountButtonTapped)):
+//			guard let genesisFactorSource = state.genesisFactorSource else {
+//				assertionFailure("Should not have allowed to tap continue button if genesisFactorSource is nil")
+//				return .none
+//			}
+//			assert(!state.isCreatingAccount)
+//			state.focusedField = nil
+//
+//			// FIXME: get
+//			state.gatherFactor = .init(
+//				purpose: .init(purpose: .createAccount),
+//				factorSource: genesisFactorSource
+//			)
+//
+//			if state.shouldCreateProfile {
+//				return createProfile(state: &state)
+//			} else {
+//				return createAccount(state: &state)
+//			}
+//
+//		case let .internal(.system(.createdNewAccountResult(.failure(error)))):
+//			state.gatherFactor = nil
+//			errorQueue.schedule(error)
+//			return .none
+//
+//		case let .internal(.system(.createdNewAccountResult(.success(account)))):
+//			state.gatherFactor = nil
+//			return .run { [isFirstAccount = state.isFirstAccount] send in
+//				await send(.delegate(.createdNewAccount(account: account, isFirstAccount: isFirstAccount)))
+//			}
+//
+//		case .internal(.view(.closeButtonTapped)):
+//			return .run { send in
+//				await send(.delegate(.dismissCreateAccount))
+//			}
+//
+//		case let .internal(.view(.textFieldChanged(accountName))):
+//			state.inputtedAccountName = accountName
+//			return .none
+//
+//		case let .internal(.view(.textFieldFocused(focus))):
+//			return .run { send in
+//				try await self.mainQueue.sleep(for: .seconds(0.5))
+//				await send(.internal(.system(.focusTextField(focus))))
+//			}
+//
+//		case .internal(.view(.viewAppeared)):
+//			return .run { send in
+//				await send(.internal(.system(.loadFactorSourcesResult(
+//					TaskResult {
+//						try await profileClient.getFactorSources()
+//					}
+//				))))
+//				try await self.mainQueue.sleep(for: .seconds(0.5))
+//				await send(.internal(.system(.focusTextField(.accountName))))
+//			}
+//
+//		case let .internal(.system(.focusTextField(focus))):
+//			state.focusedField = focus
+//			return .none
+//
+//		case let .internal(.system(.loadFactorSourcesResult(.success(factorSources)))):
+//			state.factorSources = factorSources
+//			return .none
+//
+//		case let .internal(.system(.loadFactorSourcesResult(.failure(error)))):
+//			errorQueue.schedule(error)
+//			return .none
+//
+//		case let .child(.gatherFactor(.delegate(.finishedWithResult(result)))):
+//			loggerGlobal.critical("🔮 \(String(describing: result))")
+//			state.gatherFactor = nil
+//			return .none
+//
+//		case .child(.gatherFactor):
+//			return .none
+//
+//		case .delegate:
+//			return .none
+//		}
+		fatalError()
 	}
 }
 
@@ -139,17 +140,18 @@ private extension NameNewEntity {
 	}
 
 	func createProfile(state: inout State) -> EffectTask<Action> {
-		.run { [nameOfFirstAccount = state.sanitizedAccountName] send in
-			await send(.internal(.system(.createdNewAccountResult(
-				TaskResult {
-					let accountOnCurrentNetwork = try await profileClient.createNewProfile(
-						CreateNewProfileRequest(
-							nameOfFirstAccount: nameOfFirstAccount
-						)
-					)
-					return accountOnCurrentNetwork
-				}
-			))))
-		}
+//		.run { [nameOfFirstAccount = state.sanitizedAccountName] send in
+//			await send(.internal(.system(.createdNewAccountResult(
+//				TaskResult {
+//					let accountOnCurrentNetwork = try await profileClient.createNewProfile(
+//						CreateNewProfileRequest(
+//							nameOfFirstAccount: nameOfFirstAccount
+//						)
+//					)
+//					return accountOnCurrentNetwork
+//				}
+//			))))
+//		}
+		.none
 	}
 }

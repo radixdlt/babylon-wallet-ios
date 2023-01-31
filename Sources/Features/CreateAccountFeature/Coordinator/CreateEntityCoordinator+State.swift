@@ -18,14 +18,14 @@ public extension CreateEntityCoordinator {
 
 // MARK: - CreateEntityCoordinator.State.Root
 public extension CreateEntityCoordinator.State {
-	enum Root: Equatable {
-		public typealias InitialState = NameNewEntity.State
-		case nameNewEntity(NameNewEntity.State)
-		case selectGenesisFactorSource(SelectGenesisFactorSource.State)
-		case completion(CompletionState)
-
-		public init(state: InitialState = .init()) {
-			self = .nameNewEntity(state)
+	struct Root: Equatable {
+		public enum Mode: Equatable {}
+		public enum Step: Equatable {
+			case nameNewEntity(NameNewEntity.State)
+			case selectGenesisFactorSource(SelectGenesisFactorSource.State)
+			case completion(CompletionState)
 		}
+
+		let mode: Mode
 	}
 }
