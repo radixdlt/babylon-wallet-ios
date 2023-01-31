@@ -88,7 +88,7 @@ package.addModules([
 			"CreateAccountFeature",
 			"ProfileClient",
 		],
-		tests: .no
+		tests: .yes()
 	),
 	.feature(
 		name: "FungibleTokenDetailsFeature",
