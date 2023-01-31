@@ -16,21 +16,22 @@ public extension NameNewEntity {
 
 public extension NameNewEntity.View {
 	var body: some View {
-		ForceFullScreen {
-			ZStack {
-				createAccountView
-					.zIndex(0)
-
-				IfLetStore(
-					store.scope(
-						state: \.gatherFactor,
-						action: { .child(.gatherFactor($0)) }
-					),
-					then: { GatherFactor.View(store: $0) }
-				)
-				.zIndex(1)
-			}
-		}
+//		ForceFullScreen {
+//			ZStack {
+//				createAccountView
+//					.zIndex(0)
+//
+//				IfLetStore(
+//					store.scope(
+//						state: \.gatherFactor,
+//						action: { .child(.gatherFactor($0)) }
+//					),
+//					then: { GatherFactor.View(store: $0) }
+//				)
+//				.zIndex(1)
+//			}
+//		}
+		Text("Foo")
 	}
 }
 
@@ -95,7 +96,7 @@ internal extension NameNewEntity.View {
 					Spacer()
 
 					Button(L10n.CreateAccount.createAccountButtonTitle) {
-						viewStore.send(.createAccountButtonTapped)
+						viewStore.send(.confirmNameButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
 					.controlState(viewStore.createAccountButtonState)
@@ -118,16 +119,17 @@ extension NameNewEntity.View {
 		public var isLoaderVisible: Bool
 		public var createAccountButtonState: ControlState
 		public var isDismissButtonVisible: Bool
-		@BindableState public var focusedField: NameNewEntity.State.Field?
+		@BindingState public var focusedField: NameNewEntity.State.Field?
 
 		init(state: NameNewEntity.State) {
-			titleText = state.isFirstAccount == false ? L10n.CreateAccount.createNewAccount : L10n.CreateAccount.createFirstAccount
-			accountName = state.inputtedAccountName
-			isLoaderVisible = state.isCreatingAccount
-			let isNameValid = !state.sanitizedAccountName.isEmpty
-			createAccountButtonState = (isNameValid && !state.isCreatingAccount) ? .enabled : .disabled
-			isDismissButtonVisible = !state.shouldCreateProfile && state.factorSources != nil
-			focusedField = state.focusedField
+//			titleText = state.isFirstAccount == false ? L10n.CreateAccount.createNewAccount : L10n.CreateAccount.createFirstAccount
+//			accountName = state.inputtedAccountName
+//			isLoaderVisible = state.isCreatingAccount
+//			let isNameValid = !state.sanitizedAccountName.isEmpty
+//			createAccountButtonState = (isNameValid && !state.isCreatingAccount) ? .enabled : .disabled
+//			isDismissButtonVisible = !state.shouldCreateProfile && state.factorSources != nil
+//			focusedField = state.focusedField
+			fatalError()
 		}
 	}
 }
@@ -154,17 +156,18 @@ private extension NameNewEntity.View {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct NameNewEntity_Previews: PreviewProvider {
-	static var previews: some View {
-		NameNewEntity.View(
-			store: .init(
-				initialState: .init(shouldCreateProfile: false),
-				reducer: NameNewEntity()
-			)
-		)
-	}
-}
-#endif
+//
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+// struct NameNewEntity_Previews: PreviewProvider {
+//	static var previews: some View {
+//		NameNewEntity.View(
+//			store: .init(
+//				initialState: .init(shouldCreateProfile: false),
+//				reducer: NameNewEntity()
+//			)
+//		)
+//	}
+// }
+// #endif

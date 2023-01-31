@@ -43,7 +43,11 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 
 			case .internal(.view(.createAccountButtonTapped)):
 				state.createAccountCoordinator = .init(
-					completionDestination: .chooseAccounts
+					step: .nameNewEntity(.init()),
+					config: .init(
+						create: .anotherAccount
+					),
+					completionDestination: .home
 				)
 				return .none
 

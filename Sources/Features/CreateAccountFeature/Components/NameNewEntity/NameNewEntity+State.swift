@@ -14,29 +14,19 @@ public extension NameNewEntity {
 
 //		public let shouldCreateProfile: Bool
 
-		public var factorSources: FactorSources?
-		public var genesisFactorSource: FactorSource?
-		public var gatherFactor: GatherFactor<GatherFactorPurposeDerivePublicKey>.State?
-
-		@BindableState public var focusedField: Field?
+		@BindingState public var focusedField: Field?
 
 		public init(
 			//			onNetworkWithID: NetworkID? = nil,
 //			shouldCreateProfile: Bool = false,
 			isFirstAccount: Bool = false,
 			inputtedAccountName: String = "",
-			focusedField: Field? = nil,
-			factorSources: FactorSources? = nil,
-			genesisFactorSource: FactorSource? = nil,
-			gatherFactor: GatherFactor<GatherFactorPurposeDerivePublicKey>.State? = nil
+			focusedField: Field? = nil
 		) {
 //			self.onNetworkWithID = onNetworkWithID
 //			self.shouldCreateProfile = shouldCreateProfile
 			self.inputtedName = inputtedAccountName
 			self.focusedField = focusedField
-			self.factorSources = factorSources
-			self.genesisFactorSource = genesisFactorSource
-			self.gatherFactor = gatherFactor
 			self.isFirst = isFirstAccount
 		}
 	}

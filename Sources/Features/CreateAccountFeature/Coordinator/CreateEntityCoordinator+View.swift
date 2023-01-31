@@ -14,14 +14,14 @@ public extension CreateEntityCoordinator {
 
 public extension CreateEntityCoordinator.View {
 	var body: some View {
-		SwitchStore(store.scope(state: \.root)) {
+		SwitchStore(store.scope(state: \.step)) {
 			CaseLet(
-				state: /CreateEntityCoordinator.State.Root.nameNewEntity,
+				state: /CreateEntityCoordinator.State.Step.nameNewEntity,
 				action: { CreateEntityCoordinator.Action.child(.nameNewEntity($0)) },
 				then: { NameNewEntity.View(store: $0) }
 			)
 			CaseLet(
-				state: /CreateEntityCoordinator.State.Root.selectGenesisFactorSource,
+				state: /CreateEntityCoordinator.State.Step.selectGenesisFactorSource,
 				action: { CreateEntityCoordinator.Action.child(.selectGenesisFactorSource($0)) },
 				then: { SelectGenesisFactorSource.View(store: $0) }
 			)

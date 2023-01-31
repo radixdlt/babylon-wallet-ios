@@ -10,13 +10,15 @@ public extension Onboarding {
 		case createAccountCoordinator(CreateAccountCoordinator.State)
 
 		public init() {
-//			self = .createAccountCoordinator(
-//				.init(
-//					completionDestination: .home,
-//					rootState: .init(shouldCreateProfile: true, isFirstAccount: true)
-//				)
-//			)
-			fatalError()
+			self = .createAccountCoordinator(
+				.init(
+					step: .nameNewEntity(.init()),
+					config: .init(
+						create: .profile
+					),
+					completionDestination: .home
+				)
+			)
 		}
 	}
 }

@@ -1,6 +1,27 @@
 import FeaturePrelude
 
-public typealias CreateAccountCoordinator = CreateEntityCoordinator<CreateAccountCompletionState, CreateAccountCompletionAction>
+// MARK: - CreateAccountConfig
+public struct CreateAccountConfig: CreateEntityStateConfigProtocol {
+	public var mode: Mode
+
+	public var networkID: NetworkID?
+
+	public enum Mode: Sendable, Equatable {
+		case profile
+		case firstAccount
+		case anotherAccount
+	}
+
+	public init(
+		create mode: Mode,
+		networkID: NetworkID? = nil
+	) {
+		self.mode = mode
+		self.networkID = networkID
+	}
+}
+
+public typealias CreateAccountCoordinator = CreateEntityCoordinator<CreateAccountConfig, CreateAccountCompletionState, CreateAccountCompletionAction>
 
 // MARK: - CreateEntityCompletionDestinationProtocol
 public protocol CreateEntityCompletionDestinationProtocol: Sendable, Equatable {
@@ -59,26 +80,31 @@ public enum CreateAccountCompletionAction: CreateEntityCompletionActionProtocol 
 	public static var completed: Self { fatalError() }
 }
 
+// MARK: - CreateEntityStateConfigProtocol
+public protocol CreateEntityStateConfigProtocol: Sendable, Equatable {}
+
 // MARK: - CreateEntityCoordinator
 public struct CreateEntityCoordinator<
+	StateConfig: CreateEntityStateConfigProtocol,
 	CompletionState: CreateEntityCompletionStateProtocol,
 	CompletionAction: CreateEntityCompletionActionProtocol
+
 >: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.root, action: /Action.self) {
-			EmptyReducer()
-				.ifCaseLet(/State.Root.nameNewEntity, action: /Action.child .. Action.ChildAction.nameNewEntity) {
-					NameNewEntity()
-				}
-				.ifCaseLet(/State.Root.selectGenesisFactorSource, action: /Action.child .. Action.ChildAction.selectGenesisFactorSource) {
-					SelectGenesisFactorSource()
-				}
-//				.ifCaseLet(/State.Root.entityCompletion, action: /Action.child .. Action.ChildAction.entityCompletion) {
-			//                    EntityCompletion()
+//		Scope(state: \.root, action: /Action.self) {
+//			EmptyReducer()
+//				.ifCaseLet(/State.Root.nameNewEntity, action: /Action.child .. Action.ChildAction.nameNewEntity) {
+//					NameNewEntity()
 //				}
-		}
+//				.ifCaseLet(/State.Root.selectGenesisFactorSource, action: /Action.child .. Action.ChildAction.selectGenesisFactorSource) {
+//					SelectGenesisFactorSource()
+//				}
+		////				.ifCaseLet(/State.Root.entityCompletion, action: /Action.child .. Action.ChildAction.entityCompletion) {
+//			//                    EntityCompletion()
+		////				}
+//		}
 		Reduce(self.core)
 	}
 
