@@ -16,11 +16,11 @@ extension ProfileClient: TestDependencyKey {
 	public static let previewValue: Self = with(.noop) {
 		$0.getAccounts = {
 			let accounts: [OnNetwork.Account] = [.previewValue0, .previewValue1]
-			return NonEmpty(rawValue: OrderedSet(accounts))!
+			return NonEmpty(rawValue: IdentifiedArrayOf(uniqueElements: accounts))!
 		}
 		$0.getPersonas = {
 			let accounts: [OnNetwork.Persona] = [.previewValue0, .previewValue1]
-			return OrderedSet(accounts)
+			return IdentifiedArrayOf(uniqueElements: accounts)
 		}
 	}
 
@@ -38,6 +38,10 @@ extension ProfileClient: TestDependencyKey {
 		getAccounts: unimplemented("\(Self.self).getAccounts"),
 		getPersonas: unimplemented("\(Self.self).getPersonas"),
 		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
+		getConnectedDapps: unimplemented("\(Self.self).getConnectedDapps"),
+		addConnectedDapp: unimplemented("\(Self.self).addConnectedDapp"),
+		detailsForConnectedDapp: unimplemented("\(Self.self).detailsForConnectedDapp"),
+		updateConnectedDapp: unimplemented("\(Self.self).updateConnectedDapp"),
 		addP2PClient: unimplemented("\(Self.self).addP2PClient"),
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
@@ -68,6 +72,10 @@ public extension ProfileClient {
 		getAccounts: { throw NoopError() },
 		getPersonas: { throw NoopError() },
 		getP2PClients: { throw NoopError() },
+		getConnectedDapps: { throw NoopError() },
+		addConnectedDapp: { _ in throw NoopError() },
+		detailsForConnectedDapp: { _ in throw NoopError() },
+		updateConnectedDapp: { _ in throw NoopError() },
 		addP2PClient: { _ in throw NoopError() },
 		deleteP2PClientByID: { _ in throw NoopError() },
 		getAppPreferences: { throw NoopError() },

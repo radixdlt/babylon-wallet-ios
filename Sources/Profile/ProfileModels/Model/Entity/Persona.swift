@@ -41,7 +41,7 @@ public extension OnNetwork {
 		public let displayName: String?
 
 		/// Fields containing personal information you have inputted.
-		public let fields: OrderedSet<Field>
+		public let fields: IdentifiedArrayOf<Field>
 
 		public init(
 			networkID: NetworkID,
@@ -50,7 +50,7 @@ public extension OnNetwork {
 			index: Index,
 			derivationPath: EntityDerivationPath,
 			displayName: String?,
-			fields: OrderedSet<Field>
+			fields: IdentifiedArrayOf<Field>
 		) {
 			self.networkID = networkID
 			self.address = address

@@ -51,7 +51,7 @@ public struct TransactionHeader: Sendable, Codable, Hashable {
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(String(version), forKey: .version)
-		try container.encode(String(networkId.id), forKey: .networkId)
+		try container.encode(String(networkId), forKey: .networkId)
 		try container.encode(String(startEpochInclusive), forKey: .startEpochInclusive)
 		try container.encode(String(endEpochExclusive), forKey: .endEpochExclusive)
 		try container.encode(String(nonce), forKey: .nonce)

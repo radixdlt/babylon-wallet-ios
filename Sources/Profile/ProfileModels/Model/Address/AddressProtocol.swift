@@ -20,7 +20,7 @@ public extension CustomStringConvertible where Self: AddressProtocol {
 
 // MARK: - AddressKindProtocol
 /// A type which has an address kind.
-public protocol AddressKindProtocol: AddressProtocol {
+public protocol AddressKindProtocol: AddressProtocol, Codable {
 	init(address: String) throws
 
 	/// The kind of address
@@ -33,4 +33,16 @@ public protocol AddressKindProtocol: AddressProtocol {
 	/// Tries to unwraps the nominal type `Address` (enum)
 	/// into this specific type.
 	static func unwrap(address: Address) -> Self?
+}
+
+public extension AddressKindProtocol {
+	init(from decoder: Decoder) throws {
+		let singleValueContainer = try decoder.singleValueContainer()
+		try self.init(address: singleValueContainer.decode(String.self))
+	}
+
+	func encode(to encoder: Encoder) throws {
+		var singleValueContainer = encoder.singleValueContainer()
+		try singleValueContainer.encode(self.address)
+	}
 }

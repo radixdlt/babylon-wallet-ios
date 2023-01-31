@@ -6,8 +6,8 @@ import FeatureTestingPrelude
 final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 	func test_dismissIncomingConnectionRequest_whenTappedOnCloseButton_thenCoortinateDismissal() async {
 		// given
-		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
-			requestItem: .init(numberOfAddresses: 1),
+		let requestItem: P2P.OneTimeAccountsRequestToHandle = .init(
+			requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
 			parentRequest: .previewValue
 		)
 
@@ -32,8 +32,8 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 
 	func test_proceedWithConnectionRequest_whenTappedOnContinueButton_thenNotifiesDelegate() async {
 		// given
-		let requestItem: P2P.OneTimeAccountAddressesRequestToHandle = .init(
-			requestItem: .init(numberOfAddresses: 1),
+		let requestItem: P2P.OneTimeAccountsRequestToHandle = .init(
+			requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
 			parentRequest: .previewValue
 		)
 
@@ -47,7 +47,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 			initialState: initialState,
 			reducer: DappConnectionRequest()
 		)
-		let accounts: NonEmpty<OrderedSet<OnNetwork.Account>> = .init(rawValue: .init([.previewValue0, .previewValue1]))!
+		let accounts: NonEmpty<IdentifiedArrayOf<OnNetwork.Account>> = .init(rawValue: .init([.previewValue0, .previewValue1]))!
 		store.dependencies.profileClient.getAccounts = { @Sendable in accounts }
 
 		// when

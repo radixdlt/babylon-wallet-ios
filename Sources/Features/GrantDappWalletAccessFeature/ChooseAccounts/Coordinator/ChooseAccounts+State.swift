@@ -4,32 +4,19 @@ import FeaturePrelude
 // MARK: - ChooseAccounts.State
 public extension ChooseAccounts {
 	struct State: Equatable {
-		public let request: P2P.OneTimeAccountAddressesRequestToHandle
-		public var canProceed: Bool
+		public let request: P2P.OneTimeAccountsRequestToHandle
 		public var accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
 		public var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		public init(
-			request: P2P.OneTimeAccountAddressesRequestToHandle,
-			canProceed: Bool = false,
+			request: P2P.OneTimeAccountsRequestToHandle,
 			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = [],
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil
 		) {
 			self.request = request
-			self.canProceed = canProceed
 			self.accounts = accounts
 			self.createAccountCoordinator = createAccountCoordinator
 		}
-	}
-}
-
-public extension ChooseAccounts.State {
-	init(
-		request: P2P.RequestFromClient
-	) throws {
-		try self.init(
-			request: .init(request: request)
-		)
 	}
 }
 
@@ -43,8 +30,7 @@ extension ChooseAccounts.State {
 #if DEBUG
 public extension ChooseAccounts.State {
 	static let previewValue: Self = .init(
-		request: .init(requestItem: .previewValue, parentRequest: .previewValue),
-		canProceed: false,
+		request: .init(request: .previewValueOneTimeAccountAccess)!,
 		accounts: .init(
 			uniqueElements: [
 				.previewValueOne,
