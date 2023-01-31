@@ -45,23 +45,20 @@ public extension Personas.View {
 
 						Separator()
 
-						// TODO: implement
-						/*
-						 VStack(alignment: .leading) {
-						 	ForEachStore(
-						 		store.scope(
-						 			state: \.clients,
-						 			action: { .child(.connection(id: $0, action: $1)) }
-						 		),
-						 		content: {
-						 			ManageP2PClient.View(store: $0)
-						 				.padding(.medium3)
+						VStack(alignment: .leading) {
+							ForEachStore(
+								store.scope(
+									state: \.personas,
+									action: { .child(.persona(id: $0, action: $1)) }
+								),
+								content: {
+									Persona.View(store: $0)
+										.padding(.medium3)
 
-						 			Separator()
-						 		}
-						 	)
-						 }
-						 */
+									Separator()
+								}
+							)
+						}
 
 						Button(L10n.Personas.createNewPersonaButtonTitle) {
 							viewStore.send(.createNewPersonaButtonTapped)

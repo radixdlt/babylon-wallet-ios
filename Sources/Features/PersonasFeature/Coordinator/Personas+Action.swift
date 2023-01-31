@@ -3,6 +3,7 @@ import FeaturePrelude
 // MARK: - Personas.Action
 public extension Personas {
 	enum Action: Sendable, Equatable {
+		case child(ChildAction)
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
@@ -10,6 +11,17 @@ public extension Personas {
 
 public extension Personas.Action {
 	static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
+}
+
+// MARK: - Personas.Action.ChildAction
+public extension Personas.Action {
+	enum ChildAction: Sendable, Equatable {
+		case persona(Persona.Action)
+		case persona(
+			id: OnNetwork.Persona.ID,
+			action: Persona.Action
+		)
+	}
 }
 
 // MARK: - Personas.Action.ViewAction

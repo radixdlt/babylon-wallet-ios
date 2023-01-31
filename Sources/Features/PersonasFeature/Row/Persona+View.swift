@@ -41,6 +41,8 @@ extension Persona.View {
 import SwiftUI // NB: necessary for previews to appear
 
 // MARK: - Persona_Preview
+
+// TODO: preview fails, persona previewValue needs to be fixed
 struct Persona_Preview: PreviewProvider {
 	static var previews: some View {
 		Persona.View(

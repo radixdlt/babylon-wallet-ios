@@ -6,7 +6,7 @@ public extension Personas {
 		public var personas: IdentifiedArrayOf<Persona.State>
 
 		public init(
-			personas: IdentifiedArrayOf<Persona.State>
+			personas: IdentifiedArrayOf<Persona.State> = .init()
 		) {
 			self.personas = personas
 		}
@@ -15,7 +15,6 @@ public extension Personas {
 
 #if DEBUG
 public extension Personas.State {
-	// TODO: implement
-	static let previewValue: Self = .init(personas: .init())
+	static let previewValue: Self = .init()
 }
 #endif

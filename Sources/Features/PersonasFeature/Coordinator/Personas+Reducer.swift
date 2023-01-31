@@ -19,6 +19,10 @@ public extension Personas {
 
 		case .delegate:
 			return .none
+
+		case .child:
+			// TODO: implement
+			return .none
 		}
 	}
 }
