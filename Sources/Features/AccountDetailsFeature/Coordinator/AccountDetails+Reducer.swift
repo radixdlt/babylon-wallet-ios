@@ -20,29 +20,29 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.view(.appeared)):
+		case .view(.appeared):
 			return .run { [address = state.address] send in
 				await send(.delegate(.refresh(address)))
 			}
-		case .internal(.view(.dismissAccountDetailsButtonTapped)):
+		case .view(.dismissAccountDetailsButtonTapped):
 			return .run { send in
 				await send(.delegate(.dismissAccountDetails))
 			}
-		case .internal(.view(.displayAccountPreferencesButtonTapped)):
+		case .view(.displayAccountPreferencesButtonTapped):
 			return .run { [address = state.address] send in
 				await send(.delegate(.displayAccountPreferences(address)))
 			}
-		case .internal(.view(.copyAddressButtonTapped)):
+		case .view(.copyAddressButtonTapped):
 			let address = state.address.address
 			return .fireAndForget { pasteboardClient.copyString(address) }
-		case .internal(.view(.pullToRefreshStarted)):
+		case .view(.pullToRefreshStarted):
 			return .run { [address = state.address] send in
 				await send(.delegate(.refresh(address)))
 			}
-		case .internal(.view(.transferButtonTapped)):
+		case .view(.transferButtonTapped):
 			state.destination = .transfer(AssetTransfer.State(from: state.account))
 			return .none
-		case .child, .delegate:
+		case .internal, .child, .delegate:
 			return .none
 		}
 	}

@@ -6,7 +6,7 @@ public extension AccountDetails {
 	// MARK: Action
 	enum Action: Sendable, Equatable {
 		case child(ChildAction)
-		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
+		case view(ViewAction)
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
@@ -34,9 +34,7 @@ public extension AccountDetails.Action {
 
 // MARK: - AccountDetails.Action.InternalAction
 public extension AccountDetails.Action {
-	enum InternalAction: Sendable, Equatable {
-		case view(ViewAction)
-	}
+	enum InternalAction: Sendable, Equatable {}
 }
 
 // MARK: - AccountDetails.Action.DelegateAction
