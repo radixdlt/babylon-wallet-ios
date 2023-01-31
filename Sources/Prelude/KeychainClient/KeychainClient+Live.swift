@@ -16,7 +16,7 @@ public extension KeychainClient {
 	static var liveValue: Self = live()
 
 	static func live(
-		accessibility: Accessibility = .whenPasscodeSetThisDeviceOnly,
+		accessibility: KeychainAccess.Accessibility = .whenPasscodeSetThisDeviceOnly,
 		authenticationPolicy: AuthenticationPolicy = .biometryCurrentSet,
 		service: String? = "Radix Wallet",
 		accessGroup: String? = nil,
