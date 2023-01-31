@@ -59,9 +59,18 @@ public struct CaseReduce<State, Action>: ReducerProtocol {
 		_ reduce: @escaping (inout State, CaseAction) -> EffectTask<Action>,
 		case casePath: CasePath<Action, CaseAction>
 	) {
+		self.init(reduce, case: casePath, embed: { $0 })
+	}
+
+	@usableFromInline
+	init<CaseAction, EmbeddableAction>(
+		_ reduce: @escaping (inout State, CaseAction) -> EffectTask<EmbeddableAction>,
+		case casePath: CasePath<Action, CaseAction>,
+		embed embedding: @escaping (EmbeddableAction) -> Action
+	) {
 		self.reduce = { state, action in
 			guard let inputAction = casePath.extract(from: action) else { return .none }
-			return reduce(&state, inputAction)
+			return reduce(&state, inputAction).map(embedding)
 		}
 	}
 
