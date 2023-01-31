@@ -1,9 +1,8 @@
-import Dependencies
 import Foundation
 @preconcurrency import KeychainAccess
 
 // MARK: - KeychainClient
-public struct KeychainClient: Sendable, DependencyKey {
+public struct KeychainClient: Sendable {
 	public typealias Key = String
 
 	public var dataForKey: DataForKey
