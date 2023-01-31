@@ -1,9 +1,8 @@
-import Dependencies
 import Foundation
 @preconcurrency import KeychainAccess
 
 // MARK: - KeychainClient
-public struct KeychainClient: Sendable, DependencyKey {
+public struct KeychainClient: Sendable {
 	public typealias Key = String
 
 	public var dataForKey: DataForKey
@@ -36,9 +35,10 @@ public extension KeychainClient {
 	typealias UpdateDataForKey = @Sendable (Data, Key, Protection?, AuthenticationPrompt?) async throws -> Void
 
 	struct Protection: Sendable {
-		public let accessibility: Accessibility
+		public let accessibility: KeychainAccess.Accessibility
 		public let authenticationPolicy: AuthenticationPolicy
-		public init(accessibility: Accessibility, authenticationPolicy: AuthenticationPolicy) {
+
+		public init(accessibility: KeychainAccess.Accessibility, authenticationPolicy: AuthenticationPolicy) {
 			self.accessibility = accessibility
 			self.authenticationPolicy = authenticationPolicy
 		}
