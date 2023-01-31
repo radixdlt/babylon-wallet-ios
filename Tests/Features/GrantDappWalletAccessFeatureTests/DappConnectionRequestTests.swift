@@ -1,5 +1,5 @@
+@testable import DappInteractionFeature
 import FeatureTestingPrelude
-@testable import GrantDappWalletAccessFeature
 
 // MARK: - IncomingConnectionRequestFromDappReviewFeatureTests
 @MainActor

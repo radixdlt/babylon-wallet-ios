@@ -5,7 +5,6 @@ import AccountPreferencesFeature
 import CreateAccountFeature
 import FeaturePrelude
 import FungibleTokenListFeature
-import GrantDappWalletAccessFeature
 import P2PConnectivityClient
 import ProfileClient
 import TransactionSigningFeature

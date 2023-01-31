@@ -1,5 +1,4 @@
 import FeaturePrelude
-import GrantDappWalletAccessFeature
 import HandleDappRequests
 import HomeFeature
 import P2PConnectivityClient
