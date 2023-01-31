@@ -45,7 +45,7 @@ final class ManifestToStringTests: TestCase {
 					abi: Blob(data: sha256(data: package.abi)),
 					ownerBadge: NonFungibleGlobalId(
 						resourceAddress: .init(address: "resource_sim1qzf8hl3azz2q0e5s33nh2mt8wmvqjfxdrv06ysus4alqh0994h"),
-						nonFungibleLocalId: .u32(12)
+						nonFungibleLocalId: .integer(12)
 					)
 				)
 			}.instructions

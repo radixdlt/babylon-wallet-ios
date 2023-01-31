@@ -34,14 +34,14 @@ public indirect enum Value_: Sendable, Codable, Hashable {
 
 	case `enum`(Enum)
 
-	case some(Value_)
+	case some(Some)
 	case none
-	case ok(Value_)
-	case err(Value_)
+	case ok(Ok)
+	case err(Err)
 
 	case array(Array_)
 	case tuple(Tuple)
-	case map(Map)
+	case map(Map_)
 
 	case decimal(Decimal_)
 	case preciseDecimal(PreciseDecimal)
@@ -185,11 +185,13 @@ public extension Value_ {
 
 public extension Value_ {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
 		case type
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
 		switch self {
 		case let .boolean(value):
@@ -241,15 +243,13 @@ public extension Value_ {
 		case let .enum(value):
 			try value.encode(to: encoder)
 		case let .some(value):
-			// `Optional` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try Optional.some(value).proxyEncodable.encode(to: encoder)
+			try value.encode(to: encoder)
 		case .none:
-			// `Optional` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try Optional.none.proxyEncodable.encode(to: encoder)
+			try None().encode(to: encoder)
 		case let .ok(value):
-			try Result.success(value).encode(to: encoder)
+			try value.encode(to: encoder)
 		case let .err(value):
-			try Result.failure(value).encode(to: encoder)
+			try value.encode(to: encoder)
 
 		case let .array(value):
 			try value.encode(to: encoder)
@@ -368,21 +368,13 @@ public extension Value_ {
 			self = try .enum(.init(from: decoder))
 
 		case .some:
-			let x: Value_? = try Value_?.ProxyDecodable(from: decoder).decoded
-			self = .some(x.unsafelyUnwrapped)
+			self = try .some(.init(from: decoder))
 		case .none:
 			self = .none
 		case .ok:
-			let x: Result<Value_, Value_> = try .init(from: decoder)
-			self = try .ok(x.get())
+			self = try .ok(.init(from: decoder))
 		case .err:
-			let x: Result<Value_, Value_> = try .init(from: decoder)
-			switch x {
-			case let .failure(value):
-				self = .err(value)
-			case .success:
-				throw InternalDecodingFailure.parsingError
-			}
+			self = try .err(.init(from: decoder))
 
 		case .array:
 			self = try .array(.init(from: decoder))

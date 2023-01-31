@@ -30,7 +30,7 @@ CALL_NATIVE_METHOD
         "NonFungible", 
         Array<Tuple>(
             Tuple(
-                NonFungibleLocalId({non_fungible_id}), 
+                NonFungibleLocalId({non_fungible_local_id}), 
                 Tuple(Bytes("5c2100"), Bytes("5c2100"))
             )
         )

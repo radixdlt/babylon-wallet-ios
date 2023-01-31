@@ -13,7 +13,7 @@ public struct DeriveNonFungibleGlobalIdRequest: Sendable, Codable, Hashable {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case resourceAddress = "resource_address"
-		case nonFungibleLocalId = "non_fungible_id"
+		case nonFungibleLocalId = "non_fungible_local_id"
 	}
 }
 
@@ -30,6 +30,6 @@ public struct DeriveNonFungibleGlobalIdResponse: Sendable, Codable, Hashable {
 
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
-		case nonFungibleGlobalId = "non_fungible_address"
+		case nonFungibleGlobalId = "non_fungible_global_id"
 	}
 }

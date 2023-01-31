@@ -29,6 +29,6 @@ public struct DeriveNonFungibleGlobalIdFromPublicKeyResponse: Sendable, Codable,
 
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
-		case nonFungibleGlobalId = "non_fungible_address"
+		case nonFungibleGlobalId = "non_fungible_global_id"
 	}
 }

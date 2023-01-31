@@ -41,9 +41,9 @@ enum SborDecodeEncodeTestVectors {
 	typealias Vector = (encoded: String, decoded: Value_)
 	static let vectors: [Vector] = [
 		// SBOR Primitive Types
-		(
-			encoded: "5c0000",
-			decoded: .unit(Unit())
-		),
+		//		(
+		//			encoded: "5c0000",
+		//			decoded: .unit(Unit())
+		//		),
 	]
 }

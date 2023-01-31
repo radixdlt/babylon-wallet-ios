@@ -186,7 +186,7 @@ public extension TransactionManifest {
 			for instruction in instructions {
 				switch instruction {
 				case let .callMethod(callMethodInstruction):
-					let isAccountComponent = callMethodInstruction.receiver.isAccountComponent()
+					let isAccountComponent = callMethodInstruction.receiver.address.starts(with: "account")
 					let isMethodThatRequiresAuth = [
 						"lock_fee",
 						"lock_contingent_fee",
@@ -202,14 +202,7 @@ public extension TransactionManifest {
 					].contains(callMethodInstruction.methodName)
 
 					if isAccountComponent, isMethodThatRequiresAuth {
-						switch callMethodInstruction.receiver {
-						case let .componentAddress(componentAddress):
-							accountsRequiredToSign.insert(componentAddress)
-						case .component:
-							// TODO: The RENodeId should be translated to an account component
-							// address and added to the set
-							break
-						}
+						accountsRequiredToSign.insert(callMethodInstruction.receiver)
 					}
 
 				default:

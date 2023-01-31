@@ -25,7 +25,7 @@ public extension NonFungibleGlobalId {
 	private enum CodingKeys: String, CodingKey {
 		case type
 		case resourceAddress = "resource_address"
-		case nonFungibleLocalId = "non_fungible_id"
+		case nonFungibleLocalId = "non_fungible_local_id"
 	}
 
 	// MARK: Codable
