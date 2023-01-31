@@ -153,7 +153,7 @@ public extension Profile {
 		} else {
 			let onNetwork = OnNetwork(
 				networkID: networkID,
-				accounts: .init(rawValue: .init([account]))!,
+				accounts: .init(rawValue: .init(uniqueElements: [account]))!,
 				personas: [],
 				connectedDapps: []
 			)

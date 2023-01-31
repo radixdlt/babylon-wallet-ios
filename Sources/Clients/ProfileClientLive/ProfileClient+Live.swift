@@ -210,6 +210,11 @@ public extension ProfileClient {
 					_ = try await profile.addConnectedDapp(connectedDapp)
 				}
 			},
+			detailsForConnectedDapp: { connectedDappSimple in
+				try await profileHolder.get { profile in
+					try profile.detailsForConnectedDapp(connectedDappSimple)
+				}
+			},
 			updateConnectedDapp: { updated in
 				try await profileHolder.asyncMutating { profile in
 					try await profile.updateConnectedDapp(updated)

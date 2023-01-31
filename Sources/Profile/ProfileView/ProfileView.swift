@@ -273,7 +273,7 @@ public extension P2PClientsView {
 public struct ConnectedDappsView: IndentedView {
 	public let connectedDapps: [OnNetwork.ConnectedDapp]
 	public let indentation: Indentation
-	public let authorizedPersonasForDapp: (OnNetwork.ConnectedDapp) -> IdentifiedArrayOf<OnNetwork.AuthorizedPersona>
+	public let getDetailedConnectedDapp: (OnNetwork.ConnectedDapp) -> OnNetwork.ConnectedDappDetailed
 }
 
 public extension ConnectedDappsView {
@@ -291,7 +291,7 @@ public extension ConnectedDappsView {
 					ConnectedDappView(
 						connectedDapp: connectedDapp,
 						indentation: inOneLevel,
-						authorizedPersonas: authorizedPersonasForDapp(connectedDapp)
+						authorizedPersonas: getDetailedConnectedDapp(connectedDapp).detailedAuthorizedPersonas
 					)
 				}
 			}
@@ -304,7 +304,7 @@ public extension ConnectedDappsView {
 public struct ConnectedDappView: IndentedView {
 	public let connectedDapp: OnNetwork.ConnectedDapp
 	public let indentation: Indentation
-	public let authorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersona>
+	public let authorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>
 }
 
 public extension ConnectedDappView {
@@ -312,6 +312,41 @@ public extension ConnectedDappView {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("Name", value: String(describing: connectedDapp.displayName))
 			Labeled("Dapp def address", value: String(describing: connectedDapp.dAppDefinitionAddress))
+			ForEach(authorizedPersonas) {
+				DappAuthorizedPersonaView(
+					detailedAuthorizedPersona: $0,
+					indentation: inOneLevel
+				)
+			}
+		}
+		.padding([.leading], leadingPadding)
+	}
+}
+
+// MARK: - DappAuthorizedPersonaView
+public struct DappAuthorizedPersonaView: IndentedView {
+	public let detailedAuthorizedPersona: OnNetwork.AuthorizedPersonaDetailed
+	public let indentation: Indentation
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			Labeled("Address", value: detailedAuthorizedPersona.identityAddress.address)
+			Labeled("Name", value: detailedAuthorizedPersona.displayName ?? "<NONE>")
+
+			Text("Fields")
+			ForEach(detailedAuthorizedPersona.fields) { field in
+				VStack {
+					Labeled("id", value: field.id.description)
+					Labeled("kind", value: field.kind.rawValue)
+					Labeled("value", value: field.value)
+				}
+			}
+
+			Text("Shared Accounts")
+			ForEach(detailedAuthorizedPersona.simpleAccounts) { simpleAccount in
+				Labeled("displayName", value: simpleAccount.label ?? "<NONE>")
+				Labeled("address", value: simpleAccount.address.address)
+				Labeled("appearanceID", value: simpleAccount.appearanceID.description)
+			}
 		}
 		.padding([.leading], leadingPadding)
 	}
@@ -397,7 +432,7 @@ public extension OnNetworkView {
 				connectedDapps: onNetwork.connectedDapps.elements,
 				indentation: inOneLevel
 			) {
-				try! onNetwork.authorizedPersonas(dapp: $0)
+				try! onNetwork.detailsForConnectedDapp($0)
 			}
 		}
 		.padding([.leading], leadingPadding)

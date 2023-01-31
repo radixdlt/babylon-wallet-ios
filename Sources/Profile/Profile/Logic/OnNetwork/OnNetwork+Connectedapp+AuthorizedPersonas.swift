@@ -2,7 +2,9 @@ import Prelude
 
 // MARK: ~~~=== LOGIC ===~~~
 public extension OnNetwork {
-	struct AccountForDisplay: Sendable, Hashable {
+	struct AccountForDisplay: Sendable, Hashable, Identifiable {
+		public typealias ID = AccountAddress
+		public var id: ID { address }
 		public let address: AccountAddress
 		public let label: String?
 		public let appearanceID: OnNetwork.Account.AppearanceID
@@ -18,7 +20,7 @@ public extension OnNetwork {
 		}
 	}
 
-	struct AuthorizedPersona: Sendable, Hashable, Identifiable {
+	struct AuthorizedPersonaDetailed: Sendable, Hashable, Identifiable {
 		public typealias ID = IdentityAddress
 		public var id: ID { identityAddress }
 		/// Address that globally abnd uniquely identifies this Persona.
@@ -37,14 +39,21 @@ public extension OnNetwork {
 		public let simpleAccounts: OrderedSet<AccountForDisplay>
 	}
 
-	func authorizedPersonas(dapp: ConnectedDapp) throws -> IdentifiedArrayOf<AuthorizedPersona> {
+	struct ConnectedDappDetailed: Sendable, Hashable {
+		public let networkID: Network.ID
+		public let dAppDefinitionAddress: DappDefinitionAddress
+		public let displayName: String
+		public let detailedAuthorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>
+	}
+
+	func detailsForConnectedDapp(_ dapp: ConnectedDapp) throws -> ConnectedDappDetailed {
 		guard
 			dapp.networkID == self.networkID
 		else {
 			/// this is a sign that ProfileSnapshot is in a bad state somehow...
 			throw NetworkDiscrepancyError()
 		}
-		return try .init(uniqueElements: dapp.referencesToAuthorizedPersonas.map { simple in
+		let detailedAuthorizedPersonas = try IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>(uniqueElements: dapp.referencesToAuthorizedPersonas.map { simple in
 
 			guard
 				let persona = self.personas.first(where: { $0.address == simple.identityAddress })
@@ -53,7 +62,7 @@ public extension OnNetwork {
 				throw DiscrepancyConnectedDappReferencedPersonaWhichDoesNotExist()
 			}
 
-			return AuthorizedPersona(
+			return AuthorizedPersonaDetailed(
 				identityAddress: persona.address,
 				displayName: persona.displayName,
 				fields: try .init(uniqueElements: simple.fieldIDs.map { fieldID in
@@ -79,6 +88,13 @@ public extension OnNetwork {
 				})
 			)
 		})
+
+		return .init(
+			networkID: networkID,
+			dAppDefinitionAddress: dapp.dAppDefinitionAddress,
+			displayName: dapp.displayName,
+			detailedAuthorizedPersonas: detailedAuthorizedPersonas
+		)
 	}
 
 	struct NetworkDiscrepancyError: Swift.Error {}
