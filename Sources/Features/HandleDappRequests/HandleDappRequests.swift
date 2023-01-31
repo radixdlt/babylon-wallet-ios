@@ -1,5 +1,5 @@
+import DappInteractionFeature
 import FeaturePrelude
-import GrantDappWalletAccessFeature
 import P2PConnectivityClient
 import ProfileClient
 import TransactionClient
