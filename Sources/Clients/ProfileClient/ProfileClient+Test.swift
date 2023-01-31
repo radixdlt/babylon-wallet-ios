@@ -16,11 +16,11 @@ extension ProfileClient: TestDependencyKey {
 	public static let previewValue: Self = with(.noop) {
 		$0.getAccounts = {
 			let accounts: [OnNetwork.Account] = [.previewValue0, .previewValue1]
-			return NonEmpty(rawValue: OrderedSet(accounts))!
+			return NonEmpty(rawValue: IdentifiedArrayOf(uniqueElements: accounts))!
 		}
 		$0.getPersonas = {
 			let accounts: [OnNetwork.Persona] = [.previewValue0, .previewValue1]
-			return OrderedSet(accounts)
+			return IdentifiedArrayOf(uniqueElements: accounts)
 		}
 	}
 

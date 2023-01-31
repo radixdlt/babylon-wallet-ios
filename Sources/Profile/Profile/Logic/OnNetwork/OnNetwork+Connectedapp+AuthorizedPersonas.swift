@@ -18,7 +18,9 @@ public extension OnNetwork {
 		}
 	}
 
-	struct AuthorizedPersona: Sendable, Hashable {
+	struct AuthorizedPersona: Sendable, Hashable, Identifiable {
+		public typealias ID = IdentityAddress
+		public var id: ID { identityAddress }
 		/// Address that globally abnd uniquely identifies this Persona.
 		public let identityAddress: IdentityAddress
 
@@ -28,22 +30,21 @@ public extension OnNetwork {
 
 		/// The persona data that the user has given the Dapp access to,
 		/// being the trippple: `(id, kind, value)`
-		public let fields: OrderedSet<OnNetwork.Persona.Field>
+		public let fields: IdentifiedArrayOf<OnNetwork.Persona.Field>
 
 		/// Information of accounts the user has given the Dapp access to,
 		/// being the tripple `(accountAddress, displayName, appearanceID)`
 		public let simpleAccounts: OrderedSet<AccountForDisplay>
 	}
 
-	func authorizedPersonas(dapp: ConnectedDapp) throws -> OrderedSet<AuthorizedPersona> {
+	func authorizedPersonas(dapp: ConnectedDapp) throws -> IdentifiedArrayOf<AuthorizedPersona> {
 		guard
 			dapp.networkID == self.networkID
 		else {
 			/// this is a sign that ProfileSnapshot is in a bad state somehow...
 			throw NetworkDiscrepancyError()
 		}
-
-		return try .init(dapp.referencesToAuthorizedPersonas.map { simple in
+		return try .init(uniqueElements: dapp.referencesToAuthorizedPersonas.map { simple in
 
 			guard
 				let persona = self.personas.first(where: { $0.address == simple.identityAddress })
@@ -55,7 +56,7 @@ public extension OnNetwork {
 			return AuthorizedPersona(
 				identityAddress: persona.address,
 				displayName: persona.displayName,
-				fields: try .init(simple.fieldIDs.map { fieldID in
+				fields: try .init(uniqueElements: simple.fieldIDs.map { fieldID in
 					guard
 						let field = persona.fields.first(where: { $0.id == fieldID })
 					else {

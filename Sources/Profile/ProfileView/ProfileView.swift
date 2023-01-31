@@ -273,7 +273,7 @@ public extension P2PClientsView {
 public struct ConnectedDappsView: IndentedView {
 	public let connectedDapps: [OnNetwork.ConnectedDapp]
 	public let indentation: Indentation
-	public let authorizedPersonasForDapp: (OnNetwork.ConnectedDapp) -> OrderedSet<OnNetwork.AuthorizedPersona>
+	public let authorizedPersonasForDapp: (OnNetwork.ConnectedDapp) -> IdentifiedArrayOf<OnNetwork.AuthorizedPersona>
 }
 
 public extension ConnectedDappsView {
@@ -304,7 +304,7 @@ public extension ConnectedDappsView {
 public struct ConnectedDappView: IndentedView {
 	public let connectedDapp: OnNetwork.ConnectedDapp
 	public let indentation: Indentation
-	public let authorizedPersonas: OrderedSet<OnNetwork.AuthorizedPersona>
+	public let authorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersona>
 }
 
 public extension ConnectedDappView {
