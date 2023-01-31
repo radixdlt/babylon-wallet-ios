@@ -124,13 +124,13 @@ final class ProfileTests: TestCase {
 		signerOf = try await profile.signers(networkID: networkID, address: secondAccount.address, mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference).first
 		try await doTest(signerOf: signerOf)
 
-		try await profile.createNewVirtualAccount(
+		let thirdAccount = try await profile.createNewVirtualAccount(
 			networkID: networkID,
 			displayName: "Third",
 			createFactorInstance: createFactorInstance
 		)
 
-		try await profile.createNewVirtualPersona(
+		let persona0 = try await profile.createNewVirtualPersona(
 			networkID: networkID,
 			displayName: "Mrs Incognito",
 			fields: [
@@ -140,7 +140,7 @@ final class ProfileTests: TestCase {
 			createFactorInstance: createFactorInstance
 		)
 
-		try await profile.createNewVirtualPersona(
+		let persona1 = try await profile.createNewVirtualPersona(
 			networkID: networkID,
 			displayName: "Mrs Public",
 			fields: [
@@ -184,12 +184,69 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(onNetwork.accounts.count, 3)
 		XCTAssertEqual(onNetwork.personas.count, 2)
 
+		var connectedDapp = try await profile.addConnectedDapp(
+			.init(
+				networkID: networkID,
+				dAppDefinitionAddress: try .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
+				displayName: "RadiSwap",
+				referencesToAuthorizedPersonas:
+				.init(arrayLiteral:
+					.init(
+						identityAddress: persona0.address,
+						fieldIDs: .init(persona0.fields.map(\.id)),
+						sharedAccounts: try .init(
+							mode: .exactly(.init(
+								arrayLiteral:
+								secondAccount.address,
+								thirdAccount.address
+							)))
+					),
+					.init(
+						identityAddress: persona1.address,
+						fieldIDs: .init(persona1.fields.map(\.id)),
+						sharedAccounts: try .init(
+							mode: .atLeast(.init(
+								arrayLiteral:
+								secondAccount.address
+							)))
+					))
+			)
+		)
+
+		var authorizedPersona0 = connectedDapp.referencesToAuthorizedPersonas[0]
+		XCTAssertThrowsError(
+			try authorizedPersona0.sharedAccounts.updateAccounts(.init(
+				arrayLiteral:
+				secondAccount.address
+			)), "Should not be able to specify another number of accounts if `exactly` was specified."
+		)
+
+		var authorizedPersona1 = connectedDapp.referencesToAuthorizedPersonas[1]
+		XCTAssertNoThrow(
+			try authorizedPersona1.sharedAccounts.updateAccounts(.init(
+				arrayLiteral:
+				secondAccount.address,
+				thirdAccount.address
+			)), "Should be able to specify more accounts if `atLeast` was specified."
+		)
+
+		connectedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(OnNetwork.Persona.Field.ID()) // add unknown fieldID
+
+		// Cannot use `XCTAssertThrowsError` since it does not accept async code
+		// => fallback to `do catch`
+		do {
+			try await profile.updateConnectedDapp(connectedDapp)
+			XCTFail("No error was thrown, but we expected `updateConnectedDapp` to have failed because ConnectedDapp was invalid")
+		} catch {
+			// All good, we expected error
+		}
+
 		let snapshot = profile.snaphot()
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
-//		 let data = try jsonEncoder.encode(snapshot)
+		let data = try jsonEncoder.encode(snapshot)
 		/* Uncomment to generate a new test vector */
-//		print(String(data: data, encoding: .utf8)!)
+		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {
@@ -303,11 +360,17 @@ final class ProfileTests: TestCase {
 		XCTAssertNotNil(p2pClient1.signalingServerConfig)
 		XCTAssertNotNil(p2pClient1.webRTCConfig)
 		XCTAssertNotNil(p2pClient1.connectorConfig)
+
+		XCTAssertEqual(onNetwork.connectedDapps.count, 1)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas.count, 2)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts.mode, .exactly)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1qavvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqxgpf32", "account_tdx_b_1ql2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54ts25dgyv"])
 	}
 
 	func test_version_compatability_check_too_low() throws {
 		let json = """
-		{ "version": 6 }
+		{ "version": 7 }
 		""".data(using: .utf8)!
 
 		XCTAssertThrowsError(
@@ -316,7 +379,7 @@ final class ProfileTests: TestCase {
 			guard let error = anyError as? IncompatibleProfileVersion else {
 				return XCTFail("WrongErrorType")
 			}
-			XCTAssertEqual(error, .init(decodedVersion: 6, minimumRequiredVersion: .minimum))
+			XCTAssertEqual(error, .init(decodedVersion: 7, minimumRequiredVersion: .minimum))
 		}
 	}
 

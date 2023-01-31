@@ -40,14 +40,14 @@ public extension ChooseAccounts.Action {
 // MARK: - ChooseAccounts.Action.InternalAction.SystemAction
 public extension ChooseAccounts.Action.InternalAction {
 	enum SystemAction: Sendable, Equatable {
-		case loadAccountsResult(TaskResult<NonEmpty<OrderedSet<OnNetwork.Account>>>)
+		case loadAccountsResult(TaskResult<NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>>)
 	}
 }
 
 // MARK: - ChooseAccounts.Action.DelegateAction
 public extension ChooseAccounts.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case finishedChoosingAccounts(NonEmpty<OrderedSet<OnNetwork.Account>>, P2P.OneTimeAccountsRequestToHandle)
+		case finishedChoosingAccounts(NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>, P2P.OneTimeAccountsRequestToHandle)
 		case dismissChooseAccounts(P2P.OneTimeAccountsRequestToHandle)
 	}
 }

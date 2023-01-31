@@ -47,7 +47,7 @@ final class IncomingConnectionRequestFromDappReviewFeatureTests: TestCase {
 			initialState: initialState,
 			reducer: DappConnectionRequest()
 		)
-		let accounts: NonEmpty<OrderedSet<OnNetwork.Account>> = .init(rawValue: .init([.previewValue0, .previewValue1]))!
+		let accounts: NonEmpty<IdentifiedArrayOf<OnNetwork.Account>> = .init(rawValue: .init([.previewValue0, .previewValue1]))!
 		store.dependencies.profileClient.getAccounts = { @Sendable in accounts }
 
 		// when

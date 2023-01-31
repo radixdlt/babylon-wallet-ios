@@ -198,6 +198,28 @@ public extension ProfileClient {
 					profile.appPreferences.p2pClients
 				}
 			},
+			getConnectedDapps: {
+				let currentNetworkID = await getCurrentNetworkID()
+				return try await profileHolder.get { profile in
+					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
+					return onNetwork.connectedDapps
+				}
+			},
+			addConnectedDapp: { connectedDapp in
+				try await profileHolder.asyncMutating { profile in
+					_ = try await profile.addConnectedDapp(connectedDapp)
+				}
+			},
+			detailsForConnectedDapp: { connectedDappSimple in
+				try await profileHolder.get { profile in
+					try profile.detailsForConnectedDapp(connectedDappSimple)
+				}
+			},
+			updateConnectedDapp: { updated in
+				try await profileHolder.asyncMutating { profile in
+					try await profile.updateConnectedDapp(updated)
+				}
+			},
 			addP2PClient: { newClient in
 				try await profileHolder.asyncMutating { profile in
 					_ = profile.appendP2PClient(newClient)

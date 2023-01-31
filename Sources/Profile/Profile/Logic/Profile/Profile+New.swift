@@ -67,7 +67,7 @@ public extension Profile {
 		let network = networkAndGateway.network
 		let networkID = network.id
 		let nonEmptyFactorSource = NonEmpty(
-			rawValue: OrderedSet(
+			rawValue: IdentifiedArrayOf(uniqueElements:
 				[curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource]
 			)
 		)!
@@ -84,7 +84,7 @@ public extension Profile {
 
 		let onNetwork = OnNetwork(
 			networkID: networkID,
-			accounts: .init(rawValue: .init([account0]))!,
+			accounts: .init(rawValue: .init(uniqueElements: [account0]))!,
 			personas: [],
 			connectedDapps: []
 		)
@@ -130,6 +130,12 @@ struct WrongAddressType: Swift.Error {}
 
 // MARK: - AccountAlreadyExists
 struct AccountAlreadyExists: Swift.Error {}
+
+// MARK: - ConnectedDappAlreadyExists
+struct ConnectedDappAlreadyExists: Swift.Error {}
+
+// MARK: - ConnectedDappDoesNotExists
+struct ConnectedDappDoesNotExists: Swift.Error {}
 
 // MARK: - PersonaAlreadyExists
 struct PersonaAlreadyExists: Swift.Error {}
