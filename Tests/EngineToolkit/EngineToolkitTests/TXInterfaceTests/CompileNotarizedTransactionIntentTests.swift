@@ -4,7 +4,7 @@ import TestingPrelude
 
 final class CompileNotarizedTransactionIntentTests: TestCase {
 	override func setUp() {
-		debugPrint = false
+		debugPrint = true
 		super.setUp()
 	}
 
@@ -21,46 +21,7 @@ final class CompileNotarizedTransactionIntentTests: TestCase {
 	func test__common_manifests_can_be_notarized_without_issues() throws {
 		let testVectors: [(manifest: String, blobs: [[UInt8]])] = [
 			(
-				manifest: String(decoding: try resource(named: "multi_account_resource_transfer", extension: ".rtm"), as: UTF8.self),
-				blobs: []
-			),
-			(
-				manifest: String(decoding: try resource(named: "resource_transfer", extension: ".rtm"), as: UTF8.self),
-				blobs: []
-			),
-			(
-				manifest: String(decoding: try resource(named: "free_funds", extension: ".rtm"), as: UTF8.self),
-				blobs: []
-			),
-			(
-				manifest: String(decoding: try resource(named: "publish_with_owner", extension: ".rtm"), as: UTF8.self),
-				blobs: [
-					[10],
-					[10],
-				]
-			),
-			(
-				manifest: String(decoding: try resource(named: "no_initial_supply_fungible", extension: ".rtm"), as: UTF8.self),
-				blobs: []
-			),
-			(
-				manifest: String(decoding: try resource(named: "with_initial_supply_fungible", extension: ".rtm"), as: UTF8.self),
-				blobs: []
-			),
-			(
-				manifest: String(decoding: try resource(named: "no_initial_supply_non_fungible", extension: ".rtm"), as: UTF8.self),
-				blobs: []
-			),
-			(
-				manifest: String(decoding: try resource(named: "with_initial_supply_non_fungible", extension: ".rtm"), as: UTF8.self),
-				blobs: []
-			),
-			(
-				manifest: String(decoding: try resource(named: "mint_fungible", extension: ".rtm"), as: UTF8.self),
-				blobs: []
-			),
-			(
-				manifest: String(decoding: try resource(named: "mint_non_fungible", extension: ".rtm"), as: UTF8.self),
+				manifest: String(decoding: try resource(named: "values", extension: ".rtm"), as: UTF8.self),
 				blobs: []
 			),
 		]

@@ -14,7 +14,7 @@ import Prelude
 //
 // Probably best to do when we move all models into a single package.
 
-// TODO: Remove
+// TODO: We need a better type that we can serialize to a string.
 public typealias NetworkID = Tagged<(network: (), id: ()), UInt8>
 
 public extension NetworkID {

@@ -25,7 +25,7 @@ final class TransactionBuildingTests: TestCase {
 
 		let compiledSignedTransactionIntent = try EngineToolkit().compileSignedTransactionIntentRequest(
 			request: signedTransactionIntent
-		).get().compiledSignedIntent
+		).get().compiledIntent
 
 		let isValid = try notaryPrivateKey
 			.publicKey()

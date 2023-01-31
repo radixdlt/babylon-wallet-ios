@@ -50,7 +50,6 @@ public extension TransactionManifest {
 				try EngineToolkit()
 					.convertManifest(
 						request: .init(
-							transactionVersion: .default,
 							manifest: manifest, // need blobs
 							// Wanna convert from Self (`.parsed`) -> ManifestInstrictions.string
 							outputFormat: .string,
@@ -170,11 +169,9 @@ public extension TransactionManifest {
 	}
 
 	func accountsRequiredToSign(
-		networkId: NetworkID,
-		version: TXVersion = .default
+		networkId: NetworkID
 	) throws -> Set<ComponentAddress> {
 		let convertedManifest = try EngineToolkit().convertManifest(request: ConvertManifestRequest(
-			transactionVersion: version,
 			manifest: self,
 			outputFormat: .parsed,
 			networkId: networkId

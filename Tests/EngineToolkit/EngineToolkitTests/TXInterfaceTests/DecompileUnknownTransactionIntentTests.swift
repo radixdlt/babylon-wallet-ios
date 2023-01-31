@@ -2,11 +2,16 @@
 import TestingPrelude
 
 final class DecompileUnknownTransactionIntentTests: TestCase {
+	override func setUp() {
+		debugPrint = true
+		super.setUp()
+	}
+
 	func test__decompile_unknown_transaction_intent_does_not_throw_on_a_transaction_intent_ed25519() throws {
 		let testTransaction = try testTransactionEd25519(signerCount: 5)
 		let request = DecompileUnknownTransactionIntentRequest(
 			compiledUnknownIntent: testTransaction.compiledTransactionIntent,
-			manifestInstructionsOutputFormat: .string
+			instructionsOutputKind: .string
 		)
 		XCTAssertNoThrow(try sut.decompileUnknownTransactionIntentRequest(request: request).get())
 	}
@@ -15,7 +20,7 @@ final class DecompileUnknownTransactionIntentTests: TestCase {
 		let testTransaction = try testTransactionEd25519(signerCount: 5)
 		let request = DecompileUnknownTransactionIntentRequest(
 			compiledUnknownIntent: testTransaction.compiledSignedTransactionIntent,
-			manifestInstructionsOutputFormat: .string
+			instructionsOutputKind: .string
 		)
 		XCTAssertNoThrow(try sut.decompileUnknownTransactionIntentRequest(request: request).get())
 	}
@@ -24,7 +29,7 @@ final class DecompileUnknownTransactionIntentTests: TestCase {
 		let testTransaction = try testTransactionEd25519(signerCount: 5)
 		let request = DecompileUnknownTransactionIntentRequest(
 			compiledUnknownIntent: testTransaction.compiledNotarizedTransactionIntent,
-			manifestInstructionsOutputFormat: .string
+			instructionsOutputKind: .string
 		)
 		XCTAssertNoThrow(try sut.decompileUnknownTransactionIntentRequest(request: request).get())
 	}
@@ -33,7 +38,7 @@ final class DecompileUnknownTransactionIntentTests: TestCase {
 		let testTransaction = try testTransactionEd25519(signerCount: 5)
 		let request = DecompileUnknownTransactionIntentRequest(
 			compiledUnknownIntent: testTransaction.compiledTransactionIntent,
-			manifestInstructionsOutputFormat: .string
+			instructionsOutputKind: .string
 		)
 		XCTAssertNoThrow(try sut.decompileUnknownTransactionIntentRequest(request: request).get())
 	}
@@ -42,7 +47,7 @@ final class DecompileUnknownTransactionIntentTests: TestCase {
 		let testTransaction = try testTransactionEd25519(signerCount: 5)
 		let request = DecompileUnknownTransactionIntentRequest(
 			compiledUnknownIntent: testTransaction.compiledSignedTransactionIntent,
-			manifestInstructionsOutputFormat: .string
+			instructionsOutputKind: .string
 		)
 		XCTAssertNoThrow(try sut.decompileUnknownTransactionIntentRequest(request: request).get())
 	}
@@ -51,7 +56,7 @@ final class DecompileUnknownTransactionIntentTests: TestCase {
 		let testTransaction = try testTransactionEd25519(signerCount: 5)
 		let request = DecompileUnknownTransactionIntentRequest(
 			compiledUnknownIntent: testTransaction.compiledNotarizedTransactionIntent,
-			manifestInstructionsOutputFormat: .string
+			instructionsOutputKind: .string
 		)
 		XCTAssertNoThrow(try sut.decompileUnknownTransactionIntentRequest(request: request).get())
 	}

@@ -10,7 +10,7 @@ public extension TransactionManifest {
 
 public extension TransactionIntent {
 	func blobs(_ blobs: [[UInt8]]) -> Self {
-		.init(header: header, manifest: .init(instructions: self.manifest.instructions, blobs: blobs))
+		.init(header: header, manifest: .init(instructions: manifest.instructions, blobs: blobs))
 	}
 }
 
@@ -27,10 +27,10 @@ public struct NotarizedNonNotarySignedButIntentSignedTransctionContext: Hashable
 		notarizedTransactionHash: Data
 	) -> NotarizedSignedTransctionContext {
 		.init(
-			transactionIntent: self.transactionIntent,
-			transactionIntentHash: self.transactionIntentHash,
-			compileTransactionIntentResponse: self.compileTransactionIntentResponse,
-			signedTransactionIntent: self.signedTransactionIntent,
+			transactionIntent: transactionIntent,
+			transactionIntentHash: transactionIntentHash,
+			compileTransactionIntentResponse: compileTransactionIntentResponse,
+			signedTransactionIntent: signedTransactionIntent,
 			compileSignedTransactionIntentResponse: compileSignedTransactionIntentResponse,
 			notarizedTransactionHash: notarizedTransactionHash,
 			notarizedTransaction: notarizedTransaction
@@ -109,12 +109,12 @@ public extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 	func sign(with privateKey: Engine.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		let compiledSignedTransactionIntent = try EngineToolkit().compileSignedTransactionIntentRequest(
 			request: self.signedTransactionIntent
-		).get().compiledSignedIntent
+		).get().compiledIntent
 
 		let (signature, _) = try privateKey.signReturningHashOfMessage(data: compiledSignedTransactionIntent)
 
 		let signedTransactionIntent = SignedTransactionIntent(
-			intent: self.transactionIntent,
+			intent: transactionIntent,
 			intentSignatures: self.signedTransactionIntent.intentSignatures + [signature]
 		)
 		var mutableSelf = self
@@ -141,7 +141,7 @@ public extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 			request: signedTransactionIntent
 		).get()
 
-		let compiledSignedTransactionIntent = compileSignedTransactionIntentResponse.compiledSignedIntent
+		let compiledSignedTransactionIntent = compileSignedTransactionIntentResponse.compiledIntent
 
 		// Notarize the signed intent to create a notarized transaction
 		let (notarySignature, notarizedTransactionHash) = try notaryPrivateKey.signReturningHashOfMessage(

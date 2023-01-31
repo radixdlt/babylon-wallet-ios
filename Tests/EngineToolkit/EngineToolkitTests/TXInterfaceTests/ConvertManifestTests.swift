@@ -568,7 +568,6 @@ func makeRequest(
 	manifest: TransactionManifest
 ) -> ConvertManifestRequest {
 	ConvertManifestRequest(
-		transactionVersion: 1,
 		manifest: manifest,
 		outputFormat: outputFormat,
 		networkId: .simulator

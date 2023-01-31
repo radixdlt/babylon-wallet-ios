@@ -60,7 +60,6 @@ final class ManifestToStringTests: TestCase {
 
 			for outputInstructionKind in [ManifestInstructionsKind.parsed, ManifestInstructionsKind.string] {
 				XCTAssertNoThrow(try sut.convertManifest(request: ConvertManifestRequest(
-					transactionVersion: 0x01,
 					manifest: transactionManifest,
 					outputFormat: outputInstructionKind,
 					networkId: 0xF2

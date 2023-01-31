@@ -6,7 +6,7 @@ final class DecompileNotarizedTransactionIntentTests: TestCase {
 		let testTransaction = try testTransactionEd25519(signerCount: 5)
 		let request = DecompileNotarizedTransactionIntentRequest(
 			compiledNotarizedIntent: testTransaction.compiledNotarizedTransactionIntent,
-			manifestInstructionsOutputFormat: .string
+			instructionsOutputKind: .string
 		)
 		XCTAssertNoThrow(try sut.decompileNotarizedTransactionIntentRequest(request: request).get())
 	}
@@ -15,7 +15,7 @@ final class DecompileNotarizedTransactionIntentTests: TestCase {
 		let testTransaction = try testTransactionSecp256k1(signerCount: 5)
 		let request = DecompileNotarizedTransactionIntentRequest(
 			compiledNotarizedIntent: testTransaction.compiledNotarizedTransactionIntent,
-			manifestInstructionsOutputFormat: .string
+			instructionsOutputKind: .string
 		)
 		XCTAssertNoThrow(try sut.decompileNotarizedTransactionIntentRequest(request: request).get())
 	}
