@@ -192,11 +192,17 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "PersonasFeature",
+		dependencies: [],
+		tests: .yes()
+	),
+	.feature(
 		name: "SettingsFeature",
 		dependencies: [
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
+			"PersonasFeature",
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
 			"ProfileView",
 		],

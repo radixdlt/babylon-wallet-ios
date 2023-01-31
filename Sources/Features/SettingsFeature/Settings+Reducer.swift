@@ -2,6 +2,7 @@ import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
+import PersonasFeature
 import ProfileClient
 
 // MARK: - AppSettings
@@ -22,6 +23,9 @@ public extension AppSettings {
 			}
 			.ifLet(\.manageGatewayAPIEndpoints, action: /Action.child .. Action.ChildAction.manageGatewayAPIEndpoints) {
 				ManageGatewayAPIEndpoints()
+			}
+			.ifLet(\.personas, action: /Action.child .. Action.ChildAction.personas) {
+				Personas()
 			}
 	}
 
@@ -48,6 +52,7 @@ public extension AppSettings {
 		case let .internal(.system(.loadP2PClientsResult(.success(clients)))):
 			state.canAddP2PClient = clients.isEmpty
 			return .none
+
 		case let .internal(.system(.loadP2PClientsResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
@@ -90,13 +95,24 @@ public extension AppSettings {
 			state.manageP2PClients = nil
 			return loadP2PClients()
 
+		case .child(.personas(.delegate(.dismiss))):
+			state.personas = nil
+			return .none
+
 		case .child, .delegate:
 			return .none
+
 		case .internal(.view(.addP2PClientButtonTapped)):
 			state.manageP2PClients = .init(newConnection: .init())
 			return .none
+
 		case .internal(.view(.editGatewayAPIEndpointButtonTapped)):
 			state.manageGatewayAPIEndpoints = .init()
+			return .none
+
+		case .internal(.view(.personasButtonTapped)):
+			// TODO: implement
+			state.personas = .init(personas: .init())
 			return .none
 		}
 	}
