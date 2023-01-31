@@ -200,11 +200,17 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "PersonasFeature",
+		dependencies: [],
+		tests: .yes()
+	),
+	.feature(
 		name: "SettingsFeature",
 		dependencies: [
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
+			"PersonasFeature",
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
 			"ProfileView",
 		],
@@ -604,6 +610,12 @@ package.targets.append(
 		path: "Sources/EngineToolkit/RadixEngineToolkit/RadixEngineToolkit.xcframework"
 	)
 )
+
+// MARK: - Unit Tests
+
+package.addModules([
+	.module(name: "Unit Tests", dependencies: [], tests: .no),
+])
 
 // MARK: - Extensions
 

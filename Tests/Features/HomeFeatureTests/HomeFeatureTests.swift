@@ -37,7 +37,7 @@ final class HomeFeatureTests: TestCase {
 		let accountDetailsState = AccountDetails.State(for: accountRowState)
 		var initialState: Home.State = .previewValue
 		initialState.accountDetails = accountDetailsState
-		initialState.accountList = .init(nonEmptyOrderedSetOfAccounts: .init(rawValue: .init([account]))!)
+		initialState.accountList = .init(accounts: .init(rawValue: .init([account]))!)
 
 		let store = TestStore(
 			initialState: initialState,

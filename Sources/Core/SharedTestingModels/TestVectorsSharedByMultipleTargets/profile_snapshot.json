@@ -201,7 +201,7 @@
                 "accountsReferencedByAddress" : [
                   "account_tdx_b_1qavvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqxgpf32"
                 ],
-                "mode" : "orMore"
+                "mode" : "atLeast"
               }
             }
           ]

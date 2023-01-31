@@ -2,6 +2,7 @@ import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
+import PersonasFeature
 import ProfileClient
 #if DEBUG
 import ProfileView
@@ -32,7 +33,6 @@ public extension AppSettings.View {
 			ForceFullScreen {
 				ZStack {
 					settingsView(viewStore: viewStore)
-						.zIndex(0)
 
 					IfLetStore(
 						store.scope(
@@ -41,7 +41,6 @@ public extension AppSettings.View {
 						),
 						then: { ManageP2PClients.View(store: $0) }
 					)
-					.zIndex(1)
 
 					IfLetStore(
 						store.scope(
@@ -50,7 +49,14 @@ public extension AppSettings.View {
 						),
 						then: { ManageGatewayAPIEndpoints.View(store: $0) }
 					)
-					.zIndex(2)
+
+					IfLetStore(
+						store.scope(
+							state: \.personas,
+							action: { .child(.personas($0)) }
+						),
+						then: { Personas.View(store: $0) }
+					)
 				}
 			}
 		}
@@ -101,6 +107,13 @@ private extension AppSettings.View {
 							icon: Image(asset: AssetResource.gateway)
 						) {
 							viewStore.send(.editGatewayAPIEndpointButtonTapped)
+						}
+
+						Row(
+							L10n.Settings.personasButtonTitle,
+							icon: Image(asset: AssetResource.personas)
+						) {
+							viewStore.send(.personasButtonTapped)
 						}
 
 						Spacer()

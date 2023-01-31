@@ -216,4 +216,17 @@ private extension Color {
 	static let connected: Self = .green
 	static let closed: Self = .red
 }
+
+import SwiftUI // NB: necessary for previews to appear
+
+struct ManageP2PClient_Preview: PreviewProvider {
+	static var previews: some View {
+		ManageP2PClient.View(
+			store: .init(
+				initialState: .previewValue,
+				reducer: ManageP2PClient()
+			)
+		)
+	}
+}
 #endif

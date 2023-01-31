@@ -205,7 +205,7 @@ final class ProfileTests: TestCase {
 						identityAddress: persona1.address,
 						fieldIDs: .init(persona1.fields.map(\.id)),
 						sharedAccounts: try .init(
-							mode: .orMore(.init(
+							mode: .atLeast(.init(
 								arrayLiteral:
 								secondAccount.address
 							)))
@@ -227,7 +227,7 @@ final class ProfileTests: TestCase {
 				arrayLiteral:
 				secondAccount.address,
 				thirdAccount.address
-			)), "Should be able to specify more accounts if `orMore` was specified."
+			)), "Should be able to specify more accounts if `atLeast` was specified."
 		)
 
 		connectedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(OnNetwork.Persona.Field.ID()) // add unknown fieldID
