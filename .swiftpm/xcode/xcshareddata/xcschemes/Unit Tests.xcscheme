@@ -182,16 +182,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "GrantDappWalletAccessFeatureTests"
-               BuildableName = "GrantDappWalletAccessFeatureTests"
-               BlueprintName = "GrantDappWalletAccessFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "HandleDappRequestsTests"
                BuildableName = "HandleDappRequestsTests"
                BlueprintName = "HandleDappRequestsTests"
