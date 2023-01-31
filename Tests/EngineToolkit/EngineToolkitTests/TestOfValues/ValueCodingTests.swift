@@ -95,9 +95,9 @@ final class ValueEncodingTests: TestCase {
 			),
 
 			(
-				value: Value_.enum(.init(.u32(1), fields: [.u8(1)])),
+				value: Value_.enum(.init(.u8(1), fields: [.u8(1)])),
 				jsonRepresentation: """
-				{"type":"Enum","variant":{"type":"U32","discriminator":"1"},"fields":[{"type":"U8","value":"1"}]}
+				{"type":"Enum","variant":{"type":"U8","discriminator":"1"},"fields":[{"type":"U8","value":"1"}]}
 				"""
 			),
 			(
@@ -141,7 +141,7 @@ final class ValueEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: try Value_.map(.init(
+				value: Value_.map(.init(
 					keyValueKind: .string,
 					valueValueKind: .u16,
 					entries: [

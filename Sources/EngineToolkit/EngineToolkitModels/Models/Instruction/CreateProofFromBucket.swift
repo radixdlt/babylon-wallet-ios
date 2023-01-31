@@ -9,6 +9,7 @@ public struct CreateProofFromBucket: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
+
 	public let bucket: Bucket
 	public let proof: Proof
 
@@ -22,6 +23,7 @@ public struct CreateProofFromBucket: InstructionProtocol {
 
 public extension CreateProofFromBucket {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 		case bucket
@@ -29,6 +31,7 @@ public extension CreateProofFromBucket {
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)

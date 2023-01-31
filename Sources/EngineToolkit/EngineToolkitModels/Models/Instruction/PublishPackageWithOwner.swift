@@ -5,10 +5,11 @@ public struct PublishPackageWithOwner: InstructionProtocol {
 	// Type name, used as a discriminator
 	public static let kind: InstructionKind = .publishPackageWithOwner
 	public func embed() -> Instruction {
-		.publishPackage(self)
+		.publishPackageWithOwner(self)
 	}
 
 	// MARK: Stored properties
+
 	public let code: Blob
 	public let abi: Blob
 	public let ownerBadge: NonFungibleGlobalId
@@ -24,6 +25,7 @@ public struct PublishPackageWithOwner: InstructionProtocol {
 
 public extension PublishPackageWithOwner {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 		case ownerBadge = "owner_badge"
@@ -32,6 +34,7 @@ public extension PublishPackageWithOwner {
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)

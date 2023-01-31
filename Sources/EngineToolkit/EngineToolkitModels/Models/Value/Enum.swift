@@ -77,7 +77,7 @@ public extension Enum {
 // MARK: - EnumDiscriminator
 public enum EnumDiscriminator: Sendable, Codable, Hashable {
 	case string(String)
-	case u32(UInt32)
+	case u8(UInt8)
 
 	// MARK: Init
 
@@ -85,8 +85,8 @@ public enum EnumDiscriminator: Sendable, Codable, Hashable {
 		self = .string(discriminator)
 	}
 
-	public init(_ discriminator: UInt32) {
-		self = .u32(discriminator)
+	public init(_ discriminator: UInt8) {
+		self = .u8(discriminator)
 	}
 }
 
@@ -103,8 +103,8 @@ public extension EnumDiscriminator {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
-		case let .u32(discriminator):
-			try container.encode("U32", forKey: .type)
+		case let .u8(discriminator):
+			try container.encode("U8", forKey: .type)
 			try container.encode(String(discriminator), forKey: .discriminator)
 		case let .string(discriminator):
 			try container.encode("String", forKey: .type)
@@ -121,8 +121,8 @@ public extension EnumDiscriminator {
 		case "String":
 			let discriminator = try container.decode(String.self, forKey: .discriminator)
 			self = .string(discriminator)
-		case "U32":
-			self = try .u32(decodeAndConvertToNumericType(container: container, key: .discriminator))
+		case "U8":
+			self = try .u8(decodeAndConvertToNumericType(container: container, key: .discriminator))
 		default:
 			throw InternalDecodingFailure.parsingError
 		}

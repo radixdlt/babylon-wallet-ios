@@ -21,7 +21,7 @@ public struct Map_: ValueProtocol, Sendable, Codable, Hashable {
 		keyValueKind: ValueKind,
 		valueValueKind: ValueKind,
 		entries: [[Value_]]
-	) throws {
+	) {
 		self.keyValueKind = keyValueKind
 		self.valueValueKind = valueValueKind
 		self.entries = entries

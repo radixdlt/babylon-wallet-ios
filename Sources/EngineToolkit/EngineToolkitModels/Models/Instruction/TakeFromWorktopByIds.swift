@@ -9,6 +9,7 @@ public struct TakeFromWorktopByIds: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
+
 	public let resourceAddress: ResourceAddress
 	public let ids: Set<NonFungibleLocalId>
 	public let bucket: Bucket
@@ -29,6 +30,7 @@ public struct TakeFromWorktopByIds: InstructionProtocol {
 
 public extension TakeFromWorktopByIds {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 		case ids
@@ -37,6 +39,7 @@ public extension TakeFromWorktopByIds {
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
