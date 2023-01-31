@@ -162,9 +162,11 @@ public extension Profile {
 	}
 
 	/// Saves a `ConnectedDapp` into the profile
+	@discardableResult
 	mutating func addConnectedDapp(
-		_ connectedDapp: OnNetwork.ConnectedDapp
-	) async throws {
+		_ unvalidatedConnectedDapp: OnNetwork.ConnectedDapp
+	) async throws -> OnNetwork.ConnectedDapp {
+		let connectedDapp = try validateAuthorizedPersonas(of: unvalidatedConnectedDapp)
 		let networkID = connectedDapp.networkID
 		var network = try onNetwork(id: networkID)
 		guard !network.connectedDapps.contains(where: { $0.dAppDefinitionAddress == connectedDapp.dAppDefinitionAddress }) else {
@@ -174,12 +176,45 @@ public extension Profile {
 			fatalError("Incorrect implementation, should have been a new ConnectedDapp")
 		}
 		try updateOnNetwork(network)
+		return connectedDapp
+	}
+
+	@discardableResult
+	private func validateAuthorizedPersonas(of connectedDapp: OnNetwork.ConnectedDapp) throws -> OnNetwork.ConnectedDapp {
+		let networkID = connectedDapp.networkID
+		let network = try onNetwork(id: networkID)
+
+		// Validate that all Personas are known and that every Field.ID is known
+		// for each Persona.
+		struct ConnectedDappReferencesUnknownPersonas: Swift.Error {}
+		struct ConnectedDappReferencesUnknownPersonaField: Swift.Error {}
+		for personaNeedle in connectedDapp.referencesToAuthorizedPersonas {
+			guard let persona = network.personas.first(where: { $0.address == personaNeedle.identityAddress }) else {
+				throw ConnectedDappReferencesUnknownPersonas()
+			}
+			let fieldIDNeedles = Set(personaNeedle.fieldIDs)
+			let fieldIDHaystack = Set(persona.fields.map(\.id))
+			guard fieldIDHaystack.isSuperset(of: fieldIDNeedles) else {
+				throw ConnectedDappReferencesUnknownPersonaField()
+			}
+		}
+
+		// Validate that all Accounts are known
+		let accountAddressNeedles: Set<AccountAddress> = Set(connectedDapp.referencesToAuthorizedPersonas.flatMap(\.sharedAccounts.accountsReferencedByAddress))
+		let accountAddressHaystack = Set(network.accounts.map(\.address))
+		guard accountAddressHaystack.isSuperset(of: accountAddressNeedles) else {
+			struct ConnectedDappReferencesUnknownAccount: Swift.Error {}
+			throw ConnectedDappReferencesUnknownAccount()
+		}
+		// All good
+		return connectedDapp
 	}
 
 	/// Updates a `ConnectedDapp` in the profile
 	mutating func updateConnectedDapp(
-		_ connectedDapp: OnNetwork.ConnectedDapp
+		_ unvalidatedConnectedDapp: OnNetwork.ConnectedDapp
 	) async throws {
+		let connectedDapp = try validateAuthorizedPersonas(of: unvalidatedConnectedDapp)
 		let networkID = connectedDapp.networkID
 		var network = try onNetwork(id: networkID)
 		guard network.connectedDapps.contains(where: { $0.dAppDefinitionAddress == connectedDapp.dAppDefinitionAddress }) else {

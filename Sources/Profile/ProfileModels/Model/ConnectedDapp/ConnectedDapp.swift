@@ -18,7 +18,19 @@ public extension OnNetwork {
 		public let displayName: String
 
 		// mutable so that we can add new authorized personas
-		public var referencesToAuthorizedPersonas: OrderedSet<AuthorizedPersonaSimple>
+		public var referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple>
+
+		public init(
+			networkID: Network.ID,
+			dAppDefinitionAddress: DappDefinitionAddress,
+			displayName: String,
+			referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple> = .init()
+		) {
+			self.networkID = networkID
+			self.dAppDefinitionAddress = dAppDefinitionAddress
+			self.displayName = displayName
+			self.referencesToAuthorizedPersonas = referencesToAuthorizedPersonas
+		}
 	}
 }
 
@@ -27,8 +39,10 @@ public extension OnNetwork.ConnectedDapp {
 	struct AuthorizedPersonaSimple:
 		Sendable,
 		Hashable,
+		Identifiable,
 		Codable
 	{
+		public typealias ID = IdentityAddress
 		/// The globally unique identifier of a Persona is its address, used
 		/// to lookup persona
 		public let identityAddress: IdentityAddress
@@ -73,6 +87,7 @@ public extension OnNetwork.ConnectedDapp {
 				case orMore(OrderedSet<AccountAddress>)
 
 				public enum Stripped:
+					String,
 					Sendable,
 					Hashable,
 					Codable
@@ -105,6 +120,12 @@ public extension OnNetwork.ConnectedDapp {
 			self.fieldIDs = fieldIDs
 			self.sharedAccounts = sharedAccounts
 		}
+	}
+}
+
+public extension OnNetwork.ConnectedDapp.AuthorizedPersonaSimple {
+	var id: ID {
+		identityAddress
 	}
 }
 
