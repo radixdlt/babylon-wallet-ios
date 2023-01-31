@@ -33,7 +33,6 @@ public extension AppSettings.View {
 			ForceFullScreen {
 				ZStack {
 					settingsView(viewStore: viewStore)
-						.zIndex(0)
 
 					IfLetStore(
 						store.scope(
@@ -42,7 +41,6 @@ public extension AppSettings.View {
 						),
 						then: { ManageP2PClients.View(store: $0) }
 					)
-					.zIndex(1)
 
 					IfLetStore(
 						store.scope(
@@ -51,7 +49,6 @@ public extension AppSettings.View {
 						),
 						then: { ManageGatewayAPIEndpoints.View(store: $0) }
 					)
-					.zIndex(2)
 
 					IfLetStore(
 						store.scope(
@@ -60,7 +57,6 @@ public extension AppSettings.View {
 						),
 						then: { Personas.View(store: $0) }
 					)
-					.zIndex(3)
 				}
 			}
 		}
