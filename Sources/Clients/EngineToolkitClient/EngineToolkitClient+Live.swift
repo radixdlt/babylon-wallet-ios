@@ -24,13 +24,13 @@ public extension EngineToolkitClient {
 					request: .init(
 						transactionVersion: request.version,
 						manifest: request.manifest,
-						outputFormat: .json,
+						outputFormat: .parsed,
 						networkId: request.networkID
 					)
 				)
 				.get()
 
-				guard case let .json(instructions) = converted.instructions else {
+				guard case let .parsed(instructions) = converted.instructions else {
 					throw FailedToConvertManifestToFormatWhereInstructionsAreJSON()
 				}
 

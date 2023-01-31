@@ -1,6 +1,7 @@
 import Prelude
 
 // MARK: - NetworkIDType
+
 // TODO: move this type to Network.swift.
 //
 // public typealias NetworkID = Network.ID // or even deprecate it?
@@ -13,6 +14,7 @@ import Prelude
 //
 // Probably best to do when we move all models into a single package.
 
+// TODO: Remove
 public typealias NetworkID = Tagged<(network: (), id: ()), UInt8>
 
 public extension NetworkID {

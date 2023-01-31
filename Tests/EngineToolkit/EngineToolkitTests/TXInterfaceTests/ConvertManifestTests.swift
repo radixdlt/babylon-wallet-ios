@@ -5,7 +5,7 @@ import TestingPrelude
 //
 // final class ConvertManifestTests: TestCase {
 //    func test__convertManifest_from_string_to_json_does_not_throw_ed25519() throws {
-//        let request = makeRequest(outputFormat: .json, manifest: try testTransactionEd25519(signerCount: 0).notarizedTransaction.signedIntent.intent.manifest)
+//        let request = makeRequest(outputFormat: .parsed, manifest: try testTransactionEd25519(signerCount: 0).notarizedTransaction.signedIntent.intent.manifest)
 //        XCTAssertNoThrow(try sut.convertManifest(request: request).get())
 //    }
 //
@@ -17,7 +17,7 @@ import TestingPrelude
 //    }
 //
 //    func test__convertManifest_from_string_to_json_does_not_throw_secp256k1() throws {
-//        let request = makeRequest(outputFormat: .json, manifest: try testTransactionSecp256k1(signerCount: 0).notarizedTransaction.signedIntent.intent.manifest)
+//        let request = makeRequest(outputFormat: .parsed, manifest: try testTransactionSecp256k1(signerCount: 0).notarizedTransaction.signedIntent.intent.manifest)
 //        XCTAssertNoThrow(try sut.convertManifest(request: request).get())
 //    }
 //
@@ -564,7 +564,7 @@ import TestingPrelude
 // }
 //
 func makeRequest(
-	outputFormat: ManifestInstructionsKind = .json,
+	outputFormat: ManifestInstructionsKind = .parsed,
 	manifest: TransactionManifest
 ) -> ConvertManifestRequest {
 	ConvertManifestRequest(

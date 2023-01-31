@@ -3,7 +3,7 @@ import Prelude
 
 final class ManifestResultBuilderTest: TestCase {
 	func test__complex_resultBuilder() throws {
-		let expected = try sut.convertManifest(request: makeRequest(outputFormat: .json, manifest: .complex)).get()
+		let expected = try sut.convertManifest(request: makeRequest(outputFormat: .parsed, manifest: .complex)).get()
 
 		let built: TransactionManifest = try TransactionManifest {
 			// Withdraw XRD from account

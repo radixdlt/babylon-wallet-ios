@@ -44,7 +44,7 @@ public extension TransactionManifest {
 			return instructionsStringsWithoutNewline
 				.joined(separator: separator)
 
-		case let .json(instructionsOnJSONFormat):
+		case let .parsed(instructionsOnJSONFormat):
 			// We dont wanna print JSON, so we go through conversion to STRING first
 			func stringifyManifest(networkForRequest: NetworkID) throws -> TransactionManifest {
 				try EngineToolkit()
@@ -52,7 +52,7 @@ public extension TransactionManifest {
 						request: .init(
 							transactionVersion: .default,
 							manifest: manifest, // need blobs
-							// Wanna convert from Self (`.json`) -> ManifestInstrictions.string
+							// Wanna convert from Self (`.parsed`) -> ManifestInstrictions.string
 							outputFormat: .string,
 							networkId: networkForRequest
 						)
@@ -176,12 +176,12 @@ public extension TransactionManifest {
 		let convertedManifest = try EngineToolkit().convertManifest(request: ConvertManifestRequest(
 			transactionVersion: version,
 			manifest: self,
-			outputFormat: .json,
+			outputFormat: .parsed,
 			networkId: networkId
 		)).get()
 
 		switch convertedManifest.instructions {
-		case let .json(instructions):
+		case let .parsed(instructions):
 			var accountsRequiredToSign: Set<ComponentAddress> = []
 			for instruction in instructions {
 				switch instruction {

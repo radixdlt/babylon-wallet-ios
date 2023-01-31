@@ -88,7 +88,7 @@
 //			request: .init(
 //				transactionVersion: header.version,
 //				manifest: transactionManifest,
-//				outputFormat: .json,
+//				outputFormat: .parsed,
 //				networkId: networkID
 //			)
 //		).get()

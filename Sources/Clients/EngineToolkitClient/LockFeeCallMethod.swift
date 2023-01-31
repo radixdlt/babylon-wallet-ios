@@ -85,7 +85,7 @@ public extension EngineToolkitClient {
 				at: 0
 			)
 		}
-		return .init(instructions: .json(instructions.map { $0.embed() }))
+		return .init(instructions: .parsed(instructions.map { $0.embed() }))
 	}
 }
 

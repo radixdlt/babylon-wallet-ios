@@ -9,7 +9,7 @@ extension EngineToolkitClient: TestDependencyKey {
 		convertManifestInstructionsToJSONIfItWasString: { _ in
 			.init(
 				instructions: [],
-				convertedManifestThatContainsThem: .init(instructions: .json([]))
+				convertedManifestThatContainsThem: .init(instructions: .parsed([]))
 			)
 		},
 		compileTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
