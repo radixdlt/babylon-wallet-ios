@@ -195,6 +195,15 @@ public extension EngineToolkit {
 			function: derive_virtual_identity_address
 		)
 	}
+
+	func knownEntityAddresses(
+		request: KnownEntityAddressesRequest
+	) -> Result<KnownEntityAddressesResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: known_entity_addresses
+		)
+	}
 }
 
 // MARK: Private (But Internal For Tests)
