@@ -1,5 +1,4 @@
 // MARK: - TransientIdentifier
-
 public enum TransientIdentifier: Sendable, Codable, Hashable {
 	case string(String)
 	case u32(UInt32)
