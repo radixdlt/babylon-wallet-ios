@@ -13,37 +13,35 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 			AssetsView()
 		}
 
-		Reduce(core)
+		CaseReduce(core, case: /Action.view)
 			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
 				Destinations()
 			}
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
+	func core(state: inout State, action: Action.ViewAction) -> EffectTask<Action> {
 		switch action {
-		case .view(.appeared):
+		case .appeared:
 			return .run { [address = state.address] send in
 				await send(.delegate(.refresh(address)))
 			}
-		case .view(.dismissAccountDetailsButtonTapped):
+		case .dismissAccountDetailsButtonTapped:
 			return .run { send in
 				await send(.delegate(.dismissAccountDetails))
 			}
-		case .view(.displayAccountPreferencesButtonTapped):
+		case .displayAccountPreferencesButtonTapped:
 			return .run { [address = state.address] send in
 				await send(.delegate(.displayAccountPreferences(address)))
 			}
-		case .view(.copyAddressButtonTapped):
+		case .copyAddressButtonTapped:
 			let address = state.address.address
 			return .fireAndForget { pasteboardClient.copyString(address) }
-		case .view(.pullToRefreshStarted):
+		case .pullToRefreshStarted:
 			return .run { [address = state.address] send in
 				await send(.delegate(.refresh(address)))
 			}
-		case .view(.transferButtonTapped):
+		case .transferButtonTapped:
 			state.destination = .transfer(AssetTransfer.State(from: state.account))
-			return .none
-		case .internal, .child, .delegate:
 			return .none
 		}
 	}
