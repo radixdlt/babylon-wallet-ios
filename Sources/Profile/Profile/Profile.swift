@@ -6,7 +6,8 @@ public extension ProfileSnapshot.Version {
 	///
 	/// Changelog:
 	/// - 7: Added networkID in Account and Persona
-	static let minimum: Self = 7
+	/// - 8: Changed ConnectedDapp format
+	static let minimum: Self = 8
 }
 
 // MARK: - Profile

@@ -19,7 +19,7 @@ public extension AccountList {
 
 // MARK: - Convenience
 public extension AccountList.State {
-	init(nonEmptyOrderedSetOfAccounts accounts: NonEmpty<OrderedSet<OnNetwork.Account>>) {
+	init(accounts: NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>) {
 		self.init(
 			accounts: .init(uniqueElements: accounts.rawValue.elements.map(AccountList.Row.State.init(account:)))
 		)

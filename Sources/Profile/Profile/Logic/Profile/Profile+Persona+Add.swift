@@ -10,7 +10,7 @@ public extension Profile {
 	mutating func createNewVirtualPersona(
 		networkID: NetworkID,
 		displayName: String? = nil,
-		fields: OrderedSet<OnNetwork.Persona.Field> = .init(),
+		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
 	) async throws -> OnNetwork.Persona {
 		try await createNewVirtualPersona(
@@ -29,7 +29,7 @@ public extension Profile {
 	mutating func createNewVirtualPersona(
 		networkID: NetworkID,
 		displayName: String? = nil,
-		fields: OrderedSet<OnNetwork.Persona.Field> = .init(),
+		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
 	) async throws -> OnNetwork.Persona {
 		let persona = try await creatingNewVirtualPersona(
@@ -62,7 +62,7 @@ public extension Profile {
 	func creatingNewVirtualPersona(
 		networkID: NetworkID,
 		displayName: String? = nil,
-		fields: OrderedSet<OnNetwork.Persona.Field> = .init(),
+		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
 	) async throws -> OnNetwork.Persona {
 		try await creatingNewVirtualPersona(networkID: networkID, displayName: displayName, fields: fields, createFactorInstance: mnemonicForFactorSourceByReferenceToCreateFactorInstance(
@@ -75,7 +75,7 @@ public extension Profile {
 	func creatingNewVirtualPersona(
 		networkID: NetworkID,
 		displayName: String? = nil,
-		fields: OrderedSet<OnNetwork.Persona.Field> = .init(),
+		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
 	) async throws -> OnNetwork.Persona {
 		let onNetwork = try onNetwork(id: networkID)
@@ -98,7 +98,7 @@ public extension Profile {
 		personaIndex: Int,
 		networkID: NetworkID,
 		displayName: String? = nil,
-		fields: OrderedSet<OnNetwork.Persona.Field> = .init(),
+		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
 	) async throws -> OnNetwork.Persona {
 		try await OnNetwork.createNewVirtualEntity(

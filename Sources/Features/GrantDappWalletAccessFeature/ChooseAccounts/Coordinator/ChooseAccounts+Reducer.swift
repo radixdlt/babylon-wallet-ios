@@ -13,7 +13,7 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 		Reduce { state, action in
 			switch action {
 			case .internal(.view(.continueButtonTapped)):
-				let nonEmptySelectedAccounts = NonEmpty(rawValue: OrderedSet(state.accounts.filter(\.isSelected).map(\.account)))!
+				let nonEmptySelectedAccounts = NonEmpty(rawValue: IdentifiedArrayOf(uniqueElements: state.accounts.filter(\.isSelected).map(\.account)))!
 				return .run { [request = state.request] send in
 					await send(.delegate(.finishedChoosingAccounts(nonEmptySelectedAccounts,
 					                                               request)))

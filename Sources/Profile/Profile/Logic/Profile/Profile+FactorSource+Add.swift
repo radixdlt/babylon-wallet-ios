@@ -39,7 +39,7 @@ internal extension FactorSources {
 	}
 }
 
-public extension NonEmpty where Collection == OrderedSet<OnNetwork.Account> {
+public extension NonEmpty where Collection == IdentifiedArrayOf<OnNetwork.Account> {
 	// FIXME: uh terrible, please fix this.
 	@discardableResult
 	mutating func appendAccount(_ account: OnNetwork.Account) -> OnNetwork.Account {
@@ -50,7 +50,7 @@ public extension NonEmpty where Collection == OrderedSet<OnNetwork.Account> {
 	}
 }
 
-public extension NonEmpty where Collection == OrderedSet<Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource> {
+public extension NonEmpty where Collection == IdentifiedArrayOf<Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource> {
 	// FIXME: uh terrible, please fix this.
 	@discardableResult
 	mutating func appendFactorSource(_ factorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource) -> Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource? {

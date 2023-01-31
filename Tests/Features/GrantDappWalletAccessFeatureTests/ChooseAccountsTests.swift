@@ -25,7 +25,7 @@ final class ChooseAccountsTests: TestCase {
 		await store.send(.view(.continueButtonTapped))
 
 		// then
-		let expectedAccounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: [singleAccount.account]))!
+		let expectedAccounts = NonEmpty(rawValue: IdentifiedArrayOf(uniqueElements: [singleAccount.account]))!
 		await store.receive(.delegate(.finishedChoosingAccounts(expectedAccounts, requestItem)))
 	}
 
