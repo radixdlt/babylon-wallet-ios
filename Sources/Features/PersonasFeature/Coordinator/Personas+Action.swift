@@ -16,7 +16,6 @@ public extension Personas.Action {
 // MARK: - Personas.Action.ChildAction
 public extension Personas.Action {
 	enum ChildAction: Sendable, Equatable {
-		case persona(Persona.Action)
 		case persona(
 			id: OnNetwork.Persona.ID,
 			action: Persona.Action
