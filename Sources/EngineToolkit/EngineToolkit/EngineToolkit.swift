@@ -46,6 +46,7 @@ internal extension EngineToolkit {
 }
 
 // MARK: Public
+
 public extension EngineToolkit {
 	/// Obtains information on the current transaction library used.
 	///
@@ -185,9 +186,19 @@ public extension EngineToolkit {
 			function: derive_virtual_account_address
 		)
 	}
+
+	func deriveVirtualIdentityAddressRequest(
+		request: DeriveVirtualIdentityAddressRequest
+	) -> Result<DeriveVirtualIdentityAddressResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: derive_virtual_identity_address
+		)
+	}
 }
 
 // MARK: Private (But Internal For Tests)
+
 internal extension EngineToolkit {
 	/// Calls the transaction library with a given input and returns the output back.
 	///
