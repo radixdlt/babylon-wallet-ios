@@ -105,6 +105,10 @@
 
 "onboarding.newAccountButtonTitle" = "New Account";
 
+"personas.createNewPersonaButtonTitle" = "Create new persona";
+"personas.subtitle" = "Here are all the Personas connected to your account";
+"personas.title" = "Personas";
+
 "profileLoad.decodingError" = "Failed to create Wallet from backup: %@";
 "profileLoad.failedToCreateProfileFromSnapshotError" = "Failed to create Wallet from backup, error: %@, version: %@";
 
@@ -117,6 +121,7 @@
 "settings.gatewayButtonTitle" = "Network Gateway";
 "settings.inspectProfileButtonTitle" = "Inspect Profile";
 "settings.noProfileText" = "No Wallet Data Found";
+"settings.personasButtonTitle" = "Personas";
 "settings.title" = "Wallet Settings";
 "settings.versionInfo" = "Version: %@ build #%@";
 

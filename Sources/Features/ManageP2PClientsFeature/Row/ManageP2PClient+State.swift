@@ -44,3 +44,9 @@ public extension ManageP2PClient.State {
 		)
 	}
 }
+
+#if DEBUG
+public extension ManageP2PClient.State {
+	static let previewValue: Self = .init(clientWithConnectionStatus: .init(p2pClient: .previewValue))
+}
+#endif
