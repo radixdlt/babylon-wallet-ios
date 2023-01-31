@@ -84,7 +84,10 @@ package.addModules([
 	),
 	.feature(
 		name: "DappInteractionFeature",
-		dependencies: [],
+		dependencies: [
+			"CreateAccountFeature",
+			"ProfileClient",
+		],
 		tests: .no
 	),
 	.feature(
@@ -100,17 +103,9 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "GrantDappWalletAccessFeature",
-		dependencies: [
-			"CreateAccountFeature",
-			"ProfileClient",
-		],
-		tests: .yes()
-	),
-	.feature(
 		name: "HandleDappRequests",
 		dependencies: [
-			"GrantDappWalletAccessFeature",
+			"DappInteractionFeature",
 			"P2PConnectivityClient",
 			"TransactionSigningFeature",
 		],
@@ -125,7 +120,7 @@ package.addModules([
 			"AccountPreferencesFeature",
 			"AppSettings",
 			"CreateAccountFeature",
-			"GrantDappWalletAccessFeature",
+			"DappInteractionFeature",
 			"P2PConnectivityClient",
 			"ProfileClient",
 			"TransactionSigningFeature",
