@@ -13,32 +13,32 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 			AssetsView()
 		}
 
-		CaseReduce(core, case: /Action.view)
+		CaseReduce(core, case: /Action.view, embed: Action.delegate)
 			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
 				Destinations()
 			}
 	}
 
-	func core(state: inout State, action: Action.ViewAction) -> EffectTask<Action> {
+	func core(state: inout State, action: Action.ViewAction) -> EffectTask<Action.DelegateAction> {
 		switch action {
 		case .appeared:
 			return .run { [address = state.address] send in
-				await send(.delegate(.refresh(address)))
+				await send(.refresh(address))
 			}
 		case .dismissAccountDetailsButtonTapped:
 			return .run { send in
-				await send(.delegate(.dismissAccountDetails))
+				await send(.dismissAccountDetails)
 			}
 		case .displayAccountPreferencesButtonTapped:
 			return .run { [address = state.address] send in
-				await send(.delegate(.displayAccountPreferences(address)))
+				await send(.displayAccountPreferences(address))
 			}
 		case .copyAddressButtonTapped:
 			let address = state.address.address
 			return .fireAndForget { pasteboardClient.copyString(address) }
 		case .pullToRefreshStarted:
 			return .run { [address = state.address] send in
-				await send(.delegate(.refresh(address)))
+				await send(.refresh(address))
 			}
 		case .transferButtonTapped:
 			state.destination = .transfer(AssetTransfer.State(from: state.account))
