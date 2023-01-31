@@ -7,7 +7,6 @@ public extension AccountDetails {
 	enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		case view(ViewAction)
-		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
 }
@@ -30,11 +29,6 @@ public extension AccountDetails.Action {
 		case transferButtonTapped
 		case pullToRefreshStarted
 	}
-}
-
-// MARK: - AccountDetails.Action.InternalAction
-public extension AccountDetails.Action {
-	enum InternalAction: Sendable, Equatable {}
 }
 
 // MARK: - AccountDetails.Action.DelegateAction
