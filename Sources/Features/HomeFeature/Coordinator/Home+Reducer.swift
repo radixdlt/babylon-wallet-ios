@@ -66,7 +66,7 @@ public struct Home: Sendable, ReducerProtocol {
 			return .none
 
 		case let .internal(.system(.accountsLoadedResult(.success(accounts)))):
-			state.accountList = .init(nonEmptyOrderedSetOfAccounts: accounts)
+			state.accountList = .init(accounts: accounts)
 			return fetchPortfolio(accounts)
 
 		case let .internal(.system(.appSettingsLoadedResult(.failure(error)))):

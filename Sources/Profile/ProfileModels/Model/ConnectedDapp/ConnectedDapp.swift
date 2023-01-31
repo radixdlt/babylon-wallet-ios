@@ -59,7 +59,7 @@ public extension OnNetwork.ConnectedDapp {
 			Hashable,
 			Codable
 		{
-			public let mode: Mode.Stripped
+			public let mode: Mode.Discriminator
 
 			// FIXME: When we have **value** generics we would use something like:
 			// `OrderedSet<N; AccountAddress` (however that would be encodoed)
@@ -73,7 +73,7 @@ public extension OnNetwork.ConnectedDapp {
 						throw MustBeExactlyAccountLength()
 					}
 					self.accountsReferencedByAddress = new
-				case .orMore:
+				case .atLeast:
 					guard new.count >= self.accountsReferencedByAddress.count else {
 						struct MustBeSameOrMoreAccounts: Swift.Error {}
 						throw MustBeSameOrMoreAccounts()
@@ -84,16 +84,16 @@ public extension OnNetwork.ConnectedDapp {
 
 			public enum Mode {
 				case exactly(OrderedSet<AccountAddress>)
-				case orMore(OrderedSet<AccountAddress>)
+				case atLeast(OrderedSet<AccountAddress>)
 
-				public enum Stripped:
+				public enum Discriminator:
 					String,
 					Sendable,
 					Hashable,
 					Codable
 				{
 					case exactly
-					case orMore
+					case atLeast
 				}
 			}
 
@@ -101,8 +101,8 @@ public extension OnNetwork.ConnectedDapp {
 				mode: Mode
 			) throws {
 				switch mode {
-				case let .orMore(accounts):
-					self.mode = .orMore
+				case let .atLeast(accounts):
+					self.mode = .atLeast
 					self.accountsReferencedByAddress = accounts
 				case let .exactly(accounts):
 					self.mode = .exactly
