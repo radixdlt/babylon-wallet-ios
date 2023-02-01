@@ -3,13 +3,11 @@ import FeaturePrelude
 // MARK: - DappInteraction.Action
 public extension DappInteraction {
 	enum Action: Sendable, Equatable {
+		case view(ViewAction)
 		case `internal`(InternalAction)
+		case child(ChildAction)
 		case delegate(DelegateAction)
 	}
-}
-
-public extension DappInteraction.Action {
-	static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 }
 
 // MARK: - DappInteraction.Action.ViewAction
@@ -21,15 +19,14 @@ public extension DappInteraction.Action {
 
 // MARK: - DappInteraction.Action.InternalAction
 public extension DappInteraction.Action {
-	enum InternalAction: Sendable, Equatable {
-		case view(ViewAction)
-		case system(SystemAction)
-	}
+	enum InternalAction: Sendable, Equatable {}
 }
 
-// MARK: - DappInteraction.Action.SystemAction
+// MARK: - DappInteraction.Action.ChildAction
 public extension DappInteraction.Action {
-	enum SystemAction: Sendable, Equatable {}
+	enum ChildAction: Sendable, Equatable {
+		case navigation(NavigationActionOf<DappInteraction.Destinations>)
+	}
 }
 
 // MARK: - DappInteraction.Action.DelegateAction

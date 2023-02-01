@@ -20,6 +20,8 @@ public extension DappInteraction.View {
 			send: { .view($0) }
 		) { viewStore in
 			// TODO: implement
+//			NavigationStackStore
+
 			Text("Implement: DappInteraction")
 				.background(Color.yellow)
 				.foregroundColor(.red)

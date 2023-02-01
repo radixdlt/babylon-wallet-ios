@@ -5,6 +5,9 @@ public extension DappInteraction {
 	struct State: Sendable, Equatable {
 		let interaction: P2P.FromDapp.WalletInteraction
 
+		@NavigationStateOf<Destinations>
+		var navigation: NavigationState<Destinations.State>.Path
+
 		public init(
 			interaction: P2P.FromDapp.WalletInteraction
 		) {
