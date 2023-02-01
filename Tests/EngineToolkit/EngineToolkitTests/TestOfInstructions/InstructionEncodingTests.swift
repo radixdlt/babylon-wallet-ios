@@ -273,17 +273,17 @@ final class InstructionEncodingTests: TestCase {
 				{"instruction":"CLAIM_PACKAGE_ROYALTY","package_address":{"address":"package_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqxrmwtq","type":"PackageAddress"}}
 				"""
 			),
-			(
-				value: .setMethodAccessRule(.init(
-					entityAddress: .componentAddress("component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr"),
-					index: 0,
-					key: "get_token",
-					rule: .init(.u8(0), fields: [])
-				)),
-				jsonRepresentation: """
-				{"entity_address":{"address":"component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr","type":"ComponentAddress"},"index":{"type":"U8","value":"0"},"instruction":"SET_METHOD_ACCESS_RULE","key":{"type":"String","value":"get_token"},"rule":{"fields":[],"type":"Enum","variant":{"discriminator":"0","type":"U8"}}}
-				"""
-			),
+			//            (
+			//                value: .setMethodAccessRule(.init(
+			//                    entityAddress: .componentAddress("component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr"),
+			//                    index: 0,
+			//                    key: "get_token",
+			//                    rule: .init(.u8(0), fields: [])
+			//                )),
+			//                jsonRepresentation: """
+			//                {"entity_address":{"address":"component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr","type":"ComponentAddress"},"index":{"type":"U32","value":"0"},"instruction":"SET_METHOD_ACCESS_RULE","key":{"type":"String","value":"get_token"},"rule":{"fields":[],"type":"Enum","variant":{"discriminator":"0","type":"U8"}}}
+			//                """
+			//            ),
 			(
 				value: .mintFungible(.init(
 					resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",

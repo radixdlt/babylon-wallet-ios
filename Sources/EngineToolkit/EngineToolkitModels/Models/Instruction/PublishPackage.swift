@@ -14,11 +14,11 @@ public struct PublishPackage: InstructionProtocol {
 	public let abi: Blob
 	public let royaltyConfig: Map_
 	public let metadata: Map_
-	public let accessRules: Enum
+	public let accessRules: Tuple
 
 	// MARK: Init
 
-	public init(code: Blob, abi: Blob, royaltyConfig: Map_, metadata: Map_, accessRules: Enum) {
+	public init(code: Blob, abi: Blob, royaltyConfig: Map_, metadata: Map_, accessRules: Tuple) {
 		self.code = code
 		self.abi = abi
 		self.royaltyConfig = royaltyConfig
@@ -65,7 +65,7 @@ public extension PublishPackage {
 			abi: container.decode(Blob.self, forKey: .abi),
 			royaltyConfig: container.decode(Map_.self, forKey: .royaltyConfig),
 			metadata: container.decode(Map_.self, forKey: .metadata),
-			accessRules: container.decode(Enum.self, forKey: .accessRules)
+			accessRules: container.decode(Tuple.self, forKey: .accessRules)
 		)
 	}
 }

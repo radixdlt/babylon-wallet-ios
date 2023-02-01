@@ -11,13 +11,13 @@ public struct SetMethodAccessRule: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let entityAddress: Address
-	public let index: UInt8
-	public let key: String
+	public let index: UInt32
+	public let key: Enum
 	public let rule: Enum
 
 	// MARK: Init
 
-	public init(entityAddress: Address, index: UInt8, key: String, rule: Enum) {
+	public init(entityAddress: Address, index: UInt32, key: Enum, rule: Enum) {
 		self.entityAddress = entityAddress
 		self.index = index
 		self.key = key
@@ -44,7 +44,7 @@ public extension SetMethodAccessRule {
 
 		try container.encode(entityAddress, forKey: .entityAddress)
 		try container.encode(index.proxyEncodable, forKey: .index)
-		try container.encode(key.proxyEncodable, forKey: .key)
+		try container.encode(key, forKey: .key)
 		try container.encode(rule, forKey: .rule)
 	}
 
@@ -57,8 +57,8 @@ public extension SetMethodAccessRule {
 		}
 
 		let entityAddress = try container.decode(Address.self, forKey: .entityAddress)
-		let index = try container.decode(UInt8.ProxyDecodable.self, forKey: .index).decoded
-		let key = try container.decode(String.ProxyDecodable.self, forKey: .key).decoded
+		let index = try container.decode(UInt32.ProxyDecodable.self, forKey: .index).decoded
+		let key = try container.decode(Enum.self, forKey: .key)
 		let rule = try container.decode(Enum.self, forKey: .rule)
 
 		self.init(entityAddress: entityAddress, index: index, key: key, rule: rule)

@@ -299,14 +299,13 @@ private extension EngineToolkit {
 		do {
 			let response = try jsonDecoder.decode(Response.self, from: jsonData)
 			return .success(response)
-		} catch let firstError {
-			guard let str = String(data: jsonData, encoding: .utf8) else {
-				#if DEBUG
-				prettyPrint(responseJSONString: jsonString, error: firstError, failedToDecodeInto: Response.self)
-				#endif
-				return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEitherNorAsSwiftDecodingError(responseType: "\(Response.self)", nonSwiftDecodingError: String(describing: firstError)))
-			}
-			return .failure(.errorResponse(str))
+		} catch let error as Swift.DecodingError {
+			#if DEBUG
+			prettyPrint(responseJSONString: jsonString, error: error, failedToDecodeInto: Response.self)
+			#endif
+			return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEither(responseType: "\(Response.self)", decodingError: error))
+		} catch {
+			return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEitherNorAsSwiftDecodingError(responseType: "\(Response.self)", nonSwiftDecodingError: String(describing: error)))
 		}
 	}
 
