@@ -16,95 +16,75 @@ public extension NameNewEntity {
 
 public extension NameNewEntity.View {
 	var body: some View {
-//		ForceFullScreen {
-//			ZStack {
-//				createAccountView
-//					.zIndex(0)
-//
-//				IfLetStore(
-//					store.scope(
-//						state: \.gatherFactor,
-//						action: { .child(.gatherFactor($0)) }
-//					),
-//					then: { GatherFactor.View(store: $0) }
-//				)
-//				.zIndex(1)
-//			}
-//		}
-		Text("Foo")
-	}
-}
-
-internal extension NameNewEntity.View {
-	@ViewBuilder
-	var createAccountView: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			VStack(spacing: .zero) {
-				if viewStore.isDismissButtonVisible {
-					NavigationBar(
-						leadingItem: CloseButton {
-							viewStore.send(.closeButtonTapped)
-						}
-					)
-					.foregroundColor(.app.gray1)
-					.padding([.horizontal, .top], .medium3)
-				} else {
+		ForceFullScreen {
+			WithViewStore(
+				store,
+				observe: ViewState.init(state:),
+				send: { .view($0) }
+			) { viewStore in
+				VStack(spacing: .zero) {
+					//                    if viewStore.isDismissButtonVisible {
+					//                        NavigationBar(
+					//                            leadingItem: CloseButton {
+					//                                viewStore.send(.closeButtonTapped)
+					//                            }
+					//                        )
+					//                        .foregroundColor(.app.gray1)
+					//                        .padding([.horizontal, .top], .medium3)
+					//                    } else {
 					Spacer()
 						.frame(minHeight: .small2, maxHeight: .large1)
-				}
-				VStack {
-					title(with: viewStore)
+					//                    }
+					VStack {
+						title(with: viewStore)
 
-					Spacer()
-						.frame(minHeight: .small2, maxHeight: .large1)
+						Spacer()
+							.frame(minHeight: .small2, maxHeight: .large1)
 
-					VStack(spacing: .large1) {
-						subtitle
+						VStack(spacing: .large1) {
+							subtitle
 
-						let accountNameBinding = viewStore.binding(
-							get: \.accountName,
-							send: { .textFieldChanged($0) }
-						)
-
-						AppTextField(
-							placeholder: L10n.CreateAccount.placeholder,
-							text: accountNameBinding,
-							hint: L10n.CreateAccount.explanation,
-							binding: $focusedField,
-							equals: .accountName,
-							first: viewStore.binding(
-								get: \.focusedField,
-								send: { .textFieldFocused($0) }
+							let nameBinding = viewStore.binding(
+								get: \.entityName,
+								send: { .textFieldChanged($0) }
 							)
-						)
-						#if os(iOS)
-						.textFieldCharacterLimit(30, forText: accountNameBinding)
-						#endif
-						.autocorrectionDisabled()
+
+							AppTextField(
+								placeholder: L10n.CreateAccount.placeholder,
+								text: nameBinding,
+								hint: L10n.CreateAccount.explanation,
+								binding: $focusedField,
+								equals: .accountName,
+								first: viewStore.binding(
+									get: \.focusedField,
+									send: { .textFieldFocused($0) }
+								)
+							)
+							#if os(iOS)
+							.textFieldCharacterLimit(30, forText: nameBinding)
+							#endif
+							.autocorrectionDisabled()
+						}
+
+						Spacer(minLength: .small2)
+
+						//                        if viewStore.isLoaderVisible {
+						//                            ProgressView()
+						//                        }
+
+						Spacer()
+
+						Button(L10n.CreateAccount.createAccountButtonTitle) {
+							viewStore.send(.confirmNameButtonTapped)
+						}
+						.buttonStyle(.primaryRectangular)
+						.controlState(viewStore.createEntityButtonState)
 					}
-
-					Spacer(minLength: .small2)
-
-					if viewStore.isLoaderVisible {
-						ProgressView()
-					}
-
-					Spacer()
-
-					Button(L10n.CreateAccount.createAccountButtonTitle) {
-						viewStore.send(.confirmNameButtonTapped)
-					}
-					.buttonStyle(.primaryRectangular)
-					.controlState(viewStore.createAccountButtonState)
+					.padding([.horizontal, .bottom], .medium1)
 				}
-				.padding([.horizontal, .bottom], .medium1)
-			}
-			.onAppear {
-				viewStore.send(.viewAppeared)
+				.onAppear {
+					viewStore.send(.viewAppeared)
+				}
 			}
 		}
 	}
@@ -115,21 +95,16 @@ extension NameNewEntity.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		public var titleText: String
-		public var accountName: String
-		public var isLoaderVisible: Bool
-		public var createAccountButtonState: ControlState
-		public var isDismissButtonVisible: Bool
+		public var entityName: String
+		public var createEntityButtonState: ControlState
 		@BindingState public var focusedField: NameNewEntity.State.Field?
 
 		init(state: NameNewEntity.State) {
-//			titleText = state.isFirstAccount == false ? L10n.CreateAccount.createNewAccount : L10n.CreateAccount.createFirstAccount
-//			accountName = state.inputtedAccountName
-//			isLoaderVisible = state.isCreatingAccount
-//			let isNameValid = !state.sanitizedAccountName.isEmpty
-//			createAccountButtonState = (isNameValid && !state.isCreatingAccount) ? .enabled : .disabled
-//			isDismissButtonVisible = !state.shouldCreateProfile && state.factorSources != nil
-//			focusedField = state.focusedField
-			fatalError()
+			titleText = state.isFirst == false ? L10n.CreateAccount.createNewAccount : L10n.CreateAccount.createFirstAccount
+			entityName = state.inputtedName
+			let isNameValid = !state.sanitizedName.isEmpty
+			createEntityButtonState = isNameValid ? .enabled : .disabled
+			focusedField = state.focusedField
 		}
 	}
 }

@@ -4,30 +4,20 @@ import GatherFactorsFeature
 // MARK: - NameNewEntity.State
 public extension NameNewEntity {
 	struct State: Sendable, Equatable {
-//		public var onNetworkWithID: NetworkID?
 		public var isFirst: Bool
 		public var inputtedName: String
 		public var sanitizedName: String { inputtedName.trimmed() }
-//		public var isCreatingAccount: Bool {
-//			gatherFactor != nil
-//		}
-
-//		public let shouldCreateProfile: Bool
 
 		@BindingState public var focusedField: Field?
 
 		public init(
-			//			onNetworkWithID: NetworkID? = nil,
-//			shouldCreateProfile: Bool = false,
-			isFirstAccount: Bool = false,
-			inputtedAccountName: String = "",
+			isFirst: Bool,
+			inputtedEntityName: String = "",
 			focusedField: Field? = nil
 		) {
-//			self.onNetworkWithID = onNetworkWithID
-//			self.shouldCreateProfile = shouldCreateProfile
-			self.inputtedName = inputtedAccountName
+			self.inputtedName = inputtedEntityName
 			self.focusedField = focusedField
-			self.isFirst = isFirstAccount
+			self.isFirst = isFirst
 		}
 	}
 }

@@ -14,22 +14,35 @@ public extension CreateEntityCoordinator {
 
 public extension CreateEntityCoordinator.View {
 	var body: some View {
-		SwitchStore(store.scope(state: \.step)) {
-			CaseLet(
-				state: /CreateEntityCoordinator.State.Step.nameNewEntity,
-				action: { CreateEntityCoordinator.Action.child(.nameNewEntity($0)) },
-				then: { NameNewEntity.View(store: $0) }
-			)
-			CaseLet(
-				state: /CreateEntityCoordinator.State.Step.selectGenesisFactorSource,
-				action: { CreateEntityCoordinator.Action.child(.selectGenesisFactorSource($0)) },
-				then: { SelectGenesisFactorSource.View(store: $0) }
-			)
-//			CaseLet(
-//				state: /CreateEntityCoordinator.State.Root.completion,
-//				action: { CreateEntityCoordinator.Action.child(.completion($0)) },
-			//                then: { NewEntityCompletion<CompletionState.Entity>.View(store: $0) }
-//			)
+		WithViewStore(store, observe: { $0 }) { _ in
+			//            VStack {
+			//                NavigationBar(
+			//                    leadingItem: Group { viewStore.canBeDismissed ? CloseButton {
+			//                        viewStore.send(.closeButtonTapped)
+			//                    } : EmptyView() }
+			//                )
+			//                .foregroundColor(.app.gray1)
+			//                .padding([.horizontal, .top], .medium3)
+//
+//
+			//            }
+			SwitchStore(store.scope(state: \.step)) {
+				CaseLet(
+					state: /CreateEntityCoordinator.State.Step.nameNewEntity,
+					action: { CreateEntityCoordinator.Action.child(.nameNewEntity($0)) },
+					then: { NameNewEntity.View(store: $0) }
+				)
+				CaseLet(
+					state: /CreateEntityCoordinator.State.Step.selectGenesisFactorSource,
+					action: { CreateEntityCoordinator.Action.child(.selectGenesisFactorSource($0)) },
+					then: { SelectGenesisFactorSource.View(store: $0) }
+				)
+				//            CaseLet(
+				//                state: /CreateEntityCoordinator.State.Root.completion,
+				//                action: { CreateEntityCoordinator.Action.child(.completion($0)) },
+				//                then: { NewEntityCompletion<CompletionState.Entity>.View(store: $0) }
+				//            )
+			}
 		}
 	}
 }

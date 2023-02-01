@@ -12,7 +12,7 @@ public extension Onboarding {
 		public init() {
 			self = .createAccountCoordinator(
 				.init(
-					step: .nameNewEntity(.init()),
+					step: .nameNewEntity(.init(isFirst: true)),
 					config: .init(
 						create: .profile
 					),

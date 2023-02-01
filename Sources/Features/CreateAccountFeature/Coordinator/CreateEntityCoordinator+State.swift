@@ -12,12 +12,15 @@ public extension CreateEntityCoordinator {
 		public let step: Step
 		public let config: StateConfig
 		public let completionDestination: CompletionState.Destination
+		public let canBeDismissed: Bool
 
 		public init(
 			step: Step,
+			canBeDismissed: Bool = true,
 			config: StateConfig,
 			completionDestination: CompletionState.Destination
 		) {
+			self.canBeDismissed = canBeDismissed
 			self.step = step
 			self.completionDestination = completionDestination
 			self.config = config
