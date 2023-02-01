@@ -34,5 +34,7 @@ public extension SelectGenesisFactorSource.Action {
 
 // MARK: - SelectGenesisFactorSource.Action.DelegateAction
 public extension SelectGenesisFactorSource.Action {
-	enum DelegateAction: Sendable, Equatable {}
+	enum DelegateAction: Sendable, Equatable {
+		case confirmedFactorSource(FactorSource, specifiedNameForNewEntityToCreate: String)
+	}
 }

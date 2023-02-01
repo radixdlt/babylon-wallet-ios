@@ -3,7 +3,16 @@ import FeaturePrelude
 // MARK: - CreationOfEntity.State
 public extension CreationOfEntity {
 	struct State: Sendable, Equatable {
-		public init() {}
+		public let name: String
+		public let genesisFactorSource: FactorSource
+
+		public init(
+			name: String,
+			genesisFactorSource: FactorSource
+		) {
+			self.name = name
+			self.genesisFactorSource = genesisFactorSource
+		}
 	}
 }
 

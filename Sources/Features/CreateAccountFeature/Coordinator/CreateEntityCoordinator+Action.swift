@@ -11,10 +11,11 @@ public extension CreateEntityCoordinator {
 // MARK: - CreateEntityCoordinator.Action.ChildAction
 public extension CreateEntityCoordinator.Action {
 	enum ChildAction: Sendable, Equatable {
-		case nameNewEntity(NameNewEntity.Action)
-		case selectGenesisFactorSource(SelectGenesisFactorSource.Action)
-		case creationOfEntity(CreationOfEntity<CreateEntityCoordinator.Entity>.Action)
-		case completion(CompletionAction)
+		public typealias Entity = CreateEntityCoordinator.Entity
+		case step0_nameNewEntity(NameNewEntity<Entity>.Action)
+		case step1_selectGenesisFactorSource(SelectGenesisFactorSource.Action)
+		case step2_creationOfEntity(CreationOfEntity<Entity>.Action)
+		case step3_completion(CompletionAction)
 	}
 }
 

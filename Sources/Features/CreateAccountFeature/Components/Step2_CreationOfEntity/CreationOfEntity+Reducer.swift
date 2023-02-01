@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 // MARK: - CreationOfEntity
-public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtocol {
+public struct CreationOfEntity<Entity: EntityProtocol & Equatable & Sendable>: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {

@@ -42,7 +42,7 @@ public extension NameNewEntity.View {
 							.frame(minHeight: .small2, maxHeight: .large1)
 
 						VStack(spacing: .large1) {
-							subtitle
+							subtitle(with: viewStore)
 
 							let nameBinding = viewStore.binding(
 								get: \.entityName,
@@ -50,9 +50,9 @@ public extension NameNewEntity.View {
 							)
 
 							AppTextField(
-								placeholder: L10n.CreateAccount.placeholder,
+								placeholder: viewStore.namePlaceholder,
 								text: nameBinding,
-								hint: L10n.CreateAccount.explanation,
+								hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
 								binding: $focusedField,
 								equals: .accountName,
 								first: viewStore.binding(
@@ -74,7 +74,7 @@ public extension NameNewEntity.View {
 
 						Spacer()
 
-						Button(L10n.CreateAccount.createAccountButtonTitle) {
+						Button(L10n.CreateEntity.NameNewEntity.Name.Button.title) {
 							viewStore.send(.confirmNameButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
@@ -94,13 +94,19 @@ public extension NameNewEntity.View {
 extension NameNewEntity.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
+		public let namePlaceholder: String
 		public var titleText: String
 		public var entityName: String
+		public let entityKindName: String
 		public var createEntityButtonState: ControlState
 		@BindingState public var focusedField: NameNewEntity.State.Field?
 
 		init(state: NameNewEntity.State) {
-			titleText = state.isFirst == false ? L10n.CreateAccount.createNewAccount : L10n.CreateAccount.createFirstAccount
+			let entityKind = Entity.entityKind
+			let entityKindName = entityKind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
+			self.entityKindName = entityKindName
+			self.namePlaceholder = entityKind == .account ? L10n.CreateEntity.NameNewEntity.Name.Field.Placeholder.Specific.account : L10n.CreateEntity.NameNewEntity.Name.Field.Placeholder.Specific.persona
+			titleText = state.isFirst ? L10n.CreateEntity.NameNewEntity.Title.first(entityKindName) : L10n.CreateEntity.NameNewEntity.Title.notFirst(entityKindName)
 			entityName = state.inputtedName
 			let isNameValid = !state.sanitizedName.isEmpty
 			createEntityButtonState = isNameValid ? .enabled : .disabled
@@ -121,8 +127,8 @@ private extension NameNewEntity.View {
 			.textStyle(.sheetTitle)
 	}
 
-	var subtitle: some View {
-		Text(L10n.CreateAccount.subtitle)
+	func subtitle(with viewStore: ViewStore) -> some View {
+		Text(L10n.CreateEntity.NameNewEntity.subtitle(viewStore.entityKindName.lowercased()))
 			.fixedSize(horizontal: false, vertical: true)
 			.padding(.horizontal, .large1)
 			.multilineTextAlignment(.center)

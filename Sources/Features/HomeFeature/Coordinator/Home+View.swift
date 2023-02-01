@@ -96,7 +96,7 @@ private extension Home.View {
 						)
 					)
 
-					Button(L10n.CreateAccount.createNewAccount) {
+					Button(L10n.Home.CreateAccount.buttonTitle) {
 						viewStore.send(.createAccountButtonTapped)
 					}
 					.buttonStyle(.secondaryRectangular())

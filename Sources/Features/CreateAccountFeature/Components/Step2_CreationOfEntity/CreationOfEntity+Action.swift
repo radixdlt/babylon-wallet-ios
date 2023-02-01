@@ -34,5 +34,7 @@ public extension CreationOfEntity.Action {
 
 // MARK: - CreationOfEntity.Action.DelegateAction
 public extension CreationOfEntity.Action {
-	enum DelegateAction: Sendable, Equatable {}
+	enum DelegateAction: Sendable, Equatable {
+		case createdEntity(Entity)
+	}
 }

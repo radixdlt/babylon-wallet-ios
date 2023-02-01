@@ -26,12 +26,12 @@ public extension CreateEntityCoordinator.View {
 //
 //
 			//            }
-//			SwitchStore(store.scope(state: \.step)) {
-//				CaseLet(
-//					state: /CreateEntityCoordinator.State.Step.nameNewEntity,
-//					action: { CreateEntityCoordinator.Action.child(.nameNewEntity($0)) },
-//					then: { NameNewEntity.View(store: $0) }
-//				)
+			SwitchStore(store.scope(state: \.step)) {
+				CaseLet(
+					state: /CreateEntityCoordinator.State.Step.step0_nameNewEntity,
+					action: { CreateEntityCoordinator.Action.child(.step0_nameNewEntity($0)) },
+					then: { NameNewEntity.View(store: $0) }
+				)
 //				CaseLet(
 //					state: /CreateEntityCoordinator.State.Step.selectGenesisFactorSource,
 //					action: { CreateEntityCoordinator.Action.child(.selectGenesisFactorSource($0)) },
@@ -42,8 +42,7 @@ public extension CreateEntityCoordinator.View {
 //				//                action: { CreateEntityCoordinator.Action.child(.completion($0)) },
 //				//                then: { NewEntityCompletion<CompletionState.Entity>.View(store: $0) }
 //				//            )
-//			}
-			Text("So so empty")
+			}
 		}
 	}
 }

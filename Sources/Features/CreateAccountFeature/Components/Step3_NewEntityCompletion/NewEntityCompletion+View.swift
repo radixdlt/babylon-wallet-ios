@@ -29,7 +29,7 @@ public extension NewEntityCompletion.View {
 					Spacer()
 
 					VStack(spacing: .medium1) {
-						Text(L10n.CreateAccount.Completion.title)
+						Text(L10n.CreateEntity.Completion.title)
 							.foregroundColor(.app.gray1)
 							.textStyle(.sheetTitle)
 
@@ -37,7 +37,7 @@ public extension NewEntityCompletion.View {
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 
-						Text(L10n.CreateAccount.Completion.explanation)
+						Text(viewStore.explaination)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
@@ -46,7 +46,7 @@ public extension NewEntityCompletion.View {
 
 					Spacer()
 
-					Button(L10n.CreateAccount.Completion.goToDestination(viewStore.destination.displayText)) {
+					Button(L10n.CreateEntity.Completion.goToDestination(viewStore.destination.displayText)) {
 						viewStore.send(.goToDestination)
 					}
 					.buttonStyle(.primaryRectangular)
@@ -106,9 +106,9 @@ private extension NewEntityCompletion.View {
 
 	func subtitleText(with viewStore: CompletionViewStore) -> String {
 		if viewStore.isFirstOnNetwork {
-			return L10n.CreateAccount.Completion.subtitleFirstAccount
+			return L10n.CreateEntity.Completion.Subtitle.first(viewStore.entityKind)
 		} else {
-			return L10n.CreateAccount.Completion.subtitle
+			return L10n.CreateEntity.Completion.Subtitle.notFirst(viewStore.entityKind)
 		}
 	}
 }
@@ -129,16 +129,19 @@ private extension NewEntityCompletion.View {
 extension NewEntityCompletion.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
+		let entityKind: String
 		let entityName: String
 		let entityIndex: Int
 		let destination: Destination
 		let isFirstOnNetwork: Bool
+		let explaination: String
 
 		// Account only
 		let accountAddress: AddressView.ViewState?
 		let appearanceID: OnNetwork.Account.AppearanceID?
 
 		init(state: NewEntityCompletion.State) {
+			entityKind = state.entity.kind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
 			entityName = state.displayName
 			entityIndex = state.index
 			destination = state.destination
@@ -147,7 +150,9 @@ extension NewEntityCompletion.View {
 			if let account = state.entity as? OnNetwork.Account {
 				self.accountAddress = .init(address: account.address.address, format: .short())
 				self.appearanceID = account.appearanceID
+				self.explaination = L10n.CreateEntity.Completion.Explanation.Specific.account
 			} else {
+				self.explaination = L10n.CreateEntity.Completion.Explanation.Specific.persona
 				self.accountAddress = nil
 				self.appearanceID = nil
 			}

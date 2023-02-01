@@ -30,7 +30,7 @@ public protocol CreateEntityCompletionDestinationProtocol: Sendable, Equatable {
 
 // MARK: - CreateEntityCompletionStateProtocol
 public protocol CreateEntityCompletionStateProtocol: Sendable, Equatable {
-	associatedtype Entity: EntityProtocol
+	associatedtype Entity: EntityProtocol & Sendable & Equatable
 	associatedtype Destination: CreateEntityCompletionDestinationProtocol
 	var entity: Entity { get }
 	var isFirstOnNetwork: Bool { get }
@@ -54,9 +54,9 @@ public struct CreateAccountCompletionState: CreateEntityCompletionStateProtocol 
 		public var displayText: String {
 			switch self {
 			case .home:
-				return L10n.CreateAccount.Completion.Destination.home
+				return L10n.CreateEntity.Completion.Destination.home
 			case .chooseAccounts:
-				return L10n.CreateAccount.Completion.Destination.chooseAccounts
+				return L10n.CreateEntity.Completion.Destination.chooseEntities(L10n.Common.Account.kind)
 			}
 		}
 	}
@@ -94,38 +94,49 @@ public struct CreateEntityCoordinator<
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-//		Scope(state: \.root, action: /Action.self) {
-//			EmptyReducer()
-//				.ifCaseLet(/State.Root.nameNewEntity, action: /Action.child .. Action.ChildAction.nameNewEntity) {
-//					NameNewEntity()
-//				}
-//				.ifCaseLet(/State.Root.selectGenesisFactorSource, action: /Action.child .. Action.ChildAction.selectGenesisFactorSource) {
-//					SelectGenesisFactorSource()
-//				}
-		////				.ifCaseLet(/State.Root.entityCompletion, action: /Action.child .. Action.ChildAction.entityCompletion) {
-//			//                    EntityCompletion()
-		////				}
-//		}
+		Scope(state: \.step, action: /Action.self) {
+			EmptyReducer()
+				.ifCaseLet(/State.Step.step0_nameNewEntity, action: /Action.child .. Action.ChildAction.step0_nameNewEntity) {
+					NameNewEntity()
+				}
+				.ifCaseLet(/State.Step.step1_selectGenesisFactorSource, action: /Action.child .. Action.ChildAction.step1_selectGenesisFactorSource) {
+					SelectGenesisFactorSource()
+				}
+			//				.ifCaseLet(/State.Root.entityCompletion, action: /Action.child .. Action.ChildAction.entityCompletion) {
+			//                    EntityCompletion()
+			//				}
+		}
 		Reduce(self.core)
 	}
 
 	private func core(state: inout State, action: Action) -> EffectTask<Action> {
-//		switch action {
-//		case let .child(.nameNewEntity(.delegate(.named))):
-//
-		//            fatalError()
-//		case .child(.nameNewEntity(.delegate(.dismiss))):
-//			return .run { send in
-//				await send(.delegate(.dismissed))
-//			}
-//
-//		case .child(.accountCompletion(.delegate(.completed))):
-//			return .run { send in
-//				await send(.delegate(.completed))
-//			}
-//		default:
-//			return .none
-//		}
-		fatalError()
+		switch action {
+		case let .child(.step0_nameNewEntity(.delegate(.named(name)))):
+			state.step = .step1_selectGenesisFactorSource(.init(specifiedNameForNewEntityToCreate: name))
+			return .none
+
+		case .child(.step0_nameNewEntity(.delegate(.dismiss))):
+			return .run { send in
+				await send(.delegate(.dismissed))
+			}
+
+		case let .child(.step1_selectGenesisFactorSource(.delegate(.confirmedFactorSource(factorSource, specifiedNameForNewEntityToCreate)))):
+			state.step = .step2_creationOfEntity(.init(name: specifiedNameForNewEntityToCreate, genesisFactorSource: factorSource))
+			return .none
+
+		case let .child(.step2_creationOfEntity(.delegate(.createdEntity(newEntity)))):
+			let isFirstOnNetwork: Bool = { () -> Bool in fatalError("todo, propagate isFirstOnNetwork") }()
+			state.step = .step3_completion(
+				.init(
+					entity: newEntity,
+					isFirstOnNetwork: isFirstOnNetwork,
+					destination: state.completionDestination
+				)
+			)
+			return .none
+
+		default:
+			return .none
+		}
 	}
 }
