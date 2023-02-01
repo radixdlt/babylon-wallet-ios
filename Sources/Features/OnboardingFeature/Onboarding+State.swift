@@ -1,12 +1,12 @@
-import CreateAccountFeature
+import CreateEntityFeature
+import CreateProfileFeature
 import FeaturePrelude
-import ImportProfileFeature
 
 // MARK: - Onboarding.State
 public extension Onboarding {
 	// MARK: State
 	enum State: Equatable {
-		case importProfile(ImportProfile.State)
+		case createProfile(CreateProfileCoordinator.State)
 		case createAccountCoordinator(CreateAccountCoordinator.State)
 
 		public init() {

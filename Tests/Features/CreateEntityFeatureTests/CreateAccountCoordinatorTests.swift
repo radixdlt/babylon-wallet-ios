@@ -1,4 +1,4 @@
-@testable import CreateAccountFeature
+@testable import CreateEntityFeature
 import FeatureTestingPrelude
 
 @MainActor

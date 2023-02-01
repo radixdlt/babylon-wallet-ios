@@ -2,7 +2,7 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import CreateAccountFeature
+import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - Home.State

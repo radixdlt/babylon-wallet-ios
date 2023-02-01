@@ -110,3 +110,9 @@ public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10
 		"""
 	}
 }
+
+#if DEBUG
+public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
+	static let previewValue: Self = try! .init(mnemonic: .generate())
+}
+#endif // DEBUG

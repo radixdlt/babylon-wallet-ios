@@ -1,5 +1,5 @@
+@testable import CreateProfileFeature
 import FeatureTestingPrelude
-@testable import ImportProfileFeature
 import Profile
 
 // MARK: - ImportProfileFeatureTests

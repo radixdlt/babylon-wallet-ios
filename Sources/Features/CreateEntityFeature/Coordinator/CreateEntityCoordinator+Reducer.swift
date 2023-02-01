@@ -1,4 +1,5 @@
 import FeaturePrelude
+import ProfileClient
 
 // MARK: - CreateAccountConfig
 public struct CreateAccountConfig: CreateEntityStateConfigProtocol {
@@ -8,8 +9,16 @@ public struct CreateAccountConfig: CreateEntityStateConfigProtocol {
 
 	public enum Mode: Sendable, Equatable {
 		case profile
-		case firstAccount
+		case firstAccountOnASecondNetwork
 		case anotherAccount
+	}
+
+	public var isCreatingProfile: Bool {
+		switch mode {
+		case .profile: return true
+		case .firstAccountOnASecondNetwork, .anotherAccount:
+			return false
+		}
 	}
 
 	public init(
@@ -81,7 +90,9 @@ public enum CreateAccountCompletionAction: CreateEntityCompletionActionProtocol 
 }
 
 // MARK: - CreateEntityStateConfigProtocol
-public protocol CreateEntityStateConfigProtocol: Sendable, Equatable {}
+public protocol CreateEntityStateConfigProtocol: Sendable, Equatable {
+	var isCreatingProfile: Bool { get }
+}
 
 // MARK: - CreateEntityCoordinator
 public struct CreateEntityCoordinator<
@@ -91,6 +102,8 @@ public struct CreateEntityCoordinator<
 
 >: Sendable, ReducerProtocol {
 	public typealias Entity = CompletionState.Entity
+	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.errorQueue) var errorQueue
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -112,7 +125,40 @@ public struct CreateEntityCoordinator<
 	private func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case let .child(.step0_nameNewEntity(.delegate(.named(name)))):
-			state.step = .step1_selectGenesisFactorSource(.init(specifiedNameForNewEntityToCreate: name))
+			if state.config.isCreatingProfile {
+				//                state.step = .step2_creationOfEntity(.init(name: name, genesisFactorSource: factorSource, isCreatingProfile: true))
+				return .run { send in
+					await send(.internal(.generateProfile(TaskResult {
+						try await profileClient.createNewProfile(
+							CreateNewProfileRequest(
+								nameOfFirstAccount: name
+							)
+						)
+					})))
+				}
+			} else {
+				return .run { send in
+					await send(.internal(.loadFactorSourcesResult(TaskResult {
+						try await profileClient.getFactorSources()
+					}, beforeCreatingEntityWithName: name)))
+				}
+			}
+
+		case let .internal(.loadFactorSourcesResult(.failure(error), _)):
+			errorQueue.schedule(error)
+			return .none
+
+		case let .internal(.loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate)):
+			precondition(!factorSources.factorSources.isEmpty)
+			if factorSources.factorSources.count > 1 {
+				state.step = .step1_selectGenesisFactorSource(.init(
+					specifiedNameForNewEntityToCreate: specifiedNameForNewEntityToCreate,
+					factorSources: factorSources.factorSources
+				))
+			} else {
+				let factorSource = factorSources.factorSources[0]
+				state.step = .step2_creationOfEntity(.init(name: specifiedNameForNewEntityToCreate, genesisFactorSource: factorSource))
+			}
 			return .none
 
 		case .child(.step0_nameNewEntity(.delegate(.dismiss))):

@@ -1,6 +1,6 @@
-import CreateAccountFeature
+import CreateEntityFeature
+import CreateProfileFeature
 import FeaturePrelude
-import ImportProfileFeature
 
 // MARK: - Onboarding.Action
 public extension Onboarding {
@@ -14,7 +14,7 @@ public extension Onboarding {
 // MARK: - Onboarding.Action.ChildAction
 public extension Onboarding.Action {
 	enum ChildAction: Sendable, Equatable {
-		case importProfile(ImportProfile.Action)
+		case createProfile(CreateProfileCoordinator.Action)
 		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 }

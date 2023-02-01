@@ -1,7 +1,7 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPreferencesFeature
-import CreateAccountFeature
+import CreateEntityFeature
 import FeaturePrelude
 import GrantDappWalletAccessFeature
 import TransactionSigningFeature

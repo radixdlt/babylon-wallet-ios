@@ -1,4 +1,4 @@
-import CreateAccountFeature
+import CreateEntityFeature
 import FeaturePrelude
 import GatewayAPI
 import ProfileClient
@@ -115,7 +115,7 @@ public extension ManageGatewayAPIEndpoints {
 			state.createAccountCoordinator = .init(
 				step: .step0_nameNewEntity(.init(isFirst: false)),
 				config: .init(
-					create: .firstAccount,
+					create: .firstAccountOnASecondNetwork,
 					networkID: newNetworkAndGateway.network.id
 				),
 				completionDestination: .home

@@ -1,6 +1,6 @@
-import CreateAccountFeature
+import CreateEntityFeature
+import CreateProfileFeature
 import FeaturePrelude
-import ImportProfileFeature
 
 // MARK: - Onboarding
 public struct Onboarding: Sendable, ReducerProtocol {
@@ -9,10 +9,10 @@ public struct Onboarding: Sendable, ReducerProtocol {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.ifCaseLet(
-				/Onboarding.State.importProfile,
-				action: /Action.child .. Action.ChildAction.importProfile
+				/Onboarding.State.createProfile,
+				action: /Action.child .. Action.ChildAction.createProfile
 			) {
-				ImportProfile()
+				CreateProfileCoordinator()
 			}
 			.ifCaseLet(
 				/Onboarding.State.createAccountCoordinator,

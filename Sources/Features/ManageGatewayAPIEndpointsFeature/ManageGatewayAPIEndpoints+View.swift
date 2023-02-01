@@ -1,4 +1,4 @@
-import CreateAccountFeature
+import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - ManageGatewayAPIEndpoints.View

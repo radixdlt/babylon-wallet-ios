@@ -1,6 +1,6 @@
-import CreateAccountFeature
+import CreateEntityFeature
+import CreateProfileFeature
 import FeaturePrelude
-import ImportProfileFeature
 
 // MARK: - Onboarding.View
 public extension Onboarding {
@@ -18,9 +18,9 @@ public extension Onboarding.View {
 	var body: some View {
 		SwitchStore(store) {
 			CaseLet(
-				state: /Onboarding.State.importProfile,
-				action: { Onboarding.Action.child(.importProfile($0)) },
-				then: { ImportProfile.View(store: $0) }
+				state: /Onboarding.State.createProfile,
+				action: { Onboarding.Action.child(.createProfile($0)) },
+				then: { CreateProfileCoordinator.View(store: $0) }
 			)
 			CaseLet(
 				state: /Onboarding.State.createAccountCoordinator,

@@ -1,10 +1,10 @@
-// @testable import CreateAccountFeature
+// @testable import CreateEntityFeature
 // import Cryptography
 // import FeatureTestingPrelude
 // import ProfileClient
 //
 // @MainActor
-// final class CreateAccountFeatureTests: TestCase {
+// final class CreateEntityFeatureTests: TestCase {
 //	let testScheduler = DispatchQueue.test
 //
 //	func test_closeButtonTapped_whenTappedOnCloseButton_thenCoordinateDismissal() async {
