@@ -9,12 +9,12 @@ public extension AssetsView {
 		case listSelectorTapped(AssetsView.AssetsViewType)
 	}
 
-	enum InternalAction: Sendable, Equatable {}
+	typealias InternalAction = Never
 
 	enum ChildAction: Sendable, Equatable {
 		case fungibleTokenList(FungibleTokenList.Action)
 		case nonFungibleTokenList(NonFungibleTokenList.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {}
+	typealias DelegateAction = Never
 }

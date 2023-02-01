@@ -2,7 +2,7 @@ import FeaturePrelude
 import FungibleTokenListFeature
 import NonFungibleTokenListFeature
 
-public struct AssetsView: Sendable, Feature {
+public struct AssetsView: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
@@ -17,13 +17,10 @@ public struct AssetsView: Sendable, Feature {
 		Reduce(self.core)
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
+	public func reduceView(into state: inout State, action: ViewAction) -> EffectTask<Action> {
 		switch action {
-		case let .view(.listSelectorTapped(type)):
+		case let .listSelectorTapped(type):
 			state.type = type
-			return .none
-
-		case .child, .delegate:
 			return .none
 		}
 	}

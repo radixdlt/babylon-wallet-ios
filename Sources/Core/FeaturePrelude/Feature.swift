@@ -1,53 +1,14 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - Feature
-public protocol Feature: ReducerProtocol where State: Sendable & Equatable {
+// MARK: - _FeatureReducer
+public protocol _FeatureReducer: ReducerProtocol where State: Sendable & Equatable {
 	associatedtype ViewAction: Sendable, Equatable
 	associatedtype InternalAction: Sendable, Equatable
 	associatedtype ChildAction: Sendable, Equatable
 	associatedtype DelegateAction: Sendable, Equatable
 
 	associatedtype View: SwiftUI.View
-}
-
-// MARK: - AutoFeature
-public protocol AutoFeature: Feature where Action == ActionOf<Self> {
-	func viewReduce(state: inout State, action: ViewAction) -> EffectTask<Action>
-	func internalReduce(state: inout State, action: InternalAction) -> EffectTask<Action>
-	func childReduce(state: inout State, action: ChildAction) -> EffectTask<Action>
-	func delegateReduce(state: inout State, action: DelegateAction) -> EffectTask<Action>
-}
-
-public extension AutoFeature {
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case let .view(viewAction):
-			return viewReduce(state: &state, action: viewAction)
-		case let .internal(internalAction):
-			return internalReduce(state: &state, action: internalAction)
-		case let .child(childAction):
-			return childReduce(state: &state, action: childAction)
-		case let .delegate(delegateAction):
-			return delegateReduce(state: &state, action: delegateAction)
-		}
-	}
-
-	func viewReduce(state: inout State, action: ViewAction) -> EffectTask<Action> {
-		.none
-	}
-
-	func internalReduce(state: inout State, action: InternalAction) -> EffectTask<Action> {
-		.none
-	}
-
-	func childReduce(state: inout State, action: ChildAction) -> EffectTask<Action> {
-		.none
-	}
-
-	func delegateReduce(state: inout State, action: DelegateAction) -> EffectTask<Action> {
-		.none
-	}
 }
 
 // MARK: - FeatureAction
@@ -63,12 +24,46 @@ public enum FeatureAction<
 	case delegate(DelegateAction)
 }
 
-public typealias ActionOf<F: Feature> = FeatureAction<
+public typealias ActionOf<F: _FeatureReducer> = FeatureAction<
 	F.ViewAction,
 	F.InternalAction,
 	F.ChildAction,
 	F.DelegateAction
 >
+
+// MARK: - FeatureReducer
+public protocol FeatureReducer: _FeatureReducer where Action == ActionOf<Self> {
+	func reduceView(into state: inout State, action: ViewAction) -> EffectTask<Action>
+	func reduceInternal(into state: inout State, action: InternalAction) -> EffectTask<Action>
+	func reduceChild(into state: inout State, action: ChildAction) -> EffectTask<Action>
+}
+
+public extension FeatureReducer {
+	func core(state: inout State, action: Action) -> EffectTask<Action> {
+		switch action {
+		case let .view(viewAction):
+			return reduceView(into: &state, action: viewAction)
+		case let .internal(internalAction):
+			return reduceInternal(into: &state, action: internalAction)
+		case let .child(childAction):
+			return reduceChild(into: &state, action: childAction)
+		case .delegate:
+			return .none
+		}
+	}
+
+	func reduceView(into state: inout State, action: ViewAction) -> EffectTask<Action> {
+		.none
+	}
+
+	func reduceInternal(into state: inout State, action: InternalAction) -> EffectTask<Action> {
+		.none
+	}
+
+	func reduceChild(into state: inout State, action: ChildAction) -> EffectTask<Action> {
+		.none
+	}
+}
 
 // MARK: - MyView
 struct MyView: View {
@@ -78,7 +73,7 @@ struct MyView: View {
 }
 
 // MARK: - MyFeature
-struct MyFeature: AutoFeature {
+struct MyFeature: FeatureReducer {
 	typealias View = MyView
 
 	typealias Action = ActionOf<Self>
@@ -101,7 +96,7 @@ struct MyFeature: AutoFeature {
 		Reduce(core)
 	}
 
-	func viewReduce(state: inout State, action: ViewAction) -> EffectTask<Action> {
+	func reduceView(into state: inout State, action: ViewAction) -> EffectTask<Action> {
 		switch action {
 		case .listSelectorTapped:
 			return .none
