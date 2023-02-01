@@ -300,19 +300,13 @@ private extension EngineToolkit {
 			let response = try jsonDecoder.decode(Response.self, from: jsonData)
 			return .success(response)
 		} catch let firstError {
-			do {
-				/// We might have got an **ErrorResponse** from the Radix Engine Toolkit,
-				/// try decoding jsonData to that instead.
-				let errorResponse = try jsonDecoder.decode(ErrorResponse.self, from: jsonData)
-				return .failure(.errorResponse(errorResponse))
-			} catch let decodingError as Swift.DecodingError {
+			guard let str = String(data: jsonData, encoding: .utf8) else {
 				#if DEBUG
 				prettyPrint(responseJSONString: jsonString, error: firstError, failedToDecodeInto: Response.self)
 				#endif
-				return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEither(responseType: "\(Response.self)", decodingError: decodingError))
-			} catch {
 				return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEitherNorAsSwiftDecodingError(responseType: "\(Response.self)", nonSwiftDecodingError: String(describing: firstError)))
 			}
+			return .failure(.errorResponse(str))
 		}
 	}
 
@@ -409,7 +403,7 @@ func prettyPrint<FailedDecodable: Decodable>(
 ) {
 	prettyPrint(
 		jsonString: responseJSONString,
-		label: "\n📦⬇️ Failed to parse response JSON string to either \(FailedDecodable.self) or \(ErrorResponse.self), underlying decoding error: \(String(describing: error))"
+		label: "\n📦⬇️ Failed to parse response JSON string to either \(FailedDecodable.self) or ErrorResponse, underlying decoding error: \(String(describing: error))"
 	)
 }
 

@@ -378,7 +378,6 @@ final class InstructionEncodingTests: TestCase {
 		for (value, jsonRepresentation) in testVectors {
 			// Act
 			let string = try XCTUnwrap(String(data: encoder.encode(value), encoding: .utf8))
-			print(string)
 
 			// Assert
 			XCTAssertNoDifference(string, jsonRepresentation)

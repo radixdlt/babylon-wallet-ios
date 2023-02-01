@@ -209,7 +209,7 @@ public extension TransactionManifest {
 
 			return accountsRequiredToSign
 		case .string:
-			throw SborDecodeError(value: "Impossible case") // TODO: need a better error
+			fatalError("Converted the manifest to Parsed by instead received a string manifest!")
 		}
 	}
 }
