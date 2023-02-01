@@ -7,8 +7,8 @@ let package = Package(
 	name: "Babylon",
 	defaultLocalization: "en",
 	platforms: [
-		.macOS(.v12), // for development purposes
-		.iOS(.v15),
+		.macOS(.v13), // for development purposes
+		.iOS(.v16),
 	]
 )
 

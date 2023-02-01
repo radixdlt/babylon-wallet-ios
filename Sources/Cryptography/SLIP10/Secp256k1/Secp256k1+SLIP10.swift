@@ -28,8 +28,8 @@ extension K1.PublicKey: ECPublicKey {
 	}
 
 	/// Creates a key from a raw representation.
-	public init<D>(uncompressedRepresentation pointer: D) throws where D: ContiguousBytes {
-		self = try K1.PublicKey.import(from: pointer)
+	public init<D>(rawRepresentation: D) throws where D: ContiguousBytes {
+		self = try K1.PublicKey.import(from: rawRepresentation)
 	}
 
 	/// A raw representation of the key.

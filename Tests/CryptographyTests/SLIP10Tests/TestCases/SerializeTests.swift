@@ -51,7 +51,6 @@ final class SerializeTests: TestCase {
 	}
 }
 
-@available(macOS 13, iOS 16, *)
 extension SerializeTests {
 	/// Expected values generated with Python ref impl: https://github.com/satoshilabs/slips/blob/master/slip-0010/testvectors.py
 	func testMasterKeyXPUBP256() throws {

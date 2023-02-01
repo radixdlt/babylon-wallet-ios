@@ -35,11 +35,7 @@ extension Curve25519.Signing.PrivateKey: ECPrivateKey {}
 extension Curve25519.Signing.PublicKey: ECPublicKey {
 	public init<Bytes>(compressedRepresentation: Bytes) throws where Bytes: ContiguousBytes {
 		// Curve25519 public keys ARE always compressed.
-		try self.init(uncompressedRepresentation: compressedRepresentation)
-	}
-
-	public init<D>(uncompressedRepresentation: D) throws where D: ContiguousBytes {
-		try self.init(rawRepresentation: uncompressedRepresentation)
+		try self.init(rawRepresentation: compressedRepresentation)
 	}
 
 	public var compressedRepresentation: Data {
