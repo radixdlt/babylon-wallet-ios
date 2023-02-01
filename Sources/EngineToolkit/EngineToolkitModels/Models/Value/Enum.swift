@@ -91,6 +91,11 @@ public enum EnumDiscriminator: Sendable, Codable, Hashable {
 }
 
 public extension EnumDiscriminator {
+	private enum Kind: String, Codable {
+		case u8 = "U8"
+		case string = "String"
+	}
+
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -104,10 +109,10 @@ public extension EnumDiscriminator {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
 		case let .u8(discriminator):
-			try container.encode("U8", forKey: .type)
+			try container.encode(Kind.u8, forKey: .type)
 			try container.encode(String(discriminator), forKey: .discriminator)
 		case let .string(discriminator):
-			try container.encode("String", forKey: .type)
+			try container.encode(Kind.string, forKey: .type)
 			try container.encode(String(discriminator), forKey: .discriminator)
 		}
 	}
@@ -116,15 +121,12 @@ public extension EnumDiscriminator {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 
-		let type = try container.decode(String.self, forKey: .type)
+		let type = try container.decode(Kind.self, forKey: .type)
 		switch type {
-		case "String":
-			let discriminator = try container.decode(String.self, forKey: .discriminator)
-			self = .string(discriminator)
-		case "U8":
+		case .u8:
 			self = try .u8(decodeAndConvertToNumericType(container: container, key: .discriminator))
-		default:
-			throw InternalDecodingFailure.parsingError
+		case .string:
+			self = try .string(container.decode(String.self, forKey: .discriminator))
 		}
 	}
 }
