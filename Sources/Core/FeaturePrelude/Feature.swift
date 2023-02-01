@@ -3,10 +3,10 @@ import SwiftUI
 
 // MARK: - _FeatureReducer
 public protocol _FeatureReducer: ReducerProtocol where State: Sendable & Equatable {
-	associatedtype ViewAction: Sendable, Equatable
-	associatedtype InternalAction: Sendable, Equatable
-	associatedtype ChildAction: Sendable, Equatable
-	associatedtype DelegateAction: Sendable, Equatable
+	associatedtype ViewAction: Sendable & Equatable = Never
+	associatedtype InternalAction: Sendable & Equatable = Never
+	associatedtype ChildAction: Sendable & Equatable = Never
+	associatedtype DelegateAction: Sendable & Equatable = Never
 
 	associatedtype View: SwiftUI.View
 }
@@ -39,6 +39,8 @@ public protocol FeatureReducer: _FeatureReducer where Action == ActionOf<Self> {
 }
 
 public extension FeatureReducer {
+	typealias Action = ActionOf<Self>
+
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case let .view(viewAction):
@@ -76,17 +78,11 @@ struct MyView: View {
 struct MyFeature: FeatureReducer {
 	typealias View = MyView
 
-	typealias Action = ActionOf<Self>
-
 	enum ViewAction: Sendable, Equatable {
 		case listSelectorTapped
 		case fungibleTokenList
 		case nonFungibleTokenList
 	}
-
-	typealias InternalAction = Never
-	typealias ChildAction = Never
-	typealias DelegateAction = Never
 
 	struct State: Equatable {
 		var blabla: String
