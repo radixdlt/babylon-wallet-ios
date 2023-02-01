@@ -3,7 +3,7 @@ import TestingPrelude
 
 final class CompileTransactionIntentTests: TestCase {
 	override func setUp() {
-		debugPrint = true
+		debugPrint = false
 		super.setUp()
 	}
 

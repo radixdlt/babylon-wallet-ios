@@ -4,7 +4,7 @@ import Prelude
 // MARK: - DeriveNonFungibleGlobalIdFromPublicKeyRequestTests
 final class DeriveNonFungibleGlobalIdFromPublicKeyRequestTests: TestCase {
 	override func setUp() {
-		debugPrint = true
+		debugPrint = false
 		super.setUp()
 	}
 
