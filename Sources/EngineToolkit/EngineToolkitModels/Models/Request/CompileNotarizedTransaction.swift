@@ -15,7 +15,7 @@ public struct CompileNotarizedTransactionIntentResponse: Sendable, Codable, Hash
 	}
 
 	public init(compiledIntentHex: String) throws {
-		self.compiledIntent = try [UInt8](hex: compiledIntentHex)
+		self.compiledIntent = try .init(hex: compiledIntentHex)
 	}
 }
 

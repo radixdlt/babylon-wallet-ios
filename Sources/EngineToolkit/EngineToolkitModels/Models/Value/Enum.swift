@@ -25,6 +25,22 @@ public struct Enum: ValueProtocol, Sendable, Codable, Hashable {
 		self.fields = fields
 	}
 
+	public init(_ variant: String) {
+		self.init(.string(variant))
+	}
+
+	public init(_ variant: String, fields: [Value_]) {
+		self.init(.string(variant), fields: fields)
+	}
+
+	public init(_ variant: UInt8) {
+		self.init(.u8(variant))
+	}
+
+	public init(_ variant: UInt8, fields: [Value_]) {
+		self.init(.u8(variant), fields: fields)
+	}
+
 	public init(
 		_ variant: EnumDiscriminator,
 		@ValuesBuilder fields: () throws -> [ValueProtocol]
