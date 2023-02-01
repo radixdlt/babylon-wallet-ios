@@ -158,6 +158,11 @@ public extension GatewayAPIClient {
 					request: GatewayAPI.EntityResourcesRequest(address: accountAddress.address)
 				) { @Sendable base in base.appendingPathComponent("entity/resources") }
 			},
+			accountMetadataByAddress: { @Sendable accountAddress in
+				try await post(
+					request: GatewayAPI.EntityMetadataRequest(address: accountAddress.address)
+				) { @Sendable base in base.appendingPathComponent("entity/metadata") }
+			},
 			resourcesOverview: { resourcesOverviewRequest in
 				try await post(
 					request: resourcesOverviewRequest

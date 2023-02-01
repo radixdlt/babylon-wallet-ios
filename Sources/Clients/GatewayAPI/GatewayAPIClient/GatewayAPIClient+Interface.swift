@@ -9,6 +9,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var getNetworkName: GetNetworkName
 	public var getEpoch: GetEpoch
 	public var accountResourcesByAddress: GetAccountResourcesByAddress
+	public var accountMetadataByAddress: GetAccountMetadataByAddress
 	public var resourcesOverview: GetResourcesOverview
 	public var resourceDetailsByResourceIdentifier: GetResourceDetailsByResourceIdentifier
 	public var getNonFungibleIds: GetNonFungibleIds
@@ -22,6 +23,8 @@ public extension GatewayAPIClient {
 	typealias GetEpoch = @Sendable () async throws -> Epoch
 
 	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityResourcesResponse
+
+	typealias GetAccountMetadataByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityMetadataResponse
 
 	typealias GetResourcesOverview = @Sendable (GatewayAPI.EntityOverviewRequest) async throws -> GatewayAPI.EntityOverviewResponse
 

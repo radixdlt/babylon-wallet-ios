@@ -86,6 +86,7 @@ package.addModules([
 		name: "DappInteractionFeature",
 		dependencies: [
 			"CreateAccountFeature",
+			"GatewayAPI",
 			"ProfileClient",
 		],
 		tests: .yes()
