@@ -13,6 +13,7 @@ public extension CreateEntityCoordinator.Action {
 	enum ChildAction: Sendable, Equatable {
 		case nameNewEntity(NameNewEntity.Action)
 		case selectGenesisFactorSource(SelectGenesisFactorSource.Action)
+		case creationOfEntity(CreationOfEntity<CreateEntityCoordinator.Entity>.Action)
 		case completion(CompletionAction)
 	}
 }

@@ -90,6 +90,7 @@ public struct CreateEntityCoordinator<
 	CompletionAction: CreateEntityCompletionActionProtocol
 
 >: Sendable, ReducerProtocol {
+	public typealias Entity = CompletionState.Entity
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {

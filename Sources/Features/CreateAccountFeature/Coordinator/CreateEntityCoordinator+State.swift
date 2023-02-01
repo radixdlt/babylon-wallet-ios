@@ -4,9 +4,10 @@ import FeaturePrelude
 public extension CreateEntityCoordinator {
 	struct State: Equatable {
 		public enum Step: Equatable {
-			case nameNewEntity(NameNewEntity.State)
-			case selectGenesisFactorSource(SelectGenesisFactorSource.State)
-			case completion(CompletionState)
+			case step0_nameNewEntity(NameNewEntity.State)
+			case step1_selectGenesisFactorSource(SelectGenesisFactorSource.State)
+			case step2_creationOfEntity(CreationOfEntity<Entity>.State)
+			case step3_completion(CompletionState)
 		}
 
 		public let step: Step
