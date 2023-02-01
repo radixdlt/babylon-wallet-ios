@@ -926,8 +926,4 @@ extension P256: Slip10SupportedECCurve {
 extension P256.Signing.PrivateKey: ECPrivateKey {}
 
 // MARK: - P256.Signing.PublicKey + ECPublicKey
-extension P256.Signing.PublicKey: ECPublicKey {
-	public init<D>(uncompressedRepresentation: D) throws where D: ContiguousBytes {
-		try self.init(rawRepresentation: uncompressedRepresentation)
-	}
-}
+extension P256.Signing.PublicKey: ECPublicKey {}
