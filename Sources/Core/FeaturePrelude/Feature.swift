@@ -41,6 +41,10 @@ public protocol FeatureReducer: _FeatureReducer where Action == ActionOf<Self> {
 public extension FeatureReducer {
 	typealias Action = ActionOf<Self>
 
+	var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+	}
+
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case let .view(viewAction):
@@ -86,10 +90,6 @@ struct MyFeature: FeatureReducer {
 
 	struct State: Equatable {
 		var blabla: String
-	}
-
-	public var body: some ReducerProtocolOf<Self> {
-		Reduce(core)
 	}
 
 	func reduceView(into state: inout State, action: ViewAction) -> EffectTask<Action> {
