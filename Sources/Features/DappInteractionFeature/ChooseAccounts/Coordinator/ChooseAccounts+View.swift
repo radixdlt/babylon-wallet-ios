@@ -76,19 +76,11 @@ public extension ChooseAccounts.View {
 							.frame(height: .large1 * 1.5)
 					}
 
-					VStack(spacing: .zero) {
-						Color.app.gray4
-							.frame(height: 1)
-							.padding(.bottom, .medium3)
-
-						Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
-							viewStore.send(.continueButtonTapped)
-						}
-						.buttonStyle(.primaryRectangular)
-						.controlState(viewStore.canProceed ? .enabled : .disabled)
-						.padding(.horizontal, .medium3)
-						.padding(.bottom, .medium1)
-					}
+					ConfirmationFooter(
+						title: L10n.DApp.ConnectionRequest.continueButtonTitle,
+						isEnabled: viewStore.canProceed,
+						action: { viewStore.send(.continueButtonTapped) }
+					)
 				}
 			}
 			.onAppear {
