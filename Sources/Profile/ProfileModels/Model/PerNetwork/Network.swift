@@ -23,7 +23,7 @@ public extension Network {
 	typealias Name = Tagged<Self, String>
 
 	static let nebunet = Self(
-		name: "nebunet",
+		name: "betanet",
 		id: .nebunet
 	)
 	static let hammunet = Self(
