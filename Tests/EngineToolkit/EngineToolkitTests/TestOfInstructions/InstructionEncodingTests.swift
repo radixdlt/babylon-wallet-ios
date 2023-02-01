@@ -40,20 +40,20 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .takeFromWorktop(.init(
 					resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
-					bucket: .init(integerLiteral: 1)
+					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"instruction":"TAKE_FROM_WORKTOP","into_bucket":{"identifier":{"type":"U32","value":"1"},"type":"Bucket"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
+				{"instruction":"TAKE_FROM_WORKTOP","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
 				"""
 			),
 			(
 				value: .takeFromWorktopByAmount(.init(
 					amount: .init(value: "1"),
 					resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
-					bucket: .init(integerLiteral: 1)
+					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"amount":{"type":"Decimal","value":"1"},"instruction":"TAKE_FROM_WORKTOP_BY_AMOUNT","into_bucket":{"identifier":{"type":"U32","value":"1"},"type":"Bucket"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
+				{"amount":{"type":"Decimal","value":"1"},"instruction":"TAKE_FROM_WORKTOP_BY_AMOUNT","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
 				"""
 			),
 			(
@@ -62,16 +62,16 @@ final class InstructionEncodingTests: TestCase {
 						.integer(1),
 					],
 					resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
-					bucket: .init(integerLiteral: 1)
+					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"TAKE_FROM_WORKTOP_BY_IDS","into_bucket":{"identifier":{"type":"U32","value":"1"},"type":"Bucket"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
+				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"TAKE_FROM_WORKTOP_BY_IDS","into_bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
 				"""
 			),
 			(
-				value: .returnToWorktop(.init(bucket: .init(identifier: 1))),
+				value: .returnToWorktop(.init(bucket: .init(stringLiteral: "ident"))),
 				jsonRepresentation: """
-				{"bucket":{"identifier":{"type":"U32","value":"1"},"type":"Bucket"},"instruction":"RETURN_TO_WORKTOP"}
+				{"bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"instruction":"RETURN_TO_WORKTOP"}
 				"""
 			),
 			(
@@ -103,15 +103,15 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: .popFromAuthZone(.init(proof: .init(integerLiteral: 1))),
+				value: .popFromAuthZone(.init(proof: .init(stringLiteral: "ident"))),
 				jsonRepresentation: """
-				{"instruction":"POP_FROM_AUTH_ZONE","into_proof":{"identifier":{"type":"U32","value":"1"},"type":"Proof"}}
+				{"instruction":"POP_FROM_AUTH_ZONE","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"}}
 				"""
 			),
 			(
-				value: .pushToAuthZone(.init(proof: .init(integerLiteral: 1))),
+				value: .pushToAuthZone(.init(proof: .init(stringLiteral: "ident"))),
 				jsonRepresentation: """
-				{"instruction":"PUSH_TO_AUTH_ZONE","proof":{"identifier":{"type":"U32","value":"1"},"type":"Proof"}}
+				{"instruction":"PUSH_TO_AUTH_ZONE","proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"}}
 				"""
 			),
 			(
@@ -123,20 +123,20 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .createProofFromAuthZone(.init(
 					resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
-					intoProof: .init(integerLiteral: 1)
+					intoProof: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"instruction":"CREATE_PROOF_FROM_AUTH_ZONE","into_proof":{"identifier":{"type":"U32","value":"1"},"type":"Proof"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
+				{"instruction":"CREATE_PROOF_FROM_AUTH_ZONE","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
 				"""
 			),
 			(
 				value: .createProofFromAuthZoneByAmount(.init(
 					resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
 					amount: .init(value: "1"),
-					intoProof: .init(integerLiteral: 1)
+					intoProof: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"amount":{"type":"Decimal","value":"1"},"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT","into_proof":{"identifier":{"type":"U32","value":"1"},"type":"Proof"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
+				{"amount":{"type":"Decimal","value":"1"},"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
 				"""
 			),
 			(
@@ -145,25 +145,25 @@ final class InstructionEncodingTests: TestCase {
 					ids: [
 						.integer(1),
 					],
-					intoProof: .init(integerLiteral: 1)
+					intoProof: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS","into_proof":{"identifier":{"type":"U32","value":"1"},"type":"Proof"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
+				{"ids":[{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}}],"instruction":"CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS","into_proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"}}
 				"""
 			),
 			(
 				value: .cloneProof(.init(
-					from: .init(integerLiteral: 1),
-					to: .init(integerLiteral: 2)
+					from: .init(stringLiteral: "ident"),
+					to: .init(stringLiteral: "ident2")
 				)),
 				jsonRepresentation: """
-				{"instruction":"CLONE_PROOF","into_proof":{"identifier":{"type":"U32","value":"2"},"type":"Proof"},"proof":{"identifier":{"type":"U32","value":"1"},"type":"Proof"}}
+				{"instruction":"CLONE_PROOF","into_proof":{"identifier":{"type":"String","value":"ident2"},"type":"Proof"},"proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"}}
 				"""
 			),
 			(
-				value: .dropProof(.init(integerLiteral: 1)),
+				value: .dropProof(.init(stringLiteral: "ident")),
 				jsonRepresentation: """
-				{"instruction":"DROP_PROOF","proof":{"identifier":{"type":"U32","value":"1"},"type":"Proof"}}
+				{"instruction":"DROP_PROOF","proof":{"identifier":{"type":"String","value":"ident"},"type":"Proof"}}
 				"""
 			),
 			(
@@ -186,24 +186,11 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: .publishPackageWithOwner(.init(
-					code: try .init(hex: "36dae540b7889956f1f1d8d46ba23e5e44bf5723aef2a8e6b698686c02583618"),
-					abi: try .init(hex: "15e8699a6d63a96f66f6feeb609549be2688b96b02119f260ae6dfd012d16a5d"),
-					ownerBadge: .init(
-						resourceAddress: "resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety",
-						nonFungibleLocalId: .integer(1)
-					)
-				)),
-				jsonRepresentation: """
-				{"abi":{"hash":"15e8699a6d63a96f66f6feeb609549be2688b96b02119f260ae6dfd012d16a5d","type":"Blob"},"code":{"hash":"36dae540b7889956f1f1d8d46ba23e5e44bf5723aef2a8e6b698686c02583618","type":"Blob"},"instruction":"PUBLISH_PACKAGE_WITH_OWNER","owner_badge":{"non_fungible_local_id":{"type":"NonFungibleLocalId","value":{"type":"Integer","value":"1"}},"resource_address":{"address":"resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqz8qety","type":"ResourceAddress"},"type":"NonFungibleGlobalId"}}
-				"""
-			),
-			(
 				value: .burnResource(.init(
-					bucket: .init(integerLiteral: 1)
+					bucket: .init(stringLiteral: "ident")
 				)),
 				jsonRepresentation: """
-				{"bucket":{"identifier":{"type":"U32","value":"1"},"type":"Bucket"},"instruction":"BURN_RESOURCE"}
+				{"bucket":{"identifier":{"type":"String","value":"ident"},"type":"Bucket"},"instruction":"BURN_RESOURCE"}
 				"""
 			),
 			(
@@ -238,14 +225,17 @@ final class InstructionEncodingTests: TestCase {
 			(
 				value: .setComponentRoyaltyConfig(.init(
 					componentAddress: "component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr",
-					royaltyConfig: .map(.init(
-						keyValueKind: .string,
-						valueValueKind: .tuple,
-						entries: []
-					))
+					royaltyConfig: .tuple(.init(values: [
+						.map(.init(
+							keyValueKind: .string,
+							valueValueKind: .u32,
+							entries: []
+						)),
+						.u32(1),
+					]))
 				)),
 				jsonRepresentation: """
-				{"component_address":{"address":"component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr","type":"ComponentAddress"},"instruction":"SET_COMPONENT_ROYALTY_CONFIG","royalty_config":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Tuple"}}
+				{"component_address":{"address":"component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr","type":"ComponentAddress"},"instruction":"SET_COMPONENT_ROYALTY_CONFIG","royalty_config":{"elements":[{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"U32"},{"type":"U32","value":"1"}],"type":"Tuple"}}
 				"""
 			),
 			(
@@ -281,7 +271,7 @@ final class InstructionEncodingTests: TestCase {
 			//                    rule: .init(.u8(0), fields: [])
 			//                )),
 			//                jsonRepresentation: """
-			//                {"entity_address":{"address":"component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr","type":"ComponentAddress"},"index":{"type":"U32","value":"0"},"instruction":"SET_METHOD_ACCESS_RULE","key":{"type":"String","value":"get_token"},"rule":{"fields":[],"type":"Enum","variant":{"discriminator":"0","type":"U8"}}}
+			//                {"entity_address":{"type":"ComponentAddress","address":"component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr"},"index":{"type":"U32","value":"0"},"instruction":"SET_METHOD_ACCESS_RULE","key":{"type":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[{"type":"String","value":"get_token"}]},"rule":{"type":"Enum","variant":{"type":"U8","discriminator":"0"},"fields":[]}}
 			//                """
 			//            ),
 			(
@@ -319,11 +309,11 @@ final class InstructionEncodingTests: TestCase {
 				value: .createFungibleResource(.init(
 					divisibility: 18,
 					metadata: .init(keyValueKind: .string, valueValueKind: .string, entries: []),
-					accessRules: .init(keyValueKind: .string, valueValueKind: .enum, entries: []),
+					accessRules: .init(keyValueKind: .enum, valueValueKind: .tuple, entries: []),
 					initialSupply: .none
 				)),
 				jsonRepresentation: """
-				{"access_rules":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},"divisibility":{"type":"U8","value":"18"},"initial_supply":{"type":"None"},"instruction":"CREATE_FUNGIBLE_RESOURCE","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"}}
+				{"access_rules":{"entries":[],"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"divisibility":{"type":"U8","value":"18"},"initial_supply":{"type":"None"},"instruction":"CREATE_FUNGIBLE_RESOURCE","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"}}
 				"""
 			),
 			(
@@ -344,11 +334,11 @@ final class InstructionEncodingTests: TestCase {
 				value: .createNonFungibleResource(.init(
 					idType: .init(.u8(0), fields: []),
 					metadata: .init(keyValueKind: .string, valueValueKind: .string, entries: []),
-					accessRules: .init(keyValueKind: .string, valueValueKind: .enum, entries: []),
+					accessRules: .init(keyValueKind: .enum, valueValueKind: .tuple, entries: []),
 					initialSupply: .none
 				)),
 				jsonRepresentation: """
-				{"access_rules":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"Enum"},"id_type":{"fields":[],"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"initial_supply":{"type":"None"},"instruction":"CREATE_NON_FUNGIBLE_RESOURCE","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"}}
+				{"access_rules":{"entries":[],"key_value_kind":"Enum","type":"Map","value_value_kind":"Tuple"},"id_type":{"fields":[],"type":"Enum","variant":{"discriminator":"0","type":"U8"}},"initial_supply":{"type":"None"},"instruction":"CREATE_NON_FUNGIBLE_RESOURCE","metadata":{"entries":[],"key_value_kind":"String","type":"Map","value_value_kind":"String"}}
 				"""
 			),
 			(
@@ -364,9 +354,12 @@ final class InstructionEncodingTests: TestCase {
 				"""
 			),
 			(
-				value: try .createValidator(.init(key: .init(hex: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"))),
+				value: try .createValidator(.init(
+					key: .init(hex: "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"),
+					ownerAccessRule: .init(.u8(0))
+				)),
 				jsonRepresentation: """
-				{"instruction":"CREATE_VALIDATOR","key":{"public_key":"0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798","type":"EcdsaSecp256k1PublicKey"}}
+				{"instruction":"CREATE_VALIDATOR","key":{"public_key":"0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798","type":"EcdsaSecp256k1PublicKey"},"owner_access_rule":{"fields":[],"type":"Enum","variant":{"discriminator":"0","type":"U8"}}}
 				"""
 			),
 		]

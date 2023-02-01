@@ -11,13 +11,16 @@ public struct CreateValidator: InstructionProtocol {
 	// MARK: Stored properties
 
 	public let key: EcdsaSecp256k1PublicKey
+	public let ownerAccessRule: Enum
 
 	// MARK: Init
 
 	public init(
-		key: EcdsaSecp256k1PublicKey
+		key: EcdsaSecp256k1PublicKey,
+		ownerAccessRule: Enum
 	) {
 		self.key = key
+		self.ownerAccessRule = ownerAccessRule
 	}
 }
 
@@ -27,6 +30,7 @@ public extension CreateValidator {
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 		case key
+		case ownerAccessRule = "owner_access_rule"
 	}
 
 	// MARK: Codable
@@ -36,6 +40,7 @@ public extension CreateValidator {
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(key, forKey: .key)
+		try container.encode(ownerAccessRule, forKey: .ownerAccessRule)
 	}
 
 	init(from decoder: Decoder) throws {
@@ -47,9 +52,11 @@ public extension CreateValidator {
 		}
 
 		let key = try container.decode(EcdsaSecp256k1PublicKey.self, forKey: .key)
+		let ownerAccessRule = try container.decode(Enum.self, forKey: .ownerAccessRule)
 
 		self.init(
-			key: key
+			key: key,
+			ownerAccessRule: ownerAccessRule
 		)
 	}
 }

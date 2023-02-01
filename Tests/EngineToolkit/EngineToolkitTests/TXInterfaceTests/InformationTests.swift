@@ -7,7 +7,7 @@ final class InformationTests: TestCase {
 			information,
 			.init(
 				packageVersion: "0.8.0",
-				gitHash: "965ebfd7cf87de4e22e78d542b54ba27ab4db52a"
+				gitHash: "2117ac3061ceaf609331a90f995f0bc0e75eb386"
 			)
 		)
 	}
