@@ -271,6 +271,15 @@
       }
     },
     {
+      "identity" : "swiftui-navigation-transitions",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/davdroman/swiftui-navigation-transitions",
+      "state" : {
+        "revision" : "c07692890d2e6d4e9e3936ae2f13be8c84551de7",
+        "version" : "0.7.2"
+      }
+    },
+    {
       "identity" : "webrtc",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stasel/WebRTC",

@@ -351,6 +351,9 @@ package.addModules([
 			.product(name: "Introspect", package: "SwiftUI-Introspect") {
 				.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4")
 			},
+			.product(name: "NavigationTransitions", package: "swiftui-navigation-transitions") {
+				.package(url: "https://github.com/davdroman/swiftui-navigation-transitions", from: "0.1.0")
+			},
 			.product(name: "NukeUI", package: "Nuke") {
 				.package(url: "https://github.com/kean/Nuke", from: "11.3.1")
 			},
