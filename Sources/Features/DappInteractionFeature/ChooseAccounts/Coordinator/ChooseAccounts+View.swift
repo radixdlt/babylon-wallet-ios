@@ -30,7 +30,7 @@ public extension ChooseAccounts.View {
 				)
 				.zIndex(1)
 
-				VStack {
+				VStack(spacing: .zero) {
 					NavigationBar(
 						leadingItem: CloseButton {
 							viewStore.send(.dismissButtonTapped)
@@ -38,6 +38,9 @@ public extension ChooseAccounts.View {
 					)
 					.foregroundColor(.app.gray1)
 					.padding([.horizontal, .top], .medium3)
+
+					Spacer()
+						.frame(height: .small2)
 
 					ScrollView {
 						VStack {
@@ -71,13 +74,20 @@ public extension ChooseAccounts.View {
 
 						Spacer()
 							.frame(height: .large1 * 1.5)
+					}
+
+					VStack(spacing: .zero) {
+						Color.app.gray4
+							.frame(height: 1)
+							.padding(.bottom, .medium3)
 
 						Button(L10n.DApp.ConnectionRequest.continueButtonTitle) {
 							viewStore.send(.continueButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
 						.controlState(viewStore.canProceed ? .enabled : .disabled)
-						.padding(.medium1)
+						.padding(.horizontal, .medium3)
+						.padding(.bottom, .medium1)
 					}
 				}
 			}
