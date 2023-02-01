@@ -87,7 +87,7 @@ private extension Home.View {
 			)
 			.padding(EdgeInsets(top: .medium1, leading: .large2, bottom: .zero, trailing: .medium1))
 
-			RefreshableScrollView {
+			ScrollView {
 				LazyVStack(spacing: .medium1) {
 					AccountList.View(
 						store: store.scope(
