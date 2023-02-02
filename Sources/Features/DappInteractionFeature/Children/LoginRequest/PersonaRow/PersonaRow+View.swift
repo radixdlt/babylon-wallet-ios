@@ -20,31 +20,38 @@ public extension PersonaRow.View {
 			send: { .view($0) }
 		) { _ in
 			VStack(alignment: .leading, spacing: .zero) {
-				HStack(alignment: .top) {
-					Circle()
-						.strokeBorder(Color.app.gray3, lineWidth: 1)
-						.background(Circle().fill(Color.app.gray4))
-						.frame(.small)
-						.padding(.trailing, .small1)
+				ZStack {
+					HStack(alignment: .top) {
+						Circle()
+							.strokeBorder(Color.app.gray3, lineWidth: 1)
+							.background(Circle().fill(Color.app.gray4))
+							.frame(.small)
+							.padding(.trailing, .small1)
 
-					VStack(alignment: .leading, spacing: 4) {
-						Text("RadMatt")
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
+						VStack(alignment: .leading, spacing: 4) {
+							Text("RadMatt")
+								.foregroundColor(.app.gray1)
+								.textStyle(.secondaryHeader)
 
-						Text("SHaring")
+							Text("Sharing")
+								.foregroundColor(.app.gray2)
+								.textStyle(.body2Header)
+
+							Group {
+								Text("3 pieces of personal data")
+								Text("4 accounts")
+							}
 							.foregroundColor(.app.gray2)
-							.textStyle(.body2Header)
-
-						Group {
-							Text("3 pieces of personal data")
-							Text("4 accounts")
+							.textStyle(.body2Regular)
 						}
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
+
+						Spacer()
 					}
 
-					Spacer()
+					HStack {
+						Spacer()
+						RadioButton(state: .selected)
+					}
 				}
 				.padding(.medium2)
 

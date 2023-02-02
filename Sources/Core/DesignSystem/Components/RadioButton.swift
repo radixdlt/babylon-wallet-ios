@@ -4,7 +4,7 @@ import SwiftUI
 public struct RadioButton: View {
 	public var state: State
 
-	init(state: State) {
+	public init(state: State) {
 		self.state = state
 	}
 }
