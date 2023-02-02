@@ -3,15 +3,21 @@ import FeaturePrelude
 // MARK: - LoginRequest.State
 public extension LoginRequest {
 	struct State: Sendable, Hashable {
-		let dappDefinitionAddress: DappDefinitionAddress
-		let dappMetadata: DappMetadata
+		public let dappDefinitionAddress: DappDefinitionAddress
+		public let dappMetadata: DappMetadata
+		public var personas: IdentifiedArrayOf<PersonaRow.State>
 
 		public init(
 			dappDefinitionAddress: DappDefinitionAddress,
-			dappMetadata: DappMetadata
+			dappMetadata: DappMetadata,
+//			personas: IdentifiedArrayOf<PersonaRow.State> = []
+			personas: IdentifiedArrayOf<PersonaRow.State> = .init(uniqueElements: [
+				.init(persona: .previewValue0),
+			])
 		) {
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
+			self.personas = personas
 		}
 	}
 }

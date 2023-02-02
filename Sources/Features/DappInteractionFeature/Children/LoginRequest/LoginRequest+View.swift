@@ -41,6 +41,7 @@ public extension LoginRequest.View {
 									.foregroundColor(.app.gray1)
 									.textStyle(.sheetTitle)
 
+								// TODO: dappName + message
 								subtitle(
 									dappName: "Collabo.Fi",
 									message: " is requesting you login for the first time with a Persona."
@@ -50,12 +51,19 @@ public extension LoginRequest.View {
 							}
 							.padding(.bottom, .medium1)
 
+							// TODO: localize
 							Text("Choose a Persona")
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Header)
 								.padding(.bottom, .medium2)
 
-							// TODO: add persona row
+							ForEachStore(
+								store.scope(
+									state: \.personas,
+									action: { .child(.persona(id: $0, action: $1)) }
+								),
+								content: { PersonaRow.View(store: $0) }
+							)
 
 							Button(L10n.Personas.createNewPersonaButtonTitle) {
 								viewStore.send(.createNewPersonaButtonTapped)
@@ -70,6 +78,7 @@ public extension LoginRequest.View {
 						.padding(.horizontal, .medium1)
 					}
 
+					// TODO: localize
 					ConfirmationFooter(
 						title: "Continue",
 						isEnabled: true,
