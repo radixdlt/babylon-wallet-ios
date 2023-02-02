@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 public struct DappInteraction: Sendable, FeatureReducer {
-	public struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		let interaction: P2P.FromDapp.WalletInteraction
 
 		@NavigationStateOf<Destinations>

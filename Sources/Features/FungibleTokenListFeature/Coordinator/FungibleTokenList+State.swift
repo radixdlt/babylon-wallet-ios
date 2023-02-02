@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: FungibleTokenList.State
 public extension FungibleTokenList {
 	// MARK: State
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		public var sections: IdentifiedArrayOf<FungibleTokenList.Section.State>
 		public var selectedToken: FungibleTokenContainer?
 

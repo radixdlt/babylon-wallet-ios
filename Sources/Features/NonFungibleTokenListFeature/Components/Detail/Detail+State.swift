@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Detail.State
 public extension NonFungibleTokenList.Detail {
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		var container: NonFungibleTokenContainer
 		var asset: NonFungibleToken
 	}

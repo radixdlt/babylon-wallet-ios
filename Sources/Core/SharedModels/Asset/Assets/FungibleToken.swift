@@ -72,7 +72,7 @@ public extension FungibleToken {
 }
 
 // MARK: - FungibleTokenContainer
-public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
+public struct FungibleTokenContainer: Sendable, AssetContainer, Hashable {
 	public let owner: AccountAddress
 	public typealias T = FungibleToken
 	public var asset: FungibleToken

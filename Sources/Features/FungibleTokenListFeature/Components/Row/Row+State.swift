@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - FungibleTokenList.Row.State
 public extension FungibleTokenList.Row {
 	// MARK: State
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		public var container: FungibleTokenContainer
 
 		// MARK: - AppSettings properties
