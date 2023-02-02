@@ -78,7 +78,7 @@ public extension P2P.FromDapp.WalletInteraction {
 	static func previewValueOneTimeAccount(
 		id: ID = .previewValue0
 	) -> Self {
-		try! .init(
+		.init(
 			id: id,
 			items: .request(
 				.unauthorized(.init(
@@ -94,7 +94,7 @@ public extension P2P.FromDapp.WalletInteraction {
 	static func previewValueSignTX(
 		id: ID = .previewValue0
 	) -> Self {
-		try! .init(
+		.init(
 			id: id,
 			items: .transaction(.init(
 				send: .previewValue
