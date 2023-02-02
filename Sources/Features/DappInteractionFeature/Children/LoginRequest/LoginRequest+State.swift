@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - LoginRequest.State
 public extension LoginRequest {
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		public init() {}
 	}
 }

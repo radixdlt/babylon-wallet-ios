@@ -1,27 +1,24 @@
 import FeaturePrelude
 
-// MARK: - DappInteraction.View
-public extension DappInteraction {
+// MARK: - DappInteractionLoading.View
+public extension DappInteractionLoading {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<DappInteraction>
+		private let store: StoreOf<DappInteractionLoading>
 
-		public init(store: StoreOf<DappInteraction>) {
+		public init(store: StoreOf<DappInteractionLoading>) {
 			self.store = store
 		}
 	}
 }
 
-public extension DappInteraction.View {
+public extension DappInteractionLoading.View {
 	var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			// TODO: implement
-//			NavigationStackStore
-
 			Text("Implement: DappInteraction")
 				.background(Color.yellow)
 				.foregroundColor(.red)
@@ -30,10 +27,10 @@ public extension DappInteraction.View {
 	}
 }
 
-// MARK: - DappInteraction.View.ViewState
-extension DappInteraction.View {
+// MARK: - DappInteractionLoading.View.ViewState
+extension DappInteractionLoading.View {
 	struct ViewState: Equatable {
-		init(state: DappInteraction.State) {
+		init(state: DappInteractionLoading.State) {
 			// TODO: implement
 		}
 	}
@@ -43,18 +40,18 @@ extension DappInteraction.View {
 import SwiftUI // NB: necessary for previews to appear
 
 // MARK: - DappInteraction_Preview
-struct DappInteraction_Preview: PreviewProvider {
+struct DappInteractionLoading_Preview: PreviewProvider {
 	static var previews: some View {
-		DappInteraction.View(
+		DappInteractionLoading.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: DappInteraction()
+				reducer: DappInteractionLoading()
 			)
 		)
 	}
 }
 
-public extension DappInteraction.State {
+public extension DappInteractionLoading.State {
 	static let previewValue: Self = .init(
 		interaction: .previewValueOneTimeAccount
 	)

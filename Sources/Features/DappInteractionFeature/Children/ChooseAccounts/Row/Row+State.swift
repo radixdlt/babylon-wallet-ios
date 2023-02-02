@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - ChooseAccounts.Row.State
 public extension ChooseAccounts.Row {
-	struct State: Equatable {
+	struct State: Hashable {
 		public let account: OnNetwork.Account
 		public var isSelected: Bool = false
 

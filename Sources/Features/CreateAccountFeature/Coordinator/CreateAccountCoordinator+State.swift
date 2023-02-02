@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - CreateAccountCoordinator.State
 public extension CreateAccountCoordinator {
-	struct State: Equatable {
+	struct State: Hashable {
 		public let completionDestination: CreateAccountCompletionDestination
 		public var root: Root
 
@@ -18,7 +18,7 @@ public extension CreateAccountCoordinator {
 
 // MARK: - CreateAccountCoordinator.State.Root
 public extension CreateAccountCoordinator.State {
-	enum Root: Equatable {
+	enum Root: Hashable {
 		public typealias InitialState = CreateAccount.State
 		case createAccount(CreateAccount.State)
 		case accountCompletion(AccountCompletion.State)
@@ -30,7 +30,7 @@ public extension CreateAccountCoordinator.State {
 }
 
 // MARK: - CreateAccountCompletionDestination
-public enum CreateAccountCompletionDestination: String, Sendable {
+public enum CreateAccountCompletionDestination: String, Sendable, Hashable {
 	case home
 	case chooseAccounts
 

@@ -3,7 +3,7 @@ import FeaturePrelude
 
 // MARK: - ChooseAccounts.State
 public extension ChooseAccounts {
-	struct State: Equatable {
+	struct State: Hashable {
 		public let request: P2P.OneTimeAccountsRequestToHandle
 		public var accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
 		public var createAccountCoordinator: CreateAccountCoordinator.State?

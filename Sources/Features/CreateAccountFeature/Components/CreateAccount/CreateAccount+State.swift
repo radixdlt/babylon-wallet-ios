@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - CreateAccount.State
 public extension CreateAccount {
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		public var onNetworkWithID: NetworkID?
 		public var isFirstAccount: Bool
 		public var inputtedAccountName: String

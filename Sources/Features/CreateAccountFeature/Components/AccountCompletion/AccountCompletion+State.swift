@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - AccountCompletion.State
 public extension AccountCompletion {
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		public let account: OnNetwork.Account
 		public let isFirstAccount: Bool
 		public let destination: CreateAccountCompletionDestination
