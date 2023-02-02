@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - AssetTransfer.State
 public extension AssetTransfer {
 	// MARK: State
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		public typealias From = OnNetwork.Account
 
 		// TODO: declare union type for this in SharedModels

@@ -3,7 +3,7 @@ import FeaturePrelude
 
 public extension AccountDetails {
 	struct Destinations: ReducerProtocol {
-		public enum State: Equatable {
+		public enum State: Hashable {
 			// TODO: case preferences(AccountPreferences.State)
 			case transfer(AssetTransfer.State)
 		}

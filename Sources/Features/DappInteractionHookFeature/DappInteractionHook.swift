@@ -2,14 +2,15 @@ import DappInteractionFeature
 import FeaturePrelude
 import P2PConnectivityClient
 import ProfileClient
-import TransactionClient
-// import TransactionSigningFeature
 
 // MARK: - DappInteractionHook
 public struct DappInteractionHook: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 //		public var currentRequest: P2P.UnfinishedRequestFromClient?
 		public var unfinishedRequestsFromClient: P2P.UnfinishedRequestsFromClient
+
+		@PresentationStateOf<DappInteraction>
+		public var dappInteraction
 
 		public init(
 			//			currentRequest: P2P.UnfinishedRequestFromClient? = nil,
@@ -38,8 +39,7 @@ public struct DappInteractionHook: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-//		case chooseAccounts(ChooseAccounts.Action)
-//		case transactionSigning(TransactionSigning.Action)
+		case dappInteraction(PresentationActionOf<DappInteraction>)
 	}
 
 	@Dependency(\.profileClient) var profileClient
@@ -51,12 +51,9 @@ public struct DappInteractionHook: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
-//			.ifLet(\.chooseAccounts, action: /Action.child .. ChildAction.chooseAccounts) {
-//				ChooseAccounts()
-//			}
-//			.ifLet(\.transactionSigning, action: /Action.child .. ChildAction.transactionSigning) {
-//				TransactionSigning()
-//			}
+			.presentationDestination(\.$dappInteraction, action: /Action.child .. ChildAction.dappInteraction) {
+				DappInteraction()
+			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
