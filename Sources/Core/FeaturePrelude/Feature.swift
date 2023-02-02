@@ -38,7 +38,7 @@ public protocol FeatureReducer: _FeatureReducer where Action == ActionOf<Self> {
 	func reduceChild(into state: inout State, action: ChildAction) -> EffectTask<Action>
 }
 
-public extension FeatureReducer {
+public extension ReducerProtocol where Self: FeatureReducer {
 	typealias Action = ActionOf<Self>
 
 	var body: some ReducerProtocolOf<Self> {
