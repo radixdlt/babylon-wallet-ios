@@ -4,7 +4,7 @@ import TransactionSigningFeature
 
 // MARK: - HandleDappRequests.State
 public extension HandleDappRequests {
-	struct State: Equatable {
+	struct State: Hashable {
 		public var currentRequest: CurrentRequest?
 		public var unfinishedRequestsFromClient: P2P.UnfinishedRequestsFromClient
 
@@ -56,7 +56,7 @@ public extension HandleDappRequests.State {
 		}
 	}
 
-	enum CurrentRequest: Equatable {
+	enum CurrentRequest: Hashable {
 		case transactionSigning(TransactionSigning.State)
 		case chooseAccounts(ChooseAccounts.State)
 

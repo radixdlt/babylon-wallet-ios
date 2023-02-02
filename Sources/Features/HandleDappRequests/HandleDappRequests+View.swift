@@ -16,25 +16,15 @@ public extension HandleDappRequests {
 
 public extension HandleDappRequests.View {
 	var body: some View {
-		ZStack {
-			IfLetStore(
-				store.scope(
-					state: \.chooseAccounts,
-					action: { .child(.chooseAccounts($0)) }
-				),
-				then: { ChooseAccounts.View(store: $0) }
-			)
-
-			IfLetStore(
-				store.scope(
-					state: \.transactionSigning,
-					action: { .child(.transactionSigning($0)) }
-				),
-				then: { TransactionSigning.View(store: $0) }
-			)
-		}
-		.task { @MainActor in
-			await ViewStore(store.stateless).send(.view(.task)).finish()
-		}
+		ZStack {}
+//			.sheet(
+//				store: <#T##Store<PresentationState<State>, PresentationAction<State, Action>>#>,
+//				state: <#T##(State) -> DestinationState?#>,
+//				action: <#T##(DestinationAction) -> Action#>,
+//				content: <#T##(Store<DestinationState, DestinationAction>) -> View#>
+//			)
+			.task {
+				await ViewStore(store.stateless).send(.view(.task)).finish()
+			}
 	}
 }

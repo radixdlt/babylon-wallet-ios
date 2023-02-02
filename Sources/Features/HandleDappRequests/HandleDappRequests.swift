@@ -6,52 +6,70 @@ import TransactionClient
 import TransactionSigningFeature
 
 // MARK: - HandleDappRequests
-public struct HandleDappRequests: Sendable, ReducerProtocol {
+public struct HandleDappRequests: Sendable, FeatureReducer {
+	public enum ViewAction: Sendable, Equatable {
+		case task
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case loadClientIDsResult(TaskResult<OrderedSet<P2PClient.ID>>)
+		case receivedRequestIsValidHandleIt(P2P.RequestFromClient)
+		case sendMessageReceivedReceiptBackToPeer(P2PClient, readMessage: P2PConnections.IncomingMessage)
+		case sendMessageReceivedReceiptBackToPeerResult(TaskResult<P2PConnections.IncomingMessage>)
+		case receiveRequestFromP2PClientResult(TaskResult<P2P.RequestFromClient>)
+		case rejected(P2P.RequestFromClient)
+		case failedWithError(P2P.RequestFromClient, P2P.ToDapp.WalletInteractionFailureResponse.ErrorType, String?)
+		case handleNextRequestItemIfNeeded
+		case presentViewForP2PRequest(P2P.RequestItemToHandle)
+		case sendResponseBackToDappResult(TaskResult<P2P.SentResponseToClient>)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case chooseAccounts(ChooseAccounts.Action)
+		case transactionSigning(TransactionSigning.Action)
+	}
+
 	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
-}
 
-public extension HandleDappRequests {
-	var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
-			.ifLet(\.chooseAccounts, action: /Action.child .. Action.ChildAction.chooseAccounts) {
+			.ifLet(\.chooseAccounts, action: /Action.child .. ChildAction.chooseAccounts) {
 				ChooseAccounts()
 			}
-			.ifLet(\.transactionSigning, action: /Action.child .. Action.ChildAction.transactionSigning) {
+			.ifLet(\.transactionSigning, action: /Action.child .. ChildAction.transactionSigning) {
 				TransactionSigning()
 			}
 	}
-}
 
-private extension HandleDappRequests {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case let .internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))):
+		case let .internal(.receiveRequestFromP2PClientResult(.failure(error))):
 			errorQueue.schedule(error)
 			return .none
 
-		case let .internal(.system(.sendMessageReceivedReceiptBackToPeer(client, readMessage))):
+		case let .internal(.sendMessageReceivedReceiptBackToPeer(client, readMessage)):
 			return .run { send in
-				await send(.internal(.system(.sendMessageReceivedReceiptBackToPeerResult(
+				await send(.internal(.sendMessageReceivedReceiptBackToPeerResult(
 					TaskResult {
 						try await p2pConnectivityClient.sendMessageReadReceipt(client.id, readMessage)
 						return readMessage
 					}
-				))))
+				)))
 			}
 
-		case .internal(.system(.sendMessageReceivedReceiptBackToPeerResult(.success(_)))):
+		case .internal(.sendMessageReceivedReceiptBackToPeerResult(.success(_))):
 			return .none
 
-		case let .internal(.system(.sendMessageReceivedReceiptBackToPeerResult(.failure(error)))):
+		case let .internal(.sendMessageReceivedReceiptBackToPeerResult(.failure(error))):
 			errorQueue.schedule(error)
 			return .none
 
-		case let .internal(.system(.receiveRequestFromP2PClientResult(.success(requestFromP2P)))):
+		case let .internal(.receiveRequestFromP2PClientResult(.success(requestFromP2P))):
 
 			return .run { send in
 				let currentNetworkID = await profileClient.getCurrentNetworkID()
@@ -60,17 +78,17 @@ private extension HandleDappRequests {
 					let incommingRequestNetwork = try Network.lookupBy(id: requestFromP2P.interaction.metadata.networkId)
 					let currentNetwork = try Network.lookupBy(id: currentNetworkID)
 
-					await send(.internal(.system(.failedWithError(
+					await send(.internal(.failedWithError(
 						requestFromP2P,
 						.wrongNetwork,
 						L10n.DApp.Request.wrongNetworkError(incommingRequestNetwork.name, currentNetwork.name)
-					))))
+					)))
 					return
 				}
-				await send(.internal(.system(.receivedRequestIsValidHandleIt(requestFromP2P))))
+				await send(.internal(.receivedRequestIsValidHandleIt(requestFromP2P)))
 			}
 
-		case let .internal(.system(.receivedRequestIsValidHandleIt(validRequestFromP2P))):
+		case let .internal(.receivedRequestIsValidHandleIt(validRequestFromP2P)):
 			state.unfinishedRequestsFromClient.queue(requestFromClient: validRequestFromP2P)
 
 			guard state.currentRequest == nil else {
@@ -82,10 +100,10 @@ private extension HandleDappRequests {
 				return .none
 			}
 			return .run { send in
-				await send(.internal(.system(.presentViewForP2PRequest(itemToHandle))))
+				await send(.internal(.presentViewForP2PRequest(itemToHandle)))
 			}
 
-		case let .internal(.system(.presentViewForP2PRequest(requestItemToHandle))):
+		case let .internal(.presentViewForP2PRequest(requestItemToHandle)):
 			state.currentRequest = .init(requestItemToHandle: requestItemToHandle)
 			return .none
 
@@ -107,7 +125,7 @@ private extension HandleDappRequests {
 				.oneTimeAccounts(request.requestItem), with: responseItem
 			) else {
 				return .run { send in
-					await send(.internal(.system(.handleNextRequestItemIfNeeded)))
+					await send(.internal(.handleNextRequestItemIfNeeded))
 				}
 			}
 
@@ -117,32 +135,32 @@ private extension HandleDappRequests {
 			)
 
 			return .run { [p2pConnectivityClient] send in
-				await send(.internal(.system(.sendResponseBackToDappResult(
+				await send(.internal(.sendResponseBackToDappResult(
 					TaskResult {
 						try await p2pConnectivityClient.sendMessage(response)
 					}
-				))))
+				)))
 			}
 
-		case .internal(.system(.handleNextRequestItemIfNeeded)):
+		case .internal(.handleNextRequestItemIfNeeded):
 			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
 
-		case .internal(.system(.sendResponseBackToDappResult(.success(_)))):
+		case .internal(.sendResponseBackToDappResult(.success(_))):
 			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
 
-		case let .internal(.system(.sendResponseBackToDappResult(.failure(error)))):
+		case let .internal(.sendResponseBackToDappResult(.failure(error))):
 			errorQueue.schedule(error)
 			return .none
 
 		case let .child(.transactionSigning(.delegate(.failed(failedRequest?, txFailure)))):
 			return .run { send in
 				let (errorKind, message) = txFailure.errorKindAndMessage
-				await send(.internal(.system(
+				await send(.internal(
 					.failedWithError(
 						failedRequest.parentRequest,
 						errorKind,
 						message
-					))))
+					)))
 			}
 
 		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, request?)))):
@@ -152,7 +170,7 @@ private extension HandleDappRequests {
 			)
 			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(.send(request.requestItem), with: responseItem) else {
 				return .run { send in
-					await send(.internal(.system(.handleNextRequestItemIfNeeded)))
+					await send(.internal(.handleNextRequestItemIfNeeded))
 				}
 			}
 			let response = P2P.ResponseToClientByID(
@@ -161,24 +179,24 @@ private extension HandleDappRequests {
 			)
 
 			return .run { send in
-				await send(.internal(.system(.sendResponseBackToDappResult(
+				await send(.internal(.sendResponseBackToDappResult(
 					TaskResult {
 						try await p2pConnectivityClient.sendMessage(response)
 					}
-				))))
+				)))
 			}
 
 		case let .child(.transactionSigning(.delegate(.rejected(rejectedRequestItem?)))):
 			return .run { send in
-				await send(.internal(.system(.rejected(rejectedRequestItem.parentRequest))))
+				await send(.internal(.rejected(rejectedRequestItem.parentRequest)))
 			}
 
 		case let .child(.chooseAccounts(.delegate(.dismissChooseAccounts(rejectedRequestItem)))):
 			return .run { send in
-				await send(.internal(.system(.rejected(rejectedRequestItem.parentRequest))))
+				await send(.internal(.rejected(rejectedRequestItem.parentRequest)))
 			}
 
-		case let .internal(.system(.rejected(request))):
+		case let .internal(.rejected(request)):
 			return respondBackWithFailure(
 				state: &state,
 				connectionID: request.client.id,
@@ -189,7 +207,7 @@ private extension HandleDappRequests {
 				)
 			)
 
-		case let .internal(.system(.failedWithError(request, error, message))):
+		case let .internal(.failedWithError(request, error, message)):
 			errorQueue.schedule(error)
 			return respondBackWithFailure(
 				state: &state,
@@ -201,7 +219,7 @@ private extension HandleDappRequests {
 				)
 			)
 
-		case .internal(.view(.task)):
+		case .view(.task):
 			return .run { send in
 				do {
 					try await p2pConnectivityClient.loadFromProfileAndConnectAll()
@@ -209,31 +227,31 @@ private extension HandleDappRequests {
 						guard !Task.isCancelled else {
 							return
 						}
-						await send(.internal(.system(.loadClientIDsResult(.success(clientIDs)))))
+						await send(.internal(.loadClientIDsResult(.success(clientIDs))))
 					}
 				} catch {
-					await send(.internal(.system(.loadClientIDsResult(.failure(error)))))
+					await send(.internal(.loadClientIDsResult(.failure(error))))
 				}
 			}
 
-		case let .internal(.system(.loadClientIDsResult(.success(clientIDs)))):
+		case let .internal(.loadClientIDsResult(.success(clientIDs))):
 			return .run { send in
 				for clientID in clientIDs {
 					do {
 						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(clientID) {
-							await send(.internal(.system(.sendMessageReceivedReceiptBackToPeer(
+							await send(.internal(.sendMessageReceivedReceiptBackToPeer(
 								request.client, readMessage: request.originalMessage
-							))))
+							)))
 
-							await send(.internal(.system(.receiveRequestFromP2PClientResult(.success(request)))))
+							await send(.internal(.receiveRequestFromP2PClientResult(.success(request))))
 						}
 					} catch {
-						await send(.internal(.system(.receiveRequestFromP2PClientResult(.failure(error)))))
+						await send(.internal(.receiveRequestFromP2PClientResult(.failure(error))))
 					}
 				}
 			}
 
-		case let .internal(.system(.loadClientIDsResult(.failure(error)))):
+		case let .internal(.loadClientIDsResult(.failure(error))):
 			errorQueue.schedule(error)
 			return .none
 
@@ -256,11 +274,11 @@ private extension HandleDappRequests {
 		)
 
 		return .run { [p2pConnectivityClient] send in
-			await send(.internal(.system(.sendResponseBackToDappResult(
+			await send(.internal(.sendResponseBackToDappResult(
 				TaskResult {
 					try await p2pConnectivityClient.sendMessage(response)
 				}
-			))))
+			)))
 		}
 	}
 
@@ -273,7 +291,7 @@ private extension HandleDappRequests {
 
 		return .run { send in
 			try await mainQueue.sleep(for: .seconds(1))
-			await send(.internal(.system(.presentViewForP2PRequest(next))))
+			await send(.internal(.presentViewForP2PRequest(next)))
 		}
 	}
 }

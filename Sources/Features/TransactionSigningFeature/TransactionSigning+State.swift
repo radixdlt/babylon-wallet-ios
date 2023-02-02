@@ -3,7 +3,7 @@ import struct TransactionClient.MakeTransactionHeaderInput
 
 // MARK: - TransactionSigning.State
 public extension TransactionSigning {
-	struct State: Equatable {
+	struct State: Hashable {
 		public enum Origin: Equatable {
 			case p2p(request: P2P.SendTransactionToHandle)
 			case local(manifest: TransactionManifest)
