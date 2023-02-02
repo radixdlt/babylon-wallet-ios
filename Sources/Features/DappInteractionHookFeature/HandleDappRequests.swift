@@ -3,10 +3,23 @@ import FeaturePrelude
 import P2PConnectivityClient
 import ProfileClient
 import TransactionClient
-import TransactionSigningFeature
+// import TransactionSigningFeature
 
 // MARK: - HandleDappRequests
 public struct HandleDappRequests: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+//		public var currentRequest: P2P.UnfinishedRequestFromClient?
+		public var unfinishedRequestsFromClient: P2P.UnfinishedRequestsFromClient
+
+		public init(
+			//			currentRequest: P2P.UnfinishedRequestFromClient? = nil,
+			unfinishedRequestsFromClient: P2P.UnfinishedRequestsFromClient = .init()
+		) {
+//			self.currentRequest = currentRequest
+			self.unfinishedRequestsFromClient = unfinishedRequestsFromClient
+		}
+	}
+
 	public enum ViewAction: Sendable, Equatable {
 		case task
 	}
@@ -25,8 +38,8 @@ public struct HandleDappRequests: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case chooseAccounts(ChooseAccounts.Action)
-		case transactionSigning(TransactionSigning.Action)
+//		case chooseAccounts(ChooseAccounts.Action)
+//		case transactionSigning(TransactionSigning.Action)
 	}
 
 	@Dependency(\.profileClient) var profileClient
@@ -107,40 +120,40 @@ public struct HandleDappRequests: Sendable, FeatureReducer {
 //			state.currentRequest = .init(requestItemToHandle: requestItemToHandle)
 			return .none
 
-		case let .child(.chooseAccounts(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
-//			state.currentRequest = nil
-
-			let simpleInfoForAccounts: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
-				.init(account: $0)
-			}
-			guard !request.requestItem.requiresProofOfOwnership else {
-				errorQueue.schedule(NSError(domain: "UnsupportedDappRequest - proofs for account addresses is not yet supported", code: 0))
-				return .none
-			}
-			let responseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem.oneTimeAccounts(
-				.withoutProof(.init(accounts: .init(rawValue: simpleInfoForAccounts)!))
-			)
-
-			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(
-				.oneTimeAccounts(request.requestItem), with: responseItem
-			) else {
-				return .run { send in
-					await send(.internal(.handleNextRequestItemIfNeeded))
-				}
-			}
-
-			let response = P2P.ResponseToClientByID(
-				connectionID: request.parentRequest.client.id,
-				responseToDapp: responseToDapp
-			)
-
-			return .run { [p2pConnectivityClient] send in
-				await send(.internal(.sendResponseBackToDappResult(
-					TaskResult {
-						try await p2pConnectivityClient.sendMessage(response)
-					}
-				)))
-			}
+//		case let .child(.chooseAccounts(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
+////			state.currentRequest = nil
+//
+//			let simpleInfoForAccounts: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
+//				.init(account: $0)
+//			}
+//			guard !request.requestItem.requiresProofOfOwnership else {
+//				errorQueue.schedule(NSError(domain: "UnsupportedDappRequest - proofs for account addresses is not yet supported", code: 0))
+//				return .none
+//			}
+//			let responseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem.oneTimeAccounts(
+//				.withoutProof(.init(accounts: .init(rawValue: simpleInfoForAccounts)!))
+//			)
+//
+//			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(
+//				.oneTimeAccounts(request.requestItem), with: responseItem
+//			) else {
+//				return .run { send in
+//					await send(.internal(.handleNextRequestItemIfNeeded))
+//				}
+//			}
+//
+//			let response = P2P.ResponseToClientByID(
+//				connectionID: request.parentRequest.client.id,
+//				responseToDapp: responseToDapp
+//			)
+//
+//			return .run { [p2pConnectivityClient] send in
+//				await send(.internal(.sendResponseBackToDappResult(
+//					TaskResult {
+//						try await p2pConnectivityClient.sendMessage(response)
+//					}
+//				)))
+//			}
 
 		case .internal(.handleNextRequestItemIfNeeded):
 			return presentViewForNextBufferedRequestFromBrowserIfNeeded(state: &state)
@@ -152,49 +165,49 @@ public struct HandleDappRequests: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .child(.transactionSigning(.delegate(.failed(failedRequest?, txFailure)))):
-			return .run { send in
-				let (errorKind, message) = txFailure.errorKindAndMessage
-				await send(.internal(
-					.failedWithError(
-						failedRequest.parentRequest,
-						errorKind,
-						message
-					)))
-			}
+//		case let .child(.transactionSigning(.delegate(.failed(failedRequest?, txFailure)))):
+//			return .run { send in
+//				let (errorKind, message) = txFailure.errorKindAndMessage
+//				await send(.internal(
+//					.failedWithError(
+//						failedRequest.parentRequest,
+//						errorKind,
+//						message
+//					)))
+//			}
 
-		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, request?)))):
-//			state.currentRequest = nil
-			let responseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem.send(
-				.init(txID: txID)
-			)
-			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(.send(request.requestItem), with: responseItem) else {
-				return .run { send in
-					await send(.internal(.handleNextRequestItemIfNeeded))
-				}
-			}
-			let response = P2P.ResponseToClientByID(
-				connectionID: request.parentRequest.client.id,
-				responseToDapp: responseToDapp
-			)
+//		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, request?)))):
+////			state.currentRequest = nil
+//			let responseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem.send(
+//				.init(txID: txID)
+//			)
+//			guard let responseToDapp = state.unfinishedRequestsFromClient.finish(.send(request.requestItem), with: responseItem) else {
+//				return .run { send in
+//					await send(.internal(.handleNextRequestItemIfNeeded))
+//				}
+//			}
+//			let response = P2P.ResponseToClientByID(
+//				connectionID: request.parentRequest.client.id,
+//				responseToDapp: responseToDapp
+//			)
+//
+//			return .run { send in
+//				await send(.internal(.sendResponseBackToDappResult(
+//					TaskResult {
+//						try await p2pConnectivityClient.sendMessage(response)
+//					}
+//				)))
+//			}
 
-			return .run { send in
-				await send(.internal(.sendResponseBackToDappResult(
-					TaskResult {
-						try await p2pConnectivityClient.sendMessage(response)
-					}
-				)))
-			}
-
-		case let .child(.transactionSigning(.delegate(.rejected(rejectedRequestItem?)))):
-			return .run { send in
-				await send(.internal(.rejected(rejectedRequestItem.parentRequest)))
-			}
-
-		case let .child(.chooseAccounts(.delegate(.dismissChooseAccounts(rejectedRequestItem)))):
-			return .run { send in
-				await send(.internal(.rejected(rejectedRequestItem.parentRequest)))
-			}
+//		case let .child(.transactionSigning(.delegate(.rejected(rejectedRequestItem?)))):
+//			return .run { send in
+//				await send(.internal(.rejected(rejectedRequestItem.parentRequest)))
+//			}
+//
+//		case let .child(.chooseAccounts(.delegate(.dismissChooseAccounts(rejectedRequestItem)))):
+//			return .run { send in
+//				await send(.internal(.rejected(rejectedRequestItem.parentRequest)))
+//			}
 
 		case let .internal(.rejected(request)):
 			return respondBackWithFailure(
@@ -296,46 +309,46 @@ public struct HandleDappRequests: Sendable, FeatureReducer {
 	}
 }
 
-extension ApproveTransactionFailure {
-	var errorKindAndMessage: (errorKind: P2P.ToDapp.WalletInteractionFailureResponse.ErrorType, message: String?) {
-		switch self {
-		case let .transactionFailure(transactionFailure):
-			switch transactionFailure {
-			case let .failedToCompileOrSign(error):
-				switch error {
-				case .failedToCompileNotarizedTXIntent, .failedToCompileTXIntent, .failedToCompileSignedTXIntent, .failedToGenerateTXId:
-					return (errorKind: .failedToCompileTransaction, message: nil)
-				case .failedToSignIntentWithAccountSigners, .failedToSignSignedCompiledIntentWithNotarySigner, .failedToConvertNotarySignature, .failedToConvertAccountSignatures:
-					return (errorKind: .failedToSignTransaction, message: nil)
-				}
-			case let .failedToPrepareForTXSigning(error):
-				return (errorKind: .failedToPrepareTransaction, message: error.errorDescription)
-
-			case let .failedToSubmit(submissionError):
-
-				switch submissionError {
-				case .failedToSubmitTX:
-					return (errorKind: .failedToSubmitTransaction, message: nil)
-				case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .rejected):
-					return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TXID: \(txID)")
-				case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
-					return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TXID: \(txID)")
-				case let .failedToPollTX(txID, _):
-					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
-				case let .invalidTXWasDuplicate(txID):
-					return (errorKind: .submittedTransactionWasDuplicate, message: "TXID: \(txID)")
-				case let .failedToGetTransactionStatus(txID, _):
-					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
-				}
-			}
-
-		case let .prepareTransactionFailure(prepareTransactionFailure):
-			switch prepareTransactionFailure {
-			case let .addTransactionFee(addTransactionFeeError):
-				return (errorKind: .failedToPrepareTransaction, message: addTransactionFeeError.localizedDescription)
-			case let .loadNetworkID(loadNetworkIDError):
-				return (errorKind: .failedToPrepareTransaction, message: loadNetworkIDError.localizedDescription)
-			}
-		}
-	}
-}
+// extension ApproveTransactionFailure {
+//	var errorKindAndMessage: (errorKind: P2P.ToDapp.WalletInteractionFailureResponse.ErrorType, message: String?) {
+//		switch self {
+//		case let .transactionFailure(transactionFailure):
+//			switch transactionFailure {
+//			case let .failedToCompileOrSign(error):
+//				switch error {
+//				case .failedToCompileNotarizedTXIntent, .failedToCompileTXIntent, .failedToCompileSignedTXIntent, .failedToGenerateTXId:
+//					return (errorKind: .failedToCompileTransaction, message: nil)
+//				case .failedToSignIntentWithAccountSigners, .failedToSignSignedCompiledIntentWithNotarySigner, .failedToConvertNotarySignature, .failedToConvertAccountSignatures:
+//					return (errorKind: .failedToSignTransaction, message: nil)
+//				}
+//			case let .failedToPrepareForTXSigning(error):
+//				return (errorKind: .failedToPrepareTransaction, message: error.errorDescription)
+//
+//			case let .failedToSubmit(submissionError):
+//
+//				switch submissionError {
+//				case .failedToSubmitTX:
+//					return (errorKind: .failedToSubmitTransaction, message: nil)
+//				case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .rejected):
+//					return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TXID: \(txID)")
+//				case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
+//					return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TXID: \(txID)")
+//				case let .failedToPollTX(txID, _):
+//					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+//				case let .invalidTXWasDuplicate(txID):
+//					return (errorKind: .submittedTransactionWasDuplicate, message: "TXID: \(txID)")
+//				case let .failedToGetTransactionStatus(txID, _):
+//					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+//				}
+//			}
+//
+//		case let .prepareTransactionFailure(prepareTransactionFailure):
+//			switch prepareTransactionFailure {
+//			case let .addTransactionFee(addTransactionFeeError):
+//				return (errorKind: .failedToPrepareTransaction, message: addTransactionFeeError.localizedDescription)
+//			case let .loadNetworkID(loadNetworkIDError):
+//				return (errorKind: .failedToPrepareTransaction, message: loadNetworkIDError.localizedDescription)
+//			}
+//		}
+//	}
+// }
