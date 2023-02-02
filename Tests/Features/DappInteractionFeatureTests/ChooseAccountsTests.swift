@@ -13,6 +13,9 @@ final class ChooseAccountsTests: TestCase {
 		singleAccount.isSelected = true
 		let store = TestStore(
 			initialState: ChooseAccounts.State(
+				kind: .oneTime,
+				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+				dappMetadata: .init(name: "Dapp name", description: "A description"),
 				request: requestItem,
 				accounts: [
 					singleAccount,
@@ -36,7 +39,12 @@ final class ChooseAccountsTests: TestCase {
 			parentRequest: .previewValue
 		)
 		let store = TestStore(
-			initialState: ChooseAccounts.State(request: requestItem),
+			initialState: ChooseAccounts.State(
+				kind: .oneTime,
+				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+				dappMetadata: .init(name: "Dapp name", description: "A description"),
+				request: requestItem
+			),
 			reducer: ChooseAccounts()
 		)
 
@@ -53,6 +61,9 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = true
 
 		let initialState: ChooseAccounts.State = .init(
+			kind: .oneTime,
+			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+			dappMetadata: .init(name: "Dapp name", description: "A description"),
 			request: .init(
 				requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
 				parentRequest: .previewValue
@@ -85,6 +96,9 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
+			kind: .oneTime,
+			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+			dappMetadata: .init(name: "Dapp name", description: "A description"),
 			request: .init(
 				requestItem: .init(numberOfAccounts: .atLeast(1), requiresProofOfOwnership: false),
 				parentRequest: .previewValue
@@ -121,6 +135,9 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
+			kind: .oneTime,
+			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+			dappMetadata: .init(name: "Dapp name", description: "A description"),
 			request: .init(
 				requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
 				parentRequest: .previewValue
@@ -153,6 +170,9 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
+			kind: .oneTime,
+			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+			dappMetadata: .init(name: "Dapp name", description: "A description"),
 			request: .init(
 				requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
 				parentRequest: .previewValue

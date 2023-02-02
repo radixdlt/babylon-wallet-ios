@@ -66,8 +66,11 @@ public extension HandleDappRequests.State {
 				preconditionFailure("Implement auth! :D")
 			case let .oneTimeAccounts(item):
 				self = .chooseAccounts(
-					.init(request:
-						.init(
+					.init(
+						kind: .oneTime, // FIXME: david
+						dappDefinitionAddress: try! .init(address: "account_deadbeef"), // FIXME: david
+						dappMetadata: .init(name: "Dapp name", description: "A description"), // FIXME: david
+						request: .init(
 							requestItem: item,
 							parentRequest: requestItemToHandle.parentRequest
 						)

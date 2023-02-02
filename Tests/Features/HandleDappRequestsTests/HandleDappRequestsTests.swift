@@ -42,7 +42,12 @@ final class HandleDappRequestsTests: TestCase {
 
 		await store.receive(.internal(.system(.presentViewForP2PRequest(.init(requestItem: request.interaction.erasedItems.first!, parentRequest: request))))) {
 			$0.currentRequest = .chooseAccounts(
-				.init(request: try XCTUnwrap(P2P.OneTimeAccountsRequestToHandle(request: request)))
+				.init(
+					kind: .oneTime,
+					dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+					dappMetadata: .init(name: "Dapp name", description: "A description"),
+					request: try XCTUnwrap(P2P.OneTimeAccountsRequestToHandle(request: request))
+				)
 			)
 		}
 		await clientsWasLoaded.withValue {
@@ -53,7 +58,12 @@ final class HandleDappRequestsTests: TestCase {
 
 	func test__GIVEN__already_handling_a_request__WHEN__receiveRequest__THEN__new_request_is_queued() async throws {
 		let currentRequest: HandleDappRequests.State.CurrentRequest = .chooseAccounts(
-			.init(request: try XCTUnwrap(P2P.OneTimeAccountsRequestToHandle(request: .previewValueOneTimeAccountAccess)))
+			.init(
+				kind: .oneTime,
+				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+				dappMetadata: .init(name: "Dapp name", description: "A description"),
+				request: try XCTUnwrap(P2P.OneTimeAccountsRequestToHandle(request: .previewValueOneTimeAccountAccess))
+			)
 		)
 
 		let store = TestStore(
@@ -94,7 +104,7 @@ final class HandleDappRequestsTests: TestCase {
 				metadata: .init(
 					networkId: .nebunet,
 					origin: "",
-					dAppId: ""
+					dAppDefinitionAddress: try! .init(address: "account_deadbeef")
 				)
 			),
 			client: .previewValue
