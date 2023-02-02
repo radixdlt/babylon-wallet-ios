@@ -2,17 +2,17 @@
 public struct DecompileTransactionIntentRequest: Sendable, Codable, Hashable {
 	// MARK: Stored properties
 	public let compiledIntent: [UInt8]
-	public let manifestInstructionsOutputFormat: ManifestInstructionsKind
+	public let instructionsOutputKind: ManifestInstructionsKind
 
 	// MARK: Init
 
-	public init(compiledIntent: [UInt8], manifestInstructionsOutputFormat: ManifestInstructionsKind) {
+	public init(compiledIntent: [UInt8], instructionsOutputKind: ManifestInstructionsKind) {
 		self.compiledIntent = compiledIntent
-		self.manifestInstructionsOutputFormat = manifestInstructionsOutputFormat
+		self.instructionsOutputKind = instructionsOutputKind
 	}
 
-	public init(compiledIntentHex: String, manifestInstructionsOutputFormat: ManifestInstructionsKind) throws {
-		try self.init(compiledIntent: [UInt8](hex: compiledIntentHex), manifestInstructionsOutputFormat: manifestInstructionsOutputFormat)
+	public init(compiledIntentHex: String, instructionsOutputKind: ManifestInstructionsKind) throws {
+		try self.init(compiledIntent: [UInt8](hex: compiledIntentHex), instructionsOutputKind: instructionsOutputKind)
 	}
 }
 
@@ -20,14 +20,14 @@ public extension DecompileTransactionIntentRequest {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case compiledIntent = "compiled_intent"
-		case manifestInstructionsOutputFormat = "manifest_instructions_output_format"
+		case instructionsOutputKind = "instructions_output_kind"
 	}
 
 	// MARK: Codable
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(compiledIntent.hex(), forKey: .compiledIntent)
-		try container.encode(manifestInstructionsOutputFormat, forKey: .manifestInstructionsOutputFormat)
+		try container.encode(instructionsOutputKind, forKey: .instructionsOutputKind)
 	}
 
 	init(from decoder: Decoder) throws {
@@ -36,7 +36,7 @@ public extension DecompileTransactionIntentRequest {
 
 		try self.init(
 			compiledIntentHex: container.decode(String.self, forKey: .compiledIntent),
-			manifestInstructionsOutputFormat: container.decode(ManifestInstructionsKind.self, forKey: .manifestInstructionsOutputFormat)
+			instructionsOutputKind: container.decode(ManifestInstructionsKind.self, forKey: .instructionsOutputKind)
 		)
 	}
 }

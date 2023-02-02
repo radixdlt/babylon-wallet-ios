@@ -12,7 +12,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var accountMetadataByAddress: GetAccountMetadataByAddress
 	public var resourcesOverview: GetResourcesOverview
 	public var resourceDetailsByResourceIdentifier: GetResourceDetailsByResourceIdentifier
-	public var getNonFungibleIds: GetNonFungibleIds
+	public var getNonFungibleLocalIds: GetNonFungibleLocalIds
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
 }
@@ -30,7 +30,7 @@ public extension GatewayAPIClient {
 
 	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.EntityDetailsResponse
 
-	typealias GetNonFungibleIds = @Sendable (AccountAddress, ResourceIdentifier) async throws -> GatewayAPI.NonFungibleIdsResponseAllOf
+	typealias GetNonFungibleLocalIds = @Sendable (AccountAddress, ResourceIdentifier) async throws -> GatewayAPI.NonFungibleLocalIdsResponseAllOf
 
 	typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 

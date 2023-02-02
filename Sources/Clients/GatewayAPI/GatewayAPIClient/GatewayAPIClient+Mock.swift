@@ -12,7 +12,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		accountMetadataByAddress: unimplemented("\(Self.self).accountMetadataByAddress"),
 		resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
 		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
-		getNonFungibleIds: unimplemented("\(Self.self).getNonFungibleIds"),
+		getNonFungibleLocalIds: unimplemented("\(Self.self).getNonFungibleLocalIds"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
 		transactionStatus: unimplemented("\(Self.self).transactionStatus")
 	)
@@ -30,7 +30,7 @@ extension GatewayAPIClient: TestDependencyKey {
 			accountMetadataByAddress: unimplemented("\(Self.self).accountMetadataByAddress"),
 			resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
 			resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
-			getNonFungibleIds: unimplemented("\(Self.self).getNonFungibleIds"),
+			getNonFungibleLocalIds: unimplemented("\(Self.self).getNonFungibleLocalIds"),
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},

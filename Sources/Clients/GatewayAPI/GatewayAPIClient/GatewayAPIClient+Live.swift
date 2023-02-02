@@ -172,9 +172,9 @@ public extension GatewayAPIClient {
 				try await post(
 					request: GatewayAPI.EntityDetailsRequest(address: resourceAddress)
 				) { $0.appendingPathComponent("entity/details") }
-			}, getNonFungibleIds: { accountAddress, resourceAddress in
+			}, getNonFungibleLocalIds: { accountAddress, resourceAddress in
 				try await post(
-					request: GatewayAPI.EntityNonFungibleIdsRequestAllOf(
+					request: GatewayAPI.EntityNonFungibleLocalIdsRequestAllOf(
 						address: accountAddress.address,
 						resourceAddress: resourceAddress
 					)

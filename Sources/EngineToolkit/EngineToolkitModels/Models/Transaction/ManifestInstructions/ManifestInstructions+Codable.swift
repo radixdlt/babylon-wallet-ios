@@ -15,8 +15,8 @@ public extension ManifestInstructions {
 		case let .string(value):
 			try container.encode(ManifestInstructionsKind.string, forKey: .type)
 			try container.encode(value, forKey: .value)
-		case let .json(value):
-			try container.encode(ManifestInstructionsKind.json, forKey: .type)
+		case let .parsed(value):
+			try container.encode(ManifestInstructionsKind.parsed, forKey: .type)
 			try container.encode(value, forKey: .value)
 		}
 	}
@@ -30,9 +30,9 @@ public extension ManifestInstructions {
 		case .string:
 			let manifestInstructions = try container.decode(String.self, forKey: .value)
 			self = .string(manifestInstructions)
-		case .json:
+		case .parsed:
 			let manifestInstructions = try container.decode([Instruction].self, forKey: .value)
-			self = .json(manifestInstructions)
+			self = .parsed(manifestInstructions)
 		}
 	}
 }

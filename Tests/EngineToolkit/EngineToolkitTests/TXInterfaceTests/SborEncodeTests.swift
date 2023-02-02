@@ -25,7 +25,7 @@ private extension SborEncodeDecodeRequestTests {
 			networkId: .mainnet
 		)
 		let decoded = try sut.sborDecodeRequest(request: decodeRequest).get()
-		XCTAssertNoDifference(decoded, vector.decoded, line: line)
+		XCTAssertNoDifference(decoded.value, vector.decoded, line: line)
 
 		let encodeRequest = vector.decoded
 		let encoded = try sut.sborEncodeRequest(request: encodeRequest).get()
@@ -42,8 +42,8 @@ enum SborDecodeEncodeTestVectors {
 	static let vectors: [Vector] = [
 		// SBOR Primitive Types
 		(
-			encoded: "5c0000",
-			decoded: .unit(Unit())
+			encoded: "5c0100",
+			decoded: .boolean(false)
 		),
 	]
 }

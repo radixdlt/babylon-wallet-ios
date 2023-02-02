@@ -4,34 +4,37 @@ public typealias CompileSignedTransactionIntentRequest = SignedTransactionIntent
 // MARK: - CompileSignedTransactionIntentResponse
 public struct CompileSignedTransactionIntentResponse: Sendable, Codable, Hashable {
 	// MARK: Stored properties
-	public let compiledSignedIntent: [UInt8]
+
+	public let compiledIntent: [UInt8]
 
 	// MARK: Init
 
 	public init(bytes compiledIntent: [UInt8]) {
-		self.compiledSignedIntent = compiledIntent
+		self.compiledIntent = compiledIntent
 	}
 
 	public init(hex compiledIntentHex: String) throws {
-		self.compiledSignedIntent = try [UInt8](hex: compiledIntentHex)
+		self.compiledIntent = try [UInt8](hex: compiledIntentHex)
 	}
 }
 
 public extension CompileSignedTransactionIntentResponse {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
-		case compiledSignedIntent = "compiled_signed_intent"
+		case compiledIntent = "compiled_intent"
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(Data(compiledSignedIntent).hex(), forKey: .compiledSignedIntent)
+		try container.encode(Data(compiledIntent).hex(), forKey: .compiledIntent)
 	}
 
 	init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		try self.init(hex: try container.decode(String.self, forKey: .compiledSignedIntent))
+		try self.init(hex: try container.decode(String.self, forKey: .compiledIntent))
 	}
 }

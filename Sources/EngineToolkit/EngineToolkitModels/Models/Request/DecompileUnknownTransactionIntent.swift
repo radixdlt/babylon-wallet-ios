@@ -1,36 +1,39 @@
 // MARK: - DecompileUnknownTransactionIntentRequest
 public struct DecompileUnknownTransactionIntentRequest: Sendable, Codable, Hashable {
 	// MARK: Stored properties
+
 	public let compiledUnknownIntent: [UInt8]
-	public let manifestInstructionsOutputFormat: ManifestInstructionsKind
+	public let instructionsOutputKind: ManifestInstructionsKind
 
 	// MARK: Init
 
-	public init(compiledUnknownIntent: [UInt8], manifestInstructionsOutputFormat: ManifestInstructionsKind) {
+	public init(compiledUnknownIntent: [UInt8], instructionsOutputKind: ManifestInstructionsKind) {
 		self.compiledUnknownIntent = compiledUnknownIntent
-		self.manifestInstructionsOutputFormat = manifestInstructionsOutputFormat
+		self.instructionsOutputKind = instructionsOutputKind
 	}
 
-	public init(compiledUnknownIntentHex: String, manifestInstructionsOutputFormat: ManifestInstructionsKind) throws {
+	public init(compiledUnknownIntentHex: String, instructionsOutputKind: ManifestInstructionsKind) throws {
 		try self.init(
 			compiledUnknownIntent: [UInt8](hex: compiledUnknownIntentHex),
-			manifestInstructionsOutputFormat: manifestInstructionsOutputFormat
+			instructionsOutputKind: instructionsOutputKind
 		)
 	}
 }
 
 public extension DecompileUnknownTransactionIntentRequest {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
 		case compiledUnknownIntent = "compiled_unknown_intent"
-		case manifestInstructionsOutputFormat = "manifest_instructions_output_format"
+		case instructionsOutputKind = "instructions_output_kind"
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(compiledUnknownIntent.hex(), forKey: .compiledUnknownIntent)
-		try container.encode(manifestInstructionsOutputFormat, forKey: .manifestInstructionsOutputFormat)
+		try container.encode(instructionsOutputKind, forKey: .instructionsOutputKind)
 	}
 
 	init(from decoder: Decoder) throws {
@@ -39,7 +42,7 @@ public extension DecompileUnknownTransactionIntentRequest {
 
 		try self.init(
 			compiledUnknownIntentHex: container.decode(String.self, forKey: .compiledUnknownIntent),
-			manifestInstructionsOutputFormat: container.decode(ManifestInstructionsKind.self, forKey: .manifestInstructionsOutputFormat)
+			instructionsOutputKind: container.decode(ManifestInstructionsKind.self, forKey: .instructionsOutputKind)
 		)
 	}
 }
@@ -56,39 +59,46 @@ public enum DecompileUnknownTransactionIntentResponse: Sendable, Codable, Hashab
 }
 
 public extension DecompileUnknownTransactionIntentResponse {
-	// MARK: CodingKeys
+	private enum Kind: String, Codable {
+		case transactionIntent = "TransactionIntent"
+		case signedTransactionIntent = "SignedTransactionIntent"
+		case notarizedTransactionIntent = "NotarizedTransactionIntent"
+	}
+
 	private enum CodingKeys: String, CodingKey {
-		case variant
 		case type
-		case field
+		case value
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
-		var container: SingleValueEncodingContainer = encoder.singleValueContainer()
+		var container = encoder.container(keyedBy: CodingKeys.self)
 
 		switch self {
 		case let .transactionIntent(intent):
-			try container.encode(intent)
+			try container.encode(Kind.transactionIntent, forKey: .type)
+			try container.encode(intent, forKey: .value)
 		case let .signedTransactionIntent(intent):
-			try container.encode(intent)
+			try container.encode(Kind.signedTransactionIntent, forKey: .type)
+			try container.encode(intent, forKey: .value)
 		case let .notarizedTransactionIntent(intent):
-			try container.encode(intent)
+			try container.encode(Kind.notarizedTransactionIntent, forKey: .type)
+			try container.encode(intent, forKey: .value)
 		}
 	}
 
 	init(from decoder: Decoder) throws {
-		// Checking for type discriminator
-		let container = try decoder.singleValueContainer()
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let kind = try container.decode(Kind.self, forKey: .type)
 
-		do {
-			self = .transactionIntent(try container.decode(DecompileTransactionIntentResponse.self))
-		} catch {
-			do {
-				self = .signedTransactionIntent(try container.decode(DecompileSignedTransactionIntentResponse.self))
-			} catch {
-				self = .notarizedTransactionIntent(try container.decode(DecompileNotarizedTransactionIntentResponse.self))
-			}
+		switch kind {
+		case .transactionIntent:
+			self = .transactionIntent(try container.decode(TransactionIntent.self, forKey: .value))
+		case .signedTransactionIntent:
+			self = .signedTransactionIntent(try container.decode(SignedTransactionIntent.self, forKey: .value))
+		case .notarizedTransactionIntent:
+			self = .notarizedTransactionIntent(try container.decode(NotarizedTransaction.self, forKey: .value))
 		}
 	}
 }

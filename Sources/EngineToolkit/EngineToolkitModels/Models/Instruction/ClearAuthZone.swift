@@ -7,15 +7,19 @@ public struct ClearAuthZone: InstructionProtocol {
 	public func embed() -> Instruction {
 		.clearAuthZone(self)
 	}
+
+	public init() {}
 }
 
 public extension ClearAuthZone {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
