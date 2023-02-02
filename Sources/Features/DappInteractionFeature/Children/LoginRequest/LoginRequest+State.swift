@@ -6,18 +6,18 @@ public extension LoginRequest {
 		public let dappDefinitionAddress: DappDefinitionAddress
 		public let dappMetadata: DappMetadata
 		public var personas: IdentifiedArrayOf<PersonaRow.State>
+		public var isKnownDapp: Bool
 
 		public init(
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
-//			personas: IdentifiedArrayOf<PersonaRow.State> = []
-			personas: IdentifiedArrayOf<PersonaRow.State> = .init(uniqueElements: [
-				.init(persona: .previewValue0),
-			])
+			personas: IdentifiedArrayOf<PersonaRow.State> = [],
+			isKnownDapp: Bool = false
 		) {
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
 			self.personas = personas
+			self.isKnownDapp = isKnownDapp
 		}
 	}
 }
@@ -26,7 +26,11 @@ public extension LoginRequest {
 public extension LoginRequest.State {
 	static let previewValue: Self = .init(
 		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
-		dappMetadata: .previewValue
+		dappMetadata: .previewValue,
+		personas: .init(uniqueElements: [
+			.init(persona: .previewValue0),
+			.init(persona: .previewValue1),
+		])
 	)
 }
 #endif

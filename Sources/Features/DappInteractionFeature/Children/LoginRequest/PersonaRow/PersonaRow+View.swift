@@ -18,7 +18,7 @@ public extension PersonaRow.View {
 			store,
 			observe: ViewState.init(state:),
 			send: { .view($0) }
-		) { _ in
+		) { viewStore in
 			VStack(alignment: .leading, spacing: .zero) {
 				ZStack {
 					HStack(alignment: .top) {
@@ -29,7 +29,7 @@ public extension PersonaRow.View {
 							.padding(.trailing, .small1)
 
 						VStack(alignment: .leading, spacing: 4) {
-							Text("RadMatt")
+							Text(viewStore.name)
 								.foregroundColor(.app.gray1)
 								.textStyle(.secondaryHeader)
 
@@ -55,16 +55,18 @@ public extension PersonaRow.View {
 				}
 				.padding(.medium2)
 
-				Group {
-					Color.app.gray4
-						.frame(height: 1)
+				/*
+				 Group {
+				 	Color.app.gray4
+				 		.frame(height: 1)
 
-					Text("Your last login was on 23 Jan 2023")
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
-						.padding(.horizontal, .medium2)
-						.padding(.vertical, .small1)
-				}
+				 	Text("Your last login was on 23 Jan 2023")
+				 		.foregroundColor(.app.gray2)
+				 		.textStyle(.body2Regular)
+				 		.padding(.horizontal, .medium2)
+				 		.padding(.vertical, .small1)
+				 }
+				 */
 			}
 			.background(Color.app.gray5)
 			.cornerRadius(.small1)
@@ -75,8 +77,10 @@ public extension PersonaRow.View {
 // MARK: - PersonaRow.View.ViewState
 extension PersonaRow.View {
 	struct ViewState: Equatable {
+		let name: String
+
 		init(state: PersonaRow.State) {
-			// TODO: implement
+			name = state.persona.displayName ?? "Unknown dApp"
 		}
 	}
 }

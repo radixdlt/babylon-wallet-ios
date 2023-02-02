@@ -37,14 +37,13 @@ public extension LoginRequest.View {
 							VStack(spacing: .medium2) {
 								dappImage
 								// TODO: login / new login
-								Text("New Login Request")
+								Text(title(with: viewStore))
 									.foregroundColor(.app.gray1)
 									.textStyle(.sheetTitle)
 
-								// TODO: dappName + message
 								subtitle(
-									dappName: "Collabo.Fi",
-									message: " is requesting you login for the first time with a Persona."
+									dappName: viewStore.dappName,
+									message: subtitleText(with: viewStore)
 								)
 								.textStyle(.secondaryHeader)
 								.multilineTextAlignment(.center)
@@ -64,6 +63,9 @@ public extension LoginRequest.View {
 								),
 								content: { PersonaRow.View(store: $0) }
 							)
+
+							Spacer()
+								.frame(height: .medium1)
 
 							Button(L10n.Personas.createNewPersonaButtonTitle) {
 								viewStore.send(.createNewPersonaButtonTapped)
@@ -90,6 +92,11 @@ public extension LoginRequest.View {
 	}
 }
 
+// MARK: - LoginRequest.View.LoginRequestViewStore
+private extension LoginRequest.View {
+	typealias LoginRequestViewStore = ComposableArchitecture.ViewStore<LoginRequest.View.ViewState, LoginRequest.Action.ViewAction>
+}
+
 // MARK: - Private Computed Properties
 private extension LoginRequest.View {
 	var dappImage: some View {
@@ -97,6 +104,10 @@ private extension LoginRequest.View {
 		Color.app.gray4
 			.frame(.medium)
 			.cornerRadius(.medium3)
+	}
+
+	func title(with viewStore: LoginRequestViewStore) -> String {
+		viewStore.isKnownDapp ? "Login Request" : "New Login Request"
 	}
 
 	func subtitle(dappName: String, message: String) -> some View {
@@ -108,13 +119,26 @@ private extension LoginRequest.View {
 
 		return Text(component1 + component2)
 	}
+
+	func subtitleText(with viewStore: LoginRequestViewStore) -> String {
+		// TODO: localize
+		if viewStore.isKnownDapp {
+			return " is requesting you login with a Persona."
+		} else {
+			return " is requesting you login for the first time with a Persona."
+		}
+	}
 }
 
 // MARK: - LoginRequest.View.ViewState
 extension LoginRequest.View {
 	struct ViewState: Equatable {
+		let dappName: String
+		let isKnownDapp: Bool
+
 		init(state: LoginRequest.State) {
-			// TODO: implement
+			dappName = state.dappMetadata.name
+			isKnownDapp = state.isKnownDapp
 		}
 	}
 }
