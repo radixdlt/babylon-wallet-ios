@@ -24,11 +24,11 @@ public enum FeatureAction<
 	case delegate(DelegateAction)
 }
 
-public typealias ActionOf<F: _FeatureReducer> = FeatureAction<
-	F.ViewAction,
-	F.InternalAction,
-	F.ChildAction,
-	F.DelegateAction
+public typealias ActionOf<Feature: _FeatureReducer> = FeatureAction<
+	Feature.ViewAction,
+	Feature.InternalAction,
+	Feature.ChildAction,
+	Feature.DelegateAction
 >
 
 // MARK: - FeatureReducer
