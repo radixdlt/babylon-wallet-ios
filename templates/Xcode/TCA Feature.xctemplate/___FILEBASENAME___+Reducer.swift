@@ -1,14 +1,13 @@
 import FeaturePrelude
 
 // MARK: - ___VARIABLE_featureName___
-public struct ___VARIABLE_featureName___: Sendable, ReducerProtocol {
+public struct ___VARIABLE_featureName___: Sendable, FeatureReducer {
 	public init() {}
 
-	public var body: some ReducerProtocolOf<Self> {
-		Reduce(core)
-	}
-
-	func core(into state: inout State, action: Action) -> EffectTask<Action> {
-		.none
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .appeared:
+			return .none
+		}
 	}
 }
