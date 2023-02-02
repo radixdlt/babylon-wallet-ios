@@ -70,36 +70,3 @@ public extension ReducerProtocol where Self: FeatureReducer {
 		.none
 	}
 }
-
-// MARK: - MyView
-struct MyView: View {
-	var body: some View {
-		Text("")
-	}
-}
-
-// MARK: - MyFeature
-struct MyFeature: FeatureReducer {
-	typealias View = MyView
-
-	enum ViewAction: Sendable, Equatable {
-		case listSelectorTapped
-		case fungibleTokenList
-		case nonFungibleTokenList
-	}
-
-	struct State: Equatable {
-		var blabla: String
-	}
-
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .listSelectorTapped:
-			return .none
-		case .fungibleTokenList:
-			return .none
-		case .nonFungibleTokenList:
-			return .none
-		}
-	}
-}
