@@ -7,12 +7,12 @@ public extension AssetTransfer {
 		public typealias From = OnNetwork.Account
 
 		// TODO: declare union type for this in SharedModels
-		public enum AssetToTransfer: Sendable, Equatable {
+		public enum AssetToTransfer: Sendable, Hashable {
 			case token(FungibleToken)
 //			case nft(NonFungibleToken)
 		}
 
-		public enum To: Sendable, Equatable {
+		public enum To: Sendable, Hashable {
 //			case account(OnNetwork.Account)
 			case address(AccountAddress)
 

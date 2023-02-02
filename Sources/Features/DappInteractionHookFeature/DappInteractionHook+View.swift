@@ -17,16 +17,17 @@ public extension DappInteractionHook {
 public extension DappInteractionHook.View {
 	var body: some View {
 		ZStack {}
-//			.fullScreenCover(
-//				store: <#T##Store<PresentationState<State>, PresentationAction<State, Action>>#>,
-//				state: <#T##(State) -> DestinationState?#>,
-//				action: <#T##(DestinationAction) -> Action#>,
-//				content: <#T##(Store<DestinationState, DestinationAction>) -> Content#>
-//			)
-//			.fullScreenCover(
-//				store: <#T##Store<PresentationState<State>, PresentationAction<State, Action>>#>,
-//				content: <#T##(Store<State, Action>) -> Content#>
-//			)
+		#if os(iOS)
+			.fullScreenCover(
+				store: store.scope(state: \.$dappInteraction, action: { .child(.dappInteraction($0)) }),
+				content: { DappInteraction.View(store: $0) }
+			)
+		#elseif os(macOS)
+			.sheet(
+				store: store.scope(state: \.$dappInteraction, action: { .child(.dappInteraction($0)) }),
+				content: { DappInteraction.View(store: $0) }
+			)
+		#endif
 			.task {
 				await ViewStore(store.stateless).send(.view(.task)).finish()
 			}

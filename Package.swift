@@ -70,7 +70,7 @@ package.addModules([
 		dependencies: [
 			"TransactionSigningFeature",
 		],
-		tests: .no
+		tests: .yes()
 	),
 	.feature(
 		name: "CreateAccountFeature",
