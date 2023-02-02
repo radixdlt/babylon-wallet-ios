@@ -7,11 +7,12 @@ public struct ImportProfile: Sendable, ReducerProtocol {
 	@Dependency(\.dataReader) var dataReader
 	@Dependency(\.jsonDecoder) var jsonDecoder
 	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.profileClient) var profileClient
 	public init() {}
 }
 
 public extension ImportProfile {
-	func reduce(into state: inout State, action: Action) -> Effect<Action, Never> {
+	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.goBack)):
 			return .run { send in
@@ -35,7 +36,13 @@ public extension ImportProfile {
 				let data = try dataReader.contentsOf(profileURL, options: .uncached)
 				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
 				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
-				await send(.delegate(.importedProfileSnapshot(snapshot)))
+				struct FailedToInjectProfile: Swift.Error {}
+				switch await profileClient.loadProfile() {
+				case let .success(.some(profile)) where snapshot == profile.snaphot():
+					await send(.delegate(.imported))
+				default:
+					throw FailedToInjectProfile()
+				}
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}

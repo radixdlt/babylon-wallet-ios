@@ -8,17 +8,8 @@ public struct CreateAccountConfig: CreateEntityStateConfigProtocol {
 	public var networkID: NetworkID?
 
 	public enum Mode: Sendable, Equatable {
-		case profile
 		case firstAccountOnASecondNetwork
 		case anotherAccount
-	}
-
-	public var isCreatingProfile: Bool {
-		switch mode {
-		case .profile: return true
-		case .firstAccountOnASecondNetwork, .anotherAccount:
-			return false
-		}
 	}
 
 	public init(
@@ -90,9 +81,7 @@ public enum CreateAccountCompletionAction: CreateEntityCompletionActionProtocol 
 }
 
 // MARK: - CreateEntityStateConfigProtocol
-public protocol CreateEntityStateConfigProtocol: Sendable, Equatable {
-	var isCreatingProfile: Bool { get }
-}
+public protocol CreateEntityStateConfigProtocol: Sendable, Equatable {}
 
 // MARK: - CreateEntityCoordinator
 public struct CreateEntityCoordinator<
@@ -125,23 +114,10 @@ public struct CreateEntityCoordinator<
 	private func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case let .child(.step0_nameNewEntity(.delegate(.named(name)))):
-			if state.config.isCreatingProfile {
-				//                state.step = .step2_creationOfEntity(.init(name: name, genesisFactorSource: factorSource, isCreatingProfile: true))
-				return .run { send in
-					await send(.internal(.generateProfile(TaskResult {
-						try await profileClient.createNewProfile(
-							CreateNewProfileRequest(
-								nameOfFirstAccount: name
-							)
-						)
-					})))
-				}
-			} else {
-				return .run { send in
-					await send(.internal(.loadFactorSourcesResult(TaskResult {
-						try await profileClient.getFactorSources()
-					}, beforeCreatingEntityWithName: name)))
-				}
+			return .run { send in
+				await send(.internal(.loadFactorSourcesResult(TaskResult {
+					try await profileClient.getFactorSources()
+				}, beforeCreatingEntityWithName: name)))
 			}
 
 		case let .internal(.loadFactorSourcesResult(.failure(error), _)):

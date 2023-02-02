@@ -62,9 +62,7 @@ public extension ProfileClient {
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
 		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.nebunet },
 		setNetworkAndGateway: { _ in },
-		createNewProfile: { _ in
-			OnNetwork.Account.previewValue0
-		},
+		createNewProfile: { FactorSource.previewValue },
 		loadProfile: { .success(nil) },
 		extractProfileSnapshot: { throw NoopError() },
 		deleteProfileAndFactorSources: {},

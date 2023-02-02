@@ -37,6 +37,6 @@ public extension ImportProfile.Action {
 public extension ImportProfile.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case goBack
-		case importedProfileSnapshot(ProfileSnapshot)
+		case imported
 	}
 }

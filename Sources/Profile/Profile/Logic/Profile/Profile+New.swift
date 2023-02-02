@@ -23,28 +23,31 @@ struct EncodeAddressRequest {
 }
 
 public extension Profile {
+	enum AccountCreationStrategy: Sendable, Equatable {
+		case createAccountOnDefaultNetwork(named: String)
+		case noAccountThusNoOnNetwork
+	}
+
 	static func new(
 		networkAndGateway: AppPreferences.NetworkAndGateway,
 		mnemonic: Mnemonic,
 		bip39Passphrase: String = "",
-		firstAccountDisplayName: String? = "Main"
+		accountCreationStrategy: AccountCreationStrategy = .noAccountThusNoOnNetwork
 	) async throws -> Self {
-		let curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource = try Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(
+		let factorSource = try Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(
 			mnemonic: mnemonic,
 			bip39Passphrase: bip39Passphrase
 		)
 
-		return try await Self.new(
-			networkAndGateway: networkAndGateway,
-			firstAccountDisplayName: firstAccountDisplayName,
-			curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource: curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource,
-			createFactorInstance: { (createFactorInstanceRequest: CreateFactorInstanceRequest) async throws -> AnyCreateFactorInstanceForResponse? in
+		switch accountCreationStrategy {
+		case let .createAccountOnDefaultNetwork(accountName):
+			let createFactorInstance: CreateFactorInstanceForRequest = { (createFactorInstanceRequest: CreateFactorInstanceRequest) async throws -> AnyCreateFactorInstanceForResponse? in
 				switch createFactorInstanceRequest {
 				case let .fromNonHardwareHierarchicalDeterministicMnemonicFactorSource(nonHWHDRequest):
-					guard curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource.reference == nonHWHDRequest.reference else {
+					guard factorSource.reference == nonHWHDRequest.reference else {
 						return nil
 					}
-					let createFactorInstanceForResponse = try await curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource.createInstance(
+					let createFactorInstanceForResponse = try await factorSource.createInstance(
 						input: .init(
 							mnemonic: mnemonic,
 							bip39Passphrase: bip39Passphrase,
@@ -55,39 +58,39 @@ public extension Profile {
 					return try createFactorInstanceForResponse.eraseToAny()
 				}
 			}
-		)
+
+			return try await Self.new(
+				networkAndGateway: networkAndGateway,
+				factorSource: factorSource, accountCreationFromFactorInstanceStrategy: .createAccountOnDefaultNetwork(
+					named: accountName,
+					createFactorInstance: createFactorInstance
+				)
+			)
+		case .noAccountThusNoOnNetwork:
+			return try await Self.new(
+				networkAndGateway: networkAndGateway,
+				factorSource: factorSource, accountCreationFromFactorInstanceStrategy: .noAccountThusNoOnNetwork
+			)
+		}
+	}
+
+	enum AccountCreationFromFactorInstanceStrategy: Sendable {
+		case createAccountOnDefaultNetwork(named: String, createFactorInstance: CreateFactorInstanceForRequest)
+		case noAccountThusNoOnNetwork
 	}
 
 	static func new(
 		networkAndGateway: AppPreferences.NetworkAndGateway,
-		firstAccountDisplayName: String?,
-		curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource,
-		createFactorInstance: @escaping CreateFactorInstanceForRequest
+		factorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource,
+		accountCreationFromFactorInstanceStrategy: AccountCreationFromFactorInstanceStrategy
 	) async throws -> Self {
 		let network = networkAndGateway.network
 		let networkID = network.id
 		let nonEmptyFactorSource = NonEmpty(
-			rawValue: IdentifiedArrayOf(uniqueElements:
-				[curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource]
-			)
+			rawValue: IdentifiedArrayOf(uniqueElements: [factorSource])
 		)!
 
 		let factorSources = FactorSources(curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources: nonEmptyFactorSource)
-
-		let account0 = try await Self.createNewVirtualAccount(
-			factorSources: factorSources,
-			accountIndex: 0,
-			networkID: networkID,
-			displayName: firstAccountDisplayName,
-			createFactorInstance: createFactorInstance
-		)
-
-		let onNetwork = OnNetwork(
-			networkID: networkID,
-			accounts: .init(rawValue: .init(uniqueElements: [account0]))!,
-			personas: [],
-			connectedDapps: []
-		)
 
 		let appPreferences = AppPreferences(
 			display: .default,
@@ -95,11 +98,35 @@ public extension Profile {
 			networkAndGateway: networkAndGateway
 		)
 
-		return Self(
-			factorSources: factorSources,
-			appPreferences: appPreferences,
-			perNetwork: .init(onNetwork: onNetwork)
-		)
+		switch accountCreationFromFactorInstanceStrategy {
+		case .noAccountThusNoOnNetwork:
+			return Self(
+				factorSources: factorSources,
+				appPreferences: appPreferences,
+				perNetwork: .init(dictionary: .init())
+			)
+		case let .createAccountOnDefaultNetwork(accountName, createFactorInstance):
+			let account0 = try await Self.createNewVirtualAccount(
+				factorSources: factorSources,
+				accountIndex: 0,
+				networkID: networkID,
+				displayName: accountName,
+				createFactorInstance: createFactorInstance
+			)
+
+			let onNetwork = OnNetwork(
+				networkID: networkID,
+				accounts: .init(rawValue: .init(uniqueElements: [account0]))!,
+				personas: [],
+				connectedDapps: []
+			)
+
+			return Self(
+				factorSources: factorSources,
+				appPreferences: appPreferences,
+				perNetwork: .init(onNetwork: onNetwork)
+			)
+		}
 	}
 }
 

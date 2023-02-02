@@ -68,17 +68,16 @@ public extension ProfileClient {
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
-			createNewProfile: { request in
-
+			createNewProfile: {
 				@Dependency(\.mnemonicClient.generate) var generateMnemonic
 
 				let mnemonic = try generateMnemonic(BIP39.WordCount.twentyFour, BIP39.Language.english)
 
 				let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
+
 				let newProfile = try await Profile.new(
 					networkAndGateway: networkAndGateway,
-					mnemonic: mnemonic,
-					firstAccountDisplayName: request.nameOfFirstAccount
+					mnemonic: mnemonic
 				)
 
 				let factorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
@@ -91,9 +90,7 @@ public extension ProfileClient {
 
 				await profileHolder.injectProfile(newProfile)
 
-				let accountOnCurrentNetwork = try newProfile.onNetwork(id: networkAndGateway.network.id).accounts.first
-
-				return accountOnCurrentNetwork
+				return newProfile.factorSources.factorSources.first
 			},
 			loadProfile: {
 				@Dependency(\.jsonDecoder) var jsonDecoder

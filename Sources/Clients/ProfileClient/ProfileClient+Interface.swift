@@ -109,8 +109,7 @@ public extension ProfileClient {
 
 	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
-	// Returns the first account on the current Network for this new Profile. Which is what the `CreateAccount` feature uses (used during Onboarding).
-	typealias CreateNewProfile = @Sendable (CreateNewProfileRequest) async throws -> OnNetwork.Account
+	typealias CreateNewProfile = @Sendable () async throws -> FactorSource
 
 	typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 

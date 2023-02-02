@@ -24,6 +24,11 @@ public struct Onboarding: Sendable, ReducerProtocol {
 
 	private func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
+		case .child(.createProfile(.delegate(.criticalFailureCouldNotCreateProfile))):
+			fatalError("Can wo do anything better than crash..?")
+		case .child(.createProfile(.delegate(.completedWithProfile))):
+			state = .createAccountCoordinator(.init())
+
 		case .child(.createAccountCoordinator(.delegate(.completed))):
 			return .run { send in
 				await send(.delegate(.completed))

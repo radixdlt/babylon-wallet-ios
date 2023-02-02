@@ -4,6 +4,7 @@ import FeaturePrelude
 public extension CreateProfileCoordinator {
 	enum Action: Sendable, Equatable {
 		case `internal`(InternalAction)
+		case child(ChildAction)
 		case delegate(DelegateAction)
 	}
 }
@@ -27,6 +28,14 @@ public extension CreateProfileCoordinator.Action {
 	}
 }
 
+// MARK: - CreateProfileCoordinator.Action.ChildAction
+public extension CreateProfileCoordinator.Action {
+	enum ChildAction: Sendable, Equatable {
+		case importProfile(ImportProfile.Action)
+		case newProfile(NewProfile.Action)
+	}
+}
+
 // MARK: - CreateProfileCoordinator.Action.SystemAction
 public extension CreateProfileCoordinator.Action {
 	enum SystemAction: Sendable, Equatable {}
@@ -34,5 +43,8 @@ public extension CreateProfileCoordinator.Action {
 
 // MARK: - CreateProfileCoordinator.Action.DelegateAction
 public extension CreateProfileCoordinator.Action {
-	enum DelegateAction: Sendable, Equatable {}
+	enum DelegateAction: Sendable, Equatable {
+		case completedWithProfile
+		case criticalFailureCouldNotCreateProfile
+	}
 }

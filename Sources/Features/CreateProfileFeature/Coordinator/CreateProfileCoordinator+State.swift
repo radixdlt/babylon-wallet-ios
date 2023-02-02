@@ -2,8 +2,12 @@ import FeaturePrelude
 
 // MARK: - CreateProfileCoordinator.State
 public extension CreateProfileCoordinator {
-	struct State: Sendable, Equatable {
-		public init() {}
+	enum State: Sendable, Equatable {
+		case importProfile(ImportProfile.State)
+		case newProfile(NewProfile.State)
+		public init() {
+			self = .newProfile(.init())
+		}
 	}
 }
 

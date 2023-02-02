@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - ImportProfile.State
 public extension ImportProfile {
-	struct State: Equatable {
+	struct State: Equatable & Sendable {
 		public var isDisplayingFileImporter = false
 
 		public init(

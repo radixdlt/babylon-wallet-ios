@@ -14,25 +14,17 @@ public extension CreateProfileCoordinator {
 
 public extension CreateProfileCoordinator.View {
 	var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			// TODO: implement
-			Text("Implement: CreateProfileCoordinator")
-				.background(Color.yellow)
-				.foregroundColor(.red)
-				.onAppear { viewStore.send(.appeared) }
-		}
-	}
-}
-
-// MARK: - CreateProfileCoordinator.View.ViewState
-extension CreateProfileCoordinator.View {
-	struct ViewState: Equatable {
-		init(state: CreateProfileCoordinator.State) {
-			// TODO: implement
+		SwitchStore(store) {
+			CaseLet(
+				state: /CreateProfileCoordinator.State.importProfile,
+				action: { CreateProfileCoordinator.Action.child(.importProfile($0)) },
+				then: { ImportProfile.View(store: $0) }
+			)
+			CaseLet(
+				state: /CreateProfileCoordinator.State.newProfile,
+				action: { CreateProfileCoordinator.Action.child(.newProfile($0)) },
+				then: { NewProfile.View(store: $0) }
+			)
 		}
 	}
 }
