@@ -4,9 +4,17 @@ import Profile
 // MARK: - CreateEntityCoordinator.Action
 public extension CreateEntityCoordinator {
 	enum Action: Sendable, Equatable {
+		case view(ViewAction)
 		case child(ChildAction)
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
+	}
+}
+
+// MARK: - CreateEntityCoordinator.Action.ViewAction
+public extension CreateEntityCoordinator.Action {
+	enum ViewAction: Sendable, Equatable {
+		case dismiss
 	}
 }
 

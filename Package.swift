@@ -202,7 +202,9 @@ package.addModules([
 	),
 	.feature(
 		name: "PersonasFeature",
-		dependencies: [],
+		dependencies: [
+			"CreateEntityFeature",
+		],
 		tests: .yes()
 	),
 	.feature(

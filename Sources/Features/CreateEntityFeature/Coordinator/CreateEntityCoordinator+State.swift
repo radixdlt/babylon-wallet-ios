@@ -25,10 +25,11 @@ public extension CreateEntityCoordinator {
 // MARK: - CreateEntityNavigationButtonCTA
 public enum CreateEntityNavigationButtonCTA: Sendable, Equatable {
 	case goHome
+	case goBackToPersonaList
 	case goBackToChooseEntities
 
-	public static let goBackToChooseAccounts: Self = .goBackToChooseAccounts
-	public static let goBackToChoosePersonas: Self = .goBackToChooseAccounts
+	public static let goBackToChooseAccounts: Self = .goBackToChooseEntities
+	public static let goBackToChoosePersonas: Self = .goBackToChooseEntities
 }
 
 // MARK: - CreateEntityConfig

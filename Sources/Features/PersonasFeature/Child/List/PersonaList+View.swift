@@ -1,18 +1,18 @@
 import FeaturePrelude
 
-// MARK: - Personas.View
-public extension Personas {
+// MARK: - PersonaList.View
+public extension PersonaList {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<Personas>
+		private let store: StoreOf<PersonaList>
 
-		public init(store: StoreOf<Personas>) {
+		public init(store: StoreOf<PersonaList>) {
 			self.store = store
 		}
 	}
 }
 
-public extension Personas.View {
+public extension PersonaList.View {
 	var body: some View {
 		WithViewStore(
 			store,
@@ -22,7 +22,7 @@ public extension Personas.View {
 			ForceFullScreen {
 				VStack(spacing: .zero) {
 					NavigationBar(
-						titleText: L10n.Personas.title,
+						titleText: L10n.PersonaList.title,
 						leadingItem: BackButton {
 							viewStore.send(.dismissButtonTapped)
 						}
@@ -34,7 +34,7 @@ public extension Personas.View {
 
 					ScrollView {
 						HStack {
-							Text(L10n.Personas.subtitle)
+							Text(L10n.PersonaList.subtitle)
 								.foregroundColor(.app.gray2)
 								.textStyle(.body1HighImportance)
 								.padding([.horizontal, .top], .medium3)
@@ -60,7 +60,7 @@ public extension Personas.View {
 							)
 						}
 
-						Button(L10n.Personas.createNewPersonaButtonTitle) {
+						Button(L10n.PersonaList.createNewPersonaButtonTitle) {
 							viewStore.send(.createNewPersonaButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(
@@ -75,10 +75,10 @@ public extension Personas.View {
 	}
 }
 
-// MARK: - Personas.View.ViewState
-extension Personas.View {
+// MARK: - PersonaList.View.ViewState
+extension PersonaList.View {
 	struct ViewState: Equatable {
-		init(state: Personas.State) {
+		init(state: PersonaList.State) {
 			// TODO: implement
 		}
 	}
@@ -90,10 +90,10 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - Personas_Preview
 struct Personas_Preview: PreviewProvider {
 	static var previews: some View {
-		Personas.View(
+		PersonaList.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: Personas()
+				reducer: PersonaList()
 			)
 		)
 	}

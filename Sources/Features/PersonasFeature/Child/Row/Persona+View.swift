@@ -20,7 +20,7 @@ public extension Persona.View {
 			send: { .view($0) }
 		) { viewStore in
 			// TODO: implement
-			Text("Implement: Persona")
+			Text(viewStore.displayName)
 				.background(Color.yellow)
 				.foregroundColor(.red)
 				.onAppear { viewStore.send(.appeared) }
@@ -31,8 +31,10 @@ public extension Persona.View {
 // MARK: - Persona.View.ViewState
 extension Persona.View {
 	struct ViewState: Equatable {
+		public let displayName: String
 		init(state: Persona.State) {
 			// TODO: implement
+			displayName = state.persona.displayName ?? "NO NAME" // FIXME: change to required propery?
 		}
 	}
 }

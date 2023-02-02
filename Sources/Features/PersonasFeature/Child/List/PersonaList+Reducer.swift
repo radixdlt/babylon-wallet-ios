@@ -1,11 +1,11 @@
 import FeaturePrelude
 
-// MARK: - Personas
-public struct Personas: Sendable, ReducerProtocol {
+// MARK: - PersonaList
+public struct PersonaList: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension Personas {
+public extension PersonaList {
 	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.dismissButtonTapped)):
@@ -14,8 +14,9 @@ public extension Personas {
 			}
 
 		case .internal(.view(.createNewPersonaButtonTapped)):
-			// TODO: implement
-			return .none
+			return .run { send in
+				await send(.delegate(.createNewPersona))
+			}
 
 		case .delegate:
 			return .none

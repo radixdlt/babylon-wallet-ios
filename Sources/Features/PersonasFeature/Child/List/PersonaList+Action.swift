@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - Personas.Action
-public extension Personas {
+// MARK: - PersonaList.Action
+public extension PersonaList {
 	enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		case `internal`(InternalAction)
@@ -9,12 +9,12 @@ public extension Personas {
 	}
 }
 
-public extension Personas.Action {
+public extension PersonaList.Action {
 	static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 }
 
-// MARK: - Personas.Action.ChildAction
-public extension Personas.Action {
+// MARK: - PersonaList.Action.ChildAction
+public extension PersonaList.Action {
 	enum ChildAction: Sendable, Equatable {
 		case persona(
 			id: OnNetwork.Persona.ID,
@@ -23,30 +23,31 @@ public extension Personas.Action {
 	}
 }
 
-// MARK: - Personas.Action.ViewAction
-public extension Personas.Action {
+// MARK: - PersonaList.Action.ViewAction
+public extension PersonaList.Action {
 	enum ViewAction: Sendable, Equatable {
 		case dismissButtonTapped
 		case createNewPersonaButtonTapped
 	}
 }
 
-// MARK: - Personas.Action.InternalAction
-public extension Personas.Action {
+// MARK: - PersonaList.Action.InternalAction
+public extension PersonaList.Action {
 	enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
-// MARK: - Personas.Action.SystemAction
-public extension Personas.Action {
+// MARK: - PersonaList.Action.SystemAction
+public extension PersonaList.Action {
 	enum SystemAction: Sendable, Equatable {}
 }
 
-// MARK: - Personas.Action.DelegateAction
-public extension Personas.Action {
+// MARK: - PersonaList.Action.DelegateAction
+public extension PersonaList.Action {
 	enum DelegateAction: Sendable, Equatable {
+		case createNewPersona
 		case dismiss
 	}
 }

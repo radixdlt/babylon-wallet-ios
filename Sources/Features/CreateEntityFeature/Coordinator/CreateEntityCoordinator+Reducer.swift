@@ -36,6 +36,11 @@ public struct CreateEntityCoordinator<
 
 	private func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
+		case .view(.dismiss):
+			precondition(state.config.canBeDismissed)
+			return .run { send in
+				await send(.delegate(.dismissed))
+			}
 		case let .child(.step0_nameNewEntity(.delegate(.named(name)))):
 			return .run { send in
 				await send(.internal(.loadFactorSourcesResult(TaskResult {

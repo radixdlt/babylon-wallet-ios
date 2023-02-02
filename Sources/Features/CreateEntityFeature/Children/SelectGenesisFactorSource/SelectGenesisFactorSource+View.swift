@@ -20,6 +20,7 @@ public extension SelectGenesisFactorSource.View {
 			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
+				// FIXME: appStore submission: implement this screen with a picker
 				VStack {
 					Spacer()
 					Button("Confirm OnDevice factor source") {
