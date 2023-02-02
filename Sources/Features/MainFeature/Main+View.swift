@@ -1,5 +1,5 @@
+import DappInteractionHookFeature
 import FeaturePrelude
-import HandleDappRequests
 import HomeFeature
 import SettingsFeature
 
@@ -42,7 +42,9 @@ public extension Main.View {
 					action: { .child(.handleDappRequest($0)) }
 				)
 			)
-			.zIndex(100)
+			// TODO: verify these
+//			.hidden()
+//			.accessibility(hidden: true)
 		}
 	}
 }

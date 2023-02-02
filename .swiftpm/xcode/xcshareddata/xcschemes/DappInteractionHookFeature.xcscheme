@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "HandleDappRequests"
-               BuildableName = "HandleDappRequests"
-               BlueprintName = "HandleDappRequests"
+               BlueprintIdentifier = "DappInteractionHookFeature"
+               BuildableName = "DappInteractionHookFeature"
+               BlueprintName = "DappInteractionHookFeature"
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "HandleDappRequestsTests"
-               BuildableName = "HandleDappRequestsTests"
-               BlueprintName = "HandleDappRequestsTests"
+               BlueprintIdentifier = "DappInteractionHookFeatureTests"
+               BuildableName = "DappInteractionHookFeatureTests"
+               BlueprintName = "DappInteractionHookFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -60,9 +60,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "HandleDappRequests"
-            BuildableName = "HandleDappRequests"
-            BlueprintName = "HandleDappRequests"
+            BlueprintIdentifier = "DappInteractionHookFeature"
+            BuildableName = "DappInteractionHookFeature"
+            BlueprintName = "DappInteractionHookFeature"
             ReferencedContainer = "container:">
          </BuildableReference>
       </MacroExpansion>

@@ -38,12 +38,12 @@ public struct HandleDappRequests: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
-			.ifLet(\.chooseAccounts, action: /Action.child .. ChildAction.chooseAccounts) {
-				ChooseAccounts()
-			}
-			.ifLet(\.transactionSigning, action: /Action.child .. ChildAction.transactionSigning) {
-				TransactionSigning()
-			}
+//			.ifLet(\.chooseAccounts, action: /Action.child .. ChildAction.chooseAccounts) {
+//				ChooseAccounts()
+//			}
+//			.ifLet(\.transactionSigning, action: /Action.child .. ChildAction.transactionSigning) {
+//				TransactionSigning()
+//			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -91,10 +91,10 @@ public struct HandleDappRequests: Sendable, FeatureReducer {
 		case let .internal(.receivedRequestIsValidHandleIt(validRequestFromP2P)):
 			state.unfinishedRequestsFromClient.queue(requestFromClient: validRequestFromP2P)
 
-			guard state.currentRequest == nil else {
-				// already handling a requests
-				return .none
-			}
+//			guard state.currentRequest == nil else {
+//				// already handling a requests
+//				return .none
+//			}
 			guard let itemToHandle = state.unfinishedRequestsFromClient.next() else {
 				// We just queued a request, did it contain no RequestItems at all? This is undefined behavior. Should we return an empty response here?
 				return .none
@@ -104,11 +104,11 @@ public struct HandleDappRequests: Sendable, FeatureReducer {
 			}
 
 		case let .internal(.presentViewForP2PRequest(requestItemToHandle)):
-			state.currentRequest = .init(requestItemToHandle: requestItemToHandle)
+//			state.currentRequest = .init(requestItemToHandle: requestItemToHandle)
 			return .none
 
 		case let .child(.chooseAccounts(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
-			state.currentRequest = nil
+//			state.currentRequest = nil
 
 			let simpleInfoForAccounts: [P2P.ToDapp.WalletAccount] = selectedAccounts.map {
 				.init(account: $0)
@@ -164,7 +164,7 @@ public struct HandleDappRequests: Sendable, FeatureReducer {
 			}
 
 		case let .child(.transactionSigning(.delegate(.signedTXAndSubmittedToGateway(txID, request?)))):
-			state.currentRequest = nil
+//			state.currentRequest = nil
 			let responseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem.send(
 				.init(txID: txID)
 			)
@@ -265,7 +265,7 @@ public struct HandleDappRequests: Sendable, FeatureReducer {
 		connectionID: P2PClient.ID,
 		failure: P2P.ToDapp.WalletInteractionFailureResponse
 	) -> EffectTask<Action> {
-		state.currentRequest = nil
+//		state.currentRequest = nil
 		state.unfinishedRequestsFromClient.failed(interactionId: failure.interactionId)
 
 		let response = P2P.ResponseToClientByID(

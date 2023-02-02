@@ -92,6 +92,15 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "DappInteractionHookFeature",
+		dependencies: [
+			"DappInteractionFeature",
+			"P2PConnectivityClient",
+			"TransactionSigningFeature",
+		],
+		tests: .yes()
+	),
+	.feature(
 		name: "FungibleTokenDetailsFeature",
 		dependencies: [],
 		tests: .no
@@ -100,15 +109,6 @@ package.addModules([
 		name: "FungibleTokenListFeature",
 		dependencies: [
 			"FungibleTokenDetailsFeature",
-		],
-		tests: .yes()
-	),
-	.feature(
-		name: "HandleDappRequests",
-		dependencies: [
-			"DappInteractionFeature",
-			"P2PConnectivityClient",
-			"TransactionSigningFeature",
 		],
 		tests: .yes()
 	),
@@ -146,7 +146,7 @@ package.addModules([
 		dependencies: [
 			"AppSettings",
 			"AccountPortfolio",
-			"HandleDappRequests",
+			"DappInteractionHookFeature",
 			"HomeFeature",
 			"SettingsFeature",
 		],

@@ -1,5 +1,5 @@
+import DappInteractionHookFeature
 import FeaturePrelude
-import HandleDappRequests
 import HomeFeature
 import ProfileClient
 import SettingsFeature

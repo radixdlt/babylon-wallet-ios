@@ -1,4 +1,4 @@
-import HandleDappRequests
+import DappInteractionHookFeature
 import HomeFeature
 import SettingsFeature
 
