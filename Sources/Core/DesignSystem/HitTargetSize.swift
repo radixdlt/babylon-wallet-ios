@@ -8,6 +8,9 @@ public enum HitTargetSize: CGFloat {
 	/// 44
 	case small = 44
 
+	/// 64
+	case medium = 64
+
 	public var frame: CGSize {
 		.init(width: rawValue, height: rawValue)
 	}

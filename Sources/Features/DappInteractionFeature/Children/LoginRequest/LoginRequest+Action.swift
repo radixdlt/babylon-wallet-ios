@@ -15,7 +15,8 @@ public extension LoginRequest.Action {
 // MARK: - LoginRequest.Action.ViewAction
 public extension LoginRequest.Action {
 	enum ViewAction: Sendable, Equatable {
-		case appeared
+		case dismissButtonTapped
+		case createNewPersonaButtonTapped
 	}
 }
 

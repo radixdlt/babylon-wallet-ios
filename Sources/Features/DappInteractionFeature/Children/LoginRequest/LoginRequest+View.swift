@@ -19,12 +19,85 @@ public extension LoginRequest.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			// TODO: implement
-			Text("Implement: LoginRequest")
-				.background(Color.yellow)
-				.foregroundColor(.red)
-				.onAppear { viewStore.send(.appeared) }
+			ForceFullScreen {
+				VStack(spacing: .zero) {
+					NavigationBar(
+						leadingItem: CloseButton {
+							viewStore.send(.dismissButtonTapped)
+						}
+					)
+					.foregroundColor(.app.gray1)
+					.padding([.horizontal, .top], .medium3)
+
+					Spacer()
+						.frame(height: .small2)
+
+					ScrollView {
+						VStack {
+							VStack(spacing: .medium2) {
+								dappImage
+								// TODO: login / new login
+								Text("New Login Request")
+									.foregroundColor(.app.gray1)
+									.textStyle(.sheetTitle)
+
+								subtitle(
+									dappName: "Collabo.Fi",
+									message: " is requesting you login for the first time with a Persona."
+								)
+								.textStyle(.secondaryHeader)
+								.multilineTextAlignment(.center)
+							}
+							.padding(.bottom, .medium1)
+
+							Text("Choose a Persona")
+								.foregroundColor(.app.gray1)
+								.textStyle(.body1Header)
+								.padding(.bottom, .medium2)
+
+							// TODO: add persona row
+
+							Button(L10n.Personas.createNewPersonaButtonTitle) {
+								viewStore.send(.createNewPersonaButtonTapped)
+							}
+							.buttonStyle(.secondaryRectangular(
+								shouldExpand: false
+							))
+
+							Spacer()
+								.frame(height: .large1 * 1.5)
+						}
+						.padding(.horizontal, .medium1)
+					}
+
+					ConfirmationFooter(
+						title: "Continue",
+						isEnabled: true,
+						action: {}
+					)
+				}
+			}
 		}
+	}
+}
+
+// MARK: - Private Computed Properties
+private extension LoginRequest.View {
+	var dappImage: some View {
+		// TODO: use placeholder only when image is unavailable
+		Color.app.gray4
+			.frame(.medium)
+			.cornerRadius(.medium3)
+	}
+
+	func subtitle(dappName: String, message: String) -> some View {
+		var component1 = AttributedString(dappName)
+		component1.foregroundColor = .app.gray1
+
+		var component2 = AttributedString(message)
+		component2.foregroundColor = .app.gray2
+
+		return Text(component1 + component2)
 	}
 }
 
