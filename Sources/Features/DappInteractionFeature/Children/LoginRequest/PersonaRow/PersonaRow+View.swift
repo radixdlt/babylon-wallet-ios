@@ -18,12 +18,36 @@ public extension PersonaRow.View {
 			store,
 			observe: ViewState.init(state:),
 			send: { .view($0) }
-		) { viewStore in
-			// TODO: implement
-			Text("Implement: PersonaRow")
-				.background(Color.yellow)
-				.foregroundColor(.red)
-				.onAppear { viewStore.send(.appeared) }
+		) { _ in
+			HStack(alignment: .top) {
+				Circle()
+					.strokeBorder(Color.app.gray3, lineWidth: 1)
+					.background(Circle().fill(Color.app.gray4))
+					.frame(.small)
+					.padding(.trailing, .small1)
+
+				VStack(alignment: .leading, spacing: 4) {
+					Text("RadMatt")
+						.foregroundColor(.app.gray1)
+						.textStyle(.secondaryHeader)
+
+					Text("SHaring")
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Header)
+
+					Group {
+						Text("3 pieces of personal data")
+						Text("4 accounts")
+					}
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2Regular)
+				}
+
+				Spacer()
+			}
+			.padding(.medium2)
+			.background(Color.app.gray5)
+			.cornerRadius(.small1)
 		}
 	}
 }
