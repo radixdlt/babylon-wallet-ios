@@ -108,25 +108,29 @@ public enum L10n {
       public static func explanationExactNumberOfAccounts(_ p1: Int) -> String {
         return L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactNumberOfAccounts", p1, fallback: "#%d Accounts")
       }
-      /// Choose the account(s) you want %@ to know about.
-      public static func subtitle(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle", String(describing: p1), fallback: "Choose the account(s) you want %@ to know about.")
-      }
-      /// Choose Accounts
-      public static let title = L10n.tr("Localizable", "dApp.chooseAccounts.title", fallback: "Choose Accounts")
       /// Unnamed Account
       public static let unnamedAccount = L10n.tr("Localizable", "dApp.chooseAccounts.unnamedAccount", fallback: "Unnamed Account")
     }
     public enum ConnectionRequest {
       /// Continue
       public static let continueButtonTitle = L10n.tr("Localizable", "dApp.connectionRequest.continueButtonTitle", fallback: "Continue")
-      /// For this dApp to function, it needs the following:
-      public static let subtitle = L10n.tr("Localizable", "dApp.connectionRequest.subtitle", fallback: "For this dApp to function, it needs the following:")
-      /// dApp Connection Request
-      public static let title = L10n.tr("Localizable", "dApp.connectionRequest.title", fallback: "dApp Connection Request")
-      /// %@ wants to connect to your wallet
-      public static func wantsToConnect(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dApp.connectionRequest.wantsToConnect", String(describing: p1), fallback: "%@ wants to connect to your wallet")
+    }
+    public enum LoginRequest {
+      /// Choose a Persona
+      public static let chooseAPersonaTitle = L10n.tr("Localizable", "dApp.loginRequest.chooseAPersonaTitle", fallback: "Choose a Persona")
+      /// Continue
+      public static let continueButtonTitle = L10n.tr("Localizable", "dApp.loginRequest.continueButtonTitle", fallback: "Continue")
+      public enum Subtitle {
+        ///  is requesting you login with a Persona.
+        public static let knownDapp = L10n.tr("Localizable", "dApp.loginRequest.subtitle.knownDapp", fallback: " is requesting you login with a Persona.")
+        ///  is requesting you login for the first time with a Persona.
+        public static let newDapp = L10n.tr("Localizable", "dApp.loginRequest.subtitle.newDapp", fallback: " is requesting you login for the first time with a Persona.")
+      }
+      public enum Title {
+        /// Login Request
+        public static let knownDapp = L10n.tr("Localizable", "dApp.loginRequest.title.knownDapp", fallback: "Login Request")
+        /// New Login Request
+        public static let newDapp = L10n.tr("Localizable", "dApp.loginRequest.title.newDapp", fallback: "New Login Request")
       }
     }
     public enum Request {

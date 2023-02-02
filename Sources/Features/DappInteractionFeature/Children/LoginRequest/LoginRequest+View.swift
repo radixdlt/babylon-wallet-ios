@@ -36,8 +36,8 @@ public extension LoginRequest.View {
 						VStack {
 							VStack(spacing: .medium2) {
 								dappImage
-								// TODO: login / new login
-								Text(title(with: viewStore))
+
+								Text(titleText(with: viewStore))
 									.foregroundColor(.app.gray1)
 									.textStyle(.sheetTitle)
 
@@ -50,8 +50,7 @@ public extension LoginRequest.View {
 							}
 							.padding(.bottom, .medium1)
 
-							// TODO: localize
-							Text("Choose a Persona")
+							Text(L10n.DApp.LoginRequest.chooseAPersonaTitle)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Header)
 								.padding(.bottom, .medium2)
@@ -80,9 +79,8 @@ public extension LoginRequest.View {
 						.padding(.horizontal, .medium1)
 					}
 
-					// TODO: localize
 					ConfirmationFooter(
-						title: "Continue",
+						title: L10n.DApp.LoginRequest.continueButtonTitle,
 						isEnabled: true,
 						action: {}
 					)
@@ -100,14 +98,16 @@ private extension LoginRequest.View {
 // MARK: - Private Computed Properties
 private extension LoginRequest.View {
 	var dappImage: some View {
-		// TODO: use placeholder only when image is unavailable
+		// NOTE: using placeholder until API is available
 		Color.app.gray4
 			.frame(.medium)
 			.cornerRadius(.medium3)
 	}
 
-	func title(with viewStore: LoginRequestViewStore) -> String {
-		viewStore.isKnownDapp ? "Login Request" : "New Login Request"
+	func titleText(with viewStore: LoginRequestViewStore) -> String {
+		viewStore.isKnownDapp ?
+			L10n.DApp.LoginRequest.Title.knownDapp :
+			L10n.DApp.LoginRequest.Title.newDapp
 	}
 
 	func subtitle(dappName: String, message: String) -> some View {
@@ -121,12 +121,9 @@ private extension LoginRequest.View {
 	}
 
 	func subtitleText(with viewStore: LoginRequestViewStore) -> String {
-		// TODO: localize
-		if viewStore.isKnownDapp {
-			return " is requesting you login with a Persona."
-		} else {
-			return " is requesting you login for the first time with a Persona."
-		}
+		viewStore.isKnownDapp ?
+			L10n.DApp.LoginRequest.Subtitle.knownDapp :
+			L10n.DApp.LoginRequest.Subtitle.newDapp
 	}
 }
 
