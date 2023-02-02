@@ -42,13 +42,11 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 				return .none
 
 			case .internal(.view(.createAccountButtonTapped)):
-				state.createAccountCoordinator = .init(
-					step: .step0_nameNewEntity(.init(isFirst: false)),
-					config: .init(
-						create: .anotherAccount
-					),
-					completionDestination: .home
-				)
+				state.createAccountCoordinator = .init(config: .init(
+					isFirstEntity: false,
+					canBeDismissed: true,
+					navigationButtonCTA: .goBackToChooseAccounts
+				))
 				return .none
 
 			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child

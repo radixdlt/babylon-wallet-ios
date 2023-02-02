@@ -1,4 +1,5 @@
 import FeaturePrelude
+import Profile
 
 // MARK: - CreateEntityCoordinator.Action
 public extension CreateEntityCoordinator {
@@ -8,8 +9,6 @@ public extension CreateEntityCoordinator {
 		case delegate(DelegateAction)
 	}
 }
-
-import Profile
 
 // MARK: - CreateEntityCoordinator.Action.InternalAction
 public extension CreateEntityCoordinator.Action {
@@ -27,7 +26,7 @@ public extension CreateEntityCoordinator.Action {
 		case step0_nameNewEntity(NameNewEntity<Entity>.Action)
 		case step1_selectGenesisFactorSource(SelectGenesisFactorSource.Action)
 		case step2_creationOfEntity(CreationOfEntity<Entity>.Action)
-		case step3_completion(CompletionAction)
+		case step3_completion(NewEntityCompletion<Entity>.Action)
 	}
 }
 

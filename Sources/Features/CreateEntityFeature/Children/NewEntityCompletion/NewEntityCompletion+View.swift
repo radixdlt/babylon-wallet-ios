@@ -46,7 +46,7 @@ public extension NewEntityCompletion.View {
 
 					Spacer()
 
-					Button(L10n.CreateEntity.Completion.goToDestination(viewStore.destination.displayText)) {
+					Button(L10n.CreateEntity.Completion.goToDestination(viewStore.destinationDisplayText)) {
 						viewStore.send(.goToDestination)
 					}
 					.buttonStyle(.primaryRectangular)
@@ -132,7 +132,7 @@ extension NewEntityCompletion.View {
 		let entityKind: String
 		let entityName: String
 		let entityIndex: Int
-		let destination: Destination
+		let destinationDisplayText: String
 		let isFirstOnNetwork: Bool
 		let explaination: String
 
@@ -141,10 +141,20 @@ extension NewEntityCompletion.View {
 		let appearanceID: OnNetwork.Account.AppearanceID?
 
 		init(state: NewEntityCompletion.State) {
-			entityKind = state.entity.kind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
+			let entityKind = state.entity.kind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
+			self.entityKind = entityKind
 			entityName = state.displayName
 			entityIndex = state.index
-			destination = state.destination
+
+			destinationDisplayText = {
+				switch state.navigationButtonCTA {
+				case .goHome:
+					return L10n.CreateEntity.Completion.Destination.home
+				case .goBackToChooseEntities:
+					return L10n.CreateEntity.Completion.Destination.chooseEntities(entityKind)
+				}
+			}()
+
 			isFirstOnNetwork = state.isFirstOnNetwork
 
 			if let account = state.entity as? OnNetwork.Account {

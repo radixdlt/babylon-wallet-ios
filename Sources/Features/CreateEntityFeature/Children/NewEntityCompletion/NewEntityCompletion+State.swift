@@ -2,20 +2,30 @@ import FeaturePrelude
 
 // MARK: - NewEntityCompletion.State
 public extension NewEntityCompletion {
-	struct State: CreateEntityCompletionStateProtocol {
+	struct State: Sendable & Equatable {
 		public let entity: Entity
 		public let isFirstOnNetwork: Bool
-		public let destination: Destination
+		public let navigationButtonCTA: CreateEntityNavigationButtonCTA
 
 		public init(
 			entity: Entity,
 			isFirstOnNetwork: Bool,
-			destination: Destination
+			navigationButtonCTA: CreateEntityNavigationButtonCTA
 		) {
 			self.entity = entity
 			self.isFirstOnNetwork = isFirstOnNetwork
-			self.destination = destination
+			self.navigationButtonCTA = navigationButtonCTA
 		}
+	}
+}
+
+public extension NewEntityCompletion.State {
+	init(entity: Entity, config: CreateEntityConfig) {
+		self.init(
+			entity: entity,
+			isFirstOnNetwork: config.isFirstEntity,
+			navigationButtonCTA: config.navigationButtonCTA
+		)
 	}
 }
 

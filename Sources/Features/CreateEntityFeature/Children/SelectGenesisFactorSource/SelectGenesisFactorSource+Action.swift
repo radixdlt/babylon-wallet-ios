@@ -15,7 +15,7 @@ public extension SelectGenesisFactorSource.Action {
 // MARK: - SelectGenesisFactorSource.Action.ViewAction
 public extension SelectGenesisFactorSource.Action {
 	enum ViewAction: Sendable, Equatable {
-		case appeared
+		case confirmOnDeviceFactorSource
 	}
 }
 

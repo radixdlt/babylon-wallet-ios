@@ -19,11 +19,15 @@ public extension SelectGenesisFactorSource.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			// TODO: implement
-			Text("Implement: SelectGenesisFactorSource")
-				.background(Color.yellow)
-				.foregroundColor(.red)
-				.onAppear { viewStore.send(.appeared) }
+			ForceFullScreen {
+				VStack {
+					Spacer()
+					Button("Confirm OnDevice factor source") {
+						viewStore.send(.confirmOnDeviceFactorSource)
+					}
+					Spacer()
+				}
+			}
 		}
 	}
 }

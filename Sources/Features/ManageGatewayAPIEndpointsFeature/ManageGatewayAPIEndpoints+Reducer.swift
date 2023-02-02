@@ -112,14 +112,14 @@ public extension ManageGatewayAPIEndpoints {
 			return skipSwitching(state: &state)
 
 		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway))):
-			state.createAccountCoordinator = .init(
-				step: .step0_nameNewEntity(.init(isFirst: false)),
-				config: .init(
-					create: .firstAccountOnASecondNetwork,
-					networkID: newNetworkAndGateway.network.id
-				),
-				completionDestination: .home
-			)
+
+			state.createAccountCoordinator = .init(config: .init(
+				specificNetworkID: newNetworkAndGateway.network.id,
+				isFirstEntity: false,
+				canBeDismissed: true,
+				navigationButtonCTA: .goHome
+			))
+
 			return .none
 
 		case let .internal(.system(.switchToResult(.failure(error)))):

@@ -1,12 +1,12 @@
 import FeaturePrelude
 
 // MARK: - NewEntityCompletion
-public struct NewEntityCompletion<Entity: EntityProtocol & Sendable & Equatable, Destination: CreateEntityCompletionDestinationProtocol>: Sendable, ReducerProtocol {
+public struct NewEntityCompletion<Entity: EntityProtocol & Sendable & Equatable>: Sendable, ReducerProtocol {
 	public init() {}
 }
 
 public extension NewEntityCompletion {
-	func reduce(into state: inout State, action: Action) -> ComposableArchitecture.Effect<Action, Never> {
+	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.goToDestination)):
 			return .run { send in

@@ -50,13 +50,12 @@ public struct Home: Sendable, ReducerProtocol {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.createAccountButtonTapped)):
-			state.createAccountCoordinator = .init(
-				step: .step0_nameNewEntity(.init(isFirst: false)),
-				config: .init(
-					create: .anotherAccount
-				),
-				completionDestination: .home
-			)
+
+			state.createAccountCoordinator = .init(config: .init(
+				isFirstEntity: false,
+				canBeDismissed: true,
+				navigationButtonCTA: .goHome
+			))
 			return .none
 
 		case .internal(.view(.didAppear)):

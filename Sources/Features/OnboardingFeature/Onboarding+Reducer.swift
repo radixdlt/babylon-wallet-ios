@@ -26,13 +26,22 @@ public struct Onboarding: Sendable, ReducerProtocol {
 		switch action {
 		case .child(.createProfile(.delegate(.criticalFailureCouldNotCreateProfile))):
 			fatalError("Can wo do anything better than crash..?")
+
 		case .child(.createProfile(.delegate(.completedWithProfile))):
-			state = .createAccountCoordinator(.init())
+			state = .createAccountCoordinator(.init(
+				config: .init(
+					isFirstEntity: true,
+					canBeDismissed: false,
+					navigationButtonCTA: .goHome
+				)
+			))
+			return .none
 
 		case .child(.createAccountCoordinator(.delegate(.completed))):
 			return .run { send in
 				await send(.delegate(.completed))
 			}
+
 		default:
 			return .none
 		}

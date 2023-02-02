@@ -22,6 +22,12 @@ public extension NameNewEntity {
 	}
 }
 
+public extension NameNewEntity.State {
+	init(config: CreateEntityConfig) {
+		self.init(isFirst: config.isFirstEntity)
+	}
+}
+
 // MARK: - NameNewEntity.State.Field
 public extension NameNewEntity.State {
 	enum Field: String, Sendable, Hashable {

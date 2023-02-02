@@ -37,11 +37,16 @@ public extension CreateEntityCoordinator.View {
 					action: { CreateEntityCoordinator.Action.child(.step1_selectGenesisFactorSource($0)) },
 					then: { SelectGenesisFactorSource.View(store: $0) }
 				)
-//				//            CaseLet(
-//				//                state: /CreateEntityCoordinator.State.Root.completion,
-//				//                action: { CreateEntityCoordinator.Action.child(.completion($0)) },
-//				//                then: { NewEntityCompletion<CompletionState.Entity>.View(store: $0) }
-//				//            )
+				CaseLet(
+					state: /CreateEntityCoordinator.State.Step.step2_creationOfEntity,
+					action: { CreateEntityCoordinator.Action.child(.step2_creationOfEntity($0)) },
+					then: { CreationOfEntity.View(store: $0) }
+				)
+				CaseLet(
+					state: /CreateEntityCoordinator.State.Step.step3_completion,
+					action: { CreateEntityCoordinator.Action.child(.step3_completion($0)) },
+					then: { NewEntityCompletion.View(store: $0) }
+				)
 			}
 		}
 	}
