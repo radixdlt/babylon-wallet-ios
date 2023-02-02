@@ -33,9 +33,9 @@ public typealias ActionOf<Feature: _FeatureReducer> = FeatureAction<
 
 // MARK: - FeatureReducer
 public protocol FeatureReducer: _FeatureReducer where Action == ActionOf<Self> {
-	func reduceView(into state: inout State, action: ViewAction) -> EffectTask<Action>
-	func reduceInternal(into state: inout State, action: InternalAction) -> EffectTask<Action>
-	func reduceChild(into state: inout State, action: ChildAction) -> EffectTask<Action>
+	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action>
+	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action>
+	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action>
 }
 
 public extension ReducerProtocol where Self: FeatureReducer {
@@ -48,25 +48,25 @@ public extension ReducerProtocol where Self: FeatureReducer {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case let .view(viewAction):
-			return reduceView(into: &state, action: viewAction)
+			return reduce(into: &state, viewAction: viewAction)
 		case let .internal(internalAction):
-			return reduceInternal(into: &state, action: internalAction)
+			return reduce(into: &state, internalAction: internalAction)
 		case let .child(childAction):
-			return reduceChild(into: &state, action: childAction)
+			return reduce(into: &state, childAction: childAction)
 		case .delegate:
 			return .none
 		}
 	}
 
-	func reduceView(into state: inout State, action: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		.none
 	}
 
-	func reduceInternal(into state: inout State, action: InternalAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		.none
 	}
 
-	func reduceChild(into state: inout State, action: ChildAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		.none
 	}
 }
@@ -92,8 +92,8 @@ struct MyFeature: FeatureReducer {
 		var blabla: String
 	}
 
-	func reduceView(into state: inout State, action: ViewAction) -> EffectTask<Action> {
-		switch action {
+	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
 		case .listSelectorTapped:
 			return .none
 		case .fungibleTokenList:

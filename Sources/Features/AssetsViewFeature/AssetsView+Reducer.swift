@@ -17,8 +17,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 		Reduce(self.core)
 	}
 
-	public func reduceView(into state: inout State, action: ViewAction) -> EffectTask<Action> {
-		switch action {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
 		case let .listSelectorTapped(type):
 			state.type = type
 			return .none
