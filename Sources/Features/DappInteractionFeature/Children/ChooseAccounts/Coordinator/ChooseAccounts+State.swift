@@ -9,29 +9,28 @@ public extension ChooseAccounts {
 			case ongoing
 		}
 
+		public typealias NumberOfAccounts = P2P.FromDapp.WalletInteraction.NumberOfAccounts
+
 		public let kind: Kind
 		public let dappDefinitionAddress: DappDefinitionAddress
 		public let dappMetadata: DappMetadata
-
-		public let request: P2P.OneTimeAccountsRequestToHandle
-		public var accounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
+		public let numberOfAccounts: NumberOfAccounts
+		public var availableAccounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
 		public var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		public init(
 			kind: Kind,
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
-
-			request: P2P.OneTimeAccountsRequestToHandle,
-			accounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = [],
+			numberOfAccounts: NumberOfAccounts,
+			availableAccounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = [],
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil
 		) {
 			self.kind = kind
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
-
-			self.request = request
-			self.accounts = accounts
+			self.numberOfAccounts = numberOfAccounts
+			self.availableAccounts = availableAccounts
 			self.createAccountCoordinator = createAccountCoordinator
 		}
 	}
@@ -40,7 +39,7 @@ public extension ChooseAccounts {
 // MARK: - Computed Properties
 extension ChooseAccounts.State {
 	var selectedAccounts: [ChooseAccounts.Row.State] {
-		accounts.filter(\.isSelected)
+		availableAccounts.filter(\.isSelected)
 	}
 }
 
@@ -50,9 +49,8 @@ public extension ChooseAccounts.State {
 		kind: .oneTime,
 		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 		dappMetadata: .previewValue,
-
-		request: .init(request: .previewValueOneTimeAccountAccess)!,
-		accounts: .init(
+		numberOfAccounts: .atLeast(2),
+		availableAccounts: .init(
 			uniqueElements: [
 				.previewValueOne,
 			]

@@ -4,12 +4,6 @@ import struct TransactionClient.MakeTransactionHeaderInput
 // MARK: - TransactionSigning.State
 public extension TransactionSigning {
 	struct State: Hashable {
-		public enum Origin: Equatable {
-			case p2p(request: P2P.SendTransactionToHandle)
-			case local(manifest: TransactionManifest)
-		}
-
-		public let request: P2P.SendTransactionToHandle?
 		public let transactionManifestWithoutLockFee: TransactionManifest
 		public var transactionWithLockFee: TransactionManifest?
 		public var transactionWithLockFeeString: String?
@@ -17,18 +11,11 @@ public extension TransactionSigning {
 		public var isSigningTX: Bool = false
 
 		public init(
-			origin: Origin,
+			transactionManifestWithoutLockFee: TransactionManifest,
 			transactionWithLockFee: TransactionManifest? = nil, // TODO: remove?
 			makeTransactionHeaderInput: MakeTransactionHeaderInput = .default
 		) {
-			switch origin {
-			case let .p2p(request):
-				self.request = request
-				self.transactionManifestWithoutLockFee = request.requestItem.transactionManifest
-			case let .local(manifest):
-				self.request = nil
-				self.transactionManifestWithoutLockFee = manifest
-			}
+			self.transactionManifestWithoutLockFee = transactionManifestWithoutLockFee
 			self.transactionWithLockFee = transactionWithLockFee
 			self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		}
@@ -82,15 +69,6 @@ public extension TransactionManifest {
 }
 
 public extension TransactionSigning.State {
-	static var previewValue: Self {
-		.init(
-			origin: .p2p(
-				request: P2P.SendTransactionToHandle(
-					requestItem: .previewValue,
-					parentRequest: .previewValue
-				)
-			)
-		)
-	}
+	static let previewValue = Self(transactionManifestWithoutLockFee: .mock)
 }
 #endif

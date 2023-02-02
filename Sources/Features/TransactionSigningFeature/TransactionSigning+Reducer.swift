@@ -42,14 +42,14 @@ public extension TransactionSigning {
 
 		case let .internal(.loadNetworkIDResult(.failure(error), _)):
 			errorQueue.schedule(error)
-			return .run { [failedRequest = state.request] send in
-				await send(.delegate(.failed(failedRequest, ApproveTransactionFailure.prepareTransactionFailure(.loadNetworkID(error)))))
+			return .run { send in
+				await send(.delegate(.failed(ApproveTransactionFailure.prepareTransactionFailure(.loadNetworkID(error)))))
 			}
 
 		case let .internal(.addLockFeeInstructionToManifestResult(.failure(error))):
 			errorQueue.schedule(error)
-			return .run { [failedRequest = state.request] send in
-				await send(.delegate(.failed(failedRequest, ApproveTransactionFailure.prepareTransactionFailure(.addTransactionFee(error)))))
+			return .run { send in
+				await send(.delegate(.failed(ApproveTransactionFailure.prepareTransactionFailure(.addTransactionFee(error)))))
 			}
 
 		case .internal(.view(.signTransactionButtonTapped)):
@@ -76,24 +76,21 @@ public extension TransactionSigning {
 		case let .internal(.signTransactionResult(.success(txID))):
 			state.isSigningTX = false
 
-			return .run { [request = state.request] send in
+			return .run { send in
 				await send(.delegate(
-					.signedTXAndSubmittedToGateway(
-						txID,
-						request: request
-					)
+					.signedTXAndSubmittedToGateway(txID)
 				))
 			}
 
 		case let .internal(.signTransactionResult(.failure(transactionFailure))):
 			state.isSigningTX = false
-			return .run { [failedRequest = state.request] send in
-				await send(.delegate(.failed(failedRequest, .transactionFailure(transactionFailure))))
+			return .run { send in
+				await send(.delegate(.failed(.transactionFailure(transactionFailure))))
 			}
 
 		case .internal(.view(.closeButtonTapped)):
-			return .run { [rejectedRequest = state.request] send in
-				await send(.delegate(.rejected(rejectedRequest)))
+			return .run { send in
+				await send(.delegate(.rejected))
 			}
 
 		case .delegate:

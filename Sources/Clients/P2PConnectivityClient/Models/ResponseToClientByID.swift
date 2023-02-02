@@ -1,6 +1,4 @@
-import P2PModels
-import Prelude
-import ProfileModels
+import ClientPrelude
 
 // MARK: - P2P.ResponseToClientByID
 public extension P2P {

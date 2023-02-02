@@ -13,15 +13,14 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 		Reduce { state, action in
 			switch action {
 			case .internal(.view(.continueButtonTapped)):
-				let nonEmptySelectedAccounts = NonEmpty(rawValue: IdentifiedArrayOf(uniqueElements: state.accounts.filter(\.isSelected).map(\.account)))!
-				return .run { [request = state.request] send in
-					await send(.delegate(.finishedChoosingAccounts(nonEmptySelectedAccounts,
-					                                               request)))
+				let selectedAccounts = IdentifiedArrayOf(uniqueElements: state.selectedAccounts.map(\.account))
+				return .run { send in
+					await send(.delegate(.continueButtonTapped(selectedAccounts)))
 				}
 
 			case .internal(.view(.dismissButtonTapped)):
-				return .run { [request = state.request] send in
-					await send(.delegate(.dismissChooseAccounts(request)))
+				return .run { send in
+					await send(.delegate(.dismissButtonTapped))
 				}
 
 			case .internal(.view(.didAppear)):
@@ -32,7 +31,7 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 				}
 
 			case let .internal(.system(.loadAccountsResult(.success(accounts)))):
-				state.accounts = .init(uniqueElements: accounts.map {
+				state.availableAccounts = .init(uniqueElements: accounts.map {
 					ChooseAccounts.Row.State(account: $0)
 				})
 				return .none
@@ -50,21 +49,20 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child
 			// and every other action should fall-through - @davdroman-rdx
 			case let .child(.account(id: id, action: action)):
-				guard let account = state.accounts[id: id] else { return .none }
-				let oneTimeAccountRequest = state.request.requestItem
+				guard let account = state.availableAccounts[id: id] else { return .none }
 				switch action {
 				case .internal(.view(.didSelect)):
-					let numberOfAccounts = oneTimeAccountRequest.numberOfAccounts
+					let numberOfAccounts = state.numberOfAccounts
 
 					if account.isSelected {
-						state.accounts[id: id]?.isSelected = false
+						state.availableAccounts[id: id]?.isSelected = false
 					} else {
 						switch numberOfAccounts.quantifier {
 						case .atLeast:
-							state.accounts[id: id]?.isSelected = true
+							state.availableAccounts[id: id]?.isSelected = true
 						case .exactly:
 							guard state.selectedAccounts.count < numberOfAccounts.quantity else { break }
-							state.accounts[id: id]?.isSelected = true
+							state.availableAccounts[id: id]?.isSelected = true
 						}
 					}
 
@@ -83,7 +81,10 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 					}))))
 				}
 
-			case .delegate(.dismissChooseAccounts):
+			case .delegate(.dismissButtonTapped):
+				// TODO: @Nikola this is an unnedeed bit of logic afaik, as the dismiss button is unreachable when create account is present
+				// Verify this is true and if so please do remove it :)
+				// If we do need it for some reason, declare a separate action to do so, as we shouldn't be layering behavior onto our own delegates like this (it makes testing reasoning harder).
 				state.createAccountCoordinator = nil
 				return .none
 
@@ -91,7 +92,7 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 				return .none
 			}
 		}
-		.forEach(\.accounts, action: /Action.child .. Action.ChildAction.account) {
+		.forEach(\.availableAccounts, action: /Action.child .. Action.ChildAction.account) {
 			ChooseAccounts.Row()
 		}
 		.ifLet(\.createAccountCoordinator, action: /Action.child .. Action.ChildAction.createAccountCoordinator) {

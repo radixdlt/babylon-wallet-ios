@@ -1,4 +1,4 @@
-import Prelude
+import FeaturePrelude
 
 // MARK: - P2P.FromDapp.WalletRequestItem
 public extension P2P.FromDapp.WalletInteraction {

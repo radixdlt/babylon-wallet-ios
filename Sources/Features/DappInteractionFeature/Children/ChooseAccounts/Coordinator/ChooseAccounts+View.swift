@@ -48,17 +48,12 @@ public extension ChooseAccounts.View {
 								Text(L10n.DApp.ChooseAccounts.explanation(viewStore.numberOfAccountsExplanation))
 									.foregroundColor(.app.gray1)
 									.textStyle(.sheetTitle)
-
-								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.interaction.metadata.dAppDefinitionAddress.description))
-									.foregroundColor(.app.gray1)
-									.textStyle(.body1Regular)
-									.padding(.medium1)
 							}
 							.multilineTextAlignment(.center)
 
 							ForEachStore(
 								store.scope(
-									state: \.accounts,
+									state: \.availableAccounts,
 									action: { .child(.account(id: $0, action: $1)) }
 								),
 								content: { ChooseAccounts.Row.View(store: $0) }
@@ -99,28 +94,23 @@ private extension ChooseAccounts.View {
 extension ChooseAccounts.View {
 	struct ViewState: Equatable {
 		let canProceed: Bool
-		let oneTimeAccountAddressesRequest: P2P.FromDapp.WalletInteraction.OneTimeAccountsRequestItem
 		let numberOfAccountsExplanation: String
-		let interaction: P2P.FromDapp.WalletInteraction
 
 		init(state: ChooseAccounts.State) {
+			let quantifier = state.numberOfAccounts.quantifier
+			let quantity = state.numberOfAccounts.quantity
+
 			canProceed = {
-				let numberOfAccounts = state.request.requestItem.numberOfAccounts
-				switch numberOfAccounts.quantifier {
+				switch quantifier {
 				case .atLeast:
-					return state.selectedAccounts.count >= numberOfAccounts.quantity
+					return state.selectedAccounts.count >= quantity
 				case .exactly:
-					return state.selectedAccounts.count == numberOfAccounts.quantity
+					return state.selectedAccounts.count == quantity
 				}
 			}()
-			// FIXME: remove Force Unwrap
-			oneTimeAccountAddressesRequest = state.request.requestItem
-			interaction = state.request.parentRequest.interaction
 			numberOfAccountsExplanation = {
-				let numberOfAccounts = state.request.requestItem.numberOfAccounts
-				switch numberOfAccounts.quantifier {
+				switch quantifier {
 				case .exactly:
-					let quantity = numberOfAccounts.quantity
 					if quantity == 1 {
 						return L10n.DApp.ChooseAccounts.explanationExactlyOneAccount
 					} else {

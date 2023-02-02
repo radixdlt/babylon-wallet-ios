@@ -1,6 +1,4 @@
-import P2PConnection
-import Prelude
-import ProfileModels
+import ClientPrelude
 
 // MARK: - P2P.RequestFromClient
 public extension P2P {
@@ -31,8 +29,8 @@ public struct InvalidRequestFromDapp: Swift.Error, Equatable, CustomStringConver
 #if DEBUG
 public extension P2PClient {
 	static let previewValue: Self = try! .init(
-		connectionPassword: ConnectionPassword(hex: "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"),
-		displayName: "Placeholder"
+		connectionPassword: .placeholder,
+		displayName: "PreviewValue"
 	)
 }
 

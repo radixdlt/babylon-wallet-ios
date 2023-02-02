@@ -34,13 +34,9 @@ public extension TransactionSigning.Action {
 // MARK: - TransactionSigning.Action.DelegateAction
 public extension TransactionSigning.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case rejected(P2P.SendTransactionToHandle?)
-		case failed(P2P.SendTransactionToHandle?, ApproveTransactionFailure)
-
-		case signedTXAndSubmittedToGateway(
-			TransactionIntent.TXID,
-			request: P2P.SendTransactionToHandle?
-		)
+		case rejected
+		case failed(ApproveTransactionFailure)
+		case signedTXAndSubmittedToGateway(TransactionIntent.TXID)
 	}
 }
 

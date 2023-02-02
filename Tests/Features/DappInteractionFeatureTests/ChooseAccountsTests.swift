@@ -5,10 +5,6 @@ import FeatureTestingPrelude
 final class ChooseAccountsTests: TestCase {
 	func test_continueFromChooseAccounts_whenTappedOnContinue_thenFinishAccountSelection() async {
 		// given
-		let requestItem: P2P.OneTimeAccountsRequestToHandle = .init(
-			requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
-			parentRequest: .previewValue
-		)
 		var singleAccount = ChooseAccounts.Row.State.previewValueOne
 		singleAccount.isSelected = true
 		let store = TestStore(
@@ -16,8 +12,8 @@ final class ChooseAccountsTests: TestCase {
 				kind: .oneTime,
 				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 				dappMetadata: .init(name: "Dapp name", description: "A description"),
-				request: requestItem,
-				accounts: [
+				numberOfAccounts: .exactly(1),
+				availableAccounts: [
 					singleAccount,
 				]
 			),
@@ -28,22 +24,18 @@ final class ChooseAccountsTests: TestCase {
 		await store.send(.view(.continueButtonTapped))
 
 		// then
-		let expectedAccounts = NonEmpty(rawValue: IdentifiedArrayOf(uniqueElements: [singleAccount.account]))!
-		await store.receive(.delegate(.finishedChoosingAccounts(expectedAccounts, requestItem)))
+		let expectedAccounts = IdentifiedArrayOf(uniqueElements: [singleAccount.account])
+		await store.receive(.delegate(.continueButtonTapped(expectedAccounts)))
 	}
 
 	func test_dismissChooseAccounts_whenTappedOnDismiss_thenCoordinateDismissal() async {
 		// given
-		let requestItem: P2P.OneTimeAccountsRequestToHandle = .init(
-			requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
-			parentRequest: .previewValue
-		)
 		let store = TestStore(
 			initialState: ChooseAccounts.State(
 				kind: .oneTime,
 				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 				dappMetadata: .init(name: "Dapp name", description: "A description"),
-				request: requestItem
+				numberOfAccounts: .exactly(1)
 			),
 			reducer: ChooseAccounts()
 		)
@@ -52,7 +44,7 @@ final class ChooseAccountsTests: TestCase {
 		await store.send(.view(.dismissButtonTapped))
 
 		// then
-		await store.receive(.delegate(.dismissChooseAccounts(requestItem)))
+		await store.receive(.delegate(.dismissButtonTapped))
 	}
 
 	func test_didSelectAccount_whenTappedOnSelectedAccount_thenDeselectThatAccount() async {
@@ -64,11 +56,8 @@ final class ChooseAccountsTests: TestCase {
 			kind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
-			request: .init(
-				requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
-				parentRequest: .previewValue
-			),
-			accounts: .init(
+			numberOfAccounts: .exactly(1),
+			availableAccounts: .init(
 				uniqueElements: [
 					accountRow,
 				]
@@ -83,7 +72,7 @@ final class ChooseAccountsTests: TestCase {
 		// when
 		await store.send(.child(.account(id: accountRow.id, action: .view(.didSelect)))) {
 			// then
-			$0.accounts[id: accountRow.id]?.isSelected = false
+			$0.availableAccounts[id: accountRow.id]?.isSelected = false
 		}
 	}
 
@@ -99,11 +88,8 @@ final class ChooseAccountsTests: TestCase {
 			kind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
-			request: .init(
-				requestItem: .init(numberOfAccounts: .atLeast(1), requiresProofOfOwnership: false),
-				parentRequest: .previewValue
-			),
-			accounts: .init(
+			numberOfAccounts: .atLeast(1),
+			availableAccounts: .init(
 				uniqueElements: [
 					accountRowOne,
 					accountRowTwo,
@@ -119,13 +105,13 @@ final class ChooseAccountsTests: TestCase {
 		// when
 		await store.send(.child(.account(id: accountRowOne.id, action: .view(.didSelect)))) {
 			// then
-			$0.accounts[id: accountRowOne.id]?.isSelected = true
+			$0.availableAccounts[id: accountRowOne.id]?.isSelected = true
 		}
 
 		// when
 		await store.send(.child(.account(id: accountRowTwo.id, action: .view(.didSelect)))) {
 			// then
-			$0.accounts[id: accountRowTwo.id]?.isSelected = true
+			$0.availableAccounts[id: accountRowTwo.id]?.isSelected = true
 		}
 	}
 
@@ -138,11 +124,8 @@ final class ChooseAccountsTests: TestCase {
 			kind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
-			request: .init(
-				requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
-				parentRequest: .previewValue
-			),
-			accounts: .init(
+			numberOfAccounts: .exactly(1),
+			availableAccounts: .init(
 				uniqueElements: [
 					accountRow,
 				]
@@ -157,7 +140,7 @@ final class ChooseAccountsTests: TestCase {
 		// when
 		await store.send(.child(.account(id: accountRow.id, action: .view(.didSelect)))) {
 			// then
-			$0.accounts[id: accountRow.id]?.isSelected = true
+			$0.availableAccounts[id: accountRow.id]?.isSelected = true
 		}
 	}
 
@@ -173,11 +156,8 @@ final class ChooseAccountsTests: TestCase {
 			kind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
-			request: .init(
-				requestItem: .init(numberOfAccounts: .exactly(1), requiresProofOfOwnership: false),
-				parentRequest: .previewValue
-			),
-			accounts: .init(
+			numberOfAccounts: .exactly(1),
+			availableAccounts: .init(
 				uniqueElements: [
 					accountRowOne,
 					accountRowTwo,

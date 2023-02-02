@@ -1,7 +1,4 @@
-import P2PConnection
-import P2PModels
-import Prelude
-import ProfileModels
+import ClientPrelude
 
 // MARK: - P2P.SentResponseToClient
 public extension P2P {

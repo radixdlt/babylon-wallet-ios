@@ -1,4 +1,4 @@
-import Prelude
+import FeaturePrelude
 
 public extension P2P {
 	typealias OneTimeAccountsRequestToHandle = SpecificRequestItemToHandle<P2P.FromDapp.WalletInteraction.OneTimeAccountsRequestItem>
