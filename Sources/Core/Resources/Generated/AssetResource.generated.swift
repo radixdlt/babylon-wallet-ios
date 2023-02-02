@@ -42,7 +42,6 @@ public enum AssetResource {
   public static let fungibleToken = ImageAsset(name: "fungible-token")
   public static let nft = ImageAsset(name: "nft")
   public static let xrd = ImageAsset(name: "xrd")
-  public static let dappPlaceholder = ImageAsset(name: "dapp-placeholder")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 
