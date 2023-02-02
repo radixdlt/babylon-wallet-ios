@@ -1,6 +1,5 @@
 import DappInteractionFeature
 import FeaturePrelude
-import TransactionSigningFeature
 
 // MARK: - DappInteractionHook.View
 public extension DappInteractionHook {

@@ -50,7 +50,7 @@ public struct DappInteractionHook: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Reduce(self.core)
+		Reduce(core)
 			.presentationDestination(\.$dappInteraction, action: /Action.child .. ChildAction.dappInteraction) {
 				DappInteraction()
 			}
