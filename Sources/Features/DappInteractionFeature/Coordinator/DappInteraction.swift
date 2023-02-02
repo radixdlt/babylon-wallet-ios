@@ -3,14 +3,17 @@ import FeaturePrelude
 public struct DappInteraction: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let interaction: P2P.FromDapp.WalletInteraction
+		let dappMetadata: DappMetadata
 
 		@NavigationStateOf<Destinations>
 		var navigation: NavigationState<Destinations.State>.Path
 
 		public init(
-			interaction: P2P.FromDapp.WalletInteraction
+			interaction: P2P.FromDapp.WalletInteraction,
+			dappMetadata: DappMetadata
 		) {
 			self.interaction = interaction
+			self.dappMetadata = dappMetadata
 		}
 	}
 
@@ -26,7 +29,7 @@ public struct DappInteraction: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case login(LoginRequest.State)
 			case chooseOneTimeAccounts(ChooseAccounts.State)
-//			case chooseOngoingAccounts(TempScreen.State)
+			case chooseOngoingAccounts(ChooseAccounts.State)
 		}
 
 		public enum Action: Sendable, Equatable {

@@ -69,7 +69,7 @@ public extension P2P.FromDapp.WalletInteraction.Metadata {
 	static let previewValue = Self(
 		networkId: .simulator,
 		origin: "Placeholder",
-		dAppId: "Placeholder"
+		dAppDefinitionAddress: try! .init(address: "DappDefinitionAddress")
 	)
 }
 
