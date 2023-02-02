@@ -57,7 +57,7 @@ public extension AssetsView.View {
 
 // MARK: - AssetsView.View.AssetsViewViewStore
 private extension AssetsView.View {
-	typealias AssetsViewViewStore = ComposableArchitecture.ViewStore<AssetsView.View.ViewState, AssetsView.Action.ViewAction>
+	typealias AssetsViewViewStore = ComposableArchitecture.ViewStore<AssetsView.View.ViewState, AssetsView.ViewAction>
 }
 
 // MARK: - Private Methods
