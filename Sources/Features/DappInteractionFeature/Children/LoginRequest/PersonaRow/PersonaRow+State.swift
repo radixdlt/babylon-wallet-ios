@@ -4,7 +4,7 @@ import FeaturePrelude
 public extension PersonaRow {
 	struct State: Sendable, Equatable, Hashable {
 		public let persona: OnNetwork.Persona
-		public var selectionState: SelectionState
+		public var isSelected: Bool
 		public let hasAlreadyLoggedIn: Bool
 
 		public init(
@@ -12,7 +12,7 @@ public extension PersonaRow {
 			hasAlreadyLoggedIn: Bool
 		) {
 			self.persona = persona
-			self.selectionState = hasAlreadyLoggedIn ? .selected : .unselected
+			self.isSelected = hasAlreadyLoggedIn
 			self.hasAlreadyLoggedIn = hasAlreadyLoggedIn
 		}
 	}
@@ -23,15 +23,6 @@ extension PersonaRow.State: Identifiable {
 	public typealias ID = IdentityAddress
 	public var address: IdentityAddress { persona.address }
 	public var id: ID { address }
-}
-
-// MARK: - PersonaRow.State.SelectionState
-public extension PersonaRow.State {
-	enum SelectionState: Sendable, Equatable {
-		case unselected
-		case selected
-		case disabled
-	}
 }
 
 #if DEBUG

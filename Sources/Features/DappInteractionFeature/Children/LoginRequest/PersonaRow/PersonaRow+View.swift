@@ -88,15 +88,7 @@ extension PersonaRow.View {
 		init(state: PersonaRow.State) {
 			name = state.persona.displayName ?? L10n.DApp.unknownName
 			hasAlreadyLoggedIn = state.hasAlreadyLoggedIn
-
-			switch state.selectionState {
-			case .unselected:
-				selectionState = .unselected
-			case .selected:
-				selectionState = .selected
-			case .disabled:
-				selectionState = .disabled
-			}
+			selectionState = state.isSelected ? .selected : .unselected
 		}
 	}
 }
