@@ -56,7 +56,8 @@ struct DappInteraction_Preview: PreviewProvider {
 
 public extension DappInteraction.State {
 	static let previewValue: Self = .init(
-		interaction: .previewValueOneTimeAccount
+		interaction: .previewValueOneTimeAccount,
+		dappMetadata: .previewValue
 	)
 }
 #endif
