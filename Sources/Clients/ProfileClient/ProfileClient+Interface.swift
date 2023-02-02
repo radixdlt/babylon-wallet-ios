@@ -30,8 +30,7 @@ public struct ProfileClient: Sendable {
 	public var deleteP2PClientByID: DeleteP2PClientByID
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
-	public var createUnsavedVirtualAccount: CreateUnsavedVirtualAccount
-	public var createUnsavedVirtualPersona: CreateUnsavedVirtualPersona
+	public var createUnsavedVirtualEntity: CreateUnsavedVirtualEntity
 	public var addAccount: AddAccount
 	public var addPersona: AddPersona
 	public var lookupAccountByAddress: LookupAccountByAddress
@@ -60,8 +59,7 @@ public struct ProfileClient: Sendable {
 		deleteP2PClientByID: @escaping DeleteP2PClientByID,
 		getAppPreferences: @escaping GetAppPreferences,
 		setDisplayAppPreferences: @escaping SetDisplayAppPreferences,
-		createUnsavedVirtualAccount: @escaping CreateUnsavedVirtualAccount,
-		createUnsavedVirtualPersona: @escaping CreateUnsavedVirtualPersona,
+		createUnsavedVirtualEntity: @escaping CreateUnsavedVirtualEntity,
 		addAccount: @escaping AddAccount,
 		addPersona: @escaping AddPersona,
 		lookupAccountByAddress: @escaping LookupAccountByAddress,
@@ -88,8 +86,7 @@ public struct ProfileClient: Sendable {
 		self.deleteP2PClientByID = deleteP2PClientByID
 		self.getAppPreferences = getAppPreferences
 		self.setDisplayAppPreferences = setDisplayAppPreferences
-		self.createUnsavedVirtualAccount = createUnsavedVirtualAccount
-		self.createUnsavedVirtualPersona = createUnsavedVirtualPersona
+		self.createUnsavedVirtualEntity = createUnsavedVirtualEntity
 		self.addAccount = addAccount
 		self.addPersona = addPersona
 		self.lookupAccountByAddress = lookupAccountByAddress
@@ -98,6 +95,8 @@ public struct ProfileClient: Sendable {
 }
 
 public extension ProfileClient {
+	typealias GetDerivationPathForNewEntity = @Sendable (GetDerivationPathForNewEntityRequest) async throws -> (path: DerivationPath, index: Int)
+
 	typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	typealias LoadProfileResult = Swift.Result<Profile?, Profile.LoadingFailure>
 	typealias LoadProfile = @Sendable () async -> LoadProfileResult
@@ -127,8 +126,7 @@ public extension ProfileClient {
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
-	typealias CreateUnsavedVirtualAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
-	typealias CreateUnsavedVirtualPersona = @Sendable (CreatePersonaRequest) async throws -> OnNetwork.Persona
+	typealias CreateUnsavedVirtualEntity = @Sendable (CreateVirtualEntityRequest) async throws -> any EntityProtocol
 	typealias AddAccount = @Sendable (OnNetwork.Account) async throws -> Void
 	typealias AddPersona = @Sendable (OnNetwork.Persona) async throws -> Void
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account

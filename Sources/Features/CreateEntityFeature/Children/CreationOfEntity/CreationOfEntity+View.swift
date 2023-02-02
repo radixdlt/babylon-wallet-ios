@@ -19,10 +19,7 @@ public extension CreationOfEntity.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			// TODO: implement
-			Text("Implement: CreationOfEntity")
-				.background(Color.yellow)
-				.foregroundColor(.red)
+			SwiftUI.Color.white
 				.onAppear { viewStore.send(.appeared) }
 		}
 	}

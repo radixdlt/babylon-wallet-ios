@@ -21,7 +21,7 @@ public extension Profile {
 
 		let onNetwork = OnNetwork(
 			networkID: networkID,
-			accounts: .init(rawValue: .init([account0]))!,
+			accounts: .init(rawValue: .init(uniqueElements: [account0]))!,
 			personas: [],
 			connectedDapps: []
 		)

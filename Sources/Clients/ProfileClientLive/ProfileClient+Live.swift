@@ -54,6 +54,35 @@ public extension ProfileClient {
 			}
 		}
 
+		let getDerivationPathForNewEntity: GetDerivationPathForNewEntity = { request in
+			let networkID: NetworkID = await {
+				if let networkID = request.networkID {
+					return networkID
+				}
+				return await getCurrentNetworkID()
+			}()
+
+			return try await profileHolder.getAsync { profile in
+				let index: Int = {
+					if let network = try? profile.onNetwork(id: networkID) {
+						switch request.entityKind {
+						case .account:
+							return network.accounts.count
+						case .identity:
+							return network.personas.count
+						}
+					} else {
+						return 0
+					}
+				}()
+
+				switch request.entityKind {
+				case .account: return try (path: DerivationPath.accountPath(.init(networkID: networkID, index: index, keyKind: request.keyKind)), index: index)
+				case .identity: return try (path: DerivationPath.identityPath(.init(networkID: networkID, index: index, keyKind: request.keyKind)), index: index)
+				}
+			}
+		}
+
 		return Self(
 			getFactorSources: {
 				try await profileHolder.getAsync { $0.factorSources }
@@ -236,39 +265,117 @@ public extension ProfileClient {
 					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
-			createUnsavedVirtualAccount: { request in
-				try await profileHolder.getAsync { profile in
-					let networkID = await getCurrentNetworkID()
-					return try await profile.creatingNewVirtualAccount(
-						networkID: request.overridingNetworkID ?? networkID,
-						displayName: request.accountName,
-						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-							try await keychainClient
-								.loadFactorSourceMnemonic(
-									reference: reference,
-									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-								)
-						}
+			createUnsavedVirtualEntity: { request in
+				let networkID: NetworkID = await {
+					if let networkID = request.networkID {
+						return networkID
+					}
+					return await getCurrentNetworkID()
+				}()
+				let getDerivationPathRequest = try request.getDerivationPathRequest()
+				let (derivationPath, index) = try await getDerivationPathForNewEntity(getDerivationPathRequest)
+				let factorSource = request.factorSource
+				//                let request = CreateFactorInstanceRequest.fromNonHardwareHierarchicalDeterministicMnemonicFactorSource(
+				//                    .init(
+				//                        reference: request.factorSource.any().reference,
+				//                        derivationPath: derivationPath//.wrapAsDerivationPath()
+				//                    ))
+//
+				//                guard
+				//                    let genesisFactorInstanceSome = try await createFactorInstance(request),
+				//                    let genesisFactorInstance = genesisFactorInstanceSome.factorInstance.any() as? (any FactorInstanceHierarchicalDeterministicProtocol)
+				//                else {
+				//                    throw NoInstance()
+				//                }
+				guard let mnemonic = try await keychainClient.loadFactorSourceMnemonic(
+					reference: factorSource.reference,
+					authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+				) else {
+					struct FailedToFindFactorSource: Swift.Error {}
+					throw FailedToFindFactorSource()
+				}
+
+				let genesisFactorInstanceResponse = try await factorSource.createAnyFactorInstanceForResponse(
+					input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
+						mnemonic: mnemonic,
+						derivationPath: derivationPath,
+						includePrivateKey: false
 					)
+				)
+				let genesisFactorInstance = genesisFactorInstanceResponse.factorInstance
+
+				let displayName = request.displayName
+				let unsecuredControl = UnsecuredEntityControl(
+					genesisFactorInstance: genesisFactorInstance
+				)
+
+				switch request.entityKind {
+				case .identity:
+					let identityAddress = try OnNetwork.Persona.deriveAddress(
+						networkID: networkID,
+						publicKey: genesisFactorInstance.publicKey
+					)
+
+					let persona = try OnNetwork.Persona(
+						networkID: networkID,
+						address: identityAddress,
+						securityState: .unsecured(unsecuredControl),
+						index: index,
+						derivationPath: derivationPath.asIdentityPath(),
+						displayName: displayName,
+						fields: .init()
+					)
+					return persona
+				case .account:
+					let accountAddress = try OnNetwork.Account.deriveAddress(
+						networkID: networkID,
+						publicKey: genesisFactorInstance.publicKey
+					)
+
+					let account = try OnNetwork.Account(
+						networkID: networkID,
+						address: accountAddress,
+						securityState: .unsecured(unsecuredControl),
+						index: index,
+						derivationPath: derivationPath.asAccountPath(),
+						displayName: displayName
+					)
+					return account
 				}
 			},
-			createUnsavedVirtualPersona: { request in
-				try await profileHolder.getAsync { profile in
-					let networkID = await getCurrentNetworkID()
-					return try await profile.creatingNewVirtualPersona(
-						networkID: request.overridingNetworkID ?? networkID,
-						displayName: request.personaName,
-						fields: request.fields,
-						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-							try await keychainClient
-								.loadFactorSourceMnemonic(
-									reference: reference,
-									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-								)
-						}
-					)
-				}
-			},
+//			createUnsavedVirtualAccount: { request in
+//				try await profileHolder.getAsync { profile in
+//					let networkID = await getCurrentNetworkID()
+//					return try await profile.creatingNewVirtualAccount(
+//						networkID: request.overridingNetworkID ?? networkID,
+//						displayName: request.accountName,
+//						mnemonicForFactorSourceByReference: { [keychainClient] reference in
+//							try await keychainClient
+//								.loadFactorSourceMnemonic(
+//									reference: reference,
+//									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+//								)
+//						}
+//					)
+//				}
+//			},
+//			createUnsavedVirtualPersona: { request in
+//				try await profileHolder.getAsync { profile in
+//					let networkID = await getCurrentNetworkID()
+//					return try await profile.creatingNewVirtualPersona(
+//						networkID: request.overridingNetworkID ?? networkID,
+//						displayName: request.personaName,
+//						fields: request.fields,
+//						mnemonicForFactorSourceByReference: { [keychainClient] reference in
+//							try await keychainClient
+//								.loadFactorSourceMnemonic(
+//									reference: reference,
+//									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+//								)
+//						}
+//					)
+//				}
+//			},
 			addAccount: { account in
 				try await profileHolder.asyncMutating { profile in
 					try await profile.addAccount(account)

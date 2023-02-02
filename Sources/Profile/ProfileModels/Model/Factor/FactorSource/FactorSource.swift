@@ -33,6 +33,10 @@ public extension FactorSource {
 			return source
 		}
 	}
+
+	var supportsHierarchicalDeterministicDerivation: Bool {
+		any().supportsHierarchicalDeterministicDerivation
+	}
 }
 
 public extension FactorSource {

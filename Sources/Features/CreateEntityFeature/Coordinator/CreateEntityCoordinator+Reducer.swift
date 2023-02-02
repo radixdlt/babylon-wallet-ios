@@ -58,7 +58,7 @@ public struct CreateEntityCoordinator<
 			} else {
 				return goToStep2Creation(
 					entityName: specifiedNameForNewEntityToCreate,
-					genesisFactorSource: factorSources.factorSources[0],
+					genesisFactorSource: factorSources.factorSources[0].any() as! Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource,
 					state: &state
 				)
 			}
@@ -81,6 +81,11 @@ public struct CreateEntityCoordinator<
 				state: &state
 			)
 
+		case let .child(.step3_completion(.delegate(.completed))):
+			return .run { send in
+				await send(.delegate(.completed))
+			}
+
 		default:
 			return .none
 		}
@@ -102,10 +107,11 @@ public struct CreateEntityCoordinator<
 
 	private func goToStep2Creation(
 		entityName: String,
-		genesisFactorSource: FactorSource,
+		genesisFactorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource,
 		state: inout State
 	) -> EffectTask<Action> {
 		state.step = .step2_creationOfEntity(.init(
+			networkID: state.config.specificNetworkID,
 			name: entityName,
 			genesisFactorSource: genesisFactorSource
 		))

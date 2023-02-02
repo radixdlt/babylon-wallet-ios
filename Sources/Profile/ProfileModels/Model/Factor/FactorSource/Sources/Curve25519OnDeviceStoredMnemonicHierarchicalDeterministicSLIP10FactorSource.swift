@@ -18,6 +18,7 @@ public struct Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10Fac
 {
 	/// `SHA256(SHA256(masterPublicKey.compressedForm)`
 	public let factorSourceID: FactorSourceID
+	public var supportsHierarchicalDeterministicDerivation: Bool { true }
 
 	/// When this factor source was created.
 	public let creationDate: Date

@@ -35,6 +35,6 @@ public extension SelectGenesisFactorSource.Action {
 // MARK: - SelectGenesisFactorSource.Action.DelegateAction
 public extension SelectGenesisFactorSource.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case confirmedFactorSource(FactorSource, specifiedNameForNewEntityToCreate: String)
+		case confirmedFactorSource(Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource, specifiedNameForNewEntityToCreate: String)
 	}
 }

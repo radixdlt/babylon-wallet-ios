@@ -29,7 +29,9 @@ public extension CreationOfEntity.Action {
 
 // MARK: - CreationOfEntity.Action.SystemAction
 public extension CreationOfEntity.Action {
-	enum SystemAction: Sendable, Equatable {}
+	enum SystemAction: Sendable, Equatable {
+		case createEntityResult(TaskResult<Entity>)
+	}
 }
 
 // MARK: - CreationOfEntity.Action.DelegateAction
