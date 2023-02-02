@@ -10,7 +10,7 @@ public extension TokenView {
 		ZStack {
 			Circle()
 				.strokeBorder(.orange, lineWidth: 1)
-				.background(Circle().foregroundColor(Color.App.random))
+				.background(Circle().fill(Color.App.random))
 			Text(code)
 				.textCase(.uppercase)
 				.foregroundColor(.app.buttonTextBlack)
