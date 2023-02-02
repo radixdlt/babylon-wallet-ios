@@ -19,33 +19,46 @@ public extension PersonaRow.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { _ in
-			HStack(alignment: .top) {
-				Circle()
-					.strokeBorder(Color.app.gray3, lineWidth: 1)
-					.background(Circle().fill(Color.app.gray4))
-					.frame(.small)
-					.padding(.trailing, .small1)
+			VStack(alignment: .leading, spacing: .zero) {
+				HStack(alignment: .top) {
+					Circle()
+						.strokeBorder(Color.app.gray3, lineWidth: 1)
+						.background(Circle().fill(Color.app.gray4))
+						.frame(.small)
+						.padding(.trailing, .small1)
 
-				VStack(alignment: .leading, spacing: 4) {
-					Text("RadMatt")
-						.foregroundColor(.app.gray1)
-						.textStyle(.secondaryHeader)
+					VStack(alignment: .leading, spacing: 4) {
+						Text("RadMatt")
+							.foregroundColor(.app.gray1)
+							.textStyle(.secondaryHeader)
 
-					Text("SHaring")
+						Text("SHaring")
+							.foregroundColor(.app.gray2)
+							.textStyle(.body2Header)
+
+						Group {
+							Text("3 pieces of personal data")
+							Text("4 accounts")
+						}
 						.foregroundColor(.app.gray2)
-						.textStyle(.body2Header)
-
-					Group {
-						Text("3 pieces of personal data")
-						Text("4 accounts")
+						.textStyle(.body2Regular)
 					}
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2Regular)
-				}
 
-				Spacer()
+					Spacer()
+				}
+				.padding(.medium2)
+
+				Group {
+					Color.app.gray4
+						.frame(height: 1)
+
+					Text("Your last login was on 23 Jan 2023")
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+						.padding(.horizontal, .medium2)
+						.padding(.vertical, .small1)
+				}
 			}
-			.padding(.medium2)
 			.background(Color.app.gray5)
 			.cornerRadius(.small1)
 		}
