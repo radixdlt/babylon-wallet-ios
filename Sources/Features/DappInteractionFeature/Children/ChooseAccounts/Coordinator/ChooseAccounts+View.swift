@@ -49,7 +49,7 @@ public extension ChooseAccounts.View {
 									.foregroundColor(.app.gray1)
 									.textStyle(.sheetTitle)
 
-								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.interaction.metadata.dAppId))
+								Text(L10n.DApp.ChooseAccounts.subtitle(viewStore.interaction.metadata.dAppDefinitionAddress.description))
 									.foregroundColor(.app.gray1)
 									.textStyle(.body1Regular)
 									.padding(.medium1)
