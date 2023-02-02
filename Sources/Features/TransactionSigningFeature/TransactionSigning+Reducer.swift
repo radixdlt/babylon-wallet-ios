@@ -88,7 +88,7 @@ public extension TransactionSigning {
 				await send(.delegate(.failed(.transactionFailure(transactionFailure))))
 			}
 
-		case .internal(.view(.closeButtonTapped)):
+		case .internal(.view(.dismissButtonTapped)):
 			return .run { send in
 				await send(.delegate(.rejected))
 			}

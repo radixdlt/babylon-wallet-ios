@@ -4,18 +4,9 @@ import TransactionSigningFeature
 
 @MainActor
 final class TransactionSigningFeatureTests: TestCase {
-	let request = P2P.SendTransactionToHandle(
-		requestItem: .init(
-			version: .default,
-			transactionManifest: .mock,
-			message: nil
-		),
-		parentRequest: .previewValue
-	)
-
 	lazy var store: TestStore = .init(
 		initialState: TransactionSigning.State(
-			origin: .p2p(request: request),
+			transactionManifestWithoutLockFee: .mock,
 			transactionWithLockFee: .mock
 		),
 		reducer: TransactionSigning()
@@ -37,7 +28,7 @@ final class TransactionSigningFeatureTests: TestCase {
 		await store.receive(.internal(.signTransactionResult(.failure(.failedToCompileOrSign(.failedToCompileTXIntent))))) {
 			$0.isSigningTX = false
 		}
-		await store.receive(.delegate(.failed(request, .transactionFailure(.failedToCompileOrSign(.failedToCompileTXIntent)))))
+		await store.receive(.delegate(.failed(.transactionFailure(.failedToCompileOrSign(.failedToCompileTXIntent)))))
 
 		// Happy path
 		store.dependencies.transactionClient.signAndSubmitTransaction = { @Sendable _ in
@@ -52,7 +43,7 @@ final class TransactionSigningFeatureTests: TestCase {
 	}
 
 	func testReject() async {
-		await store.send(.view(.closeButtonTapped))
-		await store.receive(.delegate(.rejected(request)))
+		await store.send(.view(.dismissButtonTapped))
+		await store.receive(.delegate(.rejected))
 	}
 }

@@ -24,7 +24,7 @@ public extension TransactionSigning.View {
 					NavigationBar(
 						titleText: L10n.TransactionSigning.title,
 						leadingItem: CloseButton {
-							viewStore.send(.closeButtonTapped)
+							viewStore.send(.dismissButtonTapped)
 						}
 					)
 					ForceFullScreen {

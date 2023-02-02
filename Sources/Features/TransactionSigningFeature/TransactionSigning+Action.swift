@@ -17,7 +17,7 @@ public extension TransactionSigning.Action {
 	enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case signTransactionButtonTapped
-		case closeButtonTapped
+		case dismissButtonTapped
 	}
 }
 
