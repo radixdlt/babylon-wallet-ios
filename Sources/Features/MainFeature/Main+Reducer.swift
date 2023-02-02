@@ -15,8 +15,8 @@ public struct Main: Sendable, ReducerProtocol {
 			Home()
 		}
 
-		Scope(state: \.handleDappRequests, action: /Action.child .. Action.ChildAction.handleDappRequest) {
-			HandleDappRequests()
+		Scope(state: \.dappInteractionHook, action: /Action.child .. Action.ChildAction.dappInteractionHook) {
+			DappInteractionHook()
 		}
 
 		Reduce(self.core)
@@ -46,7 +46,7 @@ public struct Main: Sendable, ReducerProtocol {
 			state.settings = nil
 			return .none
 
-//		case .child(.handleDappRequest(.child(.chooseAccounts(.child(.createAccountCoordinator(.delegate(.completed))))))):
+//		case .child(.dappInteractionHook(.child(.chooseAccounts(.child(.createAccountCoordinator(.delegate(.completed))))))):
 //			return .run { send in
 //				await send(.child(.home(.delegate(.reloadAccounts))))
 //			}

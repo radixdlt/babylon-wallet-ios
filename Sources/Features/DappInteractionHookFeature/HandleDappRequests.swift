@@ -5,8 +5,8 @@ import ProfileClient
 import TransactionClient
 // import TransactionSigningFeature
 
-// MARK: - HandleDappRequests
-public struct HandleDappRequests: Sendable, FeatureReducer {
+// MARK: - DappInteractionHook
+public struct DappInteractionHook: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 //		public var currentRequest: P2P.UnfinishedRequestFromClient?
 		public var unfinishedRequestsFromClient: P2P.UnfinishedRequestsFromClient

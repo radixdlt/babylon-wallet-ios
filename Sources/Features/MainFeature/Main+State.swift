@@ -11,16 +11,16 @@ public extension Main {
 	struct State: Equatable {
 		public var home: Home.State
 		public var settings: AppSettings.State?
-		public var handleDappRequests: HandleDappRequests.State
+		public var dappInteractionHook: DappInteractionHook.State
 
 		public init(
 			home: Home.State = .init(),
-			handleDappRequests: HandleDappRequests.State = .init(),
-			settings: AppSettings.State? = nil
+			settings: AppSettings.State? = nil,
+			dappInteractionHook: DappInteractionHook.State = .init()
 		) {
 			self.home = home
 			self.settings = settings
-			self.handleDappRequests = handleDappRequests
+			self.dappInteractionHook = dappInteractionHook
 		}
 	}
 }

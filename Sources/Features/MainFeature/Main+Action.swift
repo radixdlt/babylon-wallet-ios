@@ -16,7 +16,7 @@ public extension Main.Action {
 	enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
 		case settings(AppSettings.Action)
-		case handleDappRequest(HandleDappRequests.Action)
+		case dappInteractionHook(DappInteractionHook.Action)
 	}
 }
 

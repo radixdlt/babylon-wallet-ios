@@ -2,11 +2,11 @@ import DappInteractionFeature
 import FeaturePrelude
 import TransactionSigningFeature
 
-// MARK: - HandleDappRequests.View
-public extension HandleDappRequests {
+// MARK: - DappInteractionHook.View
+public extension DappInteractionHook {
 	@MainActor
 	struct View: SwiftUI.View {
-		public typealias Store = StoreOf<HandleDappRequests>
+		public typealias Store = StoreOf<DappInteractionHook>
 		public let store: Store
 		public init(store: Store) {
 			self.store = store
@@ -14,7 +14,7 @@ public extension HandleDappRequests {
 	}
 }
 
-public extension HandleDappRequests.View {
+public extension DappInteractionHook.View {
 	var body: some View {
 		ZStack {}
 //			.sheet(

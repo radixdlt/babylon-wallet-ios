@@ -36,10 +36,10 @@ public extension Main.View {
 			)
 			.zIndex(1)
 
-			HandleDappRequests.View(
+			DappInteractionHook.View(
 				store: store.scope(
-					state: \.handleDappRequests,
-					action: { .child(.handleDappRequest($0)) }
+					state: \.dappInteractionHook,
+					action: { .child(.dappInteractionHook($0)) }
 				)
 			)
 			// TODO: verify these
