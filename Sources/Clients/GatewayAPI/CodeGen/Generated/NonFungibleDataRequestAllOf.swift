@@ -18,22 +18,22 @@ public extension GatewayAPI {
 	struct NonFungibleDataRequestAllOf: Codable, Hashable {
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
-		public private(set) var nonFungibleId: String
+		public private(set) var nonFungibleLocalId: String
 		/** This cursor allows forward pagination, by providing the cursor from the previous request. */
 		public private(set) var cursor: String?
 		/** The page size requested. */
 		public private(set) var limit: Int?
 
-		public init(address: String, nonFungibleId: String, cursor: String? = nil, limit: Int? = nil) {
+		public init(address: String, nonFungibleLocalId: String, cursor: String? = nil, limit: Int? = nil) {
 			self.address = address
-			self.nonFungibleId = nonFungibleId
+			self.nonFungibleLocalId = nonFungibleLocalId
 			self.cursor = cursor
 			self.limit = limit
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case address
-			case nonFungibleId = "non_fungible_id"
+			case nonFungibleLocalId = "non_fungible_id"
 			case cursor
 			case limit
 		}
@@ -43,7 +43,7 @@ public extension GatewayAPI {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(address, forKey: .address)
-			try container.encode(nonFungibleId, forKey: .nonFungibleId)
+			try container.encode(nonFungibleLocalId, forKey: .nonFungibleLocalId)
 			try container.encodeIfPresent(cursor, forKey: .cursor)
 			try container.encodeIfPresent(limit, forKey: .limit)
 		}

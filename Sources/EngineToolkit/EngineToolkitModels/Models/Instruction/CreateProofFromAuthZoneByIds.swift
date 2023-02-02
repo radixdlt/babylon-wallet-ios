@@ -10,14 +10,14 @@ public struct CreateProofFromAuthZoneByIds: InstructionProtocol {
 
 	// MARK: Stored properties
 	public let resourceAddress: ResourceAddress
-	public let ids: Set<NonFungibleId>
+	public let ids: Set<NonFungibleLocalId>
 	public let intoProof: Proof
 
 	// MARK: Init
 
 	public init(
 		resourceAddress: ResourceAddress,
-		ids: Set<NonFungibleId>,
+		ids: Set<NonFungibleLocalId>,
 		intoProof: Proof
 	) {
 		self.resourceAddress = resourceAddress
@@ -55,7 +55,7 @@ public extension CreateProofFromAuthZoneByIds {
 
 		try self.init(
 			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			ids: container.decode(Set<NonFungibleId>.self, forKey: .ids),
+			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
 			intoProof: container.decode(Proof.self, forKey: .intoProof)
 		)
 	}

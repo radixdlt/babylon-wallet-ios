@@ -37,7 +37,7 @@ final class AccountsRequiredToSignTests: TestCase {
 		CALL_METHOD
 		    ComponentAddress("account_sim1qvcqup8crcr07qxcprncvptayz9ustn2wfs0dh5pqagqqxvefg")
 		    "withdraw_by_ids"
-		    Array<NonFungibleId>();
+		    Array<NonFungibleLocalId>();
 
 		CALL_METHOD
 		    ComponentAddress("account_sim1qvcqup8crcr07qxcprncvptayz9ustn2wfs0dh5pqagqqxvefg")
@@ -56,7 +56,7 @@ final class AccountsRequiredToSignTests: TestCase {
 		    ComponentAddress("account_sim1q0g8lr6vnuf4ey70t8ctxjgq6j7r5d6s7288fzr52jssmjs79x")
 		    "lock_fee_and_withdraw_by_ids"
 		    Decimal("100")
-		    Array<NonFungibleId>();
+		    Array<NonFungibleLocalId>();
 
 		CALL_METHOD
 		    ComponentAddress("account_sim1qw4z7rd4x429796cmgp7ql50j0n8rrlujkwqa9xf3vpqg8crj4")
@@ -72,7 +72,7 @@ final class AccountsRequiredToSignTests: TestCase {
 		CALL_METHOD
 		    ComponentAddress("account_sim1q04p2nchcux4x3ppeq98f73ku83zem6yf0f9t2ad0lss5c20ea")
 		    "create_proof_by_ids"
-		    Array<NonFungibleId>();
+		    Array<NonFungibleLocalId>();
 
 		# Calls to account components, but to methods which do not require any signatures
 
@@ -120,7 +120,7 @@ final class AccountsRequiredToSignTests: TestCase {
 		CALL_METHOD
 		    ComponentAddress("component_sim1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7q8utaxr")
 		    "withdraw_by_ids"
-		    Array<NonFungibleId>();
+		    Array<NonFungibleLocalId>();
 
 		CALL_METHOD
 		    ComponentAddress("component_sim1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7q8utaxr")
@@ -139,7 +139,7 @@ final class AccountsRequiredToSignTests: TestCase {
 		    ComponentAddress("component_sim1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7q8utaxr")
 		    "lock_fee_and_withdraw_by_ids"
 		    Decimal("100")
-		    Array<NonFungibleId>();
+		    Array<NonFungibleLocalId>();
 
 		CALL_METHOD
 		    ComponentAddress("component_sim1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7q8utaxr")
@@ -155,7 +155,7 @@ final class AccountsRequiredToSignTests: TestCase {
 		CALL_METHOD
 		    ComponentAddress("component_sim1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7q8utaxr")
 		    "create_proof_by_ids"
-		    Array<NonFungibleId>();
+		    Array<NonFungibleLocalId>();
 		"""
 		let transactionManifest = TransactionManifest(instructions: .string(manifestStringInstructions))
 

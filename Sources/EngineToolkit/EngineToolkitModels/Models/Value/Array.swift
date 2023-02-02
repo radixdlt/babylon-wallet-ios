@@ -9,38 +9,36 @@ public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 	}
 
 	// MARK: Stored properties
-	public let elementType: ValueKind
+
+	public let elementKind: ValueKind
 	public let elements: [Value_]
 
 	// MARK: Init
 
 	public init(
-		elementType: ValueKind,
+		elementKind: ValueKind,
 		elements: [Value_]
 	) throws {
-		self.elementType = elementType
-		guard elements.allSatisfy({ $0.kind == elementType }) else {
-			throw Error.homogeneousArrayRequired
-		}
+		self.elementKind = elementKind
 		self.elements = elements
 	}
 
 	public init(
-		elementType: ValueKind,
+		elementKind: ValueKind,
 		@ValuesBuilder buildValues: () throws -> [ValueProtocol]
 	) throws {
 		try self.init(
-			elementType: elementType,
+			elementKind: elementKind,
 			elements: buildValues().map { $0.embedValue() }
 		)
 	}
 
 	public init(
-		elementType: ValueKind,
+		elementKind: ValueKind,
 		@SpecificValuesBuilder buildValues: () throws -> [Value_]
 	) throws {
 		try self.init(
-			elementType: elementType,
+			elementKind: elementKind,
 			elements: buildValues()
 		)
 	}
@@ -55,17 +53,19 @@ public extension Array_ {
 
 public extension Array_ {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
-		case elements, elementType = "element_type", type
+		case elements, elementKind = "element_kind", type
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
 		try container.encode(elements, forKey: .elements)
-		try container.encode(elementType, forKey: .elementType)
+		try container.encode(elementKind, forKey: .elementKind)
 	}
 
 	init(from decoder: Decoder) throws {
@@ -77,7 +77,7 @@ public extension Array_ {
 		}
 
 		try self.init(
-			elementType: container.decode(ValueKind.self, forKey: .elementType),
+			elementKind: container.decode(ValueKind.self, forKey: .elementKind),
 			elements: container.decode([Value_].self, forKey: .elements)
 		)
 	}

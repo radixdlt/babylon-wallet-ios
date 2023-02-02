@@ -22,15 +22,14 @@ public extension EngineToolkitClient {
 
 				let converted = try engineToolkit.convertManifest(
 					request: .init(
-						transactionVersion: request.version,
 						manifest: request.manifest,
-						outputFormat: .json,
+						outputFormat: .parsed,
 						networkId: request.networkID
 					)
 				)
 				.get()
 
-				guard case let .json(instructions) = converted.instructions else {
+				guard case let .parsed(instructions) = converted.instructions else {
 					throw FailedToConvertManifestToFormatWhereInstructionsAreJSON()
 				}
 
@@ -59,8 +58,7 @@ public extension EngineToolkitClient {
 			accountAddressesNeedingToSignTransaction: { request throws -> Set<AccountAddress> in
 				try Set(
 					request.manifest.accountsRequiredToSign(
-						networkId: request.networkID,
-						version: request.version
+						networkId: request.networkID
 					).map {
 						try AccountAddress(componentAddress: $0)
 					}

@@ -23,12 +23,14 @@ private extension Engine.Signature {
 
 public extension Engine.Signature {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
-		case discriminator = "type"
+		case discriminator = "curve"
 		case signature
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(discriminator, forKey: .discriminator)

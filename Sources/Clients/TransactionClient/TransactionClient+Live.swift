@@ -64,7 +64,7 @@ public extension TransactionClient {
 			let notarySignatureWithPublicKey: SignatureWithPublicKey
 			do {
 				notarySignatureWithPublicKey = try await notaryAndSigners.notarySigner.notarySigner(
-					compiledSignedIntent.compiledSignedIntent
+					compiledSignedIntent.compiledIntent
 				)
 			} catch {
 				return .failure(.failedToSignSignedCompiledIntentWithNotarySigner)
@@ -97,8 +97,9 @@ public extension TransactionClient {
 			@Dependency(\.mainQueue) var mainQueue
 
 			// MARK: Submit TX
+
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
-				notarizedTransactionHex: Data(compiledNotarizedTXIntent.compiledNotarizedIntent).hex
+				notarizedTransactionHex: Data(compiledNotarizedTXIntent.compiledIntent).hex
 			)
 
 			let response: GatewayAPI.TransactionSubmitResponse
@@ -114,6 +115,7 @@ public extension TransactionClient {
 			}
 
 			// MARK: Poll Status
+
 			var txStatus: GatewayAPI.TransactionStatus = .pending
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {

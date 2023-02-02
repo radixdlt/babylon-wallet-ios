@@ -1,6 +1,7 @@
 // MARK: - EncodeAddressRequest
 public struct EncodeAddressRequest: Sendable, Codable, Hashable {
 	// MARK: Stored properties
+
 	public let addressBytes: [UInt8]
 	public let networkId: NetworkID
 
@@ -21,16 +22,18 @@ public struct EncodeAddressRequest: Sendable, Codable, Hashable {
 
 public extension EncodeAddressRequest {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
 		case addressBytes = "address_bytes"
 		case networkId = "network_id"
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(addressBytes.hex(), forKey: .addressBytes)
-		try container.encode(networkId, forKey: .networkId)
+		try container.encode(String(networkId), forKey: .networkId)
 	}
 
 	init(from decoder: Decoder) throws {
@@ -39,7 +42,7 @@ public extension EncodeAddressRequest {
 
 		try self.init(
 			addressHex: container.decode(String.self, forKey: .addressBytes),
-			networkId: container.decode(NetworkID.self, forKey: .networkId)
+			networkId: NetworkID(decodeAndConvertToNumericType(container: container, key: .networkId))
 		)
 	}
 }

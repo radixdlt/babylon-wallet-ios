@@ -7,14 +7,14 @@ public enum ManifestInstructions: Sendable, Codable, Hashable, CustomStringConve
 	// ==============
 
 	case string(String)
-	case json([Instruction])
+	case parsed([Instruction])
 }
 
 // MARK: ManifestInstructions.Kind
 public extension ManifestInstructions {
 	enum Kind: String, Codable, Hashable, Sendable {
 		case string = "String"
-		case json = "JSON"
+		case parsed = "Parsed"
 	}
 }
 
@@ -27,7 +27,7 @@ public extension ManifestInstructions {
 		switch self {
 		case let .string(string):
 			return string
-		case let .json(instructions):
+		case let .parsed(instructions):
 			return instructions.lazy.map { String(describing: $0) }.joined(separator: "\n")
 		}
 	}

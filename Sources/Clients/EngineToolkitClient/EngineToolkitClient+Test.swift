@@ -9,12 +9,12 @@ extension EngineToolkitClient: TestDependencyKey {
 		convertManifestInstructionsToJSONIfItWasString: { _ in
 			.init(
 				instructions: [],
-				convertedManifestThatContainsThem: .init(instructions: .json([]))
+				convertedManifestThatContainsThem: .init(instructions: .parsed([]))
 			)
 		},
 		compileTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
 		compileSignedTransactionIntent: { _ in .init(bytes: [0xDE, 0xAD]) },
-		compileNotarizedTransactionIntent: { _ in .init(compiledNotarizedIntent: [0xDE, 0xAD]) },
+		compileNotarizedTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
 		generateTXID: { _ in "deadbeef" },
 		accountAddressesNeedingToSignTransaction: { _ in [] }
 	)

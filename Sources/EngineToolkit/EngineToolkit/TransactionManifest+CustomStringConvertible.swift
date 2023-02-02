@@ -44,15 +44,14 @@ public extension TransactionManifest {
 			return instructionsStringsWithoutNewline
 				.joined(separator: separator)
 
-		case let .json(instructionsOnJSONFormat):
+		case let .parsed(instructionsOnJSONFormat):
 			// We dont wanna print JSON, so we go through conversion to STRING first
 			func stringifyManifest(networkForRequest: NetworkID) throws -> TransactionManifest {
 				try EngineToolkit()
 					.convertManifest(
 						request: .init(
-							transactionVersion: .default,
 							manifest: manifest, // need blobs
-							// Wanna convert from Self (`.json`) -> ManifestInstrictions.string
+							// Wanna convert from Self (`.parsed`) -> ManifestInstrictions.string
 							outputFormat: .string,
 							networkId: networkForRequest
 						)
@@ -170,23 +169,21 @@ public extension TransactionManifest {
 	}
 
 	func accountsRequiredToSign(
-		networkId: NetworkID,
-		version: TXVersion = .default
+		networkId: NetworkID
 	) throws -> Set<ComponentAddress> {
 		let convertedManifest = try EngineToolkit().convertManifest(request: ConvertManifestRequest(
-			transactionVersion: version,
 			manifest: self,
-			outputFormat: .json,
+			outputFormat: .parsed,
 			networkId: networkId
 		)).get()
 
 		switch convertedManifest.instructions {
-		case let .json(instructions):
+		case let .parsed(instructions):
 			var accountsRequiredToSign: Set<ComponentAddress> = []
 			for instruction in instructions {
 				switch instruction {
 				case let .callMethod(callMethodInstruction):
-					let isAccountComponent = callMethodInstruction.receiver.isAccountComponent()
+					let isAccountComponent = callMethodInstruction.receiver.address.starts(with: "account")
 					let isMethodThatRequiresAuth = [
 						"lock_fee",
 						"lock_contingent_fee",
@@ -202,14 +199,7 @@ public extension TransactionManifest {
 					].contains(callMethodInstruction.methodName)
 
 					if isAccountComponent, isMethodThatRequiresAuth {
-						switch callMethodInstruction.receiver {
-						case let .componentAddress(componentAddress):
-							accountsRequiredToSign.insert(componentAddress)
-						case .component:
-							// TODO: The RENodeId should be translated to an account component
-							// address and added to the set
-							break
-						}
+						accountsRequiredToSign.insert(callMethodInstruction.receiver)
 					}
 
 				default:
@@ -219,7 +209,7 @@ public extension TransactionManifest {
 
 			return accountsRequiredToSign
 		case .string:
-			throw SborDecodeError(value: "Impossible case") // TODO: need a better error
+			fatalError("Converted the manifest to Parsed by instead received a string manifest!")
 		}
 	}
 }

@@ -75,10 +75,11 @@ extension Component {
 }
 
 // MARK: - Private Computed Properties
+
 private extension Component {
 	var metadata: [[String: String]] {
 		// TODO: refactor when API returns NFT metadata
-//		token.metadata ?? []
+		//		token.metadata ?? []
 		[]
 	}
 }
@@ -86,9 +87,7 @@ private extension Component {
 extension NonFungibleToken.ID {
 	var stringRepresentation: String {
 		switch self {
-		case let .u32(value):
-			return "\(value)"
-		case let .u64(value):
+		case let .integer(value):
 			return "\(value)"
 		case let .uuid(value):
 			return "\(value)"
