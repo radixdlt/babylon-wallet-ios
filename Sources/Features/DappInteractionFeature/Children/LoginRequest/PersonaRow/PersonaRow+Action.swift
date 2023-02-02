@@ -15,7 +15,7 @@ public extension PersonaRow.Action {
 // MARK: - PersonaRow.Action.ViewAction
 public extension PersonaRow.Action {
 	enum ViewAction: Sendable, Equatable {
-		case appeared
+		case didSelect
 	}
 }
 

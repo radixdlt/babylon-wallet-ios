@@ -28,8 +28,8 @@ public extension LoginRequest.State {
 		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 		dappMetadata: .previewValue,
 		personas: .init(uniqueElements: [
-			.init(persona: .previewValue0),
-			.init(persona: .previewValue1),
+			.init(persona: .previewValue0, hasAlreadyLoggedIn: true),
+			.init(persona: .previewValue1, hasAlreadyLoggedIn: false),
 		])
 	)
 }

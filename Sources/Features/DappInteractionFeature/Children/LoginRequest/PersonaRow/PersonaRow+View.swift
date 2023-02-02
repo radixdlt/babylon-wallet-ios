@@ -50,26 +50,30 @@ public extension PersonaRow.View {
 
 					HStack {
 						Spacer()
-						RadioButton(state: .selected)
+						RadioButton(state: viewStore.selectionState)
 					}
 				}
 				.padding(.medium2)
 
-				/*
-				 Group {
-				 	Color.app.gray4
-				 		.frame(height: 1)
+				if viewStore.hasAlreadyLoggedIn {
+					Group {
+						Color.app.gray4
+							.frame(height: 1)
 
-				 	Text("Your last login was on 23 Jan 2023")
-				 		.foregroundColor(.app.gray2)
-				 		.textStyle(.body2Regular)
-				 		.padding(.horizontal, .medium2)
-				 		.padding(.vertical, .small1)
-				 }
-				 */
+						// TODO: replace with dapp.lastUsedOn
+						Text("Your last login was on 23 Jan 2023")
+							.foregroundColor(.app.gray2)
+							.textStyle(.body2Regular)
+							.padding(.horizontal, .medium2)
+							.padding(.vertical, .small1)
+					}
+				}
 			}
 			.background(Color.app.gray5)
 			.cornerRadius(.small1)
+			.onTapGesture {
+				viewStore.send(.didSelect)
+			}
 		}
 	}
 }
@@ -78,9 +82,21 @@ public extension PersonaRow.View {
 extension PersonaRow.View {
 	struct ViewState: Equatable {
 		let name: String
+		let hasAlreadyLoggedIn: Bool
+		let selectionState: RadioButton.State
 
 		init(state: PersonaRow.State) {
-			name = state.persona.displayName ?? "Unknown dApp"
+			name = state.persona.displayName ?? L10n.DApp.unknownName
+			hasAlreadyLoggedIn = state.hasAlreadyLoggedIn
+
+			switch state.selectionState {
+			case .unselected:
+				selectionState = .unselected
+			case .selected:
+				selectionState = .selected
+			case .disabled:
+				selectionState = .disabled
+			}
 		}
 	}
 }

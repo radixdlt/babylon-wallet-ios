@@ -33,7 +33,7 @@ public extension LoginRequest.View {
 						.frame(height: .small2)
 
 					ScrollView {
-						VStack {
+						VStack(spacing: .medium2) {
 							VStack(spacing: .medium2) {
 								dappImage
 
@@ -48,12 +48,12 @@ public extension LoginRequest.View {
 								.textStyle(.secondaryHeader)
 								.multilineTextAlignment(.center)
 							}
-							.padding(.bottom, .medium1)
+							.padding(.bottom, .medium2)
 
 							Text(L10n.DApp.LoginRequest.chooseAPersonaTitle)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Header)
-								.padding(.bottom, .medium2)
+								.padding(.bottom, .small2)
 
 							ForEachStore(
 								store.scope(
