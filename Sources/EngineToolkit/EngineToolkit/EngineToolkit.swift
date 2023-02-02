@@ -46,6 +46,7 @@ internal extension EngineToolkit {
 }
 
 // MARK: Public
+
 public extension EngineToolkit {
 	/// Obtains information on the current transaction library used.
 	///
@@ -110,7 +111,7 @@ public extension EngineToolkit {
 	) -> Result<CompileNotarizedTransactionIntentResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: compile_notarized_transaction_intent
+			function: compile_notarized_transaction
 		)
 	}
 
@@ -119,7 +120,7 @@ public extension EngineToolkit {
 	) -> Result<DecompileNotarizedTransactionIntentResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: decompile_notarized_transaction_intent
+			function: decompile_notarized_transaction
 		)
 	}
 
@@ -168,21 +169,12 @@ public extension EngineToolkit {
 		)
 	}
 
-	func deriveNonFungibleAddressFromPublicKeyRequest(
-		request: DeriveNonFungibleAddressFromPublicKeyRequest
-	) -> Result<DeriveNonFungibleAddressFromPublicKeyResponse, Error> {
+	func deriveNonFungibleGlobalIdFromPublicKeyRequest(
+		request: DeriveNonFungibleGlobalIdFromPublicKeyRequest
+	) -> Result<DeriveNonFungibleGlobalIdFromPublicKeyResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: derive_non_fungible_address_from_public_key
-		)
-	}
-
-	func deriveNonFungibleAddressRequest(
-		request: DeriveNonFungibleAddressRequest
-	) -> Result<DeriveNonFungibleAddressResponse, Error> {
-		callLibraryFunction(
-			request: request,
-			function: derive_non_fungible_address
+			function: derive_non_fungible_global_id_from_public_key
 		)
 	}
 
@@ -194,9 +186,28 @@ public extension EngineToolkit {
 			function: derive_virtual_account_address
 		)
 	}
+
+	func deriveVirtualIdentityAddressRequest(
+		request: DeriveVirtualIdentityAddressRequest
+	) -> Result<DeriveVirtualIdentityAddressResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: derive_virtual_identity_address
+		)
+	}
+
+	func knownEntityAddresses(
+		request: KnownEntityAddressesRequest
+	) -> Result<KnownEntityAddressesResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: known_entity_addresses
+		)
+	}
 }
 
 // MARK: Private (But Internal For Tests)
+
 internal extension EngineToolkit {
 	/// Calls the transaction library with a given input and returns the output back.
 	///
@@ -288,20 +299,13 @@ private extension EngineToolkit {
 		do {
 			let response = try jsonDecoder.decode(Response.self, from: jsonData)
 			return .success(response)
-		} catch let firstError {
-			do {
-				/// We might have got an **ErrorResponse** from the Radix Engine Toolkit,
-				/// try decoding jsonData to that instead.
-				let errorResponse = try jsonDecoder.decode(ErrorResponse.self, from: jsonData)
-				return .failure(.errorResponse(errorResponse))
-			} catch let decodingError as Swift.DecodingError {
-				#if DEBUG
-				prettyPrint(responseJSONString: jsonString, error: firstError, failedToDecodeInto: Response.self)
-				#endif
-				return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEither(responseType: "\(Response.self)", decodingError: decodingError))
-			} catch {
-				return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEitherNorAsSwiftDecodingError(responseType: "\(Response.self)", nonSwiftDecodingError: String(describing: firstError)))
-			}
+		} catch let error as Swift.DecodingError {
+			#if DEBUG
+			prettyPrint(responseJSONString: jsonString, error: error, failedToDecodeInto: Response.self)
+			#endif
+			return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEither(responseType: "\(Response.self)", decodingError: error))
+		} catch {
+			return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEitherNorAsSwiftDecodingError(responseType: "\(Response.self)", nonSwiftDecodingError: String(describing: error)))
 		}
 	}
 
@@ -398,7 +402,7 @@ func prettyPrint<FailedDecodable: Decodable>(
 ) {
 	prettyPrint(
 		jsonString: responseJSONString,
-		label: "\n📦⬇️ Failed to parse response JSON string to either \(FailedDecodable.self) or \(ErrorResponse.self), underlying decoding error: \(String(describing: error))"
+		label: "\n📦⬇️ Failed to parse response JSON string to either \(FailedDecodable.self) or ErrorResponse, underlying decoding error: \(String(describing: error))"
 	)
 }
 

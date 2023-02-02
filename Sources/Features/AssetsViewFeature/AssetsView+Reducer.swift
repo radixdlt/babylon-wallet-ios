@@ -2,28 +2,25 @@ import FeaturePrelude
 import FungibleTokenListFeature
 import NonFungibleTokenListFeature
 
-public struct AssetsView: Sendable, ReducerProtocol {
+public struct AssetsView: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.nonFungibleTokenList, action: /Action.child .. Action.ChildAction.nonFungibleTokenList) {
+		Scope(state: \.nonFungibleTokenList, action: /Action.child .. ChildAction.nonFungibleTokenList) {
 			NonFungibleTokenList()
 		}
 
-		Scope(state: \.fungibleTokenList, action: /Action.child .. Action.ChildAction.fungibleTokenList) {
+		Scope(state: \.fungibleTokenList, action: /Action.child .. ChildAction.fungibleTokenList) {
 			FungibleTokenList()
 		}
 
 		Reduce(self.core)
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case let .internal(.view(.listSelectorTapped(type))):
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case let .listSelectorTapped(type):
 			state.type = type
-			return .none
-
-		case .child, .delegate:
 			return .none
 		}
 	}

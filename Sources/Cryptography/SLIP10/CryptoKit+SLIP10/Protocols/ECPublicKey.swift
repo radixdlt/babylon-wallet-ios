@@ -9,5 +9,5 @@ public protocol ECPublicKey {
 	// and it results in wrong key, so we want to use `x963Representation` for P256.
 	init<Bytes>(compressedRepresentation: Bytes) throws where Bytes: ContiguousBytes
 
-	init<D>(uncompressedRepresentation: D) throws where D: ContiguousBytes
+	init<D>(rawRepresentation: D) throws where D: ContiguousBytes
 }

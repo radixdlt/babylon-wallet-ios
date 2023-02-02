@@ -27,8 +27,9 @@ public extension Engine.PublicKey {
 
 public extension Engine.PublicKey {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
-		case discriminator = "type"
+		case discriminator = "curve"
 		case publicKey = "public_key"
 	}
 
@@ -40,6 +41,7 @@ public extension Engine.PublicKey {
 	}
 
 	// MARK: Codable
+
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 

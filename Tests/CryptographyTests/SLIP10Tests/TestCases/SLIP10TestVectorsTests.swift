@@ -237,7 +237,6 @@ final class SLIP10TestVectorsTests: TestCase {
 	}
 
 	// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-1-for-nist256p1
-	@available(macOS 13, iOS 16, *)
 	func testSlip10Vector1P256() throws {
 		try doTest(
 			curve: P256.self,
@@ -246,7 +245,6 @@ final class SLIP10TestVectorsTests: TestCase {
 	}
 }
 
-@available(macOS 13, iOS 16, *)
 extension SLIP10TestVectorsTests {
 	// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-2-for-nist256p1
 	func testSlip10Vector2P256() throws {
@@ -284,7 +282,6 @@ extension SLIP10TestVectorsTests {
 	}
 }
 
-@available(macOS 13, iOS 16, *)
 private let seedRetryVectorP256 = try! TestVector<P256>(
 	seed: "a7305bc8df8d0951f0cb224c0e95d7707cbdf2c6ce7e8d481fec69c7ff5e9446",
 	vectorID: 1,
@@ -303,7 +300,6 @@ private let seedRetryVectorP256 = try! TestVector<P256>(
 	]
 )
 
-@available(macOS 13, iOS 16, *)
 private let derivationRetryVectorP256 = try! TestVector<P256>(
 	seed: "000102030405060708090a0b0c0d0e0f",
 	vectorID: 1,
@@ -344,7 +340,6 @@ private let derivationRetryVectorP256 = try! TestVector<P256>(
 	]
 )
 
-@available(macOS 13, iOS 16, *)
 private let vector1P256 = try! TestVector<P256>(
 	seed: "000102030405060708090a0b0c0d0e0f",
 	vectorID: 1,
@@ -422,7 +417,6 @@ private let vector1P256 = try! TestVector<P256>(
 	]
 )
 
-@available(macOS 13, iOS 16, *)
 private let vector2P256 = try! TestVector<P256>(
 	seed: "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542",
 	vectorID: 2,
@@ -910,7 +904,6 @@ private extension SLIP10TestVectorsTests {
 }
 
 // MARK: P256
-@available(macOS 13, iOS 16, *)
 public extension Slip10CurveType {
 	/// The elliptic curve `P256`, `secp256r1`, `prime256v1` or as SLIP-0010 calls it `Nist256p1`
 	static let p256 = Self(
@@ -923,7 +916,6 @@ public extension Slip10CurveType {
 }
 
 // MARK: - P256 + Slip10SupportedECCurve
-@available(macOS 13, iOS 16, *)
 extension P256: Slip10SupportedECCurve {
 	public typealias PrivateKey = P256.Signing.PrivateKey
 	public typealias PublicKey = P256.Signing.PublicKey
@@ -931,13 +923,7 @@ extension P256: Slip10SupportedECCurve {
 }
 
 // MARK: - P256.Signing.PrivateKey + ECPrivateKey
-@available(macOS 13, iOS 16, *)
 extension P256.Signing.PrivateKey: ECPrivateKey {}
 
 // MARK: - P256.Signing.PublicKey + ECPublicKey
-@available(macOS 13, iOS 16, *)
-extension P256.Signing.PublicKey: ECPublicKey {
-	public init<D>(uncompressedRepresentation: D) throws where D: ContiguousBytes {
-		try self.init(rawRepresentation: uncompressedRepresentation)
-	}
-}
+extension P256.Signing.PublicKey: ECPublicKey {}

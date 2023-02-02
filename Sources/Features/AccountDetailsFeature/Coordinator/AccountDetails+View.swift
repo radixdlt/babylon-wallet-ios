@@ -54,7 +54,7 @@ public extension AccountDetails.View {
 					.padding(.bottom)
 					#endif
 
-					RefreshableScrollView {
+					ScrollView {
 						VStack(spacing: .medium3) {
 							AssetsView.View(
 								store: store.scope(

@@ -22,7 +22,7 @@ public struct TransactionManifest: Sendable, Codable, Hashable {
 		blobs: [[UInt8]] = []
 	) {
 		self.init(
-			instructions: .json(instructions),
+			instructions: .parsed(instructions),
 			blobs: blobs
 		)
 	}

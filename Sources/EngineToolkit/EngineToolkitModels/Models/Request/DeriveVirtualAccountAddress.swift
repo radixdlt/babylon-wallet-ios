@@ -10,10 +10,25 @@ public struct DeriveVirtualAccountAddressRequest: Sendable, Codable, Hashable {
 		self.publicKey = publicKey
 		self.networkId = networkId
 	}
+}
 
+public extension DeriveVirtualAccountAddressRequest {
 	private enum CodingKeys: String, CodingKey {
 		case publicKey = "public_key"
 		case networkId = "network_id"
+	}
+
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(publicKey, forKey: .publicKey)
+		try container.encode(String(networkId), forKey: .networkId)
+	}
+
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		let publicKey = try container.decode(Engine.PublicKey.self, forKey: .publicKey)
+		let networkId: UInt8 = try decodeAndConvertToNumericType(container: container, key: .networkId)
+		self.init(publicKey: publicKey, networkId: NetworkID(networkId))
 	}
 }
 

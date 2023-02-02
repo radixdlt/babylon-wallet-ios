@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - ComponentAddress
-public struct ComponentAddress: ValueProtocol, Sendable, Codable, Hashable, AddressProtocol, CallMethodReceiverCompatible {
+public struct ComponentAddress: ValueProtocol, Sendable, Codable, Hashable, AddressProtocol {
 	// Type name, used as a discriminator
 	public static let kind: ValueKind = .componentAddress
 	public func embedValue() -> Value_ {
@@ -43,11 +43,5 @@ public extension ComponentAddress {
 
 		// Decoding `address`
 		try self.init(address: container.decode(String.self, forKey: .address))
-	}
-}
-
-public extension ComponentAddress {
-	func toCallMethodReceiver() -> CallMethodReceiver {
-		.componentAddress(self)
 	}
 }

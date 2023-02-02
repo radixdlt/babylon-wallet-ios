@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kean/Nuke",
       "state" : {
-        "revision" : "2e9337168d08acccf72c039bf9324be24a1cf7d7",
-        "version" : "11.5.3"
+        "revision" : "df6cfba3f49aa6777b8c1084cb7778899ca166d3",
+        "version" : "11.6.0"
       }
     },
     {
@@ -150,7 +150,7 @@
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
         "branch" : "navigation",
-        "revision" : "a5003768c79fded485e9dcdf04d913c18bd1a48e"
+        "revision" : "c748b809107d83593d0fdd7d17aa7a47cab7d4a0"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-custom-dump",
       "state" : {
-        "revision" : "ead7d30cc224c3642c150b546f4f1080d1c411a8",
-        "version" : "0.6.1"
+        "revision" : "87dd388a193569b288d03cb4060db54f90d1a66f",
+        "version" : "0.7.0"
       }
     },
     {
@@ -167,8 +167,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-dependencies",
       "state" : {
-        "revision" : "7a094fcc6a4fcb34fbe625ecd3acd81b881a6dfb",
-        "version" : "0.1.3"
+        "revision" : "8282b0c59662eb38946afe30eb403663fc2ecf76",
+        "version" : "0.1.4"
       }
     },
     {
@@ -176,8 +176,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tgrapperon/swift-dependencies-additions",
       "state" : {
-        "revision" : "2e5d138090b643fa8ed398a94d0e1a3fb00375b1",
-        "version" : "0.2.0"
+        "revision" : "842f6f2f03c591275a40550839bfa20b05e85072",
+        "version" : "0.3.0"
       }
     },
     {
@@ -203,8 +203,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-log.git",
       "state" : {
-        "revision" : "e6ca651cbc30b9117aa5586c6e0f8ebbc0a63e0e",
-        "version" : "1.5.0"
+        "revision" : "32e8d724467f8fe623624570367e3d50c5638e46",
+        "version" : "1.5.2"
       }
     },
     {
@@ -266,8 +266,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swiftui-navigation",
       "state" : {
-        "revision" : "bf0fb9d53019cbde1a1e0cf290b560a0a0411282",
-        "version" : "0.6.0"
+        "revision" : "270a754308f5440be52fc295242eb7031638bd15",
+        "version" : "0.6.1"
       }
     },
     {

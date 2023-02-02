@@ -18,23 +18,23 @@ public extension GatewayAPI {
 	struct NonFungibleDataResponseAllOf: Codable, Hashable {
 		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var address: String
-		public private(set) var nonFungibleIdType: NonFungibleIdType
-		public private(set) var nonFungibleId: String
+		public private(set) var nonFungibleLocalIdType: NonFungibleLocalIdType
+		public private(set) var nonFungibleLocalId: String
 		public private(set) var mutableDataHex: String
 		public private(set) var immutableDataHex: String
 
-		public init(address: String, nonFungibleIdType: NonFungibleIdType, nonFungibleId: String, mutableDataHex: String, immutableDataHex: String) {
+		public init(address: String, nonFungibleLocalIdType: NonFungibleLocalIdType, nonFungibleLocalId: String, mutableDataHex: String, immutableDataHex: String) {
 			self.address = address
-			self.nonFungibleIdType = nonFungibleIdType
-			self.nonFungibleId = nonFungibleId
+			self.nonFungibleLocalIdType = nonFungibleLocalIdType
+			self.nonFungibleLocalId = nonFungibleLocalId
 			self.mutableDataHex = mutableDataHex
 			self.immutableDataHex = immutableDataHex
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case address
-			case nonFungibleIdType = "non_fungible_id_type"
-			case nonFungibleId = "non_fungible_id"
+			case nonFungibleLocalIdType = "non_fungible_id_type"
+			case nonFungibleLocalId = "non_fungible_id"
 			case mutableDataHex = "mutable_data_hex"
 			case immutableDataHex = "immutable_data_hex"
 		}
@@ -44,8 +44,8 @@ public extension GatewayAPI {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(address, forKey: .address)
-			try container.encode(nonFungibleIdType, forKey: .nonFungibleIdType)
-			try container.encode(nonFungibleId, forKey: .nonFungibleId)
+			try container.encode(nonFungibleLocalIdType, forKey: .nonFungibleLocalIdType)
+			try container.encode(nonFungibleLocalId, forKey: .nonFungibleLocalId)
 			try container.encode(mutableDataHex, forKey: .mutableDataHex)
 			try container.encode(immutableDataHex, forKey: .immutableDataHex)
 		}

@@ -1,27 +1,42 @@
 // MARK: - ConvertManifestRequest
 public struct ConvertManifestRequest: Sendable, Codable, Hashable {
-	public let transactionVersion: TXVersion
 	public let networkId: NetworkID
-	public let manifestInstructionsOutputFormat: ManifestInstructionsKind
+	public let instructionsOutputKind: ManifestInstructionsKind
 	public let manifest: TransactionManifest
 
 	public init(
-		transactionVersion: TXVersion,
 		manifest: TransactionManifest,
 		outputFormat: ManifestInstructionsKind,
 		networkId: NetworkID
 	) {
-		self.transactionVersion = transactionVersion
-		self.manifestInstructionsOutputFormat = outputFormat
+		self.instructionsOutputKind = outputFormat
 		self.manifest = manifest
 		self.networkId = networkId
 	}
+}
 
+public extension ConvertManifestRequest {
 	private enum CodingKeys: String, CodingKey {
-		case transactionVersion = "transaction_version"
 		case networkId = "network_id"
-		case manifestInstructionsOutputFormat = "manifest_instructions_output_format"
+		case instructionsOutputKind = "instructions_output_kind"
 		case manifest
+	}
+
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(String(networkId), forKey: .networkId)
+		try container.encode(instructionsOutputKind, forKey: .instructionsOutputKind)
+		try container.encode(manifest, forKey: .manifest)
+	}
+
+	init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+
+		let networkId: UInt8 = try decodeAndConvertToNumericType(container: container, key: .networkId)
+		let instructionsOutputKind = try container.decode(ManifestInstructionsKind.self, forKey: .instructionsOutputKind)
+		let manifest = try container.decode(TransactionManifest.self, forKey: .manifest)
+
+		self.init(manifest: manifest, outputFormat: instructionsOutputKind, networkId: NetworkID(networkId))
 	}
 }
 

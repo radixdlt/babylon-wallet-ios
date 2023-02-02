@@ -4,14 +4,14 @@ import ProfileModels
 
 // MARK: - NonFungibleToken
 public struct NonFungibleToken: Sendable, Token, Hashable {
-	public let nonFungibleId: ID
-	public typealias ID = NonFungibleId
-	public var id: ID { nonFungibleId }
+	public let nonFungibleLocalId: ID
+	public typealias ID = NonFungibleLocalId
+	public var id: ID { nonFungibleLocalId }
 
 	public init(
-		nonFungibleId: ID
+		nonFungibleLocalId: ID
 	) {
-		self.nonFungibleId = nonFungibleId
+		self.nonFungibleLocalId = nonFungibleLocalId
 	}
 }
 
@@ -77,15 +77,15 @@ public extension NonFungibleTokenContainer {
 
 public extension NonFungibleToken {
 	static let mock1 = Self(
-		nonFungibleId: .string("nft1-deadbeef")
+		nonFungibleLocalId: .string("nft1-deadbeef")
 	)
 
 	static let mock2 = Self(
-		nonFungibleId: .string("nft2-deadbeef")
+		nonFungibleLocalId: .string("nft2-deadbeef")
 	)
 
 	static let mock3 = Self(
-		nonFungibleId: .string("nft3-deadbeef")
+		nonFungibleLocalId: .string("nft3-deadbeef")
 	)
 }
 #endif

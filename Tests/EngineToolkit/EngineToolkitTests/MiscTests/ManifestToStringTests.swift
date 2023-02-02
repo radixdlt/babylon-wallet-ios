@@ -43,9 +43,9 @@ final class ManifestToStringTests: TestCase {
 				PublishPackageWithOwner(
 					code: Blob(data: sha256(data: package.code)),
 					abi: Blob(data: sha256(data: package.abi)),
-					ownerBadge: NonFungibleAddress(
+					ownerBadge: NonFungibleGlobalId(
 						resourceAddress: .init(address: "resource_sim1qzf8hl3azz2q0e5s33nh2mt8wmvqjfxdrv06ysus4alqh0994h"),
-						nonFungibleId: .u32(12)
+						nonFungibleLocalId: .integer(12)
 					)
 				)
 			}.instructions
@@ -58,9 +58,8 @@ final class ManifestToStringTests: TestCase {
 				]
 			)
 
-			for outputInstructionKind in [ManifestInstructionsKind.json, ManifestInstructionsKind.string] {
+			for outputInstructionKind in [ManifestInstructionsKind.parsed, ManifestInstructionsKind.string] {
 				XCTAssertNoThrow(try sut.convertManifest(request: ConvertManifestRequest(
-					transactionVersion: 0x01,
 					manifest: transactionManifest,
 					outputFormat: outputInstructionKind,
 					networkId: 0xF2
