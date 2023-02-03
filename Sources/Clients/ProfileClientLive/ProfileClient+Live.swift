@@ -122,23 +122,25 @@ public extension ProfileClient {
 
 				let mnemonic = request.onDeviceFactorSourceMnemonic
 
-				let factorSource = try Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(
-					mnemonic: mnemonic,
-					bip39Passphrase: request.bip39Passphrase
+				// FIXME: Cleanup post Betanet v2 when we have the new FactorSource format.
+				let expectedFactorSourceID = try HD.Root(
+					seed: mnemonic.seed(passphrase: request.bip39Passphrase)
+				).factorSourceID(
+					curve: Curve25519.self
 				)
 
-				try await profileHolder.get { profile in
-					guard profile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first == factorSource else {
-						struct DiscrepancyMismatchingFactorSources: Swift.Error {}
-						throw DiscrepancyMismatchingFactorSources()
+				try await profileHolder.getAsync { profile in
+					let factorSource = profile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first
+					guard factorSource.factorSourceID == expectedFactorSourceID else {
+						struct DiscrepancyMismatchingFactorSourceIDs: Swift.Error {}
+						throw DiscrepancyMismatchingFactorSourceIDs()
 					}
 					// all good
+					try await keychainClient.updateFactorSource(
+						mnemonic: mnemonic,
+						reference: factorSource.reference
+					)
 				}
-
-				try await keychainClient.updateFactorSource(
-					mnemonic: mnemonic,
-					reference: factorSource.reference
-				)
 
 				try await profileHolder.persistAndAllowFuturePersistenceOfEphemeralProfile()
 
