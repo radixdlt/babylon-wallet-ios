@@ -38,6 +38,6 @@ public extension ConfirmationFooter {
 // MARK: - ConfirmationFooter_Previews
 struct ConfirmationFooter_Previews: PreviewProvider {
 	static var previews: some View {
-		ConfirmationFooter(title: "proba", isEnabled: true, action: {})
+		ConfirmationFooter(title: "Continue", isEnabled: true, action: {})
 	}
 }
