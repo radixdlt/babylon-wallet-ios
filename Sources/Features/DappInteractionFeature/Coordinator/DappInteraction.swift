@@ -2,18 +2,23 @@ import FeaturePrelude
 
 public struct DappInteraction: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let interaction: P2P.FromDapp.WalletInteraction
+		public typealias Interaction = P2P.FromDapp.WalletInteraction
+		typealias AnyInteractionItem = P2P.FromDapp.WalletInteraction.AnyInteractionItem
+		typealias AnyInteractionResponseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem
+
 		let dappMetadata: DappMetadata
+		let interaction: Interaction
+		var responses: [AnyInteractionItem: AnyInteractionResponseItem] = [:]
 
 		@NavigationStateOf<Destinations>
 		var navigation: NavigationState<Destinations.State>.Path
 
 		public init(
-			interaction: P2P.FromDapp.WalletInteraction,
-			dappMetadata: DappMetadata
+			dappMetadata: DappMetadata,
+			interaction: Interaction
 		) {
-			self.interaction = interaction
 			self.dappMetadata = dappMetadata
+			self.interaction = interaction
 		}
 	}
 

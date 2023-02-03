@@ -6,19 +6,13 @@ import ProfileClient
 // MARK: - DappInteractionHook
 public struct DappInteractionHook: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-//		public var currentRequest: P2P.UnfinishedRequestFromClient?
-		public var unfinishedRequestsFromClient: P2P.UnfinishedRequestsFromClient
+		var currentRequest: P2P.RequestFromClient? { requestQueue.first }
+		var requestQueue: OrderedSet<P2P.RequestFromClient> = []
 
 		@PresentationStateOf<DappInteraction>
 		public var dappInteraction
 
-		public init(
-			//			currentRequest: P2P.UnfinishedRequestFromClient? = nil,
-			unfinishedRequestsFromClient: P2P.UnfinishedRequestsFromClient = .init()
-		) {
-//			self.currentRequest = currentRequest
-			self.unfinishedRequestsFromClient = unfinishedRequestsFromClient
-		}
+		public init() {}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -34,7 +28,7 @@ public struct DappInteractionHook: Sendable, FeatureReducer {
 		case rejected(P2P.RequestFromClient)
 		case failedWithError(P2P.RequestFromClient, P2P.ToDapp.WalletInteractionFailureResponse.ErrorType, String?)
 		case handleNextRequestItemIfNeeded
-		case presentViewForP2PRequest(P2P.RequestItemToHandle)
+//		case presentViewForP2PRequest(P2P.RequestItemToHandle)
 		case sendResponseBackToDappResult(TaskResult<P2P.SentResponseToClient>)
 	}
 
@@ -99,23 +93,23 @@ public struct DappInteractionHook: Sendable, FeatureReducer {
 			}
 
 		case let .internal(.receivedRequestIsValidHandleIt(validRequestFromP2P)):
-			state.unfinishedRequestsFromClient.queue(requestFromClient: validRequestFromP2P)
+//			state.unfinishedRequestsFromClient.queue(requestFromClient: validRequestFromP2P)
 
 //			guard state.currentRequest == nil else {
 //				// already handling a requests
 //				return .none
 //			}
-			guard let itemToHandle = state.unfinishedRequestsFromClient.next() else {
-				// We just queued a request, did it contain no RequestItems at all? This is undefined behavior. Should we return an empty response here?
-				return .none
-			}
-			return .run { send in
-				await send(.internal(.presentViewForP2PRequest(itemToHandle)))
+//			guard let itemToHandle = state.unfinishedRequestsFromClient.next() else {
+//				// We just queued a request, did it contain no RequestItems at all? This is undefined behavior. Should we return an empty response here?
+//				return .none
+//			}
+			return .run { _ in
+//				await send(.internal(.presentViewForP2PRequest(itemToHandle)))
 			}
 
-		case let .internal(.presentViewForP2PRequest(requestItemToHandle)):
-//			state.currentRequest = .init(requestItemToHandle: requestItemToHandle)
-			return .none
+//		case let .internal(.presentViewForP2PRequest(requestItemToHandle)):
+////			state.currentRequest = .init(requestItemToHandle: requestItemToHandle)
+//			return .none
 
 //		case let .child(.chooseAccounts(.delegate(.finishedChoosingAccounts(selectedAccounts, request)))):
 ////			state.currentRequest = nil
@@ -276,7 +270,7 @@ public struct DappInteractionHook: Sendable, FeatureReducer {
 		failure: P2P.ToDapp.WalletInteractionFailureResponse
 	) -> EffectTask<Action> {
 //		state.currentRequest = nil
-		state.unfinishedRequestsFromClient.failed(interactionId: failure.interactionId)
+//		state.unfinishedRequestsFromClient.failed(interactionId: failure.interactionId)
 
 		let response = P2P.ResponseToClientByID(
 			connectionID: connectionID,
@@ -295,14 +289,15 @@ public struct DappInteractionHook: Sendable, FeatureReducer {
 	func presentViewForNextBufferedRequestFromBrowserIfNeeded(
 		state: inout State
 	) -> EffectTask<Action> {
-		guard let next = state.unfinishedRequestsFromClient.next() else {
-			return .none
-		}
-
-		return .run { send in
-			try await mainQueue.sleep(for: .seconds(1))
-			await send(.internal(.presentViewForP2PRequest(next)))
-		}
+		.none
+//		guard let next = state.unfinishedRequestsFromClient.next() else {
+//			return .none
+//		}
+//
+//		return .run { send in
+//			try await mainQueue.sleep(for: .seconds(1))
+//			await send(.internal(.presentViewForP2PRequest(next)))
+//		}
 	}
 }
 
