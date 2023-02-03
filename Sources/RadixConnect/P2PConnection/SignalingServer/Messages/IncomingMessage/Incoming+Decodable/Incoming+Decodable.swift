@@ -101,47 +101,47 @@ public extension SignalingServerMessage.Incoming {
 	}
 }
 
-#if DEBUG
-extension SignalingServerMessage.Incoming: Encodable {}
-public extension SignalingServerMessage.Incoming {
-	func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		switch self {
-		case let .fromSignalingServerItself(fromSignalingServerItself):
-			switch fromSignalingServerItself {
-			case let .notification(notification):
-				switch notification {
-				case .remoteClientJustConnected:
-					try container.encode(ResponseType.remoteClientJustConnected, forKey: .responseType)
-				case .remoteClientDisconnected:
-					try container.encode(ResponseType.remoteClientDisconnected, forKey: .responseType)
-				case .remoteClientIsAlreadyConnected:
-					try container.encode(ResponseType.remoteClientIsAlreadyConnected, forKey: .responseType)
-				}
-			case let .responseForRequest(responseForRequest):
-				switch responseForRequest {
-				case let .failure(failure):
-					switch failure {
-					case let .invalidMessageError(error):
-						try container.encode(ResponseType.invalidMessageError, forKey: .responseType)
-						try container.encode(error.messageSentThatWasInvalid, forKey: .message)
-					case let .noRemoteClientToTalkTo(requestId):
-						try container.encode(ResponseType.missingRemoteClientError, forKey: .responseType)
-						try container.encode(requestId, forKey: .requestId)
-					case let .validationError(error):
-						try container.encode(ResponseType.validationError, forKey: .responseType)
-						try container.encode(error.requestId, forKey: .requestId)
-						try container.encode(error.reason.description, forKey: .error)
-					}
-				case let .success(requestId):
-					try container.encode(ResponseType.success, forKey: .responseType)
-					try container.encode(requestId, forKey: .requestId)
-				}
-			}
-		case let .fromRemoteClientOriginally(fromRemoteClientOriginally):
-			try container.encode(ResponseType.fromRemoteClientOriginally, forKey: .responseType)
-			try container.encode(fromRemoteClientOriginally, forKey: .message)
-		}
-	}
-}
-#endif // DEBUG
+// #if DEBUG
+// extension SignalingServerMessage.Incoming: Encodable {}
+// public extension SignalingServerMessage.Incoming {
+//	func encode(to encoder: Encoder) throws {
+//		var container = encoder.container(keyedBy: CodingKeys.self)
+//		switch self {
+//		case let .fromSignalingServerItself(fromSignalingServerItself):
+//			switch fromSignalingServerItself {
+//			case let .notification(notification):
+//				switch notification {
+//				case .remoteClientJustConnected:
+//					try container.encode(ResponseType.remoteClientJustConnected, forKey: .responseType)
+//				case .remoteClientDisconnected:
+//					try container.encode(ResponseType.remoteClientDisconnected, forKey: .responseType)
+//				case .remoteClientIsAlreadyConnected:
+//					try container.encode(ResponseType.remoteClientIsAlreadyConnected, forKey: .responseType)
+//				}
+//			case let .responseForRequest(responseForRequest):
+//				switch responseForRequest {
+//				case let .failure(failure):
+//					switch failure {
+//					case let .invalidMessageError(error):
+//						try container.encode(ResponseType.invalidMessageError, forKey: .responseType)
+//						try container.encode(error.messageSentThatWasInvalid, forKey: .message)
+//					case let .noRemoteClientToTalkTo(requestId):
+//						try container.encode(ResponseType.missingRemoteClientError, forKey: .responseType)
+//						try container.encode(requestId, forKey: .requestId)
+//					case let .validationError(error):
+//						try container.encode(ResponseType.validationError, forKey: .responseType)
+//						try container.encode(error.requestId, forKey: .requestId)
+//						try container.encode(error.reason.description, forKey: .error)
+//					}
+//				case let .success(requestId):
+//					try container.encode(ResponseType.success, forKey: .responseType)
+//					try container.encode(requestId, forKey: .requestId)
+//				}
+//			}
+//		case let .fromRemoteClientOriginally(fromRemoteClient):
+//			try container.encode(ResponseType.fromRemoteClient, forKey: .responseType)
+//			try container.encode(fromRemoteClient, forKey: .message)
+//		}
+//	}
+// }
+// #endif // DEBUG

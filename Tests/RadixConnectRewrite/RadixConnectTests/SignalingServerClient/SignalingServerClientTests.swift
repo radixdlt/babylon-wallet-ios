@@ -1,0 +1,269 @@
+//import Models
+@testable import RadixConnect
+import TestingPrelude
+
+// MARK: - SignalingClientTests
+final class SignalingClientTests: TestCase {
+
+        // MARK: - Test Values
+        static let requestId = RequestID.init(rawValue: UUID().uuidString)
+        static let sdp = SDP(rawValue: "Some sdp desc")
+        static let offer = RTCPrimitive.Offer(sdp: sdp)
+        static let answer = RTCPrimitive.Answer(sdp: sdp)
+        static let iceCandidate = RTCPrimitive.ICECandidate(sdp: sdp,
+                                                            sdpMLineIndex: 32,
+                                                            sdpMid: "Mid",
+                                                            serverUrl: "URL")
+        static let connectionID = try! SignalingServerConnectionID.init(.init(.deadbeef32Bytes))
+        static let encryptionKey = try! EncryptionKey.init(rawValue: .init(data: .deadbeef32Bytes))
+
+        let webSocketClient = MockWebSocketClient()
+        lazy var signalingClient = SignalingClient(encryptionKey: Self.encryptionKey,
+                                                   webSocketClient: webSocketClient,
+                                                   connectionID: Self.connectionID,
+                                                   idBuilder: { Self.requestId })
+
+        // MARK: - Outgoing Messages
+
+        func test_sentMessagesAreInCorrectFormat_offer() throws {
+                try assertSentMessageFormat(
+                        .offer(Self.offer),
+                        expectedPayload: Self.offer.payload
+                )
+        }
+
+        func test_sentMessagesAreInCorrectFormat_answer() throws {
+                try assertSentMessageFormat(
+                        .answer(Self.answer),
+                        expectedPayload: Self.answer.payload
+                )
+        }
+
+//        func test_sentMessagesAreInCorrectFormat_ICECandidate() throws {
+//                try assertSentMessageFormat(
+//                        .addICE(Self.iceCandidate),
+//                        expectedPayload: Self.iceCandidate.payload
+//                )
+//        }
+
+        // MARK: - Incomming Messages
+
+        func test_receivedMessagesAreProperlyDecoded_remoteClientDisconnected() throws {
+                let notification = IncommingMessage.FromSignalingServer.Notification.remoteClientDisconnected
+
+                try assertIncommingMessageDecoding(
+                        msg: notification.payload,
+                        stream: signalingClient.onRemoteClientState,
+                        expected: notification)
+        }
+
+        func test_receivedMessagesAreProperlyDecoded_remoteClientIsAlreadyConnected() throws {
+                let notification = IncommingMessage.FromSignalingServer.Notification.remoteClientIsAlreadyConnected
+
+                try assertIncommingMessageDecoding(
+                        msg: notification.payload,
+                        stream: signalingClient.onRemoteClientState,
+                        expected: notification)
+        }
+
+        func test_receivedMessagesAreProperlyDecoded_remoteClientJustConnected() throws {
+                let notification = IncommingMessage.FromSignalingServer.Notification.remoteClientJustConnected
+                try assertIncommingMessageDecoding(
+                        msg: notification.payload,
+                        stream: signalingClient.onRemoteClientState,
+                        expected: notification)
+        }
+
+        func test_receivedMessagesAreProperlyDecoded_offer() throws {
+                try assertIncommingPrimitiveDecoding(
+                        payload: Self.offer.payload,
+                        method: "offer",
+                        stream: signalingClient.onOffer,
+                        expected: Self.offer
+                )
+        }
+
+        func test_receivedMessagesAreProperlyDecoded_answer() throws {
+                try assertIncommingPrimitiveDecoding(
+                        payload: Self.answer.payload,
+                        method: "answer",
+                        stream: signalingClient.onAnswer,
+                        expected: Self.answer
+                )
+        }
+
+        func test_receivedMessagesAreProperlyDecoded_iceCandidate() throws {
+                try assertIncommingPrimitiveDecoding(
+                        payload: Self.iceCandidate.payload,
+                        method: "iceCandidate",
+                        stream: signalingClient.onICECanddiate,
+                        expected: Self.iceCandidate
+                )
+        }
+
+        // MARK: - Helpers
+
+        func assertIncommingMessageDecoding<Decoded: Sendable & Equatable>(
+                msg incomming: JSONValue,
+                stream: AnyAsyncSequence<Decoded>,
+                expected: Decoded,
+                file: StaticString = #filePath,
+                line: UInt = #line) throws {
+                let exp = expectation(description: "Wait for message")
+                Task {
+                        let value = try await stream.prefix(1).collect().first!
+                        XCTAssertEqual(value, expected, file: file, line: line)
+                        exp.fulfill()
+                }
+                webSocketClient.receiveIncommingMessage(incomming)
+                wait(for: [exp], timeout: 1.0)
+        }
+
+        func assertIncommingPrimitiveDecoding<Decoded: Sendable & Equatable>(
+                payload: JSONValue,
+                method: String,
+                stream: AnyAsyncSequence<Decoded>,
+                expected: Decoded,
+                file: StaticString = #filePath,
+                line: UInt = #line
+        ) throws {
+                let encoded = try JSONEncoder().encode(payload)
+                let encrypted = try Self.encryptionKey.encrypt(data: encoded)
+                let data = JSONValue.dictionary([
+                        "requestId": .string(Self.requestId.rawValue),
+                        "method": .string(method),
+                        "source": .string("extension"),
+                        "connectionId": .string(Self.connectionID.rawValue.data.hex()),
+                        "encryptedPayload": .string(encrypted.hex),
+                ])
+
+                let remoteData = JSONValue.dictionary([
+                        "info": .string("remoteData"),
+                        "requestId": .string(Self.requestId.rawValue),
+                        "data": data
+                ])
+
+                try assertIncommingMessageDecoding(
+                        msg: remoteData,
+                        stream: stream,
+                        expected: expected)
+        }
+
+        func assertSentMessageFormat(_ primitive: RTCPrimitive,
+                                     expectedPayload: JSONValue,
+                                     file: StaticString = #filePath,
+                                     line: UInt = #line) throws {
+
+                let exp = expectation(description: "Wait for message")
+                let expectedMethod = ClientMessage.Method(from: primitive)
+
+                Task {
+                        try await signalingClient.sendToRemote(rtcPrimitive: primitive)
+                }
+
+                Task {
+                        let sentMessage = await webSocketClient.sentMessagesStream.prefix(1).collect()
+
+                        let decodedMessage = try! JSONDecoder().decode(JSONValue.self, from: sentMessage.first!).dictionary!
+                        XCTAssertEqual(decodedMessage["requestId"], .string(Self.requestId.rawValue), file: file, line: line)
+                        XCTAssertEqual(decodedMessage["method"], .string(expectedMethod.rawValue), file: file, line: line)
+                        XCTAssertEqual(decodedMessage["source"], .string("wallet"), file: file, line: line)
+                        XCTAssertEqual(decodedMessage["connectionId"], .string(.deadbeef32Bytes), file: file, line: line)
+
+                        let encryptedPayload = try! EncryptedPayload.init(rawValue: .init(hex:  decodedMessage["encryptedPayload"]!.string!))
+                        let decryptPayload = try! Self.encryptionKey.decrypt(data: encryptedPayload.data)
+                        let decodedPayload = try! JSONDecoder().decode(JSONValue.self, from: decryptPayload)
+                        XCTAssertEqual(decodedPayload, expectedPayload, file: file, line: line)
+                        exp.fulfill()
+                }
+
+                wait(for: [exp], timeout: 1.0)
+        }
+}
+
+extension RTCPrimitive.Offer {
+        var payload: JSONValue {
+                JSONValue.dictionary([
+                        "sdp": .string(sdp.rawValue)
+                ])
+        }
+}
+
+extension RTCPrimitive.Answer {
+        var payload: JSONValue {
+                JSONValue.dictionary([
+                        "sdp": .string(sdp.rawValue)
+                ])
+        }
+}
+
+extension RTCPrimitive.ICECandidate {
+        var payload: JSONValue {
+                JSONValue.dictionary([
+                        "candidate": .string(candidate.rawValue),
+                        "sdpMLineIndex": .int32(sdpMLineIndex),
+                        "sdpMid": .string(sdpMid!),
+                        "serverUrl": .string(serverUrl!)
+                ])
+        }
+}
+
+extension IncommingMessage.FromSignalingServer.Notification {
+        var payload: JSONValue {
+                .dictionary([
+                        "info": .string(self.rawValue)
+                ])
+        }
+}
+
+extension Data {
+        static let deadbeef32Bytes = try! Data(hex: .deadbeef32Bytes)
+}
+
+extension String {
+        static let deadbeef32Bytes = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+}
+
+// MARK: - MockWebSocketClient
+final class MockWebSocketClient: WebSocketClient, Sendable {
+        let stateStreamContinuation: AsyncStream<URLSessionWebSocketTask.State>.Continuation!
+        let messagesStreamContinuation: AsyncThrowingStream<Data, Error>.Continuation!
+        let stateStream: AsyncStream<URLSessionWebSocketTask.State>
+        let incomingMessageStream: AsyncThrowingStream<Data, Error>
+
+        let sentMessagesStream: AsyncStream<Data>
+        let sentMessagesStreamContinuation: AsyncStream<Data>.Continuation!
+
+        init() {
+                var _stateStreamContinuation: AsyncStream<URLSessionWebSocketTask.State>.Continuation!
+                var _messagesStreamContinuation: AsyncThrowingStream<Data, Error>.Continuation!
+                var _sentMessagesStreamContinuation: AsyncStream<Data>.Continuation!
+                self.stateStream = AsyncStream.init { continuation in
+                        _stateStreamContinuation = continuation
+                }
+                self.incomingMessageStream = AsyncThrowingStream.init { continuation in
+                        _messagesStreamContinuation = continuation
+                }
+                self.sentMessagesStream = AsyncStream.init { continuation in
+                        _sentMessagesStreamContinuation = continuation
+                }
+                self.stateStreamContinuation = _stateStreamContinuation
+                self.messagesStreamContinuation = _messagesStreamContinuation
+                self.sentMessagesStreamContinuation = _sentMessagesStreamContinuation
+        }
+
+        func send(message: Data) async throws {
+                sentMessagesStreamContinuation.yield(message)
+        }
+
+        nonisolated func close(with closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {}
+
+        nonisolated func open() {}
+
+        // MARK: - Helpers
+
+        func receiveIncommingMessage(_ msg: JSONValue) {
+                let encoded = try! JSONEncoder().encode(msg)
+                messagesStreamContinuation.yield(encoded)
+        }
+}
