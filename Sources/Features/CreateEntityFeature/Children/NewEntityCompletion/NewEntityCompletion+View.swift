@@ -172,18 +172,25 @@ extension NewEntityCompletion.View {
 	}
 }
 
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct AccountCompletion_Preview: PreviewProvider {
-//	static var previews: some View {
-//		NewEntityCompletion.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: NewEntityCompletion()
-//			)
-//		)
-//	}
-// }
-//
-// #endif
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct AccountCompletion_Preview: PreviewProvider {
+	static var previews: some View {
+		NewEntityCompletion<OnNetwork.Account>.View(
+			store: .init(
+				initialState: .init(
+					entity: .previewValue0,
+					config: .init(
+						isFirstEntity: true,
+						canBeDismissed: false,
+						navigationButtonCTA: .goBackToChooseAccounts
+					)
+				),
+				reducer: NewEntityCompletion()
+			)
+		)
+	}
+}
+
+#endif
