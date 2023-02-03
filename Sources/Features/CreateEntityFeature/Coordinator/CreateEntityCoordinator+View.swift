@@ -17,7 +17,7 @@ public extension CreateEntityCoordinator.View {
 		WithViewStore(store, observe: { $0 }) { viewStore in
 			ForceFullScreen {
 				VStack {
-					if viewStore.state.config.canBeDismissed {
+					if viewStore.state.shouldDisplayNavBar {
 						NavigationBar(
 							leadingItem: CloseButton {
 								viewStore.send(.view(.dismiss))

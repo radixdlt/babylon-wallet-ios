@@ -95,7 +95,7 @@ public struct CreateEntityCoordinator<
 				await send(.delegate(.completed))
 			}
 
-		default:
+		case .child, .delegate:
 			return .none
 		}
 	}

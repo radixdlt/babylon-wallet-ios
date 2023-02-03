@@ -23,6 +23,18 @@ public extension CreateEntityCoordinator {
 	}
 }
 
+extension CreateEntityCoordinator.State {
+	var shouldDisplayNavBar: Bool {
+		guard
+			config.canBeDismissed
+		else { return false }
+		switch step {
+		case .step0_nameNewEntity, .step1_selectGenesisFactorSource: return true
+		case .step2_creationOfEntity, .step3_completion: return false
+		}
+	}
+}
+
 // MARK: - CreateEntityNavigationButtonCTA
 public enum CreateEntityNavigationButtonCTA: Sendable, Equatable {
 	case goHome
