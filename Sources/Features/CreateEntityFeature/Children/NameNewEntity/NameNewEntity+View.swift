@@ -22,66 +22,46 @@ public extension NameNewEntity.View {
 				observe: ViewState.init(state:),
 				send: { .view($0) }
 			) { viewStore in
-				VStack(spacing: .zero) {
-					//                    if viewStore.isDismissButtonVisible {
-					//                        NavigationBar(
-					//                            leadingItem: CloseButton {
-					//                                viewStore.send(.closeButtonTapped)
-					//                            }
-					//                        )
-					//                        .foregroundColor(.app.gray1)
-					//                        .padding([.horizontal, .top], .medium3)
-					//                    } else {
+				VStack {
+					title(with: viewStore)
+
 					Spacer()
 						.frame(minHeight: .small2, maxHeight: .large1)
-					//                    }
-					VStack {
-						title(with: viewStore)
 
-						Spacer()
-							.frame(minHeight: .small2, maxHeight: .large1)
+					VStack(spacing: .large1) {
+						subtitle(with: viewStore)
 
-						VStack(spacing: .large1) {
-							subtitle(with: viewStore)
+						let nameBinding = viewStore.binding(
+							get: \.entityName,
+							send: { .textFieldChanged($0) }
+						)
 
-							let nameBinding = viewStore.binding(
-								get: \.entityName,
-								send: { .textFieldChanged($0) }
+						AppTextField(
+							placeholder: viewStore.namePlaceholder,
+							text: nameBinding,
+							hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
+							binding: $focusedField,
+							equals: .accountName,
+							first: viewStore.binding(
+								get: \.focusedField,
+								send: { .textFieldFocused($0) }
 							)
-
-							AppTextField(
-								placeholder: viewStore.namePlaceholder,
-								text: nameBinding,
-								hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
-								binding: $focusedField,
-								equals: .accountName,
-								first: viewStore.binding(
-									get: \.focusedField,
-									send: { .textFieldFocused($0) }
-								)
-							)
-							#if os(iOS)
-							.textFieldCharacterLimit(30, forText: nameBinding)
-							#endif
-							.autocorrectionDisabled()
-						}
-
-						Spacer(minLength: .small2)
-
-						//                        if viewStore.isLoaderVisible {
-						//                            ProgressView()
-						//                        }
-
-						Spacer()
-
-						Button(L10n.CreateEntity.NameNewEntity.Name.Button.title) {
-							viewStore.send(.confirmNameButtonTapped)
-						}
-						.buttonStyle(.primaryRectangular)
-						.controlState(viewStore.createEntityButtonState)
+						)
+						#if os(iOS)
+						.textFieldCharacterLimit(30, forText: nameBinding)
+						#endif
+						.autocorrectionDisabled()
 					}
-					.padding([.horizontal, .bottom], .medium1)
+
+					Spacer(minLength: .small2)
+
+					Button(L10n.CreateEntity.NameNewEntity.Name.Button.title) {
+						viewStore.send(.confirmNameButtonTapped)
+					}
+					.buttonStyle(.primaryRectangular)
+					.controlState(viewStore.createEntityButtonState)
 				}
+				.padding([.horizontal, .bottom], .medium1)
 				.onAppear {
 					viewStore.send(.viewAppeared)
 				}
@@ -137,18 +117,17 @@ private extension NameNewEntity.View {
 	}
 }
 
-//
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-// struct NameNewEntity_Previews: PreviewProvider {
-//	static var previews: some View {
-//		NameNewEntity.View(
-//			store: .init(
-//				initialState: .init(shouldCreateProfile: false),
-//				reducer: NameNewEntity()
-//			)
-//		)
-//	}
-// }
-// #endif
+#if DEBUG
+import SwiftUI // NB: necessary for previews to appear
+
+struct NameNewEntity_Previews: PreviewProvider {
+	static var previews: some View {
+		NameNewEntity<OnNetwork.Account>.View(
+			store: .init(
+				initialState: .init(isFirst: true),
+				reducer: NameNewEntity()
+			)
+		)
+	}
+}
+#endif

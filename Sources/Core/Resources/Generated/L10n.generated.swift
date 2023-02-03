@@ -84,8 +84,8 @@ public enum L10n {
         public enum Specific {
           /// Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.
           public static let account = L10n.tr("Localizable", "createEntity.completion.explanation.specific.account", fallback: "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.")
-          /// The personal data you've specified for this Persona does not live on the Radix Network, only in your Radix wallet.
-          public static let persona = L10n.tr("Localizable", "createEntity.completion.explanation.specific.persona", fallback: "The personal data you've specified for this Persona does not live on the Radix Network, only in your Radix wallet.")
+          /// The personal data you specify for this Persona does not live on the Radix Network, only in your Radix wallet.
+          public static let persona = L10n.tr("Localizable", "createEntity.completion.explanation.specific.persona", fallback: "The personal data you specify for this Persona does not live on the Radix Network, only in your Radix wallet.")
         }
       }
       public enum Subtitle {

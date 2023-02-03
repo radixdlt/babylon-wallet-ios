@@ -22,11 +22,11 @@ public extension NewEntityCompletion.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack(spacing: .medium2) {
-					Spacer()
-
-					accountsStackView(with: viewStore)
-
-					Spacer()
+					if let whenAccount = viewStore.whenAccount {
+						Spacer()
+						accountsStackView(with: viewStore, for: whenAccount)
+						Spacer()
+					}
 
 					VStack(spacing: .medium1) {
 						Text(L10n.CreateEntity.Completion.title)
@@ -59,36 +59,37 @@ public extension NewEntityCompletion.View {
 
 private extension NewEntityCompletion.View {
 	@ViewBuilder
-	func accountsStackView(with viewStore: CompletionViewStore) -> some View {
-		if let accountAddress = viewStore.accountAddress, let appearanceID = viewStore.appearanceID {
-			ZStack {
-				VStack(spacing: .small2) {
-					Text(viewStore.entityName)
-						.foregroundColor(.app.white)
-						.textStyle(.body1Header)
-						.multilineTextAlignment(.center)
+	func accountsStackView(
+		with viewStore: CompletionViewStore,
+		for whenAccount: ViewState.WhenAccount
+	) -> some View {
+		ZStack {
+			VStack(spacing: .small2) {
+				Text(viewStore.entityName)
+					.foregroundColor(.app.white)
+					.textStyle(.body1Header)
+					.multilineTextAlignment(.center)
 
-					AddressView(accountAddress)
-						.foregroundColor(.app.whiteTransparent)
-				}
-				.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
-				.background(appearanceID.gradient)
-				.cornerRadius(.small1)
-				.padding(.horizontal, .medium1)
-				.zIndex(4)
-
-				Group {
-					ForEach(0 ..< Constants.transparentCardsCount, id: \.self) { index in
-						nextAppearanceId(from: viewStore.entityIndex + index).gradient.opacity(0.2)
-							.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
-							.cornerRadius(.small1)
-							.scaleEffect(scale(index: index))
-							.zIndex(reversedZIndex(count: Constants.transparentCardsCount, index: index))
-							.offset(y: Constants.transparentCardOffset * CGFloat(index))
-					}
-				}
-				.offset(y: Constants.transparentCardOffset)
+				AddressView(whenAccount.accountAddress)
+					.foregroundColor(.app.whiteTransparent)
 			}
+			.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
+			.background(whenAccount.appearanceID.gradient)
+			.cornerRadius(.small1)
+			.padding(.horizontal, .medium1)
+			.zIndex(4)
+
+			Group {
+				ForEach(0 ..< Constants.transparentCardsCount, id: \.self) { index in
+					nextAppearanceId(from: viewStore.entityIndex + index).gradient.opacity(0.2)
+						.frame(width: Constants.cardFrame.width, height: Constants.cardFrame.height)
+						.cornerRadius(.small1)
+						.scaleEffect(scale(index: index))
+						.zIndex(reversedZIndex(count: Constants.transparentCardsCount, index: index))
+						.offset(y: Constants.transparentCardOffset * CGFloat(index))
+				}
+			}
+			.offset(y: Constants.transparentCardOffset)
 		}
 	}
 
@@ -137,8 +138,12 @@ extension NewEntityCompletion.View {
 		let explaination: String
 
 		// Account only
-		let accountAddress: AddressView.ViewState?
-		let appearanceID: OnNetwork.Account.AppearanceID?
+		struct WhenAccount: Equatable {
+			let accountAddress: AddressView.ViewState
+			let appearanceID: OnNetwork.Account.AppearanceID
+		}
+
+		let whenAccount: WhenAccount?
 
 		init(state: NewEntityCompletion.State) {
 			let entityKind = state.entity.kind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
@@ -160,13 +165,14 @@ extension NewEntityCompletion.View {
 			isFirstOnNetwork = state.isFirstOnNetwork
 
 			if let account = state.entity as? OnNetwork.Account {
-				self.accountAddress = .init(address: account.address.address, format: .short())
-				self.appearanceID = account.appearanceID
+				self.whenAccount = WhenAccount(
+					accountAddress: .init(address: account.address.address, format: .short()),
+					appearanceID: account.appearanceID
+				)
 				self.explaination = L10n.CreateEntity.Completion.Explanation.Specific.account
 			} else {
 				self.explaination = L10n.CreateEntity.Completion.Explanation.Specific.persona
-				self.accountAddress = nil
-				self.appearanceID = nil
+				self.whenAccount = nil
 			}
 		}
 	}

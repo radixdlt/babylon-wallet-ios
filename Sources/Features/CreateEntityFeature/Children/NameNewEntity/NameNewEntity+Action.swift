@@ -41,7 +41,6 @@ public extension NameNewEntity.Action.InternalAction {
 // MARK: - NameNewEntity.Action.DelegateAction
 public extension NameNewEntity.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case dismiss
 		case named(NonEmpty<String>)
 	}
 }

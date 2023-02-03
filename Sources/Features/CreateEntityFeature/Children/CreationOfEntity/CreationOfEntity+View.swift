@@ -33,19 +33,3 @@ extension CreationOfEntity.View {
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI // NB: necessary for previews to appear
-//
-//// MARK: - CreationOfEntity_Preview
-// struct CreationOfEntity_Preview: PreviewProvider {
-//	static var previews: some View {
-//		CreationOfEntity.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: CreationOfEntity()
-//			)
-//		)
-//	}
-// }
-// #endif

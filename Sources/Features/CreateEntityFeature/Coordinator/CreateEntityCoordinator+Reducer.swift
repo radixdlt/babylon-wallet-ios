@@ -77,11 +77,6 @@ public struct CreateEntityCoordinator<
 				)
 			}
 
-		case .child(.step0_nameNewEntity(.delegate(.dismiss))):
-			return .run { send in
-				await send(.delegate(.dismissed))
-			}
-
 		case let .child(.step1_selectGenesisFactorSource(.delegate(.confirmedFactorSource(factorSource, specifiedNameForNewEntityToCreate)))):
 			return goToStep2Creation(
 				entityName: specifiedNameForNewEntityToCreate,
