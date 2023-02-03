@@ -53,7 +53,7 @@ final class ProfileTests: TestCase {
 		var profile = try await Profile.new(
 			networkAndGateway: networkAndGateway,
 			mnemonic: curve25519FactorSourceMnemonic,
-			firstAccountDisplayName: "First"
+			accountCreationStrategy: .createAccountOnDefaultNetwork(named: .init(rawValue: "First")!)
 		)
 
 		let secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource = try Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource(

@@ -53,9 +53,15 @@ public extension FactorSources {
 			secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources.elements.map { $0 }
 	}
 
-	var factorSources: [FactorSource] {
-		curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.rawValue.elements.map { $0.wrapAsFactorSource() } +
-			secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources.elements.map { $0.wrapAsFactorSource() }
+	var factorSources: NonEmpty<IdentifiedArrayOf<FactorSource>> {
+		var idArray: IdentifiedArrayOf<FactorSource> = .init()
+		idArray.append(contentsOf: curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.rawValue.elements.map { $0.wrapAsFactorSource() })
+		idArray.append(contentsOf:
+			secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources.elements.map { $0.wrapAsFactorSource() })
+		guard let nonEmpty = NonEmpty(rawValue: idArray) else {
+			fatalError("Incorrect implementation, factorSources should NEVER be empty.")
+		}
+		return nonEmpty
 	}
 
 	func find(reference: FactorSourceReference) -> (any FactorSourceProtocol)? {
@@ -82,3 +88,14 @@ public extension FactorSources {
 		"""
 	}
 }
+
+#if DEBUG
+public extension NonEmpty where Collection == IdentifiedArrayOf<FactorSource> {
+	static let previewValue: Self = .init(rawValue: .previewValue)!
+}
+
+public extension IdentifiedArrayOf<FactorSource> {
+	static let previewValue: Self = .init(arrayLiteral: FactorSource.previewValue)
+}
+
+#endif // DEBUG

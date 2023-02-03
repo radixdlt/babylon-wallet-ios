@@ -18,7 +18,7 @@ public extension App {
 public extension App.Action {
 	enum ChildAction: Sendable, Equatable {
 		case main(Main.Action)
-		case onboarding(Onboarding.Action)
+		case onboardingCoordinator(OnboardingCoordinator.Action)
 		case splash(Splash.Action)
 	}
 }

@@ -18,8 +18,8 @@ public struct App: Sendable, ReducerProtocol {
 				.ifCaseLet(/App.State.Root.main, action: /Action.child .. Action.ChildAction.main) {
 					Main()
 				}
-				.ifCaseLet(/App.State.Root.onboarding, action: /Action.child .. Action.ChildAction.onboarding) {
-					Onboarding()
+				.ifCaseLet(/App.State.Root.onboardingCoordinator, action: /Action.child .. Action.ChildAction.onboardingCoordinator) {
+					OnboardingCoordinator()
 				}
 				.ifCaseLet(/App.State.Root.splash, action: /Action.child .. Action.ChildAction.splash) {
 					Splash()
@@ -56,7 +56,7 @@ public struct App: Sendable, ReducerProtocol {
 		case .child(.main(.delegate(.removedWallet))):
 			return goToOnboarding(state: &state)
 
-		case .child(.onboarding(.delegate(.completed))):
+		case .child(.onboardingCoordinator(.delegate(.completed))):
 			return goToMain(state: &state)
 
 		case let .child(.splash(.delegate(.profileResultLoaded(profileResult)))):
@@ -113,7 +113,7 @@ public struct App: Sendable, ReducerProtocol {
 	}
 
 	func goToOnboarding(state: inout State) -> EffectTask<Action> {
-		state.root = .onboarding(.init())
+		state.root = .onboardingCoordinator(.init())
 		return .none
 	}
 }

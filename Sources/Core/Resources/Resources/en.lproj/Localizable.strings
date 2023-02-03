@@ -16,23 +16,32 @@
 "assetsView.poolShare" = "Pool Shares";
 "assetsView.tokens" = "Tokens";
 
+"common.account.kind" = "Account";
+"common.persona.kind" = "Persona";
+
 "common.P2PClientNotFoundInProfile" = "Inconsistency trying to use deleted Linked Connector.";
 "common.P2PConnectionOffline" = "Linked Connector Offline";
 
-"createAccount.biometricsPrompt" = "Authenticate to create new account with this phone.";
-"createAccount.completion.destination.chooseAccounts" = "Choose Accounts";
-"createAccount.completion.destination.home" = "Account List";
-"createAccount.completion.explanation" = "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.";
-"createAccount.completion.goToDestination" = "Go to %@";
-"createAccount.completion.subtitle" = "Your account has been created.";
-"createAccount.completion.subtitleFirstAccount" = "You’ve created your first account.";
-"createAccount.completion.title" = "Congratulations";
-"createAccount.createAccountButtonTitle" = "Create Account";
-"createAccount.createFirstAccount" = "Create First Account";
-"createAccount.createNewAccount" = "Create New Account";
-"createAccount.explanation" = "This can be changed any time";
-"createAccount.placeholder" = "e.g. My Main Account";
-"createAccount.subtitle" = "What would you like to call your account?";
+"createEntity.nameNewEntity.title.first" = "Create First %s";
+"createEntity.nameNewEntity.title.notFirst" = "Create New %s";
+"createEntity.nameNewEntity.subtitle" = "What would you like to call your %s?";
+
+"createEntity.nameNewEntity.name.field.placeholder.specific.account" = "e.g. My Main Account";
+"createEntity.nameNewEntity.name.field.placeholder.specific.persona" = "e.g. Ellis Bell";
+"createEntity.nameNewEntity.name.field.explanation" = "This can be changed any time";
+"createEntity.nameNewEntity.name.button.title" = "Continue";
+
+"createEntity.creationOfEntity.biometricsPrompt" = "Authenticate to create new %s with this phone.";
+
+"createEntity.completion.title" = "Congratulations";
+"createEntity.completion.subtitle.notFirst" = "Your %s has been created.";
+"createEntity.completion.subtitle.first" = "You’ve created your first %s.";
+"createEntity.completion.explanation.specific.account" = "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.";
+"createEntity.completion.explanation.specific.persona" = "The personal data you specify for this Persona does not live on the Radix Network, only in your Radix wallet.";
+"createEntity.completion.destination.home" = "Account List";
+"createEntity.completion.destination.settingsPersonaList" = "Persona List";
+"createEntity.completion.destination.chooseEntities" = "Choose %ss";
+"createEntity.completion.goToDestination" = "Go to %@";
 
 "dApp.chooseAccounts.createNewAccount" = "Create a New Account";
 "dApp.chooseAccounts.explanation" = "Choose %@";
@@ -41,6 +50,8 @@
 "dApp.chooseAccounts.explanationExactNumberOfAccounts" = "#%d Accounts";
 "dApp.chooseAccounts.explanationExactlyOneAccount" = "One Account";
 "dApp.chooseAccounts.unnamedAccount" = "Unnamed Account";
+"dApp.chooseAccounts.subtitle" = "Choose the account(s) you want %@ to know about.";
+"dApp.chooseAccounts.title" = "Choose Accounts";
 "dApp.connectionRequest.continueButtonTitle" = "Continue";
 "dApp.loginRequest.chooseAPersonaTitle" = "Choose a Persona";
 "dApp.loginRequest.continueButtonTitle" = "Continue";
@@ -49,13 +60,13 @@
 "dApp.loginRequest.title.knownDapp" = "Login Request";
 "dApp.loginRequest.title.newDapp" = "New Login Request";
 "dApp.request.wrongNetworkError" = "Request received from dApp for network %@, but you are currently connected to %@.";
-"dApp.unknownName" = "Unknown dApp";
 
 "fungibleTokenList.detail.currentSupply" = "Current Supply";
 "fungibleTokenList.detail.resourceAddress" = "Resource Address";
 
 "home.header.subtitle" = "Welcome, here are all your accounts on the Radix Network";
 "home.header.title" = "Radix Wallet";
+"home.createAccount.buttonTitle" = "Create Account";
 "home.visitHub.buttonTitle" = "Visit the Radix Dashboard";
 "home.visitHub.title" = "Ready to get started using the Radix Network and your Wallet?";
 
@@ -110,6 +121,9 @@
 "personas.createNewPersonaButtonTitle" = "Create a New persona";
 "personas.subtitle" = "Here are all the Personas connected to your account";
 "personas.title" = "Personas";
+"personaList.createNewPersonaButtonTitle" = "Create new persona";
+"personaList.subtitle" = "Here are all the Personas connected to your account";
+"personaList.title" = "Personas";
 
 "profileLoad.decodingError" = "Failed to create Wallet from backup: %@";
 "profileLoad.failedToCreateProfileFromSnapshotError" = "Failed to create Wallet from backup, error: %@, version: %@";

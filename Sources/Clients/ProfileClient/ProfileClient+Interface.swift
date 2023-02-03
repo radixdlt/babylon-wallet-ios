@@ -3,13 +3,16 @@ import Cryptography
 
 // MARK: - ProfileClient
 public struct ProfileClient: Sendable {
+	public var getFactorSources: GetFactorSources
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
 	public var getNetworkAndGateway: GetNetworkAndGateway
 	public var setNetworkAndGateway: SetNetworkAndGateway
 
 	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
-	public var createNewProfile: CreateNewProfile
+	public var createEphemeralProfileAndUnsavedOnDeviceFactorSource: CreateEphemeralProfileAndUnsavedOnDeviceFactorSource
+	public var injectProfileSnapshot: InjectProfileSnapshot
+	public var commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic
 
 	public var loadProfile: LoadProfile
 	public var extractProfileSnapshot: ExtractProfileSnapshot
@@ -29,8 +32,7 @@ public struct ProfileClient: Sendable {
 	public var deleteP2PClientByID: DeleteP2PClientByID
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
-	public var createUnsavedVirtualAccount: CreateUnsavedVirtualAccount
-	public var createUnsavedVirtualPersona: CreateUnsavedVirtualPersona
+	public var createUnsavedVirtualEntity: CreateUnsavedVirtualEntity
 	public var addAccount: AddAccount
 	public var addPersona: AddPersona
 	public var lookupAccountByAddress: LookupAccountByAddress
@@ -38,11 +40,14 @@ public struct ProfileClient: Sendable {
 	public var signersForAccountsGivenAddresses: SignersForAccountsGivenAddresses
 
 	public init(
+		getFactorSources: @escaping GetFactorSources,
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
 		getGatewayAPIEndpointBaseURL: @escaping GetGatewayAPIEndpointBaseURL,
 		getNetworkAndGateway: @escaping GetNetworkAndGateway,
 		setNetworkAndGateway: @escaping SetNetworkAndGateway,
-		createNewProfile: @escaping CreateNewProfile,
+		createEphemeralProfileAndUnsavedOnDeviceFactorSource: @escaping CreateEphemeralProfileAndUnsavedOnDeviceFactorSource,
+		injectProfileSnapshot: @escaping InjectProfileSnapshot,
+		commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: @escaping CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic,
 		loadProfile: @escaping LoadProfile,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
@@ -58,18 +63,20 @@ public struct ProfileClient: Sendable {
 		deleteP2PClientByID: @escaping DeleteP2PClientByID,
 		getAppPreferences: @escaping GetAppPreferences,
 		setDisplayAppPreferences: @escaping SetDisplayAppPreferences,
-		createUnsavedVirtualAccount: @escaping CreateUnsavedVirtualAccount,
-		createUnsavedVirtualPersona: @escaping CreateUnsavedVirtualPersona,
+		createUnsavedVirtualEntity: @escaping CreateUnsavedVirtualEntity,
 		addAccount: @escaping AddAccount,
 		addPersona: @escaping AddPersona,
 		lookupAccountByAddress: @escaping LookupAccountByAddress,
 		signersForAccountsGivenAddresses: @escaping SignersForAccountsGivenAddresses
 	) {
+		self.getFactorSources = getFactorSources
 		self.getCurrentNetworkID = getCurrentNetworkID
 		self.getGatewayAPIEndpointBaseURL = getGatewayAPIEndpointBaseURL
 		self.getNetworkAndGateway = getNetworkAndGateway
 		self.setNetworkAndGateway = setNetworkAndGateway
-		self.createNewProfile = createNewProfile
+		self.createEphemeralProfileAndUnsavedOnDeviceFactorSource = createEphemeralProfileAndUnsavedOnDeviceFactorSource
+		self.commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic = commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic
+		self.injectProfileSnapshot = injectProfileSnapshot
 		self.loadProfile = loadProfile
 		self.extractProfileSnapshot = extractProfileSnapshot
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
@@ -85,8 +92,7 @@ public struct ProfileClient: Sendable {
 		self.deleteP2PClientByID = deleteP2PClientByID
 		self.getAppPreferences = getAppPreferences
 		self.setDisplayAppPreferences = setDisplayAppPreferences
-		self.createUnsavedVirtualAccount = createUnsavedVirtualAccount
-		self.createUnsavedVirtualPersona = createUnsavedVirtualPersona
+		self.createUnsavedVirtualEntity = createUnsavedVirtualEntity
 		self.addAccount = addAccount
 		self.addPersona = addPersona
 		self.lookupAccountByAddress = lookupAccountByAddress
@@ -94,7 +100,55 @@ public struct ProfileClient: Sendable {
 	}
 }
 
+// MARK: - CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest
+public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest: Sendable, Equatable {
+	public let networkAndGateway: AppPreferences.NetworkAndGateway
+	public let language: BIP39.Language
+	public let wordCount: BIP39.WordCount
+	public let bip39Passphrase: String
+	public init(
+		networkAndGateway: AppPreferences.NetworkAndGateway = .nebunet,
+		language: BIP39.Language = .english,
+		wordCount: BIP39.WordCount = .twentyFour,
+		bip39Passphrase: String = ""
+	) {
+		self.networkAndGateway = networkAndGateway
+		self.language = language
+		self.wordCount = wordCount
+		self.bip39Passphrase = bip39Passphrase
+	}
+}
+
+// MARK: - CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse
+public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse: Sendable, Equatable {
+	public let request: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest
+	public let onDeviceFactorSourceMnemonic: Mnemonic
+	public let profile: Profile
+	public init(
+		request: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest,
+		mnemonic: Mnemonic,
+		profile: Profile
+	) {
+		self.onDeviceFactorSourceMnemonic = mnemonic
+		self.profile = profile
+		self.request = request
+	}
+}
+
+// MARK: - CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest
+public struct CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest: Sendable, Equatable {
+	public let onDeviceFactorSourceMnemonic: Mnemonic
+	public let bip39Passphrase: String
+	public init(onDeviceFactorSourceMnemonic: Mnemonic, bip39Passphrase: String) {
+		self.onDeviceFactorSourceMnemonic = onDeviceFactorSourceMnemonic
+		self.bip39Passphrase = bip39Passphrase
+	}
+}
+
 public extension ProfileClient {
+	typealias GetDerivationPathForNewEntity = @Sendable (GetDerivationPathForNewEntityRequest) async throws -> (path: DerivationPath, index: Int)
+
+	typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	typealias LoadProfileResult = Swift.Result<Profile?, Profile.LoadingFailure>
 	typealias LoadProfile = @Sendable () async -> LoadProfileResult
 
@@ -105,8 +159,10 @@ public extension ProfileClient {
 
 	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
-	// Returns the first account on the current Network for this new Profile. Which is what the `CreateAccount` feature uses (used during Onboarding).
-	typealias CreateNewProfile = @Sendable (CreateNewProfileRequest) async throws -> OnNetwork.Account
+	typealias CreateEphemeralProfileAndUnsavedOnDeviceFactorSource = @Sendable (CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest) async throws -> CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse
+
+	typealias InjectProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
+	typealias CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic = @Sendable (CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest) async throws -> Void
 
 	typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 
@@ -124,8 +180,7 @@ public extension ProfileClient {
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
-	typealias CreateUnsavedVirtualAccount = @Sendable (CreateAccountRequest) async throws -> OnNetwork.Account
-	typealias CreateUnsavedVirtualPersona = @Sendable (CreatePersonaRequest) async throws -> OnNetwork.Persona
+	typealias CreateUnsavedVirtualEntity = @Sendable (CreateVirtualEntityRequest) async throws -> any EntityProtocol
 	typealias AddAccount = @Sendable (OnNetwork.Account) async throws -> Void
 	typealias AddPersona = @Sendable (OnNetwork.Persona) async throws -> Void
 	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account

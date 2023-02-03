@@ -1,7 +1,7 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPreferencesFeature
-import CreateAccountFeature
+import CreateEntityFeature
 import FeaturePrelude
 import TransactionSigningFeature
 
@@ -95,7 +95,7 @@ private extension Home.View {
 						)
 					)
 
-					Button(L10n.CreateAccount.createNewAccount) {
+					Button(L10n.Home.CreateAccount.buttonTitle) {
 						viewStore.send(.createAccountButtonTapped)
 					}
 					.buttonStyle(.secondaryRectangular())

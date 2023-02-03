@@ -2,7 +2,7 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
-import CreateAccountFeature
+import CreateEntityFeature
 import FeaturePrelude
 import FungibleTokenListFeature
 import P2PConnectivityClient
@@ -49,9 +49,12 @@ public struct Home: Sendable, ReducerProtocol {
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.createAccountButtonTapped)):
-			state.createAccountCoordinator = .init(
-				completionDestination: .home
-			)
+
+			state.createAccountCoordinator = .init(config: .init(
+				isFirstEntity: false,
+				canBeDismissed: true,
+				navigationButtonCTA: .goHome
+			))
 			return .none
 
 		case .internal(.view(.didAppear)):

@@ -1,3 +1,4 @@
+import Cryptography
 import Prelude
 
 // MARK: - FactorInstance
@@ -39,6 +40,16 @@ public extension FactorInstance {
 
 	var factorInstanceID: FactorInstanceID {
 		property(\.factorInstanceID)
+	}
+
+	// uhm, not pretty, but this is highly temporary, gonna be rewritten before March 2023.
+	var publicKey: SLIP10.PublicKey {
+		switch self {
+		case let .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(fi):
+			return fi.publicKey
+		case let .secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance(fi):
+			return fi.publicKey
+		}
 	}
 
 	internal func property<Property>(_ keyPath: KeyPath<FactorInstanceProtocol, Property>) -> Property {

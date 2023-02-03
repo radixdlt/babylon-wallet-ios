@@ -58,7 +58,7 @@ extension ChooseAccounts.Row.View {
 		init(state: ChooseAccounts.Row.State) {
 			appearanceID = state.account.appearanceID
 			isSelected = state.isSelected
-			accountName = state.account.displayName ?? L10n.DApp.ChooseAccounts.unnamedAccount
+			accountName = state.account.displayName.rawValue
 			accountAddress = .init(address: state.account.address.address, format: .short())
 		}
 	}

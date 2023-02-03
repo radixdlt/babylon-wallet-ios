@@ -76,7 +76,7 @@ private extension AccountList.Row.View {
 extension AccountList.Row.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		let name: String?
+		let name: String
 		let address: AddressView.ViewState
 		let appearanceID: OnNetwork.Account.AppearanceID
 		let aggregatedValue: Float?
@@ -85,7 +85,7 @@ extension AccountList.Row.View {
 		let portfolio: AccountPortfolio
 
 		init(state: AccountList.Row.State) {
-			name = state.account.displayName
+			name = state.account.displayName.rawValue
 			address = .init(address: state.account.address.address, format: .short())
 			appearanceID = state.account.appearanceID
 			aggregatedValue = state.aggregatedValue

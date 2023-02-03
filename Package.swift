@@ -73,7 +73,7 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "CreateAccountFeature",
+		name: "CreateEntityFeature",
 		dependencies: [
 			"Cryptography",
 			"GatewayAPI",
@@ -113,7 +113,7 @@ package.addModules([
 			"AccountPortfolio",
 			"AccountPreferencesFeature",
 			"AppSettings",
-			"CreateAccountFeature",
+			"CreateEntityFeature",
 			"P2PConnectivityClient",
 			"ProfileClient",
 			"TransactionSigningFeature",
@@ -124,14 +124,6 @@ package.addModules([
 				"NonFungibleTokenListFeature",
 			]
 		)
-	),
-	.feature(
-		name: "ImportProfileFeature",
-		dependencies: [
-			"Cryptography",
-			"ProfileClient",
-		],
-		tests: .yes()
 	),
 	.feature(
 		name: "MainFeature",
@@ -155,7 +147,7 @@ package.addModules([
 	.feature(
 		name: "ManageGatewayAPIEndpointsFeature",
 		dependencies: [
-			"CreateAccountFeature",
+			"CreateEntityFeature",
 			"GatewayAPI",
 		],
 		tests: .yes()
@@ -179,14 +171,16 @@ package.addModules([
 	.feature(
 		name: "OnboardingFeature",
 		dependencies: [
-			"CreateAccountFeature",
-			"ImportProfileFeature",
+			"CreateEntityFeature",
+			"ProfileClient",
 		],
 		tests: .yes()
 	),
 	.feature(
 		name: "PersonasFeature",
-		dependencies: [],
+		dependencies: [
+			"CreateEntityFeature",
+		],
 		tests: .yes()
 	),
 	.feature(

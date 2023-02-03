@@ -3,7 +3,7 @@ import AccountListFeature
 import AccountPortfolio
 import AccountPreferencesFeature
 import AppSettings
-import CreateAccountFeature
+import CreateEntityFeature
 import FeaturePrelude
 import P2PConnectivityClient
 import TransactionSigningFeature

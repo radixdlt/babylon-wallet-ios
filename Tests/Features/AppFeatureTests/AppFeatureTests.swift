@@ -24,7 +24,7 @@ final class AppFeatureTests: TestCase {
 		// when
 		await store.send(.child(.main(.delegate(.removedWallet)))) {
 			// then
-			$0.root = .onboarding(.init())
+			$0.root = .onboardingCoordinator(.init())
 		}
 	}
 
@@ -84,7 +84,7 @@ final class AppFeatureTests: TestCase {
 
 		// then
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(nil)))))) {
-			$0.root = .onboarding(.init())
+			$0.root = .onboardingCoordinator(.init())
 		}
 
 		await testScheduler.run() // fast-forward scheduler to the end of time
@@ -123,7 +123,7 @@ final class AppFeatureTests: TestCase {
 
 		// then
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
-			$0.root = .onboarding(.init())
+			$0.root = .onboardingCoordinator(.init())
 		}
 
 		await store.receive(.internal(.system(.displayErrorAlert(
@@ -184,7 +184,7 @@ final class AppFeatureTests: TestCase {
 
 		await store.send(.view(.deleteIncompatibleProfile))
 		await store.receive(.internal(.system(.deletedIncompatibleProfile))) {
-			$0.root = .onboarding(.init())
+			$0.root = .onboardingCoordinator(.init())
 		}
 
 		await testScheduler.run() // fast-forward scheduler to the end of time
@@ -230,7 +230,7 @@ final class AppFeatureTests: TestCase {
 
 		await store.send(.view(.deleteIncompatibleProfile))
 		await store.receive(.internal(.system(.deletedIncompatibleProfile))) {
-			$0.root = .onboarding(.init())
+			$0.root = .onboardingCoordinator(.init())
 		}
 
 		await testScheduler.run() // fast-forward scheduler to the end of time

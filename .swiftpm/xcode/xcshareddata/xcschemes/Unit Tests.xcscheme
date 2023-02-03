@@ -112,16 +112,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CreateAccountFeatureTests"
-               BuildableName = "CreateAccountFeatureTests"
-               BlueprintName = "CreateAccountFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "CryptographyTests"
                BuildableName = "CryptographyTests"
                BlueprintName = "CryptographyTests"
@@ -195,16 +185,6 @@
                BlueprintIdentifier = "HomeFeatureTests"
                BuildableName = "HomeFeatureTests"
                BlueprintName = "HomeFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ImportProfileFeatureTests"
-               BuildableName = "ImportProfileFeatureTests"
-               BlueprintName = "ImportProfileFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -392,9 +372,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DappInteractionFeatureTests"
-               BuildableName = "DappInteractionFeatureTests"
-               BlueprintName = "DappInteractionFeatureTests"
+               BlueprintIdentifier = "CreateEntityFeatureTests"
+               BuildableName = "CreateEntityFeatureTests"
+               BlueprintName = "CreateEntityFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -402,9 +382,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AssetTransferFeatureTests"
-               BuildableName = "AssetTransferFeatureTests"
-               BlueprintName = "AssetTransferFeatureTests"
+               BlueprintIdentifier = "PersonasFeatureTests"
+               BuildableName = "PersonasFeatureTests"
+               BlueprintName = "PersonasFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

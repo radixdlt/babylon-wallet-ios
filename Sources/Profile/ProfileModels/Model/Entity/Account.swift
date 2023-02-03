@@ -42,8 +42,8 @@ public extension OnNetwork {
 		/// instance supports Hierarchical Deterministic derivation.
 		public let derivationPath: EntityDerivationPath
 
-		/// An optional displayName or label, used by presentation layer only.
-		public let displayName: String?
+		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
+		public let displayName: NonEmpty<String>
 
 		public init(
 			networkID: NetworkID,
@@ -52,7 +52,7 @@ public extension OnNetwork {
 			index: Index,
 			appearanceID: AppearanceID? = nil,
 			derivationPath: EntityDerivationPath,
-			displayName: String?
+			displayName: NonEmpty<String>
 		) {
 			self.networkID = networkID
 			self.address = address

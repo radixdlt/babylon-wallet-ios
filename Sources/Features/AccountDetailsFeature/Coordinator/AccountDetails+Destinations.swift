@@ -2,13 +2,13 @@ import AssetTransferFeature
 import FeaturePrelude
 
 public extension AccountDetails {
-	struct Destinations: ReducerProtocol {
-		public enum State: Hashable {
+	struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Equatable {
 			// TODO: case preferences(AccountPreferences.State)
 			case transfer(AssetTransfer.State)
 		}
 
-		public enum Action: Equatable {
+		public enum Action: Sendable, Equatable {
 			// TODO: case preferences(AccountPreferences.Action)
 			case transfer(AssetTransfer.Action)
 		}
