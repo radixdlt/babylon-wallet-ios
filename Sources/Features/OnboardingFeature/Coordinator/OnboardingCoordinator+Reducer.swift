@@ -36,7 +36,7 @@ public struct OnboardingCoordinator: Sendable, ReducerProtocol {
 		case .child(.newProfileThenAccountCoordinator(.delegate(.criticialErrorFailedToCommitEphemeralProfile))):
 			fatalError("Failed to commit ephemeral profile")
 
-		default:
+		case .child, .delegate:
 			return .none
 		}
 	}

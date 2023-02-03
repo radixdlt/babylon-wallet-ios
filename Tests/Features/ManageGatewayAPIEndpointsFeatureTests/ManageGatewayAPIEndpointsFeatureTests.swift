@@ -168,16 +168,9 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		store.exhaustivity = .off
 		await store.send(.internal(.system(.hasAccountsResult(.success(false)))))
 		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway)))) {
-//			$0.createAccountCoordinator = .init(
-//				completionDestination: .home,
-//				rootState: .init(
-//					onNetworkWithID: newNetworkAndGateway.network.id,
-//					isFirstAccount: true
-//				)
-//			)
 			$0.createAccountCoordinator = .init(config: .init(
 				specificNetworkID: newNetworkAndGateway.network.id,
-				isFirstEntity: true,
+				isFirstEntity: false,
 				canBeDismissed: true,
 				navigationButtonCTA: .goHome
 			))
@@ -190,12 +183,6 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				//				createAccountCoordinator: .init(
-//					completionDestination: .home,
-//					rootState: .init(
-//						onNetworkWithID: newNetworkAndGateway.network.id
-//					)
-//				),
 				createAccountCoordinator: .init(config: .init(
 					specificNetworkID: newNetworkAndGateway.network.id,
 					isFirstEntity: false,
@@ -227,12 +214,6 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				//				createAccountCoordinator: .init(
-//					completionDestination: .home,
-//					rootState: .init(
-//						onNetworkWithID: newNetworkAndGateway.network.id
-//					)
-//				),
 				createAccountCoordinator: .init(config: .init(
 					specificNetworkID: newNetworkAndGateway.network.id,
 					isFirstEntity: false,
