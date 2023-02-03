@@ -2,6 +2,7 @@ import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
+import ConnectedDAppsFeature
 import P2PModels
 import PersonasFeature
 import Profile
@@ -21,6 +22,7 @@ public extension AppSettings {
 public extension AppSettings.Action {
 	enum ChildAction: Sendable, Equatable {
 		case manageP2PClients(ManageP2PClients.Action)
+		case connectedDApps(ConnectedDApps.Action)
 		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
 		case personasCoordinator(PersonasCoordinator.Action)
 	}
@@ -37,6 +39,7 @@ public extension AppSettings.Action {
 		case addP2PClientButtonTapped
 
 		case editGatewayAPIEndpointButtonTapped
+		case connectedDAppsButtonTapped
 		case personasButtonTapped
 
 		#if DEBUG

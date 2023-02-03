@@ -2,6 +2,7 @@ import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
+import ConnectedDAppsFeature
 import PersonasFeature
 import ProfileClient
 #if DEBUG
@@ -41,6 +42,14 @@ public extension AppSettings.View {
 						),
 						then: { ManageP2PClients.View(store: $0) }
 					)
+					
+					IfLetStore(
+						store.scope(
+							state: \.connectedDApps,
+							action: { .child(.connectedDApps($0)) }
+						),
+						then: { ConnectedDApps.View(store: $0) }
+					)
 
 					IfLetStore(
 						store.scope(
@@ -49,7 +58,7 @@ public extension AppSettings.View {
 						),
 						then: { ManageGatewayAPIEndpoints.View(store: $0) }
 					)
-
+					
 					IfLetStore(
 						store.scope(
 							state: \.personasCoordinator,
@@ -101,21 +110,29 @@ private extension AppSettings.View {
 						) {
 							viewStore.send(.manageP2PClientsButtonTapped)
 						}
-
+						
+						Row(
+							L10n.Settings.connectedDAppsButtonTitle,
+							icon: Image(asset: AssetResource.connectedDapps)
+						) {
+							viewStore.send(.connectedDAppsButtonTapped)
+						}
+						
 						Row(
 							L10n.Settings.gatewayButtonTitle,
 							icon: Image(asset: AssetResource.gateway)
 						) {
 							viewStore.send(.editGatewayAPIEndpointButtonTapped)
 						}
-
+						
 						Row(
 							L10n.Settings.personasButtonTitle,
 							icon: Image(asset: AssetResource.personas)
 						) {
 							viewStore.send(.personasButtonTapped)
 						}
-
+					}
+					VStack(spacing: .zero) {
 						Spacer()
 							.frame(height: .large3)
 

@@ -82,6 +82,13 @@ package.addModules([
 		],
 		tests: .yes()
 	),
+    .feature(
+        name: "ConnectedDAppsFeature",
+        dependencies: [
+            "ProfileClient",
+        ],
+        tests: .no
+    ),
 	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
@@ -188,6 +195,7 @@ package.addModules([
 		dependencies: [
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
+			"ConnectedDAppsFeature",
 			"ManageGatewayAPIEndpointsFeature",
 			"PersonasFeature",
 			"P2PConnectivityClient", // deleting connections when wallet is deleted

@@ -2,6 +2,7 @@ import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
+import ConnectedDAppsFeature
 import PersonasFeature
 import ProfileClient
 
@@ -10,6 +11,7 @@ public extension AppSettings {
 	// MARK: State
 	struct State: Equatable {
 		public var manageP2PClients: ManageP2PClients.State?
+		public var connectedDApps: ConnectedDApps.State?
 		public var manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State?
 		public var personasCoordinator: PersonasCoordinator.State?
 		public var canAddP2PClient: Bool

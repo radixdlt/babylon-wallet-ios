@@ -11,7 +11,7 @@ public struct ForceFullScreen<Content>: View where Content: View {
 	private let content: Content
 
 	public init(
-		@ViewBuilder content: @escaping () -> Content
+		@ViewBuilder content: @escaping () -> Content // This isn't really escaping
 	) {
 		self.content = content()
 	}

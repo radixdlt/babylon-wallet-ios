@@ -2,6 +2,7 @@ import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
+import ConnectedDAppsFeature
 import PersonasFeature
 import ProfileClient
 
@@ -27,6 +28,9 @@ public extension AppSettings {
 			.ifLet(\.personasCoordinator, action: /Action.child .. Action.ChildAction.personasCoordinator) {
 				PersonasCoordinator()
 			}
+			.ifLet(\.connectedDApps, action: /Action.child .. Action.ChildAction.connectedDApps) {
+				ConnectedDApps()
+			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -44,6 +48,14 @@ public extension AppSettings {
 
 		case .internal(.view(.manageP2PClientsButtonTapped)):
 			state.manageP2PClients = .init()
+			return .none
+			
+		case .internal(.view(.connectedDAppsButtonTapped)):
+			state.connectedDApps = .init()
+			return .none
+			
+		case .child(.connectedDApps(.delegate(.dismiss))):
+			state.connectedDApps = nil
 			return .none
 
 		case .internal(.view(.didAppear)):

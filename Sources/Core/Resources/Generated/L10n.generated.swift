@@ -487,6 +487,8 @@ public enum L10n {
   public enum Settings {
     /// Close
     public static let closeButtonTitle = L10n.tr("Localizable", "settings.closeButtonTitle", fallback: "Close")
+    /// Connected dApps
+    public static let connectedDAppsButtonTitle = L10n.tr("Localizable", "settings.connectedDAppsButtonTitle", fallback: "Connected dApps")
     /// Delete Wallet Data
     public static let deleteAllButtonTitle = L10n.tr("Localizable", "settings.deleteAllButtonTitle", fallback: "Delete Wallet Data")
     /// Linked Connector
