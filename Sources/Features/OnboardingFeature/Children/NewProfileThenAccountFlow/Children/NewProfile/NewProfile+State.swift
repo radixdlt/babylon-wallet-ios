@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - NewProfile.State
 public extension NewProfile {
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		public init() {}
 	}
 }

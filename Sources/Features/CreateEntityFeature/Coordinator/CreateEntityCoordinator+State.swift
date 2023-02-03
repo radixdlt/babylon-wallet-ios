@@ -3,8 +3,8 @@ import ProfileClient
 
 // MARK: - CreateEntityCoordinator.State
 public extension CreateEntityCoordinator {
-	struct State: Sendable, Equatable {
-		public enum Step: Sendable, Equatable {
+	struct State: Sendable, Hashable {
+		public enum Step: Sendable, Hashable {
 			case step0_nameNewEntity(NameNewEntity<Entity>.State)
 			case step1_selectGenesisFactorSource(SelectGenesisFactorSource.State)
 			case step2_creationOfEntity(CreationOfEntity<Entity>.State)
@@ -47,7 +47,7 @@ public enum CreateEntityNavigationButtonCTA: Sendable, Equatable {
 }
 
 // MARK: - CreateEntityConfig
-public struct CreateEntityConfig: Sendable, Equatable {
+public struct CreateEntityConfig: Sendable, Hashable {
 	// N.B. this will have to be non nil if this CreateEntity flow
 	// was triggered as part NewProfileThenAccount flow (part of onboarding), since
 	// we will have created a new factor

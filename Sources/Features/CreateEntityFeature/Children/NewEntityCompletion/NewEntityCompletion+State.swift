@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - NewEntityCompletion.State
 public extension NewEntityCompletion {
-	struct State: Sendable & Equatable {
+	struct State: Sendable & Hashable {
 		public let entity: Entity
 		public let isFirstOnNetwork: Bool
 		public let navigationButtonCTA: CreateEntityNavigationButtonCTA

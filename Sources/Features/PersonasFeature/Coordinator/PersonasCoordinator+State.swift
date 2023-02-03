@@ -3,7 +3,7 @@ import FeaturePrelude
 
 // MARK: - PersonasCoordinator.State
 public extension PersonasCoordinator {
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		public var personaList: PersonaList.State
 
 		public var createPersonaCoordinator: CreatePersonaCoordinator.State?

@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - SelectGenesisFactorSource.State
 public extension SelectGenesisFactorSource {
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		public let specifiedNameForNewEntityToCreate: NonEmpty<String>
 		public let factorSources: NonEmpty<IdentifiedArrayOf<FactorSource>>
 

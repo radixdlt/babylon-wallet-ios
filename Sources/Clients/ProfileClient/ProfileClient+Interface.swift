@@ -101,7 +101,7 @@ public struct ProfileClient: Sendable {
 }
 
 // MARK: - CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest
-public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest: Sendable, Equatable {
+public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest: Sendable, Hashable {
 	public let networkAndGateway: AppPreferences.NetworkAndGateway
 	public let language: BIP39.Language
 	public let wordCount: BIP39.WordCount
@@ -120,7 +120,7 @@ public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest: Senda
 }
 
 // MARK: - CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse
-public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse: Sendable, Equatable {
+public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse: Sendable, Hashable {
 	public let request: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest
 	public let onDeviceFactorSourceMnemonic: Mnemonic
 	public let profile: Profile
@@ -136,7 +136,7 @@ public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse: Send
 }
 
 // MARK: - CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest
-public struct CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest: Sendable, Equatable {
+public struct CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest: Sendable, Hashable {
 	public let onDeviceFactorSourceMnemonic: Mnemonic
 	public let bip39Passphrase: String
 	public init(onDeviceFactorSourceMnemonic: Mnemonic, bip39Passphrase: String) {

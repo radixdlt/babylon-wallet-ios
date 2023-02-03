@@ -6,7 +6,7 @@ public typealias CreatePersonaCoordinator = CreateEntityCoordinator<OnNetwork.Pe
 
 // MARK: - CreateEntityCoordinator
 public struct CreateEntityCoordinator<
-	_Entity: EntityProtocol & Sendable & Equatable
+	_Entity: EntityProtocol & Sendable & Hashable
 >: Sendable, ReducerProtocol {
 	public typealias Entity = _Entity
 	@Dependency(\.profileClient) var profileClient
