@@ -1,5 +1,4 @@
 import FeaturePrelude
-import GatherFactorsFeature
 import LocalAuthenticationClient
 import ProfileClient
 

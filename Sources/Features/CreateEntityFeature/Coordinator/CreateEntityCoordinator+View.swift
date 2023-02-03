@@ -25,6 +25,9 @@ public extension CreateEntityCoordinator.View {
 						)
 						.foregroundColor(.app.gray1)
 						.padding([.horizontal, .top], .medium3)
+					} else {
+						Spacer()
+							.frame(minHeight: .small2, maxHeight: .large1)
 					}
 					SwitchStore(store.scope(state: \.step)) {
 						CaseLet(

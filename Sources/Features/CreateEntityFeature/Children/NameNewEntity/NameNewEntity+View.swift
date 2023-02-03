@@ -1,5 +1,4 @@
 import FeaturePrelude
-import GatherFactorsFeature
 
 // MARK: - NameNewEntity.View
 public extension NameNewEntity {
