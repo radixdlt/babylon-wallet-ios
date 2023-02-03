@@ -8,14 +8,14 @@ internal extension OnNetwork {
 		factorSources: FactorSources,
 		index: Int,
 		networkID: NetworkID,
-		displayName: String?,
+		displayName: NonEmpty<String>,
 		createFactorInstance: @escaping CreateFactorInstanceForRequest,
 		makeEntity: (
 			_ address: Entity.EntityAddress,
 			_ securityState: EntitySecurityState,
 			_ index: Int,
 			_ derivationPath: Entity.EntityDerivationPath,
-			_ displayName: String?
+			_ displayName: NonEmpty<String>
 		) throws -> Entity
 	) async throws -> Entity {
 		let derivationPath = try Entity.EntityDerivationPath(

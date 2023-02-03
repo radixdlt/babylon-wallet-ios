@@ -6,7 +6,7 @@ import Prelude
 /// A protocol **all** FactorSources conform to.
 public protocol FactorSourceProtocol {
 	/// Type specific type of FactorInstance this source can produce.
-	associatedtype Instance: FactorInstanceProtocol
+	associatedtype Instance: FactorInstanceProtocol & Sendable
 
 	associatedtype CreateFactorInstanceInput: CreateFactorInstanceInputProtocol
 
@@ -15,6 +15,8 @@ public protocol FactorSourceProtocol {
 
 	/// When this factor source was added by the user to the wallet.
 	var creationDate: Date { get }
+
+	var supportsHierarchicalDeterministicDerivation: Bool { get }
 
 	/// A stable and globally unique identifier for this factor source.
 	var factorSourceID: FactorSourceID { get }

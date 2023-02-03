@@ -1,4 +1,4 @@
-import CreateAccountFeature
+import CreateEntityFeature
 import FeaturePrelude
 import ProfileClient
 
@@ -42,9 +42,11 @@ public struct ChooseAccounts: Sendable, ReducerProtocol {
 				return .none
 
 			case .internal(.view(.createAccountButtonTapped)):
-				state.createAccountCoordinator = .init(
-					completionDestination: .chooseAccounts
-				)
+				state.createAccountCoordinator = .init(config: .init(
+					isFirstEntity: false,
+					canBeDismissed: true,
+					navigationButtonCTA: .goBackToChooseAccounts
+				))
 				return .none
 
 			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child

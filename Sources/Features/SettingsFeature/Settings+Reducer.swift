@@ -24,8 +24,8 @@ public extension AppSettings {
 			.ifLet(\.manageGatewayAPIEndpoints, action: /Action.child .. Action.ChildAction.manageGatewayAPIEndpoints) {
 				ManageGatewayAPIEndpoints()
 			}
-			.ifLet(\.personas, action: /Action.child .. Action.ChildAction.personas) {
-				Personas()
+			.ifLet(\.personasCoordinator, action: /Action.child .. Action.ChildAction.personasCoordinator) {
+				PersonasCoordinator()
 			}
 	}
 
@@ -95,8 +95,8 @@ public extension AppSettings {
 			state.manageP2PClients = nil
 			return loadP2PClients()
 
-		case .child(.personas(.delegate(.dismiss))):
-			state.personas = nil
+		case .child(.personasCoordinator(.delegate(.dismiss))):
+			state.personasCoordinator = nil
 			return .none
 
 		case .child, .delegate:
@@ -112,7 +112,7 @@ public extension AppSettings {
 
 		case .internal(.view(.personasButtonTapped)):
 			// TODO: implement
-			state.personas = .init(personas: .init())
+			state.personasCoordinator = .init()
 			return .none
 		}
 	}

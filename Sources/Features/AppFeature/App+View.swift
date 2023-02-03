@@ -33,9 +33,9 @@ public extension App.View {
 				)
 
 				CaseLet(
-					state: /App.State.Root.onboarding,
-					action: { App.Action.child(.onboarding($0)) },
-					then: { Onboarding.View(store: $0) }
+					state: /App.State.Root.onboardingCoordinator,
+					action: { App.Action.child(.onboardingCoordinator($0)) },
+					then: { OnboardingCoordinator.View(store: $0) }
 				)
 
 				CaseLet(

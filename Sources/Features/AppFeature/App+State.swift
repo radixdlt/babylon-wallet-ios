@@ -8,7 +8,7 @@ public extension App {
 	struct State: Equatable {
 		public enum Root: Equatable {
 			case main(Main.State)
-			case onboarding(Onboarding.State)
+			case onboardingCoordinator(OnboardingCoordinator.State)
 			case splash(Splash.State)
 		}
 

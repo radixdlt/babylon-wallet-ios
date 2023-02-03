@@ -14,6 +14,7 @@ public struct HexCodable:
 	Hashable,
 	Codable,
 	Identifiable,
+	CustomStringConvertible,
 	DataProtocol
 {
 	/// The underlying `Data` that is always hex coded.
@@ -101,6 +102,13 @@ public extension HexCodable {
 	func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		try container.encode(data.hex())
+	}
+}
+
+// MARK: CustomStringConvertible
+public extension HexCodable {
+	var description: String {
+		data.hex()
 	}
 }
 

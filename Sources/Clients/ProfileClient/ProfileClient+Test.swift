@@ -25,11 +25,14 @@ extension ProfileClient: TestDependencyKey {
 	}
 
 	public static let testValue = Self(
+		getFactorSources: unimplemented("\(Self.self).getFactorSources"),
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
 		getGatewayAPIEndpointBaseURL: unimplemented("\(Self.self).getGatewayAPIEndpointBaseURL"),
 		getNetworkAndGateway: unimplemented("\(Self.self).getNetworkAndGateway"),
 		setNetworkAndGateway: unimplemented("\(Self.self).setNetworkAndGateway"),
-		createNewProfile: unimplemented("\(Self.self).createNewProfile"),
+		createEphemeralProfileAndUnsavedOnDeviceFactorSource: unimplemented("\(Self.self).createEphemeralProfileAndUnsavedOnDeviceFactorSource"),
+		injectProfileSnapshot: unimplemented("\(Self.self).injectProfileSnapshot"),
+		commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: unimplemented("\(Self.self).commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic"),
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
@@ -45,8 +48,7 @@ extension ProfileClient: TestDependencyKey {
 		deleteP2PClientByID: unimplemented("\(Self.self).deleteP2PClientByID"),
 		getAppPreferences: unimplemented("\(Self.self).getAppPreferences"),
 		setDisplayAppPreferences: unimplemented("\(Self.self).setDisplayAppPreferences"),
-		createUnsavedVirtualAccount: unimplemented("\(Self.self).createUnsavedVirtualAccount"),
-		createUnsavedVirtualPersona: unimplemented("\(Self.self).createUnsavedVirtualPersona"),
+		createUnsavedVirtualEntity: unimplemented("\(Self.self).createUnsavedVirtualEntity"),
 		addAccount: unimplemented("\(Self.self).addAccount"),
 		addPersona: unimplemented("\(Self.self).addPersona"),
 		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
@@ -56,13 +58,14 @@ extension ProfileClient: TestDependencyKey {
 
 public extension ProfileClient {
 	static let noop = Self(
+		getFactorSources: { throw NoopError() },
 		getCurrentNetworkID: { NetworkID.nebunet },
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
 		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.nebunet },
 		setNetworkAndGateway: { _ in },
-		createNewProfile: { _ in
-			OnNetwork.Account.previewValue0
-		},
+		createEphemeralProfileAndUnsavedOnDeviceFactorSource: { _ in throw NoopError() },
+		injectProfileSnapshot: { _ in },
+		commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: { _ in },
 		loadProfile: { .success(nil) },
 		extractProfileSnapshot: { throw NoopError() },
 		deleteProfileAndFactorSources: {},
@@ -78,8 +81,7 @@ public extension ProfileClient {
 		deleteP2PClientByID: { _ in throw NoopError() },
 		getAppPreferences: { throw NoopError() },
 		setDisplayAppPreferences: { _ in throw NoopError() },
-		createUnsavedVirtualAccount: { _ in throw NoopError() },
-		createUnsavedVirtualPersona: { _ in throw NoopError() },
+		createUnsavedVirtualEntity: { _ in throw NoopError() },
 		addAccount: { _ in },
 		addPersona: { _ in },
 		lookupAccountByAddress: { _ in .previewValue0 },

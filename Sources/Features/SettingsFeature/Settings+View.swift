@@ -52,10 +52,10 @@ public extension AppSettings.View {
 
 					IfLetStore(
 						store.scope(
-							state: \.personas,
-							action: { .child(.personas($0)) }
+							state: \.personasCoordinator,
+							action: { .child(.personasCoordinator($0)) }
 						),
-						then: { Personas.View(store: $0) }
+						then: { PersonasCoordinator.View(store: $0) }
 					)
 				}
 			}

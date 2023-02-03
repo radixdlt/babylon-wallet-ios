@@ -6,6 +6,7 @@ public enum FactorSource:
 	Sendable,
 	Hashable,
 	Codable,
+	Identifiable,
 	CustomStringConvertible,
 	CustomDumpStringConvertible
 {
@@ -19,6 +20,11 @@ public enum FactorSource:
 }
 
 public extension FactorSource {
+	typealias ID = FactorSourceID
+	var id: ID {
+		any().factorSourceID
+	}
+
 	func any() -> any FactorSourceProtocol {
 		switch self {
 		case let .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(source):
@@ -26,6 +32,10 @@ public extension FactorSource {
 		case let .secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource(source):
 			return source
 		}
+	}
+
+	var supportsHierarchicalDeterministicDerivation: Bool {
+		any().supportsHierarchicalDeterministicDerivation
 	}
 }
 
@@ -47,3 +57,11 @@ public extension FactorSource {
 		}
 	}
 }
+
+#if DEBUG
+
+public extension FactorSource {
+	static let previewValue: Self = .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(.previewValue)
+}
+
+#endif // DEBUG

@@ -9,7 +9,7 @@ public extension Profile {
 	@discardableResult
 	mutating func createNewVirtualPersona(
 		networkID: NetworkID,
-		displayName: String? = nil,
+		displayName: NonEmpty<String>,
 		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
 	) async throws -> OnNetwork.Persona {
@@ -28,7 +28,7 @@ public extension Profile {
 	@discardableResult
 	mutating func createNewVirtualPersona(
 		networkID: NetworkID,
-		displayName: String? = nil,
+		displayName: NonEmpty<String>,
 		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
 	) async throws -> OnNetwork.Persona {
@@ -61,7 +61,7 @@ public extension Profile {
 	/// Creates a new **Virtual**  `Persona` without saving it into the profile.
 	func creatingNewVirtualPersona(
 		networkID: NetworkID,
-		displayName: String? = nil,
+		displayName: NonEmpty<String>,
 		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
 	) async throws -> OnNetwork.Persona {
@@ -74,7 +74,7 @@ public extension Profile {
 	/// Creates a new **Virtual**  `Persona` without saving it into the profile.
 	func creatingNewVirtualPersona(
 		networkID: NetworkID,
-		displayName: String? = nil,
+		displayName: NonEmpty<String>,
 		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
 	) async throws -> OnNetwork.Persona {
@@ -97,7 +97,7 @@ public extension Profile {
 		factorSources: FactorSources,
 		personaIndex: Int,
 		networkID: NetworkID,
-		displayName: String? = nil,
+		displayName: NonEmpty<String>,
 		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
 	) async throws -> OnNetwork.Persona {

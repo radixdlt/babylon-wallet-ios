@@ -330,20 +330,20 @@ public struct DappAuthorizedPersonaView: IndentedView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("Address", value: detailedAuthorizedPersona.identityAddress.address)
-			Labeled("Name", value: detailedAuthorizedPersona.displayName ?? "<NONE>")
+			Labeled("Name", value: detailedAuthorizedPersona.displayName.rawValue)
 
 			Text("Fields")
 			ForEach(detailedAuthorizedPersona.fields) { field in
 				VStack {
 					Labeled("id", value: field.id.description)
 					Labeled("kind", value: field.kind.rawValue)
-					Labeled("value", value: field.value)
+					Labeled("value", value: field.value.rawValue)
 				}
 			}
 
 			Text("Shared Accounts")
 			ForEach(detailedAuthorizedPersona.simpleAccounts) { simpleAccount in
-				Labeled("displayName", value: simpleAccount.label ?? "<NONE>")
+				Labeled("displayName", value: simpleAccount.label.rawValue)
 				Labeled("address", value: simpleAccount.address.address)
 				Labeled("appearanceID", value: simpleAccount.appearanceID.description)
 			}
@@ -481,7 +481,7 @@ public extension EntityView {
 	var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			if let displayName = entity.displayName {
-				Labeled("DisplayName", value: displayName)
+				Labeled("DisplayName", value: displayName.rawValue)
 			}
 
 			Labeled("Index", value: String(describing: entity.index))
@@ -499,7 +499,7 @@ public extension EntityView {
 				Group {
 					Text("Persona fields")
 					ForEach(persona.fields) { field in
-						Labeled(field.kind.rawValue, value: field.value)
+						Labeled(field.kind.rawValue, value: field.value.rawValue)
 					}
 				}.padding([.leading], indentation.inOneLevel.leadingPadding)
 			}

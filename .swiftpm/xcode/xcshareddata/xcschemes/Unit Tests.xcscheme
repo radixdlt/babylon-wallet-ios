@@ -112,16 +112,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CreateAccountFeatureTests"
-               BuildableName = "CreateAccountFeatureTests"
-               BlueprintName = "CreateAccountFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "CryptographyTests"
                BuildableName = "CryptographyTests"
                BlueprintName = "CryptographyTests"
@@ -205,16 +195,6 @@
                BlueprintIdentifier = "HomeFeatureTests"
                BuildableName = "HomeFeatureTests"
                BlueprintName = "HomeFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "ImportProfileFeatureTests"
-               BuildableName = "ImportProfileFeatureTests"
-               BlueprintName = "ImportProfileFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -395,6 +375,26 @@
                BlueprintIdentifier = "TransactionSigningFeatureTests"
                BuildableName = "TransactionSigningFeatureTests"
                BlueprintName = "TransactionSigningFeatureTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "CreateEntityFeatureTests"
+               BuildableName = "CreateEntityFeatureTests"
+               BlueprintName = "CreateEntityFeatureTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "PersonasFeatureTests"
+               BuildableName = "PersonasFeatureTests"
+               BlueprintName = "PersonasFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

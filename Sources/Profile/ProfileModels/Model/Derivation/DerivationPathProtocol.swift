@@ -88,6 +88,26 @@ public extension DerivationPath {
 		case let .identityPath(path): return path.derivationPath
 		}
 	}
+
+	func asIdentityPath() throws -> IdentityHierarchicalDeterministicDerivationPath {
+		switch self {
+		case let .identityPath(path):
+			return path
+		default:
+			struct NotAnIdentityPath: Swift.Error {}
+			throw NotAnIdentityPath()
+		}
+	}
+
+	func asAccountPath() throws -> AccountHierarchicalDeterministicDerivationPath {
+		switch self {
+		case let .accountPath(path):
+			return path
+		default:
+			struct NotAnAccountPath: Swift.Error {}
+			throw NotAnAccountPath()
+		}
+	}
 }
 
 public extension DerivationPath {

@@ -52,6 +52,6 @@ public extension AccountDetails.State {
 	}
 
 	var displayName: String {
-		account.displayName ?? "Unnamed account"
+		account.displayName.rawValue
 	}
 }
