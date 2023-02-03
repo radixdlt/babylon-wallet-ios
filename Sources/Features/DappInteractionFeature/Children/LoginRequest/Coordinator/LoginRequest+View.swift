@@ -92,7 +92,7 @@ public extension LoginRequest.View {
 
 // MARK: - LoginRequest.View.LoginRequestViewStore
 private extension LoginRequest.View {
-	typealias LoginRequestViewStore = ComposableArchitecture.ViewStore<LoginRequest.View.ViewState, LoginRequest.Action.ViewAction>
+	typealias LoginRequestViewStore = ComposableArchitecture.ViewStore<LoginRequest.View.ViewState, LoginRequest.ViewAction>
 }
 
 // MARK: - Private Computed Properties
@@ -155,5 +155,16 @@ struct LoginRequest_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+public extension LoginRequest.State {
+	static let previewValue: Self = .init(
+		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+		dappMetadata: .previewValue,
+		personas: .init(uniqueElements: [
+			.init(persona: .previewValue0, hasAlreadyLoggedIn: false),
+			.init(persona: .previewValue1, hasAlreadyLoggedIn: false),
+		])
+	)
 }
 #endif

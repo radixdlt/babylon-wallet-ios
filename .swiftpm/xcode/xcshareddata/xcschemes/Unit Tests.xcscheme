@@ -172,16 +172,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "HandleDappRequestsTests"
-               BuildableName = "HandleDappRequestsTests"
-               BlueprintName = "HandleDappRequestsTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "HomeFeatureTests"
                BuildableName = "HomeFeatureTests"
                BlueprintName = "HomeFeatureTests"
@@ -395,16 +385,6 @@
                BlueprintIdentifier = "AssetTransferFeatureTests"
                BuildableName = "AssetTransferFeatureTests"
                BlueprintName = "AssetTransferFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "DappInteractionFeatureTests"
-               BuildableName = "DappInteractionFeatureTests"
-               BlueprintName = "DappInteractionFeatureTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

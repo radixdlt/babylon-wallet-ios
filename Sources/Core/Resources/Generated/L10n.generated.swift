@@ -162,6 +162,8 @@ public enum L10n {
       }
       /// Choose Accounts
       public static let title = L10n.tr("Localizable", "dApp.chooseAccounts.title", fallback: "Choose Accounts")
+      /// Unnamed Account
+      public static let unnamedAccount = L10n.tr("Localizable", "dApp.chooseAccounts.unnamedAccount", fallback: "Unnamed Account")
     }
     public enum ConnectionRequest {
       /// Continue
@@ -339,6 +341,14 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "personaList.subtitle", fallback: "Here are all the Personas connected to your account")
     /// Personas
     public static let title = L10n.tr("Localizable", "personaList.title", fallback: "Personas")
+  }
+  public enum Personas {
+    /// Create a New persona
+    public static let createNewPersonaButtonTitle = L10n.tr("Localizable", "personas.createNewPersonaButtonTitle", fallback: "Create a New persona")
+    /// Here are all the Personas connected to your account
+    public static let subtitle = L10n.tr("Localizable", "personas.subtitle", fallback: "Here are all the Personas connected to your account")
+    /// Personas
+    public static let title = L10n.tr("Localizable", "personas.title", fallback: "Personas")
   }
   public enum ProfileLoad {
     /// Failed to create Wallet from backup: %@
