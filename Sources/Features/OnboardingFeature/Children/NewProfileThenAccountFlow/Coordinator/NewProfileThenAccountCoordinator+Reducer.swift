@@ -25,7 +25,18 @@ public struct NewProfileThenAccountCoordinator: Sendable, FeatureReducer {
 		switch childAction {
 		case let .newProfile(.delegate(.createdProfile(unsavedProfile))):
 			state.unsavedProfile = unsavedProfile
-			state.step = .createAccountCoordinator(.init(config: .init(isFirstEntity: true, canBeDismissed: false, navigationButtonCTA: .goHome)))
+
+			state.step = .createAccountCoordinator(.init(
+				config: .init(
+					specificGenesisFactorInstanceDerivationStrategy: .useMnemonic(
+						unsavedProfile.onDeviceFactorSourceMnemonic,
+						forFactorSource: unsavedProfile.profile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first
+					),
+					isFirstEntity: true,
+					canBeDismissed: false,
+					navigationButtonCTA: .goHome
+				)
+			))
 			return .none
 
 		case .newProfile(.delegate(.criticalFailureCouldNotCreateProfile)):

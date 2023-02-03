@@ -296,35 +296,34 @@ public extension ProfileClient {
 				}()
 				let getDerivationPathRequest = try request.getDerivationPathRequest()
 				let (derivationPath, index) = try await getDerivationPathForNewEntity(getDerivationPathRequest)
-				let factorSource = request.factorSource
-				//                let request = CreateFactorInstanceRequest.fromNonHardwareHierarchicalDeterministicMnemonicFactorSource(
-				//                    .init(
-				//                        reference: request.factorSource.any().reference,
-				//                        derivationPath: derivationPath//.wrapAsDerivationPath()
-				//                    ))
-//
-				//                guard
-				//                    let genesisFactorInstanceSome = try await createFactorInstance(request),
-				//                    let genesisFactorInstance = genesisFactorInstanceSome.factorInstance.any() as? (any FactorInstanceHierarchicalDeterministicProtocol)
-				//                else {
-				//                    throw NoInstance()
-				//                }
-				guard let mnemonic = try await keychainClient.loadFactorSourceMnemonic(
-					reference: factorSource.reference,
-					authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-				) else {
-					struct FailedToFindFactorSource: Swift.Error {}
-					throw FailedToFindFactorSource()
-				}
 
-				let genesisFactorInstanceResponse = try await factorSource.createAnyFactorInstanceForResponse(
-					input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
-						mnemonic: mnemonic,
-						derivationPath: derivationPath,
-						includePrivateKey: false
+				let genesisFactorInstance: FactorInstance = try await {
+					let genesisFactorInstanceDerivationStrategy = request.genesisFactorInstanceDerivationStrategy
+					let mnemonic: Mnemonic
+					let factorSource = genesisFactorInstanceDerivationStrategy.factorSource
+					switch genesisFactorInstanceDerivationStrategy {
+					case .loadMnemonicFromKeychainForFactorSource:
+						guard let loadedMnemonic = try await keychainClient.loadFactorSourceMnemonic(
+							reference: factorSource.reference,
+							authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+						) else {
+							struct FailedToFindFactorSource: Swift.Error {}
+							throw FailedToFindFactorSource()
+						}
+						mnemonic = loadedMnemonic
+					case let .useMnemonic(unsavedMnemonic, _):
+						mnemonic = unsavedMnemonic
+					}
+
+					let genesisFactorInstanceResponse = try await factorSource.createAnyFactorInstanceForResponse(
+						input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
+							mnemonic: mnemonic,
+							derivationPath: derivationPath,
+							includePrivateKey: false
+						)
 					)
-				)
-				let genesisFactorInstance = genesisFactorInstanceResponse.factorInstance
+					return genesisFactorInstanceResponse.factorInstance
+				}()
 
 				let displayName = request.displayName
 				let unsecuredControl = UnsecuredEntityControl(
@@ -365,39 +364,6 @@ public extension ProfileClient {
 					return account
 				}
 			},
-//			createUnsavedVirtualAccount: { request in
-//				try await profileHolder.getAsync { profile in
-//					let networkID = await getCurrentNetworkID()
-//					return try await profile.creatingNewVirtualAccount(
-//						networkID: request.overridingNetworkID ?? networkID,
-//						displayName: request.accountName,
-//						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-//							try await keychainClient
-//								.loadFactorSourceMnemonic(
-//									reference: reference,
-//									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-//								)
-//						}
-//					)
-//				}
-//			},
-//			createUnsavedVirtualPersona: { request in
-//				try await profileHolder.getAsync { profile in
-//					let networkID = await getCurrentNetworkID()
-//					return try await profile.creatingNewVirtualPersona(
-//						networkID: request.overridingNetworkID ?? networkID,
-//						displayName: request.personaName,
-//						fields: request.fields,
-//						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-//							try await keychainClient
-//								.loadFactorSourceMnemonic(
-//									reference: reference,
-//									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-//								)
-//						}
-//					)
-//				}
-//			},
 			addAccount: { account in
 				try await profileHolder.asyncMutating { profile in
 					try await profile.addAccount(account)

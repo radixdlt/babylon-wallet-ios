@@ -1,4 +1,5 @@
 import FeaturePrelude
+import ProfileClient
 import ProfileModels
 
 // MARK: - CreationOfEntity.State
@@ -6,16 +7,16 @@ public extension CreationOfEntity {
 	struct State: Sendable, Equatable {
 		public let networkID: NetworkID?
 		public let name: NonEmpty<String>
-		public let genesisFactorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource
+		public let genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy
 
 		public init(
 			networkID: NetworkID?,
 			name: NonEmpty<String>,
-			genesisFactorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource
+			genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy
 		) {
 			self.networkID = networkID
 			self.name = name
-			self.genesisFactorSource = genesisFactorSource
+			self.genesisFactorInstanceDerivationStrategy = genesisFactorInstanceDerivationStrategy
 		}
 	}
 }
