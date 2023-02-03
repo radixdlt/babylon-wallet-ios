@@ -145,7 +145,7 @@ private extension ManageGatewayAPIEndpoints.View {
 				.textStyle(.secondaryHeader)
 
 			HStack {
-				label(L10n.ManageGateway.networkName, value: networkAndGateway.network.name)
+				label(L10n.ManageGateway.networkName, value: ViewState.resolveName(network: networkAndGateway.network))
 				Spacer()
 				label(L10n.ManageGateway.networkID, value: networkAndGateway.network.id)
 			}
@@ -173,6 +173,14 @@ extension ManageGatewayAPIEndpoints.View {
 			focusedField = state.focusedField
 		}
 	}
+}
+
+extension ManageGatewayAPIEndpoints.View.ViewState {
+	static func resolveName(network: Network) -> String {
+		networkNameMap[network] ?? network.name.rawValue
+	}
+
+	private static let networkNameMap: [Network: String] = [.nebunet: "betanet", .mardunet: "betanet"]
 }
 
 #if DEBUG
