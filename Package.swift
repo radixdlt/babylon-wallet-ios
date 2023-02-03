@@ -85,7 +85,7 @@ package.addModules([
 	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
-			"CreateAccountFeature",
+			"CreateEntityFeature",
 			"GatewayAPI",
 			"P2PConnectivityClient",
 			"ProfileClient",
