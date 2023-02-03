@@ -34,8 +34,9 @@
 "createAccount.placeholder" = "e.g. My Main Account";
 "createAccount.subtitle" = "What would you like to call your account?";
 
-"dApp.chooseAccounts.createNewAccount" = "+ Create a New Account";
+"dApp.chooseAccounts.createNewAccount" = "Create a New Account";
 "dApp.chooseAccounts.explanation" = "Choose %@";
+"dApp.chooseAccounts.title" = "Account Permission";
 "dApp.chooseAccounts.explanationAtLeastOneAccount" = "At Least One Account";
 "dApp.chooseAccounts.explanationExactNumberOfAccounts" = "#%d Accounts";
 "dApp.chooseAccounts.explanationExactlyOneAccount" = "One Account";

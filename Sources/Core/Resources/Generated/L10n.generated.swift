@@ -94,8 +94,8 @@ public enum L10n {
     /// Unknown dApp
     public static let unknownName = L10n.tr("Localizable", "dApp.unknownName", fallback: "Unknown dApp")
     public enum ChooseAccounts {
-      /// + Create a New Account
-      public static let createNewAccount = L10n.tr("Localizable", "dApp.chooseAccounts.createNewAccount", fallback: "+ Create a New Account")
+      /// Create a New Account
+      public static let createNewAccount = L10n.tr("Localizable", "dApp.chooseAccounts.createNewAccount", fallback: "Create a New Account")
       /// Choose %@
       public static func explanation(_ p1: Any) -> String {
         return L10n.tr("Localizable", "dApp.chooseAccounts.explanation", String(describing: p1), fallback: "Choose %@")
@@ -108,6 +108,8 @@ public enum L10n {
       public static func explanationExactNumberOfAccounts(_ p1: Int) -> String {
         return L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactNumberOfAccounts", p1, fallback: "#%d Accounts")
       }
+      /// Account Permission
+      public static let title = L10n.tr("Localizable", "dApp.chooseAccounts.title", fallback: "Account Permission")
       /// Unnamed Account
       public static let unnamedAccount = L10n.tr("Localizable", "dApp.chooseAccounts.unnamedAccount", fallback: "Unnamed Account")
     }

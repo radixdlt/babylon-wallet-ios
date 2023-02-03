@@ -64,7 +64,7 @@ public extension LoginRequest.View {
 							)
 
 							Spacer()
-								.frame(height: .medium1)
+								.frame(height: .small3)
 
 							Button(L10n.Personas.createNewPersonaButtonTitle) {
 								viewStore.send(.createNewPersonaButtonTapped)
