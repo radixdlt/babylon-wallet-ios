@@ -81,7 +81,7 @@ public extension LoginRequest.View {
 
 					ConfirmationFooter(
 						title: L10n.DApp.LoginRequest.continueButtonTitle,
-						isEnabled: true,
+						isEnabled: viewStore.canProceed,
 						action: {}
 					)
 				}
@@ -132,10 +132,12 @@ extension LoginRequest.View {
 	struct ViewState: Equatable {
 		let dappName: String
 		let isKnownDapp: Bool
+		let canProceed: Bool
 
 		init(state: LoginRequest.State) {
 			dappName = state.dappMetadata.name
 			isKnownDapp = state.isKnownDapp
+			canProceed = state.selectedPersona != nil
 		}
 	}
 }

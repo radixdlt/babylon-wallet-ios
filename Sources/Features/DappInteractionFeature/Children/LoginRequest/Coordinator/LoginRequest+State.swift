@@ -16,9 +16,17 @@ public extension LoginRequest {
 		) {
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
-			self.personas = personas
+			self.personas = .init(
+				uniqueElements: personas.sorted(by: { $0.hasAlreadyLoggedIn && !$1.hasAlreadyLoggedIn })
+			)
 			self.isKnownDapp = isKnownDapp
 		}
+	}
+}
+
+public extension LoginRequest.State {
+	var selectedPersona: OnNetwork.Persona? {
+		personas.first(where: { $0.isSelected })?.persona
 	}
 }
 
@@ -28,7 +36,7 @@ public extension LoginRequest.State {
 		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 		dappMetadata: .previewValue,
 		personas: .init(uniqueElements: [
-			.init(persona: .previewValue0, hasAlreadyLoggedIn: true),
+			.init(persona: .previewValue0, hasAlreadyLoggedIn: false),
 			.init(persona: .previewValue1, hasAlreadyLoggedIn: false),
 		])
 	)
