@@ -11,8 +11,25 @@ public enum HitTargetSize: CGFloat {
 	/// 64
 	case medium = 64
 
+	/// 104
+	case veryLarge = 104
+
 	public var frame: CGSize {
 		.init(width: rawValue, height: rawValue)
+	}
+
+	// TODO: • figure out remaining corner radii
+	public var cornerRadius: CGFloat {
+		switch self {
+		case .verySmall:
+			fatalError()
+		case .small:
+			return .small2
+		case .medium:
+			fatalError()
+		case .veryLarge:
+			return .medium3
+		}
 	}
 }
 

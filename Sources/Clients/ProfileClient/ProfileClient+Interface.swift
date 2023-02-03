@@ -26,6 +26,7 @@ public struct ProfileClient: Sendable {
 	public var getP2PClients: GetP2PClients
 	public var getConnectedDapps: GetConnectedDapps
 	public var addConnectedDapp: AddConnectedDapp
+	public var forgetConnectedDapp: ForgetConnectedDapp
 	public var addP2PClient: AddP2PClient
 	public var updateConnectedDapp: UpdateConnectedDapp
 	public var detailsForConnectedDapp: DetailsForConnectedDapp
@@ -57,6 +58,7 @@ public struct ProfileClient: Sendable {
 		getP2PClients: @escaping GetP2PClients,
 		getConnectedDapps: @escaping GetConnectedDapps,
 		addConnectedDapp: @escaping AddConnectedDapp,
+		forgetConnectedDapp: @escaping ForgetConnectedDapp,
 		detailsForConnectedDapp: @escaping DetailsForConnectedDapp,
 		updateConnectedDapp: @escaping UpdateConnectedDapp,
 		addP2PClient: @escaping AddP2PClient,
@@ -85,6 +87,7 @@ public struct ProfileClient: Sendable {
 		self.getPersonas = getPersonas
 		self.getConnectedDapps = getConnectedDapps
 		self.addConnectedDapp = addConnectedDapp
+		self.forgetConnectedDapp = forgetConnectedDapp
 		self.detailsForConnectedDapp = detailsForConnectedDapp
 		self.updateConnectedDapp = updateConnectedDapp
 		self.getP2PClients = getP2PClients
@@ -176,6 +179,7 @@ extension ProfileClient {
 	public typealias GetP2PClients = @Sendable () async throws -> P2PClients
 	public typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
 	public typealias AddConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
+	public typealias ForgetConnectedDapp = @Sendable (OnNetwork.ConnectedDapp.ID, NetworkID) async throws -> Void
 	public typealias UpdateConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
 	public typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	public typealias GetAppPreferences = @Sendable () async throws -> AppPreferences

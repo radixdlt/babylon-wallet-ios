@@ -3,12 +3,6 @@ import FeaturePrelude
 // MARK: - ConnectExtensionView
 struct ConnectExtensionView: View {
 	let action: () -> Void
-
-	init(
-		action: @escaping () -> Void
-	) {
-		self.action = action
-	}
 }
 
 extension ConnectExtensionView {
@@ -40,7 +34,6 @@ extension ConnectExtensionView {
 		}
 		.background(Color.app.gray5)
 		.cornerRadius(.medium3)
-		.padding(.horizontal, .medium1)
 	}
 }
 

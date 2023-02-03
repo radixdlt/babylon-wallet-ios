@@ -1,3 +1,4 @@
+import ConnectedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
@@ -7,6 +8,8 @@ import ProfileClient
 
 // MARK: - AppSettings
 public struct AppSettings: Sendable, ReducerProtocol {
+	public typealias Store = StoreOf<Self>
+
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
@@ -27,14 +30,15 @@ extension AppSettings {
 			.ifLet(\.personasCoordinator, action: /Action.child .. Action.ChildAction.personasCoordinator) {
 				PersonasCoordinator()
 			}
+			.presentationDestination(\.$connectedDapps, action: /Action.child .. Action.ChildAction.connectedDapps) {
+				ConnectedDapps()
+			}
 	}
 
 	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.dismissSettingsButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismissSettings))
-			}
+			return .send(.delegate(.dismissSettings))
 
 		case .internal(.view(.deleteProfileAndFactorSourcesButtonTapped)):
 			return .run { send in
@@ -45,6 +49,10 @@ extension AppSettings {
 		case .internal(.view(.manageP2PClientsButtonTapped)):
 			state.manageP2PClients = .init()
 			return .none
+
+		case .internal(.view(.connectedDappsButtonTapped)):
+			// TODO: This proxying is only necessary because of our strict view/child separation
+			return .send(.child(.connectedDapps(.present(.init()))))
 
 		case .internal(.view(.didAppear)):
 			return loadP2PClients()
@@ -99,9 +107,6 @@ extension AppSettings {
 			state.personasCoordinator = nil
 			return .none
 
-		case .child, .delegate:
-			return .none
-
 		case .internal(.view(.addP2PClientButtonTapped)):
 			state.manageP2PClients = .init(newConnection: .init())
 			return .none
@@ -113,6 +118,9 @@ extension AppSettings {
 		case .internal(.view(.personasButtonTapped)):
 			// TODO: implement
 			state.personasCoordinator = .init()
+			return .none
+
+		case .internal, .child, .delegate:
 			return .none
 		}
 	}

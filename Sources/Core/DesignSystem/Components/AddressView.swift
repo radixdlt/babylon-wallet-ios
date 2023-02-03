@@ -29,6 +29,7 @@ extension AddressView {
 
 				if copyAddressAction != nil {
 					Image(asset: AssetResource.copy)
+						.foregroundColor(.app.gray2)
 				}
 			}
 		}
@@ -43,37 +44,45 @@ extension AddressView {
 // MARK: AddressView.ViewState
 extension AddressView {
 	public struct ViewState: Equatable {
-		public var formattedAddress: String
+		public let formattedAddress: String
 
 		public init(address: String, format: AddressFormat) {
-			switch format {
-			case let .short(format):
-				let total = format.first + format.last
-				if address.count <= total {
-					formattedAddress = address
-				} else {
-					formattedAddress = address.prefix(format.first) + "..." + address.suffix(format.last)
-				}
-			case .full:
-				formattedAddress = address
-			}
+			self.formattedAddress = address.formatted(format)
 		}
 	}
 }
 
-// MARK: - AddressView.ViewState.AddressFormat
-extension AddressView.ViewState {
-	public enum AddressFormat {
-		case short(ShortAddressFormat = .default)
-		case full
+// TODO: • Move somewhere else
+
+extension String {
+	public func formatted(_ format: AddressFormat) -> String {
+		switch format {
+		case let .short(format):
+			let total = format.first + format.last
+			if count <= total {
+				return self
+			} else {
+				return prefix(format.first) + "..." + suffix(format.last)
+			}
+		case .full:
+			return self
+		}
 	}
 }
 
-// MARK: - AddressView.ViewState.AddressFormat.ShortAddressFormat
-extension AddressView.ViewState.AddressFormat {
+// MARK: - AddressFormat
+public enum AddressFormat {
+	case short(ShortAddressFormat = .default)
+	case full
+
+	public static let short = AddressFormat.short(.default)
+}
+
+// MARK: AddressFormat.ShortAddressFormat
+extension AddressFormat {
 	public struct ShortAddressFormat {
-		var first: Int
-		var last: Int
+		public var first: Int
+		public var last: Int
 
 		public static let `default` = Self(first: 4, last: 6)
 	}

@@ -62,6 +62,12 @@ public enum L10n {
       public static let kind = L10n.tr("Localizable", "common.persona.kind", fallback: "Persona")
     }
   }
+  public enum ConnectedDapps {
+    /// Here are all the dApps that you have logged into with this Radix Wallet.
+    public static let intro = L10n.tr("Localizable", "connectedDapps.intro", fallback: "Here are all the dApps that you have logged into with this Radix Wallet.")
+    /// Connected dApps
+    public static let title = L10n.tr("Localizable", "connectedDapps.title", fallback: "Connected dApps")
+  }
   public enum CreateEntity {
     public enum Completion {
       /// Go to %@
@@ -320,6 +326,22 @@ public enum L10n {
       }
     }
   }
+  public enum DAppProfile {
+    /// dApp Definition
+    public static let definition = L10n.tr("Localizable", "dAppProfile.definition", fallback: "dApp Definition")
+    /// Forget this dApp
+    public static let forgetDapp = L10n.tr("Localizable", "dAppProfile.forgetDapp", fallback: "Forget this dApp")
+    /// Missing description
+    public static let missingDescription = L10n.tr("Localizable", "dAppProfile.missingDescription", fallback: "Missing description")
+    /// Associated NFTs
+    public static let nfts = L10n.tr("Localizable", "dAppProfile.nfts", fallback: "Associated NFTs")
+    /// Here are the Personas that you have previously used to connect to this dApp.
+    public static let personaHeading = L10n.tr("Localizable", "dAppProfile.personaHeading", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
+    /// Associated Tokens
+    public static let tokens = L10n.tr("Localizable", "dAppProfile.tokens", fallback: "Associated Tokens")
+    /// Website
+    public static let website = L10n.tr("Localizable", "dAppProfile.website", fallback: "Website")
+  }
   public enum FungibleTokenList {
     public enum Detail {
       /// Current Supply
@@ -468,6 +490,32 @@ public enum L10n {
     /// Personas
     public static let title = L10n.tr("Localizable", "personaList.title", fallback: "Personas")
   }
+  public enum PersonaProfile {
+    /// Here are the account names and addresses that you are currently sharing with %@.
+    public static func accountSharingDescription(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "personaProfile.accountSharingDescription", String(describing: p1), fallback: "Here are the account names and addresses that you are currently sharing with %@.")
+    }
+    /// Address
+    public static let addressHeading = L10n.tr("Localizable", "personaProfile.addressHeading", fallback: "Address")
+    /// Disconnect Persona from this dApp
+    public static let disconnectPersona = L10n.tr("Localizable", "personaProfile.disconnectPersona", fallback: "Disconnect Persona from this dApp")
+    /// Edit Account Sharing
+    public static let editAccountSharing = L10n.tr("Localizable", "personaProfile.editAccountSharing", fallback: "Edit Account Sharing")
+    /// Edit Persona
+    public static let editPersona = L10n.tr("Localizable", "personaProfile.editPersona", fallback: "Edit Persona")
+    /// First Name
+    public static let firstNameHeading = L10n.tr("Localizable", "personaProfile.firstNameHeading", fallback: "First Name")
+    /// Here is the personal data that you are sharing with %@
+    public static func personalDataSharingDescription(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "personaProfile.personalDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
+    }
+    /// Persona Name
+    public static let personaNameHeading = L10n.tr("Localizable", "personaProfile.personaNameHeading", fallback: "Persona Name")
+    /// Second Name
+    public static let secondNameHeading = L10n.tr("Localizable", "personaProfile.secondNameHeading", fallback: "Second Name")
+    /// Twitter Username
+    public static let twitterNameHeading = L10n.tr("Localizable", "personaProfile.twitterNameHeading", fallback: "Twitter Username")
+  }
   public enum Personas {
     /// Create a New Persona
     public static let createNewPersonaButtonTitle = L10n.tr("Localizable", "personas.createNewPersonaButtonTitle", fallback: "Create a New Persona")
@@ -489,6 +537,8 @@ public enum L10n {
   public enum Settings {
     /// Close
     public static let closeButtonTitle = L10n.tr("Localizable", "settings.closeButtonTitle", fallback: "Close")
+    /// Connected dApps
+    public static let connectedDappsButtonTitle = L10n.tr("Localizable", "settings.connectedDappsButtonTitle", fallback: "Connected dApps")
     /// Delete Wallet Data
     public static let deleteAllButtonTitle = L10n.tr("Localizable", "settings.deleteAllButtonTitle", fallback: "Delete Wallet Data")
     /// Linked Connector
