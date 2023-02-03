@@ -4,29 +4,22 @@ import FeaturePrelude
 // MARK: - ChooseAccounts.State
 public extension ChooseAccounts {
 	struct State: Hashable {
-		public enum Kind: Sendable, Hashable {
-			case oneTime
-			case ongoing
-		}
-
-		public typealias NumberOfAccounts = P2P.FromDapp.WalletInteraction.NumberOfAccounts
-
-		public let kind: Kind
+		public let requestKind: DappInteraction.RequestKind
 		public let dappDefinitionAddress: DappDefinitionAddress
 		public let dappMetadata: DappMetadata
-		public let numberOfAccounts: NumberOfAccounts
+		public let numberOfAccounts: DappInteraction.NumberOfAccounts
 		public var availableAccounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
 		public var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		public init(
-			kind: Kind,
+			requestKind: DappInteraction.RequestKind,
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
-			numberOfAccounts: NumberOfAccounts,
+			numberOfAccounts: DappInteraction.NumberOfAccounts,
 			availableAccounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = [],
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil
 		) {
-			self.kind = kind
+			self.requestKind = requestKind
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
 			self.numberOfAccounts = numberOfAccounts
@@ -46,7 +39,7 @@ extension ChooseAccounts.State {
 #if DEBUG
 public extension ChooseAccounts.State {
 	static let previewValue: Self = .init(
-		kind: .oneTime,
+		requestKind: .oneTime,
 		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 		dappMetadata: .previewValue,
 		numberOfAccounts: .atLeast(2),

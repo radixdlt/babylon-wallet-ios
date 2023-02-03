@@ -1,5 +1,19 @@
 import FeaturePrelude
 
+public extension DappInteraction {
+	typealias NumberOfAccounts = P2P.FromDapp.WalletInteraction.NumberOfAccounts
+
+	enum PermissionKind {
+		case accounts(RequestKind)
+		case personaData(RequestKind)
+	}
+
+	enum RequestKind {
+		case ongoing
+		case oneTime
+	}
+}
+
 // MARK: - P2P.FromDapp.WalletRequestItem
 extension P2P.FromDapp.WalletInteraction {
 	/// A union type containing all request items allowed in a `WalletInteraction`, for app handling purposes.
