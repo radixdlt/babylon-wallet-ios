@@ -1,18 +1,14 @@
 import FeaturePrelude
 
 // MARK: - ChooseAccounts.Row.View
-public extension ChooseAccounts.Row {
+extension ChooseAccounts.Row {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<ChooseAccounts.Row>
-
-		public init(store: StoreOf<ChooseAccounts.Row>) {
-			self.store = store
-		}
+		let store: StoreOf<ChooseAccounts.Row>
 	}
 }
 
-public extension ChooseAccounts.Row.View {
+extension ChooseAccounts.Row.View {
 	var body: some View {
 		WithViewStore(
 			store,

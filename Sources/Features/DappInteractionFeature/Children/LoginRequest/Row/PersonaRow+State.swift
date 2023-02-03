@@ -1,13 +1,13 @@
 import FeaturePrelude
 
 // MARK: - PersonaRow.State
-public extension PersonaRow {
+extension PersonaRow {
 	struct State: Sendable, Equatable, Hashable {
-		public let persona: OnNetwork.Persona
-		public var isSelected: Bool
-		public let lastLoginDate: Date?
+		let persona: OnNetwork.Persona
+		var isSelected: Bool
+		let lastLoginDate: Date?
 
-		public init(
+		init(
 			persona: OnNetwork.Persona,
 			isSelected: Bool,
 			lastLoginDate: Date?
@@ -21,13 +21,13 @@ public extension PersonaRow {
 
 // MARK: - PersonaRow.State + Identifiable
 extension PersonaRow.State: Identifiable {
-	public typealias ID = IdentityAddress
-	public var address: IdentityAddress { persona.address }
-	public var id: ID { address }
+	typealias ID = IdentityAddress
+	var address: IdentityAddress { persona.address }
+	var id: ID { address }
 }
 
 #if DEBUG
-public extension PersonaRow.State {
+extension PersonaRow.State {
 	static let previewValue: Self = .init(
 		persona: .previewValue0,
 		isSelected: true,

@@ -3,13 +3,11 @@ import FeaturePrelude
 import ProfileClient
 
 // MARK: - ChooseAccounts
-public struct ChooseAccounts: Sendable, ReducerProtocol {
+struct ChooseAccounts: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 
-	public init() {}
-
-	public var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerProtocolOf<Self> {
 		Reduce { state, action in
 			switch action {
 			case .internal(.view(.continueButtonTapped)):

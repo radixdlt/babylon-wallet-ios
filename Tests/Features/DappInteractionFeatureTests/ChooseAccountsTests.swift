@@ -9,7 +9,7 @@ final class ChooseAccountsTests: TestCase {
 		singleAccount.isSelected = true
 		let store = TestStore(
 			initialState: ChooseAccounts.State(
-				requestKind: .oneTime,
+				accessKind: .oneTime,
 				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 				dappMetadata: .init(name: "Dapp name", description: "A description"),
 				numberOfAccounts: .exactly(1),
@@ -32,7 +32,7 @@ final class ChooseAccountsTests: TestCase {
 		// given
 		let store = TestStore(
 			initialState: ChooseAccounts.State(
-				requestKind: .oneTime,
+				accessKind: .oneTime,
 				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 				dappMetadata: .init(name: "Dapp name", description: "A description"),
 				numberOfAccounts: .exactly(1)
@@ -53,7 +53,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = true
 
 		let initialState: ChooseAccounts.State = .init(
-			requestKind: .oneTime,
+			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
 			numberOfAccounts: .exactly(1),
@@ -85,7 +85,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			requestKind: .oneTime,
+			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
 			numberOfAccounts: .atLeast(1),
@@ -121,7 +121,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			requestKind: .oneTime,
+			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
 			numberOfAccounts: .exactly(1),
@@ -153,7 +153,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			requestKind: .oneTime,
+			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
 			numberOfAccounts: .exactly(1),

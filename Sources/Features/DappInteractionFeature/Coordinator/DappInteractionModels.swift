@@ -1,14 +1,16 @@
 import FeaturePrelude
 
-public extension DappInteraction {
+// enum DappInteraction {}
+
+extension DappInteraction {
 	typealias NumberOfAccounts = P2P.FromDapp.WalletInteraction.NumberOfAccounts
 
-	enum PermissionKind {
-		case accounts(RequestKind)
-		case personaData(RequestKind)
+	enum PermissionKind: Sendable, Hashable {
+		case accounts(AccessKind)
+		case personaData(AccessKind)
 	}
 
-	enum RequestKind {
+	enum AccessKind: Sendable, Hashable {
 		case ongoing
 		case oneTime
 	}

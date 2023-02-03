@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - LoginRequest
-public struct LoginRequest: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct LoginRequest: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
 
@@ -12,7 +12,7 @@ public struct LoginRequest: Sendable, FeatureReducer {
 			personas.first(where: { $0.isSelected })?.persona
 		}
 
-		public init(
+		init(
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata
 		) {
@@ -21,28 +21,28 @@ public struct LoginRequest: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case createNewPersonaButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case personasLoaded(IdentifiedArrayOf<OnNetwork.Persona>, OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case persona(id: PersonaRow.State.ID, action: PersonaRow.Action)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
+	enum DelegateAction: Sendable, Equatable {
 		case continueButtonTapped(OnNetwork.Persona, OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?)
 	}
 
-	public init() {}
+	init() {}
 
 	@Dependency(\.profileClient) var profileClient
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
 			return .run { [dappDefinitionAddress = state.dappDefinitionAddress] send in
@@ -72,7 +72,7 @@ public struct LoginRequest: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .personasLoaded(personas, authorizedPersona):
 			state.authorizedPersona = authorizedPersona
@@ -82,7 +82,7 @@ public struct LoginRequest: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		// TODO: @Nikola this should be:
 		// case let .persona(id: id, action: .delegate(.didSelect)):

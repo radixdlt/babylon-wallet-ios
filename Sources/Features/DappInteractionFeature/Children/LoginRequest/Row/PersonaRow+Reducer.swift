@@ -1,10 +1,8 @@
 import FeaturePrelude
 
 // MARK: - PersonaRow
-public struct PersonaRow: Sendable, ReducerProtocol {
-	public init() {}
-
-	public var body: some ReducerProtocolOf<Self> {
+struct PersonaRow: Sendable, ReducerProtocol {
+	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 	}
 

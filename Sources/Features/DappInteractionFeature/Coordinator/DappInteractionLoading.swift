@@ -1,20 +1,18 @@
 import FeaturePrelude
 
 // MARK: - DappInteraction
-public struct DappInteractionLoading: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+struct DappInteractionLoading: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
 		let interaction: P2P.FromDapp.WalletInteraction
 
-		public init(
+		init(
 			interaction: P2P.FromDapp.WalletInteraction
 		) {
 			self.interaction = interaction
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 	}
-
-	public init() {}
 }

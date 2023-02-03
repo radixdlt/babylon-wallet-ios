@@ -4,21 +4,19 @@ import ProfileClient
 
 // MARK: - DappInteractionHook
 struct DappInteractionHook: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+	struct State: Sendable, Hashable {
 		var currentRequest: P2P.RequestFromClient? { requestQueue.first }
 		var requestQueue: OrderedSet<P2P.RequestFromClient> = []
 
 		@PresentationStateOf<DappInteraction>
-		public var dappInteraction
-
-		public init() {}
+		var dappInteraction
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case task
 	}
 
-	public enum InternalAction: Sendable, Equatable {
+	enum InternalAction: Sendable, Equatable {
 		case loadClientIDsResult(TaskResult<OrderedSet<P2PClient.ID>>)
 		case receivedRequestIsValidHandleIt(P2P.RequestFromClient)
 		case sendMessageReceivedReceiptBackToPeer(P2PClient, readMessage: P2PConnections.IncomingMessage)
@@ -31,7 +29,7 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 		case sendResponseBackToDappResult(TaskResult<P2P.SentResponseToClient>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case dappInteraction(PresentationActionOf<DappInteraction>)
 	}
 
@@ -40,9 +38,7 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 
-	public init() {}
-
-	public var body: some ReducerProtocolOf<Self> {
+	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.presentationDestination(\.$dappInteraction, action: /Action.child .. ChildAction.dappInteraction) {
 				DappInteraction()

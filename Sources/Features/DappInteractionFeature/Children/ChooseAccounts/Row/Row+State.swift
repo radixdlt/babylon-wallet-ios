@@ -1,12 +1,12 @@
 import FeaturePrelude
 
 // MARK: - ChooseAccounts.Row.State
-public extension ChooseAccounts.Row {
+extension ChooseAccounts.Row {
 	struct State: Hashable {
-		public let account: OnNetwork.Account
-		public var isSelected: Bool = false
+		let account: OnNetwork.Account
+		var isSelected: Bool = false
 
-		public init(
+		init(
 			account: OnNetwork.Account,
 			isSelected: Bool = false
 		) {
@@ -18,13 +18,13 @@ public extension ChooseAccounts.Row {
 
 // MARK: - ChooseAccounts.Row.State + Identifiable
 extension ChooseAccounts.Row.State: Identifiable {
-	public typealias ID = AccountAddress
-	public var address: AccountAddress { account.address }
-	public var id: ID { address }
+	typealias ID = AccountAddress
+	var address: AccountAddress { account.address }
+	var id: ID { address }
 }
 
 #if DEBUG
-public extension ChooseAccounts.Row.State {
+extension ChooseAccounts.Row.State {
 	static let previewValueOne = Self(account: .previewValue0)
 	static let previewValueTwo = Self(account: .previewValue1)
 }

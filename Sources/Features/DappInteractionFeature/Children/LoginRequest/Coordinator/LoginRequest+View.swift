@@ -1,18 +1,14 @@
 import FeaturePrelude
 
 // MARK: - LoginRequest.View
-public extension LoginRequest {
+extension LoginRequest {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<LoginRequest>
-
-		public init(store: StoreOf<LoginRequest>) {
-			self.store = store
-		}
+		let store: StoreOf<LoginRequest>
 	}
 }
 
-public extension LoginRequest.View {
+extension LoginRequest.View {
 	var body: some View {
 		WithViewStore(
 			store,
@@ -151,7 +147,7 @@ struct LoginRequest_Preview: PreviewProvider {
 	}
 }
 
-public extension LoginRequest.State {
+extension LoginRequest.State {
 	static let previewValue: Self = .init(
 		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 		dappMetadata: .previewValue

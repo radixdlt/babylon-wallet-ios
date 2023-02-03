@@ -1,18 +1,14 @@
 import FeaturePrelude
 
 // MARK: - PersonaRow.View
-public extension PersonaRow {
+extension PersonaRow {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<PersonaRow>
-
-		public init(store: StoreOf<PersonaRow>) {
-			self.store = store
-		}
+		let store: StoreOf<PersonaRow>
 	}
 }
 
-public extension PersonaRow.View {
+extension PersonaRow.View {
 	var body: some View {
 		WithViewStore(
 			store,

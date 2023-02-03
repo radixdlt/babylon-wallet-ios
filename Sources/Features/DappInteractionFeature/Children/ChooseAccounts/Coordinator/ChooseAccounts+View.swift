@@ -2,18 +2,14 @@ import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - ChooseAccounts.View
-public extension ChooseAccounts {
+extension ChooseAccounts {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<ChooseAccounts>
-
-		public init(store: StoreOf<ChooseAccounts>) {
-			self.store = store
-		}
+		let store: StoreOf<ChooseAccounts>
 	}
 }
 
-public extension ChooseAccounts.View {
+extension ChooseAccounts.View {
 	var body: some View {
 		WithViewStore(
 			store,

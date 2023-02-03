@@ -1,18 +1,14 @@
 import FeaturePrelude
 
 // MARK: - Permission.View
-public extension Permission {
+extension Permission {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<Permission>
-
-		public init(store: StoreOf<Permission>) {
-			self.store = store
-		}
+		let store: StoreOf<Permission>
 	}
 }
 
-public extension Permission.View {
+extension Permission.View {
 	var body: some View {
 		WithViewStore(
 			store,

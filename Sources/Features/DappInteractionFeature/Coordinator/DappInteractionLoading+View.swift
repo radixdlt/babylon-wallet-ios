@@ -1,18 +1,14 @@
 import FeaturePrelude
 
 // MARK: - DappInteractionLoading.View
-public extension DappInteractionLoading {
+extension DappInteractionLoading {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<DappInteractionLoading>
-
-		public init(store: StoreOf<DappInteractionLoading>) {
-			self.store = store
-		}
+		let store: StoreOf<DappInteractionLoading>
 	}
 }
 
-public extension DappInteractionLoading.View {
+extension DappInteractionLoading.View {
 	var body: some View {
 		WithViewStore(
 			store,
@@ -51,7 +47,7 @@ struct DappInteractionLoading_Preview: PreviewProvider {
 	}
 }
 
-public extension DappInteractionLoading.State {
+extension DappInteractionLoading.State {
 	static let previewValue: Self = .init(
 		interaction: .previewValueOneTimeAccount
 	)

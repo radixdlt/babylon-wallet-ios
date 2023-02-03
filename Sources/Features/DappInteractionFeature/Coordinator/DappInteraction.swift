@@ -1,8 +1,8 @@
 import FeaturePrelude
 
-public struct DappInteraction: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public typealias Interaction = P2P.FromDapp.WalletInteraction
+struct DappInteraction: Sendable, FeatureReducer {
+	struct State: Sendable, Hashable {
+		typealias Interaction = P2P.FromDapp.WalletInteraction
 		typealias AnyInteractionItem = P2P.FromDapp.WalletInteraction.AnyInteractionItem
 		typealias AnyInteractionResponseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem
 
@@ -13,7 +13,7 @@ public struct DappInteraction: Sendable, FeatureReducer {
 		@NavigationStateOf<Destinations>
 		var navigation: NavigationState<Destinations.State>.Path
 
-		public init(
+		init(
 			dappMetadata: DappMetadata,
 			interaction: Interaction
 		) {
@@ -22,27 +22,27 @@ public struct DappInteraction: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
+	enum ViewAction: Sendable, Equatable {
 		case appeared
 	}
 
-	public enum ChildAction: Sendable, Equatable {
+	enum ChildAction: Sendable, Equatable {
 		case navigation(NavigationActionOf<Destinations>)
 	}
 
-	public struct Destinations: Sendable, ReducerProtocol {
-		public enum State: Sendable, Hashable {
+	struct Destinations: Sendable, ReducerProtocol {
+		enum State: Sendable, Hashable {
 			case login(LoginRequest.State)
 			case chooseOneTimeAccounts(ChooseAccounts.State)
 			case chooseOngoingAccounts(ChooseAccounts.State)
 		}
 
-		public enum Action: Sendable, Equatable {
+		enum Action: Sendable, Equatable {
 			case login(LoginRequest.Action)
 			case chooseOneTimeAccounts(ChooseAccounts.Action)
 		}
 
-		public var body: some ReducerProtocolOf<Self> {
+		var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.login, action: /Action.login) {
 				LoginRequest()
 			}
@@ -51,6 +51,4 @@ public struct DappInteraction: Sendable, FeatureReducer {
 			}
 		}
 	}
-
-	public init() {}
 }
