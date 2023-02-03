@@ -15,10 +15,11 @@ public extension CreateEntityCoordinator {
 		public let config: CreateEntityConfig
 
 		public init(
+			step: Step? = nil,
 			config: CreateEntityConfig
 		) {
 			self.config = config
-			self.step = .step0_nameNewEntity(.init(config: config))
+			self.step = step ?? .step0_nameNewEntity(.init(config: config))
 		}
 	}
 }

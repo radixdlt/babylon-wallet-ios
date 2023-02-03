@@ -2,7 +2,7 @@ import Cryptography
 import FeaturePrelude
 
 // MARK: - NameNewEntity
-public struct NameNewEntity<Entity: EntityProtocol & Equatable & Sendable>: Sendable, ReducerProtocol {
+public struct NameNewEntity<Entity: EntityProtocol>: Sendable, ReducerProtocol {
 	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -19,8 +19,8 @@ public struct NameNewEntity<Entity: EntityProtocol & Equatable & Sendable>: Send
 				await send(.delegate(.named(sanitizedName)))
 			}
 
-		case let .internal(.view(.textFieldChanged(accountName))):
-			state.inputtedName = accountName
+		case let .internal(.view(.textFieldChanged(inputtedName))):
+			state.inputtedName = inputtedName
 			state.sanitizedName = NonEmpty(rawValue: state.inputtedName.trimmed())
 			return .none
 
@@ -33,7 +33,7 @@ public struct NameNewEntity<Entity: EntityProtocol & Equatable & Sendable>: Send
 		case .internal(.view(.viewAppeared)):
 			return .run { send in
 				try await self.mainQueue.sleep(for: .seconds(0.5))
-				await send(.internal(.system(.focusTextField(.accountName))))
+				await send(.internal(.system(.focusTextField(.entityName))))
 			}
 
 		case let .internal(.system(.focusTextField(focus))):

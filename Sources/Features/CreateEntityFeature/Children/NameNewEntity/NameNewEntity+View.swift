@@ -40,7 +40,7 @@ public extension NameNewEntity.View {
 							text: nameBinding,
 							hint: L10n.CreateEntity.NameNewEntity.Name.Field.explanation,
 							binding: $focusedField,
-							equals: .accountName,
+							equals: .entityName,
 							first: viewStore.binding(
 								get: \.focusedField,
 								send: { .textFieldFocused($0) }

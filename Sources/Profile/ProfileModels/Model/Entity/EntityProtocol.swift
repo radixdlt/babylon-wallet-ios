@@ -4,7 +4,7 @@ import Prelude
 
 // MARK: - EntityProtocol
 /// An `Account` or a `Persona`
-public protocol EntityProtocol {
+public protocol EntityProtocol: Sendable, Equatable {
 	/// The type of address of entity.
 	associatedtype EntityAddress: AddressKindProtocol
 

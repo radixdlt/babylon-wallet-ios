@@ -2,7 +2,7 @@ import FeaturePrelude
 import ProfileClient
 
 // MARK: - CreationOfEntity
-public struct CreationOfEntity<Entity: EntityProtocol & Equatable & Sendable>: Sendable, ReducerProtocol {
+public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 

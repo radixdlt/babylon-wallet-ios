@@ -30,6 +30,6 @@ public extension NameNewEntity.State {
 // MARK: - NameNewEntity.State.Field
 public extension NameNewEntity.State {
 	enum Field: String, Sendable, Hashable {
-		case accountName
+		case entityName
 	}
 }
