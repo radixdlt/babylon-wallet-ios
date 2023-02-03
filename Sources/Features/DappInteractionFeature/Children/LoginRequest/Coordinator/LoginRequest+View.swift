@@ -21,14 +21,6 @@ public extension LoginRequest.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack(spacing: .zero) {
-					NavigationBar(
-						leadingItem: CloseButton {
-							viewStore.send(.dismissButtonTapped)
-						}
-					)
-					.foregroundColor(.app.gray1)
-					.padding([.horizontal, .top], .medium3)
-
 					Spacer()
 						.frame(height: .small2)
 
@@ -37,16 +29,16 @@ public extension LoginRequest.View {
 							VStack(spacing: .medium2) {
 								dappImage
 
-								Text(titleText(with: viewStore))
-									.foregroundColor(.app.gray1)
-									.textStyle(.sheetTitle)
-
-								subtitle(
-									dappName: viewStore.dappName,
-									message: subtitleText(with: viewStore)
-								)
-								.textStyle(.secondaryHeader)
-								.multilineTextAlignment(.center)
+//								Text(titleText(with: viewStore))
+//									.foregroundColor(.app.gray1)
+//									.textStyle(.sheetTitle)
+//
+//								subtitle(
+//									dappName: viewStore.dappName,
+//									message: subtitleText(with: viewStore)
+//								)
+//								.textStyle(.secondaryHeader)
+//								.multilineTextAlignment(.center)
 							}
 							.padding(.bottom, .medium2)
 
@@ -104,11 +96,12 @@ private extension LoginRequest.View {
 			.cornerRadius(.medium3)
 	}
 
-	func titleText(with viewStore: LoginRequestViewStore) -> String {
-		viewStore.isKnownDapp ?
-			L10n.DApp.LoginRequest.Title.knownDapp :
-			L10n.DApp.LoginRequest.Title.newDapp
-	}
+	// TODO: @Nikola do this in ViewState
+//	func titleText(with viewStore: LoginRequestViewStore) -> String {
+//		viewStore.isKnownDapp ?
+//			L10n.DApp.LoginRequest.Title.knownDapp :
+//			L10n.DApp.LoginRequest.Title.newDapp
+//	}
 
 	func subtitle(dappName: String, message: String) -> some View {
 		var component1 = AttributedString(dappName)
@@ -120,23 +113,24 @@ private extension LoginRequest.View {
 		return Text(component1 + component2)
 	}
 
-	func subtitleText(with viewStore: LoginRequestViewStore) -> String {
-		viewStore.isKnownDapp ?
-			L10n.DApp.LoginRequest.Subtitle.knownDapp :
-			L10n.DApp.LoginRequest.Subtitle.newDapp
-	}
+	// TODO: @Nikola do this in ViewState
+//	func subtitleText(with viewStore: LoginRequestViewStore) -> String {
+//		viewStore.isKnownDapp ?
+//			L10n.DApp.LoginRequest.Subtitle.knownDapp :
+//			L10n.DApp.LoginRequest.Subtitle.newDapp
+//	}
 }
 
 // MARK: - LoginRequest.View.ViewState
 extension LoginRequest.View {
 	struct ViewState: Equatable {
 		let dappName: String
-		let isKnownDapp: Bool
+//		let isKnownDapp: Bool
 		let canProceed: Bool
 
 		init(state: LoginRequest.State) {
 			dappName = state.dappMetadata.name
-			isKnownDapp = state.isKnownDapp
+//			isKnownDapp = state.isKnownDapp
 			canProceed = state.selectedPersona != nil
 		}
 	}
@@ -160,11 +154,7 @@ struct LoginRequest_Preview: PreviewProvider {
 public extension LoginRequest.State {
 	static let previewValue: Self = .init(
 		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
-		dappMetadata: .previewValue,
-		personas: .init(uniqueElements: [
-			.init(persona: .previewValue0, hasAlreadyLoggedIn: false),
-			.init(persona: .previewValue1, hasAlreadyLoggedIn: false),
-		])
+		dappMetadata: .previewValue
 	)
 }
 #endif

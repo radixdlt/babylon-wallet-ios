@@ -9,10 +9,11 @@ public extension PersonaRow {
 
 		public init(
 			persona: OnNetwork.Persona,
+			isSelected: Bool,
 			lastLoginDate: Date?
 		) {
 			self.persona = persona
-			self.isSelected = hasAlreadyLoggedIn
+			self.isSelected = isSelected
 			self.lastLoginDate = lastLoginDate
 		}
 	}
@@ -29,7 +30,8 @@ extension PersonaRow.State: Identifiable {
 public extension PersonaRow.State {
 	static let previewValue: Self = .init(
 		persona: .previewValue0,
-		hasAlreadyLoggedIn: true
+		isSelected: true,
+		lastLoginDate: nil
 	)
 }
 #endif

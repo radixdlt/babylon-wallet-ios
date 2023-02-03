@@ -55,13 +55,12 @@ public extension PersonaRow.View {
 				}
 				.padding(.medium2)
 
-				if viewStore.hasAlreadyLoggedIn {
+				if let lastLoginDate = viewStore.lastLoginDate {
 					Group {
 						Color.app.gray4
 							.frame(height: 1)
 
-						// TODO: replace with dapp.lastUsedOn
-						Text("Your last login was on 23 Jan 2023")
+						Text(lastLoginDate)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body2Regular)
 							.padding(.horizontal, .medium2)
@@ -82,12 +81,12 @@ public extension PersonaRow.View {
 extension PersonaRow.View {
 	struct ViewState: Equatable {
 		let name: String
-		let hasAlreadyLoggedIn: Bool
+		let lastLoginDate: String?
 		let selectionState: RadioButton.State
 
 		init(state: PersonaRow.State) {
-			name = state.persona.displayName ?? L10n.DApp.unknownName
-			hasAlreadyLoggedIn = state.hasAlreadyLoggedIn
+			name = state.persona.displayName.rawValue.nilIfBlank ?? "Unknown Dapp" // FIXME: @Nikola sorry, I think L10n.DApp.unknownName got lost in the merge
+			lastLoginDate = nil // TODO:
 			selectionState = state.isSelected ? .selected : .unselected
 		}
 	}
