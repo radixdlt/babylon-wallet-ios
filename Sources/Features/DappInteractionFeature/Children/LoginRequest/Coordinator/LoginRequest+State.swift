@@ -3,23 +3,18 @@ import FeaturePrelude
 // MARK: - LoginRequest.State
 public extension LoginRequest {
 	struct State: Sendable, Hashable {
-		public let dappDefinitionAddress: DappDefinitionAddress
-		public let dappMetadata: DappMetadata
-		public var personas: IdentifiedArrayOf<PersonaRow.State>
-		public var isKnownDapp: Bool
+		let dappDefinitionAddress: DappDefinitionAddress
+		let dappMetadata: DappMetadata
+		var personas: IdentifiedArrayOf<PersonaRow.State>
+		var connectedDapp: OnNetwork.ConnectedDapp?
+		var mostRecentPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
 
 		public init(
 			dappDefinitionAddress: DappDefinitionAddress,
-			dappMetadata: DappMetadata,
-			personas: IdentifiedArrayOf<PersonaRow.State> = [],
-			isKnownDapp: Bool = false
+			dappMetadata: DappMetadata
 		) {
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
-			self.personas = .init(
-				uniqueElements: personas.sorted(by: { $0.hasAlreadyLoggedIn && !$1.hasAlreadyLoggedIn })
-			)
-			self.isKnownDapp = isKnownDapp
 		}
 	}
 }

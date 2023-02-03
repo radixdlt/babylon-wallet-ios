@@ -23,6 +23,7 @@ public extension LoginRequest.Action {
 // MARK: - LoginRequest.Action.ViewAction
 public extension LoginRequest.Action {
 	enum ViewAction: Sendable, Equatable {
+		case appeared
 		case dismissButtonTapped
 		case createNewPersonaButtonTapped
 	}
@@ -43,5 +44,7 @@ public extension LoginRequest.Action {
 
 // MARK: - LoginRequest.Action.DelegateAction
 public extension LoginRequest.Action {
-	enum DelegateAction: Sendable, Equatable {}
+	enum DelegateAction: Sendable, Equatable {
+		case continueButtonTapped(OnNetwork.Persona, OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?)
+	}
 }

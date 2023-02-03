@@ -54,6 +54,9 @@ public extension OnNetwork.ConnectedDapp {
 		/// List of "ongoing accountAddresses" that user given the dApp access to.
 		public var sharedAccounts: SharedAccounts
 
+		/// Date of last login for this persona.
+		public var lastLoginDate: Date
+
 		public struct SharedAccounts:
 			Sendable,
 			Hashable,
@@ -114,11 +117,13 @@ public extension OnNetwork.ConnectedDapp {
 		public init(
 			identityAddress: IdentityAddress,
 			fieldIDs: OrderedSet<OnNetwork.Persona.Field.ID>,
-			sharedAccounts: SharedAccounts
+			sharedAccounts: SharedAccounts,
+			lastLoginDate: Date
 		) {
 			self.identityAddress = identityAddress
 			self.fieldIDs = fieldIDs
 			self.sharedAccounts = sharedAccounts
+			self.lastLoginDate = lastLoginDate
 		}
 	}
 }
