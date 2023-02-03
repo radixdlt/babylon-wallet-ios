@@ -1,34 +1,26 @@
-import DappInteractionFeature
 import FeaturePrelude
 
 // MARK: - DappInteractionHook.View
-public extension DappInteractionHook {
-	@MainActor
-	struct View: SwiftUI.View {
-		public typealias Store = StoreOf<DappInteractionHook>
-		public let store: Store
-		public init(store: Store) {
-			self.store = store
-		}
-	}
-}
+extension DappInteractionHook {
+	struct ViewModifier: SwiftUI.ViewModifier {
+		let store: StoreOf<DappInteractionHook>
 
-public extension DappInteractionHook.View {
-	var body: some View {
-		ZStack {}
-		#if os(iOS)
+		func body(content: Content) -> some View {
+			content
+			#if os(iOS)
 			.fullScreenCover(
 				store: store.scope(state: \.$dappInteraction, action: { .child(.dappInteraction($0)) }),
 				content: { DappInteraction.View(store: $0) }
 			)
-		#elseif os(macOS)
+			#elseif os(macOS)
 			.sheet(
 				store: store.scope(state: \.$dappInteraction, action: { .child(.dappInteraction($0)) }),
 				content: { DappInteraction.View(store: $0) }
 			)
-		#endif
+			#endif
 			.task {
 				await ViewStore(store.stateless).send(.view(.task)).finish()
 			}
+		}
 	}
 }

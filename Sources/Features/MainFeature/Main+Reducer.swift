@@ -1,4 +1,3 @@
-import DappInteractionHookFeature
 import FeaturePrelude
 import HomeFeature
 import ProfileClient
@@ -13,10 +12,6 @@ public struct Main: Sendable, ReducerProtocol {
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.home, action: /Action.child .. Action.ChildAction.home) {
 			Home()
-		}
-
-		Scope(state: \.dappInteractionHook, action: /Action.child .. Action.ChildAction.dappInteractionHook) {
-			DappInteractionHook()
 		}
 
 		Reduce(self.core)

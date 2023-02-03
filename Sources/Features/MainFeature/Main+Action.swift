@@ -1,4 +1,3 @@
-import DappInteractionHookFeature
 import HomeFeature
 import SettingsFeature
 
@@ -16,7 +15,6 @@ public extension Main.Action {
 	enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
 		case settings(AppSettings.Action)
-		case dappInteractionHook(DappInteractionHook.Action)
 	}
 }
 

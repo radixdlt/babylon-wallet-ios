@@ -1,4 +1,4 @@
-import DappInteractionHookFeature
+import DappInteractionFeature
 import FeaturePrelude
 import HomeFeature
 import SettingsFeature
@@ -35,17 +35,8 @@ public extension Main.View {
 				then: { AppSettings.View(store: $0) }
 			)
 			.zIndex(1)
-
-			DappInteractionHook.View(
-				store: store.scope(
-					state: \.dappInteractionHook,
-					action: { .child(.dappInteractionHook($0)) }
-				)
-			)
-			// TODO: verify these
-//			.hidden()
-//			.accessibility(hidden: true)
 		}
+		.presentsDappInteractions()
 	}
 }
 

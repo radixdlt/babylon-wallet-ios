@@ -1,4 +1,3 @@
-import DappInteractionHookFeature
 import FeaturePrelude
 import HomeFeature
 import P2PConnectivityClient
@@ -11,16 +10,13 @@ public extension Main {
 	struct State: Equatable {
 		public var home: Home.State
 		public var settings: AppSettings.State?
-		public var dappInteractionHook: DappInteractionHook.State
 
 		public init(
 			home: Home.State = .init(),
-			settings: AppSettings.State? = nil,
-			dappInteractionHook: DappInteractionHook.State = .init()
+			settings: AppSettings.State? = nil
 		) {
 			self.home = home
 			self.settings = settings
-			self.dappInteractionHook = dappInteractionHook
 		}
 	}
 }

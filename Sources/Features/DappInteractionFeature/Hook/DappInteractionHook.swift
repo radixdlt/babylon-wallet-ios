@@ -1,10 +1,22 @@
-import DappInteractionFeature
 import FeaturePrelude
 import P2PConnectivityClient
 import ProfileClient
 
+public extension View {
+	func presentsDappInteractions() -> some View {
+		self.modifier(
+			DappInteractionHook.ViewModifier(
+				store: .init(
+					initialState: .init(),
+					reducer: DappInteractionHook()
+				)
+			)
+		)
+	}
+}
+
 // MARK: - DappInteractionHook
-public struct DappInteractionHook: Sendable, FeatureReducer {
+struct DappInteractionHook: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var currentRequest: P2P.RequestFromClient? { requestQueue.first }
 		var requestQueue: OrderedSet<P2P.RequestFromClient> = []

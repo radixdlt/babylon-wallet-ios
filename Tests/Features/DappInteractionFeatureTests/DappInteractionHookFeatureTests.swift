@@ -1,5 +1,5 @@
 // import FeatureTestingPrelude
-// @testable import DappInteractionHookFeature
+// @testable import DappInteractionFeature
 //
 // @MainActor
 // final class DappInteractionHookFeatureTests: TestCase {

@@ -87,15 +87,8 @@ package.addModules([
 		dependencies: [
 			"CreateAccountFeature",
 			"GatewayAPI",
-			"ProfileClient",
-		],
-		tests: .yes()
-	),
-	.feature(
-		name: "DappInteractionHookFeature",
-		dependencies: [
-			"DappInteractionFeature",
 			"P2PConnectivityClient",
+			"ProfileClient",
 			"TransactionSigningFeature",
 		],
 		tests: .yes()
@@ -121,7 +114,6 @@ package.addModules([
 			"AccountPreferencesFeature",
 			"AppSettings",
 			"CreateAccountFeature",
-			"DappInteractionFeature",
 			"P2PConnectivityClient",
 			"ProfileClient",
 			"TransactionSigningFeature",
@@ -146,7 +138,7 @@ package.addModules([
 		dependencies: [
 			"AppSettings",
 			"AccountPortfolio",
-			"DappInteractionHookFeature",
+			"DappInteractionFeature",
 			"HomeFeature",
 			"SettingsFeature",
 		],
