@@ -37,7 +37,7 @@ public extension Profile {
 		factorSources: FactorSources,
 		accountIndex: Int,
 		networkID: NetworkID,
-		displayName: String? = nil,
+		displayName: NonEmpty<String>,
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
 	) async throws -> OnNetwork.Account {
 		try await OnNetwork.createNewVirtualEntity(
@@ -63,7 +63,7 @@ public extension Profile {
 	func createNewVirtualAccountWithoutSavingIt(
 		networkID: NetworkID,
 		accountIndex: Int = 0,
-		displayName: String?,
+		displayName: NonEmpty<String>,
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
 	) async throws -> OnNetwork.Account {
 		try await Self.createNewVirtualAccount(
@@ -105,7 +105,7 @@ public extension Profile {
 	@discardableResult
 	mutating func createNewVirtualAccount(
 		networkID: NetworkID,
-		displayName: String? = nil,
+		displayName: NonEmpty<String>,
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
 	) async throws -> OnNetwork.Account {
 		try await createNewVirtualAccount(
@@ -122,7 +122,7 @@ public extension Profile {
 	@discardableResult
 	mutating func createNewVirtualAccount(
 		networkID: NetworkID,
-		displayName: String? = nil,
+		displayName: NonEmpty<String>,
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
 	) async throws -> OnNetwork.Account {
 		let account = try await self.creatingNewVirtualAccount(
@@ -229,7 +229,7 @@ public extension Profile {
 	/// Creates a new **Virtual** `Account` without saving it into the profile.
 	func creatingNewVirtualAccount(
 		networkID: NetworkID,
-		displayName: String? = nil,
+		displayName: NonEmpty<String>,
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
 	) async throws -> OnNetwork.Account {
 		try await creatingNewVirtualAccount(
@@ -245,7 +245,7 @@ public extension Profile {
 	/// Creates a new **Virtual** `Account` without saving it into the profile.
 	func creatingNewVirtualAccount(
 		networkID: NetworkID,
-		displayName: String? = nil,
+		displayName: NonEmpty<String>,
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
 	) async throws -> OnNetwork.Account {
 		let maybeNetworkNetwork = try? onNetwork(id: networkID)

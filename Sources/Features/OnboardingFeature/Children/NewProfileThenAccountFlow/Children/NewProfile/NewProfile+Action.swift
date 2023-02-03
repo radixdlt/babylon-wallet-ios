@@ -1,4 +1,5 @@
 import FeaturePrelude
+import ProfileClient
 
 // MARK: - NewProfile.Action
 public extension NewProfile {
@@ -30,7 +31,7 @@ public extension NewProfile.Action {
 // MARK: - NewProfile.Action.SystemAction
 public extension NewProfile.Action {
 	enum SystemAction: Sendable, Equatable {
-		case createProfileResult(TaskResult<FactorSource>)
+		case createProfileResult(TaskResult<CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse>)
 	}
 }
 
@@ -38,6 +39,6 @@ public extension NewProfile.Action {
 public extension NewProfile.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case criticalFailureCouldNotCreateProfile
-		case createdProfile(factorSource: FactorSource)
+		case createdProfile(CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse)
 	}
 }

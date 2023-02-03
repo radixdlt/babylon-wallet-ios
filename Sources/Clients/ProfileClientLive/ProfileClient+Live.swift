@@ -97,29 +97,51 @@ public extension ProfileClient {
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
-			createNewProfile: {
+			createEphemeralProfileAndUnsavedOnDeviceFactorSource: { request in
 				@Dependency(\.mnemonicClient.generate) var generateMnemonic
 
-				let mnemonic = try generateMnemonic(BIP39.WordCount.twentyFour, BIP39.Language.english)
-
-				let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
+				let mnemonic = try generateMnemonic(request.wordCount, request.language)
 
 				let newProfile = try await Profile.new(
-					networkAndGateway: networkAndGateway,
+					networkAndGateway: request.networkAndGateway,
 					mnemonic: mnemonic
 				)
 
-				let factorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
+				// This new profile is marked as "ephemeral" which means it is
+				// not allowed to be persisted to keychain.
+				await profileHolder.injectProfile(newProfile, isEphemeral: true)
+
+				return CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse(request: request, mnemonic: mnemonic, profile: newProfile)
+			},
+			injectProfileSnapshot: { snapshot in
+				let profile = try Profile(snapshot: snapshot)
+				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
+				await profileHolder.injectProfile(profile, isEphemeral: false)
+			},
+			commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: { request in
+
+				let mnemonic = request.onDeviceFactorSourceMnemonic
+
+				let factorSource = try Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(
+					mnemonic: mnemonic,
+					bip39Passphrase: request.bip39Passphrase
+				)
+
+				try await profileHolder.get { profile in
+					guard profile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first == factorSource else {
+						struct DiscrepancyMismatchingFactorSources: Swift.Error {}
+						throw DiscrepancyMismatchingFactorSources()
+					}
+					// all good
+				}
 
 				try await keychainClient.updateFactorSource(
 					mnemonic: mnemonic,
-					reference: factorSourceReference
+					reference: factorSource.reference
 				)
-				try await keychainClient.updateProfile(profile: newProfile)
 
-				await profileHolder.injectProfile(newProfile)
+				try await profileHolder.persistAndAllowFuturePersistenceOfEphemeralProfile()
 
-				return newProfile.factorSources.factorSources.first
 			},
 			loadProfile: {
 				@Dependency(\.jsonDecoder) var jsonDecoder
@@ -189,7 +211,7 @@ public extension ProfileClient {
 					)
 				}
 
-				await profileHolder.injectProfile(profile)
+				await profileHolder.injectProfile(profile, isEphemeral: false)
 				return .success(profile)
 			},
 			extractProfileSnapshot: {
@@ -438,7 +460,15 @@ struct NoProfile: Swift.Error {}
 // MARK: - ProfileHolder
 private actor ProfileHolder: GlobalActor {
 	@Dependency(\.keychainClient) var keychainClient
+
+	/// If this is set to `true` it means that any edits of the profile should not be persisted at all
+	/// this is used for convenience of implementation of Onboarding flow where we create an ephemeral
+	/// profile which should only be persisted at the end of Onboarding flow. Letting this ephemeral
+	/// profile live here (in stored property `profile`) allows us to use the same APIs as if it would
+	/// have not been ephemeral, and at the
+	private var isEphemeral: Bool = false
 	private var profile: Profile?
+
 	private init() {}
 	fileprivate static let shared = ProfileHolder()
 
@@ -462,8 +492,15 @@ private actor ProfileHolder: GlobalActor {
 		return try await withProfile(profile)
 	}
 
+	func persistAndAllowFuturePersistenceOfEphemeralProfile() async throws {
+		isEphemeral = false
+		try await persistProfileIfAllowed()
+	}
+
+	// if profile is marked as "ephemeral" we will not persist.
 	// Async because we might wanna add iCloud sync here in future.
-	private func persistProfile() async throws {
+	private func persistProfileIfAllowed() async throws {
+		guard !isEphemeral else { return }
 		let profileSnapshot = try takeProfileSnapshot()
 		try await keychainClient.updateProfileSnapshot(profileSnapshot: profileSnapshot)
 	}
@@ -474,11 +511,12 @@ private actor ProfileHolder: GlobalActor {
 		}
 		let result = try await mutateProfile(&profile)
 		self.profile = profile
-		try await persistProfile()
+		// if profile is marked as "ephemeral" we will not persist.
+		try await persistProfileIfAllowed()
 		return result
 	}
 
-	func injectProfile(_ profile: Profile) async {
+	func injectProfile(_ profile: Profile, isEphemeral: Bool) async {
 		self.profile = profile
 	}
 

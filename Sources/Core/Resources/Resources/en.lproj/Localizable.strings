@@ -50,13 +50,11 @@
 "dApp.chooseAccounts.explanationExactlyOneAccount" = "One Account";
 "dApp.chooseAccounts.subtitle" = "Choose the account(s) you want %@ to know about.";
 "dApp.chooseAccounts.title" = "Choose Accounts";
-"dApp.chooseAccounts.unnamedAccount" = "Unnamed Account";
 "dApp.connectionRequest.continueButtonTitle" = "Continue";
 "dApp.connectionRequest.subtitle" = "For this dApp to function, it needs the following:";
 "dApp.connectionRequest.title" = "dApp Connection Request";
 "dApp.connectionRequest.wantsToConnect" = "%@ wants to connect to your wallet";
 "dApp.request.wrongNetworkError" = "Request received from dApp for network %@, but you are currently connected to %@.";
-"dApp.unknownName" = "Unknown dApp";
 
 "fungibleTokenList.detail.currentSupply" = "Current Supply";
 "fungibleTokenList.detail.resourceAddress" = "Resource Address";

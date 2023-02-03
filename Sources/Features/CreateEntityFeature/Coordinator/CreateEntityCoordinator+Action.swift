@@ -21,9 +21,7 @@ public extension CreateEntityCoordinator.Action {
 // MARK: - CreateEntityCoordinator.Action.InternalAction
 public extension CreateEntityCoordinator.Action {
 	enum InternalAction: Sendable, Equatable {
-		// FIXME: handle this better, perhaphs in fact we SHOULD allow accounts to be empty, to have an empty profile here
-		case generateProfile(TaskResult<OnNetwork.Account>)
-		case loadFactorSourcesResult(TaskResult<FactorSources>, beforeCreatingEntityWithName: String)
+		case loadFactorSourcesResult(TaskResult<FactorSources>, beforeCreatingEntityWithName: NonEmpty<String>)
 	}
 }
 

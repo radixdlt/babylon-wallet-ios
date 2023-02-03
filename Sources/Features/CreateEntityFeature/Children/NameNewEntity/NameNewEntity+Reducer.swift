@@ -11,13 +11,17 @@ public struct NameNewEntity<Entity: EntityProtocol & Equatable & Sendable>: Send
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.confirmNameButtonTapped)):
+			guard let sanitizedName = state.sanitizedName else {
+				return .none
+			}
 			state.focusedField = nil
-			return .run { [name = state.sanitizedName] send in
-				await send(.delegate(.named(name)))
+			return .run { send in
+				await send(.delegate(.named(sanitizedName)))
 			}
 
 		case let .internal(.view(.textFieldChanged(accountName))):
 			state.inputtedName = accountName
+			state.sanitizedName = NonEmpty(rawValue: state.inputtedName.trimmed())
 			return .none
 
 		case let .internal(.view(.textFieldFocused(focus))):

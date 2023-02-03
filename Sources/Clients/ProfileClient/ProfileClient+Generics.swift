@@ -2,28 +2,6 @@ import ClientPrelude
 import ProfileModels
 
 public extension ProfileClient {
-	//    func getDerivationPathForNewEntity<Path: EntityDerivationPathProtocol & Sendable>(
-	//        request: GetDerivationPathForNewEntityRequest
-	//    ) async throws -> Path {
-//
-	//        guard
-	//            Path.Entity.entityKind == request.entityKind
-	//        else {
-	//            throw DiscrepancyBetweenSpecifiedEntityKindInRequestAndGenericTypeArgument()
-	//        }
-//
-	//        let erased = try await getDerivationPathForNewEntity(request)
-//
-	//        guard
-	//            let path = erased as? Path
-	//        else {
-	//            throw DiscrepancyBetweenSpecifiedEntityKindInRequestAndGenericTypeArgument()
-	//        }
-//
-	//        return path
-//
-	//    }
-
 	func createNewUnsavedVirtualEntity<Entity: EntityProtocol & Sendable>(
 		request: CreateVirtualEntityRequest
 	) async throws -> Entity {

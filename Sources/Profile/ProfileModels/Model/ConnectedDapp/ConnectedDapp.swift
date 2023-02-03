@@ -15,7 +15,7 @@ public extension OnNetwork {
 
 		public let dAppDefinitionAddress: DappDefinitionAddress
 
-		public let displayName: String
+		public let displayName: NonEmpty<String>
 
 		// mutable so that we can add new authorized personas
 		public var referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple>
@@ -23,7 +23,7 @@ public extension OnNetwork {
 		public init(
 			networkID: Network.ID,
 			dAppDefinitionAddress: DappDefinitionAddress,
-			displayName: String,
+			displayName: NonEmpty<String>,
 			referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple> = .init()
 		) {
 			self.networkID = networkID

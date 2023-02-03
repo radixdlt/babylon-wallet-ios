@@ -36,10 +36,7 @@ public extension NewEntityCompletion.State {
 	}
 
 	var displayName: String {
-		if let displayName = entity.displayName {
-			return displayName
-		}
-		return "Unnamed " + (entity.kind == .account ? "account" : "persona")
+		entity.displayName.rawValue
 	}
 
 	var index: Int {

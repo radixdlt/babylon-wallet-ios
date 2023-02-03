@@ -30,8 +30,8 @@ public protocol EntityProtocol {
 	/// Security state of this entity, either `secured` or not (controlled by a DeviceFactorInstance)
 	var securityState: EntitySecurityState { get set }
 
-	/// An optional displayName or label, used by presentation layer only.
-	var displayName: String? { get }
+	/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
+	var displayName: NonEmpty<String> { get }
 }
 
 public extension EntityProtocol {

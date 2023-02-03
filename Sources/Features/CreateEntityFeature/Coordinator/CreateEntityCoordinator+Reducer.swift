@@ -86,7 +86,7 @@ public struct CreateEntityCoordinator<
 				state: &state
 			)
 
-		case let .child(.step3_completion(.delegate(.completed))):
+		case .child(.step3_completion(.delegate(.completed))):
 			return .run { send in
 				await send(.delegate(.completed))
 			}
@@ -97,7 +97,7 @@ public struct CreateEntityCoordinator<
 	}
 
 	private func goToStep1SelectGenesisFactorSource(
-		entityName: String,
+		entityName: NonEmpty<String>,
 		factorSources: NonEmpty<IdentifiedArrayOf<FactorSource>>,
 		state: inout State
 	) -> EffectTask<Action> {
@@ -111,7 +111,7 @@ public struct CreateEntityCoordinator<
 	}
 
 	private func goToStep2Creation(
-		entityName: String,
+		entityName: NonEmpty<String>,
 		genesisFactorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource,
 		state: inout State
 	) -> EffectTask<Action> {

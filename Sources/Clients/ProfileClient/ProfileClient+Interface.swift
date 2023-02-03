@@ -10,7 +10,9 @@ public struct ProfileClient: Sendable {
 	public var setNetworkAndGateway: SetNetworkAndGateway
 
 	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
-	public var createNewProfile: CreateNewProfile
+	public var createEphemeralProfileAndUnsavedOnDeviceFactorSource: CreateEphemeralProfileAndUnsavedOnDeviceFactorSource
+	public var injectProfileSnapshot: InjectProfileSnapshot
+	public var commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic
 
 	public var loadProfile: LoadProfile
 	public var extractProfileSnapshot: ExtractProfileSnapshot
@@ -43,7 +45,9 @@ public struct ProfileClient: Sendable {
 		getGatewayAPIEndpointBaseURL: @escaping GetGatewayAPIEndpointBaseURL,
 		getNetworkAndGateway: @escaping GetNetworkAndGateway,
 		setNetworkAndGateway: @escaping SetNetworkAndGateway,
-		createNewProfile: @escaping CreateNewProfile,
+		createEphemeralProfileAndUnsavedOnDeviceFactorSource: @escaping CreateEphemeralProfileAndUnsavedOnDeviceFactorSource,
+		injectProfileSnapshot: @escaping InjectProfileSnapshot,
+		commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: @escaping CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic,
 		loadProfile: @escaping LoadProfile,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
@@ -70,7 +74,9 @@ public struct ProfileClient: Sendable {
 		self.getGatewayAPIEndpointBaseURL = getGatewayAPIEndpointBaseURL
 		self.getNetworkAndGateway = getNetworkAndGateway
 		self.setNetworkAndGateway = setNetworkAndGateway
-		self.createNewProfile = createNewProfile
+		self.createEphemeralProfileAndUnsavedOnDeviceFactorSource = createEphemeralProfileAndUnsavedOnDeviceFactorSource
+		self.commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic = commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic
+		self.injectProfileSnapshot = injectProfileSnapshot
 		self.loadProfile = loadProfile
 		self.extractProfileSnapshot = extractProfileSnapshot
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
@@ -94,6 +100,51 @@ public struct ProfileClient: Sendable {
 	}
 }
 
+// MARK: - CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest
+public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest: Sendable, Equatable {
+	public let networkAndGateway: AppPreferences.NetworkAndGateway
+	public let language: BIP39.Language
+	public let wordCount: BIP39.WordCount
+	public let bip39Passphrase: String
+	public init(
+		networkAndGateway: AppPreferences.NetworkAndGateway = .nebunet,
+		language: BIP39.Language = .english,
+		wordCount: BIP39.WordCount = .twentyFour,
+		bip39Passphrase: String = ""
+	) {
+		self.networkAndGateway = networkAndGateway
+		self.language = language
+		self.wordCount = wordCount
+		self.bip39Passphrase = bip39Passphrase
+	}
+}
+
+// MARK: - CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse
+public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse: Sendable, Equatable {
+	public let request: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest
+	public let onDeviceFactorSourceMnemonic: Mnemonic
+	public let profile: Profile
+	public init(
+		request: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest,
+		mnemonic: Mnemonic,
+		profile: Profile
+	) {
+		self.onDeviceFactorSourceMnemonic = mnemonic
+		self.profile = profile
+		self.request = request
+	}
+}
+
+// MARK: - CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest
+public struct CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest: Sendable, Equatable {
+	public let onDeviceFactorSourceMnemonic: Mnemonic
+	public let bip39Passphrase: String
+	public init(onDeviceFactorSourceMnemonic: Mnemonic, bip39Passphrase: String) {
+		self.onDeviceFactorSourceMnemonic = onDeviceFactorSourceMnemonic
+		self.bip39Passphrase = bip39Passphrase
+	}
+}
+
 public extension ProfileClient {
 	typealias GetDerivationPathForNewEntity = @Sendable (GetDerivationPathForNewEntityRequest) async throws -> (path: DerivationPath, index: Int)
 
@@ -108,7 +159,10 @@ public extension ProfileClient {
 
 	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
-	typealias CreateNewProfile = @Sendable () async throws -> FactorSource
+	typealias CreateEphemeralProfileAndUnsavedOnDeviceFactorSource = @Sendable (CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest) async throws -> CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse
+
+	typealias InjectProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
+	typealias CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic = @Sendable (CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest) async throws -> Void
 
 	typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 

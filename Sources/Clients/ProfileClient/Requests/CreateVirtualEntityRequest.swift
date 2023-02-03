@@ -10,14 +10,14 @@ public struct CreateVirtualEntityRequest: Sendable, Equatable {
 	public let factorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource
 
 	public let entityKind: EntityKind
-	public let displayName: String
+	public let displayName: NonEmpty<String>
 	public let keychainAccessFactorSourcesAuthPrompt: String
 
 	public init(
 		networkID: NetworkID?,
 		factorSource uncheckedFactorSource: any FactorSourceProtocol,
 		entityKind: EntityKind,
-		displayName: String,
+		displayName: NonEmpty<String>,
 		keychainAccessFactorSourcesAuthPrompt: String
 	) throws {
 		guard let factorSource = uncheckedFactorSource as? Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource else {

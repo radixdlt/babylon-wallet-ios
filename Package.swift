@@ -84,15 +84,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "CreateProfileFeature",
-		dependencies: [
-			"Cryptography",
-			"LocalAuthenticationClient",
-			"ProfileClient",
-		],
-		tests: .yes()
-	),
-	.feature(
 		name: "FungibleTokenDetailsFeature",
 		dependencies: [],
 		tests: .no
@@ -196,7 +187,7 @@ package.addModules([
 		name: "OnboardingFeature",
 		dependencies: [
 			"CreateEntityFeature",
-			"CreateProfileFeature",
+			"ProfileClient",
 		],
 		tests: .yes()
 	),

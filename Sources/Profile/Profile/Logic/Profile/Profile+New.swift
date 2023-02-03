@@ -24,7 +24,7 @@ struct EncodeAddressRequest {
 
 public extension Profile {
 	enum AccountCreationStrategy: Sendable, Equatable {
-		case createAccountOnDefaultNetwork(named: String)
+		case createAccountOnDefaultNetwork(named: NonEmpty<String>)
 		case noAccountThusNoOnNetwork
 	}
 
@@ -75,7 +75,7 @@ public extension Profile {
 	}
 
 	enum AccountCreationFromFactorInstanceStrategy: Sendable {
-		case createAccountOnDefaultNetwork(named: String, createFactorInstance: CreateFactorInstanceForRequest)
+		case createAccountOnDefaultNetwork(named: NonEmpty<String>, createFactorInstance: CreateFactorInstanceForRequest)
 		case noAccountThusNoOnNetwork
 	}
 

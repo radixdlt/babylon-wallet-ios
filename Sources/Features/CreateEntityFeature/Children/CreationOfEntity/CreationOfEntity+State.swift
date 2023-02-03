@@ -5,12 +5,12 @@ import ProfileModels
 public extension CreationOfEntity {
 	struct State: Sendable, Equatable {
 		public let networkID: NetworkID?
-		public let name: String
+		public let name: NonEmpty<String>
 		public let genesisFactorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource
 
 		public init(
 			networkID: NetworkID?,
-			name: String,
+			name: NonEmpty<String>,
 			genesisFactorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource
 		) {
 			self.networkID = networkID

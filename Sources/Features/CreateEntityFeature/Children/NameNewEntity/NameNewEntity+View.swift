@@ -108,7 +108,7 @@ extension NameNewEntity.View {
 			self.namePlaceholder = entityKind == .account ? L10n.CreateEntity.NameNewEntity.Name.Field.Placeholder.Specific.account : L10n.CreateEntity.NameNewEntity.Name.Field.Placeholder.Specific.persona
 			titleText = state.isFirst ? L10n.CreateEntity.NameNewEntity.Title.first(entityKindName) : L10n.CreateEntity.NameNewEntity.Title.notFirst(entityKindName)
 			entityName = state.inputtedName
-			let isNameValid = !state.sanitizedName.isEmpty
+			let isNameValid = state.sanitizedName != nil
 			createEntityButtonState = isNameValid ? .enabled : .disabled
 			focusedField = state.focusedField
 		}

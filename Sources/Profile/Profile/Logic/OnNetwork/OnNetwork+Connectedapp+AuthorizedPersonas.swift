@@ -6,12 +6,12 @@ public extension OnNetwork {
 		public typealias ID = AccountAddress
 		public var id: ID { address }
 		public let address: AccountAddress
-		public let label: String?
+		public let label: NonEmpty<String>
 		public let appearanceID: OnNetwork.Account.AppearanceID
 
 		public init(
 			address: AccountAddress,
-			label: String?,
+			label: NonEmpty<String>,
 			appearanceID: OnNetwork.Account.AppearanceID
 		) {
 			self.address = address
@@ -28,7 +28,7 @@ public extension OnNetwork {
 
 		// FIXME: change Persona and Account to require displayname, and make this non optional?
 		/// The display name of the Persona, as stored in `OnNetwork.Persona`
-		public let displayName: String?
+		public let displayName: NonEmpty<String>
 
 		/// The persona data that the user has given the Dapp access to,
 		/// being the trippple: `(id, kind, value)`
@@ -42,7 +42,7 @@ public extension OnNetwork {
 	struct ConnectedDappDetailed: Sendable, Hashable {
 		public let networkID: Network.ID
 		public let dAppDefinitionAddress: DappDefinitionAddress
-		public let displayName: String
+		public let displayName: NonEmpty<String>
 		public let detailedAuthorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>
 	}
 

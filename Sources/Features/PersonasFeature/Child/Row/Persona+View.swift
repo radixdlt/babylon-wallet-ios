@@ -34,7 +34,7 @@ extension Persona.View {
 		public let displayName: String
 		init(state: Persona.State) {
 			// TODO: implement
-			displayName = state.persona.displayName ?? "NO NAME" // FIXME: change to required propery?
+			displayName = state.persona.displayName.rawValue
 		}
 	}
 }

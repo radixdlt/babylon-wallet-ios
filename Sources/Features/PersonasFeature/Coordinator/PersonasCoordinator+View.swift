@@ -15,35 +15,30 @@ public extension PersonasCoordinator {
 
 public extension PersonasCoordinator.View {
 	var body: some View {
-//		WithViewStore(
-//			store,
-//			observe: ViewState.init(state:),
-//			send: { .view($0) }
-//		) { viewStore in
-//			// TODO: implement
-//			Text("Implement: PersonasCoordinator")
-//				.background(Color.yellow)
-//				.foregroundColor(.red)
-//				.onAppear { viewStore.send(.appeared) }
-//		}
-		ForceFullScreen {
-			ZStack {
-				PersonaList.View(
-					store: store.scope(
-						state: \.personaList,
-						action: { .child(.personaList($0)) }
+		WithViewStore(
+			store,
+			observe: ViewState.init(state:),
+			send: { .view($0) }
+		) { viewStore in
+			ForceFullScreen {
+				ZStack {
+					PersonaList.View(
+						store: store.scope(
+							state: \.personaList,
+							action: { .child(.personaList($0)) }
+						)
 					)
-				)
-				.onAppear { viewStore.send(.appeared) }
+					.onAppear { viewStore.send(.appeared) }
 
-				IfLetStore(
-					store.scope(
-						state: \.createPersonaCoordinator,
-						action: { .child(.createPersonaCoordinator($0)) }
-					),
-					then: { CreatePersonaCoordinator.View(store: $0) }
-				)
-				.zIndex(1)
+					IfLetStore(
+						store.scope(
+							state: \.createPersonaCoordinator,
+							action: { .child(.createPersonaCoordinator($0)) }
+						),
+						then: { CreatePersonaCoordinator.View(store: $0) }
+					)
+					.zIndex(1)
+				}
 			}
 		}
 	}

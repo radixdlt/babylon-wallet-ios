@@ -6,7 +6,7 @@ public extension NameNewEntity {
 	struct State: Sendable, Equatable {
 		public var isFirst: Bool
 		public var inputtedName: String
-		public var sanitizedName: String { inputtedName.trimmed() }
+		public var sanitizedName: NonEmpty<String>?
 
 		@BindingState public var focusedField: Field?
 

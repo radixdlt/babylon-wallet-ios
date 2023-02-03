@@ -37,6 +37,11 @@ public struct CreationOfEntity<Entity: EntityProtocol & Equatable & Sendable>: S
 					)
 
 					let entity: Entity = try await profileClient.createNewUnsavedVirtualEntity(request: request)
+					// N.B. if this create entity flow is triggered as part of onboarding
+					// the ProfileClients live implemntation will hold onto an "ephemeral"
+					// profile and this entity gets saved into this ephemeral profile.
+					// so at end of NewProfileThenAccount flow we need to "commit" the
+					// ephemeral profile so it gets persisted.
 					try await profileClient.saveNewEntity(entity)
 					return entity
 				}

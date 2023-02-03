@@ -141,8 +141,6 @@ public enum L10n {
     }
   }
   public enum DApp {
-    /// Unknown dApp
-    public static let unknownName = L10n.tr("Localizable", "dApp.unknownName", fallback: "Unknown dApp")
     public enum ChooseAccounts {
       /// + Create a New Account
       public static let createNewAccount = L10n.tr("Localizable", "dApp.chooseAccounts.createNewAccount", fallback: "+ Create a New Account")
@@ -164,8 +162,6 @@ public enum L10n {
       }
       /// Choose Accounts
       public static let title = L10n.tr("Localizable", "dApp.chooseAccounts.title", fallback: "Choose Accounts")
-      /// Unnamed Account
-      public static let unnamedAccount = L10n.tr("Localizable", "dApp.chooseAccounts.unnamedAccount", fallback: "Unnamed Account")
     }
     public enum ConnectionRequest {
       /// Continue

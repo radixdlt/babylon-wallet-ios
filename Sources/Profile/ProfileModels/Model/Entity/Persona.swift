@@ -37,8 +37,8 @@ public extension OnNetwork {
 		/// Security of this persona
 		public var securityState: EntitySecurityState
 
-		/// An optional displayName or label, used by presentation layer only.
-		public let displayName: String?
+		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
+		public let displayName: NonEmpty<String>
 
 		/// Fields containing personal information you have inputted.
 		public let fields: IdentifiedArrayOf<Field>
@@ -49,7 +49,7 @@ public extension OnNetwork {
 			securityState: EntitySecurityState,
 			index: Index,
 			derivationPath: EntityDerivationPath,
-			displayName: String?,
+			displayName: NonEmpty<String>,
 			fields: IdentifiedArrayOf<Field>
 		) {
 			self.networkID = networkID
@@ -126,7 +126,8 @@ public extension OnNetwork.Persona {
 		/// Content type, e.g. `email` or `zip`
 		public let kind: Kind
 
-		/// The content of this field, a string, e.g. "foo@bar.com" for email, or "GWC8+3H" as ZIP code
+		/// The content of this field, a non empty string, e.g. "foo@bar.com" for email
+		/// or "GWC8+3H" as ZIP code
 		public let value: Value
 
 		public init(kind: Kind, value: Value) {
@@ -139,7 +140,7 @@ public extension OnNetwork.Persona {
 
 public extension OnNetwork.Persona.Field {
 	typealias ID = UUID
-	typealias Value = String
+	typealias Value = NonEmpty<String>
 
 	enum Kind:
 		String,
