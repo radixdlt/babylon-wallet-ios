@@ -60,9 +60,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			state.createPersonaCoordinator = nil
 			return .none
 
-		case .createPersonaCoordinator:
-			return .none
-		case .personaList:
+		default:
 			return .none
 		}
 	}

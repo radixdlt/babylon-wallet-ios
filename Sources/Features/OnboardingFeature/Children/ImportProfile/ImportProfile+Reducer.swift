@@ -35,14 +35,8 @@ public extension ImportProfile {
 			return .run { send in
 				let data = try dataReader.contentsOf(profileURL, options: .uncached)
 				let snapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: data)
-				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
-				struct FailedToInjectProfile: Swift.Error {}
-				switch await profileClient.loadProfile() {
-				case let .success(.some(profile)) where snapshot == profile.snaphot():
-					await send(.delegate(.imported))
-				default:
-					throw FailedToInjectProfile()
-				}
+				try await profileClient.injectProfileSnapshot(snapshot)
+				await send(.delegate(.imported))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
