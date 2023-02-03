@@ -51,11 +51,11 @@ public extension OnNetwork.ConnectedDapp {
 		/// mutable so that we can mutate the fields
 		public var fieldIDs: OrderedSet<OnNetwork.Persona.Field.ID>
 
-		/// List of "ongoing accountAddresses" that user given the dApp access to.
-		public var sharedAccounts: SharedAccounts
-
 		/// Date of last login for this persona.
 		public var lastLoginDate: Date
+
+		/// List of "ongoing accountAddresses" that user given the dApp access to.
+		public var sharedAccounts: SharedAccounts
 
 		public struct SharedAccounts:
 			Sendable,
@@ -117,13 +117,13 @@ public extension OnNetwork.ConnectedDapp {
 		public init(
 			identityAddress: IdentityAddress,
 			fieldIDs: OrderedSet<OnNetwork.Persona.Field.ID>,
-			sharedAccounts: SharedAccounts,
-			lastLoginDate: Date
+			lastLoginDate: Date,
+			sharedAccounts: SharedAccounts
 		) {
 			self.identityAddress = identityAddress
 			self.fieldIDs = fieldIDs
-			self.sharedAccounts = sharedAccounts
 			self.lastLoginDate = lastLoginDate
+			self.sharedAccounts = sharedAccounts
 		}
 	}
 }

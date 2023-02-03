@@ -2,7 +2,6 @@ import Foundation
 
 // MARK: - DappMetadata
 public struct DappMetadata: Sendable, Hashable {
-//	public let icon: ???
 	public let name: String
 	public let description: String
 

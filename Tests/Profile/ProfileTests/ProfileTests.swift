@@ -194,21 +194,25 @@ final class ProfileTests: TestCase {
 					.init(
 						identityAddress: persona0.address,
 						fieldIDs: .init(persona0.fields.map(\.id)),
+						lastLoginDate: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
 						sharedAccounts: try .init(
 							mode: .exactly(.init(
 								arrayLiteral:
 								secondAccount.address,
 								thirdAccount.address
-							)))
+							))
+						)
 					),
 					.init(
 						identityAddress: persona1.address,
 						fieldIDs: .init(persona1.fields.map(\.id)),
+						lastLoginDate: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
 						sharedAccounts: try .init(
 							mode: .atLeast(.init(
 								arrayLiteral:
 								secondAccount.address
-							)))
+							))
+						)
 					))
 			)
 		)
