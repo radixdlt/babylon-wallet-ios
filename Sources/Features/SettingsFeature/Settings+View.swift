@@ -94,9 +94,9 @@ private extension AppSettings.View {
 							Spacer()
 								.frame(height: .medium3)
 						}
-
+						
 						#if DEBUG
-						Row(
+						PlainListRow(
 							L10n.Settings.inspectProfileButtonTitle,
 							icon: Image(systemName: "wallet.pass")
 						) {
@@ -104,34 +104,35 @@ private extension AppSettings.View {
 						}
 						#endif
 
-						Row(
+						PlainListRow(
 							L10n.Settings.desktopConnectionsButtonTitle,
 							icon: Image(asset: AssetResource.desktopConnections)
 						) {
 							viewStore.send(.manageP2PClientsButtonTapped)
 						}
-						
-						Row(
+												
+						PlainListRow(
 							L10n.Settings.connectedDAppsButtonTitle,
 							icon: Image(asset: AssetResource.connectedDapps)
 						) {
 							viewStore.send(.connectedDAppsButtonTapped)
 						}
 						
-						Row(
+						PlainListRow(
 							L10n.Settings.gatewayButtonTitle,
 							icon: Image(asset: AssetResource.gateway)
 						) {
 							viewStore.send(.editGatewayAPIEndpointButtonTapped)
 						}
 						
-						Row(
+						PlainListRow(
 							L10n.Settings.personasButtonTitle,
 							icon: Image(asset: AssetResource.personas)
 						) {
 							viewStore.send(.personasButtonTapped)
 						}
 					}
+					.buttonStyle(.settingsRowStyle)
 					VStack(spacing: .zero) {
 						Spacer()
 							.frame(height: .large3)

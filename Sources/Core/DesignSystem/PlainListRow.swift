@@ -1,12 +1,13 @@
-import FeaturePrelude
+import SwiftUI
+import Resources
 
 // MARK: - Row
-struct Row: View {
+public struct PlainListRow: View {
 	let title: String
 	let icon: Image
 	let action: () -> Void
-
-	init(
+	
+	public init(
 		_ title: String,
 		icon: Image,
 		action: @escaping () -> Void
@@ -17,8 +18,8 @@ struct Row: View {
 	}
 }
 
-extension Row {
-	var body: some View {
+extension PlainListRow {
+	public var body: some View {
 		Button(
 			action: {
 				action()
@@ -51,24 +52,6 @@ extension Row {
 				.frame(height: .largeButtonHeight)
 			}
 		)
-		.buttonStyle(SettingsRowStyle())
+//		.buttonStyle(SettingsRowStyle())
 	}
 }
-
-// MARK: - SettingsRowStyle
-struct SettingsRowStyle: ButtonStyle {
-	func makeBody(configuration: Self.Configuration) -> some View {
-		configuration.label
-			.background(configuration.isPressed ? Color.app.gray4 : Color.app.white)
-	}
-}
-
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct Row_Previews: PreviewProvider {
-	static var previews: some View {
-		Row("Title", icon: Image(systemName: "wallet.pass"), action: {})
-	}
-}
-#endif

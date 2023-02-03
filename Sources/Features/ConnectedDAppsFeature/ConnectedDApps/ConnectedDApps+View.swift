@@ -34,6 +34,10 @@ public extension ConnectedDApps.View {
 					
 					Separator()
 
+					PlainListRow("kkk", icon: .init(asset: AssetResource.browsers)) {
+						print("DID TAP")
+					}
+					
 					Text("ConnectedDApps")
 					
 					Spacer()
