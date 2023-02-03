@@ -43,14 +43,3 @@ public extension NewEntityCompletion.State {
 		entity.index
 	}
 }
-
-//
-// #if DEBUG
-// public extension NewEntityCompletion.State where Entity == OnNetwork.Account, Destination == CreateAccountCompletionDestination {
-//	static let previewValue: Self = .init(
-//		entity: OnNetwork.Account.previewValue0,
-//		isFirstOnNetwork: true,
-//		destination: .home
-//	)
-// }
-// #endif
