@@ -1,6 +1,19 @@
 import FeaturePrelude
 
-// MARK: - DappInteractionHook.View
+public extension View {
+	func presentsDappInteractions() -> some View {
+		self.modifier(
+			DappInteractionHook.ViewModifier(
+				store: .init(
+					initialState: .init(),
+					reducer: DappInteractionHook()
+				)
+			)
+		)
+	}
+}
+
+// MARK: - DappInteractionHook.ViewModifier
 extension DappInteractionHook {
 	struct ViewModifier: SwiftUI.ViewModifier {
 		let store: StoreOf<DappInteractionHook>

@@ -2,19 +2,6 @@ import FeaturePrelude
 import P2PConnectivityClient
 import ProfileClient
 
-public extension View {
-	func presentsDappInteractions() -> some View {
-		self.modifier(
-			DappInteractionHook.ViewModifier(
-				store: .init(
-					initialState: .init(),
-					reducer: DappInteractionHook()
-				)
-			)
-		)
-	}
-}
-
 // MARK: - DappInteractionHook
 struct DappInteractionHook: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
