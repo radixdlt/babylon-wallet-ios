@@ -20,12 +20,3 @@ public extension CreationOfEntity {
 		}
 	}
 }
-
-// MARK: - FactorSourceNotHDCompatible
-struct FactorSourceNotHDCompatible: Swift.Error {}
-
-// #if DEBUG
-// public extension CreationOfEntity.State {
-//	static let previewValue: Self = .init()
-// }
-// #endif
