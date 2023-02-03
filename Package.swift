@@ -130,7 +130,7 @@ package.addModules([
 		dependencies: [
 			"AppSettings",
 			"AccountPortfolio",
-//			"DappInteractionFeature",
+			"DappInteractionFeature",
 			"HomeFeature",
 			"SettingsFeature",
 		],
