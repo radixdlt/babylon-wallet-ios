@@ -187,6 +187,14 @@ public enum L10n {
         public static let newDapp = L10n.tr("Localizable", "dApp.loginRequest.title.newDapp", fallback: "New Login Request")
       }
     }
+    public enum MetadataLoading {
+      public enum ErrorAlert {
+        /// Cancel
+        public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.cancelButtonTitle", fallback: "Cancel")
+        /// Retry
+        public static let retryButtonTitle = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.retryButtonTitle", fallback: "Retry")
+      }
+    }
     public enum Request {
       /// Request received from dApp for network %@, but you are currently connected to %@.
       public static func wrongNetworkError(_ p1: Any, _ p2: Any) -> String {

@@ -1,6 +1,6 @@
 import FeaturePrelude
 
-struct DappInteraction: Sendable, FeatureReducer {
+struct DappInteractionFlow: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		typealias Interaction = P2P.FromDapp.WalletInteraction
 		typealias AnyInteractionItem = P2P.FromDapp.WalletInteraction.AnyInteractionItem

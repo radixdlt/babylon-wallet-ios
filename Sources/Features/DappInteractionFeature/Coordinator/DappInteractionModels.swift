@@ -1,6 +1,7 @@
 import FeaturePrelude
 
-// enum DappInteraction {}
+// MARK: - DappInteraction
+enum DappInteraction {}
 
 extension DappInteraction {
 	typealias NumberOfAccounts = P2P.FromDapp.WalletInteraction.NumberOfAccounts

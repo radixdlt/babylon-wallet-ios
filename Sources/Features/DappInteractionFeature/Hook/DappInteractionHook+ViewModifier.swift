@@ -25,12 +25,12 @@ extension DappInteractionHook {
 			#if os(iOS)
 			.fullScreenCover(
 				store: store.scope(state: \.$dappInteraction, action: { .child(.dappInteraction($0)) }),
-				content: { DappInteraction.View(store: $0) }
+				content: { DappInteractionCoordinator.View(store: $0) }
 			)
 			#elseif os(macOS)
 			.sheet(
 				store: store.scope(state: \.$dappInteraction, action: { .child(.dappInteraction($0)) }),
-				content: { DappInteraction.View(store: $0) }
+				content: { DappInteractionCoordinator.View(store: $0) }
 			)
 			#endif
 			.task {

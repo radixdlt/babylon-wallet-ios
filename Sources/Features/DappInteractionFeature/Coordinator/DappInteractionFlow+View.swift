@@ -1,14 +1,14 @@
 import FeaturePrelude
 
-// MARK: - DappInteraction.View
-extension DappInteraction {
+// MARK: - DappInteractionFlow.View
+extension DappInteractionFlow {
 	@MainActor
 	struct View: SwiftUI.View {
-		let store: StoreOf<DappInteraction>
+		let store: StoreOf<DappInteractionFlow>
 	}
 }
 
-extension DappInteraction.View {
+extension DappInteractionFlow.View {
 	var body: some View {
 		WithViewStore(
 			store,
@@ -26,10 +26,10 @@ extension DappInteraction.View {
 	}
 }
 
-// MARK: - DappInteraction.View.ViewState
-extension DappInteraction.View {
+// MARK: - DappInteractionFlow.View.ViewState
+extension DappInteractionFlow.View {
 	struct ViewState: Equatable {
-		init(state: DappInteraction.State) {
+		init(state: DappInteractionFlow.State) {
 			// TODO: implement
 		}
 	}
@@ -41,16 +41,16 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - DappInteraction_Preview
 struct DappInteraction_Preview: PreviewProvider {
 	static var previews: some View {
-		DappInteraction.View(
+		DappInteractionFlow.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: DappInteraction()
+				reducer: DappInteractionFlow()
 			)
 		)
 	}
 }
 
-extension DappInteraction.State {
+extension DappInteractionFlow.State {
 	static let previewValue: Self = .init(
 		dappMetadata: .previewValue,
 		interaction: .previewValueOneTimeAccount

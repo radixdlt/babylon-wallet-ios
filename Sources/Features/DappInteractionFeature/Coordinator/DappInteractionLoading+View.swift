@@ -11,23 +11,29 @@ extension DappInteractionLoading {
 extension DappInteractionLoading.View {
 	var body: some View {
 		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
+			store.stateless,
+			observe: { false }, // TODO: use $0 when Apple makes Void conform to Equatable
 			send: { .view($0) }
 		) { viewStore in
-			Text("Implement: DappInteraction")
-				.background(Color.yellow)
-				.foregroundColor(.red)
-				.onAppear { viewStore.send(.appeared) }
-		}
-	}
-}
-
-// MARK: - DappInteractionLoading.View.ViewState
-extension DappInteractionLoading.View {
-	struct ViewState: Equatable {
-		init(state: DappInteractionLoading.State) {
-			// TODO: implement
+			NavigationStack {
+				ForceFullScreen {}
+					.overlayLoadingView()
+					.onAppear { viewStore.send(.appeared) }
+					.alert(
+						store.scope(
+							state: \.errorAlert,
+							action: { .view(.errorAlert($0)) }
+						),
+						dismiss: .systemDismissed
+					)
+				#if os(iOS)
+					.toolbar {
+						ToolbarItemGroup(placement: .navigationBarLeading) {
+							CloseButton { viewStore.send(.dismissButtonTapped) }
+						}
+					}
+				#endif
+			}
 		}
 	}
 }

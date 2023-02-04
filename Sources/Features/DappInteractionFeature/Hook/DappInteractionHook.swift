@@ -8,7 +8,7 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 		var currentRequest: P2P.RequestFromClient? { requestQueue.first }
 		var requestQueue: OrderedSet<P2P.RequestFromClient> = []
 
-		@PresentationStateOf<DappInteraction>
+		@PresentationStateOf<DappInteractionCoordinator>
 		var dappInteraction
 	}
 
@@ -30,7 +30,7 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case dappInteraction(PresentationActionOf<DappInteraction>)
+		case dappInteraction(PresentationActionOf<DappInteractionCoordinator>)
 	}
 
 	@Dependency(\.profileClient) var profileClient
@@ -41,7 +41,7 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.presentationDestination(\.$dappInteraction, action: /Action.child .. ChildAction.dappInteraction) {
-				DappInteraction()
+				DappInteractionCoordinator()
 			}
 	}
 
