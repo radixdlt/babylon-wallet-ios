@@ -41,4 +41,7 @@ public extension CGFloat {
 
 	/// 75
 	static let largeButtonHeight: Self = 75
+	
+	/// 60
+	static let navBarHeight: Self = 66
 }

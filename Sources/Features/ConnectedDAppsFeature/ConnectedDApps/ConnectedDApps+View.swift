@@ -1,11 +1,10 @@
 import FeaturePrelude
 
-// MARK: - ConnectedDApps.View
+// MARK: - View
 
 public extension ConnectedDApps {
     @MainActor
     struct View: SwiftUI.View {
-        public typealias Store = ComposableArchitecture.Store<State, Action>
         private let store: Store
 
         public init(store: Store) {
@@ -14,12 +13,24 @@ public extension ConnectedDApps {
     }
 }
 
+// MARK: - Body
+
 public extension ConnectedDApps.View {
+	struct ViewState: Equatable {
+		let dApps: [DAppRowModel] = [
+			.init(name: "NBA Top Shot", thumbnail: .placeholder),
+			.init(name: "RTFK", thumbnail: .placeholder),
+			.init(name: "Nas Black", thumbnail: .placeholder),
+			.init(name: "Razzlekhan", thumbnail: .placeholder),
+			.init(name: "Randi Zuckerberg", thumbnail: .placeholder)
+		]
+	}
+	
 	var body: some View {
 		ForceFullScreen {
 			WithViewStore(
 				store,
-				observe: ViewState.init(state:),
+				observe: \.viewState,
 				send: { .view($0) }
 			) { viewStore in
 				VStack(spacing: .zero) {
@@ -30,47 +41,43 @@ public extension ConnectedDApps.View {
 						}
 					)
 					.foregroundColor(.app.gray1)
-					.padding([.horizontal, .top], .medium3)
-					
-					Separator()
-
-					PlainListRow("kkk", icon: .init(asset: AssetResource.browsers)) {
-						print("DID TAP")
+					.padding(.horizontal, .small2)
+					.frame(height: .navBarHeight)
+					ScrollView {
+						VStack(spacing: 0) {
+							Separator()
+							
+							ForEach(viewStore.dApps) { dApp in
+								PlainListRow(dApp.name, icon: Rectangle().fill(.orange), verySmall: false) {
+									viewStore.send(.didTapDApp(dApp.name))
+								}
+							}
+							.padding(.horizontal, .medium3)
+							
+							Spacer()
+						}
 					}
-					
-					Text("ConnectedDApps")
-					
-					Spacer()
 				}
+			}
+		}
+		.overlay {
+			IfLetStore(store.destination) { destinationStore in
+				ConnectedDApp.View(store: destinationStore)
 			}
 		}
 	}
 }
+	
+	// MARK: - Extensions
 
-// MARK: - ConnectedDApps.View.ViewState
-extension ConnectedDApps.View {
-    // MARK: ViewState
-    struct ViewState: Equatable {
-        init(state: ConnectedDApps.State) {
-            
-        }
-    }
+extension ConnectedDApps.State {
+	var viewState: ConnectedDApps.View.ViewState {
+		.init()
+	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-//struct ConnectedDApps_Preview: PreviewProvider {
-//    static var previews: some View {
-//        ConnectedDApps.View(
-//            store: .init(
-//                initialState: .init(
-//                    fungibleTokenList: .init(sections: []),
-//                    nonFungibleTokenList: .init(rows: [])
-//                ),
-//                reducer: AssetsView()
-//            )
-//        )
-//    }
-//}
-#endif
+struct DAppRowModel: Identifiable, Equatable {
+	let id: UUID = .init()
+	let name: String
+	let thumbnail: URL
+}

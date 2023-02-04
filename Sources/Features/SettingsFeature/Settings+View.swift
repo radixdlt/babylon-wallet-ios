@@ -75,7 +75,7 @@ public extension AppSettings.View {
 private extension AppSettings.View {
 	func settingsView(viewStore: ViewStore<ViewState, AppSettings.Action.ViewAction>) -> some View {
 		ForceFullScreen {
-			VStack {
+			VStack(spacing: 0) {
 				NavigationBar(
 					titleText: L10n.Settings.title,
 					leadingItem: BackButton {
@@ -83,16 +83,15 @@ private extension AppSettings.View {
 					}
 				)
 				.foregroundColor(.app.gray1)
-				.padding([.horizontal, .top], .medium3)
-
+				.padding(.horizontal, .small2)
+				.frame(height: .navBarHeight)
 				ScrollView {
 					VStack(spacing: .zero) {
 						if viewStore.canAddP2PClient {
 							ConnectExtensionView {
 								viewStore.send(.addP2PClientButtonTapped)
 							}
-							Spacer()
-								.frame(height: .medium3)
+							.padding([.vertical], .medium3)
 						}
 						
 						#if DEBUG
@@ -106,51 +105,46 @@ private extension AppSettings.View {
 
 						PlainListRow(
 							L10n.Settings.desktopConnectionsButtonTitle,
-							icon: Image(asset: AssetResource.desktopConnections)
+							asset: AssetResource.desktopConnections
 						) {
 							viewStore.send(.manageP2PClientsButtonTapped)
 						}
 												
 						PlainListRow(
 							L10n.Settings.connectedDAppsButtonTitle,
-							icon: Image(asset: AssetResource.connectedDapps)
+							asset: AssetResource.connectedDapps
 						) {
 							viewStore.send(.connectedDAppsButtonTapped)
 						}
 						
 						PlainListRow(
 							L10n.Settings.gatewayButtonTitle,
-							icon: Image(asset: AssetResource.gateway)
+							asset: AssetResource.gateway
 						) {
 							viewStore.send(.editGatewayAPIEndpointButtonTapped)
 						}
 						
 						PlainListRow(
 							L10n.Settings.personasButtonTitle,
-							icon: Image(asset: AssetResource.personas)
+							asset: AssetResource.personas
 						) {
 							viewStore.send(.personasButtonTapped)
 						}
 					}
 					.buttonStyle(.settingsRowStyle)
+					.padding(.horizontal, .medium3)
+					.padding(.bottom, .large3)
 					VStack(spacing: .zero) {
-						Spacer()
-							.frame(height: .large3)
-
 						Button(L10n.Settings.deleteAllButtonTitle) {
 							viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(isDestructive: true))
-
-						Spacer()
-							.frame(height: .large1)
+						.padding(.bottom, .large1)
 
 						Text(viewStore.appVersion)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body2Regular)
-
-						Spacer()
-							.frame(height: .medium1)
+							.padding(.bottom, .medium1)
 					}
 				}
 				.onAppear {

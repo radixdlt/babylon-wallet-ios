@@ -51,7 +51,7 @@ public extension AppSettings {
 			return .none
 			
 		case .internal(.view(.connectedDAppsButtonTapped)):
-			state.connectedDApps = .init()
+			state.connectedDApps = .init(destination: nil)
 			return .none
 			
 		case .child(.connectedDApps(.delegate(.dismiss))):
