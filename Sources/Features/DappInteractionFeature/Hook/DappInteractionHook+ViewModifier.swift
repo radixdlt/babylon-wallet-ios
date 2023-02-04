@@ -15,10 +15,12 @@ public extension View {
 
 // MARK: - DappInteractionHook.ViewModifier
 extension DappInteractionHook {
+	typealias View = Never
+
 	struct ViewModifier: SwiftUI.ViewModifier {
 		let store: StoreOf<DappInteractionHook>
 
-		func body(content: Content) -> some View {
+		func body(content: Content) -> some SwiftUI.View {
 			content
 			#if os(iOS)
 			.fullScreenCover(

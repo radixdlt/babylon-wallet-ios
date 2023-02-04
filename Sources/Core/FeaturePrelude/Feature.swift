@@ -7,6 +7,8 @@ public protocol _FeatureReducer: ReducerProtocol where State: Sendable & Hashabl
 	associatedtype InternalAction: Sendable & Equatable = Never
 	associatedtype ChildAction: Sendable & Equatable = Never
 	associatedtype DelegateAction: Sendable & Equatable = Never
+
+	associatedtype View: SwiftUI.View
 }
 
 // MARK: - FeatureAction
