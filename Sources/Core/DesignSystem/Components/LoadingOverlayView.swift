@@ -1,7 +1,7 @@
 import SwiftUI
 
 public extension View {
-	func overlayLoadingView() -> some View {
+	func presentsLoadingViewOverlay() -> some View {
 		overlayPreferenceValue(LoadingContextKey.self, alignment: .center) { context in
 			if case let .global(text) = context {
 				LoadingOverlayView(text)

@@ -188,6 +188,8 @@ public enum L10n {
       }
     }
     public enum MetadataLoading {
+      /// Loading...
+      public static let prompt = L10n.tr("Localizable", "dApp.metadataLoading.prompt", fallback: "Loading...")
       public enum ErrorAlert {
         /// Cancel
         public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.cancelButtonTitle", fallback: "Cancel")

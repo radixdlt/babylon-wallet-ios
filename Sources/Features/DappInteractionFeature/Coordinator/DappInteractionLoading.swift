@@ -3,8 +3,10 @@ import GatewayAPI
 
 // MARK: - DappInteractionLoading
 struct DappInteractionLoading: Sendable, FeatureReducer {
+	// TODO: convert to enum State { case loading(...), finished(...) }
 	struct State: Sendable, Hashable {
 		let interaction: P2P.FromDapp.WalletInteraction
+		var isLoading: Bool = false
 		var errorAlert: AlertState<ViewAction.ErrorAlertAction>?
 
 		init(interaction: P2P.FromDapp.WalletInteraction) {
@@ -38,12 +40,12 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return metadataLoadingEffect(for: state)
+			return metadataLoadingEffect(with: &state)
 		case let .errorAlert(action):
 			state.errorAlert = nil
 			switch action {
 			case .retryButtonTapped:
-				return metadataLoadingEffect(for: state)
+				return metadataLoadingEffect(with: &state)
 			case .cancelButtonTapped, .systemDismissed:
 				return .send(.delegate(.dismiss))
 			}
@@ -52,8 +54,9 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		}
 	}
 
-	func metadataLoadingEffect(for state: State) -> EffectTask<Action> {
-		.run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress] send in
+	func metadataLoadingEffect(with state: inout State) -> EffectTask<Action> {
+		state.isLoading = true
+		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress] send in
 			let metadata = await TaskResult {
 				try await gatewayAPI.accountMetadataByAddress(dappDefinitionAddress).metadata
 			}
@@ -65,6 +68,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .dappMetadataLoadingResult(.success(dappMetadata)):
+			state.isLoading = false
 			return .send(.delegate(.dappMetadataLoaded(dappMetadata)))
 		case let .dappMetadataLoadingResult(.failure(error)):
 			state.errorAlert = .init(

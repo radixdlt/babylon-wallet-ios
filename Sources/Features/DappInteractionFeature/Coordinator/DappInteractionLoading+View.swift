@@ -2,43 +2,52 @@ import FeaturePrelude
 
 // MARK: - DappInteractionLoading.View
 extension DappInteractionLoading {
+	struct ViewState: Equatable {
+		let screenState: ControlState
+
+		init(state: State) {
+			self.screenState = state.isLoading
+				? .loading(.global(text: L10n.DApp.MetadataLoading.prompt))
+				: .enabled
+		}
+	}
+
 	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<DappInteractionLoading>
-	}
-}
 
-extension DappInteractionLoading.View {
-	var body: some View {
-		WithViewStore(
-			store.stateless,
-			observe: { false }, // TODO: use $0 when Apple makes Void conform to Equatable
-			send: { .view($0) }
-		) { viewStore in
-			NavigationStack {
-				ForceFullScreen {}
-					.overlayLoadingView()
-					.onAppear { viewStore.send(.appeared) }
-					.alert(
-						store.scope(
-							state: \.errorAlert,
-							action: { .view(.errorAlert($0)) }
-						),
-						dismiss: .systemDismissed
-					)
-				#if os(iOS)
-					.toolbar {
-						ToolbarItemGroup(placement: .navigationBarLeading) {
-							CloseButton { viewStore.send(.dismissButtonTapped) }
+		var body: some SwiftUI.View {
+			WithViewStore(
+				store,
+				observe: DappInteractionLoading.ViewState.init,
+				send: { .view($0) }
+			) { viewStore in
+				NavigationStack {
+					ForceFullScreen {}
+						.onAppear { viewStore.send(.appeared) }
+						.alert(
+							store.scope(
+								state: \.errorAlert,
+								action: { .view(.errorAlert($0)) }
+							),
+							dismiss: .systemDismissed
+						)
+					#if os(iOS)
+						.toolbar {
+							ToolbarItemGroup(placement: .navigationBarLeading) {
+								CloseButton { viewStore.send(.dismissButtonTapped) }
+							}
 						}
-					}
-				#endif
+					#endif
+				}
+				.controlState(viewStore.screenState)
 			}
 		}
 	}
 }
 
 #if DEBUG
+import GatewayAPI
 import SwiftUI // NB: necessary for previews to appear
 
 // MARK: - DappInteraction_Preview
@@ -48,8 +57,18 @@ struct DappInteractionLoading_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue,
 				reducer: DappInteractionLoading()
-			)
+			) {
+				$0.gatewayAPIClient.accountMetadataByAddress = { _ in
+					try await Task.sleep(for: .seconds(3))
+					return GatewayAPI.EntityMetadataResponse(
+						ledgerState: .previewValue,
+						address: "abc",
+						metadata: .init(items: [])
+					)
+				}
+			}
 		)
+		.presentsLoadingViewOverlay()
 	}
 }
 

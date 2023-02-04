@@ -36,13 +36,7 @@ extension GatewayAPIClient: TestDependencyKey {
 			},
 			transactionStatus: { _ in
 				.init(
-					ledgerState: .init(
-						network: "Network name",
-						stateVersion: 0,
-						proposerRoundTimestamp: "",
-						epoch: 1337,
-						round: 0
-					),
+					ledgerState: .previewValue,
 					status: .committedSuccess,
 					knownPayloads: [.init(payloadHashHex: "payload-hash-hex", status: .committedSuccess)],
 					errorMessage: nil
@@ -57,6 +51,16 @@ public extension DependencyValues {
 		get { self[GatewayAPIClient.self] }
 		set { self[GatewayAPIClient.self] = newValue }
 	}
+}
+
+public extension GatewayAPI.LedgerState {
+	static let previewValue = Self(
+		network: "Network name",
+		stateVersion: 0,
+		proposerRoundTimestamp: "",
+		epoch: 1337,
+		round: 0
+	)
 }
 
 private let fungibleResourceAddresses = [

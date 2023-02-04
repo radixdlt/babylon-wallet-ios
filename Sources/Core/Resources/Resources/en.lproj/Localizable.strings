@@ -43,6 +43,7 @@
 "createEntity.completion.destination.chooseEntities" = "Choose %ss";
 "createEntity.completion.goToDestination" = "Go to %@";
 
+"dApp.metadataLoading.prompt" = "Loading...";
 "dApp.metadataLoading.errorAlert.retryButtonTitle" = "Retry";
 "dApp.metadataLoading.errorAlert.cancelButtonTitle" = "Cancel";
 "dApp.chooseAccounts.createNewAccount" = "Create a New Account";
