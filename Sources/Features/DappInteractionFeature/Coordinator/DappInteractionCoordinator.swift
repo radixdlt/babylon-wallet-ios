@@ -26,6 +26,24 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		case dismiss
 	}
 
+	var body: some ReducerProtocolOf<Self> {
+		Scope(
+			state: /State.loading,
+			action: /Action.child .. ChildAction.loading
+		) {
+			DappInteractionLoading()
+		}
+
+		Scope(
+			state: /State.flow,
+			action: /Action.child .. ChildAction.flow
+		) {
+			DappInteractionFlow()
+		}
+
+		Reduce(core)
+	}
+
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .loading(.delegate(.dappMetadataLoaded(dappMetadata))):
@@ -34,7 +52,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			}
 			return .none
 		case .loading(.delegate(.dismiss)):
-			return .run { send in await send(.delegate(.dismiss)) }
+			return .send(.delegate(.dismiss))
 		default:
 			return .none
 		}

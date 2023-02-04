@@ -47,7 +47,6 @@ extension DappInteractionLoading {
 }
 
 #if DEBUG
-import GatewayAPI
 import SwiftUI // NB: necessary for previews to appear
 
 // MARK: - DappInteraction_Preview
@@ -57,16 +56,9 @@ struct DappInteractionLoading_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue,
 				reducer: DappInteractionLoading()
-			) {
-				$0.gatewayAPIClient.accountMetadataByAddress = { _ in
-					try await Task.sleep(for: .seconds(3))
-					return GatewayAPI.EntityMetadataResponse(
-						ledgerState: .previewValue,
-						address: "abc",
-						metadata: .init(items: [])
-					)
-				}
-			}
+					.dependency(\.gatewayAPIClient, .previewValueDappMetadataFailure)
+					.dependency(\.gatewayAPIClient, .previewValueDappMetadataSuccess)
+			)
 		)
 		.presentsLoadingViewOverlay()
 	}

@@ -17,6 +17,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		transactionStatus: unimplemented("\(Self.self).transactionStatus")
 	)
 
+	// TODO: convert to noop, don't use in tests.
 	private static func mock(
 		fungibleResourceCount _: Int = 2,
 		nonFungibleResourceCount _: Int = 2,
