@@ -24,6 +24,7 @@ extension DappInteractionLoading {
 			) { viewStore in
 				NavigationStack {
 					ForceFullScreen {}
+						.controlState(viewStore.screenState)
 						.onAppear { viewStore.send(.appeared) }
 						.alert(
 							store.scope(
@@ -40,7 +41,6 @@ extension DappInteractionLoading {
 						}
 					#endif
 				}
-				.controlState(viewStore.screenState)
 			}
 		}
 	}
