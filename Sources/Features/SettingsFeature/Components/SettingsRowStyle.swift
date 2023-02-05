@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - SettingsRowStyle
 struct SettingsRowStyle: ButtonStyle {
-	func makeBody(configuration: Self.Configuration) -> some View {
+	func makeBody(configuration: Configuration) -> some View {
 		configuration.label
 			.background(configuration.isPressed ? Color.app.gray4 : Color.app.white)
 	}
@@ -17,8 +17,11 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct SettingsRowStyle_Previews: PreviewProvider {
 	static var previews: some View {
-		PlainListRow("Title", icon: Image(systemName: "wallet.pass"), action: {})
-			.buttonStyle(.settingsRowStyle)
+		PlainListRow(title: "Title") {
+			Image(systemName: "wallet.pass")
+		} action: {
+		}
+		.buttonStyle(.settingsRowStyle)
 	}
 }
 #endif

@@ -8,6 +8,8 @@ import ProfileClient
 
 // MARK: - AppSettings
 public struct AppSettings: Sendable, ReducerProtocol {
+	public typealias Store = StoreOf<Self>
+
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
@@ -28,17 +30,16 @@ public extension AppSettings {
 			.ifLet(\.personasCoordinator, action: /Action.child .. Action.ChildAction.personasCoordinator) {
 				PersonasCoordinator()
 			}
-			.ifLet(\.connectedDApps, action: /Action.child .. Action.ChildAction.connectedDApps) {
+			.presentationDestination(\.connectedDApps, action: /Action.child .. Action.ChildAction.connectedDApps) {
 				ConnectedDApps()
 			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
+						
 		case .internal(.view(.dismissSettingsButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismissSettings))
-			}
+			return .send(.delegate(.dismissSettings))
 
 		case .internal(.view(.deleteProfileAndFactorSourcesButtonTapped)):
 			return .run { send in
@@ -51,12 +52,8 @@ public extension AppSettings {
 			return .none
 			
 		case .internal(.view(.connectedDAppsButtonTapped)):
-			state.connectedDApps = .init(destination: nil)
-			return .none
-			
-		case .child(.connectedDApps(.delegate(.dismiss))):
-			state.connectedDApps = nil
-			return .none
+			// TODO: This proxying is only necessary because of our strict view/child separation
+			return .send(.child(.connectedDApps(.present(.init()))))
 
 		case .internal(.view(.didAppear)):
 			return loadP2PClients()
@@ -111,7 +108,7 @@ public extension AppSettings {
 			state.personasCoordinator = nil
 			return .none
 
-		case .child, .delegate:
+		case .internal, .child, .delegate:
 			return .none
 
 		case .internal(.view(.addP2PClientButtonTapped)):

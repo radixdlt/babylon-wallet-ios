@@ -27,50 +27,46 @@ public extension ConnectedDApps.View {
 	}
 	
 	var body: some View {
-		ForceFullScreen {
-			WithViewStore(
-				store,
-				observe: \.viewState,
-				send: { .view($0) }
-			) { viewStore in
-				VStack(spacing: .zero) {
-					NavigationBar(
-						titleText: L10n.ConnectedDApps.title,
-						leadingItem: BackButton {
-							viewStore.send(.dismissButtonTapped)
-						}
-					)
-					.foregroundColor(.app.gray1)
-					.padding(.horizontal, .small2)
-					.frame(height: .navBarHeight)
-					ScrollView {
-						VStack(spacing: 0) {
-							Separator()
-							
-							ForEach(viewStore.dApps) { dApp in
-								PlainListRow(dApp.name, icon: Rectangle().fill(.orange), verySmall: false) {
-									viewStore.send(.didTapDApp(dApp.name))
-								}
-							}
-							.padding(.horizontal, .medium3)
-							
-							Spacer()
+		WithViewStore(
+			store,
+			observe: \.viewState,
+			send: { .view($0) }
+		) { viewStore in
+			ScrollView {
+				VStack(spacing: 0) {
+					BodyText(L10n.ConnectedDApps.body)
+					
+					Separator()
+					
+					ForEach(viewStore.dApps) { dApp in
+						PlainListRow(title: dApp.name) {
+							DAppPlaceholder()
+						} action: {
+							viewStore.send(.didSelectDApp(dApp.name))
 						}
 					}
+					
+					Spacer()
 				}
+				.padding(.horizontal, .medium3)
 			}
-		}
-		.overlay {
-			IfLetStore(store.destination) { destinationStore in
-				ConnectedDApp.View(store: destinationStore)
+			.navBarTitle(L10n.ConnectedDApps.title)
+			.navigationDestination(store: store.selectedDApp) { store in
+				ConnectedDApp.View(store: store)
 			}
 		}
 	}
 }
-	
-	// MARK: - Extensions
 
-extension ConnectedDApps.State {
+// MARK: - Extensions
+
+private extension ConnectedDApps.Store {
+	var selectedDApp: PresentationStoreOf<ConnectedDApp> {
+		scope(state: \.selectedDApp) { .child(.selectedDApp($0)) }
+	}
+}
+
+private extension ConnectedDApps.State {
 	var viewState: ConnectedDApps.View.ViewState {
 		.init()
 	}
@@ -81,3 +77,28 @@ struct DAppRowModel: Identifiable, Equatable {
 	let name: String
 	let thumbnail: URL
 }
+
+// TODO: • Move somewhere else
+
+public struct BodyText: View {
+	private let text: String
+	private let textStyle: TextStyle
+	private let color: Color
+
+	public init(_ text: String, textStyle: TextStyle = .body1HighImportance, color: Color = .app.gray2) {
+		self.text = text
+		self.textStyle = textStyle
+		self.color = color
+	}
+	
+	public var body: some View {
+		HStack(spacing: 0) {
+			Text(text)
+				.textStyle(textStyle)
+				.foregroundColor(color)
+			Spacer(minLength: 0)
+		}
+		.padding(.vertical, .medium3)
+	}
+}
+

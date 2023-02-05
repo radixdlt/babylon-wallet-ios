@@ -156,6 +156,40 @@ private extension TextStyle {
 	}
 }
 
+// MARK: - TextStyle_
+//public struct TextStyle_ {
+//	let font: Font
+//	let lineSpacing: CGFloat
+//		
+//	public static let sheetTitle = TextStyle_(font: .app.sheetTitle, lineSpacing: .𝟛𝟞)
+//	public static let sectionHeader = TextStyle_(font: .app.sectionHeader, lineSpacing: .𝟚𝟛)
+//	public static let secondaryHeader = TextStyle_(font: .app.secondaryHeader, lineSpacing: .𝟚𝟛)
+//	public static let body1Header = TextStyle_(font: .app.body1Header, lineSpacing: .𝟚𝟛)
+//	public static let body1HighImportance = TextStyle_(font: .app.body1HighImportance, lineSpacing: .𝟚𝟛)
+//	public static let body1Regular = TextStyle_(font: .app.body1Regular, lineSpacing: .𝟚𝟛)
+//	public static let body1StandaloneLink = TextStyle_(font: .app.body1StandaloneLink, lineSpacing: .𝟚𝟛)
+//	public static let body1Link = TextStyle_(font: .app.body1Link, lineSpacing: .𝟚𝟛)
+//	public static let body2Header = TextStyle_(font: .app.body2Header, lineSpacing: .𝟙𝟠)
+//	public static let body2HighImportance = TextStyle_(font: .app.body2HighImportance, lineSpacing: .𝟙𝟠)
+//	public static let body2Regular = TextStyle_(font: .app.body2Regular, lineSpacing: .𝟙𝟠)
+//	public static let body2Link = TextStyle_(font: .app.body2Link, lineSpacing: .𝟙𝟠)
+//	public static let button = TextStyle_(font: .app.button, lineSpacing: .𝟙𝟠)
+//}
+//
+//public extension View {
+//	func textStyle(_ style: TextStyle_) -> some View {
+//		self.font(style.font)
+//			.lineSpacing(style.lineSpacing)
+//	}
+//}
+//
+//private extension TextStyle_ {
+//	init(font: Font, lineSpacing: CGFloat.LineSpacing) {
+//		self.font = font
+//		self.lineSpacing = .lineSpacing(lineSpacing)
+//	}
+//}
+
 private extension CGFloat {
 	static func lineSpacing(_ value: LineSpacing) -> CGFloat {
 		value.rawValue / 4

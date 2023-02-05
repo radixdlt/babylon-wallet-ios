@@ -62,6 +62,16 @@ public enum L10n {
       public static let kind = L10n.tr("Localizable", "common.persona.kind", fallback: "Persona")
     }
   }
+  public enum ConnectedDApp {
+    /// Here are the Personas that you have previously used to connect to this dApp.
+    public static let body = L10n.tr("Localizable", "connectedDApp.body", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
+  }
+  public enum ConnectedDApps {
+    /// Here are all the Decentralized Apps that you have connected to with this Radix Wallet.
+    public static let body = L10n.tr("Localizable", "connectedDApps.body", fallback: "Here are all the Decentralized Apps that you have connected to with this Radix Wallet.")
+    /// Connected dApps
+    public static let title = L10n.tr("Localizable", "connectedDApps.title", fallback: "Connected dApps")
+  }
   public enum CreateEntity {
     public enum Completion {
       /// Go to %@
@@ -317,6 +327,10 @@ public enum L10n {
         public static let retryButtonTitle = L10n.tr("Localizable", "dApp.response.failureAlert.retryButtonTitle", fallback: "Retry")
       }
     }
+  }
+  public enum DAppPersona {
+    /// You are currently sharing the following pieces of personal data required by this dApp.
+    public static let body = L10n.tr("Localizable", "dAppPersona.body", fallback: "You are currently sharing the following pieces of personal data required by this dApp.")
   }
   public enum FungibleTokenList {
     public enum Detail {

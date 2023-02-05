@@ -124,6 +124,11 @@
 "manageP2PClients.sendTestMessageButtonTitle" = "Send Test Msg";
 
 "connectedDApps.title" = "Connected dApps";
+"connectedDApps.body" = "Here are all the Decentralized Apps that you have connected to with this Radix Wallet.";
+
+"connectedDApp.body" = "Here are the Personas that you have previously used to connect to this dApp.";
+
+"dAppPersona.body" = "You are currently sharing the following pieces of personal data required by this dApp.";
 
 "newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
 "newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";

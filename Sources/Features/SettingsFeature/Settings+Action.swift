@@ -22,7 +22,7 @@ public extension AppSettings {
 public extension AppSettings.Action {
 	enum ChildAction: Sendable, Equatable {
 		case manageP2PClients(ManageP2PClients.Action)
-		case connectedDApps(ConnectedDApps.Action)
+		case connectedDApps(PresentationActionOf<ConnectedDApps>)
 		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
 		case personasCoordinator(PersonasCoordinator.Action)
 	}

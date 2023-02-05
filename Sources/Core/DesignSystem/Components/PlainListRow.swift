@@ -6,18 +6,36 @@ import Resources
 public struct PlainListRow<Icon: View>: View {
 	let title: String
 	let icon: Icon
-	let verySmall: Bool
 	let action: () -> Void
 	
-	public init(_ title: String, icon: Icon, verySmall: Bool = true, action: @escaping () -> Void) {
+	public init(title: String, @ViewBuilder icon: () -> Icon, action: @escaping () -> Void) {
 		self.title = title
-		self.icon = icon
-		self.verySmall = verySmall
+		self.icon = icon()
 		self.action = action
 	}
 	
-	public init(_ title: String,asset: ImageAsset,action: @escaping () -> Void) where Icon == Image {
-		self.init(title, icon: Image(asset: asset), action: action)
+	public init(title: String, asset: ImageAsset, action: @escaping () -> Void) where Icon == AssetIcon {
+		self.title = title
+		self.icon = AssetIcon(asset: asset)
+		self.action = action
+	}
+}
+
+public struct AssetIcon: View {
+	private let asset: ImageAsset
+	private let hitTargetSize: HitTargetSize
+	private let cornerRadius: CGFloat
+
+	public init(asset: ImageAsset, verySmall: Bool = true) {
+		self.asset = asset
+		self.hitTargetSize = verySmall ? .verySmall : .small
+		self.cornerRadius = verySmall ? .small3 : .small2
+	}
+	
+	public var body: some View {
+		Image(asset: asset)
+			.frame(hitTargetSize)
+			.cornerRadius(cornerRadius)
 	}
 }
 
@@ -29,8 +47,6 @@ extension PlainListRow {
 			VStack(spacing: .zero) {
 				HStack(spacing: .zero) {
 					icon
-						.frame(verySmall ? .verySmall : .small)
-						.cornerRadius(verySmall ? .small3 : .small2)
 						.padding(.trailing, .medium3)
 					Text(title)
 						.textStyle(.body1Header)

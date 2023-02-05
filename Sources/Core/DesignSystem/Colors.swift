@@ -43,10 +43,14 @@ extension Color {
 	#endif
 }
 
-public extension Color {
+public extension ShapeStyle where Self == Color {
 	/// Namespace only
-	struct App { fileprivate init() {} }
-	static let app = App()
+	static var app: Color.App { Color.app }
+}
+
+public extension Color {
+	fileprivate static let app = App()
+	struct App { }
 }
 
 public extension Color.App {

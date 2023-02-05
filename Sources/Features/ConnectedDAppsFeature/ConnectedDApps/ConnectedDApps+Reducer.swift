@@ -3,14 +3,12 @@ import FeaturePrelude
 // MARK: - Reducer
 
 public struct ConnectedDApps: Sendable, FeatureReducer {
-	public typealias Store = ComposableArchitecture.Store<State, Action>
-
+	public typealias Store = StoreOf<Self>
 	public init() {}
 	
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			._printChanges()
-			.ifLet(\.destination, action: /Action.child .. ChildAction.destination) {
+			.presentationDestination(\.selectedDApp, action: /Action.child .. ChildAction.selectedDApp) {
 				ConnectedDApp()
 			}
 	}
@@ -19,33 +17,21 @@ public struct ConnectedDApps: Sendable, FeatureReducer {
         switch viewAction {
         case .appeared:
             return .none
-		case .didTapDApp(let name):
-			state.destination = .init(name: name)
-			return .none
-		case .dismissButtonTapped:
-			return .send(.delegate(.dismiss))
+		case .didSelectDApp(let name):
+			// TODO: • This proxying is only necessary because of our strict view/child separation
+			return .send(.child(.selectedDApp(.present(.init(name: name)))))
         }
     }
-	
-	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
-		switch childAction {
-		case .destination(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-		case .destination:
-			return .none
-		}
-	}
 }
 
 // MARK: - State
 
 public extension ConnectedDApps {
-	struct State: Sendable, Equatable {
-		public var destination: ConnectedDApp.State?
+	struct State: Sendable, Hashable {
+		public var selectedDApp: PresentationStateOf<ConnectedDApp>
 		
-		public init(destination: ConnectedDApp.State?) {
-			self.destination = destination
+		public init(selectedDApp: PresentationStateOf<ConnectedDApp> = .dismissed) {
+			self.selectedDApp = selectedDApp
 		}
 	}
 }
@@ -55,25 +41,13 @@ public extension ConnectedDApps {
 public extension ConnectedDApps {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
-		case didTapDApp(String)
-		case dismissButtonTapped
+		case didSelectDApp(String)
 	}
 	
 	enum DelegateAction: Sendable, Equatable {
-		case dismiss
 	}
 	
 	enum ChildAction: Sendable, Equatable {
-		case destination(ConnectedDApp.Action)
-	}
-}
-
-// MARK: - Child Stores
-
-extension ConnectedDApps.Store {
-	var destination: Store<ConnectedDApp.State?, ConnectedDApp.Action> {
-		scope(state: \.destination) { destinationAction in
-			.child(.destination(destinationAction))
-		}
+		case selectedDApp(PresentationActionOf<ConnectedDApp>)
 	}
 }
