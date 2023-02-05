@@ -56,7 +56,9 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	func metadataLoadingEffect(with state: inout State) -> EffectTask<Action> {
 		state.isLoading = true
 		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress] send in
-			let metadata = await TaskResult { try await DappMetadata(for: dappDefinitionAddress) }
+			let metadata = await TaskResult {
+				DappMetadata(try await gatewayAPI.accountMetadataByAddress(dappDefinitionAddress).metadata)
+			}
 			await send(.internal(.dappMetadataLoadingResult(metadata)))
 		}
 	}
@@ -81,5 +83,14 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 			)
 			return .none
 		}
+	}
+}
+
+extension DappMetadata {
+	init(_ metadata: GatewayAPI.EntityMetadataCollection) {
+		self.init(
+			name: metadata.items.first(where: { $0.key == "name" })?.value ?? "",
+			description: metadata.items.first(where: { $0.key == "description" })?.value ?? ""
+		)
 	}
 }

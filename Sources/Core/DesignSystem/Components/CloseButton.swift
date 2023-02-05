@@ -13,7 +13,7 @@ public struct CloseButton: View {
 public extension CloseButton {
 	var body: some View {
 		Button(action: action) {
-			Image(asset: AssetResource.close).renderingMode(.original)
+			Image(asset: AssetResource.close).tint(.app.gray1)
 		}
 		.frame(.small)
 	}

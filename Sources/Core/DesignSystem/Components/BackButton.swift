@@ -13,7 +13,7 @@ public struct BackButton: View {
 public extension BackButton {
 	var body: some View {
 		Button(action: action) {
-			Image(asset: AssetResource.arrowBack).renderingMode(.original)
+			Image(asset: AssetResource.arrowBack).tint(.app.gray1)
 		}
 		.frame(.small)
 	}
