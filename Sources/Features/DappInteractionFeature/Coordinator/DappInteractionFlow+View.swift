@@ -2,22 +2,14 @@ import FeaturePrelude
 
 // MARK: - DappInteractionFlow.View
 extension DappInteractionFlow {
-	struct ViewState: Equatable {
-		let root: DappInteractionFlow.Destinations.State?
-
-		init(state: DappInteractionFlow.State) {
-			self.root = state.root
-		}
-	}
-
 	@MainActor
 	struct View: SwiftUI.View {
 		let store: StoreOf<DappInteractionFlow>
 
 		var body: some SwiftUI.View {
 			WithViewStore(
-				store,
-				observe: DappInteractionFlow.ViewState.init(state:),
+				store.stateless,
+				observe: { false }, // NB: Void does not conform to Equatable (yet)
 				send: { .view($0) }
 			) { viewStore in
 				NavigationStackStore(
