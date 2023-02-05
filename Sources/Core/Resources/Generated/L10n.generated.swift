@@ -202,6 +202,12 @@ public enum L10n {
       public static func wrongNetworkError(_ p1: Any, _ p2: Any) -> String {
         return L10n.tr("Localizable", "dApp.request.wrongNetworkError", String(describing: p1), String(describing: p2), fallback: "Request received from dApp for network %@, but you are currently connected to %@.")
       }
+      public enum MalformedErrorAlert {
+        /// Interaction received from dApp does not contain any valid requests.
+        public static let message = L10n.tr("Localizable", "dApp.request.malformedErrorAlert.message", fallback: "Interaction received from dApp does not contain any valid requests.")
+        /// OK
+        public static let okButtonTitle = L10n.tr("Localizable", "dApp.request.malformedErrorAlert.okButtonTitle", fallback: "OK")
+      }
     }
   }
   public enum FungibleTokenList {

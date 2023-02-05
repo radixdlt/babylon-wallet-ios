@@ -63,6 +63,8 @@
 "dApp.loginRequest.title.knownDapp" = "Login Request";
 "dApp.loginRequest.title.newDapp" = "New Login Request";
 "dApp.request.wrongNetworkError" = "Request received from dApp for network %@, but you are currently connected to %@.";
+"dApp.request.malformedErrorAlert.message" = "Interaction received from dApp does not contain any valid requests.";
+"dApp.request.malformedErrorAlert.okButtonTitle" = "OK";
 
 "fungibleTokenList.detail.currentSupply" = "Current Supply";
 "fungibleTokenList.detail.resourceAddress" = "Resource Address";

@@ -20,8 +20,14 @@ extension DappInteractionCoordinator {
 						then: { DappInteractionFlow.View(store: $0) }
 					)
 				}
-				.transition(.opacity)
 			}
+			.alert(
+				store: store.scope(
+					state: \.errorAlert,
+					action: { .view(.malformedInteractionErrorAlert($0)) }
+				),
+				dismiss: .systemDismissed
+			)
 		}
 	}
 }

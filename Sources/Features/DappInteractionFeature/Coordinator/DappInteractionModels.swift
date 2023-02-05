@@ -28,6 +28,21 @@ extension P2P.FromDapp.WalletInteraction {
 
 		// transactions
 		case send(SendTransactionItem)
+
+		var priority: some Comparable {
+			switch self {
+			// requests
+			case .auth:
+				return 0
+			case .ongoingAccounts:
+				return 1
+			case .oneTimeAccounts:
+				return 2
+			// transactions
+			case .send:
+				return 0
+			}
+		}
 	}
 
 	// NB: keep this logic synced up with the enum above
