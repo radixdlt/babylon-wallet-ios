@@ -54,9 +54,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared
+		case closeButtonTapped
+		case backButtonTapped
 	}
 
 	enum ChildAction: Sendable, Equatable {
+		case root(Destinations.Action)
 		case path(NavigationActionOf<Destinations>)
 	}
 
@@ -89,6 +92,16 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				TransactionSigning()
 			}
 		}
+	}
+
+	var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
+				Destinations()
+			}
+			.navigationDestination(\.$path, action: /Action.child .. ChildAction.path) {
+				Destinations()
+			}
 	}
 }
 

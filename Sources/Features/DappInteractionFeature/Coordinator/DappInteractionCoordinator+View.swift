@@ -40,7 +40,7 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 	static var previews: some View {
 		DappInteractionCoordinator.View(
 			store: .init(
-				initialState: .init(interaction: .previewValueNoRequestItems),
+				initialState: .init(interaction: .previewValueOneTimeAccount),
 				reducer: DappInteractionCoordinator()
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataSuccess)
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataFailure)
