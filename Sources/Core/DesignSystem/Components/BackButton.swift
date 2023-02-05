@@ -23,5 +23,6 @@ public extension BackButton {
 struct BackButton_Previews: PreviewProvider {
 	static var previews: some View {
 		BackButton {}
+			.previewLayout(.sizeThatFits)
 	}
 }

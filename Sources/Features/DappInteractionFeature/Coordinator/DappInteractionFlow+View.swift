@@ -55,6 +55,7 @@ extension DappInteractionFlow {
 					action: DappInteractionFlow.Destinations.Action.chooseAccounts,
 					then: { ChooseAccounts.View(store: $0) }
 				)
+				// TODO: complete cases
 			}
 		}
 	}

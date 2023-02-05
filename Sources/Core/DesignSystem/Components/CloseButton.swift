@@ -23,5 +23,6 @@ public extension CloseButton {
 struct CloseButton_Previews: PreviewProvider {
 	static var previews: some View {
 		CloseButton {}
+			.previewLayout(.sizeThatFits)
 	}
 }
