@@ -40,7 +40,7 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 	static var previews: some View {
 		DappInteractionCoordinator.View(
 			store: .init(
-				initialState: .init(interaction: .previewValueOneTimeAccount),
+				initialState: .init(interaction: .previewValueNoRequestItems),
 				reducer: DappInteractionCoordinator()
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataSuccess)
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataFailure)
@@ -63,6 +63,7 @@ extension GatewayAPIClient {
 		}
 	}
 
+	// TODO: should be with(noop) — see GatewayAPIClient+Mock.swift for deets.
 	static let previewValueDappMetadataFailure = with(previewValue) {
 		$0.accountMetadataByAddress = { @Sendable _ in
 			try await Task.sleep(for: .seconds(2))

@@ -66,7 +66,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		case let .dappMetadataLoadingResult(.success(dappMetadata)):
 			state.isLoading = false
 			return .send(.delegate(.dappMetadataLoaded(dappMetadata)))
-		case let .dappMetadataLoadingResult(.failure(_)):
+		case .dappMetadataLoadingResult(.failure(_)):
 			state.errorAlert = .init(
 				title: { TextState(L10n.App.errorOccurredTitle) },
 				actions: {

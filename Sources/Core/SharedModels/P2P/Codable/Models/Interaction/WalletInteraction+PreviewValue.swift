@@ -102,5 +102,13 @@ public extension P2P.FromDapp.WalletInteraction {
 			metadata: .previewValue
 		)
 	}
+
+	static let previewValueNoRequestItems = Self(
+		id: .previewValue,
+		items: .request(.unauthorized(.init(
+			oneTimeAccounts: nil
+		))),
+		metadata: .previewValue
+	)
 }
 #endif // DEBUG

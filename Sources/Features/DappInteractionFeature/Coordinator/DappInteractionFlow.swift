@@ -32,7 +32,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: [AnyInteractionItem: AnyInteractionResponseItem] = [:]
 
-		let root: Destinations.State?
+		var root: Destinations.State?
 		@NavigationStateOf<Destinations>
 		var path: NavigationState<Destinations.State>.Path
 
@@ -45,12 +45,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction)) {
 				self.interactionItems = interactionItems
-				switch interactionItems.first {
-				case .remote(.auth(.usePersona)):
-					self.root = Destinations.State(for: interactionItems.first, in: remoteInteraction, with: dappMetadata)
-				default:
-					self.root = Destinations.State(for: interactionItems.first, in: remoteInteraction, with: dappMetadata)
-				}
+				self.root = Destinations.State(for: interactionItems.first, in: remoteInteraction, with: dappMetadata)
 			} else {
 				return nil
 			}
