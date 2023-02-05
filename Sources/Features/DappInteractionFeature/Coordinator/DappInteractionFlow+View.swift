@@ -7,50 +7,37 @@ extension DappInteractionFlow {
 		let store: StoreOf<DappInteractionFlow>
 
 		var body: some SwiftUI.View {
-			WithViewStore(
-				store.stateless,
-				observe: { false }, // NB: Void does not conform to Equatable (yet)
-				send: { .view($0) }
-			) { viewStore in
-				NavigationStackStore(
-					store.scope(
-						state: \.$path,
-						action: { .child(.path($0)) }
-					)
+			NavigationStackStore(
+				store.scope(state: \.$path, action: { .child(.path($0)) })
+			) {
+				IfLetStore(
+					store.scope(state: \.root, action: { .child(.root($0)) })
 				) {
-					IfLetStore(
-						store.scope(
-							state: \.root,
-							action: { .child(.root($0)) }
-						),
-						then: { store in
-							destination(for: store)
-							#if os(iOS)
-								.toolbar {
-									ToolbarItem(placement: .navigationBarLeading) {
-										CloseButton { viewStore.send(.closeButtonTapped) }
-									}
-								}
-							#endif
-						}
-					)
-				}
-				.navigationDestination(
-					store: store.scope(
-						state: \.$path,
-						action: { .child(.path($0)) }
-					),
-					destination: { store in
-						destination(for: store)
-						#if os(iOS)
-							.toolbar {
-								ToolbarItem(placement: .navigationBarLeading) {
-									BackButton { viewStore.send(.backButtonTapped) }
+					destination(for: $0)
+					#if os(iOS)
+						.toolbar {
+							ToolbarItem(placement: .navigationBarLeading) {
+								CloseButton {
+									ViewStore(store.stateless).send(.view(.closeButtonTapped))
 								}
 							}
-						#endif
+						}
+					#endif
+				}
+			}
+			.navigationDestination(
+				store: store.scope(state: \.$path, action: { .child(.path($0)) })
+			) {
+				destination(for: $0)
+				#if os(iOS)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							BackButton {
+								ViewStore(store.stateless).send(.view(.backButtonTapped))
+							}
+						}
 					}
-				)
+				#endif
 			}
 		}
 

@@ -17,60 +17,48 @@ extension ChooseAccounts.View {
 			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
-				VStack(spacing: .zero) {
-					NavigationBar(
-						leadingItem: CloseButton {
-							viewStore.send(.dismissButtonTapped)
-						}
-					)
-					.foregroundColor(.app.gray1)
-					.padding([.horizontal, .top], .medium3)
+				ScrollView {
+					VStack(spacing: .small1) {
+						VStack(spacing: .medium2) {
+							dappImage
 
-					Spacer()
-						.frame(height: .small2)
+							Text(L10n.DApp.ChooseAccounts.title)
+								.foregroundColor(.app.gray1)
+								.textStyle(.sheetTitle)
 
-					ScrollView {
-						VStack(spacing: .small1) {
-							VStack(spacing: .medium2) {
-								dappImage
-
-								Text(L10n.DApp.ChooseAccounts.title)
-									.foregroundColor(.app.gray1)
-									.textStyle(.sheetTitle)
-
-								subtitle(
-									dappName: viewStore.dappName,
-									message: subtitleText(with: viewStore)
-								)
-								.textStyle(.secondaryHeader)
-								.multilineTextAlignment(.center)
-							}
-							.padding(.bottom, .medium2)
-
-							ForEachStore(
-								store.scope(
-									state: \.availableAccounts,
-									action: { .child(.account(id: $0, action: $1)) }
-								),
-								content: { ChooseAccounts.Row.View(store: $0) }
+							subtitle(
+								dappName: viewStore.dappName,
+								message: subtitleText(with: viewStore)
 							)
-
-							Spacer()
-								.frame(height: .small3)
-
-							Button(L10n.DApp.ChooseAccounts.createNewAccount) {
-								viewStore.send(.createAccountButtonTapped)
-							}
-							.buttonStyle(.secondaryRectangular(
-								shouldExpand: false
-							))
-
-							Spacer()
-								.frame(height: .large1 * 1.5)
+							.textStyle(.secondaryHeader)
+							.multilineTextAlignment(.center)
 						}
-						.padding(.horizontal, .medium1)
-					}
+						.padding(.bottom, .medium2)
 
+						ForEachStore(
+							store.scope(
+								state: \.availableAccounts,
+								action: { .child(.account(id: $0, action: $1)) }
+							),
+							content: { ChooseAccounts.Row.View(store: $0) }
+						)
+
+						Spacer()
+							.frame(height: .small3)
+
+						Button(L10n.DApp.ChooseAccounts.createNewAccount) {
+							viewStore.send(.createAccountButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(
+							shouldExpand: false
+						))
+
+						Spacer()
+							.frame(height: .large1 * 1.5)
+					}
+					.padding(.horizontal, .medium1)
+				}
+				.safeAreaInset(edge: .bottom) {
 					ConfirmationFooter(
 						title: L10n.DApp.LoginRequest.continueButtonTitle,
 						isEnabled: viewStore.canProceed,
