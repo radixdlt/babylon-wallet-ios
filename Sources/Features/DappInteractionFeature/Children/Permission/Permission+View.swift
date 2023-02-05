@@ -16,65 +16,53 @@ extension Permission.View {
 			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
-				VStack(spacing: .zero) {
-					NavigationBar(
-						leadingItem: CloseButton {
-//							viewStore.send(.dismissButtonTapped)
-						}
-					)
-					.foregroundColor(.app.gray1)
-					.padding([.horizontal, .top], .medium3)
-
-					Spacer()
-						.frame(height: .small2)
-
-					ScrollView {
+				ScrollView {
+					VStack(spacing: .medium2) {
 						VStack(spacing: .medium2) {
-							VStack(spacing: .medium2) {
-								dappImage
+							dappImage
 
-								Text(titleText(with: viewStore))
+							Text(titleText(with: viewStore))
+								.foregroundColor(.app.gray1)
+								.textStyle(.sheetTitle)
+
+							subtitle(
+								dappName: viewStore.dappName,
+								message: subtitleText(with: viewStore)
+							)
+							.textStyle(.secondaryHeader)
+							.multilineTextAlignment(.center)
+						}
+						.padding(.bottom, .medium2)
+
+						VStack {
+							HStack {
+								Text("• 2 or more accounts")
 									.foregroundColor(.app.gray1)
-									.textStyle(.sheetTitle)
-
-								subtitle(
-									dappName: viewStore.dappName,
-									message: subtitleText(with: viewStore)
-								)
-								.textStyle(.secondaryHeader)
-								.multilineTextAlignment(.center)
-							}
-							.padding(.bottom, .medium2)
-
-							VStack {
-								HStack {
-									Text("• 2 or more accounts")
-										.foregroundColor(.app.gray1)
-										.textStyle(.body1Regular)
-										.padding([.horizontal, .vertical], .medium1)
-
-									Spacer()
-								}
-								.background(Color.app.gray5)
-								.cornerRadius(.medium3)
+									.textStyle(.body1Regular)
+									.padding([.horizontal, .vertical], .medium1)
 
 								Spacer()
-									.frame(height: .large1 * 1.5)
-
-								Text("You can update this permission in your settings at any time.")
-									.foregroundColor(.app.gray2)
-									.textStyle(.body1Regular)
-									.multilineTextAlignment(.center)
-									.padding(.horizontal, .medium3)
 							}
-							.padding(.horizontal, .medium3)
+							.background(Color.app.gray5)
+							.cornerRadius(.medium3)
 
 							Spacer()
 								.frame(height: .large1 * 1.5)
-						}
-						.padding(.horizontal, .medium1)
-					}
 
+							Text("You can update this permission in your settings at any time.")
+								.foregroundColor(.app.gray2)
+								.textStyle(.body1Regular)
+								.multilineTextAlignment(.center)
+								.padding(.horizontal, .medium3)
+						}
+						.padding(.horizontal, .medium3)
+
+						Spacer()
+							.frame(height: .large1 * 1.5)
+					}
+					.padding(.horizontal, .medium1)
+				}
+				.safeAreaInset(edge: .bottom) {
 					ConfirmationFooter(
 						title: L10n.DApp.LoginRequest.continueButtonTitle,
 						isEnabled: true,
