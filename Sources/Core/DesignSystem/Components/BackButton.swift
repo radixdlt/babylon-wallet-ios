@@ -12,10 +12,9 @@ public struct BackButton: View {
 
 public extension BackButton {
 	var body: some View {
-		Button(
-			action: action,
-			label: { Image(asset: AssetResource.arrowBack) }
-		)
+		Button(action: action) {
+			Image(asset: AssetResource.arrowBack).renderingMode(.original)
+		}
 		.frame(.small)
 	}
 }

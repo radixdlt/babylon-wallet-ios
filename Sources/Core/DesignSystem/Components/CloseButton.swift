@@ -12,10 +12,9 @@ public struct CloseButton: View {
 
 public extension CloseButton {
 	var body: some View {
-		Button(
-			action: action,
-			label: { Image(asset: AssetResource.close) }
-		)
+		Button(action: action) {
+			Image(asset: AssetResource.close).renderingMode(.original)
+		}
 		.frame(.small)
 	}
 }
