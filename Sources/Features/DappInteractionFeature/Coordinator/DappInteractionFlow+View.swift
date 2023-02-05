@@ -43,17 +43,13 @@ struct DappInteraction_Preview: PreviewProvider {
 	static var previews: some View {
 		DappInteractionFlow.View(
 			store: .init(
-				initialState: .previewValue,
+				initialState: .init(
+					dappMetadata: .previewValue,
+					interaction: .previewValueOneTimeAccount
+				)!,
 				reducer: DappInteractionFlow()
 			)
 		)
 	}
-}
-
-extension DappInteractionFlow.State {
-	static let previewValue: Self = .init(
-		dappMetadata: .previewValue,
-		interaction: .previewValueOneTimeAccount
-	)
 }
 #endif

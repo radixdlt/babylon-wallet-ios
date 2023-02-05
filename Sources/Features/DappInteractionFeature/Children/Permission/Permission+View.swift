@@ -101,9 +101,9 @@ private extension Permission.View {
 
 	func titleText(with viewStore: PermissionViewStore) -> String {
 		switch viewStore.permissionKind {
-		case .account:
+		case .accounts:
 			return "Account Permission"
-		case .personalData:
+		case .personaData:
 			return "Personal Data Permission"
 		}
 	}
@@ -120,9 +120,9 @@ private extension Permission.View {
 
 	func subtitleText(with viewStore: PermissionViewStore) -> String {
 		switch viewStore.permissionKind {
-		case .account:
+		case .accounts:
 			return " is requesting permission to always be able to view account information when you login with this Persona."
-		case .personalData:
+		case .personaData:
 			return " is requesting permission to always be able to view the following personal data when you login with this Persona."
 		}
 	}
@@ -131,7 +131,7 @@ private extension Permission.View {
 // MARK: - Permission.View.ViewState
 extension Permission.View {
 	struct ViewState: Equatable {
-		let permissionKind: Permission.Kind
+		let permissionKind: DappInteraction.PermissionKind
 		let dappName: String
 
 		init(state: Permission.State) {

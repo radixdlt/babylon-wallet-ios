@@ -2,19 +2,19 @@ import FeaturePrelude
 
 struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		enum Stage {
+		enum ChildState: Sendable, Hashable {
 			case loading(DappInteractionLoading.State)
 			case flow(DappInteractionFlow.State)
 //			case submitting(DappInteractionSubmitting.State)
 		}
 
 		let interaction: P2P.FromDapp.WalletInteraction
-		var stage: Stage
+		var childState: ChildState
 		var errorAlert: AlertState<ViewAction.MalformedInteractionErrorAlertAction>? = nil
 
 		init(interaction: P2P.FromDapp.WalletInteraction) {
 			self.interaction = interaction
-			self.stage = .loading(.init(interaction: interaction))
+			self.childState = .loading(.init(interaction: interaction))
 		}
 	}
 
@@ -42,15 +42,15 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.stage, action: /.self) {
+		Scope(state: \.childState, action: /.self) {
 			Scope(
-				state: /State.loading,
+				state: /State.ChildState.loading,
 				action: /Action.child .. ChildAction.loading
 			) {
 				DappInteractionLoading()
 			}
 			Scope(
-				state: /State.flow,
+				state: /State.ChildState.flow,
 				action: /Action.child .. ChildAction.flow
 			) {
 				DappInteractionFlow()
@@ -60,19 +60,30 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		Reduce(core)
 	}
 
+	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case let .malformedInteractionErrorAlert(action):
+			state.errorAlert = nil
+			switch action {
+			case .okButtonTapped, .systemDismissed:
+				return .send(.delegate(.dismiss))
+			}
+		}
+	}
+
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .loading(.delegate(.dappMetadataLoaded(dappMetadata))):
-			if let flowState = DappInteractionFlow.State(dappMetadata: dappMetadata, remoteInteraction: state.interaction) {
-				state.stage = .flow(flowState)
+			if let flowState = DappInteractionFlow.State(dappMetadata: dappMetadata, interaction: state.interaction) {
+				state.childState = .flow(flowState)
 			} else {
 				state.errorAlert = .init(
 					title: { TextState(L10n.App.errorOccurredTitle) },
-					actions: [
+					actions: {
 						ButtonState(role: .cancel, action: .send(.okButtonTapped)) {
 							TextState(L10n.DApp.Request.MalformedErrorAlert.okButtonTitle)
-						},
-					],
+						}
+					},
 					message: { TextState(L10n.DApp.Request.MalformedErrorAlert.message) }
 				)
 			}

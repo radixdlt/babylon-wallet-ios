@@ -32,20 +32,25 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: [AnyInteractionItem: AnyInteractionResponseItem] = [:]
 
-		let root: Destinations.State? // remove optional (only used for usePersona)
+		let root: Destinations.State?
 		@NavigationStateOf<Destinations>
 		var path: NavigationState<Destinations.State>.Path
 
 		init?(
 			dappMetadata: DappMetadata,
-			remoteInteraction: RemoteInteraction
+			interaction remoteInteraction: RemoteInteraction
 		) {
 			self.dappMetadata = dappMetadata
 			self.remoteInteraction = remoteInteraction
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction)) {
 				self.interactionItems = interactionItems
-				self.root = Destinations.State(for: interactionItems.first, in: remoteInteraction, with: dappMetadata)
+				switch interactionItems.first {
+				case .remote(.auth(.usePersona)):
+					self.root = Destinations.State(for: interactionItems.first, in: remoteInteraction, with: dappMetadata)
+				default:
+					self.root = Destinations.State(for: interactionItems.first, in: remoteInteraction, with: dappMetadata)
+				}
 			} else {
 				return nil
 			}
@@ -69,7 +74,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 
 		enum Action: Sendable, Equatable {
-			case usePersona
 			case login(LoginRequest.Action)
 			case permission(Permission.Action)
 			case chooseAccounts(ChooseAccounts.Action)
@@ -117,33 +121,38 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 
 extension DappInteractionFlow.Destinations.State {
 	init?(
-		for item: DappInteractionFlow.State.RemoteInteractionItem,
+		for item: DappInteractionFlow.State.AnyInteractionItem,
 		in interaction: DappInteractionFlow.State.RemoteInteraction,
 		with dappMetadata: DappMetadata
 	) {
 		switch item {
-		case .auth(.usePersona):
+		case .remote(.auth(.usePersona)):
 			return nil
-		case .auth(.login(_)): // TODO: bind to item when implementing auth challenge
+		case .remote(.auth(.login(_))): // TODO: bind to item when implementing auth challenge
 			self = .login(.init(
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata
 			))
-		case let .ongoingAccounts(item):
+		case let .local(.permissionRequested(permission)):
+			self = .permission(.init(
+				permissionKind: permission,
+				dappMetadata: dappMetadata
+			))
+		case let .remote(.ongoingAccounts(item)):
 			self = .chooseAccounts(.init(
 				accessKind: .ongoing,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
 			))
-		case let .oneTimeAccounts(item):
+		case let .remote(.oneTimeAccounts(item)):
 			self = .chooseAccounts(.init(
 				accessKind: .oneTime,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
 			))
-		case let .send(item):
+		case let .remote(.send(item)):
 			self = .signAndSubmitTransaction(.init(
 				transactionManifestWithoutLockFee: item.transactionManifest
 			))

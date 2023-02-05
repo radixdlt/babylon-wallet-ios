@@ -3,7 +3,6 @@ import GatewayAPI
 
 // MARK: - DappInteractionLoading
 struct DappInteractionLoading: Sendable, FeatureReducer {
-	// TODO: convert to enum State { case loading(...), finished(...) }
 	struct State: Sendable, Hashable {
 		let interaction: P2P.FromDapp.WalletInteraction
 		var isLoading: Bool = false
@@ -67,18 +66,18 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		case let .dappMetadataLoadingResult(.success(dappMetadata)):
 			state.isLoading = false
 			return .send(.delegate(.dappMetadataLoaded(dappMetadata)))
-		case let .dappMetadataLoadingResult(.failure(error)):
+		case let .dappMetadataLoadingResult(.failure(_)):
 			state.errorAlert = .init(
-				title: TextState(L10n.App.errorOccurredTitle),
-				message: TextState(error.legibleLocalizedDescription),
-				buttons: [
+				title: { TextState(L10n.App.errorOccurredTitle) },
+				actions: {
 					ButtonState(action: .send(.retryButtonTapped)) {
 						TextState(L10n.DApp.MetadataLoading.ErrorAlert.retryButtonTitle)
-					},
+					}
 					ButtonState(role: .cancel, action: .send(.cancelButtonTapped)) {
 						TextState(L10n.DApp.MetadataLoading.ErrorAlert.cancelButtonTitle)
-					},
-				]
+					}
+				},
+				message: { TextState(L10n.DApp.MetadataLoading.ErrorAlert.message) }
 			)
 			return .none
 		}

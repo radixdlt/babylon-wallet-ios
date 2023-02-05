@@ -3,7 +3,7 @@ import struct TransactionClient.MakeTransactionHeaderInput
 
 // MARK: - TransactionSigning.State
 public extension TransactionSigning {
-	struct State: Hashable {
+	struct State: Sendable, Hashable {
 		public let transactionManifestWithoutLockFee: TransactionManifest
 		public var transactionWithLockFee: TransactionManifest?
 		public var transactionWithLockFeeString: String?

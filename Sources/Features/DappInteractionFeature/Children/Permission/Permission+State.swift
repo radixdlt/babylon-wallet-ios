@@ -3,11 +3,11 @@ import FeaturePrelude
 // MARK: - Permission.State
 extension Permission {
 	struct State: Sendable, Hashable {
-		let permissionKind: Kind
+		let permissionKind: DappInteraction.PermissionKind
 		let dappMetadata: DappMetadata
 
 		init(
-			permissionKind: Kind,
+			permissionKind: DappInteraction.PermissionKind,
 			dappMetadata: DappMetadata
 		) {
 			self.permissionKind = permissionKind
@@ -16,18 +16,10 @@ extension Permission {
 	}
 }
 
-// MARK: - Permission.Kind
-extension Permission {
-	enum Kind: Sendable, Equatable {
-		case account
-		case personalData
-	}
-}
-
 #if DEBUG
 extension Permission.State {
 	static let previewValue: Self = .init(
-		permissionKind: .account,
+		permissionKind: .accounts(.ongoing),
 		dappMetadata: .previewValue
 	)
 }
