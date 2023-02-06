@@ -119,9 +119,8 @@ extension LoginRequest.View {
 
 		init(state: LoginRequest.State) {
 			dappName = state.dappMetadata.name
-			// TODO: @Nikola
-			let isKnownDapp = state.authorizedPersona != nil
 
+			let isKnownDapp = state.authorizedPersona != nil
 			title = isKnownDapp ?
 				L10n.DApp.LoginRequest.Title.knownDapp :
 				L10n.DApp.LoginRequest.Title.newDapp

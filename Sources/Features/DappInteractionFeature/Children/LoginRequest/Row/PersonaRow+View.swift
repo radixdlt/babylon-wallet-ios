@@ -5,7 +5,6 @@ extension PersonaRow {
 	struct ViewState: Equatable {
 		let name: String
 		let lastLogin: String?
-		let numberOfSharedAccounts: String?
 		let selectionState: RadioButton.State
 
 		init(state: PersonaRow.State) {
@@ -18,15 +17,6 @@ extension PersonaRow {
 				self.lastLogin = L10n.DApp.LoginRequest.Row.lastLoginWasOn(formatted)
 			} else {
 				self.lastLogin = nil
-			}
-
-			switch state.numberOfSharedAccounts {
-			case 0:
-				numberOfSharedAccounts = nil
-			case 1:
-				numberOfSharedAccounts = L10n.DApp.LoginRequest.Row.oneSharedAccount
-			default:
-				numberOfSharedAccounts = L10n.DApp.LoginRequest.Row.moreSharedAccounts(state.numberOfSharedAccounts)
 			}
 
 			selectionState = state.isSelected ? .selected : .unselected

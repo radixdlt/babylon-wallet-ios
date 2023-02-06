@@ -9,18 +9,15 @@ struct PersonaRow: Sendable, FeatureReducer {
 		let persona: OnNetwork.Persona
 		var isSelected: Bool
 		let lastLogin: Date?
-		let numberOfSharedAccounts: UInt
 
 		init(
 			persona: OnNetwork.Persona,
 			isSelected: Bool,
-			lastLogin: Date?,
-			numberOfSharedAccounts: UInt
+			lastLogin: Date?
 		) {
 			self.persona = persona
 			self.isSelected = isSelected
 			self.lastLogin = lastLogin
-			self.numberOfSharedAccounts = numberOfSharedAccounts
 		}
 	}
 
@@ -45,8 +42,7 @@ extension PersonaRow.State {
 	static let previewValue: Self = .init(
 		persona: .previewValue0,
 		isSelected: true,
-		lastLogin: Date(),
-		numberOfSharedAccounts: 2
+		lastLogin: Date()
 	)
 }
 #endif

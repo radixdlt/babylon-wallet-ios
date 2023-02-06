@@ -95,8 +95,7 @@ struct LoginRequest: Sendable, FeatureReducer {
 					return PersonaRow.State(
 						persona: persona,
 						isSelected: lastLogin != nil,
-						lastLogin: lastLogin,
-						numberOfSharedAccounts: 0 // TODO: implement
+						lastLogin: lastLogin
 					)
 				}
 				.sorted(by: { $0.isSelected && !$1.isSelected })

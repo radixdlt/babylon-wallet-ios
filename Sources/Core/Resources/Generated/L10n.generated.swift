@@ -179,14 +179,6 @@ public enum L10n {
         public static func lastLoginWasOn(_ p1: Any) -> String {
           return L10n.tr("Localizable", "dApp.loginRequest.row.lastLoginWasOn", String(describing: p1), fallback: "Your last login was on %@")
         }
-        /// %@ accounts
-        public static func moreSharedAccounts(_ p1: Any) -> String {
-          return L10n.tr("Localizable", "dApp.loginRequest.row.moreSharedAccounts", String(describing: p1), fallback: "%@ accounts")
-        }
-        /// 1 account
-        public static let oneSharedAccount = L10n.tr("Localizable", "dApp.loginRequest.row.oneSharedAccount", fallback: "1 account")
-        /// Sharing
-        public static let sharing = L10n.tr("Localizable", "dApp.loginRequest.row.sharing", fallback: "Sharing")
       }
       public enum Subtitle {
         ///  is requesting you login with a Persona.

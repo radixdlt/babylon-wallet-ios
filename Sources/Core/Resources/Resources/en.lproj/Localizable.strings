@@ -56,9 +56,6 @@
 "dApp.loginRequest.chooseAPersonaTitle" = "Choose a Persona";
 "dApp.loginRequest.continueButtonTitle" = "Continue";
 "dApp.loginRequest.row.lastLoginWasOn" = "Your last login was on %@";
-"dApp.loginRequest.row.moreSharedAccounts" = "%@ accounts";
-"dApp.loginRequest.row.oneSharedAccount" = "1 account";
-"dApp.loginRequest.row.sharing" = "Sharing";
 "dApp.loginRequest.subtitle.knownDapp" = " is requesting you login with a Persona.";
 "dApp.loginRequest.subtitle.newDapp" = " is requesting you login for the first time with a Persona.";
 "dApp.loginRequest.title.knownDapp" = "Login Request";
