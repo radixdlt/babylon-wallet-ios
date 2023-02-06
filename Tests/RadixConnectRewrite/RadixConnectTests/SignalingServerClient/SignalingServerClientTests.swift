@@ -46,6 +46,20 @@ final class SignalingClientTests: TestCase {
 //                )
 //        }
 
+        func testSendMessage_awaitsConfirmation() throws {
+                let exp = expectation(description: "exp")
+                Task {
+                        try await signalingClient.sendToRemote(rtcPrimitive: .offer(Self.offer))
+                        exp.fulfill()
+                }
+                webSocketClient.receiveIncommingMessage(.dictionary([
+                        "info": .string("confirmation"),
+                        "requestId": .string(Self.requestId.rawValue)
+                ]))
+
+                wait(for: [exp], timeout: 1.0)
+        }
+
         // MARK: - Incomming Messages
 
         func test_receivedMessagesAreProperlyDecoded_remoteClientDisconnected() throws {
@@ -100,6 +114,7 @@ final class SignalingClientTests: TestCase {
                         expected: Self.iceCandidate
                 )
         }
+        
 
         // MARK: - Helpers
 

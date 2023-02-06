@@ -24,13 +24,11 @@ extension RTCPrimitive {
                 public var sdp: SDP { candidate }
                 public let sdpMLineIndex: Int32
                 public let sdpMid: String?
-                public let serverUrl: String?
 
                 public init(sdp: SDP, sdpMLineIndex: Int32, sdpMid: String?, serverUrl: String?) {
                         self.candidate = sdp
                         self.sdpMLineIndex = sdpMLineIndex
                         self.sdpMid = sdpMid
-                        self.serverUrl = serverUrl
                 }
         }
 }

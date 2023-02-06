@@ -1,12 +1,10 @@
 import Foundation
 import AsyncExtensions
+import Prelude
 
 protocol WebSocketClient: Sendable {
-        var stateStream: AsyncStream<URLSessionWebSocketTask.State> { get }
         var incomingMessageStream: AsyncThrowingStream<Data, Error> { get }
-
         func send(message: Data) async throws
-        func close(with closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?)
 }
 
 // MARK: - AnyAsyncIterator + Sendable
@@ -15,23 +13,27 @@ extension AnyAsyncIterator: @unchecked Sendable where Self.Element: Sendable {}
 // MARK: - AnyAsyncSequence + Sendable
 extension AnyAsyncSequence: @unchecked Sendable where Self.AsyncIterator: Sendable {}
 
-struct SignalingClient {
-        private let incommingMessages: AnyAsyncSequence<IncommingMessage>
-        private let incommingSignalingServerMessagges: AnyAsyncSequence<IncommingMessage.FromSignalingServer>
-        let incommingRemoteClientMessagges: AnyAsyncSequence<RTCPrimitive>
 
+struct SignalingClient {
+        // MARK: - Configuration
         private let encryptionKey: EncryptionKey
         private let webSocketClient: WebSocketClient
         private let jsonDecoder: JSONDecoder
         private let jsonEncoder: JSONEncoder
         private let connectionID: SignalingServerConnectionID
+        private let idBuilder: @Sendable () -> RequestID
 
-        let idBuilder: @Sendable () -> RequestID
+        // MARK: - Streams
+        private let incommingMessages: AnyAsyncSequence<IncommingMessage>
+        private let incommingSignalingServerMessagges: AnyAsyncSequence<IncommingMessage.FromSignalingServer>
+        private let incommingRemoteClientMessagges: AnyAsyncSequence<RTCPrimitive>
 
         let onICECanddiate: AnyAsyncSequence<RTCPrimitive.ICECandidate>
         let onOffer: AnyAsyncSequence<RTCPrimitive.Offer>
         let onAnswer: AnyAsyncSequence<RTCPrimitive.Answer>
         let onRemoteClientState: AnyAsyncSequence<IncommingMessage.FromSignalingServer.Notification>
+
+        // MARK: - Initializer
 
         init(encryptionKey: EncryptionKey,
              webSocketClient: WebSocketClient,
@@ -51,54 +53,45 @@ struct SignalingClient {
                 self.incommingMessages = webSocketClient
                         .incomingMessageStream
                         .eraseToAnyAsyncSequence()
-                        .map {
-                                do {
-                                        let msg = try jsonDecoder.decode(IncommingMessage.self, from: $0)
-                                        return msg
-                                } catch {
-                                        throw error
-                                }
-
-                        }
-                        .compactMap {
-                                let x = $0
-                                return x
+                        .mapSkippingError {
+                                try jsonDecoder.decode(IncommingMessage.self, from: $0)
+                        } logError: { error in
+                                loggerGlobal.info("Failed to decode incomming Message - \(error)")
                         }
                         .share()
                         .eraseToAnyAsyncSequence()
 
                 self.incommingRemoteClientMessagges = self.incommingMessages
-                        .compactMap {
-                                $0.fromRemoteClient
-                        }
-                        .map { [encryption = encryptionKey] message in
+                        .compactMap(\.fromRemoteClient)
+                        .mapSkippingError { [encryption = encryptionKey] message in
                                 try message.extractRTCPrimitive(encryption, decoder: jsonDecoder)
+                        } logError: { error in
+                                loggerGlobal.info("Failed to extract RTCPrimitive - \(error)")
                         }
-                        .share()
                         .eraseToAnyAsyncSequence()
                 
                 self.incommingSignalingServerMessagges = self.incommingMessages
-                        .compactMap {
-                                $0.fromSignalingServer
-                        }
-                        .share()
+                        .compactMap(\.fromSignalingServer)
                         .eraseToAnyAsyncSequence()
 
                 self.onOffer = self.incommingRemoteClientMessagges
                         .compactMap(\.offer)
+                        .logInfo("Received Offer from remote client: %@")
                         .eraseToAnyAsyncSequence()
 
                 self.onAnswer = self.incommingRemoteClientMessagges
                         .compactMap(\.answer)
-                        .share()
+                        .logInfo("Received Answer from remote client: %@")
                         .eraseToAnyAsyncSequence()
 
                 self.onICECanddiate = self.incommingRemoteClientMessagges
                         .compactMap(\.addICE)
+                        .logInfo("Received ICECandidate from remote client: %@")
                         .eraseToAnyAsyncSequence()
 
                 self.onRemoteClientState = self.incommingSignalingServerMessagges
                         .compactMap(\.notification)
+                        .logInfo("Received Notification from Signaling Server: %@")
                         .eraseToAnyAsyncSequence()
         }
 
@@ -107,7 +100,7 @@ struct SignalingClient {
                 let encodedPrimitive = try jsonEncoder.encode(rtcPrimitive)
                 let encryptedPrimitive = try encryptionKey.encrypt(data: encodedPrimitive)
                 let encryptedPayload = EncryptedPayload.init(.init(data: encryptedPrimitive))
-                let hex = encryptedPrimitive.hex
+
                 let message = ClientMessage(requestId: id,
                                             method: .init(from: rtcPrimitive),
                                             source: .wallet,
@@ -116,8 +109,10 @@ struct SignalingClient {
 
                 let encodedMessage = try jsonEncoder.encode(message)
 
+                loggerGlobal.info("Sending message to remote client")
                 try await webSocketClient.send(message: encodedMessage)
                 try await waitForRequestAck(id)
+                loggerGlobal.info("Message sent to remote client")
         }
 
         private func waitForRequestAck(_ requestId: RequestID) async throws {
@@ -127,5 +122,31 @@ struct SignalingClient {
                                 return try incoming.resultOfRequest(id: requestId)?.get()
                         }
                         .first { true }
+        }
+}
+
+extension AsyncSequence {
+        func mapSkippingError<NewValue: Sendable>(
+                _ f: @Sendable @escaping (Element) async throws -> NewValue,
+                logError: @Sendable @escaping (Error) -> Void = { _ in }
+        ) -> AnyAsyncSequence<NewValue> where Element: Sendable, Self: Sendable {
+                compactMap { element in
+                        do {
+                                return try await f(element)
+                        } catch {
+                                logError(error)
+                                return nil
+                        }
+                }.eraseToAnyAsyncSequence()
+        }
+}
+
+extension AsyncSequence {
+        func logInfo(
+                _ message: String
+        ) -> AnyAsyncSequence<Element>  where Element: Sendable, Self: Sendable {
+                handleEvents(onElement: { element in
+                        loggerGlobal.info(.init(stringLiteral: String(format: message, "\(dump(element))")))
+                }).eraseToAnyAsyncSequence()
         }
 }

@@ -18,3 +18,6 @@ typealias EncryptionKey = Tagged<EncryptionKeyTag, HexCodable32Bytes>
 
 enum SDPTag {}
 typealias SDP = Tagged<SDPTag, String>
+
+enum DataChannelIDTag {}
+typealias DataChannelID = Tagged<DataChannelIDTag, Int32>
