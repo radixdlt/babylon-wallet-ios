@@ -166,13 +166,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
 		if
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
-			let destination = Destinations.State(for: nextRequest, in: state.remoteInteraction, with: state.dappMetadata),
-			state.root != destination,
-			state.path.last != destination
+			let destination = Destinations.State(for: nextRequest, in: state.remoteInteraction, with: state.dappMetadata)
 		{
 			if state.root == nil {
 				state.root = destination
-			} else {
+			} else if state.path.last != destination {
 				state.path.append(destination)
 			}
 			return .none
