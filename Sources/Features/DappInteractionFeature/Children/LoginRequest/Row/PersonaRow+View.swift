@@ -2,78 +2,6 @@ import FeaturePrelude
 
 // MARK: - PersonaRow.View
 extension PersonaRow {
-	@MainActor
-	struct View: SwiftUI.View {
-		let store: StoreOf<PersonaRow>
-	}
-}
-
-extension PersonaRow.View {
-	var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			VStack(alignment: .leading, spacing: .zero) {
-				ZStack {
-					HStack(alignment: .center) {
-						Circle()
-							.strokeBorder(Color.app.gray3, lineWidth: 1)
-							.background(Circle().fill(Color.app.gray4))
-							.frame(.small)
-							.padding(.trailing, .small1)
-
-						VStack(alignment: .leading, spacing: 4) {
-							Text(viewStore.name)
-								.foregroundColor(.app.gray1)
-								.textStyle(.secondaryHeader)
-
-							if let numberOfSharedAccounts = viewStore.numberOfSharedAccounts {
-								Text(L10n.DApp.LoginRequest.Row.sharing)
-									.foregroundColor(.app.gray2)
-									.textStyle(.body2Header)
-
-								Text(numberOfSharedAccounts)
-									.foregroundColor(.app.gray2)
-									.textStyle(.body2Regular)
-							}
-						}
-
-						Spacer()
-					}
-
-					HStack {
-						Spacer()
-						RadioButton(state: viewStore.selectionState)
-					}
-				}
-				.padding(.medium2)
-
-				if let lastLogin = viewStore.lastLogin {
-					Group {
-						Color.app.gray4
-							.frame(height: 1)
-
-						Text(lastLogin)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body2Regular)
-							.padding(.horizontal, .medium2)
-							.padding(.vertical, .small1)
-					}
-				}
-			}
-			.background(Color.app.gray5)
-			.cornerRadius(.small1)
-			.onTapGesture {
-				viewStore.send(.didSelect)
-			}
-		}
-	}
-}
-
-// MARK: - PersonaRow.View.ViewState
-extension PersonaRow.View {
 	struct ViewState: Equatable {
 		let name: String
 		let lastLogin: String?
@@ -102,6 +30,73 @@ extension PersonaRow.View {
 			}
 
 			selectionState = state.isSelected ? .selected : .unselected
+		}
+	}
+
+	@MainActor
+	struct View: SwiftUI.View {
+		let store: StoreOf<PersonaRow>
+
+		var body: some SwiftUI.View {
+			WithViewStore(
+				store,
+				observe: ViewState.init(state:),
+				send: { .view($0) }
+			) { viewStore in
+				VStack(alignment: .leading, spacing: .zero) {
+					ZStack {
+						HStack(alignment: .center) {
+							Circle()
+								.strokeBorder(Color.app.gray3, lineWidth: 1)
+								.background(Circle().fill(Color.app.gray4))
+								.frame(.small)
+								.padding(.trailing, .small1)
+
+							VStack(alignment: .leading, spacing: 4) {
+								Text(viewStore.name)
+									.foregroundColor(.app.gray1)
+									.textStyle(.secondaryHeader)
+
+								if let numberOfSharedAccounts = viewStore.numberOfSharedAccounts {
+									Text(L10n.DApp.LoginRequest.Row.sharing)
+										.foregroundColor(.app.gray2)
+										.textStyle(.body2Header)
+
+									Text(numberOfSharedAccounts)
+										.foregroundColor(.app.gray2)
+										.textStyle(.body2Regular)
+								}
+							}
+
+							Spacer()
+						}
+
+						HStack {
+							Spacer()
+							RadioButton(state: viewStore.selectionState)
+						}
+					}
+					.padding(.medium2)
+
+					if let lastLogin = viewStore.lastLogin {
+						Group {
+							Color.app.gray4
+								.frame(height: 1)
+
+							Text(lastLogin)
+								.foregroundColor(.app.gray2)
+								.textStyle(.body2Regular)
+								.padding(.horizontal, .medium2)
+								.padding(.vertical, .small1)
+						}
+					}
+				}
+				.background(Color.app.gray5)
+				.cornerRadius(.small1)
+				.onTapGesture {
+					viewStore.send(.didSelect)
+				}
+			}
 		}
 	}
 }
