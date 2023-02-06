@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - PersonaRow.State
-extension PersonaRow {
+// MARK: - PersonaRow
+struct PersonaRow: Sendable, FeatureReducer {
 	struct State: Sendable, Equatable, Hashable {
 		let persona: OnNetwork.Persona
 		var isSelected: Bool
@@ -12,12 +12,27 @@ extension PersonaRow {
 			persona: OnNetwork.Persona,
 			isSelected: Bool,
 			lastLogin: Date?,
-			numberOfSharedAccounts: UInt = 0
+			numberOfSharedAccounts: UInt
 		) {
 			self.persona = persona
 			self.isSelected = isSelected
 			self.lastLogin = lastLogin
 			self.numberOfSharedAccounts = numberOfSharedAccounts
+		}
+	}
+
+	enum ViewAction: Sendable, Equatable {
+		case didSelect
+	}
+
+	enum DelegateAction: Sendable, Equatable {
+		case didSelect
+	}
+
+	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .didSelect:
+			return .send(.delegate(.didSelect))
 		}
 	}
 }

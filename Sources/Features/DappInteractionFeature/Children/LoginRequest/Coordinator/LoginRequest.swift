@@ -90,7 +90,8 @@ struct LoginRequest: Sendable, FeatureReducer {
 					return PersonaRow.State(
 						persona: persona,
 						isSelected: lastLogin != nil,
-						lastLogin: lastLogin
+						lastLogin: lastLogin,
+						numberOfSharedAccounts: 0 // TODO: implement
 					)
 				}
 				.sorted(by: { $0.isSelected && !$1.isSelected })
@@ -102,12 +103,7 @@ struct LoginRequest: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		// TODO: @Nikola this should be:
-		// case let .persona(id: id, action: .delegate(.didSelect)):
-		//
-		// We should never observe non-delegate actions from parent reducers, even
-		// if the actions are the same name and shape.
-		case let .persona(id: id, action: .view(.didSelect)):
+		case let .persona(id: id, action: .delegate(.didSelect)):
 			state.personas.forEach {
 				if $0.id == id {
 					if !$0.isSelected {
@@ -118,6 +114,7 @@ struct LoginRequest: Sendable, FeatureReducer {
 				}
 			}
 			return .none
+
 		default:
 			return .none
 		}
