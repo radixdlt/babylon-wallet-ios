@@ -65,6 +65,10 @@ public enum L10n {
   public enum ConnectedDApp {
     /// Here are the Personas that you have previously used to connect to this dApp.
     public static let body = L10n.tr("Localizable", "connectedDApp.body", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
+    /// Domains:
+    public static let domainsHeading = L10n.tr("Localizable", "connectedDApp.domainsHeading", fallback: "Domains:")
+    /// Tokens:
+    public static let tokensHeading = L10n.tr("Localizable", "connectedDApp.tokensHeading", fallback: "Tokens:")
   }
   public enum ConnectedDApps {
     /// Here are all the Decentralized Apps that you have connected to with this Radix Wallet.

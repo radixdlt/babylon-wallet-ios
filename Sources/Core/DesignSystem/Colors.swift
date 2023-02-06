@@ -93,7 +93,7 @@ public extension Color.App {
 	var buttonTextBlack: Color { .black }
 	var buttonTextBlackTransparent: Color { .black.opacity(0.6) }
 
-	var shadowBlack: Color { .black.opacity(0.08) }
+	var shadowBlack: Color { .black.opacity(0.15) }
 
 	// gradient
 	var account0green: Color { .init(hex: .account0green) }

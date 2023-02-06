@@ -30,13 +30,14 @@ public struct ConnectedDApp: Sendable, FeatureReducer {
 public extension ConnectedDApp {
 	struct State: Sendable, Hashable {
 		public let name: String
-
 		public let personas: [DAppPersonaRowModel] = .debug
+		public let dApp: ConnectedDAppModel
 
 		public var selectedPersona: PresentationStateOf<DAppPersona>
 		
 		public init(name: String, selectedPersona: PresentationStateOf<DAppPersona> = .dismissed) {
 			self.name = name
+			self.dApp = .debug(name)
 			self.selectedPersona = selectedPersona
 		}
 	}
@@ -57,6 +58,23 @@ public extension ConnectedDApp {
 
 // MARK: - For Debugging
 
+public struct ConnectedDAppModel: Identifiable, Hashable, Sendable {
+	public let id: UUID = .init()
+	let name: String
+	let description: String
+	let domainNames: [String]
+	let tokens: Int
+}
+
+extension ConnectedDAppModel {
+	static func debug(_ name: String) -> ConnectedDAppModel {
+		.init(name: name,
+			  description: .lorem,
+			  domainNames: ["https://nft.nike.com", "https://meta-radix.xyz"],
+			  tokens: .random(in: 5...20))
+	}
+}
+
 public struct DAppPersonaRowModel: Identifiable, Hashable, Sendable {
 	public let id: UUID = .init()
 	let thumbnail: URL = .placeholder
@@ -73,3 +91,8 @@ extension [DAppPersonaRowModel] {
 		.init(name: "RonaldMcD", personalDataCount: 2, accountCount: 1)
 	]
 }
+
+extension String {
+	static let lorem: String = "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt."
+}
+

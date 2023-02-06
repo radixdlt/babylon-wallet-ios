@@ -15,12 +15,11 @@ public extension ConnectedDApp {
 
 // MARK: - Body
 
-// icon, name, description, associated domain name(s), maybe even associated tokens/NFTs
-
 public extension ConnectedDApp.View {
 	struct ViewState: Equatable {
 		let name: String
 		let personas: [DAppPersonaRowModel]
+		let dApp: ConnectedDAppModel
 	}
 	
 	var body: some View {
@@ -30,12 +29,9 @@ public extension ConnectedDApp.View {
 			send: { .view($0) }
 		) { viewStore in
 			ScrollView {
-				VStack(spacing: 0) {
-					Text("A dApp called \(viewStore.name)")
-						.padding(50)
-						.border(.orange)
-						.padding(10)
-					
+				VStack(alignment: .leading, spacing: 0) {
+					ConnectedDAppHeader(model: viewStore.dApp)
+									
 					BodyText(L10n.ConnectedDApp.body)
 					
 					VStack(spacing: .medium3) {
@@ -70,7 +66,9 @@ private extension ConnectedDApp.Store {
 private extension ConnectedDApp.State {
 	var viewState: ConnectedDApp.View.ViewState {
 		.init(name: name,
-			  personas: personas)
+			  personas: personas,
+			  dApp: dApp
+		)
 	}
 }
 
@@ -89,14 +87,54 @@ public extension View {
 
 // TODO: • Move somewhere else
 
-public struct DAppPersonaCard: View {
-	private let model: DAppPersonaRowModel
-	
-	public init(model: DAppPersonaRowModel) {
-		self.model = model
+struct ConnectedDAppHeader: View {
+	let model: ConnectedDAppModel
+		
+	var body: some View {
+		VStack(alignment: .leading, spacing: .small2) {
+			HStack(alignment: .top, spacing: .small2) {
+				DAppPlaceholder(large: true)
+				
+				if model.domainNames.count > 0 {
+					VStack(alignment: .leading, spacing: 0) {
+						Text(L10n.ConnectedDApp.domainsHeading)
+							.textStyle(.body2HighImportance)
+							.padding(.bottom, .small2)
+						VStack(alignment: .leading, spacing: .small3) {
+							ForEach(model.domainNames, id: \.self) { domainName in
+								Text(domainName)
+									.textStyle(.body2Header)
+									.foregroundColor(.app.gray2)
+							}
+						}
+					}
+				}
+				Spacer(minLength: 0)
+			}
+			.padding(.top, .medium3)
+
+			BodyText(model.description)
+
+			if model.tokens > 0 {
+				Text(L10n.ConnectedDApp.tokensHeading)
+					.textStyle(.body2HighImportance)
+					.padding(.bottom, .small2)
+				let columns: [GridItem] = [GridItem(.adaptive(minimum: .large1), spacing: .small2)]
+				let tokens = 0..<model.tokens
+				LazyVGrid(columns: columns, spacing: .small2) {
+					ForEach(tokens, id: \.self) { _ in
+						NFTPlaceholder()
+					}
+				}
+			}
+		}
 	}
-	
-	public var body: some View {
+}
+
+struct DAppPersonaCard: View {
+	let model: DAppPersonaRowModel
+		
+	var body: some View {
 		HStack(spacing: 0) {
 			VStack(spacing: 0) {
 				PersonaThumbnail(model.thumbnail)
@@ -123,14 +161,14 @@ public struct DAppPersonaCard: View {
 			Spacer()
 			Image(asset: AssetResource.chevronRight)
 				.foregroundColor(.app.gray1)
-				.padding(.trailing, .medium3)
+				.padding(.trailing, 2)
 		}
 		.padding(.medium2)
 		.background {
 			VStack {
 				RoundedRectangle(cornerRadius: .small1)
 					.fill(.app.gray5)
-					.shadow(color: .app.shadowBlack, radius: .small2, x: 0, y: .small3)
+					.shadow(color: .app.shadowBlack, radius: .small2, x: .zero, y: .small2)
 			}
 		}
 	}
@@ -154,4 +192,3 @@ public struct PersonaThumbnail: View {
 		.frame(.small)
 	}
 }
-
