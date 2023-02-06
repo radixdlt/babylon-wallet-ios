@@ -75,10 +75,24 @@ struct LoginRequest: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .personasLoaded(personas, authorizedPersona):
-			state.authorizedPersona = authorizedPersona
-			// TODO: @Nikola map personas to rows, putting the authorized persona up at the top
-//			state.personas = ...
+		case let .personasLoaded(personas, authorizedPersonaSimple):
+			state.personas = .init(uniqueElements:
+				personas.map { (persona: OnNetwork.Persona) in
+					let lastLogin: Date? = {
+						guard let authorizedPersonaSimple else { return nil }
+						return persona.address == authorizedPersonaSimple.identityAddress
+							? authorizedPersonaSimple.lastLogin
+							: nil
+					}()
+					return PersonaRow.State(
+						persona: persona,
+						isSelected: lastLogin != nil,
+						lastLogin: lastLogin
+					)
+				}
+				.sorted(by: { $0.isSelected && !$1.isSelected })
+			)
+			state.authorizedPersona = authorizedPersonaSimple
 			return .none
 		}
 	}
