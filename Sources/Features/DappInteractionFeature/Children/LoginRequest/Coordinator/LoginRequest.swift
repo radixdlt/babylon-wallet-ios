@@ -43,6 +43,13 @@ struct LoginRequest: Sendable, FeatureReducer {
 
 	@Dependency(\.profileClient) var profileClient
 
+	var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.forEach(\.personas, action: /Action.child .. ChildAction.persona) {
+				PersonaRow()
+			}
+	}
+
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
