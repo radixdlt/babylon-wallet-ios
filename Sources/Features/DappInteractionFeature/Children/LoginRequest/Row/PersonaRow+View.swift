@@ -56,16 +56,6 @@ extension PersonaRow {
 								Text(viewStore.name)
 									.foregroundColor(.app.gray1)
 									.textStyle(.secondaryHeader)
-
-								if let numberOfSharedAccounts = viewStore.numberOfSharedAccounts {
-									Text(L10n.DApp.LoginRequest.Row.sharing)
-										.foregroundColor(.app.gray2)
-										.textStyle(.body2Header)
-
-									Text(numberOfSharedAccounts)
-										.foregroundColor(.app.gray2)
-										.textStyle(.body2Regular)
-								}
 							}
 
 							Spacer()
