@@ -43,7 +43,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			self.dappMetadata = dappMetadata
 			self.remoteInteraction = remoteInteraction
 
-			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction)) {
+			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
 				self.interactionItems = interactionItems
 				self.root = Destinations.State(for: interactionItems.first, in: remoteInteraction, with: dappMetadata)
 			} else {
@@ -134,9 +134,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 }
 
 extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
-	init(for remoteInteraction: DappInteractionFlow.State.RemoteInteraction) {
+	init(for remoteInteractionItems: some Collection<DappInteractionFlow.State.RemoteInteractionItem>) {
 		self.init(
-			remoteInteraction.erasedItems
+			remoteInteractionItems
 				.sorted(by: { $0.priority < $1.priority })
 				.reduce(into: []) { items, currentItem in
 					switch currentItem {
