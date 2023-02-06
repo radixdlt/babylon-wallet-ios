@@ -12,9 +12,7 @@ struct ChooseAccounts: Sendable, ReducerProtocol {
 			switch action {
 			case .internal(.view(.continueButtonTapped)):
 				let selectedAccounts = IdentifiedArrayOf(uniqueElements: state.selectedAccounts.map(\.account))
-				return .run { send in
-					await send(.delegate(.continueButtonTapped(selectedAccounts)))
-				}
+				return .send(.delegate(.continueButtonTapped(state.interactionItem, selectedAccounts)))
 
 			case .internal(.view(.dismissButtonTapped)):
 				return .run { send in

@@ -23,14 +23,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		}
 
 		enum LocalInteractionResponseItem: Sendable, Hashable {
-			case permissionGranted(Permission.State.PermissionKind)
+			case permissionGranted
 		}
 
 		let dappMetadata: DappMetadata
 		let remoteInteraction: RemoteInteraction
 
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
-		var responseItems: [AnyInteractionItem: AnyInteractionResponseItem] = [:]
+		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
 
 		var root: Destinations.State?
 		@NavigationStateOf<Destinations>
@@ -115,21 +115,51 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
 		case .backButtonTapped:
-			_ = state.path.popLast()
-			return .none
+			return goBackEffect(for: &state)
 		}
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case
-			let .root(.login(.delegate(.continueButtonTapped(persona, authorizedPersona)))),
-			let .path(.element(_, .login(.delegate(.continueButtonTapped(persona, authorizedPersona))))):
-			state.path.append(.chooseAccounts(.previewValue)) // TODO: proper handling
-			return .none
+			let .root(.login(.delegate(.continueButtonTapped(item, persona, authorizedPersona)))),
+			let .path(.element(_, .login(.delegate(.continueButtonTapped(item, persona, authorizedPersona))))):
+			let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withoutChallenge(.init(
+				identityAddress: persona.address.address
+			)))))
+			state.responseItems[item] = responseItem
+			return continueEffect(for: &state)
+		case
+			let .root(.permission(.delegate(.continueButtonTapped(item)))),
+			let .path(.element(_, .permission(.delegate(.continueButtonTapped(item))))):
+			let responseItem: State.AnyInteractionResponseItem = .local(.permissionGranted)
+			state.responseItems[item] = responseItem
+			return continueEffect(for: &state)
 		default:
 			return .none
 		}
+	}
+
+	func continueEffect(for state: inout State) -> EffectTask<Action> {
+		if
+			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
+			let destination = Destinations.State(for: nextRequest, in: state.remoteInteraction, with: state.dappMetadata)
+		{
+			if state.root == nil {
+				state.root = destination
+			} else {
+				state.path.append(destination)
+			}
+			return .none
+		} else {
+			return .run { _ in } // TODO: flow is finished, submit response!
+		}
+	}
+
+	func goBackEffect(for state: inout State) -> EffectTask<Action> {
+		state.responseItems.removeLast()
+		state.path.removeLast()
+		return .none
 	}
 }
 
@@ -157,25 +187,28 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 
 extension DappInteractionFlow.Destinations.State {
 	init?(
-		for item: DappInteractionFlow.State.AnyInteractionItem,
+		for anyItem: DappInteractionFlow.State.AnyInteractionItem,
 		in interaction: DappInteractionFlow.State.RemoteInteraction,
 		with dappMetadata: DappMetadata
 	) {
-		switch item {
+		switch anyItem {
 		case .remote(.auth(.usePersona)):
 			return nil
 		case .remote(.auth(.login(_))): // TODO: bind to item when implementing auth challenge
 			self = .login(.init(
+				interactionItem: anyItem,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata
 			))
 		case let .local(.permissionRequested(permissionKind)):
 			self = .permission(.init(
+				interactionItem: anyItem,
 				permissionKind: permissionKind,
 				dappMetadata: dappMetadata
 			))
 		case let .remote(.ongoingAccounts(item)):
 			self = .chooseAccounts(.init(
+				interactionItem: anyItem,
 				accessKind: .ongoing,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata,
@@ -183,6 +216,7 @@ extension DappInteractionFlow.Destinations.State {
 			))
 		case let .remote(.oneTimeAccounts(item)):
 			self = .chooseAccounts(.init(
+				interactionItem: anyItem,
 				accessKind: .oneTime,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata,

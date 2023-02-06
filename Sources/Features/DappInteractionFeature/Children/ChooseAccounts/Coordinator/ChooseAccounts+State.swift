@@ -9,6 +9,7 @@ extension ChooseAccounts {
 			case oneTime
 		}
 
+		let interactionItem: DappInteractionFlow.State.AnyInteractionItem! // TODO: @davdroman factor out onto Proxy reducer
 		let accessKind: AccessKind
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
@@ -17,6 +18,7 @@ extension ChooseAccounts {
 		var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		init(
+			interactionItem: DappInteractionFlow.State.AnyInteractionItem!,
 			accessKind: AccessKind,
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
@@ -24,6 +26,7 @@ extension ChooseAccounts {
 			availableAccounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = [],
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil
 		) {
+			self.interactionItem = interactionItem
 			self.accessKind = accessKind
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
@@ -44,6 +47,7 @@ extension ChooseAccounts.State {
 #if DEBUG
 extension ChooseAccounts.State {
 	static let previewValue: Self = .init(
+		interactionItem: nil,
 		accessKind: .oneTime,
 		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 		dappMetadata: .previewValue,

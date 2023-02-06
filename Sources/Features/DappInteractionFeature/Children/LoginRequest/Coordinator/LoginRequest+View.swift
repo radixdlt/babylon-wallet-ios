@@ -130,10 +130,7 @@ extension LoginRequest.View {
 			canProceed = state.selectedPersona != nil
 
 			if let persona = state.selectedPersona {
-				continueButtonRequirements = .init(
-					persona: persona,
-					authorizedPersona: state.authorizedPersona
-				)
+				continueButtonRequirements = .init(persona: persona)
 			} else {
 				continueButtonRequirements = nil
 			}
@@ -159,6 +156,7 @@ struct LoginRequest_Preview: PreviewProvider {
 
 extension LoginRequest.State {
 	static let previewValue: Self = .init(
+		interactionItem: nil,
 		dappDefinitionAddress: try! .init(address: "DappDefinitionAddress"),
 		dappMetadata: .previewValue
 	)
