@@ -108,6 +108,9 @@ import ProfileClient
 
 extension ProfileClient {
 	static let previewValueTwoPersonas = with(noop) {
+		$0.getAccounts = {
+			NonEmpty(.previewValue0, .previewValue1)
+		}
 		$0.getPersonas = {
 			[.previewValue0, .previewValue1]
 		}
