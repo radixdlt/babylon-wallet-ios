@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - Permission.State
-extension Permission {
+// MARK: - Permission
+struct Permission: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let permissionKind: DappInteraction.PermissionKind
 		let dappMetadata: DappMetadata
@@ -12,6 +12,17 @@ extension Permission {
 		) {
 			self.permissionKind = permissionKind
 			self.dappMetadata = dappMetadata
+		}
+	}
+
+	enum ViewAction: Sendable, Equatable {
+		case appeared
+	}
+
+	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .appeared:
+			return .none
 		}
 	}
 }
