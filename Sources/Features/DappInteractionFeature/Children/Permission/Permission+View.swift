@@ -3,13 +3,10 @@ import FeaturePrelude
 // MARK: - Permission.View
 extension Permission {
 	struct ViewState: Equatable {
-		let dappName: String
 		let title: String
-		let subtitle: String
+		let subtitle: AttributedString
 
 		init(state: Permission.State) {
-			dappName = state.dappMetadata.name
-
 			switch state.permissionKind {
 			case .accounts:
 				title = "Account Permission"
@@ -17,11 +14,18 @@ extension Permission {
 				title = "Personal Data Permission"
 			}
 
+			let dappName = AttributedString(state.dappMetadata.name, attributes: .init([.foregroundColor: Color.app.gray1]))
 			switch state.permissionKind {
 			case .accounts:
-				subtitle = " is requesting permission to always be able to view account information when you login with this Persona."
+				subtitle = dappName + AttributedString(
+					" is requesting permission to always be able to view account information when you login with this Persona.",
+					attributes: .init([.foregroundColor: Color.app.gray2])
+				)
 			case .personaData:
-				subtitle = " is requesting permission to always be able to view the following personal data when you login with this Persona."
+				subtitle = dappName + AttributedString(
+					" is requesting permission to always be able to view the following personal data when you login with this Persona.",
+					attributes: .init([.foregroundColor: Color.app.gray2])
+				)
 			}
 		}
 	}
@@ -46,12 +50,9 @@ extension Permission {
 									.foregroundColor(.app.gray1)
 									.textStyle(.sheetTitle)
 
-								subtitle(
-									dappName: viewStore.dappName,
-									message: viewStore.subtitle
-								)
-								.textStyle(.secondaryHeader)
-								.multilineTextAlignment(.center)
+								Text(viewStore.subtitle)
+									.textStyle(.secondaryHeader)
+									.multilineTextAlignment(.center)
 							}
 							.padding(.bottom, .medium2)
 
@@ -107,16 +108,6 @@ private extension Permission.View {
 		Color.app.gray4
 			.frame(.medium)
 			.cornerRadius(.medium3)
-	}
-
-	func subtitle(dappName: String, message: String) -> some View {
-		var component1 = AttributedString(dappName)
-		component1.foregroundColor = .app.gray1
-
-		var component2 = AttributedString(message)
-		component2.foregroundColor = .app.gray2
-
-		return Text(component1 + component2)
 	}
 }
 
