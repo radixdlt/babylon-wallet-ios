@@ -57,8 +57,8 @@ struct LoginRequest: Sendable, FeatureReducer {
 							return
 						}
 						if
-							let lastLoginDate = mostRecentlyAuthorizedPersona?.lastLoginDate,
-							currentAuthorizedPersona.lastLoginDate > lastLoginDate
+							let lastLogin = mostRecentlyAuthorizedPersona?.lastLogin,
+							currentAuthorizedPersona.lastLogin > lastLogin
 						{
 							mostRecentlyAuthorizedPersona = currentAuthorizedPersona
 						}

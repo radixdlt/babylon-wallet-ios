@@ -5,16 +5,16 @@ extension PersonaRow {
 	struct State: Sendable, Equatable, Hashable {
 		let persona: OnNetwork.Persona
 		var isSelected: Bool
-		let lastLoginDate: Date?
+		let lastLogin: Date?
 
 		init(
 			persona: OnNetwork.Persona,
 			isSelected: Bool,
-			lastLoginDate: Date?
+			lastLogin: Date?
 		) {
 			self.persona = persona
 			self.isSelected = isSelected
-			self.lastLoginDate = lastLoginDate
+			self.lastLogin = lastLogin
 		}
 	}
 }
@@ -31,7 +31,7 @@ extension PersonaRow.State {
 	static let previewValue: Self = .init(
 		persona: .previewValue0,
 		isSelected: true,
-		lastLoginDate: nil
+		lastLogin: nil
 	)
 }
 #endif

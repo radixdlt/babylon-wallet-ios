@@ -51,12 +51,12 @@ extension PersonaRow.View {
 				}
 				.padding(.medium2)
 
-				if let lastLoginDate = viewStore.lastLoginDate {
+				if let lastLogin = viewStore.lastLogin {
 					Group {
 						Color.app.gray4
 							.frame(height: 1)
 
-						Text(lastLoginDate)
+						Text(lastLogin)
 							.foregroundColor(.app.gray2)
 							.textStyle(.body2Regular)
 							.padding(.horizontal, .medium2)
@@ -77,12 +77,12 @@ extension PersonaRow.View {
 extension PersonaRow.View {
 	struct ViewState: Equatable {
 		let name: String
-		let lastLoginDate: String?
+		let lastLogin: String?
 		let selectionState: RadioButton.State
 
 		init(state: PersonaRow.State) {
 			name = state.persona.displayName.rawValue.nilIfBlank ?? "Unknown Dapp" // FIXME: @Nikola sorry, I think L10n.DApp.unknownName got lost in the merge
-			lastLoginDate = nil // TODO:
+			lastLogin = nil // TODO:
 			selectionState = state.isSelected ? .selected : .unselected
 		}
 	}
