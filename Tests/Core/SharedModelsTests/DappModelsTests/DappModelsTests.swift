@@ -8,13 +8,13 @@ final class ToDappResponseTests: TestCase {
 			items: .request(
 				.unauthorized(.init(
 					oneTimeAccounts: .withoutProof(.init(
-						accounts: .init(
-							rawValue: [.init(
+						accounts: [
+							.init(
 								accountAddress: try! .init(address: "address"),
 								label: "Label",
 								appearanceId: .fromIndex(0)
-							)]
-						)!
+							),
+						]
 					))
 				))
 			)
