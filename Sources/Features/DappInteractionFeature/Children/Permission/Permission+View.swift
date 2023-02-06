@@ -97,12 +97,8 @@ extension Permission {
 	}
 }
 
-// MARK: - Permission.View.PermissionViewStore
 private extension Permission.View {
-	typealias PermissionViewStore = ComposableArchitecture.ViewStore<Permission.ViewState, Permission.ViewAction>
-}
-
-private extension Permission.View {
+	// NB: will most likely belong in ViewState
 	var dappImage: some View {
 		// NOTE: using placeholder until API is available
 		Color.app.gray4
