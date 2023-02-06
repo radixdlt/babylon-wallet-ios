@@ -67,11 +67,18 @@ extension LoginRequest.View {
 						.padding(.horizontal, .medium1)
 					}
 
-					ConfirmationFooter(
-						title: L10n.DApp.LoginRequest.continueButtonTitle,
-						isEnabled: viewStore.canProceed,
-						action: {}
-					)
+					WithControlRequirements(
+						viewStore.continueButtonRequirements,
+						forAction: {
+							viewStore.send(.continueButtonTapped($0.persona, $0.authorizedPersona))
+						}
+					) { action in
+						ConfirmationFooter(
+							title: L10n.DApp.LoginRequest.continueButtonTitle,
+							isEnabled: viewStore.canProceed,
+							action: action
+						)
+					}
 				}
 			}
 			.onAppear {
@@ -126,6 +133,12 @@ extension LoginRequest.View {
 		let title: String
 		let subtitle: String
 		let canProceed: Bool
+		let continueButtonRequirements: ContinueButtonRequirements?
+
+		struct ContinueButtonRequirements: Equatable {
+			let persona: OnNetwork.Persona
+			let authorizedPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
+		}
 
 		init(state: LoginRequest.State) {
 			dappName = state.dappMetadata.name
@@ -136,6 +149,15 @@ extension LoginRequest.View {
 				L10n.DApp.LoginRequest.Subtitle.knownDapp :
 				L10n.DApp.LoginRequest.Subtitle.newDapp
 			canProceed = state.selectedPersona != nil
+
+			if let persona = state.selectedPersona {
+				continueButtonRequirements = .init(
+					persona: persona,
+					authorizedPersona: state.authorizedPersona
+				)
+			} else {
+				continueButtonRequirements = nil
+			}
 		}
 	}
 }
