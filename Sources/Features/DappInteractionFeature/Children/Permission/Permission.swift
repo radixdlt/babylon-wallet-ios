@@ -22,12 +22,19 @@ struct Permission: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared
+		case continueButtonTapped
+	}
+
+	enum DelegateAction: Sendable, Equatable {
+		case continueButtonTapped(State.PermissionKind)
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
 			return .none
+		case .continueButtonTapped:
+			return .send(.delegate(.continueButtonTapped(state.permissionKind)))
 		}
 	}
 }

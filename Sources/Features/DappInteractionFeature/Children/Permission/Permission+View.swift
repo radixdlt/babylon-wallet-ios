@@ -119,7 +119,7 @@ extension Permission {
 						ConfirmationFooter(
 							title: L10n.DApp.LoginRequest.continueButtonTitle,
 							isEnabled: true,
-							action: {}
+							action: { viewStore.send(.continueButtonTapped) }
 						)
 					}
 				}
