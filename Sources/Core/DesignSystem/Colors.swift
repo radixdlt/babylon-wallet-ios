@@ -36,8 +36,25 @@ public extension Color.App {
 	// alert
 	var red1: Color { .init(hex: .red1) }
 
+	@available(*, deprecated, message: "Use dynamic 'background' color instead")
 	var backgroundDark: Color { .black }
+	@available(*, deprecated, message: "Use dynamic 'background' color instead")
 	var backgroundLight: Color { .white }
+	var background: Color {
+		// TODO: convenience func to do this for every semantic color
+		Color(
+			UIColor(dynamicProvider: { traitCollection in
+				switch traitCollection.userInterfaceStyle {
+				case .dark:
+					return .black
+				case .light, .unspecified:
+					return .white
+				@unknown default:
+					return .white
+				}
+			})
+		)
+	}
 
 	var notification: Color { .init(hex: .red1) }
 

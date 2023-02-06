@@ -32,12 +32,16 @@ public extension ConfirmationFooter {
 			.padding(.horizontal, .medium3)
 			.padding(.bottom, .medium1)
 		}
+		.background(Color.app.background.edgesIgnoringSafeArea(.bottom))
 	}
 }
 
 // MARK: - ConfirmationFooter_Previews
 struct ConfirmationFooter_Previews: PreviewProvider {
 	static var previews: some View {
-		ConfirmationFooter(title: "Continue", isEnabled: true, action: {})
+		Color.white
+			.safeAreaInset(edge: .bottom) {
+				ConfirmationFooter(title: "Continue", isEnabled: true, action: {})
+			}
 	}
 }
