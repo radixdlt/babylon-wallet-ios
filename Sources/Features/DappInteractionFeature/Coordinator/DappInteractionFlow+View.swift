@@ -82,11 +82,33 @@ struct DappInteraction_Preview: PreviewProvider {
 			store: .init(
 				initialState: .init(
 					dappMetadata: .previewValue,
-					interaction: .previewValueOneTimeAccount
+					interaction: .init(
+						id: .previewValue0,
+						items: .request(.authorized(.init(
+							auth: .login(.init(challenge: nil)),
+							oneTimeAccounts: .previewValue,
+							ongoingAccounts: .init(
+								numberOfAccounts: .atLeast(2),
+								requiresProofOfOwnership: false
+							)
+						))),
+						metadata: .previewValue
+					)
 				)!,
 				reducer: DappInteractionFlow()
+					.dependency(\.profileClient, .previewValueTwoPersonas)
 			)
 		)
+	}
+}
+
+import ProfileClient
+
+extension ProfileClient {
+	static let previewValueTwoPersonas = with(noop) {
+		$0.getPersonas = {
+			[.previewValue0, .previewValue1]
+		}
 	}
 }
 #endif
