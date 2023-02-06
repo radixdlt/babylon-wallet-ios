@@ -63,6 +63,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case path(NavigationActionOf<Destinations>)
 	}
 
+	enum DelegateAction: Sendable, Equatable {
+		case dismiss
+	}
+
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
 			case login(LoginRequest.State)
@@ -102,6 +106,30 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			.navigationDestination(\.$path, action: /Action.child .. ChildAction.path) {
 				Destinations()
 			}
+	}
+
+	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .appeared:
+			return .none // TODO: handle current case (in case it's usePersona)
+		case .closeButtonTapped:
+			return .send(.delegate(.dismiss))
+		case .backButtonTapped:
+			_ = state.path.popLast()
+			return .none
+		}
+	}
+
+	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case
+			let .root(.login(.delegate(.continueButtonTapped(persona, authorizedPersona)))),
+			let .path(.element(_, .login(.delegate(.continueButtonTapped(persona, authorizedPersona))))):
+			state.path.append(.chooseAccounts(.previewValue)) // TODO: proper handling
+			return .none
+		default:
+			return .none
+		}
 	}
 }
 
