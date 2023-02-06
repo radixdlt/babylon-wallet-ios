@@ -31,5 +31,7 @@ extension ChooseAccounts.Row.Action.InternalAction {
 
 // MARK: - ChooseAccounts.Row.Action.DelegateAction
 extension ChooseAccounts.Row.Action {
-	enum DelegateAction: Sendable, Equatable {}
+	enum DelegateAction: Sendable, Equatable {
+		case didSelect
+	}
 }

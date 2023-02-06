@@ -9,7 +9,10 @@ extension ChooseAccounts {
 }
 
 extension ChooseAccounts.Row {
-	func reduce(into _: inout State, action _: Action) -> ComposableArchitecture.Effect<Action, Never> {
-		.none
+	func reduce(into _: inout State, action: Action) -> ComposableArchitecture.Effect<Action, Never> {
+		switch action {
+		case .internal(.view(.didSelect)):
+			return .send(.delegate(.didSelect))
+		}
 	}
 }
