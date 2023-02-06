@@ -21,13 +21,13 @@ extension Permission.View {
 						VStack(spacing: .medium2) {
 							dappImage
 
-							Text(titleText(with: viewStore))
+							Text(viewStore.title)
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)
 
 							subtitle(
 								dappName: viewStore.dappName,
-								message: subtitleText(with: viewStore)
+								message: viewStore.subtitle
 							)
 							.textStyle(.secondaryHeader)
 							.multilineTextAlignment(.center)
@@ -87,15 +87,6 @@ private extension Permission.View {
 			.cornerRadius(.medium3)
 	}
 
-	func titleText(with viewStore: PermissionViewStore) -> String {
-		switch viewStore.permissionKind {
-		case .accounts:
-			return "Account Permission"
-		case .personaData:
-			return "Personal Data Permission"
-		}
-	}
-
 	func subtitle(dappName: String, message: String) -> some View {
 		var component1 = AttributedString(dappName)
 		component1.foregroundColor = .app.gray1
@@ -105,26 +96,31 @@ private extension Permission.View {
 
 		return Text(component1 + component2)
 	}
-
-	func subtitleText(with viewStore: PermissionViewStore) -> String {
-		switch viewStore.permissionKind {
-		case .accounts:
-			return " is requesting permission to always be able to view account information when you login with this Persona."
-		case .personaData:
-			return " is requesting permission to always be able to view the following personal data when you login with this Persona."
-		}
-	}
 }
 
 // MARK: - Permission.View.ViewState
 extension Permission.View {
 	struct ViewState: Equatable {
-		let permissionKind: DappInteraction.PermissionKind
 		let dappName: String
+		let title: String
+		let subtitle: String
 
 		init(state: Permission.State) {
-			permissionKind = state.permissionKind
 			dappName = state.dappMetadata.name
+
+			switch state.permissionKind {
+			case .accounts:
+				title = "Account Permission"
+			case .personaData:
+				title = "Personal Data Permission"
+			}
+
+			switch state.permissionKind {
+			case .accounts:
+				subtitle = " is requesting permission to always be able to view account information when you login with this Persona."
+			case .personaData:
+				subtitle = " is requesting permission to always be able to view the following personal data when you login with this Persona."
+			}
 		}
 	}
 }
