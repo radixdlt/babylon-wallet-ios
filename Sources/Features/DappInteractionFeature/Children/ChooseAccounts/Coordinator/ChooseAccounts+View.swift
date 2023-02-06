@@ -62,7 +62,7 @@ extension ChooseAccounts.View {
 					ConfirmationFooter(
 						title: L10n.DApp.LoginRequest.continueButtonTitle,
 						isEnabled: viewStore.canProceed,
-						action: {}
+						action: { viewStore.send(.continueButtonTapped) }
 					)
 				}
 			}

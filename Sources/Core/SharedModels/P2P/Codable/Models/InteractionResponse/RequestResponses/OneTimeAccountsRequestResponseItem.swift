@@ -21,16 +21,16 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 	struct OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
 		public let accounts: [P2P.ToDapp.WalletAccount]
 
-		public init(accounts: NonEmpty<[P2P.ToDapp.WalletAccount]>) {
-			self.accounts = accounts.rawValue
+		public init(accounts: [P2P.ToDapp.WalletAccount]) {
+			self.accounts = accounts
 		}
 	}
 
 	struct OneTimeAccountsWithProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
 		public let accounts: [P2P.ToDapp.WalletAccountWithProof]
 
-		public init(accounts: NonEmpty<[P2P.ToDapp.WalletAccountWithProof]>) {
-			self.accounts = accounts.rawValue
+		public init(accounts: [P2P.ToDapp.WalletAccountWithProof]) {
+			self.accounts = accounts
 		}
 	}
 }

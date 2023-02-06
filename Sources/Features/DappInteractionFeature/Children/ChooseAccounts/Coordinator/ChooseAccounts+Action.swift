@@ -46,6 +46,10 @@ extension ChooseAccounts.Action.InternalAction {
 // MARK: - ChooseAccounts.Action.DelegateAction
 extension ChooseAccounts.Action {
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped(DappInteractionFlow.State.AnyInteractionItem, IdentifiedArrayOf<OnNetwork.Account>)
+		case continueButtonTapped(
+			DappInteractionFlow.State.AnyInteractionItem,
+			IdentifiedArrayOf<OnNetwork.Account>,
+			ChooseAccounts.State.AccessKind
+		)
 	}
 }

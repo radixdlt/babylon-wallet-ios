@@ -135,6 +135,19 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			let responseItem: State.AnyInteractionResponseItem = .local(.permissionGranted)
 			state.responseItems[item] = responseItem
 			return continueEffect(for: &state)
+		case
+			let .root(.chooseAccounts(.delegate(.continueButtonTapped(item, accounts, accessKind)))),
+			let .path(.element(_, .chooseAccounts(.delegate(.continueButtonTapped(item, accounts, accessKind))))):
+			let responseItem: State.AnyInteractionResponseItem = {
+				switch accessKind {
+				case .ongoing:
+					return .remote(.ongoingAccounts(.withoutProof(.init(accounts: accounts.map(P2P.ToDapp.WalletAccount.init)))))
+				case .oneTime:
+					return .remote(.oneTimeAccounts(.withoutProof(.init(accounts: accounts.map(P2P.ToDapp.WalletAccount.init)))))
+				}
+			}()
+			state.responseItems[item] = responseItem
+			return continueEffect(for: &state)
 		default:
 			return .none
 		}

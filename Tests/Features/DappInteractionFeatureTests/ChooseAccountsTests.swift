@@ -28,7 +28,7 @@ final class ChooseAccountsTests: TestCase {
 
 		// then
 		let expectedAccounts = IdentifiedArrayOf(uniqueElements: [singleAccount.account])
-		await store.receive(.delegate(.continueButtonTapped(interactionItem, expectedAccounts)))
+		await store.receive(.delegate(.continueButtonTapped(interactionItem, expectedAccounts, .oneTime)))
 	}
 
 	func test_didSelectAccount_whenTappedOnSelectedAccount_thenDeselectThatAccount() async {
