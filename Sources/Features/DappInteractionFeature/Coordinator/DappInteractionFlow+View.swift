@@ -1,4 +1,5 @@
 import FeaturePrelude
+import TransactionSigningFeature
 
 // MARK: - DappInteractionFlow.View
 extension DappInteractionFlow {
@@ -51,11 +52,20 @@ extension DappInteractionFlow {
 					then: { LoginRequest.View(store: $0) }
 				)
 				CaseLet(
+					state: /DappInteractionFlow.Destinations.State.permission,
+					action: DappInteractionFlow.Destinations.Action.permission,
+					then: { Permission.View(store: $0) }
+				)
+				CaseLet(
 					state: /DappInteractionFlow.Destinations.State.chooseAccounts,
 					action: DappInteractionFlow.Destinations.Action.chooseAccounts,
 					then: { ChooseAccounts.View(store: $0) }
 				)
-				// TODO: complete cases
+				CaseLet(
+					state: /DappInteractionFlow.Destinations.State.signAndSubmitTransaction,
+					action: DappInteractionFlow.Destinations.Action.signAndSubmitTransaction,
+					then: { TransactionSigning.View(store: $0) }
+				)
 			}
 		}
 	}
