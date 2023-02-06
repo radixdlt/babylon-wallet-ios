@@ -14,19 +14,33 @@ extension Permission {
 				title = "Personal Data Permission"
 			}
 
-			let dappName = with(AttributedString(state.dappMetadata.name)) {
-				$0.foregroundColor = .app.gray1
-			}
-			subtitle = dappName + with(AttributedString({
+			let normalColor = Color.app.gray2
+			let highlightColor = Color.app.gray1
+			subtitle = AttributedString(state.dappMetadata.name, foregroundColor: highlightColor) + {
+				let always = AttributedString("always", foregroundColor: highlightColor)
 				switch state.permissionKind {
 				case .accounts:
-					return " is requesting permission to always be able to view account information when you login with this Persona." as String
+					return AttributedString(
+						" is requesting permission to ",
+						foregroundColor: normalColor
+					)
+						+ always
+						+ AttributedString(
+							" be able to view account information when you login with this Persona.",
+							foregroundColor: normalColor
+						)
 				case .personaData:
-					return " is requesting permission to always be able to view the following personal data when you login with this Persona." as String
+					return AttributedString(
+						" is requesting permission to ",
+						foregroundColor: normalColor
+					)
+						+ always
+						+ AttributedString(
+							" be able to view the following personal data when you login with this Persona.",
+							foregroundColor: normalColor
+						)
 				}
-			}())) {
-				$0.foregroundColor = .app.gray2
-			}
+			}()
 		}
 	}
 
