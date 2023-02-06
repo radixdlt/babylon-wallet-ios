@@ -196,11 +196,11 @@ final class ProfileTests: TestCase {
 						fieldIDs: .init(persona0.fields.map(\.id)),
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
 						sharedAccounts: try .init(
-							mode: .exactly(.init(
-								arrayLiteral:
+							accountsReferencedByAddress: [
 								secondAccount.address,
-								thirdAccount.address
-							))
+								thirdAccount.address,
+							],
+							forRequest: .exactly(2)
 						)
 					),
 					.init(
@@ -208,10 +208,10 @@ final class ProfileTests: TestCase {
 						fieldIDs: .init(persona1.fields.map(\.id)),
 						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
 						sharedAccounts: try .init(
-							mode: .atLeast(.init(
-								arrayLiteral:
-								secondAccount.address
-							))
+							accountsReferencedByAddress: [
+								secondAccount.address,
+							],
+							forRequest: .atLeast(1)
 						)
 					))
 			)
@@ -219,19 +219,16 @@ final class ProfileTests: TestCase {
 
 		var authorizedPersona0 = connectedDapp.referencesToAuthorizedPersonas[0]
 		XCTAssertThrowsError(
-			try authorizedPersona0.sharedAccounts.updateAccounts(.init(
-				arrayLiteral:
-				secondAccount.address
-			)), "Should not be able to specify another number of accounts if `exactly` was specified."
+			try authorizedPersona0.sharedAccounts.updateAccounts([secondAccount.address]),
+			"Should not be able to specify another number of accounts if `exactly` was specified."
 		)
 
 		var authorizedPersona1 = connectedDapp.referencesToAuthorizedPersonas[1]
 		XCTAssertNoThrow(
-			try authorizedPersona1.sharedAccounts.updateAccounts(.init(
-				arrayLiteral:
+			try authorizedPersona1.sharedAccounts.updateAccounts([
 				secondAccount.address,
-				thirdAccount.address
-			)), "Should be able to specify more accounts if `atLeast` was specified."
+				thirdAccount.address,
+			]), "Should be able to specify more accounts if `atLeast` was specified."
 		)
 
 		connectedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(OnNetwork.Persona.Field.ID()) // add unknown fieldID
@@ -315,7 +312,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			onNetwork.accounts[0].address.address,
-			"account_tdx_b_1qu53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqt2xqvl"
+			"account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f"
 		)
 
 		XCTAssertEqual(
@@ -325,7 +322,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			onNetwork.accounts[1].address.address,
-			"account_tdx_b_1qavvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqxgpf32"
+			"account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu"
 		)
 
 		XCTAssertEqual(
@@ -335,7 +332,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			onNetwork.accounts[2].address.address,
-			"account_tdx_b_1ql2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54ts25dgyv"
+			"account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"
 		)
 
 		XCTAssertEqual(
@@ -344,7 +341,7 @@ final class ProfileTests: TestCase {
 		)
 		XCTAssertEqual(
 			onNetwork.personas[0].address.address,
-			"account_tdx_b_1q7vt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpskvpcn0"
+			"identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm"
 		)
 
 		XCTAssertEqual(
@@ -354,7 +351,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			onNetwork.personas[1].address.address,
-			"account_tdx_b_1qlvtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkschfnr8"
+			"identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pClients.clients.count, 2)
@@ -368,13 +365,14 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(onNetwork.connectedDapps.count, 1)
 		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas.count, 2)
 		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
-		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts.mode, .exactly)
-		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1qavvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqxgpf32", "account_tdx_b_1ql2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54ts25dgyv"])
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts.request.quantifier, .exactly)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts.request.quantity, 2)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu", "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"])
 	}
 
 	func test_version_compatability_check_too_low() throws {
 		let json = """
-		{ "version": 7 }
+		{ "version": 8 }
 		""".data(using: .utf8)!
 
 		XCTAssertThrowsError(
@@ -383,7 +381,7 @@ final class ProfileTests: TestCase {
 			guard let error = anyError as? IncompatibleProfileVersion else {
 				return XCTFail("WrongErrorType")
 			}
-			XCTAssertEqual(error, .init(decodedVersion: 7, minimumRequiredVersion: .minimum))
+			XCTAssertEqual(error, .init(decodedVersion: 8, minimumRequiredVersion: .minimum))
 		}
 	}
 

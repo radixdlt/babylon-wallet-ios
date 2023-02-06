@@ -62,55 +62,34 @@ public extension OnNetwork.ConnectedDapp {
 			Hashable,
 			Codable
 		{
-			public let mode: Mode.Discriminator
-
-			// FIXME: When we have **value** generics we would use something like:
-			// `OrderedSet<N; AccountAddress` (however that would be encodoed)
-			public private(set) var accountsReferencedByAddress: OrderedSet<AccountAddress>
-
-			public mutating func updateAccounts(_ new: OrderedSet<AccountAddress>) throws {
-				switch self.mode {
-				case .exactly:
-					guard new.count == self.accountsReferencedByAddress.count else {
-						struct MustBeExactlyAccountLength: Swift.Error {}
-						throw MustBeExactlyAccountLength()
-					}
-					self.accountsReferencedByAddress = new
-				case .atLeast:
-					guard new.count >= self.accountsReferencedByAddress.count else {
-						struct MustBeSameOrMoreAccounts: Swift.Error {}
-						throw MustBeSameOrMoreAccounts()
-					}
-					self.accountsReferencedByAddress = new
-				}
-			}
-
-			public enum Mode {
-				case exactly(OrderedSet<AccountAddress>)
-				case atLeast(OrderedSet<AccountAddress>)
-
-				public enum Discriminator:
-					String,
-					Sendable,
-					Hashable,
-					Codable
-				{
+			public struct NumberOfAccounts: Sendable, Hashable, Codable {
+				public enum Quantifier: String, Sendable, Hashable, Codable {
 					case exactly
 					case atLeast
 				}
+
+				public let quantifier: Quantifier
+				public let quantity: Int
+
+				public static func exactly(_ quantity: Int) -> Self {
+					.init(quantifier: .exactly, quantity: quantity)
+				}
+
+				public static func atLeast(_ quantity: Int) -> Self {
+					.init(quantifier: .atLeast, quantity: quantity)
+				}
 			}
 
+			public let request: NumberOfAccounts
+			public private(set) var accountsReferencedByAddress: OrderedSet<AccountAddress>
+
 			public init(
-				mode: Mode
-			) {
-				switch mode {
-				case let .atLeast(accounts):
-					self.mode = .atLeast
-					self.accountsReferencedByAddress = accounts
-				case let .exactly(accounts):
-					self.mode = .exactly
-					self.accountsReferencedByAddress = accounts
-				}
+				accountsReferencedByAddress: OrderedSet<AccountAddress>,
+				forRequest request: NumberOfAccounts
+			) throws {
+				try Self.validate(accountsReferencedByAddress: accountsReferencedByAddress, forRequest: request)
+				self.request = request
+				self.accountsReferencedByAddress = accountsReferencedByAddress
 			}
 		}
 
@@ -125,6 +104,33 @@ public extension OnNetwork.ConnectedDapp {
 			self.lastLogin = lastLogin
 			self.sharedAccounts = sharedAccounts
 		}
+	}
+}
+
+public extension OnNetwork.ConnectedDapp.AuthorizedPersonaSimple.SharedAccounts {
+	static func validate(
+		accountsReferencedByAddress: OrderedSet<AccountAddress>,
+		forRequest request: NumberOfAccounts
+	) throws {
+		switch request.quantifier {
+		case .atLeast:
+			guard accountsReferencedByAddress.count >= request.quantity else {
+				struct NotEnoughAccountsProvided: Swift.Error {}
+				throw NotEnoughAccountsProvided()
+			}
+		// all good
+		case .exactly:
+			guard accountsReferencedByAddress.count == request.quantity else {
+				struct InvalidNumberOfAccounts: Swift.Error {}
+				throw InvalidNumberOfAccounts()
+			}
+			// all good
+		}
+	}
+
+	mutating func updateAccounts(_ new: OrderedSet<AccountAddress>) throws {
+		try Self.validate(accountsReferencedByAddress: new, forRequest: self.request)
+		self.accountsReferencedByAddress = new
 	}
 }
 

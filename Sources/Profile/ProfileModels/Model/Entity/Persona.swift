@@ -138,6 +138,24 @@ public extension OnNetwork.Persona {
 	}
 }
 
+import Cryptography
+import EngineToolkit
+public extension OnNetwork.Persona {
+	static func deriveAddress(
+		networkID: NetworkID,
+		publicKey: SLIP10.PublicKey
+	) throws -> EntityAddress {
+		let response = try EngineToolkit().deriveVirtualIdentityAddressRequest(
+			request: .init(
+				publicKey: publicKey.intoEngine(),
+				networkId: networkID
+			)
+		).get()
+
+		return try EntityAddress(address: response.virtualIdentityAddress.address)
+	}
+}
+
 public extension OnNetwork.Persona.Field {
 	typealias ID = UUID
 	typealias Value = NonEmpty<String>

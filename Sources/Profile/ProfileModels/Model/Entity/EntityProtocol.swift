@@ -13,6 +13,11 @@ public protocol EntityProtocol: Sendable, Equatable {
 
 	static var entityKind: EntityKind { get }
 
+	static func deriveAddress(
+		networkID: NetworkID,
+		publicKey: SLIP10.PublicKey
+	) throws -> EntityAddress
+
 	/// The ID of the network this entity exists on.
 	var networkID: NetworkID { get }
 

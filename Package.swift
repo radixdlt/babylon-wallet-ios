@@ -421,7 +421,7 @@ package.addModules([
 		category: .profile,
 		dependencies: [
 			"Cryptography",
-			"EngineToolkitModels",
+			"EngineToolkit", // address derivation
 			"P2PModels",
 		],
 		tests: .no
