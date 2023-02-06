@@ -3,12 +3,15 @@ import FeatureTestingPrelude
 
 @MainActor
 final class ChooseAccountsTests: TestCase {
+	let interactionItem: DappInteractionFlow.State.AnyInteractionItem = .local(.permissionRequested(.accounts(.exactly(2))))
+
 	func test_continueFromChooseAccounts_whenTappedOnContinue_thenFinishAccountSelection() async {
 		// given
 		var singleAccount = ChooseAccounts.Row.State.previewValueOne
 		singleAccount.isSelected = true
 		let store = TestStore(
 			initialState: ChooseAccounts.State(
+				interactionItem: interactionItem,
 				accessKind: .oneTime,
 				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 				dappMetadata: .init(name: "Dapp name", description: "A description"),
@@ -25,13 +28,14 @@ final class ChooseAccountsTests: TestCase {
 
 		// then
 		let expectedAccounts = IdentifiedArrayOf(uniqueElements: [singleAccount.account])
-		await store.receive(.delegate(.continueButtonTapped(expectedAccounts)))
+		await store.receive(.delegate(.continueButtonTapped(interactionItem, expectedAccounts)))
 	}
 
 	func test_dismissChooseAccounts_whenTappedOnDismiss_thenCoordinateDismissal() async {
 		// given
 		let store = TestStore(
 			initialState: ChooseAccounts.State(
+				interactionItem: interactionItem,
 				accessKind: .oneTime,
 				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 				dappMetadata: .init(name: "Dapp name", description: "A description"),
@@ -53,6 +57,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = true
 
 		let initialState: ChooseAccounts.State = .init(
+			interactionItem: interactionItem,
 			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
@@ -85,6 +90,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
+			interactionItem: interactionItem,
 			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
@@ -121,6 +127,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
+			interactionItem: interactionItem,
 			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
@@ -153,6 +160,7 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
+			interactionItem: interactionItem,
 			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
