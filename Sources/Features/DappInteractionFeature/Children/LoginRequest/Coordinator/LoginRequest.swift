@@ -39,8 +39,6 @@ struct LoginRequest: Sendable, FeatureReducer {
 		case continueButtonTapped(OnNetwork.Persona, OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?)
 	}
 
-	init() {}
-
 	@Dependency(\.profileClient) var profileClient
 
 	var body: some ReducerProtocolOf<Self> {
