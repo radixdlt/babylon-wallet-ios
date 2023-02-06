@@ -95,4 +95,12 @@ struct PersonaRow_Preview: PreviewProvider {
 		)
 	}
 }
+
+extension PersonaRow.State {
+	static let previewValue: Self = .init(
+		persona: .previewValue0,
+		isSelected: true,
+		lastLogin: Date()
+	)
+}
 #endif

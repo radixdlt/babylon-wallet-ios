@@ -5,6 +5,7 @@ extension Permission {
 	struct ViewState: Equatable {
 		let title: String
 		let subtitle: AttributedString
+		let numberOfAccounts: String
 
 		init(state: Permission.State) {
 			switch state.permissionKind {
@@ -41,6 +42,22 @@ extension Permission {
 						)
 				}
 			}()
+
+			switch state.permissionKind {
+			case let .accounts(numberOfAccounts):
+				switch (numberOfAccounts.quantifier, numberOfAccounts.quantity) {
+				case (.atLeast, 0):
+					self.numberOfAccounts = "Any accounts"
+				case let (.atLeast, number):
+					self.numberOfAccounts = "\(number) or more accounts"
+				case (.exactly, 1):
+					self.numberOfAccounts = "1 account"
+				case let (.exactly, number):
+					self.numberOfAccounts = "\(number) accounts"
+				}
+			case .personalData:
+				self.numberOfAccounts = ""
+			}
 		}
 	}
 
@@ -72,7 +89,7 @@ extension Permission {
 
 							VStack {
 								HStack {
-									Text("• 2 or more accounts")
+									Text("• " + viewStore.numberOfAccounts)
 										.foregroundColor(.app.gray1)
 										.textStyle(.body1Regular)
 										.padding([.horizontal, .vertical], .medium1)

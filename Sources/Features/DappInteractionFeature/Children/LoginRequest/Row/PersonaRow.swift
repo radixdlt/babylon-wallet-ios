@@ -36,13 +36,3 @@ struct PersonaRow: Sendable, FeatureReducer {
 		}
 	}
 }
-
-#if DEBUG
-extension PersonaRow.State {
-	static let previewValue: Self = .init(
-		persona: .previewValue0,
-		isSelected: true,
-		lastLogin: Date()
-	)
-}
-#endif
