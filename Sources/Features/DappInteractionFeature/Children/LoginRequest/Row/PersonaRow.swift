@@ -2,7 +2,10 @@ import FeaturePrelude
 
 // MARK: - PersonaRow
 struct PersonaRow: Sendable, FeatureReducer {
-	struct State: Sendable, Equatable, Hashable {
+	struct State: Sendable, Equatable, Hashable, Identifiable {
+		typealias ID = IdentityAddress
+
+		var id: ID { persona.address }
 		let persona: OnNetwork.Persona
 		var isSelected: Bool
 		let lastLogin: Date?
@@ -35,13 +38,6 @@ struct PersonaRow: Sendable, FeatureReducer {
 			return .send(.delegate(.didSelect))
 		}
 	}
-}
-
-// MARK: - PersonaRow.State + Identifiable
-extension PersonaRow.State: Identifiable {
-	typealias ID = IdentityAddress
-	var address: IdentityAddress { persona.address }
-	var id: ID { address }
 }
 
 #if DEBUG
