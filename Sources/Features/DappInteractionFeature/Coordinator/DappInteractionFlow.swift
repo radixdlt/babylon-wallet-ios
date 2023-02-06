@@ -111,7 +111,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .none // TODO: handle current case (in case it's usePersona)
+			// TODO: handle usePersona
+			return continueEffect(for: &state)
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
 		case .backButtonTapped:
@@ -138,25 +139,36 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case
 			let .root(.chooseAccounts(.delegate(.continueButtonTapped(item, accounts, accessKind)))),
 			let .path(.element(_, .chooseAccounts(.delegate(.continueButtonTapped(item, accounts, accessKind))))):
-			let responseItem: State.AnyInteractionResponseItem = {
-				switch accessKind {
-				case .ongoing:
-					return .remote(.ongoingAccounts(.withoutProof(.init(accounts: accounts.map(P2P.ToDapp.WalletAccount.init)))))
-				case .oneTime:
-					return .remote(.oneTimeAccounts(.withoutProof(.init(accounts: accounts.map(P2P.ToDapp.WalletAccount.init)))))
-				}
-			}()
-			state.responseItems[item] = responseItem
+			setAccountsResponse(to: item, accounts, accessKind: accessKind, into: &state)
 			return continueEffect(for: &state)
 		default:
 			return .none
 		}
 	}
 
+	func setAccountsResponse(
+		to item: State.AnyInteractionItem,
+		_ accounts: some Collection<OnNetwork.Account>,
+		accessKind: ChooseAccounts.State.AccessKind,
+		into state: inout State
+	) {
+		let responseItem: State.AnyInteractionResponseItem = {
+			switch accessKind {
+			case .ongoing:
+				return .remote(.ongoingAccounts(.withoutProof(.init(accounts: accounts.map(P2P.ToDapp.WalletAccount.init)))))
+			case .oneTime:
+				return .remote(.oneTimeAccounts(.withoutProof(.init(accounts: accounts.map(P2P.ToDapp.WalletAccount.init)))))
+			}
+		}()
+		state.responseItems[item] = responseItem
+	}
+
 	func continueEffect(for state: inout State) -> EffectTask<Action> {
 		if
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
-			let destination = Destinations.State(for: nextRequest, in: state.remoteInteraction, with: state.dappMetadata)
+			let destination = Destinations.State(for: nextRequest, in: state.remoteInteraction, with: state.dappMetadata),
+			state.root != destination,
+			state.path.last != destination
 		{
 			if state.root == nil {
 				state.root = destination

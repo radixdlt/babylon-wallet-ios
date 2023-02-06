@@ -125,8 +125,9 @@ extension ProfileClient {
 					identityAddress: OnNetwork.Persona.previewValue1.address,
 					fieldIDs: [],
 					lastLogin: .now,
-					sharedAccounts: .init(
-						mode: .atLeast([try! AccountAddress(address: "abc")])
+					sharedAccounts: try! .init(
+						accountsReferencedByAddress: [try! AccountAddress(address: "abc")],
+						forRequest: .exactly(1)
 					)
 				),
 			]
