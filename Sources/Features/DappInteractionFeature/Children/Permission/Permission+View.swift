@@ -37,7 +37,7 @@ extension Permission {
 		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
-				observe: ViewState.init(state:),
+				observe: Permission.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
 				ForceFullScreen {
@@ -99,7 +99,7 @@ extension Permission {
 
 private extension Permission.View {
 	// NB: will most likely belong in ViewState
-	var dappImage: some View {
+	var dappImage: some SwiftUI.View {
 		// NOTE: using placeholder until API is available
 		Color.app.gray4
 			.frame(.medium)
@@ -112,7 +112,7 @@ import SwiftUI // NB: necessary for previews to appear
 
 // MARK: - Permission_Preview
 struct Permission_Preview: PreviewProvider {
-	static var previews: some View {
+	static var previews: some SwiftUI.View {
 		Permission.View(
 			store: .init(
 				initialState: .previewValue,
