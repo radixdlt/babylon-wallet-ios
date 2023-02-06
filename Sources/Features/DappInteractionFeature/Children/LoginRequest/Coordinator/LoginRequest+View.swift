@@ -32,12 +32,11 @@ extension LoginRequest.View {
 							.textStyle(.secondaryHeader)
 							.multilineTextAlignment(.center)
 						}
-						.padding(.bottom, .medium2)
+						.padding(.bottom, .small2)
 
 						Text(L10n.DApp.LoginRequest.chooseAPersonaTitle)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Header)
-							.padding(.bottom, .small2)
 
 						ForEachStore(
 							store.scope(
@@ -46,9 +45,6 @@ extension LoginRequest.View {
 							),
 							content: { PersonaRow.View(store: $0) }
 						)
-
-						Spacer()
-							.frame(height: .small3)
 
 						Button(L10n.Personas.createNewPersonaButtonTitle) {
 							viewStore.send(.createNewPersonaButtonTapped)
