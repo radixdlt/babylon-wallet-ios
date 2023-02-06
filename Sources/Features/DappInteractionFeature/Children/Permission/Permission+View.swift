@@ -10,7 +10,7 @@ extension Permission {
 			switch state.permissionKind {
 			case .accounts:
 				title = "Account Permission"
-			case .personaData:
+			case .personalData:
 				title = "Personal Data Permission"
 			}
 
@@ -29,7 +29,7 @@ extension Permission {
 							" be able to view account information when you login with this Persona.",
 							foregroundColor: normalColor
 						)
-				case .personaData:
+				case .personalData:
 					return AttributedString(
 						" is requesting permission to ",
 						foregroundColor: normalColor

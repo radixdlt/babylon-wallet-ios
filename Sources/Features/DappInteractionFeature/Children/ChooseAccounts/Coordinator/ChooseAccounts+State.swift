@@ -4,7 +4,12 @@ import FeaturePrelude
 // MARK: - ChooseAccounts.State
 extension ChooseAccounts {
 	struct State: Hashable {
-		let accessKind: DappInteraction.AccessKind
+		enum AccessKind: Sendable, Hashable {
+			case ongoing
+			case oneTime
+		}
+
+		let accessKind: AccessKind
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
 		let numberOfAccounts: DappInteraction.NumberOfAccounts
@@ -12,7 +17,7 @@ extension ChooseAccounts {
 		var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		init(
-			accessKind: DappInteraction.AccessKind,
+			accessKind: AccessKind,
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
 			numberOfAccounts: DappInteraction.NumberOfAccounts,

@@ -19,11 +19,11 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		typealias RemoteInteractionResponseItem = P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem
 
 		enum LocalInteractionItem: Sendable, Hashable {
-			case permissionRequested(DappInteraction.PermissionKind)
+			case permissionRequested(Permission.State.PermissionKind)
 		}
 
 		enum LocalInteractionResponseItem: Sendable, Hashable {
-			case permissionGranted(DappInteraction.PermissionKind)
+			case permissionGranted(Permission.State.PermissionKind)
 		}
 
 		let dappMetadata: DappMetadata
@@ -142,8 +142,8 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 					switch currentItem {
 					case .auth:
 						items.append(.remote(currentItem))
-					case .ongoingAccounts:
-						items.append(.local(.permissionRequested(.accounts(.ongoing))))
+					case let .ongoingAccounts(item):
+						items.append(.local(.permissionRequested(.accounts(item.numberOfAccounts))))
 						items.append(.remote(currentItem))
 					case .oneTimeAccounts:
 						items.append(.remote(currentItem))
@@ -169,9 +169,9 @@ extension DappInteractionFlow.Destinations.State {
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata
 			))
-		case let .local(.permissionRequested(permission)):
+		case let .local(.permissionRequested(permissionKind)):
 			self = .permission(.init(
-				permissionKind: permission,
+				permissionKind: permissionKind,
 				dappMetadata: dappMetadata
 			))
 		case let .remote(.ongoingAccounts(item)):

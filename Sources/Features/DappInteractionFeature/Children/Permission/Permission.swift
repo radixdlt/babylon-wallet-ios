@@ -3,11 +3,16 @@ import FeaturePrelude
 // MARK: - Permission
 struct Permission: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let permissionKind: DappInteraction.PermissionKind
+		let permissionKind: PermissionKind
 		let dappMetadata: DappMetadata
 
+		enum PermissionKind: Sendable, Hashable {
+			case accounts(DappInteraction.NumberOfAccounts)
+			case personalData
+		}
+
 		init(
-			permissionKind: DappInteraction.PermissionKind,
+			permissionKind: PermissionKind,
 			dappMetadata: DappMetadata
 		) {
 			self.permissionKind = permissionKind
@@ -30,7 +35,7 @@ struct Permission: Sendable, FeatureReducer {
 #if DEBUG
 extension Permission.State {
 	static let previewValue: Self = .init(
-		permissionKind: .accounts(.ongoing),
+		permissionKind: .accounts(.exactly(1)),
 		dappMetadata: .previewValue
 	)
 }
