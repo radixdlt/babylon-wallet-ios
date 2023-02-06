@@ -24,7 +24,6 @@ extension ChooseAccounts.Action {
 	enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case continueButtonTapped
-		case dismissButtonTapped
 		case createAccountButtonTapped
 	}
 }
@@ -48,6 +47,5 @@ extension ChooseAccounts.Action.InternalAction {
 extension ChooseAccounts.Action {
 	enum DelegateAction: Sendable, Equatable {
 		case continueButtonTapped(DappInteractionFlow.State.AnyInteractionItem, IdentifiedArrayOf<OnNetwork.Account>)
-		case dismissButtonTapped
 	}
 }

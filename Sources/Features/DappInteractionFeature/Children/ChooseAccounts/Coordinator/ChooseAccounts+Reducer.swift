@@ -14,11 +14,6 @@ struct ChooseAccounts: Sendable, ReducerProtocol {
 				let selectedAccounts = IdentifiedArrayOf(uniqueElements: state.selectedAccounts.map(\.account))
 				return .send(.delegate(.continueButtonTapped(state.interactionItem, selectedAccounts)))
 
-			case .internal(.view(.dismissButtonTapped)):
-				return .run { send in
-					await send(.delegate(.dismissButtonTapped))
-				}
-
 			case .internal(.view(.didAppear)):
 				return .run { send in
 					await send(.internal(.system(.loadAccountsResult(TaskResult {
@@ -73,13 +68,6 @@ struct ChooseAccounts: Sendable, ReducerProtocol {
 						try await profileClient.getAccounts()
 					}))))
 				}
-
-			case .delegate(.dismissButtonTapped):
-				// TODO: @Nikola this is an unnedeed bit of logic afaik, as the dismiss button is unreachable when create account is present
-				// Verify this is true and if so please do remove it :)
-				// If we do need it for some reason, declare a separate action to do so, as we shouldn't be layering behavior onto our own delegates like this (it makes testing reasoning harder).
-				state.createAccountCoordinator = nil
-				return .none
 
 			case .child, .delegate:
 				return .none

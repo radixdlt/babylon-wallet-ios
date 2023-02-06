@@ -31,26 +31,6 @@ final class ChooseAccountsTests: TestCase {
 		await store.receive(.delegate(.continueButtonTapped(interactionItem, expectedAccounts)))
 	}
 
-	func test_dismissChooseAccounts_whenTappedOnDismiss_thenCoordinateDismissal() async {
-		// given
-		let store = TestStore(
-			initialState: ChooseAccounts.State(
-				interactionItem: interactionItem,
-				accessKind: .oneTime,
-				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
-				dappMetadata: .init(name: "Dapp name", description: "A description"),
-				numberOfAccounts: .exactly(1)
-			),
-			reducer: ChooseAccounts()
-		)
-
-		// when
-		await store.send(.view(.dismissButtonTapped))
-
-		// then
-		await store.receive(.delegate(.dismissButtonTapped))
-	}
-
 	func test_didSelectAccount_whenTappedOnSelectedAccount_thenDeselectThatAccount() async {
 		// given
 		var accountRow = ChooseAccounts.Row.State.previewValueOne
@@ -75,8 +55,10 @@ final class ChooseAccountsTests: TestCase {
 		)
 
 		// when
-		await store.send(.child(.account(id: accountRow.id, action: .view(.didSelect)))) {
-			// then
+		await store.send(.child(.account(id: accountRow.id, action: .view(.didSelect))))
+
+		// then
+		await store.receive(.child(.account(id: accountRow.id, action: .delegate(.didSelect)))) {
 			$0.availableAccounts[id: accountRow.id]?.isSelected = false
 		}
 	}
@@ -109,13 +91,15 @@ final class ChooseAccountsTests: TestCase {
 		)
 
 		// when
-		await store.send(.child(.account(id: accountRowOne.id, action: .view(.didSelect)))) {
+		await store.send(.child(.account(id: accountRowOne.id, action: .view(.didSelect))))
+		await store.receive(.child(.account(id: accountRowOne.id, action: .delegate(.didSelect)))) {
 			// then
 			$0.availableAccounts[id: accountRowOne.id]?.isSelected = true
 		}
 
-		// when
-		await store.send(.child(.account(id: accountRowTwo.id, action: .view(.didSelect)))) {
+		// then
+		await store.send(.child(.account(id: accountRowTwo.id, action: .view(.didSelect))))
+		await store.receive(.child(.account(id: accountRowTwo.id, action: .delegate(.didSelect)))) {
 			// then
 			$0.availableAccounts[id: accountRowTwo.id]?.isSelected = true
 		}
@@ -145,8 +129,10 @@ final class ChooseAccountsTests: TestCase {
 		)
 
 		// when
-		await store.send(.child(.account(id: accountRow.id, action: .view(.didSelect)))) {
-			// then
+		await store.send(.child(.account(id: accountRow.id, action: .view(.didSelect))))
+
+		// then
+		await store.receive(.child(.account(id: accountRow.id, action: .delegate(.didSelect)))) {
 			$0.availableAccounts[id: accountRow.id]?.isSelected = true
 		}
 	}
@@ -183,5 +169,6 @@ final class ChooseAccountsTests: TestCase {
 
 		// then
 		// no state change should occur
+		await store.receive(.child(.account(id: accountRowTwo.id, action: .delegate(.didSelect))))
 	}
 }
