@@ -17,7 +17,7 @@ extension PersonaRow.View {
 		) { viewStore in
 			VStack(alignment: .leading, spacing: .zero) {
 				ZStack {
-					HStack(alignment: .top) {
+					HStack(alignment: .center) {
 						Circle()
 							.strokeBorder(Color.app.gray3, lineWidth: 1)
 							.background(Circle().fill(Color.app.gray4))
@@ -29,16 +29,15 @@ extension PersonaRow.View {
 								.foregroundColor(.app.gray1)
 								.textStyle(.secondaryHeader)
 
-							Text("Sharing")
-								.foregroundColor(.app.gray2)
-								.textStyle(.body2Header)
+							if let numberOfSharedAccounts = viewStore.numberOfSharedAccounts {
+								Text(L10n.DApp.LoginRequest.Row.sharing)
+									.foregroundColor(.app.gray2)
+									.textStyle(.body2Header)
 
-							Group {
-								Text("3 pieces of personal data")
-								Text("4 accounts")
+								Text(numberOfSharedAccounts)
+									.foregroundColor(.app.gray2)
+									.textStyle(.body2Regular)
 							}
-							.foregroundColor(.app.gray2)
-							.textStyle(.body2Regular)
 						}
 
 						Spacer()
@@ -78,11 +77,30 @@ extension PersonaRow.View {
 	struct ViewState: Equatable {
 		let name: String
 		let lastLogin: String?
+		let numberOfSharedAccounts: String?
 		let selectionState: RadioButton.State
 
 		init(state: PersonaRow.State) {
-			name = state.persona.displayName.rawValue.nilIfBlank ?? "Unknown Dapp" // FIXME: @Nikola sorry, I think L10n.DApp.unknownName got lost in the merge
-			lastLogin = nil // TODO:
+			name = state.persona.displayName.rawValue
+
+			if let lastLogin = state.lastLogin {
+				let formatter = DateFormatter()
+				formatter.dateFormat = "d MMM YYY"
+				let formatted = formatter.string(from: lastLogin)
+				self.lastLogin = L10n.DApp.LoginRequest.Row.lastLoginWasOn(formatted)
+			} else {
+				self.lastLogin = nil
+			}
+
+			switch state.numberOfSharedAccounts {
+			case 0:
+				numberOfSharedAccounts = nil
+			case 1:
+				numberOfSharedAccounts = L10n.DApp.LoginRequest.Row.oneSharedAccount
+			default:
+				numberOfSharedAccounts = L10n.DApp.LoginRequest.Row.moreSharedAccounts(state.numberOfSharedAccounts)
+			}
+
 			selectionState = state.isSelected ? .selected : .unselected
 		}
 	}
