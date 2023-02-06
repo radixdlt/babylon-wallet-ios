@@ -40,6 +40,7 @@ extension DappInteractionFlow {
 					}
 				#endif
 			}
+			.navigationTransition(.slide)
 		}
 
 		func destination(
