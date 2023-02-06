@@ -13,6 +13,8 @@ extension ChooseAccounts.Row {
 		switch action {
 		case .internal(.view(.didSelect)):
 			return .send(.delegate(.didSelect))
+		case .delegate:
+			return .none
 		}
 	}
 }

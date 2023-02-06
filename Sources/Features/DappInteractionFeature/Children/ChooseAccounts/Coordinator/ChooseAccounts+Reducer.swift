@@ -46,28 +46,23 @@ struct ChooseAccounts: Sendable, ReducerProtocol {
 				))
 				return .none
 
-			// FIXME: this logic belongs to the child instead, as only delegates should be intercepted via .child
-			// and every other action should fall-through - @davdroman-rdx
-			case let .child(.account(id: id, action: action)):
+			case let .child(.account(id: id, action: .delegate(.didSelect))):
 				guard let account = state.availableAccounts[id: id] else { return .none }
-				switch action {
-				case .internal(.view(.didSelect)):
-					let numberOfAccounts = state.numberOfAccounts
+				let numberOfAccounts = state.numberOfAccounts
 
-					if account.isSelected {
-						state.availableAccounts[id: id]?.isSelected = false
-					} else {
-						switch numberOfAccounts.quantifier {
-						case .atLeast:
-							state.availableAccounts[id: id]?.isSelected = true
-						case .exactly:
-							guard state.selectedAccounts.count < numberOfAccounts.quantity else { break }
-							state.availableAccounts[id: id]?.isSelected = true
-						}
+				if account.isSelected {
+					state.availableAccounts[id: id]?.isSelected = false
+				} else {
+					switch numberOfAccounts.quantifier {
+					case .atLeast:
+						state.availableAccounts[id: id]?.isSelected = true
+					case .exactly:
+						guard state.selectedAccounts.count < numberOfAccounts.quantity else { break }
+						state.availableAccounts[id: id]?.isSelected = true
 					}
-
-					return .none
 				}
+
+				return .none
 
 			case .child(.createAccountCoordinator(.delegate(.dismissed))):
 				state.createAccountCoordinator = nil

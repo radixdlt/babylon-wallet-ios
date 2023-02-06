@@ -4,7 +4,7 @@ import FeaturePrelude
 extension ChooseAccounts.Row {
 	struct State: Hashable {
 		let account: OnNetwork.Account
-		var isSelected: Bool = false
+		var isSelected: Bool
 
 		init(
 			account: OnNetwork.Account,
