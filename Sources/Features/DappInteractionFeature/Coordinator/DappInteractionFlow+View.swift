@@ -40,8 +40,8 @@ extension DappInteractionFlow {
 						}
 					#endif
 				}
+				.navigationTransition(.slide)
 			}
-			.navigationTransition(.slide)
 			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 		}
 
