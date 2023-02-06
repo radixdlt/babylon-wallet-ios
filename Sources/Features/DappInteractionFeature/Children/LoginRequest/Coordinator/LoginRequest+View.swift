@@ -74,6 +74,9 @@ extension LoginRequest.View {
 					)
 				}
 			}
+			.onAppear {
+				viewStore.send(.appeared)
+			}
 		}
 	}
 }
@@ -111,9 +114,7 @@ private extension LoginRequest.View {
 
 	// TODO: @Nikola do this in ViewState
 //	func subtitleText(with viewStore: LoginRequestViewStore) -> String {
-//		viewStore.isKnownDapp ?
-//			L10n.DApp.LoginRequest.Subtitle.knownDapp :
-//			L10n.DApp.LoginRequest.Subtitle.newDapp
+
 //	}
 }
 
@@ -122,11 +123,17 @@ extension LoginRequest.View {
 	struct ViewState: Equatable {
 		let dappName: String
 //		let isKnownDapp: Bool
+		let title: String
+		let subtitle: String
 		let canProceed: Bool
 
 		init(state: LoginRequest.State) {
 			dappName = state.dappMetadata.name
 //			isKnownDapp = state.isKnownDapp
+			let isKnownDapp = state.authorizedPersona != nil
+			subtitle = isKnownDapp ?
+				L10n.DApp.LoginRequest.Subtitle.knownDapp :
+				L10n.DApp.LoginRequest.Subtitle.newDapp
 			canProceed = state.selectedPersona != nil
 		}
 	}
@@ -142,6 +149,7 @@ struct LoginRequest_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue,
 				reducer: LoginRequest()
+					.dependency(\.profileClient, .previewValueTwoPersonas)
 			)
 		)
 	}
