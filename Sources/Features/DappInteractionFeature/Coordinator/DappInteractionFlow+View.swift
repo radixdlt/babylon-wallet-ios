@@ -109,6 +109,24 @@ extension ProfileClient {
 		$0.getPersonas = {
 			[.previewValue0, .previewValue1]
 		}
+		$0.getConnectedDapps = {
+			var dapp = OnNetwork.ConnectedDapp(
+				networkID: .nebunet,
+				dAppDefinitionAddress: try! DappDefinitionAddress(address: ""),
+				displayName: .init(rawValue: "something")!
+			)
+			dapp.referencesToAuthorizedPersonas = [
+				.init(
+					identityAddress: OnNetwork.Persona.previewValue1.address,
+					fieldIDs: [],
+					lastLogin: .now,
+					sharedAccounts: .init(
+						mode: .atLeast([try! AccountAddress(address: "abc")])
+					)
+				),
+			]
+			return [dapp]
+		}
 	}
 }
 #endif

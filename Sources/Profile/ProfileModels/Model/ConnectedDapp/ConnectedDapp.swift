@@ -102,7 +102,7 @@ public extension OnNetwork.ConnectedDapp {
 
 			public init(
 				mode: Mode
-			) throws {
+			) {
 				switch mode {
 				case let .atLeast(accounts):
 					self.mode = .atLeast
