@@ -16,57 +16,51 @@ extension LoginRequest.View {
 			send: { .view($0) }
 		) { viewStore in
 			ForceFullScreen {
-				VStack(spacing: .zero) {
-					Spacer()
-						.frame(height: .small2)
-
-					ScrollView {
+				ScrollView {
+					VStack(spacing: .medium2) {
 						VStack(spacing: .medium2) {
-							VStack(spacing: .medium2) {
-								dappImage
+							dappImage
 
-//								Text(titleText(with: viewStore))
-//									.foregroundColor(.app.gray1)
-//									.textStyle(.sheetTitle)
+//							Text(titleText(with: viewStore))
+//								.foregroundColor(.app.gray1)
+//								.textStyle(.sheetTitle)
 //
-//								subtitle(
-//									dappName: viewStore.dappName,
-//									message: subtitleText(with: viewStore)
-//								)
-//								.textStyle(.secondaryHeader)
-//								.multilineTextAlignment(.center)
-							}
-							.padding(.bottom, .medium2)
-
-							Text(L10n.DApp.LoginRequest.chooseAPersonaTitle)
-								.foregroundColor(.app.gray1)
-								.textStyle(.body1Header)
-								.padding(.bottom, .small2)
-
-							ForEachStore(
-								store.scope(
-									state: \.personas,
-									action: { .child(.persona(id: $0, action: $1)) }
-								),
-								content: { PersonaRow.View(store: $0) }
-							)
-
-							Spacer()
-								.frame(height: .small3)
-
-							Button(L10n.Personas.createNewPersonaButtonTitle) {
-								viewStore.send(.createNewPersonaButtonTapped)
-							}
-							.buttonStyle(.secondaryRectangular(
-								shouldExpand: false
-							))
-
-							Spacer()
-								.frame(height: .large1 * 1.5)
+//							subtitle(
+//								dappName: viewStore.dappName,
+//								message: subtitleText(with: viewStore)
+//							)
+//							.textStyle(.secondaryHeader)
+//							.multilineTextAlignment(.center)
 						}
-						.padding(.horizontal, .medium1)
-					}
+						.padding(.bottom, .medium2)
 
+						Text(L10n.DApp.LoginRequest.chooseAPersonaTitle)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Header)
+							.padding(.bottom, .small2)
+
+						ForEachStore(
+							store.scope(
+								state: \.personas,
+								action: { .child(.persona(id: $0, action: $1)) }
+							),
+							content: { PersonaRow.View(store: $0) }
+						)
+
+						Spacer()
+							.frame(height: .small3)
+
+						Button(L10n.Personas.createNewPersonaButtonTitle) {
+							viewStore.send(.createNewPersonaButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular(
+							shouldExpand: false
+						))
+					}
+					.padding(.horizontal, .medium1)
+					.padding(.bottom, .large1 * 1.5)
+				}
+				.safeAreaInset(edge: .bottom) {
 					WithControlRequirements(
 						viewStore.continueButtonRequirements,
 						forAction: {
