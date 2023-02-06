@@ -40,7 +40,7 @@ extension PersonaRow {
 		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
-				observe: ViewState.init(state:),
+				observe: PersonaRow.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
 				VStack(alignment: .leading, spacing: .zero) {
