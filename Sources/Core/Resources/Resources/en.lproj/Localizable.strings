@@ -27,7 +27,7 @@
 "createEntity.nameNewEntity.subtitle" = "What would you like to call your %s?";
 
 "createEntity.nameNewEntity.name.field.placeholder.specific.account" = "e.g. My Main Account";
-"createEntity.nameNewEntity.name.field.placeholder.specific.persona" = "e.g. Ellis Bell";
+"createEntity.nameNewEntity.name.field.placeholder.specific.persona" = "e.g. My Main Persona";
 "createEntity.nameNewEntity.name.field.explanation" = "This can be changed any time";
 "createEntity.nameNewEntity.name.button.title" = "Continue";
 
@@ -37,7 +37,7 @@
 "createEntity.completion.subtitle.notFirst" = "Your %s has been created.";
 "createEntity.completion.subtitle.first" = "You’ve created your first %s.";
 "createEntity.completion.explanation.specific.account" = "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.";
-"createEntity.completion.explanation.specific.persona" = "The personal data you specify for this Persona does not live on the Radix Network, only in your Radix wallet.";
+"createEntity.completion.explanation.specific.persona" = "Personal data that you add to your Persona will only be shared with dApp websites with your permission in the Radix Wallet.";
 "createEntity.completion.destination.home" = "Account List";
 "createEntity.completion.destination.settingsPersonaList" = "Persona List";
 "createEntity.completion.destination.chooseEntities" = "Choose %ss";

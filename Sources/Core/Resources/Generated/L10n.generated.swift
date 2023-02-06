@@ -84,8 +84,8 @@ public enum L10n {
         public enum Specific {
           /// Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.
           public static let account = L10n.tr("Localizable", "createEntity.completion.explanation.specific.account", fallback: "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.")
-          /// The personal data you specify for this Persona does not live on the Radix Network, only in your Radix wallet.
-          public static let persona = L10n.tr("Localizable", "createEntity.completion.explanation.specific.persona", fallback: "The personal data you specify for this Persona does not live on the Radix Network, only in your Radix wallet.")
+          /// Personal data that you add to your Persona will only be shared with dApp websites with your permission in the Radix Wallet.
+          public static let persona = L10n.tr("Localizable", "createEntity.completion.explanation.specific.persona", fallback: "Personal data that you add to your Persona will only be shared with dApp websites with your permission in the Radix Wallet.")
         }
       }
       public enum Subtitle {
@@ -122,8 +122,8 @@ public enum L10n {
             public enum Specific {
               /// e.g. My Main Account
               public static let account = L10n.tr("Localizable", "createEntity.nameNewEntity.name.field.placeholder.specific.account", fallback: "e.g. My Main Account")
-              /// e.g. Ellis Bell
-              public static let persona = L10n.tr("Localizable", "createEntity.nameNewEntity.name.field.placeholder.specific.persona", fallback: "e.g. Ellis Bell")
+              /// e.g. My Main Persona
+              public static let persona = L10n.tr("Localizable", "createEntity.nameNewEntity.name.field.placeholder.specific.persona", fallback: "e.g. My Main Persona")
             }
           }
         }
