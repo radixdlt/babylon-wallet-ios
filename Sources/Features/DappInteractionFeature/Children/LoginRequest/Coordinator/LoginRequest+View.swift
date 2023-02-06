@@ -60,7 +60,7 @@ extension LoginRequest.View {
 					WithControlRequirements(
 						viewStore.continueButtonRequirements,
 						forAction: {
-							viewStore.send(.continueButtonTapped($0.persona, $0.authorizedPersona))
+							viewStore.send(.continueButtonTapped($0.persona))
 						}
 					) { action in
 						ConfirmationFooter(
@@ -114,7 +114,6 @@ extension LoginRequest.View {
 
 		struct ContinueButtonRequirements: Equatable {
 			let persona: OnNetwork.Persona
-			let authorizedPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
 		}
 
 		init(state: LoginRequest.State) {

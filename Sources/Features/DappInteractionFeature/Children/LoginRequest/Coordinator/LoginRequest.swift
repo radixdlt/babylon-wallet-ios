@@ -24,7 +24,7 @@ struct LoginRequest: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case createNewPersonaButtonTapped
-		case continueButtonTapped(OnNetwork.Persona, OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?)
+		case continueButtonTapped(OnNetwork.Persona)
 	}
 
 	enum InternalAction: Sendable, Equatable {
@@ -76,8 +76,8 @@ struct LoginRequest: Sendable, FeatureReducer {
 		case .createNewPersonaButtonTapped:
 			// TODO:
 			return .none
-		case let .continueButtonTapped(persona, authorizedPersona):
-			return .send(.delegate(.continueButtonTapped(persona, authorizedPersona)))
+		case let .continueButtonTapped(persona):
+			return .send(.delegate(.continueButtonTapped(persona, state.authorizedPersona)))
 		}
 	}
 
