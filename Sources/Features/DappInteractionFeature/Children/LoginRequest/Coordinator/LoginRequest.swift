@@ -56,10 +56,11 @@ struct LoginRequest: Sendable, FeatureReducer {
 						guard let currentAuthorizedPersona = connectedDapp.referencesToAuthorizedPersonas.first(by: currentPersona.address) else {
 							return
 						}
-						if
-							let lastLogin = mostRecentlyAuthorizedPersona?.lastLogin,
-							currentAuthorizedPersona.lastLogin > lastLogin
-						{
+						if let mostRecentlyAuthorizedPersonaCopy = mostRecentlyAuthorizedPersona {
+							if currentAuthorizedPersona.lastLogin > mostRecentlyAuthorizedPersonaCopy.lastLogin {
+								mostRecentlyAuthorizedPersona = currentAuthorizedPersona
+							}
+						} else {
 							mostRecentlyAuthorizedPersona = currentAuthorizedPersona
 						}
 					}
