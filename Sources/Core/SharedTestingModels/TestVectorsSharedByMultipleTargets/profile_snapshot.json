@@ -14,8 +14,8 @@
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
-        "firstEstablishedOn" : "2023-01-31T10:28:14Z",
-        "lastUsedOn" : "2023-01-31T10:28:14Z",
+        "firstEstablishedOn" : "2023-02-06T15:28:09Z",
+        "lastUsedOn" : "2023-02-06T15:28:09Z",
         "platform" : "browser"
       },
       {
@@ -30,8 +30,8 @@
           "retryAttempts" : 3
         },
         "displayName" : "iPhone 13",
-        "firstEstablishedOn" : "2023-01-31T10:28:14Z",
-        "lastUsedOn" : "2023-01-31T10:28:14Z",
+        "firstEstablishedOn" : "2023-02-06T15:28:09Z",
+        "lastUsedOn" : "2023-02-06T15:28:09Z",
         "platform" : "iPhone",
         "signalingServerConfig" : {
           "signalingServerBaseURL" : "custom.signal.com",
@@ -67,14 +67,14 @@
   "factorSources" : {
     "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources" : [
       {
-        "creationDate" : "2023-01-31T10:28:14Z",
+        "creationDate" : "2023-02-06T15:28:09Z",
         "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
         "label" : "DeviceFactorSource"
       }
     ],
     "secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources" : [
       {
-        "creationDate" : "2023-01-31T10:28:14Z",
+        "creationDate" : "2023-02-06T15:28:09Z",
         "factorSourceID" : "85d985e6861e3fb4b39c753b09b9be67d43896d53b0d1dfcb2682ae261d32eb2",
         "label" : "OlympiaFactorSource"
       }
@@ -84,7 +84,7 @@
     {
       "accounts" : [
         {
-          "address" : "account_tdx_b_1qu53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqt2xqvl",
+          "address" : "account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f",
           "appearanceID" : 0,
           "derivationPath" : "m/44H/1022H/11H/525H/0H/1238H",
           "displayName" : "First",
@@ -103,7 +103,7 @@
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2023-01-31T10:28:14Z",
+                "initializationDate" : "2023-02-06T15:28:09Z",
                 "publicKey" : {
                   "compressedData" : "b9c37926187c6ecfee40577e29942ecc1371c5bb6350288aca92033b16ce595c",
                   "curve" : "curve25519"
@@ -113,7 +113,7 @@
           }
         },
         {
-          "address" : "account_tdx_b_1qavvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqxgpf32",
+          "address" : "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
           "appearanceID" : 1,
           "derivationPath" : "m/44H/1022H/11H/525H/1H/1238H",
           "displayName" : "Second",
@@ -132,7 +132,7 @@
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2023-01-31T10:28:14Z",
+                "initializationDate" : "2023-02-06T15:28:09Z",
                 "publicKey" : {
                   "compressedData" : "7c906945cf3d4b4ab27ebf11b6f98e07c506323809f9b501275914f72739ed86",
                   "curve" : "curve25519"
@@ -142,7 +142,7 @@
           }
         },
         {
-          "address" : "account_tdx_b_1ql2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54ts25dgyv",
+          "address" : "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6",
           "appearanceID" : 2,
           "derivationPath" : "m/44H/1022H/11H/525H/2H/1238H",
           "displayName" : "Third",
@@ -161,7 +161,7 @@
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2023-01-31T10:28:14Z",
+                "initializationDate" : "2023-02-06T15:28:09Z",
                 "publicKey" : {
                   "compressedData" : "3f9d3dbae544a46d58703baab5db8d0643879733f7b6e01b39bf96c16ea827d6",
                   "curve" : "curve25519"
@@ -179,29 +179,35 @@
           "referencesToAuthorizedPersonas" : [
             {
               "fieldIDs" : [
-                "3AC4F94D-DCFA-4012-80AD-1DAF51AE000A",
-                "342E48F5-4D7F-4D09-A58A-4E49E399212C"
+                "843A4716-D238-4D55-BF5B-1FF7EBDFF717",
+                "6C62C3C8-1CD9-4049-9B2F-347486BA97B9"
               ],
-              "identityAddress" : "account_tdx_b_1q7vt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpskvpcn0",
+              "identityAddress" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
               "sharedAccounts" : {
                 "accountsReferencedByAddress" : [
-                  "account_tdx_b_1qavvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqxgpf32",
-                  "account_tdx_b_1ql2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54ts25dgyv"
+                  "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
+                  "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"
                 ],
-                "mode" : "exactly"
+                "request" : {
+                  "quantifier" : "exactly",
+                  "quantity" : 2
+                }
               }
             },
             {
               "fieldIDs" : [
-                "DAB2877E-95A4-40A6-8A0F-89098CE6251B",
-                "08DDBC25-1FAC-46A8-B437-5A5CE302180A"
+                "FAD199A5-D6A8-425D-8807-C1561C2425C8",
+                "AC37E346-32EF-4670-9097-1AC27B20D394"
               ],
-              "identityAddress" : "account_tdx_b_1qlvtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkschfnr8",
+              "identityAddress" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
               "sharedAccounts" : {
                 "accountsReferencedByAddress" : [
-                  "account_tdx_b_1qavvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqxgpf32"
+                  "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu"
                 ],
-                "mode" : "atLeast"
+                "request" : {
+                  "quantifier" : "atLeast",
+                  "quantity" : 1
+                }
               }
             }
           ]
@@ -210,17 +216,17 @@
       "networkID" : 11,
       "personas" : [
         {
-          "address" : "account_tdx_b_1q7vt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpskvpcn0",
+          "address" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
           "derivationPath" : "m/44H/1022H/11H/618H/0H/1238H",
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "3AC4F94D-DCFA-4012-80AD-1DAF51AE000A",
+              "id" : "843A4716-D238-4D55-BF5B-1FF7EBDFF717",
               "kind" : "firstName",
               "value" : "Jane"
             },
             {
-              "id" : "342E48F5-4D7F-4D09-A58A-4E49E399212C",
+              "id" : "6C62C3C8-1CD9-4049-9B2F-347486BA97B9",
               "kind" : "lastName",
               "value" : "Incognitoson"
             }
@@ -240,7 +246,7 @@
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2023-01-31T10:28:14Z",
+                "initializationDate" : "2023-02-06T15:28:09Z",
                 "publicKey" : {
                   "compressedData" : "f361cef2453721ed1b67e4c9266697325766513413de39d19746371466f9f63b",
                   "curve" : "curve25519"
@@ -250,17 +256,17 @@
           }
         },
         {
-          "address" : "account_tdx_b_1qlvtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkschfnr8",
+          "address" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
           "derivationPath" : "m/44H/1022H/11H/618H/1H/1238H",
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "DAB2877E-95A4-40A6-8A0F-89098CE6251B",
+              "id" : "FAD199A5-D6A8-425D-8807-C1561C2425C8",
               "kind" : "firstName",
               "value" : "Maria"
             },
             {
-              "id" : "08DDBC25-1FAC-46A8-B437-5A5CE302180A",
+              "id" : "AC37E346-32EF-4670-9097-1AC27B20D394",
               "kind" : "lastName",
               "value" : "Publicson"
             }
@@ -280,7 +286,7 @@
                   "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                   "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
                 },
-                "initializationDate" : "2023-01-31T10:28:14Z",
+                "initializationDate" : "2023-02-06T15:28:09Z",
                 "publicKey" : {
                   "compressedData" : "772ba0ebe12a1637458fefef15299bc57f8e9e21fcf106181d3d780ad1e2bf51",
                   "curve" : "curve25519"
@@ -292,5 +298,5 @@
       ]
     }
   ],
-  "version" : 8
+  "version" : 9
 }
