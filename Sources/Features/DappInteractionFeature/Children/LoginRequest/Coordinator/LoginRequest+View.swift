@@ -21,16 +21,16 @@ extension LoginRequest.View {
 						VStack(spacing: .medium2) {
 							dappImage
 
-//							Text(titleText(with: viewStore))
-//								.foregroundColor(.app.gray1)
-//								.textStyle(.sheetTitle)
-//
-//							subtitle(
-//								dappName: viewStore.dappName,
-//								message: subtitleText(with: viewStore)
-//							)
-//							.textStyle(.secondaryHeader)
-//							.multilineTextAlignment(.center)
+							Text(viewStore.title)
+								.foregroundColor(.app.gray1)
+								.textStyle(.sheetTitle)
+
+							subtitle(
+								dappName: viewStore.dappName,
+								message: viewStore.subtitle
+							)
+							.textStyle(.secondaryHeader)
+							.multilineTextAlignment(.center)
 						}
 						.padding(.bottom, .medium2)
 
@@ -96,13 +96,6 @@ private extension LoginRequest.View {
 			.cornerRadius(.medium3)
 	}
 
-	// TODO: @Nikola do this in ViewState
-//	func titleText(with viewStore: LoginRequestViewStore) -> String {
-//		viewStore.isKnownDapp ?
-//			L10n.DApp.LoginRequest.Title.knownDapp :
-//			L10n.DApp.LoginRequest.Title.newDapp
-//	}
-
 	func subtitle(dappName: String, message: String) -> some View {
 		var component1 = AttributedString(dappName)
 		component1.foregroundColor = .app.gray1
@@ -112,18 +105,12 @@ private extension LoginRequest.View {
 
 		return Text(component1 + component2)
 	}
-
-	// TODO: @Nikola do this in ViewState
-//	func subtitleText(with viewStore: LoginRequestViewStore) -> String {
-
-//	}
 }
 
 // MARK: - LoginRequest.View.ViewState
 extension LoginRequest.View {
 	struct ViewState: Equatable {
 		let dappName: String
-//		let isKnownDapp: Bool
 		let title: String
 		let subtitle: String
 		let canProceed: Bool
@@ -137,8 +124,12 @@ extension LoginRequest.View {
 		init(state: LoginRequest.State) {
 			dappName = state.dappMetadata.name
 			// TODO: @Nikola
-			title = ""
 			let isKnownDapp = state.authorizedPersona != nil
+
+			title = isKnownDapp ?
+				L10n.DApp.LoginRequest.Title.knownDapp :
+				L10n.DApp.LoginRequest.Title.newDapp
+
 			subtitle = isKnownDapp ?
 				L10n.DApp.LoginRequest.Subtitle.knownDapp :
 				L10n.DApp.LoginRequest.Subtitle.newDapp
