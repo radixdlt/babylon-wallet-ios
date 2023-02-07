@@ -23,8 +23,10 @@ public typealias AssetImageTypeAlias = ImageAsset.Image
 // swiftlint:disable identifier_name line_length nesting type_body_length type_name
 public enum AssetResource {
   public static let arrowBack = ImageAsset(name: "arrow-back")
-  public static let checkmarkSelected = ImageAsset(name: "checkmark-selected")
-  public static let checkmarkUnselected = ImageAsset(name: "checkmark-unselected")
+  public static let checkmarkDarkSelected = ImageAsset(name: "checkmark-dark-selected")
+  public static let checkmarkDarkUnselected = ImageAsset(name: "checkmark-dark-unselected")
+  public static let checkmarkLightSelected = ImageAsset(name: "checkmark-light-selected")
+  public static let checkmarkLightUnselected = ImageAsset(name: "checkmark-light-unselected")
   public static let chevronRight = ImageAsset(name: "chevron-right")
   public static let close = ImageAsset(name: "close")
   public static let copy = ImageAsset(name: "copy")

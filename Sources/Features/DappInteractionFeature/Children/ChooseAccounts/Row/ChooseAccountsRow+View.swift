@@ -39,7 +39,10 @@ extension ChooseAccountsRow {
 
 					Spacer()
 
-					CheckmarkView(isChecked: viewStore.isSelected)
+					CheckmarkView(
+						appearance: .light,
+						isChecked: viewStore.isSelected
+					)
 				}
 				.padding(.medium1)
 				.background(
