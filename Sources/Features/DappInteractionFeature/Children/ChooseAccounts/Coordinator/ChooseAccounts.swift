@@ -14,7 +14,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			availableAccounts.filter(\.isSelected)
 		}
 
-		let interactionItem: DappInteractionFlow.State.AnyInteractionItem! // TODO: @davdroman factor out onto Proxy reducer
 		let accessKind: AccessKind
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
@@ -23,7 +22,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		init(
-			interactionItem: DappInteractionFlow.State.AnyInteractionItem!,
 			accessKind: AccessKind,
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
@@ -31,7 +29,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			availableAccounts: IdentifiedArrayOf<ChooseAccountsRow.State> = [],
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil
 		) {
-			self.interactionItem = interactionItem
 			self.accessKind = accessKind
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
@@ -57,11 +54,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped(
-			DappInteractionFlow.State.AnyInteractionItem,
-			IdentifiedArrayOf<OnNetwork.Account>,
-			ChooseAccounts.State.AccessKind
-		)
+		case continueButtonTapped(IdentifiedArrayOf<OnNetwork.Account>, ChooseAccounts.State.AccessKind)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -88,7 +81,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 		case .continueButtonTapped:
 			let selectedAccounts = IdentifiedArrayOf(uniqueElements: state.selectedAccounts.map(\.account))
-			return .send(.delegate(.continueButtonTapped(state.interactionItem, selectedAccounts, state.accessKind)))
+			return .send(.delegate(.continueButtonTapped(selectedAccounts, state.accessKind)))
 
 		case .createAccountButtonTapped:
 			state.createAccountCoordinator = .init(config: .init(

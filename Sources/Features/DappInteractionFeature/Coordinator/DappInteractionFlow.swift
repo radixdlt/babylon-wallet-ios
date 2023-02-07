@@ -73,16 +73,16 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		enum State: Sendable, Hashable {
 			case login(StateWithRelayedInteractionItem<LoginRequest.State>)
-			case permission(Permission.State)
-			case chooseAccounts(ChooseAccounts.State)
-			case signAndSubmitTransaction(TransactionSigning.State)
+			case permission(StateWithRelayedInteractionItem<Permission.State>)
+			case chooseAccounts(StateWithRelayedInteractionItem<ChooseAccounts.State>)
+			case signAndSubmitTransaction(StateWithRelayedInteractionItem<TransactionSigning.State>)
 		}
 
 		enum Action: Sendable, Equatable {
 			case login(ActionWithRelayedInteractionItem<LoginRequest.Action>)
-			case permission(Permission.Action)
-			case chooseAccounts(ChooseAccounts.Action)
-			case signAndSubmitTransaction(TransactionSigning.Action)
+			case permission(ActionWithRelayedInteractionItem<Permission.Action>)
+			case chooseAccounts(ActionWithRelayedInteractionItem<ChooseAccounts.Action>)
+			case signAndSubmitTransaction(ActionWithRelayedInteractionItem<TransactionSigning.Action>)
 		}
 
 		var body: some ReducerProtocolOf<Self> {
@@ -90,13 +90,13 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				Relay { LoginRequest() }
 			}
 			Scope(state: /State.permission, action: /Action.permission) {
-				Permission()
+				Relay { Permission() }
 			}
 			Scope(state: /State.chooseAccounts, action: /Action.chooseAccounts) {
-				ChooseAccounts()
+				Relay { ChooseAccounts() }
 			}
 			Scope(state: /State.signAndSubmitTransaction, action: /Action.signAndSubmitTransaction) {
-				TransactionSigning()
+				Relay { TransactionSigning() }
 			}
 		}
 	}
@@ -134,14 +134,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			state.responseItems[item] = responseItem
 			return continueEffect(for: &state)
 		case
-			let .root(.permission(.delegate(.continueButtonTapped(item)))),
-			let .path(.element(_, .permission(.delegate(.continueButtonTapped(item))))):
+			let .root(.permission(.relay(item, .delegate(.continueButtonTapped)))),
+			let .path(.element(_, .permission(.relay(item, .delegate(.continueButtonTapped))))):
 			let responseItem: State.AnyInteractionResponseItem = .local(.permissionGranted)
 			state.responseItems[item] = responseItem
 			return continueEffect(for: &state)
 		case
-			let .root(.chooseAccounts(.delegate(.continueButtonTapped(item, accounts, accessKind)))),
-			let .path(.element(_, .chooseAccounts(.delegate(.continueButtonTapped(item, accounts, accessKind))))):
+			let .root(.chooseAccounts(.relay(item, .delegate(.continueButtonTapped(accounts, accessKind))))),
+			let .path(.element(_, .chooseAccounts(.relay(item, .delegate(.continueButtonTapped(accounts, accessKind)))))):
 			setAccountsResponse(to: item, accounts, accessKind: accessKind, into: &state)
 			return continueEffect(for: &state)
 		default:
@@ -226,31 +226,28 @@ extension DappInteractionFlow.Destinations.State {
 				dappMetadata: dappMetadata
 			)))
 		case let .local(.permissionRequested(permissionKind)):
-			self = .permission(.init(
-				interactionItem: anyItem,
+			self = .permission(.relayed(anyItem, with: .init(
 				permissionKind: permissionKind,
 				dappMetadata: dappMetadata
-			))
+			)))
 		case let .remote(.ongoingAccounts(item)):
-			self = .chooseAccounts(.init(
-				interactionItem: anyItem,
+			self = .chooseAccounts(.relayed(anyItem, with: .init(
 				accessKind: .ongoing,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
-			))
+			)))
 		case let .remote(.oneTimeAccounts(item)):
-			self = .chooseAccounts(.init(
-				interactionItem: anyItem,
+			self = .chooseAccounts(.relayed(anyItem, with: .init(
 				accessKind: .oneTime,
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata,
 				numberOfAccounts: item.numberOfAccounts
-			))
+			)))
 		case let .remote(.send(item)):
-			self = .signAndSubmitTransaction(.init(
+			self = .signAndSubmitTransaction(.relayed(anyItem, with: .init(
 				transactionManifestWithoutLockFee: item.transactionManifest
-			))
+			)))
 		}
 	}
 }

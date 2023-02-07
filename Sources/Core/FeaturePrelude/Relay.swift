@@ -13,6 +13,9 @@ public struct RelayState<RelayedState, MainState> {
 	}
 }
 
+// MARK: Sendable
+extension RelayState: Sendable where RelayedState: Sendable, MainState: Sendable {}
+
 // MARK: Equatable
 extension RelayState: Equatable where RelayedState: Equatable, MainState: Equatable {}
 
@@ -23,6 +26,9 @@ extension RelayState: Hashable where RelayedState: Hashable, MainState: Hashable
 public enum RelayAction<RelayedState, MainAction> {
 	case relay(RelayedState, MainAction)
 }
+
+// MARK: Sendable
+extension RelayAction: Sendable where RelayedState: Sendable, MainAction: Sendable {}
 
 // MARK: Equatable
 extension RelayAction: Equatable where RelayedState: Equatable, MainAction: Equatable {}

@@ -11,7 +11,6 @@ final class ChooseAccountsTests: TestCase {
 		singleAccount.isSelected = true
 		let store = TestStore(
 			initialState: ChooseAccounts.State(
-				interactionItem: interactionItem,
 				accessKind: .oneTime,
 				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 				dappMetadata: .init(name: "Dapp name", description: "A description"),
@@ -28,7 +27,7 @@ final class ChooseAccountsTests: TestCase {
 
 		// then
 		let expectedAccounts = IdentifiedArrayOf(uniqueElements: [singleAccount.account])
-		await store.receive(.delegate(.continueButtonTapped(interactionItem, expectedAccounts, .oneTime)))
+		await store.receive(.delegate(.continueButtonTapped(expectedAccounts, .oneTime)))
 	}
 
 	func test_didSelectAccount_whenTappedOnSelectedAccount_thenDeselectThatAccount() async {
@@ -37,7 +36,6 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = true
 
 		let initialState: ChooseAccounts.State = .init(
-			interactionItem: interactionItem,
 			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
@@ -72,7 +70,6 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			interactionItem: interactionItem,
 			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
@@ -111,7 +108,6 @@ final class ChooseAccountsTests: TestCase {
 		accountRow.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			interactionItem: interactionItem,
 			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
@@ -146,7 +142,6 @@ final class ChooseAccountsTests: TestCase {
 		accountRowTwo.isSelected = false
 
 		let initialState: ChooseAccounts.State = .init(
-			interactionItem: interactionItem,
 			accessKind: .oneTime,
 			dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 			dappMetadata: .init(name: "Dapp name", description: "A description"),
