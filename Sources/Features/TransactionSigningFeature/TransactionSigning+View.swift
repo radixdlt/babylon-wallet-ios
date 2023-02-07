@@ -78,15 +78,14 @@ struct TransactionSigning_Preview: PreviewProvider {
 				initialState: .previewValue,
 				reducer: TransactionSigning()
 					.dependency(\.profileClient.getCurrentNetworkID) { .nebunet }
-					.dependency(\.transactionClient.addLockFeeInstructionToManifest) { _ in .mock }
+					.dependency(\.transactionClient.addLockFeeInstructionToManifest) { _ in .previewValue }
 			)
 		)
 	}
 }
 
 public extension TransactionManifest {
-	// TODO: rename to previewValue
-	static var mock: Self {
+	static var previewValue: Self {
 		.init(instructions: .string(
 			"""
 			# Withdraw XRD from account
@@ -131,6 +130,6 @@ public extension TransactionManifest {
 }
 
 public extension TransactionSigning.State {
-	static let previewValue = Self(transactionManifestWithoutLockFee: .mock)
+	static let previewValue = Self(transactionManifestWithoutLockFee: .previewValue)
 }
 #endif
