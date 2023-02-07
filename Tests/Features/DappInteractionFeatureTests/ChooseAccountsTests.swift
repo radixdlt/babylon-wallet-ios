@@ -133,7 +133,7 @@ final class ChooseAccountsTests: TestCase {
 		}
 	}
 
-	func test_didSelectAccount_whenTappedOnDeselectedAccount_thenDontSelectThatAccount_ifOverSelectedAccountLimit() async {
+	func test_didSelectAccount_whenTappedOnDeselectedAccount_thenSelectThatAccountInstead_ifAccountLimitOfOne() async {
 		// given
 		var accountRowOne = ChooseAccountsRow.State.previewValueOne
 		accountRowOne.isSelected = true
@@ -163,7 +163,9 @@ final class ChooseAccountsTests: TestCase {
 		await store.send(.child(.account(id: accountRowTwo.id, action: .view(.didSelect))))
 
 		// then
-		// no state change should occur
-		await store.receive(.child(.account(id: accountRowTwo.id, action: .delegate(.didSelect))))
+		await store.receive(.child(.account(id: accountRowTwo.id, action: .delegate(.didSelect)))) {
+			$0.availableAccounts[id: accountRowOne.id]?.isSelected = false
+			$0.availableAccounts[id: accountRowTwo.id]?.isSelected = true
+		}
 	}
 }
