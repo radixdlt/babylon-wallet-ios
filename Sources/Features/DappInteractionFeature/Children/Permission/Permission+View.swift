@@ -3,13 +3,6 @@ import FeaturePrelude
 // MARK: - Permission.View
 extension Permission {
 	struct ViewState: Equatable {
-		var dappImage: some SwiftUI.View {
-			// NOTE: using placeholder until API is available
-			Color.app.gray4
-				.frame(.medium)
-				.cornerRadius(.medium3)
-		}
-
 		let title: String
 		let subtitle: AttributedString
 		let numberOfAccounts: String
@@ -96,7 +89,7 @@ extension Permission {
 					ScrollView {
 						VStack(spacing: .medium2) {
 							VStack(spacing: .medium2) {
-								viewStore.dappImage
+								dappImage
 
 								Text(viewStore.title)
 									.foregroundColor(.app.gray1)
@@ -145,6 +138,13 @@ extension Permission {
 					}
 				}
 			}
+		}
+
+		var dappImage: some SwiftUI.View {
+			// NOTE: using placeholder until API is available
+			Color.app.gray4
+				.frame(.medium)
+				.cornerRadius(.medium3)
 		}
 	}
 }
