@@ -122,7 +122,7 @@ extension ChooseAccounts {
 						}
 						.padding(.horizontal, .medium1)
 					}
-					.safeAreaInset(edge: .bottom) {
+					.safeAreaInset(edge: .bottom, spacing: .zero) {
 						ConfirmationFooter(
 							title: L10n.DApp.LoginRequest.continueButtonTitle,
 							isEnabled: viewStore.canProceed,

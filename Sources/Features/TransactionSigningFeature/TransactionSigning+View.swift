@@ -39,18 +39,22 @@ public extension TransactionSigning {
 				send: { .view($0) }
 			) { viewStore in
 				ForceFullScreen {
-					ScrollView([.vertical], showsIndicators: false) {
+					ScrollView(showsIndicators: false) {
 						if let manifest = viewStore.manifest {
 							Text(manifest)
-								.padding()
 								.font(.system(size: 13, design: .monospaced))
-								.frame(maxHeight: .infinity, alignment: .topLeading)
-								.padding([.horizontal, .bottom])
+								.frame(
+									maxWidth: .infinity,
+									maxHeight: .infinity,
+									alignment: .topLeading
+								)
+								.padding()
+								.multilineTextAlignment(.leading)
+								.background(Color(white: 0.9))
 						}
 					}
-					.background(Color(white: 0.9))
 				}
-				.safeAreaInset(edge: .bottom) {
+				.safeAreaInset(edge: .bottom, spacing: .zero) {
 					ConfirmationFooter(
 						title: L10n.TransactionSigning.signTransactionButtonTitle,
 						isEnabled: viewStore.signButtonEnabled,
@@ -58,9 +62,7 @@ public extension TransactionSigning {
 					)
 				}
 				.controlState(viewStore.viewControlState)
-				.onAppear {
-					viewStore.send(.didAppear)
-				}
+				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}
@@ -75,6 +77,8 @@ struct TransactionSigning_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue,
 				reducer: TransactionSigning()
+					.dependency(\.profileClient.getCurrentNetworkID) { .nebunet }
+					.dependency(\.transactionClient.addLockFeeInstructionToManifest) { _ in .mock }
 			)
 		)
 	}
@@ -127,9 +131,6 @@ public extension TransactionManifest {
 }
 
 public extension TransactionSigning.State {
-	static let previewValue = Self(
-		transactionManifestWithoutLockFee: .mock,
-		transactionWithLockFee: .mock
-	)
+	static let previewValue = Self(transactionManifestWithoutLockFee: .mock)
 }
 #endif

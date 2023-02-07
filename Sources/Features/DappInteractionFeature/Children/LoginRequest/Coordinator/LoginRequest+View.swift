@@ -90,7 +90,7 @@ extension LoginRequest {
 						.padding(.horizontal, .medium1)
 						.padding(.bottom, .large1 * 1.5)
 					}
-					.safeAreaInset(edge: .bottom) {
+					.safeAreaInset(edge: .bottom, spacing: .zero) {
 						WithControlRequirements(
 							viewStore.continueButtonRequirements,
 							forAction: {

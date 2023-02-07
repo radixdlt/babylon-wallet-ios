@@ -13,23 +13,26 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 
 		public init(
 			transactionManifestWithoutLockFee: TransactionManifest,
-			transactionWithLockFee: TransactionManifest? = nil, // TODO: remove?
 			makeTransactionHeaderInput: MakeTransactionHeaderInput = .default
 		) {
 			self.transactionManifestWithoutLockFee = transactionManifestWithoutLockFee
-			self.transactionWithLockFee = transactionWithLockFee
 			self.makeTransactionHeaderInput = makeTransactionHeaderInput
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case didAppear
+		case appeared
 		case signTransactionButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadNetworkIDResult(TaskResult<NetworkID>, manifestWithFeeLock: TransactionManifest)
-		case addLockFeeInstructionToManifestResult(TaskResult<TransactionManifest>)
+		// TODO: replace with tuple when Apple makes them autoconform to Equatable
+		public struct AddLockInstructionToManifestSuccessValues: Sendable, Equatable {
+			let manifestWithLockFee: TransactionManifest
+			let manifestWithLockFeeString: String
+		}
+
+		case addLockFeeInstructionToManifestResult(TaskResult<AddLockInstructionToManifestSuccessValues>)
 		case signTransactionResult(TransactionResult)
 	}
 
@@ -39,20 +42,30 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.transactionClient) var transactionClient
 	@Dependency(\.profileClient) var profileClient
+	@Dependency(\.transactionClient) var transactionClient
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .didAppear:
+		case .appeared:
 			return .run { [manifest = state.transactionManifestWithoutLockFee] send in
-				await send(.internal(.addLockFeeInstructionToManifestResult(
-					TaskResult {
-						try await transactionClient.addLockFeeInstructionToManifest(manifest)
-					}
-				)))
+				let networkID = await profileClient.getCurrentNetworkID()
+				let result = await TaskResult {
+					let manifestWithLockFee = try await transactionClient.addLockFeeInstructionToManifest(manifest)
+					let manifestWithLockFeeString = manifestWithLockFee.toString(
+						preamble: "",
+						blobOutputFormat: .includeBlobsByByteCountOnly,
+						blobPreamble: "\n\nBLOBS:\n",
+						networkID: networkID
+					)
+					return InternalAction.AddLockInstructionToManifestSuccessValues(
+						manifestWithLockFee: manifestWithLockFee,
+						manifestWithLockFeeString: manifestWithLockFeeString
+					)
+				}
+				await send(.internal(.addLockFeeInstructionToManifestResult(result)))
 			}
 
 		case .signTransactionButtonTapped:
@@ -80,27 +93,10 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .addLockFeeInstructionToManifestResult(.success(transactionWithLockFee)):
-			state.transactionWithLockFee = transactionWithLockFee
-			return .run { send in
-				await send(.internal(.loadNetworkIDResult(
-					TaskResult { await profileClient.getCurrentNetworkID() },
-					manifestWithFeeLock: transactionWithLockFee
-				)))
-			}
-
-		case let .loadNetworkIDResult(.success(networkID), manifestWithFeeLock):
-			state.transactionWithLockFeeString = manifestWithFeeLock.toString(
-				preamble: "",
-				blobOutputFormat: .includeBlobsByByteCountOnly,
-				blobPreamble: "\n\nBLOBS:\n",
-				networkID: networkID
-			)
+		case let .addLockFeeInstructionToManifestResult(.success(values)):
+			state.transactionWithLockFee = values.manifestWithLockFee
+			state.transactionWithLockFeeString = values.manifestWithLockFeeString
 			return .none
-
-		case let .loadNetworkIDResult(.failure(error), _):
-			errorQueue.schedule(error)
-			return .send(.delegate(.failed(ApproveTransactionFailure.prepareTransactionFailure(.loadNetworkID(error)))))
 
 		case let .addLockFeeInstructionToManifestResult(.failure(error)):
 			errorQueue.schedule(error)

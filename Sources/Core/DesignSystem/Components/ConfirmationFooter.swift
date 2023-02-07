@@ -20,16 +20,14 @@ public struct ConfirmationFooter: View {
 public extension ConfirmationFooter {
 	var body: some View {
 		VStack(spacing: .zero) {
-			Color.app.gray4
-				.frame(height: 1)
-				.padding(.bottom, .medium3)
+			Color.app.gray4.frame(height: 1)
 
 			Button(title) {
 				action()
 			}
 			.buttonStyle(.primaryRectangular)
 			.controlState(isEnabled ? .enabled : .disabled)
-			.padding(.horizontal, .medium3)
+			.padding([.top, .horizontal], .medium3)
 			.padding(.bottom, .medium1)
 		}
 		.background(Color.app.background.edgesIgnoringSafeArea(.bottom))
@@ -39,8 +37,8 @@ public extension ConfirmationFooter {
 // MARK: - ConfirmationFooter_Previews
 struct ConfirmationFooter_Previews: PreviewProvider {
 	static var previews: some View {
-		Color.white
-			.safeAreaInset(edge: .bottom) {
+		Color.red
+			.safeAreaInset(edge: .bottom, spacing: .zero) {
 				ConfirmationFooter(title: "Continue", isEnabled: true, action: {})
 			}
 	}

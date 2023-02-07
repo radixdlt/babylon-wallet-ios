@@ -1,25 +1,50 @@
 import FeatureTestingPrelude
-import TransactionClient
 @testable import TransactionSigningFeature
 
 @MainActor
 final class TransactionSigningFeatureTests: TestCase {
-	lazy var store: TestStore = .init(
-		initialState: TransactionSigning.State(
-			transactionManifestWithoutLockFee: .mock,
-			transactionWithLockFee: .mock
-		),
-		reducer: TransactionSigning()
-	)
+	func testAddLockFeeToManifestOnAppearFailure() async {
+		// given
+		let store = TestStore(
+			initialState: TransactionSigning.State(
+				transactionManifestWithoutLockFee: .mock
+			),
+			reducer: TransactionSigning()
+		) {
+			$0.profileClient.getCurrentNetworkID = { .nebunet }
+			$0.transactionClient.addLockFeeInstructionToManifest = { _ in throw NoopError() }
+			$0.errorQueue.schedule = { XCTAssertEqual($0 as? NoopError, NoopError()) }
+		}
 
-	func testInitialState() {
-		XCTAssertEqual(store.state.transactionManifestWithoutLockFee, .mock)
+		// when
+		await store.send(.view(.appeared))
+
+		// then
+		await store.receive(.internal(.addLockFeeInstructionToManifestResult(.failure(NoopError()))))
+		await store.receive(.delegate(.failed(.prepareTransactionFailure(.addTransactionFee(NoopError())))))
 	}
 
 	func testSignTransaction() async {
+		let store = TestStore(
+			initialState: TransactionSigning.State(
+				transactionManifestWithoutLockFee: .mock
+			),
+			reducer: TransactionSigning()
+		) {
+			$0.profileClient.getCurrentNetworkID = { .nebunet }
+			$0.transactionClient.addLockFeeInstructionToManifest = { _ in .mock }
+			$0.errorQueue.schedule = { _ in }
+		}
+		store.exhaustivity = .off(showSkippedAssertions: true)
+
 		// Unhappy path - sign TX error
 		store.dependencies.transactionClient.signAndSubmitTransaction = { @Sendable _ in
 			.failure(.failedToCompileOrSign(.failedToCompileTXIntent))
+		}
+
+		await store.send(.view(.appeared))
+		await store.receive(/TransactionSigning.Action.internal .. /TransactionSigning.InternalAction.addLockFeeInstructionToManifestResult .. TaskResult.success) {
+			$0.transactionWithLockFee = .mock
 		}
 
 		await store.send(.view(.signTransactionButtonTapped)) {

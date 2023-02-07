@@ -10,7 +10,6 @@ public enum ApproveTransactionFailure: Sendable, LocalizedError, Equatable {
 		}
 
 		case addTransactionFee(Swift.Error)
-		case loadNetworkID(Swift.Error)
 		public var errorDescription: String? {
 			switch self {
 			case let .addTransactionFee(error):
@@ -19,8 +18,6 @@ public enum ApproveTransactionFailure: Sendable, LocalizedError, Equatable {
 					return message
 				}
 				return "\(message), engine toolkit: \(String(describing: engineToolkitError.errorDescription))"
-			case let .loadNetworkID(error):
-				return "Failed to load network ID, reason: \(String(describing: error))"
 			}
 		}
 	}
