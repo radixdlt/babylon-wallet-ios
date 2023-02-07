@@ -32,6 +32,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
 
+		var personaNotFoundErrorAlert: AlertState<ViewAction.PersonaNotFoundErrorAlertAction>? = nil
+
 		var root: Destinations.State?
 		@NavigationStateOf<Destinations>
 		var path: NavigationState<Destinations.State>.Path
@@ -56,6 +58,17 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case appeared
 		case closeButtonTapped
 		case backButtonTapped
+		case personaNotFoundErrorAlert(PersonaNotFoundErrorAlertAction)
+
+		enum PersonaNotFoundErrorAlertAction: Sendable, Equatable {
+			case cancelButtonTapped
+			case systemDismissed
+		}
+	}
+
+	enum InternalAction: Sendable, Equatable {
+		case usePersona(P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem, OnNetwork.Persona)
+		case presentPersonaNotFoundErrorAlert
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -113,15 +126,60 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 	}
 
+	@Dependency(\.profileClient) var profileClient
+
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			// TODO: handle usePersona
-			return continueEffect(for: &state)
+			// NB: this if let should become a one liner with native case paths:
+			// if let usePersonaRequest = state.remoteInteractions.items[keyPath: \.request?.authorized?.auth?.usePersona?] {
+			if let usePersonaItem = { () -> P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem? in
+				switch state.remoteInteraction.items {
+				case let .request(.authorized(item)):
+					switch item.auth {
+					case let .usePersona(item): return item
+					default: return nil
+					}
+				default: return nil
+				}
+			}() {
+				return .run { [usePersonaItem] send in
+					if let persona = try await profileClient.getPersonas().first(by: .init(address: usePersonaItem.identityAddress)) {
+						await send(.internal(.usePersona(usePersonaItem, persona)))
+					} else {
+						await send(.internal(.presentPersonaNotFoundErrorAlert))
+					}
+				}
+			} else {
+				return .none
+			}
+		case .personaNotFoundErrorAlert:
+			state.personaNotFoundErrorAlert = nil
+			return .send(.delegate(.dismiss))
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
 		case .backButtonTapped:
 			return goBackEffect(for: &state)
+		}
+	}
+
+	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .usePersona(item, persona):
+			state.responseItems[.remote(.auth(.usePersona(item)))] = .remote(.auth(.usePersona(.init(identityAddress: persona.address.address))))
+			// TODO: look ahead at ongoing accounts request and fill them out if possible
+			return continueEffect(for: &state)
+		case .presentPersonaNotFoundErrorAlert:
+			state.personaNotFoundErrorAlert = .init(
+				title: { TextState(L10n.App.errorOccurredTitle) },
+				actions: {
+					ButtonState(role: .cancel, action: .send(.cancelButtonTapped)) {
+						TextState(L10n.DApp.Request.SpecifiedPersonaNotFoundError.cancelButtonTitle)
+					}
+				},
+				message: { TextState(L10n.DApp.Request.SpecifiedPersonaNotFoundError.message) }
+			)
+			return .none
 		}
 	}
 
@@ -130,6 +188,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case
 			let .root(.relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedPersona))))),
 			let .path(.element(_, .relay(item, .login(.delegate(.continueButtonTapped(persona, authorizedPersona)))))):
+			// TODO: look ahead at ongoing accounts request and fill them out if possible
 			let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withoutChallenge(.init(
 				identityAddress: persona.address.address
 			)))))

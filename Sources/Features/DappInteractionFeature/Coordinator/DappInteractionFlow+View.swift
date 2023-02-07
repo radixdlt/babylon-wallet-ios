@@ -45,6 +45,13 @@ extension DappInteractionFlow {
 				#endif
 			}
 			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+			.alert(
+				store.scope(
+					state: \.personaNotFoundErrorAlert,
+					action: { .view(.personaNotFoundErrorAlert($0)) }
+				),
+				dismiss: .systemDismissed
+			)
 		}
 
 		func destination(
