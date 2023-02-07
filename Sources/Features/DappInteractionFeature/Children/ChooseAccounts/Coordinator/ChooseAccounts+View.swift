@@ -161,10 +161,10 @@ struct ChooseAccounts_Preview: PreviewProvider {
 
 extension ChooseAccounts.State {
 	static let previewValue: Self = .init(
-		accessKind: .oneTime,
+		accessKind: .ongoing,
 		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
 		dappMetadata: .previewValue,
-		numberOfAccounts: .atLeast(2),
+		numberOfAccounts: .exactly(1),
 		availableAccounts: .init(
 			uniqueElements: [
 				.previewValueOne,

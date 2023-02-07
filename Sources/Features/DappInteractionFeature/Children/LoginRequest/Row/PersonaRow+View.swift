@@ -53,7 +53,10 @@ extension PersonaRow {
 
 						HStack {
 							Spacer()
-							RadioButton(state: viewStore.selectionState)
+							RadioButton(
+								appearance: .dark,
+								state: viewStore.selectionState
+							)
 						}
 					}
 					.padding(.medium2)

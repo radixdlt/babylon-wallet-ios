@@ -96,8 +96,11 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .loadAccountsResult(.success(accounts)):
+			let mode: ChooseAccountsRow.State.Mode = state.numberOfAccounts.quantifier == .exactly &&
+				state.numberOfAccounts.quantity == 1 ? .radioButton : .checkmark
+
 			state.availableAccounts = .init(uniqueElements: accounts.map {
-				ChooseAccountsRow.State(account: $0)
+				ChooseAccountsRow.State(account: $0, mode: mode)
 			})
 			return .none
 
@@ -120,8 +123,15 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 				case .atLeast:
 					state.availableAccounts[id: id]?.isSelected = true
 				case .exactly:
-					guard state.selectedAccounts.count < numberOfAccounts.quantity else { break }
-					state.availableAccounts[id: id]?.isSelected = true
+					switch numberOfAccounts.quantity {
+					case 1:
+						state.availableAccounts.forEach {
+							state.availableAccounts[id: $0.id]?.isSelected = $0.id == id
+						}
+					default:
+						guard state.selectedAccounts.count < numberOfAccounts.quantity else { break }
+						state.availableAccounts[id: id]?.isSelected = true
+					}
 				}
 			}
 

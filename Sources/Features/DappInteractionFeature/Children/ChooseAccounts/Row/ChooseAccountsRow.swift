@@ -3,20 +3,26 @@ import FeaturePrelude
 // MARK: - ChooseAccountsRow
 struct ChooseAccountsRow: Sendable, FeatureReducer {
 	struct State: Sendable, Equatable, Hashable, Identifiable {
+		enum Mode {
+			case checkmark
+			case radioButton
+		}
+
 		typealias ID = AccountAddress
 
 		var address: AccountAddress { account.address }
 		var id: ID { address }
 
 		let account: OnNetwork.Account
-		var isSelected: Bool
+		let mode: Mode
+		var isSelected: Bool = false
 
 		init(
 			account: OnNetwork.Account,
-			isSelected: Bool = false
+			mode: Mode
 		) {
 			self.account = account
-			self.isSelected = isSelected
+			self.mode = mode
 		}
 	}
 

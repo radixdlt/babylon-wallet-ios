@@ -7,12 +7,14 @@ extension ChooseAccountsRow {
 		let isSelected: Bool
 		let accountName: String
 		let accountAddress: AddressView.ViewState
+		let mode: ChooseAccountsRow.State.Mode
 
 		init(state: ChooseAccountsRow.State) {
 			appearanceID = state.account.appearanceID
 			isSelected = state.isSelected
 			accountName = state.account.displayName.rawValue
 			accountAddress = .init(address: state.account.address.address, format: .short())
+			mode = state.mode
 		}
 	}
 
@@ -39,10 +41,18 @@ extension ChooseAccountsRow {
 
 					Spacer()
 
-					CheckmarkView(
-						appearance: .light,
-						isChecked: viewStore.isSelected
-					)
+					switch viewStore.mode {
+					case .checkmark:
+						CheckmarkView(
+							appearance: .light,
+							isChecked: viewStore.isSelected
+						)
+					case .radioButton:
+						RadioButton(
+							appearance: .light,
+							state: viewStore.isSelected ? .selected : .unselected
+						)
+					}
 				}
 				.padding(.medium1)
 				.background(
@@ -73,7 +83,7 @@ struct Row_Preview: PreviewProvider {
 }
 
 extension ChooseAccountsRow.State {
-	static let previewValueOne = Self(account: .previewValue0)
-	static let previewValueTwo = Self(account: .previewValue1)
+	static let previewValueOne = Self(account: .previewValue0, mode: .radioButton)
+	static let previewValueTwo = Self(account: .previewValue1, mode: .checkmark)
 }
 #endif

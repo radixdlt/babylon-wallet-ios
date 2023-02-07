@@ -109,13 +109,7 @@ struct LoginRequest: Sendable, FeatureReducer {
 		switch childAction {
 		case let .persona(id: id, action: .delegate(.didSelect)):
 			state.personas.forEach {
-				if $0.id == id {
-					if !$0.isSelected {
-						state.personas[id: $0.id]?.isSelected = true
-					}
-				} else {
-					state.personas[id: $0.id]?.isSelected = false
-				}
+				state.personas[id: $0.id]?.isSelected = $0.id == id
 			}
 			return .none
 

@@ -1,52 +1,66 @@
+import Resources
 import SwiftUI
 
 // MARK: - RadioButton
 public struct RadioButton: View {
+	public enum State {
+		case unselected
+		case selected
+		case disabled
+	}
+
+	public enum Appearance {
+		case light
+		case dark
+	}
+
+	public let appearance: Appearance
 	public var state: State
 
-	public init(state: State) {
+	public init(
+		appearance: Appearance,
+		state: State
+	) {
+		self.appearance = appearance
 		self.state = state
 	}
 }
 
 public extension RadioButton {
 	var body: some View {
-		Circle()
-			.strokeBorder(borderColor, lineWidth: lineWidth)
-			.frame(width: 20, height: 20)
-	}
-}
+		let resource: ImageAsset = {
+			switch (appearance, state) {
+			case (.light, .unselected):
+				return AssetResource.radioButtonLightUnselected
+			case (.light, .selected):
+				return AssetResource.radioButtonLightSelected
+			case (.light, .disabled):
+				return AssetResource.radioButtonLightDisabled
+			case (.dark, .unselected):
+				return AssetResource.radioButtonDarkUnselected
+			case (.dark, .selected):
+				return AssetResource.radioButtonDarkSelected
+			case (.dark, .disabled):
+				return AssetResource.radioButtonDarkDisabled
+			}
+		}()
 
-private extension RadioButton {
-	var borderColor: Color {
-		switch state {
-		case .unselected: return .app.gray2
-		case .selected: return .app.gray1
-		case .disabled: return .app.gray3
-		}
-	}
-
-	var lineWidth: CGFloat {
-		switch state {
-		case .unselected: return 1
-		case .selected: return 6
-		case .disabled: return 6
-		}
+		return Image(asset: resource)
+			.padding(.leading, .small1)
 	}
 }
 
 // MARK: - RadioButton_Previews
 struct RadioButton_Previews: PreviewProvider {
 	static var previews: some View {
-		RadioButton(state: .selected)
-	}
-}
+		ZStack {
+			Color.green
 
-// MARK: - RadioButton.State
-public extension RadioButton {
-	enum State {
-		case unselected
-		case selected
-		case disabled
+			RadioButton(
+				appearance: .dark,
+				state: .unselected
+			)
+		}
+		.frame(.medium)
 	}
 }
