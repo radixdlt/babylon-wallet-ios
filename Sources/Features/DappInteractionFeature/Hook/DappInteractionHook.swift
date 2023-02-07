@@ -102,9 +102,8 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 			let next = state.requestQueue.first
 		{
 			state.currentDappInteraction = .relayed(next, with: .init(interaction: next.interaction))
-		} else {
-			return .none
 		}
+		return .none
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
