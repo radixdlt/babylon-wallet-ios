@@ -3,8 +3,12 @@ import FeaturePrelude
 // MARK: - Completion.View
 extension Completion {
 	struct ViewState: Equatable {
+		let title: String
+		let subtitle: String
+
 		init(state: Completion.State) {
-			// TODO: implement
+			title = L10n.DApp.Completion.title
+			subtitle = L10n.DApp.Completion.subtitle(state.dappMetadata.name)
 		}
 	}
 
@@ -18,11 +22,19 @@ extension Completion {
 				observe: Completion.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				// TODO: implement
-				Text("Implement: Completion")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				VStack(spacing: .medium2) {
+					Image(asset: AssetResource.successCheckmark)
+
+					Text(viewStore.title)
+						.foregroundColor(.app.gray1)
+						.textStyle(.sheetTitle)
+
+					Text(viewStore.subtitle)
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1Regular)
+						.multilineTextAlignment(.center)
+				}
+				.padding(.horizontal, .medium1)
 			}
 		}
 	}
@@ -44,6 +56,6 @@ struct Completion_Preview: PreviewProvider {
 }
 
 extension Completion.State {
-	static let previewValue: Self = .init()
+	static let previewValue: Self = .init(dappMetadata: .previewValue)
 }
 #endif

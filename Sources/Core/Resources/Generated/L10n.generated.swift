@@ -187,6 +187,14 @@ public enum L10n {
         public static let ongoing = L10n.tr("Localizable", "dApp.chooseAccounts.title.ongoing", fallback: "Account Permission")
       }
     }
+    public enum Completion {
+      /// Request from %s complete
+      public static func subtitle(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dApp.completion.subtitle", p1, fallback: "Request from %s complete")
+      }
+      /// Success
+      public static let title = L10n.tr("Localizable", "dApp.completion.title", fallback: "Success")
+    }
     public enum LoginRequest {
       /// Choose a Persona
       public static let chooseAPersonaTitle = L10n.tr("Localizable", "dApp.loginRequest.chooseAPersonaTitle", fallback: "Choose a Persona")
