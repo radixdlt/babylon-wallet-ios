@@ -63,7 +63,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		enum PersonaNotFoundErrorAlertAction: Sendable, Equatable {
 			case cancelButtonTapped
-			case systemDismissed
 		}
 	}
 
@@ -155,10 +154,15 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			} else {
 				return .none
 			}
-		case .personaNotFoundErrorAlert:
+		case let .personaNotFoundErrorAlert(action):
 			state.personaNotFoundErrorAlert = nil
-			// FIXME: .rejectedByUser should perhaps be a different, more specialized error (.invalidSpecifiedPersona?)
-			return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
+			switch action {
+			case .dismiss, .present:
+				return .none
+			case .presented(.cancelButtonTapped):
+				// FIXME: .rejectedByUser should perhaps be a different, more specialized error (.invalidSpecifiedPersona?)
+				return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
+			}
 		case .closeButtonTapped:
 			return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
 		case .backButtonTapped:
