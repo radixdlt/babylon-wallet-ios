@@ -84,7 +84,7 @@
 "dApp.request.malformedErrorAlert.message" = "Interaction received from dApp does not contain any valid requests.";
 "dApp.request.malformedErrorAlert.okButtonTitle" = "OK";
 "dApp.request.wrongNetworkError" = "Request received from dApp for network %@, but you are currently connected to %@.";
-"dApp.request.specifiedPersonaNotFoundError.message" = "Persona specified by dApp does not exist.";
+"dApp.request.specifiedPersonaNotFoundError.message" = "Persona specified by dApp does not exist.\n\n%@";
 "dApp.request.specifiedPersonaNotFoundError.cancelButtonTitle" = "Cancel";
 
 "fungibleTokenList.detail.currentSupply" = "Current Supply";

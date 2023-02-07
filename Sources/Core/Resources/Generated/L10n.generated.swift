@@ -292,7 +292,11 @@ public enum L10n {
         /// Cancel
         public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.request.specifiedPersonaNotFoundError.cancelButtonTitle", fallback: "Cancel")
         /// Persona specified by dApp does not exist.
-        public static let message = L10n.tr("Localizable", "dApp.request.specifiedPersonaNotFoundError.message", fallback: "Persona specified by dApp does not exist.")
+        /// 
+        /// %@
+        public static func message(_ p1: Any) -> String {
+          return L10n.tr("Localizable", "dApp.request.specifiedPersonaNotFoundError.message", String(describing: p1), fallback: "Persona specified by dApp does not exist.\n\n%@")
+        }
       }
     }
   }
