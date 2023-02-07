@@ -1,3 +1,4 @@
+// MARK: - ClientMessage
 struct ClientMessage: Sendable, Codable, Equatable {
 	enum Method: String, Sendable, Codable, Equatable {
 		case offer
@@ -19,14 +20,14 @@ struct ClientMessage: Sendable, Codable, Equatable {
 }
 
 extension ClientMessage.Method {
-        init(from primitive: RTCPrimitive) {
-                switch primitive {
-                case .offer:
-                        self = .offer
-                case .answer:
-                        self = .answer
-                case .addICE:
-                        self = .iceCandidate
-                }
-        }
+	init(from primitive: RTCPrimitive) {
+		switch primitive {
+		case .offer:
+			self = .offer
+		case .answer:
+			self = .answer
+		case .addICE:
+			self = .iceCandidate
+		}
+	}
 }

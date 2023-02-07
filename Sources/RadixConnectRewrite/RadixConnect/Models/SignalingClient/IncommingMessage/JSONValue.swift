@@ -1,9 +1,11 @@
 import Foundation
 
+// MARK: - JSONValue
 // https://gist.github.com/hannesoid/10a35895e4dc5d6f1bb6428f7d4d23a5
 public indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hashable {
 	case double(Double)
-        case int32(Int32)
+	case int32(Int32)
+	case int(Int)
 	case string(String)
 	case bool(Bool)
 	case dictionary([String: JSONValue])
@@ -18,13 +20,16 @@ public indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hash
 		} else if let value = try? singleValueContainer.decode(String.self) {
 			self = .string(value)
 			return
+		} else if let value = try? singleValueContainer.decode(Int.self) {
+			self = .int(value)
+			return
+		} else if let value = try? singleValueContainer.decode(Int32.self) {
+			self = .int32(value)
+			return
 		} else if let value = try? singleValueContainer.decode(Double.self) {
 			self = .double(value)
 			return
-		} else if let value = try? singleValueContainer.decode(Int32.self) {
-                        self = .int32(value)
-                        return
-                } else if let value = try? singleValueContainer.decode([String: JSONValue].self) {
+		} else if let value = try? singleValueContainer.decode([String: JSONValue].self) {
 			self = .dictionary(value)
 			return
 		} else if let value = try? singleValueContainer.decode([JSONValue].self) {
@@ -53,8 +58,9 @@ public indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hash
 		case let .string(string): try container.encode(string)
 		case let .bool(bool): try container.encode(bool)
 		case .nil: try container.encodeNil()
-                case let .int32(int): try container.encode(int)
-                }
+		case let .int32(int): try container.encode(int)
+		case let .int(int): try container.encode(int)
+		}
 	}
 
 	public var description: String {
@@ -79,65 +85,67 @@ public indirect enum JSONValue: Codable, CustomStringConvertible, Sendable, Hash
 			return dictionary.map {
 				"\($0.key): \($0.value.stringRepresentation)"
 			}.joined(separator: ", ")
-                case let .int32(int):
-                        return "\(int)"
-                }
+		case let .int32(int):
+			return "\(int)"
+		case let .int(int):
+			return "\(int)"
+		}
 	}
 }
 
 // MARK: - Convenience
 public extension JSONValue {
-        var string: String? {
-                switch self {
-                case let .string(value):
-                        return value
-                default:
-                        return nil
-                }
-        }
+	var string: String? {
+		switch self {
+		case let .string(value):
+			return value
+		default:
+			return nil
+		}
+	}
 
-        var double: Double? {
-                switch self {
-                case let .double(value):
-                        return value
-                default:
-                        return nil
-                }
-        }
+	var double: Double? {
+		switch self {
+		case let .double(value):
+			return value
+		default:
+			return nil
+		}
+	}
 
-        var bool: Bool? {
-                switch self {
-                case let .bool(value):
-                        return value
-                default:
-                        return nil
-                }
-        }
+	var bool: Bool? {
+		switch self {
+		case let .bool(value):
+			return value
+		default:
+			return nil
+		}
+	}
 
-        var dictionary: [String: JSONValue]? {
-                switch self {
-                case let .dictionary(value):
-                        return value
-                default:
-                        return nil
-                }
-        }
+	var dictionary: [String: JSONValue]? {
+		switch self {
+		case let .dictionary(value):
+			return value
+		default:
+			return nil
+		}
+	}
 
-        var array: [JSONValue]? {
-                switch self {
-                case let .array(value):
-                        return value
-                default:
-                        return nil
-                }
-        }
+	var array: [JSONValue]? {
+		switch self {
+		case let .array(value):
+			return value
+		default:
+			return nil
+		}
+	}
 
-        var isNil: Bool {
-                switch self {
-                case .nil:
-                        return true
-                default:
-                        return false
-                }
-        }
+	var isNil: Bool {
+		switch self {
+		case .nil:
+			return true
+		default:
+			return false
+		}
+	}
 }

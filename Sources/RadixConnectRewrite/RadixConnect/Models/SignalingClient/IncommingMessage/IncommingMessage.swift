@@ -10,19 +10,19 @@ enum IncommingMessage: Sendable, Equatable {
 }
 
 extension IncommingMessage {
-        var fromSignalingServer: FromSignalingServer? {
-                guard case let .fromSignalingServer(value) = self else {
-                        return nil
-                }
-                return value
-        }
+	var fromSignalingServer: FromSignalingServer? {
+		guard case let .fromSignalingServer(value) = self else {
+			return nil
+		}
+		return value
+	}
 
-        var fromRemoteClient: ClientMessage? {
-                guard case let .fromRemoteClient(value) = self else {
-                        return nil
-                }
-                return value
-        }
+	var fromRemoteClient: ClientMessage? {
+		guard case let .fromRemoteClient(value) = self else {
+			return nil
+		}
+		return value
+	}
 }
 
 extension IncommingMessage.FromSignalingServer {
@@ -37,19 +37,19 @@ extension IncommingMessage.FromSignalingServer {
 		case failure(RequestFailure)
 	}
 
-        var responseForRequest: ResponseForRequest? {
-                guard case let .responseForRequest(value) = self else {
-                        return nil
-                }
-                return value
-        }
+	var responseForRequest: ResponseForRequest? {
+		guard case let .responseForRequest(value) = self else {
+			return nil
+		}
+		return value
+	}
 
-        var notification: Notification? {
-                guard case let .notification(value) = self else {
-                        return nil
-                }
-                return value
-        }
+	var notification: Notification? {
+		guard case let .notification(value) = self else {
+			return nil
+		}
+		return value
+	}
 }
 
 extension IncommingMessage.FromSignalingServer.ResponseForRequest {
@@ -71,17 +71,29 @@ extension IncommingMessage.FromSignalingServer.ResponseForRequest {
 }
 
 extension IncommingMessage.FromSignalingServer.ResponseForRequest {
-        func resultOfRequest(id needle: RequestID) -> Result<Void, RequestFailure>? {
-                switch self {
-                case let .success(id) where id == needle:
-                        return .success(())
-                case let .failure(.invalidMessageError(invalidMessageError)) where invalidMessageError.messageSentThatWasInvalid.requestId == needle:
-                        return .failure(.invalidMessageError(invalidMessageError))
-                case let .failure(.noRemoteClientToTalkTo(id)) where id == needle:
-                        return .failure(.noRemoteClientToTalkTo(id))
-                case let .failure(.validationError(validationError)) where validationError.requestId == needle:
-                        return .failure(.validationError(validationError))
-                default: return nil
-                }
-        }
+	func resultOfRequest(id needle: RequestID) -> Result<Void, RequestFailure>? {
+		switch self {
+		case let .success(id) where id == needle:
+			return .success(())
+		case let .failure(.invalidMessageError(invalidMessageError)) where invalidMessageError.messageSentThatWasInvalid.requestId == needle:
+			return .failure(.invalidMessageError(invalidMessageError))
+		case let .failure(.noRemoteClientToTalkTo(id)) where id == needle:
+			return .failure(.noRemoteClientToTalkTo(id))
+		case let .failure(.validationError(validationError)) where validationError.requestId == needle:
+			return .failure(.validationError(validationError))
+		default: return nil
+		}
+	}
+}
+
+extension IncommingMessage.FromSignalingServer.Notification {
+	var remoteClientDidConnect: Bool {
+		switch self {
+		case .remoteClientJustConnected,
+		     .remoteClientIsAlreadyConnected:
+			return true
+		case .remoteClientDisconnected:
+			return false
+		}
+	}
 }
