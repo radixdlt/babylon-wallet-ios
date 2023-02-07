@@ -144,30 +144,42 @@ public enum L10n {
     public enum ChooseAccounts {
       /// Create a New Account
       public static let createNewAccount = L10n.tr("Localizable", "dApp.chooseAccounts.createNewAccount", fallback: "Create a New Account")
-      /// Choose %@
-      public static func explanation(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dApp.chooseAccounts.explanation", String(describing: p1), fallback: "Choose %@")
+      public enum Subtitle {
+        public enum Message {
+          public enum OneTime {
+            ///  is making a one-time request for at least %d accounts.
+            public static func atLeast(_ p1: Int) -> String {
+              return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.oneTime.atLeast", p1, fallback: " is making a one-time request for at least %d accounts.")
+            }
+            ///  is making a one-time request for at least 1 account.
+            public static let atLeastOne = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.oneTime.atLeastOne", fallback: " is making a one-time request for at least 1 account.")
+            ///  is making a one-time request for any number of accounts.
+            public static let atLeastZero = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.oneTime.atLeastZero", fallback: " is making a one-time request for any number of accounts.")
+            ///  is making a one-time request for at least %d accounts.
+            public static func exactly(_ p1: Int) -> String {
+              return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.oneTime.exactly", p1, fallback: " is making a one-time request for at least %d accounts.")
+            }
+            ///  is making a one-time request for 1 account.
+            public static let exactlyOne = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.oneTime.exactlyOne", fallback: " is making a one-time request for 1 account.")
+          }
+          public enum Ongoing {
+            /// Choose at least %d accounts you wish to use with 
+            public static func atLeast(_ p1: Int) -> String {
+              return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.ongoing.atLeast", p1, fallback: "Choose at least %d accounts you wish to use with ")
+            }
+            /// Choose at least 1 account you wish to use with 
+            public static let atLeastOne = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.ongoing.atLeastOne", fallback: "Choose at least 1 account you wish to use with ")
+            /// Choose any accounts you wish to use with 
+            public static let atLeastZero = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.ongoing.atLeastZero", fallback: "Choose any accounts you wish to use with ")
+            /// Choose %d accounts you wish to use with 
+            public static func exactly(_ p1: Int) -> String {
+              return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.ongoing.exactly", p1, fallback: "Choose %d accounts you wish to use with ")
+            }
+            /// Choose 1 account you wish to use with 
+            public static let exactlyOne = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.ongoing.exactlyOne", fallback: "Choose 1 account you wish to use with ")
+          }
+        }
       }
-      /// At Least One Account
-      public static let explanationAtLeastOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationAtLeastOneAccount", fallback: "At Least One Account")
-      /// One Account
-      public static let explanationExactlyOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactlyOneAccount", fallback: "One Account")
-      /// #%d Accounts
-      public static func explanationExactNumberOfAccounts(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactNumberOfAccounts", p1, fallback: "#%d Accounts")
-      }
-      /// Choose the account(s) you want %@ to know about.
-      public static func subtitle(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle", String(describing: p1), fallback: "Choose the account(s) you want %@ to know about.")
-      }
-      /// Choose Accounts
-      public static let title = L10n.tr("Localizable", "dApp.chooseAccounts.title", fallback: "Choose Accounts")
-      /// Unnamed Account
-      public static let unnamedAccount = L10n.tr("Localizable", "dApp.chooseAccounts.unnamedAccount", fallback: "Unnamed Account")
-    }
-    public enum ConnectionRequest {
-      /// Continue
-      public static let continueButtonTitle = L10n.tr("Localizable", "dApp.connectionRequest.continueButtonTitle", fallback: "Continue")
     }
     public enum LoginRequest {
       /// Choose a Persona

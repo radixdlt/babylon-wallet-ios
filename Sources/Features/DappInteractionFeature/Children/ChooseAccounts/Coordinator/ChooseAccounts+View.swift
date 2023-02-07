@@ -22,28 +22,28 @@ extension ChooseAccounts {
 					case .ongoing:
 						switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
 						case (.atLeast, 0):
-							return "Choose any accounts you wish to use with "
+							return L10n.DApp.ChooseAccounts.Subtitle.Message.Ongoing.atLeastZero
 						case (.atLeast, 1):
-							return "Choose at least 1 account you wish to use with "
+							return L10n.DApp.ChooseAccounts.Subtitle.Message.Ongoing.atLeastOne
 						case let (.atLeast, number):
-							return "Choose at least \(number) accounts you wish to use with "
+							return L10n.DApp.ChooseAccounts.Subtitle.Message.Ongoing.atLeast(number)
 						case (.exactly, 1):
-							return "Choose 1 account you wish to use with "
+							return L10n.DApp.ChooseAccounts.Subtitle.Message.Ongoing.exactlyOne
 						case let (.exactly, number):
-							return "Choose \(number) accounts you wish to use with "
+							return L10n.DApp.ChooseAccounts.Subtitle.Message.Ongoing.exactly(number)
 						}
 					case .oneTime:
 						switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
 						case (.atLeast, 0):
-							return " is making a one-time request for any number of accounts."
+							return L10n.DApp.ChooseAccounts.Subtitle.Message.OneTime.atLeastZero
 						case (.atLeast, 1):
-							return " is making a one-time request for at least 1 account."
+							return L10n.DApp.ChooseAccounts.Subtitle.Message.OneTime.atLeastOne
 						case let (.atLeast, number):
-							return " is making a one-time request for at least \(number) accounts."
+							return L10n.DApp.ChooseAccounts.Subtitle.Message.OneTime.atLeast(number)
 						case (.exactly, 1):
-							return " is making a one-time request for 1 account."
+							return L10n.DApp.ChooseAccounts.Subtitle.Message.OneTime.exactlyOne
 						case let (.exactly, number):
-							return " is making a one-time request for at least \(number) accounts."
+							return L10n.DApp.ChooseAccounts.Subtitle.Message.OneTime.exactly(number)
 						}
 					}
 				}()

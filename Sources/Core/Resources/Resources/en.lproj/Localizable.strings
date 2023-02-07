@@ -44,15 +44,16 @@
 "createEntity.completion.goToDestination" = "Go to %@";
 
 "dApp.chooseAccounts.createNewAccount" = "Create a New Account";
-"dApp.chooseAccounts.explanation" = "Choose %@";
-"dApp.chooseAccounts.explanationAtLeastOneAccount" = "At Least One Account";
-"dApp.chooseAccounts.explanationExactNumberOfAccounts" = "#%d Accounts";
-"dApp.chooseAccounts.explanationExactlyOneAccount" = "One Account";
-"dApp.chooseAccounts.subtitle" = "Choose the account(s) you want %@ to know about.";
-"dApp.chooseAccounts.title" = "Account Permission";
-"dApp.chooseAccounts.title" = "Choose Accounts";
-"dApp.chooseAccounts.unnamedAccount" = "Unnamed Account";
-"dApp.connectionRequest.continueButtonTitle" = "Continue";
+"dApp.chooseAccounts.subtitle.message.oneTime.atLeast" = " is making a one-time request for at least %d accounts.";
+"dApp.chooseAccounts.subtitle.message.oneTime.atLeastOne" = " is making a one-time request for at least 1 account.";
+"dApp.chooseAccounts.subtitle.message.oneTime.atLeastZero" = " is making a one-time request for any number of accounts.";
+"dApp.chooseAccounts.subtitle.message.oneTime.exactly" = " is making a one-time request for at least %d accounts.";
+"dApp.chooseAccounts.subtitle.message.oneTime.exactlyOne" = " is making a one-time request for 1 account.";
+"dApp.chooseAccounts.subtitle.message.ongoing.atLeast" = "Choose at least %d accounts you wish to use with ";
+"dApp.chooseAccounts.subtitle.message.ongoing.atLeastOne" = "Choose at least 1 account you wish to use with ";
+"dApp.chooseAccounts.subtitle.message.ongoing.atLeastZero" = "Choose any accounts you wish to use with ";
+"dApp.chooseAccounts.subtitle.message.ongoing.exactly" = "Choose %d accounts you wish to use with ";
+"dApp.chooseAccounts.subtitle.message.ongoing.exactlyOne" = "Choose 1 account you wish to use with ";
 "dApp.loginRequest.chooseAPersonaTitle" = "Choose a Persona";
 "dApp.loginRequest.continueButtonTitle" = "Continue";
 "dApp.loginRequest.row.lastLoginWasOn" = "Your last login was on %@";
