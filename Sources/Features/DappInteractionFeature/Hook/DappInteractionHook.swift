@@ -124,6 +124,8 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 //				}
 //				await send(.internal(.sentResponseToDapp(for: request)))
 //			}
+		default:
+			return .none
 		}
 	}
 }
