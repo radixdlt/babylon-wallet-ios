@@ -108,9 +108,6 @@ public extension AppSettings {
 			state.personasCoordinator = nil
 			return .none
 
-		case .internal, .child, .delegate:
-			return .none
-
 		case .internal(.view(.addP2PClientButtonTapped)):
 			state.manageP2PClients = .init(newConnection: .init())
 			return .none
@@ -122,6 +119,9 @@ public extension AppSettings {
 		case .internal(.view(.personasButtonTapped)):
 			// TODO: implement
 			state.personasCoordinator = .init()
+			return .none
+			
+		case .internal, .child, .delegate:
 			return .none
 		}
 	}
