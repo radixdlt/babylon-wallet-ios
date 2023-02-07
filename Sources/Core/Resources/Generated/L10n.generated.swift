@@ -277,8 +277,8 @@ public enum L10n {
         public static let okButtonTitle = L10n.tr("Localizable", "dApp.request.malformedErrorAlert.okButtonTitle", fallback: "OK")
       }
       public enum SpecifiedPersonaNotFoundError {
-        /// Persona specified by dApp does not exist.
-        public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.request.specifiedPersonaNotFoundError.cancelButtonTitle", fallback: "Persona specified by dApp does not exist.")
+        /// Cancel
+        public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.request.specifiedPersonaNotFoundError.cancelButtonTitle", fallback: "Cancel")
         /// Persona specified by dApp does not exist.
         public static let message = L10n.tr("Localizable", "dApp.request.specifiedPersonaNotFoundError.message", fallback: "Persona specified by dApp does not exist.")
       }
