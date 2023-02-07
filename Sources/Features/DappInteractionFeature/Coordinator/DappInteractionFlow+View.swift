@@ -93,19 +93,10 @@ struct DappInteraction_Preview: PreviewProvider {
 			store: .init(
 				initialState: .init(
 					dappMetadata: .previewValue,
-					interaction: .init(
-						id: .previewValue0,
-						items: .request(.authorized(.init(
-							//							auth: .login(.init(challenge: nil)),
-//							auth: .usePersona(.init(identityAddress: OnNetwork.Persona.previewValue0.address.address)),
-							auth: .usePersona(.init(identityAddress: "invalidaddress")),
-							oneTimeAccounts: .previewValue,
-							ongoingAccounts: .init(
-								numberOfAccounts: .atLeast(2),
-								requiresProofOfOwnership: false
-							)
-						))),
-						metadata: .previewValue
+					interaction: .previewValueAllRequests(
+						auth: .login(.init(challenge: nil))
+//						auth: .usePersona(.init(identityAddress: OnNetwork.Persona.previewValue0.address.address))
+//						auth: .usePersona(.init(identityAddress: "invalidaddress"))
 					)
 				)!,
 				reducer: DappInteractionFlow()

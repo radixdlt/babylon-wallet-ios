@@ -40,7 +40,13 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 	static var previews: some View {
 		DappInteractionCoordinator.View(
 			store: .init(
-				initialState: .init(interaction: .previewValueOneTimeAccount),
+				initialState: .init(
+					interaction: .previewValueAllRequests(
+						auth: .login(.init(challenge: nil))
+//						auth: .usePersona(.init(identityAddress: OnNetwork.Persona.previewValue0.address.address))
+//						auth: .usePersona(.init(identityAddress: "invalidaddress"))
+					)
+				),
 				reducer: DappInteractionCoordinator()
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataSuccess)
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataFailure)

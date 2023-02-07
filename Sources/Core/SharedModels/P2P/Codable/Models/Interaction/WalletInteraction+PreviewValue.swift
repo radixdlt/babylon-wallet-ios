@@ -74,6 +74,21 @@ public extension P2P.FromDapp.WalletInteraction.Metadata {
 }
 
 public extension P2P.FromDapp.WalletInteraction {
+	static func previewValueAllRequests(auth: P2P.FromDapp.WalletInteraction.AuthRequestItem) -> Self {
+		.init(
+			id: .previewValue0,
+			items: .request(.authorized(.init(
+				auth: auth,
+				oneTimeAccounts: .previewValue,
+				ongoingAccounts: .init(
+					numberOfAccounts: .atLeast(2),
+					requiresProofOfOwnership: false
+				)
+			))),
+			metadata: .previewValue
+		)
+	}
+
 	static let previewValueOneTimeAccount: Self = .previewValueOneTimeAccount()
 	static func previewValueOneTimeAccount(
 		id: ID = .previewValue0
