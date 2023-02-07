@@ -50,26 +50,26 @@ extension DappInteractionFlow {
 		func destination(
 			for store: StoreOf<DappInteractionFlow.Destinations>
 		) -> some SwiftUI.View {
-			SwitchStore(store) {
+			SwitchStore(store.relay()) {
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.State.login,
-					action: DappInteractionFlow.Destinations.Action.login,
-					then: { LoginRequest.View(store: $0.relay()) }
+					state: /DappInteractionFlow.Destinations.MainState.login,
+					action: DappInteractionFlow.Destinations.MainAction.login,
+					then: { LoginRequest.View(store: $0) }
 				)
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.State.permission,
-					action: DappInteractionFlow.Destinations.Action.permission,
-					then: { Permission.View(store: $0.relay()) }
+					state: /DappInteractionFlow.Destinations.MainState.permission,
+					action: DappInteractionFlow.Destinations.MainAction.permission,
+					then: { Permission.View(store: $0) }
 				)
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.State.chooseAccounts,
-					action: DappInteractionFlow.Destinations.Action.chooseAccounts,
-					then: { ChooseAccounts.View(store: $0.relay()) }
+					state: /DappInteractionFlow.Destinations.MainState.chooseAccounts,
+					action: DappInteractionFlow.Destinations.MainAction.chooseAccounts,
+					then: { ChooseAccounts.View(store: $0) }
 				)
 				CaseLet(
-					state: /DappInteractionFlow.Destinations.State.signAndSubmitTransaction,
-					action: DappInteractionFlow.Destinations.Action.signAndSubmitTransaction,
-					then: { TransactionSigning.View(store: $0.relay()) }
+					state: /DappInteractionFlow.Destinations.MainState.signAndSubmitTransaction,
+					action: DappInteractionFlow.Destinations.MainAction.signAndSubmitTransaction,
+					then: { TransactionSigning.View(store: $0) }
 				)
 			}
 		}
