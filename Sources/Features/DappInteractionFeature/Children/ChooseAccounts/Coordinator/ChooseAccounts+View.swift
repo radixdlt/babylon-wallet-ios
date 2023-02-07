@@ -4,6 +4,13 @@ import FeaturePrelude
 // MARK: - ChooseAccounts.View
 extension ChooseAccounts {
 	struct ViewState: Equatable {
+		var dappImage: some SwiftUI.View {
+			// NOTE: using placeholder until API is available
+			Color.app.gray4
+				.frame(.medium)
+				.cornerRadius(.medium3)
+		}
+
 		let title: String
 		let subtitle: AttributedString
 		let canProceed: Bool
@@ -87,7 +94,7 @@ extension ChooseAccounts {
 					ScrollView {
 						VStack(spacing: .small1) {
 							VStack(spacing: .medium2) {
-								dappImage
+								viewStore.dappImage
 
 								Text(viewStore.title)
 									.foregroundColor(.app.gray1)
@@ -135,16 +142,6 @@ extension ChooseAccounts {
 				}
 			}
 		}
-	}
-}
-
-// MARK: - Private Computed Properties
-private extension ChooseAccounts.View {
-	var dappImage: some SwiftUI.View {
-		// NOTE: using placeholder until API is available
-		Color.app.gray4
-			.frame(.medium)
-			.cornerRadius(.medium3)
 	}
 }
 
