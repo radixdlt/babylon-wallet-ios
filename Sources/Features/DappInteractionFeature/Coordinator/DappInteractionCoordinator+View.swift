@@ -48,6 +48,8 @@ struct DappInteractionCoordinator_Previews: PreviewProvider {
 					)
 				),
 				reducer: DappInteractionCoordinator()
+					.dependency(\.profileClient, .previewValueTwoPersonas(existing: false))
+					.dependency(\.profileClient, .previewValueTwoPersonas(existing: true))
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataSuccess)
 					.dependency(\.gatewayAPIClient, .previewValueDappMetadataFailure)
 			)

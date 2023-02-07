@@ -100,7 +100,8 @@ struct DappInteraction_Preview: PreviewProvider {
 					)
 				)!,
 				reducer: DappInteractionFlow()
-					.dependency(\.profileClient, .previewValueTwoPersonas)
+					.dependency(\.profileClient, .previewValueTwoPersonas(existing: true))
+					.dependency(\.profileClient, .previewValueTwoPersonas(existing: false))
 			)
 		)
 	}
@@ -109,31 +110,37 @@ struct DappInteraction_Preview: PreviewProvider {
 import ProfileClient
 
 extension ProfileClient {
-	static let previewValueTwoPersonas = with(noop) {
-		$0.getAccounts = {
-			NonEmpty(.previewValue0, .previewValue1)
-		}
-		$0.getPersonas = {
-			[.previewValue0, .previewValue1]
-		}
-		$0.getConnectedDapps = {
-			var dapp = OnNetwork.ConnectedDapp(
-				networkID: .nebunet,
-				dAppDefinitionAddress: try! .init(address: "DappDefinitionAddress"),
-				displayName: .init(rawValue: "something")!
-			)
-			dapp.referencesToAuthorizedPersonas = [
-				.init(
-					identityAddress: OnNetwork.Persona.previewValue1.address,
-					fieldIDs: [],
-					lastLogin: .now,
-					sharedAccounts: try! .init(
-						accountsReferencedByAddress: [try! AccountAddress(address: "abc")],
-						forRequest: .exactly(1)
-					)
-				),
-			]
-			return [dapp]
+	static func previewValueTwoPersonas(existing: Bool) -> Self {
+		with(noop) {
+			$0.getAccounts = {
+				NonEmpty(.previewValue0, .previewValue1)
+			}
+			$0.getPersonas = {
+				if existing {
+					return [.previewValue0, .previewValue1]
+				} else {
+					return [.previewValue0]
+				}
+			}
+			$0.getConnectedDapps = {
+				var dapp = OnNetwork.ConnectedDapp(
+					networkID: .nebunet,
+					dAppDefinitionAddress: try! .init(address: "DappDefinitionAddress"),
+					displayName: .init(rawValue: "something")!
+				)
+				dapp.referencesToAuthorizedPersonas = [
+					.init(
+						identityAddress: OnNetwork.Persona.previewValue1.address,
+						fieldIDs: [],
+						lastLogin: .now,
+						sharedAccounts: try! .init(
+							accountsReferencedByAddress: [try! AccountAddress(address: "abc")],
+							forRequest: .exactly(1)
+						)
+					),
+				]
+				return [dapp]
+			}
 		}
 	}
 }

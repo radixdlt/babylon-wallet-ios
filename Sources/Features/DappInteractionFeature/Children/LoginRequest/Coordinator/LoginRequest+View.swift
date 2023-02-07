@@ -130,7 +130,8 @@ struct LoginRequest_Preview: PreviewProvider {
 			store: .init(
 				initialState: .previewValue,
 				reducer: LoginRequest()
-					.dependency(\.profileClient, .previewValueTwoPersonas)
+					.dependency(\.profileClient, .previewValueTwoPersonas(existing: true))
+					.dependency(\.profileClient, .previewValueTwoPersonas(existing: false))
 			)
 		)
 	}
