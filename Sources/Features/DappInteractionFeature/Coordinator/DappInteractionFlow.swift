@@ -77,7 +77,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case dismiss
+		case dismiss(P2P.ToDapp.WalletInteractionFailureResponse)
+		case submit(P2P.ToDapp.WalletInteractionSuccessResponse)
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -155,9 +156,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 		case .personaNotFoundErrorAlert:
 			state.personaNotFoundErrorAlert = nil
-			return .send(.delegate(.dismiss))
+			// FIXME: .rejectedByUser should probably be a different, specialized error perhaps (.invalidSpecifiedPersona?)
+			return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
 		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
+			return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
 		case .backButtonTapped:
 			return goBackEffect(for: &state)
 		}
@@ -205,6 +207,16 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			let .path(.element(_, .relay(item, .chooseAccounts(.delegate(.continueButtonTapped(accounts, accessKind)))))):
 			setAccountsResponse(to: item, accounts, accessKind: accessKind, into: &state)
 			return continueEffect(for: &state)
+		case
+			let .root(.relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID))))),
+			let .path(.element(_, .relay(item, .signAndSubmitTransaction(.delegate(.signedTXAndSubmittedToGateway(txID)))))):
+			state.responseItems[item] = .remote(.send(.init(txID: txID)))
+			return continueEffect(for: &state)
+		case
+			let .root(.relay(item, .signAndSubmitTransaction(.delegate(.failed(error))))),
+			let .path(.element(_, .relay(item, .signAndSubmitTransaction(.delegate(.failed(error)))))):
+			let (errorKind, message) = error.errorKindAndMessage
+			return dismissEffect(for: state, errorKind: errorKind, message: message)
 		default:
 			return .none
 		}
@@ -247,6 +259,18 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		state.responseItems.removeLast()
 		state.path.removeLast()
 		return .none
+	}
+
+	func dismissEffect(
+		for state: State,
+		errorKind: P2P.ToDapp.WalletInteractionFailureResponse.ErrorType,
+		message: String?
+	) -> EffectTask<Action> {
+		.send(.delegate(.dismiss(.init(
+			interactionId: state.remoteInteraction.id,
+			errorType: errorKind,
+			message: message
+		))))
 	}
 }
 
@@ -309,6 +333,48 @@ extension DappInteractionFlow.Destinations.State {
 			self = .relayed(anyItem, with: .signAndSubmitTransaction(.init(
 				transactionManifestWithoutLockFee: item.transactionManifest
 			)))
+		}
+	}
+}
+
+extension ApproveTransactionFailure {
+	var errorKindAndMessage: (errorKind: P2P.ToDapp.WalletInteractionFailureResponse.ErrorType, message: String?) {
+		switch self {
+		case let .transactionFailure(transactionFailure):
+			switch transactionFailure {
+			case let .failedToCompileOrSign(error):
+				switch error {
+				case .failedToCompileNotarizedTXIntent, .failedToCompileTXIntent, .failedToCompileSignedTXIntent, .failedToGenerateTXId:
+					return (errorKind: .failedToCompileTransaction, message: nil)
+				case .failedToSignIntentWithAccountSigners, .failedToSignSignedCompiledIntentWithNotarySigner, .failedToConvertNotarySignature, .failedToConvertAccountSignatures:
+					return (errorKind: .failedToSignTransaction, message: nil)
+				}
+			case let .failedToPrepareForTXSigning(error):
+				return (errorKind: .failedToPrepareTransaction, message: error.errorDescription)
+
+			case let .failedToSubmit(submissionError):
+
+				switch submissionError {
+				case .failedToSubmitTX:
+					return (errorKind: .failedToSubmitTransaction, message: nil)
+				case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .rejected):
+					return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TXID: \(txID)")
+				case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
+					return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TXID: \(txID)")
+				case let .failedToPollTX(txID, _):
+					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+				case let .invalidTXWasDuplicate(txID):
+					return (errorKind: .submittedTransactionWasDuplicate, message: "TXID: \(txID)")
+				case let .failedToGetTransactionStatus(txID, _):
+					return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+				}
+			}
+
+		case let .prepareTransactionFailure(prepareTransactionFailure):
+			switch prepareTransactionFailure {
+			case let .addTransactionFee(addTransactionFeeError):
+				return (errorKind: .failedToPrepareTransaction, message: addTransactionFeeError.localizedDescription)
+			}
 		}
 	}
 }
