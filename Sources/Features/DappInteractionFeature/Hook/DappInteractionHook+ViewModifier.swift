@@ -2,14 +2,16 @@ import FeaturePrelude
 
 public extension View {
 	func presentsDappInteractions() -> some View {
-		self.modifier(
-			DappInteractionHook.ViewModifier(
-				store: .init(
-					initialState: .init(),
-					reducer: DappInteractionHook()
-				)
+		self.presentsDappInteractions(
+			store: .init(
+				initialState: .init(),
+				reducer: DappInteractionHook()
 			)
 		)
+	}
+
+	internal func presentsDappInteractions(store: StoreOf<DappInteractionHook>) -> some View {
+		self.modifier(DappInteractionHook.ViewModifier(store: store))
 	}
 }
 
@@ -24,13 +26,13 @@ extension DappInteractionHook {
 			content
 			#if os(iOS)
 			.fullScreenCover(
-				store: store.scope(state: \.$dappInteraction, action: { .child(.dappInteraction($0)) }),
-				content: { DappInteractionCoordinator.View(store: $0) }
+				store: store.scope(state: \.$currentDappInteraction, action: { .child(.dappInteraction($0)) }),
+				content: { DappInteractionCoordinator.View(store: $0.relay()) }
 			)
 			#elseif os(macOS)
 			.sheet(
-				store: store.scope(state: \.$dappInteraction, action: { .child(.dappInteraction($0)) }),
-				content: { DappInteractionCoordinator.View(store: $0) }
+				store: store.scope(state: \.$currentDappInteraction, action: { .child(.dappInteraction($0)) }),
+				content: { DappInteractionCoordinator.View(store: $0.relay()) }
 			)
 			#endif
 			.task {
@@ -39,3 +41,16 @@ extension DappInteractionHook {
 		}
 	}
 }
+
+#if DEBUG
+struct DappInteractionHook_Previews: PreviewProvider {
+	static var previews: some View {
+		Color.red.presentsDappInteractions(
+			store: .init(
+				initialState: .init(),
+				reducer: DappInteractionHook()
+			)
+		)
+	}
+}
+#endif
