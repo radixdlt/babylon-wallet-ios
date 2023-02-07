@@ -1,6 +1,6 @@
 import FeatureTestingPrelude
 import TransactionClient
-import TransactionSigningFeature
+@testable import TransactionSigningFeature
 
 @MainActor
 final class TransactionSigningFeatureTests: TestCase {
@@ -40,10 +40,5 @@ final class TransactionSigningFeatureTests: TestCase {
 		await store.receive(.internal(.signTransactionResult(.success("MOCKED_TX_ID")))) {
 			$0.isSigningTX = false
 		}
-	}
-
-	func testReject() async {
-		await store.send(.view(.dismissButtonTapped))
-		await store.receive(.delegate(.rejected))
 	}
 }

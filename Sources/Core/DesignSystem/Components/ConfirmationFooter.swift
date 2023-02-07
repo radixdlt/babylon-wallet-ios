@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - ConfirmationFooter
 public struct ConfirmationFooter: View {
 	public let title: String
-	public let isEnabled: Bool
+	public let isEnabled: Bool // TODO: remove, just set .controlState from outside instead
 	public let action: () -> Void
 
 	public init(
