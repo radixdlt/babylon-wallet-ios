@@ -28,6 +28,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		let dappMetadata: DappMetadata
 		let remoteInteraction: RemoteInteraction
+		var remoteResponseItems: [RemoteInteractionResponseItem] {
+			// NB: should be    .compactMap(\.remote?) with native case paths
+			responseItems.values.compactMap(/DappInteractionFlow.State.AnyInteractionResponseItem.remote)
+		}
 
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
@@ -256,7 +260,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 			return .none
 		} else {
-			return .run { _ in } // TODO: flow is finished, submit response!
+			if let response = P2P.ToDapp.WalletInteractionSuccessResponse(
+				for: state.remoteInteraction,
+				with: state.remoteResponseItems
+			) {
+				return .send(.delegate(.submit(response)))
+			} else {
+				return .none // TODO: throw error (invalid response format)
+			}
 		}
 	}
 

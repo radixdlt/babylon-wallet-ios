@@ -76,7 +76,7 @@ extension P2P.ToDapp.WalletInteractionSuccessResponse {
 
 	init?(
 		for interaction: P2P.FromDapp.WalletInteraction,
-		with items: [P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem]
+		with items: some Collection<P2P.ToDapp.WalletInteractionSuccessResponse.AnyInteractionResponseItem>
 	) {
 		switch interaction.items {
 		case .request:
