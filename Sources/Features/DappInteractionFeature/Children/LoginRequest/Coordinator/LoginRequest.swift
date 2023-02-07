@@ -3,7 +3,6 @@ import FeaturePrelude
 // MARK: - LoginRequest
 struct LoginRequest: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let interactionItem: DappInteractionFlow.State.AnyInteractionItem! // TODO: @davdroman factor out onto Proxy reducer
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
 
@@ -14,11 +13,9 @@ struct LoginRequest: Sendable, FeatureReducer {
 		}
 
 		init(
-			interactionItem: DappInteractionFlow.State.AnyInteractionItem!,
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata
 		) {
-			self.interactionItem = interactionItem
 			self.dappDefinitionAddress = dappDefinitionAddress
 			self.dappMetadata = dappMetadata
 		}
@@ -39,11 +36,7 @@ struct LoginRequest: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped(
-			DappInteractionFlow.State.AnyInteractionItem,
-			OnNetwork.Persona,
-			OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
-		)
+		case continueButtonTapped(OnNetwork.Persona, OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?)
 	}
 
 	@Dependency(\.profileClient) var profileClient
@@ -84,7 +77,7 @@ struct LoginRequest: Sendable, FeatureReducer {
 			// TODO:
 			return .none
 		case let .continueButtonTapped(persona):
-			return .send(.delegate(.continueButtonTapped(state.interactionItem, persona, state.authorizedPersona)))
+			return .send(.delegate(.continueButtonTapped(persona, state.authorizedPersona)))
 		}
 	}
 

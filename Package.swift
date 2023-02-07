@@ -316,7 +316,7 @@ package.addModules([
 		name: "FeaturePrelude",
 		dependencies: [
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-				.package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "navigation")
+				.package(url: "https://github.com/davdroman/swift-composable-architecture", branch: "scope-local-state-action")
 			},
 			"DesignSystem",
 			"Resources",

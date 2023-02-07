@@ -68,15 +68,18 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
+		typealias StateWithRelayedInteractionItem<MainState> = RelayState<DappInteractionFlow.State.AnyInteractionItem, MainState>
+		typealias ActionWithRelayedInteractionItem<MainAction> = RelayAction<DappInteractionFlow.State.AnyInteractionItem, MainAction>
+
 		enum State: Sendable, Hashable {
-			case login(LoginRequest.State)
+			case login(StateWithRelayedInteractionItem<LoginRequest.State>)
 			case permission(Permission.State)
 			case chooseAccounts(ChooseAccounts.State)
 			case signAndSubmitTransaction(TransactionSigning.State)
 		}
 
 		enum Action: Sendable, Equatable {
-			case login(LoginRequest.Action)
+			case login(ActionWithRelayedInteractionItem<LoginRequest.Action>)
 			case permission(Permission.Action)
 			case chooseAccounts(ChooseAccounts.Action)
 			case signAndSubmitTransaction(TransactionSigning.Action)
@@ -84,7 +87,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.login, action: /Action.login) {
-				LoginRequest()
+				Relay { LoginRequest() }
 			}
 			Scope(state: /State.permission, action: /Action.permission) {
 				Permission()
@@ -123,8 +126,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case
-			let .root(.login(.delegate(.continueButtonTapped(item, persona, authorizedPersona)))),
-			let .path(.element(_, .login(.delegate(.continueButtonTapped(item, persona, authorizedPersona))))):
+			let .root(.login(.relay(item, .delegate(.continueButtonTapped(persona, authorizedPersona))))),
+			let .path(.element(_, .login(.relay(item, .delegate(.continueButtonTapped(persona, authorizedPersona)))))):
 			let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withoutChallenge(.init(
 				identityAddress: persona.address.address
 			)))))
@@ -218,11 +221,10 @@ extension DappInteractionFlow.Destinations.State {
 		case .remote(.auth(.usePersona)):
 			return nil
 		case .remote(.auth(.login(_))): // TODO: bind to item when implementing auth challenge
-			self = .login(.init(
-				interactionItem: anyItem,
+			self = .login(.relayed(anyItem, with: .init(
 				dappDefinitionAddress: interaction.metadata.dAppDefinitionAddress,
 				dappMetadata: dappMetadata
-			))
+			)))
 		case let .local(.permissionRequested(permissionKind)):
 			self = .permission(.init(
 				interactionItem: anyItem,

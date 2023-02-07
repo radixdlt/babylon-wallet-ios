@@ -54,7 +54,7 @@ extension DappInteractionFlow {
 				CaseLet(
 					state: /DappInteractionFlow.Destinations.State.login,
 					action: DappInteractionFlow.Destinations.Action.login,
-					then: { LoginRequest.View(store: $0) }
+					then: { LoginRequest.View(store: $0.relay()) }
 				)
 				CaseLet(
 					state: /DappInteractionFlow.Destinations.State.permission,

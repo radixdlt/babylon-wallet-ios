@@ -141,7 +141,6 @@ struct LoginRequest_Preview: PreviewProvider {
 
 extension LoginRequest.State {
 	static let previewValue: Self = .init(
-		interactionItem: nil,
 		dappDefinitionAddress: try! .init(address: "DappDefinitionAddress"),
 		dappMetadata: .previewValue
 	)
