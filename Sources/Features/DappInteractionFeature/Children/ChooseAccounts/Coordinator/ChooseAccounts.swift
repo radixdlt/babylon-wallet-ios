@@ -10,7 +10,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			case oneTime
 		}
 
-		var selectedAccounts: [ChooseAccounts.Row.State] {
+		var selectedAccounts: [ChooseAccountsRow.State] {
 			availableAccounts.filter(\.isSelected)
 		}
 
@@ -19,7 +19,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
 		let numberOfAccounts: DappInteraction.NumberOfAccounts
-		var availableAccounts: IdentifiedArrayOf<ChooseAccounts.Row.State>
+		var availableAccounts: IdentifiedArrayOf<ChooseAccountsRow.State>
 		var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		init(
@@ -28,7 +28,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			dappDefinitionAddress: DappDefinitionAddress,
 			dappMetadata: DappMetadata,
 			numberOfAccounts: DappInteraction.NumberOfAccounts,
-			availableAccounts: IdentifiedArrayOf<ChooseAccounts.Row.State> = [],
+			availableAccounts: IdentifiedArrayOf<ChooseAccountsRow.State> = [],
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil
 		) {
 			self.interactionItem = interactionItem
@@ -52,7 +52,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case account(id: ChooseAccounts.Row.State.ID, action: ChooseAccounts.Row.Action)
+		case account(id: ChooseAccountsRow.State.ID, action: ChooseAccountsRow.Action)
 		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 
@@ -70,7 +70,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.forEach(\.availableAccounts, action: /Action.child .. ChildAction.account) {
-				ChooseAccounts.Row()
+				ChooseAccountsRow()
 			}
 			.ifLet(\.createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
 				CreateAccountCoordinator()
@@ -104,7 +104,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadAccountsResult(.success(accounts)):
 			state.availableAccounts = .init(uniqueElements: accounts.map {
-				ChooseAccounts.Row.State(account: $0)
+				ChooseAccountsRow.State(account: $0)
 			})
 			return .none
 

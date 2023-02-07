@@ -104,7 +104,7 @@ extension ChooseAccounts {
 									state: \.availableAccounts,
 									action: { .child(.account(id: $0, action: $1)) }
 								),
-								content: { ChooseAccounts.Row.View(store: $0) }
+								content: { ChooseAccountsRow.View(store: $0) }
 							)
 
 							Spacer()
