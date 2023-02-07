@@ -22,11 +22,12 @@ extension DappInteractionCoordinator {
 				}
 			}
 			.alert(
-				store.scope(
-					state: \.errorAlert,
+				store: store.scope(
+					state: \.$errorAlert,
 					action: { .view(.malformedInteractionErrorAlert($0)) }
 				),
-				dismiss: .systemDismissed
+				state: { $0 },
+				action: { $0 }
 			)
 		}
 	}

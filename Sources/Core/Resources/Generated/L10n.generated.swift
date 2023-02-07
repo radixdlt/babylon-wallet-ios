@@ -226,7 +226,11 @@ public enum L10n {
         /// Cancel
         public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.cancelButtonTitle", fallback: "Cancel")
         /// Danger! Bad dApp config or you're being spoofed!
-        public static let message = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.message", fallback: "Danger! Bad dApp config or you're being spoofed!")
+        /// 
+        /// %@
+        public static func message(_ p1: Any) -> String {
+          return L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.message", String(describing: p1), fallback: "Danger! Bad dApp config or you're being spoofed!\n\n%@")
+        }
         /// Retry
         public static let retryButtonTitle = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.retryButtonTitle", fallback: "Retry")
       }

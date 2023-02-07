@@ -6,6 +6,8 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let interaction: P2P.FromDapp.WalletInteraction
 		var isLoading: Bool = false
+
+		@PresentationState
 		var errorAlert: AlertState<ViewAction.ErrorAlertAction>?
 
 		init(interaction: P2P.FromDapp.WalletInteraction) {
@@ -15,13 +17,12 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared
-		case errorAlert(ErrorAlertAction)
+		case errorAlert(PresentationAction<AlertState<ErrorAlertAction>, ErrorAlertAction>)
 		case dismissButtonTapped
 
 		enum ErrorAlertAction: Sendable, Equatable {
 			case retryButtonTapped
 			case cancelButtonTapped
-			case systemDismissed
 		}
 	}
 
@@ -43,9 +44,11 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		case let .errorAlert(action):
 			state.errorAlert = nil
 			switch action {
-			case .retryButtonTapped:
+			case .dismiss, .present:
+				return .none
+			case .presented(.retryButtonTapped):
 				return metadataLoadingEffect(with: &state)
-			case .cancelButtonTapped, .systemDismissed:
+			case .presented(.cancelButtonTapped):
 				return .send(.delegate(.dismiss))
 			}
 		case .dismissButtonTapped:
@@ -68,7 +71,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		case let .dappMetadataLoadingResult(.success(dappMetadata)):
 			state.isLoading = false
 			return .send(.delegate(.dappMetadataLoaded(dappMetadata)))
-		case .dappMetadataLoadingResult(.failure(_)):
+		case let .dappMetadataLoadingResult(.failure(error)):
 			state.errorAlert = .init(
 				title: { TextState(L10n.App.errorOccurredTitle) },
 				actions: {
@@ -79,7 +82,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 						TextState(L10n.DApp.MetadataLoading.ErrorAlert.cancelButtonTitle)
 					}
 				},
-				message: { TextState(L10n.DApp.MetadataLoading.ErrorAlert.message) }
+				message: { TextState(L10n.DApp.MetadataLoading.ErrorAlert.message(error.legibleLocalizedDescription)) }
 			)
 			return .none
 		}

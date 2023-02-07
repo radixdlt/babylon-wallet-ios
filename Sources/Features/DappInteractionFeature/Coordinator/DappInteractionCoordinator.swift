@@ -9,6 +9,8 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 		let interaction: P2P.FromDapp.WalletInteraction
 		var childState: ChildState
+
+		@PresentationState
 		var errorAlert: AlertState<ViewAction.MalformedInteractionErrorAlertAction>? = nil
 
 		init(interaction: P2P.FromDapp.WalletInteraction) {
@@ -18,11 +20,13 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	}
 
 	enum ViewAction: Sendable, Equatable {
-		case malformedInteractionErrorAlert(MalformedInteractionErrorAlertAction)
+		case malformedInteractionErrorAlert(
+			PresentationAction<AlertState<MalformedInteractionErrorAlertAction>,
+				MalformedInteractionErrorAlertAction>
+		)
 
 		enum MalformedInteractionErrorAlertAction: Sendable, Equatable {
 			case okButtonTapped
-			case systemDismissed
 		}
 	}
 
@@ -63,7 +67,9 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		case let .malformedInteractionErrorAlert(action):
 			state.errorAlert = nil
 			switch action {
-			case .okButtonTapped, .systemDismissed:
+			case .dismiss, .present:
+				return .none
+			case .presented(.okButtonTapped):
 				return .send(.delegate(.dismissAndSubmit(.failure(.init(
 					interactionId: state.interaction.id,
 					errorType: .rejectedByUser,

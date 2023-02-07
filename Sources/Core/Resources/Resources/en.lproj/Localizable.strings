@@ -66,7 +66,7 @@
 "dApp.loginRequest.title.knownDapp" = "Login Request";
 "dApp.loginRequest.title.newDapp" = "New Login Request";
 "dApp.metadataLoading.errorAlert.cancelButtonTitle" = "Cancel";
-"dApp.metadataLoading.errorAlert.message" = "Danger! Bad dApp config or you're being spoofed!";
+"dApp.metadataLoading.errorAlert.message" = "Danger! Bad dApp config or you're being spoofed!\n\n%@";
 "dApp.metadataLoading.errorAlert.retryButtonTitle" = "Retry";
 "dApp.metadataLoading.prompt" = "Loading...";
 "dApp.permission.numberOfAccounts.atLeast" = "%d or more accounts";

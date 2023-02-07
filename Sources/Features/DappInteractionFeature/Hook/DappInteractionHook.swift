@@ -91,7 +91,7 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 			state.requestQueue.remove(request)
 			return .concatenate(
 				.send(.child(.dappInteraction(.dismiss))),
-//				.run { _ in try await clock.sleep(for: .seconds(1)) },
+				.run { _ in try await clock.sleep(for: .seconds(1)) },
 				presentInteractionIfNeededEffect(state: &state)
 			)
 		}

@@ -27,11 +27,12 @@ extension DappInteractionLoading {
 						.controlState(viewStore.screenState)
 						.onAppear { viewStore.send(.appeared) }
 						.alert(
-							store.scope(
-								state: \.errorAlert,
+							store: store.scope(
+								state: \.$errorAlert,
 								action: { .view(.errorAlert($0)) }
 							),
-							dismiss: .systemDismissed
+							state: { $0 },
+							action: { $0 }
 						)
 					#if os(iOS)
 						.toolbar {
