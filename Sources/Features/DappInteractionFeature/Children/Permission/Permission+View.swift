@@ -15,32 +15,40 @@ extension Permission {
 				title = "Personal Data Permission"
 			}
 
-			let normalColor = Color.app.gray2
-			let highlightColor = Color.app.gray1
-			subtitle = AttributedString(state.dappMetadata.name, foregroundColor: highlightColor) + {
-				let always = AttributedString("always", foregroundColor: highlightColor)
-				switch state.permissionKind {
-				case .accounts:
-					return AttributedString(
-						" is requesting permission to ",
-						foregroundColor: normalColor
-					)
-						+ always
-						+ AttributedString(
-							" be able to view account information when you login with this Persona.",
+			subtitle = {
+				let normalColor = Color.app.gray2
+				let highlightColor = Color.app.gray1
+
+				let dappName = AttributedString(state.dappMetadata.name, foregroundColor: highlightColor)
+
+				let explanation: AttributedString = {
+					let always = AttributedString("always", foregroundColor: highlightColor)
+
+					switch state.permissionKind {
+					case .accounts:
+						return AttributedString(
+							" is requesting permission to ",
 							foregroundColor: normalColor
 						)
-				case .personalData:
-					return AttributedString(
-						" is requesting permission to ",
-						foregroundColor: normalColor
-					)
-						+ always
-						+ AttributedString(
-							" be able to view the following personal data when you login with this Persona.",
+							+ always
+							+ AttributedString(
+								" be able to view account information when you login with this Persona.",
+								foregroundColor: normalColor
+							)
+					case .personalData:
+						return AttributedString(
+							" is requesting permission to ",
 							foregroundColor: normalColor
 						)
-				}
+							+ always
+							+ AttributedString(
+								" be able to view the following personal data when you login with this Persona.",
+								foregroundColor: normalColor
+							)
+					}
+				}()
+
+				return dappName + explanation
 			}()
 
 			switch state.permissionKind {
