@@ -11,9 +11,9 @@ extension ChooseAccounts {
 		init(state: ChooseAccounts.State) {
 			switch state.accessKind {
 			case .ongoing:
-				title = "Account Permission"
+				title = L10n.DApp.ChooseAccounts.Title.ongoing
 			case .oneTime:
-				title = "Account Request"
+				title = L10n.DApp.ChooseAccounts.Title.oneTime
 			}
 
 			subtitle = {

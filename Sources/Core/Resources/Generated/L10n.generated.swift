@@ -180,6 +180,12 @@ public enum L10n {
           }
         }
       }
+      public enum Title {
+        /// Account Request
+        public static let oneTime = L10n.tr("Localizable", "dApp.chooseAccounts.title.oneTime", fallback: "Account Request")
+        /// Account Permission
+        public static let ongoing = L10n.tr("Localizable", "dApp.chooseAccounts.title.ongoing", fallback: "Account Permission")
+      }
     }
     public enum LoginRequest {
       /// Choose a Persona
@@ -215,6 +221,48 @@ public enum L10n {
         public static let message = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.message", fallback: "Danger! Bad dApp config or you're being spoofed!")
         /// Retry
         public static let retryButtonTitle = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.retryButtonTitle", fallback: "Retry")
+      }
+    }
+    public enum Permission {
+      /// You can update this permission in your settings at any time.
+      public static let updateInSettingsExplanation = L10n.tr("Localizable", "dApp.permission.updateInSettingsExplanation", fallback: "You can update this permission in your settings at any time.")
+      public enum NumberOfAccounts {
+        /// %d or more accounts
+        public static func atLeast(_ p1: Int) -> String {
+          return L10n.tr("Localizable", "dApp.permission.numberOfAccounts.atLeast", p1, fallback: "%d or more accounts")
+        }
+        /// Any number of accounts
+        public static let atLeastZero = L10n.tr("Localizable", "dApp.permission.numberOfAccounts.atLeastZero", fallback: "Any number of accounts")
+        /// %d accounts
+        public static func exactly(_ p1: Int) -> String {
+          return L10n.tr("Localizable", "dApp.permission.numberOfAccounts.exactly", p1, fallback: "%d accounts")
+        }
+        /// 1 account
+        public static let exactlyOne = L10n.tr("Localizable", "dApp.permission.numberOfAccounts.exactlyOne", fallback: "1 account")
+      }
+      public enum Subtitle {
+        /// always
+        public static let always = L10n.tr("Localizable", "dApp.permission.subtitle.always", fallback: "always")
+        public enum Explanation {
+          public enum Accounts {
+            ///  is requesting permission to 
+            public static let first = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.accounts.first", fallback: " is requesting permission to ")
+            ///  be able to view account information when you login with this Persona.
+            public static let second = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.accounts.second", fallback: " be able to view account information when you login with this Persona.")
+          }
+          public enum PersonalData {
+            ///  is requesting permission to 
+            public static let first = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personalData.first", fallback: " is requesting permission to ")
+            ///  be able to view the following personal data when you login with this Persona.
+            public static let second = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personalData.second", fallback: " be able to view the following personal data when you login with this Persona.")
+          }
+        }
+      }
+      public enum Title {
+        /// Account Permission
+        public static let accounts = L10n.tr("Localizable", "dApp.permission.title.accounts", fallback: "Account Permission")
+        /// Personal Data Permission
+        public static let personalData = L10n.tr("Localizable", "dApp.permission.title.personalData", fallback: "Personal Data Permission")
       }
     }
     public enum Request {

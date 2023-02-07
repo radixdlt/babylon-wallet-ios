@@ -10,9 +10,9 @@ extension Permission {
 		init(state: Permission.State) {
 			switch state.permissionKind {
 			case .accounts:
-				title = "Account Permission"
+				title = L10n.DApp.Permission.Title.accounts
 			case .personalData:
-				title = "Personal Data Permission"
+				title = L10n.DApp.Permission.Title.personalData
 			}
 
 			subtitle = {
@@ -22,27 +22,27 @@ extension Permission {
 				let dappName = AttributedString(state.dappMetadata.name, foregroundColor: highlightColor)
 
 				let explanation: AttributedString = {
-					let always = AttributedString("always", foregroundColor: highlightColor)
+					let always = AttributedString(L10n.DApp.Permission.Subtitle.always, foregroundColor: highlightColor)
 
 					switch state.permissionKind {
 					case .accounts:
 						return AttributedString(
-							" is requesting permission to ",
+							L10n.DApp.Permission.Subtitle.Explanation.Accounts.first,
 							foregroundColor: normalColor
 						)
 							+ always
 							+ AttributedString(
-								" be able to view account information when you login with this Persona.",
+								L10n.DApp.Permission.Subtitle.Explanation.Accounts.second,
 								foregroundColor: normalColor
 							)
 					case .personalData:
 						return AttributedString(
-							" is requesting permission to ",
+							L10n.DApp.Permission.Subtitle.Explanation.PersonalData.first,
 							foregroundColor: normalColor
 						)
 							+ always
 							+ AttributedString(
-								" be able to view the following personal data when you login with this Persona.",
+								L10n.DApp.Permission.Subtitle.Explanation.PersonalData.second,
 								foregroundColor: normalColor
 							)
 					}
@@ -51,21 +51,27 @@ extension Permission {
 				return dappName + explanation
 			}()
 
-			switch state.permissionKind {
-			case let .accounts(numberOfAccounts):
-				switch (numberOfAccounts.quantifier, numberOfAccounts.quantity) {
-				case (.atLeast, 0):
-					self.numberOfAccounts = "Any number of accounts"
-				case let (.atLeast, number):
-					self.numberOfAccounts = "\(number) or more accounts"
-				case (.exactly, 1):
-					self.numberOfAccounts = "1 account"
-				case let (.exactly, number):
-					self.numberOfAccounts = "\(number) accounts"
-				}
-			case .personalData:
-				self.numberOfAccounts = ""
-			}
+			numberOfAccounts = {
+				let message: String = {
+					switch state.permissionKind {
+					case let .accounts(numberOfAccounts):
+						switch (numberOfAccounts.quantifier, numberOfAccounts.quantity) {
+						case (.atLeast, 0):
+							return L10n.DApp.Permission.NumberOfAccounts.atLeastZero
+						case let (.atLeast, number):
+							return L10n.DApp.Permission.NumberOfAccounts.atLeast(number)
+						case (.exactly, 1):
+							return L10n.DApp.Permission.NumberOfAccounts.exactlyOne
+						case let (.exactly, number):
+							return L10n.DApp.Permission.NumberOfAccounts.exactly(number)
+						}
+					case .personalData:
+						return ""
+					}
+				}()
+
+				return "•  " + message
+			}()
 		}
 	}
 
@@ -97,7 +103,7 @@ extension Permission {
 
 							VStack {
 								HStack {
-									Text("• " + viewStore.numberOfAccounts)
+									Text(viewStore.numberOfAccounts)
 										.foregroundColor(.app.gray1)
 										.textStyle(.body1Regular)
 										.padding([.horizontal, .vertical], .medium1)
@@ -110,7 +116,7 @@ extension Permission {
 								Spacer()
 									.frame(height: .large1 * 1.5)
 
-								Text("You can update this permission in your settings at any time.")
+								Text(L10n.DApp.Permission.updateInSettingsExplanation)
 									.foregroundColor(.app.gray2)
 									.textStyle(.body1Regular)
 									.multilineTextAlignment(.center)
@@ -159,5 +165,12 @@ struct Permission_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension Permission.State {
+	static let previewValue: Self = .init(
+		permissionKind: .accounts(.exactly(1)),
+		dappMetadata: .previewValue
+	)
 }
 #endif

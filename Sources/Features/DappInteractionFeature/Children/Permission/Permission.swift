@@ -38,12 +38,3 @@ struct Permission: Sendable, FeatureReducer {
 		}
 	}
 }
-
-#if DEBUG
-extension Permission.State {
-	static let previewValue: Self = .init(
-		permissionKind: .accounts(.atLeast(2)),
-		dappMetadata: .previewValue
-	)
-}
-#endif
