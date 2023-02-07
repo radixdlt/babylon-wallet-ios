@@ -89,9 +89,9 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 
 		case let .sentResponseToDapp(request):
 			state.requestQueue.remove(request)
-			state.currentDappInteraction = nil
 			return .concatenate(
-				.run { _ in try await clock.sleep(for: .seconds(1)) },
+				.send(.child(.dappInteraction(.dismiss))),
+//				.run { _ in try await clock.sleep(for: .seconds(1)) },
 				presentInteractionIfNeededEffect(state: &state)
 			)
 		}
@@ -111,21 +111,20 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .dappInteraction(.presented(.relay(request, .delegate(.dismiss)))):
-			return .none
-//			let response = P2P.ResponseToClientByID(
-//				connectionID: request.client.id,
-//				responseToDapp: response // TODO
-//			)
-//
-//			return .run { [request] send in
-//				do {
-//					try await p2pConnectivityClient.sendMessage(response) // TODO: retry mechanism? :shrug:
-//				} catch {
-//					errorQueue.schedule(error)
-//				}
-//				await send(.internal(.sentResponseToDapp(for: request)))
-//			}
+		case let .dappInteraction(.presented(.relay(request, .delegate(.dismissAndSubmit(response))))):
+			let response = P2P.ResponseToClientByID(
+				connectionID: request.client.id,
+				responseToDapp: response
+			)
+
+			return .run { [request] send in
+				do {
+					_ = try await p2pConnectivityClient.sendMessage(response) // TODO: retry mechanism? :shrug:
+				} catch {
+					errorQueue.schedule(error)
+				}
+				await send(.internal(.sentResponseToDapp(for: request)))
+			}
 		default:
 			return .none
 		}

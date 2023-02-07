@@ -5,7 +5,6 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		enum ChildState: Sendable, Hashable {
 			case loading(DappInteractionLoading.State)
 			case flow(DappInteractionFlow.State)
-//			case submitting(DappInteractionSubmitting.State)
 		}
 
 		let interaction: P2P.FromDapp.WalletInteraction
@@ -34,11 +33,10 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	enum ChildAction: Sendable, Equatable {
 		case loading(DappInteractionLoading.Action)
 		case flow(DappInteractionFlow.Action)
-//		case submitting(DappInteractionSubmitting.Action)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case dismiss
+		case dismissAndSubmit(P2P.ToDapp.WalletInteractionResponse)
 	}
 
 	var body: some ReducerProtocolOf<Self> {
@@ -66,7 +64,11 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			state.errorAlert = nil
 			switch action {
 			case .okButtonTapped, .systemDismissed:
-				return .send(.delegate(.dismiss))
+				return .send(.delegate(.dismissAndSubmit(.failure(.init(
+					interactionId: state.interaction.id,
+					errorType: .rejectedByUser,
+					message: nil
+				)))))
 			}
 		}
 	}
@@ -89,7 +91,15 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 			}
 			return .none
 		case .loading(.delegate(.dismiss)):
-			return .send(.delegate(.dismiss))
+			return .send(.delegate(.dismissAndSubmit(.failure(.init(
+				interactionId: state.interaction.id,
+				errorType: .rejectedByUser,
+				message: nil
+			)))))
+		case let .flow(.delegate(.dismiss(error))):
+			return .send(.delegate(.dismissAndSubmit(.failure(error))))
+		case let .flow(.delegate(.submit(response))):
+			return .send(.delegate(.dismissAndSubmit(.success(response))))
 		default:
 			return .none
 		}
