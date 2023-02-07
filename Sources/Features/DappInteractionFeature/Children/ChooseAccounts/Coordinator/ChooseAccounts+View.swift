@@ -22,13 +22,14 @@ extension ChooseAccounts.View {
 						VStack(spacing: .medium2) {
 							dappImage
 
-							Text(L10n.DApp.ChooseAccounts.title)
+							Text(viewStore.title)
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)
 
 							subtitle(
+								with: viewStore,
 								dappName: viewStore.dappName,
-								message: subtitleText(with: viewStore)
+								message: viewStore.subtitle
 							)
 							.textStyle(.secondaryHeader)
 							.multilineTextAlignment(.center)
@@ -151,27 +152,40 @@ private extension ChooseAccounts.View {
 			.cornerRadius(.medium3)
 	}
 
-	func subtitle(dappName: String, message: String) -> some View {
+	func subtitle(
+		with viewStore: ChooseAccountsViewStore,
+		dappName: String,
+		message: String
+	) -> some View {
 		var component1 = AttributedString(message)
 		component1.foregroundColor = .app.gray2
 
-		var component2 = AttributedString(dappName)
-		component2.foregroundColor = .app.gray1
+		var dappname = AttributedString(dappName)
+		dappname.foregroundColor = .app.gray1
 
-		return Text(component1 + component2)
+		var component3 = AttributedString(".")
+		component3.foregroundColor = .app.gray2
+
+		switch viewStore.accessKind {
+		case .ongoing:
+			return Text(component1 + dappname + component3)
+		case .oneTime:
+			return Text(dappname + component1)
+		}
 	}
 
-	func subtitleText(with viewStore: ChooseAccountsViewStore) -> String {
+//	func subtitleText(with viewStore: ChooseAccountsViewStore) -> String {
+
 //		"Choose 1 account you wish to use with "
-		"Choose at least 2 accounts you wish to use with "
+//		"Choose at least 2 accounts you wish to use with "
 //		Choose any accounts you wish to use with Collabo.Fi.
 
-		/*
-		 viewStore.isKnownDapp ?
-		 	L10n.DApp.LoginRequest.Subtitle.knownDapp :
-		 	L10n.DApp.LoginRequest.Subtitle.newDapp
-		 */
-	}
+	/*
+	 viewStore.isKnownDapp ?
+	 	L10n.DApp.LoginRequest.Subtitle.knownDapp :
+	 	L10n.DApp.LoginRequest.Subtitle.newDapp
+	 */
+//	}
 }
 
 // MARK: - ChooseAccounts.View.ViewState
@@ -179,7 +193,10 @@ extension ChooseAccounts.View {
 	struct ViewState: Equatable {
 		let dappName: String
 		let canProceed: Bool
-		let numberOfAccountsExplanation: String
+//		let numberOfAccountsExplanation: String
+		let title: String
+		let subtitle: String
+		let accessKind: ChooseAccounts.State.AccessKind
 
 		init(state: ChooseAccounts.State) {
 			dappName = state.dappMetadata.name
@@ -194,19 +211,59 @@ extension ChooseAccounts.View {
 					return state.selectedAccounts.count == quantity
 				}
 			}()
-			numberOfAccountsExplanation = {
-				switch quantifier {
-				case .exactly:
-					if quantity == 1 {
-						return L10n.DApp.ChooseAccounts.explanationExactlyOneAccount
-					} else {
-						return L10n.DApp.ChooseAccounts.explanationExactNumberOfAccounts(quantity)
-					}
-				case .atLeast:
-					// TODO: revise this localization
-					return L10n.DApp.ChooseAccounts.explanationAtLeastOneAccount
+			/*
+			 numberOfAccountsExplanation = {
+			 	switch quantifier {
+			 	case .exactly:
+			 		if quantity == 1 {
+			 			return L10n.DApp.ChooseAccounts.explanationExactlyOneAccount
+			 		} else {
+			 			return L10n.DApp.ChooseAccounts.explanationExactNumberOfAccounts(quantity)
+			 		}
+			 	case .atLeast:
+			 		// TODO: revise this localization
+			 		return L10n.DApp.ChooseAccounts.explanationAtLeastOneAccount
+			 	}
+			 }()
+			 */
+
+			switch state.accessKind {
+			case .ongoing:
+				title = "Account Permission"
+			case .oneTime:
+				title = "Account Request"
+			}
+
+			switch state.accessKind {
+			case .ongoing:
+				switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
+				case (.atLeast, 0):
+					subtitle = "Choose any accounts you wish to use with "
+				case (.atLeast, 1):
+					subtitle = "Choose at least 1 account you wish to use with "
+				case let (.atLeast, number):
+					subtitle = "Choose at least \(number) accounts you wish to use with "
+				case (.exactly, 1):
+					subtitle = "Choose 1 account you wish to use with "
+				case let (.exactly, number):
+					subtitle = "Choose \(number) accounts you wish to use with "
 				}
-			}()
+			case .oneTime:
+				switch (state.numberOfAccounts.quantifier, state.numberOfAccounts.quantity) {
+				case (.atLeast, 0):
+					subtitle = " is making a one-time request for any number of accounts."
+				case (.atLeast, 1):
+					subtitle = " is making a one-time request for at least 1 account."
+				case let (.atLeast, number):
+					subtitle = " is making a one-time request for at least \(number) accounts."
+				case (.exactly, 1):
+					subtitle = " is making a one-time request for 1 account."
+				case let (.exactly, number):
+					subtitle = " is making a one-time request for at least \(number) accounts."
+				}
+			}
+
+			accessKind = state.accessKind
 		}
 	}
 }

@@ -47,7 +47,7 @@ extension Permission {
 			case let .accounts(numberOfAccounts):
 				switch (numberOfAccounts.quantifier, numberOfAccounts.quantity) {
 				case (.atLeast, 0):
-					self.numberOfAccounts = "Any accounts"
+					self.numberOfAccounts = "Any number of accounts"
 				case let (.atLeast, number):
 					self.numberOfAccounts = "\(number) or more accounts"
 				case (.exactly, 1):
