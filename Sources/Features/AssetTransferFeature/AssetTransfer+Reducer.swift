@@ -54,10 +54,7 @@ public struct AssetTransfer: Sendable, ReducerProtocol {
 				"""
 			))
 			state.destination = .transactionSigning(
-				TransactionSigning.State(
-					transactionManifestWithoutLockFee: manifest,
-					transactionWithLockFee: manifest
-				)
+				TransactionSigning.State(transactionManifestWithoutLockFee: manifest)
 			)
 			return .none
 		case .child:
