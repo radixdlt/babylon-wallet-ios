@@ -29,6 +29,7 @@ extension DappInteractionCoordinator {
 				state: { $0 },
 				action: { $0 }
 			)
+			.showDeveloperDisclaimerBanner()
 		}
 	}
 }
