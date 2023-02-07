@@ -76,7 +76,7 @@ extension ChooseAccounts.View {
 
 // MARK: - ChooseAccounts.View.ChooseAccountsViewStore
 private extension ChooseAccounts.View {
-	typealias ChooseAccountsViewStore = ComposableArchitecture.ViewStore<ChooseAccounts.View.ViewState, ChooseAccounts.Action.ViewAction>
+	typealias ChooseAccountsViewStore = ComposableArchitecture.ViewStore<ChooseAccounts.View.ViewState, ChooseAccounts.ViewAction>
 }
 
 // MARK: - Private Computed Properties
@@ -187,5 +187,21 @@ struct ChooseAccounts_Preview: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension ChooseAccounts.State {
+	static let previewValue: Self = .init(
+		interactionItem: nil,
+		accessKind: .oneTime,
+		dappDefinitionAddress: try! .init(address: "account_deadbeef"),
+		dappMetadata: .previewValue,
+		numberOfAccounts: .atLeast(2),
+		availableAccounts: .init(
+			uniqueElements: [
+				.previewValueOne,
+			]
+		),
+		createAccountCoordinator: nil
+	)
 }
 #endif
