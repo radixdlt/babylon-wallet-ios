@@ -37,7 +37,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		var root: Destinations.State?
 		@NavigationStateOf<Destinations>
-		var path: NavigationState<Destinations.State>.Path
+		var path
 
 		init?(
 			dappMetadata: DappMetadata,
