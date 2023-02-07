@@ -63,6 +63,15 @@ public extension EngineToolkitClient {
 						try AccountAddress(componentAddress: $0)
 					}
 				)
+			},
+			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in
+				let result = engineToolkit.knownEntityAddresses(request: .init(networkId: networkID))
+				switch result {
+				case .success(let response):
+					return response
+				case .failure(let error):
+					throw NoKnownAddressForNetworkID(unknownNetworkID: networkID)
+				}
 			}
 		)
 	}()

@@ -16,7 +16,8 @@ extension EngineToolkitClient: TestDependencyKey {
 		compileSignedTransactionIntent: { _ in .init(bytes: [0xDE, 0xAD]) },
 		compileNotarizedTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
 		generateTXID: { _ in "deadbeef" },
-		accountAddressesNeedingToSignTransaction: { _ in [] }
+		accountAddressesNeedingToSignTransaction: { _ in [] },
+		knownEntityAddresses: { _ in fatalError() }
 	)
 
 	public static let testValue = Self(
@@ -27,6 +28,7 @@ extension EngineToolkitClient: TestDependencyKey {
 		compileSignedTransactionIntent: unimplemented("\(Self.self).compileSignedTransactionIntent"),
 		compileNotarizedTransactionIntent: unimplemented("\(Self.self).compileNotarizedTransactionIntent"),
 		generateTXID: unimplemented("\(Self.self).generateTXID"),
-		accountAddressesNeedingToSignTransaction: unimplemented("\(Self.self).accountAddressesNeedingToSignTransaction")
+		accountAddressesNeedingToSignTransaction: unimplemented("\(Self.self).accountAddressesNeedingToSignTransaction"),
+		knownEntityAddresses: unimplemented("\(Self.self).knownEntityAddresses")
 	)
 }
