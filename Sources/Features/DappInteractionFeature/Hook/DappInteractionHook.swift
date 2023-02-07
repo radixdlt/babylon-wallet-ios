@@ -29,7 +29,7 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 
 	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
-	@Dependency(\.mainQueue) var mainQueue
+	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 
 	var body: some ReducerProtocolOf<Self> {
@@ -90,7 +90,10 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 		case let .sentResponseToDapp(request):
 			state.requestQueue.remove(request)
 			state.currentDappInteraction = nil
-			return presentInteractionIfNeededEffect(state: &state)
+			return .concatenate(
+				.run { _ in try await clock.sleep(for: .seconds(1)) },
+				presentInteractionIfNeededEffect(state: &state)
+			)
 		}
 	}
 
