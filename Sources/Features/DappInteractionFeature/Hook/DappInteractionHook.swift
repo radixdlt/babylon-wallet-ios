@@ -58,7 +58,7 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 								let incomingRequestNetwork = try Network.lookupBy(id: request.interaction.metadata.networkId)
 								let currentNetwork = try Network.lookupBy(id: currentNetworkID)
 
-								try await p2pConnectivityClient.sendMessage(.init(
+								_ = try await p2pConnectivityClient.sendMessage(.init(
 									connectionID: request.client.id,
 									responseToDapp: .failure(
 										.init(
