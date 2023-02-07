@@ -20,6 +20,7 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case receivedRequestFromDapp(P2P.RequestFromClient)
+		case presentQueuedRequestIfNeeded
 		case sentResponseToDapp(for: P2P.RequestFromClient)
 	}
 
@@ -85,20 +86,23 @@ struct DappInteractionHook: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .receivedRequestFromDapp(request):
 			state.requestQueue.append(request)
-			return presentInteractionIfNeededEffect(state: &state)
+			return presentQueuedRequestIfNeededEffect(for: &state)
+
+		case .presentQueuedRequestIfNeeded:
+			return presentQueuedRequestIfNeededEffect(for: &state)
 
 		case let .sentResponseToDapp(request):
 			state.requestQueue.remove(request)
-			return .concatenate(
-				.send(.child(.dappInteraction(.dismiss))),
-				.run { _ in try await clock.sleep(for: .seconds(1)) },
-				presentInteractionIfNeededEffect(state: &state)
-			)
+			state.currentDappInteraction = nil
+			return .run { send in
+				try await clock.sleep(for: .seconds(1))
+				await send(.internal(.presentQueuedRequestIfNeeded))
+			}
 		}
 	}
 
-	func presentInteractionIfNeededEffect(
-		state: inout State
+	func presentQueuedRequestIfNeededEffect(
+		for state: inout State
 	) -> EffectTask<Action> {
 		if
 			state.currentDappInteraction == nil,
