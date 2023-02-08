@@ -1,5 +1,5 @@
-import FeaturePrelude
 import EngineToolkitClient
+import FeaturePrelude
 
 // MARK: - FungibleTokenDetails.View
 public extension FungibleTokenDetails {

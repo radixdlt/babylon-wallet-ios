@@ -15,7 +15,7 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 
 	public var generateTXID: GenerateTXID
 	public var accountAddressesNeedingToSignTransaction: AccountAddressesNeedingToSignTransaction
-	
+
 	public var knownEntityAddresses: KnownEntityAddresses
 }
 
@@ -53,7 +53,7 @@ public extension EngineToolkitClient {
 	typealias CompileNotarizedTransactionIntent = @Sendable (NotarizedTransaction) throws -> CompileNotarizedTransactionIntentResponse
 
 	typealias GenerateTXID = @Sendable (TransactionIntent) throws -> TXID
-	
+
 	typealias KnownEntityAddresses = @Sendable (NetworkID) throws -> KnownEntityAddressesResponse
 }
 

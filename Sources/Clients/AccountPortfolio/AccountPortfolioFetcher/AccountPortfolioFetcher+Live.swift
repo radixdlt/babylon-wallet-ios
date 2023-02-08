@@ -1,7 +1,7 @@
 import AppSettings
 import ClientPrelude
-import GatewayAPI
 import EngineToolkitClient
+import GatewayAPI
 
 // MARK: - AccountPortfolioFetcher + DependencyKey
 extension AccountPortfolioFetcher: DependencyKey {
@@ -41,7 +41,7 @@ public extension AccountPortfolioFetcher {
 		@Dependency(\.engineToolkitClient) var engineToolkit
 		let xrdContainer = accountPortfolioDictionary.first?.value.fungibleTokenContainers
 			.first { engineToolkit.isXRD(component: $0.asset.componentAddress, on: networkID) }
-		
+
 		if let xrdContainer = xrdContainer {
 			return xrdContainer
 		} else {

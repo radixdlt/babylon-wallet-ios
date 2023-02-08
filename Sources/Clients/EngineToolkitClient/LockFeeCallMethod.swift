@@ -75,7 +75,7 @@ public extension EngineToolkitClient {
 		}
 		return .init(instructions: .parsed(instructions.map { $0.embed() }))
 	}
-	
+
 	private func faucetAddress(for networkID: NetworkID) throws -> ComponentAddress {
 		try knownEntityAddresses(networkID).faucetComponentAddress
 	}
