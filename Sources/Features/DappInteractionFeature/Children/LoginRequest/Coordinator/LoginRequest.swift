@@ -34,7 +34,6 @@ struct LoginRequest: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case personasLoaded(IdentifiedArrayOf<OnNetwork.Persona>, OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?)
-		case loadPersonasResult(TaskResult<IdentifiedArrayOf<OnNetwork.Persona>>)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -62,28 +61,8 @@ struct LoginRequest: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			return .run { [dappDefinitionAddress = state.dappDefinitionAddress] send in
-				let personas = try await profileClient.getPersonas()
-				let connectedDapps = try await profileClient.getConnectedDapps()
-				let authorizedPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple? = {
-					guard let connectedDapp = connectedDapps.first(by: dappDefinitionAddress) else {
-						return nil
-					}
-					return personas.reduce(into: nil) { mostRecentlyAuthorizedPersona, currentPersona in
-						guard let currentAuthorizedPersona = connectedDapp.referencesToAuthorizedPersonas.first(by: currentPersona.address) else {
-							return
-						}
-						if let mostRecentlyAuthorizedPersonaCopy = mostRecentlyAuthorizedPersona {
-							if currentAuthorizedPersona.lastLogin > mostRecentlyAuthorizedPersonaCopy.lastLogin {
-								mostRecentlyAuthorizedPersona = currentAuthorizedPersona
-							}
-						} else {
-							mostRecentlyAuthorizedPersona = currentAuthorizedPersona
-						}
-					}
-				}()
-				await send(.internal(.personasLoaded(personas, authorizedPersona)))
-			}
+			return loadPersonas(state: &state)
+
 		case .createNewPersonaButtonTapped:
 			state.createPersonaCoordinator = .init(config: .init(
 				isFirstEntity: state.personas.isEmpty,
@@ -117,17 +96,6 @@ struct LoginRequest: Sendable, FeatureReducer {
 			)
 			state.authorizedPersona = authorizedPersonaSimple
 			return .none
-
-		case let .loadPersonasResult(.success(personas)):
-			state.personas = .init(uniqueElements: personas.map {
-				// TODO: @Nikola - populate with correct values
-				PersonaRow.State(persona: $0, isSelected: false, lastLogin: nil)
-			})
-			return .none
-
-		case let .loadPersonasResult(.failure(error)):
-			errorQueue.schedule(error)
-			return .none
 		}
 	}
 
@@ -145,14 +113,35 @@ struct LoginRequest: Sendable, FeatureReducer {
 
 		case .createPersonaCoordinator(.presented(.delegate(.completed))):
 			state.createPersonaCoordinator = nil
-			return .run { send in
-				await send(.internal(.loadPersonasResult(TaskResult {
-					try await profileClient.getPersonas()
-				})))
-			}
+			return loadPersonas(state: &state)
 
 		default:
 			return .none
+		}
+	}
+
+	func loadPersonas(state: inout State) -> EffectTask<Action> {
+		.run { [dappDefinitionAddress = state.dappDefinitionAddress] send in
+			let personas = try await profileClient.getPersonas()
+			let connectedDapps = try await profileClient.getConnectedDapps()
+			let authorizedPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple? = {
+				guard let connectedDapp = connectedDapps.first(by: dappDefinitionAddress) else {
+					return nil
+				}
+				return personas.reduce(into: nil) { mostRecentlyAuthorizedPersona, currentPersona in
+					guard let currentAuthorizedPersona = connectedDapp.referencesToAuthorizedPersonas.first(by: currentPersona.address) else {
+						return
+					}
+					if let mostRecentlyAuthorizedPersonaCopy = mostRecentlyAuthorizedPersona {
+						if currentAuthorizedPersona.lastLogin > mostRecentlyAuthorizedPersonaCopy.lastLogin {
+							mostRecentlyAuthorizedPersona = currentAuthorizedPersona
+						}
+					} else {
+						mostRecentlyAuthorizedPersona = currentAuthorizedPersona
+					}
+				}
+			}()
+			await send(.internal(.personasLoaded(personas, authorizedPersona)))
 		}
 	}
 }
