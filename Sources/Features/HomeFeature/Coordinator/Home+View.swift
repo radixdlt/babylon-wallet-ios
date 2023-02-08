@@ -2,6 +2,7 @@ import AccountDetailsFeature
 import AccountListFeature
 import AccountPreferencesFeature
 import CreateEntityFeature
+import DappInteractionFeature
 import FeaturePrelude
 import TransactionSigningFeature
 
@@ -63,6 +64,7 @@ public extension Home.View {
 					.zIndex(3)
 				}
 			}
+			.presentsDappInteractions()
 		}
 	}
 }

@@ -114,6 +114,7 @@ package.addModules([
 			"AccountPreferencesFeature",
 			"AppSettings",
 			"CreateEntityFeature",
+			"DappInteractionFeature",
 			"P2PConnectivityClient",
 			"ProfileClient",
 			"TransactionSigningFeature",
@@ -130,7 +131,6 @@ package.addModules([
 		dependencies: [
 			"AppSettings",
 			"AccountPortfolio",
-			"DappInteractionFeature",
 			"HomeFeature",
 			"SettingsFeature",
 		],
