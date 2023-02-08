@@ -62,8 +62,8 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 			let metadata = await TaskResult {
 				do {
 					return DappMetadata(try await gatewayAPI.resourceDetailsByResourceIdentifier(dappDefinitionAddress.address).metadata)
-				} catch let error as BadHTTPResponseCode where error.got == 501 {
-					return DappMetadata(name: nil) // HTTP 501 Not Implemented - return unknown dapp metadata as instructed by network team
+				} catch let error as BadHTTPResponseCode {
+					return DappMetadata(name: nil) // Not found - return unknown dapp metadata as instructed by network team
 				} catch {
 					throw error
 				}
