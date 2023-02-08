@@ -59,9 +59,9 @@ extension ProfileClient: TestDependencyKey {
 public extension ProfileClient {
 	static let noop = Self(
 		getFactorSources: { throw NoopError() },
-		getCurrentNetworkID: { NetworkID.nebunet },
+		getCurrentNetworkID: { NetworkID.hammunet },
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
-		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.nebunet },
+		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.hammunet },
 		setNetworkAndGateway: { _ in },
 		createEphemeralProfileAndUnsavedOnDeviceFactorSource: { _ in throw NoopError() },
 		injectProfileSnapshot: { _ in },

@@ -23,7 +23,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		txStatus: GatewayAPI.TransactionStatus? = nil
 	) -> Self {
 		.init(
-			getNetworkName: { _ in .init("Nebunet") },
+			getNetworkName: { _ in .init("Nebunet") }, // Update this?
 			getEpoch: { .init(rawValue: 123) },
 			accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
 			resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),

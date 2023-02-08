@@ -97,7 +97,7 @@ public extension FungibleTokenContainer {
 public extension FungibleToken {
 	/// The native token of the Radix Ledger
 	static let xrd = Self(
-		componentAddress: "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9",
+		componentAddress: "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9", // Should this be updated?
 		divisibility: 18,
 		totalSupply: 24_000_000_000,
 		totalMinted: 0,

@@ -25,7 +25,7 @@ public struct AppPreferences:
 	public init(
 		display: Display = .default,
 		p2pClients: P2PClients,
-		networkAndGateway: NetworkAndGateway = .nebunet
+		networkAndGateway: NetworkAndGateway = .hammunet
 	) {
 		self.display = display
 		self.p2pClients = p2pClients
