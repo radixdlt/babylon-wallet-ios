@@ -1,4 +1,5 @@
 import FeaturePrelude
+import EngineToolkitClient
 
 // MARK: - FungibleTokenDetails.View
 public extension FungibleTokenDetails {
@@ -100,14 +101,16 @@ extension FungibleTokenDetails.View {
 		var currentSupply: BigDecimal?
 
 		init(state: FungibleTokenDetails.State) {
-			displayName = state.asset.name
-			iconURL = state.asset.iconURL
-			placeholderAsset = state.asset.placeholderImage
-			amount = state.amount
-			symbol = state.asset.symbol
-			description = state.asset.tokenDescription
-			address = .init(address: state.asset.componentAddress.address, format: .short())
-			currentSupply = state.asset.totalMinted
+			self.displayName = state.asset.name
+			self.iconURL = state.asset.iconURL
+			@Dependency(\.engineToolkitClient) var engineToolkit
+			let assetIsXRD = engineToolkit.isXRD(component: state.asset.componentAddress)
+			self.placeholderAsset = state.asset.placeholderImage(xrd: true)
+			self.amount = state.amount
+			self.symbol = state.asset.symbol
+			self.description = state.asset.tokenDescription
+			self.address = .init(address: state.asset.componentAddress.address, format: .short())
+			self.currentSupply = state.asset.totalMinted
 		}
 	}
 }
