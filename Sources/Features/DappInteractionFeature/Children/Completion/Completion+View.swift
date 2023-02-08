@@ -50,8 +50,9 @@ extension Completion {
 				.padding([.top, .horizontal], .small2)
 				.padding(.bottom, .medium3)
 			}
-			.presentationDetentIntrinsicHeight()
 			.presentationDragIndicator(.visible)
+			.presentationDetentIntrinsicHeight()
+			.presentationDetentBlurBackground()
 		}
 	}
 }
@@ -62,7 +63,7 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - Completion_Preview
 struct Completion_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
-		WithState(initialValue: true) { $isPresented in
+		WithState(initialValue: false) { $isPresented in
 			ZStack {
 				Color.red
 				Button("Present") { isPresented = true }
@@ -74,6 +75,10 @@ struct Completion_Preview: PreviewProvider {
 						reducer: Completion()
 					)
 				)
+			}
+			.task {
+				try? await Task.sleep(for: .seconds(2))
+				isPresented = true
 			}
 		}
 	}
