@@ -86,6 +86,7 @@
 "dApp.request.wrongNetworkError" = "Request received from dApp for network %@, but you are currently connected to %@.";
 "dApp.request.specifiedPersonaNotFoundError.message" = "Persona specified by dApp does not exist.\n\n%@";
 "dApp.request.specifiedPersonaNotFoundError.cancelButtonTitle" = "Cancel";
+"dApp.metadata.unknownName" = "Unknown dApp";
 
 "fungibleTokenList.detail.currentSupply" = "Current Supply";
 "fungibleTokenList.detail.resourceAddress" = "Resource Address";

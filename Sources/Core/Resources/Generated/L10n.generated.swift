@@ -219,6 +219,10 @@ public enum L10n {
         public static let newDapp = L10n.tr("Localizable", "dApp.loginRequest.title.newDapp", fallback: "New Login Request")
       }
     }
+    public enum Metadata {
+      /// Unknown dApp
+      public static let unknownName = L10n.tr("Localizable", "dApp.metadata.unknownName", fallback: "Unknown dApp")
+    }
     public enum MetadataLoading {
       /// Loading...
       public static let prompt = L10n.tr("Localizable", "dApp.metadataLoading.prompt", fallback: "Loading...")

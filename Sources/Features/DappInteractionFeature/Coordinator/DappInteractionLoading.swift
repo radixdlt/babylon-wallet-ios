@@ -60,7 +60,13 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 		state.isLoading = true
 		return .run { [dappDefinitionAddress = state.interaction.metadata.dAppDefinitionAddress] send in
 			let metadata = await TaskResult {
-				DappMetadata(try await gatewayAPI.accountMetadataByAddress(dappDefinitionAddress).metadata)
+				do {
+					return DappMetadata(try await gatewayAPI.resourceDetailsByResourceIdentifier(dappDefinitionAddress.address).metadata)
+				} catch let error as BadHTTPResponseCode where error.got == 501 {
+					return DappMetadata(name: nil) // HTTP 501 Not Implemented - return unknown dapp metadata as instructed by network team
+				} catch {
+					throw error
+				}
 			}
 			await send(.internal(.dappMetadataLoadingResult(metadata)))
 		}
@@ -92,8 +98,8 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 extension DappMetadata {
 	init(_ metadata: GatewayAPI.EntityMetadataCollection) {
 		self.init(
-			name: metadata.items.first(where: { $0.key == "name" })?.value ?? "",
-			description: metadata.items.first(where: { $0.key == "description" })?.value ?? ""
+			name: metadata.items.first(where: { $0.key == "name" })?.value,
+			description: metadata.items.first(where: { $0.key == "description" })?.value
 		)
 	}
 }
