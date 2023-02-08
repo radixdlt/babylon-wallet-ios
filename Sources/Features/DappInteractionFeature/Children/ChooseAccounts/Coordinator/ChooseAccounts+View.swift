@@ -49,7 +49,7 @@ extension ChooseAccounts {
 				}()
 
 				let attributedMessage = AttributedString(message, foregroundColor: .app.gray2)
-				let dappName = AttributedString(state.dappMetadata.name, foregroundColor: .app.gray1)
+				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: .app.gray1)
 				let dot = AttributedString(".", foregroundColor: .app.gray2)
 
 				switch state.accessKind {

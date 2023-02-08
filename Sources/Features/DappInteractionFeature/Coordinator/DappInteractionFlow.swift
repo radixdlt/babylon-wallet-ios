@@ -73,7 +73,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case usePersona(
 			P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem,
 			OnNetwork.Persona,
-			OnNetwork.ConnectedDapp,
+			OnNetwork.ConnectedDapp?,
 			OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
@@ -301,7 +301,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							displayName: state.dappMetadata.name
 						)
 						// This extraction is really verbose right now, but it should become a lot simpler with native case paths
-						let sharedAccountsInfo: (P2P.FromDapp.WalletInteraction.NumberOfAccounts, [P2P.ToDapp.WalletAccount])? = {
+						let sharedAccountsInfo = { () -> (P2P.FromDapp.WalletInteraction.NumberOfAccounts, [P2P.ToDapp.WalletAccount])? in
 							let numberOfAccounts: P2P.FromDapp.WalletInteraction.NumberOfAccounts
 							switch state.remoteInteraction.items {
 							case let .request(.authorized(items)):
@@ -321,7 +321,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 								case let .withProof(item):
 									accounts = item.accounts.map(\.account)
 								case let .withoutProof(item):
-									accounts = item.accounts.map(\.account)
+									accounts = item.accounts
+								default:
+									return nil
 								}
 							default:
 								return nil
@@ -330,8 +332,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 						}()
 						let sharedAccounts: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple.SharedAccounts?
 						if let (numberOfAccounts, accounts) = sharedAccountsInfo {
-							sharedAccounts = .init(
-								accountsReferencedByAddress: OrderedSet(try accounts.map { try .init(address: $0) }),
+							sharedAccounts = try .init(
+								accountsReferencedByAddress: OrderedSet(try accounts.map { try .init(address: $0.address) }),
 								forRequest: numberOfAccounts
 							)
 						} else {

@@ -342,10 +342,14 @@ public struct DappAuthorizedPersonaView: IndentedView {
 			}
 
 			Text("Shared Accounts")
-			ForEach(detailedAuthorizedPersona.simpleAccounts) { simpleAccount in
-				Labeled("displayName", value: simpleAccount.label.rawValue)
-				Labeled("address", value: simpleAccount.address.address)
-				Labeled("appearanceID", value: simpleAccount.appearanceID.description)
+			if let simpleAccounts = detailedAuthorizedPersona.simpleAccounts {
+				ForEach(simpleAccounts) { simpleAccount in
+					Labeled("displayName", value: simpleAccount.label.rawValue)
+					Labeled("address", value: simpleAccount.address.address)
+					Labeled("appearanceID", value: simpleAccount.appearanceID.description)
+				}
+			} else {
+				Text("None yet")
 			}
 		}
 		.padding([.leading], leadingPadding)

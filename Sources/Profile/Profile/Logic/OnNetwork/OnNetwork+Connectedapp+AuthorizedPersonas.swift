@@ -36,7 +36,7 @@ public extension OnNetwork {
 
 		/// Information of accounts the user has given the Dapp access to,
 		/// being the tripple `(accountAddress, displayName, appearanceID)`
-		public let simpleAccounts: OrderedSet<AccountForDisplay>
+		public let simpleAccounts: OrderedSet<AccountForDisplay>?
 	}
 
 	struct ConnectedDappDetailed: Sendable, Hashable {
@@ -74,18 +74,24 @@ public extension OnNetwork {
 					}
 					return field
 				}),
-				simpleAccounts: try .init(simple.sharedAccounts.accountsReferencedByAddress.map { accountAddress in
-					guard
-						let account = self.accounts.first(where: { $0.address == accountAddress })
-					else {
-						throw ConnectedDappReferencesAccountThatDoesNotExist()
+				simpleAccounts: try {
+					if let sharedAccounts = simple.sharedAccounts {
+						return try .init(sharedAccounts.accountsReferencedByAddress.map { accountAddress in
+							guard
+								let account = self.accounts.first(where: { $0.address == accountAddress })
+							else {
+								throw ConnectedDappReferencesAccountThatDoesNotExist()
+							}
+							return AccountForDisplay(
+								address: account.address,
+								label: account.displayName,
+								appearanceID: account.appearanceID
+							)
+						})
+					} else {
+						return nil
 					}
-					return AccountForDisplay(
-						address: account.address,
-						label: account.displayName,
-						appearanceID: account.appearanceID
-					)
-				})
+				}()
 			)
 		})
 

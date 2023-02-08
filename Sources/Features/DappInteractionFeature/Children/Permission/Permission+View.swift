@@ -19,7 +19,7 @@ extension Permission {
 				let normalColor = Color.app.gray2
 				let highlightColor = Color.app.gray1
 
-				let dappName = AttributedString(state.dappMetadata.name, foregroundColor: highlightColor)
+				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: highlightColor)
 
 				let explanation: AttributedString = {
 					let always = AttributedString(L10n.DApp.Permission.Subtitle.always, foregroundColor: highlightColor)

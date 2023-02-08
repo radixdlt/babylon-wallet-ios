@@ -21,7 +21,7 @@ extension Login {
 				L10n.DApp.Login.Title.newDapp
 
 			subtitle = {
-				let dappName = AttributedString(state.dappMetadata.name, foregroundColor: .app.gray1)
+				let dappName = AttributedString(state.dappMetadata.name.rawValue, foregroundColor: .app.gray1)
 
 				let explanation = AttributedString(
 					isKnownDapp ?
