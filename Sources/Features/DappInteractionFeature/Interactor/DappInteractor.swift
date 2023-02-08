@@ -7,11 +7,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var requestQueue: OrderedSet<P2P.RequestFromClient> = []
 
-		typealias DappInteractionState = RelayState<P2P.RequestFromClient, DappInteractionCoordinator.State>
-		typealias DappInteractionAction = RelayAction<P2P.RequestFromClient, DappInteractionCoordinator.Action>
-
 		@PresentationState
-		var currentDappInteraction: DappInteractionState?
+		var currentModal: Destinations.State?
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -21,11 +18,32 @@ struct DappInteractor: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case receivedRequestFromDapp(P2P.RequestFromClient)
 		case presentQueuedRequestIfNeeded
-		case sentResponseToDapp(for: P2P.RequestFromClient)
+		case sentResponseToDapp(DappMetadata?, for: P2P.RequestFromClient)
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case dappInteraction(PresentationAction<State.DappInteractionState, State.DappInteractionAction>)
+		case modal(PresentationActionOf<Destinations>)
+	}
+
+	struct Destinations: Sendable, ReducerProtocol {
+		enum State: Sendable, Hashable {
+			case dappInteraction(RelayState<P2P.RequestFromClient, DappInteractionCoordinator.State>)
+			case dappInteractionCompletion(RelayState<P2P.RequestFromClient, Completion.State>)
+		}
+
+		enum Action: Sendable, Equatable {
+			case dappInteraction(RelayAction<P2P.RequestFromClient, DappInteractionCoordinator.Action>)
+			case dappInteractionCompletion(RelayAction<P2P.RequestFromClient, Completion.Action>)
+		}
+
+		var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.dappInteraction, action: /Action.dappInteraction) {
+				Relay { DappInteractionCoordinator() }
+			}
+			Scope(state: /State.dappInteractionCompletion, action: /Action.dappInteractionCompletion) {
+				Relay { Completion() }
+			}
+		}
 	}
 
 	@Dependency(\.profileClient) var profileClient
@@ -35,8 +53,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$currentDappInteraction, action: /Action.child .. ChildAction.dappInteraction) {
-				Relay { DappInteractionCoordinator() }
+			.presentationDestination(\.$currentModal, action: /Action.child .. ChildAction.modal) {
+				Destinations()
 			}
 	}
 
@@ -91,13 +109,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .presentQueuedRequestIfNeeded:
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
-		case let .sentResponseToDapp(request):
+		case let .sentResponseToDapp(dappMetadata, for: request):
 			state.requestQueue.remove(request)
-			state.currentDappInteraction = nil
-			return .run { send in
-				try await clock.sleep(for: .seconds(1))
-				await send(.internal(.presentQueuedRequestIfNeeded))
-			}
+			state.currentModal = .dappInteractionCompletion(.relayed(request, with: .init(
+				dappMetadata: dappMetadata ?? DappMetadata(name: nil)
+			)))
+			return .none
 		}
 	}
 
@@ -105,17 +122,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 		for state: inout State
 	) -> EffectTask<Action> {
 		if
-			state.currentDappInteraction == nil,
+			state.currentModal == nil,
 			let next = state.requestQueue.first
 		{
-			state.currentDappInteraction = .relayed(next, with: .init(interaction: next.interaction))
+			state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.interaction)))
 		}
 		return .none
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .dappInteraction(.presented(.relay(request, .delegate(.dismissAndSubmit(response))))):
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submitAndDismiss(response, dappMetadata)))))):
 			let response = P2P.ResponseToClientByID(
 				connectionID: request.client.id,
 				responseToDapp: response
@@ -127,7 +144,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				} catch {
 					errorQueue.schedule(error)
 				}
-				await send(.internal(.sentResponseToDapp(for: request)))
+				await send(.internal(.sentResponseToDapp(dappMetadata, for: request)))
 			}
 		default:
 			return .none

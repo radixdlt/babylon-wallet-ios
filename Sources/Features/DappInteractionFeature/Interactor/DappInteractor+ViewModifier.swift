@@ -26,12 +26,16 @@ extension DappInteractor {
 			content
 			#if os(iOS)
 			.fullScreenCover(
-				store: store.scope(state: \.$currentDappInteraction, action: { .child(.dappInteraction($0)) }),
+				store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
+				state: /DappInteractor.Destinations.State.dappInteraction,
+				action: DappInteractor.Destinations.Action.dappInteraction,
 				content: { DappInteractionCoordinator.View(store: $0.relay()) }
 			)
-			#elseif os(macOS)
+			#elseif os(macOS) // .fullScreenCover is not available on macOS
 			.sheet(
-				store: store.scope(state: \.$currentDappInteraction, action: { .child(.dappInteraction($0)) }),
+				store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
+				state: /DappInteractor.Destinations.State.dappInteraction,
+				action: DappInteractor.Destinations.Action.dappInteraction,
 				content: { DappInteractionCoordinator.View(store: $0.relay()) }
 			)
 			#endif

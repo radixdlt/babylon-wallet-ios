@@ -78,7 +78,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismiss(P2P.ToDapp.WalletInteractionFailureResponse)
-		case submit(P2P.ToDapp.WalletInteractionSuccessResponse)
+		case submit(P2P.ToDapp.WalletInteractionSuccessResponse, DappMetadata)
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -266,7 +266,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				for: state.remoteInteraction,
 				with: state.responseItems.values.compactMap(/State.AnyInteractionResponseItem.remote)
 			) {
-				return .send(.delegate(.submit(response)))
+				return .send(.delegate(.submit(response, state.dappMetadata)))
 			} else {
 				return .none // TODO: throw error (invalid response format)
 			}
