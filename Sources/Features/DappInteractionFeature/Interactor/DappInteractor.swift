@@ -116,14 +116,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.requestQueue.remove(request)
 			state.currentModal = nil
 			onDismiss?()
-			switch response {
-			case .success:
-				return .run { send in
-					try await clock.sleep(for: .seconds(1))
+			return .run { send in
+				try await clock.sleep(for: .seconds(0.5))
+				switch response {
+				case .success:
 					await send(.internal(.presentInteractionSuccessView(dappMetadata ?? DappMetadata(name: nil))))
+				case .failure:
+					await send(.internal(.presentQueuedRequestIfNeeded))
 				}
-			case .failure:
-				return presentQueuedRequestIfNeededEffect(for: &state)
 			}
 
 		case let .presentInteractionSuccessView(dappMetadata):
@@ -160,6 +160,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 				}
 				await send(.internal(.sentResponseToDapp(responseToDapp, for: request, dappMetadata)))
 			}
+
+		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
+			state.currentModal = nil
+			return .run { send in
+				try await clock.sleep(for: .seconds(0.5))
+				await send(.internal(.presentQueuedRequestIfNeeded))
+			}
+
 		default:
 			return .none
 		}

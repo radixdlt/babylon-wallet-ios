@@ -22,19 +22,28 @@ extension Completion {
 				observe: Completion.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				VStack(spacing: .medium2) {
-					Image(asset: AssetResource.successCheckmark)
+				NavigationStack {
+					VStack(spacing: .medium2) {
+						Image(asset: AssetResource.successCheckmark)
 
-					Text(viewStore.title)
-						.foregroundColor(.app.gray1)
-						.textStyle(.sheetTitle)
+						Text(viewStore.title)
+							.foregroundColor(.app.gray1)
+							.textStyle(.sheetTitle)
 
-					Text(viewStore.subtitle)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1Regular)
-						.multilineTextAlignment(.center)
+						Text(viewStore.subtitle)
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Regular)
+							.multilineTextAlignment(.center)
+					}
+					.padding(.horizontal, .medium1)
+					#if os(iOS)
+						.toolbar {
+							ToolbarItem(placement: .navigationBarLeading) {
+								CloseButton { viewStore.send(.closeButtonTapped) }
+							}
+						}
+					#endif
 				}
-				.padding(.horizontal, .medium1)
 			}
 		}
 	}
