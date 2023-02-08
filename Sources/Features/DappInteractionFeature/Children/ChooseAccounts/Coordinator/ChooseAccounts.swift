@@ -70,9 +70,6 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			.presentationDestination(\.$createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
 				CreateAccountCoordinator()
 			}
-//			.ifLet(\.createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
-//				CreateAccountCoordinator()
-//			}
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {

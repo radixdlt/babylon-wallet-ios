@@ -1,3 +1,4 @@
+import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - LoginRequest.View
@@ -108,6 +109,13 @@ extension LoginRequest {
 				.onAppear {
 					viewStore.send(.appeared)
 				}
+				.sheet(
+					store: store.scope(
+						state: \.$createPersonaCoordinator,
+						action: { .child(.createPersonaCoordinator($0)) }
+					),
+					content: { CreatePersonaCoordinator.View(store: $0) }
+				)
 			}
 		}
 

@@ -1,16 +1,21 @@
+import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - LoginRequest
 struct LoginRequest: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
+		var selectedPersona: OnNetwork.Persona? {
+			personas.first(where: { $0.isSelected })?.persona
+		}
+
 		let dappDefinitionAddress: DappDefinitionAddress
 		let dappMetadata: DappMetadata
 
 		var personas: IdentifiedArrayOf<PersonaRow.State> = []
 		var authorizedPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
-		var selectedPersona: OnNetwork.Persona? {
-			personas.first(where: { $0.isSelected })?.persona
-		}
+
+		@PresentationState
+		var createPersonaCoordinator: CreatePersonaCoordinator.State? = nil
 
 		init(
 			dappDefinitionAddress: DappDefinitionAddress,
@@ -29,22 +34,28 @@ struct LoginRequest: Sendable, FeatureReducer {
 
 	enum InternalAction: Sendable, Equatable {
 		case personasLoaded(IdentifiedArrayOf<OnNetwork.Persona>, OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?)
+		case loadPersonasResult(TaskResult<IdentifiedArrayOf<OnNetwork.Persona>>)
 	}
 
 	enum ChildAction: Sendable, Equatable {
 		case persona(id: PersonaRow.State.ID, action: PersonaRow.Action)
+		case createPersonaCoordinator(PresentationActionOf<CreatePersonaCoordinator>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
 		case continueButtonTapped(OnNetwork.Persona, OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?)
 	}
 
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.forEach(\.personas, action: /Action.child .. ChildAction.persona) {
 				PersonaRow()
+			}
+			.presentationDestination(\.$createPersonaCoordinator, action: /Action.child .. ChildAction.createPersonaCoordinator) {
+				CreatePersonaCoordinator()
 			}
 	}
 
@@ -74,7 +85,12 @@ struct LoginRequest: Sendable, FeatureReducer {
 				await send(.internal(.personasLoaded(personas, authorizedPersona)))
 			}
 		case .createNewPersonaButtonTapped:
-			// TODO:
+			// TODO: @Nikola - populate with correct values
+			state.createPersonaCoordinator = .init(config: .init(
+				isFirstEntity: true,
+				canBeDismissed: true,
+				navigationButtonCTA: .goBackToPersonaList
+			))
 			return .none
 		case let .continueButtonTapped(persona):
 			return .send(.delegate(.continueButtonTapped(persona, state.authorizedPersona)))
@@ -102,6 +118,17 @@ struct LoginRequest: Sendable, FeatureReducer {
 			)
 			state.authorizedPersona = authorizedPersonaSimple
 			return .none
+
+		case let .loadPersonasResult(.success(personas)):
+			state.personas = .init(uniqueElements: personas.map {
+				// TODO: @Nikola - populate with correct values
+				PersonaRow.State(persona: $0, isSelected: false, lastLogin: nil)
+			})
+			return .none
+
+		case let .loadPersonasResult(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
 		}
 	}
 
@@ -112,6 +139,18 @@ struct LoginRequest: Sendable, FeatureReducer {
 				state.personas[id: $0.id]?.isSelected = $0.id == id
 			}
 			return .none
+
+		case .createPersonaCoordinator(.presented(.delegate(.dismissed))):
+			state.createPersonaCoordinator = nil
+			return .none
+
+		case .createPersonaCoordinator(.presented(.delegate(.completed))):
+			state.createPersonaCoordinator = nil
+			return .run { send in
+				await send(.internal(.loadPersonasResult(TaskResult {
+					try await profileClient.getPersonas()
+				})))
+			}
 
 		default:
 			return .none
