@@ -116,14 +116,13 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.requestQueue.remove(request)
 			state.currentModal = nil
 			onDismiss?()
-			return .run { send in
-				try await clock.sleep(for: .seconds(0.5))
-				switch response {
-				case .success:
-					await send(.internal(.presentInteractionSuccessView(dappMetadata ?? DappMetadata(name: nil))))
-				case .failure:
-					await send(.internal(.presentQueuedRequestIfNeeded))
-				}
+			switch response {
+			case .success:
+				return delayedPresentationEffect(
+					for: .internal(.presentInteractionSuccessView(dappMetadata ?? DappMetadata(name: nil)))
+				)
+			case .failure:
+				return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
 
 		case let .presentInteractionSuccessView(dappMetadata):
@@ -163,25 +162,29 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
-			return .run { send in
-				try await clock.sleep(for: .seconds(0.5))
-				await send(.internal(.presentQueuedRequestIfNeeded))
-			}
+			return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
 
-		// NB: handles background tap to dismiss success screen.
+		// NB: handles "background tap to dismiss" for success screen.
 		case .modal(.dismiss):
 			switch state.currentModal {
 			case .none, .dappInteraction:
 				return .none
 			case .dappInteractionCompletion:
-				return .run { send in
-					try await clock.sleep(for: .seconds(0.5))
-					await send(.internal(.presentQueuedRequestIfNeeded))
-				}
+				return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
 
 		default:
 			return .none
+		}
+	}
+
+	func delayedPresentationEffect(
+		delay: Duration = .seconds(0.5),
+		for action: Action
+	) -> EffectTask<Action> {
+		.run { send in
+			try await clock.sleep(for: delay)
+			await send(action)
 		}
 	}
 }
