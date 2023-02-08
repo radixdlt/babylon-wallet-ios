@@ -15,7 +15,7 @@ public extension OnNetwork {
 
 		public let dAppDefinitionAddress: DappDefinitionAddress
 
-		public let displayName: NonEmpty<String>
+		public let displayName: String
 
 		// mutable so that we can add new authorized personas
 		public var referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple>
@@ -23,7 +23,7 @@ public extension OnNetwork {
 		public init(
 			networkID: Network.ID,
 			dAppDefinitionAddress: DappDefinitionAddress,
-			displayName: NonEmpty<String>,
+			displayName: String,
 			referencesToAuthorizedPersonas: IdentifiedArrayOf<AuthorizedPersonaSimple> = .init()
 		) {
 			self.networkID = networkID
@@ -55,7 +55,7 @@ public extension OnNetwork.ConnectedDapp {
 		public var lastLogin: Date
 
 		/// List of "ongoing accountAddresses" that user given the dApp access to.
-		public var sharedAccounts: SharedAccounts
+		public var sharedAccounts: SharedAccounts?
 
 		public struct SharedAccounts:
 			Sendable,
@@ -97,7 +97,7 @@ public extension OnNetwork.ConnectedDapp {
 			identityAddress: IdentityAddress,
 			fieldIDs: OrderedSet<OnNetwork.Persona.Field.ID>,
 			lastLogin: Date,
-			sharedAccounts: SharedAccounts
+			sharedAccounts: SharedAccounts?
 		) {
 			self.identityAddress = identityAddress
 			self.fieldIDs = fieldIDs

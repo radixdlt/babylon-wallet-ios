@@ -127,7 +127,7 @@ extension ProfileClient {
 				var dapp = OnNetwork.ConnectedDapp(
 					networkID: .nebunet,
 					dAppDefinitionAddress: try! .init(address: "DappDefinitionAddress"),
-					displayName: .init(rawValue: "something")!
+					displayName: "My Fancy dApp"
 				)
 				dapp.referencesToAuthorizedPersonas = [
 					.init(
