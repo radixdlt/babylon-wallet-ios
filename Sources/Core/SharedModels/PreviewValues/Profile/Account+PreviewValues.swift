@@ -5,7 +5,7 @@ import ProfileModels
 // Update?
 public extension OnNetwork.Account {
 	static let previewValue0 = try! Self(
-		networkID: .nebunet,
+		networkID: .hammunet,
 		address: .init(
 			address: "account_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
 		),
@@ -29,7 +29,7 @@ public extension OnNetwork.Account {
 	)
 
 	static let previewValue1 = try! Self(
-		networkID: .nebunet,
+		networkID: .hammunet,
 		address: .init(
 			address: "account_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
 		),

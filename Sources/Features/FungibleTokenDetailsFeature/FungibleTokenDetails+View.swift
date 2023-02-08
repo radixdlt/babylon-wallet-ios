@@ -105,7 +105,7 @@ extension FungibleTokenDetails.View {
 			self.iconURL = state.asset.iconURL
 			@Dependency(\.engineToolkitClient) var engineToolkit
 			let assetIsXRD = engineToolkit.isXRD(component: state.asset.componentAddress)
-			self.placeholderAsset = state.asset.placeholderImage(xrd: true)
+			self.placeholderAsset = state.asset.placeholderImage(isXRD: assetIsXRD)
 			self.amount = state.amount
 			self.symbol = state.asset.symbol
 			self.description = state.asset.tokenDescription

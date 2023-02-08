@@ -42,7 +42,7 @@ private extension FungibleTokenList.Row.View {
 			HStack(alignment: .center) {
 				HStack(spacing: .small1) {
 					LazyImage(url: container.asset.iconURL) { _ in
-						Image(asset: container.asset.placeholderImage(xrd: viewStore.isXRD))
+						Image(asset: container.asset.placeholderImage(isXRD: viewStore.isXRD))
 							.resizable()
 							.frame(.small)
 					}
