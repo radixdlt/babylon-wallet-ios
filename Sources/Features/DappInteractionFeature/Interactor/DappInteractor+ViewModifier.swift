@@ -5,22 +5,22 @@ public extension View {
 		self.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),
-				reducer: DappInteractionHook()
+				reducer: DappInteractor()
 			)
 		)
 	}
 
-	internal func presentsDappInteractions(store: StoreOf<DappInteractionHook>) -> some View {
-		self.modifier(DappInteractionHook.ViewModifier(store: store))
+	internal func presentsDappInteractions(store: StoreOf<DappInteractor>) -> some View {
+		self.modifier(DappInteractor.ViewModifier(store: store))
 	}
 }
 
 // MARK: - DappInteractionHook.ViewModifier
-extension DappInteractionHook {
+extension DappInteractor {
 	typealias View = Never
 
 	struct ViewModifier: SwiftUI.ViewModifier {
-		let store: StoreOf<DappInteractionHook>
+		let store: StoreOf<DappInteractor>
 
 		func body(content: Content) -> some SwiftUI.View {
 			content
@@ -48,7 +48,7 @@ struct DappInteractionHook_Previews: PreviewProvider {
 		Color.red.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),
-				reducer: DappInteractionHook()
+				reducer: DappInteractor()
 			)
 		)
 	}

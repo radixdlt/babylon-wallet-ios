@@ -3,7 +3,7 @@ import P2PConnectivityClient
 import ProfileClient
 
 // MARK: - DappInteractionHook
-struct DappInteractionHook: Sendable, FeatureReducer {
+struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var requestQueue: OrderedSet<P2P.RequestFromClient> = []
 

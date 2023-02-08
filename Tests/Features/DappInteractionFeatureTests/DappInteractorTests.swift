@@ -2,7 +2,7 @@
 // @testable import DappInteractionFeature
 //
 // @MainActor
-// final class DappInteractionHookFeatureTests: TestCase {
+// final class DappInteractorFeatureTests: TestCase {
 //	func test__GIVEN__initialState__WHEN__receiveChooseAccountRequest__THEN__request_is_queued_and_immediately_handled() async throws {
 //		let clientsWasLoaded = ActorIsolated<Bool>(false)
 //
@@ -11,8 +11,8 @@
 //		let clientIDs = OrderedSet(arrayLiteral: request.client.id)
 //
 //		let store = TestStore(
-//			initialState: DappInteractionHook.State(),
-//			reducer: DappInteractionHook()
+//			initialState: DappInteractor.State(),
+//			reducer: DappInteractor()
 //		) {
 //			$0.p2pConnectivityClient.loadFromProfileAndConnectAll = {
 //				await clientsWasLoaded.setValue(true)
@@ -57,7 +57,7 @@
 //	}
 //
 //	func test__GIVEN__already_handling_a_request__WHEN__receiveRequest__THEN__new_request_is_queued() async throws {
-//		let currentRequest: DappInteractionHook.State.CurrentRequest = .chooseAccounts(
+//		let currentRequest: DappInteractor.State.CurrentRequest = .chooseAccounts(
 //			.init(
 //				kind: .oneTime,
 //				dappDefinitionAddress: try! .init(address: "account_deadbeef"),
@@ -67,11 +67,11 @@
 //		)
 //
 //		let store = TestStore(
-//			initialState: DappInteractionHook.State(
+//			initialState: DappInteractor.State(
 //				unfinishedRequestsFromClient: .init(),
 //				currentRequest: currentRequest
 //			),
-//			reducer: DappInteractionHook()
+//			reducer: DappInteractor()
 //		) {
 //			$0.profileClient.getCurrentNetworkID = { .simulator }
 //			$0.p2pConnectivityClient.sendMessageReadReceipt = { _, _ in /* do nothing */ }
@@ -120,10 +120,10 @@
 //		)
 //
 //		let store = TestStore(
-//			initialState: DappInteractionHook.State(
+//			initialState: DappInteractor.State(
 //				unfinishedRequestsFromClient: .init()
 //			),
-//			reducer: DappInteractionHook()
+//			reducer: DappInteractor()
 //		) {
 //			$0.profileClient.getCurrentNetworkID = { currentNetworkID }
 //			$0.errorQueue.schedule = {
