@@ -2,8 +2,8 @@ import Resources
 import SharedModels
 
 public extension FungibleToken {
-	var placeholderImage: ImageAsset {
-		if isXRD {
+	func placeholderImage(xrd: Bool) -> ImageAsset {
+		if xrd {
 			return AssetResource.xrd
 		} else {
 			return AssetResource.fungibleToken
