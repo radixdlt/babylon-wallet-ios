@@ -1,11 +1,11 @@
 import FeaturePrelude
 
 public extension View {
-	func presentsDappInteractions() -> some View {
+	func presentsDappInteractions(onDismiss: (@Sendable () -> Void)?) -> some View {
 		self.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),
-				reducer: DappInteractor()
+				reducer: DappInteractor(onDismiss: onDismiss)
 			)
 		)
 	}
@@ -52,7 +52,7 @@ struct DappInteractionHook_Previews: PreviewProvider {
 		Color.red.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),
-				reducer: DappInteractor()
+				reducer: DappInteractor(onDismiss: nil)
 			)
 		)
 	}

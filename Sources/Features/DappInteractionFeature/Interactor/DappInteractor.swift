@@ -18,7 +18,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case receivedRequestFromDapp(P2P.RequestFromClient)
 		case presentQueuedRequestIfNeeded
-		case sentResponseToDapp(DappMetadata?, for: P2P.RequestFromClient)
+		case sentResponseToDapp(P2P.ToDapp.WalletInteractionResponse, for: P2P.RequestFromClient, DappMetadata?)
+		case presentInteractionSuccessView(DappMetadata)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -28,12 +29,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 	struct Destinations: Sendable, ReducerProtocol {
 		enum State: Sendable, Hashable {
 			case dappInteraction(RelayState<P2P.RequestFromClient, DappInteractionCoordinator.State>)
-			case dappInteractionCompletion(RelayState<P2P.RequestFromClient, Completion.State>)
+			case dappInteractionCompletion(Completion.State)
 		}
 
 		enum Action: Sendable, Equatable {
 			case dappInteraction(RelayAction<P2P.RequestFromClient, DappInteractionCoordinator.Action>)
-			case dappInteractionCompletion(RelayAction<P2P.RequestFromClient, Completion.Action>)
+			case dappInteractionCompletion(Completion.Action)
 		}
 
 		var body: some ReducerProtocolOf<Self> {
@@ -41,10 +42,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 				Relay { DappInteractionCoordinator() }
 			}
 			Scope(state: /State.dappInteractionCompletion, action: /Action.dappInteractionCompletion) {
-				Relay { Completion() }
+				Completion()
 			}
 		}
 	}
+
+	let onDismiss: (@Sendable () -> Void)?
 
 	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
@@ -109,11 +112,22 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .presentQueuedRequestIfNeeded:
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
-		case let .sentResponseToDapp(dappMetadata, for: request):
+		case let .sentResponseToDapp(response, for: request, dappMetadata):
 			state.requestQueue.remove(request)
-			state.currentModal = .dappInteractionCompletion(.relayed(request, with: .init(
-				dappMetadata: dappMetadata ?? DappMetadata(name: nil)
-			)))
+			state.currentModal = nil
+			onDismiss?()
+			switch response {
+			case .success:
+				return .run { send in
+					try await clock.sleep(for: .seconds(1))
+					await send(.internal(.presentInteractionSuccessView(dappMetadata ?? DappMetadata(name: nil))))
+				}
+			case .failure:
+				return presentQueuedRequestIfNeededEffect(for: &state)
+			}
+
+		case let .presentInteractionSuccessView(dappMetadata):
+			state.currentModal = .dappInteractionCompletion(.init(dappMetadata: dappMetadata))
 			return .none
 		}
 	}
@@ -132,19 +146,19 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submitAndDismiss(response, dappMetadata)))))):
+		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submitAndDismiss(responseToDapp, dappMetadata)))))):
 			let response = P2P.ResponseToClientByID(
 				connectionID: request.client.id,
-				responseToDapp: response
+				responseToDapp: responseToDapp
 			)
 
-			return .run { [request] send in
+			return .run { send in
 				do {
 					_ = try await p2pConnectivityClient.sendMessage(response) // TODO: retry mechanism? :shrug:
 				} catch {
 					errorQueue.schedule(error)
 				}
-				await send(.internal(.sentResponseToDapp(dappMetadata, for: request)))
+				await send(.internal(.sentResponseToDapp(responseToDapp, for: request, dappMetadata)))
 			}
 		default:
 			return .none

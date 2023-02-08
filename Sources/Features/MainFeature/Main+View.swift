@@ -36,7 +36,9 @@ public extension Main.View {
 			)
 			.zIndex(1)
 		}
-		.presentsDappInteractions()
+		.presentsDappInteractions(onDismiss: {
+			ViewStore(store.stateless).send(.child(.home(.view(.didAppear))))
+		})
 	}
 }
 
