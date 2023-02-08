@@ -28,6 +28,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		let dappMetadata: DappMetadata
 		let remoteInteraction: RemoteInteraction
+		var connectedDapp: OnNetwork.ConnectedDapp?
 
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
@@ -86,14 +87,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		typealias Action = RelayAction<DappInteractionFlow.State.AnyInteractionItem, MainAction>
 
 		enum MainState: Sendable, Hashable {
-			case login(LoginRequest.State)
+			case login(Login.State)
 			case permission(Permission.State)
 			case chooseAccounts(ChooseAccounts.State)
 			case signAndSubmitTransaction(TransactionSigning.State)
 		}
 
 		enum MainAction: Sendable, Equatable {
-			case login(LoginRequest.Action)
+			case login(Login.Action)
 			case permission(Permission.Action)
 			case chooseAccounts(ChooseAccounts.Action)
 			case signAndSubmitTransaction(TransactionSigning.Action)
@@ -102,7 +103,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		var body: some ReducerProtocolOf<Self> {
 			Relay {
 				Scope(state: /MainState.login, action: /MainAction.login) {
-					LoginRequest()
+					Login()
 				}
 				Scope(state: /MainState.permission, action: /MainAction.permission) {
 					Permission()

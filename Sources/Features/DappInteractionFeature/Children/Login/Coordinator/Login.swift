@@ -2,7 +2,7 @@ import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - LoginRequest
-struct LoginRequest: Sendable, FeatureReducer {
+struct Login: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		var selectedPersona: OnNetwork.Persona? {
 			personas.first(where: { $0.isSelected })?.persona

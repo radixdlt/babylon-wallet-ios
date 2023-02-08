@@ -124,7 +124,7 @@ extension ChooseAccounts {
 					}
 					.safeAreaInset(edge: .bottom, spacing: .zero) {
 						ConfirmationFooter(
-							title: L10n.DApp.LoginRequest.continueButtonTitle,
+							title: L10n.DApp.Login.continueButtonTitle,
 							isEnabled: viewStore.canProceed,
 							action: { viewStore.send(.continueButtonTapped) }
 						)

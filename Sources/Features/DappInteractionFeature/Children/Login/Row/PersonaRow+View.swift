@@ -14,7 +14,7 @@ extension PersonaRow {
 				let formatter = DateFormatter()
 				formatter.dateFormat = "d MMM YYY"
 				let formatted = formatter.string(from: lastLogin)
-				self.lastLogin = L10n.DApp.LoginRequest.Row.lastLoginWasOn(formatted)
+				self.lastLogin = L10n.DApp.Login.Row.lastLoginWasOn(formatted)
 			} else {
 				self.lastLogin = nil
 			}

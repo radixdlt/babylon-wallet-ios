@@ -2,7 +2,7 @@ import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - LoginRequest.View
-extension LoginRequest {
+extension Login {
 	struct ViewState: Equatable {
 		let title: String
 		let subtitle: AttributedString
@@ -13,20 +13,20 @@ extension LoginRequest {
 			let persona: OnNetwork.Persona
 		}
 
-		init(state: LoginRequest.State) {
+		init(state: Login.State) {
 			let isKnownDapp = state.authorizedPersona != nil
 
 			title = isKnownDapp ?
-				L10n.DApp.LoginRequest.Title.knownDapp :
-				L10n.DApp.LoginRequest.Title.newDapp
+				L10n.DApp.Login.Title.knownDapp :
+				L10n.DApp.Login.Title.newDapp
 
 			subtitle = {
 				let dappName = AttributedString(state.dappMetadata.name, foregroundColor: .app.gray1)
 
 				let explanation = AttributedString(
 					isKnownDapp ?
-						L10n.DApp.LoginRequest.Subtitle.knownDapp :
-						L10n.DApp.LoginRequest.Subtitle.newDapp,
+						L10n.DApp.Login.Subtitle.knownDapp :
+						L10n.DApp.Login.Subtitle.newDapp,
 					foregroundColor: .app.gray2
 				)
 
@@ -45,12 +45,12 @@ extension LoginRequest {
 
 	@MainActor
 	struct View: SwiftUI.View {
-		let store: StoreOf<LoginRequest>
+		let store: StoreOf<Login>
 
 		var body: some SwiftUI.View {
 			WithViewStore(
 				store,
-				observe: LoginRequest.ViewState.init,
+				observe: Login.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
 				ForceFullScreen {
@@ -69,7 +69,7 @@ extension LoginRequest {
 							}
 							.padding(.bottom, .small2)
 
-							Text(L10n.DApp.LoginRequest.chooseAPersonaTitle)
+							Text(L10n.DApp.Login.chooseAPersonaTitle)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body1Header)
 
@@ -99,7 +99,7 @@ extension LoginRequest {
 							}
 						) { action in
 							ConfirmationFooter(
-								title: L10n.DApp.LoginRequest.continueButtonTitle,
+								title: L10n.DApp.Login.continueButtonTitle,
 								isEnabled: viewStore.canProceed,
 								action: action
 							)
@@ -132,12 +132,12 @@ extension LoginRequest {
 import SwiftUI // NB: necessary for previews to appear
 
 // MARK: - LoginRequest_Preview
-struct LoginRequest_Preview: PreviewProvider {
+struct Login_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
-		LoginRequest.View(
+		Login.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: LoginRequest()
+				reducer: Login()
 					.dependency(\.profileClient, .previewValueTwoPersonas(existing: true))
 					.dependency(\.profileClient, .previewValueTwoPersonas(existing: false))
 			)
@@ -145,7 +145,7 @@ struct LoginRequest_Preview: PreviewProvider {
 	}
 }
 
-extension LoginRequest.State {
+extension Login.State {
 	static let previewValue: Self = .init(
 		dappDefinitionAddress: try! .init(address: "DappDefinitionAddress"),
 		dappMetadata: .previewValue
