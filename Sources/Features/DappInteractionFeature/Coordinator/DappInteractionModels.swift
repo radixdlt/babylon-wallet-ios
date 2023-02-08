@@ -8,6 +8,29 @@ extension DappInteraction {
 	typealias NumberOfAccounts = P2P.FromDapp.WalletInteraction.NumberOfAccounts
 }
 
+// MARK: - DappMetadata
+struct DappMetadata: Sendable, Hashable {
+	let name: String
+	let description: String?
+
+	init(
+		name: String?,
+		description: String? = nil
+	) {
+		self.name = name?.nilIfBlank ?? L10n.DApp.Metadata.unknownName
+		self.description = description
+	}
+}
+
+#if DEBUG
+extension DappMetadata {
+	static let previewValue: Self = .init(
+		name: "Collabo.Fi",
+		description: "A very collaby finance dapp"
+	)
+}
+#endif
+
 // MARK: - P2P.FromDapp.WalletRequestItem
 extension P2P.FromDapp.WalletInteraction {
 	/// A union type containing all request items allowed in a `WalletInteraction`, for app handling purposes.
