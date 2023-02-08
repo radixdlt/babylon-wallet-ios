@@ -28,7 +28,7 @@ public struct InvalidRequestFromDapp: Swift.Error, Equatable, CustomStringConver
 
 #if DEBUG
 public extension P2PClient {
-	static let previewValue: Self = try! .init(
+	static let previewValue: Self = .init(
 		connectionPassword: .placeholder,
 		displayName: "PreviewValue"
 	)
