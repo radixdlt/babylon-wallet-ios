@@ -19,6 +19,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 		let dappMetadata: DappMetadata
 		let numberOfAccounts: DappInteraction.NumberOfAccounts
 		var availableAccounts: IdentifiedArrayOf<ChooseAccountsRow.State>
+
+		@PresentationState
 		var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		init(
@@ -51,6 +53,8 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	enum ChildAction: Sendable, Equatable {
 		case account(id: ChooseAccountsRow.State.ID, action: ChooseAccountsRow.Action)
 		case createAccountCoordinator(CreateAccountCoordinator.Action)
+
+		case temp(PresentationActionOf<CreateAccountCoordinator>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -62,12 +66,15 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
+			.presentationDestination(\.$createAccountCoordinator, action: /Action.child .. ChildAction.temp) {
+				CreateAccountCoordinator()
+			}
 			.forEach(\.availableAccounts, action: /Action.child .. ChildAction.account) {
 				ChooseAccountsRow()
 			}
-			.ifLet(\.createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
-				CreateAccountCoordinator()
-			}
+//			.ifLet(\.createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
+//				CreateAccountCoordinator()
+//			}
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -142,6 +149,15 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			return .none
 
 		case .createAccountCoordinator(.delegate(.completed)):
+			state.createAccountCoordinator = nil
+			return .run { send in
+				await send(.internal(.loadAccountsResult(TaskResult {
+					try await profileClient.getAccounts()
+				})))
+			}
+
+		case .temp(.presented(.child(.step3_completion(.internal(.view(.goToDestination)))))):
+			print("🟢")
 			state.createAccountCoordinator = nil
 			return .run { send in
 				await send(.internal(.loadAccountsResult(TaskResult {

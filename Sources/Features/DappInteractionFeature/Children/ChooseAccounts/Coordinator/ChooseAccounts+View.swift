@@ -133,6 +133,10 @@ extension ChooseAccounts {
 				.onAppear {
 					viewStore.send(.didAppear)
 				}
+				.sheet(
+					store: store.scope(state: \.$createAccountCoordinator, action: { .child(.temp($0)) }),
+					content: { CreateAccountCoordinator.View(store: $0) }
+				)
 			}
 		}
 
