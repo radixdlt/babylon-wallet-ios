@@ -47,8 +47,11 @@ extension Completion {
 						}
 					#endif
 				}
-				.padding(.vertical, .medium3)
+				.padding([.top, .horizontal], .small2)
+				.padding(.bottom, .medium3)
 			}
+			.presentationDetentIntrinsicHeight()
+			.presentationDragIndicator(.visible)
 		}
 	}
 }
@@ -62,6 +65,7 @@ struct Completion_Preview: PreviewProvider {
 		WithState(initialValue: true) { $isPresented in
 			ZStack {
 				Color.red
+				Button("Present") { isPresented = true }
 			}
 			.sheet(isPresented: $isPresented) {
 				Completion.View(
@@ -70,7 +74,6 @@ struct Completion_Preview: PreviewProvider {
 						reducer: Completion()
 					)
 				)
-				.presentationDetentIntrinsicHeight()
 			}
 		}
 	}
