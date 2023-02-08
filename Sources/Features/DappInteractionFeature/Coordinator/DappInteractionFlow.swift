@@ -224,8 +224,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			state.responseItems[item] = .remote(.send(.init(txID: txID)))
 			return continueEffect(for: &state)
 		case
-			let .root(.relay(item, .signAndSubmitTransaction(.delegate(.failed(error))))),
-			let .path(.element(_, .relay(item, .signAndSubmitTransaction(.delegate(.failed(error)))))):
+			let .root(.relay(_, .signAndSubmitTransaction(.delegate(.failed(error))))),
+			let .path(.element(_, .relay(_, .signAndSubmitTransaction(.delegate(.failed(error)))))):
 			let (errorKind, message) = error.errorKindAndMessage
 			return dismissEffect(for: state, errorKind: errorKind, message: message)
 		default:
