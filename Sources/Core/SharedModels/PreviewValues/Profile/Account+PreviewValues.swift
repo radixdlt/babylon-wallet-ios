@@ -7,7 +7,7 @@ public extension OnNetwork.Account {
 	static let previewValue0 = try! Self(
 		networkID: .hammunet,
 		address: .init(
-			address: "account_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
+			address: "identity_tdx_22_1pd803nvt5fqp89wg7lrayga3r727s5fsgxcdanrqmjvsncmmjg"
 		),
 		securityState: .unsecured(.init(
 			genesisFactorInstance: .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(.init(
@@ -31,7 +31,7 @@ public extension OnNetwork.Account {
 	static let previewValue1 = try! Self(
 		networkID: .hammunet,
 		address: .init(
-			address: "account_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
+			address: "account_tdx_22_1pzdqkuwwcn0k3c2ekep7tnltpa0myescyy6lu945w4aq9ewwz0"
 		),
 		securityState: .unsecured(.init(
 			genesisFactorInstance: .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(.init(
