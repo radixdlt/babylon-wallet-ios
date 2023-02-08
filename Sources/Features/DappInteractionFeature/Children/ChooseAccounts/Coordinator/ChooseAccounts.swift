@@ -4,7 +4,7 @@ import ProfileClient
 
 // MARK: - ChooseAccounts
 struct ChooseAccounts: Sendable, FeatureReducer {
-	struct State: Hashable {
+	struct State: Sendable, Hashable {
 		enum AccessKind: Sendable, Hashable {
 			case ongoing
 			case oneTime
