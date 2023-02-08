@@ -15,7 +15,7 @@ private struct PresentationDetentBlurBackgroundModifier: ViewModifier {
 	let style: UIBlurEffect.Style
 	let animationDuration = 0.35
 
-	@State var blurEffectView: UIView?
+	@Weak var blurEffectView: UIView?
 
 	func body(content: Content) -> some View {
 		content
@@ -43,7 +43,7 @@ private struct PresentationDetentBlurBackgroundModifier: ViewModifier {
 					)
 				}
 			}
-			.background(Snitch(willDisappear: {
+			.onWillDisappear {
 				UIView.animate(
 					withDuration: animationDuration,
 					delay: 0,
@@ -52,28 +52,21 @@ private struct PresentationDetentBlurBackgroundModifier: ViewModifier {
 						blurEffectView?.alpha = 0
 					}
 				)
-			}))
+			}
 	}
 }
 
-// MARK: - Snitch
-private struct Snitch: UIViewControllerRepresentable {
-	final class ViewController: UIViewController {
-		var willDisappear: (() -> Void)?
-
-		override func viewWillDisappear(_ animated: Bool) {
-			super.viewWillDisappear(animated)
-			willDisappear?()
-		}
+// MARK: - Weak
+@propertyWrapper
+private final class Weak<T: AnyObject> {
+	var wrappedValue: T? {
+		get { weakValue }
+		set { weakValue = newValue }
 	}
 
-	var willDisappear: (() -> Void)?
+	weak var weakValue: T?
 
-	func makeUIViewController(context: Context) -> some UIViewController {
-		with(ViewController()) {
-			$0.willDisappear = willDisappear
-		}
+	init(wrappedValue: T?) {
+		self.weakValue = wrappedValue
 	}
-
-	func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
 }
