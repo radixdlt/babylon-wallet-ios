@@ -22,7 +22,10 @@ extension Completion {
 				observe: Completion.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				NavigationStack {
+				VStack(spacing: 0) {
+					NavigationBar(
+						leadingItem: CloseButton { viewStore.send(.closeButtonTapped) }
+					)
 					VStack(spacing: .medium2) {
 						Image(asset: AssetResource.successCheckmark)
 
@@ -44,6 +47,7 @@ extension Completion {
 						}
 					#endif
 				}
+				.padding(.vertical, .medium3)
 			}
 		}
 	}
@@ -55,12 +59,20 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - Completion_Preview
 struct Completion_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
-		Completion.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: Completion()
-			)
-		)
+		WithState(initialValue: true) { $isPresented in
+			ZStack {
+				Color.red
+			}
+			.sheet(isPresented: $isPresented) {
+				Completion.View(
+					store: .init(
+						initialState: .previewValue,
+						reducer: Completion()
+					)
+				)
+				.presentationDetentAutoHeight()
+			}
+		}
 	}
 }
 
