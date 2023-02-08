@@ -80,11 +80,3 @@ public extension EngineToolkitClient {
 		try knownEntityAddresses(networkID).faucetComponentAddress
 	}
 }
-
-// MARK: - NoKnownAddressForNetworkID
-public struct NoKnownAddressForNetworkID: LocalizedError {
-	public let unknownNetworkID: NetworkID
-	public var errorDescription: String? {
-		"\(Self.self)(unknownNetworkID: \(unknownNetworkID)"
-	}
-}

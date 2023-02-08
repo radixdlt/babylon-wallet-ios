@@ -65,10 +65,7 @@ public extension EngineToolkitClient {
 				)
 			},
 			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in
-				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).mapError { _ in
-					NoKnownAddressForNetworkID(unknownNetworkID: networkID)
-				}
-				.get()
+				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).get()
 			}
 		)
 	}()
