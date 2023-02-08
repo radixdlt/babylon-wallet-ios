@@ -67,7 +67,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 			.forEach(\.availableAccounts, action: /Action.child .. ChildAction.account) {
 				ChooseAccountsRow()
 			}
-			.presentationDestination(\.$createAccountCoordinator, action: /Action.child .. ChildAction.temp) {
+			.presentationDestination(\.$createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
 				CreateAccountCoordinator()
 			}
 //			.ifLet(\.createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
