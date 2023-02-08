@@ -52,9 +52,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	enum ChildAction: Sendable, Equatable {
 		case account(id: ChooseAccountsRow.State.ID, action: ChooseAccountsRow.Action)
-		case createAccountCoordinator(CreateAccountCoordinator.Action)
-
-		case temp(PresentationActionOf<CreateAccountCoordinator>)
+		case createAccountCoordinator(PresentationActionOf<CreateAccountCoordinator>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -66,11 +64,11 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$createAccountCoordinator, action: /Action.child .. ChildAction.temp) {
-				CreateAccountCoordinator()
-			}
 			.forEach(\.availableAccounts, action: /Action.child .. ChildAction.account) {
 				ChooseAccountsRow()
+			}
+			.presentationDestination(\.$createAccountCoordinator, action: /Action.child .. ChildAction.temp) {
+				CreateAccountCoordinator()
 			}
 //			.ifLet(\.createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
 //				CreateAccountCoordinator()
@@ -144,20 +142,11 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 
 			return .none
 
-		case .createAccountCoordinator(.delegate(.dismissed)):
+		case .createAccountCoordinator(.presented(.delegate(.dismissed))):
 			state.createAccountCoordinator = nil
 			return .none
 
-		case .createAccountCoordinator(.delegate(.completed)):
-			state.createAccountCoordinator = nil
-			return .run { send in
-				await send(.internal(.loadAccountsResult(TaskResult {
-					try await profileClient.getAccounts()
-				})))
-			}
-
-		case .temp(.presented(.child(.step3_completion(.internal(.view(.goToDestination)))))):
-			print("🟢")
+		case .createAccountCoordinator(.presented(.delegate(.completed))):
 			state.createAccountCoordinator = nil
 			return .run { send in
 				await send(.internal(.loadAccountsResult(TaskResult {
