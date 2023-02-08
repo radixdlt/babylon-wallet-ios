@@ -59,14 +59,13 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 // MARK: - FungibleTokenContainer
 public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
 	public let owner: AccountAddress
-	public typealias T = FungibleToken
 	public var asset: FungibleToken
 
 	// TODO: replace String type with appropriate numeric type with 0b2^256 / 0d1e18 ~ 1e60 support
 	/// Token amount held in one account, expressed as regular decimal value, for example: 105.78 XRD
-	public var amount: String?
+	public let amount: String?
 	/// Token worth in currently selected currency.
-	public var worth: BigDecimal?
+	public let worth: BigDecimal?
 
 	public init(
 		owner: AccountAddress,

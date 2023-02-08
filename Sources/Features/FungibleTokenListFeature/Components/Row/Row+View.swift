@@ -1,3 +1,4 @@
+import EngineToolkitClient
 import FeaturePrelude
 
 // MARK: - FungibleTokenList.Row.View
@@ -111,8 +112,6 @@ private extension FungibleTokenList.Row.View {
 	}
 }
 
-import EngineToolkitClient
-
 // MARK: - FungibleTokenList.Row.View.ViewState
 extension FungibleTokenList.Row.View {
 	// MARK: ViewState
@@ -126,6 +125,7 @@ extension FungibleTokenList.Row.View {
 			self.container = state.container
 			self.currency = state.currency
 			self.isCurrencyAmountVisible = state.isCurrencyAmountVisible
+			// FIXME: Find better solution
 			@Dependency(\.engineToolkitClient) var engineToolkit
 			self.isXRD = engineToolkit.isXRD(component: container.asset.componentAddress)
 		}

@@ -91,18 +91,19 @@ public extension FungibleTokenDetails.View {
 // MARK: - FungibleTokenDetails.View.ViewState
 extension FungibleTokenDetails.View {
 	struct ViewState: Equatable {
-		var displayName: String?
-		var iconURL: URL?
-		var placeholderAsset: ImageAsset
-		var amount: String?
-		var symbol: String?
-		var description: String?
-		var address: AddressView.ViewState
-		var currentSupply: BigDecimal?
+		let displayName: String?
+		let iconURL: URL?
+		let placeholderAsset: ImageAsset
+		let amount: String?
+		let symbol: String?
+		let description: String?
+		let address: AddressView.ViewState
+		let currentSupply: BigDecimal?
 
 		init(state: FungibleTokenDetails.State) {
 			self.displayName = state.asset.name
 			self.iconURL = state.asset.iconURL
+			// FIXME: Find better solution
 			@Dependency(\.engineToolkitClient) var engineToolkit
 			let assetIsXRD = engineToolkit.isXRD(component: state.asset.componentAddress)
 			self.placeholderAsset = state.asset.placeholderImage(isXRD: assetIsXRD)
