@@ -56,21 +56,6 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	}
 }
 
-public extension FungibleToken {
-	var isXRD: Bool {
-		NetworkID.allCases.contains(where: isXRD(on:))
-	}
-
-	func isXRD(on networkID: NetworkID) -> Bool {
-		guard let xrdAddress = Network.KnownAddresses.addressMap[networkID]?.xrd,
-		      self.componentAddress.address == xrdAddress.address
-		else {
-			return false
-		}
-		return true
-	}
-}
-
 // MARK: - FungibleTokenContainer
 public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
 	public let owner: AccountAddress
