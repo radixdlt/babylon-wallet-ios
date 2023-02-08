@@ -85,11 +85,10 @@ struct LoginRequest: Sendable, FeatureReducer {
 				await send(.internal(.personasLoaded(personas, authorizedPersona)))
 			}
 		case .createNewPersonaButtonTapped:
-			// TODO: @Nikola - populate with correct values
 			state.createPersonaCoordinator = .init(config: .init(
-				isFirstEntity: true,
+				isFirstEntity: state.personas.isEmpty,
 				canBeDismissed: true,
-				navigationButtonCTA: .goBackToPersonaList
+				navigationButtonCTA: .goBackToChoosePersonas
 			))
 			return .none
 		case let .continueButtonTapped(persona):
