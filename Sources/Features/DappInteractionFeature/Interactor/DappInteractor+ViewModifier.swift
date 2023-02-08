@@ -43,7 +43,7 @@ extension DappInteractor {
 				store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
 				state: /DappInteractor.Destinations.State.dappInteractionCompletion,
 				action: DappInteractor.Destinations.Action.dappInteractionCompletion,
-				content: { Completion.View(store: $0).presentationDetentAutoHeight() }
+				content: { Completion.View(store: $0).presentationDetentIntrinsicHeight() }
 			)
 			.task {
 				await ViewStore(store.stateless).send(.view(.task)).finish()
