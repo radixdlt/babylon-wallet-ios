@@ -70,7 +70,7 @@ struct Completion_Preview: PreviewProvider {
 						reducer: Completion()
 					)
 				)
-				.presentationDetentAutoHeight()
+				.presentationDetentIntrinsicHeight()
 			}
 		}
 	}
