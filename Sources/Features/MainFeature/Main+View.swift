@@ -1,3 +1,4 @@
+import DappInteractionFeature
 import FeaturePrelude
 import HomeFeature
 import SettingsFeature
@@ -35,6 +36,7 @@ public extension Main.View {
 			)
 			.zIndex(1)
 		}
+		.presentsDappInteractions()
 	}
 }
 
