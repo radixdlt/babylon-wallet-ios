@@ -168,6 +168,18 @@ struct DappInteractor: Sendable, FeatureReducer {
 				await send(.internal(.presentQueuedRequestIfNeeded))
 			}
 
+		// NB: handles background tap to dismiss success screen.
+		case .modal(.dismiss):
+			switch state.currentModal {
+			case .none, .dappInteraction:
+				return .none
+			case .dappInteractionCompletion:
+				return .run { send in
+					try await clock.sleep(for: .seconds(0.5))
+					await send(.internal(.presentQueuedRequestIfNeeded))
+				}
+			}
+
 		default:
 			return .none
 		}
