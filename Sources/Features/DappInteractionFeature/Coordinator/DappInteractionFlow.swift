@@ -295,7 +295,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				with: state.responseItems.values.compactMap(/State.AnyInteractionResponseItem.remote)
 			) {
 				return .run { [state] send in
-					// Save persona and ongoing accounts to Profile
+					// Save login date, data fields, and ongoing accounts to Profile
 					if let persona = state.persona {
 						let networkID = await profileClient.getCurrentNetworkID()
 						var connectedDapp = state.connectedDapp ?? .init(

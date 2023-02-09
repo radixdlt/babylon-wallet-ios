@@ -179,7 +179,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	func delayedPresentationEffect(
-		delay: Duration = .seconds(0.5),
+		delay: Duration = .seconds(0.35),
 		for action: Action
 	) -> EffectTask<Action> {
 		.run { send in
