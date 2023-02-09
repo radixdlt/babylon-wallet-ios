@@ -229,7 +229,7 @@ package.addModules([
 			"AppSettings",
 			"EngineToolkitClient",
 			"GatewayAPI",
-			"ProfileClient"
+			"ProfileClient",
 		],
 		tests: .yes()
 	),
@@ -249,7 +249,7 @@ package.addModules([
 			"Cryptography",
 			"EngineToolkit",
 			"Profile",
-			"ProfileClient"
+			"ProfileClient",
 		],
 		tests: .yes()
 	),
