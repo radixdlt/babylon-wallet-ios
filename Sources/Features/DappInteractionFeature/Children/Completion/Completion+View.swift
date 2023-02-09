@@ -53,7 +53,7 @@ extension Completion {
 			.presentationDragIndicator(.visible)
 			.presentationDetentIntrinsicHeight()
 			#if os(iOS)
-				.presentationDetentBlurBackground()
+				.presentationBackground(.blur)
 			#endif
 		}
 	}

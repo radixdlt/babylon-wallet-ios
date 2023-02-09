@@ -3,17 +3,21 @@ import Introspect
 import Prelude
 import SwiftUI
 
+public enum PresentationBackground {
+	case blur(style: UIBlurEffect.Style)
+
+	public static let blur: Self = .blur(style: .systemUltraThinMaterialDark)
+}
+
 public extension View {
-	func presentationDetentBlurBackground(
-		style: UIBlurEffect.Style = .systemUltraThinMaterialDark
-	) -> some View {
-		self.modifier(PresentationDetentBlurBackgroundModifier(style: style))
+	func presentationBackground(_ background: PresentationBackground) -> some View {
+		self.modifier(PresentationBackgroundModifier(background: background))
 	}
 }
 
 // MARK: - PresentationDetentBlurBackgroundModifier
-private struct PresentationDetentBlurBackgroundModifier: ViewModifier {
-	let style: UIBlurEffect.Style
+private struct PresentationBackgroundModifier: ViewModifier {
+	let background: PresentationBackground
 
 	func body(content: Content) -> some View {
 		content
@@ -27,11 +31,16 @@ private struct PresentationDetentBlurBackgroundModifier: ViewModifier {
 
 				sheetPresentationController.largestUndimmedDetentIdentifier = .large
 
-				let blurEffectView = with(UIVisualEffectView(effect: UIBlurEffect(style: style))) {
-					$0.frame = containerView.bounds
-					$0.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-				}
-				containerView.insertSubview(blurEffectView, at: 0)
+				let backgroundView: UIView = {
+					switch background {
+					case let .blur(style):
+						return with(UIVisualEffectView(effect: UIBlurEffect(style: style))) {
+							$0.frame = containerView.bounds
+							$0.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+						}
+					}
+				}()
+				containerView.insertSubview(backgroundView, at: 0)
 
 				// TODO: find a way to make this work
 //				sheetPresentationController.swizzle(
@@ -40,16 +49,16 @@ private struct PresentationDetentBlurBackgroundModifier: ViewModifier {
 //				)
 //				sheetPresentationController.additionalPresentationAnimation = {
 //					viewController.transitionCoordinator?.animate(alongsideTransition: { context in
-//						blurEffectView.alpha = 1
+//						backgroundView.alpha = 1
 //					})
 //				}
 				// Workaround for now
-				blurEffectView.alpha = 0
+				backgroundView.alpha = 0
 				UIView.animate(
 					withDuration: 0.35,
 					delay: 0,
 					options: [.curveEaseInOut],
-					animations: { blurEffectView.alpha = 1 }
+					animations: { backgroundView.alpha = 1 }
 				)
 
 				sheetPresentationController.swizzle(
@@ -58,7 +67,7 @@ private struct PresentationDetentBlurBackgroundModifier: ViewModifier {
 				)
 				sheetPresentationController.additionalDismissalAnimation = {
 					viewController.transitionCoordinator?.animate(alongsideTransition: { _ in
-						blurEffectView.alpha = 0
+						backgroundView.alpha = 0
 					})
 				}
 			}
