@@ -19,6 +19,7 @@ extension FaucetClient: DependencyKey {
 			}
 
 			do {
+				// FIXME: @Nikola fix decoding
 				let epochs = try JSONDecoder().decode(EpochsForAccountAddresses.self, from: encodedEpoch)
 				guard let lastUsedEpoch = epochs.getEpoch(for: accountAddress) else {
 					return true
@@ -80,7 +81,7 @@ extension FaucetClient: DependencyKey {
 
 		return Self(
 			getFreeXRD: getFreeXRD,
-			isAllowedToUseFaucet: isAllowedToUseFaucet,
+			isAllowedToUseFaucet: { _ in true }, // TODO: @Nikola revert back to using isAllowedToUseFaucet after decoding is fixed
 			saveLastUsedEpoch: saveLastUsedEpoch
 		)
 	}()
