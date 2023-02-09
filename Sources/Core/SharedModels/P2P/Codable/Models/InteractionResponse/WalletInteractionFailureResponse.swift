@@ -3,6 +3,12 @@ import Prelude
 // MARK: - P2P.ToDapp.WalletInteractionFailureResponse
 public extension P2P.ToDapp {
 	struct WalletInteractionFailureResponse: Sendable, Hashable, Encodable {
+		private enum CodingKeys: String, CodingKey {
+			case interactionId
+			case errorType = "error"
+			case message
+		}
+
 		/// *MUST* match an ID from an incoming request from Dapp.
 		public let interactionId: P2P.FromDapp.WalletInteraction.ID
 		public let errorType: ErrorType
