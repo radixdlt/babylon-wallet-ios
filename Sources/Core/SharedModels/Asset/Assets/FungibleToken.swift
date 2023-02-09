@@ -68,9 +68,9 @@ public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
 
 	// TODO: replace String type with appropriate numeric type with 0b2^256 / 0d1e18 ~ 1e60 support
 	/// Token amount held in one account, expressed as regular decimal value, for example: 105.78 XRD
-	public let amount: String?
+	public var amount: String?
 	/// Token worth in currently selected currency.
-	public let worth: BigDecimal?
+	public var worth: BigDecimal?
 
 	public init(
 		owner: AccountAddress,
