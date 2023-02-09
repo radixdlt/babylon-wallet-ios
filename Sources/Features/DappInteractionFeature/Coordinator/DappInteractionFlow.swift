@@ -77,6 +77,17 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
+		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
+
+		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
+			struct AccountsPayload: Sendable, Equatable {
+				var requestItem: DappInteractionFlow.State.AnyInteractionItem
+				var accounts: [OnNetwork.Account]
+				var numberOfAccountsRequested: DappInteraction.NumberOfAccounts
+			}
+
+			var accountsPayload: AccountsPayload?
+		}
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -197,8 +208,18 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				)
 			))))
 
-			// TODO: look ahead at ongoing accounts request and fill them out if possible
+			return autofillOngoingResponseItemsIfPossibleEffect(for: &state)
 
+		case let .autofillOngoingResponseItemsIfPossible(payload):
+			if let accountsPayload = payload.accountsPayload {
+				state.responseItems[.local(.permissionRequested(.accounts(accountsPayload.numberOfAccountsRequested)))] = .local(.permissionGranted)
+				setAccountsResponse(
+					to: accountsPayload.requestItem,
+					accountsPayload.accounts,
+					accessKind: .ongoing,
+					into: &state
+				)
+			}
 			return continueEffect(for: &state)
 
 		case let .presentPersonaNotFoundErrorAlert(reason):
@@ -232,9 +253,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			)))))
 			state.responseItems[item] = responseItem
 
-			// TODO: look ahead at ongoing accounts request and fill them out if possible
-
-			return continueEffect(for: &state)
+			return autofillOngoingResponseItemsIfPossibleEffect(for: &state)
 		case
 			let .root(.relay(item, .permission(.delegate(.continueButtonTapped)))),
 			let .path(.element(_, .relay(item, .permission(.delegate(.continueButtonTapped))))):
@@ -263,6 +282,46 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		default:
 			return .none
+		}
+	}
+
+	func autofillOngoingResponseItemsIfPossibleEffect(
+		for state: inout State
+	) -> EffectTask<Action> {
+		.run { [state] send in
+			var payload = InternalAction.AutofillOngoingResponseItemsPayload()
+
+			// TODO: autofill persona data here too
+
+			if
+				let ongoingAccountsRequestItem = { () -> P2P.FromDapp.WalletInteraction.OngoingAccountsRequestItem? in
+					switch state.remoteInteraction.items {
+					case let .request(.authorized(items)):
+						return items.ongoingAccounts
+					default:
+						return nil
+					}
+				}(),
+				let sharedAccounts = state.authorizedPersona?.sharedAccounts
+			{
+				if ongoingAccountsRequestItem.numberOfAccounts == sharedAccounts.request {
+					let allAccounts = try await profileClient.getAccounts()
+					if
+						let selectedAccounts = try? sharedAccounts.accountsReferencedByAddress.compactMap({ sharedAccount in
+							allAccounts.first(by: try .init(address: sharedAccount.address))
+						}),
+						selectedAccounts.count == sharedAccounts.accountsReferencedByAddress.count
+					{
+						payload.accountsPayload = .init(
+							requestItem: .remote(.ongoingAccounts(ongoingAccountsRequestItem)),
+							accounts: selectedAccounts,
+							numberOfAccountsRequested: sharedAccounts.request
+						)
+					}
+				}
+			}
+
+			await send(.internal(.autofillOngoingResponseItemsIfPossible(payload)))
 		}
 	}
 
