@@ -36,10 +36,10 @@ public extension Main.View {
 			)
 			.zIndex(1)
 		}
-		.presentsDappInteractions(onDismiss: {
+		.presentsDappInteractions(onDismiss: { [store = store.stateless] in
 			// FIXME: ideally profileClient.getAccounts() would return a stream that'd allow all relevant screens to update independently.
 			// Until then, manual reloading is necessary when we come back from interaction flow (in case we created accounts).
-			ViewStore(store.stateless).send(.child(.home(.view(.didAppear))))
+			ViewStore(store).send(.child(.home(.view(.didAppear))))
 		})
 	}
 }
