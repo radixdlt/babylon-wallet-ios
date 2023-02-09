@@ -1,6 +1,7 @@
 import AccountListFeature
 import AssetsViewFeature
 import AssetTransferFeature
+import EngineToolkitClient
 import FeaturePrelude
 import FungibleTokenListFeature
 
@@ -18,6 +19,7 @@ public extension AccountDetails {
 			self.account = account.account
 
 			let fungibleTokenCategories = account.portfolio.fungibleTokenContainers.elements.sortedIntoCategories()
+			@Dependency(\.engineToolkitClient) var engineToolkit: EngineToolkitClient
 
 			assets = .init(
 				fungibleTokenList: .init(

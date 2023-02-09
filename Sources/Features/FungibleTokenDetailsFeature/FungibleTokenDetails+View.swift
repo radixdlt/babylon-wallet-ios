@@ -1,4 +1,3 @@
-import EngineToolkitClient
 import FeaturePrelude
 
 // MARK: - FungibleTokenDetails.View
@@ -103,10 +102,7 @@ extension FungibleTokenDetails.View {
 		init(state: FungibleTokenDetails.State) {
 			self.displayName = state.asset.name
 			self.iconURL = state.asset.iconURL
-			// FIXME: Find better solution
-			@Dependency(\.engineToolkitClient) var engineToolkit
-			let assetIsXRD = engineToolkit.isXRD(component: state.asset.componentAddress)
-			self.placeholderAsset = state.asset.placeholderImage(isXRD: assetIsXRD)
+			self.placeholderAsset = .placeholderImage(isXRD: state.asset.isXRD)
 			self.amount = state.amount
 			self.symbol = state.asset.symbol
 			self.description = state.asset.tokenDescription

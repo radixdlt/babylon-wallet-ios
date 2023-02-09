@@ -1,8 +1,11 @@
 import ClientPrelude
+import EngineToolkitClient
 import struct Profile.AccountAddress // FIXME: should probably be in ProfileModels so we can remove this import altogether
 
 // MARK: - AccountPortfolioFetcher
 public struct AccountPortfolioFetcher: Sendable {
+	@Dependency(\.engineToolkitClient) var engineToolkit: EngineToolkitClient
+
 	public var fetchPortfolio: FetchPortfolio
 
 	public init(

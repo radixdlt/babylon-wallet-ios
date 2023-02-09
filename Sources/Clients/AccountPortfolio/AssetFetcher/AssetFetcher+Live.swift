@@ -69,7 +69,8 @@ extension AccountPortfolio {
 					totalBurnt: nil,
 					tokenDescription: nil,
 					name: nil,
-					symbol: nil
+					symbol: nil,
+					isXRD: false // Can these be XRD?
 				),
 				amount: $0.amount.value,
 				worth: nil
@@ -168,6 +169,7 @@ extension FungibleToken {
 			tokenDescription: dict[.description],
 			name: dict[.name],
 			symbol: dict[.symbol],
+			isXRD: isXRD,
 			tokenInfoURL: dict[.url]
 		)
 	}

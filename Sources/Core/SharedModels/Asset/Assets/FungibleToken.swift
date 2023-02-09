@@ -19,6 +19,9 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	/// Symbol of token, e.g. `"XRD"`.
 	public let symbol: String?
 
+	/// True if the token represents XRD.
+	public let isXRD: Bool
+
 	/// Token icon URL.
 	public let iconURL: URL?
 
@@ -40,6 +43,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 		tokenDescription: String?,
 		name: String?,
 		symbol: String?,
+		isXRD: Bool,
 		tokenInfoURL: String? = nil,
 		iconURL: URL? = nil
 	) {
@@ -51,6 +55,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 		self.tokenDescription = tokenDescription
 		self.name = name
 		self.symbol = symbol
+		self.isXRD = isXRD
 		self.tokenInfoURL = tokenInfoURL
 		self.iconURL = iconURL
 	}
@@ -104,6 +109,7 @@ public extension FungibleToken {
 		tokenDescription: "The native token of the Radix Ledger",
 		name: "Radix",
 		symbol: "XRD",
+		isXRD: true,
 		tokenInfoURL: "https://tokens.radixdlt.com"
 	)
 }
@@ -118,7 +124,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Bitcoin",
-		symbol: "BTC"
+		symbol: "BTC",
+		isXRD: false
 	)
 
 	static let dot = Self(
@@ -129,7 +136,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Polkadot",
-		symbol: "DOT"
+		symbol: "DOT",
+		isXRD: false
 	)
 
 	static let eth = Self(
@@ -140,7 +148,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Ethereum",
-		symbol: "ETH"
+		symbol: "ETH",
+		isXRD: false
 	)
 
 	static let ltc = Self(
@@ -151,7 +160,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Litecoin",
-		symbol: "LTC"
+		symbol: "LTC",
+		isXRD: false
 	)
 
 	static let sol = Self(
@@ -162,7 +172,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Solana",
-		symbol: "SOL"
+		symbol: "SOL",
+		isXRD: false
 	)
 
 	static let usdt = Self(
@@ -173,7 +184,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Tether",
-		symbol: "USDT"
+		symbol: "USDT",
+		isXRD: false
 	)
 
 	static let xrp = Self(
@@ -184,7 +196,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "XRP token",
-		symbol: "XRP"
+		symbol: "XRP",
+		isXRD: false
 	)
 }
 #endif

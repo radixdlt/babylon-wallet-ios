@@ -1,6 +1,5 @@
 import AppSettings
 import ClientPrelude
-import EngineToolkitClient
 import GatewayAPI
 
 // MARK: - AccountPortfolioFetcher + DependencyKey
@@ -38,9 +37,8 @@ extension AccountPortfolioFetcher: DependencyKey {
 public extension AccountPortfolioFetcher {
 	func fetchXRDBalance(of accountAddress: AccountAddress, on networkID: NetworkID) async throws -> FungibleTokenContainer {
 		let accountPortfolioDictionary = try await fetchPortfolio([accountAddress])
-		@Dependency(\.engineToolkitClient) var engineToolkit
 		let xrdContainer = accountPortfolioDictionary.first?.value.fungibleTokenContainers
-			.first { engineToolkit.isXRD(component: $0.asset.componentAddress, on: networkID) }
+			.first(where: \.asset.isXRD)
 
 		if let xrdContainer = xrdContainer {
 			return xrdContainer

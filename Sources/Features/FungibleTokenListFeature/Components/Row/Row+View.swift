@@ -1,4 +1,3 @@
-import EngineToolkitClient
 import FeaturePrelude
 
 // MARK: - FungibleTokenList.Row.View
@@ -43,7 +42,7 @@ private extension FungibleTokenList.Row.View {
 			HStack(alignment: .center) {
 				HStack(spacing: .small1) {
 					LazyImage(url: container.asset.iconURL) { _ in
-						Image(asset: container.asset.placeholderImage(isXRD: viewStore.isXRD))
+						Image(asset: .placeholderImage(isXRD: viewStore.container.asset.isXRD))
 							.resizable()
 							.frame(.small)
 					}
@@ -119,15 +118,11 @@ extension FungibleTokenList.Row.View {
 		let container: FungibleTokenContainer
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
-		let isXRD: Bool
 
 		init(state: FungibleTokenList.Row.State) {
 			self.container = state.container
 			self.currency = state.currency
 			self.isCurrencyAmountVisible = state.isCurrencyAmountVisible
-			// FIXME: Find better solution
-			@Dependency(\.engineToolkitClient) var engineToolkit
-			self.isXRD = engineToolkit.isXRD(component: container.asset.componentAddress)
 		}
 	}
 }
