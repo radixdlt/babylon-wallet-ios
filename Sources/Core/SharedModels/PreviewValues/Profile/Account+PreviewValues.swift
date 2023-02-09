@@ -6,7 +6,7 @@ public extension OnNetwork.Account {
 	static let previewValue0 = try! Self(
 		networkID: .hammunet,
 		address: .init(
-			address: "identity_tdx_22_1pd803nvt5fqp89wg7lrayga3r727s5fsgxcdanrqmjvsncmmjg"
+			address: "account_tdx_22_1pzyhfyz7rk6mhmrk4ssp55xt48pejcwravhyxuzdjh2qqq9tsj"
 		),
 		securityState: .unsecured(.init(
 			genesisFactorInstance: .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(.init(
