@@ -48,9 +48,9 @@ public extension Network.KnownAddresses {
 	)
 
 	static let hammunet = Self(
-		faucet: "component_tdx_22_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7ql6v973",
-		createAccountComponent: "package_tdx_22_1qy4hrp8a9apxldp5cazvxgwdj80cxad4u8cpkaqqnhlsk0emdf",
-		xrd: "resource_tdx_22_1qzxcrac59cy2v9lpcpmf82qel3cjj25v3k5m09rxurgqfpm3gw"
+		faucet: "component_tdx_22_1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3s7s5gc3",
+		createAccountComponent: "package_tdx_22_1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqscu4yjr",
+		xrd: "resource_tdx_22_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqj3nwpk"
 	)
 	static let mardunet = Self(
 		faucet: "component_tdx_24_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7qlp5g7p",
