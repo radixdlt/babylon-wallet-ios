@@ -30,6 +30,7 @@ extension DappInteractionCoordinator {
 				action: { $0 }
 			)
 			.showDeveloperDisclaimerBanner()
+			.presentsLoadingViewOverlay()
 		}
 	}
 }
