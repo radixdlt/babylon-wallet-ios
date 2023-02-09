@@ -220,7 +220,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			state.authorizedPersona = authorizedPersona
 
 			let responseItem: State.AnyInteractionResponseItem = .remote(.auth(.login(.withoutChallenge(.init(
-				identityAddress: persona.address.address
+				persona: .init(
+					identityAddress: persona.address.address,
+					label: persona.displayName.rawValue
+				)
 			)))))
 			state.responseItems[item] = responseItem
 
