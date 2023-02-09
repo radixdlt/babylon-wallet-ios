@@ -25,9 +25,7 @@ extension DappInteractionCoordinator {
 				store: store.scope(
 					state: \.$errorAlert,
 					action: { .view(.malformedInteractionErrorAlert($0)) }
-				),
-				state: { $0 },
-				action: { $0 }
+				)
 			)
 			.showDeveloperDisclaimerBanner()
 			.presentsLoadingViewOverlay()

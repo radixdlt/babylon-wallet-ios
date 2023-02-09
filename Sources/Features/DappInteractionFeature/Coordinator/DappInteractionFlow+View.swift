@@ -49,9 +49,7 @@ extension DappInteractionFlow {
 				store: store.scope(
 					state: \.$personaNotFoundErrorAlert,
 					action: { .view(.personaNotFoundErrorAlert($0)) }
-				),
-				state: { $0 },
-				action: { $0 }
+				)
 			)
 		}
 

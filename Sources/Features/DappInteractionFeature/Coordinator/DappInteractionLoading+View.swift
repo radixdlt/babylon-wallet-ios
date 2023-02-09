@@ -30,9 +30,7 @@ extension DappInteractionLoading {
 							store: store.scope(
 								state: \.$errorAlert,
 								action: { .view(.errorAlert($0)) }
-							),
-							state: { $0 },
-							action: { $0 }
+							)
 						)
 					#if os(iOS)
 						.toolbar {
