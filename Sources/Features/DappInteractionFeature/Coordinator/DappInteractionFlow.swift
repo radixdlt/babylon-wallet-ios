@@ -190,7 +190,12 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			state.connectedDapp = connectedDapp
 			state.authorizedPersona = authorizedPersona
 
-			state.responseItems[.remote(.auth(.usePersona(item)))] = .remote(.auth(.usePersona(.init(identityAddress: persona.address.address))))
+			state.responseItems[.remote(.auth(.usePersona(item)))] = .remote(.auth(.usePersona(.init(
+				persona: .init(
+					identityAddress: persona.address.address,
+					label: persona.displayName.rawValue
+				)
+			))))
 
 			// TODO: look ahead at ongoing accounts request and fill them out if possible
 
