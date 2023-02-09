@@ -45,6 +45,12 @@ extension DappInteractor {
 				action: DappInteractor.Destinations.Action.dappInteractionCompletion,
 				content: { Completion.View(store: $0) }
 			)
+			.alert(
+				store: store.scope(
+					state: \.$responseFailureAlert,
+					action: { .view(.responseFailureAlert($0)) }
+				)
+			)
 			.task {
 				await ViewStore(store.stateless).send(.view(.task)).finish()
 			}

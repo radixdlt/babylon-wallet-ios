@@ -303,6 +303,20 @@ public enum L10n {
         }
       }
     }
+    public enum Response {
+      public enum FailureAlert {
+        /// Cancel
+        public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.response.failureAlert.cancelButtonTitle", fallback: "Cancel")
+        /// Failed to send response payload back to dApp.
+        /// 
+        /// %@
+        public static func message(_ p1: Any) -> String {
+          return L10n.tr("Localizable", "dApp.response.failureAlert.message", String(describing: p1), fallback: "Failed to send response payload back to dApp.\n\n%@")
+        }
+        /// Retry
+        public static let retryButtonTitle = L10n.tr("Localizable", "dApp.response.failureAlert.retryButtonTitle", fallback: "Retry")
+      }
+    }
   }
   public enum FungibleTokenList {
     public enum Detail {

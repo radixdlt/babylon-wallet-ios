@@ -9,17 +9,26 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		@PresentationState
 		var currentModal: Destinations.State?
+		@PresentationState
+		var responseFailureAlert: AlertState<ViewAction.ResponseFailureAlertAction>?
 	}
 
 	enum ViewAction: Sendable, Equatable {
 		case task
+		case responseFailureAlert(PresentationAction<AlertState<ViewAction.ResponseFailureAlertAction>, ViewAction.ResponseFailureAlertAction>)
+
+		enum ResponseFailureAlertAction: Sendable, Hashable {
+			case cancelButtonTapped(P2P.RequestFromClient)
+			case retryButtonTapped(P2P.ResponseToClientByID, for: P2P.RequestFromClient, DappMetadata?)
+		}
 	}
 
 	enum InternalAction: Sendable, Equatable {
 		case receivedRequestFromDapp(P2P.RequestFromClient)
 		case presentQueuedRequestIfNeeded
 		case sentResponseToDapp(P2P.ToDapp.WalletInteractionResponse, for: P2P.RequestFromClient, DappMetadata?)
-		case presentInteractionSuccessView(DappMetadata)
+		case presentResponseFailureAlert(P2P.ResponseToClientByID, for: P2P.RequestFromClient, DappMetadata?, reason: String)
+		case presentResponseSuccessView(DappMetadata)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -100,6 +109,18 @@ struct DappInteractor: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+
+		case let .responseFailureAlert(action):
+			state.responseFailureAlert = nil
+			switch action {
+			case .dismiss, .present:
+				return .none
+			case let .presented(.cancelButtonTapped(request)):
+				dismissCurrentModalAndRequest(request, for: &state)
+				return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
+			case let .presented(.retryButtonTapped(response, request, dappMetadata)):
+				return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
+			}
 		}
 	}
 
@@ -113,19 +134,32 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
 		case let .sentResponseToDapp(response, for: request, dappMetadata):
-			state.requestQueue.remove(request)
-			state.currentModal = nil
-			onDismiss?()
+			dismissCurrentModalAndRequest(request, for: &state)
 			switch response {
 			case .success:
 				return delayedPresentationEffect(
-					for: .internal(.presentInteractionSuccessView(dappMetadata ?? DappMetadata(name: nil)))
+					for: .internal(.presentResponseSuccessView(dappMetadata ?? DappMetadata(name: nil)))
 				)
 			case .failure:
 				return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
 
-		case let .presentInteractionSuccessView(dappMetadata):
+		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
+			state.responseFailureAlert = .init(
+				title: { TextState(L10n.App.errorOccurredTitle) },
+				actions: {
+					ButtonState(role: .cancel, action: .cancelButtonTapped(request)) {
+						TextState(L10n.DApp.Response.FailureAlert.cancelButtonTitle)
+					}
+					ButtonState(action: .retryButtonTapped(response, for: request, dappMetadata)) {
+						TextState(L10n.DApp.Response.FailureAlert.retryButtonTitle)
+					}
+				},
+				message: { TextState(L10n.DApp.Response.FailureAlert.message(reason)) }
+			)
+			return .none
+
+		case let .presentResponseSuccessView(dappMetadata):
 			state.currentModal = .dappInteractionCompletion(.init(dappMetadata: dappMetadata))
 			return .none
 		}
@@ -150,15 +184,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				connectionID: request.client.id,
 				responseToDapp: responseToDapp
 			)
-
-			return .run { send in
-				do {
-					_ = try await p2pConnectivityClient.sendMessage(response) // TODO: retry mechanism? :shrug:
-				} catch {
-					errorQueue.schedule(error)
-				}
-				await send(.internal(.sentResponseToDapp(responseToDapp, for: request, dappMetadata)))
-			}
+			return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
 
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
@@ -176,6 +202,25 @@ struct DappInteractor: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+
+	func sendResponseToDappEffect(
+		_ response: P2P.ResponseToClientByID,
+		for request: P2P.RequestFromClient,
+		dappMetadata: DappMetadata?
+	) -> EffectTask<Action> {
+		.run { send in
+			_ = try await p2pConnectivityClient.sendMessage(response)
+			await send(.internal(.sentResponseToDapp(response.responseToDapp, for: request, dappMetadata)))
+		} catch: { error, send in
+			await send(.internal(.presentResponseFailureAlert(response, for: request, dappMetadata, reason: error.legibleLocalizedDescription)))
+		}
+	}
+
+	func dismissCurrentModalAndRequest(_ request: P2P.RequestFromClient, for state: inout State) {
+		state.requestQueue.remove(request)
+		state.currentModal = nil
+		onDismiss?()
 	}
 
 	func delayedPresentationEffect(

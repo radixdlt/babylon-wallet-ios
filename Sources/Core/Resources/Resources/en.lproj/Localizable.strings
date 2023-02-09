@@ -87,6 +87,9 @@
 "dApp.request.specifiedPersonaNotFoundError.message" = "Persona specified by dApp does not exist.\n\n%@";
 "dApp.request.specifiedPersonaNotFoundError.cancelButtonTitle" = "Cancel";
 "dApp.metadata.unknownName" = "Unknown dApp";
+"dApp.response.failureAlert.cancelButtonTitle" = "Cancel";
+"dApp.response.failureAlert.retryButtonTitle" = "Retry";
+"dApp.response.failureAlert.message" = "Failed to send response payload back to dApp.\n\n%@";
 
 "fungibleTokenList.detail.currentSupply" = "Current Supply";
 "fungibleTokenList.detail.resourceAddress" = "Resource Address";
