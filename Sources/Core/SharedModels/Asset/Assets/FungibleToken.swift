@@ -98,6 +98,7 @@ public extension FungibleTokenContainer {
 	}
 }
 
+#if DEBUG
 public extension FungibleToken {
 	/// The native token of the Radix Ledger
 	static let xrd = Self(
@@ -112,10 +113,7 @@ public extension FungibleToken {
 		isXRD: true,
 		tokenInfoURL: "https://tokens.radixdlt.com"
 	)
-}
 
-#if DEBUG
-public extension FungibleToken {
 	static let btc = Self(
 		componentAddress: "btc-deadbeef",
 		divisibility: 18,

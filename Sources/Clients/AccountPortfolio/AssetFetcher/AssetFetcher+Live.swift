@@ -1,4 +1,5 @@
 import ClientPrelude
+import EngineToolkitClient
 import GatewayAPI
 
 // MARK: - AssetFetcher + DependencyKey
@@ -8,7 +9,7 @@ extension AssetFetcher: DependencyKey {
 			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 			let resourcesResponse = try await gatewayAPIClient.accountResourcesByAddress(accountAddress)
-			var accountPortfolio = try AccountPortfolio(response: resourcesResponse)
+			var accountPortfolio = try await AccountPortfolio(response: resourcesResponse)
 
 			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.componentAddress)
 			let nonFungibleTokenAddresses = accountPortfolio.nonFungibleTokenContainers.map(\.resourceAddress)
@@ -57,12 +58,17 @@ extension AssetFetcher: DependencyKey {
 
 // MARK: - Helpers - Resources response
 extension AccountPortfolio {
-	init(response: GatewayAPI.EntityResourcesResponse) throws {
+	init(response: GatewayAPI.EntityResourcesResponse) async throws {
+		@Dependency(\.engineToolkitClient) var engineToolkitClient
+		@Dependency(\.profileClient.getCurrentNetworkID) var getCurrentNetworkID
+		let networkID = await getCurrentNetworkID()
 		let fungibleContainers = try response.fungibleResources.items.map {
-			FungibleTokenContainer(
+			let componentAddress = ComponentAddress(address: $0.address)
+			let isXRD = try engineToolkitClient.isXRD(component: componentAddress, on: networkID)
+			return FungibleTokenContainer(
 				owner: try .init(address: response.address),
 				asset: .init(
-					componentAddress: .init(address: $0.address),
+					componentAddress: componentAddress,
 					divisibility: nil,
 					totalSupply: nil,
 					totalMinted: nil,
@@ -70,7 +76,7 @@ extension AccountPortfolio {
 					tokenDescription: nil,
 					name: nil,
 					symbol: nil,
-					isXRD: false // Can these be XRD?
+					isXRD: isXRD
 				),
 				amount: $0.amount.value,
 				worth: nil
