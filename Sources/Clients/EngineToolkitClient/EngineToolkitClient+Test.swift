@@ -17,7 +17,7 @@ extension EngineToolkitClient: TestDependencyKey {
 		compileNotarizedTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
 		generateTXID: { _ in "deadbeef" },
 		accountAddressesNeedingToSignTransaction: { _ in [] },
-		knownEntityAddresses: { _ in fatalError() }
+		knownEntityAddresses: { _ in throw NoopError() }
 	)
 
 	public static let testValue = Self(
