@@ -21,7 +21,11 @@ private struct PresentationBackgroundModifier: ViewModifier {
 
 	func body(content: Content) -> some View {
 		content
+			// hands us the view controller corresponding to the SwiftUI view this modifier is attached
+			// to as soon as it's added to its parent view/window
 			.introspectViewController { viewController in
+				// attempt to get the controller in which this sheet is being presented
+				// and grab its container view
 				guard
 					let sheetPresentationController = viewController.sheetPresentationController,
 					let containerView = sheetPresentationController.containerView
@@ -29,8 +33,10 @@ private struct PresentationBackgroundModifier: ViewModifier {
 					return
 				}
 
+				// disable standard background dimming altogether, as we're going to use our own
 				sheetPresentationController.largestUndimmedDetentIdentifier = .large
 
+				// initialize background view and apply the chosen visual effects to it
 				let backgroundView: UIView = {
 					switch background {
 					case let .blur(style):
@@ -40,9 +46,11 @@ private struct PresentationBackgroundModifier: ViewModifier {
 						}
 					}
 				}()
+				// add the background view at the very back of the container hierarchy
 				containerView.insertSubview(backgroundView, at: 0)
 
-				// TODO: find a way to make this work
+				// TODO: @davdroman find a way to make this work post betanet v2, otherwise
+				// settle for current workaround which is near perfect anyway.
 //				sheetPresentationController.swizzle(
 //					original: #selector(UIPresentationController.presentationTransitionWillBegin),
 //					swizzled: #selector(UIPresentationController.swizzled_presentationTransitionWillBegin)
@@ -53,6 +61,7 @@ private struct PresentationBackgroundModifier: ViewModifier {
 //					})
 //				}
 				// Workaround for now
+				// rudimentarily dims in background view
 				backgroundView.alpha = 0
 				UIView.animate(
 					withDuration: 0.35,
@@ -61,11 +70,17 @@ private struct PresentationBackgroundModifier: ViewModifier {
 					animations: { backgroundView.alpha = 1 }
 				)
 
+				// hook into dismissalTransitionWillBegin via swizzling in order to layer in additional
+				// dismissal animation behavior
+				// ref: https://developer.apple.com/documentation/uikit/uipresentationcontroller/1618342-dismissaltransitionwillbegin
 				sheetPresentationController.swizzle(
 					original: #selector(UIPresentationController.dismissalTransitionWillBegin),
 					swizzled: #selector(UIPresentationController.swizzled_dismissalTransitionWillBegin)
 				)
+				// define said additional dismissal animation behavior
 				sheetPresentationController.additionalDismissalAnimation = {
+					// in this case, it fades out the background view as the user drags down
+					// to dismiss or the user is dismissed via a button, etc
 					viewController.transitionCoordinator?.animate(alongsideTransition: { _ in
 						backgroundView.alpha = 0
 					})
@@ -87,6 +102,8 @@ private extension UIPresentationController {
 }
 
 private extension UIPresentationController {
+	// runtime properties enabled by the obj-c runtime
+	// ref: https://nshipster.com/associated-objects
 	var additionalPresentationAnimation: (() -> Void)? {
 		get {
 			let key = unsafeBitCast(Selector(#function), to: UnsafeRawPointer.self)
@@ -98,6 +115,8 @@ private extension UIPresentationController {
 		}
 	}
 
+	// runtime properties enabled by the obj-c runtime
+	// ref: https://nshipster.com/associated-objects
 	var additionalDismissalAnimation: (() -> Void)? {
 		get {
 			let key = unsafeBitCast(Selector(#function), to: UnsafeRawPointer.self)
@@ -110,6 +129,7 @@ private extension UIPresentationController {
 	}
 }
 
+// basic swizzling logic. could probably be generalised to be used anywhere else where needed.
 private extension UIPresentationController {
 	static var swizzledSelectors: [Selector: Void] = [:]
 
@@ -117,6 +137,7 @@ private extension UIPresentationController {
 		original originalSelector: Selector,
 		swizzled swizzledSelector: Selector
 	) {
+		// ensures selector being swizzled hasn't been previously swizzled
 		guard Self.swizzledSelectors[originalSelector] == nil else {
 			return
 		}
