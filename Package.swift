@@ -229,7 +229,7 @@ package.addModules([
 			"AppSettings",
 			"EngineToolkitClient",
 			"GatewayAPI",
-			"ProfileClient",
+			"ProfileClient"
 		],
 		tests: .yes()
 	),
