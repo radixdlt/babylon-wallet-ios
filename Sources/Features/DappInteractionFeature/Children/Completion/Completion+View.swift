@@ -52,7 +52,9 @@ extension Completion {
 			}
 			.presentationDragIndicator(.visible)
 			.presentationDetentIntrinsicHeight()
-			.presentationDetentBlurBackground()
+			#if os(iOS)
+				.presentationDetentBlurBackground()
+			#endif
 		}
 	}
 }

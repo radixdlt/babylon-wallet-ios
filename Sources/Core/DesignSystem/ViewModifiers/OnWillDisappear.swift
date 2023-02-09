@@ -1,3 +1,4 @@
+#if os(iOS)
 import SwiftUI
 
 public extension View {
@@ -36,3 +37,4 @@ private struct Snitch: UIViewControllerRepresentable {
 
 	func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {}
 }
+#endif

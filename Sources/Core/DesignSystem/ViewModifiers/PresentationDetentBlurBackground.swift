@@ -1,3 +1,4 @@
+#if os(iOS)
 import Introspect
 import Prelude
 import SwiftUI
@@ -70,3 +71,4 @@ private final class Weak<T: AnyObject> {
 		self.weakValue = wrappedValue
 	}
 }
+#endif
