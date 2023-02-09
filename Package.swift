@@ -220,6 +220,7 @@ package.addModules([
 		name: "AccountPortfolio",
 		dependencies: [
 			"AppSettings",
+			"EngineToolkitClient",
 			"GatewayAPI",
 			"ProfileClient",
 		],
@@ -241,6 +242,7 @@ package.addModules([
 			"Cryptography",
 			"EngineToolkit",
 			"Profile",
+			"ProfileClient",
 		],
 		tests: .yes()
 	),

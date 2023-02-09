@@ -7,7 +7,7 @@ public extension FungibleTokenList.Row {
 		public var container: FungibleTokenContainer
 
 		// MARK: - AppSettings properties
-		public var currency: FiatCurrency
+		public let currency: FiatCurrency
 		public var isCurrencyAmountVisible: Bool
 
 		public init(
