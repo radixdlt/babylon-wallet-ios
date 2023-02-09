@@ -129,7 +129,7 @@ public extension App {
 		}
 
 		public var errorDescription: String? {
-			underlyingError.localizedDescription
+			underlyingError.legibleLocalizedDescription
 		}
 
 		public static func == (lhs: Self, rhs: Self) -> Bool {
