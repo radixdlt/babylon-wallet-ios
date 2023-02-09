@@ -9,9 +9,9 @@ extension Date: @unchecked Sendable {}
 struct ExpectedHTTPURLResponse: Swift.Error {}
 
 // MARK: - BadHTTPResponseCode
-struct BadHTTPResponseCode: Swift.Error {
-	let got: Int
-	let butExpected = Self.expected
+public struct BadHTTPResponseCode: Swift.Error {
+	public let got: Int
+	public let butExpected = Self.expected
 	static let expected = 200
 }
 
@@ -157,6 +157,11 @@ public extension GatewayAPIClient {
 				try await post(
 					request: GatewayAPI.EntityResourcesRequest(address: accountAddress.address)
 				) { @Sendable base in base.appendingPathComponent("entity/resources") }
+			},
+			accountMetadataByAddress: { @Sendable accountAddress in
+				try await post(
+					request: GatewayAPI.EntityMetadataRequest(address: accountAddress.address)
+				) { @Sendable base in base.appendingPathComponent("entity/metadata") }
 			},
 			resourcesOverview: { resourcesOverviewRequest in
 				try await post(

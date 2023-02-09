@@ -57,7 +57,7 @@ public extension AssetTransfer.View {
 				#if os(iOS)
 					.navigationBarTitleDisplayMode(.large)
 				#endif
-					.safeAreaInset(edge: .bottom) {
+					.safeAreaInset(edge: .bottom, spacing: .zero) {
 						WithControlRequirements(
 							viewStore.output,
 							forAction: {

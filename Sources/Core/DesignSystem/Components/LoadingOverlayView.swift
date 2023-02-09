@@ -1,7 +1,7 @@
 import SwiftUI
 
 public extension View {
-	func overlayLoadingView() -> some View {
+	func presentsLoadingViewOverlay() -> some View {
 		overlayPreferenceValue(LoadingContextKey.self, alignment: .center) { context in
 			if case let .global(text) = context {
 				LoadingOverlayView(text)
@@ -19,21 +19,21 @@ private struct LoadingOverlayView: View {
 
 	public var body: some View {
 		ZStack {
-			Color.app.gray2
-				.cornerRadius(.small1)
-
-			VStack {
-				LoadingView()
+			VStack(spacing: .medium2) {
+				LoadingView().frame(width: 100, height: 100)
 				if let text {
 					Text(text)
-						.lineLimit(2)
+						.lineLimit(nil)
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.white)
+						.multilineTextAlignment(.center)
 				}
 			}
-			.padding()
+			.padding(.medium2)
 		}
-		.frame(width: 180, height: 180)
+		.frame(minWidth: 180)
+		.background(Color.app.gray2.cornerRadius(.small1))
+		.frame(maxWidth: 240)
 	}
 }
 
@@ -42,7 +42,11 @@ private struct LoadingOverlayView: View {
 // MARK: - ConnectUsingPassword_Preview
 struct LoadingOverlayView_Preview: PreviewProvider {
 	static var previews: some View {
-		LoadingOverlayView("Connecting")
+		VStack {
+			LoadingOverlayView("Loading...")
+			LoadingOverlayView("Preparing transaction...")
+			LoadingOverlayView("Doing something very long to describe...")
+		}
 	}
 }
 #endif

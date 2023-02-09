@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - NonFungibleTokenList.Row.State
 public extension NonFungibleTokenList.Row {
 	// MARK: State
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		public var container: NonFungibleTokenContainer
 		public var isExpanded = false
 

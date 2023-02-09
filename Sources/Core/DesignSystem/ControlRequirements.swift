@@ -86,7 +86,7 @@ struct WithControlRequirements_Previews: PreviewProvider {
 			Form {
 				TextField("Name", text: $name, prompt: Text("Name"))
 			}
-			.safeAreaInset(edge: .bottom) {
+			.safeAreaInset(edge: .bottom, spacing: .zero) {
 				WithControlRequirements(
 					name.nilIfBlank,
 					forAction: { name in print("Hello \(name)!") }

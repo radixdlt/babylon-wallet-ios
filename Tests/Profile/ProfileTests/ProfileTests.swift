@@ -194,6 +194,7 @@ final class ProfileTests: TestCase {
 					.init(
 						identityAddress: persona0.address,
 						fieldIDs: .init(persona0.fields.map(\.id)),
+						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
 						sharedAccounts: try .init(
 							accountsReferencedByAddress: [
 								secondAccount.address,
@@ -205,6 +206,7 @@ final class ProfileTests: TestCase {
 					.init(
 						identityAddress: persona1.address,
 						fieldIDs: .init(persona1.fields.map(\.id)),
+						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
 						sharedAccounts: try .init(
 							accountsReferencedByAddress: [
 								secondAccount.address,
@@ -216,14 +218,16 @@ final class ProfileTests: TestCase {
 		)
 
 		var authorizedPersona0 = connectedDapp.referencesToAuthorizedPersonas[0]
+		var authorizedPersona0SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
 		XCTAssertThrowsError(
-			try authorizedPersona0.sharedAccounts.updateAccounts([secondAccount.address]),
+			try authorizedPersona0SharedAccounts.updateAccounts([secondAccount.address]),
 			"Should not be able to specify another number of accounts if `exactly` was specified."
 		)
 
 		var authorizedPersona1 = connectedDapp.referencesToAuthorizedPersonas[1]
+		var authorizedPersona1SharedAccounts = try XCTUnwrap(authorizedPersona1.sharedAccounts)
 		XCTAssertNoThrow(
-			try authorizedPersona1.sharedAccounts.updateAccounts([
+			try authorizedPersona1SharedAccounts.updateAccounts([
 				secondAccount.address,
 				thirdAccount.address,
 			]), "Should be able to specify more accounts if `atLeast` was specified."
@@ -363,9 +367,9 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(onNetwork.connectedDapps.count, 1)
 		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas.count, 2)
 		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
-		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts.request.quantifier, .exactly)
-		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts.request.quantity, 2)
-		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu", "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"])
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu", "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"])
 	}
 
 	func test_version_compatability_check_too_low() throws {

@@ -35,10 +35,10 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 
 	struct AuthLoginWithoutChallengeRequestResponseItem: Sendable, Hashable, Encodable {
 		public let discriminator = "loginWithoutChallenge"
-		public let identityAddress: String
+		public let persona: P2P.ToDapp.Persona
 
-		public init(identityAddress: String) {
-			self.identityAddress = identityAddress
+		public init(persona: P2P.ToDapp.Persona) {
+			self.persona = persona
 		}
 	}
 
@@ -67,10 +67,10 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 	struct AuthUsePersonaRequestResponseItem: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.FromDapp.WalletInteraction.AuthRequestItem.Discriminator.usePersona.rawValue
-		public let identityAddress: String
+		public let persona: P2P.ToDapp.Persona
 
-		public init(identityAddress: String) {
-			self.identityAddress = identityAddress
+		public init(persona: P2P.ToDapp.Persona) {
+			self.persona = persona
 		}
 	}
 }

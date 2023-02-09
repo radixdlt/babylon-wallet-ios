@@ -147,10 +147,10 @@
     {
       "identity" : "swift-composable-architecture",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/pointfreeco/swift-composable-architecture",
+      "location" : "https://github.com/davdroman/swift-composable-architecture",
       "state" : {
-        "branch" : "navigation",
-        "revision" : "c748b809107d83593d0fdd7d17aa7a47cab7d4a0"
+        "branch" : "scope-local-state-action",
+        "revision" : "ddbc1ae67a13c629fcf23ce605096e3cfcdb918c"
       }
     },
     {
@@ -268,6 +268,15 @@
       "state" : {
         "revision" : "270a754308f5440be52fc295242eb7031638bd15",
         "version" : "0.6.1"
+      }
+    },
+    {
+      "identity" : "swiftui-navigation-transitions",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/davdroman/swiftui-navigation-transitions",
+      "state" : {
+        "revision" : "c07692890d2e6d4e9e3936ae2f13be8c84551de7",
+        "version" : "0.7.2"
       }
     },
     {

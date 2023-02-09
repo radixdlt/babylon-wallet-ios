@@ -4,8 +4,8 @@ import ProfileClient
 
 // MARK: - NewProfileThenAccountCoordinator.State
 public extension NewProfileThenAccountCoordinator {
-	struct State: Sendable, Equatable {
-		public enum Step: Sendable, Equatable {
+	struct State: Sendable, Hashable {
+		public enum Step: Sendable, Hashable {
 			case newProfile(NewProfile.State)
 			case createAccountCoordinator(CreateAccountCoordinator.State)
 		}

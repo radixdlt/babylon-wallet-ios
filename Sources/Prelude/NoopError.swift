@@ -1,5 +1,5 @@
 // MARK: - NoopError
-public struct NoopError: LocalizedError {
+public struct NoopError {
 	public let message: String
 	public let file: StaticString
 	public let line: UInt
@@ -15,8 +15,16 @@ public struct NoopError: LocalizedError {
 	}
 }
 
-public extension NoopError {
-	var errorDescription: String? {
+// MARK: LocalizedError
+extension NoopError: LocalizedError {
+	public var errorDescription: String? {
 		"\(message) in `\(file)`#\(line)"
+	}
+}
+
+// MARK: Equatable
+extension NoopError: Equatable {
+	public static func == (lhs: NoopError, rhs: NoopError) -> Bool {
+		lhs.message == rhs.message
 	}
 }

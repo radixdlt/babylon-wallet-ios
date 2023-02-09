@@ -200,7 +200,11 @@ public extension Profile {
 		}
 
 		// Validate that all Accounts are known
-		let accountAddressNeedles: Set<AccountAddress> = Set(connectedDapp.referencesToAuthorizedPersonas.flatMap(\.sharedAccounts.accountsReferencedByAddress))
+		let accountAddressNeedles: Set<AccountAddress> = Set(
+			connectedDapp.referencesToAuthorizedPersonas.flatMap {
+				$0.sharedAccounts?.accountsReferencedByAddress ?? []
+			}
+		)
 		let accountAddressHaystack = Set(network.accounts.map(\.address))
 		guard accountAddressHaystack.isSuperset(of: accountAddressNeedles) else {
 			struct ConnectedDappReferencesUnknownAccount: Swift.Error {}

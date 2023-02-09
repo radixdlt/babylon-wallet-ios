@@ -18,13 +18,7 @@ public extension App {
 
 public extension App.View {
 	var body: some View {
-		VStack(spacing: .zero) {
-			Text(L10n.App.developmentOnlyInfo)
-				.frame(maxWidth: .infinity, alignment: .center)
-				.padding(.small3)
-				.background(Color.app.orange2)
-				.textStyle(.body2HighImportance)
-
+		ZStack {
 			SwitchStore(store.scope(state: \.root)) {
 				CaseLet(
 					state: /App.State.Root.main,
@@ -54,7 +48,8 @@ public extension App.View {
 			.task { @MainActor in
 				await ViewStore(store.stateless).send(.view(.task)).finish()
 			}
-			.overlayLoadingView()
+			.showDeveloperDisclaimerBanner()
+			.presentsLoadingViewOverlay()
 		}
 	}
 }

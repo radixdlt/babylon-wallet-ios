@@ -3,7 +3,6 @@ import AccountListFeature
 import AccountPreferencesFeature
 import CreateEntityFeature
 import FeaturePrelude
-import GrantDappWalletAccessFeature
 import TransactionSigningFeature
 
 // MARK: - Home.View

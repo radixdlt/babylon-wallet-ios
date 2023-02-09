@@ -3,7 +3,7 @@ import TransactionSigningFeature
 
 public extension AssetTransfer {
 	struct Destinations: ReducerProtocol {
-		public enum State: Equatable {
+		public enum State: Hashable {
 			case transactionSigning(TransactionSigning.State)
 		}
 

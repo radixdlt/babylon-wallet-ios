@@ -1,6 +1,48 @@
 import Prelude
 import SwiftUI
 
+#if os(iOS)
+typealias PlatformSpecificColor = UIColor
+extension UIColor {
+	static func dynamic(
+		light lightModeColor: UIColor,
+		dark darkModeColor: UIColor
+	) -> UIColor {
+		UIColor { $0.userInterfaceStyle == .dark ? darkModeColor : lightModeColor }
+	}
+}
+
+#elseif os(macOS)
+typealias PlatformSpecificColor = NSColor
+extension NSColor {
+	static func dynamic(
+		light lightModeColor: NSColor,
+		dark darkModeColor: NSColor
+	) -> NSColor {
+		NSColor(name: nil, dynamicProvider: { $0.name == .darkAqua ? darkModeColor : lightModeColor })
+	}
+}
+#endif
+
+extension Color {
+	#if os(iOS)
+	static func dynamic(
+		light lightModeColor: UIColor,
+		dark darkModeColor: UIColor
+	) -> Color {
+		self.init(uiColor: .dynamic(light: lightModeColor, dark: darkModeColor))
+	}
+
+	#elseif os(macOS)
+	static func dynamic(
+		light lightModeColor: NSColor,
+		dark darkModeColor: NSColor
+	) -> Color {
+		self.init(nsColor: .dynamic(light: lightModeColor, dark: darkModeColor))
+	}
+	#endif
+}
+
 public extension Color {
 	/// Namespace only
 	struct App { fileprivate init() {} }
@@ -36,7 +78,10 @@ public extension Color.App {
 	// alert
 	var red1: Color { .init(hex: .red1) }
 
+	var background: Color { .dynamic(light: .white, dark: .black) }
+	@available(*, deprecated, message: "Use dynamic 'background' color instead")
 	var backgroundDark: Color { .black }
+	@available(*, deprecated, message: "Use dynamic 'background' color instead")
 	var backgroundLight: Color { .white }
 
 	var notification: Color { .init(hex: .red1) }

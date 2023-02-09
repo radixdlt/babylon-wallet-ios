@@ -69,16 +69,31 @@ public extension P2P.FromDapp.WalletInteraction.Metadata {
 	static let previewValue = Self(
 		networkId: .simulator,
 		origin: "Placeholder",
-		dAppId: "Placeholder"
+		dAppDefinitionAddress: try! .init(address: "DappDefinitionAddress")
 	)
 }
 
 public extension P2P.FromDapp.WalletInteraction {
+	static func previewValueAllRequests(auth: P2P.FromDapp.WalletInteraction.AuthRequestItem) -> Self {
+		.init(
+			id: .previewValue0,
+			items: .request(.authorized(.init(
+				auth: auth,
+				oneTimeAccounts: .previewValue,
+				ongoingAccounts: .init(
+					numberOfAccounts: .atLeast(2),
+					requiresProofOfOwnership: false
+				)
+			))),
+			metadata: .previewValue
+		)
+	}
+
 	static let previewValueOneTimeAccount: Self = .previewValueOneTimeAccount()
 	static func previewValueOneTimeAccount(
 		id: ID = .previewValue0
 	) -> Self {
-		try! .init(
+		.init(
 			id: id,
 			items: .request(
 				.unauthorized(.init(
@@ -94,7 +109,7 @@ public extension P2P.FromDapp.WalletInteraction {
 	static func previewValueSignTX(
 		id: ID = .previewValue0
 	) -> Self {
-		try! .init(
+		.init(
 			id: id,
 			items: .transaction(.init(
 				send: .previewValue
@@ -102,5 +117,13 @@ public extension P2P.FromDapp.WalletInteraction {
 			metadata: .previewValue
 		)
 	}
+
+	static let previewValueNoRequestItems = Self(
+		id: .previewValue,
+		items: .request(.unauthorized(.init(
+			oneTimeAccounts: nil
+		))),
+		metadata: .previewValue
+	)
 }
 #endif // DEBUG

@@ -8,13 +8,13 @@ final class ToDappResponseTests: TestCase {
 			items: .request(
 				.unauthorized(.init(
 					oneTimeAccounts: .withoutProof(.init(
-						accounts: .init(
-							rawValue: [.init(
+						accounts: [
+							.init(
 								accountAddress: try! .init(address: "address"),
 								label: "Label",
 								appearanceId: .fromIndex(0)
-							)]
-						)!
+							),
+						]
 					))
 				))
 			)
@@ -56,7 +56,7 @@ final class ToDappResponseTests: TestCase {
 			"metadata": [
 				"networkId": 34,
 				"origin": "radixdlt.dashboard.com",
-				"dAppId": "https://dashboard-pr-126.rdx-works-main.extratools.works",
+				"dAppDefinitionAddress": "account_deadbeef",
 			],
 		]
 		try XCTAssertJSONDecoding(
@@ -74,7 +74,7 @@ final class ToDappResponseTests: TestCase {
 				metadata: .init(
 					networkId: 34,
 					origin: "radixdlt.dashboard.com",
-					dAppId: "https://dashboard-pr-126.rdx-works-main.extratools.works"
+					dAppDefinitionAddress: try! .init(address: "account_deadbeef")
 				)
 			)
 		)
@@ -94,7 +94,7 @@ final class ToDappResponseTests: TestCase {
 			"metadata": [
 				"networkId": 34,
 				"origin": "https://dashboard-pr-126.rdx-works-main.extratools.works",
-				"dAppId": "radixdlt.dashboard.com",
+				"dAppDefinitionAddress": "account_deadbeef",
 			],
 		]
 		try XCTAssertJSONDecoding(
@@ -111,7 +111,7 @@ final class ToDappResponseTests: TestCase {
 				metadata: .init(
 					networkId: 34,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
-					dAppId: "radixdlt.dashboard.com"
+					dAppDefinitionAddress: try! .init(address: "account_deadbeef")
 				)
 			)
 		)

@@ -3,7 +3,7 @@ import Cryptography
 import ProfileModels
 
 // MARK: - GenesisFactorInstanceDerivationStrategy
-public enum GenesisFactorInstanceDerivationStrategy: Sendable, Equatable {
+public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {
 	case loadMnemonicFromKeychainForFactorSource(Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource)
 
 	/// Needed when creating a virtual entity as part of NewProfileThenAccount flow (part of Onboarding),

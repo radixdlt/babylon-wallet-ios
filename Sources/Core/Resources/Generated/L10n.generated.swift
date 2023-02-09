@@ -84,8 +84,8 @@ public enum L10n {
         public enum Specific {
           /// Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.
           public static let account = L10n.tr("Localizable", "createEntity.completion.explanation.specific.account", fallback: "Your account lives on the Radix Network and you can access it anytime in your Radix Wallet.")
-          /// The personal data you specify for this Persona does not live on the Radix Network, only in your Radix wallet.
-          public static let persona = L10n.tr("Localizable", "createEntity.completion.explanation.specific.persona", fallback: "The personal data you specify for this Persona does not live on the Radix Network, only in your Radix wallet.")
+          /// Personal data that you add to your Persona will only be shared with dApp websites with your permission in the Radix Wallet.
+          public static let persona = L10n.tr("Localizable", "createEntity.completion.explanation.specific.persona", fallback: "Personal data that you add to your Persona will only be shared with dApp websites with your permission in the Radix Wallet.")
         }
       }
       public enum Subtitle {
@@ -122,8 +122,8 @@ public enum L10n {
             public enum Specific {
               /// e.g. My Main Account
               public static let account = L10n.tr("Localizable", "createEntity.nameNewEntity.name.field.placeholder.specific.account", fallback: "e.g. My Main Account")
-              /// e.g. Ellis Bell
-              public static let persona = L10n.tr("Localizable", "createEntity.nameNewEntity.name.field.placeholder.specific.persona", fallback: "e.g. Ellis Bell")
+              /// e.g. My Main Persona
+              public static let persona = L10n.tr("Localizable", "createEntity.nameNewEntity.name.field.placeholder.specific.persona", fallback: "e.g. My Main Persona")
             }
           }
         }
@@ -142,43 +142,179 @@ public enum L10n {
   }
   public enum DApp {
     public enum ChooseAccounts {
-      /// + Create a New Account
-      public static let createNewAccount = L10n.tr("Localizable", "dApp.chooseAccounts.createNewAccount", fallback: "+ Create a New Account")
-      /// Choose %@
-      public static func explanation(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dApp.chooseAccounts.explanation", String(describing: p1), fallback: "Choose %@")
+      /// Create a New Account
+      public static let createNewAccount = L10n.tr("Localizable", "dApp.chooseAccounts.createNewAccount", fallback: "Create a New Account")
+      public enum Subtitle {
+        public enum Message {
+          public enum OneTime {
+            ///  is making a one-time request for at least %d accounts.
+            public static func atLeast(_ p1: Int) -> String {
+              return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.oneTime.atLeast", p1, fallback: " is making a one-time request for at least %d accounts.")
+            }
+            ///  is making a one-time request for at least 1 account.
+            public static let atLeastOne = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.oneTime.atLeastOne", fallback: " is making a one-time request for at least 1 account.")
+            ///  is making a one-time request for any number of accounts.
+            public static let atLeastZero = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.oneTime.atLeastZero", fallback: " is making a one-time request for any number of accounts.")
+            ///  is making a one-time request for at least %d accounts.
+            public static func exactly(_ p1: Int) -> String {
+              return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.oneTime.exactly", p1, fallback: " is making a one-time request for at least %d accounts.")
+            }
+            ///  is making a one-time request for 1 account.
+            public static let exactlyOne = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.oneTime.exactlyOne", fallback: " is making a one-time request for 1 account.")
+          }
+          public enum Ongoing {
+            /// Choose at least %d accounts you wish to use with 
+            public static func atLeast(_ p1: Int) -> String {
+              return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.ongoing.atLeast", p1, fallback: "Choose at least %d accounts you wish to use with ")
+            }
+            /// Choose at least 1 account you wish to use with 
+            public static let atLeastOne = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.ongoing.atLeastOne", fallback: "Choose at least 1 account you wish to use with ")
+            /// Choose any accounts you wish to use with 
+            public static let atLeastZero = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.ongoing.atLeastZero", fallback: "Choose any accounts you wish to use with ")
+            /// Choose %d accounts you wish to use with 
+            public static func exactly(_ p1: Int) -> String {
+              return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.ongoing.exactly", p1, fallback: "Choose %d accounts you wish to use with ")
+            }
+            /// Choose 1 account you wish to use with 
+            public static let exactlyOne = L10n.tr("Localizable", "dApp.chooseAccounts.subtitle.message.ongoing.exactlyOne", fallback: "Choose 1 account you wish to use with ")
+          }
+        }
       }
-      /// At Least One Account
-      public static let explanationAtLeastOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationAtLeastOneAccount", fallback: "At Least One Account")
-      /// One Account
-      public static let explanationExactlyOneAccount = L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactlyOneAccount", fallback: "One Account")
-      /// #%d Accounts
-      public static func explanationExactNumberOfAccounts(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "dApp.chooseAccounts.explanationExactNumberOfAccounts", p1, fallback: "#%d Accounts")
+      public enum Title {
+        /// Account Request
+        public static let oneTime = L10n.tr("Localizable", "dApp.chooseAccounts.title.oneTime", fallback: "Account Request")
+        /// Account Permission
+        public static let ongoing = L10n.tr("Localizable", "dApp.chooseAccounts.title.ongoing", fallback: "Account Permission")
       }
-      /// Choose the account(s) you want %@ to know about.
-      public static func subtitle(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dApp.chooseAccounts.subtitle", String(describing: p1), fallback: "Choose the account(s) you want %@ to know about.")
-      }
-      /// Choose Accounts
-      public static let title = L10n.tr("Localizable", "dApp.chooseAccounts.title", fallback: "Choose Accounts")
     }
-    public enum ConnectionRequest {
+    public enum Completion {
+      /// Request from %s complete
+      public static func subtitle(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "dApp.completion.subtitle", p1, fallback: "Request from %s complete")
+      }
+      /// Success
+      public static let title = L10n.tr("Localizable", "dApp.completion.title", fallback: "Success")
+    }
+    public enum Login {
+      /// Choose a Persona
+      public static let chooseAPersonaTitle = L10n.tr("Localizable", "dApp.login.chooseAPersonaTitle", fallback: "Choose a Persona")
       /// Continue
-      public static let continueButtonTitle = L10n.tr("Localizable", "dApp.connectionRequest.continueButtonTitle", fallback: "Continue")
-      /// For this dApp to function, it needs the following:
-      public static let subtitle = L10n.tr("Localizable", "dApp.connectionRequest.subtitle", fallback: "For this dApp to function, it needs the following:")
-      /// dApp Connection Request
-      public static let title = L10n.tr("Localizable", "dApp.connectionRequest.title", fallback: "dApp Connection Request")
-      /// %@ wants to connect to your wallet
-      public static func wantsToConnect(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "dApp.connectionRequest.wantsToConnect", String(describing: p1), fallback: "%@ wants to connect to your wallet")
+      public static let continueButtonTitle = L10n.tr("Localizable", "dApp.login.continueButtonTitle", fallback: "Continue")
+      public enum Row {
+        /// Your last login was on %@
+        public static func lastLoginWasOn(_ p1: Any) -> String {
+          return L10n.tr("Localizable", "dApp.login.row.lastLoginWasOn", String(describing: p1), fallback: "Your last login was on %@")
+        }
+      }
+      public enum Subtitle {
+        ///  is requesting you login with a Persona.
+        public static let knownDapp = L10n.tr("Localizable", "dApp.login.subtitle.knownDapp", fallback: " is requesting you login with a Persona.")
+        ///  is requesting you login for the first time with a Persona.
+        public static let newDapp = L10n.tr("Localizable", "dApp.login.subtitle.newDapp", fallback: " is requesting you login for the first time with a Persona.")
+      }
+      public enum Title {
+        /// Login Request
+        public static let knownDapp = L10n.tr("Localizable", "dApp.login.title.knownDapp", fallback: "Login Request")
+        /// New Login Request
+        public static let newDapp = L10n.tr("Localizable", "dApp.login.title.newDapp", fallback: "New Login Request")
+      }
+    }
+    public enum Metadata {
+      /// Unknown dApp
+      public static let unknownName = L10n.tr("Localizable", "dApp.metadata.unknownName", fallback: "Unknown dApp")
+    }
+    public enum MetadataLoading {
+      /// Loading...
+      public static let prompt = L10n.tr("Localizable", "dApp.metadataLoading.prompt", fallback: "Loading...")
+      public enum ErrorAlert {
+        /// Cancel
+        public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.cancelButtonTitle", fallback: "Cancel")
+        /// Danger! Bad dApp config or you're being spoofed!
+        /// 
+        /// %@
+        public static func message(_ p1: Any) -> String {
+          return L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.message", String(describing: p1), fallback: "Danger! Bad dApp config or you're being spoofed!\n\n%@")
+        }
+        /// Retry
+        public static let retryButtonTitle = L10n.tr("Localizable", "dApp.metadataLoading.errorAlert.retryButtonTitle", fallback: "Retry")
+      }
+    }
+    public enum Permission {
+      /// You can update this permission in your settings at any time.
+      public static let updateInSettingsExplanation = L10n.tr("Localizable", "dApp.permission.updateInSettingsExplanation", fallback: "You can update this permission in your settings at any time.")
+      public enum NumberOfAccounts {
+        /// %d or more accounts
+        public static func atLeast(_ p1: Int) -> String {
+          return L10n.tr("Localizable", "dApp.permission.numberOfAccounts.atLeast", p1, fallback: "%d or more accounts")
+        }
+        /// Any number of accounts
+        public static let atLeastZero = L10n.tr("Localizable", "dApp.permission.numberOfAccounts.atLeastZero", fallback: "Any number of accounts")
+        /// %d accounts
+        public static func exactly(_ p1: Int) -> String {
+          return L10n.tr("Localizable", "dApp.permission.numberOfAccounts.exactly", p1, fallback: "%d accounts")
+        }
+        /// 1 account
+        public static let exactlyOne = L10n.tr("Localizable", "dApp.permission.numberOfAccounts.exactlyOne", fallback: "1 account")
+      }
+      public enum Subtitle {
+        /// always
+        public static let always = L10n.tr("Localizable", "dApp.permission.subtitle.always", fallback: "always")
+        public enum Explanation {
+          public enum Accounts {
+            ///  is requesting permission to 
+            public static let first = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.accounts.first", fallback: " is requesting permission to ")
+            ///  be able to view account information when you login with this Persona.
+            public static let second = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.accounts.second", fallback: " be able to view account information when you login with this Persona.")
+          }
+          public enum PersonalData {
+            ///  is requesting permission to 
+            public static let first = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personalData.first", fallback: " is requesting permission to ")
+            ///  be able to view the following personal data when you login with this Persona.
+            public static let second = L10n.tr("Localizable", "dApp.permission.subtitle.explanation.personalData.second", fallback: " be able to view the following personal data when you login with this Persona.")
+          }
+        }
+      }
+      public enum Title {
+        /// Account Permission
+        public static let accounts = L10n.tr("Localizable", "dApp.permission.title.accounts", fallback: "Account Permission")
+        /// Personal Data Permission
+        public static let personalData = L10n.tr("Localizable", "dApp.permission.title.personalData", fallback: "Personal Data Permission")
       }
     }
     public enum Request {
       /// Request received from dApp for network %@, but you are currently connected to %@.
       public static func wrongNetworkError(_ p1: Any, _ p2: Any) -> String {
         return L10n.tr("Localizable", "dApp.request.wrongNetworkError", String(describing: p1), String(describing: p2), fallback: "Request received from dApp for network %@, but you are currently connected to %@.")
+      }
+      public enum MalformedErrorAlert {
+        /// Interaction received from dApp does not contain any valid requests.
+        public static let message = L10n.tr("Localizable", "dApp.request.malformedErrorAlert.message", fallback: "Interaction received from dApp does not contain any valid requests.")
+        /// OK
+        public static let okButtonTitle = L10n.tr("Localizable", "dApp.request.malformedErrorAlert.okButtonTitle", fallback: "OK")
+      }
+      public enum SpecifiedPersonaNotFoundError {
+        /// Cancel
+        public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.request.specifiedPersonaNotFoundError.cancelButtonTitle", fallback: "Cancel")
+        /// Persona specified by dApp does not exist.
+        /// 
+        /// %@
+        public static func message(_ p1: Any) -> String {
+          return L10n.tr("Localizable", "dApp.request.specifiedPersonaNotFoundError.message", String(describing: p1), fallback: "Persona specified by dApp does not exist.\n\n%@")
+        }
+      }
+    }
+    public enum Response {
+      public enum FailureAlert {
+        /// Cancel
+        public static let cancelButtonTitle = L10n.tr("Localizable", "dApp.response.failureAlert.cancelButtonTitle", fallback: "Cancel")
+        /// Failed to send response payload back to dApp.
+        /// 
+        /// %@
+        public static func message(_ p1: Any) -> String {
+          return L10n.tr("Localizable", "dApp.response.failureAlert.message", String(describing: p1), fallback: "Failed to send response payload back to dApp.\n\n%@")
+        }
+        /// Retry
+        public static let retryButtonTitle = L10n.tr("Localizable", "dApp.response.failureAlert.retryButtonTitle", fallback: "Retry")
       }
     }
   }
@@ -329,6 +465,14 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "personaList.subtitle", fallback: "Here are all the Personas connected to your account")
     /// Personas
     public static let title = L10n.tr("Localizable", "personaList.title", fallback: "Personas")
+  }
+  public enum Personas {
+    /// Create a New Persona
+    public static let createNewPersonaButtonTitle = L10n.tr("Localizable", "personas.createNewPersonaButtonTitle", fallback: "Create a New Persona")
+    /// Here are all the Personas connected to your account
+    public static let subtitle = L10n.tr("Localizable", "personas.subtitle", fallback: "Here are all the Personas connected to your account")
+    /// Personas
+    public static let title = L10n.tr("Localizable", "personas.title", fallback: "Personas")
   }
   public enum ProfileLoad {
     /// Failed to create Wallet from backup: %@

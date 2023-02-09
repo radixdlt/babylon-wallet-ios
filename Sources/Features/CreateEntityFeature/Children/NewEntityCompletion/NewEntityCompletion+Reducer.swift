@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 // MARK: - NewEntityCompletion
-public struct NewEntityCompletion<Entity: EntityProtocol & Sendable & Equatable>: Sendable, ReducerProtocol {
+public struct NewEntityCompletion<Entity: EntityProtocol & Sendable & Hashable>: Sendable, ReducerProtocol {
 	public init() {}
 }
 

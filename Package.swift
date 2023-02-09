@@ -70,7 +70,7 @@ package.addModules([
 		dependencies: [
 			"TransactionSigningFeature",
 		],
-		tests: .no
+		tests: .yes()
 	),
 	.feature(
 		name: "CreateEntityFeature",
@@ -79,6 +79,17 @@ package.addModules([
 			"GatewayAPI",
 			"LocalAuthenticationClient",
 			"ProfileClient",
+		],
+		tests: .yes()
+	),
+	.feature(
+		name: "DappInteractionFeature",
+		dependencies: [
+			"CreateEntityFeature",
+			"GatewayAPI",
+			"P2PConnectivityClient",
+			"ProfileClient",
+			"TransactionSigningFeature",
 		],
 		tests: .yes()
 	),
@@ -95,23 +106,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "GrantDappWalletAccessFeature",
-		dependencies: [
-			"CreateEntityFeature",
-			"ProfileClient",
-		],
-		tests: .yes()
-	),
-	.feature(
-		name: "HandleDappRequests",
-		dependencies: [
-			"GrantDappWalletAccessFeature",
-			"P2PConnectivityClient",
-			"TransactionSigningFeature",
-		],
-		tests: .yes()
-	),
-	.feature(
 		name: "HomeFeature",
 		dependencies: [
 			"AccountListFeature",
@@ -120,7 +114,6 @@ package.addModules([
 			"AccountPreferencesFeature",
 			"AppSettings",
 			"CreateEntityFeature",
-			"GrantDappWalletAccessFeature",
 			"P2PConnectivityClient",
 			"ProfileClient",
 			"TransactionSigningFeature",
@@ -137,7 +130,7 @@ package.addModules([
 		dependencies: [
 			"AppSettings",
 			"AccountPortfolio",
-			"HandleDappRequests",
+			"DappInteractionFeature",
 			"HomeFeature",
 			"SettingsFeature",
 		],
@@ -325,7 +318,7 @@ package.addModules([
 		name: "FeaturePrelude",
 		dependencies: [
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-				.package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "navigation")
+				.package(url: "https://github.com/davdroman/swift-composable-architecture", branch: "scope-local-state-action")
 			},
 			"DesignSystem",
 			"Resources",
@@ -346,6 +339,9 @@ package.addModules([
 		dependencies: [
 			.product(name: "Introspect", package: "SwiftUI-Introspect") {
 				.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4")
+			},
+			.product(name: "NavigationTransitions", package: "swiftui-navigation-transitions", condition: .when(platforms: [.iOS])) {
+				.package(url: "https://github.com/davdroman/swiftui-navigation-transitions", from: "0.1.0")
 			},
 			.product(name: "NukeUI", package: "Nuke") {
 				.package(url: "https://github.com/kean/Nuke", from: "11.3.1")

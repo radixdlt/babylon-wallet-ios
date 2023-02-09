@@ -1,5 +1,6 @@
 import EngineToolkitModels
 import Prelude
+import ProfileModels
 
 // MARK: - P2P.FromDapp
 public extension P2P {
@@ -38,16 +39,15 @@ public extension P2P.FromDapp {
 public extension P2P.FromDapp.WalletInteraction {
 	struct Metadata: Sendable, Hashable, Decodable {
 		public typealias Origin = Tagged<(Self, origin: ()), String>
-		public typealias DAppID = Tagged<(Self, dAppId: ()), String>
 
 		public let networkId: NetworkID
 		public let origin: Origin
-		public let dAppId: DAppID
+		public let dAppDefinitionAddress: DappDefinitionAddress
 
-		public init(networkId: NetworkID, origin: Origin, dAppId: DAppID) {
+		public init(networkId: NetworkID, origin: Origin, dAppDefinitionAddress: DappDefinitionAddress) {
 			self.networkId = networkId
 			self.origin = origin
-			self.dAppId = dAppId
+			self.dAppDefinitionAddress = dAppDefinitionAddress
 		}
 	}
 }

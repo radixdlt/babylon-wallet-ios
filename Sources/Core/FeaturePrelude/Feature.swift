@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - _FeatureReducer
-public protocol _FeatureReducer: ReducerProtocol where State: Sendable & Equatable {
+public protocol _FeatureReducer: ReducerProtocol where State: Sendable & Hashable {
 	associatedtype ViewAction: Sendable & Equatable = Never
 	associatedtype InternalAction: Sendable & Equatable = Never
 	associatedtype ChildAction: Sendable & Equatable = Never

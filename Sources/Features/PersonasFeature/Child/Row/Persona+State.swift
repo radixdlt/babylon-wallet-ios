@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - Persona.State
 public extension Persona {
-	struct State: Sendable, Equatable, Identifiable {
+	struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = OnNetwork.Persona.ID
 		public var id: ID { persona.id }
 		public let persona: OnNetwork.Persona

@@ -23,12 +23,20 @@ public typealias AssetImageTypeAlias = ImageAsset.Image
 // swiftlint:disable identifier_name line_length nesting type_body_length type_name
 public enum AssetResource {
   public static let arrowBack = ImageAsset(name: "arrow-back")
-  public static let checkmarkSelected = ImageAsset(name: "checkmark-selected")
-  public static let checkmarkUnselected = ImageAsset(name: "checkmark-unselected")
+  public static let checkmarkDarkSelected = ImageAsset(name: "checkmark-dark-selected")
+  public static let checkmarkDarkUnselected = ImageAsset(name: "checkmark-dark-unselected")
+  public static let checkmarkLightSelected = ImageAsset(name: "checkmark-light-selected")
+  public static let checkmarkLightUnselected = ImageAsset(name: "checkmark-light-unselected")
   public static let chevronRight = ImageAsset(name: "chevron-right")
   public static let close = ImageAsset(name: "close")
   public static let copy = ImageAsset(name: "copy")
   public static let ellipsis = ImageAsset(name: "ellipsis")
+  public static let radioButtonDarkDisabled = ImageAsset(name: "radioButton-dark-disabled")
+  public static let radioButtonDarkSelected = ImageAsset(name: "radioButton-dark-selected")
+  public static let radioButtonDarkUnselected = ImageAsset(name: "radioButton-dark-unselected")
+  public static let radioButtonLightDisabled = ImageAsset(name: "radioButton-light-disabled")
+  public static let radioButtonLightSelected = ImageAsset(name: "radioButton-light-selected")
+  public static let radioButtonLightUnselected = ImageAsset(name: "radioButton-light-unselected")
   public static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
   public static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
   public static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
@@ -42,7 +50,7 @@ public enum AssetResource {
   public static let fungibleToken = ImageAsset(name: "fungible-token")
   public static let nft = ImageAsset(name: "nft")
   public static let xrd = ImageAsset(name: "xrd")
-  public static let dappPlaceholder = ImageAsset(name: "dapp-placeholder")
+  public static let successCheckmark = ImageAsset(name: "success-checkmark")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 

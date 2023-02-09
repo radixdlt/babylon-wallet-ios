@@ -16,7 +16,7 @@ public struct NonFungibleToken: Sendable, Token, Hashable {
 }
 
 // MARK: - NonFungibleTokenContainer
-public struct NonFungibleTokenContainer: Sendable, Identifiable, Equatable {
+public struct NonFungibleTokenContainer: Sendable, Identifiable, Hashable {
 	public let owner: AccountAddress
 	public let resourceAddress: ComponentAddress
 	public var assets: [NonFungibleToken]

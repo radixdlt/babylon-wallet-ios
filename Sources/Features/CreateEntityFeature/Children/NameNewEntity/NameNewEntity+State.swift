@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - NameNewEntity.State
 public extension NameNewEntity {
-	struct State: Sendable, Equatable {
+	struct State: Sendable, Hashable {
 		public var isFirst: Bool
 		public var inputtedName: String
 		public var sanitizedName: NonEmpty<String>?
