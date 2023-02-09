@@ -1,7 +1,7 @@
 import ClientPrelude
 import EngineToolkitClient
-import ProfileClient
 import GatewayAPI
+import ProfileClient
 
 // MARK: - AssetFetcher + DependencyKey
 extension AssetFetcher: DependencyKey {

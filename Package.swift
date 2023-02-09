@@ -227,6 +227,7 @@ package.addModules([
 		name: "AccountPortfolio",
 		dependencies: [
 			"AppSettings",
+			"EngineToolkitClient",
 			"GatewayAPI",
 			"ProfileClient",
 		],
