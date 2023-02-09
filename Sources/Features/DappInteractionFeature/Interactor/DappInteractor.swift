@@ -90,7 +90,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 										)
 									)
 								))
-								return
+								continue
 							}
 
 							await send(.internal(.receivedRequestFromDapp(request)))
