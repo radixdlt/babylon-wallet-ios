@@ -19,6 +19,9 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 	/// Symbol of token, e.g. `"XRD"`.
 	public let symbol: String?
 
+	/// True if the token represents XRD.
+	public let isXRD: Bool
+
 	/// Token icon URL.
 	public let iconURL: URL?
 
@@ -40,6 +43,7 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 		tokenDescription: String?,
 		name: String?,
 		symbol: String?,
+		isXRD: Bool,
 		tokenInfoURL: String? = nil,
 		iconURL: URL? = nil
 	) {
@@ -51,30 +55,15 @@ public struct FungibleToken: Sendable, Asset, Token, Hashable {
 		self.tokenDescription = tokenDescription
 		self.name = name
 		self.symbol = symbol
+		self.isXRD = isXRD
 		self.tokenInfoURL = tokenInfoURL
 		self.iconURL = iconURL
-	}
-}
-
-public extension FungibleToken {
-	var isXRD: Bool {
-		NetworkID.allCases.contains(where: isXRD(on:))
-	}
-
-	func isXRD(on networkID: NetworkID) -> Bool {
-		guard let xrdAddress = Network.KnownAddresses.addressMap[networkID]?.xrd,
-		      self.componentAddress.address == xrdAddress.address
-		else {
-			return false
-		}
-		return true
 	}
 }
 
 // MARK: - FungibleTokenContainer
 public struct FungibleTokenContainer: Sendable, AssetContainer, Equatable {
 	public let owner: AccountAddress
-	public typealias T = FungibleToken
 	public var asset: FungibleToken
 
 	// TODO: replace String type with appropriate numeric type with 0b2^256 / 0d1e18 ~ 1e60 support
@@ -109,10 +98,11 @@ public extension FungibleTokenContainer {
 	}
 }
 
+#if DEBUG
 public extension FungibleToken {
 	/// The native token of the Radix Ledger
 	static let xrd = Self(
-		componentAddress: "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9",
+		componentAddress: "resource_tdx_22_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqj3nwpk",
 		divisibility: 18,
 		totalSupply: 24_000_000_000,
 		totalMinted: 0,
@@ -120,12 +110,10 @@ public extension FungibleToken {
 		tokenDescription: "The native token of the Radix Ledger",
 		name: "Radix",
 		symbol: "XRD",
+		isXRD: true,
 		tokenInfoURL: "https://tokens.radixdlt.com"
 	)
-}
 
-#if DEBUG
-public extension FungibleToken {
 	static let btc = Self(
 		componentAddress: "btc-deadbeef",
 		divisibility: 18,
@@ -134,7 +122,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Bitcoin",
-		symbol: "BTC"
+		symbol: "BTC",
+		isXRD: false
 	)
 
 	static let dot = Self(
@@ -145,7 +134,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Polkadot",
-		symbol: "DOT"
+		symbol: "DOT",
+		isXRD: false
 	)
 
 	static let eth = Self(
@@ -156,7 +146,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Ethereum",
-		symbol: "ETH"
+		symbol: "ETH",
+		isXRD: false
 	)
 
 	static let ltc = Self(
@@ -167,7 +158,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Litecoin",
-		symbol: "LTC"
+		symbol: "LTC",
+		isXRD: false
 	)
 
 	static let sol = Self(
@@ -178,7 +170,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Solana",
-		symbol: "SOL"
+		symbol: "SOL",
+		isXRD: false
 	)
 
 	static let usdt = Self(
@@ -189,7 +182,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "Tether",
-		symbol: "USDT"
+		symbol: "USDT",
+		isXRD: false
 	)
 
 	static let xrp = Self(
@@ -200,7 +194,8 @@ public extension FungibleToken {
 		totalBurnt: 0,
 		tokenDescription: nil,
 		name: "XRP token",
-		symbol: "XRP"
+		symbol: "XRP",
+		isXRD: false
 	)
 }
 #endif

@@ -42,7 +42,7 @@ private extension FungibleTokenList.Row.View {
 			HStack(alignment: .center) {
 				HStack(spacing: .small1) {
 					LazyImage(url: container.asset.iconURL) { _ in
-						Image(asset: container.asset.placeholderImage)
+						Image(asset: .placeholderImage(isXRD: viewStore.container.asset.isXRD))
 							.resizable()
 							.frame(.small)
 					}
@@ -120,9 +120,9 @@ extension FungibleTokenList.Row.View {
 		let isCurrencyAmountVisible: Bool
 
 		init(state: FungibleTokenList.Row.State) {
-			container = state.container
-			currency = state.currency
-			isCurrencyAmountVisible = state.isCurrencyAmountVisible
+			self.container = state.container
+			self.currency = state.currency
+			self.isCurrencyAmountVisible = state.isCurrencyAmountVisible
 		}
 	}
 }

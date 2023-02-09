@@ -14,17 +14,6 @@ public extension EngineToolkitClient {
 		}
 	}
 
-	private func knownAddresses(for networkID: NetworkID) throws -> Network.KnownAddresses {
-		guard let knownAddresses = Network.KnownAddresses.addressMap[networkID] else {
-			throw NoKnownAddressForNetworkID(unknownNetworkID: networkID)
-		}
-		return knownAddresses
-	}
-
-	private func faucetAddress(for networkID: NetworkID) throws -> ComponentAddress {
-		try knownAddresses(for: networkID).faucet
-	}
-
 	func lockFeeCallMethod(
 		faucetForNetwork networkID: NetworkID,
 		fee: String = "10"
@@ -63,8 +52,7 @@ public extension EngineToolkitClient {
 		networkID: NetworkID,
 		componentAddress: ComponentAddress
 	) throws -> TransactionManifest {
-		let knownAddresses = try knownAddresses(for: networkID)
-		let faucetAddress = knownAddresses.faucet
+		let faucetAddress = try faucetAddress(for: networkID)
 		var instructions: [any InstructionProtocol] = [
 			CallMethod(
 				receiver: faucetAddress,
@@ -87,12 +75,8 @@ public extension EngineToolkitClient {
 		}
 		return .init(instructions: .parsed(instructions.map { $0.embed() }))
 	}
-}
 
-// MARK: - NoKnownAddressForNetworkID
-public struct NoKnownAddressForNetworkID: LocalizedError {
-	public let unknownNetworkID: NetworkID
-	public var errorDescription: String? {
-		"\(Self.self)(unknownNetworkID: \(unknownNetworkID)"
+	private func faucetAddress(for networkID: NetworkID) throws -> ComponentAddress {
+		try knownEntityAddresses(networkID).faucetComponentAddress
 	}
 }

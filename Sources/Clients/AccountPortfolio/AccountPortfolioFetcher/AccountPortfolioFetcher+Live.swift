@@ -38,7 +38,8 @@ public extension AccountPortfolioFetcher {
 	func fetchXRDBalance(of accountAddress: AccountAddress, on networkID: NetworkID) async throws -> FungibleTokenContainer {
 		let accountPortfolioDictionary = try await fetchPortfolio([accountAddress])
 		let xrdContainer = accountPortfolioDictionary.first?.value.fungibleTokenContainers
-			.first(where: { $0.asset.isXRD(on: networkID) })
+			.first(where: \.asset.isXRD)
+
 		if let xrdContainer = xrdContainer {
 			return xrdContainer
 		} else {

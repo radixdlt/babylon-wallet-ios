@@ -8,7 +8,7 @@ public extension ProfileSnapshot.Version {
 	/// - 7: Added networkID in Account and Persona
 	/// - 8: Changed ConnectedDapp format
 	/// - 9: Personas now use Identity addresses as intended.
-	static let minimum: Self = 9
+	static let minimum: Self = 10
 }
 
 // MARK: - Profile
