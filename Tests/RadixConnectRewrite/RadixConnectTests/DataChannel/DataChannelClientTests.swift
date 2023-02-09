@@ -7,171 +7,192 @@ import TestingPrelude
 final class DataChannelClientTests: TestCase {
 	static let numberOfChunks = 3
 
-	let messageID = ChunkedMessagePackage.MessageID(rawValue: UUID().uuidString)
-	let testChunksData = try! Data.random(length: MessageSplitter.messageSizeChunkLimitDefault * DataChannelClientTests.numberOfChunks)
-	lazy var packages = MessageSplitter().split(message: testChunksData, messageID: messageID)
-	var packagesMetaData: ChunkedMessagePackage.MetaDataPackage {
-		packages[0].metaData!
+	let messageID = DataChannelMessage.ID(rawValue: UUID().uuidString)
+	let testChunksData = try! Data.random(length: DataChannelAssembledMessage.chunkSize * DataChannelClientTests.numberOfChunks)
+        lazy var chunkedMessages = DataChannelAssembledMessage(message: testChunksData, id: messageID).split()
+        lazy var assembledMesage = DataChannelAssembledMessage(message: testChunksData, id: messageID)
+        lazy var receiveError = DataChannelMessage.Receipt.ReceiveError(messageId: messageID, error: .messageHashesMismatch)
+
+        var packagesMetaData: DataChannelMessage.ChunkedMessage.MetaDataPackage {
+                chunkedMessages[0].metaData!
 	}
+
 
 	let dataChannel = DataChannelMock()
 	let delegate = DataChannelDelegateMock()
 	let jsonEncoder = JSONEncoder()
 	lazy var client = DataChannelClient(dataChannel: dataChannel, delegate: delegate, idBuilder: { self.messageID })
 
-	func test_sendMessage() async throws {
+	func test_sendMessage_receiveConfirmation_success() async throws {
+                // Stub the message confirmation
+                try self.delegate.receiveIncommingMessage(
+                        .receipt(.receiveMessageConfirmation(.init(messageId: self.messageID)))
+                )
+                
 		try await client.sendMessage(testChunksData)
 
 		// + 1 for MetaData package
 		let sentPackagesData = await dataChannel.sentData.prefix(Self.numberOfChunks + 1).collect()
 
-		let sentPackages = try sentPackagesData.map { try JSONDecoder().decode(ChunkedMessagePackage.self, from: $0) }
+                let sentPackages = try sentPackagesData.map {
+                        try JSONDecoder().decode(DataChannelMessage.self, from: $0).chunkedMessage!
+                }
 
-		XCTAssertEqual(packages, sentPackages)
+		XCTAssertEqual(chunkedMessages, sentPackages)
 	}
+
+        func test_sendMessage_receiveError_throwsError() async throws {
+                // Stub the message confirmation
+                try self.delegate.receiveIncommingMessage(
+                        .receipt(.receiveMessageError(.init(messageId: self.messageID, error: .messageHashesMismatch)))
+                )
+
+                do {
+                        try await client.sendMessage(testChunksData)
+                        XCTFail("Expected to throw error")
+                } catch {}
+        }
 
 	// MARK: - ReceiveMessage Happy Paths
 
-	func test_receiveMessageError() async throws {
-		let expectedError = ChunkedMessagePackage.ReceiveError(messageId: messageID, error: .messageHashesMismatch)
-		try await assertReceivedMessages([.receiveMessageError(expectedError)], expected: .failure(expectedError))
-	}
-
-	func assertReceivedMessages(_ packages: [ChunkedMessagePackage], expected: Result<MessageAssembler.IncommingMessage, Error>) async throws {
-		try packages.forEach(delegate.receiveIncommingPackage)
-		let receivedMessageResult = try await client.receivedMessages.prefix(1).collect().first!
-
-		switch (expected, receivedMessageResult) {
-		case let (.success(expectedMessage), .success(receivedMessage)):
-			XCTAssertEqual(expectedMessage, receivedMessage)
-		case let (.failure(expectedError as ChunkedMessagePackage.ReceiveError), .failure(receivedError as ChunkedMessagePackage.ReceiveError)):
-			XCTAssertEqual(expectedError, receivedError)
-		case let (.failure(expectedError as MessageAssembler.Error), .failure(receivedError as MessageAssembler.Error)):
-			XCTAssertEqual(expectedError, receivedError)
-		default:
-			XCTFail("Missmatched response, expected: \(expected), received: \(receivedMessageResult)")
-		}
-	}
-
-	func test_receiveMessageConfirmation() async throws {
-		let expectedConfirmation = ChunkedMessagePackage.ReceiveConfirmation(messageId: messageID)
-		try await assertReceivedMessages([.receiveMessageConfirmation(expectedConfirmation)], expected: .success(.receiveConfirmation(expectedConfirmation)))
-	}
-
 	func test_receiveChunks_happyPath() async throws {
 		try await assertReceivedMessages(
-			packages,
-			expected: .success(.message(
-				.init(
-					idOfChunks: messageID,
-					messageContent: testChunksData,
-					messageHash: packagesMetaData.hashOfMessage.data
-				)
-			))
+			chunkedMessages,
+			expected: .success(assembledMesage)
 		)
+                try await assertSendsConfirmationReceipt()
 	}
 
 	func test_receiveChunks_unsortedChunks() async throws {
 		try await assertReceivedMessages(
-			packages.shuffled(),
-			expected: .success(.message(
-				.init(
-					idOfChunks: messageID,
-					messageContent: testChunksData,
-					messageHash: packagesMetaData.hashOfMessage.data
-				)
-			))
+			chunkedMessages.shuffled(),
+			expected: .success(assembledMesage)
 		)
+                try await assertSendsConfirmationReceipt()
 	}
 
 	func test_receiveChunks_metaDataIsNotFirst() async throws {
-		var packages = packages
+		var packages = chunkedMessages
 		packages.swapAt(0, packages.count - 1)
 
 		try await assertReceivedMessages(
 			packages,
-			expected: .success(.message(
-				.init(
-					idOfChunks: messageID,
-					messageContent: testChunksData,
-					messageHash: packagesMetaData.hashOfMessage.data
-				)
-			))
+			expected: .success(assembledMesage)
 		)
+
+                try await assertSendsConfirmationReceipt()
 	}
 
 	// MARK: - ReceiveMessage Error paths
 
 	func test_receiveChunks_incorrectIndices() async throws {
 		// Will replace the last package with a wrong one
-		let wrongIndexPackage = ChunkedMessagePackage.chunk(.init(messageId: messageID, chunkIndex: 5, chunkData: Data()))
-		let packages = Array(packages.dropLast(1) + [wrongIndexPackage])
+                let wrongIndexPackage = DataChannelMessage.ChunkedMessage.chunk(
+                        .init(messageId: messageID, chunkIndex: 5, chunkData: Data())
+                )
+		let packages = Array(chunkedMessages.dropLast(1) + [wrongIndexPackage])
 
 		try await assertReceivedMessages(
 			packages,
-			expected: .failure(MessageAssembler.Error.parseError(.incorrectIndicesOfChunkedPackages))
+                        expected: .failure(receiveError)
 		)
+                try await assertSendsErrorReceipt()
 	}
 
-	func test_receiveChunks_zeroChunks() async throws {
-		let metaData = ChunkedMessagePackage.MetaDataPackage(
-			messageId: messageID,
-			chunkCount: 0,
-			messageByteCount: 3,
-			hashOfMessage: .deadbeef32Bytes
-		)
+        func test_receiveChunks_zeroChunks() async throws {
+                let metaData = DataChannelMessage.ChunkedMessage.metaData(
+                        .init(
+                                messageId: messageID,
+                                chunkCount: 0,
+                                messageByteCount: 3,
+                                hashOfMessage: .deadbeef32Bytes
+                        )
+                )
 
 		try await assertReceivedMessages(
-			[.metaData(metaData)],
-			expected: .failure(MessageAssembler.Error.parseError(.noPackages))
+			[metaData],
+			expected: .failure(receiveError)
 		)
+                try await assertSendsErrorReceipt()
 	}
 
 	func test_receiveChunks_invalidBytesCount() async throws {
-		let metaData = ChunkedMessagePackage.MetaDataPackage(
-			messageId: messageID,
-			chunkCount: 3,
-			messageByteCount: 10,
-			hashOfMessage: .deadbeef32Bytes
-		)
+                let metaData = DataChannelMessage.ChunkedMessage.metaData(
+                        .init(
+                                messageId: messageID,
+                                chunkCount: 3,
+                                messageByteCount: 10,
+                                hashOfMessage: .deadbeef32Bytes
+                        )
+                )
 
-		let packages = packages.replacing([.metaData(packagesMetaData)], with: [ChunkedMessagePackage.metaData(metaData)])
+		let packages = chunkedMessages.replacing([.metaData(packagesMetaData)], with: [metaData])
 
 		try await assertReceivedMessages(
 			packages,
-			expected: .failure(
-				MessageAssembler
-					.Error
-					.messageByteCountMismatch(
-						got: testChunksData.count,
-						butMetaDataPackageStated: metaData.messageByteCount
-					)
-			)
+			expected: .failure(receiveError)
 		)
+
+                try await assertSendsErrorReceipt()
 	}
 
 	func test_receiveChunks_invalidMessageHash() async throws {
-		let metaData = ChunkedMessagePackage.MetaDataPackage(
-			messageId: messageID,
-			chunkCount: 3,
-			messageByteCount: testChunksData.count,
-			hashOfMessage: .deadbeef32Bytes
-		)
+                let metaData = DataChannelMessage.ChunkedMessage.metaData(
+                        .init(
+                                messageId: messageID,
+                                chunkCount: 3,
+                                messageByteCount: testChunksData.count,
+                                hashOfMessage: .deadbeef32Bytes
+                        )
+                )
 
-		let packages = packages.replacing([.metaData(packagesMetaData)], with: [ChunkedMessagePackage.metaData(metaData)])
+		let packages = chunkedMessages.replacing([.metaData(packagesMetaData)], with: [metaData])
 
 		try await assertReceivedMessages(
 			packages,
-			expected: .failure(
-				MessageAssembler
-					.Error
-					.hashMismatch(
-						calculated: packagesMetaData.hashOfMessage.hex(),
-						butExpected: metaData.hashOfMessage.hex()
-					)
-			)
+			expected: .failure(receiveError)
 		)
+
+                try await assertSendsErrorReceipt()
 	}
+
+        func assertReceivedMessages(
+                _ messages: [DataChannelMessage.ChunkedMessage],
+                expected: Result<DataChannelAssembledMessage, Error>
+        ) async throws {
+                try messages.map(DataChannelMessage.chunkedMessage).forEach(delegate.receiveIncommingMessage)
+                let receivedMessageResult = try await client.incommingAssembledMessages.prefix(1).collect().first!
+
+                switch (expected, receivedMessageResult) {
+                case let (.success(expectedMessage), .success(receivedMessage)):
+                        XCTAssertEqual(expectedMessage, receivedMessage)
+                case let (.failure(expectedError as DataChannelMessage.Receipt.ReceiveError),
+                          .failure(receivedError as DataChannelMessage.Receipt.ReceiveError)):
+                        XCTAssertEqual(expectedError, receivedError)
+                default:
+                        XCTFail("Missmatched response, expected: \(expected), received: \(receivedMessageResult)")
+                }
+        }
+
+        func assertSendsErrorReceipt() async throws {
+                let sentMessage = await dataChannel.sentData.prefix(1).collect().first!
+                let decodedSentMessage = try JSONDecoder().decode(DataChannelMessage.self, from: sentMessage)
+
+                XCTAssertEqual(
+                        decodedSentMessage,
+                                .receipt(.receiveMessageError(.init(messageId: messageID, error: .messageHashesMismatch)))
+                )
+        }
+
+        func assertSendsConfirmationReceipt() async throws {
+                let sentMessage = await dataChannel.sentData.prefix(1).collect().first!
+                let decodedSentMessage = try JSONDecoder().decode(DataChannelMessage.self, from: sentMessage)
+
+                XCTAssertEqual(
+                        decodedSentMessage,
+                        .receipt(.receiveMessageConfirmation(.init(messageId: messageID)))
+                )
+        }
 }
 
 extension Data {
@@ -211,7 +232,7 @@ final class DataChannelDelegateMock: DataChannelDelegate, Sendable {
 }
 
 extension DataChannelDelegateMock {
-	func receiveIncommingPackage(_ message: ChunkedMessagePackage) throws {
+	func receiveIncommingMessage(_ message: DataChannelMessage) throws {
 		let data = try JSONEncoder().encode(message)
 		onMessageReceivedContinuation.yield(data)
 	}

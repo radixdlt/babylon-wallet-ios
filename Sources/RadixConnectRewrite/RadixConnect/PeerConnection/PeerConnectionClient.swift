@@ -33,9 +33,9 @@ extension PeerConnectionClient {
 		try await dataChannelClient.sendMessage(data)
 	}
 
-	func receivedMessagesStream() async -> AnyAsyncSequence<Result<MessageAssembler.IncommingMessage, Error>> {
-		await dataChannelClient.receivedMessages
-	}
+//	func receivedMessagesStream() async -> AnyAsyncSequence<Result<MessageAssembler.IncommingMessage, Error>> {
+//		await dataChannelClient.receivedMessages
+//	}
 }
 
 extension PeerConnectionClient {
