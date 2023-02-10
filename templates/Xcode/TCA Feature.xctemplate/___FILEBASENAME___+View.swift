@@ -1,11 +1,15 @@
 import FeaturePrelude
 
+public extension ___VARIABLE_featureName___.State {
+	var viewState: ___VARIABLE_featureName___.ViewState {
+		.init()
+	}
+}
+
 // MARK: - ___VARIABLE_featureName___.View
 public extension ___VARIABLE_featureName___ {
 	struct ViewState: Equatable {
-		public init(state: ___VARIABLE_featureName___.State) {
-			// TODO: implement
-		}
+		// TODO: declare some properties
 	}
 
 	@MainActor
@@ -17,11 +21,7 @@ public extension ___VARIABLE_featureName___ {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: ___VARIABLE_featureName___.ViewState.init(state:),
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				// TODO: implement
 				Text("Implement: ___VARIABLE_featureName___")
 					.background(Color.yellow)
