@@ -10,12 +10,8 @@ public extension ConnectedDApps {
 			self.store = store
 		}
 	}
-}
 
-// MARK: - Body
-
-public extension ConnectedDApps.View {
-	struct ViewState: Equatable {
+	internal struct ViewState: Equatable {
 		let dApps: [DAppRowModel] = [
 			.init(name: "NBA Top Shot", thumbnail: .placeholder),
 			.init(name: "RTFK", thumbnail: .placeholder),
@@ -24,13 +20,13 @@ public extension ConnectedDApps.View {
 			.init(name: "Randi Zuckerberg", thumbnail: .placeholder),
 		]
 	}
+}
 
+// MARK: - Body
+
+public extension ConnectedDApps.View {
 	var body: some View {
-		WithViewStore(
-			store,
-			observe: \.viewState,
-			send: { .view($0) }
-		) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
 					BodyText(L10n.ConnectedDApps.body)
@@ -66,7 +62,7 @@ private extension ConnectedDApps.Store {
 }
 
 private extension ConnectedDApps.State {
-	var viewState: ConnectedDApps.View.ViewState {
+	var viewState: ConnectedDApps.ViewState {
 		.init()
 	}
 }

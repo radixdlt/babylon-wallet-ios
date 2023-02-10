@@ -23,11 +23,7 @@ public extension ConnectedDApp {
 
 public extension ConnectedDApp.View {
 	var body: some View {
-		WithViewStore(
-			store,
-			observe: \.viewState,
-			send: { .view($0) }
-		) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(alignment: .leading, spacing: 0) {
 					ConnectedDAppHeader(model: viewStore.dApp)

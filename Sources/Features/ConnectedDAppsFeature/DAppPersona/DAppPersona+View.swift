@@ -11,45 +11,40 @@ public extension DAppPersona {
 			self.store = store
 		}
 	}
+
+	internal struct ViewState: Equatable {
+		let persona: String
+	}
 }
 
 // MARK: - Body
 
 public extension DAppPersona.View {
-	struct ViewState: Equatable {
-		let persona: String
-	}
-	
 	var body: some View {
-			WithViewStore(
-				store,
-				observe: \.viewState,
-				send: { .view($0) }
-			) { viewStore in
-				ScrollView {
-					VStack(spacing: 0) {
-						BodyText(L10n.DAppPersona.body)
-						
-						Separator()
-												
-						Text("A persona called \(viewStore.persona)")
-							.padding(30)
-							.border(.brown)
-							.padding(30)
-						Spacer()
-					}
-					.padding(.horizontal, .medium3)
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			ScrollView {
+				VStack(spacing: 0) {
+					BodyText(L10n.DAppPersona.body)
+
+					Separator()
+
+					Text("A persona called \(viewStore.persona)")
+						.padding(30)
+						.border(.brown)
+						.padding(30)
+					Spacer()
 				}
-				.navBarTitle(viewStore.persona)
+				.padding(.horizontal, .medium3)
 			}
+			.navBarTitle(viewStore.persona)
+		}
 	}
 }
 
 // MARK: - Extensions
 
 private extension DAppPersona.State {
-	var viewState: DAppPersona.View.ViewState {
+	var viewState: DAppPersona.ViewState {
 		.init(persona: persona)
 	}
 }
-
