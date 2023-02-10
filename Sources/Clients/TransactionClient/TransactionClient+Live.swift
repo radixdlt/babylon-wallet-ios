@@ -169,7 +169,7 @@ public extension TransactionClient {
 			networkID: NetworkID,
 			manifest: TransactionManifest,
 			makeTransactionHeaderInput: MakeTransactionHeaderInput,
-			getNotaryAndSigners: @Sendable (AccountAddressesNeedingToSignTransactionRequest) async throws -> NotaryAndSigners
+			getNotaryAndSigners: @Sendable (AccountAddressesInvolvedInTransactionRequest) async throws -> NotaryAndSigners
 		) async -> Result<(intent: TransactionIntent, notaryAndSigners: NotaryAndSigners), TransactionFailure.FailedToPrepareForTXSigning> {
 			let nonce = engineToolkitClient.generateTXNonce()
 			let epoch: Epoch
@@ -181,7 +181,7 @@ public extension TransactionClient {
 
 			let version = engineToolkitClient.getTransactionVersion()
 
-			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesNeedingToSignTransactionRequest(
+			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesInvolvedInTransactionRequest(
 				version: version,
 				manifest: manifest,
 				networkID: networkID
@@ -224,7 +224,7 @@ public extension TransactionClient {
 		func signAndSubmit(
 			manifest: TransactionManifest,
 			makeTransactionHeaderInput: MakeTransactionHeaderInput,
-			getNotaryAndSigners: @escaping @Sendable (AccountAddressesNeedingToSignTransactionRequest) async throws -> NotaryAndSigners
+			getNotaryAndSigners: @escaping @Sendable (AccountAddressesInvolvedInTransactionRequest) async throws -> NotaryAndSigners
 		) async -> TransactionResult {
 			await buildTransactionIntent(
 				networkID: profileClient.getCurrentNetworkID(),
@@ -288,7 +288,7 @@ public extension TransactionClient {
 
 				let version = engineToolkitClient.getTransactionVersion()
 
-				let accountAddressesNeedingToSignTransactionRequest = AccountAddressesNeedingToSignTransactionRequest(
+				let accountsSuitableToPayForTXFeeRequest = AccountAddressesInvolvedInTransactionRequest(
 					version: version,
 					manifest: manifestWithJSONInstructions.convertedManifestThatContainsThem,
 					networkID: networkID
@@ -297,12 +297,10 @@ public extension TransactionClient {
 				let lockFeeAmount = 10
 
 				let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
-					let addressesManifestReferences =
-						try engineToolkitClient.accountAddressesNeedingToSignTransaction(
-							accountAddressesNeedingToSignTransactionRequest
-						)
+					let accountAddressesSuitableToPayTransactionFeeRef =
+						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-					let xrdContainers = try await addressesManifestReferences.concurrentMap { try await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
+					let xrdContainers = try await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { try await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
 					let firstWithEnoughFunds = xrdContainers.first(where: { $0.unsafeFailingAmountWithoutPrecision >= Float(lockFeeAmount) })?.owner
 
 					if let firstWithEnoughFunds = firstWithEnoughFunds {

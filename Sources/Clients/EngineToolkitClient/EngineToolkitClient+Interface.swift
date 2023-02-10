@@ -15,6 +15,7 @@ public struct EngineToolkitClient: Sendable, DependencyKey {
 
 	public var generateTXID: GenerateTXID
 	public var accountAddressesNeedingToSignTransaction: AccountAddressesNeedingToSignTransaction
+	public var accountAddressesSuitableToPayTransactionFee: AccountAddressesSuitableToPayTransactionFee
 
 	public var knownEntityAddresses: KnownEntityAddresses
 }
@@ -44,7 +45,8 @@ public extension EngineToolkitClient {
 
 	typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (ConvertManifestInstructionsToJSONIfItWasStringRequest) throws -> JSONInstructionsTransactionManifest
 
-	typealias AccountAddressesNeedingToSignTransaction = @Sendable (AccountAddressesNeedingToSignTransactionRequest) throws -> Set<AccountAddress>
+	typealias AccountAddressesNeedingToSignTransaction = @Sendable (AccountAddressesInvolvedInTransactionRequest) throws -> Set<AccountAddress>
+	typealias AccountAddressesSuitableToPayTransactionFee = @Sendable (AccountAddressesInvolvedInTransactionRequest) throws -> Set<AccountAddress>
 
 	typealias CompileTransactionIntent = @Sendable (TransactionIntent) throws -> CompileTransactionIntentResponse
 
@@ -57,8 +59,8 @@ public extension EngineToolkitClient {
 	typealias KnownEntityAddresses = @Sendable (NetworkID) throws -> KnownEntityAddressesResponse
 }
 
-// MARK: - AccountAddressesNeedingToSignTransactionRequest
-public struct AccountAddressesNeedingToSignTransactionRequest: Sendable, Hashable {
+// MARK: - AccountAddressesInvolvedInTransactionRequest
+public struct AccountAddressesInvolvedInTransactionRequest: Sendable, Hashable {
 	public let version: TXVersion
 	public let manifest: TransactionManifest
 	public let networkID: NetworkID
