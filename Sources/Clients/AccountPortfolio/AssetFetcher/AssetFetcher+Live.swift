@@ -1,7 +1,6 @@
 import ClientPrelude
 import EngineToolkitClient
 import GatewayAPI
-import ProfileClient
 
 // MARK: - AssetFetcher + DependencyKey
 extension AssetFetcher: DependencyKey {
@@ -10,7 +9,7 @@ extension AssetFetcher: DependencyKey {
 			@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 			let resourcesResponse = try await gatewayAPIClient.accountResourcesByAddress(accountAddress)
-			var accountPortfolio = try await AccountPortfolio(response: resourcesResponse)
+			var accountPortfolio = try AccountPortfolio(response: resourcesResponse)
 
 			let fungibleTokenAddresses = accountPortfolio.fungibleTokenContainers.map(\.asset.componentAddress)
 			let nonFungibleTokenAddresses = accountPortfolio.nonFungibleTokenContainers.map(\.resourceAddress)
@@ -59,12 +58,11 @@ extension AssetFetcher: DependencyKey {
 
 // MARK: - Helpers - Resources response
 extension AccountPortfolio {
-	init(response: GatewayAPI.EntityResourcesResponse) async throws {
+	init(response: GatewayAPI.EntityResourcesResponse) throws {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
-		@Dependency(\.profileClient.getCurrentNetworkID) var getCurrentNetworkID
-		let networkID = await getCurrentNetworkID()
 		let fungibleContainers = try response.fungibleResources.items.map {
 			let componentAddress = ComponentAddress(address: $0.address)
+			let networkID = try Network.lookupBy(name: response.ledgerState.network).id
 			let isXRD = try engineToolkitClient.isXRD(component: componentAddress, on: networkID)
 			return FungibleTokenContainer(
 				owner: try .init(address: response.address),

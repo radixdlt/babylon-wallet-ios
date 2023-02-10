@@ -242,7 +242,6 @@ package.addModules([
 			"Cryptography",
 			"EngineToolkit",
 			"Profile",
-			"ProfileClient",
 		],
 		tests: .yes()
 	),
