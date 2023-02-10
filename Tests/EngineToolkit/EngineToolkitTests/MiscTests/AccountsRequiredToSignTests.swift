@@ -170,6 +170,9 @@ final class AccountsRequiredToSignTests: TestCase {
 			"account_sim1q0ewuyq9780mrftmlx706qrlw8n5rk48qj876p3zzrwqj28net",
 			"account_sim1q04p2nchcux4x3ppeq98f73ku83zem6yf0f9t2ad0lss5c20ea",
 		]
+		var expectedAccountsSuitableToPayFee = expectedAccountsRequiredToSign
+		expectedAccountsSuitableToPayFee.insert("account_sim1qd3gq5m2lnfc8ahau2td5mprqf44nucsgxagmllnsjyqj426ly")
+		expectedAccountsSuitableToPayFee.insert("account_sim1qdv0uj0zs7qrcyl6qee0csu6prdssuz9r7uldsz3sqhqvw24hw")
 
 		// Act
 		let accountsRequiredToSign = try transactionManifest.accountsRequiredToSign(networkId: 0xF2)
@@ -185,7 +188,7 @@ final class AccountsRequiredToSignTests: TestCase {
 
 		// Assert
 		XCTAssertNoDifference(
-			expectedAccountsRequiredToSign,
+			expectedAccountsSuitableToPayFee,
 			accountsSuitableToPayTXFee
 		)
 	}
