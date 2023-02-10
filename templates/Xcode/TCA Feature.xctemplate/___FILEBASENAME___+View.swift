@@ -16,7 +16,7 @@ public extension ___VARIABLE_featureName___ {
 			self.store = store
 		}
 
-		public var body: some View {
+		public var body: some SwiftUI.View {
 			WithViewStore(
 				store,
 				observe: ___VARIABLE_featureName___.ViewState.init(state:),
