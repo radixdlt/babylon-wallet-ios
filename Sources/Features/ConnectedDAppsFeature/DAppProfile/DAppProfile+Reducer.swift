@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - ConnectedDApp
-public struct ConnectedDApp: Sendable, FeatureReducer {
+// MARK: - DAppProfile
+public struct DAppProfile: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
 
 	public init() {}
@@ -9,7 +9,7 @@ public struct ConnectedDApp: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.presentationDestination(\.$selectedPersona, action: /Action.child .. ChildAction.selectedPersona) {
-				DAppPersona()
+				PersonaProfile()
 			}
 	}
 
@@ -24,16 +24,16 @@ public struct ConnectedDApp: Sendable, FeatureReducer {
 	}
 }
 
-// MARK: ConnectedDApp.State
-public extension ConnectedDApp {
+// MARK: DAppProfile.State
+public extension DAppProfile {
 	struct State: Sendable, Hashable {
 		public let name: String
-		public let personas: [DAppPersonaRowModel] = .debug
-		public let dApp: ConnectedDAppModel
+		public let personas: [PersonaProfileRowModel] = .debug
+		public let dApp: DAppProfileModel
 
-		@PresentationState public var selectedPersona: DAppPersona.State?
+		@PresentationState public var selectedPersona: PersonaProfile.State?
 
-		public init(name: String, selectedPersona: DAppPersona.State? = nil) {
+		public init(name: String, selectedPersona: PersonaProfile.State? = nil) {
 			self.name = name
 			self.dApp = .debug(name)
 			self.selectedPersona = selectedPersona
@@ -43,19 +43,19 @@ public extension ConnectedDApp {
 
 // MARK: - Action
 
-public extension ConnectedDApp {
+public extension DAppProfile {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case didSelectPersona(String)
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case selectedPersona(PresentationActionOf<DAppPersona>)
+		case selectedPersona(PresentationActionOf<PersonaProfile>)
 	}
 }
 
-// MARK: - ConnectedDAppModel
-public struct ConnectedDAppModel: Identifiable, Hashable, Sendable {
+// MARK: - DAppProfileModel
+public struct DAppProfileModel: Identifiable, Hashable, Sendable {
 	public let id: UUID = .init()
 	let name: String
 	let description: String
@@ -63,33 +63,17 @@ public struct ConnectedDAppModel: Identifiable, Hashable, Sendable {
 	let tokens: Int
 }
 
-extension ConnectedDAppModel {
-	static func debug(_ name: String) -> ConnectedDAppModel {
+extension DAppProfileModel {
+	static func debug(_ name: String) -> DAppProfileModel {
 		.init(name: name,
-		      description: .lorem,
+		      description: .nbaTopShot,
 		      domainNames: ["https://nft.nike.com", "https://meta-radix.xyz"],
 		      tokens: .random(in: 5 ... 20))
 	}
 }
 
-// MARK: - DAppPersonaRowModel
-public struct DAppPersonaRowModel: Identifiable, Hashable, Sendable {
-	public let id: UUID = .init()
-	let thumbnail: URL = .placeholder
-	let name: String
-	let sharingStatus: String = "Sharing"
-	let personalDataCount: Int
-	let accountCount: Int
-}
-
-extension [DAppPersonaRowModel] {
-	static let debug: [DAppPersonaRowModel] = [
-		.init(name: "RadMatt", personalDataCount: 3, accountCount: 2),
-		.init(name: "MattMountain", personalDataCount: 4, accountCount: 1),
-		.init(name: "RonaldMcD", personalDataCount: 2, accountCount: 1),
-	]
-}
-
 extension String {
+	static let nbaTopShot: String = "NBA Top Shot is a decentralized application that provides users with the opportunity to purchase, collect, and showcase digital blockchain collectibles"
+
 	static let lorem: String = "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt."
 }

@@ -3,12 +3,13 @@ import FeaturePrelude
 // MARK: - ConnectedDApps
 public struct ConnectedDApps: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
+
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.presentationDestination(\.$selectedDApp, action: /Action.child .. ChildAction.selectedDApp) {
-				ConnectedDApp()
+				DAppProfile()
 			}
 	}
 
@@ -26,12 +27,27 @@ public struct ConnectedDApps: Sendable, FeatureReducer {
 // MARK: ConnectedDApps.State
 public extension ConnectedDApps {
 	struct State: Sendable, Hashable {
-		@PresentationState public var selectedDApp: ConnectedDApp.State?
+		@PresentationState public var selectedDApp: DAppProfile.State?
 
-		public init(selectedDApp: ConnectedDApp.State? = nil) {
+		public let dApps: [DAppRowModel]
+
+		public init(selectedDApp: DAppProfile.State? = nil) {
 			self.selectedDApp = selectedDApp
+			self.dApps = [
+				.init(name: "NBA Top Shot", thumbnail: .placeholder),
+				.init(name: "Megaswap", thumbnail: .placeholder),
+				.init(name: "UniDEX", thumbnail: .placeholder),
+				.init(name: "Nas Black", thumbnail: .placeholder),
+			]
 		}
 	}
+}
+
+// MARK: - DAppRowModel
+public struct DAppRowModel: Identifiable, Hashable {
+	public let id: UUID = .init()
+	public let name: String
+	public let thumbnail: URL
 }
 
 // MARK: - Action
@@ -45,6 +61,6 @@ public extension ConnectedDApps {
 	enum DelegateAction: Sendable, Equatable {}
 
 	enum ChildAction: Sendable, Equatable {
-		case selectedDApp(PresentationActionOf<ConnectedDApp>)
+		case selectedDApp(PresentationActionOf<DAppProfile>)
 	}
 }

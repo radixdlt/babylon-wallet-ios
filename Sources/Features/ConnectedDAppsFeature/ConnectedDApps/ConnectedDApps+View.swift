@@ -12,13 +12,7 @@ public extension ConnectedDApps {
 	}
 
 	internal struct ViewState: Equatable {
-		let dApps: [DAppRowModel] = [
-			.init(name: "NBA Top Shot", thumbnail: .placeholder),
-			.init(name: "RTFK", thumbnail: .placeholder),
-			.init(name: "Nas Black", thumbnail: .placeholder),
-			.init(name: "Razzlekhan", thumbnail: .placeholder),
-			.init(name: "Randi Zuckerberg", thumbnail: .placeholder),
-		]
+		let dApps: [DAppRowModel]
 	}
 }
 
@@ -33,21 +27,24 @@ public extension ConnectedDApps.View {
 
 					Separator()
 
-					ForEach(viewStore.dApps) { dApp in
-						PlainListRow(title: dApp.name) {
-							DAppPlaceholder()
-						} action: {
-							viewStore.send(.didSelectDApp(dApp.name))
+					VStack(spacing: .medium3) {
+						ForEach(viewStore.dApps) { dApp in
+							RadixCard(padding: 0) {
+								PlainListRow(title: dApp.name) {
+									DAppPlaceholder()
+								} action: {
+									viewStore.send(.didSelectDApp(dApp.name))
+								}
+							}
 						}
 					}
-
 					Spacer()
 				}
 				.padding(.horizontal, .medium3)
 			}
 			.navBarTitle(L10n.ConnectedDApps.title)
 			.navigationDestination(store: store.selectedDApp) { store in
-				ConnectedDApp.View(store: store)
+				DAppProfile.View(store: store)
 			}
 		}
 	}
@@ -56,22 +53,15 @@ public extension ConnectedDApps.View {
 // MARK: - Extensions
 
 private extension ConnectedDApps.Store {
-	var selectedDApp: PresentationStoreOf<ConnectedDApp> {
+	var selectedDApp: PresentationStoreOf<DAppProfile> {
 		scope(state: \.$selectedDApp) { .child(.selectedDApp($0)) }
 	}
 }
 
 private extension ConnectedDApps.State {
 	var viewState: ConnectedDApps.ViewState {
-		.init()
+		.init(dApps: dApps)
 	}
-}
-
-// MARK: - DAppRowModel
-struct DAppRowModel: Identifiable, Equatable {
-	let id: UUID = .init()
-	let name: String
-	let thumbnail: URL
 }
 
 // MARK: - BodyText
@@ -96,5 +86,47 @@ public struct BodyText: View {
 			Spacer(minLength: 0)
 		}
 		.padding(.vertical, .medium3)
+	}
+}
+
+// MARK: - RadixCard
+public struct RadixCard<Contents: View>: View {
+	private let contents: Contents
+	private let padding: CGFloat
+
+	public init(padding: CGFloat = .medium3, @ViewBuilder contents: () -> Contents) {
+		self.contents = contents()
+		self.padding = padding
+	}
+
+	public var body: some View {
+		HStack(spacing: 0) {
+			contents
+		}
+		.padding(padding)
+		.cardStyle
+	}
+}
+
+public extension View {
+	var cardStyle: some View {
+		background {
+			RoundedRectangle(cornerRadius: .small1)
+				.fill(.white)
+				.radixShadow
+		}
+	}
+
+	var radixShadow: some View {
+		shadow(color: .app.gray2.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
+	}
+}
+
+// MARK: - RadixChevron
+public struct RadixChevron: View {
+	public var body: some View {
+		Image(asset: AssetResource.chevronRight)
+			.foregroundColor(.app.gray1)
+			.padding(.trailing, 2)
 	}
 }

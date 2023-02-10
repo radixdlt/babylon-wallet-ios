@@ -332,10 +332,6 @@ public enum L10n {
       }
     }
   }
-  public enum DAppPersona {
-    /// You are currently sharing the following pieces of personal data required by this dApp.
-    public static let body = L10n.tr("Localizable", "dAppPersona.body", fallback: "You are currently sharing the following pieces of personal data required by this dApp.")
-  }
   public enum FungibleTokenList {
     public enum Detail {
       /// Current Supply
@@ -483,6 +479,10 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "personaList.subtitle", fallback: "Here are all the Personas connected to your account")
     /// Personas
     public static let title = L10n.tr("Localizable", "personaList.title", fallback: "Personas")
+  }
+  public enum PersonaProfile {
+    /// You are currently sharing the following pieces of personal data required by this dApp.
+    public static let body = L10n.tr("Localizable", "personaProfile.body", fallback: "You are currently sharing the following pieces of personal data required by this dApp.")
   }
   public enum Personas {
     /// Create a New Persona

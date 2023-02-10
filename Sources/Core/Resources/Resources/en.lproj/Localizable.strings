@@ -130,7 +130,7 @@
 "connectedDApp.domainsHeading" = "Domains:";
 "connectedDApp.tokensHeading" = "Tokens:";
 
-"dAppPersona.body" = "You are currently sharing the following pieces of personal data required by this dApp.";
+"personaProfile.body" = "You are currently sharing the following pieces of personal data required by this dApp.";
 
 "newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
 "newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";

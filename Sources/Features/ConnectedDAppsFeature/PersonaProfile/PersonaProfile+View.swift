@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - View
 
-public extension DAppPersona {
+public extension PersonaProfile {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: Store
@@ -19,12 +19,12 @@ public extension DAppPersona {
 
 // MARK: - Body
 
-public extension DAppPersona.View {
+public extension PersonaProfile.View {
 	var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
-					BodyText(L10n.DAppPersona.body)
+					BodyText(L10n.PersonaProfile.body)
 
 					Separator()
 
@@ -43,8 +43,8 @@ public extension DAppPersona.View {
 
 // MARK: - Extensions
 
-private extension DAppPersona.State {
-	var viewState: DAppPersona.ViewState {
+private extension PersonaProfile.State {
+	var viewState: PersonaProfile.ViewState {
 		.init(persona: persona)
 	}
 }

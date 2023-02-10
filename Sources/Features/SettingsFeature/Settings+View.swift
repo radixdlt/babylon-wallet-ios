@@ -96,7 +96,7 @@ private extension AppSettings.View {
 						ConnectExtensionView {
 							viewStore.send(.addP2PClientButtonTapped)
 						}
-						.padding([.vertical], .medium3)
+						.padding(.medium3)
 					}
 
 					#if DEBUG
@@ -107,7 +107,7 @@ private extension AppSettings.View {
 					} action: {
 						viewStore.send(.debugInspectProfileButtonTapped)
 					}
-
+					.withSeparator
 					#endif
 
 					PlainListRow(
@@ -116,6 +116,7 @@ private extension AppSettings.View {
 					) {
 						viewStore.send(.manageP2PClientsButtonTapped)
 					}
+					.withSeparator
 
 					PlainListRow(
 						title: L10n.Settings.connectedDAppsButtonTitle,
@@ -123,6 +124,7 @@ private extension AppSettings.View {
 					) {
 						viewStore.send(.connectedDAppsButtonTapped)
 					}
+					.withSeparator
 
 					PlainListRow(
 						title: L10n.Settings.gatewayButtonTitle,
@@ -130,6 +132,7 @@ private extension AppSettings.View {
 					) {
 						viewStore.send(.editGatewayAPIEndpointButtonTapped)
 					}
+					.withSeparator
 
 					PlainListRow(
 						title: L10n.Settings.personasButtonTitle,
@@ -137,9 +140,9 @@ private extension AppSettings.View {
 					) {
 						viewStore.send(.personasButtonTapped)
 					}
+					.withSeparator
 				}
 				.buttonStyle(.settingsRowStyle)
-				.padding(.horizontal, .medium3)
 				.padding(.bottom, .large3)
 				VStack(spacing: .zero) {
 					Button(L10n.Settings.deleteAllButtonTitle) {

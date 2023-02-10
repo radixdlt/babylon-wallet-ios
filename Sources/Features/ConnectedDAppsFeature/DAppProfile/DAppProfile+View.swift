@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - View
 
-public extension ConnectedDApp {
+public extension DAppProfile {
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: Store
@@ -14,19 +14,19 @@ public extension ConnectedDApp {
 
 	internal struct ViewState: Equatable {
 		let name: String
-		let personas: [DAppPersonaRowModel]
-		let dApp: ConnectedDAppModel
+		let personas: [PersonaProfileRowModel]
+		let dApp: DAppProfileModel
 	}
 }
 
 // MARK: - Body
 
-public extension ConnectedDApp.View {
+public extension DAppProfile.View {
 	var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(alignment: .leading, spacing: 0) {
-					ConnectedDAppHeader(model: viewStore.dApp)
+					DAppProfileHeader(model: viewStore.dApp)
 
 					BodyText(L10n.ConnectedDApp.body)
 
@@ -35,16 +35,19 @@ public extension ConnectedDApp.View {
 							Button {
 								viewStore.send(.didSelectPersona(persona.name))
 							} label: {
-								DAppPersonaCard(model: persona)
+								RadixCard {
+									PersonaProfileCard(model: persona)
+								}
 							}
 						}
 					}
 					Spacer()
 				}
+				.padding(.top, .medium1)
 				.padding(.horizontal, .medium3)
 				.navBarTitle(viewStore.name)
 				.navigationDestination(store: store.selectedPersona) { store in
-					DAppPersona.View(store: store)
+					PersonaProfile.View(store: store)
 				}
 			}
 		}
@@ -53,14 +56,14 @@ public extension ConnectedDApp.View {
 
 // MARK: - Extensions
 
-private extension ConnectedDApp.Store {
-	var selectedPersona: PresentationStoreOf<DAppPersona> {
+private extension DAppProfile.Store {
+	var selectedPersona: PresentationStoreOf<PersonaProfile> {
 		scope(state: \.$selectedPersona) { .child(.selectedPersona($0)) }
 	}
 }
 
-private extension ConnectedDApp.State {
-	var viewState: ConnectedDApp.ViewState {
+private extension DAppProfile.State {
+	var viewState: DAppProfile.ViewState {
 		.init(name: name,
 		      personas: personas,
 		      dApp: dApp)
@@ -80,36 +83,51 @@ public extension View {
 	}
 }
 
-// MARK: - ConnectedDAppHeader
+// MARK: - DAppProfileHeader
 // TODO: • Move somewhere else
 
-struct ConnectedDAppHeader: View {
-	let model: ConnectedDAppModel
+struct DAppProfileHeader: View {
+	let model: DAppProfileModel
 
 	var body: some View {
-		VStack(alignment: .leading, spacing: .small2) {
-			HStack(alignment: .top, spacing: .small2) {
-				DAppPlaceholder(large: true)
+		VStack(spacing: .medium1) {
+			DAppPlaceholder(size: .veryLarge)
+			//				.padding(.bottom, .small2)
+			Separator()
+				.padding(.horizontal, .medium1)
+			Text(model.description)
+				.textStyle(.body1Regular)
+				.foregroundColor(.app.gray1)
+				.padding(.horizontal, .large2)
+			Separator()
+				.padding(.horizontal, .medium1)
+			VStack(spacing: .medium3) {
+				HStack(spacing: 0) {
+					Text("•• dApp definition")
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray2)
+					Spacer(minLength: 0)
+					Text("•• dApp definition")
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray2)
+				}
+			}
 
-				if model.domainNames.count > 0 {
-					VStack(alignment: .leading, spacing: 0) {
-						Text(L10n.ConnectedDApp.domainsHeading)
-							.textStyle(.body2HighImportance)
-							.padding(.bottom, .small2)
-						VStack(alignment: .leading, spacing: .small3) {
-							ForEach(model.domainNames, id: \.self) { domainName in
-								Text(domainName)
-									.textStyle(.body2Header)
-									.foregroundColor(.app.gray2)
-							}
+			if model.domainNames.count > 0 {
+				VStack(alignment: .leading, spacing: 0) {
+					Text(L10n.ConnectedDApp.domainsHeading)
+						.textStyle(.body2HighImportance)
+						.padding(.bottom, .small2)
+					VStack(alignment: .leading, spacing: .small3) {
+						ForEach(model.domainNames, id: \.self) { domainName in
+							Text(domainName)
+								.textStyle(.body2Header)
+								.foregroundColor(.app.gray2)
 						}
 					}
 				}
-				Spacer(minLength: 0)
 			}
 			.padding(.top, .medium3)
-
-			BodyText(model.description)
 
 			if model.tokens > 0 {
 				Text(L10n.ConnectedDApp.tokensHeading)
@@ -127,9 +145,9 @@ struct ConnectedDAppHeader: View {
 	}
 }
 
-// MARK: - DAppPersonaCard
-struct DAppPersonaCard: View {
-	let model: DAppPersonaRowModel
+// MARK: - PersonaProfileCard
+struct PersonaProfileCard: View {
+	let model: PersonaProfileRowModel
 
 	var body: some View {
 		HStack(spacing: 0) {
@@ -156,17 +174,7 @@ struct DAppPersonaCard: View {
 				.foregroundColor(.app.gray2)
 			}
 			Spacer()
-			Image(asset: AssetResource.chevronRight)
-				.foregroundColor(.app.gray1)
-				.padding(.trailing, 2)
-		}
-		.padding(.medium2)
-		.background {
-			VStack {
-				RoundedRectangle(cornerRadius: .small1)
-					.fill(.app.gray5)
-					.shadow(color: .app.shadowBlack, radius: .small2, x: .zero, y: .small2)
-			}
+			RadixChevron()
 		}
 	}
 }
