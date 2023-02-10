@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -o errexit # exit out if any command fails
+set -o nounset # exit out if any used variable is unset
+
 echo "Installing CLI tools (if missing)"
 if ! command -v grealpath &> /dev/null; then
     brew install coreutils
