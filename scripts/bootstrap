@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "Installing CLI tools (if missing)"
-if ! command -v gln &> /dev/null; then
+if ! command -v grealpath &> /dev/null; then
     brew install coreutils
 fi
 if ! command -v swiftformat &> /dev/null; then
@@ -15,12 +15,12 @@ pushd "$DIR/.." > /dev/null
 echo "Symlinking Git hooks"
 GIT_HOOKS_DIR=.git/hooks
 mkdir -p "$GIT_HOOKS_DIR"
-ln -sf "$(realpath --relative-to=.git/hooks scripts)/pre-commit" "$GIT_HOOKS_DIR"
+ln -sf "$(grealpath --relative-to=.git/hooks scripts)/pre-commit" "$GIT_HOOKS_DIR"
 
 echo "Importing custom Xcode templates"
 XCODE_TEMPLATES_DIR="$HOME/Library/Developer/Xcode/Templates/File Templates"
 mkdir -p "$XCODE_TEMPLATES_DIR"
-gln -sf -T "$(realpath --relative-to="$XCODE_TEMPLATES_DIR" templates/Xcode)" "$XCODE_TEMPLATES_DIR/babylon-wallet-ios"
+gln -sf -T "$(grealpath --relative-to="$XCODE_TEMPLATES_DIR" templates/Xcode)" "$XCODE_TEMPLATES_DIR/babylon-wallet-ios"
 
 echo "Done ✅"
 
