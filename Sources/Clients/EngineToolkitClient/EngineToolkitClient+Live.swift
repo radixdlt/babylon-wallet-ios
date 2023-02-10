@@ -64,6 +64,15 @@ public extension EngineToolkitClient {
 					}
 				)
 			},
+			accountAddressesSuitableToPayTransactionFee: { request throws -> Set<AccountAddress> in
+				try Set(
+					request.manifest.accountsSuitableToPayTXFee(
+						networkId: request.networkID
+					).map {
+						try AccountAddress(componentAddress: $0)
+					}
+				)
+			},
 			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in
 				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).get()
 			}

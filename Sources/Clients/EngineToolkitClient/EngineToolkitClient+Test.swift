@@ -17,6 +17,7 @@ extension EngineToolkitClient: TestDependencyKey {
 		compileNotarizedTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
 		generateTXID: { _ in "deadbeef" },
 		accountAddressesNeedingToSignTransaction: { _ in [] },
+		accountAddressesSuitableToPayTransactionFee: { _ in [] },
 		knownEntityAddresses: { _ in throw NoopError() }
 	)
 
@@ -29,6 +30,7 @@ extension EngineToolkitClient: TestDependencyKey {
 		compileNotarizedTransactionIntent: unimplemented("\(Self.self).compileNotarizedTransactionIntent"),
 		generateTXID: unimplemented("\(Self.self).generateTXID"),
 		accountAddressesNeedingToSignTransaction: unimplemented("\(Self.self).accountAddressesNeedingToSignTransaction"),
+		accountAddressesSuitableToPayTransactionFee: unimplemented("\(Self.self).accountAddressesSuitableToPayTransactionFee"),
 		knownEntityAddresses: unimplemented("\(Self.self).knownEntityAddresses")
 	)
 }
