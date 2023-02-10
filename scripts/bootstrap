@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "Installing CLI tools (if missing)"
-if ! command -v realpath &> /dev/null; then
+if ! command -v gln &> /dev/null; then
     brew install coreutils
 fi
 if ! command -v swiftformat &> /dev/null; then
