@@ -1,36 +1,34 @@
 import FeaturePrelude
 
-// MARK: - Reducer
-
+// MARK: - ConnectedDApps
 public struct ConnectedDApps: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
 	public init() {}
-	
+
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.selectedDApp, action: /Action.child .. ChildAction.selectedDApp) {
+			.presentationDestination(\.$selectedDApp, action: /Action.child .. ChildAction.selectedDApp) {
 				ConnectedDApp()
 			}
 	}
 
-    public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-        switch viewAction {
-        case .appeared:
-            return .none
-		case .didSelectDApp(let name):
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .appeared:
+			return .none
+		case let .didSelectDApp(name):
 			// TODO: • This proxying is only necessary because of our strict view/child separation
 			return .send(.child(.selectedDApp(.present(.init(name: name)))))
-        }
-    }
+		}
+	}
 }
 
-// MARK: - State
-
+// MARK: ConnectedDApps.State
 public extension ConnectedDApps {
 	struct State: Sendable, Hashable {
-		public var selectedDApp: PresentationStateOf<ConnectedDApp>
-		
-		public init(selectedDApp: PresentationStateOf<ConnectedDApp> = .dismissed) {
+		@PresentationState public var selectedDApp: ConnectedDApp.State?
+
+		public init(selectedDApp: ConnectedDApp.State? = nil) {
 			self.selectedDApp = selectedDApp
 		}
 	}
@@ -43,10 +41,9 @@ public extension ConnectedDApps {
 		case appeared
 		case didSelectDApp(String)
 	}
-	
-	enum DelegateAction: Sendable, Equatable {
-	}
-	
+
+	enum DelegateAction: Sendable, Equatable {}
+
 	enum ChildAction: Sendable, Equatable {
 		case selectedDApp(PresentationActionOf<ConnectedDApp>)
 	}

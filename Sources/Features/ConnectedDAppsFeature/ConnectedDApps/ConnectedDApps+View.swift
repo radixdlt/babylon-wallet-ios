@@ -1,16 +1,15 @@
 import FeaturePrelude
 
-// MARK: - View
-
+// MARK: - ConnectedDApps.View
 public extension ConnectedDApps {
-    @MainActor
-    struct View: SwiftUI.View {
-        private let store: Store
+	@MainActor
+	struct View: SwiftUI.View {
+		private let store: Store
 
-        public init(store: Store) {
-            self.store = store
-        }
-    }
+		public init(store: Store) {
+			self.store = store
+		}
+	}
 }
 
 // MARK: - Body
@@ -22,10 +21,10 @@ public extension ConnectedDApps.View {
 			.init(name: "RTFK", thumbnail: .placeholder),
 			.init(name: "Nas Black", thumbnail: .placeholder),
 			.init(name: "Razzlekhan", thumbnail: .placeholder),
-			.init(name: "Randi Zuckerberg", thumbnail: .placeholder)
+			.init(name: "Randi Zuckerberg", thumbnail: .placeholder),
 		]
 	}
-	
+
 	var body: some View {
 		WithViewStore(
 			store,
@@ -35,9 +34,9 @@ public extension ConnectedDApps.View {
 			ScrollView {
 				VStack(spacing: 0) {
 					BodyText(L10n.ConnectedDApps.body)
-					
+
 					Separator()
-					
+
 					ForEach(viewStore.dApps) { dApp in
 						PlainListRow(title: dApp.name) {
 							DAppPlaceholder()
@@ -45,7 +44,7 @@ public extension ConnectedDApps.View {
 							viewStore.send(.didSelectDApp(dApp.name))
 						}
 					}
-					
+
 					Spacer()
 				}
 				.padding(.horizontal, .medium3)
@@ -62,7 +61,7 @@ public extension ConnectedDApps.View {
 
 private extension ConnectedDApps.Store {
 	var selectedDApp: PresentationStoreOf<ConnectedDApp> {
-		scope(state: \.selectedDApp) { .child(.selectedDApp($0)) }
+		scope(state: \.$selectedDApp) { .child(.selectedDApp($0)) }
 	}
 }
 
@@ -72,12 +71,14 @@ private extension ConnectedDApps.State {
 	}
 }
 
+// MARK: - DAppRowModel
 struct DAppRowModel: Identifiable, Equatable {
 	let id: UUID = .init()
 	let name: String
 	let thumbnail: URL
 }
 
+// MARK: - BodyText
 // TODO: • Move somewhere else
 
 public struct BodyText: View {
@@ -90,7 +91,7 @@ public struct BodyText: View {
 		self.textStyle = textStyle
 		self.color = color
 	}
-	
+
 	public var body: some View {
 		HStack(spacing: 0) {
 			Text(text)
@@ -101,4 +102,3 @@ public struct BodyText: View {
 		.padding(.vertical, .medium3)
 	}
 }
-

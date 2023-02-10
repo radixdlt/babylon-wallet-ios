@@ -31,8 +31,7 @@ public extension ConnectedDApp {
 		public let personas: [DAppPersonaRowModel] = .debug
 		public let dApp: ConnectedDAppModel
 
-		@PresentationStateOf<DAppPersona>
-		public var selectedPersona: DAppPersona.State?
+		@PresentationState public var selectedPersona: DAppPersona.State?
 
 		public init(name: String, selectedPersona: DAppPersona.State? = nil) {
 			self.name = name
@@ -55,8 +54,7 @@ public extension ConnectedDApp {
 	}
 }
 
-// MARK: - For Debugging
-
+// MARK: - ConnectedDAppModel
 public struct ConnectedDAppModel: Identifiable, Hashable, Sendable {
 	public let id: UUID = .init()
 	let name: String
@@ -74,6 +72,7 @@ extension ConnectedDAppModel {
 	}
 }
 
+// MARK: - DAppPersonaRowModel
 public struct DAppPersonaRowModel: Identifiable, Hashable, Sendable {
 	public let id: UUID = .init()
 	let thumbnail: URL = .placeholder

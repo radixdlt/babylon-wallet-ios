@@ -1,8 +1,8 @@
+import ConnectedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
-import ConnectedDAppsFeature
 import PersonasFeature
 import ProfileClient
 
@@ -30,14 +30,13 @@ public extension AppSettings {
 			.ifLet(\.personasCoordinator, action: /Action.child .. Action.ChildAction.personasCoordinator) {
 				PersonasCoordinator()
 			}
-			.presentationDestination(\.connectedDApps, action: /Action.child .. Action.ChildAction.connectedDApps) {
+			.presentationDestination(\.$connectedDApps, action: /Action.child .. Action.ChildAction.connectedDApps) {
 				ConnectedDApps()
 			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-						
 		case .internal(.view(.dismissSettingsButtonTapped)):
 			return .send(.delegate(.dismissSettings))
 
@@ -50,7 +49,7 @@ public extension AppSettings {
 		case .internal(.view(.manageP2PClientsButtonTapped)):
 			state.manageP2PClients = .init()
 			return .none
-			
+
 		case .internal(.view(.connectedDAppsButtonTapped)):
 			// TODO: This proxying is only necessary because of our strict view/child separation
 			return .send(.child(.connectedDApps(.present(.init()))))
@@ -120,7 +119,7 @@ public extension AppSettings {
 			// TODO: implement
 			state.personasCoordinator = .init()
 			return .none
-			
+
 		case .internal, .child, .delegate:
 			return .none
 		}

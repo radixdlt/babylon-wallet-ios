@@ -1,8 +1,8 @@
+import ConnectedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
-import ConnectedDAppsFeature
 import PersonasFeature
 import ProfileClient
 #if DEBUG
@@ -32,7 +32,7 @@ public extension AppSettings.View {
 				ForceFullScreen {
 					ZStack {
 						settingsView(viewStore: viewStore)
-						
+
 						IfLetStore(
 							store.scope(
 								state: \.manageP2PClients,
@@ -40,7 +40,7 @@ public extension AppSettings.View {
 							),
 							then: { ManageP2PClients.View(store: $0) }
 						)
-												
+
 						IfLetStore(
 							store.scope(
 								state: \.manageGatewayAPIEndpoints,
@@ -83,7 +83,7 @@ public extension AppSettings.View {
 
 extension AppSettings.Store {
 	var connectedDApps: PresentationStoreOf<ConnectedDApps> {
-		scope(state: \.connectedDApps) { .child(.connectedDApps($0)) }
+		scope(state: \.$connectedDApps) { .child(.connectedDApps($0)) }
 	}
 }
 
@@ -98,8 +98,8 @@ private extension AppSettings.View {
 						}
 						.padding([.vertical], .medium3)
 					}
-					
-                    #if DEBUG
+
+					#if DEBUG
 					PlainListRow(
 						title: L10n.Settings.inspectProfileButtonTitle
 					) {
@@ -107,30 +107,30 @@ private extension AppSettings.View {
 					} action: {
 						viewStore.send(.debugInspectProfileButtonTapped)
 					}
-					
-                    #endif
-					
+
+					#endif
+
 					PlainListRow(
 						title: L10n.Settings.desktopConnectionsButtonTitle,
 						asset: AssetResource.desktopConnections
 					) {
 						viewStore.send(.manageP2PClientsButtonTapped)
 					}
-					
+
 					PlainListRow(
 						title: L10n.Settings.connectedDAppsButtonTitle,
 						asset: AssetResource.connectedDapps
 					) {
 						viewStore.send(.connectedDAppsButtonTapped)
 					}
-					
+
 					PlainListRow(
 						title: L10n.Settings.gatewayButtonTitle,
 						asset: AssetResource.gateway
 					) {
 						viewStore.send(.editGatewayAPIEndpointButtonTapped)
 					}
-					
+
 					PlainListRow(
 						title: L10n.Settings.personasButtonTitle,
 						asset: AssetResource.personas
@@ -147,7 +147,7 @@ private extension AppSettings.View {
 					}
 					.buttonStyle(.secondaryRectangular(isDestructive: true))
 					.padding(.bottom, .large1)
-					
+
 					Text(viewStore.appVersion)
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
@@ -157,29 +157,29 @@ private extension AppSettings.View {
 			.onAppear {
 				viewStore.send(.didAppear)
 			}
-            #if DEBUG
-			.sheet(
-				isPresented: viewStore.binding(
-					get: \.isDebugProfileViewSheetPresented,
-					send: { .setDebugProfileSheet(isPresented: $0) }
-				)
-			) {
-				VStack {
-					Button(L10n.Settings.closeButtonTitle) {
-						viewStore.send(.setDebugProfileSheet(isPresented: false))
-					}
-					if let profile = viewStore.profileToInspect {
-						ProfileView(
-							profile: profile,
-							// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-							keychainClient: KeychainClient.liveValue
-						)
-					} else {
-						Text(L10n.Settings.noProfileText)
+			#if DEBUG
+				.sheet(
+					isPresented: viewStore.binding(
+						get: \.isDebugProfileViewSheetPresented,
+						send: { .setDebugProfileSheet(isPresented: $0) }
+					)
+				) {
+					VStack {
+						Button(L10n.Settings.closeButtonTitle) {
+							viewStore.send(.setDebugProfileSheet(isPresented: false))
+						}
+						if let profile = viewStore.profileToInspect {
+							ProfileView(
+								profile: profile,
+								// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
+								keychainClient: KeychainClient.liveValue
+							)
+						} else {
+							Text(L10n.Settings.noProfileText)
+						}
 					}
 				}
-			}
-            #endif
+			#endif
 		}
 	}
 }
@@ -187,10 +187,10 @@ private extension AppSettings.View {
 // MARK: - AppSettings.View.ViewState
 public extension AppSettings.View {
 	struct ViewState: Equatable {
-#if DEBUG
+		#if DEBUG
 		public let isDebugProfileViewSheetPresented: Bool
 		public let profileToInspect: Profile?
-#endif
+		#endif
 		public let canAddP2PClient: Bool
 		public let appVersion: String
 
