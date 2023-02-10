@@ -45,14 +45,15 @@ public extension AccountDetails.View {
 					.foregroundColor(.app.whiteTransparent)
 					.padding(.bottom, .medium1)
 
-					#if DEBUG // FF
-					Button(
-						"Transfer",
-						action: { viewStore.send(.transferButtonTapped) }
-					)
-					.buttonStyle(.secondaryRectangular())
-					.padding(.bottom)
-					#endif
+					// TODO: @davdroman take care of proper Asset Transfer implementation
+//					#if DEBUG // FF
+//					Button(
+//						"Transfer",
+//						action: { viewStore.send(.transferButtonTapped) }
+//					)
+//					.buttonStyle(.secondaryRectangular())
+//					.padding(.bottom)
+//					#endif
 
 					ScrollView {
 						VStack(spacing: .medium3) {
