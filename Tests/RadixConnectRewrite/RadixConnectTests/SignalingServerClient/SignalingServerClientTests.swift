@@ -5,14 +5,17 @@ import TestingPrelude
 // MARK: - SignalingClientTests
 final class SignalingClientTests: TestCase {
 	// MARK: - Test Values
+        static let remoteClientId = ClientID(rawValue: UUID().uuidString)
+        static let ownClientId = ClientID(rawValue: UUID().uuidString)
 	static let requestId = RequestID(rawValue: UUID().uuidString)
 	static let sdp = SDP(rawValue: "Some sdp desc")
-	static let offer = RTCPrimitive.Offer(sdp: sdp)
-	static let answer = RTCPrimitive.Answer(sdp: sdp)
-	static let iceCandidate = RTCPrimitive.ICECandidate(sdp: sdp,
+	static let offer = IdentifiedPrimitive(content: RTCPrimitive.Offer(sdp: sdp), id: remoteClientId)
+	static let answer = IdentifiedPrimitive(content: RTCPrimitive.Answer(sdp: sdp), id: remoteClientId)
+        static let iceCandidate = IdentifiedPrimitive(content:RTCPrimitive.ICECandidate(sdp: sdp,
 	                                                    sdpMLineIndex: 32,
 	                                                    sdpMid: "Mid",
-	                                                    serverUrl: "URL")
+                                                                                        serverUrl: "URL"),
+                                                      id: remoteClientId)
 	static let connectionID = try! SignalingServerConnectionID(.init(.deadbeef32Bytes))
 	static let encryptionKey = try! EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
 
@@ -20,21 +23,22 @@ final class SignalingClientTests: TestCase {
 	lazy var signalingClient = SignalingClient(encryptionKey: Self.encryptionKey,
 	                                           webSocketClient: webSocketClient,
 	                                           connectionID: Self.connectionID,
-	                                           idBuilder: { Self.requestId })
+	                                           idBuilder: { Self.requestId },
+                                                   ownClientId: Self.ownClientId)
 
 	// MARK: - Outgoing Messages
 
 	func test_sentMessagesAreInCorrectFormat_offer() throws {
 		try assertSentMessageFormat(
 			.offer(Self.offer),
-			expectedPayload: Self.offer.payload
+                        expectedPayload: Self.offer.content.payload
 		)
 	}
 
 	func test_sentMessagesAreInCorrectFormat_answer() throws {
 		try assertSentMessageFormat(
 			.answer(Self.answer),
-			expectedPayload: Self.answer.payload
+                        expectedPayload: Self.answer.content.payload
 		)
 	}
 
@@ -62,7 +66,7 @@ final class SignalingClientTests: TestCase {
 	// MARK: - Incomming Messages
 
 	func test_receivedMessagesAreProperlyDecoded_remoteClientDisconnected() throws {
-		let notification = IncommingMessage.FromSignalingServer.Notification.remoteClientDisconnected
+                let notification = IncommingMessage.FromSignalingServer.Notification.remoteClientDisconnected(Self.remoteClientId)
 
 		try assertIncommingMessageDecoding(
 			msg: notification.payload,
@@ -72,7 +76,7 @@ final class SignalingClientTests: TestCase {
 	}
 
 	func test_receivedMessagesAreProperlyDecoded_remoteClientIsAlreadyConnected() throws {
-		let notification = IncommingMessage.FromSignalingServer.Notification.remoteClientIsAlreadyConnected
+		let notification = IncommingMessage.FromSignalingServer.Notification.remoteClientIsAlreadyConnected(Self.remoteClientId)
 
 		try assertIncommingMessageDecoding(
 			msg: notification.payload,
@@ -82,7 +86,7 @@ final class SignalingClientTests: TestCase {
 	}
 
 	func test_receivedMessagesAreProperlyDecoded_remoteClientJustConnected() throws {
-		let notification = IncommingMessage.FromSignalingServer.Notification.remoteClientJustConnected
+		let notification = IncommingMessage.FromSignalingServer.Notification.remoteClientJustConnected(Self.remoteClientId)
 		try assertIncommingMessageDecoding(
 			msg: notification.payload,
 			stream: signalingClient.onRemoteClientState,
@@ -92,7 +96,7 @@ final class SignalingClientTests: TestCase {
 
 	func test_receivedMessagesAreProperlyDecoded_offer() throws {
 		try assertIncommingPrimitiveDecoding(
-			payload: Self.offer.payload,
+                        payload: Self.offer.content.payload,
 			method: "offer",
 			stream: signalingClient.onOffer,
 			expected: Self.offer
@@ -101,7 +105,7 @@ final class SignalingClientTests: TestCase {
 
 	func test_receivedMessagesAreProperlyDecoded_answer() throws {
 		try assertIncommingPrimitiveDecoding(
-			payload: Self.answer.payload,
+                        payload: Self.answer.content.payload,
 			method: "answer",
 			stream: signalingClient.onAnswer,
 			expected: Self.answer
@@ -110,7 +114,7 @@ final class SignalingClientTests: TestCase {
 
 	func test_receivedMessagesAreProperlyDecoded_iceCandidate() throws {
 		try assertIncommingPrimitiveDecoding(
-			payload: Self.iceCandidate.payload,
+                        payload: Self.iceCandidate.content.payload,
 			method: "iceCandidate",
 			stream: signalingClient.onICECanddiate,
 			expected: Self.iceCandidate
@@ -150,6 +154,8 @@ final class SignalingClientTests: TestCase {
 			"requestId": .string(Self.requestId.rawValue),
 			"method": .string(method),
 			"source": .string("extension"),
+                        "sourceClientId": .string(Self.remoteClientId.rawValue),
+                        "targetClientId": .string(Self.ownClientId.rawValue),
 			"connectionId": .string(Self.connectionID.rawValue.data.hex()),
 			"encryptedPayload": .string(encrypted.hex),
 		])
@@ -227,8 +233,20 @@ extension RTCPrimitive.ICECandidate {
 
 extension IncommingMessage.FromSignalingServer.Notification {
 	var payload: JSONValue {
-		.dictionary([
-			"info": .string(self.rawValue),
+                let infoKey: String = {
+                        switch self {
+                        case .remoteClientJustConnected:
+                                return "remoteClientJustConnected"
+                        case .remoteClientDisconnected:
+                                return "remoteClientDisconnected"
+                        case .remoteClientIsAlreadyConnected:
+                                return "remoteClientIsAlreadyConnected"
+                        }
+                }()
+
+                        return .dictionary([
+                        "info": .string(infoKey),
+                        "remoteClientId": .string(remoteClientId.rawValue)
 		])
 	}
 }

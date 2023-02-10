@@ -1,11 +1,8 @@
 // MARK: - PeerConnection
 protocol PeerConnection: Sendable {
-	func setLocalOffer(_ offer: RTCPrimitive.Offer) async throws
+	func setLocalAnswer(_ answer: RTCPrimitive.Answer) async throws
 
-	func setRemoteAnswer(_ answer: RTCPrimitive.Answer) async throws
-
-	/// Generate an SDP offer.
-	func createLocalOffer() async throws -> RTCPrimitive.Offer
+        func setRemoteOffer(_ offer: RTCPrimitive.Offer) async throws
 
 	/// Generate an SDP answer.
 	func createLocalAnswer() async throws -> RTCPrimitive.Answer

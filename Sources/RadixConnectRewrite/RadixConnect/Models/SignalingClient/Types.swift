@@ -25,3 +25,6 @@ typealias SDP = Tagged<SDPTag, String>
 // MARK: - DataChannelIDTag
 enum DataChannelIDTag {}
 typealias DataChannelID = Tagged<DataChannelIDTag, Int32>
+
+enum ClientIDTag {}
+typealias ClientID = Tagged<ClientIDTag, String>

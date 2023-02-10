@@ -15,6 +15,8 @@ struct ClientMessage: Sendable, Codable, Equatable {
 	let requestId: RequestID
 	let method: Method
 	let source: Source
+        let sourceClientId: ClientID
+        let targetClientId: ClientID
 	let connectionId: SignalingServerConnectionID
 	let encryptedPayload: EncryptedPayload
 }
@@ -26,7 +28,7 @@ extension ClientMessage.Method {
 			self = .offer
 		case .answer:
 			self = .answer
-		case .addICE:
+		case .iceCandidate:
 			self = .iceCandidate
 		}
 	}

@@ -1,8 +1,32 @@
 // MARK: - RTCPrimitive
+
+struct Identified<T, Id> {
+        let content: T
+        let id: Id
+}
+
+extension Identified: Equatable where T: Equatable, Id: Equatable {}
+extension Identified: Sendable where T: Sendable, Id: Sendable {}
+
+typealias IdentifiedPrimitive<T: Sendable> = Identified<T, ClientID>
+
 enum RTCPrimitive: Sendable {
-	case offer(Offer)
-	case answer(Answer)
-	case addICE(ICECandidate)
+        case offer(IdentifiedPrimitive<RTCPrimitive.Offer>)
+        case answer(IdentifiedPrimitive<RTCPrimitive.Answer>)
+        case iceCandidate(IdentifiedPrimitive<RTCPrimitive.ICECandidate>)
+}
+
+extension RTCPrimitive {
+        var clientId: ClientID {
+                switch self {
+                case let .offer(offer):
+                        return offer.id
+                case let .answer(answer):
+                        return answer.id
+                case let .iceCandidate(iceCandidate):
+                        return iceCandidate.id
+                }
+        }
 }
 
 extension RTCPrimitive {
@@ -35,22 +59,22 @@ extension RTCPrimitive {
 }
 
 extension RTCPrimitive {
-	var offer: Offer? {
+	var offer: IdentifiedPrimitive<Offer>? {
 		guard case let .offer(offer) = self else {
 			return nil
 		}
 		return offer
 	}
 
-	var answer: Answer? {
+	var answer: IdentifiedPrimitive<Answer>? {
 		guard case let .answer(answer) = self else {
 			return nil
 		}
 		return answer
 	}
 
-	var addICE: ICECandidate? {
-		guard case let .addICE(ice) = self else {
+	var addICE: IdentifiedPrimitive<ICECandidate>? {
+		guard case let .iceCandidate(ice) = self else {
 			return nil
 		}
 		return ice
@@ -63,11 +87,11 @@ extension RTCPrimitive: Encodable {
 		var singleValueContainer = encoder.singleValueContainer()
 		switch self {
 		case let .offer(value):
-			try singleValueContainer.encode(value)
+                        try singleValueContainer.encode(value.content)
 		case let .answer(value):
-			try singleValueContainer.encode(value)
-		case let .addICE(value):
-			try singleValueContainer.encode(value)
+                        try singleValueContainer.encode(value.content)
+		case let .iceCandidate(value):
+                        try singleValueContainer.encode(value.content)
 		}
 	}
 }

@@ -67,13 +67,13 @@ extension RTCPeerConnection: PeerConnection {
 		return DataChannelClient(dataChannel: dataChannel, delegate: delegate)
 	}
 
-	func setLocalOffer(_ offer: RTCPrimitive.Offer) async throws {
-		try await setLocalDescription(.init(from: offer))
-	}
+        func setLocalAnswer(_ answer: RTCPrimitive.Answer) async throws {
+                try await setLocalDescription(.init(from: answer))
+        }
 
-	func setRemoteAnswer(_ answer: RTCPrimitive.Answer) async throws {
-		try await setLocalDescription(.init(from: answer))
-	}
+        func setRemoteOffer(_ offer: RTCPrimitive.Offer) async throws {
+                try await setRemoteDescription(.init(from: offer))
+        }
 
 	func createLocalOffer() async throws -> RTCPrimitive.Offer {
 		.init(from: try await self.offer(for: .negotiationConstraints))

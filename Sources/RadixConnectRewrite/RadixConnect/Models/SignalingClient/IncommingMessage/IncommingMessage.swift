@@ -26,10 +26,10 @@ extension IncommingMessage {
 }
 
 extension IncommingMessage.FromSignalingServer {
-	enum Notification: String, Sendable, Equatable {
-		case remoteClientJustConnected
-		case remoteClientDisconnected
-		case remoteClientIsAlreadyConnected
+	enum Notification: Sendable, Equatable {
+		case remoteClientJustConnected(ClientID)
+		case remoteClientDisconnected(ClientID)
+		case remoteClientIsAlreadyConnected(ClientID)
 	}
 
 	enum ResponseForRequest: Sendable, Equatable {
@@ -96,4 +96,11 @@ extension IncommingMessage.FromSignalingServer.Notification {
 			return false
 		}
 	}
+
+        var remoteClientId: ClientID {
+                switch self {
+                case let .remoteClientDisconnected(id), let .remoteClientIsAlreadyConnected(id), let .remoteClientJustConnected(id):
+                        return id
+                }
+        }
 }

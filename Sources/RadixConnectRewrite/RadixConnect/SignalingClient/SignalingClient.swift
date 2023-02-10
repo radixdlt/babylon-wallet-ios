@@ -23,15 +23,16 @@ struct SignalingClient {
 	private let jsonEncoder: JSONEncoder
 	private let connectionID: SignalingServerConnectionID
 	private let idBuilder: @Sendable () -> RequestID
+        private let ownClientId: ClientID
 
 	// MARK: - Streams
 	private let incommingMessages: AnyAsyncSequence<IncommingMessage>
 	private let incommingSignalingServerMessagges: AnyAsyncSequence<IncommingMessage.FromSignalingServer>
 	private let incommingRemoteClientMessagges: AnyAsyncSequence<RTCPrimitive>
 
-	let onICECanddiate: AnyAsyncSequence<RTCPrimitive.ICECandidate>
-	let onOffer: AnyAsyncSequence<RTCPrimitive.Offer>
-	let onAnswer: AnyAsyncSequence<RTCPrimitive.Answer>
+	let onICECanddiate: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.ICECandidate>>
+	let onOffer: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.Offer>>
+	let onAnswer: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.Answer>>
 	let onRemoteClientState: AnyAsyncSequence<IncommingMessage.FromSignalingServer.Notification>
 
 	// MARK: - Initializer
@@ -40,6 +41,7 @@ struct SignalingClient {
 	     webSocketClient: WebSocketClient,
 	     connectionID: SignalingServerConnectionID,
 	     idBuilder: @Sendable @escaping () -> RequestID = { .init(UUID().uuidString) },
+             ownClientId: ClientID = .init(UUID().uuidString),
 	     jsonDecoder: JSONDecoder = .init(),
 	     jsonEncoder: JSONEncoder = .init())
 	{
@@ -47,6 +49,7 @@ struct SignalingClient {
 		self.webSocketClient = webSocketClient
 		self.connectionID = connectionID
 		self.idBuilder = idBuilder
+                self.ownClientId = ownClientId
 		self.jsonEncoder = jsonEncoder
 		self.jsonDecoder = jsonDecoder
 
@@ -104,6 +107,8 @@ struct SignalingClient {
 		let message = ClientMessage(requestId: id,
 		                            method: .init(from: rtcPrimitive),
 		                            source: .wallet,
+                                            sourceClientId: ownClientId,
+                                            targetClientId: rtcPrimitive.clientId,
 		                            connectionId: connectionID,
 		                            encryptedPayload: encryptedPayload)
 

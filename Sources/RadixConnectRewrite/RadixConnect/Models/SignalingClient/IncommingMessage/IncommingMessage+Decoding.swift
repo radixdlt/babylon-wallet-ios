@@ -35,7 +35,8 @@ extension IncommingMessage {
 // MARK: - IncommingMessage + Decodable
 extension IncommingMessage: Decodable {
 	enum CodingKeys: String, CodingKey {
-		case responseType = "info", requestId, error, source = "target", message = "data"
+		case responseType = "info", requestId, error,
+                     source = "target", message = "data", remoteClientId
 	}
 
 	init(from decoder: Decoder) throws {
@@ -47,11 +48,14 @@ extension IncommingMessage: Decodable {
 			self = try .fromRemoteClient(container.decode(ClientMessage.self, forKey: .message))
 
 		case .remoteClientJustConnected:
-			self = .fromSignalingServer(.notification(.remoteClientJustConnected))
+                        let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
+			self = .fromSignalingServer(.notification(.remoteClientJustConnected(clientId)))
 		case .remoteClientIsAlreadyConnected:
-			self = .fromSignalingServer(.notification(.remoteClientIsAlreadyConnected))
+                        let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
+			self = .fromSignalingServer(.notification(.remoteClientIsAlreadyConnected(clientId)))
 		case .remoteClientDisconnected:
-			self = .fromSignalingServer(.notification(.remoteClientDisconnected))
+                        let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
+			self = .fromSignalingServer(.notification(.remoteClientDisconnected(clientId)))
 
 		case .missingRemoteClientError:
 			let requestId = try container.decode(RequestID.self, forKey: .requestId)
