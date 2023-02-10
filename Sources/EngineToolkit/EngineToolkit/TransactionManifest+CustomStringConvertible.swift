@@ -167,49 +167,4 @@ public extension TransactionManifest {
 		// Best we can do is default to the primary network given the roadmap.
 		toString(networkID: .hammunet)
 	}
-
-	func accountsRequiredToSign(
-		networkId: NetworkID
-	) throws -> Set<ComponentAddress> {
-		let convertedManifest = try EngineToolkit().convertManifest(request: ConvertManifestRequest(
-			manifest: self,
-			outputFormat: .parsed,
-			networkId: networkId
-		)).get()
-
-		switch convertedManifest.instructions {
-		case let .parsed(instructions):
-			var accountsRequiredToSign: Set<ComponentAddress> = []
-			for instruction in instructions {
-				switch instruction {
-				case let .callMethod(callMethodInstruction):
-					let isAccountComponent = callMethodInstruction.receiver.address.starts(with: "account")
-					let isMethodThatRequiresAuth = [
-						"lock_fee",
-						"lock_contingent_fee",
-						"withdraw",
-						"withdraw_by_amount",
-						"withdraw_by_ids",
-						"lock_fee_and_withdraw",
-						"lock_fee_and_withdraw_by_amount",
-						"lock_fee_and_withdraw_by_ids",
-						"create_proof",
-						"create_proof_by_amount",
-						"create_proof_by_ids",
-					].contains(callMethodInstruction.methodName)
-
-					if isAccountComponent, isMethodThatRequiresAuth {
-						accountsRequiredToSign.insert(callMethodInstruction.receiver)
-					}
-
-				default:
-					break
-				}
-			}
-
-			return accountsRequiredToSign
-		case .string:
-			fatalError("Converted the manifest to Parsed by instead received a string manifest!")
-		}
-	}
 }

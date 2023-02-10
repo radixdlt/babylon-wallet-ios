@@ -180,4 +180,23 @@ final class AccountsRequiredToSignTests: TestCase {
 			accountsRequiredToSign
 		)
 	}
+
+	func test_setMetaData() throws {
+		let transactionManifest = TransactionManifest {
+			SetMetadata(
+				entityAddress: .componentAddress("account_sim1q0egd2wpyslhkd28yuwpzq0qdg4aq73kl4urcnc3qsxsk6kug3"),
+				key: "name",
+				value: "Radix Dashboard"
+			)
+
+			SetMetadata(
+				entityAddress: .componentAddress("component_sim1qgehpqdhhr62xh76wh6gppnyn88a0uau68epljprvj3sxknsqr"),
+				key: "name",
+				value: "Radix Dashboard"
+			)
+		}
+
+		let accountsRequiredToSign = try transactionManifest.accountsRequiredToSign(networkId: 0xF2)
+		XCTAssertNoDifference(accountsRequiredToSign, ["account_sim1q0egd2wpyslhkd28yuwpzq0qdg4aq73kl4urcnc3qsxsk6kug3"])
+	}
 }
