@@ -11,17 +11,17 @@ public extension ConnectedDApp {
 			self.store = store
 		}
 	}
+
+	internal struct ViewState: Equatable {
+		let name: String
+		let personas: [DAppPersonaRowModel]
+		let dApp: ConnectedDAppModel
+	}
 }
 
 // MARK: - Body
 
 public extension ConnectedDApp.View {
-	struct ViewState: Equatable {
-		let name: String
-		let personas: [DAppPersonaRowModel]
-		let dApp: ConnectedDAppModel
-	}
-	
 	var body: some View {
 		WithViewStore(
 			store,
@@ -31,9 +31,9 @@ public extension ConnectedDApp.View {
 			ScrollView {
 				VStack(alignment: .leading, spacing: 0) {
 					ConnectedDAppHeader(model: viewStore.dApp)
-									
+
 					BodyText(L10n.ConnectedDApp.body)
-					
+
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.personas) { persona in
 							Button {
@@ -59,16 +59,15 @@ public extension ConnectedDApp.View {
 
 private extension ConnectedDApp.Store {
 	var selectedPersona: PresentationStoreOf<DAppPersona> {
-		scope(state: \.selectedPersona) { .child(.selectedPersona($0)) }
+		scope(state: \.$selectedPersona) { .child(.selectedPersona($0)) }
 	}
 }
 
 private extension ConnectedDApp.State {
-	var viewState: ConnectedDApp.View.ViewState {
+	var viewState: ConnectedDApp.ViewState {
 		.init(name: name,
-			  personas: personas,
-			  dApp: dApp
-		)
+		      personas: personas,
+		      dApp: dApp)
 	}
 }
 
@@ -85,16 +84,17 @@ public extension View {
 	}
 }
 
+// MARK: - ConnectedDAppHeader
 // TODO: • Move somewhere else
 
 struct ConnectedDAppHeader: View {
 	let model: ConnectedDAppModel
-		
+
 	var body: some View {
 		VStack(alignment: .leading, spacing: .small2) {
 			HStack(alignment: .top, spacing: .small2) {
 				DAppPlaceholder(large: true)
-				
+
 				if model.domainNames.count > 0 {
 					VStack(alignment: .leading, spacing: 0) {
 						Text(L10n.ConnectedDApp.domainsHeading)
@@ -120,7 +120,7 @@ struct ConnectedDAppHeader: View {
 					.textStyle(.body2HighImportance)
 					.padding(.bottom, .small2)
 				let columns: [GridItem] = [GridItem(.adaptive(minimum: .large1), spacing: .small2)]
-				let tokens = 0..<model.tokens
+				let tokens = 0 ..< model.tokens
 				LazyVGrid(columns: columns, spacing: .small2) {
 					ForEach(tokens, id: \.self) { _ in
 						NFTPlaceholder()
@@ -131,9 +131,10 @@ struct ConnectedDAppHeader: View {
 	}
 }
 
+// MARK: - DAppPersonaCard
 struct DAppPersonaCard: View {
 	let model: DAppPersonaRowModel
-		
+
 	var body: some View {
 		HStack(spacing: 0) {
 			VStack(spacing: 0) {
@@ -174,13 +175,14 @@ struct DAppPersonaCard: View {
 	}
 }
 
+// MARK: - PersonaThumbnail
 public struct PersonaThumbnail: View {
 	private let url: URL
-	
+
 	public init(_ url: URL) {
 		self.url = url
 	}
-	
+
 	public var body: some View {
 		ZStack {
 			Rectangle()
