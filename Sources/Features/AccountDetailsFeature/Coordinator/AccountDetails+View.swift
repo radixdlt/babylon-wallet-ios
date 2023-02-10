@@ -46,6 +46,7 @@ public extension AccountDetails.View {
 					.padding(.bottom, .medium1)
 
 					// TODO: @davdroman take care of proper Asset Transfer implementation
+					// when we have the proper spec and designs
 //					#if DEBUG // FF
 //					Button(
 //						"Transfer",
