@@ -16,19 +16,19 @@ public struct SborEncodeResponse: Sendable, Codable, Hashable {
 	}
 }
 
-public extension SborEncodeResponse {
+extension SborEncodeResponse {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case encodedValue = "encoded_value"
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(encodedValue.hex(), forKey: .encodedValue)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 

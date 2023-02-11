@@ -5,8 +5,8 @@ import Prelude
 // MARK: - TransactionManifest + CustomStringConvertible
 extension TransactionManifest: CustomStringConvertible {}
 
-public extension TransactionManifest {
-	enum BlobOutputFormat {
+extension TransactionManifest {
+	public enum BlobOutputFormat {
 		case excludeBlobs
 		case includeBlobsByByteCountOnly
 		case includeBlobs
@@ -135,7 +135,7 @@ public extension TransactionManifest {
 		return [preamble, body].joined()
 	}
 
-	func toString(
+	public func toString(
 		preamble: String = "~~~ MANIFEST ~~~\n",
 		blobOutputFormat: BlobOutputFormat = .default,
 		blobSeparator: String = "\n",
@@ -163,7 +163,7 @@ public extension TransactionManifest {
 		return manifestString
 	}
 
-	var description: String {
+	public var description: String {
 		// Best we can do is default to the primary network given the roadmap.
 		toString(networkID: .hammunet)
 	}

@@ -14,8 +14,8 @@ import AnyCodable
 public typealias LedgerStateMixin = GatewayAPI.LedgerStateMixin
 
 // MARK: - GatewayAPI.LedgerStateMixin
-public extension GatewayAPI {
-	struct LedgerStateMixin: Codable, Hashable {
+extension GatewayAPI {
+	public struct LedgerStateMixin: Codable, Hashable {
 		public private(set) var ledgerState: LedgerState
 
 		public init(ledgerState: LedgerState) {

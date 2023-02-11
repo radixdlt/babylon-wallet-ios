@@ -1,22 +1,22 @@
 import Foundation
 
 // MARK: - HD.Path.Component
-public extension HD.Path {
-	enum Component: Hashable, Sendable {
+extension HD.Path {
+	public enum Component: Hashable, Sendable {
 		case root(onlyPublic: Bool)
 		case child(Child)
 	}
 }
 
-public extension HD.Path.Component {
-	static let rootPrivateKey = "m"
-	static let rootOnlyPublicKey = "M"
+extension HD.Path.Component {
+	public static let rootPrivateKey = "m"
+	public static let rootOnlyPublicKey = "M"
 
-	enum Error: Swift.Error {
+	public enum Error: Swift.Error {
 		case expectedRootToBeAtDepthZero
 	}
 
-	static func inferredDepth(string: String) throws -> Self {
+	public static func inferredDepth(string: String) throws -> Self {
 		switch string {
 		case Self.rootPrivateKey:
 			return .root(onlyPublic: false)
@@ -30,7 +30,7 @@ public extension HD.Path.Component {
 		}
 	}
 
-	init(depth explicitDepth: Int, string: String) throws {
+	public init(depth explicitDepth: Int, string: String) throws {
 		switch string {
 		case Self.rootPrivateKey:
 			guard explicitDepth == 0 else { throw Error.expectedRootToBeAtDepthZero }
@@ -46,21 +46,21 @@ public extension HD.Path.Component {
 		}
 	}
 
-	func toString() -> String {
+	public func toString() -> String {
 		switch self {
 		case let .child(childComponent): return childComponent.toString()
 		case let .root(onlyPublic): return onlyPublic ? Self.rootOnlyPublicKey : Self.rootPrivateKey
 		}
 	}
 
-	var isRoot: Bool {
+	public var isRoot: Bool {
 		switch self {
 		case .child: return false
 		case .root: return true
 		}
 	}
 
-	var asChild: Child? {
+	public var asChild: Child? {
 		switch self {
 		case let .child(childComponent): return childComponent
 		case .root: return nil
@@ -69,9 +69,9 @@ public extension HD.Path.Component {
 }
 
 // MARK: - HD.Path.Component.Child
-public extension HD.Path.Component {
+extension HD.Path.Component {
 	/// One component in an HD Derivation path
-	struct Child: Hashable, Sendable {
+	public struct Child: Hashable, Sendable {
 		public let depth: Depth
 		public let nonHardenedValue: Value
 		public let isHardened: Bool
@@ -98,8 +98,8 @@ public extension HD.Path.Component {
 	}
 }
 
-public extension HD.Path.Component.Child {
-	static func == (lhs: Self, rhs: Self) -> Bool {
+extension HD.Path.Component.Child {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
 		guard
 			lhs.isHardened == rhs.isHardened,
 			lhs.nonHardenedValue == rhs.nonHardenedValue
@@ -113,7 +113,7 @@ public extension HD.Path.Component.Child {
 		}
 	}
 
-	func toString() -> String {
+	public func toString() -> String {
 		let intString = nonHardenedValue.description
 		guard isHardened else {
 			return intString
@@ -124,7 +124,7 @@ public extension HD.Path.Component.Child {
 		].joined(separator: "")
 	}
 
-	enum Depth: Hashable, Sendable {
+	public enum Depth: Hashable, Sendable {
 		public typealias Value = UInt8
 		case inferred
 		case explicit(Value)
@@ -139,25 +139,25 @@ public extension HD.Path.Component.Child {
 		}
 	}
 
-	typealias Value = UInt32
+	public typealias Value = UInt32
 
-	static let hardenedIncrement = Value(1) << 31
+	public static let hardenedIncrement = Value(1) << 31
 
-	var value: Value {
+	public var value: Value {
 		guard isHardened else {
 			return nonHardenedValue
 		}
 		return nonHardenedValue + Self.hardenedIncrement
 	}
 
-	static let canonicalDelimitor = "H"
-	static let acceptedDelimitors = [canonicalDelimitor, "h", "'", "\""]
+	public static let canonicalDelimitor = "H"
+	public static let acceptedDelimitors = [canonicalDelimitor, "h", "'", "\""]
 
-	enum Error: Swift.Error {
+	public enum Error: Swift.Error {
 		case notAnInteger(String)
 	}
 
-	init(depth: Depth, string: String) throws {
+	public init(depth: Depth, string: String) throws {
 		var string = string
 		Self.acceptedDelimitors.forEach {
 			string = string.replacingOccurrences(of: $0, with: Self.canonicalDelimitor)

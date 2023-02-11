@@ -1,9 +1,9 @@
 import ClientPrelude
 
 // MARK: - P2P.SentResponseToClient
-public extension P2P {
+extension P2P {
 	// MARK: - SentResponseToClient
-	struct SentResponseToClient: Sendable, Equatable {
+	public struct SentResponseToClient: Sendable, Equatable {
 		public let sentReceipt: P2PConnections.SentReceipt
 		public let responseToDapp: P2P.ToDapp.WalletInteractionResponse
 		public let client: P2PClient
@@ -20,8 +20,8 @@ public extension P2P {
 }
 
 #if DEBUG
-public extension P2P.ToDapp.WalletInteractionResponse {
-	static let previewValue: Self = .success(.init(
+extension P2P.ToDapp.WalletInteractionResponse {
+	public static let previewValue: Self = .success(.init(
 		interactionId: .previewValue,
 		items: .request(.unauthorized(.init(
 			oneTimeAccounts: nil
@@ -29,15 +29,15 @@ public extension P2P.ToDapp.WalletInteractionResponse {
 	))
 }
 
-public extension ChunkingTransportOutgoingMessage {
-	static let previewValue = Self(data: .deadbeef32Bytes, messageID: MessageID())
+extension ChunkingTransportOutgoingMessage {
+	public static let previewValue = Self(data: .deadbeef32Bytes, messageID: MessageID())
 }
 
-public extension P2PConnections.SentReceipt {
-	static let previewValue = Self(messageSent: .previewValue)
+extension P2PConnections.SentReceipt {
+	public static let previewValue = Self(messageSent: .previewValue)
 }
 
-public extension P2P.SentResponseToClient {
-	static let previewValue = Self(sentReceipt: .previewValue, responseToDapp: .previewValue, client: .previewValue)
+extension P2P.SentResponseToClient {
+	public static let previewValue = Self(sentReceipt: .previewValue, responseToDapp: .previewValue, client: .previewValue)
 }
 #endif

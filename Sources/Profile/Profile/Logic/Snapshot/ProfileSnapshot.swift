@@ -3,20 +3,20 @@ import EngineToolkitModels
 import Prelude
 
 // MARK: - ProfileSnapshot.Version
-public extension ProfileSnapshot {
-	typealias Version = Tagged<Self, UInt32>
+extension ProfileSnapshot {
+	public typealias Version = Tagged<Self, UInt32>
 }
 
 // MARK: - ProfileSnapshot.Version.ProfileVersionHolder
-private extension ProfileSnapshot.Version {
-	struct ProfileVersionHolder: Decodable {
+extension ProfileSnapshot.Version {
+	fileprivate struct ProfileVersionHolder: Decodable {
 		// name of property MUST match that of ProfileSnapshot
 		let version: ProfileSnapshot.Version
 	}
 }
 
-public extension ProfileSnapshot.Version {
-	static func fromJSON(
+extension ProfileSnapshot.Version {
+	public static func fromJSON(
 		data: Data,
 		jsonDecoder: JSONDecoder = .iso8601
 	) throws -> Self {
@@ -34,8 +34,8 @@ struct IncompatibleProfileVersion: LocalizedError, Equatable {
 	}
 }
 
-public extension ProfileSnapshot {
-	static func validateCompatability(
+extension ProfileSnapshot {
+	public static func validateCompatability(
 		version: Version
 	) throws {
 		let minimumRequiredVersion: ProfileSnapshot.Version = .minimum
@@ -50,9 +50,9 @@ public extension ProfileSnapshot {
 	}
 }
 
-public extension ProfileSnapshot {
+extension ProfileSnapshot {
 	@discardableResult
-	static func validateVersionCompatability(
+	public static func validateVersionCompatability(
 		ofProfileSnapshotJSONData data: Data,
 		jsonDecoder: JSONDecoder = .iso8601
 	) throws -> Version {
@@ -95,14 +95,14 @@ public struct ProfileSnapshot:
 }
 
 // MARK: Take Snapshot
-public extension Profile {
-	func snaphot() -> ProfileSnapshot {
+extension Profile {
+	public func snaphot() -> ProfileSnapshot {
 		.init(profile: self)
 	}
 }
 
-public extension Profile {
-	init(
+extension Profile {
+	public init(
 		snapshot: ProfileSnapshot
 	) throws {
 		try ProfileSnapshot.validateCompatability(version: snapshot.version)
@@ -116,8 +116,8 @@ public extension Profile {
 	}
 }
 
-public extension ProfileSnapshot {
-	var customDumpMirror: Mirror {
+extension ProfileSnapshot {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -129,7 +129,7 @@ public extension ProfileSnapshot {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		factorSources: \(factorSources),
 		appPreferences: \(appPreferences),

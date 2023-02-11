@@ -2,25 +2,25 @@ import Cryptography
 import Prelude
 
 // MARK: - Engine.PrivateKey
-public extension Engine {
-	enum PrivateKey {
+extension Engine {
+	public enum PrivateKey {
 		case curve25519(Curve25519.Signing.PrivateKey)
 		case secp256k1(K1.PrivateKey)
 	}
 }
 
-public extension Engine.PrivateKey {
-	func publicKey() throws -> Engine.PublicKey {
+extension Engine.PrivateKey {
+	public func publicKey() throws -> Engine.PublicKey {
 		try SLIP10.PrivateKey(engine: self)
 			.publicKey()
 			.intoEngine()
 	}
 }
 
-public extension Engine.PrivateKey {
+extension Engine.PrivateKey {
 	/// Expects a non hashed `data`, will SHA256 double hash it for secp256k1,
 	/// but not for Curve25519, before signing.
-	func sign(
+	public func sign(
 		data: any DataProtocol,
 		ifECDSASkipHashingBeforeSigning: Bool = false
 	) throws -> Engine.SignatureWithPublicKey {
@@ -29,7 +29,7 @@ public extension Engine.PrivateKey {
 
 	/// Expects a non hashed `data`, will SHA256 double hash it for secp256k1,
 	/// but not for Curve25519, before signing.
-	func signReturningHashOfMessage(
+	public func signReturningHashOfMessage(
 		data: any DataProtocol,
 		ifECDSASkipHashingBeforeSigning: Bool = false
 	) throws -> (signatureWithPublicKey: Engine.SignatureWithPublicKey, hashOfMessage: Data) {

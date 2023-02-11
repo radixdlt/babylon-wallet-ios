@@ -14,8 +14,8 @@ public struct AppSettings: Sendable, Codable, Hashable {
 	}
 }
 
-public extension AppSettings {
-	static let `default`: Self = .init(
+extension AppSettings {
+	public static let `default`: Self = .init(
 		currency: .usd,
 		isCurrencyAmountVisible: true
 	)

@@ -35,8 +35,8 @@ public enum ApproveTransactionFailure: Sendable, LocalizedError, Equatable {
 	}
 }
 
-public extension EngineToolkit.Error {
-	var errorDescription: String? {
+extension EngineToolkit.Error {
+	public var errorDescription: String? {
 		switch self {
 		case let .callLibraryFunctionFailure(callLibraryFunctionFailure):
 			switch callLibraryFunctionFailure {

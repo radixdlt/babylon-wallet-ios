@@ -1,16 +1,16 @@
 import Foundation
 
 // MARK: - HD.Path
-public extension HD {
+extension HD {
 	/// A BIP32 derivation, either full or relative
-	enum Path: HDPathConvertible, Hashable, Sendable {
+	public enum Path: HDPathConvertible, Hashable, Sendable {
 		case full(Full)
 		case relative(Relative)
 	}
 }
 
-public extension HD.Path {
-	func depth() throws -> Component.Child.Depth.Value {
+extension HD.Path {
+	public func depth() throws -> Component.Child.Depth.Value {
 		switch self {
 		case let .relative(relativePath):
 			return try relativePath.depth()
@@ -19,21 +19,21 @@ public extension HD.Path {
 		}
 	}
 
-	var components: [Component] {
+	public var components: [Component] {
 		switch self {
 		case let .relative(relative): return relative.components
 		case let .full(full): return full.components
 		}
 	}
 
-	func toString() -> String {
+	public func toString() -> String {
 		switch self {
 		case let .relative(relative): return relative.toString()
 		case let .full(full): return full.toString()
 		}
 	}
 
-	init(components: [Component]) throws {
+	public init(components: [Component]) throws {
 		do {
 			let full = try Full(components: components)
 			self = .full(full)
@@ -43,7 +43,7 @@ public extension HD.Path {
 		}
 	}
 
-	init(string: String) throws {
+	public init(string: String) throws {
 		do {
 			let full = try Full(string: string)
 			self = .full(full)
@@ -64,16 +64,16 @@ public protocol HDPathConvertible {
 	func toString() -> String
 }
 
-public extension HDPathConvertible {
-	func appending(child: HD.Path.Component.Child) throws -> Self {
+extension HDPathConvertible {
+	public func appending(child: HD.Path.Component.Child) throws -> Self {
 		var children = self.components
 		children.append(HD.Path.Component.child(child))
 		return try Self(components: children)
 	}
 }
 
-public extension HD.Path {
-	static func validate(components: [Component]) throws -> [Component] {
+extension HD.Path {
+	public static func validate(components: [Component]) throws -> [Component] {
 		guard components.count > 1 else { return components }
 		let children = components.compactMap(\.asChild)
 
@@ -93,7 +93,7 @@ public extension HD.Path {
 		return components
 	}
 
-	struct Relative: Hashable, Sendable, HDPathConvertible {
+	public struct Relative: Hashable, Sendable, HDPathConvertible {
 		public let components: [Component]
 		public init(components: [Component]) throws {
 			guard !components.isEmpty else {
@@ -146,7 +146,7 @@ public extension HD.Path {
 		}
 	}
 
-	enum Error: Swift.Error, Equatable {
+	public enum Error: Swift.Error, Equatable {
 		case cannotBeEmpty
 		case pathMustStartWithRoot
 		case relativePathCannotContainRoot
@@ -156,7 +156,7 @@ public extension HD.Path {
 	}
 
 	/// A full BIP32 derivation path
-	struct Full: Hashable, Sendable, HDPathConvertible {
+	public struct Full: Hashable, Sendable, HDPathConvertible {
 		public var onlyPublic: Bool {
 			switch components[0] {
 			case let .root(onlyPublic): return onlyPublic
@@ -227,12 +227,12 @@ public extension HD.Path {
 	}
 }
 
-public extension HD.Path {
-	static let delimitor: Character = "/"
+extension HD.Path {
+	public static let delimitor: Character = "/"
 }
 
-public extension HDPathConvertible {
-	func toString() -> String {
+extension HDPathConvertible {
+	public func toString() -> String {
 		components.map { $0.toString() }.joined(separator: String(HD.Path.delimitor))
 	}
 }

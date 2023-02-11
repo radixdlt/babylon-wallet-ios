@@ -11,8 +11,8 @@ public protocol OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourc
 	func createInstance(input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput) async throws -> CreateFactorInstanceWithKey<Instance>
 }
 
-public extension OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
-	func createAnyFactorInstanceForResponse(
+extension OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
+	public func createAnyFactorInstanceForResponse(
 		input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput
 	) async throws -> AnyCreateFactorInstanceForResponse {
 		try await Self.createInstance(
@@ -21,7 +21,7 @@ public extension OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSour
 		).eraseToAny()
 	}
 
-	func createInstance(
+	public func createInstance(
 		input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput
 	) async throws -> CreateFactorInstanceWithKey<Instance> {
 		try await Self.createInstance(
@@ -30,7 +30,7 @@ public extension OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSour
 		)
 	}
 
-	static func createInstance(
+	public static func createInstance(
 		factorSourceReference: FactorSourceReference,
 		createInstanceInput input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput
 	) async throws -> CreateFactorInstanceWithKey<Instance> {

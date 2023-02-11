@@ -36,8 +36,8 @@ public struct OnNetwork:
 	}
 }
 
-public extension OnNetwork {
-	var customDumpMirror: Mirror {
+extension OnNetwork {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -50,7 +50,7 @@ public extension OnNetwork {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		networkID: \(networkID),
 		accounts: \(accounts),

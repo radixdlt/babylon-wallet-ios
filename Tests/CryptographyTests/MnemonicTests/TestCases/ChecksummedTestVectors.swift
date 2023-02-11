@@ -53,8 +53,8 @@ final class ChecksummedTestVectors: TestCase {
 	}
 }
 
-private extension ChecksummedTestVectors {
-	func doTestChecksummed(
+extension ChecksummedTestVectors {
+	private func doTestChecksummed(
 		jsonName: String,
 		language: BIP39.Language,
 		file: StaticString = #file, line: UInt = #line
@@ -71,7 +71,7 @@ private extension ChecksummedTestVectors {
 		}
 	}
 
-	func doTest(
+	private func doTest(
 		vectors: [ChecksummedVector],
 		language: BIP39.Language,
 		file: StaticString = #file, line: UInt = #line
@@ -85,7 +85,7 @@ private extension ChecksummedTestVectors {
 		}
 	}
 
-	func doTest(
+	private func doTest(
 		vector: ChecksummedVector,
 		language: BIP39.Language,
 		file: StaticString = #filePath, line: UInt = #line

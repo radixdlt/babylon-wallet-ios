@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - AggregatedValue.State
-public extension AggregatedValue {
+extension AggregatedValue {
 	// MARK: State
-	struct State: Sendable, Equatable {
+	public struct State: Sendable, Equatable {
 		public var value: Float?
 
 		// MARK: - AppSettings properties
@@ -23,8 +23,8 @@ public extension AggregatedValue {
 }
 
 #if DEBUG
-public extension AggregatedValue.State {
-	static let previewValue = AggregatedValue.State(
+extension AggregatedValue.State {
+	public static let previewValue = AggregatedValue.State(
 		value: 1_000_000,
 		currency: .usd
 	)

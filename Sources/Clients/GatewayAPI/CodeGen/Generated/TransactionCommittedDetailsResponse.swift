@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionCommittedDetailsResponse = GatewayAPI.TransactionCommittedDetailsResponse
 
 // MARK: - GatewayAPI.TransactionCommittedDetailsResponse
-public extension GatewayAPI {
-	struct TransactionCommittedDetailsResponse: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionCommittedDetailsResponse: Codable, Hashable {
 		public private(set) var ledgerState: LedgerState
 		public private(set) var transaction: CommittedTransactionInfo
 		public private(set) var details: TransactionCommittedDetailsResponseDetails

@@ -26,12 +26,12 @@ public struct RPCMessageUnencrypted: Sendable, Hashable {
 }
 
 #if DEBUG
-public extension P2PConnectionID {
-	static let deadbeef32Bytes: Self = try! .init(data: .deadbeef32Bytes)
+extension P2PConnectionID {
+	public static let deadbeef32Bytes: Self = try! .init(data: .deadbeef32Bytes)
 }
 
-public extension RPCMessageUnencrypted {
-	static func placeholder(
+extension RPCMessageUnencrypted {
+	public static func placeholder(
 		method: RPCMethod = .answer,
 		source: ClientSource = .mobileWallet,
 		connectionId: P2PConnectionID = .deadbeef32Bytes,
@@ -47,6 +47,6 @@ public extension RPCMessageUnencrypted {
 		)
 	}
 
-	static let placeholder = Self.placeholder()
+	public static let placeholder = Self.placeholder()
 }
 #endif // DEBUG

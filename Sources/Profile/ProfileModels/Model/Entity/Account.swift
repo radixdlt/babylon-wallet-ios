@@ -4,12 +4,12 @@ import EngineToolkitModels
 import Prelude
 
 // MARK: - OnNetwork.Account
-public extension OnNetwork {
+extension OnNetwork {
 	/// A network unique account with a unique public address and a set of cryptographic
 	/// factors used to control it. The account is either `virtual` or not. By "virtual"
 	/// we mean that the Radix Public Ledger does not yet know of the public address
 	/// of this account.
-	struct Account:
+	public struct Account:
 		EntityProtocol,
 		Sendable,
 		Hashable,
@@ -67,8 +67,8 @@ public extension OnNetwork {
 	}
 }
 
-public extension OnNetwork.Account {
-	static func deriveAddress(
+extension OnNetwork.Account {
+	public static func deriveAddress(
 		networkID: NetworkID,
 		publicKey: SLIP10.PublicKey
 	) throws -> EntityAddress {
@@ -83,25 +83,25 @@ public extension OnNetwork.Account {
 	}
 }
 
-public extension OnNetwork.Account {
-	static var entityKind: EntityKind { .account }
+extension OnNetwork.Account {
+	public static var entityKind: EntityKind { .account }
 
-	typealias EntityAddress = AccountAddress
+	public typealias EntityAddress = AccountAddress
 
 	/// Index in list of collection of accounts, per network.
-	typealias Index = Int
+	public typealias Index = Int
 
 	/// A stable and globally unique identifier of an account.
-	typealias ID = EntityAddress
+	public typealias ID = EntityAddress
 
-	typealias EntityDerivationPath = AccountHierarchicalDeterministicDerivationPath
+	public typealias EntityDerivationPath = AccountHierarchicalDeterministicDerivationPath
 
 	/// A stable and globally unique identifier for this account.
-	var id: ID { address }
+	public var id: ID { address }
 }
 
-public extension OnNetwork.Account {
-	var customDumpMirror: Mirror {
+extension OnNetwork.Account {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -115,7 +115,7 @@ public extension OnNetwork.Account {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		"displayName": \(String(describing: displayName)),
 		"index": \(index),

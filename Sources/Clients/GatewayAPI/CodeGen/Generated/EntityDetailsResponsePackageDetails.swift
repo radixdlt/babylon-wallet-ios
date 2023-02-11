@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityDetailsResponsePackageDetails = GatewayAPI.EntityDetailsResponsePackageDetails
 
 // MARK: - GatewayAPI.EntityDetailsResponsePackageDetails
-public extension GatewayAPI {
-	struct EntityDetailsResponsePackageDetails: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityDetailsResponsePackageDetails: Codable, Hashable {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
 		public private(set) var codeHex: String
 

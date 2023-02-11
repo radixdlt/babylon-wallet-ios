@@ -15,8 +15,8 @@ public enum SignatureWithPublicKey: Sendable, Hashable {
 	)
 }
 
-public extension SignatureWithPublicKey {
-	var signature: SLIP10.Signature {
+extension SignatureWithPublicKey {
+	public var signature: SLIP10.Signature {
 		switch self {
 		case let .eddsaEd25519(signature, _):
 			return .eddsaEd25519(signature)
@@ -25,7 +25,7 @@ public extension SignatureWithPublicKey {
 		}
 	}
 
-	var publicKey: SLIP10.PublicKey {
+	public var publicKey: SLIP10.PublicKey {
 		switch self {
 		case let .eddsaEd25519(_, publicKey):
 			return .eddsaEd25519(publicKey)

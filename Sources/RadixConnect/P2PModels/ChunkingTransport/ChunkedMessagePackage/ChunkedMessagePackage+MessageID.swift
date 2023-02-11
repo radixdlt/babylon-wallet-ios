@@ -1,9 +1,9 @@
 import Foundation
 
-public extension ChunkedMessagePackage {
-	typealias MessageID = String
+extension ChunkedMessagePackage {
+	public typealias MessageID = String
 
-	var messageId: MessageID {
+	public var messageId: MessageID {
 		switch self {
 		case let .chunk(value): return value.messageId
 		case let .metaData(value): return value.messageId

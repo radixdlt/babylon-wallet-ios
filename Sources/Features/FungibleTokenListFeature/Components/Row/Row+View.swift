@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - FungibleTokenList.Row.View
-public extension FungibleTokenList.Row {
+extension FungibleTokenList.Row {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -15,8 +15,8 @@ public extension FungibleTokenList.Row {
 	}
 }
 
-public extension FungibleTokenList.Row.View {
-	var body: some View {
+extension FungibleTokenList.Row.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -31,13 +31,13 @@ public extension FungibleTokenList.Row.View {
 }
 
 // MARK: - FungibleTokenList.Row.View.RowViewStore
-private extension FungibleTokenList.Row.View {
-	typealias RowViewStore = ViewStore<FungibleTokenList.Row.View.ViewState, FungibleTokenList.Row.Action.ViewAction>
+extension FungibleTokenList.Row.View {
+	fileprivate typealias RowViewStore = ViewStore<FungibleTokenList.Row.View.ViewState, FungibleTokenList.Row.Action.ViewAction>
 }
 
 // MARK: - Private Methods
-private extension FungibleTokenList.Row.View {
-	func tokenRow(with viewStore: RowViewStore, container: FungibleTokenContainer) -> some View {
+extension FungibleTokenList.Row.View {
+	fileprivate func tokenRow(with viewStore: RowViewStore, container: FungibleTokenContainer) -> some View {
 		ZStack {
 			HStack(alignment: .center) {
 				HStack(spacing: .small1) {
@@ -87,7 +87,7 @@ private extension FungibleTokenList.Row.View {
 		.frame(height: .large1 * 2)
 	}
 
-	func tokenAmount(
+	fileprivate func tokenAmount(
 		amount: String?,
 		isVisible: Bool
 	) -> String {
@@ -98,7 +98,7 @@ private extension FungibleTokenList.Row.View {
 		return String(describing: amount)
 	}
 
-	func tokenValue(_ value: BigDecimal?, isVisible: Bool, currency: FiatCurrency) -> String {
+	fileprivate func tokenValue(_ value: BigDecimal?, isVisible: Bool, currency: FiatCurrency) -> String {
 		if isVisible {
 			if let value = value, let doubleValue = Double(value.description) {
 				return doubleValue.formatted(.currency(code: currency.symbol))

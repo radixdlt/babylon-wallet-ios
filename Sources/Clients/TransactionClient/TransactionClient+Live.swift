@@ -5,8 +5,8 @@ import EngineToolkitClient
 import GatewayAPI
 import ProfileClient
 
-public extension TransactionClient {
-	static var liveValue: Self {
+extension TransactionClient {
+	public static var liveValue: Self {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.profileClient) var profileClient
@@ -429,8 +429,8 @@ public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable 
 	}
 }
 
-public extension LocalizedError where Self: Equatable {
-	static func == (lhs: Self, rhs: Self) -> Bool {
+extension LocalizedError where Self: Equatable {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.errorDescription == rhs.errorDescription
 	}
 }

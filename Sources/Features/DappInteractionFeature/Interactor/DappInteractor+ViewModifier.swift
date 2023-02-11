@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-public extension View {
-	func presentsDappInteractions(onDismiss: (@Sendable () -> Void)?) -> some View {
+extension View {
+	public func presentsDappInteractions(onDismiss: (@Sendable () -> Void)?) -> some View {
 		self.presentsDappInteractions(
 			store: .init(
 				initialState: .init(),

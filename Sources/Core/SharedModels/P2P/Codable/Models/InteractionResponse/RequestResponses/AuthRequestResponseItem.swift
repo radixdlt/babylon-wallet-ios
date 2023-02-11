@@ -1,8 +1,8 @@
 import Prelude
 
 // MARK: - P2P.ToDapp.WalletInteractionSuccessResponse.AuthRequestResponseItem
-public extension P2P.ToDapp.WalletInteractionSuccessResponse {
-	enum AuthRequestResponseItem: Sendable, Hashable, Encodable {
+extension P2P.ToDapp.WalletInteractionSuccessResponse {
+	public enum AuthRequestResponseItem: Sendable, Hashable, Encodable {
 		case login(AuthLoginRequestResponseItem)
 		case usePersona(AuthUsePersonaRequestResponseItem)
 
@@ -18,8 +18,8 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 }
 
 // MARK: - P2P.FromDapp.WalletInteraction.AuthLoginRequestItem
-public extension P2P.ToDapp.WalletInteractionSuccessResponse {
-	enum AuthLoginRequestResponseItem: Sendable, Hashable, Encodable {
+extension P2P.ToDapp.WalletInteractionSuccessResponse {
+	public enum AuthLoginRequestResponseItem: Sendable, Hashable, Encodable {
 		case withoutChallenge(AuthLoginWithoutChallengeRequestResponseItem)
 		case withChallenge(AuthLoginWithChallengeRequestResponseItem)
 
@@ -33,7 +33,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 		}
 	}
 
-	struct AuthLoginWithoutChallengeRequestResponseItem: Sendable, Hashable, Encodable {
+	public struct AuthLoginWithoutChallengeRequestResponseItem: Sendable, Hashable, Encodable {
 		public let discriminator = "loginWithoutChallenge"
 		public let persona: P2P.ToDapp.Persona
 
@@ -42,7 +42,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 		}
 	}
 
-	struct AuthLoginWithChallengeRequestResponseItem: Sendable, Hashable, Encodable {
+	public struct AuthLoginWithChallengeRequestResponseItem: Sendable, Hashable, Encodable {
 		public let discriminator = "loginWithChallenge"
 		public let persona: P2P.ToDapp.Persona
 		public let challenge: String
@@ -64,8 +64,8 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 }
 
 // MARK: - P2P.ToDapp.WalletInteractionSuccessResponse.AuthUsePersonaRequestResponseItem
-public extension P2P.ToDapp.WalletInteractionSuccessResponse {
-	struct AuthUsePersonaRequestResponseItem: Sendable, Hashable, Encodable {
+extension P2P.ToDapp.WalletInteractionSuccessResponse {
+	public struct AuthUsePersonaRequestResponseItem: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.FromDapp.WalletInteraction.AuthRequestItem.Discriminator.usePersona.rawValue
 		public let persona: P2P.ToDapp.Persona
 

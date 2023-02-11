@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionStatusResponseAllOf = GatewayAPI.TransactionStatusResponseAllOf
 
 // MARK: - GatewayAPI.TransactionStatusResponseAllOf
-public extension GatewayAPI {
-	struct TransactionStatusResponseAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionStatusResponseAllOf: Codable, Hashable {
 		public private(set) var status: TransactionStatus
 		public private(set) var knownPayloads: [TransactionStatusResponseKnownPayloadItem]
 		public private(set) var errorMessage: String?

@@ -33,8 +33,8 @@ public struct AppPreferences:
 	}
 }
 
-public extension AppPreferences {
-	var customDumpMirror: Mirror {
+extension AppPreferences {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -45,7 +45,7 @@ public extension AppPreferences {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		display: \(display),
 		p2pClients: \(p2pClients),
@@ -54,9 +54,9 @@ public extension AppPreferences {
 }
 
 // MARK: AppPreferences.Display
-public extension AppPreferences {
+extension AppPreferences {
 	/// Display settings in the wallet app, such as appearences, currency etc.
-	struct Display:
+	public struct Display:
 		Sendable,
 		Hashable,
 		Codable,
@@ -72,12 +72,12 @@ public extension AppPreferences {
 	}
 }
 
-public extension AppPreferences.Display {
-	static let `default` = Self()
+extension AppPreferences.Display {
+	public static let `default` = Self()
 }
 
-public extension AppPreferences.Display {
-	var customDumpMirror: Mirror {
+extension AppPreferences.Display {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -87,7 +87,7 @@ public extension AppPreferences.Display {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		fiatCurrencyPriceTarget: \(fiatCurrencyPriceTarget),
 		"""
@@ -106,8 +106,8 @@ public enum FiatCurrency:
 	case usd, eur, gbp
 }
 
-public extension FiatCurrency {
-	var sign: String {
+extension FiatCurrency {
+	public var sign: String {
 		switch self {
 		case .usd:
 			return "$"
@@ -118,7 +118,7 @@ public extension FiatCurrency {
 		}
 	}
 
-	var symbol: String {
+	public var symbol: String {
 		rawValue.uppercased()
 	}
 }

@@ -17,8 +17,8 @@ public struct NavigationBar<LeadingItem: View, TrailingItem: View>: View {
 	}
 }
 
-public extension NavigationBar {
-	var body: some View {
+extension NavigationBar {
+	public var body: some View {
 		HStack {
 			if let leadingButton = leadingItem {
 				leadingButton
@@ -44,8 +44,8 @@ public extension NavigationBar {
 	}
 }
 
-public extension NavigationBar {
-	init(
+extension NavigationBar {
+	public init(
 		titleText: String? = nil,
 		leadingItem: LeadingItem,
 		trailingItem: TrailingItem
@@ -58,8 +58,8 @@ public extension NavigationBar {
 	}
 }
 
-public extension NavigationBar where LeadingItem == EmptyView {
-	init(
+extension NavigationBar where LeadingItem == EmptyView {
+	public init(
 		titleText: String? = nil,
 		trailingItem: TrailingItem
 	) {
@@ -71,8 +71,8 @@ public extension NavigationBar where LeadingItem == EmptyView {
 	}
 }
 
-public extension NavigationBar where TrailingItem == EmptyView {
-	init(
+extension NavigationBar where TrailingItem == EmptyView {
+	public init(
 		titleText: String? = nil,
 		leadingItem: LeadingItem
 	) {
@@ -84,8 +84,8 @@ public extension NavigationBar where TrailingItem == EmptyView {
 	}
 }
 
-public extension NavigationBar where LeadingItem == EmptyView, TrailingItem == EmptyView {
-	init(
+extension NavigationBar where LeadingItem == EmptyView, TrailingItem == EmptyView {
+	public init(
 		titleText: String? = nil
 	) {
 		self.init(
@@ -97,8 +97,8 @@ public extension NavigationBar where LeadingItem == EmptyView, TrailingItem == E
 }
 
 // MARK: - Private Computed Properties
-private extension NavigationBar {
-	var placeholderSpacer: some View {
+extension NavigationBar {
+	private var placeholderSpacer: some View {
 		Spacer()
 			.frame(.small)
 	}

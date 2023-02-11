@@ -14,13 +14,13 @@ public struct EncryptionKey: Sendable, Hashable {
 	}
 }
 
-public extension EncryptionKey {
-	enum Error: Swift.Error {
+extension EncryptionKey {
+	public enum Error: Swift.Error {
 		case incorrectByteCount(got: Int, butExpected: Int)
 	}
 
-	static let byteCount = 32
-	var symmetric: SymmetricKey {
+	public static let byteCount = 32
+	public var symmetric: SymmetricKey {
 		.init(data: data)
 	}
 }

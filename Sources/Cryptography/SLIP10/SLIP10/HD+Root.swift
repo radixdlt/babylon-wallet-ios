@@ -1,8 +1,8 @@
 import Foundation
 
 // MARK: - HD.Root
-public extension HD {
-	struct Root {
+extension HD {
+	public struct Root {
 		public let seed: Data
 
 		/// Initialize HD Root with 128-512 bits. 256 bits is recommended.
@@ -19,18 +19,18 @@ public extension HD {
 	}
 }
 
-public extension HD.Root {
-	static let minBitCount = 128
-	static let maxBitCount = 512
+extension HD.Root {
+	public static let minBitCount = 128
+	public static let maxBitCount = 512
 
-	enum Error: Swift.Error, Equatable {
+	public enum Error: Swift.Error, Equatable {
 		case tooFewBits(got: Int, expectedAtLeast: Int)
 		case tooManyBits(got: Int, expectedAtMost: Int)
 	}
 }
 
-internal extension HD.Root {
-	func deriveKey<Curve>(
+extension HD.Root {
+	internal func deriveKey<Curve>(
 		path: HD.Path.Full,
 		keyToDerive: KeyToDerive
 	) throws -> HD.ExtendedKey<Curve> {
@@ -41,7 +41,7 @@ internal extension HD.Root {
 		)
 	}
 
-	func deriveKey<Curve>(
+	internal func deriveKey<Curve>(
 		path: HD.Path.Full,
 		curve: Curve.Type,
 		keyToDerive: KeyToDerive
@@ -79,20 +79,20 @@ internal extension HD.Root {
 	}
 }
 
-public extension HD.Root {
-	func derivePrivateKey<Curve>(path: HD.Path.Full) throws -> HD.ExtendedKey<Curve> {
+extension HD.Root {
+	public func derivePrivateKey<Curve>(path: HD.Path.Full) throws -> HD.ExtendedKey<Curve> {
 		try derivePrivateKey(path: path, curve: Curve.self)
 	}
 
-	func derivePrivateKey<Curve>(path: HD.Path.Full, curve: Curve.Type) throws -> HD.ExtendedKey<Curve> {
+	public func derivePrivateKey<Curve>(path: HD.Path.Full, curve: Curve.Type) throws -> HD.ExtendedKey<Curve> {
 		try deriveKey(path: path, keyToDerive: .derivePrivateKey)
 	}
 
-	func derivePublicKey<Curve>(path: HD.Path.Full) throws -> HD.ExtendedKey<Curve> {
+	public func derivePublicKey<Curve>(path: HD.Path.Full) throws -> HD.ExtendedKey<Curve> {
 		try derivePublicKey(path: path, curve: Curve.self)
 	}
 
-	func derivePublicKey<Curve>(path: HD.Path.Full, curve: Curve.Type) throws -> HD.ExtendedKey<Curve> {
+	public func derivePublicKey<Curve>(path: HD.Path.Full, curve: Curve.Type) throws -> HD.ExtendedKey<Curve> {
 		try deriveKey(path: path, keyToDerive: .derivePublicKeyOnly)
 	}
 }

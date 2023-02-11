@@ -8,10 +8,10 @@ public struct ConnectUsingSecrets: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension ConnectUsingSecrets {
+extension ConnectUsingSecrets {
 	private enum FocusFieldID {}
 	private enum ConnectID {}
-	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.task)):
 			return .run { [connectionPassword = state.connectionSecrets.connectionPassword] send in

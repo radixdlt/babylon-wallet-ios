@@ -11,8 +11,8 @@ extension FaucetClient: TestDependencyKey {
 	)
 }
 
-public extension FaucetClient {
-	static let noop = Self(
+extension FaucetClient {
+	public static let noop = Self(
 		getFreeXRD: { _ in .init("transactionID-deadbeef") },
 		isAllowedToUseFaucet: { _ in true },
 		saveLastUsedEpoch: { _ in }

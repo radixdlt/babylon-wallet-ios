@@ -2,9 +2,9 @@ import FeaturePrelude
 import P2PConnection
 
 // MARK: - ManageP2PClient.View
-public extension ManageP2PClient {
+extension ManageP2PClient {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.StoreOf<ManageP2PClient>
 		public let store: Store
 		public init(store: Store) {
@@ -13,8 +13,8 @@ public extension ManageP2PClient {
 	}
 }
 
-public extension ManageP2PClient.View {
-	var body: some View {
+extension ManageP2PClient.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -52,8 +52,8 @@ public extension ManageP2PClient.View {
 }
 
 // MARK: - ManageP2PClient.View.ViewState
-public extension ManageP2PClient.View {
-	struct ViewState: Equatable {
+extension ManageP2PClient.View {
+	public struct ViewState: Equatable {
 		public var connectionName: String
 
 		#if DEBUG
@@ -83,9 +83,9 @@ public extension ManageP2PClient.View {
 // MARK: DEBUG
 
 #if DEBUG
-private extension ManageP2PClient.View {
+extension ManageP2PClient.View {
 	@ViewBuilder
-	func debugView(
+	fileprivate func debugView(
 		viewStore: ViewStore<ViewState, ManageP2PClient.Action.ViewAction>
 	) -> some View {
 		Text(L10n.ManageP2PClients.connectionID(viewStore.connectionID))
@@ -166,12 +166,12 @@ extension ManageP2PClient.View.ViewState {
 	}
 }
 
-private extension ManageP2PClient.View.ViewState {
-	var connectionStatusDescription: String {
+extension ManageP2PClient.View.ViewState {
+	fileprivate var connectionStatusDescription: String {
 		connectionStatus.rawValue.capitalized
 	}
 
-	var connectionStatusColor: Color {
+	fileprivate var connectionStatusColor: Color {
 		switch connectionStatus {
 		case .disconnected, .failed, .closed: return .closed
 		case .closing: return .closing
@@ -181,11 +181,11 @@ private extension ManageP2PClient.View.ViewState {
 		}
 	}
 
-	var websocketConnectionStatusDescription: String {
+	fileprivate var websocketConnectionStatusDescription: String {
 		webSocketStatus.description.capitalized
 	}
 
-	var websocketConnectionStatusColor: Color {
+	fileprivate var websocketConnectionStatusColor: Color {
 		switch webSocketStatus {
 		case .new: return .new
 		case .connecting: return .connecting
@@ -195,11 +195,11 @@ private extension ManageP2PClient.View.ViewState {
 		}
 	}
 
-	var dataChannelReadyStateDescription: String {
+	fileprivate var dataChannelReadyStateDescription: String {
 		dataChannelStatus.description
 	}
 
-	var dataChannelReadyStateColor: Color {
+	fileprivate var dataChannelReadyStateColor: Color {
 		switch dataChannelStatus {
 		case .closed: return .closed
 		case .open: return .connected
@@ -209,12 +209,12 @@ private extension ManageP2PClient.View.ViewState {
 	}
 }
 
-private extension Color {
-	static let new: Self = .gray
-	static let connecting: Self = .yellow
-	static let closing: Self = .orange
-	static let connected: Self = .green
-	static let closed: Self = .red
+extension Color {
+	fileprivate static let new: Self = .gray
+	fileprivate static let connecting: Self = .yellow
+	fileprivate static let closing: Self = .orange
+	fileprivate static let connected: Self = .green
+	fileprivate static let closed: Self = .red
 }
 
 import SwiftUI // NB: necessary for previews to appear

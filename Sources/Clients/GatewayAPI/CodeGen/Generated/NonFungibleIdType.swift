@@ -14,8 +14,8 @@ import AnyCodable
 public typealias NonFungibleLocalIdType = GatewayAPI.NonFungibleLocalIdType
 
 // MARK: - GatewayAPI.NonFungibleLocalIdType
-public extension GatewayAPI {
-	enum NonFungibleLocalIdType: String, Codable, CaseIterable {
+extension GatewayAPI {
+	public enum NonFungibleLocalIdType: String, Codable, CaseIterable {
 		case string
 		case u32
 		case u64

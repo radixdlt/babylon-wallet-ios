@@ -1,5 +1,5 @@
 import Foundation
 
-public extension SignalingServerMessage {
-	typealias Outgoing = RPCMessage
+extension SignalingServerMessage {
+	public typealias Outgoing = RPCMessage
 }

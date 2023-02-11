@@ -14,12 +14,12 @@ public struct WebRTCOffer: WebRTCPrimitiveProtocol {
 	}
 }
 
-public extension WebRTCOffer {
-	var description: String {
+extension WebRTCOffer {
+	public var description: String {
 		description(includeTypeName: true)
 	}
 
-	func description(includeTypeName: Bool) -> String {
+	public func description(includeTypeName: Bool) -> String {
 		let props = "sdp: \(sdp)"
 		guard includeTypeName else {
 			return props
@@ -29,7 +29,7 @@ public extension WebRTCOffer {
 }
 
 #if DEBUG
-public extension WebRTCOffer {
-	static let placeholder = Self(sdp: "<OFFER SDP GOES HERE>")
+extension WebRTCOffer {
+	public static let placeholder = Self(sdp: "<OFFER SDP GOES HERE>")
 }
 #endif // DEBUG

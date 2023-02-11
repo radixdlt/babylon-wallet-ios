@@ -15,8 +15,8 @@ public final class RTCPrimitiveExtractorFromRPCMessage: Sendable {
 	}
 }
 
-public extension RTCPrimitiveExtractorFromRPCMessage {
-	convenience init(
+extension RTCPrimitiveExtractorFromRPCMessage {
+	public convenience init(
 		connectionSecrets: ConnectionSecrets
 	) {
 		self.init(
@@ -26,8 +26,8 @@ public extension RTCPrimitiveExtractorFromRPCMessage {
 	}
 }
 
-public extension RTCPrimitiveExtractorFromRPCMessage {
-	func extract(rpcMessage: RPCMessage) throws -> WebRTCPrimitive {
+extension RTCPrimitiveExtractorFromRPCMessage {
+	public func extract(rpcMessage: RPCMessage) throws -> WebRTCPrimitive {
 		guard rpcMessage.connectionID == self.connectionID else {
 			throw ConverseError.signalingServer(
 				.wrongConnectionSecretForEncryptedRPCMessage(

@@ -9,8 +9,8 @@ public enum PresentationBackground {
 	public static let blur: Self = .blur(style: .systemUltraThinMaterialDark)
 }
 
-public extension View {
-	func presentationBackground(_ background: PresentationBackground) -> some View {
+extension View {
+	public func presentationBackground(_ background: PresentationBackground) -> some View {
 		self.modifier(PresentationBackgroundModifier(background: background))
 	}
 }
@@ -89,22 +89,22 @@ private struct PresentationBackgroundModifier: ViewModifier {
 	}
 }
 
-private extension UIPresentationController {
-	@objc dynamic func swizzled_dismissalTransitionWillBegin() {
+extension UIPresentationController {
+	@objc fileprivate dynamic func swizzled_dismissalTransitionWillBegin() {
 		swizzled_dismissalTransitionWillBegin()
 		additionalDismissalAnimation?()
 	}
 
-	@objc dynamic func swizzled_presentationTransitionWillBegin() {
+	@objc fileprivate dynamic func swizzled_presentationTransitionWillBegin() {
 		swizzled_presentationTransitionWillBegin()
 		additionalPresentationAnimation?()
 	}
 }
 
-private extension UIPresentationController {
+extension UIPresentationController {
 	// runtime properties enabled by the obj-c runtime
 	// ref: https://nshipster.com/associated-objects
-	var additionalPresentationAnimation: (() -> Void)? {
+	fileprivate var additionalPresentationAnimation: (() -> Void)? {
 		get {
 			let key = unsafeBitCast(Selector(#function), to: UnsafeRawPointer.self)
 			return objc_getAssociatedObject(self, key) as? () -> Void
@@ -117,7 +117,7 @@ private extension UIPresentationController {
 
 	// runtime properties enabled by the obj-c runtime
 	// ref: https://nshipster.com/associated-objects
-	var additionalDismissalAnimation: (() -> Void)? {
+	fileprivate var additionalDismissalAnimation: (() -> Void)? {
 		get {
 			let key = unsafeBitCast(Selector(#function), to: UnsafeRawPointer.self)
 			return objc_getAssociatedObject(self, key) as? () -> Void
@@ -130,10 +130,10 @@ private extension UIPresentationController {
 }
 
 // basic swizzling logic. could probably be generalised to be used anywhere else where needed.
-private extension UIPresentationController {
-	static var swizzledSelectors: [Selector: Void] = [:]
+extension UIPresentationController {
+	fileprivate static var swizzledSelectors: [Selector: Void] = [:]
 
-	func swizzle(
+	fileprivate func swizzle(
 		original originalSelector: Selector,
 		swizzled swizzledSelector: Selector
 	) {

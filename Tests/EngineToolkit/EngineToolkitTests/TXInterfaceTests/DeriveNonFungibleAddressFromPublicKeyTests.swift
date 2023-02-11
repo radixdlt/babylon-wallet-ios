@@ -13,8 +13,8 @@ final class DeriveNonFungibleGlobalIdFromPublicKeyRequestTests: TestCase {
 	}
 }
 
-private extension DeriveNonFungibleGlobalIdFromPublicKeyRequestTests {
-	func doTest(
+extension DeriveNonFungibleGlobalIdFromPublicKeyRequestTests {
+	private func doTest(
 		vector: DeriveNonFungibleGlobalIdFromPublicKeyTestVectors.Vector,
 		networkID: NetworkID = .simulator,
 		line: UInt = #line
@@ -28,7 +28,7 @@ private extension DeriveNonFungibleGlobalIdFromPublicKeyRequestTests {
 		XCTAssertNoDifference(derivedNonFungibleGlobalId, vector.nonFungibleGlobalId, line: line)
 	}
 
-	typealias TestSuite = DeriveNonFungibleGlobalIdFromPublicKeyTestVectors
+	fileprivate typealias TestSuite = DeriveNonFungibleGlobalIdFromPublicKeyTestVectors
 }
 
 // MARK: - DeriveNonFungibleGlobalIdFromPublicKeyTestVectors

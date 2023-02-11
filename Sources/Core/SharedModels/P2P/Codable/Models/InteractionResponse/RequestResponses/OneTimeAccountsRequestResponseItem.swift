@@ -1,8 +1,8 @@
 import Prelude
 
 // MARK: - P2P.ToDapp.WalletInteractionSuccessResponse.OneTimeAccountsRequestResponseItem
-public extension P2P.ToDapp.WalletInteractionSuccessResponse {
-	enum OneTimeAccountsRequestResponseItem: Sendable, Hashable, Encodable {
+extension P2P.ToDapp.WalletInteractionSuccessResponse {
+	public enum OneTimeAccountsRequestResponseItem: Sendable, Hashable, Encodable {
 		case withoutProof(OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem)
 		case withProof(OneTimeAccountsWithProofOfOwnershipRequestResponseItem)
 
@@ -17,8 +17,8 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 	}
 }
 
-public extension P2P.ToDapp.WalletInteractionSuccessResponse {
-	struct OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
+extension P2P.ToDapp.WalletInteractionSuccessResponse {
+	public struct OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
 		public let accounts: [P2P.ToDapp.WalletAccount]
 
 		public init(accounts: [P2P.ToDapp.WalletAccount]) {
@@ -26,7 +26,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 		}
 	}
 
-	struct OneTimeAccountsWithProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
+	public struct OneTimeAccountsWithProofOfOwnershipRequestResponseItem: Sendable, Hashable, Encodable {
 		public let accounts: [P2P.ToDapp.WalletAccountWithProof]
 
 		public init(accounts: [P2P.ToDapp.WalletAccountWithProof]) {

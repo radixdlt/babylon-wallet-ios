@@ -10,8 +10,8 @@ public struct CloseButton: View {
 	}
 }
 
-public extension CloseButton {
-	var body: some View {
+extension CloseButton {
+	public var body: some View {
 		Button(action: action) {
 			Image(asset: AssetResource.close).tint(.app.gray1)
 		}

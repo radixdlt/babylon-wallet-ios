@@ -27,8 +27,8 @@ public struct PrimaryRectangularButtonStyle: ButtonStyle {
 	}
 }
 
-private extension PrimaryRectangularButtonStyle {
-	var foregroundColor: Color {
+extension PrimaryRectangularButtonStyle {
+	private var foregroundColor: Color {
 		switch controlState {
 		case .enabled:
 			return .app.white
@@ -40,6 +40,6 @@ private extension PrimaryRectangularButtonStyle {
 	}
 }
 
-public extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
-	static var primaryRectangular: Self { Self() }
+extension ButtonStyle where Self == PrimaryRectangularButtonStyle {
+	public static var primaryRectangular: Self { Self() }
 }

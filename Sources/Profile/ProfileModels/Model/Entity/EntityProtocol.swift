@@ -39,6 +39,6 @@ public protocol EntityProtocol: Sendable, Equatable {
 	var displayName: NonEmpty<String> { get }
 }
 
-public extension EntityProtocol {
-	var kind: EntityKind { Self.entityKind }
+extension EntityProtocol {
+	public var kind: EntityKind { Self.entityKind }
 }

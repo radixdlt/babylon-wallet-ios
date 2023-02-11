@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - LocalNetworkPermission.View
-public extension LocalNetworkPermission {
+extension LocalNetworkPermission {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<LocalNetworkPermission>
 
 		public init(store: StoreOf<LocalNetworkPermission>) {
@@ -12,8 +12,8 @@ public extension LocalNetworkPermission {
 	}
 }
 
-public extension LocalNetworkPermission.View {
-	var body: some View {
+extension LocalNetworkPermission.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

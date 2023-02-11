@@ -1,9 +1,9 @@
 import Prelude
 
-private extension BIP39 {
-	static var cachedWordLists: [Language: WordList] = [:]
+extension BIP39 {
+	fileprivate static var cachedWordLists: [Language: WordList] = [:]
 
-	static func words(for language: Language) -> [String] {
+	fileprivate static func words(for language: Language) -> [String] {
 		switch language {
 		case .english:
 			return WordList.english
@@ -24,14 +24,14 @@ private extension BIP39 {
 		}
 	}
 
-	static func makeWordList(for language: Language) -> WordList {
+	fileprivate static func makeWordList(for language: Language) -> WordList {
 		let words = Self.words(for: language)
 		return try! WordList(words: words, language: language)
 	}
 }
 
-public extension BIP39 {
-	static func wordList(for language: Language) -> WordList {
+extension BIP39 {
+	public static func wordList(for language: Language) -> WordList {
 		if let list = cachedWordLists[language] {
 			return list
 		}

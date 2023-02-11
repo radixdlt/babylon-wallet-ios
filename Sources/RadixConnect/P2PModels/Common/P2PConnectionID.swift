@@ -13,18 +13,18 @@ public struct P2PConnectionID: Sendable, Hashable, Codable, CustomStringConverti
 	}
 }
 
-public extension P2PConnectionID {
-	var description: String {
+extension P2PConnectionID {
+	public var description: String {
 		data.hex()
 	}
 }
 
-public extension P2PConnectionID {
-	enum Error: Swift.Error {
+extension P2PConnectionID {
+	public enum Error: Swift.Error {
 		case incorrectByteCount(got: Int, butExpected: Int)
 	}
 
-	static let byteCount = 32
+	public static let byteCount = 32
 }
 
 public func == (connectionIdString: String, connectionID: P2PConnectionID) -> Bool {
@@ -35,14 +35,14 @@ public func == (connectionID: P2PConnectionID, connectionIdString: String) -> Bo
 	connectionID.hex() == connectionIdString
 }
 
-public extension P2PConnectionID {
-	func hex(options: Data.HexEncodingOptions = []) -> String {
+extension P2PConnectionID {
+	public func hex(options: Data.HexEncodingOptions = []) -> String {
 		data.hex(options: options)
 	}
 }
 
 #if DEBUG
-public extension P2PConnectionID {
-	static let placeholder = try! Self(data: .deadbeef32Bytes)
+extension P2PConnectionID {
+	public static let placeholder = try! Self(data: .deadbeef32Bytes)
 }
 #endif // DEBUG

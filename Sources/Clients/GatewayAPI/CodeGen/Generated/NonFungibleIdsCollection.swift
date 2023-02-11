@@ -14,8 +14,8 @@ import AnyCodable
 public typealias NonFungibleLocalIdsCollection = GatewayAPI.NonFungibleLocalIdsCollection
 
 // MARK: - GatewayAPI.NonFungibleLocalIdsCollection
-public extension GatewayAPI {
-	struct NonFungibleLocalIdsCollection: Codable, Hashable {
+extension GatewayAPI {
+	public struct NonFungibleLocalIdsCollection: Codable, Hashable {
 		public private(set) var totalCount: Int64?
 		public private(set) var previousCursor: String?
 		public private(set) var nextCursor: String?

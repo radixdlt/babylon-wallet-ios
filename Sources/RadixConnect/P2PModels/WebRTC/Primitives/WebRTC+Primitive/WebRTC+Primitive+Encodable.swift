@@ -1,7 +1,7 @@
 import Foundation
 
-public extension WebRTCPrimitive {
-	func encode(to encoder: Encoder) throws {
+extension WebRTCPrimitive {
+	public func encode(to encoder: Encoder) throws {
 		var singleValueContainer = encoder.singleValueContainer()
 		switch self {
 		case let .offer(value):

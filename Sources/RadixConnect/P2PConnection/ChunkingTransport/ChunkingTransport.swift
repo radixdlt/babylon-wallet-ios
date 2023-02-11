@@ -75,28 +75,28 @@ public final class ChunkingTransport {
 	}
 }
 
-public extension ChunkingTransport {
-	typealias Error = ConverseError
-	typealias Send = @Sendable (Data) throws -> Void
+extension ChunkingTransport {
+	public typealias Error = ConverseError
+	public typealias Send = @Sendable (Data) throws -> Void
 
-	typealias MessageID = ChunkedMessagePackage.MessageID
-	typealias IncomingMessage = ChunkingTransportIncomingMessage
-	typealias OutgoingMessage = ChunkingTransportOutgoingMessage
-	typealias SentReceipt = ChunkingTransportSentReceipt
+	public typealias MessageID = ChunkedMessagePackage.MessageID
+	public typealias IncomingMessage = ChunkingTransportIncomingMessage
+	public typealias OutgoingMessage = ChunkingTransportOutgoingMessage
+	public typealias SentReceipt = ChunkingTransportSentReceipt
 }
 
-public extension ChunkingTransport {
-	var outgoingMessageConfirmedPublisher: AnyPublisher<SentReceipt, Error> {
+extension ChunkingTransport {
+	public var outgoingMessageConfirmedPublisher: AnyPublisher<SentReceipt, Error> {
 		outgoingMessageConfirmedSubject.eraseToAnyPublisher()
 	}
 
-	var incomingMessagesPublisher: AnyPublisher<IncomingMessage, Error> {
+	public var incomingMessagesPublisher: AnyPublisher<IncomingMessage, Error> {
 		incomingMessagesSubject.eraseToAnyPublisher()
 	}
 }
 
-public extension ChunkingTransport {
-	func send(
+extension ChunkingTransport {
+	public func send(
 		data message: Data,
 		messageID: MessageID
 	) throws {
@@ -108,11 +108,11 @@ public extension ChunkingTransport {
 		}
 	}
 
-	func webRTCClientIncomingMessage(completedWith completion: Subscribers.Completion<ConverseError>) {
+	public func webRTCClientIncomingMessage(completedWith completion: Subscribers.Completion<ConverseError>) {
 		incomingMessagesSubject.send(completion: completion)
 	}
 
-	func receive(messageFromWebRTC: IncomingWebRTCMessage) {
+	public func receive(messageFromWebRTC: IncomingWebRTCMessage) {
 		let connectionID = self.connectionID
 		do {
 			guard let assembled = try handleChunkedMessagePackageJSONData(messageFromWebRTC.message) else {
@@ -141,11 +141,11 @@ public extension ChunkingTransport {
 	/// This does NOT send a message read confirmation (receipt), this adds this message to a filter ensuring if
 	/// the dApp resends this message due to this side not having sent a message read confirmation response in time
 	/// that we do not display the same message twice.
-	func markMessageAsHandled(_ incomingMessage: IncomingMessage) async {
+	public func markMessageAsHandled(_ incomingMessage: IncomingMessage) async {
 		await HandledMessagesByPeers.finishedHandling(message: incomingMessage, peerID: connectionID)
 	}
 
-	func sendReceiveMessageConfirmation(
+	public func sendReceiveMessageConfirmation(
 		for incomingMessage: IncomingMessage,
 		markMessageAsHandled: Bool = true
 	) throws {
@@ -160,8 +160,8 @@ public extension ChunkingTransport {
 	}
 }
 
-private extension ChunkingTransport {
-	func gotConfirmationFor(
+extension ChunkingTransport {
+	private func gotConfirmationFor(
 		outgoingMessage confirmedSentOutgoingMsg: ChunkedMessageReceiver.Message.Outgoing
 	) throws {
 		let msgId = confirmedSentOutgoingMsg.messageId
@@ -178,7 +178,7 @@ private extension ChunkingTransport {
 		outgoingMessageConfirmedSubject.send(sentReceipt)
 	}
 
-	func encodeAndSend<Model: Encodable>(
+	private func encodeAndSend<Model: Encodable>(
 		model: Model
 	) throws {
 		loggerGlobal.trace("JSON Encoding model before sending it over p2p, model is of type: \(Model.self) and value: \(String(describing: model))")
@@ -187,12 +187,12 @@ private extension ChunkingTransport {
 		try send(message)
 	}
 
-	func encodeAndSend(package: ChunkedMessagePackage) throws {
+	private func encodeAndSend(package: ChunkedMessagePackage) throws {
 		loggerGlobal.trace("⬆️ sending package over P2P: \(String(describing: package.packageType)), messageId: \(package.messageId)")
 		try encodeAndSend(model: package)
 	}
 
-	func handleChunkedMessagePackageJSONData(
+	private func handleChunkedMessagePackageJSONData(
 		_ packageJSONData: Data
 	) throws -> ChunkedMessageReceiver.Message? {
 		loggerGlobal.trace("⬇️ 🥩 RAW received #\(packageJSONData.count) bytes over P2P channel")

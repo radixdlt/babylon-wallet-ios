@@ -38,14 +38,14 @@ public protocol FeatureReducer: _FeatureReducer where Action == ActionOf<Self> {
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action>
 }
 
-public extension ReducerProtocol where Self: FeatureReducer {
-	typealias Action = ActionOf<Self>
+extension ReducerProtocol where Self: FeatureReducer {
+	public typealias Action = ActionOf<Self>
 
-	var body: some ReducerProtocolOf<Self> {
+	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
+	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case let .view(viewAction):
 			return reduce(into: &state, viewAction: viewAction)
@@ -58,15 +58,15 @@ public extension ReducerProtocol where Self: FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		.none
 	}
 
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		.none
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		.none
 	}
 }

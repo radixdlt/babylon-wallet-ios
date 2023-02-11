@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - SelectGenesisFactorSource.State
-public extension SelectGenesisFactorSource {
-	struct State: Sendable, Hashable {
+extension SelectGenesisFactorSource {
+	public struct State: Sendable, Hashable {
 		public let specifiedNameForNewEntityToCreate: NonEmpty<String>
 		public let factorSources: NonEmpty<IdentifiedArrayOf<FactorSource>>
 
@@ -17,8 +17,8 @@ public extension SelectGenesisFactorSource {
 }
 
 #if DEBUG
-public extension SelectGenesisFactorSource.State {
-	static let previewValue: Self = .init(
+extension SelectGenesisFactorSource.State {
+	public static let previewValue: Self = .init(
 		specifiedNameForNewEntityToCreate: "preview",
 		factorSources: .previewValue
 	)

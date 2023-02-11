@@ -6,24 +6,24 @@ public protocol IdentifierConvertible: ExpressibleByStringLiteral, ExpressibleBy
 	init(identifier: TransientIdentifier)
 }
 
-public extension IdentifierConvertible {
-	init(_ identifier: TransientIdentifier) {
+extension IdentifierConvertible {
+	public init(_ identifier: TransientIdentifier) {
 		self.init(identifier: identifier)
 	}
 
-	init(identifier: String) {
+	public init(identifier: String) {
 		self.init(identifier: .string(identifier))
 	}
 
-	init(identifier: UInt32) {
+	public init(identifier: UInt32) {
 		self.init(identifier: .u32(identifier))
 	}
 
-	init(stringLiteral value: String) {
+	public init(stringLiteral value: String) {
 		self.init(identifier: value)
 	}
 
-	init(integerLiteral value: UInt32) {
+	public init(integerLiteral value: UInt32) {
 		self.init(identifier: value)
 	}
 }

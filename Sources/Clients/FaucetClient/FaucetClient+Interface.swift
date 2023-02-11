@@ -18,15 +18,15 @@ public struct FaucetClient: Sendable {
 	}
 }
 
-public extension FaucetClient {
-	typealias GetFreeXRD = @Sendable (FaucetRequest) async throws -> TXID
-	typealias IsAllowedToUseFaucet = @Sendable (AccountAddress) async throws -> Bool
-	typealias SaveLastUsedEpoch = @Sendable (FaucetRequest) async throws -> Void
+extension FaucetClient {
+	public typealias GetFreeXRD = @Sendable (FaucetRequest) async throws -> TXID
+	public typealias IsAllowedToUseFaucet = @Sendable (AccountAddress) async throws -> Bool
+	public typealias SaveLastUsedEpoch = @Sendable (FaucetRequest) async throws -> Void
 }
 
 // MARK: FaucetClient.FaucetRequest
-public extension FaucetClient {
-	struct FaucetRequest: Sendable, Hashable {
+extension FaucetClient {
+	public struct FaucetRequest: Sendable, Hashable {
 		public let recipientAccountAddress: AccountAddress
 		public let unlockKeychainPromptShowToUser: String
 		public let addLockFeeInstructionToManifest: Bool
@@ -45,8 +45,8 @@ public extension FaucetClient {
 	}
 }
 
-public extension DependencyValues {
-	var faucetClient: FaucetClient {
+extension DependencyValues {
+	public var faucetClient: FaucetClient {
 		get { self[FaucetClient.self] }
 		set { self[FaucetClient.self] = newValue }
 	}

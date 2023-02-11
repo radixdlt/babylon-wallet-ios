@@ -14,8 +14,8 @@ import AnyCodable
 public typealias GatewayInfoResponseReleaseInfo = GatewayAPI.GatewayInfoResponseReleaseInfo
 
 // MARK: - GatewayAPI.GatewayInfoResponseReleaseInfo
-public extension GatewayAPI {
-	struct GatewayInfoResponseReleaseInfo: Codable, Hashable {
+extension GatewayAPI {
+	public struct GatewayInfoResponseReleaseInfo: Codable, Hashable {
 		/** The release that is currently deployed to the Gateway API. */
 		public private(set) var releaseVersion: String
 		/** The Open API Schema version that was used to generate the API models. */

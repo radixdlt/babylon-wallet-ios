@@ -6,9 +6,9 @@ import PersonasFeature
 import ProfileClient
 
 // MARK: AppSettings.State
-public extension AppSettings {
+extension AppSettings {
 	// MARK: State
-	struct State: Equatable {
+	public struct State: Equatable {
 		public var manageP2PClients: ManageP2PClients.State?
 		public var manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State?
 		public var personasCoordinator: PersonasCoordinator.State?

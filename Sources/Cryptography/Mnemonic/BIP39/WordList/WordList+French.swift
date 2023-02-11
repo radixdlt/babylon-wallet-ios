@@ -1,8 +1,8 @@
 import Foundation
 
 // swiftlint:disable file_length
-public extension BIP39.WordList {
-	static let french: [String] = {
+extension BIP39.WordList {
+	public static let french: [String] = {
 		let words =
 			"""
 			abaisser

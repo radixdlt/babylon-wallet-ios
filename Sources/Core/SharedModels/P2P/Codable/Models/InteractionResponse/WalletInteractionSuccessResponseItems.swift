@@ -1,8 +1,8 @@
 import Prelude
 
 // MARK: - P2P.ToDapp.WalletInteractionSuccessResponse.Items
-public extension P2P.ToDapp.WalletInteractionSuccessResponse {
-	enum Items: Sendable, Hashable, Encodable {
+extension P2P.ToDapp.WalletInteractionSuccessResponse {
+	public enum Items: Sendable, Hashable, Encodable {
 		case request(RequestResponseItems)
 		case transaction(TransactionResponseItems)
 
@@ -17,8 +17,8 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 	}
 }
 
-public extension P2P.ToDapp.WalletInteractionSuccessResponse {
-	enum RequestResponseItems: Sendable, Hashable, Encodable {
+extension P2P.ToDapp.WalletInteractionSuccessResponse {
+	public enum RequestResponseItems: Sendable, Hashable, Encodable {
 		case unauthorized(UnauthorizedRequestResponseItems)
 		case authorized(AuthorizedRequestResponseItems)
 
@@ -32,7 +32,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 		}
 	}
 
-	struct UnauthorizedRequestResponseItems: Sendable, Hashable, Encodable {
+	public struct UnauthorizedRequestResponseItems: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.FromDapp.WalletInteraction.Items.Discriminator.unauthorizedRequest.rawValue
 		public let oneTimeAccounts: OneTimeAccountsRequestResponseItem?
 
@@ -41,7 +41,7 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 		}
 	}
 
-	struct AuthorizedRequestResponseItems: Sendable, Hashable, Encodable {
+	public struct AuthorizedRequestResponseItems: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.FromDapp.WalletInteraction.Items.Discriminator.authorizedRequest.rawValue
 		public let auth: AuthRequestResponseItem
 		public let oneTimeAccounts: OneTimeAccountsRequestResponseItem?
@@ -60,8 +60,8 @@ public extension P2P.ToDapp.WalletInteractionSuccessResponse {
 }
 
 // MARK: - P2P.ToDapp.WalletInteractionSuccessResponse.TransactionResponseItems
-public extension P2P.ToDapp.WalletInteractionSuccessResponse {
-	struct TransactionResponseItems: Sendable, Hashable, Encodable {
+extension P2P.ToDapp.WalletInteractionSuccessResponse {
+	public struct TransactionResponseItems: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.FromDapp.WalletInteraction.Items.Discriminator.transaction.rawValue
 		public let send: SendTransactionResponseItem
 

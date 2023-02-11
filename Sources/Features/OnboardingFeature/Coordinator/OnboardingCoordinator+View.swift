@@ -2,9 +2,9 @@ import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - OnboardingCoordinator.View
-public extension OnboardingCoordinator {
+extension OnboardingCoordinator {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<OnboardingCoordinator>
 
 		public init(store: StoreOf<OnboardingCoordinator>) {
@@ -13,8 +13,8 @@ public extension OnboardingCoordinator {
 	}
 }
 
-public extension OnboardingCoordinator.View {
-	var body: some View {
+extension OnboardingCoordinator.View {
+	public var body: some View {
 		SwitchStore(store) {
 			CaseLet(
 				state: /OnboardingCoordinator.State.importProfile,

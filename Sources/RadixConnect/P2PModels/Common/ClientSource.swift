@@ -6,12 +6,12 @@ public enum ClientSource: String, Codable, Sendable, Hashable, CustomStringConve
 	case mobileWallet = "wallet"
 }
 
-public extension ClientSource {
-	var debugDescription: String {
+extension ClientSource {
+	public var debugDescription: String {
 		rawValue
 	}
 
-	var description: String {
+	public var description: String {
 		switch self {
 		case .browserExtension: return "Browser Extension"
 		case .mobileWallet: return "Mobile Wallet"

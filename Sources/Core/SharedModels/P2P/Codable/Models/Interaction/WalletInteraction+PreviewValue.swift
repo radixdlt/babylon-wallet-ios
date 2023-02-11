@@ -2,8 +2,8 @@ import Prelude
 
 #if DEBUG
 
-public extension TransactionManifest {
-	static let previewValue = Self(instructions: .string(complexManifestString))
+extension TransactionManifest {
+	public static let previewValue = Self(instructions: .string(complexManifestString))
 }
 
 private let complexManifestString = """
@@ -45,36 +45,36 @@ DROP_ALL_PROOFS;
 CALL_METHOD ComponentAddress("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum") "complicated_method" Decimal("1") PreciseDecimal("2");
 """
 
-public extension P2P.FromDapp.WalletInteraction.OneTimeAccountsRequestItem {
-	static let previewValue: Self = .init(
+extension P2P.FromDapp.WalletInteraction.OneTimeAccountsRequestItem {
+	public static let previewValue: Self = .init(
 		numberOfAccounts: .exactly(1),
 		requiresProofOfOwnership: false
 	)
 }
 
-public extension P2P.FromDapp.WalletInteraction.SendTransactionItem {
-	static let previewValue: Self = .init(version: .default, transactionManifest: .previewValue, message: nil)
+extension P2P.FromDapp.WalletInteraction.SendTransactionItem {
+	public static let previewValue: Self = .init(version: .default, transactionManifest: .previewValue, message: nil)
 }
 
-public extension P2P.FromDapp.WalletInteraction.ID {
-	static let previewValue = Self.previewValue0
-	static let previewValue0: Self = "E621E1F8-C36C-495A-93FC-0C247A3E6E5F"
-	static let previewValue1: Self = "D621E1F8-C36C-495A-93FC-0C247A3E6E5F"
-	static let previewValue2: Self = "C621E1F8-C36C-495A-93FC-0C247A3E6E5F"
-	static let previewValue3: Self = "B621E1F8-C36C-495A-93FC-0C247A3E6E5F"
-	static let previewValue4: Self = "A621E1F8-C36C-495A-93FC-0C247A3E6E5F"
+extension P2P.FromDapp.WalletInteraction.ID {
+	public static let previewValue = Self.previewValue0
+	public static let previewValue0: Self = "E621E1F8-C36C-495A-93FC-0C247A3E6E5F"
+	public static let previewValue1: Self = "D621E1F8-C36C-495A-93FC-0C247A3E6E5F"
+	public static let previewValue2: Self = "C621E1F8-C36C-495A-93FC-0C247A3E6E5F"
+	public static let previewValue3: Self = "B621E1F8-C36C-495A-93FC-0C247A3E6E5F"
+	public static let previewValue4: Self = "A621E1F8-C36C-495A-93FC-0C247A3E6E5F"
 }
 
-public extension P2P.FromDapp.WalletInteraction.Metadata {
-	static let previewValue = Self(
+extension P2P.FromDapp.WalletInteraction.Metadata {
+	public static let previewValue = Self(
 		networkId: .simulator,
 		origin: "Placeholder",
 		dAppDefinitionAddress: try! .init(address: "DappDefinitionAddress")
 	)
 }
 
-public extension P2P.FromDapp.WalletInteraction {
-	static func previewValueAllRequests(auth: P2P.FromDapp.WalletInteraction.AuthRequestItem) -> Self {
+extension P2P.FromDapp.WalletInteraction {
+	public static func previewValueAllRequests(auth: P2P.FromDapp.WalletInteraction.AuthRequestItem) -> Self {
 		.init(
 			id: .previewValue0,
 			items: .request(.authorized(.init(
@@ -89,8 +89,8 @@ public extension P2P.FromDapp.WalletInteraction {
 		)
 	}
 
-	static let previewValueOneTimeAccount: Self = .previewValueOneTimeAccount()
-	static func previewValueOneTimeAccount(
+	public static let previewValueOneTimeAccount: Self = .previewValueOneTimeAccount()
+	public static func previewValueOneTimeAccount(
 		id: ID = .previewValue0
 	) -> Self {
 		.init(
@@ -104,9 +104,9 @@ public extension P2P.FromDapp.WalletInteraction {
 		)
 	}
 
-	static let previewValueSignTX: Self = .previewValueSignTX()
+	public static let previewValueSignTX: Self = .previewValueSignTX()
 
-	static func previewValueSignTX(
+	public static func previewValueSignTX(
 		id: ID = .previewValue0
 	) -> Self {
 		.init(
@@ -118,7 +118,7 @@ public extension P2P.FromDapp.WalletInteraction {
 		)
 	}
 
-	static let previewValueNoRequestItems = Self(
+	public static let previewValueNoRequestItems = Self(
 		id: .previewValue,
 		items: .request(.unauthorized(.init(
 			oneTimeAccounts: nil

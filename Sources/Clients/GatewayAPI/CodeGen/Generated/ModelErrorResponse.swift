@@ -14,8 +14,8 @@ import AnyCodable
 public typealias ModelErrorResponse = GatewayAPI.ModelErrorResponse
 
 // MARK: - GatewayAPI.ModelErrorResponse
-public extension GatewayAPI {
-	struct ModelErrorResponse: Codable, Hashable {
+extension GatewayAPI {
+	public struct ModelErrorResponse: Codable, Hashable {
 		/** A human-readable error message. */
 		public private(set) var message: String
 		/** A numeric code corresponding to the given error type. */

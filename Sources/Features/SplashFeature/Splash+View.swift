@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - Splash.View
-public extension Splash {
+extension Splash {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -13,8 +13,8 @@ public extension Splash {
 	}
 }
 
-public extension Splash.View {
-	var body: some View {
+extension Splash.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

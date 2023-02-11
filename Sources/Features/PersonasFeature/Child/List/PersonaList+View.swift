@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - PersonaList.View
-public extension PersonaList {
+extension PersonaList {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<PersonaList>
 
 		public init(store: StoreOf<PersonaList>) {
@@ -12,8 +12,8 @@ public extension PersonaList {
 	}
 }
 
-public extension PersonaList.View {
-	var body: some View {
+extension PersonaList.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

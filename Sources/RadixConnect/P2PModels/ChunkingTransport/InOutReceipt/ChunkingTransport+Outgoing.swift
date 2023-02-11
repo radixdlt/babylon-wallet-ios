@@ -11,9 +11,9 @@ public struct ChunkingTransportOutgoingMessage: Sendable, Hashable, CustomString
 	}
 }
 
-public extension ChunkingTransportOutgoingMessage {
-	typealias MessageID = ChunkedMessagePackage.MessageID
-	var description: String {
+extension ChunkingTransportOutgoingMessage {
+	public typealias MessageID = ChunkedMessagePackage.MessageID
+	public var description: String {
 		"""
 		messageID: \(messageID),
 		data: #\(data.count) bytes

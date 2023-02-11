@@ -14,8 +14,8 @@ import AnyCodable
 public typealias GatewayInformationResponseAllOfWellKnownAddresses = GatewayAPI.GatewayInformationResponseAllOfWellKnownAddresses
 
 // MARK: - GatewayAPI.GatewayInformationResponseAllOfWellKnownAddresses
-public extension GatewayAPI {
-	struct GatewayInformationResponseAllOfWellKnownAddresses: Codable, Hashable {
+extension GatewayAPI {
+	public struct GatewayInformationResponseAllOfWellKnownAddresses: Codable, Hashable {
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var accountPackage: String
 		/** The Bech32m-encoded human readable version of the component (normal, account, system) global address. */

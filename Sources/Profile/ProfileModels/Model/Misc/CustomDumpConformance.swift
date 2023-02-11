@@ -1,7 +1,7 @@
 import Prelude
 
-public extension RawRepresentable where Self: CustomDumpRepresentable {
-	var customDumpValue: Any {
+extension RawRepresentable where Self: CustomDumpRepresentable {
+	public var customDumpValue: Any {
 		rawValue
 	}
 }

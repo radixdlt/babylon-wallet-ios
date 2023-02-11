@@ -14,8 +14,8 @@ final class DeriveVirtualAccountAddressRequestTests: TestCase {
 	}
 }
 
-private extension DeriveVirtualAccountAddressRequestTests {
-	func doTest(
+extension DeriveVirtualAccountAddressRequestTests {
+	private func doTest(
 		vector: DeriveVirtualAccountAddressTestVectors.Vector,
 		networkID: NetworkID = .simulator,
 		line: UInt = #line
@@ -33,7 +33,7 @@ private extension DeriveVirtualAccountAddressRequestTests {
 		)
 	}
 
-	typealias TestSuite = DeriveVirtualAccountAddressTestVectors
+	fileprivate typealias TestSuite = DeriveVirtualAccountAddressTestVectors
 }
 
 // MARK: - DeriveVirtualAccountAddressTestVectors

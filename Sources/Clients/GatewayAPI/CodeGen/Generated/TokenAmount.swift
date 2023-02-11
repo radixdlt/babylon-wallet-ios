@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TokenAmount = GatewayAPI.TokenAmount
 
 // MARK: - GatewayAPI.TokenAmount
-public extension GatewayAPI {
-	struct TokenAmount: Codable, Hashable {
+extension GatewayAPI {
+	public struct TokenAmount: Codable, Hashable {
 		/** The string-encoded decimal representing the amount */
 		public private(set) var value: String
 		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */

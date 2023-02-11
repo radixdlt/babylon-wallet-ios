@@ -9,8 +9,8 @@ public enum ChunkedMessagePackage: Codable, Sendable & Equatable {
 }
 
 #if DEBUG
-public extension Array where Element == ChunkedMessagePackage {
-	static let placeholder: Self = [
+extension Array where Element == ChunkedMessagePackage {
+	public static let placeholder: Self = [
 		.metaData(.placeholder(chunkCount: 2)),
 		.chunk(.placeholder(index: 0)),
 		.chunk(.placeholder(index: 1)),

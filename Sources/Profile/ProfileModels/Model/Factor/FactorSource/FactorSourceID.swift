@@ -4,8 +4,8 @@ import Prelude
 
 /// An identifier for some factor source, it **MUST** be a a stable and unique identifer.
 public typealias FactorSourceID = Tagged<FactorSource, HexCodable>
-public extension FactorSourceID {
-	init(hashingPublicKey publicKeyData: Data) {
+extension FactorSourceID {
+	public init(hashingPublicKey publicKeyData: Data) {
 		self.init(
 			rawValue: HexCodable(
 				data: SHA256.hash(publicKey: publicKeyData)
@@ -14,22 +14,22 @@ public extension FactorSourceID {
 	}
 }
 
-public extension HD.Root {
-	func factorSourceID<Curve: Slip10SupportedECCurve>(
+extension HD.Root {
+	public func factorSourceID<Curve: Slip10SupportedECCurve>(
 		curve: Curve.Type
 	) throws -> FactorSourceID {
 		try SHA256.factorSourceID(hdRoot: self, curve: curve)
 	}
 }
 
-public extension SHA256 {
+extension SHA256 {
 	/// `SHA256(SHA256(publicKey.compressedForm)`
 	fileprivate static func hash(publicKey: Data) -> Data {
 		Data(SHA256.twice(data: publicKey))
 	}
 
 	/// Creates a FactorSourceID using `SHA256(SHA256(hdRoot.GETID.publicKey.compressedForm)` of the `masterKey`
-	static func factorSourceID<Curve: Slip10SupportedECCurve>(
+	public static func factorSourceID<Curve: Slip10SupportedECCurve>(
 		getIDKey: HD.ExtendedKey<Curve>
 	) -> FactorSourceID {
 		FactorSourceID(
@@ -41,7 +41,7 @@ public extension SHA256 {
 	/// where `"GETID"` is derivation path, according to [CAP-26][cap26]
 	///
 	/// [cap26]: https://radixdlt.atlassian.net/l/cp/UNaBAGUC
-	static func factorSourceID<Curve: Slip10SupportedECCurve>(
+	public static func factorSourceID<Curve: Slip10SupportedECCurve>(
 		hdRoot: HD.Root,
 		curve: Curve.Type
 	) throws -> FactorSourceID {
@@ -50,7 +50,7 @@ public extension SHA256 {
 	}
 
 	/// Creates a `FactorInstanceID` using `SHA256(SHA256(publicKey.compressedForm)` of the `publickey`
-	static func factorInstanceID(publicKey: SLIP10.PublicKey) -> FactorInstanceID {
+	public static func factorInstanceID(publicKey: SLIP10.PublicKey) -> FactorInstanceID {
 		FactorInstanceID(
 			rawValue: HexCodable(
 				data: Self.hash(publicKey: publicKey.compressedData)

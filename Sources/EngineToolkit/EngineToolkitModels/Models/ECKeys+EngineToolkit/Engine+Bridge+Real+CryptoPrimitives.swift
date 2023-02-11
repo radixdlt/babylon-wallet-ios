@@ -1,8 +1,8 @@
 import Cryptography
 import Prelude
 
-public extension SLIP10.PrivateKey {
-	init(engine enginePrivateKey: Engine.PrivateKey) {
+extension SLIP10.PrivateKey {
+	public init(engine enginePrivateKey: Engine.PrivateKey) {
 		switch enginePrivateKey {
 		case let .secp256k1(key):
 			self = .secp256k1(key)
@@ -12,8 +12,8 @@ public extension SLIP10.PrivateKey {
 	}
 }
 
-public extension SLIP10.PrivateKey {
-	func intoEngine() throws -> Engine.PrivateKey {
+extension SLIP10.PrivateKey {
+	public func intoEngine() throws -> Engine.PrivateKey {
 		switch self {
 		case let .secp256k1(key): return .secp256k1(key)
 		case let .curve25519(key): return .curve25519(key)
@@ -21,8 +21,8 @@ public extension SLIP10.PrivateKey {
 	}
 }
 
-public extension SLIP10.PublicKey {
-	init(engine enginePublicKey: Engine.PublicKey) throws {
+extension SLIP10.PublicKey {
+	public init(engine enginePublicKey: Engine.PublicKey) throws {
 		switch enginePublicKey {
 		case let .eddsaEd25519(key):
 			self = try .eddsaEd25519(Curve25519.Signing.PublicKey(rawRepresentation: key.bytes))
@@ -32,8 +32,8 @@ public extension SLIP10.PublicKey {
 	}
 }
 
-public extension SLIP10.PublicKey {
-	func intoEngine() throws -> Engine.PublicKey {
+extension SLIP10.PublicKey {
+	public func intoEngine() throws -> Engine.PublicKey {
 		switch self {
 		case let .ecdsaSecp256k1(key):
 			return try .ecdsaSecp256k1(key.intoEngine())
@@ -43,14 +43,14 @@ public extension SLIP10.PublicKey {
 	}
 }
 
-public extension K1.PublicKey {
-	func intoEngine() throws -> Engine.EcdsaSecp256k1PublicKey {
+extension K1.PublicKey {
+	public func intoEngine() throws -> Engine.EcdsaSecp256k1PublicKey {
 		try .init(bytes: self.rawRepresentation(format: .compressed))
 	}
 }
 
-public extension SLIP10.Signature {
-	init(engine engineSignature: Engine.Signature) throws {
+extension SLIP10.Signature {
+	public init(engine engineSignature: Engine.Signature) throws {
 		switch engineSignature {
 		case let .eddsaEd25519(signature):
 			// TODO: validate
@@ -61,8 +61,8 @@ public extension SLIP10.Signature {
 	}
 }
 
-public extension SignatureWithPublicKey {
-	func intoEngine() throws -> Engine.SignatureWithPublicKey {
+extension SignatureWithPublicKey {
+	public func intoEngine() throws -> Engine.SignatureWithPublicKey {
 		switch self {
 		case let .ecdsaSecp256k1(signature, _):
 			return .ecdsaSecp256k1(

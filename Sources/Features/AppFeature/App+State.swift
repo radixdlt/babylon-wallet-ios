@@ -4,8 +4,8 @@ import OnboardingFeature
 import SplashFeature
 
 // MARK: App.State
-public extension App {
-	struct State: Equatable {
+extension App {
+	public struct State: Equatable {
 		public enum Root: Equatable {
 			case main(Main.State)
 			case onboardingCoordinator(OnboardingCoordinator.State)

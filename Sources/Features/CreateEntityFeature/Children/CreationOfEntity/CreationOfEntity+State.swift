@@ -3,8 +3,8 @@ import ProfileClient
 import ProfileModels
 
 // MARK: - CreationOfEntity.State
-public extension CreationOfEntity {
-	struct State: Sendable, Hashable {
+extension CreationOfEntity {
+	public struct State: Sendable, Hashable {
 		public let networkID: NetworkID?
 		public let name: NonEmpty<String>
 		public let genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy

@@ -27,8 +27,8 @@ public enum DataChannelState: String, Sendable, Hashable, Codable, CustomStringC
 	case closed
 }
 
-public extension DataChannelState {
-	var description: String {
+extension DataChannelState {
+	public var description: String {
 		rawValue
 	}
 }

@@ -25,11 +25,11 @@ public struct RPCMessage: Codable, Sendable, Hashable, CustomStringConvertible {
 	}
 }
 
-public extension RPCMessage {
+extension RPCMessage {
 	// Potentially dangerous since caller can pass incorrect data. e.g.
 	// `RPCMessage(encryption: Data(), of: unencrypted)` which is obviously
 	// not correct.
-	init(
+	public init(
 		encryption encryptedPayload: Data,
 		of unencrypted: RPCMessageUnencrypted
 	) {
@@ -43,8 +43,8 @@ public extension RPCMessage {
 	}
 }
 
-public extension RPCMessage {
-	var description: String {
+extension RPCMessage {
+	public var description: String {
 		"""
 		connectionID: \(connectionId),
 		requestId: \(requestId),
@@ -56,9 +56,9 @@ public extension RPCMessage {
 }
 
 #if DEBUG
-public extension RPCMessage {
-	static let placeholder = Self.placeholder()
-	static func placeholder(requestId: String = "0") -> Self {
+extension RPCMessage {
+	public static let placeholder = Self.placeholder()
+	public static func placeholder(requestId: String = "0") -> Self {
 		.init(method: .offer,
 		      source: .mobileWallet,
 		      connectionId: .deadbeef32Bytes,

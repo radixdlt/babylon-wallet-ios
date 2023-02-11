@@ -60,8 +60,8 @@ public struct AccountPreferences: Sendable, ReducerProtocol {
 	}
 }
 
-private extension AccountPreferences {
-	func loadIsAllowedToUseFaucet(_ state: inout State) -> EffectTask<Action> {
+extension AccountPreferences {
+	private func loadIsAllowedToUseFaucet(_ state: inout State) -> EffectTask<Action> {
 		state.faucetButtonState = .loading(.local)
 		return .run { [address = state.address] send in
 			await send(.internal(.system(.isAllowedToUseFaucet(

@@ -26,8 +26,8 @@ public struct RadioButton: View {
 	}
 }
 
-public extension RadioButton {
-	var body: some View {
+extension RadioButton {
+	public var body: some View {
 		let resource: ImageAsset = {
 			switch (appearance, state) {
 			case (.light, .unselected):

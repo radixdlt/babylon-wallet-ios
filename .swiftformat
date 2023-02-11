@@ -7,7 +7,7 @@
 
 --stripunusedargs closure-only
 --enable marktypes
---disable redundantNilInit,redundantSelf
+--disable redundantNilInit,redundantSelf,extensionAccessControl
 --lineaftermarks false
 --ifdef no-indent
 --header strip

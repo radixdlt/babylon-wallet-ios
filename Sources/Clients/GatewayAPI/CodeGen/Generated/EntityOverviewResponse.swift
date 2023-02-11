@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityOverviewResponse = GatewayAPI.EntityOverviewResponse
 
 // MARK: - GatewayAPI.EntityOverviewResponse
-public extension GatewayAPI {
-	struct EntityOverviewResponse: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityOverviewResponse: Codable, Hashable {
 		public private(set) var ledgerState: LedgerState
 		public private(set) var entities: [EntityOverviewResponseEntityItem]
 

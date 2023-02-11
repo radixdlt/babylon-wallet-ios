@@ -27,7 +27,7 @@ public struct DecodeAddressResponse: Sendable, Codable, Hashable {
 
 // MARK: Codable
 
-public extension DecodeAddressResponse {
+extension DecodeAddressResponse {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -40,7 +40,7 @@ public extension DecodeAddressResponse {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 
 		try container.encode(networkId, forKey: .networkId)
@@ -50,7 +50,7 @@ public extension DecodeAddressResponse {
 		try container.encode(hrp, forKey: .hrp)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 

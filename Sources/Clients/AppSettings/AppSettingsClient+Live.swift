@@ -44,7 +44,7 @@ extension AppSettingsClient: DependencyKey {
 	}
 }
 
-public extension AppSettingsClient {
-	typealias Value = AppSettingsClient
-	static let liveValue = AppSettingsClient.live()
+extension AppSettingsClient {
+	public typealias Value = AppSettingsClient
+	public static let liveValue = AppSettingsClient.live()
 }

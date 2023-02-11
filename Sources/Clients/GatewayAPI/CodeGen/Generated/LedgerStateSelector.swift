@@ -14,9 +14,9 @@ import AnyCodable
 public typealias LedgerStateSelector = GatewayAPI.LedgerStateSelector
 
 // MARK: - GatewayAPI.LedgerStateSelector
-public extension GatewayAPI {
+extension GatewayAPI {
 	/** Allows a client to request a response referencing an earlier (&#x60;at_*&#x60; properties) or later (&#x60;from_*&#x60; properties) ledger state. */
-	struct LedgerStateSelector: Codable, Hashable {
+	public struct LedgerStateSelector: Codable, Hashable {
 		/** If the version is provided, the latest ledger state <= the given version is returned. */
 		public private(set) var stateVersion: Int64?
 		/** If a timestamp is provided, the latest ledger state <= the given timestamp is returned. */

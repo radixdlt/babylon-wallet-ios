@@ -56,11 +56,11 @@ public struct P2PClient:
 	}
 }
 
-public extension P2PClient {
+extension P2PClient {
 	/// Convenience init if you want to specfity a `P2PConfig` in full. Which will use the
 	/// `config.webRTCConfig` as customWebRTCConfig overriding the default one when decoded and
 	/// analogously for `config.signalingServerConfig`.
-	init(
+	public init(
 		config: P2PConfig,
 		displayName: String,
 		platform: Platform = .browser,
@@ -82,7 +82,7 @@ public extension P2PClient {
 	/// P2PConfig using the stored `connectionPassword` and custom `webRTCConfig` if any, else the
 	/// `WebRTCConfig.default` will be used and analogously for `signalingServerConfig`, using the custom
 	/// one if present, else `SignalingServerConfig.default` will be used, and analogously for `connectorConfig`
-	var config: P2PConfig {
+	public var config: P2PConfig {
 		.init(
 			connectionPassword: connectionPassword,
 			connectorConfig: self.connectorConfig ?? .default,
@@ -93,9 +93,9 @@ public extension P2PClient {
 }
 
 // MARK: P2PClient.Platform
-public extension P2PClient {
+extension P2PClient {
 	/// The platform of the remote client, either `Browser`, or `Android` or `iPhone`.
-	enum Platform:
+	public enum Platform:
 		String,
 		Sendable,
 		Hashable,
@@ -108,23 +108,23 @@ public extension P2PClient {
 	}
 }
 
-public extension P2PClient {
-	typealias ID = P2PConnectionID
-	var id: P2PConnectionID {
+extension P2PClient {
+	public typealias ID = P2PConnectionID
+	public var id: P2PConnectionID {
 		config.connectionID
 	}
 
-	static func == (lhs: Self, rhs: Self) -> Bool {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.connectionPassword == rhs.connectionPassword
 	}
 
-	func hash(into hasher: inout Hasher) {
+	public func hash(into hasher: inout Hasher) {
 		hasher.combine(connectionPassword)
 	}
 }
 
-public extension P2PClient {
-	var description: String {
+extension P2PClient {
+	public var description: String {
 		"""
 		connectionPasswordMasked: \(connectionPassword.hexMask(showLast: 6)),
 		platform: \(platform),
@@ -138,26 +138,26 @@ public extension P2PClient {
 	}
 }
 
-public extension String {
-	func mask(showLast suffixCount: Int) -> String.SubSequence {
+extension String {
+	public func mask(showLast suffixCount: Int) -> String.SubSequence {
 		"..." + suffix(suffixCount)
 	}
 }
 
-public extension Data {
-	func hexMask(showLast suffixCount: Int) -> String.SubSequence {
+extension Data {
+	public func hexMask(showLast suffixCount: Int) -> String.SubSequence {
 		hex().mask(showLast: suffixCount)
 	}
 }
 
-public extension HexCodable {
-	func hexMask(showLast suffixCount: Int) -> String.SubSequence {
+extension HexCodable {
+	public func hexMask(showLast suffixCount: Int) -> String.SubSequence {
 		data.hexMask(showLast: suffixCount)
 	}
 }
 
-public extension ConnectionPassword {
-	func hexMask(showLast suffixCount: Int) -> String.SubSequence {
+extension ConnectionPassword {
+	public func hexMask(showLast suffixCount: Int) -> String.SubSequence {
 		data.hexMask(showLast: suffixCount)
 	}
 }
@@ -168,9 +168,9 @@ extension Date: @unchecked Sendable {}
 // MARK: - Data + Sendable
 extension Data: @unchecked Sendable {}
 
-public extension Date {
+extension Date {
 	/// Ugly hack around the fact that dates differs when encoded and decoded, by some nanoseconds or something... urgh!
-	var stableEquatableAfterJSONRoundtrip: Self {
+	public var stableEquatableAfterJSONRoundtrip: Self {
 		let jsonEncoder = JSONEncoder()
 		jsonEncoder.dateEncodingStrategy = .iso8601
 		let jsonDecoder = JSONDecoder()

@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityDetailsResponseFungibleResourceDetails = GatewayAPI.EntityDetailsResponseFungibleResourceDetails
 
 // MARK: - GatewayAPI.EntityDetailsResponseFungibleResourceDetails
-public extension GatewayAPI {
-	struct EntityDetailsResponseFungibleResourceDetails: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityDetailsResponseFungibleResourceDetails: Codable, Hashable {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
 		public private(set) var accessRulesChain: AnyCodable
 		public private(set) var vaultAccessRulesChain: AnyCodable

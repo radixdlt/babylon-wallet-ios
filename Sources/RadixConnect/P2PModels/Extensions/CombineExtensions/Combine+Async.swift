@@ -1,8 +1,8 @@
 import Combine
 import Foundation
 
-public extension Publisher {
-	func async() async throws -> Output {
+extension Publisher {
+	public func async() async throws -> Output {
 		try await withCheckedThrowingContinuation { continuation in
 			var cancellable: AnyCancellable?
 			var finishedWithoutValue = true

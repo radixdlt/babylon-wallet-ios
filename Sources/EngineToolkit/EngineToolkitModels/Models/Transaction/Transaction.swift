@@ -41,16 +41,16 @@ public struct TransactionManifest: Sendable, Codable, Hashable {
 // MARK: - InstructionsBuilder
 @resultBuilder
 public struct InstructionsBuilder {}
-public extension InstructionsBuilder {
-	static func buildBlock(_ instructions: Instruction...) -> [Instruction] {
+extension InstructionsBuilder {
+	public static func buildBlock(_ instructions: Instruction...) -> [Instruction] {
 		instructions
 	}
 
-	static func buildBlock(_ instruction: Instruction) -> [Instruction] {
+	public static func buildBlock(_ instruction: Instruction) -> [Instruction] {
 		[instruction]
 	}
 
-	static func buildBlock(_ instruction: Instruction) -> Instruction {
+	public static func buildBlock(_ instruction: Instruction) -> Instruction {
 		instruction
 	}
 }
@@ -58,26 +58,26 @@ public extension InstructionsBuilder {
 // MARK: - SpecificInstructionsBuilder
 @resultBuilder
 public struct SpecificInstructionsBuilder {}
-public extension SpecificInstructionsBuilder {
-	static func buildBlock(_ instructions: any InstructionProtocol...) -> [any InstructionProtocol] {
+extension SpecificInstructionsBuilder {
+	public static func buildBlock(_ instructions: any InstructionProtocol...) -> [any InstructionProtocol] {
 		instructions
 	}
 
-	static func buildBlock(_ instruction: any InstructionProtocol) -> [any InstructionProtocol] {
+	public static func buildBlock(_ instruction: any InstructionProtocol) -> [any InstructionProtocol] {
 		[instruction]
 	}
 
-	static func buildBlock(_ instruction: any InstructionProtocol) -> any InstructionProtocol {
+	public static func buildBlock(_ instruction: any InstructionProtocol) -> any InstructionProtocol {
 		instruction
 	}
 }
 
-public extension TransactionManifest {
-	init(@InstructionsBuilder buildInstructions: () throws -> [Instruction]) rethrows {
+extension TransactionManifest {
+	public init(@InstructionsBuilder buildInstructions: () throws -> [Instruction]) rethrows {
 		try self.init(instructions: buildInstructions())
 	}
 
-	init(@SpecificInstructionsBuilder buildInstructions: () throws -> [any InstructionProtocol]) rethrows {
+	public init(@SpecificInstructionsBuilder buildInstructions: () throws -> [any InstructionProtocol]) rethrows {
 		try self.init(instructions: buildInstructions())
 	}
 }

@@ -30,8 +30,8 @@ public enum ConnectionStatus: String, Sendable, Hashable, Codable, CustomStringC
 	case failed
 }
 
-public extension ConnectionStatus {
-	init?(iceConnectionState: ICEConnectionState) {
+extension ConnectionStatus {
+	public init?(iceConnectionState: ICEConnectionState) {
 		switch iceConnectionState {
 		case .new: self = .new
 		case .disconnected: self = .disconnected
@@ -43,7 +43,7 @@ public extension ConnectionStatus {
 		}
 	}
 
-	init(peerConnectionState: PeerConnectionState) {
+	public init(peerConnectionState: PeerConnectionState) {
 		switch peerConnectionState {
 		case .new: self = .new
 		case .connecting: self = .connecting
@@ -54,7 +54,7 @@ public extension ConnectionStatus {
 		}
 	}
 
-	init(dataChannelState: DataChannelState) {
+	public init(dataChannelState: DataChannelState) {
 		switch dataChannelState {
 		case .open:
 			self = .connected

@@ -1,10 +1,10 @@
 import Foundation
 
-public extension Mnemonic {
-	static let wordSeparator: Character = " "
+extension Mnemonic {
+	public static let wordSeparator: Character = " "
 
 	/// Attempts to restores a mnemonic from a bip39 phrase in `language`
-	init(
+	public init(
 		phrase: String,
 		wordSeparator: Character = Self.wordSeparator,
 		language maybeKnownLanguage: BIP39.Language?,

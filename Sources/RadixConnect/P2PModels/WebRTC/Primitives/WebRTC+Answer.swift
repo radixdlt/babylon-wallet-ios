@@ -15,12 +15,12 @@ public struct WebRTCAnswer: WebRTCPrimitiveProtocol {
 	}
 }
 
-public extension WebRTCAnswer {
-	var description: String {
+extension WebRTCAnswer {
+	public var description: String {
 		description(includeTypeName: true)
 	}
 
-	func description(includeTypeName: Bool) -> String {
+	public func description(includeTypeName: Bool) -> String {
 		let props = "sdp: \(sdp)"
 		guard includeTypeName else {
 			return props
@@ -30,7 +30,7 @@ public extension WebRTCAnswer {
 }
 
 #if DEBUG
-public extension WebRTCAnswer {
-	static let placeholder = Self(sdp: "<ANSWER SDP GOES HERE>")
+extension WebRTCAnswer {
+	public static let placeholder = Self(sdp: "<ANSWER SDP GOES HERE>")
 }
 #endif // DEBUG

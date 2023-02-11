@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-public extension Home {
-	struct Header: Sendable, ReducerProtocol {
+extension Home {
+	public struct Header: Sendable, ReducerProtocol {
 		public init() {}
 
 		public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {

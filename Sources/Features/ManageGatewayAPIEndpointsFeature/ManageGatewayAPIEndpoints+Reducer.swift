@@ -12,15 +12,15 @@ public struct ManageGatewayAPIEndpoints: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension ManageGatewayAPIEndpoints {
-	var body: some ReducerProtocolOf<Self> {
+extension ManageGatewayAPIEndpoints {
+	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
 			.ifLet(\.createAccountCoordinator, action: /Action.createAccountCoordinator) {
 				CreateAccountCoordinator()
 			}
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
+	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.didAppear)):
 			return .run { send in
@@ -153,7 +153,7 @@ public extension ManageGatewayAPIEndpoints {
 		}
 	}
 
-	func skipSwitching(state: inout State) -> EffectTask<Action> {
+	public func skipSwitching(state: inout State) -> EffectTask<Action> {
 		state.createAccountCoordinator = nil
 		state.validatedNewNetworkAndGatewayToSwitchTo = nil
 		return .none

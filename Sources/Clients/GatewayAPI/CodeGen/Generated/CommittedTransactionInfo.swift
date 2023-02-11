@@ -14,8 +14,8 @@ import AnyCodable
 public typealias CommittedTransactionInfo = GatewayAPI.CommittedTransactionInfo
 
 // MARK: - GatewayAPI.CommittedTransactionInfo
-public extension GatewayAPI {
-	struct CommittedTransactionInfo: Codable, Hashable {
+extension GatewayAPI {
+	public struct CommittedTransactionInfo: Codable, Hashable {
 		public private(set) var stateVersion: Int64?
 		public private(set) var transactionStatus: TransactionStatus
 		public private(set) var payloadHashHex: String

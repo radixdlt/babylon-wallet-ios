@@ -14,8 +14,8 @@ import AnyCodable
 public typealias NotSyncedUpError = GatewayAPI.NotSyncedUpError
 
 // MARK: - GatewayAPI.NotSyncedUpError
-public extension GatewayAPI {
-	struct NotSyncedUpError: Codable, Hashable {
+extension GatewayAPI {
+	public struct NotSyncedUpError: Codable, Hashable {
 		/** The type of error. Each subtype may have its own additional structured fields. */
 		public private(set) var type: String
 		/** The request type that triggered this exception. */

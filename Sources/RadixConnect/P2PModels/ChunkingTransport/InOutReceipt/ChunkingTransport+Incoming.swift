@@ -22,10 +22,10 @@ public struct ChunkingTransportIncomingMessage: Sendable, Hashable, CustomString
 	}
 }
 
-public extension ChunkingTransportIncomingMessage {
-	typealias MessageID = ChunkedMessagePackage.MessageID
+extension ChunkingTransportIncomingMessage {
+	public typealias MessageID = ChunkedMessagePackage.MessageID
 
-	var description: String {
+	public var description: String {
 		"""
 		messageID: \(messageID),
 		messageHash: #\(messageHash.hex()),

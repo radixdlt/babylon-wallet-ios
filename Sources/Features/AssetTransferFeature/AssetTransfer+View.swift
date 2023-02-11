@@ -2,9 +2,9 @@ import FeaturePrelude
 import TransactionSigningFeature
 
 // MARK: - AssetTransfer.View
-public extension AssetTransfer {
+extension AssetTransfer {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -14,8 +14,8 @@ public extension AssetTransfer {
 	}
 }
 
-public extension AssetTransfer.View {
-	var body: some View {
+extension AssetTransfer.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

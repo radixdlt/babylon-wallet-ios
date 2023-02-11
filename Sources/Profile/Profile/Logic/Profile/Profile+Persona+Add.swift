@@ -3,11 +3,11 @@ import Foundation
 import Prelude
 
 // MARK: Add Persona
-public extension Profile {
+extension Profile {
 	/// Creates a new **Virtual** `Persona` and saves it into the profile, by trying to load
 	/// mnemonics using `mnemonicForFactorSourceByReference`, to create factor instances for this new Persona.
 	@discardableResult
-	mutating func createNewVirtualPersona(
+	public mutating func createNewVirtualPersona(
 		networkID: NetworkID,
 		displayName: NonEmpty<String>,
 		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
@@ -26,7 +26,7 @@ public extension Profile {
 
 	/// Creates a new **Virtual** `Persona` and saves it into the profile.
 	@discardableResult
-	mutating func createNewVirtualPersona(
+	public mutating func createNewVirtualPersona(
 		networkID: NetworkID,
 		displayName: NonEmpty<String>,
 		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
@@ -43,7 +43,7 @@ public extension Profile {
 		return persona
 	}
 
-	mutating func addPersona(
+	public mutating func addPersona(
 		_ persona: OnNetwork.Persona
 	) async throws {
 		let networkID = persona.networkID
@@ -59,7 +59,7 @@ public extension Profile {
 	}
 
 	/// Creates a new **Virtual**  `Persona` without saving it into the profile.
-	func creatingNewVirtualPersona(
+	public func creatingNewVirtualPersona(
 		networkID: NetworkID,
 		displayName: NonEmpty<String>,
 		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
@@ -72,7 +72,7 @@ public extension Profile {
 	}
 
 	/// Creates a new **Virtual**  `Persona` without saving it into the profile.
-	func creatingNewVirtualPersona(
+	public func creatingNewVirtualPersona(
 		networkID: NetworkID,
 		displayName: NonEmpty<String>,
 		fields: IdentifiedArrayOf<OnNetwork.Persona.Field> = .init(),
@@ -93,7 +93,7 @@ public extension Profile {
 	}
 
 	/// Creates a new **Virtual** `Persona` without saving it anywhere
-	static func createNewVirtualPersona(
+	public static func createNewVirtualPersona(
 		factorSources: FactorSources,
 		personaIndex: Int,
 		networkID: NetworkID,

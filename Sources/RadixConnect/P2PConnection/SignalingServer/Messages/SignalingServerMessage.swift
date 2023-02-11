@@ -6,15 +6,15 @@ public enum SignalingServerMessage: Sendable, Hashable {
 	case outgoing(Outgoing)
 }
 
-public extension SignalingServerMessage {
-	var incoming: Incoming? {
+extension SignalingServerMessage {
+	public var incoming: Incoming? {
 		switch self {
 		case let .incoming(value): return value
 		case .outgoing: return nil
 		}
 	}
 
-	var outgoing: Outgoing? {
+	public var outgoing: Outgoing? {
 		switch self {
 		case let .outgoing(value): return value
 		case .incoming: return nil

@@ -8,8 +8,8 @@ public struct ScanQR: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension ScanQR {
-	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+extension ScanQR {
+	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		case let .internal(.view(.macInputConnectionPasswordChanged(connectionPassword))):
@@ -38,8 +38,8 @@ public extension ScanQR {
 	}
 }
 
-private extension ScanQR {
-	func parseConnectionPassword(hexString: String) -> EffectTask<Action> {
+extension ScanQR {
+	fileprivate func parseConnectionPassword(hexString: String) -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.system(.connectionSecretsFromScannedStringResult(
 				TaskResult {

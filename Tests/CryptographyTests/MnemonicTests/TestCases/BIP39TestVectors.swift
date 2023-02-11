@@ -138,8 +138,8 @@ final class BIP39TestVectors: TestCase {
 	}
 }
 
-private extension BIP39TestVectors {
-	func doTest(
+extension BIP39TestVectors {
+	private func doTest(
 		vectors: [BIP39Vector],
 		language: BIP39.Language,
 		file: StaticString = #file, line: UInt = #line
@@ -153,7 +153,7 @@ private extension BIP39TestVectors {
 		}
 	}
 
-	func doTest(
+	private func doTest(
 		vector: BIP39Vector,
 		language: BIP39.Language,
 		file: StaticString = #file, line: UInt = #line

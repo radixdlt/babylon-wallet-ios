@@ -22,13 +22,13 @@ struct EncodeAddressRequest {
 	}
 }
 
-public extension Profile {
-	enum AccountCreationStrategy: Sendable, Equatable {
+extension Profile {
+	public enum AccountCreationStrategy: Sendable, Equatable {
 		case createAccountOnDefaultNetwork(named: NonEmpty<String>)
 		case noAccountThusNoOnNetwork
 	}
 
-	static func new(
+	public static func new(
 		networkAndGateway: AppPreferences.NetworkAndGateway,
 		mnemonic: Mnemonic,
 		bip39Passphrase: String = "",
@@ -74,12 +74,12 @@ public extension Profile {
 		}
 	}
 
-	enum AccountCreationFromFactorInstanceStrategy: Sendable {
+	public enum AccountCreationFromFactorInstanceStrategy: Sendable {
 		case createAccountOnDefaultNetwork(named: NonEmpty<String>, createFactorInstance: CreateFactorInstanceForRequest)
 		case noAccountThusNoOnNetwork
 	}
 
-	static func new(
+	public static func new(
 		networkAndGateway: AppPreferences.NetworkAndGateway,
 		factorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource,
 		accountCreationFromFactorInstanceStrategy: AccountCreationFromFactorInstanceStrategy
@@ -136,18 +136,18 @@ internal struct NoInstance: Swift.Error {}
 // MARK: - FailedToFindFactorSource
 internal struct FailedToFindFactorSource: Swift.Error {}
 
-internal extension Profile {
-	mutating func updateOnNetwork(_ onNetwork: OnNetwork) throws {
+extension Profile {
+	internal mutating func updateOnNetwork(_ onNetwork: OnNetwork) throws {
 		try perNetwork.update(onNetwork)
 	}
 }
 
-public extension Profile {
-	func onNetwork(id needle: NetworkID) throws -> OnNetwork {
+extension Profile {
+	public func onNetwork(id needle: NetworkID) throws -> OnNetwork {
 		try perNetwork.onNetwork(id: needle)
 	}
 
-	func containsNetwork(withID networkID: NetworkID) -> Bool {
+	public func containsNetwork(withID networkID: NetworkID) -> Bool {
 		(try? onNetwork(id: networkID)) != nil
 	}
 }

@@ -1,8 +1,8 @@
 import Foundation
 
-public extension AsyncStream {
+extension AsyncStream {
 	/// By PointFreeCo Stephen Celis: https://forums.swift.org/t/when-can-we-move-asyncsequence-forward/61991/2
-	init<S: AsyncSequence>(_ sequence: S) where S.Element == Element {
+	public init<S: AsyncSequence>(_ sequence: S) where S.Element == Element {
 		var iterator: S.AsyncIterator?
 		self.init {
 			if iterator == nil {
@@ -15,7 +15,7 @@ public extension AsyncStream {
 
 /// By PointFreeCo:
 /// https://github.com/pointfreeco/swift-composable-architecture/blob/53ddc5904c065190d05c035ca0e4589cb6d45d61/Sources/ComposableArchitecture/Effects/ConcurrencySupport.swift#L125-L131
-public extension AsyncStream {
+extension AsyncStream {
 	/// Constructs and returns a stream along with its backing continuation.
 	///
 	/// This is handy for immediately escaping the continuation from an async stream, which typically
@@ -63,7 +63,7 @@ public extension AsyncStream {
 	///   default, the stream buffers an unlimited number of elements. You can also set the policy to
 	///   buffer a specified number of oldest or newest elements.
 	/// - Returns: An `AsyncStream`.
-	static func streamWithContinuation(
+	public static func streamWithContinuation(
 		_ elementType: Element.Type = Element.self,
 		bufferingPolicy limit: Continuation.BufferingPolicy = .unbounded
 	) -> (stream: Self, continuation: Continuation) {
@@ -73,7 +73,7 @@ public extension AsyncStream {
 }
 
 // By PointFreeCo: https://github.com/pointfreeco/swift-composable-architecture/blob/53ddc5904c065190d05c035ca0e4589cb6d45d61/Sources/ComposableArchitecture/Effects/ConcurrencySupport.swift#L222-L228
-public extension AsyncThrowingStream where Failure == Swift.Error {
+extension AsyncThrowingStream where Failure == Swift.Error {
 	/// Constructs and returns a stream along with its backing continuation.
 	///
 	/// This is handy for immediately escaping the continuation from an async stream, which typically
@@ -121,7 +121,7 @@ public extension AsyncThrowingStream where Failure == Swift.Error {
 	///   default, the stream buffers an unlimited number of elements. You can also set the policy to
 	///   buffer a specified number of oldest or newest elements.
 	/// - Returns: An `AsyncThrowingStream`.
-	static func streamWithContinuation(
+	public static func streamWithContinuation(
 		_ elementType: Element.Type = Element.self,
 		bufferingPolicy limit: Continuation.BufferingPolicy = .unbounded
 	) -> (stream: Self, continuation: Continuation) {

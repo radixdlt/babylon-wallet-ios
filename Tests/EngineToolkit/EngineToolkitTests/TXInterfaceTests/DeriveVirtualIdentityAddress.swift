@@ -14,8 +14,8 @@ final class DeriveVirtualIdentityAddressRequestTests: TestCase {
 	}
 }
 
-private extension DeriveVirtualIdentityAddressRequestTests {
-	func doTest(
+extension DeriveVirtualIdentityAddressRequestTests {
+	private func doTest(
 		vector: DeriveVirtualIdentityAddressTestVectors.Vector,
 		networkID: NetworkID = .simulator,
 		line: UInt = #line
@@ -33,7 +33,7 @@ private extension DeriveVirtualIdentityAddressRequestTests {
 		)
 	}
 
-	typealias TestSuite = DeriveVirtualIdentityAddressTestVectors
+	fileprivate typealias TestSuite = DeriveVirtualIdentityAddressTestVectors
 }
 
 // MARK: - DeriveVirtualIdentityAddressTestVectors

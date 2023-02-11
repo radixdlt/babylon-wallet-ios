@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - NameNewEntity.View
-public extension NameNewEntity {
+extension NameNewEntity {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<NameNewEntity>
 		@FocusState private var focusedField: NameNewEntity.State.Field?
 
@@ -13,8 +13,8 @@ public extension NameNewEntity {
 	}
 }
 
-public extension NameNewEntity.View {
-	var body: some View {
+extension NameNewEntity.View {
+	public var body: some View {
 		ForceFullScreen {
 			WithViewStore(
 				store,
@@ -95,18 +95,18 @@ extension NameNewEntity.View {
 }
 
 // MARK: - NameNewEntity.View.ViewStore
-private extension NameNewEntity.View {
-	typealias ViewStore = ComposableArchitecture.ViewStore<NameNewEntity.View.ViewState, NameNewEntity.Action.ViewAction>
+extension NameNewEntity.View {
+	fileprivate typealias ViewStore = ComposableArchitecture.ViewStore<NameNewEntity.View.ViewState, NameNewEntity.Action.ViewAction>
 }
 
-private extension NameNewEntity.View {
-	func title(with viewStore: ViewStore) -> some View {
+extension NameNewEntity.View {
+	fileprivate func title(with viewStore: ViewStore) -> some View {
 		Text(viewStore.titleText)
 			.foregroundColor(.app.gray1)
 			.textStyle(.sheetTitle)
 	}
 
-	func subtitle(with viewStore: ViewStore) -> some View {
+	fileprivate func subtitle(with viewStore: ViewStore) -> some View {
 		Text(L10n.CreateEntity.NameNewEntity.subtitle(viewStore.entityKindName.lowercased()))
 			.fixedSize(horizontal: false, vertical: true)
 			.padding(.horizontal, .large1)

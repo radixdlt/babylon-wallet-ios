@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - FungibleTokenDetails.View
-public extension FungibleTokenDetails {
+extension FungibleTokenDetails {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<FungibleTokenDetails>
 
 		public init(store: StoreOf<FungibleTokenDetails>) {
@@ -12,8 +12,8 @@ public extension FungibleTokenDetails {
 	}
 }
 
-public extension FungibleTokenDetails.View {
-	var body: some View {
+extension FungibleTokenDetails.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

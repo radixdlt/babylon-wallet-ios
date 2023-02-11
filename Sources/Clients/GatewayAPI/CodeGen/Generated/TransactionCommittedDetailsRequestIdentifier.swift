@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionCommittedDetailsRequestIdentifier = GatewayAPI.TransactionCommittedDetailsRequestIdentifier
 
 // MARK: - GatewayAPI.TransactionCommittedDetailsRequestIdentifier
-public extension GatewayAPI {
-	struct TransactionCommittedDetailsRequestIdentifier: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionCommittedDetailsRequestIdentifier: Codable, Hashable {
 		public private(set) var type: TransactionCommittedDetailsRequestIdentifierType
 		public private(set) var valueHex: String
 

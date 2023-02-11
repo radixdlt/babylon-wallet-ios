@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - ImportProfile.View
-public extension ImportProfile {
+extension ImportProfile {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		let store: StoreOf<ImportProfile>
 		public init(store: StoreOf<ImportProfile>) {
 			self.store = store
@@ -11,8 +11,8 @@ public extension ImportProfile {
 	}
 }
 
-public extension ImportProfile.View {
-	var body: some View {
+extension ImportProfile.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: { $0 },

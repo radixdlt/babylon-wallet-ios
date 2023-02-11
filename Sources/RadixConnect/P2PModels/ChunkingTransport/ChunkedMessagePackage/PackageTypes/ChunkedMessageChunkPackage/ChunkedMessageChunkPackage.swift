@@ -18,12 +18,12 @@ public struct ChunkedMessageChunkPackage: Sendable, Codable, Comparable {
 }
 
 // MARK: Decodable
-public extension ChunkedMessageChunkPackage {
-	enum CodingKeys: String, CodingKey {
+extension ChunkedMessageChunkPackage {
+	public enum CodingKeys: String, CodingKey {
 		case messageId, chunkIndex, chunkData
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		self.messageId = try container.decode(ChunkedMessagePackage.MessageID.self, forKey: .messageId)
 		self.chunkIndex = try container.decode(Int.self, forKey: .chunkIndex)
@@ -39,16 +39,16 @@ public extension ChunkedMessageChunkPackage {
 }
 
 // MARK: Comparable
-public extension ChunkedMessageChunkPackage {
+extension ChunkedMessageChunkPackage {
 	// Comparable so we can sort them conveniently if received unsorted.
-	static func < (lhs: ChunkedMessageChunkPackage, rhs: ChunkedMessageChunkPackage) -> Bool {
+	public static func < (lhs: ChunkedMessageChunkPackage, rhs: ChunkedMessageChunkPackage) -> Bool {
 		lhs.chunkIndex < rhs.chunkIndex
 	}
 }
 
 #if DEBUG
-public extension ChunkedMessageChunkPackage {
-	static func placeholder(index: Int) -> Self {
+extension ChunkedMessageChunkPackage {
+	public static func placeholder(index: Int) -> Self {
 		.init(
 			messageID: .deadbeef32Bytes,
 			chunkIndex: index,

@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - ImportProfile.State
-public extension ImportProfile {
-	struct State: Equatable & Sendable {
+extension ImportProfile {
+	public struct State: Equatable & Sendable {
 		public var isDisplayingFileImporter = false
 
 		public init(
@@ -14,7 +14,7 @@ public extension ImportProfile {
 }
 
 #if DEBUG
-public extension ImportProfile.State {
-	static let previewValue: Self = .init()
+extension ImportProfile.State {
+	public static let previewValue: Self = .init()
 }
 #endif

@@ -18,7 +18,7 @@ public struct CompileSignedTransactionIntentResponse: Sendable, Codable, Hashabl
 	}
 }
 
-public extension CompileSignedTransactionIntentResponse {
+extension CompileSignedTransactionIntentResponse {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -27,12 +27,12 @@ public extension CompileSignedTransactionIntentResponse {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Data(compiledIntent).hex(), forKey: .compiledIntent)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		try self.init(hex: try container.decode(String.self, forKey: .compiledIntent))

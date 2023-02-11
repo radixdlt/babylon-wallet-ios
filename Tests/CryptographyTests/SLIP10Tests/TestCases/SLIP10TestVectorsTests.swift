@@ -793,8 +793,8 @@ private let vector2Secp256k1 = try! TestVector<SECP256K1>(
 	]
 )
 
-private extension SLIP10TestVectorsTests {
-	func doTest<C>(
+extension SLIP10TestVectorsTests {
+	private func doTest<C>(
 		curve: C.Type,
 		vector: TestVector<C>,
 		_ line: UInt = #line
@@ -811,7 +811,7 @@ private extension SLIP10TestVectorsTests {
 		}
 	}
 
-	func doTestCase<C>(
+	private func doTestCase<C>(
 		root: HD.Root,
 		case testCase: TestVector<C>.TestScenario,
 		testIndex: Int,
@@ -904,9 +904,9 @@ private extension SLIP10TestVectorsTests {
 }
 
 // MARK: P256
-public extension Slip10CurveType {
+extension Slip10CurveType {
 	/// The elliptic curve `P256`, `secp256r1`, `prime256v1` or as SLIP-0010 calls it `Nist256p1`
-	static let p256 = Self(
+	public static let p256 = Self(
 		// For some strange reason SLIP-0010 calls P256 "Nist256p1" instead of
 		// either `P256`, `secp256r1` or `prime256v1`. Unfortunate!
 		// https://github.com/satoshilabs/slips/blob/master/slip-0010.md#master-key-generation

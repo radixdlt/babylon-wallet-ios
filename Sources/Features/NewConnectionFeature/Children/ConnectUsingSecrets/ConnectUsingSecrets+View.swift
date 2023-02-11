@@ -1,16 +1,16 @@
 import FeaturePrelude
 
 // MARK: - ConnectUsingSecrets.State.Field
-public extension ConnectUsingSecrets.State {
-	enum Field: String, Sendable, Hashable {
+extension ConnectUsingSecrets.State {
+	public enum Field: String, Sendable, Hashable {
 		case connectionName
 	}
 }
 
 // MARK: - ConnectUsingSecrets.View
-public extension ConnectUsingSecrets {
+extension ConnectUsingSecrets {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<ConnectUsingSecrets>
 		@FocusState private var focusedField: ConnectUsingSecrets.State.Field?
 		public init(store: StoreOf<ConnectUsingSecrets>) {
@@ -19,8 +19,8 @@ public extension ConnectUsingSecrets {
 	}
 }
 
-public extension ConnectUsingSecrets.View {
-	var body: some View {
+extension ConnectUsingSecrets.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

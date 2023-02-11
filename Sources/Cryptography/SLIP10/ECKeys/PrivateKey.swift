@@ -12,32 +12,32 @@ extension Curve25519.Signing.PrivateKey: Hashable {
 	}
 }
 
-public extension Curve25519.Signing.PrivateKey {
-	static func == (lhs: Self, rhs: Self) -> Bool {
+extension Curve25519.Signing.PrivateKey {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.publicKey == rhs.publicKey
 	}
 }
 
 // MARK: - SLIP10.PrivateKey
-public extension SLIP10 {
-	enum PrivateKey: Sendable, Hashable {
+extension SLIP10 {
+	public enum PrivateKey: Sendable, Hashable {
 		case curve25519(Curve25519.Signing.PrivateKey)
 		case secp256k1(K1.PrivateKey)
 	}
 }
 
-public extension SHA256 {
+extension SHA256 {
 	/// SHA256 hashes `data` twice, as in `SHA256(SHA256(data))`
-	static func twice(data: any DataProtocol) -> SHA256.Digest {
+	public static func twice(data: any DataProtocol) -> SHA256.Digest {
 		SHA256.hash(data: Data(SHA256.hash(data: data)))
 	}
 }
 
-public extension SLIP10.PrivateKey {
+extension SLIP10.PrivateKey {
 	/// Expects a non hashed `data`, will SHA256 double hash it for secp256k1,
 	/// but not for Curve25519, before signing, for secp256k1 we produce a
 	/// recoverable ECDSA signature.
-	func sign(
+	public func sign(
 		data: any DataProtocol,
 		ifECDSASkipHashingBeforeSigning: Bool = false
 	) throws -> SignatureWithPublicKey {
@@ -50,7 +50,7 @@ public extension SLIP10.PrivateKey {
 	/// Expects a non hashed `data`, will SHA256 double hash it for secp256k1,
 	/// but not for Curve25519, before signing, for secp256k1 we produce a
 	/// recoverable ECDSA signature.
-	func signReturningHashOfMessage(
+	public func signReturningHashOfMessage(
 		data: any DataProtocol,
 		ifECDSASkipHashingBeforeSigning: Bool = false
 	) throws -> (signatureWithPublicKey: SignatureWithPublicKey, hashOfMessage: Data) {
@@ -97,8 +97,8 @@ public extension SLIP10.PrivateKey {
 // MARK: - SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong
 struct SpecifiedToSkipHashingBeforeSigningButInputDataIsNot32BytesLong: Swift.Error {}
 
-public extension SLIP10.PrivateKey {
-	func publicKey() -> SLIP10.PublicKey {
+extension SLIP10.PrivateKey {
+	public func publicKey() -> SLIP10.PublicKey {
 		switch self {
 		case let .secp256k1(privateKey):
 			return .ecdsaSecp256k1(privateKey.publicKey)
@@ -108,8 +108,8 @@ public extension SLIP10.PrivateKey {
 	}
 }
 
-public extension SLIP10.PrivateKey {
-	var rawRepresentation: Data {
+extension SLIP10.PrivateKey {
+	public var rawRepresentation: Data {
 		switch self {
 		case let .secp256k1(privateKey):
 			return privateKey.rawRepresentation
@@ -118,7 +118,7 @@ public extension SLIP10.PrivateKey {
 		}
 	}
 
-	var hex: String {
+	public var hex: String {
 		rawRepresentation.hex
 	}
 }

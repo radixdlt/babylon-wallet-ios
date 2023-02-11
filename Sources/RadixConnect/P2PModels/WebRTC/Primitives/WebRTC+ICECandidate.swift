@@ -39,14 +39,14 @@ public struct WebRTCICECandidate: WebRTCPrimitiveProtocol {
 	}
 }
 
-public extension WebRTCICECandidate {
-	var sdp: String { candidate }
+extension WebRTCICECandidate {
+	public var sdp: String { candidate }
 
-	var description: String {
+	public var description: String {
 		description(includeTypeName: true)
 	}
 
-	func description(includeTypeName: Bool) -> String {
+	public func description(includeTypeName: Bool) -> String {
 		let props = "sdpMLineIndex: \(sdpMLineIndex), sdpMid: \(String(describing: sdpMid)), sdp: \(sdp)), serverUrl: \(String(describing: serverUrl))"
 		guard includeTypeName else {
 			return props
@@ -56,11 +56,11 @@ public extension WebRTCICECandidate {
 }
 
 #if DEBUG
-public extension WebRTCICECandidate {
-	static func placeholder(index: Int = 0) -> Self {
+extension WebRTCICECandidate {
+	public static func placeholder(index: Int = 0) -> Self {
 		Self(sdp: "<ICE SDP GOES HERE>", sdpMid: nil, sdpMLineIndex: index, serverUrl: URL.placeholder.absoluteString)
 	}
 
-	static let placeholder = Self.placeholder()
+	public static let placeholder = Self.placeholder()
 }
 #endif // DEBUG

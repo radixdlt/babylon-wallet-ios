@@ -13,8 +13,8 @@ public struct PrimaryTextButtonStyle: ButtonStyle {
 	}
 }
 
-private extension PrimaryTextButtonStyle {
-	var foregroundColor: Color {
+extension PrimaryTextButtonStyle {
+	private var foregroundColor: Color {
 		if isEnabled {
 			return isDestructive ? .app.red1 : .app.blue2
 		} else {
@@ -23,8 +23,8 @@ private extension PrimaryTextButtonStyle {
 	}
 }
 
-public extension ButtonStyle where Self == PrimaryTextButtonStyle {
-	static func primaryText(isDestructive: Bool = false) -> Self {
+extension ButtonStyle where Self == PrimaryTextButtonStyle {
+	public static func primaryText(isDestructive: Bool = false) -> Self {
 		Self(isDestructive: isDestructive)
 	}
 }

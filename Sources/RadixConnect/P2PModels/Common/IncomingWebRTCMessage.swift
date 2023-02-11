@@ -21,8 +21,8 @@ public struct IncomingWebRTCMessage: Sendable, Hashable, CustomStringConvertible
 	}
 }
 
-public extension IncomingWebRTCMessage {
-	var description: String {
+extension IncomingWebRTCMessage {
+	public var description: String {
 		"""
 		connectionID: \(connectionID),
 		dataChannelLabelledID: \(dataChannelLabelledID),

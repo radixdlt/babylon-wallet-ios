@@ -1,9 +1,9 @@
 import Foundation
 
 // MARK: From Entropy
-public extension Mnemonic {
+extension Mnemonic {
 	/// Attempts to translates `entropy` (checked `Data`) into a BIP39 mnemonic in `language`.
-	init(
+	public init(
 		entropy: BIP39.Entropy,
 		language: BIP39.Language = .default
 	) throws {
@@ -12,7 +12,7 @@ public extension Mnemonic {
 	}
 
 	/// Attempts to translates `rawEntropy` (`Data`) into a BIP39 mnemonic in `language`.
-	init(
+	public init(
 		rawEntropy: Data,
 		language: BIP39.Language = .default
 	) throws {

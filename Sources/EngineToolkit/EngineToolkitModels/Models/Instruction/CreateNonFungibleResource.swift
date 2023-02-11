@@ -30,7 +30,7 @@ public struct CreateNonFungibleResource: InstructionProtocol {
 	}
 }
 
-public extension CreateNonFungibleResource {
+extension CreateNonFungibleResource {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -43,7 +43,7 @@ public extension CreateNonFungibleResource {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
@@ -53,7 +53,7 @@ public extension CreateNonFungibleResource {
 		try container.encode(initialSupply, forKey: .initialSupply)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: InstructionKind = try container.decode(InstructionKind.self, forKey: .type)

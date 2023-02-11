@@ -202,8 +202,8 @@ final class SignalingServerMessageUnitTests: TestCase {
 	}
 }
 
-private extension SignalingServerMessageUnitTests {
-	func doTest(
+extension SignalingServerMessageUnitTests {
+	private func doTest(
 		json jsonString: String,
 		assert: (SignalingServerMessage.Incoming) throws -> Void
 	) throws {

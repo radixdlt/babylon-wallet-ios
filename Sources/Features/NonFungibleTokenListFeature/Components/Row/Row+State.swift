@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Row.State
-public extension NonFungibleTokenList.Row {
+extension NonFungibleTokenList.Row {
 	// MARK: State
-	struct State: Sendable, Hashable {
+	public struct State: Sendable, Hashable {
 		public var container: NonFungibleTokenContainer
 		public var isExpanded = false
 
@@ -21,8 +21,8 @@ extension NonFungibleTokenList.Row.State: Identifiable {
 }
 
 #if DEBUG
-public extension NonFungibleTokenList.Row.State {
-	static let previewValue = Self(
+extension NonFungibleTokenList.Row.State {
+	public static let previewValue = Self(
 		container: .mock1
 	)
 }

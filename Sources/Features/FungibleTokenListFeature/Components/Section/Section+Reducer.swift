@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-public extension FungibleTokenList {
-	struct Section: Sendable, ReducerProtocol {
+extension FungibleTokenList {
+	public struct Section: Sendable, ReducerProtocol {
 		public init() {}
 
 		public var body: some ReducerProtocolOf<Self> {

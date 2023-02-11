@@ -1,8 +1,8 @@
 import Prelude
 
 // MARK: - P2P.ToDapp.WalletInteractionFailureResponse
-public extension P2P.ToDapp {
-	struct WalletInteractionFailureResponse: Sendable, Hashable, Encodable {
+extension P2P.ToDapp {
+	public struct WalletInteractionFailureResponse: Sendable, Hashable, Encodable {
 		private enum CodingKeys: String, CodingKey {
 			case interactionId
 			case errorType = "error"
@@ -27,10 +27,10 @@ public extension P2P.ToDapp {
 }
 
 // MARK: - P2P.ToDapp.WalletInteractionFailureResponse.ErrorType
-public extension P2P.ToDapp.WalletInteractionFailureResponse {
+extension P2P.ToDapp.WalletInteractionFailureResponse {
 	// TODO: ask if we should do associated values here for `message` construction,
 	// in which case we'll need to declare discriminators
-	enum ErrorType: String, Sendable, LocalizedError, Hashable, Encodable {
+	public enum ErrorType: String, Sendable, LocalizedError, Hashable, Encodable {
 		case rejectedByUser
 		case wrongNetwork
 		case failedToPrepareTransaction

@@ -10,8 +10,8 @@ public struct SignalingServerEncryption: Sendable {
 	}
 }
 
-public extension SignalingServerEncryption {
-	func encrypt(_ message: RPCMessageUnencrypted) throws -> RPCMessage {
+extension SignalingServerEncryption {
+	public func encrypt(_ message: RPCMessageUnencrypted) throws -> RPCMessage {
 		let encrypted = try AES.GCM
 			.seal(
 				message.unencryptedPayload,
@@ -25,7 +25,7 @@ public extension SignalingServerEncryption {
 		)
 	}
 
-	func decrypt(data msg: Data) throws -> Data {
+	public func decrypt(data msg: Data) throws -> Data {
 		try AES.GCM.open(
 			AES.GCM.SealedBox(combined: msg),
 			using: key.symmetric

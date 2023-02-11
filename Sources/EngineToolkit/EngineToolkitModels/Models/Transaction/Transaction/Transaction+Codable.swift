@@ -1,6 +1,6 @@
 import Foundation
 
-public extension TransactionManifest {
+extension TransactionManifest {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type
@@ -9,7 +9,7 @@ public extension TransactionManifest {
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		let hexBlobs = blobs.map { $0.hex() }
 
@@ -17,7 +17,7 @@ public extension TransactionManifest {
 		try container.encode(hexBlobs, forKey: .blobs)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 

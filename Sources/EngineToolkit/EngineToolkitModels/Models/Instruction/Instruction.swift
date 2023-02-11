@@ -70,8 +70,8 @@ public indirect enum Instruction: Sendable, Codable, Hashable {
 
 // MARK: InstructionKind
 
-public extension Instruction {
-	var kind: InstructionKind {
+extension Instruction {
+	public var kind: InstructionKind {
 		switch self {
 		case .callFunction:
 			return .callFunction
@@ -174,7 +174,7 @@ public extension Instruction {
 	}
 }
 
-public extension Instruction {
+extension Instruction {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -183,7 +183,7 @@ public extension Instruction {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		switch self {
 		case let .callFunction(instruction):
 			try instruction.encode(to: encoder)
@@ -285,7 +285,7 @@ public extension Instruction {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: InstructionKind = try container.decode(InstructionKind.self, forKey: .type)

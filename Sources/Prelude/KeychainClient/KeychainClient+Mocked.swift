@@ -1,7 +1,7 @@
 import Dependencies
 
-public extension DependencyValues {
-	var keychainClient: KeychainClient {
+extension DependencyValues {
+	public var keychainClient: KeychainClient {
 		get { self[KeychainClient.self] }
 		set { self[KeychainClient.self] = newValue }
 	}

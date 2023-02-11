@@ -5,10 +5,10 @@ import Prelude
 // MARK: - CannotCreateDerivationPathEntityIndexIsOutOfBound
 struct CannotCreateDerivationPathEntityIndexIsOutOfBound: Swift.Error {}
 
-public extension HD.Path.Component.Child {
-	static let bip44Purpose: Self = .init(nonHardenedValue: 44, isHardened: true)
+extension HD.Path.Component.Child {
+	public static let bip44Purpose: Self = .init(nonHardenedValue: 44, isHardened: true)
 
-	static let coinType: Self = .init(nonHardenedValue: 1022, isHardened: true)
+	public static let coinType: Self = .init(nonHardenedValue: 1022, isHardened: true)
 
 	/// The last component of the special purpose derivation path component uesd by factor sources as identifier,
 	/// according to [CAP-26][cap26], the format is:
@@ -21,10 +21,10 @@ public extension HD.Path.Component.Child {
 	/// [cap26]: https://radixdlt.atlassian.net/l/cp/UNaBAGUC
 	/// [slip10]: https://github.com/satoshilabs/slips/blob/master/slip-0010.md
 	///
-	static let getID: Self = .init(nonHardenedValue: 365, isHardened: true)
+	public static let getID: Self = .init(nonHardenedValue: 365, isHardened: true)
 }
 
-public extension HD.Path.Full {
+extension HD.Path.Full {
 	/// Special purpose derivation path component uesd by factor sources as identifier,
 	/// according to [CAP-26][cap26], the format is:
 	///
@@ -36,7 +36,7 @@ public extension HD.Path.Full {
 	/// [cap26]: https://radixdlt.atlassian.net/l/cp/UNaBAGUC
 	/// [slip10]: https://github.com/satoshilabs/slips/blob/master/slip-0010.md
 	///
-	static let getID: Self = {
+	public static let getID: Self = {
 		try! Self(
 			children: [
 				.bip44Purpose,
@@ -47,7 +47,7 @@ public extension HD.Path.Full {
 		)
 	}()
 
-	static func identity(
+	public static func identity(
 		networkID: NetworkID,
 		index: Int,
 		keyKind: KeyKind
@@ -60,7 +60,7 @@ public extension HD.Path.Full {
 		)
 	}
 
-	static func account(
+	public static func account(
 		networkID: NetworkID,
 		index: Int,
 		keyKind: KeyKind
@@ -73,7 +73,7 @@ public extension HD.Path.Full {
 		)
 	}
 
-	static func defaultForEntity(
+	public static func defaultForEntity(
 		networkID: NetworkID,
 		entityKind: EntityKind,
 		index unboundIndex: Int,
@@ -116,29 +116,29 @@ public protocol EntityDerivationPathProtocol: DerivationPathSchemeProtocol {
 	) throws
 }
 
-public extension EntityDerivationPathProtocol {
-	var derivationPath: String { fullPath.toString() }
-	static var derivationScheme: DerivationScheme { .slip10 }
-	static var purpose: DerivationPurpose { .publicKeyForAddressOfEntity(type: Entity.self) }
+extension EntityDerivationPathProtocol {
+	public var derivationPath: String { fullPath.toString() }
+	public static var derivationScheme: DerivationScheme { .slip10 }
+	public static var purpose: DerivationPurpose { .publicKeyForAddressOfEntity(type: Entity.self) }
 }
 
-public extension DerivationPathProtocol where Self: Encodable {
-	func encode(to encoder: Encoder) throws {
+extension DerivationPathProtocol where Self: Encodable {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		try container.encode(derivationPath)
 	}
 }
 
-public extension DerivationPathProtocol where Self: Decodable {
-	init(from decoder: Decoder) throws {
+extension DerivationPathProtocol where Self: Decodable {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		let derivationPath = try container.decode(String.self)
 		try self.init(derivationPath: derivationPath)
 	}
 }
 
-public extension EntityDerivationPathProtocol {
-	init(derivationPath: String) throws {
+extension EntityDerivationPathProtocol {
+	public init(derivationPath: String) throws {
 		try self.init(fullPath: .init(string: derivationPath))
 	}
 }
@@ -269,8 +269,8 @@ extension HD.Path.Component.Child.Depth {
 	}
 }
 
-public extension InvalidDerivationPathForEntity {
-	var customDumpDescription: String {
+extension InvalidDerivationPathForEntity {
+	public var customDumpDescription: String {
 		switch self {
 		case let .invalidComponentCount(expected, unexpected): return "InvalidDerivationPathForEntity.invalidComponentCount(expected: \(expected), butGot: \(unexpected))"
 		case .invalidFirstComponentNotRoot: return "InvalidDerivationPathForEntity.invalidFirstComponentNotRoot"
@@ -284,7 +284,7 @@ public extension InvalidDerivationPathForEntity {
 		}
 	}
 
-	var description: String {
+	public var description: String {
 		switch self {
 		case let .invalidComponentCount(expected, unexpected): return "InvalidDerivationPathForEntity.invalidComponentCount(expected: \(expected), butGot: \(unexpected))"
 		case .invalidFirstComponentNotRoot: return "InvalidDerivationPathForEntity.invalidFirstComponentNotRoot"
@@ -299,28 +299,28 @@ public extension InvalidDerivationPathForEntity {
 	}
 }
 
-public extension AccountHierarchicalDeterministicDerivationPath {
-	var customDumpDescription: String {
+extension AccountHierarchicalDeterministicDerivationPath {
+	public var customDumpDescription: String {
 		"AccountHierarchicalDeterministicDerivationPath(\(derivationPath))"
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		AccountHierarchicalDeterministicDerivationPath: \(derivationPath),
 		"""
 	}
 }
 
-public extension AccountHierarchicalDeterministicDerivationPath {
+extension AccountHierarchicalDeterministicDerivationPath {
 	/// Wraps this specific type of derivation path to the shared
 	/// nominal type `DerivationPath` (enum)
-	func wrapAsDerivationPath() -> DerivationPath {
+	public func wrapAsDerivationPath() -> DerivationPath {
 		.accountPath(self)
 	}
 
 	/// Tries to unwraps the nominal type `DerivationPath` (enum)
 	/// into this specific type.
-	static func unwrap(derivationPath: DerivationPath) -> Self? {
+	public static func unwrap(derivationPath: DerivationPath) -> Self? {
 		switch derivationPath {
 		case let .accountPath(path): return path
 		default: return nil

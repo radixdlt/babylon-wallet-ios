@@ -1,8 +1,8 @@
 import Foundation
 
 // swiftlint:disable file_length
-public extension BIP39.WordList {
-	static let italian: [String] = {
+extension BIP39.WordList {
+	public static let italian: [String] = {
 		let words =
 			"""
 			abaco

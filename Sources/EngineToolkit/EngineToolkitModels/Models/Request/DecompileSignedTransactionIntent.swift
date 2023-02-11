@@ -16,7 +16,7 @@ public struct DecompileSignedTransactionIntentRequest: Sendable, Codable, Hashab
 	}
 }
 
-public extension DecompileSignedTransactionIntentRequest {
+extension DecompileSignedTransactionIntentRequest {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case compiledSignedIntent = "compiled_signed_intent"
@@ -24,13 +24,13 @@ public extension DecompileSignedTransactionIntentRequest {
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(compiledSignedIntent.hex(), forKey: .compiledSignedIntent)
 		try container.encode(instructionsOutputKind, forKey: .instructionsOutputKind)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 

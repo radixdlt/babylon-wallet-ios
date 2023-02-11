@@ -43,7 +43,7 @@ extension NonFungibleLocalId: ValueProtocol, Sendable, Codable, Hashable {
 	}
 }
 
-public extension NonFungibleLocalId {
+extension NonFungibleLocalId {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -52,13 +52,13 @@ public extension NonFungibleLocalId {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 		try container.encode(self.toInternal(), forKey: .value)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
@@ -86,7 +86,7 @@ private enum NonFungibleLocalIdInternal: Sendable, Codable, Hashable {
 	}
 }
 
-private extension NonFungibleLocalIdInternal {
+extension NonFungibleLocalIdInternal {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -95,7 +95,7 @@ private extension NonFungibleLocalIdInternal {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	fileprivate func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
 		case let .integer(identifier):
@@ -113,7 +113,7 @@ private extension NonFungibleLocalIdInternal {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	private init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let value = try container.decode(Kind.self, forKey: .type)
 		switch value {

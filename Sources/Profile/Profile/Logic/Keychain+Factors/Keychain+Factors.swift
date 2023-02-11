@@ -12,8 +12,8 @@ private func key(from factorInstanceID: FactorInstanceID) -> String {
 private let profileSnapshotKeychainKey = "profileSnapshotKeychainKey"
 
 // MARK: Save
-public extension KeychainClient {
-	func updateProfile(
+extension KeychainClient {
+	public func updateProfile(
 		profile: Profile,
 		protection: Protection? = .defaultForProfile,
 		authentcationPrompt: AuthenticationPrompt? = nil,
@@ -28,7 +28,7 @@ public extension KeychainClient {
 		)
 	}
 
-	func updateProfileSnapshot(
+	public func updateProfileSnapshot(
 		profileSnapshot: ProfileSnapshot,
 		protection: Protection? = .defaultForProfile,
 		authentcationPrompt: AuthenticationPrompt? = nil,
@@ -38,7 +38,7 @@ public extension KeychainClient {
 		try await updateDataForKey(data, profileSnapshotKeychainKey, protection, authentcationPrompt)
 	}
 
-	func updateFactorSource(
+	public func updateFactorSource(
 		mnemonic: Mnemonic,
 		protection: Protection? = nil,
 		reference factorSourceReference: FactorSourceReference
@@ -50,7 +50,7 @@ public extension KeychainClient {
 		)
 	}
 
-	func updateFactorSource(
+	public func updateFactorSource(
 		data: Data,
 		reference factorSourceReference: FactorSourceReference,
 		protection: Protection? = nil
@@ -63,7 +63,7 @@ public extension KeychainClient {
 		)
 	}
 
-	func updateFactorInstance(
+	public func updateFactorInstance(
 		privateKey: Curve25519.Signing.PrivateKey,
 		factorInstanceID: FactorInstanceID,
 		protection: Protection? = nil
@@ -78,8 +78,8 @@ public extension KeychainClient {
 }
 
 // MARK: Load
-public extension KeychainClient {
-	func loadProfile(
+extension KeychainClient {
+	public func loadProfile(
 		authenticationPrompt: AuthenticationPrompt,
 		jsonDecoder: JSONDecoder = .iso8601
 	) async throws -> Profile? {
@@ -90,13 +90,13 @@ public extension KeychainClient {
 		return try Profile(snapshot: snapshot)
 	}
 
-	func loadProfileSnapshotJSONData(
+	public func loadProfileSnapshotJSONData(
 		authenticationPrompt: AuthenticationPrompt
 	) async throws -> Data? {
 		try await dataForKey(profileSnapshotKeychainKey, authenticationPrompt)
 	}
 
-	func loadProfileSnapshot(
+	public func loadProfileSnapshot(
 		jsonDecoder: JSONDecoder = .iso8601,
 		authenticationPrompt: AuthenticationPrompt
 	) async throws -> ProfileSnapshot? {
@@ -108,7 +108,7 @@ public extension KeychainClient {
 		return try jsonDecoder.decode(ProfileSnapshot.self, from: profileSnapshotData)
 	}
 
-	func loadFactorSourceMnemonic(
+	public func loadFactorSourceMnemonic(
 		reference factorSourceReference: FactorSourceReference,
 		authenticationPrompt: AuthenticationPrompt
 	) async throws -> Mnemonic? {
@@ -119,14 +119,14 @@ public extension KeychainClient {
 		return try Mnemonic(entropy: .init(data: data))
 	}
 
-	func loadFactorSourceData(
+	public func loadFactorSourceData(
 		reference factorSourceReference: FactorSourceReference,
 		authenticationPrompt: AuthenticationPrompt
 	) async throws -> Data? {
 		try await dataForKey(key(from: factorSourceReference), authenticationPrompt)
 	}
 
-	func loadFactorInstancePrivateKey(
+	public func loadFactorInstancePrivateKey(
 		factorInstanceID: FactorInstanceID,
 		authenticationPrompt: AuthenticationPrompt
 	) async throws -> Curve25519.Signing.PrivateKey? {
@@ -136,8 +136,8 @@ public extension KeychainClient {
 }
 
 // MARK: Remove
-public extension KeychainClient {
-	func removeAllFactorSourcesAndProfileSnapshot(
+extension KeychainClient {
+	public func removeAllFactorSourcesAndProfileSnapshot(
 		authenticationPrompt: AuthenticationPrompt,
 		jsonDecoder: JSONDecoder = .iso8601
 	) async throws {
@@ -154,17 +154,17 @@ public extension KeychainClient {
 		try await removeProfileSnapshot()
 	}
 
-	func removeProfileSnapshot() async throws {
+	public func removeProfileSnapshot() async throws {
 		try await removeDataForKey(profileSnapshotKeychainKey)
 	}
 
-	func removeDataForFactorSource(
+	public func removeDataForFactorSource(
 		reference factorSourceReference: FactorSourceReference
 	) async throws {
 		try await removeDataForKey(key(from: factorSourceReference))
 	}
 
-	func removeDataForFactorInstance(
+	public func removeDataForFactorInstance(
 		id factorInstanceID: FactorInstanceID
 	) async throws {
 		try await removeDataForKey(key(from: factorInstanceID))

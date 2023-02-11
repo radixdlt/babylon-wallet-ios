@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: AccountPreferences.State
-public extension AccountPreferences {
+extension AccountPreferences {
 	// MARK: State
-	struct State: Equatable {
+	public struct State: Equatable {
 		public let address: AccountAddress
 		public var faucetButtonState: ControlState
 

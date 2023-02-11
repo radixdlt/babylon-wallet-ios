@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionStatusRequest = GatewayAPI.TransactionStatusRequest
 
 // MARK: - GatewayAPI.TransactionStatusRequest
-public extension GatewayAPI {
-	struct TransactionStatusRequest: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionStatusRequest: Codable, Hashable {
 		public private(set) var atLedgerState: LedgerStateSelector?
 		public private(set) var intentHashHex: String?
 

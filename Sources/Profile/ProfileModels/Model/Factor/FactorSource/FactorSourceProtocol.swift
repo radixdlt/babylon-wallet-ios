@@ -33,13 +33,13 @@ public protocol FactorSourceProtocol {
 	static func unwrap(factorSource: FactorSource) -> Self?
 }
 
-public extension FactorSourceProtocol where Self: Identifiable, Self.ID == FactorSourceID {
-	var id: ID { factorSourceID }
+extension FactorSourceProtocol where Self: Identifiable, Self.ID == FactorSourceID {
+	public var id: ID { factorSourceID }
 }
 
-public extension FactorSourceProtocol {
-	var factorSourceKind: FactorSourceKind { Self.factorSourceKind }
-	var reference: FactorSourceReference {
+extension FactorSourceProtocol {
+	public var factorSourceKind: FactorSourceKind { Self.factorSourceKind }
+	public var reference: FactorSourceReference {
 		.init(factorSourceKind: Self.factorSourceKind, factorSourceID: factorSourceID)
 	}
 }

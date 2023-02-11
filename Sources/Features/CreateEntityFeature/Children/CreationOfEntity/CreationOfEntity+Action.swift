@@ -1,42 +1,42 @@
 import FeaturePrelude
 
 // MARK: - CreationOfEntity.Action
-public extension CreationOfEntity {
-	enum Action: Sendable, Equatable {
+extension CreationOfEntity {
+	public enum Action: Sendable, Equatable {
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
 }
 
-public extension CreationOfEntity.Action {
-	static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
+extension CreationOfEntity.Action {
+	public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 }
 
 // MARK: - CreationOfEntity.Action.ViewAction
-public extension CreationOfEntity.Action {
-	enum ViewAction: Sendable, Equatable {
+extension CreationOfEntity.Action {
+	public enum ViewAction: Sendable, Equatable {
 		case appeared
 	}
 }
 
 // MARK: - CreationOfEntity.Action.InternalAction
-public extension CreationOfEntity.Action {
-	enum InternalAction: Sendable, Equatable {
+extension CreationOfEntity.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
 // MARK: - CreationOfEntity.Action.SystemAction
-public extension CreationOfEntity.Action {
-	enum SystemAction: Sendable, Equatable {
+extension CreationOfEntity.Action {
+	public enum SystemAction: Sendable, Equatable {
 		case createEntityResult(TaskResult<Entity>)
 	}
 }
 
 // MARK: - CreationOfEntity.Action.DelegateAction
-public extension CreationOfEntity.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension CreationOfEntity.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case createdEntity(Entity)
 	}
 }

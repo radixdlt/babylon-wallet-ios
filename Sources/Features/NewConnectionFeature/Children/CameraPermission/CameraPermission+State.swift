@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - CameraPermission.State
-public extension CameraPermission {
-	struct State: Sendable, Equatable {
+extension CameraPermission {
+	public struct State: Sendable, Equatable {
 		var permissionDeniedAlert: AlertState<Action.ViewAction.PermissionDeniedAlertAction>?
 
 		init() {
@@ -12,7 +12,7 @@ public extension CameraPermission {
 }
 
 #if DEBUG
-public extension CameraPermission.State {
-	static let previewValue: Self = .init()
+extension CameraPermission.State {
+	public static let previewValue: Self = .init()
 }
 #endif

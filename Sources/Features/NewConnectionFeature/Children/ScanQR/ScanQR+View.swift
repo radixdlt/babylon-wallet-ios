@@ -5,9 +5,9 @@ import CodeScanner
 #endif // iOS
 
 // MARK: - ScanQR.View
-public extension ScanQR {
+extension ScanQR {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<ScanQR>
 
 		public init(store: StoreOf<ScanQR>) {
@@ -16,8 +16,8 @@ public extension ScanQR {
 	}
 }
 
-public extension ScanQR.View {
-	var body: some View {
+extension ScanQR.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -34,9 +34,9 @@ public extension ScanQR.View {
 
 // MARK: Private Views
 
-private extension ScanQR.View {
+extension ScanQR.View {
 	@ViewBuilder
-	func contentView(
+	fileprivate func contentView(
 		viewStore: ViewStore<ViewState, ScanQR.Action.ViewAction>
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
@@ -47,7 +47,7 @@ private extension ScanQR.View {
 	}
 
 	@ViewBuilder
-	func scanQRCode(
+	fileprivate func scanQRCode(
 		viewStore: ViewStore<ViewState, ScanQR.Action.ViewAction>
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
@@ -75,7 +75,7 @@ private extension ScanQR.View {
 	}
 
 	@ViewBuilder
-	func macOSInputView(viewStore: ViewStore<ViewState, ScanQR.Action.ViewAction>) -> some View {
+	fileprivate func macOSInputView(viewStore: ViewStore<ViewState, ScanQR.Action.ViewAction>) -> some View {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		VStack(alignment: .center) {
 			Text("Manually input connection password which you can see if you right click and inspect the browser window.")

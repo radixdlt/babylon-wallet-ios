@@ -2,21 +2,21 @@ import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - PersonasCoordinator.Action
-public extension PersonasCoordinator {
-	enum ViewAction: Sendable, Equatable {
+extension PersonasCoordinator {
+	public enum ViewAction: Sendable, Equatable {
 		case appeared
 	}
 
-	enum InternalAction: Sendable & Equatable {
+	public enum InternalAction: Sendable & Equatable {
 		case loadPersonasResult(TaskResult<IdentifiedArrayOf<OnNetwork.Persona>>)
 	}
 
-	enum ChildAction: Sendable, Equatable {
+	public enum ChildAction: Sendable, Equatable {
 		case personaList(PersonaList.Action)
 		case createPersonaCoordinator(CreatePersonaCoordinator.Action)
 	}
 
-	enum DelegateAction: Sendable, Equatable {
+	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 	}
 }

@@ -12,8 +12,8 @@ public struct LocalNetworkPermission: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension LocalNetworkPermission {
-	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+extension LocalNetworkPermission {
+	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
 			return .run { send in

@@ -1,15 +1,15 @@
 import FeaturePrelude
 
 // MARK: - Home.VisitHub.View
-public extension Home.VisitHub {
+extension Home.VisitHub {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		let store: Store<State, Action>
 	}
 }
 
-public extension Home.VisitHub.View {
-	var body: some View {
+extension Home.VisitHub.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -35,8 +35,8 @@ extension Home.VisitHub.View {
 	}
 }
 
-private extension Home.VisitHub.View {
-	var title: some View {
+extension Home.VisitHub.View {
+	fileprivate var title: some View {
 		Text(L10n.Home.VisitHub.title)
 			.foregroundColor(.app.gray1)
 			.textStyle(.body1Regular)
@@ -44,7 +44,7 @@ private extension Home.VisitHub.View {
 			.padding()
 	}
 
-	func visitHubButton(_ action: @escaping () -> Void) -> some View {
+	fileprivate func visitHubButton(_ action: @escaping () -> Void) -> some View {
 		Button(
 			action: action,
 			label: {
