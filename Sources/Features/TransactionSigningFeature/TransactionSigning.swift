@@ -37,7 +37,7 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case failed(ApproveTransactionFailure)
+		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TransactionIntent.TXID)
 	}
 
@@ -100,7 +100,8 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 
 		case let .addLockFeeInstructionToManifestResult(.failure(error)):
 			errorQueue.schedule(error)
-			return .send(.delegate(.failed(ApproveTransactionFailure.prepareTransactionFailure(.addTransactionFee(error)))))
+//			return .send(.delegate(.failed(ApproveTransactionFailure.prepareTransactionFailure(.addTransactionFee(error)))))
+			return .none
 
 		case let .signTransactionResult(.success(txID)):
 			state.isSigningTX = false
@@ -108,7 +109,7 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 
 		case let .signTransactionResult(.failure(transactionFailure)):
 			state.isSigningTX = false
-			return .send(.delegate(.failed(.transactionFailure(transactionFailure))))
+			return .send(.delegate(.failed(transactionFailure)))
 		}
 	}
 }
