@@ -29,11 +29,11 @@ public extension ConnectedDApps.View {
 
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.dApps) { dApp in
-							RadixCard(padding: 0) {
+							RadixCard {
 								PlainListRow(title: dApp.name) {
-									DAppPlaceholder()
-								} action: {
 									viewStore.send(.didSelectDApp(dApp.name))
+								} icon: {
+									DAppPlaceholder()
 								}
 							}
 						}
@@ -92,18 +92,15 @@ public struct BodyText: View {
 // MARK: - RadixCard
 public struct RadixCard<Contents: View>: View {
 	private let contents: Contents
-	private let padding: CGFloat
 
-	public init(padding: CGFloat = .medium3, @ViewBuilder contents: () -> Contents) {
+	public init(@ViewBuilder contents: () -> Contents) {
 		self.contents = contents()
-		self.padding = padding
 	}
 
 	public var body: some View {
 		HStack(spacing: 0) {
 			contents
 		}
-		.padding(padding)
 		.cardStyle
 	}
 }

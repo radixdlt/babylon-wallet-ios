@@ -18,14 +18,33 @@ public struct DAppPlaceholder: View {
 	}
 }
 
+// MARK: - TokenPlaceholder
+public struct TokenPlaceholder: View {
+	private let size: HitTargetSize
+
+	public init(size hitTargetSize: HitTargetSize = .small) {
+		self.size = hitTargetSize
+	}
+
+	public var body: some View {
+		Circle()
+			.fill(.app.gray4)
+			.frame(size)
+	}
+}
+
 // MARK: - NFTPlaceholder
 public struct NFTPlaceholder: View {
-	public init() {}
+	private let size: HitTargetSize
+
+	public init(size hitTargetSize: HitTargetSize = .small) {
+		self.size = hitTargetSize
+	}
 
 	public var body: some View {
 		Rectangle()
 			.fill(.app.green2)
-			.aspectRatio(1, contentMode: .fill)
+			.frame(size)
 	}
 }
 

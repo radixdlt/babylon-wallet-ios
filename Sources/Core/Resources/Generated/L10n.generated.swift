@@ -62,14 +62,6 @@ public enum L10n {
       public static let kind = L10n.tr("Localizable", "common.persona.kind", fallback: "Persona")
     }
   }
-  public enum ConnectedDApp {
-    /// Here are the Personas that you have previously used to connect to this dApp.
-    public static let body = L10n.tr("Localizable", "connectedDApp.body", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
-    /// Domains:
-    public static let domainsHeading = L10n.tr("Localizable", "connectedDApp.domainsHeading", fallback: "Domains:")
-    /// Tokens:
-    public static let tokensHeading = L10n.tr("Localizable", "connectedDApp.tokensHeading", fallback: "Tokens:")
-  }
   public enum ConnectedDApps {
     /// Here are all the Decentralized Apps that you have connected to with this Radix Wallet.
     public static let body = L10n.tr("Localizable", "connectedDApps.body", fallback: "Here are all the Decentralized Apps that you have connected to with this Radix Wallet.")
@@ -331,6 +323,18 @@ public enum L10n {
         public static let retryButtonTitle = L10n.tr("Localizable", "dApp.response.failureAlert.retryButtonTitle", fallback: "Retry")
       }
     }
+  }
+  public enum DAppProfile {
+    /// dApp Definition
+    public static let definition = L10n.tr("Localizable", "dAppProfile.definition", fallback: "dApp Definition")
+    /// Associated NFTs
+    public static let nfts = L10n.tr("Localizable", "dAppProfile.nfts", fallback: "Associated NFTs")
+    /// Here are the Personas that you have previously used to connect to this dApp.
+    public static let personaHeading = L10n.tr("Localizable", "dAppProfile.personaHeading", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
+    /// Associated Tokens
+    public static let tokens = L10n.tr("Localizable", "dAppProfile.tokens", fallback: "Associated Tokens")
+    /// Website
+    public static let website = L10n.tr("Localizable", "dAppProfile.website", fallback: "Website")
   }
   public enum FungibleTokenList {
     public enum Detail {

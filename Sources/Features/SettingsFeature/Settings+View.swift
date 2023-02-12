@@ -103,9 +103,9 @@ private extension AppSettings.View {
 					PlainListRow(
 						title: L10n.Settings.inspectProfileButtonTitle
 					) {
-						Image(systemName: "wallet.pass")
-					} action: {
 						viewStore.send(.debugInspectProfileButtonTapped)
+					} icon: {
+						Image(systemName: "wallet.pass")
 					}
 					.withSeparator
 					#endif

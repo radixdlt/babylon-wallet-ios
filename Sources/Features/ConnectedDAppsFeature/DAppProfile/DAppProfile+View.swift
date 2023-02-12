@@ -14,6 +14,7 @@ public extension DAppProfile {
 
 	internal struct ViewState: Equatable {
 		let name: String
+		let addressViewState: AddressView.ViewState
 		let personas: [PersonaProfileRowModel]
 		let dApp: DAppProfileModel
 	}
@@ -23,29 +24,21 @@ public extension DAppProfile {
 
 public extension DAppProfile.View {
 	var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+		WithViewStore(store.actionless, observe: \.name) { viewStore in
 			ScrollView {
 				VStack(alignment: .leading, spacing: 0) {
-					DAppProfileHeader(model: viewStore.dApp)
-
-					BodyText(L10n.ConnectedDApp.body)
-
+					Header(store: store)
+					TokenList(store: store)
+					NFTList(store: store)
 					VStack(spacing: .medium3) {
-						ForEach(viewStore.personas) { persona in
-							Button {
-								viewStore.send(.didSelectPersona(persona.name))
-							} label: {
-								RadixCard {
-									PersonaProfileCard(model: persona)
-								}
-							}
-						}
+						BodyText(L10n.DAppProfile.personaHeading, textStyle: .body1HighImportance, color: .app.gray2)
+							.padding(.vertical, .large3)
+						PersonasList(store: store)
 					}
-					Spacer()
 				}
 				.padding(.top, .medium1)
 				.padding(.horizontal, .medium3)
-				.navBarTitle(viewStore.name)
+				.navBarTitle(viewStore.state)
 				.navigationDestination(store: store.selectedPersona) { store in
 					PersonaProfile.View(store: store)
 				}
@@ -65,6 +58,7 @@ private extension DAppProfile.Store {
 private extension DAppProfile.State {
 	var viewState: DAppProfile.ViewState {
 		.init(name: name,
+		      addressViewState: .init(address: dApp.address.address, format: .short),
 		      personas: personas,
 		      dApp: dApp)
 	}
@@ -74,7 +68,7 @@ private extension DAppProfile.State {
 
 public extension View {
 	func navBarTitle(_ title: String) -> some View {
-		self.toolbar {
+		toolbar {
 			ToolbarItem(placement: .principal) {
 				Text(title)
 			}
@@ -83,61 +77,133 @@ public extension View {
 	}
 }
 
-// MARK: - DAppProfileHeader
-// TODO: • Move somewhere else
+// MARK: Child Views
 
-struct DAppProfileHeader: View {
-	let model: DAppProfileModel
+extension DAppProfile.View {
+	@MainActor
+	struct Header: View {
+		let store: StoreOf<DAppProfile>
+	}
 
+	@MainActor
+	struct TokenList: View {
+		let store: StoreOf<DAppProfile>
+	}
+
+	@MainActor
+	struct NFTList: View {
+		let store: StoreOf<DAppProfile>
+	}
+
+	@MainActor
+	struct PersonasList: View {
+		let store: StoreOf<DAppProfile>
+	}
+}
+
+extension DAppProfile.View.Header {
 	var body: some View {
-		VStack(spacing: .medium1) {
-			DAppPlaceholder(size: .veryLarge)
-			//				.padding(.bottom, .small2)
-			Separator()
-				.padding(.horizontal, .medium1)
-			Text(model.description)
-				.textStyle(.body1Regular)
-				.foregroundColor(.app.gray1)
-				.padding(.horizontal, .large2)
-			Separator()
-				.padding(.horizontal, .medium1)
-			VStack(spacing: .medium3) {
-				HStack(spacing: 0) {
-					Text("•• dApp definition")
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			VStack(spacing: .medium1) {
+				DAppPlaceholder(size: .veryLarge)
+				//				.padding(.bottom, .small2)
+				Separator()
+					.padding(.horizontal, .medium1)
+				Text(viewStore.dApp.description)
+					.textStyle(.body1Regular)
+					.foregroundColor(.app.gray1)
+					.padding(.horizontal, .large2)
+				Separator()
+					.padding(.horizontal, .medium1)
+				VStack(spacing: .medium3) {
+					HStack(spacing: 0) {
+						Text(L10n.DAppProfile.definition)
+							.textStyle(.body1Regular)
+							.foregroundColor(.app.gray2)
+						Spacer(minLength: 0)
+						AddressView(viewStore.addressViewState, textStyle: .body1HighImportance) {
+							viewStore.send(.copyAddressButtonTapped)
+						}
+						.foregroundColor(.app.gray1)
+					}
+					Text(L10n.DAppProfile.website)
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.gray2)
-					Spacer(minLength: 0)
-					Text("•• dApp definition")
-						.textStyle(.body1Regular)
-						.foregroundColor(.app.gray2)
-				}
-			}
-
-			if model.domainNames.count > 0 {
-				VStack(alignment: .leading, spacing: 0) {
-					Text(L10n.ConnectedDApp.domainsHeading)
-						.textStyle(.body2HighImportance)
-						.padding(.bottom, .small2)
-					VStack(alignment: .leading, spacing: .small3) {
-						ForEach(model.domainNames, id: \.self) { domainName in
-							Text(domainName)
-								.textStyle(.body2Header)
-								.foregroundColor(.app.gray2)
+					Button {
+						viewStore.send(.openURLTapped)
+					} label: {
+						Label {
+							Text(viewStore.dApp.domain.absoluteString)
+								.textStyle(.body1HighImportance)
+								.foregroundColor(.app.blue2)
+						} icon: {
+							Image(asset: AssetResource.iconLinkOut)
 						}
 					}
 				}
 			}
-			.padding(.top, .medium3)
+		}
+	}
+}
 
-			if model.tokens > 0 {
-				Text(L10n.ConnectedDApp.tokensHeading)
-					.textStyle(.body2HighImportance)
-					.padding(.bottom, .small2)
-				let columns: [GridItem] = [GridItem(.adaptive(minimum: .large1), spacing: .small2)]
-				let tokens = 0 ..< model.tokens
-				LazyVGrid(columns: columns, spacing: .small2) {
-					ForEach(tokens, id: \.self) { _ in
-						NFTPlaceholder()
+extension DAppProfile.View.TokenList {
+	var body: some View {
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			if !viewStore.dApp.tokens.isEmpty {
+				Text(L10n.DAppProfile.tokens)
+					.textStyle(.body1Regular)
+					.foregroundColor(.app.gray2)
+				VStack(spacing: .medium3) {
+					ForEach(viewStore.dApp.tokens) { token in
+						RadixCard {
+							PlainListRow(withChevron: false, title: token.name) {
+								viewStore.send(.tokenTapped(token.id))
+							} icon: {
+								TokenPlaceholder(size: .small)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+extension DAppProfile.View.NFTList {
+	var body: some View {
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			if !viewStore.dApp.nfts.isEmpty {
+				Text(L10n.DAppProfile.tokens)
+					.textStyle(.body1Regular)
+					.foregroundColor(.app.gray2)
+				VStack(spacing: .medium3) {
+					ForEach(viewStore.dApp.nfts) { nft in
+						RadixCard {
+							PlainListRow(withChevron: false, title: nft.name) {
+								viewStore.send(.nftTapped(nft.id))
+							} icon: {
+								NFTPlaceholder(size: .small)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+extension DAppProfile.View.PersonasList {
+	var body: some View {
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			VStack(spacing: .medium3) {
+				ForEach(viewStore.personas) { persona in
+					Button {
+						viewStore.send(.personaSelected(persona.name))
+					} label: {
+						RadixCard {
+							PersonaProfileCard(model: persona)
+								.padding(.medium3)
+						}
 					}
 				}
 			}

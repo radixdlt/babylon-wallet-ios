@@ -43,37 +43,45 @@ public extension AddressView {
 // MARK: AddressView.ViewState
 public extension AddressView {
 	struct ViewState: Equatable {
-		public var formattedAddress: String
+		public let formattedAddress: String
 
 		public init(address: String, format: AddressFormat) {
-			switch format {
-			case let .short(format):
-				let total = format.first + format.last
-				if address.count <= total {
-					formattedAddress = address
-				} else {
-					formattedAddress = address.prefix(format.first) + "..." + address.suffix(format.last)
-				}
-			case .full:
-				formattedAddress = address
-			}
+			self.formattedAddress = address.formatted(format)
 		}
 	}
 }
 
-// MARK: - AddressView.ViewState.AddressFormat
-public extension AddressView.ViewState {
-	enum AddressFormat {
-		case short(ShortAddressFormat = .default)
-		case full
+// TODO: • Move somewhere else
+
+public extension String {
+	func formatted(_ format: AddressFormat) -> String {
+		switch format {
+		case let .short(format):
+			let total = format.first + format.last
+			if count <= total {
+				return self
+			} else {
+				return prefix(format.first) + "..." + suffix(format.last)
+			}
+		case .full:
+			return self
+		}
 	}
 }
 
-// MARK: - AddressView.ViewState.AddressFormat.ShortAddressFormat
-public extension AddressView.ViewState.AddressFormat {
+// MARK: - AddressFormat
+public enum AddressFormat {
+	case short(ShortAddressFormat = .default)
+	case full
+
+	public static let short = AddressFormat.short(.default)
+}
+
+// MARK: AddressFormat.ShortAddressFormat
+public extension AddressFormat {
 	struct ShortAddressFormat {
-		var first: Int
-		var last: Int
+		public var first: Int
+		public var last: Int
 
 		public static let `default` = Self(first: 4, last: 6)
 	}

@@ -3,17 +3,26 @@ import SwiftUI
 
 // MARK: - PlainListRow
 public struct PlainListRow<Icon: View>: View {
+	let chevron: Bool
 	let title: String
 	let icon: Icon
 	let action: () -> Void
 
-	public init(title: String, @ViewBuilder icon: () -> Icon, action: @escaping () -> Void) {
+	public init(withChevron chevron: Bool = true,
+	            title: String, action: @escaping () -> Void,
+	            @ViewBuilder icon: () -> Icon)
+	{
+		self.chevron = chevron
 		self.title = title
 		self.icon = icon()
 		self.action = action
 	}
 
-	public init(title: String, asset: ImageAsset, action: @escaping () -> Void) where Icon == AssetIcon {
+	public init(withChevron chevron: Bool = true,
+	            title: String, asset: ImageAsset,
+	            action: @escaping () -> Void) where Icon == AssetIcon
+	{
+		self.chevron = chevron
 		self.title = title
 		self.icon = AssetIcon(asset: asset)
 		self.action = action
@@ -31,8 +40,10 @@ public extension PlainListRow {
 				Text(title)
 					.textStyle(.body1Header)
 					.foregroundColor(.app.gray1)
-				Spacer()
-				Image(asset: AssetResource.chevronRight)
+				Spacer(minLength: 0)
+				if chevron {
+					Image(asset: AssetResource.chevronRight)
+				}
 			}
 			.frame(height: .largeButtonHeight)
 		}

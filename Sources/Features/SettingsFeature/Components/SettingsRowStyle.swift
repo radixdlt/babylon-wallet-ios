@@ -17,9 +17,8 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct SettingsRowStyle_Previews: PreviewProvider {
 	static var previews: some View {
-		PlainListRow(title: "Title") {
+		PlainListRow(title: "Title") {} icon: {
 			Image(systemName: "wallet.pass")
-		} action: {
 		}
 		.buttonStyle(.settingsRowStyle)
 	}

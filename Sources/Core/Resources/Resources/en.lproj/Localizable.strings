@@ -126,9 +126,11 @@
 "connectedDApps.title" = "Connected dApps";
 "connectedDApps.body" = "Here are all the Decentralized Apps that you have connected to with this Radix Wallet.";
 
-"connectedDApp.body" = "Here are the Personas that you have previously used to connect to this dApp.";
-"connectedDApp.domainsHeading" = "Domains:";
-"connectedDApp.tokensHeading" = "Tokens:";
+"dAppProfile.definition" = "dApp Definition";
+"dAppProfile.website" = "Website";
+"dAppProfile.tokens" = "Associated Tokens";
+"dAppProfile.nfts" = "Associated NFTs";
+"dAppProfile.personaHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
 
 "personaProfile.body" = "You are currently sharing the following pieces of personal data required by this dApp.";
 
