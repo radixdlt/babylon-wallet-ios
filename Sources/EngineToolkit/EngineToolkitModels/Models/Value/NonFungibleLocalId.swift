@@ -89,13 +89,13 @@ private enum NonFungibleLocalIdInternal: Sendable, Codable, Hashable {
 extension NonFungibleLocalIdInternal {
 	// MARK: CodingKeys
 
-	private enum CodingKeys: String, CodingKey {
+	enum CodingKeys: String, CodingKey {
 		case value, type
 	}
 
 	// MARK: Codable
 
-	fileprivate func encode(to encoder: Encoder) throws {
+	func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
 		case let .integer(identifier):
@@ -113,7 +113,7 @@ extension NonFungibleLocalIdInternal {
 		}
 	}
 
-	private init(from decoder: Decoder) throws {
+	init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let value = try container.decode(Kind.self, forKey: .type)
 		switch value {
