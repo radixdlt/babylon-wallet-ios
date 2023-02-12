@@ -11,8 +11,8 @@ public struct ChunkedMessageReceiveError: LocalizedError, Codable, Sendable, Has
 }
 
 // MARK: ChunkedMessageReceiveError.Reason
-public extension ChunkedMessageReceiveError {
-	enum Reason: String, Sendable, Hashable, Codable {
+extension ChunkedMessageReceiveError {
+	public enum Reason: String, Sendable, Hashable, Codable {
 		case messageHashesMismatch
 	}
 }

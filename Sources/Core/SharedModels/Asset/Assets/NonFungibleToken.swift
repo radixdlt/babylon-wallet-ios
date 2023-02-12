@@ -46,8 +46,8 @@ public struct NonFungibleTokenContainer: Sendable, Identifiable, Hashable {
 }
 
 #if DEBUG
-public extension NonFungibleTokenContainer {
-	static let mock1 = Self(
+extension NonFungibleTokenContainer {
+	public static let mock1 = Self(
 		owner: try! .init(address: "account-address"),
 		resourceAddress: .init(address: "resource-address-1"),
 		assets: [.mock1, .mock2, .mock3],
@@ -56,7 +56,7 @@ public extension NonFungibleTokenContainer {
 		iconURL: nil
 	)
 
-	static let mock2 = Self(
+	public static let mock2 = Self(
 		owner: try! .init(address: "account-address"),
 		resourceAddress: .init(address: "resource-address-2"),
 		assets: [.mock1, .mock2, .mock3],
@@ -65,7 +65,7 @@ public extension NonFungibleTokenContainer {
 		iconURL: nil
 	)
 
-	static let mock3 = Self(
+	public static let mock3 = Self(
 		owner: try! .init(address: "account-address"),
 		resourceAddress: .init(address: "resource-address-3"),
 		assets: [.mock1, .mock2, .mock3],
@@ -75,16 +75,16 @@ public extension NonFungibleTokenContainer {
 	)
 }
 
-public extension NonFungibleToken {
-	static let mock1 = Self(
+extension NonFungibleToken {
+	public static let mock1 = Self(
 		nonFungibleLocalId: .string("nft1-deadbeef")
 	)
 
-	static let mock2 = Self(
+	public static let mock2 = Self(
 		nonFungibleLocalId: .string("nft2-deadbeef")
 	)
 
-	static let mock3 = Self(
+	public static let mock3 = Self(
 		nonFungibleLocalId: .string("nft3-deadbeef")
 	)
 }

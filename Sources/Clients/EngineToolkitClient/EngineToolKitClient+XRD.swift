@@ -1,8 +1,8 @@
 import ClientPrelude
 import EngineToolkit
 
-public extension EngineToolkitClient {
-	func isXRD(component: ComponentAddress, on networkID: NetworkID) throws -> Bool {
+extension EngineToolkitClient {
+	public func isXRD(component: ComponentAddress, on networkID: NetworkID) throws -> Bool {
 		try isXRD(address: component.address, on: networkID)
 	}
 

@@ -2,7 +2,7 @@ import Cryptography
 import EngineToolkitModels
 import Prelude
 
-public extension TransactionManifest {
+extension TransactionManifest {
 	private func involvedAccounts(
 		networkId: NetworkID,
 		callMethodFilter: (CallMethod) -> Bool = { _ in true }
@@ -53,7 +53,7 @@ public extension TransactionManifest {
 		}
 	}
 
-	func accountsRequiredToSign(
+	public func accountsRequiredToSign(
 		networkId: NetworkID
 	) throws -> Set<ComponentAddress> {
 		try involvedAccounts(
@@ -76,7 +76,7 @@ public extension TransactionManifest {
 		)
 	}
 
-	func accountsSuitableToPayTXFee(networkId: NetworkID) throws -> Set<ComponentAddress> {
+	public func accountsSuitableToPayTXFee(networkId: NetworkID) throws -> Set<ComponentAddress> {
 		try involvedAccounts(
 			networkId: networkId
 		)

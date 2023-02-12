@@ -34,14 +34,14 @@ final class InterfaceTests: TestCase {
 	}
 }
 
-public extension HD.Path.Relative {
-	static func harden(_ value: HierarchicalDeterministic.Path.Component.Child.Value) throws -> Self {
+extension HD.Path.Relative {
+	public static func harden(_ value: HierarchicalDeterministic.Path.Component.Child.Value) throws -> Self {
 		try .init(components: [.harden(value)])
 	}
 }
 
-public extension HD.Path.Component {
-	static func harden(_ value: HierarchicalDeterministic.Path.Component.Child.Value) -> Self {
+extension HD.Path.Component {
+	public static func harden(_ value: HierarchicalDeterministic.Path.Component.Child.Value) -> Self {
 		.child(.harden(value))
 	}
 }

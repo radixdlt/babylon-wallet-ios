@@ -1,7 +1,7 @@
 import SwiftUI
 
-public extension View {
-	func onSizeChanged(
+extension View {
+	public func onSizeChanged(
 		perform action: @escaping (CGSize) -> Void
 	) -> some View {
 		background(GeometryReader { geo in

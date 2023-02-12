@@ -1,8 +1,8 @@
 import Prelude
 
 // MARK: - P2P.FromDapp.WalletInteraction.Items
-public extension P2P.FromDapp.WalletInteraction {
-	enum Items: Sendable, Hashable, Decodable {
+extension P2P.FromDapp.WalletInteraction {
+	public enum Items: Sendable, Hashable, Decodable {
 		private enum CodingKeys: String, CodingKey {
 			case discriminator
 		}
@@ -31,13 +31,13 @@ public extension P2P.FromDapp.WalletInteraction {
 	}
 }
 
-public extension P2P.FromDapp.WalletInteraction {
-	enum RequestItems: Sendable, Hashable {
+extension P2P.FromDapp.WalletInteraction {
+	public enum RequestItems: Sendable, Hashable {
 		case unauthorized(UnauthorizedRequestItems)
 		case authorized(AuthorizedRequestItems)
 	}
 
-	struct UnauthorizedRequestItems: Sendable, Hashable, Decodable {
+	public struct UnauthorizedRequestItems: Sendable, Hashable, Decodable {
 		public let oneTimeAccounts: OneTimeAccountsRequestItem?
 
 		public init(oneTimeAccounts: OneTimeAccountsRequestItem?) {
@@ -45,7 +45,7 @@ public extension P2P.FromDapp.WalletInteraction {
 		}
 	}
 
-	struct AuthorizedRequestItems: Sendable, Hashable, Decodable {
+	public struct AuthorizedRequestItems: Sendable, Hashable, Decodable {
 		public let auth: AuthRequestItem
 		public let oneTimeAccounts: OneTimeAccountsRequestItem?
 		public let ongoingAccounts: OngoingAccountsRequestItem?
@@ -63,8 +63,8 @@ public extension P2P.FromDapp.WalletInteraction {
 }
 
 // MARK: - P2P.FromDapp.WalletInteraction.TransactionItems
-public extension P2P.FromDapp.WalletInteraction {
-	struct TransactionItems: Sendable, Hashable, Decodable {
+extension P2P.FromDapp.WalletInteraction {
+	public struct TransactionItems: Sendable, Hashable, Decodable {
 		public let send: SendTransactionItem
 	}
 }

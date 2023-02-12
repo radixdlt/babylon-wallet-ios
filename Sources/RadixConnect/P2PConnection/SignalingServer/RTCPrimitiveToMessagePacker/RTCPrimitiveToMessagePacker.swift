@@ -17,8 +17,8 @@ public final class RTCPrimitiveToMessagePacker: Sendable {
 	}
 }
 
-public extension RTCPrimitiveToMessagePacker {
-	convenience init(
+extension RTCPrimitiveToMessagePacker {
+	public convenience init(
 		connectionSecrets: ConnectionSecrets,
 		jsonEncoder: JSONEncoder = .init()
 	) {
@@ -30,8 +30,8 @@ public extension RTCPrimitiveToMessagePacker {
 	}
 }
 
-public extension RTCPrimitiveToMessagePacker {
-	func pack(primitive: WebRTCPrimitive) throws -> SignalingServerMessage.Outgoing {
+extension RTCPrimitiveToMessagePacker {
+	public func pack(primitive: WebRTCPrimitive) throws -> SignalingServerMessage.Outgoing {
 		let unencryptedPayload = try jsonEncoder.encode(primitive)
 
 		let unencryptedMessage = RPCMessageUnencrypted(
@@ -46,8 +46,8 @@ public extension RTCPrimitiveToMessagePacker {
 	}
 }
 
-internal extension WebRTCPrimitive {
-	var method: RPCMethod {
+extension WebRTCPrimitive {
+	internal var method: RPCMethod {
 		switch self {
 		case .answer: return .answer
 		case .iceCandidate: return .iceCandidate

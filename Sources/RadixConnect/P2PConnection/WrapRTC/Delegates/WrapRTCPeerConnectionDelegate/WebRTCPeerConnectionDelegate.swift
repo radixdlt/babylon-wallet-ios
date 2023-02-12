@@ -18,44 +18,44 @@ public protocol WebRTCPeerConnectionDelegate: AnyObject {
 	func peerConnectionShouldNegotiate(id: P2PConnectionID)
 }
 
-public extension WebRTCPeerConnectionDelegate {
-	func peerConnection(id: P2PConnectionID, didChangePeerConnectionState peerConnectionState: PeerConnectionState) {
+extension WebRTCPeerConnectionDelegate {
+	public func peerConnection(id: P2PConnectionID, didChangePeerConnectionState peerConnectionState: PeerConnectionState) {
 		loggerGlobal.warning("NOT IMPLEMENTED: \(#function), IGNORED \(String(describing: peerConnectionState))")
 	}
 
-	func peerConnection(id: P2PConnectionID, didChangeSignalingState signalingState: SignalingState) {
+	public func peerConnection(id: P2PConnectionID, didChangeSignalingState signalingState: SignalingState) {
 		loggerGlobal.warning("NOT IMPLEMENTED: \(#function), IGNORED \(String(describing: signalingState))")
 	}
 
-	func peerConnection(id: P2PConnectionID, didChangeICEConnectionState iceConnectionState: ICEConnectionState) {
+	public func peerConnection(id: P2PConnectionID, didChangeICEConnectionState iceConnectionState: ICEConnectionState) {
 		loggerGlobal.warning("NOT IMPLEMENTED: \(#function), IGNORED \(String(describing: iceConnectionState))")
 	}
 
-	func peerConnection(id: P2PConnectionID, didChangeICEGatheringState iceGatheringState: ICEGatheringState) {
+	public func peerConnection(id: P2PConnectionID, didChangeICEGatheringState iceGatheringState: ICEGatheringState) {
 		loggerGlobal.warning("NOT IMPLEMENTED: \(#function), IGNORED \(String(describing: iceGatheringState))")
 	}
 
-	func peerConnection(id: P2PConnectionID, didGenerateICECandidate iceCandidate: WebRTCICECandidate) {
+	public func peerConnection(id: P2PConnectionID, didGenerateICECandidate iceCandidate: WebRTCICECandidate) {
 		loggerGlobal.warning("NOT IMPLEMENTED: \(#function), IGNORED")
 	}
 
-	func peerConnection(id: P2PConnectionID, didRemoveICECandidates iceCandidates: [WebRTCICECandidate]) {
+	public func peerConnection(id: P2PConnectionID, didRemoveICECandidates iceCandidates: [WebRTCICECandidate]) {
 		loggerGlobal.warning("NOT IMPLEMENTED: \(#function), IGNORED #\(iceCandidates.count) ICECanidates.")
 	}
 
-	func peerConnection(id: P2PConnectionID, didAddStreamWithID streamID: String) {
+	public func peerConnection(id: P2PConnectionID, didAddStreamWithID streamID: String) {
 		loggerGlobal.warning("NOT IMPLEMENTED: \(#function), IGNORED streamID: \(String(describing: streamID))")
 	}
 
-	func peerConnection(id: P2PConnectionID, didRemoveStreamWithID streamID: String) {
+	public func peerConnection(id: P2PConnectionID, didRemoveStreamWithID streamID: String) {
 		loggerGlobal.warning("NOT IMPLEMENTED: \(#function), IGNORED streamID: \(String(describing: streamID))")
 	}
 
-	func peerConnection(id: P2PConnectionID, didOpenDataChannel labelledID: DataChannelLabelledID) {
+	public func peerConnection(id: P2PConnectionID, didOpenDataChannel labelledID: DataChannelLabelledID) {
 		loggerGlobal.warning("NOT IMPLEMENTED: \(#function), IGNORED labelledID: \(String(describing: labelledID))")
 	}
 
-	func peerConnectionShouldNegotiate(id: P2PConnectionID) {
+	public func peerConnectionShouldNegotiate(id: P2PConnectionID) {
 		loggerGlobal.warning("NOT IMPLEMENTED: \(#function)")
 	}
 }

@@ -16,8 +16,8 @@ public enum FactorInstance:
 	case secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance(Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance)
 }
 
-public extension FactorInstance {
-	func any() -> any FactorInstanceProtocol {
+extension FactorInstance {
+	public func any() -> any FactorInstanceProtocol {
 		switch self {
 		case let .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(instance):
 			return instance
@@ -26,24 +26,24 @@ public extension FactorInstance {
 		}
 	}
 
-	var factorInstanceKind: FactorInstanceKind {
+	public var factorInstanceKind: FactorInstanceKind {
 		property(\.factorInstanceKind)
 	}
 
-	var factorSourceReference: FactorSourceReference {
+	public var factorSourceReference: FactorSourceReference {
 		property(\.factorSourceReference)
 	}
 
-	var initializationDate: Date {
+	public var initializationDate: Date {
 		property(\.initializationDate)
 	}
 
-	var factorInstanceID: FactorInstanceID {
+	public var factorInstanceID: FactorInstanceID {
 		property(\.factorInstanceID)
 	}
 
 	// uhm, not pretty, but this is highly temporary, gonna be rewritten before March 2023.
-	var publicKey: SLIP10.PublicKey {
+	public var publicKey: SLIP10.PublicKey {
 		switch self {
 		case let .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(fi):
 			return fi.publicKey
@@ -56,7 +56,7 @@ public extension FactorInstance {
 		any()[keyPath: keyPath]
 	}
 
-	var curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance? {
+	public var curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance? {
 		switch self {
 		case let .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(instance):
 			return instance
@@ -66,8 +66,8 @@ public extension FactorInstance {
 	}
 }
 
-public extension FactorInstance {
-	var customDumpDescription: String {
+extension FactorInstance {
+	public var customDumpDescription: String {
 		switch self {
 		case let .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(factorInstance):
 			return "\(String(describing: factorInstance))"
@@ -77,12 +77,12 @@ public extension FactorInstance {
 	}
 }
 
-public extension FactorInstance {
-	enum CodingKeys: String, CodingKey {
+extension FactorInstance {
+	public enum CodingKeys: String, CodingKey {
 		case factorSourceReference
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// This is slightly "hacky", what we do is that we rely on the fact that each FactorInstance
 		// conform to FactorInstanceProtocol which requires a non-static stored (JSON encoded)
 		// property named `factorSourceReference` of type `FactorSourceReference`, which contains the
@@ -101,7 +101,7 @@ public extension FactorInstance {
 		}
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var singleValueContainer = encoder.singleValueContainer()
 		switch self {
 		case let .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(instance):

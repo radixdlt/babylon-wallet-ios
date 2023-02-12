@@ -14,8 +14,8 @@ import AnyCodable
 public typealias ResultSetCursorMixin = GatewayAPI.ResultSetCursorMixin
 
 // MARK: - GatewayAPI.ResultSetCursorMixin
-public extension GatewayAPI {
-	struct ResultSetCursorMixin: Codable, Hashable {
+extension GatewayAPI {
+	public struct ResultSetCursorMixin: Codable, Hashable {
 		public private(set) var totalCount: Int64?
 		public private(set) var previousCursor: String?
 		public private(set) var nextCursor: String?

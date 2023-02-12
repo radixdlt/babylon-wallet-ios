@@ -14,8 +14,8 @@ import AnyCodable
 public typealias GatewayInformationResponseAllOf = GatewayAPI.GatewayInformationResponseAllOf
 
 // MARK: - GatewayAPI.GatewayInformationResponseAllOf
-public extension GatewayAPI {
-	struct GatewayInformationResponseAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct GatewayInformationResponseAllOf: Codable, Hashable {
 		public private(set) var knownTarget: GatewayInfoResponseKnownTarget
 		public private(set) var releaseInfo: GatewayInfoResponseReleaseInfo
 		public private(set) var wellKnownAddresses: GatewayInformationResponseAllOfWellKnownAddresses

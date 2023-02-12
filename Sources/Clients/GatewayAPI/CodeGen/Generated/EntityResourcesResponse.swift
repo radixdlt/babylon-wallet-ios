@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityResourcesResponse = GatewayAPI.EntityResourcesResponse
 
 // MARK: - GatewayAPI.EntityResourcesResponse
-public extension GatewayAPI {
-	struct EntityResourcesResponse: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityResourcesResponse: Codable, Hashable {
 		public private(set) var ledgerState: LedgerState
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String

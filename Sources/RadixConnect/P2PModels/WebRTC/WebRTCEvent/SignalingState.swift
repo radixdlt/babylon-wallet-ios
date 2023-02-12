@@ -55,8 +55,8 @@ public enum SignalingState: String, Sendable, Hashable, Codable, CustomStringCon
 	case closed
 }
 
-public extension SignalingState {
-	var description: String {
+extension SignalingState {
+	public var description: String {
 		rawValue
 	}
 }

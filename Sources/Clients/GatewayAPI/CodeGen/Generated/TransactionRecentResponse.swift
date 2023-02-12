@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionRecentResponse = GatewayAPI.TransactionRecentResponse
 
 // MARK: - GatewayAPI.TransactionRecentResponse
-public extension GatewayAPI {
-	struct TransactionRecentResponse: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionRecentResponse: Codable, Hashable {
 		public private(set) var ledgerState: LedgerState
 		public private(set) var totalCount: Int64?
 		public private(set) var previousCursor: String?

@@ -20,8 +20,8 @@ public enum TransactionFailure: Sendable, LocalizedError, Equatable {
 }
 
 // MARK: TransactionFailure.FailedToPrepareForTXSigning
-public extension TransactionFailure {
-	enum FailedToPrepareForTXSigning: Sendable, LocalizedError, Equatable {
+extension TransactionFailure {
+	public enum FailedToPrepareForTXSigning: Sendable, LocalizedError, Equatable {
 		case failedToGetEpoch
 		case failedToLoadNotaryAndSigners
 		case failedToLoadNotaryPublicKey
@@ -40,8 +40,8 @@ public extension TransactionFailure {
 }
 
 // MARK: TransactionFailure.CompileOrSignFailure
-public extension TransactionFailure {
-	enum CompileOrSignFailure: Sendable, LocalizedError, Equatable {
+extension TransactionFailure {
+	public enum CompileOrSignFailure: Sendable, LocalizedError, Equatable {
 		case failedToCompileTXIntent
 		case failedToGenerateTXId
 		case failedToCompileSignedTXIntent

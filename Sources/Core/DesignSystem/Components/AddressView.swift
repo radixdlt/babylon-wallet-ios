@@ -18,8 +18,8 @@ public struct AddressView: View {
 	}
 }
 
-public extension AddressView {
-	var body: some View {
+extension AddressView {
+	public var body: some View {
 		Button(action: copyAddressAction ?? {}) {
 			HStack(spacing: .small2) {
 				Text(state.formattedAddress)
@@ -35,14 +35,14 @@ public extension AddressView {
 		.controlState(controlState)
 	}
 
-	var controlState: ControlState {
+	public var controlState: ControlState {
 		copyAddressAction != nil ? .enabled : .disabled
 	}
 }
 
 // MARK: AddressView.ViewState
-public extension AddressView {
-	struct ViewState: Equatable {
+extension AddressView {
+	public struct ViewState: Equatable {
 		public var formattedAddress: String
 
 		public init(address: String, format: AddressFormat) {
@@ -62,16 +62,16 @@ public extension AddressView {
 }
 
 // MARK: - AddressView.ViewState.AddressFormat
-public extension AddressView.ViewState {
-	enum AddressFormat {
+extension AddressView.ViewState {
+	public enum AddressFormat {
 		case short(ShortAddressFormat = .default)
 		case full
 	}
 }
 
 // MARK: - AddressView.ViewState.AddressFormat.ShortAddressFormat
-public extension AddressView.ViewState.AddressFormat {
-	struct ShortAddressFormat {
+extension AddressView.ViewState.AddressFormat {
+	public struct ShortAddressFormat {
 		var first: Int
 		var last: Int
 

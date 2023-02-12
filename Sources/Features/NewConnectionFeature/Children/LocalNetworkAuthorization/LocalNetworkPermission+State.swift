@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - LocalNetworkPermission.State
-public extension LocalNetworkPermission {
-	struct State: Sendable, Equatable {
+extension LocalNetworkPermission {
+	public struct State: Sendable, Equatable {
 		var permissionDeniedAlert: AlertState<Action.ViewAction.PermissionDeniedAlertAction>?
 
 		init() {
@@ -12,7 +12,7 @@ public extension LocalNetworkPermission {
 }
 
 #if DEBUG
-public extension LocalNetworkPermission.State {
-	static let previewValue: Self = .init()
+extension LocalNetworkPermission.State {
+	public static let previewValue: Self = .init()
 }
 #endif

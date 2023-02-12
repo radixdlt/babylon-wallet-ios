@@ -1,8 +1,8 @@
 import Foundation
 
 // MARK: - BIP39.Language
-public extension BIP39 {
-	enum Language: String, CaseIterable, CustomStringConvertible, Sendable, Hashable {
+extension BIP39 {
+	public enum Language: String, CaseIterable, CustomStringConvertible, Sendable, Hashable {
 		case english = "English"
 		case japanese = "Japanese"
 		case korean = "Korean"
@@ -14,12 +14,12 @@ public extension BIP39 {
 	}
 }
 
-public extension BIP39.Language {
-	static let `default` = Self.english
+extension BIP39.Language {
+	public static let `default` = Self.english
 }
 
-public extension BIP39.Language {
-	var description: String {
+extension BIP39.Language {
+	public var description: String {
 		rawValue
 	}
 }

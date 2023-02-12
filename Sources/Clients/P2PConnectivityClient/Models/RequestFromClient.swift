@@ -1,9 +1,9 @@
 import ClientPrelude
 
 // MARK: - P2P.RequestFromClient
-public extension P2P {
+extension P2P {
 	// MARK: - RequestFromClient
-	struct RequestFromClient: Sendable, Hashable {
+	public struct RequestFromClient: Sendable, Hashable {
 		public let originalMessage: P2PConnections.IncomingMessage
 
 		public let interaction: FromDapp.WalletInteraction
@@ -27,25 +27,25 @@ public struct InvalidRequestFromDapp: Swift.Error, Equatable, CustomStringConver
 }
 
 #if DEBUG
-public extension P2PClient {
-	static let previewValue: Self = .init(
+extension P2PClient {
+	public static let previewValue: Self = .init(
 		connectionPassword: .placeholder,
 		displayName: "PreviewValue"
 	)
 }
 
-public extension P2PConnections.IncomingMessage {
-	static let previewValue = Self(messagePayload: .deadbeef32Bytes, messageID: "previewValue", messageHash: .deadbeef32Bytes)
+extension P2PConnections.IncomingMessage {
+	public static let previewValue = Self(messagePayload: .deadbeef32Bytes, messageID: "previewValue", messageHash: .deadbeef32Bytes)
 }
 
-public extension P2P.RequestFromClient {
-	static let previewValue = Self.previewValueOneTimeAccountAccess
-	static let previewValueOneTimeAccountAccess: Self = .init(
+extension P2P.RequestFromClient {
+	public static let previewValue = Self.previewValueOneTimeAccountAccess
+	public static let previewValueOneTimeAccountAccess: Self = .init(
 		originalMessage: .previewValue,
 		interaction: .previewValueOneTimeAccount,
 		client: .previewValue
 	)
-	static let previewValueSignTXRequest: Self = .init(
+	public static let previewValueSignTXRequest: Self = .init(
 		originalMessage: .previewValue,
 		interaction: .previewValueSignTX,
 		client: .previewValue

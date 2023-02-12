@@ -19,7 +19,7 @@ public struct CompileNotarizedTransactionIntentResponse: Sendable, Codable, Hash
 	}
 }
 
-public extension CompileNotarizedTransactionIntentResponse {
+extension CompileNotarizedTransactionIntentResponse {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -28,12 +28,12 @@ public extension CompileNotarizedTransactionIntentResponse {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(compiledIntent.hex(), forKey: .compiledIntent)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		try self.init(compiledIntentHex: try container.decode(String.self, forKey: .compiledIntent))

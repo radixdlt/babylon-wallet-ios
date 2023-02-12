@@ -1,6 +1,6 @@
 import Foundation
 
-public extension ManifestInstructions {
+extension ManifestInstructions {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type
@@ -8,7 +8,7 @@ public extension ManifestInstructions {
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 
 		switch self {
@@ -21,7 +21,7 @@ public extension ManifestInstructions {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let manifestInstructionsKind: ManifestInstructionsKind = try container.decode(ManifestInstructionsKind.self, forKey: .type)

@@ -2,8 +2,8 @@ import Algorithms
 import struct CryptoKit.SHA256
 import Prelude
 
-internal extension BIP39 {
-	static func mapEntropyToWords(
+extension BIP39 {
+	internal static func mapEntropyToWords(
 		entropy: Entropy,
 		language: Language
 	) throws -> [String] {
@@ -26,7 +26,7 @@ internal extension BIP39 {
 	}
 
 	/// This is not mapping exactly to the entropy because the mnemonic words contains a checksummed word.
-	static func mapWordsToEntropyBitArray(
+	internal static func mapWordsToEntropyBitArray(
 		words mnemonicWords: [String],
 		language: Language
 	) throws -> BitArray {

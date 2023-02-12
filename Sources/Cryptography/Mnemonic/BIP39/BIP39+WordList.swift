@@ -1,8 +1,8 @@
 import Prelude
 
 // MARK: - BIP39.WordList
-public extension BIP39 {
-	struct WordList: Hashable {
+extension BIP39 {
+	public struct WordList: Hashable {
 		public struct Word: Hashable {
 			public typealias Index = UInt11
 			public let word: String
@@ -43,8 +43,8 @@ public extension BIP39 {
 	}
 }
 
-internal extension BIP39.WordList {
-	func words(at indices: [Word.Index]) -> [String] {
+extension BIP39.WordList {
+	internal func words(at indices: [Word.Index]) -> [String] {
 		indices.map { index in
 			guard let word = self.indexToWord[index] else {
 				fatalError("Incorrect implementation, should always be able to located word at index. Index was: \(index), language: \(language)")
@@ -53,7 +53,7 @@ internal extension BIP39.WordList {
 		}
 	}
 
-	func indices(of words: [String]) -> [Word.Index] {
+	internal func indices(of words: [String]) -> [Word.Index] {
 		words.map { wordString in
 			guard let index = self.wordToIndex[wordString] else {
 				fatalError("Incorrect implementation, should always be able to located index of word. Word was: \(wordString), language: \(language)")
@@ -62,7 +62,7 @@ internal extension BIP39.WordList {
 		}
 	}
 
-	func missingWord(from words: [String]) -> String? {
+	internal func missingWord(from words: [String]) -> String? {
 		for word in words {
 			if self.wordToIndex[word] == nil {
 				return word // missing
@@ -71,14 +71,14 @@ internal extension BIP39.WordList {
 		return nil // no missing
 	}
 
-	func containsAllWords(in words: [String]) -> Bool {
+	internal func containsAllWords(in words: [String]) -> Bool {
 		missingWord(from: words) == nil
 	}
 }
 
-internal extension BIP39.WordList {
-	static let size = 2048
+extension BIP39.WordList {
+	internal static let size = 2048
 
 	/// `2^11 => 2048`
-	static let sizeLog2 = 11
+	internal static let sizeLog2 = 11
 }

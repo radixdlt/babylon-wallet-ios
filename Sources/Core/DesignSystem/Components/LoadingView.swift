@@ -16,8 +16,8 @@ public struct LoadingView: View {
 	}
 }
 
-public extension LoadingView {
-	var body: some View {
+extension LoadingView {
+	public var body: some View {
 		ZStack {
 			Circle()
 				.stroke(

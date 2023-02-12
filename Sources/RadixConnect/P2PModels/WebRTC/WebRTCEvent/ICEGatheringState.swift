@@ -24,8 +24,8 @@ public enum ICEGatheringState: String, Sendable, Hashable, Codable, CustomString
 	case gathering
 }
 
-public extension ICEGatheringState {
-	var description: String {
+extension ICEGatheringState {
+	public var description: String {
 		rawValue
 	}
 }

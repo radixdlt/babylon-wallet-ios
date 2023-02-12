@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionNotFoundErrorAllOf = GatewayAPI.TransactionNotFoundErrorAllOf
 
 // MARK: - GatewayAPI.TransactionNotFoundErrorAllOf
-public extension GatewayAPI {
-	struct TransactionNotFoundErrorAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionNotFoundErrorAllOf: Codable, Hashable {
 		public private(set) var transactionNotFound: TransactionCommittedDetailsRequestIdentifier
 
 		public init(transactionNotFound: TransactionCommittedDetailsRequestIdentifier) {

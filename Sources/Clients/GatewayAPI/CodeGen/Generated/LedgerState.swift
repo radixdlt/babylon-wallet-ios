@@ -14,9 +14,9 @@ import AnyCodable
 public typealias LedgerState = GatewayAPI.LedgerState
 
 // MARK: - GatewayAPI.LedgerState
-public extension GatewayAPI {
+extension GatewayAPI {
 	/** The ledger state against which the response was generated. Can be used to detect if the Network Gateway is returning up-to-date information.  */
-	struct LedgerState: Codable, Hashable {
+	public struct LedgerState: Codable, Hashable {
 		/** The name of the network against which the request is made. */
 		public private(set) var network: String
 		/** The state version of the ledger. Each transaction increments the state version by 1. */

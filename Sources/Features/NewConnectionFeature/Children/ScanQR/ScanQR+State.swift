@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - ScanQR.State
-public extension ScanQR {
-	struct State: Equatable {
+extension ScanQR {
+	public struct State: Equatable {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		public var connectionPassword: String
 
@@ -18,7 +18,7 @@ public extension ScanQR {
 }
 
 #if DEBUG
-public extension ScanQR.State {
-	static let previewValue: Self = .init()
+extension ScanQR.State {
+	public static let previewValue: Self = .init()
 }
 #endif

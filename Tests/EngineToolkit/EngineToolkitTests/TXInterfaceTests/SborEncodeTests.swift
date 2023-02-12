@@ -13,8 +13,8 @@ final class SborEncodeDecodeRequestTests: TestCase {
 	}
 }
 
-private extension SborEncodeDecodeRequestTests {
-	func doTest(
+extension SborEncodeDecodeRequestTests {
+	private func doTest(
 		vector: SborDecodeEncodeTestVectors.Vector,
 		index: Int,
 		networkID: NetworkID = .simulator,
@@ -32,7 +32,7 @@ private extension SborEncodeDecodeRequestTests {
 		XCTAssertNoDifference(encoded.encodedValue, try [UInt8](hex: vector.encoded), line: line)
 	}
 
-	typealias TestSuite = SborDecodeEncodeTestVectors
+	fileprivate typealias TestSuite = SborDecodeEncodeTestVectors
 }
 
 // MARK: - SborDecodeEncodeTestVectors

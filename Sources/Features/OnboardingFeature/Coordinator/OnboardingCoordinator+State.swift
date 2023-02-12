@@ -2,9 +2,9 @@ import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - OnboardingCoordinator.State
-public extension OnboardingCoordinator {
+extension OnboardingCoordinator {
 	// MARK: State
-	enum State: Equatable {
+	public enum State: Equatable {
 		case importProfile(ImportProfile.State)
 		case newProfileThenAccountCoordinator(NewProfileThenAccountCoordinator.State)
 
@@ -15,7 +15,7 @@ public extension OnboardingCoordinator {
 }
 
 #if DEBUG
-public extension OnboardingCoordinator.State {
-	static let previewValue: Self = .init()
+extension OnboardingCoordinator.State {
+	public static let previewValue: Self = .init()
 }
 #endif

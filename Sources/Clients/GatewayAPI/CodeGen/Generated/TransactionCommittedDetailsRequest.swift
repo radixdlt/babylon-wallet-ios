@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionCommittedDetailsRequest = GatewayAPI.TransactionCommittedDetailsRequest
 
 // MARK: - GatewayAPI.TransactionCommittedDetailsRequest
-public extension GatewayAPI {
-	struct TransactionCommittedDetailsRequest: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionCommittedDetailsRequest: Codable, Hashable {
 		public private(set) var atLedgerState: LedgerStateSelector?
 		public private(set) var transactionIdentifier: TransactionCommittedDetailsRequestIdentifier
 

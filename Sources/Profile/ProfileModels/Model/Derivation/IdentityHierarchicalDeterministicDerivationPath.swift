@@ -49,35 +49,35 @@ public struct IdentityHierarchicalDeterministicDerivationPath:
 	}
 }
 
-public extension IdentityHierarchicalDeterministicDerivationPath {
-	static let purpose: DerivationPurpose = .publicKeyForAddress(kind: .identity)
-	static let derivationScheme: DerivationScheme = .slip10
+extension IdentityHierarchicalDeterministicDerivationPath {
+	public static let purpose: DerivationPurpose = .publicKeyForAddress(kind: .identity)
+	public static let derivationScheme: DerivationScheme = .slip10
 }
 
-public extension IdentityHierarchicalDeterministicDerivationPath {
-	var _description: String {
+extension IdentityHierarchicalDeterministicDerivationPath {
+	public var _description: String {
 		"IdentityHierarchicalDeterministicDerivationPath(\(derivationPath))"
 	}
 
-	var customDumpDescription: String {
+	public var customDumpDescription: String {
 		_description
 	}
 
-	var description: String {
+	public var description: String {
 		_description
 	}
 }
 
-public extension IdentityHierarchicalDeterministicDerivationPath {
+extension IdentityHierarchicalDeterministicDerivationPath {
 	/// Wraps this specific type of derivation path to the shared
 	/// nominal type `DerivationPath` (enum)
-	func wrapAsDerivationPath() -> DerivationPath {
+	public func wrapAsDerivationPath() -> DerivationPath {
 		.identityPath(self)
 	}
 
 	/// Tries to unwraps the nominal type `DerivationPath` (enum)
 	/// into this specific type.
-	static func unwrap(derivationPath: DerivationPath) -> Self? {
+	public static func unwrap(derivationPath: DerivationPath) -> Self? {
 		switch derivationPath {
 		case let .identityPath(path): return path
 		default: return nil

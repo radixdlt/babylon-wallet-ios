@@ -1,19 +1,19 @@
 import FeaturePrelude
 
-public extension ___VARIABLE_featureName___.State {
-	var viewState: ___VARIABLE_featureName___.ViewState {
+extension ___VARIABLE_featureName___.State {
+	public var viewState: ___VARIABLE_featureName___.ViewState {
 		.init()
 	}
 }
 
 // MARK: - ___VARIABLE_featureName___.View
-public extension ___VARIABLE_featureName___ {
-	struct ViewState: Equatable {
+extension ___VARIABLE_featureName___ {
+	public struct ViewState: Equatable {
 		// TODO: declare some properties
 	}
 
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<___VARIABLE_featureName___>
 
 		public init(store: StoreOf<___VARIABLE_featureName___>) {
@@ -47,7 +47,7 @@ struct ___VARIABLE_featureName____Preview: PreviewProvider {
 	}
 }
 
-public extension ___VARIABLE_featureName___.State {
-	static let previewValue = Self()
+extension ___VARIABLE_featureName___.State {
+	public static let previewValue = Self()
 }
 #endif

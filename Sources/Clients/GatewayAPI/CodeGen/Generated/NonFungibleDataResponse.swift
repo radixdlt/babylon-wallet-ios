@@ -14,8 +14,8 @@ import AnyCodable
 public typealias NonFungibleDataResponse = GatewayAPI.NonFungibleDataResponse
 
 // MARK: - GatewayAPI.NonFungibleDataResponse
-public extension GatewayAPI {
-	struct NonFungibleDataResponse: Codable, Hashable {
+extension GatewayAPI {
+	public struct NonFungibleDataResponse: Codable, Hashable {
 		public private(set) var ledgerState: LedgerState
 		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var address: String

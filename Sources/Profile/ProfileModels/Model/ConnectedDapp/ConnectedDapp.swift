@@ -1,9 +1,9 @@
 import Prelude
 
 // MARK: - OnNetwork.ConnectedDapp
-public extension OnNetwork {
+extension OnNetwork {
 	/// A connection made between a Radix Dapp and the user.
-	struct ConnectedDapp:
+	public struct ConnectedDapp:
 		Sendable,
 		Hashable,
 		Codable,
@@ -35,8 +35,8 @@ public extension OnNetwork {
 }
 
 // MARK: - OnNetwork.ConnectedDapp.AuthorizedPersonaSimple
-public extension OnNetwork.ConnectedDapp {
-	struct AuthorizedPersonaSimple:
+extension OnNetwork.ConnectedDapp {
+	public struct AuthorizedPersonaSimple:
 		Sendable,
 		Hashable,
 		Identifiable,
@@ -107,8 +107,8 @@ public extension OnNetwork.ConnectedDapp {
 	}
 }
 
-public extension OnNetwork.ConnectedDapp.AuthorizedPersonaSimple.SharedAccounts {
-	static func validate(
+extension OnNetwork.ConnectedDapp.AuthorizedPersonaSimple.SharedAccounts {
+	public static func validate(
 		accountsReferencedByAddress: OrderedSet<AccountAddress>,
 		forRequest request: NumberOfAccounts
 	) throws {
@@ -128,26 +128,26 @@ public extension OnNetwork.ConnectedDapp.AuthorizedPersonaSimple.SharedAccounts 
 		}
 	}
 
-	mutating func updateAccounts(_ new: OrderedSet<AccountAddress>) throws {
+	public mutating func updateAccounts(_ new: OrderedSet<AccountAddress>) throws {
 		try Self.validate(accountsReferencedByAddress: new, forRequest: self.request)
 		self.accountsReferencedByAddress = new
 	}
 }
 
-public extension OnNetwork.ConnectedDapp.AuthorizedPersonaSimple {
-	var id: ID {
+extension OnNetwork.ConnectedDapp.AuthorizedPersonaSimple {
+	public var id: ID {
 		identityAddress
 	}
 }
 
-public extension OnNetwork.ConnectedDapp {
-	var id: DappDefinitionAddress {
+extension OnNetwork.ConnectedDapp {
+	public var id: DappDefinitionAddress {
 		dAppDefinitionAddress
 	}
 }
 
-public extension OnNetwork.ConnectedDapp {
-	var customDumpMirror: Mirror {
+extension OnNetwork.ConnectedDapp {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -158,7 +158,7 @@ public extension OnNetwork.ConnectedDapp {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		dAppDefinitionAddress: \(dAppDefinitionAddress),
 		displayName: \(String(describing: displayName)),

@@ -1,8 +1,8 @@
 #if os(iOS)
 import SwiftUI
 
-public extension View {
-	func onWillDisappear(perform action: @escaping () -> Void) -> some View {
+extension View {
+	public func onWillDisappear(perform action: @escaping () -> Void) -> some View {
 		self.modifier(OnWillDisappearModifier(onWillDisappear: action))
 	}
 }

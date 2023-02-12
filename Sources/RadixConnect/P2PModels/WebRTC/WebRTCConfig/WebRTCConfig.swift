@@ -16,8 +16,8 @@ public struct WebRTCConfig: Sendable, Hashable, Codable, CustomStringConvertible
 	public static let `default` = Self()
 }
 
-public extension WebRTCConfig {
-	var description: String {
+extension WebRTCConfig {
+	public var description: String {
 		"""
 		peerConnectionConfig: \(peerConnectionConfig),
 		dataChannelConfig: \(dataChannelConfig)
@@ -26,8 +26,8 @@ public extension WebRTCConfig {
 }
 
 #if DEBUG
-public extension WebRTCConfig {
-	static let placeholder = Self(
+extension WebRTCConfig {
+	public static let placeholder = Self(
 		peerConnectionConfig: .placeholder,
 		dataChannelConfig: .placeholder
 	)

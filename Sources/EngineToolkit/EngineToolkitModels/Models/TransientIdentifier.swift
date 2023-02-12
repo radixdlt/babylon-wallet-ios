@@ -14,7 +14,7 @@ public enum TransientIdentifier: Sendable, Codable, Hashable {
 	}
 }
 
-public extension TransientIdentifier {
+extension TransientIdentifier {
 	private enum Kind: String, Codable {
 		case u32 = "U32"
 		case string = "String"
@@ -29,7 +29,7 @@ public extension TransientIdentifier {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
 		case let .u32(value):
@@ -41,7 +41,7 @@ public extension TransientIdentifier {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type value
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 

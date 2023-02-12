@@ -145,47 +145,47 @@ public struct CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicReques
 	}
 }
 
-public extension ProfileClient {
-	typealias GetDerivationPathForNewEntity = @Sendable (GetDerivationPathForNewEntityRequest) async throws -> (path: DerivationPath, index: Int)
+extension ProfileClient {
+	public typealias GetDerivationPathForNewEntity = @Sendable (GetDerivationPathForNewEntityRequest) async throws -> (path: DerivationPath, index: Int)
 
-	typealias GetFactorSources = @Sendable () async throws -> FactorSources
-	typealias LoadProfileResult = Swift.Result<Profile?, Profile.LoadingFailure>
-	typealias LoadProfile = @Sendable () async -> LoadProfileResult
+	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
+	public typealias LoadProfileResult = Swift.Result<Profile?, Profile.LoadingFailure>
+	public typealias LoadProfile = @Sendable () async -> LoadProfileResult
 
-	typealias GetGatewayAPIEndpointBaseURL = @Sendable () async -> URL
-	typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
+	public typealias GetGatewayAPIEndpointBaseURL = @Sendable () async -> URL
+	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 
-	typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Void
+	public typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Void
 
-	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
+	public typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
-	typealias CreateEphemeralProfileAndUnsavedOnDeviceFactorSource = @Sendable (CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest) async throws -> CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse
+	public typealias CreateEphemeralProfileAndUnsavedOnDeviceFactorSource = @Sendable (CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest) async throws -> CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse
 
-	typealias InjectProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
-	typealias CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic = @Sendable (CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest) async throws -> Void
+	public typealias InjectProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
+	public typealias CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic = @Sendable (CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest) async throws -> Void
 
-	typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
+	public typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
-	typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
-	typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
-	typealias GetAccounts = @Sendable () async throws -> NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>
-	typealias GetPersonas = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.Persona>
-	typealias GetConnectedDapps = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.ConnectedDapp>
-	typealias DetailsForConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> OnNetwork.ConnectedDappDetailed
-	typealias GetP2PClients = @Sendable () async throws -> P2PClients
-	typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
-	typealias AddConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
-	typealias UpdateConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
-	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
-	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
-	typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
-	typealias CreateUnsavedVirtualEntity = @Sendable (CreateVirtualEntityRequest) async throws -> any EntityProtocol
-	typealias AddAccount = @Sendable (OnNetwork.Account) async throws -> Void
-	typealias AddPersona = @Sendable (OnNetwork.Persona) async throws -> Void
-	typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
+	public typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
+	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
+	public typealias GetAccounts = @Sendable () async throws -> NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>
+	public typealias GetPersonas = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.Persona>
+	public typealias GetConnectedDapps = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.ConnectedDapp>
+	public typealias DetailsForConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> OnNetwork.ConnectedDappDetailed
+	public typealias GetP2PClients = @Sendable () async throws -> P2PClients
+	public typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
+	public typealias AddConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
+	public typealias UpdateConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
+	public typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
+	public typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
+	public typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
+	public typealias CreateUnsavedVirtualEntity = @Sendable (CreateVirtualEntityRequest) async throws -> any EntityProtocol
+	public typealias AddAccount = @Sendable (OnNetwork.Account) async throws -> Void
+	public typealias AddPersona = @Sendable (OnNetwork.Persona) async throws -> Void
+	public typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 
-	typealias SignersForAccountsGivenAddresses = @Sendable (SignersForAccountsGivenAddressesRequest) async throws -> NonEmpty<OrderedSet<SignersOfAccount>>
+	public typealias SignersForAccountsGivenAddresses = @Sendable (SignersForAccountsGivenAddressesRequest) async throws -> NonEmpty<OrderedSet<SignersOfAccount>>
 }
 
 public typealias SignersOfAccount = SignersOf<OnNetwork.Account>

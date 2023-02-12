@@ -14,8 +14,8 @@ import AnyCodable
 public typealias NonFungibleDataRequest = GatewayAPI.NonFungibleDataRequest
 
 // MARK: - GatewayAPI.NonFungibleDataRequest
-public extension GatewayAPI {
-	struct NonFungibleDataRequest: Codable, Hashable {
+extension GatewayAPI {
+	public struct NonFungibleDataRequest: Codable, Hashable {
 		public private(set) var atLedgerState: LedgerStateSelector?
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String

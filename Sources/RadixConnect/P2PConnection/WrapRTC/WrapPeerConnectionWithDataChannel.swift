@@ -56,18 +56,18 @@ public final class WrapPeerConnectionWithDataChannel {
 	}
 }
 
-public extension WrapPeerConnectionWithDataChannel {
-	typealias ID = P2PConnectionID
-	var id: ID { connectionID }
+extension WrapPeerConnectionWithDataChannel {
+	public typealias ID = P2PConnectionID
+	public var id: ID { connectionID }
 
-	func close() {
+	public func close() {
 		dataChannel.delegate = nil
 		peerConnection.delegate = nil
 		dataChannel.close()
 		peerConnection.close()
 	}
 
-	func sendDataOverChannel(_ data: Data) throws {
+	public func sendDataOverChannel(_ data: Data) throws {
 		guard dataChannel.readyState == .open else {
 			throw ConverseError.webRTC(.failedToSendDataSinceChannelIsNotOpen(self.webRTCConfig.dataChannelConfig.dataChannelLabelledID))
 		}
@@ -75,13 +75,13 @@ public extension WrapPeerConnectionWithDataChannel {
 		dataChannel.sendData(.init(data: data, isBinary: true))
 	}
 
-	func dataChannelReadyState() throws -> DataChannelState {
+	public func dataChannelReadyState() throws -> DataChannelState {
 		try DataChannelState(rtcDataChannelState: dataChannel.readyState)
 	}
 }
 
-private extension WrapPeerConnectionWithDataChannel {
-	var mediaConstraints: RTCMediaConstraints {
+extension WrapPeerConnectionWithDataChannel {
+	private var mediaConstraints: RTCMediaConstraints {
 		.init(
 			mandatoryConstraints: [
 				kRTCMediaConstraintsIceRestart: kRTCMediaConstraintsValueTrue,
@@ -92,7 +92,7 @@ private extension WrapPeerConnectionWithDataChannel {
 
 	// The `RTCPeerConnectionFactory` is in charge of creating new RTCPeerConnection instances.
 	// A new RTCPeerConnection should be created every new call, but the factory is shared.
-	static let connectionFactory: RTCPeerConnectionFactory = {
+	fileprivate static let connectionFactory: RTCPeerConnectionFactory = {
 		RTCInitializeSSL()
 		let videoEncoderFactory = RTCDefaultVideoEncoderFactory()
 		let videoDecoderFactory = RTCDefaultVideoDecoderFactory()
@@ -103,7 +103,7 @@ private extension WrapPeerConnectionWithDataChannel {
 	}()
 
 	/// Instantiates and configures a new `RTCPeerConnection` with list of config for ICE servers and other configurations.
-	static func createPeerConnection(
+	fileprivate static func createPeerConnection(
 		peerConnectionConfig: WebRTCPeerConnectionConfig,
 		peerConnectionDelegate: WrapRTCPeerConnectionDelegate
 	) throws -> RTCPeerConnection {
@@ -149,7 +149,7 @@ private extension WrapPeerConnectionWithDataChannel {
 	}
 
 	// Important to create this BEFORE we make an offer.
-	static func createDataChannel(
+	fileprivate static func createDataChannel(
 		peerConnection: RTCPeerConnection,
 		webRTCDataChannelConfig: WebRTCDataChannelConfig,
 		dataChannelDelegate: WrapRTCDataChannelDelegate
@@ -167,8 +167,8 @@ private extension WrapPeerConnectionWithDataChannel {
 	}
 }
 
-internal extension WrapPeerConnectionWithDataChannel {
-	func __set(
+extension WrapPeerConnectionWithDataChannel {
+	internal func __set(
 		remoteICECandidate: RTCIceCandidate,
 		callback: @escaping SetCallback
 	) {
@@ -186,7 +186,7 @@ internal extension WrapPeerConnectionWithDataChannel {
 	}
 
 	/// Used when we receive an RTC ANSWER from remote client
-	func __set(
+	internal func __set(
 		remoteSdp: RTCSessionDescription,
 		callBack: @escaping SetCallback
 	) {
@@ -204,29 +204,29 @@ internal extension WrapPeerConnectionWithDataChannel {
 	}
 }
 
-public extension WrapPeerConnectionWithDataChannel {
-	func setRemote(
+extension WrapPeerConnectionWithDataChannel {
+	public func setRemote(
 		offer: WebRTCOffer,
 		callBack: @escaping SetCallback
 	) {
 		__set(remoteSdp: offer.rtcSessionDescription(), callBack: callBack)
 	}
 
-	func setRemote(
+	public func setRemote(
 		answer: WebRTCAnswer,
 		callBack: @escaping SetCallback
 	) {
 		__set(remoteSdp: answer.rtcSessionDescription(), callBack: callBack)
 	}
 
-	func setRemote(
+	public func setRemote(
 		iceCandidate: WebRTCICECandidate,
 		callback: @escaping SetCallback
 	) {
 		__set(remoteICECandidate: iceCandidate.rtc(), callback: callback)
 	}
 
-	func createOffer(
+	public func createOffer(
 		callBack: @escaping CreateOfferCallback
 	) {
 		loggerGlobal.debug("WrapRTC peer id=\(connectionID) creating Offer...")

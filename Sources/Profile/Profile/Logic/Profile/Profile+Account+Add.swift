@@ -2,13 +2,13 @@ import Cryptography
 import EngineToolkit
 import Prelude
 
-public extension Profile {
-	struct NetworkAlreadyExists: Swift.Error {}
-	struct AccountDoesNotHaveIndexZero: Swift.Error {}
+extension Profile {
+	public struct NetworkAlreadyExists: Swift.Error {}
+	public struct AccountDoesNotHaveIndexZero: Swift.Error {}
 
 	/// Throws if the network of the account is not new and does not have index 0.
 	@discardableResult
-	mutating func add(
+	public mutating func add(
 		account account0: OnNetwork.Account,
 		toNewNetworkWithID networkID: NetworkID
 	) throws -> OnNetwork {
@@ -31,9 +31,9 @@ public extension Profile {
 }
 
 // MARK: Create Account
-public extension Profile {
+extension Profile {
 	/// Creates a new **Virtual** `Account` without saving it anywhere
-	static func createNewVirtualAccount(
+	public static func createNewVirtualAccount(
 		factorSources: FactorSources,
 		accountIndex: Int,
 		networkID: NetworkID,
@@ -60,7 +60,7 @@ public extension Profile {
 	}
 
 	/// Creates a new Virtual `Account` **without saving it** anywhere or adding it to the profile.
-	func createNewVirtualAccountWithoutSavingIt(
+	public func createNewVirtualAccountWithoutSavingIt(
 		networkID: NetworkID,
 		accountIndex: Int = 0,
 		displayName: NonEmpty<String>,
@@ -79,8 +79,8 @@ public extension Profile {
 	}
 }
 
-public extension FactorSources {
-	func onDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(
+extension FactorSources {
+	public func onDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(
 		byReference needle: FactorSourceReference
 	) -> (any OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource)? {
 		switch needle.factorSourceKind {
@@ -99,11 +99,11 @@ public enum CreateAccountError: Swift.Error, Equatable {
 }
 
 // MARK: Add Virtual Account
-public extension Profile {
+extension Profile {
 	/// Creates a new **Virtual** `Account` and saves it into the profile, by trying to load
 	/// mnemonics using `mnemonicForFactorSourceByReference`, to create factor instances for this new account.
 	@discardableResult
-	mutating func createNewVirtualAccount(
+	public mutating func createNewVirtualAccount(
 		networkID: NetworkID,
 		displayName: NonEmpty<String>,
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
@@ -120,7 +120,7 @@ public extension Profile {
 
 	/// Creates a new **Virtual** `Account` and saves it into the profile.
 	@discardableResult
-	mutating func createNewVirtualAccount(
+	public mutating func createNewVirtualAccount(
 		networkID: NetworkID,
 		displayName: NonEmpty<String>,
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
@@ -137,7 +137,7 @@ public extension Profile {
 	}
 
 	/// Saves an `Account` into the profile
-	mutating func addAccount(
+	public mutating func addAccount(
 		_ account: OnNetwork.Account
 	) async throws {
 		let networkID = account.networkID
@@ -163,7 +163,7 @@ public extension Profile {
 
 	/// Saves a `ConnectedDapp` into the profile
 	@discardableResult
-	mutating func addConnectedDapp(
+	public mutating func addConnectedDapp(
 		_ unvalidatedConnectedDapp: OnNetwork.ConnectedDapp
 	) async throws -> OnNetwork.ConnectedDapp {
 		let connectedDapp = try validateAuthorizedPersonas(of: unvalidatedConnectedDapp)
@@ -215,7 +215,7 @@ public extension Profile {
 	}
 
 	/// Updates a `ConnectedDapp` in the profile
-	mutating func updateConnectedDapp(
+	public mutating func updateConnectedDapp(
 		_ unvalidatedConnectedDapp: OnNetwork.ConnectedDapp
 	) async throws {
 		let connectedDapp = try validateAuthorizedPersonas(of: unvalidatedConnectedDapp)
@@ -231,7 +231,7 @@ public extension Profile {
 	}
 
 	/// Creates a new **Virtual** `Account` without saving it into the profile.
-	func creatingNewVirtualAccount(
+	public func creatingNewVirtualAccount(
 		networkID: NetworkID,
 		displayName: NonEmpty<String>,
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
@@ -247,7 +247,7 @@ public extension Profile {
 	}
 
 	/// Creates a new **Virtual** `Account` without saving it into the profile.
-	func creatingNewVirtualAccount(
+	public func creatingNewVirtualAccount(
 		networkID: NetworkID,
 		displayName: NonEmpty<String>,
 		createFactorInstance: @escaping CreateFactorInstanceForRequest
@@ -266,8 +266,8 @@ public extension Profile {
 	}
 }
 
-internal extension Profile {
-	static func mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+extension Profile {
+	internal static func mnemonicForFactorSourceByReferenceToCreateFactorInstance(
 		factorSources: FactorSources,
 		includePrivateKey: Bool,
 		_ mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
@@ -293,7 +293,7 @@ internal extension Profile {
 		}
 	}
 
-	func mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+	internal func mnemonicForFactorSourceByReferenceToCreateFactorInstance(
 		includePrivateKey: Bool,
 		_ mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
 	) -> CreateFactorInstanceForRequest {

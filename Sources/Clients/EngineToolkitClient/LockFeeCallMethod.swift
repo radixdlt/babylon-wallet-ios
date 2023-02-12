@@ -1,8 +1,8 @@
 import ClientPrelude
 import EngineToolkit
 
-public extension EngineToolkitClient {
-	func lockFeeCallMethod(
+extension EngineToolkitClient {
+	public func lockFeeCallMethod(
 		address: ComponentAddress,
 		fee: String = "10"
 	) -> CallMethod {
@@ -14,7 +14,7 @@ public extension EngineToolkitClient {
 		}
 	}
 
-	func lockFeeCallMethod(
+	public func lockFeeCallMethod(
 		faucetForNetwork networkID: NetworkID,
 		fee: String = "10"
 	) throws -> CallMethod {
@@ -22,7 +22,7 @@ public extension EngineToolkitClient {
 		return lockFeeCallMethod(address: faucetAddress, fee: fee)
 	}
 
-	func manifestForFaucet(
+	public func manifestForFaucet(
 		includeLockFeeInstruction: Bool,
 		networkID: NetworkID,
 		accountAddress: AccountAddress
@@ -47,7 +47,7 @@ public extension EngineToolkitClient {
 	///     ComponentAddress("${account_component_address}")
 	///     "deposit_batch"
 	///     Expression("ENTIRE_WORKTOP");
-	func manifestForFaucet(
+	public func manifestForFaucet(
 		includeLockFeeInstruction: Bool,
 		networkID: NetworkID,
 		componentAddress: ComponentAddress

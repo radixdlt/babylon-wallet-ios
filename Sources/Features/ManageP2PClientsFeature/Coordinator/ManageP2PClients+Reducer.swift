@@ -10,8 +10,8 @@ public struct ManageP2PClients: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension ManageP2PClients {
-	var body: some ReducerProtocolOf<Self> {
+extension ManageP2PClients {
+	public var body: some ReducerProtocolOf<Self> {
 		CombineReducers {
 			EmptyReducer()
 				.forEach(\.clients, action: /Action.child .. Action.ChildAction.connection) {
@@ -28,7 +28,7 @@ public extension ManageP2PClients {
 		}
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
+	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.task)):
 			return .run { send in

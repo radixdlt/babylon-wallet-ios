@@ -21,7 +21,7 @@ public struct CreateProofFromBucket: InstructionProtocol {
 	}
 }
 
-public extension CreateProofFromBucket {
+extension CreateProofFromBucket {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -32,7 +32,7 @@ public extension CreateProofFromBucket {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
@@ -40,7 +40,7 @@ public extension CreateProofFromBucket {
 		try container.encode(proof, forKey: .intoProof)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: InstructionKind = try container.decode(InstructionKind.self, forKey: .type)

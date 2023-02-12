@@ -38,25 +38,25 @@ public struct ConvertManifestInstructionsToJSONIfItWasStringRequest: Sendable, H
 	}
 }
 
-public extension EngineToolkitClient {
-	typealias GetTransactionVersion = @Sendable () -> TXVersion
+extension EngineToolkitClient {
+	public typealias GetTransactionVersion = @Sendable () -> TXVersion
 
-	typealias GenerateTXNonce = @Sendable () -> Nonce
+	public typealias GenerateTXNonce = @Sendable () -> Nonce
 
-	typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (ConvertManifestInstructionsToJSONIfItWasStringRequest) throws -> JSONInstructionsTransactionManifest
+	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (ConvertManifestInstructionsToJSONIfItWasStringRequest) throws -> JSONInstructionsTransactionManifest
 
-	typealias AccountAddressesNeedingToSignTransaction = @Sendable (AccountAddressesInvolvedInTransactionRequest) throws -> Set<AccountAddress>
-	typealias AccountAddressesSuitableToPayTransactionFee = @Sendable (AccountAddressesInvolvedInTransactionRequest) throws -> Set<AccountAddress>
+	public typealias AccountAddressesNeedingToSignTransaction = @Sendable (AccountAddressesInvolvedInTransactionRequest) throws -> Set<AccountAddress>
+	public typealias AccountAddressesSuitableToPayTransactionFee = @Sendable (AccountAddressesInvolvedInTransactionRequest) throws -> Set<AccountAddress>
 
-	typealias CompileTransactionIntent = @Sendable (TransactionIntent) throws -> CompileTransactionIntentResponse
+	public typealias CompileTransactionIntent = @Sendable (TransactionIntent) throws -> CompileTransactionIntentResponse
 
-	typealias CompileSignedTransactionIntent = @Sendable (SignedTransactionIntent) throws -> CompileSignedTransactionIntentResponse
+	public typealias CompileSignedTransactionIntent = @Sendable (SignedTransactionIntent) throws -> CompileSignedTransactionIntentResponse
 
-	typealias CompileNotarizedTransactionIntent = @Sendable (NotarizedTransaction) throws -> CompileNotarizedTransactionIntentResponse
+	public typealias CompileNotarizedTransactionIntent = @Sendable (NotarizedTransaction) throws -> CompileNotarizedTransactionIntentResponse
 
-	typealias GenerateTXID = @Sendable (TransactionIntent) throws -> TXID
+	public typealias GenerateTXID = @Sendable (TransactionIntent) throws -> TXID
 
-	typealias KnownEntityAddresses = @Sendable (NetworkID) throws -> KnownEntityAddressesResponse
+	public typealias KnownEntityAddresses = @Sendable (NetworkID) throws -> KnownEntityAddressesResponse
 }
 
 // MARK: - AccountAddressesInvolvedInTransactionRequest

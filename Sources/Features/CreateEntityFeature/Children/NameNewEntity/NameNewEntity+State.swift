@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - NameNewEntity.State
-public extension NameNewEntity {
-	struct State: Sendable, Hashable {
+extension NameNewEntity {
+	public struct State: Sendable, Hashable {
 		public var isFirst: Bool
 		public var inputtedName: String
 		public var sanitizedName: NonEmpty<String>?
@@ -21,15 +21,15 @@ public extension NameNewEntity {
 	}
 }
 
-public extension NameNewEntity.State {
-	init(config: CreateEntityConfig) {
+extension NameNewEntity.State {
+	public init(config: CreateEntityConfig) {
 		self.init(isFirst: config.isFirstEntity)
 	}
 }
 
 // MARK: - NameNewEntity.State.Field
-public extension NameNewEntity.State {
-	enum Field: String, Sendable, Hashable {
+extension NameNewEntity.State {
+	public enum Field: String, Sendable, Hashable {
 		case entityName
 	}
 }

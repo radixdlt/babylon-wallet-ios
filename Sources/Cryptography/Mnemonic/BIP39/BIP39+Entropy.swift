@@ -4,13 +4,13 @@ import Security
 // MARK: - SecureBytesGenerator
 private enum SecureBytesGenerator {}
 
-private extension SecureBytesGenerator {
-	enum Error: Swift.Error {
+extension SecureBytesGenerator {
+	fileprivate enum Error: Swift.Error {
 		case failed(code: OSStatus)
 	}
 
 	// https://developer.apple.com/documentation/security/1399291-secrandomcopybytes
-	static func generate(byteCount count: Int) throws -> Data {
+	fileprivate static func generate(byteCount count: Int) throws -> Data {
 		var bytes = [UInt8](repeating: 0, count: count)
 		let status: OSStatus = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
 		guard status == errSecSuccess else {
@@ -21,8 +21,8 @@ private extension SecureBytesGenerator {
 }
 
 // MARK: - BIP39.Entropy
-public extension BIP39 {
-	struct Entropy: Equatable {
+extension BIP39 {
+	public struct Entropy: Equatable {
 		public let data: Data
 		public let wordCount: BIP39.WordCount
 
@@ -43,8 +43,8 @@ public extension BIP39 {
 }
 
 // MARK: - BIP39.Entropy.Error
-public extension BIP39.Entropy {
-	enum Error: Swift.Error, Equatable {
+extension BIP39.Entropy {
+	public enum Error: Swift.Error, Equatable {
 		case invalidByteCount(Int)
 	}
 }

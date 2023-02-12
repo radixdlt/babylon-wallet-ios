@@ -2,8 +2,8 @@ import FeaturePrelude
 import P2PConnection
 
 // MARK: - ConnectUsingSecrets.State
-public extension ConnectUsingSecrets {
-	struct State: Equatable {
+extension ConnectUsingSecrets {
+	public struct State: Equatable {
 		public var connectionSecrets: ConnectionSecrets
 		public var isConnecting: Bool
 		public var isPromptingForName: Bool
@@ -33,7 +33,7 @@ public extension ConnectUsingSecrets {
 }
 
 #if DEBUG
-public extension ConnectUsingSecrets.State {
-	static let previewValue: Self = .init(connectionSecrets: .placeholder)
+extension ConnectUsingSecrets.State {
+	public static let previewValue: Self = .init(connectionSecrets: .placeholder)
 }
 #endif

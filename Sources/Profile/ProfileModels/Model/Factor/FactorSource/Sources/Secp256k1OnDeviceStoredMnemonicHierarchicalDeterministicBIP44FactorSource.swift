@@ -57,16 +57,16 @@ public struct Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44Facto
 	}
 }
 
-public extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource {
+extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource {
 	/// Wraps this specific type of factor source to the shared
 	/// nominal type `FactorSource` (enum)
-	func wrapAsFactorSource() -> FactorSource {
+	public func wrapAsFactorSource() -> FactorSource {
 		.secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource(self)
 	}
 
 	/// Tries to unwraps the nominal type `FactorSource` (enum)
 	/// into this specific type.
-	static func unwrap(factorSource: FactorSource) -> Self? {
+	public static func unwrap(factorSource: FactorSource) -> Self? {
 		switch factorSource {
 		case let .secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource(source):
 			return source
@@ -75,25 +75,25 @@ public extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44Fa
 		}
 	}
 
-	static func embedPrivateKey(_ privateKey: Self.Curve.PrivateKey) -> SLIP10.PrivateKey {
+	public static func embedPrivateKey(_ privateKey: Self.Curve.PrivateKey) -> SLIP10.PrivateKey {
 		.secp256k1(privateKey)
 	}
 
-	static func embedPublicKey(_ publicKey: Self.Curve.PublicKey) -> SLIP10.PublicKey {
+	public static func embedPublicKey(_ publicKey: Self.Curve.PublicKey) -> SLIP10.PublicKey {
 		.ecdsaSecp256k1(publicKey)
 	}
 }
 
-public extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource {
-	static let factorSourceKind: FactorSourceKind = .secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSourceKind
+extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource {
+	public static let factorSourceKind: FactorSourceKind = .secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSourceKind
 
-	typealias Instance = Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance
-	typealias CreateFactorInstanceInput = CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput
-	typealias Curve = SECP256K1
+	public typealias Instance = Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance
+	public typealias CreateFactorInstanceInput = CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput
+	public typealias Curve = SECP256K1
 }
 
-public extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource {
-	var customDumpMirror: Mirror {
+extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -105,7 +105,7 @@ public extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44Fa
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		id: \(id),
 		creationDate: \(creationDate.ISO8601Format()),

@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - NewConnection.State
-public extension NewConnection {
-	enum State: Equatable {
+extension NewConnection {
+	public enum State: Equatable {
 		case localNetworkPermission(LocalNetworkPermission.State)
 		case cameraPermission(CameraPermission.State)
 		case scanQR(ScanQR.State)
@@ -15,7 +15,7 @@ public extension NewConnection {
 }
 
 #if DEBUG
-public extension NewConnection.State {
-	static let previewValue: Self = .init()
+extension NewConnection.State {
+	public static let previewValue: Self = .init()
 }
 #endif

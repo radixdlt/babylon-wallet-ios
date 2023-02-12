@@ -17,8 +17,8 @@ public struct ConfirmationFooter: View {
 	}
 }
 
-public extension ConfirmationFooter {
-	var body: some View {
+extension ConfirmationFooter {
+	public var body: some View {
 		VStack(spacing: .zero) {
 			Color.app.gray4.frame(height: 1)
 

@@ -5,8 +5,8 @@ public struct NewEntityCompletion<Entity: EntityProtocol & Sendable & Hashable>:
 	public init() {}
 }
 
-public extension NewEntityCompletion {
-	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+extension NewEntityCompletion {
+	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.goToDestination)):
 			return .run { send in

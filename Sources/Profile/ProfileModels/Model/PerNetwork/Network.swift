@@ -19,29 +19,29 @@ public struct Network:
 	}
 }
 
-public extension Network {
-	typealias Name = Tagged<Self, String>
+extension Network {
+	public typealias Name = Tagged<Self, String>
 
-	static let nebunet = Self(
+	public static let nebunet = Self(
 		name: "nebunet",
 		id: .nebunet
 	)
-	static let hammunet = Self(
+	public static let hammunet = Self(
 		name: "hammunet",
 		id: .hammunet
 	)
-	static let enkinet = Self(
+	public static let enkinet = Self(
 		name: "enkinet",
 		id: .enkinet
 	)
-	static let mardunet = Self(
+	public static let mardunet = Self(
 		name: "mardunet",
 		id: .mardunet
 	)
 }
 
-private extension Network {
-	static let lookupSet: Set<Network> = [
+extension Network {
+	fileprivate static let lookupSet: Set<Network> = [
 		.nebunet,
 		.hammunet,
 		.enkinet,
@@ -49,19 +49,19 @@ private extension Network {
 	]
 }
 
-public extension Network {
-	static func lookupBy(name rawValue: Name.RawValue) throws -> Self {
+extension Network {
+	public static func lookupBy(name rawValue: Name.RawValue) throws -> Self {
 		guard let network = lookupSet.first(where: { $0.name.rawValue == rawValue }) else {
 			throw UnknownNetwork(description: "No network found with name: '\(rawValue)'")
 		}
 		return network
 	}
 
-	static func lookupBy(name: Name) throws -> Self {
+	public static func lookupBy(name: Name) throws -> Self {
 		try lookupBy(name: name.rawValue)
 	}
 
-	static func lookupBy(id: NetworkID) throws -> Self {
+	public static func lookupBy(id: NetworkID) throws -> Self {
 		guard let network = lookupSet.first(where: { $0.id == id }) else {
 			throw UnknownNetwork(description: "No network found with id: '\(id)'")
 		}
@@ -74,8 +74,8 @@ struct UnknownNetwork: Swift.Error, CustomStringConvertible {
 	let description: String
 }
 
-public extension Network {
-	var customDumpMirror: Mirror {
+extension Network {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -86,7 +86,7 @@ public extension Network {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		name: \(name),
 		id: \(id)

@@ -37,16 +37,16 @@ public final class SignalingServerClient {
 	}
 }
 
-public extension SignalingServerClient {
-	typealias IncomingMessage = SignalingServerMessage.Incoming
-	typealias OutgoingMessage = SignalingServerMessage.Outgoing
-	typealias TransportCallback<Response: Sendable> = @Sendable (Result<Response, Error>) -> Void
-	typealias TransportVoidCallback = TransportCallback<Void>
-	typealias Error = ConverseError
+extension SignalingServerClient {
+	public typealias IncomingMessage = SignalingServerMessage.Incoming
+	public typealias OutgoingMessage = SignalingServerMessage.Outgoing
+	public typealias TransportCallback<Response: Sendable> = @Sendable (Result<Response, Error>) -> Void
+	public typealias TransportVoidCallback = TransportCallback<Void>
+	public typealias Error = ConverseError
 }
 
-private extension SignalingServerClient {
-	func transport(
+extension SignalingServerClient {
+	private func transport(
 		rpcPrimitive: WebRTCPrimitive,
 		callback: @escaping TransportVoidCallback
 	) {
@@ -83,11 +83,11 @@ private extension SignalingServerClient {
 		}
 	}
 
-	var incomingMessagesFromSignalingServerPublisher: AnyPublisher<IncomingMessage.FromSignalingServerItself, Error> {
+	private var incomingMessagesFromSignalingServerPublisher: AnyPublisher<IncomingMessage.FromSignalingServerItself, Error> {
 		self.receivedMessagesSubject.compactMap(\.fromSignalingServerItself).eraseToAnyPublisher()
 	}
 
-	var incomingRTCPrimitivesPublisher: AnyPublisher<WebRTCPrimitive, Error> {
+	private var incomingRTCPrimitivesPublisher: AnyPublisher<WebRTCPrimitive, Error> {
 		receivedMessagesSubject.tryCompactMap { [weak self] incomingMessage in
 			guard let self = self else {
 				throw Error.signalingServer(.failedToExtractRPCFromIncomingMessageFromSignalingServerSelfIsNil)
@@ -109,7 +109,7 @@ private extension SignalingServerClient {
 		.eraseToAnyPublisher()
 	}
 
-	func sendPingContinuously() {
+	private func sendPingContinuously() {
 		guard let webSocketClient else {
 			let error = Error.signalingServer(.unableToPingWebSocketClientIsNil)
 			loggerGlobal.error("Unable to send ping, webSocketClient is nil")
@@ -146,14 +146,14 @@ private extension SignalingServerClient {
 		}
 	}
 
-	func connectAndStartPinging(didConnect: @escaping @Sendable () -> Void) {
+	private func connectAndStartPinging(didConnect: @escaping @Sendable () -> Void) {
 		let webSocketClient = WebSocketClient(url: url, stateSubject: stateSubject)
 		self.webSocketClient = webSocketClient
 		webSocketClient.connect(didOpen: didConnect)
 		sendPingContinuously()
 	}
 
-	func parseData(_ data: Data) -> Result<IncomingMessage, Error> {
+	private func parseData(_ data: Data) -> Result<IncomingMessage, Error> {
 		do {
 			let message = try jsonDecoder.decode(IncomingMessage.self, from: data)
 			return .success(message)
@@ -162,7 +162,7 @@ private extension SignalingServerClient {
 		}
 	}
 
-	func parseMessage(_ message: URLSessionWebSocketTask.Message) -> Result<IncomingMessage, Error> {
+	private func parseMessage(_ message: URLSessionWebSocketTask.Message) -> Result<IncomingMessage, Error> {
 		switch message {
 		case let .string(string):
 			loggerGlobal.trace("Inaccuracy received WebSocket message as `String` but expected `Data`, will interpret this String as .utf8 data...")
@@ -175,7 +175,7 @@ private extension SignalingServerClient {
 		}
 	}
 
-	func receiveMessage(
+	private func receiveMessage(
 		callback: @escaping @Sendable (Result<IncomingMessage, Error>) -> Void
 	) {
 		guard let webSocketClient else {
@@ -200,7 +200,7 @@ private extension SignalingServerClient {
 		}
 	}
 
-	func receiveMessagesAndEmitOnSubject() {
+	private func receiveMessagesAndEmitOnSubject() {
 		receiveMessage { [weak self] result in
 			guard let self = self else {
 				loggerGlobal.error("Failed to receive message, self is nil")
@@ -219,13 +219,13 @@ private extension SignalingServerClient {
 	}
 }
 
-public extension SignalingServerClient {
-	func connect(didConnect: @escaping @Sendable () -> Void) {
+extension SignalingServerClient {
+	public func connect(didConnect: @escaping @Sendable () -> Void) {
 		connectAndStartPinging(didConnect: didConnect)
 		receiveMessagesAndEmitOnSubject()
 	}
 
-	func close(webSocketDidClose: @escaping @Sendable (URLSessionWebSocketTask.CloseCode?) -> Void) {
+	public func close(webSocketDidClose: @escaping @Sendable (URLSessionWebSocketTask.CloseCode?) -> Void) {
 		pingTask?.cancel()
 		pingTask = nil
 		receivedMessagesSubject.send(completion: .finished)
@@ -239,22 +239,22 @@ public extension SignalingServerClient {
 		}
 	}
 
-	func sendOffer(_ offer: WebRTCOffer, callback: @escaping TransportVoidCallback) {
+	public func sendOffer(_ offer: WebRTCOffer, callback: @escaping TransportVoidCallback) {
 		transport(rpcPrimitive: .offer(offer), callback: callback)
 	}
 
-	func sendAnswer(_ answer: WebRTCAnswer, callback: @escaping TransportVoidCallback) {
+	public func sendAnswer(_ answer: WebRTCAnswer, callback: @escaping TransportVoidCallback) {
 		transport(rpcPrimitive: .answer(answer), callback: callback)
 	}
 
-	func sendICECandidate(_ iceCandidate: WebRTCICECandidate, callback: @escaping TransportVoidCallback) {
+	public func sendICECandidate(_ iceCandidate: WebRTCICECandidate, callback: @escaping TransportVoidCallback) {
 		transport(rpcPrimitive: .iceCandidate(iceCandidate), callback: callback)
 	}
 }
 
 // MARK: Combine
-private extension SignalingServerClient {
-	func transport(rpcPrimitive: WebRTCPrimitive) -> Future<Void, Error> {
+extension SignalingServerClient {
+	private func transport(rpcPrimitive: WebRTCPrimitive) -> Future<Void, Error> {
 		Future { [weak self] promise in
 			guard let self = self else {
 				let error = Error.signalingServer(.failedToTransportRPCPrimitiveSelfIsNil)
@@ -269,44 +269,44 @@ private extension SignalingServerClient {
 	}
 }
 
-public extension SignalingServerClient {
-	var remoteClientJustConnectedPublisher: AnyPublisher<Void, Error> {
+extension SignalingServerClient {
+	public var remoteClientJustConnectedPublisher: AnyPublisher<Void, Error> {
 		incomingMessagesFromSignalingServerPublisher
 			.filter(\.isRemoteClientJustConnected)
 			.map { _ in }
 			.eraseToAnyPublisher()
 	}
 
-	var remoteClientIsAlreadyConnectedPublisher: AnyPublisher<Void, Error> {
+	public var remoteClientIsAlreadyConnectedPublisher: AnyPublisher<Void, Error> {
 		incomingMessagesFromSignalingServerPublisher
 			.filter(\.isRemoteClientIsAlreadyConnected)
 			.map { _ in }
 			.eraseToAnyPublisher()
 	}
 
-	var remoteClientIsAlreadyConnectedOrJustConnectedPublisher: AnyPublisher<Void, Error> {
+	public var remoteClientIsAlreadyConnectedOrJustConnectedPublisher: AnyPublisher<Void, Error> {
 		incomingMessagesFromSignalingServerPublisher
 			.filter(\.isRemoteClientConnected)
 			.map { _ in }
 			.eraseToAnyPublisher()
 	}
 
-	func sendingOffer(_ offer: WebRTCOffer) -> AnyPublisher<Void, Error> {
+	public func sendingOffer(_ offer: WebRTCOffer) -> AnyPublisher<Void, Error> {
 		transport(rpcPrimitive: .offer(offer)).eraseToAnyPublisher()
 	}
 
-	func sendingICECandidate(_ iceCandidate: WebRTCICECandidate) -> AnyPublisher<Void, Error> {
+	public func sendingICECandidate(_ iceCandidate: WebRTCICECandidate) -> AnyPublisher<Void, Error> {
 		transport(rpcPrimitive: .iceCandidate(iceCandidate)).eraseToAnyPublisher()
 	}
 
-	func sendingAnswer(_ answer: WebRTCAnswer) -> AnyPublisher<Void, Error> {
+	public func sendingAnswer(_ answer: WebRTCAnswer) -> AnyPublisher<Void, Error> {
 		transport(rpcPrimitive: .answer(answer)).eraseToAnyPublisher()
 	}
 }
 
 // MARK: Async
-private extension SignalingServerClient {
-	func transport(rpcPrimitive: WebRTCPrimitive) async throws {
+extension SignalingServerClient {
+	private func transport(rpcPrimitive: WebRTCPrimitive) async throws {
 		try await withCheckedThrowingContinuation { [weak self] (continuation: CheckedContinuation<Void, Swift.Error>) in
 			guard let self = self else {
 				let error = Error.signalingServer(.failedToTransportRPCPrimitiveSelfIsNil)
@@ -321,12 +321,12 @@ private extension SignalingServerClient {
 	}
 }
 
-public extension SignalingServerClient {
-	func remoteClientConnected() async throws {
+extension SignalingServerClient {
+	public func remoteClientConnected() async throws {
 		try await remoteClientIsAlreadyConnectedOrJustConnectedPublisher.async()
 	}
 
-	func disconnect() async throws {
+	public func disconnect() async throws {
 		try await withCheckedThrowingContinuation { [weak self] (continuation: CheckedContinuation<Void, Swift.Error>) in
 			guard let self = self else {
 				let error = Error.signalingServer(.failedToDisconnectSignalingServerSelfIsNil)
@@ -341,7 +341,7 @@ public extension SignalingServerClient {
 		}
 	}
 
-	func connect() async throws {
+	public func connect() async throws {
 		try await withCheckedThrowingContinuation { [weak self] (continuation: CheckedContinuation<Void, Swift.Error>) in
 			guard let self = self else {
 				let error = Error.signalingServer(.failedToConnectToWebSocketSelfIsNil)
@@ -355,31 +355,31 @@ public extension SignalingServerClient {
 		}
 	}
 
-	func sendOffer(_ offer: WebRTCOffer) async throws {
+	public func sendOffer(_ offer: WebRTCOffer) async throws {
 		try await transport(rpcPrimitive: .offer(offer))
 	}
 
-	func sendICECandidates(_ iceCandidate: WebRTCICECandidate) async throws {
+	public func sendICECandidates(_ iceCandidate: WebRTCICECandidate) async throws {
 		try await transport(rpcPrimitive: .iceCandidate(iceCandidate))
 	}
 
-	func sendAnswer(_ answer: WebRTCAnswer) async throws {
+	public func sendAnswer(_ answer: WebRTCAnswer) async throws {
 		try await transport(rpcPrimitive: .answer(answer))
 	}
 
-	var answerFromRemoteClientPublisher: AnyPublisher<WebRTCAnswer, Error> {
+	public var answerFromRemoteClientPublisher: AnyPublisher<WebRTCAnswer, Error> {
 		incomingRTCPrimitivesPublisher.compactMap(\.answer).eraseToAnyPublisher()
 	}
 
-	func receiveAnswerFromRemoteClient() async throws -> WebRTCAnswer {
+	public func receiveAnswerFromRemoteClient() async throws -> WebRTCAnswer {
 		try await answerFromRemoteClientPublisher.async()
 	}
 
-	var iceCandidateFromRemoteClientPublisher: AnyPublisher<WebRTCICECandidate, Error> {
+	public var iceCandidateFromRemoteClientPublisher: AnyPublisher<WebRTCICECandidate, Error> {
 		incomingRTCPrimitivesPublisher.compactMap(\.iceCandidate).eraseToAnyPublisher()
 	}
 
-	func receiveRemoteICECandidate() async throws -> WebRTCICECandidate {
+	public func receiveRemoteICECandidate() async throws -> WebRTCICECandidate {
 		try await iceCandidateFromRemoteClientPublisher.async()
 	}
 }

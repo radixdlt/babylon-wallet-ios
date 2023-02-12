@@ -1,7 +1,7 @@
 import Dependencies
 
-public extension DependencyValues {
-	var errorQueue: ErrorQueue {
+extension DependencyValues {
+	public var errorQueue: ErrorQueue {
 		get { self[ErrorQueue.self] }
 		set { self[ErrorQueue.self] = newValue }
 	}

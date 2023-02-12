@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionRecentRequest = GatewayAPI.TransactionRecentRequest
 
 // MARK: - GatewayAPI.TransactionRecentRequest
-public extension GatewayAPI {
-	struct TransactionRecentRequest: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionRecentRequest: Codable, Hashable {
 		public private(set) var atLedgerState: LedgerStateSelector?
 		public private(set) var fromLedgerState: LedgerStateSelector?
 		/** This cursor allows forward pagination, by providing the cursor from the previous request. */

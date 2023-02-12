@@ -2,9 +2,9 @@ import FeaturePrelude
 import ProfileClient
 
 // MARK: Splash.State
-public extension Splash {
+extension Splash {
 	// MARK: State
-	struct State: Equatable {
+	public struct State: Equatable {
 		public var biometricsCheckFailedAlert: AlertState<Action.ViewAction.BiometricsCheckFailedAlertAction>?
 		public var loadProfileResult: ProfileClient.LoadProfileResult?
 

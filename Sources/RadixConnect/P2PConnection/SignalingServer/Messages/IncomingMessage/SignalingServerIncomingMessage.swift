@@ -1,15 +1,15 @@
 import Foundation
 
 // MARK: - SignalingServerMessage.Incoming
-public extension SignalingServerMessage {
-	enum Incoming: Sendable, Hashable, Decodable, CustomStringConvertible {
+extension SignalingServerMessage {
+	public enum Incoming: Sendable, Hashable, Decodable, CustomStringConvertible {
 		case fromSignalingServerItself(FromSignalingServerItself)
 		case fromRemoteClientOriginally(FromRemoteClientOriginally)
 	}
 }
 
-public extension SignalingServerMessage.Incoming {
-	var description: String {
+extension SignalingServerMessage.Incoming {
+	public var description: String {
 		switch self {
 		case let .fromSignalingServerItself(value):
 			return "fromSignalingServerItself(\(value))"
@@ -19,17 +19,17 @@ public extension SignalingServerMessage.Incoming {
 	}
 }
 
-public extension SignalingServerMessage.Incoming {
-	typealias RequestId = String
-	typealias FromRemoteClientOriginally = RPCMessage
-	enum FromSignalingServerItself: Sendable, Hashable, CustomStringConvertible {
+extension SignalingServerMessage.Incoming {
+	public typealias RequestId = String
+	public typealias FromRemoteClientOriginally = RPCMessage
+	public enum FromSignalingServerItself: Sendable, Hashable, CustomStringConvertible {
 		case notification(Notification)
 		case responseForRequest(ResponseForRequest)
 	}
 }
 
-public extension SignalingServerMessage.Incoming.FromSignalingServerItself {
-	var description: String {
+extension SignalingServerMessage.Incoming.FromSignalingServerItself {
+	public var description: String {
 		switch self {
 		case let .notification(notification):
 			return "notification(\(notification))"
@@ -39,8 +39,8 @@ public extension SignalingServerMessage.Incoming.FromSignalingServerItself {
 	}
 }
 
-public extension SignalingServerMessage.Incoming.FromSignalingServerItself {
-	var responseForRequest: ResponseForRequest? {
+extension SignalingServerMessage.Incoming.FromSignalingServerItself {
+	public var responseForRequest: ResponseForRequest? {
 		switch self {
 		case let .responseForRequest(responseForRequest):
 			return responseForRequest
@@ -49,7 +49,7 @@ public extension SignalingServerMessage.Incoming.FromSignalingServerItself {
 		}
 	}
 
-	var notification: Notification? {
+	public var notification: Notification? {
 		switch self {
 		case let .notification(value):
 			return value
@@ -59,30 +59,30 @@ public extension SignalingServerMessage.Incoming.FromSignalingServerItself {
 	}
 }
 
-public extension SignalingServerMessage.Incoming {
-	var fromSignalingServerItself: FromSignalingServerItself? {
+extension SignalingServerMessage.Incoming {
+	public var fromSignalingServerItself: FromSignalingServerItself? {
 		switch self {
 		case let .fromSignalingServerItself(value): return value
 		case .fromRemoteClientOriginally: return nil
 		}
 	}
 
-	var fromRemoteClientOriginally: RPCMessage? {
+	public var fromRemoteClientOriginally: RPCMessage? {
 		switch self {
 		case let .fromRemoteClientOriginally(value): return value
 		case .fromSignalingServerItself: return nil
 		}
 	}
 
-	var responseForRequest: FromSignalingServerItself.ResponseForRequest? {
+	public var responseForRequest: FromSignalingServerItself.ResponseForRequest? {
 		fromSignalingServerItself?.responseForRequest
 	}
 
-	var notification: FromSignalingServerItself.Notification? {
+	public var notification: FromSignalingServerItself.Notification? {
 		fromSignalingServerItself?.notification
 	}
 
-	var rtcAnswerRPCMessageFromRemoteClient: RPCMessage? {
+	public var rtcAnswerRPCMessageFromRemoteClient: RPCMessage? {
 		guard
 			let rpcMessage = fromRemoteClientOriginally,
 			rpcMessage.method == .answer
@@ -92,7 +92,7 @@ public extension SignalingServerMessage.Incoming {
 		return rpcMessage
 	}
 
-	var rtcOfferRPCMessageFromRemoteClient: RPCMessage? {
+	public var rtcOfferRPCMessageFromRemoteClient: RPCMessage? {
 		guard
 			let rpcMessage = fromRemoteClientOriginally,
 			rpcMessage.method == .offer
@@ -102,7 +102,7 @@ public extension SignalingServerMessage.Incoming {
 		return rpcMessage
 	}
 
-	var rtcICECandidateRPCMessageFromRemoteClient: RPCMessage? {
+	public var rtcICECandidateRPCMessageFromRemoteClient: RPCMessage? {
 		guard
 			let rpcMessage = fromRemoteClientOriginally,
 			rpcMessage.method == .iceCandidate
@@ -113,42 +113,42 @@ public extension SignalingServerMessage.Incoming {
 	}
 }
 
-public extension SignalingServerMessage.Incoming {
-	var isRemoteClientConnected: Bool {
+extension SignalingServerMessage.Incoming {
+	public var isRemoteClientConnected: Bool {
 		guard let notification = notification else { return false }
 		return notification.isRemoteClientConnected
 	}
 
-	var remoteClientIsAlreadyConnected: Self? {
+	public var remoteClientIsAlreadyConnected: Self? {
 		fromSignalingServerItself?.remoteClientIsAlreadyConnected.map { .fromSignalingServerItself($0) }
 	}
 
-	var remoteClientJustConnected: Self? {
+	public var remoteClientJustConnected: Self? {
 		fromSignalingServerItself?.remoteClientJustConnected.map { .fromSignalingServerItself($0) }
 	}
 }
 
-public extension SignalingServerMessage.Incoming.FromSignalingServerItself {
-	var isRemoteClientConnected: Bool {
+extension SignalingServerMessage.Incoming.FromSignalingServerItself {
+	public var isRemoteClientConnected: Bool {
 		guard let notification = notification else { return false }
 		return notification.isRemoteClientConnected
 	}
 
-	var isRemoteClientJustConnected: Bool {
+	public var isRemoteClientJustConnected: Bool {
 		guard let notification = notification else { return false }
 		return notification.isRemoteClientJustConnected
 	}
 
-	var isRemoteClientIsAlreadyConnected: Bool {
+	public var isRemoteClientIsAlreadyConnected: Bool {
 		guard let notification = notification else { return false }
 		return notification.isRemoteClientIsAlreadyConnected
 	}
 
-	var remoteClientIsAlreadyConnected: Self? {
+	public var remoteClientIsAlreadyConnected: Self? {
 		notification?.remoteClientIsAlreadyConnected.map { .notification($0) }
 	}
 
-	var remoteClientJustConnected: Self? {
+	public var remoteClientJustConnected: Self? {
 		notification?.remoteClientJustConnected.map { .notification($0) }
 	}
 }

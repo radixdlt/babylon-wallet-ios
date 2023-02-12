@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: To Seed
-public extension Mnemonic {
+extension Mnemonic {
 	/// Derives a binaru seed of this mnemonic using provided `passhrase`
 	/// (or empty), as described in [BIP39].
 	///
@@ -9,7 +9,7 @@ public extension Mnemonic {
 	/// BIP-0032 or similar methods.
 	///
 	/// [BIP39]: https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki#From_mnemonic_to_seed
-	func seed(
+	public func seed(
 		passphrase: String = ""
 	) throws -> Data {
 		let mnemonic = phrase

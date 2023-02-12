@@ -3,10 +3,10 @@ import EngineToolkitModels
 import Prelude
 import ProfileModels
 
-public extension Profile {
+extension Profile {
 	/// Adds a new `FactorSource` to the profile, returns `nil` if it was not inserted (because already present).
 	@discardableResult
-	mutating func addFactorSource(
+	public mutating func addFactorSource(
 		_ factorSource: any FactorSourceProtocol
 	) -> FactorSource? {
 		addFactorSource(factorSource: factorSource.wrapAsFactorSource())
@@ -14,17 +14,17 @@ public extension Profile {
 
 	/// Adds a new `FactorSource` to the profile, returns `nil` if it was not inserted (because already present).
 	@discardableResult
-	mutating func addFactorSource(
+	public mutating func addFactorSource(
 		factorSource: FactorSource
 	) -> FactorSource? {
 		factorSources.add(factorSource: factorSource)
 	}
 }
 
-internal extension FactorSources {
+extension FactorSources {
 	/// Adds a new `FactorSource` to the profile, returns `nil` if it was not inserted (because already present).
 	@discardableResult
-	mutating func add(
+	internal mutating func add(
 		factorSource: FactorSource
 	) -> FactorSource? {
 		switch factorSource {
@@ -39,10 +39,10 @@ internal extension FactorSources {
 	}
 }
 
-public extension NonEmpty where Collection == IdentifiedArrayOf<OnNetwork.Account> {
+extension NonEmpty where Collection == IdentifiedArrayOf<OnNetwork.Account> {
 	// FIXME: uh terrible, please fix this.
 	@discardableResult
-	mutating func appendAccount(_ account: OnNetwork.Account) -> OnNetwork.Account {
+	public mutating func appendAccount(_ account: OnNetwork.Account) -> OnNetwork.Account {
 		var orderedSet = self.rawValue
 		orderedSet.append(account)
 		self = .init(rawValue: orderedSet)!
@@ -50,10 +50,10 @@ public extension NonEmpty where Collection == IdentifiedArrayOf<OnNetwork.Accoun
 	}
 }
 
-public extension NonEmpty where Collection == IdentifiedArrayOf<Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource> {
+extension NonEmpty where Collection == IdentifiedArrayOf<Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource> {
 	// FIXME: uh terrible, please fix this.
 	@discardableResult
-	mutating func appendFactorSource(_ factorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource) -> Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource? {
+	public mutating func appendFactorSource(_ factorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource) -> Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource? {
 		var orderedSet = self.rawValue
 		let (wasInserted, _) = orderedSet.append(factorSource)
 		guard wasInserted else {

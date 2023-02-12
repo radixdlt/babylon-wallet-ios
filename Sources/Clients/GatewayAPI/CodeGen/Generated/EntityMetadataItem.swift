@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityMetadataItem = GatewayAPI.EntityMetadataItem
 
 // MARK: - GatewayAPI.EntityMetadataItem
-public extension GatewayAPI {
-	struct EntityMetadataItem: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityMetadataItem: Codable, Hashable {
 		public private(set) var key: String
 		public private(set) var value: String
 

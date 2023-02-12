@@ -86,8 +86,8 @@ public struct FungibleTokenContainer: Sendable, AssetContainer, Hashable {
 }
 
 // TODO: delete this when support for big decimals is added
-public extension FungibleTokenContainer {
-	var unsafeFailingAmountWithoutPrecision: Float {
+extension FungibleTokenContainer {
+	public var unsafeFailingAmountWithoutPrecision: Float {
 		if let amount = amount,
 		   let floatAmount = Float(amount)
 		{
@@ -99,9 +99,9 @@ public extension FungibleTokenContainer {
 }
 
 #if DEBUG
-public extension FungibleToken {
+extension FungibleToken {
 	/// The native token of the Radix Ledger
-	static let xrd = Self(
+	public static let xrd = Self(
 		componentAddress: "resource_tdx_22_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqj3nwpk",
 		divisibility: 18,
 		totalSupply: 24_000_000_000,
@@ -114,7 +114,7 @@ public extension FungibleToken {
 		tokenInfoURL: "https://tokens.radixdlt.com"
 	)
 
-	static let btc = Self(
+	public static let btc = Self(
 		componentAddress: "btc-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -126,7 +126,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let dot = Self(
+	public static let dot = Self(
 		componentAddress: "dot-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -138,7 +138,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let eth = Self(
+	public static let eth = Self(
 		componentAddress: "eth-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -150,7 +150,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let ltc = Self(
+	public static let ltc = Self(
 		componentAddress: "ltc-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -162,7 +162,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let sol = Self(
+	public static let sol = Self(
 		componentAddress: "sol-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -174,7 +174,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let usdt = Self(
+	public static let usdt = Self(
 		componentAddress: "usdt-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -186,7 +186,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let xrp = Self(
+	public static let xrp = Self(
 		componentAddress: "xrp-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,

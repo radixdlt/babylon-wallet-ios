@@ -7,8 +7,8 @@ import ProfileClient
 extension ProfileClient: DependencyKey {}
 
 // MARK: - ProfileClient + LiveValue
-public extension ProfileClient {
-	static let liveValue: Self = {
+extension ProfileClient {
+	public static let liveValue: Self = {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.keychainClient) var keychainClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient

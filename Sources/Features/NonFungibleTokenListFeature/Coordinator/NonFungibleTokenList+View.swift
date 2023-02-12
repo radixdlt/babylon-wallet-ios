@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.View
-public extension NonFungibleTokenList {
+extension NonFungibleTokenList {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -15,8 +15,8 @@ public extension NonFungibleTokenList {
 	}
 }
 
-public extension NonFungibleTokenList.View {
-	var body: some View {
+extension NonFungibleTokenList.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

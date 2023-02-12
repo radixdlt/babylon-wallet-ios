@@ -3,9 +3,9 @@ import FeaturePrelude
 import FungibleTokenListFeature
 
 // MARK: - AccountList.Row.View
-public extension AccountList.Row {
+extension AccountList.Row {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -17,8 +17,8 @@ public extension AccountList.Row {
 	}
 }
 
-public extension AccountList.Row.View {
-	var body: some View {
+extension AccountList.Row.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -62,8 +62,8 @@ public extension AccountList.Row.View {
 }
 
 // MARK: - Private Methods
-private extension AccountList.Row.View {
-	func formattedAmmount(_ value: Float?, isVisible: Bool, currency: FiatCurrency) -> String {
+extension AccountList.Row.View {
+	fileprivate func formattedAmmount(_ value: Float?, isVisible: Bool, currency: FiatCurrency) -> String {
 		if isVisible {
 			return value?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign) -"
 		} else {

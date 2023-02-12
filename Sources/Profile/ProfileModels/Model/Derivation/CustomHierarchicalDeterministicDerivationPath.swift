@@ -28,28 +28,28 @@ public struct CustomHierarchicalDeterministicDerivationPath:
 	}
 }
 
-public extension CustomHierarchicalDeterministicDerivationPath {
-	var customDumpDescription: String {
+extension CustomHierarchicalDeterministicDerivationPath {
+	public var customDumpDescription: String {
 		_description
 	}
 
-	var description: String {
+	public var description: String {
 		_description
 	}
 
-	var _description: String {
+	public var _description: String {
 		"CustomHierarchicalDeterministicDerivationPath(\(derivationPath))"
 	}
 }
 
-public extension CustomHierarchicalDeterministicDerivationPath {
-	func wrapAsDerivationPath() -> DerivationPath {
+extension CustomHierarchicalDeterministicDerivationPath {
+	public func wrapAsDerivationPath() -> DerivationPath {
 		.customPath(self)
 	}
 
 	/// Tries to unwraps the nominal type `DerivationPath` (enum)
 	/// into this specific type.
-	static func unwrap(derivationPath: DerivationPath) -> Self? {
+	public static func unwrap(derivationPath: DerivationPath) -> Self? {
 		switch derivationPath {
 		case let .customPath(path): return path
 		default: return nil

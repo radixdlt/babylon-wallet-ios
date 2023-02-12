@@ -2,9 +2,9 @@ import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - NewProfileThenAccountCoordinator.View
-public extension NewProfileThenAccountCoordinator {
+extension NewProfileThenAccountCoordinator {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<NewProfileThenAccountCoordinator>
 
 		public init(store: StoreOf<NewProfileThenAccountCoordinator>) {
@@ -13,8 +13,8 @@ public extension NewProfileThenAccountCoordinator {
 	}
 }
 
-public extension NewProfileThenAccountCoordinator.View {
-	var body: some View {
+extension NewProfileThenAccountCoordinator.View {
+	public var body: some View {
 		SwitchStore(store.scope(state: \.step)) {
 			CaseLet(
 				state: /NewProfileThenAccountCoordinator.State.Step.newProfile,

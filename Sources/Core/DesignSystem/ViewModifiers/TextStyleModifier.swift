@@ -17,8 +17,8 @@ public enum TextStyle {
 	case button
 }
 
-public extension View {
-	@ViewBuilder func textStyle(_ style: TextStyle) -> some View {
+extension View {
+	@ViewBuilder public func textStyle(_ style: TextStyle) -> some View {
 		switch style {
 		case .sheetTitle:
 			modifier(TextStyle.SheetTitle())
@@ -50,8 +50,8 @@ public extension View {
 	}
 }
 
-private extension TextStyle {
-	struct SheetTitle: ViewModifier {
+extension TextStyle {
+	fileprivate struct SheetTitle: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.sheetTitle)
@@ -59,7 +59,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct SectionHeader: ViewModifier {
+	fileprivate struct SectionHeader: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.sectionHeader)
@@ -67,7 +67,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct SecondaryHeader: ViewModifier {
+	fileprivate struct SecondaryHeader: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.secondaryHeader)
@@ -75,7 +75,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct Body1Header: ViewModifier {
+	fileprivate struct Body1Header: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.body1Header)
@@ -83,7 +83,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct Body1HighImportance: ViewModifier {
+	fileprivate struct Body1HighImportance: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.body1HighImportance)
@@ -91,7 +91,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct Body1Regular: ViewModifier {
+	fileprivate struct Body1Regular: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.body1Regular)
@@ -99,7 +99,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct Body1StandaloneLink: ViewModifier {
+	fileprivate struct Body1StandaloneLink: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.body1StandaloneLink)
@@ -107,7 +107,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct Body1Link: ViewModifier {
+	fileprivate struct Body1Link: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.body1Link)
@@ -115,7 +115,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct Body2Header: ViewModifier {
+	fileprivate struct Body2Header: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.body2Header)
@@ -123,7 +123,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct Body2HighImportance: ViewModifier {
+	fileprivate struct Body2HighImportance: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.body2HighImportance)
@@ -131,7 +131,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct Body2Regular: ViewModifier {
+	fileprivate struct Body2Regular: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.body2Regular)
@@ -139,7 +139,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct Body2Link: ViewModifier {
+	fileprivate struct Body2Link: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.body2Link)
@@ -147,7 +147,7 @@ private extension TextStyle {
 		}
 	}
 
-	struct Button: ViewModifier {
+	fileprivate struct Button: ViewModifier {
 		func body(content: Content) -> some View {
 			content
 				.font(.app.button)
@@ -156,15 +156,15 @@ private extension TextStyle {
 	}
 }
 
-private extension CGFloat {
-	static func lineSpacing(_ value: LineSpacing) -> CGFloat {
+extension CGFloat {
+	fileprivate static func lineSpacing(_ value: LineSpacing) -> CGFloat {
 		value.rawValue / 4
 	}
 }
 
 // MARK: - CGFloat.LineSpacing
-private extension CGFloat {
-	enum LineSpacing: CGFloat {
+extension CGFloat {
+	fileprivate enum LineSpacing: CGFloat {
 		case 𝟛𝟞 = 36
 		case 𝟚𝟛 = 23
 		case 𝟙𝟠 = 18

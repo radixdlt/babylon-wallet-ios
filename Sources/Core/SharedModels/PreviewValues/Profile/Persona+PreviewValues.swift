@@ -2,8 +2,8 @@
 import Prelude
 import ProfileModels
 
-public extension OnNetwork.Persona {
-	static let previewValue0 = try! Self(
+extension OnNetwork.Persona {
+	public static let previewValue0 = try! Self(
 		networkID: .nebunet,
 		address: .init(
 			address: "identity_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
@@ -31,7 +31,7 @@ public extension OnNetwork.Persona {
 		]
 	)
 
-	static let previewValue1 = try! Self(
+	public static let previewValue1 = try! Self(
 		networkID: .nebunet,
 		address: .init(
 			address: "identity_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"

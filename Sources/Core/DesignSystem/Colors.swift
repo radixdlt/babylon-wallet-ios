@@ -43,81 +43,81 @@ extension Color {
 	#endif
 }
 
-public extension Color {
+extension Color {
 	/// Namespace only
-	struct App { fileprivate init() {} }
-	static let app = App()
+	public struct App { fileprivate init() {} }
+	public static let app = App()
 }
 
-public extension Color.App {
+extension Color.App {
 	// blue
-	var blue1: Color { .init(hex: .blue1) }
-	var blue2: Color { .init(hex: .blue2) }
-	var blue3: Color { .init(hex: .blue3) }
+	public var blue1: Color { .init(hex: .blue1) }
+	public var blue2: Color { .init(hex: .blue2) }
+	public var blue3: Color { .init(hex: .blue3) }
 
 	// green
-	var green1: Color { .init(hex: .green1) }
-	var green2: Color { .init(hex: .green2) }
-	var green3: Color { .init(hex: .green3) }
+	public var green1: Color { .init(hex: .green1) }
+	public var green2: Color { .init(hex: .green2) }
+	public var green3: Color { .init(hex: .green3) }
 
 	// gray
-	var gray1: Color { .init(hex: .gray1) }
-	var gray2: Color { .init(hex: .gray2) }
-	var gray3: Color { .init(hex: .gray3) }
-	var gray4: Color { .init(hex: .gray4) }
-	var gray5: Color { .init(hex: .gray5) }
+	public var gray1: Color { .init(hex: .gray1) }
+	public var gray2: Color { .init(hex: .gray2) }
+	public var gray3: Color { .init(hex: .gray3) }
+	public var gray4: Color { .init(hex: .gray4) }
+	public var gray5: Color { .init(hex: .gray5) }
 
 	// white
-	var white: Color { .init(hex: .white) }
-	var whiteTransparent: Color { .white.opacity(0.8) }
+	public var white: Color { .init(hex: .white) }
+	public var whiteTransparent: Color { .white.opacity(0.8) }
 
 	// orange
-	var orange1: Color { .init(hex: .orange1) }
-	var orange2: Color { .init(hex: .orange2) }
+	public var orange1: Color { .init(hex: .orange1) }
+	public var orange2: Color { .init(hex: .orange2) }
 
 	// alert
-	var red1: Color { .init(hex: .red1) }
+	public var red1: Color { .init(hex: .red1) }
 
-	var background: Color { .dynamic(light: .white, dark: .black) }
+	public var background: Color { .dynamic(light: .white, dark: .black) }
 	@available(*, deprecated, message: "Use dynamic 'background' color instead")
-	var backgroundDark: Color { .black }
+	public var backgroundDark: Color { .black }
 	@available(*, deprecated, message: "Use dynamic 'background' color instead")
-	var backgroundLight: Color { .white }
+	public var backgroundLight: Color { .white }
 
-	var notification: Color { .init(hex: .red1) }
+	public var notification: Color { .init(hex: .red1) }
 
-	var buttonTextBlack: Color { .black }
-	var buttonTextBlackTransparent: Color { .black.opacity(0.6) }
+	public var buttonTextBlack: Color { .black }
+	public var buttonTextBlackTransparent: Color { .black.opacity(0.6) }
 
-	var shadowBlack: Color { .black.opacity(0.08) }
+	public var shadowBlack: Color { .black.opacity(0.08) }
 
 	// gradient
-	var account0green: Color { .init(hex: .account0green) }
+	public var account0green: Color { .init(hex: .account0green) }
 
-	var account1pink: Color { .init(hex: .account1pink) }
+	public var account1pink: Color { .init(hex: .account1pink) }
 
-	var account4pink: Color { .init(hex: .account4pink) }
+	public var account4pink: Color { .init(hex: .account4pink) }
 
-	var account5blue: Color { .init(hex: .account5blue) }
+	public var account5blue: Color { .init(hex: .account5blue) }
 
-	var account6green: Color { .init(hex: .account6green) }
+	public var account6green: Color { .init(hex: .account6green) }
 
-	var account7pink: Color { .init(hex: .account7pink) }
+	public var account7pink: Color { .init(hex: .account7pink) }
 
-	var account9green1: Color { .init(hex: .account9green1) }
-	var account9green2: Color { .init(hex: .account9green2) }
+	public var account9green1: Color { .init(hex: .account9green1) }
+	public var account9green2: Color { .init(hex: .account9green2) }
 
-	var account10pink1: Color { .init(hex: .account10pink1) }
-	var account10pink2: Color { .init(hex: .account10pink2) }
+	public var account10pink1: Color { .init(hex: .account10pink1) }
+	public var account10pink2: Color { .init(hex: .account10pink2) }
 
-	var account11green: Color { .init(hex: .account11green) }
-	var account11blue1: Color { .init(hex: .account11blue1) }
-	var account11pink: Color { .init(hex: .account11pink) }
+	public var account11green: Color { .init(hex: .account11green) }
+	public var account11blue1: Color { .init(hex: .account11blue1) }
+	public var account11pink: Color { .init(hex: .account11pink) }
 }
 
 // MARK: - Color.Hex
-private extension Color {
-	enum Hex: UInt32 {
+extension Color {
+	fileprivate enum Hex: UInt32 {
 		// blue
 		case blue1 = 0x060F8F
 		case blue2 = 0x052CC0
@@ -170,16 +170,16 @@ private extension Color {
 	}
 }
 
-private extension Double {
-	static let defaultOpacity: Self = 1
+extension Double {
+	fileprivate static let defaultOpacity: Self = 1
 }
 
-private extension Color {
-	init(hex: Hex, opacity: Double = .defaultOpacity) {
+extension Color {
+	fileprivate init(hex: Hex, opacity: Double = .defaultOpacity) {
 		self.init(hex: hex.rawValue, opacity: opacity)
 	}
 
-	init(hex: UInt32, opacity: Double = .defaultOpacity) {
+	fileprivate init(hex: UInt32, opacity: Double = .defaultOpacity) {
 		func value(shift: Int) -> Double {
 			Double((hex >> shift) & 0xFF) / 255
 		}
@@ -193,8 +193,8 @@ private extension Color {
 	}
 }
 
-public extension Color.App {
-	static var random: Color {
+extension Color.App {
+	public static var random: Color {
 		Color(
 			red: .random(in: 0 ... 1),
 			green: .random(in: 0 ... 1),

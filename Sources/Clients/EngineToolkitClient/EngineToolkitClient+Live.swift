@@ -3,8 +3,8 @@ import Cryptography
 @preconcurrency import EngineToolkit
 import struct Profile.AccountAddress
 
-public extension EngineToolkitClient {
-	static let liveValue: Self = {
+extension EngineToolkitClient {
+	public static let liveValue: Self = {
 		let engineToolkit = EngineToolkit()
 
 		let generateTXNonce: GenerateTXNonce = { Nonce.secureRandom() }
@@ -83,8 +83,8 @@ public extension EngineToolkitClient {
 // MARK: - FailedToConvertManifestToFormatWhereInstructionsAreJSON
 struct FailedToConvertManifestToFormatWhereInstructionsAreJSON: Swift.Error {}
 
-public extension AccountAddress {
-	init(componentAddress: ComponentAddress) throws {
+extension AccountAddress {
+	public init(componentAddress: ComponentAddress) throws {
 		try self.init(address: componentAddress.address)
 	}
 }

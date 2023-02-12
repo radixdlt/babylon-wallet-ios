@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - NewEntityCompletion.View
-public extension NewEntityCompletion {
+extension NewEntityCompletion {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.StoreOf<NewEntityCompletion>
 		private let store: Store
 
@@ -13,8 +13,8 @@ public extension NewEntityCompletion {
 	}
 }
 
-public extension NewEntityCompletion.View {
-	var body: some View {
+extension NewEntityCompletion.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -57,9 +57,9 @@ public extension NewEntityCompletion.View {
 	}
 }
 
-private extension NewEntityCompletion.View {
+extension NewEntityCompletion.View {
 	@ViewBuilder
-	func accountsStackView(
+	fileprivate func accountsStackView(
 		with viewStore: CompletionViewStore,
 		for whenAccount: ViewState.WhenAccount
 	) -> some View {
@@ -93,19 +93,19 @@ private extension NewEntityCompletion.View {
 		}
 	}
 
-	func scale(index: Int) -> CGFloat {
+	fileprivate func scale(index: Int) -> CGFloat {
 		1 - (CGFloat(index + 1) * 0.05)
 	}
 
-	func reversedZIndex(count: Int, index: Int) -> Double {
+	fileprivate func reversedZIndex(count: Int, index: Int) -> Double {
 		Double(count - index)
 	}
 
-	func nextAppearanceId(from accountIndex: OnNetwork.Account.Index) -> OnNetwork.Account.AppearanceID {
+	fileprivate func nextAppearanceId(from accountIndex: OnNetwork.Account.Index) -> OnNetwork.Account.AppearanceID {
 		OnNetwork.Account.AppearanceID.fromIndex(accountIndex + 1)
 	}
 
-	func subtitleText(with viewStore: CompletionViewStore) -> String {
+	fileprivate func subtitleText(with viewStore: CompletionViewStore) -> String {
 		if viewStore.isFirstOnNetwork {
 			return L10n.CreateEntity.Completion.Subtitle.first(viewStore.entityKind)
 		} else {
@@ -122,8 +122,8 @@ private enum Constants {
 }
 
 // MARK: - NewEntityCompletion.View.CompletionViewStore
-private extension NewEntityCompletion.View {
-	typealias CompletionViewStore = ViewStore<NewEntityCompletion.View.ViewState, NewEntityCompletion.Action.ViewAction>
+extension NewEntityCompletion.View {
+	fileprivate typealias CompletionViewStore = ViewStore<NewEntityCompletion.View.ViewState, NewEntityCompletion.Action.ViewAction>
 }
 
 // MARK: - NewEntityCompletion.View.ViewState

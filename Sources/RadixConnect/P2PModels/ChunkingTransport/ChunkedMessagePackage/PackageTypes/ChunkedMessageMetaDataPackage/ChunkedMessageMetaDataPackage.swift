@@ -21,8 +21,8 @@ public struct ChunkedMessageMetaDataPackage: Codable, Sendable & Equatable {
 }
 
 #if DEBUG
-public extension ChunkedMessageMetaDataPackage {
-	static func placeholder(chunkCount: Int) -> Self {
+extension ChunkedMessageMetaDataPackage {
+	public static func placeholder(chunkCount: Int) -> Self {
 		.init(
 			messageID: .deadbeef32Bytes,
 			chunkCount: chunkCount,

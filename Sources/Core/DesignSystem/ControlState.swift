@@ -52,8 +52,8 @@ extension EnvironmentValues {
 	}
 }
 
-public extension View {
-	func controlState(_ state: ControlState) -> some View {
+extension View {
+	public func controlState(_ state: ControlState) -> some View {
 		self.environment(\.controlState, state)
 			.transformPreference(LoadingContextKey.self) {
 				switch state {

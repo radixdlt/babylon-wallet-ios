@@ -27,12 +27,12 @@ public protocol FactorInstanceProtocol {
 	static func unwrap(factorInstance: FactorInstance) -> Self?
 }
 
-public extension FactorInstanceProtocol {
-	var factorInstanceKind: FactorInstanceKind {
+extension FactorInstanceProtocol {
+	public var factorInstanceKind: FactorInstanceKind {
 		Self.factorInstanceKind
 	}
 }
 
-public extension FactorInstanceProtocol where Self: Identifiable, Self.ID == FactorInstanceID {
-	var id: ID { factorInstanceID }
+extension FactorInstanceProtocol where Self: Identifiable, Self.ID == FactorInstanceID {
+	public var id: ID { factorInstanceID }
 }

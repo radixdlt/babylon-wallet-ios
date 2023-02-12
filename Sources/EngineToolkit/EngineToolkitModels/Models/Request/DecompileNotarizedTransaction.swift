@@ -19,7 +19,7 @@ public struct DecompileNotarizedTransactionIntentRequest: Sendable, Codable, Has
 	}
 }
 
-public extension DecompileNotarizedTransactionIntentRequest {
+extension DecompileNotarizedTransactionIntentRequest {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case compiledNotarizedIntent = "compiled_notarized_intent"
@@ -27,13 +27,13 @@ public extension DecompileNotarizedTransactionIntentRequest {
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(compiledNotarizedIntent.hex(), forKey: .compiledNotarizedIntent)
 		try container.encode(instructionsOutputKind, forKey: .instructionsOutputKind)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 

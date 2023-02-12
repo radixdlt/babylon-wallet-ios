@@ -10,8 +10,8 @@ public struct BackButton: View {
 	}
 }
 
-public extension BackButton {
-	var body: some View {
+extension BackButton {
+	public var body: some View {
 		Button(action: action) {
 			Image(asset: AssetResource.arrowBack).tint(.app.gray1)
 		}

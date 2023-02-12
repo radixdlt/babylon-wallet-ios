@@ -14,8 +14,8 @@ import AnyCodable
 public typealias NonFungibleDataRequestAllOf = GatewayAPI.NonFungibleDataRequestAllOf
 
 // MARK: - GatewayAPI.NonFungibleDataRequestAllOf
-public extension GatewayAPI {
-	struct NonFungibleDataRequestAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct NonFungibleDataRequestAllOf: Codable, Hashable {
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
 		public private(set) var nonFungibleLocalId: String

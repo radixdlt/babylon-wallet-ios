@@ -13,8 +13,8 @@
 //===----------------------------------------------------------------------===//
 import XCTest
 
-public extension XCTestCase {
-	func readTestFixtureData(
+extension XCTestCase {
+	public func readTestFixtureData(
 		bundle: Bundle? = nil,
 		jsonName: String,
 		file: StaticString = #filePath,
@@ -39,7 +39,7 @@ public extension XCTestCase {
 		return try Data(contentsOf: fileURL)
 	}
 
-	func readTestFixture<T: Decodable>(
+	public func readTestFixture<T: Decodable>(
 		bundle: Bundle? = nil,
 		jsonName: String,
 		jsonDecoder: JSONDecoder = .iso8601,
@@ -50,7 +50,7 @@ public extension XCTestCase {
 		return try jsonDecoder.decode(T.self, from: data)
 	}
 
-	func testFixture<T: Decodable>(
+	public func testFixture<T: Decodable>(
 		bundle: Bundle? = nil,
 		jsonName: String,
 		jsonDecoder: JSONDecoder = .iso8601,

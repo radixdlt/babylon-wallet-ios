@@ -15,20 +15,20 @@ public struct AppSettingsClient: Sendable {
 }
 
 // MARK: - Typealias
-public extension AppSettingsClient {
-	typealias SaveSettings = @Sendable (AppSettings) async throws -> Void
-	typealias LoadSettings = @Sendable () async throws -> AppSettings
+extension AppSettingsClient {
+	public typealias SaveSettings = @Sendable (AppSettings) async throws -> Void
+	public typealias LoadSettings = @Sendable () async throws -> AppSettings
 }
 
 // MARK: - Public Methods
-public extension AppSettingsClient {
-	func saveCurrency(currency: FiatCurrency) async throws {
+extension AppSettingsClient {
+	public func saveCurrency(currency: FiatCurrency) async throws {
 		try await updating {
 			$0.currency = currency
 		}
 	}
 
-	func saveIsCurrencyAmountVisible(_ isCurrencyAmountVisible: Bool) async throws {
+	public func saveIsCurrencyAmountVisible(_ isCurrencyAmountVisible: Bool) async throws {
 		try await updating {
 			$0.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
@@ -36,8 +36,8 @@ public extension AppSettingsClient {
 }
 
 // MARK: - Private Methods
-private extension AppSettingsClient {
-	func updating(_ modify: (inout AppSettings) -> Void) async throws {
+extension AppSettingsClient {
+	private func updating(_ modify: (inout AppSettings) -> Void) async throws {
 		var settings = try await loadSettings()
 		modify(&settings)
 		try await saveSettings(settings)
@@ -45,8 +45,8 @@ private extension AppSettingsClient {
 }
 
 // MARK: AppSettingsClient.Error
-public extension AppSettingsClient {
-	enum Error: Swift.Error, LocalizedError {
+extension AppSettingsClient {
+	public enum Error: Swift.Error, LocalizedError {
 		case loadSettingsFailed(reason: String)
 		case saveSettingsFailed(reason: String)
 	}
@@ -59,8 +59,8 @@ extension AppSettingsClient {
 	}
 }
 
-public extension DependencyValues {
-	var appSettingsClient: AppSettingsClient {
+extension DependencyValues {
+	public var appSettingsClient: AppSettingsClient {
 		get { self[AppSettingsClient.self] }
 		set { self[AppSettingsClient.self] = newValue }
 	}

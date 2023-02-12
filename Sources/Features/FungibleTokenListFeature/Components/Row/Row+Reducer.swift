@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-public extension FungibleTokenList {
-	struct Row: Sendable, ReducerProtocol {
+extension FungibleTokenList {
+	public struct Row: Sendable, ReducerProtocol {
 		public init() {}
 
 		public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {

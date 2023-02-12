@@ -14,8 +14,8 @@ import AnyCodable
 public typealias InvalidRequestErrorAllOf = GatewayAPI.InvalidRequestErrorAllOf
 
 // MARK: - GatewayAPI.InvalidRequestErrorAllOf
-public extension GatewayAPI {
-	struct InvalidRequestErrorAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct InvalidRequestErrorAllOf: Codable, Hashable {
 		/** One or more validation errors which occurred when validating the request. */
 		public private(set) var validationErrors: [ValidationErrorsAtPath]
 

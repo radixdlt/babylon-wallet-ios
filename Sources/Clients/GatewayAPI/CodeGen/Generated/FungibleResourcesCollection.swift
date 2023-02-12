@@ -14,8 +14,8 @@ import AnyCodable
 public typealias FungibleResourcesCollection = GatewayAPI.FungibleResourcesCollection
 
 // MARK: - GatewayAPI.FungibleResourcesCollection
-public extension GatewayAPI {
-	struct FungibleResourcesCollection: Codable, Hashable {
+extension GatewayAPI {
+	public struct FungibleResourcesCollection: Codable, Hashable {
 		public private(set) var totalCount: Int64?
 		public private(set) var previousCursor: String?
 		public private(set) var nextCursor: String?

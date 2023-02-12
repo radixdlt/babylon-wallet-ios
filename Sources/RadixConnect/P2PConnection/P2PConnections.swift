@@ -22,14 +22,14 @@ public actor P2PConnections: GlobalActor {
 }
 
 // MARK: CRUD
-public extension P2PConnections {
-	typealias SentReceipt = ChunkingTransport.SentReceipt
-	typealias IncomingMessage = ChunkingTransport.IncomingMessage
-	typealias MessageID = IncomingMessage.MessageID
+extension P2PConnections {
+	public typealias SentReceipt = ChunkingTransport.SentReceipt
+	public typealias IncomingMessage = ChunkingTransport.IncomingMessage
+	public typealias MessageID = IncomingMessage.MessageID
 
 	/// throws an error if no connection with the given ID is found, use `add` methods
 	/// if this is a new connection.
-	func connect(id: ID, force: Bool) async throws {
+	public func connect(id: ID, force: Bool) async throws {
 		guard let connection = self.get(id: id) else {
 			throw ConverseError.connectionsError(.noConnectionFoundForID(id))
 		}
@@ -37,7 +37,7 @@ public extension P2PConnections {
 	}
 
 	/// returns `P2PConnectionID` of new or aleady existing `P2PConnection`
-	func add(
+	public func add(
 		config: P2PConfig,
 		connectMode: ConnectMode,
 		emitConnectionsUpdate shouldEmitConnectionsUpdate: Bool = true
@@ -51,11 +51,11 @@ public extension P2PConnections {
 
 	/// returns `true` iff the connection was present (and removed), returns `false` if the connection was not present.
 	@discardableResult
-	func removeAndDisconnect(id: ID) async throws -> Bool {
+	public func removeAndDisconnect(id: ID) async throws -> Bool {
 		try await doRemoveAndDisconnect(id: id, emitConnectionsUpdate: true)
 	}
 
-	func removeAndDisconnectAll() async throws {
+	public func removeAndDisconnectAll() async throws {
 		defer { emitConnectionsUpdate() }
 		try await withThrowingTaskGroup(of: Void.self) { [unowned self] group in
 			for connection in self.connections {
@@ -71,7 +71,7 @@ public extension P2PConnections {
 	}
 
 	/// returns `true` iff all connections were added, returns `false` if any of the connection already existed
-	func add(
+	public func add(
 		connectionsFor configs: OrderedSet<P2PConfig>,
 		connectMode: ConnectMode,
 		emitConnectionsUpdate shouldEmitConnectionsUpdate: Bool = true
@@ -96,7 +96,7 @@ public extension P2PConnections {
 	}
 
 	/// returns `true` iff all connections were added, returns `false` if any of the connection already existed
-	func add(
+	public func add(
 		connectionsFor clients: OrderedSet<P2PClient>,
 		connectMode: ConnectMode = .connect(force: false, inBackground: false),
 		emitConnectionsUpdate shouldEmitConnectionsUpdate: Bool = true
@@ -109,7 +109,7 @@ public extension P2PConnections {
 	}
 
 	/// returns `true` iff all connections were added, returns `false` if any of the connection already existed
-	func add(
+	public func add(
 		connectionsFor clients: P2PClients,
 		connectMode: ConnectMode = .connect(force: false, inBackground: false),
 		emitConnectionsUpdate shouldEmitConnectionsUpdate: Bool = true
@@ -123,30 +123,30 @@ public extension P2PConnections {
 }
 
 // MARK: API
-public extension P2PConnections {
-	typealias ID = P2PConnectionID
+extension P2PConnections {
+	public typealias ID = P2PConnectionID
 
 	/// A non replaying non multicasted async sequence
-	func connectionIDsAsyncSequence() async throws -> AnyAsyncSequence<IDs> {
+	public func connectionIDsAsyncSequence() async throws -> AnyAsyncSequence<IDs> {
 		connectionsUpdatesAsyncBufferedChannel.eraseToAnyAsyncSequence()
 	}
 
 	/// A shared (multicast) async sequence.
-	func sentReceiptsAsyncSequence(
+	public func sentReceiptsAsyncSequence(
 		for id: ID
 	) async throws -> AnyAsyncSequence<SentReceipt> {
 		try await asyncSequence(for: id) { await $0.sentReceiptsAsyncSequence() }
 	}
 
 	/// A replaying multicasting async sequence.
-	func connectionStatusChangeEventAsyncSequence(
+	public func connectionStatusChangeEventAsyncSequence(
 		for id: ID
 	) async throws -> AnyAsyncSequence<ConnectionStatusChangeEvent> {
 		try await asyncSequence(for: id) { await $0.connectionStatusAsyncSequence() }
 	}
 
 	/// A shared (multicast) async sequence.
-	func incomingMessagesAsyncSequence(
+	public func incomingMessagesAsyncSequence(
 		for id: ID
 	) async throws -> AnyAsyncSequence<IncomingMessage> {
 		try await asyncSequence(for: id) { await $0.incomingMessagesAsyncSequence() }
@@ -154,7 +154,7 @@ public extension P2PConnections {
 
 	/// Sends a message recived confirmation (receipt) for `readMessage` back to
 	/// sending remote peer over WebRTC.
-	func sendReceipt(
+	public func sendReceipt(
 		for id: ID,
 		readMessage: IncomingMessage,
 		alsoMarkMessageAsHandled: Bool = true
@@ -166,7 +166,7 @@ public extension P2PConnections {
 	}
 
 	/// Sends `data` to remote peer over WebRTC.
-	func sendData(for id: ID, data: Data, messageID: String) async throws {
+	public func sendData(for id: ID, data: Data, messageID: String) async throws {
 		guard let connection = self.get(id: id) else {
 			return
 		}
@@ -175,10 +175,10 @@ public extension P2PConnections {
 }
 
 // MARK: Convenience
-public extension P2PConnections {
+extension P2PConnections {
 	/// Just sugar for `add(config:autoconnect)` applying default configs.
 	/// returns `P2PConnectionID` of new or already existing `P2PConnection`
-	func add(
+	public func add(
 		connectionPassword: ConnectionPassword,
 		connectMode: ConnectMode = .connect(force: false, inBackground: false),
 		emitConnectionsUpdate shouldEmitConnectionsUpdate: Bool = true
@@ -192,16 +192,16 @@ public extension P2PConnections {
 }
 
 // MARK: Debug
-public extension P2PConnections {
+extension P2PConnections {
 	/// A replaying multicasting async sequence.
-	func debugDataChannelState(
+	public func debugDataChannelState(
 		for id: ID
 	) async throws -> AnyAsyncSequence<DataChannelState> {
 		try await asyncSequence(for: id) { await $0.dataChannelStatusAsyncSequence() }
 	}
 
 	/// A replaying multicasting async sequence.
-	func debugWebSocketState(
+	public func debugWebSocketState(
 		for id: ID
 	) async throws -> AnyAsyncSequence<WebSocketState> {
 		try await asyncSequence(for: id) { await $0.webSocketStatusAsyncSequence() }
@@ -215,15 +215,15 @@ public enum ConnectMode: Sendable, Hashable {
 }
 
 // MARK: Private
-private extension P2PConnections {
-	func emitConnectionsUpdate() {
+extension P2PConnections {
+	private func emitConnectionsUpdate() {
 		connectionsUpdatesAsyncBufferedChannel.send(
 			OrderedSet(connections.map(\.connectionID))
 		)
 	}
 
 	/// returns `P2PConnectionID` of new or already existing `P2PConnection`
-	func doAdd(
+	private func doAdd(
 		config: P2PConfig,
 		emitConnectionsUpdate shouldEmitConnectionsUpdate: Bool,
 		mode: ConnectMode
@@ -258,13 +258,13 @@ private extension P2PConnections {
 		return connection.id
 	}
 
-	func connect(_ connection: P2PConnection, force: Bool) async throws {
+	fileprivate func connect(_ connection: P2PConnection, force: Bool) async throws {
 		try await connection.connectIfNeeded(force: force)
 	}
 
 	/// returns `true` iff the connection was present (and removed), returns `false` if the connection was not present.
 	@discardableResult
-	func doRemoveAndDisconnect(
+	private func doRemoveAndDisconnect(
 		id: ID,
 		emitConnectionsUpdate shouldEmitConnectionsUpdate: Bool
 	) async throws -> Bool {
@@ -277,12 +277,12 @@ private extension P2PConnections {
 		return true
 	}
 
-	func get(id: ID) -> P2PConnection? {
+	private func get(id: ID) -> P2PConnection? {
 		connections.first(where: { $0.connectionID == id })
 	}
 
 	/// returns `true` iff the connection was present (and removed), returns `false` if the connection was not present.
-	func doRemoveAndDisconnect(
+	private func doRemoveAndDisconnect(
 		connection: P2PConnection,
 		emitConnectionsUpdate shouldEmitConnectionsUpdate: Bool
 	) async throws {
@@ -293,7 +293,7 @@ private extension P2PConnections {
 		}
 	}
 
-	func asyncSequence<Element>(
+	private func asyncSequence<Element>(
 		for id: ID,
 		from: (P2PConnection) async -> AnyAsyncSequence<Element>
 	) async throws -> AnyAsyncSequence<Element> {

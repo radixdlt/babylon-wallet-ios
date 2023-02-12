@@ -3,8 +3,8 @@ import FeaturePrelude
 import ProfileClient
 
 // MARK: - NewProfileThenAccountCoordinator.State
-public extension NewProfileThenAccountCoordinator {
-	struct State: Sendable, Hashable {
+extension NewProfileThenAccountCoordinator {
+	public struct State: Sendable, Hashable {
 		public enum Step: Sendable, Hashable {
 			case newProfile(NewProfile.State)
 			case createAccountCoordinator(CreateAccountCoordinator.State)
@@ -24,7 +24,7 @@ public extension NewProfileThenAccountCoordinator {
 }
 
 #if DEBUG
-public extension NewProfileThenAccountCoordinator.State {
-	static let previewValue: Self = .init()
+extension NewProfileThenAccountCoordinator.State {
+	public static let previewValue: Self = .init()
 }
 #endif

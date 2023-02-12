@@ -2,8 +2,8 @@ import FeaturePrelude
 import P2PModels
 
 // MARK: - CameraPermission.Action
-public extension CameraPermission {
-	enum Action: Sendable, Equatable {
+extension CameraPermission {
+	public enum Action: Sendable, Equatable {
 		static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -11,8 +11,8 @@ public extension CameraPermission {
 }
 
 // MARK: - CameraPermission.Action.ViewAction
-public extension CameraPermission.Action {
-	enum ViewAction: Sendable, Equatable {
+extension CameraPermission.Action {
+	public enum ViewAction: Sendable, Equatable {
 		public enum PermissionDeniedAlertAction: Sendable, Equatable {
 			case dismissed
 			case cancelButtonTapped
@@ -25,23 +25,23 @@ public extension CameraPermission.Action {
 }
 
 // MARK: - CameraPermission.Action.InternalAction
-public extension CameraPermission.Action {
-	enum InternalAction: Sendable, Equatable {
+extension CameraPermission.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
 // MARK: - CameraPermission.Action.SystemAction
-public extension CameraPermission.Action {
-	enum SystemAction: Sendable, Equatable {
+extension CameraPermission.Action {
+	public enum SystemAction: Sendable, Equatable {
 		case displayPermissionDeniedAlert
 	}
 }
 
 // MARK: - CameraPermission.Action.DelegateAction
-public extension CameraPermission.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension CameraPermission.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case permissionResponse(Bool)
 	}
 }

@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - NewProfile.View
-public extension NewProfile {
+extension NewProfile {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<NewProfile>
 
 		public init(store: StoreOf<NewProfile>) {
@@ -12,8 +12,8 @@ public extension NewProfile {
 	}
 }
 
-public extension NewProfile.View {
-	var body: some View {
+extension NewProfile.View {
+	public var body: some View {
 		ForceFullScreen {
 			Image(asset: AssetResource.splash)
 				.resizable()

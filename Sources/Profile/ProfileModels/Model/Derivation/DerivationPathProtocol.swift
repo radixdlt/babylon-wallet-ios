@@ -33,8 +33,8 @@ public protocol DerivationPathProtocol {
 	static func unwrap(derivationPath: DerivationPath) -> Self?
 }
 
-public extension DerivationPathProtocol {
-	init(path: HD.Path.Full) throws {
+extension DerivationPathProtocol {
+	public init(path: HD.Path.Full) throws {
 		try self.init(derivationPath: path.toString())
 	}
 }
@@ -52,8 +52,8 @@ public protocol DerivationPathPurposeProtocol: DerivationPathProtocol {
 	static var purpose: DerivationPurpose { get }
 }
 
-public extension DerivationPathProtocol where Self: Identifiable, ID == String {
-	var id: String { derivationPath }
+extension DerivationPathProtocol where Self: Identifiable, ID == String {
+	public var id: String { derivationPath }
 }
 
 // MARK: - DerivationPath
@@ -76,12 +76,12 @@ public enum DerivationPath:
 	case customPath(CustomHierarchicalDeterministicDerivationPath)
 }
 
-public extension DerivationPath {
-	static let getID: Self = try! .customPath(.init(path: .getID))
+extension DerivationPath {
+	public static let getID: Self = try! .customPath(.init(path: .getID))
 }
 
-public extension DerivationPath {
-	var derivationPath: String {
+extension DerivationPath {
+	public var derivationPath: String {
 		switch self {
 		case let .accountPath(path): return path.derivationPath
 		case let .customPath(path): return path.derivationPath
@@ -89,7 +89,7 @@ public extension DerivationPath {
 		}
 	}
 
-	func asIdentityPath() throws -> IdentityHierarchicalDeterministicDerivationPath {
+	public func asIdentityPath() throws -> IdentityHierarchicalDeterministicDerivationPath {
 		switch self {
 		case let .identityPath(path):
 			return path
@@ -99,7 +99,7 @@ public extension DerivationPath {
 		}
 	}
 
-	func asAccountPath() throws -> AccountHierarchicalDeterministicDerivationPath {
+	public func asAccountPath() throws -> AccountHierarchicalDeterministicDerivationPath {
 		switch self {
 		case let .accountPath(path):
 			return path
@@ -110,12 +110,12 @@ public extension DerivationPath {
 	}
 }
 
-public extension DerivationPath {
-	enum Discriminator: String, Codable {
+extension DerivationPath {
+	public enum Discriminator: String, Codable {
 		case accountPath, identityPath, customPath
 	}
 
-	var discriminator: Discriminator {
+	public var discriminator: Discriminator {
 		switch self {
 		case .accountPath: return .accountPath
 		case .identityPath: return .identityPath
@@ -127,13 +127,13 @@ public extension DerivationPath {
 		case discriminator, derivationPath
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(discriminator, forKey: .discriminator)
 		try container.encode(derivationPath, forKey: .derivationPath)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
 		let derivationPath = try container.decode(String.self, forKey: .derivationPath)
@@ -148,8 +148,8 @@ public extension DerivationPath {
 	}
 }
 
-public extension DerivationPath {
-	func hdFullPath() throws -> HD.Path.Full {
+extension DerivationPath {
+	public func hdFullPath() throws -> HD.Path.Full {
 		switch self {
 		case let .customPath(path): return try HD.Path.Full(string: path.derivationPath)
 		case let .identityPath(path): return path.fullPath
@@ -158,16 +158,16 @@ public extension DerivationPath {
 	}
 }
 
-public extension DerivationPath {
-	var customDumpDescription: String {
+extension DerivationPath {
+	public var customDumpDescription: String {
 		_description
 	}
 
-	var description: String {
+	public var description: String {
 		_description
 	}
 
-	var _description: String {
+	public var _description: String {
 		derivationPath
 	}
 }

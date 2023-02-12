@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionSubmitRequest = GatewayAPI.TransactionSubmitRequest
 
 // MARK: - GatewayAPI.TransactionSubmitRequest
-public extension GatewayAPI {
-	struct TransactionSubmitRequest: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionSubmitRequest: Codable, Hashable {
 		/** The notarized transaction payload which can be submitted, hex encoded. */
 		public private(set) var notarizedTransactionHex: String
 

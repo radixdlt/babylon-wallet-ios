@@ -26,7 +26,7 @@ public struct CreateProofFromAuthZoneByAmount: InstructionProtocol {
 	}
 }
 
-public extension CreateProofFromAuthZoneByAmount {
+extension CreateProofFromAuthZoneByAmount {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
@@ -36,7 +36,7 @@ public extension CreateProofFromAuthZoneByAmount {
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
@@ -45,7 +45,7 @@ public extension CreateProofFromAuthZoneByAmount {
 		try container.encode(intoProof, forKey: .intoProof)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: InstructionKind = try container.decode(InstructionKind.self, forKey: .type)

@@ -1,11 +1,11 @@
 import Foundation
 
-public extension Identifiable where Self: RawRepresentable, RawValue: Hashable, ID == RawValue {
-	var id: ID { rawValue }
+extension Identifiable where Self: RawRepresentable, RawValue: Hashable, ID == RawValue {
+	public var id: ID { rawValue }
 }
 
-public extension CustomStringConvertible where Self: RawRepresentable, RawValue == String {
-	var description: String {
+extension CustomStringConvertible where Self: RawRepresentable, RawValue == String {
+	public var description: String {
 		rawValue
 	}
 }

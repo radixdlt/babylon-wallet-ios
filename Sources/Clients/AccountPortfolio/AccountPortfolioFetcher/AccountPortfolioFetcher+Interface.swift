@@ -13,12 +13,12 @@ public struct AccountPortfolioFetcher: Sendable {
 }
 
 // MARK: AccountPortfolioFetcher.FetchPortfolio
-public extension AccountPortfolioFetcher {
-	typealias FetchPortfolio = @Sendable ([AccountAddress]) async throws -> AccountPortfolioDictionary
+extension AccountPortfolioFetcher {
+	public typealias FetchPortfolio = @Sendable ([AccountAddress]) async throws -> AccountPortfolioDictionary
 }
 
-public extension DependencyValues {
-	var accountPortfolioFetcher: AccountPortfolioFetcher {
+extension DependencyValues {
+	public var accountPortfolioFetcher: AccountPortfolioFetcher {
 		get { self[AccountPortfolioFetcher.self] }
 		set { self[AccountPortfolioFetcher.self] = newValue }
 	}

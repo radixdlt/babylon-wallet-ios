@@ -3,9 +3,9 @@ import FungibleTokenListFeature
 import NonFungibleTokenListFeature
 
 // MARK: - AssetsView.State
-public extension AssetsView {
+extension AssetsView {
 	// MARK: State
-	struct State: Sendable, Hashable {
+	public struct State: Sendable, Hashable {
 		public var type: AssetsViewType
 		public var fungibleTokenList: FungibleTokenList.State
 		public var nonFungibleTokenList: NonFungibleTokenList.State
@@ -23,8 +23,8 @@ public extension AssetsView {
 }
 
 // MARK: - AssetsView.AssetsViewType
-public extension AssetsView {
-	enum AssetsViewType: String, Sendable, Hashable, CaseIterable, Identifiable {
+extension AssetsView {
+	public enum AssetsViewType: String, Sendable, Hashable, CaseIterable, Identifiable {
 		case tokens
 		case nfts
 

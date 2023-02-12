@@ -20,7 +20,7 @@ public struct DecompileUnknownTransactionIntentRequest: Sendable, Codable, Hasha
 	}
 }
 
-public extension DecompileUnknownTransactionIntentRequest {
+extension DecompileUnknownTransactionIntentRequest {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -30,13 +30,13 @@ public extension DecompileUnknownTransactionIntentRequest {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(compiledUnknownIntent.hex(), forKey: .compiledUnknownIntent)
 		try container.encode(instructionsOutputKind, forKey: .instructionsOutputKind)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 
@@ -58,7 +58,7 @@ public enum DecompileUnknownTransactionIntentResponse: Sendable, Codable, Hashab
 	case notarizedTransactionIntent(DecompileNotarizedTransactionIntentResponse)
 }
 
-public extension DecompileUnknownTransactionIntentResponse {
+extension DecompileUnknownTransactionIntentResponse {
 	private enum Kind: String, Codable {
 		case transactionIntent = "TransactionIntent"
 		case signedTransactionIntent = "SignedTransactionIntent"
@@ -72,7 +72,7 @@ public extension DecompileUnknownTransactionIntentResponse {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 
 		switch self {
@@ -88,7 +88,7 @@ public extension DecompileUnknownTransactionIntentResponse {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind = try container.decode(Kind.self, forKey: .type)
 

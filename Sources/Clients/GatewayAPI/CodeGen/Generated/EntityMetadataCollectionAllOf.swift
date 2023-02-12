@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityMetadataCollectionAllOf = GatewayAPI.EntityMetadataCollectionAllOf
 
 // MARK: - GatewayAPI.EntityMetadataCollectionAllOf
-public extension GatewayAPI {
-	struct EntityMetadataCollectionAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityMetadataCollectionAllOf: Codable, Hashable {
 		public private(set) var items: [EntityMetadataItem]
 
 		public init(items: [EntityMetadataItem]) {

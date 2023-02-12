@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - SelectGenesisFactorSource.View
-public extension SelectGenesisFactorSource {
+extension SelectGenesisFactorSource {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<SelectGenesisFactorSource>
 
 		public init(store: StoreOf<SelectGenesisFactorSource>) {
@@ -12,8 +12,8 @@ public extension SelectGenesisFactorSource {
 	}
 }
 
-public extension SelectGenesisFactorSource.View {
-	var body: some View {
+extension SelectGenesisFactorSource.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

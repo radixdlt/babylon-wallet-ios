@@ -14,8 +14,8 @@ import AnyCodable
 public typealias GatewayError = GatewayAPI.GatewayError
 
 // MARK: - GatewayAPI.GatewayError
-public extension GatewayAPI {
-	struct GatewayError: Codable, Hashable {
+extension GatewayAPI {
+	public struct GatewayError: Codable, Hashable {
 		/** The type of error. Each subtype may have its own additional structured fields. */
 		public private(set) var type: String
 

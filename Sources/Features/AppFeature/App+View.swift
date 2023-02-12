@@ -4,9 +4,9 @@ import OnboardingFeature
 import SplashFeature
 
 // MARK: - App.View
-public extension App {
+extension App {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -16,8 +16,8 @@ public extension App {
 	}
 }
 
-public extension App.View {
-	var body: some View {
+extension App.View {
+	public var body: some View {
 		ZStack {
 			SwitchStore(store.scope(state: \.root)) {
 				CaseLet(

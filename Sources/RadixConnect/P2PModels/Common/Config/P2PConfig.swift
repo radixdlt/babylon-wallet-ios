@@ -20,12 +20,12 @@ public struct P2PConfig: Sendable, Hashable, Codable {
 	}
 }
 
-public extension P2PConfig {
-	var connectionSecrets: ConnectionSecrets {
+extension P2PConfig {
+	public var connectionSecrets: ConnectionSecrets {
 		try! .from(connectionPassword: connectionPassword)
 	}
 
-	var connectionID: P2PConnectionID {
+	public var connectionID: P2PConnectionID {
 		connectionSecrets.connectionID
 	}
 }

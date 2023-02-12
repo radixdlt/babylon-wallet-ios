@@ -2,20 +2,20 @@ import FeaturePrelude
 import P2PConnection
 
 // MARK: - ConnectUsingSecrets.Action
-public extension ConnectUsingSecrets {
-	enum Action: Sendable, Equatable {
+extension ConnectUsingSecrets {
+	public enum Action: Sendable, Equatable {
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
 }
 
-public extension ConnectUsingSecrets.Action {
-	static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
+extension ConnectUsingSecrets.Action {
+	public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 }
 
 // MARK: - ConnectUsingSecrets.Action.ViewAction
-public extension ConnectUsingSecrets.Action {
-	enum ViewAction: Sendable, Equatable {
+extension ConnectUsingSecrets.Action {
+	public enum ViewAction: Sendable, Equatable {
 		case task
 		case appeared
 		case nameOfConnectionChanged(String)
@@ -25,24 +25,24 @@ public extension ConnectUsingSecrets.Action {
 }
 
 // MARK: - ConnectUsingSecrets.Action.InternalAction
-public extension ConnectUsingSecrets.Action {
-	enum InternalAction: Sendable, Equatable {
+extension ConnectUsingSecrets.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
 // MARK: - ConnectUsingSecrets.Action.SystemAction
-public extension ConnectUsingSecrets.Action {
-	enum SystemAction: Sendable, Equatable {
+extension ConnectUsingSecrets.Action {
+	public enum SystemAction: Sendable, Equatable {
 		case focusTextField(ConnectUsingSecrets.State.Field?)
 		case establishConnectionResult(TaskResult<P2PConnectionID>)
 	}
 }
 
 // MARK: - ConnectUsingSecrets.Action.DelegateAction
-public extension ConnectUsingSecrets.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension ConnectUsingSecrets.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case connected(P2P.ClientWithConnectionStatus)
 	}
 }

@@ -12,13 +12,13 @@ public struct Fingerprint: Hashable {
 	}
 }
 
-public extension Fingerprint {
-	static let byteCount = 4
-	enum Error: Swift.Error {
+extension Fingerprint {
+	public static let byteCount = 4
+	public enum Error: Swift.Error {
 		case incorrectByteCount(expected: Int, butGot: Int)
 	}
 
-	static let masterKey = try! Self(data: Data([0x00, 0x00, 0x00, 0x00]))
+	public static let masterKey = try! Self(data: Data([0x00, 0x00, 0x00, 0x00]))
 }
 
 extension Fingerprint {

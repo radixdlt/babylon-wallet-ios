@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityDetailsResponseDetailsType = GatewayAPI.EntityDetailsResponseDetailsType
 
 // MARK: - GatewayAPI.EntityDetailsResponseDetailsType
-public extension GatewayAPI {
-	enum EntityDetailsResponseDetailsType: String, Codable, CaseIterable {
+extension GatewayAPI {
+	public enum EntityDetailsResponseDetailsType: String, Codable, CaseIterable {
 		case fungibleResource = "fungible_resource"
 		case nonFungibleResource = "non_fungible_resource"
 		case package

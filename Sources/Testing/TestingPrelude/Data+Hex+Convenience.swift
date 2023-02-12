@@ -1,7 +1,7 @@
 import Prelude
 
-public extension String {
-	var hexData: Data {
+extension String {
+	public var hexData: Data {
 		try! Data(hex: self)
 	}
 }

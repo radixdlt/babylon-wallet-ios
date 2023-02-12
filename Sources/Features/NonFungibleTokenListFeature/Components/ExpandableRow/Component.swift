@@ -76,8 +76,8 @@ extension Component {
 
 // MARK: - Private Computed Properties
 
-private extension Component {
-	var metadata: [[String: String]] {
+extension Component {
+	private var metadata: [[String: String]] {
 		// TODO: refactor when API returns NFT metadata
 		//		token.metadata ?? []
 		[]
@@ -119,8 +119,8 @@ extension Component: ExpandableRow {
 }
 
 // MARK: - Component.Constants
-private extension Component {
-	enum Constants {
+extension Component {
+	fileprivate enum Constants {
 		static let radius: CGFloat = .small1
 	}
 }

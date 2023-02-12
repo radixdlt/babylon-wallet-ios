@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-public extension Array where Element == FungibleTokenContainer {
-	func sortedIntoCategories() -> [FungibleTokenCategory] {
+extension Array where Element == FungibleTokenContainer {
+	public func sortedIntoCategories() -> [FungibleTokenCategory] {
 		var xrdContainer: FungibleTokenContainer?
 		var noValueTokens = [FungibleTokenContainer]()
 		var tokensWithValues = [FungibleTokenContainer]()

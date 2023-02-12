@@ -11,12 +11,12 @@ public final class DataReader {
 	}
 }
 
-public extension DataReader {
-	var isFinished: Bool {
+extension DataReader {
+	public var isFinished: Bool {
 		offset == sourceSize
 	}
 
-	func readUInt<U>(byteCount: Int, endianess: Endianess = .big) throws -> U where U: FixedWidthInteger & UnsignedInteger {
+	public func readUInt<U>(byteCount: Int, endianess: Endianess = .big) throws -> U where U: FixedWidthInteger & UnsignedInteger {
 		let bytes = try read(byteCount: byteCount)
 
 		switch endianess {
@@ -33,7 +33,7 @@ public extension DataReader {
 		}
 	}
 
-	func readInt<I>(byteCount: Int, endianess: Endianess = .big) throws -> I where I: FixedWidthInteger & SignedInteger {
+	public func readInt<I>(byteCount: Int, endianess: Endianess = .big) throws -> I where I: FixedWidthInteger & SignedInteger {
 		let bytes = try read(byteCount: byteCount)
 
 		let littleEndianInt = bytes.withUnsafeBytes {
@@ -58,20 +58,20 @@ public enum Endianess {
 	case big, little
 }
 
-public extension String {
-	func trimWhitespacesIncludingNullTerminators() -> String {
+extension String {
+	public func trimWhitespacesIncludingNullTerminators() -> String {
 		trimmingCharacters(in: .whitespacesAndNewlines.union(.init(charactersIn: .null)))
 	}
 
-	static var null: String { String(.null) }
+	public static var null: String { String(.null) }
 }
 
-public extension Character {
-	static var null: Self { Character(.init(0x00)) }
+extension Character {
+	public static var null: Self { Character(.init(0x00)) }
 }
 
-public extension DataReader {
-	enum Error: Swift.Error {
+extension DataReader {
+	public enum Error: Swift.Error {
 		case failedToCreateRawRepresentableFromRawValue
 		case dataReaderHasNoMoreBytesToBeRead
 		case dataEmpty
@@ -80,35 +80,35 @@ public extension DataReader {
 		case stringLongerThanExpectedMaxLength(got: Int, butExpectedAtMost: Int)
 	}
 
-	func readByte() throws -> UInt8 {
+	public func readByte() throws -> UInt8 {
 		try readUInt8()
 	}
 
-	func readUInt8() throws -> UInt8 {
+	public func readUInt8() throws -> UInt8 {
 		try readUInt(byteCount: 1, endianess: .big) // does not matter
 	}
 
-	func readInt8(endianess: Endianess = .big) throws -> Int8 {
+	public func readInt8(endianess: Endianess = .big) throws -> Int8 {
 		try readInt(byteCount: 1, endianess: endianess)
 	}
 
-	func readUInt16(endianess: Endianess = .big) throws -> UInt16 {
+	public func readUInt16(endianess: Endianess = .big) throws -> UInt16 {
 		try readUInt(byteCount: 2, endianess: endianess)
 	}
 
-	func readInt16(endianess: Endianess = .big) throws -> Int16 {
+	public func readInt16(endianess: Endianess = .big) throws -> Int16 {
 		try readInt(byteCount: 2, endianess: endianess)
 	}
 
-	func readUInt32(endianess: Endianess = .big) throws -> UInt32 {
+	public func readUInt32(endianess: Endianess = .big) throws -> UInt32 {
 		try readUInt(byteCount: 4, endianess: endianess)
 	}
 
-	func readInt32(endianess: Endianess = .big) throws -> Int32 {
+	public func readInt32(endianess: Endianess = .big) throws -> Int32 {
 		try readInt(byteCount: 4, endianess: endianess)
 	}
 
-	func read(byteCount: Int) throws -> Data {
+	public func read(byteCount: Int) throws -> Data {
 		guard source.count >= byteCount else {
 			throw Error.dataReaderHasNoMoreBytesToBeRead
 		}
@@ -119,17 +119,17 @@ public extension DataReader {
 		return Data(source[startIndex ..< endIndex])
 	}
 
-	func readRest(throwIfEmpty: Bool = true) throws -> Data {
+	public func readRest(throwIfEmpty: Bool = true) throws -> Data {
 		let remainingByteCount = source.count - offset
 		guard remainingByteCount > 0 else { throw Error.dataEmpty }
 		return try read(byteCount: remainingByteCount)
 	}
 
-	func readInt(endianess: Endianess = .big) throws -> Int {
+	public func readInt(endianess: Endianess = .big) throws -> Int {
 		try readInt(byteCount: MemoryLayout<Int>.size, endianess: endianess)
 	}
 
-	func readFloat() throws -> Float {
+	public func readFloat() throws -> Float {
 		var floatBytes = try read(byteCount: 4)
 		let float: Float = floatBytes.withUnsafeMutableBytes {
 			$0.load(as: Float.self)
@@ -137,7 +137,7 @@ public extension DataReader {
 		return float
 	}
 
-	func seek(to targetOffset: Int) throws {
+	public func seek(to targetOffset: Int) throws {
 		guard targetOffset < source.count else {
 			throw Error.dataReaderHasNoMoreBytesToBeRead
 		}
@@ -145,12 +145,12 @@ public extension DataReader {
 		self.offset = targetOffset
 	}
 
-	func skip(byteCount: Int) throws {
+	public func skip(byteCount: Int) throws {
 		// Discard data
 		let _ = try read(byteCount: byteCount)
 	}
 
-	func read<R>(_ rawRepresentable: R.Type, endianess: Endianess = .big) throws -> R where R: RawRepresentable, R.RawValue: FixedWidthInteger & SignedInteger {
+	public func read<R>(_ rawRepresentable: R.Type, endianess: Endianess = .big) throws -> R where R: RawRepresentable, R.RawValue: FixedWidthInteger & SignedInteger {
 		let rawValue: R.RawValue = try readInt(byteCount: MemoryLayout<R.RawValue>.size, endianess: endianess)
 		guard let rawRepresentable = R(rawValue: rawValue) else {
 			throw Error.failedToCreateRawRepresentableFromRawValue
@@ -158,7 +158,7 @@ public extension DataReader {
 		return rawRepresentable
 	}
 
-	func read<R>(_ rawRepresentable: R.Type, endianess: Endianess = .big) throws -> R where R: RawRepresentable, R.RawValue: FixedWidthInteger & UnsignedInteger {
+	public func read<R>(_ rawRepresentable: R.Type, endianess: Endianess = .big) throws -> R where R: RawRepresentable, R.RawValue: FixedWidthInteger & UnsignedInteger {
 		let rawValue: R.RawValue = try readUInt(byteCount: MemoryLayout<R.RawValue>.size, endianess: endianess)
 		guard let rawRepresentable = R(rawValue: rawValue) else {
 			throw Error.failedToCreateRawRepresentableFromRawValue
@@ -166,7 +166,7 @@ public extension DataReader {
 		return rawRepresentable
 	}
 
-	func readStringOfKnownMaxLength(_ maxLength: UInt32, trim: Bool = true) throws -> String? {
+	public func readStringOfKnownMaxLength(_ maxLength: UInt32, trim: Bool = true) throws -> String? {
 		guard maxLength > 0 else { return nil }
 		let data = try read(byteCount: .init(maxLength))
 
@@ -186,7 +186,7 @@ public extension DataReader {
 		}
 	}
 
-	func readBool() throws -> Bool {
+	public func readBool() throws -> Bool {
 		try readUInt8() != 0
 	}
 }

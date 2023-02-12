@@ -2,8 +2,8 @@ import Foundation
 import P2PModels
 import WebRTC
 
-internal extension ICEConnectionState {
-	init(rtcIceConnectionState: RTCIceConnectionState) throws {
+extension ICEConnectionState {
+	internal init(rtcIceConnectionState: RTCIceConnectionState) throws {
 		switch rtcIceConnectionState {
 		case .new: self = .new
 		case .checking: self = .checking

@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityNonFungibleLocalIdsResponseAllOf = GatewayAPI.EntityNonFungibleLocalIdsResponseAllOf
 
 // MARK: - GatewayAPI.EntityNonFungibleLocalIdsResponseAllOf
-public extension GatewayAPI {
-	struct EntityNonFungibleLocalIdsResponseAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityNonFungibleLocalIdsResponseAllOf: Codable, Hashable {
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
 		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */

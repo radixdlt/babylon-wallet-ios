@@ -1,9 +1,9 @@
 import ClientPrelude
 
 // MARK: - P2P.ResponseToClientByID
-public extension P2P {
+extension P2P {
 	// MARK: - ResponseToClientByID
-	struct ResponseToClientByID: Sendable, Hashable {
+	public struct ResponseToClientByID: Sendable, Hashable {
 		public let connectionID: P2PConnectionID
 		public let responseToDapp: ToDapp.WalletInteractionResponse
 		public init(

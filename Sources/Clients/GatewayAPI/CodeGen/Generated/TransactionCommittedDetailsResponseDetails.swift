@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionCommittedDetailsResponseDetails = GatewayAPI.TransactionCommittedDetailsResponseDetails
 
 // MARK: - GatewayAPI.TransactionCommittedDetailsResponseDetails
-public extension GatewayAPI {
-	struct TransactionCommittedDetailsResponseDetails: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionCommittedDetailsResponseDetails: Codable, Hashable {
 		/** The raw transaction payload, hex encoded. */
 		public private(set) var rawHex: String
 		public private(set) var receipt: AnyCodable

@@ -34,8 +34,8 @@ extension AccountPortfolioFetcher: DependencyKey {
 	)
 }
 
-public extension AccountPortfolioFetcher {
-	func fetchXRDBalance(of accountAddress: AccountAddress, on networkID: NetworkID) async throws -> FungibleTokenContainer {
+extension AccountPortfolioFetcher {
+	public func fetchXRDBalance(of accountAddress: AccountAddress, on networkID: NetworkID) async throws -> FungibleTokenContainer {
 		let accountPortfolioDictionary = try await fetchPortfolio([accountAddress])
 		let xrdContainer = accountPortfolioDictionary.first?.value.fungibleTokenContainers
 			.first(where: \.asset.isXRD)
@@ -49,8 +49,8 @@ public extension AccountPortfolioFetcher {
 }
 
 // MARK: - AccountPortfolioFetcher.Error
-public extension AccountPortfolioFetcher {
-	enum Error: Swift.Error {
+extension AccountPortfolioFetcher {
+	public enum Error: Swift.Error {
 		case failedToFetchXRD
 	}
 }

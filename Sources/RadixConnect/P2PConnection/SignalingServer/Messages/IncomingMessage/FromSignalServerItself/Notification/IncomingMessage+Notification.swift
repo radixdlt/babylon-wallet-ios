@@ -1,44 +1,44 @@
 import Foundation
 
 // MARK: - SignalingServerMessage.Incoming.FromSignalingServerItself.Notification
-public extension SignalingServerMessage.Incoming.FromSignalingServerItself {
-	enum Notification: String, Sendable, Hashable, Decodable, CustomStringConvertible {
+extension SignalingServerMessage.Incoming.FromSignalingServerItself {
+	public enum Notification: String, Sendable, Hashable, Decodable, CustomStringConvertible {
 		case remoteClientJustConnected
 		case remoteClientDisconnected
 		case remoteClientIsAlreadyConnected
 	}
 }
 
-internal extension SignalingServerMessage.Incoming.FromSignalingServerItself.Notification {
-	var isRemoteClientConnected: Bool {
+extension SignalingServerMessage.Incoming.FromSignalingServerItself.Notification {
+	internal var isRemoteClientConnected: Bool {
 		switch self {
 		case .remoteClientDisconnected: return false
 		case .remoteClientIsAlreadyConnected, .remoteClientJustConnected: return true
 		}
 	}
 
-	var isRemoteClientJustConnected: Bool {
+	internal var isRemoteClientJustConnected: Bool {
 		switch self {
 		case .remoteClientDisconnected, .remoteClientIsAlreadyConnected: return false
 		case .remoteClientJustConnected: return true
 		}
 	}
 
-	var isRemoteClientIsAlreadyConnected: Bool {
+	internal var isRemoteClientIsAlreadyConnected: Bool {
 		switch self {
 		case .remoteClientJustConnected, .remoteClientDisconnected: return false
 		case .remoteClientIsAlreadyConnected: return true
 		}
 	}
 
-	var remoteClientIsAlreadyConnected: Self? {
+	internal var remoteClientIsAlreadyConnected: Self? {
 		guard case .remoteClientIsAlreadyConnected = self else {
 			return nil
 		}
 		return self
 	}
 
-	var remoteClientJustConnected: Self? {
+	internal var remoteClientJustConnected: Self? {
 		guard case .remoteClientJustConnected = self else {
 			return nil
 		}
@@ -46,8 +46,8 @@ internal extension SignalingServerMessage.Incoming.FromSignalingServerItself.Not
 	}
 }
 
-public extension SignalingServerMessage.Incoming.FromSignalingServerItself.Notification {
-	var description: String {
+extension SignalingServerMessage.Incoming.FromSignalingServerItself.Notification {
+	public var description: String {
 		rawValue
 	}
 }

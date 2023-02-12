@@ -34,8 +34,8 @@ public struct SecondaryRectangularButtonStyle: ButtonStyle {
 	}
 }
 
-private extension SecondaryRectangularButtonStyle {
-	var foregroundColor: Color {
+extension SecondaryRectangularButtonStyle {
+	private var foregroundColor: Color {
 		switch controlState {
 		case .enabled:
 			return isDestructive ? .app.red1 : .app.gray1
@@ -47,8 +47,8 @@ private extension SecondaryRectangularButtonStyle {
 	}
 }
 
-public extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
-	static func secondaryRectangular(
+extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
+	public static func secondaryRectangular(
 		shouldExpand: Bool = false,
 		isDestructive: Bool = false,
 		image: Image? = nil

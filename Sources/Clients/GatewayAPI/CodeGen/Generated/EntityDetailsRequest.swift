@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityDetailsRequest = GatewayAPI.EntityDetailsRequest
 
 // MARK: - GatewayAPI.EntityDetailsRequest
-public extension GatewayAPI {
-	struct EntityDetailsRequest: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityDetailsRequest: Codable, Hashable {
 		public private(set) var atLedgerState: LedgerStateSelector?
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String

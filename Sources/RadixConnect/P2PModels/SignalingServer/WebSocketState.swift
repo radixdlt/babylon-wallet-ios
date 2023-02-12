@@ -10,8 +10,8 @@ public enum WebSocketState: Sendable, Hashable, CustomStringConvertible {
 	case closed(URLSessionWebSocketTask.CloseCode)
 }
 
-public extension WebSocketState {
-	var description: String {
+extension WebSocketState {
+	public var description: String {
 		switch self {
 		case .new: return "new"
 		case .connecting: return "connecting"

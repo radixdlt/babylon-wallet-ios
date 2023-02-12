@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityDetailsResponseComponentDetails = GatewayAPI.EntityDetailsResponseComponentDetails
 
 // MARK: - GatewayAPI.EntityDetailsResponseComponentDetails
-public extension GatewayAPI {
-	struct EntityDetailsResponseComponentDetails: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityDetailsResponseComponentDetails: Codable, Hashable {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var packageAddress: String

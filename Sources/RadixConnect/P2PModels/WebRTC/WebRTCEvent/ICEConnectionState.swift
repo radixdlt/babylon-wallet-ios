@@ -48,8 +48,8 @@ public enum ICEConnectionState: String, Sendable, Hashable, Codable, CustomStrin
 	case closed
 }
 
-public extension ICEConnectionState {
-	var description: String {
+extension ICEConnectionState {
+	public var description: String {
 		rawValue
 	}
 }

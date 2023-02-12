@@ -1,7 +1,7 @@
 import ClientPrelude
 
-public extension DependencyValues {
-	var ___VARIABLE_dependencyKey___: ___VARIABLE_clientName___ {
+extension DependencyValues {
+	public var ___VARIABLE_dependencyKey___: ___VARIABLE_clientName___ {
 		get { self[___VARIABLE_clientName___.self] }
 		set { self[___VARIABLE_clientName___.self] = newValue }
 	}

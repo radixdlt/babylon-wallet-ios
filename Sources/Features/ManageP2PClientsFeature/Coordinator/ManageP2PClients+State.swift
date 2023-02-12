@@ -3,8 +3,8 @@ import NewConnectionFeature
 import P2PConnectivityClient
 
 // MARK: - ManageP2PClients.State
-public extension ManageP2PClients {
-	struct State: Equatable {
+extension ManageP2PClients {
+	public struct State: Equatable {
 		public var clients: IdentifiedArrayOf<ManageP2PClient.State>
 
 		public var newConnection: NewConnection.State?
@@ -20,7 +20,7 @@ public extension ManageP2PClients {
 }
 
 #if DEBUG
-public extension ManageP2PClients.State {
-	static let previewValue: Self = .init()
+extension ManageP2PClients.State {
+	public static let previewValue: Self = .init()
 }
 #endif

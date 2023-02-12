@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityFungiblesResponse = GatewayAPI.EntityFungiblesResponse
 
 // MARK: - GatewayAPI.EntityFungiblesResponse
-public extension GatewayAPI {
-	struct EntityFungiblesResponse: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityFungiblesResponse: Codable, Hashable {
 		public private(set) var ledgerState: LedgerState
 		/** The Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String

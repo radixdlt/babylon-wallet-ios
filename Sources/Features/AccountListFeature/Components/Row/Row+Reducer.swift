@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - AccountList.Row
-public extension AccountList {
-	struct Row: Sendable, ReducerProtocol {
+extension AccountList {
+	public struct Row: Sendable, ReducerProtocol {
 		public init() {}
 
 		public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {

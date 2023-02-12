@@ -18,8 +18,8 @@ public struct ConnectionStatusChangeEvent: Sendable, Hashable, CustomStringConve
 }
 
 // MARK: ConnectionStatusChangeEvent.Source
-public extension ConnectionStatusChangeEvent {
-	enum Source: Sendable, Hashable, CustomStringConvertible {
+extension ConnectionStatusChangeEvent {
+	public enum Source: Sendable, Hashable, CustomStringConvertible {
 		case user
 		case dataChannelReadyState(channelID: DataChannelLabelledID, dataChannelReadyState: DataChannelState)
 		case iceConnection
@@ -34,14 +34,14 @@ public extension ConnectionStatusChangeEvent {
 	}
 }
 
-public extension ConnectionStatusChangeEvent {
-	var description: String {
+extension ConnectionStatusChangeEvent {
+	public var description: String {
 		"\(connectionStatus), source: \(source), id: \(connectionID)"
 	}
 }
 
-public extension ConnectionStatusChangeEvent.Source {
-	var description: String {
+extension ConnectionStatusChangeEvent.Source {
+	public var description: String {
 		switch self {
 		case .user: return "user"
 		case let .dataChannelReadyState(channelID, dataChannelReadyState):

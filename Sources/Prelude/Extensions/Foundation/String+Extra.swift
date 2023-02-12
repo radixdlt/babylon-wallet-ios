@@ -1,33 +1,33 @@
 import Foundation
 
-public extension StringProtocol {
-	var isBlank: Bool {
+extension StringProtocol {
+	public var isBlank: Bool {
 		trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
 	}
 
-	func trimmed() -> String {
+	public func trimmed() -> String {
 		trimmingCharacters(in: .whitespaces)
 	}
 
-	func lines() -> Int {
+	public func lines() -> Int {
 		split(separator: "\n", omittingEmptySubsequences: false).count
 	}
 
-	var nilIfEmpty: Self? {
+	public var nilIfEmpty: Self? {
 		isEmpty ? nil : self
 	}
 
-	var nilIfBlank: Self? {
+	public var nilIfBlank: Self? {
 		isBlank ? nil : self
 	}
 }
 
-public extension Optional where Wrapped: StringProtocol {
-	var isNilOrEmpty: Bool {
+extension Optional where Wrapped: StringProtocol {
+	public var isNilOrEmpty: Bool {
 		self == nil || self?.isEmpty == true
 	}
 
-	var isNilOrBlank: Bool {
+	public var isNilOrBlank: Bool {
 		self == nil || self?.isBlank == true
 	}
 }

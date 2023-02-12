@@ -2,8 +2,8 @@
 import Prelude
 import ProfileModels
 
-public extension OnNetwork.Account {
-	static let previewValue0 = try! Self(
+extension OnNetwork.Account {
+	public static let previewValue0 = try! Self(
 		networkID: .hammunet,
 		address: .init(
 			address: "account_tdx_22_1pzyhfyz7rk6mhmrk4ssp55xt48pejcwravhyxuzdjh2qqq9tsj"
@@ -27,7 +27,7 @@ public extension OnNetwork.Account {
 		displayName: "Main"
 	)
 
-	static let previewValue1 = try! Self(
+	public static let previewValue1 = try! Self(
 		networkID: .hammunet,
 		address: .init(
 			address: "account_tdx_22_1pzdqkuwwcn0k3c2ekep7tnltpa0myescyy6lu945w4aq9ewwz0"

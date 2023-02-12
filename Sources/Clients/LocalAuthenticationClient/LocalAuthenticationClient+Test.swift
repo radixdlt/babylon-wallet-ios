@@ -1,7 +1,7 @@
 import ClientPrelude
 
-public extension DependencyValues {
-	var localAuthenticationClient: LocalAuthenticationClient {
+extension DependencyValues {
+	public var localAuthenticationClient: LocalAuthenticationClient {
 		get { self[LocalAuthenticationClient.self] }
 		set { self[LocalAuthenticationClient.self] = newValue }
 	}
