@@ -57,15 +57,6 @@ extension PersonaList.View {
 								}
 							)
 						}.padding(.horizontal, .small1)
-
-						Button(L10n.PersonaList.createNewPersonaButtonTitle) {
-							viewStore.send(.createNewPersonaButtonTapped)
-						}
-						.buttonStyle(.secondaryRectangular(
-							shouldExpand: true
-						))
-						.padding(.horizontal, .medium3)
-						.padding(.vertical, .large1)
 					}
 				}
 			}
