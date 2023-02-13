@@ -13,7 +13,7 @@ extension AccountPortfolioFetcher: DependencyKey {
 				returning: AccountPortfolioDictionary.self,
 				body: { taskGroup in
 					for address in addresses {
-						taskGroup.addTask {
+						_ = taskGroup.addTaskUnlessCancelled {
 							try Task.checkCancellation()
 							let assets = try await assetFetcher.fetchAssets(address)
 							return (address, assets)
@@ -35,16 +35,12 @@ extension AccountPortfolioFetcher: DependencyKey {
 }
 
 extension AccountPortfolioFetcher {
-	public func fetchXRDBalance(of accountAddress: AccountAddress, on networkID: NetworkID) async throws -> FungibleTokenContainer {
-		let accountPortfolioDictionary = try await fetchPortfolio([accountAddress])
-		let xrdContainer = accountPortfolioDictionary.first?.value.fungibleTokenContainers
-			.first(where: \.asset.isXRD)
-
-		if let xrdContainer = xrdContainer {
-			return xrdContainer
-		} else {
-			throw Error.failedToFetchXRD
+	public func fetchXRDBalance(of accountAddress: AccountAddress, on networkID: NetworkID) async -> FungibleTokenContainer? {
+		guard let accountPortfolioDictionary = try? await fetchPortfolio([accountAddress]) else {
+			return nil
 		}
+		return accountPortfolioDictionary.first?.value.fungibleTokenContainers
+			.first(where: \.asset.isXRD)
 	}
 }
 
