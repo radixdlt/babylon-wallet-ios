@@ -38,8 +38,8 @@ extension TransactionFailure {
 				return (errorKind: .failedToSignTransaction, message: nil)
 			}
 
-		case let .failedToSubmit(submissionError):
-			switch submissionError {
+		case let .failedToSubmit(error):
+			switch error {
 			case .failedToSubmitTX:
 				return (errorKind: .failedToSubmitTransaction, message: nil)
 			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .rejected):
