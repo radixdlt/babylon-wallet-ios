@@ -29,6 +29,7 @@ extension DappInteractionCoordinator {
 			)
 			.showDeveloperDisclaimerBanner()
 			.presentsLoadingViewOverlay()
+			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 		}
 	}
 }
