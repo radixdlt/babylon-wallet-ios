@@ -39,6 +39,11 @@ extension Double: JSONEncodable {
 	func encodeToJSON() -> Any { self }
 }
 
+// MARK: - Decimal + JSONEncodable
+extension Decimal: JSONEncodable {
+	func encodeToJSON() -> Any { self }
+}
+
 // MARK: - String + JSONEncodable
 extension String: JSONEncodable {
 	func encodeToJSON() -> Any { self }

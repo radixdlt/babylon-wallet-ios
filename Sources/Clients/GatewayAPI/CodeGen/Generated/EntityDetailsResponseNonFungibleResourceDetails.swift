@@ -19,20 +19,20 @@ extension GatewayAPI {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
 		public private(set) var accessRulesChain: AnyCodable
 		public private(set) var vaultAccessRulesChain: AnyCodable
-		public private(set) var nonFungibleLocalIdType: NonFungibleLocalIdType
+		public private(set) var nonFungibleIdType: NonFungibleLocalIdType
 
-		public init(discriminator: EntityDetailsResponseDetailsType, accessRulesChain: AnyCodable, vaultAccessRulesChain: AnyCodable, nonFungibleLocalIdType: NonFungibleLocalIdType) {
+		public init(discriminator: EntityDetailsResponseDetailsType, accessRulesChain: AnyCodable, vaultAccessRulesChain: AnyCodable, nonFungibleIdType: NonFungibleLocalIdType) {
 			self.discriminator = discriminator
 			self.accessRulesChain = accessRulesChain
 			self.vaultAccessRulesChain = vaultAccessRulesChain
-			self.nonFungibleLocalIdType = nonFungibleLocalIdType
+			self.nonFungibleIdType = nonFungibleIdType
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case discriminator
 			case accessRulesChain = "access_rules_chain"
 			case vaultAccessRulesChain = "vault_access_rules_chain"
-			case nonFungibleLocalIdType = "non_fungible_id_type"
+			case nonFungibleIdType = "non_fungible_id_type"
 		}
 
 		// Encodable protocol methods
@@ -42,7 +42,7 @@ extension GatewayAPI {
 			try container.encode(discriminator, forKey: .discriminator)
 			try container.encode(accessRulesChain, forKey: .accessRulesChain)
 			try container.encode(vaultAccessRulesChain, forKey: .vaultAccessRulesChain)
-			try container.encode(nonFungibleLocalIdType, forKey: .nonFungibleLocalIdType)
+			try container.encode(nonFungibleIdType, forKey: .nonFungibleIdType)
 		}
 	}
 }

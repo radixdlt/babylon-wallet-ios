@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -16,21 +16,21 @@ public typealias NonFungibleLocalIdsCollectionItem = GatewayAPI.NonFungibleLocal
 // MARK: - GatewayAPI.NonFungibleLocalIdsCollectionItem
 extension GatewayAPI {
 	public struct NonFungibleLocalIdsCollectionItem: Codable, Hashable {
-		public private(set) var nonFungibleLocalId: String
+		public private(set) var nonFungibleId: String
 
-		public init(nonFungibleLocalId: String) {
-			self.nonFungibleLocalId = nonFungibleLocalId
+		public init(nonFungibleId: String) {
+			self.nonFungibleId = nonFungibleId
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
-			case nonFungibleLocalId = "non_fungible_id"
+			case nonFungibleId = "non_fungible_id"
 		}
 
 		// Encodable protocol methods
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(nonFungibleLocalId, forKey: .nonFungibleLocalId)
+			try container.encode(nonFungibleId, forKey: .nonFungibleId)
 		}
 	}
 }

@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -21,20 +21,20 @@ extension GatewayAPI {
 		public private(set) var address: String
 		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var resourceAddress: String
-		public private(set) var nonFungibleLocalIds: NonFungibleLocalIdsCollection
+		public private(set) var nonFungibleIds: NonFungibleLocalIdsCollection
 
-		public init(ledgerState: LedgerState, address: String, resourceAddress: String, nonFungibleLocalIds: NonFungibleLocalIdsCollection) {
+		public init(ledgerState: LedgerState, address: String, resourceAddress: String, nonFungibleIds: NonFungibleLocalIdsCollection) {
 			self.ledgerState = ledgerState
 			self.address = address
 			self.resourceAddress = resourceAddress
-			self.nonFungibleLocalIds = nonFungibleLocalIds
+			self.nonFungibleIds = nonFungibleIds
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case ledgerState = "ledger_state"
 			case address
 			case resourceAddress = "resource_address"
-			case nonFungibleLocalIds = "non_fungible_ids"
+			case nonFungibleIds = "non_fungible_ids"
 		}
 
 		// Encodable protocol methods
@@ -44,7 +44,7 @@ extension GatewayAPI {
 			try container.encode(ledgerState, forKey: .ledgerState)
 			try container.encode(address, forKey: .address)
 			try container.encode(resourceAddress, forKey: .resourceAddress)
-			try container.encode(nonFungibleLocalIds, forKey: .nonFungibleLocalIds)
+			try container.encode(nonFungibleIds, forKey: .nonFungibleIds)
 		}
 	}
 }
