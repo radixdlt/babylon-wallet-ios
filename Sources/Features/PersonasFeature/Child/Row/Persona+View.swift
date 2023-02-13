@@ -19,28 +19,23 @@ extension Persona.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			VStack(alignment: .leading, spacing: .zero) {
-				ZStack {
-					HStack(alignment: .center) {
-						Circle()
-							.strokeBorder(Color.app.gray3, lineWidth: 1)
-							.background(Circle().fill(Color.app.gray4))
-							.frame(.small)
-							.padding(.trailing, .small1)
+			HStack(alignment: .center) {
+				Circle()
+					.strokeBorder(Color.app.gray3, lineWidth: 1)
+					.background(Circle().fill(Color.app.gray4))
+					.frame(.small)
+					.padding(.trailing, .small1)
 
-						VStack(alignment: .leading, spacing: 4) {
-							Text(viewStore.displayName)
-								.foregroundColor(.app.gray1)
-								.textStyle(.secondaryHeader)
-						}
-
-						Spacer()
-					}
+				VStack(alignment: .leading, spacing: 4) {
+					Text(viewStore.displayName)
+						.foregroundColor(.app.gray1)
+						.textStyle(.secondaryHeader)
 				}
-				.padding(.medium2)
-			}
-			.background(Color.app.gray5)
-			.cornerRadius(.small1)
+
+				Spacer()
+			}.padding(.medium2)
+				.background(Color.app.gray5)
+				.cornerRadius(.small1)
 		}
 	}
 }
