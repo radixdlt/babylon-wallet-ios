@@ -33,9 +33,10 @@ extension Persona.View {
 				}
 
 				Spacer()
-			}.padding(.medium2)
-				.background(Color.app.gray5)
-				.cornerRadius(.small1)
+			}
+			.padding(.medium2)
+			.background(Color.app.gray5)
+			.cornerRadius(.small1)
 		}
 	}
 }
