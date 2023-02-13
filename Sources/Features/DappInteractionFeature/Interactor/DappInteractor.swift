@@ -30,7 +30,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case sentResponseToDapp(P2P.ToDapp.WalletInteractionResponse, for: P2P.RequestFromClient, DappMetadata?)
 		case presentResponseFailureAlert(P2P.ResponseToClientByID, for: P2P.RequestFromClient, DappMetadata?, reason: String)
 		case presentResponseSuccessView(DappMetadata)
-		case ensureCurrentModalIsActuallyPresented(Destinations.State)
+		case ensureCurrentModalIsActuallyPresented
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -165,26 +165,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.currentModal = .dappInteractionCompletion(.init(dappMetadata: dappMetadata))
 			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
 
-		case let .ensureCurrentModalIsActuallyPresented(destination):
-			if state.currentModalIsActuallyPresented == false {
-				state.currentModal = nil
-				state.currentModal = destination
-				return .run { send in
-					try await clock.sleep(for: .seconds(0.5))
-					await send(.internal(.ensureCurrentModalIsActuallyPresented(destination)))
-				}
-			} else {
-				state.currentModalIsActuallyPresented = false
-				return .none
-			}
+		case .ensureCurrentModalIsActuallyPresented:
+			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
 		}
-	}
-
-	func ensureCurrentModalIsActuallyPresentedEffect(
-		for state: inout State
-	) -> EffectTask<Action> {
-		guard let currentModal = state.currentModal else { return .none }
-		return .send(.internal(.ensureCurrentModalIsActuallyPresented(currentModal)))
 	}
 
 	func presentQueuedRequestIfNeededEffect(
@@ -197,6 +180,23 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.interaction)))
 			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
 		} else {
+			return .none
+		}
+	}
+
+	func ensureCurrentModalIsActuallyPresentedEffect(
+		for state: inout State
+	) -> EffectTask<Action> {
+		guard let currentModal = state.currentModal else { return .none }
+		if state.currentModalIsActuallyPresented == false {
+			state.currentModal = nil
+			state.currentModal = currentModal
+			return .run { send in
+				try await clock.sleep(for: .seconds(0.5))
+				await send(.internal(.ensureCurrentModalIsActuallyPresented))
+			}
+		} else {
+			state.currentModalIsActuallyPresented = false
 			return .none
 		}
 	}
