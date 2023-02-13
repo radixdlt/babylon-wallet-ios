@@ -39,7 +39,6 @@ extension TransactionFailure {
 			}
 
 		case let .failedToSubmit(submissionError):
-
 			switch submissionError {
 			case .failedToSubmitTX:
 				return (errorKind: .failedToSubmitTransaction, message: nil)
