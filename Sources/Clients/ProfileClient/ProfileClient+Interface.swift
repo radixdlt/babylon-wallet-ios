@@ -107,7 +107,7 @@ public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest: Senda
 	public let wordCount: BIP39.WordCount
 	public let bip39Passphrase: String
 	public init(
-		networkAndGateway: AppPreferences.NetworkAndGateway = .hammunet,
+		networkAndGateway: AppPreferences.NetworkAndGateway = .nebunet,
 		language: BIP39.Language = .english,
 		wordCount: BIP39.WordCount = .twentyFour,
 		bip39Passphrase: String = ""
