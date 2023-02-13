@@ -2,7 +2,7 @@ import EngineToolkitClient
 import FeaturePrelude
 import TransactionClient
 
-public extension EngineToolkit.Error {
+extension EngineToolkit.Error {
 	var errorDescription: String? {
 		switch self {
 		case let .callLibraryFunctionFailure(callLibraryFunctionFailure):
