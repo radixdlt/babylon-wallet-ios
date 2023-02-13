@@ -372,9 +372,9 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu", "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"])
 	}
 
-	func test_version_compatability_check_too_low() throws {
+	func test_version_compatibility_check_too_low() throws {
 		let json = """
-		{ "version": 8 }
+		{ "version": 10 }
 		""".data(using: .utf8)!
 
 		XCTAssertThrowsError(
@@ -383,11 +383,11 @@ final class ProfileTests: TestCase {
 			guard let error = anyError as? IncompatibleProfileVersion else {
 				return XCTFail("WrongErrorType")
 			}
-			XCTAssertEqual(error, .init(decodedVersion: 8, minimumRequiredVersion: .minimum))
+			XCTAssertEqual(error, .init(decodedVersion: 10, minimumRequiredVersion: .minimum))
 		}
 	}
 
-	func test_version_compatability_check_ok() throws {
+	func test_version_compatibility_check_ok() throws {
 		let json = """
 		{ "version": \(ProfileSnapshot.Version.minimum) }
 		""".data(using: .utf8)!

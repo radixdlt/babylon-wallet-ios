@@ -70,7 +70,7 @@ public struct ProfileSnapshot:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
-	/// A Semantic Versioning of the Profile Snapshot data format used for compatability checks.
+	/// A Semantic Versioning of the Profile Snapshot data format used for compatibility checks.
 	public let version: Version
 
 	/// All sources of factors, used for authorization such as spending funds, contains no
