@@ -293,15 +293,15 @@ extension TransactionClient {
 					networkID: networkID
 				)
 
-				let lockFeeAmount = 10
+				let lockFeeAmount: BigDecimal = 10
 
 				let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
 					let accountAddressesSuitableToPayTransactionFeeRef =
 						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-					let xrdContainersOptionals = try await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { try await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
+					let xrdContainersOptionals = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
 					let xrdContainers = xrdContainersOptionals.compactMap { $0 }
-					let firstWithEnoughFunds = xrdContainers.first(where: { $0.unsafeFailingAmountWithoutPrecision >= Float(lockFeeAmount) })?.owner
+					let firstWithEnoughFunds = xrdContainers.first(where: { $0.amount >= lockFeeAmount })?.owner
 
 					if let firstWithEnoughFunds = firstWithEnoughFunds {
 						return firstWithEnoughFunds
@@ -312,7 +312,7 @@ extension TransactionClient {
 
 				let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
 					address: ComponentAddress(address: accountAddress.address),
-					fee: String(lockFeeAmount)
+					fee: lockFeeAmount.description
 				).embed()
 
 				instructions.insert(lockFeeCallMethodInstruction, at: 0)

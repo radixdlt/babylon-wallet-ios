@@ -66,35 +66,20 @@ public struct FungibleTokenContainer: Sendable, AssetContainer, Hashable {
 	public let owner: AccountAddress
 	public var asset: FungibleToken
 
-	// TODO: replace String type with appropriate numeric type with 0b2^256 / 0d1e18 ~ 1e60 support
-	/// Token amount held in one account, expressed as regular decimal value, for example: 105.78 XRD
-	public var amount: String?
+	public var amount: BigDecimal
 	/// Token worth in currently selected currency.
 	public var worth: BigDecimal?
 
 	public init(
 		owner: AccountAddress,
 		asset: FungibleToken,
-		amount: String?,
+		amount: BigDecimal,
 		worth: BigDecimal?
 	) {
 		self.owner = owner
 		self.asset = asset
 		self.amount = amount
 		self.worth = worth
-	}
-}
-
-// TODO: delete this when support for big decimals is added
-extension FungibleTokenContainer {
-	public var unsafeFailingAmountWithoutPrecision: Float {
-		if let amount = amount,
-		   let floatAmount = Float(amount)
-		{
-			return floatAmount
-		} else {
-			return 0
-		}
 	}
 }
 
