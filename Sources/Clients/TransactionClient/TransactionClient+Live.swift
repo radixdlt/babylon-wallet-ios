@@ -300,7 +300,8 @@ extension TransactionClient {
 					let accountAddressesSuitableToPayTransactionFeeRef =
 						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-					let xrdContainers = try await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { try await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
+					let xrdContainersOptionals = try await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { try await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
+					let xrdContainers = xrdContainersOptionals.compactMap { $0 }
 					let firstWithEnoughFunds = xrdContainers.first(where: { $0.unsafeFailingAmountWithoutPrecision >= Float(lockFeeAmount) })?.owner
 
 					if let firstWithEnoughFunds = firstWithEnoughFunds {
