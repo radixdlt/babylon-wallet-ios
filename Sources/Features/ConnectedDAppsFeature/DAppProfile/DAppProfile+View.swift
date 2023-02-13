@@ -115,7 +115,7 @@ extension DAppProfile.View.Header {
 					.padding(.horizontal, .large2)
 				Separator()
 					.padding(.horizontal, .medium1)
-				VStack(spacing: .medium3) {
+				VStack(alignment: .leading, spacing: .medium3) {
 					HStack(spacing: 0) {
 						Text(L10n.DAppProfile.definition)
 							.textStyle(.body1Regular)
@@ -142,6 +142,28 @@ extension DAppProfile.View.Header {
 					}
 				}
 			}
+		}
+	}
+}
+
+extension LabelStyle where Self == TrailingIconLabelStyle {
+	/// Applies the `trailingIcon` style with the default spacing
+	static var trailingIcon: Self { .trailingIcon() }
+
+	/// A label style where the icon follows the "title", or text part
+	static func trailingIcon(spacing: CGFloat = .small2) -> Self {
+		.init(spacing: spacing)
+	}
+}
+
+// MARK: - TrailingIconLabelStyle
+struct TrailingIconLabelStyle: LabelStyle {
+	let spacing: CGFloat
+
+	func makeBody(configuration: Configuration) -> some View {
+		HStack(spacing: spacing) {
+			configuration.title
+			configuration.icon
 		}
 	}
 }
