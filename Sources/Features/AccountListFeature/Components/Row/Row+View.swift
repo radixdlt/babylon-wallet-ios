@@ -90,13 +90,13 @@ extension AccountList.Row.View {
 		let portfolio: AccountPortfolio
 
 		init(state: AccountList.Row.State) {
-			name = state.account.displayName.rawValue
-			address = .init(address: state.account.address.address, format: .short())
-			appearanceID = state.account.appearanceID
-			aggregatedValue = state.aggregatedValue
-			currency = state.currency
-			isCurrencyAmountVisible = state.isCurrencyAmountVisible
-			portfolio = state.portfolio
+			self.name = state.account.displayName.rawValue
+			self.address = .init(address: state.account.address.address, format: .short())
+			self.appearanceID = state.account.appearanceID
+			self.aggregatedValue = state.aggregatedValue
+			self.currency = state.currency
+			self.isCurrencyAmountVisible = state.isCurrencyAmountVisible
+			self.portfolio = state.portfolio
 		}
 	}
 }
