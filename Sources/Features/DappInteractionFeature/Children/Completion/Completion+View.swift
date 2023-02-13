@@ -49,6 +49,7 @@ extension Completion {
 				}
 				.padding([.top, .horizontal], .small2)
 				.padding(.bottom, .medium3)
+				.onAppear { viewStore.send(.appeared) }
 			}
 			.presentationDragIndicator(.visible)
 			.presentationDetentIntrinsicHeight()
