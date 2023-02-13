@@ -220,15 +220,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.currentModalIsActuallyPresented = true
 			return .none
 
-		// NB: handles "background tap to dismiss" for success screen.
-		case .modal(.dismiss):
-			switch state.currentModal {
-			case .none, .dappInteraction:
-				return .none
-			case .dappInteractionCompletion:
-				return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
-			}
-
 		default:
 			return .none
 		}
