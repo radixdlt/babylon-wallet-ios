@@ -72,7 +72,8 @@ struct Login: Sendable, FeatureReducer {
 			))
 			return .none
 		case let .continueButtonTapped(persona):
-			return .send(.delegate(.continueButtonTapped(persona, state.connectedDapp, state.authorizedPersona)))
+			let authorizedPersona = state.connectedDapp?.referencesToAuthorizedPersonas.first(by: persona.address)
+			return .send(.delegate(.continueButtonTapped(persona, state.connectedDapp, authorizedPersona)))
 		}
 	}
 
