@@ -28,7 +28,7 @@ extension AccountList.Row.View {
 				VStack(alignment: .leading, spacing: .zero) {
 					HeaderView(
 						name: viewStore.name,
-						value: formattedAmmount(
+						value: formattedAmount(
 							viewStore.aggregatedValue,
 							isVisible: viewStore.isCurrencyAmountVisible,
 							currency: viewStore.currency
@@ -63,7 +63,7 @@ extension AccountList.Row.View {
 
 // MARK: - Private Methods
 extension AccountList.Row.View {
-	fileprivate func formattedAmmount(_ value: BigDecimal?, isVisible: Bool, currency: FiatCurrency) -> String {
+	fileprivate func formattedAmount(_ value: BigDecimal?, isVisible: Bool, currency: FiatCurrency) -> String {
 		if isVisible {
 			if let value {
 				// FIXME: Fix formatting of BigDecimal with symbol
