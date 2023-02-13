@@ -6,7 +6,7 @@ extension AccountList.Row {
 	// MARK: State
 	public struct State: Sendable, Equatable {
 		public let account: OnNetwork.Account
-		public var aggregatedValue: Float?
+		public var aggregatedValue: BigDecimal?
 		public var portfolio: AccountPortfolio
 
 		// MARK: - AppSettings properties
@@ -15,7 +15,7 @@ extension AccountList.Row {
 
 		public init(
 			account: OnNetwork.Account,
-			aggregatedValue: Float?,
+			aggregatedValue: BigDecimal?,
 			portfolio: AccountPortfolio,
 			currency: FiatCurrency,
 			isCurrencyAmountVisible: Bool

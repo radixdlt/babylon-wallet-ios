@@ -93,7 +93,7 @@ extension FungibleTokenDetails.View {
 		let displayName: String?
 		let iconURL: URL?
 		let placeholderAsset: ImageAsset
-		let amount: String?
+		let amount: String
 		let symbol: String?
 		let description: String?
 		let address: AddressView.ViewState
@@ -103,7 +103,7 @@ extension FungibleTokenDetails.View {
 			self.displayName = state.asset.name
 			self.iconURL = state.asset.iconURL
 			self.placeholderAsset = .placeholderImage(isXRD: state.asset.isXRD)
-			self.amount = state.amount
+			self.amount = state.amount.description
 			self.symbol = state.asset.symbol
 			self.description = state.asset.tokenDescription
 			self.address = .init(address: state.asset.componentAddress.address, format: .short())

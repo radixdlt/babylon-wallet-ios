@@ -88,7 +88,7 @@ extension FungibleTokenList.Row.View {
 	}
 
 	fileprivate func tokenAmount(
-		amount: String?,
+		amount: BigDecimal?,
 		isVisible: Bool
 	) -> String {
 		guard isVisible else { return "••••" }
@@ -135,7 +135,7 @@ struct Row_Preview: PreviewProvider {
 		FungibleTokenList.Row.View(
 			store: .init(
 				initialState: .init(
-					container: .init(owner: try! .init(address: "owner_address"), asset: .xrd, amount: "100", worth: 200),
+					container: .init(owner: try! .init(address: "owner_address"), asset: .xrd, amount: 100.0, worth: 200),
 					currency: .usd,
 					isCurrencyAmountVisible: true
 				),

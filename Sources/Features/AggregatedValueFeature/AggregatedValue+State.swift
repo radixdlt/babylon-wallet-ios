@@ -4,14 +4,14 @@ import FeaturePrelude
 extension AggregatedValue {
 	// MARK: State
 	public struct State: Sendable, Equatable {
-		public var value: Float?
+		public var value: BigDecimal?
 
 		// MARK: - AppSettings properties
 		public var currency: FiatCurrency
 		public var isCurrencyAmountVisible: Bool
 
 		public init(
-			value: Float? = nil,
+			value: BigDecimal? = nil,
 			currency: FiatCurrency = .usd,
 			isCurrencyAmountVisible: Bool = false
 		) {

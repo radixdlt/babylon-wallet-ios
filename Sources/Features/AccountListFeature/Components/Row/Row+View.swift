@@ -63,9 +63,14 @@ extension AccountList.Row.View {
 
 // MARK: - Private Methods
 extension AccountList.Row.View {
-	fileprivate func formattedAmmount(_ value: Float?, isVisible: Bool, currency: FiatCurrency) -> String {
+	fileprivate func formattedAmmount(_ value: BigDecimal?, isVisible: Bool, currency: FiatCurrency) -> String {
 		if isVisible {
-			return value?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign) -"
+			if let value {
+				// FIXME: Fix formatting of BigDecimal with symbol
+				return "\(currency.symbol) \(String(describing: value))"
+			} else {
+				return "\(currency.sign) -"
+			}
 		} else {
 			return "\(currency.sign) ••••"
 		}
@@ -79,7 +84,7 @@ extension AccountList.Row.View {
 		let name: String
 		let address: AddressView.ViewState
 		let appearanceID: OnNetwork.Account.AppearanceID
-		let aggregatedValue: Float?
+		let aggregatedValue: BigDecimal?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
 		let portfolio: AccountPortfolio
