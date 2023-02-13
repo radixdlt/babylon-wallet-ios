@@ -48,7 +48,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			state.createPersonaCoordinator = .init(config: .init(
 				isFirstEntity: isFirst,
 				canBeDismissed: true,
-				navigationButtonCTA: .goBackToChoosePersonas
+				navigationButtonCTA: .goBackToPersonaList
 			))
 			return .none
 

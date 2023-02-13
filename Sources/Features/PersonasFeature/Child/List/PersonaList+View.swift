@@ -53,12 +53,10 @@ extension PersonaList.View {
 								),
 								content: {
 									Persona.View(store: $0)
-										.padding(.medium3)
-
-									Separator()
+										.padding(.vertical, .small3)
 								}
 							)
-						}
+						}.padding(.horizontal, .small1)
 
 						Button(L10n.PersonaList.createNewPersonaButtonTitle) {
 							viewStore.send(.createNewPersonaButtonTapped)

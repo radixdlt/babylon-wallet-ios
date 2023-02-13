@@ -149,10 +149,10 @@
 "onboarding.newAccountButtonTitle" = "New Account";
 
 "personas.createNewPersonaButtonTitle" = "Create a New Persona";
-"personas.subtitle" = "Here are all the Personas connected to your account";
+"personas.subtitle" = "Here are all of your current Personas in your Wallet";
 "personas.title" = "Personas";
 "personaList.createNewPersonaButtonTitle" = "Create new persona";
-"personaList.subtitle" = "Here are all the Personas connected to your account";
+"personaList.subtitle" = "Here are all of your current Personas in your Wallet";
 "personaList.title" = "Personas";
 
 "profileLoad.decodingError" = "Failed to create Wallet from backup: %@";
