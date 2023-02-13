@@ -8,7 +8,9 @@ extension ProfileSnapshot.Version {
 	/// - 7: Added networkID in Account and Persona
 	/// - 8: Changed ConnectedDapp format
 	/// - 9: Personas now use Identity addresses as intended.
-	public static let minimum: Self = 9
+	/// - 10: Temp switch default network to Hammunet as RC for Betanet v2
+	/// - 11: Switch back default network to Nebunet before Betanet v2 release.
+	public static let minimum: Self = 11
 }
 
 // MARK: - Profile
@@ -18,7 +20,7 @@ public struct Profile:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
-	/// A Semantic Versioning of the Profile Snapshot data format used for compatability checks.
+	/// A Semantic Versioning of the Profile Snapshot data format used for compatibility checks.
 	public let version: ProfileSnapshot.Version
 
 	/// All sources of factors, used for authorization such as spending funds, contains no
