@@ -26,7 +26,7 @@ extension TransactionFailure {
 			switch error {
 			case .failedToFindAccountWithEnoughFundsToLockFee:
 				return (errorKind: .failedToFindAccountWithEnoughFundsToLockFee, message: error.errorDescription)
-			case .failedToGetEpoch, .failedToLoadNotaryAndSigners, .failedToLoadNotaryPublicKey:
+			case .failedToGetEpoch, .failedToLoadNotaryAndSigners, .failedToLoadNotaryPublicKey, .failedToParseTXItIsProbablyInvalid:
 				return (errorKind: .failedToPrepareTransaction, message: error.errorDescription)
 			}
 
@@ -60,6 +60,7 @@ extension TransactionFailure {
 // MARK: TransactionFailure.FailedToPrepareForTXSigning
 extension TransactionFailure {
 	public enum FailedToPrepareForTXSigning: Sendable, LocalizedError, Equatable {
+		case failedToParseTXItIsProbablyInvalid
 		case failedToGetEpoch
 		case failedToLoadNotaryAndSigners
 		case failedToLoadNotaryPublicKey
@@ -67,6 +68,8 @@ extension TransactionFailure {
 
 		public var errorDescription: String? {
 			switch self {
+			case .failedToParseTXItIsProbablyInvalid:
+				return "Failed to parse transaction, it is probably invalid."
 			case .failedToGetEpoch:
 				return "Failed to get epoch"
 			case .failedToLoadNotaryPublicKey:

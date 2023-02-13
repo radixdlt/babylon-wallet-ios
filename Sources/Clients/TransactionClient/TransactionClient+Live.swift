@@ -281,7 +281,14 @@ extension TransactionClient {
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			addLockFeeInstructionToManifest: { maybeStringManifest in
-				let manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
+				let manifestWithJSONInstructions: JSONInstructionsTransactionManifest
+				do {
+					manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
+				} catch {
+					loggerGlobal.error("Failed to convert manifest: \(String(describing: error))")
+					throw TransactionFailure.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid)
+				}
+
 				var instructions = manifestWithJSONInstructions.instructions
 				let networkID = await profileClient.getCurrentNetworkID()
 
@@ -299,7 +306,7 @@ extension TransactionClient {
 					let accountAddressesSuitableToPayTransactionFeeRef =
 						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-					let xrdContainersOptionals = try await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { try await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
+					let xrdContainersOptionals = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
 					let xrdContainers = xrdContainersOptionals.compactMap { $0 }
 					let firstWithEnoughFunds = xrdContainers.first(where: { $0.unsafeFailingAmountWithoutPrecision >= Float(lockFeeAmount) })?.owner
 
