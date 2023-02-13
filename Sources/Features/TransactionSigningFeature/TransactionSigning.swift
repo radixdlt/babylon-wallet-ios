@@ -68,7 +68,7 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 				} catch let error as TransactionFailure {
 					await send(.internal(.addLockFeeInstructionToManifestResult(.failure(error))))
 				} catch {
-					errorQueue.schedule(error)
+					await send(.internal(.addLockFeeInstructionToManifestResult(.failure(.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)))))
 				}
 			}
 

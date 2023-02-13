@@ -281,7 +281,14 @@ extension TransactionClient {
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			addLockFeeInstructionToManifest: { maybeStringManifest in
-				let manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
+				let manifestWithJSONInstructions: JSONInstructionsTransactionManifest
+				do {
+					manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
+				} catch {
+					loggerGlobal.error("Failed to convert manifest: \(String(describing: error))")
+					throw TransactionFailure.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid)
+				}
+
 				var instructions = manifestWithJSONInstructions.instructions
 				let networkID = await profileClient.getCurrentNetworkID()
 
