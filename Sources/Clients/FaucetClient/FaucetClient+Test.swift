@@ -6,15 +6,13 @@ extension FaucetClient: TestDependencyKey {
 
 	public static let testValue: FaucetClient = Self(
 		getFreeXRD: unimplemented("\(Self.self).getFreeXRD"),
-		isAllowedToUseFaucet: unimplemented("\(Self.self).isAllowedToUseFaucet"),
-		saveLastUsedEpoch: unimplemented("\(Self.self).saveLasaveLastUsedEpoch")
+		isAllowedToUseFaucet: unimplemented("\(Self.self).isAllowedToUseFaucet")
 	)
 }
 
 extension FaucetClient {
 	public static let noop = Self(
-		getFreeXRD: { _ in .init("transactionID-deadbeef") },
-		isAllowedToUseFaucet: { _ in true },
-		saveLastUsedEpoch: { _ in }
+		getFreeXRD: { _ in },
+		isAllowedToUseFaucet: { _ in true }
 	)
 }

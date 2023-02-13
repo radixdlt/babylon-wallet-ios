@@ -5,23 +5,19 @@ import TransactionClient
 public struct FaucetClient: Sendable {
 	public var getFreeXRD: GetFreeXRD
 	public var isAllowedToUseFaucet: IsAllowedToUseFaucet
-	public var saveLastUsedEpoch: SaveLastUsedEpoch
 
 	public init(
 		getFreeXRD: @escaping GetFreeXRD,
-		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet,
-		saveLastUsedEpoch: @escaping SaveLastUsedEpoch
+		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet
 	) {
 		self.getFreeXRD = getFreeXRD
 		self.isAllowedToUseFaucet = isAllowedToUseFaucet
-		self.saveLastUsedEpoch = saveLastUsedEpoch
 	}
 }
 
 extension FaucetClient {
-	public typealias GetFreeXRD = @Sendable (FaucetRequest) async throws -> TXID
-	public typealias IsAllowedToUseFaucet = @Sendable (AccountAddress) async throws -> Bool
-	public typealias SaveLastUsedEpoch = @Sendable (FaucetRequest) async throws -> Void
+	public typealias GetFreeXRD = @Sendable (FaucetRequest) async throws -> Void
+	public typealias IsAllowedToUseFaucet = @Sendable (AccountAddress) async -> Bool
 }
 
 // MARK: FaucetClient.FaucetRequest
