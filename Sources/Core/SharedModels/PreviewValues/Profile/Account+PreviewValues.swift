@@ -4,9 +4,9 @@ import ProfileModels
 
 extension OnNetwork.Account {
 	public static let previewValue0 = try! Self(
-		networkID: .hammunet,
+		networkID: .nebunet,
 		address: .init(
-			address: "account_tdx_22_1pzyhfyz7rk6mhmrk4ssp55xt48pejcwravhyxuzdjh2qqq9tsj"
+			address: "account_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"
 		),
 		securityState: .unsecured(.init(
 			genesisFactorInstance: .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(.init(
@@ -28,9 +28,9 @@ extension OnNetwork.Account {
 	)
 
 	public static let previewValue1 = try! Self(
-		networkID: .hammunet,
+		networkID: .nebunet,
 		address: .init(
-			address: "account_tdx_22_1pzdqkuwwcn0k3c2ekep7tnltpa0myescyy6lu945w4aq9ewwz0"
+			address: "account_tdx_a_1qvlrgnqrvk6tzmg8z6lusprl3weupfkmu52gkfhmncjsnhn0kp"
 		),
 		securityState: .unsecured(.init(
 			genesisFactorInstance: .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(.init(
