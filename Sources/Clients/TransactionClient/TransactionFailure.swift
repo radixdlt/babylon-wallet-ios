@@ -19,12 +19,51 @@ public enum TransactionFailure: Sendable, LocalizedError, Equatable {
 	}
 }
 
+extension TransactionFailure {
+	public var errorKindAndMessage: (errorKind: P2P.ToDapp.WalletInteractionFailureResponse.ErrorType, message: String?) {
+		switch self {
+		case let .failedToPrepareForTXSigning(error):
+			switch error {
+			case .failedToFindAccountWithEnoughFundsToLockFee:
+				return (errorKind: .failedToFindAccountWithEnoughFundsToLockFee, message: error.errorDescription)
+			case .failedToGetEpoch, .failedToLoadNotaryAndSigners, .failedToLoadNotaryPublicKey:
+				return (errorKind: .failedToPrepareTransaction, message: error.errorDescription)
+			}
+
+		case let .failedToCompileOrSign(error):
+			switch error {
+			case .failedToCompileNotarizedTXIntent, .failedToCompileTXIntent, .failedToCompileSignedTXIntent, .failedToGenerateTXId:
+				return (errorKind: .failedToCompileTransaction, message: nil)
+			case .failedToSignIntentWithAccountSigners, .failedToSignSignedCompiledIntentWithNotarySigner, .failedToConvertNotarySignature, .failedToConvertAccountSignatures:
+				return (errorKind: .failedToSignTransaction, message: nil)
+			}
+
+		case let .failedToSubmit(error):
+			switch error {
+			case .failedToSubmitTX:
+				return (errorKind: .failedToSubmitTransaction, message: nil)
+			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .rejected):
+				return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TXID: \(txID)")
+			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
+				return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TXID: \(txID)")
+			case let .failedToPollTX(txID, _):
+				return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+			case let .invalidTXWasDuplicate(txID):
+				return (errorKind: .submittedTransactionWasDuplicate, message: "TXID: \(txID)")
+			case let .failedToGetTransactionStatus(txID, _):
+				return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+			}
+		}
+	}
+}
+
 // MARK: TransactionFailure.FailedToPrepareForTXSigning
 extension TransactionFailure {
 	public enum FailedToPrepareForTXSigning: Sendable, LocalizedError, Equatable {
 		case failedToGetEpoch
 		case failedToLoadNotaryAndSigners
 		case failedToLoadNotaryPublicKey
+		case failedToFindAccountWithEnoughFundsToLockFee
 
 		public var errorDescription: String? {
 			switch self {
@@ -34,6 +73,8 @@ extension TransactionFailure {
 				return "Failed to load notary public key"
 			case .failedToLoadNotaryAndSigners:
 				return "Failed to load notary and signers"
+			case .failedToFindAccountWithEnoughFundsToLockFee:
+				return "Failed to find an account with enough funds to lock fee"
 			}
 		}
 	}
