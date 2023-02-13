@@ -5,20 +5,19 @@ import ProfileClient
 import TransactionClient
 
 let minimumNumberOfEpochsPassedForFaucetToBeReused = 1
+// internal for tests
+let epochForWhenLastUsedByAccountAddressKey = "faucet.epochForWhenLastUsedByAccountAddressKey"
 
 // MARK: - FaucetClient + DependencyKey
 extension FaucetClient: DependencyKey {
 	public static let liveValue: Self = {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
-		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		@Dependency(\.transactionClient) var transactionClient
-		@Dependency(\.engineToolkitClient) var engineToolkitClient
-		@Dependency(\.profileClient) var profileClient
 
 		// Return `nil` for `not allowed to use` else: return `some` for `is alllowed to use`
 		@Sendable func isAllowedToUseFaucetIfSoGetEpochs(accountAddress: AccountAddress) async -> (epochs: EpochForWhenLastUsedByAccountAddress, current: Epoch?)? {
+			@Dependency(\.gatewayAPIClient.getEpoch) var getEpoch
 			let epochs = userDefaultsClient.loadEpochForWhenLastUsedByAccountAddress()
-			guard let current = try? await gatewayAPIClient.getEpoch() else { return (epochs, nil) /* is allowed to use */ }
+			guard let current = try? await getEpoch() else { return (epochs, nil) /* is allowed to use */ }
 			guard let last = epochs.getEpoch(for: accountAddress) else { return (epochs, current) /* is allowed to use */ }
 
 			// Edge case
@@ -41,6 +40,10 @@ extension FaucetClient: DependencyKey {
 		}
 
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
+			@Dependency(\.transactionClient.signAndSubmitTransaction) var signAndSubmitTransaction
+			@Dependency(\.profileClient.getCurrentNetworkID) var getCurrentNetworkID
+			@Dependency(\.engineToolkitClient) var engineToolkitClient
+
 			let accountAddress = faucetRequest.recipientAccountAddress
 			guard let epochsAndMaybeCurrent = await isAllowedToUseFaucetIfSoGetEpochs(
 				accountAddress: accountAddress
@@ -49,7 +52,7 @@ extension FaucetClient: DependencyKey {
 				return
 			}
 
-			let networkID = await profileClient.getCurrentNetworkID()
+			let networkID = await getCurrentNetworkID()
 			let manifest = try engineToolkitClient.manifestForFaucet(
 				includeLockFeeInstruction: faucetRequest.addLockFeeInstructionToManifest,
 				networkID: networkID,
@@ -62,7 +65,7 @@ extension FaucetClient: DependencyKey {
 				unlockKeychainPromptShowToUser: faucetRequest.unlockKeychainPromptShowToUser
 			)
 
-			let _ = try await transactionClient.signAndSubmitTransaction(signSubmitTXRequest).get()
+			let _ = try await signAndSubmitTransaction(signSubmitTXRequest).get()
 
 			// Try update last used
 			guard let current = epochsAndMaybeCurrent.current else {
@@ -86,9 +89,10 @@ extension FaucetClient: DependencyKey {
 
 private extension UserDefaultsClient {
 	func loadEpochForWhenLastUsedByAccountAddress() -> EpochForWhenLastUsedByAccountAddress {
+		@Dependency(\.jsonDecoder) var jsonDecoder
 		if
-			let data = dataForKey(epochForWhenLastUsedByAccountAddressKey),
-			let epochs = try? JSONDecoder().decode(EpochForWhenLastUsedByAccountAddress.self, from: data)
+			let data = self.dataForKey(epochForWhenLastUsedByAccountAddressKey),
+			let epochs = try? jsonDecoder().decode(EpochForWhenLastUsedByAccountAddress.self, from: data)
 		{
 			return epochs
 		} else {
@@ -97,19 +101,19 @@ private extension UserDefaultsClient {
 	}
 
 	func saveEpochForWhenLastUsedByAccountAddress(_ value: EpochForWhenLastUsedByAccountAddress) async {
+		@Dependency(\.jsonEncoder) var jsonEncoder
 		do {
-			let data = try JSONEncoder().encode(value)
-			await setData(data, epochForWhenLastUsedByAccountAddressKey)
+			let data = try jsonEncoder().encode(value)
+			await self.setData(data, epochForWhenLastUsedByAccountAddressKey)
 		} catch {
 			// Not important enough to throw...
 		}
 	}
 }
 
-private let epochForWhenLastUsedByAccountAddressKey = "faucet.epochForWhenLastUsedByAccountAddressKey"
-
 // MARK: - EpochForWhenLastUsedByAccountAddress
-private struct EpochForWhenLastUsedByAccountAddress: Codable, Hashable, Sendable {
+// internal for tests
+internal struct EpochForWhenLastUsedByAccountAddress: Codable, Hashable, Sendable {
 	struct EpochForAccount: Codable, Sendable, Hashable, Identifiable {
 		typealias ID = AccountAddress
 		var id: ID { accountAddress }
@@ -117,9 +121,9 @@ private struct EpochForWhenLastUsedByAccountAddress: Codable, Hashable, Sendable
 		var epoch: Epoch
 	}
 
-	private var epochForAccounts: IdentifiedArrayOf<EpochForAccount>
-	fileprivate init() {
-		self.epochForAccounts = []
+	internal var epochForAccounts: IdentifiedArrayOf<EpochForAccount>
+	internal init(epochForAccounts: IdentifiedArrayOf<EpochForAccount> = .init()) {
+		self.epochForAccounts = epochForAccounts
 	}
 
 	mutating func update(epoch: Epoch, for id: AccountAddress) {

@@ -252,7 +252,8 @@ package.addModules([
 			"GatewayAPI",
 			"ProfileClient",
 			"TransactionClient",
-		], tests: .no
+		],
+		tests: .yes()
 	),
 	.client(
 		name: "GatewayAPI",
