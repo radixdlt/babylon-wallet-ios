@@ -7,8 +7,10 @@ protocol PeerConnectionFactory: Sendable {
 	func makePeerConnectionClient() throws -> PeerConnectionClient
 }
 
-
-func makePeerConnections(using signalingServerClient: SignalingClient, factory: PeerConnectionFactory) -> AnyAsyncSequence<Result<PeerConnectionClient, Error>> {
+func makePeerConnections(
+        using signalingServerClient: SignalingClient,
+        factory: PeerConnectionFactory
+) -> AnyAsyncSequence<Result<PeerConnectionClient, Error>> {
         @Sendable func negotiatePeerConnection(_ offer: IdentifiedPrimitive<RTCPrimitive.Offer>) async throws -> PeerConnectionClient {
                 let peerConnectionClient = try factory.makePeerConnectionClient()
 
@@ -22,18 +24,26 @@ func makePeerConnections(using signalingServerClient: SignalingClient, factory: 
                        try await peerConnectionClient.onRemoteICECandidate($0.content)
                 }.eraseToAnyAsyncSequence()
 
+                let onConnectionEstablished = peerConnectionClient
+                        .onIceConnectionState
+                        .filter {
+                                $0 == .connected
+                        }
+                        .prefix(1)
+
+                _ = await peerConnectionClient.onNegotiationNeeded.prefix(1).collect()
+                try await peerConnectionClient.onRemoteOffer(offer.content)
                 let localAnswer = try await peerConnectionClient.createAnswer()
                 try await signalingServerClient.sendToRemote(rtcPrimitive: .answer(.init(content: localAnswer, id: offer.id)))
 
-                await withThrowingTaskGroup(of: Void.self) { group in
-                        onLocalIceCandidate.await(inGroup: &group)
-                        onRemoteIceCandidate.await(inGroup: &group)
-
-                        group.addTask {
-                                // Determin the best way to know when the data channel did open
-                                await peerConnectionClient.onIceConnectionState.filter { $0 == .connected }.prefix(1).collect()
+                Task {
+                        await withThrowingTaskGroup(of: Void.self) { group in
+                                onLocalIceCandidate.await(inGroup: &group)
+                                onRemoteIceCandidate.await(inGroup: &group)
                         }
                 }
+
+                _ = await onConnectionEstablished.collect()
 
                 return peerConnectionClient
         }

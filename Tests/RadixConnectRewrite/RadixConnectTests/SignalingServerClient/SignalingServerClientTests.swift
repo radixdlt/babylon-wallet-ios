@@ -13,8 +13,7 @@ final class SignalingClientTests: TestCase {
 	static let answer = IdentifiedPrimitive(content: RTCPrimitive.Answer(sdp: sdp), id: remoteClientId)
         static let iceCandidate = IdentifiedPrimitive(content:RTCPrimitive.ICECandidate(sdp: sdp,
 	                                                    sdpMLineIndex: 32,
-	                                                    sdpMid: "Mid",
-                                                                                        serverUrl: "URL"),
+	                                                    sdpMid: "Mid"),
                                                       id: remoteClientId)
 	static let connectionID = try! SignalingServerConnectionID(.init(.deadbeef32Bytes))
 	static let encryptionKey = try! EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
@@ -229,6 +228,19 @@ extension RTCPrimitive.ICECandidate {
 			"sdpMid": .string(sdpMid!),
 		])
 	}
+}
+
+extension RTCPrimitive {
+        var payload: JSONValue {
+                switch self {
+                case let .offer(offer):
+                        return offer.content.payload
+                case let .answer(answer):
+                        return answer.content.payload
+                case let .iceCandidate(iceCandidate):
+                        return iceCandidate.content.payload
+                }
+        }
 }
 
 extension IncommingMessage.FromSignalingServer.Notification {

@@ -91,8 +91,7 @@ private extension RTCPrimitive.ICECandidate {
 		self.init(
 			sdp: .init(rtc.sdp),
 			sdpMLineIndex: rtc.sdpMLineIndex,
-			sdpMid: rtc.sdpMid,
-			serverUrl: rtc.serverUrl
+			sdpMid: rtc.sdpMid
 		)
 	}
 }

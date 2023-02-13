@@ -10,7 +10,7 @@ extension Identified: Sendable where T: Sendable, Id: Sendable {}
 
 typealias IdentifiedPrimitive<T: Sendable> = Identified<T, ClientID>
 
-enum RTCPrimitive: Sendable {
+enum RTCPrimitive: Equatable, Sendable {
         case offer(IdentifiedPrimitive<RTCPrimitive.Offer>)
         case answer(IdentifiedPrimitive<RTCPrimitive.Answer>)
         case iceCandidate(IdentifiedPrimitive<RTCPrimitive.ICECandidate>)
@@ -50,7 +50,7 @@ extension RTCPrimitive {
 		public let sdpMLineIndex: Int32
 		public let sdpMid: String?
 
-		public init(sdp: SDP, sdpMLineIndex: Int32, sdpMid: String?, serverUrl: String?) {
+		public init(sdp: SDP, sdpMLineIndex: Int32, sdpMid: String?) {
 			self.candidate = sdp
 			self.sdpMLineIndex = sdpMLineIndex
 			self.sdpMid = sdpMid
