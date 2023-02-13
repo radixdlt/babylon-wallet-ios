@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 
 // https://stackoverflow.com/a/50281094/976628
 public class OpenISO8601DateFormatter: DateFormatter {

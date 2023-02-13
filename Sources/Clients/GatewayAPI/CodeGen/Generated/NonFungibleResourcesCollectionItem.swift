@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -16,7 +16,7 @@ public typealias NonFungibleResourcesCollectionItem = GatewayAPI.NonFungibleReso
 // MARK: - GatewayAPI.NonFungibleResourcesCollectionItem
 extension GatewayAPI {
 	public struct NonFungibleResourcesCollectionItem: Codable, Hashable {
-		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
+		/** Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var address: String
 		public private(set) var amount: Int64
 

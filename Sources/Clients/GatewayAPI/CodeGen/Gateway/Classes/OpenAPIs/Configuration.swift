@@ -4,7 +4,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 
 @available(*, deprecated, renamed: "GatewayAPI.Configuration")
 public typealias Configuration = GatewayAPI.Configuration

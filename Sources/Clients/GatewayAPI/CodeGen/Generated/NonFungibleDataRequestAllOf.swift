@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -16,24 +16,25 @@ public typealias NonFungibleDataRequestAllOf = GatewayAPI.NonFungibleDataRequest
 // MARK: - GatewayAPI.NonFungibleDataRequestAllOf
 extension GatewayAPI {
 	public struct NonFungibleDataRequestAllOf: Codable, Hashable {
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
-		public private(set) var nonFungibleLocalId: String
+		/** String-encoded non-fungible ID. */
+		public private(set) var nonFungibleId: String
 		/** This cursor allows forward pagination, by providing the cursor from the previous request. */
 		public private(set) var cursor: String?
 		/** The page size requested. */
 		public private(set) var limit: Int?
 
-		public init(address: String, nonFungibleLocalId: String, cursor: String? = nil, limit: Int? = nil) {
+		public init(address: String, nonFungibleId: String, cursor: String? = nil, limit: Int? = nil) {
 			self.address = address
-			self.nonFungibleLocalId = nonFungibleLocalId
+			self.nonFungibleId = nonFungibleId
 			self.cursor = cursor
 			self.limit = limit
 		}
 
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case address
-			case nonFungibleLocalId = "non_fungible_id"
+			case nonFungibleId = "non_fungible_id"
 			case cursor
 			case limit
 		}
@@ -43,7 +44,7 @@ extension GatewayAPI {
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(address, forKey: .address)
-			try container.encode(nonFungibleLocalId, forKey: .nonFungibleLocalId)
+			try container.encode(nonFungibleId, forKey: .nonFungibleId)
 			try container.encodeIfPresent(cursor, forKey: .cursor)
 			try container.encodeIfPresent(limit, forKey: .limit)
 		}

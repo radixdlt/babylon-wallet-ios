@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -16,7 +16,7 @@ public typealias EntityFungiblesResponseAllOf = GatewayAPI.EntityFungiblesRespon
 // MARK: - GatewayAPI.EntityFungiblesResponseAllOf
 extension GatewayAPI {
 	public struct EntityFungiblesResponseAllOf: Codable, Hashable {
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
 		public private(set) var fungibles: FungibleResourcesCollection
 

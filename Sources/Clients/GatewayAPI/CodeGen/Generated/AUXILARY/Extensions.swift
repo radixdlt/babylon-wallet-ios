@@ -4,7 +4,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -36,6 +36,11 @@ extension Int64: JSONEncodable {
 
 // MARK: - Double + JSONEncodable
 extension Double: JSONEncodable {
+	func encodeToJSON() -> Any { self }
+}
+
+// MARK: - Decimal + JSONEncodable
+extension Decimal: JSONEncodable {
 	func encodeToJSON() -> Any { self }
 }
 

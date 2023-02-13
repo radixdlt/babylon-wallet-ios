@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -16,7 +16,7 @@ public typealias GatewayInfoResponseKnownTarget = GatewayAPI.GatewayInfoResponse
 // MARK: - GatewayAPI.GatewayInfoResponseKnownTarget
 extension GatewayAPI {
 	public struct GatewayInfoResponseKnownTarget: Codable, Hashable {
-		/** The latest-seen state version of the tip of the network's ledger. If this is significantly ahead of the current LedgerState version, the Network Gateway is possibly behind and may be reporting outdated information.  */
+		/** The latest-seen state version of the tip of the network's ledger. If this is significantly ahead of the current ledger state version, the Network Gateway is possibly behind and may be reporting outdated information.  */
 		public private(set) var stateVersion: Int64
 
 		public init(stateVersion: Int64) {
