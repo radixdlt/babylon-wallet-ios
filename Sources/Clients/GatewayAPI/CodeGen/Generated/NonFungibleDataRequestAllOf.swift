@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -16,8 +16,9 @@ public typealias NonFungibleDataRequestAllOf = GatewayAPI.NonFungibleDataRequest
 // MARK: - GatewayAPI.NonFungibleDataRequestAllOf
 extension GatewayAPI {
 	public struct NonFungibleDataRequestAllOf: Codable, Hashable {
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
+		/** String-encoded non-fungible ID. */
 		public private(set) var nonFungibleId: String
 		/** This cursor allows forward pagination, by providing the cursor from the previous request. */
 		public private(set) var cursor: String?

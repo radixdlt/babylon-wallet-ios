@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -17,7 +17,7 @@ public typealias EntityDetailsRequest = GatewayAPI.EntityDetailsRequest
 extension GatewayAPI {
 	public struct EntityDetailsRequest: Codable, Hashable {
 		public private(set) var atLedgerState: LedgerStateSelector?
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
 
 		public init(atLedgerState: LedgerStateSelector? = nil, address: String) {

@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -19,9 +19,9 @@ extension GatewayAPI {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
 		public private(set) var accessRulesChain: AnyCodable
 		public private(set) var vaultAccessRulesChain: AnyCodable
-		public private(set) var nonFungibleIdType: NonFungibleLocalIdType
+		public private(set) var nonFungibleIdType: NonFungibleIdType
 
-		public init(discriminator: EntityDetailsResponseDetailsType, accessRulesChain: AnyCodable, vaultAccessRulesChain: AnyCodable, nonFungibleIdType: NonFungibleLocalIdType) {
+		public init(discriminator: EntityDetailsResponseDetailsType, accessRulesChain: AnyCodable, vaultAccessRulesChain: AnyCodable, nonFungibleIdType: NonFungibleIdType) {
 			self.discriminator = discriminator
 			self.accessRulesChain = accessRulesChain
 			self.vaultAccessRulesChain = vaultAccessRulesChain

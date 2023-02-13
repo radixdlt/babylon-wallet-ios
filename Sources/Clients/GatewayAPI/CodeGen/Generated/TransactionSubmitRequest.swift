@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -16,7 +16,7 @@ public typealias TransactionSubmitRequest = GatewayAPI.TransactionSubmitRequest
 // MARK: - GatewayAPI.TransactionSubmitRequest
 extension GatewayAPI {
 	public struct TransactionSubmitRequest: Codable, Hashable {
-		/** The notarized transaction payload which can be submitted, hex encoded. */
+		/** Hex-encoded notarized transaction payload which can be submitted. */
 		public private(set) var notarizedTransactionHex: String
 
 		public init(notarizedTransactionHex: String) {
