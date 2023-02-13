@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -16,6 +16,7 @@ public typealias TransactionStatusResponseKnownPayloadItem = GatewayAPI.Transact
 // MARK: - GatewayAPI.TransactionStatusResponseKnownPayloadItem
 extension GatewayAPI {
 	public struct TransactionStatusResponseKnownPayloadItem: Codable, Hashable {
+		/** Hex-encoded SHA-256 hash. */
 		public private(set) var payloadHashHex: String
 		public private(set) var status: TransactionStatus
 		public private(set) var errorMessage: String?

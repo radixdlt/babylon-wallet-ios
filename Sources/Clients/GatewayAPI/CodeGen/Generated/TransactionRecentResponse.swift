@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -17,8 +17,11 @@ public typealias TransactionRecentResponse = GatewayAPI.TransactionRecentRespons
 extension GatewayAPI {
 	public struct TransactionRecentResponse: Codable, Hashable {
 		public private(set) var ledgerState: LedgerState
+		/** Total number of items in underlying collection, fragment of which is available in `items` collection. */
 		public private(set) var totalCount: Int64?
+		/** If specified, contains a cursor to query previous page of the `items` collection. */
 		public private(set) var previousCursor: String?
+		/** If specified, contains a cursor to query next page of the `items` collection. */
 		public private(set) var nextCursor: String?
 		/** The page of user transactions. */
 		public private(set) var items: [CommittedTransactionInfo]

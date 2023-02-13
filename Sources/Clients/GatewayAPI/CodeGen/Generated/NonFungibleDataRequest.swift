@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -17,18 +17,19 @@ public typealias NonFungibleDataRequest = GatewayAPI.NonFungibleDataRequest
 extension GatewayAPI {
 	public struct NonFungibleDataRequest: Codable, Hashable {
 		public private(set) var atLedgerState: LedgerStateSelector?
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
-		public private(set) var nonFungibleLocalId: String
+		/** String-encoded non-fungible ID. */
+		public private(set) var nonFungibleId: String
 		/** This cursor allows forward pagination, by providing the cursor from the previous request. */
 		public private(set) var cursor: String?
 		/** The page size requested. */
 		public private(set) var limit: Int?
 
-		public init(atLedgerState: LedgerStateSelector? = nil, address: String, nonFungibleLocalId: String, cursor: String? = nil, limit: Int? = nil) {
+		public init(atLedgerState: LedgerStateSelector? = nil, address: String, nonFungibleId: String, cursor: String? = nil, limit: Int? = nil) {
 			self.atLedgerState = atLedgerState
 			self.address = address
-			self.nonFungibleLocalId = nonFungibleLocalId
+			self.nonFungibleId = nonFungibleId
 			self.cursor = cursor
 			self.limit = limit
 		}
@@ -36,7 +37,7 @@ extension GatewayAPI {
 		public enum CodingKeys: String, CodingKey, CaseIterable {
 			case atLedgerState = "at_ledger_state"
 			case address
-			case nonFungibleLocalId = "non_fungible_id"
+			case nonFungibleId = "non_fungible_id"
 			case cursor
 			case limit
 		}
@@ -47,7 +48,7 @@ extension GatewayAPI {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encodeIfPresent(atLedgerState, forKey: .atLedgerState)
 			try container.encode(address, forKey: .address)
-			try container.encode(nonFungibleLocalId, forKey: .nonFungibleLocalId)
+			try container.encode(nonFungibleId, forKey: .nonFungibleId)
 			try container.encodeIfPresent(cursor, forKey: .cursor)
 			try container.encodeIfPresent(limit, forKey: .limit)
 		}

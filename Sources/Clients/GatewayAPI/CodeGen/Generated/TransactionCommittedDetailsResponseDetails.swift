@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -16,11 +16,11 @@ public typealias TransactionCommittedDetailsResponseDetails = GatewayAPI.Transac
 // MARK: - GatewayAPI.TransactionCommittedDetailsResponseDetails
 extension GatewayAPI {
 	public struct TransactionCommittedDetailsResponseDetails: Codable, Hashable {
-		/** The raw transaction payload, hex encoded. */
+		/** Hex-encoded binary blob. */
 		public private(set) var rawHex: String
 		public private(set) var receipt: AnyCodable
 		public private(set) var referencedGlobalEntities: [String]
-		/** The message bytes, hex encoded. */
+		/** Hex-encoded binary blob. */
 		public private(set) var messageHex: String?
 
 		public init(rawHex: String, receipt: AnyCodable, referencedGlobalEntities: [String], messageHex: String? = nil) {

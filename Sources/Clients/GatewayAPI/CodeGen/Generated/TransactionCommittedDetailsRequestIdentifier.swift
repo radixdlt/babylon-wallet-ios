@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -17,6 +17,7 @@ public typealias TransactionCommittedDetailsRequestIdentifier = GatewayAPI.Trans
 extension GatewayAPI {
 	public struct TransactionCommittedDetailsRequestIdentifier: Codable, Hashable {
 		public private(set) var type: TransactionCommittedDetailsRequestIdentifierType
+		/** Hex-encoded binary blob. */
 		public private(set) var valueHex: String
 
 		public init(type: TransactionCommittedDetailsRequestIdentifierType, valueHex: String) {

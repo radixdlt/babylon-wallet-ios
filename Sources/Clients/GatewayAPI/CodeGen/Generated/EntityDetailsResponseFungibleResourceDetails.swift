@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -20,11 +20,11 @@ extension GatewayAPI {
 		public private(set) var accessRulesChain: AnyCodable
 		public private(set) var vaultAccessRulesChain: AnyCodable
 		public private(set) var divisibility: Int
-		/** The string-encoded decimal representing the amount */
+		/** String-encoded decimal representing the amount of a related fungible resource. */
 		public private(set) var totalSupply: String
-		/** The string-encoded decimal representing the amount */
+		/** String-encoded decimal representing the amount of a related fungible resource. */
 		public private(set) var totalMinted: String
-		/** The string-encoded decimal representing the amount */
+		/** String-encoded decimal representing the amount of a related fungible resource. */
 		public private(set) var totalBurnt: String
 
 		public init(discriminator: EntityDetailsResponseDetailsType, accessRulesChain: AnyCodable, vaultAccessRulesChain: AnyCodable, divisibility: Int, totalSupply: String, totalMinted: String, totalBurnt: String) {

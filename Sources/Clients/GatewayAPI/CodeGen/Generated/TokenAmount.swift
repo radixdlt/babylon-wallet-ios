@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -15,10 +15,11 @@ public typealias TokenAmount = GatewayAPI.TokenAmount
 
 // MARK: - GatewayAPI.TokenAmount
 extension GatewayAPI {
+	/** Represents a decimal amount of a given resource. */
 	public struct TokenAmount: Codable, Hashable {
-		/** The string-encoded decimal representing the amount */
+		/** String-encoded decimal representing the amount of a related fungible resource. */
 		public private(set) var value: String
-		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
+		/** Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var address: String?
 
 		public init(value: String, address: String? = nil) {

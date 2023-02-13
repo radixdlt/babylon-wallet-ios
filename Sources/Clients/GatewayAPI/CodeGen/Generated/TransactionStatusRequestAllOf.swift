@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -16,9 +16,10 @@ public typealias TransactionStatusRequestAllOf = GatewayAPI.TransactionStatusReq
 // MARK: - GatewayAPI.TransactionStatusRequestAllOf
 extension GatewayAPI {
 	public struct TransactionStatusRequestAllOf: Codable, Hashable {
-		public private(set) var intentHashHex: String?
+		/** Hex-encoded SHA-256 hash. */
+		public private(set) var intentHashHex: String
 
-		public init(intentHashHex: String? = nil) {
+		public init(intentHashHex: String) {
 			self.intentHashHex = intentHashHex
 		}
 
@@ -30,7 +31,7 @@ extension GatewayAPI {
 
 		public func encode(to encoder: Encoder) throws {
 			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encodeIfPresent(intentHashHex, forKey: .intentHashHex)
+			try container.encode(intentHashHex, forKey: .intentHashHex)
 		}
 	}
 }
