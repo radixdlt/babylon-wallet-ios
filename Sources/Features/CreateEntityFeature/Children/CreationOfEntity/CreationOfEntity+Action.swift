@@ -38,5 +38,6 @@ extension CreationOfEntity.Action {
 extension CreationOfEntity.Action {
 	public enum DelegateAction: Sendable, Equatable {
 		case createdEntity(Entity)
+		case createEntityFailed
 	}
 }
