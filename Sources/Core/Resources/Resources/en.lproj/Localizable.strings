@@ -131,8 +131,10 @@
 "dAppProfile.tokens" = "Associated Tokens";
 "dAppProfile.nfts" = "Associated NFTs";
 "dAppProfile.personaHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
+"dAppProfile.forgetDApp" = "Forget this dApp";
 
 "personaProfile.body" = "You are currently sharing the following pieces of personal data required by this dApp.";
+"personaProfile.disconnectPersona" = "Disconnect Persona from this dApp";
 
 "newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
 "newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";

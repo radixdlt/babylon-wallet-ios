@@ -327,6 +327,8 @@ public enum L10n {
   public enum DAppProfile {
     /// dApp Definition
     public static let definition = L10n.tr("Localizable", "dAppProfile.definition", fallback: "dApp Definition")
+    /// Forget this dApp
+    public static let forgetDApp = L10n.tr("Localizable", "dAppProfile.forgetDApp", fallback: "Forget this dApp")
     /// Associated NFTs
     public static let nfts = L10n.tr("Localizable", "dAppProfile.nfts", fallback: "Associated NFTs")
     /// Here are the Personas that you have previously used to connect to this dApp.
@@ -487,6 +489,8 @@ public enum L10n {
   public enum PersonaProfile {
     /// You are currently sharing the following pieces of personal data required by this dApp.
     public static let body = L10n.tr("Localizable", "personaProfile.body", fallback: "You are currently sharing the following pieces of personal data required by this dApp.")
+    /// Disconnect Persona from this dApp
+    public static let disconnectPersona = L10n.tr("Localizable", "personaProfile.disconnectPersona", fallback: "Disconnect Persona from this dApp")
   }
   public enum Personas {
     /// Create a New Persona

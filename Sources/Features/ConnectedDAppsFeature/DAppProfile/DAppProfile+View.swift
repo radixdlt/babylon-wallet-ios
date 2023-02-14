@@ -27,7 +27,7 @@ public extension DAppProfile {
 
 public extension DAppProfile.View {
 	var body: some View {
-		WithViewStore(store.actionless, observe: \.viewState) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .medium1) {
 					DAppPlaceholder(size: .veryLarge)
@@ -58,20 +58,15 @@ public extension DAppProfile.View {
 							.padding(.vertical, .large3)
 							.padding(.horizontal, .medium1)
 						PersonasList(store: store)
+							.padding(.bottom, .large2)
 					}
 					.background(.app.gray5)
 
 					VStack {
-						RadixButton("dasdfsaf") {}
-							.padding(.medium3)
-
-						RadixButton(destructive: "dasdfsaf") {}
-							.padding(.medium3)
-
-						RadixButton("My main account", account: "08un8n08908n9", gradient: .init(colors: [.green, .yellow])) {}
-							.padding(.medium3)
-
-//						.padding(.bottom, .medium3)
+						RadixButton(destructive: L10n.DAppProfile.forgetDApp) {
+							viewStore.send(.forgetThisDApp)
+						}
+						.padding([.horizontal, .bottom], .medium3)
 					}
 				}
 				.navBarTitle(viewStore.title)

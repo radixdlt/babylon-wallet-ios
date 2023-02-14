@@ -37,6 +37,8 @@ public struct DAppProfile: Sendable, FeatureReducer {
 		case let .personaTapped(persona):
 			// TODO: • This proxying is only necessary because of our strict view/child separation
 			return .send(.child(.selectedPersona(.present(.init(persona: persona)))))
+		case .forgetThisDApp:
+			return .none
 		}
 	}
 }
@@ -68,6 +70,7 @@ public extension DAppProfile {
 		case tokenTapped(UUID)
 		case nftTapped(UUID)
 		case personaTapped(String)
+		case forgetThisDApp
 	}
 
 	enum ChildAction: Sendable, Equatable {
