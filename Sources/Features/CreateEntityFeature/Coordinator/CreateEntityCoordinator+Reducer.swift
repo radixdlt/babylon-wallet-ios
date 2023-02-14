@@ -90,7 +90,7 @@ public struct CreateEntityCoordinator<
 				state: &state
 			)
 
-		case .child(.step2_creationOfEntity(.delegate(.biometricsCheckFailed))):
+		case .child(.step2_creationOfEntity(.delegate(.createEntityFailed))):
 			state.step = .step0_nameNewEntity(.init(config: state.config))
 			return .none
 
