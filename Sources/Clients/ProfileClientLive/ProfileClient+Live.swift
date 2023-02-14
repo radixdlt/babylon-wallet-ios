@@ -166,13 +166,19 @@ extension ProfileClient {
 						jsonDecoder: jsonDecoder()
 					)
 				} catch {
-					return .failure(
-						.decodingFailure(
-							json: profileSnapshotData,
-							.known(.noProfileSnapshotVersionFoundInJSON
-							)
-						)
-					)
+//					return .failure(
+//						.decodingFailure(
+//							json: profileSnapshotData,
+//							.known(.noProfileSnapshotVersionFoundInJSON
+//							)
+//						)
+//					)
+					// FIXME: post betanet v2, remove this and return `failure(.noProfileSnapshotVersionFoundInJSON)`
+					// above instead
+					return .failure(.profileVersionOutdated(
+						json: profileSnapshotData,
+						version: 1 // irrelevant, not show to user.
+					))
 				}
 
 				do {
