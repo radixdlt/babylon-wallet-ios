@@ -93,32 +93,3 @@ extension AppPreferences.Display {
 		"""
 	}
 }
-
-// MARK: - FiatCurrency
-public enum FiatCurrency:
-	String,
-	Sendable,
-	Hashable,
-	Codable,
-	CustomStringConvertible,
-	CustomDumpRepresentable
-{
-	case usd, eur, gbp
-}
-
-extension FiatCurrency {
-	public var sign: String {
-		switch self {
-		case .usd:
-			return "$"
-		case .gbp:
-			return "£"
-		case .eur:
-			return "€"
-		}
-	}
-
-	public var symbol: String {
-		rawValue.uppercased()
-	}
-}
