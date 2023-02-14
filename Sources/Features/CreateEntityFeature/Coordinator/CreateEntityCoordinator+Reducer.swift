@@ -90,6 +90,10 @@ public struct CreateEntityCoordinator<
 				state: &state
 			)
 
+		case .child(.step2_creationOfEntity(.delegate(.biometricsCheckFailed))):
+			state.step = .step0_nameNewEntity(.init(config: state.config))
+			return .none
+
 		case .child(.step3_completion(.delegate(.completed))):
 			return .run { send in
 				await send(.delegate(.completed))
