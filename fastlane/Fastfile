@@ -1,7 +1,7 @@
 fastlane_require 'dotenv'
 
 before_all do
-    xcodes(select_for_current_build_only: true)
+    ensure_xcode_version
     Dotenv.load ".env.secret"
     ensure_git_status_clean
 end
