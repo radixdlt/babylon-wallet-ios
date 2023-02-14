@@ -172,4 +172,19 @@ final class BigDecimalTests: TestCase {
 			XCTAssertNotEqual(first, second)
 		}
 	}
+
+	func test_format_bigdecimal() throws {
+		func doTest(_ bigDecimalString: String, expected: String) throws {
+			let bigDecimal = try BigDecimal(fromString: bigDecimalString)
+			XCTAssertEqual(bigDecimal.format(), expected)
+		}
+		try doTest("57896044618658097711785492504343953926634992332820282019728.792003956564819968", expected: "57896044618658097711785492504343953926634992332820282019728.7")
+		try doTest("1000000000.1", expected: "1000000000.1")
+		try doTest("1000000000", expected: "1000000000")
+		try doTest("1000.1234", expected: "1000.1234")
+		try doTest("1000.5", expected: "1000.5")
+		try doTest("0.1234567", expected: "0.1234567")
+		try doTest("0.4321", expected: "0.4321")
+		try doTest("0.99999999999999999", expected: "0.9999999")
+	}
 }
