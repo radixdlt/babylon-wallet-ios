@@ -24,7 +24,7 @@ public extension PersonaProfile.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
-					BodyText(L10n.PersonaProfile.body)
+					TextBlock(L10n.PersonaProfile.body)
 
 					Separator()
 

@@ -106,6 +106,7 @@ private extension AppSettings.View {
 						viewStore.send(.debugInspectProfileButtonTapped)
 					} icon: {
 						Image(systemName: "wallet.pass")
+							.frame(.verySmall)
 					}
 					.withSeparator
 					#endif

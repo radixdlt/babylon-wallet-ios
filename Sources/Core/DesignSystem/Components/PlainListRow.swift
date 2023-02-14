@@ -27,18 +27,14 @@ public struct PlainListRow<Icon: View>: View {
 		self.icon = AssetIcon(asset: asset)
 		self.action = action
 	}
-}
 
-// MARK: - Body
-
-public extension PlainListRow {
-	var body: some View {
+	public var body: some View {
 		Button(action: action) {
 			HStack(spacing: .zero) {
 				icon
 					.padding(.trailing, .medium3)
 				Text(title)
-					.textStyle(.body1Header)
+					.textStyle(.secondaryHeader)
 					.foregroundColor(.app.gray1)
 				Spacer(minLength: 0)
 				if chevron {

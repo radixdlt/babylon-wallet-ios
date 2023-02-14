@@ -4,7 +4,7 @@ import FeaturePrelude
 struct SettingsRowStyle: ButtonStyle {
 	func makeBody(configuration: Configuration) -> some View {
 		configuration.label
-			.background(configuration.isPressed ? Color.app.gray4 : Color.app.white)
+			.background(configuration.isPressed ? .app.gray4 : .app.white)
 	}
 }
 

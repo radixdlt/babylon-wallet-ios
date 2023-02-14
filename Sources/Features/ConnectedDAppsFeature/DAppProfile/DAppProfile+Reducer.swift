@@ -34,7 +34,7 @@ public struct DAppProfile: Sendable, FeatureReducer {
 			return .none
 		case let .nftTapped(nft):
 			return .none
-		case let .personaSelected(persona):
+		case let .personaTapped(persona):
 			// TODO: • This proxying is only necessary because of our strict view/child separation
 			return .send(.child(.selectedPersona(.present(.init(persona: persona)))))
 		}
@@ -67,7 +67,7 @@ public extension DAppProfile {
 		case copyAddressButtonTapped
 		case tokenTapped(UUID)
 		case nftTapped(UUID)
-		case personaSelected(String)
+		case personaTapped(String)
 	}
 
 	enum ChildAction: Sendable, Equatable {

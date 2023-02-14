@@ -29,6 +29,7 @@ public extension AddressView {
 
 				if copyAddressAction != nil {
 					Image(asset: AssetResource.copy)
+						.foregroundColor(.app.gray2)
 				}
 			}
 		}

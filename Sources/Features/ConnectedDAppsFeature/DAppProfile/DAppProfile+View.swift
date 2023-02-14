@@ -13,7 +13,10 @@ public extension DAppProfile {
 	}
 
 	internal struct ViewState: Equatable {
-		let name: String
+		let title: String
+		let showTokenList: Bool
+		let showNFTList: Bool
+
 		let addressViewState: AddressView.ViewState
 		let personas: [PersonaProfileRowModel]
 		let dApp: DAppProfileModel
@@ -24,21 +27,54 @@ public extension DAppProfile {
 
 public extension DAppProfile.View {
 	var body: some View {
-		WithViewStore(store.actionless, observe: \.name) { viewStore in
+		WithViewStore(store.actionless, observe: \.viewState) { viewStore in
 			ScrollView {
-				VStack(alignment: .leading, spacing: 0) {
-					Header(store: store)
-					TokenList(store: store)
-					NFTList(store: store)
-					VStack(spacing: .medium3) {
-						BodyText(L10n.DAppProfile.personaHeading, textStyle: .body1HighImportance, color: .app.gray2)
+				VStack(spacing: .medium1) {
+					DAppPlaceholder(size: .veryLarge)
+						.padding(.top, .medium1)
+
+					Separator()
+						.padding(.horizontal, .medium1)
+
+					TextBlock(viewStore.dApp.description, textStyle: .body1Regular, color: .app.gray1)
+						.padding(.horizontal, .large2)
+
+					Separator()
+						.padding(.horizontal, .medium1)
+
+					InfoBlock(store: store)
+						.padding(.horizontal, .large2)
+
+					if viewStore.showTokenList {
+						TokenList(store: store)
+					}
+
+					if viewStore.showNFTList {
+						NFTList(store: store)
+					}
+
+					VStack(spacing: 0) {
+						TextBlock(L10n.DAppProfile.personaHeading, textStyle: .body1HighImportance, color: .app.gray2)
 							.padding(.vertical, .large3)
+							.padding(.horizontal, .medium1)
 						PersonasList(store: store)
 					}
+					.background(.app.gray5)
+
+					VStack {
+						RadixButton("dasdfsaf") {}
+							.padding(.medium3)
+
+						RadixButton(destructive: "dasdfsaf") {}
+							.padding(.medium3)
+
+						RadixButton("My main account", account: "08un8n08908n9", gradient: .init(colors: [.green, .yellow])) {}
+							.padding(.medium3)
+
+//						.padding(.bottom, .medium3)
+					}
 				}
-				.padding(.top, .medium1)
-				.padding(.horizontal, .medium3)
-				.navBarTitle(viewStore.state)
+				.navBarTitle(viewStore.title)
 				.navigationDestination(store: store.selectedPersona) { store in
 					PersonaProfile.View(store: store)
 				}
@@ -57,7 +93,9 @@ private extension DAppProfile.Store {
 
 private extension DAppProfile.State {
 	var viewState: DAppProfile.ViewState {
-		.init(name: name,
+		.init(title: name,
+		      showTokenList: !dApp.tokens.isEmpty,
+		      showNFTList: !dApp.nfts.isEmpty,
 		      addressViewState: .init(address: dApp.address.address, format: .short),
 		      personas: personas,
 		      dApp: dApp)
@@ -81,100 +119,40 @@ public extension View {
 
 extension DAppProfile.View {
 	@MainActor
-	struct Header: View {
+	struct InfoBlock: View {
 		let store: StoreOf<DAppProfile>
-	}
 
-	@MainActor
-	struct TokenList: View {
-		let store: StoreOf<DAppProfile>
-	}
-
-	@MainActor
-	struct NFTList: View {
-		let store: StoreOf<DAppProfile>
-	}
-
-	@MainActor
-	struct PersonasList: View {
-		let store: StoreOf<DAppProfile>
-	}
-}
-
-extension DAppProfile.View.Header {
-	var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			VStack(spacing: .medium1) {
-				DAppPlaceholder(size: .veryLarge)
-				//				.padding(.bottom, .small2)
-				Separator()
-					.padding(.horizontal, .medium1)
-				Text(viewStore.dApp.description)
-					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray1)
-					.padding(.horizontal, .large2)
-				Separator()
-					.padding(.horizontal, .medium1)
-				VStack(alignment: .leading, spacing: .medium3) {
+		var body: some View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				VStack(alignment: .leading, spacing: .medium2) {
 					HStack(spacing: 0) {
-						Text(L10n.DAppProfile.definition)
-							.textStyle(.body1Regular)
-							.foregroundColor(.app.gray2)
+						SectionHeading(L10n.DAppProfile.definition)
 						Spacer(minLength: 0)
 						AddressView(viewStore.addressViewState, textStyle: .body1HighImportance) {
 							viewStore.send(.copyAddressButtonTapped)
 						}
 						.foregroundColor(.app.gray1)
 					}
-					Text(L10n.DAppProfile.website)
-						.textStyle(.body1Regular)
-						.foregroundColor(.app.gray2)
-					Button {
+
+					SectionHeading(L10n.DAppProfile.website)
+
+					URLButton(url: viewStore.dApp.domain) {
 						viewStore.send(.openURLTapped)
-					} label: {
-						Label {
-							Text(viewStore.dApp.domain.absoluteString)
-								.textStyle(.body1HighImportance)
-								.foregroundColor(.app.blue2)
-						} icon: {
-							Image(asset: AssetResource.iconLinkOut)
-						}
 					}
 				}
 			}
 		}
 	}
-}
 
-extension LabelStyle where Self == TrailingIconLabelStyle {
-	/// Applies the `trailingIcon` style with the default spacing
-	static var trailingIcon: Self { .trailingIcon() }
+	@MainActor
+	struct TokenList: View {
+		let store: StoreOf<DAppProfile>
 
-	/// A label style where the icon follows the "title", or text part
-	static func trailingIcon(spacing: CGFloat = .small2) -> Self {
-		.init(spacing: spacing)
-	}
-}
+		var body: some View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				SectionHeading(L10n.DAppProfile.tokens)
+					.padding(.horizontal, .large2)
 
-// MARK: - TrailingIconLabelStyle
-struct TrailingIconLabelStyle: LabelStyle {
-	let spacing: CGFloat
-
-	func makeBody(configuration: Configuration) -> some View {
-		HStack(spacing: spacing) {
-			configuration.title
-			configuration.icon
-		}
-	}
-}
-
-extension DAppProfile.View.TokenList {
-	var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			if !viewStore.dApp.tokens.isEmpty {
-				Text(L10n.DAppProfile.tokens)
-					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray2)
 				VStack(spacing: .medium3) {
 					ForEach(viewStore.dApp.tokens) { token in
 						RadixCard {
@@ -184,20 +162,22 @@ extension DAppProfile.View.TokenList {
 								TokenPlaceholder(size: .small)
 							}
 						}
+						.padding(.horizontal, .medium3)
 					}
 				}
 			}
 		}
 	}
-}
 
-extension DAppProfile.View.NFTList {
-	var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			if !viewStore.dApp.nfts.isEmpty {
-				Text(L10n.DAppProfile.tokens)
-					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray2)
+	@MainActor
+	struct NFTList: View {
+		let store: StoreOf<DAppProfile>
+
+		var body: some View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				SectionHeading(L10n.DAppProfile.nfts)
+					.padding(.horizontal, .large2)
+
 				VStack(spacing: .medium3) {
 					ForEach(viewStore.dApp.nfts) { nft in
 						RadixCard {
@@ -207,25 +187,29 @@ extension DAppProfile.View.NFTList {
 								NFTPlaceholder(size: .small)
 							}
 						}
+						.padding(.horizontal, .medium3)
 					}
 				}
 			}
 		}
 	}
-}
 
-extension DAppProfile.View.PersonasList {
-	var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			VStack(spacing: .medium3) {
-				ForEach(viewStore.personas) { persona in
-					Button {
-						viewStore.send(.personaSelected(persona.name))
-					} label: {
+	@MainActor
+	struct PersonasList: View {
+		let store: StoreOf<DAppProfile>
+
+		var body: some View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				VStack(spacing: .medium3) {
+					ForEach(viewStore.personas) { persona in
 						RadixCard {
-							PersonaProfileCard(model: persona)
-								.padding(.medium3)
+							PlainListRow(title: persona.name) {
+								viewStore.send(.personaTapped(persona.name))
+							} icon: {
+								PersonaThumbnail(persona.thumbnail)
+							}
 						}
+						.padding(.horizontal, .medium3)
 					}
 				}
 			}
@@ -233,36 +217,66 @@ extension DAppProfile.View.PersonasList {
 	}
 }
 
-// MARK: - PersonaProfileCard
-struct PersonaProfileCard: View {
-	let model: PersonaProfileRowModel
+// MARK: - URLButton
+// General purpose helper views
 
-	var body: some View {
-		HStack(spacing: 0) {
-			VStack(spacing: 0) {
-				PersonaThumbnail(model.thumbnail)
-				Spacer()
-			}
-			.padding(.trailing, .medium3)
-			VStack(alignment: .leading, spacing: 0) {
-				Text(model.name)
-					.textStyle(.secondaryHeader)
-					.foregroundColor(.app.gray1)
-					.padding(.bottom, 6)
-				Text(model.sharingStatus)
-					.textStyle(.body2Header)
+struct URLButton: View {
+	let url: URL
+	let action: () -> Void
+
+	public var body: some View {
+		Button(action: action) {
+			Label {
+				Text(url.absoluteString)
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.blue2)
+			} icon: {
+				Image(asset: AssetResource.iconLinkOut)
 					.foregroundColor(.app.gray2)
-					.padding(.bottom, 6)
-				Group {
-					Text("\(model.personalDataCount) pieces of personal data")
-						.padding(.bottom, 4)
-					Text("\(model.accountCount) accounts")
-				}
-				.textStyle(.body2Regular)
-				.foregroundColor(.app.gray2)
 			}
-			Spacer()
-			RadixChevron()
+			.labelStyle(.trailingIcon)
+		}
+	}
+}
+
+// MARK: - SectionHeading
+struct SectionHeading: View {
+	let text: String
+
+	init(_ text: String) {
+		self.text = text
+	}
+
+	public var body: some View {
+		HStack(spacing: 0) {
+			Text(text)
+				.textStyle(.body1Regular)
+				.foregroundColor(.app.gray2)
+			Spacer(minLength: 0)
+		}
+	}
+}
+
+// MARK: - TextBlock
+// TODO: • Useful components - Move somewhere
+
+public struct TextBlock: View {
+	let text: String
+	let textStyle: TextStyle
+	let color: Color
+
+	public init(_ text: String, textStyle: TextStyle = .body1Regular, color: Color = .app.gray1) {
+		self.text = text
+		self.textStyle = textStyle
+		self.color = color
+	}
+
+	public var body: some View {
+		HStack(spacing: 0) {
+			Text(text)
+				.textStyle(textStyle)
+				.foregroundColor(color)
+			Spacer(minLength: 0)
 		}
 	}
 }
@@ -284,5 +298,29 @@ public struct PersonaThumbnail: View {
 				.stroke(.app.gray3, lineWidth: 1)
 		}
 		.frame(.small)
+	}
+}
+
+// TODO: • Useful style - Move somewhere
+
+public extension LabelStyle where Self == TrailingIconLabelStyle {
+	/// Applies the `trailingIcon` style with the default spacing
+	static var trailingIcon: Self { .trailingIcon() }
+
+	/// A label style where the icon follows the "title", or text part
+	static func trailingIcon(spacing: CGFloat = .small2) -> Self {
+		.init(spacing: spacing)
+	}
+}
+
+// MARK: - TrailingIconLabelStyle
+public struct TrailingIconLabelStyle: LabelStyle {
+	let spacing: CGFloat
+
+	public func makeBody(configuration: Configuration) -> some View {
+		HStack(spacing: spacing) {
+			configuration.title
+			configuration.icon
+		}
 	}
 }

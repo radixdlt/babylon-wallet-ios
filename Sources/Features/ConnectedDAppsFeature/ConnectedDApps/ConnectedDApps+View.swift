@@ -23,7 +23,8 @@ public extension ConnectedDApps.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
-					BodyText(L10n.ConnectedDApps.body)
+					TextBlock(L10n.ConnectedDApps.body, textStyle: .body1HighImportance, color: .app.gray2)
+						.padding(.vertical, .medium3)
 
 					Separator()
 
@@ -61,31 +62,6 @@ private extension ConnectedDApps.Store {
 private extension ConnectedDApps.State {
 	var viewState: ConnectedDApps.ViewState {
 		.init(dApps: dApps)
-	}
-}
-
-// MARK: - BodyText
-// TODO: • Move somewhere else
-
-public struct BodyText: View {
-	private let text: String
-	private let textStyle: TextStyle
-	private let color: Color
-
-	public init(_ text: String, textStyle: TextStyle = .body1HighImportance, color: Color = .app.gray2) {
-		self.text = text
-		self.textStyle = textStyle
-		self.color = color
-	}
-
-	public var body: some View {
-		HStack(spacing: 0) {
-			Text(text)
-				.textStyle(textStyle)
-				.foregroundColor(color)
-			Spacer(minLength: 0)
-		}
-		.padding(.vertical, .medium3)
 	}
 }
 
