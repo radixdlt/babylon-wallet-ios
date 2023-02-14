@@ -8,56 +8,54 @@ protocol PeerConnectionFactory: Sendable {
 }
 
 func makePeerConnections(
-        using signalingServerClient: SignalingClient,
-        factory: PeerConnectionFactory
+	using signalingServerClient: SignalingClient,
+	factory: PeerConnectionFactory
 ) -> AnyAsyncSequence<Result<PeerConnectionClient, Error>> {
-        @Sendable func negotiatePeerConnection(_ offer: IdentifiedPrimitive<RTCPrimitive.Offer>) async throws -> PeerConnectionClient {
-                let peerConnectionClient = try factory.makePeerConnectionClient()
+	@Sendable func negotiatePeerConnection(_ offer: IdentifiedPrimitive<RTCPrimitive.Offer>) async throws -> PeerConnectionClient {
+		let peerConnectionClient = try factory.makePeerConnectionClient()
 
-                let onLocalIceCandidate = peerConnectionClient.onGeneratedICECandidate.map {
-                        IdentifiedPrimitive(content: $0, id: offer.id)
-                }.map {
-                        try await signalingServerClient.sendToRemote(rtcPrimitive: .iceCandidate($0))
-                }.eraseToAnyAsyncSequence()
+		let onLocalIceCandidate = peerConnectionClient.onGeneratedICECandidate.map {
+			IdentifiedPrimitive(content: $0, id: offer.id)
+		}.map {
+			try await signalingServerClient.sendToRemote(rtcPrimitive: .iceCandidate($0))
+		}.eraseToAnyAsyncSequence()
 
-                let onRemoteIceCandidate = signalingServerClient.onICECanddiate.map {
-                       try await peerConnectionClient.onRemoteICECandidate($0.content)
-                }.eraseToAnyAsyncSequence()
+		let onRemoteIceCandidate = signalingServerClient.onICECanddiate.map {
+			try await peerConnectionClient.onRemoteICECandidate($0.content)
+		}.eraseToAnyAsyncSequence()
 
-                let onConnectionEstablished = peerConnectionClient
-                        .onIceConnectionState
-                        .filter {
-                                $0 == .connected
-                        }
-                        .prefix(1)
+		let onConnectionEstablished = peerConnectionClient
+			.onIceConnectionState
+			.filter {
+				$0 == .connected
+			}
+			.prefix(1)
 
-                _ = await peerConnectionClient.onNegotiationNeeded.prefix(1).collect()
-                try await peerConnectionClient.onRemoteOffer(offer.content)
-                let localAnswer = try await peerConnectionClient.createAnswer()
-                try await signalingServerClient.sendToRemote(rtcPrimitive: .answer(.init(content: localAnswer, id: offer.id)))
+		_ = await peerConnectionClient.onNegotiationNeeded.prefix(1).collect()
+		try await peerConnectionClient.onRemoteOffer(offer.content)
+		let localAnswer = try await peerConnectionClient.createAnswer()
+		try await signalingServerClient.sendToRemote(rtcPrimitive: .answer(.init(content: localAnswer, id: offer.id)))
 
-                Task {
-                        await withThrowingTaskGroup(of: Void.self) { group in
-                                onLocalIceCandidate.await(inGroup: &group)
-                                onRemoteIceCandidate.await(inGroup: &group)
-                        }
-                }
+		Task {
+			await withThrowingTaskGroup(of: Void.self) { group in
+				onLocalIceCandidate.await(inGroup: &group)
+				onRemoteIceCandidate.await(inGroup: &group)
+			}
+		}
 
-                _ = await onConnectionEstablished.collect()
+		_ = await onConnectionEstablished.collect()
 
-                return peerConnectionClient
-        }
+		return peerConnectionClient
+	}
 
-        return signalingServerClient
-                .onOffer
-                .map {
-                       try await negotiatePeerConnection($0)
-                }
-                .mapToResult()
-                .eraseToAnyAsyncSequence()
-
+	return signalingServerClient
+		.onOffer
+		.map {
+			try await negotiatePeerConnection($0)
+		}
+		.mapToResult()
+		.eraseToAnyAsyncSequence()
 }
-
 
 extension AsyncSequence where Element == Void {
 	func await(inGroup group: inout ThrowingTaskGroup<Void, Error>) where Self: Sendable {

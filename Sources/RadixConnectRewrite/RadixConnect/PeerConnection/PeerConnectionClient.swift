@@ -13,13 +13,13 @@ struct PeerConnectionClient {
 		self.dataChannelClient = try peerConnection.createDataChannel()
 	}
 
-        func onRemoteOffer(_ answer: RTCPrimitive.Offer) async throws {
-                try await peerConnection.setRemoteOffer(answer)
-        }
+	func onRemoteOffer(_ answer: RTCPrimitive.Offer) async throws {
+		try await peerConnection.setRemoteOffer(answer)
+	}
 
 	func createAnswer() async throws -> RTCPrimitive.Answer {
 		let answer = try await peerConnection.createLocalAnswer()
-                try await peerConnection.setLocalAnswer(answer)
+		try await peerConnection.setLocalAnswer(answer)
 		return answer
 	}
 

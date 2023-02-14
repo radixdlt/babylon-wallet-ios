@@ -1,32 +1,35 @@
-// MARK: - RTCPrimitive
-
+// MARK: - Identified
 struct Identified<T, Id> {
-        let content: T
-        let id: Id
+	let content: T
+	let id: Id
 }
 
+// MARK: Equatable
 extension Identified: Equatable where T: Equatable, Id: Equatable {}
+
+// MARK: Sendable
 extension Identified: Sendable where T: Sendable, Id: Sendable {}
 
 typealias IdentifiedPrimitive<T: Sendable> = Identified<T, ClientID>
 
+// MARK: - RTCPrimitive
 enum RTCPrimitive: Equatable, Sendable {
-        case offer(IdentifiedPrimitive<RTCPrimitive.Offer>)
-        case answer(IdentifiedPrimitive<RTCPrimitive.Answer>)
-        case iceCandidate(IdentifiedPrimitive<RTCPrimitive.ICECandidate>)
+	case offer(IdentifiedPrimitive<RTCPrimitive.Offer>)
+	case answer(IdentifiedPrimitive<RTCPrimitive.Answer>)
+	case iceCandidate(IdentifiedPrimitive<RTCPrimitive.ICECandidate>)
 }
 
 extension RTCPrimitive {
-        var clientId: ClientID {
-                switch self {
-                case let .offer(offer):
-                        return offer.id
-                case let .answer(answer):
-                        return answer.id
-                case let .iceCandidate(iceCandidate):
-                        return iceCandidate.id
-                }
-        }
+	var clientId: ClientID {
+		switch self {
+		case let .offer(offer):
+			return offer.id
+		case let .answer(answer):
+			return answer.id
+		case let .iceCandidate(iceCandidate):
+			return iceCandidate.id
+		}
+	}
 }
 
 extension RTCPrimitive {
@@ -87,11 +90,11 @@ extension RTCPrimitive: Encodable {
 		var singleValueContainer = encoder.singleValueContainer()
 		switch self {
 		case let .offer(value):
-                        try singleValueContainer.encode(value.content)
+			try singleValueContainer.encode(value.content)
 		case let .answer(value):
-                        try singleValueContainer.encode(value.content)
+			try singleValueContainer.encode(value.content)
 		case let .iceCandidate(value):
-                        try singleValueContainer.encode(value.content)
+			try singleValueContainer.encode(value.content)
 		}
 	}
 }

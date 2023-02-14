@@ -62,11 +62,11 @@ extension ClientMessage {
 
 		switch method {
 		case .offer:
-                        return .offer(.init(content: try decoder.decode(RTCPrimitive.Offer.self, from: data), id: sourceClientId))
-                case .answer:
-                        return .answer(.init(content: try decoder.decode(RTCPrimitive.Answer.self, from: data), id: sourceClientId))
-                case .iceCandidate:
-                        return .iceCandidate(.init(content: try decoder.decode(RTCPrimitive.ICECandidate.self, from: data), id: sourceClientId))
+			return .offer(.init(content: try decoder.decode(RTCPrimitive.Offer.self, from: data), id: sourceClientId))
+		case .answer:
+			return .answer(.init(content: try decoder.decode(RTCPrimitive.Answer.self, from: data), id: sourceClientId))
+		case .iceCandidate:
+			return .iceCandidate(.init(content: try decoder.decode(RTCPrimitive.ICECandidate.self, from: data), id: sourceClientId))
 		case .iceCandidates:
 			fatalError()
 		}

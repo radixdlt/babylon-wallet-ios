@@ -15,8 +15,8 @@ struct ClientMessage: Sendable, Codable, Equatable {
 	let requestId: RequestID
 	let method: Method
 	let source: Source
-        let sourceClientId: ClientID
-        let targetClientId: ClientID
+	let sourceClientId: ClientID
+	let targetClientId: ClientID
 	let connectionId: SignalingServerConnectionID
 	let encryptedPayload: EncryptedPayload
 }

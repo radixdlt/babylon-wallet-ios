@@ -2,13 +2,13 @@ import CryptoKit
 @testable import RadixConnect
 import TestingPrelude
 
-// MARK: - PackagesEncodingDecodingTests
+// MARK: - DataChannelMessageEncodingDecodingTests
 @MainActor
 final class DataChannelMessageEncodingDecodingTests: TestCase {
 	let messageID: DataChannelMessage.ID = .init(rawValue: "Id")
 
 	func test_decoding_receiveError() throws {
-                let expectedError = DataChannelMessage.receipt(.receiveMessageError(
+		let expectedError = DataChannelMessage.receipt(.receiveMessageError(
 			.init(messageId: messageID, error: .messageHashesMismatch)
 		))
 		try assertDecoding(of: expectedError)
@@ -36,7 +36,7 @@ final class DataChannelMessageEncodingDecodingTests: TestCase {
 	}
 
 	func test_decoding_encoding_receiveChunk() throws {
-                let expectedChunk = DataChannelMessage.chunkedMessage(.chunk(
+		let expectedChunk = DataChannelMessage.chunkedMessage(.chunk(
 			.init(messageId: messageID, chunkIndex: 3, chunkData: Data())
 		))
 		try assertDecoding(of: expectedChunk)
@@ -105,13 +105,13 @@ extension DataChannelMessage.ChunkedMessage.ChunkPackage {
 extension DataChannelMessage {
 	var json: JSONValue {
 		switch self {
-                case let .chunkedMessage(.metaData(metaData)):
+		case let .chunkedMessage(.metaData(metaData)):
 			return metaData.json
-                case let .chunkedMessage(.chunk(chunk)):
+		case let .chunkedMessage(.chunk(chunk)):
 			return chunk.json
-                case let .receipt(.receiveMessageConfirmation(confirmation)):
+		case let .receipt(.receiveMessageConfirmation(confirmation)):
 			return confirmation.json
-                case let .receipt(.receiveMessageError(error)):
+		case let .receipt(.receiveMessageError(error)):
 			return error.json
 		}
 	}

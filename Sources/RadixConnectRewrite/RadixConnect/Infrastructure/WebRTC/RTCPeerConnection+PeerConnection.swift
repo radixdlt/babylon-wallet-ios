@@ -2,6 +2,8 @@ import WebRTC
 
 // MARK: - WebRTCFactory
 struct WebRTCFactory {
+        struct FailedToCreatePeerConnectionError: Error {}
+
 	static let factory: RTCPeerConnectionFactory = {
 		RTCInitializeSSL()
 		let videoEncoderFactory = RTCDefaultVideoEncoderFactory()
@@ -46,10 +48,14 @@ struct WebRTCFactory {
 		]
 	)
 
-	static func makeRTCPeerConnection(delegate: RTCPeerConnectionDelegate) -> PeerConnection {
-		factory.peerConnection(with: peerConnectionConfig,
+	static func makeRTCPeerConnection(delegate: RTCPeerConnectionDelegate) throws -> PeerConnection {
+		guard let peerConnection = factory.peerConnection(with: peerConnectionConfig,
 		                       constraints: peerConnectionConstraints,
-		                       delegate: delegate)!
+                                                                  delegate: delegate) else {
+                        throw FailedToCreatePeerConnectionError()
+                }
+
+                return peerConnection
 	}
 }
 
@@ -67,13 +73,13 @@ extension RTCPeerConnection: PeerConnection {
 		return DataChannelClient(dataChannel: dataChannel, delegate: delegate)
 	}
 
-        func setLocalAnswer(_ answer: RTCPrimitive.Answer) async throws {
-                try await setLocalDescription(.init(from: answer))
-        }
+	func setLocalAnswer(_ answer: RTCPrimitive.Answer) async throws {
+		try await setLocalDescription(.init(from: answer))
+	}
 
-        func setRemoteOffer(_ offer: RTCPrimitive.Offer) async throws {
-                try await setRemoteDescription(.init(from: offer))
-        }
+	func setRemoteOffer(_ offer: RTCPrimitive.Offer) async throws {
+		try await setRemoteDescription(.init(from: offer))
+	}
 
 	func createLocalOffer() async throws -> RTCPrimitive.Offer {
 		.init(from: try await self.offer(for: .negotiationConstraints))

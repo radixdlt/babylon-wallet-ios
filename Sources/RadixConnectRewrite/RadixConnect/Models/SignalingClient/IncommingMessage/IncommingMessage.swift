@@ -97,10 +97,10 @@ extension IncommingMessage.FromSignalingServer.Notification {
 		}
 	}
 
-        var remoteClientId: ClientID {
-                switch self {
-                case let .remoteClientDisconnected(id), let .remoteClientIsAlreadyConnected(id), let .remoteClientJustConnected(id):
-                        return id
-                }
-        }
+	var remoteClientId: ClientID {
+		switch self {
+		case let .remoteClientDisconnected(id), let .remoteClientIsAlreadyConnected(id), let .remoteClientJustConnected(id):
+			return id
+		}
+	}
 }

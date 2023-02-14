@@ -23,7 +23,7 @@ struct SignalingClient {
 	private let jsonEncoder: JSONEncoder
 	private let connectionID: SignalingServerConnectionID
 	private let idBuilder: @Sendable () -> RequestID
-        private let ownClientId: ClientID
+	private let ownClientId: ClientID
 
 	// MARK: - Streams
 	private let incommingMessages: AnyAsyncSequence<IncommingMessage>
@@ -41,7 +41,7 @@ struct SignalingClient {
 	     webSocketClient: WebSocketClient,
 	     connectionID: SignalingServerConnectionID,
 	     idBuilder: @Sendable @escaping () -> RequestID = { .init(UUID().uuidString) },
-             ownClientId: ClientID = .init(UUID().uuidString),
+	     ownClientId: ClientID = .init(UUID().uuidString),
 	     jsonDecoder: JSONDecoder = .init(),
 	     jsonEncoder: JSONEncoder = .init())
 	{
@@ -49,7 +49,7 @@ struct SignalingClient {
 		self.webSocketClient = webSocketClient
 		self.connectionID = connectionID
 		self.idBuilder = idBuilder
-                self.ownClientId = ownClientId
+		self.ownClientId = ownClientId
 		self.jsonEncoder = jsonEncoder
 		self.jsonDecoder = jsonDecoder
 
@@ -107,8 +107,8 @@ struct SignalingClient {
 		let message = ClientMessage(requestId: id,
 		                            method: .init(from: rtcPrimitive),
 		                            source: .wallet,
-                                            sourceClientId: ownClientId,
-                                            targetClientId: rtcPrimitive.clientId,
+		                            sourceClientId: ownClientId,
+		                            targetClientId: rtcPrimitive.clientId,
 		                            connectionId: connectionID,
 		                            encryptedPayload: encryptedPayload)
 

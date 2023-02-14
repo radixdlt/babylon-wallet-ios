@@ -36,7 +36,7 @@ extension IncommingMessage {
 extension IncommingMessage: Decodable {
 	enum CodingKeys: String, CodingKey {
 		case responseType = "info", requestId, error,
-                     source = "target", message = "data", remoteClientId
+		     source = "target", message = "data", remoteClientId
 	}
 
 	init(from decoder: Decoder) throws {
@@ -48,13 +48,13 @@ extension IncommingMessage: Decodable {
 			self = try .fromRemoteClient(container.decode(ClientMessage.self, forKey: .message))
 
 		case .remoteClientJustConnected:
-                        let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
+			let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
 			self = .fromSignalingServer(.notification(.remoteClientJustConnected(clientId)))
 		case .remoteClientIsAlreadyConnected:
-                        let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
+			let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
 			self = .fromSignalingServer(.notification(.remoteClientIsAlreadyConnected(clientId)))
 		case .remoteClientDisconnected:
-                        let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
+			let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)
 			self = .fromSignalingServer(.notification(.remoteClientDisconnected(clientId)))
 
 		case .missingRemoteClientError:
