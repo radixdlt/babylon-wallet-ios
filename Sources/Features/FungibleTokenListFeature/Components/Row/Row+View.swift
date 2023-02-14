@@ -95,7 +95,7 @@ extension FungibleTokenList.Row.View {
 		guard let amount else {
 			return "-"
 		}
-		return String(describing: amount)
+		return amount.format()
 	}
 
 	fileprivate func tokenValue(_ value: BigDecimal?, isVisible: Bool, currency: FiatCurrency) -> String {
