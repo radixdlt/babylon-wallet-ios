@@ -12,7 +12,7 @@ extension FiatCurrency {
 	func formattedWith(
 		amount formattedAmount: String
 	) -> String {
-		let components = formattingPlacement == .leading ? [symbol, formattedAmount] : [formattedAmount, sign]
+		let components = formattingPlacement == .leading ? [sign, formattedAmount] : [formattedAmount, sign]
 		return components.joined(separator: separatorWithAmount)
 	}
 }
