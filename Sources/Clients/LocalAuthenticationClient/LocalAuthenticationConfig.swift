@@ -20,30 +20,30 @@ public struct LocalAuthenticationConfig: Equatable, Sendable, CustomStringConver
 	}
 }
 
-public extension LocalAuthenticationConfig {
-	static let biometricsAndPasscodeSetUp = Self(
+extension LocalAuthenticationConfig {
+	public static let biometricsAndPasscodeSetUp = Self(
 		isPasscodeSetUp: true,
 		isBiometricsSetUp: true
 	)
 
-	static let neitherBiometricsNorPasscodeSetUp = Self(
+	public static let neitherBiometricsNorPasscodeSetUp = Self(
 		isPasscodeSetUp: false,
 		isBiometricsSetUp: false // irrelevant
 	)
 
-	static let passcodeSetUpButNotBiometrics = Self(
+	public static let passcodeSetUpButNotBiometrics = Self(
 		isPasscodeSetUp: true,
 		isBiometricsSetUp: false
 	)
 
-	static let passcodeSetUpButBiometricsIsUnknown = Self(
+	public static let passcodeSetUpButBiometricsIsUnknown = Self(
 		isPasscodeSetUp: true,
 		isBiometricsSetUp: nil
 	)
 }
 
-public extension LocalAuthenticationConfig {
-	var description: String {
+extension LocalAuthenticationConfig {
+	public var description: String {
 		switch (isPasscodeSetUp, isBiometricsSetUp) {
 		case (true, .some(true)):
 			return "Biometrics (and passcode)"

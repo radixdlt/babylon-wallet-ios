@@ -2,9 +2,9 @@ import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - PersonasCoordinator.View
-public extension PersonasCoordinator {
+extension PersonasCoordinator {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<PersonasCoordinator>
 
 		public init(store: StoreOf<PersonasCoordinator>) {
@@ -13,8 +13,8 @@ public extension PersonasCoordinator {
 	}
 }
 
-public extension PersonasCoordinator.View {
-	var body: some View {
+extension PersonasCoordinator.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

@@ -11,8 +11,8 @@ extension LocalAuthenticationClient: DependencyKey {
 }
 
 // MARK: - LocalAuthenticationClient.Error
-public extension LocalAuthenticationClient {
-	enum Error: Swift.Error, Equatable {
+extension LocalAuthenticationClient {
+	public enum Error: Swift.Error, Equatable {
 		case contextDeinitialized
 		case queryCancelled
 		case evaluationError(LAError)
@@ -21,10 +21,10 @@ public extension LocalAuthenticationClient {
 	}
 }
 
-private extension LAContext {
-	typealias Error = LocalAuthenticationClient.Error
+extension LAContext {
+	fileprivate typealias Error = LocalAuthenticationClient.Error
 
-	func canEvaluate(
+	private func canEvaluate(
 		policy: LAPolicy,
 		errorHandling: (LAError) -> Result<Bool, Error>?
 	) async throws -> Bool {
@@ -63,7 +63,7 @@ private extension LAContext {
 		}
 	}
 
-	func evaluateIfPasscodeIsSetUp() async throws -> Bool {
+	private func evaluateIfPasscodeIsSetUp() async throws -> Bool {
 		try await canEvaluate(policy: .deviceOwnerAuthentication) { laError in
 			switch laError.code {
 			case .appCancel, .userCancel:
@@ -78,7 +78,7 @@ private extension LAContext {
 		}
 	}
 
-	func evaluateIfBiometricsIsSetUp() async throws -> Bool {
+	private func evaluateIfBiometricsIsSetUp() async throws -> Bool {
 		try await canEvaluate(policy: .deviceOwnerAuthenticationWithBiometrics) { laError in
 			switch laError.code {
 			case .appCancel, .userCancel:
@@ -94,7 +94,7 @@ private extension LAContext {
 	}
 
 	// Returns `nil` if user presses "cancel" button
-	func queryLocalAuthenticationConfig() async throws -> LocalAuthenticationConfig {
+	fileprivate func queryLocalAuthenticationConfig() async throws -> LocalAuthenticationConfig {
 		let passcodeSupportedResult = try await evaluateIfPasscodeIsSetUp()
 
 		guard passcodeSupportedResult else {

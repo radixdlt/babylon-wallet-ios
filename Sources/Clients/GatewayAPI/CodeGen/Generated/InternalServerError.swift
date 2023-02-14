@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias InternalServerError = GatewayAPI.InternalServerError
 
 // MARK: - GatewayAPI.InternalServerError
-public extension GatewayAPI {
-	struct InternalServerError: Codable, Hashable {
+extension GatewayAPI {
+	public struct InternalServerError: Codable, Hashable {
 		/** The type of error. Each subtype may have its own additional structured fields. */
 		public private(set) var type: String
 		/** Gives an error type which occurred within the Gateway API when serving the request. */

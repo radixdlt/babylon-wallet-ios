@@ -30,29 +30,29 @@ public final class WebRTCClient: WebRTCPeerConnectionDelegate, WebRTCDataChannel
 	}
 }
 
-public extension WebRTCClient {
-	var negotiatePublisher: AnyPublisher<Void, Never> {
+extension WebRTCClient {
+	public var negotiatePublisher: AnyPublisher<Void, Never> {
 		negotiateSubject.eraseToAnyPublisher()
 	}
 
-	var locallyICECandidatePublisher: AnyPublisher<WebRTCICECandidate, ConverseError> {
+	public var locallyICECandidatePublisher: AnyPublisher<WebRTCICECandidate, ConverseError> {
 		locallyICECandidateSubject.eraseToAnyPublisher()
 	}
 
-	var incomingMessagePublisher: AnyPublisher<IncomingWebRTCMessage, ConverseError> {
+	public var incomingMessagePublisher: AnyPublisher<IncomingWebRTCMessage, ConverseError> {
 		incomingMessageSubject.eraseToAnyPublisher()
 	}
 
-	var connectionStatusChangePublisher: AnyPublisher<ConnectionStatusChangeEvent, ConverseError> {
+	public var connectionStatusChangePublisher: AnyPublisher<ConnectionStatusChangeEvent, ConverseError> {
 		connectionStatusChangeSubject.eraseToAnyPublisher()
 	}
 
-	func close() {
+	public func close() {
 		wrapped?.close()
 		wrapped = nil
 	}
 
-	func createOffer(callback: @escaping CreateOfferCallback) {
+	public func createOffer(callback: @escaping CreateOfferCallback) {
 		guard let wrapped else {
 			let error = ConverseError.WebRTC.wrappedPeerConnectionAndChannelIsNilProbablySinceCloseHasBeenCalled
 			loggerGlobal.error("Failed to create offer, wrapped PeerConnectionAndChannel is nil (probably since 'close' was called on it.)")
@@ -63,8 +63,8 @@ public extension WebRTCClient {
 	}
 }
 
-private extension WebRTCClient {
-	func emit(
+extension WebRTCClient {
+	private func emit(
 		connectionStatus: ConnectionStatus,
 		source: ConnectionStatusChangeEvent.Source
 	) {
@@ -78,8 +78,8 @@ private extension WebRTCClient {
 	}
 }
 
-public extension WebRTCClient {
-	func sendData(_ data: Data) throws {
+extension WebRTCClient {
+	public func sendData(_ data: Data) throws {
 		guard let wrapped else {
 			throw ConverseError.WebRTC.wrappedPeerConnectionAndChannelIsNilProbablySinceCloseHasBeenCalled
 		}
@@ -88,12 +88,12 @@ public extension WebRTCClient {
 }
 
 // MARK: WebRTCDataChannelDelegate
-public extension WebRTCClient {
-	var dataChannelLabelledID: DataChannelLabelledID {
+extension WebRTCClient {
+	public var dataChannelLabelledID: DataChannelLabelledID {
 		webRTCConfig.dataChannelConfig.dataChannelLabelledID
 	}
 
-	func dataChannel(
+	public func dataChannel(
 		labelledID: DataChannelLabelledID,
 		didChangeReadyState dataChannelReadyState: DataChannelState
 	) {
@@ -109,7 +109,7 @@ public extension WebRTCClient {
 		emit(connectionStatus: connectionStatus, source: .dataChannelReadyState(channelID: labelledID, dataChannelReadyState: dataChannelReadyState))
 	}
 
-	func dataChannel(
+	public func dataChannel(
 		labelledID: DataChannelLabelledID,
 		didReceiveMessageData messageData: Data
 	) {
@@ -133,8 +133,8 @@ public extension WebRTCClient {
 
 // MARK: WebRTCPeerConnectionDelegate
 
-public extension WebRTCClient {
-	func dataChannelReadyState() throws -> DataChannelState {
+extension WebRTCClient {
+	public func dataChannelReadyState() throws -> DataChannelState {
 		guard let wrapped else {
 			let error = ConverseError.WebRTC.wrappedPeerConnectionAndChannelIsNilProbablySinceCloseHasBeenCalled
 			loggerGlobal.error("Failed to query DataChannel readyState, wrapped PeerConnectionAndChannel is nil (probably since 'close' was called on it.)")
@@ -143,26 +143,26 @@ public extension WebRTCClient {
 		return try wrapped.dataChannelReadyState()
 	}
 
-	func peerConnection(
+	public func peerConnection(
 		id: P2PConnectionID,
 		didChangeICEGatheringState iceGatheringState: ICEGatheringState
 	) {
 		loggerGlobal.debug("NOOP: didChangeICEGatheringState => \(iceGatheringState), id=\(id)")
 	}
 
-	func peerConnection(
+	public func peerConnection(
 		id: P2PConnectionID,
 		didChangeSignalingState signalingState: SignalingState
 	) {
 		loggerGlobal.debug("NOOP: signalingState => \(signalingState), id=\(id)")
 	}
 
-	func peerConnectionShouldNegotiate(id: P2PConnectionID) {
+	public func peerConnectionShouldNegotiate(id: P2PConnectionID) {
 		loggerGlobal.debug("peerConnectionShouldNegotiate, id=\(id)")
 		negotiateSubject.send(())
 	}
 
-	func peerConnection(
+	public func peerConnection(
 		id: P2PConnectionID,
 		didChangeICEConnectionState iceConnectionState: ICEConnectionState
 	) {
@@ -173,7 +173,7 @@ public extension WebRTCClient {
 		emit(connectionStatus: connectionStatus, source: .iceConnection)
 	}
 
-	func peerConnection(
+	public func peerConnection(
 		id: P2PConnectionID,
 		didGenerateICECandidate iceCandidate: WebRTCICECandidate
 	) {
@@ -187,7 +187,7 @@ public extension WebRTCClient {
 		locallyICECandidateSubject.send(iceCandidate)
 	}
 
-	func peerConnection(
+	public func peerConnection(
 		id: P2PConnectionID,
 		didChangePeerConnectionState peerConnectionState: PeerConnectionState
 	) {
@@ -201,28 +201,28 @@ public extension WebRTCClient {
 		emit(connectionStatus: connectionStatus, source: .peerConnection)
 	}
 
-	func peerConnection(
+	public func peerConnection(
 		id: P2PConnectionID,
 		didRemoveICECandidates iceCandidates: [WebRTCICECandidate]
 	) {
 		loggerGlobal.debug("NOOP: didRemoveICECandidates, id=\(id)")
 	}
 
-	func peerConnection(
+	public func peerConnection(
 		id: P2PConnectionID,
 		didAddStreamWithID streamID: String
 	) {
 		loggerGlobal.debug("NOOP: didAddStreamWithID, connection id=\(id)")
 	}
 
-	func peerConnection(
+	public func peerConnection(
 		id: P2PConnectionID,
 		didRemoveStreamWithID streamID: String
 	) {
 		loggerGlobal.debug("NOOP: didRemoveStreamWithID, connection id=\(id)")
 	}
 
-	func peerConnection(
+	public func peerConnection(
 		id: P2PConnectionID,
 		didOpenDataChannel labelledID: DataChannelLabelledID
 	) {

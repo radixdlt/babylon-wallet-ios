@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionRecentRequestAllOf = GatewayAPI.TransactionRecentRequestAllOf
 
 // MARK: - GatewayAPI.TransactionRecentRequestAllOf
-public extension GatewayAPI {
-	struct TransactionRecentRequestAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionRecentRequestAllOf: Codable, Hashable {
 		public private(set) var fromLedgerState: LedgerStateSelector?
 		/** This cursor allows forward pagination, by providing the cursor from the previous request. */
 		public private(set) var cursor: String?

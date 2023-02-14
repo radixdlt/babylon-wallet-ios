@@ -3,9 +3,9 @@ import LocalAuthenticationClient
 import ProfileClient
 
 // MARK: - Splash.Action
-public extension Splash {
+extension Splash {
 	// MARK: Action
-	enum Action: Sendable, Equatable {
+	public enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -13,8 +13,8 @@ public extension Splash {
 }
 
 // MARK: - Splash.Action.ViewAction
-public extension Splash.Action {
-	enum ViewAction: Sendable, Equatable {
+extension Splash.Action {
+	public enum ViewAction: Sendable, Equatable {
 		public enum BiometricsCheckFailedAlertAction: Sendable, Equatable {
 			case dismissed
 			case cancelButtonTapped
@@ -27,24 +27,24 @@ public extension Splash.Action {
 }
 
 // MARK: - Splash.Action.InternalAction
-public extension Splash.Action {
-	enum InternalAction: Sendable, Equatable {
+extension Splash.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
 // MARK: - Splash.Action.SystemAction
-public extension Splash.Action {
-	enum SystemAction: Sendable, Equatable {
+extension Splash.Action {
+	public enum SystemAction: Sendable, Equatable {
 		case biometricsConfigResult(TaskResult<LocalAuthenticationConfig>)
 		case loadProfileResult(ProfileClient.LoadProfileResult)
 	}
 }
 
 // MARK: - Splash.Action.DelegateAction
-public extension Splash.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension Splash.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case profileResultLoaded(ProfileClient.LoadProfileResult)
 	}
 }

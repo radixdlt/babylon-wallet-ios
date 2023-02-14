@@ -8,12 +8,12 @@ public protocol AddressProtocol {
 	var address: String { get }
 }
 
-public extension AddressProtocol where Self: Identifiable, ID == String {
-	var id: String { address }
+extension AddressProtocol where Self: Identifiable, ID == String {
+	public var id: String { address }
 }
 
-public extension CustomStringConvertible where Self: AddressProtocol {
-	var description: String {
+extension CustomStringConvertible where Self: AddressProtocol {
+	public var description: String {
 		address
 	}
 }
@@ -35,13 +35,13 @@ public protocol AddressKindProtocol: AddressProtocol, Codable {
 	static func unwrap(address: Address) -> Self?
 }
 
-public extension AddressKindProtocol {
-	init(from decoder: Decoder) throws {
+extension AddressKindProtocol {
+	public init(from decoder: Decoder) throws {
 		let singleValueContainer = try decoder.singleValueContainer()
 		try self.init(address: singleValueContainer.decode(String.self))
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var singleValueContainer = encoder.singleValueContainer()
 		try singleValueContainer.encode(self.address)
 	}

@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - CameraPermission.View
-public extension CameraPermission {
+extension CameraPermission {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<CameraPermission>
 
 		public init(store: StoreOf<CameraPermission>) {
@@ -12,8 +12,8 @@ public extension CameraPermission {
 	}
 }
 
-public extension CameraPermission.View {
-	var body: some View {
+extension CameraPermission.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

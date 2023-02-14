@@ -2,40 +2,7 @@ import EngineToolkitClient
 import FeaturePrelude
 import TransactionClient
 
-// MARK: - ApproveTransactionFailure
-public enum ApproveTransactionFailure: Sendable, LocalizedError, Equatable {
-	public enum PrepareTransactionFailure: Sendable, LocalizedError, Equatable {
-		public static func == (lhs: Self, rhs: Self) -> Bool {
-			lhs.errorDescription == rhs.errorDescription
-		}
-
-		case addTransactionFee(Swift.Error)
-		public var errorDescription: String? {
-			switch self {
-			case let .addTransactionFee(error):
-				let message = "Failed to add fee to transaction manifest"
-				guard let engineToolkitError = error as? EngineToolkit.Error else {
-					return message
-				}
-				return "\(message), engine toolkit: \(String(describing: engineToolkitError.errorDescription))"
-			}
-		}
-	}
-
-	case prepareTransactionFailure(PrepareTransactionFailure)
-	case transactionFailure(TransactionFailure)
-
-	public var errorDescription: String? {
-		switch self {
-		case let .prepareTransactionFailure(error):
-			return error.localizedDescription
-		case let .transactionFailure(error):
-			return error.localizedDescription
-		}
-	}
-}
-
-public extension EngineToolkit.Error {
+extension EngineToolkit.Error {
 	var errorDescription: String? {
 		switch self {
 		case let .callLibraryFunctionFailure(callLibraryFunctionFailure):

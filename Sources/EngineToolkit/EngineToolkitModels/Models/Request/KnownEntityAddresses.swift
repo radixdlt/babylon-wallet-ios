@@ -9,18 +9,18 @@ public struct KnownEntityAddressesRequest: Sendable, Codable, Hashable {
 	}
 }
 
-public extension KnownEntityAddressesRequest {
+extension KnownEntityAddressesRequest {
 	private enum CodingKeys: String, CodingKey {
 		case publicKey = "public_key"
 		case networkId = "network_id"
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(String(networkId), forKey: .networkId)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let networkId: UInt8 = try decodeAndConvertToNumericType(container: container, key: .networkId)
 		self.init(networkId: NetworkID(networkId))
@@ -73,3 +73,20 @@ public struct KnownEntityAddressesResponse: Sendable, Codable, Hashable {
 		case epochManagerSystemAddress = "epoch_manager_system_address"
 	}
 }
+
+#if DEBUG
+extension KnownEntityAddressesResponse {
+	public static let previewValue = Self.nebunet
+	public static let nebunet = Self(
+		faucetComponentAddress: "component_tdx_b_1qftacppvmr9ezmekxqpq58en0nk954x0a7jv2zz0hc7qdxyth4",
+		faucetPackageAddress: "unknown",
+		accountPackageAddress: "package_tdx_b_1qy4hrp8a9apxldp5cazvxgwdj80cxad4u8cpkaqqnhlssf7lg2",
+		xrdResourceAddress: "resource_tdx_b_1qzkcyv5dwq3r6kawy6pxpvcythx8rh8ntum6ws62p95s9hhz9x",
+		systemTokenResourceAddress: "unknown",
+		ecdsaSecp256k1TokenResourceAddress: "resource_tdx_b_1qzu3wdlw3fx7t82fmt2qme2kpet4g3n2epx02sew49wsp8mlue",
+		eddsaEd25519TokenResourceAddress: "resource_tdx_b_1qq8cays25704xdyap2vhgmshkkfyr023uxdtk59ddd4q4zaqlf",
+		packageTokenResourceAddress: "unknown",
+		epochManagerSystemAddress: "system_tdx_b_1qne8qu4seyvzfgd94p3z8rjcdl3v0nfhv84judpum2lq328939"
+	)
+}
+#endif // DEBUG

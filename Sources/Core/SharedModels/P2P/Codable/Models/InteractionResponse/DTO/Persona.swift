@@ -1,7 +1,7 @@
 import Prelude
 
-public extension P2P.ToDapp {
-	struct Persona: Sendable, Hashable, Encodable {
+extension P2P.ToDapp {
+	public struct Persona: Sendable, Hashable, Encodable {
 		public let identityAddress: String
 		public let label: String
 

@@ -66,16 +66,14 @@ public struct FungibleTokenContainer: Sendable, AssetContainer, Hashable {
 	public let owner: AccountAddress
 	public var asset: FungibleToken
 
-	// TODO: replace String type with appropriate numeric type with 0b2^256 / 0d1e18 ~ 1e60 support
-	/// Token amount held in one account, expressed as regular decimal value, for example: 105.78 XRD
-	public var amount: String?
+	public var amount: BigDecimal
 	/// Token worth in currently selected currency.
 	public var worth: BigDecimal?
 
 	public init(
 		owner: AccountAddress,
 		asset: FungibleToken,
-		amount: String?,
+		amount: BigDecimal,
 		worth: BigDecimal?
 	) {
 		self.owner = owner
@@ -85,24 +83,11 @@ public struct FungibleTokenContainer: Sendable, AssetContainer, Hashable {
 	}
 }
 
-// TODO: delete this when support for big decimals is added
-public extension FungibleTokenContainer {
-	var unsafeFailingAmountWithoutPrecision: Float {
-		if let amount = amount,
-		   let floatAmount = Float(amount)
-		{
-			return floatAmount
-		} else {
-			return 0
-		}
-	}
-}
-
 #if DEBUG
-public extension FungibleToken {
+extension FungibleToken {
 	/// The native token of the Radix Ledger
-	static let xrd = Self(
-		componentAddress: "resource_tdx_22_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqj3nwpk",
+	public static let xrd = Self(
+		componentAddress: "resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9",
 		divisibility: 18,
 		totalSupply: 24_000_000_000,
 		totalMinted: 0,
@@ -114,7 +99,7 @@ public extension FungibleToken {
 		tokenInfoURL: "https://tokens.radixdlt.com"
 	)
 
-	static let btc = Self(
+	public static let btc = Self(
 		componentAddress: "btc-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -126,7 +111,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let dot = Self(
+	public static let dot = Self(
 		componentAddress: "dot-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -138,7 +123,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let eth = Self(
+	public static let eth = Self(
 		componentAddress: "eth-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -150,7 +135,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let ltc = Self(
+	public static let ltc = Self(
 		componentAddress: "ltc-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -162,7 +147,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let sol = Self(
+	public static let sol = Self(
 		componentAddress: "sol-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -174,7 +159,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let usdt = Self(
+	public static let usdt = Self(
 		componentAddress: "usdt-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,
@@ -186,7 +171,7 @@ public extension FungibleToken {
 		isXRD: false
 	)
 
-	static let xrp = Self(
+	public static let xrp = Self(
 		componentAddress: "xrp-deadbeef",
 		divisibility: 18,
 		totalSupply: 0,

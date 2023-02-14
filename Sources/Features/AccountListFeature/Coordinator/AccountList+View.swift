@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - AccountList.View
-public extension AccountList {
+extension AccountList {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -15,8 +15,8 @@ public extension AccountList {
 	}
 }
 
-public extension AccountList.View {
-	var body: some View {
+extension AccountList.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

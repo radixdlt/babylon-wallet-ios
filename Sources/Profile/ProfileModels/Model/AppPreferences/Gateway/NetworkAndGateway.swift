@@ -1,8 +1,8 @@
 import Prelude
 
 // MARK: - AppPreferences.NetworkAndGateway
-public extension AppPreferences {
-	struct NetworkAndGateway:
+extension AppPreferences {
+	public struct NetworkAndGateway:
 		Sendable,
 		Hashable,
 		Codable,
@@ -19,31 +19,31 @@ public extension AppPreferences {
 	}
 }
 
-public extension AppPreferences.NetworkAndGateway {
+extension AppPreferences.NetworkAndGateway {
 	/// `"https://betanet.radixdlt.com"`
 	/// you can also use `"https://nebunet-gateway.radixdlt.com"`
-	static var nebunet: Self {
+	public static var nebunet: Self {
 		.init(
 			network: .nebunet,
 			gatewayAPIEndpointURL: URL(string: "https://betanet.radixdlt.com")!
 		)
 	}
 
-	static var hammunet: Self {
+	public static var hammunet: Self {
 		.init(
 			network: .hammunet,
 			gatewayAPIEndpointURL: URL(string: "https://hammunet-gateway.radixdlt.com")!
 		)
 	}
 
-	static var enkinet: Self {
+	public static var enkinet: Self {
 		.init(
 			network: .enkinet,
 			gatewayAPIEndpointURL: URL(string: "https://enkinet-gateway.radixdlt.com")!
 		)
 	}
 
-	static var mardunet: Self {
+	public static var mardunet: Self {
 		.init(
 			network: .mardunet,
 			gatewayAPIEndpointURL: URL(string: "https://mardunet-gateway.radixdlt.com")!
@@ -51,8 +51,8 @@ public extension AppPreferences.NetworkAndGateway {
 	}
 }
 
-public extension AppPreferences.NetworkAndGateway {
-	var customDumpMirror: Mirror {
+extension AppPreferences.NetworkAndGateway {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -63,7 +63,7 @@ public extension AppPreferences.NetworkAndGateway {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		network: \(network),
 		gatewayAPIEndpointURL: \(gatewayAPIEndpointURL)

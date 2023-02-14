@@ -6,8 +6,8 @@ public protocol ValueProtocol {
 	func embedValue() -> Value_
 }
 
-public extension ValueProtocol {
-	var kind: ValueKind { Self.kind }
+extension ValueProtocol {
+	public var kind: ValueKind { Self.kind }
 }
 
 // MARK: - Value_
@@ -70,12 +70,12 @@ public indirect enum Value_: Sendable, Codable, Hashable {
 	case bytes(Bytes)
 }
 
-public extension Value_ {
+extension Value_ {
 	// ===========
 	// Value Kind
 	// ===========
 
-	var kind: ValueKind {
+	public var kind: ValueKind {
 		switch self {
 		case .boolean:
 			return .bool
@@ -183,7 +183,7 @@ public extension Value_ {
 	}
 }
 
-public extension Value_ {
+extension Value_ {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -192,7 +192,7 @@ public extension Value_ {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		switch self {
 		case let .boolean(value):
 			// `Bool` is already `Codable` so we have to go through its proxy type for JSON coding.
@@ -312,7 +312,7 @@ public extension Value_ {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)

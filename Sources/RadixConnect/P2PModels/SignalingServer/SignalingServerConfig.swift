@@ -16,12 +16,12 @@ public struct SignalingServerConfig: Sendable, Hashable, Codable {
 	public static let `default` = Self()
 }
 
-public extension URL {
-	static let defaultBaseForSignalingServer = Self(string: "wss://signaling-server-betanet.radixdlt.com")!
+extension URL {
+	public static let defaultBaseForSignalingServer = Self(string: "wss://signaling-server-betanet.radixdlt.com")!
 }
 
-public extension SignalingServerConfig {
-	func signalingServerURL(
+extension SignalingServerConfig {
+	public func signalingServerURL(
 		connectionID: P2PConnectionID,
 		source: ClientSource = .mobileWallet
 	) throws -> URL {
@@ -57,14 +57,14 @@ public extension SignalingServerConfig {
 }
 
 // MARK: - SignalingServerConfig.QueryParameterName
-private extension SignalingServerConfig {
-	enum QueryParameterName: String {
+extension SignalingServerConfig {
+	fileprivate enum QueryParameterName: String {
 		case target, source
 	}
 }
 
 #if DEBUG
-public extension SignalingServerConfig {
-	static let placeholder = Self.default
+extension SignalingServerConfig {
+	public static let placeholder = Self.default
 }
 #endif // DEBUG

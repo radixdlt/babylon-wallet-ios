@@ -14,8 +14,8 @@ public struct ChunkingTransportSentReceipt: Sendable, Hashable, CustomStringConv
 	}
 }
 
-public extension ChunkingTransportSentReceipt {
-	var description: String {
+extension ChunkingTransportSentReceipt {
+	public var description: String {
 		"""
 		confirmedReceivedAt: \(confirmedReceivedAt),
 		messageSent: \(messageSent)

@@ -2,8 +2,8 @@ import Foundation
 import P2PModels
 import WebRTC
 
-internal extension ICEGatheringState {
-	init(rtcIceGatheringState: RTCIceGatheringState) throws {
+extension ICEGatheringState {
+	internal init(rtcIceGatheringState: RTCIceGatheringState) throws {
 		switch rtcIceGatheringState {
 		case .complete: self = .complete
 		case .gathering: self = .gathering

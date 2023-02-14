@@ -1,8 +1,8 @@
 import Prelude
 import ProfileModels
 
-public extension OnNetwork.Account {
-	static let testValue = try! Self(
+extension OnNetwork.Account {
+	public static let testValue = try! Self(
 		networkID: .nebunet,
 		address: .init(
 			address: "account_tdx_a_1qwv0unmwmxschqj8sntg6n9eejkrr6yr6fa4ekxazdzqhm6wy5"

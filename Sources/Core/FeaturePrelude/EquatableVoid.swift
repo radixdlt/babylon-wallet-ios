@@ -8,8 +8,8 @@ public struct EquatableVoid: Sendable, Equatable {
 	public init() {}
 }
 
-public extension TaskResult where Success == EquatableVoid {
-	init(catching body: @Sendable () async throws -> Void) async {
+extension TaskResult where Success == EquatableVoid {
+	public init(catching body: @Sendable () async throws -> Void) async {
 		do {
 			try await body()
 			self = .success(EquatableVoid())

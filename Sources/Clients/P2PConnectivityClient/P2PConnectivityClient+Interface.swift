@@ -1,8 +1,8 @@
 import ClientPrelude
 
 // MARK: - DependencyValues
-public extension DependencyValues {
-	var p2pConnectivityClient: P2PConnectivityClient {
+extension DependencyValues {
+	public var p2pConnectivityClient: P2PConnectivityClient {
 		get { self[P2PConnectivityClient.self] }
 		set { self[P2PConnectivityClient.self] = newValue }
 	}
@@ -35,28 +35,28 @@ public struct P2PConnectivityClient: DependencyKey, Sendable {
 	public var _debugDataChannelStatusAsyncSequence: DebugGetDataChannelStatusAsyncSequence
 }
 
-public extension P2PConnectivityClient {
-	typealias LoadFromProfileAndConnectAll = @Sendable () async throws -> Void
-	typealias DisconnectAndRemoveAll = @Sendable () async -> Void
+extension P2PConnectivityClient {
+	public typealias LoadFromProfileAndConnectAll = @Sendable () async throws -> Void
+	public typealias DisconnectAndRemoveAll = @Sendable () async -> Void
 
-	typealias GetAsyncSequenceOfByP2PClientID<Value> = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<Value>
+	public typealias GetAsyncSequenceOfByP2PClientID<Value> = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<Value>
 
-	typealias GetLocalNetworkAccess = @Sendable () async -> Bool
+	public typealias GetLocalNetworkAccess = @Sendable () async -> Bool
 
-	typealias GetP2PClientIDs = @Sendable () async throws -> AnyAsyncSequence<OrderedSet<P2PClient.ID>>
-	typealias GetP2PClientsByIDs = @Sendable (OrderedSet<P2PClient.ID>) async throws -> OrderedSet<P2PClient>
+	public typealias GetP2PClientIDs = @Sendable () async throws -> AnyAsyncSequence<OrderedSet<P2PClient.ID>>
+	public typealias GetP2PClientsByIDs = @Sendable (OrderedSet<P2PClient.ID>) async throws -> OrderedSet<P2PClient>
 
-	typealias AddP2PClientWithConnection = @Sendable (P2PClient) async throws -> Void
-	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
+	public typealias AddP2PClientWithConnection = @Sendable (P2PClient) async throws -> Void
+	public typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 
-	typealias GetConnectionStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<P2P.ClientWithConnectionStatus>
-	typealias GetRequestsFromP2PClientAsyncSequence = GetAsyncSequenceOfByP2PClientID<P2P.RequestFromClient>
+	public typealias GetConnectionStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<P2P.ClientWithConnectionStatus>
+	public typealias GetRequestsFromP2PClientAsyncSequence = GetAsyncSequenceOfByP2PClientID<P2P.RequestFromClient>
 
-	typealias SendMessageReadReceipt = @Sendable (P2PClient.ID, P2PConnections.IncomingMessage) async throws -> Void
-	typealias SendMessage = @Sendable (P2P.ResponseToClientByID) async throws -> P2P.SentResponseToClient
+	public typealias SendMessageReadReceipt = @Sendable (P2PClient.ID, P2PConnections.IncomingMessage) async throws -> Void
+	public typealias SendMessage = @Sendable (P2P.ResponseToClientByID) async throws -> P2P.SentResponseToClient
 
 	// MARK: Debug functionality
-	typealias _SendTestMessage = @Sendable (P2PClient.ID, String) async throws -> Void
-	typealias DebugGetWebsocketStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<WebSocketState>
-	typealias DebugGetDataChannelStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<DataChannelState>
+	public typealias _SendTestMessage = @Sendable (P2PClient.ID, String) async throws -> Void
+	public typealias DebugGetWebsocketStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<WebSocketState>
+	public typealias DebugGetDataChannelStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<DataChannelState>
 }

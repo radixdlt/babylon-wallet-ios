@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionCommittedDetailsResponseAllOf = GatewayAPI.TransactionCommittedDetailsResponseAllOf
 
 // MARK: - GatewayAPI.TransactionCommittedDetailsResponseAllOf
-public extension GatewayAPI {
-	struct TransactionCommittedDetailsResponseAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionCommittedDetailsResponseAllOf: Codable, Hashable {
 		public private(set) var transaction: CommittedTransactionInfo
 		public private(set) var details: TransactionCommittedDetailsResponseDetails
 

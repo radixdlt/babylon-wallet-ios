@@ -2,6 +2,6 @@ import Cryptography
 import EngineToolkitModels
 import Prelude
 
-public extension NetworkID {
-	var derivationPathComponentNonHardenedValue: HD.Path.Component.Child.Value { .init(self.rawValue) }
+extension NetworkID {
+	public var derivationPathComponentNonHardenedValue: HD.Path.Component.Child.Value { .init(self.rawValue) }
 }

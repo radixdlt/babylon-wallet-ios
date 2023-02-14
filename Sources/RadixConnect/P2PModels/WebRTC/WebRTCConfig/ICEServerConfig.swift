@@ -21,8 +21,8 @@ public struct ICEServerConfig: Sendable, Hashable, Codable, CustomStringConverti
 	}
 }
 
-public extension ICEServerConfig {
-	var description: String {
+extension ICEServerConfig {
+	public var description: String {
 		"""
 		url: \(url),
 		credentials: \(String(describing: credentials))
@@ -31,8 +31,8 @@ public extension ICEServerConfig {
 }
 
 // MARK: ICEServerConfig.Credentials
-public extension ICEServerConfig {
-	struct Credentials: Sendable, Hashable, Codable, CustomStringConvertible {
+extension ICEServerConfig {
+	public struct Credentials: Sendable, Hashable, Codable, CustomStringConvertible {
 		public let username: String
 		public let password: String
 		public init(username: String, password: String) {
@@ -42,8 +42,8 @@ public extension ICEServerConfig {
 	}
 }
 
-public extension ICEServerConfig.Credentials {
-	var description: String {
+extension ICEServerConfig.Credentials {
+	public var description: String {
 		"""
 		username: \(username),
 		password: \(password)
@@ -51,13 +51,13 @@ public extension ICEServerConfig.Credentials {
 	}
 }
 
-public extension Array where Element == ICEServerConfig {
+extension Array where Element == ICEServerConfig {
 	// TURN and possibly STUN servers.
 	//
 	// Other potential stun servers are:
 	// "stun.services.mozilla.org",
 	// "stun:stun.stunprotocol.org",
-	static let `default`: Self = [
+	public static let `default`: Self = [
 		ICEServerConfig?.none,
 		.init(
 			url: .init(string: "turn:turn-betanet-udp.radixdlt.com:80?transport=udp")!,
@@ -75,8 +75,8 @@ public extension Array where Element == ICEServerConfig {
 	].compactMap { $0 }
 }
 
-public extension ICEServerConfig.Credentials {
-	static let unsafe = Self(username: "username", password: "password")
+extension ICEServerConfig.Credentials {
+	public static let unsafe = Self(username: "username", password: "password")
 }
 
 #if DEBUG
@@ -86,11 +86,11 @@ extension ICEServerConfig: ExpressibleByStringLiteral {
 	}
 }
 
-public extension URL {
-	static let placeholder = Self(string: "stun:stun.l.google.com:19302")!
+extension URL {
+	public static let placeholder = Self(string: "stun:stun.l.google.com:19302")!
 }
 
-public extension ICEServerConfig {
-	static let placeholder = Self(url: .placeholder)
+extension ICEServerConfig {
+	public static let placeholder = Self(url: .placeholder)
 }
 #endif // DEBUG

@@ -13,8 +13,8 @@ extension PasteboardClient: TestDependencyKey {
 	)
 }
 
-public extension DependencyValues {
-	var pasteboardClient: PasteboardClient {
+extension DependencyValues {
+	public var pasteboardClient: PasteboardClient {
 		get { self[PasteboardClient.self] }
 		set { self[PasteboardClient.self] = newValue }
 	}

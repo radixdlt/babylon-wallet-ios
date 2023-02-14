@@ -9,8 +9,8 @@ extension AssetFetcher: TestDependencyKey {
 	)
 }
 
-public extension AssetFetcher {
-	static let noop = Self(
+extension AssetFetcher {
+	public static let noop = Self(
 		fetchAssets: { _ in
 			AccountPortfolio(fungibleTokenContainers: [], nonFungibleTokenContainers: [], poolShareContainers: [], badgeContainers: [])
 		}

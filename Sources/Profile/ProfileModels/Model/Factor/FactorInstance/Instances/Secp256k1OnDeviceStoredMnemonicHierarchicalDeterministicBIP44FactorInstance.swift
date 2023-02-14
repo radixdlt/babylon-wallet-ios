@@ -35,22 +35,22 @@ public struct Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44Facto
 	}
 }
 
-public extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance {
-	static let factorInstanceKind: FactorInstanceKind = .secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstanceKind
-	typealias Curve = SECP256K1
-	typealias ID = FactorSourceReference
+extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance {
+	public static let factorInstanceKind: FactorInstanceKind = .secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstanceKind
+	public typealias Curve = SECP256K1
+	public typealias ID = FactorSourceReference
 }
 
-public extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance {
+extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance {
 	/// Wraps this `Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance` into the shared
 	/// nominal type `FactorInstance` (enum)
-	func wrapAsFactorInstance() -> FactorInstance {
+	public func wrapAsFactorInstance() -> FactorInstance {
 		.secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance(self)
 	}
 
 	/// Tries to unwraps the nominal type `FactorInstance` (enum)
 	/// into a `Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance` instance.
-	static func unwrap(factorInstance: FactorInstance) -> Self? {
+	public static func unwrap(factorInstance: FactorInstance) -> Self? {
 		switch factorInstance {
 		case let .secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance(instance):
 			return instance
@@ -60,8 +60,8 @@ public extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44Fa
 	}
 }
 
-public extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance {
-	var customDumpMirror: Mirror {
+extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorInstance {
+	public var customDumpMirror: Mirror {
 		.init(self, children: [
 			"factorSourceReference": factorSourceReference,
 			"publicKey": publicKey,
@@ -70,7 +70,7 @@ public extension Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44Fa
 		])
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		"factorSourceReference": \(factorSourceReference),
 		"publicKey": \(publicKey),

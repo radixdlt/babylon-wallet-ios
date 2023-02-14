@@ -6,9 +6,9 @@ import FeaturePrelude
 import TransactionSigningFeature
 
 // MARK: - Home.View
-public extension Home {
+extension Home {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -20,8 +20,8 @@ public extension Home {
 	}
 }
 
-public extension Home.View {
-	var body: some View {
+extension Home.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -75,8 +75,8 @@ extension Home.View {
 	}
 }
 
-private extension Home.View {
-	func homeView(with viewStore: ViewStore<Home.View.ViewState, Home.Action.ViewAction>) -> some View {
+extension Home.View {
+	fileprivate func homeView(with viewStore: ViewStore<Home.View.ViewState, Home.Action.ViewAction>) -> some View {
 		VStack {
 			Home.Header.View(
 				store: store.scope(
@@ -111,8 +111,8 @@ private extension Home.View {
 	}
 }
 
-private extension Home.View {
-	var title: some View {
+extension Home.View {
+	fileprivate var title: some View {
 		Text(L10n.AggregatedValue.title)
 			.foregroundColor(.app.buttonTextBlack)
 			.textStyle(.body2Header)

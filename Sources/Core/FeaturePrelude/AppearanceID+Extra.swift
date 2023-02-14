@@ -2,8 +2,8 @@ import DesignSystem
 import SharedModels
 import SwiftUI
 
-public extension OnNetwork.Account.AppearanceID {
-	var gradient: LinearGradient {
+extension OnNetwork.Account.AppearanceID {
+	public var gradient: LinearGradient {
 		switch self {
 		case ._0:
 			return .app.account0

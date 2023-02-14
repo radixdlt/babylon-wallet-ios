@@ -19,8 +19,8 @@ public struct UnsecuredEntityControl:
 	}
 }
 
-public extension UnsecuredEntityControl {
-	var customDumpMirror: Mirror {
+extension UnsecuredEntityControl {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -30,7 +30,7 @@ public extension UnsecuredEntityControl {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		genesisFactorInstance: \(genesisFactorInstance)
 		"""

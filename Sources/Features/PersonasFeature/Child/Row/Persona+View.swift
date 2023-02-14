@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - Persona.View
-public extension Persona {
+extension Persona {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<Persona>
 
 		public init(store: StoreOf<Persona>) {
@@ -12,18 +12,31 @@ public extension Persona {
 	}
 }
 
-public extension Persona.View {
-	var body: some View {
+extension Persona.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			// TODO: implement
-			Text(viewStore.displayName)
-				.background(Color.yellow)
-				.foregroundColor(.red)
-				.onAppear { viewStore.send(.appeared) }
+			HStack(alignment: .center) {
+				Circle()
+					.strokeBorder(Color.app.gray3, lineWidth: 1)
+					.background(Circle().fill(Color.app.gray4))
+					.frame(.small)
+					.padding(.trailing, .small1)
+
+				VStack(alignment: .leading, spacing: 4) {
+					Text(viewStore.displayName)
+						.foregroundColor(.app.gray1)
+						.textStyle(.secondaryHeader)
+				}
+
+				Spacer()
+			}
+			.padding(.medium2)
+			.background(Color.app.gray5)
+			.cornerRadius(.small1)
 		}
 	}
 }
@@ -33,7 +46,6 @@ extension Persona.View {
 	struct ViewState: Equatable {
 		public let displayName: String
 		init(state: Persona.State) {
-			// TODO: implement
 			displayName = state.persona.displayName.rawValue
 		}
 	}

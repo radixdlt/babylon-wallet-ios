@@ -11,8 +11,8 @@ public protocol SLIP10DerivationPathComponent {
 	var derivationPathComponentNonHardenedValue: HD.Path.Component.Child.Value { get }
 }
 
-public extension SLIP10DerivationPathComponent where Self: RawRepresentable, RawValue == HD.Path.Component.Child.Value {
-	var derivationPathComponentNonHardenedValue: HD.Path.Component.Child.Value { rawValue }
+extension SLIP10DerivationPathComponent where Self: RawRepresentable, RawValue == HD.Path.Component.Child.Value {
+	public var derivationPathComponentNonHardenedValue: HD.Path.Component.Child.Value { rawValue }
 }
 
 // MARK: - KeyKind
@@ -38,13 +38,13 @@ public enum KeyKind:
 	case authenticationSigningKey = 706
 }
 
-public extension KeyKind {
+extension KeyKind {
 	// https://rdxworks.slack.com/archives/C031A0V1A1W/p1665751090101519?thread_ts=1665750717.513349&cid=C031A0V1A1W
-	static let virtualEntity = Self.transactionSigningKey
+	public static let virtualEntity = Self.transactionSigningKey
 }
 
-public extension KeyKind {
-	var description: String {
+extension KeyKind {
+	public var description: String {
 		switch self {
 		case .transactionSigningKey: return "transactionSigningKey"
 		case .authenticationSigningKey: return "authenticationSigningKey"

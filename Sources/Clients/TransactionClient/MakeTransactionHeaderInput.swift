@@ -17,6 +17,6 @@ public struct MakeTransactionHeaderInput: Sendable, Hashable {
 	}
 }
 
-public extension MakeTransactionHeaderInput {
-	static let `default` = Self()
+extension MakeTransactionHeaderInput {
+	public static let `default` = Self()
 }

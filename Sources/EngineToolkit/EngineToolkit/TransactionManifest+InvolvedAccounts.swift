@@ -2,9 +2,10 @@ import Cryptography
 import EngineToolkitModels
 import Prelude
 
-public extension TransactionManifest {
-	func accountsRequiredToSign(
-		networkId: NetworkID
+extension TransactionManifest {
+	private func involvedAccounts(
+		networkId: NetworkID,
+		callMethodFilter: (CallMethod) -> Bool = { _ in true }
 	) throws -> Set<ComponentAddress> {
 		let convertedManifest = try EngineToolkit().convertManifest(request: ConvertManifestRequest(
 			manifest: self,
@@ -18,23 +19,13 @@ public extension TransactionManifest {
 			for instruction in instructions {
 				switch instruction {
 				case let .callMethod(callMethodInstruction):
-					let isMethodThatRequiresAuth = [
-						"lock_fee",
-						"lock_contingent_fee",
-						"withdraw",
-						"withdraw_by_amount",
-						"withdraw_by_ids",
-						"lock_fee_and_withdraw",
-						"lock_fee_and_withdraw_by_amount",
-						"lock_fee_and_withdraw_by_ids",
-						"create_proof",
-						"create_proof_by_amount",
-						"create_proof_by_ids",
-					].contains(callMethodInstruction.methodName)
-
-					if let accountAddress = callMethodInstruction.receiver.asAccountComponentAddress, isMethodThatRequiresAuth {
-						accountsRequiredToSign.insert(accountAddress)
+					guard
+						let accountAddress = callMethodInstruction.receiver.asAccountComponentAddress,
+						callMethodFilter(callMethodInstruction)
+					else {
+						continue
 					}
+					accountsRequiredToSign.insert(accountAddress)
 				case let .setMetadata(setMetadataInstruction):
 					if let accountAddress = setMetadataInstruction.entityAddress.asAccountComponentAddress {
 						accountsRequiredToSign.insert(accountAddress)
@@ -60,5 +51,34 @@ public extension TransactionManifest {
 		case .string:
 			fatalError("Converted the manifest to Parsed by instead received a string manifest!")
 		}
+	}
+
+	public func accountsRequiredToSign(
+		networkId: NetworkID
+	) throws -> Set<ComponentAddress> {
+		try involvedAccounts(
+			networkId: networkId,
+			callMethodFilter: {
+				[
+					"lock_fee",
+					"lock_contingent_fee",
+					"withdraw",
+					"withdraw_by_amount",
+					"withdraw_by_ids",
+					"lock_fee_and_withdraw",
+					"lock_fee_and_withdraw_by_amount",
+					"lock_fee_and_withdraw_by_ids",
+					"create_proof",
+					"create_proof_by_amount",
+					"create_proof_by_ids",
+				].contains($0.methodName)
+			}
+		)
+	}
+
+	public func accountsSuitableToPayTXFee(networkId: NetworkID) throws -> Set<ComponentAddress> {
+		try involvedAccounts(
+			networkId: networkId
+		)
 	}
 }

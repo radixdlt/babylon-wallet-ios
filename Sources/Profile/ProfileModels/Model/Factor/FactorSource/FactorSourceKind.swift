@@ -20,8 +20,8 @@ public enum FactorSourceKind:
 	case secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSourceKind
 }
 
-public extension FactorSourceKind {
-	var sourceOfInstanceOfKind: FactorInstanceKind {
+extension FactorSourceKind {
+	public var sourceOfInstanceOfKind: FactorInstanceKind {
 		switch self {
 		case .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind:
 			return .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstanceKind

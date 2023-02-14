@@ -21,8 +21,8 @@ extension FungibleTokenCategory: Identifiable {
 }
 
 // MARK: FungibleTokenCategory.CategoryType
-public extension FungibleTokenCategory {
-	enum CategoryType: Sendable {
+extension FungibleTokenCategory {
+	public enum CategoryType: Sendable {
 		case xrd
 		case nonXrd
 	}

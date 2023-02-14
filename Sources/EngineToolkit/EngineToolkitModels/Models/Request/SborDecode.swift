@@ -17,7 +17,7 @@ public struct SborDecodeRequest: Sendable, Codable, Hashable {
 	}
 }
 
-public extension SborDecodeRequest {
+extension SborDecodeRequest {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -27,13 +27,13 @@ public extension SborDecodeRequest {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(encodedValue.hex(), forKey: .encodedValue)
 		try container.encode(String(networkId), forKey: .networkId)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		try self.init(
 			encodedHex: container.decode(String.self, forKey: .encodedValue),
@@ -51,17 +51,17 @@ public struct SborDecodeResponse: Sendable, Codable, Hashable {
 	}
 }
 
-public extension SborDecodeResponse {
+extension SborDecodeResponse {
 	private enum CodingKeys: String, CodingKey {
 		case value
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(value, forKey: .value)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		try self.init(value: container.decode(Value_.self, forKey: .value))
 	}

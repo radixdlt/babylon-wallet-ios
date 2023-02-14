@@ -8,9 +8,9 @@ public struct NetworkSwitchingClient: Sendable, DependencyKey {
 	public var switchTo: SwitchTo
 }
 
-public extension NetworkSwitchingClient {
-	typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
-	typealias ValidateGatewayURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway?
-	typealias HasAccountOnNetwork = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Bool
-	typealias SwitchTo = @Sendable (AppPreferences.NetworkAndGateway) async throws -> AppPreferences.NetworkAndGateway
+extension NetworkSwitchingClient {
+	public typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
+	public typealias ValidateGatewayURL = @Sendable (URL) async throws -> AppPreferences.NetworkAndGateway?
+	public typealias HasAccountOnNetwork = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Bool
+	public typealias SwitchTo = @Sendable (AppPreferences.NetworkAndGateway) async throws -> AppPreferences.NetworkAndGateway
 }

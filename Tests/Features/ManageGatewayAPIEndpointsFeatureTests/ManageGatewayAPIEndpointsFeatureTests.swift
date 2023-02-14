@@ -236,16 +236,16 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 
 #if DEBUG
 
-public extension URL {
-	static let previewValue = URL(string: "https://example.com")!
+extension URL {
+	public static let previewValue = URL(string: "https://example.com")!
 }
 
-public extension Network {
-	static let previewValue = Self(name: "Placeholder", id: .simulator)
+extension Network {
+	public static let previewValue = Self(name: "Placeholder", id: .simulator)
 }
 
-public extension AppPreferences.NetworkAndGateway {
-	static let previewValue = Self(
+extension AppPreferences.NetworkAndGateway {
+	public static let previewValue = Self(
 		network: .previewValue,
 		gatewayAPIEndpointURL: .previewValue
 	)

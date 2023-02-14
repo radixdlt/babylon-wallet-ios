@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 
 open class CodableHelper {
 	private static var customDateFormatter: DateFormatter?

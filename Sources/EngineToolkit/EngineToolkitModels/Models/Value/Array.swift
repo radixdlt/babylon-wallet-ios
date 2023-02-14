@@ -45,13 +45,13 @@ public struct Array_: ValueProtocol, Sendable, Codable, Hashable {
 }
 
 // MARK: Array_.Error
-public extension Array_ {
-	enum Error: String, Swift.Error, Sendable, Hashable {
+extension Array_ {
+	public enum Error: String, Swift.Error, Sendable, Hashable {
 		case homogeneousArrayRequired
 	}
 }
 
-public extension Array_ {
+extension Array_ {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -60,7 +60,7 @@ public extension Array_ {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
@@ -68,7 +68,7 @@ public extension Array_ {
 		try container.encode(elementKind, forKey: .elementKind)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)

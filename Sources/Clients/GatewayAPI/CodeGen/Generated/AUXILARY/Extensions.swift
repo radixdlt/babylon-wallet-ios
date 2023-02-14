@@ -4,7 +4,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -36,6 +36,11 @@ extension Int64: JSONEncodable {
 
 // MARK: - Double + JSONEncodable
 extension Double: JSONEncodable {
+	func encodeToJSON() -> Any { self }
+}
+
+// MARK: - Decimal + JSONEncodable
+extension Decimal: JSONEncodable {
 	func encodeToJSON() -> Any { self }
 }
 
@@ -133,45 +138,45 @@ extension String: CodingKey {
 	}
 }
 
-public extension KeyedEncodingContainerProtocol {
-	mutating func encodeArray<T>(_ values: [T], forKey key: Self.Key) throws where T: Encodable {
+extension KeyedEncodingContainerProtocol {
+	public mutating func encodeArray<T>(_ values: [T], forKey key: Self.Key) throws where T: Encodable {
 		var arrayContainer = nestedUnkeyedContainer(forKey: key)
 		try arrayContainer.encode(contentsOf: values)
 	}
 
-	mutating func encodeArrayIfPresent<T>(_ values: [T]?, forKey key: Self.Key) throws where T: Encodable {
+	public mutating func encodeArrayIfPresent<T>(_ values: [T]?, forKey key: Self.Key) throws where T: Encodable {
 		if let values = values {
 			try encodeArray(values, forKey: key)
 		}
 	}
 
-	mutating func encodeMap<T>(_ pairs: [Self.Key: T]) throws where T: Encodable {
+	public mutating func encodeMap<T>(_ pairs: [Self.Key: T]) throws where T: Encodable {
 		for (key, value) in pairs {
 			try encode(value, forKey: key)
 		}
 	}
 
-	mutating func encodeMapIfPresent<T>(_ pairs: [Self.Key: T]?) throws where T: Encodable {
+	public mutating func encodeMapIfPresent<T>(_ pairs: [Self.Key: T]?) throws where T: Encodable {
 		if let pairs = pairs {
 			try encodeMap(pairs)
 		}
 	}
 
-	mutating func encode(_ value: Decimal, forKey key: Self.Key) throws {
+	public mutating func encode(_ value: Decimal, forKey key: Self.Key) throws {
 		var mutableValue = value
 		let stringValue = NSDecimalString(&mutableValue, Locale(identifier: "en_US"))
 		try encode(stringValue, forKey: key)
 	}
 
-	mutating func encodeIfPresent(_ value: Decimal?, forKey key: Self.Key) throws {
+	public mutating func encodeIfPresent(_ value: Decimal?, forKey key: Self.Key) throws {
 		if let value = value {
 			try encode(value, forKey: key)
 		}
 	}
 }
 
-public extension KeyedDecodingContainerProtocol {
-	func decodeArray<T>(_ type: T.Type, forKey key: Self.Key) throws -> [T] where T: Decodable {
+extension KeyedDecodingContainerProtocol {
+	public func decodeArray<T>(_ type: T.Type, forKey key: Self.Key) throws -> [T] where T: Decodable {
 		var tmpArray = [T]()
 
 		var nestedContainer = try nestedUnkeyedContainer(forKey: key)
@@ -183,7 +188,7 @@ public extension KeyedDecodingContainerProtocol {
 		return tmpArray
 	}
 
-	func decodeArrayIfPresent<T>(_ type: T.Type, forKey key: Self.Key) throws -> [T]? where T: Decodable {
+	public func decodeArrayIfPresent<T>(_ type: T.Type, forKey key: Self.Key) throws -> [T]? where T: Decodable {
 		var tmpArray: [T]?
 
 		if contains(key) {
@@ -193,7 +198,7 @@ public extension KeyedDecodingContainerProtocol {
 		return tmpArray
 	}
 
-	func decodeMap<T>(_ type: T.Type, excludedKeys: Set<Self.Key>) throws -> [Self.Key: T] where T: Decodable {
+	public func decodeMap<T>(_ type: T.Type, excludedKeys: Set<Self.Key>) throws -> [Self.Key: T] where T: Decodable {
 		var map: [Self.Key: T] = [:]
 
 		for key in allKeys {
@@ -206,7 +211,7 @@ public extension KeyedDecodingContainerProtocol {
 		return map
 	}
 
-	func decode(_ type: Decimal.Type, forKey key: Self.Key) throws -> Decimal {
+	public func decode(_ type: Decimal.Type, forKey key: Self.Key) throws -> Decimal {
 		let stringValue = try decode(String.self, forKey: key)
 		guard let decimalValue = Decimal(string: stringValue) else {
 			let context = DecodingError.Context(codingPath: [key], debugDescription: "The key \(key) couldn't be converted to a Decimal value")
@@ -216,7 +221,7 @@ public extension KeyedDecodingContainerProtocol {
 		return decimalValue
 	}
 
-	func decodeIfPresent(_ type: Decimal.Type, forKey key: Self.Key) throws -> Decimal? {
+	public func decodeIfPresent(_ type: Decimal.Type, forKey key: Self.Key) throws -> Decimal? {
 		guard let stringValue = try decodeIfPresent(String.self, forKey: key) else {
 			return nil
 		}

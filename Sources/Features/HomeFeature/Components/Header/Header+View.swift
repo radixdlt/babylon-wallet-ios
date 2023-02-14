@@ -1,15 +1,15 @@
 import FeaturePrelude
 
 // MARK: - Home.Header.View
-public extension Home.Header {
+extension Home.Header {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		let store: Store<State, Action>
 	}
 }
 
-public extension Home.Header.View {
-	var body: some View {
+extension Home.Header.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -40,8 +40,8 @@ extension Home.Header.View {
 	}
 }
 
-private extension Home.Header.View {
-	var subtitleView: some SwiftUI.View {
+extension Home.Header.View {
+	fileprivate var subtitleView: some SwiftUI.View {
 		HStack(spacing: .large1) {
 			Text(L10n.Home.Header.subtitle)
 				.foregroundColor(.app.gray2)

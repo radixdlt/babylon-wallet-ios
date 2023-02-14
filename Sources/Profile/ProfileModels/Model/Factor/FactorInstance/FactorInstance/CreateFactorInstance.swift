@@ -6,9 +6,9 @@ public enum CreateFactorInstanceRequest {
 }
 
 // MARK: CreateFactorInstanceRequest.FromNonHardwareHierarchicalDeterministicMnemonicFactorSource
-public extension CreateFactorInstanceRequest {
+extension CreateFactorInstanceRequest {
 	/// A request that can be used by any Non-Hardware Hierarchical Deterministic Factor Source.
-	struct FromNonHardwareHierarchicalDeterministicMnemonicFactorSource {
+	public struct FromNonHardwareHierarchicalDeterministicMnemonicFactorSource {
 		public let reference: FactorSourceReference
 		public let derivationPath: DerivationPath
 

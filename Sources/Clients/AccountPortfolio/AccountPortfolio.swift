@@ -21,14 +21,14 @@ public struct AccountPortfolio: Sendable, Equatable {
 }
 
 // MARK: - Computed Properties
-public extension AccountPortfolio {
-	var worth: BigDecimal? {
+extension AccountPortfolio {
+	public var worth: BigDecimal? {
 		fungibleTokenContainers.compactMap(\.worth).reduce(0, +)
 	}
 }
 
-public extension AccountPortfolio {
-	static let empty: AccountPortfolio = Self(
+extension AccountPortfolio {
+	public static let empty: AccountPortfolio = Self(
 		fungibleTokenContainers: [],
 		nonFungibleTokenContainers: [],
 		poolShareContainers: [],

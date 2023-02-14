@@ -29,13 +29,13 @@ public struct Map_: ValueProtocol, Sendable, Codable, Hashable {
 }
 
 // MARK: Map_.Error
-public extension Map_ {
-	enum Error: String, Swift.Error, Sendable, Hashable {
+extension Map_ {
+	public enum Error: String, Swift.Error, Sendable, Hashable {
 		case homogeneousMapRequired
 	}
 }
 
-public extension Map_ {
+extension Map_ {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -47,7 +47,7 @@ public extension Map_ {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
@@ -56,7 +56,7 @@ public extension Map_ {
 		try container.encode(entries, forKey: .entries) // TODO: Fix map
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)

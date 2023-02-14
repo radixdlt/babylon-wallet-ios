@@ -1,7 +1,7 @@
 import Prelude
 
-public extension P2P.ToDapp {
-	struct WalletInteractionSuccessResponse: Sendable, Hashable, Encodable {
+extension P2P.ToDapp {
+	public struct WalletInteractionSuccessResponse: Sendable, Hashable, Encodable {
 		/// *MUST* match an ID from an incoming request from Dapp.
 		public let interactionId: P2P.FromDapp.WalletInteraction.ID
 		public let items: Items

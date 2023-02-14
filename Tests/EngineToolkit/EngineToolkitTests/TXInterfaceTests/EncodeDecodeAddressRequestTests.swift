@@ -14,8 +14,8 @@ final class EncodeDecodeAddressRequestTests: TestCase {
 	}
 }
 
-private extension EncodeDecodeAddressRequestTests {
-	func doTest(
+extension EncodeDecodeAddressRequestTests {
+	private func doTest(
 		vector: AddressDecodeEncodeTestVectors.Vector,
 		networkID: NetworkID = .simulator,
 		line: UInt = #line
@@ -33,7 +33,7 @@ private extension EncodeDecodeAddressRequestTests {
 		XCTAssertNoDifference(encoded.address, vector.encoded)
 	}
 
-	typealias TestSuite = AddressDecodeEncodeTestVectors
+	fileprivate typealias TestSuite = AddressDecodeEncodeTestVectors
 }
 
 // MARK: - AddressDecodeEncodeTestVectors

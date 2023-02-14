@@ -1,7 +1,7 @@
 import Foundation
 
-public extension Mnemonic {
-	enum Error: Swift.Error {
+extension Mnemonic {
+	public enum Error: Swift.Error {
 		/// Might occur when trying to create a mnemonic from a list of words
 		/// when the language is not known.
 		case unknownLanguage

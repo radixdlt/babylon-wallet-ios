@@ -1,42 +1,188 @@
 openapi: 3.0.0
 info:
-  version: 2.0.0
+  version: 0.1.0
   title: Radix Babylon Gateway API
   license:
     name: The Radix License, Version 1.0
-    url: https://www.radixfoundation.org/licenses/LICENSE-v1
-  description: |
-    See https://docs.radixdlt.com/main/apis/introduction.html
-servers:
+    url: https://www.radixfoundation.org/licenses/license-v1
+  x-logo:
+    url: https://docs.radixdlt.com/main/_images/radix-logo-banner.png
+    href: https://docs.radixdlt.com
+  description: | # TODO Add links to wallet once they get published
+    This API is designed to enable clients to efficiently query information on the RadixDLT ledger,
+    and allow clients to build and submit transactions to the network.
+    It is designed for use by wallets and explorers.
+
+    This document is an API reference documentation, visit [User Guide](https://docs.radixdlt.com/main/apis/gateway-api.html) to learn more about different usage scenarios.
+
+    The Gateway API is implemented by the [Network Gateway](https://github.com/radixdlt/babylon-gateway),
+    which is configured to read from [full node(s)](https://github.com/radixdlt/babylon-node) to extract
+    and index data from the network.
+servers: # TODO define mainnet / betanet endpoints?
+  - url: https://betanet.radixdlt.com
   - url: http://localhost:5208
-  - url: https://stokenet.radixdlt.com
-  - url: https://mainnet.radixdlt.com
+x-tagGroups:
+  - name: Overview
+    tags:
+      - SubAPIs
+      - Concepts
+      - Architecture
+  - name: Endpoints
+    tags:
+      - Status
+      - Transaction
+      - Stream
+      - State
 tags:
+  - name: SubAPIs
+    x-displayName: Sub-APIs
+    x-traitTag: true
+    description: |
+      The Gateway API is split into 4 sub APIs:
+      - **Status** (`/status/*`) - For status and configuration details for the Gateway / Network.
+      - **Transaction** (`/transaction/*`) - For transaction construction, preview, submission, and monitoring the status of an individual transaction.
+      - **Stream** (`/transaction/*`) - For reading committed transactions.
+      - **State** (`/state/*`, `/entity/*` and `/non-fungible/*`) - For reading the current or past ledger state of the network.
+  - name: Architecture
+    x-traitTag: true
+    description: |
+
+      ## Request-Response Format
+
+      The API is designed in a JSON-RPC-like style, using HTTP as a transport layer, which means that:
+      - Requests always use HTTP POST method.
+      - There is no HTTP cache involved.
+      - Client-originated errors result in HTTP 4xx error responses.
+      - Server-originated errors result in HTTP 5xx error responses:
+          - The error object contains an HTTP-like `code`
+          - The error object also contains a structured/typed properties, with a `type` discriminator, allowing for structured error interpretation in client software.
+
+      ## Pagination Model
+
+      Collections can grow in size therefore every dynamic-length collection is a subject to pagination where a generic data struct is used to represent a chunk (page) of
+      underlying data. Gateway API uses cursor-based pagination model where the sole existence of the cursor indicates that next chunk (page) of the underlying collection is
+      available.
+
+      ```
+      collection {
+        int64? total_count,
+        string? next_cursor,
+        string? previous_cursor,
+        T[] items
+      }
+      ```
+
+      - `total_count` *(optional)* if present specifies the overall size of the underlying collection,
+      - `next_cursor` *(optional)* if present indicates that the next chunk (page) exists and can be fetched using collection-specific endpoint and cursor value,
+      - `previous_cursor` *(optional)* if present indicates that the previous chunk (page) exists and can be fetched using collection-specific endpoint and cursor value,
+      - `items` a chunk (page) of unerlying collection items.
+  - name: Concepts
+    x-displayName: Concepts
+    x-traitTag: true # Don't display endpoints under this tag
+    description: |
+      Interacting with this API effectively may require knowledge about the Radix Babylon Transaction Model and the State Model.
+
+      We share some very high-level details below, but please see the [official documentation](http://docs.radixdlt.com) for more details on this.
+
+      ## Transactions and the Gateway
+
+      User transactions are formed of a core "intent", which is then signed by 0+ signatories, before being notarized. The output is called a notarized payload.
+      It is this notarized transaction payload which is submitted to the network.
+
+      For most users, this construction process will generally happen in their Radix Wallet. If you wish to construct transactions programmatically or offline,
+      you will need to integrate the Radix Engine Toolkit into your application for construction and finalization.
+
+      Once submitted, a transaction payload can end up being either rejected or committed. Transactions get rejected if they fail to pass certain criteria at the given time.
+      A transaction payload can be marked as a:
+      - **Permanent Rejection** if it is never possible for it to be committed (eg it's statically invalid, or only valid up until epoch 100 and it's now epoch 101)
+      - **Temporary Rejection** if it still may be possible that the transaction payload could be committed
+
+      A given intent typically is only part of one submitted notarized payload, but it's possible for a notary to notarize and submit multiple payloads for the same intent.
+      The Radix Engine ensures that any intent can only be committed once.
+
+      A committed transaction is either committed with an outcome of "Success" or "Failure":
+      - **Committed Failure** will result in fees being paid up until the failure point, but all other changes will be discarded.
+      - **Committed Success** will result in all changes being committed.
+
+      Only committed transactions appear on ledger.
+
+      The gateway will attempt to submit your transaction to nodes on the network.
+      If it gets temporarily rejected, the error message will be recorded against the transaction, but the Gateway will
+      retry submission for a limited time. During this time, the status will be reported as pending.
+
+      ## State Model
+
+      The Radix Engine consists of "global entities".
+      A global entity has a Bech32m Address, with a human-readable-prefix (and prefix byte) matching the entity type.
+
+      As an example, entities include concepts like Components, Packages, Vaults, Resource Managers and Key-Value Stores.
+
+      Each entity owns substates which store data, and these substates can own other entities.
+      For example, an Account Component has a struct substate which owns a Key-Value Store. This Key-Value store has an
+      entry for each resoure the Account owns, and each Key-Value Store Entry owns a corresponding Vault.
+
+      For each global entity, the Gateway aggregates its owned resources by looking at the contents of Vaults in the
+      subtree of entities under that global entity.
   - name: Status
+    x-displayName: Status Endpoints
     description: Query information about the Gateway API status.
   - name: Transaction
-    description: Preview and submit transactions, and query transaction status and contents.
-  - name: Entity
-  - name: Non-Fungible
+    x-displayName: Transaction Endpoints
+    description: Query status of, construct, preview and submit transactions.
+  - name: Stream
+    x-displayName: Stream Endpoints
+    description: Browse through the history of transactions.
+  - name: State
+    x-displayName: State Endpoints
+    description: Query information snapshot about state of ledger entities at present or past time.
 paths:
   "/gateway/information":
     post:
       operationId: GatewayInformation
       summary: Get Gateway Information
-      description: Returns the Gateway API version, network and current ledger state.
+      description: |
+        Returns the Gateway API version, current ledger state and well-known network addresses.
       tags:
         - Status
       responses:
         "200":
-          description: The Network
+          description: Network Gateway Information
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/GatewayInformationResponse"
 
+  "/transaction/recent":
+    post:
+      operationId: TransactionRecent
+      summary: Get Recent Transactions
+      description: |
+        Returns user-initiated transactions which have been committed to the ledger.
+        The returned response is in a paginated format, ordered by most recently committed.
+      tags:
+        - Stream
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionRecentRequest"
+      responses:
+        "200":
+          description: Recent Transactions (paginated)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionRecentResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
   "/transaction/construction":
     post:
       operationId: TransactionConstruction
+      summary: Get Construction Metadata
+      description: |
+        Returns information needed to construct a new transaction including current `epoch` number.
       tags:
         - Transaction
       responses:
@@ -47,36 +193,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TransactionConstructionResponse"
-  "/transaction/recent":
-    post:
-      operationId: TransactionRecent
-      summary: Get Recent Transactions
-      description: |
-        Returns user-initiated transactions which have been successfully committed to the ledger.
-        The transactions are returned in a paginated format, ordered by most recent.
-      tags:
-        - Transaction
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/TransactionRecentRequest"
-      responses:
-        "200":
-          description: A page of the most recent transactions
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TransactionRecentResponse"
-        "4XX":
-          $ref: "#/components/responses/ErrorResponse"
   "/transaction/preview":
     post:
       operationId: TransactionPreview
       summary: Preview Transaction
       description: |
         Previews transaction against the network.
+        This endpoint is effectively a proxy towards CoreApi's `/v0/transaction/preview` endpoint. See CoreApi's documentation for more details.
       tags:
         - Transaction
       requestBody:
@@ -84,6 +207,7 @@ paths:
         content:
           application/json:
             schema:
+              description: Refer to `#/components/schemas/TransactionPreviewRequest` of CoreApi for more details.
               type: object
       responses:
         "200":
@@ -91,6 +215,7 @@ paths:
           content:
             application/json:
               schema:
+                description: Refer to `#/components/schemas/TransactionPreviewResponse` of CoreApi for more details.
                 type: object
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
@@ -100,7 +225,6 @@ paths:
       summary: Submit Transaction
       description: |
         Submits a signed transaction payload to the network.
-        The transaction identifier from finalize or submit can then be used to track the transaction status.
       tags:
         - Transaction
       requestBody:
@@ -121,9 +245,10 @@ paths:
   "/transaction/committed-details":
     post:
       operationId: TransactionCommittedDetails
-      summary: Transaction Committed Details
+      summary: Get Committed Transaction Details
       description: |
-        Returns the status and contents of the transaction with the given transaction identifier. Transaction identifiers which aren't recognised as either belonging to a committed transaction or a transaction submitted through this Network Gateway may return a `TransactionNotFoundError`. Transaction identifiers relating to failed transactions will, after a delay, also be reported as a `TransactionNotFoundError`.
+        Returns the committed details and receipt of the transaction for a given transaction identifier.
+        Transaction identifiers which don't correspond to a committed transaction will return a `TransactionNotFoundError`.
       tags:
         - Transaction
       requestBody:
@@ -144,7 +269,9 @@ paths:
   "/transaction/status":
     post:
       operationId: TransactionStatus
-      summary: Transaction Status
+      summary: Get Transaction Status
+      description: |
+        Returns overall transaction status and all of its known payloads based on supplied intent hash.
       tags:
         - Transaction
       requestBody:
@@ -166,9 +293,13 @@ paths:
   /entity/overview:
     post:
       operationId: EntityOverview
-      summary: Returns incomplete collection of basic information for a given collection of entities.
+      summary: Get Entities Overview
+      description: |
+        Returns basic information (incomplete metadata) for a given collection of entities.
+        This endpoint is intended to be used for populating screens which contain a small bit of information about
+        multiple entities.
       tags:
-        - Entity
+        - State
       requestBody:
         required: true
         content:
@@ -177,7 +308,7 @@ paths:
               $ref: "#/components/schemas/EntityOverviewRequest"
       responses:
         "200":
-          description: Entity Details
+          description: Entities Overview
           content:
             application/json:
               schema:
@@ -187,9 +318,11 @@ paths:
   /entity/details:
     post:
       operationId: EntityDetails
-      summary: Returns detailed information for a given entity.
+      summary: Get Entity Details
+      description: |
+        Returns detailed information for a single entity.
       tags:
-        - Entity
+        - State
       requestBody:
         required: true
         content:
@@ -208,9 +341,15 @@ paths:
   /entity/resources:
     post:
       operationId: EntityResources
-      summary: Returns incomplete collection of fungible and non-fungible resources associated with a given entity.
+      summary: Get Entity Resource Totals
+      description: |
+        Returns the total amount of each fungible and non-fungible resources owned by a given global entity.
+        The response for fungibles and non-fungibles is paginated, and only the first page of each is returned.
+        The returned lists are ordered by the resource's first appearance on the ledger.
+        For further pages, use the `entity/fungibles` and `entity/non-fungibles` endpoints.
+        To get the owned non-fungible ids (instead of just the amount), use the `entity/non-fungible-ids` endpoint.
       tags:
-        - Entity
+        - State
       requestBody:
         required: true
         content:
@@ -229,9 +368,12 @@ paths:
   /entity/metadata:
     post:
       operationId: EntityMetadata
-      summary: Iterates through all metadata associated with a given entity.
+      summary: Get Entity Metadata
+      description: |
+        Returns all the metadata properties associated with a given global entity.
+        The returned response is in a paginated format, ordered by first appearance on the ledger.
       tags:
-        - Entity
+        - State
       requestBody:
         required: true
         content:
@@ -240,7 +382,7 @@ paths:
               $ref: "#/components/schemas/EntityMetadataRequest"
       responses:
         "200":
-          description: Entity Metadata
+          description: Entity Metadata (paginated)
           content:
             application/json:
               schema:
@@ -250,9 +392,12 @@ paths:
   /entity/fungibles:
     post:
       operationId: EntityFungibles
-      summary: Iterates through all fungible resources associated with a given entity.
+      summary: Get Entity Fungible Resource Totals
+      description: |
+        Returns the total amount of each fungible resource owned by a given global entity.
+        The returned response is in a paginated format, ordered by the resource's first appearance on the ledger.
       tags:
-        - Entity
+        - State
       requestBody:
         required: true
         content:
@@ -261,7 +406,7 @@ paths:
               $ref: "#/components/schemas/EntityFungiblesRequest"
       responses:
         "200":
-          description: Entity Fungibles
+          description: Entity Fungibles (paginated)
           content:
             application/json:
               schema:
@@ -271,9 +416,12 @@ paths:
   /entity/non-fungibles:
     post:
       operationId: EntityNonFungibles
-      summary: Iterates through all non-fungible resources associated with a given entity.
+      summary: Get Entity Non-Fungible Resource Totals
+      description: |
+        Returns the total amount of each non-fungible resource owned by a given global entity.
+        The returned response is in a paginated format, ordered by the resource's first appearance on the ledger.
       tags:
-        - Entity
+        - State
       requestBody:
         required: true
         content:
@@ -282,7 +430,7 @@ paths:
               $ref: "#/components/schemas/EntityNonFungiblesRequest"
       responses:
         "200":
-          description: Entity Non-Fungibles
+          description: Entity Non-Fungibles (paginated)
           content:
             application/json:
               schema:
@@ -291,53 +439,62 @@ paths:
           $ref: "#/components/responses/ErrorResponse"
   /entity/non-fungible/ids:
     post:
-      operationId: EntityNonFungibleLocalIds
-      summary: Iterates through all non-fungible ids associated with a given non-fungible resource of a given entity.
+      operationId: EntityNonFungibleIds
+      #### TODO: CONTINUE FROM HERE WITH ADDING GET AND FIXING THE DESCRIPTIONS
+      summary: Get Entity Non-Fungible IDs
+      description: |
+        Returns all non-fungible IDs of a given non-fungible resource owned by a given entity.
+        The returned response is in a paginated format, ordered by the resource's first appearence on the ledger.
       tags:
-        - Entity
+        - State
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EntityNonFungibleLocalIdsRequest"
+              $ref: "#/components/schemas/EntityNonFungibleIdsRequest"
       responses:
         "200":
-          description: Entity Non-Fungibles
+          description: Entity Non-Fungible IDs (paginated)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EntityNonFungibleLocalIdsResponse"
+                $ref: "#/components/schemas/EntityNonFungibleIdsResponse"
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
 
   /non-fungible/ids:
     post:
-      operationId: NonFungibleLocalIds
-      summary: Iterates through all non-fungible ids of a given non-fungible resource.
+      operationId: NonFungibleIds
+      summary: Get Non-Fungible Collection
+      description: |
+        Returns the non-fungible IDs of a given non-fungible resource.
+        Returned response is in a paginated format, ordered by their first appearance on the ledger.
       tags:
-        - Non-Fungible
+        - State
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NonFungibleLocalIdsRequest"
+              $ref: "#/components/schemas/NonFungibleIdsRequest"
       responses:
         "200":
-          description: Non-Fungible Ids
+          description: Non-Fungible IDs (paginated)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NonFungibleLocalIdsResponse"
+                $ref: "#/components/schemas/NonFungibleIdsResponse"
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
   /non-fungible/data:
     post:
-      operationId: NonFungibleData
-      summary: Returns data associated with a given non-fungible id.
+      operationId: NonFungibleIdData
+      summary: Get Non-Fungible Data
+      description: |
+        Returns data associated with a given non-fungible ID of a given non-fungible resource.
       tags:
-        - Non-Fungible
+        - State
       requestBody:
         required: true
         content:
@@ -346,11 +503,33 @@ paths:
               $ref: "#/components/schemas/NonFungibleDataRequest"
       responses:
         "200":
-          description: Non-Fungible Data
+          description: Non-Fungible ID Data
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/NonFungibleDataResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
+  /state/validators/list:
+    post:
+      operationId: StateValidatorsList
+      summary: Get Validators List
+      tags:
+        - State
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StateValidatorsListRequest"
+      responses:
+        "200":
+          description: Validators List
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StateValidatorsListResponse"
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
 
@@ -370,18 +549,82 @@ components:
     #
 
     EntityAddress:
+      description: Bech32m-encoded human readable version of the entity's global address.
       type: string
-      description: The Bech32m-encoded human readable version of the entity's global address.
     ComponentAddress:
+      description: Bech32m-encoded human readable version of the component (normal, account, system) global address.
       type: string
-      description: The Bech32m-encoded human readable version of the component (normal, account, system) global address.
     ResourceAddress:
+      description: Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address.
       type: string
-      description: The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address.
 
     BigDecimal:
+      description: String-encoded decimal representing the amount of a related fungible resource.
       type: string
-      description: The string-encoded decimal representing the amount
+
+    NonFungibleId:
+      description: String-encoded non-fungible ID.
+      type: string
+
+    HashHexString:
+      description: Hex-encoded SHA-256 hash.
+      type: string
+    HexString:
+      description: Hex-encoded binary blob.
+      type: string
+    NotarizedTransactionHexString:
+      description: Hex-encoded notarized transaction payload which can be submitted.
+      type: string
+
+    AccessRulesChain:
+      description: Refer to `#/components/schemas/AccessRules` of CoreApi for more details.
+      type: object
+
+    #
+    # Keys
+    #
+    PublicKeyType:
+      type: string
+      enum:
+        - EcdsaSecp256k1
+        - EddsaEd25519
+    PublicKey:
+      type: object
+      required:
+        - key_type
+      properties:
+        key_type:
+          $ref: "#/components/schemas/PublicKeyType"
+      discriminator:
+        propertyName: key_type
+        mapping:
+          # NOTE: These need to match PublicKeyType
+          EcdsaSecp256k1: "#/components/schemas/PublicKeyEcdsaSecp256k1"
+          EddsaEd25519: "#/components/schemas/PublicKeyEddsaEd25519"
+    PublicKeyEcdsaSecp256k1:
+      allOf:
+        - $ref: "#/components/schemas/PublicKey"
+        - type: object
+          required:
+            - key_hex
+          properties:
+            key_hex:
+              type: string
+              minLength: 66
+              maxLength: 66
+              description: The hex-encoded compressed ECDSA Secp256k1 public key (33 bytes)
+    PublicKeyEddsaEd25519:
+      allOf:
+        - $ref: "#/components/schemas/PublicKey"
+        - type: object
+          required:
+            - key_hex
+          properties:
+            key_hex:
+              type: string
+              minLength: 64
+              maxLength: 64
+              description: The hex-encoded compressed EdDSA Ed25519 public key (32 bytes)
 
     #
     # Common Request Types
@@ -394,26 +637,30 @@ components:
           $ref: "#/components/schemas/LedgerStateSelector"
 
     LedgerStateSelector:
-      description: Allows a client to request a response referencing an earlier (`at_*` properties) or later (`from_*` properties) ledger state.
+      description: |
+        Optional. This allows for a request to be made against a historic state.
+        If a constraint is specified, the Gateway will resolve the request against the ledger state at that time.
+        If not specified, requests will be made with respect to the top of the committed ledger.
       type: object
       nullable: true
       properties:
         state_version:
-          description: If the version is provided, the latest ledger state <= the given version is returned.
+          description: If provided, the latest ledger state lower than or equal to the given state version is returned.
           nullable: true
           type: integer
           format: int64
         timestamp:
-          description: If a timestamp is provided, the latest ledger state <= the given timestamp is returned.
+          description: If provided, the latest ledger state lower than or equal to the given round timestamp is returned.
           nullable: true
           type: string
           format: date-time
         epoch:
-          description: If an epoch is provided, the ledger state at the given epoch <= the given round (else round 0) is returned.
+          description: If provided, the ledger state lower than or equal to the given epoch at round 0 is returned.
           nullable: true
           type: integer
           format: int64
         round:
+          description: If provided must be accompanied with `epoch`, the ledger state lower than or equal to the given epoch and round is returned.
           nullable: true
           type: integer
           format: int64
@@ -433,19 +680,23 @@ components:
       type: object
       properties:
         total_count:
+          description: Total number of items in underlying collection, fragment of which is available in `items` collection.
           type: integer
           format: int64
           nullable: true
         previous_cursor:
+          description: If specified, contains a cursor to query previous page of the `items` collection.
           type: string
           nullable: true
         next_cursor:
+          description: If specified, contains a cursor to query next page of the `items` collection.
           type: string
           nullable: true
 
     LedgerState:
       description: |
-        The ledger state against which the response was generated. Can be used to detect if the Network Gateway is returning up-to-date information.
+        The ledger state against which the response was generated.
+        Can be used to detect if the Network Gateway is returning up-to-date information.
       type: object
       required:
         - network
@@ -463,7 +714,10 @@ components:
           format: int64
         proposer_round_timestamp:
           description: |
-            The round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.
+            The proposer round timestamp of the consensus round when this transaction was committed to ledger.
+            This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set.
+            If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated
+            information, or the network has stalled.
           type: string
           # TODO add format: date-time once OAS generator get fixed support for required value-types
         epoch:
@@ -476,6 +730,7 @@ components:
           format: int64
 
     EntityMetadataCollection:
+      description: Entity metadata collection.
       allOf:
         - $ref: "#/components/schemas/ResultSetCursorMixin"
         - type: object
@@ -487,17 +742,21 @@ components:
               items:
                 $ref: "#/components/schemas/EntityMetadataItem"
     EntityMetadataItem:
+      description: Entity metadata key-value pair.
       type: object
       required:
         - key
         - value
       properties:
         key:
+          description: Entity metadata key.
           type: string
         value:
+          description: Entity metadata value.
           type: string
 
     FungibleResourcesCollection:
+      description: Fungible resources collection.
       allOf:
         - $ref: "#/components/schemas/ResultSetCursorMixin"
         - type: object
@@ -519,6 +778,7 @@ components:
         amount:
           $ref: "#/components/schemas/TokenAmount"
     NonFungibleResourcesCollection:
+      description: Non-fungible resources collection.
       allOf:
         - $ref: "#/components/schemas/ResultSetCursorMixin"
         - type: object
@@ -540,7 +800,8 @@ components:
         amount:
           type: integer
           format: int64
-    NonFungibleLocalIdsCollection:
+    NonFungibleIdsCollection:
+      description: Non-fungible resource IDs collection.
       allOf:
         - $ref: "#/components/schemas/ResultSetCursorMixin"
         - type: object
@@ -550,14 +811,14 @@ components:
             items:
               type: array
               items:
-                $ref: "#/components/schemas/NonFungibleLocalIdsCollectionItem"
-    NonFungibleLocalIdsCollectionItem:
+                $ref: "#/components/schemas/NonFungibleIdsCollectionItem"
+    NonFungibleIdsCollectionItem:
       type: object
       required:
         - non_fungible_id
       properties:
         non_fungible_id:
-          type: string
+          $ref: "#/components/schemas/NonFungibleId"
 
     CommittedTransactionInfo:
       type: object
@@ -574,9 +835,9 @@ components:
         transaction_status:
           $ref: "#/components/schemas/TransactionStatus"
         payload_hash_hex:
-          type: string
+          $ref: "#/components/schemas/HashHexString"
         intent_hash_hex:
-          type: string
+          $ref: "#/components/schemas/HashHexString"
         fee_paid:
           $ref: "#/components/schemas/TokenAmount"
         confirmed_at:
@@ -597,6 +858,7 @@ components:
         - rejected
 
     TokenAmount:
+      description: Represents a decimal amount of a given resource.
       type: object
       required:
         - value
@@ -607,14 +869,63 @@ components:
         address:
           $ref: "#/components/schemas/ResourceAddress"
 
-    NonFungibleLocalIdType:
+    NonFungibleIdType:
       type: string
       enum:
         - string
-        - u32
-        - u64
+        - number
         - bytes
         - uuid
+
+    ValidatorCollection:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/ValidatorCollectionItem"
+    ValidatorCollectionItem:
+      type: object
+      required:
+        - address
+        - metadata
+      properties:
+        address:
+          $ref: "#/components/schemas/EntityAddress"
+        state:
+          type: object
+          nullable: true
+        active_in_epoch:
+          $ref: "#/components/schemas/ValidatorCollectionItemActiveInEpoch"
+        metadata:
+          $ref: "#/components/schemas/EntityMetadataCollection"
+    ValidatorCollectionItemActiveInEpoch:
+      type: object
+      required:
+        - stake
+        - key
+      properties:
+        stake:
+          $ref: "#/components/schemas/ValidatorCollectionItemActiveInEpochStake"
+        key:
+          $ref: "#/components/schemas/PublicKey"
+        metadata:
+          $ref: "#/components/schemas/EntityMetadataCollection"
+    ValidatorCollectionItemActiveInEpochStake:
+      type: object
+      required:
+        - stake
+        - stake_percentage
+      properties:
+        stake:
+          $ref: "#/components/schemas/TokenAmount"
+        stake_percentage:
+          type: number
+          format: double
 
     #
     # /gateway/* Request & Response Types
@@ -665,7 +976,7 @@ components:
       properties:
         state_version:
           description: |
-            The latest-seen state version of the tip of the network's ledger. If this is significantly ahead of the current LedgerState version, the Network Gateway is possibly behind and may be reporting outdated information.
+            The latest-seen state version of the tip of the network's ledger. If this is significantly ahead of the current ledger state version, the Network Gateway is possibly behind and may be reporting outdated information.
           type: integer
           format: int64
     GatewayInfoResponseReleaseInfo:
@@ -727,8 +1038,7 @@ components:
         - notarized_transaction_hex
       properties:
         notarized_transaction_hex:
-          description: The notarized transaction payload which can be submitted, hex encoded.
-          type: string
+          $ref: "#/components/schemas/NotarizedTransactionHexString"
     TransactionSubmitResponse:
       type: object
       required:
@@ -740,13 +1050,12 @@ components:
 
     TransactionStatusRequest:
       allOf:
-        - $ref: "#/components/schemas/AtLedgerStateMixin"
         - type: object
           required:
-            - transaction_identifier
+            - intent_hash_hex
           properties:
             intent_hash_hex:
-              type: string
+              $ref: "#/components/schemas/HashHexString"
       example:
         intent_hash_hex: "<transaction-intent-hash>"
     TransactionStatusResponse:
@@ -773,7 +1082,7 @@ components:
         - status
       properties:
         payload_hash_hex:
-          type: string
+          $ref: "#/components/schemas/HashHexString"
         status:
           $ref: "#/components/schemas/TransactionStatus"
         error_message:
@@ -808,7 +1117,7 @@ components:
         type:
           $ref: "#/components/schemas/TransactionCommittedDetailsRequestIdentifierType"
         value_hex:
-          type: string
+          $ref: "#/components/schemas/HexString"
     TransactionCommittedDetailsResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
@@ -829,8 +1138,7 @@ components:
         - referenced_global_entities
       properties:
         raw_hex:
-          description: The raw transaction payload, hex encoded.
-          type: string
+          $ref: "#/components/schemas/HexString"
         receipt:
           type: object
         referenced_global_entities:
@@ -838,8 +1146,7 @@ components:
           items:
             type: string
         message_hex:
-          description: The message bytes, hex encoded.
-          type: string
+          $ref: "#/components/schemas/HexString"
 
     #
     # /entity/* Request & Response Types
@@ -890,7 +1197,6 @@ components:
           required:
             - address
             - metadata
-            - details
           properties:
             address:
               $ref: "#/components/schemas/EntityAddress"
@@ -960,7 +1266,7 @@ components:
         vault_access_rules_chain:
           type: object
         non_fungible_id_type:
-          $ref: "#/components/schemas/NonFungibleLocalIdType"
+          $ref: "#/components/schemas/NonFungibleIdType"
     EntityDetailsResponsePackageDetails:
       type: object
       required:
@@ -970,7 +1276,7 @@ components:
         discriminator:
           $ref: "#/components/schemas/EntityDetailsResponseDetailsType"
         code_hex:
-          type: string
+          $ref: "#/components/schemas/HexString"
     EntityDetailsResponseComponentDetails:
       type: object
       required:
@@ -1123,7 +1429,7 @@ components:
             non_fungibles:
               $ref: "#/components/schemas/NonFungibleResourcesCollection"
 
-    EntityNonFungibleLocalIdsRequest:
+    EntityNonFungibleIdsRequest:
       allOf:
         - $ref: "#/components/schemas/AtLedgerStateMixin"
         - type: object
@@ -1145,7 +1451,7 @@ components:
       example:
         address: "<component-entity-address>"
         resource_address: "<non-fungible-resource-entity-address>"
-    EntityNonFungibleLocalIdsResponse:
+    EntityNonFungibleIdsResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
         - type: object
@@ -1159,9 +1465,9 @@ components:
             resource_address:
               $ref: "#/components/schemas/ResourceAddress"
             non_fungible_ids:
-              $ref: "#/components/schemas/NonFungibleLocalIdsCollection"
+              $ref: "#/components/schemas/NonFungibleIdsCollection"
 
-    NonFungibleLocalIdsRequest:
+    NonFungibleIdsRequest:
       allOf:
         - $ref: "#/components/schemas/AtLedgerStateMixin"
         - type: object
@@ -1180,7 +1486,7 @@ components:
               nullable: true
       example:
         address: "<non-fungible-entity-address>"
-    NonFungibleLocalIdsResponse:
+    NonFungibleIdsResponse:
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
         - type: object
@@ -1191,9 +1497,9 @@ components:
             address:
               $ref: "#/components/schemas/EntityAddress"
             non_fungible_ids:
-              $ref: "#/components/schemas/NonFungibleLocalIdsCollection"
+              $ref: "#/components/schemas/NonFungibleIdsCollection"
 
-    NonFungibleDataRequest:
+    NonFungibleDataRequest: # TODO rename to NonFungibleIdDataRequest
       allOf:
         - $ref: "#/components/schemas/AtLedgerStateMixin"
         - type: object
@@ -1204,7 +1510,7 @@ components:
             address:
               $ref: "#/components/schemas/EntityAddress"
             non_fungible_id:
-              type: string
+              $ref: "#/components/schemas/NonFungibleId"
             cursor:
               description: This cursor allows forward pagination, by providing the cursor from the previous request.
               type: string
@@ -1216,7 +1522,7 @@ components:
       example:
         address: "<non-fungible-entity-address>"
         non_fungible_id: "0a0100000000"
-    NonFungibleDataResponse:
+    NonFungibleDataResponse: # TODO rename to NonFungibleIdDataResponse
       allOf:
         - $ref: "#/components/schemas/LedgerStateMixin"
         - type: object
@@ -1230,13 +1536,38 @@ components:
             address:
               $ref: "#/components/schemas/ResourceAddress"
             non_fungible_id_type:
-              $ref: "#/components/schemas/NonFungibleLocalIdType"
+              $ref: "#/components/schemas/NonFungibleIdType"
             non_fungible_id:
-              type: string
+              $ref: "#/components/schemas/NonFungibleId"
             mutable_data_hex:
-              type: string
+              $ref: "#/components/schemas/HexString"
             immutable_data_hex:
+              $ref: "#/components/schemas/HexString"
+
+    #
+    # /state/validators/* Request & Response Types
+    #
+
+    StateValidatorsListRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - type: object
+          properties:
+            cursor:
+              description: This cursor allows forward pagination, by providing the cursor from the previous request.
               type: string
+              nullable: true
+      example:
+        at_ledger_state: null
+    StateValidatorsListResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - type: object
+          required:
+            - validators
+          properties:
+            validators:
+              $ref: "#/components/schemas/ValidatorCollection"
 
     #
     # Errors

@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - AggregatedValue.View
-public extension AggregatedValue {
+extension AggregatedValue {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -15,8 +15,8 @@ public extension AggregatedValue {
 	}
 }
 
-public extension AggregatedValue.View {
-	var body: some View {
+extension AggregatedValue.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -39,7 +39,7 @@ extension AggregatedValue.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
 		var isValueVisible: Bool
-		var value: Float?
+		var value: BigDecimal?
 		var currency: FiatCurrency // FIXME: this should be currency, since it can be any currency
 
 		init(state: AggregatedValue.State) {
@@ -52,18 +52,19 @@ extension AggregatedValue.View {
 
 // MARK: - AggregatedValueView
 private struct AggregatedValueView: View {
-	let value: Float?
+	let value: BigDecimal?
 	let currency: FiatCurrency
 	let isValueVisible: Bool
 	let toggleVisibilityAction: () -> Void
 
 	// TODO: is this the right way to handle no value -> 0?
-	var amount: Float {
+	var amount: BigDecimal {
 		value ?? 0
 	}
 
 	var formattedAmount: String {
-		amount.formatted(.currency(code: currency.symbol))
+//		amount.formatted(.currency(code: currency.symbol))
+		amount.description
 	}
 
 	var body: some View {
@@ -91,7 +92,7 @@ private struct AggregatedValueView: View {
 // TODO: extract to separate Feature when view complexity increases
 private struct AmountView: View {
 	var isValueVisible: Bool
-	let amount: Float // NOTE: used for copying the actual value
+	let amount: BigDecimal // NOTE: used for copying the actual value
 	let formattedAmount: String
 	let fiatCurrency: FiatCurrency
 

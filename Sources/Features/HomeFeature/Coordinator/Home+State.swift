@@ -6,9 +6,9 @@ import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - Home.State
-public extension Home {
+extension Home {
 	// MARK: State
-	struct State: Equatable {
+	public struct State: Equatable {
 		public var accountPortfolioDictionary: AccountPortfolioDictionary
 
 		// MARK: - Components
@@ -40,8 +40,8 @@ public extension Home {
 
 #if DEBUG
 
-public extension Home.State {
-	static let previewValue = Home.State(
+extension Home.State {
+	public static let previewValue = Home.State(
 		header: .init(hasNotification: false),
 		accountDetails: AccountDetails.State(
 			for: .init(

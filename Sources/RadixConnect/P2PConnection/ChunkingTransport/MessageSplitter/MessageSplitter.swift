@@ -21,16 +21,16 @@ public final class MessageSplitter: Sendable {
 	}
 }
 
-public extension MessageSplitter {
-	typealias ID = ChunkedMessagePackage.MessageID
-	typealias Split = @Sendable (Data, ID) throws -> [ChunkedMessagePackage]
+extension MessageSplitter {
+	public typealias ID = ChunkedMessagePackage.MessageID
+	public typealias Split = @Sendable (Data, ID) throws -> [ChunkedMessagePackage]
 
 	// According to CAP19
-	static let messageSizeChunkLimitDefault = 15441
+	public static let messageSizeChunkLimitDefault = 15441
 }
 
-public extension MessageSplitter {
-	func split(message: Data, messageID: ID) throws -> [ChunkedMessagePackage] {
+extension MessageSplitter {
+	public func split(message: Data, messageID: ID) throws -> [ChunkedMessagePackage] {
 		let chunks = message.chunks(ofCount: messageSizeChunkLimit)
 		let hashOfMessage = try RadixHasher.hash(data: message)
 

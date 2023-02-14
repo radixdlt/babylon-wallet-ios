@@ -119,9 +119,9 @@ public struct App: Sendable, ReducerProtocol {
 }
 
 // MARK: App.UserFacingError
-public extension App {
+extension App {
 	/// A purely user-facing error. Not made for developer logging or analytics collection.
-	struct UserFacingError: Sendable, Equatable, LocalizedError {
+	public struct UserFacingError: Sendable, Equatable, LocalizedError {
 		let underlyingError: Swift.Error
 
 		init(_ underlyingError: Swift.Error) {

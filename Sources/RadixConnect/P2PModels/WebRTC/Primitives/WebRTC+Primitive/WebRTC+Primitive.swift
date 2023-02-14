@@ -12,22 +12,22 @@ public enum WebRTCPrimitive: Sendable, Hashable, Encodable, CustomStringConverti
 	case iceCandidate(WebRTCICECandidate)
 }
 
-public extension WebRTCPrimitive {
-	var offer: WebRTCOffer? {
+extension WebRTCPrimitive {
+	public var offer: WebRTCOffer? {
 		guard case let .offer(offer) = self else {
 			return nil
 		}
 		return offer
 	}
 
-	var answer: WebRTCAnswer? {
+	public var answer: WebRTCAnswer? {
 		guard case let .answer(answer) = self else {
 			return nil
 		}
 		return answer
 	}
 
-	var iceCandidate: WebRTCICECandidate? {
+	public var iceCandidate: WebRTCICECandidate? {
 		guard case let .iceCandidate(iceCandidate) = self else {
 			return nil
 		}
@@ -35,8 +35,8 @@ public extension WebRTCPrimitive {
 	}
 }
 
-public extension WebRTCPrimitive {
-	var description: String {
+extension WebRTCPrimitive {
+	public var description: String {
 		switch self {
 		case let .offer(offer):
 			return "offer(\(offer.description(includeTypeName: false))"
@@ -49,7 +49,7 @@ public extension WebRTCPrimitive {
 }
 
 #if DEBUG
-public extension WebRTCPrimitive {
-	static let placeholder = Self.offer(.placeholder)
+extension WebRTCPrimitive {
+	public static let placeholder = Self.offer(.placeholder)
 }
 #endif // DEBUG

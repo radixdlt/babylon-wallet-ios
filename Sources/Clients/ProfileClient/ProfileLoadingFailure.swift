@@ -2,8 +2,8 @@ import ClientPrelude
 import Profile
 
 // MARK: - Profile.LoadingFailure
-public extension Profile {
-	enum LoadingFailure: Sendable, Swift.Error, Equatable {
+extension Profile {
+	public enum LoadingFailure: Sendable, Swift.Error, Equatable {
 		case profileVersionOutdated(json: Data, version: ProfileSnapshot.Version)
 		case decodingFailure(json: Data, JSONDecodingError)
 
@@ -14,8 +14,8 @@ public extension Profile {
 	}
 }
 
-public extension Profile {
-	struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Equatable {
+extension Profile {
+	public struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Equatable {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
 			lhs.version == rhs.version && lhs.errorDescription == rhs.errorDescription
 		}
@@ -30,14 +30,14 @@ public extension Profile {
 		public var errorDescription: String? { L10n.ProfileLoad.failedToCreateProfileFromSnapshotError(error, version) }
 	}
 
-	enum JSONDecodingError: Sendable, LocalizedError, Equatable {
+	public enum JSONDecodingError: Sendable, LocalizedError, Equatable {
 		case known(KnownDecodingError)
 		case unknown(UnknownDecodingError)
 	}
 }
 
-public extension Profile.JSONDecodingError {
-	var errorDescription: String? {
+extension Profile.JSONDecodingError {
+	public var errorDescription: String? {
 		switch self {
 		case let .known(error):
 			return error.localizedDescription
@@ -46,7 +46,7 @@ public extension Profile.JSONDecodingError {
 		}
 	}
 
-	enum KnownDecodingError: Sendable, LocalizedError, Equatable {
+	public enum KnownDecodingError: Sendable, LocalizedError, Equatable {
 		case noProfileSnapshotVersionFoundInJSON
 		case decodingError(FailedToDecodeProfile)
 
@@ -61,7 +61,7 @@ public extension Profile.JSONDecodingError {
 	}
 
 	// Swift.DecodingError made `Equatable` inside `EngineToolkitModels`
-	struct FailedToDecodeProfile: Sendable, LocalizedError, Equatable {
+	public struct FailedToDecodeProfile: Sendable, LocalizedError, Equatable {
 		public let decodingError: Swift.DecodingError
 		public init(decodingError: DecodingError) {
 			self.decodingError = decodingError
@@ -70,7 +70,7 @@ public extension Profile.JSONDecodingError {
 		public var errorDescription: String? { L10n.ProfileLoad.decodingError(decodingError) }
 	}
 
-	struct UnknownDecodingError: Sendable, LocalizedError, Equatable {
+	public struct UnknownDecodingError: Sendable, LocalizedError, Equatable {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
 			lhs.errorDescription == rhs.errorDescription
 		}

@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - FungibleTokenList.Row.State
-public extension FungibleTokenList.Row {
+extension FungibleTokenList.Row {
 	// MARK: State
-	struct State: Sendable, Hashable {
+	public struct State: Sendable, Hashable {
 		public var container: FungibleTokenContainer
 
 		// MARK: - AppSettings properties

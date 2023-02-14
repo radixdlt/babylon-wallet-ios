@@ -1,8 +1,8 @@
 import Resources
 import SwiftUI
 
-public extension View {
-	func showDeveloperDisclaimerBanner() -> some View {
+extension View {
+	public func showDeveloperDisclaimerBanner() -> some View {
 		VStack(spacing: 0) {
 			DeveloperDisclaimerBanner()
 			self

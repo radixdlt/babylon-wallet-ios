@@ -24,15 +24,15 @@ public struct FactorSources:
 	}
 }
 
-public extension FactorSources {
+extension FactorSources {
 	/// When the wallet notarized transactions it should be able to do that without the input from the user (except auth with Biometrics...)
 	/// thus we use the "OnDeviceFactorSource" which is the `Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource`
 	/// as factor source for notary private key.
-	typealias NotaryFactorSource = Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource
+	public typealias NotaryFactorSource = Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource
 	/// When the wallet notarized transactions it should be able to do that without the input from the user (except auth with Biometrics...)
 	/// thus we use the "OnDeviceFactorSource" which is the `Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource`
 	/// as factor source for notary private key.
-	var notaryFactorSource: NotaryFactorSource {
+	public var notaryFactorSource: NotaryFactorSource {
 		curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first
 	}
 }
@@ -40,20 +40,20 @@ public extension FactorSources {
 // MARK: - NoNonHardwareHierarchicalDeterministicFactorSourceFound
 public struct NoNonHardwareHierarchicalDeterministicFactorSourceFound: Swift.Error {}
 
-public extension FactorSources {
-	func anyNonHardwareHierarchicalDeterministicFactorSource() throws -> any FactorSourceNonHardwareHierarchicalDeterministicProtocol {
+extension FactorSources {
+	public func anyNonHardwareHierarchicalDeterministicFactorSource() throws -> any FactorSourceNonHardwareHierarchicalDeterministicProtocol {
 		guard let source = anyFactorSources.compactMap({ $0 as? (any FactorSourceNonHardwareHierarchicalDeterministicProtocol) }).first else {
 			throw NoNonHardwareHierarchicalDeterministicFactorSourceFound()
 		}
 		return source
 	}
 
-	var anyFactorSources: [any FactorSourceProtocol] {
+	public var anyFactorSources: [any FactorSourceProtocol] {
 		curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.rawValue.elements.map { $0 } +
 			secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources.elements.map { $0 }
 	}
 
-	var factorSources: NonEmpty<IdentifiedArrayOf<FactorSource>> {
+	public var factorSources: NonEmpty<IdentifiedArrayOf<FactorSource>> {
 		var idArray: IdentifiedArrayOf<FactorSource> = .init()
 		idArray.append(contentsOf: curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.rawValue.elements.map { $0.wrapAsFactorSource() })
 		idArray.append(contentsOf:
@@ -64,13 +64,13 @@ public extension FactorSources {
 		return nonEmpty
 	}
 
-	func find(reference: FactorSourceReference) -> (any FactorSourceProtocol)? {
+	public func find(reference: FactorSourceReference) -> (any FactorSourceProtocol)? {
 		anyFactorSources.first(where: { $0.reference == reference })
 	}
 }
 
-public extension FactorSources {
-	var customDumpMirror: Mirror {
+extension FactorSources {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -81,7 +81,7 @@ public extension FactorSources {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		"curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources": \(curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources),
 		"secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources": \(secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources),
@@ -90,12 +90,12 @@ public extension FactorSources {
 }
 
 #if DEBUG
-public extension NonEmpty where Collection == IdentifiedArrayOf<FactorSource> {
-	static let previewValue: Self = .init(rawValue: .previewValue)!
+extension NonEmpty where Collection == IdentifiedArrayOf<FactorSource> {
+	public static let previewValue: Self = .init(rawValue: .previewValue)!
 }
 
-public extension IdentifiedArrayOf<FactorSource> {
-	static let previewValue: Self = .init(arrayLiteral: FactorSource.previewValue)
+extension IdentifiedArrayOf<FactorSource> {
+	public static let previewValue: Self = .init(arrayLiteral: FactorSource.previewValue)
 }
 
 #endif // DEBUG

@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityOverviewResponseAllOf = GatewayAPI.EntityOverviewResponseAllOf
 
 // MARK: - GatewayAPI.EntityOverviewResponseAllOf
-public extension GatewayAPI {
-	struct EntityOverviewResponseAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityOverviewResponseAllOf: Codable, Hashable {
 		public private(set) var entities: [EntityOverviewResponseEntityItem]
 
 		public init(entities: [EntityOverviewResponseEntityItem]) {

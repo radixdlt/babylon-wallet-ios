@@ -1,8 +1,8 @@
 import ClientPrelude
 import ProfileModels
 
-public extension ProfileClient {
-	func createNewUnsavedVirtualEntity<Entity: EntityProtocol & Sendable>(
+extension ProfileClient {
+	public func createNewUnsavedVirtualEntity<Entity: EntityProtocol & Sendable>(
 		request: CreateVirtualEntityRequest
 	) async throws -> Entity {
 		guard Entity.entityKind == request.entityKind else {
@@ -15,7 +15,7 @@ public extension ProfileClient {
 		return entity
 	}
 
-	func saveNewEntity<Entity: EntityProtocol>(_ entity: Entity) async throws {
+	public func saveNewEntity<Entity: EntityProtocol>(_ entity: Entity) async throws {
 		switch entity.kind {
 		case .account:
 			guard let account = entity as? OnNetwork.Account else {

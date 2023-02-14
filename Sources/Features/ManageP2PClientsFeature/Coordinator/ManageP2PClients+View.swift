@@ -3,9 +3,9 @@ import NewConnectionFeature
 import P2PConnectivityClient
 
 // MARK: - ManageP2PClients.View
-public extension ManageP2PClients {
+extension ManageP2PClients {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.StoreOf<ManageP2PClients>
 		public let store: Store
 		public init(store: Store) {
@@ -14,8 +14,8 @@ public extension ManageP2PClients {
 	}
 }
 
-public extension ManageP2PClients.View {
-	var body: some View {
+extension ManageP2PClients.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -40,8 +40,8 @@ public extension ManageP2PClients.View {
 	}
 }
 
-private extension ManageP2PClients.View {
-	func manageP2PClientsView(
+extension ManageP2PClients.View {
+	fileprivate func manageP2PClientsView(
 		viewStore: ViewStore<ViewState, ManageP2PClients.Action.ViewAction>
 	) -> some View {
 		ForceFullScreen {
@@ -105,8 +105,8 @@ private extension ManageP2PClients.View {
 }
 
 // MARK: - ManageP2PClients.View.ViewState
-public extension ManageP2PClients.View {
-	struct ViewState: Equatable {
+extension ManageP2PClients.View {
+	public struct ViewState: Equatable {
 		public var clients: IdentifiedArrayOf<ManageP2PClient.State>
 		public var canAddMoreConnections: Bool {
 			// FIXME: Post betanet we should allow multiple connections...

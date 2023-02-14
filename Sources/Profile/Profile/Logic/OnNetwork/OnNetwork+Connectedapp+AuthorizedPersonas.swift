@@ -1,8 +1,8 @@
 import Prelude
 
 // MARK: ~~~=== LOGIC ===~~~
-public extension OnNetwork {
-	struct AccountForDisplay: Sendable, Hashable, Identifiable {
+extension OnNetwork {
+	public struct AccountForDisplay: Sendable, Hashable, Identifiable {
 		public typealias ID = AccountAddress
 		public var id: ID { address }
 		public let address: AccountAddress
@@ -20,7 +20,7 @@ public extension OnNetwork {
 		}
 	}
 
-	struct AuthorizedPersonaDetailed: Sendable, Hashable, Identifiable {
+	public struct AuthorizedPersonaDetailed: Sendable, Hashable, Identifiable {
 		public typealias ID = IdentityAddress
 		public var id: ID { identityAddress }
 		/// Address that globally abnd uniquely identifies this Persona.
@@ -39,14 +39,14 @@ public extension OnNetwork {
 		public let simpleAccounts: OrderedSet<AccountForDisplay>?
 	}
 
-	struct ConnectedDappDetailed: Sendable, Hashable {
+	public struct ConnectedDappDetailed: Sendable, Hashable {
 		public let networkID: Network.ID
 		public let dAppDefinitionAddress: DappDefinitionAddress
 		public let displayName: NonEmpty<String>
 		public let detailedAuthorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>
 	}
 
-	func detailsForConnectedDapp(_ dapp: ConnectedDapp) throws -> ConnectedDappDetailed {
+	public func detailsForConnectedDapp(_ dapp: ConnectedDapp) throws -> ConnectedDappDetailed {
 		guard
 			dapp.networkID == self.networkID
 		else {
@@ -103,8 +103,8 @@ public extension OnNetwork {
 		)
 	}
 
-	struct NetworkDiscrepancyError: Swift.Error {}
-	struct DiscrepancyConnectedDappReferencedPersonaWhichDoesNotExist: Swift.Error {}
-	struct ConnectedDappReferencesFieldIDThatDoesNotExist: Swift.Error {}
-	struct ConnectedDappReferencesAccountThatDoesNotExist: Swift.Error {}
+	public struct NetworkDiscrepancyError: Swift.Error {}
+	public struct DiscrepancyConnectedDappReferencedPersonaWhichDoesNotExist: Swift.Error {}
+	public struct ConnectedDappReferencesFieldIDThatDoesNotExist: Swift.Error {}
+	public struct ConnectedDappReferencesAccountThatDoesNotExist: Swift.Error {}
 }

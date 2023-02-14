@@ -5,28 +5,24 @@ import TransactionClient
 public struct FaucetClient: Sendable {
 	public var getFreeXRD: GetFreeXRD
 	public var isAllowedToUseFaucet: IsAllowedToUseFaucet
-	public var saveLastUsedEpoch: SaveLastUsedEpoch
 
 	public init(
 		getFreeXRD: @escaping GetFreeXRD,
-		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet,
-		saveLastUsedEpoch: @escaping SaveLastUsedEpoch
+		isAllowedToUseFaucet: @escaping IsAllowedToUseFaucet
 	) {
 		self.getFreeXRD = getFreeXRD
 		self.isAllowedToUseFaucet = isAllowedToUseFaucet
-		self.saveLastUsedEpoch = saveLastUsedEpoch
 	}
 }
 
-public extension FaucetClient {
-	typealias GetFreeXRD = @Sendable (FaucetRequest) async throws -> TXID
-	typealias IsAllowedToUseFaucet = @Sendable (AccountAddress) async throws -> Bool
-	typealias SaveLastUsedEpoch = @Sendable (FaucetRequest) async throws -> Void
+extension FaucetClient {
+	public typealias GetFreeXRD = @Sendable (FaucetRequest) async throws -> Void
+	public typealias IsAllowedToUseFaucet = @Sendable (AccountAddress) async -> Bool
 }
 
 // MARK: FaucetClient.FaucetRequest
-public extension FaucetClient {
-	struct FaucetRequest: Sendable, Hashable {
+extension FaucetClient {
+	public struct FaucetRequest: Sendable, Hashable {
 		public let recipientAccountAddress: AccountAddress
 		public let unlockKeychainPromptShowToUser: String
 		public let addLockFeeInstructionToManifest: Bool
@@ -45,8 +41,8 @@ public extension FaucetClient {
 	}
 }
 
-public extension DependencyValues {
-	var faucetClient: FaucetClient {
+extension DependencyValues {
+	public var faucetClient: FaucetClient {
 		get { self[FaucetClient.self] }
 		set { self[FaucetClient.self] = newValue }
 	}

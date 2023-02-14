@@ -17,22 +17,22 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var transactionStatus: GetTransactionStatus
 }
 
-public extension GatewayAPIClient {
-	typealias GetNetworkName = @Sendable (URL) async throws -> Network.Name
+extension GatewayAPIClient {
+	public typealias GetNetworkName = @Sendable (URL) async throws -> Network.Name
 
-	typealias GetEpoch = @Sendable () async throws -> Epoch
+	public typealias GetEpoch = @Sendable () async throws -> Epoch
 
-	typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityResourcesResponse
+	public typealias GetAccountResourcesByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityResourcesResponse
 
-	typealias GetAccountMetadataByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityMetadataResponse
+	public typealias GetAccountMetadataByAddress = @Sendable (AccountAddress) async throws -> GatewayAPI.EntityMetadataResponse
 
-	typealias GetResourcesOverview = @Sendable (GatewayAPI.EntityOverviewRequest) async throws -> GatewayAPI.EntityOverviewResponse
+	public typealias GetResourcesOverview = @Sendable (GatewayAPI.EntityOverviewRequest) async throws -> GatewayAPI.EntityOverviewResponse
 
-	typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.EntityDetailsResponse
+	public typealias GetResourceDetailsByResourceIdentifier = @Sendable (ResourceIdentifier) async throws -> GatewayAPI.EntityDetailsResponse
 
-	typealias GetNonFungibleLocalIds = @Sendable (AccountAddress, ResourceIdentifier) async throws -> GatewayAPI.NonFungibleLocalIdsResponseAllOf
+	public typealias GetNonFungibleLocalIds = @Sendable (AccountAddress, ResourceIdentifier) async throws -> GatewayAPI.NonFungibleIdsResponseAllOf
 
-	typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
+	public typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 
-	typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
+	public typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
 }

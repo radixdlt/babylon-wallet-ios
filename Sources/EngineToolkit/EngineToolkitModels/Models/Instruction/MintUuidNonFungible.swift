@@ -24,7 +24,7 @@ public struct MintUuidNonFungible: InstructionProtocol {
 	}
 }
 
-public extension MintUuidNonFungible {
+extension MintUuidNonFungible {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -35,7 +35,7 @@ public extension MintUuidNonFungible {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
@@ -43,7 +43,7 @@ public extension MintUuidNonFungible {
 		try container.encode(entries, forKey: .entries)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: InstructionKind = try container.decode(InstructionKind.self, forKey: .type)

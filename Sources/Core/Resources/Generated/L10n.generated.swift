@@ -461,16 +461,16 @@ public enum L10n {
   public enum PersonaList {
     /// Create new persona
     public static let createNewPersonaButtonTitle = L10n.tr("Localizable", "personaList.createNewPersonaButtonTitle", fallback: "Create new persona")
-    /// Here are all the Personas connected to your account
-    public static let subtitle = L10n.tr("Localizable", "personaList.subtitle", fallback: "Here are all the Personas connected to your account")
+    /// Here are all of your current Personas in your Wallet
+    public static let subtitle = L10n.tr("Localizable", "personaList.subtitle", fallback: "Here are all of your current Personas in your Wallet")
     /// Personas
     public static let title = L10n.tr("Localizable", "personaList.title", fallback: "Personas")
   }
   public enum Personas {
     /// Create a New Persona
     public static let createNewPersonaButtonTitle = L10n.tr("Localizable", "personas.createNewPersonaButtonTitle", fallback: "Create a New Persona")
-    /// Here are all the Personas connected to your account
-    public static let subtitle = L10n.tr("Localizable", "personas.subtitle", fallback: "Here are all the Personas connected to your account")
+    /// Here are all of your current Personas in your Wallet
+    public static let subtitle = L10n.tr("Localizable", "personas.subtitle", fallback: "Here are all of your current Personas in your Wallet")
     /// Personas
     public static let title = L10n.tr("Localizable", "personas.title", fallback: "Personas")
   }

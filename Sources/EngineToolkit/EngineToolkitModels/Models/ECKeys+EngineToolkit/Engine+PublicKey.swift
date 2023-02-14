@@ -2,8 +2,8 @@ import Cryptography
 import Prelude
 
 // MARK: - Engine.PublicKey
-public extension Engine {
-	enum PublicKey: Sendable, Codable, Hashable {
+extension Engine {
+	public enum PublicKey: Sendable, Codable, Hashable {
 		// ==============
 		// Enum Variants
 		// ==============
@@ -12,8 +12,8 @@ public extension Engine {
 	}
 }
 
-public extension Engine.PublicKey {
-	func isValidSignature(
+extension Engine.PublicKey {
+	public func isValidSignature(
 		_ engineSignature: Engine.Signature,
 		for message: any DataProtocol
 	) throws -> Bool {
@@ -25,7 +25,7 @@ public extension Engine.PublicKey {
 	}
 }
 
-public extension Engine.PublicKey {
+extension Engine.PublicKey {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -42,7 +42,7 @@ public extension Engine.PublicKey {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 
 		switch self {
@@ -55,7 +55,7 @@ public extension Engine.PublicKey {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(CurveDiscriminator.self, forKey: .discriminator)
@@ -69,16 +69,16 @@ public extension Engine.PublicKey {
 	}
 }
 
-public extension Engine.PublicKey {
+extension Engine.PublicKey {
 	/// For ECDSA secp256k1 public keys this will use the compressed representation
 	/// For EdDSA Curve25519 there is no difference between compressed and uncompressed.
-	var compressedRepresentation: Data {
+	public var compressedRepresentation: Data {
 		try! SLIP10.PublicKey(engine: self).compressedRepresentation
 	}
 
 	/// For ECDSA secp256k1 public keys this will use the uncompressed representation
 	/// For EdDSA Curve25519 there is no difference between compressed and uncompressed.
-	var uncompressedRepresentation: Data {
+	public var uncompressedRepresentation: Data {
 		try! SLIP10.PublicKey(engine: self).uncompressedRepresentation
 	}
 }

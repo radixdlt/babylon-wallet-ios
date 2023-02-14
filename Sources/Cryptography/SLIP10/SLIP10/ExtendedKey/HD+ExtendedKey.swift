@@ -2,8 +2,8 @@ import CryptoKit
 import Prelude
 
 // MARK: - HD.ExtendedKey
-public extension HD {
-	struct ExtendedKey<Curve>: Equatable where Curve: Slip10SupportedECCurve {
+extension HD {
+	public struct ExtendedKey<Curve>: Equatable where Curve: Slip10SupportedECCurve {
 		internal let key: Key
 
 		public let derivationPath: HD.Path
@@ -26,8 +26,8 @@ public extension HD {
 }
 
 // MARK: - HD.ExtendedKey.Key
-internal extension HD.ExtendedKey {
-	enum Key: Equatable {
+extension HD.ExtendedKey {
+	internal enum Key: Equatable {
 		case privateKey(Curve.PrivateKey)
 		case publicKeyOnly(Curve.PublicKey)
 
@@ -64,14 +64,14 @@ internal extension HD.ExtendedKey {
 	}
 }
 
-public extension HD.ExtendedKey {
-	var privateKey: Curve.PrivateKey? { key.privateKey }
-	var publicKey: Curve.PublicKey { key.publicKey }
+extension HD.ExtendedKey {
+	public var privateKey: Curve.PrivateKey? { key.privateKey }
+	public var publicKey: Curve.PublicKey { key.publicKey }
 }
 
 // MARK: Equatable
-public extension HD.ExtendedKey {
-	static func == (lhs: Self, rhs: Self) -> Bool {
+extension HD.ExtendedKey {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
 		guard
 			lhs.chainCode == rhs.chainCode,
 			lhs.key == rhs.key,
@@ -83,8 +83,8 @@ public extension HD.ExtendedKey {
 	}
 }
 
-internal extension HD.ExtendedKey {
-	func keyAsData(forceSelectPublicKey: Bool) -> Data {
+extension HD.ExtendedKey {
+	internal func keyAsData(forceSelectPublicKey: Bool) -> Data {
 		var serializedBytes: Data
 		switch (forceSelectPublicKey, key) {
 		case (false, let .privateKey(privateKey)):
@@ -102,7 +102,7 @@ internal extension HD.ExtendedKey {
 		return serializedBytes
 	}
 
-	func keyAsScalar(forceSelectPublicKey: Bool) -> BigUInt {
+	internal func keyAsScalar(forceSelectPublicKey: Bool) -> BigUInt {
 		BigUInt(keyAsData(forceSelectPublicKey: forceSelectPublicKey))
 	}
 }
@@ -134,8 +134,8 @@ internal func serializeByPrependingByteToReachKeyLength(
 	return bytes
 }
 
-private extension HD.ExtendedKey {
-	static func derivePrivateKeyAlways(
+extension HD.ExtendedKey {
+	fileprivate static func derivePrivateKeyAlways(
 		parent: Self,
 		component: HD.Path.Component.Child
 	) throws -> Self {
@@ -183,7 +183,7 @@ private extension HD.ExtendedKey {
 		)
 	}
 
-	static func deriveKey(
+	fileprivate static func deriveKey(
 		parent: Self,
 		relativePath path: HD.Path.Relative,
 		keyToDerive: KeyToDerive
@@ -199,8 +199,8 @@ private extension HD.ExtendedKey {
 	}
 }
 
-internal extension HD.ExtendedKey {
-	func selecting(keyToDerive: KeyToDerive) throws -> Self {
+extension HD.ExtendedKey {
+	internal func selecting(keyToDerive: KeyToDerive) throws -> Self {
 		let key: Key = try {
 			switch keyToDerive {
 			case .derivePublicKeyOnly:
@@ -223,27 +223,27 @@ internal extension HD.ExtendedKey {
 }
 
 // MARK: - HD.ExtendedKey.Error
-public extension HD.ExtendedKey {
-	enum Error: Swift.Error {
+extension HD.ExtendedKey {
+	public enum Error: Swift.Error {
 		case providedPublicKeyDoesNotMatchThatOfPrivateKey
 		case cannotDerivePrivateKeyFromPublicKeyOnly
 	}
 }
 
-public extension HD.ExtendedKey {
-	func derivePrivateKey(
+extension HD.ExtendedKey {
+	public func derivePrivateKey(
 		component: HD.Path.Component.Child
 	) throws -> Self {
 		try Self.derivePrivateKeyAlways(parent: self, component: component)
 	}
 
-	func derivePrivateKey(
+	public func derivePrivateKey(
 		path: HD.Path.Relative
 	) throws -> Self {
 		try Self.deriveKey(parent: self, relativePath: path, keyToDerive: .derivePrivateKey)
 	}
 
-	func derivePublicKey(
+	public func derivePublicKey(
 		component: HD.Path.Component.Child
 	) throws -> Self {
 		if key.isOnlyPublicKey, Curve.isCurve25519 {
@@ -252,7 +252,7 @@ public extension HD.ExtendedKey {
 		return try self.derivePrivateKey(component: component).selecting(keyToDerive: .derivePublicKeyOnly)
 	}
 
-	func derivePublicKey(
+	public func derivePublicKey(
 		path: HD.Path.Relative
 	) throws -> Self {
 		if key.isOnlyPublicKey, Curve.isCurve25519 {

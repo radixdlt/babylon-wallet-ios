@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,15 +14,15 @@ import AnyCodable
 public typealias EntityDetailsResponse = GatewayAPI.EntityDetailsResponse
 
 // MARK: - GatewayAPI.EntityDetailsResponse
-public extension GatewayAPI {
-	struct EntityDetailsResponse: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityDetailsResponse: Codable, Hashable {
 		public private(set) var ledgerState: LedgerState
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
 		public private(set) var metadata: EntityMetadataCollection
-		public private(set) var details: EntityDetailsResponseDetails
+		public private(set) var details: EntityDetailsResponseDetails?
 
-		public init(ledgerState: LedgerState, address: String, metadata: EntityMetadataCollection, details: EntityDetailsResponseDetails) {
+		public init(ledgerState: LedgerState, address: String, metadata: EntityMetadataCollection, details: EntityDetailsResponseDetails? = nil) {
 			self.ledgerState = ledgerState
 			self.address = address
 			self.metadata = metadata
@@ -43,7 +43,7 @@ public extension GatewayAPI {
 			try container.encode(ledgerState, forKey: .ledgerState)
 			try container.encode(address, forKey: .address)
 			try container.encode(metadata, forKey: .metadata)
-			try container.encode(details, forKey: .details)
+			try container.encodeIfPresent(details, forKey: .details)
 		}
 	}
 }

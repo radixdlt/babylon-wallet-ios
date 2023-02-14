@@ -45,8 +45,8 @@ public struct CreateVirtualEntityRequest: Sendable, Equatable {
 	}
 }
 
-public extension CreateVirtualEntityRequest {
-	func getDerivationPathRequest() throws -> GetDerivationPathForNewEntityRequest {
+extension CreateVirtualEntityRequest {
+	public func getDerivationPathRequest() throws -> GetDerivationPathForNewEntityRequest {
 		try .init(networkID: networkID, factorSource: genesisFactorInstanceDerivationStrategy.factorSource, entityKind: entityKind, keyKind: .transactionSigningKey)
 	}
 }

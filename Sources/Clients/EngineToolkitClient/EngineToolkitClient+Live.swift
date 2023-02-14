@@ -3,8 +3,8 @@ import Cryptography
 @preconcurrency import EngineToolkit
 import struct Profile.AccountAddress
 
-public extension EngineToolkitClient {
-	static let liveValue: Self = {
+extension EngineToolkitClient {
+	public static let liveValue: Self = {
 		let engineToolkit = EngineToolkit()
 
 		let generateTXNonce: GenerateTXNonce = { Nonce.secureRandom() }
@@ -64,6 +64,15 @@ public extension EngineToolkitClient {
 					}
 				)
 			},
+			accountAddressesSuitableToPayTransactionFee: { request throws -> Set<AccountAddress> in
+				try Set(
+					request.manifest.accountsSuitableToPayTXFee(
+						networkId: request.networkID
+					).map {
+						try AccountAddress(componentAddress: $0)
+					}
+				)
+			},
 			knownEntityAddresses: { networkID throws -> KnownEntityAddressesResponse in
 				try engineToolkit.knownEntityAddresses(request: .init(networkId: networkID)).get()
 			}
@@ -74,8 +83,8 @@ public extension EngineToolkitClient {
 // MARK: - FailedToConvertManifestToFormatWhereInstructionsAreJSON
 struct FailedToConvertManifestToFormatWhereInstructionsAreJSON: Swift.Error {}
 
-public extension AccountAddress {
-	init(componentAddress: ComponentAddress) throws {
+extension AccountAddress {
+	public init(componentAddress: ComponentAddress) throws {
 		try self.init(address: componentAddress.address)
 	}
 }

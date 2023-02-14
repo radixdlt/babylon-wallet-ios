@@ -20,8 +20,8 @@ public struct CheckmarkView: View {
 	}
 }
 
-public extension CheckmarkView {
-	var body: some View {
+extension CheckmarkView {
+	public var body: some View {
 		let resource: ImageAsset = {
 			switch (appearance, isChecked) {
 			case (.light, true):

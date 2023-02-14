@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - Persona.State
-public extension Persona {
-	struct State: Sendable, Hashable, Identifiable {
+extension Persona {
+	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = OnNetwork.Persona.ID
 		public var id: ID { persona.id }
 		public let persona: OnNetwork.Persona
@@ -16,7 +16,7 @@ public extension Persona {
 }
 
 #if DEBUG
-public extension Persona.State {
-	static let previewValue: Self = .init(persona: .previewValue0)
+extension Persona.State {
+	public static let previewValue: Self = .init(persona: .previewValue0)
 }
 #endif

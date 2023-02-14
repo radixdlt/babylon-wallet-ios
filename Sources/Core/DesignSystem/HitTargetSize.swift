@@ -16,9 +16,9 @@ public enum HitTargetSize: CGFloat {
 	}
 }
 
-public extension View {
+extension View {
 	@inlinable
-	func frame(_ size: HitTargetSize, alignment: Alignment = .center) -> some View {
+	public func frame(_ size: HitTargetSize, alignment: Alignment = .center) -> some View {
 		frame(width: size.frame.width, height: size.frame.height, alignment: alignment)
 	}
 }

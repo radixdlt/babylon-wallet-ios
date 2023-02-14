@@ -3,14 +3,14 @@ import Prelude
 import ProfileModels
 
 // MARK: - P2P.FromDapp
-public extension P2P {
+extension P2P {
 	/// Just a namespace
-	enum FromDapp {}
+	public enum FromDapp {}
 }
 
 // MARK: - P2P.FromDapp.WalletInteraction
-public extension P2P.FromDapp {
-	struct WalletInteraction: Sendable, Hashable, Decodable, Identifiable {
+extension P2P.FromDapp {
+	public struct WalletInteraction: Sendable, Hashable, Decodable, Identifiable {
 		private enum CodingKeys: String, CodingKey {
 			case id = "interactionId"
 			case items
@@ -36,8 +36,8 @@ public extension P2P.FromDapp {
 }
 
 // MARK: - P2P.FromDapp.WalletInteraction.Metadata
-public extension P2P.FromDapp.WalletInteraction {
-	struct Metadata: Sendable, Hashable, Decodable {
+extension P2P.FromDapp.WalletInteraction {
+	public struct Metadata: Sendable, Hashable, Decodable {
 		public typealias Origin = Tagged<(Self, origin: ()), String>
 
 		public let networkId: NetworkID

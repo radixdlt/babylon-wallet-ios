@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - CreationOfEntity.View
-public extension CreationOfEntity {
+extension CreationOfEntity {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<CreationOfEntity>
 
 		public init(store: StoreOf<CreationOfEntity>) {
@@ -12,8 +12,8 @@ public extension CreationOfEntity {
 	}
 }
 
-public extension CreationOfEntity.View {
-	var body: some View {
+extension CreationOfEntity.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),

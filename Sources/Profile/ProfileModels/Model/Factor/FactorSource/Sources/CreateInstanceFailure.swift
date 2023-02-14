@@ -12,16 +12,16 @@ public enum CreateFactorInstanceFailure:
 	case expectedInputType(String, gotGot: String)
 }
 
-public extension CreateFactorInstanceFailure {
-	var customDumpDescription: String {
+extension CreateFactorInstanceFailure {
+	public var customDumpDescription: String {
 		_description
 	}
 
-	var description: String {
+	public var description: String {
 		_description
 	}
 
-	var _description: String {
+	public var _description: String {
 		switch self {
 		case let .expectedInputType(expectedType, unexpectedInput): return "CreateFactorInstanceFailure.expectedInputType(\(expectedType), butGot: \(unexpectedInput))"
 		}

@@ -32,12 +32,12 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 			let manifestWithLockFeeString: String
 		}
 
-		case addLockFeeInstructionToManifestResult(TaskResult<AddLockInstructionToManifestSuccessValues>)
+		case addLockFeeInstructionToManifestResult(Result<AddLockInstructionToManifestSuccessValues, TransactionFailure>)
 		case signTransactionResult(TransactionResult)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case failed(ApproveTransactionFailure)
+		case failed(TransactionFailure)
 		case signedTXAndSubmittedToGateway(TransactionIntent.TXID)
 	}
 
@@ -51,8 +51,8 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { [manifest = state.transactionManifestWithoutLockFee] send in
-				let networkID = await profileClient.getCurrentNetworkID()
-				let result = await TaskResult {
+				do {
+					let networkID = await profileClient.getCurrentNetworkID()
 					let manifestWithLockFee = try await transactionClient.addLockFeeInstructionToManifest(manifest)
 					let manifestWithLockFeeString = manifestWithLockFee.toString(
 						preamble: "",
@@ -60,12 +60,16 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 						blobPreamble: "\n\nBLOBS:\n",
 						networkID: networkID
 					)
-					return InternalAction.AddLockInstructionToManifestSuccessValues(
+					let result = InternalAction.AddLockInstructionToManifestSuccessValues(
 						manifestWithLockFee: manifestWithLockFee,
 						manifestWithLockFeeString: manifestWithLockFeeString
 					)
+					await send(.internal(.addLockFeeInstructionToManifestResult(.success(result))))
+				} catch let error as TransactionFailure {
+					await send(.internal(.addLockFeeInstructionToManifestResult(.failure(error))))
+				} catch {
+					await send(.internal(.addLockFeeInstructionToManifestResult(.failure(.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)))))
 				}
-				await send(.internal(.addLockFeeInstructionToManifestResult(result)))
 			}
 
 		case .signTransactionButtonTapped:
@@ -98,9 +102,8 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 			state.transactionWithLockFeeString = values.manifestWithLockFeeString
 			return .none
 
-		case let .addLockFeeInstructionToManifestResult(.failure(error)):
-			errorQueue.schedule(error)
-			return .send(.delegate(.failed(ApproveTransactionFailure.prepareTransactionFailure(.addTransactionFee(error)))))
+		case let .addLockFeeInstructionToManifestResult(.failure(transactionFailure)):
+			return .send(.delegate(.failed(transactionFailure)))
 
 		case let .signTransactionResult(.success(txID)):
 			state.isSigningTX = false
@@ -108,7 +111,7 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 
 		case let .signTransactionResult(.failure(transactionFailure)):
 			state.isSigningTX = false
-			return .send(.delegate(.failed(.transactionFailure(transactionFailure))))
+			return .send(.delegate(.failed(transactionFailure)))
 		}
 	}
 }

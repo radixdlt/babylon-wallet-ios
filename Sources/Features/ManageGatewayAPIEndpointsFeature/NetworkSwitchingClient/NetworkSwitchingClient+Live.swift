@@ -2,15 +2,15 @@ import FeaturePrelude
 import GatewayAPI
 import ProfileClient
 
-public extension DependencyValues {
-	var networkSwitchingClient: NetworkSwitchingClient {
+extension DependencyValues {
+	public var networkSwitchingClient: NetworkSwitchingClient {
 		get { self[NetworkSwitchingClient.self] }
 		set { self[NetworkSwitchingClient.self] = newValue }
 	}
 }
 
-public extension NetworkSwitchingClient {
-	static let liveValue: Self = {
+extension NetworkSwitchingClient {
+	public static let liveValue: Self = {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.profileClient) var profileClient
 

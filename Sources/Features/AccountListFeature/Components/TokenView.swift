@@ -5,8 +5,8 @@ public struct TokenView: View {
 	let code: String
 }
 
-public extension TokenView {
-	var body: some View {
+extension TokenView {
+	public var body: some View {
 		ZStack {
 			Circle()
 				.strokeBorder(.orange, lineWidth: 1)

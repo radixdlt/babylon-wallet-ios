@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - NewConnection.Action
-public extension NewConnection {
-	enum Action: Sendable, Equatable {
+extension NewConnection {
+	public enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -11,8 +11,8 @@ public extension NewConnection {
 }
 
 // MARK: - NewConnection.Action.ChildAction
-public extension NewConnection.Action {
-	enum ChildAction: Sendable, Equatable {
+extension NewConnection.Action {
+	public enum ChildAction: Sendable, Equatable {
 		case cameraPermission(CameraPermission.Action)
 		case localNetworkPermission(LocalNetworkPermission.Action)
 		case scanQR(ScanQR.Action)
@@ -21,28 +21,28 @@ public extension NewConnection.Action {
 }
 
 // MARK: - NewConnection.Action.ViewAction
-public extension NewConnection.Action {
-	enum ViewAction: Sendable, Equatable {
+extension NewConnection.Action {
+	public enum ViewAction: Sendable, Equatable {
 		case dismissButtonTapped
 	}
 }
 
 // MARK: - NewConnection.Action.InternalAction
-public extension NewConnection.Action {
-	enum InternalAction: Sendable, Equatable {
+extension NewConnection.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
 // MARK: - NewConnection.Action.SystemAction
-public extension NewConnection.Action {
-	enum SystemAction: Sendable, Equatable {}
+extension NewConnection.Action {
+	public enum SystemAction: Sendable, Equatable {}
 }
 
 // MARK: - NewConnection.Action.DelegateAction
-public extension NewConnection.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension NewConnection.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case newConnection(P2P.ClientWithConnectionStatus)
 	}

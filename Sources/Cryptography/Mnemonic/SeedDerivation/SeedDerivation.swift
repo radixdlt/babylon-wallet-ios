@@ -4,10 +4,10 @@ import Prelude
 // MARK: - SeedDerivation
 public enum SeedDerivation {}
 
-public extension SeedDerivation {
+extension SeedDerivation {
 	@inlinable
 	@inline(__always)
-	static func seedFromMnemonic<M: ContiguousBytes>(
+	public static func seedFromMnemonic<M: ContiguousBytes>(
 		_ mnemonicData: M,
 		passphrase: String
 	) throws -> Data {
@@ -51,8 +51,8 @@ public extension SeedDerivation {
 }
 
 // MARK: SeedDerivation.Error
-public extension SeedDerivation {
-	enum Error: Swift.Error, Equatable {
+extension SeedDerivation {
+	public enum Error: Swift.Error, Equatable {
 		case internalError(origin: String)
 	}
 }

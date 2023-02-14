@@ -8,9 +8,9 @@ public struct ManageP2PClient: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension ManageP2PClient {
+extension ManageP2PClient {
 	private enum ConnectionUpdateTasksID {}
-	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.viewAppeared)):
 			return .run { [id = state.client.id] send in

@@ -17,25 +17,25 @@ public enum DerivationPurpose:
 	case hashOfPublicKeyAsID
 }
 
-public extension DerivationPurpose {
-	var _description: String {
+extension DerivationPurpose {
+	public var _description: String {
 		switch self {
 		case let .publicKeyForAddress(addressKind): return "DerivationPurpose(.publicKeyForAddress(\(addressKind))"
 		case .hashOfPublicKeyAsID: return "DerivationPurpose(.hashOfPublicKeyAsID)"
 		}
 	}
 
-	var customDumpDescription: String {
+	public var customDumpDescription: String {
 		_description
 	}
 
-	var description: String {
+	public var description: String {
 		_description
 	}
 }
 
-public extension DerivationPurpose {
-	static func publicKeyForAddressOfEntity<Entity: EntityProtocol>(type _: Entity.Type) -> Self {
+extension DerivationPurpose {
+	public static func publicKeyForAddressOfEntity<Entity: EntityProtocol>(type _: Entity.Type) -> Self {
 		switch Entity.entityKind {
 		case .account: return .publicKeyForAddress(kind: .account)
 		case .identity: return .publicKeyForAddress(kind: .identity)

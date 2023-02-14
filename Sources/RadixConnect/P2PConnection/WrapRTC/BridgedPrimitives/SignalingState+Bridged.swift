@@ -2,8 +2,8 @@ import Foundation
 import P2PModels
 import WebRTC
 
-internal extension SignalingState {
-	init(rtcSignalingState: RTCSignalingState) throws {
+extension SignalingState {
+	internal init(rtcSignalingState: RTCSignalingState) throws {
 		switch rtcSignalingState {
 		case .stable: self = .stable
 		case .haveLocalOffer: self = .haveLocalOffer

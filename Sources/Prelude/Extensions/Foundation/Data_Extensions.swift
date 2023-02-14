@@ -2,9 +2,9 @@ import Foundation
 
 #if DEBUG
 // https://gist.github.com/cprovatas/5c9f51813bc784ef1d7fcbfb89de74fe
-public extension Data {
+extension Data {
 	/// NSString gives us a nice sanitized debugDescription
-	var prettyPrintedJSONString: NSString? {
+	public var prettyPrintedJSONString: NSString? {
 		guard
 			let object = try? JSONSerialization.jsonObject(with: self, options: []),
 			let data = try? JSONSerialization.data(withJSONObject: object, options: [.prettyPrinted]),

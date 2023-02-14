@@ -15,8 +15,8 @@ public struct AppSettings: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension AppSettings {
-	var body: some ReducerProtocolOf<Self> {
+extension AppSettings {
+	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
 			.ifLet(\.manageP2PClients, action: /Action.child .. Action.ChildAction.manageP2PClients) {
 				ManageP2PClients()
@@ -29,7 +29,7 @@ public extension AppSettings {
 			}
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
+	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.dismissSettingsButtonTapped)):
 			return .run { send in
@@ -119,8 +119,8 @@ public extension AppSettings {
 }
 
 // MARK: Private
-private extension AppSettings {
-	func loadP2PClients() -> EffectTask<Action> {
+extension AppSettings {
+	fileprivate func loadP2PClients() -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.system(.loadP2PClientsResult(
 				TaskResult { try await profileClient.getP2PClients() }

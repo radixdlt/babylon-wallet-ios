@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - ManageP2PClient.State
-public extension ManageP2PClient {
+extension ManageP2PClient {
 //	typealias State = P2P.ClientWithConnectionStatus
-	struct State: Sendable, Hashable, Identifiable {
+	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = P2PClient.ID
 		public var id: ID { client.id }
 		public let client: P2PClient
@@ -36,8 +36,8 @@ public extension ManageP2PClient {
 	}
 }
 
-public extension ManageP2PClient.State {
-	init(clientWithConnectionStatus: P2P.ClientWithConnectionStatus) {
+extension ManageP2PClient.State {
+	public init(clientWithConnectionStatus: P2P.ClientWithConnectionStatus) {
 		self.init(
 			client: clientWithConnectionStatus.p2pClient,
 			connectionStatus: clientWithConnectionStatus.connectionStatus
@@ -46,7 +46,7 @@ public extension ManageP2PClient.State {
 }
 
 #if DEBUG
-public extension ManageP2PClient.State {
-	static let previewValue: Self = .init(clientWithConnectionStatus: .init(p2pClient: .previewValue))
+extension ManageP2PClient.State {
+	public static let previewValue: Self = .init(clientWithConnectionStatus: .init(p2pClient: .previewValue))
 }
 #endif

@@ -64,8 +64,8 @@ public struct Relay<
 	}
 }
 
-public extension Store {
-	func relay<RelayedState, MainState, MainAction>() -> Store<MainState, MainAction> where
+extension Store {
+	public func relay<RelayedState, MainState, MainAction>() -> Store<MainState, MainAction> where
 		State == RelayState<RelayedState, MainState>,
 		Action == RelayAction<RelayedState, MainAction>
 	{

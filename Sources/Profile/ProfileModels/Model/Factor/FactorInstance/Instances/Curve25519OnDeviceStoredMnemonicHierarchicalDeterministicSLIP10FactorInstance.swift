@@ -35,23 +35,23 @@ public struct Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10Fac
 	}
 }
 
-public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance {
-	static let factorInstanceKind: FactorInstanceKind = .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstanceKind
+extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance {
+	public static let factorInstanceKind: FactorInstanceKind = .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstanceKind
 
-	typealias Curve = Curve25519
-	typealias ID = FactorSourceReference
+	public typealias Curve = Curve25519
+	public typealias ID = FactorSourceReference
 }
 
-public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance {
+extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance {
 	/// Wraps this `Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance` into the shared
 	/// nominal type `FactorInstance` (enum)
-	func wrapAsFactorInstance() -> FactorInstance {
+	public func wrapAsFactorInstance() -> FactorInstance {
 		.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(self)
 	}
 
 	/// Tries to unwraps the nominal type `FactorInstance` (enum)
 	/// into a `Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance` instance.
-	static func unwrap(factorInstance: FactorInstance) -> Self? {
+	public static func unwrap(factorInstance: FactorInstance) -> Self? {
 		switch factorInstance {
 		case let .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance(instance):
 			return instance
@@ -61,8 +61,8 @@ public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10
 	}
 }
 
-public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance {
-	var customDumpMirror: Mirror {
+extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance {
+	public var customDumpMirror: Mirror {
 		.init(self, children: [
 			"factorSourceReference": factorSourceReference,
 			"publicKey": publicKey.compressedData.hex(),
@@ -71,7 +71,7 @@ public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10
 		])
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		"factorSourceReference": \(factorSourceReference),
 		"publicKey": \(publicKey.compressedData.hex()),

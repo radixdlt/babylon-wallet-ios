@@ -55,16 +55,16 @@ public struct Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10Fac
 	}
 }
 
-public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
+extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
 	/// Wraps this specific type of factor source to the shared
 	/// nominal type `FactorSource` (enum)
-	func wrapAsFactorSource() -> FactorSource {
+	public func wrapAsFactorSource() -> FactorSource {
 		.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(self)
 	}
 
 	/// Tries to unwraps the nominal type `FactorSource` (enum)
 	/// into this specific type.
-	static func unwrap(factorSource: FactorSource) -> Self? {
+	public static func unwrap(factorSource: FactorSource) -> Self? {
 		switch factorSource {
 		case let .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(source):
 			return source
@@ -73,25 +73,25 @@ public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10
 		}
 	}
 
-	static func embedPrivateKey(_ privateKey: Self.Curve.PrivateKey) -> SLIP10.PrivateKey {
+	public static func embedPrivateKey(_ privateKey: Self.Curve.PrivateKey) -> SLIP10.PrivateKey {
 		.curve25519(privateKey)
 	}
 
-	static func embedPublicKey(_ publicKey: Self.Curve.PublicKey) -> SLIP10.PublicKey {
+	public static func embedPublicKey(_ publicKey: Self.Curve.PublicKey) -> SLIP10.PublicKey {
 		.eddsaEd25519(publicKey)
 	}
 }
 
-public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
-	static let factorSourceKind: FactorSourceKind = .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind
+extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
+	public static let factorSourceKind: FactorSourceKind = .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind
 
-	typealias Instance = Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance
-	typealias CreateFactorInstanceInput = CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput
-	typealias Curve = Curve25519
+	public typealias Instance = Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorInstance
+	public typealias CreateFactorInstanceInput = CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput
+	public typealias Curve = Curve25519
 }
 
-public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
-	var customDumpMirror: Mirror {
+extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -103,7 +103,7 @@ public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		id: \(id),
 		creationDate: \(creationDate.ISO8601Format()),
@@ -113,7 +113,7 @@ public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10
 }
 
 #if DEBUG
-public extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
-	static let previewValue: Self = try! .init(mnemonic: .generate())
+extension Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
+	public static let previewValue: Self = try! .init(mnemonic: .generate())
 }
 #endif // DEBUG

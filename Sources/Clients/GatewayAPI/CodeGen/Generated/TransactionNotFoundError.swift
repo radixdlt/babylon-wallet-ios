@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionNotFoundError = GatewayAPI.TransactionNotFoundError
 
 // MARK: - GatewayAPI.TransactionNotFoundError
-public extension GatewayAPI {
-	struct TransactionNotFoundError: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionNotFoundError: Codable, Hashable {
 		/** The type of error. Each subtype may have its own additional structured fields. */
 		public private(set) var type: String
 		public private(set) var transactionNotFound: TransactionCommittedDetailsRequestIdentifier

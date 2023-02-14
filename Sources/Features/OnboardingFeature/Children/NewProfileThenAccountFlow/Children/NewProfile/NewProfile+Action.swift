@@ -2,42 +2,42 @@ import FeaturePrelude
 import ProfileClient
 
 // MARK: - NewProfile.Action
-public extension NewProfile {
-	enum Action: Sendable, Equatable {
+extension NewProfile {
+	public enum Action: Sendable, Equatable {
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
 }
 
-public extension NewProfile.Action {
-	static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
+extension NewProfile.Action {
+	public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 }
 
 // MARK: - NewProfile.Action.ViewAction
-public extension NewProfile.Action {
-	enum ViewAction: Sendable, Equatable {
+extension NewProfile.Action {
+	public enum ViewAction: Sendable, Equatable {
 		case appeared
 	}
 }
 
 // MARK: - NewProfile.Action.InternalAction
-public extension NewProfile.Action {
-	enum InternalAction: Sendable, Equatable {
+extension NewProfile.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
 // MARK: - NewProfile.Action.SystemAction
-public extension NewProfile.Action {
-	enum SystemAction: Sendable, Equatable {
+extension NewProfile.Action {
+	public enum SystemAction: Sendable, Equatable {
 		case createProfileResult(TaskResult<CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse>)
 	}
 }
 
 // MARK: - NewProfile.Action.DelegateAction
-public extension NewProfile.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension NewProfile.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case criticalFailureCouldNotCreateProfile
 		case createdProfile(CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse)
 	}

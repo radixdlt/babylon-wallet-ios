@@ -11,6 +11,6 @@ public protocol Slip10SupportedECCurve where PrivateKey.PublicKey == Self.Public
 	static var slip10Curve: Slip10CurveType { get }
 }
 
-public extension Slip10SupportedECCurve {
-	var slip10Curve: Slip10CurveType { Self.slip10Curve }
+extension Slip10SupportedECCurve {
+	public var slip10Curve: Slip10CurveType { Self.slip10Curve }
 }

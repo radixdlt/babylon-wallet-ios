@@ -19,13 +19,13 @@ public enum FactorSource:
 	case secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource(Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource)
 }
 
-public extension FactorSource {
-	typealias ID = FactorSourceID
-	var id: ID {
+extension FactorSource {
+	public typealias ID = FactorSourceID
+	public var id: ID {
 		any().factorSourceID
 	}
 
-	func any() -> any FactorSourceProtocol {
+	public func any() -> any FactorSourceProtocol {
 		switch self {
 		case let .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(source):
 			return source
@@ -34,21 +34,21 @@ public extension FactorSource {
 		}
 	}
 
-	var supportsHierarchicalDeterministicDerivation: Bool {
+	public var supportsHierarchicalDeterministicDerivation: Bool {
 		any().supportsHierarchicalDeterministicDerivation
 	}
 }
 
-public extension FactorSource {
-	var customDumpDescription: String {
+extension FactorSource {
+	public var customDumpDescription: String {
 		_description
 	}
 
-	var description: String {
+	public var description: String {
 		_description
 	}
 
-	var _description: String {
+	public var _description: String {
 		switch self {
 		case let .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(source):
 			return "Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(\(source)"
@@ -60,8 +60,8 @@ public extension FactorSource {
 
 #if DEBUG
 
-public extension FactorSource {
-	static let previewValue: Self = .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(.previewValue)
+extension FactorSource {
+	public static let previewValue: Self = .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(.previewValue)
 }
 
 #endif // DEBUG

@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias InternalServerErrorAllOf = GatewayAPI.InternalServerErrorAllOf
 
 // MARK: - GatewayAPI.InternalServerErrorAllOf
-public extension GatewayAPI {
-	struct InternalServerErrorAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct InternalServerErrorAllOf: Codable, Hashable {
 		/** Gives an error type which occurred within the Gateway API when serving the request. */
 		public private(set) var exception: String
 		/** Gives a human readable message - likely just a trace ID for reporting the error. */

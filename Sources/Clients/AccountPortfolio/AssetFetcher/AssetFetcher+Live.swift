@@ -37,7 +37,7 @@ extension AssetFetcher: DependencyKey {
 							taskGroup.addTask {
 								try Task.checkCancellation()
 								let response = try await gatewayAPIClient.getNonFungibleLocalIds(accountAddress, resourceAddress.address)
-								let nonFungibleLocalIds = response.nonFungibleLocalIds.items.map(\.nonFungibleLocalId)
+								let nonFungibleLocalIds = response.nonFungibleIds.items.map(\.nonFungibleId)
 								return (resourceAddress, nonFungibleLocalIds)
 							}
 						}
@@ -60,8 +60,9 @@ extension AssetFetcher: DependencyKey {
 extension AccountPortfolio {
 	init(response: GatewayAPI.EntityResourcesResponse) throws {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
-		let fungibleContainers = try response.fungibleResources.items.map {
-			let componentAddress = ComponentAddress(address: $0.address)
+		let fungibleContainers = try response.fungibleResources.items.map { fungibleBalance in
+			let balance = try BigDecimal(fromString: fungibleBalance.amount.value)
+			let componentAddress = ComponentAddress(address: fungibleBalance.address)
 			let networkID = try Network.lookupBy(name: response.ledgerState.network).id
 			let isXRD = try engineToolkitClient.isXRD(component: componentAddress, on: networkID)
 			return FungibleTokenContainer(
@@ -77,7 +78,7 @@ extension AccountPortfolio {
 					symbol: nil,
 					isXRD: isXRD
 				),
-				amount: $0.amount.value,
+				amount: balance,
 				worth: nil
 			)
 		}

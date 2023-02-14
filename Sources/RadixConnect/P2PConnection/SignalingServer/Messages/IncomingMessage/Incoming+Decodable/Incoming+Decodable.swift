@@ -2,8 +2,8 @@ import Foundation
 import P2PModels
 
 // MARK: - SignalingServerMessage.Incoming.ResponseType
-private extension SignalingServerMessage.Incoming {
-	enum ResponseType: String, Codable, Sendable, Hashable {
+extension SignalingServerMessage.Incoming {
+	fileprivate enum ResponseType: String, Codable, Sendable, Hashable {
 		// MARK: ResponseToRequest
 
 		/// Confirmation sent to us by the signaling server informing us that an RPC message sent by us was accepted by the signaling server, but necessarily received by any remote client yet. If we get this, it means that we did not get `missingRemoteClientError`, and these two events (messages) are mutually exclusive, i.e. the signaling server knows that it can dispatch our sent message to a remote client.
@@ -33,12 +33,12 @@ private extension SignalingServerMessage.Incoming {
 	}
 }
 
-public extension SignalingServerMessage.Incoming {
-	enum CodingKeys: String, CodingKey {
+extension SignalingServerMessage.Incoming {
+	public enum CodingKeys: String, CodingKey {
 		case responseType = "info", requestId, error, source = "target", message = "data"
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let responseType = try container.decode(ResponseType.self, forKey: .responseType)
 
@@ -103,8 +103,8 @@ public extension SignalingServerMessage.Incoming {
 
 #if DEBUG
 extension SignalingServerMessage.Incoming: Encodable {}
-public extension SignalingServerMessage.Incoming {
-	func encode(to encoder: Encoder) throws {
+extension SignalingServerMessage.Incoming {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
 		case let .fromSignalingServerItself(fromSignalingServerItself):

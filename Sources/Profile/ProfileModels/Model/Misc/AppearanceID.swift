@@ -1,14 +1,14 @@
 import Foundation
 
 // MARK: - OnNetwork.Account.AppearanceID
-public extension OnNetwork.Account {
+extension OnNetwork.Account {
 	/// An identifier for a certain User Interface rendered appearance for a account (or accounts
 	/// if user has many accounts, since we recycle them).
 	///
 	/// Typically used to identifiy gradients displayed by the Babylon Mobile Wallet, but
 	/// a Dapp will get access to this appearance ID when connecting to the wallet so that
 	/// the Dapp too can render the connected account with the appropriate appearance.
-	enum AppearanceID:
+	public enum AppearanceID:
 		UInt8,
 		Sendable,
 		Hashable,
@@ -32,29 +32,29 @@ public extension OnNetwork.Account {
 	}
 }
 
-public extension OnNetwork.Account.AppearanceID {
-	struct UnknownID: Swift.Error {
+extension OnNetwork.Account.AppearanceID {
+	public struct UnknownID: Swift.Error {
 		let unknown: OnNetwork.Account.AppearanceID.ID
 	}
 
-	var description: String {
+	public var description: String {
 		String(describing: id)
 	}
 
-	static func fromIndex(_ accountIndex: OnNetwork.Account.Index) -> Self {
+	public static func fromIndex(_ accountIndex: OnNetwork.Account.Index) -> Self {
 		let mod = allCases.count
 		let gradientIndex = accountIndex % mod
 		return allCases[gradientIndex]
 	}
 }
 
-public extension OnNetwork.Account.AppearanceID {
-	func encode(to encoder: Encoder) throws {
+extension OnNetwork.Account.AppearanceID {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		try container.encode(id)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		try self.init(id: container.decode(ID.self))
 	}

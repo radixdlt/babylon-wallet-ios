@@ -47,15 +47,15 @@ extension GatewayAPIClient: TestDependencyKey {
 	}
 }
 
-public extension DependencyValues {
-	var gatewayAPIClient: GatewayAPIClient {
+extension DependencyValues {
+	public var gatewayAPIClient: GatewayAPIClient {
 		get { self[GatewayAPIClient.self] }
 		set { self[GatewayAPIClient.self] = newValue }
 	}
 }
 
-public extension GatewayAPI.LedgerState {
-	static let previewValue = Self(
+extension GatewayAPI.LedgerState {
+	public static let previewValue = Self(
 		network: "Network name",
 		stateVersion: 0,
 		proposerRoundTimestamp: "",
@@ -86,15 +86,15 @@ private func nonFungibleResourceAddress(at index: Int) -> String {
 	nonFungibleResourceAddresses[index % nonFungibleResourceAddresses.count]
 }
 
-private extension FixedWidthInteger {
-	var data: Data {
+extension FixedWidthInteger {
+	fileprivate var data: Data {
 		let data = withUnsafeBytes(of: self) { Data($0) }
 		return data
 	}
 }
 
-private extension Data {
-	var asUInt: UInt {
+extension Data {
+	fileprivate var asUInt: UInt {
 		withUnsafeBytes { $0.load(as: UInt.self) }
 	}
 }

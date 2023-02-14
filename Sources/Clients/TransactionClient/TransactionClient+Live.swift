@@ -5,8 +5,8 @@ import EngineToolkitClient
 import GatewayAPI
 import ProfileClient
 
-public extension TransactionClient {
-	static var liveValue: Self {
+extension TransactionClient {
+	public static var liveValue: Self {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.profileClient) var profileClient
@@ -120,7 +120,6 @@ public extension TransactionClient {
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatus {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
-					atLedgerState: nil,
 					intentHashHex: txID.rawValue
 				)
 				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
@@ -169,7 +168,7 @@ public extension TransactionClient {
 			networkID: NetworkID,
 			manifest: TransactionManifest,
 			makeTransactionHeaderInput: MakeTransactionHeaderInput,
-			getNotaryAndSigners: @Sendable (AccountAddressesNeedingToSignTransactionRequest) async throws -> NotaryAndSigners
+			getNotaryAndSigners: @Sendable (AccountAddressesInvolvedInTransactionRequest) async throws -> NotaryAndSigners
 		) async -> Result<(intent: TransactionIntent, notaryAndSigners: NotaryAndSigners), TransactionFailure.FailedToPrepareForTXSigning> {
 			let nonce = engineToolkitClient.generateTXNonce()
 			let epoch: Epoch
@@ -181,7 +180,7 @@ public extension TransactionClient {
 
 			let version = engineToolkitClient.getTransactionVersion()
 
-			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesNeedingToSignTransactionRequest(
+			let accountAddressesNeedingToSignTransactionRequest = AccountAddressesInvolvedInTransactionRequest(
 				version: version,
 				manifest: manifest,
 				networkID: networkID
@@ -224,7 +223,7 @@ public extension TransactionClient {
 		func signAndSubmit(
 			manifest: TransactionManifest,
 			makeTransactionHeaderInput: MakeTransactionHeaderInput,
-			getNotaryAndSigners: @escaping @Sendable (AccountAddressesNeedingToSignTransactionRequest) async throws -> NotaryAndSigners
+			getNotaryAndSigners: @escaping @Sendable (AccountAddressesInvolvedInTransactionRequest) async throws -> NotaryAndSigners
 		) async -> TransactionResult {
 			await buildTransactionIntent(
 				networkID: profileClient.getCurrentNetworkID(),
@@ -282,39 +281,45 @@ public extension TransactionClient {
 		return Self(
 			convertManifestInstructionsToJSONIfItWasString: convertManifestInstructionsToJSONIfItWasString,
 			addLockFeeInstructionToManifest: { maybeStringManifest in
-				let manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
+				let manifestWithJSONInstructions: JSONInstructionsTransactionManifest
+				do {
+					manifestWithJSONInstructions = try await convertManifestInstructionsToJSONIfItWasString(maybeStringManifest)
+				} catch {
+					loggerGlobal.error("Failed to convert manifest: \(String(describing: error))")
+					throw TransactionFailure.failedToPrepareForTXSigning(.failedToParseTXItIsProbablyInvalid)
+				}
+
 				var instructions = manifestWithJSONInstructions.instructions
 				let networkID = await profileClient.getCurrentNetworkID()
 
 				let version = engineToolkitClient.getTransactionVersion()
 
-				let accountAddressesNeedingToSignTransactionRequest = AccountAddressesNeedingToSignTransactionRequest(
+				let accountsSuitableToPayForTXFeeRequest = AccountAddressesInvolvedInTransactionRequest(
 					version: version,
 					manifest: manifestWithJSONInstructions.convertedManifestThatContainsThem,
 					networkID: networkID
 				)
 
-				let lockFeeAmount = 10
+				let lockFeeAmount: BigDecimal = 10
 
 				let accountAddress: AccountAddress = try await { () async throws -> AccountAddress in
-					let addressesManifestReferences =
-						try engineToolkitClient.accountAddressesNeedingToSignTransaction(
-							accountAddressesNeedingToSignTransactionRequest
-						)
+					let accountAddressesSuitableToPayTransactionFeeRef =
+						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-					let xrdContainers = try await addressesManifestReferences.concurrentMap { try await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
-					let firstWithEnoughFunds = xrdContainers.first(where: { $0.unsafeFailingAmountWithoutPrecision >= Float(lockFeeAmount) })?.owner
+					let xrdContainersOptionals = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
+					let xrdContainers = xrdContainersOptionals.compactMap { $0 }
+					let firstWithEnoughFunds = xrdContainers.first(where: { $0.amount >= lockFeeAmount })?.owner
 
 					if let firstWithEnoughFunds = firstWithEnoughFunds {
 						return firstWithEnoughFunds
 					} else {
-						throw P2P.ToDapp.WalletInteractionFailureResponse.ErrorType.failedToFindAccountWithEnoughFundsToLockFee
+						throw TransactionFailure.failedToPrepareForTXSigning(.failedToFindAccountWithEnoughFundsToLockFee)
 					}
 				}()
 
 				let lockFeeCallMethodInstruction = engineToolkitClient.lockFeeCallMethod(
 					address: ComponentAddress(address: accountAddress.address),
-					fee: String(lockFeeAmount)
+					fee: lockFeeAmount.description
 				).embed()
 
 				instructions.insert(lockFeeCallMethodInstruction, at: 0)
@@ -431,8 +436,8 @@ public struct FailedToGetTransactionStatus: Sendable, LocalizedError, Equatable 
 	}
 }
 
-public extension LocalizedError where Self: Equatable {
-	static func == (lhs: Self, rhs: Self) -> Bool {
+extension LocalizedError where Self: Equatable {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.errorDescription == rhs.errorDescription
 	}
 }

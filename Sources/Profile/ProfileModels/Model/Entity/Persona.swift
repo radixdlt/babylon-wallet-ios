@@ -2,12 +2,12 @@ import EngineToolkitModels
 import Prelude
 
 // MARK: - OnNetwork.Persona
-public extension OnNetwork {
+extension OnNetwork {
 	/// A network unique account with a unique public address and a set of cryptographic
 	/// factors used to control it. The account is either `virtual` or not. By "virtual"
 	/// we mean that the Radix Public Ledger does not yet know of the public address
 	/// of this account.
-	struct Persona:
+	public struct Persona:
 		EntityProtocol,
 		Sendable,
 		Hashable,
@@ -63,25 +63,25 @@ public extension OnNetwork {
 	}
 }
 
-public extension OnNetwork.Persona {
-	static var entityKind: EntityKind { .identity }
+extension OnNetwork.Persona {
+	public static var entityKind: EntityKind { .identity }
 
-	typealias EntityAddress = IdentityAddress
+	public typealias EntityAddress = IdentityAddress
 
 	/// Index in list of collection of personas, per network.
-	typealias Index = Int
+	public typealias Index = Int
 
 	/// A stable and globally unique identifier of an account.
-	typealias ID = EntityAddress
+	public typealias ID = EntityAddress
 
-	typealias EntityDerivationPath = IdentityHierarchicalDeterministicDerivationPath
+	public typealias EntityDerivationPath = IdentityHierarchicalDeterministicDerivationPath
 
 	/// A stable and globally unique identifier for this persona.
-	var id: ID { address }
+	public var id: ID { address }
 }
 
-public extension OnNetwork.Persona {
-	var customDumpMirror: Mirror {
+extension OnNetwork.Persona {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -96,7 +96,7 @@ public extension OnNetwork.Persona {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		"displayName": \(String(describing: displayName)),
 		"index": \(index),
@@ -109,9 +109,9 @@ public extension OnNetwork.Persona {
 }
 
 // MARK: - OnNetwork.Persona.Field
-public extension OnNetwork.Persona {
+extension OnNetwork.Persona {
 	/// A field containing personal informations
-	struct Field:
+	public struct Field:
 		Sendable,
 		Hashable,
 		Codable,
@@ -140,8 +140,8 @@ public extension OnNetwork.Persona {
 
 import Cryptography
 import EngineToolkit
-public extension OnNetwork.Persona {
-	static func deriveAddress(
+extension OnNetwork.Persona {
+	public static func deriveAddress(
 		networkID: NetworkID,
 		publicKey: SLIP10.PublicKey
 	) throws -> EntityAddress {
@@ -156,11 +156,11 @@ public extension OnNetwork.Persona {
 	}
 }
 
-public extension OnNetwork.Persona.Field {
-	typealias ID = UUID
-	typealias Value = NonEmpty<String>
+extension OnNetwork.Persona.Field {
+	public typealias ID = UUID
+	public typealias Value = NonEmpty<String>
 
-	enum Kind:
+	public enum Kind:
 		String,
 		Sendable,
 		Hashable,
@@ -176,8 +176,8 @@ public extension OnNetwork.Persona.Field {
 	}
 }
 
-public extension OnNetwork.Persona.Field {
-	var customDumpMirror: Mirror {
+extension OnNetwork.Persona.Field {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -189,7 +189,7 @@ public extension OnNetwork.Persona.Field {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		"id": \(id),
 		"kind": \(kind),

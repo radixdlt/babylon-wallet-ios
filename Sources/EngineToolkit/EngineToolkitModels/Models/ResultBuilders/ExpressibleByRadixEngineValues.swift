@@ -5,12 +5,12 @@ public protocol ExpressibleByRadixEngineValues: ExpressibleByArrayLiteral {
 	init(values: [Value_])
 }
 
-public extension ExpressibleByRadixEngineValues {
-	init(_ values: [any ValueProtocol]) {
+extension ExpressibleByRadixEngineValues {
+	public init(_ values: [any ValueProtocol]) {
 		self.init(values: values.map { $0.embedValue() })
 	}
 
-	init(arrayLiteral elements: Value_...) {
+	public init(arrayLiteral elements: Value_...) {
 		self.init(values: elements)
 	}
 }
@@ -18,16 +18,16 @@ public extension ExpressibleByRadixEngineValues {
 // MARK: - ValuesBuilder
 @resultBuilder
 public struct ValuesBuilder {}
-public extension ValuesBuilder {
-	static func buildBlock(_ values: any ValueProtocol...) -> [any ValueProtocol] {
+extension ValuesBuilder {
+	public static func buildBlock(_ values: any ValueProtocol...) -> [any ValueProtocol] {
 		values
 	}
 
-	static func buildBlock(_ value: any ValueProtocol) -> [any ValueProtocol] {
+	public static func buildBlock(_ value: any ValueProtocol) -> [any ValueProtocol] {
 		[value]
 	}
 
-	static func buildBlock(_ value: any ValueProtocol) -> any ValueProtocol {
+	public static func buildBlock(_ value: any ValueProtocol) -> any ValueProtocol {
 		value
 	}
 }
@@ -35,30 +35,30 @@ public extension ValuesBuilder {
 // MARK: - SpecificValuesBuilder
 @resultBuilder
 public struct SpecificValuesBuilder {}
-public extension SpecificValuesBuilder {
-	static func buildBlock(_ values: Value_...) -> [Value_] {
+extension SpecificValuesBuilder {
+	public static func buildBlock(_ values: Value_...) -> [Value_] {
 		values
 	}
 
-	static func buildBlock(_ value: Value_) -> [Value_] {
+	public static func buildBlock(_ value: Value_) -> [Value_] {
 		[value]
 	}
 
-	static func buildBlock(_ value: Value_) -> Value_ {
+	public static func buildBlock(_ value: Value_) -> Value_ {
 		value
 	}
 }
 
-public extension ExpressibleByRadixEngineValues {
-	init(@ValuesBuilder buildValues: () throws -> [any ValueProtocol]) rethrows {
+extension ExpressibleByRadixEngineValues {
+	public init(@ValuesBuilder buildValues: () throws -> [any ValueProtocol]) rethrows {
 		self.init(try buildValues())
 	}
 
-	init(@SpecificValuesBuilder buildValues: () throws -> [Value_]) rethrows {
+	public init(@SpecificValuesBuilder buildValues: () throws -> [Value_]) rethrows {
 		self.init(values: try buildValues())
 	}
 
-	init(@SpecificValuesBuilder buildValue: () throws -> Value_) rethrows {
+	public init(@SpecificValuesBuilder buildValue: () throws -> Value_) rethrows {
 		self.init(values: [try buildValue()])
 	}
 }

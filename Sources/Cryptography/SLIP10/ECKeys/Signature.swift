@@ -3,15 +3,15 @@ import Foundation
 import K1
 
 // MARK: - SLIP10.Signature
-public extension SLIP10 {
-	enum Signature: Sendable, Hashable {
+extension SLIP10 {
+	public enum Signature: Sendable, Hashable {
 		case ecdsaSecp256k1(ECDSASignatureRecoverable)
 		case eddsaEd25519(EdDSASignature)
 	}
 }
 
-public extension SLIP10.Signature {
-	var rawRepresentation: Data {
+extension SLIP10.Signature {
+	public var rawRepresentation: Data {
 		switch self {
 		case let .ecdsaSecp256k1(secp256k1):
 			return secp256k1.rawRepresentation

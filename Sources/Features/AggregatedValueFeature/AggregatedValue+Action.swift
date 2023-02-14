@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - AggregatedValue.Action
-public extension AggregatedValue {
+extension AggregatedValue {
 	// MARK: Action
-	enum Action: Sendable, Equatable {
+	public enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -11,22 +11,22 @@ public extension AggregatedValue {
 }
 
 // MARK: - AggregatedValue.Action.ViewAction
-public extension AggregatedValue.Action {
-	enum ViewAction: Sendable, Equatable {
+extension AggregatedValue.Action {
+	public enum ViewAction: Sendable, Equatable {
 		case toggleVisibilityButtonTapped
 	}
 }
 
 // MARK: - AggregatedValue.Action.InternalAction
-public extension AggregatedValue.Action {
-	enum InternalAction: Sendable, Equatable {
+extension AggregatedValue.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 	}
 }
 
 // MARK: - AggregatedValue.Action.DelegateAction
-public extension AggregatedValue.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension AggregatedValue.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case toggleIsCurrencyAmountVisible
 	}
 }

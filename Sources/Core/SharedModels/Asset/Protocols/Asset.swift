@@ -7,8 +7,8 @@ public protocol Asset: Sendable, Equatable, Identifiable where ID == ComponentAd
 	var componentAddress: ComponentAddress { get }
 }
 
-public extension Asset {
-	var id: ID { componentAddress }
+extension Asset {
+	public var id: ID { componentAddress }
 }
 
 // MARK: - AssetMetadata

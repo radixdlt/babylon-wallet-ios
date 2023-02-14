@@ -1,11 +1,11 @@
 import Foundation
 
-public extension ChunkedMessagePackage {
-	enum CodingKeys: String, CodingKey {
+extension ChunkedMessagePackage {
+	public enum CodingKeys: String, CodingKey {
 		case packageType
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
 		let container = try decoder.singleValueContainer()
 		let packageType = try keyedContainer.decode(PackageType.self, forKey: .packageType)

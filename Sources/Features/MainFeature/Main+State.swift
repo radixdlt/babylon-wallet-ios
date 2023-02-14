@@ -5,9 +5,9 @@ import SettingsFeature
 import TransactionSigningFeature
 
 // MARK: - Main.State
-public extension Main {
+extension Main {
 	// MARK: State
-	struct State: Equatable {
+	public struct State: Equatable {
 		public var home: Home.State
 		public var settings: AppSettings.State?
 
@@ -22,8 +22,8 @@ public extension Main {
 }
 
 #if DEBUG
-public extension Main.State {
-	static let previewValue = Self(
+extension Main.State {
+	public static let previewValue = Self(
 		home: .previewValue,
 		settings: nil
 	)

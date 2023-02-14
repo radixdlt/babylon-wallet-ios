@@ -7,8 +7,8 @@ import ProfileClient
 extension ProfileClient: DependencyKey {}
 
 // MARK: - ProfileClient + LiveValue
-public extension ProfileClient {
-	static let liveValue: Self = {
+extension ProfileClient {
+	public static let liveValue: Self = {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.keychainClient) var keychainClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -25,7 +25,7 @@ public extension ProfileClient {
 			do {
 				return try await getAppPreferences().networkAndGateway
 			} catch {
-				return AppPreferences.NetworkAndGateway.hammunet
+				return AppPreferences.NetworkAndGateway.nebunet
 			}
 		}
 

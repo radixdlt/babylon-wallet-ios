@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionStatusResponse = GatewayAPI.TransactionStatusResponse
 
 // MARK: - GatewayAPI.TransactionStatusResponse
-public extension GatewayAPI {
-	struct TransactionStatusResponse: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionStatusResponse: Codable, Hashable {
 		public private(set) var ledgerState: LedgerState
 		public private(set) var status: TransactionStatus
 		public private(set) var knownPayloads: [TransactionStatusResponseKnownPayloadItem]

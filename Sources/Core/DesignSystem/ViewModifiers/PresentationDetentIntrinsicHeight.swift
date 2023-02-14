@@ -1,7 +1,7 @@
 import SwiftUI
 
-public extension View {
-	func presentationDetentIntrinsicHeight() -> some View {
+extension View {
+	public func presentationDetentIntrinsicHeight() -> some View {
 		self.modifier(PresentationDetentIntrinsicHeight())
 	}
 }

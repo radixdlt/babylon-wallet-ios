@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - NewConnection.View
-public extension NewConnection {
+extension NewConnection {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<NewConnection>
 
 		public init(store: StoreOf<NewConnection>) {
@@ -12,8 +12,8 @@ public extension NewConnection {
 	}
 }
 
-public extension NewConnection.View {
-	var body: some View {
+extension NewConnection.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -62,8 +62,8 @@ public extension NewConnection.View {
 }
 
 // MARK: - NewConnection.View.ViewState
-public extension NewConnection.View {
-	struct ViewState: Equatable {
+extension NewConnection.View {
+	public struct ViewState: Equatable {
 		init(state: NewConnection.State) {}
 	}
 }

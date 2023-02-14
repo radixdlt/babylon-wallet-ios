@@ -9,6 +9,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		@PresentationState
 		var currentModal: Destinations.State?
+		var currentModalIsActuallyPresented = false
 		@PresentationState
 		var responseFailureAlert: AlertState<ViewAction.ResponseFailureAlertAction>?
 	}
@@ -29,6 +30,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case sentResponseToDapp(P2P.ToDapp.WalletInteractionResponse, for: P2P.RequestFromClient, DappMetadata?)
 		case presentResponseFailureAlert(P2P.ResponseToClientByID, for: P2P.RequestFromClient, DappMetadata?, reason: String)
 		case presentResponseSuccessView(DappMetadata)
+		case ensureCurrentModalIsActuallyPresented
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -161,7 +163,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case let .presentResponseSuccessView(dappMetadata):
 			state.currentModal = .dappInteractionCompletion(.init(dappMetadata: dappMetadata))
-			return .none
+			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
+
+		case .ensureCurrentModalIsActuallyPresented:
+			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
 		}
 	}
 
@@ -173,8 +178,27 @@ struct DappInteractor: Sendable, FeatureReducer {
 			let next = state.requestQueue.first
 		{
 			state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.interaction)))
+			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
+		} else {
+			return .none
 		}
-		return .none
+	}
+
+	func ensureCurrentModalIsActuallyPresentedEffect(
+		for state: inout State
+	) -> EffectTask<Action> {
+		guard let currentModal = state.currentModal else { return .none }
+		if state.currentModalIsActuallyPresented == false {
+			state.currentModal = nil
+			state.currentModal = currentModal
+			return .run { send in
+				try await clock.sleep(for: .seconds(0.5))
+				await send(.internal(.ensureCurrentModalIsActuallyPresented))
+			}
+		} else {
+			state.currentModalIsActuallyPresented = false
+			return .none
+		}
 	}
 
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
@@ -190,14 +214,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.currentModal = nil
 			return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
 
-		// NB: handles "background tap to dismiss" for success screen.
-		case .modal(.dismiss):
-			switch state.currentModal {
-			case .none, .dappInteraction:
-				return .none
-			case .dappInteractionCompletion:
-				return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
-			}
+		case
+			.modal(.presented(.dappInteraction(.relay(_, .delegate(.presented))))),
+			.modal(.presented(.dappInteractionCompletion(.delegate(.presented)))):
+			state.currentModalIsActuallyPresented = true
+			return .none
 
 		default:
 			return .none

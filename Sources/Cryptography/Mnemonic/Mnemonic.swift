@@ -49,6 +49,6 @@ public struct Mnemonic: Sendable, Hashable {
 	}
 }
 
-public extension Mnemonic {
-	var phrase: String { words.joined(separator: String(Self.wordSeparator)) }
+extension Mnemonic {
+	public var phrase: String { words.joined(separator: String(Self.wordSeparator)) }
 }

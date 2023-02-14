@@ -4,9 +4,9 @@ import HomeFeature
 import SettingsFeature
 
 // MARK: - Main.View
-public extension Main {
+extension Main {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -16,8 +16,8 @@ public extension Main {
 	}
 }
 
-public extension Main.View {
-	var body: some View {
+extension Main.View {
+	public var body: some View {
 		ZStack {
 			Home.View(
 				store: store.scope(

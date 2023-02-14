@@ -2,9 +2,9 @@ import AssetsViewFeature
 import FeaturePrelude
 
 // MARK: - AccountDetails.Action
-public extension AccountDetails {
+extension AccountDetails {
 	// MARK: Action
-	enum Action: Sendable, Equatable {
+	public enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -13,16 +13,16 @@ public extension AccountDetails {
 }
 
 // MARK: - AccountDetails.Action.ChildAction
-public extension AccountDetails.Action {
-	enum ChildAction: Sendable, Equatable {
+extension AccountDetails.Action {
+	public enum ChildAction: Sendable, Equatable {
 		case assets(AssetsView.Action)
 		case destination(PresentationActionOf<AccountDetails.Destinations>)
 	}
 }
 
 // MARK: - AccountDetails.Action.ViewAction
-public extension AccountDetails.Action {
-	enum ViewAction: Sendable, Equatable {
+extension AccountDetails.Action {
+	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case dismissAccountDetailsButtonTapped
 		case displayAccountPreferencesButtonTapped
@@ -33,15 +33,15 @@ public extension AccountDetails.Action {
 }
 
 // MARK: - AccountDetails.Action.InternalAction
-public extension AccountDetails.Action {
-	enum InternalAction: Sendable, Equatable {
+extension AccountDetails.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 	}
 }
 
 // MARK: - AccountDetails.Action.DelegateAction
-public extension AccountDetails.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension AccountDetails.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case dismissAccountDetails
 		case displayAccountPreferences(AccountAddress)
 		case displayTransfer

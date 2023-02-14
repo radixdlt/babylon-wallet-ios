@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias FungibleResourcesCollectionAllOf = GatewayAPI.FungibleResourcesCollectionAllOf
 
 // MARK: - GatewayAPI.FungibleResourcesCollectionAllOf
-public extension GatewayAPI {
-	struct FungibleResourcesCollectionAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct FungibleResourcesCollectionAllOf: Codable, Hashable {
 		public private(set) var items: [FungibleResourcesCollectionItem]
 
 		public init(items: [FungibleResourcesCollectionItem]) {

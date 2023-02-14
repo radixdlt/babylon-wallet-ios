@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - NewEntityCompletion.State
-public extension NewEntityCompletion {
-	struct State: Sendable & Hashable {
+extension NewEntityCompletion {
+	public struct State: Sendable & Hashable {
 		public let entity: Entity
 		public let isFirstOnNetwork: Bool
 		public let navigationButtonCTA: CreateEntityNavigationButtonCTA
@@ -19,8 +19,8 @@ public extension NewEntityCompletion {
 	}
 }
 
-public extension NewEntityCompletion.State {
-	init(entity: Entity, config: CreateEntityConfig) {
+extension NewEntityCompletion.State {
+	public init(entity: Entity, config: CreateEntityConfig) {
 		self.init(
 			entity: entity,
 			isFirstOnNetwork: config.isFirstEntity,
@@ -30,16 +30,16 @@ public extension NewEntityCompletion.State {
 }
 
 // MARK: - NewEntityCompletion.State.Origin
-public extension NewEntityCompletion.State {
-	var entityAddress: Entity.EntityAddress {
+extension NewEntityCompletion.State {
+	public var entityAddress: Entity.EntityAddress {
 		entity.address
 	}
 
-	var displayName: String {
+	public var displayName: String {
 		entity.displayName.rawValue
 	}
 
-	var index: Int {
+	public var index: Int {
 		entity.index
 	}
 }

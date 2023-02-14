@@ -9,8 +9,8 @@ private enum ProfileFromSnapshotImporterKey: DependencyKey {
 	static let liveValue = { @Sendable in try Profile(snapshot: $0) }
 }
 
-public extension DependencyValues {
-	var profileFromSnapshotImporter: ProfileFromSnapshotImporter {
+extension DependencyValues {
+	public var profileFromSnapshotImporter: ProfileFromSnapshotImporter {
 		get { self[ProfileFromSnapshotImporterKey.self] }
 		set { self[ProfileFromSnapshotImporterKey.self] = newValue }
 	}

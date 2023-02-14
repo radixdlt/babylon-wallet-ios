@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionStatus = GatewayAPI.TransactionStatus
 
 // MARK: - GatewayAPI.TransactionStatus
-public extension GatewayAPI {
-	enum TransactionStatus: String, Codable, CaseIterable {
+extension GatewayAPI {
+	public enum TransactionStatus: String, Codable, CaseIterable {
 		case unknown
 		case committedSuccess = "committed_success"
 		case committedFailure = "committed_failure"

@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,14 +14,14 @@ import AnyCodable
 public typealias LedgerState = GatewayAPI.LedgerState
 
 // MARK: - GatewayAPI.LedgerState
-public extension GatewayAPI {
+extension GatewayAPI {
 	/** The ledger state against which the response was generated. Can be used to detect if the Network Gateway is returning up-to-date information.  */
-	struct LedgerState: Codable, Hashable {
+	public struct LedgerState: Codable, Hashable {
 		/** The name of the network against which the request is made. */
 		public private(set) var network: String
 		/** The state version of the ledger. Each transaction increments the state version by 1. */
 		public private(set) var stateVersion: Int64
-		/** The round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.  */
+		/** The proposer round timestamp of the consensus round when this transaction was committed to ledger. This is not guaranteed to be strictly increasing, as it is computed as an average across the validator set. If this is significantly behind the current timestamp, the Network Gateway is likely reporting out-dated information, or the network has stalled.  */
 		public private(set) var proposerRoundTimestamp: String
 		/** The epoch number of the ledger at this state version. */
 		public private(set) var epoch: Int64

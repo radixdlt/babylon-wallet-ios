@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - TransactionSigning.View
-public extension TransactionSigning {
-	struct ViewState: Equatable {
+extension TransactionSigning {
+	public struct ViewState: Equatable {
 		let manifest: String?
 		let isShowingLoader: Bool
 		let signButtonEnabled: Bool // TODO: ControlState instead
@@ -25,7 +25,7 @@ public extension TransactionSigning {
 	}
 
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<TransactionSigning>
 
 		public init(store: StoreOf<TransactionSigning>) {
@@ -84,8 +84,8 @@ struct TransactionSigning_Preview: PreviewProvider {
 	}
 }
 
-public extension TransactionManifest {
-	static var previewValue: Self {
+extension TransactionManifest {
+	public static var previewValue: Self {
 		.init(instructions: .string(
 			"""
 			# Withdraw XRD from account
@@ -129,7 +129,7 @@ public extension TransactionManifest {
 	}
 }
 
-public extension TransactionSigning.State {
-	static let previewValue = Self(transactionManifestWithoutLockFee: .previewValue)
+extension TransactionSigning.State {
+	public static let previewValue = Self(transactionManifestWithoutLockFee: .previewValue)
 }
 #endif

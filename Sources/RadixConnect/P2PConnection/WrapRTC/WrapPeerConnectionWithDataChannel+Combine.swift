@@ -2,8 +2,8 @@ import Combine
 import P2PModels
 import Prelude
 
-public extension WrapPeerConnectionWithDataChannel {
-	func createOffer() -> Future<WebRTCOffer, ConverseError.WebRTC> {
+extension WrapPeerConnectionWithDataChannel {
+	public func createOffer() -> Future<WebRTCOffer, ConverseError.WebRTC> {
 		let connectionID = self.connectionID
 		return Future { [weak self] promise in
 			guard let self = self else {
@@ -18,7 +18,7 @@ public extension WrapPeerConnectionWithDataChannel {
 		}
 	}
 
-	func setRemoteOffer(_ offer: WebRTCOffer) -> Future<Void, ConverseError.WebRTC> {
+	public func setRemoteOffer(_ offer: WebRTCOffer) -> Future<Void, ConverseError.WebRTC> {
 		let connectionID = self.connectionID
 		return Future { [weak self] promise in
 			guard let self = self else {
@@ -33,7 +33,7 @@ public extension WrapPeerConnectionWithDataChannel {
 		}
 	}
 
-	func setRemoteAnswer(_ answer: WebRTCAnswer) -> Future<Void, ConverseError.WebRTC> {
+	public func setRemoteAnswer(_ answer: WebRTCAnswer) -> Future<Void, ConverseError.WebRTC> {
 		let connectionID = self.connectionID
 		return Future { [weak self] promise in
 			guard let self = self else {
@@ -48,7 +48,7 @@ public extension WrapPeerConnectionWithDataChannel {
 		}
 	}
 
-	func setRemoteICECandidate(_ iceCandidate: WebRTCICECandidate) -> Future<Void, ConverseError.WebRTC> {
+	public func setRemoteICECandidate(_ iceCandidate: WebRTCICECandidate) -> Future<Void, ConverseError.WebRTC> {
 		let connectionID = self.connectionID
 		return Future { [weak self] promise in
 			guard let self = self else {

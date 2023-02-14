@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,10 +14,10 @@ import AnyCodable
 public typealias EntityDetailsResponseComponentDetails = GatewayAPI.EntityDetailsResponseComponentDetails
 
 // MARK: - GatewayAPI.EntityDetailsResponseComponentDetails
-public extension GatewayAPI {
-	struct EntityDetailsResponseComponentDetails: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityDetailsResponseComponentDetails: Codable, Hashable {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var packageAddress: String
 		public private(set) var blueprintName: String
 		public private(set) var state: AnyCodable

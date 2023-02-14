@@ -11,8 +11,8 @@ public struct ImportProfile: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension ImportProfile {
-	func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+extension ImportProfile {
+	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.goBack)):
 			return .run { send in

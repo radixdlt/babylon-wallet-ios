@@ -11,8 +11,8 @@ public struct TokenListView: View {
 	}
 }
 
-public extension TokenListView {
-	var body: some View {
+extension TokenListView {
+	public var body: some View {
 		HStack(spacing: -10) {
 			if sortedTokens.count > limit {
 				ForEach(sortedTokens[0 ..< limit]) { token in

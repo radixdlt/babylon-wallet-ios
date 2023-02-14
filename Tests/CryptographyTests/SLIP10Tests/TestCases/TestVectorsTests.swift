@@ -27,8 +27,8 @@ final class TestVectorsTests: TestCase {
 	}
 }
 
-private extension TestVectorsTests {
-	func doTestFile(
+extension TestVectorsTests {
+	private func doTestFile(
 		testFile: TestFile,
 		file: StaticString = #file, line: UInt = #line
 	) throws {
@@ -42,7 +42,7 @@ private extension TestVectorsTests {
 		print(" - PASSED ✅")
 	}
 
-	func doTestGroup(
+	private func doTestGroup(
 		group: TestGroup,
 		file: StaticString = #file, line: UInt = #line
 	) throws {
@@ -79,7 +79,7 @@ private extension TestVectorsTests {
 		}
 	}
 
-	func doTestScenario(
+	private func doTestScenario(
 		root: HD.Root,
 		testScenario: TestScenario,
 		groupId: Int,
@@ -99,7 +99,7 @@ private extension TestVectorsTests {
 		}
 	}
 
-	func XCTAssertKeysEqual(
+	private func XCTAssertKeysEqual(
 		_ actual: ExtendedKey,
 		expected: ExtendedKey,
 		_ prefix: String? = nil,

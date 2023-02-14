@@ -2,9 +2,9 @@
 import Introspect
 import SwiftUI
 
-public extension View {
+extension View {
 	@MainActor
-	func textFieldCharacterLimit(_ limit: Int?, forText text: Binding<String>) -> some View {
+	public func textFieldCharacterLimit(_ limit: Int?, forText text: Binding<String>) -> some View {
 		self.introspectTextField { uiTextField in
 			if let limit {
 				uiTextField.dynamicProperties = (characterLimit: limit, textBinding: text)
@@ -15,8 +15,8 @@ public extension View {
 	}
 }
 
-private extension UITextField {
-	var dynamicProperties: (characterLimit: Int, textBinding: Binding<String>)? {
+extension UITextField {
+	fileprivate var dynamicProperties: (characterLimit: Int, textBinding: Binding<String>)? {
 		get {
 			let key = unsafeBitCast(Selector(#function), to: UnsafeRawPointer.self)
 			return objc_getAssociatedObject(self, key) as? (characterLimit: Int, textBinding: Binding<String>)
@@ -29,8 +29,8 @@ private extension UITextField {
 	}
 }
 
-private extension UITextFieldDelegate {
-	func swizzle() {
+extension UITextFieldDelegate {
+	fileprivate func swizzle() {
 		guard !SwizzledUITextFieldDelegate.state.isActive else { return }
 
 		guard let delegateClass = object_getClass(self) else {

@@ -67,8 +67,8 @@ public indirect enum JSONValue: Decodable, CustomStringConvertible, Sendable, Ha
 }
 
 // MARK: - Convenience
-public extension JSONValue {
-	var string: String? {
+extension JSONValue {
+	public var string: String? {
 		switch self {
 		case let .string(value):
 			return value
@@ -77,7 +77,7 @@ public extension JSONValue {
 		}
 	}
 
-	var double: Double? {
+	public var double: Double? {
 		switch self {
 		case let .double(value):
 			return value
@@ -86,7 +86,7 @@ public extension JSONValue {
 		}
 	}
 
-	var bool: Bool? {
+	public var bool: Bool? {
 		switch self {
 		case let .bool(value):
 			return value
@@ -95,7 +95,7 @@ public extension JSONValue {
 		}
 	}
 
-	var dictionary: [String: JSONValue]? {
+	public var dictionary: [String: JSONValue]? {
 		switch self {
 		case let .dictionary(value):
 			return value
@@ -104,7 +104,7 @@ public extension JSONValue {
 		}
 	}
 
-	var array: [JSONValue]? {
+	public var array: [JSONValue]? {
 		switch self {
 		case let .array(value):
 			return value
@@ -113,7 +113,7 @@ public extension JSONValue {
 		}
 	}
 
-	var isNil: Bool {
+	public var isNil: Bool {
 		switch self {
 		case .nil:
 			return true

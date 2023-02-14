@@ -11,8 +11,8 @@ public enum ManifestInstructions: Sendable, Codable, Hashable, CustomStringConve
 }
 
 // MARK: ManifestInstructions.Kind
-public extension ManifestInstructions {
-	enum Kind: String, Codable, Hashable, Sendable {
+extension ManifestInstructions {
+	public enum Kind: String, Codable, Hashable, Sendable {
 		case string = "String"
 		case parsed = "Parsed"
 	}
@@ -20,10 +20,10 @@ public extension ManifestInstructions {
 
 public typealias ManifestInstructionsKind = ManifestInstructions.Kind
 
-public extension ManifestInstructions {
+extension ManifestInstructions {
 	@available(iOS, deprecated: 999, message: "Prefer using `String(describing: transactionManifest)` if you have that, which will result in much better printing.")
 	@available(macOS, deprecated: 999, message: "Prefer using `String(describing: transactionManifest)` if you have that, which will result in much better printing.")
-	var description: String {
+	public var description: String {
 		switch self {
 		case let .string(string):
 			return string

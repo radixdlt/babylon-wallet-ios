@@ -33,8 +33,8 @@ struct Header: View {
 }
 
 // MARK: Header.Constants
-private extension Header {
-	enum Constants {
+extension Header {
+	fileprivate enum Constants {
 		static let radius: CGFloat = .small1
 	}
 }

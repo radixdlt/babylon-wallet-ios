@@ -23,15 +23,15 @@ extension JSONDecoder {
 	}
 }
 
-public extension GatewayAPIClient {
-	typealias Value = GatewayAPIClient
-	static let liveValue = GatewayAPIClient.live(
+extension GatewayAPIClient {
+	public typealias Value = GatewayAPIClient
+	public static let liveValue = GatewayAPIClient.live(
 		urlSession: .shared,
 		jsonEncoder: .init(),
 		jsonDecoder: .default
 	)
 
-	static func live(
+	public static func live(
 		urlSession: URLSession,
 		jsonEncoder: JSONEncoder,
 		jsonDecoder: JSONDecoder
@@ -174,7 +174,7 @@ public extension GatewayAPIClient {
 				) { $0.appendingPathComponent("entity/details") }
 			}, getNonFungibleLocalIds: { accountAddress, resourceAddress in
 				try await post(
-					request: GatewayAPI.EntityNonFungibleLocalIdsRequestAllOf(
+					request: GatewayAPI.EntityNonFungibleIdsRequestAllOf(
 						address: accountAddress.address,
 						resourceAddress: resourceAddress
 					)

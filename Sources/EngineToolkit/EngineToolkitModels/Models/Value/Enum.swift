@@ -56,7 +56,7 @@ public struct Enum: ValueProtocol, Sendable, Codable, Hashable {
 	}
 }
 
-public extension Enum {
+extension Enum {
 	// MARK: CodingKeys
 
 	private enum CodingKeys: String, CodingKey {
@@ -67,7 +67,7 @@ public extension Enum {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
@@ -75,7 +75,7 @@ public extension Enum {
 		try container.encode(fields, forKey: .fields)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
@@ -106,7 +106,7 @@ public enum EnumDiscriminator: Sendable, Codable, Hashable {
 	}
 }
 
-public extension EnumDiscriminator {
+extension EnumDiscriminator {
 	private enum Kind: String, Codable {
 		case u8 = "U8"
 		case string = "String"
@@ -121,7 +121,7 @@ public extension EnumDiscriminator {
 
 	// MARK: Codable
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		switch self {
 		case let .u8(discriminator):
@@ -133,7 +133,7 @@ public extension EnumDiscriminator {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 

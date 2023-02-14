@@ -1,17 +1,17 @@
 import FeaturePrelude
 
 // MARK: - AggregatedValue.State
-public extension AggregatedValue {
+extension AggregatedValue {
 	// MARK: State
-	struct State: Sendable, Equatable {
-		public var value: Float?
+	public struct State: Sendable, Equatable {
+		public var value: BigDecimal?
 
 		// MARK: - AppSettings properties
 		public var currency: FiatCurrency
 		public var isCurrencyAmountVisible: Bool
 
 		public init(
-			value: Float? = nil,
+			value: BigDecimal? = nil,
 			currency: FiatCurrency = .usd,
 			isCurrencyAmountVisible: Bool = false
 		) {
@@ -23,8 +23,8 @@ public extension AggregatedValue {
 }
 
 #if DEBUG
-public extension AggregatedValue.State {
-	static let previewValue = AggregatedValue.State(
+extension AggregatedValue.State {
+	public static let previewValue = AggregatedValue.State(
 		value: 1_000_000,
 		currency: .usd
 	)

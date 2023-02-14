@@ -2,8 +2,8 @@ import ClientPrelude
 import Cryptography
 import Profile
 
-public extension DependencyValues {
-	var profileClient: ProfileClient {
+extension DependencyValues {
+	public var profileClient: ProfileClient {
 		get { self[ProfileClient.self] }
 		set { self[ProfileClient.self] = newValue }
 	}
@@ -56,12 +56,12 @@ extension ProfileClient: TestDependencyKey {
 	)
 }
 
-public extension ProfileClient {
-	static let noop = Self(
+extension ProfileClient {
+	public static let noop = Self(
 		getFactorSources: { throw NoopError() },
-		getCurrentNetworkID: { NetworkID.hammunet },
+		getCurrentNetworkID: { NetworkID.nebunet },
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
-		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.hammunet },
+		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.nebunet },
 		setNetworkAndGateway: { _ in },
 		createEphemeralProfileAndUnsavedOnDeviceFactorSource: { _ in throw NoopError() },
 		injectProfileSnapshot: { _ in },

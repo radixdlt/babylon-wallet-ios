@@ -2,9 +2,9 @@ import Cryptography
 import EngineToolkitModels
 import Prelude
 
-internal extension OnNetwork {
+extension OnNetwork {
 	/// Creates a new, non saved, **Virtual** `Entity` of type `Entity.Type`
-	static func createNewVirtualEntity<Entity: EntityProtocol>(
+	internal static func createNewVirtualEntity<Entity: EntityProtocol>(
 		factorSources: FactorSources,
 		index: Int,
 		networkID: NetworkID,
@@ -66,8 +66,8 @@ struct PersonaIndexOutOfBounds: Swift.Error {}
 // MARK: - NoEntityFoundMatchingCriteria
 struct NoEntityFoundMatchingCriteria: Swift.Error {}
 
-public extension Profile {
-	func entity(
+extension Profile {
+	public func entity(
 		networkID: NetworkID,
 		kind: EntityKind,
 		entityIndex: Int
@@ -87,7 +87,7 @@ public extension Profile {
 		}
 	}
 
-	func entity<Entity: EntityProtocol>(
+	public func entity<Entity: EntityProtocol>(
 		networkID: NetworkID,
 		entityType: Entity.Type,
 		entityIndex: Int
@@ -98,9 +98,9 @@ public extension Profile {
 		return entity
 	}
 
-	struct IncorrectEntityType: Swift.Error {}
+	public struct IncorrectEntityType: Swift.Error {}
 
-	func entity(
+	public func entity(
 		networkID: NetworkID,
 		address: ProfileModels.AddressProtocol
 	) throws -> any EntityProtocol {
@@ -114,7 +114,7 @@ public extension Profile {
 		}
 	}
 
-	func signers<Entity>(
+	public func signers<Entity>(
 		networkID: NetworkID,
 		address: ProfileModels.AddressProtocol,
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
@@ -129,7 +129,7 @@ public extension Profile {
 		)
 	}
 
-	func signers<Entity>(
+	public func signers<Entity>(
 		networkID: NetworkID,
 		entityType: Entity.Type,
 		entityIndex: Int,
@@ -141,7 +141,7 @@ public extension Profile {
 		)
 	}
 
-	func signers<Entity>(
+	public func signers<Entity>(
 		of entity: Entity,
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
 	) async throws -> NonEmpty<OrderedSet<SignersOf<Entity>>> where Entity: EntityProtocol & Sendable & Hashable {
@@ -150,7 +150,7 @@ public extension Profile {
 
 	/// Makes sure to only read mnemonic for factor source from keychain once
 	/// Makes sure to only read mnemonic for factor source from keychain once
-	func signers<Entity>(
+	public func signers<Entity>(
 		ofEntities entities: some Collection<Entity>,
 		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
 	) async throws -> NonEmpty<OrderedSet<SignersOf<Entity>>> where Entity: EntityProtocol & Sendable & Hashable {
@@ -206,18 +206,18 @@ public struct SignersOf<Entity: EntityProtocol & Sendable & Hashable>: Sendable,
 	}
 }
 
-public extension SignersOf {
-	func hash(into hasher: inout Hasher) {
+extension SignersOf {
+	public func hash(into hasher: inout Hasher) {
 		hasher.combine(entity)
 	}
 
-	static func == (lhs: Self, rhs: Self) -> Bool {
+	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.entity == rhs.entity
 	}
 
-	typealias Signer = @Sendable (any DataProtocol) async throws -> SignatureWithPublicKey
+	public typealias Signer = @Sendable (any DataProtocol) async throws -> SignatureWithPublicKey
 
-	init(entity: Entity, notaryPrivateKey: SLIP10.PrivateKey) {
+	public init(entity: Entity, notaryPrivateKey: SLIP10.PrivateKey) {
 		self.init(
 			entity: entity,
 			notaryPublicKey: notaryPrivateKey.publicKey(),

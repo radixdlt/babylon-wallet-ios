@@ -1,8 +1,8 @@
 import FeaturePrelude
 
 // MARK: - PersonaList.State
-public extension PersonaList {
-	struct State: Sendable, Hashable {
+extension PersonaList {
+	public struct State: Sendable, Hashable {
 		public var personas: IdentifiedArrayOf<Persona.State>
 
 		public init(
@@ -14,7 +14,7 @@ public extension PersonaList {
 }
 
 #if DEBUG
-public extension PersonaList.State {
-	static let previewValue: Self = .init()
+extension PersonaList.State {
+	public static let previewValue: Self = .init()
 }
 #endif

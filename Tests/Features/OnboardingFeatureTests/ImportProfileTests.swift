@@ -92,12 +92,12 @@ final class ImportProfileTests: TestCase {
 	}
 }
 
-private extension ImportProfileTests {
-	func profileSnapshotData() throws -> Data {
+extension ImportProfileTests {
+	private func profileSnapshotData() throws -> Data {
 		try readTestFixtureData(jsonName: "profile_snapshot")
 	}
 
-	func profileSnapshot() throws -> ProfileSnapshot {
+	private func profileSnapshot() throws -> ProfileSnapshot {
 		let jsonDecoder = JSONDecoder.iso8601
 		let data = try profileSnapshotData()
 		return try jsonDecoder.decode(ProfileSnapshot.self, from: data)

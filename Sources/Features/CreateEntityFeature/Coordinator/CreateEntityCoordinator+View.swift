@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - CreateEntityCoordinator.View
-public extension CreateEntityCoordinator {
+extension CreateEntityCoordinator {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<CreateEntityCoordinator>
 
 		public init(store: StoreOf<CreateEntityCoordinator>) {
@@ -12,8 +12,8 @@ public extension CreateEntityCoordinator {
 	}
 }
 
-public extension CreateEntityCoordinator.View {
-	var body: some View {
+extension CreateEntityCoordinator.View {
+	public var body: some View {
 		WithViewStore(store, observe: { $0 }) { viewStore in
 			ForceFullScreen {
 				VStack {

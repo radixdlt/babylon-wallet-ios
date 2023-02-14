@@ -25,8 +25,8 @@ extension ProfileClient {
 }
 
 // MARK: - P2PConnectivityClient + :LiveValue
-public extension P2PConnectivityClient {
-	static let liveValue: Self = {
+extension P2PConnectivityClient {
+	public static let liveValue: Self = {
 		@Dependency(\.profileClient) var profileClient
 
 		let localNetworkAuthorization = LocalNetworkAuthorization()

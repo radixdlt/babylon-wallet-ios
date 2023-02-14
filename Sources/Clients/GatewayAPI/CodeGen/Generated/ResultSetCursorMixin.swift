@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,10 +14,13 @@ import AnyCodable
 public typealias ResultSetCursorMixin = GatewayAPI.ResultSetCursorMixin
 
 // MARK: - GatewayAPI.ResultSetCursorMixin
-public extension GatewayAPI {
-	struct ResultSetCursorMixin: Codable, Hashable {
+extension GatewayAPI {
+	public struct ResultSetCursorMixin: Codable, Hashable {
+		/** Total number of items in underlying collection, fragment of which is available in `items` collection. */
 		public private(set) var totalCount: Int64?
+		/** If specified, contains a cursor to query previous page of the `items` collection. */
 		public private(set) var previousCursor: String?
+		/** If specified, contains a cursor to query next page of the `items` collection. */
 		public private(set) var nextCursor: String?
 
 		public init(totalCount: Int64? = nil, previousCursor: String? = nil, nextCursor: String? = nil) {

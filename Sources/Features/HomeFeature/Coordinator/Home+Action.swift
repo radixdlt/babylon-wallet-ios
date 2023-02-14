@@ -9,9 +9,9 @@ import P2PConnectivityClient
 import TransactionSigningFeature
 
 // MARK: - Home.Action
-public extension Home {
+extension Home {
 	// MARK: Action
-	enum Action: Sendable, Equatable {
+	public enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -20,8 +20,8 @@ public extension Home {
 }
 
 // MARK: - Home.Action.ChildAction
-public extension Home.Action {
-	enum ChildAction: Sendable, Equatable {
+extension Home.Action {
+	public enum ChildAction: Sendable, Equatable {
 		case accountList(AccountList.Action)
 		case header(Home.Header.Action)
 		case accountPreferences(AccountPreferences.Action)
@@ -31,8 +31,8 @@ public extension Home.Action {
 }
 
 // MARK: - Home.Action.ViewAction
-public extension Home.Action {
-	enum ViewAction: Sendable, Equatable {
+extension Home.Action {
+	public enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case pullToRefreshStarted
 		case createAccountButtonTapped
@@ -40,16 +40,16 @@ public extension Home.Action {
 }
 
 // MARK: - Home.Action.InternalAction
-public extension Home.Action {
-	enum InternalAction: Sendable, Equatable {
+extension Home.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
 // MARK: - Home.Action.SystemAction
-public extension Home.Action {
-	enum SystemAction: Sendable, Equatable {
+extension Home.Action {
+	public enum SystemAction: Sendable, Equatable {
 		case accountsLoadedResult(TaskResult<NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>>)
 		case appSettingsLoadedResult(TaskResult<AppSettings>)
 		case isCurrencyAmountVisibleLoaded(Bool)
@@ -59,8 +59,8 @@ public extension Home.Action {
 }
 
 // MARK: - Home.Action.DelegateAction
-public extension Home.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension Home.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
 		case reloadAccounts
 	}

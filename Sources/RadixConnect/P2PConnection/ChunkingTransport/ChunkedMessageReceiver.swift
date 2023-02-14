@@ -18,8 +18,8 @@ public final class ChunkedMessageReceiver {
 	}
 }
 
-public extension ChunkedMessageReceiver {
-	func receive(
+extension ChunkedMessageReceiver {
+	public func receive(
 		packageJSONData data: Data
 	) throws -> Message? {
 		loggerGlobal.trace("⬇️☑️ Trying to JSON decode package json data into ChunkedMessagePackage")
@@ -31,7 +31,7 @@ public extension ChunkedMessageReceiver {
 		return try receive(package: package)
 	}
 
-	func receive(package: ChunkedMessagePackage) throws -> Message? {
+	public func receive(package: ChunkedMessagePackage) throws -> Message? {
 		if let receiveMessageError = package.receiveMessageError {
 			throw receiveMessageError
 		}
@@ -86,40 +86,40 @@ public extension ChunkedMessageReceiver {
 }
 
 // MARK: ChunkedMessageReceiver.Message
-public extension ChunkedMessageReceiver {
-	enum Message: Sendable, Hashable {
+extension ChunkedMessageReceiver {
+	public enum Message: Sendable, Hashable {
 		case outgoingMessageGotReceivedConfirmation(Outgoing)
 		case incomingMessage(Incoming)
 	}
 }
 
-public extension ChunkedMessageReceiver.Message {
-	struct Outgoing: Sendable, Hashable {
+extension ChunkedMessageReceiver.Message {
+	public struct Outgoing: Sendable, Hashable {
 		public let messageId: ChunkedMessagePackage.MessageID
 		public init(messageId: ChunkedMessagePackage.MessageID) {
 			self.messageId = messageId
 		}
 	}
 
-	typealias Incoming = ChunkingTransportIncomingMessage
+	public typealias Incoming = ChunkingTransportIncomingMessage
 }
 
-public extension ChunkedMessageReceiver.Message {
-	var messageId: ChunkedMessagePackage.MessageID {
+extension ChunkedMessageReceiver.Message {
+	public var messageId: ChunkedMessagePackage.MessageID {
 		switch self {
 		case let .outgoingMessageGotReceivedConfirmation(value): return value.messageId
 		case let .incomingMessage(value): return value.messageID
 		}
 	}
 
-	var incoming: Incoming? {
+	public var incoming: Incoming? {
 		guard case let .incomingMessage(value) = self else {
 			return nil
 		}
 		return value
 	}
 
-	var outgoingMessageGotReceivedConfirmation: Outgoing? {
+	public var outgoingMessageGotReceivedConfirmation: Outgoing? {
 		guard case let .outgoingMessageGotReceivedConfirmation(value) = self else {
 			return nil
 		}
@@ -128,6 +128,6 @@ public extension ChunkedMessageReceiver.Message {
 }
 
 // MARK: - ChunkedMessageReceiver.Error
-public extension ChunkedMessageReceiver {
-	typealias Error = ConverseError.ChunkingTransportError.ReceiveError
+extension ChunkedMessageReceiver {
+	public typealias Error = ConverseError.ChunkingTransportError.ReceiveError
 }

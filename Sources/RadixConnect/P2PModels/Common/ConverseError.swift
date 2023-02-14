@@ -13,8 +13,8 @@ public enum ConverseError: LocalizedError, Sendable {
 	case shared(Shared)
 }
 
-public extension ConverseError {
-	var errorDescription: String? {
+extension ConverseError {
+	public var errorDescription: String? {
 		switch self {
 		case let .unknownError(error):
 			return "Unknown error: \(String(describing: error))"
@@ -38,26 +38,26 @@ public extension ConverseError {
 	}
 }
 
-public extension ConverseError {
-	enum ConnectError: LocalizedError, Sendable {
+extension ConverseError {
+	public enum ConnectError: LocalizedError, Sendable {
 		case failedToEstablishConnectionAfterMultipleAttempts(attempts: Int)
 	}
 
-	enum ConnectionsError: LocalizedError, Sendable {
+	public enum ConnectionsError: LocalizedError, Sendable {
 		case noConnectionFoundForID(P2PConnectionID)
 	}
 
-	enum PeerError: String, LocalizedError, Sendable {
+	public enum PeerError: String, LocalizedError, Sendable {
 		case createdTransportWithNonMatchingConnectionIDs
 		case unableToSendDataWebRTCClientIsNil
 		case unableToSendReadReceiptWebRTCClientIsNil
 	}
 
-	enum Shared: String, LocalizedError, Sendable {
+	public enum Shared: String, LocalizedError, Sendable {
 		case publisherFinishedWithoutValue
 	}
 
-	enum WebRTC: LocalizedError, Sendable {
+	public enum WebRTC: LocalizedError, Sendable {
 		case peerWithIDAlreadyExists(P2PConnectionID)
 		case failedToCreatePeerConnection(config: WebRTCPeerConnectionConfig)
 		case failedToCreateDataChannel(config: WebRTCDataChannelConfig)
@@ -87,7 +87,7 @@ public extension ConverseError {
 		case wrappedPeerConnectionAndChannelIsNilProbablySinceCloseHasBeenCalled
 	}
 
-	enum WebSocket: LocalizedError, Sendable {
+	public enum WebSocket: LocalizedError, Sendable {
 		case unableToPingTaskIsNil
 		case unableToSendDataTaskIsNil
 		case unableToReceiveTaskIsNil
@@ -97,7 +97,7 @@ public extension ConverseError {
 		case receiveMessageFailed(underlyingError: Swift.Error)
 	}
 
-	enum SignalingServer: LocalizedError, Sendable {
+	public enum SignalingServer: LocalizedError, Sendable {
 		case failedToCreateSignalingServerURLInvalidPath
 		case failedToCreateSignalingServerURLInvalidQueryParameters
 
@@ -122,22 +122,22 @@ public extension ConverseError {
 		case failedToTransportRPCMessage(webSocketError: ConverseError.WebSocket)
 	}
 
-	enum ChunkingTransportError: LocalizedError, Sendable {
+	public enum ChunkingTransportError: LocalizedError, Sendable {
 		case unknownError(Swift.Error)
 		case assembler(AssemblerError)
 		case receive(ReceiveError)
 	}
 }
 
-public extension ConverseError.ChunkingTransportError {
-	enum AssemblerError: LocalizedError, Sendable, Hashable {
+extension ConverseError.ChunkingTransportError {
+	public enum AssemblerError: LocalizedError, Sendable, Hashable {
 		case foundReceiveMessageError(ChunkedMessageReceiveError)
 		case parseError(ParseError)
 		case messageByteCountMismatch(got: Int, butMetaDataPackageStated: Int)
 		case hashMismatch(calculated: String, butExpected: String)
 	}
 
-	enum ReceiveError: LocalizedError, Sendable {
+	public enum ReceiveError: LocalizedError, Sendable {
 		case unknownError(Swift.Error)
 		case alreadyGotMetaData(forMessageWithID: ChunkedMessagePackage.MessageID)
 		case expectedFirstPackageToBeMetaDataPackage
@@ -148,8 +148,8 @@ public extension ConverseError.ChunkingTransportError {
 }
 
 // MARK: - ConverseError.ChunkingTransportError.AssemblerError.ParseError
-public extension ConverseError.ChunkingTransportError.AssemblerError {
-	enum ParseError: LocalizedError, Sendable, Hashable {
+extension ConverseError.ChunkingTransportError.AssemblerError {
+	public enum ParseError: LocalizedError, Sendable, Hashable {
 		case noPackages
 		case noMetaDataPackage
 		case foundMultipleMetaDataPackages
@@ -163,8 +163,8 @@ public extension ConverseError.ChunkingTransportError.AssemblerError {
 	}
 }
 
-public extension ConverseError.ChunkingTransportError {
-	init(error: Swift.Error) {
+extension ConverseError.ChunkingTransportError {
+	public init(error: Swift.Error) {
 		if let assemblerError = error as? AssemblerError {
 			self = .assembler(assemblerError)
 		} else if let parseError = error as? AssemblerError.ParseError {

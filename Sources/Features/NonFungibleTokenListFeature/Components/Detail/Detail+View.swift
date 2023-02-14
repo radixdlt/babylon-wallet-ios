@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Detail.View
-public extension NonFungibleTokenList.Detail {
+extension NonFungibleTokenList.Detail {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<NonFungibleTokenList.Detail>
 
 		public init(store: StoreOf<NonFungibleTokenList.Detail>) {
@@ -12,8 +12,8 @@ public extension NonFungibleTokenList.Detail {
 	}
 }
 
-public extension NonFungibleTokenList.Detail.View {
-	var body: some View {
+extension NonFungibleTokenList.Detail.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -108,7 +108,7 @@ public extension NonFungibleTokenList.Detail.View {
 		}
 	}
 
-	var headerIconAsset: ImageAsset {
+	public var headerIconAsset: ImageAsset {
 		// TODO: implement depending on the API design
 		AssetResource.nft
 	}

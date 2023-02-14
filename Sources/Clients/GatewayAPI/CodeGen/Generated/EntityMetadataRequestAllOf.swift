@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,9 +14,9 @@ import AnyCodable
 public typealias EntityMetadataRequestAllOf = GatewayAPI.EntityMetadataRequestAllOf
 
 // MARK: - GatewayAPI.EntityMetadataRequestAllOf
-public extension GatewayAPI {
-	struct EntityMetadataRequestAllOf: Codable, Hashable {
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+extension GatewayAPI {
+	public struct EntityMetadataRequestAllOf: Codable, Hashable {
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
 		/** This cursor allows forward pagination, by providing the cursor from the previous request. */
 		public private(set) var cursor: String?

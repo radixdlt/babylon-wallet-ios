@@ -1,40 +1,40 @@
 import FeaturePrelude
 
 // MARK: - SelectGenesisFactorSource.Action
-public extension SelectGenesisFactorSource {
-	enum Action: Sendable, Equatable {
+extension SelectGenesisFactorSource {
+	public enum Action: Sendable, Equatable {
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
 	}
 }
 
-public extension SelectGenesisFactorSource.Action {
-	static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
+extension SelectGenesisFactorSource.Action {
+	public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 }
 
 // MARK: - SelectGenesisFactorSource.Action.ViewAction
-public extension SelectGenesisFactorSource.Action {
-	enum ViewAction: Sendable, Equatable {
+extension SelectGenesisFactorSource.Action {
+	public enum ViewAction: Sendable, Equatable {
 		case confirmOnDeviceFactorSource
 	}
 }
 
 // MARK: - SelectGenesisFactorSource.Action.InternalAction
-public extension SelectGenesisFactorSource.Action {
-	enum InternalAction: Sendable, Equatable {
+extension SelectGenesisFactorSource.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
 // MARK: - SelectGenesisFactorSource.Action.SystemAction
-public extension SelectGenesisFactorSource.Action {
-	enum SystemAction: Sendable, Equatable {}
+extension SelectGenesisFactorSource.Action {
+	public enum SystemAction: Sendable, Equatable {}
 }
 
 // MARK: - SelectGenesisFactorSource.Action.DelegateAction
-public extension SelectGenesisFactorSource.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension SelectGenesisFactorSource.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case confirmedFactorSource(Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource, specifiedNameForNewEntityToCreate: NonEmpty<String>)
 	}
 }
