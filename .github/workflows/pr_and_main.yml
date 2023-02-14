@@ -60,7 +60,7 @@ jobs:
         run: bundle exec fastlane ios tests
 
       - name: "Build and archive (release)"
-        run: bundle exec fastlane ios build --env ios.release
+        run: bundle exec fastlane ios build --env ios.beta
 
   # snapshot_tests:
   #   name: "Snapshot tests"
