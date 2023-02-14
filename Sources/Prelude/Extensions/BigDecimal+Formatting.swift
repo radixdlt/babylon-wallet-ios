@@ -2,12 +2,18 @@ import BigDecimal
 import Foundation
 
 extension FiatCurrency {
+	var separatorWithAmount: String {
+		switch self {
+		case .eur, .usd, .gbp: return ""
+		case .sek: return " "
+		}
+	}
+
 	func formattedWith(
-		amount formattedAmount: String,
-		separator: String = " "
+		amount formattedAmount: String
 	) -> String {
-		let components = formattingPlacement == .leading ? [symbol, formattedAmount] : [formattedAmount, symbol]
-		return components.joined(separator: separator)
+		let components = formattingPlacement == .leading ? [symbol, formattedAmount] : [formattedAmount, sign]
+		return components.joined(separator: separatorWithAmount)
 	}
 }
 
@@ -28,7 +34,11 @@ extension BigDecimal {
 			case let components = stringRepresentation.split(separator: separatorRequiredByBigDecimalLib),
 			components.count == 2
 		else {
-			return stringRepresentation
+			if let currency {
+				return currency.formattedWith(amount: stringRepresentation)
+			} else {
+				return stringRepresentation
+			}
 		}
 
 		let integerPart = String(components[0])
@@ -72,10 +82,13 @@ extension BigDecimal {
 			guard let bigInt = try? BigDecimal(fromString: integerPart) else {
 				return bailout()
 			}
-			if bigInt.isZero {
-				return formattedDecimalPartWith0AndSeparator
+
+			let formatted = bigInt.isZero ? formattedDecimalPartWith0AndSeparator : integerPart
+
+			if let currency {
+				return currency.formattedWith(amount: formatted)
 			} else {
-				return integerPart
+				return formatted
 			}
 		}
 

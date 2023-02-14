@@ -1,5 +1,4 @@
 // MARK: - FiatCurrency
-
 public enum FiatCurrency:
 	String,
 	Sendable,
