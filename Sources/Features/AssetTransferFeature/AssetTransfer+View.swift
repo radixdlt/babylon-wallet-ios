@@ -127,19 +127,20 @@ extension AssetTransfer.View {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct AssetTransfer_Preview: PreviewProvider {
-	static var previews: some View {
-		AssetTransfer.View(
-			store: .init(
-				initialState: .init(
-					from: .previewValue0
-				),
-				reducer: AssetTransfer()
-			)
-		)
-	}
-}
-#endif
+// FIXME: fix post betanet v2 release
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+// struct AssetTransfer_Preview: PreviewProvider {
+//	static var previews: some View {
+//		AssetTransfer.View(
+//			store: .init(
+//				initialState: .init(
+//					from: .previewValue0
+//				),
+//				reducer: AssetTransfer()
+//			)
+//		)
+//	}
+// }
+// #endif

@@ -34,7 +34,7 @@ extension AssetTransfer {
 
 		public init(
 			from: From,
-			asset: AssetToTransfer = .token(.xrd),
+			asset: AssetToTransfer,
 			amount: Decimal_? = nil,
 			to: To? = nil
 		) {
