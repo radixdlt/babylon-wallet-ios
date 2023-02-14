@@ -9,8 +9,6 @@ extension DependencyValues {
 	}
 }
 
-#if DEBUG
-
 // MARK: - ProfileClient + TestDependencyKey
 extension ProfileClient: TestDependencyKey {
 	public static let previewValue: Self = with(.noop) {
@@ -88,4 +86,3 @@ extension ProfileClient {
 		signersForAccountsGivenAddresses: { _ in throw NoopError() }
 	)
 }
-#endif
