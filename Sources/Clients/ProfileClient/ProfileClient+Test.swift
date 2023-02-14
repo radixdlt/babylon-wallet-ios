@@ -9,19 +9,7 @@ extension DependencyValues {
 	}
 }
 
-// MARK: - ProfileClient + TestDependencyKey
-extension ProfileClient: TestDependencyKey {
-	public static let previewValue: Self = with(.noop) {
-		$0.getAccounts = {
-			let accounts: [OnNetwork.Account] = [.previewValue0, .previewValue1]
-			return NonEmpty(rawValue: IdentifiedArrayOf(uniqueElements: accounts))!
-		}
-		$0.getPersonas = {
-			let accounts: [OnNetwork.Persona] = [.previewValue0, .previewValue1]
-			return IdentifiedArrayOf(uniqueElements: accounts)
-		}
-	}
-
+extension ProfileClient {
 	public static let testValue = Self(
 		getFactorSources: unimplemented("\(Self.self).getFactorSources"),
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
@@ -52,9 +40,7 @@ extension ProfileClient: TestDependencyKey {
 		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
 		signersForAccountsGivenAddresses: unimplemented("\(Self.self).signersForAccountsGivenAddresses")
 	)
-}
 
-extension ProfileClient {
 	public static let noop = Self(
 		getFactorSources: { throw NoopError() },
 		getCurrentNetworkID: { NetworkID.nebunet },
@@ -82,7 +68,27 @@ extension ProfileClient {
 		createUnsavedVirtualEntity: { _ in throw NoopError() },
 		addAccount: { _ in },
 		addPersona: { _ in },
-		lookupAccountByAddress: { _ in .previewValue0 },
+		lookupAccountByAddress: { _ in throw NoopError() },
 		signersForAccountsGivenAddresses: { _ in throw NoopError() }
 	)
 }
+
+// MARK: - ProfileClient + TestDependencyKey
+#if DEBUG
+extension ProfileClient: TestDependencyKey {
+	public static let previewValue: Self = with(.noop) {
+		$0.getAccounts = {
+			let accounts: [OnNetwork.Account] = [.previewValue0, .previewValue1]
+			return NonEmpty(rawValue: IdentifiedArrayOf(uniqueElements: accounts))!
+		}
+		$0.getPersonas = {
+			let accounts: [OnNetwork.Persona] = [.previewValue0, .previewValue1]
+			return IdentifiedArrayOf(uniqueElements: accounts)
+		}
+	}
+}
+#else // NOT debug
+extension ProfileClient: TestDependencyKey {
+	public static let previewValue: Self = .noop
+}
+#endif
