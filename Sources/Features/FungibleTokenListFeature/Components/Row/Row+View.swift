@@ -100,8 +100,8 @@ extension FungibleTokenList.Row.View {
 
 	fileprivate func tokenValue(_ value: BigDecimal?, isVisible: Bool, currency: FiatCurrency) -> String {
 		if isVisible {
-			if let value = value, let doubleValue = Double(value.description) {
-				return doubleValue.formatted(.currency(code: currency.symbol))
+			if let value {
+				return "\(value.format()) \(currency.symbol)"
 			} else {
 				return "\(currency.sign) -"
 			}
