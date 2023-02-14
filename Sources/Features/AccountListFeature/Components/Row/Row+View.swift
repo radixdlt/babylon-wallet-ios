@@ -63,11 +63,15 @@ extension AccountList.Row.View {
 
 // MARK: - Private Methods
 extension AccountList.Row.View {
-	fileprivate func formattedAmount(_ value: BigDecimal?, isVisible: Bool, currency: FiatCurrency) -> String {
+	fileprivate func formattedAmount(
+		_ value: BigDecimal?,
+		isVisible: Bool,
+		currency: FiatCurrency
+	) -> String {
 		if isVisible {
 			if let value {
 				// FIXME: Fix formatting of BigDecimal with symbol
-				return "\(currency.symbol) \(String(describing: value))"
+				return "\(currency.symbol) \(value.format())"
 			} else {
 				return "\(currency.sign) -"
 			}

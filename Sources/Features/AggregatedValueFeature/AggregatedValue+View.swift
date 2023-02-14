@@ -63,8 +63,7 @@ private struct AggregatedValueView: View {
 	}
 
 	var formattedAmount: String {
-//		amount.formatted(.currency(code: currency.symbol))
-		amount.description
+		amount.format()
 	}
 
 	var body: some View {

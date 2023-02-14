@@ -103,7 +103,7 @@ extension FungibleTokenDetails.View {
 			self.displayName = state.asset.name
 			self.iconURL = state.asset.iconURL
 			self.placeholderAsset = .placeholderImage(isXRD: state.asset.isXRD)
-			self.amount = state.amount.description
+			self.amount = state.amount.format()
 			self.symbol = state.asset.symbol
 			self.description = state.asset.tokenDescription
 			self.address = .init(address: state.asset.componentAddress.address, format: .short())
