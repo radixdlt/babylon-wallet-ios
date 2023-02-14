@@ -43,9 +43,7 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtoco
 			}
 
 		case .internal(.system(.createEntityResult(.failure))):
-			return .run { send in
-				await send(.delegate(.biometricsCheckFailed))
-			}
+			return .send(.delegate(.biometricsCheckFailed))
 
 		case let .internal(.system(.createEntityResult(.success(entity)))):
 			return .run { send in
