@@ -63,8 +63,8 @@ public enum L10n {
     }
   }
   public enum ConnectedDApps {
-    /// Here are all the Decentralized Apps that you have connected to with this Radix Wallet.
-    public static let body = L10n.tr("Localizable", "connectedDApps.body", fallback: "Here are all the Decentralized Apps that you have connected to with this Radix Wallet.")
+    /// Here are all the dApps that you have logged into with this Radix Wallet.
+    public static let intro = L10n.tr("Localizable", "connectedDApps.intro", fallback: "Here are all the dApps that you have logged into with this Radix Wallet.")
     /// Connected dApps
     public static let title = L10n.tr("Localizable", "connectedDApps.title", fallback: "Connected dApps")
   }

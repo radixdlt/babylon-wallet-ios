@@ -23,7 +23,8 @@ public extension ConnectedDApps.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
-					LeadingText(L10n.ConnectedDApps.body, textStyle: .body1HighImportance, color: .app.gray2)
+					Text(L10n.ConnectedDApps.intro)
+						.textType(.textBlock)
 						.padding(.vertical, .medium3)
 
 					Separator()

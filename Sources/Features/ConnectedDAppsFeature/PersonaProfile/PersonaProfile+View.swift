@@ -77,36 +77,41 @@ extension PersonaProfile.View {
 				VStack(spacing: .medium1) {
 					PersonaThumbnail(.placeholder, size: .veryLarge)
 
-					VStack(spacing: .small2) {
-						LeadingText(sectionHeading: L10n.PersonaProfile.personaNameHeading)
-						LeadingText(dataItem: viewStore.personaName)
-					}
+					InfoPair(heading: L10n.PersonaProfile.personaNameHeading,
+					         item: viewStore.personaName)
 
-					LeadingText(L10n.PersonaProfile.personalDataSharingDescription(viewStore.dAppName))
+					Text(L10n.PersonaProfile.personalDataSharingDescription(viewStore.dAppName))
+						.textType(.textBlock)
 
 					Separator()
 
-					VStack(spacing: .small2) {
-						LeadingText(sectionHeading: L10n.PersonaProfile.firstNameHeading)
-						LeadingText(dataItem: viewStore.firstName)
-					}
+					InfoPair(heading: L10n.PersonaProfile.firstNameHeading,
+					         item: viewStore.firstName)
 
-					VStack(spacing: .small2) {
-						LeadingText(sectionHeading: L10n.PersonaProfile.secondNameHeading)
-						LeadingText(dataItem: viewStore.secondName)
-					}
+					InfoPair(heading: L10n.PersonaProfile.secondNameHeading,
+					         item: viewStore.secondName)
 
-					VStack(spacing: .small2) {
-						LeadingText(sectionHeading: L10n.PersonaProfile.addressHeading)
-						LeadingText(dataItem: viewStore.streetAddress)
-					}
+					InfoPair(heading: L10n.PersonaProfile.addressHeading,
+					         item: viewStore.streetAddress)
 
-					VStack(spacing: .small2) {
-						LeadingText(sectionHeading: L10n.PersonaProfile.twitterNameHeading)
-						LeadingText(dataItem: viewStore.twitterName)
-					}
+					InfoPair(heading: L10n.PersonaProfile.twitterNameHeading,
+					         item: viewStore.twitterName)
 				}
 				.padding(.horizontal, .medium1)
+			}
+		}
+	}
+
+	private struct InfoPair: View {
+		let heading: String
+		let item: String
+
+		var body: some View {
+			VStack(spacing: .small2) {
+				Text(heading)
+					.textType(.sectionHeading)
+				Text(item)
+					.textType(.infoItem)
 			}
 		}
 	}
@@ -137,7 +142,8 @@ extension PersonaProfile.View {
 		var body: some View {
 			WithViewStore(store, observe: \.accountSectionViewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
-					LeadingText(L10n.PersonaProfile.accountSharingDescription(viewStore.dAppName))
+					Text(L10n.PersonaProfile.accountSharingDescription(viewStore.dAppName))
+						.textType(.textBlock)
 						.padding(.vertical, .medium2)
 						.padding(.horizontal, .medium1)
 

@@ -124,7 +124,7 @@
 "manageP2PClients.sendTestMessageButtonTitle" = "Send Test Msg";
 
 "connectedDApps.title" = "Connected dApps";
-"connectedDApps.body" = "Here are all the Decentralized Apps that you have connected to with this Radix Wallet.";
+"connectedDApps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
 
 "dAppProfile.definition" = "dApp Definition";
 "dAppProfile.website" = "Website";

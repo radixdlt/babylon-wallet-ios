@@ -29,48 +29,24 @@ public extension DAppProfile.View {
 	var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
-				VStack(spacing: .medium1) {
+				VStack(spacing: 0) {
 					DAppPlaceholder(size: .veryLarge)
-						.padding(.top, .medium1)
-
-					Separator()
-						.padding(.horizontal, .medium1)
-
-					LeadingText(viewStore.dApp.description, textStyle: .body1Regular, color: .app.gray1)
-						.padding(.horizontal, .large2)
-
-					Separator()
-						.padding(.horizontal, .medium1)
+						.padding(.vertical, .large2)
 
 					InfoBlock(store: store)
-						.padding(.horizontal, .large2)
 
-					if viewStore.showTokenList {
-						LeadingText(sectionHeading: L10n.DAppProfile.tokens)
-							.padding(.horizontal, .large2)
-						TokenList(store: store)
-					}
+					TokenList(store: store)
 
-					if viewStore.showNFTList {
-						LeadingText(sectionHeading: L10n.DAppProfile.nfts)
-							.padding(.horizontal, .large2)
-						NFTList(store: store)
-					}
+					NFTList(store: store)
 
-					VStack(spacing: 0) {
-						LeadingText(L10n.DAppProfile.personaHeading, textStyle: .body1HighImportance, color: .app.gray2)
-							.padding(.vertical, .large3)
-							.padding(.horizontal, .medium1)
-						PersonasList(store: store)
-							.padding(.bottom, .large2)
-					}
-					.background(.app.gray5)
+					PersonaList(store: store)
 
 					Button(L10n.DAppProfile.forgetDApp) {
 						viewStore.send(.forgetThisDApp)
 					}
 					.buttonStyle(.destructive)
-					.padding([.horizontal, .bottom], .medium3)
+					.padding([.horizontal, .top], .medium3)
+					.padding(.bottom, .large2)
 				}
 				.navBarTitle(viewStore.title)
 				.navigationDestination(store: store.selectedPersona) { store in
@@ -110,8 +86,16 @@ extension DAppProfile.View {
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium2) {
+					Separator()
+
+					Text(viewStore.dApp.description)
+						.textType(.textBlock)
+
+					Separator()
+
 					HStack(spacing: 0) {
-						LeadingText(sectionHeading: L10n.DAppProfile.definition)
+						Text(L10n.DAppProfile.definition)
+							.textType(.sectionHeading)
 						Spacer(minLength: 0)
 						AddressView(viewStore.addressViewState, textStyle: .body1HighImportance) {
 							viewStore.send(.copyAddressButtonTapped)
@@ -119,12 +103,16 @@ extension DAppProfile.View {
 						.foregroundColor(.app.gray1)
 					}
 
-					LeadingText(sectionHeading: L10n.DAppProfile.website)
+					Text(L10n.DAppProfile.website)
+						.textType(.sectionHeading)
 
-					URLButton(url: viewStore.dApp.domain) {
+					Button(viewStore.dApp.domain.absoluteString) {
 						viewStore.send(.openURLTapped)
 					}
+					.buttonStyle(.url)
 				}
+				.padding(.horizontal, .medium1)
+				.padding(.bottom, .large2)
 			}
 		}
 	}
@@ -135,17 +123,24 @@ extension DAppProfile.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .medium3) {
-					ForEach(viewStore.dApp.tokens) { token in
-						RadixCard {
-							PlainListRow(withChevron: false, title: token.name) {
-								viewStore.send(.tokenTapped(token.id))
-							} icon: {
-								TokenPlaceholder(size: .small)
+				if viewStore.showTokenList {
+					VStack(alignment: .leading, spacing: .medium3) {
+						Text(L10n.DAppProfile.tokens)
+							.textType(.sectionHeading)
+							.padding(.horizontal, .medium1)
+
+						ForEach(viewStore.dApp.tokens) { token in
+							RadixCard {
+								PlainListRow(withChevron: false, title: token.name) {
+									viewStore.send(.tokenTapped(token.id))
+								} icon: {
+									TokenPlaceholder(size: .small)
+								}
 							}
+							.padding(.horizontal, .medium3)
 						}
-						.padding(.horizontal, .medium3)
 					}
+					.padding(.bottom, .medium1)
 				}
 			}
 		}
@@ -157,40 +152,56 @@ extension DAppProfile.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .medium3) {
-					ForEach(viewStore.dApp.nfts) { nft in
-						RadixCard {
-							PlainListRow(withChevron: false, title: nft.name) {
-								viewStore.send(.nftTapped(nft.id))
-							} icon: {
-								NFTPlaceholder(size: .small)
+				if viewStore.showNFTList {
+					VStack(alignment: .leading, spacing: .medium3) {
+						Text(L10n.DAppProfile.nfts)
+							.textType(.sectionHeading)
+							.padding(.horizontal, .medium1)
+
+						ForEach(viewStore.dApp.nfts) { nft in
+							RadixCard {
+								PlainListRow(withChevron: false, title: nft.name) {
+									viewStore.send(.nftTapped(nft.id))
+								} icon: {
+									NFTPlaceholder(size: .small)
+								}
 							}
+							.padding(.horizontal, .medium3)
 						}
-						.padding(.horizontal, .medium3)
 					}
+					.padding(.bottom, .medium1)
 				}
 			}
 		}
 	}
 
 	@MainActor
-	struct PersonasList: View {
+	struct PersonaList: View {
 		let store: StoreOf<DAppProfile>
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .medium3) {
-					ForEach(viewStore.personas) { persona in
-						RadixCard {
-							PlainListRow(title: persona.name) {
-								viewStore.send(.personaTapped(persona.name))
-							} icon: {
-								PersonaThumbnail(persona.thumbnail)
+				VStack(alignment: .leading, spacing: 0) {
+					Text(L10n.DAppProfile.personaHeading)
+						.textType(.sectionHeading)
+						.padding(.horizontal, .medium1)
+						.padding(.vertical, .large3)
+
+					VStack(spacing: .medium3) {
+						ForEach(viewStore.personas) { persona in
+							RadixCard {
+								PlainListRow(title: persona.name) {
+									viewStore.send(.personaTapped(persona.name))
+								} icon: {
+									PersonaThumbnail(persona.thumbnail)
+								}
 							}
+							.padding(.horizontal, .medium3)
 						}
-						.padding(.horizontal, .medium3)
 					}
 				}
+				.padding(.bottom, .large2)
+				.background(.app.gray5)
 			}
 		}
 	}
