@@ -3,7 +3,7 @@ import Profile
 
 // MARK: - Profile.LoadingFailure
 extension Profile {
-	public enum LoadingFailure: Sendable, Swift.Error, Equatable {
+	public enum LoadingFailure: Sendable, Swift.Error, Equatable, Hashable {
 		case profileVersionOutdated(json: Data, version: ProfileSnapshot.Version)
 		case decodingFailure(json: Data, JSONDecodingError)
 
@@ -15,7 +15,7 @@ extension Profile {
 }
 
 extension Profile {
-	public struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Equatable {
+	public struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Equatable, Hashable {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
 			lhs.version == rhs.version && String(describing: lhs.error) == String(describing: rhs.error)
 		}
@@ -41,7 +41,8 @@ extension Profile {
 	}
 }
 
-extension Profile.JSONDecodingError {
+// MARK: - Profile.JSONDecodingError + Hashable
+extension Profile.JSONDecodingError: Hashable {
 	public var errorDescription: String? {
 		switch self {
 		case let .known(error):
@@ -51,7 +52,7 @@ extension Profile.JSONDecodingError {
 		}
 	}
 
-	public enum KnownDecodingError: Sendable, LocalizedError, Equatable {
+	public enum KnownDecodingError: Sendable, LocalizedError, Equatable, Hashable {
 		case noProfileSnapshotVersionFoundInJSON
 		case decodingError(FailedToDecodeProfile)
 
@@ -79,7 +80,7 @@ extension Profile.JSONDecodingError {
 		public var errorDescription: String? { L10n.ProfileLoad.decodingError(decodingError) }
 	}
 
-	public struct UnknownDecodingError: Sendable, LocalizedError, Equatable {
+	public struct UnknownDecodingError: Sendable, LocalizedError, Equatable, Hashable {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
 			String(describing: lhs.error) == String(describing: rhs.error)
 		}
