@@ -46,6 +46,8 @@ public struct Splash: Sendable, FeatureReducer {
 	@Dependency(\.profileClient.loadProfile) var loadProfile
 	@Dependency(\.openURL) var openURL
 
+	public init() {}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .viewAppeared:
