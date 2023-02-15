@@ -17,7 +17,12 @@ extension Profile {
 extension Profile {
 	public struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Equatable {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
-			lhs.version == rhs.version && lhs.errorDescription == rhs.errorDescription
+			lhs.version == rhs.version && String(describing: lhs.error) == String(describing: rhs.error)
+		}
+
+		public func hash(into hasher: inout Hasher) {
+			hasher.combine(version)
+			hasher.combine(String(describing: error))
 		}
 
 		public let version: ProfileSnapshot.Version
@@ -50,6 +55,10 @@ extension Profile.JSONDecodingError {
 		case noProfileSnapshotVersionFoundInJSON
 		case decodingError(FailedToDecodeProfile)
 
+		public func hash(into hasher: inout Hasher) {
+			hasher.combine(String(describing: self))
+		}
+
 		public var errorDescription: String? {
 			switch self {
 			case .noProfileSnapshotVersionFoundInJSON:
@@ -72,7 +81,11 @@ extension Profile.JSONDecodingError {
 
 	public struct UnknownDecodingError: Sendable, LocalizedError, Equatable {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
-			lhs.errorDescription == rhs.errorDescription
+			String(describing: lhs.error) == String(describing: rhs.error)
+		}
+
+		public func hash(into hasher: inout Hasher) {
+			hasher.combine(String(describing: self))
 		}
 
 		public let error: Swift.Error
