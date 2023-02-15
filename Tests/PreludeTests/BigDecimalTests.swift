@@ -174,17 +174,45 @@ final class BigDecimalTests: TestCase {
 	}
 
 	func test_format_bigdecimal() throws {
-		func doTest(_ bigDecimalString: String, expected: String) throws {
+		func doTest(_ bigDecimalString: String, expected: String, line: UInt = #line) throws {
+			let locale = Locale(identifier: "en_US_POSIX")
 			let bigDecimal = try BigDecimal(fromString: bigDecimalString)
-			XCTAssertEqual(bigDecimal.format(), expected)
+			XCTAssertEqual(bigDecimal.format(locale: locale), expected, line: line)
 		}
-		try doTest("57896044618658097711785492504343953926634992332820282019728.792003956564819968", expected: "57896044618658097711785492504343953926634992332820282019728.7")
+
+		try doTest("57896044618658097711785492504343953926634992332820282019728", expected: "57896044618658097711785492504343953926634992332820282019728")
+		try doTest("57896044618658097711785492504343953926634992332820282019728.0", expected: "57896044618658097711785492504343953926634992332820282019728")
+
+		try doTest("57896044618658097711785492504343953926634992332820282019728.792003956564819968", expected: "57896044618658097711785492504343953926634992332820282019728.8") // rounded `0.79` -> `0.80`
 		try doTest("1000000000.1", expected: "1000000000.1")
 		try doTest("1000000000", expected: "1000000000")
 		try doTest("1000.1234", expected: "1000.1234")
 		try doTest("1000.5", expected: "1000.5")
 		try doTest("0.1234567", expected: "0.1234567")
 		try doTest("0.4321", expected: "0.4321")
-		try doTest("0.99999999999999999", expected: "0.9999999")
+		try doTest("0.99999999999999999", expected: "1")
+		try doTest("0.00000000000000001", expected: "0")
+		try doTest("0", expected: "0")
+		try doTest("1", expected: "1")
+		try doTest("0.0", expected: "0")
+		try doTest("1.0", expected: "1")
+	}
+
+	func test_format_bigdecimal_with_currency() throws {
+		func doTest(_ bigDecimalString: String, expected: String, line: UInt = #line) throws {
+			let locale = Locale(identifier: "en_US_POSIX")
+			let bigDecimal = try BigDecimal(fromString: bigDecimalString)
+			XCTAssertEqual(bigDecimal.format(fiatCurrency: .usd, locale: locale), expected, line: line)
+		}
+
+		try doTest("57896044618658097711785492504343953926634992332820282019728.792003956564819968", expected: "$57896044618658097711785492504343953926634992332820282019728.8") // rounded `0.79` -> `0.80`
+		try doTest("1000000000.1", expected: "$1000000000.1")
+		try doTest("1000000000", expected: "$1000000000")
+		try doTest("1000.1234", expected: "$1000.1234")
+		try doTest("1000.5", expected: "$1000.5")
+		try doTest("0.1234567", expected: "$0.1234567")
+		try doTest("0.4321", expected: "$0.4321")
+		try doTest("0.99999999999999999", expected: "$1")
+		try doTest("0.00000000000000001", expected: "$0")
 	}
 }
