@@ -6,17 +6,14 @@ import ProfileClient
 public struct Splash: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var biometricsCheckFailedAlert: AlertState<ViewAction.BiometricsCheckFailedAlertAction>?
-		// TODO: @Nikola
-//		public var loadProfileResult: ProfileClient.LoadProfileResult?
+		public var loadProfileResult: ProfileClient.LoadProfileResult?
 
 		public init(
-			biometricsCheckFailedAlert: AlertState<ViewAction.BiometricsCheckFailedAlertAction>? = nil
-			// TODO: @Nikola
-//			profileResult loadProfileResult: ProfileClient.LoadProfileResult? = nil
+			biometricsCheckFailedAlert: AlertState<ViewAction.BiometricsCheckFailedAlertAction>? = nil,
+			profileResult loadProfileResult: ProfileClient.LoadProfileResult? = nil
 		) {
 			self.biometricsCheckFailedAlert = biometricsCheckFailedAlert
-			// TODO: @Nikola
-//			self.loadProfileResult = loadProfileResult
+			self.loadProfileResult = loadProfileResult
 		}
 	}
 
@@ -60,9 +57,7 @@ public struct Splash: Sendable, FeatureReducer {
 
 			switch action {
 			case .dismissed, .cancelButtonTapped:
-				// TODO: @Nikola
-//				return notifyDelegate(profileResult: state.loadProfileResult)
-				return .none
+				return notifyDelegate(profileResult: state.loadProfileResult)
 
 			case .openSettingsButtonTapped:
 				#if os(iOS)
@@ -102,15 +97,11 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 			}
 
-			// TODO: @Nikola
-//			return notifyDelegate(profileResult: state.loadProfileResult)
-			return .none
+			return notifyDelegate(profileResult: state.loadProfileResult)
 
 		case let .loadProfileResult(result):
-			// TODO: @Nikola
-//			state.loadProfileResult = result
-//			return delay().concatenate(with: verifyBiometrics())
-			return .none
+			state.loadProfileResult = result
+			return delay().concatenate(with: verifyBiometrics())
 		}
 	}
 
