@@ -1,15 +1,17 @@
 import FeaturePrelude
 
 // MARK: - SettingsRowStyle
+
+extension ButtonStyle where Self == SettingsRowStyle {
+	static var settingsRowStyle: SettingsRowStyle { SettingsRowStyle() }
+}
+
+// MARK: - SettingsRowStyle
 struct SettingsRowStyle: ButtonStyle {
 	func makeBody(configuration: Configuration) -> some View {
 		configuration.label
 			.background(configuration.isPressed ? .app.gray4 : .app.white)
 	}
-}
-
-extension ButtonStyle where Self == SettingsRowStyle {
-	static var settingsRowStyle: SettingsRowStyle { SettingsRowStyle() }
 }
 
 #if DEBUG

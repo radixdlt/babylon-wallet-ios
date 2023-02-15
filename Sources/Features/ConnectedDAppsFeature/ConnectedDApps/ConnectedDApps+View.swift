@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - ConnectedDApps.View
-public extension ConnectedDApps {
+extension ConnectedDApps {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: Store
 
 		public init(store: Store) {
@@ -11,7 +11,7 @@ public extension ConnectedDApps {
 		}
 	}
 
-	internal struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let dApps: [DAppRowModel]
 	}
 }
@@ -53,53 +53,14 @@ public extension ConnectedDApps.View {
 
 // MARK: - Extensions
 
-private extension ConnectedDApps.Store {
-	var selectedDApp: PresentationStoreOf<DAppProfile> {
-		scope(state: \.$selectedDApp) { .child(.selectedDApp($0)) }
-	}
-}
-
 private extension ConnectedDApps.State {
 	var viewState: ConnectedDApps.ViewState {
 		.init(dApps: dApps)
 	}
 }
 
-// MARK: - RadixCard
-public struct RadixCard<Contents: View>: View {
-	private let contents: Contents
-
-	public init(@ViewBuilder contents: () -> Contents) {
-		self.contents = contents()
-	}
-
-	public var body: some View {
-		HStack(spacing: 0) {
-			contents
-		}
-		.cardStyle
-	}
-}
-
-public extension View {
-	var cardStyle: some View {
-		background {
-			RoundedRectangle(cornerRadius: .small1)
-				.fill(.white)
-				.radixShadow
-		}
-	}
-
-	var radixShadow: some View {
-		shadow(color: .app.gray2.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
-	}
-}
-
-// MARK: - RadixChevron
-public struct RadixChevron: View {
-	public var body: some View {
-		Image(asset: AssetResource.chevronRight)
-			.foregroundColor(.app.gray1)
-			.padding(.trailing, 2)
+private extension ConnectedDApps.Store {
+	var selectedDApp: PresentationStoreOf<DAppProfile> {
+		scope(state: \.$selectedDApp) { .child(.selectedDApp($0)) }
 	}
 }

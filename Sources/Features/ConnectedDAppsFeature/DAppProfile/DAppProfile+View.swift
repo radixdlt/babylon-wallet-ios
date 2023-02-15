@@ -2,17 +2,17 @@ import FeaturePrelude
 
 // MARK: - View
 
-public extension DAppProfile {
+extension DAppProfile {
 	@MainActor
-	struct View: SwiftUI.View {
-		private let store: Store
+	public struct View: SwiftUI.View {
+		let store: Store
 
 		public init(store: Store) {
 			self.store = store
 		}
 	}
 
-	internal struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let title: String
 		let showTokenList: Bool
 		let showNFTList: Bool
@@ -46,13 +46,13 @@ public extension DAppProfile.View {
 						.padding(.horizontal, .large2)
 
 					if viewStore.showTokenList {
-						SectionHeading(L10n.DAppProfile.tokens)
+						TextBlock(sectionHeading: L10n.DAppProfile.tokens)
 							.padding(.horizontal, .large2)
 						TokenList(store: store)
 					}
 
 					if viewStore.showNFTList {
-						SectionHeading(L10n.DAppProfile.nfts)
+						TextBlock(sectionHeading: L10n.DAppProfile.nfts)
 							.padding(.horizontal, .large2)
 						NFTList(store: store)
 					}
@@ -84,12 +84,6 @@ public extension DAppProfile.View {
 
 // MARK: - Extensions
 
-private extension DAppProfile.Store {
-	var selectedPersona: PresentationStoreOf<PersonaProfile> {
-		scope(state: \.$selectedPersona) { .child(.selectedPersona($0)) }
-	}
-}
-
 private extension DAppProfile.State {
 	var viewState: DAppProfile.ViewState {
 		.init(title: name,
@@ -101,16 +95,9 @@ private extension DAppProfile.State {
 	}
 }
 
-// TODO: • Move somewhere else
-
-public extension View {
-	func navBarTitle(_ title: String) -> some View {
-		toolbar {
-			ToolbarItem(placement: .principal) {
-				Text(title)
-			}
-		}
-		.navigationTitle(title)
+private extension DAppProfile.Store {
+	var selectedPersona: PresentationStoreOf<PersonaProfile> {
+		scope(state: \.$selectedPersona) { .child(.selectedPersona($0)) }
 	}
 }
 
@@ -125,7 +112,7 @@ extension DAppProfile.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium2) {
 					HStack(spacing: 0) {
-						SectionHeading(L10n.DAppProfile.definition)
+						TextBlock(sectionHeading: L10n.DAppProfile.definition)
 						Spacer(minLength: 0)
 						AddressView(viewStore.addressViewState, textStyle: .body1HighImportance) {
 							viewStore.send(.copyAddressButtonTapped)
@@ -133,7 +120,7 @@ extension DAppProfile.View {
 						.foregroundColor(.app.gray1)
 					}
 
-					SectionHeading(L10n.DAppProfile.website)
+					TextBlock(sectionHeading: L10n.DAppProfile.website)
 
 					URLButton(url: viewStore.dApp.domain) {
 						viewStore.send(.openURLTapped)
@@ -210,110 +197,15 @@ extension DAppProfile.View {
 	}
 }
 
-// MARK: - URLButton
-// General purpose helper views
+// TODO: • Move somewhere else
 
-struct URLButton: View {
-	let url: URL
-	let action: () -> Void
-
-	public var body: some View {
-		Button(action: action) {
-			Label {
-				Text(url.absoluteString)
-					.textStyle(.body1HighImportance)
-					.foregroundColor(.app.blue2)
-			} icon: {
-				Image(asset: AssetResource.iconLinkOut)
-					.foregroundColor(.app.gray2)
+public extension View {
+	func navBarTitle(_ title: String) -> some View {
+		toolbar {
+			ToolbarItem(placement: .principal) {
+				Text(title)
 			}
-			.labelStyle(.trailingIcon)
 		}
-	}
-}
-
-// MARK: - SectionHeading
-struct SectionHeading: View {
-	let text: String
-
-	init(_ text: String) {
-		self.text = text
-	}
-
-	public var body: some View {
-		HStack(spacing: 0) {
-			Text(text)
-				.textStyle(.body1Regular)
-				.foregroundColor(.app.gray2)
-			Spacer(minLength: 0)
-		}
-	}
-}
-
-// MARK: - TextBlock
-// TODO: • Useful components - Move somewhere
-
-public struct TextBlock: View {
-	let text: String
-	let textStyle: TextStyle
-	let color: Color
-
-	public init(_ text: String, textStyle: TextStyle = .body1Regular, color: Color = .app.gray1) {
-		self.text = text
-		self.textStyle = textStyle
-		self.color = color
-	}
-
-	public var body: some View {
-		HStack(spacing: 0) {
-			Text(text)
-				.textStyle(textStyle)
-				.foregroundColor(color)
-			Spacer(minLength: 0)
-		}
-	}
-}
-
-// MARK: - PersonaThumbnail
-public struct PersonaThumbnail: View {
-	private let url: URL
-
-	public init(_ url: URL) {
-		self.url = url
-	}
-
-	public var body: some View {
-		ZStack {
-			Rectangle()
-				.fill(.blue)
-				.clipShape(Circle())
-			Circle()
-				.stroke(.app.gray3, lineWidth: 1)
-		}
-		.frame(.small)
-	}
-}
-
-// TODO: • Useful style - Move somewhere
-
-public extension LabelStyle where Self == TrailingIconLabelStyle {
-	/// Applies the `trailingIcon` style with the default spacing
-	static var trailingIcon: Self { .trailingIcon() }
-
-	/// A label style where the icon follows the "title", or text part
-	static func trailingIcon(spacing: CGFloat = .small2) -> Self {
-		.init(spacing: spacing)
-	}
-}
-
-// MARK: - TrailingIconLabelStyle
-public struct TrailingIconLabelStyle: LabelStyle {
-	let spacing: CGFloat
-
-	public func makeBody(configuration: Configuration) -> some View {
-		HStack(spacing: spacing) {
-			configuration.title
-			configuration.icon
-		}
+		.navigationTitle(title)
 	}
 }

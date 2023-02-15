@@ -13,7 +13,7 @@ import ProfileView
 public extension AppSettings {
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: Store
+		let store: Store
 
 		public init(store: Store) {
 			self.store = store
@@ -23,11 +23,7 @@ public extension AppSettings {
 
 public extension AppSettings.View {
 	var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			NavigationStack {
 				ForceFullScreen {
 					ZStack {
@@ -81,14 +77,43 @@ public extension AppSettings.View {
 	}
 }
 
+extension AppSettings.State {
+	var viewState: AppSettings.ViewState {
+		.init(state: self)
+	}
+}
+
 extension AppSettings.Store {
 	var connectedDApps: PresentationStoreOf<ConnectedDApps> {
 		scope(state: \.$connectedDApps) { .child(.connectedDApps($0)) }
 	}
 }
 
-private extension AppSettings.View {
-	func settingsView(viewStore: ViewStore<ViewState, AppSettings.Action.ViewAction>) -> some View {
+// MARK: - SettingsRowModel
+struct SettingsRowModel: Identifiable {
+	var id: String { title }
+	let title: String
+	let asset: ImageAsset
+	let action: AppSettings.Action.ViewAction
+}
+
+extension AppSettings.View {
+	private static let settingsRows: [SettingsRowModel] = [
+		.init(title: L10n.Settings.inspectProfileButtonTitle,
+		      asset: AssetResource.desktopConnections,
+		      action: .manageP2PClientsButtonTapped),
+		.init(title: L10n.Settings.connectedDAppsButtonTitle,
+		      asset: AssetResource.connectedDapps,
+		      action: .connectedDAppsButtonTapped),
+		.init(title: L10n.Settings.gatewayButtonTitle,
+		      asset: AssetResource.gateway,
+		      action: .editGatewayAPIEndpointButtonTapped),
+		.init(title: L10n.Settings.personasButtonTitle,
+		      asset: AssetResource.personas,
+		      action: .personasButtonTapped),
+	]
+
+	private func settingsView(viewStore: ViewStore<AppSettings.ViewState, AppSettings.Action.ViewAction>) -> some View {
 		VStack(spacing: 0) {
 			ScrollView {
 				VStack(spacing: .zero) {
@@ -100,50 +125,24 @@ private extension AppSettings.View {
 					}
 
 					#if DEBUG
-					PlainListRow(
-						title: L10n.Settings.inspectProfileButtonTitle
-					) {
+					PlainListRow(title: L10n.Settings.inspectProfileButtonTitle) {
 						viewStore.send(.debugInspectProfileButtonTapped)
 					} icon: {
 						Image(systemName: "wallet.pass")
 							.frame(.verySmall)
 					}
 					.withSeparator
+					.buttonStyle(.settingsRowStyle)
 					#endif
 
-					PlainListRow(
-						title: L10n.Settings.desktopConnectionsButtonTitle,
-						asset: AssetResource.desktopConnections
-					) {
-						viewStore.send(.manageP2PClientsButtonTapped)
+					ForEach(Self.settingsRows) { row in
+						PlainListRow(title: row.title, asset: row.asset) {
+							viewStore.send(row.action)
+						}
+						.withSeparator
+						.buttonStyle(.settingsRowStyle)
 					}
-					.withSeparator
-
-					PlainListRow(
-						title: L10n.Settings.connectedDAppsButtonTitle,
-						asset: AssetResource.connectedDapps
-					) {
-						viewStore.send(.connectedDAppsButtonTapped)
-					}
-					.withSeparator
-
-					PlainListRow(
-						title: L10n.Settings.gatewayButtonTitle,
-						asset: AssetResource.gateway
-					) {
-						viewStore.send(.editGatewayAPIEndpointButtonTapped)
-					}
-					.withSeparator
-
-					PlainListRow(
-						title: L10n.Settings.personasButtonTitle,
-						asset: AssetResource.personas
-					) {
-						viewStore.send(.personasButtonTapped)
-					}
-					.withSeparator
 				}
-				.buttonStyle(.settingsRowStyle)
 				.padding(.bottom, .large3)
 				VStack(spacing: .zero) {
 					Button(L10n.Settings.deleteAllButtonTitle) {
@@ -188,17 +187,17 @@ private extension AppSettings.View {
 	}
 }
 
-// MARK: - AppSettings.View.ViewState
-public extension AppSettings.View {
+// MARK: - AppSettings.ViewState
+extension AppSettings {
 	struct ViewState: Equatable {
 		#if DEBUG
-		public let isDebugProfileViewSheetPresented: Bool
-		public let profileToInspect: Profile?
+		let isDebugProfileViewSheetPresented: Bool
+		let profileToInspect: Profile?
 		#endif
-		public let canAddP2PClient: Bool
-		public let appVersion: String
+		let canAddP2PClient: Bool
+		let appVersion: String
 
-		public init(state: AppSettings.State) {
+		init(state: AppSettings.State) {
 			#if DEBUG
 			isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			profileToInspect = state.profileToInspect
