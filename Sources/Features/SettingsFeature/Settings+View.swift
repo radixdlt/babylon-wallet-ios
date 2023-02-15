@@ -10,13 +10,32 @@ import ProfileView
 #endif
 
 // MARK: - AppSettings.View
-public extension AppSettings {
+extension AppSettings {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		let store: Store
 
 		public init(store: Store) {
 			self.store = store
+		}
+	}
+
+	struct ViewState: Equatable {
+		#if DEBUG
+		let isDebugProfileViewSheetPresented: Bool
+		let profileToInspect: Profile?
+		#endif
+		let canAddP2PClient: Bool
+		let appVersion: String
+
+		init(state: AppSettings.State) {
+			#if DEBUG
+			self.isDebugProfileViewSheetPresented = state.profileToInspect != nil
+			self.profileToInspect = state.profileToInspect
+			#endif
+			self.canAddP2PClient = state.canAddP2PClient
+			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
+			self.appVersion = L10n.Settings.versionInfo(bundleInfo.shortVersion, bundleInfo.version)
 		}
 	}
 }
@@ -77,6 +96,8 @@ public extension AppSettings.View {
 	}
 }
 
+// MARK: - Extensions
+
 extension AppSettings.State {
 	var viewState: AppSettings.ViewState {
 		.init(state: self)
@@ -90,28 +111,31 @@ extension AppSettings.Store {
 }
 
 // MARK: - SettingsRowModel
-struct SettingsRowModel: Identifiable {
-	var id: String { title }
-	let title: String
-	let asset: ImageAsset
-	let action: AppSettings.Action.ViewAction
-}
 
 extension AppSettings.View {
-	private static let settingsRows: [SettingsRowModel] = [
-		.init(title: L10n.Settings.inspectProfileButtonTitle,
-		      asset: AssetResource.desktopConnections,
-		      action: .manageP2PClientsButtonTapped),
-		.init(title: L10n.Settings.connectedDAppsButtonTitle,
-		      asset: AssetResource.connectedDapps,
-		      action: .connectedDAppsButtonTapped),
-		.init(title: L10n.Settings.gatewayButtonTitle,
-		      asset: AssetResource.gateway,
-		      action: .editGatewayAPIEndpointButtonTapped),
-		.init(title: L10n.Settings.personasButtonTitle,
-		      asset: AssetResource.personas,
-		      action: .personasButtonTapped),
-	]
+	struct RowModel: Identifiable {
+		var id: String { title }
+		let title: String
+		let asset: ImageAsset
+		let action: AppSettings.Action.ViewAction
+	}
+
+	private func settingsRows() -> [RowModel] {
+		[
+			.init(title: L10n.Settings.inspectProfileButtonTitle,
+			      asset: AssetResource.desktopConnections,
+			      action: .manageP2PClientsButtonTapped),
+			.init(title: L10n.Settings.connectedDAppsButtonTitle,
+			      asset: AssetResource.connectedDapps,
+			      action: .connectedDAppsButtonTapped),
+			.init(title: L10n.Settings.gatewayButtonTitle,
+			      asset: AssetResource.gateway,
+			      action: .editGatewayAPIEndpointButtonTapped),
+			.init(title: L10n.Settings.personasButtonTitle,
+			      asset: AssetResource.personas,
+			      action: .personasButtonTapped),
+		]
+	}
 
 	private func settingsView(viewStore: ViewStore<AppSettings.ViewState, AppSettings.Action.ViewAction>) -> some View {
 		VStack(spacing: 0) {
@@ -135,7 +159,7 @@ extension AppSettings.View {
 					.buttonStyle(.settingsRowStyle)
 					#endif
 
-					ForEach(Self.settingsRows) { row in
+					ForEach(settingsRows()) { row in
 						PlainListRow(title: row.title, asset: row.asset) {
 							viewStore.send(row.action)
 						}
@@ -183,28 +207,6 @@ extension AppSettings.View {
 					}
 				}
 			#endif
-		}
-	}
-}
-
-// MARK: - AppSettings.ViewState
-extension AppSettings {
-	struct ViewState: Equatable {
-		#if DEBUG
-		let isDebugProfileViewSheetPresented: Bool
-		let profileToInspect: Profile?
-		#endif
-		let canAddP2PClient: Bool
-		let appVersion: String
-
-		init(state: AppSettings.State) {
-			#if DEBUG
-			isDebugProfileViewSheetPresented = state.profileToInspect != nil
-			profileToInspect = state.profileToInspect
-			#endif
-			canAddP2PClient = state.canAddP2PClient
-			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
-			appVersion = L10n.Settings.versionInfo(bundleInfo.shortVersion, bundleInfo.version)
 		}
 	}
 }

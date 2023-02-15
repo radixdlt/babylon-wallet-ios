@@ -23,7 +23,7 @@ public extension ConnectedDApps.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
-					TextBlock(L10n.ConnectedDApps.body, textStyle: .body1HighImportance, color: .app.gray2)
+					LeadingText(L10n.ConnectedDApps.body, textStyle: .body1HighImportance, color: .app.gray2)
 						.padding(.vertical, .medium3)
 
 					Separator()
@@ -53,13 +53,13 @@ public extension ConnectedDApps.View {
 
 // MARK: - Extensions
 
-private extension ConnectedDApps.State {
+extension ConnectedDApps.State {
 	var viewState: ConnectedDApps.ViewState {
 		.init(dApps: dApps)
 	}
 }
 
-private extension ConnectedDApps.Store {
+extension ConnectedDApps.Store {
 	var selectedDApp: PresentationStoreOf<DAppProfile> {
 		scope(state: \.$selectedDApp) { .child(.selectedDApp($0)) }
 	}

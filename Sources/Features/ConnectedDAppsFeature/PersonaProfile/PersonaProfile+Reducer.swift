@@ -1,7 +1,9 @@
 import FeaturePrelude
+import ProfileClient
 
 // MARK: - PersonaProfile
 public struct PersonaProfile: Sendable, FeatureReducer {
+	@Dependency(\.profileClient) var profileClient
 	public typealias Store = StoreOf<Self>
 
 	public init() {}
@@ -10,6 +12,12 @@ public struct PersonaProfile: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .none
+		case let .accountTapped(address):
+			return .none
+		case .editAccountSharingTapped:
+			return .none
+		case .disconnectPersonaTapped:
+			return .none
 		}
 	}
 }
@@ -17,10 +25,20 @@ public struct PersonaProfile: Sendable, FeatureReducer {
 // MARK: PersonaProfile.State
 public extension PersonaProfile {
 	struct State: Sendable, Hashable {
-		let persona: String
+		public let dAppName: String
+		public let personaName: String
+		public let firstName: String
+		public let secondName: String
+		public let streetAddress: String
+		public let twitterName: String
 
-		public init(persona: String) {
-			self.persona = persona
+		public init(dAppName: String, personaName: String, firstName: String, secondName: String, streetAddress: String, twitterName: String) {
+			self.dAppName = dAppName
+			self.personaName = personaName
+			self.firstName = firstName
+			self.secondName = secondName
+			self.streetAddress = streetAddress
+			self.twitterName = twitterName
 		}
 	}
 }
@@ -29,6 +47,9 @@ public extension PersonaProfile {
 public extension PersonaProfile {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
+		case accountTapped(AccountAddress)
+		case editAccountSharingTapped
+		case disconnectPersonaTapped
 	}
 }
 

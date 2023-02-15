@@ -3,9 +3,11 @@ import SwiftUI
 // MARK: - PersonaThumbnail
 public struct PersonaThumbnail: View {
 	let url: URL
+	let size: HitTargetSize
 
-	public init(_ url: URL) {
+	public init(_ url: URL, size: HitTargetSize = .small) {
 		self.url = url
+		self.size = size
 	}
 
 	public var body: some View {
@@ -16,7 +18,7 @@ public struct PersonaThumbnail: View {
 			Circle()
 				.stroke(.app.gray3, lineWidth: 1)
 		}
-		.frame(.small)
+		.frame(size)
 	}
 }
 

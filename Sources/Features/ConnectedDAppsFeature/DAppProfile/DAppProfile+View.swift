@@ -36,7 +36,7 @@ public extension DAppProfile.View {
 					Separator()
 						.padding(.horizontal, .medium1)
 
-					TextBlock(viewStore.dApp.description, textStyle: .body1Regular, color: .app.gray1)
+					LeadingText(viewStore.dApp.description, textStyle: .body1Regular, color: .app.gray1)
 						.padding(.horizontal, .large2)
 
 					Separator()
@@ -46,19 +46,19 @@ public extension DAppProfile.View {
 						.padding(.horizontal, .large2)
 
 					if viewStore.showTokenList {
-						TextBlock(sectionHeading: L10n.DAppProfile.tokens)
+						LeadingText(sectionHeading: L10n.DAppProfile.tokens)
 							.padding(.horizontal, .large2)
 						TokenList(store: store)
 					}
 
 					if viewStore.showNFTList {
-						TextBlock(sectionHeading: L10n.DAppProfile.nfts)
+						LeadingText(sectionHeading: L10n.DAppProfile.nfts)
 							.padding(.horizontal, .large2)
 						NFTList(store: store)
 					}
 
 					VStack(spacing: 0) {
-						TextBlock(L10n.DAppProfile.personaHeading, textStyle: .body1HighImportance, color: .app.gray2)
+						LeadingText(L10n.DAppProfile.personaHeading, textStyle: .body1HighImportance, color: .app.gray2)
 							.padding(.vertical, .large3)
 							.padding(.horizontal, .medium1)
 						PersonasList(store: store)
@@ -112,7 +112,7 @@ extension DAppProfile.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium2) {
 					HStack(spacing: 0) {
-						TextBlock(sectionHeading: L10n.DAppProfile.definition)
+						LeadingText(sectionHeading: L10n.DAppProfile.definition)
 						Spacer(minLength: 0)
 						AddressView(viewStore.addressViewState, textStyle: .body1HighImportance) {
 							viewStore.send(.copyAddressButtonTapped)
@@ -120,7 +120,7 @@ extension DAppProfile.View {
 						.foregroundColor(.app.gray1)
 					}
 
-					TextBlock(sectionHeading: L10n.DAppProfile.website)
+					LeadingText(sectionHeading: L10n.DAppProfile.website)
 
 					URLButton(url: viewStore.dApp.domain) {
 						viewStore.send(.openURLTapped)
