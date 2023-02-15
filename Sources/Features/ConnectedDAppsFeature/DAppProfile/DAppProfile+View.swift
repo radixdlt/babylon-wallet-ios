@@ -46,10 +46,14 @@ public extension DAppProfile.View {
 						.padding(.horizontal, .large2)
 
 					if viewStore.showTokenList {
+						SectionHeading(L10n.DAppProfile.tokens)
+							.padding(.horizontal, .large2)
 						TokenList(store: store)
 					}
 
 					if viewStore.showNFTList {
+						SectionHeading(L10n.DAppProfile.nfts)
+							.padding(.horizontal, .large2)
 						NFTList(store: store)
 					}
 
@@ -145,9 +149,6 @@ extension DAppProfile.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				SectionHeading(L10n.DAppProfile.tokens)
-					.padding(.horizontal, .large2)
-
 				VStack(spacing: .medium3) {
 					ForEach(viewStore.dApp.tokens) { token in
 						RadixCard {
@@ -170,9 +171,6 @@ extension DAppProfile.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				SectionHeading(L10n.DAppProfile.nfts)
-					.padding(.horizontal, .large2)
-
 				VStack(spacing: .medium3) {
 					ForEach(viewStore.dApp.nfts) { nft in
 						RadixCard {
