@@ -85,7 +85,14 @@ extension NameNewEntity.View {
 			let entityKindName = entityKind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
 			self.entityKindName = entityKindName
 			self.namePlaceholder = entityKind == .account ? L10n.CreateEntity.NameNewEntity.Name.Field.Placeholder.Specific.account : L10n.CreateEntity.NameNewEntity.Name.Field.Placeholder.Specific.persona
-			titleText = state.isFirst ? L10n.CreateEntity.NameNewEntity.Title.first(entityKindName) : L10n.CreateEntity.NameNewEntity.Title.notFirst(entityKindName)
+			titleText = {
+				switch entityKind {
+				case .account:
+					return state.isFirst ? L10n.CreateEntity.NameNewEntity.Account.Title.first : L10n.CreateEntity.NameNewEntity.Account.Title.notFirst
+				case .identity:
+					return L10n.CreateEntity.NameNewEntity.Persona.title
+				}
+			}()
 			entityName = state.inputtedName
 			let isNameValid = state.sanitizedName != nil
 			createEntityButtonState = isNameValid ? .enabled : .disabled
@@ -121,7 +128,7 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct NameNewEntity_Previews: PreviewProvider {
 	static var previews: some View {
-		NameNewEntity<OnNetwork.Account>.View(
+		NameNewEntity<OnNetwork.Persona>.View(
 			store: .init(
 				initialState: .init(isFirst: true),
 				reducer: NameNewEntity()

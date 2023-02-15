@@ -22,8 +22,9 @@
 "common.P2PClientNotFoundInProfile" = "Inconsistency trying to use deleted Linked Connector.";
 "common.P2PConnectionOffline" = "Linked Connector Offline";
 
-"createEntity.nameNewEntity.title.first" = "Create First %s";
-"createEntity.nameNewEntity.title.notFirst" = "Create New %s";
+"createEntity.nameNewEntity.account.title.first" = "Create First Account";
+"createEntity.nameNewEntity.account.title.notFirst" = "Create New Account";
+"createEntity.nameNewEntity.persona.title" = "Create a Persona";
 "createEntity.nameNewEntity.subtitle" = "What would you like to call your %s?";
 
 "createEntity.nameNewEntity.name.field.placeholder.specific.account" = "e.g. My Main Account";
