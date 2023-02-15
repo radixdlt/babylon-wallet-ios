@@ -42,9 +42,8 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtoco
 				))))
 			}
 
-		case let .internal(.system(.createEntityResult(.failure(error)))):
-			errorQueue.schedule(error)
-			return .none
+		case .internal(.system(.createEntityResult(.failure))):
+			return .send(.delegate(.createEntityFailed))
 
 		case let .internal(.system(.createEntityResult(.success(entity)))):
 			return .run { send in

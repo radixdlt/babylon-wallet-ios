@@ -57,8 +57,6 @@ final class CreationOfEntityTests: TestCase {
 		let expectedErrors = Set([createNewAccountError])
 		await store.send(.view(.appeared))
 		await store.receive(.internal(.system(.createEntityResult(.failure(createNewAccountError)))))
-		await errorQueue.withValue { errors in
-			XCTAssertEqual(errors, expectedErrors)
-		}
+		await store.receive(.delegate(.createEntityFailed))
 	}
 }
