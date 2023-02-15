@@ -110,6 +110,14 @@ public enum L10n {
       public static func subtitle(_ p1: UnsafePointer<CChar>) -> String {
         return L10n.tr("Localizable", "createEntity.nameNewEntity.subtitle", p1, fallback: "What would you like to call your %s?")
       }
+      public enum Account {
+        public enum Title {
+          /// Create First Account
+          public static let first = L10n.tr("Localizable", "createEntity.nameNewEntity.account.title.first", fallback: "Create First Account")
+          /// Create New Account
+          public static let notFirst = L10n.tr("Localizable", "createEntity.nameNewEntity.account.title.notFirst", fallback: "Create New Account")
+        }
+      }
       public enum Name {
         public enum Button {
           /// Continue
@@ -128,15 +136,9 @@ public enum L10n {
           }
         }
       }
-      public enum Title {
-        /// Create First %s
-        public static func first(_ p1: UnsafePointer<CChar>) -> String {
-          return L10n.tr("Localizable", "createEntity.nameNewEntity.title.first", p1, fallback: "Create First %s")
-        }
-        /// Create New %s
-        public static func notFirst(_ p1: UnsafePointer<CChar>) -> String {
-          return L10n.tr("Localizable", "createEntity.nameNewEntity.title.notFirst", p1, fallback: "Create New %s")
-        }
+      public enum Persona {
+        /// Create a Persona
+        public static let title = L10n.tr("Localizable", "createEntity.nameNewEntity.persona.title", fallback: "Create a Persona")
       }
     }
   }
