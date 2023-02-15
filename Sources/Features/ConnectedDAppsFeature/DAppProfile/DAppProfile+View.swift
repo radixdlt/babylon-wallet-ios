@@ -66,12 +66,11 @@ public extension DAppProfile.View {
 					}
 					.background(.app.gray5)
 
-					VStack {
-						RadixButton(destructive: L10n.DAppProfile.forgetDApp) {
-							viewStore.send(.forgetThisDApp)
-						}
-						.padding([.horizontal, .bottom], .medium3)
+					Button(L10n.DAppProfile.forgetDApp) {
+						viewStore.send(.forgetThisDApp)
 					}
+					.buttonStyle(.destructive)
+					.padding([.horizontal, .bottom], .medium3)
 				}
 				.navBarTitle(viewStore.title)
 				.navigationDestination(store: store.selectedPersona) { store in

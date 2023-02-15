@@ -8,23 +8,7 @@ public struct PersonaProfile: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
-		switch viewAction {
-		case .appeared:
-			return .none
-		case let .accountTapped(address):
-			return .none
-		case .editAccountSharingTapped:
-			return .none
-		case .disconnectPersonaTapped:
-			return .none
-		}
-	}
-}
-
-// MARK: PersonaProfile.State
-public extension PersonaProfile {
-	struct State: Sendable, Hashable {
+	public struct State: Sendable, Hashable {
 		public let dAppName: String
 		public let personaName: String
 		public let firstName: String
@@ -41,15 +25,28 @@ public extension PersonaProfile {
 			self.twitterName = twitterName
 		}
 	}
-}
 
-// MARK: PersonaProfile.ViewAction
-public extension PersonaProfile {
-	enum ViewAction: Sendable, Equatable {
+	public enum ViewAction: Sendable, Equatable {
 		case appeared
+		case editPersonaTapped
 		case accountTapped(AccountAddress)
 		case editAccountSharingTapped
 		case disconnectPersonaTapped
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .appeared:
+			return .none
+		case .editPersonaTapped:
+			return .none
+		case let .accountTapped(address):
+			return .none
+		case .editAccountSharingTapped:
+			return .none
+		case .disconnectPersonaTapped:
+			return .none
+		}
 	}
 }
 

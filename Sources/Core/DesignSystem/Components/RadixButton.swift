@@ -1,71 +1,59 @@
 import Resources
 import SwiftUI
 
-// MARK: - RadixButton
-public struct RadixButton<Background: View>: View {
-	private let text: String
-	private let secondaryText: String?
-	private let textColor: Color
-	private let background: Background
-	private let action: () -> Void
+// MARK: - AccountButton
+/// An account button with the given address and gradient
+public struct AccountButton: View {
+	let accountName: String
+	let address: String
+	let gradient: Gradient
+	let action: () -> Void
 
-	/// The standard gray Radix button
-	public init(_ text: String, action: @escaping () -> Void) where Background == Color {
-		self.text = text
-		self.secondaryText = nil
-		self.textColor = .app.gray1
-		self.background = Color.app.gray4
-		self.action = action
-	}
-
-	/// A destructive Radix button
-	public init(destructive text: String, action: @escaping () -> Void) where Background == Color {
-		self.text = text
-		self.secondaryText = nil
-		self.textColor = .white
-		self.background = Color.app.red1
-		self.action = action
-	}
-
-	/// An account button with the given address and gradient
-	public init(_ accountName: String, account: String, gradient: Gradient, action: @escaping () -> Void) where Background == LinearGradient {
-		self.text = accountName
-		self.secondaryText = account
-		self.textColor = .white
-		self.background = LinearGradient(gradient: gradient, startPoint: .leading, endPoint: .trailing)
+	public init(_ accountName: String, address: String, gradient: Gradient, action: @escaping () -> Void) {
+		self.accountName = accountName
+		self.address = address
+		self.gradient = gradient
 		self.action = action
 	}
 
 	public var body: some View {
 		Button(action: action) {
-			content
-				.frame(height: .standardButtonHeight)
-				.frame(maxWidth: .infinity)
-				.background(background)
-				.clipShape(.radixButton)
-		}
-	}
-
-	@ViewBuilder
-	private var content: some View {
-		if let secondaryText {
 			HStack(spacing: 0) {
-				mainText
+				Text(accountName)
+					.textStyle(.body1Header)
+					.foregroundColor(.app.white)
 				Spacer(minLength: 0)
-				Text(secondaryText.formatted(.short))
+				Text(address.formatted(.short))
 					.textStyle(.body2HighImportance)
-					.foregroundColor(textColor.opacity(0.8))
+					.foregroundColor(.app.whiteTransparent)
 			}
 			.padding(.horizontal, .large2)
-		} else {
-			mainText
+			.frame(height: .standardButtonHeight)
+			.background {
+				LinearGradient(gradient: gradient, startPoint: .leading, endPoint: .trailing)
+					.clipShape(.radixButton)
+			}
 		}
 	}
+}
 
-	private var mainText: some View {
-		Text(text)
+public extension ButtonStyle where Self == RadixButtonStyle {
+	static var radix: RadixButtonStyle { .init(textColor: .app.gray1, backgroundColor: .app.gray4) }
+	static var destructive: RadixButtonStyle { .init(textColor: .white, backgroundColor: .app.red1) }
+}
+
+// MARK: - RadixButtonStyle
+public struct RadixButtonStyle: ButtonStyle {
+	let textColor: Color
+	let backgroundColor: Color
+
+	public func makeBody(configuration: Configuration) -> some View {
+		configuration.label
 			.textStyle(.body1Header)
 			.foregroundColor(textColor)
+			.frame(maxWidth: .infinity)
+			.frame(height: .standardButtonHeight)
+			.background(backgroundColor.clipShape(.radixButton))
 	}
 }
 

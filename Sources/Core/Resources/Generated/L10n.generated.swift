@@ -493,12 +493,12 @@ public enum L10n {
     }
     /// Address
     public static let addressHeading = L10n.tr("Localizable", "personaProfile.addressHeading", fallback: "Address")
-    /// You are currently sharing the following pieces of personal data required by this dApp.
-    public static let body = L10n.tr("Localizable", "personaProfile.body", fallback: "You are currently sharing the following pieces of personal data required by this dApp.")
     /// Disconnect Persona from this dApp
     public static let disconnectPersona = L10n.tr("Localizable", "personaProfile.disconnectPersona", fallback: "Disconnect Persona from this dApp")
     /// Edit Account Sharing
     public static let editAccountSharing = L10n.tr("Localizable", "personaProfile.editAccountSharing", fallback: "Edit Account Sharing")
+    /// Edit Persona
+    public static let editPersona = L10n.tr("Localizable", "personaProfile.editPersona", fallback: "Edit Persona")
     /// First Name
     public static let firstNameHeading = L10n.tr("Localizable", "personaProfile.firstNameHeading", fallback: "First Name")
     /// Here is the personal data that you are sharing with %@

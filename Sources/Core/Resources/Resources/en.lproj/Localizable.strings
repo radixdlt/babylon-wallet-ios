@@ -133,10 +133,9 @@
 "dAppProfile.personaHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
 "dAppProfile.forgetDApp" = "Forget this dApp";
 
-"personaProfile.body" = "You are currently sharing the following pieces of personal data required by this dApp.";
-
 "personaProfile.personaNameHeading" = "Persona Name";
 "personaProfile.personalDataSharingDescription" = "Here is the personal data that you are sharing with %@";
+"personaProfile.editPersona" = "Edit Persona";
 "personaProfile.firstNameHeading" = "First Name";
 "personaProfile.secondNameHeading" = "Second Name";
 "personaProfile.addressHeading" = "Address";

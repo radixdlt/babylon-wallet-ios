@@ -13,12 +13,7 @@ extension PersonaProfile {
 	}
 
 	struct ViewState: Equatable {
-		let dAppName: String
 		let personaName: String
-		let firstName: String
-		let secondName: String
-		let streetAddress: String
-		let twitterName: String
 	}
 }
 
@@ -26,8 +21,59 @@ extension PersonaProfile {
 
 public extension PersonaProfile.View {
 	var body: some View {
-		WithViewStore(store.actionless, observe: \.viewState) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
+				VStack(spacing: 0) {
+					InfoSection(store: store.actionless)
+
+					Button(L10n.PersonaProfile.editPersona) {
+						viewStore.send(.editPersonaTapped)
+					}
+					.buttonStyle(.radix)
+					.frame(width: 250)
+					.padding(.vertical, .large3)
+
+					AccountSection(store: store)
+						.background(.app.gray5)
+
+					Button(L10n.PersonaProfile.disconnectPersona) {
+						viewStore.send(.disconnectPersonaTapped)
+					}
+					.buttonStyle(.destructive)
+					.padding([.horizontal, .top], .medium3)
+					.padding(.bottom, .large2)
+				}
+			}
+			.navBarTitle(viewStore.personaName)
+		}
+	}
+}
+
+// MARK: - Extensions
+
+private extension PersonaProfile.State {
+	var viewState: PersonaProfile.ViewState {
+		.init(personaName: personaName)
+	}
+}
+
+// MARK: - PersonaProfile.View.InfoSection
+extension PersonaProfile.View {
+	@MainActor
+	struct InfoSection: View {
+		let store: Store<PersonaProfile.State, Never>
+
+		struct ViewState: Equatable {
+			let dAppName: String
+			let personaName: String
+			let firstName: String
+			let secondName: String
+			let streetAddress: String
+			let twitterName: String
+		}
+
+		var body: some View {
+			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(spacing: .medium1) {
 					PersonaThumbnail(.placeholder, size: .veryLarge)
 
@@ -35,6 +81,8 @@ public extension PersonaProfile.View {
 						LeadingText(sectionHeading: L10n.PersonaProfile.personaNameHeading)
 						LeadingText(dataItem: viewStore.personaName)
 					}
+
+					LeadingText(L10n.PersonaProfile.personalDataSharingDescription(viewStore.dAppName))
 
 					Separator()
 
@@ -57,20 +105,15 @@ public extension PersonaProfile.View {
 						LeadingText(sectionHeading: L10n.PersonaProfile.twitterNameHeading)
 						LeadingText(dataItem: viewStore.twitterName)
 					}
-
-					ActionZone(store: store)
 				}
 				.padding(.horizontal, .medium1)
 			}
-			.navBarTitle(viewStore.personaName)
 		}
 	}
 }
 
-// MARK: - Extensions
-
 private extension PersonaProfile.State {
-	var viewState: PersonaProfile.ViewState {
+	var infoSectionViewState: PersonaProfile.View.InfoSection.ViewState {
 		.init(dAppName: dAppName,
 		      personaName: personaName,
 		      firstName: firstName,
@@ -80,10 +123,10 @@ private extension PersonaProfile.State {
 	}
 }
 
-// MARK: - PersonaProfile.View.ActionZone
+// MARK: - PersonaProfile.View.AccountSection
 extension PersonaProfile.View {
 	@MainActor
-	struct ActionZone: View {
+	struct AccountSection: View {
 		struct ViewState: Equatable {
 			let dAppName: String
 			let sharingAccounts: [NamedAccount]
@@ -92,15 +135,27 @@ extension PersonaProfile.View {
 		let store: StoreOf<PersonaProfile>
 
 		var body: some View {
-			WithViewStore(store, observe: \.actionZoneViewState, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.accountSectionViewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
 					LeadingText(L10n.PersonaProfile.accountSharingDescription(viewStore.dAppName))
 						.padding(.vertical, .medium2)
-					ForEach(viewStore.sharingAccounts, id: \.address.id) { account in
-						RadixButton(account.name, account: account.address.address, gradient: account.gradient) {
-							viewStore.send(.appeared)
+						.padding(.horizontal, .medium1)
+
+					VStack(spacing: .medium3) {
+						ForEach(viewStore.sharingAccounts, id: \.name) { account in
+							AccountButton(account.name, address: account.address.address, gradient: account.gradient) {
+								viewStore.send(.appeared)
+							}
 						}
 					}
+					.padding(.horizontal, .medium3)
+
+					Button(L10n.PersonaProfile.editAccountSharing) {
+						viewStore.send(.editAccountSharingTapped)
+					}
+					.buttonStyle(.radix)
+					.frame(width: 250)
+					.padding(.vertical, .large3)
 				}
 			}
 		}
@@ -108,10 +163,11 @@ extension PersonaProfile.View {
 }
 
 private extension PersonaProfile.State {
-	var actionZoneViewState: PersonaProfile.View.ActionZone.ViewState {
-		.init(dAppName: self.viewState.dAppName,
+	var accountSectionViewState: PersonaProfile.View.AccountSection.ViewState {
+		.init(dAppName: dAppName,
 		      sharingAccounts: [
-		      	.init(name: "My main account", gradient: .init(colors: [.green, .yellow]), address: try! .init(address: "account_d_82734975")),
+		      	.init(name: "My account", gradient: .init(colors: [.green, .yellow]), address: try! .init(address: "account_d_827m9765")),
+		      	.init(name: "My second account", gradient: .init(colors: [.purple, .red]), address: try! .init(address: "account_d_8223445")),
 		      	.init(name: "My savings account", gradient: .init(colors: [.blue, .orange]), address: try! .init(address: "account_d_82734975")),
 		      ])
 	}
