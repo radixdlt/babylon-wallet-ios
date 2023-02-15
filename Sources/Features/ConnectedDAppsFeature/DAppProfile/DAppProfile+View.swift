@@ -14,9 +14,6 @@ extension DAppProfile {
 
 	struct ViewState: Equatable {
 		let title: String
-		let showTokenList: Bool
-		let showNFTList: Bool
-
 		let addressViewState: AddressView.ViewState
 		let personas: [PersonaProfileRowModel]
 		let dApp: DAppProfileModel
@@ -62,8 +59,6 @@ public extension DAppProfile.View {
 private extension DAppProfile.State {
 	var viewState: DAppProfile.ViewState {
 		.init(title: name,
-		      showTokenList: !dApp.tokens.isEmpty,
-		      showNFTList: !dApp.nfts.isEmpty,
 		      addressViewState: .init(address: dApp.address.address, format: .short),
 		      personas: personas,
 		      dApp: dApp)
@@ -122,25 +117,13 @@ extension DAppProfile.View {
 		let store: StoreOf<DAppProfile>
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				if viewStore.showTokenList {
-					VStack(alignment: .leading, spacing: .medium3) {
-						Text(L10n.DAppProfile.tokens)
-							.textType(.sectionHeading)
-							.padding(.horizontal, .medium1)
-
-						ForEach(viewStore.dApp.tokens) { token in
-							RadixCard {
-								PlainListRow(withChevron: false, title: token.name) {
-									viewStore.send(.tokenTapped(token.id))
-								} icon: {
-									TokenPlaceholder(size: .small)
-								}
-							}
-							.padding(.horizontal, .medium3)
-						}
-					}
-					.padding(.bottom, .medium1)
+			WithViewStore(store, observe: \.dApp.tokens, send: { .view($0) }) { viewStore in
+				ListWithHeading(heading: L10n.DAppProfile.tokens,
+				                elements: viewStore.state,
+				                title: \.name) { _ in
+					TokenPlaceholder(size: .small)
+				} action: { id in
+					viewStore.send(.tokenTapped(id))
 				}
 			}
 		}
@@ -151,26 +134,45 @@ extension DAppProfile.View {
 		let store: StoreOf<DAppProfile>
 
 		var body: some View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				if viewStore.showNFTList {
-					VStack(alignment: .leading, spacing: .medium3) {
-						Text(L10n.DAppProfile.nfts)
-							.textType(.sectionHeading)
-							.padding(.horizontal, .medium1)
-
-						ForEach(viewStore.dApp.nfts) { nft in
-							RadixCard {
-								PlainListRow(withChevron: false, title: nft.name) {
-									viewStore.send(.nftTapped(nft.id))
-								} icon: {
-									NFTPlaceholder(size: .small)
-								}
-							}
-							.padding(.horizontal, .medium3)
-						}
-					}
-					.padding(.bottom, .medium1)
+			WithViewStore(store, observe: \.dApp.nfts, send: { .view($0) }) { viewStore in
+				ListWithHeading(heading: L10n.DAppProfile.nfts,
+				                elements: viewStore.state,
+				                title: \.name) { _ in
+					NFTPlaceholder(size: .small)
+				} action: { id in
+					viewStore.send(.nftTapped(id))
 				}
+			}
+		}
+	}
+
+	@MainActor
+	struct ListWithHeading<Element: Identifiable, Icon: View>: View {
+		let heading: String
+		let elements: [Element]
+		let title: (Element) -> String
+		let icon: (Element) -> Icon
+		let action: (Element.ID) -> Void
+
+		var body: some View {
+			if !elements.isEmpty {
+				VStack(alignment: .leading, spacing: .medium3) {
+					Text(L10n.DAppProfile.nfts)
+						.textType(.sectionHeading)
+						.padding(.horizontal, .medium1)
+
+					ForEach(elements) { element in
+						RadixCard {
+							PlainListRow(withChevron: false, title: title(element)) {
+								action(element.id)
+							} icon: {
+								icon(element)
+							}
+						}
+						.padding(.horizontal, .medium3)
+					}
+				}
+				.padding(.bottom, .medium1)
 			}
 		}
 	}
