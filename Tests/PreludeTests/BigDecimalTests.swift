@@ -174,9 +174,10 @@ final class BigDecimalTests: TestCase {
 	}
 
 	func test_format_bigdecimal() throws {
-		func doTest(_ bigDecimalString: String, expected: String) throws {
+		func doTest(_ bigDecimalString: String, expected: String, line: UInt = #line) throws {
+			let locale = Locale(identifier: "en_US_POSIX")
 			let bigDecimal = try BigDecimal(fromString: bigDecimalString)
-			XCTAssertEqual(bigDecimal.format(locale: Locale(identifier: "en_US_POSIX")), expected)
+			XCTAssertEqual(bigDecimal.format(locale: locale), expected, line: line)
 		}
 
 		try doTest("57896044618658097711785492504343953926634992332820282019728", expected: "57896044618658097711785492504343953926634992332820282019728")
@@ -198,9 +199,10 @@ final class BigDecimalTests: TestCase {
 	}
 
 	func test_format_bigdecimal_with_currency() throws {
-		func doTest(_ bigDecimalString: String, expected: String) throws {
+		func doTest(_ bigDecimalString: String, expected: String, line: UInt = #line) throws {
+			let locale = Locale(identifier: "en_US_POSIX")
 			let bigDecimal = try BigDecimal(fromString: bigDecimalString)
-			XCTAssertEqual(bigDecimal.format(currency: .usd, locale: Locale(identifier: "en_US_POSIX")), expected)
+			XCTAssertEqual(bigDecimal.format(fiatCurrency: .usd, locale: locale), expected, line: line)
 		}
 
 		try doTest("57896044618658097711785492504343953926634992332820282019728.792003956564819968", expected: "$57896044618658097711785492504343953926634992332820282019728.8") // rounded `0.79` -> `0.80`
