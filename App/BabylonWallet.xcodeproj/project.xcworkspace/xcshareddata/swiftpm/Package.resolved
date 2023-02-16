@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/twostraws/CodeScanner",
       "state" : {
-        "revision" : "c7859712034a08bb5a018fbe8751c1f1edc4b248",
-        "version" : "2.2.1"
+        "revision" : "88a61323cae0aa4e7056f122600e5d38fd305a77",
+        "version" : "2.3.0"
       }
     },
     {
@@ -95,8 +95,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kean/Nuke",
       "state" : {
-        "revision" : "df6cfba3f49aa6777b8c1084cb7778899ca166d3",
-        "version" : "11.6.0"
+        "revision" : "67bd45931180f652159e3342575277a7f197b3ab",
+        "version" : "11.6.2"
       }
     },
     {
@@ -113,8 +113,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-async-algorithms",
       "state" : {
-        "revision" : "aed5422380244498344a036b8d94e27f370d9a22",
-        "version" : "0.0.4"
+        "revision" : "9cfed92b026c524674ed869a4ff2dcfdeedf8a2a",
+        "version" : "0.1.0"
       }
     },
     {
@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "branch" : "main",
-        "revision" : "d46bc92295ea05c720836176d3fc3f396ef209d6"
+        "revision" : "3c4eea896f8ee9cbe1c11d1d3d46b0f2809da958",
+        "version" : "0.12.0"
       }
     },
     {
@@ -150,7 +150,7 @@
       "location" : "https://github.com/davdroman/swift-composable-architecture",
       "state" : {
         "branch" : "navigation-relay",
-        "revision" : "b55f30b3bdf8e9b6a1161a3b90b944a11e0d5e67"
+        "revision" : "a6967840f05acccdefddb26c2fbb9e53d1e2f1de"
       }
     },
     {
@@ -158,8 +158,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-custom-dump",
       "state" : {
-        "revision" : "87dd388a193569b288d03cb4060db54f90d1a66f",
-        "version" : "0.7.0"
+        "revision" : "dd86159e25c749873f144577e5d18309bf57534f",
+        "version" : "0.8.0"
       }
     },
     {
@@ -185,8 +185,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-identified-collections",
       "state" : {
-        "revision" : "fd34c544ad27f3ba6b19142b348005bfa85b6005",
-        "version" : "0.6.0"
+        "revision" : "ad3932d28c2e0a009a0167089619526709ef6497",
+        "version" : "0.7.0"
       }
     },
     {
@@ -239,8 +239,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-tagged",
       "state" : {
-        "revision" : "af06825aaa6adffd636c10a2570b2010c7c07e6a",
-        "version" : "0.9.0"
+        "revision" : "3907a9438f5b57d317001dc99f3f11b46882272b",
+        "version" : "0.10.0"
       }
     },
     {
@@ -257,8 +257,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/siteline/SwiftUI-Introspect",
       "state" : {
-        "revision" : "fc40fb11d4922d6e936a3d2abaa54bcab4fc877e",
-        "version" : "0.2.0"
+        "revision" : "0ee6d36368422aa2fef62fc41a86a179abe46ef1",
+        "version" : "0.2.2"
       }
     },
     {
@@ -275,8 +275,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/davdroman/swiftui-navigation-transitions",
       "state" : {
-        "revision" : "c07692890d2e6d4e9e3936ae2f13be8c84551de7",
-        "version" : "0.7.2"
+        "revision" : "1e2598d88bf82ead5775b785f2f7f44c35347f3f",
+        "version" : "0.7.4"
       }
     },
     {
@@ -293,8 +293,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/xctest-dynamic-overlay",
       "state" : {
-        "revision" : "16b23a295fa322eb957af98037f86791449de60f",
-        "version" : "0.8.1"
+        "revision" : "62041e6016a30f56952f5d7d3f12a3fd7029e1cd",
+        "version" : "0.8.3"
       }
     }
   ],
