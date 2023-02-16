@@ -1,5 +1,7 @@
 Jira ticket: paste link here
 
+Complements / depends on / relates to #link to other PR
+
 ## Description
 This PR solves / fixes / adds / includes functionality 1 and functionality 2.
 
