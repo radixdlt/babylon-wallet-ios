@@ -14,8 +14,8 @@ extension DAppProfile {
 
 	struct ViewState: Equatable {
 		let title: String
-		let description: String
-		let url: String
+		let description: String?
+		let domain: String?
 		let addressViewState: AddressView.ViewState
 		let personas: [Persona]
 
@@ -69,8 +69,8 @@ public extension DAppProfile.View {
 private extension DAppProfile.State {
 	var viewState: DAppProfile.ViewState {
 		.init(title: dApp.displayName.rawValue,
-		      description: .nbaTopShot,
-		      url: "https://nba-topshot.xyz",
+		      description: metadata.description,
+		      domain: metadata.domain,
 		      addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .short),
 		      personas: dApp.detailedAuthorizedPersonas.map(DAppProfile.ViewState.Persona.init))
 	}
@@ -102,10 +102,11 @@ extension DAppProfile.View {
 				VStack(alignment: .leading, spacing: .medium2) {
 					Separator()
 
-					Text(viewStore.description)
-						.textType(.textBlock)
-
-					Separator()
+					if let description = viewStore.description {
+						Text(description)
+							.textType(.textBlock)
+						Separator()
+					}
 
 					HStack(spacing: 0) {
 						Text(L10n.DAppProfile.definition)
@@ -117,13 +118,15 @@ extension DAppProfile.View {
 						.foregroundColor(.app.gray1)
 					}
 
-					Text(L10n.DAppProfile.website)
-						.textType(.sectionHeading)
+					if let domain = viewStore.domain {
+						Text(L10n.DAppProfile.website)
+							.textType(.sectionHeading)
 
-					Button(viewStore.url) {
-						viewStore.send(.openURLTapped)
+						Button(domain) {
+							viewStore.send(.openURLTapped)
+						}
+						.buttonStyle(.url)
 					}
-					.buttonStyle(.url)
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.bottom, .large2)
@@ -281,13 +284,4 @@ extension String {
 
 extension ComponentAddress {
 	static let mock = ComponentAddress(address: "component_sim1qfh2n5twmrzrlstqepsu3u624r4pdzca9pqhrcy7624sfmxzep")
-}
-
-// MARK: - DAppProfileModel
-public struct DAppProfileModel: Identifiable, Hashable, Sendable {
-	public let id: UUID = .init()
-	let name: String
-	let address: ComponentAddress
-	let description: String
-	let domain: URL
 }
