@@ -122,7 +122,7 @@ extension AppSettings.View {
 
 	private func settingsRows() -> [RowModel] {
 		[
-			.init(title: L10n.Settings.inspectProfileButtonTitle,
+			.init(title: L10n.Settings.desktopConnectionsButtonTitle,
 			      asset: AssetResource.desktopConnections,
 			      action: .manageP2PClientsButtonTapped),
 			.init(title: L10n.Settings.connectedDAppsButtonTitle,

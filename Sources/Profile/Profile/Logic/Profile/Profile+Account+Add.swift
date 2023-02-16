@@ -5,6 +5,7 @@ import Prelude
 public extension Profile {
 	struct NetworkAlreadyExists: Swift.Error {}
 	struct AccountDoesNotHaveIndexZero: Swift.Error {}
+	struct DAppWasNotConnected: Swift.Error {}
 
 	/// Throws if the network of the account is not new and does not have index 0.
 	@discardableResult
@@ -177,6 +178,27 @@ public extension Profile {
 		}
 		try updateOnNetwork(network)
 		return connectedDapp
+	}
+
+	/// Forgets  a `ConnectedDapp`
+	mutating func forgetConnectedDApp(
+		_ connectedDAppID: OnNetwork.ConnectedDapp.ID,
+		on networkID: NetworkID
+	) async throws {
+		var network = try onNetwork(id: networkID)
+		guard network.connectedDapps.remove(id: connectedDAppID) != nil else {
+			throw DAppWasNotConnected()
+		}
+
+		try updateOnNetwork(network)
+
+		// TODO: • remove
+		let networkAfter = try onNetwork(id: networkID)
+		if networkAfter.connectedDapps.ids.contains(connectedDAppID) {
+			print("••• failed to remove")
+		} else {
+			print("••• managed to remove")
+		}
 	}
 
 	@discardableResult

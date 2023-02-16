@@ -26,6 +26,7 @@ public struct ProfileClient: Sendable {
 	public var getP2PClients: GetP2PClients
 	public var getConnectedDapps: GetConnectedDapps
 	public var addConnectedDapp: AddConnectedDapp
+	public var forgetConnectedDApp: ForgetConnectedDApp
 	public var addP2PClient: AddP2PClient
 	public var updateConnectedDapp: UpdateConnectedDapp
 	public var detailsForConnectedDapp: DetailsForConnectedDapp
@@ -57,6 +58,7 @@ public struct ProfileClient: Sendable {
 		getP2PClients: @escaping GetP2PClients,
 		getConnectedDapps: @escaping GetConnectedDapps,
 		addConnectedDapp: @escaping AddConnectedDapp,
+		forgetConnectedDApp: @escaping ForgetConnectedDApp,
 		detailsForConnectedDapp: @escaping DetailsForConnectedDapp,
 		updateConnectedDapp: @escaping UpdateConnectedDapp,
 		addP2PClient: @escaping AddP2PClient,
@@ -85,6 +87,7 @@ public struct ProfileClient: Sendable {
 		self.getPersonas = getPersonas
 		self.getConnectedDapps = getConnectedDapps
 		self.addConnectedDapp = addConnectedDapp
+		self.forgetConnectedDApp = forgetConnectedDApp
 		self.detailsForConnectedDapp = detailsForConnectedDapp
 		self.updateConnectedDapp = updateConnectedDapp
 		self.getP2PClients = getP2PClients
@@ -176,6 +179,7 @@ public extension ProfileClient {
 	typealias GetP2PClients = @Sendable () async throws -> P2PClients
 	typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
 	typealias AddConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
+	typealias ForgetConnectedDApp = @Sendable (OnNetwork.ConnectedDapp.ID, NetworkID) async throws -> Void
 	typealias UpdateConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
 	typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
@@ -189,3 +193,33 @@ public extension ProfileClient {
 }
 
 public typealias SignersOfAccount = SignersOf<OnNetwork.Account>
+
+//// TODO: • Move
+// extension OnNetwork.ConnectedDappDetailed: Identifiable {
+//	public var id: DappDefinitionAddress.ID {
+//		dAppDefinitionAddress.id
+//	}
+// }
+
+//// TODO: • Do we care about order?
+// extension ProfileClient {
+//	public func getDetailedConnectedDApps() async throws -> IdentifiedArrayOf<OnNetwork.ConnectedDappDetailed> {
+//		let dApps = try await getConnectedDapps()
+//
+//		return await withTaskGroup(of: OnNetwork.ConnectedDappDetailed?.self) { group in
+//			var result: IdentifiedArrayOf<OnNetwork.ConnectedDappDetailed> = []
+//			for dApp in dApps {
+//				group.addTask {
+//					try? await detailsForConnectedDapp(dApp)
+//				}
+//			}
+//
+//			for await dAppDetails in group {
+//				guard let dAppDetails else { continue }
+//				result.append(dAppDetails)
+//			}
+//
+//			return result
+//		}
+//	}
+// }

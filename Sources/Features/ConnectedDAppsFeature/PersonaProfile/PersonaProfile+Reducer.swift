@@ -10,19 +10,11 @@ public struct PersonaProfile: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		public let dAppName: String
-		public let personaName: String
-		public let firstName: String
-		public let secondName: String
-		public let streetAddress: String
-		public let twitterName: String
+		public let persona: OnNetwork.AuthorizedPersonaDetailed
 
-		public init(dAppName: String, personaName: String, firstName: String, secondName: String, streetAddress: String, twitterName: String) {
+		public init(dAppName: String, persona: OnNetwork.AuthorizedPersonaDetailed) {
 			self.dAppName = dAppName
-			self.personaName = personaName
-			self.firstName = firstName
-			self.secondName = secondName
-			self.streetAddress = streetAddress
-			self.twitterName = twitterName
+			self.persona = persona
 		}
 	}
 
@@ -45,25 +37,10 @@ public struct PersonaProfile: Sendable, FeatureReducer {
 		case .editAccountSharingTapped:
 			return .none
 		case .disconnectPersonaTapped:
+
+//			profileClient.updateConnectedDapp
+
 			return .none
 		}
 	}
-}
-
-// MARK: - PersonaProfileRowModel
-public struct PersonaProfileRowModel: Identifiable, Hashable, Sendable {
-	public let id: UUID = .init()
-	let thumbnail: URL = .placeholder
-	let name: String
-	let sharingStatus: String = "Sharing"
-	let personalDataCount: Int
-	let accountCount: Int
-}
-
-extension [PersonaProfileRowModel] {
-	static let debug: [PersonaProfileRowModel] = [
-		.init(name: "RadMatt", personalDataCount: 3, accountCount: 2),
-		.init(name: "MattMountain", personalDataCount: 4, accountCount: 1),
-		.init(name: "RonaldMcD", personalDataCount: 2, accountCount: 1),
-	]
 }

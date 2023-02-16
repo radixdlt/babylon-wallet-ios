@@ -12,7 +12,7 @@ extension ConnectedDApps {
 	}
 
 	struct ViewState: Equatable {
-		let dApps: [DAppRowModel]
+		let dApps: IdentifiedArrayOf<OnNetwork.ConnectedDapp>
 	}
 }
 
@@ -32,17 +32,22 @@ public extension ConnectedDApps.View {
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.dApps) { dApp in
 							RadixCard {
-								PlainListRow(title: dApp.name) {
-									viewStore.send(.didSelectDApp(dApp.name))
+								PlainListRow(title: dApp.displayName.rawValue) {
+									viewStore.send(.didSelectDApp(dApp.id))
 								} icon: {
 									DAppPlaceholder()
 								}
 							}
 						}
 					}
+					.animation(.easeInOut, value: viewStore.dApps)
+
 					Spacer()
 				}
 				.padding(.horizontal, .medium3)
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 			}
 			.navBarTitle(L10n.ConnectedDApps.title)
 			.navigationDestination(store: store.selectedDApp) { store in

@@ -1,17 +1,57 @@
 import FeaturePrelude
+import GatewayAPI
+import ProfileClient
 
 // MARK: - DAppProfile
 public struct DAppProfile: Sendable, FeatureReducer {
+	@Dependency(\.gatewayAPIClient) var gatewayClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
+	@Dependency(\.profileClient) var profileClient
 
 	public typealias Store = StoreOf<Self>
+
+	// MARK: State
+
+	public struct State: Sendable, Hashable {
+		public let dApp: OnNetwork.ConnectedDappDetailed
+
+		@PresentationState
+		public var presentedPersona: PersonaProfile.State?
+
+		init(dApp: OnNetwork.ConnectedDappDetailed, presentedPersona: PersonaProfile.State? = nil) {
+			self.dApp = dApp
+			self.presentedPersona = presentedPersona
+		}
+	}
+
+	// MARK: Action
+
+	public enum ViewAction: Sendable, Equatable {
+		case appeared
+		case openURLTapped
+		case copyAddressButtonTapped
+		case tokenTapped(UUID)
+		case nftTapped(UUID)
+		case personaTapped(OnNetwork.Persona.ID)
+		case forgetThisDApp
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case forgetDApp(id: OnNetwork.ConnectedDapp.ID, networkID: NetworkID)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case presentedPersona(PresentationActionOf<PersonaProfile>)
+	}
+
+	// MARK: Reducer
 
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$selectedPersona, action: /Action.child .. ChildAction.selectedPersona) {
+			.presentationDestination(\.$presentedPersona, action: /Action.child .. ChildAction.presentedPersona) {
 				PersonaProfile()
 			}
 	}
@@ -19,125 +59,53 @@ public struct DAppProfile: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
+
 			return .none
+
 		case .copyAddressButtonTapped:
-			let address = state.dApp.address.address
+			let address = state.dApp.dAppDefinitionAddress
 			return .fireAndForget {
-				pasteboardClient.copyString(address)
+				pasteboardClient.copyString(address.address)
 			}
+
 		case .openURLTapped:
-			let url = state.dApp.domain
+//			let url = state.dApp.url
 			return .fireAndForget {
-				await openURL(url)
+				await openURL(.placeholder)
 			}
+
 		case let .tokenTapped(token):
 			return .none
+
 		case let .nftTapped(nft):
 			return .none
-		case let .personaTapped(persona):
-			// TODO: • This proxying is only necessary because of our strict view/child separation
 
-			let state = PersonaProfile.State(dAppName: state.dApp.name,
-			                                 personaName: persona,
-			                                 firstName: "Matt",
-			                                 secondName: "Smith",
-			                                 streetAddress: "45 Hornhill Road, Texas 23918",
-			                                 twitterName: "@radmatt")
+		case let .personaTapped(id):
+			guard let persona = state.dApp.detailedAuthorizedPersonas[id: id] else { return .none }
+			let presented = PersonaProfile.State(dAppName: state.dApp.displayName.rawValue, persona: persona)
+			return .send(.child(.presentedPersona(.present(presented))))
 
-			return .send(.child(.selectedPersona(.present(state))))
 		case .forgetThisDApp:
-			return .none
+			let dAppID = state.dApp.dAppDefinitionAddress
+			let networkID = state.dApp.networkID
+			return .send(.delegate(.forgetDApp(id: dAppID, networkID: networkID)))
 		}
 	}
-}
 
-// MARK: DAppProfile.State
-public extension DAppProfile {
-	struct State: Sendable, Hashable {
-		public let name: String
-		public let personas: [PersonaProfileRowModel] = .debug
-		public let dApp: DAppProfileModel
-
-		@PresentationState public var selectedPersona: PersonaProfile.State?
-
-		public init(name: String, selectedPersona: PersonaProfile.State? = nil) {
-			self.name = name
-			self.dApp = .mock(name)
-			self.selectedPersona = selectedPersona
+	func metadataLoadingEffect(with state: inout State) -> EffectTask<Action> {
+//		state.isLoading = true
+		let dappDefinitionAddress = state.dApp.dAppDefinitionAddress
+		return .task {
+			let metadata = await TaskResult {
+				do {
+					return DappMetadata(try await gatewayAPI.resourceDetailsByResourceIdentifier(dappDefinitionAddress.address).metadata)
+				} catch let error as BadHTTPResponseCode {
+					return DappMetadata(name: nil) // Not found - return unknown dapp metadata as instructed by network team
+				} catch {
+					throw error
+				}
+			}
+			await send(.internal(.dappMetadataLoadingResult(metadata)))
 		}
-	}
-}
-
-// MARK: - Action
-
-public extension DAppProfile {
-	enum ViewAction: Sendable, Equatable {
-		case appeared
-		case openURLTapped
-		case copyAddressButtonTapped
-		case tokenTapped(UUID)
-		case nftTapped(UUID)
-		case personaTapped(String)
-		case forgetThisDApp
-	}
-
-	enum ChildAction: Sendable, Equatable {
-		case selectedPersona(PresentationActionOf<PersonaProfile>)
-	}
-}
-
-// MARK: - DAppProfileModel
-public struct DAppProfileModel: Identifiable, Hashable, Sendable {
-	public let id: UUID = .init()
-	let name: String
-	let address: ComponentAddress
-	let description: String
-	let domain: URL
-	let tokens: [TokenModel]
-	let nfts: [TokenModel]
-
-	public struct TokenModel: Identifiable, Hashable, Sendable {
-		public let id: UUID = .init()
-		let name: String
-		let address: ComponentAddress = .mock
-	}
-
-	public struct NFTModel: Identifiable, Hashable, Sendable {
-		public let id: UUID = .init()
-		let name: String
-		let address: ComponentAddress = .mock
-	}
-}
-
-extension String {
-	static let nbaTopShot: String = "NBA Top Shot is a decentralized application that provides users with the opportunity to purchase, collect, and showcase digital blockchain collectibles"
-
-	static let lorem: String = "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt."
-}
-
-extension ComponentAddress {
-	static let mock = ComponentAddress(address: "component_sim1qfh2n5twmrzrlstqepsu3u624r4pdzca9pqhrcy7624sfmxzep")
-}
-
-extension DAppProfileModel {
-	static func mock(_ name: String) -> Self {
-		.init(name: name,
-		      address: .mock,
-		      description: .nbaTopShot,
-		      domain: .init(string: "https://nba-topshot.xyz")!,
-		      tokens: [.mock("NBA")],
-		      nfts: [.mock("NBA Top Shot")])
-	}
-}
-
-extension DAppProfileModel.TokenModel {
-	static func mock(_ name: String) -> Self {
-		.init(name: name)
-	}
-}
-
-extension DAppProfileModel.NFTModel {
-	static func mock(_ name: String) -> Self {
-		.init(name: name)
 	}
 }

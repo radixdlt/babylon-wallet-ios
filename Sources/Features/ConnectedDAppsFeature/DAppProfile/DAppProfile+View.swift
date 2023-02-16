@@ -14,9 +14,16 @@ extension DAppProfile {
 
 	struct ViewState: Equatable {
 		let title: String
+		let description: String
+		let url: String
 		let addressViewState: AddressView.ViewState
-		let personas: [PersonaProfileRowModel]
-		let dApp: DAppProfileModel
+		let personas: [Persona]
+
+		struct Persona: Identifiable, Hashable, Sendable {
+			let id: OnNetwork.Persona.ID
+			let name: String
+			let thumbnail: URL
+		}
 	}
 }
 
@@ -45,8 +52,11 @@ public extension DAppProfile.View {
 					.padding([.horizontal, .top], .medium3)
 					.padding(.bottom, .large2)
 				}
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 				.navBarTitle(viewStore.title)
-				.navigationDestination(store: store.selectedPersona) { store in
+				.navigationDestination(store: store.presentedPersona) { store in
 					PersonaProfile.View(store: store)
 				}
 			}
@@ -58,16 +68,25 @@ public extension DAppProfile.View {
 
 private extension DAppProfile.State {
 	var viewState: DAppProfile.ViewState {
-		.init(title: name,
-		      addressViewState: .init(address: dApp.address.address, format: .short),
-		      personas: personas,
-		      dApp: dApp)
+		.init(title: dApp.displayName.rawValue,
+		      description: .nbaTopShot,
+		      url: "https://nba-topshot.xyz",
+		      addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .short),
+		      personas: dApp.detailedAuthorizedPersonas.map(DAppProfile.ViewState.Persona.init))
+	}
+}
+
+private extension DAppProfile.ViewState.Persona {
+	init(persona: OnNetwork.AuthorizedPersonaDetailed) {
+		self.init(id: persona.id,
+		          name: persona.displayName.rawValue,
+		          thumbnail: .placeholder)
 	}
 }
 
 private extension DAppProfile.Store {
-	var selectedPersona: PresentationStoreOf<PersonaProfile> {
-		scope(state: \.$selectedPersona) { .child(.selectedPersona($0)) }
+	var presentedPersona: PresentationStoreOf<PersonaProfile> {
+		scope(state: \.$presentedPersona) { .child(.presentedPersona($0)) }
 	}
 }
 
@@ -83,7 +102,7 @@ extension DAppProfile.View {
 				VStack(alignment: .leading, spacing: .medium2) {
 					Separator()
 
-					Text(viewStore.dApp.description)
+					Text(viewStore.description)
 						.textType(.textBlock)
 
 					Separator()
@@ -101,7 +120,7 @@ extension DAppProfile.View {
 					Text(L10n.DAppProfile.website)
 						.textType(.sectionHeading)
 
-					Button(viewStore.dApp.domain.absoluteString) {
+					Button(viewStore.url) {
 						viewStore.send(.openURLTapped)
 					}
 					.buttonStyle(.url)
@@ -157,7 +176,7 @@ extension DAppProfile.View {
 		var body: some View {
 			if !elements.isEmpty {
 				VStack(alignment: .leading, spacing: .medium3) {
-					Text(L10n.DAppProfile.nfts)
+					Text(heading)
 						.textType(.sectionHeading)
 						.padding(.horizontal, .medium1)
 
@@ -193,7 +212,7 @@ extension DAppProfile.View {
 						ForEach(viewStore.personas) { persona in
 							RadixCard {
 								PlainListRow(title: persona.name) {
-									viewStore.send(.personaTapped(persona.name))
+									viewStore.send(.personaTapped(persona.id))
 								} icon: {
 									PersonaThumbnail(persona.thumbnail)
 								}
@@ -220,4 +239,55 @@ public extension View {
 		}
 		.navigationTitle(title)
 	}
+}
+
+extension OnNetwork.ConnectedDappDetailed {
+	var tokens: [TokenModel] {
+		[.mock("NBA"), .mock("NAS")]
+	}
+
+	var nfts: [TokenModel] {
+		[.mock("NBA top shot"), .mock("NAS RTFK")]
+	}
+}
+
+// MARK: - TokenModel
+public struct TokenModel: Identifiable, Hashable, Sendable {
+	public let id: UUID = .init()
+	let name: String
+	let address: ComponentAddress = .mock
+
+	static func mock(_ name: String) -> Self {
+		.init(name: name)
+	}
+}
+
+// MARK: - NFTModel
+public struct NFTModel: Identifiable, Hashable, Sendable {
+	public let id: UUID = .init()
+	let name: String
+	let address: ComponentAddress = .mock
+
+	static func mock(_ name: String) -> Self {
+		.init(name: name)
+	}
+}
+
+extension String {
+	static let nbaTopShot: String = "NBA Top Shot is a decentralized application that provides users with the opportunity to purchase, collect, and showcase digital blockchain collectibles"
+
+	static let lorem: String = "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt."
+}
+
+extension ComponentAddress {
+	static let mock = ComponentAddress(address: "component_sim1qfh2n5twmrzrlstqepsu3u624r4pdzca9pqhrcy7624sfmxzep")
+}
+
+// MARK: - DAppProfileModel
+public struct DAppProfileModel: Identifiable, Hashable, Sendable {
+	public let id: UUID = .init()
+	let name: String
+	let address: ComponentAddress
+	let description: String
+	let domain: URL
 }

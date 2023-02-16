@@ -263,6 +263,11 @@ public extension ProfileClient {
 					_ = try await profile.addConnectedDapp(connectedDapp)
 				}
 			},
+			forgetConnectedDApp: { connectedDappID, networkID in
+				try await profileHolder.asyncMutating { profile in
+					_ = try await profile.forgetConnectedDApp(connectedDappID, on: networkID)
+				}
+			},
 			detailsForConnectedDapp: { connectedDappSimple in
 				try await profileHolder.get { profile in
 					try profile.detailsForConnectedDapp(connectedDappSimple)

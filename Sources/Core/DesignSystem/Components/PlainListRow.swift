@@ -19,7 +19,8 @@ public struct PlainListRow<Icon: View>: View {
 	}
 
 	public init(withChevron chevron: Bool = true,
-	            title: String, asset: ImageAsset,
+	            title: String,
+	            asset: ImageAsset,
 	            action: @escaping () -> Void) where Icon == AssetIcon
 	{
 		self.chevron = chevron

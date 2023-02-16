@@ -82,13 +82,14 @@ package.addModules([
 		],
 		tests: .yes()
 	),
-    .feature(
-        name: "ConnectedDAppsFeature",
-        dependencies: [
-            "ProfileClient",
-        ],
-        tests: .no
-    ),
+	.feature(
+		name: "ConnectedDAppsFeature",
+		dependencies: [
+			"GatewayAPI",
+			"ProfileClient",
+		],
+		tests: .no
+	),
 	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [

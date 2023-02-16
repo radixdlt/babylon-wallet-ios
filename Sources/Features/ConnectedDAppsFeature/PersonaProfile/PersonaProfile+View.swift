@@ -24,6 +24,9 @@ public extension PersonaProfile.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
+					PersonaThumbnail(.placeholder, size: .veryLarge)
+						.padding(.vertical, .large2)
+
 					InfoSection(store: store.actionless)
 
 					Button(L10n.PersonaProfile.editPersona) {
@@ -53,7 +56,7 @@ public extension PersonaProfile.View {
 
 private extension PersonaProfile.State {
 	var viewState: PersonaProfile.ViewState {
-		.init(personaName: personaName)
+		.init(personaName: persona.displayName.rawValue)
 	}
 }
 
@@ -61,29 +64,27 @@ private extension PersonaProfile.State {
 extension PersonaProfile.View {
 	@MainActor
 	struct InfoSection: View {
-		let store: Store<PersonaProfile.State, Never>
-
 		struct ViewState: Equatable {
 			let dAppName: String
 			let personaName: String
-			let firstName: String
-			let secondName: String
-			let streetAddress: String
-			let twitterName: String
+			let firstName: String = "Matt"
+			let secondName: String = "Smith"
+			let streetAddress: String = "45 Hornhill Road, Texas 23918"
+			let twitterName: String = "@radmatt"
 		}
+
+		let store: Store<PersonaProfile.State, Never>
 
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
-				VStack(spacing: .medium1) {
-					PersonaThumbnail(.placeholder, size: .veryLarge)
-
+				VStack(alignment: .leading, spacing: .medium1) {
 					InfoPair(heading: L10n.PersonaProfile.personaNameHeading,
 					         item: viewStore.personaName)
 
+					Separator()
+
 					Text(L10n.PersonaProfile.personalDataSharingDescription(viewStore.dAppName))
 						.textType(.textBlock)
-
-					Separator()
 
 					InfoPair(heading: L10n.PersonaProfile.firstNameHeading,
 					         item: viewStore.firstName)
@@ -107,7 +108,7 @@ extension PersonaProfile.View {
 		let item: String
 
 		var body: some View {
-			VStack(spacing: .small2) {
+			VStack(alignment: .leading, spacing: .small2) {
 				Text(heading)
 					.textType(.sectionHeading)
 				Text(item)
@@ -120,11 +121,7 @@ extension PersonaProfile.View {
 private extension PersonaProfile.State {
 	var infoSectionViewState: PersonaProfile.View.InfoSection.ViewState {
 		.init(dAppName: dAppName,
-		      personaName: personaName,
-		      firstName: firstName,
-		      secondName: secondName,
-		      streetAddress: streetAddress,
-		      twitterName: twitterName)
+		      personaName: persona.displayName.rawValue)
 	}
 }
 
@@ -144,6 +141,7 @@ extension PersonaProfile.View {
 				VStack(spacing: 0) {
 					Text(L10n.PersonaProfile.accountSharingDescription(viewStore.dAppName))
 						.textType(.textBlock)
+						.flushedLeft
 						.padding(.vertical, .medium2)
 						.padding(.horizontal, .medium1)
 
