@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - AccountList.State
 extension AccountList {
 	// MARK: State
-	public struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		public var accounts: IdentifiedArrayOf<AccountList.Row.State>
 		public var alert: AlertState<Action.ViewAction>?
 

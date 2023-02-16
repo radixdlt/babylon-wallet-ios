@@ -4,7 +4,7 @@ import FeaturePrelude
 // MARK: - AccountList.Row.State
 extension AccountList.Row {
 	// MARK: State
-	public struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		public let account: OnNetwork.Account
 		public var aggregatedValue: BigDecimal?
 		public var portfolio: AccountPortfolio

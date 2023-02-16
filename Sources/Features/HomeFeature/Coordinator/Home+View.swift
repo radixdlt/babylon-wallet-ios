@@ -1,82 +1,81 @@
 import AccountDetailsFeature
 import AccountListFeature
+import AccountPortfolio
 import AccountPreferencesFeature
 import CreateEntityFeature
 import FeaturePrelude
 import TransactionSigningFeature
 
+extension Home.State {
+	var viewState: Home.ViewState {
+		.init()
+	}
+}
+
+// MARK: - Home.ViewState
+extension Home {
+	struct ViewState: Equatable {}
+}
+
 // MARK: - Home.View
 extension Home {
 	@MainActor
 	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+		private let store: StoreOf<Home>
 
-		public init(
-			store: Store
-		) {
+		public init(store: StoreOf<Home>) {
 			self.store = store
 		}
-	}
-}
 
-extension Home.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			ForceFullScreen {
-				ZStack {
-					homeView(with: viewStore)
-						.onAppear {
-							viewStore.send(.didAppear)
-						}
-						.zIndex(0)
+		public var body: some SwiftUI.View {
+			WithViewStore(
+				store,
+				observe: \.viewState,
+				send: { .view($0) }
+			) { viewStore in
+				ForceFullScreen {
+					ZStack {
+						homeView(with: viewStore)
+							.onAppear {
+								viewStore.send(.appeared)
+							}
+							.zIndex(0)
 
-					IfLetStore(
-						store.scope(
-							state: \.createAccountCoordinator,
-							action: { .child(.createAccountCoordinator($0)) }
-						),
-						then: { CreateAccountCoordinator.View(store: $0) }
-					)
-					.zIndex(1)
+						IfLetStore(
+							store.scope(
+								state: \.createAccountCoordinator,
+								action: { .child(.createAccountCoordinator($0)) }
+							),
+							then: { CreateAccountCoordinator.View(store: $0) }
+						)
+						.zIndex(1)
 
-					IfLetStore(
-						store.scope(
-							state: \.accountDetails,
-							action: { .child(.accountDetails($0)) }
-						),
-						then: { AccountDetails.View(store: $0) }
-					)
-					.zIndex(2)
+						IfLetStore(
+							store.scope(
+								state: \.accountDetails,
+								action: { .child(.accountDetails($0)) }
+							),
+							then: { AccountDetails.View(store: $0) }
+						)
+						.zIndex(2)
 
-					IfLetStore(
-						store.scope(
-							state: \.accountPreferences,
-							action: { .child(.accountPreferences($0)) }
-						),
-						then: { AccountPreferences.View(store: $0) }
-					)
-					.zIndex(3)
+						IfLetStore(
+							store.scope(
+								state: \.accountPreferences,
+								action: { .child(.accountPreferences($0)) }
+							),
+							then: { AccountPreferences.View(store: $0) }
+						)
+						.zIndex(3)
+					}
 				}
 			}
 		}
 	}
 }
 
-// MARK: - Home.View.ViewState
 extension Home.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		init(state _: Home.State) {}
-	}
-}
-
-extension Home.View {
-	fileprivate func homeView(with viewStore: ViewStore<Home.View.ViewState, Home.Action.ViewAction>) -> some View {
+	fileprivate func homeView(with viewStore: ViewStore<Home.ViewState, Home.ViewAction>) -> some View {
 		VStack {
 			Home.Header.View(
 				store: store.scope(
@@ -132,5 +131,25 @@ struct HomeView_Previews: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension Home.State {
+	public static let previewValue = Home.State(
+		header: .init(hasNotification: false),
+		accountDetails: AccountDetails.State(
+			for: .init(
+				account: .previewValue0,
+				aggregatedValue: nil,
+				portfolio: AccountPortfolio(
+					fungibleTokenContainers: [],
+					nonFungibleTokenContainers: [.mock1, .mock2, .mock3],
+					poolShareContainers: [],
+					badgeContainers: []
+				),
+				currency: .gbp,
+				isCurrencyAmountVisible: false
+			)
+		)
+	)
 }
 #endif

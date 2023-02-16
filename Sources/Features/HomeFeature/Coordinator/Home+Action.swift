@@ -1,3 +1,4 @@
+/*
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
@@ -65,3 +66,4 @@ extension Home.Action {
 		case reloadAccounts
 	}
 }
+*/
