@@ -44,14 +44,12 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// WHEN: existing profile is loaded
-		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
-			.success(existingProfile)
-		)))))) {
+		await store.send(.child(.splash(.internal(.loadProfileResult(.success(existingProfile)))))) {
 			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: .success(existingProfile)))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.system(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp)))))))
+		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(existingProfile)))))) {
@@ -75,12 +73,12 @@ final class AppFeatureTests: TestCase {
 		let viewTask = await store.send(.view(.task))
 
 		// when
-		await store.send(.child(.splash(.internal(.system(.loadProfileResult(.success(nil))))))) {
+		await store.send(.child(.splash(.internal(.loadProfileResult(.success(nil)))))) {
 			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: .success(nil)))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.system(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp)))))))
+		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(.success(nil)))))) {
@@ -112,14 +110,12 @@ final class AppFeatureTests: TestCase {
 		let result: ProfileClient.LoadProfileResult = .failure(
 			failure
 		)
-		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
-			result
-		)))))) {
+		await store.send(.child(.splash(.internal(.loadProfileResult(result))))) {
 			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: result))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.system(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp)))))))
+		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		// then
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
@@ -165,14 +161,12 @@ final class AppFeatureTests: TestCase {
 		let badVersion: ProfileSnapshot.Version = 0
 		let failedToCreateProfileFromSnapshot = Profile.FailedToCreateProfileFromSnapshot(version: badVersion, error: SomeError())
 		let result = ProfileClient.LoadProfileResult.failure(.failedToCreateProfileFromSnapshot(failedToCreateProfileFromSnapshot))
-		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
-			result
-		)))))) {
+		await store.send(.child(.splash(.internal(.loadProfileResult(result))))) {
 			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: result))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.system(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp)))))))
+		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
 			$0.errorAlert = .init(
@@ -211,14 +205,12 @@ final class AppFeatureTests: TestCase {
 		struct SomeError: Swift.Error {}
 		let badVersion: ProfileSnapshot.Version = 0
 		let result = ProfileClient.LoadProfileResult.failure(.profileVersionOutdated(json: Data([0xDE, 0xAD]), version: badVersion))
-		await store.send(.child(.splash(.internal(.system(.loadProfileResult(
-			result
-		)))))) {
+		await store.send(.child(.splash(.internal(.loadProfileResult(result))))) {
 			$0.root = .splash(.init(biometricsCheckFailedAlert: nil, profileResult: result))
 		}
 
 		await testScheduler.advance(by: .seconds(2))
-		await store.receive(.child(.splash(.internal(.system(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp)))))))
+		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
 			$0.errorAlert = .init(
