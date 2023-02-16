@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 extension Splash.State {
-	public var viewState: Splash.ViewState {
+	var viewState: Splash.ViewState {
 		.init()
 	}
 }
@@ -32,7 +32,7 @@ extension Splash {
 				.edgesIgnoringSafeArea(.all)
 				.alert(store.scope(state: \.biometricsCheckFailedAlert, action: { .view(.biometricsCheckFailed($0)) }), dismiss: .dismissed)
 				.onAppear {
-					viewStore.send(.viewAppeared)
+					viewStore.send(.appeared)
 				}
 			}
 		}

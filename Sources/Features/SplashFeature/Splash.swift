@@ -24,7 +24,7 @@ public struct Splash: Sendable, FeatureReducer {
 			case openSettingsButtonTapped
 		}
 
-		case viewAppeared
+		case appeared
 		case biometricsCheckFailed(BiometricsCheckFailedAlertAction)
 	}
 
@@ -47,7 +47,7 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .viewAppeared:
+		case .appeared:
 			return .run { send in
 				await send(.internal(.loadProfileResult(loadProfile())))
 			}
