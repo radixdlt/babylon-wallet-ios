@@ -69,8 +69,8 @@ public extension DAppProfile.View {
 private extension DAppProfile.State {
 	var viewState: DAppProfile.ViewState {
 		.init(title: dApp.displayName.rawValue,
-		      description: metadata.description,
-		      domain: metadata.domain,
+		      description: metadata?.description,
+		      domain: metadata?.domain,
 		      addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .short),
 		      personas: dApp.detailedAuthorizedPersonas.map(DAppProfile.ViewState.Persona.init))
 	}
@@ -104,13 +104,13 @@ extension DAppProfile.View {
 
 					if let description = viewStore.description {
 						Text(description)
-							.textType(.textBlock)
+							.textBlock
 						Separator()
 					}
 
 					HStack(spacing: 0) {
 						Text(L10n.DAppProfile.definition)
-							.textType(.sectionHeading)
+							.sectionHeading
 						Spacer(minLength: 0)
 						AddressView(viewStore.addressViewState, textStyle: .body1HighImportance) {
 							viewStore.send(.copyAddressButtonTapped)
@@ -120,12 +120,17 @@ extension DAppProfile.View {
 
 					if let domain = viewStore.domain {
 						Text(L10n.DAppProfile.website)
-							.textType(.sectionHeading)
+							.sectionHeading
 
-						Button(domain) {
-							viewStore.send(.openURLTapped)
+						if let url = URL(string: domain) {
+							Button(domain) {
+								viewStore.send(.openURLTapped(url))
+							}
+							.buttonStyle(.url)
+						} else {
+							Text(domain)
+								.urlLink
 						}
-						.buttonStyle(.url)
 					}
 				}
 				.padding(.horizontal, .medium1)
@@ -180,7 +185,7 @@ extension DAppProfile.View {
 			if !elements.isEmpty {
 				VStack(alignment: .leading, spacing: .medium3) {
 					Text(heading)
-						.textType(.sectionHeading)
+						.sectionHeading
 						.padding(.horizontal, .medium1)
 
 					ForEach(elements) { element in
@@ -207,7 +212,7 @@ extension DAppProfile.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: 0) {
 					Text(L10n.DAppProfile.personaHeading)
-						.textType(.sectionHeading)
+						.sectionHeading
 						.padding(.horizontal, .medium1)
 						.padding(.vertical, .large3)
 

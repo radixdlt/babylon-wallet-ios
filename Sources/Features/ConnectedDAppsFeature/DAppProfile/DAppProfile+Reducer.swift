@@ -18,6 +18,7 @@ public struct DAppProfile: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let dApp: OnNetwork.ConnectedDappDetailed
 
+		@Loadable
 		public var metadata: Metadata? = nil
 
 		@PresentationState
@@ -38,7 +39,7 @@ public struct DAppProfile: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case openURLTapped
+		case openURLTapped(URL)
 		case copyAddressButtonTapped
 		case tokenTapped(UUID)
 		case nftTapped(UUID)
@@ -72,18 +73,14 @@ public struct DAppProfile: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
-			state.metadata = .loading
+			state.$metadata = .loading
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .task {
-				do {
-					let metadataEntities = try await gatewayClient.resourceDetailsByResourceIdentifier(dAppID.address).metadata
-					let metadata = State.Metadata(metadataEntities)
-					return .internal(.metadataLoaded(.loaded(metadata)))
-				} catch is BadHTTPResponseCode {
-					return .internal(.metadataLoaded(.failed(.badHTTPResponseCode)))
-				} catch {
-					return .internal(.metadataLoaded(.failed(.unknown)))
-				}
+				let metadataEntities = try await gatewayClient.resourceDetailsByResourceIdentifier(dAppID.address).metadata
+				let metadata = State.Metadata(metadataEntities)
+				return .internal(.metadataLoaded(.loaded(metadata)))
+			} catch: { error in
+				.internal(.metadataLoaded(.failed(error is BadHTTPResponseCode ? .badHTTPResponseCode : .unknown)))
 			}
 
 		case .copyAddressButtonTapped:
@@ -92,10 +89,9 @@ public struct DAppProfile: Sendable, FeatureReducer {
 				pasteboardClient.copyString(address.address)
 			}
 
-		case .openURLTapped:
-//			let url = state.dApp.url
+		case let .openURLTapped(url):
 			return .fireAndForget {
-				await openURL(.placeholder)
+				await openURL(url)
 			}
 
 		case let .tokenTapped(token):
@@ -119,7 +115,7 @@ public struct DAppProfile: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .metadataLoaded(metadata):
-			state.metadata = metadata
+			state.$metadata = metadata
 			return .none
 		}
 	}
@@ -147,27 +143,14 @@ public enum Loadable<Value> {
 	case loaded(Value)
 	case failed(LoadingError)
 
-	subscript<T>(dynamicMember keyPath: KeyPath<Value, T?>) -> T? {
-		value?[keyPath: keyPath]
-	}
-
-	subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> T? {
-		value?[keyPath: keyPath]
-	}
-
-	public var value: Value? {
-		guard case let .loaded(value) = self else { return nil }
-		return value
-	}
-
-	public func map<T>(transform: (Value) -> T) -> Loadable<T> {
+	subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> Loadable<T> {
 		switch self {
 		case .notLoaded:
 			return .notLoaded
 		case .loading:
 			return .loading
 		case let .loaded(value):
-			return .loaded(transform(value))
+			return .loaded(value[keyPath: keyPath])
 		case let .failed(loadingError):
 			return .failed(loadingError)
 		}
@@ -179,6 +162,11 @@ public enum Loadable<Value> {
 		} else {
 			self = .notLoaded
 		}
+	}
+
+	public init(error: Error) {
+		let loadingError: LoadingError = error is BadHTTPResponseCode ? .badHTTPResponseCode : .unknown
+		self = .failed(loadingError)
 	}
 
 	public var projectedValue: Self {

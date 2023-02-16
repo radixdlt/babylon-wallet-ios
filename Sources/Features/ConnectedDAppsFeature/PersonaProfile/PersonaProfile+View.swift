@@ -84,7 +84,7 @@ extension PersonaProfile.View {
 					Separator()
 
 					Text(L10n.PersonaProfile.personalDataSharingDescription(viewStore.dAppName))
-						.textType(.textBlock)
+						.textBlock
 
 					InfoPair(heading: L10n.PersonaProfile.firstNameHeading,
 					         item: viewStore.firstName)
@@ -110,9 +110,9 @@ extension PersonaProfile.View {
 		var body: some View {
 			VStack(alignment: .leading, spacing: .small2) {
 				Text(heading)
-					.textType(.sectionHeading)
+					.sectionHeading
 				Text(item)
-					.textType(.infoItem)
+					.infoItem
 			}
 		}
 	}
@@ -140,7 +140,7 @@ extension PersonaProfile.View {
 			WithViewStore(store, observe: \.accountSectionViewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
 					Text(L10n.PersonaProfile.accountSharingDescription(viewStore.dAppName))
-						.textType(.textBlock)
+						.textBlock
 						.flushedLeft
 						.padding(.vertical, .medium2)
 						.padding(.horizontal, .medium1)

@@ -67,25 +67,7 @@ extension TextStyle {
 	}
 }
 
-// MARK: - TextType
-public enum TextType {
-	/// Text formatted as a section heading
-	case sectionHeading
-
-	/// Text formatted as an info item
-	case infoItem
-
-	/// Text formatted as an info item
-	case textBlock
-}
-
 public extension View {
-	func textType(_ type: TextType) -> some View {
-		let styling = type.textStyling
-		return textStyle(styling.textStyle)
-			.foregroundColor(styling.color)
-	}
-
 	var flushedLeft: some View {
 		HStack(spacing: 0) {
 			self
@@ -94,17 +76,28 @@ public extension View {
 	}
 }
 
-extension TextType {
-	var textStyling: (textStyle: TextStyle, color: Color) {
-		switch self {
-		case .sectionHeading:
-			return (.body1Regular, .app.gray2)
+public extension Text {
+	/// Text formatted as a section heading
+	var sectionHeading: some View {
+		textStyle(.body1Regular)
+			.foregroundColor(.app.gray2)
+	}
 
-		case .infoItem:
-			return (.body1HighImportance, .app.gray1)
+	/// Text formatted as an info item
+	var infoItem: some View {
+		textStyle(.body1HighImportance)
+			.foregroundColor(.app.gray1)
+	}
 
-		case .textBlock:
-			return (.body1HighImportance, .app.gray2)
-		}
+	/// An informative block of text
+	var textBlock: some View {
+		textStyle(.body1HighImportance)
+			.foregroundColor(.app.gray2)
+	}
+
+	/// A url
+	var urlLink: some View {
+		textStyle(.body1HighImportance)
+			.foregroundColor(.app.blue2)
 	}
 }

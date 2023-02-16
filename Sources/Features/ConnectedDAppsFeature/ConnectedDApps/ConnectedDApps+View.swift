@@ -24,7 +24,7 @@ public extension ConnectedDApps.View {
 			ScrollView {
 				VStack(spacing: 0) {
 					Text(L10n.ConnectedDApps.intro)
-						.textType(.textBlock)
+						.textBlock
 						.padding(.vertical, .medium3)
 
 					Separator()
