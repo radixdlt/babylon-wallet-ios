@@ -65,7 +65,6 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
-		case reloadAccounts
 	}
 
 	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
@@ -255,22 +254,6 @@ public struct Home: Sendable, FeatureReducer {
 		case .createAccountCoordinator(.delegate(.completed)):
 			state.createAccountCoordinator = nil
 			return loadAccountsAndSettings()
-
-		default:
-			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, action: ActionOf<Home>) -> EffectTask<ActionOf<Home>> {
-		switch action {
-		case let .delegate(delegateAction):
-			switch delegateAction {
-			case .displaySettings:
-				return .none
-
-			case .reloadAccounts:
-				return loadAccountsAndSettings()
-			}
 
 		default:
 			return .none
