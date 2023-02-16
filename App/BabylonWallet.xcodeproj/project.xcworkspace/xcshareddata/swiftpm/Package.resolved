@@ -122,8 +122,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-case-paths",
       "state" : {
-        "branch" : "reflection-spi",
-        "revision" : "c3884415e00b39d04356509e56b84f76c27bd3db"
+        "branch" : "main",
+        "revision" : "d46bc92295ea05c720836176d3fc3f396ef209d6"
       }
     },
     {
@@ -149,8 +149,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/davdroman/swift-composable-architecture",
       "state" : {
-        "branch" : "scope-local-state-action",
-        "revision" : "ddbc1ae67a13c629fcf23ce605096e3cfcdb918c"
+        "branch" : "navigation-relay",
+        "revision" : "b55f30b3bdf8e9b6a1161a3b90b944a11e0d5e67"
       }
     },
     {
