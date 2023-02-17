@@ -24,7 +24,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		@PresentationState
 		public var presentedPersona: PersonaDetails.State? = nil
 
-		init(dApp: OnNetwork.ConnectedDappDetailed, presentedPersona: PersonaDetails.State? = nil) {
+		public init(dApp: OnNetwork.ConnectedDappDetailed, presentedPersona: PersonaDetails.State? = nil) {
 			self.dApp = dApp
 			self.presentedPersona = presentedPersona
 		}

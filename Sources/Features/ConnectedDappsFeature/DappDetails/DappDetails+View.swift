@@ -56,7 +56,7 @@ public extension DappDetails.View {
 					viewStore.send(.appeared)
 				}
 				.navBarTitle(viewStore.title)
-				.navigationDestination(store: store.presentedPersona) { store in
+				.sheet(store: store.presentedPersona) { store in
 					PersonaDetails.View(store: store)
 				}
 			}
