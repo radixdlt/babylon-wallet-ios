@@ -30,7 +30,6 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedDapps(IdentifiedArrayOf<OnNetwork.ConnectedDapp>)
-		case forgotDapp(OnNetwork.ConnectedDapp.ID)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {}
@@ -61,25 +60,27 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 			guard let dApp = state.dApps[id: id] else { return .none } // TODO: • Handle error? Put details directly in enum case?
 
 			return .task {
-				let detailed = try await profileClient.detailsForConnectedDapp(dApp)
-				let presented = DappDetails.State(dApp: detailed)
-				return .child(.presentedDapp(.present(presented)))
+				let details = try await profileClient.detailsForConnectedDapp(dApp)
+				let detailsState = DappDetails.State(dApp: details)
+				return .child(.presentedDapp(.present(detailsState)))
 			}
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .presentedDapp(.presented(.delegate(.forgetDapp(id: dAppID, networkID: networkID)))):
+		case let .presentedDapp(.presented(.delegate(.dAppForgotten(id: dAppID, networkID: networkID)))):
 			let presentedDappID = state.presentedDapp?.dApp.dAppDefinitionAddress
-			return .run { send in
-				try await profileClient.forgetConnectedDapp(dAppID, networkID)
-				if dAppID == presentedDappID {
-					await send(.child(.presentedDapp(.dismiss)), animation: .default)
-				}
+			let presentedDappNetworkID = state.presentedDapp?.dApp.networkID // TODO: • Perhaps dApp ID is unique on its own?
 
-				await send(.internal(.forgotDapp(dAppID)))
+			if dAppID == presentedDappID, networkID == presentedDappNetworkID {
+				// This does not work
+				state.presentedDapp = nil
 			}
+
+			// Could pop up a message here
+
+			return .none
 
 		case .presentedDapp:
 			return .none
@@ -90,10 +91,6 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadedDapps(dApps):
 			state.dApps = dApps
-			return .none
-
-		case let .forgotDapp(dAppID):
-			// Could pop up a message here
 			return .none
 		}
 	}

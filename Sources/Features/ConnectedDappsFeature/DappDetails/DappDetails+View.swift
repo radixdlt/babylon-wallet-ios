@@ -46,7 +46,7 @@ public extension DappDetails.View {
 					PersonaList(store: store)
 
 					Button(L10n.DAppDetails.forgetDapp) {
-						viewStore.send(.forgetThisDapp)
+						viewStore.send(.forgetThisDappTapped)
 					}
 					.buttonStyle(.destructive)
 					.padding([.horizontal, .top], .medium3)

@@ -4,9 +4,12 @@ import ProfileClient
 // MARK: - PersonaDetails
 public struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.profileClient) var profileClient
+
 	public typealias Store = StoreOf<Self>
 
 	public init() {}
+
+	// MARK: - State
 
 	public struct State: Sendable, Hashable {
 		public let dAppName: String
@@ -18,6 +21,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	// MARK: - Action
+
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case editPersonaTapped
@@ -25,6 +30,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case editAccountSharingTapped
 		case disconnectPersonaTapped
 	}
+
+	// MARK: - Reducer
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {

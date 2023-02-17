@@ -4,12 +4,12 @@ import ProfileClient
 
 // MARK: - DappDetails
 public struct DappDetails: Sendable, FeatureReducer {
-	public struct FailedToLoadMetadata: Error, Hashable {}
-
 	@Dependency(\.gatewayAPIClient) var gatewayClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.profileClient) var profileClient
+
+	public struct FailedToLoadMetadata: Error, Hashable {}
 
 	public typealias Store = StoreOf<Self>
 
@@ -44,11 +44,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case tokenTapped(UUID)
 		case nftTapped(UUID)
 		case personaTapped(OnNetwork.Persona.ID)
-		case forgetThisDapp
+		case forgetThisDappTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case forgetDapp(id: OnNetwork.ConnectedDapp.ID, networkID: NetworkID)
+		case dAppForgotten(id: OnNetwork.ConnectedDapp.ID, networkID: NetworkID)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -105,10 +105,14 @@ public struct DappDetails: Sendable, FeatureReducer {
 			let presented = PersonaDetails.State(dAppName: state.dApp.displayName.rawValue, persona: persona)
 			return .send(.child(.presentedPersona(.present(presented))))
 
-		case .forgetThisDapp:
+		case .forgetThisDappTapped:
 			let dAppID = state.dApp.dAppDefinitionAddress
 			let networkID = state.dApp.networkID
-			return .send(.delegate(.forgetDapp(id: dAppID, networkID: networkID)))
+
+			return .task {
+				try await profileClient.forgetConnectedDapp(dAppID, networkID)
+				return .delegate(.dAppForgotten(id: dAppID, networkID: networkID))
+			}
 		}
 	}
 
