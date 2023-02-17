@@ -110,9 +110,21 @@ public struct DappDetails: Sendable, FeatureReducer {
 			let networkID = state.dApp.networkID
 
 			return .task {
-				try await profileClient.forgetConnectedDapp(dAppID, networkID)
+//				try await profileClient.forgetConnectedDapp(dAppID, networkID)
 				return .delegate(.dAppForgotten(id: dAppID, networkID: networkID))
 			}
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .presentedPersona(.presented(.delegate(.testTapped))):
+			print("PARENT: .delegate(.testTapped)")
+			state.presentedPersona = nil
+			return .none
+
+		default:
+			return .none
 		}
 	}
 

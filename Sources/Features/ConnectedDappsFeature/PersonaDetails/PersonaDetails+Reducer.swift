@@ -31,6 +31,10 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case disconnectPersonaTapped
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case testTapped
+	}
+
 	// MARK: - Reducer
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -44,10 +48,11 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case .editAccountSharingTapped:
 			return .none
 		case .disconnectPersonaTapped:
+			return .send(.delegate(.testTapped))
 
 //			profileClient.updateConnectedDapp
 
-			return .none
+//			return .none
 		}
 	}
 }
