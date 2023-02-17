@@ -27,6 +27,11 @@ extension AccountList.State {
 }
 
 #if DEBUG
+extension AccountList.State {
+	static let previewValue: Self = .init(
+		accounts: .init(uniqueElements: [.previewValue]))
+}
+
 extension Array where Element == AccountList.Row.State {
 	public static let previewValue: Self = []
 }

@@ -16,7 +16,7 @@ public struct Home: Sendable, FeatureReducer {
 		public var accountPortfolioDictionary: AccountPortfolioDictionary
 
 		// MARK: - Components
-		public var header: Home.Header.State
+		public var header: Header.State
 		public var accountList: AccountList.State
 
 		// MARK: - Children
@@ -26,7 +26,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		public init(
 			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
-			header: Home.Header.State = .init(),
+			header: Header.State = .init(),
 			accountList: AccountList.State = .init(accounts: []),
 			accountDetails: AccountDetails.State? = nil,
 			accountPreferences: AccountPreferences.State? = nil,
@@ -57,7 +57,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case accountList(AccountList.Action)
-		case header(Home.Header.Action)
+		case header(Header.Action)
 		case accountPreferences(AccountPreferences.Action)
 		case accountDetails(AccountDetails.Action)
 		case createAccountCoordinator(CreateAccountCoordinator.Action)
@@ -79,7 +79,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.header, action: /Action.child .. ChildAction.header) {
-			Home.Header()
+			Header()
 		}
 
 		accountListReducer()

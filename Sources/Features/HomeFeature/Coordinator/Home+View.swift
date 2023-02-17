@@ -12,13 +12,10 @@ extension Home.State {
 	}
 }
 
-// MARK: - Home.ViewState
-extension Home {
-	struct ViewState: Equatable {}
-}
-
 // MARK: - Home.View
 extension Home {
+	struct ViewState: Equatable {}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<Home>
@@ -71,51 +68,47 @@ extension Home {
 				}
 			}
 		}
-	}
-}
 
-extension Home.View {
-	fileprivate func homeView(with viewStore: ViewStore<Home.ViewState, Home.ViewAction>) -> some View {
-		VStack {
-			Home.Header.View(
-				store: store.scope(
-					state: \.header,
-					action: { .child(.header($0)) }
-				)
-			)
-			.padding(EdgeInsets(top: .medium1, leading: .large2, bottom: .zero, trailing: .medium1))
-
-			ScrollView {
-				LazyVStack(spacing: .medium1) {
-					AccountList.View(
-						store: store.scope(
-							state: \.accountList,
-							action: { .child(.accountList($0)) }
-						)
+		fileprivate func homeView(with viewStore: ViewStore<Home.ViewState, Home.ViewAction>) -> some SwiftUI.View {
+			VStack {
+				Header.View(
+					store: store.scope(
+						state: \.header,
+						action: { .child(.header($0)) }
 					)
+				)
+				.padding(EdgeInsets(top: .medium1, leading: .large2, bottom: .zero, trailing: .medium1))
 
-					Button(L10n.Home.CreateAccount.buttonTitle) {
-						viewStore.send(.createAccountButtonTapped)
+				ScrollView {
+					LazyVStack(spacing: .medium1) {
+						AccountList.View(
+							store: store.scope(
+								state: \.accountList,
+								action: { .child(.accountList($0)) }
+							)
+						)
+
+						Button(L10n.Home.CreateAccount.buttonTitle) {
+							viewStore.send(.createAccountButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular())
+
+						Spacer()
 					}
-					.buttonStyle(.secondaryRectangular())
-
-					Spacer()
+					.padding(.medium1)
 				}
-				.padding(.medium1)
-			}
-			.refreshable {
-				await viewStore.send(.pullToRefreshStarted).finish()
+				.refreshable {
+					await viewStore.send(.pullToRefreshStarted).finish()
+				}
 			}
 		}
-	}
-}
 
-extension Home.View {
-	fileprivate var title: some View {
-		Text(L10n.AggregatedValue.title)
-			.foregroundColor(.app.buttonTextBlack)
-			.textStyle(.body2Header)
-			.textCase(.uppercase)
+		fileprivate var title: some SwiftUI.View {
+			Text(L10n.AggregatedValue.title)
+				.foregroundColor(.app.buttonTextBlack)
+				.textStyle(.body2Header)
+				.textCase(.uppercase)
+		}
 	}
 }
 
@@ -123,7 +116,7 @@ extension Home.View {
 import SwiftUI // NB: necessary for previews to appear
 
 struct HomeView_Previews: PreviewProvider {
-	static var previews: some View {
+	static var previews: some SwiftUI.View {
 		Home.View(
 			store: .init(
 				initialState: .previewValue,
@@ -135,21 +128,7 @@ struct HomeView_Previews: PreviewProvider {
 
 extension Home.State {
 	public static let previewValue = Home.State(
-		header: .init(hasNotification: false),
-		accountDetails: AccountDetails.State(
-			for: .init(
-				account: .previewValue0,
-				aggregatedValue: nil,
-				portfolio: AccountPortfolio(
-					fungibleTokenContainers: [],
-					nonFungibleTokenContainers: [.mock1, .mock2, .mock3],
-					poolUnitContainers: [],
-					badgeContainers: []
-				),
-				currency: .gbp,
-				isCurrencyAmountVisible: false
-			)
-		)
+		header: .init()
 	)
 }
 #endif
