@@ -2,62 +2,62 @@ import Cryptography
 import EngineToolkitModels
 import Prelude
 
-extension OnNetwork {
-	/// Creates a new, non saved, **Virtual** `Entity` of type `Entity.Type`
-	internal static func createNewVirtualEntity<Entity: EntityProtocol>(
-		factorSources: FactorSources,
-		index: Int,
-		networkID: NetworkID,
-		displayName: NonEmpty<String>,
-		createFactorInstance: @escaping CreateFactorInstanceForRequest,
-		makeEntity: (
-			_ address: Entity.EntityAddress,
-			_ securityState: EntitySecurityState,
-			_ index: Int,
-			_ derivationPath: Entity.EntityDerivationPath,
-			_ displayName: NonEmpty<String>
-		) throws -> Entity
-	) async throws -> Entity {
-		let derivationPath = try Entity.EntityDerivationPath(
-			networkID: networkID,
-			index: index,
-			keyKind: .virtualEntity
-		)
-
-		let nonHWHDSource = try factorSources.anyNonHardwareHierarchicalDeterministicFactorSource()
-		let request = CreateFactorInstanceRequest.fromNonHardwareHierarchicalDeterministicMnemonicFactorSource(
-			.init(
-				reference: nonHWHDSource.reference,
-				derivationPath: derivationPath.wrapAsDerivationPath()
-			))
-
-		guard
-			let genesisFactorInstanceSome = try await createFactorInstance(request),
-			let genesisFactorInstance = genesisFactorInstanceSome.factorInstance.any() as? (any FactorInstanceHierarchicalDeterministicProtocol)
-		else {
-			throw NoInstance()
-		}
-
-		let address = try Entity.deriveAddress(
-			networkID: networkID,
-			publicKey: genesisFactorInstance.publicKey
-		)
-
-		let unsecuredControl = UnsecuredEntityControl(
-			genesisFactorInstance: genesisFactorInstance.wrapAsFactorInstance()
-		)
-
-		return try makeEntity(
-			address,
-			.unsecured(unsecuredControl),
-			index,
-			derivationPath,
-			displayName
-		)
-	}
-}
-
 // MARK: - AccountIndexOutOfBounds
+// extension OnNetwork {
+//	/// Creates a new, non saved, **Virtual** `Entity` of type `Entity.Type`
+//	internal static func createNewVirtualEntity<Entity: EntityProtocol>(
+//		factorSources: FactorSources,
+//		index: Int,
+//		networkID: NetworkID,
+//		displayName: NonEmpty<String>,
+//		createFactorInstance: @escaping CreateFactorInstanceForRequest,
+//		makeEntity: (
+//			_ address: Entity.EntityAddress,
+//			_ securityState: EntitySecurityState,
+//			_ index: Int,
+//			_ derivationPath: Entity.EntityDerivationPath,
+//			_ displayName: NonEmpty<String>
+//		) throws -> Entity
+//	) async throws -> Entity {
+//		let derivationPath = try Entity.EntityDerivationPath(
+//			networkID: networkID,
+//			index: index,
+//			keyKind: .virtualEntity
+//		)
+//
+//		let nonHWHDSource = try factorSources.anyNonHardwareHierarchicalDeterministicFactorSource()
+//		let request = CreateFactorInstanceRequest.fromNonHardwareHierarchicalDeterministicMnemonicFactorSource(
+//			.init(
+//				reference: nonHWHDSource.reference,
+//				derivationPath: derivationPath.wrapAsDerivationPath()
+//			))
+//
+//		guard
+//			let genesisFactorInstanceSome = try await createFactorInstance(request),
+//			let genesisFactorInstance = genesisFactorInstanceSome.factorInstance.any() as? (any FactorInstanceHierarchicalDeterministicProtocol)
+//		else {
+//			throw NoInstance()
+//		}
+//
+//		let address = try Entity.deriveAddress(
+//			networkID: networkID,
+//			publicKey: genesisFactorInstance.publicKey
+//		)
+//
+//		let unsecuredControl = UnsecuredEntityControl(
+//			genesisFactorInstance: genesisFactorInstance.wrapAsFactorInstance()
+//		)
+//
+//		return try makeEntity(
+//			address,
+//			.unsecured(unsecuredControl),
+//			index,
+//			derivationPath,
+//			displayName
+//		)
+//	}
+// }
+
 struct AccountIndexOutOfBounds: Swift.Error {}
 
 // MARK: - PersonaIndexOutOfBounds
@@ -114,75 +114,75 @@ extension Profile {
 		}
 	}
 
-	public func signers<Entity>(
-		networkID: NetworkID,
-		address: ProfileModels.AddressProtocol,
-		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
-	) async throws -> NonEmpty<OrderedSet<SignersOf<Entity>>> where Entity: EntityProtocol & Sendable & Hashable {
-		let someEntity = try entity(networkID: networkID, address: address)
-		guard let entity = someEntity as? Entity else {
-			throw IncorrectEntityType()
-		}
-		return try await signers(
-			of: entity,
-			mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-		)
-	}
-
-	public func signers<Entity>(
-		networkID: NetworkID,
-		entityType: Entity.Type,
-		entityIndex: Int,
-		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
-	) async throws -> NonEmpty<OrderedSet<SignersOf<Entity>>> where Entity: EntityProtocol & Sendable & Hashable {
-		try await signers(
-			of: entity(networkID: networkID, entityType: entityType, entityIndex: entityIndex),
-			mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-		)
-	}
-
-	public func signers<Entity>(
-		of entity: Entity,
-		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
-	) async throws -> NonEmpty<OrderedSet<SignersOf<Entity>>> where Entity: EntityProtocol & Sendable & Hashable {
-		try await signers(ofEntities: [entity], mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference)
-	}
-
-	/// Makes sure to only read mnemonic for factor source from keychain once
-	/// Makes sure to only read mnemonic for factor source from keychain once
-	public func signers<Entity>(
-		ofEntities entities: some Collection<Entity>,
-		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
-	) async throws -> NonEmpty<OrderedSet<SignersOf<Entity>>> where Entity: EntityProtocol & Sendable & Hashable {
-		guard !entities.isEmpty else {
-			throw NoInstance()
-		}
-
-		let factorSource = factorSources.notaryFactorSource
-		let factorSourceRef = factorSource.reference
-
-		guard let mnemonic = try await mnemonicForFactorSourceByReference(factorSourceRef) else {
-			throw CreateAccountError.noMnemonicFoundInKeychainForReference(factorSourceRef)
-		}
-
-		var orderedSet = OrderedSet<SignersOf<Entity>>()
-
-		for entity in entities {
-			let notaryFactorInstance = try await factorSource.createAnyFactorInstanceForResponse(
-				input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
-					mnemonic: mnemonic,
-					derivationPath: entity.derivationPath.wrapAsDerivationPath(),
-					includePrivateKey: true
-				)
-			)
-
-			let notaryPrivateKey = try notaryFactorInstance.getPrivateKey()
-			let signers = SignersOf<Entity>(entity: entity, notaryPrivateKey: notaryPrivateKey)
-			orderedSet.append(signers)
-		}
-
-		return NonEmpty(rawValue: orderedSet)!
-	}
+//	public func signers<Entity>(
+//		networkID: NetworkID,
+//		address: ProfileModels.AddressProtocol,
+//		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
+//	) async throws -> NonEmpty<OrderedSet<SignersOf<Entity>>> where Entity: EntityProtocol & Sendable & Hashable {
+//		let someEntity = try entity(networkID: networkID, address: address)
+//		guard let entity = someEntity as? Entity else {
+//			throw IncorrectEntityType()
+//		}
+//		return try await signers(
+//			of: entity,
+//			mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
+//		)
+//	}
+//
+//	public func signers<Entity>(
+//		networkID: NetworkID,
+//		entityType: Entity.Type,
+//		entityIndex: Int,
+//		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
+//	) async throws -> NonEmpty<OrderedSet<SignersOf<Entity>>> where Entity: EntityProtocol & Sendable & Hashable {
+//		try await signers(
+//			of: entity(networkID: networkID, entityType: entityType, entityIndex: entityIndex),
+//			mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
+//		)
+//	}
+//
+//	public func signers<Entity>(
+//		of entity: Entity,
+//		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
+//	) async throws -> NonEmpty<OrderedSet<SignersOf<Entity>>> where Entity: EntityProtocol & Sendable & Hashable {
+//		try await signers(ofEntities: [entity], mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference)
+//	}
+//
+//	/// Makes sure to only read mnemonic for factor source from keychain once
+//	public func signers<Entity>(
+//		ofEntities entities: some Collection<Entity>,
+//		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
+//	) async throws -> NonEmpty<OrderedSet<SignersOf<Entity>>> where Entity: EntityProtocol & Sendable & Hashable {
+	////		guard !entities.isEmpty else {
+	////			throw NoInstance()
+	////		}
+	////
+	////		let factorSource = factorSources.first
+	////		let factorSourceRef = factorSource.reference
+	////
+	////		guard let mnemonic = try await mnemonicForFactorSourceByReference(factorSourceRef) else {
+	////			throw CreateAccountError.noMnemonicFoundInKeychainForReference(factorSourceRef)
+	////		}
+	////
+	////		var orderedSet = OrderedSet<SignersOf<Entity>>()
+	////
+	////		for entity in entities {
+	////			let notaryFactorInstance = try await factorSource.createAnyFactorInstanceForResponse(
+	////				input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
+	////					mnemonic: mnemonic,
+	////					derivationPath: entity.derivationPath.wrapAsDerivationPath(),
+	////					includePrivateKey: true
+	////				)
+	////			)
+	////
+	////			let notaryPrivateKey = try notaryFactorInstance.getPrivateKey()
+	////			let signers = SignersOf<Entity>(entity: entity, notaryPrivateKey: notaryPrivateKey)
+	////			orderedSet.append(signers)
+	////		}
+	////
+	////		return NonEmpty(rawValue: orderedSet)!
+	//        fixMultifactor()
+//	}
 }
 
 // MARK: - SignersOf

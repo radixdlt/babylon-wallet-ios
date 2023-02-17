@@ -132,3 +132,25 @@ extension HexCodable {
 	public static let deadbeef32Bytes = Self(data: .deadbeef32Bytes)
 }
 #endif // DEBUG
+
+// MARK: - CodableViaHexCodable
+public protocol CodableViaHexCodable: Codable {
+	var hexCodable: HexCodable { get }
+	init(hexCodable: HexCodable) throws
+}
+
+public extension CodableViaHexCodable {
+	init(data: Data) throws {
+		try self.init(hexCodable: .init(data: data))
+	}
+
+	func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		try container.encode(self.hexCodable)
+	}
+
+	init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		try self.init(hexCodable: container.decode(HexCodable.self))
+	}
+}

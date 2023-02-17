@@ -51,12 +51,12 @@ public struct CreateEntityCoordinator<
 			return .none
 
 		case let .internal(.loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate)):
-			precondition(!factorSources.factorSources.isEmpty)
+			precondition(!factorSources.isEmpty)
 
-			if state.config.specificGenesisFactorInstanceDerivationStrategy == nil, factorSources.factorSources.count > 1 {
+			if state.config.specificGenesisFactorInstanceDerivationStrategy == nil, factorSources.count > 1 {
 				return goToStep1SelectGenesisFactorSource(
 					entityName: specifiedNameForNewEntityToCreate,
-					factorSources: factorSources.factorSources,
+					factorSources: factorSources,
 					state: &state
 				)
 			} else {
@@ -64,7 +64,7 @@ public struct CreateEntityCoordinator<
 					if let specific = state.config.specificGenesisFactorInstanceDerivationStrategy {
 						return specific
 					}
-					guard let onDevice = factorSources.factorSources[0].any() as? Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource else {
+					guard let onDevice = factorSources.first(where: { $0.kind == .device }) else {
 						fatalError("Only supported Factor Source is Curve25519 onDevice for now.")
 					}
 					return .loadMnemonicFromKeychainForFactorSource(onDevice)

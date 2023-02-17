@@ -78,9 +78,6 @@ extension IdentityHierarchicalDeterministicDerivationPath {
 	/// Tries to unwraps the nominal type `DerivationPath` (enum)
 	/// into this specific type.
 	public static func unwrap(derivationPath: DerivationPath) -> Self? {
-		switch derivationPath {
-		case let .identityPath(path): return path
-		default: return nil
-		}
+		try? derivationPath.asIdentityPath()
 	}
 }

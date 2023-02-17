@@ -65,7 +65,3 @@ extension EntitySecurityState {
 		}
 	}
 }
-
-extension Identifiable where Self: FactorInstanceProtocol, ID == FactorSourceReference {
-	public var id: ID { factorSourceReference }
-}

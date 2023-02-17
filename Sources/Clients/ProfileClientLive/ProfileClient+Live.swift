@@ -97,52 +97,54 @@ extension ProfileClient {
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
-			createEphemeralProfileAndUnsavedOnDeviceFactorSource: { request in
-				@Dependency(\.mnemonicClient.generate) var generateMnemonic
+			createEphemeralProfileAndUnsavedOnDeviceFactorSource: { _ in
+//				@Dependency(\.mnemonicClient.generate) var generateMnemonic
 
-				let mnemonic = try generateMnemonic(request.wordCount, request.language)
-
-				let newProfile = try await Profile.new(
-					networkAndGateway: request.networkAndGateway,
-					mnemonic: mnemonic
-				)
-
-				// This new profile is marked as "ephemeral" which means it is
-				// not allowed to be persisted to keychain.
-				await profileHolder.injectProfile(newProfile, isEphemeral: true)
-
-				return CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse(request: request, mnemonic: mnemonic, profile: newProfile)
+//				let mnemonic = try generateMnemonic(request.wordCount, request.language)
+//
+//				let newProfile = try await Profile.new(
+//					networkAndGateway: request.networkAndGateway,
+//					mnemonic: mnemonic
+//				)
+//
+//				// This new profile is marked as "ephemeral" which means it is
+//				// not allowed to be persisted to keychain.
+//				await profileHolder.injectProfile(newProfile, isEphemeral: true)
+//
+//				return CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse(request: request, mnemonic: mnemonic, profile: newProfile)
+				fixMultifactor()
 			},
 			injectProfileSnapshot: { snapshot in
 				let profile = try Profile(snapshot: snapshot)
 				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
-			commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: { request in
+			commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: { _ in
 
-				let mnemonic = request.onDeviceFactorSourceMnemonic
-
-				// FIXME: Cleanup post Betanet v2 when we have the new FactorSource format.
-				let expectedFactorSourceID = try HD.Root(
-					seed: mnemonic.seed(passphrase: request.bip39Passphrase)
-				).factorSourceID(
-					curve: Curve25519.self
-				)
-
-				try await profileHolder.getAsync { profile in
-					let factorSource = profile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first
-					guard factorSource.factorSourceID == expectedFactorSourceID else {
-						struct DiscrepancyMismatchingFactorSourceIDs: Swift.Error {}
-						throw DiscrepancyMismatchingFactorSourceIDs()
-					}
-					// all good
-					try await keychainClient.updateFactorSource(
-						mnemonic: mnemonic,
-						reference: factorSource.reference
-					)
-				}
-
-				try await profileHolder.persistAndAllowFuturePersistenceOfEphemeralProfile()
+//				let mnemonic = request.onDeviceFactorSourceMnemonic
+//
+//				// FIXME: Cleanup post Betanet v2 when we have the new FactorSource format.
+//				let expectedFactorSourceID = try HD.Root(
+//					seed: mnemonic.seed(passphrase: request.bip39Passphrase)
+//				).factorSourceID(
+//					curve: Curve25519.self
+//				)
+//
+//				try await profileHolder.getAsync { profile in
+//					let factorSource = profile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first
+//					guard factorSource.factorSourceID == expectedFactorSourceID else {
+//						struct DiscrepancyMismatchingFactorSourceIDs: Swift.Error {}
+//						throw DiscrepancyMismatchingFactorSourceIDs()
+//					}
+//					// all good
+//					try await keychainClient.updateFactorSource(
+//						mnemonic: mnemonic,
+//						reference: factorSource.reference
+//					)
+//				}
+//
+//				try await profileHolder.persistAndAllowFuturePersistenceOfEphemeralProfile()
+				fixMultifactor()
 
 			},
 			loadProfile: {
@@ -226,16 +228,17 @@ extension ProfileClient {
 				try await profileHolder.takeProfileSnapshot()
 			},
 			deleteProfileAndFactorSources: {
-				do {
-					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot(
-						// This should not be be shown due to settings of profile snapshot
-						// item when it was originally stored.
-						authenticationPrompt: "Read wallet data in order get reference to secret's to delete"
-					)
-				} catch {
-					try await keychainClient.removeProfileSnapshot()
-				}
-				await profileHolder.removeProfile()
+//				do {
+//					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot(
+//						// This should not be be shown due to settings of profile snapshot
+//						// item when it was originally stored.
+//						authenticationPrompt: "Read wallet data in order get reference to secret's to delete"
+//					)
+//				} catch {
+//					try await keychainClient.removeProfileSnapshot()
+//				}
+//				await profileHolder.removeProfile()
+				fixMultifactor()
 			},
 			hasAccountOnNetwork: hasAccountOnNetwork,
 			getAccounts: {
@@ -295,128 +298,133 @@ extension ProfileClient {
 					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
-			createUnsavedVirtualEntity: { request in
-				let networkID: NetworkID = await {
-					if let networkID = request.networkID {
-						return networkID
-					}
-					return await getCurrentNetworkID()
-				}()
-				let getDerivationPathRequest = try request.getDerivationPathRequest()
-				let (derivationPath, index) = try await getDerivationPathForNewEntity(getDerivationPathRequest)
-
-				let genesisFactorInstance: FactorInstance = try await {
-					let genesisFactorInstanceDerivationStrategy = request.genesisFactorInstanceDerivationStrategy
-					let mnemonic: Mnemonic
-					let factorSource = genesisFactorInstanceDerivationStrategy.factorSource
-					switch genesisFactorInstanceDerivationStrategy {
-					case .loadMnemonicFromKeychainForFactorSource:
-						guard let loadedMnemonic = try await keychainClient.loadFactorSourceMnemonic(
-							reference: factorSource.reference,
-							authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-						) else {
-							struct FailedToFindFactorSource: Swift.Error {}
-							throw FailedToFindFactorSource()
-						}
-						mnemonic = loadedMnemonic
-					case let .useMnemonic(unsavedMnemonic, _):
-						mnemonic = unsavedMnemonic
-					}
-
-					let genesisFactorInstanceResponse = try await factorSource.createAnyFactorInstanceForResponse(
-						input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
-							mnemonic: mnemonic,
-							derivationPath: derivationPath,
-							includePrivateKey: false
-						)
-					)
-					return genesisFactorInstanceResponse.factorInstance
-				}()
-
-				let displayName = request.displayName
-				let unsecuredControl = UnsecuredEntityControl(
-					genesisFactorInstance: genesisFactorInstance
-				)
-
-				switch request.entityKind {
-				case .identity:
-					let identityAddress = try OnNetwork.Persona.deriveAddress(
-						networkID: networkID,
-						publicKey: genesisFactorInstance.publicKey
-					)
-
-					let persona = try OnNetwork.Persona(
-						networkID: networkID,
-						address: identityAddress,
-						securityState: .unsecured(unsecuredControl),
-						index: index,
-						derivationPath: derivationPath.asIdentityPath(),
-						displayName: displayName,
-						fields: .init()
-					)
-					return persona
-				case .account:
-					let accountAddress = try OnNetwork.Account.deriveAddress(
-						networkID: networkID,
-						publicKey: genesisFactorInstance.publicKey
-					)
-
-					let account = try OnNetwork.Account(
-						networkID: networkID,
-						address: accountAddress,
-						securityState: .unsecured(unsecuredControl),
-						index: index,
-						derivationPath: derivationPath.asAccountPath(),
-						displayName: displayName
-					)
-					return account
-				}
+			createUnsavedVirtualEntity: { _ in
+//				let networkID: NetworkID = await {
+//					if let networkID = request.networkID {
+//						return networkID
+//					}
+//					return await getCurrentNetworkID()
+//				}()
+//				let getDerivationPathRequest = try request.getDerivationPathRequest()
+//				let (derivationPath, index) = try await getDerivationPathForNewEntity(getDerivationPathRequest)
+//
+//				let genesisFactorInstance: FactorInstance = try await {
+				////					let genesisFactorInstanceDerivationStrategy = request.genesisFactorInstanceDerivationStrategy
+				////					let mnemonic: Mnemonic
+				////					let factorSource = genesisFactorInstanceDerivationStrategy.factorSource
+				////					switch genesisFactorInstanceDerivationStrategy {
+				////					case .loadMnemonicFromKeychainForFactorSource:
+				////						guard let loadedMnemonic = try await keychainClient.loadFactorSourceMnemonic(
+				////							reference: factorSource.reference,
+				////							authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+				////						) else {
+				////							struct FailedToFindFactorSource: Swift.Error {}
+				////							throw FailedToFindFactorSource()
+				////						}
+				////						mnemonic = loadedMnemonic
+				////					case let .useMnemonic(unsavedMnemonic, _):
+				////						mnemonic = unsavedMnemonic
+				////					}
+				////
+				////					let genesisFactorInstanceResponse = try await factorSource.createAnyFactorInstanceForResponse(
+				////						input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
+				////							mnemonic: mnemonic,
+				////							derivationPath: derivationPath,
+				////							includePrivateKey: false
+				////						)
+				////					)
+				////					return genesisFactorInstanceResponse.factorInstance
+				//                    fixMultifactor()
+//				}()
+//
+//				let displayName = request.displayName
+//				let unsecuredControl = UnsecuredEntityControl(
+//					genesisFactorInstance: genesisFactorInstance
+//				)
+//
+//				switch request.entityKind {
+//				case .identity:
+//					let identityAddress = try OnNetwork.Persona.deriveAddress(
+//						networkID: networkID,
+//						publicKey: genesisFactorInstance.publicKey
+//					)
+//
+//					let persona = try OnNetwork.Persona(
+//						networkID: networkID,
+//						address: identityAddress,
+//						securityState: .unsecured(unsecuredControl),
+//						index: index,
+//						derivationPath: derivationPath.asIdentityPath(),
+//						displayName: displayName,
+//						fields: .init()
+//					)
+//					return persona
+//				case .account:
+//					let accountAddress = try OnNetwork.Account.deriveAddress(
+//						networkID: networkID,
+//						publicKey: genesisFactorInstance.publicKey
+//					)
+//
+//					let account = try OnNetwork.Account(
+//						networkID: networkID,
+//						address: accountAddress,
+//						securityState: .unsecured(unsecuredControl),
+//						index: index,
+//						derivationPath: derivationPath.asAccountPath(),
+//						displayName: displayName
+//					)
+//					return account
+//				}
+				fixMultifactor()
 			},
-			addAccount: { account in
-				try await profileHolder.asyncMutating { profile in
-					try await profile.addAccount(account)
-				}
+			addAccount: { _ in
+//				try await profileHolder.asyncMutating { profile in
+//					try await profile.addAccount(account)
+//				}
+				fixMultifactor()
 			},
-			addPersona: { persona in
-				try await profileHolder.asyncMutating { profile in
-					try await profile.addPersona(persona)
-				}
+			addPersona: { _ in
+				//                try await profileHolder.asyncMutating { profile in
+				//                    try await profile.addPersona(persona)
+				//                }
+				fixMultifactor()
 			},
 			lookupAccountByAddress: lookupAccountByAddress,
-			signersForAccountsGivenAddresses: { request in
+			signersForAccountsGivenAddresses: { _ in
 
-				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { reference in
-					try await keychainClient.loadFactorSourceMnemonic(
-						reference: reference,
-						authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-					)
-				}
-
-				func getAccountSignersFromAddresses() async throws -> NonEmpty<OrderedSet<SignersOfAccount>>? {
-					guard let addresses = NonEmpty(rawValue: request.addresses) else { return nil }
-
-					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
-
-					return try await profileHolder.getAsync { profile in
-						try await profile.signers(
-							ofEntities: accounts,
-							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-						)
-					}
-				}
-
-				guard let fromAddresses = try? await getAccountSignersFromAddresses() else {
-					// TransactionManifest does not reference any accounts => use any account!
-					return try await profileHolder.getAsync { profile in
-						try await profile.signers(
-							networkID: request.networkID,
-							entityType: OnNetwork.Account.self,
-							entityIndex: 0,
-							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-						)
-					}
-				}
-				return fromAddresses
+//				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { reference in
+//					try await keychainClient.loadFactorSourceMnemonic(
+//						reference: reference,
+//						authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+//					)
+//				}
+//
+//				func getAccountSignersFromAddresses() async throws -> NonEmpty<OrderedSet<SignersOfAccount>>? {
+//					guard let addresses = NonEmpty(rawValue: request.addresses) else { return nil }
+//
+//					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
+//
+//					return try await profileHolder.getAsync { profile in
+//						try await profile.signers(
+//							ofEntities: accounts,
+//							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
+//						)
+//					}
+//				}
+//
+//				guard let fromAddresses = try? await getAccountSignersFromAddresses() else {
+//					// TransactionManifest does not reference any accounts => use any account!
+//					return try await profileHolder.getAsync { profile in
+//						try await profile.signers(
+//							networkID: request.networkID,
+//							entityType: OnNetwork.Account.self,
+//							entityIndex: 0,
+//							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
+//						)
+//					}
+//				}
+//				return fromAddresses
+				fixMultifactor()
 			}
 		)
 	}()

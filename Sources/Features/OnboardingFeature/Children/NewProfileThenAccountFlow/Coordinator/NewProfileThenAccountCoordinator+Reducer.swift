@@ -30,7 +30,7 @@ public struct NewProfileThenAccountCoordinator: Sendable, FeatureReducer {
 				config: .init(
 					specificGenesisFactorInstanceDerivationStrategy: .useMnemonic(
 						unsavedProfile.onDeviceFactorSourceMnemonic,
-						forFactorSource: unsavedProfile.profile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first
+						forFactorSource: unsavedProfile.profile.factorSources.first(where: { $0.kind == .device })!
 					),
 					isFirstEntity: true,
 					canBeDismissed: false,

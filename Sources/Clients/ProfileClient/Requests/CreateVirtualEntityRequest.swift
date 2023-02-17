@@ -4,13 +4,13 @@ import ProfileModels
 
 // MARK: - GenesisFactorInstanceDerivationStrategy
 public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {
-	case loadMnemonicFromKeychainForFactorSource(Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource)
+	case loadMnemonicFromKeychainForFactorSource(FactorSource)
 
 	/// Needed when creating a virtual entity as part of NewProfileThenAccount flow (part of Onboarding),
 	/// during which no mnemonic has yet been saved into keychain.
-	case useMnemonic(Mnemonic, forFactorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource)
+	case useMnemonic(Mnemonic, forFactorSource: FactorSource)
 
-	public var factorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
+	public var factorSource: FactorSource {
 		switch self {
 		case let .loadMnemonicFromKeychainForFactorSource(factorSource): return factorSource
 		case let .useMnemonic(_, factorSource): return factorSource
@@ -47,6 +47,11 @@ public struct CreateVirtualEntityRequest: Sendable, Equatable {
 
 extension CreateVirtualEntityRequest {
 	public func getDerivationPathRequest() throws -> GetDerivationPathForNewEntityRequest {
-		try .init(networkID: networkID, factorSource: genesisFactorInstanceDerivationStrategy.factorSource, entityKind: entityKind, keyKind: .transactionSigningKey)
+		try .init(
+			networkID: networkID,
+			factorSource: genesisFactorInstanceDerivationStrategy.factorSource,
+			entityKind: entityKind,
+			keyKind: .transactionSigningKey
+		)
 	}
 }

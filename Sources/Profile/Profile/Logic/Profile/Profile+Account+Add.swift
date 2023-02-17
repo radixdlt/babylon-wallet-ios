@@ -2,6 +2,17 @@ import Cryptography
 import EngineToolkit
 import Prelude
 
+extension NonEmpty where Collection == IdentifiedArrayOf<OnNetwork.Account> {
+	// FIXME: uh terrible, please fix this.
+	@discardableResult
+	public mutating func appendAccount(_ account: OnNetwork.Account) -> OnNetwork.Account {
+		var orderedSet = self.rawValue
+		orderedSet.append(account)
+		self = .init(rawValue: orderedSet)!
+		return account
+	}
+}
+
 extension Profile {
 	public struct NetworkAlreadyExists: Swift.Error {}
 	public struct AccountDoesNotHaveIndexZero: Swift.Error {}
@@ -32,109 +43,90 @@ extension Profile {
 
 // MARK: Create Account
 extension Profile {
-	/// Creates a new **Virtual** `Account` without saving it anywhere
-	public static func createNewVirtualAccount(
-		factorSources: FactorSources,
-		accountIndex: Int,
-		networkID: NetworkID,
-		displayName: NonEmpty<String>,
-		createFactorInstance: @escaping CreateFactorInstanceForRequest
-	) async throws -> OnNetwork.Account {
-		try await OnNetwork.createNewVirtualEntity(
-			factorSources: factorSources,
-			index: accountIndex,
-			networkID: networkID,
-			displayName: displayName,
-			createFactorInstance: createFactorInstance,
-			makeEntity: {
-				OnNetwork.Account(
-					networkID: networkID,
-					address: $0,
-					securityState: $1,
-					index: $2,
-					derivationPath: $3,
-					displayName: $4
-				)
-			}
-		)
-	}
+//	/// Creates a new **Virtual** `Account` without saving it anywhere
+//	public static func createNewVirtualAccount(
+//		factorSources: FactorSources,
+//		accountIndex: Int,
+//		networkID: NetworkID,
+//		displayName: NonEmpty<String>,
+//		createFactorInstance: @escaping CreateFactorInstanceForRequest
+//	) async throws -> OnNetwork.Account {
+//		try await OnNetwork.createNewVirtualEntity(
+//			factorSources: factorSources,
+//			index: accountIndex,
+//			networkID: networkID,
+//			displayName: displayName,
+//			createFactorInstance: createFactorInstance,
+//			makeEntity: {
+//				OnNetwork.Account(
+//					networkID: networkID,
+//					address: $0,
+//					securityState: $1,
+//					index: $2,
+//					derivationPath: $3,
+//					displayName: $4
+//				)
+//			}
+//		)
+//	}
 
-	/// Creates a new Virtual `Account` **without saving it** anywhere or adding it to the profile.
-	public func createNewVirtualAccountWithoutSavingIt(
-		networkID: NetworkID,
-		accountIndex: Int = 0,
-		displayName: NonEmpty<String>,
-		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
-	) async throws -> OnNetwork.Account {
-		try await Self.createNewVirtualAccount(
-			factorSources: self.factorSources,
-			accountIndex: accountIndex,
-			networkID: networkID,
-			displayName: displayName,
-			createFactorInstance: mnemonicForFactorSourceByReferenceToCreateFactorInstance(
-				includePrivateKey: false,
-				mnemonicForFactorSourceByReference
-			)
-		)
-	}
-}
-
-extension FactorSources {
-	public func onDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(
-		byReference needle: FactorSourceReference
-	) -> (any OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource)? {
-		switch needle.factorSourceKind {
-		case .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind:
-			return self.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first(where: { $0.reference == needle })
-		case .secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSourceKind:
-			return self.secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources.first(where: { $0.reference == needle })
-		}
-	}
-}
-
-// MARK: - CreateAccountError
-public enum CreateAccountError: Swift.Error, Equatable {
-	case noFactorSourceFoundInProfileForReference(FactorSourceReference)
-	case noMnemonicFoundInKeychainForReference(FactorSourceReference)
+//	/// Creates a new Virtual `Account` **without saving it** anywhere or adding it to the profile.
+//	public func createNewVirtualAccountWithoutSavingIt(
+//		networkID: NetworkID,
+//		accountIndex: Int = 0,
+//		displayName: NonEmpty<String>,
+//		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
+//	) async throws -> OnNetwork.Account {
+//		try await Self.createNewVirtualAccount(
+//			factorSources: self.factorSources,
+//			accountIndex: accountIndex,
+//			networkID: networkID,
+//			displayName: displayName,
+//			createFactorInstance: mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+//				includePrivateKey: false,
+//				mnemonicForFactorSourceByReference
+//			)
+//		)
+//	}
 }
 
 // MARK: Add Virtual Account
 extension Profile {
-	/// Creates a new **Virtual** `Account` and saves it into the profile, by trying to load
-	/// mnemonics using `mnemonicForFactorSourceByReference`, to create factor instances for this new account.
-	@discardableResult
-	public mutating func createNewVirtualAccount(
-		networkID: NetworkID,
-		displayName: NonEmpty<String>,
-		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
-	) async throws -> OnNetwork.Account {
-		try await createNewVirtualAccount(
-			networkID: networkID,
-			displayName: displayName,
-			createFactorInstance: mnemonicForFactorSourceByReferenceToCreateFactorInstance(
-				includePrivateKey: false,
-				mnemonicForFactorSourceByReference
-			)
-		)
-	}
+//	/// Creates a new **Virtual** `Account` and saves it into the profile, by trying to load
+//	/// mnemonics using `mnemonicForFactorSourceByReference`, to create factor instances for this new account.
+//	@discardableResult
+//	public mutating func createNewVirtualAccount(
+//		networkID: NetworkID,
+//		displayName: NonEmpty<String>,
+//		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
+//	) async throws -> OnNetwork.Account {
+//		try await createNewVirtualAccount(
+//			networkID: networkID,
+//			displayName: displayName,
+//			createFactorInstance: mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+//				includePrivateKey: false,
+//				mnemonicForFactorSourceByReference
+//			)
+//		)
+//	}
 
-	/// Creates a new **Virtual** `Account` and saves it into the profile.
-	@discardableResult
-	public mutating func createNewVirtualAccount(
-		networkID: NetworkID,
-		displayName: NonEmpty<String>,
-		createFactorInstance: @escaping CreateFactorInstanceForRequest
-	) async throws -> OnNetwork.Account {
-		let account = try await self.creatingNewVirtualAccount(
-			networkID: networkID,
-			displayName: displayName,
-			createFactorInstance: createFactorInstance
-		)
-
-		try await addAccount(account)
-
-		return account
-	}
+//	/// Creates a new **Virtual** `Account` and saves it into the profile.
+//	@discardableResult
+//	public mutating func createNewVirtualAccount(
+//		networkID: NetworkID,
+//		displayName: NonEmpty<String>,
+//		createFactorInstance: @escaping CreateFactorInstanceForRequest
+//	) async throws -> OnNetwork.Account {
+//		let account = try await self.creatingNewVirtualAccount(
+//			networkID: networkID,
+//			displayName: displayName,
+//			createFactorInstance: createFactorInstance
+//		)
+//
+//		try await addAccount(account)
+//
+//		return account
+//	}
 
 	/// Saves an `Account` into the profile
 	public mutating func addAccount(
@@ -230,79 +222,79 @@ extension Profile {
 		try updateOnNetwork(network)
 	}
 
-	/// Creates a new **Virtual** `Account` without saving it into the profile.
-	public func creatingNewVirtualAccount(
-		networkID: NetworkID,
-		displayName: NonEmpty<String>,
-		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
-	) async throws -> OnNetwork.Account {
-		try await creatingNewVirtualAccount(
-			networkID: networkID,
-			displayName: displayName,
-			createFactorInstance: mnemonicForFactorSourceByReferenceToCreateFactorInstance(
-				includePrivateKey: false,
-				mnemonicForFactorSourceByReference
-			)
-		)
-	}
-
-	/// Creates a new **Virtual** `Account` without saving it into the profile.
-	public func creatingNewVirtualAccount(
-		networkID: NetworkID,
-		displayName: NonEmpty<String>,
-		createFactorInstance: @escaping CreateFactorInstanceForRequest
-	) async throws -> OnNetwork.Account {
-		let maybeNetworkNetwork = try? onNetwork(id: networkID)
-
-		let account = try await Self.createNewVirtualAccount(
-			factorSources: self.factorSources,
-			accountIndex: maybeNetworkNetwork?.accounts.count ?? 0,
-			networkID: networkID,
-			displayName: displayName,
-			createFactorInstance: createFactorInstance
-		)
-
-		return account
-	}
+//	/// Creates a new **Virtual** `Account` without saving it into the profile.
+//	public func creatingNewVirtualAccount(
+//		networkID: NetworkID,
+//		displayName: NonEmpty<String>,
+//		mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
+//	) async throws -> OnNetwork.Account {
+//		try await creatingNewVirtualAccount(
+//			networkID: networkID,
+//			displayName: displayName,
+//			createFactorInstance: mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+//				includePrivateKey: false,
+//				mnemonicForFactorSourceByReference
+//			)
+//		)
+//	}
+//
+//	/// Creates a new **Virtual** `Account` without saving it into the profile.
+//	public func creatingNewVirtualAccount(
+//		networkID: NetworkID,
+//		displayName: NonEmpty<String>,
+//		createFactorInstance: @escaping CreateFactorInstanceForRequest
+//	) async throws -> OnNetwork.Account {
+//		let maybeNetworkNetwork = try? onNetwork(id: networkID)
+//
+//		let account = try await Self.createNewVirtualAccount(
+//			factorSources: self.factorSources,
+//			accountIndex: maybeNetworkNetwork?.accounts.count ?? 0,
+//			networkID: networkID,
+//			displayName: displayName,
+//			createFactorInstance: createFactorInstance
+//		)
+//
+//		return account
+//	}
 }
 
-extension Profile {
-	internal static func mnemonicForFactorSourceByReferenceToCreateFactorInstance(
-		factorSources: FactorSources,
-		includePrivateKey: Bool,
-		_ mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
-	) -> CreateFactorInstanceForRequest {
-		{ createFactorInstanceRequest in
-			switch createFactorInstanceRequest {
-			case let .fromNonHardwareHierarchicalDeterministicMnemonicFactorSource(nonHWHDRequest):
-				guard let factorSource = factorSources.onDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(byReference: nonHWHDRequest.reference) else {
-					throw CreateAccountError.noFactorSourceFoundInProfileForReference(nonHWHDRequest.reference)
-				}
-				precondition(factorSource.reference == nonHWHDRequest.reference)
-				guard let mnemonic = try await mnemonicForFactorSourceByReference(nonHWHDRequest.reference) else {
-					throw CreateAccountError.noMnemonicFoundInKeychainForReference(factorSource.reference)
-				}
-				return try await factorSource.createAnyFactorInstanceForResponse(
-					input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
-						mnemonic: mnemonic,
-						derivationPath: nonHWHDRequest.derivationPath,
-						includePrivateKey: includePrivateKey
-					)
-				)
-			}
-		}
-	}
-
-	internal func mnemonicForFactorSourceByReferenceToCreateFactorInstance(
-		includePrivateKey: Bool,
-		_ mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
-	) -> CreateFactorInstanceForRequest {
-		Self.mnemonicForFactorSourceByReferenceToCreateFactorInstance(
-			factorSources: self.factorSources,
-			includePrivateKey: includePrivateKey,
-			mnemonicForFactorSourceByReference
-		)
-	}
-}
-
-public typealias MnemonicForFactorSourceByReference = @Sendable (FactorSourceReference) async throws -> Mnemonic?
+// extension Profile {
+//	internal static func mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+//		factorSources: FactorSources,
+//		includePrivateKey: Bool,
+//		_ mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
+//	) -> CreateFactorInstanceForRequest {
+//		{ createFactorInstanceRequest in
+//			switch createFactorInstanceRequest {
+//			case let .fromNonHardwareHierarchicalDeterministicMnemonicFactorSource(nonHWHDRequest):
+//				guard let factorSource = factorSources.onDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(byReference: nonHWHDRequest.reference) else {
+//					throw CreateAccountError.noFactorSourceFoundInProfileForReference(nonHWHDRequest.reference)
+//				}
+//				precondition(factorSource.reference == nonHWHDRequest.reference)
+//				guard let mnemonic = try await mnemonicForFactorSourceByReference(nonHWHDRequest.reference) else {
+//					throw CreateAccountError.noMnemonicFoundInKeychainForReference(factorSource.reference)
+//				}
+//				return try await factorSource.createAnyFactorInstanceForResponse(
+//					input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
+//						mnemonic: mnemonic,
+//						derivationPath: nonHWHDRequest.derivationPath,
+//						includePrivateKey: includePrivateKey
+//					)
+//				)
+//			}
+//		}
+//	}
+//
+//	internal func mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+//		includePrivateKey: Bool,
+//		_ mnemonicForFactorSourceByReference: @escaping MnemonicForFactorSourceByReference
+//	) -> CreateFactorInstanceForRequest {
+//		Self.mnemonicForFactorSourceByReferenceToCreateFactorInstance(
+//			factorSources: self.factorSources,
+//			includePrivateKey: includePrivateKey,
+//			mnemonicForFactorSourceByReference
+//		)
+//	}
+// }
+//
+// public typealias MnemonicForFactorSourceByReference = @Sendable (FactorSourceReference) async throws -> Mnemonic?

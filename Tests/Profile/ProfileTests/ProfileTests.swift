@@ -64,7 +64,7 @@ final class ProfileTests: TestCase {
 			profile.addFactorSource(secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource)
 		)
 
-		let deviceFactorSource = try Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(
+		let deviceFactorSource = try FactorSource(
 			mnemonic: curve25519FactorSourceMnemonic
 		)
 
