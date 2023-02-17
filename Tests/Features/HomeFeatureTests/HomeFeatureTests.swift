@@ -37,7 +37,7 @@ final class HomeFeatureTests: TestCase {
 		let accountDetailsState = AccountDetails.State(for: accountRowState)
 		var initialState: Home.State = .previewValue
 		initialState.accountDetails = accountDetailsState
-		initialState.accountList = .init(accounts: .init(rawValue: .init([account]))!)
+		initialState.accountList = .init(accounts: .init(uniqueElements: [account].map(AccountList.Row.State.init(account:))))
 
 		let store = TestStore(
 			initialState: initialState,
@@ -45,7 +45,7 @@ final class HomeFeatureTests: TestCase {
 		)
 
 		// when
-		await store.send(.internal(.system(.fetchPortfolioResult(.success(totalPortfolio))))) { [address] in
+		await store.send(.internal(.fetchPortfolioResult(.success(totalPortfolio)))) { [address] in
 			// then
 			// local dictionary
 			$0.accountPortfolioDictionary = totalPortfolio
@@ -122,7 +122,7 @@ final class HomeFeatureTests: TestCase {
 		)
 
 		// when
-		await store.send(.internal(.system(.fetchPortfolioResult(.success(accountPortfolio))))) {
+		await store.send(.internal(.fetchPortfolioResult(.success(accountPortfolio)))) {
 			// then
 			guard let key = accountPortfolio.first?.key else {
 				XCTFail("Failed to fetch first account")
