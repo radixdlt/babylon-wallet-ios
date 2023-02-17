@@ -4,26 +4,21 @@ import Prelude
 
 // MARK: - WebSocketClient
 protocol WebSocketClient: Sendable {
-	var incomingMessageStream: AsyncThrowingStream<Data, Error> { get }
+	var incommingMessages: AsyncThrowingStream<Data, Error> { get }
 	func send(message: Data) async throws
 }
-
-// MARK: - AnyAsyncIterator + Sendable
-extension AnyAsyncIterator: @unchecked Sendable where Self.Element: Sendable {}
-
-// MARK: - AnyAsyncSequence + Sendable
-extension AnyAsyncSequence: @unchecked Sendable where Self.AsyncIterator: Sendable {}
 
 // MARK: - SignalingClient
 struct SignalingClient {
 	// MARK: - Configuration
 	private let encryptionKey: EncryptionKey
-	private let webSocketClient: WebSocketClient
 	private let jsonDecoder: JSONDecoder
 	private let jsonEncoder: JSONEncoder
 	private let connectionID: SignalingServerConnectionID
 	private let idBuilder: @Sendable () -> RequestID
 	private let ownClientId: ClientID
+	private let webSocketClient: WebSocketClient
+	private let clientSource: ClientMessage.Source
 
 	// MARK: - Streams
 	private let incommingMessages: AnyAsyncSequence<IncommingMessage>
@@ -43,7 +38,8 @@ struct SignalingClient {
 	     idBuilder: @Sendable @escaping () -> RequestID = { .init(UUID().uuidString) },
 	     ownClientId: ClientID = .init(UUID().uuidString),
 	     jsonDecoder: JSONDecoder = .init(),
-	     jsonEncoder: JSONEncoder = .init())
+	     jsonEncoder: JSONEncoder = .init(),
+	     clientSource: ClientMessage.Source = .wallet)
 	{
 		self.encryptionKey = encryptionKey
 		self.webSocketClient = webSocketClient
@@ -52,9 +48,10 @@ struct SignalingClient {
 		self.ownClientId = ownClientId
 		self.jsonEncoder = jsonEncoder
 		self.jsonDecoder = jsonDecoder
+		self.clientSource = clientSource
 
 		self.incommingMessages = webSocketClient
-			.incomingMessageStream
+			.incommingMessages
 			.eraseToAnyAsyncSequence()
 			.mapSkippingError {
 				try jsonDecoder.decode(IncommingMessage.self, from: $0)
@@ -80,21 +77,25 @@ struct SignalingClient {
 		self.onOffer = self.incommingRemoteClientMessagges
 			.compactMap(\.offer)
 			.logInfo("Received Offer from remote client: %@")
+			.share()
 			.eraseToAnyAsyncSequence()
 
 		self.onAnswer = self.incommingRemoteClientMessagges
 			.compactMap(\.answer)
 			.logInfo("Received Answer from remote client: %@")
+			.share()
 			.eraseToAnyAsyncSequence()
 
 		self.onICECanddiate = self.incommingRemoteClientMessagges
 			.compactMap(\.addICE)
 			.logInfo("Received ICECandidate from remote client: %@")
+			.share()
 			.eraseToAnyAsyncSequence()
 
 		self.onRemoteClientState = self.incommingSignalingServerMessagges
 			.compactMap(\.notification)
 			.logInfo("Received Notification from Signaling Server: %@")
+			.share()
 			.eraseToAnyAsyncSequence()
 	}
 
@@ -103,10 +104,11 @@ struct SignalingClient {
 		let encodedPrimitive = try jsonEncoder.encode(rtcPrimitive)
 		let encryptedPrimitive = try encryptionKey.encrypt(data: encodedPrimitive)
 		let encryptedPayload = EncryptedPayload(.init(data: encryptedPrimitive))
+		let method = ClientMessage.Method(from: rtcPrimitive)
 
 		let message = ClientMessage(requestId: id,
-		                            method: .init(from: rtcPrimitive),
-		                            source: .wallet,
+		                            method: method,
+		                            source: clientSource,
 		                            sourceClientId: ownClientId,
 		                            targetClientId: rtcPrimitive.clientId,
 		                            connectionId: connectionID,
@@ -114,10 +116,8 @@ struct SignalingClient {
 
 		let encodedMessage = try jsonEncoder.encode(message)
 
-		loggerGlobal.info("Sending message to remote client")
 		try await webSocketClient.send(message: encodedMessage)
 		try await waitForRequestAck(id)
-		loggerGlobal.info("Message sent to remote client")
 	}
 
 	private func waitForRequestAck(_ requestId: RequestID) async throws {
@@ -127,31 +127,5 @@ struct SignalingClient {
 				try incoming.resultOfRequest(id: requestId)?.get()
 			}
 			.first { true }
-	}
-}
-
-extension AsyncSequence {
-	func mapSkippingError<NewValue: Sendable>(
-		_ f: @Sendable @escaping (Element) async throws -> NewValue,
-		logError: @Sendable @escaping (Error) -> Void = { _ in }
-	) -> AnyAsyncSequence<NewValue> where Element: Sendable, Self: Sendable {
-		compactMap { element in
-			do {
-				return try await f(element)
-			} catch {
-				logError(error)
-				return nil
-			}
-		}.eraseToAnyAsyncSequence()
-	}
-}
-
-extension AsyncSequence {
-	func logInfo(
-		_ message: String
-	) -> AnyAsyncSequence<Element> where Element: Sendable, Self: Sendable {
-		handleEvents(onElement: { element in
-			loggerGlobal.info(.init(stringLiteral: String(format: message, "\(dump(element))")))
-		}).eraseToAnyAsyncSequence()
 	}
 }

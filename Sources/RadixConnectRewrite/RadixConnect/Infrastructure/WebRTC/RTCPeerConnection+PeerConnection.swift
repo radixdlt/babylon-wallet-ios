@@ -2,7 +2,7 @@ import WebRTC
 
 // MARK: - WebRTCFactory
 struct WebRTCFactory {
-        struct FailedToCreatePeerConnectionError: Error {}
+	struct FailedToCreatePeerConnectionError: Error {}
 
 	static let factory: RTCPeerConnectionFactory = {
 		RTCInitializeSSL()
@@ -50,12 +50,13 @@ struct WebRTCFactory {
 
 	static func makeRTCPeerConnection(delegate: RTCPeerConnectionDelegate) throws -> PeerConnection {
 		guard let peerConnection = factory.peerConnection(with: peerConnectionConfig,
-		                       constraints: peerConnectionConstraints,
-                                                                  delegate: delegate) else {
-                        throw FailedToCreatePeerConnectionError()
-                }
+		                                                  constraints: peerConnectionConstraints,
+		                                                  delegate: delegate)
+		else {
+			throw FailedToCreatePeerConnectionError()
+		}
 
-                return peerConnection
+		return peerConnection
 	}
 }
 

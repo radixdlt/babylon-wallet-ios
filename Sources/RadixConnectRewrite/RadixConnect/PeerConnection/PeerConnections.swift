@@ -4,25 +4,79 @@ import Prelude
 
 // MARK: - PeerConnectionFactory
 protocol PeerConnectionFactory: Sendable {
-	func makePeerConnectionClient() throws -> PeerConnectionClient
+	func makePeerConnectionClient(for clienclientIDtId: ClientID) throws -> PeerConnectionClient
 }
 
-func makePeerConnections(
-	using signalingServerClient: SignalingClient,
-	factory: PeerConnectionFactory
-) -> AnyAsyncSequence<Result<PeerConnectionClient, Error>> {
-	@Sendable func negotiatePeerConnection(_ offer: IdentifiedPrimitive<RTCPrimitive.Offer>) async throws -> PeerConnectionClient {
-		let peerConnectionClient = try factory.makePeerConnectionClient()
+// MARK: - PeerConnectionBuilder
+final class PeerConnectionBuilder {
+	let peerConnections: AsyncStream<Result<PeerConnectionClient, FailedToCreatePeerConnectionError>>
 
-		let onLocalIceCandidate = peerConnectionClient.onGeneratedICECandidate.map {
-			IdentifiedPrimitive(content: $0, id: offer.id)
-		}.map {
-			try await signalingServerClient.sendToRemote(rtcPrimitive: .iceCandidate($0))
-		}.eraseToAnyAsyncSequence()
+	private let signalingServerClient: SignalingClient
+	private let factory: PeerConnectionFactory
+	private let peerConnectionsContinuation: AsyncStream<Result<PeerConnectionClient, FailedToCreatePeerConnectionError>>.Continuation
+	private let negotiationTask: Task<Void, Error>
 
-		let onRemoteIceCandidate = signalingServerClient.onICECanddiate.map {
-			try await peerConnectionClient.onRemoteICECandidate($0.content)
-		}.eraseToAnyAsyncSequence()
+	init(signalingServerClient: SignalingClient, factory: PeerConnectionFactory) {
+		self.signalingServerClient = signalingServerClient
+		self.factory = factory
+
+		let (peerConnections, peerConnectionsContinuation) = AsyncStream<Result<PeerConnectionClient, FailedToCreatePeerConnectionError>>.streamWithContinuation()
+		self.peerConnections = peerConnections
+		self.peerConnectionsContinuation = peerConnectionsContinuation
+
+		@Sendable func negotiate(_ offer: IdentifiedPrimitive<RTCPrimitive.Offer>) async {
+			do {
+				let peerConnection = try await Self.negotiatePeerConnection(offer, signalingServerClient: signalingServerClient, factory: factory)
+				peerConnectionsContinuation.yield(.success(peerConnection))
+			} catch {
+				peerConnectionsContinuation.yield(
+					.failure(
+						FailedToCreatePeerConnectionError(
+							remoteClientId: offer.id,
+							underlyingError: error
+						)
+					)
+				)
+			}
+		}
+
+		self.negotiationTask = Task {
+			try await withThrowingTaskGroup(of: Void.self) { group in
+				for try await offer in signalingServerClient.onOffer {
+					_ = group.addTaskUnlessCancelled {
+						try Task.checkCancellation()
+						guard !Task.isCancelled else { return }
+						await negotiate(offer)
+					}
+				}
+			}
+		}
+	}
+
+	deinit {
+		negotiationTask.cancel()
+	}
+
+	static func negotiatePeerConnection(_ offer: IdentifiedPrimitive<RTCPrimitive.Offer>,
+	                                    signalingServerClient: SignalingClient,
+	                                    factory: PeerConnectionFactory) async throws -> PeerConnectionClient
+	{
+		let peerConnectionClient = try factory.makePeerConnectionClient(for: offer.id)
+
+		let onLocalIceCandidate = peerConnectionClient
+			.onGeneratedICECandidate
+			.map { candidate in
+				let primitive = IdentifiedPrimitive(content: candidate, id: offer.id)
+				return try await signalingServerClient.sendToRemote(rtcPrimitive: .iceCandidate(primitive))
+			}.eraseToAnyAsyncSequence()
+
+		let onRemoteIceCandidate = signalingServerClient
+			.onICECanddiate
+			.filter { $0.id == offer.id }
+			.map {
+				try await peerConnectionClient.onRemoteICECandidate($0.content)
+			}
+			.eraseToAnyAsyncSequence()
 
 		let onConnectionEstablished = peerConnectionClient
 			.onIceConnectionState
@@ -36,7 +90,7 @@ func makePeerConnections(
 		let localAnswer = try await peerConnectionClient.createAnswer()
 		try await signalingServerClient.sendToRemote(rtcPrimitive: .answer(.init(content: localAnswer, id: offer.id)))
 
-		Task {
+		let iceExchangeTask = Task {
 			await withThrowingTaskGroup(of: Void.self) { group in
 				onLocalIceCandidate.await(inGroup: &group)
 				onRemoteIceCandidate.await(inGroup: &group)
@@ -44,26 +98,13 @@ func makePeerConnections(
 		}
 
 		_ = await onConnectionEstablished.collect()
-
+		iceExchangeTask.cancel()
 		return peerConnectionClient
 	}
-
-	return signalingServerClient
-		.onOffer
-		.map {
-			try await negotiatePeerConnection($0)
-		}
-		.mapToResult()
-		.eraseToAnyAsyncSequence()
 }
 
-extension AsyncSequence where Element == Void {
-	func await(inGroup group: inout ThrowingTaskGroup<Void, Error>) where Self: Sendable {
-		_ = group.addTaskUnlessCancelled {
-			try Task.checkCancellation()
-			for try await _ in self {
-				guard !Task.isCancelled else { return }
-			}
-		}
-	}
+// MARK: - FailedToCreatePeerConnectionError
+struct FailedToCreatePeerConnectionError: Error {
+	let remoteClientId: ClientID
+	let underlyingError: Error
 }

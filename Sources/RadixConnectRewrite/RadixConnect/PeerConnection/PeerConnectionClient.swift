@@ -3,11 +3,13 @@ import Foundation
 
 // MARK: - PeerConnectionClient
 struct PeerConnectionClient {
-	let peerConnection: PeerConnection
-	let delegate: PeerConnectionDelegate
+	let id: ClientID
+	private let peerConnection: PeerConnection
+	private let delegate: PeerConnectionDelegate
 	private let dataChannelClient: DataChannelClient
 
-	init(peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
+	init(id: ClientID, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
+		self.id = id
 		self.peerConnection = peerConnection
 		self.delegate = delegate
 		self.dataChannelClient = try peerConnection.createDataChannel()

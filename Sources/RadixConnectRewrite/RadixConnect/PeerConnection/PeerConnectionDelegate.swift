@@ -21,3 +21,8 @@ protocol PeerConnectionDelegate: Sendable {
 	var onSignalingState: AsyncStream<SignalingState> { get }
 	var onGeneratedICECandidate: AsyncStream<RTCPrimitive.ICECandidate> { get }
 }
+
+// MARK: - SignalingState
+public enum SignalingState: String, Sendable, Hashable, Codable {
+	case closed, stable, haveLocalOffer, haveLocalPrAnswer, haveRemoteOffer, haveRemotePrAnswer
+}

@@ -84,6 +84,19 @@ extension IncommingMessage.FromSignalingServer.ResponseForRequest {
 		default: return nil
 		}
 	}
+
+	var requestId: RequestID? {
+		switch self {
+		case let .success(id):
+			return id
+		case let .failure(.noRemoteClientToTalkTo(id)):
+			return id
+		case let .failure(.validationError(error)):
+			return error.requestId
+		default:
+			return nil
+		}
+	}
 }
 
 extension IncommingMessage.FromSignalingServer.Notification {

@@ -4,118 +4,292 @@ import TestingPrelude
 // MARK: - SignalingServerNegotiationTests
 @MainActor
 final class SignalingServerNegotiationTests: TestCase {
+	// Static config
 	static let connectionID = try! SignalingServerConnectionID(.init(.deadbeef32Bytes))
 	static let encryptionKey = try! EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
-	static let ownClientId = ClientID(rawValue: UUID().uuidString)
-	static let remoteClientId = ClientID(rawValue: UUID().uuidString)
+	static let ownClientId = ClientID.any
 
+	// Shared clients
 	let dataChannelClient = DataChannelClient(dataChannel: DataChannelMock(), delegate: DataChannelDelegateMock())
-	let answer = RTCPrimitive.Answer(sdp: "Answer_SDP")
-	lazy var peerConnection = MockPeerConnection(dataChannel: .success(dataChannelClient))
-	let delegate = MockPeerConnectionDelegate()
-	lazy var peerConnectionFactory = MockPeerConnectionFactory(peerConnection: peerConnection, peerConnectionDelegate: delegate)
 	let webSocketClient = MockWebSocketClient()
-
 	lazy var signalingClient = SignalingClient(encryptionKey: Self.encryptionKey,
 	                                           webSocketClient: webSocketClient,
 	                                           connectionID: Self.connectionID,
 	                                           ownClientId: Self.ownClientId)
 
 	func test_makePeerConnection_happyFlow() async throws {
-		let peerConnectionsStream = makePeerConnections(using: signalingClient, factory: peerConnectionFactory)
+		let remoteClientID = ClientID.any
+		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientID)
+		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
+		let conenctionBuilder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 
 		let peerConnectionTask = Task {
-			try await peerConnectionsStream.prefix(1).collect()
+			await conenctionBuilder.peerConnections.prefix(1).collect()
 		}
 
-		// Receive incomming offer from remoteClientId
-		let remoteOffer = IdentifiedPrimitive(content: RTCPrimitive.Offer(sdp: "SDP"), id: Self.remoteClientId)
-		try await receiveOffer(remoteOffer)
+		// Negotiate the PeerConnection
+		try await performNegotiation(forClient: remoteClientID, peerConnection: peerConnection, peerConnectionDelegate: delegate)
 
-		// Send answer
-		let answer = IdentifiedPrimitive(content: answer, id: remoteOffer.id)
-		try await sendAnswer(answer)
-
-		// Receive ICECandidate
-		let remoteICECandidate = IdentifiedPrimitive(content: RTCPrimitive.ICECandidate(sdp: "sdp", sdpMLineIndex: 2, sdpMid: "mid"), id: Self.remoteClientId)
-		try await receiveICECandidate(remoteICECandidate)
-
-		// Receive ICECandidate
-		let localICECandidate = IdentifiedPrimitive(content: RTCPrimitive.ICECandidate(sdp: "sdp Local", sdpMLineIndex: 22, sdpMid: "mid_local"), id: Self.remoteClientId)
-		try await sendICECandidate(localICECandidate)
-
-		// When ICEConnection state is connected the peer connection is returned
-		delegate.sendICEConnectionStateEvent(.connected)
-
-		_ = try await peerConnectionTask.value
+		// Await for PeerConnection to be estblished
+		let result = await peerConnectionTask.value.first!
+		XCTAssertEqual(result.map(\.id), .success(remoteClientID))
 	}
 
-        func test_makePeerConnection_failedToInstantiatePeerConnection() async throws {
-                let failingPeerConnectonFactory = MockPeerConnectionFactory(peerConnection: <#T##MockPeerConnection#>, peerConnectionDelegate: <#T##MockPeerConnectionDelegate#>)
-                let peerConnectionsStream = makePeerConnections(using: signalingClient, factory: peerConnectionFactory)
+	func test_makePeerConnection_parallelNegotiation() async throws {
+		// Configure 4 peer connections to be negotiated in parallel
+		let remoteClientId2 = ClientID(rawValue: UUID().uuidString)
+		let remoteClientId3 = ClientID(rawValue: UUID().uuidString)
+		let remoteClientId1 = ClientID(rawValue: UUID().uuidString)
+		let remoteClientId4 = ClientID(rawValue: UUID().uuidString)
 
-                let peerConnectionTask = Task {
-                        try await peerConnectionsStream.prefix(1).collect()
-                }
+		let (client1, peerConnection1, delegate1) = makePeerConnectionClient(remoteClientId1)
+		let (client2, peerConnection2, delegate2) = makePeerConnectionClient(remoteClientId2)
+		let (client3, peerConnection3, delegate3) = makePeerConnectionClient(remoteClientId3)
+		let (client4, peerConnection4, delegate4) = makePeerConnectionClient(remoteClientId4)
+		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client1, client2, client3, client4])
+		let conenctionBuilder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 
-                let remoteOffer = IdentifiedPrimitive(content: RTCPrimitive.Offer(sdp: "SDP"), id: Self.remoteClientId)
-                try await receiveOffer(remoteOffer)
+		let peerConnectionTask = Task {
+			// Await for 4 PeerConnection to be made
+			await conenctionBuilder.peerConnections.prefix(4).collect()
+		}
 
-                peerc
+		// Trigger negotiations
 
+		Task {
+			try await performNegotiation(forClient: remoteClientId1, peerConnection: peerConnection1, peerConnectionDelegate: delegate1)
+		}
 
-                _ = try await peerConnectionTask.value
-        }
+		Task {
+			try await performNegotiation(forClient: remoteClientId2, peerConnection: peerConnection2, peerConnectionDelegate: delegate2)
+		}
 
-	private func receiveOffer(_ primitive: IdentifiedPrimitive<RTCPrimitive.Offer>) async throws {
+		Task {
+			try await performNegotiation(forClient: remoteClientId3, peerConnection: peerConnection3, peerConnectionDelegate: delegate3)
+		}
+
+		Task {
+			try await performFailingNegotiation(forClient: remoteClientId4, peerConnection: peerConnection4, peerConnectionDelegate: delegate4)
+		}
+
+		// Assert that the result for all negotiations are returns
+
+		/// We are interested only comparing the created `PeerConnectionClient.id`'s, or the failure
+		let result: [ClientID: Result<ClientID, FailedToCreatePeerConnectionError>] = await peerConnectionTask
+			.value
+			.reduce(into: [:]) { partialResult, nextResult in
+				switch nextResult {
+				case let .success(peerConnection):
+					partialResult[peerConnection.id] = .success(peerConnection.id)
+				case let .failure(failure):
+					partialResult[failure.remoteClientId] = .failure(failure)
+				}
+			}
+
+		let expectedResults: [ClientID: Result<ClientID, FailedToCreatePeerConnectionError>] = [
+			remoteClientId1: .success(remoteClientId1),
+			remoteClientId2: .success(remoteClientId2),
+			remoteClientId3: .success(remoteClientId3),
+			remoteClientId4: .failure(FailedToCreatePeerConnectionError(remoteClientId: remoteClientId4, underlyingError: NSError(domain: "dom", code: 1))),
+		]
+
+		XCTAssertEqual(result, expectedResults)
+	}
+
+	func test_makePeerConnection_failedToSetRemoteDescriptionAfterOffer() async throws {
+		let remoteClientId = ClientID.any
+		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientId)
+		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
+		let conenctionBuilder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
+
+		let peerConnectionTask = Task {
+			await conenctionBuilder.peerConnections.prefix(1).collect().first!
+		}
+
 		try webSocketClient.receiveIncommingMessage(
-			makeClientMessage(.offer(primitive), requestId: .any)
+			makeClientMessage(.offer(.anyOffer(for: remoteClientId)))
+		)
+		delegate.sendNegotiationNeededEvent()
+
+		// Await set offer
+		_ = await peerConnection.onRemoteOffer()
+		peerConnection.completeSetRemoteOffer(with: .failure(NSError(domain: "dom", code: 1)))
+
+		let result = await peerConnectionTask.value
+
+		XCTAssertThrowsError(try result.get())
+	}
+
+	func test_makePeerConnection_failsToGenerateAnswer() async throws {
+		let remoteClientId = ClientID.any
+		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientId)
+		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
+		let conenctionBuilder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
+
+		let peerConnectionTask = Task {
+			await conenctionBuilder.peerConnections.prefix(1).collect().first!
+		}
+
+		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
+
+		await peerConnection.onCreateLocalAnswer()
+		peerConnection.completeCreateLocalAnswerRequest(with: .failure(NSError(domain: "dom", code: 1)))
+
+		let result = await peerConnectionTask.value
+
+		XCTAssertThrowsError(try result.get())
+	}
+
+	func test_makePeerConnection_failsToSendAnswerToRemote() async throws {
+		let remoteClientId = ClientID.any
+		let (client, peerConnection, delegate) = makePeerConnectionClient(remoteClientId)
+		let peerConnectionFactory = MockPeerConnectionFactory(clients: [client])
+		let conenctionBuilder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
+
+		let peerConnectionTask = Task {
+			await conenctionBuilder.peerConnections.prefix(1).collect().first!
+		}
+
+		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: delegate)
+
+		await peerConnection.onCreateLocalAnswer()
+		peerConnection.completeCreateLocalAnswerRequest(with: .success(.any))
+
+		let message = try await webSocketClient.onClientMessageSent()
+		webSocketClient.respondToRequest(message: .failure(.noRemoteClientToTalkTo(.init(message.requestId.rawValue))))
+		let result = await peerConnectionTask.value
+
+		XCTAssertThrowsError(try result.get())
+	}
+
+	// MARK: - Private
+
+	/// Performs the full successfull negotiation flow for the given remoteClientId
+	private func performNegotiation(
+		forClient remoteClientId: ClientID,
+		peerConnection: MockPeerConnection,
+		peerConnectionDelegate: MockPeerConnectionDelegate
+	) async throws {
+		// Receive incomming offer from remoteClientId
+		try await receiveRemoteOffer(.anyOffer(for: remoteClientId), peerConnection: peerConnection, peerConnectionDelegate: peerConnectionDelegate)
+
+		// Send answer
+		try await createAndSendAnswer(.anyAnswer(for: remoteClientId), peerConnection: peerConnection)
+
+		// Receive ICECandidate
+		try await receiveICECandidate(.anyICECandidate(for: remoteClientId), peerConnection: peerConnection)
+
+		// Send ICECandidate
+		try await sendICECandidate(.anyICECandidate(for: remoteClientId), peerConnectionDelegate: peerConnectionDelegate)
+
+		// When ICEConnection state is connected the negotiation is completed
+		peerConnectionDelegate.sendICEConnectionStateEvent(.connected)
+	}
+
+	/// Performs a failing negotiation flow for the given remoteClientId
+	private func performFailingNegotiation(forClient remoteClientId: ClientID,
+	                                       peerConnection: MockPeerConnection,
+	                                       peerConnectionDelegate: MockPeerConnectionDelegate) async throws
+	{
+		try webSocketClient.receiveIncommingMessage(
+			makeClientMessage(.offer(.anyOffer(for: remoteClientId)))
+		)
+
+		peerConnectionDelegate.sendNegotiationNeededEvent()
+
+		// Await set offer
+		_ = await peerConnection.onRemoteOffer()
+		peerConnection.completeSetRemoteOffer(with: .failure(NSError(domain: "dom", code: 1)))
+	}
+
+	/// This function will trigger the negotiation flow for the given offer,
+	/// as well it will assert that the Offer was properly set on the created PeerConnection.
+	private func receiveRemoteOffer(_ primitive: IdentifiedPrimitive<RTCPrimitive.Offer>,
+	                                peerConnection: MockPeerConnection,
+	                                peerConnectionDelegate: MockPeerConnectionDelegate) async throws
+	{
+		// Receive the incomming offer
+		try webSocketClient.receiveIncommingMessage(
+			makeClientMessage(.offer(primitive))
 		)
 
 		// Before setting the Offer, the negotiation needed event has to occur
-		delegate.sendNegotiationNeededEvent()
+		peerConnectionDelegate.sendNegotiationNeededEvent()
 
+		// Await for the remote offer to be configured on the peer connection
 		let configuredOffer = await peerConnection.configuredRemoteOffer.prefix(1).collect().first!
+
+		// Assert that the configured offer does amtch the incomming offer
 		XCTAssertEqual(configuredOffer, primitive.content)
+
+		// Complete the set remote offer action on peerConnection, thus allowing the negotiation to flow further
+		peerConnection.completeSetRemoteOffer(with: .success(()))
 	}
 
-	private func receiveICECandidate(_ primitive: IdentifiedPrimitive<RTCPrimitive.ICECandidate>) async throws {
+	/// Trigger a `receiveICECandidate` event, as well assert that the received ICECanddiate is properly set on the PeerConnection
+	private func receiveICECandidate(_ primitive: IdentifiedPrimitive<RTCPrimitive.ICECandidate>, peerConnection: MockPeerConnection) async throws {
+		// Receive the incomming ICECandidate
 		try webSocketClient.receiveIncommingMessage(
-			makeClientMessage(.iceCandidate(primitive), requestId: .any)
+			makeClientMessage(.iceCandidate(primitive))
 		)
 
-		let configuredICECandidate = await peerConnection.configuredICECandidate.prefix(1).collect().first!
+		// Await for the ICECandidate to be configured on peerConnection
+		let configuredICECandidate = await peerConnection.configuredICECandidate.filter { $0.sdp == primitive.content.sdp }.prefix(1).collect().first!
+
+		// Assert that the configured ICECandidate does match the incomming ICECanddiate
 		XCTAssertEqual(configuredICECandidate, primitive.content)
+
+		// Complete the add ICECandidate action on PeerConnection
+		peerConnection.completeAddICECandidate(with: .success(()))
 	}
 
-	private func sendICECandidate(_ primitive: IdentifiedPrimitive<RTCPrimitive.ICECandidate>) async throws {
-		delegate.onGeneratedICECandidateContinuation.yield(primitive.content)
+	/// Trigger the `generated local ICECandidate` event, as well assert that the generated ICECandidate is sent throught he WebSocket to the proper client
+	private func sendICECandidate(_ primitive: IdentifiedPrimitive<RTCPrimitive.ICECandidate>, peerConnectionDelegate: MockPeerConnectionDelegate) async throws {
+		// Generate local ICECandidate
+		peerConnectionDelegate.generateICECandiddate(primitive.content)
+
+		// Assert that the generated ICECandidate was properly sent
 		try await assertDidSendMessage(.iceCandidate(primitive))
 	}
 
-	private func sendAnswer(_ primitive: IdentifiedPrimitive<RTCPrimitive.Answer>) async throws {
-		peerConnection.completeCreateLocalAnswerRequest(with: primitive.content)
+	/// Trigger the `create local answer` event.
+	private func createAndSendAnswer(_ primitive: IdentifiedPrimitive<RTCPrimitive.Answer>, peerConnection: MockPeerConnection) async throws {
+		// Await for create local answer to be triggered
+		await peerConnection.onCreateLocalAnswer()
+
+		// Complete the create local answer request
+		peerConnection.completeCreateLocalAnswerRequest(with: .success(primitive.content))
+
+		// Await for the created local answer to be configured on the peerConnection
 		let configuredAnswer = await peerConnection.configuredLocalAnswer.prefix(1).collect().first!
+
+		// Assert that the configured answer does match the created one
 		XCTAssertEqual(configuredAnswer, primitive.content)
+
+		// Assert that the created answer is properly sent through the webSocket
 		try await assertDidSendMessage(.answer(primitive))
 	}
 
+	/// Assert the given primitive was properly sent through the WebSocketClient
 	func assertDidSendMessage(_ primitive: RTCPrimitive) async throws {
-		let sentMessageData = await webSocketClient.sentMessagesStream.prefix(1).collect().first!
-		let sentMessage = try JSONDecoder().decode(ClientMessage.self, from: sentMessageData)
+		let sentMessage = try await webSocketClient.sentMessagesSequence.filter {
+			$0.targetClientId == primitive.clientId && $0.method == .init(from: primitive)
+		}.prefix(1).collect().first!
+
 		XCTAssertEqual(sentMessage.method, .init(from: primitive))
 		XCTAssertEqual(sentMessage.sourceClientId, Self.ownClientId)
-		XCTAssertEqual(sentMessage.targetClientId, primitive.clientId)
 		let sentPrimitive = try sentMessage.extractRTCPrimitive(Self.encryptionKey)
-		XCTAssertEqual(sentPrimitive, primitive)
+		XCTAssertEqual(sentPrimitive.payload, primitive.payload)
 		webSocketClient.respondToRequest(message: .success(sentMessage.requestId))
 	}
 
-	func makeClientMessage(_ primitive: RTCPrimitive, requestId: RequestID) throws -> JSONValue {
+	/// Creates a client message that is to be received from remote client
+	func makeClientMessage(_ primitive: RTCPrimitive) throws -> JSONValue {
+		let requestId = RequestID.any.rawValue
 		let encoded = try JSONEncoder().encode(primitive.payload)
 		let encrypted = try Self.encryptionKey.encrypt(data: encoded)
 		let data = JSONValue.dictionary([
-			"requestId": .string(requestId.rawValue),
+			"requestId": .string(requestId),
 			"method": .string(ClientMessage.Method(from: primitive).rawValue),
 			"source": .string("wallet"),
 			"sourceClientId": .string(primitive.clientId.rawValue),
@@ -126,133 +300,28 @@ final class SignalingServerNegotiationTests: TestCase {
 
 		let remoteData = JSONValue.dictionary([
 			"info": .string("remoteData"),
-			"requestId": .string("Id"),
+			"requestId": .string(requestId),
 			"data": data,
 		])
 
 		return remoteData
 	}
-}
 
-
-
-extension MockWebSocketClient {
-	func respondToRequest(message: IncommingMessage.FromSignalingServer.ResponseForRequest) {
-		receiveIncommingMessage(message.json)
+	/// Creates a PeerConnectionClient for the given remoteClientID and returns also its collaborators
+	private func makePeerConnectionClient(_ remoteClientID: ClientID) -> (client: PeerConnectionClient, peerConnection: MockPeerConnection, delegate: MockPeerConnectionDelegate) {
+		let peerConnection = MockPeerConnection(dataChannel: .success(dataChannelClient))
+		let delegate = MockPeerConnectionDelegate()
+		return (
+			try! PeerConnectionClient(id: remoteClientID, peerConnection: peerConnection, delegate: delegate),
+			peerConnection,
+			delegate
+		)
 	}
 }
 
-extension IncommingMessage.FromSignalingServer.ResponseForRequest {
-	var json: JSONValue {
-		switch self {
-		case let .success(value):
-			return .dictionary([
-				"info": .string("confirmation"),
-				"requestId": .string(value.rawValue),
-			])
-		case let .failure(failure):
-			fatalError()
-			//                        return .dictionary([
-			//                                "info": .string("missingRemoteClientError"),
-			//                                "requestId": .string(failure.rawValue),
-			//                        ])
-		}
-	}
-}
-
-extension RequestID {
-	static var any: RequestID {
-		.init(rawValue: UUID().uuidString)
-	}
-}
-
-// MARK: - MockPeerConnectionFactory
-final class MockPeerConnectionFactory: PeerConnectionFactory {
-	let peerConnection: Result<MockPeerConnection, Error>
-	let peerConnectionDelegate: MockPeerConnectionDelegate
-
-	init(peerConnection: Result<MockPeerConnection, Error>, peerConnectionDelegate: MockPeerConnectionDelegate) {
-		self.peerConnection = peerConnection
-		self.peerConnectionDelegate = peerConnectionDelegate
-	}
-
-	func makePeerConnectionClient() throws -> PeerConnectionClient {
-		try PeerConnectionClient(peerConnection: peerConnection, delegate: peerConnectionDelegate)
-	}
-}
-
-// MARK: - MockPeerConnectionDelegate
-final class MockPeerConnectionDelegate: PeerConnectionDelegate {
-	let onNegotiationNeeded: AsyncStream<Void>
-	let onIceConnectionState: AsyncStream<ICEConnectionState>
-	let onSignalingState: AsyncStream<SignalingState>
-	let onGeneratedICECandidate: AsyncStream<RTCPrimitive.ICECandidate>
-
-	let onNegotiationNeededContinuation: AsyncStream<Void>.Continuation
-	let onIceConnectionStateContinuation: AsyncStream<ICEConnectionState>.Continuation
-	let onSignalingStateContinuation: AsyncStream<SignalingState>.Continuation
-	let onGeneratedICECandidateContinuation: AsyncStream<RTCPrimitive.ICECandidate>.Continuation
-
-	init() {
-		(onNegotiationNeeded, onNegotiationNeededContinuation) = AsyncStream<Void>.streamWithContinuation()
-		(onIceConnectionState, onIceConnectionStateContinuation) = AsyncStream<ICEConnectionState>.streamWithContinuation()
-		(onSignalingState, onSignalingStateContinuation) = AsyncStream<SignalingState>.streamWithContinuation()
-		(onGeneratedICECandidate, onGeneratedICECandidateContinuation) = AsyncStream<RTCPrimitive.ICECandidate>.streamWithContinuation()
-	}
-
-	func sendNegotiationNeededEvent() {
-		onNegotiationNeededContinuation.yield(())
-	}
-
-	func sendICEConnectionStateEvent(_ state: ICEConnectionState) {
-		onIceConnectionStateContinuation.yield(state)
-	}
-}
-
-// MARK: - MockPeerConnection
-final class MockPeerConnection: PeerConnection {
-	let dataChannel: Result<DataChannelClient, Error>
-
-	let configuredRemoteOffer: AsyncStream<RTCPrimitive.Offer>
-	let configuredLocalAnswer: AsyncStream<RTCPrimitive.Answer>
-	let configuredICECandidate: AsyncStream<RTCPrimitive.ICECandidate>
-
-	let configuredRemoteOfferContinuation: AsyncStream<RTCPrimitive.Offer>.Continuation
-	let configuredLocalAnswerContinuation: AsyncStream<RTCPrimitive.Answer>.Continuation
-	let configuredICECandidateContinuation: AsyncStream<RTCPrimitive.ICECandidate>.Continuation
-
-	private var localAnswerContinuation: CheckedContinuation<RTCPrimitive.Answer, any Error>?
-
-	init(dataChannel: Result<DataChannelClient, Error> = .failure(NSError(domain: "test", code: 1))) {
-		self.dataChannel = dataChannel
-		(configuredRemoteOffer, configuredRemoteOfferContinuation) = AsyncStream<RTCPrimitive.Offer>.streamWithContinuation()
-		(configuredLocalAnswer, configuredLocalAnswerContinuation) = AsyncStream<RTCPrimitive.Answer>.streamWithContinuation()
-		(configuredICECandidate, configuredICECandidateContinuation) = AsyncStream<RTCPrimitive.ICECandidate>.streamWithContinuation()
-	}
-
-	func setLocalAnswer(_ answer: RTCPrimitive.Answer) async throws {
-		configuredLocalAnswerContinuation.yield(answer)
-	}
-
-	func setRemoteOffer(_ offer: RTCPrimitive.Offer) async throws {
-		configuredRemoteOfferContinuation.yield(offer)
-	}
-
-	func createLocalAnswer() async throws -> RTCPrimitive.Answer {
-		try await withCheckedThrowingContinuation { continuation in
-			localAnswerContinuation = continuation
-		}
-	}
-
-	func addRemoteICECandidate(_ candidate: RTCPrimitive.ICECandidate) async throws {
-		configuredICECandidateContinuation.yield(candidate)
-	}
-
-	func createDataChannel() throws -> DataChannelClient {
-		try dataChannel.get()
-	}
-
-	func completeCreateLocalAnswerRequest(with answer: RTCPrimitive.Answer) {
-		localAnswerContinuation?.resume(with: .success(answer))
+// MARK: - FailedToCreatePeerConnectionError + Equatable
+extension FailedToCreatePeerConnectionError: Equatable {
+	public static func == (lhs: RadixConnect.FailedToCreatePeerConnectionError, rhs: RadixConnect.FailedToCreatePeerConnectionError) -> Bool {
+		lhs.remoteClientId == rhs.remoteClientId && lhs.underlyingError as NSError == rhs.underlyingError as NSError
 	}
 }
