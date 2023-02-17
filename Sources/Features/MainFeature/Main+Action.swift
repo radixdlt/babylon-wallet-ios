@@ -29,7 +29,5 @@ extension Main.Action {
 
 // MARK: - Main.Action.Delegate
 extension Main.Action {
-	public enum Delegate: Sendable, Equatable {
-		case removedWallet
-	}
 }
+*/

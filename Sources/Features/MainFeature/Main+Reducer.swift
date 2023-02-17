@@ -3,13 +3,39 @@ import HomeFeature
 import ProfileClient
 import SettingsFeature
 
-public struct Main: Sendable, ReducerProtocol {
+public struct Main: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		public var home: Home.State
+		// TODO: @Nikola uncomment
+//		public var settings: AppSettings.State?
+
+		public init(
+			home: Home.State = .init()
+			// TODO: @Nikola uncomment
+//			settings: AppSettings.State? = nil
+		) {
+			self.home = home
+			// TODO: @Nikola uncomment
+//			self.settings = settings
+		}
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case home(Home.Action)
+		case settings(AppSettings.Action)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case removedWallet
+	}
+
+	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.home, action: /Action.child .. Action.ChildAction.home) {
+		Scope(state: \.home, action: /Action.child .. ChildAction.home) {
 			Home()
 		}
 
@@ -45,8 +71,9 @@ public struct Main: Sendable, ReducerProtocol {
 			state.destination = nil
 			return .none
 
-		case .child, .delegate:
-			return .none
-		}
-	}
+	 	case .child, .delegate:
+	 		return .none
+	 	}
+	 }
+	 */
 }
