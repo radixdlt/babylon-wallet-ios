@@ -27,6 +27,9 @@ public struct App: Sendable, ReducerProtocol {
 		}
 
 		Reduce(self.core)
+			.presentationDestination(\.$alert, action: /Action.internal .. Action.InternalAction.view .. Action.ViewAction.alert) {
+				Alerts()
+			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -43,14 +46,13 @@ public struct App: Sendable, ReducerProtocol {
 			}
 
 		case let .internal(.system(.displayErrorAlert(error))):
-			state.errorAlert = .init(
-				title: .init(L10n.App.errorOccurredTitle),
-				message: .init(error.legibleLocalizedDescription)
+			state.alert = .userErrorAlert(
+				.init(
+					title: { TextState(L10n.App.errorOccurredTitle) },
+					actions: {},
+					message: { TextState(error.legibleLocalizedDescription) }
+				)
 			)
-			return .none
-
-		case .internal(.view(.errorAlertDismissButtonTapped)):
-			state.errorAlert = nil
 			return .none
 
 		case .child(.main(.delegate(.removedWallet))):
@@ -78,30 +80,33 @@ public struct App: Sendable, ReducerProtocol {
 				return incompatibleSnapshotData(version: version, state: &state)
 			}
 
-		case .internal(.view(.deleteIncompatibleProfile)):
+		case .internal(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))):
 			return .run { send in
 				do {
 					try await keychainClient.removeProfileSnapshot()
 				} catch {
 					errorQueue.schedule(error)
 				}
-				await send(.internal(.system(.deletedIncompatibleProfile)))
+				await send(.internal(.system(.incompatibleProfileDeleted)))
 			}
-		case .internal(.system(.deletedIncompatibleProfile)):
+		case .internal(.system(.incompatibleProfileDeleted)):
 			return goToOnboarding(state: &state)
 
-		case .child:
+		case .child, .internal(.view(.alert)):
 			return .none
 		}
 	}
 
 	func incompatibleSnapshotData(version: ProfileSnapshot.Version, state: inout State) -> EffectTask<Action> {
-		state.errorAlert = .init(
-			title: .init(L10n.Splash.incompatibleProfileVersionAlertTitle),
-			message: .init(L10n.Splash.incompatibleProfileVersionAlertMessage),
-			dismissButton: .destructive(
-				.init(L10n.Splash.incompatibleProfileVersionAlertDeleteButton),
-				action: .send(Action.ViewAction.deleteIncompatibleProfile)
+		state.alert = .incompatibleProfileErrorAlert(
+			.init(
+				title: { TextState(L10n.Splash.incompatibleProfileVersionAlertTitle) },
+				actions: {
+					ButtonState(role: .destructive, action: .deleteWalletDataButtonTapped) {
+						TextState(L10n.Splash.incompatibleProfileVersionAlertDeleteButton)
+					}
+				},
+				message: { TextState(L10n.Splash.incompatibleProfileVersionAlertMessage) }
 			)
 		)
 		return .none
