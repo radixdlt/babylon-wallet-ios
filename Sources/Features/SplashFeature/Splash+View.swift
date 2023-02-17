@@ -30,7 +30,12 @@ extension Splash {
 						.scaledToFill()
 				}
 				.edgesIgnoringSafeArea(.all)
-				.alert(store.scope(state: \.biometricsCheckFailedAlert, action: { .view(.biometricsCheckFailed($0)) }), dismiss: .dismissed)
+				.alert(
+					store: store.scope(
+						state: \.$biometricsCheckFailedAlert,
+						action: { .view(.biometricsCheckFailedAlert($0)) }
+					)
+				)
 				.onAppear {
 					viewStore.send(.appeared)
 				}
