@@ -290,3 +290,27 @@ extension String {
 extension ComponentAddress {
 	static let mock = ComponentAddress(address: "component_sim1qfh2n5twmrzrlstqepsu3u624r4pdzca9pqhrcy7624sfmxzep")
 }
+
+// MARK: - LoadableView
+struct LoadableView<Value, Content: View>: View {
+	let value: Loadable<Value>
+	let content: (Value) -> Content
+
+	public init(value: Loadable<Value>, @ViewBuilder content: @escaping (Value) -> Content) {
+		self.value = value
+		self.content = content
+	}
+
+	var body: some View {
+		switch value {
+		case .notLoaded:
+			Color.gray // Shimmer?
+		case .loading:
+			Color.orange // Animated shimmer?
+		case let .loaded(value):
+			content(value)
+		case .failed:
+			Color.red // Error message?
+		}
+	}
+}

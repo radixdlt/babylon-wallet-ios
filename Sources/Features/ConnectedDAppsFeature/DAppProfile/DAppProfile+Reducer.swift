@@ -80,7 +80,7 @@ public struct DAppProfile: Sendable, FeatureReducer {
 				let metadata = State.Metadata(metadataEntities)
 				return .internal(.metadataLoaded(.loaded(metadata)))
 			} catch: { error in
-				.internal(.metadataLoaded(.failed(error is BadHTTPResponseCode ? .badHTTPResponseCode : .unknown)))
+				.internal(.metadataLoaded(.init(error)))
 			}
 
 		case .copyAddressButtonTapped:
@@ -128,6 +128,7 @@ extension DAppProfile.State.Metadata {
 	}
 }
 
+// We could even consider give EntityMetadataCollection support for dynamicMemberLookup
 extension GatewayAPI.EntityMetadataCollection {
 	subscript(key: String) -> String? {
 		items.first { $0.key == key }?.value
@@ -164,7 +165,7 @@ public enum Loadable<Value> {
 		}
 	}
 
-	public init(error: Error) {
+	public init(_ error: Error) {
 		let loadingError: LoadingError = error is BadHTTPResponseCode ? .badHTTPResponseCode : .unknown
 		self = .failed(loadingError)
 	}
