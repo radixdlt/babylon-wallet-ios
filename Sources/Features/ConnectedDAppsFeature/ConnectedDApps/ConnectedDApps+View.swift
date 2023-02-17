@@ -67,6 +67,6 @@ extension ConnectedDApps.State {
 
 extension ConnectedDApps.Store {
 	var selectedDApp: PresentationStoreOf<DAppProfile> {
-		scope(state: \.$selectedDApp) { .child(.selectedDApp($0)) }
+		scope(state: \.$presentedDApp) { .child(.presentedtedDApp($0)) }
 	}
 }

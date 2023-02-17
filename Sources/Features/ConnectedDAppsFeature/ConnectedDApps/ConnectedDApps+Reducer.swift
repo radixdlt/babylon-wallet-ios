@@ -13,11 +13,11 @@ public struct ConnectedDApps: Sendable, FeatureReducer {
 		public var dApps: IdentifiedArrayOf<OnNetwork.ConnectedDapp>
 
 		@PresentationState
-		public var selectedDApp: DAppProfile.State?
+		public var presentedDApp: DAppProfile.State?
 
-		public init(dApps: IdentifiedArrayOf<OnNetwork.ConnectedDapp> = [], selectedDApp: DAppProfile.State? = nil) {
+		public init(dApps: IdentifiedArrayOf<OnNetwork.ConnectedDapp> = [], presentedDApp: DAppProfile.State? = nil) {
 			self.dApps = dApps
-			self.selectedDApp = selectedDApp
+			self.presentedDApp = presentedDApp
 		}
 	}
 
@@ -36,7 +36,7 @@ public struct ConnectedDApps: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {}
 
 	public enum ChildAction: Sendable, Equatable {
-		case selectedDApp(PresentationActionOf<DAppProfile>)
+		case presentedtedDApp(PresentationActionOf<DAppProfile>)
 	}
 
 	// MARK: Reducer
@@ -45,7 +45,7 @@ public struct ConnectedDApps: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$selectedDApp, action: /Action.child .. ChildAction.selectedDApp) {
+			.presentationDestination(\.$presentedDApp, action: /Action.child .. ChildAction.presentedtedDApp) {
 				DAppProfile()
 			}
 	}
@@ -55,14 +55,6 @@ public struct ConnectedDApps: Sendable, FeatureReducer {
 		case .appeared:
 			return .task {
 				let dApps = try await profileClient.getConnectedDapps() // TODO: • Handle error?
-
-				print("APPEARED")
-				for dApp in dApps {
-					print("    \(dApp.displayName.rawValue)")
-					print("    \(dApp.dAppDefinitionAddress.address)")
-					print("    \(dApp.networkID)")
-					print("    #\(dApp.referencesToAuthorizedPersonas.count)")
-				}
 				return .internal(.loadedDApps(dApps))
 			}
 		case let .didSelectDApp(id):
@@ -71,23 +63,25 @@ public struct ConnectedDApps: Sendable, FeatureReducer {
 			return .task {
 				let detailed = try await profileClient.detailsForConnectedDapp(dApp)
 				let presented = DAppProfile.State(dApp: detailed)
-				return .child(.selectedDApp(.present(presented)))
+				return .child(.presentedtedDApp(.present(presented)))
 			}
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .selectedDApp(.presented(.delegate(.forgetDApp(id: dAppID, networkID: networkID)))):
-
-			return .task {
-				print("REDUCER child forgetDApp")
+		case let .presentedtedDApp(.presented(.delegate(.forgetDApp(id: dAppID, networkID: networkID)))):
+			let presentedDAppID = state.presentedDApp?.dApp.dAppDefinitionAddress
+			return .run { send in
 				try await profileClient.forgetConnectedDApp(dAppID, networkID)
-				print("REDUCER child forgetDApp OK")
-				return .internal(.forgotDApp(dAppID))
+				if dAppID == presentedDAppID {
+					await send(.child(.presentedtedDApp(.dismiss)), animation: .default)
+				}
+
+				await send(.internal(.forgotDApp(dAppID)))
 			}
 
-		case .selectedDApp:
+		case .presentedtedDApp:
 			return .none
 		}
 	}
@@ -99,11 +93,7 @@ public struct ConnectedDApps: Sendable, FeatureReducer {
 			return .none
 
 		case let .forgotDApp(dAppID):
-			print("REDUCER internal forgotDApp, dismissing")
-			if state.selectedDApp?.dApp.dAppDefinitionAddress == dAppID {
-				state.selectedDApp = nil
-			}
-
+			// Could pop up a message here
 			return .none
 		}
 	}

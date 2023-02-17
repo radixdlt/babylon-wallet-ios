@@ -121,6 +121,7 @@ public struct DAppProfile: Sendable, FeatureReducer {
 	}
 }
 
+// TODO: • Move or use existing DappMetadata from DappInteraction
 extension DAppProfile.State.Metadata {
 	init(_ metadata: GatewayAPI.EntityMetadataCollection) {
 		self.description = metadata["description"]

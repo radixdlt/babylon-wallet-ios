@@ -14,7 +14,7 @@ extension DAppProfile {
 
 	struct ViewState: Equatable {
 		let title: String
-		let description: String?
+		let description: Loadable<String?>
 		let domain: String?
 		let addressViewState: AddressView.ViewState
 		let personas: [Persona]
@@ -69,7 +69,7 @@ public extension DAppProfile.View {
 private extension DAppProfile.State {
 	var viewState: DAppProfile.ViewState {
 		.init(title: dApp.displayName.rawValue,
-		      description: metadata?.description,
+		      description: $metadata.description,
 		      domain: metadata?.domain,
 		      addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .short),
 		      personas: dApp.detailedAuthorizedPersonas.map(DAppProfile.ViewState.Persona.init))
@@ -102,9 +102,10 @@ extension DAppProfile.View {
 				VStack(alignment: .leading, spacing: .medium2) {
 					Separator()
 
-					if let description = viewStore.description {
-						Text(description)
+					LoadableView(viewStore.description) { description in
+						Text(description ?? L10n.DAppProfile.missingDescription)
 							.textBlock
+							.italic(description == nil)
 						Separator()
 					}
 
@@ -296,7 +297,7 @@ struct LoadableView<Value, Content: View>: View {
 	let value: Loadable<Value>
 	let content: (Value) -> Content
 
-	public init(value: Loadable<Value>, @ViewBuilder content: @escaping (Value) -> Content) {
+	public init(_ value: Loadable<Value>, @ViewBuilder content: @escaping (Value) -> Content) {
 		self.value = value
 		self.content = content
 	}

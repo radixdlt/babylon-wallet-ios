@@ -44,3 +44,9 @@ public struct PersonaProfile: Sendable, FeatureReducer {
 		}
 	}
 }
+
+extension IdentifiedArrayOf<OnNetwork.Persona.Field> {
+	subscript(kind kind: OnNetwork.Persona.Field.Kind) -> OnNetwork.Persona.Field.Value? {
+		first { $0.kind == kind }?.value
+	}
+}

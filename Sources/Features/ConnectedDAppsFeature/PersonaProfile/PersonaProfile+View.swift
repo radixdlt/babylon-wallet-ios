@@ -67,10 +67,10 @@ extension PersonaProfile.View {
 		struct ViewState: Equatable {
 			let dAppName: String
 			let personaName: String
-			let firstName: String = "Matt"
-			let secondName: String = "Smith"
-			let streetAddress: String = "45 Hornhill Road, Texas 23918"
-			let twitterName: String = "@radmatt"
+			let firstName: String?
+			let lastName: String?
+			let email: String?
+			let personalIdentificationNumber: String?
 		}
 
 		let store: Store<PersonaProfile.State, Never>
@@ -90,13 +90,13 @@ extension PersonaProfile.View {
 					         item: viewStore.firstName)
 
 					InfoPair(heading: L10n.PersonaProfile.secondNameHeading,
-					         item: viewStore.secondName)
+					         item: viewStore.lastName)
 
 					InfoPair(heading: L10n.PersonaProfile.addressHeading,
-					         item: viewStore.streetAddress)
+					         item: viewStore.email)
 
 					InfoPair(heading: L10n.PersonaProfile.twitterNameHeading,
-					         item: viewStore.twitterName)
+					         item: viewStore.personalIdentificationNumber)
 				}
 				.padding(.horizontal, .medium1)
 			}
@@ -105,13 +105,13 @@ extension PersonaProfile.View {
 
 	private struct InfoPair: View {
 		let heading: String
-		let item: String
+		let item: String?
 
 		var body: some View {
 			VStack(alignment: .leading, spacing: .small2) {
 				Text(heading)
 					.sectionHeading
-				Text(item)
+				Text(item ?? "-")
 					.infoItem
 			}
 		}
@@ -121,7 +121,11 @@ extension PersonaProfile.View {
 private extension PersonaProfile.State {
 	var infoSectionViewState: PersonaProfile.View.InfoSection.ViewState {
 		.init(dAppName: dAppName,
-		      personaName: persona.displayName.rawValue)
+		      personaName: persona.displayName.rawValue,
+		      firstName: persona.fields[kind: .firstName]?.rawValue,
+		      lastName: persona.fields[kind: .lastName]?.rawValue,
+		      email: persona.fields[kind: .email]?.rawValue,
+		      personalIdentificationNumber: persona.fields[kind: .personalIdentificationNumber]?.rawValue)
 	}
 }
 

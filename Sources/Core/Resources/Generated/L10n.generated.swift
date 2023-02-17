@@ -329,6 +329,8 @@ public enum L10n {
     public static let definition = L10n.tr("Localizable", "dAppProfile.definition", fallback: "dApp Definition")
     /// Forget this dApp
     public static let forgetDApp = L10n.tr("Localizable", "dAppProfile.forgetDApp", fallback: "Forget this dApp")
+    /// Missing description
+    public static let missingDescription = L10n.tr("Localizable", "dAppProfile.missingDescription", fallback: "Missing description")
     /// Associated NFTs
     public static let nfts = L10n.tr("Localizable", "dAppProfile.nfts", fallback: "Associated NFTs")
     /// Here are the Personas that you have previously used to connect to this dApp.

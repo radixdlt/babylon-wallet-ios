@@ -127,6 +127,7 @@
 "connectedDApps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
 
 "dAppProfile.definition" = "dApp Definition";
+"dAppProfile.missingDescription" = "Missing description";
 "dAppProfile.website" = "Website";
 "dAppProfile.tokens" = "Associated Tokens";
 "dAppProfile.nfts" = "Associated NFTs";
