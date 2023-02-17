@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: - AccountList.State
 extension AccountList {
 	// MARK: State
-	public struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		public var accounts: IdentifiedArrayOf<AccountList.Row.State>
 		public var alert: AlertState<Action.ViewAction>?
 
@@ -27,6 +27,11 @@ extension AccountList.State {
 }
 
 #if DEBUG
+extension AccountList.State {
+	static let previewValue: Self = .init(
+		accounts: .init(uniqueElements: [.previewValue]))
+}
+
 extension Array where Element == AccountList.Row.State {
 	public static let previewValue: Self = []
 }

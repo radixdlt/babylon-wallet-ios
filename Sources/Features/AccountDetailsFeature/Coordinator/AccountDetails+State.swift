@@ -7,7 +7,7 @@ import FungibleTokenListFeature
 // MARK: - AccountDetails.State
 extension AccountDetails {
 	// MARK: State
-	public struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		public let account: OnNetwork.Account
 		public var assets: AssetsView.State
 

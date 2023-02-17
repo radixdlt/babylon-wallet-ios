@@ -14,7 +14,7 @@ public struct Badge: Asset {
 }
 
 // MARK: - BadgeContainer
-public struct BadgeContainer: AssetContainer {
+public struct BadgeContainer: AssetContainer, Sendable, Hashable {
 	public var owner: AccountAddress
 	public typealias T = Badge
 	public var asset: Badge

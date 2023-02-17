@@ -5,11 +5,11 @@ import FeatureTestingPrelude
 final class VisitHubTests: TestCase {
 	func testVisitHubButtonTapped() async {
 		let store = TestStore(
-			initialState: Home.VisitHub.State(),
-			reducer: Home.VisitHub()
+			initialState: VisitHub.State(),
+			reducer: VisitHub()
 		)
 
-		await store.send(.internal(.view(.visitHubButtonTapped)))
+		await store.send(.view(.visitHubButtonTapped))
 		await store.receive(.delegate(.displayHub))
 	}
 }
