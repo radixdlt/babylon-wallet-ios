@@ -29,10 +29,6 @@ public struct AccountList: Sendable, ReducerProtocol {
 					}
 				}
 
-			case .internal(.view(.alertDismissButtonTapped)):
-				state.alert = nil
-				return .none
-
 			case .internal(.view(.viewAppeared)):
 				return .run { send in
 					await send(.delegate(.fetchPortfolioForAccounts))
