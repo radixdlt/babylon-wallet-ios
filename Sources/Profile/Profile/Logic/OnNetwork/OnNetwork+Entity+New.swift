@@ -2,6 +2,9 @@ import Cryptography
 import EngineToolkitModels
 import Prelude
 
+// MARK: - NoInstance
+internal struct NoInstance: Swift.Error {}
+
 // MARK: - AccountIndexOutOfBounds
 // extension OnNetwork {
 //	/// Creates a new, non saved, **Virtual** `Entity` of type `Entity.Type`

@@ -112,39 +112,3 @@ import ProfileModels
 //		}
 //	}
 // }
-
-internal struct NoInstance: Swift.Error {}
-
-// MARK: - FailedToFindFactorSource
-internal struct FailedToFindFactorSource: Swift.Error {}
-
-extension Profile {
-	internal mutating func updateOnNetwork(_ onNetwork: OnNetwork) throws {
-		try perNetwork.update(onNetwork)
-	}
-}
-
-extension Profile {
-	public func onNetwork(id needle: NetworkID) throws -> OnNetwork {
-		try perNetwork.onNetwork(id: needle)
-	}
-
-	public func containsNetwork(withID networkID: NetworkID) -> Bool {
-		(try? onNetwork(id: networkID)) != nil
-	}
-}
-
-// MARK: - WrongAddressType
-struct WrongAddressType: Swift.Error {}
-
-// MARK: - AccountAlreadyExists
-struct AccountAlreadyExists: Swift.Error {}
-
-// MARK: - ConnectedDappAlreadyExists
-struct ConnectedDappAlreadyExists: Swift.Error {}
-
-// MARK: - ConnectedDappDoesNotExists
-struct ConnectedDappDoesNotExists: Swift.Error {}
-
-// MARK: - PersonaAlreadyExists
-struct PersonaAlreadyExists: Swift.Error {}

@@ -2,6 +2,15 @@ import Cryptography
 import EngineToolkit
 import Prelude
 
+// MARK: - ConnectedDappDoesNotExists
+struct ConnectedDappDoesNotExists: Swift.Error {}
+
+// MARK: - ConnectedDappAlreadyExists
+struct ConnectedDappAlreadyExists: Swift.Error {}
+
+// MARK: - AccountAlreadyExists
+struct AccountAlreadyExists: Swift.Error {}
+
 extension NonEmpty where Collection == IdentifiedArrayOf<OnNetwork.Account> {
 	// FIXME: uh terrible, please fix this.
 	@discardableResult

@@ -97,7 +97,7 @@ extension ProfileClient {
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
-			createEphemeralProfileAndUnsavedOnDeviceFactorSource: { _ in
+			createOnboardingWallet: { _ in
 //				@Dependency(\.mnemonicClient.generate) var generateMnemonic
 
 //				let mnemonic = try generateMnemonic(request.wordCount, request.language)
@@ -119,7 +119,7 @@ extension ProfileClient {
 				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
-			commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: { _ in
+			commitOnboardingWallet: { _ in
 
 //				let mnemonic = request.onDeviceFactorSourceMnemonic
 //

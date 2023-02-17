@@ -1,36 +1,37 @@
 import EngineToolkitModels
 import Prelude
 
-// MARK: - PerNetwork
-/// An ordered dictionary mapping from a `Network` to an `OnNetwork`, which is a
-/// collection of accounts, personas and connected dapps.
-public struct PerNetwork:
-	Sendable,
-	Hashable,
-	Codable,
-	CustomStringConvertible,
-	CustomDumpStringConvertible
-{
-	/// An ordered dictionary mapping from a `Network` to an `OnNetwork`, which is a
-	/// collection of accounts, personas and connected dapps.
-	public internal(set) var dictionary: OrderedDictionary<NetworkID, OnNetwork>
-
-	public init(dictionary: OrderedDictionary<NetworkID, OnNetwork>) {
-		self.dictionary = dictionary
-	}
-
-	public init(onNetwork: OnNetwork) {
-		self.init(dictionary: [onNetwork.networkID: onNetwork])
-	}
-}
+//// MARK: - PerNetwork
+///// An ordered dictionary mapping from a `Network` to an `OnNetwork`, which is a
+///// collection of accounts, personas and connected dapps.
+// public struct PerNetwork:
+//	Sendable,
+//	Hashable,
+//	Codable,
+//	CustomStringConvertible,
+//	CustomDumpStringConvertible
+// {
+//	/// An ordered dictionary mapping from a `Network` to an `OnNetwork`, which is a
+//	/// collection of accounts, personas and connected dapps.
+//	public internal(set) var dictionary: OrderedDictionary<NetworkID, OnNetwork>
+//
+//	public init(dictionary: OrderedDictionary<NetworkID, OnNetwork>) {
+//		self.dictionary = dictionary
+//	}
+//
+//	public init(onNetwork: OnNetwork) {
+//		self.init(dictionary: [onNetwork.networkID: onNetwork])
+//	}
+// }
+public typealias PerNetwork = OrderedDictionary<NetworkID, OnNetwork>
 
 extension PerNetwork {
-	public var count: Int {
-		dictionary.count
-	}
+//	public var count: Int {
+//		dictionary.count
+//	}
 
 	public func onNetwork(id needle: NetworkID) throws -> OnNetwork {
-		guard let onNetwork = dictionary[needle] else {
+		guard let onNetwork = self[needle] else {
 			throw Error.unknownNetworkWithID(needle)
 		}
 		return onNetwork
@@ -48,18 +49,18 @@ extension PerNetwork {
 	}
 
 	public mutating func update(_ onNetwork: OnNetwork) throws {
-		guard dictionary.contains(where: { $0.key == onNetwork.networkID }) else {
+		guard self.contains(where: { $0.key == onNetwork.networkID }) else {
 			throw Error.unknownNetworkWithID(onNetwork.networkID)
 		}
-		let updatedElement = dictionary.updateValue(onNetwork, forKey: onNetwork.networkID)
+		let updatedElement = self.updateValue(onNetwork, forKey: onNetwork.networkID)
 		assert(updatedElement != nil)
 	}
 
 	public mutating func add(_ onNetwork: OnNetwork) throws {
-		guard !dictionary.contains(where: { $0.key == onNetwork.networkID }) else {
+		guard !self.contains(where: { $0.key == onNetwork.networkID }) else {
 			throw Error.networkAlreadyExistsWithID(onNetwork.networkID)
 		}
-		let updatedElement = dictionary.updateValue(onNetwork, forKey: onNetwork.networkID)
+		let updatedElement = self.updateValue(onNetwork, forKey: onNetwork.networkID)
 		assert(updatedElement == nil)
 	}
 }
@@ -81,25 +82,25 @@ extension PerNetwork.Error {
 	}
 }
 
-extension PerNetwork {
-	public init(from decoder: Decoder) throws {
-		let singleValueContainer = try decoder.singleValueContainer()
-		let array = try singleValueContainer.decode([OnNetwork].self)
-		self.init(dictionary: .init(uniqueKeysWithValues: array.map { element in
-			(key: element.networkID, value: element)
-		}))
-	}
-
-	public func encode(to encoder: Encoder) throws {
-		var singleValueContainer = encoder.singleValueContainer()
-		let onNetworkArray = [OnNetwork](self.dictionary.values)
-		try singleValueContainer.encode(onNetworkArray)
-	}
-}
+// extension PerNetwork {
+//	public init(from decoder: Decoder) throws {
+//		let singleValueContainer = try decoder.singleValueContainer()
+//		let array = try singleValueContainer.decode([OnNetwork].self)
+//		self.init(dictionary: .init(uniqueKeysWithValues: array.map { element in
+//			(key: element.networkID, value: element)
+//		}))
+//	}
+//
+//	public func encode(to encoder: Encoder) throws {
+//		var singleValueContainer = encoder.singleValueContainer()
+//		let onNetworkArray = [OnNetwork](self.dictionary.values)
+//		try singleValueContainer.encode(onNetworkArray)
+//	}
+// }
 
 extension PerNetwork {
 	public var _description: String {
-		String(describing: dictionary)
+		String(describing: self)
 	}
 
 	public var description: String {

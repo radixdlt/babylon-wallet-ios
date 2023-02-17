@@ -2,6 +2,9 @@ import EngineToolkit
 import Foundation
 import Prelude
 
+// MARK: - PersonaAlreadyExists
+struct PersonaAlreadyExists: Swift.Error {}
+
 // MARK: Add Persona
 extension Profile {
 //	/// Creates a new **Virtual** `Persona` and saves it into the profile, by trying to load

@@ -1,19 +1,20 @@
 import Cryptography
 import Prelude
+import ProfileModels
 
 // MARK: - OnboardingWallet
-public struct OnboardingWallet: Sendable, Equatable {
-	public static func == (lhs: OnboardingWallet, rhs: OnboardingWallet) -> Bool {
-		lhs.privateFactorSource == rhs.privateFactorSource && lhs.profile == rhs.profile
-	}
+public struct OnboardingWallet: Sendable, Hashable {
+//	public static func == (lhs: OnboardingWallet, rhs: OnboardingWallet) -> Bool {
+//		lhs.privateFactorSource == rhs.privateFactorSource && lhs.profile == rhs.profile
+//	}
 
 	public let privateFactorSource: PrivateHDFactorSource
 	public let profile: Profile
-	public init(privateFactorSource: PrivateHDFactorSource, profile: Profile) async throws {
-		guard await profile.containsFactorSource(
+	public init(privateFactorSource: PrivateHDFactorSource, profile: Profile) throws {
+		guard profile.containsFactorSource(
 			withID: privateFactorSource.factorSource.id
 		) else {
-			fatalError("discrepancy")
+			preconditionFailure("discrepancy")
 		}
 		self.privateFactorSource = privateFactorSource
 		self.profile = profile

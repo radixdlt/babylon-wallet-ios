@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - PrivateHDFactorSource
-public struct PrivateHDFactorSource: Sendable, Equatable {
+public struct PrivateHDFactorSource: Sendable, Hashable {
 	public let mnemonicWithPassphrase: MnemonicWithPassphrase
 	public let factorSource: FactorSource
 

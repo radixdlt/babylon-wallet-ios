@@ -2,7 +2,7 @@ import Cryptography
 import Prelude
 
 // MARK: - MnemonicWithPassphrase
-public struct MnemonicWithPassphrase: Sendable, Equatable, Codable {
+public struct MnemonicWithPassphrase: Sendable, Hashable, Codable {
 	public let mnemonic: Mnemonic
 	public let passphrase: String
 	public init(mnemonic: Mnemonic, passphrase: String) {

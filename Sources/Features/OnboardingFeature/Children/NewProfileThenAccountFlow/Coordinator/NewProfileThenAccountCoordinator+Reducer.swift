@@ -23,15 +23,12 @@ public struct NewProfileThenAccountCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .newProfile(.delegate(.createdProfile(unsavedProfile))):
-			state.unsavedProfile = unsavedProfile
+		case let .newProfile(.delegate(.createdOnboardingWallet(onboardingWallet))):
+			state.onboardingWallet = onboardingWallet
 
 			state.step = .createAccountCoordinator(.init(
 				config: .init(
-					specificGenesisFactorInstanceDerivationStrategy: .useMnemonic(
-						unsavedProfile.onDeviceFactorSourceMnemonic,
-						forFactorSource: unsavedProfile.profile.factorSources.first(where: { $0.kind == .device })!
-					),
+					specificGenesisFactorInstanceDerivationStrategy: .useOnboardingWallet(onboardingWallet),
 					isFirstEntity: true,
 					canBeDismissed: false,
 					navigationButtonCTA: .goHome
@@ -43,18 +40,18 @@ public struct NewProfileThenAccountCoordinator: Sendable, FeatureReducer {
 			fatalError("Failed to create new profile, what to do other than crash..?")
 
 		case .createAccountCoordinator(.delegate(.completed)):
-			guard let unsavedProfileAndMnemonic = state.unsavedProfile else {
+			guard let onboardingWallet = state.onboardingWallet else {
 				assertionFailure("incorrect implementation")
 				return .none
 			}
-			let request = CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest(
-				onDeviceFactorSourceMnemonic: unsavedProfileAndMnemonic.onDeviceFactorSourceMnemonic,
-				bip39Passphrase: unsavedProfileAndMnemonic.request.bip39Passphrase
-			)
+//			let request = CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest(
+			//                onDeviceFactorSourceMnemonic: unsavedProfileAndMnemonic.privateFactorSource.mnemonicWithPassphrase.mnemonic,
+			//                bip39Passphrase: unsavedProfileAndMnemonic.privateFactorSource.mnemonicWithPassphrase.passphrase
+//			)
 
 			return .run { send in
 				await send(.internal(.commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicResult(TaskResult {
-					try await profileClient.commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic(request)
+					try await profileClient.commitOnboardingWallet(onboardingWallet)
 				})))
 			}
 		default:

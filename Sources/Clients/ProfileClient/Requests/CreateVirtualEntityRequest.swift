@@ -6,14 +6,12 @@ import ProfileModels
 public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {
 	case loadMnemonicFromKeychainForFactorSource(FactorSource)
 
-	/// Needed when creating a virtual entity as part of NewProfileThenAccount flow (part of Onboarding),
-	/// during which no mnemonic has yet been saved into keychain.
-	case useMnemonic(Mnemonic, forFactorSource: FactorSource)
+	case useOnboardingWallet(OnboardingWallet)
 
 	public var factorSource: FactorSource {
 		switch self {
 		case let .loadMnemonicFromKeychainForFactorSource(factorSource): return factorSource
-		case let .useMnemonic(_, factorSource): return factorSource
+		case let .useOnboardingWallet(onboardingWallet): return onboardingWallet.privateFactorSource.factorSource
 		}
 	}
 }

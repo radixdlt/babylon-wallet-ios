@@ -11,14 +11,14 @@ extension NewProfileThenAccountCoordinator {
 		}
 
 		public var step: Step
-		public var unsavedProfile: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse?
+		public var onboardingWallet: OnboardingWallet?
 
 		public init(
 			step: Step = .newProfile(.init()),
-			unsavedProfile: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse? = nil
+			onboardingWallet: OnboardingWallet? = nil
 		) {
 			self.step = step
-			self.unsavedProfile = unsavedProfile
+			self.onboardingWallet = onboardingWallet
 		}
 	}
 }

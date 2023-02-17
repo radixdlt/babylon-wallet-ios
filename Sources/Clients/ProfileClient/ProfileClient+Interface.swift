@@ -10,9 +10,9 @@ public struct ProfileClient: Sendable {
 	public var setNetworkAndGateway: SetNetworkAndGateway
 
 	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
-	public var createEphemeralProfileAndUnsavedOnDeviceFactorSource: CreateEphemeralProfileAndUnsavedOnDeviceFactorSource
+	public var createOnboardingWallet: CreateOnboardingWallet
 	public var injectProfileSnapshot: InjectProfileSnapshot
-	public var commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic
+	public var commitOnboardingWallet: CommitOnboardingWallet
 
 	public var loadProfile: LoadProfile
 	public var extractProfileSnapshot: ExtractProfileSnapshot
@@ -45,9 +45,9 @@ public struct ProfileClient: Sendable {
 		getGatewayAPIEndpointBaseURL: @escaping GetGatewayAPIEndpointBaseURL,
 		getNetworkAndGateway: @escaping GetNetworkAndGateway,
 		setNetworkAndGateway: @escaping SetNetworkAndGateway,
-		createEphemeralProfileAndUnsavedOnDeviceFactorSource: @escaping CreateEphemeralProfileAndUnsavedOnDeviceFactorSource,
+		createOnboardingWallet: @escaping CreateOnboardingWallet,
 		injectProfileSnapshot: @escaping InjectProfileSnapshot,
-		commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: @escaping CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic,
+		commitOnboardingWallet: @escaping CommitOnboardingWallet,
 		loadProfile: @escaping LoadProfile,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
@@ -74,8 +74,8 @@ public struct ProfileClient: Sendable {
 		self.getGatewayAPIEndpointBaseURL = getGatewayAPIEndpointBaseURL
 		self.getNetworkAndGateway = getNetworkAndGateway
 		self.setNetworkAndGateway = setNetworkAndGateway
-		self.createEphemeralProfileAndUnsavedOnDeviceFactorSource = createEphemeralProfileAndUnsavedOnDeviceFactorSource
-		self.commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic = commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic
+		self.createOnboardingWallet = createOnboardingWallet
+		self.commitOnboardingWallet = commitOnboardingWallet
 		self.injectProfileSnapshot = injectProfileSnapshot
 		self.loadProfile = loadProfile
 		self.extractProfileSnapshot = extractProfileSnapshot
@@ -100,8 +100,8 @@ public struct ProfileClient: Sendable {
 	}
 }
 
-// MARK: - CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest
-public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest: Sendable, Hashable {
+// MARK: - CreateOnboardingWalletRequest
+public struct CreateOnboardingWalletRequest: Sendable, Hashable {
 	public let networkAndGateway: AppPreferences.NetworkAndGateway
 	public let language: BIP39.Language
 	public let wordCount: BIP39.WordCount
@@ -119,23 +119,23 @@ public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest: Senda
 	}
 }
 
-// MARK: - CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse
-public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse: Sendable, Hashable {
-	public let request: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest
-	public let onDeviceFactorSourceMnemonic: Mnemonic
-	public let profile: Profile
-	public init(
-		request: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest,
-		mnemonic: Mnemonic,
-		profile: Profile
-	) {
-		self.onDeviceFactorSourceMnemonic = mnemonic
-		self.profile = profile
-		self.request = request
-	}
-}
-
 // MARK: - CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest
+//// MARK: - CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse
+// public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse: Sendable, Hashable {
+//	public let request: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest
+//	public let onDeviceFactorSourceMnemonic: Mnemonic
+//	public let profile: Profile
+//	public init(
+//		request: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest,
+//		mnemonic: Mnemonic,
+//		profile: Profile
+//	) {
+//		self.onDeviceFactorSourceMnemonic = mnemonic
+//		self.profile = profile
+//		self.request = request
+//	}
+// }
+
 public struct CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest: Sendable, Hashable {
 	public let onDeviceFactorSourceMnemonic: Mnemonic
 	public let bip39Passphrase: String
@@ -159,10 +159,10 @@ extension ProfileClient {
 
 	public typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
-	public typealias CreateEphemeralProfileAndUnsavedOnDeviceFactorSource = @Sendable (CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest) async throws -> CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse
+	public typealias CreateOnboardingWallet = @Sendable (CreateOnboardingWalletRequest) async throws -> OnboardingWallet
 
 	public typealias InjectProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
-	public typealias CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic = @Sendable (CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest) async throws -> Void
+	public typealias CommitOnboardingWallet = @Sendable (OnboardingWallet) async throws -> Void
 
 	public typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 

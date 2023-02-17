@@ -34,7 +34,7 @@ public struct Profile:
 	/// Effectivly **per network**: a list of accounts, personas and connected dApps.
 	public internal(set) var perNetwork: PerNetwork
 
-	internal init(
+	public init(
 		version: ProfileSnapshot.Version = .minimum,
 		factorSources: FactorSources,
 		appPreferences: AppPreferences,
@@ -44,6 +44,14 @@ public struct Profile:
 		self.factorSources = factorSources
 		self.appPreferences = appPreferences
 		self.perNetwork = perNetwork
+	}
+
+	public init(factorSource: FactorSource) {
+		self.init(
+			factorSources: .init(factorSource),
+			appPreferences: .default,
+			perNetwork: .init()
+		)
 	}
 }
 
