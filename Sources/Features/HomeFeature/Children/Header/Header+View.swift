@@ -93,10 +93,14 @@ struct Header_Preview: PreviewProvider {
 	static var previews: some View {
 		Header.View(
 			store: .init(
-				initialState: .init(),
+				initialState: .previewValue,
 				reducer: Header()
 			)
 		)
 	}
+}
+
+extension Header.State {
+	static let previewValue = Self()
 }
 #endif
