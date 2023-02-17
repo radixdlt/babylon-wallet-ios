@@ -14,13 +14,12 @@ extension LocalNetworkPermission {
 extension LocalNetworkPermission.Action {
 	public enum ViewAction: Sendable, Equatable {
 		public enum PermissionDeniedAlertAction: Sendable, Equatable {
-			case dismissed
 			case cancelButtonTapped
 			case openSettingsButtonTapped
 		}
 
 		case appeared
-		case permissionDeniedAlert(PermissionDeniedAlertAction)
+		case permissionDeniedAlert(PresentationAction<AlertState<PermissionDeniedAlertAction>, PermissionDeniedAlertAction>)
 	}
 }
 
