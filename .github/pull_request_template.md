@@ -30,3 +30,6 @@ Additional notes.
 
 ## Video
 paste link here
+
+## PR submission checklist
+- [ ] I have tested account to account transfer flow and have confirmed that it works
