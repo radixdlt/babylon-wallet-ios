@@ -45,7 +45,7 @@ public extension DappDetails.View {
 
 					PersonaList(store: store)
 
-					Button(L10n.DAppProfile.forgetDapp) {
+					Button(L10n.DAppDetails.forgetDapp) {
 						viewStore.send(.forgetThisDapp)
 					}
 					.buttonStyle(.destructive)
@@ -57,7 +57,7 @@ public extension DappDetails.View {
 				}
 				.navBarTitle(viewStore.title)
 				.navigationDestination(store: store.presentedPersona) { store in
-					PersonaProfile.View(store: store)
+					PersonaDetails.View(store: store)
 				}
 			}
 		}
@@ -85,7 +85,7 @@ private extension DappDetails.ViewState.Persona {
 }
 
 private extension DappDetails.Store {
-	var presentedPersona: PresentationStoreOf<PersonaProfile> {
+	var presentedPersona: PresentationStoreOf<PersonaDetails> {
 		scope(state: \.$presentedPersona) { .child(.presentedPersona($0)) }
 	}
 }
@@ -103,14 +103,14 @@ extension DappDetails.View {
 					Separator()
 
 					LoadableView(viewStore.description) { description in
-						Text(description ?? L10n.DAppProfile.missingDescription)
+						Text(description ?? L10n.DAppDetails.missingDescription)
 							.textBlock
 							.italic(description == nil)
 						Separator()
 					}
 
 					HStack(spacing: 0) {
-						Text(L10n.DAppProfile.definition)
+						Text(L10n.DAppDetails.definition)
 							.sectionHeading
 						Spacer(minLength: 0)
 						AddressView(viewStore.addressViewState, textStyle: .body1HighImportance) {
@@ -120,7 +120,7 @@ extension DappDetails.View {
 					}
 
 					if let domain = viewStore.domain {
-						Text(L10n.DAppProfile.website)
+						Text(L10n.DAppDetails.website)
 							.sectionHeading
 
 						if let url = URL(string: domain) {
@@ -146,7 +146,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.dApp.tokens, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppProfile.tokens,
+				ListWithHeading(heading: L10n.DAppDetails.tokens,
 				                elements: viewStore.state,
 				                title: \.name) { _ in
 					TokenPlaceholder(size: .small)
@@ -163,7 +163,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.dApp.nfts, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppProfile.nfts,
+				ListWithHeading(heading: L10n.DAppDetails.nfts,
 				                elements: viewStore.state,
 				                title: \.name) { _ in
 					NFTPlaceholder(size: .small)
@@ -212,7 +212,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: 0) {
-					Text(L10n.DAppProfile.personaHeading)
+					Text(L10n.DAppDetails.personaHeading)
 						.sectionHeading
 						.padding(.horizontal, .medium1)
 						.padding(.vertical, .large3)

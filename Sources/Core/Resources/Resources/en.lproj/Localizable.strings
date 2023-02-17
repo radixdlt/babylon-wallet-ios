@@ -127,26 +127,26 @@
 "connectedDapps.title" = "Connected dApps";
 "connectedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
 
-"dAppProfile.definition" = "dApp Definition";
-"dAppProfile.missingDescription" = "Missing description";
-"dAppProfile.website" = "Website";
-"dAppProfile.tokens" = "Associated Tokens";
-"dAppProfile.nfts" = "Associated NFTs";
-"dAppProfile.personaHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
-"dAppProfile.forgetDapp" = "Forget this dApp";
+"dAppDetails.definition" = "dApp Definition";
+"dAppDetails.missingDescription" = "Missing description";
+"dAppDetails.website" = "Website";
+"dAppDetails.tokens" = "Associated Tokens";
+"dAppDetails.nfts" = "Associated NFTs";
+"dAppDetails.personaHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
+"dAppDetails.forgetDapp" = "Forget this dApp";
 
-"personaProfile.personaNameHeading" = "Persona Name";
-"personaProfile.personalDataSharingDescription" = "Here is the personal data that you are sharing with %@";
-"personaProfile.editPersona" = "Edit Persona";
-"personaProfile.firstNameHeading" = "First Name";
-"personaProfile.secondNameHeading" = "Second Name";
-"personaProfile.addressHeading" = "Address";
-"personaProfile.twitterNameHeading" = "Twitter Username";
+"personaDetails.personaNameHeading" = "Persona Name";
+"personaDetails.personalDataSharingDescription" = "Here is the personal data that you are sharing with %@";
+"personaDetails.editPersona" = "Edit Persona";
+"personaDetails.firstNameHeading" = "First Name";
+"personaDetails.secondNameHeading" = "Second Name";
+"personaDetails.addressHeading" = "Address";
+"personaDetails.twitterNameHeading" = "Twitter Username";
 
-"personaProfile.accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
+"personaDetails.accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
 
-"personaProfile.editAccountSharing" = "Edit Account Sharing";
-"personaProfile.disconnectPersona" = "Disconnect Persona from this dApp";
+"personaDetails.editAccountSharing" = "Edit Account Sharing";
+"personaDetails.disconnectPersona" = "Disconnect Persona from this dApp";
 
 "newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
 "newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";

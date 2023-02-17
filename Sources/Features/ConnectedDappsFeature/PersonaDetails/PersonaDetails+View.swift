@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - View
 
-extension PersonaProfile {
+extension PersonaDetails {
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: Store
@@ -19,7 +19,7 @@ extension PersonaProfile {
 
 // MARK: - Body
 
-public extension PersonaProfile.View {
+public extension PersonaDetails.View {
 	var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
@@ -29,7 +29,7 @@ public extension PersonaProfile.View {
 
 					InfoSection(store: store.actionless)
 
-					Button(L10n.PersonaProfile.editPersona) {
+					Button(L10n.PersonaDetails.editPersona) {
 						viewStore.send(.editPersonaTapped)
 					}
 					.buttonStyle(.radix)
@@ -39,7 +39,7 @@ public extension PersonaProfile.View {
 					AccountSection(store: store)
 						.background(.app.gray5)
 
-					Button(L10n.PersonaProfile.disconnectPersona) {
+					Button(L10n.PersonaDetails.disconnectPersona) {
 						viewStore.send(.disconnectPersonaTapped)
 					}
 					.buttonStyle(.destructive)
@@ -54,14 +54,14 @@ public extension PersonaProfile.View {
 
 // MARK: - Extensions
 
-private extension PersonaProfile.State {
-	var viewState: PersonaProfile.ViewState {
+private extension PersonaDetails.State {
+	var viewState: PersonaDetails.ViewState {
 		.init(personaName: persona.displayName.rawValue)
 	}
 }
 
-// MARK: - PersonaProfile.View.InfoSection
-extension PersonaProfile.View {
+// MARK: - PersonaDetails.View.InfoSection
+extension PersonaDetails.View {
 	@MainActor
 	struct InfoSection: View {
 		struct ViewState: Equatable {
@@ -73,29 +73,29 @@ extension PersonaProfile.View {
 			let personalIdentificationNumber: String?
 		}
 
-		let store: Store<PersonaProfile.State, Never>
+		let store: Store<PersonaDetails.State, Never>
 
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					InfoPair(heading: L10n.PersonaProfile.personaNameHeading,
+					InfoPair(heading: L10n.PersonaDetails.personaNameHeading,
 					         item: viewStore.personaName)
 
 					Separator()
 
-					Text(L10n.PersonaProfile.personalDataSharingDescription(viewStore.dAppName))
+					Text(L10n.PersonaDetails.personalDataSharingDescription(viewStore.dAppName))
 						.textBlock
 
-					InfoPair(heading: L10n.PersonaProfile.firstNameHeading,
+					InfoPair(heading: L10n.PersonaDetails.firstNameHeading,
 					         item: viewStore.firstName)
 
-					InfoPair(heading: L10n.PersonaProfile.secondNameHeading,
+					InfoPair(heading: L10n.PersonaDetails.secondNameHeading,
 					         item: viewStore.lastName)
 
-					InfoPair(heading: L10n.PersonaProfile.addressHeading,
+					InfoPair(heading: L10n.PersonaDetails.addressHeading,
 					         item: viewStore.email)
 
-					InfoPair(heading: L10n.PersonaProfile.twitterNameHeading,
+					InfoPair(heading: L10n.PersonaDetails.twitterNameHeading,
 					         item: viewStore.personalIdentificationNumber)
 				}
 				.padding(.horizontal, .medium1)
@@ -118,8 +118,8 @@ extension PersonaProfile.View {
 	}
 }
 
-private extension PersonaProfile.State {
-	var infoSectionViewState: PersonaProfile.View.InfoSection.ViewState {
+private extension PersonaDetails.State {
+	var infoSectionViewState: PersonaDetails.View.InfoSection.ViewState {
 		.init(dAppName: dAppName,
 		      personaName: persona.displayName.rawValue,
 		      firstName: persona.fields[kind: .firstName]?.rawValue,
@@ -129,8 +129,8 @@ private extension PersonaProfile.State {
 	}
 }
 
-// MARK: - PersonaProfile.View.AccountSection
-extension PersonaProfile.View {
+// MARK: - PersonaDetails.View.AccountSection
+extension PersonaDetails.View {
 	@MainActor
 	struct AccountSection: View {
 		struct ViewState: Equatable {
@@ -138,12 +138,12 @@ extension PersonaProfile.View {
 			let sharingAccounts: [NamedAccount]
 		}
 
-		let store: StoreOf<PersonaProfile>
+		let store: StoreOf<PersonaDetails>
 
 		var body: some View {
 			WithViewStore(store, observe: \.accountSectionViewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
-					Text(L10n.PersonaProfile.accountSharingDescription(viewStore.dAppName))
+					Text(L10n.PersonaDetails.accountSharingDescription(viewStore.dAppName))
 						.textBlock
 						.flushedLeft
 						.padding(.vertical, .medium2)
@@ -158,7 +158,7 @@ extension PersonaProfile.View {
 					}
 					.padding(.horizontal, .medium3)
 
-					Button(L10n.PersonaProfile.editAccountSharing) {
+					Button(L10n.PersonaDetails.editAccountSharing) {
 						viewStore.send(.editAccountSharingTapped)
 					}
 					.buttonStyle(.radix)
@@ -170,8 +170,8 @@ extension PersonaProfile.View {
 	}
 }
 
-private extension PersonaProfile.State {
-	var accountSectionViewState: PersonaProfile.View.AccountSection.ViewState {
+private extension PersonaDetails.State {
+	var accountSectionViewState: PersonaDetails.View.AccountSection.ViewState {
 		.init(dAppName: dAppName,
 		      sharingAccounts: [
 		      	.init(name: "My account", gradient: .init(colors: [.app.account1pink, .app.account11blue1]), address: try! .init(address: "account_d_827m9765")),

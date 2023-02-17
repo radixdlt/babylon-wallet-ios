@@ -22,9 +22,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var metadata: Metadata? = nil
 
 		@PresentationState
-		public var presentedPersona: PersonaProfile.State? = nil
+		public var presentedPersona: PersonaDetails.State? = nil
 
-		init(dApp: OnNetwork.ConnectedDappDetailed, presentedPersona: PersonaProfile.State? = nil) {
+		init(dApp: OnNetwork.ConnectedDappDetailed, presentedPersona: PersonaDetails.State? = nil) {
 			self.dApp = dApp
 			self.presentedPersona = presentedPersona
 		}
@@ -56,7 +56,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case presentedPersona(PresentationActionOf<PersonaProfile>)
+		case presentedPersona(PresentationActionOf<PersonaDetails>)
 	}
 
 	// MARK: Reducer
@@ -66,7 +66,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.presentationDestination(\.$presentedPersona, action: /Action.child .. ChildAction.presentedPersona) {
-				PersonaProfile()
+				PersonaDetails()
 			}
 	}
 
@@ -102,7 +102,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		case let .personaTapped(id):
 			guard let persona = state.dApp.detailedAuthorizedPersonas[id: id] else { return .none }
-			let presented = PersonaProfile.State(dAppName: state.dApp.displayName.rawValue, persona: persona)
+			let presented = PersonaDetails.State(dAppName: state.dApp.displayName.rawValue, persona: persona)
 			return .send(.child(.presentedPersona(.present(presented))))
 
 		case .forgetThisDapp:

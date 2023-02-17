@@ -1,8 +1,8 @@
 import FeaturePrelude
 import ProfileClient
 
-// MARK: - PersonaProfile
-public struct PersonaProfile: Sendable, FeatureReducer {
+// MARK: - PersonaDetails
+public struct PersonaDetails: Sendable, FeatureReducer {
 	@Dependency(\.profileClient) var profileClient
 	public typealias Store = StoreOf<Self>
 

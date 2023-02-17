@@ -326,21 +326,21 @@ public enum L10n {
       }
     }
   }
-  public enum DAppProfile {
+  public enum DAppDetails {
     /// dApp Definition
-    public static let definition = L10n.tr("Localizable", "dAppProfile.definition", fallback: "dApp Definition")
+    public static let definition = L10n.tr("Localizable", "dAppDetails.definition", fallback: "dApp Definition")
     /// Forget this dApp
-    public static let forgetDapp = L10n.tr("Localizable", "dAppProfile.forgetDapp", fallback: "Forget this dApp")
+    public static let forgetDapp = L10n.tr("Localizable", "dAppDetails.forgetDapp", fallback: "Forget this dApp")
     /// Missing description
-    public static let missingDescription = L10n.tr("Localizable", "dAppProfile.missingDescription", fallback: "Missing description")
+    public static let missingDescription = L10n.tr("Localizable", "dAppDetails.missingDescription", fallback: "Missing description")
     /// Associated NFTs
-    public static let nfts = L10n.tr("Localizable", "dAppProfile.nfts", fallback: "Associated NFTs")
+    public static let nfts = L10n.tr("Localizable", "dAppDetails.nfts", fallback: "Associated NFTs")
     /// Here are the Personas that you have previously used to connect to this dApp.
-    public static let personaHeading = L10n.tr("Localizable", "dAppProfile.personaHeading", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
+    public static let personaHeading = L10n.tr("Localizable", "dAppDetails.personaHeading", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
     /// Associated Tokens
-    public static let tokens = L10n.tr("Localizable", "dAppProfile.tokens", fallback: "Associated Tokens")
+    public static let tokens = L10n.tr("Localizable", "dAppDetails.tokens", fallback: "Associated Tokens")
     /// Website
-    public static let website = L10n.tr("Localizable", "dAppProfile.website", fallback: "Website")
+    public static let website = L10n.tr("Localizable", "dAppDetails.website", fallback: "Website")
   }
   public enum FungibleTokenList {
     public enum Detail {
@@ -482,6 +482,32 @@ public enum L10n {
     /// New Account
     public static let newAccountButtonTitle = L10n.tr("Localizable", "onboarding.newAccountButtonTitle", fallback: "New Account")
   }
+  public enum PersonaDetails {
+    /// Here are the account names and addresses that you are currently sharing with %@.
+    public static func accountSharingDescription(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "personaDetails.accountSharingDescription", String(describing: p1), fallback: "Here are the account names and addresses that you are currently sharing with %@.")
+    }
+    /// Address
+    public static let addressHeading = L10n.tr("Localizable", "personaDetails.addressHeading", fallback: "Address")
+    /// Disconnect Persona from this dApp
+    public static let disconnectPersona = L10n.tr("Localizable", "personaDetails.disconnectPersona", fallback: "Disconnect Persona from this dApp")
+    /// Edit Account Sharing
+    public static let editAccountSharing = L10n.tr("Localizable", "personaDetails.editAccountSharing", fallback: "Edit Account Sharing")
+    /// Edit Persona
+    public static let editPersona = L10n.tr("Localizable", "personaDetails.editPersona", fallback: "Edit Persona")
+    /// First Name
+    public static let firstNameHeading = L10n.tr("Localizable", "personaDetails.firstNameHeading", fallback: "First Name")
+    /// Here is the personal data that you are sharing with %@
+    public static func personalDataSharingDescription(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "personaDetails.personalDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
+    }
+    /// Persona Name
+    public static let personaNameHeading = L10n.tr("Localizable", "personaDetails.personaNameHeading", fallback: "Persona Name")
+    /// Second Name
+    public static let secondNameHeading = L10n.tr("Localizable", "personaDetails.secondNameHeading", fallback: "Second Name")
+    /// Twitter Username
+    public static let twitterNameHeading = L10n.tr("Localizable", "personaDetails.twitterNameHeading", fallback: "Twitter Username")
+  }
   public enum PersonaList {
     /// Create new persona
     public static let createNewPersonaButtonTitle = L10n.tr("Localizable", "personaList.createNewPersonaButtonTitle", fallback: "Create new persona")
@@ -489,32 +515,6 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "personaList.subtitle", fallback: "Here are all of your current Personas in your Wallet")
     /// Personas
     public static let title = L10n.tr("Localizable", "personaList.title", fallback: "Personas")
-  }
-  public enum PersonaProfile {
-    /// Here are the account names and addresses that you are currently sharing with %@.
-    public static func accountSharingDescription(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "personaProfile.accountSharingDescription", String(describing: p1), fallback: "Here are the account names and addresses that you are currently sharing with %@.")
-    }
-    /// Address
-    public static let addressHeading = L10n.tr("Localizable", "personaProfile.addressHeading", fallback: "Address")
-    /// Disconnect Persona from this dApp
-    public static let disconnectPersona = L10n.tr("Localizable", "personaProfile.disconnectPersona", fallback: "Disconnect Persona from this dApp")
-    /// Edit Account Sharing
-    public static let editAccountSharing = L10n.tr("Localizable", "personaProfile.editAccountSharing", fallback: "Edit Account Sharing")
-    /// Edit Persona
-    public static let editPersona = L10n.tr("Localizable", "personaProfile.editPersona", fallback: "Edit Persona")
-    /// First Name
-    public static let firstNameHeading = L10n.tr("Localizable", "personaProfile.firstNameHeading", fallback: "First Name")
-    /// Here is the personal data that you are sharing with %@
-    public static func personalDataSharingDescription(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "personaProfile.personalDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")
-    }
-    /// Persona Name
-    public static let personaNameHeading = L10n.tr("Localizable", "personaProfile.personaNameHeading", fallback: "Persona Name")
-    /// Second Name
-    public static let secondNameHeading = L10n.tr("Localizable", "personaProfile.secondNameHeading", fallback: "Second Name")
-    /// Twitter Username
-    public static let twitterNameHeading = L10n.tr("Localizable", "personaProfile.twitterNameHeading", fallback: "Twitter Username")
   }
   public enum Personas {
     /// Create a New Persona
