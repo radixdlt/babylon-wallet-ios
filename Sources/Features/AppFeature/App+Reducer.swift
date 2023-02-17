@@ -13,15 +13,15 @@ public struct App: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.root, action: /Action.self) {
+		Scope(state: \.root, action: /Action.child) {
 			EmptyReducer()
-				.ifCaseLet(/App.State.Root.main, action: /Action.child .. Action.ChildAction.main) {
+				.ifCaseLet(/State.Root.main, action: /Action.ChildAction.main) {
 					Main()
 				}
-				.ifCaseLet(/App.State.Root.onboardingCoordinator, action: /Action.child .. Action.ChildAction.onboardingCoordinator) {
+				.ifCaseLet(/State.Root.onboardingCoordinator, action: /Action.ChildAction.onboardingCoordinator) {
 					OnboardingCoordinator()
 				}
-				.ifCaseLet(/App.State.Root.splash, action: /Action.child .. Action.ChildAction.splash) {
+				.ifCaseLet(/State.Root.splash, action: /Action.ChildAction.splash) {
 					Splash()
 				}
 		}

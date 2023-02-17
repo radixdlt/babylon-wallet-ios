@@ -3,7 +3,7 @@ import Profile
 
 // MARK: - Profile.LoadingFailure
 extension Profile {
-	public enum LoadingFailure: Sendable, Swift.Error, Equatable {
+	public enum LoadingFailure: Sendable, Swift.Error, Hashable {
 		case profileVersionOutdated(json: Data, version: ProfileSnapshot.Version)
 		case decodingFailure(json: Data, JSONDecodingError)
 
@@ -15,9 +15,14 @@ extension Profile {
 }
 
 extension Profile {
-	public struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Equatable {
+	public struct FailedToCreateProfileFromSnapshot: Sendable, LocalizedError, Hashable {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
-			lhs.version == rhs.version && lhs.errorDescription == rhs.errorDescription
+			lhs.version == rhs.version && String(describing: lhs.error) == String(describing: rhs.error)
+		}
+
+		public func hash(into hasher: inout Hasher) {
+			hasher.combine(version)
+			hasher.combine(String(describing: error))
 		}
 
 		public let version: ProfileSnapshot.Version
@@ -36,7 +41,8 @@ extension Profile {
 	}
 }
 
-extension Profile.JSONDecodingError {
+// MARK: - Profile.JSONDecodingError + Hashable
+extension Profile.JSONDecodingError: Hashable {
 	public var errorDescription: String? {
 		switch self {
 		case let .known(error):
@@ -46,9 +52,13 @@ extension Profile.JSONDecodingError {
 		}
 	}
 
-	public enum KnownDecodingError: Sendable, LocalizedError, Equatable {
+	public enum KnownDecodingError: Sendable, LocalizedError, Hashable {
 		case noProfileSnapshotVersionFoundInJSON
 		case decodingError(FailedToDecodeProfile)
+
+		public func hash(into hasher: inout Hasher) {
+			hasher.combine(String(describing: self))
+		}
 
 		public var errorDescription: String? {
 			switch self {
@@ -70,9 +80,13 @@ extension Profile.JSONDecodingError {
 		public var errorDescription: String? { L10n.ProfileLoad.decodingError(decodingError) }
 	}
 
-	public struct UnknownDecodingError: Sendable, LocalizedError, Equatable {
+	public struct UnknownDecodingError: Sendable, LocalizedError, Hashable {
 		public static func == (lhs: Self, rhs: Self) -> Bool {
-			lhs.errorDescription == rhs.errorDescription
+			String(describing: lhs.error) == String(describing: rhs.error)
+		}
+
+		public func hash(into hasher: inout Hasher) {
+			hasher.combine(String(describing: self))
 		}
 
 		public let error: Swift.Error
