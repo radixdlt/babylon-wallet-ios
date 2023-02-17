@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - View
 
-extension DappProfile {
+extension DappDetails {
 	@MainActor
 	public struct View: SwiftUI.View {
 		let store: Store
@@ -29,7 +29,7 @@ extension DappProfile {
 
 // MARK: - Body
 
-public extension DappProfile.View {
+public extension DappDetails.View {
 	var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
@@ -66,17 +66,17 @@ public extension DappProfile.View {
 
 // MARK: - Extensions
 
-private extension DappProfile.State {
-	var viewState: DappProfile.ViewState {
+private extension DappDetails.State {
+	var viewState: DappDetails.ViewState {
 		.init(title: dApp.displayName.rawValue,
 		      description: $metadata.description,
 		      domain: metadata?.domain,
 		      addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .short),
-		      personas: dApp.detailedAuthorizedPersonas.map(DappProfile.ViewState.Persona.init))
+		      personas: dApp.detailedAuthorizedPersonas.map(DappDetails.ViewState.Persona.init))
 	}
 }
 
-private extension DappProfile.ViewState.Persona {
+private extension DappDetails.ViewState.Persona {
 	init(persona: OnNetwork.AuthorizedPersonaDetailed) {
 		self.init(id: persona.id,
 		          name: persona.displayName.rawValue,
@@ -84,7 +84,7 @@ private extension DappProfile.ViewState.Persona {
 	}
 }
 
-private extension DappProfile.Store {
+private extension DappDetails.Store {
 	var presentedPersona: PresentationStoreOf<PersonaProfile> {
 		scope(state: \.$presentedPersona) { .child(.presentedPersona($0)) }
 	}
@@ -92,10 +92,10 @@ private extension DappProfile.Store {
 
 // MARK: Child Views
 
-extension DappProfile.View {
+extension DappDetails.View {
 	@MainActor
 	struct InfoBlock: View {
-		let store: StoreOf<DappProfile>
+		let store: StoreOf<DappDetails>
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
@@ -142,7 +142,7 @@ extension DappProfile.View {
 
 	@MainActor
 	struct TokenList: View {
-		let store: StoreOf<DappProfile>
+		let store: StoreOf<DappDetails>
 
 		var body: some View {
 			WithViewStore(store, observe: \.dApp.tokens, send: { .view($0) }) { viewStore in
@@ -159,7 +159,7 @@ extension DappProfile.View {
 
 	@MainActor
 	struct NFTList: View {
-		let store: StoreOf<DappProfile>
+		let store: StoreOf<DappDetails>
 
 		var body: some View {
 			WithViewStore(store, observe: \.dApp.nfts, send: { .view($0) }) { viewStore in
@@ -207,7 +207,7 @@ extension DappProfile.View {
 
 	@MainActor
 	struct PersonaList: View {
-		let store: StoreOf<DappProfile>
+		let store: StoreOf<DappDetails>
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in

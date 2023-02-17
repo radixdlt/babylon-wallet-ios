@@ -13,9 +13,9 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		public var dApps: IdentifiedArrayOf<OnNetwork.ConnectedDapp>
 
 		@PresentationState
-		public var presentedDapp: DappProfile.State?
+		public var presentedDapp: DappDetails.State?
 
-		public init(dApps: IdentifiedArrayOf<OnNetwork.ConnectedDapp> = [], presentedDapp: DappProfile.State? = nil) {
+		public init(dApps: IdentifiedArrayOf<OnNetwork.ConnectedDapp> = [], presentedDapp: DappDetails.State? = nil) {
 			self.dApps = dApps
 			self.presentedDapp = presentedDapp
 		}
@@ -36,7 +36,7 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {}
 
 	public enum ChildAction: Sendable, Equatable {
-		case presentedtedDapp(PresentationActionOf<DappProfile>)
+		case presentedtedDapp(PresentationActionOf<DappDetails>)
 	}
 
 	// MARK: Reducer
@@ -46,7 +46,7 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
 			.presentationDestination(\.$presentedDapp, action: /Action.child .. ChildAction.presentedtedDapp) {
-				DappProfile()
+				DappDetails()
 			}
 	}
 
@@ -62,7 +62,7 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 
 			return .task {
 				let detailed = try await profileClient.detailsForConnectedDapp(dApp)
-				let presented = DappProfile.State(dApp: detailed)
+				let presented = DappDetails.State(dApp: detailed)
 				return .child(.presentedtedDapp(.present(presented)))
 			}
 		}

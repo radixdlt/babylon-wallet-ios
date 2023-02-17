@@ -51,7 +51,7 @@ public extension ConnectedDapps.View {
 			}
 			.navBarTitle(L10n.ConnectedDapps.title)
 			.navigationDestination(store: store.selectedDapp) { store in
-				DappProfile.View(store: store)
+				DappDetails.View(store: store)
 			}
 		}
 	}
@@ -66,7 +66,7 @@ extension ConnectedDapps.State {
 }
 
 extension ConnectedDapps.Store {
-	var selectedDapp: PresentationStoreOf<DappProfile> {
+	var selectedDapp: PresentationStoreOf<DappDetails> {
 		scope(state: \.$presentedDapp) { .child(.presentedtedDapp($0)) }
 	}
 }

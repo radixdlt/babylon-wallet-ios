@@ -2,8 +2,8 @@ import FeaturePrelude
 import GatewayAPI
 import ProfileClient
 
-// MARK: - DappProfile
-public struct DappProfile: Sendable, FeatureReducer {
+// MARK: - DappDetails
+public struct DappDetails: Sendable, FeatureReducer {
 	public struct FailedToLoadMetadata: Error, Hashable {}
 
 	@Dependency(\.gatewayAPIClient) var gatewayClient
@@ -122,7 +122,7 @@ public struct DappProfile: Sendable, FeatureReducer {
 }
 
 // TODO: • Move or use existing DappMetadata from DappInteraction
-extension DappProfile.State.Metadata {
+extension DappDetails.State.Metadata {
 	init(_ metadata: GatewayAPI.EntityMetadataCollection) {
 		self.description = metadata["description"]
 		self.domain = metadata["domain"]
