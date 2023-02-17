@@ -50,7 +50,7 @@ public extension ConnectedDapps.View {
 				}
 			}
 			.navBarTitle(L10n.ConnectedDapps.title)
-			.navigationDestination(store: store.selectedDapp) { store in
+			.navigationDestination(store: store.presentedDapp) { store in
 				DappDetails.View(store: store)
 			}
 		}
@@ -66,7 +66,7 @@ extension ConnectedDapps.State {
 }
 
 extension ConnectedDapps.Store {
-	var selectedDapp: PresentationStoreOf<DappDetails> {
-		scope(state: \.$presentedDapp) { .child(.presentedtedDapp($0)) }
+	var presentedDapp: PresentationStoreOf<DappDetails> {
+		scope(state: \.$presentedDapp) { .child(.presentedDapp($0)) }
 	}
 }

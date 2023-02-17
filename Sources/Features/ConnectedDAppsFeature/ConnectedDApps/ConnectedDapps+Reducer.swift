@@ -36,7 +36,7 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {}
 
 	public enum ChildAction: Sendable, Equatable {
-		case presentedtedDapp(PresentationActionOf<DappDetails>)
+		case presentedDapp(PresentationActionOf<DappDetails>)
 	}
 
 	// MARK: Reducer
@@ -45,7 +45,7 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$presentedDapp, action: /Action.child .. ChildAction.presentedtedDapp) {
+			.presentationDestination(\.$presentedDapp, action: /Action.child .. ChildAction.presentedDapp) {
 				DappDetails()
 			}
 	}
@@ -63,25 +63,25 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 			return .task {
 				let detailed = try await profileClient.detailsForConnectedDapp(dApp)
 				let presented = DappDetails.State(dApp: detailed)
-				return .child(.presentedtedDapp(.present(presented)))
+				return .child(.presentedDapp(.present(presented)))
 			}
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .presentedtedDapp(.presented(.delegate(.forgetDapp(id: dAppID, networkID: networkID)))):
+		case let .presentedDapp(.presented(.delegate(.forgetDapp(id: dAppID, networkID: networkID)))):
 			let presentedDappID = state.presentedDapp?.dApp.dAppDefinitionAddress
 			return .run { send in
 				try await profileClient.forgetConnectedDapp(dAppID, networkID)
 				if dAppID == presentedDappID {
-					await send(.child(.presentedtedDapp(.dismiss)), animation: .default)
+					await send(.child(.presentedDapp(.dismiss)), animation: .default)
 				}
 
 				await send(.internal(.forgotDapp(dAppID)))
 			}
 
-		case .presentedtedDapp:
+		case .presentedDapp:
 			return .none
 		}
 	}
