@@ -3,11 +3,10 @@ import FeaturePrelude
 // MARK: - CameraPermission.State
 extension CameraPermission {
 	public struct State: Sendable, Equatable {
-		var permissionDeniedAlert: AlertState<Action.ViewAction.PermissionDeniedAlertAction>?
+		@PresentationState
+		var permissionDeniedAlert: AlertState<Action.ViewAction.PermissionDeniedAlertAction>? = nil
 
-		init() {
-			self.permissionDeniedAlert = nil
-		}
+		init() {}
 	}
 }
 
