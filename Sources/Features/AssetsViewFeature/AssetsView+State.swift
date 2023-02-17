@@ -30,7 +30,7 @@ extension AssetsView {
 
 		// TODO: uncomment when ready for implementation
 		/*
-		 case poolShare
+		 case poolUnits
 		 case badges
 		 */
 
@@ -43,8 +43,8 @@ extension AssetsView {
 
 				// TODO: uncomment when ready for implementation
 				/*
-				 case .poolShare:
-				 	return L10n.AssetsView.poolShare
+				 case .poolUnits:
+				 	return L10n.AssetsView.poolUnits
 				 case .badges:
 				 	return L10n.AssetsView.badges
 				 */

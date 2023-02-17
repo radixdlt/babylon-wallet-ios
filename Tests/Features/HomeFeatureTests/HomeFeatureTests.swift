@@ -28,7 +28,7 @@ final class HomeFeatureTests: TestCase {
 			account.address: .init(
 				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
 				nonFungibleTokenContainers: [nftContainer1, nftContainer2, nftContainer3],
-				poolShareContainers: [],
+				poolUnitContainers: [],
 				badgeContainers: []
 			),
 		]
@@ -110,7 +110,7 @@ final class HomeFeatureTests: TestCase {
 			account.address: .init(
 				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
 				nonFungibleTokenContainers: [],
-				poolShareContainers: [],
+				poolUnitContainers: [],
 				badgeContainers: []
 			),
 		]

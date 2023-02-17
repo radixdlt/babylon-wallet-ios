@@ -4,18 +4,18 @@ import ClientPrelude
 public struct AccountPortfolio: Sendable, Hashable {
 	public var fungibleTokenContainers: IdentifiedArrayOf<FungibleTokenContainer>
 	public var nonFungibleTokenContainers: IdentifiedArrayOf<NonFungibleTokenContainer>
-	public var poolShareContainers: IdentifiedArrayOf<PoolUnitContainer>
+	public var poolUnitContainers: IdentifiedArrayOf<PoolUnitContainer>
 	public var badgeContainers: IdentifiedArrayOf<BadgeContainer>
 
 	public init(
 		fungibleTokenContainers: IdentifiedArrayOf<FungibleTokenContainer>,
 		nonFungibleTokenContainers: IdentifiedArrayOf<NonFungibleTokenContainer>,
-		poolShareContainers: IdentifiedArrayOf<PoolUnitContainer>,
+		poolUnitContainers: IdentifiedArrayOf<PoolUnitContainer>,
 		badgeContainers: IdentifiedArrayOf<BadgeContainer>
 	) {
 		self.fungibleTokenContainers = fungibleTokenContainers
 		self.nonFungibleTokenContainers = nonFungibleTokenContainers
-		self.poolShareContainers = poolShareContainers
+		self.poolUnitContainers = poolUnitContainers
 		self.badgeContainers = badgeContainers
 	}
 }
@@ -31,7 +31,7 @@ extension AccountPortfolio {
 	public static let empty: AccountPortfolio = Self(
 		fungibleTokenContainers: [],
 		nonFungibleTokenContainers: [],
-		poolShareContainers: [],
+		poolUnitContainers: [],
 		badgeContainers: []
 	)
 }

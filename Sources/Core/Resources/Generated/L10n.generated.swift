@@ -43,8 +43,8 @@ public enum L10n {
     public static let badges = L10n.tr("Localizable", "assetsView.badges", fallback: "Badges")
     /// NFTs
     public static let nfts = L10n.tr("Localizable", "assetsView.nfts", fallback: "NFTs")
-    /// Pool Shares
-    public static let poolShare = L10n.tr("Localizable", "assetsView.poolShare", fallback: "Pool Shares")
+    /// Pool Units
+    public static let poolUnits = L10n.tr("Localizable", "assetsView.poolUnits", fallback: "Pool Units")
     /// Tokens
     public static let tokens = L10n.tr("Localizable", "assetsView.tokens", fallback: "Tokens")
   }

@@ -143,7 +143,7 @@ extension Home.State {
 				portfolio: AccountPortfolio(
 					fungibleTokenContainers: [],
 					nonFungibleTokenContainers: [.mock1, .mock2, .mock3],
-					poolShareContainers: [],
+					poolUnitContainers: [],
 					badgeContainers: []
 				),
 				currency: .gbp,
