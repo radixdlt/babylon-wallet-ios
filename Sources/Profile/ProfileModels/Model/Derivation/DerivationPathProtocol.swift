@@ -80,17 +80,17 @@ extension DerivationPath {
 
 	/// The **default** derivation path for `Account`s.
 	public static func accountPath(_ path: AccountHierarchicalDeterministicDerivationPath) -> Self {
-		fixMultifactor()
+		Self(scheme: .cap26, path: path.derivationPath)
 	}
 
 	/// The **default** derivation path for `Identities`s (Personas).
 	public static func identityPath(_ path: IdentityHierarchicalDeterministicDerivationPath) -> Self {
-		fixMultifactor()
+		Self(scheme: .cap26, path: path.derivationPath)
 	}
 
 	/// A **custom** derivation path use to derive some keys.
 	public static func customPath(_ path: CustomHierarchicalDeterministicDerivationPath) -> Self {
-		fixMultifactor()
+		Self(scheme: .cap26, path: path.derivationPath)
 	}
 }
 

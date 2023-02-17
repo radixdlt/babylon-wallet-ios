@@ -102,17 +102,15 @@ public struct ProfileClient: Sendable {
 
 // MARK: - CreateOnboardingWalletRequest
 public struct CreateOnboardingWalletRequest: Sendable, Hashable {
-	public let networkAndGateway: AppPreferences.NetworkAndGateway
 	public let language: BIP39.Language
 	public let wordCount: BIP39.WordCount
 	public let bip39Passphrase: String
+
 	public init(
-		networkAndGateway: AppPreferences.NetworkAndGateway = .nebunet,
 		language: BIP39.Language = .english,
 		wordCount: BIP39.WordCount = .twentyFour,
 		bip39Passphrase: String = ""
 	) {
-		self.networkAndGateway = networkAndGateway
 		self.language = language
 		self.wordCount = wordCount
 		self.bip39Passphrase = bip39Passphrase

@@ -97,22 +97,27 @@ extension ProfileClient {
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
-			createOnboardingWallet: { _ in
-//				@Dependency(\.mnemonicClient.generate) var generateMnemonic
+			createOnboardingWallet: { request in
+				@Dependency(\.mnemonicClient.generate) var generateMnemonic
 
-//				let mnemonic = try generateMnemonic(request.wordCount, request.language)
-//
-//				let newProfile = try await Profile.new(
-//					networkAndGateway: request.networkAndGateway,
-//					mnemonic: mnemonic
-//				)
-//
-//				// This new profile is marked as "ephemeral" which means it is
-//				// not allowed to be persisted to keychain.
-//				await profileHolder.injectProfile(newProfile, isEphemeral: true)
-//
-//				return CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse(request: request, mnemonic: mnemonic, profile: newProfile)
-				fixMultifactor()
+				let bip39Passphrase = request.bip39Passphrase
+				let mnemonic = try generateMnemonic(request.wordCount, request.language)
+				let mnemonicAndPassphrase = MnemonicWithPassphrase(
+					mnemonic: mnemonic,
+					passphrase: bip39Passphrase
+				)
+				let onDeviceFactorSource = try FactorSource.babylon(
+					mnemonic: mnemonic,
+					bip39Passphrase: bip39Passphrase
+				)
+				let privateFactorSource = try PrivateHDFactorSource(
+					mnemonicWithPassphrase: mnemonicAndPassphrase,
+					factorSource: onDeviceFactorSource
+				)
+
+				let profile = Profile(factorSource: onDeviceFactorSource)
+
+				return OnboardingWallet(privateFactorSource: privateFactorSource, profile: profile)
 			},
 			injectProfileSnapshot: { snapshot in
 				let profile = try Profile(snapshot: snapshot)
