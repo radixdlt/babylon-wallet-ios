@@ -22,10 +22,11 @@ extension PersonaDetails {
 public extension PersonaDetails.View {
 	var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			ScrollView {
+			ScrollView(showsIndicators: false) {
 				VStack(spacing: 0) {
 					PersonaThumbnail(.placeholder, size: .veryLarge)
 						.padding(.vertical, .large2)
+						.border(.green)
 
 					InfoSection(store: store.actionless)
 
@@ -33,7 +34,7 @@ public extension PersonaDetails.View {
 						viewStore.send(.editPersonaTapped)
 					}
 					.buttonStyle(.radix)
-					.frame(width: 250)
+					.frame(width: .standardButtonWidth)
 					.padding(.vertical, .large3)
 
 					AccountSection(store: store)
@@ -47,7 +48,7 @@ public extension PersonaDetails.View {
 					.padding(.bottom, .large2)
 				}
 			}
-			.navBarTitle(viewStore.personaName)
+			.navigationTitle(viewStore.personaName)
 		}
 	}
 }
@@ -70,6 +71,7 @@ extension PersonaDetails.View {
 			let firstName: String?
 			let lastName: String?
 			let email: String?
+			let zipCode: String?
 			let personalIdentificationNumber: String?
 		}
 
@@ -86,17 +88,21 @@ extension PersonaDetails.View {
 					Text(L10n.PersonaDetails.personalDataSharingDescription(viewStore.dAppName))
 						.textBlock
 
-					InfoPair(heading: L10n.PersonaDetails.firstNameHeading,
-					         item: viewStore.firstName)
+					if let firstName = viewStore.firstName {
+						InfoPair(heading: L10n.PersonaDetails.firstNameHeading, item: firstName)
+					}
 
-					InfoPair(heading: L10n.PersonaDetails.secondNameHeading,
-					         item: viewStore.lastName)
+					if let lastName = viewStore.lastName {
+						InfoPair(heading: L10n.PersonaDetails.secondNameHeading, item: lastName)
+					}
 
-					InfoPair(heading: L10n.PersonaDetails.addressHeading,
-					         item: viewStore.email)
+					if let email = viewStore.email {
+						InfoPair(heading: L10n.PersonaDetails.emailHeading, item: email)
+					}
 
-					InfoPair(heading: L10n.PersonaDetails.twitterNameHeading,
-					         item: viewStore.personalIdentificationNumber)
+					if let zipCode = viewStore.zipCode {
+						InfoPair(heading: L10n.PersonaDetails.zipCodeHeading, item: zipCode)
+					}
 				}
 				.padding(.horizontal, .medium1)
 			}
@@ -105,13 +111,13 @@ extension PersonaDetails.View {
 
 	private struct InfoPair: View {
 		let heading: String
-		let item: String?
+		let item: String
 
 		var body: some View {
 			VStack(alignment: .leading, spacing: .small2) {
 				Text(heading)
 					.sectionHeading
-				Text(item ?? "-")
+				Text(item)
 					.infoItem
 			}
 		}
@@ -125,6 +131,7 @@ private extension PersonaDetails.State {
 		      firstName: persona.fields[kind: .firstName]?.rawValue,
 		      lastName: persona.fields[kind: .lastName]?.rawValue,
 		      email: persona.fields[kind: .email]?.rawValue,
+		      zipCode: persona.fields[kind: .zipCode]?.rawValue,
 		      personalIdentificationNumber: persona.fields[kind: .personalIdentificationNumber]?.rawValue)
 	}
 }
@@ -162,7 +169,7 @@ extension PersonaDetails.View {
 						viewStore.send(.editAccountSharingTapped)
 					}
 					.buttonStyle(.radix)
-					.frame(width: 250)
+					.frame(width: .standardButtonWidth)
 					.padding(.vertical, .large3)
 				}
 			}

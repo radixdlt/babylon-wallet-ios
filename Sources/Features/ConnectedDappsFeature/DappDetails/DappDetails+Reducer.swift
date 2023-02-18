@@ -44,6 +44,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case tokenTapped(UUID)
 		case nftTapped(UUID)
 		case personaTapped(OnNetwork.Persona.ID)
+		case dismissPersonaTapped
 		case forgetThisDappTapped
 	}
 
@@ -104,6 +105,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 			guard let persona = state.dApp.detailedAuthorizedPersonas[id: id] else { return .none }
 			let presented = PersonaDetails.State(dAppName: state.dApp.displayName.rawValue, persona: persona)
 			return .send(.child(.presentedPersona(.present(presented))))
+
+		case .dismissPersonaTapped:
+			state.presentedPersona = nil
+			print("DappDetails: .dismissPersonaTapped")
+			return .none
 
 		case .forgetThisDappTapped:
 			let dAppID = state.dApp.dAppDefinitionAddress

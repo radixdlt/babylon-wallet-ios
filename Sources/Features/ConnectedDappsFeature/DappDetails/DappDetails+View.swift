@@ -55,9 +55,19 @@ public extension DappDetails.View {
 				.onAppear {
 					viewStore.send(.appeared)
 				}
-				.navBarTitle(viewStore.title)
+				.navigationTitle(viewStore.title)
 				.sheet(store: store.presentedPersona) { store in
-					PersonaDetails.View(store: store)
+					NavigationStack {
+						PersonaDetails.View(store: store)
+							.navigationBarTitleDisplayMode(.inline)
+							.toolbar {
+								ToolbarItem(placement: .primaryAction) {
+									CloseButton {
+										viewStore.send(.dismissPersonaTapped)
+									}
+								}
+							}
+					}
 				}
 			}
 		}
@@ -146,9 +156,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.dApp.tokens, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppDetails.tokens,
-				                elements: viewStore.state,
-				                title: \.name) { _ in
+				ListWithHeading(heading: L10n.DAppDetails.tokens, elements: viewStore.state, title: \.name) { _ in
 					TokenPlaceholder(size: .small)
 				} action: { id in
 					viewStore.send(.tokenTapped(id))
@@ -163,9 +171,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.dApp.nfts, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.DAppDetails.nfts,
-				                elements: viewStore.state,
-				                title: \.name) { _ in
+				ListWithHeading(heading: L10n.DAppDetails.nfts, elements: viewStore.state, title: \.name) { _ in
 					NFTPlaceholder(size: .small)
 				} action: { id in
 					viewStore.send(.nftTapped(id))
@@ -238,17 +244,6 @@ extension DappDetails.View {
 }
 
 // TODO: • Move somewhere else
-
-public extension View {
-	func navBarTitle(_ title: String) -> some View {
-		toolbar {
-			ToolbarItem(placement: .principal) {
-				Text(title)
-			}
-		}
-		.navigationTitle(title)
-	}
-}
 
 extension OnNetwork.ConnectedDappDetailed {
 	var tokens: [TokenModel] {

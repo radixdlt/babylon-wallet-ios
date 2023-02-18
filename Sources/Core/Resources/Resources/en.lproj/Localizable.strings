@@ -140,8 +140,8 @@
 "personaDetails.editPersona" = "Edit Persona";
 "personaDetails.firstNameHeading" = "First Name";
 "personaDetails.secondNameHeading" = "Second Name";
-"personaDetails.addressHeading" = "Address";
-"personaDetails.twitterNameHeading" = "Twitter Username";
+"personaDetails.emailHeading" = "Email";
+"personaDetails.zipCodeHeading" = "Zip Code";
 
 "personaDetails.accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
 

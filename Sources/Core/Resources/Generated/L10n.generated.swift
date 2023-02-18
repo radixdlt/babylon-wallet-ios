@@ -487,14 +487,14 @@ public enum L10n {
     public static func accountSharingDescription(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.accountSharingDescription", String(describing: p1), fallback: "Here are the account names and addresses that you are currently sharing with %@.")
     }
-    /// Address
-    public static let addressHeading = L10n.tr("Localizable", "personaDetails.addressHeading", fallback: "Address")
     /// Disconnect Persona from this dApp
     public static let disconnectPersona = L10n.tr("Localizable", "personaDetails.disconnectPersona", fallback: "Disconnect Persona from this dApp")
     /// Edit Account Sharing
     public static let editAccountSharing = L10n.tr("Localizable", "personaDetails.editAccountSharing", fallback: "Edit Account Sharing")
     /// Edit Persona
     public static let editPersona = L10n.tr("Localizable", "personaDetails.editPersona", fallback: "Edit Persona")
+    /// Email
+    public static let emailHeading = L10n.tr("Localizable", "personaDetails.emailHeading", fallback: "Email")
     /// First Name
     public static let firstNameHeading = L10n.tr("Localizable", "personaDetails.firstNameHeading", fallback: "First Name")
     /// Here is the personal data that you are sharing with %@
@@ -505,8 +505,8 @@ public enum L10n {
     public static let personaNameHeading = L10n.tr("Localizable", "personaDetails.personaNameHeading", fallback: "Persona Name")
     /// Second Name
     public static let secondNameHeading = L10n.tr("Localizable", "personaDetails.secondNameHeading", fallback: "Second Name")
-    /// Twitter Username
-    public static let twitterNameHeading = L10n.tr("Localizable", "personaDetails.twitterNameHeading", fallback: "Twitter Username")
+    /// Zip Code
+    public static let zipCodeHeading = L10n.tr("Localizable", "personaDetails.zipCodeHeading", fallback: "Zip Code")
   }
   public enum PersonaList {
     /// Create new persona

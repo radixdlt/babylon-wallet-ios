@@ -49,7 +49,7 @@ public extension ConnectedDapps.View {
 					viewStore.send(.appeared)
 				}
 			}
-			.navBarTitle(L10n.ConnectedDapps.title)
+			.navigationTitle(L10n.ConnectedDapps.title)
 			.navigationDestination(store: store.presentedDapp) { store in
 				DappDetails.View(store: store)
 			}
