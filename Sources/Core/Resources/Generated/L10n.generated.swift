@@ -335,6 +335,8 @@ public enum L10n {
     public static let missingDescription = L10n.tr("Localizable", "dAppDetails.missingDescription", fallback: "Missing description")
     /// Associated NFTs
     public static let nfts = L10n.tr("Localizable", "dAppDetails.nfts", fallback: "Associated NFTs")
+    /// No Personas have been used to connect to this dApp.
+    public static let noPersonasHeading = L10n.tr("Localizable", "dAppDetails.noPersonasHeading", fallback: "No Personas have been used to connect to this dApp.")
     /// Here are the Personas that you have previously used to connect to this dApp.
     public static let personaHeading = L10n.tr("Localizable", "dAppDetails.personaHeading", fallback: "Here are the Personas that you have previously used to connect to this dApp.")
     /// Associated Tokens
@@ -497,6 +499,10 @@ public enum L10n {
     public static let emailHeading = L10n.tr("Localizable", "personaDetails.emailHeading", fallback: "Email")
     /// First Name
     public static let firstNameHeading = L10n.tr("Localizable", "personaDetails.firstNameHeading", fallback: "First Name")
+    /// You are not sharing any personal data with %@
+    public static func notSharingAnything(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "personaDetails.notSharingAnything", String(describing: p1), fallback: "You are not sharing any personal data with %@")
+    }
     /// Here is the personal data that you are sharing with %@
     public static func personalDataSharingDescription(_ p1: Any) -> String {
       return L10n.tr("Localizable", "personaDetails.personalDataSharingDescription", String(describing: p1), fallback: "Here is the personal data that you are sharing with %@")

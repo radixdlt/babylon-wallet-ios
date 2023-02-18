@@ -133,6 +133,7 @@
 "dAppDetails.tokens" = "Associated Tokens";
 "dAppDetails.nfts" = "Associated NFTs";
 "dAppDetails.personaHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
+"dAppDetails.noPersonasHeading" = "No Personas have been used to connect to this dApp.";
 "dAppDetails.forgetDapp" = "Forget this dApp";
 
 "personaDetails.personaNameHeading" = "Persona Name";
@@ -142,6 +143,7 @@
 "personaDetails.secondNameHeading" = "Second Name";
 "personaDetails.emailHeading" = "Email";
 "personaDetails.zipCodeHeading" = "Zip Code";
+"personaDetails.notSharingAnything" = "You are not sharing any personal data with %@";
 
 "personaDetails.accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
 

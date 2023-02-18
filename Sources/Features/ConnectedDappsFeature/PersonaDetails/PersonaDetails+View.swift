@@ -26,7 +26,6 @@ public extension PersonaDetails.View {
 				VStack(spacing: 0) {
 					PersonaThumbnail(.placeholder, size: .veryLarge)
 						.padding(.vertical, .large2)
-						.border(.green)
 
 					InfoSection(store: store.actionless)
 
@@ -73,6 +72,10 @@ extension PersonaDetails.View {
 			let email: String?
 			let zipCode: String?
 			let personalIdentificationNumber: String?
+
+			var isSharingSomething: Bool {
+				firstName != nil || lastName != nil || email != nil || zipCode != nil || personalIdentificationNumber != nil
+			}
 		}
 
 		let store: Store<PersonaDetails.State, Never>
@@ -85,8 +88,13 @@ extension PersonaDetails.View {
 
 					Separator()
 
-					Text(L10n.PersonaDetails.personalDataSharingDescription(viewStore.dAppName))
-						.textBlock
+					if viewStore.isSharingSomething {
+						Text(L10n.PersonaDetails.personalDataSharingDescription(viewStore.dAppName))
+							.textBlock
+					} else {
+						Text(L10n.PersonaDetails.notSharingAnything(viewStore.dAppName))
+							.textBlock
+					}
 
 					if let firstName = viewStore.firstName {
 						InfoPair(heading: L10n.PersonaDetails.firstNameHeading, item: firstName)

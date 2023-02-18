@@ -69,14 +69,9 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .presentedDapp(.presented(.delegate(.dAppForgotten(id: dAppID, networkID: networkID)))):
-			let presentedDappID = state.presentedDapp?.dApp.dAppDefinitionAddress
-			let presentedDappNetworkID = state.presentedDapp?.dApp.networkID // TODO: • Perhaps dApp ID is unique on its own?
-
-			if dAppID == presentedDappID, networkID == presentedDappNetworkID {
-				// This does not work
-				state.presentedDapp = nil
-			}
+		case let .presentedDapp(.presented(.delegate(.dAppForgotten))):
+			// This does not work
+			state.presentedDapp = nil
 
 			// Could pop up a message here
 

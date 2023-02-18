@@ -16,7 +16,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public let dApp: OnNetwork.ConnectedDappDetailed
+		public var dApp: OnNetwork.ConnectedDappDetailed
 
 		@Loadable
 		public var metadata: Metadata? = nil
@@ -49,11 +49,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case dAppForgotten(id: OnNetwork.ConnectedDapp.ID, networkID: NetworkID)
+		case dAppForgotten
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<State.Metadata>)
+		case dAppUpdated(OnNetwork.ConnectedDappDetailed)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -103,31 +104,36 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		case let .personaTapped(id):
 			guard let persona = state.dApp.detailedAuthorizedPersonas[id: id] else { return .none }
-			let presented = PersonaDetails.State(dAppName: state.dApp.displayName.rawValue, persona: persona)
-			return .send(.child(.presentedPersona(.present(presented))))
+			let presentedState = PersonaDetails.State(dAppName: state.dApp.displayName.rawValue,
+			                                          dAppID: state.dApp.dAppDefinitionAddress,
+			                                          networkID: state.dApp.networkID,
+			                                          persona: persona)
+
+			return .send(.child(.presentedPersona(.present(presentedState))))
 
 		case .dismissPersonaTapped:
 			state.presentedPersona = nil
-			print("DappDetails: .dismissPersonaTapped")
 			return .none
 
 		case .forgetThisDappTapped:
-			let dAppID = state.dApp.dAppDefinitionAddress
-			let networkID = state.dApp.networkID
-
 			return .task {
 //				try await profileClient.forgetConnectedDapp(dAppID, networkID)
-				return .delegate(.dAppForgotten(id: dAppID, networkID: networkID))
+				return .delegate(.dAppForgotten)
 			}
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .presentedPersona(.presented(.delegate(.testTapped))):
-			print("PARENT: .delegate(.testTapped)")
+		case .presentedPersona(.presented(.delegate(.personaDisconnected))):
+			print("PARENT: .delegate(.disconnectPersonaTapped) from child")
 			state.presentedPersona = nil
-			return .none
+
+			let dAppID = state.dApp.dAppDefinitionAddress
+			return .task {
+				let updatedDapp = try await profileClient.getDappDetails(dAppID)
+				return .internal(.dAppUpdated(updatedDapp))
+			}
 
 		default:
 			return .none
@@ -138,6 +144,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .metadataLoaded(metadata):
 			state.$metadata = metadata
+			return .none
+		case let .dAppUpdated(dApp):
+			print("PARENT: dAppUpdated: \(dApp.detailedAuthorizedPersonas.count)")
+			state.dApp = dApp
 			return .none
 		}
 	}

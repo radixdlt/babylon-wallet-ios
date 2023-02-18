@@ -244,6 +244,26 @@ extension Profile {
 		try updateOnNetwork(network)
 	}
 
+	public mutating func disconnectPersonaFromDapp(
+		_ personaID: OnNetwork.Persona.ID,
+		dAppID: OnNetwork.ConnectedDapp.ID,
+		networkID: NetworkID
+	) async throws {
+		var network = try onNetwork(id: networkID)
+		guard var connectedDapp = network.connectedDapps[id: dAppID] else {
+			throw ConnectedDappDoesNotExists()
+		}
+
+		guard connectedDapp.referencesToAuthorizedPersonas.remove(id: personaID) != nil else {
+			throw PersonaNotConnected()
+		}
+
+		guard network.connectedDapps.updateOrAppend(connectedDapp) != nil else {
+			fatalError("Incorrect implementation, should have been an existing ConnectedDapp")
+		}
+		try updateOnNetwork(network)
+	}
+
 	/// Creates a new **Virtual** `Account` without saving it into the profile.
 	public func creatingNewVirtualAccount(
 		networkID: NetworkID,
@@ -318,5 +338,8 @@ extension Profile {
 		)
 	}
 }
+
+// MARK: - PersonaNotConnected
+struct PersonaNotConnected: Swift.Error {}
 
 public typealias MnemonicForFactorSourceByReference = @Sendable (FactorSourceReference) async throws -> Mnemonic?

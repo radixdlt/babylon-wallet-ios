@@ -13,10 +13,18 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		public let dAppName: String
+		public let dAppID: OnNetwork.ConnectedDapp.ID
+		public let networkID: NetworkID
 		public let persona: OnNetwork.AuthorizedPersonaDetailed
 
-		public init(dAppName: String, persona: OnNetwork.AuthorizedPersonaDetailed) {
+		public init(dAppName: String,
+		            dAppID: OnNetwork.ConnectedDapp.ID,
+		            networkID: NetworkID,
+		            persona: OnNetwork.AuthorizedPersonaDetailed)
+		{
 			self.dAppName = dAppName
+			self.dAppID = dAppID
+			self.networkID = networkID
 			self.persona = persona
 		}
 	}
@@ -32,7 +40,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case testTapped
+		case personaDisconnected
 	}
 
 	// MARK: - Reducer
@@ -48,11 +56,12 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case .editAccountSharingTapped:
 			return .none
 		case .disconnectPersonaTapped:
-			return .send(.delegate(.testTapped))
-
-//			profileClient.updateConnectedDapp
-
-//			return .none
+			print("••• disconnectPersonaTapped")
+			let (personaID, dAppID, networkID) = (state.persona.id, state.dAppID, state.networkID)
+			return .task {
+				try await profileClient.disconnectPersonaFromDapp(personaID, dAppID, networkID)
+				return .delegate(.personaDisconnected)
+			}
 		}
 	}
 }

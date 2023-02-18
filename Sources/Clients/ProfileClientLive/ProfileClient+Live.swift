@@ -284,6 +284,11 @@ extension ProfileClient {
 					try await profile.updateConnectedDapp(updated)
 				}
 			},
+			disconnectPersonaFromDapp: { personaID, connectedDappID, networkID in
+				try await profileHolder.asyncMutating { profile in
+					try await profile.disconnectPersonaFromDapp(personaID, dAppID: connectedDappID, networkID: networkID)
+				}
+			},
 			addP2PClient: { newClient in
 				try await profileHolder.asyncMutating { profile in
 					_ = profile.appendP2PClient(newClient)

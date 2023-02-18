@@ -217,28 +217,35 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading, spacing: 0) {
-					Text(L10n.DAppDetails.personaHeading)
+				if viewStore.personas.isEmpty {
+					Text(L10n.DAppDetails.noPersonasHeading)
 						.sectionHeading
 						.padding(.horizontal, .medium1)
 						.padding(.vertical, .large3)
+				} else {
+					VStack(alignment: .leading, spacing: 0) {
+						Text(L10n.DAppDetails.personaHeading)
+							.sectionHeading
+							.padding(.horizontal, .medium1)
+							.padding(.vertical, .large3)
 
-					VStack(spacing: .medium3) {
-						ForEach(viewStore.personas) { persona in
-							RadixCard {
-								PlainListRow(title: persona.name) {
-									viewStore.send(.personaTapped(persona.id))
-								} icon: {
-									PersonaThumbnail(persona.thumbnail)
+						VStack(spacing: .medium3) {
+							ForEach(viewStore.personas) { persona in
+								RadixCard {
+									PlainListRow(title: persona.name) {
+										viewStore.send(.personaTapped(persona.id))
+									} icon: {
+										PersonaThumbnail(persona.thumbnail)
+									}
 								}
+								.padding(.horizontal, .medium3)
 							}
-							.padding(.horizontal, .medium3)
 						}
 					}
+					.padding(.bottom, .large2)
 				}
-				.padding(.bottom, .large2)
-				.background(.app.gray5)
 			}
+			.background(.app.gray5)
 		}
 	}
 }
