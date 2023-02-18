@@ -131,7 +131,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .task {
-				let updatedDapp = try await profileClient.getDappDetails(dAppID)
+				let updatedDapp = try await profileClient.getDetailedDapp(dAppID)
 				return .internal(.dAppUpdated(updatedDapp))
 			}
 

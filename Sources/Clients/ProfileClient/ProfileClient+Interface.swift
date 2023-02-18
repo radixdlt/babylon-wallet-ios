@@ -200,7 +200,7 @@ public typealias SignersOfAccount = SignersOf<OnNetwork.Account>
 
 // Where to put this?
 extension ProfileClient {
-	public func getDappDetails(_ id: OnNetwork.ConnectedDapp.ID) async throws -> OnNetwork.ConnectedDappDetailed {
+	public func getDetailedDapp(_ id: OnNetwork.ConnectedDapp.ID) async throws -> OnNetwork.ConnectedDappDetailed {
 		let dApps = try await getConnectedDapps()
 		guard let dApp = dApps[id: id] else {
 			throw ConnectedDappDoesNotExists()

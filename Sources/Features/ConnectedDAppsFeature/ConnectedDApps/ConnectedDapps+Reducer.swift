@@ -32,8 +32,6 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		case loadedDapps(IdentifiedArrayOf<OnNetwork.ConnectedDapp>)
 	}
 
-	public enum DelegateAction: Sendable, Equatable {}
-
 	public enum ChildAction: Sendable, Equatable {
 		case presentedDapp(PresentationActionOf<DappDetails>)
 	}
@@ -56,11 +54,9 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 				let dApps = try await profileClient.getConnectedDapps() // TODO: • Handle error?
 				return .internal(.loadedDapps(dApps))
 			}
-		case let .didSelectDapp(id):
-			guard let dApp = state.dApps[id: id] else { return .none } // TODO: • Handle error? Put details directly in enum case?
-
+		case let .didSelectDapp(dAppID):
 			return .task {
-				let details = try await profileClient.detailsForConnectedDapp(dApp)
+				let details = try await profileClient.getDetailedDapp(dAppID)
 				let detailsState = DappDetails.State(dApp: details)
 				return .child(.presentedDapp(.present(detailsState)))
 			}
