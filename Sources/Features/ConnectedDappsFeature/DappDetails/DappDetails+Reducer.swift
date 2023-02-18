@@ -19,7 +19,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var dApp: OnNetwork.ConnectedDappDetailed
 
 		@Loadable
-		public var metadata: Metadata? = nil
+		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
 
 		@PresentationState
 		public var presentedPersona: PersonaDetails.State? = nil
@@ -27,11 +27,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public init(dApp: OnNetwork.ConnectedDappDetailed, presentedPersona: PersonaDetails.State? = nil) {
 			self.dApp = dApp
 			self.presentedPersona = presentedPersona
-		}
-
-		public struct Metadata: Sendable, Hashable {
-			let description: String?
-			let domain: String?
 		}
 	}
 
@@ -53,7 +48,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case metadataLoaded(Loadable<State.Metadata>)
+		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
 		case dAppUpdated(OnNetwork.ConnectedDappDetailed)
 	}
 
@@ -78,8 +73,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.$metadata = .loading
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .task {
-				let metadataEntities = try await gatewayClient.resourceDetailsByResourceIdentifier(dAppID.address).metadata
-				let metadata = State.Metadata(metadataEntities)
+				let metadata = try await gatewayClient.resourceDetailsByResourceIdentifier(dAppID.address).metadata
 				return .internal(.metadataLoaded(.loaded(metadata)))
 			} catch: { error in
 				.internal(.metadataLoaded(.init(error)))
@@ -112,8 +106,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .send(.child(.presentedPersona(.present(presentedState))))
 
 		case .dismissPersonaTapped:
-			state.presentedPersona = nil
-			return .none
+			return .send(.child(.presentedPersona(.dismiss)))
 
 		case .forgetThisDappTapped:
 			return .task {
@@ -126,13 +119,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .presentedPersona(.presented(.delegate(.personaDisconnected))):
-			print("PARENT: .delegate(.disconnectPersonaTapped) from child")
-			state.presentedPersona = nil
-
 			let dAppID = state.dApp.dAppDefinitionAddress
-			return .task {
+			return .run { send in
 				let updatedDapp = try await profileClient.getDetailedDapp(dAppID)
-				return .internal(.dAppUpdated(updatedDapp))
+				await send(.internal(.dAppUpdated(updatedDapp)))
+				await send(.child(.presentedPersona(.dismiss)))
 			}
 
 		default:
@@ -146,23 +137,20 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.$metadata = metadata
 			return .none
 		case let .dAppUpdated(dApp):
-			print("PARENT: dAppUpdated: \(dApp.detailedAuthorizedPersonas.count)")
 			state.dApp = dApp
 			return .none
 		}
 	}
 }
 
-// TODO: • Move or use existing DappMetadata from DappInteraction
-extension DappDetails.State.Metadata {
-	init(_ metadata: GatewayAPI.EntityMetadataCollection) {
-		self.description = metadata["description"]
-		self.domain = metadata["domain"]
-	}
-}
+// MARK: - Extensions
 
 // We could even consider give EntityMetadataCollection support for dynamicMemberLookup
 extension GatewayAPI.EntityMetadataCollection {
+	var description: String? {
+		self["description"]
+	}
+
 	subscript(key: String) -> String? {
 		items.first { $0.key == key }?.value
 	}

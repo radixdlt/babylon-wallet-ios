@@ -17,7 +17,14 @@ extension DappDetails {
 		let description: Loadable<String?>
 		let domain: String?
 		let addressViewState: AddressView.ViewState
+		let otherMetadata: [MetadataItem]
 		let personas: [Persona]
+
+		struct MetadataItem: Identifiable, Hashable, Sendable {
+			var id: Self { self }
+			let key: String
+			let value: String
+		}
 
 		struct Persona: Identifiable, Hashable, Sendable {
 			let id: OnNetwork.Persona.ID
@@ -78,11 +85,19 @@ public extension DappDetails.View {
 
 private extension DappDetails.State {
 	var viewState: DappDetails.ViewState {
-		.init(title: dApp.displayName.rawValue,
-		      description: $metadata.description,
-		      domain: metadata?.domain,
-		      addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .short),
-		      personas: dApp.detailedAuthorizedPersonas.map(DappDetails.ViewState.Persona.init))
+		let ignoredKeys: Set<String> = ["description", "domain", "name"]
+
+		let otherMetadata = metadata?.items
+			.filter { !ignoredKeys.contains($0.key) }
+			.map { DappDetails.ViewState.MetadataItem(key: $0.key, value: $0.value) }
+			.sorted { $0.key < $1.key } ?? []
+
+		return .init(title: dApp.displayName.rawValue,
+		             description: $metadata.description,
+		             domain: metadata?["domain"],
+		             addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .short),
+		             otherMetadata: otherMetadata,
+		             personas: dApp.detailedAuthorizedPersonas.map(DappDetails.ViewState.Persona.init))
 	}
 }
 
@@ -136,12 +151,18 @@ extension DappDetails.View {
 						if let url = URL(string: domain) {
 							Button(domain) {
 								viewStore.send(.openURLTapped(url))
+								print("tapped proper URL:", url)
 							}
 							.buttonStyle(.url)
 						} else {
 							Text(domain)
 								.urlLink
+								.border(.orange)
 						}
+					}
+
+					ForEach(viewStore.otherMetadata) { item in
+						InfoPair(heading: item.key, item: item.value)
 					}
 				}
 				.padding(.horizontal, .medium1)

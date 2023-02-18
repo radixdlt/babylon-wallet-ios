@@ -65,13 +65,15 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .presentedDapp(.presented(.delegate(.dAppForgotten))):
-			// This does not work
-			state.presentedDapp = nil
+		case .presentedDapp(.presented(.delegate(.dAppForgotten))):
 
 			// Could pop up a message here
+			// Does not work
+			return .send(.child(.presentedDapp(.dismiss)))
 
-			return .none
+//			// This does not work either
+//			state.presentedDapp = nil
+//			return .none
 
 		case .presentedDapp:
 			return .none

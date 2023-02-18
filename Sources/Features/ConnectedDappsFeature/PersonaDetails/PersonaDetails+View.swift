@@ -116,20 +116,6 @@ extension PersonaDetails.View {
 			}
 		}
 	}
-
-	private struct InfoPair: View {
-		let heading: String
-		let item: String
-
-		var body: some View {
-			VStack(alignment: .leading, spacing: .small2) {
-				Text(heading)
-					.sectionHeading
-				Text(item)
-					.infoItem
-			}
-		}
-	}
 }
 
 private extension PersonaDetails.State {
@@ -208,5 +194,25 @@ public struct NamedAccount: Equatable, Sendable {
 		self.name = name
 		self.gradient = gradient
 		self.address = address
+	}
+}
+
+// MARK: - InfoPair
+public struct InfoPair: View {
+	let heading: String
+	let item: String
+
+	public init(heading: String, item: String) {
+		self.heading = heading
+		self.item = item
+	}
+
+	public var body: some View {
+		VStack(alignment: .leading, spacing: .small2) {
+			Text(heading)
+				.sectionHeading
+			Text(item)
+				.infoItem
+		}
 	}
 }
