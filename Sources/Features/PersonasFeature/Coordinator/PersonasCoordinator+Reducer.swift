@@ -38,11 +38,6 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .personaList(.delegate(.dismiss)):
-			return .run { send in
-				await send(.delegate(.dismiss))
-			}
-
 		case .personaList(.delegate(.createNewPersona)):
 			let isFirst = state.personaList.personas.count == 0
 			state.createPersonaCoordinator = .init(config: .init(
