@@ -54,6 +54,7 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 				let dApps = try await profileClient.getConnectedDapps() // TODO: • Handle error?
 				return .internal(.loadedDapps(dApps))
 			}
+
 		case let .didSelectDapp(dAppID):
 			return .task {
 				let details = try await profileClient.getDetailedDapp(dAppID)
@@ -66,14 +67,12 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case .presentedDapp(.presented(.delegate(.dAppForgotten))):
-
-			// Could pop up a message here
-			// Does not work
-			return .send(.child(.presentedDapp(.dismiss)))
-
-//			// This does not work either
-//			state.presentedDapp = nil
-//			return .none
+			return .run { send in
+				let dApps = try await profileClient.getConnectedDapps() // TODO: • Handle error?
+				// Could pop up a message here
+				await send(.child(.presentedDapp(.dismiss)))
+				await send(.internal(.loadedDapps(dApps)))
+			}
 
 		case .presentedDapp:
 			return .none

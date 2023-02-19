@@ -5,6 +5,7 @@ import FeaturePrelude
 extension DappDetails {
 	@MainActor
 	public struct View: SwiftUI.View {
+		@Environment(\.dismiss) private var dismiss
 		let store: Store
 
 		public init(store: Store) {
@@ -19,6 +20,7 @@ extension DappDetails {
 		let addressViewState: AddressView.ViewState
 		let otherMetadata: [MetadataItem]
 		let personas: [Persona]
+		let isDismissed: Bool
 
 		struct MetadataItem: Identifiable, Hashable, Sendable {
 			var id: Self { self }
@@ -77,6 +79,9 @@ public extension DappDetails.View {
 					}
 				}
 			}
+			.onChange(of: viewStore.isDismissed) { _ in
+				dismiss()
+			}
 		}
 	}
 }
@@ -97,7 +102,8 @@ private extension DappDetails.State {
 		             domain: metadata?["domain"],
 		             addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .short),
 		             otherMetadata: otherMetadata,
-		             personas: dApp.detailedAuthorizedPersonas.map(DappDetails.ViewState.Persona.init))
+		             personas: dApp.detailedAuthorizedPersonas.map(DappDetails.ViewState.Persona.init),
+		             isDismissed: isDismissed)
 	}
 }
 

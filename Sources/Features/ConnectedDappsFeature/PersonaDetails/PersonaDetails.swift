@@ -56,10 +56,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case .editAccountSharingTapped:
 			return .none
 		case .disconnectPersonaTapped:
-			print("••• disconnectPersonaTapped")
 			let (personaID, dAppID, networkID) = (state.persona.id, state.dAppID, state.networkID)
 			return .task {
-//				try await profileClient.disconnectPersonaFromDapp(personaID, dAppID, networkID)
+				try await profileClient.disconnectPersonaFromDapp(personaID, dAppID, networkID)
 				return .delegate(.personaDisconnected)
 			}
 		}

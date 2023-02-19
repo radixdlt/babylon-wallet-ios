@@ -24,6 +24,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 		@PresentationState
 		public var presentedPersona: PersonaDetails.State? = nil
 
+		// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
+		public var isDismissed: Bool = false
+
 		public init(dApp: OnNetwork.ConnectedDappDetailed, presentedPersona: PersonaDetails.State? = nil) {
 			self.dApp = dApp
 			self.presentedPersona = presentedPersona
@@ -109,8 +112,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .send(.child(.presentedPersona(.dismiss)))
 
 		case .forgetThisDappTapped:
+			// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
+			state.isDismissed = true
+			let (dAppID, networkID) = (state.dApp.dAppDefinitionAddress, state.dApp.networkID)
 			return .task {
-//				try await profileClient.forgetConnectedDapp(dAppID, networkID)
+				try await profileClient.forgetConnectedDapp(dAppID, networkID)
 				return .delegate(.dAppForgotten)
 			}
 		}
