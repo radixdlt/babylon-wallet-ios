@@ -23,12 +23,12 @@ extension ManageGatewayAPIEndpoints {
 	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.didAppear)):
-			return .run { send in
-				await send(.internal(.system(.loadNetworkAndGatewayResult(
+			return .task {
+				await .internal(.system(.loadNetworkAndGatewayResult(
 					TaskResult {
 						await networkSwitchingClient.getNetworkAndGateway()
 					}
-				))))
+				)))
 			}
 
 		case let .internal(.system(.loadNetworkAndGatewayResult(.success(currentNetworkAndGateway)))):
@@ -55,12 +55,12 @@ extension ManageGatewayAPIEndpoints {
 				return .none
 			}
 			state.isValidatingEndpoint = true
-			return .run { send in
-				await send(.internal(.system(.gatewayValidationResult(
+			return .task {
+				await .internal(.system(.gatewayValidationResult(
 					TaskResult {
 						try await networkSwitchingClient.validateGatewayURL(url)
 					}
-				))))
+				)))
 			}
 
 		case let .internal(.view(.focusTextField(focus))):
@@ -78,27 +78,27 @@ extension ManageGatewayAPIEndpoints {
 				return .none
 			}
 			state.validatedNewNetworkAndGatewayToSwitchTo = new
-			return .run { send in
-				await send(.internal(.system(.hasAccountsResult(
+			return .task {
+				await .internal(.system(.hasAccountsResult(
 					TaskResult {
 						try await networkSwitchingClient.hasAccountOnNetwork(new)
 					}
-				))))
+				)))
 			}
 		case let .internal(.system(.hasAccountsResult(.success(hasAccountsOnNetwork)))):
 			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
 				// weird state... should not happen.
 				return .none
 			}
-			return .run { send in
+			return .task {
 				if hasAccountsOnNetwork {
-					await send(.internal(.system(.switchToResult(
+					return await .internal(.system(.switchToResult(
 						TaskResult {
 							try await networkSwitchingClient.switchTo(new)
 						}
-					))))
+					)))
 				} else {
-					await send(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(new))))
+					return .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(new)))
 				}
 			}
 
@@ -107,7 +107,6 @@ extension ManageGatewayAPIEndpoints {
 			return skipSwitching(state: &state)
 
 		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway))):
-
 			state.createAccountCoordinator = .init(config: .init(
 				specificNetworkID: newNetworkAndGateway.network.id,
 				isFirstEntity: false,
@@ -133,12 +132,12 @@ extension ManageGatewayAPIEndpoints {
 				// weird state... should not happen.
 				return .none
 			}
-			return .run { send in
-				await send(.internal(.system(.switchToResult(
+			return .task {
+				await .internal(.system(.switchToResult(
 					TaskResult {
 						try await networkSwitchingClient.switchTo(new)
 					}
-				))))
+				)))
 			}
 
 		case .createAccountCoordinator, .delegate:

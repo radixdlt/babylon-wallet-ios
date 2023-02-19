@@ -63,12 +63,12 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 extension PersonasCoordinator {
 	func loadPersonas() -> EffectTask<Action> {
-		.run { send in
-			await send(.internal(.loadPersonasResult(
+		.task {
+			await .internal(.loadPersonasResult(
 				TaskResult {
 					try await profileClient.getPersonas()
 				}
-			)))
+			))
 		}
 	}
 }

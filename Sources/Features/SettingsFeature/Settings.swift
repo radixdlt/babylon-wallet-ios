@@ -197,7 +197,9 @@ extension AppSettings {
 	fileprivate func loadP2PClients() -> EffectTask<Action> {
 		.task {
 			await .internal(.loadP2PClientsResult(
-				TaskResult { try await profileClient.getP2PClients() }
+				TaskResult {
+					try await profileClient.getP2PClients()
+				}
 			))
 		}
 	}

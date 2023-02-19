@@ -130,14 +130,15 @@ extension ManageP2PClients {
 
 		case let .child(.newConnection(.delegate(.newConnection(connectedClient)))):
 			state.newConnection = nil
-			return .run { send in
-				await send(.internal(.system(.saveNewConnectionResult(
+			return .task {
+				await .internal(.system(.saveNewConnectionResult(
 					TaskResult {
 						try await p2pConnectivityClient.addP2PClientWithConnection(
 							connectedClient.p2pClient
 						)
-					}.map { connectedClient }
-				))))
+					}
+					.map { connectedClient }
+				)))
 			}
 
 		case .child(.newConnection(.delegate(.dismiss))):
