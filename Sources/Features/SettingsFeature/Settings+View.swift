@@ -117,27 +117,25 @@ extension AppSettings.View {
 		var id: String { title }
 		let title: String
 		let asset: ImageAsset
-		let action: AppSettings.Action.ViewAction
+		let action: AppSettings.ViewAction
 	}
 
 	private func settingsRows() -> [RowModel] {
-		[
-			.init(title: L10n.Settings.desktopConnectionsButtonTitle,
-			      asset: AssetResource.desktopConnections,
-			      action: .manageP2PClientsButtonTapped),
-			.init(title: L10n.Settings.connectedDappsButtonTitle,
-			      asset: AssetResource.connectedDapps,
-			      action: .connectedDappsButtonTapped),
-			.init(title: L10n.Settings.gatewayButtonTitle,
-			      asset: AssetResource.gateway,
-			      action: .editGatewayAPIEndpointButtonTapped),
-			.init(title: L10n.Settings.personasButtonTitle,
-			      asset: AssetResource.personas,
-			      action: .personasButtonTapped),
-		]
+		[.init(title: L10n.Settings.desktopConnectionsButtonTitle,
+		       asset: AssetResource.desktopConnections,
+		       action: .manageP2PClientsButtonTapped),
+		 .init(title: L10n.Settings.connectedDappsButtonTitle,
+		       asset: AssetResource.connectedDapps,
+		       action: .connectedDappsButtonTapped),
+		 .init(title: L10n.Settings.gatewayButtonTitle,
+		       asset: AssetResource.gateway,
+		       action: .editGatewayAPIEndpointButtonTapped),
+		 .init(title: L10n.Settings.personasButtonTitle,
+		       asset: AssetResource.personas,
+		       action: .personasButtonTapped)]
 	}
 
-	private func settingsView(viewStore: ViewStore<AppSettings.ViewState, AppSettings.Action.ViewAction>) -> some View {
+	private func settingsView(viewStore: ViewStore<AppSettings.ViewState, AppSettings.ViewAction>) -> some View {
 		VStack(spacing: 0) {
 			ScrollView {
 				VStack(spacing: .zero) {

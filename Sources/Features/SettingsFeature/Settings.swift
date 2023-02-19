@@ -16,21 +16,99 @@ public struct AppSettings: Sendable, ReducerProtocol {
 	public typealias Store = StoreOf<Self>
 
 	public init() {}
-}
 
-extension AppSettings {
+	// MARK: State
+
+	public struct State: Equatable {
+		public var manageP2PClients: ManageP2PClients.State?
+		@PresentationState public var connectedDapps: ConnectedDapps.State?
+		public var manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State?
+		public var personasCoordinator: PersonasCoordinator.State?
+		public var canAddP2PClient: Bool
+		#if DEBUG
+		public var profileToInspect: Profile?
+		#endif
+
+		public init(manageP2PClients: ManageP2PClients.State? = nil,
+		            connectedDapps: ConnectedDapps.State? = nil,
+		            manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State? = nil,
+		            personasCoordinator: PersonasCoordinator.State? = nil,
+		            canAddP2PClient: Bool = false)
+		{
+			self.manageP2PClients = manageP2PClients
+			self.connectedDapps = connectedDapps
+			self.manageGatewayAPIEndpoints = manageGatewayAPIEndpoints
+			self.personasCoordinator = personasCoordinator
+			self.canAddP2PClient = canAddP2PClient
+		}
+	}
+
+	// MARK: Action
+
+	public enum Action: Sendable, Equatable {
+		case child(ChildAction)
+		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
+		case `internal`(InternalAction)
+		case delegate(DelegateAction)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case manageP2PClients(ManageP2PClients.Action)
+		case connectedDapps(PresentationActionOf<ConnectedDapps>)
+		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
+		case personasCoordinator(PersonasCoordinator.Action)
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case didAppear
+		case dismissSettingsButtonTapped
+		case deleteProfileAndFactorSourcesButtonTapped
+
+		case manageP2PClientsButtonTapped
+		case addP2PClientButtonTapped
+
+		case editGatewayAPIEndpointButtonTapped
+		case connectedDappsButtonTapped
+		case personasButtonTapped
+
+		#if DEBUG
+		case debugInspectProfileButtonTapped
+		case setDebugProfileSheet(isPresented: Bool)
+		#endif
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case view(ViewAction)
+		case system(SystemAction)
+	}
+
+	public enum SystemAction: Sendable, Equatable {
+		case loadP2PClientsResult(TaskResult<P2PClients>)
+		#if DEBUG
+		case profileToDebugLoaded(Profile)
+		#endif
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case dismissSettings
+		case deleteProfileAndFactorSources
+		case networkChanged
+	}
+
+	// MARK: Reducer
+
 	public var body: some ReducerProtocolOf<Self> {
-		Reduce(self.core)
-			.ifLet(\.manageP2PClients, action: /Action.child .. Action.ChildAction.manageP2PClients) {
+		Reduce(core)
+			.ifLet(\.manageP2PClients, action: /Action.child .. ChildAction.manageP2PClients) {
 				ManageP2PClients()
 			}
-			.ifLet(\.manageGatewayAPIEndpoints, action: /Action.child .. Action.ChildAction.manageGatewayAPIEndpoints) {
+			.ifLet(\.manageGatewayAPIEndpoints, action: /Action.child .. ChildAction.manageGatewayAPIEndpoints) {
 				ManageGatewayAPIEndpoints()
 			}
-			.ifLet(\.personasCoordinator, action: /Action.child .. Action.ChildAction.personasCoordinator) {
+			.ifLet(\.personasCoordinator, action: /Action.child .. ChildAction.personasCoordinator) {
 				PersonasCoordinator()
 			}
-			.presentationDestination(\.$connectedDapps, action: /Action.child .. Action.ChildAction.connectedDapps) {
+			.presentationDestination(\.$connectedDapps, action: /Action.child .. ChildAction.connectedDapps) {
 				ConnectedDapps()
 			}
 	}
