@@ -4,7 +4,7 @@ import P2PConnectivityClient
 
 // MARK: - ManageP2PClients.State
 extension ManageP2PClients {
-	public struct State: Equatable {
+	public struct State: Sendable, Hashable {
 		public var clients: IdentifiedArrayOf<ManageP2PClient.State>
 
 		public var newConnection: NewConnection.State?
