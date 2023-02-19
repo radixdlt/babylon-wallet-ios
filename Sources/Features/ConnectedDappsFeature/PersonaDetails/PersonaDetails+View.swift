@@ -154,7 +154,7 @@ extension PersonaDetails.View {
 						ForEach(viewStore.sharingAccounts) { account in
 							AccountButton(account.label.rawValue,
 							              address: account.address.address,
-							              gradient: .account(account.appearanceID.id)) {
+							              gradient: .init(account.appearanceID)) {
 								viewStore.send(.appeared)
 							}
 						}
