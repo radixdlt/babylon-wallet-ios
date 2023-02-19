@@ -101,12 +101,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		case let .personaTapped(id):
 			guard let persona = state.dApp.detailedAuthorizedPersonas[id: id] else { return .none }
-			let presentedState = PersonaDetails.State(dAppName: state.dApp.displayName.rawValue,
-			                                          dAppID: state.dApp.dAppDefinitionAddress,
-			                                          networkID: state.dApp.networkID,
-			                                          persona: persona)
-
-			return .send(.child(.presentedPersona(.present(presentedState))))
+			state.presentedPersona = PersonaDetails.State(dAppName: state.dApp.displayName.rawValue,
+			                                              dAppID: state.dApp.dAppDefinitionAddress,
+			                                              networkID: state.dApp.networkID,
+			                                              persona: persona)
+			return .none
 
 		case .dismissPersonaTapped:
 			return .send(.child(.presentedPersona(.dismiss)))
