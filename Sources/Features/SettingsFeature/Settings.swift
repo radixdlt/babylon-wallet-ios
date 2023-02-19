@@ -115,9 +115,9 @@ public struct AppSettings: FeatureReducer {
 			return .send(.delegate(.dismissSettings))
 
 		case .deleteProfileAndFactorSourcesButtonTapped:
-			return .run { send in
+			return .task {
 				await p2pConnectivityClient.disconnectAndRemoveAll()
-				await send(.delegate(.deleteProfileAndFactorSources))
+				return .delegate(.deleteProfileAndFactorSources)
 			}
 
 		case .manageP2PClientsButtonTapped:
@@ -180,23 +180,13 @@ public struct AppSettings: FeatureReducer {
 		case .manageP2PClients(.dismiss):
 			return loadP2PClients()
 
-		case .manageP2PClients:
-			return .none
-
 		case .manageGatewayAPIEndpoints(.presented(.delegate(.networkChanged))):
 			return .send(.delegate(.networkChanged))
 
-		case .manageGatewayAPIEndpoints:
-			return .none
-
-		case .connectedDapps:
-			return .none
-
-//		case .personasCoordinator(.delegate(.dismiss)):
-//			state.personasCoordinator = nil
-//			return .none
-
-		case .personasCoordinator:
+		case .manageP2PClients,
+		     .manageGatewayAPIEndpoints,
+		     .connectedDapps,
+		     .personasCoordinator:
 			return .none
 		}
 	}
