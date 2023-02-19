@@ -58,8 +58,8 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		case let .didSelectDapp(dAppID):
 			return .task {
 				let details = try await profileClient.getDetailedDapp(dAppID)
-				let detailsState = DappDetails.State(dApp: details)
-				return .child(.presentedDapp(.present(detailsState)))
+				let presentedState = DappDetails.State(dApp: details)
+				return .child(.presentedDapp(.present(presentedState)))
 			}
 		}
 	}

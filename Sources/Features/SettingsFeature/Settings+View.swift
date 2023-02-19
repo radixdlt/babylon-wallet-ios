@@ -44,50 +44,31 @@ public extension AppSettings.View {
 	var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			NavigationStack {
-				ForceFullScreen {
-					ZStack {
-						settingsView(viewStore: viewStore)
-
-						IfLetStore(
-							store.scope(
-								state: \.manageP2PClients,
-								action: { .child(.manageP2PClients($0)) }
-							),
-							then: { ManageP2PClients.View(store: $0) }
-						)
-
-						IfLetStore(
-							store.scope(
-								state: \.manageGatewayAPIEndpoints,
-								action: { .child(.manageGatewayAPIEndpoints($0)) }
-							),
-							then: { ManageGatewayAPIEndpoints.View(store: $0) }
-						)
-
-						IfLetStore(
-							store.scope(
-								state: \.personasCoordinator,
-								action: { .child(.personasCoordinator($0)) }
-							),
-							then: { PersonasCoordinator.View(store: $0) }
-						)
-					}
-				}
-				.navigationBarTitleDisplayMode(.inline)
-				.toolbar {
-					ToolbarItem(placement: .navigationBarLeading) {
-						BackButton {
-							viewStore.send(.dismissSettingsButtonTapped)
+				settingsView(viewStore: viewStore)
+					.navigationBarTitleDisplayMode(.inline)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							BackButton {
+								viewStore.send(.dismissSettingsButtonTapped)
+							}
+						}
+						ToolbarItem(placement: .principal) {
+							Text(L10n.Settings.title)
 						}
 					}
-					ToolbarItem(placement: .principal) {
-						Text(L10n.Settings.title)
+					.navigationTitle(L10n.Settings.title)
+					.navigationDestination(store: store.manageP2PClients) { store in
+						ManageP2PClients.View(store: store)
 					}
-				}
-				.navigationTitle(L10n.Settings.title)
-				.navigationDestination(store: store.connectedDapps) { store in
-					ConnectedDapps.View(store: store)
-				}
+					.navigationDestination(store: store.manageGatewayAPIEndpoints) { store in
+						ManageGatewayAPIEndpoints.View(store: store)
+					}
+					.navigationDestination(store: store.connectedDapps) { store in
+						ConnectedDapps.View(store: store)
+					}
+					.navigationDestination(store: store.personasCoordinator) { store in
+						PersonasCoordinator.View(store: store)
+					}
 			}
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
@@ -105,8 +86,20 @@ extension AppSettings.State {
 }
 
 extension AppSettings.Store {
+	var manageP2PClients: PresentationStoreOf<ManageP2PClients> {
+		scope(state: \.$manageP2PClients) { .child(.manageP2PClients($0)) }
+	}
+
+	var manageGatewayAPIEndpoints: PresentationStoreOf<ManageGatewayAPIEndpoints> {
+		scope(state: \.$manageGatewayAPIEndpoints) { .child(.manageGatewayAPIEndpoints($0)) }
+	}
+
 	var connectedDapps: PresentationStoreOf<ConnectedDapps> {
 		scope(state: \.$connectedDapps) { .child(.connectedDapps($0)) }
+	}
+
+	var personasCoordinator: PresentationStoreOf<PersonasCoordinator> {
+		scope(state: \.$personasCoordinator) { .child(.personasCoordinator($0)) }
 	}
 }
 
@@ -124,12 +117,12 @@ extension AppSettings.View {
 		[.init(title: L10n.Settings.desktopConnectionsButtonTitle,
 		       asset: AssetResource.desktopConnections,
 		       action: .manageP2PClientsButtonTapped),
-		 .init(title: L10n.Settings.connectedDappsButtonTitle,
-		       asset: AssetResource.connectedDapps,
-		       action: .connectedDappsButtonTapped),
 		 .init(title: L10n.Settings.gatewayButtonTitle,
 		       asset: AssetResource.gateway,
 		       action: .editGatewayAPIEndpointButtonTapped),
+		 .init(title: L10n.Settings.connectedDappsButtonTitle,
+		       asset: AssetResource.connectedDapps,
+		       action: .connectedDappsButtonTapped),
 		 .init(title: L10n.Settings.personasButtonTitle,
 		       asset: AssetResource.personas,
 		       action: .personasButtonTapped)]

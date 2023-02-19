@@ -20,11 +20,15 @@ public struct AppSettings: FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
+		@PresentationState
 		public var manageP2PClients: ManageP2PClients.State?
 		@PresentationState
 		public var connectedDapps: ConnectedDapps.State?
+		@PresentationState
 		public var manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State?
+		@PresentationState
 		public var personasCoordinator: PersonasCoordinator.State?
+
 		public var canAddP2PClient: Bool
 		#if DEBUG
 		public var profileToInspect: Profile?
@@ -72,10 +76,10 @@ public struct AppSettings: FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case manageP2PClients(ManageP2PClients.Action)
+		case manageP2PClients(PresentationActionOf<ManageP2PClients>)
 		case connectedDapps(PresentationActionOf<ConnectedDapps>)
-		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
-		case personasCoordinator(PersonasCoordinator.Action)
+		case manageGatewayAPIEndpoints(PresentationActionOf<ManageGatewayAPIEndpoints>)
+		case personasCoordinator(PresentationActionOf<PersonasCoordinator>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -88,13 +92,13 @@ public struct AppSettings: FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.ifLet(\.manageP2PClients, action: /Action.child .. ChildAction.manageP2PClients) {
+			.presentationDestination(\.$manageP2PClients, action: /Action.child .. ChildAction.manageP2PClients) {
 				ManageP2PClients()
 			}
-			.ifLet(\.manageGatewayAPIEndpoints, action: /Action.child .. ChildAction.manageGatewayAPIEndpoints) {
+			.presentationDestination(\.$manageGatewayAPIEndpoints, action: /Action.child .. ChildAction.manageGatewayAPIEndpoints) {
 				ManageGatewayAPIEndpoints()
 			}
-			.ifLet(\.personasCoordinator, action: /Action.child .. ChildAction.personasCoordinator) {
+			.presentationDestination(\.$personasCoordinator, action: /Action.child .. ChildAction.personasCoordinator) {
 				PersonasCoordinator()
 			}
 			.presentationDestination(\.$connectedDapps, action: /Action.child .. ChildAction.connectedDapps) {
@@ -129,8 +133,8 @@ public struct AppSettings: FeatureReducer {
 			return .none
 
 		case .connectedDappsButtonTapped:
-			// TODO: This proxying is only necessary because of our strict view/child separation
-			return .send(.child(.connectedDapps(.present(.init()))))
+			let presentedState = ConnectedDapps.State()
+			return .send(.child(.connectedDapps(.present(presentedState))))
 
 		case .personasButtonTapped:
 			// TODO: implement
@@ -173,9 +177,9 @@ public struct AppSettings: FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .manageP2PClients(.delegate(.dismiss)):
-			state.manageP2PClients = nil
-			return loadP2PClients()
+//		case .manageP2PClients(.delegate(.dismiss)):
+//			state.manageP2PClients = nil
+//			return loadP2PClients()
 
 		case .manageP2PClients:
 			return .none
@@ -183,19 +187,19 @@ public struct AppSettings: FeatureReducer {
 		case .connectedDapps:
 			return .none
 
-		case .manageGatewayAPIEndpoints(.delegate(.dismiss)):
-			state.manageGatewayAPIEndpoints = nil
-			return .none
+//		case .manageGatewayAPIEndpoints(.delegate(.dismiss)):
+//			state.manageGatewayAPIEndpoints = nil
+//			return .none
 
-		case .manageGatewayAPIEndpoints(.delegate(.networkChanged)):
-			return .send(.delegate(.networkChanged))
+//		case .manageGatewayAPIEndpoints(.delegate(.networkChanged)):
+//			return .send(.delegate(.networkChanged))
 
 		case .manageGatewayAPIEndpoints:
 			return .none
 
-		case .personasCoordinator(.delegate(.dismiss)):
-			state.personasCoordinator = nil
-			return .none
+//		case .personasCoordinator(.delegate(.dismiss)):
+//			state.personasCoordinator = nil
+//			return .none
 
 		case .personasCoordinator:
 			return .none
