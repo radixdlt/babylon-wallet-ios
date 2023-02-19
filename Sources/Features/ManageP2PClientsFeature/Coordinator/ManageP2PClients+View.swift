@@ -43,15 +43,12 @@ extension ManageP2PClients.View {
 		viewStore: ViewStore<ViewState, ManageP2PClients.Action.ViewAction>
 	) -> some View {
 		ScrollView {
-			HStack {
-				Text(L10n.ManageP2PClients.p2PConnectionsSubtitle)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body1HighImportance)
-					.padding([.horizontal, .top], .medium3)
-					.padding(.bottom, .small2)
-
-				Spacer()
-			}
+			Text(L10n.ManageP2PClients.p2PConnectionsSubtitle)
+				.foregroundColor(.app.gray2)
+				.textStyle(.body1HighImportance)
+				.flushedLeft
+				.padding([.horizontal, .top], .medium3)
+				.padding(.bottom, .small2)
 
 			Separator()
 

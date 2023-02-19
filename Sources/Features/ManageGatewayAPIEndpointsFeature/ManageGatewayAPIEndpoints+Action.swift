@@ -17,7 +17,6 @@ extension ManageGatewayAPIEndpoints {
 extension ManageGatewayAPIEndpoints.Action {
 	public enum ViewAction: Sendable, Equatable {
 		case didAppear
-		case dismissButtonTapped
 		case urlStringChanged(String)
 		case switchToButtonTapped
 		case focusTextField(ManageGatewayAPIEndpoints.State.Field?)
@@ -47,7 +46,6 @@ extension ManageGatewayAPIEndpoints.Action {
 // MARK: - ManageGatewayAPIEndpoints.Action.DelegateAction
 extension ManageGatewayAPIEndpoints.Action {
 	public enum DelegateAction: Sendable, Equatable {
-		case dismiss
 		case networkChanged
 	}
 }

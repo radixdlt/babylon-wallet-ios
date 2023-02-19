@@ -43,11 +43,6 @@ extension ManageGatewayAPIEndpoints {
 			errorQueue.schedule(error)
 			return .none
 
-		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismiss))
-			}
-
 		case let .internal(.view(.urlStringChanged(urlString))):
 			state.urlString = urlString
 			let maybeURL = URL(string: urlString)
@@ -127,9 +122,7 @@ extension ManageGatewayAPIEndpoints {
 			return .none
 
 		case .internal(.system(.switchToResult(.success))):
-			return .run { send in
-				await send(.delegate(.networkChanged))
-			}
+			return .send(.delegate(.networkChanged))
 
 		case .createAccountCoordinator(.delegate(.dismissed)):
 			return skipSwitching(state: &state)

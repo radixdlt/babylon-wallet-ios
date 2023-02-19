@@ -177,21 +177,19 @@ public struct AppSettings: FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case let .manageP2PClients(action):
-			guard action == .dismiss else { return .none }
+		case .manageP2PClients(.dismiss):
 			return loadP2PClients()
 
-		case .connectedDapps:
+		case .manageP2PClients:
 			return .none
 
-//		case .manageGatewayAPIEndpoints(.delegate(.dismiss)):
-//			state.manageGatewayAPIEndpoints = nil
-//			return .none
-
-//		case .manageGatewayAPIEndpoints(.delegate(.networkChanged)):
-//			return .send(.delegate(.networkChanged))
+		case .manageGatewayAPIEndpoints(.presented(.delegate(.networkChanged))):
+			return .send(.delegate(.networkChanged))
 
 		case .manageGatewayAPIEndpoints:
+			return .none
+
+		case .connectedDapps:
 			return .none
 
 //		case .personasCoordinator(.delegate(.dismiss)):
