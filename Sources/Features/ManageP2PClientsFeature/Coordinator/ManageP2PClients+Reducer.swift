@@ -86,10 +86,6 @@ extension ManageP2PClients {
 			)
 			return .none
 
-		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismiss))
-			}
 		#if DEBUG
 		case let .child(.connection(id, .delegate(.sendTestMessage))):
 			return .run { send in
@@ -148,7 +144,7 @@ extension ManageP2PClients {
 			state.newConnection = nil
 			return .none
 
-		case .child, .delegate:
+		case .child:
 			return .none
 		}
 	}

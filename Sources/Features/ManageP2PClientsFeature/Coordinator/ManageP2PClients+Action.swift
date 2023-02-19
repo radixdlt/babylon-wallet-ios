@@ -7,7 +7,6 @@ extension ManageP2PClients {
 	public enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		case `internal`(InternalAction)
-		case delegate(DelegateAction)
 	}
 }
 
@@ -30,7 +29,6 @@ extension ManageP2PClients.Action {
 extension ManageP2PClients.Action {
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case dismissButtonTapped
 		case addNewConnectionButtonTapped
 	}
 }
@@ -52,12 +50,5 @@ extension ManageP2PClients.Action.InternalAction {
 		case saveNewConnectionResult(TaskResult<P2P.ClientWithConnectionStatus>)
 		case deleteConnectionResult(TaskResult<P2PClient.ID>)
 		case sendTestMessageResult(TaskResult<String>)
-	}
-}
-
-// MARK: - ManageP2PClients.Action.DelegateAction
-extension ManageP2PClients.Action {
-	public enum DelegateAction: Sendable, Equatable {
-		case dismiss
 	}
 }
