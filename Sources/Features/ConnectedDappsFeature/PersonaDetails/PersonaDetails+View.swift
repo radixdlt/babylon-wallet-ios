@@ -136,7 +136,7 @@ extension PersonaDetails.View {
 	struct AccountSection: View {
 		struct ViewState: Equatable {
 			let dAppName: String
-			let sharingAccounts: [NamedAccount]
+			let sharingAccounts: OrderedSet<OnNetwork.AccountForDisplay>
 		}
 
 		let store: StoreOf<PersonaDetails>
@@ -151,8 +151,10 @@ extension PersonaDetails.View {
 						.padding(.horizontal, .medium1)
 
 					VStack(spacing: .medium3) {
-						ForEach(viewStore.sharingAccounts, id: \.name) { account in
-							AccountButton(account.name, address: account.address.address, gradient: account.gradient) {
+						ForEach(viewStore.sharingAccounts) { account in
+							AccountButton(account.label.rawValue,
+							              address: account.address.address,
+							              gradient: .account(account.appearanceID.id)) {
 								viewStore.send(.appeared)
 							}
 						}
@@ -173,27 +175,7 @@ extension PersonaDetails.View {
 
 private extension PersonaDetails.State {
 	var accountSectionViewState: PersonaDetails.View.AccountSection.ViewState {
-		.init(dAppName: dAppName,
-		      sharingAccounts: [
-		      	.init(name: "My account", gradient: .init(colors: [.app.account1pink, .app.account11blue1]), address: try! .init(address: "account_d_827m9765")),
-		      	.init(name: "My second account", gradient: .init(colors: [.app.account5blue, .app.account6green]), address: try! .init(address: "account_d_8223445")),
-		      	.init(name: "My savings account", gradient: .init(colors: [.app.account0green, .app.account9green1]), address: try! .init(address: "account_d_82734975")),
-		      ])
-	}
-}
-
-// MARK: - NamedAccount
-// TODO: • Generally useful, find similar or move to Prelude
-
-public struct NamedAccount: Equatable, Sendable {
-	public let name: String
-	public let gradient: Gradient
-	public let address: AccountAddress
-
-	public init(name: String, gradient: Gradient, address: AccountAddress) {
-		self.name = name
-		self.gradient = gradient
-		self.address = address
+		.init(dAppName: dAppName, sharingAccounts: persona.simpleAccounts ?? [])
 	}
 }
 

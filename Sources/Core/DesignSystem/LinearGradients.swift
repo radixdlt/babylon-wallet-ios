@@ -62,6 +62,30 @@ extension LinearGradient.App {
 	}
 }
 
+extension Gradient {
+	public static func account(_ id: UInt8) -> Gradient {
+		.init(colors: colors(id))
+	}
+
+	private static func colors(_ id: UInt8) -> [Color] {
+		switch id % 12 {
+		case 0: return [.app.blue2, .app.account0green]
+		case 1: return [.app.blue2, .app.account1pink]
+		case 2: return [.app.blue2, .app.blue3]
+		case 3: return [.app.green1, .app.blue2]
+		case 4: return [.app.account4pink, .app.blue2]
+		case 5: return [.app.account5blue, .app.blue2]
+		case 6: return [.app.gray1, .app.account6green]
+		case 7: return [.app.gray1, .app.account7pink]
+		case 8: return [.app.blue2, .app.gray1]
+		case 9: return [.app.account9green1, .app.account9green2]
+		case 10: return [.app.account10pink1, .app.account10pink2]
+		case 11: return [.app.account11green, .app.account11blue1, .app.account11pink]
+		default: fatalError("Impossible")
+		}
+	}
+}
+
 #if DEBUG
 struct LinearGradients_Previews: PreviewProvider {
 	static var previews: some View {
