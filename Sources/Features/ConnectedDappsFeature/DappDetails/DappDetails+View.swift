@@ -94,8 +94,7 @@ private extension DappDetails.State {
 
 		let otherMetadata = metadata?.items
 			.filter { !ignoredKeys.contains($0.key) }
-			.map { DappDetails.ViewState.MetadataItem(key: $0.key, value: $0.value) }
-			.sorted { $0.key < $1.key } ?? []
+			.map { DappDetails.ViewState.MetadataItem(key: $0.key, value: $0.value) } ?? []
 
 		return .init(title: dApp.displayName.rawValue,
 		             description: $metadata.description,
@@ -153,18 +152,12 @@ extension DappDetails.View {
 					if let domain = viewStore.domain {
 						Text(L10n.DAppDetails.website)
 							.sectionHeading
-
-						if let url = URL(string: domain) {
-							Button(domain) {
+						Button(domain) {
+							if let url = URL(string: domain) {
 								viewStore.send(.openURLTapped(url))
-								print("tapped proper URL:", url)
 							}
-							.buttonStyle(.url)
-						} else {
-							Text(domain)
-								.urlLink
-								.border(.orange)
 						}
+						.buttonStyle(.url)
 					}
 
 					ForEach(viewStore.otherMetadata) { item in
