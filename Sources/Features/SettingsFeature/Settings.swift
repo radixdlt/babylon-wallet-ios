@@ -121,16 +121,16 @@ public struct AppSettings: FeatureReducer {
 			}
 
 		case .manageP2PClientsButtonTapped:
-			state.manageP2PClients = .init()
-			return .none
+			let presentedState = ManageP2PClients.State()
+			return .send(.child(.manageP2PClients(.present(presentedState))))
 
 		case .addP2PClientButtonTapped:
-			state.manageP2PClients = .init(newConnection: .init())
-			return .none
+			let presentedState = ManageP2PClients.State(newConnection: .init())
+			return .send(.child(.manageP2PClients(.present(presentedState))))
 
 		case .editGatewayAPIEndpointButtonTapped:
-			state.manageGatewayAPIEndpoints = .init()
-			return .none
+			let presentedState = ManageGatewayAPIEndpoints.State()
+			return .send(.child(.manageGatewayAPIEndpoints(.present(presentedState))))
 
 		case .connectedDappsButtonTapped:
 			let presentedState = ConnectedDapps.State()
@@ -138,8 +138,8 @@ public struct AppSettings: FeatureReducer {
 
 		case .personasButtonTapped:
 			// TODO: implement
-			state.personasCoordinator = .init()
-			return .none
+			let presentedState = PersonasCoordinator.State()
+			return .send(.child(.personasCoordinator(.present(presentedState))))
 
 		#if DEBUG
 		case .debugInspectProfileButtonTapped:

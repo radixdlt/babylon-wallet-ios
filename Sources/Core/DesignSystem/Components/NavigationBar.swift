@@ -80,15 +80,6 @@ extension NavigationBar {
 	}
 }
 
-// extension View {
-//	public func withNavigationBar(showDragHandle: Bool = false) -> some View {
-//		VStack(spacing: 0) {
-//
-//			self
-//		}
-//	}
-// }
-
 #if DEBUG
 
 // MARK: - NavigationBar_Previews
