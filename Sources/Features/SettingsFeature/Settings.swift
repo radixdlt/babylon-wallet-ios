@@ -47,16 +47,9 @@ public struct AppSettings: Sendable, ReducerProtocol {
 
 	public enum Action: Sendable, Equatable {
 		case child(ChildAction)
-		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
+		case view(ViewAction)
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
-	}
-
-	public enum ChildAction: Sendable, Equatable {
-		case manageP2PClients(ManageP2PClients.Action)
-		case connectedDapps(PresentationActionOf<ConnectedDapps>)
-		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
-		case personasCoordinator(PersonasCoordinator.Action)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -78,15 +71,17 @@ public struct AppSettings: Sendable, ReducerProtocol {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case view(ViewAction)
-		case system(SystemAction)
-	}
-
-	public enum SystemAction: Sendable, Equatable {
 		case loadP2PClientsResult(TaskResult<P2PClients>)
 		#if DEBUG
 		case profileToDebugLoaded(Profile)
 		#endif
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case manageP2PClients(ManageP2PClients.Action)
+		case connectedDapps(PresentationActionOf<ConnectedDapps>)
+		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
+		case personasCoordinator(PersonasCoordinator.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -115,31 +110,31 @@ public struct AppSettings: Sendable, ReducerProtocol {
 
 	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.view(.dismissSettingsButtonTapped)):
+		case .view(.dismissSettingsButtonTapped):
 			return .send(.delegate(.dismissSettings))
 
-		case .internal(.view(.deleteProfileAndFactorSourcesButtonTapped)):
+		case .view(.deleteProfileAndFactorSourcesButtonTapped):
 			return .run { send in
 				await p2pConnectivityClient.disconnectAndRemoveAll()
 				await send(.delegate(.deleteProfileAndFactorSources))
 			}
 
-		case .internal(.view(.manageP2PClientsButtonTapped)):
+		case .view(.manageP2PClientsButtonTapped):
 			state.manageP2PClients = .init()
 			return .none
 
-		case .internal(.view(.connectedDappsButtonTapped)):
+		case .view(.connectedDappsButtonTapped):
 			// TODO: This proxying is only necessary because of our strict view/child separation
 			return .send(.child(.connectedDapps(.present(.init()))))
 
-		case .internal(.view(.didAppear)):
+		case .view(.didAppear):
 			return loadP2PClients()
 
-		case let .internal(.system(.loadP2PClientsResult(.success(clients)))):
+		case let .internal(.loadP2PClientsResult(.success(clients))):
 			state.canAddP2PClient = clients.isEmpty
 			return .none
 
-		case let .internal(.system(.loadP2PClientsResult(.failure(error)))):
+		case let .internal(.loadP2PClientsResult(.failure(error))):
 			errorQueue.schedule(error)
 			return .none
 
@@ -156,7 +151,7 @@ public struct AppSettings: Sendable, ReducerProtocol {
 			return .none
 
 		#if DEBUG
-		case .internal(.view(.debugInspectProfileButtonTapped)):
+		case .view(.debugInspectProfileButtonTapped):
 			return .run { send in
 				guard
 					let snapshot = try? await profileClient.extractProfileSnapshot(),
@@ -164,14 +159,14 @@ public struct AppSettings: Sendable, ReducerProtocol {
 				else {
 					return
 				}
-				await send(.internal(.system(.profileToDebugLoaded(profile))))
+				await send(.internal(.profileToDebugLoaded(profile)))
 			}
 
-		case let .internal(.system(.profileToDebugLoaded(profile))):
+		case let .internal(.profileToDebugLoaded(profile)):
 			state.profileToInspect = profile
 			return .none
 
-		case let .internal(.view(.setDebugProfileSheet(isPresented))):
+		case let .view(.setDebugProfileSheet(isPresented)):
 			precondition(!isPresented)
 			state.profileToInspect = nil
 			return .none
@@ -185,15 +180,15 @@ public struct AppSettings: Sendable, ReducerProtocol {
 			state.personasCoordinator = nil
 			return .none
 
-		case .internal(.view(.addP2PClientButtonTapped)):
+		case .view(.addP2PClientButtonTapped):
 			state.manageP2PClients = .init(newConnection: .init())
 			return .none
 
-		case .internal(.view(.editGatewayAPIEndpointButtonTapped)):
+		case .view(.editGatewayAPIEndpointButtonTapped):
 			state.manageGatewayAPIEndpoints = .init()
 			return .none
 
-		case .internal(.view(.personasButtonTapped)):
+		case .view(.personasButtonTapped):
 			// TODO: implement
 			state.personasCoordinator = .init()
 			return .none
@@ -207,10 +202,9 @@ public struct AppSettings: Sendable, ReducerProtocol {
 // MARK: Private
 extension AppSettings {
 	fileprivate func loadP2PClients() -> EffectTask<Action> {
-		.run { send in
-			await send(.internal(.system(.loadP2PClientsResult(
-				TaskResult { try await profileClient.getP2PClients() }
-			))))
+		.task {
+			let result = await TaskResult { try await profileClient.getP2PClients() }
+			return .internal(.loadP2PClientsResult(result))
 		}
 	}
 }
