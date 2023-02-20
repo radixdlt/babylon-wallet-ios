@@ -49,6 +49,13 @@ extension ProfileClient {
 			}
 		}
 
+		let getAccountsOnNetwork: GetAccountsOnNetwork = { networkID in
+			try await profileHolder.get { profile in
+				let onNetwork = try profile.perNetwork.onNetwork(id: networkID)
+				return onNetwork.accounts
+			}
+		}
+
 		let hasAccountOnNetwork: HasAccountOnNetwork = { networkID in
 			try await profileHolder.get { profile in
 				profile.containsNetwork(withID: networkID)
@@ -139,8 +146,6 @@ extension ProfileClient {
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
 			commitOnboardingWallet: { request in
-//				let mnemonic = request.onDeviceFactorSourceMnemonic
-
 				try await profileHolder.getAsync { profile in
 					guard profile.id == request.profile.id else {
 						struct DiscrepancyMismatchingProfileID: Swift.Error {}
@@ -178,19 +183,13 @@ extension ProfileClient {
 						jsonDecoder: jsonDecoder()
 					)
 				} catch {
-//					return .failure(
-//						.decodingFailure(
-//							json: profileSnapshotData,
-//							.known(.noProfileSnapshotVersionFoundInJSON
-//							)
-//						)
-//					)
-					// FIXME: post betanet v2, remove this and return `failure(.noProfileSnapshotVersionFoundInJSON)`
-					// above instead
-					return .failure(.profileVersionOutdated(
-						json: profileSnapshotData,
-						version: 1 // irrelevant, not show to user.
-					))
+					return .failure(
+						.decodingFailure(
+							json: profileSnapshotData,
+							.known(.noProfileSnapshotVersionFoundInJSON
+							)
+						)
+					)
 				}
 
 				do {
@@ -250,12 +249,10 @@ extension ProfileClient {
 				await profileHolder.removeProfile()
 			},
 			hasAccountOnNetwork: hasAccountOnNetwork,
+			getAccountsOnNetwork: getAccountsOnNetwork,
 			getAccounts: {
 				let currentNetworkID = await getCurrentNetworkID()
-				return try await profileHolder.get { profile in
-					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
-					return onNetwork.accounts
-				}
+				return try await getAccountsOnNetwork(currentNetworkID)
 			},
 			getPersonas: {
 				let currentNetworkID = await getCurrentNetworkID()
@@ -322,33 +319,26 @@ extension ProfileClient {
 				let genesisFactorInstance: FactorInstance = try await {
 					let genesisFactorInstanceDerivationStrategy = request.genesisFactorInstanceDerivationStrategy
 
-					let hdRoot: HD.Root
 					let factorSource = genesisFactorInstanceDerivationStrategy.factorSource
+					let publicKey: Engine.PublicKey = try await {
+						switch genesisFactorInstanceDerivationStrategy {
+						case .loadMnemonicFromKeychainForFactorSource:
+							return try await useFactorSourceClient.onDeviceHD(factorSourceID: factorSource.id, keychainAccessFactorSourcesAuthPrompt: request.keychainAccessFactorSourcesAuthPrompt, derivationPath: derivationPath, curve: request.curve, dataToSign: nil).publicKey
 
-					switch genesisFactorInstanceDerivationStrategy {
-					case .loadMnemonicFromKeychainForFactorSource:
-						guard let loadedMnemonicWithPassphrase = try await keychainClient.loadFactorSourceMnemonicWithPassphrase(
-							factorSourceID: factorSource.id,
-							authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-						) else {
-							struct FailedToFindFactorSource: Swift.Error {}
-							throw FailedToFindFactorSource()
+						case let .useOnboardingWallet(onboardingWallet):
+							let hdRoot = try onboardingWallet.privateFactorSource.mnemonicWithPassphrase.hdRoot()
+							return try useFactorSourceClient.publicKeyFromOnDeviceHD(.init(
+								hdRoot: hdRoot,
+								derivationPath: derivationPath,
+								curve: request.curve
+							))
 						}
-						hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
-					case let GenesisFactorInstanceDerivationStrategy.useOnboardingWallet(onboardingWallet):
-						hdRoot = try onboardingWallet.privateFactorSource.mnemonicWithPassphrase.hdRoot()
-					}
-					let req = OnDeviceHDPublicKeyRequest(
-						hdRoot: hdRoot,
-						derivationPath: derivationPath,
-						curve: request.curve
-					)
 
-					let pubKey = try useFactorSourceClient.onDeviceHDPublicKey(req)
+					}()
 
 					return FactorInstance(
 						factorSourceID: factorSource.id,
-						publicKey: pubKey,
+						publicKey: publicKey,
 						derivationPath: derivationPath
 					)
 				}()
@@ -397,49 +387,12 @@ extension ProfileClient {
 					try await profile.addAccount(account)
 				}
 			},
-			addPersona: { _ in
-				//                try await profileHolder.asyncMutating { profile in
-				//                    try await profile.addPersona(persona)
-				//                }
-				fixMultifactor()
+			addPersona: { persona in
+				try await profileHolder.asyncMutating { profile in
+					try await profile.addPersona(persona)
+				}
 			},
-			lookupAccountByAddress: lookupAccountByAddress,
-			signersForAccountsGivenAddresses: { _ in
-
-//				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { reference in
-//					try await keychainClient.loadFactorSourceMnemonic(
-//						reference: reference,
-//						authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-//					)
-//				}
-//
-//				func getAccountSignersFromAddresses() async throws -> NonEmpty<OrderedSet<SignersOfAccount>>? {
-//					guard let addresses = NonEmpty(rawValue: request.addresses) else { return nil }
-//
-//					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
-//
-//					return try await profileHolder.getAsync { profile in
-//						try await profile.signers(
-//							ofEntities: accounts,
-//							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-//						)
-//					}
-//				}
-//
-//				guard let fromAddresses = try? await getAccountSignersFromAddresses() else {
-//					// TransactionManifest does not reference any accounts => use any account!
-//					return try await profileHolder.getAsync { profile in
-//						try await profile.signers(
-//							networkID: request.networkID,
-//							entityType: OnNetwork.Account.self,
-//							entityIndex: 0,
-//							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-//						)
-//					}
-//				}
-//				return fromAddresses
-				fixMultifactor()
-			}
+			lookupAccountByAddress: lookupAccountByAddress
 		)
 	}()
 }

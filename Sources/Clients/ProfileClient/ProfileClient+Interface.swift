@@ -21,6 +21,7 @@ public struct ProfileClient: Sendable {
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
 	public var hasAccountOnNetwork: HasAccountOnNetwork
+	public var getAccountsOnNetwork: GetAccountsOnNetwork
 	public var getAccounts: GetAccounts
 	public var getPersonas: GetPersonas
 	public var getP2PClients: GetP2PClients
@@ -37,8 +38,6 @@ public struct ProfileClient: Sendable {
 	public var addPersona: AddPersona
 	public var lookupAccountByAddress: LookupAccountByAddress
 
-	public var signersForAccountsGivenAddresses: SignersForAccountsGivenAddresses
-
 	public init(
 		getFactorSources: @escaping GetFactorSources,
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
@@ -52,6 +51,7 @@ public struct ProfileClient: Sendable {
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
 		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
+		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
 		getAccounts: @escaping GetAccounts,
 		getPersonas: @escaping GetPersonas,
 		getP2PClients: @escaping GetP2PClients,
@@ -66,8 +66,7 @@ public struct ProfileClient: Sendable {
 		createUnsavedVirtualEntity: @escaping CreateUnsavedVirtualEntity,
 		addAccount: @escaping AddAccount,
 		addPersona: @escaping AddPersona,
-		lookupAccountByAddress: @escaping LookupAccountByAddress,
-		signersForAccountsGivenAddresses: @escaping SignersForAccountsGivenAddresses
+		lookupAccountByAddress: @escaping LookupAccountByAddress
 	) {
 		self.getFactorSources = getFactorSources
 		self.getCurrentNetworkID = getCurrentNetworkID
@@ -81,6 +80,7 @@ public struct ProfileClient: Sendable {
 		self.extractProfileSnapshot = extractProfileSnapshot
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
 		self.hasAccountOnNetwork = hasAccountOnNetwork
+		self.getAccountsOnNetwork = getAccountsOnNetwork
 		self.getAccounts = getAccounts
 		self.getPersonas = getPersonas
 		self.getConnectedDapps = getConnectedDapps
@@ -96,7 +96,6 @@ public struct ProfileClient: Sendable {
 		self.addAccount = addAccount
 		self.addPersona = addPersona
 		self.lookupAccountByAddress = lookupAccountByAddress
-		self.signersForAccountsGivenAddresses = signersForAccountsGivenAddresses
 	}
 }
 
@@ -113,32 +112,6 @@ public struct CreateOnboardingWalletRequest: Sendable, Hashable {
 	) {
 		self.language = language
 		self.wordCount = wordCount
-		self.bip39Passphrase = bip39Passphrase
-	}
-}
-
-// MARK: - CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest
-//// MARK: - CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse
-// public struct CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse: Sendable, Hashable {
-//	public let request: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest
-//	public let onDeviceFactorSourceMnemonic: Mnemonic
-//	public let profile: Profile
-//	public init(
-//		request: CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest,
-//		mnemonic: Mnemonic,
-//		profile: Profile
-//	) {
-//		self.onDeviceFactorSourceMnemonic = mnemonic
-//		self.profile = profile
-//		self.request = request
-//	}
-// }
-
-public struct CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest: Sendable, Hashable {
-	public let onDeviceFactorSourceMnemonic: Mnemonic
-	public let bip39Passphrase: String
-	public init(onDeviceFactorSourceMnemonic: Mnemonic, bip39Passphrase: String) {
-		self.onDeviceFactorSourceMnemonic = onDeviceFactorSourceMnemonic
 		self.bip39Passphrase = bip39Passphrase
 	}
 }
@@ -167,6 +140,7 @@ extension ProfileClient {
 	// ALL METHOD MUST BE THROWING! SINCE IF A PROFILE HAS NOT BEEN INJECTED WE SHOULD THROW AN ERROR
 	public typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
 	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
+	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>
 	public typealias GetAccounts = @Sendable () async throws -> NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>
 	public typealias GetPersonas = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.Persona>
 	public typealias GetConnectedDapps = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.ConnectedDapp>
@@ -182,8 +156,4 @@ extension ProfileClient {
 	public typealias AddAccount = @Sendable (OnNetwork.Account) async throws -> Void
 	public typealias AddPersona = @Sendable (OnNetwork.Persona) async throws -> Void
 	public typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
-
-	public typealias SignersForAccountsGivenAddresses = @Sendable (SignersForAccountsGivenAddressesRequest) async throws -> NonEmpty<OrderedSet<SignersOfAccount>>
 }
-
-public typealias SignersOfAccount = SignersOf<OnNetwork.Account>

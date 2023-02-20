@@ -12,10 +12,12 @@ extension UseFactorSourceClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let noop = Self(
-		onDeviceHDPublicKey: { _ in throw NoopError() }
+		publicKeyFromOnDeviceHD: { _ in throw NoopError() },
+		signatureFromOnDeviceHD: { _ in throw NoopError() }
 	)
 
 	public static let testValue = Self(
-		onDeviceHDPublicKey: unimplemented("\(Self.self).onDeviceHDPublicKey")
+		publicKeyFromOnDeviceHD: unimplemented("\(Self.self).publicKeyFromOnDeviceHD"),
+		signatureFromOnDeviceHD: unimplemented("\(Self.self).signatureFromOnDeviceHD")
 	)
 }

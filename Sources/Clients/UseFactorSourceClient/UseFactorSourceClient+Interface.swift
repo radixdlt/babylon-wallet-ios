@@ -4,16 +4,18 @@ import ProfileModels
 
 // MARK: - UseFactorSourceClient
 public struct UseFactorSourceClient: Sendable {
-	public var onDeviceHDPublicKey: onDeviceHDPublicKey
+	public var publicKeyFromOnDeviceHD: PublicKeyFromOnDeviceHD
+	public var signatureFromOnDeviceHD: SignatureFromOnDeviceHD
 }
 
 // MARK: UseFactorSourceClient.onDeviceHDPublicKey
 extension UseFactorSourceClient {
-	public typealias onDeviceHDPublicKey = @Sendable (OnDeviceHDPublicKeyRequest) throws -> Engine.PublicKey
+	public typealias PublicKeyFromOnDeviceHD = @Sendable (PublicKeyFromOnDeviceHDRequest) throws -> Engine.PublicKey
+	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) throws -> SignatureWithPublicKey
 }
 
-// MARK: - OnDeviceHDPublicKeyRequest
-public struct OnDeviceHDPublicKeyRequest: Sendable, Hashable {
+// MARK: - PublicKeyFromOnDeviceHDRequest
+public struct PublicKeyFromOnDeviceHDRequest: Sendable, Hashable {
 	public let hdRoot: HD.Root
 	public let derivationPath: DerivationPath
 	public let curve: Slip10Curve
@@ -21,5 +23,27 @@ public struct OnDeviceHDPublicKeyRequest: Sendable, Hashable {
 		self.hdRoot = hdRoot
 		self.derivationPath = derivationPath
 		self.curve = curve
+	}
+}
+
+// MARK: - SignatureFromOnDeviceHDRequest
+public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
+	public let hdRoot: HD.Root
+	public let derivationPath: DerivationPath
+	public let curve: Slip10Curve
+
+	/// The data to sign
+	public let data: Data
+
+	public init(
+		hdRoot: HD.Root,
+		derivationPath: DerivationPath,
+		curve: Slip10Curve,
+		data: Data
+	) {
+		self.hdRoot = hdRoot
+		self.derivationPath = derivationPath
+		self.curve = curve
+		self.data = data
 	}
 }

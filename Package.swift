@@ -307,6 +307,7 @@ package.addModules([
 			"GatewayAPI",
 			"ProfileClient",
 			"AccountPortfolio",
+			"UseFactorSourceClient",
 		],
 		tests: .yes()
 	),
