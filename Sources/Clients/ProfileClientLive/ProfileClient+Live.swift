@@ -2,6 +2,7 @@ import ClientPrelude
 import Cryptography
 import EngineToolkitClient
 import ProfileClient
+import UseFactorSourceClient
 
 // MARK: - ProfileClient + DependencyKey
 extension ProfileClient: DependencyKey {}
@@ -64,6 +65,11 @@ extension ProfileClient {
 
 			return try await profileHolder.getAsync { profile in
 				let index: Int = {
+					// FIXME: - Multifactor, in the future update to:
+					// We are NOT counting the number of accounts/personas
+					// and returning the next index. We returning index
+					// for this particular factor source on this particular
+					// network for this particular entity type.
 					if let network = try? profile.onNetwork(id: networkID) {
 						switch request.entityKind {
 						case .account:
@@ -77,8 +83,12 @@ extension ProfileClient {
 				}()
 
 				switch request.entityKind {
-				case .account: return try (path: DerivationPath.accountPath(.init(networkID: networkID, index: index, keyKind: request.keyKind)), index: index)
-				case .identity: return try (path: DerivationPath.identityPath(.init(networkID: networkID, index: index, keyKind: request.keyKind)), index: index)
+				case .account:
+					let path = try DerivationPath.accountPath(.init(networkID: networkID, index: index, keyKind: request.keyKind))
+					return (path: path, index: index)
+				case .identity:
+					let path = try DerivationPath.identityPath(.init(networkID: networkID, index: index, keyKind: request.keyKind))
+					return (path: path, index: index)
 				}
 			}
 		}
@@ -306,84 +316,99 @@ extension ProfileClient {
 					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
-			createUnsavedVirtualEntity: { _ in
-//				let networkID: NetworkID = await {
-//					if let networkID = request.networkID {
-//						return networkID
-//					}
-//					return await getCurrentNetworkID()
-//				}()
-//				let getDerivationPathRequest = try request.getDerivationPathRequest()
-//				let (derivationPath, index) = try await getDerivationPathForNewEntity(getDerivationPathRequest)
+			createUnsavedVirtualEntity: { request in
+				@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+
+				let networkID: NetworkID = await {
+					if let networkID = request.networkID {
+						return networkID
+					}
+					return await getCurrentNetworkID()
+				}()
+				let getDerivationPathRequest = try request.getDerivationPathRequest()
+				let (derivationPath, index) = try await getDerivationPathForNewEntity(getDerivationPathRequest)
 //
-//				let genesisFactorInstance: FactorInstance = try await {
-				////					let genesisFactorInstanceDerivationStrategy = request.genesisFactorInstanceDerivationStrategy
-				////					let mnemonic: Mnemonic
-				////					let factorSource = genesisFactorInstanceDerivationStrategy.factorSource
-				////					switch genesisFactorInstanceDerivationStrategy {
-				////					case .loadMnemonicFromKeychainForFactorSource:
-				////						guard let loadedMnemonic = try await keychainClient.loadFactorSourceMnemonic(
-				////							reference: factorSource.reference,
-				////							authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-				////						) else {
-				////							struct FailedToFindFactorSource: Swift.Error {}
-				////							throw FailedToFindFactorSource()
-				////						}
-				////						mnemonic = loadedMnemonic
-				////					case let .useMnemonic(unsavedMnemonic, _):
-				////						mnemonic = unsavedMnemonic
-				////					}
-				////
-				////					let genesisFactorInstanceResponse = try await factorSource.createAnyFactorInstanceForResponse(
-				////						input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
-				////							mnemonic: mnemonic,
-				////							derivationPath: derivationPath,
-				////							includePrivateKey: false
-				////						)
-				////					)
-				////					return genesisFactorInstanceResponse.factorInstance
-				//                    fixMultifactor()
-//				}()
-//
-//				let displayName = request.displayName
-//				let unsecuredControl = UnsecuredEntityControl(
-//					genesisFactorInstance: genesisFactorInstance
-//				)
-//
-//				switch request.entityKind {
-//				case .identity:
-//					let identityAddress = try OnNetwork.Persona.deriveAddress(
-//						networkID: networkID,
-//						publicKey: genesisFactorInstance.publicKey
-//					)
-//
-//					let persona = try OnNetwork.Persona(
-//						networkID: networkID,
-//						address: identityAddress,
-//						securityState: .unsecured(unsecuredControl),
-//						index: index,
-//						derivationPath: derivationPath.asIdentityPath(),
-//						displayName: displayName,
-//						fields: .init()
-//					)
-//					return persona
-//				case .account:
-//					let accountAddress = try OnNetwork.Account.deriveAddress(
-//						networkID: networkID,
-//						publicKey: genesisFactorInstance.publicKey
-//					)
-//
-//					let account = try OnNetwork.Account(
-//						networkID: networkID,
-//						address: accountAddress,
-//						securityState: .unsecured(unsecuredControl),
-//						index: index,
-//						derivationPath: derivationPath.asAccountPath(),
-//						displayName: displayName
-//					)
-//					return account
-//				}
-				fixMultifactor()
+				let genesisFactorInstance: FactorInstance = try await {
+					let genesisFactorInstanceDerivationStrategy = request.genesisFactorInstanceDerivationStrategy
+
+					//                    let mnemonic: Mnemonic
+					let hdRoot: HD.Root
+					let factorSource = genesisFactorInstanceDerivationStrategy.factorSource
+
+					switch genesisFactorInstanceDerivationStrategy {
+					case .loadMnemonicFromKeychainForFactorSource:
+						//                        guard let loadedMnemonic = try await keychainClient.loadFactorSourceMnemonic(
+						//                            reference: factorSource.reference,
+						//                            authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+						//                        ) else {
+						//                            struct FailedToFindFactorSource: Swift.Error {}
+						//                            throw FailedToFindFactorSource()
+						//                        }
+						//                        mnemonic = loadedMnemonic
+						fixMultifactor()
+					case let GenesisFactorInstanceDerivationStrategy.useOnboardingWallet(onboardingWallet):
+						hdRoot = try onboardingWallet.privateFactorSource.mnemonicWithPassphrase.hdRoot()
+					}
+
+					//                    let genesisFactorInstanceResponse = try await factorSource.createAnyFactorInstanceForResponse(
+					//                        input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
+					//                            mnemonic: mnemonic,
+					//                            derivationPath: derivationPath,
+					//                            includePrivateKey: false
+					//                        )
+					//                    )
+					//                    return genesisFactorInstanceResponse.factorInstance
+					let req = OnDeviceHDPublicKeyRequest(
+						hdRoot: hdRoot,
+						derivationPath: derivationPath,
+						curve: request.curve
+					)
+					let pubKey = try useFactorSourceClient.onDeviceHDPublicKey(req)
+					return FactorInstance(
+						factorSourceID: factorSource.id,
+						publicKey: pubKey,
+						derivationPath: derivationPath
+					)
+				}()
+
+				let displayName = request.displayName
+				let unsecuredControl = UnsecuredEntityControl(
+					genesisFactorInstance: genesisFactorInstance
+				)
+
+				switch request.entityKind {
+				case .identity:
+					let identityAddress = try OnNetwork.Persona.deriveAddress(
+						networkID: networkID,
+						publicKey: .init(engine: genesisFactorInstance.publicKey)
+					)
+
+					let persona = try OnNetwork.Persona(
+						networkID: networkID,
+						address: identityAddress,
+						securityState: .unsecured(unsecuredControl),
+						index: index,
+						derivationPath: derivationPath.asIdentityPath(),
+						displayName: displayName,
+						fields: .init()
+					)
+					return persona
+				case .account:
+					let accountAddress = try OnNetwork.Account.deriveAddress(
+						networkID: networkID,
+						publicKey: .init(engine: genesisFactorInstance.publicKey)
+					)
+
+					let account = try OnNetwork.Account(
+						networkID: networkID,
+						address: accountAddress,
+						securityState: .unsecured(unsecuredControl),
+						index: index,
+						derivationPath: derivationPath.asAccountPath(),
+						displayName: displayName
+					)
+					return account
+				}
 			},
 			addAccount: { _ in
 //				try await profileHolder.asyncMutating { profile in

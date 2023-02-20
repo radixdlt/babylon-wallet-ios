@@ -288,6 +288,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"Cryptography",
+			"UseFactorSourceClient",
 		],
 		tests: .no
 	),
@@ -308,6 +309,13 @@ package.addModules([
 			"AccountPortfolio",
 		],
 		tests: .yes()
+	),
+	.client(
+		name: "UseFactorSourceClient",
+		dependencies: [
+			"Cryptography",
+		],
+		tests: .no
 	),
 ])
 

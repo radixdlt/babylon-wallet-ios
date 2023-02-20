@@ -66,4 +66,14 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 	/// Optional, since it might be a single factor instance, not derived from
 	/// and HD factor source
 	public let derivationPath: DerivationPath?
+
+	public init(
+		factorSourceID: FactorSource.ID,
+		publicKey: Engine.PublicKey,
+		derivationPath: DerivationPath?
+	) {
+		self.factorSourceID = factorSourceID
+		self.publicKey = publicKey
+		self.derivationPath = derivationPath
+	}
 }

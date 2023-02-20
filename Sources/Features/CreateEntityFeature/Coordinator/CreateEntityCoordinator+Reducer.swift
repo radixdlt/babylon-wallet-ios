@@ -1,3 +1,4 @@
+import Cryptography
 import FeaturePrelude
 import ProfileClient
 
@@ -53,7 +54,7 @@ public struct CreateEntityCoordinator<
 		case let .internal(.loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate)):
 			precondition(!factorSources.isEmpty)
 
-			if state.config.specificGenesisFactorInstanceDerivationStrategy == nil, factorSources.count > 1 {
+			if state.config.specificGenesisFactorInstanceDerivationStrategy == nil, factorSources.count > 1, factorSources.contains(where: \.supportsOlympia) {
 				return goToStep1SelectGenesisFactorSource(
 					entityName: specifiedNameForNewEntityToCreate,
 					factorSources: factorSources,
@@ -71,14 +72,16 @@ public struct CreateEntityCoordinator<
 				}()
 
 				return goToStep2Creation(
+					curve: .curve25519, // The babylon execution path, save to default to curve25519
 					entityName: specifiedNameForNewEntityToCreate,
 					genesisFactorInstanceDerivationStrategy: genesisFactorInstanceDerivationStrategy,
 					state: &state
 				)
 			}
 
-		case let .child(.step1_selectGenesisFactorSource(.delegate(.confirmedFactorSource(factorSource, specifiedNameForNewEntityToCreate)))):
+		case let .child(.step1_selectGenesisFactorSource(.delegate(.confirmedFactorSource(factorSource, specifiedNameForNewEntityToCreate, curve)))):
 			return goToStep2Creation(
+				curve: curve,
 				entityName: specifiedNameForNewEntityToCreate,
 				genesisFactorInstanceDerivationStrategy: .loadMnemonicFromKeychainForFactorSource(factorSource),
 				state: &state
@@ -119,11 +122,13 @@ public struct CreateEntityCoordinator<
 	}
 
 	private func goToStep2Creation(
+		curve: Slip10Curve,
 		entityName: NonEmpty<String>,
 		genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy,
 		state: inout State
 	) -> EffectTask<Action> {
 		state.step = .step2_creationOfEntity(.init(
+			curve: curve,
 			networkID: state.config.specificNetworkID,
 			name: entityName,
 			genesisFactorInstanceDerivationStrategy: genesisFactorInstanceDerivationStrategy

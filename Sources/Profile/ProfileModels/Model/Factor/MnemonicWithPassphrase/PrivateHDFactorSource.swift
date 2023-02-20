@@ -9,6 +9,9 @@ public struct PrivateHDFactorSource: Sendable, Hashable {
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		factorSource: FactorSource
 	) throws {
+		guard factorSource.kind.isHD else {
+			fatalError("must be HD")
+		}
 		let hdRoot = try mnemonicWithPassphrase.hdRoot()
 
 		let factorSourceID = try FactorSource.id(fromRoot: hdRoot)

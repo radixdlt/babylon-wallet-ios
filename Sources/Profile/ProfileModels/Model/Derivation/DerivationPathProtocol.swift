@@ -68,7 +68,7 @@ public struct DerivationPath:
 {
 	public let scheme: DerivationPathScheme
 	public let path: String
-	fileprivate init(scheme: DerivationPathScheme, path: String) {
+	public init(scheme: DerivationPathScheme, path: String) {
 		self.scheme = scheme
 		self.path = path
 	}
