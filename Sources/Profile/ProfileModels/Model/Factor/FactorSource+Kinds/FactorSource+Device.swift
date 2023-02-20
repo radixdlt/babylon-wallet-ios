@@ -5,34 +5,39 @@ import Prelude
 public extension FactorSource {
 	static func device(
 		mnemonic: Mnemonic,
+		hint: NonEmptyString,
 		bip39Passphrase: String = "",
 		olympiaCompatible: Bool
 	) throws -> Self {
 		try Self(
 			kind: .device,
 			id: id(fromRoot: mnemonic.hdRoot(passphrase: bip39Passphrase)),
-			hint: iOS.getDeviceDescription(),
+			hint: hint,
 			parameters: olympiaCompatible ? .olympiaBackwardsCompatible : .babylon
 		)
 	}
 
+	@MainActor
 	static func babylon(
 		mnemonic: Mnemonic,
 		bip39Passphrase: String = ""
 	) throws -> Self {
 		try .device(
 			mnemonic: mnemonic,
+			hint: Device.modelName(),
 			bip39Passphrase: bip39Passphrase,
 			olympiaCompatible: false
 		)
 	}
 
+	@MainActor
 	static func olympia(
 		mnemonic: Mnemonic,
 		bip39Passphrase: String = ""
 	) throws -> Self {
 		try .device(
 			mnemonic: mnemonic,
+			hint: Device.modelName(),
 			bip39Passphrase: bip39Passphrase,
 			olympiaCompatible: true
 		)

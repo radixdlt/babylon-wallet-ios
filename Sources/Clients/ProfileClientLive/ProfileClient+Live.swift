@@ -123,7 +123,7 @@ extension ProfileClient {
 					mnemonic: mnemonic,
 					passphrase: bip39Passphrase
 				)
-				let onDeviceFactorSource = try FactorSource.babylon(
+				let onDeviceFactorSource = try await FactorSource.babylon(
 					mnemonic: mnemonic,
 					bip39Passphrase: bip39Passphrase
 				)
@@ -275,7 +275,7 @@ extension ProfileClient {
 			},
 			addConnectedDapp: { connectedDapp in
 				try await profileHolder.asyncMutating { profile in
-					_ = try await profile.addConnectedDapp(connectedDapp)
+					_ = try profile.addConnectedDapp(connectedDapp)
 				}
 			},
 			detailsForConnectedDapp: { connectedDappSimple in
@@ -285,7 +285,7 @@ extension ProfileClient {
 			},
 			updateConnectedDapp: { updated in
 				try await profileHolder.asyncMutating { profile in
-					try await profile.updateConnectedDapp(updated)
+					try profile.updateConnectedDapp(updated)
 				}
 			},
 			addP2PClient: { newClient in
@@ -388,12 +388,12 @@ extension ProfileClient {
 			},
 			addAccount: { account in
 				try await profileHolder.asyncMutating { profile in
-					try await profile.addAccount(account)
+					try profile.addAccount(account)
 				}
 			},
 			addPersona: { persona in
 				try await profileHolder.asyncMutating { profile in
-					try await profile.addPersona(persona)
+					try profile.addPersona(persona)
 				}
 			},
 			lookupAccountByAddress: lookupAccountByAddress

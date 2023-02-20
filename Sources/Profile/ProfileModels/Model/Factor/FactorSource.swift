@@ -78,7 +78,7 @@ extension FactorSource {
 extension FactorSource {
 	public static let previewValueDevice: Self = {
 		let mnemonic = try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote", language: .english)
-		return try! Self.device(mnemonic: mnemonic, olympiaCompatible: false)
+		return try! Self.device(mnemonic: mnemonic, hint: "preview", olympiaCompatible: false)
 	}()
 }
 #endif

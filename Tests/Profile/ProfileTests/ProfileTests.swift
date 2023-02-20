@@ -53,10 +53,10 @@ final class ProfileTests: TestCase {
 			language: .english
 		)
 		let networkID = networkAndGateway.network.id
-		let babylonFactorSource = try FactorSource.babylon(mnemonic: curve25519FactorSourceMnemonic)
+		let babylonFactorSource = try await FactorSource.babylon(mnemonic: curve25519FactorSourceMnemonic)
 		var profile = Profile(factorSource: babylonFactorSource)
 
-		let olympiaFactorSource = try FactorSource.olympia(mnemonic: secp256K1FactorMnemonic)
+		let olympiaFactorSource = try await FactorSource.olympia(mnemonic: secp256K1FactorMnemonic)
 		profile.factorSources.append(olympiaFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> OnNetwork.Account {

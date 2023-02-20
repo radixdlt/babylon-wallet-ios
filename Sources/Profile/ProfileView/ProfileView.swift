@@ -138,6 +138,11 @@ extension FactorSourceView {
 				.font(.title)
 			#endif // os(macOS)
 
+			Labeled("Kind", value: factorSource.kind.rawValue)
+			Labeled("Hint", value: factorSource.hint.rawValue)
+			Labeled("Added on", value: factorSource.addedOn.ISO8601Format())
+			Labeled("ID", value: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
+
 			if let mnemonicPhraseLoadedFromKeychain {
 				VStack {
 					Text("✅ Mnemonic found in keychain ✅")
@@ -151,21 +156,15 @@ extension FactorSourceView {
 				.padding()
 				.border(Color.green, width: 2)
 			}
-
-			Labeled("ID", value: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
-			Labeled("Kind", value: factorSource.kind.rawValue)
-			Labeled("Added on", value: factorSource.addedOn.ISO8601Format())
 		}
 		.padding([.leading], leadingPadding)
 		.task {
-			Task {
-				if let mnemonic = try? await keychainClient?.loadFactorSourceMnemonicWithPassphrase(
-					factorSourceID: self.factorSource.id,
-					authenticationPrompt: "Load Mnemonic to display for debugging"
-				) {
-					self.mnemonicPhraseLoadedFromKeychain = mnemonic.mnemonic.phrase
-					self.mnemonicPassphraseLoadedFromKeychain = mnemonic.passphrase
-				}
+			if let mnemonic = try? await keychainClient?.loadFactorSourceMnemonicWithPassphrase(
+				factorSourceID: factorSource.id,
+				authenticationPrompt: "Load Mnemonic to display for debugging"
+			) {
+				self.mnemonicPhraseLoadedFromKeychain = mnemonic.mnemonic.phrase
+				self.mnemonicPassphraseLoadedFromKeychain = mnemonic.passphrase
 			}
 		}
 	}
