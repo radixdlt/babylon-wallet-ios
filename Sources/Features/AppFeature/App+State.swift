@@ -13,14 +13,12 @@ extension App {
 		}
 
 		public var root: Root
-		public var errorAlert: AlertState<Action.ViewAction>?
 
-		public init(
-			root: Root = .splash(.init()),
-			errorAlert: AlertState<Action.ViewAction>? = nil
-		) {
+		@PresentationState
+		public var alert: Alerts.State?
+
+		public init(root: Root = .splash(.init())) {
 			self.root = root
-			self.errorAlert = errorAlert
 		}
 	}
 }

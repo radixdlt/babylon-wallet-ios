@@ -13,7 +13,14 @@ public struct CameraPermission: Sendable, ReducerProtocol {
 }
 
 extension CameraPermission {
-	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.presentationDestination(\.$permissionDeniedAlert, action: /Action.internal .. Action.InternalAction.view .. Action.ViewAction.permissionDeniedAlert) {
+				EmptyReducer()
+			}
+	}
+
+	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.appeared)):
 			return .run { send in
@@ -44,10 +51,9 @@ extension CameraPermission {
 			)
 			return .none
 
-		case let .internal(.view(.permissionDeniedAlert(action))):
-			state.permissionDeniedAlert = nil
+		case let .internal(.view(.permissionDeniedAlert(.presented(action)))):
 			switch action {
-			case .dismissed, .cancelButtonTapped:
+			case .cancelButtonTapped:
 				return .run { send in
 					await send(.delegate(.permissionResponse(false)))
 				}
@@ -59,6 +65,8 @@ extension CameraPermission {
 					#endif
 				}
 			}
+		case .internal(.view(.permissionDeniedAlert)):
+			return .none
 
 		case .delegate:
 			return .none

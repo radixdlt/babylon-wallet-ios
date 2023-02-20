@@ -22,8 +22,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	enum ViewAction: Sendable, Equatable {
 		case appeared
 		case malformedInteractionErrorAlert(
-			PresentationAction<AlertState<MalformedInteractionErrorAlertAction>,
-				MalformedInteractionErrorAlertAction>
+			PresentationAction<AlertState<MalformedInteractionErrorAlertAction>, MalformedInteractionErrorAlertAction>
 		)
 
 		enum MalformedInteractionErrorAlertAction: Sendable, Equatable {
@@ -62,24 +61,26 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
+			.presentationDestination(\.$errorAlert, action: /Action.view .. ViewAction.malformedInteractionErrorAlert) {
+				EmptyReducer()
+			}
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
 			return .send(.delegate(.presented))
-		case let .malformedInteractionErrorAlert(action):
-			state.errorAlert = nil
+		case let .malformedInteractionErrorAlert(.presented(action)):
 			switch action {
-			case .dismiss, .present:
-				return .none
-			case .presented(.okButtonTapped):
+			case .okButtonTapped:
 				return .send(.delegate(.submitAndDismiss(.failure(.init(
 					interactionId: state.interaction.id,
 					errorType: .rejectedByUser,
 					message: nil
 				)))))
 			}
+		case .malformedInteractionErrorAlert:
+			return .none
 		}
 	}
 

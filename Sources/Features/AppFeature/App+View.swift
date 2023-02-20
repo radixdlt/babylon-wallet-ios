@@ -39,11 +39,14 @@ extension App.View {
 				)
 			}
 			.alert(
-				store.scope(
-					state: \.errorAlert,
-					action: { .view($0) }
-				),
-				dismiss: .errorAlertDismissButtonTapped
+				store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
+				state: /App.Alerts.State.userErrorAlert,
+				action: App.Alerts.Action.userErrorAlert
+			)
+			.alert(
+				store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
+				state: /App.Alerts.State.incompatibleProfileErrorAlert,
+				action: App.Alerts.Action.incompatibleProfileErrorAlert
 			)
 			.task { @MainActor in
 				await ViewStore(store.stateless).send(.view(.task)).finish()
@@ -63,6 +66,9 @@ struct AppView_Previews: PreviewProvider {
 			store: .init(
 				initialState: .init(),
 				reducer: App()
+					.dependency(\.localAuthenticationClient.queryConfig) {
+						.biometricsAndPasscodeSetUp
+					}
 			)
 		)
 	}

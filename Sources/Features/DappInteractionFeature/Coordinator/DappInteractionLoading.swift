@@ -37,20 +37,26 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	@Dependency(\.gatewayAPIClient) var gatewayAPI
 
+	var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.presentationDestination(\.$errorAlert, action: /Action.view .. ViewAction.errorAlert) {
+				EmptyReducer()
+			}
+	}
+
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
 			return metadataLoadingEffect(with: &state)
-		case let .errorAlert(action):
-			state.errorAlert = nil
+		case let .errorAlert(.presented(action)):
 			switch action {
-			case .dismiss, .present:
-				return .none
-			case .presented(.retryButtonTapped):
+			case .retryButtonTapped:
 				return metadataLoadingEffect(with: &state)
-			case .presented(.cancelButtonTapped):
+			case .cancelButtonTapped:
 				return .send(.delegate(.dismiss))
 			}
+		case .errorAlert:
+			return .none
 		case .dismissButtonTapped:
 			return .send(.delegate(.dismiss))
 		}
@@ -62,7 +68,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 			let metadata = await TaskResult {
 				do {
 					return DappMetadata(try await gatewayAPI.resourceDetailsByResourceIdentifier(dappDefinitionAddress.address).metadata)
-				} catch let error as BadHTTPResponseCode {
+				} catch is BadHTTPResponseCode {
 					return DappMetadata(name: nil) // Not found - return unknown dapp metadata as instructed by network team
 				} catch {
 					throw error

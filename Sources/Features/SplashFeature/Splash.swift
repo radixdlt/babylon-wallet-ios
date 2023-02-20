@@ -5,6 +5,7 @@ import ProfileClient
 // MARK: - Splash
 public struct Splash: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		@PresentationState
 		public var biometricsCheckFailedAlert: AlertState<ViewAction.BiometricsCheckFailedAlertAction>?
 		public var loadProfileResult: ProfileClient.LoadProfileResult?
 
@@ -19,13 +20,12 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		public enum BiometricsCheckFailedAlertAction: Sendable, Equatable {
-			case dismissed
 			case cancelButtonTapped
 			case openSettingsButtonTapped
 		}
 
 		case appeared
-		case biometricsCheckFailed(BiometricsCheckFailedAlertAction)
+		case biometricsCheckFailedAlert(PresentationAction<AlertState<BiometricsCheckFailedAlertAction>, BiometricsCheckFailedAlertAction>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -45,6 +45,13 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public init() {}
 
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.presentationDestination(\.$biometricsCheckFailedAlert, action: /Action.view .. ViewAction.biometricsCheckFailedAlert) {
+				EmptyReducer()
+			}
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .appeared:
@@ -52,13 +59,10 @@ public struct Splash: Sendable, FeatureReducer {
 				await send(.internal(.loadProfileResult(loadProfile())))
 			}
 
-		case let .biometricsCheckFailed(action):
-			state.biometricsCheckFailedAlert = nil
-
+		case let .biometricsCheckFailedAlert(.presented(action)):
 			switch action {
-			case .dismissed, .cancelButtonTapped:
+			case .cancelButtonTapped:
 				return notifyDelegate(profileResult: state.loadProfileResult)
-
 			case .openSettingsButtonTapped:
 				#if os(iOS)
 				return .run { _ in
@@ -68,6 +72,8 @@ public struct Splash: Sendable, FeatureReducer {
 				return .none
 				#endif
 			}
+		case .biometricsCheckFailedAlert:
+			return .none
 		}
 	}
 

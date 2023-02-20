@@ -14,28 +14,14 @@ extension LocalNetworkPermission {
 
 extension LocalNetworkPermission.View {
 	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			ZStack {}
-				.alert(
-					store.scope(
-						state: \.permissionDeniedAlert,
-						action: { .view(.permissionDeniedAlert($0)) }
-					),
-					dismiss: .dismissed
+		ZStack {}
+			.alert(
+				store: store.scope(
+					state: \.$permissionDeniedAlert,
+					action: { .view(.permissionDeniedAlert($0)) }
 				)
-				.onAppear { viewStore.send(.appeared) }
-		}
-	}
-}
-
-// MARK: - LocalNetworkPermission.View.ViewState
-extension LocalNetworkPermission.View {
-	struct ViewState: Equatable {
-		init(state: LocalNetworkPermission.State) {}
+			)
+			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 	}
 }
 

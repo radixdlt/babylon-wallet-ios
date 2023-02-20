@@ -5,14 +5,11 @@ extension AccountList {
 	// MARK: State
 	public struct State: Sendable, Hashable {
 		public var accounts: IdentifiedArrayOf<AccountList.Row.State>
-		public var alert: AlertState<Action.ViewAction>?
 
 		public init(
-			accounts: IdentifiedArrayOf<AccountList.Row.State>,
-			alert: AlertState<Action.ViewAction>? = nil
+			accounts: IdentifiedArrayOf<AccountList.Row.State>
 		) {
 			self.accounts = accounts
-			self.alert = alert
 		}
 	}
 }
