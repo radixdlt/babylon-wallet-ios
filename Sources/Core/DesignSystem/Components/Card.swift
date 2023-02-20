@@ -1,7 +1,7 @@
 import SwiftUI
 
-// MARK: - RadixCard
-public struct RadixCard<Contents: View>: View {
+// MARK: - Card
+public struct Card<Contents: View>: View {
 	let contents: Contents
 
 	public init(@ViewBuilder contents: () -> Contents) {
@@ -21,11 +21,11 @@ public extension View {
 		background {
 			RoundedRectangle(cornerRadius: .small1)
 				.fill(.white)
-				.radixShadow
+				.cardShadow
 		}
 	}
 
-	var radixShadow: some View {
+	var cardShadow: some View {
 		shadow(color: .app.gray2.opacity(0.26), radius: .medium3, x: .zero, y: .small2)
 	}
 }

@@ -155,7 +155,7 @@ extension PersonaDetails.View {
 							AccountButton(account.label.rawValue,
 							              address: account.address.address,
 							              gradient: .init(account.appearanceID)) {
-								viewStore.send(.appeared)
+								viewStore.send(.accountTapped(account.address))
 							}
 						}
 					}
@@ -196,5 +196,13 @@ public struct InfoPair: View {
 			Text(item)
 				.infoItem
 		}
+	}
+}
+
+// MARK: Extensions
+
+extension IdentifiedArrayOf<OnNetwork.Persona.Field> {
+	subscript(kind kind: OnNetwork.Persona.Field.Kind) -> OnNetwork.Persona.Field.Value? {
+		first { $0.kind == kind }?.value
 	}
 }

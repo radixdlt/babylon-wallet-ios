@@ -227,7 +227,7 @@ extension DappDetails.View {
 						.padding(.horizontal, .medium1)
 
 					ForEach(elements) { element in
-						RadixCard {
+						Card {
 							PlainListRow(showChevron: false, title: title(element)) {
 								action(element.id)
 							} icon: {
@@ -262,7 +262,7 @@ extension DappDetails.View {
 
 						VStack(spacing: .medium3) {
 							ForEach(viewStore.personas) { persona in
-								RadixCard {
+								Card {
 									PlainListRow(title: persona.name) {
 										viewStore.send(.personaTapped(persona.id))
 									} icon: {
@@ -279,16 +279,6 @@ extension DappDetails.View {
 			.background(.app.gray5)
 		}
 	}
-}
-
-extension String {
-	static let nbaTopShot: String = "NBA Top Shot is a decentralized application that provides users with the opportunity to purchase, collect, and showcase digital blockchain collectibles"
-
-	static let lorem: String = "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt."
-}
-
-extension ComponentAddress {
-	static let mock = ComponentAddress(address: "component_sim1qfh2n5twmrzrlstqepsu3u624r4pdzca9pqhrcy7624sfmxzep")
 }
 
 // MARK: - LoadableView

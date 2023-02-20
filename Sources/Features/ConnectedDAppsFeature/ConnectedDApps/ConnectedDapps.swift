@@ -68,8 +68,8 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		switch childAction {
 		case .presentedDapp(.presented(.delegate(.dAppForgotten))):
 			return .run { send in
-				let dApps = try await profileClient.getConnectedDapps() // TODO: • Handle error?
-				// Could pop up a message here
+				let dApps = try await profileClient.getConnectedDapps() // TODO: • Handle error
+				// TODO: Show toaster
 				await send(.child(.presentedDapp(.dismiss)))
 				await send(.internal(.loadedDapps(dApps)))
 			}

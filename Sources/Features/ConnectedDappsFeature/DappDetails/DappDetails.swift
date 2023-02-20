@@ -94,9 +94,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 			}
 
 		case let .fungibleTokenTapped(token):
+			// TODO: Handle this
 			return .none
 
 		case let .nonFungibleTokenTapped(nft):
+			// TODO: Handle this
 			return .none
 
 		case let .personaTapped(id):
@@ -111,6 +113,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .send(.child(.presentedPersona(.dismiss)))
 
 		case .forgetThisDappTapped:
+			// TODO: • Show confirmation alert
 			// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
 			state.isDismissed = true
 			let (dAppID, networkID) = (state.dApp.dAppDefinitionAddress, state.dApp.networkID)

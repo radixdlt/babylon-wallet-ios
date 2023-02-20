@@ -31,7 +31,7 @@ public extension ConnectedDapps.View {
 
 					VStack(spacing: .medium3) {
 						ForEach(viewStore.dApps) { dApp in
-							RadixCard {
+							Card {
 								PlainListRow(title: dApp.displayName.rawValue) {
 									viewStore.send(.didSelectDapp(dApp.id))
 								} icon: {

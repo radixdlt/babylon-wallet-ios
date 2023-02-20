@@ -32,7 +32,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	// MARK: - Action
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
 		case editPersonaTapped
 		case accountTapped(AccountAddress)
 		case editAccountSharingTapped
@@ -47,8 +46,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
-		case .appeared:
-			return .none
 		case .editPersonaTapped:
 			return .none
 		case let .accountTapped(address):
@@ -62,11 +59,5 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 				return .delegate(.personaDisconnected)
 			}
 		}
-	}
-}
-
-extension IdentifiedArrayOf<OnNetwork.Persona.Field> {
-	subscript(kind kind: OnNetwork.Persona.Field.Kind) -> OnNetwork.Persona.Field.Value? {
-		first { $0.kind == kind }?.value
 	}
 }
