@@ -26,16 +26,6 @@ extension AccountDetails.View {
 		) { viewStore in
 			ForceFullScreen {
 				VStack(spacing: .zero) {
-					NavigationBar(
-						titleText: viewStore.displayName,
-						leadingItem: BackButton {
-							viewStore.send(.dismissAccountDetailsButtonTapped)
-						},
-						trailingItem: accountPreferencesButton(with: viewStore)
-					)
-					.foregroundColor(.app.white)
-					.padding([.horizontal, .top], .medium3)
-
 					AddressView(
 						viewStore.address,
 						copyAddressAction: {
@@ -76,6 +66,24 @@ extension AccountDetails.View {
 					.padding(.bottom, .medium2 * -2)
 				}
 				.background(viewStore.appearanceID.gradient)
+			}
+			.navigationBarBackButtonHidden()
+			.toolbar {
+				ToolbarItem(placement: .navigationBarLeading) {
+					BackButton {
+						viewStore.send(.dismissAccountDetailsButtonTapped)
+					}
+					.foregroundColor(.app.white)
+				}
+				ToolbarItem(placement: .principal) {
+					Text(viewStore.displayName)
+						.textStyle(.secondaryHeader)
+						.foregroundColor(.app.white)
+				}
+				ToolbarItem(placement: .navigationBarTrailing) {
+					accountPreferencesButton(with: viewStore)
+						.foregroundColor(.app.white)
+				}
 			}
 			.onAppear {
 				viewStore.send(.appeared)
@@ -130,12 +138,15 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct AccountDetails_Preview: PreviewProvider {
 	static var previews: some View {
-		AccountDetails.View(
-			store: .init(
-				initialState: .init(for: .previewValue),
-				reducer: AccountDetails()
+		NavigationStack {
+			AccountDetails.View(
+				store: .init(
+					initialState: .init(for: .previewValue),
+					reducer: AccountDetails()
+				)
 			)
-		)
+			.navigationBarTitleDisplayMode(.inline)
+		}
 	}
 }
 #endif

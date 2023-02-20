@@ -19,8 +19,9 @@ public struct Home: Sendable, FeatureReducer {
 		public var header: Header.State
 		public var accountList: AccountList.State
 
-		// MARK: - Children
-		public var accountDetails: AccountDetails.State?
+		// MARK: - Destinations
+		@PresentationState
+		public var destination: Destinations.State?
 		public var accountPreferences: AccountPreferences.State?
 		public var createAccountCoordinator: CreateAccountCoordinator.State?
 
@@ -28,14 +29,14 @@ public struct Home: Sendable, FeatureReducer {
 			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
 			header: Header.State = .init(),
 			accountList: AccountList.State = .init(accounts: []),
-			accountDetails: AccountDetails.State? = nil,
+			destination: Destinations.State? = nil,
 			accountPreferences: AccountPreferences.State? = nil,
 			createAccount: CreateAccountCoordinator.State? = nil
 		) {
 			self.accountPortfolioDictionary = accountPortfolioDictionary
 			self.header = header
 			self.accountList = accountList
-			self.accountDetails = accountDetails
+			self.destination = destination
 			self.accountPreferences = accountPreferences
 			self.createAccountCoordinator = createAccount
 		}
@@ -56,15 +57,31 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case accountList(AccountList.Action)
 		case header(Header.Action)
+		case accountList(AccountList.Action)
+		case destination(PresentationActionOf<Destinations>)
 		case accountPreferences(AccountPreferences.Action)
-		case accountDetails(AccountDetails.Action)
 		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case accountDetails(AccountDetails.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case accountDetails(AccountDetails.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.accountDetails, action: /Action.accountDetails) {
+				AccountDetails()
+			}
+		}
 	}
 
 	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
@@ -84,15 +101,15 @@ public struct Home: Sendable, FeatureReducer {
 
 		accountListReducer()
 
-		Reduce(self.core)
+		Reduce(core)
+			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
 	}
 
 	func accountListReducer() -> some ReducerProtocolOf<Self> {
 		Scope(state: \.accountList, action: /Action.child .. ChildAction.accountList) {
 			AccountList()
-		}
-		.ifLet(\.accountDetails, action: /Action.child .. ChildAction.accountDetails) {
-			AccountDetails()
 		}
 		.ifLet(\.accountPreferences, action: /Action.child .. ChildAction.accountPreferences) {
 			AccountPreferences()
@@ -152,11 +169,11 @@ public struct Home: Sendable, FeatureReducer {
 			}
 
 			// account details
-			state.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
-				section.assets.forEach { row in
-					state.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
-				}
-			}
+//			state.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
+//				section.assets.forEach { row in
+//					state.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
+//				}
+//			}
 
 			return .none
 
@@ -168,28 +185,28 @@ public struct Home: Sendable, FeatureReducer {
 			}
 
 			// account details
-			if let details = state.accountDetails {
-				let account = details.account
-
-				// asset list
-				let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
-				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
-
-				state.accountDetails?.assets = .init(
-					type: details.assets.type,
-					fungibleTokenList: .init(
-						sections: .init(uniqueElements: categories.map { category in
-							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
-							return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
-						})
-					),
-					nonFungibleTokenList: .init(
-						rows: .init(uniqueElements: accountPortfolio.nonFungibleTokenContainers.elements.map {
-							.init(container: $0)
-						})
-					)
-				)
-			}
+//			if let details = state.accountDetails {
+//				let account = details.account
+//
+//				// asset list
+//				let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
+//				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
+//
+//				state.accountDetails?.assets = .init(
+//					type: details.assets.type,
+//					fungibleTokenList: .init(
+//						sections: .init(uniqueElements: categories.map { category in
+//							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
+//							return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
+//						})
+//					),
+//					nonFungibleTokenList: .init(
+//						rows: .init(uniqueElements: accountPortfolio.nonFungibleTokenContainers.elements.map {
+//							.init(container: $0)
+//						})
+//					)
+//				)
+//			}
 
 			return .none
 
@@ -216,7 +233,7 @@ public struct Home: Sendable, FeatureReducer {
 			return loadAccountsAndSettings()
 
 		case let .accountList(.delegate(.displayAccountDetails(account))):
-			state.accountDetails = .init(for: account)
+			state.destination = .accountDetails(.init(for: account))
 			return .none
 
 		case .header(.delegate(.displaySettings)):
@@ -236,15 +253,15 @@ public struct Home: Sendable, FeatureReducer {
 				await send(.child(.accountPreferences(.internal(.system(.refreshAccountCompleted)))))
 			}
 
-		case .accountDetails(.delegate(.dismissAccountDetails)):
-			state.accountDetails = nil
+		case .destination(.presented(.accountDetails(.delegate(.dismissAccountDetails)))):
+			state.destination = nil
 			return .none
 
-		case let .accountDetails(.delegate(.displayAccountPreferences(address))):
+		case let .destination(.presented(.accountDetails(.delegate(.displayAccountPreferences(address))))):
 			state.accountPreferences = .init(address: address)
 			return .none
 
-		case let .accountDetails(.delegate(.refresh(address))):
+		case let .destination(.presented(.accountDetails(.delegate(.refresh(address))))):
 			return refreshAccount(address)
 
 		case .createAccountCoordinator(.delegate(.dismissed)):

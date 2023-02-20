@@ -5,6 +5,10 @@ import ProfileClient
 // MARK: - WalletApp
 @main
 struct WalletApp: SwiftUI.App {
+	init() {
+		configureWalletAppUIAppearance()
+	}
+
 	var body: some SwiftUI.Scene {
 		WindowGroup {
 			App.View(

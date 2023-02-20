@@ -30,7 +30,7 @@ extension Home {
 				observe: \.viewState,
 				send: { .view($0) }
 			) { viewStore in
-				ForceFullScreen {
+				NavigationStack {
 					ZStack {
 						homeView(with: viewStore)
 							.onAppear {
@@ -49,15 +49,6 @@ extension Home {
 
 						IfLetStore(
 							store.scope(
-								state: \.accountDetails,
-								action: { .child(.accountDetails($0)) }
-							),
-							then: { AccountDetails.View(store: $0) }
-						)
-						.zIndex(2)
-
-						IfLetStore(
-							store.scope(
 								state: \.accountPreferences,
 								action: { .child(.accountPreferences($0)) }
 							),
@@ -65,7 +56,14 @@ extension Home {
 						)
 						.zIndex(3)
 					}
+					.navigationDestination(
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /Home.Destinations.State.accountDetails,
+						action: Home.Destinations.Action.accountDetails,
+						destination: { AccountDetails.View(store: $0) }
+					)
 				}
+				.navigationTransition(.default, interactivity: .pan)
 			}
 		}
 
@@ -117,6 +115,7 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct HomeView_Previews: PreviewProvider {
 	static var previews: some SwiftUI.View {
+		let _ = configureWalletAppUIAppearance()
 		Home.View(
 			store: .init(
 				initialState: .previewValue,
