@@ -434,6 +434,9 @@ package.addModules([
 			"Cryptography",
 			"EngineToolkit", // address derivation
 			"P2PModels",
+			.product(name: "DeviceKit", package: "DeviceKit") {
+				.package(url: "https://github.com/devicekit/DeviceKit", from: "5.0.0")
+			},
 		],
 		tests: .no
 	),
