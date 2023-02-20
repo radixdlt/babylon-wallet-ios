@@ -458,7 +458,7 @@ package.addModules([
 			"Cryptography",
 			"P2PModels",
 			.product(name: "WebRTC", package: "WebRTC") {
-				.package(url: "https://github.com/stasel/WebRTC", from: "109.0.1")
+				.package(url: "https://github.com/stasel/WebRTC", from: "110.0.0")
 			},
 		],
 		exclude: [
