@@ -69,9 +69,6 @@ struct AppView_Previews: PreviewProvider {
 					.dependency(\.localAuthenticationClient.queryConfig) {
 						.biometricsAndPasscodeSetUp
 					}
-					.dependency(\.profileClient.loadProfile) {
-						.failure(.profileVersionOutdated(json: Data(), version: .zero))
-					}
 			)
 		)
 	}
