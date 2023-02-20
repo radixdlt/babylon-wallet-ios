@@ -22,13 +22,14 @@ final class CreateAccountCoordinatorTests: TestCase {
 		)
 		let initialState = CreateAccountCoordinator.State(
 			step: .step2_creationOfEntity(.init(
+				curve: .curve25519,
 				networkID: nil,
 				name: "Main",
-				genesisFactorInstanceDerivationStrategy: .loadMnemonicFromKeychainForFactorSource(.previewValue)
+				genesisFactorInstanceDerivationStrategy: .loadMnemonicFromKeychainForFactorSource(.previewValueDevice)
 			)),
 			config: config
 		)
-		let account = OnNetwork.Account.testValue
+		let account = OnNetwork.Account.previewValue0
 
 		let store = TestStore(
 			initialState: initialState,

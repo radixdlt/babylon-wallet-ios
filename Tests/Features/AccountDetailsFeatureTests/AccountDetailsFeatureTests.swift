@@ -6,7 +6,7 @@ import FeatureTestingPrelude
 final class AccountDetailsFeatureTests: TestCase {
 	func test_dismissAccountDetails_whenTappedOnBackButton_thenCoordinateDismissal() async {
 		// given
-		let accountListRowState = AccountList.Row.State(account: .testValue)
+		let accountListRowState = AccountList.Row.State(account: .previewValue0)
 		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(
 			initialState: initialState,
@@ -22,7 +22,7 @@ final class AccountDetailsFeatureTests: TestCase {
 
 	func test_navigateToAccountPreferences_whenTappedOnPreferencesButton_thenCoordinateNavigationToPreferences() async {
 		// given
-		let account = OnNetwork.Account.testValue
+		let account = OnNetwork.Account.previewValue0
 		let accountListRowState = AccountList.Row.State(account: account)
 		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(
@@ -39,7 +39,7 @@ final class AccountDetailsFeatureTests: TestCase {
 
 	func test_copyAddress_whenTappedOnCopyAddress_thenCopyToPasteboard() async {
 		// given
-		let account = OnNetwork.Account.testValue
+		let account = OnNetwork.Account.previewValue0
 		let accountListRowState = AccountList.Row.State(account: account)
 		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(
@@ -61,7 +61,7 @@ final class AccountDetailsFeatureTests: TestCase {
 
 	func test_refresh_whenInitiatedRefresh_thenCoordinateRefreshForAddress() async {
 		// given
-		let account = OnNetwork.Account.testValue
+		let account = OnNetwork.Account.previewValue0
 		let accountListRowState = AccountList.Row.State(account: account)
 		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(

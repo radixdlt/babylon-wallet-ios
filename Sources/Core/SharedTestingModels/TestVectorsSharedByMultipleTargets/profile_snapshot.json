@@ -14,8 +14,8 @@
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
-        "firstEstablishedOn" : "2023-02-06T15:28:09Z",
-        "lastUsedOn" : "2023-02-06T15:28:09Z",
+        "firstEstablishedOn" : "2023-02-20T15:45:30Z",
+        "lastUsedOn" : "2023-02-20T15:45:30Z",
         "platform" : "browser"
       },
       {
@@ -30,8 +30,8 @@
           "retryAttempts" : 3
         },
         "displayName" : "iPhone 13",
-        "firstEstablishedOn" : "2023-02-06T15:28:09Z",
-        "lastUsedOn" : "2023-02-06T15:28:09Z",
+        "firstEstablishedOn" : "2023-02-20T15:45:30Z",
+        "lastUsedOn" : "2023-02-20T15:45:30Z",
         "platform" : "iPhone",
         "signalingServerConfig" : {
           "signalingServerBaseURL" : "custom.signal.com",
@@ -64,29 +64,48 @@
       }
     ]
   },
-  "factorSources" : {
-    "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources" : [
-      {
-        "creationDate" : "2023-02-06T15:28:09Z",
-        "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
-        "label" : "DeviceFactorSource"
+  "factorSources" : [
+    {
+      "addedOn" : "2023-02-20T15:45:30Z",
+      "hint" : "iPhone 14 Pro Max",
+      "id" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
+      "kind" : "device",
+      "lastUsedOn" : "2023-02-20T15:45:30Z",
+      "parameters" : {
+        "supportedCurves" : [
+          "curve25519"
+        ],
+        "supportedDerivationPathSchemes" : [
+          "cap26"
+        ]
       }
-    ],
-    "secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources" : [
-      {
-        "creationDate" : "2023-02-06T15:28:09Z",
-        "factorSourceID" : "85d985e6861e3fb4b39c753b09b9be67d43896d53b0d1dfcb2682ae261d32eb2",
-        "label" : "OlympiaFactorSource"
+    },
+    {
+      "addedOn" : "2023-02-20T15:45:30Z",
+      "hint" : "iPhone 14 Pro Max",
+      "id" : "e00d9eb10f9016910e1bc18679a1e22ac8632ceb26983c3ff19f2d8d72c32398",
+      "kind" : "device",
+      "lastUsedOn" : "2023-02-20T15:45:30Z",
+      "parameters" : {
+        "supportedCurves" : [
+          "curve25519",
+          "secp256k1"
+        ],
+        "supportedDerivationPathSchemes" : [
+          "cap26",
+          "bip44Olympia"
+        ]
       }
-    ]
-  },
+    }
+  ],
+  "id" : "6E3A4F7F-742E-40E1-BC09-ADB0808F4DF0",
   "perNetwork" : [
+    11,
     {
       "accounts" : [
         {
           "address" : "account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f",
           "appearanceID" : 0,
-          "derivationPath" : "m/44H/1022H/11H/525H/0H/1238H",
           "displayName" : "First",
           "index" : 0,
           "networkID" : 11,
@@ -95,18 +114,13 @@
             "unsecuredEntityControl" : {
               "genesisFactorInstance" : {
                 "derivationPath" : {
-                  "derivationPath" : "m/44H/1022H/11H/525H/0H/1238H",
-                  "discriminator" : "accountPath"
+                  "path" : "m/44H/1022H/11H/525H/0H/1238H",
+                  "scheme" : "cap26"
                 },
-                "factorInstanceID" : "92d321eb65f30a38c8a0cb45e775402d936f539a2fb05395d25a5c2002ca89c4",
-                "factorSourceReference" : {
-                  "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
-                  "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
-                },
-                "initializationDate" : "2023-02-06T15:28:09Z",
+                "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                 "publicKey" : {
-                  "compressedData" : "b9c37926187c6ecfee40577e29942ecc1371c5bb6350288aca92033b16ce595c",
-                  "curve" : "curve25519"
+                  "curve" : "EddsaEd25519",
+                  "public_key" : "b9c37926187c6ecfee40577e29942ecc1371c5bb6350288aca92033b16ce595c"
                 }
               }
             }
@@ -115,7 +129,6 @@
         {
           "address" : "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
           "appearanceID" : 1,
-          "derivationPath" : "m/44H/1022H/11H/525H/1H/1238H",
           "displayName" : "Second",
           "index" : 1,
           "networkID" : 11,
@@ -124,18 +137,13 @@
             "unsecuredEntityControl" : {
               "genesisFactorInstance" : {
                 "derivationPath" : {
-                  "derivationPath" : "m/44H/1022H/11H/525H/1H/1238H",
-                  "discriminator" : "accountPath"
+                  "path" : "m/44H/1022H/11H/525H/1H/1238H",
+                  "scheme" : "cap26"
                 },
-                "factorInstanceID" : "90338e0f7afb84b7181d2c63bb0446c895d9924f0b0561237b835fa80e5db6ef",
-                "factorSourceReference" : {
-                  "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
-                  "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
-                },
-                "initializationDate" : "2023-02-06T15:28:09Z",
+                "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                 "publicKey" : {
-                  "compressedData" : "7c906945cf3d4b4ab27ebf11b6f98e07c506323809f9b501275914f72739ed86",
-                  "curve" : "curve25519"
+                  "curve" : "EddsaEd25519",
+                  "public_key" : "7c906945cf3d4b4ab27ebf11b6f98e07c506323809f9b501275914f72739ed86"
                 }
               }
             }
@@ -144,7 +152,6 @@
         {
           "address" : "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6",
           "appearanceID" : 2,
-          "derivationPath" : "m/44H/1022H/11H/525H/2H/1238H",
           "displayName" : "Third",
           "index" : 2,
           "networkID" : 11,
@@ -153,18 +160,13 @@
             "unsecuredEntityControl" : {
               "genesisFactorInstance" : {
                 "derivationPath" : {
-                  "derivationPath" : "m/44H/1022H/11H/525H/2H/1238H",
-                  "discriminator" : "accountPath"
+                  "path" : "m/44H/1022H/11H/525H/2H/1238H",
+                  "scheme" : "cap26"
                 },
-                "factorInstanceID" : "5e80ae87441a8cf6d796a88c634b2bf801305448878db9b068365713c53a6626",
-                "factorSourceReference" : {
-                  "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
-                  "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
-                },
-                "initializationDate" : "2023-02-06T15:28:09Z",
+                "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                 "publicKey" : {
-                  "compressedData" : "3f9d3dbae544a46d58703baab5db8d0643879733f7b6e01b39bf96c16ea827d6",
-                  "curve" : "curve25519"
+                  "curve" : "EddsaEd25519",
+                  "public_key" : "3f9d3dbae544a46d58703baab5db8d0643879733f7b6e01b39bf96c16ea827d6"
                 }
               }
             }
@@ -179,11 +181,11 @@
           "referencesToAuthorizedPersonas" : [
             {
               "fieldIDs" : [
-                "843A4716-D238-4D55-BF5B-1FF7EBDFF717",
-                "6C62C3C8-1CD9-4049-9B2F-347486BA97B9"
+                "D7B0AF2F-0674-4F23-8865-F75B2AAD184D",
+                "C22C12C9-B047-4878-8DCF-B17BA92B9E33"
               ],
-              "lastLogin" : "2023-01-31T10:28:14Z",
               "identityAddress" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
+              "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
                 "accountsReferencedByAddress" : [
                   "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu",
@@ -197,11 +199,11 @@
             },
             {
               "fieldIDs" : [
-                "FAD199A5-D6A8-425D-8807-C1561C2425C8",
-                "AC37E346-32EF-4670-9097-1AC27B20D394"
+                "CF311281-995C-4547-B63E-28F453D143EE",
+                "63A2B047-01F5-4DA8-B78B-3F094880418A"
               ],
-              "lastLogin" : "2023-01-31T10:28:14Z",
               "identityAddress" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
+              "lastLogin" : "2001-01-01T00:00:00Z",
               "sharedAccounts" : {
                 "accountsReferencedByAddress" : [
                   "account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu"
@@ -219,16 +221,15 @@
       "personas" : [
         {
           "address" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
-          "derivationPath" : "m/44H/1022H/11H/618H/0H/1238H",
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "843A4716-D238-4D55-BF5B-1FF7EBDFF717",
+              "id" : "D7B0AF2F-0674-4F23-8865-F75B2AAD184D",
               "kind" : "firstName",
               "value" : "Jane"
             },
             {
-              "id" : "6C62C3C8-1CD9-4049-9B2F-347486BA97B9",
+              "id" : "C22C12C9-B047-4878-8DCF-B17BA92B9E33",
               "kind" : "lastName",
               "value" : "Incognitoson"
             }
@@ -240,18 +241,13 @@
             "unsecuredEntityControl" : {
               "genesisFactorInstance" : {
                 "derivationPath" : {
-                  "derivationPath" : "m/44H/1022H/11H/618H/0H/1238H",
-                  "discriminator" : "identityPath"
+                  "path" : "m/44H/1022H/11H/618H/0H/1238H",
+                  "scheme" : "cap26"
                 },
-                "factorInstanceID" : "faede376ebdc65438e5ec07654a740f07b75c2b503c9769629fc87888916e704",
-                "factorSourceReference" : {
-                  "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
-                  "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
-                },
-                "initializationDate" : "2023-02-06T15:28:09Z",
+                "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                 "publicKey" : {
-                  "compressedData" : "f361cef2453721ed1b67e4c9266697325766513413de39d19746371466f9f63b",
-                  "curve" : "curve25519"
+                  "curve" : "EddsaEd25519",
+                  "public_key" : "f361cef2453721ed1b67e4c9266697325766513413de39d19746371466f9f63b"
                 }
               }
             }
@@ -259,16 +255,15 @@
         },
         {
           "address" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
-          "derivationPath" : "m/44H/1022H/11H/618H/1H/1238H",
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "FAD199A5-D6A8-425D-8807-C1561C2425C8",
+              "id" : "CF311281-995C-4547-B63E-28F453D143EE",
               "kind" : "firstName",
               "value" : "Maria"
             },
             {
-              "id" : "AC37E346-32EF-4670-9097-1AC27B20D394",
+              "id" : "63A2B047-01F5-4DA8-B78B-3F094880418A",
               "kind" : "lastName",
               "value" : "Publicson"
             }
@@ -280,18 +275,13 @@
             "unsecuredEntityControl" : {
               "genesisFactorInstance" : {
                 "derivationPath" : {
-                  "derivationPath" : "m/44H/1022H/11H/618H/1H/1238H",
-                  "discriminator" : "identityPath"
+                  "path" : "m/44H/1022H/11H/618H/1H/1238H",
+                  "scheme" : "cap26"
                 },
-                "factorInstanceID" : "0fd393fcfa09a5d6552b3f5b79ad1427d2d991e6602cd2cbef6828185c5a4cf0",
-                "factorSourceReference" : {
-                  "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
-                  "factorSourceKind" : "curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind"
-                },
-                "initializationDate" : "2023-02-06T15:28:09Z",
+                "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                 "publicKey" : {
-                  "compressedData" : "772ba0ebe12a1637458fefef15299bc57f8e9e21fcf106181d3d780ad1e2bf51",
-                  "curve" : "curve25519"
+                  "curve" : "EddsaEd25519",
+                  "public_key" : "772ba0ebe12a1637458fefef15299bc57f8e9e21fcf106181d3d780ad1e2bf51"
                 }
               }
             }
@@ -300,5 +290,5 @@
       ]
     }
   ],
-  "version" : 11
+  "version" : 12
 }

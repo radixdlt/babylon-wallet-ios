@@ -8,7 +8,7 @@ import NonFungibleTokenListFeature
 
 @MainActor
 final class HomeFeatureTests: TestCase {
-	let account = OnNetwork.Account.testValue
+	let account = OnNetwork.Account.previewValue0
 	var address: AccountAddress { account.address }
 
 	func test_fetchPortfolio() async {
@@ -37,7 +37,7 @@ final class HomeFeatureTests: TestCase {
 		let accountDetailsState = AccountDetails.State(for: accountRowState)
 		var initialState: Home.State = .previewValue
 		initialState.accountDetails = accountDetailsState
-		initialState.accountList = .init(accounts: .init(rawValue: .init([account]))!)
+		initialState.accountList = .init(accounts: .init(rawValue: .init(uniqueElements: [account]))!)
 
 		let store = TestStore(
 			initialState: initialState,

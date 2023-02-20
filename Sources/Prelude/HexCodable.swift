@@ -140,6 +140,10 @@ public protocol CodableViaHexCodable: Codable {
 }
 
 extension CodableViaHexCodable {
+	public func hex(options: Data.HexEncodingOptions = []) -> String {
+		self.hexCodable.hex(options: options)
+	}
+
 	public init(hex: String) throws {
 		try self.init(data: .init(hex: hex))
 	}
