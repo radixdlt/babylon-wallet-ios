@@ -3,7 +3,7 @@ import FeaturePrelude
 // MARK: AccountPreferences.State
 extension AccountPreferences {
 	// MARK: State
-	public struct State: Equatable {
+	public struct State: Sendable, Hashable {
 		public let address: AccountAddress
 		public var faucetButtonState: ControlState
 

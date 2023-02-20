@@ -144,6 +144,9 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			.navigationDestination(\.$path, action: /Action.child .. ChildAction.path) {
 				Destinations()
 			}
+			.presentationDestination(\.$personaNotFoundErrorAlert, action: /Action.view .. ViewAction.personaNotFoundErrorAlert) {
+				EmptyReducer()
+			}
 	}
 
 	@Dependency(\.profileClient) var profileClient
@@ -178,15 +181,14 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			} else {
 				return .none
 			}
-		case let .personaNotFoundErrorAlert(action):
-			state.personaNotFoundErrorAlert = nil
+		case let .personaNotFoundErrorAlert(.presented(action)):
 			switch action {
-			case .dismiss, .present:
-				return .none
-			case .presented(.cancelButtonTapped):
+			case .cancelButtonTapped:
 				// FIXME: .rejectedByUser should perhaps be a different, more specialized error (.invalidSpecifiedPersona?)
 				return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
 			}
+		case .personaNotFoundErrorAlert:
+			return .none
 		case .closeButtonTapped:
 			return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
 		case .backButtonTapped:

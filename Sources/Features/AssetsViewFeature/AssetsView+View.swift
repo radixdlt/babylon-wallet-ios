@@ -44,8 +44,8 @@ extension AssetsView.View {
 
 					// TODO: uncomment when ready for implementation
 					/*
-					 case .poolShare:
-					 	Text("Pool Share")
+					 case .poolUnits:
+					 	Text("Pool Units")
 					 case .badges:
 					 	Text("Badges")
 					 */

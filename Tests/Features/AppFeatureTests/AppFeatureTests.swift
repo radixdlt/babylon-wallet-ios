@@ -11,7 +11,7 @@ final class AppFeatureTests: TestCase {
 	func test_initialAppState_whenAppLaunches_thenInitialAppStateIsSplash() {
 		let appState = App.State()
 		XCTAssertEqual(appState.root, .splash(.init()))
-		XCTAssertNil(appState.errorAlert)
+		XCTAssertNil(appState.alert)
 	}
 
 	func test_removedWallet_whenWalletRemovedFromMainScreen_thenNavigateToOnboarding() async {
@@ -123,15 +123,18 @@ final class AppFeatureTests: TestCase {
 		await store.receive(.internal(.system(.displayErrorAlert(
 			App.UserFacingError(foobar)
 		)))) {
-			$0.errorAlert = .init(
-				title: .init("An Error Occurred"),
-				message: .init("Failed to create Wallet from backup: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))")
+			$0.alert = .userErrorAlert(
+				.init(
+					title: { TextState("An Error Occurred") },
+					actions: {},
+					message: { TextState("Failed to create Wallet from backup: valueNotFound(Profile.Profile, Swift.DecodingError.Context(codingPath: [], debugDescription: \"Something went wrong\", underlyingError: nil))") }
+				)
 			)
 		}
 
-		await store.send(.view(.errorAlertDismissButtonTapped)) {
+		await store.send(.view(.alert(.dismiss))) {
 			// then
-			$0.errorAlert = nil
+			$0.alert = nil
 		}
 
 		await testScheduler.run() // fast-forward scheduler to the end of time
@@ -167,15 +170,23 @@ final class AppFeatureTests: TestCase {
 		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
-			$0.errorAlert = .init(
-				title: .init("Wallet Data is Incompatible"),
-				message: .init("For this Preview wallet version, you must delete your wallet data to continue."),
-				dismissButton: .destructive(.init("Delete Wallet Data"), action: .send(App.Action.ViewAction.deleteIncompatibleProfile))
+			$0.alert = .incompatibleProfileErrorAlert(
+				.init(
+					title: { TextState("Wallet Data is Incompatible") },
+					actions: {
+						ButtonState(role: .destructive, action: .deleteWalletDataButtonTapped) {
+							TextState("Delete Wallet Data")
+						}
+					},
+					message: { TextState("For this Preview wallet version, you must delete your wallet data to continue.") }
+				)
 			)
 		}
 
-		await store.send(.view(.deleteIncompatibleProfile))
-		await store.receive(.internal(.system(.deletedIncompatibleProfile))) {
+		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
+			$0.alert = nil
+		}
+		await store.receive(.internal(.system(.incompatibleProfileDeleted))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
@@ -211,15 +222,23 @@ final class AppFeatureTests: TestCase {
 		await store.receive(.child(.splash(.internal(.biometricsConfigResult(.success(.biometricsAndPasscodeSetUp))))))
 
 		await store.receive(.child(.splash(.delegate(.profileResultLoaded(result))))) {
-			$0.errorAlert = .init(
-				title: .init("Wallet Data is Incompatible"),
-				message: .init("For this Preview wallet version, you must delete your wallet data to continue."),
-				dismissButton: .destructive(.init("Delete Wallet Data"), action: .send(App.Action.ViewAction.deleteIncompatibleProfile))
+			$0.alert = .incompatibleProfileErrorAlert(
+				.init(
+					title: { TextState("Wallet Data is Incompatible") },
+					actions: {
+						ButtonState(role: .destructive, action: .deleteWalletDataButtonTapped) {
+							TextState("Delete Wallet Data")
+						}
+					},
+					message: { TextState("For this Preview wallet version, you must delete your wallet data to continue.") }
+				)
 			)
 		}
 
-		await store.send(.view(.deleteIncompatibleProfile))
-		await store.receive(.internal(.system(.deletedIncompatibleProfile))) {
+		await store.send(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))) {
+			$0.alert = nil
+		}
+		await store.receive(.internal(.system(.incompatibleProfileDeleted))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 

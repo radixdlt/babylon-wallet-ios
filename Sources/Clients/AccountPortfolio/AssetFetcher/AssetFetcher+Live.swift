@@ -96,7 +96,7 @@ extension AccountPortfolio {
 
 		fungibleTokenContainers = .init(uniqueElements: fungibleContainers)
 		nonFungibleTokenContainers = .init(uniqueElements: nonFungibleContainers)
-		poolShareContainers = []
+		poolUnitContainers = []
 		badgeContainers = []
 	}
 }

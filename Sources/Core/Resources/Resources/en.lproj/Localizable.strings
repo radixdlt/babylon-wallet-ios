@@ -13,7 +13,7 @@
 
 "assetsView.badges" = "Badges";
 "assetsView.nfts" = "NFTs";
-"assetsView.poolShare" = "Pool Shares";
+"assetsView.poolUnits" = "Pool Units";
 "assetsView.tokens" = "Tokens";
 
 "common.account.kind" = "Account";

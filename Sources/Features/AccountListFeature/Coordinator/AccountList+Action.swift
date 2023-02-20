@@ -22,7 +22,6 @@ extension AccountList.Action {
 extension AccountList.Action {
 	public enum ViewAction: Sendable, Equatable {
 		case viewAppeared
-		case alertDismissButtonTapped
 	}
 }
 

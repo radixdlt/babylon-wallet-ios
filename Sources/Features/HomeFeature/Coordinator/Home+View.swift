@@ -1,122 +1,114 @@
 import AccountDetailsFeature
 import AccountListFeature
+import AccountPortfolio
 import AccountPreferencesFeature
 import CreateEntityFeature
 import FeaturePrelude
 import TransactionSigningFeature
 
+extension Home.State {
+	var viewState: Home.ViewState {
+		.init()
+	}
+}
+
 // MARK: - Home.View
 extension Home {
+	struct ViewState: Equatable {}
+
 	@MainActor
 	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+		private let store: StoreOf<Home>
 
-		public init(
-			store: Store
-		) {
+		public init(store: StoreOf<Home>) {
 			self.store = store
 		}
-	}
-}
 
-extension Home.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			ForceFullScreen {
-				ZStack {
-					homeView(with: viewStore)
-						.onAppear {
-							viewStore.send(.didAppear)
-						}
-						.zIndex(0)
+		public var body: some SwiftUI.View {
+			WithViewStore(
+				store,
+				observe: \.viewState,
+				send: { .view($0) }
+			) { viewStore in
+				ForceFullScreen {
+					ZStack {
+						homeView(with: viewStore)
+							.onAppear {
+								viewStore.send(.appeared)
+							}
+							.zIndex(0)
 
-					IfLetStore(
-						store.scope(
-							state: \.createAccountCoordinator,
-							action: { .child(.createAccountCoordinator($0)) }
-						),
-						then: { CreateAccountCoordinator.View(store: $0) }
-					)
-					.zIndex(1)
-
-					IfLetStore(
-						store.scope(
-							state: \.accountDetails,
-							action: { .child(.accountDetails($0)) }
-						),
-						then: { AccountDetails.View(store: $0) }
-					)
-					.zIndex(2)
-
-					IfLetStore(
-						store.scope(
-							state: \.accountPreferences,
-							action: { .child(.accountPreferences($0)) }
-						),
-						then: { AccountPreferences.View(store: $0) }
-					)
-					.zIndex(3)
-				}
-			}
-		}
-	}
-}
-
-// MARK: - Home.View.ViewState
-extension Home.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		init(state _: Home.State) {}
-	}
-}
-
-extension Home.View {
-	fileprivate func homeView(with viewStore: ViewStore<Home.View.ViewState, Home.Action.ViewAction>) -> some View {
-		VStack {
-			Home.Header.View(
-				store: store.scope(
-					state: \.header,
-					action: { .child(.header($0)) }
-				)
-			)
-			.padding(EdgeInsets(top: .medium1, leading: .large2, bottom: .zero, trailing: .medium1))
-
-			ScrollView {
-				LazyVStack(spacing: .medium1) {
-					AccountList.View(
-						store: store.scope(
-							state: \.accountList,
-							action: { .child(.accountList($0)) }
+						IfLetStore(
+							store.scope(
+								state: \.createAccountCoordinator,
+								action: { .child(.createAccountCoordinator($0)) }
+							),
+							then: { CreateAccountCoordinator.View(store: $0) }
 						)
-					)
+						.zIndex(1)
 
-					Button(L10n.Home.CreateAccount.buttonTitle) {
-						viewStore.send(.createAccountButtonTapped)
+						IfLetStore(
+							store.scope(
+								state: \.accountDetails,
+								action: { .child(.accountDetails($0)) }
+							),
+							then: { AccountDetails.View(store: $0) }
+						)
+						.zIndex(2)
+
+						IfLetStore(
+							store.scope(
+								state: \.accountPreferences,
+								action: { .child(.accountPreferences($0)) }
+							),
+							then: { AccountPreferences.View(store: $0) }
+						)
+						.zIndex(3)
 					}
-					.buttonStyle(.secondaryRectangular())
-
-					Spacer()
 				}
-				.padding(.medium1)
-			}
-			.refreshable {
-				await viewStore.send(.pullToRefreshStarted).finish()
 			}
 		}
-	}
-}
 
-extension Home.View {
-	fileprivate var title: some View {
-		Text(L10n.AggregatedValue.title)
-			.foregroundColor(.app.buttonTextBlack)
-			.textStyle(.body2Header)
-			.textCase(.uppercase)
+		fileprivate func homeView(with viewStore: ViewStore<Home.ViewState, Home.ViewAction>) -> some SwiftUI.View {
+			VStack {
+				Header.View(
+					store: store.scope(
+						state: \.header,
+						action: { .child(.header($0)) }
+					)
+				)
+				.padding(EdgeInsets(top: .medium1, leading: .large2, bottom: .zero, trailing: .medium1))
+
+				ScrollView {
+					LazyVStack(spacing: .medium1) {
+						AccountList.View(
+							store: store.scope(
+								state: \.accountList,
+								action: { .child(.accountList($0)) }
+							)
+						)
+
+						Button(L10n.Home.CreateAccount.buttonTitle) {
+							viewStore.send(.createAccountButtonTapped)
+						}
+						.buttonStyle(.secondaryRectangular())
+
+						Spacer()
+					}
+					.padding(.medium1)
+				}
+				.refreshable {
+					await viewStore.send(.pullToRefreshStarted).finish()
+				}
+			}
+		}
+
+		fileprivate var title: some SwiftUI.View {
+			Text(L10n.AggregatedValue.title)
+				.foregroundColor(.app.buttonTextBlack)
+				.textStyle(.body2Header)
+				.textCase(.uppercase)
+		}
 	}
 }
 
@@ -124,7 +116,7 @@ extension Home.View {
 import SwiftUI // NB: necessary for previews to appear
 
 struct HomeView_Previews: PreviewProvider {
-	static var previews: some View {
+	static var previews: some SwiftUI.View {
 		Home.View(
 			store: .init(
 				initialState: .previewValue,
@@ -132,5 +124,11 @@ struct HomeView_Previews: PreviewProvider {
 			)
 		)
 	}
+}
+
+extension Home.State {
+	public static let previewValue = Home.State(
+		header: .init()
+	)
 }
 #endif

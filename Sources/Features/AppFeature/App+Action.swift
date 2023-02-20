@@ -27,8 +27,7 @@ extension App.Action {
 extension App.Action {
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case errorAlertDismissButtonTapped
-		case deleteIncompatibleProfile
+		case alert(PresentationActionOf<App.Alerts>)
 	}
 }
 
@@ -43,7 +42,7 @@ extension App.Action {
 // MARK: - App.Action.SystemAction
 extension App.Action {
 	public enum SystemAction: Sendable, Equatable {
-		case deletedIncompatibleProfile
+		case incompatibleProfileDeleted
 		case displayErrorAlert(App.UserFacingError)
 	}
 }

@@ -14,28 +14,14 @@ extension CameraPermission {
 
 extension CameraPermission.View {
 	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			ZStack {}
-				.alert(
-					store.scope(
-						state: \.permissionDeniedAlert,
-						action: { .view(.permissionDeniedAlert($0)) }
-					),
-					dismiss: .dismissed
+		ZStack {}
+			.alert(
+				store: store.scope(
+					state: \.$permissionDeniedAlert,
+					action: { .view(.permissionDeniedAlert($0)) }
 				)
-				.onAppear { viewStore.send(.appeared) }
-		}
-	}
-}
-
-// MARK: - CameraPermission.View.ViewState
-extension CameraPermission.View {
-	struct ViewState: Equatable {
-		init(state: CameraPermission.State) {}
+			)
+			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 	}
 }
 
