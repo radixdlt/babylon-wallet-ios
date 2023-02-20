@@ -32,8 +32,7 @@ public extension PersonaDetails.View {
 					Button(L10n.PersonaDetails.editPersona) {
 						viewStore.send(.editPersonaTapped)
 					}
-					.buttonStyle(.radix)
-					.frame(width: .standardButtonWidth)
+					.buttonStyle(.secondaryRectangular)
 					.padding(.vertical, .large3)
 
 					AccountSection(store: store)
@@ -42,7 +41,7 @@ public extension PersonaDetails.View {
 					Button(L10n.PersonaDetails.disconnectPersona) {
 						viewStore.send(.disconnectPersonaTapped)
 					}
-					.buttonStyle(.destructive)
+					.buttonStyle(.primaryRectangular(isDestructive: true))
 					.padding([.horizontal, .top], .medium3)
 					.padding(.bottom, .large2)
 				}
@@ -164,8 +163,7 @@ extension PersonaDetails.View {
 					Button(L10n.PersonaDetails.editAccountSharing) {
 						viewStore.send(.editAccountSharingTapped)
 					}
-					.buttonStyle(.radix)
-					.frame(width: .standardButtonWidth)
+					.buttonStyle(.secondaryRectangular)
 					.padding(.vertical, .large3)
 				}
 			}

@@ -66,7 +66,7 @@ public extension DappDetails.View {
 					Button(L10n.DAppDetails.forgetDapp) {
 						viewStore.send(.forgetThisDappTapped)
 					}
-					.buttonStyle(.destructive)
+					.buttonStyle(.primaryRectangular(isDestructive: true))
 					.padding([.horizontal, .top], .medium3)
 					.padding(.bottom, .large2)
 				}

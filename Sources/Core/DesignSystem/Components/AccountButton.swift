@@ -30,8 +30,18 @@ public struct AccountButton: View {
 			.frame(height: .standardButtonHeight)
 			.background {
 				LinearGradient(gradient: gradient, startPoint: .leading, endPoint: .trailing)
-					.clipShape(.radixButton)
+					.cornerRadius(.small2)
 			}
+		}
+		.buttonStyle(DarkenWhenPressed())
+	}
+
+	private struct DarkenWhenPressed: ButtonStyle {
+		@Environment(\.controlState) var controlState
+
+		public func makeBody(configuration: Configuration) -> some View {
+			configuration.label
+				.brightness(configuration.isPressed ? -0.1 : 0)
 		}
 	}
 }
