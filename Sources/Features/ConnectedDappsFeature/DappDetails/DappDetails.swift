@@ -76,10 +76,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.$metadata = .loading
 			let dAppID = state.dApp.dAppDefinitionAddress
 			return .task {
-				let metadata = try await gatewayClient.resourceDetailsByResourceIdentifier(dAppID.address).metadata
-				return .internal(.metadataLoaded(.loaded(metadata)))
-			} catch: { _ in
-				.internal(.metadataLoaded(.failed))
+				let result = await TaskResult {
+					try await gatewayClient.resourceDetailsByResourceIdentifier(dAppID.address).metadata
+				}
+				return .internal(.metadataLoaded(.loaded(result)))
 			}
 
 		case .copyAddressButtonTapped:

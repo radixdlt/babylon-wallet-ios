@@ -15,7 +15,7 @@ extension DappDetails {
 
 	struct ViewState: Equatable {
 		let title: String
-		let description: Loadable<String?>
+		let description: String?
 		let domain: String?
 		let addressViewState: AddressView.ViewState
 		let otherMetadata: [MetadataItem]
@@ -106,7 +106,7 @@ private extension DappDetails.State {
 			.map { DappDetails.ViewState.MetadataItem(key: $0.key, value: $0.value) } ?? []
 
 		return .init(title: dApp.displayName.rawValue,
-		             description: $metadata.description,
+		             description: metadata?.description,
 		             domain: metadata?["domain"],
 		             addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .short),
 		             otherMetadata: otherMetadata,
@@ -143,12 +143,11 @@ extension DappDetails.View {
 				VStack(alignment: .leading, spacing: .medium2) {
 					Separator()
 
-					LoadableView(viewStore.description) { description in
-						Text(description ?? L10n.DAppDetails.missingDescription)
-							.textBlock
-							.italic(description == nil)
-						Separator()
-					}
+					Text(viewStore.description ?? L10n.DAppDetails.missingDescription)
+						.textBlock
+						.flushedLeft
+
+					Separator()
 
 					HStack(spacing: 0) {
 						Text(L10n.DAppDetails.definition)
@@ -277,30 +276,6 @@ extension DappDetails.View {
 				}
 			}
 			.background(.app.gray5)
-		}
-	}
-}
-
-// MARK: - LoadableView
-struct LoadableView<Value, Content: View>: View {
-	let value: Loadable<Value>
-	let content: (Value) -> Content
-
-	public init(_ value: Loadable<Value>, @ViewBuilder content: @escaping (Value) -> Content) {
-		self.value = value
-		self.content = content
-	}
-
-	var body: some View {
-		switch value {
-		case .notLoaded:
-			Color.gray // Shimmer?
-		case .loading:
-			Color.orange // Animated shimmer?
-		case let .loaded(value):
-			content(value)
-		case .failed:
-			Color.red // Error message?
 		}
 	}
 }
