@@ -52,7 +52,7 @@ extension AddressView {
 	}
 }
 
-// TODO: • Move somewhere else
+// TODO: • Move somewhere else, make version that takes an Address
 
 extension String {
 	public func formatted(_ format: AddressFormat) -> String {

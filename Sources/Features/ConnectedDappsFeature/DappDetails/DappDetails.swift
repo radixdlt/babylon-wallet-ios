@@ -78,8 +78,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .task {
 				let metadata = try await gatewayClient.resourceDetailsByResourceIdentifier(dAppID.address).metadata
 				return .internal(.metadataLoaded(.loaded(metadata)))
-			} catch: { error in
-				.internal(.metadataLoaded(.init(error)))
+			} catch: { _ in
+				.internal(.metadataLoaded(.failed))
 			}
 
 		case .copyAddressButtonTapped:
@@ -153,7 +153,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 // MARK: - Extensions
 
-// We could even consider give EntityMetadataCollection support for dynamicMemberLookup
 extension GatewayAPI.EntityMetadataCollection {
 	var description: String? {
 		self["description"]
@@ -163,70 +162,3 @@ extension GatewayAPI.EntityMetadataCollection {
 		items.first { $0.key == key }?.value
 	}
 }
-
-// MARK: - Loadable
-@propertyWrapper
-@dynamicMemberLookup
-public enum Loadable<Value> {
-	case notLoaded
-	case loading
-	case loaded(Value)
-	case failed(LoadingError)
-
-	subscript<T>(dynamicMember keyPath: KeyPath<Value, T>) -> Loadable<T> {
-		switch self {
-		case .notLoaded:
-			return .notLoaded
-		case .loading:
-			return .loading
-		case let .loaded(value):
-			return .loaded(value[keyPath: keyPath])
-		case let .failed(loadingError):
-			return .failed(loadingError)
-		}
-	}
-
-	public init(wrappedValue: Value?) {
-		if let wrappedValue {
-			self = .loaded(wrappedValue)
-		} else {
-			self = .notLoaded
-		}
-	}
-
-	public init(_ error: Error) {
-		let loadingError: LoadingError = error is BadHTTPResponseCode ? .badHTTPResponseCode : .unknown
-		self = .failed(loadingError)
-	}
-
-	public var projectedValue: Self {
-		get { self }
-		set { self = newValue }
-	}
-
-	public var wrappedValue: Value? {
-		get {
-			guard case let .loaded(value) = self else { return nil }
-			return value
-		}
-		set {
-			if let newValue {
-				self = .loaded(newValue)
-			} else {
-				self = .notLoaded
-			}
-		}
-	}
-}
-
-// MARK: - LoadingError
-public enum LoadingError: Hashable {
-	case badHTTPResponseCode
-	case unknown
-}
-
-// MARK: - Loadable + Equatable
-extension Loadable: Equatable where Value: Equatable {}
-
-// MARK: - Loadable + Hashable
-extension Loadable: Hashable where Value: Hashable {}
