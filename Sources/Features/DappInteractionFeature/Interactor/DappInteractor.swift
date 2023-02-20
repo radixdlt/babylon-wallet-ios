@@ -179,7 +179,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		switch state.currentModal {
 		case .some(.dappInteractionCompletion):
-			return delayedPresentationEffect(for: .child(.modal(.presented(.dappInteractionCompletion(.delegate(.dismiss))))))
+			return .send(.child(.modal(.presented(.dappInteractionCompletion(.delegate(.dismiss))))))
 		case .none:
 			state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.interaction)))
 			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
