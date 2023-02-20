@@ -173,13 +173,17 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func presentQueuedRequestIfNeededEffect(
 		for state: inout State
 	) -> EffectTask<Action> {
-		if
-			state.currentModal == nil,
-			let next = state.requestQueue.first
-		{
+		guard let next = state.requestQueue.first else {
+			return .none
+		}
+
+		switch state.currentModal {
+		case .some(.dappInteractionCompletion):
+			return delayedPresentationEffect(for: .child(.modal(.presented(.dappInteractionCompletion(.delegate(.dismiss))))))
+		case .none:
 			state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.interaction)))
 			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
-		} else {
+		default:
 			return .none
 		}
 	}
