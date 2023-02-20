@@ -70,8 +70,13 @@ public struct ProfileSnapshot:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
-	/// A Semantic Versioning of the Profile Snapshot data format used for compatibility checks.
+	/// A version of the Profile Snapshot data format used for compatibility checks.
 	public let version: Version
+
+	/// A locally generated stable identfier of this Profile. Useful for checking if
+	/// to Profiles which are inequal based on `Equatable` (content) might be the
+	/// semantically the same, based on the ID.
+	public let id: ID; public typealias ID = Profile.ID
 
 	/// All sources of factors, used for authorization such as spending funds, contains no
 	/// secrets.
@@ -87,6 +92,7 @@ public struct ProfileSnapshot:
 	fileprivate init(
 		profile: Profile
 	) {
+		self.id = profile.id
 		self.version = profile.version
 		self.appPreferences = profile.appPreferences
 		self.perNetwork = profile.perNetwork
@@ -109,6 +115,7 @@ extension Profile {
 
 		self.init(
 			version: snapshot.version,
+			id: snapshot.id,
 			factorSources: snapshot.factorSources,
 			appPreferences: snapshot.appPreferences,
 			perNetwork: snapshot.perNetwork
@@ -121,6 +128,8 @@ extension ProfileSnapshot {
 		.init(
 			self,
 			children: [
+				"version": version,
+				"id": id,
 				"factorSources": factorSources,
 				"appPreferences": appPreferences,
 				"perNetwork": perNetwork,

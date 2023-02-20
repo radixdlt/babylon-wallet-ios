@@ -1,13 +1,9 @@
 import Cryptography
 import Prelude
 
-// private func key(from factorSourceReference: FactorSourceReference) -> String {
-//	factorSourceReference.id
-// }
-//
-// private func key(from factorInstanceID: FactorInstanceID) -> String {
-//	factorInstanceID.id
-// }
+private func key(factorSourceID: FactorSource.ID) -> String {
+	factorSourceID.hexCodable.hex()
+}
 
 private let profileSnapshotKeychainKey = "profileSnapshotKeychainKey"
 
@@ -38,43 +34,32 @@ extension KeychainClient {
 		try await updateDataForKey(data, profileSnapshotKeychainKey, protection, authentcationPrompt)
 	}
 
-//	public func updateFactorSource(
-//		mnemonic: Mnemonic,
-//		protection: Protection? = nil,
-//		reference factorSourceReference: FactorSourceReference
-//	) async throws {
-//		try await updateFactorSource(
-//			data: mnemonic.entropy().data,
-//			reference: factorSourceReference,
-//			protection: protection
-//		)
-//	}
-//
-//	public func updateFactorSource(
-//		data: Data,
-//		reference factorSourceReference: FactorSourceReference,
-//		protection: Protection? = nil
-//	) async throws {
-//		try await updateDataForKey(
-//			data,
-//			key(from: factorSourceReference),
-//			protection,
-//			nil
-//		)
-//	}
-//
-//	public func updateFactorInstance(
-//		privateKey: Curve25519.Signing.PrivateKey,
-//		factorInstanceID: FactorInstanceID,
-//		protection: Protection? = nil
-//	) async throws {
-//		try await updateDataForKey(
-//			privateKey.rawRepresentation,
-//			key(from: factorInstanceID),
-//			protection,
-//			nil
-//		)
-//	}
+	public func updateFactorSource(
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		protection: Protection? = nil,
+		factorSourceID: FactorSource.ID
+	) async throws {
+		@Dependency(\.jsonEncoder) var jsonEncoder
+		let jsonData = try jsonEncoder().encode(mnemonicWithPassphrase)
+		try await updateFactorSource(
+			data: jsonData,
+			factorSourceID: factorSourceID,
+			protection: protection
+		)
+	}
+
+	public func updateFactorSource(
+		data: Data,
+		factorSourceID: FactorSource.ID,
+		protection: Protection? = nil
+	) async throws {
+		try await updateDataForKey(
+			data,
+			key(factorSourceID: factorSourceID),
+			protection,
+			nil
+		)
+	}
 }
 
 // MARK: Load
@@ -108,65 +93,52 @@ extension KeychainClient {
 		return try jsonDecoder.decode(ProfileSnapshot.self, from: profileSnapshotData)
 	}
 
-//	public func loadFactorSourceMnemonic(
-//		reference factorSourceReference: FactorSourceReference,
-//		authenticationPrompt: AuthenticationPrompt
-//	) async throws -> Mnemonic? {
-//		guard let data = try await loadFactorSourceData(
-//			reference: factorSourceReference,
-//			authenticationPrompt: authenticationPrompt
-//		) else { return nil }
-//		return try Mnemonic(entropy: .init(data: data))
-//	}
-//
-//	public func loadFactorSourceData(
-//		reference factorSourceReference: FactorSourceReference,
-//		authenticationPrompt: AuthenticationPrompt
-//	) async throws -> Data? {
-//		try await dataForKey(key(from: factorSourceReference), authenticationPrompt)
-//	}
-//
-//	public func loadFactorInstancePrivateKey(
-//		factorInstanceID: FactorInstanceID,
-//		authenticationPrompt: AuthenticationPrompt
-//	) async throws -> Curve25519.Signing.PrivateKey? {
-//		guard let data = try await dataForKey(key(from: factorInstanceID), authenticationPrompt) else { return nil }
-//		return try .init(rawRepresentation: data)
-//	}
+	public func loadFactorSourceMnemonicWithPassphrase(
+		factorSourceID: FactorSource.ID,
+		authenticationPrompt: AuthenticationPrompt
+	) async throws -> MnemonicWithPassphrase? {
+		@Dependency(\.jsonDecoder) var jsonDecoder
+		guard let jsonData = try await loadFactorSourceData(
+			factorSourceID: factorSourceID,
+			authenticationPrompt: authenticationPrompt
+		) else { return nil }
+		return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: jsonData)
+	}
+
+	public func loadFactorSourceData(
+		factorSourceID: FactorSource.ID,
+		authenticationPrompt: AuthenticationPrompt
+	) async throws -> Data? {
+		try await dataForKey(key(factorSourceID: factorSourceID), authenticationPrompt)
+	}
 }
 
 //// MARK: Remove
 extension KeychainClient {
-//	public func removeAllFactorSourcesAndProfileSnapshot(
-//		authenticationPrompt: AuthenticationPrompt,
-//		jsonDecoder: JSONDecoder = .iso8601
-//	) async throws {
-//		guard let profile = try await loadProfile(
-//			authenticationPrompt: authenticationPrompt,
-//			jsonDecoder: jsonDecoder
-//		) else {
-//			return
-//		}
-//		for factorSource in profile.factorSources.anyFactorSources {
-//			try await self.removeDataForFactorSource(reference: factorSource.reference)
-//		}
-//
-//		try await removeProfileSnapshot()
-//	}
-//
+	public func removeAllFactorSourcesAndProfileSnapshot(
+		authenticationPrompt: AuthenticationPrompt,
+		jsonDecoder: JSONDecoder = .iso8601
+	) async throws {
+		guard let profile = try await loadProfile(
+			authenticationPrompt: authenticationPrompt,
+			jsonDecoder: jsonDecoder
+		) else {
+			return
+		}
+		for factorSource in profile.factorSources {
+			try await self.removeDataForFactorSource(id: factorSource.id)
+		}
+
+		try await removeProfileSnapshot()
+	}
+
 	public func removeProfileSnapshot() async throws {
 		try await removeDataForKey(profileSnapshotKeychainKey)
 	}
-//
-//	public func removeDataForFactorSource(
-//		reference factorSourceReference: FactorSourceReference
-//	) async throws {
-//		try await removeDataForKey(key(from: factorSourceReference))
-//	}
-//
-//	public func removeDataForFactorInstance(
-//		id factorInstanceID: FactorInstanceID
-//	) async throws {
-//		try await removeDataForKey(key(from: factorInstanceID))
-//	}
+
+	public func removeDataForFactorSource(
+		id factorSourceID: FactorSource.ID
+	) async throws {
+		try await removeDataForKey(key(factorSourceID: factorSourceID))
+	}
 }

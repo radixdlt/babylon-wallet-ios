@@ -138,31 +138,23 @@ extension ProfileClient {
 				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
-			commitOnboardingWallet: { _ in
-				fixMultifactor()
+			commitOnboardingWallet: { request in
 //				let mnemonic = request.onDeviceFactorSourceMnemonic
-//
-//				// FIXME: Cleanup post Betanet v2 when we have the new FactorSource format.
-//				let expectedFactorSourceID = try HD.Root(
-//					seed: mnemonic.seed(passphrase: request.bip39Passphrase)
-//				).factorSourceID(
-//					curve: Curve25519.self
-//				)
-//
-//				try await profileHolder.getAsync { profile in
-//					let factorSource = profile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first
-//					guard factorSource.factorSourceID == expectedFactorSourceID else {
-//						struct DiscrepancyMismatchingFactorSourceIDs: Swift.Error {}
-//						throw DiscrepancyMismatchingFactorSourceIDs()
-//					}
-//					// all good
-//					try await keychainClient.updateFactorSource(
-//						mnemonic: mnemonic,
-//						reference: factorSource.reference
-//					)
-//				}
-//
-//				try await profileHolder.persistAndAllowFuturePersistenceOfEphemeralProfile()
+
+				try await profileHolder.getAsync { profile in
+					guard profile.id == request.profile.id else {
+						struct DiscrepancyMismatchingProfileID: Swift.Error {}
+						throw DiscrepancyMismatchingProfileID()
+					}
+
+					// all good
+					try await keychainClient.updateFactorSource(
+						mnemonicWithPassphrase: request.privateFactorSource.mnemonicWithPassphrase,
+						factorSourceID: request.privateFactorSource.factorSource.id
+					)
+				}
+
+				try await profileHolder.persistAndAllowFuturePersistenceOfEphemeralProfile()
 
 			},
 			loadProfile: {
@@ -246,17 +238,16 @@ extension ProfileClient {
 				try await profileHolder.takeProfileSnapshot()
 			},
 			deleteProfileAndFactorSources: {
-//				do {
-//					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot(
-//						// This should not be be shown due to settings of profile snapshot
-//						// item when it was originally stored.
-//						authenticationPrompt: "Read wallet data in order get reference to secret's to delete"
-//					)
-//				} catch {
-//					try await keychainClient.removeProfileSnapshot()
-//				}
-//				await profileHolder.removeProfile()
-				fixMultifactor()
+				do {
+					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot(
+						// This should not be be shown due to settings of profile snapshot
+						// item when it was originally stored.
+						authenticationPrompt: "Read wallet data in order get reference to secret's to delete"
+					)
+				} catch {
+					try await keychainClient.removeProfileSnapshot()
+				}
+				await profileHolder.removeProfile()
 			},
 			hasAccountOnNetwork: hasAccountOnNetwork,
 			getAccounts: {
@@ -327,43 +318,34 @@ extension ProfileClient {
 				}()
 				let getDerivationPathRequest = try request.getDerivationPathRequest()
 				let (derivationPath, index) = try await getDerivationPathForNewEntity(getDerivationPathRequest)
-//
+
 				let genesisFactorInstance: FactorInstance = try await {
 					let genesisFactorInstanceDerivationStrategy = request.genesisFactorInstanceDerivationStrategy
 
-					//                    let mnemonic: Mnemonic
 					let hdRoot: HD.Root
 					let factorSource = genesisFactorInstanceDerivationStrategy.factorSource
 
 					switch genesisFactorInstanceDerivationStrategy {
 					case .loadMnemonicFromKeychainForFactorSource:
-						//                        guard let loadedMnemonic = try await keychainClient.loadFactorSourceMnemonic(
-						//                            reference: factorSource.reference,
-						//                            authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-						//                        ) else {
-						//                            struct FailedToFindFactorSource: Swift.Error {}
-						//                            throw FailedToFindFactorSource()
-						//                        }
-						//                        mnemonic = loadedMnemonic
-						fixMultifactor()
+						guard let loadedMnemonicWithPassphrase = try await keychainClient.loadFactorSourceMnemonicWithPassphrase(
+							factorSourceID: factorSource.id,
+							authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
+						) else {
+							struct FailedToFindFactorSource: Swift.Error {}
+							throw FailedToFindFactorSource()
+						}
+						hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
 					case let GenesisFactorInstanceDerivationStrategy.useOnboardingWallet(onboardingWallet):
 						hdRoot = try onboardingWallet.privateFactorSource.mnemonicWithPassphrase.hdRoot()
 					}
-
-					//                    let genesisFactorInstanceResponse = try await factorSource.createAnyFactorInstanceForResponse(
-					//                        input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
-					//                            mnemonic: mnemonic,
-					//                            derivationPath: derivationPath,
-					//                            includePrivateKey: false
-					//                        )
-					//                    )
-					//                    return genesisFactorInstanceResponse.factorInstance
 					let req = OnDeviceHDPublicKeyRequest(
 						hdRoot: hdRoot,
 						derivationPath: derivationPath,
 						curve: request.curve
 					)
+
 					let pubKey = try useFactorSourceClient.onDeviceHDPublicKey(req)
+
 					return FactorInstance(
 						factorSourceID: factorSource.id,
 						publicKey: pubKey,
@@ -410,11 +392,10 @@ extension ProfileClient {
 					return account
 				}
 			},
-			addAccount: { _ in
-//				try await profileHolder.asyncMutating { profile in
-//					try await profile.addAccount(account)
-//				}
-				fixMultifactor()
+			addAccount: { account in
+				try await profileHolder.asyncMutating { profile in
+					try await profile.addAccount(account)
+				}
 			},
 			addPersona: { _ in
 				//                try await profileHolder.asyncMutating { profile in

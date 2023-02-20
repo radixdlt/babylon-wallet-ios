@@ -20,8 +20,13 @@ public struct Profile:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
-	/// A Semantic Versioning of the Profile Snapshot data format used for compatibility checks.
+	/// A version of the Profile Snapshot data format used for compatibility checks.
 	public let version: ProfileSnapshot.Version
+
+	/// A locally generated stable identfier of this Profile. Useful for checking if
+	/// to Profiles which are inequal based on `Equatable` (content) might be the
+	/// semantically the same, based on the ID.
+	public let id: ID; public typealias ID = UUID
 
 	/// All sources of factors, used for authorization such as spending funds, contains no
 	/// secrets.
@@ -36,11 +41,13 @@ public struct Profile:
 
 	public init(
 		version: ProfileSnapshot.Version = .minimum,
+		id: ID,
 		factorSources: FactorSources,
 		appPreferences: AppPreferences,
 		perNetwork: PerNetwork
 	) {
 		self.version = version
+		self.id = id
 		self.factorSources = factorSources
 		self.appPreferences = appPreferences
 		self.perNetwork = perNetwork
@@ -48,6 +55,7 @@ public struct Profile:
 
 	public init(factorSource: FactorSource) {
 		self.init(
+			id: .init(),
 			factorSources: .init(factorSource),
 			appPreferences: .default,
 			perNetwork: .init()
