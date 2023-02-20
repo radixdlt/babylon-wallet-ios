@@ -73,3 +73,12 @@ extension FactorSource {
 		parameters.supportsOlympia
 	}
 }
+
+#if DEBUG
+extension FactorSource {
+	public static let previewValueDevice: Self = {
+		let mnemonic = try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote", language: .english)
+		return try! Self.device(mnemonic: mnemonic, olympiaCompatible: false)
+	}()
+}
+#endif

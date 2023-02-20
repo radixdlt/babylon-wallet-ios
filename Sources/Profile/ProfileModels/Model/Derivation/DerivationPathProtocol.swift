@@ -75,7 +75,6 @@ public struct DerivationPath:
 }
 
 extension DerivationPath {
-	//    static let getID = Self(scheme: .cap26, path: "m/1022H/365H")
 	public static let getID: Self = try! .customPath(.init(path: .getID))
 
 	/// The **default** derivation path for `Account`s.
@@ -114,51 +113,8 @@ extension DerivationPath {
 	}
 }
 
-// extension DerivationPath {
-//	public enum Discriminator: String, Codable {
-//		case accountPath, identityPath, customPath
-//	}
-//
-//	public var discriminator: Discriminator {
-//		switch self {
-//		case .accountPath: return .accountPath
-//		case .identityPath: return .identityPath
-//		case .customPath: return .customPath
-//		}
-//	}
-//
-//	private enum CodingKeys: String, CodingKey {
-//		case discriminator, derivationPath
-//	}
-//
-//	public func encode(to encoder: Encoder) throws {
-//		var container = encoder.container(keyedBy: CodingKeys.self)
-//		try container.encode(discriminator, forKey: .discriminator)
-//		try container.encode(derivationPath, forKey: .derivationPath)
-//	}
-//
-//	public init(from decoder: Decoder) throws {
-//		let container = try decoder.container(keyedBy: CodingKeys.self)
-//		let discriminator = try container.decode(Discriminator.self, forKey: .discriminator)
-//		let derivationPath = try container.decode(String.self, forKey: .derivationPath)
-//		switch discriminator {
-//		case .accountPath:
-//			self = try .accountPath(.init(derivationPath: derivationPath))
-//		case .identityPath:
-//			self = try .identityPath(.init(derivationPath: derivationPath))
-//		case .customPath:
-//			self = try .customPath(.init(derivationPath: derivationPath))
-//		}
-//	}
-// }
-
 extension DerivationPath {
 	public func hdFullPath() throws -> HD.Path.Full {
-//		switch self {
-//		case let .customPath(path): return try HD.Path.Full(string: path.derivationPath)
-//		case let .identityPath(path): return path.fullPath
-//		case let .accountPath(path): return path.fullPath
-//		}
 		try .init(string: path)
 	}
 }
@@ -176,3 +132,9 @@ extension DerivationPath {
 		path
 	}
 }
+
+#if DEBUG
+extension DerivationPath {
+	public static let previewValueAccount = try! Self.accountPath(.init(networkID: .nebunet, index: 0, keyKind: .transactionSigningKey))
+}
+#endif // DEBUG

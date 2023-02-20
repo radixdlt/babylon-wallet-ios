@@ -323,7 +323,13 @@ extension ProfileClient {
 					let publicKey: Engine.PublicKey = try await {
 						switch genesisFactorInstanceDerivationStrategy {
 						case .loadMnemonicFromKeychainForFactorSource:
-							return try await useFactorSourceClient.onDeviceHD(factorSourceID: factorSource.id, keychainAccessFactorSourcesAuthPrompt: request.keychainAccessFactorSourcesAuthPrompt, derivationPath: derivationPath, curve: request.curve, dataToSign: nil).publicKey
+							return try await useFactorSourceClient.onDeviceHD(
+								factorSourceID: factorSource.id,
+								keychainAccessFactorSourcesAuthPrompt: request.keychainAccessFactorSourcesAuthPrompt,
+								derivationPath: derivationPath,
+								curve: request.curve,
+								dataToSign: nil
+							).publicKey
 
 						case let .useOnboardingWallet(onboardingWallet):
 							let hdRoot = try onboardingWallet.privateFactorSource.mnemonicWithPassphrase.hdRoot()
@@ -355,12 +361,11 @@ extension ProfileClient {
 						publicKey: .init(engine: genesisFactorInstance.publicKey)
 					)
 
-					let persona = try OnNetwork.Persona(
+					let persona = OnNetwork.Persona(
 						networkID: networkID,
 						address: identityAddress,
 						securityState: .unsecured(unsecuredControl),
 						index: index,
-						derivationPath: derivationPath.asIdentityPath(),
 						displayName: displayName,
 						fields: .init()
 					)
@@ -371,12 +376,11 @@ extension ProfileClient {
 						publicKey: .init(engine: genesisFactorInstance.publicKey)
 					)
 
-					let account = try OnNetwork.Account(
+					let account = OnNetwork.Account(
 						networkID: networkID,
 						address: accountAddress,
 						securityState: .unsecured(unsecuredControl),
 						index: index,
-						derivationPath: derivationPath.asAccountPath(),
 						displayName: displayName
 					)
 					return account

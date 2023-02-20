@@ -139,17 +139,23 @@ public protocol CodableViaHexCodable: Codable {
 	init(hexCodable: HexCodable) throws
 }
 
-public extension CodableViaHexCodable {
-	init(data: Data) throws {
-		try self.init(hexCodable: .init(data: data))
+extension CodableViaHexCodable {
+	public init(hex: String) throws {
+		try self.init(data: .init(hex: hex))
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public init(data: Data) throws {
+		try self.init(hexCodable: .init(data: data))
+	}
+}
+
+extension CodableViaHexCodable {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		try container.encode(self.hexCodable)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		try self.init(hexCodable: container.decode(HexCodable.self))
 	}

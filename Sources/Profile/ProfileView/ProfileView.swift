@@ -126,6 +126,7 @@ public struct FactorSourceView: IndentedView {
 	public let indentation: Indentation
 	public var keychainClient: KeychainClient?
 	@State private var mnemonicPhraseLoadedFromKeychain: String?
+	@State private var mnemonicPassphraseLoadedFromKeychain: String?
 }
 
 extension FactorSourceView {
@@ -141,6 +142,11 @@ extension FactorSourceView {
 				VStack {
 					Text("✅ Mnemonic found in keychain ✅")
 					Text(mnemonicPhraseLoadedFromKeychain).fontWeight(.semibold)
+					if let mnemonicPassphraseLoadedFromKeychain {
+						Spacer()
+						Text("Bip39 Passphrase:")
+						Text("'\(mnemonicPassphraseLoadedFromKeychain)'")
+					}
 				}
 				.padding()
 				.border(Color.green, width: 2)
@@ -153,13 +159,13 @@ extension FactorSourceView {
 		.padding([.leading], leadingPadding)
 		.task {
 			Task {
-//				if let mnemonic = try? await keychainClient?.loadFactorSourceMnemonic(
-//					reference: self.factorSource.reference,
-//					authenticationPrompt: "Load Mnemonic to display for debugging"
-//				) {
-//					self.mnemonicPhraseLoadedFromKeychain = mnemonic.phrase
-//				}
-				fixMultifactor()
+				if let mnemonic = try? await keychainClient?.loadFactorSourceMnemonicWithPassphrase(
+					factorSourceID: self.factorSource.id,
+					authenticationPrompt: "Load Mnemonic to display for debugging"
+				) {
+					self.mnemonicPhraseLoadedFromKeychain = mnemonic.mnemonic.phrase
+					self.mnemonicPassphraseLoadedFromKeychain = mnemonic.passphrase
+				}
 			}
 		}
 	}
@@ -491,7 +497,6 @@ extension EntityView {
 
 			Labeled("Index", value: String(describing: entity.index))
 			Labeled("Address", value: entity.address.address)
-			Labeled("Derivation Path", value: entity.derivationPath.derivationPath)
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):
 				UnsecuredEntityControlView(

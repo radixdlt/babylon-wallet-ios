@@ -13,11 +13,7 @@ extension FactorSources {
 		self.init(rawValue: .init(uniqueElements: uniqueElements))!
 	}
 
-	public static let previewValue: Self = {
-		// swiftformat:disable redundantClosure
-		fixMultifactor()
-		// swiftformat:enable all
-	}()
+	public static let previewValue: Self = .init(.previewValueDevice)
 }
 
 #endif // DEBUG

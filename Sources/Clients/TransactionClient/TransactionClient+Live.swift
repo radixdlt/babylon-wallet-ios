@@ -226,9 +226,6 @@ extension TransactionClient {
 				switch notarySigner.securityState {
 				case let .unsecured(unsecuredControl):
 					notaryPublicKey = unsecuredControl.genesisFactorInstance.publicKey
-				default:
-					// `TransactionClient` is going to be completely rewritten for multifactor support
-					fixMultifactor()
 				}
 			} catch {
 				return .failure(.failedToLoadNotaryPublicKey)

@@ -10,7 +10,8 @@ extension ProfileSnapshot.Version {
 	/// - 9: Personas now use Identity addresses as intended.
 	/// - 10: Temp switch default network to Hammunet as RC for Betanet v2
 	/// - 11: Switch back default network to Nebunet before Betanet v2 release.
-	public static let minimum: Self = 11
+	/// - 12: Added `id`
+	public static let minimum: Self = 12
 }
 
 // MARK: - Profile
