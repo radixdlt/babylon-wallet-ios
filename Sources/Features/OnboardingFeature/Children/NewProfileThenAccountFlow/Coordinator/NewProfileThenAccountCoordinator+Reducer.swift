@@ -44,13 +44,9 @@ public struct NewProfileThenAccountCoordinator: Sendable, FeatureReducer {
 				assertionFailure("incorrect implementation")
 				return .none
 			}
-//			let request = CommitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicRequest(
-			//                onDeviceFactorSourceMnemonic: unsavedProfileAndMnemonic.privateFactorSource.mnemonicWithPassphrase.mnemonic,
-			//                bip39Passphrase: unsavedProfileAndMnemonic.privateFactorSource.mnemonicWithPassphrase.passphrase
-//			)
 
 			return .run { send in
-				await send(.internal(.commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicResult(TaskResult {
+				await send(.internal(.commitOnboardingWallet(TaskResult {
 					try await profileClient.commitOnboardingWallet(onboardingWallet)
 				})))
 			}
@@ -61,11 +57,11 @@ public struct NewProfileThenAccountCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case .commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicResult(.success):
+		case .commitOnboardingWallet(.success):
 			return .run { send in
 				await send(.delegate(.completed))
 			}
-		case let .commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicResult(.failure(error)):
+		case let .commitOnboardingWallet(.failure(error)):
 			errorQueue.schedule(error)
 			return .run { send in
 				await send(.delegate(.criticialErrorFailedToCommitEphemeralProfile))

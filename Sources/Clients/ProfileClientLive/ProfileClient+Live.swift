@@ -117,6 +117,10 @@ extension ProfileClient {
 
 				let profile = Profile(factorSource: onDeviceFactorSource)
 
+				// This new profile is marked as "ephemeral" which means it is
+				// not allowed to be persisted to keychain.
+				await profileHolder.injectProfile(profile, isEphemeral: true)
+
 				return OnboardingWallet(privateFactorSource: privateFactorSource, profile: profile)
 			},
 			injectProfileSnapshot: { snapshot in
@@ -125,7 +129,7 @@ extension ProfileClient {
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
 			commitOnboardingWallet: { _ in
-
+				fixMultifactor()
 //				let mnemonic = request.onDeviceFactorSourceMnemonic
 //
 //				// FIXME: Cleanup post Betanet v2 when we have the new FactorSource format.
@@ -149,7 +153,6 @@ extension ProfileClient {
 //				}
 //
 //				try await profileHolder.persistAndAllowFuturePersistenceOfEphemeralProfile()
-				fixMultifactor()
 
 			},
 			loadProfile: {

@@ -20,6 +20,6 @@ extension NewProfileThenAccountCoordinator {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonicResult(TaskResult<EquatableVoid>)
+		case commitOnboardingWallet(TaskResult<EquatableVoid>)
 	}
 }

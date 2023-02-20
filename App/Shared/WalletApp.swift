@@ -10,7 +10,7 @@ struct WalletApp: SwiftUI.App {
 			App.View(
 				store: Store(
 					initialState: App.State(),
-					reducer: App()
+					reducer: App()._printChanges()
 					#if targetEnvironment(simulator)
 						.dependency(\.localAuthenticationClient.queryConfig) { .biometricsAndPasscodeSetUp }
 					#endif
