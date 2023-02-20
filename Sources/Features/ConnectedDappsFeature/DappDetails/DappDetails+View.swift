@@ -19,6 +19,8 @@ extension DappDetails {
 		let domain: String?
 		let addressViewState: AddressView.ViewState
 		let otherMetadata: [MetadataItem]
+		let fungibleTokens: [Token]
+		let nonFungibleTokens: [Token]
 		let personas: [Persona]
 		let isDismissed: Bool
 
@@ -32,6 +34,13 @@ extension DappDetails {
 			let id: OnNetwork.Persona.ID
 			let name: String
 			let thumbnail: URL
+		}
+
+		struct Token: Identifiable, Hashable, Sendable {
+			var id: ComponentAddress { address }
+			let name: String
+			let thumbnail: URL
+			let address: ComponentAddress
 		}
 	}
 }
@@ -101,6 +110,8 @@ private extension DappDetails.State {
 		             domain: metadata?["domain"],
 		             addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .short),
 		             otherMetadata: otherMetadata,
+		             fungibleTokens: [], // TODO: Populate when we have it
+		             nonFungibleTokens: [], // TODO: Populate when we have it
 		             personas: dApp.detailedAuthorizedPersonas.map(DappDetails.ViewState.Persona.init),
 		             isDismissed: isDismissed)
 	}
@@ -175,11 +186,11 @@ extension DappDetails.View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
-			WithViewStore(store, observe: \.dApp.tokens, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState.fungibleTokens, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.DAppDetails.tokens, elements: viewStore.state, title: \.name) { _ in
 					TokenPlaceholder(size: .small)
 				} action: { id in
-					viewStore.send(.tokenTapped(id))
+					viewStore.send(.fungibleTokenTapped(id))
 				}
 			}
 		}
@@ -190,11 +201,11 @@ extension DappDetails.View {
 		let store: StoreOf<DappDetails>
 
 		var body: some View {
-			WithViewStore(store, observe: \.dApp.nfts, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: \.viewState.nonFungibleTokens, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.DAppDetails.nfts, elements: viewStore.state, title: \.name) { _ in
 					NFTPlaceholder(size: .small)
 				} action: { id in
-					viewStore.send(.nftTapped(id))
+					viewStore.send(.nonFungibleTokenTapped(id))
 				}
 			}
 		}
@@ -217,7 +228,7 @@ extension DappDetails.View {
 
 					ForEach(elements) { element in
 						RadixCard {
-							PlainListRow(withChevron: false, title: title(element)) {
+							PlainListRow(showChevron: false, title: title(element)) {
 								action(element.id)
 							} icon: {
 								icon(element)
@@ -267,40 +278,6 @@ extension DappDetails.View {
 			}
 			.background(.app.gray5)
 		}
-	}
-}
-
-// TODO: • Move somewhere else
-
-extension OnNetwork.ConnectedDappDetailed {
-	var tokens: [TokenModel] {
-		[.mock("NBA"), .mock("NAS")]
-	}
-
-	var nfts: [TokenModel] {
-		[.mock("NBA top shot"), .mock("NAS RTFK")]
-	}
-}
-
-// MARK: - TokenModel
-public struct TokenModel: Identifiable, Hashable, Sendable {
-	public let id: UUID = .init()
-	let name: String
-	let address: ComponentAddress = .mock
-
-	static func mock(_ name: String) -> Self {
-		.init(name: name)
-	}
-}
-
-// MARK: - NFTModel
-public struct NFTModel: Identifiable, Hashable, Sendable {
-	public let id: UUID = .init()
-	let name: String
-	let address: ComponentAddress = .mock
-
-	static func mock(_ name: String) -> Self {
-		.init(name: name)
 	}
 }
 

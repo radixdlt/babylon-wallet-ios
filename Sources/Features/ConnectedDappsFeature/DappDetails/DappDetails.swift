@@ -39,8 +39,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case appeared
 		case openURLTapped(URL)
 		case copyAddressButtonTapped
-		case tokenTapped(UUID)
-		case nftTapped(UUID)
+		case fungibleTokenTapped(ComponentAddress)
+		case nonFungibleTokenTapped(ComponentAddress)
 		case personaTapped(OnNetwork.Persona.ID)
 		case dismissPersonaTapped
 		case forgetThisDappTapped
@@ -93,10 +93,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 				await openURL(url)
 			}
 
-		case let .tokenTapped(token):
+		case let .fungibleTokenTapped(token):
 			return .none
 
-		case let .nftTapped(nft):
+		case let .nonFungibleTokenTapped(nft):
 			return .none
 
 		case let .personaTapped(id):

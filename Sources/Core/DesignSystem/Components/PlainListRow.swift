@@ -3,27 +3,28 @@ import SwiftUI
 
 // MARK: - PlainListRow
 public struct PlainListRow<Icon: View>: View {
-	let chevron: Bool
+	let isShowingChevron: Bool
 	let title: String
 	let icon: Icon
 	let action: () -> Void
 
-	public init(withChevron chevron: Bool = true,
-	            title: String, action: @escaping () -> Void,
+	public init(showChevron: Bool = true,
+	            title: String,
+	            action: @escaping () -> Void,
 	            @ViewBuilder icon: () -> Icon)
 	{
-		self.chevron = chevron
+		self.isShowingChevron = showChevron
 		self.title = title
 		self.icon = icon()
 		self.action = action
 	}
 
-	public init(withChevron chevron: Bool = true,
+	public init(showChevron: Bool = true,
 	            title: String,
 	            asset: ImageAsset,
 	            action: @escaping () -> Void) where Icon == AssetIcon
 	{
-		self.chevron = chevron
+		self.isShowingChevron = showChevron
 		self.title = title
 		self.icon = AssetIcon(asset: asset)
 		self.action = action
@@ -38,7 +39,7 @@ public struct PlainListRow<Icon: View>: View {
 					.textStyle(.secondaryHeader)
 					.foregroundColor(.app.gray1)
 				Spacer(minLength: 0)
-				if chevron {
+				if isShowingChevron {
 					Image(asset: AssetResource.chevronRight)
 				}
 			}
