@@ -314,6 +314,7 @@ package.addModules([
 	.client(
 		name: "UseFactorSourceClient",
 		dependencies: [
+			"Profile",
 			"Cryptography",
 		],
 		tests: .no
