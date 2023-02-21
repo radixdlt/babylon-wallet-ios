@@ -165,3 +165,16 @@ extension ProfileClient {
 	public typealias AddPersona = @Sendable (OnNetwork.Persona) async throws -> Void
 	public typealias LookupAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
 }
+
+extension ProfileClient {
+	public func getDetailedDapp(_ id: OnNetwork.ConnectedDapp.ID) async throws -> OnNetwork.ConnectedDappDetailed {
+		let dApps = try await getConnectedDapps()
+		guard let dApp = dApps[id: id] else {
+			throw ConnectedDappDoesNotExists()
+		}
+		return try await detailsForConnectedDapp(dApp)
+	}
+}
+
+// MARK: - ConnectedDappDoesNotExists
+struct ConnectedDappDoesNotExists: Swift.Error {}
