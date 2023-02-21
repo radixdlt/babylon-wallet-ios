@@ -240,7 +240,7 @@ final class ProfileTests: TestCase {
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		let data = try jsonEncoder.encode(snapshot)
 		/* Uncomment to generate a new test vector */
-		print(String(data: data, encoding: .utf8)!)
+//		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {
@@ -350,8 +350,9 @@ final class ProfileTests: TestCase {
 	}
 
 	func test_version_compatibility_check_too_low() throws {
+		let tooLow = ProfileSnapshot.Version.minimum - 1
 		let json = """
-		{ "version": 11 }
+		{ "version": \(tooLow) }
 		""".data(using: .utf8)!
 
 		XCTAssertThrowsError(
@@ -360,7 +361,7 @@ final class ProfileTests: TestCase {
 			guard let error = anyError as? IncompatibleProfileVersion else {
 				return XCTFail("WrongErrorType")
 			}
-			XCTAssertEqual(error, .init(decodedVersion: 11, minimumRequiredVersion: .minimum))
+			XCTAssertEqual(error, .init(decodedVersion: tooLow, minimumRequiredVersion: .minimum))
 		}
 	}
 

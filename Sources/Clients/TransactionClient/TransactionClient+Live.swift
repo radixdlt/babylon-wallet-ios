@@ -37,7 +37,7 @@ extension TransactionClient {
 				return .failure(.failedToGenerateTXId)
 			}
 
-			let factorSource = try! await profileClient.getFactorSources().first(where: { $0.kind == .device })!
+			let factorSource = try! await profileClient.getFactorSources().device
 			let factorSourceID = factorSource.id
 			guard let loadedMnemonicWithPassphrase = try! await keychainClient.loadFactorSourceMnemonicWithPassphrase(
 				factorSourceID: factorSourceID,

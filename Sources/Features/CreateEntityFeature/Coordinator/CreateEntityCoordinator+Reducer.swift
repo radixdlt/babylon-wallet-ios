@@ -65,14 +65,11 @@ public struct CreateEntityCoordinator<
 					if let specific = state.config.specificGenesisFactorInstanceDerivationStrategy {
 						return specific
 					}
-					guard let onDevice = factorSources.first(where: { $0.kind == .device }) else {
-						fatalError("Only supported Factor Source is Curve25519 onDevice for now.")
-					}
-					return .loadMnemonicFromKeychainForFactorSource(onDevice)
+					return .loadMnemonicFromKeychainForFactorSource(factorSources.device)
 				}()
 
 				return goToStep2Creation(
-					curve: .curve25519, // The babylon execution path, save to default to curve25519
+					curve: .curve25519, // The babylon execution path, safe to default to curve25519
 					entityName: specifiedNameForNewEntityToCreate,
 					genesisFactorInstanceDerivationStrategy: genesisFactorInstanceDerivationStrategy,
 					state: &state

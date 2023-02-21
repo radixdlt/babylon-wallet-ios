@@ -14,8 +14,8 @@
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
-        "firstEstablishedOn" : "2023-02-20T15:45:30Z",
-        "lastUsedOn" : "2023-02-20T15:45:30Z",
+        "firstEstablishedOn" : "2023-02-21T10:17:35Z",
+        "lastUsedOn" : "2023-02-21T10:17:35Z",
         "platform" : "browser"
       },
       {
@@ -30,8 +30,8 @@
           "retryAttempts" : 3
         },
         "displayName" : "iPhone 13",
-        "firstEstablishedOn" : "2023-02-20T15:45:30Z",
-        "lastUsedOn" : "2023-02-20T15:45:30Z",
+        "firstEstablishedOn" : "2023-02-21T10:17:35Z",
+        "lastUsedOn" : "2023-02-21T10:17:35Z",
         "platform" : "iPhone",
         "signalingServerConfig" : {
           "signalingServerBaseURL" : "custom.signal.com",
@@ -66,11 +66,11 @@
   },
   "factorSources" : [
     {
-      "addedOn" : "2023-02-20T15:45:30Z",
-      "hint" : "iPhone 14 Pro Max",
+      "addedOn" : "2023-02-21T10:17:35Z",
+      "hint" : "Mac",
       "id" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
       "kind" : "device",
-      "lastUsedOn" : "2023-02-20T15:45:30Z",
+      "lastUsedOn" : "2023-02-21T10:17:35Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519"
@@ -81,11 +81,11 @@
       }
     },
     {
-      "addedOn" : "2023-02-20T15:45:30Z",
-      "hint" : "iPhone 14 Pro Max",
+      "addedOn" : "2023-02-21T10:17:35Z",
+      "hint" : "Mac",
       "id" : "e00d9eb10f9016910e1bc18679a1e22ac8632ceb26983c3ff19f2d8d72c32398",
       "kind" : "device",
-      "lastUsedOn" : "2023-02-20T15:45:30Z",
+      "lastUsedOn" : "2023-02-21T10:17:35Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519",
@@ -98,9 +98,8 @@
       }
     }
   ],
-  "id" : "6E3A4F7F-742E-40E1-BC09-ADB0808F4DF0",
+  "id" : "7914BEA7-1E53-446C-9801-CB1B0B8B514E",
   "perNetwork" : [
-    11,
     {
       "accounts" : [
         {
@@ -181,8 +180,8 @@
           "referencesToAuthorizedPersonas" : [
             {
               "fieldIDs" : [
-                "D7B0AF2F-0674-4F23-8865-F75B2AAD184D",
-                "C22C12C9-B047-4878-8DCF-B17BA92B9E33"
+                "B8BC5AAC-E261-472C-B67E-1A73D7961638",
+                "8A0F9FD1-91E9-4209-8ACA-090B5434C720"
               ],
               "identityAddress" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -199,8 +198,8 @@
             },
             {
               "fieldIDs" : [
-                "CF311281-995C-4547-B63E-28F453D143EE",
-                "63A2B047-01F5-4DA8-B78B-3F094880418A"
+                "4140AC8A-AFDE-403D-961B-B2E3ECC7BBC2",
+                "79AE23C7-9641-441F-80B5-D79ECC803CC7"
               ],
               "identityAddress" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -224,12 +223,12 @@
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "D7B0AF2F-0674-4F23-8865-F75B2AAD184D",
+              "id" : "B8BC5AAC-E261-472C-B67E-1A73D7961638",
               "kind" : "firstName",
               "value" : "Jane"
             },
             {
-              "id" : "C22C12C9-B047-4878-8DCF-B17BA92B9E33",
+              "id" : "8A0F9FD1-91E9-4209-8ACA-090B5434C720",
               "kind" : "lastName",
               "value" : "Incognitoson"
             }
@@ -258,12 +257,12 @@
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "CF311281-995C-4547-B63E-28F453D143EE",
+              "id" : "4140AC8A-AFDE-403D-961B-B2E3ECC7BBC2",
               "kind" : "firstName",
               "value" : "Maria"
             },
             {
-              "id" : "63A2B047-01F5-4DA8-B78B-3F094880418A",
+              "id" : "79AE23C7-9641-441F-80B5-D79ECC803CC7",
               "kind" : "lastName",
               "value" : "Publicson"
             }
@@ -290,5 +289,5 @@
       ]
     }
   ],
-  "version" : 12
+  "version" : 13
 }

@@ -11,7 +11,8 @@ extension ProfileSnapshot.Version {
 	/// - 10: Temp switch default network to Hammunet as RC for Betanet v2
 	/// - 11: Switch back default network to Nebunet before Betanet v2 release.
 	/// - 12: Added `id`
-	public static let minimum: Self = 12
+	/// - 13: Reverted unintentially change of perNetwork
+	public static let minimum: Self = 13
 }
 
 // MARK: - Profile

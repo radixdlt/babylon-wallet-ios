@@ -29,8 +29,7 @@ public struct SelectGenesisFactorSource: Sendable, ReducerProtocol {
 			return .none
 
 		case .internal(.view(.confirmOnDeviceFactorSource)):
-//			let factorSource = state.factorSources.first(where: { $0.any().factorSourceKind == .curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSourceKind })?.any() as! FactorSource
-			let factorSource = state.factorSources.first(where: { $0.kind == .device })!
+			let factorSource = state.factorSources.device
 			return .run { [entityName = state.specifiedNameForNewEntityToCreate, curve = state.curve] send in
 				await send(.delegate(
 					.confirmedFactorSource(
