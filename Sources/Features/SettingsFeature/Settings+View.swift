@@ -1,3 +1,4 @@
+import ConnectedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
@@ -30,7 +31,7 @@ extension AppSettings.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			ForceFullScreen {
+			NavigationStack {
 				ZStack {
 					settingsView(viewStore: viewStore)
 
@@ -58,8 +59,20 @@ extension AppSettings.View {
 						then: { PersonasCoordinator.View(store: $0) }
 					)
 				}
+				.navigationDestination(store: store.connectedDapps) { store in
+					ConnectedDapps.View(store: store)
+				}
 			}
+			.tint(.app.gray1)
+			.foregroundColor(.app.gray1)
+			.textStyle(.secondaryHeader)
 		}
+	}
+}
+
+extension StoreOf<AppSettings> {
+	var connectedDapps: PresentationStoreOf<ConnectedDapps> {
+		scope(state: \.$connectedDapps) { .child(.connectedDapps($0)) }
 	}
 }
 
@@ -110,12 +123,20 @@ extension AppSettings.View {
 						}
 
 						Row(
+							L10n.Settings.connectedDappsButtonTitle,
+							icon: Image(asset: AssetResource.connectedDapps)
+						) {
+							viewStore.send(.connectedDappsButtonTapped)
+						}
+
+						Row(
 							L10n.Settings.personasButtonTitle,
 							icon: Image(asset: AssetResource.personas)
 						) {
 							viewStore.send(.personasButtonTapped)
 						}
-
+					}
+					VStack(spacing: .zero) {
 						Spacer()
 							.frame(height: .large3)
 

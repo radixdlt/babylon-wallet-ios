@@ -1,3 +1,4 @@
+import ConnectedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
@@ -11,6 +12,10 @@ extension AppSettings {
 	public struct State: Equatable {
 		public var manageP2PClients: ManageP2PClients.State?
 		public var manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State?
+
+		@PresentationState
+		public var connectedDapps: ConnectedDapps.State?
+
 		public var personasCoordinator: PersonasCoordinator.State?
 		public var canAddP2PClient: Bool
 		#if DEBUG
@@ -20,11 +25,13 @@ extension AppSettings {
 		public init(
 			manageP2PClients: ManageP2PClients.State? = nil,
 			manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State? = nil,
+			connectedDapps: ConnectedDapps.State? = nil,
 			personasCoordinator: PersonasCoordinator.State? = nil,
 			canAddP2PClient: Bool = false
 		) {
 			self.manageP2PClients = manageP2PClients
 			self.manageGatewayAPIEndpoints = manageGatewayAPIEndpoints
+			self.connectedDapps = connectedDapps
 			self.personasCoordinator = personasCoordinator
 			self.canAddP2PClient = canAddP2PClient
 		}
