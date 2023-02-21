@@ -43,3 +43,13 @@ extension AsyncSequence where Element == Void {
 		}
 	}
 }
+
+extension AsyncSequence {
+	func susbscribe(_ continuation: AsyncStream<Element>.Continuation) where Self: Sendable {
+		Task {
+			for try await value in self {
+				continuation.yield(value)
+			}
+		}
+	}
+}

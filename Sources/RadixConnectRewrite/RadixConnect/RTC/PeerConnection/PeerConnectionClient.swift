@@ -3,12 +3,14 @@ import Foundation
 
 // MARK: - PeerConnectionClient
 struct PeerConnectionClient {
-	let id: ClientID
+        typealias ID = ClientID
+
+	let id: ID
 	private let peerConnection: PeerConnection
 	private let delegate: PeerConnectionDelegate
 	private let dataChannelClient: DataChannelClient
 
-	init(id: ClientID, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
+	init(id: ID, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
 		self.id = id
 		self.peerConnection = peerConnection
 		self.delegate = delegate
@@ -35,9 +37,9 @@ extension PeerConnectionClient {
 		try await dataChannelClient.sendMessage(data)
 	}
 
-//	func receivedMessagesStream() async -> AnyAsyncSequence<Result<MessageAssembler.IncommingMessage, Error>> {
-//		await dataChannelClient.receivedMessages
-//	}
+	func receivedMessagesStream() async -> AnyAsyncSequence<Result<DataChannelAssembledMessage, Error>> {
+		await dataChannelClient.incommingAssembledMessages
+	}
 }
 
 extension PeerConnectionClient {

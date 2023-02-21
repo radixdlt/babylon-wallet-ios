@@ -4,11 +4,11 @@ import Prelude
 
 // MARK: - PeerConnectionFactory
 protocol PeerConnectionFactory: Sendable {
-	func makePeerConnectionClient(for clienclientIDtId: ClientID) throws -> PeerConnectionClient
+	func makePeerConnectionClient(for clientId: ClientID) throws -> PeerConnectionClient
 }
 
 // MARK: - PeerConnectionBuilder
-final class PeerConnectionBuilder {
+final class PeerConnectionBuilder: Sendable {
 	let peerConnections: AsyncStream<Result<PeerConnectionClient, FailedToCreatePeerConnectionError>>
 
 	private let signalingServerClient: SignalingClient
