@@ -1,9 +1,11 @@
 import Prelude
 import Tagged
 
+public enum DataChannelMessageIDTag {}
+public typealias DataChannelMessageID = Tagged<DataChannelMessageIDTag, String>
+
 // MARK: - DataChannelMessage
 enum DataChannelMessage: Codable, Sendable, Equatable {
-	public typealias ID = Tagged<Self, String>
 
 	case chunkedMessage(ChunkedMessage)
 	case receipt(Receipt)
@@ -35,19 +37,19 @@ enum DataChannelMessage: Codable, Sendable, Equatable {
 
 extension DataChannelMessage.ChunkedMessage {
 	struct MetaDataPackage: Sendable, Equatable, Codable {
-		let messageId: DataChannelMessage.ID
+		let messageId: DataChannelMessageID
 		let chunkCount: Int
 		let messageByteCount: Int
 		let hashOfMessage: HexCodable
 	}
 
 	struct ChunkPackage: Sendable, Equatable, Codable {
-		let messageId: DataChannelMessage.ID
+		let messageId: DataChannelMessageID
 		let chunkIndex: Int
 		let chunkData: Data
 	}
 
-	var messageID: DataChannelMessage.ID {
+	var messageID: DataChannelMessageID {
 		switch self {
 		case let .metaData(metadata):
 			return metadata.messageId
@@ -74,7 +76,7 @@ extension DataChannelMessage.ChunkedMessage.ChunkPackage: Comparable {
 
 extension DataChannelMessage.Receipt {
 	struct ReceiveConfirmation: Sendable, Equatable, Codable {
-		let messageId: DataChannelMessage.ID
+		let messageId: DataChannelMessageID
 	}
 
 	struct ReceiveError: Sendable, Equatable, Codable, LocalizedError {
@@ -82,11 +84,11 @@ extension DataChannelMessage.Receipt {
 			case messageHashesMismatch
 		}
 
-		let messageId: DataChannelMessage.ID
+		let messageId: DataChannelMessageID
 		let error: Reason
 	}
 
-	var messageID: DataChannelMessage.ID {
+	var messageID: DataChannelMessageID {
 		switch self {
 		case let .receiveMessageConfirmation(confirmation):
 			return confirmation.messageId

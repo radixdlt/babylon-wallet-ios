@@ -3,31 +3,50 @@ import Foundation
 
 // MARK: - RTCClients
 
-/// Meant to hold all of the created RTCClients
-actor RTCClients {
-        struct IncommingMessage {
-                let connectionId: SignalingServerConnectionID
-                let content: RTCClient.IncommingMessage
+public struct RTCIncommingMessage: Sendable {
+        public let connectionId: SignalingServerConnectionID
+        public let content: PeerConnectionMessage
+
+        public struct PeerConnectionMessage: Sendable {
+                public let peerConnectionId: PeerConnectionId
+                public let content: Result<DataChannelAssembledMessage, Error>
+        }
+}
+
+public struct RTCOutgoingMessage: Sendable {
+        public let connectionId: SignalingServerConnectionID
+        public let content: PeerConnectionMessage
+
+        public struct PeerConnectionMessage: Sendable {
+                public let peerConnectionId: PeerConnectionId
+                public let content: Data
+
+                init(peerConnectionId: PeerConnectionId, content: Data) {
+                        self.peerConnectionId = peerConnectionId
+                        self.content = content
+                }
         }
 
-        struct OutgoingMessage {
-                let connectionId: SignalingServerConnectionID
-                let content: RTCClient.OutgoingMessage
+        init(connectionId: SignalingServerConnectionID, content: PeerConnectionMessage) {
+                self.connectionId = connectionId
+                self.content = content
         }
+}
+
+/// Meant to hold all of the created RTCClients
+public actor RTCClients {
+        public let onIncommingMessage: AsyncStream<RTCIncommingMessage>
 
 	private var clients: [RTCClient] = []
+	private let onIncommingMessageContinuation: AsyncStream<RTCIncommingMessage>.Continuation!
+	private let peerConnectionFactory: PeerConnectionFactory
 
-	let onIncommingMessage: AsyncStream<IncommingMessage>
-	let onIncommingMessageContinuation: AsyncStream<IncommingMessage>.Continuation!
-
-	let peerConnectionFactory: PeerConnectionFactory
-
-	private init(peerConnectionFactory: PeerConnectionFactory) {
-		(onIncommingMessage, onIncommingMessageContinuation) = AsyncStream<IncommingMessage>.streamWithContinuation()
+        init(peerConnectionFactory: PeerConnectionFactory) {
+		(onIncommingMessage, onIncommingMessageContinuation) = AsyncStream<RTCIncommingMessage>.streamWithContinuation()
 		self.peerConnectionFactory = peerConnectionFactory
 	}
 
-	func add(_ connectionId: SignalingServerConnectionID) async throws {
+	public func add(_ connectionId: SignalingServerConnectionID) async throws {
                 let ownClientId = ClientID(rawValue: UUID().uuidString)
                 let connectionURL = try signalingServerURL(connectionID: connectionId, source: .wallet, ownClientId: ownClientId)
 		let webSocket = AsyncWebSocket(url: connectionURL)
@@ -39,16 +58,16 @@ actor RTCClients {
                 await client.listenForPeerConnections()
 
                 client.onIncommingMessage
-                        .map { IncommingMessage(connectionId: connectionId, content: $0) }
+                        .map { RTCIncommingMessage(connectionId: connectionId, content: $0) }
                         .susbscribe(onIncommingMessageContinuation)
 		self.clients.append(client)
 	}
 
-	func remove(_ connectionId: SignalingServerConnectionID) {
+	public func remove(_ connectionId: SignalingServerConnectionID) {
 		clients.removeAll(where: { $0.id == connectionId })
 	}
 
-        func sendMessage(_ message: OutgoingMessage) async throws {
+        public func sendMessage(_ message: RTCOutgoingMessage) async throws {
                 guard let rtcClient = clients.first(where: { $0.id == message.connectionId }) else {
                         fatalError()
                 }
@@ -61,22 +80,12 @@ actor RTCClients {
 
 /// Meant to hold all of the peerConnections for the given SignalingServerConnectionID
 actor RTCClient {
-        struct IncommingMessage {
-                let peerConnectionId: PeerConnectionClient.ID
-                let content: Result<DataChannelAssembledMessage, Error>
-        }
-
-        struct OutgoingMessage {
-                let peerConnectionId: PeerConnectionClient.ID
-                let content: Data
-        }
-
 	let id: SignalingServerConnectionID
 	private let peerConnectionBuilder: PeerConnectionBuilder
 	private var peerConnections: [PeerConnectionClient] = []
 
-	let onIncommingMessage: AsyncStream<IncommingMessage>
-	private let onIncommingMessageContinuation: AsyncStream<IncommingMessage>.Continuation!
+        let onIncommingMessage: AsyncStream<RTCIncommingMessage.PeerConnectionMessage>
+        private let onIncommingMessageContinuation: AsyncStream<RTCIncommingMessage.PeerConnectionMessage>.Continuation!
 	private var connectionsTask: Task<Void, Never>?
 
 	init(id: SignalingServerConnectionID,
@@ -84,7 +93,7 @@ actor RTCClient {
 	{
 		self.id = id
 		self.peerConnectionBuilder = peerConnectionBuilder
-		(onIncommingMessage, onIncommingMessageContinuation) = AsyncStream<IncommingMessage>.streamWithContinuation()
+		(onIncommingMessage, onIncommingMessageContinuation) = AsyncStream<RTCIncommingMessage.PeerConnectionMessage>.streamWithContinuation()
 	}
 
 	deinit {
@@ -98,7 +107,7 @@ actor RTCClient {
 					let connection = try connectionResult.get()
                                         await connection
                                                 .receivedMessagesStream()
-                                                .map { IncommingMessage(peerConnectionId: connection.id, content: $0) }
+                                                .map { RTCIncommingMessage.PeerConnectionMessage(peerConnectionId: connection.id, content: $0) }
                                                 .susbscribe(self.onIncommingMessageContinuation)
 					self.peerConnections.append(connection)
 				} catch {
@@ -108,7 +117,7 @@ actor RTCClient {
 		}
 	}
 
-        func sendMessage(_ message: OutgoingMessage) async throws {
+        func sendMessage(_ message: RTCOutgoingMessage.PeerConnectionMessage) async throws {
                 guard let client = peerConnections.first(where: { $0.id == message.peerConnectionId }) else {
                         fatalError()
                 }

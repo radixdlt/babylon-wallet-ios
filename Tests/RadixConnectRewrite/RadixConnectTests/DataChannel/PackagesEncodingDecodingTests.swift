@@ -5,7 +5,7 @@ import TestingPrelude
 // MARK: - DataChannelMessageEncodingDecodingTests
 @MainActor
 final class DataChannelMessageEncodingDecodingTests: TestCase {
-	let messageID: DataChannelMessage.ID = .init(rawValue: "Id")
+	let messageID: DataChannelMessageID = .init(rawValue: "Id")
 
 	func test_decoding_receiveError() throws {
 		let expectedError = DataChannelMessage.receipt(.receiveMessageError(

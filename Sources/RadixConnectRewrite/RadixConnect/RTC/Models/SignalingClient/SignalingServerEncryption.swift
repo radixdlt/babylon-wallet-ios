@@ -3,7 +3,7 @@ import Foundation
 import Prelude
 
 // MARK: - HexCodable32Bytes
-struct HexCodable32Bytes: Sendable, Codable, Equatable {
+public struct HexCodable32Bytes: Sendable, Codable, Equatable {
 	struct IncorretByteCountError: Swift.Error {
 		let got: Int
 		let expected: Int

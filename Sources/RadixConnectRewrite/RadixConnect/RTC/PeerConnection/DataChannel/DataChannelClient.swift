@@ -11,7 +11,7 @@ actor DataChannelClient: NSObject {
 	private let jsonEncoder: JSONEncoder = .init()
 	private let dataChannel: DataChannel
 	private let delegate: DataChannelDelegate
-	private let idBuilder: @Sendable () -> DataChannelMessage.ID
+	private let idBuilder: @Sendable () -> DataChannelMessageID
 
 	// MARK: - Streams
 	let onMessageReceived: AsyncStream<Data>
@@ -37,14 +37,14 @@ actor DataChannelClient: NSObject {
 	// Mutable State
 	private typealias ChunksWithMetaData = (metaData: DataChannelMessage.ChunkedMessage.MetaDataPackage?,
 	                                        chunks: [DataChannelMessage.ChunkedMessage.ChunkPackage])
-	private var messagesByID: [DataChannelMessage.ID: ChunksWithMetaData] = [:]
+	private var messagesByID: [DataChannelMessageID: ChunksWithMetaData] = [:]
 
 	// MARK: - Initializer
 
 	@Sendable init(
 		dataChannel: DataChannel,
 		delegate: DataChannelDelegate,
-		idBuilder: @Sendable @escaping () -> DataChannelMessage.ID = { .init(rawValue: UUID().uuidString) }
+		idBuilder: @Sendable @escaping () -> DataChannelMessageID = { .init(rawValue: UUID().uuidString) }
 	) {
 		self.dataChannel = dataChannel
 		self.delegate = delegate
@@ -107,7 +107,7 @@ actor DataChannelClient: NSObject {
 		}
 	}
 
-	private func waitForMessageConfirmation(_ messageID: DataChannelMessage.ID) async throws {
+	private func waitForMessageConfirmation(_ messageID: DataChannelMessageID) async throws {
 		_ = try await incommingReceipts
 			.filter { $0.messageID == messageID }
 			.prefix(1)

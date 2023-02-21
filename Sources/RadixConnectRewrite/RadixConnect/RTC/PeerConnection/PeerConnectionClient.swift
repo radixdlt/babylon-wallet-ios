@@ -1,16 +1,18 @@
 import AsyncExtensions
 import Foundation
 
-// MARK: - PeerConnectionClient
-struct PeerConnectionClient {
-        typealias ID = ClientID
 
-	let id: ID
+public typealias PeerConnectionId = ClientID
+
+// MARK: - PeerConnectionClient
+public struct PeerConnectionClient: Sendable {
+
+	let id: PeerConnectionId
 	private let peerConnection: PeerConnection
 	private let delegate: PeerConnectionDelegate
 	private let dataChannelClient: DataChannelClient
 
-	init(id: ID, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
+	init(id: PeerConnectionId, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
 		self.id = id
 		self.peerConnection = peerConnection
 		self.delegate = delegate

@@ -3,21 +3,21 @@ import Foundation
 import Prelude
 
 // MARK: - DataChannelAssembledMessage
-struct DataChannelAssembledMessage: Equatable {
+public struct DataChannelAssembledMessage: Equatable, Sendable {
 	// According to CAP19
 	static let chunkSize = 15441
 
-	let idOfChunks: DataChannelMessage.ID
-	let messageContent: Data
-	let messageHash: Data
+        public let idOfChunks: DataChannelMessageID
+        public let messageContent: Data
+        public let messageHash: Data
 
-	init(message: Data, id: DataChannelMessage.ID, messageHash: Data) {
+        public init(message: Data, id: DataChannelMessageID, messageHash: Data) {
 		self.idOfChunks = id
 		self.messageContent = message
 		self.messageHash = messageHash
 	}
 
-	init(message: Data, id: DataChannelMessage.ID) {
+        public init(message: Data, id: DataChannelMessageID) {
 		self.init(message: message, id: id, messageHash: message.hash)
 	}
 }

@@ -7,7 +7,7 @@ import TestingPrelude
 final class DataChannelClientTests: TestCase {
 	static let numberOfChunks = 3
 
-	let messageID = DataChannelMessage.ID(rawValue: UUID().uuidString)
+	let messageID = DataChannelMessageID(rawValue: UUID().uuidString)
 	let testChunksData = try! Data.random(length: DataChannelAssembledMessage.chunkSize * DataChannelClientTests.numberOfChunks)
 	lazy var chunkedMessages = DataChannelAssembledMessage(message: testChunksData, id: messageID).split()
 	lazy var assembledMesage = DataChannelAssembledMessage(message: testChunksData, id: messageID)

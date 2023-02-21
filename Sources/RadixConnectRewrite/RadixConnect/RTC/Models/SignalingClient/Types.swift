@@ -11,8 +11,8 @@ enum EncryptedPayloadTag {}
 typealias EncryptedPayload = Tagged<EncryptedPayloadTag, HexCodable>
 
 // MARK: - SignalingServerConnectionIDTag
-enum SignalingServerConnectionIDTag {}
-typealias SignalingServerConnectionID = Tagged<SignalingServerConnectionIDTag, HexCodable32Bytes>
+public enum SignalingServerConnectionIDTag {}
+public typealias SignalingServerConnectionID = Tagged<SignalingServerConnectionIDTag, HexCodable32Bytes>
 
 // MARK: - EncryptionKeyTag
 enum EncryptionKeyTag {}
@@ -27,5 +27,5 @@ enum DataChannelIDTag {}
 typealias DataChannelID = Tagged<DataChannelIDTag, Int32>
 
 // MARK: - ClientIDTag
-enum ClientIDTag {}
-typealias ClientID = Tagged<ClientIDTag, String>
+public enum ClientIDTag {}
+public typealias ClientID = Tagged<ClientIDTag, String>
