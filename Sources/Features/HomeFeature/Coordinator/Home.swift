@@ -61,6 +61,18 @@ public struct Home: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
+
+			// NB: native case paths should deem this obsolete.
+			var accountDetails: AccountDetails.State? {
+				get {
+					guard case let .accountDetails(state) = self else { return nil }
+					return state
+				}
+				set {
+					guard case .accountDetails = self, let state = newValue else { return }
+					self = .accountDetails(state)
+				}
+			}
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -152,11 +164,11 @@ public struct Home: Sendable, FeatureReducer {
 			}
 
 			// account details
-//			state.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
-//				section.assets.forEach { row in
-//					state.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
-//				}
-//			}
+			state.destination?.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
+				section.assets.forEach { row in
+					state.destination?.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
+				}
+			}
 
 			return .none
 
@@ -168,28 +180,28 @@ public struct Home: Sendable, FeatureReducer {
 			}
 
 			// account details
-//			if let details = state.accountDetails {
-//				let account = details.account
-//
-//				// asset list
-//				let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
-//				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
-//
-//				state.accountDetails?.assets = .init(
-//					type: details.assets.type,
-//					fungibleTokenList: .init(
-//						sections: .init(uniqueElements: categories.map { category in
-//							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
-//							return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
-//						})
-//					),
-//					nonFungibleTokenList: .init(
-//						rows: .init(uniqueElements: accountPortfolio.nonFungibleTokenContainers.elements.map {
-//							.init(container: $0)
-//						})
-//					)
-//				)
-//			}
+			if let details = state.destination?.accountDetails {
+				let account = details.account
+
+				// asset list
+				let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
+				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
+
+				state.destination?.accountDetails?.assets = .init(
+					type: details.assets.type,
+					fungibleTokenList: .init(
+						sections: .init(uniqueElements: categories.map { category in
+							let rows = category.tokenContainers.map { container in FungibleTokenList.Row.State(container: container, currency: .usd, isCurrencyAmountVisible: true) }
+							return FungibleTokenList.Section.State(id: category.type, assets: .init(uniqueElements: rows))
+						})
+					),
+					nonFungibleTokenList: .init(
+						rows: .init(uniqueElements: accountPortfolio.nonFungibleTokenContainers.elements.map {
+							.init(container: $0)
+						})
+					)
+				)
+			}
 
 			return .none
 
