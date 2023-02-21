@@ -68,17 +68,15 @@ extension AccountDetails.View {
 				.background(viewStore.appearanceID.gradient)
 			}
 			.navigationBarBackButtonHidden()
+			.navigationTitle(viewStore.displayName)
+			.navigationBarTitleColor(.app.white)
+			.navigationBarTitleFont(.app.secondaryHeader)
 			.toolbar {
 				ToolbarItem(placement: .navigationBarLeading) {
 					BackButton {
 						viewStore.send(.dismissAccountDetailsButtonTapped)
 					}
 					.foregroundColor(.app.white)
-				}
-				ToolbarItem(placement: .principal) {
-					Text(viewStore.displayName)
-						.textStyle(.secondaryHeader)
-						.foregroundColor(.app.white)
 				}
 				ToolbarItem(placement: .navigationBarTrailing) {
 					accountPreferencesButton(with: viewStore)

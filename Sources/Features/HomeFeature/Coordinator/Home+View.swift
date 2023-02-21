@@ -115,7 +115,6 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct HomeView_Previews: PreviewProvider {
 	static var previews: some SwiftUI.View {
-		let _ = configureWalletAppUIAppearance()
 		Home.View(
 			store: .init(
 				initialState: .previewValue,
