@@ -16,7 +16,7 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 	public let factorSourceID: FactorSource.ID
 
 	/// Also contains info about which Curve
-	public let publicKey: Engine.PublicKey
+	public let publicKey: SLIP10.PublicKey
 
 	/// Optional, since it might be a single factor instance, not derived from
 	/// and HD factor source
@@ -24,7 +24,7 @@ public struct FactorInstance: Sendable, Hashable, Codable {
 
 	public init(
 		factorSourceID: FactorSource.ID,
-		publicKey: Engine.PublicKey,
+		publicKey: SLIP10.PublicKey,
 		derivationPath: DerivationPath?
 	) {
 		self.factorSourceID = factorSourceID

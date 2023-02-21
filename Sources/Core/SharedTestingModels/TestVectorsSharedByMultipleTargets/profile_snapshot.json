@@ -14,8 +14,8 @@
       {
         "connectionPassword" : "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf",
         "displayName" : "Brave browser on Mac Studio",
-        "firstEstablishedOn" : "2023-02-21T10:17:35Z",
-        "lastUsedOn" : "2023-02-21T10:17:35Z",
+        "firstEstablishedOn" : "2023-02-21T11:24:33Z",
+        "lastUsedOn" : "2023-02-21T11:24:33Z",
         "platform" : "browser"
       },
       {
@@ -30,8 +30,8 @@
           "retryAttempts" : 3
         },
         "displayName" : "iPhone 13",
-        "firstEstablishedOn" : "2023-02-21T10:17:35Z",
-        "lastUsedOn" : "2023-02-21T10:17:35Z",
+        "firstEstablishedOn" : "2023-02-21T11:24:33Z",
+        "lastUsedOn" : "2023-02-21T11:24:33Z",
         "platform" : "iPhone",
         "signalingServerConfig" : {
           "signalingServerBaseURL" : "custom.signal.com",
@@ -66,11 +66,11 @@
   },
   "factorSources" : [
     {
-      "addedOn" : "2023-02-21T10:17:35Z",
+      "addedOn" : "2023-02-21T11:24:33Z",
       "hint" : "Mac",
       "id" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
       "kind" : "device",
-      "lastUsedOn" : "2023-02-21T10:17:35Z",
+      "lastUsedOn" : "2023-02-21T11:24:33Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519"
@@ -81,11 +81,11 @@
       }
     },
     {
-      "addedOn" : "2023-02-21T10:17:35Z",
+      "addedOn" : "2023-02-21T11:24:33Z",
       "hint" : "Mac",
       "id" : "e00d9eb10f9016910e1bc18679a1e22ac8632ceb26983c3ff19f2d8d72c32398",
       "kind" : "device",
-      "lastUsedOn" : "2023-02-21T10:17:35Z",
+      "lastUsedOn" : "2023-02-21T11:24:33Z",
       "parameters" : {
         "supportedCurves" : [
           "curve25519",
@@ -98,7 +98,7 @@
       }
     }
   ],
-  "id" : "7914BEA7-1E53-446C-9801-CB1B0B8B514E",
+  "id" : "BABE1442-3C98-41FF-AFB0-D0F5829B020D",
   "perNetwork" : [
     {
       "accounts" : [
@@ -118,8 +118,8 @@
                 },
                 "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                 "publicKey" : {
-                  "curve" : "EddsaEd25519",
-                  "public_key" : "b9c37926187c6ecfee40577e29942ecc1371c5bb6350288aca92033b16ce595c"
+                  "compressedData" : "b9c37926187c6ecfee40577e29942ecc1371c5bb6350288aca92033b16ce595c",
+                  "curve" : "curve25519"
                 }
               }
             }
@@ -141,8 +141,8 @@
                 },
                 "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                 "publicKey" : {
-                  "curve" : "EddsaEd25519",
-                  "public_key" : "7c906945cf3d4b4ab27ebf11b6f98e07c506323809f9b501275914f72739ed86"
+                  "compressedData" : "7c906945cf3d4b4ab27ebf11b6f98e07c506323809f9b501275914f72739ed86",
+                  "curve" : "curve25519"
                 }
               }
             }
@@ -164,8 +164,8 @@
                 },
                 "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                 "publicKey" : {
-                  "curve" : "EddsaEd25519",
-                  "public_key" : "3f9d3dbae544a46d58703baab5db8d0643879733f7b6e01b39bf96c16ea827d6"
+                  "compressedData" : "3f9d3dbae544a46d58703baab5db8d0643879733f7b6e01b39bf96c16ea827d6",
+                  "curve" : "curve25519"
                 }
               }
             }
@@ -180,8 +180,8 @@
           "referencesToAuthorizedPersonas" : [
             {
               "fieldIDs" : [
-                "B8BC5AAC-E261-472C-B67E-1A73D7961638",
-                "8A0F9FD1-91E9-4209-8ACA-090B5434C720"
+                "F7635EE7-FC42-4482-B671-ED10B317E3E0",
+                "7E2CE890-4DA6-4DF3-BC95-3CFF736FFEFF"
               ],
               "identityAddress" : "identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -198,8 +198,8 @@
             },
             {
               "fieldIDs" : [
-                "4140AC8A-AFDE-403D-961B-B2E3ECC7BBC2",
-                "79AE23C7-9641-441F-80B5-D79ECC803CC7"
+                "9B90E3A3-8D4F-4789-978E-439931CD7E89",
+                "29BCB112-D26A-4477-8EF2-1DE3828F8434"
               ],
               "identityAddress" : "identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen",
               "lastLogin" : "2001-01-01T00:00:00Z",
@@ -223,12 +223,12 @@
           "displayName" : "Mrs Incognito",
           "fields" : [
             {
-              "id" : "B8BC5AAC-E261-472C-B67E-1A73D7961638",
+              "id" : "F7635EE7-FC42-4482-B671-ED10B317E3E0",
               "kind" : "firstName",
               "value" : "Jane"
             },
             {
-              "id" : "8A0F9FD1-91E9-4209-8ACA-090B5434C720",
+              "id" : "7E2CE890-4DA6-4DF3-BC95-3CFF736FFEFF",
               "kind" : "lastName",
               "value" : "Incognitoson"
             }
@@ -245,8 +245,8 @@
                 },
                 "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                 "publicKey" : {
-                  "curve" : "EddsaEd25519",
-                  "public_key" : "f361cef2453721ed1b67e4c9266697325766513413de39d19746371466f9f63b"
+                  "compressedData" : "f361cef2453721ed1b67e4c9266697325766513413de39d19746371466f9f63b",
+                  "curve" : "curve25519"
                 }
               }
             }
@@ -257,12 +257,12 @@
           "displayName" : "Mrs Public",
           "fields" : [
             {
-              "id" : "4140AC8A-AFDE-403D-961B-B2E3ECC7BBC2",
+              "id" : "9B90E3A3-8D4F-4789-978E-439931CD7E89",
               "kind" : "firstName",
               "value" : "Maria"
             },
             {
-              "id" : "79AE23C7-9641-441F-80B5-D79ECC803CC7",
+              "id" : "29BCB112-D26A-4477-8EF2-1DE3828F8434",
               "kind" : "lastName",
               "value" : "Publicson"
             }
@@ -279,8 +279,8 @@
                 },
                 "factorSourceID" : "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287",
                 "publicKey" : {
-                  "curve" : "EddsaEd25519",
-                  "public_key" : "772ba0ebe12a1637458fefef15299bc57f8e9e21fcf106181d3d780ad1e2bf51"
+                  "compressedData" : "772ba0ebe12a1637458fefef15299bc57f8e9e21fcf106181d3d780ad1e2bf51",
+                  "curve" : "curve25519"
                 }
               }
             }
@@ -289,5 +289,5 @@
       ]
     }
   ],
-  "version" : 13
+  "version" : 14
 }

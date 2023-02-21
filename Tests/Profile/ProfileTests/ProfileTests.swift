@@ -78,9 +78,9 @@ final class ProfileTests: TestCase {
 
 			let address = try OnNetwork.Account.deriveAddress(networkID: networkID, publicKey: publicKey)
 
-			let factorInstance = try FactorInstance(
+			let factorInstance = FactorInstance(
 				factorSourceID: babylonFactorSource.id,
-				publicKey: publicKey.intoEngine(),
+				publicKey: publicKey,
 				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
 
@@ -116,9 +116,9 @@ final class ProfileTests: TestCase {
 
 			let address = try OnNetwork.Persona.deriveAddress(networkID: networkID, publicKey: publicKey)
 
-			let factorInstance = try FactorInstance(
+			let factorInstance = FactorInstance(
 				factorSourceID: babylonFactorSource.id,
-				publicKey: publicKey.intoEngine(),
+				publicKey: publicKey,
 				derivationPath: derivationPath.wrapAsDerivationPath()
 			)
 
@@ -238,8 +238,8 @@ final class ProfileTests: TestCase {
 		let snapshot = profile.snaphot()
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
-		let data = try jsonEncoder.encode(snapshot)
-		/* Uncomment to generate a new test vector */
+		/* Uncomment the lines below to generate a new test vector */
+		//        let data = try jsonEncoder.encode(snapshot)
 //		print(String(data: data, encoding: .utf8)!)
 	}
 
@@ -380,7 +380,7 @@ extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {
 		switch securityState {
 		case let .unsecured(control):
-			return try? .init(engine: control.genesisFactorInstance.publicKey)
+			return control.genesisFactorInstance.publicKey
 		}
 	}
 }

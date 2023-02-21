@@ -12,7 +12,10 @@ extension OnNetwork.Persona {
 			securityState: .unsecured(.init(
 				genesisFactorInstance: .init(
 					factorSourceID: .init(hex: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
-					publicKey: .eddsaEd25519(.init(hex: "7bf9f97c0cac8c6c112d716069ccc169283b9838fa2f951c625b3d4ca0a8f05b")),
+					publicKey: .eddsaEd25519(.init(
+						compressedRepresentation: Data(
+							hex: "7bf9f97c0cac8c6c112d716069ccc169283b9838fa2f951c625b3d4ca0a8f05b")
+					)),
 					derivationPath: .identityPath(.init(derivationPath: "m/44H/1022H/10H/618H/0H/1238H"))
 				)
 			)),
@@ -34,7 +37,10 @@ extension OnNetwork.Persona {
 			securityState: .unsecured(.init(
 				genesisFactorInstance: .init(
 					factorSourceID: .init(hex: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
-					publicKey: .eddsaEd25519(.init(hex: "b862c4ef84a4a97c37760636f6b94d1fba7b4881ac15a073f6c57e2996bbeca8")),
+					publicKey: .eddsaEd25519(.init(
+						compressedRepresentation: Data(
+							hex: "b862c4ef84a4a97c37760636f6b94d1fba7b4881ac15a073f6c57e2996bbeca8")
+					)),
 					derivationPath: .identityPath(.init(derivationPath: "m/44H/1022H/10H/618H/1H/1238H"))
 				)
 			)),

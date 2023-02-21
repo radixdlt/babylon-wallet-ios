@@ -12,7 +12,8 @@ extension ProfileSnapshot.Version {
 	/// - 11: Switch back default network to Nebunet before Betanet v2 release.
 	/// - 12: Added `id`
 	/// - 13: Reverted unintentially change of perNetwork
-	public static let minimum: Self = 13
+	/// - 14: Reverted `Engine.PublicKey` -> `SLIP10.PublicKey` for entities.
+	public static let minimum: Self = 14
 }
 
 // MARK: - Profile

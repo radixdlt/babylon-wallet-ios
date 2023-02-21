@@ -225,7 +225,7 @@ extension TransactionClient {
 				let notarySigner = notaryAndSigners.notarySigner
 				switch notarySigner.securityState {
 				case let .unsecured(unsecuredControl):
-					notaryPublicKey = unsecuredControl.genesisFactorInstance.publicKey
+					notaryPublicKey = try unsecuredControl.genesisFactorInstance.publicKey.intoEngine()
 				}
 			} catch {
 				return .failure(.failedToLoadNotaryPublicKey)

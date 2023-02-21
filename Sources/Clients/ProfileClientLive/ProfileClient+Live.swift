@@ -342,9 +342,9 @@ extension ProfileClient {
 
 					}()
 
-					return FactorInstance(
+					return try FactorInstance(
 						factorSourceID: factorSource.id,
-						publicKey: publicKey,
+						publicKey: .init(engine: publicKey),
 						derivationPath: derivationPath
 					)
 				}()
@@ -358,7 +358,7 @@ extension ProfileClient {
 				case .identity:
 					let identityAddress = try OnNetwork.Persona.deriveAddress(
 						networkID: networkID,
-						publicKey: .init(engine: genesisFactorInstance.publicKey)
+						publicKey: genesisFactorInstance.publicKey
 					)
 
 					let persona = OnNetwork.Persona(
@@ -373,7 +373,7 @@ extension ProfileClient {
 				case .account:
 					let accountAddress = try OnNetwork.Account.deriveAddress(
 						networkID: networkID,
-						publicKey: .init(engine: genesisFactorInstance.publicKey)
+						publicKey: genesisFactorInstance.publicKey
 					)
 
 					let account = OnNetwork.Account(
