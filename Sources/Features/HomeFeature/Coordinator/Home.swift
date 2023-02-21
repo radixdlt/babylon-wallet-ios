@@ -1,14 +1,11 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
-import AccountPreferencesFeature
 import AppSettings
 import CreateEntityFeature
 import FeaturePrelude
 import FungibleTokenListFeature
-import P2PConnectivityClient
 import ProfileClient
-import TransactionSigningFeature
 
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
@@ -22,20 +19,17 @@ public struct Home: Sendable, FeatureReducer {
 		// MARK: - Destinations
 		@PresentationState
 		public var destination: Destinations.State?
-		public var accountPreferences: AccountPreferences.State?
 
 		public init(
 			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
 			header: Header.State = .init(),
 			accountList: AccountList.State = .init(accounts: []),
-			destination: Destinations.State? = nil,
-			accountPreferences: AccountPreferences.State? = nil
+			destination: Destinations.State? = nil
 		) {
 			self.accountPortfolioDictionary = accountPortfolioDictionary
 			self.header = header
 			self.accountList = accountList
 			self.destination = destination
-			self.accountPreferences = accountPreferences
 		}
 	}
 
@@ -57,7 +51,6 @@ public struct Home: Sendable, FeatureReducer {
 		case header(Header.Action)
 		case accountList(AccountList.Action)
 		case destination(PresentationActionOf<Destinations>)
-		case accountPreferences(AccountPreferences.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -87,10 +80,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 	@Dependency(\.appSettingsClient) var appSettingsClient
-	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
-	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
@@ -100,21 +90,14 @@ public struct Home: Sendable, FeatureReducer {
 			Header()
 		}
 
-		accountListReducer()
+		Scope(state: \.accountList, action: /Action.child .. ChildAction.accountList) {
+			AccountList()
+		}
 
 		Reduce(core)
 			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
-	}
-
-	func accountListReducer() -> some ReducerProtocolOf<Self> {
-		Scope(state: \.accountList, action: /Action.child .. ChildAction.accountList) {
-			AccountList()
-		}
-		.ifLet(\.accountPreferences, action: /Action.child .. ChildAction.accountPreferences) {
-			AccountPreferences()
-		}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -241,24 +224,17 @@ public struct Home: Sendable, FeatureReducer {
 				await send(.delegate(.displaySettings))
 			}
 
-		case .accountPreferences(.delegate(.dismissAccountPreferences)):
-			state.accountPreferences = nil
-			return .none
-
-		case let .accountPreferences(.delegate(.refreshAccount(address))):
+		// this whole case is just plain awful, but hopefully only temporary until we introduce account streams.
+		case let .destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.delegate(.refreshAccount(address))))))))):
 			return .run { send in
 				await send(.internal(.accountPortfolioResult(TaskResult {
 					try await accountPortfolioFetcher.fetchPortfolio([address])
 				})))
-				await send(.child(.accountPreferences(.internal(.system(.refreshAccountCompleted)))))
+				await send(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.internal(.system(.refreshAccountCompleted)))))))))))
 			}
 
-		case .destination(.presented(.accountDetails(.delegate(.dismissAccountDetails)))):
+		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
 			state.destination = nil
-			return .none
-
-		case let .destination(.presented(.accountDetails(.delegate(.displayAccountPreferences(address))))):
-			state.accountPreferences = .init(address: address)
 			return .none
 
 		case let .destination(.presented(.accountDetails(.delegate(.refresh(address))))):

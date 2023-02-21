@@ -1,10 +1,7 @@
 import AccountDetailsFeature
 import AccountListFeature
-import AccountPortfolio
-import AccountPreferencesFeature
 import CreateEntityFeature
 import FeaturePrelude
-import TransactionSigningFeature
 
 extension Home.State {
 	var viewState: Home.ViewState {
@@ -58,16 +55,6 @@ extension Home {
 					.refreshable {
 						await viewStore.send(.pullToRefreshStarted).finish()
 					}
-//					ZStack {
-//						IfLetStore(
-//							store.scope(
-//								state: \.accountPreferences,
-//								action: { .child(.accountPreferences($0)) }
-//							),
-//							then: { AccountPreferences.View(store: $0) }
-//						)
-//						.zIndex(3)
-//					}
 					.onAppear {
 						viewStore.send(.appeared)
 					}

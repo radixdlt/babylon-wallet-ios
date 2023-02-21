@@ -1,3 +1,4 @@
+import AccountPreferencesFeature
 import AssetsViewFeature
 import AssetTransferFeature
 import FeaturePrelude
@@ -73,7 +74,7 @@ extension AccountDetails.View {
 				.toolbar {
 					ToolbarItem(placement: .navigationBarLeading) {
 						BackButton {
-							viewStore.send(.dismissAccountDetailsButtonTapped)
+							viewStore.send(.backButtonTapped)
 						}
 						.foregroundColor(.app.white)
 					}
@@ -91,6 +92,12 @@ extension AccountDetails.View {
 				.onAppear {
 					viewStore.send(.appeared)
 				}
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /AccountDetails.Destinations.State.preferences,
+					action: AccountDetails.Destinations.Action.preferences,
+					content: { AccountPreferences.View(store: $0) }
+				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 					state: /AccountDetails.Destinations.State.transfer,
@@ -111,7 +118,7 @@ extension AccountDetails.View {
 	fileprivate func accountPreferencesButton(with viewStore: AccountDetailsViewStore) -> some View {
 		Button(
 			action: {
-				viewStore.send(.displayAccountPreferencesButtonTapped)
+				viewStore.send(.preferencesButtonTapped)
 			}, label: {
 				Image(asset: AssetResource.ellipsis)
 			}
