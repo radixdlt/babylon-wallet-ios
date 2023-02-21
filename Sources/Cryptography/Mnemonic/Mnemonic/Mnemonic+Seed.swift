@@ -21,3 +21,12 @@ extension Mnemonic {
 		return seed
 	}
 }
+
+// MARK: To HDRoot
+extension Mnemonic {
+	public func hdRoot(passphrase: String = "") throws -> HD.Root {
+		try HD.Root(
+			seed: seed(passphrase: passphrase)
+		)
+	}
+}

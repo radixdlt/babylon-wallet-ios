@@ -288,6 +288,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"Cryptography",
+			"UseFactorSourceClient",
 		],
 		tests: .no
 	),
@@ -306,8 +307,17 @@ package.addModules([
 			"GatewayAPI",
 			"ProfileClient",
 			"AccountPortfolio",
+			"UseFactorSourceClient",
 		],
 		tests: .yes()
+	),
+	.client(
+		name: "UseFactorSourceClient",
+		dependencies: [
+			"Profile",
+			"Cryptography",
+		],
+		tests: .no
 	),
 ])
 
@@ -425,6 +435,10 @@ package.addModules([
 			"Cryptography",
 			"EngineToolkit", // address derivation
 			"P2PModels",
+			.product(name: "DeviceKit", package: "DeviceKit", condition: .when(platforms: [.iOS])) {
+				.package(url: "https://github.com/devicekit/DeviceKit", from: "5.0.0")
+			},
+			"Resources", // L10n
 		],
 		tests: .no
 	),

@@ -108,7 +108,7 @@ extension FactorSourcesView {
 				.font(.title)
 			#endif // os(macOS)
 
-			ForEach(factorSources.anyFactorSources, id: \.factorSourceID) { factorSource in
+			ForEach(factorSources) { factorSource in
 				FactorSourceView(
 					factorSource: factorSource,
 					indentation: inOneLevel,
@@ -122,10 +122,11 @@ extension FactorSourcesView {
 
 // MARK: - FactorSourceView
 public struct FactorSourceView: IndentedView {
-	public let factorSource: any FactorSourceProtocol
+	public let factorSource: FactorSource
 	public let indentation: Indentation
 	public var keychainClient: KeychainClient?
 	@State private var mnemonicPhraseLoadedFromKeychain: String?
+	@State private var mnemonicPassphraseLoadedFromKeychain: String?
 }
 
 extension FactorSourceView {
@@ -137,28 +138,33 @@ extension FactorSourceView {
 				.font(.title)
 			#endif // os(macOS)
 
+			Labeled("Kind", value: factorSource.kind.rawValue)
+			Labeled("Hint", value: factorSource.hint.rawValue)
+			Labeled("Added on", value: factorSource.addedOn.ISO8601Format())
+			Labeled("ID", value: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
+
 			if let mnemonicPhraseLoadedFromKeychain {
 				VStack {
 					Text("✅ Mnemonic found in keychain ✅")
 					Text(mnemonicPhraseLoadedFromKeychain).fontWeight(.semibold)
+					if let mnemonicPassphraseLoadedFromKeychain {
+						Spacer()
+						Text("Bip39 Passphrase:")
+						Text("'\(mnemonicPassphraseLoadedFromKeychain)'")
+					}
 				}
 				.padding()
 				.border(Color.green, width: 2)
 			}
-
-			Labeled("ID", value: String(factorSource.factorSourceID.id.mask(showLast: 6)))
-			Labeled("Kind", value: factorSource.factorSourceKind.rawValue)
-			Labeled("Created", value: factorSource.creationDate.ISO8601Format())
 		}
 		.padding([.leading], leadingPadding)
 		.task {
-			Task {
-				if let mnemonic = try? await keychainClient?.loadFactorSourceMnemonic(
-					reference: self.factorSource.reference,
-					authenticationPrompt: "Load Mnemonic to display for debugging"
-				) {
-					self.mnemonicPhraseLoadedFromKeychain = mnemonic.phrase
-				}
+			if let mnemonic = try? await keychainClient?.loadFactorSourceMnemonicWithPassphrase(
+				factorSourceID: factorSource.id,
+				authenticationPrompt: "Load Mnemonic to display for debugging"
+			) {
+				self.mnemonicPhraseLoadedFromKeychain = mnemonic.mnemonic.phrase
+				self.mnemonicPassphraseLoadedFromKeychain = mnemonic.passphrase
 			}
 		}
 	}
@@ -394,7 +400,7 @@ extension PerNetworkView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			ForEach(perNetwork.dictionary.keys, id: \.self) { networkID in
+			ForEach(perNetwork.keys, id: \.self) { networkID in
 				OnNetworkView(
 					onNetwork: try! perNetwork.onNetwork(id: networkID),
 					indentation: inOneLevel
@@ -490,7 +496,6 @@ extension EntityView {
 
 			Labeled("Index", value: String(describing: entity.index))
 			Labeled("Address", value: entity.address.address)
-			Labeled("Derivation Path", value: entity.derivationPath.derivationPath)
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):
 				UnsecuredEntityControlView(
@@ -531,7 +536,7 @@ extension UnsecuredEntityControlView {
 			#endif // os(macOS)
 
 			FactorInstanceView(
-				factorInstance: unsecuredControl.genesisFactorInstance.any(),
+				factorInstance: unsecuredControl.genesisFactorInstance,
 				indentation: inOneLevel
 			)
 		}
@@ -540,7 +545,7 @@ extension UnsecuredEntityControlView {
 
 // MARK: - FactorInstanceView
 public struct FactorInstanceView: IndentedView {
-	public let factorInstance: any FactorInstanceProtocol
+	public let factorInstance: FactorInstance
 	public let indentation: Indentation
 }
 
@@ -553,10 +558,7 @@ extension FactorInstanceView {
 				.font(.title)
 			#endif // os(macOS)
 
-			Labeled("ID", value: String(factorInstance.factorInstanceID.id.mask(showLast: 6)))
-			Labeled("Kind", value: factorInstance.factorInstanceKind.rawValue)
-			Labeled("Initialized On", value: factorInstance.initializationDate.ISO8601Format())
-			Labeled("Factor Source ID", value: String(factorInstance.factorSourceReference.factorSourceID.id.mask(showLast: 6)))
+			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.hexCodable.hex().mask(showLast: 6)))
 		}
 		.padding([.leading], leadingPadding)
 	}

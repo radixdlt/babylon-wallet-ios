@@ -24,13 +24,15 @@ public struct AppPreferences:
 
 	public init(
 		display: Display = .default,
-		p2pClients: P2PClients,
+		p2pClients: P2PClients = [],
 		networkAndGateway: NetworkAndGateway = .nebunet
 	) {
 		self.display = display
 		self.p2pClients = p2pClients
 		self.networkAndGateway = networkAndGateway
 	}
+
+	public static let `default`: Self = .init()
 }
 
 extension AppPreferences {

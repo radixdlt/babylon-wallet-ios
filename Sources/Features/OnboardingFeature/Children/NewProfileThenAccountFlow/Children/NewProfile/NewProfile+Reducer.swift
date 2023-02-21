@@ -15,18 +15,18 @@ public struct NewProfile: Sendable, ReducerProtocol {
 		switch action {
 		case .internal(.view(.appeared)):
 			return .run { send in
-				let request = CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceRequest()
-				await send(.internal(.system(.createProfileResult(TaskResult {
-					try await profileClient.createEphemeralProfileAndUnsavedOnDeviceFactorSource(request)
+				let request = CreateOnboardingWalletRequest()
+				await send(.internal(.system(.createOnboardingWalletResult(TaskResult {
+					try await profileClient.createOnboardingWallet(request)
 				}))))
 			}
 
-		case let .internal(.system(.createProfileResult(.success(unsavedProfile)))):
+		case let .internal(.system(.createOnboardingWalletResult(.success(onboardingWallet)))):
 			return .run { send in
-				await send(.delegate(.createdProfile(unsavedProfile)))
+				await send(.delegate(.createdOnboardingWallet(onboardingWallet)))
 			}
 
-		case let .internal(.system(.createProfileResult(.failure(error)))):
+		case let .internal(.system(.createOnboardingWalletResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .run { send in
 				await send(.delegate(.criticalFailureCouldNotCreateProfile))

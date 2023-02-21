@@ -1,3 +1,4 @@
+import Cryptography
 import FeaturePrelude
 
 // MARK: - SelectGenesisFactorSource.Action
@@ -16,6 +17,7 @@ extension SelectGenesisFactorSource.Action {
 extension SelectGenesisFactorSource.Action {
 	public enum ViewAction: Sendable, Equatable {
 		case confirmOnDeviceFactorSource
+		case selectedCurve(Slip10Curve)
 	}
 }
 
@@ -35,6 +37,6 @@ extension SelectGenesisFactorSource.Action {
 // MARK: - SelectGenesisFactorSource.Action.DelegateAction
 extension SelectGenesisFactorSource.Action {
 	public enum DelegateAction: Sendable, Equatable {
-		case confirmedFactorSource(Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource, specifiedNameForNewEntityToCreate: NonEmpty<String>)
+		case confirmedFactorSource(FactorSource, specifiedNameForNewEntityToCreate: NonEmpty<String>, curve: Slip10Curve)
 	}
 }

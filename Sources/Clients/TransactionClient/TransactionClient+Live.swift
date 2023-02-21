@@ -4,13 +4,17 @@ import Cryptography
 import EngineToolkitClient
 import GatewayAPI
 import ProfileClient
+import Resources
+import UseFactorSourceClient
 
 extension TransactionClient {
 	public static var liveValue: Self {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		@Dependency(\.keychainClient) var keychainClient
 		@Dependency(\.profileClient) var profileClient
 		@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
+		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 		let pollStrategy: PollStrategy = .default
 
@@ -33,11 +37,37 @@ extension TransactionClient {
 				return .failure(.failedToGenerateTXId)
 			}
 
+			let factorSource = try! await profileClient.getFactorSources().device
+			let factorSourceID = factorSource.id
+			guard let loadedMnemonicWithPassphrase = try! await keychainClient.loadFactorSourceMnemonicWithPassphrase(
+				factorSourceID: factorSourceID,
+				authenticationPrompt: L10n.TransactionSigning.biometricsPrompt
+			) else {
+				fatalError("should not happend")
+			}
+			let hdRoot = try! loadedMnemonicWithPassphrase.hdRoot()
+
+			@Sendable func sign(data: any DataProtocol, with account: OnNetwork.Account) async throws -> SignatureWithPublicKey {
+				switch account.securityState {
+				case let .unsecured(unsecuredControl):
+					let factorInstance = unsecuredControl.genesisFactorInstance
+					guard factorInstance.factorSourceID == factorSourceID else {
+						fatalError("wrong signer.")
+					}
+					let sigRes: SignatureWithPublicKey = try useFactorSourceClient.signatureFromOnDeviceHD(.init(
+						hdRoot: hdRoot,
+						derivationPath: factorInstance.derivationPath!,
+						curve: factorSource.parameters.supportedCurves.first,
+						data: Data(data)
+					))
+					return sigRes
+				}
+			}
+
 			let intentSignatures_: [SignatureWithPublicKey]
 			do {
-				intentSignatures_ = try await notaryAndSigners.signers.asyncMap { signer in
-					// FIXME: mainnet: Sign with ALL provided signers of the account.
-					try await signer.notarySigner(compiledTransactionIntent.compiledIntent)
+				intentSignatures_ = try await notaryAndSigners.accountsNeededToSign.asyncMap {
+					try await sign(data: compiledTransactionIntent.compiledIntent, with: $0)
 				}
 			} catch {
 				return .failure(.failedToSignIntentWithAccountSigners)
@@ -63,9 +93,7 @@ extension TransactionClient {
 
 			let notarySignatureWithPublicKey: SignatureWithPublicKey
 			do {
-				notarySignatureWithPublicKey = try await notaryAndSigners.notarySigner.notarySigner(
-					compiledSignedIntent.compiledIntent
-				)
+				notarySignatureWithPublicKey = try await sign(data: compiledSignedIntent.compiledIntent, with: notaryAndSigners.notarySigner)
 			} catch {
 				return .failure(.failedToSignSignedCompiledIntentWithNotarySigner)
 			}
@@ -194,7 +222,11 @@ extension TransactionClient {
 			}
 			let notaryPublicKey: Engine.PublicKey
 			do {
-				notaryPublicKey = try notaryAndSigners.notarySigner.notaryPublicKey.intoEngine()
+				let notarySigner = notaryAndSigners.notarySigner
+				switch notarySigner.securityState {
+				case let .unsecured(unsecuredControl):
+					notaryPublicKey = try unsecuredControl.genesisFactorInstance.publicKey.intoEngine()
+				}
 			} catch {
 				return .failure(.failedToLoadNotaryPublicKey)
 			}
@@ -251,17 +283,21 @@ extension TransactionClient {
 						)
 				)
 
-				let signersForAccounts = try await profileClient.signersForAccountsGivenAddresses(
-					.init(
-						networkID: accountAddressesNeedingToSignTransactionRequest.networkID,
-						addresses: addressesNeededToSign,
-						keychainAccessFactorSourcesAuthPrompt: request.unlockKeychainPromptShowToUser
-					)
-				)
+				let accountsNeededToSign: NonEmpty<OrderedSet<OnNetwork.Account>> = try await {
+					let accounts = try await addressesNeededToSign.asyncMap {
+						try await profileClient.lookupAccountByAddress($0)
+					}
+					guard let accounts = NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: accounts)) else {
+						// TransactionManifest does not reference any accounts => use any account!
+						let first = try await profileClient.getAccountsOnNetwork(accountAddressesNeedingToSignTransactionRequest.networkID).first
+						return NonEmpty(rawValue: OrderedSet(uncheckedUniqueElements: [first]))!
+					}
+					return accounts
+				}()
 
-				let notary = await request.selectNotary(signersForAccounts)
+				let notary = await request.selectNotary(accountsNeededToSign)
 
-				return .init(notarySigner: notary, signers: signersForAccounts)
+				return .init(notarySigner: notary, accountsNeededToSign: accountsNeededToSign)
 			}
 		}
 
@@ -333,9 +369,9 @@ extension TransactionClient {
 // MARK: - NotaryAndSigners
 struct NotaryAndSigners: Sendable, Hashable {
 	/// Notary signer
-	public let notarySigner: SignersOfAccount
+	public let notarySigner: OnNetwork.Account
 	/// Never empty, since this also contains the notary signer.
-	public let signers: NonEmpty<OrderedSet<SignersOfAccount>>
+	public let accountsNeededToSign: NonEmpty<OrderedSet<OnNetwork.Account>>
 }
 
 // MARK: - CreateOnLedgerAccountFailedExpectedToFindAddressInNewGlobalEntities

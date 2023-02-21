@@ -1,3 +1,4 @@
+import Prelude
 //===----------------------------------------------------------------------===//
 //
 // This source file is part of the SwiftCrypto open source project

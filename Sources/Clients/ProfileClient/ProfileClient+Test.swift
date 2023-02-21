@@ -16,13 +16,14 @@ extension ProfileClient {
 		getGatewayAPIEndpointBaseURL: unimplemented("\(Self.self).getGatewayAPIEndpointBaseURL"),
 		getNetworkAndGateway: unimplemented("\(Self.self).getNetworkAndGateway"),
 		setNetworkAndGateway: unimplemented("\(Self.self).setNetworkAndGateway"),
-		createEphemeralProfileAndUnsavedOnDeviceFactorSource: unimplemented("\(Self.self).createEphemeralProfileAndUnsavedOnDeviceFactorSource"),
+		createOnboardingWallet: unimplemented("\(Self.self).createOnboardingWallet"),
 		injectProfileSnapshot: unimplemented("\(Self.self).injectProfileSnapshot"),
-		commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: unimplemented("\(Self.self).commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic"),
+		commitOnboardingWallet: unimplemented("\(Self.self).commitOnboardingWallet"),
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
 		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork"),
+		getAccountsOnNetwork: unimplemented("\(Self.self).getAccountsOnNetwork"),
 		getAccounts: unimplemented("\(Self.self).getAccounts"),
 		getPersonas: unimplemented("\(Self.self).getPersonas"),
 		getP2PClients: unimplemented("\(Self.self).getP2PClients"),
@@ -37,8 +38,7 @@ extension ProfileClient {
 		createUnsavedVirtualEntity: unimplemented("\(Self.self).createUnsavedVirtualEntity"),
 		addAccount: unimplemented("\(Self.self).addAccount"),
 		addPersona: unimplemented("\(Self.self).addPersona"),
-		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress"),
-		signersForAccountsGivenAddresses: unimplemented("\(Self.self).signersForAccountsGivenAddresses")
+		lookupAccountByAddress: unimplemented("\(Self.self).lookupAccountByAddress")
 	)
 
 	public static let noop = Self(
@@ -47,13 +47,14 @@ extension ProfileClient {
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
 		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.nebunet },
 		setNetworkAndGateway: { _ in },
-		createEphemeralProfileAndUnsavedOnDeviceFactorSource: { _ in throw NoopError() },
+		createOnboardingWallet: { _ in throw NoopError() },
 		injectProfileSnapshot: { _ in },
-		commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: { _ in },
+		commitOnboardingWallet: { _ in },
 		loadProfile: { .success(nil) },
 		extractProfileSnapshot: { throw NoopError() },
 		deleteProfileAndFactorSources: {},
 		hasAccountOnNetwork: { _ in false },
+		getAccountsOnNetwork: { _ in throw NoopError() },
 		getAccounts: { throw NoopError() },
 		getPersonas: { throw NoopError() },
 		getP2PClients: { throw NoopError() },
@@ -68,8 +69,7 @@ extension ProfileClient {
 		createUnsavedVirtualEntity: { _ in throw NoopError() },
 		addAccount: { _ in },
 		addPersona: { _ in },
-		lookupAccountByAddress: { _ in throw NoopError() },
-		signersForAccountsGivenAddresses: { _ in throw NoopError() }
+		lookupAccountByAddress: { _ in throw NoopError() }
 	)
 }
 

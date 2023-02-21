@@ -2,7 +2,7 @@ import FeatureTestingPrelude
 import FungibleTokenListFeature
 
 final class FungibleTokenListSortingTests: TestCase {
-	let account = OnNetwork.Account.testValue
+	let account = OnNetwork.Account.previewValue0
 	var address: AccountAddress { account.address }
 
 	func test_sortTokensWithValues() {

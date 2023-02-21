@@ -2,6 +2,7 @@ import ClientPrelude
 import Cryptography
 import EngineToolkitClient
 import ProfileClient
+import UseFactorSourceClient
 
 // MARK: - ProfileClient + DependencyKey
 extension ProfileClient: DependencyKey {}
@@ -48,6 +49,13 @@ extension ProfileClient {
 			}
 		}
 
+		let getAccountsOnNetwork: GetAccountsOnNetwork = { networkID in
+			try await profileHolder.get { profile in
+				let onNetwork = try profile.perNetwork.onNetwork(id: networkID)
+				return onNetwork.accounts
+			}
+		}
+
 		let hasAccountOnNetwork: HasAccountOnNetwork = { networkID in
 			try await profileHolder.get { profile in
 				profile.containsNetwork(withID: networkID)
@@ -64,6 +72,11 @@ extension ProfileClient {
 
 			return try await profileHolder.getAsync { profile in
 				let index: Int = {
+					// FIXME: - Multifactor, in the future update to:
+					// We are NOT counting the number of accounts/personas
+					// and returning the next index. We returning index
+					// for this particular factor source on this particular
+					// network for this particular entity type.
 					if let network = try? profile.onNetwork(id: networkID) {
 						switch request.entityKind {
 						case .account:
@@ -77,8 +90,12 @@ extension ProfileClient {
 				}()
 
 				switch request.entityKind {
-				case .account: return try (path: DerivationPath.accountPath(.init(networkID: networkID, index: index, keyKind: request.keyKind)), index: index)
-				case .identity: return try (path: DerivationPath.identityPath(.init(networkID: networkID, index: index, keyKind: request.keyKind)), index: index)
+				case .account:
+					let path = try DerivationPath.accountPath(.init(networkID: networkID, index: index, keyKind: request.keyKind))
+					return (path: path, index: index)
+				case .identity:
+					let path = try DerivationPath.identityPath(.init(networkID: networkID, index: index, keyKind: request.keyKind))
+					return (path: path, index: index)
 				}
 			}
 		}
@@ -97,48 +114,48 @@ extension ProfileClient {
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
-			createEphemeralProfileAndUnsavedOnDeviceFactorSource: { request in
+			createOnboardingWallet: { request in
 				@Dependency(\.mnemonicClient.generate) var generateMnemonic
 
+				let bip39Passphrase = request.bip39Passphrase
 				let mnemonic = try generateMnemonic(request.wordCount, request.language)
-
-				let newProfile = try await Profile.new(
-					networkAndGateway: request.networkAndGateway,
-					mnemonic: mnemonic
+				let mnemonicAndPassphrase = MnemonicWithPassphrase(
+					mnemonic: mnemonic,
+					passphrase: bip39Passphrase
 				)
+				let onDeviceFactorSource = try await FactorSource.babylon(
+					mnemonic: mnemonic,
+					bip39Passphrase: bip39Passphrase
+				)
+				let privateFactorSource = try PrivateHDFactorSource(
+					mnemonicWithPassphrase: mnemonicAndPassphrase,
+					factorSource: onDeviceFactorSource
+				)
+
+				let profile = Profile(factorSource: onDeviceFactorSource)
 
 				// This new profile is marked as "ephemeral" which means it is
 				// not allowed to be persisted to keychain.
-				await profileHolder.injectProfile(newProfile, isEphemeral: true)
+				await profileHolder.injectProfile(profile, isEphemeral: true)
 
-				return CreateEphemeralProfileAndUnsavedOnDeviceFactorSourceResponse(request: request, mnemonic: mnemonic, profile: newProfile)
+				return OnboardingWallet(privateFactorSource: privateFactorSource, profile: profile)
 			},
 			injectProfileSnapshot: { snapshot in
 				let profile = try Profile(snapshot: snapshot)
 				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
-			commitEphemeralProfileAndPersistOnDeviceFactorSourceMnemonic: { request in
-
-				let mnemonic = request.onDeviceFactorSourceMnemonic
-
-				// FIXME: Cleanup post Betanet v2 when we have the new FactorSource format.
-				let expectedFactorSourceID = try HD.Root(
-					seed: mnemonic.seed(passphrase: request.bip39Passphrase)
-				).factorSourceID(
-					curve: Curve25519.self
-				)
-
+			commitOnboardingWallet: { request in
 				try await profileHolder.getAsync { profile in
-					let factorSource = profile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first
-					guard factorSource.factorSourceID == expectedFactorSourceID else {
-						struct DiscrepancyMismatchingFactorSourceIDs: Swift.Error {}
-						throw DiscrepancyMismatchingFactorSourceIDs()
+					guard profile.id == request.profile.id else {
+						struct DiscrepancyMismatchingProfileID: Swift.Error {}
+						throw DiscrepancyMismatchingProfileID()
 					}
+
 					// all good
 					try await keychainClient.updateFactorSource(
-						mnemonic: mnemonic,
-						reference: factorSource.reference
+						mnemonicWithPassphrase: request.privateFactorSource.mnemonicWithPassphrase,
+						factorSourceID: request.privateFactorSource.factorSource.id
 					)
 				}
 
@@ -166,19 +183,13 @@ extension ProfileClient {
 						jsonDecoder: jsonDecoder()
 					)
 				} catch {
-//					return .failure(
-//						.decodingFailure(
-//							json: profileSnapshotData,
-//							.known(.noProfileSnapshotVersionFoundInJSON
-//							)
-//						)
-//					)
-					// FIXME: post betanet v2, remove this and return `failure(.noProfileSnapshotVersionFoundInJSON)`
-					// above instead
-					return .failure(.profileVersionOutdated(
-						json: profileSnapshotData,
-						version: 1 // irrelevant, not show to user.
-					))
+					return .failure(
+						.decodingFailure(
+							json: profileSnapshotData,
+							.known(.noProfileSnapshotVersionFoundInJSON
+							)
+						)
+					)
 				}
 
 				do {
@@ -238,12 +249,10 @@ extension ProfileClient {
 				await profileHolder.removeProfile()
 			},
 			hasAccountOnNetwork: hasAccountOnNetwork,
+			getAccountsOnNetwork: getAccountsOnNetwork,
 			getAccounts: {
 				let currentNetworkID = await getCurrentNetworkID()
-				return try await profileHolder.get { profile in
-					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
-					return onNetwork.accounts
-				}
+				return try await getAccountsOnNetwork(currentNetworkID)
 			},
 			getPersonas: {
 				let currentNetworkID = await getCurrentNetworkID()
@@ -266,7 +275,7 @@ extension ProfileClient {
 			},
 			addConnectedDapp: { connectedDapp in
 				try await profileHolder.asyncMutating { profile in
-					_ = try await profile.addConnectedDapp(connectedDapp)
+					_ = try profile.addConnectedDapp(connectedDapp)
 				}
 			},
 			detailsForConnectedDapp: { connectedDappSimple in
@@ -276,7 +285,7 @@ extension ProfileClient {
 			},
 			updateConnectedDapp: { updated in
 				try await profileHolder.asyncMutating { profile in
-					try await profile.updateConnectedDapp(updated)
+					try profile.updateConnectedDapp(updated)
 				}
 			},
 			addP2PClient: { newClient in
@@ -296,6 +305,8 @@ extension ProfileClient {
 				}
 			},
 			createUnsavedVirtualEntity: { request in
+				@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+
 				let networkID: NetworkID = await {
 					if let networkID = request.networkID {
 						return networkID
@@ -307,30 +318,35 @@ extension ProfileClient {
 
 				let genesisFactorInstance: FactorInstance = try await {
 					let genesisFactorInstanceDerivationStrategy = request.genesisFactorInstanceDerivationStrategy
-					let mnemonic: Mnemonic
-					let factorSource = genesisFactorInstanceDerivationStrategy.factorSource
-					switch genesisFactorInstanceDerivationStrategy {
-					case .loadMnemonicFromKeychainForFactorSource:
-						guard let loadedMnemonic = try await keychainClient.loadFactorSourceMnemonic(
-							reference: factorSource.reference,
-							authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-						) else {
-							struct FailedToFindFactorSource: Swift.Error {}
-							throw FailedToFindFactorSource()
-						}
-						mnemonic = loadedMnemonic
-					case let .useMnemonic(unsavedMnemonic, _):
-						mnemonic = unsavedMnemonic
-					}
 
-					let genesisFactorInstanceResponse = try await factorSource.createAnyFactorInstanceForResponse(
-						input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
-							mnemonic: mnemonic,
-							derivationPath: derivationPath,
-							includePrivateKey: false
-						)
+					let factorSource = genesisFactorInstanceDerivationStrategy.factorSource
+					let publicKey: Engine.PublicKey = try await {
+						switch genesisFactorInstanceDerivationStrategy {
+						case .loadMnemonicFromKeychainForFactorSource:
+							return try await useFactorSourceClient.onDeviceHD(
+								factorSourceID: factorSource.id,
+								keychainAccessFactorSourcesAuthPrompt: request.keychainAccessFactorSourcesAuthPrompt,
+								derivationPath: derivationPath,
+								curve: request.curve,
+								dataToSign: nil
+							).publicKey
+
+						case let .useOnboardingWallet(onboardingWallet):
+							let hdRoot = try onboardingWallet.privateFactorSource.mnemonicWithPassphrase.hdRoot()
+							return try useFactorSourceClient.publicKeyFromOnDeviceHD(.init(
+								hdRoot: hdRoot,
+								derivationPath: derivationPath,
+								curve: request.curve
+							))
+						}
+
+					}()
+
+					return try FactorInstance(
+						factorSourceID: factorSource.id,
+						publicKey: .init(engine: publicKey),
+						derivationPath: derivationPath
 					)
-					return genesisFactorInstanceResponse.factorInstance
 				}()
 
 				let displayName = request.displayName
@@ -345,12 +361,11 @@ extension ProfileClient {
 						publicKey: genesisFactorInstance.publicKey
 					)
 
-					let persona = try OnNetwork.Persona(
+					let persona = OnNetwork.Persona(
 						networkID: networkID,
 						address: identityAddress,
 						securityState: .unsecured(unsecuredControl),
 						index: index,
-						derivationPath: derivationPath.asIdentityPath(),
 						displayName: displayName,
 						fields: .init()
 					)
@@ -361,12 +376,11 @@ extension ProfileClient {
 						publicKey: genesisFactorInstance.publicKey
 					)
 
-					let account = try OnNetwork.Account(
+					let account = OnNetwork.Account(
 						networkID: networkID,
 						address: accountAddress,
 						securityState: .unsecured(unsecuredControl),
 						index: index,
-						derivationPath: derivationPath.asAccountPath(),
 						displayName: displayName
 					)
 					return account
@@ -374,50 +388,15 @@ extension ProfileClient {
 			},
 			addAccount: { account in
 				try await profileHolder.asyncMutating { profile in
-					try await profile.addAccount(account)
+					try profile.addAccount(account)
 				}
 			},
 			addPersona: { persona in
 				try await profileHolder.asyncMutating { profile in
-					try await profile.addPersona(persona)
+					try profile.addPersona(persona)
 				}
 			},
-			lookupAccountByAddress: lookupAccountByAddress,
-			signersForAccountsGivenAddresses: { request in
-
-				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { reference in
-					try await keychainClient.loadFactorSourceMnemonic(
-						reference: reference,
-						authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-					)
-				}
-
-				func getAccountSignersFromAddresses() async throws -> NonEmpty<OrderedSet<SignersOfAccount>>? {
-					guard let addresses = NonEmpty(rawValue: request.addresses) else { return nil }
-
-					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
-
-					return try await profileHolder.getAsync { profile in
-						try await profile.signers(
-							ofEntities: accounts,
-							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-						)
-					}
-				}
-
-				guard let fromAddresses = try? await getAccountSignersFromAddresses() else {
-					// TransactionManifest does not reference any accounts => use any account!
-					return try await profileHolder.getAsync { profile in
-						try await profile.signers(
-							networkID: request.networkID,
-							entityType: OnNetwork.Account.self,
-							entityIndex: 0,
-							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-						)
-					}
-				}
-				return fromAddresses
-			}
+			lookupAccountByAddress: lookupAccountByAddress
 		)
 	}()
 }
