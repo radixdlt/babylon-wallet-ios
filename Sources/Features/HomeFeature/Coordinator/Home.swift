@@ -63,6 +63,7 @@ public struct Home: Sendable, FeatureReducer {
 			case createAccount(CreateAccountCoordinator.State)
 
 			// NB: native case paths should deem this obsolete.
+			// e.g. `state.destination?[keyPath: \.accountDetails] = ...` or even conciser via `@dynamicMemberLookup`
 			var accountDetails: AccountDetails.State? {
 				get {
 					guard case let .accountDetails(state) = self else { return nil }
