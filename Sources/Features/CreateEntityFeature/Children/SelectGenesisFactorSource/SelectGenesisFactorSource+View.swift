@@ -1,3 +1,4 @@
+import Cryptography
 import FeaturePrelude
 
 // MARK: - SelectGenesisFactorSource.View
@@ -22,6 +23,16 @@ extension SelectGenesisFactorSource.View {
 			ForceFullScreen {
 				// FIXME: appStore submission: implement this screen with a picker
 				VStack {
+					Picker(
+						"Curve",
+						selection: viewStore.binding(
+							get: \.selectedCurve,
+							send: { .selectedCurve($0) }
+						)
+					) {
+						Text("Heh")
+					}
+
 					Spacer()
 					Button("Confirm OnDevice factor source") {
 						viewStore.send(.confirmOnDeviceFactorSource)
@@ -36,8 +47,12 @@ extension SelectGenesisFactorSource.View {
 // MARK: - SelectGenesisFactorSource.View.ViewState
 extension SelectGenesisFactorSource.View {
 	struct ViewState: Equatable {
+		let curves: [Slip10Curve]
+		let selectedCurve: Slip10Curve
 		init(state: SelectGenesisFactorSource.State) {
 			// TODO: implement
+			selectedCurve = state.curve
+			curves = Array(Set(state.factorSources.flatMap(\.parameters.supportedCurves.elements)))
 		}
 	}
 }

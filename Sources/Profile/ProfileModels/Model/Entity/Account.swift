@@ -39,11 +39,6 @@ extension OnNetwork {
 		/// and possibly by dApps.
 		public let appearanceID: AppearanceID
 
-		/// The SLIP10 compatible Hierarchical Deterministic derivation path which is used to derive
-		/// the public keys of the factors of the different roles, if the factor source kind of said factor
-		/// instance supports Hierarchical Deterministic derivation.
-		public let derivationPath: EntityDerivationPath
-
 		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 		public let displayName: NonEmpty<String>
 
@@ -53,7 +48,6 @@ extension OnNetwork {
 			securityState: EntitySecurityState,
 			index: Index,
 			appearanceID: AppearanceID? = nil,
-			derivationPath: EntityDerivationPath,
 			displayName: NonEmpty<String>
 		) {
 			self.networkID = networkID
@@ -61,7 +55,6 @@ extension OnNetwork {
 			self.securityState = securityState
 			self.index = index
 			self.appearanceID = appearanceID ?? AppearanceID.fromIndex(index)
-			self.derivationPath = derivationPath
 			self.displayName = displayName
 		}
 	}
@@ -94,8 +87,6 @@ extension OnNetwork.Account {
 	/// A stable and globally unique identifier of an account.
 	public typealias ID = EntityAddress
 
-	public typealias EntityDerivationPath = AccountHierarchicalDeterministicDerivationPath
-
 	/// A stable and globally unique identifier for this account.
 	public var id: ID { address }
 }
@@ -109,7 +100,6 @@ extension OnNetwork.Account {
 				"index": index,
 				"address": address,
 				"securityState": securityState,
-				"derivationPath": derivationPath,
 			],
 			displayStyle: .struct
 		)
@@ -120,8 +110,7 @@ extension OnNetwork.Account {
 		"displayName": \(String(describing: displayName)),
 		"index": \(index),
 		"address": \(address),
-		"securityState": \(securityState),
-		"derivationPath": \(derivationPath)
+		"securityState": \(securityState)
 		"""
 	}
 }

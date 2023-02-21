@@ -1,3 +1,4 @@
+import Cryptography
 import FeaturePrelude
 import ProfileClient
 
@@ -51,12 +52,12 @@ public struct CreateEntityCoordinator<
 			return .none
 
 		case let .internal(.loadFactorSourcesResult(.success(factorSources), specifiedNameForNewEntityToCreate)):
-			precondition(!factorSources.factorSources.isEmpty)
+			precondition(!factorSources.isEmpty)
 
-			if state.config.specificGenesisFactorInstanceDerivationStrategy == nil, factorSources.factorSources.count > 1 {
+			if state.config.specificGenesisFactorInstanceDerivationStrategy == nil, factorSources.count > 1, factorSources.contains(where: \.supportsOlympia) {
 				return goToStep1SelectGenesisFactorSource(
 					entityName: specifiedNameForNewEntityToCreate,
-					factorSources: factorSources.factorSources,
+					factorSources: factorSources,
 					state: &state
 				)
 			} else {
@@ -64,21 +65,20 @@ public struct CreateEntityCoordinator<
 					if let specific = state.config.specificGenesisFactorInstanceDerivationStrategy {
 						return specific
 					}
-					guard let onDevice = factorSources.factorSources[0].any() as? Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource else {
-						fatalError("Only supported Factor Source is Curve25519 onDevice for now.")
-					}
-					return .loadMnemonicFromKeychainForFactorSource(onDevice)
+					return .loadMnemonicFromKeychainForFactorSource(factorSources.device)
 				}()
 
 				return goToStep2Creation(
+					curve: .curve25519, // The babylon execution path, safe to default to curve25519
 					entityName: specifiedNameForNewEntityToCreate,
 					genesisFactorInstanceDerivationStrategy: genesisFactorInstanceDerivationStrategy,
 					state: &state
 				)
 			}
 
-		case let .child(.step1_selectGenesisFactorSource(.delegate(.confirmedFactorSource(factorSource, specifiedNameForNewEntityToCreate)))):
+		case let .child(.step1_selectGenesisFactorSource(.delegate(.confirmedFactorSource(factorSource, specifiedNameForNewEntityToCreate, curve)))):
 			return goToStep2Creation(
+				curve: curve,
 				entityName: specifiedNameForNewEntityToCreate,
 				genesisFactorInstanceDerivationStrategy: .loadMnemonicFromKeychainForFactorSource(factorSource),
 				state: &state
@@ -119,11 +119,13 @@ public struct CreateEntityCoordinator<
 	}
 
 	private func goToStep2Creation(
+		curve: Slip10Curve,
 		entityName: NonEmpty<String>,
 		genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy,
 		state: inout State
 	) -> EffectTask<Action> {
 		state.step = .step2_creationOfEntity(.init(
+			curve: curve,
 			networkID: state.config.specificNetworkID,
 			name: entityName,
 			genesisFactorInstanceDerivationStrategy: genesisFactorInstanceDerivationStrategy

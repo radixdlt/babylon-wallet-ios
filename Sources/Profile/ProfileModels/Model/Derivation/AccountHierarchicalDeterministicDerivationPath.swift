@@ -321,9 +321,6 @@ extension AccountHierarchicalDeterministicDerivationPath {
 	/// Tries to unwraps the nominal type `DerivationPath` (enum)
 	/// into this specific type.
 	public static func unwrap(derivationPath: DerivationPath) -> Self? {
-		switch derivationPath {
-		case let .accountPath(path): return path
-		default: return nil
-		}
+		try? derivationPath.asAccountPath()
 	}
 }

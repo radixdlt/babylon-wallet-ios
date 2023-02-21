@@ -29,11 +29,6 @@ extension OnNetwork {
 		/// peresona on network `testnet` too! However, their `identityAddress`es will differ!
 		public let index: Int
 
-		/// The SLIP10 compatible Hierarchical Deterministic derivation path which is used to derive
-		/// the public keys of the factors of the different roles, if the factor source kind of said factor
-		/// instance supports Hierarchical Deterministic derivation.
-		public let derivationPath: EntityDerivationPath
-
 		/// Security of this persona
 		public var securityState: EntitySecurityState
 
@@ -48,7 +43,6 @@ extension OnNetwork {
 			address: EntityAddress,
 			securityState: EntitySecurityState,
 			index: Index,
-			derivationPath: EntityDerivationPath,
 			displayName: NonEmpty<String>,
 			fields: IdentifiedArrayOf<Field>
 		) {
@@ -56,7 +50,6 @@ extension OnNetwork {
 			self.address = address
 			self.securityState = securityState
 			self.index = index
-			self.derivationPath = derivationPath
 			self.fields = fields
 			self.displayName = displayName
 		}
@@ -74,8 +67,6 @@ extension OnNetwork.Persona {
 	/// A stable and globally unique identifier of an account.
 	public typealias ID = EntityAddress
 
-	public typealias EntityDerivationPath = IdentityHierarchicalDeterministicDerivationPath
-
 	/// A stable and globally unique identifier for this persona.
 	public var id: ID { address }
 }
@@ -88,7 +79,6 @@ extension OnNetwork.Persona {
 				"address": address,
 				"securityState": securityState,
 				"index": index,
-				"derivationPath": derivationPath,
 				"fields": fields,
 				"displayName": String(describing: displayName),
 			],
@@ -102,7 +92,6 @@ extension OnNetwork.Persona {
 		"index": \(index),
 		"address": \(address),
 		"securityState": \(securityState),
-		"derivationPath": \(derivationPath)
 		"fields": \(fields)
 		"""
 	}

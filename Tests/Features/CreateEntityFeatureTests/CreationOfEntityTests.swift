@@ -11,9 +11,10 @@ final class CreationOfEntityTests: TestCase {
 		let account = OnNetwork.Account.previewValue0
 		let store = TestStore(
 			initialState: CreationOfEntity<OnNetwork.Account>.State(
+				curve: .curve25519,
 				networkID: .nebunet,
 				name: account.displayName,
-				genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy.loadMnemonicFromKeychainForFactorSource(.previewValue)
+				genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy.loadMnemonicFromKeychainForFactorSource(.previewValueDevice)
 			),
 			reducer: CreationOfEntity<OnNetwork.Account>()
 		) {
@@ -35,9 +36,10 @@ final class CreationOfEntityTests: TestCase {
 		let createNewAccountError = NSError.testValue(domain: "Create New Account Request")
 		let store = TestStore(
 			initialState: CreationOfEntity<OnNetwork.Account>.State(
+				curve: .curve25519,
 				networkID: .nebunet,
 				name: "NeverCreated",
-				genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy.loadMnemonicFromKeychainForFactorSource(.previewValue)
+				genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy.loadMnemonicFromKeychainForFactorSource(.previewValueDevice)
 			),
 			reducer: CreationOfEntity<OnNetwork.Account>()
 		) {

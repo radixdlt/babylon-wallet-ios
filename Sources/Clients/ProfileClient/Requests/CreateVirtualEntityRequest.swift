@@ -4,16 +4,14 @@ import ProfileModels
 
 // MARK: - GenesisFactorInstanceDerivationStrategy
 public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {
-	case loadMnemonicFromKeychainForFactorSource(Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource)
+	case loadMnemonicFromKeychainForFactorSource(FactorSource)
 
-	/// Needed when creating a virtual entity as part of NewProfileThenAccount flow (part of Onboarding),
-	/// during which no mnemonic has yet been saved into keychain.
-	case useMnemonic(Mnemonic, forFactorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource)
+	case useOnboardingWallet(OnboardingWallet)
 
-	public var factorSource: Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource {
+	public var factorSource: FactorSource {
 		switch self {
 		case let .loadMnemonicFromKeychainForFactorSource(factorSource): return factorSource
-		case let .useMnemonic(_, factorSource): return factorSource
+		case let .useOnboardingWallet(onboardingWallet): return onboardingWallet.privateFactorSource.factorSource
 		}
 	}
 }
@@ -26,17 +24,20 @@ public struct CreateVirtualEntityRequest: Sendable, Equatable {
 	// FIXME: change to shared HDFactorSource
 	public let genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy
 
+	public let curve: Slip10Curve
 	public let entityKind: EntityKind
 	public let displayName: NonEmpty<String>
 	public let keychainAccessFactorSourcesAuthPrompt: String
 
 	public init(
+		curve: Slip10Curve,
 		networkID: NetworkID?,
 		genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy,
 		entityKind: EntityKind,
 		displayName: NonEmpty<String>,
 		keychainAccessFactorSourcesAuthPrompt: String
 	) throws {
+		self.curve = curve
 		self.networkID = networkID
 		self.genesisFactorInstanceDerivationStrategy = genesisFactorInstanceDerivationStrategy
 		self.entityKind = entityKind
@@ -47,6 +48,11 @@ public struct CreateVirtualEntityRequest: Sendable, Equatable {
 
 extension CreateVirtualEntityRequest {
 	public func getDerivationPathRequest() throws -> GetDerivationPathForNewEntityRequest {
-		try .init(networkID: networkID, factorSource: genesisFactorInstanceDerivationStrategy.factorSource, entityKind: entityKind, keyKind: .transactionSigningKey)
+		try .init(
+			networkID: networkID,
+			factorSource: genesisFactorInstanceDerivationStrategy.factorSource,
+			entityKind: entityKind,
+			keyKind: .transactionSigningKey
+		)
 	}
 }

@@ -1,12 +1,8 @@
 import Cryptography
 import Prelude
 
-private func key(from factorSourceReference: FactorSourceReference) -> String {
-	factorSourceReference.id
-}
-
-private func key(from factorInstanceID: FactorInstanceID) -> String {
-	factorInstanceID.id
+private func key(factorSourceID: FactorSource.ID) -> String {
+	factorSourceID.hexCodable.hex()
 }
 
 private let profileSnapshotKeychainKey = "profileSnapshotKeychainKey"
@@ -39,38 +35,27 @@ extension KeychainClient {
 	}
 
 	public func updateFactorSource(
-		mnemonic: Mnemonic,
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		protection: Protection? = nil,
-		reference factorSourceReference: FactorSourceReference
+		factorSourceID: FactorSource.ID
 	) async throws {
+		@Dependency(\.jsonEncoder) var jsonEncoder
+		let jsonData = try jsonEncoder().encode(mnemonicWithPassphrase)
 		try await updateFactorSource(
-			data: mnemonic.entropy().data,
-			reference: factorSourceReference,
+			data: jsonData,
+			factorSourceID: factorSourceID,
 			protection: protection
 		)
 	}
 
 	public func updateFactorSource(
 		data: Data,
-		reference factorSourceReference: FactorSourceReference,
+		factorSourceID: FactorSource.ID,
 		protection: Protection? = nil
 	) async throws {
 		try await updateDataForKey(
 			data,
-			key(from: factorSourceReference),
-			protection,
-			nil
-		)
-	}
-
-	public func updateFactorInstance(
-		privateKey: Curve25519.Signing.PrivateKey,
-		factorInstanceID: FactorInstanceID,
-		protection: Protection? = nil
-	) async throws {
-		try await updateDataForKey(
-			privateKey.rawRepresentation,
-			key(from: factorInstanceID),
+			key(factorSourceID: factorSourceID),
 			protection,
 			nil
 		)
@@ -108,30 +93,23 @@ extension KeychainClient {
 		return try jsonDecoder.decode(ProfileSnapshot.self, from: profileSnapshotData)
 	}
 
-	public func loadFactorSourceMnemonic(
-		reference factorSourceReference: FactorSourceReference,
+	public func loadFactorSourceMnemonicWithPassphrase(
+		factorSourceID: FactorSource.ID,
 		authenticationPrompt: AuthenticationPrompt
-	) async throws -> Mnemonic? {
-		guard let data = try await loadFactorSourceData(
-			reference: factorSourceReference,
+	) async throws -> MnemonicWithPassphrase? {
+		@Dependency(\.jsonDecoder) var jsonDecoder
+		guard let jsonData = try await loadFactorSourceData(
+			factorSourceID: factorSourceID,
 			authenticationPrompt: authenticationPrompt
 		) else { return nil }
-		return try Mnemonic(entropy: .init(data: data))
+		return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: jsonData)
 	}
 
 	public func loadFactorSourceData(
-		reference factorSourceReference: FactorSourceReference,
+		factorSourceID: FactorSource.ID,
 		authenticationPrompt: AuthenticationPrompt
 	) async throws -> Data? {
-		try await dataForKey(key(from: factorSourceReference), authenticationPrompt)
-	}
-
-	public func loadFactorInstancePrivateKey(
-		factorInstanceID: FactorInstanceID,
-		authenticationPrompt: AuthenticationPrompt
-	) async throws -> Curve25519.Signing.PrivateKey? {
-		guard let data = try await dataForKey(key(from: factorInstanceID), authenticationPrompt) else { return nil }
-		return try .init(rawRepresentation: data)
+		try await dataForKey(key(factorSourceID: factorSourceID), authenticationPrompt)
 	}
 }
 
@@ -147,8 +125,8 @@ extension KeychainClient {
 		) else {
 			return
 		}
-		for factorSource in profile.factorSources.anyFactorSources {
-			try await self.removeDataForFactorSource(reference: factorSource.reference)
+		for factorSource in profile.factorSources {
+			try await self.removeDataForFactorSource(id: factorSource.id)
 		}
 
 		try await removeProfileSnapshot()
@@ -159,14 +137,8 @@ extension KeychainClient {
 	}
 
 	public func removeDataForFactorSource(
-		reference factorSourceReference: FactorSourceReference
+		id factorSourceID: FactorSource.ID
 	) async throws {
-		try await removeDataForKey(key(from: factorSourceReference))
-	}
-
-	public func removeDataForFactorInstance(
-		id factorInstanceID: FactorInstanceID
-	) async throws {
-		try await removeDataForKey(key(from: factorInstanceID))
+		try await removeDataForKey(key(factorSourceID: factorSourceID))
 	}
 }

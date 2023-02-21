@@ -30,10 +30,8 @@ final class AppFeatureTests: TestCase {
 
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
 		// GIVEN: an existing profile
-		let existingProfile = try await Profile.new(
-			networkAndGateway: .nebunet,
-			mnemonic: .generate()
-		)
+		let factorSource = try FactorSource.babylon(mnemonic: .generate())
+		let existingProfile = Profile(factorSource: factorSource)
 
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(

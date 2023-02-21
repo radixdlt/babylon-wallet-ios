@@ -9,7 +9,8 @@ public struct PerNetwork:
 	Hashable,
 	Codable,
 	CustomStringConvertible,
-	CustomDumpStringConvertible
+	CustomDumpStringConvertible,
+	ExpressibleByDictionaryLiteral
 {
 	/// An ordered dictionary mapping from a `Network` to an `OnNetwork`, which is a
 	/// collection of accounts, personas and connected dapps.
@@ -25,8 +26,20 @@ public struct PerNetwork:
 }
 
 extension PerNetwork {
+	public typealias Key = NetworkID
+
+	public typealias Value = OnNetwork
+
+	public init(dictionaryLiteral elements: (Key, Value)...) {
+		self.init(dictionary: .init(uniqueKeysWithValues: elements))
+	}
+
 	public var count: Int {
 		dictionary.count
+	}
+
+	public var keys: OrderedSet<NetworkID> {
+		dictionary.keys
 	}
 
 	public func onNetwork(id needle: NetworkID) throws -> OnNetwork {
