@@ -3,6 +3,7 @@ import Foundation
 import KeychainAccess
 
 // MARK: - Keychain + Sendable
+// This is bad, please migrate to actor.
 extension Keychain: @unchecked Sendable {}
 
 // MARK: - KeychainClient + DependencyKey
@@ -10,109 +11,59 @@ extension KeychainClient: DependencyKey {
 	public static let liveValue: Self = {
 		let keychain = Keychain(service: "Radix Wallet")
 			.label("Radix Wallet")
-			.synchronizable(false)
+			.synchronizable(false) // disables iCloud
 			.accessibility(.whenPasscodeSetThisDeviceOnly, authenticationPolicy: .biometryCurrentSet)
 
-		/// Do not run in the main thread if there is a possibility that the item you are trying to add already exists, and protected. Because updating protected items requires authentication.
-		/// https://github.com/kishikawakatsumi/KeychainAccess#closed_lock_with_key-updating-a-touch-id-face-id-protected-item
-		let updateDataForKey: UpdateDataForKey = { @Sendable data, key, maybeProtection, maybeAuthenticationPrompt in
-			guard let protection = maybeProtection else {
-				if let authenticationPrompt = maybeAuthenticationPrompt {
-					return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-						Task {
-							do {
-								try keychain
-									.authenticationPrompt(authenticationPrompt)
-									.set(data, key: key)
-								continuation.resume(returning: ())
-							} catch {
-								continuation.resume(throwing: error)
-							}
-						}
-					}
-				} else {
-					return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-						Task {
-							do {
-								try keychain
-									.set(data, key: key)
-								continuation.resume(returning: ())
-							} catch {
-								continuation.resume(throwing: error)
-							}
-						}
-					}
-				}
+		@Sendable
+		func withAttributes(of request: AddKeychainItemWithRequest) -> Keychain {
+			var handle = keychain
+			if let label = request.label {
+				handle = handle.label(label.rawValue.rawValue)
 			}
-
-			guard let authenticationPrompt = maybeAuthenticationPrompt else {
-				return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-					Task {
-						do {
-							try keychain
-								.accessibility(
-									protection.accessibility,
-									authenticationPolicy: protection.authenticationPolicy
-								)
-								.set(data, key: key)
-							continuation.resume(returning: ())
-						} catch {
-							continuation.resume(throwing: error)
-						}
-					}
-				}
+			if let comment = request.comment {
+				handle = handle.comment(comment.rawValue.rawValue)
 			}
-			return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-				Task {
-					do {
-						try keychain
-							.accessibility(
-								protection.accessibility,
-								authenticationPolicy: protection.authenticationPolicy
-							)
-							.authenticationPrompt(authenticationPrompt)
-							.set(data, key: key)
-						continuation.resume(returning: ())
-					} catch {
-						continuation.resume(throwing: error)
-					}
-				}
-			}
+			return handle
 		}
 
 		return Self(
-			dataForKey: { @Sendable key, authenticationPrompt in
-				/// Do not run in the main thread if there is a possibility that the item you are trying to add already exists, and protected. Because updating protected items requires authentication.
-				/// https://github.com/kishikawakatsumi/KeychainAccess#closed_lock_with_key-updating-a-touch-id-face-id-protected-item
-				try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Data?, Error>) in
-					Task {
-						do {
-							let value = try keychain
-								.authenticationPrompt(authenticationPrompt)
-								.getData(key)
-							continuation.resume(returning: value)
-						} catch {
-							continuation.resume(throwing: error)
-						}
-					}
-				}
+			addDataWithoutAuthForKey: { request in
+				try withAttributes(of: request)
+					.set(request.data, key: request.key.rawValue.rawValue)
 			},
-			removeDataForKey: { @Sendable key in
-				/// Do not run in the main thread if there is a possibility that the item you are trying to add already exists, and protected. Because updating protected items requires authentication.
-				/// https://github.com/kishikawakatsumi/KeychainAccess#closed_lock_with_key-updating-a-touch-id-face-id-protected-item
-				try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-					Task {
-						do {
-							try keychain.remove(key)
-							continuation.resume(returning: ())
-						} catch {
-							continuation.resume(throwing: error)
-						}
-					}
-				}
+			addDataWithAuthForKey: { request in
+				try await Task {
+					try withAttributes(of: request)
+						.accessibility(request.accessibility, authenticationPolicy: request.authenticationPolicy)
+						.set(request.data, key: request.key.rawValue.rawValue)
+				}.value
 			},
-			setDataForKey: { @Sendable in try await updateDataForKey($0, $1, $2, nil) },
-			updateDataForKey: updateDataForKey
+			getDataWithoutAuthForKey: { key in
+				try keychain.getData(key.rawValue.rawValue)
+			},
+			getDataWithAuthForKey: { key, authPrompt in
+				try await Task {
+					try keychain
+						.authenticationPrompt(authPrompt.rawValue.rawValue)
+						.getData(key.rawValue.rawValue)
+				}.value
+			},
+			updateDataWithoutAuthForKey: { data, key in
+				try keychain.set(data, key: key.rawValue.rawValue)
+			},
+			updateDataWithAuthForKey: { data, key, authPrompt in
+				try await Task {
+					try keychain
+						.authenticationPrompt(authPrompt.rawValue.rawValue)
+						.set(data, key: key.rawValue.rawValue)
+				}.value
+			},
+			removeDataForKey: { key in
+				try keychain.remove(key.rawValue.rawValue)
+			},
+			removeAllItems: {
+				try keychain.removeAll()
+			}
 		)
 	}()
 }

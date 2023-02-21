@@ -1,50 +1,111 @@
 import Foundation
 @preconcurrency import KeychainAccess
+import Tagged
 
 // MARK: - KeychainClient
+/// A CRUD client around Keychain, that provides async methods for operations that requires auth
+/// and sync methods for operations on data without authentication.
 public struct KeychainClient: Sendable {
-	public typealias Key = String
+	/// `sync` adds data for `key` protected with specified accessibility, if a `Label` is provided it
+	/// will be set. If a `Comment` is provided, it will be set.
+	public var addDataWithoutAuthForKey: AddDataWithoutAuthForKey
 
-	public var dataForKey: DataForKey
+	/// `async` adds data for `key` protected with specified accessibility and authentication policy.
+	/// If a `Label` is provided it will be set. If a `Comment` is provided, it will be set.
+	public var addDataWithAuthForKey: AddDataWithAuthForKey
+
+	/// `sync` reads data for `key`.
+	public var getDataWithoutAuthForKey: GetDataWithoutAuthForKey
+
+	/// `async` reads data for `key` and prompts user with `AuthenticationPrompt` when doing so.
+	public var getDataWithAuthForKey: GetDataWithAuthForKey
+
+	/// `sync` updates `data` for `key`.
+	public var updateDataWithoutAuthForKey: UpdateDataWithoutAuthForKey
+
+	/// `async` updates `data` by `key` and prompts user with `AuthenticationPrompt` when doing so.
+	public var updateDataWithAuthForKey: UpdateDataWithAuthForKey
+
+	/// There is no way to show auth when removing Keychain item
 	public var removeDataForKey: RemoveDataForKey
 
-	/// Saves items in Keychain using access option `kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly`
-	/// read more: https://developer.apple.com/documentation/security/ksecattraccessiblewhenpasscodesetthisdeviceonly
-	public var setDataForKey: SetDataForKey
-
-	public var updateDataForKey: UpdateDataForKey
-
-	init(
-		dataForKey: @escaping DataForKey,
-		removeDataForKey: @escaping RemoveDataForKey,
-		setDataForKey: @escaping SetDataForKey,
-		updateDataForKey: @escaping UpdateDataForKey
-	) {
-		self.dataForKey = dataForKey
-		self.removeDataForKey = removeDataForKey
-		self.setDataForKey = setDataForKey
-		self.updateDataForKey = updateDataForKey
-	}
+	/// removes all items
+	public var removeAllItems: RemoveAllItems
 }
 
 extension KeychainClient {
-	public typealias DataForKey = @Sendable (Key, AuthenticationPrompt) async throws -> Data?
-	public typealias RemoveDataForKey = @Sendable (Key) async throws -> Void
-	/// Use `Protection` if you want to override default `accessibility` and `authenticationPolicy` configs
-	public typealias SetDataForKey = @Sendable (Data, Key, Protection?) async throws -> Void
-	public typealias UpdateDataForKey = @Sendable (Data, Key, Protection?, AuthenticationPrompt?) async throws -> Void
+	public typealias Label = Tagged<Self, NonEmptyString>
+	public typealias Comment = Tagged<Self, NonEmptyString>
+	public typealias Key = Tagged<Self, NonEmptyString>
+	public typealias AuthenticationPrompt = Tagged<Self, NonEmptyString>
 
-	public struct Protection: Sendable {
-		public let accessibility: KeychainAccess.Accessibility
-		public let authenticationPolicy: AuthenticationPolicy
+	public typealias AddDataWithoutAuthForKey = @Sendable (AddItemWithoutAuthRequest) throws -> Void
+	public typealias AddDataWithAuthForKey = @Sendable (AddItemWithAuthRequest) async throws -> Void
 
-		public init(accessibility: KeychainAccess.Accessibility, authenticationPolicy: AuthenticationPolicy) {
-			self.accessibility = accessibility
-			self.authenticationPolicy = authenticationPolicy
-		}
+	public typealias GetDataWithoutAuthForKey = @Sendable (Key) throws -> Data?
+	public typealias GetDataWithAuthForKey = @Sendable (Key, AuthenticationPrompt) async throws -> Data?
 
-		public static let defaultForProfile = Self(accessibility: .whenPasscodeSetThisDeviceOnly, authenticationPolicy: [])
-	}
+	public typealias UpdateDataWithoutAuthForKey = @Sendable (Data, Key) throws -> Void
+	public typealias UpdateDataWithAuthForKey = @Sendable (Data, Key, AuthenticationPrompt) async throws -> Void
+
+	public typealias RemoveDataForKey = @Sendable (Key) throws -> Void
+	public typealias RemoveAllItems = @Sendable () throws -> Void
 }
 
-public typealias AuthenticationPrompt = String
+// MARK: - AddKeychainItemWithRequest
+public protocol AddKeychainItemWithRequest {
+	var data: Data { get }
+	var key: KeychainClient.Key { get }
+	var accessibility: KeychainAccess.Accessibility { get }
+	var comment: KeychainClient.Comment? { get }
+	var label: KeychainClient.Label? { get }
+}
+
+extension KeychainClient {
+	public struct AddItemWithAuthRequest: Sendable, Equatable, AddKeychainItemWithRequest {
+		public let data: Data
+		public let key: Key
+		public let accessibility: KeychainAccess.Accessibility
+		public let authenticationPolicy: AuthenticationPolicy
+		public let comment: Comment?
+		public let label: Label?
+
+		public init(
+			data: Data,
+			key: Key,
+			accessibility: KeychainAccess.Accessibility,
+			authenticationPolicy: AuthenticationPolicy,
+			comment: Comment?,
+			label: Label?
+		) {
+			self.data = data
+			self.key = key
+			self.accessibility = accessibility
+			self.authenticationPolicy = authenticationPolicy
+			self.comment = comment
+			self.label = label
+		}
+	}
+
+	public struct AddItemWithoutAuthRequest: Sendable, Equatable, AddKeychainItemWithRequest {
+		public let data: Data
+		public let key: Key
+		public let accessibility: KeychainAccess.Accessibility
+		public let comment: Comment?
+		public let label: Label?
+
+		public init(
+			data: Data,
+			key: Key,
+			accessibility: KeychainAccess.Accessibility,
+			comment: Comment?,
+			label: Label?
+		) {
+			self.data = data
+			self.key = key
+			self.accessibility = accessibility
+			self.comment = comment
+			self.label = label
+		}
+	}
+}
