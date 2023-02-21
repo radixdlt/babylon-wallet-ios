@@ -100,7 +100,7 @@ final class ROLAClientTests: TestCase {
 			return (response, json.data)
 		}
 
-		let expectedError = ROLAClient.WellKnownFileCheckError.invalidOriginURL
+		let expectedError = ROLAFailure.invalidOriginURL
 		var didFailWithError: Error?
 
 		// when
@@ -111,7 +111,7 @@ final class ROLAClientTests: TestCase {
 				try await sut.performWellKnownFileCheck(interaction)
 			} catch {
 				didFailWithError = error
-				XCTAssertEqual(error as! ROLAClient.WellKnownFileCheckError, expectedError)
+				XCTAssertEqual(error as! ROLAFailure, expectedError)
 			}
 		}
 
@@ -136,7 +136,7 @@ final class ROLAClientTests: TestCase {
 			return (response, json.data)
 		}
 
-		let expectedError = ROLAClient.WellKnownFileCheckError.uknownFileFormat
+		let expectedError = ROLAFailure.uknownFileFormat
 		var didFailWithError: Error?
 
 		// when
@@ -147,7 +147,7 @@ final class ROLAClientTests: TestCase {
 				try await sut.performWellKnownFileCheck(interaction)
 			} catch {
 				didFailWithError = error
-				XCTAssertEqual(error as! ROLAClient.WellKnownFileCheckError, expectedError)
+				XCTAssertEqual(error as! ROLAFailure, expectedError)
 			}
 		}
 
@@ -173,7 +173,7 @@ final class ROLAClientTests: TestCase {
 			return (response, json.data)
 		}
 
-		let expectedError = ROLAClient.WellKnownFileCheckError.unknownDappDefinitionAddress
+		let expectedError = ROLAFailure.unknownDappDefinitionAddress
 		var didFailWithError: Error?
 
 		// when
@@ -184,7 +184,7 @@ final class ROLAClientTests: TestCase {
 				try await sut.performWellKnownFileCheck(interaction)
 			} catch {
 				didFailWithError = error
-				XCTAssertEqual(error as! ROLAClient.WellKnownFileCheckError, expectedError)
+				XCTAssertEqual(error as! ROLAFailure, expectedError)
 			}
 		}
 

@@ -6,7 +6,7 @@ extension ROLAClient {
 			@Dependency(\.urlSession) var urlSession
 
 			guard let originURL = URL(string: interaction.metadata.origin.rawValue) else {
-				throw WellKnownFileCheckError.invalidOriginURL
+				throw ROLAFailure.invalidOriginURL
 			}
 			let wellKnownFilePath = ".well-known/radix.json"
 			let url = originURL.appending(path: wellKnownFilePath)
@@ -25,12 +25,12 @@ extension ROLAClient {
 			do {
 				response = try JSONDecoder().decode(WellKnownFileResponse.self, from: data)
 			} catch {
-				throw WellKnownFileCheckError.uknownFileFormat
+				throw ROLAFailure.uknownFileFormat
 			}
 
 			let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)
 			guard dAppDefinitionAddresses.contains(interaction.metadata.dAppDefinitionAddress.address) else {
-				throw WellKnownFileCheckError.unknownDappDefinitionAddress
+				throw ROLAFailure.unknownDappDefinitionAddress
 			}
 		}
 	)
@@ -41,15 +41,6 @@ extension ROLAClient {
 		struct Item: Decodable {
 			let dAppDefinitionAddress: String
 		}
-	}
-}
-
-// MARK: - ROLAClient.WellKnownFileCheckError
-extension ROLAClient {
-	enum WellKnownFileCheckError: Error, LocalizedError {
-		case invalidOriginURL
-		case uknownFileFormat
-		case unknownDappDefinitionAddress
 	}
 }
 

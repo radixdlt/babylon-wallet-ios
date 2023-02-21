@@ -42,6 +42,10 @@ extension P2P.ToDapp.WalletInteractionFailureResponse {
 		case submittedTransactionWasDuplicate
 		case submittedTransactionHasFailedTransactionStatus
 		case submittedTransactionHasRejectedTransactionStatus
+		case wrongAccountType
+		case unknownWebsite
+		case radixJsonNotFound
+		case unknownDappDefinitionAddress
 
 		public var errorDescription: String? {
 			switch self {
@@ -67,6 +71,14 @@ extension P2P.ToDapp.WalletInteractionFailureResponse {
 				return "Submitted transaction failed"
 			case .submittedTransactionHasRejectedTransactionStatus:
 				return "Submitted transaction was rejected"
+			case .wrongAccountType:
+				return "Expected to find dapp definition account type"
+			case .unknownWebsite:
+				return "Origin does not match any related website"
+			case .radixJsonNotFound:
+				return "radix.json file is missing"
+			case .unknownDappDefinitionAddress:
+				return "dApp definition address does not match any well known definition address"
 			}
 		}
 	}
