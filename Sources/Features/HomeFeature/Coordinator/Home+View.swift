@@ -31,31 +31,59 @@ extension Home {
 				send: { .view($0) }
 			) { viewStore in
 				NavigationStack {
-					ZStack {
-						homeView(with: viewStore)
-							.onAppear {
-								viewStore.send(.appeared)
+					VStack(spacing: .medium1) {
+						Header.View(
+							store: store.scope(
+								state: \.header,
+								action: { .child(.header($0)) }
+							)
+						)
+						ScrollView {
+							VStack(spacing: .medium1) {
+								AccountList.View(
+									store: store.scope(
+										state: \.accountList,
+										action: { .child(.accountList($0)) }
+									)
+								)
+								.padding(.horizontal, .medium1)
+
+								Button(L10n.Home.CreateAccount.buttonTitle) {
+									viewStore.send(.createAccountButtonTapped)
+								}
+								.buttonStyle(.secondaryRectangular())
 							}
-							.zIndex(0)
-
-						IfLetStore(
-							store.scope(
-								state: \.createAccountCoordinator,
-								action: { .child(.createAccountCoordinator($0)) }
-							),
-							then: { CreateAccountCoordinator.View(store: $0) }
-						)
-						.zIndex(1)
-
-						IfLetStore(
-							store.scope(
-								state: \.accountPreferences,
-								action: { .child(.accountPreferences($0)) }
-							),
-							then: { AccountPreferences.View(store: $0) }
-						)
-						.zIndex(3)
+							.padding(.bottom, .medium1)
+						}
+						.refreshable {
+							await viewStore.send(.pullToRefreshStarted).finish()
+						}
 					}
+//					ZStack {
+//						homeView(with: viewStore)
+//							.onAppear {
+//								viewStore.send(.appeared)
+//							}
+//							.zIndex(0)
+//
+//						IfLetStore(
+//							store.scope(
+//								state: \.createAccountCoordinator,
+//								action: { .child(.createAccountCoordinator($0)) }
+//							),
+//							then: { CreateAccountCoordinator.View(store: $0) }
+//						)
+//						.zIndex(1)
+//
+//						IfLetStore(
+//							store.scope(
+//								state: \.accountPreferences,
+//								action: { .child(.accountPreferences($0)) }
+//							),
+//							then: { AccountPreferences.View(store: $0) }
+//						)
+//						.zIndex(3)
+//					}
 					.navigationDestination(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 						state: /Home.Destinations.State.accountDetails,
@@ -67,46 +95,12 @@ extension Home {
 			}
 		}
 
-		fileprivate func homeView(with viewStore: ViewStore<Home.ViewState, Home.ViewAction>) -> some SwiftUI.View {
-			VStack {
-				Header.View(
-					store: store.scope(
-						state: \.header,
-						action: { .child(.header($0)) }
-					)
-				)
-				.padding(EdgeInsets(top: .medium1, leading: .large2, bottom: .zero, trailing: .medium1))
+//		fileprivate func homeView(with viewStore: ViewStore<Home.ViewState, Home.ViewAction>) -> some SwiftUI.View {
+		////			VStack {
 
-				ScrollView {
-					LazyVStack(spacing: .medium1) {
-						AccountList.View(
-							store: store.scope(
-								state: \.accountList,
-								action: { .child(.accountList($0)) }
-							)
-						)
-
-						Button(L10n.Home.CreateAccount.buttonTitle) {
-							viewStore.send(.createAccountButtonTapped)
-						}
-						.buttonStyle(.secondaryRectangular())
-
-						Spacer()
-					}
-					.padding(.medium1)
-				}
-				.refreshable {
-					await viewStore.send(.pullToRefreshStarted).finish()
-				}
-			}
-		}
-
-		fileprivate var title: some SwiftUI.View {
-			Text(L10n.AggregatedValue.title)
-				.foregroundColor(.app.buttonTextBlack)
-				.textStyle(.body2Header)
-				.textCase(.uppercase)
-		}
+		////				.padding(EdgeInsets(top: .medium1, leading: .large2, bottom: .zero, trailing: .medium1))
+		////			}
+//		}
 	}
 }
 
