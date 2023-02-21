@@ -8,12 +8,12 @@ public enum Address: Sendable, Codable, Hashable, AddressStringConvertible {
 }
 
 // MARK: Codable
-public extension Address {
+extension Address {
 	private enum CodingKeys: String, CodingKey {
 		case type
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let singleValueContainer = try decoder.singleValueContainer()
 		let discriminator = try container.decode(ValueKind.self, forKey: .type)
@@ -29,7 +29,7 @@ public extension Address {
 		}
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var singleValueContainer = encoder.singleValueContainer()
 		switch self {
 		case let .packageAddress(encodable):
@@ -47,19 +47,46 @@ public protocol AddressStringConvertible {
 	var address: String { get }
 }
 
+extension Address {
+	public var componentAddress: ComponentAddress? {
+		switch self {
+		case let .componentAddress(componentAddress): return componentAddress
+		case .packageAddress, .resourceAddress: return nil
+		}
+	}
+
+	public var asAccountComponentAddress: ComponentAddress? {
+		guard let componentAddress else {
+			return nil
+		}
+		return componentAddress.asAccountComponentAddress
+	}
+}
+
+extension ComponentAddress {
+	public var asAccountComponentAddress: ComponentAddress? {
+		guard isAccountAddress else { return nil }
+		return self
+	}
+
+	public var isAccountAddress: Bool {
+		address.starts(with: "account")
+	}
+}
+
 // MARK: - AddressProtocol
 public protocol AddressProtocol: AddressStringConvertible, ExpressibleByStringLiteral {
 	init(address: String)
 }
 
-public extension AddressProtocol {
-	init(stringLiteral value: String) {
+extension AddressProtocol {
+	public init(stringLiteral value: String) {
 		self.init(address: value)
 	}
 }
 
-public extension Address {
-	var address: String {
+extension Address {
+	public var address: String {
 		switch self {
 		case let .packageAddress(address): return address.address
 		case let .componentAddress(address): return address.address

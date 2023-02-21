@@ -10,12 +10,12 @@ public struct MnemonicClient: Sendable, DependencyKey {
 }
 
 // MARK: MnemonicClient.Generate
-public extension MnemonicClient {
-	typealias Generate = @Sendable (BIP39.WordCount, BIP39.Language) throws -> Mnemonic
+extension MnemonicClient {
+	public typealias Generate = @Sendable (BIP39.WordCount, BIP39.Language) throws -> Mnemonic
 }
 
-public extension MnemonicClient {
-	static let liveValue: Self = .init(generate: { try Mnemonic(wordCount: $0, language: $1) })
+extension MnemonicClient {
+	public static let liveValue: Self = .init(generate: { try Mnemonic(wordCount: $0, language: $1) })
 }
 
 #if DEBUG
@@ -24,8 +24,8 @@ extension MnemonicClient: TestDependencyKey {
 }
 #endif
 
-public extension DependencyValues {
-	var mnemonicClient: MnemonicClient {
+extension DependencyValues {
+	public var mnemonicClient: MnemonicClient {
 		get { self[MnemonicClient.self] }
 		set { self[MnemonicClient.self] = newValue }
 	}

@@ -9,8 +9,8 @@ extension AccountPortfolioFetcher: TestDependencyKey {
 	)
 }
 
-public extension AccountPortfolioFetcher {
-	static let noop = Self(
+extension AccountPortfolioFetcher {
+	public static let noop = Self(
 		fetchPortfolio: { _ in [:] }
 	)
 }

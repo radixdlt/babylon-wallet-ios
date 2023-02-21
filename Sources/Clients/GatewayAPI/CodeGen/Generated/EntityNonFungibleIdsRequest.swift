@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,12 +14,12 @@ import AnyCodable
 public typealias EntityNonFungibleIdsRequest = GatewayAPI.EntityNonFungibleIdsRequest
 
 // MARK: - GatewayAPI.EntityNonFungibleIdsRequest
-public extension GatewayAPI {
-	struct EntityNonFungibleIdsRequest: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityNonFungibleIdsRequest: Codable, Hashable {
 		public private(set) var atLedgerState: LedgerStateSelector?
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
-		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
+		/** Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var resourceAddress: String?
 		/** This cursor allows forward pagination, by providing the cursor from the previous request. */
 		public private(set) var cursor: String?

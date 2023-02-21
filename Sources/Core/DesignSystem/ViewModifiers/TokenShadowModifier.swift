@@ -10,8 +10,8 @@ struct TokenRowShadow: ViewModifier {
 	}
 }
 
-public extension View {
-	func tokenRowShadow(condition: Bool? = nil) -> some View {
+extension View {
+	public func tokenRowShadow(condition: Bool? = nil) -> some View {
 		modifier(TokenRowShadow(condition: condition))
 	}
 }

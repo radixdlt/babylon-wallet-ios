@@ -1,10 +1,10 @@
-import CreateAccountFeature
+import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - ManageGatewayAPIEndpoints.View
-public extension ManageGatewayAPIEndpoints {
+extension ManageGatewayAPIEndpoints {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<ManageGatewayAPIEndpoints>
 		@FocusState private var focusedField: ManageGatewayAPIEndpoints.State.Field?
 
@@ -14,8 +14,8 @@ public extension ManageGatewayAPIEndpoints {
 	}
 }
 
-public extension ManageGatewayAPIEndpoints.View {
-	var body: some View {
+extension ManageGatewayAPIEndpoints.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -41,13 +41,13 @@ public extension ManageGatewayAPIEndpoints.View {
 }
 
 // MARK: - ManageGatewayAPIEndpoints.View.ViewStore
-private extension ManageGatewayAPIEndpoints.View {
-	typealias ViewStore = ComposableArchitecture.ViewStore<ViewState, ManageGatewayAPIEndpoints.Action.ViewAction>
+extension ManageGatewayAPIEndpoints.View {
+	fileprivate typealias ViewStore = ComposableArchitecture.ViewStore<ViewState, ManageGatewayAPIEndpoints.Action.ViewAction>
 }
 
-private extension ManageGatewayAPIEndpoints.View {
+extension ManageGatewayAPIEndpoints.View {
 	@ViewBuilder
-	func core(viewStore: ViewStore) -> some View {
+	fileprivate func core(viewStore: ViewStore) -> some View {
 		ForceFullScreen {
 			VStack(spacing: .zero) {
 				NavigationBar(
@@ -118,7 +118,7 @@ private extension ManageGatewayAPIEndpoints.View {
 	}
 
 	@ViewBuilder
-	func label(
+	fileprivate func label(
 		_ label: String,
 		value: CustomStringConvertible,
 		valueColor: Color = Color.app.gray2
@@ -136,7 +136,7 @@ private extension ManageGatewayAPIEndpoints.View {
 		.padding(.top, .small3)
 	}
 
-	func networkAndGatewayView(
+	fileprivate func networkAndGatewayView(
 		_ networkAndGateway: AppPreferences.NetworkAndGateway
 	) -> some View {
 		Group {
@@ -145,7 +145,7 @@ private extension ManageGatewayAPIEndpoints.View {
 				.textStyle(.secondaryHeader)
 
 			HStack {
-				label(L10n.ManageGateway.networkName, value: networkAndGateway.network.name)
+				label(L10n.ManageGateway.networkName, value: ViewState.resolveName(network: networkAndGateway.network))
 				Spacer()
 				label(L10n.ManageGateway.networkID, value: networkAndGateway.network.id)
 			}
@@ -173,6 +173,14 @@ extension ManageGatewayAPIEndpoints.View {
 			focusedField = state.focusedField
 		}
 	}
+}
+
+extension ManageGatewayAPIEndpoints.View.ViewState {
+	static func resolveName(network: Network) -> String {
+		networkNameMap[network] ?? network.name.rawValue
+	}
+
+	private static let networkNameMap: [Network: String] = [.nebunet: "betanet", .mardunet: "betanet"]
 }
 
 #if DEBUG

@@ -25,8 +25,8 @@ extension ProfileClient {
 }
 
 // MARK: - P2PConnectivityClient + :LiveValue
-public extension P2PConnectivityClient {
-	static let liveValue: Self = {
+extension P2PConnectivityClient {
+	public static let liveValue: Self = {
 		@Dependency(\.profileClient) var profileClient
 
 		let localNetworkAuthorization = LocalNetworkAuthorization()
@@ -122,10 +122,10 @@ public extension P2PConnectivityClient {
 					@Dependency(\.jsonDecoder) var jsonDecoder
 					let jsonData = msg.messagePayload
 					do {
-						let requestFromDapp = try jsonDecoder().decode(P2P.FromDapp.Request.self, from: jsonData)
+						let interaction = try jsonDecoder().decode(P2P.FromDapp.WalletInteraction.self, from: jsonData)
 						return try await P2P.RequestFromClient(
 							originalMessage: msg,
-							requestFromDapp: requestFromDapp,
+							interaction: interaction,
 							client: client(byID: id)
 						)
 					} catch {

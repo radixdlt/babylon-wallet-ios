@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - AccountPreferences.Action
-public extension AccountPreferences {
+extension AccountPreferences {
 	// MARK: Action
-	enum Action: Sendable, Equatable {
+	public enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
 		case delegate(DelegateAction)
@@ -11,8 +11,8 @@ public extension AccountPreferences {
 }
 
 // MARK: - AccountPreferences.Action.ViewAction
-public extension AccountPreferences.Action {
-	enum ViewAction: Sendable, Equatable {
+extension AccountPreferences.Action {
+	public enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case dismissButtonTapped
 		case faucetButtonTapped
@@ -20,16 +20,16 @@ public extension AccountPreferences.Action {
 }
 
 // MARK: - AccountPreferences.Action.InternalAction
-public extension AccountPreferences.Action {
-	enum InternalAction: Sendable, Equatable {
+extension AccountPreferences.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
 // MARK: - AccountPreferences.Action.SystemAction
-public extension AccountPreferences.Action {
-	enum SystemAction: Sendable, Equatable {
+extension AccountPreferences.Action {
+	public enum SystemAction: Sendable, Equatable {
 		case isAllowedToUseFaucet(TaskResult<Bool>)
 		case refreshAccountCompleted
 		case hideLoader
@@ -37,8 +37,8 @@ public extension AccountPreferences.Action {
 }
 
 // MARK: - AccountPreferences.Action.DelegateAction
-public extension AccountPreferences.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension AccountPreferences.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case dismissAccountPreferences
 		case refreshAccount(AccountAddress)
 	}

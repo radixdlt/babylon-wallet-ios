@@ -4,9 +4,9 @@ import OnboardingFeature
 import SplashFeature
 
 // MARK: - App.View
-public extension App {
+extension App {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -16,15 +16,9 @@ public extension App {
 	}
 }
 
-public extension App.View {
-	var body: some View {
-		VStack(spacing: .zero) {
-			Text(L10n.App.developmentOnlyInfo)
-				.frame(maxWidth: .infinity, alignment: .center)
-				.padding(.small3)
-				.background(Color.app.orange2)
-				.textStyle(.body2HighImportance)
-
+extension App.View {
+	public var body: some View {
+		ZStack {
 			SwitchStore(store.scope(state: \.root)) {
 				CaseLet(
 					state: /App.State.Root.main,
@@ -33,9 +27,9 @@ public extension App.View {
 				)
 
 				CaseLet(
-					state: /App.State.Root.onboarding,
-					action: { App.Action.child(.onboarding($0)) },
-					then: { Onboarding.View(store: $0) }
+					state: /App.State.Root.onboardingCoordinator,
+					action: { App.Action.child(.onboardingCoordinator($0)) },
+					then: { OnboardingCoordinator.View(store: $0) }
 				)
 
 				CaseLet(
@@ -45,16 +39,20 @@ public extension App.View {
 				)
 			}
 			.alert(
-				store.scope(
-					state: \.errorAlert,
-					action: { .view($0) }
-				),
-				dismiss: .errorAlertDismissButtonTapped
+				store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
+				state: /App.Alerts.State.userErrorAlert,
+				action: App.Alerts.Action.userErrorAlert
+			)
+			.alert(
+				store: store.scope(state: \.$alert, action: { .view(.alert($0)) }),
+				state: /App.Alerts.State.incompatibleProfileErrorAlert,
+				action: App.Alerts.Action.incompatibleProfileErrorAlert
 			)
 			.task { @MainActor in
 				await ViewStore(store.stateless).send(.view(.task)).finish()
 			}
-			.overlayLoadingView()
+			.showDeveloperDisclaimerBanner()
+			.presentsLoadingViewOverlay()
 		}
 	}
 }
@@ -68,6 +66,9 @@ struct AppView_Previews: PreviewProvider {
 			store: .init(
 				initialState: .init(),
 				reducer: App()
+					.dependency(\.localAuthenticationClient.queryConfig) {
+						.biometricsAndPasscodeSetUp
+					}
 			)
 		)
 	}

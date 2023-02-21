@@ -1,7 +1,7 @@
 import Prelude
 
-public extension Nonce {
-	static func secureRandom() -> Self {
+extension Nonce {
+	public static func secureRandom() -> Self {
 		let byteCount = RawValue.bitWidth / 8
 		var data = Data(repeating: 0, count: byteCount)
 		data.withUnsafeMutableBytes {

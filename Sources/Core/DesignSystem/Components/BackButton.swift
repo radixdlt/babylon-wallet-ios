@@ -10,12 +10,11 @@ public struct BackButton: View {
 	}
 }
 
-public extension BackButton {
-	var body: some View {
-		Button(
-			action: action,
-			label: { Image(asset: AssetResource.arrowBack) }
-		)
+extension BackButton {
+	public var body: some View {
+		Button(action: action) {
+			Image(asset: AssetResource.arrowBack).tint(.app.gray1)
+		}
 		.frame(.small)
 	}
 }
@@ -24,5 +23,6 @@ public extension BackButton {
 struct BackButton_Previews: PreviewProvider {
 	static var previews: some View {
 		BackButton {}
+			.previewLayout(.sizeThatFits)
 	}
 }

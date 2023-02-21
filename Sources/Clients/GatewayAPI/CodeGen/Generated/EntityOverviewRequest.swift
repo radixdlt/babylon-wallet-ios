@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityOverviewRequest = GatewayAPI.EntityOverviewRequest
 
 // MARK: - GatewayAPI.EntityOverviewRequest
-public extension GatewayAPI {
-	struct EntityOverviewRequest: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityOverviewRequest: Codable, Hashable {
 		public private(set) var atLedgerState: LedgerStateSelector?
 		public private(set) var addresses: [String]
 

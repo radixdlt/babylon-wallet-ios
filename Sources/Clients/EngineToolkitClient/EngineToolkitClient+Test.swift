@@ -9,14 +9,16 @@ extension EngineToolkitClient: TestDependencyKey {
 		convertManifestInstructionsToJSONIfItWasString: { _ in
 			.init(
 				instructions: [],
-				convertedManifestThatContainsThem: .init(instructions: .json([]))
+				convertedManifestThatContainsThem: .init(instructions: .parsed([]))
 			)
 		},
 		compileTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
 		compileSignedTransactionIntent: { _ in .init(bytes: [0xDE, 0xAD]) },
-		compileNotarizedTransactionIntent: { _ in .init(compiledNotarizedIntent: [0xDE, 0xAD]) },
+		compileNotarizedTransactionIntent: { _ in .init(compiledIntent: [0xDE, 0xAD]) },
 		generateTXID: { _ in "deadbeef" },
-		accountAddressesNeedingToSignTransaction: { _ in [] }
+		accountAddressesNeedingToSignTransaction: { _ in [] },
+		accountAddressesSuitableToPayTransactionFee: { _ in [] },
+		knownEntityAddresses: { _ in throw NoopError() }
 	)
 
 	public static let testValue = Self(
@@ -27,6 +29,8 @@ extension EngineToolkitClient: TestDependencyKey {
 		compileSignedTransactionIntent: unimplemented("\(Self.self).compileSignedTransactionIntent"),
 		compileNotarizedTransactionIntent: unimplemented("\(Self.self).compileNotarizedTransactionIntent"),
 		generateTXID: unimplemented("\(Self.self).generateTXID"),
-		accountAddressesNeedingToSignTransaction: unimplemented("\(Self.self).accountAddressesNeedingToSignTransaction")
+		accountAddressesNeedingToSignTransaction: unimplemented("\(Self.self).accountAddressesNeedingToSignTransaction"),
+		accountAddressesSuitableToPayTransactionFee: unimplemented("\(Self.self).accountAddressesSuitableToPayTransactionFee"),
+		knownEntityAddresses: unimplemented("\(Self.self).knownEntityAddresses")
 	)
 }

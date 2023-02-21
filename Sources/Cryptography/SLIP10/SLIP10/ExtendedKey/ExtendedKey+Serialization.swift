@@ -1,8 +1,8 @@
 import Prelude
 
 // MARK: From String
-public extension HD.ExtendedKey {
-	enum Version: UInt32 {
+extension HD.ExtendedKey {
+	public enum Version: UInt32 {
 		case mainnetPublic = 0x0488_B21E
 		case mainnetPrivate = 0x0488_ADE4
 		case testnetPublic = 0x0435_87CF
@@ -23,17 +23,17 @@ public extension HD.ExtendedKey {
 		}
 	}
 
-	func xpub(mainnet: Bool = true) throws -> String {
+	public func xpub(mainnet: Bool = true) throws -> String {
 		let version = mainnet ? Version.mainnetPublic : .testnetPublic
 		return try serialize(version: version)
 	}
 
-	func xprv(mainnet: Bool = true) throws -> String {
+	public func xprv(mainnet: Bool = true) throws -> String {
 		let version = mainnet ? Version.mainnetPrivate : .testnetPrivate
 		return try serialize(version: version)
 	}
 
-	init(string: String) throws {
+	public init(string: String) throws {
 		guard let contents = Base58Check.decode(string) else {
 			throw DeserializationError.failedToBase58Decode
 		}
@@ -81,23 +81,23 @@ public extension HD.ExtendedKey {
 private let serializedByteCount = 78
 
 // MARK: - HD.ExtendedKey.DeserializationError
-public extension HD.ExtendedKey {
-	enum DeserializationError: Swift.Error, Equatable {
+extension HD.ExtendedKey {
+	public enum DeserializationError: Swift.Error, Equatable {
 		case failedToBase58Decode
 		case base58DecodedHasIncorrectLength
 	}
 }
 
 // MARK: - HD.ExtendedKey.SerializationError
-public extension HD.ExtendedKey {
-	enum SerializationError: Swift.Error, Equatable {
+extension HD.ExtendedKey {
+	public enum SerializationError: Swift.Error, Equatable {
 		/// Not possible even in BIP32
 		case privateKeyNotPresent
 	}
 }
 
-private extension HD.ExtendedKey {
-	func serialize(version: Version) throws -> String {
+extension HD.ExtendedKey {
+	fileprivate func serialize(version: Version) throws -> String {
 		if version.isPrivate, self.key.isOnlyPublicKey {
 			throw SerializationError.privateKeyNotPresent
 		}

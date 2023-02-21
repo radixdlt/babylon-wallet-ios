@@ -1,7 +1,7 @@
 import ClientPrelude
 
-public extension DependencyValues {
-	var cameraPermissionClient: CameraPermissionClient {
+extension DependencyValues {
+	public var cameraPermissionClient: CameraPermissionClient {
 		get { self[CameraPermissionClient.self] }
 		set { self[CameraPermissionClient.self] = newValue }
 	}
@@ -16,8 +16,8 @@ extension CameraPermissionClient: TestDependencyKey {
 	)
 }
 
-public extension CameraPermissionClient {
-	static let noop = Self(
+extension CameraPermissionClient {
+	public static let noop = Self(
 		getCameraAccess: { false }
 	)
 }

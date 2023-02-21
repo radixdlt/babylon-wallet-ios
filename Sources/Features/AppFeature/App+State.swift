@@ -4,23 +4,21 @@ import OnboardingFeature
 import SplashFeature
 
 // MARK: App.State
-public extension App {
-	struct State: Equatable {
+extension App {
+	public struct State: Equatable {
 		public enum Root: Equatable {
 			case main(Main.State)
-			case onboarding(Onboarding.State)
+			case onboardingCoordinator(OnboardingCoordinator.State)
 			case splash(Splash.State)
 		}
 
 		public var root: Root
-		public var errorAlert: AlertState<Action.ViewAction>?
 
-		public init(
-			root: Root = .splash(.init()),
-			errorAlert: AlertState<Action.ViewAction>? = nil
-		) {
+		@PresentationState
+		public var alert: Alerts.State?
+
+		public init(root: Root = .splash(.init())) {
 			self.root = root
-			self.errorAlert = errorAlert
 		}
 	}
 }

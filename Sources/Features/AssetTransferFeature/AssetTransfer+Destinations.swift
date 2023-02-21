@@ -1,9 +1,9 @@
 import FeaturePrelude
 import TransactionSigningFeature
 
-public extension AssetTransfer {
-	struct Destinations: ReducerProtocol {
-		public enum State: Equatable {
+extension AssetTransfer {
+	public struct Destinations: ReducerProtocol {
+		public enum State: Hashable {
 			case transactionSigning(TransactionSigning.State)
 		}
 

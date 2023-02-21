@@ -1,5 +1,5 @@
-public extension Identifiable where Self: RawRepresentable, RawValue: Hashable {
-	var id: RawValue {
-		rawValue
+extension Collection where Element: Identifiable {
+	public func first(by id: Element.ID) -> Element? {
+		first(where: { $0.id == id })
 	}
 }

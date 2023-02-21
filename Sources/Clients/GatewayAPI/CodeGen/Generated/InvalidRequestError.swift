@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias InvalidRequestError = GatewayAPI.InvalidRequestError
 
 // MARK: - GatewayAPI.InvalidRequestError
-public extension GatewayAPI {
-	struct InvalidRequestError: Codable, Hashable {
+extension GatewayAPI {
+	public struct InvalidRequestError: Codable, Hashable {
 		/** The type of error. Each subtype may have its own additional structured fields. */
 		public private(set) var type: String
 		/** One or more validation errors which occurred when validating the request. */

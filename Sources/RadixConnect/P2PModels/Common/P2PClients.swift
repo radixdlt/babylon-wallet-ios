@@ -21,68 +21,68 @@ public struct P2PClients:
 }
 
 // MARK: RandomAccessCollection
-public extension P2PClients {
-	typealias Element = P2PClient
+extension P2PClients {
+	public typealias Element = P2PClient
 
-	typealias Index = OrderedSet<P2PClient>.Index
+	public typealias Index = OrderedSet<P2PClient>.Index
 
-	typealias SubSequence = OrderedSet<P2PClient>.SubSequence
+	public typealias SubSequence = OrderedSet<P2PClient>.SubSequence
 
-	typealias Indices = OrderedSet<P2PClient>.Indices
+	public typealias Indices = OrderedSet<P2PClient>.Indices
 
-	var startIndex: Index {
+	public var startIndex: Index {
 		clients.startIndex
 	}
 
-	var indices: Indices {
+	public var indices: Indices {
 		clients.indices
 	}
 
-	var endIndex: Index {
+	public var endIndex: Index {
 		clients.endIndex
 	}
 
-	func formIndex(after index: inout Index) {
+	public func formIndex(after index: inout Index) {
 		clients.formIndex(after: &index)
 	}
 
-	func formIndex(before index: inout Index) {
+	public func formIndex(before index: inout Index) {
 		clients.formIndex(before: &index)
 	}
 
-	subscript(bounds: Range<Index>) -> SubSequence {
+	public subscript(bounds: Range<Index>) -> SubSequence {
 		clients[bounds]
 	}
 
-	subscript(position: Index) -> Element {
+	public subscript(position: Index) -> Element {
 		clients[position]
 	}
 }
 
-public extension P2PClients {
-	init(from decoder: Decoder) throws {
+extension P2PClients {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		try self.init(.init(container.decode([P2PClient].self)))
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		try container.encode(clients.elements)
 	}
 }
 
-public extension P2PClients {
-	init(arrayLiteral elements: P2PClient...) {
+extension P2PClients {
+	public init(arrayLiteral elements: P2PClient...) {
 		self.init(OrderedSet(elements))
 	}
 }
 
-public extension P2PClients {
-	var _description: String {
+extension P2PClients {
+	public var _description: String {
 		String(describing: clients)
 	}
 
-	var description: String {
+	public var description: String {
 		_description
 	}
 }

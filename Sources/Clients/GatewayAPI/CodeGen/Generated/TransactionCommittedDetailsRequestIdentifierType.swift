@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionCommittedDetailsRequestIdentifierType = GatewayAPI.TransactionCommittedDetailsRequestIdentifierType
 
 // MARK: - GatewayAPI.TransactionCommittedDetailsRequestIdentifierType
-public extension GatewayAPI {
-	enum TransactionCommittedDetailsRequestIdentifierType: String, Codable, CaseIterable {
+extension GatewayAPI {
+	public enum TransactionCommittedDetailsRequestIdentifierType: String, Codable, CaseIterable {
 		case intentHash = "intent_hash"
 		case signedIntentHash = "signed_intent_hash"
 		case payloadHash = "payload_hash"

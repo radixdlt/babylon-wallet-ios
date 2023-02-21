@@ -2,13 +2,14 @@ import ClientPrelude
 import Cryptography
 import EngineToolkitClient
 import ProfileClient
+import UseFactorSourceClient
 
 // MARK: - ProfileClient + DependencyKey
 extension ProfileClient: DependencyKey {}
 
 // MARK: - ProfileClient + LiveValue
-public extension ProfileClient {
-	static let liveValue: Self = {
+extension ProfileClient {
+	public static let liveValue: Self = {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.keychainClient) var keychainClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
@@ -48,13 +49,61 @@ public extension ProfileClient {
 			}
 		}
 
+		let getAccountsOnNetwork: GetAccountsOnNetwork = { networkID in
+			try await profileHolder.get { profile in
+				let onNetwork = try profile.perNetwork.onNetwork(id: networkID)
+				return onNetwork.accounts
+			}
+		}
+
 		let hasAccountOnNetwork: HasAccountOnNetwork = { networkID in
 			try await profileHolder.get { profile in
 				profile.containsNetwork(withID: networkID)
 			}
 		}
 
+		let getDerivationPathForNewEntity: GetDerivationPathForNewEntity = { request in
+			let networkID: NetworkID = await {
+				if let networkID = request.networkID {
+					return networkID
+				}
+				return await getCurrentNetworkID()
+			}()
+
+			return try await profileHolder.getAsync { profile in
+				let index: Int = {
+					// FIXME: - Multifactor, in the future update to:
+					// We are NOT counting the number of accounts/personas
+					// and returning the next index. We returning index
+					// for this particular factor source on this particular
+					// network for this particular entity type.
+					if let network = try? profile.onNetwork(id: networkID) {
+						switch request.entityKind {
+						case .account:
+							return network.accounts.count
+						case .identity:
+							return network.personas.count
+						}
+					} else {
+						return 0
+					}
+				}()
+
+				switch request.entityKind {
+				case .account:
+					let path = try DerivationPath.accountPath(.init(networkID: networkID, index: index, keyKind: request.keyKind))
+					return (path: path, index: index)
+				case .identity:
+					let path = try DerivationPath.identityPath(.init(networkID: networkID, index: index, keyKind: request.keyKind))
+					return (path: path, index: index)
+				}
+			}
+		}
+
 		return Self(
+			getFactorSources: {
+				try await profileHolder.getAsync { $0.factorSources }
+			},
 			getCurrentNetworkID: getCurrentNetworkID,
 			getGatewayAPIEndpointBaseURL: getGatewayAPIEndpointBaseURL,
 			getNetworkAndGateway: getNetworkAndGateway,
@@ -65,32 +114,53 @@ public extension ProfileClient {
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
-			createNewProfile: { request in
-
+			createOnboardingWallet: { request in
 				@Dependency(\.mnemonicClient.generate) var generateMnemonic
 
-				let mnemonic = try generateMnemonic(BIP39.WordCount.twentyFour, BIP39.Language.english)
-
-				let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
-				let newProfile = try await Profile.new(
-					networkAndGateway: networkAndGateway,
+				let bip39Passphrase = request.bip39Passphrase
+				let mnemonic = try generateMnemonic(request.wordCount, request.language)
+				let mnemonicAndPassphrase = MnemonicWithPassphrase(
 					mnemonic: mnemonic,
-					firstAccountDisplayName: request.nameOfFirstAccount
+					passphrase: bip39Passphrase
+				)
+				let onDeviceFactorSource = try await FactorSource.babylon(
+					mnemonic: mnemonic,
+					bip39Passphrase: bip39Passphrase
+				)
+				let privateFactorSource = try PrivateHDFactorSource(
+					mnemonicWithPassphrase: mnemonicAndPassphrase,
+					factorSource: onDeviceFactorSource
 				)
 
-				let factorSourceReference = newProfile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.first.reference
+				let profile = Profile(factorSource: onDeviceFactorSource)
 
-				try await keychainClient.updateFactorSource(
-					mnemonic: mnemonic,
-					reference: factorSourceReference
-				)
-				try await keychainClient.updateProfile(profile: newProfile)
+				// This new profile is marked as "ephemeral" which means it is
+				// not allowed to be persisted to keychain.
+				await profileHolder.injectProfile(profile, isEphemeral: true)
 
-				await profileHolder.injectProfile(newProfile)
+				return OnboardingWallet(privateFactorSource: privateFactorSource, profile: profile)
+			},
+			injectProfileSnapshot: { snapshot in
+				let profile = try Profile(snapshot: snapshot)
+				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
+				await profileHolder.injectProfile(profile, isEphemeral: false)
+			},
+			commitOnboardingWallet: { request in
+				try await profileHolder.getAsync { profile in
+					guard profile.id == request.profile.id else {
+						struct DiscrepancyMismatchingProfileID: Swift.Error {}
+						throw DiscrepancyMismatchingProfileID()
+					}
 
-				let accountOnCurrentNetwork = try newProfile.onNetwork(id: networkAndGateway.network.id).accounts.first
+					// all good
+					try await keychainClient.updateFactorSource(
+						mnemonicWithPassphrase: request.privateFactorSource.mnemonicWithPassphrase,
+						factorSourceID: request.privateFactorSource.factorSource.id
+					)
+				}
 
-				return accountOnCurrentNetwork
+				try await profileHolder.persistAndAllowFuturePersistenceOfEphemeralProfile()
+
 			},
 			loadProfile: {
 				@Dependency(\.jsonDecoder) var jsonDecoder
@@ -160,7 +230,7 @@ public extension ProfileClient {
 					)
 				}
 
-				await profileHolder.injectProfile(profile)
+				await profileHolder.injectProfile(profile, isEphemeral: false)
 				return .success(profile)
 			},
 			extractProfileSnapshot: {
@@ -179,12 +249,10 @@ public extension ProfileClient {
 				await profileHolder.removeProfile()
 			},
 			hasAccountOnNetwork: hasAccountOnNetwork,
+			getAccountsOnNetwork: getAccountsOnNetwork,
 			getAccounts: {
 				let currentNetworkID = await getCurrentNetworkID()
-				return try await profileHolder.get { profile in
-					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
-					return onNetwork.accounts
-				}
+				return try await getAccountsOnNetwork(currentNetworkID)
 			},
 			getPersonas: {
 				let currentNetworkID = await getCurrentNetworkID()
@@ -196,6 +264,28 @@ public extension ProfileClient {
 			getP2PClients: {
 				try await profileHolder.get { profile in
 					profile.appPreferences.p2pClients
+				}
+			},
+			getConnectedDapps: {
+				let currentNetworkID = await getCurrentNetworkID()
+				return try await profileHolder.get { profile in
+					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
+					return onNetwork.connectedDapps
+				}
+			},
+			addConnectedDapp: { connectedDapp in
+				try await profileHolder.asyncMutating { profile in
+					_ = try profile.addConnectedDapp(connectedDapp)
+				}
+			},
+			detailsForConnectedDapp: { connectedDappSimple in
+				try await profileHolder.get { profile in
+					try profile.detailsForConnectedDapp(connectedDappSimple)
+				}
+			},
+			updateConnectedDapp: { updated in
+				try await profileHolder.asyncMutating { profile in
+					try profile.updateConnectedDapp(updated)
 				}
 			},
 			addP2PClient: { newClient in
@@ -214,85 +304,99 @@ public extension ProfileClient {
 					profile.appPreferences.display = newDisplayPreferences
 				}
 			},
-			createUnsavedVirtualAccount: { request in
-				try await profileHolder.getAsync { profile in
-					let networkID = await getCurrentNetworkID()
-					return try await profile.creatingNewVirtualAccount(
-						networkID: request.overridingNetworkID ?? networkID,
-						displayName: request.accountName,
-						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-							try await keychainClient
-								.loadFactorSourceMnemonic(
-									reference: reference,
-									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-								)
+			createUnsavedVirtualEntity: { request in
+				@Dependency(\.useFactorSourceClient) var useFactorSourceClient
+
+				let networkID: NetworkID = await {
+					if let networkID = request.networkID {
+						return networkID
+					}
+					return await getCurrentNetworkID()
+				}()
+				let getDerivationPathRequest = try request.getDerivationPathRequest()
+				let (derivationPath, index) = try await getDerivationPathForNewEntity(getDerivationPathRequest)
+
+				let genesisFactorInstance: FactorInstance = try await {
+					let genesisFactorInstanceDerivationStrategy = request.genesisFactorInstanceDerivationStrategy
+
+					let factorSource = genesisFactorInstanceDerivationStrategy.factorSource
+					let publicKey: Engine.PublicKey = try await {
+						switch genesisFactorInstanceDerivationStrategy {
+						case .loadMnemonicFromKeychainForFactorSource:
+							return try await useFactorSourceClient.onDeviceHD(
+								factorSourceID: factorSource.id,
+								keychainAccessFactorSourcesAuthPrompt: request.keychainAccessFactorSourcesAuthPrompt,
+								derivationPath: derivationPath,
+								curve: request.curve,
+								dataToSign: nil
+							).publicKey
+
+						case let .useOnboardingWallet(onboardingWallet):
+							let hdRoot = try onboardingWallet.privateFactorSource.mnemonicWithPassphrase.hdRoot()
+							return try useFactorSourceClient.publicKeyFromOnDeviceHD(.init(
+								hdRoot: hdRoot,
+								derivationPath: derivationPath,
+								curve: request.curve
+							))
 						}
+
+					}()
+
+					return try FactorInstance(
+						factorSourceID: factorSource.id,
+						publicKey: .init(engine: publicKey),
+						derivationPath: derivationPath
 					)
-				}
-			},
-			createUnsavedVirtualPersona: { request in
-				try await profileHolder.getAsync { profile in
-					let networkID = await getCurrentNetworkID()
-					return try await profile.creatingNewVirtualPersona(
-						networkID: request.overridingNetworkID ?? networkID,
-						displayName: request.personaName,
-						fields: request.fields,
-						mnemonicForFactorSourceByReference: { [keychainClient] reference in
-							try await keychainClient
-								.loadFactorSourceMnemonic(
-									reference: reference,
-									authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-								)
-						}
+				}()
+
+				let displayName = request.displayName
+				let unsecuredControl = UnsecuredEntityControl(
+					genesisFactorInstance: genesisFactorInstance
+				)
+
+				switch request.entityKind {
+				case .identity:
+					let identityAddress = try OnNetwork.Persona.deriveAddress(
+						networkID: networkID,
+						publicKey: genesisFactorInstance.publicKey
 					)
+
+					let persona = OnNetwork.Persona(
+						networkID: networkID,
+						address: identityAddress,
+						securityState: .unsecured(unsecuredControl),
+						index: index,
+						displayName: displayName,
+						fields: .init()
+					)
+					return persona
+				case .account:
+					let accountAddress = try OnNetwork.Account.deriveAddress(
+						networkID: networkID,
+						publicKey: genesisFactorInstance.publicKey
+					)
+
+					let account = OnNetwork.Account(
+						networkID: networkID,
+						address: accountAddress,
+						securityState: .unsecured(unsecuredControl),
+						index: index,
+						displayName: displayName
+					)
+					return account
 				}
 			},
 			addAccount: { account in
 				try await profileHolder.asyncMutating { profile in
-					try await profile.addAccount(account)
+					try profile.addAccount(account)
 				}
 			},
 			addPersona: { persona in
 				try await profileHolder.asyncMutating { profile in
-					try await profile.addPersona(persona)
+					try profile.addPersona(persona)
 				}
 			},
-			lookupAccountByAddress: lookupAccountByAddress,
-			signersForAccountsGivenAddresses: { request in
-
-				let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { reference in
-					try await keychainClient.loadFactorSourceMnemonic(
-						reference: reference,
-						authenticationPrompt: request.keychainAccessFactorSourcesAuthPrompt
-					)
-				}
-
-				func getAccountSignersFromAddresses() async throws -> NonEmpty<OrderedSet<SignersOfAccount>>? {
-					guard let addresses = NonEmpty(rawValue: request.addresses) else { return nil }
-
-					let accounts = try await addresses.asyncMap { try await lookupAccountByAddress($0) }
-
-					return try await profileHolder.getAsync { profile in
-						try await profile.signers(
-							ofEntities: accounts,
-							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-						)
-					}
-				}
-
-				guard let fromAddresses = try? await getAccountSignersFromAddresses() else {
-					// TransactionManifest does not reference any accounts => use any account!
-					return try await profileHolder.getAsync { profile in
-						try await profile.signers(
-							networkID: request.networkID,
-							entityType: OnNetwork.Account.self,
-							entityIndex: 0,
-							mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference
-						)
-					}
-				}
-				return fromAddresses
-			}
+			lookupAccountByAddress: lookupAccountByAddress
 		)
 	}()
 }
@@ -309,7 +413,15 @@ struct NoProfile: Swift.Error {}
 // MARK: - ProfileHolder
 private actor ProfileHolder: GlobalActor {
 	@Dependency(\.keychainClient) var keychainClient
+
+	/// If this is set to `true` it means that any edits of the profile should not be persisted at all
+	/// this is used for convenience of implementation of Onboarding flow where we create an ephemeral
+	/// profile which should only be persisted at the end of Onboarding flow. Letting this ephemeral
+	/// profile live here (in stored property `profile`) allows us to use the same APIs as if it would
+	/// have not been ephemeral, and at the
+	private var isEphemeral: Bool = false
 	private var profile: Profile?
+
 	private init() {}
 	fileprivate static let shared = ProfileHolder()
 
@@ -333,8 +445,15 @@ private actor ProfileHolder: GlobalActor {
 		return try await withProfile(profile)
 	}
 
+	func persistAndAllowFuturePersistenceOfEphemeralProfile() async throws {
+		isEphemeral = false
+		try await persistProfileIfAllowed()
+	}
+
+	// if profile is marked as "ephemeral" we will not persist.
 	// Async because we might wanna add iCloud sync here in future.
-	private func persistProfile() async throws {
+	private func persistProfileIfAllowed() async throws {
+		guard !isEphemeral else { return }
 		let profileSnapshot = try takeProfileSnapshot()
 		try await keychainClient.updateProfileSnapshot(profileSnapshot: profileSnapshot)
 	}
@@ -345,11 +464,12 @@ private actor ProfileHolder: GlobalActor {
 		}
 		let result = try await mutateProfile(&profile)
 		self.profile = profile
-		try await persistProfile()
+		// if profile is marked as "ephemeral" we will not persist.
+		try await persistProfileIfAllowed()
 		return result
 	}
 
-	func injectProfile(_ profile: Profile) async {
+	func injectProfile(_ profile: Profile, isEphemeral: Bool) async {
 		self.profile = profile
 	}
 

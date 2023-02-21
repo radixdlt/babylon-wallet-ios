@@ -8,7 +8,7 @@ let package = Package(
 	defaultLocalization: "en",
 	platforms: [
 		.macOS(.v13), // for development purposes
-		.iOS(.v15),
+		.iOS(.v16),
 	]
 )
 
@@ -70,15 +70,26 @@ package.addModules([
 		dependencies: [
 			"TransactionSigningFeature",
 		],
-		tests: .no
+		tests: .yes()
 	),
 	.feature(
-		name: "CreateAccountFeature",
+		name: "CreateEntityFeature",
 		dependencies: [
 			"Cryptography",
 			"GatewayAPI",
 			"LocalAuthenticationClient",
 			"ProfileClient",
+		],
+		tests: .yes()
+	),
+	.feature(
+		name: "DappInteractionFeature",
+		dependencies: [
+			"CreateEntityFeature",
+			"GatewayAPI",
+			"P2PConnectivityClient",
+			"ProfileClient",
+			"TransactionSigningFeature",
 		],
 		tests: .yes()
 	),
@@ -95,23 +106,6 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "GrantDappWalletAccessFeature",
-		dependencies: [
-			"CreateAccountFeature",
-			"ProfileClient",
-		],
-		tests: .yes()
-	),
-	.feature(
-		name: "HandleDappRequests",
-		dependencies: [
-			"GrantDappWalletAccessFeature",
-			"P2PConnectivityClient",
-			"TransactionSigningFeature",
-		],
-		tests: .yes()
-	),
-	.feature(
 		name: "HomeFeature",
 		dependencies: [
 			"AccountListFeature",
@@ -119,8 +113,7 @@ package.addModules([
 			"AccountPortfolio",
 			"AccountPreferencesFeature",
 			"AppSettings",
-			"CreateAccountFeature",
-			"GrantDappWalletAccessFeature",
+			"CreateEntityFeature",
 			"P2PConnectivityClient",
 			"ProfileClient",
 			"TransactionSigningFeature",
@@ -133,19 +126,11 @@ package.addModules([
 		)
 	),
 	.feature(
-		name: "ImportProfileFeature",
-		dependencies: [
-			"Cryptography",
-			"ProfileClient",
-		],
-		tests: .yes()
-	),
-	.feature(
 		name: "MainFeature",
 		dependencies: [
 			"AppSettings",
 			"AccountPortfolio",
-			"HandleDappRequests",
+			"DappInteractionFeature",
 			"HomeFeature",
 			"SettingsFeature",
 		],
@@ -162,7 +147,7 @@ package.addModules([
 	.feature(
 		name: "ManageGatewayAPIEndpointsFeature",
 		dependencies: [
-			"CreateAccountFeature",
+			"CreateEntityFeature",
 			"GatewayAPI",
 		],
 		tests: .yes()
@@ -186,8 +171,15 @@ package.addModules([
 	.feature(
 		name: "OnboardingFeature",
 		dependencies: [
-			"CreateAccountFeature",
-			"ImportProfileFeature",
+			"CreateEntityFeature",
+			"ProfileClient",
+		],
+		tests: .yes()
+	),
+	.feature(
+		name: "PersonasFeature",
+		dependencies: [
+			"CreateEntityFeature",
 		],
 		tests: .yes()
 	),
@@ -197,6 +189,7 @@ package.addModules([
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
+			"PersonasFeature",
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
 			"ProfileView",
 		],
@@ -227,6 +220,7 @@ package.addModules([
 		name: "AccountPortfolio",
 		dependencies: [
 			"AppSettings",
+			"EngineToolkitClient",
 			"GatewayAPI",
 			"ProfileClient",
 		],
@@ -258,7 +252,8 @@ package.addModules([
 			"GatewayAPI",
 			"ProfileClient",
 			"TransactionClient",
-		], tests: .no
+		],
+		tests: .yes()
 	),
 	.client(
 		name: "GatewayAPI",
@@ -293,6 +288,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"Cryptography",
+			"UseFactorSourceClient",
 		],
 		tests: .no
 	),
@@ -311,8 +307,17 @@ package.addModules([
 			"GatewayAPI",
 			"ProfileClient",
 			"AccountPortfolio",
+			"UseFactorSourceClient",
 		],
 		tests: .yes()
+	),
+	.client(
+		name: "UseFactorSourceClient",
+		dependencies: [
+			"Profile",
+			"Cryptography",
+		],
+		tests: .no
 	),
 ])
 
@@ -323,7 +328,7 @@ package.addModules([
 		name: "FeaturePrelude",
 		dependencies: [
 			.product(name: "ComposableArchitecture", package: "swift-composable-architecture") {
-				.package(url: "https://github.com/pointfreeco/swift-composable-architecture", branch: "navigation")
+				.package(url: "https://github.com/davdroman/swift-composable-architecture", branch: "navigation-relay")
 			},
 			"DesignSystem",
 			"Resources",
@@ -344,6 +349,9 @@ package.addModules([
 		dependencies: [
 			.product(name: "Introspect", package: "SwiftUI-Introspect") {
 				.package(url: "https://github.com/siteline/SwiftUI-Introspect", from: "0.1.4")
+			},
+			.product(name: "NavigationTransitions", package: "swiftui-navigation-transitions", condition: .when(platforms: [.iOS])) {
+				.package(url: "https://github.com/davdroman/swiftui-navigation-transitions", from: "0.1.0")
 			},
 			.product(name: "NukeUI", package: "Nuke") {
 				.package(url: "https://github.com/kean/Nuke", from: "11.3.1")
@@ -425,8 +433,12 @@ package.addModules([
 		category: .profile,
 		dependencies: [
 			"Cryptography",
-			"EngineToolkitModels",
+			"EngineToolkit", // address derivation
 			"P2PModels",
+			.product(name: "DeviceKit", package: "DeviceKit", condition: .when(platforms: [.iOS])) {
+				.package(url: "https://github.com/devicekit/DeviceKit", from: "5.0.0")
+			},
+			"Resources", // L10n
 		],
 		tests: .no
 	),
@@ -523,7 +535,11 @@ package.addModules([
 	.module(
 		name: "TestingPrelude",
 		category: .testing,
-		dependencies: [],
+		dependencies: [
+			.product(name: "JSONTesting", package: "swift-json-testing") {
+				.package(url: "https://github.com/davdroman/swift-json-testing", from: "0.1.0")
+			},
+		],
 		tests: .no
 	),
 	.module(
@@ -608,6 +624,12 @@ package.targets.append(
 		path: "Sources/EngineToolkit/RadixEngineToolkit/RadixEngineToolkit.xcframework"
 	)
 )
+
+// MARK: - Unit Tests
+
+package.addModules([
+	.module(name: "Unit Tests", dependencies: [], tests: .no),
+])
 
 // MARK: - Extensions
 

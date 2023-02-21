@@ -2,8 +2,8 @@ import Foundation
 import P2PModels
 import WebRTC
 
-internal extension PeerConnectionState {
-	init(rtcPeerConnectionState: RTCPeerConnectionState) throws {
+extension PeerConnectionState {
+	internal init(rtcPeerConnectionState: RTCPeerConnectionState) throws {
 		switch rtcPeerConnectionState {
 		case .new: self = .new
 		case .connecting: self = .connecting

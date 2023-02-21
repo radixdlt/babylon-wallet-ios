@@ -1,13 +1,15 @@
+import Cryptography
+import EngineToolkit
 import EngineToolkitModels
 import Prelude
 
 // MARK: - OnNetwork.Account
-public extension OnNetwork {
+extension OnNetwork {
 	/// A network unique account with a unique public address and a set of cryptographic
 	/// factors used to control it. The account is either `virtual` or not. By "virtual"
 	/// we mean that the Radix Public Ledger does not yet know of the public address
 	/// of this account.
-	struct Account:
+	public struct Account:
 		EntityProtocol,
 		Sendable,
 		Hashable,
@@ -37,13 +39,8 @@ public extension OnNetwork {
 		/// and possibly by dApps.
 		public let appearanceID: AppearanceID
 
-		/// The SLIP10 compatible Hierarchical Deterministic derivation path which is used to derive
-		/// the public keys of the factors of the different roles, if the factor source kind of said factor
-		/// instance supports Hierarchical Deterministic derivation.
-		public let derivationPath: EntityDerivationPath
-
-		/// An optional displayName or label, used by presentation layer only.
-		public let displayName: String?
+		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
+		public let displayName: NonEmpty<String>
 
 		public init(
 			networkID: NetworkID,
@@ -51,39 +48,51 @@ public extension OnNetwork {
 			securityState: EntitySecurityState,
 			index: Index,
 			appearanceID: AppearanceID? = nil,
-			derivationPath: EntityDerivationPath,
-			displayName: String?
+			displayName: NonEmpty<String>
 		) {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
 			self.index = index
 			self.appearanceID = appearanceID ?? AppearanceID.fromIndex(index)
-			self.derivationPath = derivationPath
 			self.displayName = displayName
 		}
 	}
 }
 
-public extension OnNetwork.Account {
-	static var entityKind: EntityKind { .account }
+extension OnNetwork.Account {
+	public static func deriveAddress(
+		networkID: NetworkID,
+		publicKey: SLIP10.PublicKey
+	) throws -> EntityAddress {
+		let response = try EngineToolkit().deriveVirtualAccountAddressRequest(
+			request: .init(
+				publicKey: publicKey.intoEngine(),
+				networkId: networkID
+			)
+		).get()
 
-	typealias EntityAddress = AccountAddress
-
-	/// Index in list of collection of accounts, per network.
-	typealias Index = Int
-
-	/// A stable and globally unique identifier of an account.
-	typealias ID = EntityAddress
-
-	typealias EntityDerivationPath = AccountHierarchicalDeterministicDerivationPath
-
-	/// A stable and globally unique identifier for this account.
-	var id: ID { address }
+		return try EntityAddress(address: response.virtualAccountAddress.address)
+	}
 }
 
-public extension OnNetwork.Account {
-	var customDumpMirror: Mirror {
+extension OnNetwork.Account {
+	public static var entityKind: EntityKind { .account }
+
+	public typealias EntityAddress = AccountAddress
+
+	/// Index in list of collection of accounts, per network.
+	public typealias Index = Int
+
+	/// A stable and globally unique identifier of an account.
+	public typealias ID = EntityAddress
+
+	/// A stable and globally unique identifier for this account.
+	public var id: ID { address }
+}
+
+extension OnNetwork.Account {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -91,19 +100,17 @@ public extension OnNetwork.Account {
 				"index": index,
 				"address": address,
 				"securityState": securityState,
-				"derivationPath": derivationPath,
 			],
 			displayStyle: .struct
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		"displayName": \(String(describing: displayName)),
 		"index": \(index),
 		"address": \(address),
-		"securityState": \(securityState),
-		"derivationPath": \(derivationPath)
+		"securityState": \(securityState)
 		"""
 	}
 }

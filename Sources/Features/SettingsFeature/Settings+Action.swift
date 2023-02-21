@@ -3,12 +3,13 @@ import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
 import P2PModels
+import PersonasFeature
 import Profile
 
 // MARK: - AppSettings.Action
-public extension AppSettings {
+extension AppSettings {
 	// MARK: Action
-	enum Action: Sendable, Equatable {
+	public enum Action: Sendable, Equatable {
 		case child(ChildAction)
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
@@ -17,16 +18,17 @@ public extension AppSettings {
 }
 
 // MARK: - AppSettings.Action.ChildAction
-public extension AppSettings.Action {
-	enum ChildAction: Sendable, Equatable {
+extension AppSettings.Action {
+	public enum ChildAction: Sendable, Equatable {
 		case manageP2PClients(ManageP2PClients.Action)
 		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
+		case personasCoordinator(PersonasCoordinator.Action)
 	}
 }
 
 // MARK: - AppSettings.Action.ViewAction
-public extension AppSettings.Action {
-	enum ViewAction: Sendable, Equatable {
+extension AppSettings.Action {
+	public enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case dismissSettingsButtonTapped
 		case deleteProfileAndFactorSourcesButtonTapped
@@ -35,6 +37,7 @@ public extension AppSettings.Action {
 		case addP2PClientButtonTapped
 
 		case editGatewayAPIEndpointButtonTapped
+		case personasButtonTapped
 
 		#if DEBUG
 		case debugInspectProfileButtonTapped
@@ -44,16 +47,16 @@ public extension AppSettings.Action {
 }
 
 // MARK: - AppSettings.Action.InternalAction
-public extension AppSettings.Action {
-	enum InternalAction: Sendable, Equatable {
+extension AppSettings.Action {
+	public enum InternalAction: Sendable, Equatable {
 		case view(ViewAction)
 		case system(SystemAction)
 	}
 }
 
 // MARK: - AppSettings.Action.InternalAction.SystemAction
-public extension AppSettings.Action.InternalAction {
-	enum SystemAction: Sendable, Equatable {
+extension AppSettings.Action.InternalAction {
+	public enum SystemAction: Sendable, Equatable {
 		case loadP2PClientsResult(TaskResult<P2PClients>)
 		#if DEBUG
 		case profileToDebugLoaded(Profile)
@@ -62,8 +65,8 @@ public extension AppSettings.Action.InternalAction {
 }
 
 // MARK: - AppSettings.Action.DelegateAction
-public extension AppSettings.Action {
-	enum DelegateAction: Sendable, Equatable {
+extension AppSettings.Action {
+	public enum DelegateAction: Sendable, Equatable {
 		case dismissSettings
 		case deleteProfileAndFactorSources
 		case networkChanged

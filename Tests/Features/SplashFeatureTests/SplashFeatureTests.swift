@@ -21,20 +21,21 @@ final class SplashFeatureTests: TestCase {
 
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 
-		let newProfile = try await Profile.new(networkAndGateway: .hammunet, mnemonic: .generate())
+		let factorSource = try FactorSource.babylon(mnemonic: .generate())
+		let newProfile = Profile(factorSource: factorSource)
 		store.dependencies.profileClient.loadProfile = {
 			.success(newProfile)
 		}
 
 		// when
-		await store.send(.internal(.view(.viewAppeared)))
+		await store.send(.view(.appeared))
 
 		// then
-		await store.receive(.internal(.system(.loadProfileResult(.success(newProfile))))) {
+		await store.receive(.internal(.loadProfileResult(.success(newProfile)))) {
 			$0.loadProfileResult = .success(newProfile)
 		}
 		await testScheduler.advance(by: .seconds(0.2))
-		await store.receive(.internal(.system(.biometricsConfigResult(.success(authBiometricsConfig))))) {
+		await store.receive(.internal(.biometricsConfigResult(.success(authBiometricsConfig)))) {
 			$0.biometricsCheckFailedAlert = .init(
 				title: { .init(L10n.Splash.Alert.BiometricsCheckFailed.title) },
 				actions: {
@@ -56,7 +57,8 @@ final class SplashFeatureTests: TestCase {
 
 	func test__GIVEN__splash_appeared__WHEN__biometrics_configured__THEN__notifies_delegate_with_profile_result() async throws {
 		/// Profile load success
-		let newProfile = try await Profile.new(networkAndGateway: .hammunet, mnemonic: .generate())
+		let factorSource = try FactorSource.babylon(mnemonic: .generate())
+		let newProfile = Profile(factorSource: factorSource)
 		try await assertNotifiesDelegateWithProfileResult(.success(newProfile))
 		try await assertNotifiesDelegateWithProfileResult(.success(nil))
 
@@ -89,14 +91,14 @@ final class SplashFeatureTests: TestCase {
 		}
 
 		// when
-		await store.send(.internal(.view(.viewAppeared)))
+		await store.send(.view(.appeared))
 
 		// then
-		await store.receive(.internal(.system(.loadProfileResult(result)))) {
+		await store.receive(.internal(.loadProfileResult(result))) {
 			$0.loadProfileResult = result
 		}
 		await testScheduler.advance(by: .seconds(0.2))
-		await store.receive(.internal(.system(.biometricsConfigResult(.success(authBiometricsConfig)))))
+		await store.receive(.internal(.biometricsConfigResult(.success(authBiometricsConfig))))
 		await store.receive(.delegate(.profileResultLoaded(result)))
 	}
 }

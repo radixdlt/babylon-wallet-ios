@@ -38,20 +38,20 @@ public struct Indentation {
 	}
 }
 
-public extension Indentation {
-	var leadingPadding: CGFloat {
+extension Indentation {
+	public var leadingPadding: CGFloat {
 		CGFloat(indentationLevel) * pointsToIndentPerLevel
 	}
 
-	var spacing: CGFloat {
+	public var spacing: CGFloat {
 		CGFloat(
 			Double(128) / pow(2.0, Double(indentationLevel))
 		)
 	}
 }
 
-public extension ProfileView {
-	var body: some View {
+extension ProfileView {
+	public var body: some View {
 		ScrollView {
 			VStack(alignment: .leading, spacing: indentation.spacing) {
 				Labeled("Version", value: String(describing: profile.version))
@@ -81,12 +81,12 @@ public protocol IndentedView: SwiftUI.View {
 	var indentation: Indentation { get }
 }
 
-public extension IndentedView {
-	var inOneLevel: Indentation {
+extension IndentedView {
+	public var inOneLevel: Indentation {
 		indentation.inOneLevel
 	}
 
-	var leadingPadding: CGFloat {
+	public var leadingPadding: CGFloat {
 		indentation.leadingPadding
 	}
 }
@@ -98,8 +98,8 @@ public struct FactorSourcesView: IndentedView {
 	public var keychainClient: KeychainClient?
 }
 
-public extension FactorSourcesView {
-	var body: some View {
+extension FactorSourcesView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Factor Sources")
 				.fontWeight(.heavy)
@@ -108,7 +108,7 @@ public extension FactorSourcesView {
 				.font(.title)
 			#endif // os(macOS)
 
-			ForEach(factorSources.anyFactorSources, id: \.factorSourceID) { factorSource in
+			ForEach(factorSources) { factorSource in
 				FactorSourceView(
 					factorSource: factorSource,
 					indentation: inOneLevel,
@@ -122,14 +122,15 @@ public extension FactorSourcesView {
 
 // MARK: - FactorSourceView
 public struct FactorSourceView: IndentedView {
-	public let factorSource: any FactorSourceProtocol
+	public let factorSource: FactorSource
 	public let indentation: Indentation
 	public var keychainClient: KeychainClient?
 	@State private var mnemonicPhraseLoadedFromKeychain: String?
+	@State private var mnemonicPassphraseLoadedFromKeychain: String?
 }
 
-public extension FactorSourceView {
-	var body: some View {
+extension FactorSourceView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Factor Source")
 				.fontWeight(.heavy)
@@ -137,28 +138,33 @@ public extension FactorSourceView {
 				.font(.title)
 			#endif // os(macOS)
 
+			Labeled("Kind", value: factorSource.kind.rawValue)
+			Labeled("Hint", value: factorSource.hint.rawValue)
+			Labeled("Added on", value: factorSource.addedOn.ISO8601Format())
+			Labeled("ID", value: String(factorSource.id.hexCodable.hex().mask(showLast: 6)))
+
 			if let mnemonicPhraseLoadedFromKeychain {
 				VStack {
 					Text("✅ Mnemonic found in keychain ✅")
 					Text(mnemonicPhraseLoadedFromKeychain).fontWeight(.semibold)
+					if let mnemonicPassphraseLoadedFromKeychain {
+						Spacer()
+						Text("Bip39 Passphrase:")
+						Text("'\(mnemonicPassphraseLoadedFromKeychain)'")
+					}
 				}
 				.padding()
 				.border(Color.green, width: 2)
 			}
-
-			Labeled("ID", value: String(factorSource.factorSourceID.id.mask(showLast: 6)))
-			Labeled("Kind", value: factorSource.factorSourceKind.rawValue)
-			Labeled("Created", value: factorSource.creationDate.ISO8601Format())
 		}
 		.padding([.leading], leadingPadding)
 		.task {
-			Task {
-				if let mnemonic = try? await keychainClient?.loadFactorSourceMnemonic(
-					reference: self.factorSource.reference,
-					authenticationPrompt: "Load Mnemonic to display for debugging"
-				) {
-					self.mnemonicPhraseLoadedFromKeychain = mnemonic.phrase
-				}
+			if let mnemonic = try? await keychainClient?.loadFactorSourceMnemonicWithPassphrase(
+				factorSourceID: factorSource.id,
+				authenticationPrompt: "Load Mnemonic to display for debugging"
+			) {
+				self.mnemonicPhraseLoadedFromKeychain = mnemonic.mnemonic.phrase
+				self.mnemonicPassphraseLoadedFromKeychain = mnemonic.passphrase
 			}
 		}
 	}
@@ -170,8 +176,8 @@ public struct AppPreferencesView: IndentedView {
 	public let indentation: Indentation
 }
 
-public extension AppPreferencesView {
-	var body: some View {
+extension AppPreferencesView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("App Preferences")
 				.fontWeight(.heavy)
@@ -204,8 +210,8 @@ public struct NetworkAndGatewayView: IndentedView {
 	public let indentation: Indentation
 }
 
-public extension NetworkAndGatewayView {
-	var body: some View {
+extension NetworkAndGatewayView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Network & Gateway")
 				.fontWeight(.heavy)
@@ -226,8 +232,8 @@ public struct DisplayView: IndentedView {
 	public let indentation: Indentation
 }
 
-public extension DisplayView {
-	var body: some View {
+extension DisplayView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Display")
 				.fontWeight(.heavy)
@@ -246,8 +252,8 @@ public struct P2PClientsView: IndentedView {
 	public let indentation: Indentation
 }
 
-public extension P2PClientsView {
-	var body: some View {
+extension P2PClientsView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("P2PClients")
 				.fontWeight(.heavy)
@@ -273,10 +279,11 @@ public extension P2PClientsView {
 public struct ConnectedDappsView: IndentedView {
 	public let connectedDapps: [OnNetwork.ConnectedDapp]
 	public let indentation: Indentation
+	public let getDetailedConnectedDapp: (OnNetwork.ConnectedDapp) -> OnNetwork.ConnectedDappDetailed
 }
 
-public extension ConnectedDappsView {
-	var body: some View {
+extension ConnectedDappsView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Connected Dapps")
 				.fontWeight(.heavy)
@@ -289,7 +296,8 @@ public extension ConnectedDappsView {
 				ForEach(connectedDapps) { connectedDapp in
 					ConnectedDappView(
 						connectedDapp: connectedDapp,
-						indentation: inOneLevel
+						indentation: inOneLevel,
+						authorizedPersonas: getDetailedConnectedDapp(connectedDapp).detailedAuthorizedPersonas
 					)
 				}
 			}
@@ -302,12 +310,53 @@ public extension ConnectedDappsView {
 public struct ConnectedDappView: IndentedView {
 	public let connectedDapp: OnNetwork.ConnectedDapp
 	public let indentation: Indentation
+	public let authorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>
 }
 
-public extension ConnectedDappView {
-	var body: some View {
+extension ConnectedDappView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("Name", value: String(describing: connectedDapp.name))
+			Labeled("Name", value: String(describing: connectedDapp.displayName))
+			Labeled("Dapp def address", value: String(describing: connectedDapp.dAppDefinitionAddress))
+			ForEach(authorizedPersonas) {
+				DappAuthorizedPersonaView(
+					detailedAuthorizedPersona: $0,
+					indentation: inOneLevel
+				)
+			}
+		}
+		.padding([.leading], leadingPadding)
+	}
+}
+
+// MARK: - DappAuthorizedPersonaView
+public struct DappAuthorizedPersonaView: IndentedView {
+	public let detailedAuthorizedPersona: OnNetwork.AuthorizedPersonaDetailed
+	public let indentation: Indentation
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			Labeled("Address", value: detailedAuthorizedPersona.identityAddress.address)
+			Labeled("Name", value: detailedAuthorizedPersona.displayName.rawValue)
+
+			Text("Fields")
+			ForEach(detailedAuthorizedPersona.fields) { field in
+				VStack {
+					Labeled("id", value: field.id.description)
+					Labeled("kind", value: field.kind.rawValue)
+					Labeled("value", value: field.value.rawValue)
+				}
+			}
+
+			Text("Shared Accounts")
+			if let simpleAccounts = detailedAuthorizedPersona.simpleAccounts {
+				ForEach(simpleAccounts) { simpleAccount in
+					Labeled("displayName", value: simpleAccount.label.rawValue)
+					Labeled("address", value: simpleAccount.address.address)
+					Labeled("appearanceID", value: simpleAccount.appearanceID.description)
+				}
+			} else {
+				Text("None yet")
+			}
 		}
 		.padding([.leading], leadingPadding)
 	}
@@ -319,8 +368,8 @@ public struct P2PClientView: IndentedView {
 	public let indentation: Indentation
 }
 
-public extension P2PClientView {
-	var body: some View {
+extension P2PClientView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("P2P Client")
 				.fontWeight(.heavy)
@@ -342,8 +391,8 @@ public struct PerNetworkView: IndentedView {
 	public let indentation: Indentation
 }
 
-public extension PerNetworkView {
-	var body: some View {
+extension PerNetworkView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Per Network")
 				.fontWeight(.heavy)
@@ -351,7 +400,7 @@ public extension PerNetworkView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			ForEach(perNetwork.dictionary.keys) { networkID in
+			ForEach(perNetwork.keys, id: \.self) { networkID in
 				OnNetworkView(
 					onNetwork: try! perNetwork.onNetwork(id: networkID),
 					indentation: inOneLevel
@@ -368,8 +417,8 @@ public struct OnNetworkView: IndentedView {
 	public let indentation: Indentation
 }
 
-public extension OnNetworkView {
-	var body: some View {
+extension OnNetworkView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Network")
 				.fontWeight(.heavy)
@@ -392,7 +441,9 @@ public extension OnNetworkView {
 			ConnectedDappsView(
 				connectedDapps: onNetwork.connectedDapps.elements,
 				indentation: inOneLevel
-			)
+			) {
+				try! onNetwork.detailsForConnectedDapp($0)
+			}
 		}
 		.padding([.leading], leadingPadding)
 	}
@@ -407,8 +458,8 @@ public struct EntitiesView<Entity: EntityProtocol>: IndentedView {
 	public let indentation: Indentation
 }
 
-public extension EntitiesView {
-	var body: some View {
+extension EntitiesView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text(Entity.entityKind == .identity ? "Personas" : "Accounts")
 				.fontWeight(.heavy)
@@ -436,16 +487,15 @@ public struct EntityView<Entity: EntityProtocol>: IndentedView {
 	public let indentation: Indentation
 }
 
-public extension EntityView {
-	var body: some View {
+extension EntityView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			if let displayName = entity.displayName {
-				Labeled("DisplayName", value: displayName)
+				Labeled("DisplayName", value: displayName.rawValue)
 			}
 
 			Labeled("Index", value: String(describing: entity.index))
 			Labeled("Address", value: entity.address.address)
-			Labeled("Derivation Path", value: entity.derivationPath.derivationPath)
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):
 				UnsecuredEntityControlView(
@@ -458,7 +508,7 @@ public extension EntityView {
 				Group {
 					Text("Persona fields")
 					ForEach(persona.fields) { field in
-						Labeled(field.kind.rawValue, value: field.value)
+						Labeled(field.kind.rawValue, value: field.value.rawValue)
 					}
 				}.padding([.leading], indentation.inOneLevel.leadingPadding)
 			}
@@ -476,8 +526,8 @@ public struct UnsecuredEntityControlView: IndentedView {
 	public let indentation: Indentation
 }
 
-public extension UnsecuredEntityControlView {
-	var body: some View {
+extension UnsecuredEntityControlView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Genesis factor instance")
 				.fontWeight(.heavy)
@@ -486,7 +536,7 @@ public extension UnsecuredEntityControlView {
 			#endif // os(macOS)
 
 			FactorInstanceView(
-				factorInstance: unsecuredControl.genesisFactorInstance.any(),
+				factorInstance: unsecuredControl.genesisFactorInstance,
 				indentation: inOneLevel
 			)
 		}
@@ -495,12 +545,12 @@ public extension UnsecuredEntityControlView {
 
 // MARK: - FactorInstanceView
 public struct FactorInstanceView: IndentedView {
-	public let factorInstance: any FactorInstanceProtocol
+	public let factorInstance: FactorInstance
 	public let indentation: Indentation
 }
 
-public extension FactorInstanceView {
-	var body: some View {
+extension FactorInstanceView {
+	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Factor Instance")
 				.fontWeight(.heavy)
@@ -508,10 +558,7 @@ public extension FactorInstanceView {
 				.font(.title)
 			#endif // os(macOS)
 
-			Labeled("ID", value: String(factorInstance.factorInstanceID.id.mask(showLast: 6)))
-			Labeled("Kind", value: factorInstance.factorInstanceKind.rawValue)
-			Labeled("Initialized On", value: factorInstance.initializationDate.ISO8601Format())
-			Labeled("Factor Source ID", value: String(factorInstance.factorSourceReference.factorSourceID.id.mask(showLast: 6)))
+			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.hexCodable.hex().mask(showLast: 6)))
 		}
 		.padding([.leading], leadingPadding)
 	}

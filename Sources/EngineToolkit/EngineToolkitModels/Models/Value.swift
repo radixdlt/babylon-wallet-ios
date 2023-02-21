@@ -6,8 +6,8 @@ public protocol ValueProtocol {
 	func embedValue() -> Value_
 }
 
-public extension ValueProtocol {
-	var kind: ValueKind { Self.kind }
+extension ValueProtocol {
+	public var kind: ValueKind { Self.kind }
 }
 
 // MARK: - Value_
@@ -16,7 +16,6 @@ public indirect enum Value_: Sendable, Codable, Hashable {
 	// Enum Variants
 	// ==============
 
-	case unit(Unit)
 	case boolean(Bool)
 
 	case i8(Int8)
@@ -35,30 +34,31 @@ public indirect enum Value_: Sendable, Codable, Hashable {
 
 	case `enum`(Enum)
 
-	case option(Value_?)
-	case result(Result<Value_, Value_>)
+	case some(Some)
+	case none
+	case ok(Ok)
+	case err(Err)
+
 	case array(Array_)
 	case tuple(Tuple)
+	case map(Map_)
 
 	case decimal(Decimal_)
 	case preciseDecimal(PreciseDecimal)
 
-	case component(Component)
+	// case own(Own) // Not implemented and commented out because it isn't supported to well by Scrypto
+
 	case packageAddress(PackageAddress)
 	case componentAddress(ComponentAddress)
 	case resourceAddress(ResourceAddress)
-	case systemAddress(SystemAddress)
-
-	case hash(Hash)
 
 	case bucket(Bucket)
 	case proof(Proof)
-	case vault(Vault)
 
-	case nonFungibleId(NonFungibleId)
-	case nonFungibleAddress(NonFungibleAddress)
+	case nonFungibleLocalId(NonFungibleLocalId)
+	case nonFungibleGlobalId(NonFungibleGlobalId)
 
-	case keyValueStore(KeyValueStore)
+	case hash(Hash)
 
 	case ecdsaSecp256k1PublicKey(EcdsaSecp256k1PublicKey)
 	case ecdsaSecp256k1Signature(EcdsaSecp256k1Signature)
@@ -70,16 +70,13 @@ public indirect enum Value_: Sendable, Codable, Hashable {
 	case bytes(Bytes)
 }
 
-public extension Value_ {
+extension Value_ {
 	// ===========
 	// Value Kind
 	// ===========
 
-	var kind: ValueKind {
+	public var kind: ValueKind {
 		switch self {
-		case .unit:
-			return .unit
-
 		case .boolean:
 			return .bool
 
@@ -118,25 +115,27 @@ public extension Value_ {
 
 		case .enum:
 			return .enum
-		case .option:
-			return .option
-		case .result:
-			return .result
+		case .some:
+			return .some
+		case .none:
+			return .none
+		case .ok:
+			return .ok
+		case .err:
+			return .err
 
 		case .array:
 			return .array
-
 		case .tuple:
 			return .tuple
+		case .map:
+			return .map
 
 		case .decimal:
 			return .decimal
 
 		case .preciseDecimal:
 			return .preciseDecimal
-
-		case .component:
-			return .component
 
 		case .packageAddress:
 			return .packageAddress
@@ -147,9 +146,6 @@ public extension Value_ {
 		case .resourceAddress:
 			return .resourceAddress
 
-		case .systemAddress:
-			return .systemAddress
-
 		case .hash:
 			return .hash
 
@@ -157,17 +153,12 @@ public extension Value_ {
 			return .bucket
 		case .proof:
 			return .proof
-		case .vault:
-			return .vault
 
-		case .nonFungibleId:
-			return .nonFungibleId
+		case .nonFungibleLocalId:
+			return .nonFungibleLocalId
 
-		case .nonFungibleAddress:
-			return .nonFungibleAddress
-
-		case .keyValueStore:
-			return .keyValueStore
+		case .nonFungibleGlobalId:
+			return .nonFungibleGlobalId
 
 		case .ecdsaSecp256k1PublicKey:
 			return .ecdsaSecp256k1PublicKey
@@ -192,18 +183,17 @@ public extension Value_ {
 	}
 }
 
-public extension Value_ {
+extension Value_ {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
 		case type
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
-		switch self {
-		case let .unit(value):
-			try value.encode(to: encoder)
 
+	public func encode(to encoder: Encoder) throws {
+		switch self {
 		case let .boolean(value):
 			// `Bool` is already `Codable` so we have to go through its proxy type for JSON coding.
 			try value.proxyEncodable.encode(to: encoder)
@@ -252,10 +242,13 @@ public extension Value_ {
 
 		case let .enum(value):
 			try value.encode(to: encoder)
-		case let .option(value):
-			// `Optional` is already `Codable` so we have to go through its proxy type for JSON coding.
-			try value.proxyEncodable.encode(to: encoder)
-		case let .result(value):
+		case let .some(value):
+			try value.encode(to: encoder)
+		case .none:
+			try None().encode(to: encoder)
+		case let .ok(value):
+			try value.encode(to: encoder)
+		case let .err(value):
 			try value.encode(to: encoder)
 
 		case let .array(value):
@@ -264,13 +257,13 @@ public extension Value_ {
 		case let .tuple(value):
 			try value.encode(to: encoder)
 
+		case let .map(value):
+			try value.encode(to: encoder)
+
 		case let .decimal(value):
 			try value.encode(to: encoder)
 
 		case let .preciseDecimal(value):
-			try value.encode(to: encoder)
-
-		case let .component(value):
 			try value.encode(to: encoder)
 
 		case let .packageAddress(value):
@@ -282,9 +275,6 @@ public extension Value_ {
 		case let .resourceAddress(value):
 			try value.encode(to: encoder)
 
-		case let .systemAddress(value):
-			try value.encode(to: encoder)
-
 		case let .hash(value):
 			try value.encode(to: encoder)
 
@@ -294,16 +284,10 @@ public extension Value_ {
 		case let .proof(value):
 			try value.encode(to: encoder)
 
-		case let .vault(value):
+		case let .nonFungibleLocalId(value):
 			try value.encode(to: encoder)
 
-		case let .nonFungibleId(value):
-			try value.encode(to: encoder)
-
-		case let .nonFungibleAddress(value):
-			try value.encode(to: encoder)
-
-		case let .keyValueStore(value):
+		case let .nonFungibleGlobalId(value):
 			try value.encode(to: encoder)
 
 		case let .ecdsaSecp256k1PublicKey(value):
@@ -328,15 +312,12 @@ public extension Value_ {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: ValueKind = try container.decode(ValueKind.self, forKey: .type)
 
 		switch kind {
-		case .unit:
-			self = try .unit(.init(from: decoder))
-
 		case .bool:
 			// `Bool` is already `Codable` so we have to go through its proxy type for JSON coding.
 			self = try .boolean(Bool.ProxyDecodable(from: decoder).decoded)
@@ -385,11 +366,15 @@ public extension Value_ {
 
 		case .enum:
 			self = try .enum(.init(from: decoder))
-		case .option:
-			// `Optional` is already `Codable` so we have to go through its proxy type for JSON coding.
-			self = try .option(Value_?.ProxyDecodable(from: decoder).decoded)
-		case .result:
-			self = try .result(.init(from: decoder))
+
+		case .some:
+			self = try .some(.init(from: decoder))
+		case .none:
+			self = .none
+		case .ok:
+			self = try .ok(.init(from: decoder))
+		case .err:
+			self = try .err(.init(from: decoder))
 
 		case .array:
 			self = try .array(.init(from: decoder))
@@ -397,14 +382,14 @@ public extension Value_ {
 		case .tuple:
 			self = try .tuple(.init(from: decoder))
 
+		case .map:
+			self = try .map(.init(from: decoder))
+
 		case .decimal:
 			self = try .decimal(.init(from: decoder))
 
 		case .preciseDecimal:
 			self = try .preciseDecimal(.init(from: decoder))
-
-		case .component:
-			self = try .component(.init(from: decoder))
 
 		case .packageAddress:
 			self = try .packageAddress(.init(from: decoder))
@@ -415,9 +400,6 @@ public extension Value_ {
 		case .resourceAddress:
 			self = try .resourceAddress(.init(from: decoder))
 
-		case .systemAddress:
-			self = try .systemAddress(.init(from: decoder))
-
 		case .hash:
 			self = try .hash(.init(from: decoder))
 
@@ -427,17 +409,11 @@ public extension Value_ {
 		case .proof:
 			self = try .proof(.init(from: decoder))
 
-		case .vault:
-			self = try .vault(.init(from: decoder))
+		case .nonFungibleLocalId:
+			self = try .nonFungibleLocalId(.init(from: decoder))
 
-		case .nonFungibleId:
-			self = try .nonFungibleId(.init(from: decoder))
-
-		case .nonFungibleAddress:
-			self = try .nonFungibleAddress(.init(from: decoder))
-
-		case .keyValueStore:
-			self = try .keyValueStore(.init(from: decoder))
+		case .nonFungibleGlobalId:
+			self = try .nonFungibleGlobalId(.init(from: decoder))
 
 		case .ecdsaSecp256k1PublicKey:
 			self = try .ecdsaSecp256k1PublicKey(.init(from: decoder))

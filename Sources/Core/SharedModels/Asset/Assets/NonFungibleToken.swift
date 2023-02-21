@@ -4,19 +4,19 @@ import ProfileModels
 
 // MARK: - NonFungibleToken
 public struct NonFungibleToken: Sendable, Token, Hashable {
-	public let nonFungibleId: ID
-	public typealias ID = NonFungibleId
-	public var id: ID { nonFungibleId }
+	public let nonFungibleLocalId: ID
+	public typealias ID = NonFungibleLocalId
+	public var id: ID { nonFungibleLocalId }
 
 	public init(
-		nonFungibleId: ID
+		nonFungibleLocalId: ID
 	) {
-		self.nonFungibleId = nonFungibleId
+		self.nonFungibleLocalId = nonFungibleLocalId
 	}
 }
 
 // MARK: - NonFungibleTokenContainer
-public struct NonFungibleTokenContainer: Sendable, Identifiable, Equatable {
+public struct NonFungibleTokenContainer: Sendable, Identifiable, Hashable {
 	public let owner: AccountAddress
 	public let resourceAddress: ComponentAddress
 	public var assets: [NonFungibleToken]
@@ -46,8 +46,8 @@ public struct NonFungibleTokenContainer: Sendable, Identifiable, Equatable {
 }
 
 #if DEBUG
-public extension NonFungibleTokenContainer {
-	static let mock1 = Self(
+extension NonFungibleTokenContainer {
+	public static let mock1 = Self(
 		owner: try! .init(address: "account-address"),
 		resourceAddress: .init(address: "resource-address-1"),
 		assets: [.mock1, .mock2, .mock3],
@@ -56,7 +56,7 @@ public extension NonFungibleTokenContainer {
 		iconURL: nil
 	)
 
-	static let mock2 = Self(
+	public static let mock2 = Self(
 		owner: try! .init(address: "account-address"),
 		resourceAddress: .init(address: "resource-address-2"),
 		assets: [.mock1, .mock2, .mock3],
@@ -65,7 +65,7 @@ public extension NonFungibleTokenContainer {
 		iconURL: nil
 	)
 
-	static let mock3 = Self(
+	public static let mock3 = Self(
 		owner: try! .init(address: "account-address"),
 		resourceAddress: .init(address: "resource-address-3"),
 		assets: [.mock1, .mock2, .mock3],
@@ -75,17 +75,17 @@ public extension NonFungibleTokenContainer {
 	)
 }
 
-public extension NonFungibleToken {
-	static let mock1 = Self(
-		nonFungibleId: .string("nft1-deadbeef")
+extension NonFungibleToken {
+	public static let mock1 = Self(
+		nonFungibleLocalId: .string("nft1-deadbeef")
 	)
 
-	static let mock2 = Self(
-		nonFungibleId: .string("nft2-deadbeef")
+	public static let mock2 = Self(
+		nonFungibleLocalId: .string("nft2-deadbeef")
 	)
 
-	static let mock3 = Self(
-		nonFungibleId: .string("nft3-deadbeef")
+	public static let mock3 = Self(
+		nonFungibleLocalId: .string("nft3-deadbeef")
 	)
 }
 #endif

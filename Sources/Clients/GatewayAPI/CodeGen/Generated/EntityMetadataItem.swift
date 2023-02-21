@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,9 +14,12 @@ import AnyCodable
 public typealias EntityMetadataItem = GatewayAPI.EntityMetadataItem
 
 // MARK: - GatewayAPI.EntityMetadataItem
-public extension GatewayAPI {
-	struct EntityMetadataItem: Codable, Hashable {
+extension GatewayAPI {
+	/** Entity metadata key-value pair. */
+	public struct EntityMetadataItem: Codable, Hashable {
+		/** Entity metadata key. */
 		public private(set) var key: String
+		/** Entity metadata value. */
 		public private(set) var value: String
 
 		public init(key: String, value: String) {

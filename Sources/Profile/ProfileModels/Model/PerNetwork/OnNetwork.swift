@@ -14,20 +14,20 @@ public struct OnNetwork:
 	/// have been added and dApps connected.
 	public let networkID: NetworkID
 
-	/// Accounts created by the user for this network.
-	public var accounts: NonEmpty<OrderedSet<Account>>
+	/// A **Non-empty** identifiable ordered set of `Account`s created by the user for this network.
+	public var accounts: NonEmpty<IdentifiedArrayOf<Account>>
 
-	/// Personas created by the user for this network.
-	public var personas: OrderedSet<Persona>
+	/// An Identifiable ordered set of `Persona`s created by the user for this network.
+	public var personas: IdentifiedArrayOf<Persona>
 
-	/// ConnectedDapp the user has connected with on this network.
-	public var connectedDapps: OrderedSet<ConnectedDapp>
+	/// An Identifiable ordered set of `ConnectedDapp`s the user has connected to.
+	public var connectedDapps: IdentifiedArrayOf<ConnectedDapp>
 
 	public init(
 		networkID: NetworkID,
-		accounts: NonEmpty<OrderedSet<Account>>,
-		personas: OrderedSet<Persona>,
-		connectedDapps: OrderedSet<ConnectedDapp>
+		accounts: NonEmpty<IdentifiedArrayOf<Account>>,
+		personas: IdentifiedArrayOf<Persona>,
+		connectedDapps: IdentifiedArrayOf<ConnectedDapp>
 	) {
 		self.networkID = networkID
 		self.accounts = accounts
@@ -36,8 +36,8 @@ public struct OnNetwork:
 	}
 }
 
-public extension OnNetwork {
-	var customDumpMirror: Mirror {
+extension OnNetwork {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -50,7 +50,7 @@ public extension OnNetwork {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		networkID: \(networkID),
 		accounts: \(accounts),

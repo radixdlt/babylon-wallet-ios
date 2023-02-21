@@ -10,12 +10,11 @@ public struct CloseButton: View {
 	}
 }
 
-public extension CloseButton {
-	var body: some View {
-		Button(
-			action: action,
-			label: { Image(asset: AssetResource.close) }
-		)
+extension CloseButton {
+	public var body: some View {
+		Button(action: action) {
+			Image(asset: AssetResource.close).tint(.app.gray1)
+		}
 		.frame(.small)
 	}
 }
@@ -24,5 +23,6 @@ public extension CloseButton {
 struct CloseButton_Previews: PreviewProvider {
 	static var previews: some View {
 		CloseButton {}
+			.previewLayout(.sizeThatFits)
 	}
 }

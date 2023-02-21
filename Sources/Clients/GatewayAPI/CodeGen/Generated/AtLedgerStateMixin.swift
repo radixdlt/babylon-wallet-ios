@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias AtLedgerStateMixin = GatewayAPI.AtLedgerStateMixin
 
 // MARK: - GatewayAPI.AtLedgerStateMixin
-public extension GatewayAPI {
-	struct AtLedgerStateMixin: Codable, Hashable {
+extension GatewayAPI {
+	public struct AtLedgerStateMixin: Codable, Hashable {
 		public private(set) var atLedgerState: LedgerStateSelector?
 
 		public init(atLedgerState: LedgerStateSelector? = nil) {

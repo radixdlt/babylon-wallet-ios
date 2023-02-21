@@ -1,7 +1,7 @@
 import Dependencies
 
-public extension DependencyValues {
-	var userDefaultsClient: UserDefaultsClient {
+extension DependencyValues {
+	public var userDefaultsClient: UserDefaultsClient {
 		get { self[UserDefaultsClient.self] }
 		set { self[UserDefaultsClient.self] = newValue }
 	}
@@ -26,8 +26,8 @@ extension UserDefaultsClient: TestDependencyKey {
 	)
 }
 
-public extension UserDefaultsClient {
-	static let noop = Self(
+extension UserDefaultsClient {
+	public static let noop = Self(
 		stringForKey: { _ in "dummyString " },
 		boolForKey: { _ in false },
 		dataForKey: { _ in nil },
@@ -41,19 +41,19 @@ public extension UserDefaultsClient {
 		setInteger: { _, _ in }
 	)
 
-	mutating func override(bool: Bool, forKey key: String) {
+	public mutating func override(bool: Bool, forKey key: String) {
 		boolForKey = { [self] in $0 == key ? bool : self.boolForKey(key) }
 	}
 
-	mutating func override(data: Data, forKey key: String) {
+	public mutating func override(data: Data, forKey key: String) {
 		dataForKey = { [self] in $0 == key ? data : self.dataForKey(key) }
 	}
 
-	mutating func override(double: Double, forKey key: String) {
+	public mutating func override(double: Double, forKey key: String) {
 		doubleForKey = { [self] in $0 == key ? double : self.doubleForKey(key) }
 	}
 
-	mutating func override(integer: Int, forKey key: String) {
+	public mutating func override(integer: Int, forKey key: String) {
 		integerForKey = { [self] in $0 == key ? integer : self.integerForKey(key) }
 	}
 }

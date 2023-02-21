@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,9 +14,10 @@ import AnyCodable
 public typealias EntityDetailsResponsePackageDetails = GatewayAPI.EntityDetailsResponsePackageDetails
 
 // MARK: - GatewayAPI.EntityDetailsResponsePackageDetails
-public extension GatewayAPI {
-	struct EntityDetailsResponsePackageDetails: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityDetailsResponsePackageDetails: Codable, Hashable {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
+		/** Hex-encoded binary blob. */
 		public private(set) var codeHex: String
 
 		public init(discriminator: EntityDetailsResponseDetailsType, codeHex: String) {

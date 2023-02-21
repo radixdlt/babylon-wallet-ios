@@ -12,10 +12,10 @@ public struct AssembledMessage: Sendable, Hashable {
 	public let messageHash: Data
 }
 
-public extension ChunkedMessagePackageAssembler {
-	typealias Error = ConverseError.ChunkingTransportError.AssemblerError
+extension ChunkedMessagePackageAssembler {
+	public typealias Error = ConverseError.ChunkingTransportError.AssemblerError
 
-	func assemble(packages: [ChunkedMessagePackage]) throws -> AssembledMessage {
+	public func assemble(packages: [ChunkedMessagePackage]) throws -> AssembledMessage {
 		guard
 			!packages.isEmpty
 		else {

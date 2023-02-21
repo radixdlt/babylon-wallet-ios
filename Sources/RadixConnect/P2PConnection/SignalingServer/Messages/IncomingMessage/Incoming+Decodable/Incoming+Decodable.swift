@@ -2,8 +2,8 @@ import Foundation
 import P2PModels
 
 // MARK: - SignalingServerMessage.Incoming.ResponseType
-private extension SignalingServerMessage.Incoming {
-	enum ResponseType: String, Codable, Sendable, Hashable {
+extension SignalingServerMessage.Incoming {
+	fileprivate enum ResponseType: String, Codable, Sendable, Hashable {
 		// MARK: ResponseToRequest
 
 		/// Confirmation sent to us by the signaling server informing us that an RPC message sent by us was accepted by the signaling server, but necessarily received by any remote client yet. If we get this, it means that we did not get `missingRemoteClientError`, and these two events (messages) are mutually exclusive, i.e. the signaling server knows that it can dispatch our sent message to a remote client.
@@ -33,12 +33,12 @@ private extension SignalingServerMessage.Incoming {
 	}
 }
 
-public extension SignalingServerMessage.Incoming {
-	enum CodingKeys: String, CodingKey {
+extension SignalingServerMessage.Incoming {
+	public enum CodingKeys: String, CodingKey {
 		case responseType = "info", requestId, error, source = "target", message = "data"
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let responseType = try container.decode(ResponseType.self, forKey: .responseType)
 
@@ -101,47 +101,47 @@ public extension SignalingServerMessage.Incoming {
 	}
 }
 
-// #if DEBUG
-// extension SignalingServerMessage.Incoming: Encodable {}
-// public extension SignalingServerMessage.Incoming {
-//	func encode(to encoder: Encoder) throws {
-//		var container = encoder.container(keyedBy: CodingKeys.self)
-//		switch self {
-//		case let .fromSignalingServerItself(fromSignalingServerItself):
-//			switch fromSignalingServerItself {
-//			case let .notification(notification):
-//				switch notification {
-//				case .remoteClientJustConnected:
-//					try container.encode(ResponseType.remoteClientJustConnected, forKey: .responseType)
-//				case .remoteClientDisconnected:
-//					try container.encode(ResponseType.remoteClientDisconnected, forKey: .responseType)
-//				case .remoteClientIsAlreadyConnected:
-//					try container.encode(ResponseType.remoteClientIsAlreadyConnected, forKey: .responseType)
-//				}
-//			case let .responseForRequest(responseForRequest):
-//				switch responseForRequest {
-//				case let .failure(failure):
-//					switch failure {
-//					case let .invalidMessageError(error):
-//						try container.encode(ResponseType.invalidMessageError, forKey: .responseType)
-//						try container.encode(error.messageSentThatWasInvalid, forKey: .message)
-//					case let .noRemoteClientToTalkTo(requestId):
-//						try container.encode(ResponseType.missingRemoteClientError, forKey: .responseType)
-//						try container.encode(requestId, forKey: .requestId)
-//					case let .validationError(error):
-//						try container.encode(ResponseType.validationError, forKey: .responseType)
-//						try container.encode(error.requestId, forKey: .requestId)
-//						try container.encode(error.reason.description, forKey: .error)
-//					}
-//				case let .success(requestId):
-//					try container.encode(ResponseType.success, forKey: .responseType)
-//					try container.encode(requestId, forKey: .requestId)
-//				}
-//			}
-//		case let .fromRemoteClientOriginally(fromRemoteClient):
-//			try container.encode(ResponseType.fromRemoteClient, forKey: .responseType)
-//			try container.encode(fromRemoteClient, forKey: .message)
-//		}
-//	}
-// }
-// #endif // DEBUG
+#if DEBUG
+extension SignalingServerMessage.Incoming: Encodable {}
+extension SignalingServerMessage.Incoming {
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		switch self {
+		case let .fromSignalingServerItself(fromSignalingServerItself):
+			switch fromSignalingServerItself {
+			case let .notification(notification):
+				switch notification {
+				case .remoteClientJustConnected:
+					try container.encode(ResponseType.remoteClientJustConnected, forKey: .responseType)
+				case .remoteClientDisconnected:
+					try container.encode(ResponseType.remoteClientDisconnected, forKey: .responseType)
+				case .remoteClientIsAlreadyConnected:
+					try container.encode(ResponseType.remoteClientIsAlreadyConnected, forKey: .responseType)
+				}
+			case let .responseForRequest(responseForRequest):
+				switch responseForRequest {
+				case let .failure(failure):
+					switch failure {
+					case let .invalidMessageError(error):
+						try container.encode(ResponseType.invalidMessageError, forKey: .responseType)
+						try container.encode(error.messageSentThatWasInvalid, forKey: .message)
+					case let .noRemoteClientToTalkTo(requestId):
+						try container.encode(ResponseType.missingRemoteClientError, forKey: .responseType)
+						try container.encode(requestId, forKey: .requestId)
+					case let .validationError(error):
+						try container.encode(ResponseType.validationError, forKey: .responseType)
+						try container.encode(error.requestId, forKey: .requestId)
+						try container.encode(error.reason.description, forKey: .error)
+					}
+				case let .success(requestId):
+					try container.encode(ResponseType.success, forKey: .responseType)
+					try container.encode(requestId, forKey: .requestId)
+				}
+			}
+		case let .fromRemoteClientOriginally(fromRemoteClientOriginally):
+			try container.encode(ResponseType.fromRemoteClientOriginally, forKey: .responseType)
+			try container.encode(fromRemoteClientOriginally, forKey: .message)
+		}
+	}
+}
+#endif // DEBUG

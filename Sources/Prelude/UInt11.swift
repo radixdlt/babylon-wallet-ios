@@ -19,31 +19,31 @@ extension UInt11 {
 }
 
 // MARK: - Convenience Init
-public extension UInt11 {
-	init?<T>(exactly source: T) where T: BinaryInteger {
+extension UInt11 {
+	public init?<T>(exactly source: T) where T: BinaryInteger {
 		guard let valueBoundBy16Bits = UInt16(exactly: source) else { return nil }
 		self.init(valueBoundBy16Bits: valueBoundBy16Bits)
 	}
 
-	init<T>(truncatingIfNeeded source: T) where T: BinaryInteger {
+	public init<T>(truncatingIfNeeded source: T) where T: BinaryInteger {
 		let valueBoundBy16Bits = UInt16(truncatingIfNeeded: source)
 		self.valueBoundBy16Bits = Swift.min(UInt11.max16, valueBoundBy16Bits)
 	}
 
 	/// Creates a new integer value from the given string and radix.
-	init?<S>(_ text: S, radix: Int = 10) where S: StringProtocol {
+	public init?<S>(_ text: S, radix: Int = 10) where S: StringProtocol {
 		guard let uint16 = UInt16(text, radix: radix) else { return nil }
 		self.init(valueBoundBy16Bits: uint16)
 	}
 
-	init(integerLiteral value: Int) {
+	public init(integerLiteral value: Int) {
 		guard let exactly = UInt11(exactly: value) else {
 			fatalError("bad integer literal value does not fit in UInt11, value passed was: \(value)")
 		}
 		self = exactly
 	}
 
-	init?<S>(bits: S) where S: Collection, S.Element == Bool {
+	public init?<S>(bits: S) where S: Collection, S.Element == Bool {
 		if bits.count > UInt11.bitWidth { return nil }
 		self.init(bits.binaryString, radix: 2)
 	}
@@ -82,8 +82,8 @@ extension FixedWidthInteger {
 	}
 }
 
-public extension Int {
-	static let bitsPerByte = 8
+extension Int {
+	public static let bitsPerByte = 8
 }
 
 extension Data {

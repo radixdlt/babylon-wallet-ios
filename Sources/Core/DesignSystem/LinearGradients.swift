@@ -1,59 +1,59 @@
 import Prelude
 import SwiftUI
 
-public extension LinearGradient {
+extension LinearGradient {
 	/// Namespace only
-	struct App { fileprivate init() {} }
+	public struct App { fileprivate init() {} }
 	/// Namespace containing app-specific linear gradients
-	static let app = App()
+	public static let app = App()
 }
 
-public extension LinearGradient.App {
-	var account0: LinearGradient {
+extension LinearGradient.App {
+	public var account0: LinearGradient {
 		LinearGradient(colors: [.app.blue2, .app.account0green], startPoint: .leading, endPoint: .trailing)
 	}
 
-	var account1: LinearGradient {
+	public var account1: LinearGradient {
 		LinearGradient(colors: [.app.blue2, .app.account1pink], startPoint: .leading, endPoint: .trailing)
 	}
 
-	var account2: LinearGradient {
+	public var account2: LinearGradient {
 		LinearGradient(colors: [.app.blue2, .app.blue3], startPoint: .leading, endPoint: .trailing)
 	}
 
-	var account3: LinearGradient {
+	public var account3: LinearGradient {
 		LinearGradient(colors: [.app.green1, .app.blue2], startPoint: .leading, endPoint: .trailing)
 	}
 
-	var account4: LinearGradient {
+	public var account4: LinearGradient {
 		LinearGradient(colors: [.app.account4pink, .app.blue2], startPoint: .leading, endPoint: .trailing)
 	}
 
-	var account5: LinearGradient {
+	public var account5: LinearGradient {
 		LinearGradient(colors: [.app.account5blue, .app.blue2], startPoint: .leading, endPoint: .trailing)
 	}
 
-	var account6: LinearGradient {
+	public var account6: LinearGradient {
 		LinearGradient(colors: [.app.gray1, .app.account6green], startPoint: .leading, endPoint: .trailing)
 	}
 
-	var account7: LinearGradient {
+	public var account7: LinearGradient {
 		LinearGradient(colors: [.app.gray1, .app.account7pink], startPoint: .leading, endPoint: .trailing)
 	}
 
-	var account8: LinearGradient {
+	public var account8: LinearGradient {
 		LinearGradient(colors: [.app.blue2, .app.gray1], startPoint: .leading, endPoint: .trailing)
 	}
 
-	var account9: LinearGradient {
+	public var account9: LinearGradient {
 		LinearGradient(colors: [.app.account9green1, .app.account9green2], startPoint: .leading, endPoint: .trailing)
 	}
 
-	var account10: LinearGradient {
+	public var account10: LinearGradient {
 		LinearGradient(colors: [.app.account10pink1, .app.account10pink2], startPoint: .leading, endPoint: .trailing)
 	}
 
-	var account11: LinearGradient {
+	public var account11: LinearGradient {
 		LinearGradient(
 			colors: [.app.account11green, .app.account11blue1, .app.account11pink],
 			startPoint: .leading,

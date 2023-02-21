@@ -1,25 +1,22 @@
 import FeaturePrelude
 
 // MARK: - AccountList.State
-public extension AccountList {
+extension AccountList {
 	// MARK: State
-	struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		public var accounts: IdentifiedArrayOf<AccountList.Row.State>
-		public var alert: AlertState<Action.ViewAction>?
 
 		public init(
-			accounts: IdentifiedArrayOf<AccountList.Row.State>,
-			alert: AlertState<Action.ViewAction>? = nil
+			accounts: IdentifiedArrayOf<AccountList.Row.State>
 		) {
 			self.accounts = accounts
-			self.alert = alert
 		}
 	}
 }
 
 // MARK: - Convenience
-public extension AccountList.State {
-	init(nonEmptyOrderedSetOfAccounts accounts: NonEmpty<OrderedSet<OnNetwork.Account>>) {
+extension AccountList.State {
+	public init(accounts: NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>) {
 		self.init(
 			accounts: .init(uniqueElements: accounts.rawValue.elements.map(AccountList.Row.State.init(account:)))
 		)
@@ -27,12 +24,17 @@ public extension AccountList.State {
 }
 
 #if DEBUG
-public extension Array where Element == AccountList.Row.State {
-	static let previewValue: Self = []
+extension AccountList.State {
+	static let previewValue: Self = .init(
+		accounts: .init(uniqueElements: [.previewValue]))
 }
 
-public extension IdentifiedArray where Element == AccountList.Row.State, ID == AccountList.Row.State.ID {
-	static let previewValue: Self = .init(uniqueElements: Array<AccountList.Row.State>.previewValue)
+extension Array where Element == AccountList.Row.State {
+	public static let previewValue: Self = []
+}
+
+extension IdentifiedArray where Element == AccountList.Row.State, ID == AccountList.Row.State.ID {
+	public static let previewValue: Self = .init(uniqueElements: Array<AccountList.Row.State>.previewValue)
 }
 
 #endif

@@ -71,7 +71,7 @@ public struct CallFunction: InstructionProtocol {
 	}
 }
 
-public extension CallFunction {
+extension CallFunction {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
@@ -82,7 +82,7 @@ public extension CallFunction {
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
@@ -92,7 +92,7 @@ public extension CallFunction {
 		try container.encode(arguments, forKey: .arguments)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind = try container.decode(InstructionKind.self, forKey: .type)

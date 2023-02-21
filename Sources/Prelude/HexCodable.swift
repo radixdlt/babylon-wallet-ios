@@ -14,6 +14,7 @@ public struct HexCodable:
 	Hashable,
 	Codable,
 	Identifiable,
+	CustomStringConvertible,
 	DataProtocol
 {
 	/// The underlying `Data` that is always hex coded.
@@ -25,82 +26,89 @@ public struct HexCodable:
 }
 
 // MARK: Hex
-public extension HexCodable {
-	init(hex: String) throws {
+extension HexCodable {
+	public init(hex: String) throws {
 		try self.init(data: Data(hex: hex))
 	}
 
-	func hex(options: Data.HexEncodingOptions = []) -> String {
+	public func hex(options: Data.HexEncodingOptions = []) -> String {
 		data.hex(options: options)
 	}
 }
 
 // MARK: Identifiable
-public extension HexCodable {
-	typealias ID = String
+extension HexCodable {
+	public typealias ID = String
 
 	/// The underlying `data` as a hex string.
-	var id: ID {
+	public var id: ID {
 		data.hex()
 	}
 }
 
 // MARK: DataProtocol
-public extension HexCodable {
-	typealias Regions = Data.Regions
+extension HexCodable {
+	public typealias Regions = Data.Regions
 
-	var regions: Regions {
+	public var regions: Regions {
 		data.regions
 	}
 }
 
 // MARK: RandomAccessCollection
-public extension HexCodable {
-	typealias Element = Data.Element
-	typealias SubSequence = Data.SubSequence
-	typealias Index = Data.Index
-	typealias Indices = Data.Indices
+extension HexCodable {
+	public typealias Element = Data.Element
+	public typealias SubSequence = Data.SubSequence
+	public typealias Index = Data.Index
+	public typealias Indices = Data.Indices
 
-	var endIndex: Index {
+	public var endIndex: Index {
 		data.endIndex
 	}
 
-	var indices: Indices {
+	public var indices: Indices {
 		data.indices
 	}
 
-	var startIndex: Index {
+	public var startIndex: Index {
 		data.startIndex
 	}
 
-	func formIndex(after index: inout Index) {
+	public func formIndex(after index: inout Index) {
 		data.formIndex(after: &index)
 	}
 
-	func formIndex(before index: inout Index) {
+	public func formIndex(before index: inout Index) {
 		data.formIndex(before: &index)
 	}
 
-	subscript(bounds: Range<Index>) -> SubSequence {
+	public subscript(bounds: Range<Index>) -> SubSequence {
 		data[bounds]
 	}
 
-	subscript(position: Index) -> Element {
+	public subscript(position: Index) -> Element {
 		data[position]
 	}
 }
 
 // MARK: Codable
-public extension HexCodable {
-	init(from decoder: Decoder) throws {
+extension HexCodable {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		let data = try Data(hex: container.decode(String.self))
 		self.init(data: data)
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 		try container.encode(data.hex())
+	}
+}
+
+// MARK: CustomStringConvertible
+extension HexCodable {
+	public var description: String {
+		data.hex()
 	}
 }
 
@@ -120,7 +128,39 @@ extension HexCodable: ExpressibleByStringLiteral {
 	}
 }
 
-public extension HexCodable {
-	static let deadbeef32Bytes = Self(data: .deadbeef32Bytes)
+extension HexCodable {
+	public static let deadbeef32Bytes = Self(data: .deadbeef32Bytes)
 }
 #endif // DEBUG
+
+// MARK: - CodableViaHexCodable
+public protocol CodableViaHexCodable: Codable {
+	var hexCodable: HexCodable { get }
+	init(hexCodable: HexCodable) throws
+}
+
+extension CodableViaHexCodable {
+	public func hex(options: Data.HexEncodingOptions = []) -> String {
+		self.hexCodable.hex(options: options)
+	}
+
+	public init(hex: String) throws {
+		try self.init(data: .init(hex: hex))
+	}
+
+	public init(data: Data) throws {
+		try self.init(hexCodable: .init(data: data))
+	}
+}
+
+extension CodableViaHexCodable {
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		try container.encode(self.hexCodable)
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		try self.init(hexCodable: container.decode(HexCodable.self))
+	}
+}

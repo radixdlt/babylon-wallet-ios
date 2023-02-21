@@ -5,8 +5,8 @@ import Prelude
 // MARK: - TransactionManifest + CustomStringConvertible
 extension TransactionManifest: CustomStringConvertible {}
 
-public extension TransactionManifest {
-	enum BlobOutputFormat {
+extension TransactionManifest {
+	public enum BlobOutputFormat {
 		case excludeBlobs
 		case includeBlobsByByteCountOnly
 		case includeBlobs
@@ -44,15 +44,14 @@ public extension TransactionManifest {
 			return instructionsStringsWithoutNewline
 				.joined(separator: separator)
 
-		case let .json(instructionsOnJSONFormat):
+		case let .parsed(instructionsOnJSONFormat):
 			// We dont wanna print JSON, so we go through conversion to STRING first
 			func stringifyManifest(networkForRequest: NetworkID) throws -> TransactionManifest {
 				try EngineToolkit()
 					.convertManifest(
 						request: .init(
-							transactionVersion: .default,
 							manifest: manifest, // need blobs
-							// Wanna convert from Self (`.json`) -> ManifestInstrictions.string
+							// Wanna convert from Self (`.parsed`) -> ManifestInstrictions.string
 							outputFormat: .string,
 							networkId: networkForRequest
 						)
@@ -136,7 +135,7 @@ public extension TransactionManifest {
 		return [preamble, body].joined()
 	}
 
-	func toString(
+	public func toString(
 		preamble: String = "~~~ MANIFEST ~~~\n",
 		blobOutputFormat: BlobOutputFormat = .default,
 		blobSeparator: String = "\n",
@@ -164,62 +163,8 @@ public extension TransactionManifest {
 		return manifestString
 	}
 
-	var description: String {
+	public var description: String {
 		// Best we can do is default to the primary network given the roadmap.
 		toString(networkID: .hammunet)
-	}
-
-	func accountsRequiredToSign(
-		networkId: NetworkID,
-		version: TXVersion = .default
-	) throws -> Set<ComponentAddress> {
-		let convertedManifest = try EngineToolkit().convertManifest(request: ConvertManifestRequest(
-			transactionVersion: version,
-			manifest: self,
-			outputFormat: .json,
-			networkId: networkId
-		)).get()
-
-		switch convertedManifest.instructions {
-		case let .json(instructions):
-			var accountsRequiredToSign: Set<ComponentAddress> = []
-			for instruction in instructions {
-				switch instruction {
-				case let .callMethod(callMethodInstruction):
-					let isAccountComponent = callMethodInstruction.receiver.isAccountComponent()
-					let isMethodThatRequiresAuth = [
-						"lock_fee",
-						"lock_contingent_fee",
-						"withdraw",
-						"withdraw_by_amount",
-						"withdraw_by_ids",
-						"lock_fee_and_withdraw",
-						"lock_fee_and_withdraw_by_amount",
-						"lock_fee_and_withdraw_by_ids",
-						"create_proof",
-						"create_proof_by_amount",
-						"create_proof_by_ids",
-					].contains(callMethodInstruction.methodName)
-
-					if isAccountComponent, isMethodThatRequiresAuth {
-						switch callMethodInstruction.receiver {
-						case let .componentAddress(componentAddress):
-							accountsRequiredToSign.insert(componentAddress)
-						case .component:
-							// TODO: The RENodeId should be translated to an account component
-							// address and added to the set
-							break
-						}
-					}
-
-				default:
-					break
-				}
-			}
-
-			return accountsRequiredToSign
-		case .string:
-			throw SborDecodeError(value: "Impossible case") // TODO: need a better error
-		}
 	}
 }

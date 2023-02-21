@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionCommittedDetailsRequestAllOf = GatewayAPI.TransactionCommittedDetailsRequestAllOf
 
 // MARK: - GatewayAPI.TransactionCommittedDetailsRequestAllOf
-public extension GatewayAPI {
-	struct TransactionCommittedDetailsRequestAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionCommittedDetailsRequestAllOf: Codable, Hashable {
 		public private(set) var transactionIdentifier: TransactionCommittedDetailsRequestIdentifier
 
 		public init(transactionIdentifier: TransactionCommittedDetailsRequestIdentifier) {

@@ -1,5 +1,4 @@
 import FeaturePrelude
-import HandleDappRequests
 import HomeFeature
 import ProfileClient
 import SettingsFeature
@@ -13,10 +12,6 @@ public struct Main: Sendable, ReducerProtocol {
 	public var body: some ReducerProtocolOf<Self> {
 		Scope(state: \.home, action: /Action.child .. Action.ChildAction.home) {
 			Home()
-		}
-
-		Scope(state: \.handleDappRequests, action: /Action.child .. Action.ChildAction.handleDappRequest) {
-			HandleDappRequests()
 		}
 
 		Reduce(self.core)
@@ -40,16 +35,11 @@ public struct Main: Sendable, ReducerProtocol {
 		case .child(.settings(.delegate(.networkChanged))):
 			state.settings = nil
 			state.home = .init()
-			return body.reduce(into: &state, action: .child(.home(.internal(.view(.pullToRefreshStarted)))))
+			return body.reduce(into: &state, action: .child(.home(.view(.pullToRefreshStarted))))
 
 		case .child(.settings(.delegate(.dismissSettings))):
 			state.settings = nil
 			return .none
-
-		case .child(.handleDappRequest(.child(.chooseAccounts(.child(.createAccountCoordinator(.delegate(.completed))))))):
-			return .run { send in
-				await send(.child(.home(.delegate(.reloadAccounts))))
-			}
 
 		case .child, .delegate:
 			return .none

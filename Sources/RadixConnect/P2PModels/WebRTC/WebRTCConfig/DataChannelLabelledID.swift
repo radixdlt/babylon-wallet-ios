@@ -16,8 +16,8 @@ public struct DataChannelLabelledID: Sendable, Hashable, Codable, CustomStringCo
 	public static let `default` = Self(channelId: 0, channelLabel: "data")
 }
 
-public extension DataChannelLabelledID {
-	var description: String {
+extension DataChannelLabelledID {
+	public var description: String {
 		"""
 		channelId: \(channelId),
 		channelLabel: \(channelLabel)
@@ -26,8 +26,8 @@ public extension DataChannelLabelledID {
 }
 
 #if DEBUG
-public extension DataChannelLabelledID {
-	static let placeholder = Self.default
+extension DataChannelLabelledID {
+	public static let placeholder = Self.default
 }
 #endif // DEBUG
 

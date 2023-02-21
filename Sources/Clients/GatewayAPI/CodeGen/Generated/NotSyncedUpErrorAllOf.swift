@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias NotSyncedUpErrorAllOf = GatewayAPI.NotSyncedUpErrorAllOf
 
 // MARK: - GatewayAPI.NotSyncedUpErrorAllOf
-public extension GatewayAPI {
-	struct NotSyncedUpErrorAllOf: Codable, Hashable {
+extension GatewayAPI {
+	public struct NotSyncedUpErrorAllOf: Codable, Hashable {
 		/** The request type that triggered this exception. */
 		public private(set) var requestType: String
 		/** The current delay between the Gateway DB and the network ledger round timestamp. */

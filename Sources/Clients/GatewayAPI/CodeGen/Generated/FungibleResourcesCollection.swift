@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,10 +14,14 @@ import AnyCodable
 public typealias FungibleResourcesCollection = GatewayAPI.FungibleResourcesCollection
 
 // MARK: - GatewayAPI.FungibleResourcesCollection
-public extension GatewayAPI {
-	struct FungibleResourcesCollection: Codable, Hashable {
+extension GatewayAPI {
+	/** Fungible resources collection. */
+	public struct FungibleResourcesCollection: Codable, Hashable {
+		/** Total number of items in underlying collection, fragment of which is available in `items` collection. */
 		public private(set) var totalCount: Int64?
+		/** If specified, contains a cursor to query previous page of the `items` collection. */
 		public private(set) var previousCursor: String?
+		/** If specified, contains a cursor to query next page of the `items` collection. */
 		public private(set) var nextCursor: String?
 		public private(set) var items: [FungibleResourcesCollectionItem]
 

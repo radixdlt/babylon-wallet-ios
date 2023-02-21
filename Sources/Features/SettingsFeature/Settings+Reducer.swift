@@ -2,6 +2,7 @@ import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
+import PersonasFeature
 import ProfileClient
 
 // MARK: - AppSettings
@@ -14,8 +15,8 @@ public struct AppSettings: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension AppSettings {
-	var body: some ReducerProtocolOf<Self> {
+extension AppSettings {
+	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
 			.ifLet(\.manageP2PClients, action: /Action.child .. Action.ChildAction.manageP2PClients) {
 				ManageP2PClients()
@@ -23,9 +24,12 @@ public extension AppSettings {
 			.ifLet(\.manageGatewayAPIEndpoints, action: /Action.child .. Action.ChildAction.manageGatewayAPIEndpoints) {
 				ManageGatewayAPIEndpoints()
 			}
+			.ifLet(\.personasCoordinator, action: /Action.child .. Action.ChildAction.personasCoordinator) {
+				PersonasCoordinator()
+			}
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
+	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.dismissSettingsButtonTapped)):
 			return .run { send in
@@ -48,6 +52,7 @@ public extension AppSettings {
 		case let .internal(.system(.loadP2PClientsResult(.success(clients)))):
 			state.canAddP2PClient = clients.isEmpty
 			return .none
+
 		case let .internal(.system(.loadP2PClientsResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
@@ -90,21 +95,32 @@ public extension AppSettings {
 			state.manageP2PClients = nil
 			return loadP2PClients()
 
+		case .child(.personasCoordinator(.delegate(.dismiss))):
+			state.personasCoordinator = nil
+			return .none
+
 		case .child, .delegate:
 			return .none
+
 		case .internal(.view(.addP2PClientButtonTapped)):
 			state.manageP2PClients = .init(newConnection: .init())
 			return .none
+
 		case .internal(.view(.editGatewayAPIEndpointButtonTapped)):
 			state.manageGatewayAPIEndpoints = .init()
+			return .none
+
+		case .internal(.view(.personasButtonTapped)):
+			// TODO: implement
+			state.personasCoordinator = .init()
 			return .none
 		}
 	}
 }
 
 // MARK: Private
-private extension AppSettings {
-	func loadP2PClients() -> EffectTask<Action> {
+extension AppSettings {
+	fileprivate func loadP2PClients() -> EffectTask<Action> {
 		.run { send in
 			await send(.internal(.system(.loadP2PClientsResult(
 				TaskResult { try await profileClient.getP2PClients() }

@@ -15,29 +15,29 @@ public enum EntitySecurityState:
 	case unsecured(UnsecuredEntityControl)
 }
 
-public extension EntitySecurityState {
-	var _description: String {
+extension EntitySecurityState {
+	public var _description: String {
 		switch self {
 		case let .unsecured(unsecuredEntityControl):
 			return "EntitySecurityState.unsecured(\(unsecuredEntityControl)"
 		}
 	}
 
-	var description: String {
+	public var description: String {
 		_description
 	}
 
-	var customDumpDescription: String {
+	public var customDumpDescription: String {
 		_description
 	}
 }
 
-public extension EntitySecurityState {
+extension EntitySecurityState {
 	internal enum Discriminator: String, Sendable, Equatable, Codable {
 		case unsecured
 	}
 
-	enum CodingKeys: String, CodingKey {
+	public enum CodingKeys: String, CodingKey {
 		case discriminator, unsecuredEntityControl
 	}
 
@@ -47,7 +47,7 @@ public extension EntitySecurityState {
 		}
 	}
 
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var keyedContainer = encoder.container(keyedBy: CodingKeys.self)
 		try keyedContainer.encode(discriminator, forKey: .discriminator)
 		switch self {
@@ -56,7 +56,7 @@ public extension EntitySecurityState {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let keyedContainer = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try keyedContainer.decode(Discriminator.self, forKey: .discriminator)
 		switch discriminator {
@@ -64,8 +64,4 @@ public extension EntitySecurityState {
 			self = try .unsecured(keyedContainer.decode(UnsecuredEntityControl.self, forKey: .unsecuredEntityControl))
 		}
 	}
-}
-
-public extension Identifiable where Self: FactorInstanceProtocol, ID == FactorSourceReference {
-	var id: ID { factorSourceReference }
 }

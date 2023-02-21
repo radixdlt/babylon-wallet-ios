@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,9 +14,9 @@ import AnyCodable
 public typealias EntityResourcesRequestAllOf = GatewayAPI.EntityResourcesRequestAllOf
 
 // MARK: - GatewayAPI.EntityResourcesRequestAllOf
-public extension GatewayAPI {
-	struct EntityResourcesRequestAllOf: Codable, Hashable {
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+extension GatewayAPI {
+	public struct EntityResourcesRequestAllOf: Codable, Hashable {
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
 
 		public init(address: String) {

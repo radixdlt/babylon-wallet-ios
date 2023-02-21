@@ -1,7 +1,7 @@
 fastlane_require 'dotenv'
 
 before_all do
-    xcodes(select_for_current_build_only: true)
+    ensure_xcode_version
     Dotenv.load ".env.secret"
     ensure_git_status_clean
 end
@@ -67,6 +67,7 @@ platform :ios do
 
     desc "Generate new dev certificates"
     lane :generate_new_dev_certificates do
+        Dotenv.load ".env.ios.dev"
         code_signing(type: "development", readonly: false)
     end
 

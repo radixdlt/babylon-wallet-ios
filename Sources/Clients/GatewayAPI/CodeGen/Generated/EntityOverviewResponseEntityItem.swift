@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,9 +14,9 @@ import AnyCodable
 public typealias EntityOverviewResponseEntityItem = GatewayAPI.EntityOverviewResponseEntityItem
 
 // MARK: - GatewayAPI.EntityOverviewResponseEntityItem
-public extension GatewayAPI {
-	struct EntityOverviewResponseEntityItem: Codable, Hashable {
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+extension GatewayAPI {
+	public struct EntityOverviewResponseEntityItem: Codable, Hashable {
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
 		public private(set) var metadata: EntityMetadataCollection
 

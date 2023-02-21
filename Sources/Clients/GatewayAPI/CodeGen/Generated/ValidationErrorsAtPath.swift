@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias ValidationErrorsAtPath = GatewayAPI.ValidationErrorsAtPath
 
 // MARK: - GatewayAPI.ValidationErrorsAtPath
-public extension GatewayAPI {
-	struct ValidationErrorsAtPath: Codable, Hashable {
+extension GatewayAPI {
+	public struct ValidationErrorsAtPath: Codable, Hashable {
 		public private(set) var path: String
 		public private(set) var errors: [String]
 

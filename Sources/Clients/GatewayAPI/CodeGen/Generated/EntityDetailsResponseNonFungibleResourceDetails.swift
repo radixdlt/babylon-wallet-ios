@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityDetailsResponseNonFungibleResourceDetails = GatewayAPI.EntityDetailsResponseNonFungibleResourceDetails
 
 // MARK: - GatewayAPI.EntityDetailsResponseNonFungibleResourceDetails
-public extension GatewayAPI {
-	struct EntityDetailsResponseNonFungibleResourceDetails: Codable, Hashable {
+extension GatewayAPI {
+	public struct EntityDetailsResponseNonFungibleResourceDetails: Codable, Hashable {
 		public private(set) var discriminator: EntityDetailsResponseDetailsType
 		public private(set) var accessRulesChain: AnyCodable
 		public private(set) var vaultAccessRulesChain: AnyCodable

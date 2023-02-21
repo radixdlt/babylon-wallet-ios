@@ -4,14 +4,14 @@ import Foundation
 extension BigUInt: @unchecked Sendable {}
 
 // MARK: - BigUInt.Error
-public extension BigUInt {
-	enum Error: Swift.Error {
+extension BigUInt {
+	public enum Error: Swift.Error {
 		case initFromDecimalStringFailed
 	}
 }
 
-public extension BigUInt {
-	init(decimalString: String) throws {
+extension BigUInt {
+	public init(decimalString: String) throws {
 		guard let value = Self(decimalString, radix: 10) else {
 			throw Error.initFromDecimalStringFailed
 		}
@@ -19,8 +19,8 @@ public extension BigUInt {
 	}
 }
 
-public extension BigUInt {
-	var inAttos: Self {
+extension BigUInt {
+	public var inAttos: Self {
 		self * BigUInt(2).power(18)
 	}
 }

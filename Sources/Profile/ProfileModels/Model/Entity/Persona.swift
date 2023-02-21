@@ -2,12 +2,12 @@ import EngineToolkitModels
 import Prelude
 
 // MARK: - OnNetwork.Persona
-public extension OnNetwork {
+extension OnNetwork {
 	/// A network unique account with a unique public address and a set of cryptographic
 	/// factors used to control it. The account is either `virtual` or not. By "virtual"
 	/// we mean that the Radix Public Ledger does not yet know of the public address
 	/// of this account.
-	struct Persona:
+	public struct Persona:
 		EntityProtocol,
 		Sendable,
 		Hashable,
@@ -29,66 +29,56 @@ public extension OnNetwork {
 		/// peresona on network `testnet` too! However, their `identityAddress`es will differ!
 		public let index: Int
 
-		/// The SLIP10 compatible Hierarchical Deterministic derivation path which is used to derive
-		/// the public keys of the factors of the different roles, if the factor source kind of said factor
-		/// instance supports Hierarchical Deterministic derivation.
-		public let derivationPath: EntityDerivationPath
-
 		/// Security of this persona
 		public var securityState: EntitySecurityState
 
-		/// An optional displayName or label, used by presentation layer only.
-		public let displayName: String?
+		/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
+		public let displayName: NonEmpty<String>
 
 		/// Fields containing personal information you have inputted.
-		public let fields: OrderedSet<Field>
+		public let fields: IdentifiedArrayOf<Field>
 
 		public init(
 			networkID: NetworkID,
 			address: EntityAddress,
 			securityState: EntitySecurityState,
 			index: Index,
-			derivationPath: EntityDerivationPath,
-			displayName: String?,
-			fields: OrderedSet<Field>
+			displayName: NonEmpty<String>,
+			fields: IdentifiedArrayOf<Field>
 		) {
 			self.networkID = networkID
 			self.address = address
 			self.securityState = securityState
 			self.index = index
-			self.derivationPath = derivationPath
 			self.fields = fields
 			self.displayName = displayName
 		}
 	}
 }
 
-public extension OnNetwork.Persona {
-	static var entityKind: EntityKind { .identity }
+extension OnNetwork.Persona {
+	public static var entityKind: EntityKind { .identity }
 
-	typealias EntityAddress = IdentityAddress
+	public typealias EntityAddress = IdentityAddress
 
 	/// Index in list of collection of personas, per network.
-	typealias Index = Int
+	public typealias Index = Int
 
 	/// A stable and globally unique identifier of an account.
-	typealias ID = EntityAddress
-
-	typealias EntityDerivationPath = IdentityHierarchicalDeterministicDerivationPath
+	public typealias ID = EntityAddress
 
 	/// A stable and globally unique identifier for this persona.
-	var id: ID { address }
+	public var id: ID { address }
 }
 
-public extension OnNetwork.Persona {
-	var customDumpMirror: Mirror {
+extension OnNetwork.Persona {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
 				"address": address,
 				"securityState": securityState,
 				"index": index,
-				"derivationPath": derivationPath,
 				"fields": fields,
 				"displayName": String(describing: displayName),
 			],
@@ -96,22 +86,21 @@ public extension OnNetwork.Persona {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		"displayName": \(String(describing: displayName)),
 		"index": \(index),
 		"address": \(address),
 		"securityState": \(securityState),
-		"derivationPath": \(derivationPath)
 		"fields": \(fields)
 		"""
 	}
 }
 
 // MARK: - OnNetwork.Persona.Field
-public extension OnNetwork.Persona {
+extension OnNetwork.Persona {
 	/// A field containing personal informations
-	struct Field:
+	public struct Field:
 		Sendable,
 		Hashable,
 		Codable,
@@ -126,7 +115,8 @@ public extension OnNetwork.Persona {
 		/// Content type, e.g. `email` or `zip`
 		public let kind: Kind
 
-		/// The content of this field, a string, e.g. "foo@bar.com" for email, or "GWC8+3H" as ZIP code
+		/// The content of this field, a non empty string, e.g. "foo@bar.com" for email
+		/// or "GWC8+3H" as ZIP code
 		public let value: Value
 
 		public init(kind: Kind, value: Value) {
@@ -137,11 +127,29 @@ public extension OnNetwork.Persona {
 	}
 }
 
-public extension OnNetwork.Persona.Field {
-	typealias ID = UUID
-	typealias Value = String
+import Cryptography
+import EngineToolkit
+extension OnNetwork.Persona {
+	public static func deriveAddress(
+		networkID: NetworkID,
+		publicKey: SLIP10.PublicKey
+	) throws -> EntityAddress {
+		let response = try EngineToolkit().deriveVirtualIdentityAddressRequest(
+			request: .init(
+				publicKey: publicKey.intoEngine(),
+				networkId: networkID
+			)
+		).get()
 
-	enum Kind:
+		return try EntityAddress(address: response.virtualIdentityAddress.address)
+	}
+}
+
+extension OnNetwork.Persona.Field {
+	public typealias ID = UUID
+	public typealias Value = NonEmpty<String>
+
+	public enum Kind:
 		String,
 		Sendable,
 		Hashable,
@@ -157,8 +165,8 @@ public extension OnNetwork.Persona.Field {
 	}
 }
 
-public extension OnNetwork.Persona.Field {
-	var customDumpMirror: Mirror {
+extension OnNetwork.Persona.Field {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -170,7 +178,7 @@ public extension OnNetwork.Persona.Field {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		"id": \(id),
 		"kind": \(kind),

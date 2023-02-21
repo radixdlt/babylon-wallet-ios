@@ -40,7 +40,8 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 				await send(.delegate(.refresh(address)))
 			}
 		case .internal(.view(.transferButtonTapped)):
-			state.destination = .transfer(AssetTransfer.State(from: state.account))
+			// FIXME: fix post betanet v2
+//			state.destination = .transfer(AssetTransfer.State(from: state.account))
 			return .none
 		case .child, .delegate:
 			return .none

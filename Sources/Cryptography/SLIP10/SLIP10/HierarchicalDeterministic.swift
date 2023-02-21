@@ -7,8 +7,8 @@ public enum HierarchicalDeterministic {}
 public typealias HD = HierarchicalDeterministic
 
 // MARK: HD.DerivationError
-public extension HD {
-	enum DerivationError: Swift.Error, Equatable {
+extension HD {
+	public enum DerivationError: Swift.Error, Equatable {
 		case curve25519RequiresHardenedPath
 		case curve25519LacksPublicParentKeyToPublicChildKeyInSlip10
 	}

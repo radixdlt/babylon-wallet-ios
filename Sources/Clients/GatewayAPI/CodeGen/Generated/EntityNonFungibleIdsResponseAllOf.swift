@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,11 +14,11 @@ import AnyCodable
 public typealias EntityNonFungibleIdsResponseAllOf = GatewayAPI.EntityNonFungibleIdsResponseAllOf
 
 // MARK: - GatewayAPI.EntityNonFungibleIdsResponseAllOf
-public extension GatewayAPI {
-	struct EntityNonFungibleIdsResponseAllOf: Codable, Hashable {
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+extension GatewayAPI {
+	public struct EntityNonFungibleIdsResponseAllOf: Codable, Hashable {
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
-		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
+		/** Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var resourceAddress: String
 		public private(set) var nonFungibleIds: NonFungibleIdsCollection
 

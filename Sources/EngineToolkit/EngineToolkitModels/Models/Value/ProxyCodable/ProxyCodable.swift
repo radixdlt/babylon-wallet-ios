@@ -21,10 +21,10 @@ public protocol ProxyCodable: Codable where ProxyEncodable.ToEncode == Self, Pro
 	init(decodedProxy: ProxyDecodable)
 }
 
-public extension ProxyCodable {
-	var proxyEncodable: ProxyEncodable { .init(toEncode: self) }
+extension ProxyCodable {
+	public var proxyEncodable: ProxyEncodable { .init(toEncode: self) }
 
-	init(decodedProxy: ProxyDecodable) {
+	public init(decodedProxy: ProxyDecodable) {
 		self = decodedProxy.decoded
 	}
 }

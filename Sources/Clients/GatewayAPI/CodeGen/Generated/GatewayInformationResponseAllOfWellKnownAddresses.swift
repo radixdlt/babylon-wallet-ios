@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,21 +14,21 @@ import AnyCodable
 public typealias GatewayInformationResponseAllOfWellKnownAddresses = GatewayAPI.GatewayInformationResponseAllOfWellKnownAddresses
 
 // MARK: - GatewayAPI.GatewayInformationResponseAllOfWellKnownAddresses
-public extension GatewayAPI {
-	struct GatewayInformationResponseAllOfWellKnownAddresses: Codable, Hashable {
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+extension GatewayAPI {
+	public struct GatewayInformationResponseAllOfWellKnownAddresses: Codable, Hashable {
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var accountPackage: String
-		/** The Bech32m-encoded human readable version of the component (normal, account, system) global address. */
+		/** Bech32m-encoded human readable version of the component (normal, account, system) global address. */
 		public private(set) var faucet: String
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var epochManager: String
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var clock: String
-		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
+		/** Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var ecdsaSecp256k1: String
-		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
+		/** Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var eddsaEd25519: String
-		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
+		/** Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var xrd: String
 
 		public init(accountPackage: String, faucet: String, epochManager: String, clock: String, ecdsaSecp256k1: String, eddsaEd25519: String, xrd: String) {

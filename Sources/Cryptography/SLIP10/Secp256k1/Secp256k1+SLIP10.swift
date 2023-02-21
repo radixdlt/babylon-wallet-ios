@@ -1,8 +1,8 @@
 import K1
 import Prelude
 
-public extension Slip10CurveType {
-	static let secp256k1 = Self(
+extension Slip10CurveType {
+	public static let secp256k1 = Self(
 		slip10CurveID: "Bitcoin seed",
 		curveOrder: BigUInt("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141", radix: 16)!
 	)
@@ -28,8 +28,8 @@ extension K1.PublicKey: ECPublicKey {
 	}
 
 	/// Creates a key from a raw representation.
-	public init<D>(uncompressedRepresentation pointer: D) throws where D: ContiguousBytes {
-		self = try K1.PublicKey.import(from: pointer)
+	public init<D>(rawRepresentation: D) throws where D: ContiguousBytes {
+		self = try K1.PublicKey.import(from: rawRepresentation)
 	}
 
 	/// A raw representation of the key.

@@ -1,5 +1,9 @@
 import Prelude
 
+/// YES! DappDefinitionAddress **is** an AccountAddress! NOT to be confused with the
+/// address the an component on Ledger, the `DappAddress`.
+public typealias DappDefinitionAddress = AccountAddress
+
 // MARK: - AccountAddress
 /// The address to an `Account` on the Radix network.
 public struct AccountAddress:
@@ -18,26 +22,26 @@ public struct AccountAddress:
 	}
 }
 
-public extension AccountAddress {
-	static let kind: AddressKind = .account
+extension AccountAddress {
+	public static let kind: AddressKind = .account
 }
 
-public extension AccountAddress {
-	var customDumpDescription: String {
+extension AccountAddress {
+	public var customDumpDescription: String {
 		"AccountAddress(\(address))"
 	}
 }
 
-public extension AccountAddress {
+extension AccountAddress {
 	/// Wraps this specific type of address to the shared
 	/// nominal type `Address` (enum)
-	func wrapAsAddress() -> Address {
+	public func wrapAsAddress() -> Address {
 		.account(self)
 	}
 
 	/// Tries to unwraps the nominal type `Address` (enum)
 	/// into this specific type.
-	static func unwrap(address: Address) -> Self? {
+	public static func unwrap(address: Address) -> Self? {
 		switch address {
 		case let .account(address): return address
 		default: return nil

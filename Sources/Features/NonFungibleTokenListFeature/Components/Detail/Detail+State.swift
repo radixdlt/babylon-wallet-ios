@@ -1,16 +1,16 @@
 import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Detail.State
-public extension NonFungibleTokenList.Detail {
-	struct State: Sendable, Equatable {
+extension NonFungibleTokenList.Detail {
+	public struct State: Sendable, Hashable {
 		var container: NonFungibleTokenContainer
 		var asset: NonFungibleToken
 	}
 }
 
 #if DEBUG
-public extension NonFungibleTokenList.Detail.State {
-	static let previewValue = Self(
+extension NonFungibleTokenList.Detail.State {
+	public static let previewValue = Self(
 		container: NonFungibleTokenContainer(
 			owner: try! .init(address: "owner_address"),
 			resourceAddress: .init(address: "resource_address"),

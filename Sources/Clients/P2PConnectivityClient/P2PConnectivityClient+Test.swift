@@ -41,11 +41,4 @@ extension P2PConnectivityClient {
 		_debugDataChannelStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)
 }
-
-public extension P2PClient {
-	static let previewValue = Self(
-		connectionPassword: .placeholder,
-		displayName: "PreviewValue"
-	)
-}
 #endif // DEBUG

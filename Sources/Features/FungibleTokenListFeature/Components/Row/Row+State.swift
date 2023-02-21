@@ -1,13 +1,13 @@
 import FeaturePrelude
 
 // MARK: - FungibleTokenList.Row.State
-public extension FungibleTokenList.Row {
+extension FungibleTokenList.Row {
 	// MARK: State
-	struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		public var container: FungibleTokenContainer
 
 		// MARK: - AppSettings properties
-		public var currency: FiatCurrency
+		public let currency: FiatCurrency
 		public var isCurrencyAmountVisible: Bool
 
 		public init(

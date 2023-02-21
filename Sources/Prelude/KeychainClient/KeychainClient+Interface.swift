@@ -1,9 +1,8 @@
-import Dependencies
 import Foundation
 @preconcurrency import KeychainAccess
 
 // MARK: - KeychainClient
-public struct KeychainClient: Sendable, DependencyKey {
+public struct KeychainClient: Sendable {
 	public typealias Key = String
 
 	public var dataForKey: DataForKey
@@ -28,17 +27,18 @@ public struct KeychainClient: Sendable, DependencyKey {
 	}
 }
 
-public extension KeychainClient {
-	typealias DataForKey = @Sendable (Key, AuthenticationPrompt) async throws -> Data?
-	typealias RemoveDataForKey = @Sendable (Key) async throws -> Void
+extension KeychainClient {
+	public typealias DataForKey = @Sendable (Key, AuthenticationPrompt) async throws -> Data?
+	public typealias RemoveDataForKey = @Sendable (Key) async throws -> Void
 	/// Use `Protection` if you want to override default `accessibility` and `authenticationPolicy` configs
-	typealias SetDataForKey = @Sendable (Data, Key, Protection?) async throws -> Void
-	typealias UpdateDataForKey = @Sendable (Data, Key, Protection?, AuthenticationPrompt?) async throws -> Void
+	public typealias SetDataForKey = @Sendable (Data, Key, Protection?) async throws -> Void
+	public typealias UpdateDataForKey = @Sendable (Data, Key, Protection?, AuthenticationPrompt?) async throws -> Void
 
-	struct Protection: Sendable {
-		public let accessibility: Accessibility
+	public struct Protection: Sendable {
+		public let accessibility: KeychainAccess.Accessibility
 		public let authenticationPolicy: AuthenticationPolicy
-		public init(accessibility: Accessibility, authenticationPolicy: AuthenticationPolicy) {
+
+		public init(accessibility: KeychainAccess.Accessibility, authenticationPolicy: AuthenticationPolicy) {
 			self.accessibility = accessibility
 			self.authenticationPolicy = authenticationPolicy
 		}

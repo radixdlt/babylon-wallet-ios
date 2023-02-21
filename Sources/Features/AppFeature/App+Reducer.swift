@@ -13,20 +13,23 @@ public struct App: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Scope(state: \.root, action: /Action.self) {
+		Scope(state: \.root, action: /Action.child) {
 			EmptyReducer()
-				.ifCaseLet(/App.State.Root.main, action: /Action.child .. Action.ChildAction.main) {
+				.ifCaseLet(/State.Root.main, action: /Action.ChildAction.main) {
 					Main()
 				}
-				.ifCaseLet(/App.State.Root.onboarding, action: /Action.child .. Action.ChildAction.onboarding) {
-					Onboarding()
+				.ifCaseLet(/State.Root.onboardingCoordinator, action: /Action.ChildAction.onboardingCoordinator) {
+					OnboardingCoordinator()
 				}
-				.ifCaseLet(/App.State.Root.splash, action: /Action.child .. Action.ChildAction.splash) {
+				.ifCaseLet(/State.Root.splash, action: /Action.ChildAction.splash) {
 					Splash()
 				}
 		}
 
 		Reduce(self.core)
+			.presentationDestination(\.$alert, action: /Action.internal .. Action.InternalAction.view .. Action.ViewAction.alert) {
+				Alerts()
+			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -43,20 +46,19 @@ public struct App: Sendable, ReducerProtocol {
 			}
 
 		case let .internal(.system(.displayErrorAlert(error))):
-			state.errorAlert = .init(
-				title: .init(L10n.App.errorOccurredTitle),
-				message: .init(error.legibleLocalizedDescription)
+			state.alert = .userErrorAlert(
+				.init(
+					title: { TextState(L10n.App.errorOccurredTitle) },
+					actions: {},
+					message: { TextState(error.legibleLocalizedDescription) }
+				)
 			)
-			return .none
-
-		case .internal(.view(.errorAlertDismissButtonTapped)):
-			state.errorAlert = nil
 			return .none
 
 		case .child(.main(.delegate(.removedWallet))):
 			return goToOnboarding(state: &state)
 
-		case .child(.onboarding(.delegate(.completed))):
+		case .child(.onboardingCoordinator(.delegate(.completed))):
 			return goToMain(state: &state)
 
 		case let .child(.splash(.delegate(.profileResultLoaded(profileResult)))):
@@ -78,30 +80,33 @@ public struct App: Sendable, ReducerProtocol {
 				return incompatibleSnapshotData(version: version, state: &state)
 			}
 
-		case .internal(.view(.deleteIncompatibleProfile)):
+		case .internal(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))):
 			return .run { send in
 				do {
 					try await keychainClient.removeProfileSnapshot()
 				} catch {
 					errorQueue.schedule(error)
 				}
-				await send(.internal(.system(.deletedIncompatibleProfile)))
+				await send(.internal(.system(.incompatibleProfileDeleted)))
 			}
-		case .internal(.system(.deletedIncompatibleProfile)):
+		case .internal(.system(.incompatibleProfileDeleted)):
 			return goToOnboarding(state: &state)
 
-		case .child:
+		case .child, .internal(.view(.alert)):
 			return .none
 		}
 	}
 
 	func incompatibleSnapshotData(version: ProfileSnapshot.Version, state: inout State) -> EffectTask<Action> {
-		state.errorAlert = .init(
-			title: .init(L10n.Splash.incompatibleProfileVersionAlertTitle),
-			message: .init(L10n.Splash.incompatibleProfileVersionAlertMessage),
-			dismissButton: .destructive(
-				.init(L10n.Splash.incompatibleProfileVersionAlertDeleteButton),
-				action: .send(Action.ViewAction.deleteIncompatibleProfile)
+		state.alert = .incompatibleProfileErrorAlert(
+			.init(
+				title: { TextState(L10n.Splash.incompatibleProfileVersionAlertTitle) },
+				actions: {
+					ButtonState(role: .destructive, action: .deleteWalletDataButtonTapped) {
+						TextState(L10n.Splash.incompatibleProfileVersionAlertDeleteButton)
+					}
+				},
+				message: { TextState(L10n.Splash.incompatibleProfileVersionAlertMessage) }
 			)
 		)
 		return .none
@@ -113,15 +118,15 @@ public struct App: Sendable, ReducerProtocol {
 	}
 
 	func goToOnboarding(state: inout State) -> EffectTask<Action> {
-		state.root = .onboarding(.init())
+		state.root = .onboardingCoordinator(.init())
 		return .none
 	}
 }
 
 // MARK: App.UserFacingError
-public extension App {
+extension App {
 	/// A purely user-facing error. Not made for developer logging or analytics collection.
-	struct UserFacingError: Sendable, Equatable, LocalizedError {
+	public struct UserFacingError: Sendable, Equatable, LocalizedError {
 		let underlyingError: Swift.Error
 
 		init(_ underlyingError: Swift.Error) {
@@ -129,7 +134,7 @@ public extension App {
 		}
 
 		public var errorDescription: String? {
-			underlyingError.localizedDescription
+			underlyingError.legibleLocalizedDescription
 		}
 
 		public static func == (lhs: Self, rhs: Self) -> Bool {

@@ -1,7 +1,7 @@
 import Foundation
 
-public extension ChunkedMessagePackage {
-	func encode(to encoder: Encoder) throws {
+extension ChunkedMessagePackage {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
 
 		func encodePackageType() throws {

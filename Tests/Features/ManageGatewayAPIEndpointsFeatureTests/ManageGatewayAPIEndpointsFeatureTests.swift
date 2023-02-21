@@ -168,13 +168,12 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		store.exhaustivity = .off
 		await store.send(.internal(.system(.hasAccountsResult(.success(false)))))
 		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway)))) {
-			$0.createAccountCoordinator = .init(
-				completionDestination: .home,
-				rootState: .init(
-					onNetworkWithID: newNetworkAndGateway.network.id,
-					isFirstAccount: true
-				)
-			)
+			$0.createAccountCoordinator = .init(config: .init(
+				specificNetworkID: newNetworkAndGateway.network.id,
+				isFirstEntity: false,
+				canBeDismissed: true,
+				navigationButtonCTA: .goHome
+			))
 		}
 	}
 
@@ -184,12 +183,12 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				createAccountCoordinator: .init(
-					completionDestination: .home,
-					rootState: .init(
-						onNetworkWithID: newNetworkAndGateway.network.id
-					)
-				),
+				createAccountCoordinator: .init(config: .init(
+					specificNetworkID: newNetworkAndGateway.network.id,
+					isFirstEntity: false,
+					canBeDismissed: true,
+					navigationButtonCTA: .goHome
+				)),
 				currentNetworkAndGateway: currentNetworkAndGateway,
 				validatedNewNetworkAndGatewayToSwitchTo: newNetworkAndGateway
 			),
@@ -215,12 +214,12 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				createAccountCoordinator: .init(
-					completionDestination: .home,
-					rootState: .init(
-						onNetworkWithID: newNetworkAndGateway.network.id
-					)
-				),
+				createAccountCoordinator: .init(config: .init(
+					specificNetworkID: newNetworkAndGateway.network.id,
+					isFirstEntity: false,
+					canBeDismissed: true,
+					navigationButtonCTA: .goHome
+				)),
 				currentNetworkAndGateway: .mardunet,
 				validatedNewNetworkAndGatewayToSwitchTo: newNetworkAndGateway
 			),
@@ -237,16 +236,16 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 
 #if DEBUG
 
-public extension URL {
-	static let previewValue = URL(string: "https://example.com")!
+extension URL {
+	public static let previewValue = URL(string: "https://example.com")!
 }
 
-public extension Network {
-	static let previewValue = Self(name: "Placeholder", id: .simulator)
+extension Network {
+	public static let previewValue = Self(name: "Placeholder", id: .simulator)
 }
 
-public extension AppPreferences.NetworkAndGateway {
-	static let previewValue = Self(
+extension AppPreferences.NetworkAndGateway {
+	public static let previewValue = Self(
 		network: .previewValue,
 		gatewayAPIEndpointURL: .previewValue
 	)

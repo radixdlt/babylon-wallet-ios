@@ -3,9 +3,9 @@ import Prelude
 import ProfileModels
 
 // MARK: - P2P.ClientWithConnectionStatus
-public extension P2P {
+extension P2P {
 	// MARK: - ClientWithConnectionStatus
-	struct ClientWithConnectionStatus: Sendable, Identifiable, Hashable {
+	public struct ClientWithConnectionStatus: Sendable, Identifiable, Hashable {
 		public let p2pClient: P2PClient
 		public var connectionStatus: ConnectionStatus
 
@@ -19,7 +19,7 @@ public extension P2P {
 	}
 }
 
-public extension P2P.ClientWithConnectionStatus {
-	typealias ID = P2PClient.ID
-	var id: ID { p2pClient.id }
+extension P2P.ClientWithConnectionStatus {
+	public typealias ID = P2PClient.ID
+	public var id: ID { p2pClient.id }
 }

@@ -8,6 +8,6 @@ public protocol AssetContainer: Sendable, Identifiable, Equatable {
 	var asset: T { get set }
 }
 
-public extension AssetContainer {
-	var id: T.ID { asset.id }
+extension AssetContainer {
+	public var id: T.ID { asset.id }
 }

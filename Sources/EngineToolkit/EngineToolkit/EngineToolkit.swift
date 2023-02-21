@@ -39,28 +39,29 @@ public struct EngineToolkit {
 	}
 }
 
-internal extension EngineToolkit {
-	typealias JSONStringFromJSONData = @Sendable (Data) -> String?
-	typealias CCharsFromJSONString = @Sendable (String) -> [CChar]?
-	typealias JSONDataFromJSONString = @Sendable (String) -> Data?
+extension EngineToolkit {
+	internal typealias JSONStringFromJSONData = @Sendable (Data) -> String?
+	internal typealias CCharsFromJSONString = @Sendable (String) -> [CChar]?
+	internal typealias JSONDataFromJSONString = @Sendable (String) -> Data?
 }
 
 // MARK: Public
-public extension EngineToolkit {
+
+extension EngineToolkit {
 	/// Obtains information on the current transaction library used.
 	///
 	/// This function is used to get information on the transaction library such as the package version. You may
 	/// think of this information request as the "Hello World" example of the transaction library where, this is
 	/// typically the first request type to be implemented in any implementation of the transaction library, if this
 	/// request works then you can be assured that all of the other lower level operations work as well.
-	func information() -> Result<InformationResponse, Error> {
+	public func information() -> Result<InformationResponse, Error> {
 		callLibraryFunction(
 			request: InformationRequest(),
 			function: RadixEngineToolkit.information
 		)
 	}
 
-	func convertManifest(
+	public func convertManifest(
 		request: ConvertManifestRequest
 	) -> Result<ConvertManifestResponse, Error> {
 		callLibraryFunction(
@@ -69,7 +70,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func compileTransactionIntentRequest(
+	public func compileTransactionIntentRequest(
 		request: CompileTransactionIntentRequest
 	) -> Result<CompileTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -78,7 +79,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func decompileTransactionIntentRequest(
+	public func decompileTransactionIntentRequest(
 		request: DecompileTransactionIntentRequest
 	) -> Result<DecompileTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -87,7 +88,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func compileSignedTransactionIntentRequest(
+	public func compileSignedTransactionIntentRequest(
 		request: CompileSignedTransactionIntentRequest
 	) -> Result<CompileSignedTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -96,7 +97,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func decompileSignedTransactionIntentRequest(
+	public func decompileSignedTransactionIntentRequest(
 		request: DecompileSignedTransactionIntentRequest
 	) -> Result<DecompileSignedTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -105,25 +106,25 @@ public extension EngineToolkit {
 		)
 	}
 
-	func compileNotarizedTransactionIntentRequest(
+	public func compileNotarizedTransactionIntentRequest(
 		request: CompileNotarizedTransactionIntentRequest
 	) -> Result<CompileNotarizedTransactionIntentResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: compile_notarized_transaction_intent
+			function: compile_notarized_transaction
 		)
 	}
 
-	func decompileNotarizedTransactionIntentRequest(
+	public func decompileNotarizedTransactionIntentRequest(
 		request: DecompileNotarizedTransactionIntentRequest
 	) -> Result<DecompileNotarizedTransactionIntentResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: decompile_notarized_transaction_intent
+			function: decompile_notarized_transaction
 		)
 	}
 
-	func decompileUnknownTransactionIntentRequest(
+	public func decompileUnknownTransactionIntentRequest(
 		request: DecompileUnknownTransactionIntentRequest
 	) -> Result<DecompileUnknownTransactionIntentResponse, Error> {
 		callLibraryFunction(
@@ -132,7 +133,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func decodeAddressRequest(
+	public func decodeAddressRequest(
 		request: DecodeAddressRequest
 	) -> Result<DecodeAddressResponse, Error> {
 		callLibraryFunction(
@@ -141,7 +142,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func encodeAddressRequest(
+	public func encodeAddressRequest(
 		request: EncodeAddressRequest
 	) -> Result<EncodeAddressResponse, Error> {
 		callLibraryFunction(
@@ -150,7 +151,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func sborDecodeRequest(
+	public func sborDecodeRequest(
 		request: SborDecodeRequest
 	) -> Result<SborDecodeResponse, Error> {
 		callLibraryFunction(
@@ -159,7 +160,7 @@ public extension EngineToolkit {
 		)
 	}
 
-	func sborEncodeRequest(
+	public func sborEncodeRequest(
 		request: SborEncodeRequest
 	) -> Result<SborEncodeResponse, Error> {
 		callLibraryFunction(
@@ -168,25 +169,16 @@ public extension EngineToolkit {
 		)
 	}
 
-	func deriveNonFungibleAddressFromPublicKeyRequest(
-		request: DeriveNonFungibleAddressFromPublicKeyRequest
-	) -> Result<DeriveNonFungibleAddressFromPublicKeyResponse, Error> {
+	public func deriveNonFungibleGlobalIdFromPublicKeyRequest(
+		request: DeriveNonFungibleGlobalIdFromPublicKeyRequest
+	) -> Result<DeriveNonFungibleGlobalIdFromPublicKeyResponse, Error> {
 		callLibraryFunction(
 			request: request,
-			function: derive_non_fungible_address_from_public_key
+			function: derive_non_fungible_global_id_from_public_key
 		)
 	}
 
-	func deriveNonFungibleAddressRequest(
-		request: DeriveNonFungibleAddressRequest
-	) -> Result<DeriveNonFungibleAddressResponse, Error> {
-		callLibraryFunction(
-			request: request,
-			function: derive_non_fungible_address
-		)
-	}
-
-	func deriveVirtualAccountAddressRequest(
+	public func deriveVirtualAccountAddressRequest(
 		request: DeriveVirtualAccountAddressRequest
 	) -> Result<DeriveVirtualAccountAddressResponse, Error> {
 		callLibraryFunction(
@@ -194,15 +186,34 @@ public extension EngineToolkit {
 			function: derive_virtual_account_address
 		)
 	}
+
+	public func deriveVirtualIdentityAddressRequest(
+		request: DeriveVirtualIdentityAddressRequest
+	) -> Result<DeriveVirtualIdentityAddressResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: derive_virtual_identity_address
+		)
+	}
+
+	public func knownEntityAddresses(
+		request: KnownEntityAddressesRequest
+	) -> Result<KnownEntityAddressesResponse, Error> {
+		callLibraryFunction(
+			request: request,
+			function: known_entity_addresses
+		)
+	}
 }
 
 // MARK: Private (But Internal For Tests)
-internal extension EngineToolkit {
+
+extension EngineToolkit {
 	/// Calls the transaction library with a given input and returns the output back.
 	///
 	/// This function abstracts away how the transaction library is called and provides a high level interface for
 	/// communicating and getting responses back from the library.
-	func callLibraryFunction<Request, Response>(
+	internal func callLibraryFunction<Request, Response>(
 		request: Request,
 		function: (MutableToolkitPointer?) -> MutableToolkitPointer?
 	) -> Result<Response, Error> where Request: Encodable, Response: Decodable {
@@ -252,13 +263,13 @@ internal extension EngineToolkit {
 	}
 }
 
-private extension EngineToolkit {
+extension EngineToolkit {
 	/// Serializes an object to a JSON string.
 	///
 	/// This private function takes an object and serializes it to a JSON string. In the current implementation, this
 	/// object needs to be `Encodable`, therefore, this function abstracts the serialization logic away from the
 	/// transaction library operations and into an individual function.
-	func serialize(request: any Encodable) -> Result<String, Error.SerializeRequestFailure> {
+	private func serialize(request: any Encodable) -> Result<String, Error.SerializeRequestFailure> {
 		let jsonData: Data
 		do {
 			jsonData = try jsonEncoder.encode(request)
@@ -278,7 +289,7 @@ private extension EngineToolkit {
 	///
 	/// TODO: In the future, it would be better to have this a `Result<T, Error>` since there is a chance
 	/// that this could be an error type as well and not an Ok response.
-	func deserialize<Response>(jsonString: String) -> Result<Response, Error.DeserializeResponseFailure>
+	private func deserialize<Response>(jsonString: String) -> Result<Response, Error.DeserializeResponseFailure>
 		where Response: Decodable
 	{
 		guard let jsonData = jsonDataFromJSONString(jsonString) else {
@@ -288,20 +299,13 @@ private extension EngineToolkit {
 		do {
 			let response = try jsonDecoder.decode(Response.self, from: jsonData)
 			return .success(response)
-		} catch let firstError {
-			do {
-				/// We might have got an **ErrorResponse** from the Radix Engine Toolkit,
-				/// try decoding jsonData to that instead.
-				let errorResponse = try jsonDecoder.decode(ErrorResponse.self, from: jsonData)
-				return .failure(.errorResponse(errorResponse))
-			} catch let decodingError as Swift.DecodingError {
-				#if DEBUG
-				prettyPrint(responseJSONString: jsonString, error: firstError, failedToDecodeInto: Response.self)
-				#endif
-				return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEither(responseType: "\(Response.self)", decodingError: decodingError))
-			} catch {
-				return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEitherNorAsSwiftDecodingError(responseType: "\(Response.self)", nonSwiftDecodingError: String(describing: firstError)))
-			}
+		} catch let error as Swift.DecodingError {
+			#if DEBUG
+			prettyPrint(responseJSONString: jsonString, error: error, failedToDecodeInto: Response.self)
+			#endif
+			return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEither(responseType: "\(Response.self)", decodingError: error))
+		} catch {
+			return .failure(.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEitherNorAsSwiftDecodingError(responseType: "\(Response.self)", nonSwiftDecodingError: String(describing: error)))
 		}
 	}
 
@@ -312,7 +316,7 @@ private extension EngineToolkit {
 	/// Only one memory allocator should be used at a time, and in most cases, when using the Radix Engine Toolkit
 	/// this would be the allocator provided by the library. Using multiple allocators can lead to memory corruption
 	/// issues and potential memory leaks if memory is not handeled correctly.
-	func allocateMemory(capacity: UInt) -> Result<MutableToolkitPointer, Error.CallLibraryFunctionFailure> {
+	private func allocateMemory(capacity: UInt) -> Result<MutableToolkitPointer, Error.CallLibraryFunctionFailure> {
 		if let allocatedMemory = toolkit_alloc(capacity) {
 			return .success(allocatedMemory)
 		} else {
@@ -327,7 +331,7 @@ private extension EngineToolkit {
 	/// Only one memory allocator should be used at a time, and in most cases, when using the Radix Engine Toolkit
 	/// this would be the allocator provided by the library. Using multiple allocators can lead to memory corruption
 	/// issues and potential memory leaks if memory is not handeled correctly.
-	func allocateMemoryForJSONStringOf(request requestJSONString: String) -> Result<MutableToolkitPointer, Error.CallLibraryFunctionFailure> {
+	private func allocateMemoryForJSONStringOf(request requestJSONString: String) -> Result<MutableToolkitPointer, Error.CallLibraryFunctionFailure> {
 		// Get the byte count of the C-String representation of the utf-8 encoded
 		// string.
 		let cString = Array(requestJSONString.utf8CString)
@@ -347,7 +351,7 @@ private extension EngineToolkit {
 	/// Only one memory allocator should be used at a time, and in most cases, when using the Radix Engine Toolkit
 	/// this would be the allocator provided by the library. Using multiple allocators can lead to memory corruption
 	/// issues and potential memory leaks if memory is not handeled correctly.
-	func deallocateMemoryOfNullTerminatedString(pointer: MutableToolkitPointer) {
+	private func deallocateMemoryOfNullTerminatedString(pointer: MutableToolkitPointer) {
 		toolkit_free_c_string(pointer)
 	}
 
@@ -356,7 +360,7 @@ private extension EngineToolkit {
 	/// This function writes the C-String representation of the passed string to the provided pointer. Since this is a C-String
 	/// representation, this means that an additional byte is added at the end with the null terminator.
 	@discardableResult
-	func writeJSONString(
+	private func writeJSONString(
 		of requestJSONString: String,
 		to pointer: MutableToolkitPointer
 	) -> MutableToolkitPointer {
@@ -374,7 +378,7 @@ private extension EngineToolkit {
 	/// Reads a string from the provided memory location.
 	///
 	/// This function reads a C-String, null terminated, string from the provided memory location and returns it.
-	func jsonStringOfResponse(
+	private func jsonStringOfResponse(
 		at pointer: ImmutableToolkitPointer
 	) -> String {
 		String(cString: pointer)
@@ -398,7 +402,7 @@ func prettyPrint<FailedDecodable: Decodable>(
 ) {
 	prettyPrint(
 		jsonString: responseJSONString,
-		label: "\n📦⬇️ Failed to parse response JSON string to either \(FailedDecodable.self) or \(ErrorResponse.self), underlying decoding error: \(String(describing: error))"
+		label: "\n📦⬇️ Failed to parse response JSON string to either \(FailedDecodable.self) or ErrorResponse, underlying decoding error: \(String(describing: error))"
 	)
 }
 

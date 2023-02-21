@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,9 @@ import AnyCodable
 public typealias NonFungibleIdsCollectionItem = GatewayAPI.NonFungibleIdsCollectionItem
 
 // MARK: - GatewayAPI.NonFungibleIdsCollectionItem
-public extension GatewayAPI {
-	struct NonFungibleIdsCollectionItem: Codable, Hashable {
+extension GatewayAPI {
+	public struct NonFungibleIdsCollectionItem: Codable, Hashable {
+		/** String-encoded non-fungible ID. */
 		public private(set) var nonFungibleId: String
 
 		public init(nonFungibleId: String) {

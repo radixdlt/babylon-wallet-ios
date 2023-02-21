@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias InvalidTransactionError = GatewayAPI.InvalidTransactionError
 
 // MARK: - GatewayAPI.InvalidTransactionError
-public extension GatewayAPI {
-	struct InvalidTransactionError: Codable, Hashable {
+extension GatewayAPI {
+	public struct InvalidTransactionError: Codable, Hashable {
 		/** The type of error. Each subtype may have its own additional structured fields. */
 		public private(set) var type: String
 

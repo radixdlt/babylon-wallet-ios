@@ -19,8 +19,8 @@ public struct WebRTCPeerConnectionConfig: Sendable, Hashable, Codable, CustomStr
 	public static let `default` = Self()
 }
 
-public extension WebRTCPeerConnectionConfig {
-	var description: String {
+extension WebRTCPeerConnectionConfig {
+	public var description: String {
 		"""
 		iceServerConfigs: \(iceServerConfigs),
 		sdpSemantics: \(sdpSemantics),
@@ -30,8 +30,8 @@ public extension WebRTCPeerConnectionConfig {
 }
 
 #if DEBUG
-public extension WebRTCPeerConnectionConfig {
-	static let placeholder = Self(
+extension WebRTCPeerConnectionConfig {
+	public static let placeholder = Self(
 		iceServerConfigs: [],
 		sdpSemantics: .unifiedPlan,
 		continualGatheringPolicy: .gatherOnce

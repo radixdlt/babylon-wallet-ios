@@ -1,8 +1,8 @@
 import Foundation
 
 // MARK: - Engine.SignatureWithPublicKey
-public extension Engine {
-	enum SignatureWithPublicKey: Sendable, Codable, Hashable {
+extension Engine {
+	public enum SignatureWithPublicKey: Sendable, Codable, Hashable {
 		// ==============
 		// Enum Variants
 		// ==============
@@ -18,8 +18,8 @@ public extension Engine {
 	}
 }
 
-public extension Engine.SignatureWithPublicKey {
-	var signature: Engine.Signature {
+extension Engine.SignatureWithPublicKey {
+	public var signature: Engine.Signature {
 		switch self {
 		case let .eddsaEd25519(signature, _):
 			return .eddsaEd25519(signature)
@@ -28,7 +28,7 @@ public extension Engine.SignatureWithPublicKey {
 		}
 	}
 
-	var publicKey: Engine.PublicKey? {
+	public var publicKey: Engine.PublicKey? {
 		switch self {
 		case let .eddsaEd25519(_, publicKey):
 			return .eddsaEd25519(publicKey)
@@ -38,8 +38,8 @@ public extension Engine.SignatureWithPublicKey {
 	}
 }
 
-private extension Engine.SignatureWithPublicKey {
-	var discriminator: CurveDiscriminator {
+extension Engine.SignatureWithPublicKey {
+	fileprivate var discriminator: CurveDiscriminator {
 		switch self {
 		case .ecdsaSecp256k1: return .ecdsaSecp256k1
 		case .eddsaEd25519: return .eddsaEd25519
@@ -47,16 +47,18 @@ private extension Engine.SignatureWithPublicKey {
 	}
 }
 
-public extension Engine.SignatureWithPublicKey {
+extension Engine.SignatureWithPublicKey {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
-		case discriminator = "type"
+		case discriminator = "curve"
 		case publicKey = "public_key"
 		case signature
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(discriminator, forKey: .discriminator)
 
@@ -69,7 +71,7 @@ public extension Engine.SignatureWithPublicKey {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(CurveDiscriminator.self, forKey: .discriminator)

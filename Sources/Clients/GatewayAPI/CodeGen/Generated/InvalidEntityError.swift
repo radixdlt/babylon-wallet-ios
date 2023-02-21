@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,11 +14,11 @@ import AnyCodable
 public typealias InvalidEntityError = GatewayAPI.InvalidEntityError
 
 // MARK: - GatewayAPI.InvalidEntityError
-public extension GatewayAPI {
-	struct InvalidEntityError: Codable, Hashable {
+extension GatewayAPI {
+	public struct InvalidEntityError: Codable, Hashable {
 		/** The type of error. Each subtype may have its own additional structured fields. */
 		public private(set) var type: String
-		/** The Bech32m-encoded human readable version of the entity's global address. */
+		/** Bech32m-encoded human readable version of the entity's global address. */
 		public private(set) var address: String
 
 		public init(type: String, address: String) {

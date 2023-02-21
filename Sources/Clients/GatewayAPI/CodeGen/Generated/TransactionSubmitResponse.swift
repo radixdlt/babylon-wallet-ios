@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias TransactionSubmitResponse = GatewayAPI.TransactionSubmitResponse
 
 // MARK: - GatewayAPI.TransactionSubmitResponse
-public extension GatewayAPI {
-	struct TransactionSubmitResponse: Codable, Hashable {
+extension GatewayAPI {
+	public struct TransactionSubmitResponse: Codable, Hashable {
 		/** Is true if the transaction is a duplicate of an existing pending transaction. */
 		public private(set) var duplicate: Bool
 

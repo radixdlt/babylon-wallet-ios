@@ -56,8 +56,8 @@ public final class WebSocketClient {
 	}
 }
 
-private extension WebSocketClient {
-	func webSocketTaskIfRunning() -> URLSessionWebSocketTask? {
+extension WebSocketClient {
+	private func webSocketTaskIfRunning() -> URLSessionWebSocketTask? {
 		guard let _webSocketTask else { return nil }
 		guard _webSocketTask.state == .running || _webSocketTask.state == .suspended else {
 			loggerGlobal.warning("WebSocketTask state is not running, it is: \(String(describing: _webSocketTask.state)), so treating it as nil.")
@@ -67,10 +67,10 @@ private extension WebSocketClient {
 	}
 }
 
-public extension WebSocketClient {
-	typealias Error = ConverseError.WebSocket
+extension WebSocketClient {
+	public typealias Error = ConverseError.WebSocket
 
-	func connect(didOpen: @escaping @Sendable () -> Void) {
+	public func connect(didOpen: @escaping @Sendable () -> Void) {
 		stateSubject.send(.connecting)
 		let webSocketTask = URLSession.shared.webSocketTask(with: url)
 		loggerGlobal.debug("Connecting to websocket URL: \(url.absoluteString)")
@@ -81,7 +81,7 @@ public extension WebSocketClient {
 		webSocketTask.delegate = delegate
 	}
 
-	func send(
+	public func send(
 		data: Data,
 		callback: @escaping @Sendable (Result<Void, Error>) -> Void
 	) {
@@ -101,7 +101,7 @@ public extension WebSocketClient {
 		}
 	}
 
-	func sendPing(
+	public func sendPing(
 		callback: @escaping @Sendable (Result<Void, Error>) -> Void
 	) {
 		guard let webSocketTask = webSocketTaskIfRunning() else {
@@ -120,7 +120,7 @@ public extension WebSocketClient {
 		}
 	}
 
-	func receiveMessage(
+	public func receiveMessage(
 		callback: @escaping @Sendable (Result<URLSessionWebSocketTask.Message, Error>) -> Void
 	) {
 		guard let webSocketTask = webSocketTaskIfRunning() else {
@@ -141,7 +141,7 @@ public extension WebSocketClient {
 		}
 	}
 
-	func close(didClose: @escaping @Sendable (URLSessionWebSocketTask.CloseCode) -> Void) {
+	public func close(didClose: @escaping @Sendable (URLSessionWebSocketTask.CloseCode) -> Void) {
 		stateSubject.send(.closing)
 		loggerGlobal.notice("Closing websocket with url: \(self.url.absoluteString)")
 		delegate!.didClose = { [weak self] closeCode in
@@ -152,8 +152,8 @@ public extension WebSocketClient {
 	}
 }
 
-private extension URLSessionWebSocketTask.Message {
-	var byteCount: Int {
+extension URLSessionWebSocketTask.Message {
+	fileprivate var byteCount: Int {
 		switch self {
 		case let .data(data): return data.count
 		case let .string(string): return string.data(using: .utf8)?.count ?? 0

@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,13 +14,16 @@ import AnyCodable
 public typealias NonFungibleDataResponseAllOf = GatewayAPI.NonFungibleDataResponseAllOf
 
 // MARK: - GatewayAPI.NonFungibleDataResponseAllOf
-public extension GatewayAPI {
-	struct NonFungibleDataResponseAllOf: Codable, Hashable {
-		/** The Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
+extension GatewayAPI {
+	public struct NonFungibleDataResponseAllOf: Codable, Hashable {
+		/** Bech32m-encoded human readable version of the resource (fungible, non-fungible) global address. */
 		public private(set) var address: String
 		public private(set) var nonFungibleIdType: NonFungibleIdType
+		/** String-encoded non-fungible ID. */
 		public private(set) var nonFungibleId: String
+		/** Hex-encoded binary blob. */
 		public private(set) var mutableDataHex: String
+		/** Hex-encoded binary blob. */
 		public private(set) var immutableDataHex: String
 
 		public init(address: String, nonFungibleIdType: NonFungibleIdType, nonFungibleId: String, mutableDataHex: String, immutableDataHex: String) {

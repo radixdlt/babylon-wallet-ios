@@ -75,10 +75,11 @@ extension Component {
 }
 
 // MARK: - Private Computed Properties
-private extension Component {
-	var metadata: [[String: String]] {
+
+extension Component {
+	private var metadata: [[String: String]] {
 		// TODO: refactor when API returns NFT metadata
-//		token.metadata ?? []
+		//		token.metadata ?? []
 		[]
 	}
 }
@@ -86,9 +87,7 @@ private extension Component {
 extension NonFungibleToken.ID {
 	var stringRepresentation: String {
 		switch self {
-		case let .u32(value):
-			return "\(value)"
-		case let .u64(value):
+		case let .integer(value):
 			return "\(value)"
 		case let .uuid(value):
 			return "\(value)"
@@ -120,8 +119,8 @@ extension Component: ExpandableRow {
 }
 
 // MARK: - Component.Constants
-private extension Component {
-	enum Constants {
+extension Component {
+	fileprivate enum Constants {
 		static let radius: CGFloat = .small1
 	}
 }

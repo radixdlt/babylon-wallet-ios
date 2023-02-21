@@ -2,8 +2,8 @@
 import CryptoKit
 import TestingPrelude
 
-public extension HD.Root {
-	init(mnemonic: Mnemonic, passphrase: String = "") throws {
+extension HD.Root {
+	public init(mnemonic: Mnemonic, passphrase: String = "") throws {
 		try self.init(seed: mnemonic.seed(passphrase: passphrase))
 	}
 }

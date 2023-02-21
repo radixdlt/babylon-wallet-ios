@@ -1,8 +1,8 @@
 import BitCollections
 
-public extension BitArray {
+extension BitArray {
 	// https://stackoverflow.com/a/28930093/1311272
-	func asBytesArray() -> [UInt8] {
+	public func asBytesArray() -> [UInt8] {
 		let numBits = self.count
 		let numBytes = (numBits + 7) / 8
 		var bytes = [UInt8](repeating: 0, count: numBytes)
@@ -14,23 +14,23 @@ public extension BitArray {
 		return bytes
 	}
 
-	func asData() -> Data {
+	public func asData() -> Data {
 		Data(self.asBytesArray())
 	}
 
-	init(data: Data) {
+	public init(data: Data) {
 		self.init(binaryString: data.binaryString)!
 	}
 
-	var binaryString: String { map { "\($0 == true ? 1 : 0)" }.joined() }
+	public var binaryString: String { map { "\($0 == true ? 1 : 0)" }.joined() }
 }
 
-public extension BitArray {
-	init(indices: [UInt11]) {
+extension BitArray {
+	public init(indices: [UInt11]) {
 		self.init(indices)
 	}
 
-	init?(binaryString: String) {
+	public init?(binaryString: String) {
 		var boolArray = [Bool](repeating: false, count: binaryString.count)
 		for (index, bit) in binaryString.enumerated() {
 			switch bit {
@@ -44,7 +44,7 @@ public extension BitArray {
 	}
 
 	/// A non-optimized initializer taking an array of `UInt11`
-	init<S>(_ elements: S) where S: Sequence, S.Iterator.Element == UInt11 {
+	public init<S>(_ elements: S) where S: Sequence, S.Iterator.Element == UInt11 {
 		let binaryString: String = elements.map(\.binaryString).joined()
 
 		guard

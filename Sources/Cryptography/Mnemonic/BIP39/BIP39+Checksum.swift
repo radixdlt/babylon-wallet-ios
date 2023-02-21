@@ -1,9 +1,9 @@
 import struct CryptoKit.SHA256
 import Prelude
 
-internal extension BIP39 {
+extension BIP39 {
 	@discardableResult
-	static func validateChecksumOf(
+	internal static func validateChecksumOf(
 		mnemonicWords: [String],
 		language: BIP39.Language
 	) throws -> [String] {

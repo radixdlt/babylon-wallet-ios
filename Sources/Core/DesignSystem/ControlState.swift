@@ -1,7 +1,7 @@
 import SwiftUI
 
 // MARK: - ControlState
-public enum ControlState: Equatable {
+public enum ControlState: Hashable {
 	case enabled
 	case loading(LoadingContext)
 	case disabled
@@ -23,7 +23,7 @@ public enum ControlState: Equatable {
 }
 
 // MARK: - LoadingContext
-public enum LoadingContext: Equatable {
+public enum LoadingContext: Hashable {
 	case local
 	case global(text: String?)
 }
@@ -52,8 +52,8 @@ extension EnvironmentValues {
 	}
 }
 
-public extension View {
-	func controlState(_ state: ControlState) -> some View {
+extension View {
+	public func controlState(_ state: ControlState) -> some View {
 		self.environment(\.controlState, state)
 			.transformPreference(LoadingContextKey.self) {
 				switch state {

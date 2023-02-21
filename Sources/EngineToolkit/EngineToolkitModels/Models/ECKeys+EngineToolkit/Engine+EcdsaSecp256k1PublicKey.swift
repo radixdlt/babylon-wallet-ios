@@ -1,8 +1,8 @@
 import Foundation
 
 // MARK: - Engine.EcdsaSecp256k1PublicKey
-public extension Engine {
-	struct EcdsaSecp256k1PublicKey: Sendable, Codable, Hashable {
+extension Engine {
+	public struct EcdsaSecp256k1PublicKey: Sendable, Codable, Hashable {
 		// MARK: Stored properties
 		public let bytes: [UInt8]
 
@@ -18,19 +18,19 @@ public extension Engine {
 	}
 }
 
-public extension Engine.EcdsaSecp256k1PublicKey {
+extension Engine.EcdsaSecp256k1PublicKey {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case value, type
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container: SingleValueEncodingContainer = encoder.singleValueContainer()
 		try container.encode(bytes.hex())
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		try self.init(hex: container.decode(String.self))
 	}

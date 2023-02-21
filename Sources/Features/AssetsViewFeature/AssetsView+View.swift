@@ -3,9 +3,9 @@ import FungibleTokenListFeature
 import NonFungibleTokenListFeature
 
 // MARK: - AssetsView.View
-public extension AssetsView {
+extension AssetsView {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -15,8 +15,8 @@ public extension AssetsView {
 	}
 }
 
-public extension AssetsView.View {
-	var body: some View {
+extension AssetsView.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -44,8 +44,8 @@ public extension AssetsView.View {
 
 					// TODO: uncomment when ready for implementation
 					/*
-					 case .poolShare:
-					 	Text("Pool Share")
+					 case .poolUnits:
+					 	Text("Pool Units")
 					 case .badges:
 					 	Text("Badges")
 					 */
@@ -56,13 +56,13 @@ public extension AssetsView.View {
 }
 
 // MARK: - AssetsView.View.AssetsViewViewStore
-private extension AssetsView.View {
-	typealias AssetsViewViewStore = ComposableArchitecture.ViewStore<AssetsView.View.ViewState, AssetsView.Action.ViewAction>
+extension AssetsView.View {
+	fileprivate typealias AssetsViewViewStore = ComposableArchitecture.ViewStore<AssetsView.View.ViewState, AssetsView.ViewAction>
 }
 
 // MARK: - Private Methods
-private extension AssetsView.View {
-	func selectorView(with viewStore: AssetsViewViewStore) -> some View {
+extension AssetsView.View {
+	fileprivate func selectorView(with viewStore: AssetsViewViewStore) -> some View {
 		HStack(spacing: .zero) {
 			Spacer()
 
@@ -76,7 +76,7 @@ private extension AssetsView.View {
 		}
 	}
 
-	func selectorButton(
+	fileprivate func selectorButton(
 		type: AssetsView.AssetsViewType,
 		with viewStore: AssetsViewViewStore,
 		action: @escaping () -> Void

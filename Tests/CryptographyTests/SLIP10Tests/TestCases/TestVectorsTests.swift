@@ -27,8 +27,8 @@ final class TestVectorsTests: TestCase {
 	}
 }
 
-private extension TestVectorsTests {
-	func doTestFile(
+extension TestVectorsTests {
+	private func doTestFile(
 		testFile: TestFile,
 		file: StaticString = #file, line: UInt = #line
 	) throws {
@@ -42,7 +42,7 @@ private extension TestVectorsTests {
 		print(" - PASSED ✅")
 	}
 
-	func doTestGroup(
+	private func doTestGroup(
 		group: TestGroup,
 		file: StaticString = #file, line: UInt = #line
 	) throws {
@@ -79,7 +79,7 @@ private extension TestVectorsTests {
 		}
 	}
 
-	func doTestScenario(
+	private func doTestScenario(
 		root: HD.Root,
 		testScenario: TestScenario,
 		groupId: Int,
@@ -99,7 +99,7 @@ private extension TestVectorsTests {
 		}
 	}
 
-	func XCTAssertKeysEqual(
+	private func XCTAssertKeysEqual(
 		_ actual: ExtendedKey,
 		expected: ExtendedKey,
 		_ prefix: String? = nil,
@@ -173,31 +173,19 @@ enum Slip10Curve: String, Decodable, Hashable {
 	case curve25519 = "ed25519"
 
 	init(curveType: Slip10CurveType) {
-		if #available(macOS 13, iOS 16, *) {
-			switch curveType {
-			case .secp256k1: self = .secp256k1
-			case .p256: self = .p256
-			case .curve25519: self = .curve25519
-			default: fatalError("Unsupported curve")
-			}
-		} else {
-			switch curveType {
-			case .secp256k1: self = .secp256k1
-			case .curve25519: self = .curve25519
-			default: fatalError("Unsupported curve")
-			}
+		switch curveType {
+		case .secp256k1: self = .secp256k1
+		case .p256: self = .p256
+		case .curve25519: self = .curve25519
+		default: fatalError("Unsupported curve")
 		}
 	}
 
 	var curveType: Slip10CurveType {
 		switch self {
-		case .curve25519: return .curve25519
 		case .secp256k1: return .secp256k1
-		case .p256: if #available(macOS 13, iOS 16, *) {
-				return .p256
-			} else {
-				fatalError("unsupported")
-			}
+		case .curve25519: return .curve25519
+		case .p256: return .p256
 		}
 	}
 }
@@ -232,16 +220,12 @@ extension HD.Root {
 			)
 
 		case .p256:
-			if #available(macOS 13, iOS 16, *) {
-				return try .init(
-					concrete: derivePrivateKey(
-						path: path,
-						curve: P256.self
-					)
+			return try .init(
+				concrete: derivePrivateKey(
+					path: path,
+					curve: P256.self
 				)
-			} else {
-				fatalError("unsupported")
-			}
+			)
 		}
 	}
 }

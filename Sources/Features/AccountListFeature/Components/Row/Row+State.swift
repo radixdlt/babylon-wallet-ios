@@ -2,11 +2,11 @@ import AccountPortfolio
 import FeaturePrelude
 
 // MARK: - AccountList.Row.State
-public extension AccountList.Row {
+extension AccountList.Row {
 	// MARK: State
-	struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		public let account: OnNetwork.Account
-		public var aggregatedValue: Float?
+		public var aggregatedValue: BigDecimal?
 		public var portfolio: AccountPortfolio
 
 		// MARK: - AppSettings properties
@@ -15,7 +15,7 @@ public extension AccountList.Row {
 
 		public init(
 			account: OnNetwork.Account,
-			aggregatedValue: Float?,
+			aggregatedValue: BigDecimal?,
 			portfolio: AccountPortfolio,
 			currency: FiatCurrency,
 			isCurrencyAmountVisible: Bool
@@ -30,8 +30,8 @@ public extension AccountList.Row {
 }
 
 // MARK: - Convenience
-public extension AccountList.Row.State {
-	init(account: OnNetwork.Account) {
+extension AccountList.Row.State {
+	public init(account: OnNetwork.Account) {
 		self.init(
 			account: account,
 			aggregatedValue: nil,
@@ -52,7 +52,7 @@ extension AccountList.Row.State: Identifiable {
 }
 
 #if DEBUG
-public extension AccountList.Row.State {
-	static let previewValue = Self(account: .previewValue0)
+extension AccountList.Row.State {
+	public static let previewValue = Self(account: .previewValue0)
 }
 #endif

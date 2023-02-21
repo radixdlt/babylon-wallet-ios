@@ -19,8 +19,8 @@ public enum EntityKind:
 	case identity = 618
 }
 
-public extension EntityKind {
-	var description: String {
+extension EntityKind {
+	public var description: String {
 		switch self {
 		case .account: return "account"
 		case .identity: return "identity"

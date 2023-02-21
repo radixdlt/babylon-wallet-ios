@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - FungibleTokenDetails.View
-public extension FungibleTokenDetails {
+extension FungibleTokenDetails {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<FungibleTokenDetails>
 
 		public init(store: StoreOf<FungibleTokenDetails>) {
@@ -12,8 +12,8 @@ public extension FungibleTokenDetails {
 	}
 }
 
-public extension FungibleTokenDetails.View {
-	var body: some View {
+extension FungibleTokenDetails.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -90,24 +90,24 @@ public extension FungibleTokenDetails.View {
 // MARK: - FungibleTokenDetails.View.ViewState
 extension FungibleTokenDetails.View {
 	struct ViewState: Equatable {
-		var displayName: String?
-		var iconURL: URL?
-		var placeholderAsset: ImageAsset
-		var amount: String?
-		var symbol: String?
-		var description: String?
-		var address: AddressView.ViewState
-		var currentSupply: BigDecimal?
+		let displayName: String?
+		let iconURL: URL?
+		let placeholderAsset: ImageAsset
+		let amount: String
+		let symbol: String?
+		let description: String?
+		let address: AddressView.ViewState
+		let currentSupply: BigDecimal?
 
 		init(state: FungibleTokenDetails.State) {
-			displayName = state.asset.name
-			iconURL = state.asset.iconURL
-			placeholderAsset = state.asset.placeholderImage
-			amount = state.amount
-			symbol = state.asset.symbol
-			description = state.asset.tokenDescription
-			address = .init(address: state.asset.componentAddress.address, format: .short())
-			currentSupply = state.asset.totalMinted
+			self.displayName = state.asset.name
+			self.iconURL = state.asset.iconURL
+			self.placeholderAsset = .placeholderImage(isXRD: state.asset.isXRD)
+			self.amount = state.amount.format()
+			self.symbol = state.asset.symbol
+			self.description = state.asset.tokenDescription
+			self.address = .init(address: state.asset.componentAddress.address, format: .short())
+			self.currentSupply = state.asset.totalMinted
 		}
 	}
 }

@@ -8,16 +8,16 @@ import NonFungibleTokenListFeature
 
 @MainActor
 final class HomeFeatureTests: TestCase {
-	let account = OnNetwork.Account.testValue
+	let account = OnNetwork.Account.previewValue0
 	var address: AccountAddress { account.address }
 
 	func test_fetchPortfolio() async {
 		// given
 
 		// fungible tokens
-		let btcContainer = FungibleTokenContainer(owner: address, asset: .btc, amount: "1234", worth: 1234)
-		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amount: "2345", worth: 2345)
-		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amount: "3456", worth: 3456)
+		let btcContainer = FungibleTokenContainer(owner: address, asset: .btc, amount: 1234, worth: 1234)
+		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amount: 2345, worth: 2345)
+		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amount: 3456, worth: 3456)
 
 		// non fungible tokens
 		let nftContainer1 = NonFungibleTokenContainer.mock1
@@ -28,7 +28,7 @@ final class HomeFeatureTests: TestCase {
 			account.address: .init(
 				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
 				nonFungibleTokenContainers: [nftContainer1, nftContainer2, nftContainer3],
-				poolShareContainers: [],
+				poolUnitContainers: [],
 				badgeContainers: []
 			),
 		]
@@ -37,7 +37,7 @@ final class HomeFeatureTests: TestCase {
 		let accountDetailsState = AccountDetails.State(for: accountRowState)
 		var initialState: Home.State = .previewValue
 		initialState.accountDetails = accountDetailsState
-		initialState.accountList = .init(nonEmptyOrderedSetOfAccounts: .init(rawValue: .init([account]))!)
+		initialState.accountList = .init(accounts: .init(uniqueElements: [account].map(AccountList.Row.State.init(account:))))
 
 		let store = TestStore(
 			initialState: initialState,
@@ -45,7 +45,7 @@ final class HomeFeatureTests: TestCase {
 		)
 
 		// when
-		await store.send(.internal(.system(.fetchPortfolioResult(.success(totalPortfolio))))) { [address] in
+		await store.send(.internal(.fetchPortfolioResult(.success(totalPortfolio)))) { [address] in
 			// then
 			// local dictionary
 			$0.accountPortfolioDictionary = totalPortfolio
@@ -102,15 +102,15 @@ final class HomeFeatureTests: TestCase {
 	func test_accountWorthLoaded_whenSingleAccountWorthIsLoaded_thenUpdateSingleAccount() async {
 		// given
 		// fungible tokens
-		let btcContainer = FungibleTokenContainer(owner: address, asset: .btc, amount: "1234", worth: 1234)
-		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amount: "2345", worth: 2345)
-		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amount: "3456", worth: 3456)
+		let btcContainer = FungibleTokenContainer(owner: address, asset: .btc, amount: 1234, worth: 1234)
+		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amount: 2345, worth: 2345)
+		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amount: 3456, worth: 3456)
 
 		let accountPortfolio: AccountPortfolioDictionary = [
 			account.address: .init(
 				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
 				nonFungibleTokenContainers: [],
-				poolShareContainers: [],
+				poolUnitContainers: [],
 				badgeContainers: []
 			),
 		]
@@ -122,7 +122,7 @@ final class HomeFeatureTests: TestCase {
 		)
 
 		// when
-		await store.send(.internal(.system(.fetchPortfolioResult(.success(accountPortfolio))))) {
+		await store.send(.internal(.fetchPortfolioResult(.success(accountPortfolio)))) {
 			// then
 			guard let key = accountPortfolio.first?.key else {
 				XCTFail("Failed to fetch first account")

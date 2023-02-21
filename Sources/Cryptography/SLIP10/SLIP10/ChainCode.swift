@@ -11,9 +11,9 @@ public struct ChainCode: Hashable {
 	}
 }
 
-public extension ChainCode {
-	static let byteCount = 32
-	enum Error: Swift.Error {
+extension ChainCode {
+	public static let byteCount = 32
+	public enum Error: Swift.Error {
 		case incorrectByteCount(expected: Int, butGot: Int)
 	}
 }

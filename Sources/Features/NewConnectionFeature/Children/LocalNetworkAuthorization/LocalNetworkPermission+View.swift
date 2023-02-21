@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - LocalNetworkPermission.View
-public extension LocalNetworkPermission {
+extension LocalNetworkPermission {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<LocalNetworkPermission>
 
 		public init(store: StoreOf<LocalNetworkPermission>) {
@@ -12,30 +12,16 @@ public extension LocalNetworkPermission {
 	}
 }
 
-public extension LocalNetworkPermission.View {
-	var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			ZStack {}
-				.alert(
-					store.scope(
-						state: \.permissionDeniedAlert,
-						action: { .view(.permissionDeniedAlert($0)) }
-					),
-					dismiss: .dismissed
-				)
-				.onAppear { viewStore.send(.appeared) }
-		}
-	}
-}
-
-// MARK: - LocalNetworkPermission.View.ViewState
 extension LocalNetworkPermission.View {
-	struct ViewState: Equatable {
-		init(state: LocalNetworkPermission.State) {}
+	public var body: some View {
+		ZStack {}
+			.alert(
+				store: store.scope(
+					state: \.$permissionDeniedAlert,
+					action: { .view(.permissionDeniedAlert($0)) }
+				)
+			)
+			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 	}
 }
 

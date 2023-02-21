@@ -1,4 +1,4 @@
-import CreateAccountFeature
+import CreateEntityFeature
 import FeaturePrelude
 import GatewayAPI
 import ProfileClient
@@ -12,15 +12,15 @@ public struct ManageGatewayAPIEndpoints: Sendable, ReducerProtocol {
 	public init() {}
 }
 
-public extension ManageGatewayAPIEndpoints {
-	var body: some ReducerProtocolOf<Self> {
+extension ManageGatewayAPIEndpoints {
+	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
 			.ifLet(\.createAccountCoordinator, action: /Action.createAccountCoordinator) {
 				CreateAccountCoordinator()
 			}
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
+	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.didAppear)):
 			return .run { send in
@@ -112,10 +112,14 @@ public extension ManageGatewayAPIEndpoints {
 			return skipSwitching(state: &state)
 
 		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway))):
-			state.createAccountCoordinator = .init(
-				completionDestination: .home,
-				rootState: .init(onNetworkWithID: newNetworkAndGateway.network.id, isFirstAccount: true)
-			)
+
+			state.createAccountCoordinator = .init(config: .init(
+				specificNetworkID: newNetworkAndGateway.network.id,
+				isFirstEntity: false,
+				canBeDismissed: true,
+				navigationButtonCTA: .goHome
+			))
+
 			return .none
 
 		case let .internal(.system(.switchToResult(.failure(error)))):
@@ -149,7 +153,7 @@ public extension ManageGatewayAPIEndpoints {
 		}
 	}
 
-	func skipSwitching(state: inout State) -> EffectTask<Action> {
+	public func skipSwitching(state: inout State) -> EffectTask<Action> {
 		state.createAccountCoordinator = nil
 		state.validatedNewNetworkAndGatewayToSwitchTo = nil
 		return .none

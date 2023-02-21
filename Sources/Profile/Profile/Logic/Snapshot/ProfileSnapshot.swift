@@ -3,20 +3,20 @@ import EngineToolkitModels
 import Prelude
 
 // MARK: - ProfileSnapshot.Version
-public extension ProfileSnapshot {
-	typealias Version = Tagged<Self, UInt32>
+extension ProfileSnapshot {
+	public typealias Version = Tagged<Self, UInt32>
 }
 
 // MARK: - ProfileSnapshot.Version.ProfileVersionHolder
-private extension ProfileSnapshot.Version {
-	struct ProfileVersionHolder: Decodable {
+extension ProfileSnapshot.Version {
+	fileprivate struct ProfileVersionHolder: Decodable {
 		// name of property MUST match that of ProfileSnapshot
 		let version: ProfileSnapshot.Version
 	}
 }
 
-public extension ProfileSnapshot.Version {
-	static func fromJSON(
+extension ProfileSnapshot.Version {
+	public static func fromJSON(
 		data: Data,
 		jsonDecoder: JSONDecoder = .iso8601
 	) throws -> Self {
@@ -34,8 +34,8 @@ struct IncompatibleProfileVersion: LocalizedError, Equatable {
 	}
 }
 
-public extension ProfileSnapshot {
-	static func validateCompatability(
+extension ProfileSnapshot {
+	public static func validateCompatability(
 		version: Version
 	) throws {
 		let minimumRequiredVersion: ProfileSnapshot.Version = .minimum
@@ -50,9 +50,9 @@ public extension ProfileSnapshot {
 	}
 }
 
-public extension ProfileSnapshot {
+extension ProfileSnapshot {
 	@discardableResult
-	static func validateVersionCompatability(
+	public static func validateVersionCompatability(
 		ofProfileSnapshotJSONData data: Data,
 		jsonDecoder: JSONDecoder = .iso8601
 	) throws -> Version {
@@ -70,8 +70,13 @@ public struct ProfileSnapshot:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
-	/// A Semantic Versioning of the Profile Snapshot data format used for compatability checks.
+	/// A version of the Profile Snapshot data format used for compatibility checks.
 	public let version: Version
+
+	/// A locally generated stable identfier of this Profile. Useful for checking if
+	/// to Profiles which are inequal based on `Equatable` (content) might be the
+	/// semantically the same, based on the ID.
+	public let id: ID; public typealias ID = Profile.ID
 
 	/// All sources of factors, used for authorization such as spending funds, contains no
 	/// secrets.
@@ -87,6 +92,7 @@ public struct ProfileSnapshot:
 	fileprivate init(
 		profile: Profile
 	) {
+		self.id = profile.id
 		self.version = profile.version
 		self.appPreferences = profile.appPreferences
 		self.perNetwork = profile.perNetwork
@@ -95,20 +101,21 @@ public struct ProfileSnapshot:
 }
 
 // MARK: Take Snapshot
-public extension Profile {
-	func snaphot() -> ProfileSnapshot {
+extension Profile {
+	public func snaphot() -> ProfileSnapshot {
 		.init(profile: self)
 	}
 }
 
-public extension Profile {
-	init(
+extension Profile {
+	public init(
 		snapshot: ProfileSnapshot
 	) throws {
 		try ProfileSnapshot.validateCompatability(version: snapshot.version)
 
 		self.init(
 			version: snapshot.version,
+			id: snapshot.id,
 			factorSources: snapshot.factorSources,
 			appPreferences: snapshot.appPreferences,
 			perNetwork: snapshot.perNetwork
@@ -116,11 +123,13 @@ public extension Profile {
 	}
 }
 
-public extension ProfileSnapshot {
-	var customDumpMirror: Mirror {
+extension ProfileSnapshot {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
+				"version": version,
+				"id": id,
 				"factorSources": factorSources,
 				"appPreferences": appPreferences,
 				"perNetwork": perNetwork,
@@ -129,7 +138,7 @@ public extension ProfileSnapshot {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		factorSources: \(factorSources),
 		appPreferences: \(appPreferences),

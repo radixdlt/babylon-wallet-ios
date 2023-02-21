@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,11 +14,13 @@ import AnyCodable
 public typealias CommittedTransactionInfo = GatewayAPI.CommittedTransactionInfo
 
 // MARK: - GatewayAPI.CommittedTransactionInfo
-public extension GatewayAPI {
-	struct CommittedTransactionInfo: Codable, Hashable {
+extension GatewayAPI {
+	public struct CommittedTransactionInfo: Codable, Hashable {
 		public private(set) var stateVersion: Int64?
 		public private(set) var transactionStatus: TransactionStatus
+		/** Hex-encoded SHA-256 hash. */
 		public private(set) var payloadHashHex: String
+		/** Hex-encoded SHA-256 hash. */
 		public private(set) var intentHashHex: String
 		public private(set) var feePaid: TokenAmount?
 		public private(set) var confirmedAt: Date?

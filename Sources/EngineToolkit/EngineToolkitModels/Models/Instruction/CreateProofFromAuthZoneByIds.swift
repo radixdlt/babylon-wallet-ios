@@ -10,14 +10,14 @@ public struct CreateProofFromAuthZoneByIds: InstructionProtocol {
 
 	// MARK: Stored properties
 	public let resourceAddress: ResourceAddress
-	public let ids: Set<NonFungibleId>
+	public let ids: Set<NonFungibleLocalId>
 	public let intoProof: Proof
 
 	// MARK: Init
 
 	public init(
 		resourceAddress: ResourceAddress,
-		ids: Set<NonFungibleId>,
+		ids: Set<NonFungibleLocalId>,
 		intoProof: Proof
 	) {
 		self.resourceAddress = resourceAddress
@@ -26,7 +26,7 @@ public struct CreateProofFromAuthZoneByIds: InstructionProtocol {
 	}
 }
 
-public extension CreateProofFromAuthZoneByIds {
+extension CreateProofFromAuthZoneByIds {
 	// MARK: CodingKeys
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
@@ -36,7 +36,7 @@ public extension CreateProofFromAuthZoneByIds {
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
@@ -45,7 +45,7 @@ public extension CreateProofFromAuthZoneByIds {
 		try container.encode(intoProof, forKey: .intoProof)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: InstructionKind = try container.decode(InstructionKind.self, forKey: .type)
@@ -55,7 +55,7 @@ public extension CreateProofFromAuthZoneByIds {
 
 		try self.init(
 			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
-			ids: container.decode(Set<NonFungibleId>.self, forKey: .ids),
+			ids: container.decode(Set<NonFungibleLocalId>.self, forKey: .ids),
 			intoProof: container.decode(Proof.self, forKey: .intoProof)
 		)
 	}

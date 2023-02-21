@@ -2,15 +2,15 @@ import Cryptography
 import EngineToolkitModels
 import Prelude
 
-public extension TransactionManifest {
-	func header(_ header: TransactionHeader) -> TransactionIntent {
+extension TransactionManifest {
+	public func header(_ header: TransactionHeader) -> TransactionIntent {
 		.init(header: header, manifest: self)
 	}
 }
 
-public extension TransactionIntent {
-	func blobs(_ blobs: [[UInt8]]) -> Self {
-		.init(header: header, manifest: .init(instructions: self.manifest.instructions, blobs: blobs))
+extension TransactionIntent {
+	public func blobs(_ blobs: [[UInt8]]) -> Self {
+		.init(header: header, manifest: .init(instructions: manifest.instructions, blobs: blobs))
 	}
 }
 
@@ -27,10 +27,10 @@ public struct NotarizedNonNotarySignedButIntentSignedTransctionContext: Hashable
 		notarizedTransactionHash: Data
 	) -> NotarizedSignedTransctionContext {
 		.init(
-			transactionIntent: self.transactionIntent,
-			transactionIntentHash: self.transactionIntentHash,
-			compileTransactionIntentResponse: self.compileTransactionIntentResponse,
-			signedTransactionIntent: self.signedTransactionIntent,
+			transactionIntent: transactionIntent,
+			transactionIntentHash: transactionIntentHash,
+			compileTransactionIntentResponse: compileTransactionIntentResponse,
+			signedTransactionIntent: signedTransactionIntent,
 			compileSignedTransactionIntentResponse: compileSignedTransactionIntentResponse,
 			notarizedTransactionHash: notarizedTransactionHash,
 			notarizedTransaction: notarizedTransaction
@@ -49,24 +49,24 @@ public struct NotarizedSignedTransctionContext: Hashable {
 	public internal(set) var notarizedTransaction: NotarizedTransaction
 }
 
-public extension TransactionIntent {
-	func sign(with privateKey: Curve25519.Signing.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
+extension TransactionIntent {
+	public func sign(with privateKey: Curve25519.Signing.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		try sign(with: Engine.PrivateKey.curve25519(privateKey))
 	}
 
-	func sign(with privateKey: K1.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
+	public func sign(with privateKey: K1.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		try sign(with: Engine.PrivateKey.secp256k1(privateKey))
 	}
 
-	func sign(with privateKey: SLIP10.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
+	public func sign(with privateKey: SLIP10.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		try sign(with: privateKey.intoEngine())
 	}
 
-	func sign(with privateKey: Engine.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
+	public func sign(with privateKey: Engine.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		try sign(withMany: [privateKey])
 	}
 
-	func sign(withMany privateKeys: [Engine.PrivateKey]) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
+	public func sign(withMany privateKeys: [Engine.PrivateKey]) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		let compiledTransactionIntentResponse = try EngineToolkit()
 			.compileTransactionIntentRequest(
 				request: self
@@ -93,28 +93,28 @@ public extension TransactionIntent {
 	}
 }
 
-public extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
-	func sign(with privateKey: Curve25519.Signing.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
+extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
+	public func sign(with privateKey: Curve25519.Signing.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		try sign(with: Engine.PrivateKey.curve25519(privateKey))
 	}
 
-	func sign(with privateKey: K1.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
+	public func sign(with privateKey: K1.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		try sign(with: Engine.PrivateKey.secp256k1(privateKey))
 	}
 
-	func sign(with privateKey: SLIP10.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
+	public func sign(with privateKey: SLIP10.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		try sign(with: privateKey.intoEngine())
 	}
 
-	func sign(with privateKey: Engine.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
+	public func sign(with privateKey: Engine.PrivateKey) throws -> NotarizedNonNotarySignedButIntentSignedTransctionContext {
 		let compiledSignedTransactionIntent = try EngineToolkit().compileSignedTransactionIntentRequest(
 			request: self.signedTransactionIntent
-		).get().compiledSignedIntent
+		).get().compiledIntent
 
 		let (signature, _) = try privateKey.signReturningHashOfMessage(data: compiledSignedTransactionIntent)
 
 		let signedTransactionIntent = SignedTransactionIntent(
-			intent: self.transactionIntent,
+			intent: transactionIntent,
 			intentSignatures: self.signedTransactionIntent.intentSignatures + [signature]
 		)
 		var mutableSelf = self
@@ -123,25 +123,25 @@ public extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 	}
 }
 
-public extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
-	func notarize(_ notaryPrivateKey: Curve25519.Signing.PrivateKey) throws -> NotarizedSignedTransctionContext {
+extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
+	public func notarize(_ notaryPrivateKey: Curve25519.Signing.PrivateKey) throws -> NotarizedSignedTransctionContext {
 		try notarize(Engine.PrivateKey.curve25519(notaryPrivateKey))
 	}
 
-	func notarize(_ notaryPrivateKey: K1.PrivateKey) throws -> NotarizedSignedTransctionContext {
+	public func notarize(_ notaryPrivateKey: K1.PrivateKey) throws -> NotarizedSignedTransctionContext {
 		try notarize(Engine.PrivateKey.secp256k1(notaryPrivateKey))
 	}
 
-	func notarize(_ notaryPrivateKey: SLIP10.PrivateKey) throws -> NotarizedSignedTransctionContext {
+	public func notarize(_ notaryPrivateKey: SLIP10.PrivateKey) throws -> NotarizedSignedTransctionContext {
 		try notarize(notaryPrivateKey.intoEngine())
 	}
 
-	func notarize(_ notaryPrivateKey: Engine.PrivateKey) throws -> NotarizedSignedTransctionContext {
+	public func notarize(_ notaryPrivateKey: Engine.PrivateKey) throws -> NotarizedSignedTransctionContext {
 		let compileSignedTransactionIntentResponse = try EngineToolkit().compileSignedTransactionIntentRequest(
 			request: signedTransactionIntent
 		).get()
 
-		let compiledSignedTransactionIntent = compileSignedTransactionIntentResponse.compiledSignedIntent
+		let compiledSignedTransactionIntent = compileSignedTransactionIntentResponse.compiledIntent
 
 		// Notarize the signed intent to create a notarized transaction
 		let (notarySignature, notarizedTransactionHash) = try notaryPrivateKey.signReturningHashOfMessage(
@@ -161,20 +161,20 @@ public extension NotarizedNonNotarySignedButIntentSignedTransctionContext {
 	}
 }
 
-public extension TransactionIntent {
-	func notarize(_ notaryPrivateKey: Curve25519.Signing.PrivateKey) throws -> NotarizedSignedTransctionContext {
+extension TransactionIntent {
+	public func notarize(_ notaryPrivateKey: Curve25519.Signing.PrivateKey) throws -> NotarizedSignedTransctionContext {
 		try notarize(Engine.PrivateKey.curve25519(notaryPrivateKey))
 	}
 
-	func notarize(_ notaryPrivateKey: K1.PrivateKey) throws -> NotarizedSignedTransctionContext {
+	public func notarize(_ notaryPrivateKey: K1.PrivateKey) throws -> NotarizedSignedTransctionContext {
 		try notarize(Engine.PrivateKey.secp256k1(notaryPrivateKey))
 	}
 
-	func notarize(_ notaryPrivateKey: SLIP10.PrivateKey) throws -> NotarizedSignedTransctionContext {
+	public func notarize(_ notaryPrivateKey: SLIP10.PrivateKey) throws -> NotarizedSignedTransctionContext {
 		try notarize(notaryPrivateKey.intoEngine())
 	}
 
-	func notarize(_ notaryPrivateKey: Engine.PrivateKey) throws -> NotarizedSignedTransctionContext {
+	public func notarize(_ notaryPrivateKey: Engine.PrivateKey) throws -> NotarizedSignedTransctionContext {
 		try sign(withMany: []) // a bit hacky, but hey, it works!
 			.notarize(notaryPrivateKey)
 	}

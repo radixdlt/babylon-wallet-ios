@@ -5,9 +5,9 @@ import FeaturePrelude
 import FungibleTokenListFeature
 
 // MARK: - AccountDetails.State
-public extension AccountDetails {
+extension AccountDetails {
 	// MARK: State
-	struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		public let account: OnNetwork.Account
 		public var assets: AssetsView.State
 
@@ -46,12 +46,12 @@ public extension AccountDetails {
 	}
 }
 
-public extension AccountDetails.State {
-	var address: AccountAddress {
+extension AccountDetails.State {
+	public var address: AccountAddress {
 		account.address
 	}
 
-	var displayName: String {
-		account.displayName ?? "Unnamed account"
+	public var displayName: String {
+		account.displayName.rawValue
 	}
 }

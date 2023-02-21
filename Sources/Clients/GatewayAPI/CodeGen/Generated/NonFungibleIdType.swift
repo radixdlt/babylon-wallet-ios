@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,11 +14,10 @@ import AnyCodable
 public typealias NonFungibleIdType = GatewayAPI.NonFungibleIdType
 
 // MARK: - GatewayAPI.NonFungibleIdType
-public extension GatewayAPI {
-	enum NonFungibleIdType: String, Codable, CaseIterable {
+extension GatewayAPI {
+	public enum NonFungibleIdType: String, Codable, CaseIterable {
 		case string
-		case u32
-		case u64
+		case number
 		case bytes
 		case uuid
 	}

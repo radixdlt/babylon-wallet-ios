@@ -24,17 +24,19 @@ public struct AppPreferences:
 
 	public init(
 		display: Display = .default,
-		p2pClients: P2PClients,
+		p2pClients: P2PClients = [],
 		networkAndGateway: NetworkAndGateway = .nebunet
 	) {
 		self.display = display
 		self.p2pClients = p2pClients
 		self.networkAndGateway = networkAndGateway
 	}
+
+	public static let `default`: Self = .init()
 }
 
-public extension AppPreferences {
-	var customDumpMirror: Mirror {
+extension AppPreferences {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -45,7 +47,7 @@ public extension AppPreferences {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		display: \(display),
 		p2pClients: \(p2pClients),
@@ -54,9 +56,9 @@ public extension AppPreferences {
 }
 
 // MARK: AppPreferences.Display
-public extension AppPreferences {
+extension AppPreferences {
 	/// Display settings in the wallet app, such as appearences, currency etc.
-	struct Display:
+	public struct Display:
 		Sendable,
 		Hashable,
 		Codable,
@@ -72,12 +74,12 @@ public extension AppPreferences {
 	}
 }
 
-public extension AppPreferences.Display {
-	static let `default` = Self()
+extension AppPreferences.Display {
+	public static let `default` = Self()
 }
 
-public extension AppPreferences.Display {
-	var customDumpMirror: Mirror {
+extension AppPreferences.Display {
+	public var customDumpMirror: Mirror {
 		.init(
 			self,
 			children: [
@@ -87,38 +89,9 @@ public extension AppPreferences.Display {
 		)
 	}
 
-	var description: String {
+	public var description: String {
 		"""
 		fiatCurrencyPriceTarget: \(fiatCurrencyPriceTarget),
 		"""
-	}
-}
-
-// MARK: - FiatCurrency
-public enum FiatCurrency:
-	String,
-	Sendable,
-	Hashable,
-	Codable,
-	CustomStringConvertible,
-	CustomDumpRepresentable
-{
-	case usd, eur, gbp
-}
-
-public extension FiatCurrency {
-	var sign: String {
-		switch self {
-		case .usd:
-			return "$"
-		case .gbp:
-			return "£"
-		case .eur:
-			return "€"
-		}
-	}
-
-	var symbol: String {
-		rawValue.uppercased()
 	}
 }

@@ -5,7 +5,7 @@ private let baseLabel = "com.radixpublishing"
 
 private func makeLogger(
 	label: String,
-	level: Logger.Level = .info
+	level: Logger.Level = .error
 ) -> Logger {
 	Logger(label: label) { _ in
 		#if DEBUG
@@ -24,8 +24,8 @@ private func makeLogger(
 
 public let loggerGlobal = makeLogger(label: baseLabel)
 
-public extension Logger {
-	func feature(
+extension Logger {
+	public func feature(
 		_ message: String,
 		marker: String = "feature",
 		emoji: String = "🔮"

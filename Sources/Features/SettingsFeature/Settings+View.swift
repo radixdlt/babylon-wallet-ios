@@ -2,15 +2,16 @@ import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
 import ManageP2PClientsFeature
+import PersonasFeature
 import ProfileClient
 #if DEBUG
 import ProfileView
 #endif
 
 // MARK: - AppSettings.View
-public extension AppSettings {
+extension AppSettings {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.StoreOf<AppSettings>
 		private let store: Store
 
@@ -22,8 +23,8 @@ public extension AppSettings {
 	}
 }
 
-public extension AppSettings.View {
-	var body: some View {
+extension AppSettings.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -32,7 +33,6 @@ public extension AppSettings.View {
 			ForceFullScreen {
 				ZStack {
 					settingsView(viewStore: viewStore)
-						.zIndex(0)
 
 					IfLetStore(
 						store.scope(
@@ -41,7 +41,6 @@ public extension AppSettings.View {
 						),
 						then: { ManageP2PClients.View(store: $0) }
 					)
-					.zIndex(1)
 
 					IfLetStore(
 						store.scope(
@@ -50,15 +49,22 @@ public extension AppSettings.View {
 						),
 						then: { ManageGatewayAPIEndpoints.View(store: $0) }
 					)
-					.zIndex(2)
+
+					IfLetStore(
+						store.scope(
+							state: \.personasCoordinator,
+							action: { .child(.personasCoordinator($0)) }
+						),
+						then: { PersonasCoordinator.View(store: $0) }
+					)
 				}
 			}
 		}
 	}
 }
 
-private extension AppSettings.View {
-	func settingsView(viewStore: ViewStore<ViewState, AppSettings.Action.ViewAction>) -> some View {
+extension AppSettings.View {
+	fileprivate func settingsView(viewStore: ViewStore<ViewState, AppSettings.Action.ViewAction>) -> some View {
 		ForceFullScreen {
 			VStack {
 				NavigationBar(
@@ -101,6 +107,13 @@ private extension AppSettings.View {
 							icon: Image(asset: AssetResource.gateway)
 						) {
 							viewStore.send(.editGatewayAPIEndpointButtonTapped)
+						}
+
+						Row(
+							L10n.Settings.personasButtonTitle,
+							icon: Image(asset: AssetResource.personas)
+						) {
+							viewStore.send(.personasButtonTapped)
 						}
 
 						Spacer()
@@ -154,8 +167,8 @@ private extension AppSettings.View {
 }
 
 // MARK: - AppSettings.View.ViewState
-public extension AppSettings.View {
-	struct ViewState: Equatable {
+extension AppSettings.View {
+	public struct ViewState: Equatable {
 		#if DEBUG
 		public let isDebugProfileViewSheetPresented: Bool
 		public let profileToInspect: Profile?

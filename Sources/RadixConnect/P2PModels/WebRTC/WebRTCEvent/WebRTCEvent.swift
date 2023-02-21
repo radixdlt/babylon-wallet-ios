@@ -6,8 +6,8 @@ public enum WebRTCEvent: Sendable, Hashable, Codable, CustomStringConvertible {
 	case dataChannel(DataChannelEvent)
 }
 
-public extension WebRTCEvent {
-	var description: String {
+extension WebRTCEvent {
+	public var description: String {
 		switch self {
 		case let .peerConnection(event): return "peerConnection(\(event))"
 		case let .dataChannel(event): return "dataChannel(\(event))"
@@ -16,8 +16,8 @@ public extension WebRTCEvent {
 }
 
 // MARK: WebRTCEvent.PeerConnectionEvent
-public extension WebRTCEvent {
-	enum PeerConnectionEvent: Sendable, Hashable, Codable, CustomStringConvertible {
+extension WebRTCEvent {
+	public enum PeerConnectionEvent: Sendable, Hashable, Codable, CustomStringConvertible {
 		case didAddStream(id: String)
 		case didRemoveStream(id: String)
 		case didOpenDataChannel(label: String)
@@ -33,16 +33,16 @@ public extension WebRTCEvent {
 }
 
 // MARK: WebRTCEvent.DataChannelEvent
-public extension WebRTCEvent {
-	enum DataChannelEvent: Sendable, Hashable, Codable, CustomStringConvertible {
+extension WebRTCEvent {
+	public enum DataChannelEvent: Sendable, Hashable, Codable, CustomStringConvertible {
 		case didChangeState(DataChannelState, channelLabel: String, channelId: Int32)
 
 		case didReceiveMessage(Data, channelLabel: String, channelId: Int32)
 	}
 }
 
-public extension WebRTCEvent.DataChannelEvent {
-	var description: String {
+extension WebRTCEvent.DataChannelEvent {
+	public var description: String {
 		switch self {
 		case let .didChangeState(newState, channelLabel, channelId): return "didChangeState(\(newState), channel: '\(channelLabel)', channelId: '\(channelId)')"
 		case let .didReceiveMessage(msg, channelLabel, channelId): return "didReceiveMessage(#\(msg.count) bytes, channel: '\(channelLabel)', channelId: '\(channelId)')"
@@ -50,8 +50,8 @@ public extension WebRTCEvent.DataChannelEvent {
 	}
 }
 
-public extension WebRTCEvent.PeerConnectionEvent {
-	var description: String {
+extension WebRTCEvent.PeerConnectionEvent {
+	public var description: String {
 		switch self {
 		case let .didAddStream(id): return "didAddStream(id: \(id))"
 		case let .didRemoveStream(id): return "didRemoveStream(id: \(id))"

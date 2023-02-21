@@ -1,4 +1,5 @@
 import ClientPrelude
+import EngineToolkitClient
 import GatewayAPI
 
 // MARK: - AssetFetcher + DependencyKey
@@ -35,9 +36,9 @@ extension AssetFetcher: DependencyKey {
 						for resourceAddress in nonFungibleTokenAddresses {
 							taskGroup.addTask {
 								try Task.checkCancellation()
-								let response = try await gatewayAPIClient.getNonFungibleIds(accountAddress, resourceAddress.address)
-								let nonFungibleIds = response.nonFungibleIds.items.map(\.nonFungibleId)
-								return (resourceAddress, nonFungibleIds)
+								let response = try await gatewayAPIClient.getNonFungibleLocalIds(accountAddress, resourceAddress.address)
+								let nonFungibleLocalIds = response.nonFungibleIds.items.map(\.nonFungibleId)
+								return (resourceAddress, nonFungibleLocalIds)
 							}
 						}
 
@@ -58,20 +59,26 @@ extension AssetFetcher: DependencyKey {
 // MARK: - Helpers - Resources response
 extension AccountPortfolio {
 	init(response: GatewayAPI.EntityResourcesResponse) throws {
-		let fungibleContainers = try response.fungibleResources.items.map {
-			FungibleTokenContainer(
+		@Dependency(\.engineToolkitClient) var engineToolkitClient
+		let fungibleContainers = try response.fungibleResources.items.map { fungibleBalance in
+			let balance = try BigDecimal(fromString: fungibleBalance.amount.value)
+			let componentAddress = ComponentAddress(address: fungibleBalance.address)
+			let networkID = try Network.lookupBy(name: response.ledgerState.network).id
+			let isXRD = try engineToolkitClient.isXRD(component: componentAddress, on: networkID)
+			return FungibleTokenContainer(
 				owner: try .init(address: response.address),
 				asset: .init(
-					componentAddress: .init(address: $0.address),
+					componentAddress: componentAddress,
 					divisibility: nil,
 					totalSupply: nil,
 					totalMinted: nil,
 					totalBurnt: nil,
 					tokenDescription: nil,
 					name: nil,
-					symbol: nil
+					symbol: nil,
+					isXRD: isXRD
 				),
-				amount: $0.amount.value,
+				amount: balance,
 				worth: nil
 			)
 		}
@@ -89,7 +96,7 @@ extension AccountPortfolio {
 
 		fungibleTokenContainers = .init(uniqueElements: fungibleContainers)
 		nonFungibleTokenContainers = .init(uniqueElements: nonFungibleContainers)
-		poolShareContainers = []
+		poolUnitContainers = []
 		badgeContainers = []
 	}
 }
@@ -142,7 +149,7 @@ extension NonFungibleTokenContainer {
 		Self(
 			owner: owner,
 			resourceAddress: resourceAddress,
-			assets: ids.map { NonFungibleToken(nonFungibleId: .string($0)) },
+			assets: ids.map { NonFungibleToken(nonFungibleLocalId: .string($0)) },
 			name: name,
 			description: description,
 			iconURL: iconURL
@@ -168,6 +175,7 @@ extension FungibleToken {
 			tokenDescription: dict[.description],
 			name: dict[.name],
 			symbol: dict[.symbol],
+			isXRD: isXRD,
 			tokenInfoURL: dict[.url]
 		)
 	}

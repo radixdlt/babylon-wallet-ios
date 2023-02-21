@@ -2,6 +2,7 @@ import Cryptography
 import EngineToolkit
 import P2PModels
 @testable import Profile
+import ProfileModels
 import SharedTestingModels
 import TestingPrelude
 
@@ -38,6 +39,8 @@ final class ProfileTests: TestCase {
 		)
 
 		XCTAssertEqual(key.publicKey.rawRepresentation.hex, "3b4fc51ce164be26723264f0a78b7e5ab44a143520c77e0e82bfbb9642e9cfd4")
+		let factorSourceID = try FactorSource.id(fromRoot: root)
+		XCTAssertEqual(factorSourceID.hex(), "4d8b07d0220a9b838b7626dc917b96512abc629bd912a66f60c942fc5fa2f287")
 	}
 
 	func test_new_profile() async throws {
@@ -50,115 +53,110 @@ final class ProfileTests: TestCase {
 			language: .english
 		)
 		let networkID = networkAndGateway.network.id
-		var profile = try await Profile.new(
-			networkAndGateway: networkAndGateway,
-			mnemonic: curve25519FactorSourceMnemonic,
-			firstAccountDisplayName: "First"
-		)
+		let babylonFactorSource = try await FactorSource.babylon(mnemonic: curve25519FactorSourceMnemonic)
+		var profile = Profile(factorSource: babylonFactorSource)
 
-		let secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource = try Secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource(
-			mnemonic: secp256K1FactorMnemonic
-		)
+		let olympiaFactorSource = try await FactorSource.olympia(mnemonic: secp256K1FactorMnemonic)
+		profile.factorSources.append(olympiaFactorSource)
 
-		XCTAssertNotNil(
-			profile.addFactorSource(secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource)
-		)
+		func addNewAccount(_ name: NonEmptyString) throws -> OnNetwork.Account {
+			let index = (try? profile.onNetwork(id: networkID))?.accounts.count ?? 0
+			let derivationPath = try AccountHierarchicalDeterministicDerivationPath(
+				networkID: networkID,
+				index: index,
+				keyKind: .transactionSigningKey
+			)
+			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
-		let deviceFactorSource = try Curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSource(
-			mnemonic: curve25519FactorSourceMnemonic
-		)
+			let publicKey = try hdRoot.derivePublicKey(
+				path: .init(
+					scheme: .cap26,
+					path: derivationPath.derivationPath
+				),
+				curve: .curve25519
+			)
 
-		let createFactorInstance: CreateFactorInstanceForRequest = { createFactorInstanceRequest in
+			let address = try OnNetwork.Account.deriveAddress(networkID: networkID, publicKey: publicKey)
 
-			// used by some tests below
-			let includePrivateKey = true
+			let factorInstance = FactorInstance(
+				factorSourceID: babylonFactorSource.id,
+				publicKey: publicKey,
+				derivationPath: derivationPath.wrapAsDerivationPath()
+			)
 
-			switch createFactorInstanceRequest {
-			case let .fromNonHardwareHierarchicalDeterministicMnemonicFactorSource(nonHWHDRequest):
-				if nonHWHDRequest.reference == deviceFactorSource.reference {
-					return try await deviceFactorSource.createAnyFactorInstanceForResponse(
-						input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
-							mnemonic: curve25519FactorSourceMnemonic,
-							derivationPath: nonHWHDRequest.derivationPath,
-							includePrivateKey: includePrivateKey
-						)
-					)
-				} else if nonHWHDRequest.reference == secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource.reference {
-					return try await secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSource
-						.createAnyFactorInstanceForResponse(
-							input: CreateHierarchicalDeterministicFactorInstanceWithMnemonicInput(
-								mnemonic: secp256K1FactorMnemonic,
-								derivationPath: nonHWHDRequest.derivationPath,
-								includePrivateKey: includePrivateKey
-							)
-						)
-				} else {
-					XCTFail("unknown factor source")
-					return nil
-				}
-			}
+			let account = OnNetwork.Account(
+				networkID: networkID,
+				address: address,
+				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
+				index: index,
+				displayName: name
+			)
+
+			try profile.addAccount(account)
+
+			return account
 		}
 
-		let secondAccount = try await profile.createNewVirtualAccount(
-			networkID: networkID,
-			displayName: "Second",
-			createFactorInstance: createFactorInstance
-		)
+		func addNewPersona(_ name: NonEmptyString, fields: IdentifiedArrayOf<OnNetwork.Persona.Field>) throws -> OnNetwork.Persona {
+			let index = (try? profile.onNetwork(id: networkID))?.personas.count ?? 0
+			let derivationPath = try IdentityHierarchicalDeterministicDerivationPath(
+				networkID: networkID,
+				index: index,
+				keyKind: .transactionSigningKey
+			)
+			let hdRoot = try curve25519FactorSourceMnemonic.hdRoot()
 
-		func doTest(signerOf: SignersOf<OnNetwork.Account>) async throws {
-			let testMessage = Data(SHA256.twice(data: "test".data(using: .utf8)!))
-			XCTAssertEqual(signerOf.entity, secondAccount)
-			let signatureOfSigner = try await signerOf.notarySigner(testMessage)
-			XCTAssertEqual(signatureOfSigner.publicKey.compressedRepresentation.hex, "7c906945cf3d4b4ab27ebf11b6f98e07c506323809f9b501275914f72739ed86")
-			XCTAssertTrue(signatureOfSigner.publicKey.isValidSignature(signatureOfSigner.signature, for: testMessage))
+			let publicKey = try hdRoot.derivePublicKey(
+				path: .init(
+					scheme: .cap26,
+					path: derivationPath.derivationPath
+				),
+				curve: .curve25519
+			)
+
+			let address = try OnNetwork.Persona.deriveAddress(networkID: networkID, publicKey: publicKey)
+
+			let factorInstance = FactorInstance(
+				factorSourceID: babylonFactorSource.id,
+				publicKey: publicKey,
+				derivationPath: derivationPath.wrapAsDerivationPath()
+			)
+
+			let persona = OnNetwork.Persona(
+				networkID: networkID,
+				address: address,
+				securityState: .unsecured(.init(genesisFactorInstance: factorInstance)),
+				index: index,
+				displayName: name,
+				fields: fields
+			)
+
+			try profile.addPersona(persona)
+
+			return persona
 		}
 
-		let mnemonicForFactorSourceByReference: MnemonicForFactorSourceByReference = { _ in
-			curve25519FactorSourceMnemonic
-		}
+		let firstAccount = try addNewAccount("First")
+		XCTAssertEqual(try profile.onNetwork(id: networkID).accounts.count, 1)
+		XCTAssertEqual(try profile.onNetwork(id: networkID).accounts.first, firstAccount)
+		let secondAccount = try addNewAccount("Second")
+		XCTAssertEqual(try profile.onNetwork(id: networkID).accounts.count, 2)
+		XCTAssertEqual(try profile.onNetwork(id: networkID).accounts.first, firstAccount)
+		XCTAssertEqual(try profile.onNetwork(id: networkID).accounts.last!, secondAccount)
 
-		var signerOf = try await profile.signers(of: secondAccount, mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference).first
-		try await doTest(signerOf: signerOf)
-		signerOf = try await profile.signers(networkID: networkID, entityType: OnNetwork.Account.self, entityIndex: 1, mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference).first
-		try await doTest(signerOf: signerOf)
-		signerOf = try await profile.signers(networkID: networkID, address: secondAccount.address, mnemonicForFactorSourceByReference: mnemonicForFactorSourceByReference).first
-		try await doTest(signerOf: signerOf)
+		let thirdAccount = try addNewAccount("Third")
 
-		try await profile.createNewVirtualAccount(
-			networkID: networkID,
-			displayName: "Third",
-			createFactorInstance: createFactorInstance
-		)
-
-		try await profile.createNewVirtualPersona(
-			networkID: networkID,
-			displayName: "Mrs Incognito",
-			fields: [
-				.init(kind: .firstName, value: "Jane"),
-				.init(kind: .lastName, value: "Incognitoson"),
-			],
-			createFactorInstance: createFactorInstance
-		)
-
-		try await profile.createNewVirtualPersona(
-			networkID: networkID,
-			displayName: "Mrs Public",
-			fields: [
-				.init(kind: .firstName, value: "Maria"),
-				.init(kind: .lastName, value: "Publicson"),
-			],
-			createFactorInstance: createFactorInstance
-		)
+		let firstPersona = try addNewPersona("Mrs Incognito", fields: [
+			.init(kind: .firstName, value: "Jane"),
+			.init(kind: .lastName, value: "Incognitoson"),
+		])
+		let secondPersona = try addNewPersona("Mrs Public", fields: [
+			.init(kind: .firstName, value: "Maria"),
+			.init(kind: .lastName, value: "Publicson"),
+		])
 
 		let connectionPassword = try ConnectionPassword(hex: "deadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeafdeadbeeffadedeaf")
-
-		XCTAssertNotNil(profile.appendP2PClient(
-			P2PClient(
-				connectionPassword: connectionPassword,
-				displayName: "Brave browser on Mac Studio"
-			)
-		))
-
+		XCTAssertNotNil(profile.appendP2PClient(.init(connectionPassword: connectionPassword, displayName: "Brave browser on Mac Studio")))
 		// Should not be possible to add a client with the same password
 		XCTAssertNil(profile.appendP2PClient(
 			P2PClient(
@@ -184,11 +182,64 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(onNetwork.accounts.count, 3)
 		XCTAssertEqual(onNetwork.personas.count, 2)
 
+		var connectedDapp = try profile.addConnectedDapp(
+			.init(
+				networkID: networkID,
+				dAppDefinitionAddress: try .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
+				displayName: "RadiSwap",
+				referencesToAuthorizedPersonas:
+				.init(arrayLiteral:
+					.init(
+						identityAddress: firstPersona.address,
+						fieldIDs: .init(firstPersona.fields.map(\.id)),
+						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
+						sharedAccounts: try .init(
+							accountsReferencedByAddress: [
+								secondAccount.address,
+								thirdAccount.address,
+							],
+							forRequest: .exactly(2)
+						)
+					),
+					.init(
+						identityAddress: secondPersona.address,
+						fieldIDs: .init(secondPersona.fields.map(\.id)),
+						lastLogin: Date(timeIntervalSinceReferenceDate: 0), // FIXME: @Nikola
+						sharedAccounts: try .init(
+							accountsReferencedByAddress: [
+								secondAccount.address,
+							],
+							forRequest: .atLeast(1)
+						)
+					))
+			)
+		)
+
+		let authorizedPersona0 = connectedDapp.referencesToAuthorizedPersonas[0]
+		var authorizedPersona0SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
+		XCTAssertThrowsError(
+			try authorizedPersona0SharedAccounts.updateAccounts([secondAccount.address]),
+			"Should not be able to specify another number of accounts if `exactly` was specified."
+		)
+
+		let authorizedPersona1 = connectedDapp.referencesToAuthorizedPersonas[1]
+		var authorizedPersona1SharedAccounts = try XCTUnwrap(authorizedPersona1.sharedAccounts)
+		XCTAssertNoThrow(
+			try authorizedPersona1SharedAccounts.updateAccounts([
+				secondAccount.address,
+				thirdAccount.address,
+			]), "Should be able to specify more accounts if `atLeast` was specified."
+		)
+
+		connectedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(OnNetwork.Persona.Field.ID()) // add unknown fieldID
+
+		XCTAssertThrowsError(try profile.updateConnectedDapp(connectedDapp))
+
 		let snapshot = profile.snaphot()
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
-//		 let data = try jsonEncoder.encode(snapshot)
-		/* Uncomment to generate a new test vector */
+		/* Uncomment the lines below to generate a new test vector */
+		//        let data = try jsonEncoder.encode(snapshot)
 //		print(String(data: data, encoding: .utf8)!)
 	}
 
@@ -197,8 +248,7 @@ final class ProfileTests: TestCase {
 
 		let profile = try Profile(snapshot: snapshot)
 
-		XCTAssertEqual(profile.factorSources.secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources.count, 1)
-		XCTAssertEqual(profile.factorSources.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources.rawValue.count, 1)
+		XCTAssertEqual(profile.factorSources.count, 2)
 
 		XCTAssertEqual(profile.perNetwork.count, 1)
 		let networkID = networkAndGateway.network.id
@@ -225,26 +275,13 @@ final class ProfileTests: TestCase {
 		)
 
 		XCTAssertEqual(
-			profile
-				.factorSources
-				.curve25519OnDeviceStoredMnemonicHierarchicalDeterministicSLIP10FactorSources
-				.first
-				.factorSourceID,
-
-			try HD.Root(
-				seed: curve25519FactorSourceMnemonic.seed()
-			).factorSourceID(curve: Curve25519.self)
+			profile.factorSources.first.id,
+			try FactorSource.id(fromRoot: curve25519FactorSourceMnemonic.hdRoot())
 		)
 
 		XCTAssertEqual(
-			profile.factorSources.secp256k1OnDeviceStoredMnemonicHierarchicalDeterministicBIP44FactorSources.first!.factorSourceID
-				.rawValue
-				.hex(),
-
-			try HD.Root(seed: secp256K1FactorMnemonic.seed())
-				.factorSourceID(curve: SECP256K1.self)
-				.rawValue
-				.hex()
+			profile.factorSources.first(where: { $0.supportsOlympia })!.id,
+			try FactorSource.id(fromRoot: secp256K1FactorMnemonic.hdRoot())
 		)
 
 		XCTAssertEqual(
@@ -254,7 +291,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			onNetwork.accounts[0].address.address,
-			"account_tdx_b_1qu53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqt2xqvl"
+			"account_tdx_b_1pq53vs3xmykn9xx7a80ewt228fszw2cp440u6f69lpyqkrh82f"
 		)
 
 		XCTAssertEqual(
@@ -264,7 +301,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			onNetwork.accounts[1].address.address,
-			"account_tdx_b_1qavvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqxgpf32"
+			"account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu"
 		)
 
 		XCTAssertEqual(
@@ -274,7 +311,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			onNetwork.accounts[2].address.address,
-			"account_tdx_b_1ql2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54ts25dgyv"
+			"account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"
 		)
 
 		XCTAssertEqual(
@@ -283,7 +320,7 @@ final class ProfileTests: TestCase {
 		)
 		XCTAssertEqual(
 			onNetwork.personas[0].address.address,
-			"account_tdx_b_1q7vt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpskvpcn0"
+			"identity_tdx_b_1pwvt6shevmzedf0709cgdq0d6axrts5gjfxaws46wdpsedwrfm"
 		)
 
 		XCTAssertEqual(
@@ -293,7 +330,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertEqual(
 			onNetwork.personas[1].address.address,
-			"account_tdx_b_1qlvtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkschfnr8"
+			"identity_tdx_b_1p0vtykvnyhqfamnk9jpnjeuaes9e7f72sekpw6ztqnkshkxgen"
 		)
 
 		XCTAssertEqual(profile.appPreferences.p2pClients.clients.count, 2)
@@ -303,11 +340,19 @@ final class ProfileTests: TestCase {
 		XCTAssertNotNil(p2pClient1.signalingServerConfig)
 		XCTAssertNotNil(p2pClient1.webRTCConfig)
 		XCTAssertNotNil(p2pClient1.connectorConfig)
+
+		XCTAssertEqual(onNetwork.connectedDapps.count, 1)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas.count, 2)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
+		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu", "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"])
 	}
 
-	func test_version_compatability_check_too_low() throws {
+	func test_version_compatibility_check_too_low() throws {
+		let tooLow = ProfileSnapshot.Version.minimum - 1
 		let json = """
-		{ "version": 6 }
+		{ "version": \(tooLow) }
 		""".data(using: .utf8)!
 
 		XCTAssertThrowsError(
@@ -316,11 +361,11 @@ final class ProfileTests: TestCase {
 			guard let error = anyError as? IncompatibleProfileVersion else {
 				return XCTFail("WrongErrorType")
 			}
-			XCTAssertEqual(error, .init(decodedVersion: 6, minimumRequiredVersion: .minimum))
+			XCTAssertEqual(error, .init(decodedVersion: tooLow, minimumRequiredVersion: .minimum))
 		}
 	}
 
-	func test_version_compatability_check_ok() throws {
+	func test_version_compatibility_check_ok() throws {
 		let json = """
 		{ "version": \(ProfileSnapshot.Version.minimum) }
 		""".data(using: .utf8)!
@@ -335,10 +380,7 @@ extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {
 		switch securityState {
 		case let .unsecured(control):
-			guard let hdFactorInstance = control.genesisFactorInstance.any() as? (any FactorInstanceHierarchicalDeterministicProtocol) else {
-				return nil
-			}
-			return hdFactorInstance.publicKey
+			return control.genesisFactorInstance.publicKey
 		}
 	}
 }

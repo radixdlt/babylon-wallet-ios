@@ -9,16 +9,16 @@ public struct TransactionClient: Sendable, DependencyKey {
 }
 
 // MARK: TransactionClient.SignAndSubmitTransaction
-public extension TransactionClient {
-	typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> TransactionManifest
-	typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
-	typealias SignAndSubmitTransaction = @Sendable (SignManifestRequest) async -> TransactionResult
+extension TransactionClient {
+	public typealias AddLockFeeInstructionToManifest = @Sendable (TransactionManifest) async throws -> TransactionManifest
+	public typealias ConvertManifestInstructionsToJSONIfItWasString = @Sendable (TransactionManifest) async throws -> JSONInstructionsTransactionManifest
+	public typealias SignAndSubmitTransaction = @Sendable (SignManifestRequest) async -> TransactionResult
 }
 
 public typealias TransactionResult = Swift.Result<TXID, TransactionFailure>
 
-public extension DependencyValues {
-	var transactionClient: TransactionClient {
+extension DependencyValues {
+	public var transactionClient: TransactionClient {
 		get { self[TransactionClient.self] }
 		set { self[TransactionClient.self] = newValue }
 	}
@@ -31,13 +31,14 @@ public struct SignManifestRequest: Sendable {
 	public let manifestToSign: TransactionManifest
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let unlockKeychainPromptShowToUser: String
-	public let selectNotary: @Sendable (NonEmpty<OrderedSet<SignersOfAccount>>) async -> SignersOfAccount
+	public typealias SelectNotary = @Sendable (NonEmpty<OrderedSet<OnNetwork.Account>>) async -> OnNetwork.Account
+	public let selectNotary: SelectNotary
 
 	public init(
 		manifestToSign: TransactionManifest,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput,
 		unlockKeychainPromptShowToUser: String,
-		selectNotary: @escaping @Sendable (NonEmpty<OrderedSet<SignersOfAccount>>) -> SignersOfAccount = { $0.first }
+		selectNotary: @escaping SelectNotary = { $0.first }
 	) {
 		self.manifestToSign = manifestToSign
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput

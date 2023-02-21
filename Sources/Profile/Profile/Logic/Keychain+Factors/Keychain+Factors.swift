@@ -1,19 +1,15 @@
 import Cryptography
 import Prelude
 
-private func key(from factorSourceReference: FactorSourceReference) -> String {
-	factorSourceReference.id
-}
-
-private func key(from factorInstanceID: FactorInstanceID) -> String {
-	factorInstanceID.id
+private func key(factorSourceID: FactorSource.ID) -> String {
+	factorSourceID.hexCodable.hex()
 }
 
 private let profileSnapshotKeychainKey = "profileSnapshotKeychainKey"
 
 // MARK: Save
-public extension KeychainClient {
-	func updateProfile(
+extension KeychainClient {
+	public func updateProfile(
 		profile: Profile,
 		protection: Protection? = .defaultForProfile,
 		authentcationPrompt: AuthenticationPrompt? = nil,
@@ -28,7 +24,7 @@ public extension KeychainClient {
 		)
 	}
 
-	func updateProfileSnapshot(
+	public func updateProfileSnapshot(
 		profileSnapshot: ProfileSnapshot,
 		protection: Protection? = .defaultForProfile,
 		authentcationPrompt: AuthenticationPrompt? = nil,
@@ -38,39 +34,28 @@ public extension KeychainClient {
 		try await updateDataForKey(data, profileSnapshotKeychainKey, protection, authentcationPrompt)
 	}
 
-	func updateFactorSource(
-		mnemonic: Mnemonic,
+	public func updateFactorSource(
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		protection: Protection? = nil,
-		reference factorSourceReference: FactorSourceReference
+		factorSourceID: FactorSource.ID
 	) async throws {
+		@Dependency(\.jsonEncoder) var jsonEncoder
+		let jsonData = try jsonEncoder().encode(mnemonicWithPassphrase)
 		try await updateFactorSource(
-			data: mnemonic.entropy().data,
-			reference: factorSourceReference,
+			data: jsonData,
+			factorSourceID: factorSourceID,
 			protection: protection
 		)
 	}
 
-	func updateFactorSource(
+	public func updateFactorSource(
 		data: Data,
-		reference factorSourceReference: FactorSourceReference,
+		factorSourceID: FactorSource.ID,
 		protection: Protection? = nil
 	) async throws {
 		try await updateDataForKey(
 			data,
-			key(from: factorSourceReference),
-			protection,
-			nil
-		)
-	}
-
-	func updateFactorInstance(
-		privateKey: Curve25519.Signing.PrivateKey,
-		factorInstanceID: FactorInstanceID,
-		protection: Protection? = nil
-	) async throws {
-		try await updateDataForKey(
-			privateKey.rawRepresentation,
-			key(from: factorInstanceID),
+			key(factorSourceID: factorSourceID),
 			protection,
 			nil
 		)
@@ -78,8 +63,8 @@ public extension KeychainClient {
 }
 
 // MARK: Load
-public extension KeychainClient {
-	func loadProfile(
+extension KeychainClient {
+	public func loadProfile(
 		authenticationPrompt: AuthenticationPrompt,
 		jsonDecoder: JSONDecoder = .iso8601
 	) async throws -> Profile? {
@@ -90,13 +75,13 @@ public extension KeychainClient {
 		return try Profile(snapshot: snapshot)
 	}
 
-	func loadProfileSnapshotJSONData(
+	public func loadProfileSnapshotJSONData(
 		authenticationPrompt: AuthenticationPrompt
 	) async throws -> Data? {
 		try await dataForKey(profileSnapshotKeychainKey, authenticationPrompt)
 	}
 
-	func loadProfileSnapshot(
+	public func loadProfileSnapshot(
 		jsonDecoder: JSONDecoder = .iso8601,
 		authenticationPrompt: AuthenticationPrompt
 	) async throws -> ProfileSnapshot? {
@@ -108,36 +93,29 @@ public extension KeychainClient {
 		return try jsonDecoder.decode(ProfileSnapshot.self, from: profileSnapshotData)
 	}
 
-	func loadFactorSourceMnemonic(
-		reference factorSourceReference: FactorSourceReference,
+	public func loadFactorSourceMnemonicWithPassphrase(
+		factorSourceID: FactorSource.ID,
 		authenticationPrompt: AuthenticationPrompt
-	) async throws -> Mnemonic? {
-		guard let data = try await loadFactorSourceData(
-			reference: factorSourceReference,
+	) async throws -> MnemonicWithPassphrase? {
+		@Dependency(\.jsonDecoder) var jsonDecoder
+		guard let jsonData = try await loadFactorSourceData(
+			factorSourceID: factorSourceID,
 			authenticationPrompt: authenticationPrompt
 		) else { return nil }
-		return try Mnemonic(entropy: .init(data: data))
+		return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: jsonData)
 	}
 
-	func loadFactorSourceData(
-		reference factorSourceReference: FactorSourceReference,
+	public func loadFactorSourceData(
+		factorSourceID: FactorSource.ID,
 		authenticationPrompt: AuthenticationPrompt
 	) async throws -> Data? {
-		try await dataForKey(key(from: factorSourceReference), authenticationPrompt)
-	}
-
-	func loadFactorInstancePrivateKey(
-		factorInstanceID: FactorInstanceID,
-		authenticationPrompt: AuthenticationPrompt
-	) async throws -> Curve25519.Signing.PrivateKey? {
-		guard let data = try await dataForKey(key(from: factorInstanceID), authenticationPrompt) else { return nil }
-		return try .init(rawRepresentation: data)
+		try await dataForKey(key(factorSourceID: factorSourceID), authenticationPrompt)
 	}
 }
 
 // MARK: Remove
-public extension KeychainClient {
-	func removeAllFactorSourcesAndProfileSnapshot(
+extension KeychainClient {
+	public func removeAllFactorSourcesAndProfileSnapshot(
 		authenticationPrompt: AuthenticationPrompt,
 		jsonDecoder: JSONDecoder = .iso8601
 	) async throws {
@@ -147,26 +125,20 @@ public extension KeychainClient {
 		) else {
 			return
 		}
-		for factorSource in profile.factorSources.anyFactorSources {
-			try await self.removeDataForFactorSource(reference: factorSource.reference)
+		for factorSource in profile.factorSources {
+			try await self.removeDataForFactorSource(id: factorSource.id)
 		}
 
 		try await removeProfileSnapshot()
 	}
 
-	func removeProfileSnapshot() async throws {
+	public func removeProfileSnapshot() async throws {
 		try await removeDataForKey(profileSnapshotKeychainKey)
 	}
 
-	func removeDataForFactorSource(
-		reference factorSourceReference: FactorSourceReference
+	public func removeDataForFactorSource(
+		id factorSourceID: FactorSource.ID
 	) async throws {
-		try await removeDataForKey(key(from: factorSourceReference))
-	}
-
-	func removeDataForFactorInstance(
-		id factorInstanceID: FactorInstanceID
-	) async throws {
-		try await removeDataForKey(key(from: factorInstanceID))
+		try await removeDataForKey(key(factorSourceID: factorSourceID))
 	}
 }

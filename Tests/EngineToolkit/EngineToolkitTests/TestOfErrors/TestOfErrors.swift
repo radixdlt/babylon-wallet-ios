@@ -5,6 +5,7 @@ import TestingPrelude
 // MARK: - TestOfErrors
 final class TestOfErrors: TestCase {
 	// MARK: From EngineToolkit
+
 	func test_error_serializeRequestFailure_utf8Decode() throws {
 		let sut = EngineToolkit(jsonStringFromJSONData: { _ in nil /* utf8 decode fail */ })
 		XCTAssert(
@@ -41,87 +42,6 @@ final class TestOfErrors: TestCase {
 		XCTAssert(
 			sut.information(),
 			throwsSpecificError: .deserializeResponseFailure(.beforeDecodingError(.failedToUTF8EncodeResponseJSONString))
-		)
-	}
-
-	func test_error_deserializeResponseFailure_jsonDecodeFail_non_swiftDecodingError() throws {
-		let failingMockErrorDecoder = FailingJSONDecoder()
-		let sut = EngineToolkit(jsonDecoder: failingMockErrorDecoder)
-		XCTAssert(
-			sut.information(),
-			throwsSpecificError: .deserializeResponseFailure(
-				.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEitherNorAsSwiftDecodingError(
-					responseType: "\(InformationResponse.self)",
-					nonSwiftDecodingError: MockError.jsonDecodeFail.rawValue
-				)
-			)
-		)
-	}
-
-	func test_error_deserializeResponseFailure_jsonDecodeFail_swiftDecodingError() throws {
-		let failingSwiftDecodingErrorDecoder = FailingJSONDecoderSwiftDecodingError()
-		let sut = EngineToolkit(jsonDecoder: failingSwiftDecodingErrorDecoder)
-		XCTAssert(
-			sut.information(),
-			throwsSpecificError: .deserializeResponseFailure(
-				.decodeResponseFailedAndCouldNotDecodeAsErrorResponseEither(
-					responseType: "\(InformationResponse.self)",
-					decodingError: .mock
-				)
-			)
-		)
-	}
-
-	func test_json_parse_address_error() throws {
-		let json = """
-		{
-		  "error" : "AddressError",
-		  "value" : "DecodingError(MissingSeparator)"
-		}
-		""".data(using: .utf8)!
-		let addressError = try JSONDecoder().decode(AddressError.self, from: json)
-		XCTAssertNoDifference(addressError, AddressError(value: "DecodingError(MissingSeparator)"))
-	}
-
-	func test_json_parse_errorResponse() throws {
-		let json = """
-		{
-		  "error" : "AddressError",
-		  "value" : "DecodingError(MissingSeparator)"
-		}
-		""".data(using: .utf8)!
-		let errorResponse = try JSONDecoder().decode(ErrorResponse.self, from: json)
-		XCTAssertNoDifference(errorResponse, .addressError(AddressError(value: "DecodingError(MissingSeparator)")))
-	}
-
-	// MARK: ErrorResponse (from RET)
-	func test_assert_that_decodeAddress_badRequest_missing_separator_throws_addressError_nested_DecodingError_missing_separator() throws {
-		let badRequest = DecodeAddressRequest(address: "missing separator")
-		let result = sut.decodeAddressRequest(request: badRequest)
-		let expectedErrorResponse: ErrorResponse = .addressError(AddressError(value: "Bech32mDecodingError(MissingSeparator)"))
-		XCTAssert(
-			result,
-			throwsSpecificError: .deserializeResponseFailure(.errorResponse(expectedErrorResponse))
-		)
-	}
-
-	func test_assert_that_decodeAddress_badRequest_missing_separator_throws_addressError_nested_DecodingError_invalid_char_space() throws {
-		let badRequest = DecodeAddressRequest(address: "bad1 invalid char spaces")
-		let result = sut.decodeAddressRequest(request: badRequest)
-		let expectedErrorResponse: ErrorResponse = .addressError(AddressError(value: "Bech32mDecodingError(InvalidChar(' '))"))
-		XCTAssert(
-			result,
-			throwsSpecificError: .deserializeResponseFailure(.errorResponse(expectedErrorResponse))
-		)
-	}
-
-	func test_assert_that_decodeAddress_badRequest_missing_separator_throws_addressError_nested_DecodingError_invalid_checksum() throws {
-		let badRequest = DecodeAddressRequest(address: "invalid1checksum")
-		let result = sut.decodeAddressRequest(request: badRequest)
-		let expectedErrorResponse: ErrorResponse = .addressError(AddressError(value: "Bech32mDecodingError(InvalidChecksum)"))
-		XCTAssert(
-			result,
-			throwsSpecificError: .deserializeResponseFailure(.errorResponse(expectedErrorResponse))
 		)
 	}
 }

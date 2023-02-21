@@ -85,34 +85,34 @@ internal actor P2PConnection: Sendable, Hashable, Identifiable {
 }
 
 // MARK: Public
-internal extension P2PConnection {
-	typealias SentReceipt = P2PConnections.SentReceipt
-	typealias IncomingMessage = P2PConnections.IncomingMessage
-	typealias MessageID = P2PConnections.MessageID
+extension P2PConnection {
+	internal typealias SentReceipt = P2PConnections.SentReceipt
+	internal typealias IncomingMessage = P2PConnections.IncomingMessage
+	internal typealias MessageID = P2PConnections.MessageID
 
-	nonisolated var id: P2PConnectionID { connectionID }
-	nonisolated var connectionID: P2PConnectionID { config.connectionID }
+	internal nonisolated var id: P2PConnectionID { connectionID }
+	internal nonisolated var connectionID: P2PConnectionID { config.connectionID }
 
-	static func == (lhs: P2PConnection, rhs: P2PConnection) -> Bool {
+	internal static func == (lhs: P2PConnection, rhs: P2PConnection) -> Bool {
 		lhs.connectionID == rhs.connectionID
 	}
 
-	nonisolated func hash(into hasher: inout Hasher) {
+	internal nonisolated func hash(into hasher: inout Hasher) {
 		hasher.combine(connectionID)
 	}
 }
 
 // MARK: Async Sequence
-internal extension P2PConnection {
+extension P2PConnection {
 	/// A shared (multicast) async sequence.
-	func incomingMessagesAsyncSequence() -> AnyAsyncSequence<IncomingMessage> {
+	internal func incomingMessagesAsyncSequence() -> AnyAsyncSequence<IncomingMessage> {
 		incomingMessagesAsyncBufferedChannel
 			.share()
 			.eraseToAnyAsyncSequence()
 	}
 
 	/// A shared (multicast) async sequence.
-	func sentReceiptsAsyncSequence() -> AnyAsyncSequence<SentReceipt> {
+	internal func sentReceiptsAsyncSequence() -> AnyAsyncSequence<SentReceipt> {
 		sentReceiptsAsyncBufferedChannel
 			.share()
 			.eraseToAnyAsyncSequence()
@@ -123,7 +123,7 @@ internal extension P2PConnection {
 	/// Wallet's "ManageP2PClients" feature, if I add a new P2P connection I see the correct status "connected" in
 	/// the list but if I dismiss the view and go into it again, the status is unknown since we have not emitted
 	/// any update yet (we are still connected, but the view does not know about it).
-	func connectionStatusAsyncSequence() -> AnyAsyncSequence<ConnectionStatusChangeEvent> {
+	internal func connectionStatusAsyncSequence() -> AnyAsyncSequence<ConnectionStatusChangeEvent> {
 		connectionStatusAsyncBufferedChannel
 			// We want to replay, why we use `multicast` + ReplaySubject + autoconnect instead of `share` (which uses a PassthroughSubject)
 			.multicast(connectionStatusAsyncReplaySubject)
@@ -136,7 +136,7 @@ internal extension P2PConnection {
 	/// Wallet's "ManageP2PClients" feature, if I add a new P2P connection I see the correct status "connected" in
 	/// the list but if I dismiss the view and go into it again, the status is unknown since we have not emitted
 	/// any update yet (we are still connected, but the view does not know about it).
-	func dataChannelStatusAsyncSequence() -> AnyAsyncSequence<DataChannelState> {
+	internal func dataChannelStatusAsyncSequence() -> AnyAsyncSequence<DataChannelState> {
 		dataChannelStatusAsyncBufferedChannel
 			// We want to replay, why we use `multicast` + ReplaySubject + autoconnect instead of `share` (which uses a PassthroughSubject)
 			.multicast(dataChannelStatusAsyncReplaySubject)
@@ -149,7 +149,7 @@ internal extension P2PConnection {
 	/// Wallet's "ManageP2PClients" feature, if I add a new P2P connection I see the correct status "connected" in
 	/// the list but if I dismiss the view and go into it again, the status is unknown since we have not emitted
 	/// any update yet (we are still connected, but the view does not know about it).
-	func webSocketStatusAsyncSequence() -> AnyAsyncSequence<WebSocketState> {
+	internal func webSocketStatusAsyncSequence() -> AnyAsyncSequence<WebSocketState> {
 		webSocketStatusAsyncBufferedChannel
 			// We want to replay, why we use `multicast` + ReplaySubject + autoconnect instead of `share` (which uses a PassthroughSubject)
 			.multicast(webSocketStatusAsyncReplaySubject)
@@ -159,18 +159,18 @@ internal extension P2PConnection {
 }
 
 // MARK: Methods
-internal extension P2PConnection {
-	func disconnect() {
+extension P2PConnection {
+	internal func disconnect() {
 		listenForReconnectTriggerTask?.cancel()
 		listenForReconnectTriggerTask = nil
 		disconnectAndUnsubscribeFromConnectionStatusUpdates(cancelReconnectTask: true)
 	}
 
-	func connectWithRetries() async throws {
+	internal func connectWithRetries() async throws {
 		try await connect(retryAttemptsLeft: config.connectorConfig.retryAttempts)
 	}
 
-	func connect(retryAttemptsLeft: Int, totalAttempts: Int = 0) async throws {
+	internal func connect(retryAttemptsLeft: Int, totalAttempts: Int = 0) async throws {
 		guard retryAttemptsLeft >= 0 else {
 			loggerGlobal.critical("Failed to establish connection even after #\(totalAttempts) attempts. Aborting.")
 			throw ConverseError.connectError(.failedToEstablishConnectionAfterMultipleAttempts(attempts: totalAttempts))
@@ -197,11 +197,11 @@ internal extension P2PConnection {
 		}
 	}
 
-	func send(data: Data, id: String) async throws {
+	internal func send(data: Data, id: String) async throws {
 		try await sendDataUsingChunkingTransport(data: data, id: id)
 	}
 
-	func sendReadReceipt(
+	internal func sendReadReceipt(
 		for incomingMessage: IncomingMessage,
 		alsoMarkMessageAsHandled: Bool = true
 	) async throws {
@@ -212,8 +212,8 @@ internal extension P2PConnection {
 	}
 }
 
-internal extension P2PConnection {
-	func connectIfNeeded(force: Bool = false) async throws {
+extension P2PConnection {
+	internal func connectIfNeeded(force: Bool = false) async throws {
 		if force {
 			try await connectWithRetries()
 		} else {
@@ -229,12 +229,12 @@ internal extension P2PConnection {
 }
 
 // MAKR: Private
-private extension P2PConnection {
-	func sendTestPigeon() async throws {
+extension P2PConnection {
+	private func sendTestPigeon() async throws {
 		try await send(data: Data("Pigeon".utf8), id: UUID().uuidString)
 	}
 
-	func reconnectIfNeeded(connectionStatusEventTriggeringReconnect: ConnectionStatusChangeEvent) {
+	private func reconnectIfNeeded(connectionStatusEventTriggeringReconnect: ConnectionStatusChangeEvent) {
 		guard reconnectTask == nil else {
 			loggerGlobal.notice("Skipped reconnecting to peer since we a `reconnectTask` is present, i.e. we are probably already reconnecting. Triggered by: \(connectionStatusEventTriggeringReconnect)")
 			return
@@ -247,7 +247,7 @@ private extension P2PConnection {
 		}
 	}
 
-	func disconnectAndUnsubscribeFromConnectionStatusUpdates(cancelReconnectTask: Bool) {
+	private func disconnectAndUnsubscribeFromConnectionStatusUpdates(cancelReconnectTask: Bool) {
 		loggerGlobal.notice("Disconnecting and cancelling subscriptions")
 		if cancelReconnectTask {
 			loggerGlobal.notice("Cancelling reconnect tasks and subscriptions.")
@@ -261,7 +261,7 @@ private extension P2PConnection {
 		connectionStatusAsyncBufferedChannel.send(.init(connectionID: connectionID, connectionStatus: .new, source: .user))
 	}
 
-	func connectAndSubscribeToConnectionStatusUpdates(
+	private func connectAndSubscribeToConnectionStatusUpdates(
 		cancelReconnectTask: Bool
 	) async throws {
 		defer {
@@ -370,7 +370,7 @@ private extension P2PConnection {
 		} catch {}
 	}
 
-	func sendReadReceiptUsingChunkingTransport(
+	private func sendReadReceiptUsingChunkingTransport(
 		for incomingMessage: IncomingMessage,
 		alsoMarkMessageAsHandled: Bool = true
 	) async throws {
@@ -381,7 +381,7 @@ private extension P2PConnection {
 		try transport.chunkingTransport.sendReceiveMessageConfirmation(for: incomingMessage, markMessageAsHandled: alsoMarkMessageAsHandled)
 	}
 
-	func sendDataUsingChunkingTransport(data: Data, id: String) async throws {
+	private func sendDataUsingChunkingTransport(data: Data, id: String) async throws {
 		guard let transport else {
 			loggerGlobal.error("Unable to send data, WebRTCClient is nil.")
 			self.connectionStatusAsyncBufferedChannel.send(
@@ -401,8 +401,8 @@ private extension P2PConnection {
 }
 
 // MAKR: Private Static
-private extension P2PConnection {
-	static func establishConnection(
+extension P2PConnection {
+	fileprivate static func establishConnection(
 		config: P2PConfig,
 		appendWebSocketStateChangeUpdatesTo: AsyncBufferedChannel<WebSocketState>,
 		appendConnectionChangeUpdatesTo connectionStatusAsyncChannel: AsyncThrowingBufferedChannel<ConnectionStatusChangeEvent, Swift.Error>,
@@ -583,8 +583,8 @@ private extension P2PConnection {
 	}
 }
 
-public extension Set where Element == AnyCancellable {
-	mutating func cancelAll() {
+extension Set where Element == AnyCancellable {
+	public mutating func cancelAll() {
 		forEach { $0.cancel() }
 		removeAll()
 	}

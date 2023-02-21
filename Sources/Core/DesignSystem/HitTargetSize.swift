@@ -8,14 +8,17 @@ public enum HitTargetSize: CGFloat {
 	/// 44
 	case small = 44
 
+	/// 64
+	case medium = 64
+
 	public var frame: CGSize {
 		.init(width: rawValue, height: rawValue)
 	}
 }
 
-public extension View {
+extension View {
 	@inlinable
-	func frame(_ size: HitTargetSize) -> some View {
-		frame(width: size.frame.width, height: size.frame.height)
+	public func frame(_ size: HitTargetSize, alignment: Alignment = .center) -> some View {
+		frame(width: size.frame.width, height: size.frame.height, alignment: alignment)
 	}
 }

@@ -3,9 +3,9 @@ import AssetTransferFeature
 import FeaturePrelude
 
 // MARK: - AccountDetails.View
-public extension AccountDetails {
+extension AccountDetails {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -17,8 +17,8 @@ public extension AccountDetails {
 	}
 }
 
-public extension AccountDetails.View {
-	var body: some View {
+extension AccountDetails.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -45,16 +45,18 @@ public extension AccountDetails.View {
 					.foregroundColor(.app.whiteTransparent)
 					.padding(.bottom, .medium1)
 
-					#if DEBUG // FF
-					Button(
-						"Transfer",
-						action: { viewStore.send(.transferButtonTapped) }
-					)
-					.buttonStyle(.secondaryRectangular())
-					.padding(.bottom)
-					#endif
+					// TODO: @davdroman take care of proper Asset Transfer implementation
+					// when we have the proper spec and designs
+//					#if DEBUG // FF
+//					Button(
+//						"Transfer",
+//						action: { viewStore.send(.transferButtonTapped) }
+//					)
+//					.buttonStyle(.secondaryRectangular())
+//					.padding(.bottom)
+//					#endif
 
-					RefreshableScrollView {
+					ScrollView {
 						VStack(spacing: .medium3) {
 							AssetsView.View(
 								store: store.scope(
@@ -89,13 +91,13 @@ public extension AccountDetails.View {
 }
 
 // MARK: - AccountDetails.View.AccountDetailsViewStore
-private extension AccountDetails.View {
-	typealias AccountDetailsViewStore = ViewStore<AccountDetails.View.ViewState, AccountDetails.Action.ViewAction>
+extension AccountDetails.View {
+	fileprivate typealias AccountDetailsViewStore = ViewStore<AccountDetails.View.ViewState, AccountDetails.Action.ViewAction>
 }
 
 // MARK: - Private Methods
-private extension AccountDetails.View {
-	func accountPreferencesButton(with viewStore: AccountDetailsViewStore) -> some View {
+extension AccountDetails.View {
+	fileprivate func accountPreferencesButton(with viewStore: AccountDetailsViewStore) -> some View {
 		Button(
 			action: {
 				viewStore.send(.displayAccountPreferencesButtonTapped)

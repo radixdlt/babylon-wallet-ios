@@ -18,19 +18,19 @@ public enum Address:
 	case identity(IdentityAddress)
 }
 
-public extension Address {
-	var address: String {
+extension Address {
+	public var address: String {
 		switch self {
 		case let .account(address): return address.address
 		case let .identity(address): return address.address
 		}
 	}
 
-	var description: String { address }
+	public var description: String { address }
 }
 
-public extension Address {
-	var customDumpDescription: String {
+extension Address {
+	public var customDumpDescription: String {
 		switch self {
 		case .account: return "AccountAddress(\(address))"
 		case .identity: return "IdentityAddress(\(address))"

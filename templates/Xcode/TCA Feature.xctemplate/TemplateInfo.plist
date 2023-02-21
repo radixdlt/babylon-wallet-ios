@@ -36,39 +36,11 @@
 		</dict>
 		<dict>
 			<key>Default</key>
-			<string>___VARIABLE_featureName___+Action.swift</string>
-			<key>Identifier</key>
-			<string>actionFile</string>
-			<key>Name</key>
-			<string>Action:</string>
-			<key>NotPersisted</key>
-			<true/>
-			<key>Required</key>
-			<true/>
-			<key>Type</key>
-			<string>static</string>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>___VARIABLE_featureName___+Reducer.swift</string>
+			<string>___VARIABLE_featureName___.swift</string>
 			<key>Identifier</key>
 			<string>reducerFile</string>
 			<key>Name</key>
 			<string>Reducer:</string>
-			<key>NotPersisted</key>
-			<true/>
-			<key>Required</key>
-			<true/>
-			<key>Type</key>
-			<string>static</string>
-		</dict>
-		<dict>
-			<key>Default</key>
-			<string>___VARIABLE_featureName___+State.swift</string>
-			<key>Identifier</key>
-			<string>stateFile</string>
-			<key>Name</key>
-			<string>State:</string>
 			<key>NotPersisted</key>
 			<true/>
 			<key>Required</key>

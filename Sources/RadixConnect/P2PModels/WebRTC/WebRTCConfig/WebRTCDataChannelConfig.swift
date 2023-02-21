@@ -43,12 +43,12 @@ public struct WebRTCDataChannelConfig: Sendable, Hashable, Codable, CustomString
 	public static let `default` = Self()
 }
 
-public extension WebRTCDataChannelConfig {
-	var channelId: DataChannelID { dataChannelLabelledID.channelId }
+extension WebRTCDataChannelConfig {
+	public var channelId: DataChannelID { dataChannelLabelledID.channelId }
 
-	var channelLabel: DataChannelLabel { dataChannelLabelledID.channelLabel }
+	public var channelLabel: DataChannelLabel { dataChannelLabelledID.channelLabel }
 
-	var description: String {
+	public var description: String {
 		"""
 		channelId: \(channelId),
 		channelLabel: \(channelLabel),
@@ -61,7 +61,7 @@ public extension WebRTCDataChannelConfig {
 }
 
 #if DEBUG
-public extension WebRTCDataChannelConfig {
-	static let placeholder: Self = .init(dataChannelLabelledID: .placeholder)
+extension WebRTCDataChannelConfig {
+	public static let placeholder: Self = .init(dataChannelLabelledID: .placeholder)
 }
 #endif // DEBUG

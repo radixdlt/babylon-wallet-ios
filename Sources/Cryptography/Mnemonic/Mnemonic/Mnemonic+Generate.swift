@@ -1,12 +1,12 @@
 import Foundation
 
 // MARK: Generate
-public extension Mnemonic {
+extension Mnemonic {
 	/// Generates a new mnemonic by securely generating random bytes (entropy)
 	/// of `wordCount` strength in `language`.
 	///
 	/// Sugar for `init(wordCount:language)`
-	static func generate(
+	public static func generate(
 		wordCount: BIP39.WordCount = .default,
 		language: BIP39.Language = .default
 	) throws -> Self {
@@ -18,7 +18,7 @@ public extension Mnemonic {
 
 	/// Generates a new mnemonic by securely generating random bytes (entropy)
 	/// of `wordCount` strength in `language`.
-	init(
+	public init(
 		wordCount: BIP39.WordCount = .default,
 		language: BIP39.Language = .default
 	) throws {

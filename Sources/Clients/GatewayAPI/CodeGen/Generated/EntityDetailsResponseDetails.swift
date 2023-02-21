@@ -5,7 +5,7 @@
 // https://openapi-generator.tech
 //
 
-import ClientPrelude
+import Foundation
 #if canImport(AnyCodable)
 import AnyCodable
 #endif
@@ -14,8 +14,8 @@ import AnyCodable
 public typealias EntityDetailsResponseDetails = GatewayAPI.EntityDetailsResponseDetails
 
 // MARK: - GatewayAPI.EntityDetailsResponseDetails
-public extension GatewayAPI {
-	enum EntityDetailsResponseDetails: Codable, JSONEncodable, Hashable {
+extension GatewayAPI {
+	public enum EntityDetailsResponseDetails: Codable, JSONEncodable, Hashable {
 		case typeEntityDetailsResponseComponentDetails(EntityDetailsResponseComponentDetails)
 		case typeEntityDetailsResponseFungibleResourceDetails(EntityDetailsResponseFungibleResourceDetails)
 		case typeEntityDetailsResponseNonFungibleResourceDetails(EntityDetailsResponseNonFungibleResourceDetails)

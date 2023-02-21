@@ -16,8 +16,8 @@ public struct LoadingView: View {
 	}
 }
 
-public extension LoadingView {
-	var body: some View {
+extension LoadingView {
+	public var body: some View {
 		ZStack {
 			Circle()
 				.stroke(
@@ -32,12 +32,12 @@ public extension LoadingView {
 				)
 				.rotationEffect(.degrees(rotationDegrees))
 		}
+		.animation(
+			.linear(duration: 1).speed(0.7).repeatForever(autoreverses: false),
+			value: rotationDegrees
+		)
 		.onAppear {
-			withAnimation(.linear(duration: 1)
-				.speed(0.7)
-				.repeatForever(autoreverses: false)) {
-					rotationDegrees = 360.0
-				}
+			rotationDegrees = 360.0
 		}
 	}
 }

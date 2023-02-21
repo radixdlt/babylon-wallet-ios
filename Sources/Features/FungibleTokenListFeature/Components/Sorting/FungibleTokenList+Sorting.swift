@@ -1,13 +1,13 @@
 import FeaturePrelude
 
-public extension Array where Element == FungibleTokenContainer {
-	func sortedIntoCategories() -> [FungibleTokenCategory] {
+extension Array where Element == FungibleTokenContainer {
+	public func sortedIntoCategories() -> [FungibleTokenCategory] {
 		var xrdContainer: FungibleTokenContainer?
 		var noValueTokens = [FungibleTokenContainer]()
 		var tokensWithValues = [FungibleTokenContainer]()
 
 		forEach {
-			if $0.asset == .xrd {
+			if $0.asset.isXRD {
 				xrdContainer = $0
 			} else if $0.worth == nil {
 				noValueTokens.append($0)

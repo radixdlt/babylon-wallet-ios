@@ -1,9 +1,9 @@
-import CreateAccountFeature
+import CreateEntityFeature
 import FeaturePrelude
 
 // MARK: - ManageGatewayAPIEndpoints.State
-public extension ManageGatewayAPIEndpoints {
-	struct State: Equatable {
+extension ManageGatewayAPIEndpoints {
+	public struct State: Equatable {
 		public var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		public var urlString: String
@@ -33,8 +33,8 @@ public extension ManageGatewayAPIEndpoints {
 }
 
 // MARK: - ManageGatewayAPIEndpoints.State.Field
-public extension ManageGatewayAPIEndpoints.State {
-	enum Field: String, Sendable, Hashable {
+extension ManageGatewayAPIEndpoints.State {
+	public enum Field: String, Sendable, Hashable {
 		case gatewayURL
 	}
 }
@@ -52,7 +52,7 @@ extension ManageGatewayAPIEndpoints.State {
 }
 
 #if DEBUG
-public extension ManageGatewayAPIEndpoints.State {
-	static let previewValue: Self = .init()
+extension ManageGatewayAPIEndpoints.State {
+	public static let previewValue: Self = .init()
 }
 #endif

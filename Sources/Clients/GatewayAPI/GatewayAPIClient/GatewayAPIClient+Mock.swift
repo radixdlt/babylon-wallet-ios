@@ -9,13 +9,15 @@ extension GatewayAPIClient: TestDependencyKey {
 		getNetworkName: unimplemented("\(Self.self).getNetworkName"),
 		getEpoch: unimplemented("\(Self.self).getEpoch"),
 		accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
+		accountMetadataByAddress: unimplemented("\(Self.self).accountMetadataByAddress"),
 		resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
 		resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
-		getNonFungibleIds: unimplemented("\(Self.self).getNonFungibleIds"),
+		getNonFungibleLocalIds: unimplemented("\(Self.self).getNonFungibleLocalIds"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
 		transactionStatus: unimplemented("\(Self.self).transactionStatus")
 	)
 
+	// TODO: convert to noop, don't use in tests.
 	private static func mock(
 		fungibleResourceCount _: Int = 2,
 		nonFungibleResourceCount _: Int = 2,
@@ -26,21 +28,16 @@ extension GatewayAPIClient: TestDependencyKey {
 			getNetworkName: { _ in .init("Nebunet") },
 			getEpoch: { .init(rawValue: 123) },
 			accountResourcesByAddress: unimplemented("\(Self.self).accountResourcesByAddress"),
+			accountMetadataByAddress: unimplemented("\(Self.self).accountMetadataByAddress"),
 			resourcesOverview: unimplemented("\(Self.self).resourcesOverview"),
 			resourceDetailsByResourceIdentifier: unimplemented("\(Self.self).resourceDetailsByResourceIdentifier"),
-			getNonFungibleIds: unimplemented("\(Self.self).getNonFungibleIds"),
+			getNonFungibleLocalIds: unimplemented("\(Self.self).getNonFungibleLocalIds"),
 			submitTransaction: { _ in
 				.init(duplicate: submittedTXIsDoubleSpend)
 			},
 			transactionStatus: { _ in
 				.init(
-					ledgerState: .init(
-						network: "Network name",
-						stateVersion: 0,
-						proposerRoundTimestamp: "",
-						epoch: 1337,
-						round: 0
-					),
+					ledgerState: .previewValue,
 					status: .committedSuccess,
 					knownPayloads: [.init(payloadHashHex: "payload-hash-hex", status: .committedSuccess)],
 					errorMessage: nil
@@ -50,11 +47,21 @@ extension GatewayAPIClient: TestDependencyKey {
 	}
 }
 
-public extension DependencyValues {
-	var gatewayAPIClient: GatewayAPIClient {
+extension DependencyValues {
+	public var gatewayAPIClient: GatewayAPIClient {
 		get { self[GatewayAPIClient.self] }
 		set { self[GatewayAPIClient.self] = newValue }
 	}
+}
+
+extension GatewayAPI.LedgerState {
+	public static let previewValue = Self(
+		network: "Network name",
+		stateVersion: 0,
+		proposerRoundTimestamp: "",
+		epoch: 1337,
+		round: 0
+	)
 }
 
 private let fungibleResourceAddresses = [
@@ -79,15 +86,15 @@ private func nonFungibleResourceAddress(at index: Int) -> String {
 	nonFungibleResourceAddresses[index % nonFungibleResourceAddresses.count]
 }
 
-private extension FixedWidthInteger {
-	var data: Data {
+extension FixedWidthInteger {
+	fileprivate var data: Data {
 		let data = withUnsafeBytes(of: self) { Data($0) }
 		return data
 	}
 }
 
-private extension Data {
-	var asUInt: UInt {
+extension Data {
+	fileprivate var asUInt: UInt {
 		withUnsafeBytes { $0.load(as: UInt.self) }
 	}
 }

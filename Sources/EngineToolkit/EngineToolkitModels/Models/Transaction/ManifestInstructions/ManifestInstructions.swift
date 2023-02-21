@@ -7,27 +7,27 @@ public enum ManifestInstructions: Sendable, Codable, Hashable, CustomStringConve
 	// ==============
 
 	case string(String)
-	case json([Instruction])
+	case parsed([Instruction])
 }
 
 // MARK: ManifestInstructions.Kind
-public extension ManifestInstructions {
-	enum Kind: String, Codable, Hashable, Sendable {
+extension ManifestInstructions {
+	public enum Kind: String, Codable, Hashable, Sendable {
 		case string = "String"
-		case json = "JSON"
+		case parsed = "Parsed"
 	}
 }
 
 public typealias ManifestInstructionsKind = ManifestInstructions.Kind
 
-public extension ManifestInstructions {
+extension ManifestInstructions {
 	@available(iOS, deprecated: 999, message: "Prefer using `String(describing: transactionManifest)` if you have that, which will result in much better printing.")
 	@available(macOS, deprecated: 999, message: "Prefer using `String(describing: transactionManifest)` if you have that, which will result in much better printing.")
-	var description: String {
+	public var description: String {
 		switch self {
 		case let .string(string):
 			return string
-		case let .json(instructions):
+		case let .parsed(instructions):
 			return instructions.lazy.map { String(describing: $0) }.joined(separator: "\n")
 		}
 	}

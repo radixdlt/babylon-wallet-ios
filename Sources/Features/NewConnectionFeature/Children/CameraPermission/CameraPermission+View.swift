@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: - CameraPermission.View
-public extension CameraPermission {
+extension CameraPermission {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		private let store: StoreOf<CameraPermission>
 
 		public init(store: StoreOf<CameraPermission>) {
@@ -12,30 +12,16 @@ public extension CameraPermission {
 	}
 }
 
-public extension CameraPermission.View {
-	var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			ZStack {}
-				.alert(
-					store.scope(
-						state: \.permissionDeniedAlert,
-						action: { .view(.permissionDeniedAlert($0)) }
-					),
-					dismiss: .dismissed
-				)
-				.onAppear { viewStore.send(.appeared) }
-		}
-	}
-}
-
-// MARK: - CameraPermission.View.ViewState
 extension CameraPermission.View {
-	struct ViewState: Equatable {
-		init(state: CameraPermission.State) {}
+	public var body: some View {
+		ZStack {}
+			.alert(
+				store: store.scope(
+					state: \.$permissionDeniedAlert,
+					action: { .view(.permissionDeniedAlert($0)) }
+				)
+			)
+			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
 	}
 }
 

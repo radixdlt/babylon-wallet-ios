@@ -1,8 +1,8 @@
 import Foundation
 
 // MARK: - Engine.Signature
-public extension Engine {
-	enum Signature: Sendable, Codable, Hashable {
+extension Engine {
+	public enum Signature: Sendable, Codable, Hashable {
 		// ==============
 		// Enum Variants
 		// ==============
@@ -12,8 +12,8 @@ public extension Engine {
 	}
 }
 
-private extension Engine.Signature {
-	var discriminator: CurveDiscriminator {
+extension Engine.Signature {
+	fileprivate var discriminator: CurveDiscriminator {
 		switch self {
 		case .ecdsaSecp256k1: return .ecdsaSecp256k1
 		case .eddsaEd25519: return .eddsaEd25519
@@ -21,15 +21,17 @@ private extension Engine.Signature {
 	}
 }
 
-public extension Engine.Signature {
+extension Engine.Signature {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
-		case discriminator = "type"
+		case discriminator = "curve"
 		case signature
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(discriminator, forKey: .discriminator)
 
@@ -41,7 +43,7 @@ public extension Engine.Signature {
 		}
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let discriminator = try container.decode(CurveDiscriminator.self, forKey: .discriminator)
@@ -55,8 +57,8 @@ public extension Engine.Signature {
 	}
 }
 
-public extension Engine.Signature {
-	var bytes: [UInt8] {
+extension Engine.Signature {
+	public var bytes: [UInt8] {
 		switch self {
 		case let .ecdsaSecp256k1(signature):
 			return signature.bytes
@@ -65,7 +67,7 @@ public extension Engine.Signature {
 		}
 	}
 
-	var hex: String {
+	public var hex: String {
 		bytes.hex
 	}
 }

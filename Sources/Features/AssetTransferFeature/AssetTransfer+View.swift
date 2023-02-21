@@ -2,9 +2,9 @@ import FeaturePrelude
 import TransactionSigningFeature
 
 // MARK: - AssetTransfer.View
-public extension AssetTransfer {
+extension AssetTransfer {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -14,8 +14,8 @@ public extension AssetTransfer {
 	}
 }
 
-public extension AssetTransfer.View {
-	var body: some View {
+extension AssetTransfer.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -57,7 +57,7 @@ public extension AssetTransfer.View {
 				#if os(iOS)
 					.navigationBarTitleDisplayMode(.large)
 				#endif
-					.safeAreaInset(edge: .bottom) {
+					.safeAreaInset(edge: .bottom, spacing: .zero) {
 						WithControlRequirements(
 							viewStore.output,
 							forAction: {
@@ -127,19 +127,20 @@ extension AssetTransfer.View {
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-struct AssetTransfer_Preview: PreviewProvider {
-	static var previews: some View {
-		AssetTransfer.View(
-			store: .init(
-				initialState: .init(
-					from: .previewValue0
-				),
-				reducer: AssetTransfer()
-			)
-		)
-	}
-}
-#endif
+// FIXME: fix post betanet v2 release
+// #if DEBUG
+// import SwiftUI // NB: necessary for previews to appear
+//
+// struct AssetTransfer_Preview: PreviewProvider {
+//	static var previews: some View {
+//		AssetTransfer.View(
+//			store: .init(
+//				initialState: .init(
+//					from: .previewValue0
+//				),
+//				reducer: AssetTransfer()
+//			)
+//		)
+//	}
+// }
+// #endif

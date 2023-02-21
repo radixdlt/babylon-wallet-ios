@@ -1,9 +1,9 @@
 import FeaturePrelude
 
 // MARK: NonFungibleTokenList.State
-public extension NonFungibleTokenList {
+extension NonFungibleTokenList {
 	// MARK: State
-	struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		public var rows: IdentifiedArrayOf<NonFungibleTokenList.Row.State>
 		public var selectedToken: NonFungibleTokenList.Detail.State?
 

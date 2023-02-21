@@ -9,15 +9,16 @@ public struct TakeFromWorktopByIds: InstructionProtocol {
 	}
 
 	// MARK: Stored properties
+
 	public let resourceAddress: ResourceAddress
-	public let ids: Set<NonFungibleId>
+	public let ids: Set<NonFungibleLocalId>
 	public let bucket: Bucket
 
 	// MARK: Init
 
 	// Same order as scrypto: IDS, Address, Bucket
 	public init(
-		_ ids: Set<NonFungibleId>,
+		_ ids: Set<NonFungibleLocalId>,
 		resourceAddress: ResourceAddress,
 		bucket: Bucket
 	) {
@@ -27,8 +28,9 @@ public struct TakeFromWorktopByIds: InstructionProtocol {
 	}
 }
 
-public extension TakeFromWorktopByIds {
+extension TakeFromWorktopByIds {
 	// MARK: CodingKeys
+
 	private enum CodingKeys: String, CodingKey {
 		case type = "instruction"
 		case ids
@@ -37,7 +39,8 @@ public extension TakeFromWorktopByIds {
 	}
 
 	// MARK: Codable
-	func encode(to encoder: Encoder) throws {
+
+	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(Self.kind, forKey: .type)
 
@@ -46,7 +49,7 @@ public extension TakeFromWorktopByIds {
 		try container.encode(bucket, forKey: .intoBucket)
 	}
 
-	init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		// Checking for type discriminator
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let kind: InstructionKind = try container.decode(InstructionKind.self, forKey: .type)
@@ -55,7 +58,7 @@ public extension TakeFromWorktopByIds {
 		}
 
 		let resourceAddress = try container.decode(ResourceAddress.self, forKey: .resourceAddress)
-		let ids = try container.decode(Set<NonFungibleId>.self, forKey: .ids)
+		let ids = try container.decode(Set<NonFungibleLocalId>.self, forKey: .ids)
 		let bucket = try container.decode(Bucket.self, forKey: .intoBucket)
 
 		self.init(ids, resourceAddress: resourceAddress, bucket: bucket)

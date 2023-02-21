@@ -3,9 +3,9 @@ import FeaturePrelude
 import FungibleTokenListFeature
 
 // MARK: - AccountList.Row.View
-public extension AccountList.Row {
+extension AccountList.Row {
 	@MainActor
-	struct View: SwiftUI.View {
+	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>
 		private let store: Store
 
@@ -17,8 +17,8 @@ public extension AccountList.Row {
 	}
 }
 
-public extension AccountList.Row.View {
-	var body: some View {
+extension AccountList.Row.View {
+	public var body: some View {
 		WithViewStore(
 			store,
 			observe: ViewState.init(state:),
@@ -28,7 +28,7 @@ public extension AccountList.Row.View {
 				VStack(alignment: .leading, spacing: .zero) {
 					HeaderView(
 						name: viewStore.name,
-						value: formattedAmmount(
+						value: formattedAmount(
 							viewStore.aggregatedValue,
 							isVisible: viewStore.isCurrencyAmountVisible,
 							currency: viewStore.currency
@@ -62,10 +62,19 @@ public extension AccountList.Row.View {
 }
 
 // MARK: - Private Methods
-private extension AccountList.Row.View {
-	func formattedAmmount(_ value: Float?, isVisible: Bool, currency: FiatCurrency) -> String {
+extension AccountList.Row.View {
+	fileprivate func formattedAmount(
+		_ value: BigDecimal?,
+		isVisible: Bool,
+		currency: FiatCurrency
+	) -> String {
 		if isVisible {
-			return value?.formatted(.currency(code: currency.symbol)) ?? "\(currency.sign) -"
+			if let value {
+				// FIXME: Fix formatting of BigDecimal with symbol
+				return "\(currency.symbol) \(value.format())"
+			} else {
+				return "\(currency.sign) -"
+			}
 		} else {
 			return "\(currency.sign) ••••"
 		}
@@ -76,22 +85,22 @@ private extension AccountList.Row.View {
 extension AccountList.Row.View {
 	// MARK: ViewState
 	struct ViewState: Equatable {
-		let name: String?
+		let name: String
 		let address: AddressView.ViewState
 		let appearanceID: OnNetwork.Account.AppearanceID
-		let aggregatedValue: Float?
+		let aggregatedValue: BigDecimal?
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
 		let portfolio: AccountPortfolio
 
 		init(state: AccountList.Row.State) {
-			name = state.account.displayName
-			address = .init(address: state.account.address.address, format: .short())
-			appearanceID = state.account.appearanceID
-			aggregatedValue = state.aggregatedValue
-			currency = state.currency
-			isCurrencyAmountVisible = state.isCurrencyAmountVisible
-			portfolio = state.portfolio
+			self.name = state.account.displayName.rawValue
+			self.address = .init(address: state.account.address.address, format: .short())
+			self.appearanceID = state.account.appearanceID
+			self.aggregatedValue = state.aggregatedValue
+			self.currency = state.currency
+			self.isCurrencyAmountVisible = state.isCurrencyAmountVisible
+			self.portfolio = state.portfolio
 		}
 	}
 }
