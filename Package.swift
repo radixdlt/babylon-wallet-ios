@@ -83,6 +83,14 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
+		name: "ConnectedDAppsFeature",
+		dependencies: [
+			"GatewayAPI",
+			"ProfileClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "DappInteractionFeature",
 		dependencies: [
 			"CreateEntityFeature",
@@ -183,6 +191,7 @@ package.addModules([
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
+			"ConnectedDAppsFeature",
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
