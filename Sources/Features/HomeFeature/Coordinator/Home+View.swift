@@ -96,13 +96,6 @@ extension Home {
 				#endif
 			}
 		}
-
-//		fileprivate func homeView(with viewStore: ViewStore<Home.ViewState, Home.ViewAction>) -> some SwiftUI.View {
-		////			VStack {
-
-		////				.padding(EdgeInsets(top: .medium1, leading: .large2, bottom: .zero, trailing: .medium1))
-		////			}
-//		}
 	}
 }
 
