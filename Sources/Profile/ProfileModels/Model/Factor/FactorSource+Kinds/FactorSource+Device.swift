@@ -24,7 +24,7 @@ public extension FactorSource {
 	) throws -> Self {
 		try .device(
 			mnemonic: mnemonic,
-			hint: Device.modelName(),
+			hint: Device.modelDescription(),
 			bip39Passphrase: bip39Passphrase,
 			olympiaCompatible: false
 		)
@@ -37,7 +37,7 @@ public extension FactorSource {
 	) throws -> Self {
 		try .device(
 			mnemonic: mnemonic,
-			hint: Device.modelName(),
+			hint: Device.modelDescription(),
 			bip39Passphrase: bip39Passphrase,
 			olympiaCompatible: true
 		)

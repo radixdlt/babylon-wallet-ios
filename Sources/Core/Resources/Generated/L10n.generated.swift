@@ -320,6 +320,12 @@ public enum L10n {
       }
     }
   }
+  public enum FactorSource {
+    public enum Device {
+      /// Unknown iPhone
+      public static let iPhoneModelFallback = L10n.tr("Localizable", "factorSource.device.iPhoneModelFallback", fallback: "Unknown iPhone")
+    }
+  }
   public enum FungibleTokenList {
     public enum Detail {
       /// Current Supply
