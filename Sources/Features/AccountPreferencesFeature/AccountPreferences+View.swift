@@ -42,16 +42,18 @@ extension AccountPreferences.View {
 					viewStore.send(.didAppear)
 				}
 				.navigationTitle(L10n.AccountPreferences.title)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleFont(.app.secondaryHeader, for: .inline)
-				.toolbar {
-					ToolbarItem(placement: .navigationBarLeading) {
-						CloseButton {
-							viewStore.send(.closeButtonTapped)
+				#if os(iOS)
+					.navigationBarTitleDisplayMode(.inline)
+					.navigationBarTitleColor(.app.gray1)
+					.navigationBarTitleFont(.app.secondaryHeader, for: .inline)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							CloseButton {
+								viewStore.send(.closeButtonTapped)
+							}
 						}
 					}
-				}
+				#endif
 			}
 		}
 	}
