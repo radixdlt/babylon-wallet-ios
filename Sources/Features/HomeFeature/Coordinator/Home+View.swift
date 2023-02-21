@@ -31,41 +31,34 @@ extension Home {
 				send: { .view($0) }
 			) { viewStore in
 				NavigationStack {
-					VStack(spacing: .medium1) {
-						Header.View(
-							store: store.scope(
-								state: \.header,
-								action: { .child(.header($0)) }
-							)
-						)
-						ScrollView {
-							VStack(spacing: .medium1) {
-								AccountList.View(
-									store: store.scope(
-										state: \.accountList,
-										action: { .child(.accountList($0)) }
-									)
+					ScrollView {
+						VStack(spacing: .medium1) {
+							Header.View(
+								store: store.scope(
+									state: \.header,
+									action: { .child(.header($0)) }
 								)
-								.padding(.horizontal, .medium1)
+							)
 
-								Button(L10n.Home.CreateAccount.buttonTitle) {
-									viewStore.send(.createAccountButtonTapped)
-								}
-								.buttonStyle(.secondaryRectangular())
+							AccountList.View(
+								store: store.scope(
+									state: \.accountList,
+									action: { .child(.accountList($0)) }
+								)
+							)
+							.padding(.horizontal, .medium1)
+
+							Button(L10n.Home.CreateAccount.buttonTitle) {
+								viewStore.send(.createAccountButtonTapped)
 							}
-							.padding(.bottom, .medium1)
+							.buttonStyle(.secondaryRectangular())
 						}
-						.refreshable {
-							await viewStore.send(.pullToRefreshStarted).finish()
-						}
+						.padding(.bottom, .medium1)
+					}
+					.refreshable {
+						await viewStore.send(.pullToRefreshStarted).finish()
 					}
 //					ZStack {
-//						homeView(with: viewStore)
-//							.onAppear {
-//								viewStore.send(.appeared)
-//							}
-//							.zIndex(0)
-//
 //						IfLetStore(
 //							store.scope(
 //								state: \.createAccountCoordinator,
@@ -84,6 +77,9 @@ extension Home {
 //						)
 //						.zIndex(3)
 //					}
+					.onAppear {
+						viewStore.send(.appeared)
+					}
 					.navigationDestination(
 						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
 						state: /Home.Destinations.State.accountDetails,
