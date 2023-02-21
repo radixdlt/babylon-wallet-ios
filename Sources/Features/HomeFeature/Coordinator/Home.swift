@@ -23,22 +23,19 @@ public struct Home: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State?
 		public var accountPreferences: AccountPreferences.State?
-		public var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		public init(
 			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
 			header: Header.State = .init(),
 			accountList: AccountList.State = .init(accounts: []),
 			destination: Destinations.State? = nil,
-			accountPreferences: AccountPreferences.State? = nil,
-			createAccount: CreateAccountCoordinator.State? = nil
+			accountPreferences: AccountPreferences.State? = nil
 		) {
 			self.accountPortfolioDictionary = accountPortfolioDictionary
 			self.header = header
 			self.accountList = accountList
 			self.destination = destination
 			self.accountPreferences = accountPreferences
-			self.createAccountCoordinator = createAccount
 		}
 	}
 
@@ -61,7 +58,6 @@ public struct Home: Sendable, FeatureReducer {
 		case accountList(AccountList.Action)
 		case destination(PresentationActionOf<Destinations>)
 		case accountPreferences(AccountPreferences.Action)
-		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -71,15 +67,20 @@ public struct Home: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
+			case createAccount(CreateAccountCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case accountDetails(AccountDetails.Action)
+			case createAccount(CreateAccountCoordinator.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
 			Scope(state: /State.accountDetails, action: /Action.accountDetails) {
 				AccountDetails()
+			}
+			Scope(state: /State.createAccount, action: /Action.createAccount) {
+				CreateAccountCoordinator()
 			}
 		}
 	}
@@ -114,9 +115,6 @@ public struct Home: Sendable, FeatureReducer {
 		.ifLet(\.accountPreferences, action: /Action.child .. ChildAction.accountPreferences) {
 			AccountPreferences()
 		}
-		.ifLet(\.createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
-			CreateAccountCoordinator()
-		}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -128,11 +126,13 @@ public struct Home: Sendable, FeatureReducer {
 			return loadAccountsAndSettings()
 
 		case .createAccountButtonTapped:
-			state.createAccountCoordinator = .init(config: .init(
-				isFirstEntity: false,
-				canBeDismissed: true,
-				navigationButtonCTA: .goHome
-			))
+			state.destination = .createAccount(
+				.init(config: .init(
+					isFirstEntity: false,
+					canBeDismissed: true,
+					navigationButtonCTA: .goHome
+				))
+			)
 			return .none
 		}
 	}
@@ -264,12 +264,12 @@ public struct Home: Sendable, FeatureReducer {
 		case let .destination(.presented(.accountDetails(.delegate(.refresh(address))))):
 			return refreshAccount(address)
 
-		case .createAccountCoordinator(.delegate(.dismissed)):
-			state.createAccountCoordinator = nil
+		case .destination(.presented(.createAccount(.delegate(.dismissed)))):
+			state.destination = nil
 			return .none
 
-		case .createAccountCoordinator(.delegate(.completed)):
-			state.createAccountCoordinator = nil
+		case .destination(.presented(.createAccount(.delegate(.completed)))):
+			state.destination = nil
 			return loadAccountsAndSettings()
 
 		default:

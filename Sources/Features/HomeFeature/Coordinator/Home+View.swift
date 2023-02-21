@@ -61,15 +61,6 @@ extension Home {
 //					ZStack {
 //						IfLetStore(
 //							store.scope(
-//								state: \.createAccountCoordinator,
-//								action: { .child(.createAccountCoordinator($0)) }
-//							),
-//							then: { CreateAccountCoordinator.View(store: $0) }
-//						)
-//						.zIndex(1)
-//
-//						IfLetStore(
-//							store.scope(
 //								state: \.accountPreferences,
 //								action: { .child(.accountPreferences($0)) }
 //							),
@@ -85,6 +76,12 @@ extension Home {
 						state: /Home.Destinations.State.accountDetails,
 						action: Home.Destinations.Action.accountDetails,
 						destination: { AccountDetails.View(store: $0) }
+					)
+					.sheet(
+						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+						state: /Home.Destinations.State.createAccount,
+						action: Home.Destinations.Action.createAccount,
+						content: { CreateAccountCoordinator.View(store: $0) }
 					)
 				}
 				#if os(iOS)
