@@ -126,6 +126,32 @@
 "manageP2PClients.newConnectionTitle" = "Link New Connector";
 "manageP2PClients.sendTestMessageButtonTitle" = "Send Test Msg";
 
+"connectedDapps.title" = "Connected dApps";
+"connectedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
+
+"dAppDetails.definition" = "dApp Definition";
+"dAppDetails.missingDescription" = "Missing description";
+"dAppDetails.website" = "Website";
+"dAppDetails.tokens" = "Associated Tokens";
+"dAppDetails.nfts" = "Associated NFTs";
+"dAppDetails.personaHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
+"dAppDetails.noPersonasHeading" = "No Personas have been used to connect to this dApp.";
+"dAppDetails.forgetDapp" = "Forget this dApp";
+
+"personaDetails.personaNameHeading" = "Persona Name";
+"personaDetails.personalDataSharingDescription" = "Here is the personal data that you are sharing with %@";
+"personaDetails.editPersona" = "Edit Persona";
+"personaDetails.firstNameHeading" = "First Name";
+"personaDetails.secondNameHeading" = "Second Name";
+"personaDetails.emailHeading" = "Email";
+"personaDetails.zipCodeHeading" = "Zip Code";
+"personaDetails.notSharingAnything" = "You are not sharing any personal data with %@";
+
+"personaDetails.accountSharingDescription" = "Here are the account names and addresses that you are currently sharing with %@.";
+
+"personaDetails.editAccountSharing" = "Edit Account Sharing";
+"personaDetails.disconnectPersona" = "Disconnect Persona from this dApp";
+
 "newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
 "newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";
 "newConnection.cameraPermission.deniedAlert.settingsButtonTitle" = "Settings";
@@ -169,6 +195,7 @@
 "settings.desktopConnectionsButtonTitle" = "Linked Connector";
 "settings.gatewayButtonTitle" = "Network Gateway";
 "settings.inspectProfileButtonTitle" = "Inspect Profile";
+"settings.connectedDappsButtonTitle" = "Connected dApps";
 "settings.noProfileText" = "No Wallet Data Found";
 "settings.personasButtonTitle" = "Personas";
 "settings.title" = "Wallet Settings";
