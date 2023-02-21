@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - CameraPermission.State
 extension CameraPermission {
-	public struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		@PresentationState
 		var permissionDeniedAlert: AlertState<Action.ViewAction.PermissionDeniedAlertAction>? = nil
 

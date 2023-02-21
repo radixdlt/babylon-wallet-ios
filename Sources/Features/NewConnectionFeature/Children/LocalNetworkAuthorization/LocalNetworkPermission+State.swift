@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - LocalNetworkPermission.State
 extension LocalNetworkPermission {
-	public struct State: Sendable, Equatable {
+	public struct State: Sendable, Hashable {
 		@PresentationState
 		var permissionDeniedAlert: AlertState<Action.ViewAction.PermissionDeniedAlertAction>? = nil
 
