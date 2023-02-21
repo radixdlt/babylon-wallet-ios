@@ -166,7 +166,7 @@ extension NewEntityCompletion.View {
 
 			if let account = state.entity as? OnNetwork.Account {
 				self.whenAccount = WhenAccount(
-					accountAddress: .init(address: account.address.address, format: .short()),
+					accountAddress: .init(address: account.address.address, format: .default),
 					appearanceID: account.appearanceID
 				)
 				self.explaination = L10n.CreateEntity.Completion.Explanation.Specific.account

@@ -13,7 +13,7 @@ extension ChooseAccountsRow {
 			appearanceID = state.account.appearanceID
 			isSelected = state.isSelected
 			accountName = state.account.displayName.rawValue
-			accountAddress = .init(address: state.account.address.address, format: .short())
+			accountAddress = .init(address: state.account.address.address, format: .default)
 			mode = state.mode
 		}
 	}

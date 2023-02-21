@@ -106,7 +106,7 @@ extension FungibleTokenDetails.View {
 			self.amount = state.amount.format()
 			self.symbol = state.asset.symbol
 			self.description = state.asset.tokenDescription
-			self.address = .init(address: state.asset.componentAddress.address, format: .short())
+			self.address = .init(address: state.asset.componentAddress.address, format: .default)
 			self.currentSupply = state.asset.totalMinted
 		}
 	}
