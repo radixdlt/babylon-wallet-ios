@@ -25,7 +25,7 @@ extension ROLAClient {
 			do {
 				response = try JSONDecoder().decode(WellKnownFileResponse.self, from: data)
 			} catch {
-				throw WellKnownFileCheckError.invalidOriginURL
+				throw WellKnownFileCheckError.uknownFileFormat
 			}
 
 			let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)
@@ -48,7 +48,7 @@ extension ROLAClient {
 extension ROLAClient {
 	enum WellKnownFileCheckError: Error, LocalizedError {
 		case invalidOriginURL
-		case invalidWellKnownFileStructure
+		case uknownFileFormat
 		case unknownDappDefinitionAddress
 	}
 }
