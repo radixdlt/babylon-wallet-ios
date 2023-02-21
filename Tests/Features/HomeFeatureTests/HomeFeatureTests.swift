@@ -55,47 +55,47 @@ final class HomeFeatureTests: TestCase {
 			$0.accountList.accounts[id: address]!.portfolio = accountPortfolio
 
 			// account details
-//			if $0.accountDetails != nil {
-			// asset list
-			let sortedCategories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
+			if $0.destination?.accountDetails != nil {
+				// asset list
+				let sortedCategories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
-			let section0 = FungibleTokenList.Section.State(
-				id: .xrd, assets: [
-					FungibleTokenList.Row.State(
-						container: sortedCategories[0].tokenContainers[0],
-						currency: .usd,
-						isCurrencyAmountVisible: true
+				let section0 = FungibleTokenList.Section.State(
+					id: .xrd, assets: [
+						FungibleTokenList.Row.State(
+							container: sortedCategories[0].tokenContainers[0],
+							currency: .usd,
+							isCurrencyAmountVisible: true
+						),
+					]
+				)
+
+				let section1 = FungibleTokenList.Section.State(
+					id: .nonXrd,
+					assets: [
+						FungibleTokenList.Row.State(
+							container: sortedCategories[1].tokenContainers[0],
+							currency: .usd,
+							isCurrencyAmountVisible: true
+						),
+						FungibleTokenList.Row.State(
+							container: sortedCategories[1].tokenContainers[1],
+							currency: .usd,
+							isCurrencyAmountVisible: true
+						),
+					]
+				)
+
+				let nonFungibleRows: [NonFungibleTokenList.Row.State] = accountPortfolio.nonFungibleTokenContainers.elements.map { .init(container: $0) }
+
+				$0.destination?.accountDetails?.assets = .init(
+					fungibleTokenList: .init(
+						sections: [section0, section1]
 					),
-				]
-			)
-
-			let section1 = FungibleTokenList.Section.State(
-				id: .nonXrd,
-				assets: [
-					FungibleTokenList.Row.State(
-						container: sortedCategories[1].tokenContainers[0],
-						currency: .usd,
-						isCurrencyAmountVisible: true
-					),
-					FungibleTokenList.Row.State(
-						container: sortedCategories[1].tokenContainers[1],
-						currency: .usd,
-						isCurrencyAmountVisible: true
-					),
-				]
-			)
-
-			let nonFungibleRows: [NonFungibleTokenList.Row.State] = accountPortfolio.nonFungibleTokenContainers.elements.map { .init(container: $0) }
-
-//				$0.accountDetails?.assets = .init(
-//					fungibleTokenList: .init(
-//						sections: [section0, section1]
-//					),
-//					nonFungibleTokenList: .init(
-//						rows: .init(uniqueElements: nonFungibleRows)
-//					)
-//				)
-//			}
+					nonFungibleTokenList: .init(
+						rows: .init(uniqueElements: nonFungibleRows)
+					)
+				)
+			}
 		}
 	}
 
