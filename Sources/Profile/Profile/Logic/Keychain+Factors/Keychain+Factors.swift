@@ -113,7 +113,7 @@ extension KeychainClient {
 	}
 }
 
-//// MARK: Remove
+// MARK: Remove
 extension KeychainClient {
 	public func removeAllFactorSourcesAndProfileSnapshot(
 		authenticationPrompt: AuthenticationPrompt,
