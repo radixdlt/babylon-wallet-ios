@@ -4,7 +4,8 @@ import SwiftUI
 
 extension View {
 	public func navigationBarTitleColor(
-		_ color: Color, for displayMode: NavigationBarItem.TitleDisplayMode = .automatic
+		_ color: Color,
+		for displayMode: NavigationBarItem.TitleDisplayMode = .automatic
 	) -> some View {
 		self.modifier(NavigationBarTitleColorModifier(color: color, displayMode: displayMode))
 	}
