@@ -8,15 +8,8 @@ public struct PersonaList: Sendable, ReducerProtocol {
 extension PersonaList {
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismiss))
-			}
-
 		case .internal(.view(.createNewPersonaButtonTapped)):
-			return .run { send in
-				await send(.delegate(.createNewPersona))
-			}
+			return .send(.delegate(.createNewPersona))
 
 		case .delegate:
 			return .none

@@ -26,7 +26,6 @@ extension PersonaList.Action {
 // MARK: - PersonaList.Action.ViewAction
 extension PersonaList.Action {
 	public enum ViewAction: Sendable, Equatable {
-		case dismissButtonTapped
 		case createNewPersonaButtonTapped
 	}
 }
@@ -48,6 +47,5 @@ extension PersonaList.Action {
 extension PersonaList.Action {
 	public enum DelegateAction: Sendable, Equatable {
 		case createNewPersona
-		case dismiss
 	}
 }
