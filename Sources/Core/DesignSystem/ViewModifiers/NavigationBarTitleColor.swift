@@ -1,3 +1,4 @@
+#if os(iOS)
 import Introspect
 import SwiftUI
 
@@ -5,15 +6,10 @@ extension View {
 	public func navigationBarTitleColor(
 		_ color: Color, for displayMode: NavigationBarItem.TitleDisplayMode = .automatic
 	) -> some View {
-		#if os(iOS)
 		self.modifier(NavigationBarTitleColorModifier(color: color, displayMode: displayMode))
-		#else
-		self
-		#endif
 	}
 }
 
-#if os(iOS)
 struct NavigationBarTitleColorModifier: ViewModifier {
 	let color: Color
 	let displayMode: NavigationBarItem.TitleDisplayMode

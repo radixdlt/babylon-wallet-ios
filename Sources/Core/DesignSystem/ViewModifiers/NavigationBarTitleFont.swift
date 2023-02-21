@@ -1,3 +1,4 @@
+#if os(iOS)
 import Introspect
 import Resources
 import SwiftUI
@@ -7,15 +8,10 @@ extension View {
 		_ uiFont: UIFont,
 		for displayMode: NavigationBarItem.TitleDisplayMode = .automatic
 	) -> some View {
-		#if os(iOS)
 		self.modifier(NavigationBarTitleFontModifier(uiFont: uiFont, displayMode: displayMode))
-		#else
-		self
-		#endif
 	}
 }
 
-#if os(iOS)
 struct NavigationBarTitleFontModifier: ViewModifier {
 	let uiFont: UIFont
 	let displayMode: NavigationBarItem.TitleDisplayMode

@@ -35,22 +35,24 @@ extension Header {
 				}
 				.padding(.top, .small3)
 				.navigationTitle(L10n.Home.Header.title)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.large)
-				.navigationBarTitleFont(.app.sheetTitle, for: .large)
-				.navigationBarTitleFont(.app.secondaryHeader, for: .inline)
-				.introspectNavigationController { controller in
-					controller.navigationBar.layoutMargins.left = .large2
-					controller.navigationBar.layoutMargins.right = .large2
-				}
-				.toolbar {
-					ToolbarItem(placement: .navigationBarTrailing) {
-						SettingsButton(
-							shouldShowNotification: viewStore.hasNotification,
-							action: { viewStore.send(.settingsButtonTapped) }
-						)
+				#if os(iOS)
+					.navigationBarTitleColor(.app.gray1)
+					.navigationBarTitleDisplayMode(.large)
+					.navigationBarTitleFont(.app.sheetTitle, for: .large)
+					.navigationBarTitleFont(.app.secondaryHeader, for: .inline)
+					.introspectNavigationController { controller in
+						controller.navigationBar.layoutMargins.left = .large2
+						controller.navigationBar.layoutMargins.right = .large2
 					}
-				}
+					.toolbar {
+						ToolbarItem(placement: .navigationBarTrailing) {
+							SettingsButton(
+								shouldShowNotification: viewStore.hasNotification,
+								action: { viewStore.send(.settingsButtonTapped) }
+							)
+						}
+					}
+				#endif
 			}
 		}
 

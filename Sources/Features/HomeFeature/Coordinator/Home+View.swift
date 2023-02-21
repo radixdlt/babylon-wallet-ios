@@ -91,7 +91,9 @@ extension Home {
 						destination: { AccountDetails.View(store: $0) }
 					)
 				}
+				#if os(iOS)
 				.navigationTransition(.default, interactivity: .pan)
+				#endif
 			}
 		}
 

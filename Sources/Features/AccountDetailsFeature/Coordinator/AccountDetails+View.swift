@@ -68,37 +68,35 @@ extension AccountDetails.View {
 				.background(viewStore.appearanceID.gradient)
 			}
 			.navigationBarBackButtonHidden()
-//			.navigationTitle(viewStore.displayName)
-			.navigationBarTitleDisplayMode(.inline)
-//			.large
-//			.navigationBarTitleColor(.app.white)
-//			.navigationBarTitleFont(.app.secondaryHeader)
-			.toolbar {
-				ToolbarItem(placement: .navigationBarLeading) {
-					BackButton {
-						viewStore.send(.dismissAccountDetailsButtonTapped)
+			#if os(iOS)
+				.navigationBarTitleDisplayMode(.inline)
+				.toolbar {
+					ToolbarItem(placement: .navigationBarLeading) {
+						BackButton {
+							viewStore.send(.dismissAccountDetailsButtonTapped)
+						}
+						.foregroundColor(.app.white)
 					}
-					.foregroundColor(.app.white)
+					ToolbarItem(placement: .principal) {
+						Text(viewStore.displayName)
+							.textStyle(.secondaryHeader)
+							.foregroundColor(.app.white)
+					}
+					ToolbarItem(placement: .navigationBarTrailing) {
+						accountPreferencesButton(with: viewStore)
+							.foregroundColor(.app.white)
+					}
 				}
-				ToolbarItem(placement: .principal) {
-					Text(viewStore.displayName)
-						.textStyle(.secondaryHeader)
-						.foregroundColor(.app.white)
+			#endif
+				.onAppear {
+					viewStore.send(.appeared)
 				}
-				ToolbarItem(placement: .navigationBarTrailing) {
-					accountPreferencesButton(with: viewStore)
-						.foregroundColor(.app.white)
-				}
-			}
-			.onAppear {
-				viewStore.send(.appeared)
-			}
-			.sheet(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AccountDetails.Destinations.State.transfer,
-				action: AccountDetails.Destinations.Action.transfer,
-				content: { AssetTransfer.View(store: $0) }
-			)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /AccountDetails.Destinations.State.transfer,
+					action: AccountDetails.Destinations.Action.transfer,
+					content: { AssetTransfer.View(store: $0) }
+				)
 		}
 	}
 }
@@ -150,7 +148,9 @@ struct AccountDetails_Preview: PreviewProvider {
 					reducer: AccountDetails()
 				)
 			)
+			#if os(iOS)
 			.navigationBarTitleDisplayMode(.inline)
+			#endif
 		}
 	}
 }
