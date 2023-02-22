@@ -72,14 +72,6 @@ extension SecureStorageClient: DependencyKey {
 					)
 				)
 			},
-//			updateProfileSnapshot: { profileSnapshot in
-//				guard try await loadProfileSnapshotData() != nil else {
-//					struct NoProfileSnapshotExistsCallAddNewInstead: Swift.Error {}
-//					throw NoProfileSnapshotExistsCallAddNewInstead()
-//				}
-//				let data = try jsonEncoder().encode(profileSnapshot)
-//				try await keychainClient.updateDataWithoutAuthForKey(data, profileSnapshotKeychainKey)
-//			},
 			loadProfileSnapshotData: loadProfileSnapshotData,
 			saveMnemonicForFactorSource: { privateFactorSource in
 				let factorSource = privateFactorSource.factorSource
@@ -95,7 +87,7 @@ extension SecureStorageClient: DependencyKey {
 					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
 					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy, // can be nil
 					label: "Radix Wallet Factor Secret",
-					comment: .init(factorSource.hint)
+					comment: .init("Factor hint: \(factorSource.hint)")
 				)
 			},
 			loadMnemonicByFactorSourceID: { factorSourceID, purpose in

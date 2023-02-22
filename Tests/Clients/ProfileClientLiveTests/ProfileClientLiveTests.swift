@@ -11,7 +11,7 @@ final class ProfileClientLiveTests: TestCase {
 		""".data(using: .utf8)!
 
 		await withDependencies {
-			$0.keychainClient.dataForKey = { _, _ in json }
+			$0.secureStorageClient.loadProfileSnapshotData = { json }
 		} operation: {
 			let res = await sut.loadProfile()
 
