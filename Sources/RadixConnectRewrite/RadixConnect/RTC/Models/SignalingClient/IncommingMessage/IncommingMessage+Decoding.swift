@@ -32,11 +32,15 @@ extension IncommingMessage {
 	}
 }
 
+extension CodingUserInfoKey {
+        static let clientMessageEncryptonKey = CodingUserInfoKey(rawValue: "clientMessageEncryptonKey")!
+}
+
 // MARK: - IncommingMessage + Decodable
 extension IncommingMessage: Decodable {
 	enum CodingKeys: String, CodingKey {
 		case responseType = "info", requestId, error,
-		     source = "target", message = "data", remoteClientId
+		     source = "target", message = "data", remoteClientId, targetClientId
 	}
 
 	init(from decoder: Decoder) throws {
@@ -45,7 +49,10 @@ extension IncommingMessage: Decodable {
 
 		switch responseType {
 		case .fromRemoteClient:
-			self = try .fromRemoteClient(container.decode(ClientMessage.self, forKey: .message))
+                        let encryptionKey = decoder.userInfo[.clientMessageEncryptonKey] as! EncryptionKey
+                        let message = try container.decode(ClientMessage.self, forKey: .message)
+                        let remoteClientId = try container.decode(ClientID.self, forKey: .remoteClientId)
+                        self = .fromRemoteClient(.init(remoteClientId: remoteClientId, message: message))
 
 		case .remoteClientJustConnected:
 			let clientId = try container.decode(ClientID.self, forKey: .remoteClientId)

@@ -1,45 +1,44 @@
-// import Models
-@testable import RadixConnect
-import TestingPrelude
-
+//// import Models
+//@testable import RadixConnect
+//import TestingPrelude
+//
 //// MARK: - SignalingClientTests
 // final class SignalingClientTests: TestCase {
-//	// MARK: - Test Values
-//	static let remoteClientId = ClientID(rawValue: UUID().uuidString)
-//	static let ownClientId = ClientID(rawValue: UUID().uuidString)
-//	static let requestId = RequestID(rawValue: UUID().uuidString)
-//	static let sdp = SDP(rawValue: "Some sdp desc")
-//	static let offer = IdentifiedPrimitive(content: RTCPrimitive.Offer(sdp: sdp), id: remoteClientId)
-//	static let answer = IdentifiedPrimitive(content: RTCPrimitive.Answer(sdp: sdp), id: remoteClientId)
-//	static let iceCandidate = IdentifiedPrimitive(content: RTCPrimitive.ICECandidate(sdp: sdp,
-//	                                                                                 sdpMLineIndex: 32,
-//	                                                                                 sdpMid: "Mid"),
-//	                                              id: remoteClientId)
-//	static let connectionID = try! SignalingServerConnectionID(.init(.deadbeef32Bytes))
-//	static let encryptionKey = try! EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
+//         // MARK: - Test Values
+//         static let remoteClientId = ClientID(rawValue: UUID().uuidString)
+//         static let ownClientId = ClientID(rawValue: UUID().uuidString)
+//         static let requestId = RequestID(rawValue: UUID().uuidString)
+//         static let sdp = SDP(rawValue: "Some sdp desc")
+//         static let offer = IdentifiedPrimitive(content: .offer(.init(sdp: sdp)), id: remoteClientId)
+//         static let answer = IdentifiedPrimitive(content: .answer(.init(sdp: sdp)), id: remoteClientId)
+//         static let iceCandidate = IdentifiedPrimitive(content: RTCPrimitive.ICECandidate(sdp: sdp,
+//                                                                                          sdpMLineIndex: 32,
+//                                                                                          sdpMid: "Mid"),
+//                                                       id: remoteClientId)
+//         static let connectionID = try! SignalingServerConnectionID(.init(.deadbeef32Bytes))
+//         static let encryptionKey = try! EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
 //
-//	let webSocketClient = MockWebSocketClient()
-//	lazy var signalingClient = SignalingClient(encryptionKey: Self.encryptionKey,
-//	                                           webSocketClient: webSocketClient,
-//	                                           connectionID: Self.connectionID,
-//	                                           idBuilder: { Self.requestId },
-//	                                           ownClientId: Self.ownClientId)
+//         let webSocketClient = MockWebSocketClient()
+//         lazy var signalingClient = SignalingClient(encryptionKey: Self.encryptionKey,
+//                                                    webSocketClient: webSocketClient,
+//                                                    connectionID: Self.connectionID,
+//                                                    idBuilder: { Self.requestId })
 //
-//	// MARK: - Outgoing Messages
+//         // MARK: - Outgoing Messages
 //
-//	func test_sentMessagesAreInCorrectFormat_offer() throws {
-//		try assertSentMessageFormat(
-//			.offer(Self.offer),
-//			expectedPayload: Self.offer.content.payload
-//		)
-//	}
-//
-//	func test_sentMessagesAreInCorrectFormat_answer() throws {
-//		try assertSentMessageFormat(
-//			.answer(Self.answer),
-//			expectedPayload: Self.answer.content.payload
-//		)
-//	}
+////         func test_sentMessagesAreInCorrectFormat_offer() throws {
+////		try assertSentMessageFormat(
+////			.offer(Self.offer),
+////			expectedPayload: Self.offer.content.payload
+////		)
+////	}
+////
+////	func test_sentMessagesAreInCorrectFormat_answer() throws {
+////		try assertSentMessageFormat(
+////			.answer(Self.answer),
+////			expectedPayload: Self.answer.content.payload
+////		)
+////	}
 //
 //	//        func test_sentMessagesAreInCorrectFormat_ICECandidate() throws {
 //	//                try assertSentMessageFormat(
@@ -48,19 +47,19 @@ import TestingPrelude
 //	//                )
 //	//        }
 //
-//	func testSendMessage_awaitsConfirmation() throws {
-//		let exp = expectation(description: "exp")
-//		Task {
-//			try await signalingClient.sendToRemote(rtcPrimitive: .offer(Self.offer))
-//			exp.fulfill()
-//		}
-//		webSocketClient.receiveIncommingMessage(.dictionary([
-//			"info": .string("confirmation"),
-//			"requestId": .string(Self.requestId.rawValue),
-//		]))
-//
-//		wait(for: [exp], timeout: 1.0)
-//	}
+////	func testSendMessage_awaitsConfirmation() throws {
+////		let exp = expectation(description: "exp")
+////		Task {
+////			try await signalingClient.sendToRemote(rtcPrimitive: .offer(Self.offer))
+////			exp.fulfill()
+////		}
+////		webSocketClient.receiveIncommingMessage(.dictionary([
+////			"info": .string("confirmation"),
+////			"requestId": .string(Self.requestId.rawValue),
+////		]))
+////
+////		wait(for: [exp], timeout: 1.0)
+////	}
 //
 //	// MARK: - Incomming Messages
 //

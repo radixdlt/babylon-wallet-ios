@@ -66,8 +66,7 @@ final class PeerConnectionBuilder: Sendable {
 		let onLocalIceCandidate = peerConnectionClient
 			.onGeneratedICECandidate
 			.map { candidate in
-				let primitive = IdentifiedPrimitive(content: candidate, id: offer.id)
-				return try await signalingServerClient.sendToRemote(rtcPrimitive: .iceCandidate(primitive))
+                                return try await signalingServerClient.sendToRemote(.init(content: .iceCandidate(candidate), id: offer.id))
 			}.eraseToAnyAsyncSequence()
 
 		let onRemoteIceCandidate = signalingServerClient
@@ -88,7 +87,7 @@ final class PeerConnectionBuilder: Sendable {
 		_ = await peerConnectionClient.onNegotiationNeeded.prefix(1).collect()
 		try await peerConnectionClient.onRemoteOffer(offer.content)
 		let localAnswer = try await peerConnectionClient.createAnswer()
-		try await signalingServerClient.sendToRemote(rtcPrimitive: .answer(.init(content: localAnswer, id: offer.id)))
+                try await signalingServerClient.sendToRemote(.init(content: .answer(localAnswer), id: offer.id))
 
 		let iceExchangeTask = Task {
 			await withThrowingTaskGroup(of: Void.self) { group in

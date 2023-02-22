@@ -47,12 +47,11 @@ public actor RTCClients {
 	}
 
 	public func add(_ connectionId: SignalingServerConnectionID) async throws {
-                let ownClientId = ClientID(rawValue: UUID().uuidString)
-                let connectionURL = try signalingServerURL(connectionID: connectionId, source: .wallet, ownClientId: ownClientId)
+                let connectionURL = try signalingServerURL(connectionID: connectionId, source: .wallet)
 		let webSocket = AsyncWebSocket(url: connectionURL)
                 let encryptionKey = try EncryptionKey(.init(data: connectionId.data.data))
 
-		let signalingClient = SignalingClient(encryptionKey: encryptionKey, webSocketClient: webSocket, connectionID: connectionId, ownClientId: ownClientId)
+		let signalingClient = SignalingClient(encryptionKey: encryptionKey, webSocketClient: webSocket, connectionID: connectionId)
 		let builder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 		let client = RTCClient(id: connectionId, peerConnectionBuilder: builder)
                 await client.listenForPeerConnections()
@@ -139,15 +138,14 @@ struct FailedToCreateSignalingServerURL: LocalizedError {
 
 // MARK: - QueryParameterName
 enum QueryParameterName: String {
-        case target, source, client_id
+        case target, source
 }
 
 func signalingServerURL(
 	connectionID: SignalingServerConnectionID,
-	source: ClientMessage.Source = .wallet,
-        ownClientId: ClientID
+	source: ClientSource = .wallet
 ) throws -> URL {
-	let target: ClientMessage.Source = source == .wallet ? .extension : .wallet
+	let target: ClientSource = source == .wallet ? .extension : .wallet
 
 	let url = URL.defaultBaseForSignalingServer.appendingPathComponent(
 		connectionID.hex
@@ -167,11 +165,7 @@ func signalingServerURL(
 		.init(
 			name: QueryParameterName.source.rawValue,
 			value: source.rawValue
-		),
-                .init(
-                        name: QueryParameterName.client_id.rawValue,
-                        value: ownClientId.rawValue
-                ),
+		)
 	]
 
 	guard let serverURL = urlComponents.url else {

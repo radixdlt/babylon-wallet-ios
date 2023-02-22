@@ -6,7 +6,7 @@ enum IncommingMessage: Sendable, Equatable {
 	}
 
 	case fromSignalingServer(FromSignalingServer)
-	case fromRemoteClient(ClientMessage)
+	case fromRemoteClient(RemoteData)
 }
 
 extension IncommingMessage {
@@ -17,7 +17,7 @@ extension IncommingMessage {
 		return value
 	}
 
-	var fromRemoteClient: ClientMessage? {
+	var fromRemoteClient: RemoteData? {
 		guard case let .fromRemoteClient(value) = self else {
 			return nil
 		}

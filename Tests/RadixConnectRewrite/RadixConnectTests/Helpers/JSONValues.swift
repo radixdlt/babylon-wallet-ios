@@ -48,11 +48,11 @@ extension RTCPrimitive {
 	var payload: JSONValue {
 		switch self {
 		case let .offer(offer):
-			return offer.content.payload
+			return offer.payload
 		case let .answer(answer):
-			return answer.content.payload
+			return answer.payload
 		case let .iceCandidate(iceCandidate):
-			return iceCandidate.content.payload
+			return iceCandidate.payload
 		}
 	}
 }

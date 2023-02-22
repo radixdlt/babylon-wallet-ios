@@ -8,6 +8,11 @@ protocol WebSocketClient: Sendable {
 	func send(message: Data) async throws
 }
 
+enum ClientSource: String, Sendable, Codable, Equatable {
+        case wallet
+        case `extension`
+}
+
 // MARK: - SignalingClient
 struct SignalingClient {
 	// MARK: - Configuration
@@ -16,14 +21,13 @@ struct SignalingClient {
 	private let jsonEncoder: JSONEncoder
 	private let connectionID: SignalingServerConnectionID
 	private let idBuilder: @Sendable () -> RequestID
-	private let ownClientId: ClientID
 	private let webSocketClient: WebSocketClient
-	private let clientSource: ClientMessage.Source
+	private let clientSource: ClientSource
 
 	// MARK: - Streams
 	private let incommingMessages: AnyAsyncSequence<IncommingMessage>
 	private let incommingSignalingServerMessagges: AnyAsyncSequence<IncommingMessage.FromSignalingServer>
-	private let incommingRemoteClientMessagges: AnyAsyncSequence<RTCPrimitive>
+	private let incommingRemoteClientMessagges: AnyAsyncSequence<RemoteData>
 
 	let onICECanddiate: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.ICECandidate>>
 	let onOffer: AnyAsyncSequence<IdentifiedPrimitive<RTCPrimitive.Offer>>
@@ -36,19 +40,19 @@ struct SignalingClient {
 	     webSocketClient: WebSocketClient,
 	     connectionID: SignalingServerConnectionID,
 	     idBuilder: @Sendable @escaping () -> RequestID = { .init(UUID().uuidString) },
-	     ownClientId: ClientID = .init(UUID().uuidString),
 	     jsonDecoder: JSONDecoder = .init(),
 	     jsonEncoder: JSONEncoder = .init(),
-	     clientSource: ClientMessage.Source = .wallet)
+             clientSource: ClientSource = .wallet)
 	{
 		self.encryptionKey = encryptionKey
 		self.webSocketClient = webSocketClient
 		self.connectionID = connectionID
 		self.idBuilder = idBuilder
-		self.ownClientId = ownClientId
 		self.jsonEncoder = jsonEncoder
 		self.jsonDecoder = jsonDecoder
 		self.clientSource = clientSource
+                self.jsonDecoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
+                self.jsonEncoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
 
 		self.incommingMessages = webSocketClient
 			.incommingMessages
@@ -63,11 +67,6 @@ struct SignalingClient {
 
 		self.incommingRemoteClientMessagges = self.incommingMessages
 			.compactMap(\.fromRemoteClient)
-			.mapSkippingError { [encryption = encryptionKey] message in
-				try message.extractRTCPrimitive(encryption, decoder: jsonDecoder)
-			} logError: { error in
-				loggerGlobal.info("Failed to extract RTCPrimitive - \(error)")
-			}
 			.eraseToAnyAsyncSequence()
 
 		self.incommingSignalingServerMessagges = self.incommingMessages
@@ -87,7 +86,7 @@ struct SignalingClient {
 			.eraseToAnyAsyncSequence()
 
 		self.onICECanddiate = self.incommingRemoteClientMessagges
-			.compactMap(\.addICE)
+                        .compactMap(\.iceCandidate)
 			.logInfo("Received ICECandidate from remote client: %@")
 			.share()
 			.eraseToAnyAsyncSequence()
@@ -99,25 +98,17 @@ struct SignalingClient {
 			.eraseToAnyAsyncSequence()
 	}
 
-	public func sendToRemote(rtcPrimitive: RTCPrimitive) async throws {
-		let id = idBuilder()
-		let encodedPrimitive = try jsonEncoder.encode(rtcPrimitive)
-		let encryptedPrimitive = try encryptionKey.encrypt(data: encodedPrimitive)
-		let encryptedPayload = EncryptedPayload(.init(data: encryptedPrimitive))
-		let method = ClientMessage.Method(from: rtcPrimitive)
-
-		let message = ClientMessage(requestId: id,
-		                            method: method,
-		                            source: clientSource,
-		                            sourceClientId: ownClientId,
-		                            targetClientId: rtcPrimitive.clientId,
-		                            connectionId: connectionID,
-		                            encryptedPayload: encryptedPayload)
-
+        public func sendToRemote(_ primitive: IdentifiedPrimitive<RTCPrimitive>) async throws {
+                let message = ClientMessage(requestId: idBuilder(), targetClientId: primitive.id, primitive: primitive.content)
+                let encodedMessage = try jsonEncoder.encode(message)
+                try await webSocketClient.send(message: encodedMessage)
+                try await waitForRequestAck(message.requestId)
+        }
+        
+	public func sendToRemote(message: ClientMessage) async throws {
 		let encodedMessage = try jsonEncoder.encode(message)
-
 		try await webSocketClient.send(message: encodedMessage)
-		try await waitForRequestAck(id)
+                try await waitForRequestAck(message.requestId)
 	}
 
 	private func waitForRequestAck(_ requestId: RequestID) async throws {

@@ -2,16 +2,16 @@ import Foundation
 @testable import RadixConnect
 
 extension IdentifiedPrimitive {
-	static func anyOffer(for id: ClientID) -> IdentifiedPrimitive<RTCPrimitive.Offer> {
-		.init(content: RTCPrimitive.Offer(sdp: "Offer SDP \(UUID().uuidString)"), id: id)
+	static func anyOffer(for id: ClientID) -> IdentifiedPrimitive<RTCPrimitive> {
+                .init(content: .offer(.any), id: id)
 	}
 
-	static func anyAnswer(for id: ClientID) -> IdentifiedPrimitive<RTCPrimitive.Answer> {
-		.init(content: .any, id: id)
+	static func anyAnswer(for id: ClientID) -> IdentifiedPrimitive<RTCPrimitive> {
+                .init(content: .answer(.any), id: id)
 	}
 
-	static func anyICECandidate(for id: ClientID) -> IdentifiedPrimitive<RTCPrimitive.ICECandidate> {
-		.init(content: RTCPrimitive.ICECandidate(sdp: "ICECanddiate sdp \(UUID().uuidString)", sdpMLineIndex: 2, sdpMid: "mid"), id: id)
+	static func anyICECandidate(for id: ClientID) -> IdentifiedPrimitive<RTCPrimitive> {
+                .init(content: .iceCandidate(.any), id: id)
 	}
 }
 
@@ -19,6 +19,18 @@ extension RTCPrimitive.Answer {
 	static var any: Self {
 		.init(sdp: "Answer SDP \(UUID().uuidString)")
 	}
+}
+
+extension RTCPrimitive.Offer {
+        static var any: Self {
+                .init(sdp: "Offer SDP \(UUID().uuidString)")
+        }
+}
+
+extension RTCPrimitive.ICECandidate {
+        static var any: Self {
+                .init(sdp: "ICECanddiate sdp \(UUID().uuidString)", sdpMLineIndex: 2, sdpMid: "mid")
+        }
 }
 
 extension ClientID {
