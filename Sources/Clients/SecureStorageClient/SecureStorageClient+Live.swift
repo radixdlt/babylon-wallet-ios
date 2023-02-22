@@ -3,11 +3,11 @@ import LocalAuthenticationClient // read LA config to specify max security of ne
 import Profile
 import Resources // L10n for auth prompt
 
-// MARK: - Accessibility + Sendable
-extension Accessibility: @unchecked Sendable {}
+// MARK: - KeychainAccess.Accessibility + Sendable
+extension KeychainAccess.Accessibility: @unchecked Sendable {}
 
-// MARK: - AuthenticationPolicy + Sendable
-extension AuthenticationPolicy: @unchecked Sendable {}
+// MARK: - KeychainAccess.AuthenticationPolicy + Sendable
+extension KeychainAccess.AuthenticationPolicy: @unchecked Sendable {}
 
 // MARK: - SecureStorageClient + DependencyKey
 extension SecureStorageClient: DependencyKey {
@@ -21,22 +21,23 @@ extension SecureStorageClient: DependencyKey {
 
 		struct AccesibilityAndAuthenticationPolicy: Sendable, Equatable {
 			/// The most secure currently available accessibility
-			let accessibility: Accessibility
+			let accessibility: KeychainAccess.Accessibility
 
 			/// The most secure currently available AuthenticationPolicy, if any.
 			let authenticationPolicy: AuthenticationPolicy?
 		}
 
+		let leastSecureAccessibility: KeychainAccess.Accessibility = .whenUnlocked
 		@Sendable func queryMostSecureAccesibilityAndAuthenticationPolicy() async throws -> AccesibilityAndAuthenticationPolicy {
 			let config = try await localAuthenticationClient.queryConfig()
 
 			guard config.isPasscodeSetUp else {
-				return .init(accessibility: .whenUnlocked, authenticationPolicy: nil)
+				return .init(accessibility: leastSecureAccessibility, authenticationPolicy: nil)
 			}
 
 			// we know that user has `passcode` enabled, thus we will use `.whenPasscodeSetThisDeviceOnly`
 			// BEWARE! If the user deletes the passcode any item protected by this `accessibility` WILL GET DELETED.
-			let mostSecureAccessibility: Accessibility = .whenPasscodeSetThisDeviceOnly
+			let mostSecureAccessibility: KeychainAccess.Accessibility = .whenPasscodeSetThisDeviceOnly
 
 			guard config.isBiometricsSetUp == true else {
 				// We use `userPresence` instead of explictly using `.devicePasscode` to enabled user to "upgrade" to
@@ -65,7 +66,7 @@ extension SecureStorageClient: DependencyKey {
 						data: data,
 						key: profileSnapshotKeychainKey,
 						iCloudSyncEnabled: true,
-						accessibility: Accessibility.whenUnlocked,
+						accessibility: leastSecureAccessibility, // do not delete the Profile if passcode gets deleted.
 						label: "Radix Wallet Data",
 						comment: "Contains your accounts, personas, authorizedDapps, linked connector extensions and wallet app preferences."
 					)
@@ -121,6 +122,9 @@ extension SecureStorageClient: DependencyKey {
 			},
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
 			deleteProfileAndMnemonicsByFactorSourceIDs: {
+				#if DEBUG
+				try await keychainClient.removeAllItems()
+				#else
 				guard let profileSnapshotData = try await loadProfileSnapshotData() else {
 					return
 				}
@@ -131,6 +135,7 @@ extension SecureStorageClient: DependencyKey {
 				for factorSourceID in profileSnapshot.factorSources.map(\.id) {
 					try await deleteMnemonicByFactorSourceID(factorSourceID)
 				}
+				#endif
 			}
 		)
 	}()

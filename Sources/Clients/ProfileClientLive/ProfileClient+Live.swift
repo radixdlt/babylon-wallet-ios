@@ -143,7 +143,7 @@ extension ProfileClient {
 			},
 			injectProfileSnapshot: { snapshot in
 				let profile = try Profile(snapshot: snapshot)
-				try await secureStorageClient.updateProfileSnapshot(snapshot)
+				try await secureStorageClient.addNewProfileSnapshot(snapshot)
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
 			commitOnboardingWallet: { request in
@@ -403,7 +403,7 @@ private actor ProfileHolder: GlobalActor {
 	/// profile which should only be persisted at the end of Onboarding flow. Letting this ephemeral
 	/// profile live here (in stored property `profile`) allows us to use the same APIs as if it would
 	/// have not been ephemeral, and at the
-	private var isEphemeral: Bool = false
+	private var isEphemeral: Bool = true
 	private var profile: Profile?
 
 	private init() {}
@@ -431,15 +431,19 @@ private actor ProfileHolder: GlobalActor {
 
 	func persistAndAllowFuturePersistenceOfEphemeralProfile() async throws {
 		isEphemeral = false
-		try await persistProfileIfAllowed()
+		try await persistProfileIfAllowed(isNew: true)
 	}
 
 	// if profile is marked as "ephemeral" we will not persist.
 	// Async because we might wanna add iCloud sync here in future.
-	private func persistProfileIfAllowed() async throws {
+	private func persistProfileIfAllowed(isNew: Bool) async throws {
 		guard !isEphemeral else { return }
 		let profileSnapshot = try takeProfileSnapshot()
-		try await secureStorageClient.updateProfileSnapshot(profileSnapshot)
+		if isNew {
+			try await secureStorageClient.addNewProfileSnapshot(profileSnapshot)
+		} else {
+			try await secureStorageClient.updateProfileSnapshot(profileSnapshot)
+		}
 	}
 
 	func asyncMutating<T>(_ mutateProfile: @Sendable (inout Profile) async throws -> T) async throws -> T {
@@ -449,11 +453,12 @@ private actor ProfileHolder: GlobalActor {
 		let result = try await mutateProfile(&profile)
 		self.profile = profile
 		// if profile is marked as "ephemeral" we will not persist.
-		try await persistProfileIfAllowed()
+		try await persistProfileIfAllowed(isNew: false)
 		return result
 	}
 
 	func injectProfile(_ profile: Profile, isEphemeral: Bool) async {
+		self.isEphemeral = isEphemeral
 		self.profile = profile
 	}
 

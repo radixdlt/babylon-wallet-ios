@@ -36,8 +36,12 @@ extension KeychainClient: DependencyKey {
 			fileprivate func addDataWithoutAuth(
 				_ request: AddItemWithoutAuthRequest
 			) async throws {
-				try withAttributes(of: request)
-					.set(request.data, key: request.key.rawValue.rawValue)
+				try await Task {
+					try withAttributes(of: request)
+						.accessibility(request.accessibility)
+						.set(request.data, key: request.key.rawValue.rawValue)
+
+				}.value
 			}
 
 			@Sendable
@@ -55,7 +59,9 @@ extension KeychainClient: DependencyKey {
 			fileprivate func getDataWithoutAuth(
 				forKey key: Key
 			) async throws -> Data? {
-				try keychain.getData(key.rawValue.rawValue)
+				try await Task {
+					try keychain.getData(key.rawValue.rawValue)
+				}.value
 			}
 
 			@Sendable
@@ -75,7 +81,9 @@ extension KeychainClient: DependencyKey {
 				_ data: Data,
 				forKey key: Key
 			) async throws {
-				try keychain.set(data, key: key.rawValue.rawValue)
+				try await Task {
+					try keychain.set(data, key: key.rawValue.rawValue)
+				}.value
 			}
 
 			@Sendable
@@ -95,12 +103,16 @@ extension KeychainClient: DependencyKey {
 			fileprivate func removeData(
 				forKey key: Key
 			) async throws {
-				try keychain.remove(key.rawValue.rawValue)
+				try await Task {
+					try keychain.remove(key.rawValue.rawValue)
+				}.value
 			}
 
 			@Sendable
 			fileprivate func removeAllItems() async throws {
-				try keychain.removeAll()
+				try await Task {
+					try keychain.removeAll()
+				}.value
 			}
 		}
 
