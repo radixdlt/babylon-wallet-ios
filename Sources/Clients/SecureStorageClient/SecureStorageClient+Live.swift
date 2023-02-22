@@ -59,10 +59,10 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		return Self(
-			addNewProfileSnapshot: { profileSnapshot in
+			saveProfileSnapshot: { profileSnapshot in
 				let data = try jsonEncoder().encode(profileSnapshot)
-				try await keychainClient.addDataWithoutAuthForKey(
-					KeychainClient.AddItemWithoutAuthRequest(
+				try await keychainClient.setDataWithoutAuthForKey(
+					KeychainClient.SetItemWithoutAuthRequest(
 						data: data,
 						key: profileSnapshotKeychainKey,
 						iCloudSyncEnabled: true,
@@ -72,23 +72,23 @@ extension SecureStorageClient: DependencyKey {
 					)
 				)
 			},
-			updateProfileSnapshot: { profileSnapshot in
-				guard try await loadProfileSnapshotData() != nil else {
-					struct NoProfileSnapshotExistsCallAddNewInstead: Swift.Error {}
-					throw NoProfileSnapshotExistsCallAddNewInstead()
-				}
-				let data = try jsonEncoder().encode(profileSnapshot)
-				try await keychainClient.updateDataWithoutAuthForKey(data, profileSnapshotKeychainKey)
-			},
+//			updateProfileSnapshot: { profileSnapshot in
+//				guard try await loadProfileSnapshotData() != nil else {
+//					struct NoProfileSnapshotExistsCallAddNewInstead: Swift.Error {}
+//					throw NoProfileSnapshotExistsCallAddNewInstead()
+//				}
+//				let data = try jsonEncoder().encode(profileSnapshot)
+//				try await keychainClient.updateDataWithoutAuthForKey(data, profileSnapshotKeychainKey)
+//			},
 			loadProfileSnapshotData: loadProfileSnapshotData,
-			addNewMnemonicForFactorSource: { privateFactorSource in
+			saveMnemonicForFactorSource: { privateFactorSource in
 				let factorSource = privateFactorSource.factorSource
 				let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
 				let data = try jsonEncoder().encode(mnemonicWithPassphrase)
 				let mostSecureAccesibilityAndAuthenticationPolicy = try await queryMostSecureAccesibilityAndAuthenticationPolicy()
 				let key = key(factorSourceID: factorSource.id)
 
-				try await keychainClient.addDataWithAuthenticationPolicyIfAble(
+				try await keychainClient.setDataWithAuthenticationPolicyIfAble(
 					data: data,
 					key: key,
 					iCloudSyncEnabled: false, // We do NOT want to sync this to iCloud, ever.
@@ -102,8 +102,6 @@ extension SecureStorageClient: DependencyKey {
 				let key = key(factorSourceID: factorSourceID)
 				let authPromptValue: String = {
 					switch purpose {
-					case .deleteSingleMnemonic: return L10n.Common.BiometricsPrompt.deleteMnemonic
-					case .deleteProfileAndAllMnemonics: return L10n.Common.BiometricsPrompt.deleteProfileAndAllMnemonics
 					case let .createEntity(kind):
 						let entityKindName = kind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
 						return L10n.Common.BiometricsPrompt.creationOfEntity(entityKindName)

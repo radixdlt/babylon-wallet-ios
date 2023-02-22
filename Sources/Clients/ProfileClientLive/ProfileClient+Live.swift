@@ -143,7 +143,7 @@ extension ProfileClient {
 			},
 			injectProfileSnapshot: { snapshot in
 				let profile = try Profile(snapshot: snapshot)
-				try await secureStorageClient.addNewProfileSnapshot(snapshot)
+				try await secureStorageClient.saveProfileSnapshot(snapshot)
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
 			commitOnboardingWallet: { request in
@@ -154,7 +154,7 @@ extension ProfileClient {
 					}
 
 					// all good
-					try await secureStorageClient.addNewMnemonicForFactorSource(request.privateFactorSource)
+					try await secureStorageClient.saveMnemonicForFactorSource(request.privateFactorSource)
 				}
 
 				try await profileHolder.persistAndAllowFuturePersistenceOfEphemeralProfile()
@@ -186,7 +186,7 @@ extension ProfileClient {
 				}
 
 				do {
-					try ProfileSnapshot.validateCompatability(version: decodedVersion)
+					try ProfileSnapshot.validateCompatibility(version: decodedVersion)
 				} catch {
 					// Incompatible Versions
 					return .failure(.profileVersionOutdated(
@@ -431,19 +431,15 @@ private actor ProfileHolder: GlobalActor {
 
 	func persistAndAllowFuturePersistenceOfEphemeralProfile() async throws {
 		isEphemeral = false
-		try await persistProfileIfAllowed(isNew: true)
+		try await persistProfileIfAllowed()
 	}
 
 	// if profile is marked as "ephemeral" we will not persist.
 	// Async because we might wanna add iCloud sync here in future.
-	private func persistProfileIfAllowed(isNew: Bool) async throws {
+	private func persistProfileIfAllowed() async throws {
 		guard !isEphemeral else { return }
 		let profileSnapshot = try takeProfileSnapshot()
-		if isNew {
-			try await secureStorageClient.addNewProfileSnapshot(profileSnapshot)
-		} else {
-			try await secureStorageClient.updateProfileSnapshot(profileSnapshot)
-		}
+		try await secureStorageClient.saveProfileSnapshot(profileSnapshot)
 	}
 
 	func asyncMutating<T>(_ mutateProfile: @Sendable (inout Profile) async throws -> T) async throws -> T {
@@ -453,7 +449,7 @@ private actor ProfileHolder: GlobalActor {
 		let result = try await mutateProfile(&profile)
 		self.profile = profile
 		// if profile is marked as "ephemeral" we will not persist.
-		try await persistProfileIfAllowed(isNew: false)
+		try await persistProfileIfAllowed()
 		return result
 	}
 
@@ -464,7 +460,7 @@ private actor ProfileHolder: GlobalActor {
 
 	func takeProfileSnapshot() throws -> ProfileSnapshot {
 		try get { profile in
-			profile.snaphot()
+			profile.snapshot()
 		}
 	}
 }

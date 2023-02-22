@@ -235,7 +235,7 @@ final class ProfileTests: TestCase {
 
 		XCTAssertThrowsError(try profile.updateConnectedDapp(connectedDapp))
 
-		let snapshot = profile.snaphot()
+		let snapshot = profile.snapshot()
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		/* Uncomment the lines below to generate a new test vector */
@@ -356,7 +356,7 @@ final class ProfileTests: TestCase {
 		""".data(using: .utf8)!
 
 		XCTAssertThrowsError(
-			try ProfileSnapshot.validateVersionCompatability(ofProfileSnapshotJSONData: json)
+			try ProfileSnapshot.validateVersionCompatibility(ofProfileSnapshotJSONData: json)
 		) { anyError in
 			guard let error = anyError as? IncompatibleProfileVersion else {
 				return XCTFail("WrongErrorType")
@@ -371,7 +371,7 @@ final class ProfileTests: TestCase {
 		""".data(using: .utf8)!
 
 		XCTAssertNoThrow(
-			try ProfileSnapshot.validateVersionCompatability(ofProfileSnapshotJSONData: json)
+			try ProfileSnapshot.validateVersionCompatibility(ofProfileSnapshotJSONData: json)
 		)
 	}
 }

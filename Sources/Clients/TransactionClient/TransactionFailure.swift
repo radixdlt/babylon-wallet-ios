@@ -32,7 +32,7 @@ extension TransactionFailure {
 
 		case let .failedToCompileOrSign(error):
 			switch error {
-			case .failedToCompileNotarizedTXIntent, .failedToCompileTXIntent, .failedToCompileSignedTXIntent, .failedToGenerateTXId:
+			case .failedToCompileNotarizedTXIntent, .failedToCompileTXIntent, .failedToCompileSignedTXIntent, .failedToGenerateTXId, .failedToLoadFactorSourceForSigning:
 				return (errorKind: .failedToCompileTransaction, message: nil)
 			case .failedToSignIntentWithAccountSigners, .failedToSignSignedCompiledIntentWithNotarySigner, .failedToConvertNotarySignature, .failedToConvertAccountSignatures:
 				return (errorKind: .failedToSignTransaction, message: nil)
@@ -86,6 +86,7 @@ extension TransactionFailure {
 // MARK: TransactionFailure.CompileOrSignFailure
 extension TransactionFailure {
 	public enum CompileOrSignFailure: Sendable, LocalizedError, Equatable {
+		case failedToLoadFactorSourceForSigning
 		case failedToCompileTXIntent
 		case failedToGenerateTXId
 		case failedToCompileSignedTXIntent
@@ -97,6 +98,8 @@ extension TransactionFailure {
 
 		public var errorDescription: String? {
 			switch self {
+			case .failedToLoadFactorSourceForSigning:
+				return "Failed to load factor source for signing"
 			case .failedToCompileTXIntent:
 				return "Failed to compile transaction intent"
 			case .failedToGenerateTXId:

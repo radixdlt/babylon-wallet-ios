@@ -38,21 +38,29 @@ extension TransactionClient {
 				return .failure(.failedToGenerateTXId)
 			}
 
-			let factorSource = try! await profileClient.getFactorSources().device
-			let factorSourceID = factorSource.id
-
-			guard let loadedMnemonicWithPassphrase = try! await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .signTransaction) else {
-				fatalError("should not happend")
+			let hdRoot: HD.Root
+			let factorSource: FactorSource
+			let factorSourceID: FactorSourceID
+			do {
+				factorSource = try await profileClient.getFactorSources().device
+				factorSourceID = factorSource.id
+				let loadedMnemonicWithPassphrase: MnemonicWithPassphrase
+				guard let loadedMnemonicWithPassphrase_ = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .signTransaction) else {
+					return .failure(.failedToLoadFactorSourceForSigning)
+				}
+				loadedMnemonicWithPassphrase = loadedMnemonicWithPassphrase_
+				hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
+			} catch {
+				return .failure(.failedToLoadFactorSourceForSigning)
 			}
-
-			let hdRoot = try! loadedMnemonicWithPassphrase.hdRoot()
 
 			@Sendable func sign(data: any DataProtocol, with account: OnNetwork.Account) async throws -> SignatureWithPublicKey {
 				switch account.securityState {
 				case let .unsecured(unsecuredControl):
 					let factorInstance = unsecuredControl.genesisFactorInstance
 					guard factorInstance.factorSourceID == factorSourceID else {
-						fatalError("wrong signer.")
+						assertionFailure("this should not happen")
+						throw TransactionFailure.failedToCompileOrSign(.failedToLoadFactorSourceForSigning)
 					}
 					let sigRes: SignatureWithPublicKey = try useFactorSourceClient.signatureFromOnDeviceHD(.init(
 						hdRoot: hdRoot,

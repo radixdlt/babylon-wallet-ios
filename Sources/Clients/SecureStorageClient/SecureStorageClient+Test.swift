@@ -10,10 +10,9 @@ extension DependencyValues {
 // MARK: - SecureStorageClient + TestDependencyKey
 extension SecureStorageClient: TestDependencyKey {
 	public static let noop: Self = .init(
-		addNewProfileSnapshot: { _ in },
-		updateProfileSnapshot: { _ in },
+		saveProfileSnapshot: { _ in },
 		loadProfileSnapshotData: { nil },
-		addNewMnemonicForFactorSource: { _ in },
+		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _, _ in nil },
 		deleteMnemonicByFactorSourceID: { _ in },
 		deleteProfileAndMnemonicsByFactorSourceIDs: {}
@@ -22,10 +21,9 @@ extension SecureStorageClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 
 	public static let testValue = Self(
-		addNewProfileSnapshot: unimplemented("\(Self.self).addNewProfileSnapshot"),
-		updateProfileSnapshot: unimplemented("\(Self.self).updateProfileSnapshot"),
+		saveProfileSnapshot: unimplemented("\(Self.self).saveProfileSnapshot"),
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
-		addNewMnemonicForFactorSource: unimplemented("\(Self.self).addNewMnemonicForFactorSource"),
+		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		deleteMnemonicByFactorSourceID: unimplemented("\(Self.self).deleteMnemonicByFactorSourceID"),
 		deleteProfileAndMnemonicsByFactorSourceIDs: unimplemented("\(Self.self).deleteProfileAndMnemonicsByFactorSourceIDs")

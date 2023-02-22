@@ -6,25 +6,19 @@ import Tagged
 /// A CRUD client around Keychain, that provides async methods for operations that requires auth
 /// and sync methods for operations on data without authentication.
 public struct KeychainClient: Sendable {
-	/// `sync` adds data for `key` protected with specified accessibility, if a `Label` is provided it
+	/// `sync` adds or updates data for `key` protected with specified accessibility, if a `Label` is provided it
 	/// will be set. If a `Comment` is provided, it will be set.
-	public var addDataWithoutAuthForKey: AddDataWithoutAuthForKey
+	public var setDataWithoutAuthForKey: SetDataWithoutAuthForKey
 
-	/// `async` adds data for `key` protected with specified accessibility and authentication policy.
+	/// `async` adds or updates data for `key` protected with specified accessibility and authentication policy.
 	/// If a `Label` is provided it will be set. If a `Comment` is provided, it will be set.
-	public var addDataWithAuthForKey: AddDataWithAuthForKey
+	public var setDataWithAuthForKey: SetDataWithAuthForKey
 
 	/// `sync` reads data for `key`.
 	public var getDataWithoutAuthForKey: GetDataWithoutAuthForKey
 
 	/// `async` reads data for `key` and prompts user with `AuthenticationPrompt` when doing so.
 	public var getDataWithAuthForKey: GetDataWithAuthForKey
-
-	/// `sync` updates `data` for `key`.
-	public var updateDataWithoutAuthForKey: UpdateDataWithoutAuthForKey
-
-	/// `async` updates `data` by `key` and prompts user with `AuthenticationPrompt` when doing so.
-	public var updateDataWithAuthForKey: UpdateDataWithAuthForKey
 
 	/// There is no way to show auth when removing Keychain item
 	public var removeDataForKey: RemoveDataForKey
@@ -39,21 +33,18 @@ extension KeychainClient {
 	public typealias Key = Tagged<Self, NonEmptyString>
 	public typealias AuthenticationPrompt = Tagged<Self, NonEmptyString>
 
-	public typealias AddDataWithoutAuthForKey = @Sendable (AddItemWithoutAuthRequest) async throws -> Void
-	public typealias AddDataWithAuthForKey = @Sendable (AddItemWithAuthRequest) async throws -> Void
+	public typealias SetDataWithoutAuthForKey = @Sendable (SetItemWithoutAuthRequest) async throws -> Void
+	public typealias SetDataWithAuthForKey = @Sendable (SetItemWithAuthRequest) async throws -> Void
 
 	public typealias GetDataWithoutAuthForKey = @Sendable (Key) async throws -> Data?
 	public typealias GetDataWithAuthForKey = @Sendable (Key, AuthenticationPrompt) async throws -> Data?
-
-	public typealias UpdateDataWithoutAuthForKey = @Sendable (Data, Key) async throws -> Void
-	public typealias UpdateDataWithAuthForKey = @Sendable (Data, Key, AuthenticationPrompt) async throws -> Void
 
 	public typealias RemoveDataForKey = @Sendable (Key) async throws -> Void
 	public typealias RemoveAllItems = @Sendable () async throws -> Void
 }
 
-// MARK: - AddKeychainItemWithRequest
-public protocol AddKeychainItemWithRequest {
+// MARK: - SetKeychainItemWithRequest
+public protocol SetKeychainItemWithRequest {
 	var data: Data { get }
 	var iCloudSyncEnabled: Bool { get }
 	var key: KeychainClient.Key { get }
@@ -63,7 +54,7 @@ public protocol AddKeychainItemWithRequest {
 }
 
 extension KeychainClient {
-	public func addDataWithAuthenticationPolicyIfAble(
+	public func setDataWithAuthenticationPolicyIfAble(
 		data: Data,
 		key: Key,
 		iCloudSyncEnabled: Bool,
@@ -73,7 +64,7 @@ extension KeychainClient {
 		comment: Comment?
 	) async throws {
 		if let authenticationPolicy {
-			try await self.addDataWithAuthForKey(.init(
+			try await self.setDataWithAuthForKey(.init(
 				data: data,
 				key: key,
 				iCloudSyncEnabled: iCloudSyncEnabled,
@@ -83,7 +74,7 @@ extension KeychainClient {
 				comment: comment
 			))
 		} else {
-			try await self.addDataWithoutAuthForKey(.init(
+			try await self.setDataWithoutAuthForKey(.init(
 				data: data,
 				key: key,
 				iCloudSyncEnabled: iCloudSyncEnabled,
@@ -96,7 +87,7 @@ extension KeychainClient {
 }
 
 extension KeychainClient {
-	public struct AddItemWithAuthRequest: Sendable, Equatable, AddKeychainItemWithRequest {
+	public struct SetItemWithAuthRequest: Sendable, Equatable, SetKeychainItemWithRequest {
 		public let data: Data
 		public let key: Key
 		public let iCloudSyncEnabled: Bool
@@ -124,7 +115,7 @@ extension KeychainClient {
 		}
 	}
 
-	public struct AddItemWithoutAuthRequest: Sendable, Equatable, AddKeychainItemWithRequest {
+	public struct SetItemWithoutAuthRequest: Sendable, Equatable, SetKeychainItemWithRequest {
 		public let data: Data
 		public let key: Key
 		public let iCloudSyncEnabled: Bool

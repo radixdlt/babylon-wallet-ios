@@ -16,7 +16,7 @@ extension KeychainClient: DependencyKey {
 				self.keychain = Keychain(service: "Radix Wallet")
 			}
 
-			private func withAttributes(of request: AddKeychainItemWithRequest) -> Keychain {
+			private func withAttributes(of request: SetKeychainItemWithRequest) -> Keychain {
 				var handle = keychain.synchronizable(request.iCloudSyncEnabled)
 				if let label = request.label {
 					handle = handle.label(label.rawValue.rawValue)
@@ -33,8 +33,8 @@ extension KeychainClient: DependencyKey {
 			typealias AuthenticationPrompt = KeychainClient.AuthenticationPrompt
 
 			@Sendable
-			fileprivate func addDataWithoutAuth(
-				_ request: AddItemWithoutAuthRequest
+			fileprivate func setDataWithoutAuth(
+				_ request: SetItemWithoutAuthRequest
 			) async throws {
 				try await Task {
 					try withAttributes(of: request)
@@ -45,8 +45,8 @@ extension KeychainClient: DependencyKey {
 			}
 
 			@Sendable
-			fileprivate func addDataWithAuthForKey(
-				_ request: AddItemWithAuthRequest
+			fileprivate func setDataWithAuthForKey(
+				_ request: SetItemWithAuthRequest
 			) async throws {
 				try await Task {
 					try withAttributes(of: request)
@@ -77,29 +77,6 @@ extension KeychainClient: DependencyKey {
 			}
 
 			@Sendable
-			fileprivate func updateDataWithoutAuth(
-				_ data: Data,
-				forKey key: Key
-			) async throws {
-				try await Task {
-					try keychain.set(data, key: key.rawValue.rawValue)
-				}.value
-			}
-
-			@Sendable
-			fileprivate func updateDataWithAuthForKey(
-				_ data: Data,
-				forKey key: Key,
-				authPrompt: AuthenticationPrompt
-			) async throws {
-				try await Task {
-					try keychain
-						.authenticationPrompt(authPrompt.rawValue.rawValue)
-						.set(data, key: key.rawValue.rawValue)
-				}.value
-			}
-
-			@Sendable
 			fileprivate func removeData(
 				forKey key: Key
 			) async throws {
@@ -117,12 +94,10 @@ extension KeychainClient: DependencyKey {
 		}
 
 		return Self(
-			addDataWithoutAuthForKey: { try await KeychainActor.shared.addDataWithoutAuth($0) },
-			addDataWithAuthForKey: { try await KeychainActor.shared.addDataWithAuthForKey($0) },
+			setDataWithoutAuthForKey: { try await KeychainActor.shared.setDataWithoutAuth($0) },
+			setDataWithAuthForKey: { try await KeychainActor.shared.setDataWithAuthForKey($0) },
 			getDataWithoutAuthForKey: { try await KeychainActor.shared.getDataWithoutAuth(forKey: $0) },
 			getDataWithAuthForKey: { try await KeychainActor.shared.getDataWithAuthForKey(forKey: $0, authPrompt: $1) },
-			updateDataWithoutAuthForKey: { try await KeychainActor.shared.updateDataWithoutAuth($0, forKey: $1) },
-			updateDataWithAuthForKey: { try await KeychainActor.shared.updateDataWithAuthForKey($0, forKey: $1, authPrompt: $2) },
 			removeDataForKey: { try await KeychainActor.shared.removeData(forKey: $0) },
 			removeAllItems: { try await KeychainActor.shared.removeAllItems() }
 		)

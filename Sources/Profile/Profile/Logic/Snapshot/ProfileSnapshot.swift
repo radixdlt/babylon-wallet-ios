@@ -35,7 +35,7 @@ struct IncompatibleProfileVersion: LocalizedError, Equatable {
 }
 
 extension ProfileSnapshot {
-	public static func validateCompatability(
+	public static func validateCompatibility(
 		version: Version
 	) throws {
 		let minimumRequiredVersion: ProfileSnapshot.Version = .minimum
@@ -52,12 +52,12 @@ extension ProfileSnapshot {
 
 extension ProfileSnapshot {
 	@discardableResult
-	public static func validateVersionCompatability(
+	public static func validateVersionCompatibility(
 		ofProfileSnapshotJSONData data: Data,
 		jsonDecoder: JSONDecoder = .iso8601
 	) throws -> Version {
 		let decodedVersion = try Version.fromJSON(data: data, jsonDecoder: jsonDecoder)
-		try validateCompatability(version: decodedVersion)
+		try validateCompatibility(version: decodedVersion)
 		return decodedVersion
 	}
 }
@@ -102,7 +102,7 @@ public struct ProfileSnapshot:
 
 // MARK: Take Snapshot
 extension Profile {
-	public func snaphot() -> ProfileSnapshot {
+	public func snapshot() -> ProfileSnapshot {
 		.init(profile: self)
 	}
 }
@@ -111,7 +111,7 @@ extension Profile {
 	public init(
 		snapshot: ProfileSnapshot
 	) throws {
-		try ProfileSnapshot.validateCompatability(version: snapshot.version)
+		try ProfileSnapshot.validateCompatibility(version: snapshot.version)
 
 		self.init(
 			version: snapshot.version,
