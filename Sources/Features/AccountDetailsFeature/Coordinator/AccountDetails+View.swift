@@ -119,7 +119,7 @@ extension AccountDetails.View {
 
 		init(state: AccountDetails.State) {
 			appearanceID = state.account.appearanceID
-			address = .init(address: state.address.address, format: .short())
+			address = .init(address: state.address.address, format: .default)
 			displayName = state.displayName
 		}
 	}

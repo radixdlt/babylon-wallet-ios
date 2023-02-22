@@ -31,6 +31,7 @@ public enum AssetResource {
   public static let close = ImageAsset(name: "close")
   public static let copy = ImageAsset(name: "copy")
   public static let ellipsis = ImageAsset(name: "ellipsis")
+  public static let iconLinkOut = ImageAsset(name: "icon-link-out")
   public static let radioButtonDarkDisabled = ImageAsset(name: "radioButton-dark-disabled")
   public static let radioButtonDarkSelected = ImageAsset(name: "radioButton-dark-selected")
   public static let radioButtonDarkUnselected = ImageAsset(name: "radioButton-dark-unselected")

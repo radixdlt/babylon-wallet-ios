@@ -108,7 +108,7 @@ extension AssetTransfer.View {
 			self.input = .init(
 				fromAddress: .init(
 					address: state.from.address.address,
-					format: .short()
+					format: .default
 				),
 				amount: state.amount?.value ?? "",
 				toAddress: state.to?.address.address ?? ""
