@@ -2,12 +2,13 @@ import FeaturePrelude
 import MainFeature
 import OnboardingFeature
 import ProfileClient
+import SecureStorageClient
 import SplashFeature
 
 // MARK: - App
 public struct App: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
@@ -83,7 +84,7 @@ public struct App: Sendable, ReducerProtocol {
 		case .internal(.view(.alert(.presented(.incompatibleProfileErrorAlert(.deleteWalletDataButtonTapped))))):
 			return .run { send in
 				do {
-					try await keychainClient.removeProfileSnapshot()
+					try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs()
 				} catch {
 					errorQueue.schedule(error)
 				}

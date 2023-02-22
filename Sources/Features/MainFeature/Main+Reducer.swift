@@ -4,7 +4,6 @@ import ProfileClient
 import SettingsFeature
 
 public struct Main: Sendable, ReducerProtocol {
-	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}

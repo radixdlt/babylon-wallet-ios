@@ -1,14 +1,14 @@
 import ClientPrelude
 
 extension DependencyValues {
-	public var secretStorageClient: SecretStorageClient {
-		get { self[SecretStorageClient.self] }
-		set { self[SecretStorageClient.self] = newValue }
+	public var secureStorageClient: SecureStorageClient {
+		get { self[SecureStorageClient.self] }
+		set { self[SecureStorageClient.self] = newValue }
 	}
 }
 
-// MARK: - SecretStorageClient + TestDependencyKey
-extension SecretStorageClient: TestDependencyKey {
+// MARK: - SecureStorageClient + TestDependencyKey
+extension SecureStorageClient: TestDependencyKey {
 	public static let noop: Self = .init(
 		addNewProfileSnapshot: { _ in },
 		updateProfileSnapshot: { _ in },

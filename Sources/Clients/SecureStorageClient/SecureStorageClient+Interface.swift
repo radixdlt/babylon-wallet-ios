@@ -1,8 +1,8 @@
 import ClientPrelude
 import Profile
 
-// MARK: - SecretStorageClient
-public struct SecretStorageClient: Sendable {
+// MARK: - SecureStorageClient
+public struct SecureStorageClient: Sendable {
 	public var addNewProfileSnapshot: AddNewProfileSnapshot
 	public var updateProfileSnapshot: UpdateProfileSnapshot
 	public var loadProfileSnapshotData: LoadProfileSnapshotData
@@ -14,7 +14,7 @@ public struct SecretStorageClient: Sendable {
 	public var deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs
 }
 
-extension SecretStorageClient {
+extension SecureStorageClient {
 	public typealias AddNewProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
 	public typealias UpdateProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
 	public typealias LoadProfileSnapshotData = @Sendable () async throws -> Data?
@@ -32,6 +32,9 @@ extension SecretStorageClient {
 		case signAuthChallenge
 		case createAccount
 		case createPersona
+		#if DEBUG
+		case debugOnlyInspect
+		#endif
 		public static func createEntity(kind: EntityKind) -> Self {
 			switch kind {
 			case .account: return .createAccount

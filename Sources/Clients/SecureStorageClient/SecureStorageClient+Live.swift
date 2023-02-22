@@ -9,9 +9,9 @@ extension Accessibility: @unchecked Sendable {}
 // MARK: - AuthenticationPolicy + Sendable
 extension AuthenticationPolicy: @unchecked Sendable {}
 
-// MARK: - SecretStorageClient + DependencyKey
-extension SecretStorageClient: DependencyKey {
-	public typealias Value = SecretStorageClient
+// MARK: - SecureStorageClient + DependencyKey
+extension SecureStorageClient: DependencyKey {
+	public typealias Value = SecureStorageClient
 
 	public static let liveValue: Self = {
 		@Dependency(\.keychainClient) var keychainClient
@@ -107,6 +107,9 @@ extension SecretStorageClient: DependencyKey {
 					case .createAccount: fatalError()
 					case .signTransaction: fatalError()
 					case .signAuthChallenge: fatalError()
+					#if DEBUG
+					case .debugOnlyInspect: fatalError()
+					#endif
 					}
 				}()
 				guard let data = try await keychainClient.getDataWithAuthForKey(key, authPrompt) else {

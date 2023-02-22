@@ -1,5 +1,6 @@
 import EngineToolkitClient
 import FeaturePrelude
+import SecureStorageClient
 import TransactionClient
 
 // MARK: - TransactionSigning

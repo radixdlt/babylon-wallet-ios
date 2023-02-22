@@ -6,6 +6,7 @@ import PersonasFeature
 import ProfileClient
 #if DEBUG
 import ProfileView
+import SecureStorageClient
 #endif
 
 // MARK: - AppSettings.View
@@ -153,7 +154,7 @@ extension AppSettings.View {
 								ProfileView(
 									profile: profile,
 									// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-									keychainClient: KeychainClient.liveValue
+									secureStorageClient: SecureStorageClient.liveValue
 								)
 							} else {
 								Text(L10n.Settings.noProfileText)

@@ -5,14 +5,14 @@ import EngineToolkitClient
 import GatewayAPI
 import ProfileClient
 import Resources
-import SecretStorageClient
+import SecureStorageClient
 import UseFactorSourceClient
 
 extension TransactionClient {
 	public static var liveValue: Self {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		@Dependency(\.secretStorageClient) var secretStorageClient
+		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.profileClient) var profileClient
 		@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
@@ -41,7 +41,7 @@ extension TransactionClient {
 			let factorSource = try! await profileClient.getFactorSources().device
 			let factorSourceID = factorSource.id
 
-			guard let loadedMnemonicWithPassphrase = try! await secretStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .signTransaction) else {
+			guard let loadedMnemonicWithPassphrase = try! await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .signTransaction) else {
 				fatalError("should not happend")
 			}
 

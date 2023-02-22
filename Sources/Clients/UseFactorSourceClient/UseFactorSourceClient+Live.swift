@@ -1,6 +1,6 @@
 import ClientPrelude
 import Profile
-import SecretStorageClient
+import SecureStorageClient
 
 // MARK: - UseFactorSourceClient + DependencyKey
 extension UseFactorSourceClient: DependencyKey {
@@ -38,7 +38,7 @@ extension UseFactorSourceClient {
 			}
 		}
 
-		fileprivate var loadMnemonicPurpose: SecretStorageClient.LoadMnemonicPurpose {
+		fileprivate var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
 			switch self {
 			case let .signData(_, isTransaction): return isTransaction ? .signTransaction : .signAuthChallenge
 			case .createAccount: return .createAccount
@@ -54,9 +54,9 @@ extension UseFactorSourceClient {
 		curve: Slip10Curve,
 		purpose: Purpose
 	) async throws -> (publicKey: Engine.PublicKey, signature: SignatureWithPublicKey?) {
-		@Dependency(\.secretStorageClient) var secretStorageClient
+		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		guard let loadedMnemonicWithPassphrase = try await secretStorageClient
+		guard let loadedMnemonicWithPassphrase = try await secureStorageClient
 			.loadMnemonicByFactorSourceID(factorSourceID, purpose.loadMnemonicPurpose)
 		else {
 			struct FailedToFindFactorSource: Swift.Error {}

@@ -2,7 +2,7 @@ import ClientPrelude
 import Cryptography
 import EngineToolkitClient
 import ProfileClient
-import SecretStorageClient
+import SecureStorageClient
 import UseFactorSourceClient
 
 // MARK: - ProfileClient + DependencyKey
@@ -12,7 +12,7 @@ extension ProfileClient: DependencyKey {}
 extension ProfileClient {
 	public static let liveValue: Self = {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
-		@Dependency(\.secretStorageClient) var secretStorageClient
+		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		let profileHolder = ProfileHolder.shared
@@ -143,7 +143,7 @@ extension ProfileClient {
 			},
 			injectProfileSnapshot: { snapshot in
 				let profile = try Profile(snapshot: snapshot)
-				try await secretStorageClient.updateProfileSnapshot(snapshot)
+				try await secureStorageClient.updateProfileSnapshot(snapshot)
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
 			commitOnboardingWallet: { request in
@@ -154,7 +154,7 @@ extension ProfileClient {
 					}
 
 					// all good
-					try await secretStorageClient.addNewMnemonicForFactorSource(request.privateFactorSource)
+					try await secureStorageClient.addNewMnemonicForFactorSource(request.privateFactorSource)
 				}
 
 				try await profileHolder.persistAndAllowFuturePersistenceOfEphemeralProfile()
@@ -164,7 +164,7 @@ extension ProfileClient {
 				@Dependency(\.jsonDecoder) var jsonDecoder
 
 				guard
-					let profileSnapshotData = try? await secretStorageClient.loadProfileSnapshotData()
+					let profileSnapshotData = try? await secureStorageClient.loadProfileSnapshotData()
 				else {
 					return .success(nil)
 				}
@@ -230,7 +230,7 @@ extension ProfileClient {
 				try await profileHolder.takeProfileSnapshot()
 			},
 			deleteProfileAndFactorSources: {
-				try? await secretStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs()
+				try? await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs()
 				await profileHolder.removeProfile()
 			},
 			hasAccountOnNetwork: hasAccountOnNetwork,
@@ -396,7 +396,7 @@ struct NoProfile: Swift.Error {}
 
 // MARK: - ProfileHolder
 private actor ProfileHolder: GlobalActor {
-	@Dependency(\.secretStorageClient) var secretStorageClient
+	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	/// If this is set to `true` it means that any edits of the profile should not be persisted at all
 	/// this is used for convenience of implementation of Onboarding flow where we create an ephemeral
@@ -439,7 +439,7 @@ private actor ProfileHolder: GlobalActor {
 	private func persistProfileIfAllowed() async throws {
 		guard !isEphemeral else { return }
 		let profileSnapshot = try takeProfileSnapshot()
-		try await secretStorageClient.updateProfileSnapshot(profileSnapshot)
+		try await secureStorageClient.updateProfileSnapshot(profileSnapshot)
 	}
 
 	func asyncMutating<T>(_ mutateProfile: @Sendable (inout Profile) async throws -> T) async throws -> T {

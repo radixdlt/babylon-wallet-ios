@@ -297,12 +297,12 @@ package.addModules([
 		dependencies: [
 			"ProfileClient",
 			"EngineToolkitClient",
-			"SecretStorageClient",
+			"SecureStorageClient",
 		],
 		tests: .yes()
 	),
 	.client(
-		name: "SecretStorageClient",
+		name: "SecureStorageClient",
 		dependencies: [
 			"Profile",
 			"Cryptography",
@@ -319,7 +319,7 @@ package.addModules([
 			"ProfileClient",
 			"AccountPortfolio",
 			"UseFactorSourceClient",
-			"SecretStorageClient",
+			"SecureStorageClient",
 		],
 		tests: .yes()
 	),
@@ -328,7 +328,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"Cryptography",
-			"SecretStorageClient",
+			"SecureStorageClient",
 		],
 		tests: .no
 	),
@@ -423,6 +423,7 @@ package.addModules([
 		category: .profile,
 		dependencies: [
 			"Profile",
+			"SecureStorageClient",
 		],
 		tests: .no
 	),

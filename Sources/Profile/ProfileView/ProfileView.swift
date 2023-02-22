@@ -1,22 +1,23 @@
 import P2PModels
 import Prelude
 import Profile
+import SecureStorageClient
 import SwiftUI
 
 // MARK: - ProfileView
 public struct ProfileView: IndentedView {
 	public let profile: Profile
 	public let indentation: Indentation
-	public var keychainClient: KeychainClient?
+	public var secureStorageClient: SecureStorageClient?
 
 	public init(
 		profile: Profile,
 		indentation: Indentation = .init(),
-		keychainClient: KeychainClient? = nil
+		secureStorageClient: SecureStorageClient? = nil
 	) {
 		self.profile = profile
 		self.indentation = indentation
-		self.keychainClient = keychainClient
+		self.secureStorageClient = secureStorageClient
 	}
 }
 
@@ -69,7 +70,7 @@ extension ProfileView {
 				FactorSourcesView(
 					factorSources: profile.factorSources,
 					indentation: inOneLevel,
-					keychainClient: keychainClient
+					secureStorageClient: secureStorageClient
 				)
 			}
 		}
@@ -95,7 +96,7 @@ extension IndentedView {
 public struct FactorSourcesView: IndentedView {
 	public let factorSources: FactorSources
 	public let indentation: Indentation
-	public var keychainClient: KeychainClient?
+	public var secureStorageClient: SecureStorageClient?
 }
 
 extension FactorSourcesView {
@@ -112,7 +113,7 @@ extension FactorSourcesView {
 				FactorSourceView(
 					factorSource: factorSource,
 					indentation: inOneLevel,
-					keychainClient: keychainClient
+					secureStorageClient: secureStorageClient
 				)
 			}
 		}
@@ -124,7 +125,7 @@ extension FactorSourcesView {
 public struct FactorSourceView: IndentedView {
 	public let factorSource: FactorSource
 	public let indentation: Indentation
-	public var keychainClient: KeychainClient?
+	public var secureStorageClient: SecureStorageClient?
 	@State private var mnemonicPhraseLoadedFromKeychain: String?
 	@State private var mnemonicPassphraseLoadedFromKeychain: String?
 }
@@ -159,13 +160,12 @@ extension FactorSourceView {
 		}
 		.padding([.leading], leadingPadding)
 		.task {
-			if let mnemonic = try? await keychainClient?.loadFactorSourceMnemonicWithPassphrase(
-				factorSourceID: factorSource.id,
-				authenticationPrompt: "Load Mnemonic to display for debugging"
-			) {
+			#if DEBUG
+			if let mnemonic = try? await secureStorageClient?.loadMnemonicByFactorSourceID(factorSource.id, .debugOnlyInspect) {
 				self.mnemonicPhraseLoadedFromKeychain = mnemonic.mnemonic.phrase
 				self.mnemonicPassphraseLoadedFromKeychain = mnemonic.passphrase
 			}
+			#endif
 		}
 	}
 }
