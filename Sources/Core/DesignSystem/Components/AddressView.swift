@@ -56,8 +56,6 @@ extension AddressView {
 	}
 }
 
-// TODO: • Move somewhere else, make version that takes an Address
-
 extension String {
 	public func formatted(_ format: AddressFormat = .default) -> String {
 		let total = format.first + format.last
