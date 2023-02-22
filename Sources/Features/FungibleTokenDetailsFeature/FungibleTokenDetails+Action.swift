@@ -33,6 +33,6 @@ extension FungibleTokenDetails.Action {
 // MARK: - FungibleTokenDetails.Action.DelegateAction
 extension FungibleTokenDetails.Action {
 	public enum DelegateAction: Sendable, Equatable {
-		case closeButtonTapped
+		case dismiss
 	}
 }
