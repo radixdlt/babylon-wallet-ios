@@ -15,7 +15,7 @@ extension DappDetails {
 
 	struct ViewState: Equatable {
 		let title: String
-		let description: String?
+		let description: String
 		let domain: String?
 		let addressViewState: AddressView.ViewState
 		let otherMetadata: [MetadataItem]
@@ -105,23 +105,27 @@ private extension DappDetails.State {
 			.filter { !ignoredKeys.contains($0.key) }
 			.map { DappDetails.ViewState.MetadataItem(key: $0.key, value: $0.value) } ?? []
 
-		return .init(title: dApp.displayName.rawValue,
-		             description: metadata?.description,
-		             domain: metadata?["domain"],
-		             addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .default),
-		             otherMetadata: otherMetadata,
-		             fungibleTokens: [], // TODO: Populate when we have it
-		             nonFungibleTokens: [], // TODO: Populate when we have it
-		             personas: dApp.detailedAuthorizedPersonas.map(DappDetails.ViewState.Persona.init),
-		             isDismissed: isDismissed)
+		return .init(
+			title: dApp.displayName.rawValue,
+			description: metadata?.description ?? L10n.DAppDetails.missingDescription,
+			domain: metadata?["domain"],
+			addressViewState: .init(address: dApp.dAppDefinitionAddress.address, format: .default),
+			otherMetadata: otherMetadata,
+			fungibleTokens: [], // TODO: Populate when we have it
+			nonFungibleTokens: [], // TODO: Populate when we have it
+			personas: dApp.detailedAuthorizedPersonas.map(DappDetails.ViewState.Persona.init),
+			isDismissed: isDismissed
+		)
 	}
 }
 
 private extension DappDetails.ViewState.Persona {
 	init(persona: OnNetwork.AuthorizedPersonaDetailed) {
-		self.init(id: persona.id,
-		          name: persona.displayName.rawValue,
-		          thumbnail: .placeholder)
+		self.init(
+			id: persona.id,
+			name: persona.displayName.rawValue,
+			thumbnail: .placeholder
+		)
 	}
 }
 
@@ -143,7 +147,7 @@ extension DappDetails.View {
 				VStack(alignment: .leading, spacing: .medium2) {
 					Separator()
 
-					Text(viewStore.description ?? L10n.DAppDetails.missingDescription)
+					Text(viewStore.description)
 						.textBlock
 						.flushedLeft
 

@@ -3,6 +3,7 @@ import ProfileClient
 
 // MARK: - ConnectedDapps
 public struct ConnectedDapps: Sendable, FeatureReducer {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 
 	public typealias Store = StoreOf<Self>
@@ -29,7 +30,7 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedDapps(IdentifiedArrayOf<OnNetwork.ConnectedDapp>)
+		case loadedDapps(TaskResult<IdentifiedArrayOf<OnNetwork.ConnectedDapp>>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -51,15 +52,22 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .task {
-				let dApps = try await profileClient.getConnectedDapps() // TODO: • Handle error?
-				return .internal(.loadedDapps(dApps))
+				await loadConnectedDapps()
+
+				// Option B:
+//				let result = await TaskResult {
+//					try await profileClient.getConnectedDapps()
+//				}
+//				return .internal(.loadedDapps(result))
 			}
 
 		case let .didSelectDapp(dAppID):
-			return .task {
+			return .run { send in
 				let details = try await profileClient.getDetailedDapp(dAppID)
 				let presentedState = DappDetails.State(dApp: details)
-				return .child(.presentedDapp(.present(presentedState)))
+				await send(.child(.presentedDapp(.present(presentedState))))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 		}
 	}
@@ -68,11 +76,21 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		switch childAction {
 		case .presentedDapp(.presented(.delegate(.dAppForgotten))):
 			return .run { send in
-				let dApps = try await profileClient.getConnectedDapps() // TODO: • Handle error
-				// TODO: Show toaster
-				await send(.child(.presentedDapp(.dismiss)))
-				await send(.internal(.loadedDapps(dApps)))
+				let action = await loadConnectedDapps()
+				if case .internal(.loadedDapps(.success)) = action {
+					await send(.child(.presentedDapp(.dismiss)))
+				}
+				await send(action)
 			}
+
+// Option B:
+//			return .run { send in
+//				let dApps = try await profileClient.getConnectedDapps()
+//				await send(.internal(.loadedDapps(.success(dApps))))
+//				await send(.child(.presentedDapp(.dismiss)))
+//			} catch: { error, _ in
+//				errorQueue.schedule(error)
+//			}
 
 		case .presentedDapp:
 			return .none
@@ -81,9 +99,19 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .loadedDapps(dApps):
+		case let .loadedDapps(.success(dApps)):
 			state.dApps = dApps
 			return .none
+		case let .loadedDapps(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
 		}
+	}
+
+	private func loadConnectedDapps() async -> Action {
+		let result = await TaskResult {
+			try await profileClient.getConnectedDapps()
+		}
+		return .internal(.loadedDapps(result))
 	}
 }

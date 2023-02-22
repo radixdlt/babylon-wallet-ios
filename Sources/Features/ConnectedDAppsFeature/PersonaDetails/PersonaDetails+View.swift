@@ -82,8 +82,7 @@ extension PersonaDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.infoSectionViewState) { viewStore in
 				VStack(alignment: .leading, spacing: .medium1) {
-					InfoPair(heading: L10n.PersonaDetails.personaNameHeading,
-					         item: viewStore.personaName)
+					InfoPair(heading: L10n.PersonaDetails.personaNameHeading, item: viewStore.personaName)
 
 					Separator()
 
@@ -119,13 +118,15 @@ extension PersonaDetails.View {
 
 private extension PersonaDetails.State {
 	var infoSectionViewState: PersonaDetails.View.InfoSection.ViewState {
-		.init(dAppName: dAppName,
-		      personaName: persona.displayName.rawValue,
-		      firstName: persona.fields[kind: .firstName]?.rawValue,
-		      lastName: persona.fields[kind: .lastName]?.rawValue,
-		      email: persona.fields[kind: .email]?.rawValue,
-		      zipCode: persona.fields[kind: .zipCode]?.rawValue,
-		      personalIdentificationNumber: persona.fields[kind: .personalIdentificationNumber]?.rawValue)
+		.init(
+			dAppName: dAppName,
+			personaName: persona.displayName.rawValue,
+			firstName: persona.fields[kind: .firstName],
+			lastName: persona.fields[kind: .lastName],
+			email: persona.fields[kind: .email],
+			zipCode: persona.fields[kind: .zipCode],
+			personalIdentificationNumber: persona.fields[kind: .personalIdentificationNumber]
+		)
 	}
 }
 
@@ -200,7 +201,7 @@ public struct InfoPair: View {
 // MARK: Extensions
 
 extension IdentifiedArrayOf<OnNetwork.Persona.Field> {
-	subscript(kind kind: OnNetwork.Persona.Field.Kind) -> OnNetwork.Persona.Field.Value? {
-		first { $0.kind == kind }?.value
+	subscript(kind kind: OnNetwork.Persona.Field.Kind) -> String? {
+		first { $0.kind == kind }?.value.rawValue
 	}
 }

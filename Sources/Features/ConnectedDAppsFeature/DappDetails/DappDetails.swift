@@ -4,6 +4,7 @@ import ProfileClient
 
 // MARK: - DappDetails
 public struct DappDetails: Sendable, FeatureReducer {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.gatewayAPIClient) var gatewayClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
@@ -117,9 +118,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 			// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
 			state.isDismissed = true
 			let (dAppID, networkID) = (state.dApp.dAppDefinitionAddress, state.dApp.networkID)
-			return .task {
+			return .run { send in
 				try await profileClient.forgetConnectedDapp(dAppID, networkID)
-				return .delegate(.dAppForgotten)
+				await send(.delegate(.dAppForgotten))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 		}
 	}
@@ -132,6 +135,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 				let updatedDapp = try await profileClient.getDetailedDapp(dAppID)
 				await send(.internal(.dAppUpdated(updatedDapp)))
 				await send(.child(.presentedPersona(.dismiss)))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 
 		default:

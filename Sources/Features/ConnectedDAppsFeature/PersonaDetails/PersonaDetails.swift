@@ -3,6 +3,7 @@ import ProfileClient
 
 // MARK: - PersonaDetails
 public struct PersonaDetails: Sendable, FeatureReducer {
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 
 	public typealias Store = StoreOf<Self>
@@ -17,11 +18,12 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		public let networkID: NetworkID
 		public let persona: OnNetwork.AuthorizedPersonaDetailed
 
-		public init(dAppName: String,
-		            dAppID: OnNetwork.ConnectedDapp.ID,
-		            networkID: NetworkID,
-		            persona: OnNetwork.AuthorizedPersonaDetailed)
-		{
+		public init(
+			dAppName: String,
+			dAppID: OnNetwork.ConnectedDapp.ID,
+			networkID: NetworkID,
+			persona: OnNetwork.AuthorizedPersonaDetailed
+		) {
 			self.dAppName = dAppName
 			self.dAppID = dAppID
 			self.networkID = networkID
@@ -53,10 +55,13 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case .editAccountSharingTapped:
 			return .none
 		case .disconnectPersonaTapped:
+			// TODO: • Show confirmation
 			let (personaID, dAppID, networkID) = (state.persona.id, state.dAppID, state.networkID)
-			return .task {
+			return .run { send in
 				try await profileClient.disconnectPersonaFromDapp(personaID, dAppID, networkID)
-				return .delegate(.personaDisconnected)
+				await send(.delegate(.personaDisconnected))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 		}
 	}
