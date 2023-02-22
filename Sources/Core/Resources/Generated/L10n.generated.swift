@@ -66,6 +66,8 @@ public enum L10n {
       public static let deleteMnemonic = L10n.tr("Localizable", "common.biometricsPrompt.deleteMnemonic", fallback: "Authenticate to delete factor from this phone.")
       /// Authenticate to all wallet data.
       public static let deleteProfileAndAllMnemonics = L10n.tr("Localizable", "common.biometricsPrompt.deleteProfileAndAllMnemonics", fallback: "Authenticate to all wallet data.")
+      /// Authenticate to sign auth chellenge with this phone.
+      public static let signAuthChallenge = L10n.tr("Localizable", "common.biometricsPrompt.signAuthChallenge", fallback: "Authenticate to sign auth chellenge with this phone.")
       /// Authenticate to sign transaction with this phone.
       public static let signTransaction = L10n.tr("Localizable", "common.biometricsPrompt.signTransaction", fallback: "Authenticate to sign transaction with this phone.")
     }

@@ -30,16 +30,9 @@ extension SecureStorageClient {
 		case deleteProfileAndAllMnemonics
 		case signTransaction
 		case signAuthChallenge
-		case createAccount
-		case createPersona
+		case createEntity(kind: EntityKind)
 		#if DEBUG
 		case debugOnlyInspect
 		#endif
-		public static func createEntity(kind: EntityKind) -> Self {
-			switch kind {
-			case .account: return .createAccount
-			case .identity: return .createPersona
-			}
-		}
 	}
 }

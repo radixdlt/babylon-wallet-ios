@@ -18,8 +18,6 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtoco
 			return .run { [networkID = state.networkID, genesisFactorInstanceDerivationStrategy = state.genesisFactorInstanceDerivationStrategy, name = state.name, curve = state.curve] send in
 				await send(.internal(.system(.createEntityResult(TaskResult {
 					let entityKind = Entity.entityKind
-					let entityKindName = entityKind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
-
 					let request = try CreateVirtualEntityRequest(
 						curve: curve,
 						networkID: networkID,

@@ -29,20 +29,11 @@ import Cryptography
 extension UseFactorSourceClient {
 	public enum Purpose: Sendable, Equatable {
 		case signData(Data, isTransaction: Bool)
-		case createAccount
-		case createPersona
-		public static func createEntity(kind: EntityKind) -> Self {
-			switch kind {
-			case .identity: return .createPersona
-			case .account: return .createAccount
-			}
-		}
-
+		case createEntity(kind: EntityKind)
 		fileprivate var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
 			switch self {
 			case let .signData(_, isTransaction): return isTransaction ? .signTransaction : .signAuthChallenge
-			case .createAccount: return .createAccount
-			case .createPersona: return .createPersona
+			case let .createEntity(kind): return .createEntity(kind: kind)
 			}
 		}
 	}

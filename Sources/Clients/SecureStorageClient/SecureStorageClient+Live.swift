@@ -99,19 +99,21 @@ extension SecureStorageClient: DependencyKey {
 			},
 			loadMnemonicByFactorSourceID: { factorSourceID, purpose in
 				let key = key(factorSourceID: factorSourceID)
-				let authPrompt: KeychainClient.AuthenticationPrompt = {
+				let authPromptValue: String = {
 					switch purpose {
-					case .deleteSingleMnemonic: fatalError()
-					case .deleteProfileAndAllMnemonics: fatalError()
-					case .createPersona: fatalError()
-					case .createAccount: fatalError()
-					case .signTransaction: fatalError()
-					case .signAuthChallenge: fatalError()
+					case .deleteSingleMnemonic: return L10n.Common.BiometricsPrompt.deleteMnemonic
+					case .deleteProfileAndAllMnemonics: return L10n.Common.BiometricsPrompt.deleteProfileAndAllMnemonics
+					case let .createEntity(kind):
+						let entityKindName = kind == .account ? L10n.Common.Account.kind : L10n.Common.Persona.kind
+						return L10n.Common.BiometricsPrompt.creationOfEntity(entityKindName)
+					case .signTransaction: return L10n.Common.BiometricsPrompt.signTransaction
+					case .signAuthChallenge: return L10n.Common.BiometricsPrompt.signAuthChallenge
 					#if DEBUG
-					case .debugOnlyInspect: fatalError()
+					case .debugOnlyInspect: return "Auth to inspect mnemonic in ProfileView."
 					#endif
 					}
 				}()
+				let authPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."
 				guard let data = try await keychainClient.getDataWithAuthForKey(key, authPrompt) else {
 					return nil
 				}
