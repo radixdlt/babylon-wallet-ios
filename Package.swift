@@ -309,7 +309,7 @@ package.addModules([
 			"LocalAuthenticationClient",
 			"Resources", // L10n for keychain auth prompts
 		],
-		tests: .no
+		tests: .yes()
 	),
 	.client(
 		name: "TransactionClient",
