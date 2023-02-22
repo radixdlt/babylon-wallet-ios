@@ -38,8 +38,8 @@ extension Header {
 				#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.large)
-					.navigationBarTitleFont(.app.sheetTitle, for: .large)
-					.navigationBarTitleFont(.app.secondaryHeader, for: .inline)
+					.navigationBarLargeTitleFont(.app.sheetTitle)
+					.navigationBarInlineTitleFont(.app.secondaryHeader)
 					.navigationBarLargeTitleInsets(.init(top: 0, leading: .large2, bottom: 0, trailing: .large2))
 					.toolbar {
 						ToolbarItem(placement: .navigationBarTrailing) {

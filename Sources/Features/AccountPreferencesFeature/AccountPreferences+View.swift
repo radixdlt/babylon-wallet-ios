@@ -43,9 +43,9 @@ extension AccountPreferences.View {
 				}
 				.navigationTitle(L10n.AccountPreferences.title)
 				#if os(iOS)
-					.navigationBarTitleDisplayMode(.inline)
 					.navigationBarTitleColor(.app.gray1)
-					.navigationBarTitleFont(.app.secondaryHeader, for: .inline)
+					.navigationBarTitleDisplayMode(.inline)
+					.navigationBarInlineTitleFont(.app.secondaryHeader)
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							CloseButton {

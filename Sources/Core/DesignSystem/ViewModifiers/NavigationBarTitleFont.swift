@@ -4,49 +4,40 @@ import Resources
 import SwiftUI
 
 extension View {
-	public func navigationBarTitleFont(
-		_ uiFont: UIFont,
-		for displayMode: NavigationBarItem.TitleDisplayMode = .automatic
-	) -> some View {
-		self.modifier(NavigationBarTitleFontModifier(uiFont: uiFont, displayMode: displayMode))
+	public func navigationBarInlineTitleFont(_ uiFont: UIFont) -> some View {
+		self.modifier(NavigationBarInlineTitleFontModifier(uiFont: uiFont))
+	}
+
+	public func navigationBarLargeTitleFont(_ uiFont: UIFont) -> some View {
+		self.modifier(NavigationBarLargeTitleFontModifier(uiFont: uiFont))
 	}
 }
 
-struct NavigationBarTitleFontModifier: ViewModifier {
+struct NavigationBarInlineTitleFontModifier: ViewModifier {
 	let uiFont: UIFont
-	let displayMode: NavigationBarItem.TitleDisplayMode
 
 	func body(content: Content) -> some View {
 		content.introspectNavigationController { navigationController in
 			let navigationBar = navigationController.navigationBar
-			switch displayMode {
-			case .automatic:
-				setNavigationBarInlineTitleFont(navigationBar, uiFont)
-				setNavigationBarLargeTitleFont(navigationBar, uiFont)
-			case .inline:
-				setNavigationBarInlineTitleFont(navigationBar, uiFont)
-			case .large:
-				setNavigationBarLargeTitleFont(navigationBar, uiFont)
-			@unknown default:
-				break
-			}
+			navigationBar.standardAppearance.titleTextAttributes[.font] = uiFont
+			navigationBar.compactAppearance?.titleTextAttributes[.font] = uiFont
+			navigationBar.scrollEdgeAppearance?.titleTextAttributes[.font] = uiFont
+			navigationBar.compactScrollEdgeAppearance?.titleTextAttributes[.font] = uiFont
 		}
 	}
+}
 
-	@MainActor
-	func setNavigationBarInlineTitleFont(_ navigationBar: UINavigationBar, _ uiFont: UIFont) {
-		navigationBar.standardAppearance.titleTextAttributes[.font] = uiFont
-		navigationBar.compactAppearance?.titleTextAttributes[.font] = uiFont
-		navigationBar.scrollEdgeAppearance?.titleTextAttributes[.font] = uiFont
-		navigationBar.compactScrollEdgeAppearance?.titleTextAttributes[.font] = uiFont
-	}
+struct NavigationBarLargeTitleFontModifier: ViewModifier {
+	let uiFont: UIFont
 
-	@MainActor
-	func setNavigationBarLargeTitleFont(_ navigationBar: UINavigationBar, _ uiFont: UIFont) {
-		navigationBar.standardAppearance.largeTitleTextAttributes[.font] = uiFont
-		navigationBar.compactAppearance?.largeTitleTextAttributes[.font] = uiFont
-		navigationBar.scrollEdgeAppearance?.largeTitleTextAttributes[.font] = uiFont
-		navigationBar.compactScrollEdgeAppearance?.largeTitleTextAttributes[.font] = uiFont
+	func body(content: Content) -> some View {
+		content.introspectNavigationController { navigationController in
+			let navigationBar = navigationController.navigationBar
+			navigationBar.standardAppearance.largeTitleTextAttributes[.font] = uiFont
+			navigationBar.compactAppearance?.largeTitleTextAttributes[.font] = uiFont
+			navigationBar.scrollEdgeAppearance?.largeTitleTextAttributes[.font] = uiFont
+			navigationBar.compactScrollEdgeAppearance?.largeTitleTextAttributes[.font] = uiFont
+		}
 	}
 }
 #endif
