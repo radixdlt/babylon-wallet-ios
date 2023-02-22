@@ -1,5 +1,6 @@
 import ClientPrelude
 import Profile
+import SecretStorageClient
 
 // MARK: - UseFactorSourceClient + DependencyKey
 extension UseFactorSourceClient: DependencyKey {
@@ -26,26 +27,44 @@ extension UseFactorSourceClient: DependencyKey {
 
 import Cryptography
 extension UseFactorSourceClient {
+	public enum Purpose: Sendable, Equatable {
+		case signData(Data, isTransaction: Bool)
+		case createAccount
+		case createPersona
+		public static func createEntity(kind: EntityKind) -> Self {
+			switch kind {
+			case .identity: return .createPersona
+			case .account: return .createAccount
+			}
+		}
+
+		fileprivate var loadMnemonicPurpose: SecretStorageClient.LoadMnemonicPurpose {
+			switch self {
+			case let .signData(_, isTransaction): return isTransaction ? .signTransaction : .signAuthChallenge
+			case .createAccount: return .createAccount
+			case .createPersona: return .createPersona
+			}
+		}
+	}
+
 	// FIXME: temporary only
 	public func onDeviceHD(
 		factorSourceID: FactorSource.ID,
-		keychainAccessFactorSourcesAuthPrompt: String,
 		derivationPath: DerivationPath,
 		curve: Slip10Curve,
-		dataToSign: Data? = nil
+		purpose: Purpose
 	) async throws -> (publicKey: Engine.PublicKey, signature: SignatureWithPublicKey?) {
-		@Dependency(\.keychainClient) var keychainClient
+		@Dependency(\.secretStorageClient) var secretStorageClient
 
-		guard let loadedMnemonicWithPassphrase = try await keychainClient.loadFactorSourceMnemonicWithPassphrase(
-			factorSourceID: factorSourceID,
-			authenticationPrompt: keychainAccessFactorSourcesAuthPrompt
-		) else {
+		guard let loadedMnemonicWithPassphrase = try await secretStorageClient
+			.loadMnemonicByFactorSourceID(factorSourceID, purpose.loadMnemonicPurpose)
+		else {
 			struct FailedToFindFactorSource: Swift.Error {}
 			throw FailedToFindFactorSource()
 		}
 		let hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
 
-		if let dataToSign {
+		if case let .signData(dataToSign, _) = purpose {
 			let result = try self.signatureFromOnDeviceHD(.init(hdRoot: hdRoot, derivationPath: derivationPath, curve: curve, data: dataToSign))
 			return try (publicKey: result.publicKey.intoEngine(), signature: result)
 		} else {

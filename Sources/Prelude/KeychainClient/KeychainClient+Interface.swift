@@ -39,32 +39,67 @@ extension KeychainClient {
 	public typealias Key = Tagged<Self, NonEmptyString>
 	public typealias AuthenticationPrompt = Tagged<Self, NonEmptyString>
 
-	public typealias AddDataWithoutAuthForKey = @Sendable (AddItemWithoutAuthRequest) throws -> Void
+	public typealias AddDataWithoutAuthForKey = @Sendable (AddItemWithoutAuthRequest) async throws -> Void
 	public typealias AddDataWithAuthForKey = @Sendable (AddItemWithAuthRequest) async throws -> Void
 
-	public typealias GetDataWithoutAuthForKey = @Sendable (Key) throws -> Data?
+	public typealias GetDataWithoutAuthForKey = @Sendable (Key) async throws -> Data?
 	public typealias GetDataWithAuthForKey = @Sendable (Key, AuthenticationPrompt) async throws -> Data?
 
-	public typealias UpdateDataWithoutAuthForKey = @Sendable (Data, Key) throws -> Void
+	public typealias UpdateDataWithoutAuthForKey = @Sendable (Data, Key) async throws -> Void
 	public typealias UpdateDataWithAuthForKey = @Sendable (Data, Key, AuthenticationPrompt) async throws -> Void
 
-	public typealias RemoveDataForKey = @Sendable (Key) throws -> Void
-	public typealias RemoveAllItems = @Sendable () throws -> Void
+	public typealias RemoveDataForKey = @Sendable (Key) async throws -> Void
+	public typealias RemoveAllItems = @Sendable () async throws -> Void
 }
 
 // MARK: - AddKeychainItemWithRequest
 public protocol AddKeychainItemWithRequest {
 	var data: Data { get }
+	var iCloudSyncEnabled: Bool { get }
 	var key: KeychainClient.Key { get }
 	var accessibility: KeychainAccess.Accessibility { get }
-	var comment: KeychainClient.Comment? { get }
 	var label: KeychainClient.Label? { get }
+	var comment: KeychainClient.Comment? { get }
+}
+
+extension KeychainClient {
+	public func addDataWithAuthenticationPolicyIfAble(
+		data: Data,
+		key: Key,
+		iCloudSyncEnabled: Bool,
+		accessibility: KeychainAccess.Accessibility,
+		authenticationPolicy: AuthenticationPolicy?,
+		label: Label?,
+		comment: Comment?
+	) async throws {
+		if let authenticationPolicy {
+			try await self.addDataWithAuthForKey(.init(
+				data: data,
+				key: key,
+				iCloudSyncEnabled: iCloudSyncEnabled,
+				accessibility: accessibility,
+				authenticationPolicy: authenticationPolicy,
+				label: label,
+				comment: comment
+			))
+		} else {
+			try await self.addDataWithoutAuthForKey(.init(
+				data: data,
+				key: key,
+				iCloudSyncEnabled: iCloudSyncEnabled,
+				accessibility: accessibility,
+				label: label,
+				comment: comment
+			))
+		}
+	}
 }
 
 extension KeychainClient {
 	public struct AddItemWithAuthRequest: Sendable, Equatable, AddKeychainItemWithRequest {
 		public let data: Data
 		public let key: Key
+		public let iCloudSyncEnabled: Bool
 		public let accessibility: KeychainAccess.Accessibility
 		public let authenticationPolicy: AuthenticationPolicy
 		public let comment: Comment?
@@ -73,39 +108,44 @@ extension KeychainClient {
 		public init(
 			data: Data,
 			key: Key,
+			iCloudSyncEnabled: Bool,
 			accessibility: KeychainAccess.Accessibility,
 			authenticationPolicy: AuthenticationPolicy,
-			comment: Comment?,
-			label: Label?
+			label: Label?,
+			comment: Comment?
 		) {
 			self.data = data
 			self.key = key
+			self.iCloudSyncEnabled = iCloudSyncEnabled
 			self.accessibility = accessibility
 			self.authenticationPolicy = authenticationPolicy
-			self.comment = comment
 			self.label = label
+			self.comment = comment
 		}
 	}
 
 	public struct AddItemWithoutAuthRequest: Sendable, Equatable, AddKeychainItemWithRequest {
 		public let data: Data
 		public let key: Key
+		public let iCloudSyncEnabled: Bool
 		public let accessibility: KeychainAccess.Accessibility
-		public let comment: Comment?
 		public let label: Label?
+		public let comment: Comment?
 
 		public init(
 			data: Data,
 			key: Key,
+			iCloudSyncEnabled: Bool,
 			accessibility: KeychainAccess.Accessibility,
-			comment: Comment?,
-			label: Label?
+			label: Label?,
+			comment: Comment?
 		) {
 			self.data = data
 			self.key = key
+			self.iCloudSyncEnabled = iCloudSyncEnabled
 			self.accessibility = accessibility
-			self.comment = comment
 			self.label = label
+			self.comment = comment
 		}
 	}
 }

@@ -83,8 +83,7 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 
 			let signRequest = SignManifestRequest(
 				manifestToSign: transactionWithLockFee,
-				makeTransactionHeaderInput: state.makeTransactionHeaderInput,
-				unlockKeychainPromptShowToUser: L10n.TransactionSigning.biometricsPrompt
+				makeTransactionHeaderInput: state.makeTransactionHeaderInput
 			)
 
 			return .run { send in

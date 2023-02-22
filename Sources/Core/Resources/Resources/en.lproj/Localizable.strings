@@ -34,7 +34,11 @@
 "createEntity.nameNewEntity.name.field.explanation" = "This can be changed any time";
 "createEntity.nameNewEntity.name.button.title" = "Continue";
 
-"createEntity.creationOfEntity.biometricsPrompt" = "Authenticate to create new %s with this phone.";
+
+"common.biometricsPrompt.signTransaction" = "Authenticate to sign transaction with this phone.";
+"common.biometricsPrompt.creationOfEntity" = "Authenticate to create new %s with this phone.";
+"common.biometricsPrompt.deleteMnemonic" = "Authenticate to delete factor from this phone.";
+"common.biometricsPrompt.deleteProfileAndAllMnemonics" = "Authenticate to all wallet data.";
 
 "createEntity.completion.title" = "Congratulations";
 "createEntity.completion.subtitle.notFirst" = "Your %s has been created.";
@@ -184,7 +188,6 @@
 "splash.incompatibleProfileVersionAlertMessage" = "For this Preview wallet version, you must delete your wallet data to continue.";
 "splash.incompatibleProfileVersionAlertTitle" = "Wallet Data is Incompatible";
 
-"transactionSigning.biometricsPrompt" = "Authenticate to sign transaction with this phone.";
 "transactionSigning.preparingTransactionLoadingText" = "Preparing transaction...";
 "transactionSigning.signTransactionButtonTitle" = "Approve Transaction";
 "transactionSigning.signingAndSubmittingTransactionLoadingText" = "Submitting transaction...";

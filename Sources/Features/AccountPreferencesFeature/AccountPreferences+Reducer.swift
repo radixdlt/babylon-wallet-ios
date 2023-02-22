@@ -27,8 +27,7 @@ public struct AccountPreferences: Sendable, ReducerProtocol {
 			return .run { [address = state.address] send in
 				do {
 					_ = try await faucetClient.getFreeXRD(.init(
-						recipientAccountAddress: address,
-						unlockKeychainPromptShowToUser: L10n.TransactionSigning.biometricsPrompt
+						recipientAccountAddress: address
 					))
 					guard !Task.isCancelled else { return }
 					await send(.delegate(.refreshAccount(address)))

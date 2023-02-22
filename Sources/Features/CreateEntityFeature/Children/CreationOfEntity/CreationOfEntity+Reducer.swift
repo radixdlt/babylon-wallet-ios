@@ -25,8 +25,7 @@ public struct CreationOfEntity<Entity: EntityProtocol>: Sendable, ReducerProtoco
 						networkID: networkID,
 						genesisFactorInstanceDerivationStrategy: genesisFactorInstanceDerivationStrategy,
 						entityKind: entityKind,
-						displayName: name,
-						keychainAccessFactorSourcesAuthPrompt: L10n.CreateEntity.CreationOfEntity.biometricsPrompt(entityKindName)
+						displayName: name
 					)
 
 					let entity: Entity = try await profileClient.createNewUnsavedVirtualEntity(request: request)

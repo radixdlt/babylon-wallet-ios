@@ -27,22 +27,19 @@ public struct CreateVirtualEntityRequest: Sendable, Equatable {
 	public let curve: Slip10Curve
 	public let entityKind: EntityKind
 	public let displayName: NonEmpty<String>
-	public let keychainAccessFactorSourcesAuthPrompt: String
 
 	public init(
 		curve: Slip10Curve,
 		networkID: NetworkID?,
 		genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy,
 		entityKind: EntityKind,
-		displayName: NonEmpty<String>,
-		keychainAccessFactorSourcesAuthPrompt: String
+		displayName: NonEmpty<String>
 	) throws {
 		self.curve = curve
 		self.networkID = networkID
 		self.genesisFactorInstanceDerivationStrategy = genesisFactorInstanceDerivationStrategy
 		self.entityKind = entityKind
 		self.displayName = displayName
-		self.keychainAccessFactorSourcesAuthPrompt = keychainAccessFactorSourcesAuthPrompt
 	}
 }
 

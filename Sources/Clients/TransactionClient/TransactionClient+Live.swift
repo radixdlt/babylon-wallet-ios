@@ -5,13 +5,14 @@ import EngineToolkitClient
 import GatewayAPI
 import ProfileClient
 import Resources
+import SecretStorageClient
 import UseFactorSourceClient
 
 extension TransactionClient {
 	public static var liveValue: Self {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		@Dependency(\.keychainClient) var keychainClient
+		@Dependency(\.secretStorageClient) var secretStorageClient
 		@Dependency(\.profileClient) var profileClient
 		@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
@@ -39,12 +40,11 @@ extension TransactionClient {
 
 			let factorSource = try! await profileClient.getFactorSources().device
 			let factorSourceID = factorSource.id
-			guard let loadedMnemonicWithPassphrase = try! await keychainClient.loadFactorSourceMnemonicWithPassphrase(
-				factorSourceID: factorSourceID,
-				authenticationPrompt: L10n.TransactionSigning.biometricsPrompt
-			) else {
+
+			guard let loadedMnemonicWithPassphrase = try! await secretStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .signTransaction) else {
 				fatalError("should not happend")
 			}
+
 			let hdRoot = try! loadedMnemonicWithPassphrase.hdRoot()
 
 			@Sendable func sign(data: any DataProtocol, with account: OnNetwork.Account) async throws -> SignatureWithPublicKey {

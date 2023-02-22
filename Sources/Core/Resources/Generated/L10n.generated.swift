@@ -57,6 +57,18 @@ public enum L10n {
       /// Account
       public static let kind = L10n.tr("Localizable", "common.account.kind", fallback: "Account")
     }
+    public enum BiometricsPrompt {
+      /// Authenticate to create new %s with this phone.
+      public static func creationOfEntity(_ p1: UnsafePointer<CChar>) -> String {
+        return L10n.tr("Localizable", "common.biometricsPrompt.creationOfEntity", p1, fallback: "Authenticate to create new %s with this phone.")
+      }
+      /// Authenticate to delete factor from this phone.
+      public static let deleteMnemonic = L10n.tr("Localizable", "common.biometricsPrompt.deleteMnemonic", fallback: "Authenticate to delete factor from this phone.")
+      /// Authenticate to all wallet data.
+      public static let deleteProfileAndAllMnemonics = L10n.tr("Localizable", "common.biometricsPrompt.deleteProfileAndAllMnemonics", fallback: "Authenticate to all wallet data.")
+      /// Authenticate to sign transaction with this phone.
+      public static let signTransaction = L10n.tr("Localizable", "common.biometricsPrompt.signTransaction", fallback: "Authenticate to sign transaction with this phone.")
+    }
     public enum Persona {
       /// Persona
       public static let kind = L10n.tr("Localizable", "common.persona.kind", fallback: "Persona")
@@ -97,12 +109,6 @@ public enum L10n {
         public static func notFirst(_ p1: UnsafePointer<CChar>) -> String {
           return L10n.tr("Localizable", "createEntity.completion.subtitle.notFirst", p1, fallback: "Your %s has been created.")
         }
-      }
-    }
-    public enum CreationOfEntity {
-      /// Authenticate to create new %s with this phone.
-      public static func biometricsPrompt(_ p1: UnsafePointer<CChar>) -> String {
-        return L10n.tr("Localizable", "createEntity.creationOfEntity.biometricsPrompt", p1, fallback: "Authenticate to create new %s with this phone.")
       }
     }
     public enum NameNewEntity {
@@ -547,8 +553,6 @@ public enum L10n {
     }
   }
   public enum TransactionSigning {
-    /// Authenticate to sign transaction with this phone.
-    public static let biometricsPrompt = L10n.tr("Localizable", "transactionSigning.biometricsPrompt", fallback: "Authenticate to sign transaction with this phone.")
     /// Preparing transaction...
     public static let preparingTransactionLoadingText = L10n.tr("Localizable", "transactionSigning.preparingTransactionLoadingText", fallback: "Preparing transaction...")
     /// Submitting transaction...

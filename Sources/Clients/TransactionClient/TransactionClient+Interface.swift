@@ -30,19 +30,16 @@ import ProfileClient
 public struct SignManifestRequest: Sendable {
 	public let manifestToSign: TransactionManifest
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
-	public let unlockKeychainPromptShowToUser: String
 	public typealias SelectNotary = @Sendable (NonEmpty<OrderedSet<OnNetwork.Account>>) async -> OnNetwork.Account
 	public let selectNotary: SelectNotary
 
 	public init(
 		manifestToSign: TransactionManifest,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput,
-		unlockKeychainPromptShowToUser: String,
 		selectNotary: @escaping SelectNotary = { $0.first }
 	) {
 		self.manifestToSign = manifestToSign
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
-		self.unlockKeychainPromptShowToUser = unlockKeychainPromptShowToUser
 		self.selectNotary = selectNotary
 	}
 }
