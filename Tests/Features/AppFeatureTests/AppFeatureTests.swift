@@ -143,6 +143,7 @@ final class AppFeatureTests: TestCase {
 
 	func test__GIVEN__splash__WHEN__loadProfile_results_in_failedToCreateProfileFromSnapshot__THEN__display_errorAlert_when_user_proceeds_incompatible_profile_is_deleted_from_keychain_and_navigate_to_onboarding() async throws {
 		// given
+		let expectationProfileGotDeleted = expectation(description: "Profile gets deleted")
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(
 			initialState: App.State(root: .splash(.init())),
@@ -150,8 +151,9 @@ final class AppFeatureTests: TestCase {
 		) {
 			$0.errorQueue = .liveValue
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
-			$0.keychainClient.removeDataForKey = { key in
-				XCTAssertEqual(key, "profileSnapshotKeychainKey")
+
+			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = {
+				expectationProfileGotDeleted.fulfill()
 			}
 		}
 
@@ -190,6 +192,7 @@ final class AppFeatureTests: TestCase {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
+		waitForExpectations(timeout: 1)
 		await testScheduler.run() // fast-forward scheduler to the end of time
 		await viewTask.cancel()
 	}
