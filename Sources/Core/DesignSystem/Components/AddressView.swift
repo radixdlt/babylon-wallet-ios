@@ -21,7 +21,7 @@ public struct AddressView: View {
 extension AddressView {
 	public var body: some View {
 		Button(action: copyAddressAction ?? {}) {
-			HStack(spacing: .small2) {
+			HStack(spacing: .small3) {
 				Text(state.formattedAddress)
 					.lineLimit(1)
 					.minimumScaleFactor(0.5)

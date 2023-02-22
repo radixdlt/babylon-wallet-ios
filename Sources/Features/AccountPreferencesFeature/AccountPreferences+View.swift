@@ -22,40 +22,38 @@ extension AccountPreferences.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			ForceFullScreen {
-				VStack {
-					NavigationBar(
-						titleText: L10n.AccountPreferences.title,
-						leadingItem: BackButton {
-							viewStore.send(.dismissButtonTapped)
-						}
-					)
-					.foregroundColor(.app.gray1)
-					.padding([.horizontal, .top], .medium3)
-
-					VStack(alignment: .leading) {
-						Spacer()
-							.frame(height: .large1)
-
-						Button(L10n.AccountPreferences.faucetButtonTitle) {
-							viewStore.send(.faucetButtonTapped)
-						}
-						.buttonStyle(.secondaryRectangular(shouldExpand: true))
-						.controlState(viewStore.faucetButtonState)
-
-						if viewStore.faucetButtonState.isLoading {
-							Text(L10n.AccountPreferences.loadingPrompt)
-								.font(.app.body2Regular)
-								.foregroundColor(.app.gray1)
-						}
-
-						Spacer()
+			NavigationStack {
+				VStack(alignment: .leading) {
+					Button(L10n.AccountPreferences.faucetButtonTitle) {
+						viewStore.send(.faucetButtonTapped)
 					}
-					.padding([.horizontal, .bottom], .medium1)
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
+					.controlState(viewStore.faucetButtonState)
+
+					if viewStore.faucetButtonState.isLoading {
+						Text(L10n.AccountPreferences.loadingPrompt)
+							.font(.app.body2Regular)
+							.foregroundColor(.app.gray1)
+					}
 				}
+				.frame(maxHeight: .infinity, alignment: .top)
+				.padding(.medium1)
 				.onAppear {
 					viewStore.send(.didAppear)
 				}
+				.navigationTitle(L10n.AccountPreferences.title)
+				#if os(iOS)
+					.navigationBarTitleColor(.app.gray1)
+					.navigationBarTitleDisplayMode(.inline)
+					.navigationBarInlineTitleFont(.app.secondaryHeader)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							CloseButton {
+								viewStore.send(.closeButtonTapped)
+							}
+						}
+					}
+				#endif
 			}
 		}
 	}

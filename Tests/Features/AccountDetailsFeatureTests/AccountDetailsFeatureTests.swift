@@ -6,36 +6,37 @@ import FeatureTestingPrelude
 final class AccountDetailsFeatureTests: TestCase {
 	func test_dismissAccountDetails_whenTappedOnBackButton_thenCoordinateDismissal() async {
 		// given
-		let accountListRowState = AccountList.Row.State(account: .previewValue0)
-		let initialState = AccountDetails.State(for: accountListRowState)
 		let store = TestStore(
-			initialState: initialState,
+			initialState: AccountDetails.State(
+				for: AccountList.Row.State(account: .previewValue0)
+			),
 			reducer: AccountDetails()
 		)
 
 		// when
-		await store.send(.internal(.view(.dismissAccountDetailsButtonTapped)))
+		await store.send(.internal(.view(.backButtonTapped)))
 
 		// then
-		await store.receive(.delegate(.dismissAccountDetails))
+		await store.receive(.delegate(.dismiss))
 	}
 
-	func test_navigateToAccountPreferences_whenTappedOnPreferencesButton_thenCoordinateNavigationToPreferences() async {
-		// given
-		let account = OnNetwork.Account.previewValue0
-		let accountListRowState = AccountList.Row.State(account: account)
-		let initialState = AccountDetails.State(for: accountListRowState)
-		let store = TestStore(
-			initialState: initialState,
-			reducer: AccountDetails()
-		)
-
-		// when
-		await store.send(.internal(.view(.displayAccountPreferencesButtonTapped)))
-
-		// then
-		await store.receive(.delegate(.displayAccountPreferences(account.address)))
-	}
+	// FIXME: @davdroman-rdx after proper TCA tools are released
+//	func test_navigateToAccountPreferences_whenTappedOnPreferencesButton_thenCoordinateNavigationToPreferences() async {
+//		// given
+//		let account = OnNetwork.Account.previewValue0
+//		let store = TestStore(
+//			initialState: AccountDetails.State(
+//				for: AccountList.Row.State(account: account)
+//			),
+//			reducer: AccountDetails()
+//		)
+//
+//		// when
+//		await store.send(.internal(.view(.preferencesButtonTapped))) {
+//			// then
+//			$0.destination = .preferences(.init(address: account.address))
+//		}
+//	}
 
 	func test_copyAddress_whenTappedOnCopyAddress_thenCopyToPasteboard() async {
 		// given
@@ -76,7 +77,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		await store.receive(.delegate(.refresh(account.address)))
 	}
 
-	// FIXME: @davdroman-rdx
+	// FIXME: @davdroman-rdx after proper TCA tools are released
 //	func test_displayTransfer_whenTappedOnDisplayTransfer_thenCoordinateNavigationToTransfer() async {
 //		// given
 //		let account = OnNetwork.Account.testValue

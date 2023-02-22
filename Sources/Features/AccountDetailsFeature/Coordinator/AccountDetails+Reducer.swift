@@ -24,14 +24,13 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 			return .run { [address = state.address] send in
 				await send(.delegate(.refresh(address)))
 			}
-		case .internal(.view(.dismissAccountDetailsButtonTapped)):
+		case .internal(.view(.backButtonTapped)):
 			return .run { send in
-				await send(.delegate(.dismissAccountDetails))
+				await send(.delegate(.dismiss))
 			}
-		case .internal(.view(.displayAccountPreferencesButtonTapped)):
-			return .run { [address = state.address] send in
-				await send(.delegate(.displayAccountPreferences(address)))
-			}
+		case .internal(.view(.preferencesButtonTapped)):
+			state.destination = .preferences(.init(address: state.address))
+			return .none
 		case .internal(.view(.copyAddressButtonTapped)):
 			let address = state.address.address
 			return .fireAndForget { pasteboardClient.copyString(address) }
@@ -42,6 +41,9 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 		case .internal(.view(.transferButtonTapped)):
 			// FIXME: fix post betanet v2
 //			state.destination = .transfer(AssetTransfer.State(from: state.account))
+			return .none
+		case .child(.destination(.presented(.preferences(.delegate(.dismiss))))):
+			state.destination = nil
 			return .none
 		case .child, .delegate:
 			return .none

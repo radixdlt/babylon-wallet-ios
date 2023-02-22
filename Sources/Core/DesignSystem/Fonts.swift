@@ -60,3 +60,20 @@ extension SwiftUI.Font.App {
 		.custom(FontFamily.IBMPlexSans.bold, size: 16)
 	}
 }
+
+/// UIFont/NSFont depending on platform.
+extension FontConvertible.Font {
+	/// Namespace only
+	public struct App { fileprivate init() {} }
+	public static let app = App()
+}
+
+extension FontConvertible.Font.App {
+	public var sheetTitle: FontConvertible.Font {
+		FontFamily.IBMPlexSans.bold.font(size: 32)
+	}
+
+	public var secondaryHeader: FontConvertible.Font {
+		FontFamily.IBMPlexSans.semiBold.font(size: 18)
+	}
+}

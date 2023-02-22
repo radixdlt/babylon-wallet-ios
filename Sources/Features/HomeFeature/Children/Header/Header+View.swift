@@ -25,61 +25,50 @@ extension Header {
 				observe: \.viewState,
 				send: { .view($0) }
 			) { viewStore in
-				VStack(alignment: .leading) {
-					TitleView(
-						shouldShowNotification: viewStore.state.hasNotification,
-						settingsButtonAction: {
-							viewStore.send(.settingsButtonTapped)
+				ZStack {
+					Text(L10n.Home.Header.subtitle)
+						.foregroundColor(.app.gray2)
+						.textStyle(.body1HighImportance)
+						.frame(maxWidth: .infinity, alignment: .leading)
+						.padding(.leading, .large2)
+						.padding(.trailing, 100)
+				}
+				.padding(.top, .small3)
+				.navigationTitle(L10n.Home.Header.title)
+				#if os(iOS)
+					.navigationBarTitleColor(.app.gray1)
+					.navigationBarTitleDisplayMode(.large)
+					.navigationBarLargeTitleFont(.app.sheetTitle)
+					.navigationBarInlineTitleFont(.app.secondaryHeader)
+					.navigationBarLargeTitleInsets(.init(top: 0, leading: .large2, bottom: 0, trailing: .large2))
+					.toolbar {
+						ToolbarItem(placement: .navigationBarTrailing) {
+							SettingsButton(
+								shouldShowNotification: viewStore.hasNotification,
+								action: { viewStore.send(.settingsButtonTapped) }
+							)
 						}
-					)
-					subtitleView
-				}
+					}
+				#endif
 			}
 		}
 
-		fileprivate var subtitleView: some SwiftUI.View {
-			HStack(spacing: .large1) {
-				Text(L10n.Home.Header.subtitle)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body1HighImportance)
-				Spacer(minLength: .large1)
-			}
-		}
-	}
+		private struct SettingsButton: SwiftUI.View {
+			let shouldShowNotification: Bool
+			let action: () -> Void
 
-	private struct TitleView: SwiftUI.View {
-		var shouldShowNotification: Bool
-		let settingsButtonAction: () -> Void
+			var body: some SwiftUI.View {
+				ZStack(alignment: .topTrailing) {
+					Button(action: action) {
+						Image(asset: AssetResource.homeHeaderSettings)
+					}
+					.frame(.small)
 
-		var body: some SwiftUI.View {
-			HStack {
-				Text(L10n.Home.Header.title)
-					.foregroundColor(.app.gray1)
-					.textStyle(.sheetTitle)
-				Spacer()
-				SettingsButton(
-					shouldShowNotification: shouldShowNotification,
-					action: settingsButtonAction
-				)
-			}
-		}
-	}
-
-	private struct SettingsButton: SwiftUI.View {
-		let shouldShowNotification: Bool
-		let action: () -> Void
-
-		var body: some SwiftUI.View {
-			ZStack(alignment: .topTrailing) {
-				Button(action: action) {
-					Image(asset: AssetResource.homeHeaderSettings)
-				}
-				.frame(.small)
-
-				if shouldShowNotification {
-					Circle()
-						.foregroundColor(.app.notification)
-						.frame(width: 5, height: 5)
+					if shouldShowNotification {
+						Circle()
+							.foregroundColor(.app.notification)
+							.frame(width: 5, height: 5)
+					}
 				}
 			}
 		}
@@ -91,12 +80,16 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct Header_Preview: PreviewProvider {
 	static var previews: some View {
-		Header.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: Header()
-			)
-		)
+		NavigationStack {
+			ScrollView {
+				Header.View(
+					store: .init(
+						initialState: .previewValue,
+						reducer: Header()
+					)
+				)
+			}
+		}
 	}
 }
 
