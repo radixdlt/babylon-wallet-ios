@@ -19,13 +19,7 @@ extension FungibleTokenDetails.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			VStack(spacing: .medium2) {
-				NavigationBar(
-					titleText: viewStore.displayName,
-					leadingItem: CloseButton { viewStore.send(.closeButtonTapped) }
-				)
-				.padding([.horizontal, .top], .medium3)
-
+			NavigationStack {
 				ScrollView {
 					VStack(spacing: .medium3) {
 						LazyImage(url: viewStore.iconURL) { _ in
@@ -39,6 +33,7 @@ extension FungibleTokenDetails.View {
 								Text(" " + symbol).font(.app.sectionHeader)
 						}
 					}
+					.padding(.top, .small2)
 					VStack(spacing: .medium1) {
 						let divider = Color.app.gray4.frame(height: 1).padding(.horizontal, .medium1)
 						if let description = viewStore.description {
@@ -81,8 +76,21 @@ extension FungibleTokenDetails.View {
 						.lineLimit(1)
 					}
 				}
+				.navigationBarTitle(viewStore.displayName)
+				#if os(iOS)
+					.navigationBarTitleColor(.app.gray1)
+					.navigationBarTitleDisplayMode(.inline)
+					.navigationBarInlineTitleFont(.app.secondaryHeader)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							CloseButton {
+								viewStore.send(.closeButtonTapped)
+							}
+						}
+					}
+				#endif
+					.foregroundColor(.app.gray1)
 			}
-			.foregroundColor(.app.gray1)
 		}
 	}
 }
@@ -90,7 +98,7 @@ extension FungibleTokenDetails.View {
 // MARK: - FungibleTokenDetails.View.ViewState
 extension FungibleTokenDetails.View {
 	struct ViewState: Equatable {
-		let displayName: String?
+		let displayName: String
 		let iconURL: URL?
 		let placeholderAsset: ImageAsset
 		let amount: String
@@ -100,7 +108,7 @@ extension FungibleTokenDetails.View {
 		let currentSupply: BigDecimal?
 
 		init(state: FungibleTokenDetails.State) {
-			self.displayName = state.asset.name
+			self.displayName = state.asset.name ?? ""
 			self.iconURL = state.asset.iconURL
 			self.placeholderAsset = .placeholderImage(isXRD: state.asset.isXRD)
 			self.amount = state.amount.format()
