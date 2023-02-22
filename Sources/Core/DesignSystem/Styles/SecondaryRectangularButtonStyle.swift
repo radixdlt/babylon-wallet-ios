@@ -48,6 +48,8 @@ extension SecondaryRectangularButtonStyle {
 }
 
 extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
+	public static var secondaryRectangular: Self { .secondaryRectangular() }
+
 	public static func secondaryRectangular(
 		shouldExpand: Bool = false,
 		isDestructive: Bool = false,
