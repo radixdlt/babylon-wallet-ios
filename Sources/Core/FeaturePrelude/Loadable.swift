@@ -21,17 +21,14 @@ import Foundation
 
      var body: some View {
          switch value {
-         case .notLoaded:
+         case .idle:
              // Shimmer
          case .loading:
              // Animated shimmer or spinner
-         case let .loaded(result):
-             switch result {
-             case .success(let value):
-                 content(value)
-             case .failure:
-                 // Error message or error color
-             }
+ case .success(let value):
+ content(value)
+ case .failure:
+ // Error message or error color
          }
      }
  }
