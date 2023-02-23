@@ -137,6 +137,10 @@
 "dAppDetails.personaHeading" = "Here are the Personas that you have previously used to connect to this dApp.";
 "dAppDetails.noPersonasHeading" = "No Personas have been used to connect to this dApp.";
 "dAppDetails.forgetDapp" = "Forget this dApp";
+"dAppDetails.forgetDappAlertTitle" = "Forget dApp?";
+"dAppDetails.forgetDappAlertMessage" = "Do you really want to forget this dApp?";
+"dAppDetails.forgetDappAlertConfirm" = "Forget";
+"dAppDetails.forgetDappAlertCancel" = "Cancel";
 
 "personaDetails.personaNameHeading" = "Persona Name";
 "personaDetails.personalDataSharingDescription" = "Here is the personal data that you are sharing with %@";
@@ -151,6 +155,11 @@
 
 "personaDetails.editAccountSharing" = "Edit Account Sharing";
 "personaDetails.disconnectPersona" = "Disconnect Persona from this dApp";
+
+"personaDetails.disconnectPersonaAlertTitle" = "Disconnect Persona?";
+"personaDetails.disconnectPersonaAlertMessage" = "Do you really want to disconnect the Persona from this dApp?";
+"personaDetails.disconnectPersonaAlertConfirm" = "Disconnect";
+"personaDetails.disconnectPersonaAlertCancel" = "Cancel";
 
 "newConnection.cameraPermission.deniedAlert.cancelButtonTitle" = "Cancel";
 "newConnection.cameraPermission.deniedAlert.message" = "Camera access is required to link to connector.";

@@ -331,6 +331,14 @@ public enum L10n {
     public static let definition = L10n.tr("Localizable", "dAppDetails.definition", fallback: "dApp Definition")
     /// Forget this dApp
     public static let forgetDapp = L10n.tr("Localizable", "dAppDetails.forgetDapp", fallback: "Forget this dApp")
+    /// Cancel
+    public static let forgetDappAlertCancel = L10n.tr("Localizable", "dAppDetails.forgetDappAlertCancel", fallback: "Cancel")
+    /// Forget
+    public static let forgetDappAlertConfirm = L10n.tr("Localizable", "dAppDetails.forgetDappAlertConfirm", fallback: "Forget")
+    /// Do you really want to forget this dApp?
+    public static let forgetDappAlertMessage = L10n.tr("Localizable", "dAppDetails.forgetDappAlertMessage", fallback: "Do you really want to forget this dApp?")
+    /// Forget dApp?
+    public static let forgetDappAlertTitle = L10n.tr("Localizable", "dAppDetails.forgetDappAlertTitle", fallback: "Forget dApp?")
     /// Missing description
     public static let missingDescription = L10n.tr("Localizable", "dAppDetails.missingDescription", fallback: "Missing description")
     /// Associated NFTs
@@ -497,6 +505,14 @@ public enum L10n {
     }
     /// Disconnect Persona from this dApp
     public static let disconnectPersona = L10n.tr("Localizable", "personaDetails.disconnectPersona", fallback: "Disconnect Persona from this dApp")
+    /// Cancel
+    public static let disconnectPersonaAlertCancel = L10n.tr("Localizable", "personaDetails.disconnectPersonaAlertCancel", fallback: "Cancel")
+    /// Disconnect
+    public static let disconnectPersonaAlertConfirm = L10n.tr("Localizable", "personaDetails.disconnectPersonaAlertConfirm", fallback: "Disconnect")
+    /// Do you really want to disconnect the Persona from this dApp?
+    public static let disconnectPersonaAlertMessage = L10n.tr("Localizable", "personaDetails.disconnectPersonaAlertMessage", fallback: "Do you really want to disconnect the Persona from this dApp?")
+    /// Disconnect Persona?
+    public static let disconnectPersonaAlertTitle = L10n.tr("Localizable", "personaDetails.disconnectPersonaAlertTitle", fallback: "Disconnect Persona?")
     /// Edit Account Sharing
     public static let editAccountSharing = L10n.tr("Localizable", "personaDetails.editAccountSharing", fallback: "Edit Account Sharing")
     /// Edit Persona

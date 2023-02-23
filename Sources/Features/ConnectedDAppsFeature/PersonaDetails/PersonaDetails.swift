@@ -95,16 +95,16 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 extension AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert> {
 	static var confirmforget: AlertState {
 		AlertState {
-			TextState("Actually Forget?")
+			TextState(L10n.PersonaDetails.disconnectPersonaAlertTitle)
 		} actions: {
 			ButtonState(role: .destructive, action: .confirmTapped) {
-				TextState("Forget")
+				TextState(L10n.PersonaDetails.disconnectPersonaAlertConfirm)
 			}
 			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState("Cancel")
+				TextState(L10n.PersonaDetails.disconnectPersonaAlertCancel)
 			}
 		} message: {
-			TextState("This will forget blabla")
+			TextState(L10n.PersonaDetails.disconnectPersonaAlertMessage)
 		}
 	}
 }

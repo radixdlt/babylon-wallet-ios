@@ -193,16 +193,16 @@ extension GatewayAPI.EntityMetadataCollection {
 extension AlertState<DappDetails.ViewAction.ConfirmDisconnectAlert> {
 	static var confirmDisconnect: AlertState {
 		AlertState {
-			TextState("Actually disconnect?")
+			TextState(L10n.DAppDetails.forgetDappAlertTitle)
 		} actions: {
 			ButtonState(role: .destructive, action: .confirmTapped) {
-				TextState("Disconnect")
+				TextState(L10n.DAppDetails.forgetDappAlertConfirm)
 			}
 			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState("Cancel")
+				TextState(L10n.DAppDetails.forgetDappAlertCancel)
 			}
 		} message: {
-			TextState("This will disconnnect blabla")
+			TextState(L10n.DAppDetails.forgetDappAlertMessage)
 		}
 	}
 }
