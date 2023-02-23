@@ -1,11 +1,7 @@
+import AsyncExtensions
 import ClientPrelude
 import Cryptography
 import Profile
-
-#if DEBUG
-// Only used by tests.
-extension DispatchSemaphore: @unchecked Sendable {}
-#endif
 
 // MARK: - ProfileStore
 public final actor ProfileStore: GlobalActor {
@@ -14,33 +10,27 @@ public final actor ProfileStore: GlobalActor {
 
 	public static let shared = ProfileStore()
 
-	private var state: State
+	private let state: AsyncCurrentValueSubject<State>
+
+	/// The current value of Profile. Use `update:profile` method to update it. Also see `values`,
+	/// for an async sequence of Profile.
+	public var profile: Profile { state.value.profile }
 
 	private init() {
-		self.state = Self.newEphemeral()
-		#if DEBUG
-		// For unit tests we'd like to wait for init Task to complete.
-		let semaphore = DispatchSemaphore(value: 0)
-		// Must do this in a separate thread, otherwise we block the concurrent thread pool
-		DispatchQueue.global(qos: .userInitiated).async {
-			Task {
-				await self.restoreFromSecureStorageIfAble()
-				semaphore.signal()
-			}
-		}
-		semaphore.wait()
-		#else
+		self.state = AsyncCurrentValueSubject<State>(Self.newEphemeral())
+
 		Task {
 			await restoreFromSecureStorageIfAble()
 		}
-		#endif
 	}
 }
 
 // MARK: ProfileStore.State
 extension ProfileStore {
-	/// The different possible states of Profile store.
-	fileprivate enum State: Sendable {
+	/// The different possible states of Profile store. See
+	/// `changeState:to` in `ProfileStore` for state machines valid
+	/// transitions.
+	fileprivate enum State: Sendable, CustomStringConvertible {
 		/// The initial state, set during start of init, have not yet
 		/// checked Secure Storage for an potentially existing stored
 		/// profile, which require an async Task to be done at end of
@@ -62,11 +52,26 @@ extension ProfileStore {
 }
 
 extension ProfileStore.State {
+	var description: String {
+		switch self {
+		case .newWithEphemeral: return "newWithEphemeral"
+		case .ephemeral: return "ephemeral"
+		case .persisted: return "persisted"
+		}
+	}
+
 	fileprivate var profile: Profile {
 		switch self {
 		case let .newWithEphemeral(profile, _): return profile
 		case let .ephemeral(profile, _): return profile
 		case let .persisted(profile): return profile
+		}
+	}
+
+	fileprivate var isNew: Bool {
+		switch self {
+		case .newWithEphemeral: return true
+		case .ephemeral, .persisted: return false
 		}
 	}
 }
@@ -94,7 +99,7 @@ extension ProfileStore {
 
 	private func restoreFromSecureStorageIfAble() async {
 		@Dependency(\.jsonDecoder) var jsonDecoder
-		guard case let .newWithEphemeral(ephemeralProfile, ephemeralPrivateFactorSource) = state else {
+		guard case let .newWithEphemeral(ephemeralProfile, ephemeralPrivateFactorSource) = state.value else {
 			let errorMsg = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state was: 'newWithEphemeral'"
 			loggerGlobal.critical(.init(stringLiteral: errorMsg))
 			assertionFailure(errorMsg)
@@ -103,17 +108,64 @@ extension ProfileStore {
 		guard
 			let existing = try? await secureStorageClient.loadProfile()
 		else {
-			state = .ephemeral(ephemeralProfile, ephemeralPrivateFactorSource)
+			changeState(to: .ephemeral(ephemeralProfile, ephemeralPrivateFactorSource))
 			return
 		}
 
-		state = .persisted(existing)
+		changeState(to: .persisted(existing))
+	}
+
+	private func isInitialized() async throws {
+		if !state.value.isNew {
+			return // done
+		}
+		for await value in state {
+			if !value.isNew {
+				return // done
+			}
+			continue
+		}
+		throw CancellationError()
+	}
+
+	private func changeState(to newState: State) {
+		switch (state.value, newState) {
+		case (.newWithEphemeral, .ephemeral): break // `init` finished, no profile saved.
+		case (.newWithEphemeral, .persisted): break // `init` finished, found saved profile.
+		case (.ephemeral, .persisted): break // user finished onboarding.
+		case (.persisted, .persisted): break // user updated profile, e.g. added another account.
+		default:
+			let errorMsg = "Incorrect implementation: invalid state transition from '\(String(describing: state.value))' to '\(String(describing: newState))'"
+			loggerGlobal.critical(.init(stringLiteral: errorMsg))
+			assertionFailure(errorMsg)
+			return
+		}
+		state.send(newState)
+	}
+
+	private static func multicasting<S>(
+		asyncSequence: S
+	) -> AnyAsyncSequence<S.Element>
+		where S: AsyncSequence, S.Element: Equatable & Sendable, S.AsyncIterator: Sendable
+	{
+		asyncSequence
+			.share() // Multicast
+			.buffer(policy: .bounded(1)) // replay last
+			.removeDuplicates() // no duplicates
+			.eraseToAnyAsyncSequence()
 	}
 }
 
 // MARK: Public
 extension ProfileStore {
+	/// A multicasting replaying async sequence of distinct Profile.
+	public func values() -> AnyAsyncSequence<Profile> {
+		Self.multicasting(asyncSequence: state.map(\.profile))
+	}
+
 	public func commitEphemeral() async throws {
+		try await isInitialized()
+
 		let hint: NonEmptyString
 		#if canImport(UIKit)
 		@Dependency(\.device) var device
@@ -124,7 +176,7 @@ extension ProfileStore {
 		hint = "macOS"
 		#endif
 
-		guard case let .ephemeral(ephemeralProfile, ephemeralPrivateFactorSource) = state else {
+		guard case let .ephemeral(ephemeralProfile, ephemeralPrivateFactorSource) = state.value else {
 			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state was: 'ephemeral'"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
@@ -147,11 +199,13 @@ extension ProfileStore {
 			throw error
 		}
 
-		state = .persisted(ephemeralProfile)
+		changeState(to: .persisted(ephemeralProfile))
 	}
 
 	public func update(profile: Profile) async throws {
-		guard case let .persisted(persistedProfile) = state else {
+		try await isInitialized() // it should not be possible for us to not be initialized...
+
+		guard case let .persisted(persistedProfile) = state.value else {
 			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state was: 'persisted'"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
@@ -167,6 +221,6 @@ extension ProfileStore {
 
 		try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
 
-		state = .persisted(profile)
+		changeState(to: .persisted(profile))
 	}
 }
