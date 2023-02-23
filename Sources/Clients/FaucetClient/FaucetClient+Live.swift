@@ -61,8 +61,7 @@ extension FaucetClient: DependencyKey {
 
 			let signSubmitTXRequest = SignManifestRequest(
 				manifestToSign: manifest,
-				makeTransactionHeaderInput: faucetRequest.makeTransactionHeaderInput,
-				unlockKeychainPromptShowToUser: faucetRequest.unlockKeychainPromptShowToUser
+				makeTransactionHeaderInput: faucetRequest.makeTransactionHeaderInput
 			)
 
 			let _ = try await signAndSubmitTransaction(signSubmitTXRequest).get()

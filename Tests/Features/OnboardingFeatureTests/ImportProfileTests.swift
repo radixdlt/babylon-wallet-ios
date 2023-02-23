@@ -46,9 +46,6 @@ final class ImportProfileTests: TestCase {
 		sut.dependencies.dataReader = .init { _, _ in
 			invalidProfileData
 		}
-		sut.dependencies.keychainClient.dataForKey = { _, _ in
-			invalidProfileData
-		}
 
 		let expectation = expectation(description: "Error")
 		sut.dependencies.errorQueue.schedule = { error in

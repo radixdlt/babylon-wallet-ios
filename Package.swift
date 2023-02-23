@@ -294,6 +294,17 @@ package.addModules([
 		dependencies: [
 			"ProfileClient",
 			"EngineToolkitClient",
+			"SecureStorageClient",
+		],
+		tests: .yes()
+	),
+	.client(
+		name: "SecureStorageClient",
+		dependencies: [
+			"Profile",
+			"Cryptography",
+			"LocalAuthenticationClient",
+			"Resources", // L10n for keychain auth prompts
 		],
 		tests: .yes()
 	),
@@ -305,6 +316,7 @@ package.addModules([
 			"ProfileClient",
 			"AccountPortfolio",
 			"UseFactorSourceClient",
+			"SecureStorageClient",
 		],
 		tests: .yes()
 	),
@@ -313,6 +325,7 @@ package.addModules([
 		dependencies: [
 			"Profile",
 			"Cryptography",
+			"SecureStorageClient",
 		],
 		tests: .no
 	),
@@ -407,6 +420,7 @@ package.addModules([
 		category: .profile,
 		dependencies: [
 			"Profile",
+			"SecureStorageClient",
 		],
 		tests: .no
 	),

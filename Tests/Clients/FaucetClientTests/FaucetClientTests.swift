@@ -171,7 +171,7 @@ final class FaucetClientTests: TestCase {
 				}
 			}
 		} operation: {
-			try await sut.getFreeXRD(.init(recipientAccountAddress: acco0, unlockKeychainPromptShowToUser: "not_used"))
+			try await sut.getFreeXRD(.init(recipientAccountAddress: acco0))
 		}
 	}
 }

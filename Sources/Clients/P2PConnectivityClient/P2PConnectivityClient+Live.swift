@@ -67,7 +67,6 @@ extension P2PConnectivityClient {
 
 		let loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll = {
 			Task {
-				print("🔌 Loading and connecting all P2P connections")
 				_ = try await P2PConnections.shared.add(
 					connectionsFor: profileClient.getP2PClients(),
 					connectMode: .connect(force: true, inBackground: true),
@@ -79,7 +78,6 @@ extension P2PConnectivityClient {
 		return Self(
 			loadFromProfileAndConnectAll: loadFromProfileAndConnectAll,
 			disconnectAndRemoveAll: {
-				print("🔌 Disconnecting and removing all P2P connections")
 				do {
 					try await P2PConnections.shared.removeAndDisconnectAll()
 				} catch {

@@ -1,12 +1,12 @@
 import FeaturePrelude
 import ProfileClient
+import SecureStorageClient
 
 // MARK: - ImportProfile
 public struct ImportProfile: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dataReader) var dataReader
 	@Dependency(\.jsonDecoder) var jsonDecoder
-	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
 	public init() {}
 }

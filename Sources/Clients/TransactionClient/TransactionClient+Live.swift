@@ -5,13 +5,14 @@ import EngineToolkitClient
 import GatewayAPI
 import ProfileClient
 import Resources
+import SecureStorageClient
 import UseFactorSourceClient
 
 extension TransactionClient {
 	public static var liveValue: Self {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		@Dependency(\.keychainClient) var keychainClient
+		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.profileClient) var profileClient
 		@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
@@ -37,22 +38,25 @@ extension TransactionClient {
 				return .failure(.failedToGenerateTXId)
 			}
 
-			let factorSource = try! await profileClient.getFactorSources().device
-			let factorSourceID = factorSource.id
-			guard let loadedMnemonicWithPassphrase = try! await keychainClient.loadFactorSourceMnemonicWithPassphrase(
-				factorSourceID: factorSourceID,
-				authenticationPrompt: L10n.TransactionSigning.biometricsPrompt
-			) else {
-				fatalError("should not happend")
+			let hdRoot: HD.Root
+			let factorSource: FactorSource
+			do {
+				factorSource = try await profileClient.getFactorSources().device
+				guard let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSource.id, .signTransaction) else {
+					return .failure(.failedToLoadFactorSourceForSigning)
+				}
+				hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
+			} catch {
+				return .failure(.failedToLoadFactorSourceForSigning)
 			}
-			let hdRoot = try! loadedMnemonicWithPassphrase.hdRoot()
 
 			@Sendable func sign(data: any DataProtocol, with account: OnNetwork.Account) async throws -> SignatureWithPublicKey {
 				switch account.securityState {
 				case let .unsecured(unsecuredControl):
 					let factorInstance = unsecuredControl.genesisFactorInstance
-					guard factorInstance.factorSourceID == factorSourceID else {
-						fatalError("wrong signer.")
+					guard factorInstance.factorSourceID == factorSource.id else {
+						assertionFailure("this should not happen")
+						throw TransactionFailure.failedToCompileOrSign(.failedToLoadFactorSourceForSigning)
 					}
 					let sigRes: SignatureWithPublicKey = try useFactorSourceClient.signatureFromOnDeviceHD(.init(
 						hdRoot: hdRoot,

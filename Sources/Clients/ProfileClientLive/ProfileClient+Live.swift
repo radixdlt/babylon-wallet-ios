@@ -2,6 +2,7 @@ import ClientPrelude
 import Cryptography
 import EngineToolkitClient
 import ProfileClient
+import SecureStorageClient
 import UseFactorSourceClient
 
 // MARK: - ProfileClient + DependencyKey
@@ -11,7 +12,7 @@ extension ProfileClient: DependencyKey {}
 extension ProfileClient {
 	public static let liveValue: Self = {
 		@Dependency(\.engineToolkitClient) var engineToolkitClient
-		@Dependency(\.keychainClient) var keychainClient
+		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 
 		let profileHolder = ProfileHolder.shared
@@ -142,7 +143,7 @@ extension ProfileClient {
 			},
 			injectProfileSnapshot: { snapshot in
 				let profile = try Profile(snapshot: snapshot)
-				try await keychainClient.updateProfileSnapshot(profileSnapshot: snapshot)
+				try await secureStorageClient.saveProfileSnapshot(snapshot)
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
 			commitOnboardingWallet: { request in
@@ -153,10 +154,7 @@ extension ProfileClient {
 					}
 
 					// all good
-					try await keychainClient.updateFactorSource(
-						mnemonicWithPassphrase: request.privateFactorSource.mnemonicWithPassphrase,
-						factorSourceID: request.privateFactorSource.factorSource.id
-					)
+					try await secureStorageClient.saveMnemonicForFactorSource(request.privateFactorSource)
 				}
 
 				try await profileHolder.persistAndAllowFuturePersistenceOfEphemeralProfile()
@@ -166,12 +164,7 @@ extension ProfileClient {
 				@Dependency(\.jsonDecoder) var jsonDecoder
 
 				guard
-					let profileSnapshotData = try? await keychainClient
-					.loadProfileSnapshotJSONData(
-						// This should not be be shown due to settings of profile snapshot
-						// item when it was originally stored.
-						authenticationPrompt: "Load accounts"
-					)
+					let profileSnapshotData = try? await secureStorageClient.loadProfileSnapshotData()
 				else {
 					return .success(nil)
 				}
@@ -193,7 +186,7 @@ extension ProfileClient {
 				}
 
 				do {
-					try ProfileSnapshot.validateCompatability(version: decodedVersion)
+					try ProfileSnapshot.validateCompatibility(version: decodedVersion)
 				} catch {
 					// Incompatible Versions
 					return .failure(.profileVersionOutdated(
@@ -237,15 +230,7 @@ extension ProfileClient {
 				try await profileHolder.takeProfileSnapshot()
 			},
 			deleteProfileAndFactorSources: {
-				do {
-					try await keychainClient.removeAllFactorSourcesAndProfileSnapshot(
-						// This should not be be shown due to settings of profile snapshot
-						// item when it was originally stored.
-						authenticationPrompt: "Read wallet data in order get reference to secret's to delete"
-					)
-				} catch {
-					try await keychainClient.removeProfileSnapshot()
-				}
+				try? await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs()
 				await profileHolder.removeProfile()
 			},
 			hasAccountOnNetwork: hasAccountOnNetwork,
@@ -335,10 +320,9 @@ extension ProfileClient {
 						case .loadMnemonicFromKeychainForFactorSource:
 							return try await useFactorSourceClient.onDeviceHD(
 								factorSourceID: factorSource.id,
-								keychainAccessFactorSourcesAuthPrompt: request.keychainAccessFactorSourcesAuthPrompt,
 								derivationPath: derivationPath,
 								curve: request.curve,
-								dataToSign: nil
+								purpose: .createEntity(kind: request.entityKind)
 							).publicKey
 
 						case let .useOnboardingWallet(onboardingWallet):
@@ -422,14 +406,14 @@ struct NoProfile: Swift.Error {}
 
 // MARK: - ProfileHolder
 private actor ProfileHolder: GlobalActor {
-	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	/// If this is set to `true` it means that any edits of the profile should not be persisted at all
 	/// this is used for convenience of implementation of Onboarding flow where we create an ephemeral
 	/// profile which should only be persisted at the end of Onboarding flow. Letting this ephemeral
 	/// profile live here (in stored property `profile`) allows us to use the same APIs as if it would
 	/// have not been ephemeral, and at the
-	private var isEphemeral: Bool = false
+	private var isEphemeral: Bool = true
 	private var profile: Profile?
 
 	private init() {}
@@ -465,7 +449,7 @@ private actor ProfileHolder: GlobalActor {
 	private func persistProfileIfAllowed() async throws {
 		guard !isEphemeral else { return }
 		let profileSnapshot = try takeProfileSnapshot()
-		try await keychainClient.updateProfileSnapshot(profileSnapshot: profileSnapshot)
+		try await secureStorageClient.saveProfileSnapshot(profileSnapshot)
 	}
 
 	func asyncMutating<T>(_ mutateProfile: @Sendable (inout Profile) async throws -> T) async throws -> T {
@@ -480,12 +464,13 @@ private actor ProfileHolder: GlobalActor {
 	}
 
 	func injectProfile(_ profile: Profile, isEphemeral: Bool) async {
+		self.isEphemeral = isEphemeral
 		self.profile = profile
 	}
 
 	func takeProfileSnapshot() throws -> ProfileSnapshot {
 		try get { profile in
-			profile.snaphot()
+			profile.snapshot()
 		}
 	}
 }
