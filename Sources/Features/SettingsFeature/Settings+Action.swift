@@ -1,3 +1,4 @@
+import ConnectedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
@@ -22,6 +23,7 @@ extension AppSettings.Action {
 	public enum ChildAction: Sendable, Equatable {
 		case manageP2PClients(ManageP2PClients.Action)
 		case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
+		case connectedDapps(PresentationActionOf<ConnectedDapps>)
 		case personasCoordinator(PersonasCoordinator.Action)
 	}
 }
@@ -35,6 +37,7 @@ extension AppSettings.Action {
 
 		case manageP2PClientsButtonTapped
 		case addP2PClientButtonTapped
+		case connectedDappsButtonTapped
 
 		case editGatewayAPIEndpointButtonTapped
 		case personasButtonTapped

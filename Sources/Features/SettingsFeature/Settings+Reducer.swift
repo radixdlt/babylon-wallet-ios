@@ -1,3 +1,4 @@
+import ConnectedDAppsFeature
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
@@ -26,6 +27,9 @@ extension AppSettings {
 			.ifLet(\.personasCoordinator, action: /Action.child .. Action.ChildAction.personasCoordinator) {
 				PersonasCoordinator()
 			}
+			.presentationDestination(\.$connectedDapps, action: /Action.child .. Action.ChildAction.connectedDapps) {
+				ConnectedDapps()
+			}
 	}
 
 	public func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -43,6 +47,10 @@ extension AppSettings {
 
 		case .internal(.view(.manageP2PClientsButtonTapped)):
 			state.manageP2PClients = .init()
+			return .none
+
+		case .internal(.view(.connectedDappsButtonTapped)):
+			state.connectedDapps = .init()
 			return .none
 
 		case .internal(.view(.didAppear)):
