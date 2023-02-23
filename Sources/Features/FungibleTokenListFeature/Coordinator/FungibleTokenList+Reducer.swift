@@ -5,16 +5,20 @@ public struct FungibleTokenList: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Reduce { state, action in
+		Reduce<State, Action> { state, action in
 			switch action {
 			case .child(.section(_, action: .child(.asset(_, action: .delegate(.selected(let token)))))):
-				state.selectedToken = token
+				state.destination = .details(token)
 				return .none
 			case let .internal(.view(.selectedTokenChanged(token))):
-				state.selectedToken = token
+				if let token {
+					state.destination = .details(token)
+				} else {
+					state.destination = nil
+				}
 				return .none
-			case .child(.details(.delegate(.closeButtonTapped))):
-				state.selectedToken = nil
+			case .child(.destination(.presented(.details(.delegate(.dismiss))))):
+				state.destination = nil
 				return .none
 			case .child:
 				return .none
@@ -23,8 +27,8 @@ public struct FungibleTokenList: Sendable, ReducerProtocol {
 		.forEach(\.sections, action: /Action.child .. Action.ChildAction.section) {
 			FungibleTokenList.Section()
 		}
-		.ifLet(\.selectedToken, action: /Action.child .. Action.ChildAction.details) {
-			FungibleTokenDetails()
+		.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+			Destinations()
 		}
 	}
 }

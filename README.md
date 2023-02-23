@@ -59,7 +59,7 @@ The reason for this is that some of us iOS devs still hope for Apple to back-dep
 
 Or Point-Free will make something amazing and iOS 15 compatible, follow [thread related to iOS 16 NavigationStack in TCA here](https://github.com/pointfreeco/swift-composable-architecture/discussions/1140).
 
-So for now, we just use `IfletStore` and `SwitchStore` for displaying correct screen according to state.
+So for now, we just use `IfLetStore` and `SwitchStore` for displaying correct screen according to state.
 
 # Code style
 

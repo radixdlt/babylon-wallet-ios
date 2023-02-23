@@ -108,15 +108,12 @@ package.addModules([
 	.feature(
 		name: "HomeFeature",
 		dependencies: [
-			"AccountListFeature",
 			"AccountDetailsFeature",
+			"AccountListFeature",
 			"AccountPortfolio",
-			"AccountPreferencesFeature",
 			"AppSettings",
 			"CreateEntityFeature",
-			"P2PConnectivityClient",
 			"ProfileClient",
-			"TransactionSigningFeature",
 		],
 		tests: .yes(
 			dependencies: [

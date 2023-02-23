@@ -21,7 +21,7 @@ public struct AddressView: View {
 extension AddressView {
 	public var body: some View {
 		Button(action: copyAddressAction ?? {}) {
-			HStack(spacing: .small2) {
+			HStack(spacing: .small3) {
 				Text(state.formattedAddress)
 					.lineLimit(1)
 					.minimumScaleFactor(0.5)
@@ -29,6 +29,7 @@ extension AddressView {
 
 				if copyAddressAction != nil {
 					Image(asset: AssetResource.copy)
+						.foregroundColor(.app.gray2)
 				}
 			}
 		}
@@ -43,40 +44,35 @@ extension AddressView {
 // MARK: AddressView.ViewState
 extension AddressView {
 	public struct ViewState: Equatable {
-		public var formattedAddress: String
+		public let formattedAddress: String
+
+		public init(address: String) {
+			self.formattedAddress = address
+		}
 
 		public init(address: String, format: AddressFormat) {
-			switch format {
-			case let .short(format):
-				let total = format.first + format.last
-				if address.count <= total {
-					formattedAddress = address
-				} else {
-					formattedAddress = address.prefix(format.first) + "..." + address.suffix(format.last)
-				}
-			case .full:
-				formattedAddress = address
-			}
+			self.formattedAddress = address.formatted(format)
 		}
 	}
 }
 
-// MARK: - AddressView.ViewState.AddressFormat
-extension AddressView.ViewState {
-	public enum AddressFormat {
-		case short(ShortAddressFormat = .default)
-		case full
+extension String {
+	public func formatted(_ format: AddressFormat = .default) -> String {
+		let total = format.first + format.last
+		if count <= total {
+			return self
+		} else {
+			return prefix(format.first) + "..." + suffix(format.last)
+		}
 	}
 }
 
-// MARK: - AddressView.ViewState.AddressFormat.ShortAddressFormat
-extension AddressView.ViewState.AddressFormat {
-	public struct ShortAddressFormat {
-		var first: Int
-		var last: Int
+// MARK: - AddressFormat
+public struct AddressFormat {
+	public let first: Int
+	public let last: Int
 
-		public static let `default` = Self(first: 4, last: 6)
-	}
+	public static let `default` = Self(first: 4, last: 6)
 }
 
 #if DEBUG
@@ -85,7 +81,7 @@ struct AddressView_Previews: PreviewProvider {
 		AddressView(
 			AddressView.ViewState(
 				address: "account_wqs8qxdx7qw8c",
-				format: .short()
+				format: .default
 			),
 			copyAddressAction: nil
 		)

@@ -263,6 +263,11 @@ extension ProfileClient {
 					_ = try profile.addConnectedDapp(connectedDapp)
 				}
 			},
+			forgetConnectedDapp: { connectedDappID, networkID in
+				try await profileHolder.asyncMutating { profile in
+					_ = try await profile.forgetConnectedDapp(connectedDappID, on: networkID)
+				}
+			},
 			detailsForConnectedDapp: { connectedDappSimple in
 				try await profileHolder.get { profile in
 					try profile.detailsForConnectedDapp(connectedDappSimple)
@@ -271,6 +276,11 @@ extension ProfileClient {
 			updateConnectedDapp: { updated in
 				try await profileHolder.asyncMutating { profile in
 					try profile.updateConnectedDapp(updated)
+				}
+			},
+			disconnectPersonaFromDapp: { personaID, connectedDappID, networkID in
+				try await profileHolder.asyncMutating { profile in
+					try await profile.disconnectPersonaFromDapp(personaID, dAppID: connectedDappID, networkID: networkID)
 				}
 			},
 			addP2PClient: { newClient in

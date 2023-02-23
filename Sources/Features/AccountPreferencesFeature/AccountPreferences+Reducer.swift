@@ -10,10 +10,10 @@ public struct AccountPreferences: Sendable, ReducerProtocol {
 	private enum RefreshID {}
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.view(.dismissButtonTapped)):
+		case .internal(.view(.closeButtonTapped)):
 			return .run { [address = state.address] send in
 				await send(.delegate(.refreshAccount(address)))
-				await send(.delegate(.dismissAccountPreferences))
+				await send(.delegate(.dismiss))
 			}
 
 		case .delegate:

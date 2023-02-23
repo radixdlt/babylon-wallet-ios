@@ -24,8 +24,8 @@ extension AccountDetails.Action {
 extension AccountDetails.Action {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case dismissAccountDetailsButtonTapped
-		case displayAccountPreferencesButtonTapped
+		case backButtonTapped
+		case preferencesButtonTapped
 		case copyAddressButtonTapped
 		case transferButtonTapped
 		case pullToRefreshStarted
@@ -42,8 +42,7 @@ extension AccountDetails.Action {
 // MARK: - AccountDetails.Action.DelegateAction
 extension AccountDetails.Action {
 	public enum DelegateAction: Sendable, Equatable {
-		case dismissAccountDetails
-		case displayAccountPreferences(AccountAddress)
+		case dismiss
 		case displayTransfer
 		case refresh(AccountAddress)
 	}

@@ -14,7 +14,7 @@ extension AccountPreferences {
 extension AccountPreferences.Action {
 	public enum ViewAction: Sendable, Equatable {
 		case didAppear
-		case dismissButtonTapped
+		case closeButtonTapped
 		case faucetButtonTapped
 	}
 }
@@ -39,7 +39,7 @@ extension AccountPreferences.Action {
 // MARK: - AccountPreferences.Action.DelegateAction
 extension AccountPreferences.Action {
 	public enum DelegateAction: Sendable, Equatable {
-		case dismissAccountPreferences
+		case dismiss
 		case refreshAccount(AccountAddress)
 	}
 }

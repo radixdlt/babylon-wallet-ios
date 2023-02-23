@@ -5,8 +5,14 @@ import Prelude
 // MARK: - ConnectedDappDoesNotExists
 struct ConnectedDappDoesNotExists: Swift.Error {}
 
+// MARK: - DappWasNotConnected
+struct DappWasNotConnected: Swift.Error {}
+
 // MARK: - ConnectedDappAlreadyExists
 struct ConnectedDappAlreadyExists: Swift.Error {}
+
+// MARK: - PersonaNotConnected
+struct PersonaNotConnected: Swift.Error {}
 
 // MARK: - AccountAlreadyExists
 struct AccountAlreadyExists: Swift.Error {}
@@ -95,6 +101,19 @@ extension Profile {
 		return connectedDapp
 	}
 
+	/// Forgets  a `ConnectedDapp`
+	public mutating func forgetConnectedDapp(
+		_ connectedDappID: OnNetwork.ConnectedDapp.ID,
+		on networkID: NetworkID
+	) async throws {
+		var network = try onNetwork(id: networkID)
+		guard network.connectedDapps.remove(id: connectedDappID) != nil else {
+			throw DappWasNotConnected()
+		}
+
+		try updateOnNetwork(network)
+	}
+
 	@discardableResult
 	private func validateAuthorizedPersonas(of connectedDapp: OnNetwork.ConnectedDapp) throws -> OnNetwork.ConnectedDapp {
 		let networkID = connectedDapp.networkID
@@ -128,6 +147,27 @@ extension Profile {
 		}
 		// All good
 		return connectedDapp
+	}
+
+	/// Removes a Persona from a dApp in the Profile
+	public mutating func disconnectPersonaFromDapp(
+		_ personaID: OnNetwork.Persona.ID,
+		dAppID: OnNetwork.ConnectedDapp.ID,
+		networkID: NetworkID
+	) async throws {
+		var network = try onNetwork(id: networkID)
+		guard var connectedDapp = network.connectedDapps[id: dAppID] else {
+			throw ConnectedDappDoesNotExists()
+		}
+
+		guard connectedDapp.referencesToAuthorizedPersonas.remove(id: personaID) != nil else {
+			throw PersonaNotConnected()
+		}
+
+		guard network.connectedDapps.updateOrAppend(connectedDapp) != nil else {
+			fatalError("Incorrect implementation, should have been an existing ConnectedDapp")
+		}
+		try updateOnNetwork(network)
 	}
 
 	/// Updates a `ConnectedDapp` in the profile

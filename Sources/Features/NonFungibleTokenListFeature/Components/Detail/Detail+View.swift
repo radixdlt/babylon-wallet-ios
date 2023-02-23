@@ -125,12 +125,12 @@ extension NonFungibleTokenList.Detail.View {
 		var resourceName: String?
 
 		init(state: NonFungibleTokenList.Detail.State) {
-			nftID = .init(address: state.asset.id.stringRepresentation, format: .full)
+			nftID = .init(address: state.asset.id.stringRepresentation)
 			fullNFTAddress = state.container.nftAddress(for: state.asset)
 			description = state.container.description
 			resourceAddress = .init(
 				address: state.container.resourceAddress.address,
-				format: .short()
+				format: .default
 			)
 			fullResourceAddress = state.container.resourceAddress.address
 			resourceName = state.container.name

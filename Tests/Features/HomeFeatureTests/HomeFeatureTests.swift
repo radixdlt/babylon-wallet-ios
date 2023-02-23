@@ -36,7 +36,7 @@ final class HomeFeatureTests: TestCase {
 		let accountRowState = AccountList.Row.State(account: account)
 		let accountDetailsState = AccountDetails.State(for: accountRowState)
 		var initialState: Home.State = .previewValue
-		initialState.accountDetails = accountDetailsState
+		initialState.destination = .accountDetails(accountDetailsState)
 		initialState.accountList = .init(accounts: .init(uniqueElements: [account].map(AccountList.Row.State.init(account:))))
 
 		let store = TestStore(
@@ -55,7 +55,7 @@ final class HomeFeatureTests: TestCase {
 			$0.accountList.accounts[id: address]!.portfolio = accountPortfolio
 
 			// account details
-			if $0.accountDetails != nil {
+			if $0.destination?.accountDetails != nil {
 				// asset list
 				let sortedCategories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
@@ -87,7 +87,7 @@ final class HomeFeatureTests: TestCase {
 
 				let nonFungibleRows: [NonFungibleTokenList.Row.State] = accountPortfolio.nonFungibleTokenContainers.elements.map { .init(container: $0) }
 
-				$0.accountDetails?.assets = .init(
+				$0.destination?.accountDetails?.assets = .init(
 					fungibleTokenList: .init(
 						sections: [section0, section1]
 					),

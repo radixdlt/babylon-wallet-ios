@@ -16,7 +16,7 @@ extension FungibleTokenList {
 extension FungibleTokenList.Action {
 	public enum ChildAction: Sendable, Equatable {
 		case section(id: FungibleTokenCategory.CategoryType, action: FungibleTokenList.Section.Action)
-		case details(FungibleTokenDetails.Action)
+		case destination(PresentationActionOf<FungibleTokenList.Destinations>)
 	}
 }
 

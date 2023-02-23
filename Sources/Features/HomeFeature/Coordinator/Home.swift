@@ -1,14 +1,11 @@
 import AccountDetailsFeature
 import AccountListFeature
 import AccountPortfolio
-import AccountPreferencesFeature
 import AppSettings
 import CreateEntityFeature
 import FeaturePrelude
 import FungibleTokenListFeature
-import P2PConnectivityClient
 import ProfileClient
-import TransactionSigningFeature
 
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
@@ -19,25 +16,20 @@ public struct Home: Sendable, FeatureReducer {
 		public var header: Header.State
 		public var accountList: AccountList.State
 
-		// MARK: - Children
-		public var accountDetails: AccountDetails.State?
-		public var accountPreferences: AccountPreferences.State?
-		public var createAccountCoordinator: CreateAccountCoordinator.State?
+		// MARK: - Destinations
+		@PresentationState
+		public var destination: Destinations.State?
 
 		public init(
 			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
 			header: Header.State = .init(),
 			accountList: AccountList.State = .init(accounts: []),
-			accountDetails: AccountDetails.State? = nil,
-			accountPreferences: AccountPreferences.State? = nil,
-			createAccount: CreateAccountCoordinator.State? = nil
+			destination: Destinations.State? = nil
 		) {
 			self.accountPortfolioDictionary = accountPortfolioDictionary
 			self.header = header
 			self.accountList = accountList
-			self.accountDetails = accountDetails
-			self.accountPreferences = accountPreferences
-			self.createAccountCoordinator = createAccount
+			self.destination = destination
 		}
 	}
 
@@ -56,23 +48,52 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case accountList(AccountList.Action)
 		case header(Header.Action)
-		case accountPreferences(AccountPreferences.Action)
-		case accountDetails(AccountDetails.Action)
-		case createAccountCoordinator(CreateAccountCoordinator.Action)
+		case accountList(AccountList.Action)
+		case destination(PresentationActionOf<Destinations>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
 	}
 
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case accountDetails(AccountDetails.State)
+			case createAccount(CreateAccountCoordinator.State)
+
+			// NB: native case paths should deem this obsolete.
+			// e.g. `state.destination?[keyPath: \.accountDetails] = ...` or even conciser via `@dynamicMemberLookup`
+			var accountDetails: AccountDetails.State? {
+				get {
+					guard case let .accountDetails(state) = self else { return nil }
+					return state
+				}
+				set {
+					guard case .accountDetails = self, let state = newValue else { return }
+					self = .accountDetails(state)
+				}
+			}
+		}
+
+		public enum Action: Sendable, Equatable {
+			case accountDetails(AccountDetails.Action)
+			case createAccount(CreateAccountCoordinator.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.accountDetails, action: /Action.accountDetails) {
+				AccountDetails()
+			}
+			Scope(state: /State.createAccount, action: /Action.createAccount) {
+				CreateAccountCoordinator()
+			}
+		}
+	}
+
 	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
 	@Dependency(\.appSettingsClient) var appSettingsClient
-	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
-	@Dependency(\.mainQueue) var mainQueue
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.profileClient) var profileClient
 
 	public init() {}
@@ -82,24 +103,14 @@ public struct Home: Sendable, FeatureReducer {
 			Header()
 		}
 
-		accountListReducer()
-
-		Reduce(self.core)
-	}
-
-	func accountListReducer() -> some ReducerProtocolOf<Self> {
 		Scope(state: \.accountList, action: /Action.child .. ChildAction.accountList) {
 			AccountList()
 		}
-		.ifLet(\.accountDetails, action: /Action.child .. ChildAction.accountDetails) {
-			AccountDetails()
-		}
-		.ifLet(\.accountPreferences, action: /Action.child .. ChildAction.accountPreferences) {
-			AccountPreferences()
-		}
-		.ifLet(\.createAccountCoordinator, action: /Action.child .. ChildAction.createAccountCoordinator) {
-			CreateAccountCoordinator()
-		}
+
+		Reduce(core)
+			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
@@ -111,11 +122,13 @@ public struct Home: Sendable, FeatureReducer {
 			return loadAccountsAndSettings()
 
 		case .createAccountButtonTapped:
-			state.createAccountCoordinator = .init(config: .init(
-				isFirstEntity: false,
-				canBeDismissed: true,
-				navigationButtonCTA: .goHome
-			))
+			state.destination = .createAccount(
+				.init(config: .init(
+					isFirstEntity: false,
+					canBeDismissed: true,
+					navigationButtonCTA: .goHome
+				))
+			)
 			return .none
 		}
 	}
@@ -152,9 +165,9 @@ public struct Home: Sendable, FeatureReducer {
 			}
 
 			// account details
-			state.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
+			state.destination?.accountDetails?.assets.fungibleTokenList.sections.forEach { section in
 				section.assets.forEach { row in
-					state.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
+					state.destination?.accountDetails?.assets.fungibleTokenList.sections[id: section.id]?.assets[id: row.id]?.isCurrencyAmountVisible = isVisible
 				}
 			}
 
@@ -168,14 +181,14 @@ public struct Home: Sendable, FeatureReducer {
 			}
 
 			// account details
-			if let details = state.accountDetails {
+			if let details = state.destination?.accountDetails {
 				let account = details.account
 
 				// asset list
 				let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
 				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
-				state.accountDetails?.assets = .init(
+				state.destination?.accountDetails?.assets = .init(
 					type: details.assets.type,
 					fungibleTokenList: .init(
 						sections: .init(uniqueElements: categories.map { category in
@@ -216,7 +229,7 @@ public struct Home: Sendable, FeatureReducer {
 			return loadAccountsAndSettings()
 
 		case let .accountList(.delegate(.displayAccountDetails(account))):
-			state.accountDetails = .init(for: account)
+			state.destination = .accountDetails(.init(for: account))
 			return .none
 
 		case .header(.delegate(.displaySettings)):
@@ -224,35 +237,28 @@ public struct Home: Sendable, FeatureReducer {
 				await send(.delegate(.displaySettings))
 			}
 
-		case .accountPreferences(.delegate(.dismissAccountPreferences)):
-			state.accountPreferences = nil
-			return .none
-
-		case let .accountPreferences(.delegate(.refreshAccount(address))):
+		// this whole case is just plain awful, but hopefully only temporary until we introduce account streams.
+		case let .destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.delegate(.refreshAccount(address))))))))):
 			return .run { send in
 				await send(.internal(.accountPortfolioResult(TaskResult {
 					try await accountPortfolioFetcher.fetchPortfolio([address])
 				})))
-				await send(.child(.accountPreferences(.internal(.system(.refreshAccountCompleted)))))
+				await send(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.internal(.system(.refreshAccountCompleted)))))))))))
 			}
 
-		case .accountDetails(.delegate(.dismissAccountDetails)):
-			state.accountDetails = nil
+		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
+			state.destination = nil
 			return .none
 
-		case let .accountDetails(.delegate(.displayAccountPreferences(address))):
-			state.accountPreferences = .init(address: address)
-			return .none
-
-		case let .accountDetails(.delegate(.refresh(address))):
+		case let .destination(.presented(.accountDetails(.delegate(.refresh(address))))):
 			return refreshAccount(address)
 
-		case .createAccountCoordinator(.delegate(.dismissed)):
-			state.createAccountCoordinator = nil
+		case .destination(.presented(.createAccount(.delegate(.dismissed)))):
+			state.destination = nil
 			return .none
 
-		case .createAccountCoordinator(.delegate(.completed)):
-			state.createAccountCoordinator = nil
+		case .destination(.presented(.createAccount(.delegate(.completed)))):
+			state.destination = nil
 			return loadAccountsAndSettings()
 
 		default:
