@@ -22,7 +22,7 @@ public struct FactorSource: Sendable, Hashable, Codable, Identifiable {
 	/// * "Just a private key put in my standard secure storage."
 	/// * "Mnemonic that describes a saga about a crazy horse",
 	///
-	public let hint: NonEmpty<String>
+	public private(set) var hint: NonEmptyString
 
 	/// Curve/Derivation scheme
 	public let parameters: Parameters
@@ -52,7 +52,7 @@ public struct FactorSource: Sendable, Hashable, Codable, Identifiable {
 	public init(
 		kind: FactorSourceKind,
 		id: ID,
-		hint: NonEmpty<String>,
+		hint: NonEmptyString,
 		parameters: Parameters,
 		addedOn: Date = .now,
 		lastUsedOn: Date = .now,
@@ -71,6 +71,12 @@ public struct FactorSource: Sendable, Hashable, Codable, Identifiable {
 extension FactorSource {
 	public var supportsOlympia: Bool {
 		parameters.supportsOlympia
+	}
+
+	public func changing(hint newHint: NonEmptyString) -> Self {
+		var copy = self
+		copy.hint = newHint
+		return copy
 	}
 }
 

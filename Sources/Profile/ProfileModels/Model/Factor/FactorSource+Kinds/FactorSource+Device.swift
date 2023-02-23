@@ -17,27 +17,49 @@ public extension FactorSource {
 		)
 	}
 
-	@MainActor
+	static func babylon(
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		hint: NonEmptyString = "babylon"
+	) throws -> Self {
+		try babylon(
+			mnemonic: mnemonicWithPassphrase.mnemonic,
+			bip39Passphrase: mnemonicWithPassphrase.passphrase,
+			hint: hint
+		)
+	}
+
 	static func babylon(
 		mnemonic: Mnemonic,
-		bip39Passphrase: String = ""
+		bip39Passphrase: String = "",
+		hint: NonEmptyString = "babylon"
 	) throws -> Self {
 		try .device(
 			mnemonic: mnemonic,
-			hint: Device.modelDescription(),
+			hint: hint, // will be changed by ProfileStore to device model+name
 			bip39Passphrase: bip39Passphrase,
 			olympiaCompatible: false
 		)
 	}
 
-	@MainActor
+	static func olympia(
+		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		hint: NonEmptyString = "olympia"
+	) throws -> Self {
+		try olympia(
+			mnemonic: mnemonicWithPassphrase.mnemonic,
+			bip39Passphrase: mnemonicWithPassphrase.passphrase,
+			hint: hint
+		)
+	}
+
 	static func olympia(
 		mnemonic: Mnemonic,
-		bip39Passphrase: String = ""
+		bip39Passphrase: String = "",
+		hint: NonEmptyString = "olympia"
 	) throws -> Self {
-		try .device(
+		try device(
 			mnemonic: mnemonic,
-			hint: Device.modelDescription(),
+			hint: hint, // will be changed by ProfileStore to device model+name
 			bip39Passphrase: bip39Passphrase,
 			olympiaCompatible: true
 		)

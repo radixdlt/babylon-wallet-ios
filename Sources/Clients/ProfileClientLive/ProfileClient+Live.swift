@@ -120,16 +120,15 @@ extension ProfileClient {
 
 				let bip39Passphrase = request.bip39Passphrase
 				let mnemonic = try generateMnemonic(request.wordCount, request.language)
-				let mnemonicAndPassphrase = MnemonicWithPassphrase(
+				let mnemonicWithPassphrase = MnemonicWithPassphrase(
 					mnemonic: mnemonic,
 					passphrase: bip39Passphrase
 				)
-				let onDeviceFactorSource = try await FactorSource.babylon(
-					mnemonic: mnemonic,
-					bip39Passphrase: bip39Passphrase
+				let onDeviceFactorSource = try FactorSource.babylon(
+					mnemonicWithPassphrase: mnemonicWithPassphrase
 				)
 				let privateFactorSource = try PrivateHDFactorSource(
-					mnemonicWithPassphrase: mnemonicAndPassphrase,
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
 					factorSource: onDeviceFactorSource
 				)
 
