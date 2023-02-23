@@ -41,7 +41,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case accountTapped(AccountAddress)
 		case editAccountSharingTapped
 		case disconnectPersonaTapped
-		case confirmForgetAlert(AlertActionOf<ConfirmForgetAlert>)
+		case confirmForgetAlert(PresentationAction<AlertState<ConfirmForgetAlert>, ConfirmForgetAlert>)
 
 		public enum ConfirmForgetAlert: Sendable, Equatable {
 			case confirmTapped
@@ -74,7 +74,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .disconnectPersonaTapped:
-			state.confirmForgetAlert = .confirmforget
+			state.confirmForgetAlert = .confirmForget
 			return .none
 
 		case .confirmForgetAlert(.presented(.confirmTapped)):
@@ -93,7 +93,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 }
 
 extension AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert> {
-	static var confirmforget: AlertState {
+	static var confirmForget: AlertState {
 		AlertState {
 			TextState(L10n.PersonaDetails.disconnectPersonaAlertTitle)
 		} actions: {

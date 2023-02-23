@@ -135,7 +135,10 @@ private extension DappDetails.Store {
 		scope(state: \.$presentedPersona) { .child(.presentedPersona($0)) }
 	}
 
-	var confirmDisconnectAlert: AlertStoreOf<DappDetails.ViewAction.ConfirmDisconnectAlert> {
+	var confirmDisconnectAlert: Store<PresentationState<AlertState<DappDetails.ViewAction.ConfirmDisconnectAlert>>,
+		PresentationAction<AlertState<DappDetails.ViewAction.ConfirmDisconnectAlert>,
+			DappDetails.ViewAction.ConfirmDisconnectAlert>>
+	{
 		scope(state: \.$confirmDisconnectAlert) { .view(.confirmDisconnectAlert($0)) }
 	}
 }

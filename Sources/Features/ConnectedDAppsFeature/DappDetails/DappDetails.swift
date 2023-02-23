@@ -48,7 +48,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case personaTapped(OnNetwork.Persona.ID)
 		case dismissPersonaTapped
 		case forgetThisDappTapped
-		case confirmDisconnectAlert(AlertActionOf<ConfirmDisconnectAlert>)
+		case confirmDisconnectAlert(PresentationAction<AlertState<ConfirmDisconnectAlert>, ConfirmDisconnectAlert>)
 
 		public enum ConfirmDisconnectAlert: Sendable, Equatable {
 			case confirmTapped
