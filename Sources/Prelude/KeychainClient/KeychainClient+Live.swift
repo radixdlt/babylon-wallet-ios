@@ -32,8 +32,7 @@ extension KeychainClient: DependencyKey {
 			typealias Comment = KeychainClient.Comment
 			typealias AuthenticationPrompt = KeychainClient.AuthenticationPrompt
 
-			@Sendable
-			fileprivate func setDataWithoutAuth(
+			func setDataWithoutAuth(
 				_ request: SetItemWithoutAuthRequest
 			) async throws {
 				try await Task {
@@ -44,8 +43,7 @@ extension KeychainClient: DependencyKey {
 				}.value
 			}
 
-			@Sendable
-			fileprivate func setDataWithAuthForKey(
+			func setDataWithAuthForKey(
 				_ request: SetItemWithAuthRequest
 			) async throws {
 				try await Task {
@@ -55,8 +53,7 @@ extension KeychainClient: DependencyKey {
 				}.value
 			}
 
-			@Sendable
-			fileprivate func getDataWithoutAuth(
+			func getDataWithoutAuth(
 				forKey key: Key
 			) async throws -> Data? {
 				try await Task {
@@ -64,8 +61,7 @@ extension KeychainClient: DependencyKey {
 				}.value
 			}
 
-			@Sendable
-			fileprivate func getDataWithAuthForKey(
+			func getDataWithAuthForKey(
 				forKey key: Key,
 				authPrompt: AuthenticationPrompt
 			) async throws -> Data? {
@@ -76,8 +72,7 @@ extension KeychainClient: DependencyKey {
 				}.value
 			}
 
-			@Sendable
-			fileprivate func removeData(
+			func removeData(
 				forKey key: Key
 			) async throws {
 				try await Task {
@@ -85,8 +80,7 @@ extension KeychainClient: DependencyKey {
 				}.value
 			}
 
-			@Sendable
-			fileprivate func removeAllItems() async throws {
+			func removeAllItems() async throws {
 				try await Task {
 					try keychain.removeAll()
 				}.value

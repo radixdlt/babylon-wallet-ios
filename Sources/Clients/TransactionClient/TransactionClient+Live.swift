@@ -40,15 +40,11 @@ extension TransactionClient {
 
 			let hdRoot: HD.Root
 			let factorSource: FactorSource
-			let factorSourceID: FactorSourceID
 			do {
 				factorSource = try await profileClient.getFactorSources().device
-				factorSourceID = factorSource.id
-				let loadedMnemonicWithPassphrase: MnemonicWithPassphrase
-				guard let loadedMnemonicWithPassphrase_ = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSourceID, .signTransaction) else {
+				guard let loadedMnemonicWithPassphrase = try await secureStorageClient.loadMnemonicByFactorSourceID(factorSource.id, .signTransaction) else {
 					return .failure(.failedToLoadFactorSourceForSigning)
 				}
-				loadedMnemonicWithPassphrase = loadedMnemonicWithPassphrase_
 				hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
 			} catch {
 				return .failure(.failedToLoadFactorSourceForSigning)
@@ -58,7 +54,7 @@ extension TransactionClient {
 				switch account.securityState {
 				case let .unsecured(unsecuredControl):
 					let factorInstance = unsecuredControl.genesisFactorInstance
-					guard factorInstance.factorSourceID == factorSourceID else {
+					guard factorInstance.factorSourceID == factorSource.id else {
 						assertionFailure("this should not happen")
 						throw TransactionFailure.failedToCompileOrSign(.failedToLoadFactorSourceForSigning)
 					}
