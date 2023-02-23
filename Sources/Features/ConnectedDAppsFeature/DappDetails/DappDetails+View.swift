@@ -87,6 +87,7 @@ public extension DappDetails.View {
 							}
 					}
 				}
+				.alert(store: store.confirmDisconnectAlert)
 			}
 			.onChange(of: viewStore.isDismissed) { _ in
 				dismiss()
@@ -132,6 +133,10 @@ private extension DappDetails.ViewState.Persona {
 private extension DappDetails.Store {
 	var presentedPersona: PresentationStoreOf<PersonaDetails> {
 		scope(state: \.$presentedPersona) { .child(.presentedPersona($0)) }
+	}
+
+	var confirmDisconnectAlert: AlertStoreOf<DappDetails.ViewAction.ConfirmDisconnectAlert> {
+		scope(state: \.$confirmDisconnectAlert) { .view(.confirmDisconnectAlert($0)) }
 	}
 }
 

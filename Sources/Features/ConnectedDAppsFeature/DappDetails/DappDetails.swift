@@ -25,6 +25,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 		@PresentationState
 		public var presentedPersona: PersonaDetails.State? = nil
 
+		@PresentationState
+		public var confirmDisconnectAlert: AlertState<ViewAction.ConfirmDisconnectAlert>? = nil
+
 		// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
 		public var isDismissed: Bool = false
 
@@ -45,6 +48,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case personaTapped(OnNetwork.Persona.ID)
 		case dismissPersonaTapped
 		case forgetThisDappTapped
+		case confirmDisconnectAlert(AlertActionOf<ConfirmDisconnectAlert>)
+
+		public enum ConfirmDisconnectAlert: Sendable, Equatable {
+			case confirmTapped
+			case cancelTapped
+		}
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -54,6 +63,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
 		case dAppUpdated(OnNetwork.ConnectedDappDetailed)
+		case dAppForgotten
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -68,6 +78,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 		Reduce(core)
 			.presentationDestination(\.$presentedPersona, action: /Action.child .. ChildAction.presentedPersona) {
 				PersonaDetails()
+			}
+			.presentationDestination(\.$confirmDisconnectAlert, action: /Action.view .. ViewAction.confirmDisconnectAlert) {
+				EmptyReducer()
 			}
 	}
 
@@ -114,16 +127,21 @@ public struct DappDetails: Sendable, FeatureReducer {
 			return .send(.child(.presentedPersona(.dismiss)))
 
 		case .forgetThisDappTapped:
-			// TODO: • Show confirmation alert
-			// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
-			state.isDismissed = true
+			state.confirmDisconnectAlert = .confirmDisconnect
+			return .none
+
+		case .confirmDisconnectAlert(.presented(.confirmTapped)):
 			let (dAppID, networkID) = (state.dApp.dAppDefinitionAddress, state.dApp.networkID)
 			return .run { send in
 				try await profileClient.forgetConnectedDapp(dAppID, networkID)
+				await send(.internal(.dAppForgotten))
 				await send(.delegate(.dAppForgotten))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+
+		case .confirmDisconnectAlert:
+			return .none
 		}
 	}
 
@@ -152,6 +170,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case let .dAppUpdated(dApp):
 			state.dApp = dApp
 			return .none
+		case .dAppForgotten:
+			// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
+			state.isDismissed = true
+			return .none
 		}
 	}
 }
@@ -165,5 +187,22 @@ extension GatewayAPI.EntityMetadataCollection {
 
 	subscript(key: String) -> String? {
 		items.first { $0.key == key }?.value
+	}
+}
+
+extension AlertState<DappDetails.ViewAction.ConfirmDisconnectAlert> {
+	static var confirmDisconnect: AlertState {
+		AlertState {
+			TextState("Actually disconnect?")
+		} actions: {
+			ButtonState(role: .destructive, action: .confirmTapped) {
+				TextState("Disconnect")
+			}
+			ButtonState(role: .cancel, action: .cancelTapped) {
+				TextState("Cancel")
+			}
+		} message: {
+			TextState("This will disconnnect blabla")
+		}
 	}
 }
