@@ -47,6 +47,7 @@ public extension PersonaDetails.View {
 				}
 			}
 			.navigationTitle(viewStore.personaName)
+			.alert(store: store.confirmForgetAlert)
 		}
 	}
 }
@@ -56,6 +57,12 @@ public extension PersonaDetails.View {
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
 		.init(personaName: persona.displayName.rawValue)
+	}
+}
+
+private extension PersonaDetails.Store {
+	var confirmForgetAlert: AlertStoreOf<PersonaDetails.ViewAction.ConfirmForgetAlert> {
+		scope(state: \.$confirmForgetAlert) { .view(.confirmForgetAlert($0)) }
 	}
 }
 

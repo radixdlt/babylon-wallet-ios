@@ -18,6 +18,9 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		public let networkID: NetworkID
 		public let persona: OnNetwork.AuthorizedPersonaDetailed
 
+		@PresentationState
+		public var confirmForgetAlert: AlertState<ViewAction.ConfirmForgetAlert>? = nil
+
 		public init(
 			dAppName: String,
 			dAppID: OnNetwork.ConnectedDapp.ID,
@@ -38,6 +41,12 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case accountTapped(AccountAddress)
 		case editAccountSharingTapped
 		case disconnectPersonaTapped
+		case confirmForgetAlert(AlertActionOf<ConfirmForgetAlert>)
+
+		public enum ConfirmForgetAlert: Sendable, Equatable {
+			case confirmTapped
+			case cancelTapped
+		}
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -46,16 +55,29 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	// MARK: - Reducer
 
+	public var body: some ReducerProtocolOf<Self> {
+		Reduce(core)
+			.presentationDestination(\.$confirmForgetAlert, action: /Action.view .. ViewAction.confirmForgetAlert) {
+				EmptyReducer()
+			}
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
 		switch viewAction {
 		case .editPersonaTapped:
 			return .none
+
 		case let .accountTapped(address):
 			return .none
+
 		case .editAccountSharingTapped:
 			return .none
+
 		case .disconnectPersonaTapped:
-			// TODO: • Show confirmation
+			state.confirmForgetAlert = .confirmforget
+			return .none
+
+		case .confirmForgetAlert(.presented(.confirmTapped)):
 			let (personaID, dAppID, networkID) = (state.persona.id, state.dAppID, state.networkID)
 			return .run { send in
 				try await profileClient.disconnectPersonaFromDapp(personaID, dAppID, networkID)
@@ -63,6 +85,26 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+
+		case .confirmForgetAlert:
+			return .none
+		}
+	}
+}
+
+extension AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert> {
+	static var confirmforget: AlertState {
+		AlertState {
+			TextState("Actually Forget?")
+		} actions: {
+			ButtonState(role: .destructive, action: .confirmTapped) {
+				TextState("Forget")
+			}
+			ButtonState(role: .cancel, action: .cancelTapped) {
+				TextState("Cancel")
+			}
+		} message: {
+			TextState("This will forget blabla")
 		}
 	}
 }
