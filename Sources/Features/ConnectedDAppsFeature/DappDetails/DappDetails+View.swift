@@ -47,8 +47,8 @@ extension DappDetails {
 
 // MARK: - Body
 
-public extension DappDetails.View {
-	var body: some View {
+extension DappDetails.View {
+	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {

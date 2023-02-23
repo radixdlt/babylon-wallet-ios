@@ -18,8 +18,8 @@ extension ConnectedDapps {
 
 // MARK: - Body
 
-public extension ConnectedDapps.View {
-	var body: some View {
+extension ConnectedDapps.View {
+	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
