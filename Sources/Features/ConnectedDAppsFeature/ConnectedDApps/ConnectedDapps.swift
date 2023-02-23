@@ -53,12 +53,6 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		case .appeared:
 			return .task {
 				await loadConnectedDapps()
-
-				// Option B:
-//				let result = await TaskResult {
-//					try await profileClient.getConnectedDapps()
-//				}
-//				return .internal(.loadedDapps(result))
 			}
 
 		case let .didSelectDapp(dAppID):
@@ -76,21 +70,9 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		switch childAction {
 		case .presentedDapp(.presented(.delegate(.dAppForgotten))):
 			return .run { send in
-				let action = await loadConnectedDapps()
-				if case .internal(.loadedDapps(.success)) = action {
-					await send(.child(.presentedDapp(.dismiss)))
-				}
-				await send(action)
+				await send(.child(.presentedDapp(.dismiss)))
+				await send(loadConnectedDapps())
 			}
-
-// Option B:
-//			return .run { send in
-//				let dApps = try await profileClient.getConnectedDapps()
-//				await send(.internal(.loadedDapps(.success(dApps))))
-//				await send(.child(.presentedDapp(.dismiss)))
-//			} catch: { error, _ in
-//				errorQueue.schedule(error)
-//			}
 
 		case .presentedDapp:
 			return .none
