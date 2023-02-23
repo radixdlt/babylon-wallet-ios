@@ -7,6 +7,7 @@ import PersonasFeature
 import ProfileClient
 #if DEBUG
 import ProfileView
+import SecureStorageClient
 #endif
 
 // MARK: - AppSettings.View
@@ -115,17 +116,17 @@ extension AppSettings.View {
 
 	private func settingsRows() -> [RowModel] {
 		[.init(title: L10n.Settings.desktopConnectionsButtonTitle,
-			   asset: AssetResource.desktopConnections,
-			   action: .manageP2PClientsButtonTapped),
+		       asset: AssetResource.desktopConnections,
+		       action: .manageP2PClientsButtonTapped),
 		 .init(title: L10n.Settings.gatewayButtonTitle,
-			   asset: AssetResource.gateway,
-			   action: .editGatewayAPIEndpointButtonTapped),
+		       asset: AssetResource.gateway,
+		       action: .editGatewayAPIEndpointButtonTapped),
 		 .init(title: L10n.Settings.connectedDappsButtonTitle,
-			   asset: AssetResource.connectedDapps,
-			   action: .connectedDappsButtonTapped),
+		       asset: AssetResource.connectedDapps,
+		       action: .connectedDappsButtonTapped),
 		 .init(title: L10n.Settings.personasButtonTitle,
-			   asset: AssetResource.personas,
-			   action: .personasButtonTapped)]
+		       asset: AssetResource.personas,
+		       action: .personasButtonTapped)]
 	}
 
 	private func settingsView(viewStore: ViewStore<AppSettings.ViewState, AppSettings.ViewAction>) -> some View {
@@ -190,7 +191,7 @@ extension AppSettings.View {
 							ProfileView(
 								profile: profile,
 								// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-								keychainClient: KeychainClient.liveValue
+								secureStorageClient: SecureStorageClient.liveValue
 							)
 						} else {
 							Text(L10n.Settings.noProfileText)

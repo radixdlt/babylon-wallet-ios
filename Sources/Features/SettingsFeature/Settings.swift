@@ -9,7 +9,6 @@ import ProfileClient
 // MARK: - AppSettings
 public struct AppSettings: FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 
