@@ -49,6 +49,18 @@ final class MockPeerConnectionDelegate: PeerConnectionDelegate {
 
 // MARK: - MockPeerConnection
 final class MockPeerConnection: PeerConnection {
+        func setRemoteAnswer(_ answer: RadixConnect.RTCPrimitive.Answer) async throws {
+
+        }
+
+        func createOffer() async throws -> RadixConnect.RTCPrimitive.Offer {
+                .any
+        }
+
+        func setLocalOffer(_ offer: RadixConnect.RTCPrimitive.Offer) async throws {
+                
+        }
+
 	let configuredRemoteOffer: AsyncStream<RTCPrimitive.Offer>
 	let configuredLocalAnswer: AsyncStream<RTCPrimitive.Answer>
 	let configuredICECandidate: AsyncStream<RTCPrimitive.ICECandidate>

@@ -35,23 +35,23 @@ public struct RTCOutgoingMessage: Sendable {
 
 /// Meant to hold all of the created RTCClients
 public actor RTCClients {
-        public let onIncommingMessage: AsyncStream<RTCIncommingMessage>
+        lazy var incommingMessages: AnyAsyncSequence<RTCIncommingMessage> = onIncommingMessage.eraseToAnyAsyncSequence().share().eraseToAnyAsyncSequence()
 
-	private var clients: [RTCClient] = []
+        private let onIncommingMessage: AsyncStream<RTCIncommingMessage>
+
+        private(set) var clients: [RTCClient] = []
 	private let onIncommingMessageContinuation: AsyncStream<RTCIncommingMessage>.Continuation!
 	private let peerConnectionFactory: PeerConnectionFactory
+        private let signalingServerBaseURL: URL
 
-        init(peerConnectionFactory: PeerConnectionFactory) {
+        init(peerConnectionFactory: PeerConnectionFactory = WebRTCFactory(), signalingServerBaseURL: URL = .prodSignalingServer) {
 		(onIncommingMessage, onIncommingMessageContinuation) = AsyncStream<RTCIncommingMessage>.streamWithContinuation()
 		self.peerConnectionFactory = peerConnectionFactory
+                self.signalingServerBaseURL = signalingServerBaseURL
 	}
 
 	public func add(_ connectionId: SignalingServerConnectionID) async throws {
-                let connectionURL = try signalingServerURL(connectionID: connectionId, source: .wallet)
-		let webSocket = AsyncWebSocket(url: connectionURL)
-                let encryptionKey = try EncryptionKey(.init(data: connectionId.data.data))
-
-		let signalingClient = SignalingClient(encryptionKey: encryptionKey, webSocketClient: webSocket, connectionID: connectionId)
+                let signalingClient = try SignalingClient(connectionId: connectionId, source: .wallet, baseURL: signalingServerBaseURL)
 		let builder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
 		let client = RTCClient(id: connectionId, peerConnectionBuilder: builder)
                 await client.listenForPeerConnections()
@@ -75,13 +75,23 @@ public actor RTCClients {
         }
 }
 
+extension SignalingClient {
+        init(connectionId: SignalingServerConnectionID, source: ClientSource, baseURL: URL) throws {
+                let connectionURL = try signalingServerURL(connectionID: connectionId, source: source, baseURL: baseURL)
+                let webSocket = AsyncWebSocket(url: connectionURL)
+                let encryptionKey = try EncryptionKey(.init(data: connectionId.data.data))
+
+                self.init(encryptionKey: encryptionKey, webSocketClient: webSocket, connectionID: connectionId, clientSource: source)
+        }
+}
+
 // MARK: - RTCClient
 
 /// Meant to hold all of the peerConnections for the given SignalingServerConnectionID
 actor RTCClient {
 	let id: SignalingServerConnectionID
 	private let peerConnectionBuilder: PeerConnectionBuilder
-	private var peerConnections: [PeerConnectionClient] = []
+	private(set) var peerConnections: [PeerConnectionClient] = []
 
         let onIncommingMessage: AsyncStream<RTCIncommingMessage.PeerConnectionMessage>
         private let onIncommingMessageContinuation: AsyncStream<RTCIncommingMessage.PeerConnectionMessage>.Continuation!
@@ -126,7 +136,8 @@ actor RTCClient {
 }
 
 public extension URL {
-	static let defaultBaseForSignalingServer = Self(string: "wss://signaling-server-betanet.radixdlt.com")!
+	static let prodSignalingServer = Self(string: "wss://signaling-server-betanet.radixdlt.com")!
+        static let devSignalingServer = Self(string: "wss://signaling-server-dev.rdx-works-main.extratools.works")!
 }
 
 // MARK: - FailedToCreateSignalingServerURL
@@ -143,11 +154,12 @@ enum QueryParameterName: String {
 
 func signalingServerURL(
 	connectionID: SignalingServerConnectionID,
-	source: ClientSource = .wallet
+	source: ClientSource = .wallet,
+        baseURL: URL = .prodSignalingServer
 ) throws -> URL {
 	let target: ClientSource = source == .wallet ? .extension : .wallet
 
-	let url = URL.defaultBaseForSignalingServer.appendingPathComponent(
+	let url = baseURL.appendingPathComponent(
 		connectionID.hex
 	)
 

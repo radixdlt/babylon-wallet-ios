@@ -99,7 +99,12 @@ struct SignalingClient {
 	}
 
         public func sendToRemote(_ primitive: IdentifiedPrimitive<RTCPrimitive>) async throws {
-                let message = ClientMessage(requestId: idBuilder(), targetClientId: primitive.id, primitive: primitive.content)
+                let message = ClientMessage(
+                        requestId: idBuilder(),
+                        targetClientId: primitive.id,
+                        primitive: primitive.content,
+                        connectionId: connectionID,
+                        source: clientSource)
                 let encodedMessage = try jsonEncoder.encode(message)
                 try await webSocketClient.send(message: encodedMessage)
                 try await waitForRequestAck(message.requestId)

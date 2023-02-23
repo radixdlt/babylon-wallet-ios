@@ -4,8 +4,14 @@ protocol PeerConnection: Sendable {
 
 	func setRemoteOffer(_ offer: RTCPrimitive.Offer) async throws
 
+        func setRemoteAnswer(_ answer: RTCPrimitive.Answer) async throws
+
 	/// Generate an SDP answer.
 	func createLocalAnswer() async throws -> RTCPrimitive.Answer
+
+        func createOffer() async throws -> RTCPrimitive.Offer
+
+        func setLocalOffer(_ offer: RTCPrimitive.Offer) async throws
 
 	/// Provide a remote candidate to the ICE Agent.
 	func addRemoteICECandidate(_ candidate: RTCPrimitive.ICECandidate) async throws

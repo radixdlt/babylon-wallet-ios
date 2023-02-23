@@ -23,11 +23,21 @@ public struct PeerConnectionClient: Sendable {
 		try await peerConnection.setRemoteOffer(answer)
 	}
 
+        func onRemoteAnswer(_ answer: RTCPrimitive.Answer) async throws {
+                try await peerConnection.setRemoteAnswer(answer)
+        }
+
 	func createAnswer() async throws -> RTCPrimitive.Answer {
 		let answer = try await peerConnection.createLocalAnswer()
 		try await peerConnection.setLocalAnswer(answer)
 		return answer
 	}
+
+        func createOffer() async throws -> RTCPrimitive.Offer {
+                let offer = try await peerConnection.createOffer()
+                try await peerConnection.setLocalOffer(offer)
+                return offer
+        }
 
 	func onRemoteICECandidate(_ candidate: RTCPrimitive.ICECandidate) async throws {
 		try await peerConnection.addRemoteICECandidate(candidate)

@@ -39,11 +39,15 @@ struct ClientMessage: Sendable, Equatable {
         let requestId: RequestID
         let targetClientId: ClientID
         let primitive: RTCPrimitive
+
+        // To be removed, redundant
+        let connectionId: SignalingServerConnectionID
+        let source: ClientSource
 }
 
 extension ClientMessage: Decodable {
         enum CodingKeys: String, CodingKey {
-                case requestId, method, targetClientId, encryptedPayload
+                case requestId, method, targetClientId, encryptedPayload, connectionId, source
         }
 
         init(from decoder: Decoder) throws {
@@ -65,6 +69,9 @@ extension ClientMessage: Decodable {
                 case .iceCandidate:
                         self.primitive = .iceCandidate(try JSONDecoder().decode(RTCPrimitive.ICECandidate.self, from: decryptedPyload))
                 }
+
+                self.connectionId = try container.decode(SignalingServerConnectionID.self, forKey: .connectionId)
+                self.source = try container.decode(ClientSource.self, forKey: .source)
         }
 }
 
@@ -88,8 +95,10 @@ extension ClientMessage: Encodable {
                         try container.encode(Method.answer, forKey: .method)
                 case .iceCandidate:
                         try container.encode(Method.iceCandidate, forKey: .method)
-
                 }
+
+                try container.encode(connectionId, forKey: .connectionId)
+                try container.encode(source, forKey: .source)
         }
 }
 
