@@ -13,6 +13,7 @@ extension PersonaDetails {
 	}
 
 	struct ViewState: Equatable {
+		let url: URL
 		let personaName: String
 	}
 }
@@ -24,7 +25,7 @@ public extension PersonaDetails.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: 0) {
-					PersonaThumbnail(.placeholder, size: .veryLarge)
+					PersonaThumbnail(viewStore.url, size: .veryLarge)
 						.padding(.vertical, .large2)
 
 					InfoSection(store: store.actionless)
@@ -56,7 +57,7 @@ public extension PersonaDetails.View {
 
 private extension PersonaDetails.State {
 	var viewState: PersonaDetails.ViewState {
-		.init(personaName: persona.displayName.rawValue)
+		.init(url: .init(string: "placeholder")!, personaName: persona.displayName.rawValue)
 	}
 }
 

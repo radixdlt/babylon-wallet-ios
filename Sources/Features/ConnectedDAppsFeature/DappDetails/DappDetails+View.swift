@@ -125,7 +125,7 @@ private extension DappDetails.ViewState.Persona {
 		self.init(
 			id: persona.id,
 			name: persona.displayName.rawValue,
-			thumbnail: .placeholder
+			thumbnail: URL(string: "placeholder")!
 		)
 	}
 }
