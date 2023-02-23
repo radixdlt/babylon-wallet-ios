@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - NewConnection.State
 extension NewConnection {
-	public enum State: Equatable {
+	public enum State: Sendable, Hashable {
 		case localNetworkPermission(LocalNetworkPermission.State)
 		case cameraPermission(CameraPermission.State)
 		case scanQR(ScanQR.State)

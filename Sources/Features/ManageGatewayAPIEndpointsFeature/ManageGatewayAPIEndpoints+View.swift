@@ -24,7 +24,6 @@ extension ManageGatewayAPIEndpoints.View {
 			ForceFullScreen {
 				ZStack {
 					core(viewStore: viewStore)
-						.zIndex(0)
 
 					IfLetStore(
 						store.scope(
@@ -33,7 +32,6 @@ extension ManageGatewayAPIEndpoints.View {
 						),
 						then: { CreateAccountCoordinator.View(store: $0) }
 					)
-					.zIndex(1)
 				}
 			}
 		}
@@ -48,69 +46,52 @@ extension ManageGatewayAPIEndpoints.View {
 extension ManageGatewayAPIEndpoints.View {
 	@ViewBuilder
 	fileprivate func core(viewStore: ViewStore) -> some View {
-		ForceFullScreen {
-			VStack(spacing: .zero) {
-				NavigationBar(
-					titleText: L10n.ManageGateway.title,
-					leadingItem: BackButton {
-						viewStore.send(.dismissButtonTapped)
-					}
-				)
-				.foregroundColor(.app.gray1)
-				.padding([.horizontal, .top], .medium3)
+		ScrollView {
+			Text(L10n.ManageP2PClients.p2PConnectionsSubtitle)
+				.foregroundColor(.app.gray2)
+				.textStyle(.body1HighImportance)
+				.flushedLeft
+				.padding(.medium3)
 
-				Separator()
+			Separator()
 
-				ScrollView {
-					HStack {
-						Text(L10n.ManageP2PClients.p2PConnectionsSubtitle)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body1HighImportance)
-							.padding(.medium3)
-
-						Spacer()
-					}
-
-					Separator()
-
-					VStack(alignment: .leading) {
-						if let networkAndGateway = viewStore.networkAndGateway {
-							networkAndGatewayView(networkAndGateway)
-						}
-
-						Spacer(minLength: .large1 * 2)
-
-						AppTextField(
-							placeholder: L10n.ManageGateway.textFieldPlaceholder,
-							text: viewStore.binding(
-								get: \.urlString,
-								send: { .urlStringChanged($0) }
-							),
-							hint: L10n.ManageGateway.textFieldHint,
-							binding: $focusedField,
-							equals: .gatewayURL,
-							first: viewStore.binding(
-								get: \.focusedField,
-								send: { .focusTextField($0) }
-							)
-						)
-						.autocorrectionDisabled()
-						#if os(iOS)
-							.textInputAutocapitalization(.never)
-							.keyboardType(.URL)
-						#endif // iOS
-
-						Spacer(minLength: .large1 * 2)
-
-						Button(L10n.ManageGateway.switchToButtonTitle) {
-							viewStore.send(.switchToButtonTapped)
-						}
-						.buttonStyle(.primaryRectangular)
-						.controlState(viewStore.controlState)
-					}
-					.padding(.medium3)
+			VStack(alignment: .leading) {
+				if let networkAndGateway = viewStore.networkAndGateway {
+					networkAndGatewayView(networkAndGateway)
 				}
+
+				Spacer(minLength: .large1 * 2)
+
+				AppTextField(
+					placeholder: L10n.ManageGateway.textFieldPlaceholder,
+					text: viewStore.binding(
+						get: \.urlString,
+						send: { .urlStringChanged($0) }
+					),
+					hint: L10n.ManageGateway.textFieldHint,
+					binding: $focusedField,
+					equals: .gatewayURL,
+					first: viewStore.binding(
+						get: \.focusedField,
+						send: { .focusTextField($0) }
+					)
+				)
+				.autocorrectionDisabled()
+				#if os(iOS)
+					.textInputAutocapitalization(.never)
+					.keyboardType(.URL)
+				#endif // iOS
+
+				Spacer(minLength: .large1 * 2)
+
+				Button(L10n.ManageGateway.switchToButtonTitle) {
+					viewStore.send(.switchToButtonTapped)
+				}
+				.buttonStyle(.primaryRectangular)
+				.controlState(viewStore.controlState)
 			}
+			.padding(.medium3)
+			.navigationTitle(L10n.ManageGateway.title)
 			.onAppear {
 				viewStore.send(.didAppear)
 			}
@@ -164,7 +145,7 @@ extension ManageGatewayAPIEndpoints.View {
 		public var urlString: String
 		public var networkAndGateway: AppPreferences.NetworkAndGateway?
 		public var controlState: ControlState
-		@BindableState public var focusedField: ManageGatewayAPIEndpoints.State.Field?
+		@BindingState public var focusedField: ManageGatewayAPIEndpoints.State.Field?
 
 		init(state: ManageGatewayAPIEndpoints.State) {
 			urlString = state.urlString

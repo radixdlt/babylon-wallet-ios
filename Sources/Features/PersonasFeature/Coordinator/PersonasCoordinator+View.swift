@@ -20,25 +20,22 @@ extension PersonasCoordinator.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			ForceFullScreen {
-				ZStack {
-					PersonaList.View(
-						store: store.scope(
-							state: \.personaList,
-							action: { .child(.personaList($0)) }
-						)
+			ZStack {
+				PersonaList.View(
+					store: store.scope(
+						state: \.personaList,
+						action: { .child(.personaList($0)) }
 					)
-					.onAppear { viewStore.send(.appeared) }
+				)
+				.onAppear { viewStore.send(.appeared) }
 
-					IfLetStore(
-						store.scope(
-							state: \.createPersonaCoordinator,
-							action: { .child(.createPersonaCoordinator($0)) }
-						),
-						then: { CreatePersonaCoordinator.View(store: $0) }
-					)
-					.zIndex(1)
-				}
+				IfLetStore(
+					store.scope(
+						state: \.createPersonaCoordinator,
+						action: { .child(.createPersonaCoordinator($0)) }
+					),
+					then: { CreatePersonaCoordinator.View(store: $0) }
+				)
 			}
 		}
 	}

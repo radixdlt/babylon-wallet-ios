@@ -3,7 +3,7 @@ import FeaturePrelude
 
 // MARK: - ManageGatewayAPIEndpoints.State
 extension ManageGatewayAPIEndpoints {
-	public struct State: Equatable {
+	public struct State: Sendable, Hashable {
 		public var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		public var urlString: String
@@ -12,7 +12,7 @@ extension ManageGatewayAPIEndpoints {
 		public var isSwitchToButtonEnabled: Bool
 
 		public var validatedNewNetworkAndGatewayToSwitchTo: AppPreferences.NetworkAndGateway?
-		@BindableState public var focusedField: Field?
+		@BindingState public var focusedField: Field?
 
 		public init(
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil,

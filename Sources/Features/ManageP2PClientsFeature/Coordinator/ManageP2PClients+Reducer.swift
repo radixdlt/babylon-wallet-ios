@@ -52,12 +52,12 @@ extension ManageP2PClients {
 			guard !clientIDs.isEmpty else {
 				return .none
 			}
-			return .run { send in
-				await send(.internal(.system(.loadClientsByIDsResult(
-					TaskResult {
-						try await p2pConnectivityClient.getP2PClientsByIDs(clientIDs)
-					}
-				))))
+			return .task {
+				let result = await TaskResult {
+					try await p2pConnectivityClient.getP2PClientsByIDs(clientIDs)
+				}
+
+				return .internal(.system(.loadClientsByIDsResult(result)))
 			}
 
 		case let .internal(.system(.loadClientIDsResult(.failure(error)))):
@@ -65,7 +65,6 @@ extension ManageP2PClients {
 			return .none
 
 		case let .internal(.system(.loadClientsByIDsResult(.success(clientsFromProfile)))):
-
 			state.clients = .init(
 				uniqueElements: clientsFromProfile.map { ManageP2PClient.State(client: $0) }
 			)
@@ -86,31 +85,25 @@ extension ManageP2PClients {
 			)
 			return .none
 
-		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismiss))
-			}
 		#if DEBUG
 		case let .child(.connection(id, .delegate(.sendTestMessage))):
-			return .run { send in
-				await send(.internal(.system(.sendTestMessageResult(
-					TaskResult {
-						let msg = "Test"
-						try await self.p2pConnectivityClient._sendTestMessage(id, msg)
-						return msg
-					}
-				))))
+			return .task {
+				let result = await TaskResult {
+					let msg = "Test"
+					try await self.p2pConnectivityClient._sendTestMessage(id, msg)
+					return msg
+				}
+				return .internal(.system(.sendTestMessageResult(result)))
 			}
 		#endif
 
 		case let .child(.connection(id, .delegate(.deleteConnection))):
-			return .run { send in
-				await send(.internal(.system(.deleteConnectionResult(
-					TaskResult {
-						try await p2pConnectivityClient.deleteP2PClientByID(id)
-						return id
-					}
-				))))
+			return .task {
+				let result = await TaskResult {
+					try await p2pConnectivityClient.deleteP2PClientByID(id)
+					return id
+				}
+				return .internal(.system(.deleteConnectionResult(result)))
 			}
 
 		case let .internal(.system(.deleteConnectionResult(.success(deletedID)))):
@@ -134,21 +127,22 @@ extension ManageP2PClients {
 
 		case let .child(.newConnection(.delegate(.newConnection(connectedClient)))):
 			state.newConnection = nil
-			return .run { send in
-				await send(.internal(.system(.saveNewConnectionResult(
-					TaskResult {
-						try await p2pConnectivityClient.addP2PClientWithConnection(
-							connectedClient.p2pClient
-						)
-					}.map { connectedClient }
-				))))
+			return .task {
+				let result = await TaskResult {
+					try await p2pConnectivityClient.addP2PClientWithConnection(
+						connectedClient.p2pClient
+					)
+				}
+				.map { connectedClient }
+
+				return .internal(.system(.saveNewConnectionResult(result)))
 			}
 
 		case .child(.newConnection(.delegate(.dismiss))):
 			state.newConnection = nil
 			return .none
 
-		case .child, .delegate:
+		case .child:
 			return .none
 		}
 	}

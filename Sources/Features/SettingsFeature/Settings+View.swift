@@ -14,55 +14,62 @@ import SecureStorageClient
 extension AppSettings {
 	@MainActor
 	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.StoreOf<AppSettings>
 		private let store: Store
 
-		public init(
-			store: Store
-		) {
+		public init(store: Store) {
 			self.store = store
+		}
+	}
+
+	struct ViewState: Equatable {
+		#if DEBUG
+		let isDebugProfileViewSheetPresented: Bool
+		let profileToInspect: Profile?
+		#endif
+		let canAddP2PClient: Bool
+		let appVersion: String
+
+		init(state: AppSettings.State) {
+			#if DEBUG
+			self.isDebugProfileViewSheetPresented = state.profileToInspect != nil
+			self.profileToInspect = state.profileToInspect
+			#endif
+			self.canAddP2PClient = state.canAddP2PClient
+			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
+			self.appVersion = L10n.Settings.versionInfo(bundleInfo.shortVersion, bundleInfo.version)
 		}
 	}
 }
 
 extension AppSettings.View {
 	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			NavigationStack {
-				ZStack {
-					settingsView(viewStore: viewStore)
-
-					IfLetStore(
-						store.scope(
-							state: \.manageP2PClients,
-							action: { .child(.manageP2PClients($0)) }
-						),
-						then: { ManageP2PClients.View(store: $0) }
-					)
-
-					IfLetStore(
-						store.scope(
-							state: \.manageGatewayAPIEndpoints,
-							action: { .child(.manageGatewayAPIEndpoints($0)) }
-						),
-						then: { ManageGatewayAPIEndpoints.View(store: $0) }
-					)
-
-					IfLetStore(
-						store.scope(
-							state: \.personasCoordinator,
-							action: { .child(.personasCoordinator($0)) }
-						),
-						then: { PersonasCoordinator.View(store: $0) }
-					)
-				}
-				.navigationDestination(store: store.connectedDapps) { store in
-					ConnectedDapps.View(store: store)
-				}
+				settingsView(viewStore: viewStore)
+					.navigationBarTitleDisplayMode(.inline)
+					.toolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							BackButton {
+								viewStore.send(.dismissSettingsButtonTapped)
+							}
+						}
+						ToolbarItem(placement: .principal) {
+							Text(L10n.Settings.title)
+						}
+					}
+					.navigationTitle(L10n.Settings.title)
+					.navigationDestination(store: store.manageP2PClients) { store in
+						ManageP2PClients.View(store: store)
+					}
+					.navigationDestination(store: store.manageGatewayAPIEndpoints) { store in
+						ManageGatewayAPIEndpoints.View(store: store)
+					}
+					.navigationDestination(store: store.connectedDapps) { store in
+						ConnectedDapps.View(store: store)
+					}
+					.navigationDestination(store: store.personasCoordinator) { store in
+						PersonasCoordinator.View(store: store)
+					}
 			}
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
@@ -71,141 +78,127 @@ extension AppSettings.View {
 	}
 }
 
-extension StoreOf<AppSettings> {
+// MARK: - Extensions
+
+extension AppSettings.State {
+	var viewState: AppSettings.ViewState {
+		.init(state: self)
+	}
+}
+
+private extension AppSettings.Store {
+	var manageP2PClients: PresentationStoreOf<ManageP2PClients> {
+		scope(state: \.$manageP2PClients) { .child(.manageP2PClients($0)) }
+	}
+
+	var manageGatewayAPIEndpoints: PresentationStoreOf<ManageGatewayAPIEndpoints> {
+		scope(state: \.$manageGatewayAPIEndpoints) { .child(.manageGatewayAPIEndpoints($0)) }
+	}
+
 	var connectedDapps: PresentationStoreOf<ConnectedDapps> {
 		scope(state: \.$connectedDapps) { .child(.connectedDapps($0)) }
 	}
-}
 
-extension AppSettings.View {
-	fileprivate func settingsView(viewStore: ViewStore<ViewState, AppSettings.Action.ViewAction>) -> some View {
-		ForceFullScreen {
-			VStack {
-				NavigationBar(
-					titleText: L10n.Settings.title,
-					leadingItem: BackButton {
-						viewStore.send(.dismissSettingsButtonTapped)
-					}
-				)
-				.foregroundColor(.app.gray1)
-				.padding([.horizontal, .top], .medium3)
-
-				ScrollView {
-					VStack(spacing: .zero) {
-						if viewStore.canAddP2PClient {
-							ConnectExtensionView {
-								viewStore.send(.addP2PClientButtonTapped)
-							}
-							Spacer()
-								.frame(height: .medium3)
-						}
-
-						#if DEBUG
-						Row(
-							L10n.Settings.inspectProfileButtonTitle,
-							icon: Image(systemName: "wallet.pass")
-						) {
-							viewStore.send(.debugInspectProfileButtonTapped)
-						}
-						#endif
-
-						Row(
-							L10n.Settings.desktopConnectionsButtonTitle,
-							icon: Image(asset: AssetResource.desktopConnections)
-						) {
-							viewStore.send(.manageP2PClientsButtonTapped)
-						}
-
-						Row(
-							L10n.Settings.gatewayButtonTitle,
-							icon: Image(asset: AssetResource.gateway)
-						) {
-							viewStore.send(.editGatewayAPIEndpointButtonTapped)
-						}
-
-						Row(
-							L10n.Settings.connectedDappsButtonTitle,
-							icon: Image(asset: AssetResource.connectedDapps)
-						) {
-							viewStore.send(.connectedDappsButtonTapped)
-						}
-
-						Row(
-							L10n.Settings.personasButtonTitle,
-							icon: Image(asset: AssetResource.personas)
-						) {
-							viewStore.send(.personasButtonTapped)
-						}
-					}
-					VStack(spacing: .zero) {
-						Spacer()
-							.frame(height: .large3)
-
-						Button(L10n.Settings.deleteAllButtonTitle) {
-							viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
-						}
-						.buttonStyle(.secondaryRectangular(isDestructive: true))
-
-						Spacer()
-							.frame(height: .large1)
-
-						Text(viewStore.appVersion)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body2Regular)
-
-						Spacer()
-							.frame(height: .medium1)
-					}
-				}
-				.onAppear {
-					viewStore.send(.didAppear)
-				}
-				#if DEBUG
-					.sheet(
-						isPresented: viewStore.binding(
-							get: \.isDebugProfileViewSheetPresented,
-							send: { .setDebugProfileSheet(isPresented: $0) }
-						)
-					) {
-						VStack {
-							Button(L10n.Settings.closeButtonTitle) {
-								viewStore.send(.setDebugProfileSheet(isPresented: false))
-							}
-							if let profile = viewStore.profileToInspect {
-								ProfileView(
-									profile: profile,
-									// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-									secureStorageClient: SecureStorageClient.liveValue
-								)
-							} else {
-								Text(L10n.Settings.noProfileText)
-							}
-						}
-					}
-				#endif
-			}
-		}
+	var personasCoordinator: PresentationStoreOf<PersonasCoordinator> {
+		scope(state: \.$personasCoordinator) { .child(.personasCoordinator($0)) }
 	}
 }
 
-// MARK: - AppSettings.View.ViewState
-extension AppSettings.View {
-	public struct ViewState: Equatable {
-		#if DEBUG
-		public let isDebugProfileViewSheetPresented: Bool
-		public let profileToInspect: Profile?
-		#endif
-		public let canAddP2PClient: Bool
-		public let appVersion: String
+// MARK: - SettingsRowModel
 
-		public init(state: AppSettings.State) {
+extension AppSettings.View {
+	struct RowModel: Identifiable {
+		var id: String { title }
+		let title: String
+		let asset: ImageAsset
+		let action: AppSettings.ViewAction
+	}
+
+	private func settingsRows() -> [RowModel] {
+		[.init(title: L10n.Settings.desktopConnectionsButtonTitle,
+		       asset: AssetResource.desktopConnections,
+		       action: .manageP2PClientsButtonTapped),
+		 .init(title: L10n.Settings.gatewayButtonTitle,
+		       asset: AssetResource.gateway,
+		       action: .editGatewayAPIEndpointButtonTapped),
+		 .init(title: L10n.Settings.connectedDappsButtonTitle,
+		       asset: AssetResource.connectedDapps,
+		       action: .connectedDappsButtonTapped),
+		 .init(title: L10n.Settings.personasButtonTitle,
+		       asset: AssetResource.personas,
+		       action: .personasButtonTapped)]
+	}
+
+	private func settingsView(viewStore: ViewStore<AppSettings.ViewState, AppSettings.ViewAction>) -> some View {
+		VStack(spacing: 0) {
+			ScrollView {
+				VStack(spacing: .zero) {
+					if viewStore.canAddP2PClient {
+						ConnectExtensionView {
+							viewStore.send(.addP2PClientButtonTapped)
+						}
+						.padding(.medium3)
+					}
+
+					#if DEBUG
+					PlainListRow(title: L10n.Settings.inspectProfileButtonTitle) {
+						viewStore.send(.debugInspectProfileButtonTapped)
+					} icon: {
+						Image(systemName: "wallet.pass")
+							.frame(.verySmall)
+					}
+					.withSeparator
+					.buttonStyle(.settingsRowStyle)
+					#endif
+
+					ForEach(settingsRows()) { row in
+						PlainListRow(title: row.title, asset: row.asset) {
+							viewStore.send(row.action)
+						}
+						.withSeparator
+						.buttonStyle(.settingsRowStyle)
+					}
+				}
+				.padding(.bottom, .large3)
+				VStack(spacing: .zero) {
+					Button(L10n.Settings.deleteAllButtonTitle) {
+						viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)
+					}
+					.buttonStyle(.secondaryRectangular(isDestructive: true))
+					.padding(.bottom, .large1)
+
+					Text(viewStore.appVersion)
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+						.padding(.bottom, .medium1)
+				}
+			}
+			.onAppear {
+				viewStore.send(.didAppear)
+			}
 			#if DEBUG
-			isDebugProfileViewSheetPresented = state.profileToInspect != nil
-			profileToInspect = state.profileToInspect
+				.sheet(
+					isPresented: viewStore.binding(
+						get: \.isDebugProfileViewSheetPresented,
+						send: { .setDebugProfileSheet(isPresented: $0) }
+					)
+				) {
+					VStack {
+						Button(L10n.Settings.closeButtonTitle) {
+							viewStore.send(.setDebugProfileSheet(isPresented: false))
+						}
+						if let profile = viewStore.profileToInspect {
+							ProfileView(
+								profile: profile,
+								// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
+								secureStorageClient: SecureStorageClient.liveValue
+							)
+						} else {
+							Text(L10n.Settings.noProfileText)
+						}
+					}
+				}
 			#endif
-			canAddP2PClient = state.canAddP2PClient
-			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
-			appVersion = L10n.Settings.versionInfo(bundleInfo.shortVersion, bundleInfo.version)
 		}
 	}
 }

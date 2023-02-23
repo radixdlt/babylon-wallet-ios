@@ -23,12 +23,11 @@ extension ManageGatewayAPIEndpoints {
 	public func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.didAppear)):
-			return .run { send in
-				await send(.internal(.system(.loadNetworkAndGatewayResult(
-					TaskResult {
-						await networkSwitchingClient.getNetworkAndGateway()
-					}
-				))))
+			return .task {
+				let result = await TaskResult {
+					await networkSwitchingClient.getNetworkAndGateway()
+				}
+				return .internal(.system(.loadNetworkAndGatewayResult(result)))
 			}
 
 		case let .internal(.system(.loadNetworkAndGatewayResult(.success(currentNetworkAndGateway)))):
@@ -43,11 +42,6 @@ extension ManageGatewayAPIEndpoints {
 			errorQueue.schedule(error)
 			return .none
 
-		case .internal(.view(.dismissButtonTapped)):
-			return .run { send in
-				await send(.delegate(.dismiss))
-			}
-
 		case let .internal(.view(.urlStringChanged(urlString))):
 			state.urlString = urlString
 			let maybeURL = URL(string: urlString)
@@ -60,12 +54,11 @@ extension ManageGatewayAPIEndpoints {
 				return .none
 			}
 			state.isValidatingEndpoint = true
-			return .run { send in
-				await send(.internal(.system(.gatewayValidationResult(
-					TaskResult {
-						try await networkSwitchingClient.validateGatewayURL(url)
-					}
-				))))
+			return .task {
+				let result = await TaskResult {
+					try await networkSwitchingClient.validateGatewayURL(url)
+				}
+				return .internal(.system(.gatewayValidationResult(result)))
 			}
 
 		case let .internal(.view(.focusTextField(focus))):
@@ -83,27 +76,25 @@ extension ManageGatewayAPIEndpoints {
 				return .none
 			}
 			state.validatedNewNetworkAndGatewayToSwitchTo = new
-			return .run { send in
-				await send(.internal(.system(.hasAccountsResult(
-					TaskResult {
-						try await networkSwitchingClient.hasAccountOnNetwork(new)
-					}
-				))))
+			return .task {
+				let result = await TaskResult {
+					try await networkSwitchingClient.hasAccountOnNetwork(new)
+				}
+				return .internal(.system(.hasAccountsResult(result)))
 			}
 		case let .internal(.system(.hasAccountsResult(.success(hasAccountsOnNetwork)))):
 			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
 				// weird state... should not happen.
 				return .none
 			}
-			return .run { send in
+			return .task {
 				if hasAccountsOnNetwork {
-					await send(.internal(.system(.switchToResult(
-						TaskResult {
-							try await networkSwitchingClient.switchTo(new)
-						}
-					))))
+					let result = await TaskResult {
+						try await networkSwitchingClient.switchTo(new)
+					}
+					return .internal(.system(.switchToResult(result)))
 				} else {
-					await send(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(new))))
+					return .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(new)))
 				}
 			}
 
@@ -112,7 +103,6 @@ extension ManageGatewayAPIEndpoints {
 			return skipSwitching(state: &state)
 
 		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway))):
-
 			state.createAccountCoordinator = .init(config: .init(
 				specificNetworkID: newNetworkAndGateway.network.id,
 				isFirstEntity: false,
@@ -127,9 +117,7 @@ extension ManageGatewayAPIEndpoints {
 			return .none
 
 		case .internal(.system(.switchToResult(.success))):
-			return .run { send in
-				await send(.delegate(.networkChanged))
-			}
+			return .send(.delegate(.networkChanged))
 
 		case .createAccountCoordinator(.delegate(.dismissed)):
 			return skipSwitching(state: &state)
@@ -140,12 +128,11 @@ extension ManageGatewayAPIEndpoints {
 				// weird state... should not happen.
 				return .none
 			}
-			return .run { send in
-				await send(.internal(.system(.switchToResult(
-					TaskResult {
-						try await networkSwitchingClient.switchTo(new)
-					}
-				))))
+			return .task {
+				let result = await TaskResult {
+					try await networkSwitchingClient.switchTo(new)
+				}
+				return .internal(.system(.switchToResult(result)))
 			}
 
 		case .createAccountCoordinator, .delegate:
