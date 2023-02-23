@@ -34,12 +34,13 @@ public struct AppSettings: FeatureReducer {
 		public var profileToInspect: Profile?
 		#endif
 
-		public init(manageP2PClients: ManageP2PClients.State? = nil,
-		            connectedDapps: ConnectedDapps.State? = nil,
-		            manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State? = nil,
-		            personasCoordinator: PersonasCoordinator.State? = nil,
-		            canAddP2PClient: Bool = false)
-		{
+		public init(
+			manageP2PClients: ManageP2PClients.State? = nil,
+			connectedDapps: ConnectedDapps.State? = nil,
+			manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State? = nil,
+			personasCoordinator: PersonasCoordinator.State? = nil,
+			canAddP2PClient: Bool = false
+		) {
 			self.manageP2PClients = manageP2PClients
 			self.connectedDapps = connectedDapps
 			self.manageGatewayAPIEndpoints = manageGatewayAPIEndpoints
