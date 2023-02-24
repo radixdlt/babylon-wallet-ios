@@ -2,13 +2,13 @@ import Cryptography
 import Prelude
 import ProfileModels
 
-// MARK: - OnboardingWallet
-public struct OnboardingWallet: Sendable, Hashable {
+// MARK: - EphemeralPrivateProfile
+public struct EphemeralPrivateProfile: Sendable, Hashable {
 	/// A `device` FactorSource and its Mnemonic and passphrase unencrypted.
-	public let privateFactorSource: PrivateHDFactorSource
+	public private(set) var privateFactorSource: PrivateHDFactorSource
 
 	/// A new `Profile` containing the `device` `FactorSource` of `privateFactorSource`
-	public let profile: Profile
+	public private(set) var profile: Profile
 
 	public init(
 		privateFactorSource: PrivateHDFactorSource,
@@ -17,5 +17,13 @@ public struct OnboardingWallet: Sendable, Hashable {
 		precondition(profile.factorSources.contains(privateFactorSource.factorSource), "Discrepancy.")
 		self.privateFactorSource = privateFactorSource
 		self.profile = profile
+	}
+
+	public mutating func update(deviceDescription: NonEmptyString) {
+		profile.creatingDevice = deviceDescription
+		privateFactorSource.factorSource.hint = deviceDescription
+		var factorSources = profile.factorSources.rawValue
+		factorSources[id: profile.factorSources.first.id]?.hint = deviceDescription
+		profile.factorSources = .init(rawValue: factorSources)!
 	}
 }

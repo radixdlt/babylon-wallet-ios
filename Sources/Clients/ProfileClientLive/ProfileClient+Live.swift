@@ -115,7 +115,7 @@ extension ProfileClient {
 					profile.appPreferences.networkAndGateway = networkAndGateway
 				}
 			},
-			createOnboardingWallet: { request in
+			createEphemeralPrivateProfile: { request in
 				let bip39Passphrase = request.bip39Passphrase
 				let mnemonic = try Mnemonic.generate(wordCount: request.wordCount, language: request.language)
 				let mnemonicWithPassphrase = MnemonicWithPassphrase(
@@ -136,14 +136,14 @@ extension ProfileClient {
 				// not allowed to be persisted to keychain.
 				await profileHolder.injectProfile(profile, isEphemeral: true)
 
-				return OnboardingWallet(privateFactorSource: privateFactorSource, profile: profile)
+				return EphemeralPrivateProfile(privateFactorSource: privateFactorSource, profile: profile)
 			},
 			injectProfileSnapshot: { snapshot in
 				let profile = try Profile(snapshot: snapshot)
 				try await secureStorageClient.saveProfileSnapshot(snapshot)
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
-			commitOnboardingWallet: { request in
+			commitEphemeralPrivateProfile: { request in
 				try await profileHolder.getAsync { profile in
 					guard profile.id == request.profile.id else {
 						struct DiscrepancyMismatchingProfileID: Swift.Error {}
@@ -322,8 +322,8 @@ extension ProfileClient {
 								purpose: .createEntity(kind: request.entityKind)
 							).publicKey
 
-						case let .useOnboardingWallet(onboardingWallet):
-							let hdRoot = try onboardingWallet.privateFactorSource.mnemonicWithPassphrase.hdRoot()
+						case let .useEphemeralPrivateProfile(ephemeralPrivateProfile):
+							let hdRoot = try ephemeralPrivateProfile.privateFactorSource.mnemonicWithPassphrase.hdRoot()
 							return try useFactorSourceClient.publicKeyFromOnDeviceHD(.init(
 								hdRoot: hdRoot,
 								derivationPath: derivationPath,

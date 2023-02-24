@@ -48,14 +48,14 @@ public struct Profile:
 
 	/// All sources of factors, used for authorization such as spending funds, contains no
 	/// secrets.
-	public internal(set) var factorSources: FactorSources
+	public var factorSources: FactorSources
 
 	/// Settings for this profile in the app, contains default security configs
 	/// as well as display settings.
 	public var appPreferences: AppPreferences
 
 	/// Effectivly **per network**: a list of accounts, personas and connected dApps.
-	public internal(set) var perNetwork: PerNetwork
+	public var perNetwork: PerNetwork
 
 	public init(
 		version: ProfileSnapshot.Version = .minimum,

@@ -5,8 +5,6 @@ import Profile
 import SecureStorageClient
 
 // MARK: - ProfileStore
-// FIXME: MOVE TO ANOTHER PACKAGE!
-
 public final actor ProfileStore: GlobalActor {
 	@Dependency(\.assert) var assert
 	@Dependency(\.secureStorageClient) var secureStorageClient
@@ -40,14 +38,14 @@ extension ProfileStore {
 		/// checked Secure Storage for an potentially existing stored
 		/// profile, which require an async Task to be done at end of
 		/// init (which will complete after init is done).
-		case newWithEphemeral(Profile, PrivateHDFactorSource)
+		case newWithEphemeral(EphemeralPrivateProfile)
 
 		/// The state during onboarding flow until the user has finished
 		/// creating her first account. As long as the current state is
 		/// `ephemeral`, no data has been persisted into secure storage,
 		/// and both the Profile and the private factor source can safely
 		/// be discarded.
-		case ephemeral(Profile, PrivateHDFactorSource)
+		case ephemeral(EphemeralPrivateProfile)
 
 		/// When the async Task that loads profile - if any - from secure
 		/// storage completes and indeed a profile was found, the state
@@ -67,8 +65,8 @@ extension ProfileStore.State {
 
 	fileprivate var profile: Profile {
 		switch self {
-		case let .newWithEphemeral(profile, _): return profile
-		case let .ephemeral(profile, _): return profile
+		case let .newWithEphemeral(ephemeral): return ephemeral.profile
+		case let .ephemeral(ephemeral): return ephemeral.profile
 		case let .persisted(profile): return profile
 		}
 	}
@@ -94,7 +92,8 @@ extension ProfileStore {
 			)
 			let privateFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
 			let profile = Profile(factorSource: factorSource)
-			return .newWithEphemeral(profile, privateFactorSource)
+			let ephemeral = EphemeralPrivateProfile(privateFactorSource: privateFactorSource, profile: profile)
+			return .newWithEphemeral(ephemeral)
 		} catch {
 			let errorMessage = "CRITICAL ERROR, failed to create Mnemonic or FactorSource during init of ProfileStore. Unable to use app: \(String(describing: error))"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
@@ -104,7 +103,7 @@ extension ProfileStore {
 
 	private func restoreFromSecureStorageIfAble() async {
 		@Dependency(\.jsonDecoder) var jsonDecoder
-		guard case let .newWithEphemeral(ephemeralProfile, ephemeralPrivateFactorSource) = state.value else {
+		guard case let .newWithEphemeral(ephemeral) = state.value else {
 			let errorMsg = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state was: 'newWithEphemeral'"
 			loggerGlobal.critical(.init(stringLiteral: errorMsg))
 			assertionFailure(errorMsg)
@@ -113,7 +112,7 @@ extension ProfileStore {
 		guard
 			let existing = try? await secureStorageClient.loadProfile()
 		else {
-			changeState(to: .ephemeral(ephemeralProfile, ephemeralPrivateFactorSource))
+			changeState(to: .ephemeral(ephemeral))
 			return
 		}
 
@@ -161,40 +160,37 @@ extension ProfileStore {
 	public func commitEphemeral() async throws {
 		try await isInitialized()
 
-		let creatingDevice: NonEmptyString
+		let deviceDescription: NonEmptyString
 		#if canImport(UIKit)
 		@Dependency(\.device) var device
 		let deviceModelName = await device.model
 		let deviceGivenName = await device.name
-		creatingDevice = NonEmptyString(rawValue: "\(deviceGivenName) (\(deviceModelName))")!
+		deviceDescription = NonEmptyString(rawValue: "\(deviceGivenName) (\(deviceModelName))")!
 		#else
-		creatingDevice = "macOS"
+		deviceDescription = "macOS"
 		#endif
 
-		guard case var .ephemeral(ephemeralProfile, ephemeralPrivateFactorSource) = state.value else {
+		guard case var .ephemeral(ephemeral) = state.value else {
 			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state was: 'ephemeral'"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
 			return
 		}
-		ephemeralPrivateFactorSource.factorSource.hint = creatingDevice
-		ephemeralProfile.creatingDevice = creatingDevice
-		try await secureStorageClient.saveMnemonicForFactorSource(ephemeralPrivateFactorSource)
+		ephemeral.update(deviceDescription: deviceDescription)
 
 		do {
-			try await secureStorageClient.saveProfileSnapshot(ephemeralProfile.snapshot())
+			try await secureStorageClient.save(ephemeral: ephemeral)
 		} catch {
 			let errorMessage = "Critical failure, unable to save profile snapshot: \(String(describing: error))"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			// Unlucky... we earlier successfully managed to save the mnemonic for the factor source, but
 			// we failed to save the profile snapshot => tidy up by trying to delete the just saved mnemonic, before
 			// we propate the error
-			try? await secureStorageClient.deleteMnemonicByFactorSourceID(ephemeralPrivateFactorSource.factorSource.id)
 			assertionFailure(errorMessage) // for DEBUG builds we want to crash
 			throw error
 		}
 
-		changeState(to: .persisted(ephemeralProfile))
+		changeState(to: .persisted(ephemeral.profile))
 	}
 
 	public func update(profile: Profile) async throws {

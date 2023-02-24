@@ -151,6 +151,18 @@ extension SecureStorageClient {
 		}
 		return try Profile(snapshot: existingSnapshot)
 	}
+
+	/// Either saves both mnemonic AND profile snapshot, or neither.
+	public func save(ephemeral: EphemeralPrivateProfile) async throws {
+		try await saveMnemonicForFactorSource(ephemeral.privateFactorSource)
+
+		do {
+			try await saveProfileSnapshot(ephemeral.profile.snapshot())
+		} catch {
+			try? await deleteMnemonicByFactorSourceID(ephemeral.privateFactorSource.factorSource.id)
+			throw error
+		}
+	}
 }
 
 private let profileSnapshotKeychainKey: KeychainClient.Key = "profileSnapshotKeychainKey"

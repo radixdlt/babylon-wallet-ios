@@ -10,9 +10,9 @@ public struct ProfileClient: Sendable {
 	public var setNetworkAndGateway: SetNetworkAndGateway
 
 	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
-	public var createOnboardingWallet: CreateOnboardingWallet
+	public var createEphemeralPrivateProfile: CreateEphemeralPrivateProfile
 	public var injectProfileSnapshot: InjectProfileSnapshot
-	public var commitOnboardingWallet: CommitOnboardingWallet
+	public var commitEphemeralPrivateProfile: CommitEphemeralPrivateProfile
 
 	public var loadProfile: LoadProfile
 	public var extractProfileSnapshot: ExtractProfileSnapshot
@@ -46,9 +46,9 @@ public struct ProfileClient: Sendable {
 		getGatewayAPIEndpointBaseURL: @escaping GetGatewayAPIEndpointBaseURL,
 		getNetworkAndGateway: @escaping GetNetworkAndGateway,
 		setNetworkAndGateway: @escaping SetNetworkAndGateway,
-		createOnboardingWallet: @escaping CreateOnboardingWallet,
+		createEphemeralPrivateProfile: @escaping CreateEphemeralPrivateProfile,
 		injectProfileSnapshot: @escaping InjectProfileSnapshot,
-		commitOnboardingWallet: @escaping CommitOnboardingWallet,
+		commitEphemeralPrivateProfile: @escaping CommitEphemeralPrivateProfile,
 		loadProfile: @escaping LoadProfile,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
@@ -77,8 +77,8 @@ public struct ProfileClient: Sendable {
 		self.getGatewayAPIEndpointBaseURL = getGatewayAPIEndpointBaseURL
 		self.getNetworkAndGateway = getNetworkAndGateway
 		self.setNetworkAndGateway = setNetworkAndGateway
-		self.createOnboardingWallet = createOnboardingWallet
-		self.commitOnboardingWallet = commitOnboardingWallet
+		self.createEphemeralPrivateProfile = createEphemeralPrivateProfile
+		self.commitEphemeralPrivateProfile = commitEphemeralPrivateProfile
 		self.injectProfileSnapshot = injectProfileSnapshot
 		self.loadProfile = loadProfile
 		self.extractProfileSnapshot = extractProfileSnapshot
@@ -105,8 +105,8 @@ public struct ProfileClient: Sendable {
 	}
 }
 
-// MARK: - CreateOnboardingWalletRequest
-public struct CreateOnboardingWalletRequest: Sendable, Hashable {
+// MARK: - CreateEphemeralPrivateProfileRequest
+public struct CreateEphemeralPrivateProfileRequest: Sendable, Hashable {
 	public let language: BIP39.Language
 	public let wordCount: BIP39.WordCount
 	public let bip39Passphrase: String
@@ -136,10 +136,10 @@ extension ProfileClient {
 
 	public typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
 
-	public typealias CreateOnboardingWallet = @Sendable (CreateOnboardingWalletRequest) async throws -> OnboardingWallet
+	public typealias CreateEphemeralPrivateProfile = @Sendable (CreateEphemeralPrivateProfileRequest) async throws -> EphemeralPrivateProfile
 
 	public typealias InjectProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
-	public typealias CommitOnboardingWallet = @Sendable (OnboardingWallet) async throws -> Void
+	public typealias CommitEphemeralPrivateProfile = @Sendable (EphemeralPrivateProfile) async throws -> Void
 
 	public typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 

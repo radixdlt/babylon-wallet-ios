@@ -3,7 +3,14 @@ import Prelude
 
 // MARK: - FactorSource
 /// A FactorSource is the source of FactorInstance(s).
-public struct FactorSource: Sendable, Hashable, Codable, Identifiable {
+public struct FactorSource:
+	Sendable,
+	Hashable,
+	Codable,
+	Identifiable,
+	CustomStringConvertible,
+	CustomDumpReflectable
+{
 	/// Kind of factor source
 	public let kind: FactorSourceKind
 
@@ -63,12 +70,12 @@ public struct FactorSource: Sendable, Hashable, Codable, Identifiable {
 		lastUsedOn: Date = .now,
 		storage: Storage? = nil
 	) {
-		self.kind = kind
 		self.id = id
+		self.kind = kind
 		self.hint = hint
 		self.parameters = parameters
-		self.addedOn = addedOn
-		self.lastUsedOn = lastUsedOn
+		self.addedOn = addedOn.stableEquatableAfterJSONRoundtrip
+		self.lastUsedOn = lastUsedOn.stableEquatableAfterJSONRoundtrip
 		self.storage = storage
 	}
 }
@@ -76,6 +83,36 @@ public struct FactorSource: Sendable, Hashable, Codable, Identifiable {
 extension FactorSource {
 	public var supportsOlympia: Bool {
 		parameters.supportsOlympia
+	}
+}
+
+extension FactorSource {
+	public var customDumpMirror: Mirror {
+		.init(
+			self,
+			children: [
+				"id": String(describing: id),
+				"kind": kind,
+				"hint": hint,
+				"parameters": parameters,
+				"addedOn": addedOn,
+				"lastUsedOn": lastUsedOn,
+				"storage": String(describing: storage),
+			],
+			displayStyle: .struct
+		)
+	}
+
+	public var description: String {
+		"""
+		"id": \(String(describing: id)),
+		"kind": \(kind),
+		"hint": \(hint),
+		"parameters": \(parameters),
+		"addedOn": \(addedOn.ISO8601Format()),
+		"lastUsedOn": \(lastUsedOn.ISO8601Format()),
+		"storage": \(String(describing: storage))
+		"""
 	}
 }
 
