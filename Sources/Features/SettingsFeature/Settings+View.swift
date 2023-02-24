@@ -58,6 +58,7 @@ extension AppSettings.View {
 							}
 						}
 					}
+					.navigationTransition(.default, interactivity: .pan)
 				#endif
 					.navigationDestinations(with: store, viewStore)
 			}
