@@ -46,18 +46,35 @@ extension AppSettings.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			NavigationStack {
 				settingsView(viewStore: viewStore)
+					.navigationTitle(L10n.Settings.title)
+					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.inline)
+					.navigationBarInlineTitleFont(.app.secondaryHeader)
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
-							BackButton {
+							CloseButton {
 								viewStore.send(.dismissSettingsButtonTapped)
 							}
 						}
-						ToolbarItem(placement: .principal) {
-							Text(L10n.Settings.title)
+					}
+				#if DEBUG
+					.navigationDestination(
+						isPresented: viewStore.binding(
+							get: \.isDebugProfileViewSheetPresented,
+							send: { .setDebugProfileSheet(isPresented: $0) }
+						)
+					) {
+						if let profile = viewStore.profileToInspect {
+							ProfileView(
+								profile: profile,
+								// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
+								secureStorageClient: SecureStorageClient.liveValue
+							)
+						} else {
+							Text(L10n.Settings.noProfileText)
 						}
 					}
-					.navigationTitle(L10n.Settings.title)
+				#endif
 					.navigationDestination(store: store.manageP2PClients) { store in
 						ManageP2PClients.View(store: store)
 					}
@@ -176,29 +193,6 @@ extension AppSettings.View {
 			.onAppear {
 				viewStore.send(.didAppear)
 			}
-			#if DEBUG
-				.sheet(
-					isPresented: viewStore.binding(
-						get: \.isDebugProfileViewSheetPresented,
-						send: { .setDebugProfileSheet(isPresented: $0) }
-					)
-				) {
-					VStack {
-						Button(L10n.Settings.closeButtonTitle) {
-							viewStore.send(.setDebugProfileSheet(isPresented: false))
-						}
-						if let profile = viewStore.profileToInspect {
-							ProfileView(
-								profile: profile,
-								// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-								secureStorageClient: SecureStorageClient.liveValue
-							)
-						} else {
-							Text(L10n.Settings.noProfileText)
-						}
-					}
-				}
-			#endif
 		}
 	}
 }
