@@ -8,6 +8,7 @@ import Profile
 final class ProfileStoreTests: TestCase {
 	func test__WHEN__init__THEN__24_english_word_ephmeral_mnemonic_is_generated() {
 		withDependencies {
+			$0.uuid = .incrementing
 			$0.mnemonicClient.generate = {
 				XCTAssertEqual($0, BIP39.WordCount.twentyFour)
 				XCTAssertEqual($1, BIP39.Language.english)

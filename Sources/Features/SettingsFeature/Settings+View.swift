@@ -46,6 +46,7 @@ extension AppSettings.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			NavigationStack {
 				settingsView(viewStore: viewStore)
+				#if os(iOS)
 					.navigationBarTitleDisplayMode(.inline)
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
@@ -57,6 +58,7 @@ extension AppSettings.View {
 							Text(L10n.Settings.title)
 						}
 					}
+				#endif
 					.navigationTitle(L10n.Settings.title)
 					.navigationDestination(store: store.manageP2PClients) { store in
 						ManageP2PClients.View(store: store)

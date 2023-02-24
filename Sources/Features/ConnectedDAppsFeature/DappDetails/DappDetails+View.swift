@@ -77,7 +77,9 @@ extension DappDetails.View {
 				.sheet(store: store.presentedPersona) { store in
 					NavigationStack {
 						PersonaDetails.View(store: store)
+						#if os(iOS)
 							.navigationBarTitleDisplayMode(.inline)
+						#endif
 							.toolbar {
 								ToolbarItem(placement: .primaryAction) {
 									CloseButton {

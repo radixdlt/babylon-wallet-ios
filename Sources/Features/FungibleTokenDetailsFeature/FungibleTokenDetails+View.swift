@@ -44,54 +44,61 @@ extension FungibleTokenDetails.View {
 								.padding(.horizontal, .large2)
 						}
 						divider
-						VStack(spacing: .medium3) {
-							HStack {
-								Text(L10n.FungibleTokenList.Detail.resourceAddress)
-									.textStyle(.body1Regular)
-									.foregroundColor(.app.gray2)
-								AddressView(
-									viewStore.address,
-									textStyle: .body1Regular,
-									copyAddressAction: {
-										viewStore.send(.copyAddressButtonTapped)
-									}
-								)
-								.frame(maxWidth: .infinity, alignment: .trailing)
-								.multilineTextAlignment(.trailing)
-							}
-							if let currentSupply = viewStore.currentSupply {
-								HStack {
-									Text(L10n.FungibleTokenList.Detail.currentSupply)
-										.textStyle(.body1Regular)
-										.foregroundColor(.app.gray2)
-									Text(currentSupply.description)
-										.frame(maxWidth: .infinity, alignment: .trailing)
-										.multilineTextAlignment(.trailing)
-								}
-							}
-						}
-						.frame(maxWidth: .infinity, alignment: .leading)
-						.padding(.horizontal, .large2)
-						.textStyle(.body1Regular)
-						.lineLimit(1)
+						metadata(viewStore: viewStore)
 					}
 				}
-				.navigationBarTitle(viewStore.displayName)
 				#if os(iOS)
-					.navigationBarTitleColor(.app.gray1)
-					.navigationBarTitleDisplayMode(.inline)
-					.navigationBarInlineTitleFont(.app.secondaryHeader)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							CloseButton {
-								viewStore.send(.closeButtonTapped)
-							}
+				.navigationBarTitle(viewStore.displayName)
+				.navigationBarTitleColor(.app.gray1)
+				.navigationBarTitleDisplayMode(.inline)
+				.navigationBarInlineTitleFont(.app.secondaryHeader)
+				.toolbar {
+					ToolbarItem(placement: .navigationBarLeading) {
+						CloseButton {
+							viewStore.send(.closeButtonTapped)
 						}
 					}
+				}
 				#endif
-					.foregroundColor(.app.gray1)
+				.foregroundColor(.app.gray1)
 			}
 		}
+	}
+
+	@ViewBuilder
+	private func metadata(
+		viewStore: ViewStore<FungibleTokenDetails.View.ViewState, FungibleTokenDetails.Action.ViewAction>
+	) -> some View {
+		VStack(spacing: .medium3) {
+			HStack {
+				Text(L10n.FungibleTokenList.Detail.resourceAddress)
+					.textStyle(.body1Regular)
+					.foregroundColor(.app.gray2)
+				AddressView(
+					viewStore.address,
+					textStyle: .body1Regular,
+					copyAddressAction: {
+						viewStore.send(.copyAddressButtonTapped)
+					}
+				)
+				.frame(maxWidth: .infinity, alignment: .trailing)
+				.multilineTextAlignment(.trailing)
+			}
+			if let currentSupply = viewStore.currentSupply {
+				HStack {
+					Text(L10n.FungibleTokenList.Detail.currentSupply)
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray2)
+					Text(currentSupply.description)
+						.frame(maxWidth: .infinity, alignment: .trailing)
+						.multilineTextAlignment(.trailing)
+				}
+			}
+		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.padding(.horizontal, .large2)
+		.textStyle(.body1Regular)
+		.lineLimit(1)
 	}
 }
 
