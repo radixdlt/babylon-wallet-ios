@@ -13,31 +13,31 @@ public struct Main: Sendable, ReducerProtocol {
 			Home()
 		}
 
-		Reduce(self.core)
-			.ifLet(\.settings, action: /Action.child .. Action.ChildAction.settings) {
-				AppSettings()
+		Reduce(core)
+			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+				Destinations()
 			}
 	}
 
 	func core(state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .child(.home(.delegate(.displaySettings))):
-			state.settings = .init()
+			state.destination = .settings(.init())
 			return .none
 
-		case .child(.settings(.delegate(.deleteProfileAndFactorSources))):
+		case .child(.destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources))))):
 			return .run { send in
 				try await profileClient.deleteProfileAndFactorSources()
 				await send(.delegate(.removedWallet))
 			}
 
-		case .child(.settings(.delegate(.networkChanged))):
-			state.settings = nil
+		case .child(.destination(.presented(.settings(.delegate(.networkChanged))))):
+			state.destination = nil
 			state.home = .init()
 			return body.reduce(into: &state, action: .child(.home(.view(.pullToRefreshStarted))))
 
-		case .child(.settings(.delegate(.dismissSettings))):
-			state.settings = nil
+		case .child(.destination(.presented(.settings(.delegate(.dismissSettings))))):
+			state.destination = nil
 			return .none
 
 		case .child, .delegate:

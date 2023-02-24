@@ -1,3 +1,4 @@
+import FeaturePrelude
 import HomeFeature
 import SettingsFeature
 
@@ -14,7 +15,7 @@ extension Main {
 extension Main.Action {
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
-		case settings(AppSettings.Action)
+		case destination(PresentationActionOf<Main.Destinations>)
 	}
 }
 

@@ -18,24 +18,18 @@ extension Main {
 
 extension Main.View {
 	public var body: some View {
-		ZStack {
-			Home.View(
-				store: store.scope(
-					state: \.home,
-					action: { .child(.home($0)) }
-				)
+		Home.View(
+			store: store.scope(
+				state: \.home,
+				action: { .child(.home($0)) }
 			)
-			.zIndex(0)
-
-			IfLetStore(
-				store.scope(
-					state: \.settings,
-					action: { .child(.settings($0)) }
-				),
-				then: { AppSettings.View(store: $0) }
-			)
-			.zIndex(1)
-		}
+		)
+		.sheet(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /Main.Destinations.State.settings,
+			action: Main.Destinations.Action.settings,
+			content: { AppSettings.View(store: $0) }
+		)
 		.presentsDappInteractions(onDismiss: { [store = store.stateless] in
 			// FIXME: ideally profileClient.getAccounts() would return a stream that'd allow all relevant screens to update independently.
 			// Until then, manual reloading is necessary when we come back from interaction flow (in case we created accounts).
