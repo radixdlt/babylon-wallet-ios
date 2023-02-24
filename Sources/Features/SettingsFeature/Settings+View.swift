@@ -26,7 +26,7 @@ extension AppSettings {
 		let isDebugProfileViewSheetPresented: Bool
 		let profileToInspect: Profile?
 		#endif
-		let canAddP2PClient: Bool
+		let shouldShowAddP2PClientButton: Bool
 		let appVersion: String
 
 		init(state: AppSettings.State) {
@@ -34,7 +34,7 @@ extension AppSettings {
 			self.isDebugProfileViewSheetPresented = state.profileToInspect != nil
 			self.profileToInspect = state.profileToInspect
 			#endif
-			self.canAddP2PClient = state.canAddP2PClient
+			self.shouldShowAddP2PClientButton = state.userHasNoP2PClients ?? false
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
 			self.appVersion = L10n.Settings.versionInfo(bundleInfo.shortVersion, bundleInfo.version)
 		}
@@ -59,36 +59,7 @@ extension AppSettings.View {
 						}
 					}
 				#endif
-				#if DEBUG
-					.navigationDestination(
-						isPresented: viewStore.binding(
-							get: \.isDebugProfileViewSheetPresented,
-							send: { .setDebugProfileSheet(isPresented: $0) }
-						)
-					) {
-						if let profile = viewStore.profileToInspect {
-							ProfileView(
-								profile: profile,
-								// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-								secureStorageClient: SecureStorageClient.liveValue
-							)
-						} else {
-							Text(L10n.Settings.noProfileText)
-						}
-					}
-				#endif
-					.navigationDestination(store: store.manageP2PClients) { store in
-						ManageP2PClients.View(store: store)
-					}
-					.navigationDestination(store: store.manageGatewayAPIEndpoints) { store in
-						ManageGatewayAPIEndpoints.View(store: store)
-					}
-					.navigationDestination(store: store.connectedDapps) { store in
-						ConnectedDapps.View(store: store)
-					}
-					.navigationDestination(store: store.personasCoordinator) { store in
-						PersonasCoordinator.View(store: store)
-					}
+					.navigationDestinations(with: store, viewStore)
 			}
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
@@ -106,21 +77,59 @@ extension AppSettings.State {
 	}
 }
 
-private extension AppSettings.Store {
-	var manageP2PClients: PresentationStoreOf<ManageP2PClients> {
-		scope(state: \.$manageP2PClients) { .child(.manageP2PClients($0)) }
-	}
-
-	var manageGatewayAPIEndpoints: PresentationStoreOf<ManageGatewayAPIEndpoints> {
-		scope(state: \.$manageGatewayAPIEndpoints) { .child(.manageGatewayAPIEndpoints($0)) }
-	}
-
-	var connectedDapps: PresentationStoreOf<ConnectedDapps> {
-		scope(state: \.$connectedDapps) { .child(.connectedDapps($0)) }
-	}
-
-	var personasCoordinator: PresentationStoreOf<PersonasCoordinator> {
-		scope(state: \.$personasCoordinator) { .child(.personasCoordinator($0)) }
+extension View {
+	// NB: this function is split out from the body so the compiler doesn't choke
+	// ("... compiler is unable to type-check this expression in reasonable time...").
+	//
+	// Maybe the new result builder performance improvements in Swift 5.8 will correct this.
+	@MainActor
+	fileprivate func navigationDestinations(
+		with store: StoreOf<AppSettings>,
+		_ viewStore: ViewStore<AppSettings.ViewState, AppSettings.ViewAction>
+	) -> some View {
+		self
+		#if DEBUG
+			.navigationDestination(
+				isPresented: viewStore.binding(
+					get: \.isDebugProfileViewSheetPresented,
+					send: { .setDebugProfileSheet(isPresented: $0) }
+				)
+			) {
+				if let profile = viewStore.profileToInspect {
+					ProfileView(
+						profile: profile,
+						// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
+						secureStorageClient: SecureStorageClient.liveValue
+					)
+				} else {
+					Text(L10n.Settings.noProfileText)
+				}
+			}
+		#endif
+			.navigationDestination(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /AppSettings.Destinations.State.manageP2PClients,
+				action: AppSettings.Destinations.Action.manageP2PClients,
+				destination: { ManageP2PClients.View(store: $0) }
+			)
+			.navigationDestination(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /AppSettings.Destinations.State.manageGatewayAPIEndpoints,
+				action: AppSettings.Destinations.Action.manageGatewayAPIEndpoints,
+				destination: { ManageGatewayAPIEndpoints.View(store: $0) }
+			)
+			.navigationDestination(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /AppSettings.Destinations.State.connectedDapps,
+				action: AppSettings.Destinations.Action.connectedDapps,
+				destination: { ConnectedDapps.View(store: $0) }
+			)
+			.navigationDestination(
+				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+				state: /AppSettings.Destinations.State.personas,
+				action: AppSettings.Destinations.Action.personas,
+				destination: { PersonasCoordinator.View(store: $0) }
+			)
 	}
 }
 
@@ -153,7 +162,7 @@ extension AppSettings.View {
 		VStack(spacing: 0) {
 			ScrollView {
 				VStack(spacing: .zero) {
-					if viewStore.canAddP2PClient {
+					if viewStore.shouldShowAddP2PClientButton {
 						ConnectExtensionView {
 							viewStore.send(.addP2PClientButtonTapped)
 						}
