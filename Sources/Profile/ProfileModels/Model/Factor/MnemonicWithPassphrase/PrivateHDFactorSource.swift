@@ -4,7 +4,10 @@ import NonEmpty
 // MARK: - PrivateHDFactorSource
 public struct PrivateHDFactorSource: Sendable, Hashable {
 	public let mnemonicWithPassphrase: MnemonicWithPassphrase
-	public private(set) var factorSource: FactorSource
+
+	// Only mutable so that `hint` inside factorSource can be changed
+	// before persisted.
+	public var factorSource: FactorSource
 
 	public init(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
@@ -20,13 +23,5 @@ public struct PrivateHDFactorSource: Sendable, Hashable {
 		guard factorSourceID == factorSource.id else { fatalError("discrepancy") }
 		self.mnemonicWithPassphrase = mnemonicWithPassphrase
 		self.factorSource = factorSource
-	}
-}
-
-extension PrivateHDFactorSource {
-	public func changing(hint newHint: NonEmptyString) -> Self {
-		var copy = self
-		copy.factorSource = factorSource.changing(hint: newHint)
-		return copy
 	}
 }

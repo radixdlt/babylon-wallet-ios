@@ -54,7 +54,7 @@ final class ProfileTests: TestCase {
 		)
 		let networkID = networkAndGateway.network.id
 		let babylonFactorSource = try FactorSource.babylon(mnemonic: curve25519FactorSourceMnemonic)
-		var profile = Profile(factorSource: babylonFactorSource)
+		var profile = Profile(factorSource: babylonFactorSource, creatingDevice: "computerRunningUnitTest")
 
 		let olympiaFactorSource = try FactorSource.olympia(mnemonic: secp256K1FactorMnemonic)
 		profile.factorSources.append(olympiaFactorSource)
@@ -247,6 +247,7 @@ final class ProfileTests: TestCase {
 		let snapshot: ProfileSnapshot = try readTestFixture(jsonName: "profile_snapshot")
 
 		let profile = try Profile(snapshot: snapshot)
+		XCTAssertEqual(profile.creatingDevice, "computerRunningUnitTest")
 
 		XCTAssertEqual(profile.factorSources.count, 2)
 

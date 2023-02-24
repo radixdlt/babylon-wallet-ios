@@ -4,13 +4,16 @@ import Cryptography
 import Profile
 
 // MARK: - ProfileStore
+// FIXME: MOVE TO ANOTHER PACKAGE!
+
 public final actor ProfileStore: GlobalActor {
 	@Dependency(\.assert) var assert
 	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	public static let shared = ProfileStore()
 
-	private let state: AsyncCurrentValueSubject<State>
+	@_spi(Test)
+	public /* inaccessible by SPI */ let state: AsyncCurrentValueSubject<State>
 
 	/// The current value of Profile. Use `update:profile` method to update it. Also see `values`,
 	/// for an async sequence of Profile.
@@ -30,7 +33,8 @@ extension ProfileStore {
 	/// The different possible states of Profile store. See
 	/// `changeState:to` in `ProfileStore` for state machines valid
 	/// transitions.
-	fileprivate enum State: Sendable, CustomStringConvertible {
+	@_spi(Test)
+	public /* inaccessible by SPI */ enum State: Sendable, CustomStringConvertible {
 		/// The initial state, set during start of init, have not yet
 		/// checked Secure Storage for an potentially existing stored
 		/// profile, which require an async Task to be done at end of
@@ -52,7 +56,7 @@ extension ProfileStore {
 }
 
 extension ProfileStore.State {
-	var description: String {
+	public var description: String {
 		switch self {
 		case .newWithEphemeral: return "newWithEphemeral"
 		case .ephemeral: return "ephemeral"
@@ -142,50 +146,40 @@ extension ProfileStore {
 		}
 		state.send(newState)
 	}
-
-	private static func multicasting<S>(
-		asyncSequence: S
-	) -> AnyAsyncSequence<S.Element>
-		where S: AsyncSequence, S.Element: Equatable & Sendable, S.AsyncIterator: Sendable
-	{
-		asyncSequence
-			.share() // Multicast
-			.buffer(policy: .bounded(1)) // replay last
-			.removeDuplicates() // no duplicates
-			.eraseToAnyAsyncSequence()
-	}
 }
 
 // MARK: Public
 extension ProfileStore {
 	/// A multicasting replaying async sequence of distinct Profile.
 	public func values() -> AnyAsyncSequence<Profile> {
-		Self.multicasting(asyncSequence: state.map(\.profile))
+		state.map(\.profile)
+			.share() // Multicast
+			.eraseToAnyAsyncSequence()
 	}
 
 	public func commitEphemeral() async throws {
 		try await isInitialized()
 
-		let hint: NonEmptyString
+		let creatingDevice: NonEmptyString
 		#if canImport(UIKit)
 		@Dependency(\.device) var device
 		let deviceModelName = await device.model
 		let deviceGivenName = await device.name
-		hint = NonEmptyString(rawValue: "\(deviceGivenName) (\(deviceModelName))")!
+		creatingDevice = NonEmptyString(rawValue: "\(deviceGivenName) (\(deviceModelName))")!
 		#else
-		hint = "macOS"
+		creatingDevice = "macOS"
 		#endif
 
-		guard case let .ephemeral(ephemeralProfile, ephemeralPrivateFactorSource) = state.value else {
+		guard case var .ephemeral(ephemeralProfile, ephemeralPrivateFactorSource) = state.value else {
 			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state was: 'ephemeral'"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
 			return
 		}
+		ephemeralPrivateFactorSource.factorSource.hint = creatingDevice
+		ephemeralProfile.creatingDevice = creatingDevice
+		try await secureStorageClient.saveMnemonicForFactorSource(ephemeralPrivateFactorSource)
 
-		try await secureStorageClient.saveMnemonicForFactorSource(
-			ephemeralPrivateFactorSource.changing(hint: hint) // replace emphemeral hint with device name hint.
-		)
 		do {
 			try await secureStorageClient.saveProfileSnapshot(ephemeralProfile.snapshot())
 		} catch {
@@ -204,6 +198,10 @@ extension ProfileStore {
 
 	public func update(profile: Profile) async throws {
 		try await isInitialized() // it should not be possible for us to not be initialized...
+		guard profile != state.value.profile else {
+			// prevent duplicates
+			return
+		}
 
 		guard case let .persisted(persistedProfile) = state.value else {
 			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state was: 'persisted'"

@@ -78,22 +78,31 @@ public struct ProfileSnapshot:
 	/// semantically the same, based on the ID.
 	public let id: ID; public typealias ID = Profile.ID
 
+	/// A description of the device the Profile was first generated on,
+	/// typically the wallet app reads a human provided device name
+	/// if present and able, and/or a model description of the device e.g:
+	/// `"My private phone (iPhone SE (2nd generation))"`
+	/// This string can be presented to the user during a recovery flow,
+	/// when the profile is restored from backup.
+	public let creatingDevice: NonEmptyString
+
 	/// All sources of factors, used for authorization such as spending funds, contains no
 	/// secrets.
-	public internal(set) var factorSources: FactorSources
+	public let factorSources: FactorSources
 
 	/// Settings for this profile in the app, contains default security configs
 	/// as well as display settings.
-	public internal(set) var appPreferences: AppPreferences
+	public let appPreferences: AppPreferences
 
 	/// Effectivly **per network**: a list of accounts, personas and connected dApps.
-	public internal(set) var perNetwork: PerNetwork
+	public let perNetwork: PerNetwork
 
 	fileprivate init(
 		profile: Profile
 	) {
-		self.id = profile.id
 		self.version = profile.version
+		self.id = profile.id
+		self.creatingDevice = profile.creatingDevice
 		self.appPreferences = profile.appPreferences
 		self.perNetwork = profile.perNetwork
 		self.factorSources = profile.factorSources
@@ -116,6 +125,7 @@ extension Profile {
 		self.init(
 			version: snapshot.version,
 			id: snapshot.id,
+			creatingDevice: snapshot.creatingDevice,
 			factorSources: snapshot.factorSources,
 			appPreferences: snapshot.appPreferences,
 			perNetwork: snapshot.perNetwork
@@ -130,6 +140,7 @@ extension ProfileSnapshot {
 			children: [
 				"version": version,
 				"id": id,
+				"creatingDevice": creatingDevice,
 				"factorSources": factorSources,
 				"appPreferences": appPreferences,
 				"perNetwork": perNetwork,
@@ -141,6 +152,9 @@ extension ProfileSnapshot {
 	public var description: String {
 		"""
 		factorSources: \(factorSources),
+		version: \(version),
+		creatingDevice: \(creatingDevice),
+		id: \(id),
 		appPreferences: \(appPreferences),
 		perNetwork: \(perNetwork),
 		"""

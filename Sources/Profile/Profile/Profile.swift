@@ -13,7 +13,8 @@ extension ProfileSnapshot.Version {
 	/// - 12: Added `id`
 	/// - 13: Reverted unintentially change of perNetwork
 	/// - 14: Reverted `Engine.PublicKey` -> `SLIP10.PublicKey` for entities.
-	public static let minimum: Self = 14
+	/// - 15: Add `creatingDevice` property
+	public static let minimum: Self = 15
 }
 
 // MARK: - Profile
@@ -31,6 +32,20 @@ public struct Profile:
 	/// semantically the same, based on the ID.
 	public let id: ID; public typealias ID = UUID
 
+	/// A description of the device the Profile was first generated on,
+	/// typically the wallet app reads a human provided device name
+	/// if present and able, and/or a model description of the device e.g:
+	/// `"My private phone (iPhone SE (2nd generation))"`
+	/// This string can be presented to the user during a recovery flow,
+	/// when the profile is restored from backup.
+	///
+	/// The reason why this is mutable (`var`) instead of immutable `let` is
+	/// an implementation detailed on iOS, where reading the device name
+	/// and model is `async` but we want to be able to `sync` create the
+	/// profile, thus tis property at a later point in time where an async
+	/// context is available.
+	public var creatingDevice: NonEmptyString
+
 	/// All sources of factors, used for authorization such as spending funds, contains no
 	/// secrets.
 	public internal(set) var factorSources: FactorSources
@@ -45,20 +60,27 @@ public struct Profile:
 	public init(
 		version: ProfileSnapshot.Version = .minimum,
 		id: ID,
+		creatingDevice: NonEmptyString,
 		factorSources: FactorSources,
 		appPreferences: AppPreferences,
 		perNetwork: PerNetwork
 	) {
 		self.version = version
 		self.id = id
+		self.creatingDevice = creatingDevice
 		self.factorSources = factorSources
 		self.appPreferences = appPreferences
 		self.perNetwork = perNetwork
 	}
 
-	public init(factorSource: FactorSource) {
+	public init(
+		factorSource: FactorSource,
+		creatingDevice: NonEmptyString = "placeholder"
+	) {
+		@Dependency(\.uuid) var uuid
 		self.init(
-			id: .init(),
+			id: uuid(),
+			creatingDevice: creatingDevice,
 			factorSources: .init(factorSource),
 			appPreferences: .default,
 			perNetwork: .init()

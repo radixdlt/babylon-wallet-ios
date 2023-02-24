@@ -22,7 +22,12 @@ public struct FactorSource: Sendable, Hashable, Codable, Identifiable {
 	/// * "Just a private key put in my standard secure storage."
 	/// * "Mnemonic that describes a saga about a crazy horse",
 	///
-	public private(set) var hint: NonEmptyString
+	/// The reason why this is mutable (`var`) instead of immutable `let` is
+	/// an implementation detailed on iOS, where reading the device name
+	/// and model is `async` but we want to be able to `sync` create the
+	/// profile, thus tis property at a later point in time where an async
+	/// context is available.
+	public var hint: NonEmptyString
 
 	/// Curve/Derivation scheme
 	public let parameters: Parameters
@@ -71,12 +76,6 @@ public struct FactorSource: Sendable, Hashable, Codable, Identifiable {
 extension FactorSource {
 	public var supportsOlympia: Bool {
 		parameters.supportsOlympia
-	}
-
-	public func changing(hint newHint: NonEmptyString) -> Self {
-		var copy = self
-		copy.hint = newHint
-		return copy
 	}
 }
 
