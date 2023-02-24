@@ -41,7 +41,7 @@ extension DappInteractionFlow {
 					#endif
 				}
 				#if os(iOS)
-				.navigationTransition(.slide)
+				.navigationTransition(.slide, interactivity: .disabled)
 				#endif
 			}
 			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }

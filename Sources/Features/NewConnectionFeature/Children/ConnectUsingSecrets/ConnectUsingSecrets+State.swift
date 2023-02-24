@@ -3,7 +3,7 @@ import P2PConnection
 
 // MARK: - ConnectUsingSecrets.State
 extension ConnectUsingSecrets {
-	public struct State: Equatable {
+	public struct State: Sendable, Hashable {
 		public var connectionSecrets: ConnectionSecrets
 		public var isConnecting: Bool
 		public var isPromptingForName: Bool

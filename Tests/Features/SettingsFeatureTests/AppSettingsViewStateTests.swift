@@ -13,7 +13,7 @@ final class AppSettingsViewStateTests: TestCase {
 				version: "42"
 			)
 		} operation: {
-			let sut = AppSettings.View.ViewState(state: .init())
+			let sut = AppSettings.ViewState(state: .init())
 			XCTAssertEqual(sut.appVersion, "Version: 4.2.0 build #42")
 		}
 	}

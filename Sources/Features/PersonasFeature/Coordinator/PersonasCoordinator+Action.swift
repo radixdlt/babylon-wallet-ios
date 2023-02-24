@@ -15,8 +15,4 @@ extension PersonasCoordinator {
 		case personaList(PersonaList.Action)
 		case createPersonaCoordinator(CreatePersonaCoordinator.Action)
 	}
-
-	public enum DelegateAction: Sendable, Equatable {
-		case dismiss
-	}
 }

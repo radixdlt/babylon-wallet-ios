@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - ScanQR.State
 extension ScanQR {
-	public struct State: Equatable {
+	public struct State: Sendable, Hashable {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		public var connectionPassword: String
 
