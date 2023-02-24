@@ -47,6 +47,7 @@ extension AppSettings.View {
 			NavigationStack {
 				settingsView(viewStore: viewStore)
 					.navigationTitle(L10n.Settings.title)
+				#if os(iOS)
 					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.inline)
 					.navigationBarInlineTitleFont(.app.secondaryHeader)
@@ -57,6 +58,7 @@ extension AppSettings.View {
 							}
 						}
 					}
+				#endif
 				#if DEBUG
 					.navigationDestination(
 						isPresented: viewStore.binding(
