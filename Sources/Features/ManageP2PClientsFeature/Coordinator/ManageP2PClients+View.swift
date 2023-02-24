@@ -98,7 +98,9 @@ struct ManageP2PClients_Preview: PreviewProvider {
 					reducer: ManageP2PClients()
 				)
 			)
+			#if os(iOS)
 			.navigationBarTitleDisplayMode(.inline)
+			#endif
 		}
 	}
 }
