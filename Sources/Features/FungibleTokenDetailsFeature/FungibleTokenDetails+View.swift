@@ -89,8 +89,9 @@ extension FungibleTokenDetails.View {
 						}
 					}
 				#endif
-					.foregroundColor(.app.gray1)
 			}
+			.tint(.app.gray1)
+			.foregroundColor(.app.gray1)
 		}
 	}
 }
