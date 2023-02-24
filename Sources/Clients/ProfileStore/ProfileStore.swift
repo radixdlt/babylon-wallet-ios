@@ -2,6 +2,7 @@ import AsyncExtensions
 import ClientPrelude
 import Cryptography
 import Profile
+import SecureStorageClient
 
 // MARK: - ProfileStore
 // FIXME: MOVE TO ANOTHER PACKAGE!

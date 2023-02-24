@@ -116,10 +116,8 @@ extension ProfileClient {
 				}
 			},
 			createOnboardingWallet: { request in
-				@Dependency(\.mnemonicClient.generate) var generateMnemonic
-
 				let bip39Passphrase = request.bip39Passphrase
-				let mnemonic = try generateMnemonic(request.wordCount, request.language)
+				let mnemonic = try Mnemonic.generate(wordCount: request.wordCount, language: request.language)
 				let mnemonicWithPassphrase = MnemonicWithPassphrase(
 					mnemonic: mnemonic,
 					passphrase: bip39Passphrase

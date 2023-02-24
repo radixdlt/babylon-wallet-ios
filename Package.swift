@@ -308,6 +308,14 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
+		name: "ProfileStore",
+		dependencies: [
+			"Profile",
+			"SecureStorageClient",
+		],
+		tests: .yes()
+	),
+	.client(
 		name: "SecureStorageClient",
 		dependencies: [
 			"Profile",

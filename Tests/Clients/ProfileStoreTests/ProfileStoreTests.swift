@@ -2,7 +2,8 @@ import ClientTestingPrelude
 import Cryptography
 import LocalAuthenticationClient
 import Profile
-@_spi(Test) import SecureStorageClient
+import SecureStorageClient
+@_spi(Test) import ProfileStore
 
 // MARK: - ProfileStoreTests
 final class ProfileStoreTests: TestCase {
@@ -32,7 +33,11 @@ final class ProfileStoreTests: TestCase {
 			$0.secureStorageClient.loadProfileSnapshotData = { nil }
 			$0.secureStorageClient.saveMnemonicForFactorSource = {
 				XCTAssertEqual($0.mnemonicWithPassphrase.mnemonic, .zoo)
+				#if canImport(UIKit)
 				XCTAssertEqual($0.factorSource.hint, "NAME (MODEL)")
+				#else
+				XCTAssertEqual($0.factorSource.hint, "macOS")
+				#endif
 			}
 			$0.secureStorageClient.saveProfileSnapshot = {
 				await profileSnapshotSavedIntoSecureStorage.setValue($0)
