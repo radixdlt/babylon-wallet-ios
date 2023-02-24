@@ -64,7 +64,6 @@ public struct AppSettings: FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss // TODO: remove this and use @Dependency(\.dismiss) when TCA tools are released
 		case deleteProfileAndFactorSources
-		case networkChanged
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
@@ -178,11 +177,13 @@ public struct AppSettings: FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-//		case .destination(.presented(.manageP2PClients(.dismiss))):
-//			return loadP2PClients()
-//
-//		case .destination(.presented(.manageGatewayAPIEndpoints(.presented(.delegate(.networkChanged))))):
-//			return .send(.delegate(.networkChanged))
+		case .destination(.dismiss):
+			switch state.destination {
+			case .manageP2PClients:
+				return loadP2PClients()
+			default:
+				return .none
+			}
 
 		case .destination:
 			return .none

@@ -31,7 +31,8 @@ public struct Main: Sendable, ReducerProtocol {
 				await send(.delegate(.removedWallet))
 			}
 
-		case .child(.destination(.presented(.settings(.delegate(.networkChanged))))):
+		// this should go away via network stream observation in the reducer (with .task)
+		case .child(.destination(.presented(.settings(.child(.destination(.presented(.manageGatewayAPIEndpoints(.delegate(.networkChanged))))))))):
 			state.destination = nil
 			state.home = .init()
 			return .send(.child(.home(.view(.pullToRefreshStarted))))
