@@ -92,7 +92,6 @@ extension AppSettings.View {
 			}
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
-			.textStyle(.secondaryHeader)
 		}
 	}
 }
