@@ -1,10 +1,12 @@
 import FeaturePrelude
 import P2PConnection
+import RadixConnect
 
 // MARK: - ConnectUsingSecrets
 public struct ConnectUsingSecrets: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mainQueue) var mainQueue
+        @Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	public init() {}
 }
 
@@ -17,11 +19,8 @@ extension ConnectUsingSecrets {
 			return .run { [connectionPassword = state.connectionSecrets.connectionPassword] send in
 				await send(.internal(.system(.establishConnectionResult(
 					TaskResult {
-						try await P2PConnections.shared.add(
-							connectionPassword: connectionPassword,
-							connectMode: .connect(force: true, inBackground: false),
-							emitConnectionsUpdate: false // we wanna emit after we have added the connectionID to Profile
-						)
+//                                                try await p2pConnectivityClient.addP2PWithSecrets(connectionPassword)
+                                                return try P2PConnectionID(password: connectionPassword)
 					}
 				))))
 			}

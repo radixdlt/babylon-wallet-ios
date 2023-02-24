@@ -1,33 +1,58 @@
 import AsyncExtensions
 import Foundation
+import SharedModels
+import CryptoKit
 
 // MARK: - RTCClients
 
-public struct RTCIncommingMessage: Sendable {
-        public let connectionId: SignalingServerConnectionID
+public typealias RTCIncommingMessageResult = RTCIncommingMessage<Result<P2P.FromDapp.WalletInteraction, Error>>
+public typealias RTCIncommingWalletInteraction = RTCIncommingMessage<P2P.FromDapp.WalletInteraction>
+
+public struct RTCIncommingMessage<PeerConnectionContent: Sendable>: Sendable {
+
+        public let connectionId: ConnectionPassword
         public let content: PeerConnectionMessage
 
         public struct PeerConnectionMessage: Sendable {
                 public let peerConnectionId: PeerConnectionId
-                public let content: Result<DataChannelAssembledMessage, Error>
+                public let content: PeerConnectionContent
         }
 }
 
-public struct RTCOutgoingMessage: Sendable {
-        public let connectionId: SignalingServerConnectionID
+extension RTCIncommingMessage where PeerConnectionContent == Result<P2P.FromDapp.WalletInteraction, Error> {
+        public func unwrapResult() throws -> RTCIncommingWalletInteraction {
+                return try .init(connectionId: connectionId,
+                             content: .init(peerConnectionId: content.peerConnectionId, content: content.content.get()))
+        }
+}
+
+//extension RTCIncommingMessage.PeerConnectionMessage: Equatable where PeerConnectionContent: Hashable & Equatable {}
+extension RTCIncommingMessage.PeerConnectionMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}
+extension RTCIncommingMessage: Hashable, Equatable where PeerConnectionContent: Hashable & Equatable {}
+
+extension RTCIncommingMessage {
+        public func toOutgoingMessage(_ response: P2P.ToDapp.WalletInteractionResponse) -> RTCOutgoingMessage {
+                .init(connectionId: connectionId,
+                      content: .init(peerConnectionId: content.peerConnectionId,
+                                     content: response))
+        }
+}
+
+public struct RTCOutgoingMessage: Sendable, Hashable {
+        public let connectionId: ConnectionPassword
         public let content: PeerConnectionMessage
 
-        public struct PeerConnectionMessage: Sendable {
+        public struct PeerConnectionMessage: Sendable, Hashable {
                 public let peerConnectionId: PeerConnectionId
-                public let content: Data
+                public let content: P2P.ToDapp.WalletInteractionResponse
 
-                init(peerConnectionId: PeerConnectionId, content: Data) {
+                public init(peerConnectionId: PeerConnectionId, content: P2P.ToDapp.WalletInteractionResponse) {
                         self.peerConnectionId = peerConnectionId
                         self.content = content
                 }
         }
 
-        init(connectionId: SignalingServerConnectionID, content: PeerConnectionMessage) {
+        public init(connectionId: ConnectionPassword, content: PeerConnectionMessage) {
                 self.connectionId = connectionId
                 self.content = content
         }
@@ -35,36 +60,44 @@ public struct RTCOutgoingMessage: Sendable {
 
 /// Meant to hold all of the created RTCClients
 public actor RTCClients {
-        lazy var incommingMessages: AnyAsyncSequence<RTCIncommingMessage> = onIncommingMessage.eraseToAnyAsyncSequence().share().eraseToAnyAsyncSequence()
+        public lazy var incommingMessages: AnyAsyncSequence<RTCIncommingMessageResult> = onIncommingMessage.eraseToAnyAsyncSequence().share().eraseToAnyAsyncSequence()
 
-        private let onIncommingMessage: AsyncStream<RTCIncommingMessage>
+        private let onIncommingMessage: AsyncStream<RTCIncommingMessageResult>
 
         private(set) var clients: [RTCClient] = []
-	private let onIncommingMessageContinuation: AsyncStream<RTCIncommingMessage>.Continuation!
+	private let onIncommingMessageContinuation: AsyncStream<RTCIncommingMessageResult>.Continuation!
 	private let peerConnectionFactory: PeerConnectionFactory
         private let signalingServerBaseURL: URL
 
+        public init(signalingServerBaseURL: URL = .prodSignalingServer) {
+                self.init(peerConnectionFactory: WebRTCFactory(), signalingServerBaseURL: signalingServerBaseURL)
+        }
+
         init(peerConnectionFactory: PeerConnectionFactory = WebRTCFactory(), signalingServerBaseURL: URL = .prodSignalingServer) {
-		(onIncommingMessage, onIncommingMessageContinuation) = AsyncStream<RTCIncommingMessage>.streamWithContinuation()
+		(onIncommingMessage, onIncommingMessageContinuation) = AsyncStream<RTCIncommingMessageResult>.streamWithContinuation()
 		self.peerConnectionFactory = peerConnectionFactory
                 self.signalingServerBaseURL = signalingServerBaseURL
 	}
 
-	public func add(_ connectionId: SignalingServerConnectionID) async throws {
-                let signalingClient = try SignalingClient(connectionId: connectionId, source: .wallet, baseURL: signalingServerBaseURL)
+	public func add(_ password: ConnectionPassword) async throws {
+                let signalingClient = try SignalingClient(password: password, source: .wallet, baseURL: signalingServerBaseURL)
 		let builder = PeerConnectionBuilder(signalingServerClient: signalingClient, factory: peerConnectionFactory)
-		let client = RTCClient(id: connectionId, peerConnectionBuilder: builder)
+		let client = RTCClient(id: password, peerConnectionBuilder: builder)
                 await client.listenForPeerConnections()
 
                 client.onIncommingMessage
-                        .map { RTCIncommingMessage(connectionId: connectionId, content: $0) }
+                        .map { RTCIncommingMessage(connectionId: password, content: $0) }
                         .susbscribe(onIncommingMessageContinuation)
 		self.clients.append(client)
 	}
 
-	public func remove(_ connectionId: SignalingServerConnectionID) {
+	public func remove(_ connectionId: ConnectionPassword) {
 		clients.removeAll(where: { $0.id == connectionId })
 	}
+
+        public func removeAll() {
+                clients.removeAll()
+        }
 
         public func sendMessage(_ message: RTCOutgoingMessage) async throws {
                 guard let rtcClient = clients.first(where: { $0.id == message.connectionId }) else {
@@ -76,10 +109,11 @@ public actor RTCClients {
 }
 
 extension SignalingClient {
-        init(connectionId: SignalingServerConnectionID, source: ClientSource, baseURL: URL) throws {
+        init(password: ConnectionPassword, source: ClientSource, baseURL: URL) throws {
+                let connectionId = try SignalingServerConnectionID(.init(.init(data: Data(SHA256.hash(data: password.data.data)))))
                 let connectionURL = try signalingServerURL(connectionID: connectionId, source: source, baseURL: baseURL)
                 let webSocket = AsyncWebSocket(url: connectionURL)
-                let encryptionKey = try EncryptionKey(.init(data: connectionId.data.data))
+                let encryptionKey = try EncryptionKey(.init(data: password.data.data))
 
                 self.init(encryptionKey: encryptionKey, webSocketClient: webSocket, connectionID: connectionId, clientSource: source)
         }
@@ -89,20 +123,26 @@ extension SignalingClient {
 
 /// Meant to hold all of the peerConnections for the given SignalingServerConnectionID
 actor RTCClient {
-	let id: SignalingServerConnectionID
+	let id: ConnectionPassword
 	private let peerConnectionBuilder: PeerConnectionBuilder
 	private(set) var peerConnections: [PeerConnectionClient] = []
 
-        let onIncommingMessage: AsyncStream<RTCIncommingMessage.PeerConnectionMessage>
-        private let onIncommingMessageContinuation: AsyncStream<RTCIncommingMessage.PeerConnectionMessage>.Continuation!
+        let onIncommingMessage: AsyncStream<RTCIncommingMessageResult.PeerConnectionMessage>
+        private let onIncommingMessageContinuation: AsyncStream<RTCIncommingMessageResult.PeerConnectionMessage>.Continuation!
 	private var connectionsTask: Task<Void, Never>?
 
-	init(id: SignalingServerConnectionID,
+        private let onPeerConnectionDisconnected: AsyncStream<PeerConnectionId>
+        private let onPeerConnectionDisconnectedContinuation: AsyncStream<PeerConnectionId>.Continuation!
+
+        private var disconnectTask: Task<Void, Never>?
+
+	init(id: ConnectionPassword,
 	     peerConnectionBuilder: PeerConnectionBuilder)
 	{
 		self.id = id
 		self.peerConnectionBuilder = peerConnectionBuilder
-		(onIncommingMessage, onIncommingMessageContinuation) = AsyncStream<RTCIncommingMessage.PeerConnectionMessage>.streamWithContinuation()
+		(onIncommingMessage, onIncommingMessageContinuation) = AsyncStream<RTCIncommingMessageResult.PeerConnectionMessage>.streamWithContinuation()
+                (onPeerConnectionDisconnected, onPeerConnectionDisconnectedContinuation) = AsyncStream<PeerConnectionId>.streamWithContinuation()
 	}
 
 	deinit {
@@ -116,23 +156,51 @@ actor RTCClient {
 					let connection = try connectionResult.get()
                                         await connection
                                                 .receivedMessagesStream()
-                                                .map { RTCIncommingMessage.PeerConnectionMessage(peerConnectionId: connection.id, content: $0) }
+                                                .map { messageResult in
+                                                        let interaction = messageResult.flatMap { message in
+                                                                .init { try JSONDecoder().decode(P2P.FromDapp.WalletInteraction.self, from: message.messageContent) }
+                                                        }
+                                                        return RTCIncommingMessage.PeerConnectionMessage(peerConnectionId: connection.id,
+                                                                                                  content: interaction)
+                                                }
                                                 .susbscribe(self.onIncommingMessageContinuation)
+                                        connection
+                                                .onIceConnectionState
+                                                .filter {
+                                                        $0 == .disconnected
+                                                }
+                                                .map { _ in connection.id }
+                                                .susbscribe(onPeerConnectionDisconnectedContinuation)
 					self.peerConnections.append(connection)
 				} catch {
 					// log error
 				}
 			}
 		}
+
+                disconnectTask = Task {
+                        for await id in onPeerConnectionDisconnected {
+                                removePeerConnection(id)
+                        }
+                }
 	}
+
+        func removePeerConnection(_ id: PeerConnectionId) {
+                print("==== Removing Peer connection")
+                peerConnections.removeAll(where: { $0.id == id })
+        }
 
         func sendMessage(_ message: RTCOutgoingMessage.PeerConnectionMessage) async throws {
                 guard let client = peerConnections.first(where: { $0.id == message.peerConnectionId }) else {
-                        fatalError()
+                        throw PeerConnectionDidCloseError()
                 }
-
-                try await client.sendData(message.content)
+                let data = try JSONEncoder().encode(message.content)
+                try await client.sendData(data)
         }
+}
+
+struct PeerConnectionDidCloseError: Error {
+
 }
 
 public extension URL {

@@ -280,6 +280,8 @@ package.addModules([
 		dependencies: [
 			"P2PConnection",
 			"ProfileClient",
+                        "RadixConnect",
+                        "P2PModels"
 		],
 		tests: .yes()
 	),
@@ -508,6 +510,7 @@ package.addModules([
 		category: .radixConnectRewrite,
 		dependencies: [
 			"RadixConnectModels",
+                        "SharedModels"
 		],
 		tests: .yes()
 	),

@@ -60,7 +60,7 @@ struct OfferingPeerConnectionBuilder: Sendable {
 
                 print("Bigga test WebPage - received answer from \(clientId)")
 
-                _ = await onConnectionEstablished.collect()
+                _ = try await onConnectionEstablished.collect()
 
                 print("Bigga test WebPage - connection established with \(clientId)")
                 iceExchangeTask.cancel()
@@ -128,6 +128,7 @@ final class PeerConnectionBuilder: Sendable {
 		let onLocalIceCandidate = peerConnectionClient
 			.onGeneratedICECandidate
 			.map { candidate in
+                                print("Bigga test Wallet ICECandidate generated")
                                 return try await signalingServerClient.sendToRemote(.init(content: .iceCandidate(candidate), id: offer.id))
 			}.eraseToAnyAsyncSequence()
 
@@ -135,7 +136,8 @@ final class PeerConnectionBuilder: Sendable {
 			.onICECanddiate
 			.filter { $0.id == offer.id }
 			.map {
-				try await peerConnectionClient.onRemoteICECandidate($0.content)
+                                print("Bigga test Wallet ICECandidate received")
+				return try await peerConnectionClient.onRemoteICECandidate($0.content)
 			}
 			.eraseToAnyAsyncSequence()
 
@@ -146,21 +148,20 @@ final class PeerConnectionBuilder: Sendable {
 			}
 			.prefix(1)
 
+                let iceExchangeTask = Task {
+                        await withThrowingTaskGroup(of: Void.self) { group in
+                                onLocalIceCandidate.await(inGroup: &group)
+                                onRemoteIceCandidate.await(inGroup: &group)
+                        }
+                }
+
 		_ = await peerConnectionClient.onNegotiationNeeded.prefix(1).collect()
                 print("Bigga test Wallet - starting negotiation with \(offer.id)")
 		try await peerConnectionClient.onRemoteOffer(offer.content)
 		let localAnswer = try await peerConnectionClient.createAnswer()
                 try await signalingServerClient.sendToRemote(.init(content: .answer(localAnswer), id: offer.id))
                 print("Bigga test Wallet - sent answer \(offer.id)")
-
-		let iceExchangeTask = Task {
-			await withThrowingTaskGroup(of: Void.self) { group in
-				onLocalIceCandidate.await(inGroup: &group)
-				onRemoteIceCandidate.await(inGroup: &group)
-			}
-		}
-
-		_ = await onConnectionEstablished.collect()
+		_ = try await onConnectionEstablished.collect()
 
                 print("Bigga test Wallet - Etablished connection with \(offer.id)")
 		iceExchangeTask.cancel()

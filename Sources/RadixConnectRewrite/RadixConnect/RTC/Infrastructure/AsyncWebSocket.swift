@@ -79,8 +79,10 @@ public extension AsyncWebSocket {
 	}
 
 	private func sendPingContinuously() {
-		task.sendPing { [weak self] _ in
-			self?.sendPingContinuously()
-		}
+//                Task {
+//                        task.sendPing { [weak self] _ in
+//                                self?.sendPingContinuously()
+//                        }
+//                }
 	}
 }

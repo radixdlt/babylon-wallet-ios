@@ -1,4 +1,5 @@
 import ClientPrelude
+import RadixConnect
 
 // MARK: - DependencyValues
 extension DependencyValues {
@@ -23,23 +24,23 @@ public struct P2PConnectivityClient: DependencyKey, Sendable {
 
 	public var addP2PClientWithConnection: AddP2PClientWithConnection
 	public var deleteP2PClientByID: DeleteP2PClientByID
+        public var addP2PWithSecrets:AddP2PWithPassword
 
-	public var getConnectionStatusAsyncSequence: GetConnectionStatusAsyncSequence
-	public var getRequestsFromP2PClientAsyncSequence: GetRequestsFromP2PClientAsyncSequence
-	public var sendMessageReadReceipt: SendMessageReadReceipt
+//	public var getConnectionStatusAsyncSequence: GetConnectionStatusAsyncSequence
+	public var receiveMessages: ReceiveMessages
 	public var sendMessage: SendMessage
 
 	// MARK: Debug functionality
-	public var _sendTestMessage: _SendTestMessage
-	public var _debugWebsocketStatusAsyncSequence: DebugGetWebsocketStatusAsyncSequence
-	public var _debugDataChannelStatusAsyncSequence: DebugGetDataChannelStatusAsyncSequence
+//	public var _sendTestMessage: _SendTestMessage
+//	public var _debugWebsocketStatusAsyncSequence: DebugGetWebsocketStatusAsyncSequence
+//	public var _debugDataChannelStatusAsyncSequence: DebugGetDataChannelStatusAsyncSequence
 }
 
 extension P2PConnectivityClient {
 	public typealias LoadFromProfileAndConnectAll = @Sendable () async throws -> Void
 	public typealias DisconnectAndRemoveAll = @Sendable () async -> Void
 
-	public typealias GetAsyncSequenceOfByP2PClientID<Value> = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<Value>
+//	public typealias GetAsyncSequenceOfByP2PClientID<Value> = @Sendable (P2PClient.ID) async throws -> AnyAsyncSequence<Value>
 
 	public typealias GetLocalNetworkAccess = @Sendable () async -> Bool
 
@@ -47,16 +48,16 @@ extension P2PConnectivityClient {
 	public typealias GetP2PClientsByIDs = @Sendable (OrderedSet<P2PClient.ID>) async throws -> OrderedSet<P2PClient>
 
 	public typealias AddP2PClientWithConnection = @Sendable (P2PClient) async throws -> Void
+        public typealias AddP2PWithPassword = @Sendable (ConnectionPassword) async throws -> Void
 	public typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 
-	public typealias GetConnectionStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<P2P.ClientWithConnectionStatus>
-	public typealias GetRequestsFromP2PClientAsyncSequence = GetAsyncSequenceOfByP2PClientID<P2P.RequestFromClient>
+//	public typealias GetConnectionStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<P2P.ClientWithConnectionStatus>
+	public typealias ReceiveMessages = @Sendable () async throws -> AnyAsyncSequence<RTCIncommingMessageResult>
 
-	public typealias SendMessageReadReceipt = @Sendable (P2PClient.ID, P2PConnections.IncomingMessage) async throws -> Void
-	public typealias SendMessage = @Sendable (P2P.ResponseToClientByID) async throws -> P2P.SentResponseToClient
+	public typealias SendMessage = @Sendable (RTCOutgoingMessage) async throws -> Void
 
 	// MARK: Debug functionality
-	public typealias _SendTestMessage = @Sendable (P2PClient.ID, String) async throws -> Void
-	public typealias DebugGetWebsocketStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<WebSocketState>
-	public typealias DebugGetDataChannelStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<DataChannelState>
+//	public typealias _SendTestMessage = @Sendable (P2PClient.ID, String) async throws -> Void
+//	public typealias DebugGetWebsocketStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<WebSocketState>
+//	public typealias DebugGetDataChannelStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<DataChannelState>
 }

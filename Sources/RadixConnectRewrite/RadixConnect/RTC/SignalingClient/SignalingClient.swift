@@ -58,7 +58,8 @@ struct SignalingClient {
 			.incommingMessages
 			.eraseToAnyAsyncSequence()
 			.mapSkippingError {
-				try jsonDecoder.decode(IncommingMessage.self, from: $0)
+                                print("Received message \(String(data: $0, encoding: .utf8))")
+				return try jsonDecoder.decode(IncommingMessage.self, from: $0)
 			} logError: { error in
 				loggerGlobal.info("Failed to decode incomming Message - \(error)")
 			}
@@ -67,6 +68,7 @@ struct SignalingClient {
 
 		self.incommingRemoteClientMessagges = self.incommingMessages
 			.compactMap(\.fromRemoteClient)
+                        .share()
 			.eraseToAnyAsyncSequence()
 
 		self.incommingSignalingServerMessagges = self.incommingMessages
@@ -102,12 +104,12 @@ struct SignalingClient {
                 let message = ClientMessage(
                         requestId: idBuilder(),
                         targetClientId: primitive.id,
-                        primitive: primitive.content,
-                        connectionId: connectionID,
-                        source: clientSource)
+                        primitive: primitive.content)
                 let encodedMessage = try jsonEncoder.encode(message)
                 try await webSocketClient.send(message: encodedMessage)
                 try await waitForRequestAck(message.requestId)
+
+                print("Sent to remote \(primitive)")
         }
         
 	public func sendToRemote(message: ClientMessage) async throws {

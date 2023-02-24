@@ -90,18 +90,18 @@ extension ManageP2PClients {
 			return .run { send in
 				await send(.delegate(.dismiss))
 			}
-		#if DEBUG
-		case let .child(.connection(id, .delegate(.sendTestMessage))):
-			return .run { send in
-				await send(.internal(.system(.sendTestMessageResult(
-					TaskResult {
-						let msg = "Test"
-						try await self.p2pConnectivityClient._sendTestMessage(id, msg)
-						return msg
-					}
-				))))
-			}
-		#endif
+//		#if DEBUG
+//		case let .child(.connection(id, .delegate(.sendTestMessage))):
+//			return .run { send in
+//				await send(.internal(.system(.sendTestMessageResult(
+//					TaskResult {
+//						let msg = "Test"
+//						try await self.p2pConnectivityClient._sendTestMessage(id, msg)
+//						return msg
+//					}
+//				))))
+//			}
+//		#endif
 
 		case let .child(.connection(id, .delegate(.deleteConnection))):
 			return .run { send in

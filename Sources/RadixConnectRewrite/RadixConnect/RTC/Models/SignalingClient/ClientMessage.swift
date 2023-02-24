@@ -1,5 +1,6 @@
 // MARK: - ClientMessage
 import Foundation
+import Prelude
 
 struct RemoteData: Equatable, Sendable {
         let remoteClientId: ClientID
@@ -39,15 +40,11 @@ struct ClientMessage: Sendable, Equatable {
         let requestId: RequestID
         let targetClientId: ClientID
         let primitive: RTCPrimitive
-
-        // To be removed, redundant
-        let connectionId: SignalingServerConnectionID
-        let source: ClientSource
 }
 
 extension ClientMessage: Decodable {
         enum CodingKeys: String, CodingKey {
-                case requestId, method, targetClientId, encryptedPayload, connectionId, source
+                case requestId, method, targetClientId, encryptedPayload
         }
 
         init(from decoder: Decoder) throws {
@@ -69,9 +66,6 @@ extension ClientMessage: Decodable {
                 case .iceCandidate:
                         self.primitive = .iceCandidate(try JSONDecoder().decode(RTCPrimitive.ICECandidate.self, from: decryptedPyload))
                 }
-
-                self.connectionId = try container.decode(SignalingServerConnectionID.self, forKey: .connectionId)
-                self.source = try container.decode(ClientSource.self, forKey: .source)
         }
 }
 
@@ -85,7 +79,7 @@ extension ClientMessage: Encodable {
                 let encodedPrimitive = try JSONEncoder().encode(primitive)
                 let encryptionKey = encoder.userInfo[.clientMessageEncryptonKey] as! EncryptionKey
                 let encryptedPrimitive = try encryptionKey.encrypt(data: encodedPrimitive)
-                let payload = EncryptedPayload(rawValue: .init(data: encryptedPrimitive))
+                let payload = HexCodable.init(data: encryptedPrimitive)
                 try container.encode(payload, forKey: .encryptedPayload)
 
                 switch primitive {
@@ -96,9 +90,6 @@ extension ClientMessage: Encodable {
                 case .iceCandidate:
                         try container.encode(Method.iceCandidate, forKey: .method)
                 }
-
-                try container.encode(connectionId, forKey: .connectionId)
-                try container.encode(source, forKey: .source)
         }
 }
 

@@ -12,12 +12,22 @@ public struct PeerConnectionClient: Sendable {
 	private let delegate: PeerConnectionDelegate
 	private let dataChannelClient: DataChannelClient
 
+        let onIceConnectionState: AnyAsyncSequence<ICEConnectionState>
+
 	init(id: PeerConnectionId, peerConnection: PeerConnection, delegate: PeerConnectionDelegate) throws {
 		self.id = id
 		self.peerConnection = peerConnection
 		self.delegate = delegate
 		self.dataChannelClient = try peerConnection.createDataChannel()
-	}
+
+                self.onIceConnectionState = delegate
+                        .onIceConnectionState
+                        .logInfo("Ice connection state: %@")
+                        .eraseToAnyAsyncSequence()
+                        .share()
+                        .eraseToAnyAsyncSequence()
+
+        }
 
 	func onRemoteOffer(_ answer: RTCPrimitive.Offer) async throws {
 		try await peerConnection.setRemoteOffer(answer)
@@ -57,10 +67,6 @@ extension PeerConnectionClient {
 extension PeerConnectionClient {
 	var onNegotiationNeeded: AsyncStream<Void> {
 		delegate.onNegotiationNeeded
-	}
-
-	var onIceConnectionState: AsyncStream<ICEConnectionState> {
-		delegate.onIceConnectionState
 	}
 
 	var onSignalingState: AsyncStream<SignalingState> {
