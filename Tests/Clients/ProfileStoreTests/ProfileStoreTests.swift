@@ -15,6 +15,7 @@ final class ProfileStoreTests: TestCase {
 				XCTAssertEqual($1, BIP39.Language.english)
 				return .testValue
 			}
+			$0.secureStorageClient.loadProfileSnapshotData = { nil }
 		} operation: {
 			_ = ProfileStore.shared
 		}
@@ -156,20 +157,6 @@ extension Mnemonic {
 		phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote",
 		language: .english
 	)
-}
-
-extension ProfileStore.State {
-	enum Disciminator: String, Sendable, Hashable {
-		case newWithEphemeral, ephemeral, persisted
-	}
-
-	var discriminator: Disciminator {
-		switch self {
-		case .newWithEphemeral: return .newWithEphemeral
-		case .ephemeral: return .ephemeral
-		case .persisted: return .persisted
-		}
-	}
 }
 
 extension FactorSource {
