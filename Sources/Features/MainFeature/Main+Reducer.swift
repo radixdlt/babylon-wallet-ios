@@ -40,6 +40,10 @@ public struct Main: Sendable, ReducerProtocol {
 			state.destination = nil
 			return .none
 
+		case .view(.dappInteractionPresented):
+			state.destination = nil
+			return .none
+
 		case .child, .delegate:
 			return .none
 		}
