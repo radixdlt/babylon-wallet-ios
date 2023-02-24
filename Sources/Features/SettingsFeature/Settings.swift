@@ -125,7 +125,7 @@ public struct AppSettings: FeatureReducer {
 			return .none
 
 		case .addP2PClientButtonTapped:
-			state.manageP2PClients = ManageP2PClients.State(newConnection: .init())
+			state.manageP2PClients = ManageP2PClients.State(destination: .newConnection(.init()))
 			return .none
 
 		case .editGatewayAPIEndpointButtonTapped:

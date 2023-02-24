@@ -25,7 +25,7 @@ public struct NewConnection: Sendable, ReducerProtocol {
 
 	func core(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
-		case .internal(.view(.dismissButtonTapped)):
+		case .internal(.view(.closeButtonTapped)):
 			switch state {
 			case .localNetworkPermission, .cameraPermission, .scanQR:
 				return .run { send in
