@@ -52,7 +52,7 @@ public struct AppSettings: FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case didAppear
-		case dismissSettingsButtonTapped
+		case closeButtonTapped
 		case deleteProfileAndFactorSourcesButtonTapped
 
 		case manageP2PClientsButtonTapped
@@ -83,7 +83,7 @@ public struct AppSettings: FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case dismissSettings
+		case dismiss // TODO: remove this and use @Dependency(\.dismiss) when available upstream
 		case deleteProfileAndFactorSources
 		case networkChanged
 	}
@@ -111,8 +111,8 @@ public struct AppSettings: FeatureReducer {
 		case .didAppear:
 			return loadP2PClients()
 
-		case .dismissSettingsButtonTapped:
-			return .send(.delegate(.dismissSettings))
+		case .closeButtonTapped:
+			return .send(.delegate(.dismiss))
 
 		case .deleteProfileAndFactorSourcesButtonTapped:
 			return .task {

@@ -54,7 +54,7 @@ extension AppSettings.View {
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
 							CloseButton {
-								viewStore.send(.dismissSettingsButtonTapped)
+								viewStore.send(.closeButtonTapped)
 							}
 						}
 					}
@@ -93,6 +93,8 @@ extension AppSettings.View {
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
 		}
+		.showDeveloperDisclaimerBanner()
+		.presentsLoadingViewOverlay()
 	}
 }
 

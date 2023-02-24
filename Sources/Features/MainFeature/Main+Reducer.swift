@@ -34,9 +34,9 @@ public struct Main: Sendable, ReducerProtocol {
 		case .child(.destination(.presented(.settings(.delegate(.networkChanged))))):
 			state.destination = nil
 			state.home = .init()
-			return body.reduce(into: &state, action: .child(.home(.view(.pullToRefreshStarted))))
+			return .send(.child(.home(.view(.pullToRefreshStarted))))
 
-		case .child(.destination(.presented(.settings(.delegate(.dismissSettings))))):
+		case .child(.destination(.presented(.settings(.delegate(.dismiss))))):
 			state.destination = nil
 			return .none
 
