@@ -31,6 +31,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case receivedRequestFromDapp(RTCIncommingWalletInteraction)
 		case presentQueuedRequestIfNeeded
 		case sentResponseToDapp(P2P.ToDapp.WalletInteractionResponse, for: RTCIncommingWalletInteraction, DappMetadata?)
+		case failedToSendResponseToDapp(RTCOutgoingMessage, for: RTCIncommingWalletInteraction, DappMetadata?, reason: String)
 		case presentResponseFailureAlert(RTCOutgoingMessage, for: RTCIncommingWalletInteraction, DappMetadata?, reason: String)
 		case presentResponseSuccessView(DappMetadata)
 		case ensureCurrentModalIsActuallyPresented
@@ -175,8 +176,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case .failure:
 				return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			}
+		case let .failedToSendResponseToDapp(response, for: request, metadata, reason):
+			dismissCurrentModalAndRequest(request, for: &state)
+			return delayedPresentationEffect(for: .internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
 
 		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
+
 			state.responseFailureAlert = .init(
 				title: { TextState(L10n.App.errorOccurredTitle) },
 				actions: {
@@ -226,7 +231,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.currentModal = nil
 			state.currentModal = currentModal
 			return .run { send in
-				try await clock.sleep(for: .seconds(2.0))
+				try await clock.sleep(for: .seconds(0.5))
 				await send(.internal(.ensureCurrentModalIsActuallyPresented))
 			}
 		} else {
@@ -244,7 +249,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
 			state.currentModal = nil
 			return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
-
 		case
 			.modal(.presented(.dappInteraction(.relay(_, .delegate(.presented))))),
 			.modal(.presented(.dappInteractionCompletion(.delegate(.presented)))):
@@ -265,7 +269,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			_ = try await p2pConnectivityClient.sendMessage(response)
 			await send(.internal(.sentResponseToDapp(response.content.content, for: request, dappMetadata)))
 		} catch: { error, send in
-			await send(.internal(.presentResponseFailureAlert(response, for: request, dappMetadata, reason: error.legibleLocalizedDescription)))
+			await send(.internal(.failedToSendResponseToDapp(response, for: request, dappMetadata, reason: error.localizedDescription)))
 		}
 	}
 
@@ -276,7 +280,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	func delayedPresentationEffect(
-		delay: Duration = .seconds(2.0),
+		delay: Duration = .seconds(0.75),
 		for action: Action
 	) -> EffectTask<Action> {
 		.run { send in

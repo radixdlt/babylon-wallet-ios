@@ -216,7 +216,15 @@ actor RTCClient {
 }
 
 // MARK: - PeerConnectionDidCloseError
-public struct PeerConnectionDidCloseError: Error {}
+public struct PeerConnectionDidCloseError: Error, LocalizedError {
+	public var errorDescription: String? {
+		"Peer Connection did close, retry the operation from dapp"
+	}
+//
+	//        var localizedDescription: String {
+	//                "Peer Connection did close, retry the operation from Dapp"
+	//        }
+}
 
 public extension URL {
 	static let prodSignalingServer = Self(string: "wss://signaling-server-betanet.radixdlt.com")!
