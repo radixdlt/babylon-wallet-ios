@@ -12,20 +12,13 @@ public struct ManageP2PClients: Sendable, ReducerProtocol {
 
 extension ManageP2PClients {
 	public var body: some ReducerProtocolOf<Self> {
-		CombineReducers {
-			EmptyReducer()
-				.forEach(\.clients, action: /Action.child .. Action.ChildAction.connection) {
-					ManageP2PClient()
-				}
-				.ifLet(
-					\.newConnection,
-					action: /Action.child .. Action.ChildAction.newConnection
-				) {
-					NewConnection()
-				}
-
-			Reduce(self.core)
-		}
+		Reduce(core)
+			.forEach(\.clients, action: /Action.child .. Action.ChildAction.connection) {
+				ManageP2PClient()
+			}
+			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+				Destinations()
+			}
 	}
 
 	public func core(state: inout State, action: Action) -> EffectTask<Action> {
@@ -122,11 +115,11 @@ extension ManageP2PClients {
 			return .none
 
 		case .internal(.view(.addNewConnectionButtonTapped)):
-			state.newConnection = .init()
+			state.destination = .newConnection(.init())
 			return .none
 
-		case let .child(.newConnection(.delegate(.newConnection(connectedClient)))):
-			state.newConnection = nil
+		case let .child(.destination(.presented(.newConnection(.delegate(.newConnection(connectedClient)))))):
+			state.destination = nil
 			return .task {
 				let result = await TaskResult {
 					try await p2pConnectivityClient.addP2PClientWithConnection(
@@ -138,8 +131,8 @@ extension ManageP2PClients {
 				return .internal(.system(.saveNewConnectionResult(result)))
 			}
 
-		case .child(.newConnection(.delegate(.dismiss))):
-			state.newConnection = nil
+		case .child(.destination(.presented(.newConnection(.delegate(.dismiss))))):
+			state.destination = nil
 			return .none
 
 		case .child:

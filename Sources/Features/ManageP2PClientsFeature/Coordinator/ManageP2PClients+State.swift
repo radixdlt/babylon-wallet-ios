@@ -7,14 +7,15 @@ extension ManageP2PClients {
 	public struct State: Sendable, Hashable {
 		public var clients: IdentifiedArrayOf<ManageP2PClient.State>
 
-		public var newConnection: NewConnection.State?
+		@PresentationState
+		public var destination: Destinations.State?
 
 		public init(
 			clients: IdentifiedArrayOf<ManageP2PClient.State> = .init(),
-			newConnection: NewConnection.State? = nil
+			destination: Destinations.State? = nil
 		) {
 			self.clients = clients
-			self.newConnection = newConnection
+			self.destination = destination
 		}
 	}
 }

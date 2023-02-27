@@ -1,6 +1,5 @@
 #if os(iOS)
 import Introspect
-import Resources
 import SwiftUI
 
 extension View {

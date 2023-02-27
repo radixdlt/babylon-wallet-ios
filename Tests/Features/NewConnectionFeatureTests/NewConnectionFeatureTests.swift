@@ -44,7 +44,7 @@ final class NewConnectionTests: TestCase {
 			reducer: NewConnection()
 		)
 
-		await store.send(.internal(.view(.dismissButtonTapped)))
+		await store.send(.internal(.view(.closeButtonTapped)))
 		await store.receive(.delegate(.newConnection(connectedClient)))
 	}
 

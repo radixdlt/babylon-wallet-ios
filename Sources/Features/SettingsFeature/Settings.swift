@@ -20,39 +20,21 @@ public struct AppSettings: FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var manageP2PClients: ManageP2PClients.State?
-		@PresentationState
-		public var connectedDapps: ConnectedDapps.State?
-		@PresentationState
-		public var manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State?
-		@PresentationState
-		public var personasCoordinator: PersonasCoordinator.State?
+		public var destination: Destinations.State?
 
-		public var canAddP2PClient: Bool
+		public var userHasNoP2PClients: Bool?
 		#if DEBUG
 		public var profileToInspect: Profile?
 		#endif
 
-		public init(
-			manageP2PClients: ManageP2PClients.State? = nil,
-			connectedDapps: ConnectedDapps.State? = nil,
-			manageGatewayAPIEndpoints: ManageGatewayAPIEndpoints.State? = nil,
-			personasCoordinator: PersonasCoordinator.State? = nil,
-			canAddP2PClient: Bool = false
-		) {
-			self.manageP2PClients = manageP2PClients
-			self.connectedDapps = connectedDapps
-			self.manageGatewayAPIEndpoints = manageGatewayAPIEndpoints
-			self.personasCoordinator = personasCoordinator
-			self.canAddP2PClient = canAddP2PClient
-		}
+		public init() {}
 	}
 
 	// MARK: Action
 
 	public enum ViewAction: Sendable, Equatable {
 		case didAppear
-		case dismissSettingsButtonTapped
+		case closeButtonTapped
 		case deleteProfileAndFactorSourcesButtonTapped
 
 		case manageP2PClientsButtonTapped
@@ -76,33 +58,51 @@ public struct AppSettings: FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case manageP2PClients(PresentationActionOf<ManageP2PClients>)
-		case connectedDapps(PresentationActionOf<ConnectedDapps>)
-		case manageGatewayAPIEndpoints(PresentationActionOf<ManageGatewayAPIEndpoints>)
-		case personasCoordinator(PresentationActionOf<PersonasCoordinator>)
+		case destination(PresentationActionOf<Destinations>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case dismissSettings
+		case dismiss // TODO: remove this and use @Dependency(\.dismiss) when TCA tools are released
 		case deleteProfileAndFactorSources
-		case networkChanged
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case manageP2PClients(ManageP2PClients.State)
+			case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.State)
+			case connectedDapps(ConnectedDapps.State)
+			case personas(PersonasCoordinator.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case manageP2PClients(ManageP2PClients.Action)
+			case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
+			case connectedDapps(ConnectedDapps.Action)
+			case personas(PersonasCoordinator.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.manageP2PClients, action: /Action.manageP2PClients) {
+				ManageP2PClients()
+			}
+			Scope(state: /State.manageGatewayAPIEndpoints, action: /Action.manageGatewayAPIEndpoints) {
+				ManageGatewayAPIEndpoints()
+			}
+			Scope(state: /State.connectedDapps, action: /Action.connectedDapps) {
+				ConnectedDapps()
+			}
+			Scope(state: /State.personas, action: /Action.personas) {
+				PersonasCoordinator()
+			}
+		}
 	}
 
 	// MARK: Reducer
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$manageP2PClients, action: /Action.child .. ChildAction.manageP2PClients) {
-				ManageP2PClients()
-			}
-			.presentationDestination(\.$manageGatewayAPIEndpoints, action: /Action.child .. ChildAction.manageGatewayAPIEndpoints) {
-				ManageGatewayAPIEndpoints()
-			}
-			.presentationDestination(\.$personasCoordinator, action: /Action.child .. ChildAction.personasCoordinator) {
-				PersonasCoordinator()
-			}
-			.presentationDestination(\.$connectedDapps, action: /Action.child .. ChildAction.connectedDapps) {
-				ConnectedDapps()
+			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destinations()
 			}
 	}
 
@@ -111,8 +111,8 @@ public struct AppSettings: FeatureReducer {
 		case .didAppear:
 			return loadP2PClients()
 
-		case .dismissSettingsButtonTapped:
-			return .send(.delegate(.dismissSettings))
+		case .closeButtonTapped:
+			return .send(.delegate(.dismiss))
 
 		case .deleteProfileAndFactorSourcesButtonTapped:
 			return .task {
@@ -120,25 +120,25 @@ public struct AppSettings: FeatureReducer {
 				return .delegate(.deleteProfileAndFactorSources)
 			}
 
-		case .manageP2PClientsButtonTapped:
-			state.manageP2PClients = ManageP2PClients.State()
+		case .addP2PClientButtonTapped:
+			state.destination = .manageP2PClients(.init(destination: .newConnection(.init())))
 			return .none
 
-		case .addP2PClientButtonTapped:
-			state.manageP2PClients = ManageP2PClients.State(newConnection: .init())
+		case .manageP2PClientsButtonTapped:
+			state.destination = .manageP2PClients(.init())
 			return .none
 
 		case .editGatewayAPIEndpointButtonTapped:
-			state.manageGatewayAPIEndpoints = ManageGatewayAPIEndpoints.State()
+			state.destination = .manageGatewayAPIEndpoints(.init())
 			return .none
 
 		case .connectedDappsButtonTapped:
-			state.connectedDapps = ConnectedDapps.State()
+			state.destination = .connectedDapps(.init())
 			return .none
 
 		case .personasButtonTapped:
 			// TODO: implement
-			state.personasCoordinator = PersonasCoordinator.State()
+			state.destination = .personas(.init())
 			return .none
 
 		#if DEBUG
@@ -160,7 +160,7 @@ public struct AppSettings: FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .loadP2PClientsResult(.success(clients)):
-			state.canAddP2PClient = clients.isEmpty
+			state.userHasNoP2PClients = clients.isEmpty
 			return .none
 
 		case let .loadP2PClientsResult(.failure(error)):
@@ -177,16 +177,15 @@ public struct AppSettings: FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
-		case .manageP2PClients(.dismiss):
-			return loadP2PClients()
+		case .destination(.dismiss):
+			switch state.destination {
+			case .manageP2PClients:
+				return loadP2PClients()
+			default:
+				return .none
+			}
 
-		case .manageGatewayAPIEndpoints(.presented(.delegate(.networkChanged))):
-			return .send(.delegate(.networkChanged))
-
-		case .manageP2PClients,
-		     .manageGatewayAPIEndpoints,
-		     .connectedDapps,
-		     .personasCoordinator:
+		case .destination:
 			return .none
 		}
 	}
