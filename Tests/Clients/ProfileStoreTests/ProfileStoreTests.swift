@@ -2,6 +2,7 @@ import ClientTestingPrelude
 import Cryptography
 import LocalAuthenticationClient
 import Profile
+@testable import ProfileModels
 @testable import ProfileStore
 import SecureStorageClient
 
@@ -106,8 +107,8 @@ private extension ProfileStoreTests {
 				// N.B. normally async tests like this requires use of `Set` since ordering
 				// is not guaranteed by `Task`, however, the `ProfileStore` is a state machine
 				// only allowing for certain state transitions
-				var values: [ProfileStore.State.Disciminator] = .init()
-				let expectedValues: [ProfileStore.State.Disciminator] = [.newWithEphemeral, .ephemeral, .persisted]
+				var values: [ProfileStore.State.Discriminator] = .init()
+				let expectedValues: [ProfileStore.State.Discriminator] = [.newWithEphemeral, .ephemeral, .persisted]
 				for await state in stateAsyncSubject.prefix(expectedValues.count) {
 					values.append(state.discriminator)
 					switch state {

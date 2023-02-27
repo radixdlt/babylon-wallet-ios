@@ -82,14 +82,14 @@ extension ProfileStore.State {
 }
 
 extension ProfileStore.State {
-	enum Disciminator: String, Sendable, Hashable, CustomStringConvertible {
+	enum Discriminator: String, Sendable, Hashable, CustomStringConvertible {
 		case newWithEphemeral, ephemeral, persisted
 		public var description: String {
 			rawValue
 		}
 	}
 
-	var discriminator: Disciminator {
+	var discriminator: Discriminator {
 		switch self {
 		case .newWithEphemeral: return .newWithEphemeral
 		case .ephemeral: return .ephemeral
@@ -123,7 +123,7 @@ extension ProfileStore {
 	private func restoreFromSecureStorageIfAble() async {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		guard case let .newWithEphemeral(ephemeral) = state.value else {
-			let errorMsg = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state was: '\(String(describing: State.Disciminator.newWithEphemeral))' but was in state: '\(String(describing: state.value.discriminator))'"
+			let errorMsg = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state was: '\(String(describing: State.Discriminator.newWithEphemeral))' but was in state: '\(String(describing: state.value.discriminator))'"
 			loggerGlobal.critical(.init(stringLiteral: errorMsg))
 			assertionFailure(errorMsg)
 			return
@@ -190,7 +190,7 @@ extension ProfileStore {
 		#endif
 
 		guard case var .ephemeral(ephemeral) = state.value else {
-			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: State.Disciminator.ephemeral))' but was in '\(String(describing: state.value.description))'"
+			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: State.Discriminator.ephemeral))' but was in '\(String(describing: state.value.description))'"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
 			return
@@ -220,7 +220,7 @@ extension ProfileStore {
 		}
 
 		guard case let .persisted(persistedProfile) = state.value else {
-			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: State.Disciminator.ephemeral))' but was in '\(String(describing: state.value.description))'"
+			let errorMessage = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state '\(String(describing: State.Discriminator.ephemeral))' but was in '\(String(describing: state.value.description))'"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
 			assertionFailure(errorMessage)
 			return
