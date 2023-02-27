@@ -1,10 +1,9 @@
 import ClientTestingPrelude
 import Cryptography
 import LocalAuthenticationClient
-@testable import Profile
-@testable import ProfileModels
+import Profile
+@testable import ProfileStore
 import SecureStorageClient
-@_spi(Test) import ProfileStore
 
 // MARK: - ProfileStoreTests
 final class ProfileStoreTests: TestCase {

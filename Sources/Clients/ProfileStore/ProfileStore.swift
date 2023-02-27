@@ -11,15 +11,13 @@ public final actor ProfileStore {
 
 	public static let shared = ProfileStore()
 
-	@_spi(Test)
-	public /* inaccessible by SPI */ let state: AsyncCurrentValueSubject<State>
+	let state: AsyncCurrentValueSubject<State>
 
 	/// The current value of Profile. Use `update:profile` method to update it. Also see `values`,
 	/// for an async sequence of Profile.
 	public var profile: Profile { state.value.profile }
 
-	@_spi(Test)
-	public /* inaccessible by SPI */ init(state: AsyncCurrentValueSubject<State>) {
+	init(state: AsyncCurrentValueSubject<State>) {
 		self.state = state
 
 		Task {
@@ -27,8 +25,7 @@ public final actor ProfileStore {
 		}
 	}
 
-	@_spi(Test)
-	public /* inaccessible by SPI */ init() {
+	init() {
 		self.init(state: AsyncCurrentValueSubject<State>(Self.newEphemeral()))
 	}
 }
@@ -38,8 +35,7 @@ extension ProfileStore {
 	/// The different possible states of Profile store. See
 	/// `changeState:to` in `ProfileStore` for state machines valid
 	/// transitions.
-	@_spi(Test)
-	public /* inaccessible by SPI */ enum State: Sendable, CustomStringConvertible {
+	enum State: Sendable, CustomStringConvertible {
 		/// The initial state, set during start of init, have not yet
 		/// checked Secure Storage for an potentially existing stored
 		/// profile, which require an async Task to be done at end of
@@ -86,16 +82,14 @@ extension ProfileStore.State {
 }
 
 extension ProfileStore.State {
-	@_spi(Test)
-	public enum Disciminator: String, Sendable, Hashable, CustomStringConvertible {
+	enum Disciminator: String, Sendable, Hashable, CustomStringConvertible {
 		case newWithEphemeral, ephemeral, persisted
 		public var description: String {
 			rawValue
 		}
 	}
 
-	@_spi(Test)
-	public var discriminator: Disciminator {
+	var discriminator: Disciminator {
 		switch self {
 		case .newWithEphemeral: return .newWithEphemeral
 		case .ephemeral: return .ephemeral
@@ -106,8 +100,7 @@ extension ProfileStore.State {
 
 // MARK: Private
 extension ProfileStore {
-	@_spi(Test)
-	public /* inaccessible by SPI */ static func newEphemeral() -> State {
+	static func newEphemeral() -> State {
 		@Dependency(\.mnemonicClient) var mnemonicClient
 		do {
 			let mnemonic = try mnemonicClient.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)
