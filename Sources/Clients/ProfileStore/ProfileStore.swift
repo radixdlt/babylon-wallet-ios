@@ -5,11 +5,11 @@ import Profile
 import SecureStorageClient
 
 // MARK: - ProfileStore
-public final actor ProfileStore: GlobalActor {
+public final actor ProfileStore {
 	@Dependency(\.assert) var assert
 	@Dependency(\.secureStorageClient) var secureStorageClient
 
-	public static let shared = ProfileStore()
+//	public let var shared = ProfileStore()
 
 	@_spi(Test)
 	public /* inaccessible by SPI */ let state: AsyncCurrentValueSubject<State>
@@ -18,12 +18,18 @@ public final actor ProfileStore: GlobalActor {
 	/// for an async sequence of Profile.
 	public var profile: Profile { state.value.profile }
 
-	private init() {
-		self.state = AsyncCurrentValueSubject<State>(Self.newEphemeral())
+	@_spi(Test)
+	public /* inaccessible by SPI */ init(state: AsyncCurrentValueSubject<State>) {
+		self.state = state
 
 		Task {
 			await restoreFromSecureStorageIfAble()
 		}
+	}
+
+	@_spi(Test)
+	public /* inaccessible by SPI */ init() {
+		self.init(state: AsyncCurrentValueSubject<State>(Self.newEphemeral()))
 	}
 }
 
@@ -100,7 +106,8 @@ extension ProfileStore.State {
 
 // MARK: Private
 extension ProfileStore {
-	private static func newEphemeral() -> State {
+	@_spi(Test)
+	public /* inaccessible by SPI */ static func newEphemeral() -> State {
 		@Dependency(\.mnemonicClient) var mnemonicClient
 		do {
 			let mnemonic = try mnemonicClient.generate(BIP39.WordCount.twentyFour, BIP39.Language.english)

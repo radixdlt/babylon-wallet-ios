@@ -20,10 +20,22 @@ public struct EphemeralPrivateProfile: Sendable, Hashable {
 	}
 
 	public mutating func update(deviceDescription: NonEmptyString) {
-		profile.creatingDevice = deviceDescription
-		privateFactorSource.factorSource.hint = deviceDescription
-		var factorSources = profile.factorSources.rawValue
-		factorSources[id: profile.factorSources.first.id]?.hint = deviceDescription
-		profile.factorSources = .init(rawValue: factorSources)!
+		privateFactorSource.factorSource.update(deviceDescription: deviceDescription)
+		profile.update(deviceDescription: deviceDescription)
+	}
+}
+
+extension FactorSource {
+	public mutating func update(deviceDescription hint: NonEmptyString) {
+		self.hint = hint
+	}
+}
+
+extension Profile {
+	public mutating func update(deviceDescription: NonEmptyString) {
+		self.creatingDevice = deviceDescription
+		var factorSources = self.factorSources.rawValue
+		factorSources[id: self.factorSources.first.id]?.hint = deviceDescription
+		self.factorSources = .init(rawValue: factorSources)!
 	}
 }
