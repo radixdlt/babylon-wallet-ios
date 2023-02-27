@@ -22,7 +22,7 @@ final class SplashFeatureTests: TestCase {
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 
 		let factorSource = try FactorSource.babylon(mnemonic: .generate())
-		let newProfile = Profile(factorSource: factorSource)
+		let newProfile = withDependencies { $0.uuid = .incrementing } operation: { Profile(factorSource: factorSource) }
 		store.dependencies.profileClient.loadProfile = {
 			.success(newProfile)
 		}
@@ -58,7 +58,7 @@ final class SplashFeatureTests: TestCase {
 	func test__GIVEN__splash_appeared__WHEN__biometrics_configured__THEN__notifies_delegate_with_profile_result() async throws {
 		/// Profile load success
 		let factorSource = try FactorSource.babylon(mnemonic: .generate())
-		let newProfile = Profile(factorSource: factorSource)
+		let newProfile = withDependencies { $0.uuid = .incrementing } operation: { Profile(factorSource: factorSource) }
 		try await assertNotifiesDelegateWithProfileResult(.success(newProfile))
 		try await assertNotifiesDelegateWithProfileResult(.success(nil))
 

@@ -109,7 +109,6 @@ private extension ProfileStoreTests {
 				var values: [ProfileStore.State.Disciminator] = .init()
 				let expectedValues: [ProfileStore.State.Disciminator] = [.newWithEphemeral, .ephemeral, .persisted]
 				for await state in stateAsyncSubject.prefix(expectedValues.count) {
-					print("🔮 state: \(state.discriminator.rawValue)")
 					values.append(state.discriminator)
 					switch state {
 					case let .newWithEphemeral(newEphemeral):

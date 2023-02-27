@@ -9,7 +9,7 @@ public final actor ProfileStore {
 	@Dependency(\.assert) var assert
 	@Dependency(\.secureStorageClient) var secureStorageClient
 
-//	public let var shared = ProfileStore()
+	public static let shared = ProfileStore()
 
 	@_spi(Test)
 	public /* inaccessible by SPI */ let state: AsyncCurrentValueSubject<State>

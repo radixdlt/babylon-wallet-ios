@@ -54,7 +54,12 @@ final class ProfileTests: TestCase {
 		)
 		let networkID = networkAndGateway.network.id
 		let babylonFactorSource = try FactorSource.babylon(mnemonic: curve25519FactorSourceMnemonic)
-		var profile = Profile(factorSource: babylonFactorSource, creatingDevice: "computerRunningUnitTest")
+
+		var profile = withDependencies {
+			$0.uuid = .constant(.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!)
+		} operation: {
+			Profile(factorSource: babylonFactorSource, creatingDevice: "computerRunningUnitTest")
+		}
 
 		let olympiaFactorSource = try FactorSource.olympia(mnemonic: secp256K1FactorMnemonic)
 		profile.factorSources.append(olympiaFactorSource)

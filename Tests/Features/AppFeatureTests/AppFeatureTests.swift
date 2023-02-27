@@ -1,6 +1,7 @@
 @testable import AppFeature
 import FeatureTestingPrelude
 import OnboardingFeature
+@testable import Profile
 import ProfileClient
 @testable import SplashFeature
 
@@ -31,7 +32,6 @@ final class AppFeatureTests: TestCase {
 	func test_splash__GIVEN__an_existing_profile__WHEN__existing_profile_loaded__THEN__we_navigate_to_main() async throws {
 		// GIVEN: an existing profile
 		let factorSource = try FactorSource.babylon(mnemonic: .generate())
-		let existingProfile = Profile(factorSource: factorSource)
 
 		let testScheduler = DispatchQueue.test
 		let store = TestStore(
@@ -39,6 +39,12 @@ final class AppFeatureTests: TestCase {
 			reducer: App()
 		) {
 			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+		}
+
+		let existingProfile = withDependencies {
+			$0.uuid = .incrementing
+		} operation: {
+			Profile(factorSource: factorSource)
 		}
 
 		// WHEN: existing profile is loaded

@@ -1,7 +1,7 @@
 import ClientTestingPrelude
 import Cryptography
 import LocalAuthenticationClient
-import Profile
+@testable import Profile
 @testable import SecureStorageClient
 
 // MARK: - SecureStorageClientTests
@@ -85,6 +85,7 @@ private extension SecureStorageClientTests {
 		let privateHDFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
 
 		try await withDependencies {
+			$0.uuid = .incrementing
 			$0.keychainClient.setDataWithoutAuthForKey = { request in
 				if let assertKeychainSetItemWithoutAuthRequest {
 					try assertKeychainSetItemWithoutAuthRequest(request)

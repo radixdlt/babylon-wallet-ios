@@ -463,9 +463,6 @@ package.addModules([
 			"Cryptography",
 			"EngineToolkit", // address derivation
 			"P2PModels",
-			.product(name: "DeviceKit", package: "DeviceKit", condition: .when(platforms: [.iOS])) {
-				.package(url: "https://github.com/devicekit/DeviceKit", from: "5.0.0")
-			},
 			"Resources", // L10n
 		],
 		tests: .no
