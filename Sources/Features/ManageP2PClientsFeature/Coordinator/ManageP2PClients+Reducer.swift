@@ -32,20 +32,11 @@ extension ManageP2PClients {
 		switch action {
 		case .internal(.view(.task)):
 			return .run { send in
-				do {
-					for try await p2pClientIDs in try await p2pConnectivityClient.getP2PClientIDs() {
-						guard !Task.isCancelled else {
-							return
-						}
-						await send(.internal(.system(.loadClientIDsResult(
-							.success(p2pClientIDs)
-						))))
+				await send(.internal(.system(.loadClientsByIDsResult(
+					TaskResult {
+						try await p2pConnectivityClient.getP2PClientsByIDs([])
 					}
-				} catch {
-					await send(.internal(.system(.loadClientIDsResult(
-						.failure(error)
-					))))
-				}
+				))))
 			}
 
 		case let .internal(.system(.loadClientIDsResult(.success(clientIDs)))):

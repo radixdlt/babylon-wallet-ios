@@ -20,7 +20,7 @@ extension ManageP2PClients.Action {
 	public enum ChildAction: Sendable, Equatable {
 		case newConnection(NewConnection.Action)
 		case connection(
-			id: P2PClient.ID,
+			id: ConnectionPassword,
 			action: ManageP2PClient.Action
 		)
 	}
@@ -50,7 +50,7 @@ extension ManageP2PClients.Action.InternalAction {
 		case loadClientsByIDsResult(TaskResult<OrderedSet<P2PClient>>)
 
 		case saveNewConnectionResult(TaskResult<P2P.ClientWithConnectionStatus>)
-		case deleteConnectionResult(TaskResult<P2PClient.ID>)
+		case deleteConnectionResult(TaskResult<ConnectionPassword>)
 		case sendTestMessageResult(TaskResult<String>)
 	}
 }

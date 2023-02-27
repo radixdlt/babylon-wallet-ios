@@ -149,7 +149,7 @@ extension ProfileClient {
 	public typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
 	public typealias AddConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
 	public typealias UpdateConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
-	public typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
+	public typealias DeleteP2PClientByID = @Sendable (ConnectionPassword) async throws -> Void
 	public typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	public typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
 	public typealias CreateUnsavedVirtualEntity = @Sendable (CreateVirtualEntityRequest) async throws -> any EntityProtocol

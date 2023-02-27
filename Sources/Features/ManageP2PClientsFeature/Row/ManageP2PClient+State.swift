@@ -4,8 +4,8 @@ import FeaturePrelude
 extension ManageP2PClient {
 //	typealias State = P2P.ClientWithConnectionStatus
 	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = P2PClient.ID
-		public var id: ID { client.id }
+		public typealias ID = ConnectionPassword
+		public var id: ID { client.connectionPassword }
 		public let client: P2PClient
 
 		public var connectionStatus: ConnectionStatus

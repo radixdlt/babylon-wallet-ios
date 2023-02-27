@@ -295,7 +295,7 @@ extension ProfileClient {
 			},
 			deleteP2PClientByID: { id in
 				try await profileHolder.asyncMutating { profile in
-					profile.appPreferences.p2pClients.clients.removeAll(where: { $0.id == id })
+					profile.appPreferences.p2pClients.clients.removeAll(where: { $0.connectionPassword == id })
 				}
 			},
 			getAppPreferences: getAppPreferences,

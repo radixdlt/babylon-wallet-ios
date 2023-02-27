@@ -96,7 +96,8 @@ public actor RTCClients {
 		self.clients.append(client)
 	}
 
-	public func remove(_ connectionId: ConnectionPassword) {
+	public func remove(_ connectionId: ConnectionPassword) async {
+		await clients.first(where: { $0.id == connectionId })?.cancel()
 		clients.removeAll(where: { $0.id == connectionId })
 	}
 

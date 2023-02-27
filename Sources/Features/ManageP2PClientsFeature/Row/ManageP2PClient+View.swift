@@ -40,9 +40,9 @@ extension ManageP2PClient.View {
 						}
 					)
 				}
-				#if DEBUG
-				debugView(viewStore: viewStore)
-				#endif
+//				#if DEBUG
+//				debugView(viewStore: viewStore)
+//				#endif
 			}
 			.onAppear {
 				viewStore.send(.viewAppeared)

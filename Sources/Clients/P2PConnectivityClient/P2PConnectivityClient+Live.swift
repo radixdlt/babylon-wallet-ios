@@ -89,17 +89,17 @@ extension P2PConnectivityClient {
 			getP2PClientIDs: {
 				await MulticastHolder.shared.clientIDsAsyncSequence()
 			},
-			getP2PClientsByIDs: { ids in
-				try await OrderedSet(ids.asyncMap {
-					try await client(byID: $0)
-				})
+			getP2PClientsByIDs: { _ in
+				try await OrderedSet(profileClient.getP2PClients())
 			},
 			addP2PClientWithConnection: { client in
 				try await profileClient.addP2PClient(client)
 				try await rtcClients.add(client.connectionPassword)
 			},
-			deleteP2PClientByID: { _ in
-				//                                try await profileClient.deleteP2PClientByID(id)
+			deleteP2PClientByID: { id in
+
+				try await profileClient.deleteP2PClientByID(id)
+				try await rtcClients.remove(id)
 				//                                try await rtcClients.remove(id)
 			},
 			addP2PWithSecrets: { _ in

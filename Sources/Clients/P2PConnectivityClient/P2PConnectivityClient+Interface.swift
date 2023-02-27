@@ -49,7 +49,7 @@ extension P2PConnectivityClient {
 
 	public typealias AddP2PClientWithConnection = @Sendable (P2PClient) async throws -> Void
 	public typealias AddP2PWithPassword = @Sendable (ConnectionPassword) async throws -> Void
-	public typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
+	public typealias DeleteP2PClientByID = @Sendable (ConnectionPassword) async throws -> Void
 
 //	public typealias GetConnectionStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<P2P.ClientWithConnectionStatus>
 	public typealias ReceiveMessages = @Sendable () async throws -> AnyAsyncSequence<RTCIncommingMessageResult>
