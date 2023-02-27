@@ -5,10 +5,44 @@ import Profile
 import SecureStorageClient
 
 // MARK: - ProfileStore
+/// An in-memory store for the `Profile` providing thread safe
+/// read and write access to the wallets profile. Every write
+/// of the profile is protected agaist data races thanks to
+/// the actor model and every write persists it in keychain
+/// and if user has enabled: the keychain item syncs to iCloud
+/// as well.
+///
+/// This actor is meant **not** meant to be used directly by the
+/// apps reducers, but rather always indirectly, via the live
+/// implementations of a set of clients (dependencies), namely:
+/// * AccountsClient
+/// * PersonasClient
+/// * AuthorizedDappsClient
+/// * AppPreferencesClient (P2PClients)
+///
+/// These live implementaions will all references the one and only
+/// ProfileStore singleton instance `shared`.
+///
+/// Internally, the ProfileStore is a state machine starting during
+/// init in a first state `new`, then `async` (within a `Task`), it
+/// transitions to either `ephemeral` or `persisted`. The former state
+/// is used if no ProfileSnapshot was found in `secureStorageClient`,
+/// and will trigger the user to perform onboarding in the wallet. If
+/// a ProfileSnapshot was found instead the state `persisted` is used.
+///
+/// The public interface of the ProfileStore is:
+///
+///     static let shared: ProfileStore
+///     func values() -> AnyAsyncSequence<Profile>
+///     func commitEphemeral() async throws
+///     func deleteProfile() async throws
+///     func update(profile: Profile) async throws
+///
 public final actor ProfileStore {
-	@Dependency(\.assert) var assert
+	@Dependency(\.assertionFailure) var assertionFailure
 	@Dependency(\.secureStorageClient) var secureStorageClient
 
+	/// Our
 	public static let shared = ProfileStore()
 
 	let state: AsyncCurrentValueSubject<State>
@@ -236,5 +270,17 @@ extension ProfileStore {
 		try await secureStorageClient.saveProfileSnapshot(profile.snapshot())
 
 		changeState(to: .persisted(profile))
+	}
+
+	public func deleteProfile() async throws {
+		try await isInitialized() // it should not be possible for us to not be initialized...
+		do {
+			try await secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs()
+		} catch {
+			let errorMessage = "Error, failed to delete profile or factor source, failure: \(String(describing: error))"
+			loggerGlobal.error(.init(stringLiteral: errorMessage))
+			assertionFailure(errorMessage)
+		}
+		changeState(to: Self.newEphemeral())
 	}
 }
