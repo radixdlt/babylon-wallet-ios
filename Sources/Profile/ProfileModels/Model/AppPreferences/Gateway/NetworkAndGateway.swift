@@ -1,25 +1,23 @@
 import Prelude
 
-// MARK: - AppPreferences.NetworkAndGateway
-extension AppPreferences {
-	public struct NetworkAndGateway:
-		Sendable,
-		Hashable,
-		Codable,
-		CustomStringConvertible,
-		CustomDumpReflectable
-	{
-		public let network: Network
-		public let gatewayAPIEndpointURL: URL
+// MARK: - NetworkAndGateway
+public struct NetworkAndGateway:
+	Sendable,
+	Hashable,
+	Codable,
+	CustomStringConvertible,
+	CustomDumpReflectable
+{
+	public let network: Network
+	public let gatewayAPIEndpointURL: URL
 
-		public init(network: Network, gatewayAPIEndpointURL: URL) {
-			self.network = network
-			self.gatewayAPIEndpointURL = gatewayAPIEndpointURL
-		}
+	public init(network: Network, gatewayAPIEndpointURL: URL) {
+		self.network = network
+		self.gatewayAPIEndpointURL = gatewayAPIEndpointURL
 	}
 }
 
-extension AppPreferences.NetworkAndGateway {
+extension NetworkAndGateway {
 	/// `"https://betanet.radixdlt.com"`
 	/// you can also use `"https://nebunet-gateway.radixdlt.com"`
 	public static var nebunet: Self {
@@ -51,7 +49,7 @@ extension AppPreferences.NetworkAndGateway {
 	}
 }
 
-extension AppPreferences.NetworkAndGateway {
+extension NetworkAndGateway {
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

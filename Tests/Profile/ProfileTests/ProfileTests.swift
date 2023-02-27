@@ -8,7 +8,7 @@ import TestingPrelude
 
 // MARK: - ProfileTests
 final class ProfileTests: TestCase {
-	let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
+	let networkAndGateway = NetworkAndGateway.nebunet
 
 	func test_p2p_client_eq() throws {
 		let pw = try ConnectionPassword(data: .deadbeef32Bytes)

@@ -132,9 +132,9 @@ extension ProfileClient {
 	public typealias GetGatewayAPIEndpointBaseURL = @Sendable () async -> URL
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 
-	public typealias SetNetworkAndGateway = @Sendable (AppPreferences.NetworkAndGateway) async throws -> Void
+	public typealias SetNetworkAndGateway = @Sendable (NetworkAndGateway) async throws -> Void
 
-	public typealias GetNetworkAndGateway = @Sendable () async -> AppPreferences.NetworkAndGateway
+	public typealias GetNetworkAndGateway = @Sendable () async -> NetworkAndGateway
 
 	public typealias CreateEphemeralPrivateProfile = @Sendable (CreateEphemeralPrivateProfileRequest) async throws -> EphemeralPrivateProfile
 

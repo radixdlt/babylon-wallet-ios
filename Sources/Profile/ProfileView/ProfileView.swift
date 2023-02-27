@@ -206,7 +206,7 @@ extension AppPreferencesView {
 
 // MARK: - NetworkAndGatewayView
 public struct NetworkAndGatewayView: IndentedView {
-	public let networkAndGateway: AppPreferences.NetworkAndGateway
+	public let networkAndGateway: NetworkAndGateway
 	public let indentation: Indentation
 }
 

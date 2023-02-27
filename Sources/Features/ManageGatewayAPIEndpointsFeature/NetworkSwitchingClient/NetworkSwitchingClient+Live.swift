@@ -18,7 +18,7 @@ extension NetworkSwitchingClient {
 			await profileClient.getNetworkAndGateway()
 		}
 
-		let validateGatewayURL: ValidateGatewayURL = { newURL -> AppPreferences.NetworkAndGateway? in
+		let validateGatewayURL: ValidateGatewayURL = { newURL -> NetworkAndGateway? in
 			let currentURL = await getNetworkAndGateway().gatewayAPIEndpointURL
 			guard newURL != currentURL else {
 				return nil
@@ -28,7 +28,7 @@ extension NetworkSwitchingClient {
 			// once it returns networkID!
 			let network = try Network.lookupBy(name: name)
 
-			let networkAndGateway = AppPreferences.NetworkAndGateway(
+			let networkAndGateway = NetworkAndGateway(
 				network: network,
 				gatewayAPIEndpointURL: newURL
 			)

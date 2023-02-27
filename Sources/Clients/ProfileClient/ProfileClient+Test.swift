@@ -47,7 +47,7 @@ extension ProfileClient {
 		getFactorSources: { throw NoopError() },
 		getCurrentNetworkID: { NetworkID.nebunet },
 		getGatewayAPIEndpointBaseURL: { URL(string: "example.com")! },
-		getNetworkAndGateway: { AppPreferences.NetworkAndGateway.nebunet },
+		getNetworkAndGateway: { NetworkAndGateway.nebunet },
 		setNetworkAndGateway: { _ in },
 		createEphemeralPrivateProfile: { _ in throw NoopError() },
 		injectProfileSnapshot: { _ in },

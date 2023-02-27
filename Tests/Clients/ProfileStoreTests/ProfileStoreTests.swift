@@ -100,16 +100,16 @@ private extension ProfileStoreTests {
 				await profileSnapshotSavedIntoSecureStorage.setValue($0)
 			}
 		} operation: {
-			let stateAsyncSubject: AsyncCurrentValueSubject<ProfileStore.State> = .init(ProfileStore.newEphemeral())
+			let profileStateSubject: AsyncCurrentValueSubject<ProfileStore.ProfileState> = .init(ProfileStore.newEphemeral())
 
 			Task {
 				var profile: Profile?
 				// N.B. normally async tests like this requires use of `Set` since ordering
 				// is not guaranteed by `Task`, however, the `ProfileStore` is a state machine
 				// only allowing for certain state transitions
-				var values: [ProfileStore.State.Discriminator] = .init()
-				let expectedValues: [ProfileStore.State.Discriminator] = [.newWithEphemeral, .ephemeral, .persisted]
-				for await state in stateAsyncSubject.prefix(expectedValues.count) {
+				var values: [ProfileStore.ProfileState.Discriminator] = .init()
+				let expectedValues: [ProfileStore.ProfileState.Discriminator] = [.newWithEphemeral, .ephemeral, .persisted]
+				for await state in profileStateSubject.prefix(expectedValues.count) {
 					values.append(state.discriminator)
 					switch state {
 					case let .newWithEphemeral(newEphemeral):
@@ -129,7 +129,7 @@ private extension ProfileStoreTests {
 				XCTAssertNoDifference(values, expectedValues)
 			}
 
-			let sut = ProfileStore(state: stateAsyncSubject)
+			let sut = ProfileStore(profileStateSubject: profileStateSubject)
 			try await sut.commitEphemeral()
 			let profileSnapshotMaybe = await profileSnapshotSavedIntoSecureStorage.value
 			if let assertProfileSnapshotSaved {

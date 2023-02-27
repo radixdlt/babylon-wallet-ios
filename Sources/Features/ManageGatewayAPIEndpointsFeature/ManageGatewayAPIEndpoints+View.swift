@@ -118,7 +118,7 @@ extension ManageGatewayAPIEndpoints.View {
 	}
 
 	fileprivate func networkAndGatewayView(
-		_ networkAndGateway: AppPreferences.NetworkAndGateway
+		_ networkAndGateway: NetworkAndGateway
 	) -> some View {
 		Group {
 			Text(L10n.ManageGateway.currentGatewayTitle)
@@ -143,7 +143,7 @@ extension ManageGatewayAPIEndpoints.View {
 extension ManageGatewayAPIEndpoints.View {
 	struct ViewState: Equatable {
 		public var urlString: String
-		public var networkAndGateway: AppPreferences.NetworkAndGateway?
+		public var networkAndGateway: NetworkAndGateway?
 		public var controlState: ControlState
 		@BindingState public var focusedField: ManageGatewayAPIEndpoints.State.Field?
 
