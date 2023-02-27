@@ -20,26 +20,26 @@ enum RTCPrimitive: Equatable, Sendable {
 }
 
 extension RTCPrimitive {
-        var offer: Offer? {
-                guard case let .offer(offer) = self else {
-                        return nil
-                }
-                return offer
-        }
+	var offer: Offer? {
+		guard case let .offer(offer) = self else {
+			return nil
+		}
+		return offer
+	}
 
-        var answer: Answer? {
-                guard case let .answer(answer) = self else {
-                        return nil
-                }
-                return answer
-        }
+	var answer: Answer? {
+		guard case let .answer(answer) = self else {
+			return nil
+		}
+		return answer
+	}
 
-        var iceCandidate: ICECandidate? {
-                guard case let .iceCandidate(ice) = self else {
-                        return nil
-                }
-                return ice
-        }
+	var iceCandidate: ICECandidate? {
+		guard case let .iceCandidate(ice) = self else {
+			return nil
+		}
+		return ice
+	}
 }
 
 extension RTCPrimitive {
@@ -70,7 +70,6 @@ extension RTCPrimitive {
 		}
 	}
 }
-
 
 // MARK: Encodable
 extension RTCPrimitive: Encodable {

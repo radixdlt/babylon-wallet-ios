@@ -6,7 +6,7 @@ import RadixConnect
 // MARK: - DappInteractionHook
 struct DappInteractor: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-                var requestQueue: OrderedSet<RTCIncommingWalletInteraction> = []
+		var requestQueue: OrderedSet<RTCIncommingWalletInteraction> = []
 
 		@PresentationState
 		var currentModal: Destinations.State?
@@ -17,6 +17,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case task
+		case moveToBackground
+		case moveToForeground
 		case responseFailureAlert(PresentationAction<AlertState<ViewAction.ResponseFailureAlertAction>, ViewAction.ResponseFailureAlertAction>)
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
@@ -78,25 +80,25 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .task:
 			return .run { send in
 				try await p2pConnectivityClient.loadFromProfileAndConnectAll()
-                                let currentNetworkID = await profileClient.getCurrentNetworkID()
+				let currentNetworkID = await profileClient.getCurrentNetworkID()
 
-                                for try await message in try await p2pConnectivityClient.receiveMessages() {
-                                        guard !Task.isCancelled else {
-                                                return
-                                        }
+				for try await message in try await p2pConnectivityClient.receiveMessages() {
+					guard !Task.isCancelled else {
+						return
+					}
 
-                                        do {
-                                                let interactionMessage = try message.unwrapResult()
-                                                guard interactionMessage.content.content.metadata.networkId == currentNetworkID else {
-                                                        // send error
-                                                        fatalError()
-                                                }
+					do {
+						let interactionMessage = try message.unwrapResult()
+						guard interactionMessage.content.content.metadata.networkId == currentNetworkID else {
+							// send error
+							fatalError()
+						}
 
-                                                await send(.internal(.receivedRequestFromDapp(interactionMessage)))
-                                        } catch {
-                                                fatalError()
-                                        }
-                                }
+						await send(.internal(.receivedRequestFromDapp(interactionMessage)))
+					} catch {
+						fatalError()
+					}
+				}
 //				for try await clientIDs in try await p2pConnectivityClient.getP2PClientIDs() {
 //					guard !Task.isCancelled else {
 //						return
@@ -142,6 +144,14 @@ struct DappInteractor: Sendable, FeatureReducer {
 				return delayedPresentationEffect(for: .internal(.presentQueuedRequestIfNeeded))
 			case let .presented(.retryButtonTapped(response, request, dappMetadata)):
 				return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
+			}
+		case .moveToBackground:
+			return .fireAndForget {
+				await p2pConnectivityClient.disconnectAndRemoveAll()
+			}
+		case .moveToForeground:
+			return .fireAndForget {
+				try await p2pConnectivityClient.loadFromProfileAndConnectAll()
 			}
 		}
 	}
@@ -201,7 +211,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		case .some(.dappInteractionCompletion):
 			return .send(.child(.modal(.presented(.dappInteractionCompletion(.delegate(.dismiss))))))
 		case .none:
-                        state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.content.content)))
+			state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.content.content)))
 			return ensureCurrentModalIsActuallyPresentedEffect(for: &state)
 		default:
 			return .none
@@ -216,7 +226,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.currentModal = nil
 			state.currentModal = currentModal
 			return .run { send in
-				try await clock.sleep(for: .seconds(0.5))
+				try await clock.sleep(for: .seconds(2.0))
 				await send(.internal(.ensureCurrentModalIsActuallyPresented))
 			}
 		} else {
@@ -228,7 +238,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
 		switch childAction {
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submitAndDismiss(responseToDapp, dappMetadata)))))):
-                        let response = request.toOutgoingMessage(responseToDapp)
+			let response = request.toOutgoingMessage(responseToDapp)
 			return sendResponseToDappEffect(response, for: request, dappMetadata: dappMetadata)
 
 		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
@@ -253,9 +263,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 	) -> EffectTask<Action> {
 		.run { send in
 			_ = try await p2pConnectivityClient.sendMessage(response)
-                        await send(.internal(.sentResponseToDapp(response.content.content, for: request, dappMetadata)))
+			await send(.internal(.sentResponseToDapp(response.content.content, for: request, dappMetadata)))
 		} catch: { error, send in
-                        await send(.internal(.presentResponseFailureAlert(response, for: request, dappMetadata, reason: error.legibleLocalizedDescription)))
+			await send(.internal(.presentResponseFailureAlert(response, for: request, dappMetadata, reason: error.legibleLocalizedDescription)))
 		}
 	}
 
@@ -266,7 +276,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	func delayedPresentationEffect(
-		delay: Duration = .seconds(0.75),
+		delay: Duration = .seconds(2.0),
 		for action: Action
 	) -> EffectTask<Action> {
 		.run { send in

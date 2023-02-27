@@ -29,9 +29,9 @@ extension ProfileClient {
 extension P2PConnectivityClient {
 	public static let liveValue: Self = {
 		@Dependency(\.profileClient) var profileClient
-                @Dependency(\.jsonDecoder) var jsonDecoder
+		@Dependency(\.jsonDecoder) var jsonDecoder
 
-                let rtcClients = RTCClients(signalingServerBaseURL: .devSignalingServer)
+		let rtcClients = RTCClients(signalingServerBaseURL: .devSignalingServer)
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
 		@Sendable func client(byID id: P2PClient.ID) async throws -> P2PClient {
@@ -71,9 +71,9 @@ extension P2PConnectivityClient {
 		let loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll = {
 			Task {
 				print("🔌 Loading and connecting all P2P connections")
-                                for client in try await profileClient.getP2PClients() {
-                                        try await rtcClients.add(client.connectionPassword)
-                                }
+				for client in try await profileClient.getP2PClients() {
+					try await rtcClients.add(client.connectionPassword)
+				}
 			}
 		}
 
@@ -81,7 +81,7 @@ extension P2PConnectivityClient {
 			loadFromProfileAndConnectAll: loadFromProfileAndConnectAll,
 			disconnectAndRemoveAll: {
 				print("🔌 Disconnecting and removing all P2P connections")
-                                        await rtcClients.removeAll()
+				await rtcClients.removeAll()
 			},
 			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
@@ -96,15 +96,15 @@ extension P2PConnectivityClient {
 			},
 			addP2PClientWithConnection: { client in
 				try await profileClient.addP2PClient(client)
-                                try await rtcClients.add(client.connectionPassword)
+				try await rtcClients.add(client.connectionPassword)
 			},
-                        deleteP2PClientByID: { id in
-//                                try await profileClient.deleteP2PClientByID(id)
-//                                try await rtcClients.remove(id)
-                        },
-                        addP2PWithSecrets: { password in
-//                                try await rtcClients.add(.init(.init(password.data)))
-                        },
+			deleteP2PClientByID: { _ in
+				//                                try await profileClient.deleteP2PClientByID(id)
+				//                                try await rtcClients.remove(id)
+			},
+			addP2PWithSecrets: { _ in
+				//                                try await rtcClients.add(.init(.init(password.data)))
+			},
 //			getConnectionStatusAsyncSequence: { id in
 //				try await P2PConnections.shared.connectionStatusChangeEventAsyncSequence(for: id).map {
 //					try await P2P.ClientWithConnectionStatus(
@@ -113,7 +113,7 @@ extension P2PConnectivityClient {
 //					)
 //				}.eraseToAnyAsyncSequence()
 //			},
-                        receiveMessages: { await rtcClients.incommingMessages },
+			receiveMessages: { await rtcClients.incommingMessages },
 //			getRequestsFromP2PClientAsyncSequence: { id in
 //				try await P2PConnections.shared.incomingMessagesAsyncSequence(for: id).map { msg in
 //					@Dependency(\.jsonDecoder) var jsonDecoder
@@ -136,7 +136,7 @@ extension P2PConnectivityClient {
 //
 //			},
 			sendMessage: { outgoingMsg in
-                                try await rtcClients.sendMessage(outgoingMsg)
+				try await rtcClients.sendMessage(outgoingMsg)
 			}
 //			_sendTestMessage: { id, message in
 //				let msgID = UUID().uuidString

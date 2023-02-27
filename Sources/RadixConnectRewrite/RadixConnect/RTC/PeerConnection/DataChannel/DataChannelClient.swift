@@ -84,6 +84,13 @@ actor DataChannelClient: NSObject {
 		try await waitForMessageConfirmation(id)
 	}
 
+	func cancel() {
+		onMessageReceivedContinuation.finish()
+		onReadyStateContinuation.finish()
+		delegate.cancel()
+		dataChannel.close()
+	}
+
 	// MARK: - Private
 
 	private func sendMessageOverDataChannel(_ message: DataChannelMessage) throws {

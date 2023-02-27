@@ -6,7 +6,7 @@ import RadixConnect
 public struct ConnectUsingSecrets: Sendable, ReducerProtocol {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mainQueue) var mainQueue
-        @Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
+	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	public init() {}
 }
 
@@ -19,8 +19,8 @@ extension ConnectUsingSecrets {
 			return .run { [connectionPassword = state.connectionSecrets.connectionPassword] send in
 				await send(.internal(.system(.establishConnectionResult(
 					TaskResult {
-//                                                try await p2pConnectivityClient.addP2PWithSecrets(connectionPassword)
-                                                return try P2PConnectionID(password: connectionPassword)
+						//                                                try await p2pConnectivityClient.addP2PWithSecrets(connectionPassword)
+						try P2PConnectionID(password: connectionPassword)
 					}
 				))))
 			}

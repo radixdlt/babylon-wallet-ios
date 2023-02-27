@@ -4,13 +4,16 @@ import Prelude
 
 // MARK: - WebSocketClient
 protocol WebSocketClient: Sendable {
-	var incommingMessages: AsyncThrowingStream<Data, Error> { get }
+	var incommingMessages: AsyncStream<Data> { get }
 	func send(message: Data) async throws
+
+	func cancel()
 }
 
+// MARK: - ClientSource
 enum ClientSource: String, Sendable, Codable, Equatable {
-        case wallet
-        case `extension`
+	case wallet
+	case `extension`
 }
 
 // MARK: - SignalingClient
@@ -42,7 +45,7 @@ struct SignalingClient {
 	     idBuilder: @Sendable @escaping () -> RequestID = { .init(UUID().uuidString) },
 	     jsonDecoder: JSONDecoder = .init(),
 	     jsonEncoder: JSONEncoder = .init(),
-             clientSource: ClientSource = .wallet)
+	     clientSource: ClientSource = .wallet)
 	{
 		self.encryptionKey = encryptionKey
 		self.webSocketClient = webSocketClient
@@ -51,14 +54,14 @@ struct SignalingClient {
 		self.jsonEncoder = jsonEncoder
 		self.jsonDecoder = jsonDecoder
 		self.clientSource = clientSource
-                self.jsonDecoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
-                self.jsonEncoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
+		self.jsonDecoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
+		self.jsonEncoder.userInfo[.clientMessageEncryptonKey] = encryptionKey
 
 		self.incommingMessages = webSocketClient
 			.incommingMessages
 			.eraseToAnyAsyncSequence()
 			.mapSkippingError {
-                                print("Received message \(String(data: $0, encoding: .utf8))")
+				print("Received message \(String(data: $0, encoding: .utf8))")
 				return try jsonDecoder.decode(IncommingMessage.self, from: $0)
 			} logError: { error in
 				loggerGlobal.info("Failed to decode incomming Message - \(error)")
@@ -68,7 +71,7 @@ struct SignalingClient {
 
 		self.incommingRemoteClientMessagges = self.incommingMessages
 			.compactMap(\.fromRemoteClient)
-                        .share()
+			.share()
 			.eraseToAnyAsyncSequence()
 
 		self.incommingSignalingServerMessagges = self.incommingMessages
@@ -88,7 +91,7 @@ struct SignalingClient {
 			.eraseToAnyAsyncSequence()
 
 		self.onICECanddiate = self.incommingRemoteClientMessagges
-                        .compactMap(\.iceCandidate)
+			.compactMap(\.iceCandidate)
 			.logInfo("Received ICECandidate from remote client: %@")
 			.share()
 			.eraseToAnyAsyncSequence()
@@ -100,22 +103,27 @@ struct SignalingClient {
 			.eraseToAnyAsyncSequence()
 	}
 
-        public func sendToRemote(_ primitive: IdentifiedPrimitive<RTCPrimitive>) async throws {
-                let message = ClientMessage(
-                        requestId: idBuilder(),
-                        targetClientId: primitive.id,
-                        primitive: primitive.content)
-                let encodedMessage = try jsonEncoder.encode(message)
-                try await webSocketClient.send(message: encodedMessage)
-                try await waitForRequestAck(message.requestId)
+	func cancel() {
+		webSocketClient.cancel()
+	}
 
-                print("Sent to remote \(primitive)")
-        }
-        
+	public func sendToRemote(_ primitive: IdentifiedPrimitive<RTCPrimitive>) async throws {
+		let message = ClientMessage(
+			requestId: idBuilder(),
+			targetClientId: primitive.id,
+			primitive: primitive.content
+		)
+		let encodedMessage = try jsonEncoder.encode(message)
+		try await webSocketClient.send(message: encodedMessage)
+		try await waitForRequestAck(message.requestId)
+
+		print("Sent to remote \(primitive)")
+	}
+
 	public func sendToRemote(message: ClientMessage) async throws {
 		let encodedMessage = try jsonEncoder.encode(message)
 		try await webSocketClient.send(message: encodedMessage)
-                try await waitForRequestAck(message.requestId)
+		try await waitForRequestAck(message.requestId)
 	}
 
 	private func waitForRequestAck(_ requestId: RequestID) async throws {

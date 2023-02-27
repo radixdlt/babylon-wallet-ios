@@ -1,88 +1,93 @@
 import Foundation
 
 // MARK: - AsyncWebSocket
-public final class AsyncWebSocket: WebSocketClient {
+public final class AsyncWebSocket: NSObject, WebSocketClient {
 	struct UnknownMessageReceived: Error {}
 
 	private let url: URL
 	//        private let delegate: Delegate
-	private let task: URLSessionWebSocketTask
-	private let session: URLSession
+	private var task: URLSessionWebSocketTask?
+	private lazy var session: URLSession = {
+		var config = URLSessionConfiguration.default
+		config.waitsForConnectivity = true
+		let delegate = Delegate { [weak self] in
+			self?.task?.cancel()
+			self?.task = nil
+		}
+		return URLSession(configuration: config, delegate: delegate, delegateQueue: .none)
+	}()
+
 	// public let stateStream: AsyncStream<WebSocketState>
-	public let incommingMessages: AsyncThrowingStream<Data, Error>
+	public let incommingMessages: AsyncStream<Data>
+	private let incommingMessagesContinuation: AsyncStream<Data>.Continuation
 
 	public init(url: URL) {
 		self.url = url
-		//                var stateContinuation: AsyncStream<WebSocketState>.Continuation!
-		//                self.stateStream = AsyncStream<WebSocketState> {
-		//                        stateContinuation = $0
-		//                }
-//
-		//                let delegate = Delegate(continuation: stateContinuation)
-		self.session = URLSession(configuration: .default, delegate: nil, delegateQueue: .none)
-		let task = self.session.webSocketTask(with: url)
-		self.task = task
 
-		self.incommingMessages = .init {
-			switch try await task.receive() {
+		(incommingMessages, incommingMessagesContinuation) = AsyncStream.streamWithContinuation()
+
+//		self.sendPingContinuously()
+		super.init()
+		receiveMessages()
+	}
+
+	func receiveMessages() {
+		webSocketTask().receive { [weak self] result in
+			let message = try! result.get()
+			switch message {
 			case let .data(data):
-				return data
+				self?.incommingMessagesContinuation.yield(data)
 			case let .string(string):
-				return Data(string.utf8)
+				self?.incommingMessagesContinuation.yield(Data(string.utf8))
 			@unknown default:
-				throw UnknownMessageReceived()
+				fatalError()
 			}
+			self?.receiveMessages()
 		}
+	}
 
-		//                self.delegate = delegate
-		//  delegate.continuation.yield(.connecting)
-		task.resume()
-		self.sendPingContinuously()
+	func webSocketTask() -> URLSessionWebSocketTask {
+		guard let task else {
+			print("Re-Open websocket")
+			let newTask = session.webSocketTask(with: url)
+			newTask.resume()
+			self.task = newTask
+			return newTask
+		}
+		return task
+	}
+
+	func cancel() {
+		incommingMessagesContinuation.finish()
+		task?.cancel(with: .goingAway, reason: nil)
 	}
 }
 
 // MARK: AsyncWebSocket.Delegate
-internal extension AsyncWebSocket {
+extension AsyncWebSocket {
 	final class Delegate: NSObject, URLSessionWebSocketDelegate, Sendable {
-		//                let continuation: AsyncStream<WebSocketState>.Continuation
-		//                init(continuation: AsyncStream<WebSocketState>.Continuation) {
-		//                        self.continuation = continuation
-		//                }
-		func urlSession(
-			_: URLSession,
-			webSocketTask _: URLSessionWebSocketTask,
-			didOpenWithProtocol protocol: String?
-		) {
-			//   self.continuation.yield(.connected)
+		let onClose: @Sendable () -> Void
+		init(onClose: @Sendable @escaping () -> Void = {}) {
+			self.onClose = onClose
 		}
 
-		func urlSession(
-			_: URLSession,
-			webSocketTask _: URLSessionWebSocketTask,
-			didCloseWith closeCode: URLSessionWebSocketTask.CloseCode,
-			reason: Data?
-		) {
-			//                        self.continuation.yield(.closed(closeCode.swiftify()))
-			//                        self.continuation.finish()
+		func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
+			print("Closed websocket")
+			onClose()
 		}
 	}
 }
 
 public extension AsyncWebSocket {
-	func close(with closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
-		// delegate.continuation.yield(.closing)
-		task.cancel(with: closeCode, reason: reason)
-	}
-
 	func send(message: Data) async throws {
-		try await task.send(.data(message))
+		try await webSocketTask().send(.data(message))
 	}
 
 	private func sendPingContinuously() {
-//                Task {
-//                        task.sendPing { [weak self] _ in
-//                                self?.sendPingContinuously()
-//                        }
-//                }
+		//                Task {
+		//                        task.sendPing { [weak self] _ in
+		//                                self?.sendPingContinuously()
+		//                        }
+		//                }
 	}
 }

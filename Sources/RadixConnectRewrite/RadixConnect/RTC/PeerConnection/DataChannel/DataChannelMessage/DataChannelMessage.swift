@@ -1,12 +1,12 @@
 import Prelude
 import Tagged
 
+// MARK: - DataChannelMessageIDTag
 public enum DataChannelMessageIDTag {}
 public typealias DataChannelMessageID = Tagged<DataChannelMessageIDTag, String>
 
 // MARK: - DataChannelMessage
 enum DataChannelMessage: Codable, Sendable, Equatable {
-
 	case chunkedMessage(ChunkedMessage)
 	case receipt(Receipt)
 

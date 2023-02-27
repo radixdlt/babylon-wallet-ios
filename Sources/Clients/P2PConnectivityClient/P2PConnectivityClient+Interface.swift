@@ -24,7 +24,7 @@ public struct P2PConnectivityClient: DependencyKey, Sendable {
 
 	public var addP2PClientWithConnection: AddP2PClientWithConnection
 	public var deleteP2PClientByID: DeleteP2PClientByID
-        public var addP2PWithSecrets:AddP2PWithPassword
+	public var addP2PWithSecrets: AddP2PWithPassword
 
 //	public var getConnectionStatusAsyncSequence: GetConnectionStatusAsyncSequence
 	public var receiveMessages: ReceiveMessages
@@ -48,7 +48,7 @@ extension P2PConnectivityClient {
 	public typealias GetP2PClientsByIDs = @Sendable (OrderedSet<P2PClient.ID>) async throws -> OrderedSet<P2PClient>
 
 	public typealias AddP2PClientWithConnection = @Sendable (P2PClient) async throws -> Void
-        public typealias AddP2PWithPassword = @Sendable (ConnectionPassword) async throws -> Void
+	public typealias AddP2PWithPassword = @Sendable (ConnectionPassword) async throws -> Void
 	public typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 
 //	public typealias GetConnectionStatusAsyncSequence = GetAsyncSequenceOfByP2PClientID<P2P.ClientWithConnectionStatus>

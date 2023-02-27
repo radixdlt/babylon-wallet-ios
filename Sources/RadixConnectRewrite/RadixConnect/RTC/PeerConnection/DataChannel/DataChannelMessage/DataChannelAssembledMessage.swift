@@ -7,17 +7,17 @@ public struct DataChannelAssembledMessage: Equatable, Sendable {
 	// According to CAP19
 	static let chunkSize = 15441
 
-        public let idOfChunks: DataChannelMessageID
-        public let messageContent: Data
-        public let messageHash: Data
+	public let idOfChunks: DataChannelMessageID
+	public let messageContent: Data
+	public let messageHash: Data
 
-        public init(message: Data, id: DataChannelMessageID, messageHash: Data) {
+	public init(message: Data, id: DataChannelMessageID, messageHash: Data) {
 		self.idOfChunks = id
 		self.messageContent = message
 		self.messageHash = messageHash
 	}
 
-        public init(message: Data, id: DataChannelMessageID) {
+	public init(message: Data, id: DataChannelMessageID) {
 		self.init(message: message, id: id, messageHash: message.hash)
 	}
 }

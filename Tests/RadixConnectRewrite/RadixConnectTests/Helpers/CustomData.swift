@@ -3,15 +3,15 @@ import Foundation
 
 extension IdentifiedPrimitive {
 	static func anyOffer(for id: ClientID) -> IdentifiedPrimitive<RTCPrimitive> {
-                .init(content: .offer(.any), id: id)
+		.init(content: .offer(.any), id: id)
 	}
 
 	static func anyAnswer(for id: ClientID) -> IdentifiedPrimitive<RTCPrimitive> {
-                .init(content: .answer(.any), id: id)
+		.init(content: .answer(.any), id: id)
 	}
 
 	static func anyICECandidate(for id: ClientID) -> IdentifiedPrimitive<RTCPrimitive> {
-                .init(content: .iceCandidate(.any), id: id)
+		.init(content: .iceCandidate(.any), id: id)
 	}
 }
 
@@ -22,15 +22,15 @@ extension RTCPrimitive.Answer {
 }
 
 extension RTCPrimitive.Offer {
-        static var any: Self {
-                .init(sdp: "Offer SDP \(UUID().uuidString)")
-        }
+	static var any: Self {
+		.init(sdp: "Offer SDP \(UUID().uuidString)")
+	}
 }
 
 extension RTCPrimitive.ICECandidate {
-        static var any: Self {
-                .init(sdp: "ICECanddiate sdp \(UUID().uuidString)", sdpMLineIndex: 2, sdpMid: "mid")
-        }
+	static var any: Self {
+		.init(sdp: "ICECanddiate sdp \(UUID().uuidString)", sdpMLineIndex: 2, sdpMid: "mid")
+	}
 }
 
 extension ClientID {

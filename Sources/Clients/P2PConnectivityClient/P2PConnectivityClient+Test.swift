@@ -3,7 +3,7 @@ import ClientPrelude
 #if DEBUG
 
 // MARK: - P2PConnectivityClient + TestDependencyKey
-//extension P2PConnectivityClient: TestDependencyKey {
+// extension P2PConnectivityClient: TestDependencyKey {
 //	public static let previewValue = Self.noop
 //	public static let testValue = Self(
 //		loadFromProfileAndConnectAll: unimplemented("\(Self.self).loadFromProfileAndConnectAll"),
@@ -22,9 +22,9 @@ import ClientPrelude
 ////		_debugWebsocketStatusAsyncSequence: unimplemented("\(Self.self)._debugWebsocketStatusAsyncSequence"),
 ////		_debugDataChannelStatusAsyncSequence: unimplemented("\(Self.self)._debugDataChannelStatusAsyncSequence")
 //	)
-//}
+// }
 //
-//extension P2PConnectivityClient {
+// extension P2PConnectivityClient {
 //	static let noop = Self(
 //		loadFromProfileAndConnectAll: {},
 //		disconnectAndRemoveAll: {},
@@ -41,5 +41,5 @@ import ClientPrelude
 ////		_debugWebsocketStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 ////		_debugDataChannelStatusAsyncSequence: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 //	)
-//}
+// }
 #endif // DEBUG

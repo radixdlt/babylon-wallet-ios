@@ -25,6 +25,13 @@ final class RTCPeerConnectionAsyncDelegate:
 
 		super.init()
 	}
+
+	func cancel() {
+		onNegotiationNeededContinuation.finish()
+		onIceConnectionStateContinuation.finish()
+		onSignalingStateContinuation.finish()
+		onGeneratedICECandidateContinuation.finish()
+	}
 }
 
 // MARK: RTCPeerConnectionDelegate

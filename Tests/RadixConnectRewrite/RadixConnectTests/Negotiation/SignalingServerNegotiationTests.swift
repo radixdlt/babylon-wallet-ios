@@ -7,17 +7,17 @@ final class SignalingServerNegotiationTests: TestCase {
 	// Static config
 	static let connectionID = try! SignalingServerConnectionID(.init(.deadbeef32Bytes))
 	static let encryptionKey = try! EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
-        lazy var jsonDecoder: JSONDecoder = {
-                let decoder = JSONDecoder()
-                decoder.userInfo[.clientMessageEncryptonKey] = Self.encryptionKey
-                return decoder
-        }()
+	lazy var jsonDecoder: JSONDecoder = {
+		let decoder = JSONDecoder()
+		decoder.userInfo[.clientMessageEncryptonKey] = Self.encryptionKey
+		return decoder
+	}()
 
-        lazy var jsonEncoder: JSONEncoder = {
-                let encoder = JSONEncoder()
-                encoder.userInfo[.clientMessageEncryptonKey] = Self.encryptionKey
-                return encoder
-        }()
+	lazy var jsonEncoder: JSONEncoder = {
+		let encoder = JSONEncoder()
+		encoder.userInfo[.clientMessageEncryptonKey] = Self.encryptionKey
+		return encoder
+	}()
 
 	// Shared clients
 	let dataChannelClient = DataChannelClient(dataChannel: DataChannelMock(), delegate: DataChannelDelegateMock())
@@ -164,7 +164,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		await peerConnection.onCreateLocalAnswer()
 		peerConnection.completeCreateLocalAnswerRequest(with: .success(.any))
 
-                let message = try await jsonDecoder.decode(ClientMessage.self, from: webSocketClient.onClientMessageSent())
+		let message = try await jsonDecoder.decode(ClientMessage.self, from: webSocketClient.onClientMessageSent())
 		webSocketClient.respondToRequest(message: .failure(.noRemoteClientToTalkTo(.init(message.requestId.rawValue))))
 		let result = await peerConnectionTask.value
 
@@ -229,7 +229,7 @@ final class SignalingServerNegotiationTests: TestCase {
 		let configuredOffer = await peerConnection.configuredRemoteOffer.prefix(1).collect().first!
 
 		// Assert that the configured offer does amtch the incomming offer
-                XCTAssertEqual(configuredOffer, primitive.content.offer)
+		XCTAssertEqual(configuredOffer, primitive.content.offer)
 
 		// Complete the set remote offer action on peerConnection, thus allowing the negotiation to flow further
 		peerConnection.completeSetRemoteOffer(with: .success(()))
@@ -243,10 +243,10 @@ final class SignalingServerNegotiationTests: TestCase {
 		)
 
 		// Await for the ICECandidate to be configured on peerConnection
-                let configuredICECandidate = await peerConnection.configuredICECandidate.prefix(1).collect().first!
+		let configuredICECandidate = await peerConnection.configuredICECandidate.prefix(1).collect().first!
 
 		// Assert that the configured ICECandidate does match the incomming ICECanddiate
-                XCTAssertEqual(configuredICECandidate, primitive.content.iceCandidate)
+		XCTAssertEqual(configuredICECandidate, primitive.content.iceCandidate)
 
 		// Complete the add ICECandidate action on PeerConnection
 		peerConnection.completeAddICECandidate(with: .success(()))
@@ -255,7 +255,7 @@ final class SignalingServerNegotiationTests: TestCase {
 	/// Trigger the `generated local ICECandidate` event, as well assert that the generated ICECandidate is sent throught he WebSocket to the proper client
 	private func sendICECandidate(_ primitive: IdentifiedPrimitive<RTCPrimitive>, peerConnectionDelegate: MockPeerConnectionDelegate) async throws {
 		// Generate local ICECandidate
-                peerConnectionDelegate.generateICECandiddate(primitive.content.iceCandidate!)
+		peerConnectionDelegate.generateICECandiddate(primitive.content.iceCandidate!)
 
 		// Assert that the generated ICECandidate was properly sent
 		try await assertDidSendMessage(primitive)
@@ -267,51 +267,50 @@ final class SignalingServerNegotiationTests: TestCase {
 		await peerConnection.onCreateLocalAnswer()
 
 		// Complete the create local answer request
-                peerConnection.completeCreateLocalAnswerRequest(with: .success(primitive.content.answer!))
+		peerConnection.completeCreateLocalAnswerRequest(with: .success(primitive.content.answer!))
 
 		// Await for the created local answer to be configured on the peerConnection
 		let configuredAnswer = await peerConnection.configuredLocalAnswer.prefix(1).collect().first!
 
 		// Assert that the configured answer does match the created one
-                XCTAssertEqual(configuredAnswer, primitive.content.answer)
+		XCTAssertEqual(configuredAnswer, primitive.content.answer)
 
 		// Assert that the created answer is properly sent through the webSocket
-                try await assertDidSendMessage(primitive)
+		try await assertDidSendMessage(primitive)
 	}
 
 	/// Assert the given primitive was properly sent through the WebSocketClient
 	func assertDidSendMessage(_ primitive: IdentifiedPrimitive<RTCPrimitive>) async throws {
-                let sentMessage = try await webSocketClient
-                        .sentMessagesSequence
-                        .map {
-                                try await self.jsonDecoder.decode(ClientMessage.self, from: $0)
-                                
-                        }
-                        .filter {
-                                $0.targetClientId == primitive.id && $0.primitive == primitive.content
-                        }
-                        .prefix(1)
-                        .collect()
-                        .first!
+		let sentMessage = try await webSocketClient
+			.sentMessagesSequence
+			.map {
+				try await self.jsonDecoder.decode(ClientMessage.self, from: $0)
+			}
+			.filter {
+				$0.targetClientId == primitive.id && $0.primitive == primitive.content
+			}
+			.prefix(1)
+			.collect()
+			.first!
 		webSocketClient.respondToRequest(message: .success(sentMessage.requestId))
 	}
 
 	/// Creates a client message that is to be received from remote client
 	func makeClientMessage(_ primitive: IdentifiedPrimitive<RTCPrimitive>) throws -> JSONValue {
 		let requestId = RequestID.any.rawValue
-                let encoded = try jsonEncoder.encode(primitive.content.payload)
+		let encoded = try jsonEncoder.encode(primitive.content.payload)
 		let encrypted = try Self.encryptionKey.encrypt(data: encoded)
 		let data = JSONValue.dictionary([
 			"requestId": .string(requestId),
-                        "method": .string(ClientMessage.Method(from: primitive.content).rawValue),
-                        "targetClientId": .string(UUID().uuidString),
+			"method": .string(ClientMessage.Method(from: primitive.content).rawValue),
+			"targetClientId": .string(UUID().uuidString),
 			"encryptedPayload": .string(encrypted.hex),
 		])
 
 		let remoteData = JSONValue.dictionary([
 			"info": .string("remoteData"),
 			"requestId": .string(requestId),
-                        "remoteClientId": .string(primitive.id.rawValue),
+			"remoteClientId": .string(primitive.id.rawValue),
 			"data": data,
 		])
 

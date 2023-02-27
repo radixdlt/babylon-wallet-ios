@@ -59,16 +59,15 @@ struct WebRTCFactory: PeerConnectionFactory {
 		return peerConnection
 	}
 
-        func makePeerConnectionClient(for clientId: ClientID) throws -> PeerConnectionClient {
-                let delegate = RTCPeerConnectionAsyncDelegate()
-                let peerConnection = try Self.makeRTCPeerConnection(delegate: delegate)
-                return try .init(id: clientId, peerConnection: peerConnection, delegate: delegate)
-        }
+	func makePeerConnectionClient(for clientId: ClientID) throws -> PeerConnectionClient {
+		let delegate = RTCPeerConnectionAsyncDelegate()
+		let peerConnection = try Self.makeRTCPeerConnection(delegate: delegate)
+		return try .init(id: clientId, peerConnection: peerConnection, delegate: delegate)
+	}
 }
 
 // MARK: - RTCPeerConnection + PeerConnection
 extension RTCPeerConnection: PeerConnection {
-
 	struct FailedToCreateDataChannel: Error {}
 
 	func createDataChannel() throws -> DataChannelClient {
@@ -101,17 +100,17 @@ extension RTCPeerConnection: PeerConnection {
 		try await self.add(.init(from: candidate))
 	}
 
-        func setRemoteAnswer(_ answer: RTCPrimitive.Answer) async throws {
-                try await setRemoteDescription(.init(from: answer))
-        }
+	func setRemoteAnswer(_ answer: RTCPrimitive.Answer) async throws {
+		try await setRemoteDescription(.init(from: answer))
+	}
 
-        func createOffer() async throws -> RTCPrimitive.Offer {
-                try await .init(from: offer(for: .negotiationConstraints))
-        }
+	func createOffer() async throws -> RTCPrimitive.Offer {
+		try await .init(from: offer(for: .negotiationConstraints))
+	}
 
-        func setLocalOffer(_ offer: RTCPrimitive.Offer) async throws {
-                try await setLocalDescription(.init(from: offer))
-        }
+	func setLocalOffer(_ offer: RTCPrimitive.Offer) async throws {
+		try await setLocalDescription(.init(from: offer))
+	}
 }
 
 // MARK: - RTCDataChannel + Sendable

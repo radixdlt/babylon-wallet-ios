@@ -17,6 +17,11 @@ final class RTCDataChannelAsyncDelegate: NSObject,
 		(onReadyState, onReadyStateContinuation) = AsyncStream.streamWithContinuation(DataChannelState.self)
 		super.init()
 	}
+
+	func cancel() {
+		onMessageReceivedContinuation.finish()
+		onReadyStateContinuation.finish()
+	}
 }
 
 // MARK: RTCDataChannelDelegate
