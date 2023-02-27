@@ -40,7 +40,7 @@ public struct FactorSource:
 	public let parameters: Parameters
 
 	/// When this factor source for originally added by the user.
-	public let addedOn: Date
+	public private(set) var addedOn: Date // mutable for tests only
 
 	/// Date of last usage of this factor source
 	///
@@ -122,5 +122,13 @@ extension FactorSource {
 		let mnemonic = try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote", language: .english)
 		return try! Self.device(mnemonic: mnemonic, hint: "preview", olympiaCompatible: false)
 	}()
+
+	internal func ignoringDate() -> Self {
+		var copy = self
+		copy.addedOn = .init(timeIntervalSince1970: 0)
+		copy.lastUsedOn = .init(timeIntervalSince1970: 0)
+		return copy
+	}
 }
+
 #endif

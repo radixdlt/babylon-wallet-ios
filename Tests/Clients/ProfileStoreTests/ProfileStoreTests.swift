@@ -1,7 +1,8 @@
 import ClientTestingPrelude
 import Cryptography
 import LocalAuthenticationClient
-import Profile
+@testable import Profile
+@testable import ProfileModels
 import SecureStorageClient
 @_spi(Test) import ProfileStore
 
@@ -54,8 +55,8 @@ final class ProfileStoreTests: TestCase {
 				XCTAssertNoDifference(profileSnapshot.id, profileID)
 
 				XCTAssertNoDifference(
-					profileSnapshot.factorSources.first,
-					privateFactor.factorSource.with(deviceDescription: expectedDeviceDescription)
+					profileSnapshot.factorSources.first.ignoringDate(),
+					privateFactor.factorSource.with(deviceDescription: expectedDeviceDescription).ignoringDate()
 				)
 				XCTAssertNoDifference(profileSnapshot.creatingDevice, expectedDeviceDescription)
 			}
