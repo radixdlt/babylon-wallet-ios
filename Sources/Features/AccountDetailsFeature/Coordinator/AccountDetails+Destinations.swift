@@ -3,7 +3,7 @@ import AssetTransferFeature
 import FeaturePrelude
 
 extension AccountDetails {
-	public struct Destinations: Sendable, ReducerProtocol, Hashable {
+	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
 			case preferences(AccountPreferences.State)
 			case transfer(AssetTransfer.State)

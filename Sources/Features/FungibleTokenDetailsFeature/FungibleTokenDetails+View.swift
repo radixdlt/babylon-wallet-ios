@@ -60,45 +60,10 @@ extension FungibleTokenDetails.View {
 					}
 				}
 				#endif
-				.foregroundColor(.app.gray1)
 			}
+			.tint(.app.gray1)
+			.foregroundColor(.app.gray1)
 		}
-	}
-
-	@ViewBuilder
-	private func metadata(
-		viewStore: ViewStore<FungibleTokenDetails.View.ViewState, FungibleTokenDetails.Action.ViewAction>
-	) -> some View {
-		VStack(spacing: .medium3) {
-			HStack {
-				Text(L10n.FungibleTokenList.Detail.resourceAddress)
-					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray2)
-				AddressView(
-					viewStore.address,
-					textStyle: .body1Regular,
-					copyAddressAction: {
-						viewStore.send(.copyAddressButtonTapped)
-					}
-				)
-				.frame(maxWidth: .infinity, alignment: .trailing)
-				.multilineTextAlignment(.trailing)
-			}
-			if let currentSupply = viewStore.currentSupply {
-				HStack {
-					Text(L10n.FungibleTokenList.Detail.currentSupply)
-						.textStyle(.body1Regular)
-						.foregroundColor(.app.gray2)
-					Text(currentSupply.description)
-						.frame(maxWidth: .infinity, alignment: .trailing)
-						.multilineTextAlignment(.trailing)
-				}
-			}
-		}
-		.frame(maxWidth: .infinity, alignment: .leading)
-		.padding(.horizontal, .large2)
-		.textStyle(.body1Regular)
-		.lineLimit(1)
 	}
 }
 

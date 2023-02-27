@@ -23,7 +23,7 @@ extension NewConnection.Action {
 // MARK: - NewConnection.Action.ViewAction
 extension NewConnection.Action {
 	public enum ViewAction: Sendable, Equatable {
-		case dismissButtonTapped
+		case closeButtonTapped
 	}
 }
 

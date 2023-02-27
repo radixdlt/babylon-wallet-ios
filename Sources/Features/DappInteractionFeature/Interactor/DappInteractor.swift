@@ -58,7 +58,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 		}
 	}
 
-	let onDismiss: (@Sendable () -> Void)?
+	var onPresent: (@Sendable () -> Void)? = nil
+	var onDismiss: (@Sendable () -> Void)? = nil
 
 	@Dependency(\.profileClient) var profileClient
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
@@ -129,6 +130,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
 		case let .receivedRequestFromDapp(request):
+			onPresent?()
 			state.requestQueue.append(request)
 			return presentQueuedRequestIfNeededEffect(for: &state)
 
@@ -196,7 +198,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			state.currentModal = nil
 			state.currentModal = currentModal
 			return .run { send in
-				try await clock.sleep(for: .seconds(0.5))
+				try await clock.sleep(for: .seconds(2))
 				await send(.internal(.ensureCurrentModalIsActuallyPresented))
 			}
 		} else {

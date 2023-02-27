@@ -1,3 +1,4 @@
+import FeaturePrelude
 import HomeFeature
 import SettingsFeature
 
@@ -5,8 +6,16 @@ import SettingsFeature
 extension Main {
 	// MARK: Action
 	public enum Action: Sendable, Equatable {
+		case view(ViewAction)
 		case child(ChildAction)
 		case delegate(Delegate)
+	}
+}
+
+// MARK: - Main.Action.ViewAction
+extension Main.Action {
+	public enum ViewAction: Sendable, Equatable {
+		case dappInteractionPresented
 	}
 }
 
@@ -14,7 +23,7 @@ extension Main {
 extension Main.Action {
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
-		case settings(AppSettings.Action)
+		case destination(PresentationActionOf<Main.Destinations>)
 	}
 }
 

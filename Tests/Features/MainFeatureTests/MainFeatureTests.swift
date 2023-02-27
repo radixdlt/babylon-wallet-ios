@@ -3,7 +3,7 @@ import FeatureTestingPrelude
 
 @MainActor
 final class MainFeatureTests: TestCase {
-	func test_displaySettings_whenCoordinatedToDispaySettings_thenDisplaySettings() async {
+	func test_displayAndDismissSettings() async {
 		// given
 		let store = TestStore(
 			initialState: Main.State(home: .previewValue),
@@ -14,21 +14,13 @@ final class MainFeatureTests: TestCase {
 		// when
 		await store.send(.child(.home(.delegate(.displaySettings)))) {
 			// then
-			$0.settings = .init()
+			$0.destination = .settings(.init())
 		}
-	}
-
-	func test_dismissSettings_whenCoordinatedToDismissSettings_thenDismissSettings() async {
-		// given
-		let store = TestStore(
-			initialState: Main.State(home: .previewValue, settings: .init()),
-			reducer: Main()
-		)
 
 		// when
-		await store.send(.child(.settings(.delegate(.dismissSettings)))) {
+		await store.send(.child(.destination(.presented(.settings(.delegate(.dismiss)))))) {
 			// then
-			$0.settings = nil
+			$0.destination = nil
 		}
 	}
 }
