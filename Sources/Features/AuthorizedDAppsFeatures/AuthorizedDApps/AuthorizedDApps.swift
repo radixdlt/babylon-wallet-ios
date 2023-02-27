@@ -34,10 +34,11 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedDapps(TaskResult<OnNetwork.AuthorizedDapps>)
+		case presentDappDetails(DappDetails.State)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case presentedDapp(PresentationActionOf<DappDetails>)
+		case presentedDapp(PresentationAction<DappDetails.Action>)
 	}
 
 	// MARK: Reducer
@@ -46,7 +47,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$presentedDapp, action: /Action.child .. ChildAction.presentedDapp) {
+			.ifLet(\.$presentedDapp, action: /Action.child .. ChildAction.presentedDapp) {
 				DappDetails()
 			}
 	}
@@ -61,11 +62,25 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		case let .didSelectDapp(dAppID):
 			return .run { send in
 				let details = try await profileClient.getDetailedDapp(dAppID)
-				let presentedState = DappDetails.State(dApp: details)
-				await send(.child(.presentedDapp(.present(presentedState))))
+				let presentedDappState = DappDetails.State(dApp: details)
+				await send(.internal(.presentDappDetails(presentedDappState)))
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
+		switch internalAction {
+		case let .loadedDapps(.success(dApps)):
+			state.dApps = dApps
+			return .none
+		case let .loadedDapps(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
+		case let .presentDappDetails(presentedDappState):
+			state.presentedDapp = presentedDappState
+			return .none
 		}
 	}
 
@@ -78,17 +93,6 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 			}
 
 		case .presentedDapp:
-			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
-		switch internalAction {
-		case let .loadedDapps(.success(dApps)):
-			state.dApps = dApps
-			return .none
-		case let .loadedDapps(.failure(error)):
-			errorQueue.schedule(error)
 			return .none
 		}
 	}

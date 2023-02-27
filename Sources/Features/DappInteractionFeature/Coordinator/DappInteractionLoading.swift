@@ -17,7 +17,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case appeared
-		case errorAlert(PresentationAction<AlertState<ErrorAlertAction>, ErrorAlertAction>)
+		case errorAlert(PresentationAction<ErrorAlertAction>)
 		case dismissButtonTapped
 
 		enum ErrorAlertAction: Sendable, Equatable {
@@ -39,9 +39,7 @@ struct DappInteractionLoading: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$errorAlert, action: /Action.view .. ViewAction.errorAlert) {
-				EmptyReducer()
-			}
+			.ifLet(\.$errorAlert, action: /Action.view .. ViewAction.errorAlert)
 	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {

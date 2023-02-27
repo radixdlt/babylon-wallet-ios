@@ -11,8 +11,8 @@ extension AccountDetails {
 		public let account: OnNetwork.Account
 		public var assets: AssetsView.State
 
-		@PresentationStateOf<Destinations>
-		public var destination
+		@PresentationState
+		public var destination: Destinations.State?
 
 		public init(for account: AccountList.Row.State) {
 			self.account = account.account

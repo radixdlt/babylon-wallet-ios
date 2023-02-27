@@ -62,9 +62,7 @@ private extension PersonaDetails.State {
 }
 
 private extension PersonaDetails.Store {
-	var confirmForgetAlert: Store<PresentationState<AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert>>,
-		PresentationAction<AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert>,
-			PersonaDetails.ViewAction.ConfirmForgetAlert>>
+	var confirmForgetAlert: Store<PresentationState<AlertState<PersonaDetails.ViewAction.ConfirmForgetAlert>>, PresentationAction<PersonaDetails.ViewAction.ConfirmForgetAlert>>
 	{
 		scope(state: \.$confirmForgetAlert) { .view(.confirmForgetAlert($0)) }
 	}

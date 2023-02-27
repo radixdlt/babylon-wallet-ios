@@ -23,7 +23,7 @@ extension Main.Action {
 extension Main.Action {
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
-		case destination(PresentationActionOf<Main.Destinations>)
+		case destination(PresentationAction<Main.Destinations.Action>)
 	}
 }
 

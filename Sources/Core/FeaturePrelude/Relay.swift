@@ -1,4 +1,4 @@
-import ComposableArchitecture
+@_spi(Internals) import ComposableArchitecture
 
 // MARK: - RelayState
 public struct RelayState<RelayedState, MainState> {

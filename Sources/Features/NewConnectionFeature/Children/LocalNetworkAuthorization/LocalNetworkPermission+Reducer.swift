@@ -15,9 +15,7 @@ public struct LocalNetworkPermission: Sendable, ReducerProtocol {
 extension LocalNetworkPermission {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$permissionDeniedAlert, action: /Action.internal .. Action.InternalAction.view .. Action.ViewAction.permissionDeniedAlert) {
-				EmptyReducer()
-			}
+			.ifLet(\.$permissionDeniedAlert, action: /Action.internal .. Action.InternalAction.view .. Action.ViewAction.permissionDeniedAlert)
 	}
 
 	public func core(state: inout State, action: Action) -> EffectTask<Action> {

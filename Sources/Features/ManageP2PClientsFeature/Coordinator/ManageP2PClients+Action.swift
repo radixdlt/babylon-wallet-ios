@@ -17,7 +17,7 @@ extension ManageP2PClients.Action {
 // MARK: - ManageP2PClients.Action.ChildAction
 extension ManageP2PClients.Action {
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationActionOf<ManageP2PClients.Destinations>)
+		case destination(PresentationAction<ManageP2PClients.Destinations.Action>)
 		case connection(
 			id: P2PClient.ID,
 			action: ManageP2PClient.Action

@@ -13,7 +13,7 @@ public struct AccountDetails: Sendable, ReducerProtocol {
 		}
 
 		Reduce(core)
-			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
 				Destinations()
 			}
 	}

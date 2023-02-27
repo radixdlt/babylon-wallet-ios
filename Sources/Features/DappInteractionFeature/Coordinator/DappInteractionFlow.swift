@@ -62,7 +62,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case appeared
 		case closeButtonTapped
 		case backButtonTapped
-		case personaNotFoundErrorAlert(PresentationAction<AlertState<PersonaNotFoundErrorAlertAction>, PersonaNotFoundErrorAlertAction>)
+		case personaNotFoundErrorAlert(PresentationAction<PersonaNotFoundErrorAlertAction>)
 
 		enum PersonaNotFoundErrorAlertAction: Sendable, Equatable {
 			case cancelButtonTapped
@@ -144,9 +144,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			.navigationDestination(\.$path, action: /Action.child .. ChildAction.path) {
 				Destinations()
 			}
-			.presentationDestination(\.$personaNotFoundErrorAlert, action: /Action.view .. ViewAction.personaNotFoundErrorAlert) {
-				EmptyReducer()
-			}
+			.ifLet(\.$personaNotFoundErrorAlert, action: /Action.view .. ViewAction.personaNotFoundErrorAlert)
 	}
 
 	@Dependency(\.profileClient) var profileClient

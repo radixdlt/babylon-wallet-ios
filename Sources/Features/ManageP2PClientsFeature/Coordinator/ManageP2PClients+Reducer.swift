@@ -16,7 +16,7 @@ extension ManageP2PClients {
 			.forEach(\.clients, action: /Action.child .. Action.ChildAction.connection) {
 				ManageP2PClient()
 			}
-			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
 				Destinations()
 			}
 	}

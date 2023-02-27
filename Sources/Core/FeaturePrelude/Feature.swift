@@ -71,4 +71,4 @@ extension ReducerProtocol where Self: FeatureReducer {
 	}
 }
 
-public typealias PresentationStoreOf<R: ReducerProtocol> = Store<PresentationStateOf<R>, PresentationActionOf<R>>
+public typealias PresentationStoreOf<R: ReducerProtocol> = Store<PresentationState<R.State>, PresentationAction<R.Action>>

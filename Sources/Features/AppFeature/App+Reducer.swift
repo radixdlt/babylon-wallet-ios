@@ -28,7 +28,7 @@ public struct App: Sendable, ReducerProtocol {
 		}
 
 		Reduce(self.core)
-			.presentationDestination(\.$alert, action: /Action.internal .. Action.InternalAction.view .. Action.ViewAction.alert) {
+			.ifLet(\.$alert, action: /Action.internal .. Action.InternalAction.view .. Action.ViewAction.alert) {
 				Alerts()
 			}
 	}

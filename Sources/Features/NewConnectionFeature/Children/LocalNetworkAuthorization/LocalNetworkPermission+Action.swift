@@ -19,7 +19,7 @@ extension LocalNetworkPermission.Action {
 		}
 
 		case appeared
-		case permissionDeniedAlert(PresentationAction<AlertState<PermissionDeniedAlertAction>, PermissionDeniedAlertAction>)
+		case permissionDeniedAlert(PresentationAction<PermissionDeniedAlertAction>)
 	}
 }
 

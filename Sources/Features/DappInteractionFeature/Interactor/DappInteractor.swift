@@ -16,7 +16,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	enum ViewAction: Sendable, Equatable {
 		case task
-		case responseFailureAlert(PresentationAction<AlertState<ViewAction.ResponseFailureAlertAction>, ViewAction.ResponseFailureAlertAction>)
+		case responseFailureAlert(PresentationAction<ViewAction.ResponseFailureAlertAction>)
 
 		enum ResponseFailureAlertAction: Sendable, Hashable {
 			case cancelButtonTapped(P2P.RequestFromClient)
@@ -34,7 +34,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case modal(PresentationActionOf<Destinations>)
+		case modal(PresentationAction<Destinations.Action>)
 	}
 
 	struct Destinations: Sendable, ReducerProtocol {
@@ -68,7 +68,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$currentModal, action: /Action.child .. ChildAction.modal) {
+			.ifLet(\.$currentModal, action: /Action.child .. ChildAction.modal) {
 				Destinations()
 			}
 	}

@@ -39,7 +39,7 @@ struct Login: Sendable, FeatureReducer {
 
 	enum ChildAction: Sendable, Equatable {
 		case persona(id: PersonaRow.State.ID, action: PersonaRow.Action)
-		case createPersonaCoordinator(PresentationActionOf<CreatePersonaCoordinator>)
+		case createPersonaCoordinator(PresentationAction<CreatePersonaCoordinator.Action>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -54,7 +54,7 @@ struct Login: Sendable, FeatureReducer {
 			.forEach(\.personas, action: /Action.child .. ChildAction.persona) {
 				PersonaRow()
 			}
-			.presentationDestination(\.$createPersonaCoordinator, action: /Action.child .. ChildAction.createPersonaCoordinator) {
+			.ifLet(\.$createPersonaCoordinator, action: /Action.child .. ChildAction.createPersonaCoordinator) {
 				CreatePersonaCoordinator()
 			}
 	}

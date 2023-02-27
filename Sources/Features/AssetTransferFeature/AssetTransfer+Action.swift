@@ -14,7 +14,7 @@ extension AssetTransfer {
 // MARK: - AssetTransfer.Action.ChildAction
 extension AssetTransfer.Action {
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationActionOf<AssetTransfer.Destinations>)
+		case destination(PresentationAction<AssetTransfer.Destinations.Action>)
 	}
 }
 

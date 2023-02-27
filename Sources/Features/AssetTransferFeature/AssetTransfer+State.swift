@@ -29,8 +29,8 @@ extension AssetTransfer {
 		public var amount: Decimal_?
 		public var to: To?
 
-		@PresentationStateOf<Destinations>
-		public var destination
+		@PresentationState
+		public var destination: Destinations.State?
 
 		public init(
 			from: From,

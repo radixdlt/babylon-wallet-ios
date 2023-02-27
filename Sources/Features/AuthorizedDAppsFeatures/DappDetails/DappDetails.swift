@@ -48,7 +48,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case personaTapped(OnNetwork.Persona.ID)
 		case dismissPersonaTapped
 		case forgetThisDappTapped
-		case confirmDisconnectAlert(PresentationAction<AlertState<ConfirmDisconnectAlert>, ConfirmDisconnectAlert>)
+		case confirmDisconnectAlert(PresentationAction<ConfirmDisconnectAlert>)
 
 		public enum ConfirmDisconnectAlert: Sendable, Equatable {
 			case confirmTapped
@@ -67,7 +67,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case presentedPersona(PresentationActionOf<PersonaDetails>)
+		case presentedPersona(PresentationAction<PersonaDetails.Action>)
 	}
 
 	// MARK: Reducer
@@ -76,12 +76,10 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$presentedPersona, action: /Action.child .. ChildAction.presentedPersona) {
+			.ifLet(\.$presentedPersona, action: /Action.child .. ChildAction.presentedPersona) {
 				PersonaDetails()
 			}
-			.presentationDestination(\.$confirmDisconnectAlert, action: /Action.view .. ViewAction.confirmDisconnectAlert) {
-				EmptyReducer()
-			}
+			.ifLet(\.$confirmDisconnectAlert, action: /Action.view .. ViewAction.confirmDisconnectAlert)
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {

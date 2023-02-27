@@ -27,7 +27,7 @@ public struct FungibleTokenList: Sendable, ReducerProtocol {
 		.forEach(\.sections, action: /Action.child .. Action.ChildAction.section) {
 			FungibleTokenList.Section()
 		}
-		.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+		.ifLet(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
 			Destinations()
 		}
 	}

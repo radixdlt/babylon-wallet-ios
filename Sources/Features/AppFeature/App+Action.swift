@@ -27,7 +27,7 @@ extension App.Action {
 extension App.Action {
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case alert(PresentationActionOf<App.Alerts>)
+		case alert(PresentationAction<App.Alerts.Action>)
 	}
 }
 

@@ -7,7 +7,7 @@ public struct AssetTransfer: Sendable, ReducerProtocol {
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
-			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
 				Destinations()
 			}
 	}
