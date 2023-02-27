@@ -46,7 +46,7 @@ extension OnNetwork {
 		public let detailedAuthorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>
 	}
 
-	public func detailsForConnectedDapp(_ dapp: ConnectedDapp) throws -> ConnectedDappDetailed {
+	public func detailsForConnectedDapp(_ dapp: AuthorizedDapp) throws -> ConnectedDappDetailed {
 		guard
 			dapp.networkID == self.networkID
 		else {

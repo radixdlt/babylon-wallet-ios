@@ -129,8 +129,8 @@
 "manageP2PClients.newConnectionTitle" = "Link New Connector";
 "manageP2PClients.sendTestMessageButtonTitle" = "Send Test Msg";
 
-"connectedDapps.title" = "Connected dApps";
-"connectedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
+"authorizedDapps.title" = "Connected dApps";
+"authorizedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
 
 "dAppDetails.definition" = "dApp Definition";
 "dAppDetails.missingDescription" = "Missing description";

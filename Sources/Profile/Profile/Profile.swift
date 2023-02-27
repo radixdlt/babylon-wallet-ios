@@ -6,7 +6,7 @@ extension ProfileSnapshot.Version {
 	///
 	/// Changelog:
 	/// - 7: Added networkID in Account and Persona
-	/// - 8: Changed ConnectedDapp format
+	/// - 8: Changed AuthorizedDapp format
 	/// - 9: Personas now use Identity addresses as intended.
 	/// - 10: Temp switch default network to Hammunet as RC for Betanet v2
 	/// - 11: Switch back default network to Nebunet before Betanet v2 release.

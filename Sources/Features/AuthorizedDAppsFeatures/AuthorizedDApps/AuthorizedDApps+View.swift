@@ -1,7 +1,7 @@
 import FeaturePrelude
 
-// MARK: - ConnectedDapps.View
-extension ConnectedDapps {
+// MARK: - AuthorizedDapps.View
+extension AuthorizedDapps {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -12,18 +12,18 @@ extension ConnectedDapps {
 	}
 
 	struct ViewState: Equatable {
-		let dApps: IdentifiedArrayOf<OnNetwork.ConnectedDapp>
+		let dApps: OnNetwork.AuthorizedDapps
 	}
 }
 
 // MARK: - Body
 
-extension ConnectedDapps.View {
+extension AuthorizedDapps.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
-					Text(L10n.ConnectedDapps.intro)
+					Text(L10n.AuthorizedDapps.intro)
 						.textBlock
 						.padding(.vertical, .medium3)
 
@@ -49,7 +49,7 @@ extension ConnectedDapps.View {
 					viewStore.send(.appeared)
 				}
 			}
-			.navigationTitle(L10n.ConnectedDapps.title)
+			.navigationTitle(L10n.AuthorizedDapps.title)
 			.navigationDestination(store: store.presentedDapp) { store in
 				DappDetails.View(store: store)
 			}
@@ -59,13 +59,13 @@ extension ConnectedDapps.View {
 
 // MARK: - Extensions
 
-extension ConnectedDapps.State {
-	var viewState: ConnectedDapps.ViewState {
+extension AuthorizedDapps.State {
+	var viewState: AuthorizedDapps.ViewState {
 		.init(dApps: dApps)
 	}
 }
 
-extension ConnectedDapps.Store {
+extension AuthorizedDapps.Store {
 	var presentedDapp: PresentationStoreOf<DappDetails> {
 		scope(state: \.$presentedDapp) { .child(.presentedDapp($0)) }
 	}

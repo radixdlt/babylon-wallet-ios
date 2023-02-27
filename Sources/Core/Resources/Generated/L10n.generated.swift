@@ -48,6 +48,12 @@ public enum L10n {
     /// Tokens
     public static let tokens = L10n.tr("Localizable", "assetsView.tokens", fallback: "Tokens")
   }
+  public enum AuthorizedDapps {
+    /// Here are all the dApps that you have logged into with this Radix Wallet.
+    public static let intro = L10n.tr("Localizable", "authorizedDapps.intro", fallback: "Here are all the dApps that you have logged into with this Radix Wallet.")
+    /// Connected dApps
+    public static let title = L10n.tr("Localizable", "authorizedDapps.title", fallback: "Connected dApps")
+  }
   public enum Common {
     /// Inconsistency trying to use deleted Linked Connector.
     public static let p2PClientNotFoundInProfile = L10n.tr("Localizable", "common.P2PClientNotFoundInProfile", fallback: "Inconsistency trying to use deleted Linked Connector.")
@@ -71,12 +77,6 @@ public enum L10n {
       /// Persona
       public static let kind = L10n.tr("Localizable", "common.persona.kind", fallback: "Persona")
     }
-  }
-  public enum ConnectedDapps {
-    /// Here are all the dApps that you have logged into with this Radix Wallet.
-    public static let intro = L10n.tr("Localizable", "connectedDapps.intro", fallback: "Here are all the dApps that you have logged into with this Radix Wallet.")
-    /// Connected dApps
-    public static let title = L10n.tr("Localizable", "connectedDapps.title", fallback: "Connected dApps")
   }
   public enum CreateEntity {
     public enum Completion {

@@ -12,8 +12,8 @@ struct Login: Sendable, FeatureReducer {
 		let dappMetadata: DappMetadata
 
 		var personas: IdentifiedArrayOf<PersonaRow.State> = []
-		var connectedDapp: OnNetwork.ConnectedDapp?
-		var authorizedPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
+		var connectedDapp: OnNetwork.AuthorizedDapp?
+		var authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
 
 		@PresentationState
 		var createPersonaCoordinator: CreatePersonaCoordinator.State? = nil
@@ -34,7 +34,7 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<OnNetwork.Persona>, OnNetwork.ConnectedDapp?, OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?)
+		case personasLoaded(IdentifiedArrayOf<OnNetwork.Persona>, OnNetwork.AuthorizedDapp?, OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -43,7 +43,7 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case continueButtonTapped(OnNetwork.Persona, OnNetwork.ConnectedDapp?, OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?)
+		case continueButtonTapped(OnNetwork.Persona, OnNetwork.AuthorizedDapp?, OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -126,9 +126,9 @@ struct Login: Sendable, FeatureReducer {
 	func loadPersonas(state: inout State) -> EffectTask<Action> {
 		.run { [dappDefinitionAddress = state.dappDefinitionAddress] send in
 			let personas = try await profileClient.getPersonas()
-			let connectedDapps = try await profileClient.getConnectedDapps()
-			let connectedDapp = connectedDapps.first(by: dappDefinitionAddress)
-			let authorizedPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple? = {
+			let authorizedDapps = try await profileClient.getConnectedDapps()
+			let connectedDapp = authorizedDapps.first(by: dappDefinitionAddress)
+			let authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple? = {
 				guard let connectedDapp else {
 					return nil
 				}

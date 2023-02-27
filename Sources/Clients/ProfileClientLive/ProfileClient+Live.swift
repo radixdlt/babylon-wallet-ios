@@ -252,7 +252,7 @@ extension ProfileClient {
 				let currentNetworkID = await getCurrentNetworkID()
 				return try await profileHolder.get { profile in
 					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
-					return onNetwork.connectedDapps
+					return onNetwork.authorizedDapps
 				}
 			},
 			addConnectedDapp: { connectedDapp in

@@ -277,9 +277,9 @@ extension P2PClientsView {
 
 // MARK: - ConnectedDappsView
 public struct ConnectedDappsView: IndentedView {
-	public let connectedDapps: [OnNetwork.ConnectedDapp]
+	public let authorizedDapps: OnNetwork.AuthorizedDapps
 	public let indentation: Indentation
-	public let getDetailedConnectedDapp: (OnNetwork.ConnectedDapp) -> OnNetwork.ConnectedDappDetailed
+	public let getDetailedConnectedDapp: (OnNetwork.AuthorizedDapp) -> OnNetwork.ConnectedDappDetailed
 }
 
 extension ConnectedDappsView {
@@ -290,10 +290,10 @@ extension ConnectedDappsView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			if connectedDapps.isEmpty {
+			if authorizedDapps.isEmpty {
 				Text("<None yet>").font(.callout)
 			} else {
-				ForEach(connectedDapps) { connectedDapp in
+				ForEach(authorizedDapps) { connectedDapp in
 					ConnectedDappView(
 						connectedDapp: connectedDapp,
 						indentation: inOneLevel,
@@ -308,7 +308,7 @@ extension ConnectedDappsView {
 
 // MARK: - ConnectedDappView
 public struct ConnectedDappView: IndentedView {
-	public let connectedDapp: OnNetwork.ConnectedDapp
+	public let connectedDapp: OnNetwork.AuthorizedDapp
 	public let indentation: Indentation
 	public let authorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>
 }
@@ -439,7 +439,7 @@ extension OnNetworkView {
 			)
 
 			ConnectedDappsView(
-				connectedDapps: onNetwork.connectedDapps.elements,
+				authorizedDapps: onNetwork.authorizedDapps.elements,
 				indentation: inOneLevel
 			) {
 				try! onNetwork.detailsForConnectedDapp($0)

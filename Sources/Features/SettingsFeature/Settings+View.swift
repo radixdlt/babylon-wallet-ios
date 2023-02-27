@@ -1,4 +1,4 @@
-import ConnectedDAppsFeature
+import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
@@ -122,9 +122,9 @@ extension View {
 			)
 			.navigationDestination(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AppSettings.Destinations.State.connectedDapps,
-				action: AppSettings.Destinations.Action.connectedDapps,
-				destination: { ConnectedDapps.View(store: $0) }
+				state: /AppSettings.Destinations.State.authorizedDapps,
+				action: AppSettings.Destinations.Action.authorizedDapps,
+				destination: { AuthorizedDapps.View(store: $0) }
 			)
 			.navigationDestination(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
@@ -153,7 +153,7 @@ extension AppSettings.View {
 		       asset: AssetResource.gateway,
 		       action: .editGatewayAPIEndpointButtonTapped),
 		 .init(title: L10n.Settings.connectedDappsButtonTitle,
-		       asset: AssetResource.connectedDapps,
+		       asset: AssetResource.authorizedDapps,
 		       action: .connectedDappsButtonTapped),
 		 .init(title: L10n.Settings.personasButtonTitle,
 		       asset: AssetResource.personas,

@@ -29,8 +29,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		let dappMetadata: DappMetadata
 		let remoteInteraction: RemoteInteraction
 		var persona: OnNetwork.Persona?
-		var connectedDapp: OnNetwork.ConnectedDapp?
-		var authorizedPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
+		var connectedDapp: OnNetwork.AuthorizedDapp?
+		var authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
 
 		let interactionItems: NonEmpty<OrderedSet<AnyInteractionItem>>
 		var responseItems: OrderedDictionary<AnyInteractionItem, AnyInteractionResponseItem> = [:]
@@ -73,8 +73,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case usePersona(
 			P2P.FromDapp.WalletInteraction.AuthUsePersonaRequestItem,
 			OnNetwork.Persona,
-			OnNetwork.ConnectedDapp?,
-			OnNetwork.ConnectedDapp.AuthorizedPersonaSimple?
+			OnNetwork.AuthorizedDapp?,
+			OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
@@ -399,7 +399,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							}
 							return (numberOfAccounts, accounts)
 						}()
-						let sharedAccounts: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple.SharedAccounts?
+						let sharedAccounts: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
 						if let (numberOfAccounts, accounts) = sharedAccountsInfo {
 							sharedAccounts = try .init(
 								accountsReferencedByAddress: OrderedSet(try accounts.map { try .init(address: $0.address) }),
@@ -409,7 +409,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 							sharedAccounts = nil
 						}
 						@Dependency(\.date) var now
-						let authorizedPersona: OnNetwork.ConnectedDapp.AuthorizedPersonaSimple = {
+						let authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple = {
 							if var authorizedPersona = state.authorizedPersona {
 								// NB: update personal data fields here
 								authorizedPersona.lastLogin = now()

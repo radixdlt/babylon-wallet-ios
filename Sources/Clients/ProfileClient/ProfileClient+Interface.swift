@@ -149,14 +149,14 @@ extension ProfileClient {
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>
 	public typealias GetAccounts = @Sendable () async throws -> NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>
 	public typealias GetPersonas = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.Persona>
-	public typealias GetConnectedDapps = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.ConnectedDapp>
-	public typealias DetailsForConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> OnNetwork.ConnectedDappDetailed
+	public typealias GetConnectedDapps = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.AuthorizedDapp>
+	public typealias DetailsForConnectedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> OnNetwork.ConnectedDappDetailed
 	public typealias GetP2PClients = @Sendable () async throws -> P2PClients
 	public typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
-	public typealias AddConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
-	public typealias ForgetConnectedDapp = @Sendable (OnNetwork.ConnectedDapp.ID, NetworkID) async throws -> Void
-	public typealias UpdateConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
-	public typealias DisconnectPersonaFromDapp = @Sendable (OnNetwork.Persona.ID, OnNetwork.ConnectedDapp.ID, NetworkID) async throws -> Void
+	public typealias AddConnectedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> Void
+	public typealias ForgetConnectedDapp = @Sendable (OnNetwork.AuthorizedDapp.ID, NetworkID) async throws -> Void
+	public typealias UpdateConnectedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> Void
+	public typealias DisconnectPersonaFromDapp = @Sendable (OnNetwork.Persona.ID, OnNetwork.AuthorizedDapp.ID, NetworkID) async throws -> Void
 	public typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	public typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	public typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
@@ -167,7 +167,7 @@ extension ProfileClient {
 }
 
 extension ProfileClient {
-	public func getDetailedDapp(_ id: OnNetwork.ConnectedDapp.ID) async throws -> OnNetwork.ConnectedDappDetailed {
+	public func getDetailedDapp(_ id: OnNetwork.AuthorizedDapp.ID) async throws -> OnNetwork.ConnectedDappDetailed {
 		let dApps = try await getConnectedDapps()
 		guard let dApp = dApps[id: id] else {
 			throw ConnectedDappDoesNotExists()
