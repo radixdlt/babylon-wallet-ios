@@ -48,6 +48,7 @@ extension AppSettings.View {
 				settingsView(viewStore: viewStore)
 					.navigationTitle(L10n.Settings.title)
 				#if os(iOS)
+					.navigationBarBackButtonFont(.app.backButton)
 					.navigationBarTitleColor(.app.gray1)
 					.navigationBarTitleDisplayMode(.inline)
 					.navigationBarInlineTitleFont(.app.secondaryHeader)
