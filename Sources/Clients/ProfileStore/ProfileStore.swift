@@ -98,9 +98,19 @@ extension ProfileStore {
 	/// for an async sequence of Profile.
 	public var profile: Profile { profileStateSubject.value.profile }
 
+	/// The current network with a non empty set of accounts.
+	public var network: OnNetwork { profile.network }
+
 	/// A multicasting replaying async sequence of distinct Profile.
-	public func values() -> AnyAsyncSequence<Profile> {
+	public func values() async -> AnyAsyncSequence<Profile> {
 		profileStateSubject.map(\.profile)
+			.share() // Multicast
+			.eraseToAnyAsyncSequence()
+	}
+
+	/// A multicasting replaying async sequence of distinct Profile.
+	public func accountValues() async -> AnyAsyncSequence<OnNetwork.Accounts> {
+		profileStateSubject.map(\.profile.network.accounts)
 			.share() // Multicast
 			.eraseToAnyAsyncSequence()
 	}

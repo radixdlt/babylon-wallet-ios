@@ -232,6 +232,14 @@ package.addModules([
 	.client(
 		name: "AccountsClient",
 		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "AccountsClientLive",
+		dependencies: [
+			"AccountsClient",
 			"ProfileStore",
 		],
 		tests: .yes()

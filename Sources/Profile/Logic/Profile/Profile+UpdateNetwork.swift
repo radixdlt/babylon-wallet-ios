@@ -8,6 +8,7 @@ extension Profile {
 }
 
 extension Profile {
+	/// The current network with a non empty set of accounts.
 	public var network: OnNetwork {
 		do {
 			return try onNetwork(id: self.appPreferences.gateways.current.network.id)

@@ -19,5 +19,5 @@ extension AccountsClient {
 	public typealias GetAccounts = @Sendable () async -> OnNetwork.Accounts
 
 	/// async returns an async sequence of accounts from Profile
-	public typealias Values = @Sendable () async -> OnNetwork.Accounts
+	public typealias Values = @Sendable () async -> AnyAsyncSequence<OnNetwork.Accounts>
 }

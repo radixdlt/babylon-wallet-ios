@@ -3,15 +3,6 @@ import Network
 import P2PConnection
 import ProfileClient
 
-// MARK: - AnyAsyncIterator + Sendable
-extension AnyAsyncIterator: @unchecked Sendable where Element: Sendable {}
-
-// MARK: - AnyAsyncSequence + Sendable
-extension AnyAsyncSequence: @unchecked Sendable where Element: Sendable {}
-
-// MARK: - AsyncThrowingStream.Iterator + Sendable
-extension AsyncThrowingStream.Iterator: @unchecked Sendable where Element: Sendable {}
-
 extension P2P.ClientWithConnectionStatus {
 	func connected() -> Self {
 		.init(p2pClient: p2pClient, connectionStatus: .connected)
