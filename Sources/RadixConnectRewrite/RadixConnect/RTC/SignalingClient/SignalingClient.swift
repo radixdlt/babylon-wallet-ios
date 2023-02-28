@@ -2,7 +2,7 @@ import AsyncExtensions
 import Foundation
 import Prelude
 
-// MARK: - WebSocketClient
+// MARK: - SignalingTransport
 protocol SignalingTransport: Sendable {
 	var incommingMessages: AsyncStream<Data> { get }
 	func send(message: Data) async throws
@@ -61,7 +61,7 @@ struct SignalingClient {
 			.incommingMessages
 			.eraseToAnyAsyncSequence()
 			.mapSkippingError {
-                                print("Received message \(String(describing: String(data: $0, encoding: .utf8)))")
+				print("Received message \(String(describing: String(data: $0, encoding: .utf8)))")
 				return try jsonDecoder.decode(IncommingMessage.self, from: $0)
 			} logError: { error in
 				loggerGlobal.info("Failed to decode incomming Message - \(error)")
@@ -103,7 +103,7 @@ struct SignalingClient {
 		webSocketClient.cancel()
 	}
 
-        func sendToRemote(_ primitive: IdentifiedPrimitive<RTCPrimitive>) async throws {
+	func sendToRemote(_ primitive: IdentifiedPrimitive<RTCPrimitive>) async throws {
 		let message = ClientMessage(
 			requestId: idBuilder(),
 			targetClientId: primitive.id,

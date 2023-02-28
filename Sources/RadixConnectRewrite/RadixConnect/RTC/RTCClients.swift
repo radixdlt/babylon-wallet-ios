@@ -202,8 +202,8 @@ actor RTCClient {
 	}
 
 	func removePeerConnection(_ id: PeerConnectionId) async {
-                print("Removing peer connection for id: \(id)")
-                await peerConnections.first(where: { $0.id == id })?.cancel()
+		print("Removing peer connection for id: \(id)")
+		await peerConnections.first(where: { $0.id == id })?.cancel()
 		peerConnections.removeAll(where: { $0.id == id })
 	}
 

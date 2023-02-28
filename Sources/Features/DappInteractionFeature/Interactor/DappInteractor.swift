@@ -91,22 +91,23 @@ struct DappInteractor: Sendable, FeatureReducer {
 					do {
 						let interactionMessage = try message.unwrapResult()
 						guard interactionMessage.content.content.metadata.networkId == currentNetworkID else {
-                                                        let interaction = interactionMessage.content.content
-                                                        let incomingRequestNetwork = try Network.lookupBy(id: interaction.metadata.networkId)
-                                                        let currentNetwork = try Network.lookupBy(id: currentNetworkID)
-                                                        let outMessage = interactionMessage.toOutgoingMessage(.failure(.init(
-                                                                interactionId: interaction.id,
-                                                                errorType: .wrongNetwork,
-                                                                message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
-                                                        )))
+							let interaction = interactionMessage.content.content
+							let incomingRequestNetwork = try Network.lookupBy(id: interaction.metadata.networkId)
+							let currentNetwork = try Network.lookupBy(id: currentNetworkID)
+							let outMessage = interactionMessage.toOutgoingMessage(.failure(.init(
+								interactionId: interaction.id,
+								errorType: .wrongNetwork,
+								message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
+							)))
 
-                                                        try await p2pConnectivityClient.sendMessage(outMessage)
-                                                        return
+							try await p2pConnectivityClient.sendMessage(outMessage)
+							return
 						}
 
 						await send(.internal(.receivedRequestFromDapp(interactionMessage)))
 					} catch {
-                                                loggerGlobal.error("Failed to create Peer Connection")
+						loggerGlobal.error("Failed to create Peer Connection")
+						errorQueue.schedule(error)
 					}
 				}
 			} catch: { error, _ in

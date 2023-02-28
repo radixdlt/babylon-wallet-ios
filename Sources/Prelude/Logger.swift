@@ -5,7 +5,7 @@ private let baseLabel = "com.radixpublishing"
 
 private func makeLogger(
 	label: String,
-        level: Logger.Level = .trace
+	level: Logger.Level = .trace
 ) -> Logger {
 	Logger(label: label) { _ in
 		#if DEBUG
