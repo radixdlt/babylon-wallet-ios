@@ -223,13 +223,6 @@ package.addModules([
 
 package.addModules([
 	.client(
-		name: "AccountsClient",
-		dependencies: [
-			"ProfileStore",
-		],
-		tests: .yes()
-	),
-	.client(
 		name: "AccountPortfolio",
 		dependencies: [
 			"AppSettings",
