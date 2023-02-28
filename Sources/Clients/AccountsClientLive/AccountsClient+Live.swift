@@ -7,8 +7,10 @@ extension AccountsClient: DependencyKey {
 
 	public static func live(profileStore: ProfileStore = .shared) -> Self {
 		Self(
-			getAccounts: { await profileStore.network.accounts },
-			values: { await profileStore.accountValues() }
+			getAccountsOnCurrentNetwork: { await profileStore.network.accounts },
+			accountsOnCurrentNetwork: { await profileStore.accountValues() },
+			createUnsavedVirtualAccount: { _ in fatalError("impl me") },
+			saveVirtualAccount: { _ in fatalError("impl me") }
 		)
 	}
 

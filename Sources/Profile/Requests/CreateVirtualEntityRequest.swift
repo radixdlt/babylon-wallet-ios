@@ -1,8 +1,10 @@
-import ClientPrelude
 import Cryptography
-import Profile
+import EngineToolkitModels
+import Prelude
 
 // MARK: - GenesisFactorInstanceDerivationStrategy
+// FIXME: move to some ProfileBaseClient package used AccountsClient, PersonasClient etc.
+
 public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {
 	case loadMnemonicFromKeychainForFactorSource(FactorSource)
 
@@ -17,30 +19,30 @@ public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {
 }
 
 // MARK: - CreateVirtualEntityRequest
-public struct CreateVirtualEntityRequest: Sendable, Equatable {
+public protocol CreateVirtualEntityRequest: Sendable, Equatable {
 	// if `nil` we will use current networkID
-	public let networkID: NetworkID?
+	var networkID: NetworkID? { get }
 
 	// FIXME: change to shared HDFactorSource
-	public let genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy
+	var genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy { get }
 
-	public let curve: Slip10Curve
-	public let entityKind: EntityKind
-	public let displayName: NonEmpty<String>
+	var curve: Slip10Curve { get }
+	var entityKind: EntityKind { get }
+	var displayName: NonEmpty<String> { get }
 
-	public init(
-		curve: Slip10Curve,
-		networkID: NetworkID?,
-		genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy,
-		entityKind: EntityKind,
-		displayName: NonEmpty<String>
-	) throws {
-		self.curve = curve
-		self.networkID = networkID
-		self.genesisFactorInstanceDerivationStrategy = genesisFactorInstanceDerivationStrategy
-		self.entityKind = entityKind
-		self.displayName = displayName
-	}
+//	public init(
+//		curve: Slip10Curve,
+//		networkID: NetworkID?,
+//		genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy,
+//		entityKind: EntityKind,
+//		displayName: NonEmpty<String>
+//	) throws {
+//		self.curve = curve
+//		self.networkID = networkID
+//		self.genesisFactorInstanceDerivationStrategy = genesisFactorInstanceDerivationStrategy
+//		self.entityKind = entityKind
+//		self.displayName = displayName
+//	}
 }
 
 extension CreateVirtualEntityRequest {

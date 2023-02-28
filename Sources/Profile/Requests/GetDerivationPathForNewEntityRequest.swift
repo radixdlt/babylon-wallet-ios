@@ -1,5 +1,4 @@
-import ClientPrelude
-import Profile
+import EngineToolkitModels
 
 public struct GetDerivationPathForNewEntityRequest: Sendable, Equatable {
 	// if `nil` we will use current networkID
