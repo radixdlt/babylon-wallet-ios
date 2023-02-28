@@ -20,11 +20,15 @@ extension ROLAClient {
 				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
 			}
 
+			guard !data.isEmpty else {
+				throw ROLAFailure.radixJsonNotFound
+			}
+
 			let response: WellKnownFileResponse
 			do {
 				response = try JSONDecoder().decode(WellKnownFileResponse.self, from: data)
 			} catch {
-				throw ROLAFailure.uknownFileFormat
+				throw ROLAFailure.radixJsonUnknownFileFormat
 			}
 
 			let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)

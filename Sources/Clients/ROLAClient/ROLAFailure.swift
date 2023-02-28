@@ -5,7 +5,7 @@ public enum ROLAFailure: Sendable, LocalizedError, Equatable {
 	case unknownWebsite
 	case invalidOriginURL
 	case radixJsonNotFound
-	case uknownFileFormat
+	case radixJsonUnknownFileFormat
 	case unknownDappDefinitionAddress
 
 	public var errorDescription: String? {
@@ -18,7 +18,7 @@ public enum ROLAFailure: Sendable, LocalizedError, Equatable {
 			return "Invalid origin URL"
 		case .radixJsonNotFound:
 			return "radix.json file is missing"
-		case .uknownFileFormat:
+		case .radixJsonUnknownFileFormat:
 			return "radix.json file format mismatch"
 		case .unknownDappDefinitionAddress:
 			return "dApp definition address does not match any well known definition address"
@@ -32,11 +32,11 @@ public enum ROLAFailure: Sendable, LocalizedError, Equatable {
 		case .unknownWebsite:
 			return (errorKind: .unknownWebsite, message: errorDescription)
 		case .invalidOriginURL:
-			return (errorKind: .failedToPrepareTransaction, message: errorDescription)
+			return (errorKind: .invalidOriginURL, message: errorDescription)
 		case .radixJsonNotFound:
 			return (errorKind: .radixJsonNotFound, message: errorDescription)
-		case .uknownFileFormat:
-			return (errorKind: .failedToPrepareTransaction, message: errorDescription)
+		case .radixJsonUnknownFileFormat:
+			return (errorKind: .radixJsonUnknownFileFormat, message: errorDescription)
 		case .unknownDappDefinitionAddress:
 			return (errorKind: .unknownDappDefinitionAddress, message: errorDescription)
 		}

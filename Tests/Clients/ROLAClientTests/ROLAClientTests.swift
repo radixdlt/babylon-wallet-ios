@@ -131,7 +131,7 @@ final class ROLAClientTests: TestCase {
 			return (response, json.data)
 		}
 
-		let expectedError = ROLAFailure.uknownFileFormat
+		let expectedError = ROLAFailure.radixJsonUnknownFileFormat
 
 		// when
 		await withDependencies {
@@ -139,7 +139,7 @@ final class ROLAClientTests: TestCase {
 		} operation: {
 			do {
 				try await sut.performWellKnownFileCheck(interaction)
-				XCTFail("Expected error: uknownFileFormat")
+				XCTFail("Expected error: radixJsonUnknownFileFormat")
 			} catch {
 				XCTAssertEqual(error as! ROLAFailure, expectedError)
 			}
