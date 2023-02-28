@@ -125,13 +125,13 @@ struct PeerConnectionBuilder {
 	                                    signalingServerClient: SignalingClient,
 	                                    factory: PeerConnectionFactory) async throws -> PeerConnectionClient
 	{
-		print("Bigga test Wallet - received offer from \(offer.id)")
+                loggerGlobal.trace("Received Offer with id: \(offer.id)")
 		let peerConnectionClient = try factory.makePeerConnectionClient(for: offer.id)
 
 		let onLocalIceCandidate = peerConnectionClient
 			.onGeneratedICECandidate
 			.map { candidate in
-				print("Bigga test Wallet ICECandidate generated")
+                                loggerGlobal.trace("Connection id: \(offer.id) -> Sending local ICE Candidate")
 				return try await signalingServerClient.sendToRemote(.init(content: .iceCandidate(candidate), id: offer.id))
 			}.eraseToAnyAsyncSequence()
 
@@ -139,7 +139,7 @@ struct PeerConnectionBuilder {
 			.onICECanddiate
 			.filter { $0.id == offer.id }
 			.map {
-				print("Bigga test Wallet ICECandidate received")
+                                loggerGlobal.trace("Connection id: \(offer.id) -> Received remote ICE Candidate")
 				return try await peerConnectionClient.onRemoteICECandidate($0.content)
 			}
 			.eraseToAnyAsyncSequence()
@@ -152,21 +152,24 @@ struct PeerConnectionBuilder {
 			.prefix(1)
 
 		_ = await peerConnectionClient.onNegotiationNeeded.prefix(1).collect()
-		print("Bigga test Wallet - starting negotiation with \(offer.id)")
+                loggerGlobal.trace("Connection id: \(offer.id) -> Starting negotiation")
 		try await peerConnectionClient.onRemoteOffer(offer.content)
+                loggerGlobal.trace("Connection id: \(offer.id) -> Remote Offer was configured as local description")
 		let localAnswer = try await peerConnectionClient.createAnswer()
+                loggerGlobal.trace("Connection id: \(offer.id) -> Created Answer")
 		try await signalingServerClient.sendToRemote(.init(content: .answer(localAnswer), id: offer.id))
+                loggerGlobal.trace("Connection id: \(offer.id) -> Sent Answer to remote client")
 
+                loggerGlobal.trace("Connection id: \(offer.id) -> Start ICE Candidates exchange")
 		let iceExchangeTask = Task {
 			await withThrowingTaskGroup(of: Void.self) { group in
 				onLocalIceCandidate.await(inGroup: &group)
 				onRemoteIceCandidate.await(inGroup: &group)
 			}
 		}
-		print("Bigga test Wallet - sent answer \(offer.id)")
-		_ = try await onConnectionEstablished.collect()
 
-		print("Bigga test Wallet - Etablished connection with \(offer.id)")
+		_ = try await onConnectionEstablished.collect()
+                loggerGlobal.trace("Connection id: \(offer.id) -> Connection established")
 		iceExchangeTask.cancel()
 		return peerConnectionClient
 	}

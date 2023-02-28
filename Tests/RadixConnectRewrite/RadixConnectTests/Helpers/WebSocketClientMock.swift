@@ -2,7 +2,7 @@ import AsyncExtensions
 import Foundation
 @testable import RadixConnect
 
-final class MockWebSocketClient: WebSocketClient, Sendable {
+final class MockWebSocketClient: SignalingTransport, Sendable {
 	let stateStream: AsyncStream<URLSessionWebSocketTask.State>
 	let incommingMessages: AsyncThrowingStream<Data, Error>
 	private let sentMessages: AsyncStream<Data>
