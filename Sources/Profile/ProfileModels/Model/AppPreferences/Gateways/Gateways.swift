@@ -8,7 +8,10 @@ public struct Gateways:
 	CustomStringConvertible,
 	CustomDumpReflectable
 {
+	/// Current
 	public private(set) var current: Gateway
+
+	/// Other, does not contain current, use `all` if you want to get all.
 	public private(set) var other: IdentifiedArrayOf<Gateway>
 
 	public init(
@@ -32,7 +35,9 @@ public struct Gateways:
 
 extension Gateways {
 	public typealias Elements = NonEmpty<IdentifiedArrayOf<Gateway>>
-	public var gateways: Elements {
+
+	/// All gateways
+	public var all: Elements {
 		var elements = IdentifiedArrayOf<Gateway>(uniqueElements: [current])
 		elements.append(contentsOf: other)
 		return .init(rawValue: elements)!
@@ -70,18 +75,18 @@ extension Gateways {
 extension Gateways {
 	private enum CodingKeys: String, CodingKey {
 		case current
-		case other = "saved"
+		case all = "saved"
 	}
 
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let urlOfCurrent = try container.decode(URL.self, forKey: .current)
-		let gateways = try container.decode(IdentifiedArrayOf<Gateway>.self, forKey: .other)
-		guard let current = gateways.first(where: { $0.id == urlOfCurrent }) else {
+		let all = try container.decode(IdentifiedArrayOf<Gateway>.self, forKey: .all)
+		guard let current = all.first(where: { $0.id == urlOfCurrent }) else {
 			struct DiscrepancyCurrentNotFoundAmongstSavedGateways: Swift.Error {}
 			throw DiscrepancyCurrentNotFoundAmongstSavedGateways()
 		}
-		var other = gateways
+		var other = all
 		other.remove(id: current.id)
 		try self.init(current: current, other: other)
 	}
@@ -89,7 +94,7 @@ extension Gateways {
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		try container.encode(current.url, forKey: .current)
-		try container.encode(other, forKey: .other)
+		try container.encode(all, forKey: .all)
 	}
 }
 

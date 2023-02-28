@@ -14,8 +14,9 @@ extension ProfileSnapshot.Version {
 	/// - 13: Reverted unintentially change of `"perNetwork"`
 	/// - 14: Reverted `Engine.PublicKey` -> `SLIP10.PublicKey` for entities.
 	/// - 15: Add `"creatingDevice"` property
-	/// - 16: Add `"gateways"` replacing `"networkAndGateway"`, also rename `"authorizedDapps"` -> `"authorizedDapps"`
-	public static let minimum: Self = 16
+	/// - 16: Add `"gateways"` replacing `"networkAndGateway"`
+	/// - 17: Rename `"authorizedDapps"` -> `"authorizedDapps"`
+	public static let minimum: Self = 17
 }
 
 // MARK: - Profile

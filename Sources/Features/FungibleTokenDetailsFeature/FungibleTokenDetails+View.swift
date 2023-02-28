@@ -76,18 +76,18 @@ extension FungibleTokenDetails.View {
 						.lineLimit(1)
 					}
 				}
-				.navigationBarTitle(viewStore.displayName)
 				#if os(iOS)
-					.navigationBarTitleColor(.app.gray1)
-					.navigationBarTitleDisplayMode(.inline)
-					.navigationBarInlineTitleFont(.app.secondaryHeader)
-					.toolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							CloseButton {
-								viewStore.send(.closeButtonTapped)
-							}
+				.navigationBarTitle(viewStore.displayName)
+				.navigationBarTitleColor(.app.gray1)
+				.navigationBarTitleDisplayMode(.inline)
+				.navigationBarInlineTitleFont(.app.secondaryHeader)
+				.toolbar {
+					ToolbarItem(placement: .navigationBarLeading) {
+						CloseButton {
+							viewStore.send(.closeButtonTapped)
 						}
 					}
+				}
 				#endif
 			}
 			.tint(.app.gray1)

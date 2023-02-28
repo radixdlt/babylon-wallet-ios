@@ -53,15 +53,21 @@ final class ProfileTests: TestCase {
 			language: .english
 		)
 		let networkID = gateway.network.id
-		let babylonFactorSource = try FactorSource.babylon(mnemonic: curve25519FactorSourceMnemonic)
+		let babylonFactorSource = try FactorSource.babylon(
+			mnemonic: curve25519FactorSourceMnemonic,
+			hint: creatingDevice
+		)
 
 		var profile = withDependencies {
 			$0.uuid = .constant(.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!)
 		} operation: {
-			Profile(factorSource: babylonFactorSource, creatingDevice: "computerRunningUnitTest")
+			Profile(factorSource: babylonFactorSource, creatingDevice: creatingDevice)
 		}
 
-		let olympiaFactorSource = try FactorSource.olympia(mnemonic: secp256K1FactorMnemonic)
+		let olympiaFactorSource = try FactorSource.olympia(
+			mnemonic: secp256K1FactorMnemonic,
+			hint: creatingDevice
+		)
 		profile.factorSources.append(olympiaFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> OnNetwork.Account {
@@ -244,17 +250,20 @@ final class ProfileTests: TestCase {
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		/* Uncomment the lines below to generate a new test vector */
-		let data = try jsonEncoder.encode(snapshot)
-		print(String(data: data, encoding: .utf8)!)
+//		let data = try jsonEncoder.encode(snapshot)
+//		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {
 		let snapshot: ProfileSnapshot = try readTestFixture(jsonName: "profile_snapshot")
 
 		let profile = try Profile(snapshot: snapshot)
-		XCTAssertEqual(profile.creatingDevice, "computerRunningUnitTest")
+		XCTAssertEqual(profile.creatingDevice, creatingDevice)
 
 		XCTAssertEqual(profile.factorSources.count, 2)
+		for factorSource in profile.factorSources {
+			XCTAssertEqual(factorSource.hint, creatingDevice)
+		}
 
 		XCTAssertEqual(profile.perNetwork.count, 1)
 		let networkID = gateway.network.id
@@ -381,6 +390,8 @@ final class ProfileTests: TestCase {
 		)
 	}
 }
+
+private let creatingDevice: NonEmptyString = "computerRunningUnitTest"
 
 extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {
