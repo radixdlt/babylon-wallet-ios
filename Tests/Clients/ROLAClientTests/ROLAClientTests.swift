@@ -13,7 +13,7 @@ final class ROLAClientTests: TestCase {
 	private let wellKnownFilePath = ".well-known/radix.json"
 	private func interaction(
 		origin: String,
-		dAppDefinitionAddress: String
+		dAppDefinitionAddress: DappDefinitionAddress
 	) -> P2P.FromDapp.WalletInteraction {
 		.init(
 			id: "",
@@ -25,16 +25,16 @@ final class ROLAClientTests: TestCase {
 			metadata: .init(
 				networkId: 0,
 				origin: .init(rawValue: origin),
-				dAppDefinitionAddress: try! .init(address: dAppDefinitionAddress)
+				dAppDefinitionAddress: dAppDefinitionAddress
 			)
 		)
 	}
 
-	private func json(dAppDefinitionAddress: String) -> JSON {
+	private func json(dAppDefinitionAddress: DappDefinitionAddress) -> JSON {
 		[
 			"dApps": [
 				[
-					"dAppDefinitionAddress": .string(dAppDefinitionAddress),
+					"dAppDefinitionAddress": .string(dAppDefinitionAddress.address),
 				],
 			],
 		]
@@ -53,7 +53,7 @@ final class ROLAClientTests: TestCase {
 	func testHappyPath() async throws {
 		// given
 		let origin = "https://origin.com"
-		let dAppDefinitionAddress = "dAppDefinitionAddress-deadbeef"
+		let dAppDefinitionAddress = try! DappDefinitionAddress(address: "dAppDefinitionAddress-deadbeef")
 		let interaction = interaction(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let json = json(dAppDefinitionAddress: dAppDefinitionAddress)
 		let expectedURL = URL(string: "https://origin.com/.well-known/radix.json")!
@@ -85,7 +85,7 @@ final class ROLAClientTests: TestCase {
 	func testUnhappyPath_whenOriginURLIsInvalid_thenInvalidOriginURLErrorIsThrown() async throws {
 		// given
 		let origin = ""
-		let dAppDefinitionAddress = "dAppDefinitionAddress-deadbeef"
+		let dAppDefinitionAddress = try! DappDefinitionAddress(address: "dAppDefinitionAddress-deadbeef")
 		let interaction = interaction(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let json = json(dAppDefinitionAddress: dAppDefinitionAddress)
 		let expectedURL = URL(string: "/.well-known/radix.json")!
@@ -101,7 +101,6 @@ final class ROLAClientTests: TestCase {
 		}
 
 		let expectedError = ROLAFailure.invalidOriginURL
-		var didFailWithError: Error?
 
 		// when
 		await withDependencies {
@@ -109,19 +108,17 @@ final class ROLAClientTests: TestCase {
 		} operation: {
 			do {
 				try await sut.performWellKnownFileCheck(interaction)
+				XCTFail("Expected error: invalidOriginURL")
 			} catch {
-				didFailWithError = error
 				XCTAssertEqual(error as! ROLAFailure, expectedError)
 			}
 		}
-
-		XCTAssertNotNil(didFailWithError)
 	}
 
 	func testUnhappyPath_whenJsonFileFormatIsInvalid_thenUknownFileFormatErrorIsThrown() async throws {
 		// given
 		let origin = "https://origin.com"
-		let dAppDefinitionAddress = "dAppDefinitionAddress-deadbeef"
+		let dAppDefinitionAddress = try! DappDefinitionAddress(address: "dAppDefinitionAddress-deadbeef")
 		let interaction = interaction(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
 		let json: JSON = []
 		let expectedURL = URL(string: "/.well-known/radix.json")!
@@ -137,7 +134,6 @@ final class ROLAClientTests: TestCase {
 		}
 
 		let expectedError = ROLAFailure.uknownFileFormat
-		var didFailWithError: Error?
 
 		// when
 		await withDependencies {
@@ -145,20 +141,18 @@ final class ROLAClientTests: TestCase {
 		} operation: {
 			do {
 				try await sut.performWellKnownFileCheck(interaction)
+				XCTFail("Expected error: uknownFileFormat")
 			} catch {
-				didFailWithError = error
 				XCTAssertEqual(error as! ROLAFailure, expectedError)
 			}
 		}
-
-		XCTAssertNotNil(didFailWithError)
 	}
 
 	func testUnhappyPath_whenDappDefinitionAddressIsUnknown_thenUnknownDappDefinitionAddressErrorIsThrown() async throws {
 		// given
 		let origin = "https://origin.com"
-		let knownDappDefinitionAddress = "dAppDefinitionAddress-deadbeef"
-		let unknownDappDefinitionAddress = "unknown-deadbeef"
+		let knownDappDefinitionAddress = try! DappDefinitionAddress(address: "dAppDefinitionAddress-deadbeef")
+		let unknownDappDefinitionAddress = try! DappDefinitionAddress(address: "unknown-deadbeef")
 		let interaction = interaction(origin: origin, dAppDefinitionAddress: unknownDappDefinitionAddress)
 		let json = json(dAppDefinitionAddress: knownDappDefinitionAddress)
 		let expectedURL = URL(string: "/.well-known/radix.json")!
@@ -174,7 +168,6 @@ final class ROLAClientTests: TestCase {
 		}
 
 		let expectedError = ROLAFailure.unknownDappDefinitionAddress
-		var didFailWithError: Error?
 
 		// when
 		await withDependencies {
@@ -182,13 +175,11 @@ final class ROLAClientTests: TestCase {
 		} operation: {
 			do {
 				try await sut.performWellKnownFileCheck(interaction)
+				XCTFail("Expected error: uknownFileFormat")
 			} catch {
-				didFailWithError = error
 				XCTAssertEqual(error as! ROLAFailure, expectedError)
 			}
 		}
-
-		XCTAssertNotNil(didFailWithError)
 	}
 }
 

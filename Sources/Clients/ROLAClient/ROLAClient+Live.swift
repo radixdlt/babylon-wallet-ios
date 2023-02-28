@@ -29,7 +29,7 @@ extension ROLAClient {
 			}
 
 			let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)
-			guard dAppDefinitionAddresses.contains(interaction.metadata.dAppDefinitionAddress.address) else {
+			guard dAppDefinitionAddresses.contains(interaction.metadata.dAppDefinitionAddress) else {
 				throw ROLAFailure.unknownDappDefinitionAddress
 			}
 		}
@@ -39,17 +39,7 @@ extension ROLAClient {
 		let dApps: [Item]
 
 		struct Item: Decodable {
-			let dAppDefinitionAddress: String
+			let dAppDefinitionAddress: DappDefinitionAddress
 		}
 	}
-}
-
-// MARK: - ExpectedHTTPURLResponse
-struct ExpectedHTTPURLResponse: Swift.Error {}
-
-// MARK: - BadHTTPResponseCode
-public struct BadHTTPResponseCode: Swift.Error {
-	public let got: Int
-	public let butExpected = Self.expected
-	static let expected = 200
 }
