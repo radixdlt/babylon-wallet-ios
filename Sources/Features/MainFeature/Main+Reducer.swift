@@ -5,28 +5,45 @@ import SettingsFeature
 
 public struct Main: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		// MARK: - Components
 		public var home: Home.State
-		// TODO: @Nikola uncomment
-//		public var settings: AppSettings.State?
 
-		public init(
-			home: Home.State = .init()
-			// TODO: @Nikola uncomment
-//			settings: AppSettings.State? = nil
-		) {
+		// MARK: - Destinations
+		@PresentationState
+		public var destination: Destinations.State?
+
+		public init(home: Home.State = .init()) {
 			self.home = home
-			// TODO: @Nikola uncomment
-//			self.settings = settings
 		}
+	}
+
+	public enum ViewAction: Sendable, Equatable {
+		case dappInteractionPresented
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
-		case settings(AppSettings.Action)
+		case destination(PresentationActionOf<Main.Destinations>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case removedWallet
+	}
+
+	public struct Destinations: Sendable, ReducerProtocol {
+		public enum State: Sendable, Hashable {
+			case settings(AppSettings.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case settings(AppSettings.Action)
+		}
+
+		public var body: some ReducerProtocolOf<Self> {
+			Scope(state: /State.settings, action: /Action.settings) {
+				AppSettings()
+			}
+		}
 	}
 
 	@Dependency(\.keychainClient) var keychainClient
@@ -40,40 +57,43 @@ public struct Main: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
-			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}
 
-	func core(state: inout State, action: Action) -> EffectTask<Action> {
-		switch action {
-		case .child(.home(.delegate(.displaySettings))):
+	public func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action> {
+		switch viewAction {
+		case .dappInteractionPresented:
+			state.destination = nil
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action> {
+		switch childAction {
+		case .home(.delegate(.displaySettings)):
 			state.destination = .settings(.init())
 			return .none
 
-		case .child(.destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources))))):
+		case .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources)))):
 			return .run { send in
 				try await profileClient.deleteProfileAndFactorSources()
 				await send(.delegate(.removedWallet))
 			}
 
 		// this should go away via network stream observation in the reducer (with .task)
-		case .child(.destination(.presented(.settings(.child(.destination(.presented(.manageGatewayAPIEndpoints(.delegate(.networkChanged))))))))):
+		case .destination(.presented(.settings(.child(.destination(.presented(.manageGatewayAPIEndpoints(.delegate(.networkChanged)))))))):
 			state.destination = nil
 			state.home = .init()
 			return .send(.child(.home(.view(.pullToRefreshStarted))))
 
-		case .child(.destination(.presented(.settings(.delegate(.dismiss))))):
+		case .destination(.presented(.settings(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
 
-		case .view(.dappInteractionPresented):
-			state.destination = nil
+		default:
 			return .none
-
-	 	case .child, .delegate:
-	 		return .none
-	 	}
-	 }
-	 */
+		}
+	}
 }
