@@ -48,7 +48,6 @@ extension CreateEntityCoordinator.View {
 						then: { NewEntityCompletion.View(store: $0) }
 					)
 				}
-				.toolbar(.visible, for: .navigationBar)
 				.toolbar {
 					if viewStore.shouldDisplayNavBar {
 						ToolbarItem(placement: .navigationBarLeading) {

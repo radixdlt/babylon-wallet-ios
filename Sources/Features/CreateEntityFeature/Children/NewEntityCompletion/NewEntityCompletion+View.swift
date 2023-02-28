@@ -25,6 +25,8 @@ extension NewEntityCompletion.View {
 					Spacer()
 					accountsStackView(with: viewStore, for: whenAccount)
 					Spacer()
+				} else {
+					Spacer()
 				}
 
 				VStack(spacing: .medium1) {
