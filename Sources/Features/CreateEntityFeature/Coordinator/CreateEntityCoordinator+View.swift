@@ -26,38 +26,35 @@ extension CreateEntityCoordinator.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState) { viewStore in
 			NavigationStack {
-				ZStack {
-					SwitchStore(store.scope(state: \.step)) {
-						CaseLet(
-							state: /CreateEntityCoordinator.State.Step.step0_nameNewEntity,
-							action: { CreateEntityCoordinator.Action.child(.step0_nameNewEntity($0)) },
-							then: { NameNewEntity.View(store: $0) }
-						)
-						CaseLet(
-							state: /CreateEntityCoordinator.State.Step.step1_selectGenesisFactorSource,
-							action: { CreateEntityCoordinator.Action.child(.step1_selectGenesisFactorSource($0)) },
-							then: { SelectGenesisFactorSource.View(store: $0) }
-						)
-						CaseLet(
-							state: /CreateEntityCoordinator.State.Step.step2_creationOfEntity,
-							action: { CreateEntityCoordinator.Action.child(.step2_creationOfEntity($0)) },
-							then: { CreationOfEntity.View(store: $0) }
-						)
-						CaseLet(
-							state: /CreateEntityCoordinator.State.Step.step3_completion,
-							action: { CreateEntityCoordinator.Action.child(.step3_completion($0)) },
-							then: { NewEntityCompletion.View(store: $0) }
-						)
-					}
+				SwitchStore(store.scope(state: \.step)) {
+					CaseLet(
+						state: /CreateEntityCoordinator.State.Step.step0_nameNewEntity,
+						action: { CreateEntityCoordinator.Action.child(.step0_nameNewEntity($0)) },
+						then: { NameNewEntity.View(store: $0) }
+					)
+					CaseLet(
+						state: /CreateEntityCoordinator.State.Step.step1_selectGenesisFactorSource,
+						action: { CreateEntityCoordinator.Action.child(.step1_selectGenesisFactorSource($0)) },
+						then: { SelectGenesisFactorSource.View(store: $0) }
+					)
+					CaseLet(
+						state: /CreateEntityCoordinator.State.Step.step2_creationOfEntity,
+						action: { CreateEntityCoordinator.Action.child(.step2_creationOfEntity($0)) },
+						then: { CreationOfEntity.View(store: $0) }
+					)
+					CaseLet(
+						state: /CreateEntityCoordinator.State.Step.step3_completion,
+						action: { CreateEntityCoordinator.Action.child(.step3_completion($0)) },
+						then: { NewEntityCompletion.View(store: $0) }
+					)
 				}
+				.toolbar(.visible, for: .navigationBar)
 				.toolbar {
-					ToolbarItem(placement: .navigationBarLeading) {
-						if viewStore.shouldDisplayNavBar {
+					if viewStore.shouldDisplayNavBar {
+						ToolbarItem(placement: .navigationBarLeading) {
 							CloseButton {
 								viewStore.send(.view(.dismiss))
 							}
-						} else {
-							Spacer().frame(minHeight: .small2, maxHeight: .large1)
 						}
 					}
 				}
