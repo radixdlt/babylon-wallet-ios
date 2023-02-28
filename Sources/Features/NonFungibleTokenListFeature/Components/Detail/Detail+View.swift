@@ -98,11 +98,13 @@ extension NonFungibleTokenList.Detail.View {
 					}
 					.padding(.top, .small1)
 				}
+				#if os(iOS)
 				.toolbar {
 					ToolbarItem(placement: .navigationBarLeading) {
 						CloseButton { viewStore.send(.closeButtonTapped) }
 					}
 				}
+				#endif
 			}
 			.foregroundColor(.app.gray1)
 		}
