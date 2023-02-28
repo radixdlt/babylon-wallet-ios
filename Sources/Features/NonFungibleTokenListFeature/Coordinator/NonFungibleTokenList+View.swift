@@ -42,7 +42,7 @@ struct NonFungibleTokenList_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleTokenList.View(
 			store: .init(
-				initialState: .init(rows: []),
+				initialState: .init(rows: [.init(container: .mock1)]),
 				reducer: NonFungibleTokenList()
 			)
 		)
