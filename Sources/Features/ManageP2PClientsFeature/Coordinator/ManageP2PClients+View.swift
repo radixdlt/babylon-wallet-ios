@@ -88,7 +88,6 @@ extension ManageP2PClients.View {
 					Button(L10n.ManageP2PClients.newConnectionButtonTitle) {
 						viewStore.send(.addNewConnectionButtonTapped)
 					}
-					.controlState(viewStore.canAddMoreConnections ? .enabled : .disabled)
 					.buttonStyle(.secondaryRectangular(
 						shouldExpand: true,
 						image: .init(asset: AssetResource.qrCodeScanner)
@@ -108,10 +107,6 @@ extension ManageP2PClients.View {
 extension ManageP2PClients.View {
 	public struct ViewState: Equatable {
 		public var clients: IdentifiedArrayOf<ManageP2PClient.State>
-		public var canAddMoreConnections: Bool {
-			// FIXME: Post betanet we should allow multiple connections...
-			clients.isEmpty
-		}
 
 		init(state: ManageP2PClients.State) {
 			clients = state.clients

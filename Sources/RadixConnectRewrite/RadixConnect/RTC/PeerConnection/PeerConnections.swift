@@ -151,18 +151,18 @@ struct PeerConnectionBuilder {
 			}
 			.prefix(1)
 
+		_ = await peerConnectionClient.onNegotiationNeeded.prefix(1).collect()
+		print("Bigga test Wallet - starting negotiation with \(offer.id)")
+		try await peerConnectionClient.onRemoteOffer(offer.content)
+		let localAnswer = try await peerConnectionClient.createAnswer()
+		try await signalingServerClient.sendToRemote(.init(content: .answer(localAnswer), id: offer.id))
+
 		let iceExchangeTask = Task {
 			await withThrowingTaskGroup(of: Void.self) { group in
 				onLocalIceCandidate.await(inGroup: &group)
 				onRemoteIceCandidate.await(inGroup: &group)
 			}
 		}
-
-		_ = await peerConnectionClient.onNegotiationNeeded.prefix(1).collect()
-		print("Bigga test Wallet - starting negotiation with \(offer.id)")
-		try await peerConnectionClient.onRemoteOffer(offer.content)
-		let localAnswer = try await peerConnectionClient.createAnswer()
-		try await signalingServerClient.sendToRemote(.init(content: .answer(localAnswer), id: offer.id))
 		print("Bigga test Wallet - sent answer \(offer.id)")
 		_ = try await onConnectionEstablished.collect()
 
