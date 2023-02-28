@@ -18,18 +18,14 @@ extension FungibleTokenList {
 
 extension FungibleTokenList.View {
 	public var body: some View {
-		ZStack {
-			VStack(spacing: .large2) {
-				LazyVStack(spacing: .medium2) {
-					ForEachStore(
-						store.scope(
-							state: \.sections,
-							action: { .child(.section(id: $0, action: $1)) }
-						),
-						content: { FungibleTokenList.Section.View(store: $0) }
-					)
-				}
-			}
+		LazyVStack(spacing: .medium2) {
+			ForEachStore(
+				store.scope(
+					state: \.sections,
+					action: { .child(.section(id: $0, action: $1)) }
+				),
+				content: { FungibleTokenList.Section.View(store: $0) }
+			)
 		}
 		.sheet(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),

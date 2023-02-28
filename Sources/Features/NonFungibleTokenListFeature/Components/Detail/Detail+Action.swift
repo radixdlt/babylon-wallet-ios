@@ -33,6 +33,6 @@ extension NonFungibleTokenList.Detail.Action {
 // MARK: - NonFungibleTokenList.Detail.Action.DelegateAction
 extension NonFungibleTokenList.Detail.Action {
 	public enum DelegateAction: Sendable, Equatable {
-		case closeButtonTapped
+		case dismiss
 	}
 }

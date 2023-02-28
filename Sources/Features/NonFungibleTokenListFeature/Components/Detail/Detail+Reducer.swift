@@ -14,7 +14,7 @@ extension NonFungibleTokenList.Detail {
 	public func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 		switch action {
 		case .internal(.view(.closeButtonTapped)):
-			return .run { send in await send(.delegate(.closeButtonTapped)) }
+			return .run { send in await send(.delegate(.dismiss)) }
 		case let .internal(.view(.copyAddressButtonTapped(address))):
 			return .run { _ in
 				pasteboardClient.copyString(address)
