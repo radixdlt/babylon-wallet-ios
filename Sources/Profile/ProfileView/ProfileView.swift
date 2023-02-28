@@ -190,15 +190,35 @@ extension AppPreferencesView {
 				indentation: inOneLevel
 			)
 
-//			GatewaysView(
-//				gateway: appPreferences.gateways,
-//				indentation: inOneLevel
-//			)
+			GatewaysView(
+				gateways: appPreferences.gateways,
+				indentation: inOneLevel
+			)
 
 			P2PClientsView(
 				p2pClients: appPreferences.p2pClients,
 				indentation: inOneLevel
 			)
+		}
+		.padding([.leading], leadingPadding)
+	}
+}
+
+// MARK: - GatewaysView
+public struct GatewaysView: IndentedView {
+	public let gateways: Gateways
+	public let indentation: Indentation
+}
+
+extension GatewaysView {
+	public var body: some View {
+		VStack(alignment: .leading, spacing: indentation.spacing) {
+			ForEach(gateways.all) { gateway in
+				GatewayView(
+					gateway: gateway,
+					indentation: inOneLevel
+				)
+			}
 		}
 		.padding([.leading], leadingPadding)
 	}
@@ -438,12 +458,12 @@ extension OnNetworkView {
 				indentation: inOneLevel
 			)
 
-//			AuthorizedDappsView(
-//				authorizedDapps: onNetwork.authorizedDapps.elements,
-//				indentation: inOneLevel
-//			) {
-//				try! onNetwork.detailsForAuthorizedDapp($0)
-//			}
+			AuthorizedDappsView(
+				authorizedDapps: onNetwork.authorizedDapps,
+				indentation: inOneLevel
+			) {
+				try! onNetwork.detailsForAuthorizedDapp($0)
+			}
 		}
 		.padding([.leading], leadingPadding)
 	}

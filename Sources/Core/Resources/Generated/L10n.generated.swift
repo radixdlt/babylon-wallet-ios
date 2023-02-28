@@ -51,8 +51,8 @@ public enum L10n {
   public enum AuthorizedDapps {
     /// Here are all the dApps that you have logged into with this Radix Wallet.
     public static let intro = L10n.tr("Localizable", "authorizedDapps.intro", fallback: "Here are all the dApps that you have logged into with this Radix Wallet.")
-    /// Connected dApps
-    public static let title = L10n.tr("Localizable", "authorizedDapps.title", fallback: "Connected dApps")
+    /// Authorized dApps
+    public static let title = L10n.tr("Localizable", "authorizedDapps.title", fallback: "Authorized dApps")
   }
   public enum Common {
     /// Inconsistency trying to use deleted Linked Connector.
@@ -567,8 +567,8 @@ public enum L10n {
     }
   }
   public enum Settings {
-    /// Connected dApps
-    public static let authorizedDappsButtonTitle = L10n.tr("Localizable", "settings.authorizedDappsButtonTitle", fallback: "Connected dApps")
+    /// Authorized dApps
+    public static let authorizedDappsButtonTitle = L10n.tr("Localizable", "settings.authorizedDappsButtonTitle", fallback: "Authorized dApps")
     /// Close
     public static let closeButtonTitle = L10n.tr("Localizable", "settings.closeButtonTitle", fallback: "Close")
     /// Delete Wallet Data
