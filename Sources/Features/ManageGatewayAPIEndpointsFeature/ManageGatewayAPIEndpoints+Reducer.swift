@@ -15,8 +15,8 @@ public struct ManageGatewayAPIEndpoints: Sendable, ReducerProtocol {
 extension ManageGatewayAPIEndpoints {
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(self.core)
-			.ifLet(\.createAccountCoordinator, action: /Action.createAccountCoordinator) {
-				CreateAccountCoordinator()
+			.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+				Destinations()
 			}
 	}
 
@@ -103,13 +103,14 @@ extension ManageGatewayAPIEndpoints {
 			return skipSwitching(state: &state)
 
 		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway))):
-			state.createAccountCoordinator = .init(config: .init(
-				specificNetworkID: newGateway.network.id,
-				isFirstEntity: false,
-				canBeDismissed: true,
-				navigationButtonCTA: .goHome
-			))
-
+			state.destination = .createAccount(
+				.init(config: .init(
+					specificNetworkID: newGateway.network.id,
+					isFirstEntity: false,
+					canBeDismissed: true,
+					navigationButtonCTA: .goHome
+				))
+			)
 			return .none
 
 		case let .internal(.system(.switchToResult(.failure(error)))):
@@ -119,11 +120,11 @@ extension ManageGatewayAPIEndpoints {
 		case .internal(.system(.switchToResult(.success))):
 			return .send(.delegate(.networkChanged))
 
-		case .createAccountCoordinator(.delegate(.dismissed)):
+		case .child(.destination(.presented(.createAccount(.delegate(.dismissed))))):
 			return skipSwitching(state: &state)
 
-		case .createAccountCoordinator(.delegate(.completed)):
-			state.createAccountCoordinator = nil
+		case .child(.destination(.presented(.createAccount(.delegate(.completed))))):
+			state.destination = nil
 			guard let new = state.validatedNewGatewayToSwitchTo else {
 				// weird state... should not happen.
 				return .none
@@ -135,13 +136,13 @@ extension ManageGatewayAPIEndpoints {
 				return .internal(.system(.switchToResult(result)))
 			}
 
-		case .createAccountCoordinator, .delegate:
+		case .child, .delegate:
 			return .none
 		}
 	}
 
 	public func skipSwitching(state: inout State) -> EffectTask<Action> {
-		state.createAccountCoordinator = nil
+		state.destination = nil
 		state.validatedNewGatewayToSwitchTo = nil
 		return .none
 	}
