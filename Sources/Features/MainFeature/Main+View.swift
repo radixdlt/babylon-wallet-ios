@@ -3,16 +3,8 @@ import FeaturePrelude
 import HomeFeature
 import SettingsFeature
 
-extension Main.State {
-	var viewState: Main.ViewState {
-		.init()
-	}
-}
-
 // MARK: - Main.View
 extension Main {
-	struct ViewState: Equatable {}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<Main>
