@@ -91,46 +91,24 @@ struct DappInteractor: Sendable, FeatureReducer {
 					do {
 						let interactionMessage = try message.unwrapResult()
 						guard interactionMessage.content.content.metadata.networkId == currentNetworkID else {
-							// send error
-							fatalError()
+                                                        let interaction = interactionMessage.content.content
+                                                        let incomingRequestNetwork = try Network.lookupBy(id: interaction.metadata.networkId)
+                                                        let currentNetwork = try Network.lookupBy(id: currentNetworkID)
+                                                        let outMessage = interactionMessage.toOutgoingMessage(.failure(.init(
+                                                                interactionId: interaction.id,
+                                                                errorType: .wrongNetwork,
+                                                                message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
+                                                        )))
+
+                                                        try await p2pConnectivityClient.sendMessage(outMessage)
+                                                        return
 						}
 
 						await send(.internal(.receivedRequestFromDapp(interactionMessage)))
 					} catch {
-						fatalError()
+                                                loggerGlobal.error("Failed to create Peer Connection")
 					}
 				}
-//				for try await clientIDs in try await p2pConnectivityClient.getP2PClientIDs() {
-//					guard !Task.isCancelled else {
-//						return
-//					}
-//					for clientID in clientIDs {
-//						for try await request in try await p2pConnectivityClient.getRequestsFromP2PClientAsyncSequence(clientID) {
-//							try await p2pConnectivityClient.sendMessageReadReceipt(clientID, request.originalMessage)
-//
-//							let currentNetworkID = await profileClient.getCurrentNetworkID()
-//
-//							guard request.interaction.metadata.networkId == currentNetworkID else {
-//								let incomingRequestNetwork = try Network.lookupBy(id: request.interaction.metadata.networkId)
-//								let currentNetwork = try Network.lookupBy(id: currentNetworkID)
-//
-//								_ = try await p2pConnectivityClient.sendMessage(.init(
-//									connectionID: request.client.id,
-//									responseToDapp: .failure(
-//										.init(
-//											interactionId: request.interaction.id,
-//											errorType: .wrongNetwork,
-//											message: L10n.DApp.Request.wrongNetworkError(incomingRequestNetwork.name, currentNetwork.name)
-//										)
-//									)
-//								))
-//								continue
-//							}
-//
-//							await send(.internal(.receivedRequestFromDapp(request)))
-//						}
-//					}
-//				}
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
