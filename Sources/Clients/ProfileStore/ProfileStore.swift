@@ -103,14 +103,18 @@ extension ProfileStore {
 
 	/// A multicasting replaying async sequence of distinct Profile.
 	public func values() async -> AnyAsyncSequence<Profile> {
-		profileStateSubject.map(\.profile)
-			.share() // Multicast
-			.eraseToAnyAsyncSequence()
+		lens(\.profile)
 	}
 
-	/// A multicasting replaying async sequence of distinct Profile.
+	/// A multicasting replaying async sequence of distinct Accounts for the currently selected network.
 	public func accountValues() async -> AnyAsyncSequence<OnNetwork.Accounts> {
-		profileStateSubject.map(\.profile.network.accounts)
+		lens(\.profile.network.accounts)
+	}
+
+	private func lens<Property>(
+		_ keyPath: KeyPath<ProfileState, Property>
+	) -> AnyAsyncSequence<Property> where Property: Sendable & Equatable {
+		profileStateSubject.map { $0[keyPath: keyPath] }
 			.share() // Multicast
 			.eraseToAnyAsyncSequence()
 	}
