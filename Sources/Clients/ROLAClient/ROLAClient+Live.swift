@@ -8,8 +8,7 @@ extension ROLAClient {
 			guard let originURL = URL(string: interaction.metadata.origin.rawValue) else {
 				throw ROLAFailure.invalidOriginURL
 			}
-			let wellKnownFilePath = ".well-known/radix.json"
-			let url = originURL.appending(path: wellKnownFilePath)
+			let url = originURL.appending(path: Constants.wellKnownFilePath)
 
 			let (data, urlResponse) = try await urlSession.data(from: url)
 
@@ -41,5 +40,9 @@ extension ROLAClient {
 		struct Item: Decodable {
 			let dAppDefinitionAddress: DappDefinitionAddress
 		}
+	}
+
+	enum Constants {
+		static let wellKnownFilePath = ".well-known/radix.json"
 	}
 }
