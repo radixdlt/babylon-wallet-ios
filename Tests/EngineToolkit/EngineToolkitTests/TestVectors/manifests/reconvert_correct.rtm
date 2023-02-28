@@ -1,0 +1,39 @@
+CALL_METHOD
+    ComponentAddress("account_tdx_b_1pr3kgqdw7gaz7v6zk65xjet79w9c72qyzpcuhgmv8rksqs2ugt")
+    "withdraw_by_amount"
+    Decimal("10")
+    ResourceAddress("resource_tdx_b_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8z96qp");
+
+TAKE_FROM_WORKTOP_BY_AMOUNT
+    Decimal("10")
+    ResourceAddress("resource_tdx_b_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq8z96qp")
+    Bucket("0");
+
+CALL_METHOD
+    ComponentAddress("account_tdx_b_1pr3kgqdw7gaz7v6zk65xjet79w9c72qyzpcuhgmv8rksqs2ugt")
+    "withdraw_by_amount"
+    Decimal("17000")
+    ResourceAddress("resource_tdx_b_1qre9sv98scqut4k9g3j6kxuvscczv0lzumefwgwhuf6qdu4c3r");
+
+TAKE_FROM_WORKTOP_BY_AMOUNT
+    Decimal("17000")
+    ResourceAddress("resource_tdx_b_1qre9sv98scqut4k9g3j6kxuvscczv0lzumefwgwhuf6qdu4c3r")
+    Bucket("1");
+
+CALL_METHOD
+    ComponentAddress("account_tdx_b_1pr3kgqdw7gaz7v6zk65xjet79w9c72qyzpcuhgmv8rksqs2ugt")
+    "create_proof_by_ids"
+    Array<NonFungibleLocalId>(NonFungibleLocalId("#3#"))
+    ResourceAddress("resource_tdx_b_1qq02xf63eauv5xfg0ruggmmzruk80jl5tle4shh8x7uq6j8d4d");
+
+CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS
+    Array<NonFungibleLocalId>(NonFungibleLocalId("#3#"))
+    ResourceAddress("resource_tdx_b_1qq02xf63eauv5xfg0ruggmmzruk80jl5tle4shh8x7uq6j8d4d")
+    Proof("2");
+
+CALL_METHOD
+    ComponentAddress("component_tdx_b_1qt7c7ws0a4f3wd3mwtcj4acvn87w4as9zyvkx3wwq8lskwe5zm")
+    "add_liquidity"
+    Bucket("0")
+    Bucket("1")
+    Some(Proof("2"));
