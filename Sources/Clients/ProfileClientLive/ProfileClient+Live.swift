@@ -110,9 +110,7 @@ extension ProfileClient {
 			getGateways: getGateways,
 			setGateway: { gateway in
 				try await profileHolder.asyncMutating { profile in
-					// Ensure we have accounts on network, else do not change
-					_ = try profile.onNetwork(id: gateway.network.id)
-					try profile.appPreferences.gateways.changeCurrent(to: gateway)
+					try profile.changeGateway(to: gateway)
 				}
 			},
 			createEphemeralPrivateProfile: { request in

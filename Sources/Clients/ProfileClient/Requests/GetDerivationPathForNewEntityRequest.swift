@@ -1,5 +1,5 @@
 import ClientPrelude
-import ProfileModels
+import Profile
 
 public struct GetDerivationPathForNewEntityRequest: Sendable, Equatable {
 	// if `nil` we will use current networkID

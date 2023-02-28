@@ -1,6 +1,6 @@
 import ClientPrelude
 import Cryptography
-import ProfileModels
+import Profile
 
 // MARK: - GenesisFactorInstanceDerivationStrategy
 public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {

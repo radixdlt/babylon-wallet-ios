@@ -131,6 +131,13 @@ package.addModules([
 		)
 	),
 	.feature(
+		name: "InspectProfileFeature",
+		dependencies: [
+			"SecureStorageClient",
+		],
+		tests: .no
+	),
+	.feature(
 		name: "MainFeature",
 		dependencies: [
 			"AppSettings",
@@ -197,7 +204,7 @@ package.addModules([
 			"ManageGatewayAPIEndpointsFeature",
 			"PersonasFeature",
 			"P2PConnectivityClient", // deleting connections when wallet is deleted
-			"ProfileView",
+			"InspectProfileFeature",
 		],
 		tests: .yes()
 	),
@@ -424,7 +431,7 @@ package.addModules([
 		name: "SharedModels",
 		dependencies: [
 			"EngineToolkitModels",
-			"ProfileModels",
+			"Profile",
 			"P2PConnection", // FIXME: remove dependency on this, rely only on P2PModels
 			"P2PModels",
 		],
@@ -440,21 +447,10 @@ package.addModules([
 
 package.addModules([
 	.module(
-		name: "ProfileView",
-		category: .profile,
-		dependencies: [
-			"Profile",
-			"SecureStorageClient",
-		],
-		tests: .no
-	),
-	.module(
 		name: "Profile",
-		category: .profile,
 		dependencies: [
 			"Cryptography",
-			"EngineToolkit",
-			"ProfileModels",
+			"EngineToolkit", // address derivation
 			"P2PModels",
 		],
 		tests: .yes(
@@ -462,17 +458,6 @@ package.addModules([
 				"SharedTestingModels",
 			]
 		)
-	),
-	.module(
-		name: "ProfileModels",
-		category: .profile,
-		dependencies: [
-			"Cryptography",
-			"EngineToolkit", // address derivation
-			"P2PModels",
-			"Resources", // L10n
-		],
-		tests: .no
 	),
 	.module(
 		name: "EngineToolkit",
@@ -668,7 +653,6 @@ extension Package {
 			static let testing: Self = .module(name: "Testing")
 			static let engineToolkit: Self = .module(name: "EngineToolkit")
 			static let radixConnect: Self = .module(name: "RadixConnect")
-			static let profile: Self = .module(name: "Profile")
 			var pathComponent: String {
 				switch self {
 				case .client: return "Clients"

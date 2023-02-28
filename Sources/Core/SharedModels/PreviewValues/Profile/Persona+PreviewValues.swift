@@ -1,6 +1,6 @@
 #if DEBUG
 import Prelude
-import ProfileModels
+import Profile
 
 extension OnNetwork.Persona {
 	public static let previewValue0: Self = {

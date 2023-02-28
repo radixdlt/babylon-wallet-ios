@@ -1,5 +1,5 @@
 import ClientPrelude
-import ProfileModels
+import Profile
 
 extension ProfileClient {
 	public func createNewUnsavedVirtualEntity<Entity: EntityProtocol & Sendable>(

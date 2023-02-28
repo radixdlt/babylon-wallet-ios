@@ -1,6 +1,5 @@
 import Cryptography
 import Prelude
-import ProfileModels
 
 // MARK: - EphemeralPrivateProfile
 public struct EphemeralPrivateProfile: Sendable, Hashable {

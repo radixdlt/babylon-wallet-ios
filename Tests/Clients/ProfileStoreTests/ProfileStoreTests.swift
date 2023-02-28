@@ -1,8 +1,7 @@
 import ClientTestingPrelude
 import Cryptography
 import LocalAuthenticationClient
-import Profile
-@testable import ProfileModels
+@testable import Profile
 @testable import ProfileStore
 import SecureStorageClient
 

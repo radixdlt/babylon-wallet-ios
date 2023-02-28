@@ -6,7 +6,7 @@ import ManageP2PClientsFeature
 import PersonasFeature
 import ProfileClient
 #if DEBUG
-import ProfileView
+// import ProfileView
 import SecureStorageClient
 #endif
 
@@ -83,7 +83,7 @@ extension View {
 	// NB: this function is split out from the body so the compiler doesn't choke
 	// ("... compiler is unable to type-check this expression in reasonable time...").
 	//
-	// Maybe the new result builder performance improvements in Swift 5.8 will correct this.
+	// Maybe the new result builder performance improvements in Swift 5.8 will correct this.œ
 	@MainActor
 	fileprivate func navigationDestinations(
 		with store: StoreOf<AppSettings>,
@@ -98,11 +98,12 @@ extension View {
 				)
 			) {
 				if let profile = viewStore.profileToInspect {
-					ProfileView(
-						profile: profile,
-						// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
-						secureStorageClient: SecureStorageClient.liveValue
-					)
+//					ProfileView(
+//						profile: profile,
+//						// Sorry about this, hacky hacky hack. But it is only for debugging and we are short on time..
+//						secureStorageClient: SecureStorageClient.liveValue
+//					)
+					Text("Fix Inspect Profile View please")
 				} else {
 					Text(L10n.Settings.noProfileText)
 				}

@@ -2,7 +2,6 @@ import Cryptography
 import EngineToolkit
 import P2PModels
 @testable import Profile
-import ProfileModels
 import SharedTestingModels
 import TestingPrelude
 

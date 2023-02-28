@@ -1,7 +1,6 @@
 import CreateEntityFeature
 import FeaturePrelude
 import Profile
-import ProfileModels
 
 // MARK: - NewProfileThenAccountCoordinator.Action
 extension NewProfileThenAccountCoordinator {

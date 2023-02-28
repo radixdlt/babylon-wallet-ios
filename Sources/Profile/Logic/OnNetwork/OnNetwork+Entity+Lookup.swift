@@ -50,7 +50,7 @@ extension Profile {
 
 	public func entity(
 		networkID: NetworkID,
-		address: ProfileModels.AddressProtocol
+		address: AddressProtocol
 	) throws -> any EntityProtocol {
 		let onNetwork = try onNetwork(id: networkID)
 		if let account = onNetwork.accounts.first(where: { $0.address.address == address.address }) {

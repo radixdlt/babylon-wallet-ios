@@ -52,7 +52,7 @@ extension Gateways {
 	/// * Adds (old)`current` to `other` (throws error if it was already present)
 	/// * Removes `newCurrent` from `other` (if present)
 	/// * Sets `current = newCurrent`
-	public mutating func changeCurrent(to newCurrent: Gateway) throws {
+	fileprivate mutating func changeCurrent(to newCurrent: Gateway) throws {
 		guard newCurrent != current else {
 			assert(other[id: current.id] == nil, "Discrepancy, `other` should not contain `current`.")
 			return
@@ -67,8 +67,28 @@ extension Gateways {
 	}
 
 	/// Adds `newOther` to `other` (if indeed new).
-	public mutating func add(_ newOther: Gateway, alsoSwitchTo: Bool = false) {
+	fileprivate mutating func add(_ newOther: Gateway) {
 		other.append(newOther)
+	}
+}
+
+extension Profile {
+	/// Requires the presense of an `OnNetwork` in `perNetwork` for
+	/// `newGateway.network.id`, otherwise an error is thrown.
+	public mutating func changeGateway(to newGateway: Gateway) throws {
+		let newNetworkID = newGateway.network.id
+		// Ensure we have accounts on network, else do not change
+		_ = try onNetwork(id: newNetworkID)
+		try appPreferences.gateways.changeCurrent(to: newGateway)
+	}
+
+	/// Requires the presense of an `OnNetwork` in `perNetwork` for
+	/// `newGateway.network.id`, otherwise an error is thrown.
+	public mutating func addNewGateway(_ newGateway: Gateway) throws {
+		let newNetworkID = newGateway.network.id
+		// Ensure we have accounts on network, else do not change
+		_ = try onNetwork(id: newNetworkID)
+		appPreferences.gateways.add(newGateway)
 	}
 }
 

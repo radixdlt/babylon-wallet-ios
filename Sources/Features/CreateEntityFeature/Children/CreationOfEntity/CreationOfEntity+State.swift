@@ -1,7 +1,7 @@
 import Cryptography
 import FeaturePrelude
+import Profile
 import ProfileClient
-import ProfileModels
 
 // MARK: - CreationOfEntity.State
 extension CreationOfEntity {
