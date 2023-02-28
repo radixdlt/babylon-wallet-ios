@@ -47,7 +47,7 @@ struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case loadAccountsResult(TaskResult<NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>>)
+		case loadAccountsResult(TaskResult<OnNetwork.Accounts>)
 	}
 
 	enum ChildAction: Sendable, Equatable {

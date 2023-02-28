@@ -1,4 +1,4 @@
-import ConnectedDAppsFeature
+import AuthorizedDAppsFeatures
 import FeaturePrelude
 import GatewayAPI
 import ManageGatewayAPIEndpointsFeature
@@ -41,7 +41,7 @@ public struct AppSettings: FeatureReducer {
 		case addP2PClientButtonTapped
 
 		case editGatewayAPIEndpointButtonTapped
-		case connectedDappsButtonTapped
+		case authorizedDappsButtonTapped
 		case personasButtonTapped
 
 		#if DEBUG
@@ -70,14 +70,14 @@ public struct AppSettings: FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case manageP2PClients(ManageP2PClients.State)
 			case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.State)
-			case connectedDapps(ConnectedDapps.State)
+			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case manageP2PClients(ManageP2PClients.Action)
 			case manageGatewayAPIEndpoints(ManageGatewayAPIEndpoints.Action)
-			case connectedDapps(ConnectedDapps.Action)
+			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
 		}
 
@@ -88,8 +88,8 @@ public struct AppSettings: FeatureReducer {
 			Scope(state: /State.manageGatewayAPIEndpoints, action: /Action.manageGatewayAPIEndpoints) {
 				ManageGatewayAPIEndpoints()
 			}
-			Scope(state: /State.connectedDapps, action: /Action.connectedDapps) {
-				ConnectedDapps()
+			Scope(state: /State.authorizedDapps, action: /Action.authorizedDapps) {
+				AuthorizedDapps()
 			}
 			Scope(state: /State.personas, action: /Action.personas) {
 				PersonasCoordinator()
@@ -132,8 +132,8 @@ public struct AppSettings: FeatureReducer {
 			state.destination = .manageGatewayAPIEndpoints(.init())
 			return .none
 
-		case .connectedDappsButtonTapped:
-			state.destination = .connectedDapps(.init())
+		case .authorizedDappsButtonTapped:
+			state.destination = .authorizedDapps(.init())
 			return .none
 
 		case .personasButtonTapped:

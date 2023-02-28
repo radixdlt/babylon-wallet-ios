@@ -17,14 +17,14 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 	//    func test__GIVEN__intialState__WHEN__an_invalid__URL
 
 	func test__GIVEN__initialState__WHEN__view_did_appear__THEN__current_networkAndGateway_is_loaded() async throws {
-		let getNetworkAndGatewayCalled = ActorIsolated(false)
+		let getGatewayCalled = ActorIsolated(false)
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: ManageGatewayAPIEndpoints.State(),
 			reducer: ManageGatewayAPIEndpoints()
 		) {
-			$0.networkSwitchingClient.getNetworkAndGateway = {
-				await getNetworkAndGatewayCalled.setValue(true)
+			$0.networkSwitchingClient.getGateway = {
+				await getGatewayCalled.setValue(true)
 				return .previewValue
 			}
 		}
@@ -32,18 +32,18 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		// WHEN view did appear
 		await store.send(.internal(.view(.didAppear)))
 		// THEN current network is loaded
-		await store.receive(.internal(.system(.loadNetworkAndGatewayResult(.success(.previewValue)))))
-		await getNetworkAndGatewayCalled.withValue {
+		await store.receive(.internal(.system(.loadGatewayResult(.success(.previewValue)))))
+		await getGatewayCalled.withValue {
 			XCTAssertTrue($0)
 		}
 	}
 
 	func test__GIVEN__current_network_and_gateway__WHEN__user_inputs_same_url__THEN__switchToButton_remains_disabled() async throws {
 		// GIVEN a current network and gateway
-		let currentNetworkAndGateway: AppPreferences.NetworkAndGateway = .previewValue
+		let currentGateway: Gateway = .previewValue
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				currentNetworkAndGateway: currentNetworkAndGateway,
+				currentGateway: currentGateway,
 				isSwitchToButtonEnabled: true // to capture state change
 			),
 			reducer: ManageGatewayAPIEndpoints()
@@ -51,7 +51,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		store.exhaustivity = .off
 		await store.send(.view(.urlStringChanged(
 			// WHEN user inputs same url
-			currentNetworkAndGateway.gatewayAPIEndpointURL.absoluteString
+			currentGateway.url.absoluteString
 		))) {
 			// THEN switchToButton is disabled
 			$0.isSwitchToButtonEnabled = false
@@ -60,10 +60,10 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 
 	func test__GIVEN__current_network_and_gateway__WHEN__user_inputs_a_valid_new_url__THEN__switchToButton_is_enabled() async throws {
 		// GIVEN a current network and gateway
-		let currentNetworkAndGateway: AppPreferences.NetworkAndGateway = .mardunet
+		let currentGateway: Gateway = .mardunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				currentNetworkAndGateway: currentNetworkAndGateway
+				currentGateway: currentGateway
 			),
 			reducer: ManageGatewayAPIEndpoints()
 		)
@@ -71,7 +71,7 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 
 		await store.send(.view(.urlStringChanged(
 			// WHEN user inputs a valid NEW url
-			AppPreferences.NetworkAndGateway.nebunet.gatewayAPIEndpointURL.absoluteString
+			Gateway.nebunet.url.absoluteString
 		))) {
 			// THEN switchToButton is enabled
 			$0.isSwitchToButtonEnabled = true
@@ -80,10 +80,10 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 
 	func test__GIVEN__switchToButton_is_enabled__WHEN__user_inputs_an_invalid_url__THEN__switchToButton_is_disabled() async throws {
 		// GIVEN a current network and gateway
-		let currentNetworkAndGateway: AppPreferences.NetworkAndGateway = .previewValue
+		let currentGateway: Gateway = .previewValue
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				currentNetworkAndGateway: currentNetworkAndGateway,
+				currentGateway: currentGateway,
 				isSwitchToButtonEnabled: true // to capture state change
 			),
 			reducer: ManageGatewayAPIEndpoints()
@@ -102,19 +102,19 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 	func test__GIVEN__swithToButton_enabled__WHEN__switchToButton_is_tapped__THEN__the_url_gets_validated() async throws {
 		// GIVEN a current network and gateway
 		let validatedGatewayURL = ActorIsolated<URL?>(nil)
-		let currentNetworkAndGateway: AppPreferences.NetworkAndGateway = .mardunet
-		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
+		let currentGateway: Gateway = .mardunet
+		let newGateway: Gateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				urlString: newNetworkAndGateway.gatewayAPIEndpointURL.absoluteString,
-				currentNetworkAndGateway: currentNetworkAndGateway,
+				urlString: newGateway.url.absoluteString,
+				currentGateway: currentGateway,
 				isSwitchToButtonEnabled: true
 			),
 			reducer: ManageGatewayAPIEndpoints()
 		) {
 			$0.networkSwitchingClient.validateGatewayURL = {
 				await validatedGatewayURL.setValue($0)
-				return newNetworkAndGateway
+				return newGateway
 			}
 			$0.networkSwitchingClient.hasAccountOnNetwork = { _ in
 				false
@@ -124,20 +124,20 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		await store.send(.internal(.view(.switchToButtonTapped))) {
 			$0.isValidatingEndpoint = true
 		}
-		await store.receive(.internal(.system(.gatewayValidationResult(.success(newNetworkAndGateway)))))
+		await store.receive(.internal(.system(.gatewayValidationResult(.success(newGateway)))))
 		await validatedGatewayURL.withValue {
-			XCTAssertEqual($0, newNetworkAndGateway.gatewayAPIEndpointURL)
+			XCTAssertEqual($0, newGateway.url)
 		}
 	}
 
 	func test__GIVEN__validating_a_new_endpoint__WHEN__its_validated__THEN__we_stop_loading_and_we_check_if_user_has_accounts_on_this_network() async throws {
 		let hasAccountsOnNetwork = false
-		let networkCheckedForAccounts = ActorIsolated<AppPreferences.NetworkAndGateway?>(nil)
-		let currentNetworkAndGateway: AppPreferences.NetworkAndGateway = .mardunet
-		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
+		let networkCheckedForAccounts = ActorIsolated<Gateway?>(nil)
+		let currentGateway: Gateway = .mardunet
+		let newGateway: Gateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				currentNetworkAndGateway: currentNetworkAndGateway,
+				currentGateway: currentGateway,
 				isValidatingEndpoint: true
 			),
 			reducer: ManageGatewayAPIEndpoints()
@@ -148,28 +148,28 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			}
 		}
 		store.exhaustivity = .off
-		await store.send(.internal(.system(.gatewayValidationResult(.success(newNetworkAndGateway))))) {
+		await store.send(.internal(.system(.gatewayValidationResult(.success(newGateway))))) {
 			$0.isValidatingEndpoint = false
-			$0.validatedNewNetworkAndGatewayToSwitchTo = newNetworkAndGateway
+			$0.validatedNewGatewayToSwitchTo = newGateway
 		}
 		await store.receive(.internal(.system(.hasAccountsResult(.success(hasAccountsOnNetwork)))))
 	}
 
 	func test__GIVEN__no_existing_accounts_on_a_new_network__THEN__createAccount__is_displayed() async throws {
-		let currentNetworkAndGateway: AppPreferences.NetworkAndGateway = .mardunet
-		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
+		let currentGateway: Gateway = .mardunet
+		let newGateway: Gateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				currentNetworkAndGateway: currentNetworkAndGateway,
-				validatedNewNetworkAndGatewayToSwitchTo: newNetworkAndGateway
+				currentGateway: currentGateway,
+				validatedNewGatewayToSwitchTo: newGateway
 			),
 			reducer: ManageGatewayAPIEndpoints()
 		)
 		store.exhaustivity = .off
 		await store.send(.internal(.system(.hasAccountsResult(.success(false)))))
-		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway)))) {
+		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway)))) {
 			$0.createAccountCoordinator = .init(config: .init(
-				specificNetworkID: newNetworkAndGateway.network.id,
+				specificNetworkID: newGateway.network.id,
 				isFirstEntity: false,
 				canBeDismissed: true,
 				navigationButtonCTA: .goHome
@@ -178,19 +178,19 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 	}
 
 	func test__GIVEN__finish_created_account_on_new_network__THEN__switchTo_is_called_on_networkSwitchingClient() async throws {
-		let networkSwitchedTo = ActorIsolated<AppPreferences.NetworkAndGateway?>(nil)
-		let currentNetworkAndGateway: AppPreferences.NetworkAndGateway = .mardunet
-		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
+		let networkSwitchedTo = ActorIsolated<Gateway?>(nil)
+		let currentGateway: Gateway = .mardunet
+		let newGateway: Gateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
 				createAccountCoordinator: .init(config: .init(
-					specificNetworkID: newNetworkAndGateway.network.id,
+					specificNetworkID: newGateway.network.id,
 					isFirstEntity: false,
 					canBeDismissed: true,
 					navigationButtonCTA: .goHome
 				)),
-				currentNetworkAndGateway: currentNetworkAndGateway,
-				validatedNewNetworkAndGatewayToSwitchTo: newNetworkAndGateway
+				currentGateway: currentGateway,
+				validatedNewGatewayToSwitchTo: newGateway
 			),
 			reducer: ManageGatewayAPIEndpoints()
 		) {
@@ -204,31 +204,31 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			$0.createAccountCoordinator = nil
 		}
 
-		await store.receive(.internal(.system(.switchToResult(.success(newNetworkAndGateway)))))
+		await store.receive(.internal(.system(.switchToResult(.success(newGateway)))))
 		await networkSwitchedTo.withValue {
-			XCTAssertEqual($0, newNetworkAndGateway)
+			XCTAssertEqual($0, newGateway)
 		}
 	}
 
 	func test__GIVEN__apa__WHEN__createAccount_dismissed_during_network_switching__THEN__network_remains_unchanged() async throws {
-		let newNetworkAndGateway: AppPreferences.NetworkAndGateway = .nebunet
+		let newGateway: Gateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
 				createAccountCoordinator: .init(config: .init(
-					specificNetworkID: newNetworkAndGateway.network.id,
+					specificNetworkID: newGateway.network.id,
 					isFirstEntity: false,
 					canBeDismissed: true,
 					navigationButtonCTA: .goHome
 				)),
-				currentNetworkAndGateway: .mardunet,
-				validatedNewNetworkAndGatewayToSwitchTo: newNetworkAndGateway
+				currentGateway: .mardunet,
+				validatedNewGatewayToSwitchTo: newGateway
 			),
 			reducer: ManageGatewayAPIEndpoints()
 		)
 		store.exhaustivity = .on // we ensure `exhaustivity` is on, to assert nothing happens, i.e. `switchTo` is not called on networkSwitchingClient
 		await store.send(.createAccountCoordinator(.delegate(.dismissed))) {
 			$0.createAccountCoordinator = nil
-			$0.validatedNewNetworkAndGatewayToSwitchTo = nil
+			$0.validatedNewGatewayToSwitchTo = nil
 		}
 		// nothing else should happen
 	}
@@ -244,10 +244,10 @@ extension Network {
 	public static let previewValue = Self(name: "Placeholder", id: .simulator)
 }
 
-extension AppPreferences.NetworkAndGateway {
+extension Gateway {
 	public static let previewValue = Self(
 		network: .previewValue,
-		gatewayAPIEndpointURL: .previewValue
+		url: .previewValue
 	)
 }
 #endif // DEBUG

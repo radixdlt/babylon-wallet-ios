@@ -1,8 +1,8 @@
 import FeaturePrelude
 import ProfileClient
 
-// MARK: - ConnectedDapps
-public struct ConnectedDapps: Sendable, FeatureReducer {
+// MARK: - AuthorizedDapps
+public struct AuthorizedDapps: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 
@@ -11,12 +11,15 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApps: IdentifiedArrayOf<OnNetwork.ConnectedDapp>
+		public var dApps: OnNetwork.AuthorizedDapps
 
 		@PresentationState
 		public var presentedDapp: DappDetails.State?
 
-		public init(dApps: IdentifiedArrayOf<OnNetwork.ConnectedDapp> = [], presentedDapp: DappDetails.State? = nil) {
+		public init(
+			dApps: OnNetwork.AuthorizedDapps = [],
+			presentedDapp: DappDetails.State? = nil
+		) {
 			self.dApps = dApps
 			self.presentedDapp = presentedDapp
 		}
@@ -26,11 +29,11 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case didSelectDapp(OnNetwork.ConnectedDapp.ID)
+		case didSelectDapp(OnNetwork.AuthorizedDapp.ID)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedDapps(TaskResult<IdentifiedArrayOf<OnNetwork.ConnectedDapp>>)
+		case loadedDapps(TaskResult<OnNetwork.AuthorizedDapps>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -52,7 +55,7 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .task {
-				await loadConnectedDapps()
+				await loadAuthorizedDapps()
 			}
 
 		case let .didSelectDapp(dAppID):
@@ -71,7 +74,7 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		case .presentedDapp(.presented(.delegate(.dAppForgotten))):
 			return .run { send in
 				await send(.child(.presentedDapp(.dismiss)))
-				await send(loadConnectedDapps())
+				await send(loadAuthorizedDapps())
 			}
 
 		case .presentedDapp:
@@ -90,9 +93,9 @@ public struct ConnectedDapps: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadConnectedDapps() async -> Action {
+	private func loadAuthorizedDapps() async -> Action {
 		let result = await TaskResult {
-			try await profileClient.getConnectedDapps()
+			try await profileClient.getAuthorizedDapps()
 		}
 		return .internal(.loadedDapps(result))
 	}

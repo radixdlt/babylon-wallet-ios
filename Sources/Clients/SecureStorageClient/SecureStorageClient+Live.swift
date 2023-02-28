@@ -131,6 +131,40 @@ extension SecureStorageClient: DependencyKey {
 	}()
 }
 
+extension SecureStorageClient {
+	public func loadProfileSnapshot() async throws -> ProfileSnapshot? {
+		@Dependency(\.jsonDecoder) var jsonDecoder
+		guard
+			let existingSnapshotData = try await loadProfileSnapshotData()
+		else {
+			return nil
+		}
+		return try jsonDecoder().decode(ProfileSnapshot.self, from: existingSnapshotData)
+	}
+
+	public func loadProfile() async throws -> Profile? {
+		@Dependency(\.jsonDecoder) var jsonDecoder
+		guard
+			let existingSnapshot = try await loadProfileSnapshot()
+		else {
+			return nil
+		}
+		return try Profile(snapshot: existingSnapshot)
+	}
+
+	/// Either saves both mnemonic AND profile snapshot, or neither.
+	public func save(ephemeral: EphemeralPrivateProfile) async throws {
+		try await saveMnemonicForFactorSource(ephemeral.privateFactorSource)
+
+		do {
+			try await saveProfileSnapshot(ephemeral.profile.snapshot())
+		} catch {
+			try? await deleteMnemonicByFactorSourceID(ephemeral.privateFactorSource.factorSource.id)
+			throw error
+		}
+	}
+}
+
 private let profileSnapshotKeychainKey: KeychainClient.Key = "profileSnapshotKeychainKey"
 private func key(factorSourceID: FactorSource.ID) -> KeychainClient.Key {
 	.init(rawValue: .init(rawValue: factorSourceID.hexCodable.hex())!)

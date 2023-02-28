@@ -23,20 +23,20 @@ extension ProfileClient {
 			}
 		}
 
-		let getNetworkAndGateway: GetNetworkAndGateway = {
+		let getGateways: GetGateways = {
 			do {
-				return try await getAppPreferences().networkAndGateway
+				return try await getAppPreferences().gateways
 			} catch {
-				return AppPreferences.NetworkAndGateway.nebunet
+				return .init(current: Gateway.nebunet)
 			}
 		}
 
 		let getCurrentNetworkID: GetCurrentNetworkID = {
-			await getNetworkAndGateway().network.id
+			await getGateways().current.network.id
 		}
 
 		let getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL = {
-			await getNetworkAndGateway().gatewayAPIEndpointURL
+			await getGateways().current.url
 		}
 
 		let lookupAccountByAddress: LookupAccountByAddress = { accountAddress in
@@ -107,29 +107,26 @@ extension ProfileClient {
 			},
 			getCurrentNetworkID: getCurrentNetworkID,
 			getGatewayAPIEndpointBaseURL: getGatewayAPIEndpointBaseURL,
-			getNetworkAndGateway: getNetworkAndGateway,
-			setNetworkAndGateway: { networkAndGateway in
+			getGateways: getGateways,
+			setGateway: { gateway in
 				try await profileHolder.asyncMutating { profile in
 					// Ensure we have accounts on network, else do not change
-					_ = try profile.onNetwork(id: networkAndGateway.network.id)
-					profile.appPreferences.networkAndGateway = networkAndGateway
+					_ = try profile.onNetwork(id: gateway.network.id)
+					try profile.appPreferences.gateways.changeCurrent(to: gateway)
 				}
 			},
-			createOnboardingWallet: { request in
-				@Dependency(\.mnemonicClient.generate) var generateMnemonic
-
+			createEphemeralPrivateProfile: { request in
 				let bip39Passphrase = request.bip39Passphrase
-				let mnemonic = try generateMnemonic(request.wordCount, request.language)
-				let mnemonicAndPassphrase = MnemonicWithPassphrase(
+				let mnemonic = try Mnemonic.generate(wordCount: request.wordCount, language: request.language)
+				let mnemonicWithPassphrase = MnemonicWithPassphrase(
 					mnemonic: mnemonic,
 					passphrase: bip39Passphrase
 				)
-				let onDeviceFactorSource = try await FactorSource.babylon(
-					mnemonic: mnemonic,
-					bip39Passphrase: bip39Passphrase
+				let onDeviceFactorSource = try FactorSource.babylon(
+					mnemonicWithPassphrase: mnemonicWithPassphrase
 				)
 				let privateFactorSource = try PrivateHDFactorSource(
-					mnemonicWithPassphrase: mnemonicAndPassphrase,
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
 					factorSource: onDeviceFactorSource
 				)
 
@@ -139,14 +136,14 @@ extension ProfileClient {
 				// not allowed to be persisted to keychain.
 				await profileHolder.injectProfile(profile, isEphemeral: true)
 
-				return OnboardingWallet(privateFactorSource: privateFactorSource, profile: profile)
+				return EphemeralPrivateProfile(privateFactorSource: privateFactorSource, profile: profile)
 			},
 			injectProfileSnapshot: { snapshot in
 				let profile = try Profile(snapshot: snapshot)
 				try await secureStorageClient.saveProfileSnapshot(snapshot)
 				await profileHolder.injectProfile(profile, isEphemeral: false)
 			},
-			commitOnboardingWallet: { request in
+			commitEphemeralPrivateProfile: { request in
 				try await profileHolder.getAsync { profile in
 					guard profile.id == request.profile.id else {
 						struct DiscrepancyMismatchingProfileID: Swift.Error {}
@@ -251,36 +248,36 @@ extension ProfileClient {
 					profile.appPreferences.p2pClients
 				}
 			},
-			getConnectedDapps: {
+			getAuthorizedDapps: {
 				let currentNetworkID = await getCurrentNetworkID()
 				return try await profileHolder.get { profile in
 					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
-					return onNetwork.connectedDapps
+					return onNetwork.authorizedDapps
 				}
 			},
-			addConnectedDapp: { connectedDapp in
+			addAuthorizedDapp: { authorizedDapp in
 				try await profileHolder.asyncMutating { profile in
-					_ = try profile.addConnectedDapp(connectedDapp)
+					_ = try profile.addAuthorizedDapp(authorizedDapp)
 				}
 			},
-			forgetConnectedDapp: { connectedDappID, networkID in
+			forgetAuthorizedDapp: { authorizedDappID, networkID in
 				try await profileHolder.asyncMutating { profile in
-					_ = try await profile.forgetConnectedDapp(connectedDappID, on: networkID)
+					_ = try await profile.forgetAuthorizedDapp(authorizedDappID, on: networkID)
 				}
 			},
-			detailsForConnectedDapp: { connectedDappSimple in
+			detailsForAuthorizedDapp: { authorizedDappSimple in
 				try await profileHolder.get { profile in
-					try profile.detailsForConnectedDapp(connectedDappSimple)
+					try profile.detailsForAuthorizedDapp(authorizedDappSimple)
 				}
 			},
-			updateConnectedDapp: { updated in
+			updateAuthorizedDapp: { updated in
 				try await profileHolder.asyncMutating { profile in
-					try profile.updateConnectedDapp(updated)
+					try profile.updateAuthorizedDapp(updated)
 				}
 			},
-			disconnectPersonaFromDapp: { personaID, connectedDappID, networkID in
+			disconnectPersonaFromDapp: { personaID, authorizedDappID, networkID in
 				try await profileHolder.asyncMutating { profile in
-					try await profile.disconnectPersonaFromDapp(personaID, dAppID: connectedDappID, networkID: networkID)
+					try await profile.disconnectPersonaFromDapp(personaID, dAppID: authorizedDappID, networkID: networkID)
 				}
 			},
 			addP2PClient: { newClient in
@@ -325,8 +322,8 @@ extension ProfileClient {
 								purpose: .createEntity(kind: request.entityKind)
 							).publicKey
 
-						case let .useOnboardingWallet(onboardingWallet):
-							let hdRoot = try onboardingWallet.privateFactorSource.mnemonicWithPassphrase.hdRoot()
+						case let .useEphemeralPrivateProfile(ephemeralPrivateProfile):
+							let hdRoot = try ephemeralPrivateProfile.privateFactorSource.mnemonicWithPassphrase.hdRoot()
 							return try useFactorSourceClient.publicKeyFromOnDeviceHD(.init(
 								hdRoot: hdRoot,
 								derivationPath: derivationPath,

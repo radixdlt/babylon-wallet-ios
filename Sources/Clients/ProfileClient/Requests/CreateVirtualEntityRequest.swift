@@ -6,12 +6,12 @@ import ProfileModels
 public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {
 	case loadMnemonicFromKeychainForFactorSource(FactorSource)
 
-	case useOnboardingWallet(OnboardingWallet)
+	case useEphemeralPrivateProfile(EphemeralPrivateProfile)
 
 	public var factorSource: FactorSource {
 		switch self {
 		case let .loadMnemonicFromKeychainForFactorSource(factorSource): return factorSource
-		case let .useOnboardingWallet(onboardingWallet): return onboardingWallet.privateFactorSource.factorSource
+		case let .useEphemeralPrivateProfile(ephemeralPrivateProfile): return ephemeralPrivateProfile.privateFactorSource.factorSource
 		}
 	}
 }

@@ -129,8 +129,8 @@
 "manageP2PClients.newConnectionTitle" = "Link New Connector";
 "manageP2PClients.sendTestMessageButtonTitle" = "Send Test Msg";
 
-"connectedDapps.title" = "Connected dApps";
-"connectedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
+"authorizedDapps.title" = "Authorized dApps";
+"authorizedDapps.intro" = "Here are all the dApps that you have logged into with this Radix Wallet.";
 
 "dAppDetails.definition" = "dApp Definition";
 "dAppDetails.missingDescription" = "Missing description";
@@ -207,7 +207,7 @@
 "settings.desktopConnectionsButtonTitle" = "Linked Connector";
 "settings.gatewayButtonTitle" = "Network Gateway";
 "settings.inspectProfileButtonTitle" = "Inspect Profile";
-"settings.connectedDappsButtonTitle" = "Connected dApps";
+"settings.authorizedDappsButtonTitle" = "Authorized dApps";
 "settings.noProfileText" = "No Wallet Data Found";
 "settings.personasButtonTitle" = "Personas";
 "settings.title" = "Wallet Settings";

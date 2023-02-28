@@ -83,7 +83,7 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "ConnectedDAppsFeature",
+		name: "AuthorizedDAppsFeatures",
 		dependencies: [
 			"GatewayAPI",
 			"ProfileClient",
@@ -191,7 +191,7 @@ package.addModules([
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
-			"ConnectedDAppsFeature",
+			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",
@@ -303,6 +303,14 @@ package.addModules([
 		dependencies: [
 			"ProfileClient",
 			"EngineToolkitClient",
+			"SecureStorageClient",
+		],
+		tests: .yes()
+	),
+	.client(
+		name: "ProfileStore",
+		dependencies: [
+			"Profile",
 			"SecureStorageClient",
 		],
 		tests: .yes()
@@ -455,9 +463,6 @@ package.addModules([
 			"Cryptography",
 			"EngineToolkit", // address derivation
 			"P2PModels",
-			.product(name: "DeviceKit", package: "DeviceKit", condition: .when(platforms: [.iOS])) {
-				.package(url: "https://github.com/devicekit/DeviceKit", from: "5.0.0")
-			},
 			"Resources", // L10n
 		],
 		tests: .no

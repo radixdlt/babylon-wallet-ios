@@ -40,7 +40,7 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case accountsLoadedResult(TaskResult<NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>>)
+		case accountsLoadedResult(TaskResult<OnNetwork.Accounts>)
 		case appSettingsLoadedResult(TaskResult<AppSettings>)
 		case isCurrencyAmountVisibleLoaded(Bool)
 		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)

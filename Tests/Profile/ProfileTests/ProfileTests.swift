@@ -8,7 +8,7 @@ import TestingPrelude
 
 // MARK: - ProfileTests
 final class ProfileTests: TestCase {
-	let networkAndGateway = AppPreferences.NetworkAndGateway.nebunet
+	let gateway = Gateway.nebunet
 
 	func test_p2p_client_eq() throws {
 		let pw = try ConnectionPassword(data: .deadbeef32Bytes)
@@ -52,11 +52,22 @@ final class ProfileTests: TestCase {
 			phrase: "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow",
 			language: .english
 		)
-		let networkID = networkAndGateway.network.id
-		let babylonFactorSource = try await FactorSource.babylon(mnemonic: curve25519FactorSourceMnemonic)
-		var profile = Profile(factorSource: babylonFactorSource)
+		let networkID = gateway.network.id
+		let babylonFactorSource = try FactorSource.babylon(
+			mnemonic: curve25519FactorSourceMnemonic,
+			hint: creatingDevice
+		)
 
-		let olympiaFactorSource = try await FactorSource.olympia(mnemonic: secp256K1FactorMnemonic)
+		var profile = withDependencies {
+			$0.uuid = .constant(.init(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!)
+		} operation: {
+			Profile(factorSource: babylonFactorSource, creatingDevice: creatingDevice)
+		}
+
+		let olympiaFactorSource = try FactorSource.olympia(
+			mnemonic: secp256K1FactorMnemonic,
+			hint: creatingDevice
+		)
 		profile.factorSources.append(olympiaFactorSource)
 
 		func addNewAccount(_ name: NonEmptyString) throws -> OnNetwork.Account {
@@ -182,7 +193,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(onNetwork.accounts.count, 3)
 		XCTAssertEqual(onNetwork.personas.count, 2)
 
-		var connectedDapp = try profile.addConnectedDapp(
+		var authorizedDapp = try profile.addAuthorizedDapp(
 			.init(
 				networkID: networkID,
 				dAppDefinitionAddress: try .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
@@ -215,14 +226,14 @@ final class ProfileTests: TestCase {
 			)
 		)
 
-		let authorizedPersona0 = connectedDapp.referencesToAuthorizedPersonas[0]
+		let authorizedPersona0 = authorizedDapp.referencesToAuthorizedPersonas[0]
 		var authorizedPersona0SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
 		XCTAssertThrowsError(
 			try authorizedPersona0SharedAccounts.updateAccounts([secondAccount.address]),
 			"Should not be able to specify another number of accounts if `exactly` was specified."
 		)
 
-		let authorizedPersona1 = connectedDapp.referencesToAuthorizedPersonas[1]
+		let authorizedPersona1 = authorizedDapp.referencesToAuthorizedPersonas[1]
 		var authorizedPersona1SharedAccounts = try XCTUnwrap(authorizedPersona1.sharedAccounts)
 		XCTAssertNoThrow(
 			try authorizedPersona1SharedAccounts.updateAccounts([
@@ -231,15 +242,15 @@ final class ProfileTests: TestCase {
 			]), "Should be able to specify more accounts if `atLeast` was specified."
 		)
 
-		connectedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(OnNetwork.Persona.Field.ID()) // add unknown fieldID
+		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(OnNetwork.Persona.Field.ID()) // add unknown fieldID
 
-		XCTAssertThrowsError(try profile.updateConnectedDapp(connectedDapp))
+		XCTAssertThrowsError(try profile.updateAuthorizedDapp(authorizedDapp))
 
 		let snapshot = profile.snapshot()
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		/* Uncomment the lines below to generate a new test vector */
-		//        let data = try jsonEncoder.encode(snapshot)
+//		let data = try jsonEncoder.encode(snapshot)
 //		print(String(data: data, encoding: .utf8)!)
 	}
 
@@ -247,11 +258,15 @@ final class ProfileTests: TestCase {
 		let snapshot: ProfileSnapshot = try readTestFixture(jsonName: "profile_snapshot")
 
 		let profile = try Profile(snapshot: snapshot)
+		XCTAssertEqual(profile.creatingDevice, creatingDevice)
 
 		XCTAssertEqual(profile.factorSources.count, 2)
+		for factorSource in profile.factorSources {
+			XCTAssertEqual(factorSource.hint, creatingDevice)
+		}
 
 		XCTAssertEqual(profile.perNetwork.count, 1)
-		let networkID = networkAndGateway.network.id
+		let networkID = gateway.network.id
 		let onNetwork = try profile.perNetwork.onNetwork(id: networkID)
 		XCTAssertEqual(onNetwork.accounts.count, 3)
 
@@ -341,12 +356,12 @@ final class ProfileTests: TestCase {
 		XCTAssertNotNil(p2pClient1.webRTCConfig)
 		XCTAssertNotNil(p2pClient1.connectorConfig)
 
-		XCTAssertEqual(onNetwork.connectedDapps.count, 1)
-		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas.count, 2)
-		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
-		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
-		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
-		XCTAssertEqual(onNetwork.connectedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu", "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"])
+		XCTAssertEqual(onNetwork.authorizedDapps.count, 1)
+		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas.count, 2)
+		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas[0].fieldIDs.count, 2)
+		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantifier, .exactly)
+		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.request.quantity, 2)
+		XCTAssertEqual(onNetwork.authorizedDapps[0].referencesToAuthorizedPersonas[0].sharedAccounts?.accountsReferencedByAddress.map(\.address), ["account_tdx_b_1ppvvvxm3mpk2cja05fwhpmev0ylsznqfqhlewnrxg5gqmpswhu", "account_tdx_b_1pr2q677ep9d5wxnhkkay9c6gvqln6hg3ul006w0a54tshau0z6"])
 	}
 
 	func test_version_compatibility_check_too_low() throws {
@@ -375,6 +390,8 @@ final class ProfileTests: TestCase {
 		)
 	}
 }
+
+private let creatingDevice: NonEmptyString = "computerRunningUnitTest"
 
 extension EntityProtocol {
 	func publicKey() -> SLIP10.PublicKey? {

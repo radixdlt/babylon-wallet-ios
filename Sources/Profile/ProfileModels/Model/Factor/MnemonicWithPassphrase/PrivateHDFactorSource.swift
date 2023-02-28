@@ -1,9 +1,13 @@
 import Foundation
+import NonEmpty
 
 // MARK: - PrivateHDFactorSource
 public struct PrivateHDFactorSource: Sendable, Hashable {
 	public let mnemonicWithPassphrase: MnemonicWithPassphrase
-	public let factorSource: FactorSource
+
+	// Only mutable so that `hint` inside factorSource can be changed
+	// before persisted.
+	public var factorSource: FactorSource
 
 	public init(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,

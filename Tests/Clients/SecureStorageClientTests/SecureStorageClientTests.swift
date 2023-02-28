@@ -1,7 +1,7 @@
 import ClientTestingPrelude
 import Cryptography
 import LocalAuthenticationClient
-import Profile
+@testable import Profile
 @testable import SecureStorageClient
 
 // MARK: - SecureStorageClientTests
@@ -81,10 +81,11 @@ private extension SecureStorageClientTests {
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 		let passphrase = ""
 		let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
-		let factorSource = try await FactorSource.babylon(mnemonic: mnemonicWithPassphrase.mnemonic, bip39Passphrase: passphrase)
+		let factorSource = try FactorSource.babylon(mnemonic: mnemonicWithPassphrase.mnemonic, bip39Passphrase: passphrase)
 		let privateHDFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
 
 		try await withDependencies {
+			$0.uuid = .incrementing
 			$0.keychainClient.setDataWithoutAuthForKey = { request in
 				if let assertKeychainSetItemWithoutAuthRequest {
 					try assertKeychainSetItemWithoutAuthRequest(request)

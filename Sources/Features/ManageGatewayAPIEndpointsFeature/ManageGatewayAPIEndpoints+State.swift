@@ -7,25 +7,25 @@ extension ManageGatewayAPIEndpoints {
 		public var createAccountCoordinator: CreateAccountCoordinator.State?
 
 		public var urlString: String
-		public var currentNetworkAndGateway: AppPreferences.NetworkAndGateway?
+		public var currentGateway: Gateway?
 		public var isValidatingEndpoint: Bool
 		public var isSwitchToButtonEnabled: Bool
 
-		public var validatedNewNetworkAndGatewayToSwitchTo: AppPreferences.NetworkAndGateway?
+		public var validatedNewGatewayToSwitchTo: Gateway?
 		@BindingState public var focusedField: Field?
 
 		public init(
 			createAccountCoordinator: CreateAccountCoordinator.State? = nil,
 			urlString: String = "",
-			currentNetworkAndGateway: AppPreferences.NetworkAndGateway? = nil,
-			validatedNewNetworkAndGatewayToSwitchTo: AppPreferences.NetworkAndGateway? = nil,
+			currentGateway: Gateway? = nil,
+			validatedNewGatewayToSwitchTo: Gateway? = nil,
 			isSwitchToButtonEnabled: Bool = false,
 			isValidatingEndpoint: Bool = false
 		) {
 			self.createAccountCoordinator = createAccountCoordinator
 			self.urlString = urlString
-			self.currentNetworkAndGateway = currentNetworkAndGateway
-			self.validatedNewNetworkAndGatewayToSwitchTo = validatedNewNetworkAndGatewayToSwitchTo
+			self.currentGateway = currentGateway
+			self.validatedNewGatewayToSwitchTo = validatedNewGatewayToSwitchTo
 			self.isSwitchToButtonEnabled = isSwitchToButtonEnabled
 			self.isValidatingEndpoint = isValidatingEndpoint
 		}

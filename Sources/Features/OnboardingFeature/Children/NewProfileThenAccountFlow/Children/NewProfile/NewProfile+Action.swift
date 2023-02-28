@@ -31,7 +31,7 @@ extension NewProfile.Action {
 // MARK: - NewProfile.Action.SystemAction
 extension NewProfile.Action {
 	public enum SystemAction: Sendable, Equatable {
-		case createOnboardingWalletResult(TaskResult<OnboardingWallet>)
+		case createEphemeralPrivateProfileResult(TaskResult<EphemeralPrivateProfile>)
 	}
 }
 
@@ -39,6 +39,6 @@ extension NewProfile.Action {
 extension NewProfile.Action {
 	public enum DelegateAction: Sendable, Equatable {
 		case criticalFailureCouldNotCreateProfile
-		case createdOnboardingWallet(OnboardingWallet)
+		case createdEphemeralPrivateProfile(EphemeralPrivateProfile)
 	}
 }

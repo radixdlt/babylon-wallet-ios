@@ -168,19 +168,6 @@ extension Date: @unchecked Sendable {}
 // MARK: - Data + Sendable
 extension Data: @unchecked Sendable {}
 
-extension Date {
-	/// Ugly hack around the fact that dates differs when encoded and decoded, by some nanoseconds or something... urgh!
-	public var stableEquatableAfterJSONRoundtrip: Self {
-		let jsonEncoder = JSONEncoder()
-		jsonEncoder.dateEncodingStrategy = .iso8601
-		let jsonDecoder = JSONDecoder()
-		jsonDecoder.dateDecodingStrategy = .iso8601
-		let data = try! jsonEncoder.encode(self)
-		let persistable = try! jsonDecoder.decode(Self.self, from: data)
-		return persistable
-	}
-}
-
 // MARK: - P2PClient.Platform + CustomDumpRepresentable
 extension P2PClient.Platform: CustomDumpRepresentable {
 	public var customDumpValue: Any {
