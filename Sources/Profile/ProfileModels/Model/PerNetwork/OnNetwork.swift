@@ -14,25 +14,28 @@ public struct OnNetwork:
 	/// have been added and dApps connected.
 	public let networkID: NetworkID
 
+	public typealias Accounts = NonEmpty<IdentifiedArrayOf<Account>>
 	/// A **Non-empty** identifiable ordered set of `Account`s created by the user for this network.
-	public var accounts: NonEmpty<IdentifiedArrayOf<Account>>
+	public var accounts: Accounts
 
-	/// An Identifiable ordered set of `Persona`s created by the user for this network.
-	public var personas: IdentifiedArrayOf<Persona>
+	public typealias Personas = IdentifiedArrayOf<Persona>
+	/// An identifiable ordered set of `Persona`s created by the user for this network.
+	public var personas: Personas
 
-	/// An Identifiable ordered set of `ConnectedDapp`s the user has connected to.
-	public var connectedDapps: IdentifiedArrayOf<ConnectedDapp>
+	public typealias AuthorizedDapps = IdentifiedArrayOf<AuthorizedDapp>
+	/// An identifiable ordered set of `AuthorizedDapp`s the user has connected to.
+	public var authorizedDapps: AuthorizedDapps
 
 	public init(
 		networkID: NetworkID,
-		accounts: NonEmpty<IdentifiedArrayOf<Account>>,
-		personas: IdentifiedArrayOf<Persona>,
-		connectedDapps: IdentifiedArrayOf<ConnectedDapp>
+		accounts: Accounts,
+		personas: Personas,
+		authorizedDapps: AuthorizedDapps
 	) {
 		self.networkID = networkID
 		self.accounts = accounts
 		self.personas = personas
-		self.connectedDapps = connectedDapps
+		self.authorizedDapps = authorizedDapps
 	}
 }
 
@@ -44,7 +47,7 @@ extension OnNetwork {
 				"networkID": networkID,
 				"accounts": accounts,
 				"personas": personas,
-				"connectedDapps": connectedDapps,
+				"authorizedDapps": authorizedDapps,
 			],
 			displayStyle: .struct
 		)
@@ -55,7 +58,7 @@ extension OnNetwork {
 		networkID: \(networkID),
 		accounts: \(accounts),
 		personas: \(personas),
-		connectedDapps: \(connectedDapps),
+		authorizedDapps: \(authorizedDapps),
 		"""
 	}
 }

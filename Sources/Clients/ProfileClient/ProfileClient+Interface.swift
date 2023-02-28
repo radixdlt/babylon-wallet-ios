@@ -6,8 +6,8 @@ public struct ProfileClient: Sendable {
 	public var getFactorSources: GetFactorSources
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
-	public var getNetworkAndGateway: GetNetworkAndGateway
-	public var setNetworkAndGateway: SetNetworkAndGateway
+	public var getGateways: GetGateways
+	public var setGateway: SetGateway
 
 	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
 	public var createEphemeralPrivateProfile: CreateEphemeralPrivateProfile
@@ -25,13 +25,13 @@ public struct ProfileClient: Sendable {
 	public var getAccounts: GetAccounts
 	public var getPersonas: GetPersonas
 	public var getP2PClients: GetP2PClients
-	public var getConnectedDapps: GetConnectedDapps
-	public var addConnectedDapp: AddConnectedDapp
-	public var forgetConnectedDapp: ForgetConnectedDapp
+	public var getAuthorizedDapps: GetAuthorizedDapps
+	public var addAuthorizedDapp: AddAuthorizedDapp
+	public var forgetAuthorizedDapp: ForgetAuthorizedDapp
 	public var addP2PClient: AddP2PClient
-	public var updateConnectedDapp: UpdateConnectedDapp
+	public var updateAuthorizedDapp: UpdateAuthorizedDapp
 	public var disconnectPersonaFromDapp: DisconnectPersonaFromDapp
-	public var detailsForConnectedDapp: DetailsForConnectedDapp
+	public var detailsForAuthorizedDapp: DetailsForAuthorizedDapp
 	public var deleteP2PClientByID: DeleteP2PClientByID
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
@@ -44,8 +44,8 @@ public struct ProfileClient: Sendable {
 		getFactorSources: @escaping GetFactorSources,
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
 		getGatewayAPIEndpointBaseURL: @escaping GetGatewayAPIEndpointBaseURL,
-		getNetworkAndGateway: @escaping GetNetworkAndGateway,
-		setNetworkAndGateway: @escaping SetNetworkAndGateway,
+		getGateways: @escaping GetGateways,
+		setGateway: @escaping SetGateway,
 		createEphemeralPrivateProfile: @escaping CreateEphemeralPrivateProfile,
 		injectProfileSnapshot: @escaping InjectProfileSnapshot,
 		commitEphemeralPrivateProfile: @escaping CommitEphemeralPrivateProfile,
@@ -57,11 +57,11 @@ public struct ProfileClient: Sendable {
 		getAccounts: @escaping GetAccounts,
 		getPersonas: @escaping GetPersonas,
 		getP2PClients: @escaping GetP2PClients,
-		getConnectedDapps: @escaping GetConnectedDapps,
-		addConnectedDapp: @escaping AddConnectedDapp,
-		forgetConnectedDapp: @escaping ForgetConnectedDapp,
-		detailsForConnectedDapp: @escaping DetailsForConnectedDapp,
-		updateConnectedDapp: @escaping UpdateConnectedDapp,
+		getAuthorizedDapps: @escaping GetAuthorizedDapps,
+		addAuthorizedDapp: @escaping AddAuthorizedDapp,
+		forgetAuthorizedDapp: @escaping ForgetAuthorizedDapp,
+		detailsForAuthorizedDapp: @escaping DetailsForAuthorizedDapp,
+		updateAuthorizedDapp: @escaping UpdateAuthorizedDapp,
 		disconnectPersonaFromDapp: @escaping DisconnectPersonaFromDapp,
 		addP2PClient: @escaping AddP2PClient,
 		deleteP2PClientByID: @escaping DeleteP2PClientByID,
@@ -75,8 +75,8 @@ public struct ProfileClient: Sendable {
 		self.getFactorSources = getFactorSources
 		self.getCurrentNetworkID = getCurrentNetworkID
 		self.getGatewayAPIEndpointBaseURL = getGatewayAPIEndpointBaseURL
-		self.getNetworkAndGateway = getNetworkAndGateway
-		self.setNetworkAndGateway = setNetworkAndGateway
+		self.getGateways = getGateways
+		self.setGateway = setGateway
 		self.createEphemeralPrivateProfile = createEphemeralPrivateProfile
 		self.commitEphemeralPrivateProfile = commitEphemeralPrivateProfile
 		self.injectProfileSnapshot = injectProfileSnapshot
@@ -87,11 +87,11 @@ public struct ProfileClient: Sendable {
 		self.getAccountsOnNetwork = getAccountsOnNetwork
 		self.getAccounts = getAccounts
 		self.getPersonas = getPersonas
-		self.getConnectedDapps = getConnectedDapps
-		self.addConnectedDapp = addConnectedDapp
-		self.forgetConnectedDapp = forgetConnectedDapp
-		self.detailsForConnectedDapp = detailsForConnectedDapp
-		self.updateConnectedDapp = updateConnectedDapp
+		self.getAuthorizedDapps = getAuthorizedDapps
+		self.addAuthorizedDapp = addAuthorizedDapp
+		self.forgetAuthorizedDapp = forgetAuthorizedDapp
+		self.detailsForAuthorizedDapp = detailsForAuthorizedDapp
+		self.updateAuthorizedDapp = updateAuthorizedDapp
 		self.disconnectPersonaFromDapp = disconnectPersonaFromDapp
 		self.getP2PClients = getP2PClients
 		self.addP2PClient = addP2PClient
@@ -132,9 +132,9 @@ extension ProfileClient {
 	public typealias GetGatewayAPIEndpointBaseURL = @Sendable () async -> URL
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 
-	public typealias SetNetworkAndGateway = @Sendable (NetworkAndGateway) async throws -> Void
+	public typealias SetGateway = @Sendable (Gateway) async throws -> Void
 
-	public typealias GetNetworkAndGateway = @Sendable () async -> NetworkAndGateway
+	public typealias GetGateways = @Sendable () async -> Gateways
 
 	public typealias CreateEphemeralPrivateProfile = @Sendable (CreateEphemeralPrivateProfileRequest) async throws -> EphemeralPrivateProfile
 
@@ -149,14 +149,14 @@ extension ProfileClient {
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>
 	public typealias GetAccounts = @Sendable () async throws -> NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>
 	public typealias GetPersonas = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.Persona>
-	public typealias GetConnectedDapps = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.ConnectedDapp>
-	public typealias DetailsForConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> OnNetwork.ConnectedDappDetailed
+	public typealias GetAuthorizedDapps = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.AuthorizedDapp>
+	public typealias DetailsForAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> OnNetwork.AuthorizedDappDetailed
 	public typealias GetP2PClients = @Sendable () async throws -> P2PClients
 	public typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
-	public typealias AddConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
-	public typealias ForgetConnectedDapp = @Sendable (OnNetwork.ConnectedDapp.ID, NetworkID) async throws -> Void
-	public typealias UpdateConnectedDapp = @Sendable (OnNetwork.ConnectedDapp) async throws -> Void
-	public typealias DisconnectPersonaFromDapp = @Sendable (OnNetwork.Persona.ID, OnNetwork.ConnectedDapp.ID, NetworkID) async throws -> Void
+	public typealias AddAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> Void
+	public typealias ForgetAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp.ID, NetworkID) async throws -> Void
+	public typealias UpdateAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> Void
+	public typealias DisconnectPersonaFromDapp = @Sendable (OnNetwork.Persona.ID, OnNetwork.AuthorizedDapp.ID, NetworkID) async throws -> Void
 	public typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	public typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	public typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void
@@ -167,14 +167,14 @@ extension ProfileClient {
 }
 
 extension ProfileClient {
-	public func getDetailedDapp(_ id: OnNetwork.ConnectedDapp.ID) async throws -> OnNetwork.ConnectedDappDetailed {
-		let dApps = try await getConnectedDapps()
+	public func getDetailedDapp(_ id: OnNetwork.AuthorizedDapp.ID) async throws -> OnNetwork.AuthorizedDappDetailed {
+		let dApps = try await getAuthorizedDapps()
 		guard let dApp = dApps[id: id] else {
-			throw ConnectedDappDoesNotExists()
+			throw AuthorizedDappDoesNotExists()
 		}
-		return try await detailsForConnectedDapp(dApp)
+		return try await detailsForAuthorizedDapp(dApp)
 	}
 }
 
-// MARK: - ConnectedDappDoesNotExists
-struct ConnectedDappDoesNotExists: Swift.Error {}
+// MARK: - AuthorizedDappDoesNotExists
+struct AuthorizedDappDoesNotExists: Swift.Error {}

@@ -1,9 +1,9 @@
 import Prelude
 
-// MARK: - OnNetwork.ConnectedDapp
+// MARK: - OnNetwork.AuthorizedDapp
 extension OnNetwork {
 	/// A connection made between a Radix Dapp and the user.
-	public struct ConnectedDapp:
+	public struct AuthorizedDapp:
 		Sendable,
 		Hashable,
 		Codable,
@@ -34,8 +34,8 @@ extension OnNetwork {
 	}
 }
 
-// MARK: - OnNetwork.ConnectedDapp.AuthorizedPersonaSimple
-extension OnNetwork.ConnectedDapp {
+// MARK: - OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple
+extension OnNetwork.AuthorizedDapp {
 	public struct AuthorizedPersonaSimple:
 		Sendable,
 		Hashable,
@@ -107,7 +107,7 @@ extension OnNetwork.ConnectedDapp {
 	}
 }
 
-extension OnNetwork.ConnectedDapp.AuthorizedPersonaSimple.SharedAccounts {
+extension OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts {
 	public static func validate(
 		accountsReferencedByAddress: OrderedSet<AccountAddress>,
 		forRequest request: NumberOfAccounts
@@ -134,19 +134,19 @@ extension OnNetwork.ConnectedDapp.AuthorizedPersonaSimple.SharedAccounts {
 	}
 }
 
-extension OnNetwork.ConnectedDapp.AuthorizedPersonaSimple {
+extension OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple {
 	public var id: ID {
 		identityAddress
 	}
 }
 
-extension OnNetwork.ConnectedDapp {
+extension OnNetwork.AuthorizedDapp {
 	public var id: DappDefinitionAddress {
 		dAppDefinitionAddress
 	}
 }
 
-extension OnNetwork.ConnectedDapp {
+extension OnNetwork.AuthorizedDapp {
 	public var customDumpMirror: Mirror {
 		.init(
 			self,

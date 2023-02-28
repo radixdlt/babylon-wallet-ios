@@ -14,12 +14,12 @@ extension NetworkSwitchingClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.profileClient) var profileClient
 
-		let getNetworkAndGateway: GetNetworkAndGateway = {
-			await profileClient.getNetworkAndGateway()
+		let getGateway: GetGateway = {
+			await profileClient.getGateways().current
 		}
 
-		let validateGatewayURL: ValidateGatewayURL = { newURL -> NetworkAndGateway? in
-			let currentURL = await getNetworkAndGateway().gatewayAPIEndpointURL
+		let validateGatewayURL: ValidateGatewayURL = { newURL -> Gateway? in
+			let currentURL = await getGateway().url
 			guard newURL != currentURL else {
 				return nil
 			}
@@ -28,29 +28,29 @@ extension NetworkSwitchingClient {
 			// once it returns networkID!
 			let network = try Network.lookupBy(name: name)
 
-			let networkAndGateway = NetworkAndGateway(
+			let gateway = Gateway(
 				network: network,
-				gatewayAPIEndpointURL: newURL
+				url: newURL
 			)
 
-			return networkAndGateway
+			return gateway
 		}
 
-		let hasAccountOnNetwork: HasAccountOnNetwork = { networkAndGateway in
-			try await profileClient.hasAccountOnNetwork(networkAndGateway.network.id)
+		let hasAccountOnNetwork: HasAccountOnNetwork = { gateway in
+			try await profileClient.hasAccountOnNetwork(gateway.network.id)
 		}
 
-		let switchTo: SwitchTo = { networkAndGateway in
-			guard try await hasAccountOnNetwork(networkAndGateway) else {
+		let switchTo: SwitchTo = { gateway in
+			guard try await hasAccountOnNetwork(gateway) else {
 				throw NoAccountOnNetwork()
 			}
 
-			try await profileClient.setNetworkAndGateway(networkAndGateway)
-			return networkAndGateway
+			try await profileClient.setGateway(gateway)
+			return gateway
 		}
 
 		return Self(
-			getNetworkAndGateway: getNetworkAndGateway,
+			getGateway: getGateway,
 			validateGatewayURL: validateGatewayURL,
 			hasAccountOnNetwork: hasAccountOnNetwork,
 			switchTo: switchTo

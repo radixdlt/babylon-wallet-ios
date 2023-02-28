@@ -83,7 +83,7 @@ package.addModules([
 		tests: .yes()
 	),
 	.feature(
-		name: "ConnectedDAppsFeature",
+		name: "AuthorizedDAppsFeatures",
 		dependencies: [
 			"GatewayAPI",
 			"ProfileClient",
@@ -191,7 +191,7 @@ package.addModules([
 	.feature(
 		name: "SettingsFeature",
 		dependencies: [
-			"ConnectedDAppsFeature",
+			"AuthorizedDAppsFeatures",
 			"GatewayAPI",
 			"ManageP2PClientsFeature",
 			"ManageGatewayAPIEndpointsFeature",

@@ -14,7 +14,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		public let dAppName: String
-		public let dAppID: OnNetwork.ConnectedDapp.ID
+		public let dAppID: OnNetwork.AuthorizedDapp.ID
 		public let networkID: NetworkID
 		public let persona: OnNetwork.AuthorizedPersonaDetailed
 
@@ -23,7 +23,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		public init(
 			dAppName: String,
-			dAppID: OnNetwork.ConnectedDapp.ID,
+			dAppID: OnNetwork.AuthorizedDapp.ID,
 			networkID: NetworkID,
 			persona: OnNetwork.AuthorizedPersonaDetailed
 		) {

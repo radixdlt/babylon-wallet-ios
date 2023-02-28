@@ -39,14 +39,14 @@ extension OnNetwork {
 		public let simpleAccounts: OrderedSet<AccountForDisplay>?
 	}
 
-	public struct ConnectedDappDetailed: Sendable, Hashable {
+	public struct AuthorizedDappDetailed: Sendable, Hashable {
 		public let networkID: Network.ID
 		public let dAppDefinitionAddress: DappDefinitionAddress
 		public let displayName: NonEmpty<String>
 		public let detailedAuthorizedPersonas: IdentifiedArrayOf<OnNetwork.AuthorizedPersonaDetailed>
 	}
 
-	public func detailsForConnectedDapp(_ dapp: ConnectedDapp) throws -> ConnectedDappDetailed {
+	public func detailsForAuthorizedDapp(_ dapp: AuthorizedDapp) throws -> AuthorizedDappDetailed {
 		guard
 			dapp.networkID == self.networkID
 		else {
@@ -59,7 +59,7 @@ extension OnNetwork {
 				let persona = self.personas.first(where: { $0.address == simple.identityAddress })
 			else {
 				/// this is a sign that ProfileSnapshot is in a bad state somehow...
-				throw DiscrepancyConnectedDappReferencedPersonaWhichDoesNotExist()
+				throw DiscrepancyAuthorizedDappReferencedPersonaWhichDoesNotExist()
 			}
 
 			return AuthorizedPersonaDetailed(
@@ -70,7 +70,7 @@ extension OnNetwork {
 						let field = persona.fields.first(where: { $0.id == fieldID })
 					else {
 						// FIXME: Should we maybe just skip this field instead of throwing an error? Probably?!
-						throw ConnectedDappReferencesFieldIDThatDoesNotExist()
+						throw AuthorizedDappReferencesFieldIDThatDoesNotExist()
 					}
 					return field
 				}),
@@ -80,7 +80,7 @@ extension OnNetwork {
 							guard
 								let account = self.accounts.first(where: { $0.address == accountAddress })
 							else {
-								throw ConnectedDappReferencesAccountThatDoesNotExist()
+								throw AuthorizedDappReferencesAccountThatDoesNotExist()
 							}
 							return AccountForDisplay(
 								address: account.address,
@@ -104,7 +104,7 @@ extension OnNetwork {
 	}
 
 	public struct NetworkDiscrepancyError: Swift.Error {}
-	public struct DiscrepancyConnectedDappReferencedPersonaWhichDoesNotExist: Swift.Error {}
-	public struct ConnectedDappReferencesFieldIDThatDoesNotExist: Swift.Error {}
-	public struct ConnectedDappReferencesAccountThatDoesNotExist: Swift.Error {}
+	public struct DiscrepancyAuthorizedDappReferencedPersonaWhichDoesNotExist: Swift.Error {}
+	public struct AuthorizedDappReferencesFieldIDThatDoesNotExist: Swift.Error {}
+	public struct AuthorizedDappReferencesAccountThatDoesNotExist: Swift.Error {}
 }
