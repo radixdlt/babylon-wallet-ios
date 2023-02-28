@@ -121,7 +121,7 @@ extension ProfileClient {
 					return [.previewValue0]
 				}
 			}
-			$0.getConnectedDapps = {
+			$0.getAuthorizedDapps = {
 				var dapp = OnNetwork.AuthorizedDapp(
 					networkID: .nebunet,
 					dAppDefinitionAddress: try! .init(address: "DappDefinitionAddress"),

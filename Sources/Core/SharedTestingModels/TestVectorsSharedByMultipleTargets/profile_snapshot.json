@@ -3,8 +3,8 @@
     "display" : {
       "fiatCurrencyPriceTarget" : "usd"
     },
-    "networkAndGateway" : {
-      "gatewayAPIEndpointURL" : "https://betanet.radixdlt.com",
+    "gateway" : {
+      "url" : "https://betanet.radixdlt.com",
       "network" : {
         "id" : 11,
         "name" : "nebunet"

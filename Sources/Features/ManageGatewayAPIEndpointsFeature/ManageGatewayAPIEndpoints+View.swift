@@ -56,8 +56,8 @@ extension ManageGatewayAPIEndpoints.View {
 			Separator()
 
 			VStack(alignment: .leading) {
-				if let networkAndGateway = viewStore.networkAndGateway {
-					networkAndGatewayView(networkAndGateway)
+				if let gateway = viewStore.gateway {
+					networkAndGatewayView(gateway)
 				}
 
 				Spacer(minLength: .large1 * 2)
@@ -118,7 +118,7 @@ extension ManageGatewayAPIEndpoints.View {
 	}
 
 	fileprivate func networkAndGatewayView(
-		_ networkAndGateway: NetworkAndGateway
+		_ gateway: Gateway
 	) -> some View {
 		Group {
 			Text(L10n.ManageGateway.currentGatewayTitle)
@@ -126,14 +126,14 @@ extension ManageGatewayAPIEndpoints.View {
 				.textStyle(.secondaryHeader)
 
 			HStack {
-				label(L10n.ManageGateway.networkName, value: ViewState.resolveName(network: networkAndGateway.network))
+				label(L10n.ManageGateway.networkName, value: ViewState.resolveName(network: gateway.network))
 				Spacer()
-				label(L10n.ManageGateway.networkID, value: networkAndGateway.network.id)
+				label(L10n.ManageGateway.networkID, value: gateway.network.id)
 			}
 
 			label(
 				L10n.ManageGateway.gatewayAPIEndpoint,
-				value: networkAndGateway.gatewayAPIEndpointURL.absoluteString, valueColor: .app.blue2
+				value: gateway.url.absoluteString, valueColor: .app.blue2
 			)
 		}
 	}
@@ -143,13 +143,13 @@ extension ManageGatewayAPIEndpoints.View {
 extension ManageGatewayAPIEndpoints.View {
 	struct ViewState: Equatable {
 		public var urlString: String
-		public var networkAndGateway: NetworkAndGateway?
+		public var gateway: Gateway?
 		public var controlState: ControlState
 		@BindingState public var focusedField: ManageGatewayAPIEndpoints.State.Field?
 
 		init(state: ManageGatewayAPIEndpoints.State) {
 			urlString = state.urlString
-			networkAndGateway = state.currentNetworkAndGateway
+			gateway = state.currentGateway
 			controlState = state.controlState
 			focusedField = state.focusedField
 		}

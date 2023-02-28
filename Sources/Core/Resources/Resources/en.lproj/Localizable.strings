@@ -207,7 +207,7 @@
 "settings.desktopConnectionsButtonTitle" = "Linked Connector";
 "settings.gatewayButtonTitle" = "Network Gateway";
 "settings.inspectProfileButtonTitle" = "Inspect Profile";
-"settings.connectedDappsButtonTitle" = "Connected dApps";
+"settings.authorizedDappsButtonTitle" = "Connected dApps";
 "settings.noProfileText" = "No Wallet Data Found";
 "settings.personasButtonTitle" = "Personas";
 "settings.title" = "Wallet Settings";

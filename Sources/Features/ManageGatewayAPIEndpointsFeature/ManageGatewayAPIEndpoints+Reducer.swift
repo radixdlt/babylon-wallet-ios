@@ -25,27 +25,27 @@ extension ManageGatewayAPIEndpoints {
 		case .internal(.view(.didAppear)):
 			return .task {
 				let result = await TaskResult {
-					await networkSwitchingClient.getNetworkAndGateway()
+					await networkSwitchingClient.getGateway()
 				}
-				return .internal(.system(.loadNetworkAndGatewayResult(result)))
+				return .internal(.system(.loadGatewayResult(result)))
 			}
 
-		case let .internal(.system(.loadNetworkAndGatewayResult(.success(currentNetworkAndGateway)))):
-			state.currentNetworkAndGateway = currentNetworkAndGateway
+		case let .internal(.system(.loadGatewayResult(.success(currentGateway)))):
+			state.currentGateway = currentGateway
 			#if DEBUG
 			// convenient when testing
-			state.urlString = currentNetworkAndGateway.gatewayAPIEndpointURL.absoluteString
+			state.urlString = currentGateway.url.absoluteString
 			#endif
 			return .none
 
-		case let .internal(.system(.loadNetworkAndGatewayResult(.failure(error)))):
+		case let .internal(.system(.loadGatewayResult(.failure(error)))):
 			errorQueue.schedule(error)
 			return .none
 
 		case let .internal(.view(.urlStringChanged(urlString))):
 			state.urlString = urlString
 			let maybeURL = URL(string: urlString)
-			state.isSwitchToButtonEnabled = maybeURL != nil && !(state.currentNetworkAndGateway?.gatewayAPIEndpointURL == maybeURL)
+			state.isSwitchToButtonEnabled = maybeURL != nil && !(state.currentGateway?.url == maybeURL)
 			return .none
 
 		case .internal(.view(.switchToButtonTapped)):
@@ -75,7 +75,7 @@ extension ManageGatewayAPIEndpoints {
 			guard let new = maybeNew else {
 				return .none
 			}
-			state.validatedNewNetworkAndGatewayToSwitchTo = new
+			state.validatedNewGatewayToSwitchTo = new
 			return .task {
 				let result = await TaskResult {
 					try await networkSwitchingClient.hasAccountOnNetwork(new)
@@ -83,7 +83,7 @@ extension ManageGatewayAPIEndpoints {
 				return .internal(.system(.hasAccountsResult(result)))
 			}
 		case let .internal(.system(.hasAccountsResult(.success(hasAccountsOnNetwork)))):
-			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
+			guard let new = state.validatedNewGatewayToSwitchTo else {
 				// weird state... should not happen.
 				return .none
 			}
@@ -102,9 +102,9 @@ extension ManageGatewayAPIEndpoints {
 			errorQueue.schedule(error)
 			return skipSwitching(state: &state)
 
-		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newNetworkAndGateway))):
+		case let .internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway))):
 			state.createAccountCoordinator = .init(config: .init(
-				specificNetworkID: newNetworkAndGateway.network.id,
+				specificNetworkID: newGateway.network.id,
 				isFirstEntity: false,
 				canBeDismissed: true,
 				navigationButtonCTA: .goHome
@@ -124,7 +124,7 @@ extension ManageGatewayAPIEndpoints {
 
 		case .createAccountCoordinator(.delegate(.completed)):
 			state.createAccountCoordinator = nil
-			guard let new = state.validatedNewNetworkAndGatewayToSwitchTo else {
+			guard let new = state.validatedNewGatewayToSwitchTo else {
 				// weird state... should not happen.
 				return .none
 			}
@@ -142,7 +142,7 @@ extension ManageGatewayAPIEndpoints {
 
 	public func skipSwitching(state: inout State) -> EffectTask<Action> {
 		state.createAccountCoordinator = nil
-		state.validatedNewNetworkAndGatewayToSwitchTo = nil
+		state.validatedNewGatewayToSwitchTo = nil
 		return .none
 	}
 }

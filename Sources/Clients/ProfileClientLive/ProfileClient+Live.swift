@@ -23,20 +23,20 @@ extension ProfileClient {
 			}
 		}
 
-		let getNetworkAndGateway: GetNetworkAndGateway = {
+		let getGateways: GetGateways = {
 			do {
-				return try await getAppPreferences().networkAndGateway
+				return try await getAppPreferences().gateways
 			} catch {
-				return NetworkAndGateway.nebunet
+				return .init(current: Gateway.nebunet)
 			}
 		}
 
 		let getCurrentNetworkID: GetCurrentNetworkID = {
-			await getNetworkAndGateway().network.id
+			await getGateways().current.network.id
 		}
 
 		let getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL = {
-			await getNetworkAndGateway().gatewayAPIEndpointURL
+			await getGateways().current.url
 		}
 
 		let lookupAccountByAddress: LookupAccountByAddress = { accountAddress in
@@ -107,12 +107,12 @@ extension ProfileClient {
 			},
 			getCurrentNetworkID: getCurrentNetworkID,
 			getGatewayAPIEndpointBaseURL: getGatewayAPIEndpointBaseURL,
-			getNetworkAndGateway: getNetworkAndGateway,
-			setNetworkAndGateway: { networkAndGateway in
+			getGateways: getGateways,
+			setGateway: { gateway in
 				try await profileHolder.asyncMutating { profile in
 					// Ensure we have accounts on network, else do not change
-					_ = try profile.onNetwork(id: networkAndGateway.network.id)
-					profile.appPreferences.networkAndGateway = networkAndGateway
+					_ = try profile.onNetwork(id: gateway.network.id)
+					try profile.appPreferences.gateways.changeCurrent(to: gateway)
 				}
 			},
 			createEphemeralPrivateProfile: { request in
@@ -248,36 +248,36 @@ extension ProfileClient {
 					profile.appPreferences.p2pClients
 				}
 			},
-			getConnectedDapps: {
+			getAuthorizedDapps: {
 				let currentNetworkID = await getCurrentNetworkID()
 				return try await profileHolder.get { profile in
 					let onNetwork = try profile.perNetwork.onNetwork(id: currentNetworkID)
 					return onNetwork.authorizedDapps
 				}
 			},
-			addConnectedDapp: { connectedDapp in
+			addAuthorizedDapp: { authorizedDapp in
 				try await profileHolder.asyncMutating { profile in
-					_ = try profile.addConnectedDapp(connectedDapp)
+					_ = try profile.addAuthorizedDapp(authorizedDapp)
 				}
 			},
-			forgetConnectedDapp: { connectedDappID, networkID in
+			forgetAuthorizedDapp: { authorizedDappID, networkID in
 				try await profileHolder.asyncMutating { profile in
-					_ = try await profile.forgetConnectedDapp(connectedDappID, on: networkID)
+					_ = try await profile.forgetAuthorizedDapp(authorizedDappID, on: networkID)
 				}
 			},
-			detailsForConnectedDapp: { connectedDappSimple in
+			detailsForAuthorizedDapp: { authorizedDappSimple in
 				try await profileHolder.get { profile in
-					try profile.detailsForConnectedDapp(connectedDappSimple)
+					try profile.detailsForAuthorizedDapp(authorizedDappSimple)
 				}
 			},
-			updateConnectedDapp: { updated in
+			updateAuthorizedDapp: { updated in
 				try await profileHolder.asyncMutating { profile in
-					try profile.updateConnectedDapp(updated)
+					try profile.updateAuthorizedDapp(updated)
 				}
 			},
-			disconnectPersonaFromDapp: { personaID, connectedDappID, networkID in
+			disconnectPersonaFromDapp: { personaID, authorizedDappID, networkID in
 				try await profileHolder.asyncMutating { profile in
-					try await profile.disconnectPersonaFromDapp(personaID, dAppID: connectedDappID, networkID: networkID)
+					try await profile.disconnectPersonaFromDapp(personaID, dAppID: authorizedDappID, networkID: networkID)
 				}
 			},
 			addP2PClient: { newClient in

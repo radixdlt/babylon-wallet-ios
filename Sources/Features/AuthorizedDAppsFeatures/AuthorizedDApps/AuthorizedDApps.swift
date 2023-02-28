@@ -55,7 +55,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .task {
-				await loadConnectedDapps()
+				await loadAuthorizedDapps()
 			}
 
 		case let .didSelectDapp(dAppID):
@@ -74,7 +74,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		case .presentedDapp(.presented(.delegate(.dAppForgotten))):
 			return .run { send in
 				await send(.child(.presentedDapp(.dismiss)))
-				await send(loadConnectedDapps())
+				await send(loadAuthorizedDapps())
 			}
 
 		case .presentedDapp:
@@ -93,9 +93,9 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadConnectedDapps() async -> Action {
+	private func loadAuthorizedDapps() async -> Action {
 		let result = await TaskResult {
-			try await profileClient.getConnectedDapps()
+			try await profileClient.getAuthorizedDapps()
 		}
 		return .internal(.loadedDapps(result))
 	}

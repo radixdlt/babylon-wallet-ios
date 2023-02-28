@@ -10,11 +10,12 @@ extension ProfileSnapshot.Version {
 	/// - 9: Personas now use Identity addresses as intended.
 	/// - 10: Temp switch default network to Hammunet as RC for Betanet v2
 	/// - 11: Switch back default network to Nebunet before Betanet v2 release.
-	/// - 12: Added `id`
-	/// - 13: Reverted unintentially change of perNetwork
+	/// - 12: Added `"id"`
+	/// - 13: Reverted unintentially change of `"perNetwork"`
 	/// - 14: Reverted `Engine.PublicKey` -> `SLIP10.PublicKey` for entities.
-	/// - 15: Add `creatingDevice` property
-	public static let minimum: Self = 15
+	/// - 15: Add `"creatingDevice"` property
+	/// - 16: Add `"gateways"` replacing `"networkAndGateway"`, also rename `"authorizedDapps"` -> `"authorizedDapps"`
+	public static let minimum: Self = 16
 }
 
 // MARK: - Profile

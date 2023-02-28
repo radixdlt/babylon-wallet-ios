@@ -8,7 +8,7 @@ import TestingPrelude
 
 // MARK: - ProfileTests
 final class ProfileTests: TestCase {
-	let networkAndGateway = NetworkAndGateway.nebunet
+	let gateway = Gateway.nebunet
 
 	func test_p2p_client_eq() throws {
 		let pw = try ConnectionPassword(data: .deadbeef32Bytes)
@@ -52,7 +52,7 @@ final class ProfileTests: TestCase {
 			phrase: "spirit bird issue club alcohol flock skull health lemon judge piece eyebrow",
 			language: .english
 		)
-		let networkID = networkAndGateway.network.id
+		let networkID = gateway.network.id
 		let babylonFactorSource = try FactorSource.babylon(mnemonic: curve25519FactorSourceMnemonic)
 
 		var profile = withDependencies {
@@ -187,7 +187,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(onNetwork.accounts.count, 3)
 		XCTAssertEqual(onNetwork.personas.count, 2)
 
-		var connectedDapp = try profile.addConnectedDapp(
+		var authorizedDapp = try profile.addAuthorizedDapp(
 			.init(
 				networkID: networkID,
 				dAppDefinitionAddress: try .init(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
@@ -220,14 +220,14 @@ final class ProfileTests: TestCase {
 			)
 		)
 
-		let authorizedPersona0 = connectedDapp.referencesToAuthorizedPersonas[0]
+		let authorizedPersona0 = authorizedDapp.referencesToAuthorizedPersonas[0]
 		var authorizedPersona0SharedAccounts = try XCTUnwrap(authorizedPersona0.sharedAccounts)
 		XCTAssertThrowsError(
 			try authorizedPersona0SharedAccounts.updateAccounts([secondAccount.address]),
 			"Should not be able to specify another number of accounts if `exactly` was specified."
 		)
 
-		let authorizedPersona1 = connectedDapp.referencesToAuthorizedPersonas[1]
+		let authorizedPersona1 = authorizedDapp.referencesToAuthorizedPersonas[1]
 		var authorizedPersona1SharedAccounts = try XCTUnwrap(authorizedPersona1.sharedAccounts)
 		XCTAssertNoThrow(
 			try authorizedPersona1SharedAccounts.updateAccounts([
@@ -236,16 +236,16 @@ final class ProfileTests: TestCase {
 			]), "Should be able to specify more accounts if `atLeast` was specified."
 		)
 
-		connectedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(OnNetwork.Persona.Field.ID()) // add unknown fieldID
+		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona0.id]!.fieldIDs.append(OnNetwork.Persona.Field.ID()) // add unknown fieldID
 
-		XCTAssertThrowsError(try profile.updateConnectedDapp(connectedDapp))
+		XCTAssertThrowsError(try profile.updateAuthorizedDapp(authorizedDapp))
 
 		let snapshot = profile.snapshot()
 		let jsonEncoder = JSONEncoder.iso8601
 		XCTAssertNoThrow(try jsonEncoder.encode(snapshot))
 		/* Uncomment the lines below to generate a new test vector */
-		//        let data = try jsonEncoder.encode(snapshot)
-//		print(String(data: data, encoding: .utf8)!)
+		let data = try jsonEncoder.encode(snapshot)
+		print(String(data: data, encoding: .utf8)!)
 	}
 
 	func test_decode() throws {
@@ -257,7 +257,7 @@ final class ProfileTests: TestCase {
 		XCTAssertEqual(profile.factorSources.count, 2)
 
 		XCTAssertEqual(profile.perNetwork.count, 1)
-		let networkID = networkAndGateway.network.id
+		let networkID = gateway.network.id
 		let onNetwork = try profile.perNetwork.onNetwork(id: networkID)
 		XCTAssertEqual(onNetwork.accounts.count, 3)
 

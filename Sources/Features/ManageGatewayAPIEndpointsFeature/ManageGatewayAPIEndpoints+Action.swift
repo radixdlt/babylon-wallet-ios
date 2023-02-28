@@ -34,12 +34,12 @@ extension ManageGatewayAPIEndpoints.Action {
 // MARK: - ManageGatewayAPIEndpoints.Action.SystemAction
 extension ManageGatewayAPIEndpoints.Action {
 	public enum SystemAction: Sendable, Equatable {
-		case loadNetworkAndGatewayResult(TaskResult<NetworkAndGateway>)
+		case loadGatewayResult(TaskResult<Gateway>)
 		/// Nil if no change was needed
-		case gatewayValidationResult(TaskResult<NetworkAndGateway?>)
+		case gatewayValidationResult(TaskResult<Gateway?>)
 		case hasAccountsResult(TaskResult<Bool>)
-		case createAccountOnNetworkBeforeSwitchingToIt(NetworkAndGateway)
-		case switchToResult(TaskResult<NetworkAndGateway>)
+		case createAccountOnNetworkBeforeSwitchingToIt(Gateway)
+		case switchToResult(TaskResult<Gateway>)
 	}
 }
 

@@ -41,7 +41,7 @@ public struct AppSettings: FeatureReducer {
 		case addP2PClientButtonTapped
 
 		case editGatewayAPIEndpointButtonTapped
-		case connectedDappsButtonTapped
+		case authorizedDappsButtonTapped
 		case personasButtonTapped
 
 		#if DEBUG
@@ -132,7 +132,7 @@ public struct AppSettings: FeatureReducer {
 			state.destination = .manageGatewayAPIEndpoints(.init())
 			return .none
 
-		case .connectedDappsButtonTapped:
+		case .authorizedDappsButtonTapped:
 			state.destination = .authorizedDapps(.init())
 			return .none
 

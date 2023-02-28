@@ -12,7 +12,7 @@ struct Login: Sendable, FeatureReducer {
 		let dappMetadata: DappMetadata
 
 		var personas: IdentifiedArrayOf<PersonaRow.State> = []
-		var connectedDapp: OnNetwork.AuthorizedDapp?
+		var authorizedDapp: OnNetwork.AuthorizedDapp?
 		var authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple?
 
 		@PresentationState
@@ -72,14 +72,14 @@ struct Login: Sendable, FeatureReducer {
 			))
 			return .none
 		case let .continueButtonTapped(persona):
-			let authorizedPersona = state.connectedDapp?.referencesToAuthorizedPersonas.first(by: persona.address)
-			return .send(.delegate(.continueButtonTapped(persona, state.connectedDapp, authorizedPersona)))
+			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas.first(by: persona.address)
+			return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona)))
 		}
 	}
 
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action> {
 		switch internalAction {
-		case let .personasLoaded(personas, connectedDapp, authorizedPersonaSimple):
+		case let .personasLoaded(personas, authorizedDapp, authorizedPersonaSimple):
 			state.personas = .init(uniqueElements:
 				personas.map { (persona: OnNetwork.Persona) in
 					let lastLogin: Date? = {
@@ -96,7 +96,7 @@ struct Login: Sendable, FeatureReducer {
 				}
 				.sorted(by: { $0.isSelected && !$1.isSelected })
 			)
-			state.connectedDapp = connectedDapp
+			state.authorizedDapp = authorizedDapp
 			state.authorizedPersona = authorizedPersonaSimple
 			return .none
 		}
@@ -126,14 +126,14 @@ struct Login: Sendable, FeatureReducer {
 	func loadPersonas(state: inout State) -> EffectTask<Action> {
 		.run { [dappDefinitionAddress = state.dappDefinitionAddress] send in
 			let personas = try await profileClient.getPersonas()
-			let authorizedDapps = try await profileClient.getConnectedDapps()
-			let connectedDapp = authorizedDapps.first(by: dappDefinitionAddress)
+			let authorizedDapps = try await profileClient.getAuthorizedDapps()
+			let authorizedDapp = authorizedDapps.first(by: dappDefinitionAddress)
 			let authorizedPersona: OnNetwork.AuthorizedDapp.AuthorizedPersonaSimple? = {
-				guard let connectedDapp else {
+				guard let authorizedDapp else {
 					return nil
 				}
 				return personas.reduce(into: nil) { mostRecentlyAuthorizedPersona, currentPersona in
-					guard let currentAuthorizedPersona = connectedDapp.referencesToAuthorizedPersonas.first(by: currentPersona.address) else {
+					guard let currentAuthorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.first(by: currentPersona.address) else {
 						return
 					}
 					if let mostRecentlyAuthorizedPersonaCopy = mostRecentlyAuthorizedPersona {
@@ -145,7 +145,7 @@ struct Login: Sendable, FeatureReducer {
 					}
 				}
 			}()
-			await send(.internal(.personasLoaded(personas, connectedDapp, authorizedPersona)))
+			await send(.internal(.personasLoaded(personas, authorizedDapp, authorizedPersona)))
 		}
 	}
 }

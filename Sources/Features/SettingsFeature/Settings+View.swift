@@ -152,9 +152,9 @@ extension AppSettings.View {
 		 .init(title: L10n.Settings.gatewayButtonTitle,
 		       asset: AssetResource.gateway,
 		       action: .editGatewayAPIEndpointButtonTapped),
-		 .init(title: L10n.Settings.connectedDappsButtonTitle,
+		 .init(title: L10n.Settings.authorizedDappsButtonTitle,
 		       asset: AssetResource.authorizedDapps,
-		       action: .connectedDappsButtonTapped),
+		       action: .authorizedDappsButtonTapped),
 		 .init(title: L10n.Settings.personasButtonTitle,
 		       asset: AssetResource.personas,
 		       action: .personasButtonTapped)]

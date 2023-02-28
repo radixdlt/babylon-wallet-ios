@@ -17,7 +17,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApp: OnNetwork.ConnectedDappDetailed
+		public var dApp: OnNetwork.AuthorizedDappDetailed
 
 		@Loadable
 		public var metadata: GatewayAPI.EntityMetadataCollection? = nil
@@ -31,7 +31,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		// TODO: This is part of a workaround to make SwiftUI actually dismiss the view
 		public var isDismissed: Bool = false
 
-		public init(dApp: OnNetwork.ConnectedDappDetailed, presentedPersona: PersonaDetails.State? = nil) {
+		public init(dApp: OnNetwork.AuthorizedDappDetailed, presentedPersona: PersonaDetails.State? = nil) {
 			self.dApp = dApp
 			self.presentedPersona = presentedPersona
 		}
@@ -62,7 +62,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case metadataLoaded(Loadable<GatewayAPI.EntityMetadataCollection>)
-		case dAppUpdated(OnNetwork.ConnectedDappDetailed)
+		case dAppUpdated(OnNetwork.AuthorizedDappDetailed)
 		case dAppForgotten
 	}
 
@@ -133,7 +133,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case .confirmDisconnectAlert(.presented(.confirmTapped)):
 			let (dAppID, networkID) = (state.dApp.dAppDefinitionAddress, state.dApp.networkID)
 			return .run { send in
-				try await profileClient.forgetConnectedDapp(dAppID, networkID)
+				try await profileClient.forgetAuthorizedDapp(dAppID, networkID)
 				await send(.internal(.dAppForgotten))
 				await send(.delegate(.dAppForgotten))
 			} catch: { error, _ in
