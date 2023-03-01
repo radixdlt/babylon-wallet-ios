@@ -1,43 +1,45 @@
 import FeaturePrelude
 
+extension FungibleTokenList.Row.State {
+	fileprivate var viewState: FungibleTokenList.Row.ViewState {
+		.init(
+			container: container,
+			currency: currency,
+			isCurrencyAmountVisible: isCurrencyAmountVisible
+		)
+	}
+}
+
 // MARK: - FungibleTokenList.Row.View
 extension FungibleTokenList.Row {
+	public struct ViewState: Equatable {
+		let container: FungibleTokenContainer
+		let currency: FiatCurrency
+		let isCurrencyAmountVisible: Bool
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+		private let store: StoreOf<FungibleTokenList.Row>
 
-		public init(
-			store: Store
-		) {
+		public init(store: StoreOf<FungibleTokenList.Row>) {
 			self.store = store
 		}
-	}
-}
 
-extension FungibleTokenList.Row.View {
-	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			tokenRow(with: viewStore, container: viewStore.container)
-				.padding(.horizontal, .medium1)
-				.contentShape(Rectangle())
-				.onTapGesture { viewStore.send(.tapped) }
+		public var body: some SwiftUI.View {
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				tokenRow(with: viewStore, container: viewStore.container)
+					.padding(.horizontal, .medium1)
+					.contentShape(Rectangle())
+					.onTapGesture { viewStore.send(.tapped) }
+			}
 		}
 	}
-}
-
-// MARK: - FungibleTokenList.Row.View.RowViewStore
-extension FungibleTokenList.Row.View {
-	fileprivate typealias RowViewStore = ViewStore<FungibleTokenList.Row.View.ViewState, FungibleTokenList.Row.ViewAction>
 }
 
 // MARK: - Private Methods
 extension FungibleTokenList.Row.View {
-	fileprivate func tokenRow(with viewStore: RowViewStore, container: FungibleTokenContainer) -> some View {
+	fileprivate func tokenRow(with viewStore: ViewStoreOf<FungibleTokenList.Row>, container: FungibleTokenContainer) -> some View {
 		ZStack {
 			HStack(alignment: .center) {
 				HStack(spacing: .small1) {
@@ -107,22 +109,6 @@ extension FungibleTokenList.Row.View {
 			}
 		} else {
 			return "\(currency.sign) ••••"
-		}
-	}
-}
-
-// MARK: - FungibleTokenList.Row.View.ViewState
-extension FungibleTokenList.Row.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		let container: FungibleTokenContainer
-		let currency: FiatCurrency
-		let isCurrencyAmountVisible: Bool
-
-		init(state: FungibleTokenList.Row.State) {
-			self.container = state.container
-			self.currency = state.currency
-			self.isCurrencyAmountVisible = state.isCurrencyAmountVisible
 		}
 	}
 }

@@ -8,6 +8,7 @@ public protocol _FeatureReducer: ReducerProtocol where State: Sendable & Hashabl
 	associatedtype ChildAction: Sendable & Equatable = Never
 	associatedtype DelegateAction: Sendable & Equatable = Never
 
+	associatedtype ViewState: Equatable
 	associatedtype View: SwiftUI.View
 }
 
@@ -72,3 +73,7 @@ extension ReducerProtocol where Self: FeatureReducer {
 }
 
 public typealias PresentationStoreOf<R: ReducerProtocol> = Store<PresentationStateOf<R>, PresentationActionOf<R>>
+
+// MARK: - ViewStore extensions
+
+public typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewState, Feature.ViewAction>

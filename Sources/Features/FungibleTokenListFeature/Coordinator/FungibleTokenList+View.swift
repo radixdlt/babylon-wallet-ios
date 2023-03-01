@@ -3,6 +3,8 @@ import FungibleTokenDetailsFeature
 
 // MARK: - FungibleTokenList.View
 extension FungibleTokenList {
+	public typealias ViewState = Never
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		public typealias Store = ComposableArchitecture.Store<State, Action>

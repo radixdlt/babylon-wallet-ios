@@ -1,7 +1,33 @@
 import FeaturePrelude
 
+extension FungibleTokenDetails.State {
+	fileprivate var viewState: FungibleTokenDetails.ViewState {
+		.init(
+			displayName: asset.name ?? "",
+			iconURL: asset.iconURL,
+			placeholderAsset: .placeholderImage(isXRD: asset.isXRD),
+			amount: amount.format(),
+			symbol: asset.symbol,
+			description: asset.tokenDescription,
+			address: .init(address: asset.componentAddress.address, format: .default),
+			currentSupply: asset.totalMinted
+		)
+	}
+}
+
 // MARK: - FungibleTokenDetails.View
 extension FungibleTokenDetails {
+	public struct ViewState: Equatable {
+		let displayName: String
+		let iconURL: URL?
+		let placeholderAsset: ImageAsset
+		let amount: String
+		let symbol: String?
+		let description: String?
+		let address: AddressView.ViewState
+		let currentSupply: BigDecimal?
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<FungibleTokenDetails>
@@ -14,11 +40,7 @@ extension FungibleTokenDetails {
 
 extension FungibleTokenDetails.View {
 	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			NavigationStack {
 				ScrollView {
 					VStack(spacing: .medium3) {
@@ -92,31 +114,6 @@ extension FungibleTokenDetails.View {
 			}
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
-		}
-	}
-}
-
-// MARK: - FungibleTokenDetails.View.ViewState
-extension FungibleTokenDetails.View {
-	struct ViewState: Equatable {
-		let displayName: String
-		let iconURL: URL?
-		let placeholderAsset: ImageAsset
-		let amount: String
-		let symbol: String?
-		let description: String?
-		let address: AddressView.ViewState
-		let currentSupply: BigDecimal?
-
-		init(state: FungibleTokenDetails.State) {
-			self.displayName = state.asset.name ?? ""
-			self.iconURL = state.asset.iconURL
-			self.placeholderAsset = .placeholderImage(isXRD: state.asset.isXRD)
-			self.amount = state.amount.format()
-			self.symbol = state.asset.symbol
-			self.description = state.asset.tokenDescription
-			self.address = .init(address: state.asset.componentAddress.address, format: .default)
-			self.currentSupply = state.asset.totalMinted
 		}
 	}
 }
