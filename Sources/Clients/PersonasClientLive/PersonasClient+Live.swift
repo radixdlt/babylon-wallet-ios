@@ -9,6 +9,11 @@ extension PersonasClient: DependencyKey {
 		Self(
 			getPersonas: {
 				await profileStore.network.personas
+			},
+			saveVirtualPersona: { persona in
+				try await profileStore.updating {
+					try $0.addPersona(persona)
+				}
 			}
 		)
 	}

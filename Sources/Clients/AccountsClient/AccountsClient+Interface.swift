@@ -20,18 +20,22 @@ public struct AccountsClient: Sendable {
 	/// Try to perform lookup of account by account address.
 	public var getAccountByAddress: GetAccountByAddress
 
+	public var hasAccountOnNetwork: HasAccountOnNetwork
+
 	public init(
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
 		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
 		createUnsavedVirtualAccount: @escaping CreateUnsavedVirtualAccount,
 		saveVirtualAccount: @escaping SaveVirtualAccount,
-		getAccountByAddress: @escaping GetAccountByAddress
+		getAccountByAddress: @escaping GetAccountByAddress,
+		hasAccountOnNetwork: @escaping HasAccountOnNetwork
 	) {
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
 		self.createUnsavedVirtualAccount = createUnsavedVirtualAccount
 		self.saveVirtualAccount = saveVirtualAccount
 		self.getAccountByAddress = getAccountByAddress
+		self.hasAccountOnNetwork = hasAccountOnNetwork
 	}
 }
 
@@ -44,6 +48,8 @@ extension AccountsClient {
 	public typealias SaveVirtualAccount = @Sendable (OnNetwork.Account) async throws -> Void
 
 	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> OnNetwork.Account
+
+	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 }
 
 // MARK: - CreateVirtualAccountRequest

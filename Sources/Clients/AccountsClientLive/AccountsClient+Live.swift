@@ -19,6 +19,15 @@ extension AccountsClient: DependencyKey {
 			},
 			getAccountByAddress: { address in
 				try await profileStore.network.entity(address: address)
+			},
+			hasAccountOnNetwork: { networkID in
+				do {
+					let network = try await profileStore.profile.onNetwork(id: networkID)
+					// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
+					return !network.accounts.isEmpty
+				} catch {
+					return false
+				}
 			}
 		)
 	}

@@ -3,27 +3,47 @@ import Cryptography
 
 // MARK: - ProfileClient
 public struct ProfileClient: Sendable {
+	// MARK: - =====
+
+	// MARK: - =====
+
+	// MARK: - =====
+
+	struct Separator {}
+
+	// MARK: - Migrated
+
+	// To: FactorSourceClient
 	public var getFactorSources: GetFactorSources
+
+	// To: OnboardingClient
+	public var createEphemeralPrivateProfile: CreateEphemeralPrivateProfile
+	public var injectProfileSnapshot: InjectProfileSnapshot
+	public var commitEphemeralPrivateProfile: CommitEphemeralPrivateProfile
+	public var loadProfile: LoadProfile
+
+	// To: AccountsClient
+	public var getAccounts: GetAccounts
+	public var addAccount: AddAccount
+	public var lookupAccountByAddress: LookupAccountByAddress
+	public var hasAccountOnNetwork: HasAccountOnNetwork
+	public var getAccountsOnNetwork: GetAccountsOnNetwork
+
+	// To: PersonasClient
+	public var getPersonas: GetPersonas
+	public var addPersona: AddPersona
+
+	// To: AuthorizedDappsClient
+
+	// MARK: - Not Yet Migrated
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
 	public var getGateways: GetGateways
 	public var setGateway: SetGateway
 
-	/// Creates a new profile without injecting it into the ProfileClient (ProfileHolder)
-	public var createEphemeralPrivateProfile: CreateEphemeralPrivateProfile
-	public var injectProfileSnapshot: InjectProfileSnapshot
-	public var commitEphemeralPrivateProfile: CommitEphemeralPrivateProfile
-
-	public var loadProfile: LoadProfile
 	public var extractProfileSnapshot: ExtractProfileSnapshot
-
-	/// Also deletes profile and factor sources from keychain
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
-	public var hasAccountOnNetwork: HasAccountOnNetwork
-	public var getAccountsOnNetwork: GetAccountsOnNetwork
-	public var getAccounts: GetAccounts
-	public var getPersonas: GetPersonas
 	public var getP2PClients: GetP2PClients
 	public var getAuthorizedDapps: GetAuthorizedDapps
 	public var addAuthorizedDapp: AddAuthorizedDapp
@@ -36,9 +56,6 @@ public struct ProfileClient: Sendable {
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
 	public var createUnsavedVirtualEntity: CreateUnsavedVirtualEntity
-	public var addAccount: AddAccount
-	public var addPersona: AddPersona
-	public var lookupAccountByAddress: LookupAccountByAddress
 
 	public init(
 		getFactorSources: @escaping GetFactorSources,
