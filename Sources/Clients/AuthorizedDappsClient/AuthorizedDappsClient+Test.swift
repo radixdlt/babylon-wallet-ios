@@ -9,6 +9,23 @@ extension DependencyValues {
 
 // MARK: - AuthorizedDappsClient + TestDependencyKey
 extension AuthorizedDappsClient: TestDependencyKey {
-	public static let previewValue = Self()
-	public static let testValue = Self()
+	public static let previewValue: Self = .noop
+
+	public static let noop = Self(
+		getAuthorizedDapps: { [] },
+		addAuthorizedDapp: { _ in },
+		forgetAuthorizedDapp: { _, _ in },
+		updateAuthorizedDapp: { _ in },
+		disconnectPersonaFromDapp: { _, _, _ in },
+		detailsForAuthorizedDapp: { _ in throw NoopError() }
+	)
+
+	public static let testValue = Self(
+		getAuthorizedDapps: unimplemented("\(Self.self).getAuthorizedDapps"),
+		addAuthorizedDapp: unimplemented("\(Self.self).addAuthorizedDapp"),
+		forgetAuthorizedDapp: unimplemented("\(Self.self).forgetAuthorizedDapp"),
+		updateAuthorizedDapp: unimplemented("\(Self.self).updateAuthorizedDapp"),
+		disconnectPersonaFromDapp: unimplemented("\(Self.self).disconnectPersonaFromDapp"),
+		detailsForAuthorizedDapp: unimplemented("\(Self.self).detailsForAuthorizedDapp")
+	)
 }

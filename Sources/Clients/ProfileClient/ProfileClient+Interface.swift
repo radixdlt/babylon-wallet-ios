@@ -34,6 +34,12 @@ public struct ProfileClient: Sendable {
 	public var addPersona: AddPersona
 
 	// To: AuthorizedDappsClient
+	public var getAuthorizedDapps: GetAuthorizedDapps
+	public var addAuthorizedDapp: AddAuthorizedDapp
+	public var forgetAuthorizedDapp: ForgetAuthorizedDapp
+	public var updateAuthorizedDapp: UpdateAuthorizedDapp
+	public var disconnectPersonaFromDapp: DisconnectPersonaFromDapp
+	public var detailsForAuthorizedDapp: DetailsForAuthorizedDapp
 
 	// To: AppPreferencesClient
 
@@ -41,21 +47,16 @@ public struct ProfileClient: Sendable {
 	public var getP2PClients: GetP2PClients
 	public var addP2PClient: AddP2PClient
 
-	// MARK: - Not Yet Migrated
+	// To: GatewaysClient
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
 	public var getGateways: GetGateways
 	public var setGateway: SetGateway
 
+	// MARK: - Not Yet Migrated
 	public var extractProfileSnapshot: ExtractProfileSnapshot
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
-	public var getAuthorizedDapps: GetAuthorizedDapps
-	public var addAuthorizedDapp: AddAuthorizedDapp
-	public var forgetAuthorizedDapp: ForgetAuthorizedDapp
-	public var updateAuthorizedDapp: UpdateAuthorizedDapp
-	public var disconnectPersonaFromDapp: DisconnectPersonaFromDapp
-	public var detailsForAuthorizedDapp: DetailsForAuthorizedDapp
 	public var deleteP2PClientByID: DeleteP2PClientByID
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
@@ -170,14 +171,16 @@ extension ProfileClient {
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>
 	public typealias GetAccounts = @Sendable () async throws -> NonEmpty<IdentifiedArrayOf<OnNetwork.Account>>
 	public typealias GetPersonas = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.Persona>
-	public typealias GetAuthorizedDapps = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.AuthorizedDapp>
-	public typealias DetailsForAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> OnNetwork.AuthorizedDappDetailed
 	public typealias GetP2PClients = @Sendable () async throws -> P2PClients
 	public typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
+
+	public typealias GetAuthorizedDapps = @Sendable () async throws -> IdentifiedArrayOf<OnNetwork.AuthorizedDapp>
+	public typealias DetailsForAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> OnNetwork.AuthorizedDappDetailed
 	public typealias AddAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> Void
 	public typealias ForgetAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp.ID, NetworkID) async throws -> Void
 	public typealias UpdateAuthorizedDapp = @Sendable (OnNetwork.AuthorizedDapp) async throws -> Void
 	public typealias DisconnectPersonaFromDapp = @Sendable (OnNetwork.Persona.ID, OnNetwork.AuthorizedDapp.ID, NetworkID) async throws -> Void
+
 	public typealias DeleteP2PClientByID = @Sendable (P2PClient.ID) async throws -> Void
 	public typealias GetAppPreferences = @Sendable () async throws -> AppPreferences
 	public typealias SetDisplayAppPreferences = @Sendable (AppPreferences.Display) async throws -> Void

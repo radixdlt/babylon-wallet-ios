@@ -23,6 +23,7 @@
 		E6805BCD286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
 		E6805BCE286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
 		E6805BDF286DB74300861180 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E6805BDE286DB74300861180 /* AppFeature */; settings = {ATTRIBUTES = (Required, ); }; };
+		E6A021E229AFA75D0095FACD /* AuthorizedDappsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6A021E129AFA75D0095FACD /* AuthorizedDappsClientLive */; };
 		E6BAFFBB2976CA6B00E4B1C5 /* ProfileClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6BAFFBA2976CA6B00E4B1C5 /* ProfileClientLive */; };
 		E6BAFFBD2976CA7400E4B1C5 /* ProfileClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6BAFFBC2976CA7400E4B1C5 /* ProfileClientLive */; };
 		E6E2FC1F29AF8A2E001BEA5B /* AccountsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E6E2FC1E29AF8A2E001BEA5B /* AccountsClientLive */; };
@@ -71,6 +72,7 @@
 				E62B6BD82965C15800AA08E4 /* TransactionClient in Frameworks */,
 				E6E2FC2129AF8A2E001BEA5B /* AppPreferencesClientLive in Frameworks */,
 				E62B6BDA2965C16600AA08E4 /* EngineToolkitClient in Frameworks */,
+				E6A021E229AFA75D0095FACD /* AuthorizedDappsClientLive in Frameworks */,
 				E6E2FC1F29AF8A2E001BEA5B /* AccountsClientLive in Frameworks */,
 				E6E2FC2529AF8A2E001BEA5B /* OnboardingClientLive in Frameworks */,
 				E62B6BD62965C15100AA08E4 /* P2PConnectivityClient in Frameworks */,
@@ -236,6 +238,7 @@
 				E6E2FC2629AF8A2E001BEA5B /* PersonasClientLive */,
 				E636FA8D29AF983A00BA2540 /* P2PClientsClientLive */,
 				E636FA9229AFA39900BA2540 /* GatewaysClientLive */,
+				E6A021E129AFA75D0095FACD /* AuthorizedDappsClientLive */,
 			);
 			productName = "Wallet (iOS)";
 			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -655,6 +658,10 @@
 		E6805BDE286DB74300861180 /* AppFeature */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = AppFeature;
+		};
+		E6A021E129AFA75D0095FACD /* AuthorizedDappsClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AuthorizedDappsClientLive;
 		};
 		E6A17E56292FB01500D40EDB /* AppFeature */ = {
 			isa = XCSwiftPackageProductDependency;

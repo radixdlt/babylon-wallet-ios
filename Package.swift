@@ -267,6 +267,23 @@ package.addModules([
 		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "AuthorizedDappsClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "AuthorizedDappsClientLive",
+		dependencies: [
+			"AuthorizedDappsClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "CameraPermissionClient",
 		dependencies: [],

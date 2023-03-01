@@ -260,7 +260,7 @@ extension ProfileClient {
 			},
 			forgetAuthorizedDapp: { authorizedDappID, networkID in
 				try await profileHolder.asyncMutating { profile in
-					_ = try await profile.forgetAuthorizedDapp(authorizedDappID, on: networkID)
+					_ = try profile.forgetAuthorizedDapp(authorizedDappID, on: networkID)
 				}
 			},
 			detailsForAuthorizedDapp: { authorizedDappSimple in
@@ -275,7 +275,7 @@ extension ProfileClient {
 			},
 			disconnectPersonaFromDapp: { personaID, authorizedDappID, networkID in
 				try await profileHolder.asyncMutating { profile in
-					try await profile.disconnectPersonaFromDapp(personaID, dAppID: authorizedDappID, networkID: networkID)
+					try profile.disconnectPersonaFromDapp(personaID, dAppID: authorizedDappID, networkID: networkID)
 				}
 			},
 			addP2PClient: { newClient in

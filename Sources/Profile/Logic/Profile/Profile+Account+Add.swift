@@ -105,7 +105,7 @@ extension Profile {
 	public mutating func forgetAuthorizedDapp(
 		_ authorizedDappID: OnNetwork.AuthorizedDapp.ID,
 		on networkID: NetworkID
-	) async throws {
+	) throws {
 		var network = try onNetwork(id: networkID)
 		guard network.authorizedDapps.remove(id: authorizedDappID) != nil else {
 			throw DappWasNotConnected()
@@ -154,7 +154,7 @@ extension Profile {
 		_ personaID: OnNetwork.Persona.ID,
 		dAppID: OnNetwork.AuthorizedDapp.ID,
 		networkID: NetworkID
-	) async throws {
+	) throws {
 		var network = try onNetwork(id: networkID)
 		guard var authorizedDapp = network.authorizedDapps[id: dAppID] else {
 			throw AuthorizedDappDoesNotExists()
