@@ -13,13 +13,15 @@ extension AccountsClient: TestDependencyKey {
 		getAccountsOnCurrentNetwork: { fatalError("impl me") },
 		accountsOnCurrentNetwork: { fatalError("impl me") },
 		createUnsavedVirtualAccount: { _ in fatalError("impl me") },
-		saveVirtualAccount: { _ in fatalError("impl me") }
+		saveVirtualAccount: { _ in fatalError("impl me") },
+		getAccountByAddress: { _ in fatalError("impl me") }
 	)
 	public static let previewValue: Self = .noop
 	public static let testValue = Self(
 		getAccountsOnCurrentNetwork: unimplemented("\(Self.self).getAccountsOnCurrentNetwork"),
 		accountsOnCurrentNetwork: unimplemented("\(Self.self).accountsOnCurrentNetwork"),
 		createUnsavedVirtualAccount: unimplemented("\(Self.self).createUnsavedVirtualAccount"),
-		saveVirtualAccount: unimplemented("\(Self.self).saveVirtualAccount")
+		saveVirtualAccount: unimplemented("\(Self.self).saveVirtualAccount"),
+		getAccountByAddress: unimplemented("\(Self.self).getAccountByAddress")
 	)
 }

@@ -16,6 +16,9 @@ extension AccountsClient: DependencyKey {
 				try await profileStore.updating {
 					try $0.addAccount(account)
 				}
+			},
+			getAccountByAddress: { address in
+				try await profileStore.network.entity(address: address)
 			}
 		)
 	}

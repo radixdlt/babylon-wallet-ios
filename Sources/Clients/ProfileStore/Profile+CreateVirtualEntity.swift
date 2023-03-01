@@ -4,7 +4,7 @@ import UseFactorSourceClient
 
 extension Profile {
 	public func createUnsavedVirtualEntity<Entity: EntityProtocol>(
-		request: CreateVirtualEntityRequest
+		request: CreateVirtualEntityRequestProtocol
 	) async throws -> Entity {
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 

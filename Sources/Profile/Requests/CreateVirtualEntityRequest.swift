@@ -18,8 +18,8 @@ public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {
 	}
 }
 
-// MARK: - CreateVirtualEntityRequest
-public protocol CreateVirtualEntityRequest: Sendable {
+// MARK: - CreateVirtualEntityRequestProtocol
+public protocol CreateVirtualEntityRequestProtocol: Sendable {
 	// if `nil` we will use current networkID
 	var networkID: NetworkID? { get }
 
@@ -29,23 +29,9 @@ public protocol CreateVirtualEntityRequest: Sendable {
 	var curve: Slip10Curve { get }
 	var entityKind: EntityKind { get }
 	var displayName: NonEmpty<String> { get }
-
-//	public init(
-//		curve: Slip10Curve,
-//		networkID: NetworkID?,
-//		genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy,
-//		entityKind: EntityKind,
-//		displayName: NonEmpty<String>
-//	) throws {
-//		self.curve = curve
-//		self.networkID = networkID
-//		self.genesisFactorInstanceDerivationStrategy = genesisFactorInstanceDerivationStrategy
-//		self.entityKind = entityKind
-//		self.displayName = displayName
-//	}
 }
 
-extension CreateVirtualEntityRequest {
+extension CreateVirtualEntityRequestProtocol {
 	public func getDerivationPathRequest() throws -> GetDerivationPathForNewEntityRequest {
 		try .init(
 			networkID: networkID,
@@ -53,5 +39,32 @@ extension CreateVirtualEntityRequest {
 			entityKind: entityKind,
 			keyKind: .transactionSigningKey
 		)
+	}
+}
+
+// MARK: - CreateVirtualEntityRequest
+public struct CreateVirtualEntityRequest: CreateVirtualEntityRequestProtocol, Equatable {
+	// if `nil` we will use current networkID
+	public let networkID: NetworkID?
+
+	// FIXME: change to shared HDFactorSource
+	public let genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy
+
+	public let curve: Slip10Curve
+	public let entityKind: EntityKind
+	public let displayName: NonEmpty<String>
+
+	public init(
+		curve: Slip10Curve,
+		networkID: NetworkID?,
+		genesisFactorInstanceDerivationStrategy: GenesisFactorInstanceDerivationStrategy,
+		entityKind: EntityKind,
+		displayName: NonEmpty<String>
+	) throws {
+		self.curve = curve
+		self.networkID = networkID
+		self.genesisFactorInstanceDerivationStrategy = genesisFactorInstanceDerivationStrategy
+		self.entityKind = entityKind
+		self.displayName = displayName
 	}
 }
