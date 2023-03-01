@@ -25,14 +25,14 @@ extension FungibleTokenList.Row.View {
 			tokenRow(with: viewStore, container: viewStore.container)
 				.padding(.horizontal, .medium1)
 				.contentShape(Rectangle())
-				.onTapGesture { viewStore.send(.selected) }
+				.onTapGesture { viewStore.send(.tapped) }
 		}
 	}
 }
 
 // MARK: - FungibleTokenList.Row.View.RowViewStore
 extension FungibleTokenList.Row.View {
-	fileprivate typealias RowViewStore = ViewStore<FungibleTokenList.Row.View.ViewState, FungibleTokenList.Row.Action.ViewAction>
+	fileprivate typealias RowViewStore = ViewStore<FungibleTokenList.Row.View.ViewState, FungibleTokenList.Row.ViewAction>
 }
 
 // MARK: - Private Methods
