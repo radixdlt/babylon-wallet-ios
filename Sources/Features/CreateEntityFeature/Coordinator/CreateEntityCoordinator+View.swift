@@ -48,6 +48,7 @@ extension CreateEntityCoordinator.View {
 						then: { NewEntityCompletion.View(store: $0) }
 					)
 				}
+				#if os(iOS)
 				.toolbar {
 					if viewStore.shouldDisplayNavBar {
 						ToolbarItem(placement: .navigationBarLeading) {
@@ -57,6 +58,7 @@ extension CreateEntityCoordinator.View {
 						}
 					}
 				}
+				#endif
 			}
 		}
 	}

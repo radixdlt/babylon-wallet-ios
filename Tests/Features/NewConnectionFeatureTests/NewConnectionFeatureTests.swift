@@ -31,21 +31,22 @@ final class NewConnectionTests: TestCase {
 	}
 
 	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_saved_but_without_name() async throws {
-		let connectedClient = P2P.ClientWithConnectionStatus(p2pClient: .previewValue, connectionStatus: .connected)
+		let connection = P2P.ClientWithConnectionStatus(p2pClient: .previewValue, connectionStatus: .connected)
 
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State.connectUsingSecrets(
 				ConnectUsingSecrets.State(
 					connectionSecrets: .placeholder,
-					idOfNewConnection: connectedClient.id
+					idOfNewConnection: connection.id
 				)
 			),
 			reducer: NewConnection()
 		)
 
-		await store.send(.internal(.view(.closeButtonTapped)))
-		await store.receive(.delegate(.newConnection(connectedClient)))
+		await store.send(.view(.closeButtonTapped))
+		await store.receive(.child(.connectUsingSecrets(.delegate(.connected(connection)))))
+		await store.receive(.delegate(.newConnection(connection)))
 	}
 
 	func test__GIVEN_new_connected_client__WHEN__user_confirms_name__THEN__connection_is_saved_with_that_name_trimmed() async throws {
@@ -65,20 +66,17 @@ final class NewConnectionTests: TestCase {
 				idOfNewConnection: secrets.connectionID,
 				nameOfConnection: connectionName + " ",
 				isNameValid: true
-			)
-			)
+			))
 		}
 
 		let testScheduler = DispatchQueue.test
 		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 		await store.send(.child(.connectUsingSecrets(.view(.confirmNameButtonTapped))))
 		await testScheduler.advance(by: .seconds(1))
-		let connectedClient = P2P.ClientWithConnectionStatus(p2pClient: .init(connectionPassword: secrets.connectionPassword, displayName: connectionName), connectionStatus: .connected)
+		let connection = P2P.ClientWithConnectionStatus(p2pClient: .init(connectionPassword: secrets.connectionPassword, displayName: connectionName), connectionStatus: .connected)
 
-		await store.receive(.child(.connectUsingSecrets(.delegate(.connected(connectedClient)))))
-		await store.receive(.delegate(.newConnection(
-			connectedClient
-		))
-		)
+		await store.receive(.child(.connectUsingSecrets(.internal(.cancelOngoingEffects))))
+		await store.receive(.child(.connectUsingSecrets(.delegate(.connected(connection)))))
+		await store.receive(.delegate(.newConnection(connection)))
 	}
 }
