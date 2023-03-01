@@ -1,5 +1,6 @@
 import Cryptography
 import EngineToolkitModels
+import P2PModels
 import Prelude
 
 // MARK: - TransactionManifest + CustomStringConvertible
@@ -15,6 +16,27 @@ extension TransactionManifest {
 		public static let `default`: Self = .includeBlobsByByteCountOnly
 	}
 
+	public enum ManifestConversionError: Error {
+		case networkMismatch(found: UInt?, expected: UInt?)
+		case manifestGeneration(messsage: String?)
+
+		public init?(error: Error) {
+			guard case let .deserializeResponseFailure(.errorResponse(json)) = error as? EngineToolkit.Error else { return nil }
+			guard let dict = json.dictionary, let errorType = dict["error"]?.string else { return nil }
+			switch errorType {
+			case "NetworkMismatchError":
+				let found = dict["found"]?.int.map(UInt.init)
+				let expected = dict["expected"]?.int.map(UInt.init)
+				self = .networkMismatch(found: found, expected: expected)
+			case "ManifestGenerationError":
+				let message = dict["message"]?.string
+				self = .manifestGeneration(messsage: message)
+			default:
+				return nil
+			}
+		}
+	}
+
 	internal static func toStringInstructions(
 		_ instructions: ManifestInstructions,
 		// If instructions are on JSON format we stringify them, which requires blobs (convertManifest)
@@ -22,7 +44,7 @@ extension TransactionManifest {
 		networkID: NetworkID,
 		separator: String = "\n",
 		argumentSeparator: String = "\n\t"
-	) -> String {
+	) throws -> String {
 		switch instructions {
 		case let .string(manifestString):
 
@@ -44,7 +66,7 @@ extension TransactionManifest {
 			return instructionsStringsWithoutNewline
 				.joined(separator: separator)
 
-		case let .parsed(instructionsOnJSONFormat):
+		case .parsed:
 			// We dont wanna print JSON, so we go through conversion to STRING first
 			func stringifyManifest(networkForRequest: NetworkID) throws -> TransactionManifest {
 				try EngineToolkit()
@@ -59,29 +81,28 @@ extension TransactionManifest {
 					.get()
 			}
 
-			let stringifiedManifest: TransactionManifest? = {
+			// If the chosen network is wrong, we will try with other networks
+			func stringifiedManifest() throws -> TransactionManifest {
 				do {
 					return try stringifyManifest(networkForRequest: networkID)
 				} catch {
-					// maybe NetworkMismatchError...
+					guard case .networkMismatch = ManifestConversionError(error: error) else { throw error }
 					for networkForRequest in NetworkID.all(but: networkID) {
 						do {
 							return try stringifyManifest(networkForRequest: networkForRequest)
 						} catch {
+							guard case .networkMismatch = ManifestConversionError(error: error) else { break }
 							continue
 						}
 					}
-					return nil
+
+					throw error
 				}
-			}()
-			guard let stringifiedManifest else {
-				// We fail to stringify JSON instructions..
-				return String(describing: instructionsOnJSONFormat)
 			}
 
 			// Recursively call `toString` on `stringifiedSelf`, with original arguments intact.
-			return Self.toStringInstructions(
-				stringifiedManifest.instructions, // Use newly stringified instructions!
+			return try Self.toStringInstructions(
+				stringifiedManifest().instructions, // Use newly stringified instructions!
 				in: manifest, // Don't care,
 				networkID: networkID,
 				separator: separator, // passthrough
@@ -94,8 +115,8 @@ extension TransactionManifest {
 		separator: String = "\n",
 		argumentSeparator: String = "\n\t",
 		networkID: NetworkID
-	) -> String {
-		Self.toStringInstructions(
+	) throws -> String {
+		try Self.toStringInstructions(
 			instructions,
 			// If instructions are on JSON format we stringify them, which requires blobs (convertManifest)
 			in: self,
@@ -144,8 +165,8 @@ extension TransactionManifest {
 		instructionsSeparator: String = "\n\n",
 		instructionsArgumentSeparator: String = "\n\t",
 		networkID: NetworkID
-	) -> String {
-		let instructionsString = toStringInstructions(
+	) throws -> String {
+		let instructionsString = try toStringInstructions(
 			separator: instructionsSeparator,
 			argumentSeparator: instructionsArgumentSeparator,
 			networkID: networkID
@@ -165,6 +186,10 @@ extension TransactionManifest {
 
 	public var description: String {
 		// Best we can do is default to the primary network given the roadmap.
-		toString(networkID: .hammunet)
+		do {
+			return try toString(networkID: .hammunet)
+		} catch {
+			return "Can't create description of manifest: \(error)"
+		}
 	}
 }

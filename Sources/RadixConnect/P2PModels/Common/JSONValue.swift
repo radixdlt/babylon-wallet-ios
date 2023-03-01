@@ -3,6 +3,7 @@ import Foundation
 // MARK: - JSONValue
 // https://gist.github.com/hannesoid/10a35895e4dc5d6f1bb6428f7d4d23a5
 public indirect enum JSONValue: Decodable, CustomStringConvertible, Sendable, Hashable {
+	case int(Int)
 	case double(Double)
 	case string(String)
 	case bool(Bool)
@@ -17,6 +18,9 @@ public indirect enum JSONValue: Decodable, CustomStringConvertible, Sendable, Ha
 			return
 		} else if let value = try? singleValueContainer.decode(String.self) {
 			self = .string(value)
+			return
+		} else if let value = try? singleValueContainer.decode(Int.self) {
+			self = .int(value)
 			return
 		} else if let value = try? singleValueContainer.decode(Double.self) {
 			self = .double(value)
@@ -52,6 +56,8 @@ public indirect enum JSONValue: Decodable, CustomStringConvertible, Sendable, Ha
 			return "[" + array.map { $0.stringRepresentation /* recursion */ }.joined(separator: ", ") + "]"
 		case let .bool(bool):
 			return bool ? "true" : "false"
+		case let .int(int):
+			return String(int)
 		case let .double(double):
 			let formatter = NumberFormatter()
 			formatter.maximumFractionDigits = 3
@@ -71,6 +77,15 @@ extension JSONValue {
 	public var string: String? {
 		switch self {
 		case let .string(value):
+			return value
+		default:
+			return nil
+		}
+	}
+
+	public var int: Int? {
+		switch self {
+		case let .int(value):
 			return value
 		default:
 			return nil

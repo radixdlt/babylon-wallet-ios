@@ -55,7 +55,7 @@ public struct TransactionSigning: Sendable, FeatureReducer {
 				do {
 					let networkID = await profileClient.getCurrentNetworkID()
 					let manifestWithLockFee = try await transactionClient.addLockFeeInstructionToManifest(manifest)
-					let manifestWithLockFeeString = manifestWithLockFee.toString(
+					let manifestWithLockFeeString = try manifestWithLockFee.toString(
 						preamble: "",
 						blobOutputFormat: .includeBlobsByByteCountOnly,
 						blobPreamble: "\n\nBLOBS:\n",
