@@ -52,7 +52,9 @@ extension NameNewEntity.View {
 					}
 					.padding([.horizontal, .bottom], .medium1)
 				}
+				#if os(iOS)
 				.toolbar(.visible, for: .navigationBar)
+				#endif
 				.safeAreaInset(edge: .bottom, spacing: 0) {
 					Button(L10n.CreateEntity.NameNewEntity.Name.Button.title) {
 						viewStore.send(.confirmNameButtonTapped)

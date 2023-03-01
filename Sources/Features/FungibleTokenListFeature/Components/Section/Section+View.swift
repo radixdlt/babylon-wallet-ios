@@ -4,23 +4,13 @@ import FeaturePrelude
 extension FungibleTokenList.Section {
 	@MainActor
 	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+		private let store: StoreOf<FungibleTokenList.Section>
 
-		public init(
-			store: Store
-		) {
+		public init(store: StoreOf<FungibleTokenList.Section>) {
 			self.store = store
 		}
-	}
-}
 
-extension FungibleTokenList.Section.View {
-	public var body: some View {
-		WithViewStore(
-			store.actionless,
-			observe: ViewState.init(state:)
-		) { _ in
+		public var body: some SwiftUI.View {
 			LazyVStack(spacing: .zero) {
 				ForEachStore(
 					store.scope(
@@ -37,14 +27,6 @@ extension FungibleTokenList.Section.View {
 			)
 			.padding(.horizontal, .medium3)
 		}
-	}
-}
-
-// MARK: - FungibleTokenList.Section.View.ViewState
-extension FungibleTokenList.Section.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		init(state _: FungibleTokenList.Section.State) {}
 	}
 }
 
