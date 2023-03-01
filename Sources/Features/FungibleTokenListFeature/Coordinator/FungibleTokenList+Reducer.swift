@@ -45,7 +45,7 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 			.forEach(\.sections, action: /Action.child .. ChildAction.section) {
 				FungibleTokenList.Section()
 			}
-			.presentationDestination(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 	}
