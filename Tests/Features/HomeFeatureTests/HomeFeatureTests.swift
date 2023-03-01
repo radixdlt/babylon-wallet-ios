@@ -24,14 +24,15 @@ final class HomeFeatureTests: TestCase {
 		let nftContainer2 = NonFungibleTokenContainer.mock2
 		let nftContainer3 = NonFungibleTokenContainer.mock3
 
-		let totalPortfolio: AccountPortfolioDictionary = [
-			account.address: .init(
+		let portfolios: IdentifiedArrayOf<AccountPortfolio> = .init(uniqueElements: [
+			AccountPortfolio(
+				owner: account.address,
 				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
 				nonFungibleTokenContainers: [nftContainer1, nftContainer2, nftContainer3],
 				poolUnitContainers: [],
 				badgeContainers: []
 			),
-		]
+		])
 
 		let accountRowState = AccountList.Row.State(account: account)
 		let accountDetailsState = AccountDetails.State(for: accountRowState)
@@ -45,13 +46,13 @@ final class HomeFeatureTests: TestCase {
 		)
 
 		// when
-		await store.send(.internal(.fetchPortfolioResult(.success(totalPortfolio)))) { [address] in
+		await store.send(.internal(.accountPortfoliosResult(.success(portfolios)))) { [address] in
 			// then
 			// local dictionary
-			$0.accountPortfolioDictionary = totalPortfolio
+			$0.accountPortfolios = portfolios
 
 			// account list
-			let accountPortfolio = totalPortfolio[address]!
+			let accountPortfolio = portfolios[id: address]!
 			$0.accountList.accounts[id: address]!.portfolio = accountPortfolio
 
 			// account details
@@ -106,14 +107,13 @@ final class HomeFeatureTests: TestCase {
 		let ethContainer = FungibleTokenContainer(owner: address, asset: .eth, amount: 2345, worth: 2345)
 		let xrdContainer = FungibleTokenContainer(owner: address, asset: .xrd, amount: 3456, worth: 3456)
 
-		let accountPortfolio: AccountPortfolioDictionary = [
-			account.address: .init(
-				fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
-				nonFungibleTokenContainers: [],
-				poolUnitContainers: [],
-				badgeContainers: []
-			),
-		]
+		let portfolio = AccountPortfolio(
+			owner: account.address,
+			fungibleTokenContainers: [btcContainer, ethContainer, xrdContainer],
+			nonFungibleTokenContainers: [],
+			poolUnitContainers: [],
+			badgeContainers: []
+		)
 
 		let initialState: Home.State = .init()
 		let store = TestStore(
@@ -122,13 +122,9 @@ final class HomeFeatureTests: TestCase {
 		)
 
 		// when
-		await store.send(.internal(.fetchPortfolioResult(.success(accountPortfolio)))) {
+		await store.send(.internal(.singleAccountPortfolioResult(.success(portfolio)))) {
 			// then
-			guard let key = accountPortfolio.first?.key else {
-				XCTFail("Failed to fetch first account")
-				return
-			}
-			$0.accountPortfolioDictionary[key] = accountPortfolio.first?.value
+			$0.accountPortfolios[id: portfolio.id] = portfolio
 		}
 	}
 }

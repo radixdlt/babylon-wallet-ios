@@ -247,6 +247,7 @@ package.addModules([
 	.client(
 		name: "AccountPortfolioFetcherClient",
 		dependencies: [
+			"EngineToolkitClient",
 			"GatewayAPI",
 		],
 		tests: .yes()
@@ -571,6 +572,7 @@ package.addModules([
 			"Cryptography",
 			"EngineToolkit", // address derivation
 			"P2PModels",
+			"Resources",
 		],
 		tests: .yes(
 			dependencies: [

@@ -1,7 +1,6 @@
 import FeatureTestingPrelude
 import LocalAuthenticationClient
 import OnboardingClient
-import ProfileClient
 @testable import SplashFeature
 
 // MARK: - SplashFeatureTests
@@ -11,22 +10,32 @@ final class SplashFeatureTests: TestCase {
 		let authBiometricsConfig = LocalAuthenticationConfig.neitherBiometricsNorPasscodeSetUp
 
 		let testScheduler = DispatchQueue.test
+
+		//        let newProfile = withDependencies {
+		//            $0.uuid = .incrementing
+		//        } operation: {
+		//            Profile(factorSource: factorSource)
+//
+		//        }
+
 		let store = TestStore(
 			initialState: Splash.State(),
 			reducer: Splash()
-		)
+		) {
+			$0.localAuthenticationClient = LocalAuthenticationClient {
+				authBiometricsConfig
+			}
 
-		store.dependencies.localAuthenticationClient = LocalAuthenticationClient {
-			authBiometricsConfig
+			$0.mainQueue = testScheduler.eraseToAnyScheduler()
+			//            store.dependencies.profileClient.loadProfile = {
+			//                .success(newProfile)
+			//            }
+			$0.onboardingClient.loadProfile = {
+				.newUser
+			}
 		}
-
-		store.dependencies.mainQueue = testScheduler.eraseToAnyScheduler()
 
 		let factorSource = try FactorSource.babylon(mnemonic: .generate())
-		let newProfile = withDependencies { $0.uuid = .incrementing } operation: { Profile(factorSource: factorSource) }
-		store.dependencies.profileClient.loadProfile = {
-			.success(newProfile)
-		}
 
 		// when
 		await store.send(.view(.appeared))
