@@ -1,6 +1,7 @@
 import FeaturePrelude
 import P2PConnectivityClient
 import ProfileClient
+import ROLAClient
 
 // MARK: - DappInteractionHook
 struct DappInteractor: Sendable, FeatureReducer {
@@ -65,6 +66,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.p2pConnectivityClient) var p2pConnectivityClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.rolaClient) var rolaClient
 
 	var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
@@ -105,6 +107,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 								continue
 							}
 
+							try await rolaClient.performWellKnownFileCheck(request.interaction)
 							await send(.internal(.receivedRequestFromDapp(request)))
 						}
 					}

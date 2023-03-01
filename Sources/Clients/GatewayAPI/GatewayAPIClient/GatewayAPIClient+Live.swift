@@ -5,16 +5,6 @@ import ProfileClient
 // MARK: - Date + Sendable
 extension Date: @unchecked Sendable {}
 
-// MARK: - ExpectedHTTPURLResponse
-struct ExpectedHTTPURLResponse: Swift.Error {}
-
-// MARK: - BadHTTPResponseCode
-public struct BadHTTPResponseCode: Swift.Error {
-	public let got: Int
-	public let butExpected = Self.expected
-	static let expected = 200
-}
-
 extension JSONDecoder {
 	static var `default`: JSONDecoder {
 		let decoder = JSONDecoder()

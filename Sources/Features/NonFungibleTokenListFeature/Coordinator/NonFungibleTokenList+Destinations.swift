@@ -1,19 +1,18 @@
 import FeaturePrelude
-import SettingsFeature
 
-extension Main {
+extension NonFungibleTokenList {
 	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Sendable, Hashable {
-			case settings(AppSettings.State)
+			case details(NonFungibleTokenList.Detail.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case settings(AppSettings.Action)
+			case details(NonFungibleTokenList.Detail.Action)
 		}
 
 		public var body: some ReducerProtocolOf<Self> {
-			Scope(state: /State.settings, action: /Action.settings) {
-				AppSettings()
+			Scope(state: /State.details, action: /Action.details) {
+				NonFungibleTokenList.Detail()
 			}
 		}
 	}

@@ -4,16 +4,20 @@ public struct NonFungibleTokenList: Sendable, ReducerProtocol {
 	public init() {}
 
 	public var body: some ReducerProtocolOf<Self> {
-		Reduce { state, action in
+		Reduce<State, Action> { state, action in
 			switch action {
-			case let .child(.asset(_, action: .delegate(.selected(token)))):
-				state.selectedToken = token
+			case let .child(.asset(_, action: .delegate(.selected(detailsState)))):
+				state.destination = .details(detailsState)
 				return .none
-			case let .internal(.view(.selectedTokenChanged(token))):
-				state.selectedToken = token
+			case let .internal(.view(.selectedTokenChanged(detailsState))):
+				if let detailsState {
+					state.destination = .details(detailsState)
+				} else {
+					state.destination = nil
+				}
 				return .none
-			case .child(.details(.delegate(.closeButtonTapped))):
-				state.selectedToken = nil
+			case .child(.destination(.presented(.details(.delegate(.dismiss))))):
+				state.destination = nil
 				return .none
 			case .child:
 				return .none
@@ -22,8 +26,8 @@ public struct NonFungibleTokenList: Sendable, ReducerProtocol {
 		.forEach(\.rows, action: /Action.child .. Action.ChildAction.asset) {
 			NonFungibleTokenList.Row()
 		}
-		.ifLet(\.selectedToken, action: /Action.child .. Action.ChildAction.details) {
-			NonFungibleTokenList.Detail()
+		.presentationDestination(\.$destination, action: /Action.child .. Action.ChildAction.destination) {
+			Destinations()
 		}
 	}
 }

@@ -17,48 +17,21 @@ extension NonFungibleTokenList {
 
 extension NonFungibleTokenList.View {
 	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
-			VStack(spacing: .medium1) {
-				ForEachStore(
-					store.scope(
-						state: \.rows,
-						action: { .child(.asset(id: $0, action: $1)) }
-					),
-					content: { NonFungibleTokenList.Row.View(store: $0) }
-				)
-			}
-			.sheet(
-				unwrapping: viewStore.binding(
-					get: \.selectedToken,
-					send: { .selectedTokenChanged($0) }
+		LazyVStack(spacing: .medium1) {
+			ForEachStore(
+				store.scope(
+					state: \.rows,
+					action: { .child(.asset(id: $0, action: $1)) }
 				),
-				content: { _ in
-					IfLetStore(
-						store.scope(
-							state: \.selectedToken,
-							action: { .child(.details($0)) }
-						),
-						then: { NonFungibleTokenList.Detail.View(store: $0) }
-					)
-				}
+				content: { NonFungibleTokenList.Row.View(store: $0) }
 			)
 		}
-	}
-}
-
-// MARK: - NonFungibleTokenList.View.ViewState
-extension NonFungibleTokenList.View {
-	// MARK: ViewState
-	struct ViewState: Equatable {
-		var selectedToken: NonFungibleTokenList.Detail.State?
-
-		init(state: NonFungibleTokenList.State) {
-			self.selectedToken = state.selectedToken
-		}
+		.sheet(
+			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+			state: /NonFungibleTokenList.Destinations.State.details,
+			action: NonFungibleTokenList.Destinations.Action.details,
+			content: { NonFungibleTokenList.Detail.View(store: $0) }
+		)
 	}
 }
 
@@ -69,7 +42,7 @@ struct NonFungibleTokenList_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleTokenList.View(
 			store: .init(
-				initialState: .init(rows: []),
+				initialState: .init(rows: [.init(container: .mock1)]),
 				reducer: NonFungibleTokenList()
 			)
 		)

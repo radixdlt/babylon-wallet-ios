@@ -155,40 +155,12 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		await store.receive(.internal(.system(.hasAccountsResult(.success(hasAccountsOnNetwork)))))
 	}
 
-	func test__GIVEN__no_existing_accounts_on_a_new_network__THEN__createAccount__is_displayed() async throws {
-		let currentGateway: Gateway = .mardunet
-		let newGateway: Gateway = .nebunet
-		let store = TestStore(
-			initialState: ManageGatewayAPIEndpoints.State(
-				currentGateway: currentGateway,
-				validatedNewGatewayToSwitchTo: newGateway
-			),
-			reducer: ManageGatewayAPIEndpoints()
-		)
-		store.exhaustivity = .off
-		await store.send(.internal(.system(.hasAccountsResult(.success(false)))))
-		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway)))) {
-			$0.createAccountCoordinator = .init(config: .init(
-				specificNetworkID: newGateway.network.id,
-				isFirstEntity: false,
-				canBeDismissed: true,
-				navigationButtonCTA: .goHome
-			))
-		}
-	}
-
-	func test__GIVEN__finish_created_account_on_new_network__THEN__switchTo_is_called_on_networkSwitchingClient() async throws {
+	func test__GIVEN__no_existing_accounts_on_a_new_network__THEN__display_createAccount__flow() async throws {
 		let networkSwitchedTo = ActorIsolated<Gateway?>(nil)
 		let currentGateway: Gateway = .mardunet
 		let newGateway: Gateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				createAccountCoordinator: .init(config: .init(
-					specificNetworkID: newGateway.network.id,
-					isFirstEntity: false,
-					canBeDismissed: true,
-					navigationButtonCTA: .goHome
-				)),
 				currentGateway: currentGateway,
 				validatedNewGatewayToSwitchTo: newGateway
 			),
@@ -200,10 +172,21 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 			}
 		}
 		store.exhaustivity = .off
-		await store.send(.createAccountCoordinator(.delegate(.completed))) {
-			$0.createAccountCoordinator = nil
+		// FIXME: tests should never send internal actions into the store. they should only send view or child actions.
+		await store.send(.internal(.system(.hasAccountsResult(.success(false)))))
+		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway)))) {
+			$0.destination = .createAccount(
+				.init(config: .init(
+					specificNetworkID: newGateway.network.id,
+					isFirstEntity: false,
+					canBeDismissed: true,
+					navigationButtonCTA: .goHome
+				))
+			)
 		}
-
+		await store.send(.child(.destination(.presented(.createAccount(.delegate(.completed)))))) {
+			$0.destination = nil
+		}
 		await store.receive(.internal(.system(.switchToResult(.success(newGateway)))))
 		await networkSwitchedTo.withValue {
 			XCTAssertEqual($0, newGateway)
@@ -214,23 +197,29 @@ final class ManageGatewayAPIEndpointsFeatureTests: TestCase {
 		let newGateway: Gateway = .nebunet
 		let store = TestStore(
 			initialState: ManageGatewayAPIEndpoints.State(
-				createAccountCoordinator: .init(config: .init(
-					specificNetworkID: newGateway.network.id,
-					isFirstEntity: false,
-					canBeDismissed: true,
-					navigationButtonCTA: .goHome
-				)),
 				currentGateway: .mardunet,
 				validatedNewGatewayToSwitchTo: newGateway
 			),
 			reducer: ManageGatewayAPIEndpoints()
 		)
 		store.exhaustivity = .on // we ensure `exhaustivity` is on, to assert nothing happens, i.e. `switchTo` is not called on networkSwitchingClient
-		await store.send(.createAccountCoordinator(.delegate(.dismissed))) {
-			$0.createAccountCoordinator = nil
+		// FIXME: tests should never send internal actions into the store. they should only send view or child actions.
+		await store.send(.internal(.system(.hasAccountsResult(.success(false)))))
+		await store.receive(.internal(.system(.createAccountOnNetworkBeforeSwitchingToIt(newGateway)))) {
+			$0.destination = .createAccount(
+				.init(config: .init(
+					specificNetworkID: newGateway.network.id,
+					isFirstEntity: false,
+					canBeDismissed: true,
+					navigationButtonCTA: .goHome
+				))
+			)
+		}
+		await store.send(.child(.destination(.presented(.createAccount(.delegate(.dismissed)))))) {
+			$0.destination = nil
 			$0.validatedNewGatewayToSwitchTo = nil
 		}
-		// nothing else should happen
+		await store.finish() // nothing else should happen
 	}
 }
 

@@ -97,6 +97,7 @@ package.addModules([
 			"GatewayAPI",
 			"P2PConnectivityClient",
 			"ProfileClient",
+			"ROLAClient",
 			"TransactionSigningFeature",
 		],
 		tests: .yes()
@@ -323,6 +324,11 @@ package.addModules([
 			"LocalAuthenticationClient",
 			"Resources", // L10n for keychain auth prompts
 		],
+		tests: .yes()
+	),
+	.client(
+		name: "ROLAClient",
+		dependencies: [],
 		tests: .yes()
 	),
 	.client(

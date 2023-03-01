@@ -19,13 +19,7 @@ extension NonFungibleTokenList.Detail.View {
 			observe: ViewState.init(state:),
 			send: { .view($0) }
 		) { viewStore in
-			VStack(spacing: .medium2) {
-				NavigationBar(
-					titleText: nil,
-					leadingItem: CloseButton { viewStore.send(.closeButtonTapped) }
-				)
-				.padding([.horizontal, .top], .medium3)
-
+			NavigationStack {
 				ScrollView {
 					VStack(spacing: .medium1) {
 						VStack(spacing: .medium3) {
@@ -102,7 +96,15 @@ extension NonFungibleTokenList.Detail.View {
 							.padding(.vertical, .medium1)
 						}
 					}
+					.padding(.top, .small1)
 				}
+				#if os(iOS)
+				.toolbar {
+					ToolbarItem(placement: .navigationBarLeading) {
+						CloseButton { viewStore.send(.closeButtonTapped) }
+					}
+				}
+				#endif
 			}
 			.foregroundColor(.app.gray1)
 		}
