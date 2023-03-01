@@ -52,7 +52,7 @@ extension ScanQR {
 extension ScanQR.View {
 	@ViewBuilder
 	private func scanQRCode(
-		viewStore: ViewStore<ScanQR.ViewState, ScanQR.ViewAction>
+		viewStore: ViewStoreOf<ScanQR>
 	) -> some View {
 		#if os(iOS) && !targetEnvironment(simulator)
 
@@ -80,7 +80,7 @@ extension ScanQR.View {
 
 	@ViewBuilder
 	private func macOSInputView(
-		viewStore: ViewStore<ScanQR.ViewState, ScanQR.ViewAction>
+		viewStore: ViewStoreOf<ScanQR>
 	) -> some View {
 		#if os(macOS) || (os(iOS) && targetEnvironment(simulator))
 		VStack(alignment: .center) {
