@@ -567,6 +567,8 @@ public enum L10n {
     }
   }
   public enum Settings {
+    /// App Settings
+    public static let appSettingsButtonTitle = L10n.tr("Localizable", "settings.appSettingsButtonTitle", fallback: "App Settings")
     /// Authorized dApps
     public static let authorizedDappsButtonTitle = L10n.tr("Localizable", "settings.authorizedDappsButtonTitle", fallback: "Authorized dApps")
     /// Close

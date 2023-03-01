@@ -43,6 +43,7 @@ public struct AppSettings: FeatureReducer {
 		case editGatewayAPIEndpointButtonTapped
 		case authorizedDappsButtonTapped
 		case personasButtonTapped
+		case appSettingsButtonTapped
 
 		#if DEBUG
 		case debugInspectProfileButtonTapped
@@ -139,6 +140,9 @@ public struct AppSettings: FeatureReducer {
 		case .personasButtonTapped:
 			// TODO: implement
 			state.destination = .personas(.init())
+			return .none
+
+		case .appSettingsButtonTapped:
 			return .none
 
 		#if DEBUG
