@@ -1,29 +1,26 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - _FeatureReducer
-public protocol _FeatureReducer: ReducerProtocol where State: Sendable & Hashable {
+// MARK: - FeatureReducer
+public protocol FeatureReducer: ReducerProtocol where State: Sendable & Hashable, Action == FeatureAction<Self> {
 	associatedtype ViewAction: Sendable & Equatable = Never
 	associatedtype InternalAction: Sendable & Equatable = Never
 	associatedtype ChildAction: Sendable & Equatable = Never
 	associatedtype DelegateAction: Sendable & Equatable = Never
 
+	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action>
+	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action>
+	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action>
+
 	associatedtype View: SwiftUI.View
 }
 
 // MARK: - FeatureAction
-public enum FeatureAction<Feature: _FeatureReducer>: Sendable, Equatable {
+public enum FeatureAction<Feature: FeatureReducer>: Sendable, Equatable {
 	case view(Feature.ViewAction)
 	case `internal`(Feature.InternalAction)
 	case child(Feature.ChildAction)
 	case delegate(Feature.DelegateAction)
-}
-
-// MARK: - FeatureReducer
-public protocol FeatureReducer: _FeatureReducer where Action == FeatureAction<Self> {
-	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action>
-	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action>
-	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action>
 }
 
 extension ReducerProtocol where Self: FeatureReducer {
