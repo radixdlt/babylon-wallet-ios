@@ -22,15 +22,13 @@ extension TransactionManifest {
 
 		public init?(error: Error) {
 			guard case let .deserializeResponseFailure(.errorResponse(json)) = error as? EngineToolkit.Error else { return nil }
-			guard let dict = json.dictionary, let errorType = dict["error"]?.string else { return nil }
+			guard let errorType = json["error"]?.string else { return nil }
 			switch errorType {
 			case "NetworkMismatchError":
-				let found = dict["found"]?.int.map(UInt.init)
-				let expected = dict["expected"]?.int.map(UInt.init)
-				self = .networkMismatch(found: found, expected: expected)
+				self = .networkMismatch(found: json["found"]?.uint,
+				                        expected: json["expected"]?.uint)
 			case "ManifestGenerationError":
-				let message = dict["message"]?.string
-				self = .manifestGeneration(messsage: message)
+				self = .manifestGeneration(messsage: json["message"]?.string)
 			default:
 				return nil
 			}

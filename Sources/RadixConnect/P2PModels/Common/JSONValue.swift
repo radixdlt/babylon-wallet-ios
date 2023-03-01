@@ -137,3 +137,15 @@ extension JSONValue {
 		}
 	}
 }
+
+// MARK: - Even More Convenience
+
+extension JSONValue {
+	public var uint: UInt? {
+		int.map(UInt.init)
+	}
+
+	public subscript(key: String) -> JSONValue? {
+		dictionary?[key]
+	}
+}
