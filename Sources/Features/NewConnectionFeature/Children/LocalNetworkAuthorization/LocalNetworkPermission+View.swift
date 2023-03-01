@@ -9,19 +9,17 @@ extension LocalNetworkPermission {
 		public init(store: StoreOf<LocalNetworkPermission>) {
 			self.store = store
 		}
-	}
-}
 
-extension LocalNetworkPermission.View {
-	public var body: some View {
-		ZStack {}
-			.alert(
-				store: store.scope(
-					state: \.$permissionDeniedAlert,
-					action: { .view(.permissionDeniedAlert($0)) }
+		public var body: some SwiftUI.View {
+			ZStack {}
+				.alert(
+					store: store.scope(
+						state: \.$permissionDeniedAlert,
+						action: { .view(.permissionDeniedAlert($0)) }
+					)
 				)
-			)
-			.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+				.onAppear { ViewStore(store.stateless).send(.view(.appeared)) }
+		}
 	}
 }
 
