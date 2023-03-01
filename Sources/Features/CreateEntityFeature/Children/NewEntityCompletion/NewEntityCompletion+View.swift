@@ -47,13 +47,14 @@ extension NewEntityCompletion.View {
 
 				Spacer()
 			}
+			.padding(.medium1)
 			.safeAreaInset(edge: .bottom, spacing: 0) {
 				Button(L10n.CreateEntity.Completion.goToDestination(viewStore.destinationDisplayText)) {
 					viewStore.send(.goToDestination)
 				}
 				.buttonStyle(.primaryRectangular)
+				.padding(.medium1)
 			}
-			.padding(.medium1)
 		}
 	}
 }
