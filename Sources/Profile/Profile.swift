@@ -16,7 +16,8 @@ extension ProfileSnapshot.Version {
 	/// - 15: Add `"creatingDevice"` property
 	/// - 16: Add `"gateways"` replacing `"networkAndGateway"`
 	/// - 17: Rename `"authorizedDapps"` -> `"authorizedDapps"`
-	public static let minimum: Self = 17
+	/// - 18: Add `isCurrencyAmountVisible` to app preferences.
+	public static let minimum: Self = 18
 }
 
 // MARK: - Profile

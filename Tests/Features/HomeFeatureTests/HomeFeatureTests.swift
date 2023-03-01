@@ -126,5 +126,6 @@ final class HomeFeatureTests: TestCase {
 			// then
 			$0.accountPortfolios[id: portfolio.id] = portfolio
 		}
+		await store.receive(.internal(.accountPortfoliosResult(.success(store.state.accountPortfolios))))
 	}
 }
