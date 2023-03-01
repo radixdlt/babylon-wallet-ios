@@ -55,7 +55,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		case destination(PresentationActionOf<AssetTransfer.Destinations>)
 	}
 
-	public struct Destinations: ReducerProtocol {
+	public struct Destinations: Sendable, ReducerProtocol {
 		public enum State: Hashable {
 			case transactionSigning(TransactionSigning.State)
 		}
