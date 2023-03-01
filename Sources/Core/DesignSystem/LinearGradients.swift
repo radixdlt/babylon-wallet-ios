@@ -38,7 +38,7 @@ struct LinearGradients_Previews: PreviewProvider {
 	static var previews: some View {
 		let gradients: [Gradient] = (0 ..< 12).map(Gradient.init)
 
-		NavigationView {
+		NavigationStack {
 			List(0 ..< gradients.count, id: \.self) { i in
 				HStack(spacing: 20) {
 					Circle().fill(gradients[i]).frame(width: 64, height: 64)

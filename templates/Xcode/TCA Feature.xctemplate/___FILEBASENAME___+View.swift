@@ -1,14 +1,14 @@
 import FeaturePrelude
 
 extension ___VARIABLE_featureName___.State {
-	public var viewState: ___VARIABLE_featureName___.ViewState {
+	var viewState: ___VARIABLE_featureName___.ViewState {
 		.init()
 	}
 }
 
 // MARK: - ___VARIABLE_featureName___.View
 extension ___VARIABLE_featureName___ {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		// TODO: declare some properties
 	}
 
