@@ -40,4 +40,8 @@ extension LocalNetworkPermission {
 		}
 	}
 }
+
+extension LocalNetworkPermission.State {
+	public static let previewValue: Self = .init()
+}
 #endif
