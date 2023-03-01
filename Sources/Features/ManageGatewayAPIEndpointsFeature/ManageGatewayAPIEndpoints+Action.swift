@@ -6,10 +6,8 @@ extension ManageGatewayAPIEndpoints {
 	public enum Action: Sendable, Equatable {
 		public static func view(_ action: ViewAction) -> Self { .internal(.view(action)) }
 		case `internal`(InternalAction)
+		case child(ChildAction)
 		case delegate(DelegateAction)
-
-		/// Child
-		case createAccountCoordinator(CreateAccountCoordinator.Action)
 	}
 }
 
@@ -40,6 +38,13 @@ extension ManageGatewayAPIEndpoints.Action {
 		case hasAccountsResult(TaskResult<Bool>)
 		case createAccountOnNetworkBeforeSwitchingToIt(Gateway)
 		case switchToResult(TaskResult<Gateway>)
+	}
+}
+
+// MARK: - ManageGatewayAPIEndpoints.Action.ChildAction
+extension ManageGatewayAPIEndpoints.Action {
+	public enum ChildAction: Sendable, Equatable {
+		case destination(PresentationActionOf<ManageGatewayAPIEndpoints.Destinations>)
 	}
 }
 

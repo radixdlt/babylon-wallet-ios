@@ -4,7 +4,8 @@ import FeaturePrelude
 // MARK: - ManageGatewayAPIEndpoints.State
 extension ManageGatewayAPIEndpoints {
 	public struct State: Sendable, Hashable {
-		public var createAccountCoordinator: CreateAccountCoordinator.State?
+		@PresentationState
+		public var destination: Destinations.State?
 
 		public var urlString: String
 		public var currentGateway: Gateway?
@@ -15,14 +16,12 @@ extension ManageGatewayAPIEndpoints {
 		@BindingState public var focusedField: Field?
 
 		public init(
-			createAccountCoordinator: CreateAccountCoordinator.State? = nil,
 			urlString: String = "",
 			currentGateway: Gateway? = nil,
 			validatedNewGatewayToSwitchTo: Gateway? = nil,
 			isSwitchToButtonEnabled: Bool = false,
 			isValidatingEndpoint: Bool = false
 		) {
-			self.createAccountCoordinator = createAccountCoordinator
 			self.urlString = urlString
 			self.currentGateway = currentGateway
 			self.validatedNewGatewayToSwitchTo = validatedNewGatewayToSwitchTo
