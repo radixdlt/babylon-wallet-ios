@@ -2,7 +2,7 @@ import FeaturePrelude
 
 // MARK: - NonFungibleTokenList.Detail.View
 extension NonFungibleTokenList.Detail {
-	struct ViewState: Equatable {
+	public struct ViewState: FeatureViewState {
 		var nftID: AddressView.ViewState
 		var fullNFTAddress: String
 		var description: String?
@@ -10,7 +10,7 @@ extension NonFungibleTokenList.Detail {
 		var fullResourceAddress: String
 		var resourceName: String?
 
-		init(state: NonFungibleTokenList.Detail.State) {
+		public init(state: NonFungibleTokenList.Detail.State) {
 			nftID = .init(address: state.asset.id.stringRepresentation)
 			fullNFTAddress = state.container.nftAddress(for: state.asset)
 			description = state.container.description
@@ -32,11 +32,7 @@ extension NonFungibleTokenList.Detail {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: ViewState.init(state:),
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store) { viewStore in
 				NavigationStack {
 					ScrollView {
 						VStack(spacing: .medium1) {

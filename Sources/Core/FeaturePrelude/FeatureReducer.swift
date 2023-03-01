@@ -12,6 +12,7 @@ public protocol FeatureReducer: ReducerProtocol where State: Sendable & Hashable
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action>
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action>
 
+	associatedtype ViewState: Equatable = Never
 	associatedtype View: SwiftUI.View
 }
 
@@ -57,3 +58,25 @@ extension ReducerProtocol where Self: FeatureReducer {
 }
 
 public typealias PresentationStoreOf<R: ReducerProtocol> = Store<PresentationStateOf<R>, PresentationActionOf<R>>
+
+// MARK: - FeatureViewState
+public protocol FeatureViewState<State>: Equatable {
+	associatedtype State
+	init(state: State)
+}
+
+public typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewState, Feature.ViewAction>
+
+extension WithViewStore where Content: View {
+	public init<Feature: FeatureReducer>(
+		_ store: StoreOf<Feature>,
+		content: @escaping (ViewStoreOf<Feature>) -> Content
+	) where Feature.ViewState: FeatureViewState<Feature.State>, ViewState == Feature.ViewState, ViewAction == Feature.ViewAction {
+		self.init(
+			store,
+			observe: ViewState.init(state:),
+			send: { .view($0) },
+			content: content
+		)
+	}
+}
