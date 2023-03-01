@@ -24,7 +24,7 @@ extension Profile {
 extension AppPreferences {
 	/// Appends a new `P2PClient`, returns `nil` if it was not inserted (because already present).
 	@discardableResult
-	internal mutating func appendP2PClient(_ p2pClient: P2PClient) -> P2PClient? {
+	public mutating func appendP2PClient(_ p2pClient: P2PClient) -> P2PClient? {
 		self.p2pClients.append(p2pClient)
 	}
 }

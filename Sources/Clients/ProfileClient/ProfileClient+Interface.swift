@@ -35,6 +35,12 @@ public struct ProfileClient: Sendable {
 
 	// To: AuthorizedDappsClient
 
+	// To: AppPreferencesClient
+
+	// To: P2PClientsClient
+	public var getP2PClients: GetP2PClients
+	public var addP2PClient: AddP2PClient
+
 	// MARK: - Not Yet Migrated
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
@@ -44,11 +50,9 @@ public struct ProfileClient: Sendable {
 	public var extractProfileSnapshot: ExtractProfileSnapshot
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
-	public var getP2PClients: GetP2PClients
 	public var getAuthorizedDapps: GetAuthorizedDapps
 	public var addAuthorizedDapp: AddAuthorizedDapp
 	public var forgetAuthorizedDapp: ForgetAuthorizedDapp
-	public var addP2PClient: AddP2PClient
 	public var updateAuthorizedDapp: UpdateAuthorizedDapp
 	public var disconnectPersonaFromDapp: DisconnectPersonaFromDapp
 	public var detailsForAuthorizedDapp: DetailsForAuthorizedDapp

@@ -347,7 +347,23 @@ package.addModules([
 	),
 
 	.client(
-		name: "P2PConnectivityClient",
+		name: "P2PClientsClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "P2PClientsClientLive",
+		dependencies: [
+			"P2PClientsClient",
+			"AppPreferencesClientLive",
+		],
+		tests: .yes()
+	),
+
+	.client(
+		name: "P2PConnectivityClient", // FIXME: once @ghenadie merges multichannel support, rename this `RadixConnectClient`?
 		dependencies: [
 			"P2PConnection",
 			"ProfileClient",

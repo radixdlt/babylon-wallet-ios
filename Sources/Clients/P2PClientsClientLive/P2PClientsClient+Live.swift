@@ -1,0 +1,27 @@
+import AppPreferencesClientLive
+import ClientPrelude
+import P2PClientsClient
+import ProfileStore
+
+extension P2PClientsClient: DependencyKey {
+	public typealias Value = P2PClientsClient
+
+	public static func live(
+		profileStore: ProfileStore = .shared
+	) -> Self {
+		@Dependency(\.appPreferencesClient) var appPreferencesClient
+
+		return Self(
+			getP2PClients: {
+				try await appPreferencesClient.loadPreferences().p2pClients
+			},
+			addP2PClient: { newClient in
+				try await appPreferencesClient.updating {
+					_ = $0.appendP2PClient(newClient)
+				}
+			}
+		)
+	}
+
+	public static let liveValue: Self = .live()
+}
