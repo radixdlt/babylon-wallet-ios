@@ -11,7 +11,7 @@ extension AuthorizedDapps {
 		}
 	}
 
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let dApps: OnNetwork.AuthorizedDapps
 	}
 }

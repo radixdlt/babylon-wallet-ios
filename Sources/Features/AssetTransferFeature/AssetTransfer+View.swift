@@ -2,7 +2,7 @@ import FeaturePrelude
 import TransactionSigningFeature
 
 extension AssetTransfer.State {
-	fileprivate var viewState: AssetTransfer.ViewState {
+	var viewState: AssetTransfer.ViewState {
 		.init(
 			input: .init(
 				fromAddress: .init(
@@ -28,7 +28,7 @@ extension AssetTransfer.State {
 
 // MARK: - AssetTransfer.View
 extension AssetTransfer {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		struct Input: Equatable {
 			let fromAddress: AddressView.ViewState
 			let amount: String

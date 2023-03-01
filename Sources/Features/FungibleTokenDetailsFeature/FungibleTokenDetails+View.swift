@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 extension FungibleTokenDetails.State {
-	fileprivate var viewState: FungibleTokenDetails.ViewState {
+	var viewState: FungibleTokenDetails.ViewState {
 		.init(
 			displayName: asset.name ?? "",
 			iconURL: asset.iconURL,
@@ -17,7 +17,7 @@ extension FungibleTokenDetails.State {
 
 // MARK: - FungibleTokenDetails.View
 extension FungibleTokenDetails {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let displayName: String
 		let iconURL: URL?
 		let placeholderAsset: ImageAsset

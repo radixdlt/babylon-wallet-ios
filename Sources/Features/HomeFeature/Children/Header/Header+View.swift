@@ -7,7 +7,7 @@ extension Header.State {
 }
 
 extension Header {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let hasNotification: Bool
 	}
 

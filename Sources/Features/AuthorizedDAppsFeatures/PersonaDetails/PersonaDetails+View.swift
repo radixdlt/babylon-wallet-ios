@@ -12,7 +12,7 @@ extension PersonaDetails {
 		}
 	}
 
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let url: URL
 		let personaName: String
 	}

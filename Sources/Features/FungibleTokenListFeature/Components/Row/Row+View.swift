@@ -1,7 +1,7 @@
 import FeaturePrelude
 
 extension FungibleTokenList.Row.State {
-	fileprivate var viewState: FungibleTokenList.Row.ViewState {
+	var viewState: FungibleTokenList.Row.ViewState {
 		.init(
 			container: container,
 			currency: currency,
@@ -12,7 +12,7 @@ extension FungibleTokenList.Row.State {
 
 // MARK: - FungibleTokenList.Row.View
 extension FungibleTokenList.Row {
-	public struct ViewState: Equatable {
+	struct ViewState: Equatable {
 		let container: FungibleTokenContainer
 		let currency: FiatCurrency
 		let isCurrencyAmountVisible: Bool
@@ -28,10 +28,56 @@ extension FungibleTokenList.Row {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				tokenRow(with: viewStore, container: viewStore.container)
-					.padding(.horizontal, .medium1)
-					.contentShape(Rectangle())
-					.onTapGesture { viewStore.send(.tapped) }
+				ZStack {
+					HStack(alignment: .center) {
+						HStack(spacing: .small1) {
+							LazyImage(url: viewStore.container.asset.iconURL) { _ in
+								Image(asset: .placeholderImage(isXRD: viewStore.container.asset.isXRD))
+									.resizable()
+									.frame(.small)
+							}
+
+							Text(viewStore.container.asset.symbol ?? "")
+								.foregroundColor(.app.gray1)
+								.textStyle(.body2HighImportance)
+						}
+
+						Spacer()
+
+						VStack(alignment: .trailing, spacing: .small3) {
+							Text(
+								tokenAmount(
+									amount: viewStore.container.amount,
+									isVisible: viewStore.isCurrencyAmountVisible
+								)
+							)
+							.foregroundColor(.app.gray1)
+							.textStyle(.secondaryHeader)
+
+							// TODO: uncomment when fiat value ready for implementation
+							/*
+							 Text(
+							 tokenValue(
+							 container.worth,
+							 isVisible: viewStore.isCurrencyAmountVisible,
+							 currency: viewStore.currency
+							 )
+							 )
+							 .foregroundColor(.app.gray2)
+							 .textStyle(.body2Regular)
+							 */
+						}
+					}
+
+					VStack {
+						Spacer()
+						Separator()
+					}
+				}
+				.frame(height: .large1 * 2)
+				.padding(.horizontal, .medium1)
+				.contentShape(Rectangle())
+				.onTapGesture { viewStore.send(.tapped) }
 			}
 		}
 	}
@@ -39,56 +85,6 @@ extension FungibleTokenList.Row {
 
 // MARK: - Private Methods
 extension FungibleTokenList.Row.View {
-	fileprivate func tokenRow(with viewStore: ViewStoreOf<FungibleTokenList.Row>, container: FungibleTokenContainer) -> some View {
-		ZStack {
-			HStack(alignment: .center) {
-				HStack(spacing: .small1) {
-					LazyImage(url: container.asset.iconURL) { _ in
-						Image(asset: .placeholderImage(isXRD: viewStore.container.asset.isXRD))
-							.resizable()
-							.frame(.small)
-					}
-
-					Text(container.asset.symbol ?? "")
-						.foregroundColor(.app.gray1)
-						.textStyle(.body2HighImportance)
-				}
-
-				Spacer()
-
-				VStack(alignment: .trailing, spacing: .small3) {
-					Text(
-						tokenAmount(
-							amount: container.amount,
-							isVisible: viewStore.isCurrencyAmountVisible
-						)
-					)
-					.foregroundColor(.app.gray1)
-					.textStyle(.secondaryHeader)
-
-					// TODO: uncomment when fiat value ready for implementation
-					/*
-					 Text(
-					     tokenValue(
-					         container.worth,
-					         isVisible: viewStore.isCurrencyAmountVisible,
-					         currency: viewStore.currency
-					     )
-					 )
-					 .foregroundColor(.app.gray2)
-					 .textStyle(.body2Regular)
-					 */
-				}
-			}
-
-			VStack {
-				Spacer()
-				Separator()
-			}
-		}
-		.frame(height: .large1 * 2)
-	}
-
 	fileprivate func tokenAmount(
 		amount: BigDecimal?,
 		isVisible: Bool

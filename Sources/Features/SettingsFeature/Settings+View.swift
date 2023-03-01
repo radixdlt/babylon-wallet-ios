@@ -21,7 +21,7 @@ extension AppSettings {
 		}
 	}
 
-	struct ViewState: Equatable {
+	public struct ViewState: Equatable {
 		#if DEBUG
 		let isDebugProfileViewSheetPresented: Bool
 		let profileToInspect: Profile?
