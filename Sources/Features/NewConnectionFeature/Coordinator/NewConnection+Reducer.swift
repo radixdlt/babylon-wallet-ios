@@ -103,6 +103,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 			return .none
 
 		case let .connectUsingSecrets(.delegate(.connected(connection))):
+			return .send(.delegate(.newConnection(connection)))
 			return .run { send in
 				await send(.delegate(.newConnection(connection)))
 			}
