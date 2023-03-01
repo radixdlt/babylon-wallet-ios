@@ -19,6 +19,11 @@ extension P2PClientsClient: DependencyKey {
 				try await appPreferencesClient.updating {
 					_ = $0.appendP2PClient(newClient)
 				}
+			},
+			deleteP2PClientByID: { id in
+				try await appPreferencesClient.updating {
+					$0.p2pClients.clients.removeAll(where: { $0.id == id })
+				}
 			}
 		)
 	}

@@ -42,10 +42,14 @@ public struct ProfileClient: Sendable {
 	public var detailsForAuthorizedDapp: DetailsForAuthorizedDapp
 
 	// To: AppPreferencesClient
+	public var getAppPreferences: GetAppPreferences
+	public var setDisplayAppPreferences: SetDisplayAppPreferences
 
 	// To: P2PClientsClient
 	public var getP2PClients: GetP2PClients
 	public var addP2PClient: AddP2PClient
+
+	public var deleteP2PClientByID: DeleteP2PClientByID
 
 	// To: GatewaysClient
 	public var getCurrentNetworkID: GetCurrentNetworkID
@@ -57,9 +61,7 @@ public struct ProfileClient: Sendable {
 	public var extractProfileSnapshot: ExtractProfileSnapshot
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
-	public var deleteP2PClientByID: DeleteP2PClientByID
-	public var getAppPreferences: GetAppPreferences
-	public var setDisplayAppPreferences: SetDisplayAppPreferences
+	// MARK: OBSOLETE (remove)
 	public var createUnsavedVirtualEntity: CreateUnsavedVirtualEntity
 
 	public init(
