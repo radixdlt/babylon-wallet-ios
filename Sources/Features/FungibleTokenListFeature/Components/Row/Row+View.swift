@@ -3,9 +3,27 @@ import FeaturePrelude
 extension FungibleTokenList.Row.State {
 	var viewState: FungibleTokenList.Row.ViewState {
 		.init(
-			container: container,
-			currency: currency,
-			isCurrencyAmountVisible: isCurrencyAmountVisible
+			isXRD: container.asset.isXRD,
+			iconURL: container.asset.iconURL,
+			symbol: container.asset.symbol ?? "",
+			tokenAmount: {
+				if isCurrencyAmountVisible {
+					return container.amount.format()
+				} else {
+					return "••••"
+				}
+			}(),
+			tokenValue: {
+				if isCurrencyAmountVisible {
+					if let value = container.worth {
+						return "\(value.format()) \(currency.symbol)"
+					} else {
+						return "\(currency.sign) -"
+					}
+				} else {
+					return "\(currency.sign) ••••"
+				}
+			}()
 		)
 	}
 }
@@ -13,9 +31,11 @@ extension FungibleTokenList.Row.State {
 // MARK: - FungibleTokenList.Row.View
 extension FungibleTokenList.Row {
 	struct ViewState: Equatable {
-		let container: FungibleTokenContainer
-		let currency: FiatCurrency
-		let isCurrencyAmountVisible: Bool
+		let isXRD: Bool
+		let iconURL: URL?
+		let symbol: String
+		let tokenAmount: String
+		let tokenValue: String
 	}
 
 	@MainActor
@@ -31,13 +51,13 @@ extension FungibleTokenList.Row {
 				ZStack {
 					HStack(alignment: .center) {
 						HStack(spacing: .small1) {
-							LazyImage(url: viewStore.container.asset.iconURL) { _ in
-								Image(asset: .placeholderImage(isXRD: viewStore.container.asset.isXRD))
+							LazyImage(url: viewStore.iconURL) { _ in
+								Image(asset: .placeholderImage(isXRD: viewStore.isXRD))
 									.resizable()
 									.frame(.small)
 							}
 
-							Text(viewStore.container.asset.symbol ?? "")
+							Text(viewStore.symbol)
 								.foregroundColor(.app.gray1)
 								.textStyle(.body2HighImportance)
 						}
@@ -45,24 +65,13 @@ extension FungibleTokenList.Row {
 						Spacer()
 
 						VStack(alignment: .trailing, spacing: .small3) {
-							Text(
-								tokenAmount(
-									amount: viewStore.container.amount,
-									isVisible: viewStore.isCurrencyAmountVisible
-								)
-							)
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
+							Text(viewStore.tokenAmount)
+								.foregroundColor(.app.gray1)
+								.textStyle(.secondaryHeader)
 
 							// TODO: uncomment when fiat value ready for implementation
 							/*
-							 Text(
-							 tokenValue(
-							 container.worth,
-							 isVisible: viewStore.isCurrencyAmountVisible,
-							 currency: viewStore.currency
-							 )
-							 )
+							 Text(viewStore.tokenValue)
 							 .foregroundColor(.app.gray2)
 							 .textStyle(.body2Regular)
 							 */
@@ -79,32 +88,6 @@ extension FungibleTokenList.Row {
 				.contentShape(Rectangle())
 				.onTapGesture { viewStore.send(.tapped) }
 			}
-		}
-	}
-}
-
-// MARK: - Private Methods
-extension FungibleTokenList.Row.View {
-	fileprivate func tokenAmount(
-		amount: BigDecimal?,
-		isVisible: Bool
-	) -> String {
-		guard isVisible else { return "••••" }
-		guard let amount else {
-			return "-"
-		}
-		return amount.format()
-	}
-
-	fileprivate func tokenValue(_ value: BigDecimal?, isVisible: Bool, currency: FiatCurrency) -> String {
-		if isVisible {
-			if let value {
-				return "\(value.format()) \(currency.symbol)"
-			} else {
-				return "\(currency.sign) -"
-			}
-		} else {
-			return "\(currency.sign) ••••"
 		}
 	}
 }
