@@ -19,7 +19,7 @@ public struct FungibleTokenList: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case section(id: FungibleTokenCategory.CategoryType, action: FungibleTokenList.Section.Action)
-		case destination(PresentationActionOf<FungibleTokenList.Destinations>)
+		case destination(PresentationAction<FungibleTokenList.Destinations.Action>)
 	}
 
 	public struct Destinations: Sendable, ReducerProtocol {
