@@ -1,4 +1,5 @@
 import ClientTestingPrelude
+import GatewayAPI
 @testable import ROLAClient
 
 // MARK: - ROLAClientTests
@@ -12,6 +13,13 @@ final class ROLAClientTests: TestCase {
 
 	private let wellKnownFilePath = ".well-known/radix.json"
 	private let dAppDefinitionAddress = try! DappDefinitionAddress(address: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh")
+	let ledgerState = GatewayAPI.LedgerState(
+		network: "network-deadbeef",
+		stateVersion: 0,
+		proposerRoundTimestamp: "timestamp-deadbeef",
+		epoch: 0,
+		round: 0
+	)
 	private func interaction(
 		origin: String,
 		dAppDefinitionAddress: DappDefinitionAddress
@@ -51,7 +59,7 @@ final class ROLAClientTests: TestCase {
 		try await super.tearDown()
 	}
 
-	func testHappyPath() async throws {
+	func testHappyPath_performWellKnownFileCheck() async throws {
 		// given
 		let origin = "https://origin.com"
 		let interaction = interaction(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
@@ -79,6 +87,95 @@ final class ROLAClientTests: TestCase {
 			$0.urlSession = urlSession
 		} operation: {
 			try await sut.performWellKnownFileCheck(interaction)
+		}
+	}
+
+	func testHappyPath_performDappDefinitionVerification() async throws {
+		// given
+		let origin = "https://origin.com"
+		let interaction = interaction(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
+		let accountType = "dapp definition"
+		let metadata = GatewayAPI.EntityMetadataCollection(items: [
+			.init(key: "account_type", value: accountType),
+			.init(key: "related_websites", value: origin),
+		])
+
+		// when
+		try await withDependencies {
+			$0.gatewayAPIClient.resourceDetailsByResourceIdentifier = { _ in
+				GatewayAPI.EntityDetailsResponse(
+					ledgerState: self.ledgerState,
+					address: "address-deadbeef",
+					metadata: metadata
+				)
+			}
+		} operation: {
+			try await sut.performDappDefinitionVerification(interaction)
+		}
+	}
+
+	func testUnhappyPath_whenAccountTypeIsWrong_thenWrongAccountTypeErrorIsThrown() async throws {
+		// given
+		let origin = "https://origin.com"
+		let interaction = interaction(origin: origin, dAppDefinitionAddress: dAppDefinitionAddress)
+		let wrongAccountType = "wrong account type"
+
+		let metadata = GatewayAPI.EntityMetadataCollection(items: [
+			.init(key: "account_type", value: wrongAccountType),
+			.init(key: "related_websites", value: origin),
+		])
+
+		let expectedError = ROLAFailure.wrongAccountType
+
+		// when
+		await withDependencies {
+			$0.gatewayAPIClient.resourceDetailsByResourceIdentifier = { _ in
+				GatewayAPI.EntityDetailsResponse(
+					ledgerState: self.ledgerState,
+					address: "address-deadbeef",
+					metadata: metadata
+				)
+			}
+		} operation: {
+			do {
+				try await sut.performDappDefinitionVerification(interaction)
+				XCTFail("Expected error: wrongAccountType")
+			} catch {
+				XCTAssertEqual(error as! ROLAFailure, expectedError)
+			}
+		}
+	}
+
+	func testUnhappyPath_whenOriginIsUnknown_thenUnknownWebsiteErrorIsThrown() async throws {
+		// given
+		let origin = "https://origin.com"
+		let originFromDapp = "https://someotherorigin.com"
+		let interaction = interaction(origin: originFromDapp, dAppDefinitionAddress: dAppDefinitionAddress)
+		let accountType = "dapp definition"
+
+		let metadata = GatewayAPI.EntityMetadataCollection(items: [
+			.init(key: "account_type", value: accountType),
+			.init(key: "related_websites", value: origin),
+		])
+
+		let expectedError = ROLAFailure.unknownWebsite
+
+		// when
+		await withDependencies {
+			$0.gatewayAPIClient.resourceDetailsByResourceIdentifier = { _ in
+				GatewayAPI.EntityDetailsResponse(
+					ledgerState: self.ledgerState,
+					address: "address-deadbeef",
+					metadata: metadata
+				)
+			}
+		} operation: {
+			do {
+				try await sut.performDappDefinitionVerification(interaction)
+				XCTFail("Expected error: unknownWebsite")
+			} catch {
+				XCTAssertEqual(error as! ROLAFailure, expectedError)
+			}
 		}
 	}
 
