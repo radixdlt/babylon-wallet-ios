@@ -3,18 +3,21 @@ import Foundation
 @testable import RadixConnect
 
 final class MockWebSocketClient: SignalingTransport, Sendable {
+	var incommingMessages: AsyncStream<Data>
+
+	func cancel() {}
+
 	let stateStream: AsyncStream<URLSessionWebSocketTask.State>
-	let incommingMessages: AsyncThrowingStream<Data, Error>
 	private let sentMessages: AsyncStream<Data>
 
 	private let sentMessagesStreamContinuation: AsyncStream<Data>.Continuation!
 	private let stateStreamContinuation: AsyncStream<URLSessionWebSocketTask.State>.Continuation!
-	private let messagesStreamContinuation: AsyncThrowingStream<Data, Error>.Continuation!
+	private let messagesStreamContinuation: AsyncStream<Data>.Continuation!
 
 	lazy var sentMessagesSequence: AnyAsyncSequence<Data> = sentMessages.eraseToAnyAsyncSequence().share().eraseToAnyAsyncSequence()
 
 	init() {
-		(incommingMessages, messagesStreamContinuation) = AsyncThrowingStream<Data, Error>.streamWithContinuation()
+		(incommingMessages, messagesStreamContinuation) = AsyncStream<Data>.streamWithContinuation()
 		(sentMessages, sentMessagesStreamContinuation) = AsyncStream<Data>.streamWithContinuation()
 		(stateStream, stateStreamContinuation) = AsyncStream<URLSessionWebSocketTask.State>.streamWithContinuation()
 	}

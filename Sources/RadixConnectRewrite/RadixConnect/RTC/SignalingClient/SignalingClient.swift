@@ -7,7 +7,7 @@ protocol SignalingTransport: Sendable {
 	var incommingMessages: AsyncStream<Data> { get }
 	func send(message: Data) async throws
 
-	func cancel()
+	func cancel() async
 }
 
 // MARK: - ClientSource
@@ -100,7 +100,9 @@ struct SignalingClient {
 	}
 
 	func cancel() {
-		webSocketClient.cancel()
+		Task {
+			await webSocketClient.cancel()
+		}
 	}
 
 	func sendToRemote(_ primitive: IdentifiedPrimitive<RTCPrimitive>) async throws {

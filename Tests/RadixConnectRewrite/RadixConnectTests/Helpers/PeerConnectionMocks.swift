@@ -15,6 +15,8 @@ final class MockPeerConnectionFactory: PeerConnectionFactory {
 
 // MARK: - MockPeerConnectionDelegate
 final class MockPeerConnectionDelegate: PeerConnectionDelegate {
+	func cancel() {}
+
 	let onNegotiationNeeded: AsyncStream<Void>
 	let onIceConnectionState: AsyncStream<ICEConnectionState>
 	let onSignalingState: AsyncStream<SignalingState>
@@ -45,10 +47,14 @@ final class MockPeerConnectionDelegate: PeerConnectionDelegate {
 	func generateICECandiddate(_ candidate: RTCPrimitive.ICECandidate) {
 		onGeneratedICECandidateContinuation.yield(candidate)
 	}
+
+	func close() {}
 }
 
 // MARK: - MockPeerConnection
 final class MockPeerConnection: PeerConnection {
+	func close() {}
+
 	func setRemoteAnswer(_ answer: RadixConnect.RTCPrimitive.Answer) async throws {}
 
 	func createOffer() async throws -> RadixConnect.RTCPrimitive.Offer {

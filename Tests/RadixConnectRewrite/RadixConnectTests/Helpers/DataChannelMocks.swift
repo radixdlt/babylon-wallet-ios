@@ -19,6 +19,8 @@ final class DataChannelMock: DataChannel {
 
 // MARK: - DataChannelDelegateMock
 final class DataChannelDelegateMock: DataChannelDelegate, Sendable {
+	func cancel() {}
+
 	let onMessageReceived: AsyncStream<Data>
 	let onReadyState: AsyncStream<DataChannelState>
 
