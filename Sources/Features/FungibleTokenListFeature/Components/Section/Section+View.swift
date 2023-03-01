@@ -2,8 +2,6 @@ import FeaturePrelude
 
 // MARK: - FungibleTokenList.Section.View
 extension FungibleTokenList.Section {
-	public typealias ViewState = Never
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<FungibleTokenList.Section>
