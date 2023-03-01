@@ -44,6 +44,8 @@ public struct ProfileClient: Sendable {
 	// To: AppPreferencesClient
 	public var getAppPreferences: GetAppPreferences
 	public var setDisplayAppPreferences: SetDisplayAppPreferences
+	public var extractProfileSnapshot: ExtractProfileSnapshot
+	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
 	// To: P2PClientsClient
 	public var getP2PClients: GetP2PClients
@@ -56,10 +58,6 @@ public struct ProfileClient: Sendable {
 	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
 	public var getGateways: GetGateways
 	public var setGateway: SetGateway
-
-	// MARK: - Not Yet Migrated
-	public var extractProfileSnapshot: ExtractProfileSnapshot
-	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
 	// MARK: OBSOLETE (remove)
 	public var createUnsavedVirtualEntity: CreateUnsavedVirtualEntity

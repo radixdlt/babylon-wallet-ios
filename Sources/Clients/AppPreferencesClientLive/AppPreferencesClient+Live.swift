@@ -11,6 +11,12 @@ extension AppPreferencesClient: DependencyKey {
 				try await profileStore.updating {
 					$0.appPreferences = newPreferences
 				}
+			},
+			extractProfileSnapshot: {
+				await profileStore.profile.snapshot()
+			},
+			deleteProfileAndFactorSources: {
+				try await profileStore.deleteProfile()
 			}
 		)
 	}

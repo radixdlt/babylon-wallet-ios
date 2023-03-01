@@ -6,12 +6,22 @@ public struct AppPreferencesClient: Sendable {
 	public var loadPreferences: LoadPreferences
 	public var savePreferences: SavePreferences
 
+	// FIXME: find a better home for this...? Should we have some actual `ProfileSnapshotClient`
+	// for this and `delete` method?
+	public var extractProfileSnapshot: ExtractProfileSnapshot
+	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
+
 	public init(
 		loadPreferences: @escaping LoadPreferences,
-		savePreferences: @escaping SavePreferences
+		savePreferences: @escaping SavePreferences,
+		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
+		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot
 	) {
 		self.loadPreferences = loadPreferences
 		self.savePreferences = savePreferences
+
+		self.extractProfileSnapshot = extractProfileSnapshot
+		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
 	}
 }
 
@@ -19,7 +29,11 @@ public struct AppPreferencesClient: Sendable {
 extension AppPreferencesClient {
 	public typealias LoadPreferences = @Sendable () async -> AppPreferences
 	public typealias SavePreferences = @Sendable (AppPreferences) async throws -> Void
+	public typealias ExtractProfileSnapshot = @Sendable () async throws -> ProfileSnapshot
+	public typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
+}
 
+extension AppPreferencesClient {
 	/// Syntactic sugar for:
 	///      var copy = try await loadPreferences()
 	///      try await mutatePreferences(&copy)

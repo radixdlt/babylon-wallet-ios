@@ -115,8 +115,8 @@ private extension ProfileStoreTests {
 						profile = newEphemeral.profile
 						XCTAssertNoDifference(newEphemeral.privateFactorSource.mnemonicWithPassphrase, privateFactor.mnemonicWithPassphrase)
 					case let .ephemeral(ephemeral):
-						XCTAssertNoDifference(ephemeral.profile, profile)
-						XCTAssertNoDifference(ephemeral.privateFactorSource.mnemonicWithPassphrase, privateFactor.mnemonicWithPassphrase)
+						XCTAssertNoDifference(ephemeral.private.profile, profile)
+						XCTAssertNoDifference(ephemeral.private.privateFactorSource.mnemonicWithPassphrase, privateFactor.mnemonicWithPassphrase)
 					case let .persisted(persistedProfile):
 
 						XCTAssertNoDifference(
