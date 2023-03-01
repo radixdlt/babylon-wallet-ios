@@ -54,7 +54,7 @@ jobs:
       - name: "Install additional deps"
         run: |
           echo "${{ secrets.FASTLANE_SECRETS }}" | base64 --decode > fastlane/.env.secret
-          brew install xcbeautify
+          # brew install xcbeautify
 
       - name: "Unit tests (debug)"
         run: bundle exec fastlane ios tests
