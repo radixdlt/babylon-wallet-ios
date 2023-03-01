@@ -16,6 +16,6 @@ public struct P2PClientsClient: Sendable {
 }
 
 extension P2PClientsClient {
-	public typealias GetP2PClients = @Sendable () async throws -> P2PClients
+	public typealias GetP2PClients = @Sendable () async -> P2PClients
 	public typealias AddP2PClient = @Sendable (P2PClient) async throws -> Void
 }

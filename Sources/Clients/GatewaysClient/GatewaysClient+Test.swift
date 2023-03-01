@@ -12,17 +12,15 @@ extension GatewaysClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 
 	public static let noop = Self(
-		getCurrentNetworkID: { fatalError() },
-		getGatewayAPIEndpointBaseURL: { fatalError() },
-		getGateways: { .init(current: .nebunet) },
+		getAllGateways: { fatalError() },
+		getCurrentGateway: { fatalError() },
 		addGateway: { _ in },
 		changeGateway: { _ in }
 	)
 
 	public static let testValue = Self(
-		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
-		getGatewayAPIEndpointBaseURL: unimplemented("\(Self.self).getGatewayAPIEndpointBaseURL"),
-		getGateways: unimplemented("\(Self.self).getGateways"),
+		getAllGateways: unimplemented("\(Self.self).getAllGateways"),
+		getCurrentGateway: unimplemented("\(Self.self).getCurrentGateway"),
 		addGateway: unimplemented("\(Self.self).addGateway"),
 		changeGateway: unimplemented("\(Self.self).changeGateway")
 	)

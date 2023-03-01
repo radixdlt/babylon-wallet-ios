@@ -18,6 +18,7 @@
 		E62B6BF62965C1AD00AA08E4 /* P2PConnectivityClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF52965C1AD00AA08E4 /* P2PConnectivityClient */; };
 		E62B6BFA2965C1AD00AA08E4 /* TransactionClient in Frameworks */ = {isa = PBXBuildFile; productRef = E62B6BF92965C1AD00AA08E4 /* TransactionClient */; };
 		E636FA8E29AF983A00BA2540 /* P2PClientsClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E636FA8D29AF983A00BA2540 /* P2PClientsClientLive */; };
+		E636FA9329AFA39900BA2540 /* GatewaysClientLive in Frameworks */ = {isa = PBXBuildFile; productRef = E636FA9229AFA39900BA2540 /* GatewaysClientLive */; };
 		E667FFD328F6F7ED0015544F /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = E667FFD228F6F7ED0015544F /* AppFeature */; };
 		E6805BCD286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
 		E6805BCE286DB3ED00861180 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6805BBD286DB3EC00861180 /* WalletApp.swift */; };
@@ -74,6 +75,7 @@
 				E6E2FC2529AF8A2E001BEA5B /* OnboardingClientLive in Frameworks */,
 				E62B6BD62965C15100AA08E4 /* P2PConnectivityClient in Frameworks */,
 				E636FA8E29AF983A00BA2540 /* P2PClientsClientLive in Frameworks */,
+				E636FA9329AFA39900BA2540 /* GatewaysClientLive in Frameworks */,
 				E6BAFFBB2976CA6B00E4B1C5 /* ProfileClientLive in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -233,6 +235,7 @@
 				E6E2FC2429AF8A2E001BEA5B /* OnboardingClientLive */,
 				E6E2FC2629AF8A2E001BEA5B /* PersonasClientLive */,
 				E636FA8D29AF983A00BA2540 /* P2PClientsClientLive */,
+				E636FA9229AFA39900BA2540 /* GatewaysClientLive */,
 			);
 			productName = "Wallet (iOS)";
 			productReference = E6805BC4286DB3ED00861180 /* Radix Wallet Dev.app */;
@@ -636,6 +639,10 @@
 		E636FA8D29AF983A00BA2540 /* P2PClientsClientLive */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = P2PClientsClientLive;
+		};
+		E636FA9229AFA39900BA2540 /* GatewaysClientLive */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = GatewaysClientLive;
 		};
 		E667FFD228F6F7ED0015544F /* AppFeature */ = {
 			isa = XCSwiftPackageProductDependency;

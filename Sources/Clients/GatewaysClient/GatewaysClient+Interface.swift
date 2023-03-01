@@ -3,33 +3,38 @@ import Profile
 
 // MARK: - GatewaysClient
 public struct GatewaysClient: Sendable {
-	public var getCurrentNetworkID: GetCurrentNetworkID
-	public var getGatewayAPIEndpointBaseURL: GetGatewayAPIEndpointBaseURL
-	public var getGateways: GetGateways
+	public var getAllGateways: GetAllGateways
+	public var getCurrentGateway: GetCurrentGateway
 	public var addGateway: AddGateway
 	public var changeGateway: ChangeGateway
 
 	public init(
-		getCurrentNetworkID: @escaping GetCurrentNetworkID,
-		getGatewayAPIEndpointBaseURL: @escaping GetGatewayAPIEndpointBaseURL,
-		getGateways: @escaping GetGateways,
+		getAllGateways: @escaping GetAllGateways,
+		getCurrentGateway: @escaping GetCurrentGateway,
 		addGateway: @escaping AddGateway,
 		changeGateway: @escaping ChangeGateway
 	) {
-		self.getCurrentNetworkID = getCurrentNetworkID
-		self.getGatewayAPIEndpointBaseURL = getGatewayAPIEndpointBaseURL
-		self.getGateways = getGateways
+		self.getAllGateways = getAllGateways
+		self.getCurrentGateway = getCurrentGateway
 		self.addGateway = addGateway
 		self.changeGateway = changeGateway
 	}
 }
 
 extension GatewaysClient {
-	public typealias GetGatewayAPIEndpointBaseURL = @Sendable () async -> URL
-	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
+	public typealias GetCurrentGateway = @Sendable () async -> Gateway
+	public typealias GetAllGateways = @Sendable () async -> Gateways.Elements
 
 	public typealias AddGateway = @Sendable (Gateway) async throws -> Void
 	public typealias ChangeGateway = @Sendable (Gateway) async throws -> Void
+}
 
-	public typealias GetGateways = @Sendable () async -> Gateways
+extension GatewaysClient {
+	public func getCurrentNetworkID() async -> NetworkID {
+		await getCurrentGateway().network.id
+	}
+
+	public func getGatewayAPIEndpointBaseURL() async -> URL {
+		await getCurrentGateway().url
+	}
 }
