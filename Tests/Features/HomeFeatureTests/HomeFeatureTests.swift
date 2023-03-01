@@ -1,6 +1,6 @@
 import AccountDetailsFeature
 import AccountListFeature
-import AccountPortfolio
+import AccountPortfolioFetcherClient
 import FeatureTestingPrelude
 import FungibleTokenListFeature
 @testable import HomeFeature

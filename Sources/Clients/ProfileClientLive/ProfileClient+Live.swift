@@ -134,7 +134,7 @@ extension ProfileClient {
 				// not allowed to be persisted to keychain.
 				await profileHolder.injectProfile(profile, isEphemeral: true)
 
-				return EphemeralPrivateProfile(privateFactorSource: privateFactorSource, profile: profile)
+				return Profile.Ephemeral.Private(privateFactorSource: privateFactorSource, profile: profile)
 			},
 			injectProfileSnapshot: { snapshot in
 				let profile = try Profile(snapshot: snapshot)

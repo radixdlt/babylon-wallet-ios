@@ -83,7 +83,7 @@ extension View {
 	// NB: this function is split out from the body so the compiler doesn't choke
 	// ("... compiler is unable to type-check this expression in reasonable time...").
 	//
-	// Maybe the new result builder performance improvements in Swift 5.8 will correct this.œ
+	// Maybe the new result builder performance improvements in Swift 5.8 will correct this.
 	@MainActor
 	fileprivate func navigationDestinations(
 		with store: StoreOf<AppSettings>,

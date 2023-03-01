@@ -70,8 +70,14 @@ extension AppPreferences {
 		/// Which fiat currency the prices are measured in, e.g. EUR.
 		public var fiatCurrencyPriceTarget: FiatCurrency
 
-		public init(fiatCurrencyPriceTarget: FiatCurrency = .usd) {
+		public var isCurrencyAmountVisible: Bool
+
+		public init(
+			fiatCurrencyPriceTarget: FiatCurrency = .usd,
+			isCurrencyAmountVisible: Bool = true
+		) {
 			self.fiatCurrencyPriceTarget = fiatCurrencyPriceTarget
+			self.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
 	}
 }

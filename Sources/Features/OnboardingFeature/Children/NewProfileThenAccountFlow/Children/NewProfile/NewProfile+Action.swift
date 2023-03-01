@@ -31,7 +31,7 @@ extension NewProfile.Action {
 // MARK: - NewProfile.Action.SystemAction
 extension NewProfile.Action {
 	public enum SystemAction: Sendable, Equatable {
-		case createEphemeralPrivateProfileResult(TaskResult<EphemeralPrivateProfile>)
+		case createEphemeralPrivateProfileResult(TaskResult<Profile.Ephemeral.Private>)
 	}
 }
 
@@ -39,6 +39,6 @@ extension NewProfile.Action {
 extension NewProfile.Action {
 	public enum DelegateAction: Sendable, Equatable {
 		case criticalFailureCouldNotCreateProfile
-		case createdEphemeralPrivateProfile(EphemeralPrivateProfile)
+		case createdEphemeralPrivateProfile(Profile.Ephemeral.Private)
 	}
 }

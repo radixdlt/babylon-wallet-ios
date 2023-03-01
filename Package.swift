@@ -28,7 +28,7 @@ package.addModules([
 	.feature(
 		name: "AccountListFeature",
 		dependencies: [
-			"AccountPortfolio",
+			"AccountPortfolioFetcherClient",
 			"FungibleTokenListFeature",
 		],
 		tests: .yes()
@@ -48,8 +48,8 @@ package.addModules([
 	.feature(
 		name: "AppFeature",
 		dependencies: [
-			"AccountPortfolio",
-			"AppSettings",
+			"AccountPortfolioFetcherClient",
+			"AppPreferencesClient",
 			"MainFeature",
 			"OnboardingFeature",
 			"ProfileClient",
@@ -118,8 +118,8 @@ package.addModules([
 		dependencies: [
 			"AccountDetailsFeature",
 			"AccountListFeature",
-			"AccountPortfolio",
-			"AppSettings",
+			"AccountPortfolioFetcherClient",
+			"AppPreferencesClient",
 			"CreateEntityFeature",
 			"ProfileClient",
 		],
@@ -140,8 +140,8 @@ package.addModules([
 	.feature(
 		name: "MainFeature",
 		dependencies: [
-			"AppSettings",
-			"AccountPortfolio",
+			"AppPreferencesClient",
+			"AccountPortfolioFetcherClient",
 			"DappInteractionFeature",
 			"HomeFeature",
 			"SettingsFeature",
@@ -212,7 +212,7 @@ package.addModules([
 		name: "SplashFeature",
 		dependencies: [
 			"LocalAuthenticationClient",
-			"ProfileClient",
+			"OnboardingClient",
 		],
 		tests: .yes()
 	),
@@ -245,18 +245,26 @@ package.addModules([
 		tests: .yes()
 	),
 	.client(
-		name: "AccountPortfolio",
+		name: "AccountPortfolioFetcherClient",
 		dependencies: [
-			"AppSettings",
-			"EngineToolkitClient",
 			"GatewayAPI",
-			"ProfileClient",
 		],
 		tests: .yes()
 	),
+
 	.client(
-		name: "AppSettings",
-		dependencies: [],
+		name: "AppPreferencesClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "AppPreferencesClientLive",
+		dependencies: [
+			"AppPreferencesClient",
+			"ProfileStore",
+		],
 		tests: .yes()
 	),
 	.client(
@@ -273,6 +281,23 @@ package.addModules([
 		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "FactorSourcesClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "FactorSourcesClientLive",
+		dependencies: [
+			"FactorSourcesClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "FaucetClient",
 		dependencies: [
@@ -303,6 +328,24 @@ package.addModules([
 		dependencies: [],
 		tests: .yes()
 	),
+
+	.client(
+		name: "OnboardingClient",
+		dependencies: [
+			"Profile",
+			"Cryptography",
+		],
+		tests: .no
+	),
+	.client(
+		name: "OnboardingClientLive",
+		dependencies: [
+			"OnboardingClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "P2PConnectivityClient",
 		dependencies: [
@@ -311,6 +354,23 @@ package.addModules([
 		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "PersonasClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "PersonasClientLive",
+		dependencies: [
+			"PersonasClient",
+			"ProfileStore",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "ProfileClient",
 		dependencies: [
@@ -354,7 +414,7 @@ package.addModules([
 			"EngineToolkitClient",
 			"GatewayAPI",
 			"ProfileClient",
-			"AccountPortfolio",
+			"AccountPortfolioFetcherClient",
 			"UseFactorSourceClient",
 			"SecureStorageClient",
 		],

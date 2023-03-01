@@ -136,10 +136,10 @@ extension ProfileClient {
 
 	public typealias GetGateways = @Sendable () async -> Gateways
 
-	public typealias CreateEphemeralPrivateProfile = @Sendable (CreateEphemeralPrivateProfileRequest) async throws -> EphemeralPrivateProfile
+	public typealias CreateEphemeralPrivateProfile = @Sendable (CreateEphemeralPrivateProfileRequest) async throws -> Profile.Ephemeral.Private
 
 	public typealias InjectProfileSnapshot = @Sendable (ProfileSnapshot) async throws -> Void
-	public typealias CommitEphemeralPrivateProfile = @Sendable (EphemeralPrivateProfile) async throws -> Void
+	public typealias CommitEphemeralPrivateProfile = @Sendable (Profile.Ephemeral.Private) async throws -> Void
 
 	public typealias DeleteProfileSnapshot = @Sendable () async throws -> Void
 

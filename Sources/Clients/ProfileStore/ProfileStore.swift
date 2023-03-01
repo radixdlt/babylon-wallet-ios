@@ -76,14 +76,17 @@ extension ProfileStore {
 		/// checked Secure Storage for an potentially existing stored
 		/// profile, which require an async Task to be done at end of
 		/// init (which will complete after init is done).
-		case newWithEphemeral(EphemeralPrivateProfile)
+		case newWithEphemeral(Profile.Ephemeral.Private)
 
+		/// If data was found but failed to deserialize it `loadFailure` will
+		/// be present.
+		///
 		/// The state during onboarding flow until the user has finished
 		/// creating her first account. As long as the current state is
 		/// `ephemeral`, no data has been persisted into secure storage,
 		/// and both the Profile and the private factor source can safely
 		/// be discarded.
-		case ephemeral(EphemeralPrivateProfile)
+		case ephemeral(Profile.Ephemeral)
 
 		/// When the async Task that loads profile - if any - from secure
 		/// storage completes and indeed a profile was found, the state
@@ -100,6 +103,13 @@ extension ProfileStore {
 
 	/// The current network with a non empty set of accounts.
 	public var network: OnNetwork { profile.network }
+
+	public var ephemeral: Profile.Ephemeral? {
+		switch profileStateSubject.value {
+		case let .ephemeral(ephemeral): return ephemeral
+		case .newWithEphemeral, .persisted: return nil
+		}
+	}
 
 	/// A multicasting replaying async sequence of distinct Profile.
 	public func values() async -> AnyAsyncSequence<Profile> {
@@ -141,7 +151,7 @@ extension ProfileStore {
 		ephemeral.update(deviceDescription: deviceDescription)
 
 		do {
-			try await secureStorageClient.save(ephemeral: ephemeral)
+			try await secureStorageClient.save(ephemeral: ephemeral.private)
 		} catch {
 			let errorMessage = "Critical failure, unable to save profile snapshot: \(String(describing: error))"
 			loggerGlobal.critical(.init(stringLiteral: errorMessage))
@@ -152,7 +162,7 @@ extension ProfileStore {
 			throw error
 		}
 
-		changeState(to: .persisted(ephemeral.profile))
+		changeState(to: .persisted(ephemeral.private.profile))
 	}
 
 	/// Syntactic sugar for:
@@ -217,7 +227,7 @@ extension ProfileStore.ProfileState {
 	fileprivate var profile: Profile {
 		switch self {
 		case let .newWithEphemeral(ephemeral): return ephemeral.profile
-		case let .ephemeral(ephemeral): return ephemeral.profile
+		case let .ephemeral(ephemeral): return ephemeral.private.profile
 		case let .persisted(profile): return profile
 		}
 	}
@@ -260,7 +270,7 @@ extension ProfileStore {
 			)
 			let privateFactorSource = try PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: factorSource)
 			let profile = Profile(factorSource: factorSource)
-			let ephemeral = EphemeralPrivateProfile(privateFactorSource: privateFactorSource, profile: profile)
+			let ephemeral = Profile.Ephemeral.Private(privateFactorSource: privateFactorSource, profile: profile)
 			return .newWithEphemeral(ephemeral)
 		} catch {
 			let errorMessage = "CRITICAL ERROR, failed to create Mnemonic or FactorSource during init of ProfileStore. Unable to use app: \(String(describing: error))"
@@ -271,20 +281,92 @@ extension ProfileStore {
 
 	private func restoreFromSecureStorageIfAble() async {
 		@Dependency(\.jsonDecoder) var jsonDecoder
+		@Dependency(\.errorQueue) var errorQueue
+
 		guard case let .newWithEphemeral(ephemeral) = profileStateSubject.value else {
 			let errorMsg = "Incorrect implementation: `\(#function)` was called when \(Self.self) was in the wrong state, expected state was: '\(String(describing: ProfileState.Discriminator.newWithEphemeral))' but was in state: '\(String(describing: profileStateSubject.value.discriminator))'"
 			loggerGlobal.critical(.init(stringLiteral: errorMsg))
 			assertionFailure(errorMsg)
 			return
 		}
-		guard
-			let existing = try? await secureStorageClient.loadProfile()
-		else {
-			changeState(to: .ephemeral(ephemeral))
-			return
+
+		@Sendable func load() async -> Swift.Result<Profile?, Profile.LoadingFailure> {
+			guard
+				let profileSnapshotData = try? await secureStorageClient.loadProfileSnapshotData()
+			else {
+				return .success(nil)
+			}
+
+			let decodedVersion: ProfileSnapshot.Version
+			do {
+				decodedVersion = try ProfileSnapshot.Version.fromJSON(
+					data: profileSnapshotData,
+					jsonDecoder: jsonDecoder()
+				)
+			} catch {
+				return .failure(
+					.decodingFailure(
+						json: profileSnapshotData,
+						.known(.noProfileSnapshotVersionFoundInJSON
+						)
+					)
+				)
+			}
+
+			do {
+				try ProfileSnapshot.validateCompatibility(version: decodedVersion)
+			} catch {
+				// Incompatible Versions
+				return .failure(.profileVersionOutdated(
+					json: profileSnapshotData,
+					version: decodedVersion
+				))
+			}
+
+			let profileSnapshot: ProfileSnapshot
+			do {
+				profileSnapshot = try jsonDecoder().decode(ProfileSnapshot.self, from: profileSnapshotData)
+			} catch let decodingError as Swift.DecodingError {
+				return .failure(.decodingFailure(
+					json: profileSnapshotData,
+					.known(.decodingError(.init(decodingError: decodingError)))
+				)
+				)
+			} catch {
+				return .failure(.decodingFailure(
+					json: profileSnapshotData,
+					.unknown(.init(error: error))
+				))
+			}
+
+			let profile: Profile
+			do {
+				profile = try Profile(snapshot: profileSnapshot)
+			} catch {
+				return .failure(.failedToCreateProfileFromSnapshot(
+					.init(
+						version: profileSnapshot.version,
+						error: error
+					))
+				)
+			}
+
+			return .success(profile)
 		}
 
-		changeState(to: .persisted(existing))
+		@Sendable func newState(from loadProfileResult: Swift.Result<Profile?, Profile.LoadingFailure>) -> ProfileState {
+			switch loadProfileResult {
+			case let .success(.some(existing)):
+				return .persisted(existing)
+			case .success(.none):
+				return .ephemeral(.init(private: ephemeral, loadFailure: nil))
+			case let .failure(loadFailure):
+				return .ephemeral(.init(private: ephemeral, loadFailure: loadFailure))
+			}
+		}
+
+		let newState = await newState(from: load())
+		changeState(to: newState)
 	}
 
 	private func isInitialized() async throws {

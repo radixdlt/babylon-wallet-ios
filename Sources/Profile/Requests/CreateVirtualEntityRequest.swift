@@ -8,7 +8,7 @@ import Prelude
 public enum GenesisFactorInstanceDerivationStrategy: Sendable, Hashable {
 	case loadMnemonicFromKeychainForFactorSource(FactorSource)
 
-	case useEphemeralPrivateProfile(EphemeralPrivateProfile)
+	case useEphemeralPrivateProfile(Profile.Ephemeral.Private)
 
 	public var factorSource: FactorSource {
 		switch self {

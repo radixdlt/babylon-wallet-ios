@@ -66,16 +66,6 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AccountPortfolioTests"
-               BuildableName = "AccountPortfolioTests"
-               BlueprintName = "AccountPortfolioTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
                BlueprintIdentifier = "AccountPreferencesFeatureTests"
                BuildableName = "AccountPreferencesFeatureTests"
                BlueprintName = "AccountPreferencesFeatureTests"
@@ -99,16 +89,6 @@
                BlueprintIdentifier = "AppFeatureTests"
                BuildableName = "AppFeatureTests"
                BlueprintName = "AppFeatureTests"
-               ReferencedContainer = "container:">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AppSettingsTests"
-               BuildableName = "AppSettingsTests"
-               BlueprintName = "AppSettingsTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
@@ -449,6 +429,56 @@
                BlueprintIdentifier = "AccountsClientLiveTests"
                BuildableName = "AccountsClientLiveTests"
                BlueprintName = "AccountsClientLiveTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "OnboardingClientLiveTests"
+               BuildableName = "OnboardingClientLiveTests"
+               BlueprintName = "OnboardingClientLiveTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AccountPortfolioFetcherClientTests"
+               BuildableName = "AccountPortfolioFetcherClientTests"
+               BlueprintName = "AccountPortfolioFetcherClientTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "AppPreferencesClientLiveTests"
+               BuildableName = "AppPreferencesClientLiveTests"
+               BlueprintName = "AppPreferencesClientLiveTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FactorSourcesClientLiveTests"
+               BuildableName = "FactorSourcesClientLiveTests"
+               BlueprintName = "FactorSourcesClientLiveTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "PersonasClientLiveTests"
+               BuildableName = "PersonasClientLiveTests"
+               BlueprintName = "PersonasClientLiveTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>

@@ -153,7 +153,7 @@ extension SecureStorageClient {
 	}
 
 	/// Either saves both mnemonic AND profile snapshot, or neither.
-	public func save(ephemeral: EphemeralPrivateProfile) async throws {
+	public func save(ephemeral: Profile.Ephemeral.Private) async throws {
 		try await saveMnemonicForFactorSource(ephemeral.privateFactorSource)
 
 		do {

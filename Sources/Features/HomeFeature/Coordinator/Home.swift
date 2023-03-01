@@ -1,7 +1,7 @@
 import AccountDetailsFeature
 import AccountListFeature
-import AccountPortfolio
-import AppSettings
+import AccountPortfolioFetcherClient
+import AppPreferencesClient
 import CreateEntityFeature
 import FeaturePrelude
 import FungibleTokenListFeature
@@ -10,7 +10,7 @@ import ProfileClient
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var accountPortfolioDictionary: AccountPortfolioDictionary
+		public var accountPortfolios: IdentifiedArrayOf<AccountPortfolio>
 
 		// MARK: - Components
 		public var header: Header.State
@@ -21,12 +21,12 @@ public struct Home: Sendable, FeatureReducer {
 		public var destination: Destinations.State?
 
 		public init(
-			accountPortfolioDictionary: AccountPortfolioDictionary = [:],
+			accountPortfolios: IdentifiedArrayOf<AccountPortfolio> = .init(),
 			header: Header.State = .init(),
 			accountList: AccountList.State = .init(accounts: []),
 			destination: Destinations.State? = nil
 		) {
-			self.accountPortfolioDictionary = accountPortfolioDictionary
+			self.accountPortfolios = accountPortfolios
 			self.header = header
 			self.accountList = accountList
 			self.destination = destination
@@ -41,10 +41,10 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case accountsLoadedResult(TaskResult<OnNetwork.Accounts>)
-		case appSettingsLoadedResult(TaskResult<AppSettings>)
+		case appPreferencesLoadedResult(TaskResult<AppPreferences>)
 		case isCurrencyAmountVisibleLoaded(Bool)
-		case fetchPortfolioResult(TaskResult<AccountPortfolioDictionary>)
-		case accountPortfolioResult(TaskResult<AccountPortfolioDictionary>)
+		case accountPortfoliosResult(TaskResult<IdentifiedArrayOf<AccountPortfolio>>)
+		case singleAccountPortfolioResult(TaskResult<AccountPortfolio>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -91,8 +91,8 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
-	@Dependency(\.appSettingsClient) var appSettingsClient
+	@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.profileClient) var profileClient
 
@@ -143,17 +143,17 @@ public struct Home: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .appSettingsLoadedResult(.success(appSettings)):
+		case let .appPreferencesLoadedResult(.success(appPreferences)):
 			// FIXME: Replace currency with value from Profile!
-			let currency = appSettings.currency
+			let currency = appPreferences.display.fiatCurrencyPriceTarget
 			state.accountList.accounts.forEach {
 				state.accountList.accounts[id: $0.address]?.currency = currency
 			}
 			return .run { send in
-				await send(.internal(.isCurrencyAmountVisibleLoaded(appSettings.isCurrencyAmountVisible)))
+				await send(.internal(.isCurrencyAmountVisibleLoaded(appPreferences.display.isCurrencyAmountVisible)))
 			}
 
-		case let .appSettingsLoadedResult(.failure(error)):
+		case let .appPreferencesLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 
@@ -173,19 +173,21 @@ public struct Home: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .fetchPortfolioResult(.success(totalPortfolio)):
-			state.accountPortfolioDictionary = totalPortfolio
-			state.accountList.accounts.forEach {
-				let accountPortfolio = totalPortfolio[$0.address] ?? AccountPortfolio.empty
-				state.accountList.accounts[id: $0.address]?.portfolio = accountPortfolio
+		case let .accountPortfoliosResult(.success(accountPortfolios)):
+			state.accountPortfolios = accountPortfolios
+			state.accountList.accounts.forEach { account in
+				let address = account.address
+				let accountPortfolio = accountPortfolios[id: address] ?? AccountPortfolio.empty(owner: address)
+				state.accountList.accounts[id: address]?.portfolio = accountPortfolio
 			}
 
 			// account details
 			if let details = state.destination?.accountDetails {
 				let account = details.account
+				let address = account.address
 
 				// asset list
-				let accountPortfolio = totalPortfolio[account.address] ?? AccountPortfolio.empty
+				let accountPortfolio = accountPortfolios[id: address] ?? AccountPortfolio.empty(owner: address)
 				let categories = accountPortfolio.fungibleTokenContainers.elements.sortedIntoCategories()
 
 				state.destination?.accountDetails?.assets = .init(
@@ -206,18 +208,17 @@ public struct Home: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .fetchPortfolioResult(.failure(error)):
+		case let .accountPortfoliosResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 
-		case let .accountPortfolioResult(.success(accountPortfolio)):
-			guard let key = accountPortfolio.first?.key else { return .none }
-			state.accountPortfolioDictionary[key] = accountPortfolio.first?.value
-			return .run { [portfolio = state.accountPortfolioDictionary] send in
-				await send(.internal(.fetchPortfolioResult(.success(portfolio))))
+		case let .singleAccountPortfolioResult(.success(accountPortfolio)):
+			state.accountPortfolios[id: accountPortfolio.owner] = accountPortfolio
+			return .run { [accountPortfolios = state.accountPortfolios] send in
+				await send(.internal(.accountPortfoliosResult(.success(accountPortfolios))))
 			}
 
-		case let .accountPortfolioResult(.failure(error)):
+		case let .singleAccountPortfolioResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 		}
@@ -240,8 +241,8 @@ public struct Home: Sendable, FeatureReducer {
 		// this whole case is just plain awful, but hopefully only temporary until we introduce account streams.
 		case let .destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.delegate(.refreshAccount(address))))))))):
 			return .run { send in
-				await send(.internal(.accountPortfolioResult(TaskResult {
-					try await accountPortfolioFetcher.fetchPortfolio([address])
+				await send(.internal(.singleAccountPortfolioResult(TaskResult {
+					try await accountPortfolioFetcherClient.fetchPortfolioForAccount(address)
 				})))
 				await send(.child(.destination(.presented(.accountDetails(.child(.destination(.presented(.preferences(.internal(.system(.refreshAccountCompleted)))))))))))
 			}
@@ -268,18 +269,17 @@ public struct Home: Sendable, FeatureReducer {
 
 	private func refreshAccount(_ address: AccountAddress) -> EffectTask<Action> {
 		.run { send in
-			await send(.internal(.accountPortfolioResult(TaskResult {
-				try await accountPortfolioFetcher.fetchPortfolio([address])
+			await send(.internal(.singleAccountPortfolioResult(TaskResult {
+				try await accountPortfolioFetcherClient.fetchPortfolioForAccount(address)
 			})))
 		}
 	}
 
 	private func toggleCurrencyAmountVisible() -> EffectTask<Action> {
-		.run { send in
-			var isVisible = try await appSettingsClient.loadSettings().isCurrencyAmountVisible
-			isVisible.toggle()
-			try await appSettingsClient.saveIsCurrencyAmountVisible(isVisible)
-			await send(.internal(.isCurrencyAmountVisibleLoaded(isVisible)))
+		.run { _ in
+			try await appPreferencesClient.updatingDisplay {
+				$0.isCurrencyAmountVisible.toggle()
+			}
 		}
 	}
 
@@ -290,9 +290,9 @@ public struct Home: Sendable, FeatureReducer {
 					try await profileClient.getAccounts()
 				}
 			)))
-			await send(.internal(.appSettingsLoadedResult(
+			await send(.internal(.appPreferencesLoadedResult(
 				TaskResult {
-					try await appSettingsClient.loadSettings()
+					try await appPreferencesClient.loadPreferences()
 				}
 			)))
 		}
@@ -300,8 +300,8 @@ public struct Home: Sendable, FeatureReducer {
 
 	private func fetchPortfolio(_ accounts: some Collection<OnNetwork.Account> & Sendable) -> EffectTask<Action> {
 		.run { send in
-			await send(.internal(.fetchPortfolioResult(TaskResult {
-				try await accountPortfolioFetcher.fetchPortfolio(accounts.map(\.address))
+			await send(.internal(.accountPortfoliosResult(TaskResult {
+				try await accountPortfolioFetcherClient.fetchPortfolioForAccounts(accounts.map(\.address))
 			})))
 		}
 	}

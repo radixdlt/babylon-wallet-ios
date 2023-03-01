@@ -1,4 +1,4 @@
-import AccountPortfolio
+import AccountPortfolioFetcherClient
 import ClientPrelude
 import Cryptography
 import EngineToolkitClient
@@ -14,7 +14,7 @@ extension TransactionClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.profileClient) var profileClient
-		@Dependency(\.accountPortfolioFetcher) var accountPortfolioFetcher
+		@Dependency(\.accountPortfolioFetcherClient) var accountPortfolioFetcherClient
 		@Dependency(\.useFactorSourceClient) var useFactorSourceClient
 
 		let pollStrategy: PollStrategy = .default
@@ -346,7 +346,7 @@ extension TransactionClient {
 					let accountAddressesSuitableToPayTransactionFeeRef =
 						try engineToolkitClient.accountAddressesSuitableToPayTransactionFee(accountsSuitableToPayForTXFeeRequest)
 
-					let xrdContainersOptionals = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { await accountPortfolioFetcher.fetchXRDBalance(of: $0, on: networkID) }
+					let xrdContainersOptionals = await accountAddressesSuitableToPayTransactionFeeRef.concurrentMap { await accountPortfolioFetcherClient.fetchXRDBalance(of: $0, on: networkID) }
 					let xrdContainers = xrdContainersOptionals.compactMap { $0 }
 					let firstWithEnoughFunds = xrdContainers.first(where: { $0.amount >= lockFeeAmount })?.owner
 

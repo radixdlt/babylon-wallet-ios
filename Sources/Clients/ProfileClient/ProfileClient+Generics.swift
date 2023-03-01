@@ -3,7 +3,7 @@ import Profile
 
 extension ProfileClient {
 	public func createNewUnsavedVirtualEntity<Entity: EntityProtocol & Sendable>(
-		request: CreateVirtualEntityRequestProtocol
+		request: CreateVirtualEntityRequest
 	) async throws -> Entity {
 		guard Entity.entityKind == request.entityKind else {
 			throw DiscrepancyBetweenSpecifiedEntityKindInRequestAndGenericTypeArgument()

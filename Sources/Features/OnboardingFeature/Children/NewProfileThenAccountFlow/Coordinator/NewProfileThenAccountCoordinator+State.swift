@@ -11,11 +11,11 @@ extension NewProfileThenAccountCoordinator {
 		}
 
 		public var step: Step
-		public var ephemeralPrivateProfile: EphemeralPrivateProfile?
+		public var ephemeralPrivateProfile: Profile.Ephemeral.Private?
 
 		public init(
 			step: Step = .newProfile(.init()),
-			ephemeralPrivateProfile: EphemeralPrivateProfile? = nil
+			ephemeralPrivateProfile: Profile.Ephemeral.Private? = nil
 		) {
 			self.step = step
 			self.ephemeralPrivateProfile = ephemeralPrivateProfile
