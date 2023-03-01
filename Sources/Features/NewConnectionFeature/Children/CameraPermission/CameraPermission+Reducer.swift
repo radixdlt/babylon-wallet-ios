@@ -57,9 +57,7 @@ public struct CameraPermission: Sendable, FeatureReducer {
 		case let .permissionDeniedAlert(.presented(action)):
 			switch action {
 			case .cancelButtonTapped:
-				return .run { send in
-					await send(.delegate(.permissionResponse(false)))
-				}
+				return .send(.delegate(.permissionResponse(false)))
 			case .openSettingsButtonTapped:
 				return .run { send in
 					await send(.delegate(.permissionResponse(false)))
