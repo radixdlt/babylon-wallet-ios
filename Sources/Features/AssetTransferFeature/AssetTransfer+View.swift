@@ -1,14 +1,54 @@
 import FeaturePrelude
 import TransactionSigningFeature
 
+extension AssetTransfer.State {
+	fileprivate var viewState: AssetTransfer.ViewState {
+		.init(
+			input: .init(
+				fromAddress: .init(
+					address: from.address.address,
+					format: .default
+				),
+				amount: amount?.value ?? "",
+				toAddress: to?.address.address ?? ""
+			),
+			output: {
+				if
+					let amount = amount,
+					let toAddress = to?.address
+				{
+					return .init(amount: amount, toAddress: toAddress)
+				} else {
+					return nil
+				}
+			}()
+		)
+	}
+}
+
 // MARK: - AssetTransfer.View
 extension AssetTransfer {
+	public struct ViewState: Equatable {
+		struct Input: Equatable {
+			let fromAddress: AddressView.ViewState
+			let amount: String
+			let toAddress: String
+		}
+
+		struct Output: Equatable {
+			let amount: Decimal_
+			let toAddress: AccountAddress
+		}
+
+		let input: Input
+		let output: Output?
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
-		public typealias Store = ComposableArchitecture.Store<State, Action>
-		private let store: Store
+		private let store: StoreOf<AssetTransfer>
 
-		public init(store: Store) {
+		public init(store: StoreOf<AssetTransfer>) {
 			self.store = store
 		}
 	}
@@ -16,11 +56,7 @@ extension AssetTransfer {
 
 extension AssetTransfer.View {
 	public var body: some View {
-		WithViewStore(
-			store,
-			observe: ViewState.init(state:),
-			send: { .view($0) }
-		) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			NavigationView {
 				Form {
 					VStack(alignment: .leading) {
@@ -81,48 +117,6 @@ extension AssetTransfer.View {
 			#if os(iOS)
 			.navigationViewStyle(.stack)
 			#endif
-		}
-	}
-}
-
-// MARK: - AssetTransfer.View.ViewState
-extension AssetTransfer.View {
-	// MARK: ViewState
-
-	struct ViewState: Equatable {
-		struct Input: Equatable {
-			let fromAddress: AddressView.ViewState
-			let amount: String
-			let toAddress: String
-		}
-
-		struct Output: Equatable {
-			let amount: Decimal_
-			let toAddress: AccountAddress
-		}
-
-		let input: Input
-		let output: Output?
-
-		init(state: AssetTransfer.State) {
-			self.input = .init(
-				fromAddress: .init(
-					address: state.from.address.address,
-					format: .default
-				),
-				amount: state.amount?.value ?? "",
-				toAddress: state.to?.address.address ?? ""
-			)
-			self.output = {
-				if
-					let amount = state.amount,
-					let toAddress = state.to?.address
-				{
-					return .init(amount: amount, toAddress: toAddress)
-				} else {
-					return nil
-				}
-			}()
 		}
 	}
 }
