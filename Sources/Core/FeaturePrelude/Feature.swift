@@ -12,34 +12,22 @@ public protocol _FeatureReducer: ReducerProtocol where State: Sendable & Hashabl
 }
 
 // MARK: - FeatureAction
-public enum FeatureAction<
-	ViewAction: Sendable & Equatable,
-	InternalAction: Sendable & Equatable,
-	ChildAction: Sendable & Equatable,
-	DelegateAction: Sendable & Equatable
->: Sendable, Equatable {
-	case view(ViewAction)
-	case `internal`(InternalAction)
-	case child(ChildAction)
-	case delegate(DelegateAction)
+public enum FeatureAction<Feature: _FeatureReducer>: Sendable, Equatable {
+	case view(Feature.ViewAction)
+	case `internal`(Feature.InternalAction)
+	case child(Feature.ChildAction)
+	case delegate(Feature.DelegateAction)
 }
 
-public typealias ActionOf<Feature: _FeatureReducer> = FeatureAction<
-	Feature.ViewAction,
-	Feature.InternalAction,
-	Feature.ChildAction,
-	Feature.DelegateAction
->
-
 // MARK: - FeatureReducer
-public protocol FeatureReducer: _FeatureReducer where Action == ActionOf<Self> {
+public protocol FeatureReducer: _FeatureReducer where Action == FeatureAction<Self> {
 	func reduce(into state: inout State, viewAction: ViewAction) -> EffectTask<Action>
 	func reduce(into state: inout State, internalAction: InternalAction) -> EffectTask<Action>
 	func reduce(into state: inout State, childAction: ChildAction) -> EffectTask<Action>
 }
 
 extension ReducerProtocol where Self: FeatureReducer {
-	public typealias Action = ActionOf<Self>
+	public typealias Action = FeatureAction<Self>
 
 	public var body: some ReducerProtocolOf<Self> {
 		Reduce(core)
