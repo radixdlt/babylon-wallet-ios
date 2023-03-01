@@ -323,6 +323,23 @@ package.addModules([
 		],
 		tests: .yes()
 	),
+
+	.client(
+		name: "GatewaysClient",
+		dependencies: [
+			"Profile",
+		],
+		tests: .no
+	),
+	.client(
+		name: "GatewaysClientLive",
+		dependencies: [
+			"GatewaysClient",
+			"AppPreferencesClientLive",
+		],
+		tests: .yes()
+	),
+
 	.client(
 		name: "LocalAuthenticationClient",
 		dependencies: [],

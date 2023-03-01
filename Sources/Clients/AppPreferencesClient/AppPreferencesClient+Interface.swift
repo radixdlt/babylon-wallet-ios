@@ -17,7 +17,7 @@ public struct AppPreferencesClient: Sendable {
 
 // MARK: - Typealias
 extension AppPreferencesClient {
-	public typealias LoadPreferences = @Sendable () async throws -> AppPreferences
+	public typealias LoadPreferences = @Sendable () async -> AppPreferences
 	public typealias SavePreferences = @Sendable (AppPreferences) async throws -> Void
 
 	/// Syntactic sugar for:
@@ -27,7 +27,7 @@ extension AppPreferencesClient {
 	public func updating<T>(
 		_ mutatePreferences: @Sendable (inout AppPreferences) throws -> T
 	) async throws -> T {
-		var copy = try await loadPreferences()
+		var copy = await loadPreferences()
 		let result = try mutatePreferences(&copy)
 		try await savePreferences(copy)
 		return result // in many cases `Void`.
